@@ -11,8 +11,14 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://devskyy.app'),
   title: 'DevSkyy Dashboard',
   description: 'AI-driven multi-agent orchestration platform for enterprise e-commerce automation',
+  openGraph: {
+    siteName: 'DevSkyy',
+    locale: 'en_US',
+    type: 'website',
+  },
 }
 
 export default function RootLayout({

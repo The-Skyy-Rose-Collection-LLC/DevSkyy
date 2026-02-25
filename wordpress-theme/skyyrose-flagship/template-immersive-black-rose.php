@@ -105,7 +105,7 @@ $black_rose_rooms = array(
 			array(
 				'id'         => 'br-001',
 				'name'       => esc_html__( 'BLACK Rose Crewneck', 'skyyrose-flagship' ),
-				'price'      => 'DRAFT',
+				'price'      => '$35',
 				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
 				'sizes'      => 'S,M,L,XL,2XL,3XL',
 				'image'      => get_template_directory_uri() . '/assets/images/products/br-001-crewneck.jpg',
@@ -118,7 +118,7 @@ $black_rose_rooms = array(
 			array(
 				'id'         => 'br-008',
 				'name'       => esc_html__( "Women's BLACK Rose Hooded Dress", 'skyyrose-flagship' ),
-				'price'      => 'TBD',
+				'price'      => '$120',
 				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
 				'sizes'      => 'XS,S,M,L,XL,2XL',
 				'image'      => get_template_directory_uri() . '/assets/images/products/br-008-hooded-dress.jpg',
@@ -131,7 +131,7 @@ $black_rose_rooms = array(
 			array(
 				'id'         => 'br-003',
 				'name'       => esc_html__( 'BLACK is Beautiful Jersey', 'skyyrose-flagship' ),
-				'price'      => 'DRAFT',
+				'price'      => '$45',
 				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
 				'sizes'      => 'S,M,L,XL,2XL,3XL',
 				'image'      => get_template_directory_uri() . '/assets/images/products/br-003-jersey.jpg',

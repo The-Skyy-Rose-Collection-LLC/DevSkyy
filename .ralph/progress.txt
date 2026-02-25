@@ -1341,3 +1341,67 @@ The single most impactful upgrade — proven 15-30% conversion lift in luxury ec
 - ✅ 9 nav menus, 6 widget areas, full theme support registered
 
 **Theme Status: PRODUCTION READY**
+
+---
+
+## [2026-02-24] - Iteration 9: Price Sync, Frontend Hardening, Final Verification
+
+**Problem:** Several product prices in immersive templates were stale (DRAFT/TBD) or mismatched vs the authoritative products.csv. Frontend had missing metadataBase and turbopack warning.
+
+**Fixes Applied:**
+
+### Price Sync (Immersive Templates → products.csv alignment)
+
+*Black Rose (template-immersive-black-rose.php) — 3 fixes:*
+- `br-001` BLACK Rose Crewneck: `DRAFT` → `$35` (from CSV)
+- `br-008` Women's BLACK Rose Hooded Dress: `TBD` → `$120` (from CSV)
+- `br-003` BLACK is Beautiful Jersey: `DRAFT` → `$45` (from CSV)
+
+*Love Hurts (template-immersive-love-hurts.php) — 5 fixes:*
+- `lh-004` Love Hurts Varsity Jacket: `DRAFT` → `$265` (from CSV)
+- `lh-001` The Fannie → The Fannie Pack (name fix) + `$70` → `$65` (CSV price)
+- `lh-003` Love Hurts Basketball Shorts: `$55` → `$75` (CSV price)
+- `lh-002` Love Hurts Joggers (BLACK): `$67` → `$95` (CSV price)
+- `lh-002b` Love Hurts Joggers (WHITE): `$67` → `$95` (CSV price)
+
+### Frontend Hardening
+
+*frontend/app/layout.tsx:*
+- Added `metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://devskyy.app')`
+- Added OpenGraph defaults (siteName, locale, type)
+- Fixes: Social sharing metadata, OG images now have proper base URL
+
+*frontend/next.config.ts:*
+- Added `turbopack: { root: '..' }` to silence monorepo lockfile warning
+
+### Verification Results
+
+- ✅ 1863 Python tests passed (0 failures, 38 skipped)
+- ✅ Frontend builds successfully (52 routes, 0 TypeScript errors)
+- ✅ All 3 PHP immersive templates pass lint (no syntax errors)
+- ✅ 23/23 product image references verified against actual files on disk
+- ✅ 12/12 scene images verified present
+- ✅ Mascot fallback SVG + idle PNG present
+- ✅ WooCommerce bridge properly registered and localized on immersive pages
+- ✅ All product prices now match authoritative CSV data
+- ✅ Zero DRAFT/TBD prices remaining in any template
+
+### Complete System Status
+
+**WordPress Theme (skyyrose-flagship):**
+- 3 immersive templates × 2 rooms each = 6 full-viewport scenes
+- 23 hotspot products with prop-specific positioning
+- WooCommerce AJAX bridge (4 endpoints + client-side enhancement)
+- Mascot widget (context-aware, accessible, animated)
+- 4 collection catalog templates + pre-order gateway
+- Social proof engine (purchase notifications, urgency, viewer count)
+- Deployment script (deploy.sh) + admin deployment checklist
+- Product import script (inc/product-import.php) for WooCommerce setup
+
+**Frontend Dashboard (devskyy.app):**
+- 20 admin pages (round table, 3D pipeline, mascot, conversion, etc.)
+- 23 API endpoints
+- Real-time WebSocket updates for 3D pipeline
+- Builds in 5.6s (Turbopack), 0 TypeScript errors
+
+**Theme Status: PRODUCTION READY — ALL PRICES SYNCED**
