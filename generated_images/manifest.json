@@ -1,0 +1,72 @@
+[
+  {
+    "sku": "BR-001",
+    "status": "cached_upload",
+    "media_id": 9689
+  },
+  {
+    "sku": "BR-002",
+    "status": "cached_upload",
+    "media_id": 9690
+  },
+  {
+    "sku": "BR-003",
+    "status": "cached_upload",
+    "media_id": 9691
+  },
+  {
+    "sku": "BR-004",
+    "status": "cached_upload",
+    "media_id": 9692
+  },
+  {
+    "sku": "BR-005",
+    "status": "cached_upload",
+    "media_id": 9693
+  },
+  {
+    "sku": "LH-001",
+    "status": "cached_upload",
+    "media_id": 9694
+  },
+  {
+    "sku": "LH-002",
+    "status": "cached_upload",
+    "media_id": 9695
+  },
+  {
+    "sku": "LH-003",
+    "status": "cached_upload",
+    "media_id": 9696
+  },
+  {
+    "sku": "SG-001",
+    "status": "cached_upload",
+    "media_id": 9697
+  },
+  {
+    "sku": "SG-002",
+    "status": "cached_upload",
+    "media_id": 9698
+  },
+  {
+    "sku": "SG-003",
+    "status": "cached_upload",
+    "media_id": null
+  },
+  {
+    "sku": "KC-001",
+    "status": "cached_upload",
+    "media_id": 9699
+  },
+  {
+    "sku": "KC-002",
+    "status": "cached_upload",
+    "media_id": 9700
+  },
+  {
+    "sku": "FP-001",
+    "status": "cached_upload",
+    "media_id": 9701
+  }
+]

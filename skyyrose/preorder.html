@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-collection="black-rose">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,10 +13,32 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&family=Bebas+Neue&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
 
   <style>
+    /* ── Base ── */
+    :root {
+      --void: #0A0A0A; --charcoal: #1C1C1C; --smoke: #2D2D2D;
+      --mist: #6B6B6B; --silver: #AAA; --pearl: #D4D4D4; --bone: #F5F5F5; --white: #FFF;
+      --rose: #B76E79; --rose-dark: #8B4556; --rose-light: #E8A5B2;
+      --rose-glow: rgba(183,110,121,0.3);
+      --blood: #8B0000; --blood-dark: #5C0000; --blood-light: #C41E3A;
+      --blood-glow: rgba(139,0,0,0.3);
+      --gold: #D4AF37; --gold-dark: #B8941E; --gold-light: #FFD700;
+      --gold-glow: rgba(212,175,55,0.3);
+      --font-display: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+      --font-editorial: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Montserrat', 'Inter', -apple-system, sans-serif;
+      --font-script: 'Great Vibes', cursive;
+      --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-full: 9999px;
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.15);
+      --shadow-xl: 0 16px 48px rgba(0,0,0,0.3);
+      --shadow-glow-rose: 0 0 40px var(--rose-glow);
+      --shadow-glow-blood: 0 0 40px var(--blood-glow);
+      --shadow-glow-gold: 0 0 40px var(--gold-glow);
+    }
+
     html, body { overflow: auto; height: auto; min-height: 100vh; }
     .navbar { position: sticky; top: 0; z-index: 200; background: rgba(10,10,10,0.95); backdrop-filter: blur(12px); }
 
@@ -27,7 +49,7 @@
       transition: opacity 1.4s ease;
       animation: orbDrift 22s ease-in-out infinite;
     }
-    .orb-rose  { width: 500px; height: 500px; background: radial-gradient(circle, rgba(183,110,121,0.16) 0%, transparent 70%); top: 5%;  left: -10%; animation-delay: 0s; }
+    .orb-rose  { width: 500px; height: 500px; background: radial-gradient(circle, rgba(183,110,121,0.16) 0%, transparent 70%); top: 5%;  left: -10%; }
     .orb-blood { width: 600px; height: 600px; background: radial-gradient(circle, rgba(139,0,0,0.12) 0%, transparent 70%);   top: 40%; right: -15%; animation-delay: -8s; }
     .orb-gold  { width: 400px; height: 400px; background: radial-gradient(circle, rgba(212,175,55,0.10) 0%, transparent 70%);  bottom: 10%; left: 25%; animation-delay: -16s; }
     @keyframes orbDrift {
@@ -68,12 +90,12 @@
     }
     .hero-eyebrow {
       position: relative; z-index: 1;
-      font-size: 10px; letter-spacing: 7px; text-transform: uppercase;
+      font-family: var(--font-body); font-size: 10px; letter-spacing: 7px; text-transform: uppercase;
       color: var(--rose); margin-bottom: 20px;
     }
     .hero-title {
       position: relative; z-index: 1;
-      font-family: var(--font-display);
+      font-family: 'Bebas Neue', var(--font-display);
       font-size: clamp(72px, 12vw, 140px);
       color: var(--bone); line-height: 0.88; letter-spacing: 3px;
       will-change: transform;
@@ -88,6 +110,7 @@
     }
     .hero-note {
       position: relative; z-index: 1;
+      font-family: var(--font-body);
       font-size: 11px; color: #484848; margin-top: 14px; letter-spacing: 1px;
     }
     .hero-pills {
@@ -96,6 +119,7 @@
       margin-top: 36px; flex-wrap: wrap;
     }
     .hero-pill {
+      font-family: var(--font-body);
       font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
       padding: 7px 20px; border: 1px solid; text-decoration: none;
       transition: background 0.2s, transform 0.4s cubic-bezier(0.16,1,0.3,1);
@@ -120,7 +144,7 @@
     }
     .col-section.sec-visible .col-accent { height: 100%; }
     .accent-rose  { background: var(--rose); }
-    .accent-blood { background: #8B0000; }
+    .accent-blood { background: var(--blood); }
     .accent-gold  { background: var(--gold); }
 
     .col-header { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; flex-wrap: wrap; }
@@ -128,8 +152,10 @@
       font-family: var(--font-display);
       font-size: clamp(40px, 7vw, 88px);
       color: var(--bone); line-height: 1; letter-spacing: 2px;
+      font-weight: 700;
     }
     .col-badge {
+      font-family: var(--font-body);
       font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
       padding: 5px 14px; border: 1px solid;
     }
@@ -143,72 +169,161 @@
       font-size: 16px; margin-bottom: 44px;
     }
 
-    /* ── Product Grid ── */
-    .product-grid {
+    /* ══════════════════════════════════════
+       PRODUCT GRID — Collection-Style Cards
+    ══════════════════════════════════════ */
+    .products-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 2px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
     }
-    .grid-4 { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
-    .grid-2 { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
-    @media (min-width: 900px) {
-      .grid-4 { grid-template-columns: repeat(4, 1fr); }
-      .grid-2 { grid-template-columns: repeat(2, 1fr); }
-    }
+    @media (min-width: 1200px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 640px) { .products-grid { grid-template-columns: 1fr; } }
 
     /* ── Product Card ── */
     .product-card {
-      background: #0e0e0e; position: relative; overflow: hidden;
-      cursor: pointer; transform-style: preserve-3d; will-change: transform;
+      position: relative;
+      background: var(--charcoal);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s ease;
     }
-    .card-img-wrap {
-      position: relative; aspect-ratio: 3/4; overflow: hidden; background: #111;
+    .product-card:hover {
+      transform: translateY(-8px);
     }
-    .card-img {
+    .product-card.glow-rose:hover  { box-shadow: var(--shadow-xl), var(--shadow-glow-rose); }
+    .product-card.glow-blood:hover { box-shadow: var(--shadow-xl), var(--shadow-glow-blood); }
+    .product-card.glow-gold:hover  { box-shadow: var(--shadow-xl), var(--shadow-glow-gold); }
+
+    /* Image Container */
+    .product-image {
+      position: relative;
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+      background: var(--smoke);
+    }
+    .product-image img {
       width: 100%; height: 100%; object-fit: cover; display: block;
-      transition: transform 0.7s cubic-bezier(0.16,1,0.3,1);
+      transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
     }
-    .product-card:hover .card-img { transform: scale(1.06); }
-    .product-card:hover .card-shade { opacity: 1; }
+    .product-card:hover .product-image img { transform: scale(1.08); }
 
-    .card-ribbon {
-      position: absolute; top: 14px; left: 0; z-index: 2;
-      font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
-      font-weight: 700; padding: 5px 14px;
+    /* Hover image swap (jerseys — front/back) */
+    .product-image .img-back {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      opacity: 0; z-index: 1;
+      transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1);
     }
-    .ribbon-rose  { background: var(--rose);  color: #fff; }
-    .ribbon-blood { background: #8B0000;       color: #fff; }
-    .ribbon-gold  { background: var(--gold);   color: #000; }
+    .product-card:hover .product-image .img-back { opacity: 1; transform: scale(1.08); }
 
-    .card-shade {
-      position: absolute; inset: 0; z-index: 1;
-      background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);
-      opacity: 0; transition: opacity 0.4s;
-      display: flex; align-items: flex-end; padding: 22px;
-    }
-    .card-cta-lbl {
-      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
-      color: #fff; border: 1px solid rgba(255,255,255,0.45); padding: 8px 18px;
+    /* Sold separately note */
+    .sold-sep-note {
+      font-family: var(--font-body);
+      font-size: 10px; color: var(--rose); letter-spacing: 0.1em;
+      text-transform: uppercase; text-align: center;
+      padding: 6px 0 2px; margin-top: -4px;
     }
 
-    .card-body { padding: 18px 20px 24px; }
-    .card-col  {
-      font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
-      color: var(--mist); margin-bottom: 6px;
+    /* Badge — pill, top-right, blur backdrop */
+    .product-badge {
+      position: absolute; top: 12px; right: 12px; z-index: 2;
+      font-family: var(--font-body);
+      font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 6px 14px; border-radius: var(--radius-full);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     }
-    .card-name {
+    .badge-pill-rose  { background: rgba(183,110,121,0.9); color: var(--white); }
+    .badge-pill-blood { background: rgba(139,0,0,0.85); color: var(--white); }
+    .badge-pill-gold  { background: rgba(212,175,55,0.9); color: var(--void); }
+
+    /* Wishlist Button — top-left, hidden until hover */
+    .wishlist-btn {
+      position: absolute; top: 12px; left: 12px; z-index: 2;
+      width: 44px; height: 44px;
+      background: rgba(10,10,10,0.8);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border: none; border-radius: var(--radius-full);
+      color: var(--white); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s ease;
+      opacity: 0;
+    }
+    .product-card:hover .wishlist-btn { opacity: 1; }
+    .wishlist-btn:hover { transform: scale(1.1); }
+    .wishlist-btn.rose-hover:hover   { background: var(--rose); }
+    .wishlist-btn.blood-hover:hover  { background: var(--blood); }
+    .wishlist-btn.gold-hover:hover   { background: var(--gold); }
+    .wishlist-btn.active { opacity: 1; }
+    .wishlist-btn.active svg { fill: currentColor; }
+
+    /* Product Info */
+    .product-info {
+      padding: 20px;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .product-name {
       font-family: var(--font-editorial);
-      font-size: 18px; color: var(--bone); line-height: 1.25; margin-bottom: 14px;
+      font-size: 18px; font-weight: 600;
+      color: var(--white); line-height: 1.2;
+      margin-bottom: 2px;
     }
-    .card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .card-price { font-size: 14px; color: var(--mist); }
-    .card-tag {
-      font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
-      padding: 3px 10px; border: 1px solid;
+    .product-tagline {
+      font-family: var(--font-body);
+      font-size: 12px; color: var(--silver);
+      line-height: 1.4; margin-bottom: 10px;
     }
-    .tag-rose  { color: var(--rose);  border-color: var(--rose); }
-    .tag-blood { color: #cc2222;      border-color: #cc2222; }
-    .tag-gold  { color: var(--gold);  border-color: var(--gold); }
+    .product-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--smoke);
+    }
+    .product-price {
+      font-family: var(--font-body);
+      font-size: 15px; font-weight: 700;
+    }
+    .price-rose  { color: var(--rose-light); }
+    .price-blood { color: var(--blood-light); }
+    .price-gold  { color: var(--gold-light); }
+    .product-sizes {
+      font-family: var(--font-body);
+      font-size: 11px; color: var(--mist);
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+
+    /* Quick View Button */
+    .btn-quick-view {
+      width: 100%; padding: 12px;
+      font-family: var(--font-body);
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      background: transparent;
+      border: 2px solid; border-radius: var(--radius-sm);
+      cursor: pointer; transition: all 0.25s ease;
+    }
+    .qv-rose {
+      border-color: var(--rose); color: var(--rose);
+    }
+    .qv-rose:hover {
+      background: var(--rose); color: var(--white);
+      transform: translateY(-2px); box-shadow: var(--shadow-md);
+    }
+    .qv-blood {
+      border-color: var(--blood-light); color: var(--blood-light);
+    }
+    .qv-blood:hover {
+      background: var(--blood); color: var(--white);
+      transform: translateY(-2px); box-shadow: var(--shadow-md);
+    }
+    .qv-gold {
+      border-color: var(--gold); color: var(--gold);
+    }
+    .qv-gold:hover {
+      background: var(--gold); color: var(--void);
+      transform: translateY(-2px); box-shadow: var(--shadow-md);
+    }
 
     /* ── Notify Banner ── */
     .notify-banner {
@@ -223,7 +338,7 @@
     .notify-banner h2 {
       position: relative; z-index: 1;
       font-family: var(--font-display);
-      font-size: clamp(32px, 5vw, 60px);
+      font-size: clamp(32px, 5vw, 60px); font-weight: 700;
       color: var(--bone); margin-bottom: 8px;
     }
     .notify-banner p {
@@ -265,109 +380,173 @@
     .footer-logo { font-family: var(--font-display); font-size: 22px; color: var(--bone); letter-spacing: 3px; }
     .footer-nav { display: flex; gap: 28px; }
     .footer-nav a {
+      font-family: var(--font-body);
       font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
       color: var(--mist); text-decoration: none; transition: color 0.2s;
     }
     .footer-nav a:hover { color: var(--rose); }
-    .footer-copy { font-size: 11px; color: #3a3a3a; }
+    .footer-copy { font-family: var(--font-body); font-size: 11px; color: #3a3a3a; }
 
-    /* ── Detail Modal ── */
+    /* ══════════════════════════════════════
+       DETAIL MODAL — Bottom Sheet Style
+    ══════════════════════════════════════ */
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 900;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal-backdrop.open { opacity: 1; pointer-events: auto; }
+
     .detail-modal {
-      position: fixed; inset: 0; z-index: 999;
-      background: rgba(0,0,0,0.90);
-      display: none; align-items: center; justify-content: center; padding: 20px;
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 950;
+      max-height: 92vh; overflow-y: auto;
+      background: rgba(14,14,14,0.94);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px 14px 0 0;
+      transform: translateY(100%); opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease;
     }
-    .detail-modal.open { display: flex; }
+    .detail-modal.open { transform: translateY(0); opacity: 1; }
 
-    .modal-inner {
-      background: var(--charcoal); max-width: 940px; width: 100%;
-      max-height: 92vh; overflow-y: auto; position: relative;
+    .modal-handle {
+      width: 40px; height: 4px; border-radius: 2px;
+      background: rgba(255,255,255,0.15);
+      margin: 14px auto 8px;
+    }
+
+    .modal-grid {
       display: grid; grid-template-columns: 1fr 1fr;
-      animation: modalIn 0.4s cubic-bezier(0.16,1,0.3,1);
     }
-    @keyframes modalIn { from { opacity: 0; transform: scale(0.96) translateY(20px); } to { opacity: 1; transform: none; } }
-    @media (max-width: 640px) { .modal-inner { grid-template-columns: 1fr; } }
+    @media (max-width: 700px) { .modal-grid { grid-template-columns: 1fr; } }
 
-    .modal-gallery { aspect-ratio: 1; background: #0d0d0d; overflow: hidden; position: relative; }
-    .modal-gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .modal-gal-ribbon {
-      position: absolute; top: 14px; left: 0; z-index: 2;
-      font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
-      font-weight: 700; padding: 5px 14px;
+    .modal-gallery {
+      aspect-ratio: 1; background: #0d0d0d; overflow: hidden; position: relative;
     }
+    .modal-gallery img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .modal-gal-badge {
+      position: absolute; top: 14px; right: 14px; z-index: 2;
+      font-family: var(--font-body);
+      font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 6px 14px; border-radius: var(--radius-full);
+      backdrop-filter: blur(10px);
+    }
+    .modal-close-btn {
+      position: absolute; top: 14px; left: 14px; z-index: 10;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.6);
+      width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+      font-size: 20px; display: flex; align-items: center; justify-content: center;
+      transition: color 0.2s;
+    }
+    .modal-close-btn:hover { color: var(--white); }
 
-    .modal-body { padding: 44px 40px; }
-    @media (max-width: 640px) { .modal-body { padding: 28px 22px; } }
+    .modal-body { padding: 36px 32px 40px; }
+    @media (max-width: 700px) { .modal-body { padding: 24px 20px 32px; } }
 
-    .modal-col { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 10px; }
-    .mc-rose  { color: var(--rose); }
-    .mc-blood { color: #cc2222; }
-    .mc-gold  { color: var(--gold); }
+    .modal-tag {
+      font-family: var(--font-body);
+      font-size: 9px; letter-spacing: 0.4em; text-transform: uppercase;
+      margin-bottom: 8px; display: inline-block;
+    }
+    .mt-rose  { color: var(--rose); }
+    .mt-blood { color: var(--blood-light); }
+    .mt-gold  { color: var(--gold); }
 
     .modal-name {
       font-family: var(--font-display);
-      font-size: clamp(26px, 3.5vw, 42px);
-      color: var(--bone); line-height: 1; margin-bottom: 6px;
+      font-size: clamp(24px, 3.5vw, 38px); font-weight: 700;
+      color: var(--white); line-height: 1.05; margin-bottom: 6px;
+      letter-spacing: 0.02em;
     }
-    .modal-price { font-size: 15px; color: var(--silver); margin-bottom: 18px; }
+    .modal-price {
+      font-family: var(--font-body);
+      font-size: 14px; letter-spacing: 0.08em; margin-bottom: 18px;
+    }
+    .mp-rose  { color: var(--rose); }
+    .mp-blood { color: var(--blood-light); }
+    .mp-gold  { color: var(--gold); }
+
+    .modal-divider {
+      width: 100%; height: 1px;
+      background: rgba(255,255,255,0.08); margin-bottom: 18px;
+    }
     .modal-desc {
       font-family: var(--font-editorial);
-      font-size: 15px; color: var(--mist); line-height: 1.75;
-      margin-bottom: 22px; font-style: italic;
+      font-size: 14px; color: rgba(255,255,255,0.7);
+      line-height: 1.7; margin-bottom: 14px; font-style: italic;
     }
-    .modal-spec { font-size: 11px; color: #505050; margin-bottom: 28px; line-height: 1.6; }
+    .modal-spec {
+      font-family: var(--font-body);
+      font-size: 11px; font-style: italic;
+      margin-bottom: 24px; line-height: 1.6;
+    }
+    .ms-rose  { color: rgba(183,110,121,0.55); }
+    .ms-blood { color: rgba(196,30,58,0.5); }
+    .ms-gold  { color: rgba(212,175,55,0.5); }
 
-    .modal-lbl { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--mist); margin-bottom: 10px; }
-    .size-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 26px; }
-    .sz-btn {
-      min-width: 44px; height: 44px; padding: 0 12px;
-      border: 1px solid #252525; background: transparent;
-      color: var(--mist); font-size: 12px; cursor: pointer;
-      transition: all 0.18s; font-family: var(--font-body);
+    .sizes-label {
+      font-family: var(--font-body);
+      font-size: 9px; letter-spacing: 0.35em; text-transform: uppercase;
+      color: rgba(255,255,255,0.4); margin-bottom: 10px;
     }
-    .sz-btn:hover    { border-color: var(--rose); color: var(--bone); }
-    .sz-btn.sel-rose { border-color: var(--rose); background: rgba(183,110,121,0.12); color: var(--bone); }
-    .sz-btn.sel-gold { border-color: var(--gold); background: rgba(212,175,55,0.10); color: var(--bone); }
-    .sz-btn.sel-blood{ border-color: #8B0000;      background: rgba(139,0,0,0.12); color: var(--bone); }
+    .sizes-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+    .sz-btn {
+      min-width: 44px; height: 44px; padding: 0 14px;
+      font-family: var(--font-editorial); font-size: 13px; letter-spacing: 0.06em;
+      border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.5);
+      background: transparent; border-radius: var(--radius-sm);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .sz-btn:hover { border-color: rgba(255,255,255,0.3); color: var(--white); }
+    .sz-btn.sel-rose  { border-color: var(--rose);       color: var(--rose);       background: rgba(183,110,121,0.08); }
+    .sz-btn.sel-blood { border-color: var(--blood-light); color: var(--blood-light); background: rgba(139,0,0,0.08); }
+    .sz-btn.sel-gold  { border-color: var(--gold);       color: var(--gold);       background: rgba(212,175,55,0.06); }
 
     .action-btn {
-      width: 100%; padding: 16px; border: none; cursor: pointer;
-      font-family: var(--font-body); font-size: 12px;
-      letter-spacing: 4px; text-transform: uppercase;
-      font-weight: 600; margin-bottom: 10px; transition: background 0.2s;
+      width: 100%; padding: 14px; border: none; cursor: pointer;
+      font-family: var(--font-editorial); font-size: 13px;
+      letter-spacing: 0.25em; text-transform: uppercase;
+      font-weight: 600; margin-bottom: 12px;
+      border-radius: var(--radius-sm);
+      transition: all 0.3s;
     }
-    .btn-rose  { background: var(--rose);  color: #fff; }
-    .btn-rose:hover  { background: #9e5562; }
-    .btn-blood { background: #8B0000;       color: #fff; }
-    .btn-blood:hover { background: #6a0000; }
-    .btn-gold  { background: var(--gold);   color: #000; }
-    .btn-gold:hover  { background: #b89628; }
+    .btn-rose  { background: var(--rose);  color: var(--white); }
+    .btn-rose:hover  { background: var(--rose-dark); }
+    .btn-blood { background: var(--blood); color: var(--white); }
+    .btn-blood:hover { background: var(--blood-dark); }
+    .btn-gold  { background: var(--gold);  color: var(--void); }
+    .btn-gold:hover  { background: var(--gold-dark); }
 
-    .notify-inline { display: none; margin-bottom: 10px; }
+    .notify-inline { display: none; margin-bottom: 12px; }
     .notify-inline.open { display: flex; }
     .ni-input {
       flex: 1; padding: 12px 16px;
-      background: var(--smoke); border: 1px solid #333; border-right: none;
+      background: var(--smoke); border: 1px solid rgba(255,255,255,0.1); border-right: none;
       color: var(--bone); font-size: 13px; outline: none; font-family: var(--font-body);
+      border-radius: var(--radius-sm) 0 0 var(--radius-sm);
     }
     .ni-input:focus { border-color: var(--rose); }
     .ni-go {
-      padding: 12px 18px; background: #2a2a2a; border: 1px solid #333;
+      padding: 12px 18px; background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
       color: var(--bone); cursor: pointer; font-size: 11px;
       letter-spacing: 1px; transition: background 0.2s;
+      font-family: var(--font-body);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     }
-    .ni-go:hover { background: #3a3a3a; }
+    .ni-go:hover { background: rgba(255,255,255,0.12); }
 
-    .modal-note { font-size: 11px; color: #3a3a3a; line-height: 1.6; }
-
-    .modal-close-btn {
-      position: absolute; top: 14px; right: 14px; z-index: 10;
-      background: rgba(0,0,0,0.5); border: none; color: var(--mist);
-      width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
-      font-size: 22px; display: flex; align-items: center; justify-content: center;
-      transition: color 0.2s;
+    .modal-note {
+      font-family: var(--font-body);
+      font-size: 11px; color: #3a3a3a; line-height: 1.6;
     }
-    .modal-close-btn:hover { color: var(--bone); }
   </style>
 </head>
 <body>
@@ -393,13 +572,13 @@
   <!-- Hero -->
   <header class="hero">
     <p class="hero-eyebrow">Reserve before the drop</p>
-    <h1 class="hero-title">PRE<span class="dot">·</span>ORDER</h1>
+    <h1 class="hero-title">PRE<span class="dot">&middot;</span>ORDER</h1>
     <p class="hero-tagline">Every piece. Every collection. All dropping soon.</p>
-    <p class="hero-note">Limited quantities · Ships when ready · Free cancellation</p>
+    <p class="hero-note">Limited quantities &middot; Ships when ready &middot; Free cancellation</p>
     <div class="hero-pills">
-      <a href="#black-rose" class="hero-pill hp-rose">⚫ Black Rose</a>
-      <a href="#love-hurts" class="hero-pill hp-blood">❤ Love Hurts</a>
-      <a href="#signature"  class="hero-pill hp-gold">✦ Signature</a>
+      <a href="#black-rose" class="hero-pill hp-rose">Black Rose</a>
+      <a href="#love-hurts" class="hero-pill hp-blood">Love Hurts</a>
+      <a href="#signature"  class="hero-pill hp-gold">Signature</a>
     </div>
   </header>
 
@@ -414,81 +593,162 @@
     </div>
     <p class="col-desc reveal rd1">Gothic romance. Dark florals. Reserve before the drop.</p>
 
-    <div class="product-grid grid-4">
+    <div class="products-grid">
 
-      <article class="product-card reveal rd1" onclick="openModal('br-001')">
-        <div class="card-img-wrap">
-          <img class="card-img"
-            src="assets/images/products/br-001/br-001-model.jpg"
-            onerror="this.src='assets/images/products/br-001/br-001-product.jpg'"
-            alt="Black Rose Crewneck">
-          <span class="card-ribbon ribbon-rose">Pre-Order</span>
-          <div class="card-shade"><span class="card-cta-lbl">Reserve Now</span></div>
+      <article class="product-card glow-rose reveal rd1" onclick="openModal('po-001')">
+        <div class="product-image">
+          <img class="img-front" src="assets/images/products/po-001/po-001-model.jpg" alt="Red #80 Football Jersey — Front" loading="lazy">
+          <img class="img-back" src="assets/images/products/po-001/po-001-model-back.jpg" alt="Red #80 Football Jersey — Back" loading="lazy">
+          <span class="product-badge badge-pill-rose">Pre-Order</span>
+          <button class="wishlist-btn rose-hover" onclick="event.stopPropagation();toggleWish(this)" aria-label="Add to wishlist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
         </div>
-        <div class="card-body">
-          <p class="card-col">Black Rose Collection</p>
-          <h3 class="card-name">Black Rose Crewneck</h3>
-          <div class="card-foot">
-            <span class="card-price">Price TBA</span>
-            <span class="card-tag tag-rose">Pre-Order</span>
+        <div class="product-info">
+          <h3 class="product-name">Red #80 Football Jersey</h3>
+          <p class="product-tagline">"Black Is Beautiful" — Rose-filled numerals</p>
+          <div class="product-meta">
+            <span class="product-price price-rose">Price TBA</span>
+            <span class="product-sizes">S — 3XL</span>
           </div>
+          <button class="btn-quick-view qv-rose" onclick="event.stopPropagation();openModal('po-001')">Reserve Now</button>
         </div>
       </article>
 
-      <article class="product-card reveal rd2" onclick="openModal('br-002')">
-        <div class="card-img-wrap">
-          <img class="card-img"
-            src="assets/images/products/br-002/br-002-model.jpg"
-            onerror="this.src='assets/images/products/br-002/br-002-product.jpg'"
-            alt="Black Rose Joggers">
-          <span class="card-ribbon ribbon-rose">Pre-Order</span>
-          <div class="card-shade"><span class="card-cta-lbl">Reserve Now</span></div>
+      <article class="product-card glow-rose reveal rd2" onclick="openModal('po-003')">
+        <div class="product-image">
+          <img class="img-front" src="assets/images/products/po-003/po-003-model.jpg" alt="White #32 Football Jersey — Front" loading="lazy">
+          <img class="img-back" src="assets/images/products/po-003/po-003-model-back.jpg" alt="White #32 Football Jersey — Back" loading="lazy">
+          <span class="product-badge badge-pill-rose">Pre-Order</span>
+          <button class="wishlist-btn rose-hover" onclick="event.stopPropagation();toggleWish(this)" aria-label="Add to wishlist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
         </div>
-        <div class="card-body">
-          <p class="card-col">Black Rose Collection</p>
-          <h3 class="card-name">Black Rose Joggers</h3>
-          <div class="card-foot">
-            <span class="card-price">Price TBA</span>
-            <span class="card-tag tag-rose">Pre-Order</span>
+        <div class="product-info">
+          <h3 class="product-name">White #32 Football Jersey</h3>
+          <p class="product-tagline">"Black Is Beautiful" — Bold black on white</p>
+          <div class="product-meta">
+            <span class="product-price price-rose">Price TBA</span>
+            <span class="product-sizes">S — 3XL</span>
           </div>
+          <button class="btn-quick-view qv-rose" onclick="event.stopPropagation();openModal('po-003')">Reserve Now</button>
         </div>
       </article>
 
-      <article class="product-card reveal rd3" onclick="openModal('br-003')">
-        <div class="card-img-wrap">
-          <img class="card-img"
-            src="assets/images/products/br-003/br-003-model.jpg"
-            onerror="this.src='assets/images/products/br-003/br-003-product.jpg'"
-            alt='"Black Is Beautiful" Baseball Jersey'>
-          <span class="card-ribbon ribbon-rose">Pre-Order</span>
-          <div class="card-shade"><span class="card-cta-lbl">Reserve Now</span></div>
+      <article class="product-card glow-rose reveal rd3" onclick="openModal('po-004')">
+        <div class="product-image">
+          <img class="img-front" src="assets/images/products/po-004/po-004-model.jpg" alt="Black &amp; Teal Hockey Jersey — Front" loading="lazy">
+          <img class="img-back" src="assets/images/products/po-004/po-004-model-back.jpg" alt="Black &amp; Teal Hockey Jersey — Back" loading="lazy">
+          <span class="product-badge badge-pill-rose">Pre-Order</span>
+          <button class="wishlist-btn rose-hover" onclick="event.stopPropagation();toggleWish(this)" aria-label="Add to wishlist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
         </div>
-        <div class="card-body">
-          <p class="card-col">Black Rose Collection</p>
-          <h3 class="card-name">"Black Is Beautiful" Jersey</h3>
-          <div class="card-foot">
-            <span class="card-price">Price TBA</span>
-            <span class="card-tag tag-rose">Pre-Order</span>
+        <div class="product-info">
+          <h3 class="product-name">Black &amp; Teal Hockey Jersey</h3>
+          <p class="product-tagline">Hooded hockey silhouette — Cyan rose crest</p>
+          <div class="product-meta">
+            <span class="product-price price-rose">Price TBA</span>
+            <span class="product-sizes">S — 3XL</span>
           </div>
+          <button class="btn-quick-view qv-rose" onclick="event.stopPropagation();openModal('po-004')">Reserve Now</button>
         </div>
       </article>
 
-      <article class="product-card reveal rd4" onclick="openModal('br-004')">
-        <div class="card-img-wrap">
-          <img class="card-img"
-            src="assets/images/products/br-004/br-004-model.jpg"
-            onerror="this.src='assets/images/products/br-004/br-004-product.jpg'"
-            alt="Black Rose Beanie">
-          <span class="card-ribbon ribbon-rose">Pre-Order</span>
-          <div class="card-shade"><span class="card-cta-lbl">Reserve Now</span></div>
+      <article class="product-card glow-rose reveal rd4" onclick="openModal('po-002')">
+        <div class="product-image">
+          <img class="img-front" src="assets/images/products/po-002/po-002-model.jpg" alt="THE BAY Basketball Tank — Front" loading="lazy">
+          <img class="img-back" src="assets/images/products/po-002/po-002-model-back.jpg" alt="THE BAY Basketball Tank — Back" loading="lazy">
+          <span class="product-badge badge-pill-rose">Pre-Order</span>
+          <button class="wishlist-btn rose-hover" onclick="event.stopPropagation();toggleWish(this)" aria-label="Add to wishlist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
         </div>
-        <div class="card-body">
-          <p class="card-col">Black Rose Collection</p>
-          <h3 class="card-name">Black Rose Beanie</h3>
-          <div class="card-foot">
-            <span class="card-price">Price TBA</span>
-            <span class="card-tag tag-rose">Pre-Order</span>
+        <div class="product-info">
+          <h3 class="product-name">"THE BAY" Basketball Tank</h3>
+          <p class="product-tagline">Sleeveless jersey — Bay Area pride</p>
+          <div class="product-meta">
+            <span class="product-price price-rose">Price TBA</span>
+            <span class="product-sizes">S — 3XL</span>
           </div>
+          <button class="btn-quick-view qv-rose" onclick="event.stopPropagation();openModal('po-002')">Reserve Now</button>
+        </div>
+      </article>
+
+      <article class="product-card glow-rose reveal rd1" onclick="openModal('po-006')">
+        <div class="product-image">
+          <img src="assets/images/products/po-006/po-006-model-set.jpg" alt="Black Rose Crewneck &amp; Joggers Set" loading="lazy">
+          <span class="product-badge badge-pill-rose">Pre-Order</span>
+          <button class="wishlist-btn rose-hover" onclick="event.stopPropagation();toggleWish(this)" aria-label="Add to wishlist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+        </div>
+        <div class="product-info">
+          <h3 class="product-name">Black Rose Crewneck &amp; Joggers</h3>
+          <p class="product-tagline">Rose &amp; clouds graphic — White contrast trim</p>
+          <p class="sold-sep-note">Sold Separately</p>
+          <div class="product-meta">
+            <span class="product-price price-rose">Price TBA</span>
+            <span class="product-sizes">S — 2XL</span>
+          </div>
+          <button class="btn-quick-view qv-rose" onclick="event.stopPropagation();openModal('po-006')">Reserve Now</button>
+        </div>
+      </article>
+
+      <article class="product-card glow-rose reveal rd3" onclick="openModal('po-007')">
+        <div class="product-image">
+          <img src="assets/images/products/po-007/po-007-model.jpg" alt="Black Rose Beanie" loading="lazy">
+          <span class="product-badge badge-pill-rose">Pre-Order</span>
+          <button class="wishlist-btn rose-hover" onclick="event.stopPropagation();toggleWish(this)" aria-label="Add to wishlist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+        </div>
+        <div class="product-info">
+          <h3 class="product-name">Black Rose Beanie</h3>
+          <p class="product-tagline">Ribbed knit — PVC rose patch on cuff</p>
+          <div class="product-meta">
+            <span class="product-price price-rose">Price TBA</span>
+            <span class="product-sizes">One Size</span>
+          </div>
+          <button class="btn-quick-view qv-rose" onclick="event.stopPropagation();openModal('po-007')">Reserve Now</button>
+        </div>
+      </article>
+
+      <article class="product-card glow-rose reveal rd4" onclick="openModal('po-009')">
+        <div class="product-image">
+          <img src="assets/images/products/po-009/po-009-model.jpg" alt="SR Monogram Slides" loading="lazy">
+          <span class="product-badge badge-pill-rose">Pre-Order</span>
+          <button class="wishlist-btn rose-hover" onclick="event.stopPropagation();toggleWish(this)" aria-label="Add to wishlist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+        </div>
+        <div class="product-info">
+          <h3 class="product-name">SR Monogram Slides</h3>
+          <p class="product-tagline">Contoured footbed — Bold SR strap</p>
+          <div class="product-meta">
+            <span class="product-price price-rose">Price TBA</span>
+            <span class="product-sizes">7 — 13</span>
+          </div>
+          <button class="btn-quick-view qv-rose" onclick="event.stopPropagation();openModal('po-009')">Reserve Now</button>
+        </div>
+      </article>
+
+      <article class="product-card glow-rose reveal rd1" onclick="openModal('po-011')">
+        <div class="product-image">
+          <img src="assets/images/products/po-011/po-011-model.jpg" alt="Black Rose Slides" loading="lazy">
+          <span class="product-badge badge-pill-rose">Pre-Order</span>
+          <button class="wishlist-btn rose-hover" onclick="event.stopPropagation();toggleWish(this)" aria-label="Add to wishlist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+        </div>
+        <div class="product-info">
+          <h3 class="product-name">Black Rose Slides</h3>
+          <p class="product-tagline">Rose mushroom cloud graphic — Comfort footbed</p>
+          <div class="product-meta">
+            <span class="product-price price-rose">Price TBA</span>
+            <span class="product-sizes">7 — 13</span>
+          </div>
+          <button class="btn-quick-view qv-rose" onclick="event.stopPropagation();openModal('po-011')">Reserve Now</button>
         </div>
       </article>
 
@@ -506,43 +766,43 @@
     </div>
     <p class="col-desc reveal rd1">Dramatic passion. Edgy sophistication. Reserve yours before the drop.</p>
 
-    <div class="product-grid grid-2">
+    <div class="products-grid">
 
-      <article class="product-card reveal rd1" onclick="openModal('lh-001')">
-        <div class="card-img-wrap">
-          <img class="card-img"
-            src="assets/images/products/lh-001/lh-001-model.jpg"
-            onerror="this.src='assets/images/products/lh-001/lh-001-product.jpg'"
-            alt="Love Hurts Track Pants Black">
-          <span class="card-ribbon ribbon-blood">Pre-Order</span>
-          <div class="card-shade"><span class="card-cta-lbl">Reserve Now</span></div>
+      <article class="product-card glow-blood reveal rd1" onclick="openModal('lh-001')">
+        <div class="product-image">
+          <img src="assets/images/products/lh-001/lh-001-model.jpg" alt="The Fannie — Luxury Fanny Pack" loading="lazy">
+          <span class="product-badge badge-pill-blood">Pre-Order</span>
+          <button class="wishlist-btn blood-hover" onclick="event.stopPropagation();toggleWish(this)" aria-label="Add to wishlist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
         </div>
-        <div class="card-body">
-          <p class="card-col">Love Hurts × SkyyRose</p>
-          <h3 class="card-name">Track Pants — Black</h3>
-          <div class="card-foot">
-            <span class="card-price">Price TBA</span>
-            <span class="card-tag tag-blood">Pre-Order</span>
+        <div class="product-info">
+          <h3 class="product-name">The Fannie</h3>
+          <p class="product-tagline">Luxury fanny pack — Embroidered rose detail</p>
+          <div class="product-meta">
+            <span class="product-price price-blood">Price TBA</span>
+            <span class="product-sizes">One Size</span>
           </div>
+          <button class="btn-quick-view qv-blood" onclick="event.stopPropagation();openModal('lh-001')">Reserve Now</button>
         </div>
       </article>
 
-      <article class="product-card reveal rd2" onclick="openModal('lh-002')">
-        <div class="card-img-wrap">
-          <img class="card-img"
-            src="assets/images/products/lh-002/lh-002-model.jpg"
-            onerror="this.src='assets/images/products/lh-002/lh-002-product.jpg'"
-            alt="Love Hurts Track Pants White">
-          <span class="card-ribbon ribbon-blood">Pre-Order</span>
-          <div class="card-shade"><span class="card-cta-lbl">Reserve Now</span></div>
+      <article class="product-card glow-blood reveal rd2" onclick="openModal('po-010')">
+        <div class="product-image">
+          <img src="assets/images/products/po-010/po-010-model.jpg" alt="Love Hurts Slides" loading="lazy">
+          <span class="product-badge badge-pill-blood">Pre-Order</span>
+          <button class="wishlist-btn blood-hover" onclick="event.stopPropagation();toggleWish(this)" aria-label="Add to wishlist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
         </div>
-        <div class="card-body">
-          <p class="card-col">Love Hurts × SkyyRose</p>
-          <h3 class="card-name">Track Pants — White</h3>
-          <div class="card-foot">
-            <span class="card-price">Price TBA</span>
-            <span class="card-tag tag-blood">Pre-Order</span>
+        <div class="product-info">
+          <h3 class="product-name">Love Hurts Slides</h3>
+          <p class="product-tagline">Tattoo-flash rose &amp; heart graphic</p>
+          <div class="product-meta">
+            <span class="product-price price-blood">Price TBA</span>
+            <span class="product-sizes">7 — 13</span>
           </div>
+          <button class="btn-quick-view qv-blood" onclick="event.stopPropagation();openModal('po-010')">Reserve Now</button>
         </div>
       </article>
 
@@ -560,43 +820,24 @@
     </div>
     <p class="col-desc reveal rd1">High fashion prestige. The SF collection. Reserve yours.</p>
 
-    <div class="product-grid grid-2">
+    <div class="products-grid">
 
-      <article class="product-card reveal rd1" onclick="openModal('sg-001')">
-        <div class="card-img-wrap">
-          <img class="card-img"
-            src="assets/images/products/sg-001/sg-001-model.jpg"
-            onerror="this.src='assets/images/products/sg-001/sg-001-product.jpg'"
-            alt="Golden Gate Mesh Shorts">
-          <span class="card-ribbon ribbon-gold">Pre-Order</span>
-          <div class="card-shade"><span class="card-cta-lbl">Reserve Now</span></div>
+      <article class="product-card glow-gold reveal rd1" onclick="openModal('po-005')">
+        <div class="product-image">
+          <img src="assets/images/products/po-005/po-005-model.jpg" alt="Purple Golden Gate Bridge Mesh Shorts" loading="lazy">
+          <span class="product-badge badge-pill-gold">Pre-Order</span>
+          <button class="wishlist-btn gold-hover" onclick="event.stopPropagation();toggleWish(this)" aria-label="Add to wishlist">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
         </div>
-        <div class="card-body">
-          <p class="card-col">Signature Collection</p>
-          <h3 class="card-name">Golden Gate Mesh Shorts</h3>
-          <div class="card-foot">
-            <span class="card-price">Price TBA</span>
-            <span class="card-tag tag-gold">Pre-Order</span>
+        <div class="product-info">
+          <h3 class="product-name">Purple GG Bridge Mesh Shorts</h3>
+          <p class="product-tagline">Sublimated Golden Gate at twilight</p>
+          <div class="product-meta">
+            <span class="product-price price-gold">Price TBA</span>
+            <span class="product-sizes">XS — 2XL</span>
           </div>
-        </div>
-      </article>
-
-      <article class="product-card reveal rd2" onclick="openModal('sg-002')">
-        <div class="card-img-wrap">
-          <img class="card-img"
-            src="assets/images/products/sg-002/sg-002-model.jpg"
-            onerror="this.src='assets/images/products/sg-002/sg-002-product.jpg'"
-            alt="SF Rose White Tee">
-          <span class="card-ribbon ribbon-gold">Pre-Order</span>
-          <div class="card-shade"><span class="card-cta-lbl">Reserve Now</span></div>
-        </div>
-        <div class="card-body">
-          <p class="card-col">Signature Collection</p>
-          <h3 class="card-name">SF Rose White Tee</h3>
-          <div class="card-foot">
-            <span class="card-price">Price TBA</span>
-            <span class="card-tag tag-gold">Pre-Order</span>
-          </div>
+          <button class="btn-quick-view qv-gold" onclick="event.stopPropagation();openModal('po-005')">Reserve Now</button>
         </div>
       </article>
 
@@ -623,25 +864,28 @@
       <a href="preorder.html">Pre-Order</a>
       <a href="#">Contact</a>
     </nav>
-    <span class="footer-copy">© 2025 SkyyRose. All rights reserved.</span>
+    <span class="footer-copy">&copy; 2026 SkyyRose. All rights reserved.</span>
   </footer>
 
-  <!-- ══════════ DETAIL MODAL ══════════ -->
+  <!-- ══════════ DETAIL MODAL — Bottom Sheet ══════════ -->
+  <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"></div>
   <div class="detail-modal" id="detailModal" role="dialog" aria-modal="true">
-    <div class="modal-inner">
-      <button class="modal-close-btn" onclick="closeModal()" aria-label="Close">×</button>
+    <div class="modal-handle"></div>
+    <div class="modal-grid">
       <div class="modal-gallery">
         <img id="dImg" src="" alt="">
-        <span class="modal-gal-ribbon" id="dRibbon"></span>
+        <span class="modal-gal-badge" id="dBadge"></span>
+        <button class="modal-close-btn" onclick="closeModal()" aria-label="Close">&times;</button>
       </div>
       <div class="modal-body">
-        <p class="modal-col" id="dCol"></p>
+        <p class="modal-tag" id="dCol"></p>
         <h2 class="modal-name" id="dName"></h2>
         <p class="modal-price" id="dPrice"></p>
+        <div class="modal-divider"></div>
         <p class="modal-desc" id="dDesc"></p>
         <p class="modal-spec" id="dSpec"></p>
-        <p class="modal-lbl">Select Size</p>
-        <div class="size-row" id="dSizes"></div>
+        <p class="sizes-label">Select Size</p>
+        <div class="sizes-wrap" id="dSizes"></div>
         <button class="action-btn" id="dBtn" onclick="handleCta()"></button>
         <div class="notify-inline" id="dNotify">
           <input class="ni-input" type="email" placeholder="your@email.com" id="dEmail">
@@ -653,94 +897,128 @@
   </div>
 
   <script>
+    /* ── Product Data ── */
     const PRODUCTS = {
-      'br-001': {
-        col: 'Black Rose Collection', colClass: 'mc-rose',
-        name: 'Black Rose Crewneck', price: 'Price TBA',
-        desc: 'Black crewneck sweatshirt with white ribbed collar and cuffs. Large center-chest graphic: two BLACK roses erupting from storm clouds — grey/silver tattoo-art style on black fabric.',
-        spec: 'Premium Fleece · Relaxed Oversized Fit · White Ribbed Trim',
-        sizes: ['S','M','L','XL','2XL'], selClass: 'sel-rose', btnClass: 'btn-rose',
-        img: 'assets/images/products/br-001/br-001-model.jpg',
-        fallback: 'assets/images/products/br-001/br-001-product.jpg',
-        ribbon: 'Pre-Order', ribbonClass: 'ribbon-rose',
+      'po-001': {
+        col: 'Black Rose Collection', colClass: 'mt-rose',
+        name: 'Red #80 Football Jersey', price: 'Price TBA',
+        desc: 'Red V-neck football jersey with #80 in large block numerals — numbers filled with a grey/silver rose, thorns & clouds graphic. "BLACK IS BEAUTIFUL" across upper back. SR monogram.',
+        spec: 'Athletic Jersey \u00b7 V-Neck \u00b7 Rose-Filled #80 \u00b7 Stripe Trim Sleeves',
+        specClass: 'ms-rose',
+        sizes: ['S','M','L','XL','2XL','3XL'], selClass: 'sel-rose', btnClass: 'btn-rose',
+        img: 'assets/images/products/po-001/po-001-model.jpg',
+        badgeClass: 'badge-pill-rose', priceClass: 'mp-rose',
         note: 'Reserve your size before the drop. Charged and shipped when ready. Free cancellation.'
       },
-      'br-002': {
-        col: 'Black Rose Collection', colClass: 'mc-rose',
-        name: 'Black Rose Joggers', price: 'Price TBA',
-        desc: 'Black jogger pants with white ribbed waistband and ankle cuffs. Small rose mushroom cloud graphic on upper left leg.',
-        spec: 'Premium Fleece · Tapered Jogger Fit · Black Drawstring',
-        sizes: ['S','M','L','XL','2XL'], selClass: 'sel-rose', btnClass: 'btn-rose',
-        img: 'assets/images/products/br-002/br-002-model.jpg',
-        fallback: 'assets/images/products/br-002/br-002-product.jpg',
-        ribbon: 'Pre-Order', ribbonClass: 'ribbon-rose',
+      'po-002': {
+        col: 'Black Rose Collection', colClass: 'mt-rose',
+        name: '\u201cTHE BAY\u201d Basketball Tank', price: 'Price TBA',
+        desc: 'White sleeveless basketball jersey with "THE BAY" in bold across the chest. Rose circle graphic and grey/silver rose fade on lower half. "BLACK IS BEAUTIFUL" on back.',
+        spec: 'Athletic Tank \u00b7 Round Neck \u00b7 Sublimated Graphics',
+        specClass: 'ms-rose',
+        sizes: ['S','M','L','XL','2XL','3XL'], selClass: 'sel-rose', btnClass: 'btn-rose',
+        img: 'assets/images/products/po-002/po-002-model.jpg',
+        badgeClass: 'badge-pill-rose', priceClass: 'mp-rose',
         note: 'Reserve your size before the drop. Charged and shipped when ready. Free cancellation.'
       },
-      'br-003': {
-        col: 'Black Rose Collection', colClass: 'mc-rose',
-        name: '"Black Is Beautiful" Baseball Jersey', price: 'Price TBA',
-        desc: 'Forest green baseball jersey with gold/yellow and white stripe trim. "BLACK IS BEAUTIFUL" in varsity lettering — the O replaced by a black rose graphic.',
-        spec: 'Button-Down Baseball Jersey · Relaxed Fit · Authentic Patch',
-        sizes: ['S','M','L','XL','2XL'], selClass: 'sel-rose', btnClass: 'btn-rose',
-        img: 'assets/images/products/br-003/br-003-model.jpg',
-        fallback: 'assets/images/products/br-003/br-003-product.jpg',
-        ribbon: 'Pre-Order', ribbonClass: 'ribbon-rose',
+      'po-003': {
+        col: 'Black Rose Collection', colClass: 'mt-rose',
+        name: 'White #32 Football Jersey', price: 'Price TBA',
+        desc: 'White V-neck football jersey with bold black #32 on front. Back #32 filled with grey/silver rose & clouds graphic. "BLACK IS BEAUTIFUL" text, black stripe trim, shoulder numbers.',
+        spec: 'Athletic Jersey \u00b7 V-Neck \u00b7 Black-on-White Contrast \u00b7 SR Monogram',
+        specClass: 'ms-rose',
+        sizes: ['S','M','L','XL','2XL','3XL'], selClass: 'sel-rose', btnClass: 'btn-rose',
+        img: 'assets/images/products/po-003/po-003-model.jpg',
+        badgeClass: 'badge-pill-rose', priceClass: 'mp-rose',
         note: 'Reserve your size before the drop. Charged and shipped when ready. Free cancellation.'
       },
-      'br-004': {
-        col: 'Black Rose Collection', colClass: 'mc-rose',
+      'po-004': {
+        col: 'Black Rose Collection', colClass: 'mt-rose',
+        name: 'Black & Teal Hockey Jersey', price: 'Price TBA',
+        desc: 'Black hooded hockey jersey with cyan/teal accents. Large circular rose crest on front. Cyan "BLACK IS BEAUTIFUL" and rose-filled #0 on back. Gradient stripe hem and cuffs.',
+        spec: 'Hockey Jersey \u00b7 Attached Hood \u00b7 Cyan Rose Crest \u00b7 Long Sleeves',
+        specClass: 'ms-rose',
+        sizes: ['S','M','L','XL','2XL','3XL'], selClass: 'sel-rose', btnClass: 'btn-rose',
+        img: 'assets/images/products/po-004/po-004-model.jpg',
+        badgeClass: 'badge-pill-rose', priceClass: 'mp-rose',
+        note: 'Reserve your size before the drop. Charged and shipped when ready. Free cancellation.'
+      },
+      'po-005': {
+        col: 'Signature Collection', colClass: 'mt-gold',
+        name: 'Purple GG Bridge Mesh Shorts', price: 'Price TBA',
+        desc: 'Purple mesh basketball shorts with full Golden Gate Bridge sublimated print at twilight. Rose embroidery on lower right leg. White drawstring.',
+        spec: 'Athletic Mesh \u00b7 Sublimated Print \u00b7 Rose Embroidery \u00b7 Drawstring',
+        specClass: 'ms-gold',
+        sizes: ['XS','S','M','L','XL','2XL'], selClass: 'sel-gold', btnClass: 'btn-gold',
+        img: 'assets/images/products/po-005/po-005-model.jpg',
+        badgeClass: 'badge-pill-gold', priceClass: 'mp-gold',
+        note: 'Reserve your size before the drop. Charged and shipped when ready. Free cancellation.'
+      },
+      'po-006': {
+        col: 'Black Rose Collection', colClass: 'mt-rose',
+        name: 'Black Rose Crewneck & Joggers', price: 'Price TBA',
+        desc: 'Black crewneck sweatshirt paired with matching joggers. White contrast ribbed collar, cuffs, and waistband. Large grey/silver rose with thorns and clouds graphic on center chest. Rose mushroom cloud on upper left leg of joggers. Sold separately.',
+        spec: 'Premium Fleece \u00b7 White Ribbed Trim \u00b7 Sold Separately',
+        specClass: 'ms-rose',
+        sizes: ['S','M','L','XL','2XL'], selClass: 'sel-rose', btnClass: 'btn-rose',
+        img: 'assets/images/products/po-006/po-006-model-set.jpg',
+        badgeClass: 'badge-pill-rose', priceClass: 'mp-rose',
+        note: 'Crewneck and joggers sold separately. Reserve your size before the drop. Free cancellation.'
+      },
+      'po-007': {
+        col: 'Black Rose Collection', colClass: 'mt-rose',
         name: 'Black Rose Beanie', price: 'Price TBA',
-        desc: 'Black ribbed knit beanie with fold-up cuff. PVC patch on cuff: black rose mushroom cloud graphic in grey/silver.',
-        spec: 'Ribbed Knit · Classic Fitted Beanie · PVC Patch Detail',
+        desc: 'Black ribbed knit beanie with fold-up cuff. PVC patch on cuff featuring the black rose mushroom cloud graphic in grey/silver.',
+        spec: 'Ribbed Knit \u00b7 PVC Patch \u00b7 Classic Fitted',
+        specClass: 'ms-rose',
         sizes: ['One Size'], selClass: 'sel-rose', btnClass: 'btn-rose',
-        img: 'assets/images/products/br-004/br-004-model.jpg',
-        fallback: 'assets/images/products/br-004/br-004-product.jpg',
-        ribbon: 'Pre-Order', ribbonClass: 'ribbon-rose',
-        note: 'Reserve your size before the drop. Charged and shipped when ready. Free cancellation.'
+        img: 'assets/images/products/po-007/po-007-model.jpg',
+        badgeClass: 'badge-pill-rose', priceClass: 'mp-rose',
+        note: 'One size fits all. Reserve before the drop. Free cancellation.'
       },
       'lh-001': {
-        col: 'Love Hurts × SkyyRose', colClass: 'mc-blood',
-        name: 'Track Pants — Black', price: 'Price TBA',
-        desc: 'Black track pants with white side stripe and ankle zip hem. Left-leg embroidery: red rose bouquet with heart and arrow in classic tattoo flash style.',
-        spec: 'Athletic Track Fit · Ankle Zip Hem · Tattoo Flash Embroidery',
-        sizes: ['XS','S','M','L','XL','2XL'], selClass: 'sel-blood', btnClass: 'btn-blood',
+        col: 'Love Hurts Collection', colClass: 'mt-blood',
+        name: 'The Fannie', price: 'Price TBA',
+        desc: 'Luxury fanny pack from the Love Hurts collection. Sleek black material with defiant embroidered rose. Adjustable strap for versatile wear. A symbol of Oakland authenticity.',
+        spec: 'Fanny Pack \u00b7 Embroidered Rose \u00b7 Adjustable Strap',
+        specClass: 'ms-blood',
+        sizes: ['One Size'], selClass: 'sel-blood', btnClass: 'btn-blood',
         img: 'assets/images/products/lh-001/lh-001-model.jpg',
-        fallback: 'assets/images/products/lh-001/lh-001-product.jpg',
-        ribbon: 'Pre-Order', ribbonClass: 'ribbon-blood',
-        note: 'Reserve your size before the drop. Charged and shipped when ready. Free cancellation.'
+        badgeClass: 'badge-pill-blood', priceClass: 'mp-blood',
+        note: 'One size fits all. Reserve before the drop. Free cancellation.'
       },
-      'lh-002': {
-        col: 'Love Hurts × SkyyRose', colClass: 'mc-blood',
-        name: 'Track Pants — White', price: 'Price TBA',
-        desc: 'White track pants with black side stripe and ankle zip hem. Identical tattoo flash rose bouquet embroidery on left leg.',
-        spec: 'Athletic Track Fit · Ankle Zip Hem · Tattoo Flash Embroidery',
-        sizes: ['XS','S','M','L','XL','2XL'], selClass: 'sel-blood', btnClass: 'btn-blood',
-        img: 'assets/images/products/lh-002/lh-002-model.jpg',
-        fallback: 'assets/images/products/lh-002/lh-002-product.jpg',
-        ribbon: 'Pre-Order', ribbonClass: 'ribbon-blood',
-        note: 'Reserve your size before the drop. Charged and shipped when ready. Free cancellation.'
+      'po-009': {
+        col: 'Black Rose Collection', colClass: 'mt-rose',
+        name: 'SR Monogram Slides', price: 'Price TBA',
+        desc: 'Black slide sandals with bold SR monogram on the strap. Contoured footbed for comfort. SkyyRose branding throughout.',
+        spec: 'Molded Footbed \u00b7 SR Monogram Strap \u00b7 Lightweight',
+        specClass: 'ms-rose',
+        sizes: ['7','8','9','10','11','12','13'], selClass: 'sel-rose', btnClass: 'btn-rose',
+        img: 'assets/images/products/po-009/po-009-model.jpg',
+        badgeClass: 'badge-pill-rose', priceClass: 'mp-rose',
+        note: 'Select your size. Reserve before the drop. Free cancellation.'
       },
-      'sg-001': {
-        col: 'Signature Collection', colClass: 'mc-gold',
-        name: 'Golden Gate Mesh Shorts', price: 'Price TBA',
-        desc: 'All-over sublimation print mesh shorts: Golden Gate Bridge at night — deep purple sky, orange bridge, neon city reflections. Rose mushroom cloud logo lower right.',
-        spec: 'Athletic Mesh Fabric · Mid-Thigh Length · All-Over Print',
-        sizes: ['XS','S','M','L','XL','2XL'], selClass: 'sel-gold', btnClass: 'btn-gold',
-        img: 'assets/images/products/sg-001/sg-001-model.jpg',
-        fallback: 'assets/images/products/sg-001/sg-001-product.jpg',
-        ribbon: 'Pre-Order', ribbonClass: 'ribbon-gold',
-        note: 'Reserve your size before the drop. Charged and shipped when ready. Free cancellation.'
+      'po-010': {
+        col: 'Love Hurts \u00d7 SkyyRose', colClass: 'mt-blood',
+        name: 'Love Hurts Slides', price: 'Price TBA',
+        desc: 'Black slide sandals with Love Hurts collection branding. Red rose and heart tattoo-flash graphic on strap. Contoured comfort footbed.',
+        spec: 'Molded Footbed \u00b7 Love Hurts Graphic \u00b7 Lightweight',
+        specClass: 'ms-blood',
+        sizes: ['7','8','9','10','11','12','13'], selClass: 'sel-blood', btnClass: 'btn-blood',
+        img: 'assets/images/products/po-010/po-010-model.jpg',
+        badgeClass: 'badge-pill-blood', priceClass: 'mp-blood',
+        note: 'Select your size. Reserve before the drop. Free cancellation.'
       },
-      'sg-002': {
-        col: 'Signature Collection', colClass: 'mc-gold',
-        name: 'SF Rose White Tee', price: 'Price TBA',
-        desc: 'White crew-neck tee with center chest graphic: rose mushroom cloud featuring the Golden Gate Bridge night scene inside each rose. SR monogram at collar.',
-        spec: 'Premium Cotton · Relaxed Fit · SR Monogram Detail',
-        sizes: ['XS','S','M','L','XL','2XL'], selClass: 'sel-gold', btnClass: 'btn-gold',
-        img: 'assets/images/products/sg-002/sg-002-model.jpg',
-        fallback: 'assets/images/products/sg-002/sg-002-product.jpg',
-        ribbon: 'Pre-Order', ribbonClass: 'ribbon-gold',
-        note: 'Reserve your size before the drop. Charged and shipped when ready. Free cancellation.'
+      'po-011': {
+        col: 'Black Rose Collection', colClass: 'mt-rose',
+        name: 'Black Rose Slides', price: 'Price TBA',
+        desc: 'Black slide sandals with Black Rose collection branding. Rose mushroom cloud graphic on strap in grey/silver. Contoured comfort footbed.',
+        spec: 'Molded Footbed \u00b7 Black Rose Graphic \u00b7 Lightweight',
+        specClass: 'ms-rose',
+        sizes: ['7','8','9','10','11','12','13'], selClass: 'sel-rose', btnClass: 'btn-rose',
+        img: 'assets/images/products/po-011/po-011-model.jpg',
+        badgeClass: 'badge-pill-rose', priceClass: 'mp-rose',
+        note: 'Select your size. Reserve before the drop. Free cancellation.'
       },
     };
 
@@ -753,43 +1031,54 @@
 
       const img = document.getElementById('dImg');
       img.src = p.img;
-      img.onerror = () => { img.src = p.fallback; img.onerror = null; };
       img.alt = p.name;
 
-      const ribbon = document.getElementById('dRibbon');
-      ribbon.textContent = p.ribbon;
-      ribbon.className = 'modal-gal-ribbon ' + p.ribbonClass;
+      const badge = document.getElementById('dBadge');
+      badge.textContent = 'Pre-Order';
+      badge.className = 'modal-gal-badge ' + p.badgeClass;
 
       document.getElementById('dCol').textContent = p.col;
-      document.getElementById('dCol').className = 'modal-col ' + p.colClass;
+      document.getElementById('dCol').className = 'modal-tag ' + p.colClass;
       document.getElementById('dName').textContent = p.name;
-      document.getElementById('dPrice').textContent = p.price;
+
+      const price = document.getElementById('dPrice');
+      price.textContent = p.price;
+      price.className = 'modal-price ' + p.priceClass;
+
       document.getElementById('dDesc').textContent = p.desc;
-      document.getElementById('dSpec').textContent = p.spec;
+
+      const spec = document.getElementById('dSpec');
+      spec.textContent = p.spec;
+      spec.className = 'modal-spec ' + p.specClass;
+
       document.getElementById('dNote').textContent = p.note;
 
       const sizeRow = document.getElementById('dSizes');
-      sizeRow.innerHTML = p.sizes.map(s =>
-        `<button class="sz-btn" onclick="pickSize('${s}',this,'${p.selClass}')">${s}</button>`
-      ).join('');
+      sizeRow.innerHTML = p.sizes.map(function(s) {
+        return '<button class="sz-btn" onclick="pickSize(\'' + s + '\',this,\'' + p.selClass + '\')">' + s + '</button>';
+      }).join('');
 
       const btn = document.getElementById('dBtn');
       btn.textContent = 'Reserve Your Size';
       btn.className = 'action-btn ' + p.btnClass;
 
       document.getElementById('dNotify').classList.remove('open');
+      document.getElementById('modalBackdrop').classList.add('open');
       document.getElementById('detailModal').classList.add('open');
       document.body.style.overflow = 'hidden';
     }
 
     function closeModal() {
       document.getElementById('detailModal').classList.remove('open');
+      document.getElementById('modalBackdrop').classList.remove('open');
       document.body.style.overflow = '';
       currentId = null;
     }
 
     function pickSize(size, btn, selClass) {
-      document.querySelectorAll('.sz-btn').forEach(b => b.classList.remove('sel-rose','sel-blood','sel-gold'));
+      document.querySelectorAll('.sz-btn').forEach(function(b) {
+        b.classList.remove('sel-rose','sel-blood','sel-gold');
+      });
       btn.classList.add(selClass);
     }
 
@@ -798,86 +1087,74 @@
     }
 
     function submitNotify() {
-      const email = document.getElementById('dEmail').value;
+      var email = document.getElementById('dEmail').value;
       if (!email) return;
-      const btn = document.querySelector('.ni-go');
-      btn.textContent = "✓ You're on the list";
+      var btn = document.querySelector('.ni-go');
+      btn.textContent = "\u2713 You're on the list";
       btn.style.background = '#1e5c35';
     }
 
     function bannerNotify(e, form) {
       e.preventDefault();
-      const btn = form.querySelector('.banner-btn');
-      btn.textContent = "✓ You're on the list!";
+      var btn = form.querySelector('.banner-btn');
+      btn.textContent = "\u2713 You're on the list!";
       btn.style.background = '#1e5c35';
       btn.style.animation = 'none';
     }
 
-    // Close on backdrop
-    document.getElementById('detailModal').addEventListener('click', e => {
-      if (e.target === document.getElementById('detailModal')) closeModal();
-    });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+    function toggleWish(btn) {
+      btn.classList.toggle('active');
+    }
 
-    // ── Ambient orbs ──────────────────────────────────
-    setTimeout(() => document.querySelectorAll('.orb').forEach(o => o.style.opacity = '1'), 400);
+    // Close on Escape
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
 
-    // ── Cursor glow ───────────────────────────────────
-    const glow = document.getElementById('cursor-glow');
-    let mx = 0, my = 0, gx = 0, gy = 0;
-    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    // ── Ambient orbs ──
+    setTimeout(function() {
+      document.querySelectorAll('.orb').forEach(function(o) { o.style.opacity = '1'; });
+    }, 400);
+
+    // ── Cursor glow ──
+    var glow = document.getElementById('cursor-glow');
+    var mx = 0, my = 0, gx = 0, gy = 0;
+    document.addEventListener('mousemove', function(e) { mx = e.clientX; my = e.clientY; });
     (function animGlow() {
       gx += (mx - gx) * 0.06; gy += (my - gy) * 0.06;
       glow.style.left = gx + 'px'; glow.style.top = gy + 'px';
       requestAnimationFrame(animGlow);
     })();
 
-    // ── Hero parallax ────────────────────────────────
-    const heroTitle = document.querySelector('.hero-title');
-    const heroTag   = document.querySelector('.hero-tagline');
-    window.addEventListener('scroll', () => {
-      const s = window.scrollY;
-      if (heroTitle) heroTitle.style.transform = `translateY(${s * 0.28}px)`;
-      if (heroTag)   heroTag.style.transform   = `translateY(${s * 0.14}px)`;
+    // ── Hero parallax ──
+    var heroTitle = document.querySelector('.hero-title');
+    var heroTag   = document.querySelector('.hero-tagline');
+    window.addEventListener('scroll', function() {
+      var s = window.scrollY;
+      if (heroTitle) heroTitle.style.transform = 'translateY(' + (s * 0.28) + 'px)';
+      if (heroTag)   heroTag.style.transform   = 'translateY(' + (s * 0.14) + 'px)';
     }, { passive: true });
 
-    // ── Scroll reveal ────────────────────────────────
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(e => {
+    // ── Scroll reveal ──
+    var io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
         if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    document.querySelectorAll('.reveal').forEach(function(el) { io.observe(el); });
 
-    // ── Section accent lines ──────────────────────────
-    const sio = new IntersectionObserver(entries => {
-      entries.forEach(e => e.target.classList.toggle('sec-visible', e.isIntersecting));
+    // ── Section accent lines ──
+    var sio = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) { e.target.classList.toggle('sec-visible', e.isIntersecting); });
     }, { threshold: 0.15 });
-    document.querySelectorAll('.col-section').forEach(el => sio.observe(el));
+    document.querySelectorAll('.col-section').forEach(function(el) { sio.observe(el); });
 
-    // ── Card 3D tilt ──────────────────────────────────
-    document.querySelectorAll('.product-card').forEach(card => {
-      card.addEventListener('mouseenter', () => { card.style.transition = 'transform 0.08s linear'; });
-      card.addEventListener('mousemove', e => {
-        const r = card.getBoundingClientRect();
-        const dx = (e.clientX - r.left - r.width  / 2) / (r.width  / 2);
-        const dy = (e.clientY - r.top  - r.height / 2) / (r.height / 2);
-        card.style.transform = `perspective(900px) rotateY(${dx * 7}deg) rotateX(${-dy * 7}deg) scale(1.025)`;
-      });
-      card.addEventListener('mouseleave', () => {
-        card.style.transition = 'transform 0.55s cubic-bezier(0.16,1,0.3,1)';
-        card.style.transform = '';
-      });
-    });
-
-    // ── Magnetic pills ────────────────────────────────
-    document.querySelectorAll('.hero-pill').forEach(pill => {
-      pill.addEventListener('mousemove', e => {
-        const r = pill.getBoundingClientRect();
+    // ── Magnetic pills ──
+    document.querySelectorAll('.hero-pill').forEach(function(pill) {
+      pill.addEventListener('mousemove', function(e) {
+        var r = pill.getBoundingClientRect();
         pill.style.transition = 'transform 0.1s linear';
-        pill.style.transform = `translate(${(e.clientX - r.left - r.width/2) * 0.3}px, ${(e.clientY - r.top - r.height/2) * 0.3}px)`;
+        pill.style.transform = 'translate(' + ((e.clientX - r.left - r.width/2) * 0.3) + 'px, ' + ((e.clientY - r.top - r.height/2) * 0.3) + 'px)';
       });
-      pill.addEventListener('mouseleave', () => {
+      pill.addEventListener('mouseleave', function() {
         pill.style.transition = 'transform 0.5s cubic-bezier(0.16,1,0.3,1)';
         pill.style.transform = '';
       });
