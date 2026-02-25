@@ -11,6 +11,18 @@ class Vector3 {
   set(x, y, z) { this.x = x; this.y = y; this.z = z; return this; }
   clone() { return new Vector3(this.x, this.y, this.z); }
   copy(v) { this.x = v.x; this.y = v.y; this.z = v.z; return this; }
+  toArray() { return [this.x, this.y, this.z]; }
+  project() { return this; }
+  lerpVectors(a, b, t) { this.x = a.x + (b.x - a.x) * t; this.y = a.y + (b.y - a.y) * t; this.z = a.z + (b.z - a.z) * t; return this; }
+  multiplyScalar(s) { this.x *= s; this.y *= s; this.z *= s; return this; }
+  lerp(v, t) { this.x += (v.x - this.x) * t; this.y += (v.y - this.y) * t; this.z += (v.z - this.z) * t; return this; }
+}
+
+class Vector2 {
+  constructor(x = 0, y = 0) { this.x = x; this.y = y; }
+  set(x, y) { this.x = x; this.y = y; return this; }
+  clone() { return new Vector2(this.x, this.y); }
+  copy(v) { this.x = v.x; this.y = v.y; return this; }
 }
 
 class Euler {
@@ -20,7 +32,9 @@ class Euler {
 
 class Color {
   constructor(r = 0, g = 0, b = 0) {
-    if (typeof r === 'number' && g === undefined) {
+    if (typeof r === 'string') {
+      this.r = 0; this.g = 0; this.b = 0;
+    } else if (typeof r === 'number' && g === undefined) {
       this.r = ((r >> 16) & 255) / 255;
       this.g = ((r >> 8) & 255) / 255;
       this.b = (r & 255) / 255;
@@ -29,6 +43,9 @@ class Color {
     }
   }
   set(value) { return this; }
+  copy(c) { this.r = c.r; this.g = c.g; this.b = c.b; return this; }
+  setHex(hex) { return this; }
+  clone() { const c = new Color(); c.r = this.r; c.g = this.g; c.b = this.b; return c; }
 }
 
 class Box3 {
@@ -80,7 +97,7 @@ class PlaneGeometry extends BufferGeometry { constructor(w = 1, h = 1) { super()
 class SphereGeometry extends BufferGeometry { constructor(r = 1) { super(); this.parameters = { radius: r }; } }
 class CylinderGeometry extends BufferGeometry { constructor(rt = 1, rb = 1, h = 1) { super(); this.parameters = { radiusTop: rt, radiusBottom: rb, height: h }; } }
 
-class Material { constructor() { this.color = new Color(); this.opacity = 1; this.transparent = false; } dispose() {} }
+class Material { constructor() { this.color = new Color(); this.opacity = 1; this.transparent = false; this.needsUpdate = false; } dispose() {} clone() { const m = new this.constructor(); Object.assign(m, this); m.color = this.color.clone(); return m; } }
 class MeshBasicMaterial extends Material { constructor(params = {}) { super(); Object.assign(this, params); } }
 class MeshStandardMaterial extends Material { constructor(params = {}) { super(); this.metalness = 0; this.roughness = 1; Object.assign(this, params); } }
 class MeshPhongMaterial extends Material { constructor(params = {}) { super(); Object.assign(this, params); } }
@@ -192,7 +209,10 @@ class Float32BufferAttribute extends BufferAttribute { constructor(array, itemSi
 
 const PCFSoftShadowMap = 2;
 const ACESFilmicToneMapping = 4;
+const SRGBColorSpace = 'srgb';
+const RepeatWrapping = 1000;
 
+exports.Vector2 = Vector2;
 exports.Vector3 = Vector3;
 exports.Euler = Euler;
 exports.Color = Color;
@@ -235,6 +255,8 @@ exports.ACESFilmicToneMapping = ACESFilmicToneMapping;
 exports.CanvasTexture = CanvasTexture;
 exports.SpriteMaterial = SpriteMaterial;
 exports.Sprite = Sprite;
+exports.SRGBColorSpace = SRGBColorSpace;
+exports.RepeatWrapping = RepeatWrapping;
 
 // Additional mocks for WordPress theme tests and collection experiences
 // Note: Cannot use jest.fn() here — this file is loaded via moduleNameMapper before jest globals exist
