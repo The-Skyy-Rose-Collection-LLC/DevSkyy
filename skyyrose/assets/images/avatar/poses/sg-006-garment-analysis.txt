@@ -1,0 +1,114 @@
+**TECHNICAL SPECIFICATION SHEET**
+
+**GARMENT SET: "Rose Cloud" Athleisure Ensemble**
+
+**I. GARMENT TYPE**
+
+1.  **Hoodie:** Long-sleeve pullover hooded sweatshirt with kangaroo pocket.
+2.  **Crewneck Sweatshirt:** Long-sleeve pullover crewneck sweatshirt.
+3.  **Jogger Pants:** Tapered leg sweatpants with elasticated drawstring waistband and ribbed ankle cuffs.
+
+**II. BASE COLOR**
+
+*   **Exact Hex:** #B2D8C9
+*   **Descriptive Name:** Pastel Sage Green. A soft, muted, and slightly desaturated light green, reminiscent of mint or seafoam green.
+
+**III. SECONDARY COLORS**
+
+1.  **Purple/Lavender:** Used prominently in graphic elements. (Specific hex codes detailed in "GRAPHICS" section).
+2.  **White:** Used for drawstrings, subtle highlights within graphics, and branding detail.
+3.  **Red:** Used for the small branding patch/label.
+4.  **Grey/Light Blue:** Used for subtle cloud/smoke elements within graphics.
+
+**IV. FIT & SILHOUETTE**
+
+*   **Overall Fit:** Relaxed / Oversized. Designed for comfort and a contemporary casual aesthetic, allowing for ease of movement.
+*   **Hoodie & Crewneck Sweatshirt:**
+    *   **Torso:** Relaxed fit through the chest and body.
+    *   **Length:** Standard to slightly elongated, designed to fall to approximately the mid-hip.
+    *   **Sleeves:** Relaxed, full-length sleeves with a slight taper towards the ribbed cuffs.
+*   **Jogger Pants:**
+    *   **Waist & Hip:** Relaxed fit, allowing comfortable drape.
+    *   **Thigh & Leg:** Relaxed through the thigh, gradually tapering to a fitted, ribbed ankle cuff.
+    *   **Length:** Standard full-length inseam.
+
+**V. GRAPHICS**
+
+1.  **Main Front Graphic (Hoodie & Crewneck Sweatshirt):**
+    *   **Location:** Centered vertically on the front torso. Positioned approximately 5-7 cm below the lowest point of the hood/collar opening and 5-7 cm above the top edge of the kangaroo pocket (hoodie) or waistband (crewneck).
+    *   **Relative Size:** Approximately 28 cm (width) x 32 cm (height). Visually, this is about 25-30% of the garment's torso width and 30-35% of the torso length.
+    *   **Content:** A highly stylized depiction of a multi-petaled rose flower. The rose is presented as "exploding" or "growing" from a swirling, cloud-like or smoke-like base, visually resembling a small mushroom cloud.
+    *   **Colors (Rose Petals/Structure):** Features a gradient and shading of purple and lavender tones.
+        *   Deepest Purple/Shadows: #4A148C
+        *   Mid-tone Purple: #8E44AD
+        *   Light Lavender/Highlights: #AF7AC5
+        *   Pale Lavender Accents: #D2B4DE
+    *   **Colors (Cloud/Smoke Base):** Gradations of white, light grey, and very subtle cool blue/purple.
+        *   Bright White/Highlights: #F0F4F7
+        *   Light Grey: #DDE4E9
+        *   Subtle Blue-Grey/Shadows: #C0CADF
+    *   **Style:** High-quality direct-to-garment (DTG) print or screen print, exhibiting fine detail, subtle color transitions, and a slightly textured or faded aesthetic for a vintage feel.
+
+2.  **Small Front Graphic (Jogger Pants):**
+    *   **Location:** On the wearer's left thigh, positioned approximately 2-3 cm below the waistband seam and horizontally centered within the thigh panel, or slightly above the pocket opening.
+    *   **Relative Size:** Approximately 10 cm (width) x 12 cm (height). Visually, this is about 8-10% of the jogger's total length and 10-12% of the thigh width.
+    *   **Content, Colors, Style:** Identical content, color palette, and printing style as the main front graphic (stylized rose exploding from cloud), scaled down proportionally.
+
+3.  **Small Back Graphic (Crewneck Sweatshirt):**
+    *   **Location:** Centered on the upper back, approximately 3-5 cm below the ribbed crewneck collar seam.
+    *   **Relative Size:** Approximately 10 cm (width) x 12 cm (height). Visually, this is about 8-10% of the garment's torso length and 10-12% of the torso width.
+    *   **Content, Colors, Style:** Identical content, color palette, and printing style as the main front graphic (stylized rose exploding from cloud), scaled down proportionally.
+
+**VI. TEXT**
+
+*   No visible text, words, letters, or numbers on any garment.
+
+**VII. LOGOS & BRANDING**
+
+1.  **Woven Label/Patch:**
+    *   **Location:**
+        *   **Hoodie:** Sewn onto the outer edge of the wearer's left ribbed cuff.
+        *   **Crewneck Sweatshirt:** Sewn onto the outer edge of the wearer's left ribbed cuff.
+        *   **Jogger Pants:** Sewn onto the wearer's left side, typically on the side seam or near the top of the pocket opening, in the hip area.
+    *   **Content:** Small, rectangular woven label. Features a solid red background. Contains a very small, indiscernible white graphic or wordmark in the center (appears abstract or stylized).
+    *   **Size:** Approximately 1.5 cm (height) x 2.5 cm (width).
+
+**VIII. HARDWARE**
+
+1.  **Drawstrings:**
+    *   **Material:** Flat, tightly woven cotton tape.
+    *   **Color:** Off-white / Cream white.
+    *   **Finish:** Matte, slightly textured. Ends are finished with clean, fused tips or simple knots.
+    *   **Garments:** Hoodie (at hood opening), Jogger Pants (at front waistband).
+2.  **Eyelets:**
+    *   **Material:** Metal.
+    *   **Color/Finish:** Matte silver-toned or matte white enamel finish.
+    *   **Garments:** Hoodie (two eyelets for drawstring at hood opening), Jogger Pants (two eyelets for drawstring at front waistband).
+
+**IX. FABRIC TEXTURE**
+
+*   **Main Body Fabric:** Medium-weight (estimated 320-360 GSM) cotton or cotton-blend fleece.
+    *   **Outer Surface:** Smooth, soft, uniform knit, with a subtle drape and no visible sheen.
+    *   **Inner Surface:** Likely brushed fleece for softness and warmth (not directly visible).
+    *   **Thickness:** Appears substantial, providing structure without stiffness.
+*   **Rib-Knit Fabric:**
+    *   **Composition:** Cotton or cotton-blend 1x1 or 2x2 rib-knit.
+    *   **Texture:** Clearly defined vertical ribbing.
+    *   **Stretch:** High elasticity for comfort and shape retention at cuffs, waistband, and collar.
+
+**X. SPECIAL DETAILS**
+
+1.  **Hoodie:**
+    *   **Hood:** Constructed from two panels, self-lined with the same base fabric, ensuring a clean finish.
+    *   **Kangaroo Pocket:** Large, singular patch pocket on the front torso, with openings on either side. Edges are clean-finished.
+    *   **Cuffs:** Rib-knit cuffs, approximately 5-6 cm in height.
+    *   **Waistband:** Rib-knit waistband, approximately 5-6 cm in height.
+2.  **Crewneck Sweatshirt:**
+    *   **Collar:** Rib-knit crewneck collar, approximately 2-2.5 cm in width.
+    *   **Cuffs:** Rib-knit cuffs, approximately 5-6 cm in height.
+    *   **Waistband:** Rib-knit waistband, approximately 5-6 cm in height.
+3.  **Jogger Pants:**
+    *   **Waistband:** Wide, elasticated waistband. The visible exterior portion is rib-knit, approximately 5-6 cm in height, with an internal elastic.
+    *   **Pockets:** Features two standard side-seam pockets. No visible back pockets.
+    *   **Ankle Cuffs:** Rib-knit ankle cuffs, approximately 5-6 cm in height, providing a snug fit.
+4.  **Seams:** All garments utilize professional construction seams, likely a combination of overlock stitching for interior edges and flatlock stitching for visible seam lines where applicable, ensuring durability and a comfortable finish.

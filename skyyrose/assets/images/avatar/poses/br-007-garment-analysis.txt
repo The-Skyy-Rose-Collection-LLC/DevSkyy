@@ -1,0 +1,66 @@
+Here is an ultra-precise technical description of the garment(s):
+
+---
+
+**TECHNICAL SPECIFICATION: ATHLETIC MESH SHORTS**
+
+1.  **GARMENT TYPE:** Men's Athletic Mesh Shorts (specifically, Basketball Shorts style).
+
+2.  **BASE COLOR:** Jet Black (Hex: #000000) for the main body mesh fabric.
+
+3.  **SECONDARY COLORS (in order of prominence):**
+    *   **Cream White:** (Hex: approximately #F8F8F8) for waistband, front and rear side panels, front left curved stripe, rear center panel, and drawstrings.
+    *   **Light Grey / Medium Grey:** (Hex: varies, approximately #B0B0B0 - #808080) for all-over rose and cloud pattern, "OAKLAND" text shadow/outline, base "Love Hurts" script on front, and heart graphic on rear.
+    *   **Metallic Silver / Shiny Grey:** (Hex: reflects light, approximately #C0C0C0 effect) for panel trim stripes, and small rhinestone embellishments on front "Love Hurts" script.
+    *   **Dark Grey:** (Hex: approximately #404040) for outlines of all-over roses, outline of "OAKLAND" text, and "Love Hurts" script on rear.
+    *   **Emerald Green:** (Hex: approximately #008000) for leaves on the front left thigh rose graphic.
+    *   **Pale Sky Blue:** (Hex: approximately #ADD8E6) for stylized cloud-like swirls on the front left thigh panel.
+
+4.  **FIT:** Relaxed, oversized athletic fit with a wide leg opening. Length is above-knee.
+
+5.  **GRAPHICS:**
+    *   **Main Body Mesh (Front & Back):** An all-over repeat pattern of medium grey stylized roses with darker grey outlines, interspersed with lighter grey abstract cloud-like shapes. The roses appear slightly faded or distressed. This pattern is integrated into the mesh fabric, likely via sublimation printing.
+    *   **Front Left Thigh (on upper portion of white mesh panel):** A high-quality embroidered or appliquéd graphic of a single, realistic black rose with three prominent emerald green leaves. Subtle pale sky blue stylized cloud-like swirls are integrated into the background of this rose motif, especially above it.
+    *   **Front Right Thigh (on black mesh, overlapping edge of white panel):** A large, stylized script "Love Hurts". The base text is a light grey/silver with a subtle drop shadow or outline. This script is extensively embellished with numerous small, round, metallic silver rhinestones or studs, clustered predominantly on the capital 'L' of "Love" and 'H' of "Hurts", and scattered throughout the remainder of the script, creating a glittery, reflective effect.
+    *   **Rear Center Panel (on hexagonal white mesh panel):** A centrally placed graphic featuring a stylized human heart, colored in medium grey, intricately wrapped with dark grey/black thorny vines. A single drop of stylized red/dark grey liquid (representing blood or a tear) is depicted near the bottom of the heart. Below this heart graphic, the script "Love Hurts" is rendered in dark grey/black, matching the style of the front script but without any rhinestone embellishments.
+    *   **Rear Left Side Panel (internal):** An outline of a stylized abstract shape (possibly a cloud or torn fabric effect) in light grey, positioned above the pocket opening.
+
+6.  **TEXT:**
+    *   **Front Center:** "OAKLAND" in bold, capital, block letters.
+        *   **Color:** Cream White with a distinct medium grey shadow/outline, providing a three-dimensional effect.
+        *   **Style:** Appears to be a raised appliqué or thick embroidery, giving it a tangible, textured finish.
+        *   **Placement:** Horizontally centered on the black mesh main body, positioned at approximately mid-thigh height.
+    *   **Front Right Thigh:** "Love Hurts" (as described in Graphics, with rhinestones).
+    *   **Rear Center Panel:** "Love Hurts" (as described in Graphics, without rhinestones).
+
+7.  **LOGOS & BRANDING:**
+    *   The "Love Hurts" script and associated heart graphic function as the primary brand identifier, present on both the front and rear of the shorts.
+    *   **Front Right Side Panel (on lower part of white mesh):** A small, stylized interlocking initial graphic (possibly 'LH' or 'LXH') in cream white, executed as an embroidery or appliqué, subtly integrated into the white mesh.
+
+8.  **HARDWARE:**
+    *   **Drawstrings:** Flat, woven cream white drawstrings, approximately 1cm in width, visible at the center front waistband. No aglets are visible, but polished silver-toned metal aglets would be typical for this style.
+    *   **Eyelets:** Not explicitly visible, but implied for drawstring passage. If present, likely silver-toned metal.
+
+9.  **FABRIC TEXTURE:**
+    *   **Main Body & Side Panels:** Perforated mesh fabric (likely 100% Polyester), exhibiting visible small holes throughout, providing breathability. The black mesh appears slightly denser/less sheer than the white mesh. Overall matte finish.
+    *   **Waistband:** Smooth, opaque, soft knit fabric (likely a polyester blend), providing structure and comfort.
+    *   **Graphics:**
+        *   "OAKLAND" text and front left thigh rose graphic exhibit a raised, substantial texture consistent with appliqué or thick embroidery.
+        *   The rhinestones/studs on the front "Love Hurts" script provide a hard, faceted, reflective, metallic texture.
+        *   The all-over rose and cloud pattern and rear "Love Hurts" script/heart graphic are smooth and integrated into the fabric, characteristic of sublimation printing.
+
+10. **SPECIAL DETAILS:**
+    *   **Waistband:** Wide (approximately 5-6 cm in height), flat, solid cream white elasticated waistband. Features a visible internal drawstring tunnel with gathering at the front.
+    *   **Side Panels (Front & Back):** Complex, multi-paneled construction.
+        *   **Primary Side Panel:** A cream white mesh panel runs vertically down each outer side, starting from the waistband and extending to the hem. This panel features a distinct angular, almost star-like point that extends inward towards the center of the thigh near the lower portion.
+        *   **Panel Edging:** The cream white mesh side panel is framed by two narrow stripes: an inner metallic silver/shiny grey stripe (approx. 0.3 cm) and an outer black stripe (approx. 0.5 cm).
+        *   **Internal Stripe:** Within the cream white mesh side panel, running parallel to the outer edge, is a prominent, thick black stripe (approx. 2.5-3 cm wide) with a thin medium grey outline.
+        *   **Front Left Panel Detail:** A curved, solid cream white stripe (approximately 1 cm wide, possibly piping or appliqué) extends from the waistband, arching gracefully into the upper part of the white mesh side panel.
+        *   **Rear Center Panel:** A large, distinctive hexagonal-shaped cream white mesh panel is centrally positioned on the lower back. This panel is outlined with a black and metallic silver/shiny grey stripe, matching the trim of the side panels.
+        *   **Rear Left Side Pocket/Detail:**
+            *   **Upper Left Rear:** A horizontal cream white fabric strip (approximately 1.5-2 cm wide) is sewn horizontally onto the black mesh, acting as a decorative element or the lip of a potential hidden pocket.
+            *   **Left Side Panel (Internal):** An open slit, revealing black lining, is present within the cream white mesh side panel, near the top, resembling a functional or decorative pocket opening. This opening appears to be reinforced with a cream white fabric strip along its edge.
+    *   **Hems:** The leg openings feature a clean, stitched self-fabric hem, where the various panels seamlessly integrate.
+    *   **Seams:** Visible seams outlining the distinct panel constructions, indicating durable, likely flat-felled or overlocked construction.
+
+---
