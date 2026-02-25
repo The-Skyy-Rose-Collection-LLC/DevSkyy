@@ -62,7 +62,7 @@ $gateway_products = array(
 		'collection_label' => esc_html__( 'Black Rose', 'skyyrose-flagship' ),
 		'sizes'           => 'S,M,L,XL,2XL,3XL',
 		'desc'            => esc_html__( 'Lustrous black satin with plush Sherpa lining, crowned by an exquisite embroidered rose.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/br-006-sherpa.jpg',
+		'image'           => get_template_directory_uri() . '/assets/images/products/br-006-sherpa.webp',
 		'edition'         => '250',
 	),
 	array(
@@ -86,7 +86,7 @@ $gateway_products = array(
 		'collection_label' => esc_html__( 'Love Hurts', 'skyyrose-flagship' ),
 		'sizes'           => 'One Size',
 		'desc'            => esc_html__( 'Luxury fanny pack embodying Oakland grit, passion, and the defiant bloom of a street rose.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/lh-001-fannie.jpg',
+		'image'           => get_template_directory_uri() . '/assets/images/products/lh-001-fannie.webp',
 		'edition'         => '250',
 	),
 	array(
@@ -97,7 +97,7 @@ $gateway_products = array(
 		'collection_label' => esc_html__( 'Love Hurts', 'skyyrose-flagship' ),
 		'sizes'           => 'S,M,L,XL,2XL,3XL',
 		'desc'            => esc_html__( 'Oakland grit meets luxury. Feel the fire with the embroidered rose, a symbol of passion.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/lh-002-joggers.jpg',
+		'image'           => get_template_directory_uri() . '/assets/images/products/lh-002-joggers.webp',
 		'edition'         => '250',
 	),
 	array(
@@ -132,7 +132,7 @@ $gateway_products = array(
 		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
 		'sizes'           => 'S,M,L,XL,2XL,3XL',
 		'desc'            => esc_html__( 'Embody West Coast luxury with this exclusive ensemble. Iconic blue rose and vibrant Bay Area skyline.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/sg-001-bay-set.jpg',
+		'image'           => get_template_directory_uri() . '/assets/images/products/sg-001-bay-set.webp',
 		'edition'         => '250',
 	),
 	array(
@@ -154,7 +154,7 @@ $gateway_products = array(
 		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
 		'sizes'           => 'S,M,L,XL,2XL,3XL',
 		'desc'            => esc_html__( 'The essential SkyyRose tee in a rich orchid colorway. Soft cotton with embroidered rose.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/sg-012-label-tee-orchid.jpg',
+		'image'           => get_template_directory_uri() . '/assets/images/products/sg-012-label-tee-orchid.webp',
 		'edition'         => '250',
 	),
 	array(
@@ -169,6 +169,17 @@ $gateway_products = array(
 		'edition'         => '250',
 	),
 	array(
+		'id'              => 'sg-005',
+		'name'            => esc_html__( 'Stay Golden Tee (Classic)', 'skyyrose-flagship' ),
+		'price'           => '$40',
+		'collection'      => 'signature',
+		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
+		'sizes'           => 'XS,S,M,L,XL,2XL',
+		'desc'            => esc_html__( 'The classic Stay Golden silhouette. Timeless Bay Area luxury in every stitch.', 'skyyrose-flagship' ),
+		'image'           => get_template_directory_uri() . '/assets/images/products/sg-005-stay-golden-tee.webp',
+		'edition'         => '250',
+	),
+	array(
 		'id'              => 'sg-007',
 		'name'            => esc_html__( 'The Signature Beanie', 'skyyrose-flagship' ),
 		'price'           => '$25',
@@ -177,6 +188,17 @@ $gateway_products = array(
 		'sizes'           => 'One Size',
 		'desc'            => esc_html__( 'Classic fitted beanie with embroidered signature rose. West Coast luxury meets everyday warmth.', 'skyyrose-flagship' ),
 		'image'           => get_template_directory_uri() . '/assets/images/products/sg-007-signature-beanie.webp',
+		'edition'         => '250',
+	),
+	array(
+		'id'              => 'sg-008',
+		'name'            => esc_html__( 'Signature Crop Hoodie', 'skyyrose-flagship' ),
+		'price'           => '$50',
+		'collection'      => 'signature',
+		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
+		'sizes'           => 'XS,S,M,L,XL,2XL',
+		'desc'            => esc_html__( 'Cropped silhouette meets luxury streetwear. Peach rose-gold front with black rose design on the back.', 'skyyrose-flagship' ),
+		'image'           => get_template_directory_uri() . '/assets/images/products/sg-008-crop-hoodie.webp',
 		'edition'         => '250',
 	),
 	array(
