@@ -1,5 +1,9 @@
 # DevSkyy Platform - .gitignore
 
+# Ralph context file (persists across iterations, never commit deletions)
+.ralph/ralph-context.md
+.ralph/.ralph-context.bak
+
 # Python
 __pycache__/
 *.py[cod]
