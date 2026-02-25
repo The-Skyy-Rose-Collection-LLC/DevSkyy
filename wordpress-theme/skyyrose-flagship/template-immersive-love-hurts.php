@@ -75,19 +75,6 @@ $love_hurts_rooms = array(
 				'prop'       => 'velvet-drape',
 				'prop_label' => esc_html__( 'Folded on purple velvet drape', 'skyyrose-flagship' ),
 			),
-			array(
-				'id'         => 'lh-004',
-				'name'       => esc_html__( 'Love Hurts Varsity Jacket', 'skyyrose-flagship' ),
-				'price'      => '$265',
-				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/lh-004-varsity.jpg',
-				'url'        => '/?product_id=lh-004',
-				'left'       => '28',
-				'top'        => '35',
-				'prop'       => 'chandelier',
-				'prop_label' => esc_html__( 'Draped from crystal chandelier arm', 'skyyrose-flagship' ),
-			),
 		),
 	),
 	// Room 3 — Crimson Throne Room
@@ -109,19 +96,6 @@ $love_hurts_rooms = array(
 				'prop'       => 'ornate-throne',
 				'prop_label' => esc_html__( 'Resting on ornate golden throne', 'skyyrose-flagship' ),
 			),
-			array(
-				'id'         => 'lh-003',
-				'name'       => esc_html__( 'Love Hurts Basketball Shorts', 'skyyrose-flagship' ),
-				'price'      => '$75',
-				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/lh-003-shorts.jpg',
-				'url'        => '/?product_id=lh-003',
-				'left'       => '35',
-				'top'        => '62',
-				'prop'       => 'carpet-pedestal',
-				'prop_label' => esc_html__( 'Folded on crimson carpet pedestal', 'skyyrose-flagship' ),
-			),
 		),
 	),
 	// Room 4 — Enchanted Rose Shrine
@@ -131,26 +105,13 @@ $love_hurts_rooms = array(
 		'alt'      => esc_attr__( 'Red-caped figure facing golden shrine with enchanted rose, ornate columns, and warm ethereal light', 'skyyrose-flagship' ),
 		'products' => array(
 			array(
-				'id'         => 'lh-005',
-				'name'       => esc_html__( 'Love Hurts Bomber Jacket', 'skyyrose-flagship' ),
-				'price'      => '$245',
+				'id'         => 'lh-003',
+				'name'       => esc_html__( 'Love Hurts Basketball Shorts', 'skyyrose-flagship' ),
+				'price'      => '$75',
 				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
 				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/lh-005-bomber.jpg',
-				'url'        => '/?product_id=lh-005',
-				'left'       => '45',
-				'top'        => '42',
-				'prop'       => 'golden-shrine',
-				'prop_label' => esc_html__( 'Displayed at golden shrine altar', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'lh-002',
-				'name'       => esc_html__( 'Love Hurts Joggers', 'skyyrose-flagship' ),
-				'price'      => '$95',
-				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/lh-002-joggers.jpg',
-				'url'        => '/?product_id=lh-002',
+				'image'      => get_template_directory_uri() . '/assets/images/products/lh-003-shorts.jpg',
+				'url'        => '/?product_id=lh-003',
 				'left'       => '70',
 				'top'        => '58',
 				'prop'       => 'ornate-column',
@@ -259,7 +220,7 @@ get_header();
 
 	<!-- Product Detail Panel (Glassmorphism Slide-Up) -->
 	<div class="product-panel-overlay" aria-hidden="true"></div>
-	<aside class="product-panel" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Product Details', 'skyyrose-flagship' ); ?>">
+	<aside class="product-panel" role="dialog" aria-modal="true" aria-hidden="true" aria-label="<?php esc_attr_e( 'Product Details', 'skyyrose-flagship' ); ?>">
 		<button class="product-panel-close" type="button" aria-label="<?php esc_attr_e( 'Close product details', 'skyyrose-flagship' ); ?>">&times;</button>
 		<div class="product-panel-inner">
 			<div class="product-panel-thumb">
@@ -273,7 +234,7 @@ get_header();
 				<div class="product-panel-sizes" role="group" aria-label="<?php esc_attr_e( 'Available sizes', 'skyyrose-flagship' ); ?>"></div>
 				<div class="product-panel-actions">
 					<button class="btn-add-to-cart" type="button"><?php echo esc_html__( 'Pre-Order Now', 'skyyrose-flagship' ); ?></button>
-					<a class="btn-view-details" href="#"><?php echo esc_html__( 'Details', 'skyyrose-flagship' ); ?></a>
+					<a class="btn-view-details" href="#"><?php echo esc_html__( 'View Details', 'skyyrose-flagship' ); ?></a>
 				</div>
 			</div>
 		</div>
