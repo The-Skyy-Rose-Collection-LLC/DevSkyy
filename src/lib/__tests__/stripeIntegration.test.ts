@@ -10,8 +10,10 @@ import {
   createPaymentIntent,
   validatePaymentForm,
   SKYYROSE_STRIPE_THEME,
+  Stripe,
+  StripeElements,
+  PaymentIntentResult,
 } from '../stripeIntegration';
-import type { Stripe, StripeElements, PaymentIntentResult } from '../stripeIntegration';
 
 // --- Helpers ---
 

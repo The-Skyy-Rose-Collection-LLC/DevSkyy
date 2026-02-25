@@ -3,10 +3,9 @@
  * @jest-environment jsdom
  */
 
-import { ProductInteractionHandler } from '../productInteraction';
-import type { ProductInteractionConfig, CartManager } from '../productInteraction';
-import type { ShowroomProduct, InventoryStatus } from '../../types/product';
-import type { InventoryManager } from '../inventory';
+import { ProductInteractionHandler, ProductInteractionConfig, CartManager } from '../productInteraction';
+import { ShowroomProduct, InventoryStatus } from '../../types/product';
+import { InventoryManager } from '../inventory';
 
 // Mock Logger
 jest.mock('../../utils/Logger', () => ({
