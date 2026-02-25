@@ -16,6 +16,7 @@ from .visual_generation import (
     GoogleVeoClient,
     HuggingFaceFluxClient,
     ImageQuality,
+    ReplicateLoRAClient,
     VisualGenerationRouter,
     VisualProvider,
     create_visual_router,
@@ -33,6 +34,7 @@ __all__ = [
     "GoogleImagenClient",
     "GoogleVeoClient",
     "HuggingFaceFluxClient",
+    "ReplicateLoRAClient",
     "VisualGenerationRouter",
     "create_visual_router",
     # From conversation_editor
