@@ -92,8 +92,7 @@ yarn.lock
 
 # Screenshots (from tests)
 screenshots/
-*.png
-!screenshot.png
+tests/screenshots/*.png
 
 # Misc
 .htaccess.bak
