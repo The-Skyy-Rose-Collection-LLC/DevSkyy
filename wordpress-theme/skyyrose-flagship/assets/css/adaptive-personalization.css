@@ -35,7 +35,7 @@
 	--ape-card-bg: #111111;
 
 	--ape-font-heading: var(--font-heading, 'Playfair Display', Georgia, serif);
-	--ape-font-body: var(--font-body, 'Montserrat', 'Helvetica Neue', Arial, sans-serif);
+	--ape-font-body: var(--font-body, 'Inter', 'Helvetica Neue', Arial, sans-serif);
 
 	--ape-glass-bg: rgba(17, 17, 17, 0.95);
 	--ape-glass-border: rgba(255, 255, 255, 0.06);

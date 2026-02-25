@@ -27,7 +27,7 @@
 	--cie-rose: #B76E79;
 	--cie-urgency: #DC143C;
 	--cie-success: #10B981;
-	--cie-font: var(--font-body, 'Montserrat', sans-serif);
+	--cie-font: var(--font-body, 'Inter', sans-serif);
 	--cie-heading: var(--font-heading, 'Playfair Display', Georgia, serif);
 	--cie-glass-bg: rgba(17, 17, 17, 0.88);
 	--cie-glass-border: rgba(255, 255, 255, 0.08);
