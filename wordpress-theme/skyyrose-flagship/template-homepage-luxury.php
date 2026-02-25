@@ -37,7 +37,7 @@ get_header();
 				<!-- Signature Collection -->
 				<article class="collection-card collection-signature">
 					<div class="collection-image">
-						<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Signature Collection', 'skyyrose-flagship' ); ?>">
+						<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Signature Collection', 'skyyrose-flagship' ); ?>" width="600" height="400" loading="lazy">
 					</div>
 					<div class="collection-content">
 						<span class="collection-badge">Signature</span>
@@ -50,7 +50,7 @@ get_header();
 				<!-- Love Hurts Collection -->
 				<article class="collection-card collection-love-hurts">
 					<div class="collection-image">
-						<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Love Hurts Collection', 'skyyrose-flagship' ); ?>">
+						<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Love Hurts Collection', 'skyyrose-flagship' ); ?>" width="600" height="400" loading="lazy">
 					</div>
 					<div class="collection-content">
 						<span class="collection-badge">Love Hurts</span>
@@ -63,7 +63,7 @@ get_header();
 				<!-- Black Rose Collection -->
 				<article class="collection-card collection-black-rose">
 					<div class="collection-image">
-						<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Black Rose Collection', 'skyyrose-flagship' ); ?>">
+						<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Black Rose Collection', 'skyyrose-flagship' ); ?>" width="600" height="400" loading="lazy">
 					</div>
 					<div class="collection-content">
 						<span class="collection-badge">Black Rose</span>
@@ -88,7 +88,7 @@ get_header();
 					<a href="/about" class="btn btn-outline"><?php esc_html_e( 'Learn More', 'skyyrose-flagship' ); ?></a>
 				</div>
 				<div class="about-image">
-					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'SkyyRose Luxury Streetwear', 'skyyrose-flagship' ); ?>">
+					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'SkyyRose Luxury Streetwear', 'skyyrose-flagship' ); ?>" width="600" height="400" loading="lazy">
 				</div>
 			</div>
 		</div>
