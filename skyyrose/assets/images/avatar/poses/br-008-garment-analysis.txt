@@ -1,0 +1,66 @@
+Here is the ULTRA-PRECISE technical description of the garment:
+
+**TECHNICAL SPECIFICATIONS: PULLOVER HOODIE**
+
+1.  **GARMENT TYPE:** Pullover Hoodie
+2.  **BASE COLOR:** Deep Charcoal Green Heather (Estimated Hex: #313A33) - A very dark, desaturated green with subtle grey undertones and a visible heathered effect due to fiber blending.
+3.  **SECONDARY COLORS:**
+    *   **Graphic Outlines & Details (Dark):** Charcoal Black (#222222)
+    *   **Graphic Fills (Light):** Off-White / Pale Grey (#F0F0F0)
+    *   **Graphic Shades (Mid-Tone):** Light Grey (#C0C0C0), Mid-Grey (#B0B0B0), Dark Grey (#555555), Muted Blue-Grey (#C0D0D5)
+    *   **Drawstrings:** Solid Black (#000000)
+    *   **Cuff Tag Text & Logo:** Bright Red (#CC0000) on a White (#FFFFFF) background.
+4.  **FIT:**
+    *   **Silhouette:** Relaxed Fit, offering comfortable room through the body and sleeves without being oversized or baggy.
+    *   **Length:** Standard/Regular length, intended to fall at hip level.
+    *   **Proportions:** Balanced proportions for a typical men's or unisex hoodie, with adequate sleeve length and hood volume.
+5.  **GRAPHICS:**
+    *   **Location:** Centered on the front chest of the hoodie.
+    *   **Exact Size Relative to Garment:** Approximately 9.5 inches (24 cm) in height and 7.5 inches (19 cm) in width at its widest point. This covers roughly 30-35% of the visible front torso from the neckline to the bottom hem.
+    *   **Content:** An intricate embroidered graphic depicting two thorny rose flowers, suggestive of a "barbed wire rose" style, rising from a stylized, layered cloud or smoke formation that resembles a mushroom cloud.
+        *   The right rose is slightly larger, positioned marginally higher and forward, overlapping the left rose.
+        *   Both roses feature detailed petals, stems, and numerous sharp thorns.
+        *   The base is composed of multiple distinct, horizontally layered cloud-like shapes.
+    *   **Colors & Style:** Executed entirely in high-density, multi-color embroidery.
+        *   **Prominent (Right) Rose:** Outlined with dense Charcoal Black (#222222) thread. Petals are filled predominantly with Off-White (#F0F0F0) thread, with subtle shading and contouring provided by Light Grey (#C0C0C0) stitching to enhance depth.
+        *   **Secondary (Left) Rose:** Outlined with Light Grey (#B0B0B0) thread. Petals are filled with a slightly darker Light Grey (#E0E0E0) thread.
+        *   **Stems & Thorns:** Embroidered with a mix of Mid-Grey (#B0B0B0) and Dark Grey (#555555) threads, emphasizing the barbed wire-like texture of the thorns.
+        *   **Cloud/Smoke Base:**
+            *   The topmost cloud layer is embroidered in a Muted Blue-Grey (#C0D0D5) with fine outlines and internal details in Dark Grey (#555555) thread.
+            *   The bottommost, larger cloud layer is embroidered in a solid Light Grey (#D0D0D0) with slightly darker Mid-Grey (#808080) outlines and subtle swirl details.
+        *   **Overall Style:** Highly detailed, illustrative embroidery, creating a raised, textured effect. The design elements are distinctly outlined and filled with varied thread colors to provide depth and contrast against the dark base fabric.
+6.  **TEXT:**
+    *   **Content:** "LOST"
+    *   **Location:** Woven onto a small rectangular tag located on the exterior of the left sleeve cuff, towards the wrist.
+    *   **Font Style:** Uppercase serif font, appearing slightly distressed or customized, with a clean, legible character set.
+    *   **Color:** Bright Red (#CC0000).
+    *   **Placement:** Centered horizontally below the graphic element on the tag.
+7.  **LOGOS & BRANDING:**
+    *   **Location:** Small woven rectangular tag on the exterior of the left sleeve cuff.
+    *   **Content:**
+        *   A small, stylized graphic of a simplified rose or abstract floral element, rendered in Bright Red (#CC0000), positioned above the text.
+        *   The wordmark "LOST" in Bright Red (#CC0000).
+    *   **Size:** The tag itself measures approximately 1 inch (2.5 cm) in width and 0.5 inches (1.2 cm) in height. The logo and wordmark are sized proportionally within this tag.
+    *   **Color:** Red logo/text (#CC0000) on a White (#FFFFFF) woven tag background.
+8.  **HARDWARE:**
+    *   **Drawstrings:** Flat, woven drawstrings.
+        *   **Color:** Solid Black (#000000).
+        *   **Material:** Likely cotton or a synthetic blend, with a matte finish. Approximately 0.4 inches (1 cm) wide.
+    *   **Eyelets:** Standard circular metal eyelets for the hood drawstrings.
+        *   **Color and Material Finish:** Darkened metal finish, consistent with gunmetal or antique brass, providing a subtle, non-reflective appearance.
+9.  **FABRIC TEXTURE:**
+    *   **Visible Texture:** Medium-to-heavy weight fleece-back knit fabric. The exterior exhibits a subtle heathered, almost mottled texture, characteristic of blending dark green and black/charcoal fibers. The surface appears soft and slightly brushed.
+    *   **Sheen:** Entirely matte, with no discernible luster.
+    *   **Thickness:** Substantial, indicating a warm and durable construction.
+    *   **Ribbing:**
+        *   1x1 rib-knit construction on the sleeve cuffs (approximately 2 inches / 5 cm wide).
+        *   1x1 rib-knit construction on the bottom waistband (approximately 2.5 inches / 6.5 cm wide).
+        *   Narrow 1x1 rib-knit trim along the openings of the kangaroo pocket (approximately 0.5 inches / 1.2 cm wide).
+10. **SPECIAL DETAILS:**
+    *   **Collar Type:** Attached, contoured three-panel hood. The hood opening is finished with a clean, folded self-fabric hem, providing a neat edge for the drawstrings.
+    *   **Cuffs:** Long sleeves terminating in 1x1 rib-knit cuffs, designed to fit snugly at the wrists.
+    *   **Waistband:** The garment hem features a 1x1 rib-knit waistband, offering flexibility and a secure fit.
+    *   **Hems:** All raw edges are finished either by rib-knit (cuffs, waistband, pocket opening) or a clean, folded hem (hood opening).
+    *   **Panels:** Standard construction with set-in sleeves. No extraordinary paneling is visible.
+    *   **Seams:** Standard durable seams, likely overlocked/serged for garment integrity, though not explicitly detailed in the imagery.
+    *   **Kangaroo Pocket:** A large, undivided kangaroo-style pouch pocket is located on the lower front torso. It spans horizontally across the body and features two angled entry points, each reinforced with a narrow rib-knit trim.
