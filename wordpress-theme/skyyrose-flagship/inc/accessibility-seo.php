@@ -109,22 +109,11 @@ function skyyrose_ensure_image_alt( $html, $post_id, $attachment_id ) {
 add_filter( 'post_thumbnail_html', 'skyyrose_ensure_image_alt', 10, 3 );
 
 /**
- * Add proper heading hierarchy.
+ * Heading hierarchy is handled in individual templates (single.php, page.php)
+ * where the context is known. Templates should use <h1> for the post title directly.
  *
  * @since 1.0.0
  */
-function skyyrose_heading_hierarchy() {
-	if ( is_singular() && ! is_front_page() ) {
-		// On single posts/pages, use h1 for title
-		add_filter( 'the_title', function( $title, $id ) {
-			if ( is_main_query() && get_the_ID() === $id && is_singular() ) {
-				return '<h1 class="entry-title">' . $title . '</h1>';
-			}
-			return $title;
-		}, 10, 2 );
-	}
-}
-add_action( 'wp', 'skyyrose_heading_hierarchy' );
 
 /**
  * ============================================================================
@@ -679,36 +668,35 @@ function skyyrose_add_sitemap_support() {
 add_action( 'after_setup_theme', 'skyyrose_add_sitemap_support' );
 
 /**
- * Filter sitemap entries for products.
+ * Filter a single sitemap entry for products to add images.
+ *
+ * wp_sitemaps_posts_entry passes a single entry array, not the full entries list.
  *
  * @since 1.0.0
  *
- * @param array  $entries Array of sitemap entries.
+ * @param array  $entry     Single sitemap entry with 'loc' key.
  * @param string $post_type Post type name.
- * @return array Modified entries.
+ * @return array Modified entry.
  */
-function skyyrose_filter_product_sitemap( $entries, $post_type ) {
-	if ( 'product' !== $post_type ) {
-		return $entries;
+function skyyrose_filter_product_sitemap( $entry, $post_type ) {
+	if ( 'product' !== $post_type || ! function_exists( 'wc_get_product' ) ) {
+		return $entry;
 	}
 
-	// Add product images to sitemap
-	foreach ( $entries as &$entry ) {
-		$product_id = url_to_postid( $entry['loc'] );
-		if ( $product_id ) {
-			$product = wc_get_product( $product_id );
-			if ( $product && $product->get_image_id() ) {
-				$entry['images'] = array(
-					array(
-						'src'   => wp_get_attachment_url( $product->get_image_id() ),
-						'title' => $product->get_name(),
-					),
-				);
-			}
+	$product_id = url_to_postid( $entry['loc'] );
+	if ( $product_id ) {
+		$product = wc_get_product( $product_id );
+		if ( $product && $product->get_image_id() ) {
+			$entry['images'] = array(
+				array(
+					'src'   => wp_get_attachment_url( $product->get_image_id() ),
+					'title' => $product->get_name(),
+				),
+			);
 		}
 	}
 
-	return $entries;
+	return $entry;
 }
 add_filter( 'wp_sitemaps_posts_entry', 'skyyrose_filter_product_sitemap', 10, 2 );
 
@@ -733,17 +721,11 @@ function skyyrose_robots_meta() {
 add_action( 'wp_head', 'skyyrose_robots_meta', 1 );
 
 /**
- * Add language attributes to HTML tag.
+ * Language attributes are handled by WordPress core via language_attributes().
+ * No custom filter needed — core already outputs lang="en-US" (or configured locale).
  *
  * @since 1.0.0
- *
- * @param string $output Language attributes.
- * @return string Modified attributes.
  */
-function skyyrose_language_attributes( $output ) {
-	return $output . ' lang="' . esc_attr( get_bloginfo( 'language' ) ) . '"';
-}
-add_filter( 'language_attributes', 'skyyrose_language_attributes' );
 
 /**
  * Enhance WooCommerce accessibility.
