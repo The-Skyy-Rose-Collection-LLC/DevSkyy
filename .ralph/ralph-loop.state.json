@@ -1,13 +1,13 @@
 {
   "active": true,
-  "iteration": 8,
-  "minIterations": 1,
-  "maxIterations": 25,
+  "iteration": 0,
+  "minIterations": 10,
+  "maxIterations": 10,
   "completionPromise": "COMPLETE",
   "tasksMode": false,
   "taskPromise": "READY_FOR_NEXT_TASK",
-  "prompt": "FIRST: Verify\n   all previous work — check git status, review what was built in the last 19 iterations, run      \n  tests, fix any errors, and commit all uncommitted changes with proper conventional commit        \n  messages (feat:, fix:, style:, perf:). THEN: Read .ralph/ralph-context.md for new directives and \n  execute them.",
-  "startedAt": "2026-02-25T00:41:32.367Z",
+  "prompt": "Read .ralph/ralph-context.md FIRST. It contains your complete directive with 3 tasks, critical gaps to fix, and the full arsenal of tools. You have 10 iterations — no waste. Task 0 (immersive scene pages with prop-specific hotspots) MUST be done before Task 1 (AI imagery + mascot) which MUST be done before Task 2 (WooCommerce products + deploy to skyyrose.co). Use the Elite Web Development Team, WordPress Copilot, Context7, Playwright, and every tool listed. Build a marketplace-ready WordPress theme. Deploy to skyyrose.co. Award-winning. Fashion-driven. Better than drakerelated.com.",
+  "startedAt": "",
   "model": "",
   "agent": "claude-code"
 }

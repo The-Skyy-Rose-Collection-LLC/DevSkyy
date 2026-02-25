@@ -61,7 +61,7 @@
 }
 
 .loading-text {
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.75rem;
 	font-weight: 300;
 	letter-spacing: 0.2em;
@@ -870,7 +870,7 @@
 	border: none;
 	background: none;
 	color: rgba(255, 255, 255, 0.4);
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.65rem;
 	font-weight: 500;
 	letter-spacing: 0.12em;
@@ -964,7 +964,7 @@
 }
 
 .countdown-label {
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.65rem;
 	font-weight: 600;
 	letter-spacing: 0.2em;
@@ -995,7 +995,7 @@
 }
 
 .countdown-unit-label {
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.55rem;
 	font-weight: 400;
 	letter-spacing: 0.15em;
@@ -1012,7 +1012,7 @@
 }
 
 .countdown-pieces {
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.6rem;
 	font-weight: 400;
 	letter-spacing: 0.1em;
@@ -1025,7 +1025,7 @@
    ================================================== */
 
 .product-grid-edition {
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.6rem;
 	font-weight: 500;
 	letter-spacing: 0.1em;
@@ -1121,7 +1121,7 @@
 }
 
 .incentive-popup-subtitle {
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.85rem;
 	font-weight: 300;
 	color: rgba(255, 255, 255, 0.6);
@@ -1142,7 +1142,7 @@
 	border-radius: 8px;
 	background: rgba(255, 255, 255, 0.04);
 	color: #fff;
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.85rem;
 	transition: border-color 0.2s ease;
 }
@@ -1163,7 +1163,7 @@
 	border-radius: 8px;
 	background: linear-gradient(135deg, #B76E79, #D4AF37);
 	color: #fff;
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.85rem;
 	font-weight: 600;
 	letter-spacing: 0.08em;
@@ -1177,7 +1177,7 @@
 }
 
 .incentive-popup-fine {
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.65rem;
 	font-weight: 300;
 	color: rgba(255, 255, 255, 0.3);

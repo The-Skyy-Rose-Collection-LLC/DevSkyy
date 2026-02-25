@@ -34,8 +34,8 @@
 
 	/* Typography */
 	--font-heading: 'Playfair Display', Georgia, serif;
-	--font-body: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
-	--font-accent: 'Cormorant Garamond', Georgia, serif;
+	--font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+	--font-accent: 'Playfair Display', Georgia, serif;
 
 	/* Font Weights */
 	--weight-light: 300;

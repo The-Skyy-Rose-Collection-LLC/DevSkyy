@@ -40,7 +40,7 @@
 
 	/* Typography */
 	--vel-font-heading: var(--font-heading, 'Playfair Display', Georgia, serif);
-	--vel-font-body: var(--font-body, 'Montserrat', 'Helvetica Neue', Arial, sans-serif);
+	--vel-font-body: var(--font-body, 'Inter', 'Helvetica Neue', Arial, sans-serif);
 
 	/* Easing */
 	--vel-ease-out: cubic-bezier(0.22, 1, 0.36, 1);

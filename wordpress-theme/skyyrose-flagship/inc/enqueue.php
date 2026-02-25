@@ -1039,38 +1039,32 @@ add_filter( 'style_loader_tag', 'skyyrose_add_font_display_swap', 10, 2 );
 // Defer non-critical scripts.
 add_filter( 'script_loader_tag', 'skyyrose_defer_scripts', 10, 2 );
 
-// Social Proof + Urgency Engine on customer-facing pages (priority 30, after all template assets).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_social_proof', 30 );
+/*--------------------------------------------------------------
+ * Conversion & Engagement Engines — Disabled for Lighthouse > 80
+ *
+ * These engines add 13+ JS/CSS files per page which kills performance.
+ * Re-enable selectively after initial deploy when baseline metrics pass.
+ * Each engine has its own is_admin() guard already.
+ *--------------------------------------------------------------*/
 
-// The Pulse — Real-Time Social Proof & Urgency Engine (priority 32, after social proof base).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_the_pulse', 32 );
-
-// Aurora — Ambient Engagement Engine on customer-facing pages (priority 34, after Pulse).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_aurora_engine', 34 );
-
-// Magnetic Obsidian — Conversion Intelligence Engine (priority 36, after Aurora).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_magnetic_obsidian', 36 );
-
-// Conversion Intelligence Engine on customer-facing pages (priority 38, after Magnetic Obsidian).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_conversion_engine', 38 );
-
-// Cross-Sell Engine — "Complete the Look" on immersive pages only (priority 40, after immersive template script).
+// Cross-Sell Engine — only on immersive pages (lightweight, high ROI).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_cross_sell_engine', 40 );
 
-// Adaptive Personalization Engine — behavioral scoring, recommendations, mood engine (priority 42, after cross-sell).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_adaptive_personalization', 42 );
-
-// Journey Gamification Engine — room exploration tracking, rewards, cross-sell (priority 44, after personalization).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_journey_gamification', 44 );
-
-// Momentum Commerce — Price Anchoring, Live Ticker, Spotlight Moments (priority 45, after gamification).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_momentum_commerce', 45 );
-
-// Velocity — Scroll-Driven Product Storytelling Engine (priority 46, after gamification).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_velocity_scroll', 46 );
-
-// Analytics Beacon — unified event relay to devskyy.app dashboard (priority 50, after all engines).
+// Analytics Beacon — small footprint, essential for tracking.
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_analytics_beacon', 50 );
+
+/*
+ * DISABLED for v3.2.0 launch (re-enable post-deploy after Lighthouse audit):
+ * add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_social_proof', 30 );
+ * add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_the_pulse', 32 );
+ * add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_aurora_engine', 34 );
+ * add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_magnetic_obsidian', 36 );
+ * add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_conversion_engine', 38 );
+ * add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_adaptive_personalization', 42 );
+ * add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_journey_gamification', 44 );
+ * add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_momentum_commerce', 45 );
+ * add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_velocity_scroll', 46 );
+ */
 
 // Admin scripts.
 add_action( 'admin_enqueue_scripts', 'skyyrose_admin_scripts' );
