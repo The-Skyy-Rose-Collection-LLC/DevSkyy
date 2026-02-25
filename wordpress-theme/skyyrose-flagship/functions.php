@@ -50,6 +50,7 @@ $skyyrose_core_includes = array(
 	'/inc/ajax-handlers.php',
 	'/inc/product-taxonomy.php',
 	'/inc/branded-content.php',
+	'/inc/facebook-sdk.php',
 );
 
 foreach ( $skyyrose_core_includes as $skyyrose_file ) {
