@@ -1008,12 +1008,25 @@ function skyyrose_add_font_display_swap( $html, $handle ) {
 /**
  * Preconnect to Google Fonts for faster font loading.
  *
- * @since 3.0.0
- * @return void
+ * Uses the wp_resource_hints filter instead of raw echo for proper
+ * WordPress integration and compatibility with caching plugins.
+ *
+ * @since  3.0.0
+ * @param  array  $urls          URLs to print for resource hint.
+ * @param  string $relation_type The resource hint relation (dns-prefetch, preconnect, etc.).
+ * @return array Modified URLs.
  */
-function skyyrose_preconnect_fonts() {
-	echo '<link rel="preconnect" href="https://fonts.googleapis.com">' . "\n";
-	echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
+function skyyrose_preconnect_fonts( $urls, $relation_type ) {
+	if ( 'preconnect' === $relation_type ) {
+		$urls[] = array(
+			'href' => 'https://fonts.googleapis.com',
+		);
+		$urls[] = array(
+			'href'        => 'https://fonts.gstatic.com',
+			'crossorigin' => 'anonymous',
+		);
+	}
+	return $urls;
 }
 
 /**
@@ -1091,8 +1104,8 @@ function skyyrose_admin_scripts() {
  * Hook Registration
  *--------------------------------------------------------------*/
 
-// Preconnect (very early in <head>).
-add_action( 'wp_head', 'skyyrose_preconnect_fonts', 1 );
+// Preconnect to Google Fonts (via wp_resource_hints filter).
+add_filter( 'wp_resource_hints', 'skyyrose_preconnect_fonts', 10, 2 );
 
 // Google Fonts (priority 5 so they load before template styles).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_google_fonts', 5 );
