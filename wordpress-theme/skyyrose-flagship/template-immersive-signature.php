@@ -482,16 +482,16 @@ get_header();
 
 	<!-- Collection Tab Bar -->
 	<nav class="immersive-tab-bar" aria-label="<?php esc_attr_e( 'Collection navigation', 'skyyrose-flagship' ); ?>">
-		<a href="<?php echo esc_url( home_url( '/immersive/black-rose/' ) ); ?>" class="immersive-tab" style="--tab-accent: #C0C0C0;">
+		<a href="<?php echo esc_url( home_url( '/experience-black-rose/' ) ); ?>" class="immersive-tab" style="--tab-accent: #C0C0C0;">
 			<?php echo esc_html__( 'Black Rose', 'skyyrose-flagship' ); ?>
 		</a>
-		<a href="<?php echo esc_url( home_url( '/immersive/love-hurts/' ) ); ?>" class="immersive-tab" style="--tab-accent: #DC143C;">
+		<a href="<?php echo esc_url( home_url( '/experience-love-hurts/' ) ); ?>" class="immersive-tab" style="--tab-accent: #DC143C;">
 			<?php echo esc_html__( 'Love Hurts', 'skyyrose-flagship' ); ?>
 		</a>
-		<a href="<?php echo esc_url( home_url( '/immersive/signature/' ) ); ?>" class="immersive-tab active" aria-current="page" style="--tab-accent: #D4AF37;">
+		<a href="<?php echo esc_url( home_url( '/experience-signature/' ) ); ?>" class="immersive-tab active" aria-current="page" style="--tab-accent: #B76E79;">
 			<?php echo esc_html__( 'Signature', 'skyyrose-flagship' ); ?>
 		</a>
-		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="immersive-tab" style="--tab-accent: #D4AF37;">
+		<a href="<?php echo esc_url( home_url( '/preorder/' ) ); ?>" class="immersive-tab" style="--tab-accent: #D4AF37;">
 			<?php echo esc_html__( 'Pre-Order', 'skyyrose-flagship' ); ?>
 		</a>
 	</nav>

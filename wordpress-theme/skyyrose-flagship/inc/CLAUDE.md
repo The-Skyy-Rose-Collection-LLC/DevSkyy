@@ -7,6 +7,8 @@
 
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
+| #1428 | 7:04 AM | 🔴 | Fixed WordPress theme security vulnerabilities | ~425 |
+| #1407 | 6:50 AM | 🟣 | Login Rate Limiting and Brute-Force Protection | ~509 |
 | #1308 | 5:25 AM | 🟣 | WordPress Theme Backend Infrastructure Complete | ~477 |
 | #1309 | " | 🟣 | WooCommerce Integration with Custom Product Features | ~476 |
 | #1310 | " | 🟣 | Security Hardening with CSP Headers and Nonce Helpers | ~555 |

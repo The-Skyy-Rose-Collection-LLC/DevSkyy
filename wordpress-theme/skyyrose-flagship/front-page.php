@@ -189,7 +189,7 @@ get_header();
 
 			foreach ( $collections as $collection ) :
 				// Try to get the WooCommerce product category link.
-				$collection_url = home_url( '/collection/' . $collection['slug'] . '/' );
+				$collection_url = home_url( '/collection-' . $collection['slug'] . '/' );
 
 				if ( class_exists( 'WooCommerce' ) ) {
 					$term = get_term_by( 'slug', $collection['slug'], 'product_cat' );
