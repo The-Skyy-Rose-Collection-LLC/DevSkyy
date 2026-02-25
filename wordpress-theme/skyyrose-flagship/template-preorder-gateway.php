@@ -497,6 +497,16 @@ wp_enqueue_script(
 	true
 );
 
+// Pass WooCommerce data to the gateway script.
+$gateway_wc_data = array(
+	'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
+	'nonce'       => wp_create_nonce( 'skyyrose_immersive_cart' ),
+	'checkoutUrl' => function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/checkout/' ),
+	'cartUrl'     => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
+	'wcActive'    => class_exists( 'WooCommerce' ),
+);
+wp_localize_script( 'skyyrose-preorder-gateway', 'skyyRoseGateway', $gateway_wc_data );
+
 get_template_part( 'template-parts/cinematic-toggle' );
 
 get_footer();

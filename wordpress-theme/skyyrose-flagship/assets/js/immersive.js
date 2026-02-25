@@ -544,6 +544,15 @@
 			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 			xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
+			// Get selected size before sending request (must be before onload to avoid hoisting issue).
+			var selectedSize = '';
+			if (panelSizes) {
+				var selectedBtn = panelSizes.querySelector('.size-btn.selected');
+				if (selectedBtn) {
+					selectedSize = selectedBtn.textContent;
+				}
+			}
+
 			xhr.onload = function () {
 				panelAddToCart.disabled = false;
 				if (xhr.status >= 200 && xhr.status < 300) {
@@ -585,15 +594,6 @@
 				panelAddToCart.textContent = originalText;
 				showCartNotification('Network error. Please try again.');
 			};
-
-			// Get selected size if any.
-			var selectedSize = '';
-			if (panelSizes) {
-				var selectedBtn = panelSizes.querySelector('.size-btn.selected');
-				if (selectedBtn) {
-					selectedSize = selectedBtn.textContent;
-				}
-			}
 
 			var postData = 'product_id=' + encodeURIComponent(currentProductId) +
 				'&quantity=1';

@@ -41,6 +41,7 @@
 	var cartTotal    = document.querySelector('.cart-total-amount');
 	var cartList     = document.querySelector('.cart-items-list');
 	var cartEmptyMsg = document.querySelector('.cart-empty-msg');
+	var checkoutBtn  = document.querySelector('.cart-checkout-btn');
 
 	// Sign-in panel
 	var signinOverlay = document.querySelector('.signin-overlay');
@@ -53,6 +54,7 @@
 	// Cart state
 	var cartItems = [];
 	var cartCount = 0;
+	var currentProductId = null;
 
 	/* --------------------------------------------------
 	   Loading Screen
@@ -115,7 +117,9 @@
 
 		// Populate sizes
 		if (modalSizes) {
-			modalSizes.innerHTML = '';
+			while (modalSizes.firstChild) {
+				modalSizes.removeChild(modalSizes.firstChild);
+			}
 			var sizes = (data.sizes || '').split(',').filter(Boolean);
 			sizes.forEach(function (size) {
 				var btn = document.createElement('button');
@@ -146,6 +150,7 @@
 				// Don't open modal if wishlist button was clicked
 				if (e.target.closest('.product-grid-wishlist')) return;
 
+				currentProductId = card.dataset.productId || null;
 				openModal({
 					name:            card.dataset.productName,
 					price:           card.dataset.productPrice,
@@ -175,15 +180,17 @@
 		// Add to cart from modal
 		if (modalAddBtn) {
 			modalAddBtn.addEventListener('click', function () {
-				var selectedSize = modalSizes ? modalSizes.querySelector('.size-btn.selected') : null;
-				if (!selectedSize && modalSizes && modalSizes.children.length > 0) {
+				var selectedSizeBtn = modalSizes ? modalSizes.querySelector('.size-btn.selected') : null;
+				if (!selectedSizeBtn && modalSizes && modalSizes.children.length > 0) {
 					// Auto-select first size if none selected
-					modalSizes.querySelector('.size-btn').classList.add('selected');
+					selectedSizeBtn = modalSizes.querySelector('.size-btn');
+					if (selectedSizeBtn) selectedSizeBtn.classList.add('selected');
 				}
 				addToCart({
-					name:  modalName ? modalName.textContent : '',
-					price: modalPrice ? modalPrice.textContent : '',
-					size:  selectedSize ? selectedSize.textContent : 'OS'
+					name:      modalName ? modalName.textContent : '',
+					price:     modalPrice ? modalPrice.textContent : '',
+					size:      selectedSizeBtn ? selectedSizeBtn.textContent : 'OS',
+					productId: currentProductId
 				});
 				closeModal();
 			});
@@ -199,6 +206,23 @@
 		cartCount = cartItems.length;
 		updateCartUI();
 		openCart();
+
+		// Send to WooCommerce server-side cart if available.
+		if (typeof skyyRoseGateway !== 'undefined' && skyyRoseGateway.wcActive && item.productId) {
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', skyyRoseGateway.ajaxUrl, true);
+			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+			var postData = 'action=skyyrose_immersive_add_to_cart' +
+				'&nonce=' + encodeURIComponent(skyyRoseGateway.nonce) +
+				'&product_id=' + encodeURIComponent(item.productId) +
+				'&quantity=1';
+			if (item.size && item.size !== 'OS') {
+				postData += '&attribute_pa_size=' + encodeURIComponent(item.size);
+			}
+			xhr.send(postData);
+		}
 	}
 
 	function updateCartUI() {
@@ -223,6 +247,11 @@
 		if (cartEmptyMsg) {
 			cartEmptyMsg.style.display = cartCount === 0 ? '' : 'none';
 		}
+
+		// Enable/disable checkout button
+		if (checkoutBtn) {
+			checkoutBtn.disabled = cartCount === 0;
+		}
 	}
 
 	function openCart() {
@@ -238,6 +267,17 @@
 	function initCart() {
 		if (cartClose) cartClose.addEventListener('click', closeCartPanel);
 		if (cartOverlay) cartOverlay.addEventListener('click', closeCartPanel);
+
+		// Wire checkout button to redirect to WooCommerce checkout.
+		if (checkoutBtn) {
+			checkoutBtn.addEventListener('click', function () {
+				if (cartItems.length === 0) return;
+				var checkoutUrl = (typeof skyyRoseGateway !== 'undefined' && skyyRoseGateway.checkoutUrl)
+					? skyyRoseGateway.checkoutUrl
+					: '/checkout/';
+				window.location.href = checkoutUrl;
+			});
+		}
 	}
 
 	/* --------------------------------------------------
