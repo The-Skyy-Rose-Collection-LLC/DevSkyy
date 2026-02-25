@@ -86,16 +86,29 @@ add_action( 'send_headers', 'skyyrose_send_security_headers' );
  *--------------------------------------------------------------*/
 
 /**
- * Completely disable XML-RPC to prevent brute-force and DDoS attacks.
+ * Disable XML-RPC except for Jetpack.
+ *
+ * Jetpack requires XML-RPC (jetpack.* methods) to communicate with
+ * WordPress.com. We allow Jetpack through but block everything else
+ * to prevent brute-force and DDoS attacks.
  *
  * @since 1.0.0
+ * @since 3.2.1 Whitelisted Jetpack methods.
  */
-add_filter( 'xmlrpc_enabled', '__return_false' );
+function skyyrose_xmlrpc_enabled( $enabled ) {
+	// Allow XML-RPC when Jetpack is making the request.
+	if ( defined( 'JETPACK__VERSION' ) ) {
+		return true;
+	}
+	return false;
+}
+add_filter( 'xmlrpc_enabled', 'skyyrose_xmlrpc_enabled' );
 
 /**
- * Remove XML-RPC discovery links from the HTML head and HTTP headers.
+ * Remove XML-RPC discovery links and restrict methods to Jetpack only.
  *
  * @since 2.0.0
+ * @since 3.2.1 Preserve Jetpack methods.
  * @return void
  */
 function skyyrose_remove_xmlrpc_links() {
@@ -103,11 +116,17 @@ function skyyrose_remove_xmlrpc_links() {
 	remove_action( 'wp_head', 'wlwmanifest_link' );
 	remove_action( 'xmlrpc_rsd_apis', 'rest_output_rsd' );
 
-	// Block XML-RPC requests at the HTTP level with a 403.
+	// Keep only Jetpack methods, block all others.
 	add_filter(
 		'xmlrpc_methods',
-		function () {
-			return array();
+		function ( $methods ) {
+			$allowed = array();
+			foreach ( $methods as $method => $callback ) {
+				if ( 0 === strpos( $method, 'jetpack.' ) ) {
+					$allowed[ $method ] = $callback;
+				}
+			}
+			return $allowed;
 		}
 	);
 }
