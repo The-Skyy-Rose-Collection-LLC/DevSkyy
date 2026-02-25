@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { playfair, cormorant, spaceMono } from '@/lib/fonts'
 import { SyncStatusToast } from '@/components/wordpress/sync-status-toast'
+import MascotBubble from '@/components/mascot/MascotBubble'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { QueryProvider } from '@/lib/providers/query-provider'
@@ -28,6 +29,7 @@ export default function RootLayout({
         <QueryProvider>
           {children}
         </QueryProvider>
+        <MascotBubble />
         <SyncStatusToast />
         <Analytics />
         <SpeedInsights />
