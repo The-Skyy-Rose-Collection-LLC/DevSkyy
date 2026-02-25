@@ -1,8 +1,8 @@
 # NPM Scripts Reference
 
-**Total Scripts**: 28
-**Last Updated**: 2026-02-19
-**Source**: `package.json` (v3.0.0)
+**Total Scripts**: 46 (28 root + 18 frontend)
+**Last Updated**: 2026-02-24
+**Source**: `package.json` (v3.0.0), `frontend/package.json` (v1.0.0)
 
 This document provides comprehensive reference for all npm scripts available in the DevSkyy platform.
 
@@ -140,7 +140,19 @@ pytest -v                 # Run tests
 | **Demo** | 6 | 3D collection demonstrations |
 | **Maintenance** | 8 | Security, dependencies, cleanup |
 
-**Total**: 28 scripts
+**Root Total**: 28 scripts
+
+### Frontend Scripts (`frontend/package.json`)
+
+| Category | Count | Purpose |
+|----------|-------|---------|
+| **Development** | 4 | Next.js dev, build, start, lint |
+| **Testing** | 2 | Playwright E2E tests |
+| **Deployment** | 4 | Vercel deploy (preview + production) |
+| **Vercel CLI** | 8 | Link, env sync, logs, inspect |
+
+**Frontend Total**: 18 scripts
+**Combined Total**: 46 scripts
 
 ---
 
@@ -180,6 +192,59 @@ npm run demo:black-rose       # Test specific collection
 npm run deps:check       # Check outdated packages
 npm run security:audit   # Security vulnerabilities
 npm run clean            # Clean build artifacts
+```
+
+---
+
+## Frontend Scripts (`frontend/package.json`)
+
+The Next.js frontend dashboard has its own scripts for development, testing, and Vercel deployment.
+
+### Development
+
+| Script | Command | Description | When to Use |
+|--------|---------|-------------|-------------|
+| `npm run dev` | `next dev` | Start Next.js dev server | Frontend development |
+| `npm run build` | `next build` | Build production bundle | Before deployment |
+| `npm run start` | `next start` | Start production server | Testing prod build locally |
+| `npm run lint` | `next lint` | Run ESLint | Code quality checks |
+
+### Testing
+
+| Script | Command | Description | When to Use |
+|--------|---------|-------------|-------------|
+| `npm run test:e2e` | `playwright test` | Run Playwright E2E tests | Before deployment, CI |
+| `npm run test:e2e:ui` | `playwright test --ui` | Run E2E tests with interactive UI | Debugging E2E failures |
+
+### Deployment (Vercel)
+
+| Script | Command | Description | When to Use |
+|--------|---------|-------------|-------------|
+| `npm run deploy` | `vercel` | Deploy preview | Testing changes before prod |
+| `npm run deploy:prod` | `vercel --prod` | Deploy to production | Production releases |
+| `npm run deploy:auto` | `tsx scripts/deploy.ts` | Automated deploy script | CI/CD pipeline |
+| `npm run deploy:auto:prod` | `tsx scripts/deploy.ts --prod` | Automated production deploy | CI/CD production pipeline |
+
+### Vercel CLI Utilities
+
+| Script | Command | Description | When to Use |
+|--------|---------|-------------|-------------|
+| `npm run vercel:link` | `vercel link --project=devskyy` | Link to Vercel project | Initial setup |
+| `npm run vercel:link:auto` | `./scripts/link-vercel-project.sh` | Auto-link script | CI setup |
+| `npm run vercel:env:pull` | `vercel env pull .env.local` | Pull env vars from Vercel | Sync local env |
+| `npm run vercel:env:push` | `vercel env push .env.production` | Push env vars to Vercel | Update prod secrets |
+| `npm run vercel:logs` | `vercel logs` | View deployment logs | Debugging deployments |
+| `npm run vercel:inspect` | `vercel inspect` | Inspect deployment | Checking deploy config |
+| `npm run vercel:project` | `vercel project ls` | List Vercel projects | Project management |
+
+**Frontend Workflow:**
+```bash
+cd frontend
+npm run dev          # Start development
+npm run lint         # Check quality
+npm run test:e2e     # Run E2E tests
+npm run build        # Build for production
+npm run deploy:prod  # Deploy to Vercel
 ```
 
 ---
