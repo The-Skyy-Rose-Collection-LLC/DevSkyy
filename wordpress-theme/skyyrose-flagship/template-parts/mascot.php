@@ -87,6 +87,7 @@ if ( file_exists( $skyyrose_mascot_dir . $skyyrose_context_file ) ) {
 		class="skyyrose-mascot__panel"
 		id="skyyrose-mascot-panel"
 		role="dialog"
+		aria-modal="true"
 		aria-label="<?php esc_attr_e( 'Brand Ambassador Panel', 'skyyrose-flagship' ); ?>"
 		aria-hidden="true"
 	>

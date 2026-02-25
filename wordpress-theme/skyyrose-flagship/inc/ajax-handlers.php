@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function skyyrose_ajax_contact_submit() {
 	// Verify nonce.
 	if ( ! isset( $_POST['skyyrose_contact_nonce'] ) ||
-		! wp_verify_nonce( $_POST['skyyrose_contact_nonce'], 'skyyrose_contact_form' ) ) {
+		! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['skyyrose_contact_nonce'] ) ), 'skyyrose_contact_form' ) ) {
 		wp_send_json_error(
 			array(
 				'message' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'skyyrose-flagship' ),
@@ -131,7 +131,7 @@ add_action( 'wp_ajax_nopriv_skyyrose_contact_submit', 'skyyrose_ajax_contact_sub
 function skyyrose_ajax_newsletter_subscribe() {
 	// Verify nonce.
 	if ( ! isset( $_POST['skyyrose_newsletter_nonce'] ) ||
-		! wp_verify_nonce( $_POST['skyyrose_newsletter_nonce'], 'skyyrose_newsletter' ) ) {
+		! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['skyyrose_newsletter_nonce'] ) ), 'skyyrose_newsletter' ) ) {
 		wp_send_json_error(
 			array(
 				'message' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'skyyrose-flagship' ),
@@ -189,7 +189,7 @@ add_action( 'wp_ajax_nopriv_skyyrose_newsletter_subscribe', 'skyyrose_ajax_newsl
 function skyyrose_ajax_signin() {
 	// Verify nonce.
 	if ( ! isset( $_POST['skyyrose_signin_nonce'] ) ||
-		! wp_verify_nonce( $_POST['skyyrose_signin_nonce'], 'skyyrose_signin' ) ) {
+		! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['skyyrose_signin_nonce'] ) ), 'skyyrose_signin' ) ) {
 		wp_send_json_error(
 			array(
 				'message' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'skyyrose-flagship' ),
@@ -214,7 +214,7 @@ function skyyrose_ajax_signin() {
 
 	// Sanitize input.
 	$email    = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
-	$password = isset( $_POST['password'] ) ? $_POST['password'] : '';
+	$password = isset( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : '';
 
 	if ( empty( $email ) || empty( $password ) ) {
 		wp_send_json_error(
