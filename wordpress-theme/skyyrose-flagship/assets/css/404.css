@@ -1,584 +1,1207 @@
 /**
- * 404 Page Styles — SkyyRose Flagship
+ * 404 Error Page Styles — The Skyy Rose Collection
  *
- * Styling for 404.php: animated number, orbs, sparkles, collection cards,
- * trending products, quick nav, newsletter, film grain overlay.
+ * Luxury dark theme 404 with animated gradient typography, sparkle particles,
+ * search bar, collection cards with gradient borders, trending products,
+ * quick navigation grid, newsletter CTA, floating orbs, and film grain.
  *
  * @package SkyyRose_Flagship
  * @since   3.1.0
  */
 
-/* ============================================
-   PAGE LAYOUT
-   ============================================ */
+/* ==========================================================================
+   Layout — Full Viewport
+   ========================================================================== */
+
 .error-404-page {
 	position: relative;
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
 	min-height: 100vh;
-	padding: 120px 24px 80px;
+	padding: 6rem 1.5rem 4rem;
+	background-color: #0A0A0A;
 	overflow: hidden;
+	isolation: isolate;
 }
 
 .error-404-content {
 	position: relative;
-	z-index: 2;
-	max-width: 900px;
-	margin: 0 auto;
+	z-index: 10;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	max-width: 1000px;
+	width: 100%;
 	text-align: center;
 }
 
-/* ============================================
-   FLOATING ORBS
-   ============================================ */
-.error-404-orbs {
-	position: fixed;
-	inset: 0;
-	pointer-events: none;
-	z-index: 0;
+/* ==========================================================================
+   404 Number — Animated Gradient Shift
+   ========================================================================== */
+
+.error-404-number {
+	font-family: 'Playfair Display', Georgia, serif;
+	font-size: clamp(6rem, 15vw, 12rem);
+	font-weight: 900;
+	line-height: 1;
+	letter-spacing: -0.02em;
+	margin: 0 0 1rem;
+
+	/* Animated gradient shift: rose gold -> gold -> rose gold */
+	background: linear-gradient(
+		135deg,
+		#B76E79 0%,
+		#D4AF37 25%,
+		#B76E79 50%,
+		#D4AF37 75%,
+		#B76E79 100%
+	);
+	background-size: 400% 400%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	color: transparent;
+
+	/* Gradient shift + float combined */
+	animation:
+		error404GradientShift 6s ease-in-out infinite,
+		error404Float 6s ease-in-out infinite;
+
+	/* Glow behind the number */
+	filter: drop-shadow(0 0 40px rgba(183, 110, 121, 0.2))
+	        drop-shadow(0 0 80px rgba(212, 175, 55, 0.1));
 }
 
-.error-404-orb {
-	position: absolute;
-	border-radius: 50%;
-	filter: blur(80px);
-	opacity: 0.15;
-}
+/* ==========================================================================
+   Sparkle Particles
+   ========================================================================== */
 
-.error-404-orb--1 {
-	width: 300px;
-	height: 300px;
-	background: var(--color-rose-gold, #B76E79);
-	top: 10%;
-	left: 15%;
-	animation: orb-float-1 18s ease-in-out infinite alternate;
-}
-
-.error-404-orb--2 {
-	width: 200px;
-	height: 200px;
-	background: #DC143C;
-	top: 60%;
-	right: 10%;
-	animation: orb-float-2 22s ease-in-out infinite alternate;
-}
-
-.error-404-orb--3 {
-	width: 250px;
-	height: 250px;
-	background: #C0C0C0;
-	bottom: 20%;
-	left: 40%;
-	animation: orb-float-3 15s ease-in-out infinite alternate;
-}
-
-.error-404-orb--4 {
-	width: 180px;
-	height: 180px;
-	background: #FFB6C1;
-	top: 30%;
-	right: 30%;
-	animation: orb-float-1 20s ease-in-out infinite alternate-reverse;
-}
-
-@keyframes orb-float-1 {
-	0% { transform: translate(0, 0); }
-	100% { transform: translate(30px, -40px); }
-}
-
-@keyframes orb-float-2 {
-	0% { transform: translate(0, 0); }
-	100% { transform: translate(-20px, 30px); }
-}
-
-@keyframes orb-float-3 {
-	0% { transform: translate(0, 0); }
-	100% { transform: translate(20px, 20px); }
-}
-
-/* ============================================
-   SPARKLE PARTICLES
-   ============================================ */
 .error-404-sparkles {
-	position: fixed;
+	position: absolute;
 	inset: 0;
+	z-index: 5;
 	pointer-events: none;
-	z-index: 1;
+	overflow: hidden;
 }
 
 .error-404-sparkle {
 	position: absolute;
-	width: 3px;
-	height: 3px;
+	width: 4px;
+	height: 4px;
 	border-radius: 50%;
-	background: rgba(183, 110, 121, 0.6);
-	animation: sparkle-twinkle 3s ease-in-out infinite;
+	background: #D4AF37;
+	opacity: 0;
+	animation: error404Sparkle 3s ease-in-out infinite;
 }
 
-.error-404-sparkle--1 { top: 15%; left: 20%; animation-delay: 0s; }
-.error-404-sparkle--2 { top: 25%; left: 70%; animation-delay: 0.3s; }
-.error-404-sparkle--3 { top: 40%; left: 10%; animation-delay: 0.6s; }
-.error-404-sparkle--4 { top: 55%; left: 85%; animation-delay: 0.9s; }
-.error-404-sparkle--5 { top: 70%; left: 30%; animation-delay: 1.2s; }
-.error-404-sparkle--6 { top: 80%; left: 60%; animation-delay: 1.5s; }
-.error-404-sparkle--7 { top: 10%; left: 45%; animation-delay: 1.8s; }
-.error-404-sparkle--8 { top: 35%; left: 55%; animation-delay: 2.1s; }
-.error-404-sparkle--9 { top: 65%; left: 15%; animation-delay: 2.4s; }
-.error-404-sparkle--10 { top: 20%; left: 90%; animation-delay: 0.5s; }
-.error-404-sparkle--11 { top: 50%; left: 50%; animation-delay: 1.0s; }
-.error-404-sparkle--12 { top: 85%; left: 75%; animation-delay: 2.0s; }
+/* Position each sparkle around the center/404 area */
+.error-404-sparkle--1  { top: 12%; left: 30%; animation-delay: 0s; background: #B76E79; }
+.error-404-sparkle--2  { top: 8%;  left: 55%; animation-delay: 0.3s; }
+.error-404-sparkle--3  { top: 15%; left: 70%; animation-delay: 0.6s; background: #B76E79; }
+.error-404-sparkle--4  { top: 10%; left: 42%; animation-delay: 0.9s; }
+.error-404-sparkle--5  { top: 18%; left: 25%; animation-delay: 1.2s; background: #B76E79; }
+.error-404-sparkle--6  { top: 6%;  left: 60%; animation-delay: 1.5s; }
+.error-404-sparkle--7  { top: 20%; left: 48%; animation-delay: 1.8s; background: #B76E79; }
+.error-404-sparkle--8  { top: 14%; left: 35%; animation-delay: 2.1s; }
+.error-404-sparkle--9  { top: 9%;  left: 65%; animation-delay: 2.4s; background: #B76E79; }
+.error-404-sparkle--10 { top: 16%; left: 52%; animation-delay: 0.15s; }
+.error-404-sparkle--11 { top: 11%; left: 38%; animation-delay: 0.75s; background: #B76E79; }
+.error-404-sparkle--12 { top: 19%; left: 58%; animation-delay: 1.35s; }
 
-@keyframes sparkle-twinkle {
-	0%, 100% { opacity: 0; transform: scale(0.5); }
-	50% { opacity: 1; transform: scale(1.2); }
-}
-
-/* Film Grain */
-.error-404-grain {
-	position: fixed;
-	inset: 0;
-	pointer-events: none;
-	z-index: 9998;
-	opacity: 0.04;
-	mix-blend-mode: overlay;
-}
-
-/* ============================================
-   404 NUMBER DISPLAY
-   ============================================ */
-.error-404-number {
-	font-family: 'Playfair Display', serif;
-	font-size: clamp(8rem, 20vw, 14rem);
-	font-weight: 800;
-	line-height: 1;
-	margin: 0 0 16px;
-	background: linear-gradient(135deg, var(--color-rose-gold, #B76E79) 0%, #C0C0C0 40%, #DC143C 70%, var(--color-rose-gold, #B76E79) 100%);
-	background-size: 300% 300%;
-	-webkit-background-clip: text;
-	background-clip: text;
-	-webkit-text-fill-color: transparent;
-	animation: gradient-shift 8s ease-in-out infinite;
-}
-
-@keyframes gradient-shift {
-	0% { background-position: 0% 50%; }
-	50% { background-position: 100% 50%; }
-	100% { background-position: 0% 50%; }
-}
+/* ==========================================================================
+   Title, Subtitle & Witty Line
+   ========================================================================== */
 
 .error-404-title {
-	font-family: 'Playfair Display', serif;
-	font-size: clamp(1.5rem, 4vw, 2.5rem);
-	font-weight: 600;
-	color: #fff;
-	margin: 0 0 12px;
+	font-family: 'Playfair Display', Georgia, serif;
+	font-size: clamp(1.5rem, 3vw, 2.5rem);
+	font-weight: 700;
+	color: #FFFFFF;
+	margin: 0 0 0.75rem;
+	letter-spacing: 0.01em;
 }
 
 .error-404-subtitle {
-	font-family: 'Inter', sans-serif;
-	font-size: 1rem;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-size: clamp(0.9375rem, 1.5vw, 1.125rem);
+	font-weight: 400;
+	line-height: 1.7;
 	color: rgba(255, 255, 255, 0.6);
-	margin: 0 0 8px;
+	max-width: 520px;
+	margin: 0 0 0.5rem;
 }
 
 .error-404-witty {
-	font-family: 'Inter', sans-serif;
-	font-size: 0.85rem;
+	font-family: 'Playfair Display', Georgia, serif;
+	font-size: clamp(0.875rem, 1.2vw, 1rem);
 	font-style: italic;
-	color: rgba(255, 255, 255, 0.4);
-	margin: 0 0 40px;
+	font-weight: 400;
+	color: rgba(212, 175, 55, 0.6);
+	margin: 0 0 2.5rem;
 }
 
-/* ============================================
-   SEARCH BAR
-   ============================================ */
+/* ==========================================================================
+   Search Bar
+   ========================================================================== */
+
 .error-404-search {
-	max-width: 500px;
-	margin: 0 auto 48px;
+	width: 100%;
+	max-width: 540px;
+	margin-bottom: 3rem;
 }
 
 .error-404-search-form {
+	position: relative;
 	display: flex;
-	border-radius: 12px;
-	overflow: hidden;
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	background: rgba(255, 255, 255, 0.04);
-	transition: border-color 0.2s ease;
-}
-
-.error-404-search-form:focus-within {
-	border-color: var(--color-rose-gold, #B76E79);
-	box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.15);
+	align-items: center;
 }
 
 .error-404-search-input {
-	flex: 1;
-	padding: 14px 18px;
-	border: none;
-	background: transparent;
-	color: #fff;
-	font-family: 'Inter', sans-serif;
-	font-size: 0.9rem;
+	width: 100%;
+	padding: 0.875rem 3.25rem 0.875rem 1.25rem;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-size: 0.9375rem;
+	font-weight: 400;
+	color: #FFFFFF;
+	background: #111111;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 6px;
 	outline: none;
+	transition:
+		border-color 0.3s ease,
+		box-shadow 0.3s ease;
+	-webkit-appearance: none;
+	appearance: none;
 }
 
 .error-404-search-input::placeholder {
-	color: rgba(255, 255, 255, 0.3);
+	color: rgba(255, 255, 255, 0.35);
+}
+
+.error-404-search-input:focus {
+	border-color: #B76E79;
+	box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.15),
+	            0 0 20px rgba(183, 110, 121, 0.08);
 }
 
 .error-404-search-btn {
-	padding: 14px 18px;
-	border: none;
+	position: absolute;
+	right: 4px;
+	top: 50%;
+	transform: translateY(-50%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
 	background: transparent;
+	border: none;
+	border-radius: 4px;
 	color: rgba(255, 255, 255, 0.5);
 	cursor: pointer;
-	transition: color 0.2s ease;
+	transition: color 0.3s ease;
 }
 
-.error-404-search-btn:hover {
-	color: var(--color-rose-gold, #B76E79);
+.error-404-search-btn:hover,
+.error-404-search-btn:focus-visible {
+	color: #B76E79;
 }
 
-/* ============================================
-   SECTION HEADING
-   ============================================ */
+.error-404-search-btn:focus-visible {
+	outline: 2px solid #B76E79;
+	outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Section Headings (shared)
+   ========================================================================== */
+
 .error-404-section-heading {
-	font-family: 'Playfair Display', serif;
-	font-size: 1.3rem;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-size: 0.75rem;
 	font-weight: 600;
-	color: #fff;
-	margin: 0 0 24px;
+	text-transform: uppercase;
+	letter-spacing: 0.2em;
+	color: rgba(255, 255, 255, 0.4);
+	margin: 0 0 1.25rem;
 }
 
-/* ============================================
-   COLLECTION CARDS
-   ============================================ */
+/* ==========================================================================
+   Collection Quick-Link Cards — Enhanced
+   ========================================================================== */
+
 .error-404-collections {
-	margin-bottom: 56px;
+	width: 100%;
+	margin-bottom: 3rem;
 }
 
 .error-404-cards {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
-	gap: 16px;
-	text-align: left;
+	gap: 1rem;
+	width: 100%;
 }
 
 .error-404-card {
 	position: relative;
-	display: block;
-	padding: 24px 20px;
-	border-radius: 12px;
-	background: rgba(255, 255, 255, 0.03);
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
+	padding: 1.5rem 1.25rem 1.25rem;
+	background: #111111;
 	border: 1px solid rgba(255, 255, 255, 0.06);
+	border-top: none;
+	border-radius: 8px;
 	text-decoration: none;
 	overflow: hidden;
-	transition: transform 0.3s ease, border-color 0.3s ease;
+	transition:
+		transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+		box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+		border-color 0.3s ease;
 }
 
-.error-404-card:hover {
-	transform: translateY(-4px);
-	border-color: var(--card-accent, rgba(183, 110, 121, 0.3));
-}
-
+/* Gradient top border */
 .error-404-card-border {
 	position: absolute;
 	top: 0;
 	left: 0;
 	right: 0;
 	height: 3px;
-	background: linear-gradient(90deg, transparent, var(--card-accent, #B76E79), transparent);
+	background: linear-gradient(
+		90deg,
+		var(--card-accent, #B76E79) 0%,
+		#D4AF37 50%,
+		var(--card-accent, #B76E79) 100%
+	);
+	background-size: 200% 100%;
+	animation: error404BorderShift 4s ease-in-out infinite;
+	border-radius: 8px 8px 0 0;
+}
+
+/* Glass sheen on hover */
+.error-404-card::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		135deg,
+		rgba(255, 255, 255, 0.03) 0%,
+		transparent 50%
+	);
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 0.4s ease;
+}
+
+.error-404-card:hover,
+.error-404-card:focus-visible {
+	transform: translateY(-6px);
+	box-shadow:
+		0 12px 40px rgba(0, 0, 0, 0.5),
+		0 0 30px var(--card-glow, rgba(183, 110, 121, 0.2)),
+		0 0 0 1px rgba(255, 255, 255, 0.08);
+	border-color: rgba(255, 255, 255, 0.1);
+}
+
+.error-404-card:hover::before,
+.error-404-card:focus-visible::before {
+	opacity: 1;
+}
+
+.error-404-card:focus-visible {
+	outline: 2px solid var(--card-accent, #B76E79);
+	outline-offset: 2px;
 }
 
 .error-404-card-label {
-	display: block;
-	font-family: 'Playfair Display', serif;
-	font-size: 1.1rem;
-	font-weight: 600;
-	color: #fff;
-	margin-bottom: 8px;
+	font-family: 'Playfair Display', Georgia, serif;
+	font-size: 1.125rem;
+	font-weight: 700;
+	color: #FFFFFF;
+	margin-bottom: 0.375rem;
+	transition: color 0.3s ease;
+}
+
+.error-404-card:hover .error-404-card-label {
+	color: var(--card-accent, #B76E79);
 }
 
 .error-404-card-description {
-	display: block;
-	font-family: 'Inter', sans-serif;
-	font-size: 0.8rem;
-	color: rgba(255, 255, 255, 0.5);
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-size: 0.8125rem;
+	font-weight: 400;
+	color: rgba(255, 255, 255, 0.4);
 	line-height: 1.5;
-	margin-bottom: 12px;
+	margin-bottom: 0.75rem;
 }
 
 .error-404-card-meta {
-	font-family: 'Inter', sans-serif;
-	font-size: 0.75rem;
-	color: rgba(255, 255, 255, 0.4);
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-size: 0.6875rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: var(--card-accent, #B76E79);
+	opacity: 0.7;
 }
 
 .error-404-card-arrow {
 	position: absolute;
-	bottom: 20px;
-	right: 16px;
-	font-size: 1.2rem;
-	color: rgba(255, 255, 255, 0.2);
-	transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.error-404-card:hover .error-404-card-arrow {
+	right: 1.25rem;
+	top: 50%;
+	transform: translateY(-50%) translateX(-4px);
+	font-size: 1.125rem;
 	color: var(--card-accent, #B76E79);
-	transform: translateX(4px);
+	opacity: 0;
+	transition:
+		opacity 0.3s ease,
+		transform 0.3s ease;
 }
 
-/* ============================================
-   TRENDING PRODUCTS
-   ============================================ */
+.error-404-card:hover .error-404-card-arrow,
+.error-404-card:focus-visible .error-404-card-arrow {
+	opacity: 1;
+	transform: translateY(-50%) translateX(0);
+}
+
+/* ==========================================================================
+   Trending Products
+   ========================================================================== */
+
 .error-404-trending {
-	margin-bottom: 56px;
+	width: 100%;
+	margin-bottom: 3rem;
 }
 
 .error-404-trending-grid {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
-	gap: 16px;
+	gap: 1rem;
+	width: 100%;
 }
 
 .error-404-product-card {
-	text-decoration: none;
-	display: block;
-	border-radius: 12px;
-	overflow: hidden;
-	background: rgba(255, 255, 255, 0.03);
+	display: flex;
+	flex-direction: column;
+	background: #111111;
 	border: 1px solid rgba(255, 255, 255, 0.06);
-	transition: transform 0.3s ease, border-color 0.3s ease;
+	border-radius: 8px;
+	overflow: hidden;
+	text-decoration: none;
+	transition:
+		transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+		box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.error-404-product-card:hover {
-	transform: translateY(-4px);
-	border-color: rgba(183, 110, 121, 0.2);
+.error-404-product-card:hover,
+.error-404-product-card:focus-visible {
+	transform: translateY(-6px);
+	box-shadow:
+		0 12px 40px rgba(0, 0, 0, 0.5),
+		0 0 20px rgba(183, 110, 121, 0.15);
+}
+
+.error-404-product-card:focus-visible {
+	outline: 2px solid #B76E79;
+	outline-offset: 2px;
 }
 
 .error-404-product-image {
+	position: relative;
+	width: 100%;
 	aspect-ratio: 3 / 4;
-	background: rgba(255, 255, 255, 0.02);
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	overflow: hidden;
+	background: #0A0A0A;
 }
 
 .error-404-product-image img {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
+	transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.error-404-product-card:hover .error-404-product-image img {
+	transform: scale(1.05);
 }
 
 .error-404-product-placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
 	color: rgba(255, 255, 255, 0.15);
+	background: linear-gradient(135deg, #111111 0%, #0A0A0A 100%);
 }
 
 .error-404-product-info {
-	padding: 12px 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	padding: 1rem;
 }
 
 .error-404-product-name {
-	display: block;
-	font-family: 'Inter', sans-serif;
-	font-size: 0.85rem;
-	font-weight: 500;
-	color: #fff;
-	margin-bottom: 4px;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: #FFFFFF;
+	line-height: 1.4;
 }
 
 .error-404-product-price {
-	font-family: 'Inter', sans-serif;
-	font-size: 0.8rem;
-	color: var(--color-rose-gold, #B76E79);
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-size: 0.8125rem;
+	font-weight: 500;
+	color: #B76E79;
 }
 
-/* ============================================
-   QUICK NAVIGATION
-   ============================================ */
+/* ==========================================================================
+   Quick Navigation Grid
+   ========================================================================== */
+
 .error-404-quick-nav {
-	margin-bottom: 56px;
+	width: 100%;
+	margin-bottom: 3rem;
 }
 
 .error-404-nav-grid {
 	display: grid;
 	grid-template-columns: repeat(6, 1fr);
-	gap: 12px;
+	gap: 0.75rem;
+	width: 100%;
 }
 
 .error-404-nav-item {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 8px;
-	padding: 20px 12px;
-	border-radius: 12px;
-	background: rgba(255, 255, 255, 0.03);
+	gap: 0.625rem;
+	padding: 1.25rem 0.75rem;
+	background: #111111;
 	border: 1px solid rgba(255, 255, 255, 0.06);
+	border-radius: 8px;
 	text-decoration: none;
-	transition: all 0.2s ease;
+	transition:
+		transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+		border-color 0.3s ease,
+		box-shadow 0.3s ease;
 }
 
-.error-404-nav-item:hover {
-	background: rgba(183, 110, 121, 0.08);
-	border-color: rgba(183, 110, 121, 0.2);
+.error-404-nav-item:hover,
+.error-404-nav-item:focus-visible {
+	transform: translateY(-4px);
+	border-color: rgba(183, 110, 121, 0.3);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4),
+	            0 0 16px rgba(183, 110, 121, 0.1);
+}
+
+.error-404-nav-item:focus-visible {
+	outline: 2px solid #B76E79;
+	outline-offset: 2px;
 }
 
 .error-404-nav-icon {
-	color: rgba(255, 255, 255, 0.5);
-	transition: color 0.2s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: rgba(255, 255, 255, 0.4);
+	transition: color 0.3s ease;
 }
 
 .error-404-nav-item:hover .error-404-nav-icon {
-	color: var(--color-rose-gold, #B76E79);
+	color: #B76E79;
 }
 
 .error-404-nav-label {
-	font-family: 'Inter', sans-serif;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 	font-size: 0.75rem;
 	font-weight: 500;
 	color: rgba(255, 255, 255, 0.6);
+	text-align: center;
+	transition: color 0.3s ease;
 }
 
-/* ============================================
-   NEWSLETTER CTA
-   ============================================ */
+.error-404-nav-item:hover .error-404-nav-label {
+	color: #FFFFFF;
+}
+
+/* ==========================================================================
+   Newsletter CTA
+   ========================================================================== */
+
 .error-404-newsletter {
-	padding: 40px 32px;
-	border-radius: 16px;
-	background: rgba(183, 110, 121, 0.06);
-	border: 1px solid rgba(183, 110, 121, 0.1);
-	margin-bottom: 40px;
+	width: 100%;
+	max-width: 600px;
+	padding: 2rem;
+	background: #111111;
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	border-radius: 12px;
+	margin-bottom: 2.5rem;
 }
 
 .error-404-newsletter-heading {
-	font-family: 'Playfair Display', serif;
-	font-size: 1.3rem;
-	font-weight: 600;
-	color: #fff;
-	margin: 0 0 8px;
+	font-family: 'Playfair Display', Georgia, serif;
+	font-size: clamp(1.125rem, 2vw, 1.375rem);
+	font-weight: 700;
+	color: #FFFFFF;
+	margin: 0 0 0.5rem;
 }
 
 .error-404-newsletter-text {
-	font-family: 'Inter', sans-serif;
-	font-size: 0.9rem;
-	color: rgba(255, 255, 255, 0.6);
-	margin: 0 0 20px;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-size: 0.875rem;
+	font-weight: 400;
+	color: rgba(255, 255, 255, 0.5);
+	margin: 0 0 1.25rem;
+	line-height: 1.6;
 }
 
 .error-404-newsletter-form {
 	display: flex;
-	max-width: 440px;
-	margin: 0 auto;
-	border-radius: 10px;
-	overflow: hidden;
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	background: rgba(255, 255, 255, 0.04);
+	gap: 0.5rem;
+	width: 100%;
 }
 
 .error-404-newsletter-input {
 	flex: 1;
-	padding: 12px 16px;
-	border: none;
-	background: transparent;
-	color: #fff;
-	font-family: 'Inter', sans-serif;
-	font-size: 0.9rem;
+	padding: 0.75rem 1rem;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-size: 0.875rem;
+	font-weight: 400;
+	color: #FFFFFF;
+	background: #0A0A0A;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 6px;
 	outline: none;
+	transition:
+		border-color 0.3s ease,
+		box-shadow 0.3s ease;
+	-webkit-appearance: none;
+	appearance: none;
 }
 
 .error-404-newsletter-input::placeholder {
 	color: rgba(255, 255, 255, 0.3);
 }
 
+.error-404-newsletter-input:focus {
+	border-color: #B76E79;
+	box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.15);
+}
+
 .error-404-newsletter-btn {
-	padding: 12px 24px;
-	border: none;
-	background: var(--color-rose-gold, #B76E79);
-	color: #fff;
-	font-family: 'Inter', sans-serif;
-	font-size: 0.85rem;
+	padding: 0.75rem 1.5rem;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-size: 0.875rem;
 	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: #FFFFFF;
+	background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%);
+	border: none;
+	border-radius: 6px;
 	cursor: pointer;
-	transition: background 0.2s ease;
+	transition:
+		transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+		box-shadow 0.3s ease;
+	white-space: nowrap;
 }
 
-.error-404-newsletter-btn:hover {
-	background: #a05a64;
+.error-404-newsletter-btn:hover,
+.error-404-newsletter-btn:focus-visible {
+	transform: scale(1.05);
+	box-shadow: 0 4px 20px rgba(183, 110, 121, 0.35);
 }
 
-/* ============================================
-   CTA BUTTONS
-   ============================================ */
+.error-404-newsletter-btn:focus-visible {
+	outline: 2px solid #D4AF37;
+	outline-offset: 2px;
+}
+
+.error-404-newsletter-btn:active {
+	transform: scale(1.02);
+}
+
+/* ==========================================================================
+   Dual CTA Buttons
+   ========================================================================== */
+
 .error-404-cta-group {
 	display: flex;
+	gap: 1rem;
+	flex-wrap: wrap;
 	justify-content: center;
-	gap: 16px;
 }
 
 .error-404-cta {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	padding: 14px 32px;
-	border-radius: 8px;
-	font-family: 'Inter', sans-serif;
-	font-size: 0.9rem;
+	padding: 1rem 2.5rem;
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-size: 0.9375rem;
 	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
 	text-decoration: none;
-	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	border-radius: 4px;
+	cursor: pointer;
+	transition:
+		transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+		box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.error-404-cta:hover {
-	transform: translateY(-2px);
-}
-
+/* Primary — Gradient Fill */
 .error-404-cta--primary {
-	background: linear-gradient(135deg, var(--color-rose-gold, #B76E79), #a05a64);
-	color: #fff;
+	color: #FFFFFF;
+	background: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%);
+	border: none;
+	box-shadow: 0 4px 20px rgba(183, 110, 121, 0.25);
 }
 
-.error-404-cta--primary:hover {
-	box-shadow: 0 8px 24px rgba(183, 110, 121, 0.3);
+.error-404-cta--primary:hover,
+.error-404-cta--primary:focus-visible {
+	transform: scale(1.05);
+	box-shadow:
+		0 8px 40px rgba(183, 110, 121, 0.4),
+		0 0 60px rgba(212, 175, 55, 0.15);
+	color: #FFFFFF;
 }
 
+/* Secondary — Outline */
 .error-404-cta--secondary {
-	background: rgba(255, 255, 255, 0.06);
-	border: 1px solid rgba(255, 255, 255, 0.15);
-	color: #fff;
+	color: #FFFFFF;
+	background: transparent;
+	border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.error-404-cta--secondary:hover {
-	background: rgba(255, 255, 255, 0.1);
+.error-404-cta--secondary:hover,
+.error-404-cta--secondary:focus-visible {
+	transform: scale(1.05);
+	border-color: #B76E79;
+	box-shadow: 0 0 20px rgba(183, 110, 121, 0.15);
+	color: #FFFFFF;
 }
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
-@media (max-width: 768px) {
-	.error-404-cards {
-		grid-template-columns: repeat(2, 1fr);
+.error-404-cta:focus-visible {
+	outline: 2px solid #D4AF37;
+	outline-offset: 4px;
+}
+
+.error-404-cta:active {
+	transform: scale(1.02);
+}
+
+/* ==========================================================================
+   Floating Orbs — Ambient Background
+   ========================================================================== */
+
+.error-404-orbs {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.error-404-orb {
+	position: absolute;
+	border-radius: 50%;
+	filter: blur(80px);
+	opacity: 0.12;
+}
+
+.error-404-orb--1 {
+	width: 350px;
+	height: 350px;
+	background: radial-gradient(circle, #B76E79, transparent 70%);
+	top: -5%;
+	right: -8%;
+	animation: error404OrbDrift1 18s ease-in-out infinite;
+}
+
+.error-404-orb--2 {
+	width: 280px;
+	height: 280px;
+	background: radial-gradient(circle, #D4AF37, transparent 70%);
+	bottom: 5%;
+	left: -6%;
+	animation: error404OrbDrift2 22s ease-in-out infinite;
+}
+
+.error-404-orb--3 {
+	width: 200px;
+	height: 200px;
+	background: radial-gradient(circle, #B76E79, transparent 70%);
+	top: 50%;
+	left: 55%;
+	animation: error404OrbDrift3 15s ease-in-out infinite;
+}
+
+/* New fourth orb for extra depth */
+.error-404-orb--4 {
+	width: 240px;
+	height: 240px;
+	background: radial-gradient(circle, #D4AF37, transparent 70%);
+	top: 25%;
+	left: 10%;
+	opacity: 0.08;
+	animation: error404OrbDrift4 20s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   Film Grain Overlay
+   ========================================================================== */
+
+.error-404-grain {
+	position: fixed;
+	inset: 0;
+	z-index: 9999;
+	pointer-events: none;
+	opacity: 0.03;
+	mix-blend-mode: overlay;
+}
+
+.error-404-grain::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");
+	background-repeat: repeat;
+	background-size: 200px 200px;
+}
+
+/* ==========================================================================
+   Keyframe Animations
+   ========================================================================== */
+
+@keyframes error404GradientShift {
+	0% {
+		background-position: 0% 50%;
 	}
-	.error-404-trending-grid {
-		grid-template-columns: repeat(2, 1fr);
+	50% {
+		background-position: 100% 50%;
 	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+@keyframes error404Float {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-12px);
+	}
+}
+
+@keyframes error404Sparkle {
+	0%,
+	100% {
+		opacity: 0;
+		transform: scale(0) rotate(0deg);
+	}
+	20% {
+		opacity: 1;
+		transform: scale(1) rotate(90deg);
+	}
+	40% {
+		opacity: 0.8;
+		transform: scale(1.2) rotate(180deg);
+	}
+	60% {
+		opacity: 0.4;
+		transform: scale(0.8) rotate(270deg);
+	}
+	80% {
+		opacity: 0;
+		transform: scale(0) rotate(360deg);
+	}
+}
+
+@keyframes error404BorderShift {
+	0% {
+		background-position: 0% 0%;
+	}
+	50% {
+		background-position: 100% 0%;
+	}
+	100% {
+		background-position: 0% 0%;
+	}
+}
+
+@keyframes error404OrbDrift1 {
+	0%,
+	100% {
+		transform: translate(0, 0) scale(1);
+	}
+	33% {
+		transform: translate(-30px, 20px) scale(1.05);
+	}
+	66% {
+		transform: translate(15px, -15px) scale(0.95);
+	}
+}
+
+@keyframes error404OrbDrift2 {
+	0%,
+	100% {
+		transform: translate(0, 0) scale(1);
+	}
+	33% {
+		transform: translate(25px, -30px) scale(1.08);
+	}
+	66% {
+		transform: translate(-20px, 10px) scale(0.93);
+	}
+}
+
+@keyframes error404OrbDrift3 {
+	0%,
+	100% {
+		transform: translate(0, 0) scale(1);
+	}
+	50% {
+		transform: translate(-20px, 25px) scale(1.1);
+	}
+}
+
+@keyframes error404OrbDrift4 {
+	0%,
+	100% {
+		transform: translate(0, 0) scale(1);
+	}
+	40% {
+		transform: translate(20px, -20px) scale(1.06);
+	}
+	70% {
+		transform: translate(-15px, 15px) scale(0.94);
+	}
+}
+
+/* ==========================================================================
+   Responsive — Wide Tablet / Small Desktop (1200px)
+   ========================================================================== */
+
+@media (max-width: 1200px) {
 	.error-404-nav-grid {
 		grid-template-columns: repeat(3, 1fr);
 	}
-}
 
-@media (max-width: 480px) {
-	.error-404-page {
-		padding: 100px 16px 60px;
-	}
-	.error-404-cards {
-		grid-template-columns: 1fr;
-	}
 	.error-404-trending-grid {
 		grid-template-columns: repeat(2, 1fr);
 	}
+}
+
+/* ==========================================================================
+   Responsive — Tablet (768px)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+	.error-404-page {
+		padding: 5rem 1.25rem 3rem;
+	}
+
+	.error-404-cards {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 0.75rem;
+	}
+
+	.error-404-card {
+		padding: 1.25rem 1rem 1rem;
+	}
+
+	.error-404-card-arrow {
+		display: none;
+	}
+
+	.error-404-card-description {
+		font-size: 0.75rem;
+	}
+
+	.error-404-trending-grid {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 0.75rem;
+	}
+
+	.error-404-nav-grid {
+		grid-template-columns: repeat(3, 1fr);
+		gap: 0.625rem;
+	}
+
+	.error-404-newsletter {
+		padding: 1.5rem;
+	}
+
+	.error-404-newsletter-form {
+		flex-direction: column;
+	}
+
+	.error-404-newsletter-btn {
+		width: 100%;
+		padding: 0.875rem;
+	}
+}
+
+/* ==========================================================================
+   Responsive — Mobile (480px)
+   ========================================================================== */
+
+@media (max-width: 480px) {
+	.error-404-page {
+		padding: 4rem 1rem 2.5rem;
+	}
+
+	.error-404-number {
+		margin-bottom: 0.5rem;
+	}
+
+	.error-404-title {
+		font-size: 1.375rem;
+	}
+
+	.error-404-subtitle {
+		font-size: 0.9375rem;
+	}
+
+	.error-404-witty {
+		margin-bottom: 2rem;
+	}
+
+	.error-404-search {
+		margin-bottom: 2rem;
+	}
+
+	.error-404-cards {
+		grid-template-columns: 1fr;
+		gap: 0.625rem;
+	}
+
+	.error-404-card {
+		flex-direction: row;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 1rem;
+	}
+
+	.error-404-card-label {
+		font-size: 1rem;
+		margin-bottom: 0;
+	}
+
+	.error-404-card-description {
+		display: none;
+	}
+
+	.error-404-card-meta {
+		display: none;
+	}
+
+	.error-404-card-arrow {
+		display: block;
+		position: static;
+		transform: none;
+		opacity: 0.5;
+		margin-left: auto;
+	}
+
+	.error-404-trending-grid {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 0.625rem;
+	}
+
+	.error-404-product-info {
+		padding: 0.75rem;
+	}
+
+	.error-404-product-name {
+		font-size: 0.8125rem;
+	}
+
+	.error-404-product-price {
+		font-size: 0.75rem;
+	}
+
 	.error-404-nav-grid {
 		grid-template-columns: repeat(2, 1fr);
+		gap: 0.5rem;
 	}
+
+	.error-404-nav-item {
+		padding: 1rem 0.5rem;
+	}
+
+	.error-404-newsletter {
+		padding: 1.25rem;
+	}
+
+	.error-404-newsletter-heading {
+		font-size: 1.125rem;
+	}
+
 	.error-404-cta-group {
 		flex-direction: column;
+		width: 100%;
+	}
+
+	.error-404-cta {
+		width: 100%;
+		padding: 1rem 2rem;
+	}
+
+	.error-404-orb--1 {
+		width: 200px;
+		height: 200px;
+	}
+
+	.error-404-orb--2 {
+		width: 160px;
+		height: 160px;
+	}
+
+	.error-404-orb--3 {
+		display: none;
+	}
+
+	.error-404-orb--4 {
+		display: none;
+	}
+}
+
+/* ==========================================================================
+   Accessibility — Reduced Motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	.error-404-number {
+		animation: none;
+		background-size: 200% 200%;
+	}
+
+	.error-404-orb {
+		animation: none;
+	}
+
+	.error-404-sparkle {
+		animation: none;
+		display: none;
+	}
+
+	.error-404-card-border {
+		animation: none;
+	}
+
+	.error-404-card {
+		transition: box-shadow 0.2s ease;
+	}
+
+	.error-404-card:hover,
+	.error-404-card:focus-visible {
+		transform: none;
+	}
+
+	.error-404-product-card {
+		transition: box-shadow 0.2s ease;
+	}
+
+	.error-404-product-card:hover,
+	.error-404-product-card:focus-visible {
+		transform: none;
+	}
+
+	.error-404-product-image img {
+		transition: none;
+	}
+
+	.error-404-product-card:hover .error-404-product-image img {
+		transform: none;
+	}
+
+	.error-404-nav-item {
+		transition: box-shadow 0.2s ease, border-color 0.2s ease;
+	}
+
+	.error-404-nav-item:hover,
+	.error-404-nav-item:focus-visible {
+		transform: none;
+	}
+
+	.error-404-cta {
+		transition: box-shadow 0.2s ease;
+	}
+
+	.error-404-cta:hover,
+	.error-404-cta:focus-visible {
+		transform: none;
+	}
+
+	.error-404-newsletter-btn {
+		transition: box-shadow 0.2s ease;
+	}
+
+	.error-404-newsletter-btn:hover,
+	.error-404-newsletter-btn:focus-visible {
+		transform: none;
+	}
+}
+
+/* ==========================================================================
+   High Contrast Mode
+   ========================================================================== */
+
+@media (forced-colors: active) {
+	.error-404-number {
+		-webkit-text-fill-color: currentColor;
+		background: none;
+		filter: none;
+	}
+
+	.error-404-card {
+		border: 2px solid ButtonText;
+	}
+
+	.error-404-card-border {
+		display: none;
+	}
+
+	.error-404-product-card {
+		border: 2px solid ButtonText;
+	}
+
+	.error-404-nav-item {
+		border: 2px solid ButtonText;
+	}
+
+	.error-404-cta {
+		border: 2px solid ButtonText;
+	}
+
+	.error-404-newsletter {
+		border: 2px solid ButtonText;
+	}
+
+	.error-404-search-input {
+		border: 2px solid ButtonText;
+	}
+
+	.error-404-newsletter-input {
+		border: 2px solid ButtonText;
+	}
+
+	.error-404-newsletter-btn {
+		border: 2px solid ButtonText;
+	}
+
+	.error-404-orbs,
+	.error-404-grain,
+	.error-404-sparkles {
+		display: none;
 	}
 }

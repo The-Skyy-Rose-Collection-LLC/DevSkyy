@@ -1,0 +1,46 @@
+Here is the ultra-precise technical description of the garment:
+
+**TECHNICAL SPECIFICATION: HOODED SWEATSHIRT**
+
+1.  **GARMENT TYPE:** Hooded Sweatshirt (Hoodie)
+2.  **BASE COLOR:** Dark Charcoal Heather Grey (Hex approximation: #303331, with visible lighter grey heathering effect)
+3.  **SECONDARY COLORS:**
+    *   **Graphic Embroidery (main):** Ash Grey (primary outline/details, similar to PMS Cool Gray 7 C), Bright White (secondary outlines/highlights/shading, similar to PMS White), Pale Rose Pink (subtle accents within roses, similar to PMS 706 C).
+    *   **Cuff Woven Tag:** Vivid Red (background, similar to PMS 185 C), Pure White (motif/text).
+    *   **Hardware (Eyelets):** Dark Gunmetal (metallic finish).
+4.  **FIT:**
+    *   **Silhouette:** Relaxed Fit.
+    *   **Length:** Standard Hip Length.
+    *   **Proportions:** Standard torso and sleeve proportions. Set-in sleeves.
+5.  **GRAPHICS:**
+    *   **Location:** Centered on the front torso, positioned above the kangaroo pocket opening and below the hood neckline.
+    *   **Size relative to garment:** Approximately 28-32% of the total front torso length (from shoulder seam to hem) and 20-25% of the total front torso width.
+    *   **Content:** An intricate, multi-layered embroidery depicting a stylized botanical and winged motif.
+        *   **Top:** Two prominent, intertwined roses with detailed petals and leaves.
+        *   **Mid-section:** Multiple thorny branches/stems intertwining below the roses.
+        *   **Flanking:** A pair of stylized angel wings extending outwards from the lower part of the rose/thorn structure.
+        *   **Base:** The entire motif appears to emerge from or rest upon a formation of stylized clouds.
+    *   **Colors:**
+        *   **Ash Grey:** Used for the primary outlines of roses, thorns, leaves, wings, and clouds.
+        *   **Bright White:** Used for internal shading, highlights, and finer details within the roses, wing feathers, and cloud textures.
+        *   **Pale Rose Pink:** Subtly integrated within the petals of the roses to provide depth and a delicate tint.
+    *   **Style:** High-density embroidery, employing varied stitch directions and thread counts to create texture, depth, and a detailed, almost tattoo-flash aesthetic.
+6.  **TEXT:**
+    *   **Left Cuff Woven Tag:** Extremely small and mostly illegible white text or symbol on the red portion of the tag. Likely a brand initial or short word. No other visible text on the garment.
+7.  **LOGOS & BRANDING:**
+    *   **Left Cuff Woven Tag:**
+        *   **Location:** A small, folded woven label sewn onto the top edge of the wearer's left sleeve cuff, approximately 1.5 cm from the sleeve seam.
+        *   **Content:** Rectangular tag, with one end displaying a Vivid Red background featuring a small, stylized Pure White motif (appears to be a fruit like an apple with a leaf, or a berry, or a simple heart shape) and possibly extremely small, illegible white text. The remaining portion of the tag is folded under, obscuring further details.
+        *   **Size:** Visible portion approximately 1 cm (height) x 0.7 cm (width).
+8.  **HARDWARE:**
+    *   **Drawstrings:** Two flat-knit drawstrings, color-matched to the Dark Charcoal Heather Grey base fabric. Each approximately 1 cm wide.
+    *   **Eyelets:** Two circular metal eyelets, one on each side of the hood opening, positioned to allow the drawstrings to pass through. Finish is Dark Gunmetal.
+9.  **FABRIC TEXTURE:**
+    *   **Main Body Fabric:** Mid-to-heavy weight fleece-back jersey fabric. The face side exhibits a soft handfeel with a subtle, fine heathered texture resulting from intermingled dark and light grey fibers. It has a matte finish with no noticeable sheen.
+    *   **Ribbing (Cuffs & Waistband):** 1x1 or 2x2 rib knit construction, color-matched to the Dark Charcoal Heather Grey base fabric. It provides elasticity and form retention.
+10. **SPECIAL DETAILS:**
+    *   **Hood Construction:** Double-layered hood for structural integrity and comfort, featuring a visible center seam extending from the crown to the back neck. The front opening incorporates a channel for the drawstrings.
+    *   **Cuffs:** Long sleeves finished with ribbed cuffs, approximately 7-8 cm in height, providing a snug fit.
+    *   **Waistband:** The garment hem is finished with a ribbed waistband, approximately 7-8 cm in height, matching the cuffs.
+    *   **Kangaroo Pocket:** A large, patch-style kangaroo pocket is sewn onto the front torso, positioned above the waistband, with open entries on both sides.
+    *   **Seams:** Standard construction seams (likely overlock or flatlock for comfort and durability) are visible, particularly around the sleeve armholes and side seams.
