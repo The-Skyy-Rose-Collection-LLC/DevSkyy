@@ -37,7 +37,7 @@ $love_hurts_rooms = array(
 			array(
 				'id'         => 'lh-004',
 				'name'       => esc_html__( 'Love Hurts Varsity Jacket', 'skyyrose-flagship' ),
-				'price'      => 'DRAFT',
+				'price'      => '$265',
 				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
 				'sizes'      => 'S,M,L,XL,2XL,3XL',
 				'image'      => get_template_directory_uri() . '/assets/images/products/lh-004-varsity.jpg',
@@ -49,8 +49,8 @@ $love_hurts_rooms = array(
 			),
 			array(
 				'id'         => 'lh-001',
-				'name'       => esc_html__( 'The Fannie', 'skyyrose-flagship' ),
-				'price'      => '$70',
+				'name'       => esc_html__( 'The Fannie Pack', 'skyyrose-flagship' ),
+				'price'      => '$65',
 				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
 				'sizes'      => 'One Size',
 				'image'      => get_template_directory_uri() . '/assets/images/products/lh-001-fannie.jpg',
@@ -63,7 +63,7 @@ $love_hurts_rooms = array(
 			array(
 				'id'         => 'lh-003',
 				'name'       => esc_html__( 'Love Hurts Basketball Shorts', 'skyyrose-flagship' ),
-				'price'      => '$55',
+				'price'      => '$75',
 				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
 				'sizes'      => 'S,M,L,XL,2XL,3XL',
 				'image'      => get_template_directory_uri() . '/assets/images/products/lh-003-shorts.jpg',
@@ -84,7 +84,7 @@ $love_hurts_rooms = array(
 			array(
 				'id'         => 'lh-002',
 				'name'       => esc_html__( 'Love Hurts Joggers (BLACK)', 'skyyrose-flagship' ),
-				'price'      => '$67',
+				'price'      => '$95',
 				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
 				'sizes'      => 'S,M,L,XL,2XL,3XL',
 				'image'      => get_template_directory_uri() . '/assets/images/products/lh-002-joggers.jpg',
@@ -97,7 +97,7 @@ $love_hurts_rooms = array(
 			array(
 				'id'         => 'lh-002b',
 				'name'       => esc_html__( 'Love Hurts Joggers (WHITE)', 'skyyrose-flagship' ),
-				'price'      => '$67',
+				'price'      => '$95',
 				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
 				'sizes'      => 'S,M,L,XL,2XL,3XL',
 				'image'      => get_template_directory_uri() . '/assets/images/products/lh-002-joggers.jpg',
