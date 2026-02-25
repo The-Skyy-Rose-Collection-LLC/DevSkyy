@@ -113,6 +113,50 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 	</section>
 
 	<!-- ============================================================
+	     BRAND MASCOT — PRIMARY MASCOT PLACEMENT
+	     ============================================================ -->
+	<section class="collection-mascot" id="mascot" aria-label="<?php esc_attr_e( 'Meet Our SkyyRose Mascot', 'skyyrose-flagship' ); ?>">
+		<div class="collection-mascot__inner fade-in-up">
+			<div class="collection-mascot__image-wrap">
+				<?php
+				$mascot_path = SKYYROSE_DIR . '/assets/images/mascot/';
+				$mascot_url  = SKYYROSE_ASSETS_URI . '/images/mascot/';
+				$mascot_ref  = $mascot_url . 'skyyrose-mascot-kids-capsule.png';
+				$mascot_fallback = $mascot_url . 'skyyrose-mascot-reference.png';
+				$mascot_src  = file_exists( $mascot_path . 'skyyrose-mascot-kids-capsule.png' )
+					? $mascot_ref
+					: ( file_exists( $mascot_path . 'skyyrose-mascot-reference.png' ) ? $mascot_fallback : '' );
+				if ( $mascot_src ) : ?>
+					<img
+						src="<?php echo esc_url( $mascot_src ); ?>"
+						alt="<?php esc_attr_e( 'SkyyRose brand mascot wearing Kids Capsule collection', 'skyyrose-flagship' ); ?>"
+						class="collection-mascot__image"
+						width="400"
+						height="500"
+						loading="lazy"
+						decoding="async"
+					/>
+				<?php else : ?>
+					<div class="collection-mascot__placeholder" aria-hidden="true">
+						<svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#FFB6C1" stroke-width="1" stroke-linecap="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+					</div>
+				<?php endif; ?>
+			</div>
+			<div class="collection-mascot__content">
+				<h2 class="collection-mascot__heading">
+					<?php echo esc_html__( 'Meet Your Style Guide!', 'skyyrose-flagship' ); ?>
+				</h2>
+				<p class="collection-mascot__text">
+					<?php echo esc_html__( 'Our SkyyRose mascot is here to help you explore the Kids Capsule collection. She wears every piece with confidence and style — just like your little one will!', 'skyyrose-flagship' ); ?>
+				</p>
+				<a href="#products" class="collection-mascot__cta">
+					<?php echo esc_html__( 'Explore Her Favorites', 'skyyrose-flagship' ); ?> &rarr;
+				</a>
+			</div>
+		</div>
+	</section>
+
+	<!-- ============================================================
 	     COLLECTION STORY
 	     ============================================================ -->
 	<section class="collection-story" id="story">
