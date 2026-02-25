@@ -4,7 +4,7 @@
  *
  * Defines brand constants, collection descriptions, and branded messaging
  * for empty cart, 404, checkout, and collection-specific CTAs.
- * All copy uses the SkyyRose voice: "Where Love Meets Luxury."
+ * All copy uses the SkyyRose voice: "Luxury Grows from Concrete."
  *
  * @package SkyyRose_Flagship
  * @since   3.1.0
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *--------------------------------------------------------------*/
 
 if ( ! defined( 'SKYYROSE_BRAND_TAGLINE' ) ) {
-	define( 'SKYYROSE_BRAND_TAGLINE', 'Where Love Meets Luxury' );
+	define( 'SKYYROSE_BRAND_TAGLINE', 'Luxury Grows from Concrete.' );
 }
 
 if ( ! defined( 'SKYYROSE_BRAND_COLOR_PRIMARY' ) ) {
@@ -69,7 +69,7 @@ function skyyrose_get_collection_description( $collection ) {
 		return $descriptions[ $sanitized ];
 	}
 
-	return __( 'Where Love Meets Luxury. Explore the SkyyRose collection.', 'skyyrose-flagship' );
+	return __( 'Luxury Grows from Concrete. Explore the SkyyRose collection.', 'skyyrose-flagship' );
 }
 
 /*--------------------------------------------------------------
@@ -265,7 +265,7 @@ function skyyrose_get_collection_cta( $collection ) {
 	return array(
 		'text'        => __( 'Explore Collections', 'skyyrose-flagship' ),
 		'url'         => esc_url( $shop_base ),
-		'description' => __( 'Discover the world of SkyyRose. Where Love Meets Luxury.', 'skyyrose-flagship' ),
+		'description' => __( 'Discover the world of SkyyRose. Luxury Grows from Concrete.', 'skyyrose-flagship' ),
 	);
 }
 

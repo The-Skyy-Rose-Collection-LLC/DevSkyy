@@ -4,6 +4,7 @@
  */
 
 import { CheckoutManager, createCheckoutManager } from '../checkout';
+import { handlePaymentResult, initializeStripe } from '../stripeIntegration';
 
 // Mock stripeIntegration
 jest.mock('../stripeIntegration', () => ({
@@ -21,6 +22,29 @@ const mockCart = {
 };
 
 const mockCustomer = {
+  email: 'test@example.com',
+  firstName: 'John',
+  lastName: 'Doe',
+  phone: '555-1234',
+  shippingAddress: {
+    line1: '123 Main St',
+    line2: 'Apt 4',
+    city: 'NYC',
+    state: 'NY',
+    postalCode: '10001',
+    country: 'US',
+  },
+  billingAddress: {
+    line1: '456 Billing Ave',
+    line2: 'Suite 100',
+    city: 'Brooklyn',
+    state: 'NY',
+    postalCode: '11201',
+    country: 'US',
+  },
+};
+
+const mockCustomerNoBilling = {
   email: 'test@example.com',
   firstName: 'John',
   lastName: 'Doe',
@@ -119,14 +143,166 @@ describe('CheckoutManager', () => {
       const mgr = new CheckoutManager(defaultConfig);
       await expect(mgr.redirectToCheckout('sess_123')).rejects.toThrow('Stripe not initialized');
     });
+
+    it('should redirect when stripe is initialized', async () => {
+      const mockRedirect = jest.fn().mockResolvedValue({});
+      (initializeStripe).mockReturnValue({
+        redirectToCheckout: mockRedirect,
+        confirmPayment: jest.fn(),
+      });
+
+      const mgr = new CheckoutManager(defaultConfig);
+      await mgr.redirectToCheckout('sess_123');
+
+      expect(mockRedirect).toHaveBeenCalledWith({ sessionId: 'sess_123' });
+    });
+
+    it('should throw when redirect returns error', async () => {
+      const mockRedirect = jest.fn().mockResolvedValue({ error: { message: 'Session expired' } });
+      (initializeStripe).mockReturnValue({
+        redirectToCheckout: mockRedirect,
+        confirmPayment: jest.fn(),
+      });
+
+      jest.spyOn(console, 'error').mockImplementation();
+      const mgr = new CheckoutManager(defaultConfig);
+      await expect(mgr.redirectToCheckout('sess_123')).rejects.toThrow('Session expired');
+    });
+
+    it('should save Three.js state before redirect', async () => {
+      const mockRedirect = jest.fn().mockResolvedValue({});
+      (initializeStripe).mockReturnValue({
+        redirectToCheckout: mockRedirect,
+        confirmPayment: jest.fn(),
+      });
+
+      const mgr = new CheckoutManager(defaultConfig);
+      await mgr.redirectToCheckout('sess_123');
+
+      const saved = sessionStorage.getItem('threejs_state');
+      expect(saved).not.toBeNull();
+      const parsed = JSON.parse(saved);
+      expect(parsed.timestamp).toBeDefined();
+    });
   });
 
   describe('processPayment', () => {
     it('should return error when stripe not initialized', async () => {
+      (initializeStripe).mockReturnValue(null);
       const mgr = new CheckoutManager(defaultConfig);
-      const result = await mgr.processPayment({}, mockCart, mockCustomer);
+      const result = await mgr.processPayment({}, mockCart, mockCustomerNoBilling);
       expect(result.success).toBe(false);
       expect(result.error).toContain('Stripe not initialized');
+    });
+
+    it('should process payment successfully', async () => {
+      const mockConfirmPayment = jest.fn().mockResolvedValue({
+        paymentIntent: { id: 'pi_success', status: 'succeeded' },
+      });
+      (initializeStripe).mockReturnValue({ confirmPayment: mockConfirmPayment });
+      (handlePaymentResult).mockReturnValue({ success: true, paymentIntentId: 'pi_success' });
+
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: jest.fn().mockResolvedValue({ orderId: 'order-1' }),
+      });
+
+      const mgr = new CheckoutManager(defaultConfig);
+      const result = await mgr.processPayment({}, mockCart, mockCustomerNoBilling);
+
+      expect(result.success).toBe(true);
+      expect(result.orderId).toBe('order-1');
+    });
+
+    it('should process payment with billing address and phone', async () => {
+      const mockConfirmPayment = jest.fn().mockResolvedValue({
+        paymentIntent: { id: 'pi_success', status: 'succeeded' },
+      });
+      (initializeStripe).mockReturnValue({ confirmPayment: mockConfirmPayment });
+      (handlePaymentResult).mockReturnValue({ success: true, paymentIntentId: 'pi_success' });
+
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: jest.fn().mockResolvedValue({ orderId: 'order-2' }),
+      });
+
+      const mgr = new CheckoutManager(defaultConfig);
+      const result = await mgr.processPayment({}, mockCart, mockCustomer);
+
+      expect(result.success).toBe(true);
+      // Verify billing address was used in confirmPayment call
+      const confirmArgs = mockConfirmPayment.mock.calls[0][0];
+      expect(confirmArgs.confirmParams.payment_method_data.billing_details.phone).toBe('555-1234');
+      expect(confirmArgs.confirmParams.payment_method_data.billing_details.address.line1).toBe('456 Billing Ave');
+      expect(confirmArgs.confirmParams.payment_method_data.billing_details.address.line2).toBe('Suite 100');
+    });
+
+    it('should sync to WooCommerce when enabled', async () => {
+      const mockConfirmPayment = jest.fn().mockResolvedValue({
+        paymentIntent: { id: 'pi_wc', status: 'succeeded' },
+      });
+      (initializeStripe).mockReturnValue({ confirmPayment: mockConfirmPayment });
+      (handlePaymentResult).mockReturnValue({ success: true, paymentIntentId: 'pi_wc' });
+
+      global.fetch = jest.fn()
+        .mockResolvedValueOnce({ ok: true, json: jest.fn().mockResolvedValue({ id: 789 }) }) // WC order
+        .mockResolvedValueOnce({ ok: true, json: jest.fn().mockResolvedValue({ orderId: 'order-wc' }) }); // Order record
+
+      const mgr = new CheckoutManager({ ...defaultConfig, enableWooCommerceSync: true });
+      const result = await mgr.processPayment({}, mockCart, mockCustomerNoBilling);
+
+      expect(result.success).toBe(true);
+      expect(global.fetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('should return error when payment fails', async () => {
+      const mockConfirmPayment = jest.fn().mockResolvedValue({
+        error: { message: 'Card declined' },
+      });
+      (initializeStripe).mockReturnValue({ confirmPayment: mockConfirmPayment });
+      (handlePaymentResult).mockReturnValue({ success: false, error: 'Card declined' });
+
+      const mgr = new CheckoutManager(defaultConfig);
+      const result = await mgr.processPayment({}, mockCart, mockCustomerNoBilling);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Card declined');
+    });
+
+    it('should return default error when payment result has no error message', async () => {
+      const mockConfirmPayment = jest.fn().mockResolvedValue({});
+      (initializeStripe).mockReturnValue({ confirmPayment: mockConfirmPayment });
+      (handlePaymentResult).mockReturnValue({ success: false });
+
+      const mgr = new CheckoutManager(defaultConfig);
+      const result = await mgr.processPayment({}, mockCart, mockCustomerNoBilling);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Payment failed');
+    });
+
+    it('should handle exception during payment', async () => {
+      const mockConfirmPayment = jest.fn().mockRejectedValue(new Error('Network timeout'));
+      (initializeStripe).mockReturnValue({ confirmPayment: mockConfirmPayment });
+
+      jest.spyOn(console, 'error').mockImplementation();
+      const mgr = new CheckoutManager(defaultConfig);
+      const result = await mgr.processPayment({}, mockCart, mockCustomerNoBilling);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Network timeout');
+    });
+
+    it('should handle non-Error exception during payment', async () => {
+      const mockConfirmPayment = jest.fn().mockRejectedValue('string error');
+      (initializeStripe).mockReturnValue({ confirmPayment: mockConfirmPayment });
+
+      jest.spyOn(console, 'error').mockImplementation();
+      const mgr = new CheckoutManager(defaultConfig);
+      const result = await mgr.processPayment({}, mockCart, mockCustomerNoBilling);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('Payment failed');
     });
   });
 
@@ -155,6 +331,34 @@ describe('CheckoutManager', () => {
       await expect(mgr.createWooCommerceOrder(mockCart, 'pi_test', mockCustomer)).rejects.toThrow(
         'Failed to create WooCommerce order'
       );
+    });
+
+    it('should throw on network error', async () => {
+      global.fetch = jest.fn().mockRejectedValue(new Error('Connection refused'));
+      jest.spyOn(console, 'error').mockImplementation();
+
+      const mgr = new CheckoutManager(defaultConfig);
+      await expect(mgr.createWooCommerceOrder(mockCart, 'pi_test', mockCustomer)).rejects.toThrow(
+        'Connection refused'
+      );
+    });
+
+    it('should include stripe payment ID and billing/shipping data', async () => {
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: jest.fn().mockResolvedValue({ id: 100 }),
+      });
+
+      const mgr = new CheckoutManager(defaultConfig);
+      await mgr.createWooCommerceOrder(mockCart, 'pi_stripe_123', mockCustomer);
+
+      const body = JSON.parse(global.fetch.mock.calls[0][1].body);
+      expect(body.payment_method).toBe('stripe');
+      expect(body.billing.email).toBe('test@example.com');
+      expect(body.billing.first_name).toBe('John');
+      expect(body.shipping.address_1).toBe('123 Main St');
+      expect(body.meta_data[0].value).toBe('pi_stripe_123');
+      expect(body.line_items[0].product_id).toBe(123);
     });
   });
 

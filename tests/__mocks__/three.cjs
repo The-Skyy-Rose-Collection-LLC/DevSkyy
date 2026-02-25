@@ -6,6 +6,27 @@
 // Enable ESM interop for TypeScript imports
 Object.defineProperty(exports, '__esModule', { value: true });
 
+// Mock Vector2
+class Vector2 {
+  constructor(x = 0, y = 0) {
+    this.x = x;
+    this.y = y;
+  }
+  set(x, y) {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
+  clone() {
+    return new Vector2(this.x, this.y);
+  }
+  copy(v) {
+    this.x = v.x;
+    this.y = v.y;
+    return this;
+  }
+}
+
 // Mock Vector3
 class Vector3 {
   constructor(x = 0, y = 0, z = 0) {
@@ -28,6 +49,30 @@ class Vector3 {
     this.z = v.z;
     return this;
   }
+  toArray() {
+    return [this.x, this.y, this.z];
+  }
+  project() {
+    return this;
+  }
+  lerpVectors(a, b, t) {
+    this.x = a.x + (b.x - a.x) * t;
+    this.y = a.y + (b.y - a.y) * t;
+    this.z = a.z + (b.z - a.z) * t;
+    return this;
+  }
+  multiplyScalar(s) {
+    this.x *= s;
+    this.y *= s;
+    this.z *= s;
+    return this;
+  }
+  lerp(v, t) {
+    this.x += (v.x - this.x) * t;
+    this.y += (v.y - this.y) * t;
+    this.z += (v.z - this.z) * t;
+    return this;
+  }
 }
 
 // Mock Euler
@@ -48,7 +93,9 @@ class Euler {
 // Mock Color
 class Color {
   constructor(r = 0, g = 0, b = 0) {
-    if (typeof r === 'number' && g === undefined) {
+    if (typeof r === 'string') {
+      this.r = 0; this.g = 0; this.b = 0;
+    } else if (typeof r === 'number' && g === undefined) {
       this.r = ((r >> 16) & 255) / 255;
       this.g = ((r >> 8) & 255) / 255;
       this.b = (r & 255) / 255;
@@ -60,6 +107,18 @@ class Color {
   }
   set(value) {
     return this;
+  }
+  copy(c) {
+    this.r = c.r; this.g = c.g; this.b = c.b;
+    return this;
+  }
+  setHex(hex) {
+    return this;
+  }
+  clone() {
+    const c = new Color();
+    c.r = this.r; c.g = this.g; c.b = this.b;
+    return c;
   }
 }
 
@@ -190,8 +249,15 @@ class Material {
     this.color = new Color();
     this.opacity = 1;
     this.transparent = false;
+    this.needsUpdate = false;
   }
   dispose() {}
+  clone() {
+    const m = new this.constructor();
+    Object.assign(m, this);
+    m.color = this.color.clone();
+    return m;
+  }
 }
 
 class MeshBasicMaterial extends Material {
@@ -471,8 +537,11 @@ class Float32BufferAttribute extends BufferAttribute {
 // Constants
 const PCFSoftShadowMap = 2;
 const ACESFilmicToneMapping = 4;
+const SRGBColorSpace = 'srgb';
+const RepeatWrapping = 1000;
 
 // Export each class individually for proper ESM named import compatibility
+exports.Vector2 = Vector2;
 exports.Vector3 = Vector3;
 exports.Euler = Euler;
 exports.Color = Color;
@@ -515,3 +584,5 @@ exports.ACESFilmicToneMapping = ACESFilmicToneMapping;
 exports.CanvasTexture = CanvasTexture;
 exports.SpriteMaterial = SpriteMaterial;
 exports.Sprite = Sprite;
+exports.SRGBColorSpace = SRGBColorSpace;
+exports.RepeatWrapping = RepeatWrapping;

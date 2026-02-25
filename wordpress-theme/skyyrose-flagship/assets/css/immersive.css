@@ -654,6 +654,98 @@
 }
 
 /* ==================================================
+   SCENE TAGLINE
+   ================================================== */
+
+.scene-title-overlay .scene-tagline {
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-size: var(--text-xs, 0.75rem);
+	font-weight: 400;
+	font-style: italic;
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	color: rgba(183, 110, 121, 0.6);
+	margin-top: 0.75rem;
+}
+
+/* ==================================================
+   EXPLORE FULL COLLECTION CTA
+   ================================================== */
+
+.immersive-cta {
+	position: absolute;
+	bottom: 56px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 12;
+	text-align: center;
+}
+
+.immersive-cta__link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 14px 32px;
+	border: 1px solid rgba(183, 110, 121, 0.4);
+	border-radius: 40px;
+	background: rgba(10, 10, 10, 0.6);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	color: #fff;
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	text-decoration: none;
+	transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.immersive-cta__link:hover,
+.immersive-cta__link:focus-visible {
+	border-color: var(--rose-gold, #B76E79);
+	background: rgba(183, 110, 121, 0.15);
+	transform: translateY(-2px);
+	box-shadow: 0 8px 32px rgba(183, 110, 121, 0.2);
+}
+
+.immersive-cta__arrow {
+	transition: transform 0.3s ease;
+}
+
+.immersive-cta__link:hover .immersive-cta__arrow {
+	transform: translateX(4px);
+}
+
+/* ==================================================
+   VIEW FULL COLLECTION LINK (inside product panel)
+   ================================================== */
+
+.btn-view-collection {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	margin-top: 1rem;
+	padding: 0;
+	border: none;
+	background: none;
+	color: var(--rose-gold, #B76E79);
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-size: 0.7rem;
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	text-decoration: none;
+	cursor: pointer;
+	transition: color 0.2s ease, gap 0.2s ease;
+}
+
+.btn-view-collection:hover {
+	color: #fff;
+	gap: 0.55rem;
+}
+
+/* ==================================================
    COLLECTION-SPECIFIC BEACON COLORS
    ================================================== */
 
@@ -712,6 +804,13 @@
 	.room-nav-prev { left: 8px; }
 	.room-nav-next { right: 8px; }
 
+	/* Full-screen product panel on mobile */
+	.product-panel {
+		max-height: 100vh;
+		height: 100vh;
+		border-radius: 0;
+	}
+
 	.product-panel-inner {
 		flex-direction: column;
 		padding: 1.5rem 1.5rem 2rem;
@@ -721,7 +820,7 @@
 	.product-panel-thumb {
 		flex: 0 0 auto;
 		width: 100%;
-		max-width: 200px;
+		max-width: 240px;
 		margin: 0 auto;
 	}
 
@@ -730,11 +829,15 @@
 	}
 
 	.scene-title-overlay {
-		bottom: 120px;
+		bottom: 130px;
 	}
 
 	.scene-title-overlay h1 {
 		font-size: clamp(1.5rem, 6vw, 2.5rem);
+	}
+
+	.scene-title-overlay .scene-tagline {
+		font-size: 0.65rem;
 	}
 
 	.hotspot {
@@ -759,6 +862,16 @@
 	.room-name {
 		bottom: 86px;
 	}
+
+	/* CTA positioning on mobile */
+	.immersive-cta {
+		bottom: 60px;
+	}
+
+	.immersive-cta__link {
+		padding: 12px 24px;
+		font-size: 0.65rem;
+	}
 }
 
 /* Safe area insets for notched devices */
@@ -782,6 +895,15 @@
 	font-weight: 600;
 	font-size: 0.72rem;
 	letter-spacing: 0.06em;
+}
+
+.hotspot-label-price {
+	display: block;
+	font-weight: 600;
+	font-size: 0.65rem;
+	letter-spacing: 0.04em;
+	color: var(--rose-gold, #B76E79);
+	margin-top: 2px;
 }
 
 .hotspot-label-prop {

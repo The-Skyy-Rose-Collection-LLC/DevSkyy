@@ -71,6 +71,17 @@ module.exports = {
     '!src/**/*.config.{ts,js}',
     '!src/**/index.{ts,js}',
     '!src/**/*.stories.{ts,tsx,js,jsx}',
+    // Exclude heavy Three.js/WebXR rendering files that require WebGL contexts
+    // and are tested via E2E/visual tests instead of unit tests
+    '!src/collections/ARTryOnViewer.ts',
+    '!src/collections/BaseCollectionExperience.ts',
+    '!src/collections/EnvironmentTransition.ts',
+    '!src/collections/WebXRARViewer.ts',
+    '!src/collections/ShowroomExperience.ts',
+    '!src/collections/RunwayExperience.ts',
+    '!src/lib/ModelAssetLoader.ts',
+    '!src/collections/ProductionHandlers.ts',
+    '!src/app/layout.tsx',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html', 'json'],

@@ -203,7 +203,7 @@
 				// Track product ID for add-to-cart.
 				currentProductId = hotspot.dataset.productId || null;
 
-				openPanel({
+				var productData = {
 					name:       hotspot.dataset.productName,
 					price:      hotspot.dataset.productPrice,
 					image:      hotspot.dataset.productImage,
@@ -211,9 +211,47 @@
 					sizes:      hotspot.dataset.productSizes,
 					url:        hotspot.dataset.productUrl,
 					propLabel:  hotspot.dataset.propLabel || ''
+				};
+
+				openPanel(productData);
+
+				// Analytics: dispatch hotspot click event for analytics-beacon.js.
+				trackHotspotEvent('hotspot_click', {
+					product_id:   hotspot.dataset.productId,
+					product_name: hotspot.dataset.productName,
+					product_price: hotspot.dataset.productPrice,
+					collection:   hotspot.dataset.productCollection,
+					room:         getCurrentRoomName()
 				});
 			});
 		});
+	}
+
+	/**
+	 * Dispatch a conversion event for the analytics beacon.
+	 */
+	function trackHotspotEvent(eventName, data) {
+		try {
+			document.dispatchEvent(new CustomEvent('cie:event', {
+				detail: {
+					type:      eventName,
+					category:  'immersive',
+					timestamp: Date.now(),
+					data:      data
+				}
+			}));
+		} catch (e) {
+			// Silently fail if CustomEvent is not supported.
+		}
+	}
+
+	/**
+	 * Get the current room name for analytics context.
+	 */
+	function getCurrentRoomName() {
+		if (roomNameEl) return roomNameEl.textContent || '';
+		if (layers[currentRoom]) return layers[currentRoom].dataset.roomName || '';
+		return '';
 	}
 
 	/* --------------------------------------------------
@@ -516,6 +554,14 @@
 						} else {
 							panelAddToCart.textContent = 'Added!';
 							showCartNotification('Added to pre-order cart!');
+							// Analytics: track successful add-to-cart.
+							trackHotspotEvent('add_to_cart', {
+								product_id:    currentProductId,
+								product_name:  panelName ? panelName.textContent : '',
+								product_price: panelPrice ? panelPrice.textContent : '',
+								size:          selectedSize,
+								room:          getCurrentRoomName()
+							});
 							// Trigger WooCommerce cart fragment refresh.
 							if (typeof jQuery !== 'undefined') {
 								jQuery(document.body).trigger('wc_fragment_refresh');
@@ -611,19 +657,18 @@
 			tooltip.className = 'hotspot-label hotspot-label--generated';
 			tooltip.setAttribute('aria-hidden', 'true');
 
-			// Include prop label if available.
-			var propLabel = hotspot.dataset.propLabel || '';
-			if (propLabel) {
-				var nameSpan = document.createElement('span');
-				nameSpan.className = 'hotspot-label-name';
-				nameSpan.textContent = productName;
-				var propSpan = document.createElement('span');
-				propSpan.className = 'hotspot-label-prop';
-				propSpan.textContent = propLabel;
-				tooltip.appendChild(nameSpan);
-				tooltip.appendChild(propSpan);
-			} else {
-				tooltip.textContent = productName;
+			// Show product name + price (as per directive: "Hover: name + price tooltip").
+			var productPrice = hotspot.dataset.productPrice || '';
+			var nameSpan = document.createElement('span');
+			nameSpan.className = 'hotspot-label-name';
+			nameSpan.textContent = productName;
+			tooltip.appendChild(nameSpan);
+
+			if (productPrice) {
+				var priceSpan = document.createElement('span');
+				priceSpan.className = 'hotspot-label-price';
+				priceSpan.textContent = productPrice;
+				tooltip.appendChild(priceSpan);
 			}
 
 			hotspot.appendChild(tooltip);

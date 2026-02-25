@@ -254,7 +254,7 @@ function skyyrose_organization_schema() {
 		'name'        => 'SkyyRose',
 		'legalName'   => 'SkyyRose LLC',
 		'url'         => home_url( '/' ),
-		'description' => __( 'Where Love Meets Luxury. Premium streetwear and luxury fashion brand.', 'skyyrose-flagship' ),
+		'description' => __( 'Luxury Grows from Concrete. Premium streetwear and luxury fashion brand.', 'skyyrose-flagship' ),
 		'logo'        => array(
 			'@type' => 'ImageObject',
 			'url'   => $logo_url,
@@ -262,7 +262,7 @@ function skyyrose_organization_schema() {
 		'brand'       => array(
 			'@type' => 'Brand',
 			'name'  => 'SkyyRose',
-			'slogan' => 'Where Love Meets Luxury',
+			'slogan' => 'Luxury Grows from Concrete.',
 		),
 		'sameAs'      => array(),
 	);
