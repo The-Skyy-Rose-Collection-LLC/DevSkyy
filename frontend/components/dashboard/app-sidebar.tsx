@@ -24,6 +24,7 @@ import {
   Briefcase,
   Image,
   Compass,
+  UserCircle2,
 } from 'lucide-react';
 
 import {
@@ -105,6 +106,11 @@ const mainNavItems = [
     title: 'Journey Analytics',
     url: '/admin/journey-analytics',
     icon: Compass,
+  },
+  {
+    title: 'Brand Mascot',
+    url: '/admin/mascot',
+    icon: UserCircle2,
   },
 ];
 

@@ -236,6 +236,17 @@ function skyyrose_enqueue_template_styles() {
 			);
 		}
 	}
+
+	// Brand mascot styles — loaded on pages where the mascot appears.
+	$mascot_pages = array( 'collection', '404', 'front-page', 'preorder-gateway' );
+	if ( in_array( $slug, $mascot_pages, true ) && file_exists( $base_css_dir . '/mascot.css' ) ) {
+		wp_enqueue_style(
+			'skyyrose-mascot',
+			$base_css_uri . '/mascot.css',
+			$global_deps,
+			SKYYROSE_VERSION
+		);
+	}
 }
 
 /**

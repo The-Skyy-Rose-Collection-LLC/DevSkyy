@@ -217,6 +217,43 @@ if ( empty( $skyyrose_trending_products ) ) {
 		</div>
 
 		<!-- ============================
+		     Brand Mascot — Fun Error State
+		     ============================ -->
+		<div class="error-404-mascot" aria-label="<?php esc_attr_e( 'SkyyRose Mascot', 'skyyrose-flagship' ); ?>">
+			<?php
+			$skyyrose_mascot_404_path = SKYYROSE_DIR . '/assets/images/mascot/skyyrose-mascot-404.png';
+			$skyyrose_mascot_ref_path = SKYYROSE_DIR . '/assets/images/mascot/skyyrose-mascot-reference.png';
+			$skyyrose_mascot_404_url  = SKYYROSE_ASSETS_URI . '/images/mascot/skyyrose-mascot-404.png';
+			$skyyrose_mascot_ref_url  = SKYYROSE_ASSETS_URI . '/images/mascot/skyyrose-mascot-reference.png';
+
+			$skyyrose_mascot_display = '';
+			if ( file_exists( $skyyrose_mascot_404_path ) ) {
+				$skyyrose_mascot_display = $skyyrose_mascot_404_url;
+			} elseif ( file_exists( $skyyrose_mascot_ref_path ) ) {
+				$skyyrose_mascot_display = $skyyrose_mascot_ref_url;
+			}
+
+			if ( $skyyrose_mascot_display ) : ?>
+				<img
+					src="<?php echo esc_url( $skyyrose_mascot_display ); ?>"
+					alt="<?php esc_attr_e( 'SkyyRose mascot looking lost — Oops! This page wandered off.', 'skyyrose-flagship' ); ?>"
+					class="error-404-mascot__image"
+					width="200"
+					height="250"
+					loading="lazy"
+					decoding="async"
+				/>
+			<?php else : ?>
+				<div class="error-404-mascot__placeholder" aria-hidden="true">
+					<svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#B76E79" stroke-width="1" stroke-linecap="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+				</div>
+			<?php endif; ?>
+			<p class="error-404-mascot__speech">
+				<?php esc_html_e( "Oops! Even I can't find this page. Let's explore something amazing instead!", 'skyyrose-flagship' ); ?>
+			</p>
+		</div>
+
+		<!-- ============================
 		     Collection Quick Links
 		     ============================ -->
 		<nav class="error-404-collections" aria-label="<?php esc_attr_e( 'Browse Collections', 'skyyrose-flagship' ); ?>">
