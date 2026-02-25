@@ -468,3 +468,198 @@ function skyyrose_ajax_get_cart_count() {
 }
 add_action( 'wp_ajax_skyyrose_get_cart_count', 'skyyrose_ajax_get_cart_count' );
 add_action( 'wp_ajax_nopriv_skyyrose_get_cart_count', 'skyyrose_ajax_get_cart_count' );
+
+/*--------------------------------------------------------------
+ * Pre-Order Meta Fields
+ *--------------------------------------------------------------*/
+
+/**
+ * Register the pre-order meta box on product edit screens.
+ *
+ * Adds fields for: pre-order status, edition size, available quantity,
+ * expected ship date, and pre-order price.
+ *
+ * @since 3.10.0
+ * @return void
+ */
+function skyyrose_add_preorder_meta_box() {
+	add_meta_box(
+		'skyyrose_preorder_settings',
+		esc_html__( 'Pre-Order Settings', 'skyyrose-flagship' ),
+		'skyyrose_preorder_meta_box_callback',
+		'product',
+		'side',
+		'high'
+	);
+}
+add_action( 'add_meta_boxes', 'skyyrose_add_preorder_meta_box' );
+
+/**
+ * Render the pre-order meta box UI.
+ *
+ * @since 3.10.0
+ *
+ * @param WP_Post $post Current post object.
+ * @return void
+ */
+function skyyrose_preorder_meta_box_callback( $post ) {
+
+	wp_nonce_field( 'skyyrose_preorder_nonce', 'skyyrose_preorder_nonce' );
+
+	$is_preorder    = get_post_meta( $post->ID, '_is_preorder', true );
+	$edition_size   = get_post_meta( $post->ID, '_preorder_edition_size', true );
+	$available      = get_post_meta( $post->ID, '_preorder_available', true );
+	$ship_date      = get_post_meta( $post->ID, '_preorder_ship_date', true );
+	$preorder_price = get_post_meta( $post->ID, '_preorder_price', true );
+	?>
+	<p>
+		<label>
+			<input type="checkbox" name="skyyrose_is_preorder" value="1" <?php checked( $is_preorder, '1' ); ?> />
+			<?php esc_html_e( 'This is a pre-order product', 'skyyrose-flagship' ); ?>
+		</label>
+	</p>
+	<p>
+		<label for="skyyrose_edition_size"><?php esc_html_e( 'Edition Size', 'skyyrose-flagship' ); ?></label>
+		<input type="number" id="skyyrose_edition_size" name="skyyrose_edition_size" value="<?php echo esc_attr( $edition_size ); ?>" min="1" style="width:100%;" placeholder="e.g. 250" />
+	</p>
+	<p>
+		<label for="skyyrose_preorder_available"><?php esc_html_e( 'Available Remaining', 'skyyrose-flagship' ); ?></label>
+		<input type="number" id="skyyrose_preorder_available" name="skyyrose_preorder_available" value="<?php echo esc_attr( $available ); ?>" min="0" style="width:100%;" />
+	</p>
+	<p>
+		<label for="skyyrose_ship_date"><?php esc_html_e( 'Expected Ship Date', 'skyyrose-flagship' ); ?></label>
+		<input type="date" id="skyyrose_ship_date" name="skyyrose_ship_date" value="<?php echo esc_attr( $ship_date ); ?>" style="width:100%;" />
+	</p>
+	<p>
+		<label for="skyyrose_preorder_price"><?php esc_html_e( 'Pre-Order Price ($)', 'skyyrose-flagship' ); ?></label>
+		<input type="text" id="skyyrose_preorder_price" name="skyyrose_preorder_price" value="<?php echo esc_attr( $preorder_price ); ?>" style="width:100%;" placeholder="Early access price" />
+	</p>
+	<?php
+}
+
+/**
+ * Save pre-order meta box data.
+ *
+ * @since 3.10.0
+ *
+ * @param int $post_id Post ID.
+ * @return void
+ */
+function skyyrose_save_preorder_meta( $post_id ) {
+
+	if ( ! isset( $_POST['skyyrose_preorder_nonce'] ) ) {
+		return;
+	}
+
+	if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['skyyrose_preorder_nonce'] ) ), 'skyyrose_preorder_nonce' ) ) {
+		return;
+	}
+
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+
+	// Pre-order checkbox.
+	$is_preorder = isset( $_POST['skyyrose_is_preorder'] ) ? '1' : '0';
+	update_post_meta( $post_id, '_is_preorder', $is_preorder );
+
+	// Edition size.
+	if ( isset( $_POST['skyyrose_edition_size'] ) ) {
+		$edition = absint( wp_unslash( $_POST['skyyrose_edition_size'] ) );
+		update_post_meta( $post_id, '_preorder_edition_size', $edition );
+	}
+
+	// Available remaining.
+	if ( isset( $_POST['skyyrose_preorder_available'] ) ) {
+		$available = absint( wp_unslash( $_POST['skyyrose_preorder_available'] ) );
+		update_post_meta( $post_id, '_preorder_available', $available );
+	}
+
+	// Expected ship date.
+	if ( isset( $_POST['skyyrose_ship_date'] ) ) {
+		$date = sanitize_text_field( wp_unslash( $_POST['skyyrose_ship_date'] ) );
+		update_post_meta( $post_id, '_preorder_ship_date', $date );
+	}
+
+	// Pre-order price.
+	if ( isset( $_POST['skyyrose_preorder_price'] ) ) {
+		$price = sanitize_text_field( wp_unslash( $_POST['skyyrose_preorder_price'] ) );
+		update_post_meta( $post_id, '_preorder_price', $price );
+	}
+}
+add_action( 'save_post_product', 'skyyrose_save_preorder_meta' );
+
+/**
+ * Check if a product is a pre-order item.
+ *
+ * @since 3.10.0
+ *
+ * @param int $product_id Product ID.
+ * @return bool True if the product has pre-order status.
+ */
+function skyyrose_is_preorder( $product_id ) {
+	return '1' === get_post_meta( $product_id, '_is_preorder', true );
+}
+
+/**
+ * Display pre-order badge and edition info on single product pages.
+ *
+ * @since 3.10.0
+ * @return void
+ */
+function skyyrose_preorder_single_product_notice() {
+	global $product;
+
+	if ( ! $product || ! skyyrose_is_preorder( $product->get_id() ) ) {
+		return;
+	}
+
+	$edition_size = get_post_meta( $product->get_id(), '_preorder_edition_size', true );
+	$available    = get_post_meta( $product->get_id(), '_preorder_available', true );
+	$ship_date    = get_post_meta( $product->get_id(), '_preorder_ship_date', true );
+	$preorder_px  = get_post_meta( $product->get_id(), '_preorder_price', true );
+
+	echo '<div class="skyyrose-preorder-notice" style="background:linear-gradient(135deg,#1a1a1a,#2a1a1f);border:1px solid #B76E79;border-radius:12px;padding:16px 20px;margin:16px 0;">';
+	echo '<span style="display:inline-block;background:#B76E79;color:#fff;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:4px;margin-bottom:8px;">Pre-Order</span>';
+
+	if ( $edition_size ) {
+		echo '<div style="color:#ccc;font-size:13px;margin-top:6px;">Limited Edition — <strong style="color:#B76E79;">' . esc_html( $edition_size ) . ' pieces</strong>';
+		if ( $available ) {
+			echo ' · <strong>' . esc_html( $available ) . ' remaining</strong>';
+		}
+		echo '</div>';
+	}
+
+	if ( $preorder_px ) {
+		echo '<div style="color:#ccc;font-size:13px;margin-top:4px;">Early Access Price: <strong style="color:#B76E79;">$' . esc_html( $preorder_px ) . '</strong></div>';
+	}
+
+	if ( $ship_date ) {
+		echo '<div style="color:#999;font-size:12px;margin-top:4px;">Expected Ship Date: ' . esc_html( date_i18n( 'F j, Y', strtotime( $ship_date ) ) ) . '</div>';
+	}
+
+	echo '</div>';
+}
+add_action( 'woocommerce_single_product_summary', 'skyyrose_preorder_single_product_notice', 6 );
+
+/**
+ * Replace "Add to Cart" text with "Pre-Order Now" for pre-order products.
+ *
+ * @since 3.10.0
+ *
+ * @param string      $text    Default button text.
+ * @param WC_Product  $product Product object.
+ * @return string Modified button text.
+ */
+function skyyrose_preorder_button_text( $text, $product ) {
+	if ( $product && skyyrose_is_preorder( $product->get_id() ) ) {
+		return esc_html__( 'Pre-Order Now', 'skyyrose-flagship' );
+	}
+	return $text;
+}
+add_filter( 'woocommerce_product_single_add_to_cart_text', 'skyyrose_preorder_button_text', 10, 2 );
+add_filter( 'woocommerce_product_add_to_cart_text', 'skyyrose_preorder_button_text', 10, 2 );
