@@ -107,6 +107,7 @@ if ( ! $is_in_stock ) {
 				class="product-card__image"
 				loading="lazy"
 				decoding="async"
+				onerror="this.onerror=null;this.src='<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>';"
 			>
 		</a>
 

@@ -312,6 +312,7 @@ get_header();
 								src="<?php echo esc_url( $product['image'] ); ?>"
 								alt="<?php echo esc_attr( $product['name'] ); ?>"
 								loading="lazy"
+								onerror="this.onerror=null;this.src='<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>';"
 							>
 							<span class="product-grid-badge <?php echo esc_attr( $badge_class ); ?>">
 								<?php echo esc_html( $product['collection_label'] ); ?>

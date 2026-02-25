@@ -177,6 +177,55 @@
 	}
 
 	/* --------------------------------------------------
+	   Rotating Text — Cycles through collection names
+	   -------------------------------------------------- */
+
+	function initRotatingText() {
+		var el = document.querySelector('.js-rotating-text');
+		if (!el || !el.dataset.texts) return;
+
+		var texts;
+		try {
+			texts = JSON.parse(el.dataset.texts);
+		} catch (e) {
+			return;
+		}
+
+		if (!Array.isArray(texts) || texts.length < 2) return;
+
+		var currentIndex = 0;
+
+		setInterval(function () {
+			el.style.opacity = '0';
+			setTimeout(function () {
+				currentIndex = (currentIndex + 1) % texts.length;
+				el.textContent = texts[currentIndex];
+				el.style.opacity = '1';
+			}, 300);
+		}, 3000);
+	}
+
+	/* --------------------------------------------------
+	   Smooth Scroll — Anchor links
+	   -------------------------------------------------- */
+
+	function initSmoothScroll() {
+		var links = document.querySelectorAll('.js-smooth-scroll');
+		links.forEach(function (link) {
+			link.addEventListener('click', function (e) {
+				var href = link.getAttribute('href');
+				if (!href || href.charAt(0) !== '#') return;
+
+				var target = document.querySelector(href);
+				if (!target) return;
+
+				e.preventDefault();
+				target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			});
+		});
+	}
+
+	/* --------------------------------------------------
 	   Init
 	   -------------------------------------------------- */
 
@@ -186,6 +235,8 @@
 		initScrollReveal();
 		initCounters();
 		initNewsletter();
+		initRotatingText();
+		initSmoothScroll();
 	}
 
 	if (document.readyState === 'loading') {
