@@ -263,7 +263,7 @@ get_header();
 		<section class="gateway-product-section">
 			<div class="gateway-section-header">
 				<h2><?php echo esc_html__( 'Pre-Order Collections', 'skyyrose-flagship' ); ?></h2>
-				<p><?php echo esc_html__( 'Where Love Meets Luxury', 'skyyrose-flagship' ); ?></p>
+				<p><?php echo esc_html__( 'Luxury Grows from Concrete.', 'skyyrose-flagship' ); ?></p>
 			</div>
 
 			<!-- Product Grid -->

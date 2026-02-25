@@ -71,7 +71,7 @@
 						<span class="footer-brand__text navbar__gradient-text"><?php esc_html_e( 'SKYY ROSE', 'skyyrose-flagship' ); ?></span>
 					</a>
 					<p class="footer-brand__tagline">
-						<?php esc_html_e( 'Where Love Meets Luxury', 'skyyrose-flagship' ); ?>
+						<?php esc_html_e( 'Luxury Grows from Concrete.', 'skyyrose-flagship' ); ?>
 					</p>
 					<p class="footer-brand__description">
 						<?php esc_html_e( 'Premium fashion collections crafted with passion, designed for those who dare to express their truth.', 'skyyrose-flagship' ); ?>

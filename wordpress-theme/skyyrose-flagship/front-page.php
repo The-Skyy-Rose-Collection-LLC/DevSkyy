@@ -31,17 +31,30 @@ get_header();
 		<div class="hero__sparkles" aria-hidden="true" id="js-hero-sparkles"></div>
 
 		<div class="hero__content">
-			<!-- Animated SR Logo -->
-			<div class="hero__logo" aria-hidden="true">
-				<img
-					src="<?php echo esc_url( get_template_directory_uri() . '/assets/branding/skyyrose-logo-animated.gif' ); ?>"
-					alt="<?php esc_attr_e( 'SkyyRose', 'skyyrose-flagship' ); ?>"
-					width="180"
-					height="180"
-					loading="eager"
-					class="hero__logo-img"
-				>
+
+			<!-- Brand Name — Upscale Script with Animated Reveal -->
+			<h1 class="hero__brand-name" aria-label="<?php esc_attr_e( 'SkyyRose', 'skyyrose-flagship' ); ?>">
+				<span class="hero__brand-letter" style="--i:0">S</span><span
+					class="hero__brand-letter" style="--i:1">K</span><span
+					class="hero__brand-letter" style="--i:2">Y</span><span
+					class="hero__brand-letter" style="--i:3">Y</span><span
+					class="hero__brand-letter hero__brand-letter--rose" style="--i:4">R</span><span
+					class="hero__brand-letter hero__brand-letter--rose" style="--i:5">O</span><span
+					class="hero__brand-letter hero__brand-letter--rose" style="--i:6">S</span><span
+					class="hero__brand-letter hero__brand-letter--rose" style="--i:7">E</span>
+			</h1>
+
+			<!-- Rose gold divider line with expand animation -->
+			<div class="hero__divider" aria-hidden="true">
+				<span class="hero__divider-line"></span>
+				<span class="hero__divider-diamond"></span>
+				<span class="hero__divider-line"></span>
 			</div>
+
+			<!-- Tagline — Fades in after brand name reveals -->
+			<p class="hero__tagline-main">
+				<?php esc_html_e( 'Luxury Grows from Concrete.', 'skyyrose-flagship' ); ?>
+			</p>
 
 			<span class="hero__badge">
 				<svg class="hero__badge-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
@@ -49,11 +62,6 @@ get_header();
 				</svg>
 				<?php esc_html_e( 'Oakland Luxury Streetwear', 'skyyrose-flagship' ); ?>
 			</span>
-
-			<h1 class="hero__title">
-				<span class="hero__title-line"><?php esc_html_e( 'Where Love', 'skyyrose-flagship' ); ?></span>
-				<span class="hero__title-line"><?php esc_html_e( 'Meets Luxury', 'skyyrose-flagship' ); ?></span>
-			</h1>
 
 			<!-- Rotating text cycling through collection names -->
 			<div class="hero__rotating" aria-live="polite" aria-atomic="true">

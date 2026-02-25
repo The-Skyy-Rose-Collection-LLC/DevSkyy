@@ -231,7 +231,12 @@ describe('CartManager', () => {
 
     it('should handle subscriber errors gracefully', () => {
       const cart = CartManager.getInstance();
-      const badCb = jest.fn().mockImplementation(() => { throw new Error('bad'); });
+      // First call (immediate) succeeds, second call (from addItem) throws
+      let callCount = 0;
+      const badCb = jest.fn().mockImplementation(() => {
+        callCount++;
+        if (callCount > 1) throw new Error('bad');
+      });
       cart.subscribe(badCb);
       expect(() => cart.addItem(createItem())).not.toThrow();
     });

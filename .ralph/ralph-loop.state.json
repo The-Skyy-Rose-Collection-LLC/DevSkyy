@@ -1,13 +1,13 @@
 {
   "active": true,
-  "iteration": 10,
-  "minIterations": 10,
-  "maxIterations": 10,
+  "iteration": 1,
+  "minIterations": 1,
+  "maxIterations": 0,
   "completionPromise": "COMPLETE",
   "tasksMode": false,
   "taskPromise": "READY_FOR_NEXT_TASK",
-  "prompt": "Read .ralph/ralph-context.md FIRST. It contains your complete directive with 3 tasks, critical gaps to fix, and the full arsenal of tools. You have 10 iterations — no waste. Task 0 (immersive scene pages with prop-specific hotspots) MUST be done before Task 1 (AI imagery + mascot) which MUST be done before Task 2 (WooCommerce products + deploy to skyyrose.co). Use the Elite Web Development Team, WordPress Copilot, Context7, Playwright, and every tool listed. Build a marketplace-ready WordPress theme. Deploy to skyyrose.co. Award-winning. Fashion-driven. Better than drakerelated.com.",
-  "startedAt": "",
-  "model": "",
+  "prompt": "Read .ralph/ralph-context.md — that is your deployment directive. Every instruction in    \n  that file is non-negotiable. You are Ralph. You are deploying the SkyyRose Flagship WordPress    \n  theme to enterprise-ready, Fortune 500-tier production. The theme already exists at              \n  wordpress-theme/skyyrose-flagship/ — you built it Feb 24-25. Now you're finishing it. Context7   \n  BEFORE any code. Work page by page. Update the Progress Log in ralph-context.md after every      \n  iteration. Never delete that file. Sales funnel: Interactive -> Collection Landing -> Pre-Order  \n  -> Cart. Every hotspot closes sales. Collection pages are editorial landing pages NOT grids.     \n  Brand tagline: Luxury Grows from Concrete. NEVER use Where Love Meets Luxury — its dead. Homepage\n   hero: SKYYROSE in upscale script font with animated reveal. Every product needs front+back AI   \n  model shots — 100% accurate replicas. Use /frontend-design /frontend-patterns /backend-patterns\n  /build-fix /code-review /verify. No slip-ups. Enterprise ready. Fortune 500 tier. Start with\n  Phase 1: template-immersive-black-rose.php. Go.",
+  "startedAt": "2026-02-25T15:11:09.214Z",
+  "model": "claude-opus-4-6",
   "agent": "claude-code"
 }

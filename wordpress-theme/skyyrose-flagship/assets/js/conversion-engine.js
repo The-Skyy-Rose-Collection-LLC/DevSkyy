@@ -417,7 +417,7 @@
 		headline.textContent = 'Wait — Your Cart Misses You';
 
 		var subtext = createElement('p', 'cie-exit-modal__subtext');
-		subtext.textContent = 'Pre-order slots are filling fast. Secure your pieces from the collection before they\'re gone. Where Love Meets Luxury.';
+		subtext.textContent = 'Pre-order slots are filling fast. Secure your pieces from the collection before they\'re gone. Luxury Grows from Concrete.';
 
 		var cta = createElement('a', 'cie-exit-modal__cta', {
 			'href': '/pre-order/',

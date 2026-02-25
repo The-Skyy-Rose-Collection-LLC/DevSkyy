@@ -45,7 +45,7 @@ if ( ! class_exists( 'WooCommerce' ) || ! function_exists( 'wc_get_product_id_by
 WP_CLI::log( '' );
 WP_CLI::log( '========================================' );
 WP_CLI::log( '  SkyyRose Product Import' );
-WP_CLI::log( '  Where Love Meets Luxury' );
+WP_CLI::log( '  Luxury Grows from Concrete.' );
 WP_CLI::log( '========================================' );
 WP_CLI::log( '' );
 
