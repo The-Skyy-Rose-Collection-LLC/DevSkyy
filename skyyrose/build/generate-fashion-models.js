@@ -40,6 +40,12 @@ const BRAND_DNA = {
     mood: 'High fashion prestige, editorial excellence, luxury power',
     palette: 'Champagne gold, pure white, marble textures, crystal clarity',
     settings: 'Minimalist runways, marble penthouses, modern art galleries'
+  },
+  'KIDS CAPSULE': {
+    color: '#FFB6C1',
+    mood: 'Playful luxury, youthful energy, vibrant confidence',
+    palette: 'Soft pastels, vibrant primaries, crisp whites, playful pops of color',
+    settings: 'Bright playgrounds, colorful murals, modern kid-friendly spaces'
   }
 };
 
@@ -330,6 +336,142 @@ const PRODUCTS = [
     },
     modelPose: 'Jacket fully buttoned, one hand in pocket, showing both front and hinting at back — powerful editorial presence',
     setting: 'Marble penthouse lobby, floor-to-ceiling windows, champagne gold winter light'
+  },
+
+  // ── LOVE HURTS Collection — continued ───────────────────────────────────
+  {
+    id: 'lh-004',
+    collection: 'LOVE HURTS',
+    name: 'Love Hurts Varsity Jacket',
+    referenceImage:  path.join(SOURCE_DIR, 'love-hurts/Love-Hurts-Varsity-Jacket.jpg'),
+    referenceImage2: path.join(SOURCE_DIR, 'love-hurts/lh-005-bomber-worn.jpeg'),
+    garmentTypeLock: 'HOODED VARSITY / BOMBER JACKET — raglan sleeves, snap-button front closure, ribbed cuffs and hem with striped trim. NOT a windbreaker, NOT a pullover hoodie, NOT a zip-up. White body, black raglan sleeves and hood. The front chest features "Love Hurts" in raised red cursive text with black outline.',
+    description: {
+      garment: 'Love Hurts varsity/bomber jacket — white body, black raglan sleeves and hood, snap-button front closure',
+      fit: 'Relaxed, slightly oversized bomber silhouette with ribbed cuffs and hem',
+      details: '"Love Hurts" in bold raised red cursive text with black outline on center chest. Ribbed cuffs and hem with white-black-red stripe trim. Five white snap buttons. Hood has floral rose-print lining. Two slanted welt pockets with black trim.'
+    },
+    modelPose: 'Jacket buttoned up, hood down, confident editorial stance — "Love Hurts" text on chest clearly visible',
+    setting: 'Dramatic baroque ballroom, crimson velvet curtains, golden candlelight'
+  },
+  {
+    id: 'lh-005',
+    collection: 'LOVE HURTS',
+    name: 'Love Hurts Bomber Jacket',
+    referenceImage:  path.join(SOURCE_DIR, 'love-hurts/lh-005-bomber-flat.jpeg'),
+    referenceImage2: path.join(SOURCE_DIR, 'love-hurts/lh-005-bomber-hood-detail.jpeg'),
+    garmentTypeLock: 'HOODED BOMBER JACKET — oversized silhouette, color-blocked design with diagonal paneling. Smooth satin-like exterior. NOT a windbreaker, NOT a varsity jacket with leather sleeves. Hood has floral lining. "Love Hurts" branding on front and back.',
+    description: {
+      garment: 'Love Hurts bomber jacket — white body, black sleeves and hood, satin-finish exterior',
+      fit: 'Oversized, relaxed bomber fit reaching the waist',
+      details: '"Love Hurts" embroidered in bold red script across chest. Back features large red rose intertwined with heart graphic with green leaves. Ribbed cuffs and hem with red-black-white stripes. Hood drawstring in black. Hood lining has orange/red floral rose pattern on white.'
+    },
+    modelPose: 'Full-body shot, jacket closed, hood down, one hand casually at side — front branding clearly visible. Slight turn to hint at back graphic.',
+    setting: 'Candlelit baroque theater, deep crimson curtains, dramatic moody lighting'
+  },
+  {
+    id: 'lh-002b',
+    collection: 'LOVE HURTS',
+    name: 'Love Hurts Joggers — White',
+    referenceImage:  path.join(SOURCE_DIR, 'love-hurts/lh-002-joggers-white-1.png'),
+    referenceImage2: path.join(SOURCE_DIR, 'love-hurts/lh-002-joggers-white-2.png'),
+    garmentTypeLock: 'JOGGER PANTS — lower body only. White colorway variant of the Love Hurts Joggers. Tapered at ankle with ribbed cuffs, elastic waistband with drawstring. NOT shorts, NOT sweatpants.',
+    description: {
+      garment: 'Love Hurts jogger pants — WHITE colorway with black stripe and rose heart motif',
+      fit: 'Athletic-to-streetwear tapered jogger fit, elastic waistband with drawstring',
+      details: 'White base with contrasting black stripe and Love Hurts rose heart motif on leg. Same design as black version but in white colorway.'
+    },
+    modelPose: 'Full-length stance showing BOTH LEGS completely from waist to ankle — Love Hurts branding clearly visible on leg',
+    setting: 'Dramatic baroque ballroom, crystal chandeliers, moody red-tinted lighting'
+  },
+
+  // ── SIGNATURE Collection — continued ────────────────────────────────────
+  {
+    id: 'sg-011',
+    collection: 'SIGNATURE',
+    name: 'The Signature Beanie — Grey',
+    referenceImage: path.join(SOURCE_DIR, 'signature/sg-011-beanie-grey.jpeg'),
+    garmentTypeLock: 'GREY KNIT BEANIE — headwear accessory only. Heathered grey ribbed knit beanie with folded cuff. NOT black, NOT colored. The model wears their own outfit; the beanie is the featured accessory on their head.',
+    description: {
+      garment: 'Signature Collection knit beanie in HEATHERED GREY colorway',
+      fit: 'Classic fitted beanie with folded cuff, worn on head',
+      details: 'Heathered grey ribbed knit construction. Circular tan leather-like patch with rose graphic on front center of cuff. Small rectangular tag with "&" symbol on side. Matte finish, classic understated aesthetic.'
+    },
+    modelPose: 'Head and shoulders portrait, slight head tilt showing beanie and cuff patch detail, confident editorial gaze — GREY beanie clearly visible',
+    setting: 'Minimalist dark luxury studio, subtle champagne gold accent lighting'
+  },
+  {
+    id: 'sg-012',
+    collection: 'SIGNATURE',
+    name: 'The Signature Beanie — Orange',
+    referenceImage: path.join(SOURCE_DIR, 'signature/sg-012-beanie-orange.jpeg'),
+    garmentTypeLock: 'BRIGHT ORANGE KNIT BEANIE — headwear accessory only. Vibrant orange (Tangerine Tango) ribbed knit beanie with folded cuff. NOT red, NOT yellow. The model wears their own outfit; the beanie is the featured accessory on their head.',
+    description: {
+      garment: 'Signature Collection knit beanie in BRIGHT ORANGE colorway',
+      fit: 'Classic fitted beanie with folded cuff, worn on head',
+      details: 'Vibrant bright orange ribbed knit construction. Small rectangular fabric tag on cuff with rose graphic and text in red on white background. Matte finish.'
+    },
+    modelPose: 'Head and shoulders editorial portrait, beanie cuff and tag detail clearly visible, intense confident gaze — ORANGE beanie prominently featured',
+    setting: 'Dark luxury background with warm gold and champagne rim lighting'
+  },
+  {
+    id: 'sg-013',
+    collection: 'SIGNATURE',
+    name: 'Mint & Lavender Crewneck Set',
+    referenceImage:  path.join(SOURCE_DIR, 'signature/sg-013-mint-crewneck-set-front.jpeg'),
+    referenceImage2: path.join(SOURCE_DIR, 'signature/sg-013-mint-crewneck-set-back.jpeg'),
+    garmentTypeLock: 'MATCHING COORDINATED SET — crewneck top AND jogger pants shown together as a complete outfit. Mint green base color with lavender floral graphic. NOT a hoodie set, NOT separate pieces. Reproduce EXACTLY the top and bottom pieces shown in the reference images.',
+    description: {
+      garment: 'Full coordinated matching set — mint green crewneck top and jogger pants, Signature Collection',
+      fit: 'Relaxed oversized crewneck with matching jogger pants, casual comfort fit',
+      details: 'Mint green base color. Large lavender floral graphic centered on chest of crewneck and repeated smaller on left thigh of pants. Ribbed cuffs and hem on both pieces. White drawstring on pants waistband. Small logo patch on left sleeve cuff in red and white. Cotton fleece fabric.'
+    },
+    modelPose: 'Full-length shot showing BOTH crewneck top and jogger pants as one complete matching set — lavender floral graphic clearly visible',
+    setting: 'Modern art gallery with pastel walls and airy gallery lighting, fresh luxury feel'
+  },
+  {
+    id: 'sg-014',
+    collection: 'SIGNATURE',
+    name: 'Pastel Chevron Tracksuit',
+    referenceImage: path.join(SOURCE_DIR, 'signature/sg-014-pastel-tracksuit-flat.jpeg'),
+    garmentTypeLock: 'MATCHING TRACKSUIT SET — zip-up hooded jacket AND jogger pants shown together as a complete outfit. White base with pastel chevron color blocking (pink, yellow, green, purple). NOT a pullover hoodie set. Full-length front zipper on jacket.',
+    description: {
+      garment: 'Full coordinated tracksuit — zip-up hooded jacket and jogger pants, Signature Collection',
+      fit: 'Athletic relaxed fit with tapered legs, zip-up jacket with fitted sleeves',
+      details: 'White base color with pastel chevron color blocking (pink, yellow, green, purple) on upper chest and upper thighs. Full-length pastel pink zipper on jacket. Floral graphic on left chest and left thigh. Ribbed cuffs, hem, and waistband. Hood and waist drawstrings in pastel pink. Side pockets with pastel pink trim.'
+    },
+    modelPose: 'Full-length shot showing BOTH zip-up jacket and pants as complete tracksuit — chevron color blocking and floral graphics clearly visible',
+    setting: 'Bright minimalist marble space with natural light, clean luxury aesthetic'
+  },
+
+  // ── KIDS CAPSULE Collection (2 products) ────────────────────────────────
+  {
+    id: 'kids-001',
+    collection: 'KIDS CAPSULE',
+    name: 'Kids Hoodie Set — Purple/Pink',
+    referenceImage: path.join(SOURCE_DIR, 'kids-capsule/kids-001-hoodie-set-purple.jpeg'),
+    garmentTypeLock: 'KIDS MATCHING HOODIE SET — hooded pullover top AND matching pants for children. Purple and soft pink color-blocked design. NOT adult sizing. CHILD MODEL only (ages 6-10 appearance). Both pieces must be shown together.',
+    description: {
+      garment: 'Kids hoodie set — purple and pink color-blocked pullover hoodie with matching pants',
+      fit: 'Relaxed athletic fit for children, comfortable for play and activity',
+      details: 'Color-blocked design: pink upper section, purple lower section on hoodie. Small black/white character graphic on left chest and left sleeve. Matching graphic on left thigh of pants. White drawstrings on hoodie and pants. Ribbed cuffs and hem. Cotton fleece fabric.'
+    },
+    modelPose: 'CHILD model (ages 6-10), playful confident stance showing BOTH hoodie and pants as complete set — color blocking clearly visible',
+    setting: 'Bright, colorful modern playroom or park, natural sunlight, vibrant energy'
+  },
+  {
+    id: 'kids-002',
+    collection: 'KIDS CAPSULE',
+    name: 'Kids Hoodie Set — Black/Red',
+    referenceImage: path.join(SOURCE_DIR, 'kids-capsule/kids-002-hoodie-set-black-red.jpeg'),
+    garmentTypeLock: 'KIDS MATCHING HOODIE SET — hooded pullover top AND matching pants for children. Black, red, and white color-blocked design. Red hood. NOT adult sizing. CHILD MODEL only (ages 6-10 appearance). Both pieces must be shown together.',
+    description: {
+      garment: 'Kids hoodie set — black, red, and white color-blocked pullover hoodie with matching pants',
+      fit: 'Relaxed athletic fit for children, comfortable for play and activity',
+      details: 'Color-blocked design: black on left sleeve and upper chest, red on hood and lower body, white on right sleeve and part of chest. White character graphic on left chest, left sleeve, and left thigh of pants. Ribbed cuffs and hem. Cotton fleece fabric. Elastic waistband on pants.'
+    },
+    modelPose: 'CHILD model (ages 6-10), confident playful stance showing BOTH hoodie and pants as complete set — color blocking and red hood clearly visible',
+    setting: 'Dynamic colorful urban playground, bright natural light, youthful energy'
   },
 ];
 
