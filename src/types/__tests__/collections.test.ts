@@ -2,8 +2,7 @@
  * Unit Tests for Collection Types and Constants
  */
 
-import { COLLECTIONS } from '../collections';
-import type { Collection, CollectionTheme } from '../collections';
+import { COLLECTIONS, CollectionTheme } from '../collections';
 
 describe('COLLECTIONS', () => {
   it('should define exactly 3 collections', () => {
