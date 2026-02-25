@@ -66,6 +66,7 @@ foreach ( $skyyrose_core_includes as $skyyrose_file ) {
 if ( class_exists( 'WooCommerce' ) ) {
 	$skyyrose_woo_includes = array(
 		'/inc/woocommerce.php',
+		'/inc/immersive-ajax.php',
 		'/inc/wishlist-functions.php',
 		'/inc/class-wishlist-widget.php',
 	);
@@ -87,6 +88,22 @@ add_action( 'elementor/loaded', function () {
 		require_once $elementor_path;
 	}
 } );
+
+/*--------------------------------------------------------------
+ * Admin Includes (loaded only in wp-admin context)
+ *--------------------------------------------------------------*/
+if ( is_admin() ) {
+	$skyyrose_admin_includes = array(
+		'/inc/deployment-checklist.php',
+	);
+
+	foreach ( $skyyrose_admin_includes as $skyyrose_file ) {
+		$skyyrose_filepath = SKYYROSE_DIR . $skyyrose_file;
+		if ( file_exists( $skyyrose_filepath ) ) {
+			require_once $skyyrose_filepath;
+		}
+	}
+}
 
 /*--------------------------------------------------------------
  * Legacy: brand styles enqueue (backward compat, safe to remove later)

@@ -957,6 +957,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-momentum-commerce',
 		'skyyrose-velocity-scroll',
 		'skyyrose-analytics-beacon',
+		'skyyrose-immersive-wc-bridge',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) ) {
