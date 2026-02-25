@@ -195,7 +195,10 @@ $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	<!-- ============================================================
 	     PRODUCT GRID
 	     ============================================================ -->
-	<section id="products" class="collection-products">
+	<section id="products" class="collection-products" aria-labelledby="products-heading">
+		<h2 id="products-heading" class="screen-reader-text">
+			<?php echo esc_html__( 'Signature Products', 'skyyrose-flagship' ); ?>
+		</h2>
 		<div class="collection-grid">
 			<?php
 			foreach ( $skyyrose_sg_products as $skyyrose_product ) :
