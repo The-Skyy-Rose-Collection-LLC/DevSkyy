@@ -177,6 +177,8 @@ function skyyrose_create_product_tags() {
 		'limited-edition' => __( 'Limited Edition', 'skyyrose-flagship' ),
 		'bestseller'      => __( 'Bestseller', 'skyyrose-flagship' ),
 		'new-arrival'     => __( 'New Arrival', 'skyyrose-flagship' ),
+		'pre-order'       => __( 'Pre-Order', 'skyyrose-flagship' ),
+		'collaboration'   => __( 'Collaboration', 'skyyrose-flagship' ),
 		'collab'          => __( 'Collab', 'skyyrose-flagship' ),
 		'hoodie'          => __( 'Hoodie', 'skyyrose-flagship' ),
 		'jogger'          => __( 'Jogger', 'skyyrose-flagship' ),
