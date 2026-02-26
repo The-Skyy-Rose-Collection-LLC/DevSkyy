@@ -353,7 +353,10 @@
 		var bar = createElement('div', 'cie-floating-cta');
 
 		var text = createElement('span', 'cie-floating-cta__text');
-		text.innerHTML = '<strong>' + CONFIG.preorderCurrent + '</strong> pre-orders placed — join them';
+		var strong = document.createElement('strong');
+		strong.textContent = String(parseInt(CONFIG.preorderCurrent, 10) || 0);
+		text.appendChild(strong);
+		text.appendChild(document.createTextNode(' pre-orders placed \u2014 join them'));
 
 		var btn = createElement('a', 'cie-floating-cta__btn', {
 			'href': '/pre-order/',
@@ -454,18 +457,26 @@
 		modal.appendChild(subtext);
 		modal.appendChild(cta);
 		modal.appendChild(dismiss);
+		// WCAG: dialog semantics for screen readers.
+		overlay.setAttribute('role', 'dialog');
+		overlay.setAttribute('aria-modal', 'true');
+		overlay.setAttribute('aria-label', 'Special offer');
+
 		overlay.appendChild(modal);
 		document.body.appendChild(overlay);
 
 		requestAnimationFrame(function () {
 			requestAnimationFrame(function () {
 				overlay.classList.add('visible');
+				// Move focus into the modal.
+				close.focus();
 			});
 		});
 
 		trackEvent('exit_intent_shown');
 
 		function closeOverlay() {
+			overlay.removeEventListener('keydown', trapFocus);
 			overlay.classList.remove('visible');
 			setTimeout(function () {
 				if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
@@ -474,6 +485,27 @@
 				sessionStorage.setItem('cie_exit_shown', String(Date.now()));
 			} catch (e) { /* quota */ }
 		}
+
+		// WCAG 2.4.3: Focus trap within the modal dialog.
+		function trapFocus(e) {
+			if (e.key === 'Escape') {
+				closeOverlay();
+				return;
+			}
+			if (e.key !== 'Tab') return;
+			var focusable = modal.querySelectorAll('button, a[href], [tabindex]:not([tabindex="-1"])');
+			if (!focusable.length) return;
+			var first = focusable[0];
+			var last = focusable[focusable.length - 1];
+			if (e.shiftKey && document.activeElement === first) {
+				e.preventDefault();
+				last.focus();
+			} else if (!e.shiftKey && document.activeElement === last) {
+				e.preventDefault();
+				first.focus();
+			}
+		}
+		overlay.addEventListener('keydown', trapFocus);
 
 		close.addEventListener('click', closeOverlay);
 		dismiss.addEventListener('click', closeOverlay);
@@ -614,7 +646,7 @@
 	window.SkyyRoseCIE = {
 		trackEvent: trackEvent,
 		getEvents: function () { return eventQueue.slice(); },
-		config: CONFIG,
+		config: Object.freeze ? Object.freeze(CONFIG) : CONFIG,
 	};
 
 	/* --------------------------------------------------

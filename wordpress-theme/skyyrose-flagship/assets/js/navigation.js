@@ -40,7 +40,10 @@
 		document.body.classList.remove('mobile-nav-open');
 		if (toggle) {
 			toggle.setAttribute('aria-expanded', 'false');
-			toggle.focus();
+			// Only return focus if toggle is visible (not hidden on desktop resize).
+			if (toggle.offsetParent !== null) {
+				toggle.focus();
+			}
 		}
 		if (nav) {
 			nav.classList.remove('toggled');

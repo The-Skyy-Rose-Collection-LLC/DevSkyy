@@ -394,7 +394,7 @@ function skyyrose_ajax_move_to_cart() {
 	}
 }
 add_action( 'wp_ajax_skyyrose_move_to_cart', 'skyyrose_ajax_move_to_cart' );
-add_action( 'wp_ajax_nopriv_skyyrose_move_to_cart', 'skyyrose_ajax_move_to_cart' );
+// nopriv removed: cart mutations require authentication (guest sessions can't persist wishlists).
 
 /**
  * AJAX handler: Clear wishlist.
@@ -455,7 +455,7 @@ function skyyrose_ajax_move_all_to_cart() {
 	}
 }
 add_action( 'wp_ajax_skyyrose_move_all_to_cart', 'skyyrose_ajax_move_all_to_cart' );
-add_action( 'wp_ajax_nopriv_skyyrose_move_all_to_cart', 'skyyrose_ajax_move_all_to_cart' );
+// nopriv removed: cart mutations require authentication (guest sessions can't persist wishlists).
 
 /**
  * Register REST API endpoints for wishlist.

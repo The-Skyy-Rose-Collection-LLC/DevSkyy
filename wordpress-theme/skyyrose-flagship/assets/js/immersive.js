@@ -139,9 +139,13 @@
 		panel.removeAttribute('inert');
 		panel.setAttribute('aria-hidden', 'false');
 
-		// Store product ID on panel for cross-script access (immersive-wc-bridge.js).
+		// Store product ID and SKU on panel for cross-script access (immersive-wc-bridge.js).
 		if (data.productId) {
 			panel.dataset.currentProductId = data.productId;
+		}
+		// SKU is the canonical identifier for AJAX add-to-cart (not numeric product ID).
+		if (data.productSku) {
+			panel.dataset.currentProductSku = data.productSku;
 		}
 
 		// Focus trap: move focus into panel.
@@ -157,8 +161,9 @@
 		panel.setAttribute('inert', '');
 		panel.setAttribute('aria-hidden', 'true');
 
-		// Clear stale product ID so the bridge doesn't add-to-cart for a previously viewed product.
+		// Clear stale product ID/SKU so the bridge doesn't add-to-cart for a previously viewed product.
 		delete panel.dataset.currentProductId;
+		delete panel.dataset.currentProductSku;
 
 		// Restore focus to the hotspot that opened the panel.
 		if (lastFocused) {
@@ -231,7 +236,8 @@
 					sizes:      hotspot.dataset.productSizes,
 					url:        hotspot.dataset.productUrl,
 					propLabel:  hotspot.dataset.propLabel || '',
-					productId:  hotspot.dataset.productId || ''
+					productId:  hotspot.dataset.productId || '',
+					productSku: hotspot.dataset.productSku || ''
 				};
 
 				openPanel(productData);
@@ -457,8 +463,22 @@
 		var targetY = 0;
 		var currentX = 0;
 		var currentY = 0;
+		var paused = false;
+
+		// Pause parallax rAF loop when tab is hidden to save CPU.
+		document.addEventListener('visibilitychange', function () {
+			if (document.hidden) {
+				paused = true;
+				ticking = false;
+				targetX = 0;
+				targetY = 0;
+			} else {
+				paused = false;
+			}
+		});
 
 		scene.addEventListener('mousemove', function (e) {
+			if (paused) return;
 			// Normalize mouse position to -1..1 from center.
 			var rect = scene.getBoundingClientRect();
 			targetX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;

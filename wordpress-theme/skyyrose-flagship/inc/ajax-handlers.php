@@ -115,20 +115,21 @@ function skyyrose_ajax_contact_submit() {
 		? sprintf( '[SkyyRose Contact] %s', $subject )
 		: __( '[SkyyRose Contact] New Message', 'skyyrose-flagship' );
 
+	// Strip newlines from $name and $email to prevent email header injection.
+	// Compute safe versions BEFORE using in body or headers.
+	$safe_name  = str_replace( array( "\r", "\n", "\t" ), '', $name );
+	$safe_email = str_replace( array( "\r", "\n", "\t" ), '', $email );
+
 	$body = sprintf(
 		"Name: %s\nEmail: %s\nPhone: %s\nOrder Number: %s\nPreferred Contact: %s\nReferral Source: %s\n\nMessage:\n%s",
-		$name,
-		$email,
+		$safe_name,
+		$safe_email,
 		$phone,
 		$order_number,
 		$preferred_contact,
 		$referral_source ? $referral_source : 'Not specified',
 		$message
 	);
-
-	// Strip newlines from $name and $email to prevent email header injection.
-	$safe_name  = str_replace( array( "\r", "\n", "\t" ), '', $name );
-	$safe_email = str_replace( array( "\r", "\n", "\t" ), '', $email );
 	$headers    = array(
 		'Content-Type: text/plain; charset=UTF-8',
 		sprintf( 'Reply-To: %s <%s>', $safe_name, $safe_email ),

@@ -116,13 +116,15 @@
 	function activateTab(tab) {
 		var collection = tab.dataset.collection;
 
-		// Update active tab and ARIA pressed state.
+		// Update active tab and ARIA selected state (role="tablist" pattern).
 		tabs.forEach(function (t) {
 			t.classList.remove('active');
-			t.setAttribute('aria-pressed', 'false');
+			t.setAttribute('aria-selected', 'false');
+			t.setAttribute('tabindex', '-1');
 		});
 		tab.classList.add('active');
-		tab.setAttribute('aria-pressed', 'true');
+		tab.setAttribute('aria-selected', 'true');
+		tab.setAttribute('tabindex', '0');
 
 		// Filter cards.
 		cards.forEach(function (card) {
@@ -597,6 +599,7 @@
 		function showPopup() {
 			if (shown) return;
 			shown = '1';
+			clearTimeout(popupTimerId);
 			document.removeEventListener('mouseout', onExitIntent);
 			overlay.classList.add('open');
 			overlay.setAttribute('aria-hidden', 'false');

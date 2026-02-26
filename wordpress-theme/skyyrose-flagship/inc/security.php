@@ -68,7 +68,10 @@ function skyyrose_send_security_headers() {
 	header( 'X-Frame-Options: SAMEORIGIN' );
 
 	// Enforce HTTPS via HSTS (1 year including subdomains, preload-ready).
-	header( 'Strict-Transport-Security: max-age=31536000; includeSubDomains; preload' );
+	// Only send on HTTPS — sending on HTTP bricks access for max-age duration.
+	if ( is_ssl() ) {
+		header( 'Strict-Transport-Security: max-age=31536000; includeSubDomains; preload' );
+	}
 
 	// Disable legacy XSS auditor (can introduce vulnerabilities in modern browsers).
 	header( 'X-XSS-Protection: 0' );

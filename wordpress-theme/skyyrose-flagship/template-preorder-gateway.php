@@ -184,7 +184,7 @@ get_header();
 								</p>
 							<?php endif; ?>
 						</div>
-						<button class="product-grid-view-btn" type="button" aria-label="<?php echo esc_attr( sprintf( __( 'View %s details', 'skyyrose-flagship' ), $product['name'] ) ); ?>">
+						<button class="product-grid-view-btn" type="button" aria-haspopup="dialog" aria-label="<?php echo esc_attr( sprintf( __( 'View %s details', 'skyyrose-flagship' ), $product['name'] ) ); ?>">
 							<?php esc_html_e( 'View Details', 'skyyrose-flagship' ); ?>
 						</button>
 					</article>
@@ -298,20 +298,20 @@ get_header();
 	</div>
 
 	<!-- Collection Tabs (Fixed Bottom) -->
-	<nav class="collection-tabs" aria-label="<?php esc_attr_e( 'Filter by collection', 'skyyrose-flagship' ); ?>">
-		<button class="collection-tab active" type="button" aria-pressed="true" data-collection="all" id="tab-all">
+	<div class="collection-tabs" role="tablist" aria-label="<?php esc_attr_e( 'Filter by collection', 'skyyrose-flagship' ); ?>">
+		<button class="collection-tab active" type="button" role="tab" aria-selected="true" tabindex="0" data-collection="all" id="tab-all">
 			<?php echo esc_html__( 'All', 'skyyrose-flagship' ); ?>
 		</button>
-		<button class="collection-tab" type="button" aria-pressed="false" data-collection="black-rose" id="tab-black-rose">
+		<button class="collection-tab" type="button" role="tab" aria-selected="false" tabindex="-1" data-collection="black-rose" id="tab-black-rose">
 			<?php echo esc_html__( 'Black Rose', 'skyyrose-flagship' ); ?>
 		</button>
-		<button class="collection-tab" type="button" aria-pressed="false" data-collection="love-hurts" id="tab-love-hurts">
+		<button class="collection-tab" type="button" role="tab" aria-selected="false" tabindex="-1" data-collection="love-hurts" id="tab-love-hurts">
 			<?php echo esc_html__( 'Love Hurts', 'skyyrose-flagship' ); ?>
 		</button>
-		<button class="collection-tab" type="button" aria-pressed="false" data-collection="signature" id="tab-signature">
+		<button class="collection-tab" type="button" role="tab" aria-selected="false" tabindex="-1" data-collection="signature" id="tab-signature">
 			<?php echo esc_html__( 'Signature', 'skyyrose-flagship' ); ?>
 		</button>
-	</nav>
+	</div>
 
 	<!-- Exclusive Incentive Popup — triggers after 15s or on exit intent -->
 	<div class="incentive-popup-overlay" aria-hidden="true"></div>
@@ -352,17 +352,8 @@ get_header();
 </main><!-- #primary -->
 
 <?php
-// Pass WooCommerce data to the gateway script (assets already enqueued by inc/enqueue.php).
-$gateway_wc_data = array(
-	'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
-	'nonce'       => wp_create_nonce( 'skyyrose-immersive-nonce' ),
-	'checkoutUrl' => function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/checkout/' ),
-	'cartUrl'     => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
-	'wcActive'    => class_exists( 'WooCommerce' ),
-);
-if ( wp_script_is( 'skyyrose-template-preorder-gateway', 'enqueued' ) ) {
-	wp_localize_script( 'skyyrose-template-preorder-gateway', 'skyyRoseGateway', $gateway_wc_data );
-}
+// skyyRoseGateway is localized in inc/enqueue.php during wp_enqueue_scripts (before wp_head).
+// wp_localize_script() called after wp_head is a no-op — data is silently dropped.
 
 get_template_part( 'template-parts/cinematic-toggle' );
 

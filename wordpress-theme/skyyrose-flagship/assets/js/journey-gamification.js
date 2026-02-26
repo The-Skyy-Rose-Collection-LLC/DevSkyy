@@ -223,6 +223,11 @@
 		buildProgressPill(scene);
 		updateProgressPill();
 
+		// Disconnect any previous observer to prevent multiple listeners on re-init.
+		if (explorationState.observer) {
+			explorationState.observer.disconnect();
+		}
+
 		// Watch for room transitions via MutationObserver.
 		var observer = new MutationObserver(function (mutations) {
 			for (var i = 0; i < mutations.length; i++) {
@@ -237,6 +242,7 @@
 		});
 
 		// Observe all scene-layer elements for class changes.
+		explorationState.observer = observer;
 		layers.forEach(function (layer) {
 			observer.observe(layer, { attributes: true, attributeFilter: ['class'] });
 		});
