@@ -29,6 +29,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 function skyyrose_accessibility_styles() {
+	$css_path = get_template_directory() . '/assets/css/accessibility.css';
+	if ( ! file_exists( $css_path ) ) {
+		return;
+	}
+
 	wp_enqueue_style(
 		'skyyrose-accessibility',
 		SKYYROSE_ASSETS_URI . '/css/accessibility.css',

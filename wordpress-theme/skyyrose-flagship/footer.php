@@ -101,7 +101,39 @@
 								rel="noopener noreferrer"
 							>
 								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-									<?php echo $icon; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SVG markup. ?>
+									<?php
+								echo wp_kses(
+									$icon,
+									array(
+										'path'     => array(
+											'd'    => true,
+											'fill' => true,
+										),
+										'circle'   => array(
+											'cx'   => true,
+											'cy'   => true,
+											'r'    => true,
+											'fill' => true,
+										),
+										'polyline' => array(
+											'points' => true,
+										),
+										'line'     => array(
+											'x1' => true,
+											'y1' => true,
+											'x2' => true,
+											'y2' => true,
+										),
+										'rect'     => array(
+											'x'      => true,
+											'y'      => true,
+											'width'  => true,
+											'height' => true,
+											'fill'   => true,
+										),
+									)
+								);
+								?>
 								</svg>
 							</a>
 						<?php endforeach; ?>

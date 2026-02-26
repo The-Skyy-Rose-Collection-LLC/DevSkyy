@@ -82,27 +82,57 @@
 	   -------------------------------------------------- */
 
 	function initTabs() {
-		tabs.forEach(function (tab) {
+		tabs.forEach(function (tab, index) {
+			// Set initial tabindex: only active tab is focusable.
+			tab.setAttribute('tabindex', tab.classList.contains('active') ? '0' : '-1');
+
 			tab.addEventListener('click', function () {
-				var collection = tab.dataset.collection;
-
-				// Update active tab and ARIA state
-				tabs.forEach(function (t) {
-					t.classList.remove('active');
-					t.setAttribute('aria-selected', 'false');
-				});
-				tab.classList.add('active');
-				tab.setAttribute('aria-selected', 'true');
-
-				// Filter cards
-				cards.forEach(function (card) {
-					if (collection === 'all' || card.dataset.collection === collection) {
-						card.classList.remove('hidden');
-					} else {
-						card.classList.add('hidden');
-					}
-				});
+				activateTab(tab);
 			});
+
+			tab.addEventListener('keydown', function (e) {
+				var newIndex = -1;
+				if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+					e.preventDefault();
+					newIndex = (index + 1) % tabs.length;
+				} else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+					e.preventDefault();
+					newIndex = (index - 1 + tabs.length) % tabs.length;
+				} else if (e.key === 'Home') {
+					e.preventDefault();
+					newIndex = 0;
+				} else if (e.key === 'End') {
+					e.preventDefault();
+					newIndex = tabs.length - 1;
+				}
+				if (newIndex >= 0) {
+					activateTab(tabs[newIndex]);
+					tabs[newIndex].focus();
+				}
+			});
+		});
+	}
+
+	function activateTab(tab) {
+		var collection = tab.dataset.collection;
+
+		// Update active tab, ARIA state, and tabindex.
+		tabs.forEach(function (t) {
+			t.classList.remove('active');
+			t.setAttribute('aria-selected', 'false');
+			t.setAttribute('tabindex', '-1');
+		});
+		tab.classList.add('active');
+		tab.setAttribute('aria-selected', 'true');
+		tab.setAttribute('tabindex', '0');
+
+		// Filter cards.
+		cards.forEach(function (card) {
+			if (collection === 'all' || card.dataset.collection === collection) {
+				card.classList.remove('hidden');
+			} else {
+				card.classList.add('hidden');
+			}
 		});
 	}
 
@@ -553,7 +583,7 @@
 
 	function initIncentivePopup() {
 		var overlay = document.querySelector('.incentive-popup-overlay');
-		var closeBtn = overlay ? overlay.querySelector('.incentive-popup-close') : null;
+		var closeBtn = incentivePopup ? incentivePopup.querySelector('.incentive-popup-close') : null;
 		if (!overlay) return;
 
 		var shown = sessionStorage.getItem('sr_incentive_shown');
@@ -620,6 +650,8 @@
 					return;
 				}
 				xhr.open('POST', ajaxUrl, true);
+				xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+				xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 				xhr.onload = function () {
 					try {
 						var resp = JSON.parse(xhr.responseText);
@@ -639,7 +671,11 @@
 						submitBtn.disabled = false;
 					}
 				};
-				xhr.send(formData);
+				var params = [];
+				formData.forEach(function (value, key) {
+					params.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+				});
+				xhr.send(params.join('&'));
 			});
 		}
 	}
