@@ -127,9 +127,9 @@ get_header();
 		</div><!-- .gateway-header -->
 
 		<!-- Product Section -->
-		<section class="gateway-product-section">
+		<section class="gateway-product-section" aria-labelledby="gateway-section-title">
 			<div class="gateway-section-header">
-				<h2><?php echo esc_html__( 'Pre-Order Collections', 'skyyrose-flagship' ); ?></h2>
+				<h2 id="gateway-section-title"><?php echo esc_html__( 'Pre-Order Collections', 'skyyrose-flagship' ); ?></h2>
 				<p><?php echo esc_html__( 'Luxury Grows from Concrete.', 'skyyrose-flagship' ); ?></p>
 			</div>
 

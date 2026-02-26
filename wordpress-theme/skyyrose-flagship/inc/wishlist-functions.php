@@ -57,7 +57,7 @@ function skyyrose_get_wishlist_key() {
 function skyyrose_add_to_wishlist( $product_id ) {
 	$product_id = absint( $product_id );
 
-	if ( ! $product_id || ! wc_get_product( $product_id ) ) {
+	if ( ! $product_id || ! function_exists( 'wc_get_product' ) || ! wc_get_product( $product_id ) ) {
 		return false;
 	}
 
@@ -153,13 +153,15 @@ function skyyrose_get_wishlist_items() {
 		$wishlist = is_array( $wishlist ) ? $wishlist : array();
 	}
 
-	// Filter out invalid products.
-	$wishlist = array_filter(
-		$wishlist,
-		function( $product_id ) {
-			return wc_get_product( $product_id ) !== false;
-		}
-	);
+	// Filter out invalid products (guard against WooCommerce deactivation mid-request).
+	if ( function_exists( 'wc_get_product' ) ) {
+		$wishlist = array_filter(
+			$wishlist,
+			function( $product_id ) {
+				return wc_get_product( $product_id ) !== false;
+			}
+		);
+	}
 
 	return array_values( $wishlist );
 }
@@ -187,7 +189,12 @@ function skyyrose_is_in_wishlist( $product_id ) {
  */
 function skyyrose_move_to_cart( $product_id ) {
 	$product_id = absint( $product_id );
-	$product    = wc_get_product( $product_id );
+
+	if ( ! function_exists( 'wc_get_product' ) ) {
+		return false;
+	}
+
+	$product = wc_get_product( $product_id );
 
 	if ( ! $product ) {
 		return false;

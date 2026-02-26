@@ -82,6 +82,7 @@ function skyyrose_get_love_hurts_products() {
 				'badge'      => __( 'New', 'skyyrose-flagship' ),
 				'image'      => skyyrose_product_image_uri( $p['image'] ),
 				'back_image' => '',
+				'url'        => skyyrose_product_url( 'lh-002' ),
 			);
 		}
 	}
@@ -131,7 +132,8 @@ $skyyrose_lh_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	<!-- ============================================================
 	     COLLECTION STORY
 	     ============================================================ -->
-	<section class="collection-story" id="story">
+	<section class="collection-story" id="story" aria-labelledby="story-heading">
+		<h2 id="story-heading" class="screen-reader-text"><?php esc_html_e( 'Collection Story', 'skyyrose-flagship' ); ?></h2>
 		<p class="collection-story__text">
 			<?php echo esc_html__( 'The Love Hurts collection is born from the raw, unfiltered intensity of real love. Crimson reds bleed into midnight blacks. Every stitch tells a story of passion, heartbreak, and the courage to love again. This is not for the faint of heart — it is for those who love fiercely, who wear their scars as badges of honor, and who know that the deepest connections always come with a cost.', 'skyyrose-flagship' ); ?>
 		</p>

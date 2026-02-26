@@ -455,12 +455,35 @@
 		document.body.appendChild(overlay);
 
 		// Close handlers.
-		function escHandler(e) {
-			if (e.key === 'Escape') dismiss();
+		function keyHandler(e) {
+			if (e.key === 'Escape') {
+				dismiss();
+				return;
+			}
+
+			// Focus trap — keep Tab cycling within the modal.
+			if (e.key === 'Tab') {
+				var focusable = modal.querySelectorAll('button, a[href], input, [tabindex]:not([tabindex="-1"])');
+				if (focusable.length === 0) return;
+				var first = focusable[0];
+				var last  = focusable[focusable.length - 1];
+
+				if (e.shiftKey) {
+					if (document.activeElement === first) {
+						e.preventDefault();
+						last.focus();
+					}
+				} else {
+					if (document.activeElement === last) {
+						e.preventDefault();
+						first.focus();
+					}
+				}
+			}
 		}
 
 		function dismiss() {
-			document.removeEventListener('keydown', escHandler);
+			document.removeEventListener('keydown', keyHandler);
 			overlay.classList.remove('jge-visible');
 			setTimeout(function () {
 				if (overlay.parentNode) {
@@ -473,7 +496,7 @@
 		overlay.addEventListener('click', function (e) {
 			if (e.target === overlay) dismiss();
 		});
-		document.addEventListener('keydown', escHandler);
+		document.addEventListener('keydown', keyHandler);
 
 		// Show with animation.
 		requestAnimationFrame(function () {

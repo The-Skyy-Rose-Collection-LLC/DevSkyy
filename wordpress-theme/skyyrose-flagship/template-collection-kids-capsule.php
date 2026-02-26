@@ -162,13 +162,13 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 	<!-- ============================================================
 	     COLLECTION STORY
 	     ============================================================ -->
-	<section class="collection-story" id="story">
+	<section class="collection-story" id="story" aria-labelledby="story-heading">
 		<div class="collection-story__inner fade-in-up">
 			<span class="collection-story__label">
 				<?php echo esc_html__( 'The Story', 'skyyrose-flagship' ); ?>
 			</span>
 
-			<h2 class="collection-story__heading">
+			<h2 id="story-heading" class="collection-story__heading">
 				<?php echo esc_html__( 'Where Fun Meets Fashion', 'skyyrose-flagship' ); ?>
 			</h2>
 
@@ -216,8 +216,7 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 				$skyyrose_p_image = ! empty( $skyyrose_product['image'] ) ? $skyyrose_product['image'] : $skyyrose_kc_placeholder;
 				?>
 				<a href="<?php echo esc_url( $skyyrose_p_url ); ?>"
-				   class="product-card fade-in-up <?php echo esc_attr( $skyyrose_delay_class ); ?>"
-				   aria-label="<?php echo esc_attr( $skyyrose_product['name'] ); ?>">
+				   class="product-card fade-in-up <?php echo esc_attr( $skyyrose_delay_class ); ?>">
 
 					<div class="product-card__image-wrap">
 						<img src="<?php echo esc_url( $skyyrose_p_image ); ?>"

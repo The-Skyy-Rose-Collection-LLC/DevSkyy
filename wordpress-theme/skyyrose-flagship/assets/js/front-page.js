@@ -61,9 +61,8 @@
 
 		// Suspend sparkles when tab is backgrounded to avoid DOM node accumulation.
 		document.addEventListener('visibilitychange', function () {
-			if (document.hidden) {
-				clearInterval(sparkleInterval);
-			} else if (!motionQuery || !motionQuery.matches) {
+			clearInterval(sparkleInterval);
+			if (!document.hidden && (!motionQuery || !motionQuery.matches)) {
 				sparkleInterval = setInterval(createSparkle, 400);
 			}
 		});

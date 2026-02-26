@@ -467,4 +467,19 @@
 		transform: none;
 		transition: none;
 	}
+
+	.collection-product-card,
+	.collection-explore__link,
+	.collection-hero__cta,
+	.collection-preorder-cta__btn,
+	.collection-immersive-cta__link {
+		transition: none;
+	}
+
+	.collection-product-card:hover,
+	.collection-explore__link:hover,
+	.collection-hero__cta:hover,
+	.collection-preorder-cta__btn:hover {
+		transform: none;
+	}
 }
