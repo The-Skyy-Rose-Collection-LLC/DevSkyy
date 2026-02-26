@@ -193,7 +193,7 @@ get_header();
 
 	<!-- Product Detail Panel (Glassmorphism Slide-Up) -->
 	<div class="product-panel-overlay" aria-hidden="true"></div>
-	<aside class="product-panel" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="product-panel-name">
+	<div class="product-panel" role="dialog" aria-modal="true" aria-hidden="true" inert aria-labelledby="product-panel-name">
 		<button class="product-panel-close" type="button" aria-label="<?php esc_attr_e( 'Close product details', 'skyyrose-flagship' ); ?>">&times;</button>
 		<div class="product-panel-inner">
 			<div class="product-panel-thumb">
@@ -218,7 +218,7 @@ get_header();
 				</a>
 			</div>
 		</div>
-	</aside>
+	</div>
 
 	<!-- Collection Tab Bar -->
 	<nav class="immersive-tab-bar" aria-label="<?php esc_attr_e( 'Collection navigation', 'skyyrose-flagship' ); ?>">

@@ -230,8 +230,16 @@
 .skyy-checkout__field select:focus,
 .skyy-checkout__field textarea:focus {
 	border-color: var(--skyy-woo-accent);
-	outline: none;
+	outline: 2px solid var(--skyy-woo-accent);
+	outline-offset: 2px;
 	box-shadow: 0 0 0 3px var(--skyy-woo-accent-glow);
+}
+
+.skyy-checkout__next-btn:focus-visible,
+.skyy-checkout__back-btn:focus-visible,
+.skyy-checkout__place-order-btn:focus-visible {
+	outline: 2px solid var(--skyy-woo-accent);
+	outline-offset: 2px;
 }
 
 .skyy-checkout__input::placeholder,

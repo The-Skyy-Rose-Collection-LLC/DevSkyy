@@ -42,7 +42,7 @@ if ( ! class_exists( 'WooCommerce' ) ) {
 		<?php if ( ! empty( $wishlist ) ) : ?>
 
 			<div class="wishlist-actions">
-				<?php wp_nonce_field( 'skyyrose_wishlist_action', 'skyyrose_wishlist_nonce' ); ?>
+				<?php // Nonce for AJAX is in skyyRoseWishlist.nonce (localized). Form field not needed. ?>
 				<button type="button" class="button alt wishlist-move-all" data-action="move-all">
 					<?php esc_html_e( 'Move All to Cart', 'skyyrose-flagship' ); ?>
 				</button>

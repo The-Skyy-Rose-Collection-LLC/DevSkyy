@@ -289,26 +289,45 @@
 
 				// Update cart count badge via WC fragments (selector allowlist).
 				if (data.fragments) {
-					var allowedSelectors = [
+					var numericSelectors = [
 						'.cart-count-badge', '.navbar__cart-badge',
-						'.cart-contents', '.widget_shopping_cart_content',
-						'div.widget_shopping_cart_content',
 						'.cart-count', '.cart-subtotal'
+					];
+					var htmlSelectors = [
+						'.cart-contents', '.widget_shopping_cart_content',
+						'div.widget_shopping_cart_content'
 					];
 					for (var selector in data.fragments) {
 						if (!data.fragments.hasOwnProperty(selector)) continue;
-						var isAllowed = false;
-						for (var a = 0; a < allowedSelectors.length; a++) {
-							if (selector === allowedSelectors[a]) { isAllowed = true; break; }
+						var isNumeric = false;
+						var isHtml = false;
+						for (var a = 0; a < numericSelectors.length; a++) {
+							if (selector === numericSelectors[a]) { isNumeric = true; break; }
 						}
-						if (!isAllowed) continue;
+						if (!isNumeric) {
+							for (var b = 0; b < htmlSelectors.length; b++) {
+								if (selector === htmlSelectors[b]) { isHtml = true; break; }
+							}
+						}
+						if (!isNumeric && !isHtml) continue;
 						try {
 							var targets = document.querySelectorAll(selector);
-							for (var i = 0; i < targets.length; i++) {
+							if (isNumeric) {
+								// Extract text only — prevents HTML injection in badge values.
 								var temp = document.createElement('div');
 								temp.innerHTML = data.fragments[selector];
-								if (temp.firstChild) {
-									targets[i].parentNode.replaceChild(temp.firstChild, targets[i]);
+								var text = (temp.textContent || '').trim();
+								for (var i = 0; i < targets.length; i++) {
+									targets[i].textContent = text;
+								}
+							} else {
+								// Trusted WooCommerce widget content — standard WC fragment pattern.
+								for (var j = 0; j < targets.length; j++) {
+									var tmp = document.createElement('div');
+									tmp.innerHTML = data.fragments[selector];
+									if (tmp.firstChild) {
+										targets[j].parentNode.replaceChild(tmp.firstChild, targets[j]);
+									}
 								}
 							}
 						} catch (e) { /* invalid selector — skip */ }
@@ -381,8 +400,6 @@
 		if (!addBtn) return;
 
 		addBtn.addEventListener('click', function (e) {
-			// Stop the original immersive.js handler from firing.
-			e.stopImmediatePropagation();
 			e.preventDefault();
 
 			var productId = null;
@@ -445,7 +462,7 @@
 					addBtn.textContent = originalText;
 				}
 			});
-		}, true); // Capturing phase to fire before immersive.js handler.
+		}); // No add-to-cart handler in immersive.js — bridge is the sole handler.
 	}
 
 	/* --------------------------------------------------

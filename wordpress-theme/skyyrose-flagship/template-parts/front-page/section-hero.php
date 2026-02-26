@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 
-<section class="hero" aria-label="<?php esc_attr_e( 'Hero', 'skyyrose-flagship' ); ?>">
+<section class="hero" aria-labelledby="hero-brand-name">
 	<div class="hero__bg" aria-hidden="true">
 		<div class="hero__orb hero__orb--1"></div>
 		<div class="hero__orb hero__orb--2"></div>
@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="hero__content">
 
 		<!-- Brand Name — Upscale Script with Animated Reveal -->
-		<h1 class="hero__brand-name" aria-label="<?php esc_attr_e( 'SkyyRose', 'skyyrose-flagship' ); ?>">
+		<h1 class="hero__brand-name" id="hero-brand-name" aria-label="<?php esc_attr_e( 'SkyyRose', 'skyyrose-flagship' ); ?>">
 			<span class="hero__brand-letter" aria-hidden="true" style="--i:0">S</span><span
 				class="hero__brand-letter" aria-hidden="true" style="--i:1">K</span><span
 				class="hero__brand-letter" aria-hidden="true" style="--i:2">Y</span><span

@@ -124,15 +124,14 @@ add_filter( 'post_thumbnail_html', 'skyyrose_ensure_image_alt', 10, 3 );
  * @since 1.0.0
  */
 function skyyrose_woocommerce_accessibility() {
-	// Add ARIA labels to WooCommerce elements.
-	add_filter( 'woocommerce_product_add_to_cart_text', function( $text, $product ) {
-		return '<span aria-label="' . esc_attr( sprintf( __( 'Add %s to your cart', 'skyyrose-flagship' ), $product->get_name() ) ) . '">' . $text . '</span>';
+	// Set aria-label on the add-to-cart BUTTON element (not inner text span).
+	add_filter( 'woocommerce_loop_add_to_cart_args', function( $args, $product ) {
+		$args['aria-label'] = sprintf(
+			esc_attr__( 'Add %s to your cart', 'skyyrose-flagship' ),
+			$product->get_name()
+		);
+		return $args;
 	}, 10, 2 );
-
-	// Add proper labels to quantity inputs.
-	add_action( 'woocommerce_before_quantity_input_field', function() {
-		echo '<label for="quantity" class="screen-reader-text">' . __( 'Product quantity', 'skyyrose-flagship' ) . '</label>';
-	} );
 
 	// Add ARIA labels to cart items.
 	add_filter( 'woocommerce_cart_item_remove_link', function( $link, $cart_item_key ) {
