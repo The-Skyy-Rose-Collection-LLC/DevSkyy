@@ -179,13 +179,18 @@
 
 		previousFocusEl = document.activeElement;
 		modalOverlay.classList.add('open');
+		modalOverlay.setAttribute('aria-hidden', 'false');
 		var dialog = modalOverlay.querySelector('[role="dialog"]') || modalOverlay;
+		dialog.setAttribute('aria-hidden', 'false');
 		trapFocus(dialog);
 	}
 
 	function closeModal() {
 		if (modalOverlay) {
 			modalOverlay.classList.remove('open');
+			modalOverlay.setAttribute('aria-hidden', 'true');
+			var dialog = modalOverlay.querySelector('[role="dialog"]');
+			if (dialog) dialog.setAttribute('aria-hidden', 'true');
 			// Clean up focus trap handler to prevent accumulation.
 			if (focusTrapHandler && focusTrapContainer) {
 				focusTrapContainer.removeEventListener('keydown', focusTrapHandler);
@@ -200,12 +205,9 @@
 	}
 
 	function initModal() {
-		// Open modal on card click
+		// Open modal from "View Details" button or card image click
 		cards.forEach(function (card) {
-			card.addEventListener('click', function (e) {
-				// Don't open modal if wishlist button was clicked
-				if (e.target.closest('.product-grid-wishlist')) return;
-
+			function openFromCard() {
 				currentProductId = card.dataset.productId || null;
 				openModal({
 					name:            card.dataset.productName,
@@ -215,13 +217,13 @@
 					desc:            card.dataset.productDesc,
 					sizes:           card.dataset.productSizes
 				});
-			});
+			}
 
-			// Keyboard support
-			card.addEventListener('keydown', function (e) {
-				if (e.key === 'Enter' || e.key === ' ') {
-					e.preventDefault();
-					card.click();
+			card.addEventListener('click', function (e) {
+				// Only open on View Details button or image area, not wishlist
+				if (e.target.closest('.product-grid-wishlist')) return;
+				if (e.target.closest('.product-grid-view-btn') || e.target.closest('.product-grid-image')) {
+					openFromCard();
 				}
 			});
 		});
@@ -283,6 +285,14 @@
 						}
 					} catch (e) { /* non-JSON response — keep local state */ }
 				}
+			};
+
+			xhr.onerror = function () {
+				// Network failure — remove optimistically added item.
+				var idx = cartItems.indexOf(item);
+				if (idx > -1) cartItems.splice(idx, 1);
+				cartCount = cartItems.length;
+				updateCartUI();
 			};
 
 			var postData = 'action=skyyrose_immersive_add_to_cart' +
@@ -478,12 +488,14 @@
 		// Show after 15 seconds
 		setTimeout(showPopup, 15000);
 
-		// Exit intent on desktop
-		document.addEventListener('mouseout', function (e) {
+		// Exit intent on desktop — removed after trigger to avoid needless event checks.
+		function onExitIntent(e) {
 			if (e.clientY < 5 && !shown) {
 				showPopup();
+				document.removeEventListener('mouseout', onExitIntent);
 			}
-		});
+		}
+		document.addEventListener('mouseout', onExitIntent);
 
 		if (closeBtn) {
 			closeBtn.addEventListener('click', hidePopup);

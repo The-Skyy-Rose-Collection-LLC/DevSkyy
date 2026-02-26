@@ -81,13 +81,13 @@ $skyyrose_kc_shop_url   = function_exists( 'wc_get_page_permalink' ) ? wc_get_pa
 $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg' );
 ?>
 
-<main id="primary" class="site-main" role="main">
+<main id="primary" class="site-main" role="main" tabindex="-1">
 <div class="collection--kids-capsule" data-collection="kids-capsule">
 
 	<!-- ============================================================
 	     HERO SECTION
 	     ============================================================ -->
-	<section class="collection-hero" role="banner">
+	<section class="collection-hero" aria-label="<?php esc_attr_e( 'Kids Capsule Hero', 'skyyrose-flagship' ); ?>">
 		<div class="collection-hero__overlay" aria-hidden="true"></div>
 
 		<div class="collection-hero__content fade-in-up">

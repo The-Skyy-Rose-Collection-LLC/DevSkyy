@@ -82,7 +82,7 @@ $skyyrose_br_logo_url    = esc_url( get_template_directory_uri() . '/assets/bran
 $skyyrose_br_scene_url   = esc_url( get_template_directory_uri() . '/assets/scenes/black-rose/black-rose-marble-rotunda.png' );
 ?>
 
-<main id="primary" class="site-main" role="main">
+<main id="primary" class="site-main" role="main" tabindex="-1">
 <div class="collection--black-rose" data-collection="black-rose">
 
 	<!-- ============================================================

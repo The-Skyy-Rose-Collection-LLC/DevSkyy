@@ -53,7 +53,7 @@ function skyyrose_product_schema() {
 			'@type'         => 'Offer',
 			'url'           => get_permalink( $product->get_id() ),
 			'priceCurrency' => get_woocommerce_currency(),
-			'price'         => $product->get_price(),
+			'price'         => $product->is_type( 'variable' ) ? $product->get_variation_price( 'min' ) : $product->get_price(),
 			'availability'  => $product->is_in_stock() ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
 		),
 	);

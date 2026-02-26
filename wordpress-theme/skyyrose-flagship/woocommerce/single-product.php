@@ -6,9 +6,10 @@
  * Features: sticky gallery, color/size selectors, quantity controls,
  * accordions, related products, collection-specific gradient overlay.
  *
+ * @see     https://woocommerce.com/document/template-structure/
  * @package SkyyRose_Flagship
  * @since   2.0.0
- * @version 9.5.0
+ * @version 1.6.4
  */
 
 defined( 'ABSPATH' ) || exit;

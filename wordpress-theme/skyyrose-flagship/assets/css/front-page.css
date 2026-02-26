@@ -1208,4 +1208,18 @@
 	.why-skyyrose__card-glow {
 		transition: none;
 	}
+
+	.hero__orb {
+		animation: none;
+	}
+
+	.hero__sparkle {
+		animation: none;
+	}
+
+	.js-scroll-reveal {
+		transition: none !important;
+		opacity: 1 !important;
+		transform: none !important;
+	}
 }

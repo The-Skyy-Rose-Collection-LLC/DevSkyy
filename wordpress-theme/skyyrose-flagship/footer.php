@@ -116,7 +116,7 @@
 						<li><a href="<?php echo esc_url( home_url( '/collection-love-hurts/' ) ); ?>"><?php esc_html_e( 'Love Hurts', 'skyyrose-flagship' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/collection-signature/' ) ); ?>"><?php esc_html_e( 'Signature', 'skyyrose-flagship' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/collection-kids-capsule/' ) ); ?>"><?php esc_html_e( 'Kids Capsule', 'skyyrose-flagship' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/preorder/' ) ); ?>"><?php esc_html_e( 'Pre-Order', 'skyyrose-flagship' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"><?php esc_html_e( 'Pre-Order', 'skyyrose-flagship' ); ?></a></li>
 						<?php if ( class_exists( 'WooCommerce' ) ) : ?>
 							<li><a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>"><?php esc_html_e( 'All Products', 'skyyrose-flagship' ); ?></a></li>
 						<?php endif; ?>

@@ -130,7 +130,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 			$skyyrose_trending_products[] = array(
 				'name'  => $skyyrose_404_product['name'],
 				'price' => skyyrose_format_price( $skyyrose_404_product ),
-				'link'  => home_url( '/preorder/' ),
+				'link'  => home_url( '/pre-order/' ),
 				'image' => $skyyrose_404_image,
 			);
 		}

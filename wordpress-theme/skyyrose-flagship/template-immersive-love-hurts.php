@@ -82,7 +82,7 @@ $love_hurts_rooms = array(
 get_header();
 ?>
 
-<main id="primary" class="site-main immersive-page">
+<main id="primary" class="site-main immersive-page" role="main" tabindex="-1">
 
 	<div class="immersive-scene immersive-love-hurts" role="region" aria-label="<?php esc_attr_e( 'Love Hurts Collection — The Ballroom', 'skyyrose-flagship' ); ?>">
 
@@ -229,7 +229,7 @@ get_header();
 		<a href="<?php echo esc_url( home_url( '/experience-signature/' ) ); ?>" class="immersive-tab" style="--tab-accent: #B76E79;">
 			<?php echo esc_html__( 'Signature', 'skyyrose-flagship' ); ?>
 		</a>
-		<a href="<?php echo esc_url( home_url( '/preorder/' ) ); ?>" class="immersive-tab" style="--tab-accent: #D4AF37;">
+		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="immersive-tab" style="--tab-accent: #D4AF37;">
 			<?php echo esc_html__( 'Pre-Order', 'skyyrose-flagship' ); ?>
 		</a>
 	</nav>

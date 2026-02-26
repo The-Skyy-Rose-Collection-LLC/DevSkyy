@@ -43,7 +43,11 @@ $has_glb      = ! empty( $glb_relative )
 	&& false !== $glb_realbase
 	&& 0 === strpos( $glb_realpath, $glb_realbase . DIRECTORY_SEPARATOR )
 	&& file_exists( $glb_realpath );
-$extra_class = ! empty( $args['class'] ) ? ' ' . sanitize_html_class( $args['class'] ) : '';
+if ( ! empty( $args['class'] ) ) {
+	$extra_class = ' ' . implode( ' ', array_map( 'sanitize_html_class', array_filter( explode( ' ', $args['class'] ) ) ) );
+} else {
+	$extra_class = '';
+}
 ?>
 
 <div class="brand-avatar<?php echo esc_attr( $extra_class ); ?>">

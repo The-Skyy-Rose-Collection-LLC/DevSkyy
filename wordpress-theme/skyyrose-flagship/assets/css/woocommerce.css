@@ -259,3 +259,11 @@
 	color: var(--skyy-woo-accent);
 	font-weight: 600;
 }
+
+/* Reduced motion — WooCommerce base */
+@media (prefers-reduced-motion: reduce) {
+	* {
+		transition-duration: 0.01ms !important;
+		animation-duration: 0.01ms !important;
+	}
+}

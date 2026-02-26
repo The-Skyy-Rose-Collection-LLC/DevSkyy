@@ -114,7 +114,7 @@ $skyyrose_sg_logo_url    = esc_url( get_template_directory_uri() . '/assets/bran
 $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scenes/signature/signature-golden-gate-showroom.png' );
 ?>
 
-<main id="primary" class="site-main" role="main">
+<main id="primary" class="site-main" role="main" tabindex="-1">
 <div class="collection--signature" data-collection="signature">
 
 	<!-- ============================================================

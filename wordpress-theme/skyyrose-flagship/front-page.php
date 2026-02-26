@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 ?>
 
-<main id="primary" class="site-main front-page" role="main">
+<main id="primary" class="site-main front-page" role="main" tabindex="-1">
 
 	<?php
 	// Hero — 100vh with animated orbs, sparkles, brand name reveal.

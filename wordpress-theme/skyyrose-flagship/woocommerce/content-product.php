@@ -5,16 +5,18 @@
  * Overrides WooCommerce templates/content-product.php.
  * Used in shop archives and related products grids.
  *
+ * @see     https://woocommerce.com/document/template-structure/
  * @package SkyyRose_Flagship
  * @since   2.0.0
- * @version 9.5.0
+ * @version 9.4.0
  */
 
 defined( 'ABSPATH' ) || exit;
 
 global $product;
 
-if ( empty( $product ) || ! $product->is_visible() ) {
+// Check if the product is a valid WooCommerce product and ensure its visibility before proceeding.
+if ( ! is_a( $product, WC_Product::class ) || ! $product->is_visible() ) {
 	return;
 }
 

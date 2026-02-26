@@ -49,7 +49,7 @@ foreach ( $preorder_groups as $collection_slug => $products ) {
 get_header();
 ?>
 
-<main id="primary" class="site-main">
+<main id="primary" class="site-main" role="main" tabindex="-1">
 
 	<!-- Loading Screen -->
 	<div class="preorder-loading" aria-hidden="true">
@@ -146,9 +146,6 @@ get_header();
 						data-product-collection-label="<?php echo esc_attr( $product['collection_label'] ); ?>"
 						data-product-desc="<?php echo esc_attr( $product['desc'] ); ?>"
 						data-product-sizes="<?php echo esc_attr( $product['sizes'] ); ?>"
-						role="button"
-						tabindex="0"
-						aria-label="<?php echo esc_attr( $product['name'] . ' — ' . $product['price'] ); ?>"
 					>
 						<div class="product-grid-image">
 							<img
@@ -184,6 +181,9 @@ get_header();
 								</p>
 							<?php endif; ?>
 						</div>
+						<button class="product-grid-view-btn" type="button" aria-label="<?php echo esc_attr( sprintf( __( 'View %s details', 'skyyrose-flagship' ), $product['name'] ) ); ?>">
+							<?php esc_html_e( 'View Details', 'skyyrose-flagship' ); ?>
+						</button>
 					</article>
 				<?php endforeach; ?>
 			</div>
@@ -193,7 +193,7 @@ get_header();
 
 	<!-- Product Modal -->
 	<div class="product-modal-overlay" aria-hidden="true">
-		<div class="product-modal" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Product details', 'skyyrose-flagship' ); ?>">
+		<div class="product-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-label="<?php esc_attr_e( 'Product details', 'skyyrose-flagship' ); ?>">
 			<button class="product-modal-close" type="button" aria-label="<?php esc_attr_e( 'Close', 'skyyrose-flagship' ); ?>">&times;</button>
 			<div class="modal-360-area">
 				<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Product preview', 'skyyrose-flagship' ); ?>" width="400" height="400">
@@ -218,7 +218,7 @@ get_header();
 
 	<!-- Cart Sidebar -->
 	<div class="cart-sidebar-overlay" aria-hidden="true"></div>
-	<aside class="cart-sidebar" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Shopping cart', 'skyyrose-flagship' ); ?>">
+	<aside class="cart-sidebar" role="dialog" aria-modal="true" aria-hidden="true" aria-label="<?php esc_attr_e( 'Shopping cart', 'skyyrose-flagship' ); ?>">
 		<div class="cart-sidebar-header">
 			<h3 class="cart-sidebar-title"><?php echo esc_html__( 'Your Cart', 'skyyrose-flagship' ); ?></h3>
 			<button class="cart-sidebar-close" type="button" aria-label="<?php esc_attr_e( 'Close cart', 'skyyrose-flagship' ); ?>">&times;</button>
@@ -240,7 +240,7 @@ get_header();
 
 	<!-- Sign-In Panel -->
 	<div class="signin-overlay" aria-hidden="true"></div>
-	<aside class="signin-panel" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Sign in', 'skyyrose-flagship' ); ?>">
+	<aside class="signin-panel" role="dialog" aria-modal="true" aria-hidden="true" aria-label="<?php esc_attr_e( 'Sign in', 'skyyrose-flagship' ); ?>">
 		<div class="signin-header">
 			<h3 class="signin-title"><?php echo esc_html__( 'Welcome Back', 'skyyrose-flagship' ); ?></h3>
 			<button class="signin-close" type="button" aria-label="<?php esc_attr_e( 'Close sign-in', 'skyyrose-flagship' ); ?>">&times;</button>
@@ -313,7 +313,7 @@ get_header();
 
 	<!-- Exclusive Incentive Popup — triggers after 15s or on exit intent -->
 	<div class="incentive-popup-overlay" aria-hidden="true">
-		<div class="incentive-popup" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Exclusive early access offer', 'skyyrose-flagship' ); ?>">
+		<div class="incentive-popup" role="dialog" aria-modal="true" aria-hidden="true" aria-label="<?php esc_attr_e( 'Exclusive early access offer', 'skyyrose-flagship' ); ?>">
 			<button class="incentive-popup-close" type="button" aria-label="<?php esc_attr_e( 'Close', 'skyyrose-flagship' ); ?>">&times;</button>
 			<div class="incentive-popup-content">
 				<div class="incentive-popup-monogram"><?php echo esc_html__( 'SR', 'skyyrose-flagship' ); ?></div>

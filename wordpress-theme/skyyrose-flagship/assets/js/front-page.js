@@ -39,16 +39,25 @@
 	function initSparkles() {
 		if (!sparkleContainer) return;
 
+		var motionQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+
 		// Skip sparkles entirely when user prefers reduced motion.
-		if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		if (motionQuery && motionQuery.matches) return;
 
 		// Initial burst.
 		for (var i = 0; i < 12; i++) {
 			setTimeout(createSparkle, i * 150);
 		}
 
-		// Ongoing sparkles.
-		setInterval(createSparkle, 400);
+		// Ongoing sparkles — store reference so it can be cleared.
+		var sparkleInterval = setInterval(createSparkle, 400);
+
+		// Stop sparkles if user enables reduced motion mid-session.
+		if (motionQuery && motionQuery.addEventListener) {
+			motionQuery.addEventListener('change', function (e) {
+				if (e.matches) clearInterval(sparkleInterval);
+			});
+		}
 	}
 
 	/* --------------------------------------------------

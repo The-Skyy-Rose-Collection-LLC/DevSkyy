@@ -75,7 +75,7 @@ function skyyrose_get_love_hurts_products() {
 				'sku'        => 'lh-002b',
 				'name'       => __( 'Love Hurts Joggers (WHITE)', 'skyyrose-flagship' ),
 				'price'      => skyyrose_format_price( $p ),
-				'desc'       => 'The same Oakland fire in a fresh white colorway — embroidered rose, tapered fit',
+				'desc'       => __( 'The same Oakland fire in a fresh white colorway — embroidered rose, tapered fit', 'skyyrose-flagship' ),
 				'badge'      => __( 'New', 'skyyrose-flagship' ),
 				'image'      => skyyrose_product_image_uri( $primary_img ),
 				'back_image' => '',
@@ -94,7 +94,7 @@ $skyyrose_lh_logo_url    = esc_url( get_template_directory_uri() . '/assets/bran
 $skyyrose_lh_scene_url   = esc_url( get_template_directory_uri() . '/assets/scenes/love-hurts/love-hurts-giant-rose-staircase.png' );
 ?>
 
-<main id="primary" class="site-main" role="main">
+<main id="primary" class="site-main" role="main" tabindex="-1">
 <div class="collection--love-hurts" data-collection="love-hurts">
 
 	<!-- ============================================================

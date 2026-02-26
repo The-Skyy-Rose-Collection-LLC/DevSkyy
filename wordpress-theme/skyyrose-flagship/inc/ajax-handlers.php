@@ -50,14 +50,14 @@ function skyyrose_ajax_contact_submit() {
 	}
 
 	// Sanitize input fields (contact form sends first_name + last_name).
-	$first_name = sanitize_text_field( wp_unslash( $_POST['first_name'] ?? '' ) );
-	$last_name  = sanitize_text_field( wp_unslash( $_POST['last_name'] ?? '' ) );
+	$first_name = mb_substr( sanitize_text_field( wp_unslash( $_POST['first_name'] ?? '' ) ), 0, 100 );
+	$last_name  = mb_substr( sanitize_text_field( wp_unslash( $_POST['last_name'] ?? '' ) ), 0, 100 );
 	$name       = trim( $first_name . ' ' . $last_name );
 	$email      = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
-	$phone             = sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) );
-	$subject           = sanitize_text_field( wp_unslash( $_POST['subject'] ?? '' ) );
-	$message           = sanitize_textarea_field( wp_unslash( $_POST['message'] ?? '' ) );
-	$order_number      = sanitize_text_field( wp_unslash( $_POST['order_number'] ?? '' ) );
+	$phone             = mb_substr( sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) ), 0, 30 );
+	$subject           = mb_substr( sanitize_text_field( wp_unslash( $_POST['subject'] ?? '' ) ), 0, 200 );
+	$message           = mb_substr( sanitize_textarea_field( wp_unslash( $_POST['message'] ?? '' ) ), 0, 5000 );
+	$order_number      = mb_substr( sanitize_text_field( wp_unslash( $_POST['order_number'] ?? '' ) ), 0, 50 );
 	$preferred_contact = sanitize_key( wp_unslash( $_POST['preferred_contact'] ?? 'email' ) );
 
 	// Validate required fields.
@@ -284,7 +284,7 @@ function skyyrose_ajax_signin() {
 
 	// Rate limiting: max 5 attempts per email per 15 minutes.
 	// Uses email (not IP) because REMOTE_ADDR is the proxy IP on WordPress.com.
-	$cache_key = 'skyyrose_login_attempts_' . md5( $email );
+	$cache_key = 'skyyrose_login_attempts_' . md5( strtolower( trim( $email ) ) );
 	$attempts  = (int) get_transient( $cache_key );
 
 	if ( $attempts >= 5 ) {
