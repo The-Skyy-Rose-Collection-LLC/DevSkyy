@@ -248,6 +248,7 @@ function skyyrose_ajax_add_to_wishlist() {
 				'message' => esc_html__( 'Invalid product ID.', 'skyyrose-flagship' ),
 			)
 		);
+		return;
 	}
 
 	$result = skyyrose_add_to_wishlist( $product_id );
@@ -286,6 +287,7 @@ function skyyrose_ajax_remove_from_wishlist() {
 				'message' => esc_html__( 'Invalid product ID.', 'skyyrose-flagship' ),
 			)
 		);
+		return;
 	}
 
 	$result = skyyrose_remove_from_wishlist( $product_id );
@@ -324,6 +326,7 @@ function skyyrose_ajax_move_to_cart() {
 				'message' => esc_html__( 'Invalid product ID.', 'skyyrose-flagship' ),
 			)
 		);
+		return;
 	}
 
 	$result = skyyrose_move_to_cart( $product_id );
@@ -416,9 +419,10 @@ add_action( 'wp_ajax_nopriv_skyyrose_move_all_to_cart', 'skyyrose_ajax_move_all_
 function skyyrose_register_wishlist_rest_routes() {
 	// Permission callback using WP_REST_Request for security.
 	$permission_callback = function( WP_REST_Request $request ) {
-		// Allow GET requests without authentication (for public wishlist viewing).
+		// GET requests require nonce to prevent cross-origin wishlist enumeration.
 		if ( 'GET' === $request->get_method() ) {
-			return true;
+			$nonce = $request->get_header( 'X-WP-Nonce' );
+			return $nonce && wp_verify_nonce( $nonce, 'wp_rest' );
 		}
 		// Write operations require authenticated user and valid nonce.
 		if ( ! is_user_logged_in() ) {
@@ -623,15 +627,22 @@ function skyyrose_rest_clear_wishlist( $request ) {
  * @since 1.0.0
  */
 function skyyrose_enqueue_wishlist_assets() {
-	// Enqueue wishlist CSS.
-	wp_enqueue_style(
-		'skyyrose-wishlist',
-		SKYYROSE_ASSETS_URI . '/css/wishlist.css',
-		array(),
-		SKYYROSE_VERSION
-	);
+	// Enqueue wishlist CSS (with file_exists guard to prevent 404s on partial deploys).
+	$css_path = SKYYROSE_DIR . '/assets/css/wishlist.css';
+	if ( file_exists( $css_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-wishlist',
+			SKYYROSE_ASSETS_URI . '/css/wishlist.css',
+			array(),
+			SKYYROSE_VERSION
+		);
+	}
 
 	// Enqueue wishlist JS.
+	$js_path = SKYYROSE_DIR . '/assets/js/wishlist.js';
+	if ( ! file_exists( $js_path ) ) {
+		return;
+	}
 	wp_enqueue_script(
 		'skyyrose-wishlist',
 		SKYYROSE_ASSETS_URI . '/js/wishlist.js',

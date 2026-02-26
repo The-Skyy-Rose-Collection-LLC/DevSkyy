@@ -70,6 +70,7 @@ $love_hurts_rooms = array(
 			) ),
 			skyyrose_immersive_product( 'lh-002b', array(
 				'name'       => esc_html__( 'Love Hurts Joggers (WHITE)', 'skyyrose-flagship' ),
+				'image'      => get_theme_file_uri( 'assets/images/products/lh-002-joggers.webp' ),
 				'left'       => '65',
 				'top'        => '48',
 				'prop'       => 'glass-dome',

@@ -587,7 +587,7 @@ $faq_items = array(
 						<?php esc_html_e( 'Mon-Fri 9AM-6PM PST | Sat 10AM-4PM', 'skyyrose-flagship' ); ?>
 					</p>
 					<a
-						href="https://www.google.com/maps/search/?api=1&query=Oakland+CA+94612"
+						href="<?php echo esc_url( 'https://www.google.com/maps/search/?api=1&query=Oakland+CA+94612' ); ?>"
 						class="contact-map__directions"
 						target="_blank"
 						rel="noopener noreferrer"
