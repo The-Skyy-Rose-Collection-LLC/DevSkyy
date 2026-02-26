@@ -533,107 +533,12 @@
 	}
 
 	/* --------------------------------------------------
-	   Add-to-Cart (Pre-Order) via WooCommerce AJAX
+	   Add-to-Cart State
+	   Actual WooCommerce AJAX is handled by immersive-wc-bridge.js.
+	   This section only maintains shared state used by hotspot click.
 	   -------------------------------------------------- */
 
-	var panelAddToCart = panel ? panel.querySelector('.btn-add-to-cart') : null;
 	var currentProductId = null;
-
-	function initAddToCart() {
-		if (!panelAddToCart) return;
-
-		panelAddToCart.addEventListener('click', function () {
-			if (!currentProductId) return;
-
-			// Check if WooCommerce AJAX endpoint is available.
-			var wcAjaxUrl = getWcAjaxUrl();
-			if (!wcAjaxUrl) {
-				showCartNotification('Pre-order unavailable. Please visit the product page.');
-				return;
-			}
-
-			panelAddToCart.disabled = true;
-			var originalText = panelAddToCart.textContent;
-			panelAddToCart.textContent = 'Adding...';
-
-			var xhr = new XMLHttpRequest();
-			xhr.open('POST', wcAjaxUrl + '?wc-ajax=add_to_cart', true);
-			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-			xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-			// Get selected size before sending request (must be before onload to avoid hoisting issue).
-			var selectedSize = '';
-			if (panelSizes) {
-				var selectedBtn = panelSizes.querySelector('.size-btn.selected');
-				if (selectedBtn) {
-					selectedSize = selectedBtn.textContent;
-				}
-			}
-
-			xhr.onload = function () {
-				panelAddToCart.disabled = false;
-				if (xhr.status >= 200 && xhr.status < 300) {
-					try {
-						var response = JSON.parse(xhr.responseText);
-						if (response.error) {
-							showCartNotification('Could not add item. Please try from the product page.');
-						} else {
-							panelAddToCart.textContent = 'Added!';
-							showCartNotification('Added to pre-order cart!');
-							// Analytics: track successful add-to-cart.
-							trackHotspotEvent('add_to_cart', {
-								product_id:    currentProductId,
-								product_name:  panelName ? panelName.textContent : '',
-								product_price: panelPrice ? panelPrice.textContent : '',
-								size:          selectedSize,
-								room:          getCurrentRoomName()
-							});
-							// Trigger WooCommerce cart fragment refresh.
-							if (typeof jQuery !== 'undefined') {
-								jQuery(document.body).trigger('wc_fragment_refresh');
-							}
-							setTimeout(function () {
-								panelAddToCart.textContent = originalText;
-							}, 2000);
-							return;
-						}
-					} catch (e) {
-						showCartNotification('Could not add item. Please try from the product page.');
-					}
-				} else {
-					showCartNotification('Could not add item. Please try from the product page.');
-				}
-				panelAddToCart.textContent = originalText;
-			};
-
-			xhr.onerror = function () {
-				panelAddToCart.disabled = false;
-				panelAddToCart.textContent = originalText;
-				showCartNotification('Network error. Please try again.');
-			};
-
-			var postData = 'product_id=' + encodeURIComponent(currentProductId) +
-				'&quantity=1';
-			if (selectedSize) {
-				postData += '&attribute_pa_size=' + encodeURIComponent(selectedSize);
-			}
-			xhr.send(postData);
-		});
-	}
-
-	/**
-	 * Determine the WooCommerce AJAX URL. WordPress.com uses
-	 * index.php?rest_route= but the wc-ajax endpoint is on the
-	 * standard site URL as a query parameter.
-	 */
-	function getWcAjaxUrl() {
-		// wc_add_to_cart_params is localized by WooCommerce when active.
-		if (typeof wc_add_to_cart_params !== 'undefined' && wc_add_to_cart_params.wc_ajax_url) {
-			return wc_add_to_cart_params.wc_ajax_url.toString().replace('%%endpoint%%', 'add_to_cart');
-		}
-		// No fallback — WP.com routing requires the localized URL.
-		return null;
-	}
 
 	function showCartNotification(message) {
 		// Reuse existing notification or create one.
@@ -705,7 +610,6 @@
 		initEnhancedTransitions();
 		initParallax();
 		initCinematicIntegration();
-		initAddToCart();
 		initHotspotPreview();
 	}
 

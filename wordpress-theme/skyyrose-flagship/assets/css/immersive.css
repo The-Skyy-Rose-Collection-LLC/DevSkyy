@@ -400,7 +400,7 @@
 	font-weight: 400;
 	font-style: italic;
 	letter-spacing: 0.06em;
-	color: rgba(255, 255, 255, 0.45);
+	color: rgba(255, 255, 255, 0.6);
 	margin: 0 0 0.5rem;
 }
 
@@ -598,7 +598,7 @@
 	font-weight: 500;
 	letter-spacing: 0.2em;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.45);
+	color: rgba(255, 255, 255, 0.6);
 	white-space: nowrap;
 }
 

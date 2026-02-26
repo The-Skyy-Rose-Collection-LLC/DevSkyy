@@ -86,7 +86,7 @@ $collections = array(
 								<path d="M5 12h14M12 5l7 7-7 7"/>
 							</svg>
 						</a>
-						<a href="<?php echo esc_url( home_url( '/immersive/' . $collection['slug'] . '/' ) ); ?>" class="btn btn--immersive">
+						<a href="<?php echo esc_url( home_url( '/experience-' . $collection['slug'] . '/' ) ); ?>" class="btn btn--immersive">
 							<?php esc_html_e( 'Immersive Experience', 'skyyrose-flagship' ); ?>
 						</a>
 					</div>

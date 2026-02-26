@@ -6,9 +6,10 @@
  * Features: dark #0A0A0A background, 150px product images, quantity controls,
  * sticky order summary sidebar, empty cart state.
  *
+ * @see     https://woocommerce.com/document/template-structure/
  * @package SkyyRose_Flagship
  * @since   2.0.0
- * @version 9.5.0
+ * @version 10.1.0
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -79,6 +80,8 @@ do_action( 'woocommerce_before_cart' );
 					?>
 
 					<div class="skyy-cart__items-list" data-skyy-cart-items>
+						<?php do_action( 'woocommerce_before_cart_contents' ); ?>
+
 						<?php
 						foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) :
 							$_product   = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
@@ -92,6 +95,14 @@ do_action( 'woocommerce_before_cart' );
 								continue;
 							}
 
+							/**
+							 * Filter the product name.
+							 *
+							 * @since 2.1.0
+							 * @param string $product_name Name of the product in the cart.
+							 * @param array  $cart_item    The product in the cart.
+							 * @param string $cart_item_key Key for the product in the cart.
+							 */
 							$product_name      = apply_filters( 'woocommerce_cart_item_name', $_product->get_name(), $cart_item, $cart_item_key );
 							$product_permalink = apply_filters( 'woocommerce_cart_item_permalink', $_product->is_visible() ? $_product->get_permalink( $cart_item ) : '', $cart_item, $cart_item_key );
 							$product_price     = apply_filters( 'woocommerce_cart_item_price', WC()->cart->get_product_price( $_product ), $cart_item, $cart_item_key );
@@ -145,6 +156,18 @@ do_action( 'woocommerce_before_cart' );
 											</div>
 										<?php endif; ?>
 
+										<?php
+										do_action( 'woocommerce_after_cart_item_name', $cart_item, $cart_item_key );
+
+										// Meta data.
+										echo wc_get_formatted_cart_item_data( $cart_item ); // PHPCS: XSS ok.
+
+										// Backorder notification.
+										if ( $_product->backorders_require_notification() && $_product->is_on_backorder( $cart_item['quantity'] ) ) {
+											echo wp_kses_post( apply_filters( 'woocommerce_cart_item_backorder_notification', '<p class="backorder_notification">' . esc_html__( 'Available on backorder', 'skyyrose-flagship' ) . '</p>', $product_id ) );
+										}
+										?>
+
 										<div class="skyy-cart__item-price-single">
 											<?php echo wp_kses_post( $product_price ); ?>
 										</div>
@@ -152,35 +175,56 @@ do_action( 'woocommerce_before_cart' );
 
 									<!-- Quantity Controls -->
 									<div class="skyy-cart__item-quantity">
-										<div class="skyy-cart__qty-controls">
-											<button type="button"
-													class="skyy-cart__qty-btn skyy-cart__qty-btn--minus"
-													data-action="decrease"
-													data-key="<?php echo esc_attr( $cart_item_key ); ?>"
-													aria-label="<?php esc_attr_e( 'Decrease quantity', 'skyyrose-flagship' ); ?>">
-												<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-													<path d="M3 7h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-												</svg>
-											</button>
-											<input type="number"
-												   class="skyy-cart__qty-input"
-												   name="cart[<?php echo esc_attr( $cart_item_key ); ?>][qty]"
-												   value="<?php echo esc_attr( $cart_item['quantity'] ); ?>"
-												   min="0"
-												   max="<?php echo esc_attr( $_product->get_max_purchase_quantity() > 0 ? $_product->get_max_purchase_quantity() : 99 ); ?>"
-												   step="1"
-												   inputmode="numeric"
-												   aria-label="<?php esc_attr_e( 'Item quantity', 'skyyrose-flagship' ); ?>" />
-											<button type="button"
-													class="skyy-cart__qty-btn skyy-cart__qty-btn--plus"
-													data-action="increase"
-													data-key="<?php echo esc_attr( $cart_item_key ); ?>"
-													aria-label="<?php esc_attr_e( 'Increase quantity', 'skyyrose-flagship' ); ?>">
-												<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-													<path d="M7 3v8M3 7h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-												</svg>
-											</button>
-										</div>
+										<?php
+										if ( $_product->is_sold_individually() ) {
+											$min_quantity = 1;
+											$max_quantity = 1;
+										} else {
+											$min_quantity = 0;
+											$max_quantity = $_product->get_max_purchase_quantity();
+										}
+
+										$product_quantity = sprintf(
+											'<div class="skyy-cart__qty-controls">
+												<button type="button"
+														class="skyy-cart__qty-btn skyy-cart__qty-btn--minus"
+														data-action="decrease"
+														data-key="%1$s"
+														aria-label="%2$s">
+													<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+														<path d="M3 7h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+													</svg>
+												</button>
+												<input type="number"
+													   class="skyy-cart__qty-input"
+													   name="cart[%1$s][qty]"
+													   value="%3$s"
+													   min="%4$s"
+													   max="%5$s"
+													   step="1"
+													   inputmode="numeric"
+													   aria-label="%6$s" />
+												<button type="button"
+														class="skyy-cart__qty-btn skyy-cart__qty-btn--plus"
+														data-action="increase"
+														data-key="%1$s"
+														aria-label="%7$s">
+													<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+														<path d="M7 3v8M3 7h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+													</svg>
+												</button>
+											</div>',
+											esc_attr( $cart_item_key ),
+											esc_attr__( 'Decrease quantity', 'skyyrose-flagship' ),
+											esc_attr( $cart_item['quantity'] ),
+											esc_attr( $min_quantity ),
+											esc_attr( $max_quantity > 0 ? $max_quantity : 99 ),
+											esc_attr__( 'Item quantity', 'skyyrose-flagship' ),
+											esc_attr__( 'Increase quantity', 'skyyrose-flagship' )
+										);
+
+										echo apply_filters( 'woocommerce_cart_item_quantity', $product_quantity, $cart_item_key, $cart_item ); // PHPCS: XSS ok.
+										?>
 									</div>
 
 									<!-- Price -->
@@ -194,7 +238,7 @@ do_action( 'woocommerce_before_cart' );
 										echo wp_kses_post( apply_filters(
 											'woocommerce_cart_item_remove_link',
 											sprintf(
-												'<a href="%s" class="skyy-cart__remove-btn" aria-label="%s" data-product_id="%s" data-product_sku="%s">&times;</a>',
+												'<a role="button" href="%s" class="skyy-cart__remove-btn" aria-label="%s" data-product_id="%s" data-product_sku="%s">&times;</a>',
 												esc_url( wc_get_cart_remove_url( $cart_item_key ) ),
 												/* translators: %s: product name */
 												esc_attr( sprintf( __( 'Remove %s from cart', 'skyyrose-flagship' ), wp_strip_all_tags( $product_name ) ) ),
@@ -216,6 +260,8 @@ do_action( 'woocommerce_before_cart' );
 					 * Hook: woocommerce_cart_contents.
 					 */
 					do_action( 'woocommerce_cart_contents' );
+
+					do_action( 'woocommerce_after_cart_contents' );
 					?>
 
 					<div class="skyy-cart__actions">
@@ -231,20 +277,23 @@ do_action( 'woocommerce_before_cart' );
 									   value=""
 									   placeholder="<?php esc_attr_e( 'Coupon code', 'skyyrose-flagship' ); ?>" />
 								<button type="submit"
-										class="skyy-cart__coupon-btn"
+										class="skyy-cart__coupon-btn<?php echo esc_attr( wc_wp_theme_get_element_class_name( 'button' ) ? ' ' . wc_wp_theme_get_element_class_name( 'button' ) : '' ); ?>"
 										name="apply_coupon"
 										value="<?php esc_attr_e( 'Apply', 'skyyrose-flagship' ); ?>">
 									<?php esc_html_e( 'Apply', 'skyyrose-flagship' ); ?>
 								</button>
+								<?php do_action( 'woocommerce_cart_coupon' ); ?>
 							</div>
 						<?php endif; ?>
 
 						<button type="submit"
-								class="skyy-cart__update-btn"
+								class="skyy-cart__update-btn<?php echo esc_attr( wc_wp_theme_get_element_class_name( 'button' ) ? ' ' . wc_wp_theme_get_element_class_name( 'button' ) : '' ); ?>"
 								name="update_cart"
 								value="<?php esc_attr_e( 'Update cart', 'skyyrose-flagship' ); ?>">
 							<?php esc_html_e( 'Update Cart', 'skyyrose-flagship' ); ?>
 						</button>
+
+						<?php do_action( 'woocommerce_cart_actions' ); ?>
 
 						<?php wp_nonce_field( 'woocommerce-cart', 'woocommerce-cart-nonce' ); ?>
 					</div>
@@ -268,6 +317,8 @@ do_action( 'woocommerce_before_cart' );
 					</a>
 				</div>
 			</div>
+
+			<?php do_action( 'woocommerce_before_cart_collaterals' ); ?>
 
 			<!-- ORDER SUMMARY SIDEBAR (Sticky, 400px) -->
 			<aside class="skyy-cart__summary" data-skyy-cart-summary>
