@@ -26,7 +26,7 @@ $testimonials = array(
 		'quote'    => __( 'Wore The Fannie to a gallery opening and got stopped five times. People wanted to know the brand. SkyyRose is about to blow up — get in now.', 'skyyrose-flagship' ),
 		'name'     => __( 'Jasmine R.', 'skyyrose-flagship' ),
 		'location' => __( 'Los Angeles, CA', 'skyyrose-flagship' ),
-		'product'  => __( 'The Fannie', 'skyyrose-flagship' ),
+		'product'  => __( 'The Fannie Pack', 'skyyrose-flagship' ),
 		'rating'   => 5,
 		'verified' => true,
 	),

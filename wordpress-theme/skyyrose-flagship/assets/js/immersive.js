@@ -279,6 +279,7 @@
 
 	function goToRoom(index) {
 		if (isTransitioning || index === currentRoom || index < 0 || index >= totalRooms) return;
+		if (!layers[currentRoom] || !layers[index]) return;
 
 		isTransitioning = true;
 
