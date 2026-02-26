@@ -31,7 +31,8 @@
 
 .skip-link:focus {
 	top: 0;
-	outline: none;
+	outline: 3px solid #fff;
+	outline-offset: 2px;
 }
 
 /* ==================================================

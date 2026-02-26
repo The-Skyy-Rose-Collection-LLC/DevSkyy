@@ -54,11 +54,22 @@ function skyyrose_ajax_contact_submit() {
 	$last_name  = mb_substr( sanitize_text_field( wp_unslash( $_POST['last_name'] ?? '' ) ), 0, 100 );
 	$name       = trim( $first_name . ' ' . $last_name );
 	$email      = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
-	$phone             = mb_substr( sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) ), 0, 30 );
-	$subject           = mb_substr( sanitize_text_field( wp_unslash( $_POST['subject'] ?? '' ) ), 0, 200 );
+	$phone             = str_replace( array( "\r", "\n", "\t" ), '', mb_substr( sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) ), 0, 30 ) );
+	$subject_raw       = mb_substr( sanitize_text_field( wp_unslash( $_POST['subject'] ?? '' ) ), 0, 200 );
 	$message           = mb_substr( sanitize_textarea_field( wp_unslash( $_POST['message'] ?? '' ) ), 0, 5000 );
-	$order_number      = mb_substr( sanitize_text_field( wp_unslash( $_POST['order_number'] ?? '' ) ), 0, 50 );
+	$order_number      = str_replace( array( "\r", "\n", "\t" ), '', mb_substr( sanitize_text_field( wp_unslash( $_POST['order_number'] ?? '' ) ), 0, 50 ) );
 	$preferred_contact = sanitize_key( wp_unslash( $_POST['preferred_contact'] ?? 'email' ) );
+
+	// Map subject slugs to human-readable labels.
+	$subject_labels = array(
+		'general-inquiry'    => __( 'General Inquiry', 'skyyrose-flagship' ),
+		'order-status'       => __( 'Order Status', 'skyyrose-flagship' ),
+		'returns-exchanges'  => __( 'Returns & Exchanges', 'skyyrose-flagship' ),
+		'collaboration'      => __( 'Collaboration', 'skyyrose-flagship' ),
+		'press'              => __( 'Press', 'skyyrose-flagship' ),
+		'other'              => __( 'Other', 'skyyrose-flagship' ),
+	);
+	$subject = isset( $subject_labels[ $subject_raw ] ) ? $subject_labels[ $subject_raw ] : $subject_raw;
 
 	// Validate required fields.
 	if ( empty( $name ) || empty( $email ) || empty( $message ) ) {
@@ -312,9 +323,13 @@ function skyyrose_ajax_signin() {
 	// Clear rate-limit counter on successful login.
 	delete_transient( $cache_key );
 
-	// Set authentication cookies.
+	// Initialize session and set authentication cookies.
 	$remember = isset( $_POST['remember'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['remember'] ) );
+	wp_set_current_user( $user->ID );
 	wp_set_auth_cookie( $user->ID, $remember );
+
+	/** Fires after a user signs in via AJAX — triggers WooCommerce session merge. */
+	do_action( 'wp_login', $user->user_login, $user );
 
 	wp_send_json_success(
 		array(

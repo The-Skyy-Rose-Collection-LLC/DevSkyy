@@ -48,7 +48,7 @@ foreach ( $featured_skus as $fsku ) {
 		'name'       => $p['name'],
 		'desc'       => $p['description'],
 		'price'      => skyyrose_format_price( $p ),
-		'rating'     => 5,
+		'rating'     => 0,
 		'reviews'    => 0,
 		'sku'        => $fsku,
 		'image'      => skyyrose_product_image_uri( $primary_img ),

@@ -141,10 +141,10 @@ function skyyrose_organization_schema() {
 		'legalName'   => 'SkyyRose LLC',
 		'url'         => home_url( '/' ),
 		'description' => __( 'Luxury Grows from Concrete. Premium streetwear and luxury fashion brand.', 'skyyrose-flagship' ),
-		'logo'        => array(
+		'logo'        => $logo_url ? array(
 			'@type' => 'ImageObject',
 			'url'   => $logo_url,
-		),
+		) : null,
 		'brand'       => array(
 			'@type' => 'Brand',
 			'name'  => 'SkyyRose',
@@ -185,6 +185,9 @@ function skyyrose_organization_schema() {
 			$schema['contactPoint']['email'] = $email;
 		}
 	}
+
+	// Remove null fields (e.g., logo when no custom logo is set).
+	$schema = array_filter( $schema, function ( $v ) { return null !== $v; } );
 
 	echo '<script type="application/ld+json">' . wp_json_encode( $schema ) . '</script>' . "\n";
 }

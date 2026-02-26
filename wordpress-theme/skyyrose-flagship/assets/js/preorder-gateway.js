@@ -147,6 +147,10 @@
 		first.focus();
 	}
 
+	// Direct references to sibling dialog elements (not children of overlays).
+	var productModal   = document.querySelector('.product-modal');
+	var incentivePopup = document.querySelector('.incentive-popup');
+
 	function openModal(data) {
 		if (!modalOverlay) return;
 
@@ -180,23 +184,29 @@
 		previousFocusEl = document.activeElement;
 		modalOverlay.classList.add('open');
 		modalOverlay.setAttribute('aria-hidden', 'false');
-		var dialog = modalOverlay.querySelector('[role="dialog"]') || modalOverlay;
-		dialog.setAttribute('aria-hidden', 'false');
-		trapFocus(dialog);
+		// Remove inert from the dialog so keyboard/AT users can interact.
+		if (productModal) {
+			productModal.removeAttribute('inert');
+			productModal.setAttribute('aria-hidden', 'false');
+			trapFocus(productModal);
+		}
 	}
 
 	function closeModal() {
 		if (modalOverlay) {
 			modalOverlay.classList.remove('open');
 			modalOverlay.setAttribute('aria-hidden', 'true');
-			var dialog = modalOverlay.querySelector('[role="dialog"]');
-			if (dialog) dialog.setAttribute('aria-hidden', 'true');
-			// Clean up focus trap handler to prevent accumulation.
-			if (focusTrapHandler && focusTrapContainer) {
-				focusTrapContainer.removeEventListener('keydown', focusTrapHandler);
-				focusTrapHandler = null;
-				focusTrapContainer = null;
-			}
+		}
+		// Restore inert on the dialog.
+		if (productModal) {
+			productModal.setAttribute('inert', '');
+			productModal.setAttribute('aria-hidden', 'true');
+		}
+		// Clean up focus trap handler to prevent accumulation.
+		if (focusTrapHandler && focusTrapContainer) {
+			focusTrapContainer.removeEventListener('keydown', focusTrapHandler);
+			focusTrapHandler = null;
+			focusTrapContainer = null;
 		}
 		if (previousFocusEl) {
 			previousFocusEl.focus();
@@ -260,17 +270,17 @@
 	   -------------------------------------------------- */
 
 	function showCartNotification(message) {
-		var msgEl = document.querySelector('.cart-empty-msg');
-		if (msgEl) {
-			var p = msgEl.querySelector('p');
-			if (p) {
-				p.textContent = message;
-				msgEl.style.display = '';
-				setTimeout(function () {
-					p.textContent = '';
-				}, 5000);
-			}
-		}
+		var container = cartSidebar || document.querySelector('.cart-sidebar');
+		if (!container) return;
+		// Create a dedicated notification element instead of reusing cart-empty-msg.
+		var el = document.createElement('div');
+		el.className = 'cart-notification';
+		el.setAttribute('role', 'alert');
+		el.textContent = message;
+		container.prepend(el);
+		setTimeout(function () {
+			if (el.parentNode) el.parentNode.removeChild(el);
+		}, 5000);
 	}
 
 	/* --------------------------------------------------
@@ -344,6 +354,9 @@
 			cartTotal.textContent = '$' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 		}
 
+		// Render item rows into the cart list.
+		renderCartItems();
+
 		// Show/hide empty message
 		if (cartEmptyMsg) {
 			cartEmptyMsg.style.display = cartCount === 0 ? '' : 'none';
@@ -355,14 +368,42 @@
 		}
 	}
 
+	function renderCartItems() {
+		if (!cartList) return;
+		// Remove existing item rows (but preserve the empty message element).
+		var rows = cartList.querySelectorAll('.cart-item-row');
+		rows.forEach(function (r) { r.parentNode.removeChild(r); });
+		cartItems.forEach(function (item) {
+			var row = document.createElement('div');
+			row.className = 'cart-item-row';
+			var nameSpan = document.createElement('span');
+			nameSpan.className = 'cart-item-row__name';
+			nameSpan.textContent = (item.name || '') + (item.size && item.size !== 'OS' ? ' — ' + item.size : '');
+			var priceSpan = document.createElement('span');
+			priceSpan.className = 'cart-item-row__price';
+			priceSpan.textContent = item.price || '';
+			row.appendChild(nameSpan);
+			row.appendChild(priceSpan);
+			cartList.appendChild(row);
+		});
+	}
+
 	function openCart() {
 		if (cartOverlay) cartOverlay.classList.add('open');
-		if (cartSidebar) cartSidebar.classList.add('open');
+		if (cartSidebar) {
+			cartSidebar.classList.add('open');
+			cartSidebar.removeAttribute('inert');
+			cartSidebar.setAttribute('aria-hidden', 'false');
+		}
 	}
 
 	function closeCartPanel() {
 		if (cartOverlay) cartOverlay.classList.remove('open');
-		if (cartSidebar) cartSidebar.classList.remove('open');
+		if (cartSidebar) {
+			cartSidebar.classList.remove('open');
+			cartSidebar.setAttribute('inert', '');
+			cartSidebar.setAttribute('aria-hidden', 'true');
+		}
 	}
 
 	function initCart() {
@@ -387,12 +428,20 @@
 
 	function openSignin() {
 		if (signinOverlay) signinOverlay.classList.add('open');
-		if (signinPanel) signinPanel.classList.add('open');
+		if (signinPanel) {
+			signinPanel.classList.add('open');
+			signinPanel.removeAttribute('inert');
+			signinPanel.setAttribute('aria-hidden', 'false');
+		}
 	}
 
 	function closeSigninPanel() {
 		if (signinOverlay) signinOverlay.classList.remove('open');
-		if (signinPanel) signinPanel.classList.remove('open');
+		if (signinPanel) {
+			signinPanel.classList.remove('open');
+			signinPanel.setAttribute('inert', '');
+			signinPanel.setAttribute('aria-hidden', 'true');
+		}
 	}
 
 	function initSignin() {
@@ -504,12 +553,20 @@
 			document.removeEventListener('mouseout', onExitIntent);
 			overlay.classList.add('open');
 			overlay.setAttribute('aria-hidden', 'false');
+			if (incentivePopup) {
+				incentivePopup.removeAttribute('inert');
+				incentivePopup.setAttribute('aria-hidden', 'false');
+			}
 			sessionStorage.setItem('sr_incentive_shown', '1');
 		}
 
 		function hidePopup() {
 			overlay.classList.remove('open');
 			overlay.setAttribute('aria-hidden', 'true');
+			if (incentivePopup) {
+				incentivePopup.setAttribute('inert', '');
+				incentivePopup.setAttribute('aria-hidden', 'true');
+			}
 		}
 
 		// Exit intent on desktop — removed after trigger to avoid needless event checks.
@@ -548,10 +605,17 @@
 					: form.getAttribute('action');
 				xhr.open('POST', ajaxUrl, true);
 				xhr.onload = function () {
-					if (submitBtn) {
-						submitBtn.textContent = 'Welcome to the Inner Circle!';
+					try {
+						var resp = JSON.parse(xhr.responseText);
+						if (resp && resp.success) {
+							if (submitBtn) submitBtn.textContent = 'Welcome to the Inner Circle!';
+							setTimeout(hidePopup, 2000);
+						} else {
+							if (submitBtn) { submitBtn.textContent = 'Try Again'; submitBtn.disabled = false; }
+						}
+					} catch (parseErr) {
+						if (submitBtn) { submitBtn.textContent = 'Try Again'; submitBtn.disabled = false; }
 					}
-					setTimeout(hidePopup, 2000);
 				};
 				xhr.onerror = function () {
 					if (submitBtn) {

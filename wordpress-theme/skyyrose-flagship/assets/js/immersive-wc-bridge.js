@@ -401,6 +401,7 @@
 
 		addBtn.addEventListener('click', function (e) {
 			e.preventDefault();
+			e.stopImmediatePropagation();
 
 			var productId = null;
 			var size = '';
@@ -462,7 +463,7 @@
 					addBtn.textContent = originalText;
 				}
 			});
-		}); // No add-to-cart handler in immersive.js — bridge is the sole handler.
+		}, true); // Capture phase — prevents WooCommerce default handler from double-firing.
 	}
 
 	/* --------------------------------------------------

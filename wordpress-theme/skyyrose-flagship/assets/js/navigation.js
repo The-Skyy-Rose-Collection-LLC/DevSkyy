@@ -202,7 +202,10 @@
 			}
 
 			var xhr = new XMLHttpRequest();
-			xhr.open('POST', footerForm.action || '', true);
+			var footerAjaxUrl = footerForm.action ||
+				(typeof skyyRoseData !== 'undefined' && skyyRoseData.ajaxUrl ? skyyRoseData.ajaxUrl : '');
+			if (!footerAjaxUrl) return;
+			xhr.open('POST', footerAjaxUrl, true);
 			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 			xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
