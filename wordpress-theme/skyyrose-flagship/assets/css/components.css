@@ -239,4 +239,15 @@
 	.skyyrose-film-grain {
 		display: none;
 	}
+	.skeleton {
+		animation: none;
+		background: rgba(255, 255, 255, 0.06);
+	}
+	.spinner {
+		animation: none;
+		border-top-color: var(--color-rose-gold, #B76E79);
+	}
+	.toast {
+		transition: none;
+	}
 }

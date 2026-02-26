@@ -455,7 +455,12 @@
 		document.body.appendChild(overlay);
 
 		// Close handlers.
+		function escHandler(e) {
+			if (e.key === 'Escape') dismiss();
+		}
+
 		function dismiss() {
+			document.removeEventListener('keydown', escHandler);
 			overlay.classList.remove('jge-visible');
 			setTimeout(function () {
 				if (overlay.parentNode) {
@@ -468,12 +473,7 @@
 		overlay.addEventListener('click', function (e) {
 			if (e.target === overlay) dismiss();
 		});
-		document.addEventListener('keydown', function handler(e) {
-			if (e.key === 'Escape') {
-				dismiss();
-				document.removeEventListener('keydown', handler);
-			}
-		});
+		document.addEventListener('keydown', escHandler);
 
 		// Show with animation.
 		requestAnimationFrame(function () {

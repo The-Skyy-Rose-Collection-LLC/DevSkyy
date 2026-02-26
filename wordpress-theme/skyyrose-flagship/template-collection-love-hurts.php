@@ -196,7 +196,8 @@ $skyyrose_lh_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	     ============================================================ -->
 	<section class="collection-immersive-cta">
 		<a href="<?php echo esc_url( home_url( '/experience-love-hurts/' ) ); ?>"
-		   class="collection-immersive-cta__link">
+		   class="collection-immersive-cta__link"
+		   aria-label="<?php esc_attr_e( 'Enter the Love Hurts 3D Experience', 'skyyrose-flagship' ); ?>">
 			<?php echo esc_html__( 'Enter the 3D Experience', 'skyyrose-flagship' ); ?>
 		</a>
 	</section>
