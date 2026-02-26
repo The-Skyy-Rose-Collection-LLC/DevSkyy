@@ -189,7 +189,7 @@ get_header();
 
 		<!-- Explore Full Collection CTA -->
 		<div class="immersive-cta">
-			<a href="<?php echo esc_url( home_url( '/collection/black-rose/' ) ); ?>" class="immersive-cta__link">
+			<a href="<?php echo esc_url( home_url( '/collection-black-rose/' ) ); ?>" class="immersive-cta__link">
 				<span class="immersive-cta__text"><?php esc_html_e( 'Explore the Full Collection', 'skyyrose-flagship' ); ?></span>
 				<svg class="immersive-cta__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 					<path d="M5 12h14"/>
@@ -218,7 +218,7 @@ get_header();
 					<button class="btn-add-to-cart" type="button"><?php echo esc_html__( 'Pre-Order Now', 'skyyrose-flagship' ); ?></button>
 					<a class="btn-view-details" href="#"><?php echo esc_html__( 'View Details', 'skyyrose-flagship' ); ?></a>
 				</div>
-				<a class="btn-view-collection" href="<?php echo esc_url( home_url( '/collection/black-rose/' ) ); ?>">
+				<a class="btn-view-collection" href="<?php echo esc_url( home_url( '/collection-black-rose/' ) ); ?>">
 					<?php esc_html_e( 'View Full Collection', 'skyyrose-flagship' ); ?>
 					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 						<path d="M5 12h14"/>

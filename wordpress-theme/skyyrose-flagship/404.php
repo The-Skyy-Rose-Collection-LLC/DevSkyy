@@ -382,15 +382,16 @@ if ( empty( $skyyrose_trending_products ) ) {
 			<p class="error-404-newsletter-text">
 				<?php esc_html_e( 'Be the first to know about drops, exclusives, and events.', 'skyyrose-flagship' ); ?>
 			</p>
-			<form class="error-404-newsletter-form" action="<?php echo esc_url( home_url( '/' ) ); ?>" method="post">
+			<form class="error-404-newsletter-form" action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>" method="post">
 				<?php wp_nonce_field( 'skyyrose_newsletter', 'skyyrose_newsletter_nonce' ); ?>
+				<input type="hidden" name="action" value="skyyrose_newsletter_subscribe">
 				<label for="error-404-newsletter-email" class="screen-reader-text">
 					<?php esc_html_e( 'Email address', 'skyyrose-flagship' ); ?>
 				</label>
 				<input
 					type="email"
 					id="error-404-newsletter-email"
-					name="skyyrose_newsletter_email"
+					name="email"
 					class="error-404-newsletter-input"
 					placeholder="<?php esc_attr_e( 'Enter your email', 'skyyrose-flagship' ); ?>"
 					required
