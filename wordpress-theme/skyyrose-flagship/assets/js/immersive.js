@@ -72,11 +72,11 @@
 			// Image already cached — short delay for polish.
 			setTimeout(dismissLoading, 400);
 		} else {
+			var fallbackTimer = setTimeout(dismissLoading, 5000);
 			firstImg.addEventListener('load', function () {
+				clearTimeout(fallbackTimer);
 				setTimeout(dismissLoading, 300);
 			});
-			// Fallback timeout in case image stalls.
-			setTimeout(dismissLoading, 5000);
 		}
 	}
 
@@ -138,15 +138,6 @@
 		panelOverlay.setAttribute('aria-hidden', 'false');
 		panel.removeAttribute('inert');
 		panel.setAttribute('aria-hidden', 'false');
-
-		// Update View Details link with product URL if available.
-		var viewDetailsLink = panel.querySelector('.btn-view-details');
-		if (viewDetailsLink && data.url) {
-			viewDetailsLink.href = data.url;
-			viewDetailsLink.style.display = '';
-		} else if (viewDetailsLink && !data.url) {
-			viewDetailsLink.style.display = 'none';
-		}
 
 		// Store product ID on panel for cross-script access (immersive-wc-bridge.js).
 		if (data.productId) {
@@ -304,12 +295,14 @@
 		layers[currentRoom].classList.remove('active');
 		layers[index].classList.add('active');
 
-		// Swap hotspot containers
+		// Swap hotspot containers — toggle inert + aria-hidden for keyboard safety.
 		if (hotspotGroups.length > 1) {
 			hotspotGroups[currentRoom].style.display = 'none';
 			hotspotGroups[currentRoom].setAttribute('aria-hidden', 'true');
+			hotspotGroups[currentRoom].setAttribute('inert', '');
 			hotspotGroups[index].style.display = '';
 			hotspotGroups[index].removeAttribute('aria-hidden');
+			hotspotGroups[index].removeAttribute('inert');
 		}
 
 		// Update dots
@@ -563,6 +556,7 @@
 	// NOTE: Cross-script product ID communication is handled via
 	// panel.dataset.currentProductId (set in openPanel, read by bridge).
 
+	var cartNotifTimer = null;
 	function showCartNotification(message) {
 		// Reuse existing notification or create one.
 		var notification = document.querySelector('.immersive-cart-notification');
@@ -577,9 +571,11 @@
 		notification.textContent = message;
 		notification.classList.add('visible');
 
-		setTimeout(function () {
+		if (cartNotifTimer) clearTimeout(cartNotifTimer);
+		cartNotifTimer = setTimeout(function () {
 			notification.classList.remove('visible');
-		}, 3000);
+			cartNotifTimer = null;
+		}, 3500);
 	}
 
 	/* --------------------------------------------------
