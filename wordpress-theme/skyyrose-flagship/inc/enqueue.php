@@ -288,6 +288,27 @@ function skyyrose_enqueue_template_styles() {
 		}
 	}
 
+	// WooCommerce page-specific CSS (loaded ON TOP of the base woocommerce.css).
+	$woo_page_styles = array(
+		'single-product' => 'woocommerce-single.css',
+		'cart'           => 'woocommerce-cart.css',
+		'checkout'       => 'woocommerce-checkout.css',
+	);
+
+	if ( isset( $woo_page_styles[ $slug ] ) ) {
+		$woo_file   = $woo_page_styles[ $slug ];
+		$woo_handle = 'skyyrose-' . sanitize_title( pathinfo( $woo_file, PATHINFO_FILENAME ) );
+
+		if ( file_exists( $base_css_dir . '/' . $woo_file ) ) {
+			wp_enqueue_style(
+				$woo_handle,
+				$base_css_uri . '/' . $woo_file,
+				array( 'skyyrose-template-woocommerce' ),
+				SKYYROSE_VERSION
+			);
+		}
+	}
+
 	// Brand mascot styles — loaded globally (widget appears on all pages).
 	if ( file_exists( $base_css_dir . '/mascot.css' ) ) {
 		wp_enqueue_style(
@@ -561,7 +582,8 @@ function skyyrose_enqueue_model_viewer() {
  */
 function skyyrose_model_viewer_module_type( $tag, $handle ) {
 	if ( 'google-model-viewer' === $handle ) {
-		return str_replace( '<script ', '<script type="module" ', $tag );
+		$tag = str_replace( '<script ', '<script type="module" crossorigin="anonymous" integrity="sha384-0BjW+rxF7Fz3QbhuW5QgwRN9lvXlkzJq7lGHbKev/5ETzSPb62mYgU/PtCrIHYqy" ', $tag );
+		return $tag;
 	}
 	return $tag;
 }

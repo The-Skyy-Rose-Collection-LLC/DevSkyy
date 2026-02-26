@@ -236,22 +236,22 @@ function skyyrose_get_collection_cta( $collection ) {
 	$ctas = array(
 		'black-rose'   => array(
 			'text'        => __( 'Enter the Cathedral', 'skyyrose-flagship' ),
-			'url'         => home_url( '/collection/black-rose/' ),
+			'url'         => home_url( '/collection-black-rose/' ),
 			'description' => __( 'Discover the Black Rose collection. Dark elegance awaits.', 'skyyrose-flagship' ),
 		),
 		'love-hurts'   => array(
 			'text'        => __( 'Feel Everything', 'skyyrose-flagship' ),
-			'url'         => home_url( '/collection/love-hurts/' ),
+			'url'         => home_url( '/collection-love-hurts/' ),
 			'description' => __( 'Explore the Love Hurts collection. Where passion meets pain.', 'skyyrose-flagship' ),
 		),
 		'signature'    => array(
 			'text'        => __( 'Define Your Style', 'skyyrose-flagship' ),
-			'url'         => home_url( '/collection/signature/' ),
+			'url'         => home_url( '/collection-signature/' ),
 			'description' => __( 'Shop the Signature collection. Timeless luxury, redefined.', 'skyyrose-flagship' ),
 		),
 		'kids-capsule' => array(
 			'text'        => __( 'Shop for Little Ones', 'skyyrose-flagship' ),
-			'url'         => home_url( '/collection/kids-capsule/' ),
+			'url'         => home_url( '/collection-kids-capsule/' ),
 			'description' => __( 'Explore the Kids Capsule. Luxury for the next generation.', 'skyyrose-flagship' ),
 		),
 	);

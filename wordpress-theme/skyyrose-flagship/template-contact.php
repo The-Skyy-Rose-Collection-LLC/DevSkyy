@@ -18,8 +18,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 
 // Customizer values with defaults.
-$contact_email = get_theme_mod( 'contact_email', 'hello@skyyrose.co' );
-$contact_phone = get_theme_mod( 'contact_phone', '' );
+$contact_email   = get_theme_mod( 'contact_email', 'hello@skyyrose.co' );
+$contact_phone   = get_theme_mod( 'contact_phone', '' );
+$showroom_line_1 = get_theme_mod( 'contact_address_1', 'Oakland, CA' );
+$showroom_line_2 = get_theme_mod( 'contact_address_2', 'By Appointment Only' );
 
 // Contact info cards data.
 $contact_cards = array(
@@ -34,8 +36,8 @@ $contact_cards = array(
 		'icon'        => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
 		'title'       => __( 'Visit Our Showroom', 'skyyrose-flagship' ),
 		'description' => __( 'Experience the collections in person by appointment.', 'skyyrose-flagship' ),
-		'line_1'      => __( '1234 Broadway, Suite 200', 'skyyrose-flagship' ),
-		'line_2'      => __( 'Oakland, CA 94612', 'skyyrose-flagship' ),
+		'line_1'      => esc_html( $showroom_line_1 ),
+		'line_2'      => esc_html( $showroom_line_2 ),
 	),
 	array(
 		'icon'        => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
@@ -572,8 +574,8 @@ $faq_items = array(
 						<?php esc_html_e( 'SkyyRose Showroom', 'skyyrose-flagship' ); ?>
 					</h3>
 					<p class="contact-map__address">
-						<?php esc_html_e( '1234 Broadway, Suite 200', 'skyyrose-flagship' ); ?><br>
-						<?php esc_html_e( 'Oakland, CA 94612', 'skyyrose-flagship' ); ?>
+						<?php echo esc_html( $showroom_line_1 ); ?><br>
+						<?php echo esc_html( $showroom_line_2 ); ?>
 					</p>
 					<p class="contact-map__hours">
 						<?php esc_html_e( 'Mon-Fri 9AM-6PM PST | Sat 10AM-4PM', 'skyyrose-flagship' ); ?>

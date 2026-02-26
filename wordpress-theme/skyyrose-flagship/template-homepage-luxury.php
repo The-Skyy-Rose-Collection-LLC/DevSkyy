@@ -43,7 +43,7 @@ get_header();
 						<span class="collection-badge">Signature</span>
 						<h3 class="collection-title"><?php esc_html_e( 'Signature Collection', 'skyyrose-flagship' ); ?></h3>
 						<p class="collection-description"><?php esc_html_e( 'West Coast prestige meets rose gold warmth. Premium hoodies, joggers, and statement pieces for the Bay Area lifestyle.', 'skyyrose-flagship' ); ?></p>
-						<a href="/collection/signature" class="btn btn-secondary"><?php esc_html_e( 'View Collection', 'skyyrose-flagship' ); ?></a>
+						<a href="<?php echo esc_url( home_url( '/collection-signature/' ) ); ?>" class="btn btn-secondary"><?php esc_html_e( 'View Collection', 'skyyrose-flagship' ); ?></a>
 					</div>
 				</article>
 
@@ -56,7 +56,7 @@ get_header();
 						<span class="collection-badge">Love Hurts</span>
 						<h3 class="collection-title"><?php esc_html_e( 'Love Hurts Collection', 'skyyrose-flagship' ); ?></h3>
 						<p class="collection-description"><?php esc_html_e( 'Raw passion in deep crimson. Varsity jackets, bombers, and streetwear for those who wear their heart on their sleeve.', 'skyyrose-flagship' ); ?></p>
-						<a href="/collection/love-hurts" class="btn btn-secondary"><?php esc_html_e( 'View Collection', 'skyyrose-flagship' ); ?></a>
+						<a href="<?php echo esc_url( home_url( '/collection-love-hurts/' ) ); ?>" class="btn btn-secondary"><?php esc_html_e( 'View Collection', 'skyyrose-flagship' ); ?></a>
 					</div>
 				</article>
 
@@ -69,7 +69,7 @@ get_header();
 						<span class="collection-badge">Black Rose</span>
 						<h3 class="collection-title"><?php esc_html_e( 'Black Rose Collection', 'skyyrose-flagship' ); ?></h3>
 						<p class="collection-description"><?php esc_html_e( 'Gothic luxury blooms in midnight. Embroidered hoodies, sherpa jackets, and fleece with defiant elegance.', 'skyyrose-flagship' ); ?></p>
-						<a href="/collection/black-rose" class="btn btn-secondary"><?php esc_html_e( 'View Collection', 'skyyrose-flagship' ); ?></a>
+						<a href="<?php echo esc_url( home_url( '/collection-black-rose/' ) ); ?>" class="btn btn-secondary"><?php esc_html_e( 'View Collection', 'skyyrose-flagship' ); ?></a>
 					</div>
 				</article>
 			</div>
