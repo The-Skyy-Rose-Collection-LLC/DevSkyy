@@ -6,9 +6,10 @@
  * Features: 4-step progress bar, multi-step form, sticky order summary
  * sidebar (420px), dark glass panels, WooCommerce hook integration.
  *
+ * @see     https://woocommerce.com/document/template-structure/
  * @package SkyyRose_Flagship
  * @since   2.0.0
- * @version 9.5.0
+ * @version 9.4.0
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -30,6 +31,12 @@ if ( WC()->cart->is_empty() && ! is_customize_preview() && apply_filters( 'wooco
  * @hooked woocommerce_checkout_coupon_form - 10
  */
 do_action( 'woocommerce_before_checkout_form', $checkout );
+
+// If checkout registration is disabled and not logged in, the user cannot checkout.
+if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_required() && ! is_user_logged_in() ) {
+	echo esc_html( apply_filters( 'woocommerce_checkout_must_be_logged_in_message', __( 'You must be logged in to checkout.', 'skyyrose-flagship' ) ) );
+	return;
+}
 ?>
 
 <div class="skyy-checkout" data-skyy-checkout>
@@ -68,6 +75,7 @@ do_action( 'woocommerce_before_checkout_form', $checkout );
 				  class="checkout woocommerce-checkout skyy-checkout__form"
 				  action="<?php echo esc_url( wc_get_checkout_url() ); ?>"
 				  enctype="multipart/form-data"
+				  aria-label="<?php echo esc_attr__( 'Checkout', 'skyyrose-flagship' ); ?>"
 				  data-skyy-checkout-form>
 
 				<?php

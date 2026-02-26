@@ -59,7 +59,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</span>
 
 		<!-- Rotating text cycling through collection names -->
-		<div class="hero__rotating" aria-live="polite" aria-atomic="true">
+		<div class="hero__rotating" aria-hidden="true">
 			<span class="hero__rotating-label">
 				<?php esc_html_e( 'Now Featuring:', 'skyyrose-flagship' ); ?>
 			</span>

@@ -66,7 +66,7 @@
 	font-weight: 300;
 	letter-spacing: 0.2em;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.35);
+	color: rgba(255, 255, 255, 0.6);
 }
 
 /* ==================================================
@@ -353,7 +353,7 @@
 	font-weight: 400;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.35);
+	color: rgba(255, 255, 255, 0.6);
 	margin: 0;
 }
 
@@ -638,7 +638,7 @@
 
 .cart-empty-msg p:last-child {
 	font-size: 0.85rem;
-	color: rgba(255, 255, 255, 0.35);
+	color: rgba(255, 255, 255, 0.6);
 	margin: 0;
 }
 
@@ -1008,7 +1008,7 @@
 	font-weight: 400;
 	letter-spacing: 0.15em;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.35);
+	color: rgba(255, 255, 255, 0.6);
 	margin-top: 4px;
 }
 
@@ -1024,7 +1024,7 @@
 	font-size: 0.6rem;
 	font-weight: 400;
 	letter-spacing: 0.1em;
-	color: rgba(255, 255, 255, 0.35);
+	color: rgba(255, 255, 255, 0.6);
 	text-transform: uppercase;
 }
 
@@ -1205,4 +1205,50 @@
 	.signin-panel {
 		transition-duration: 0.01ms;
 	}
+
+	.product-grid-card:hover {
+		transform: none;
+	}
+
+	.product-grid-card:hover .product-grid-image img {
+		transform: none;
+	}
+}
+
+/* Focus-visible on close buttons (WCAG 2.1 AA) */
+.cart-sidebar-close:focus-visible,
+.signin-close:focus-visible,
+.product-modal-close:focus-visible,
+.incentive-popup-close:focus-visible {
+	outline: 2px solid var(--rose-gold, #B76E79);
+	outline-offset: 2px;
+}
+
+/* View Details button for product cards */
+.product-grid-view-btn {
+	display: block;
+	width: 100%;
+	padding: 0.625rem;
+	margin-top: 0.5rem;
+	background: transparent;
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	color: rgba(255, 255, 255, 0.7);
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-size: 0.8rem;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.product-grid-view-btn:hover,
+.product-grid-view-btn:focus-visible {
+	background: var(--rose-gold, #B76E79);
+	color: #fff;
+	border-color: var(--rose-gold, #B76E79);
+}
+
+.product-grid-view-btn:focus-visible {
+	outline: 2px solid var(--rose-gold, #B76E79);
+	outline-offset: 2px;
 }
