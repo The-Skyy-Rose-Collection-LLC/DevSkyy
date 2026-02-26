@@ -70,9 +70,9 @@ get_header();
 					array( 'strong' => array() )
 				); ?>
 			</span>
-			<a href="#" class="member-banner-cta" data-action="open-signin">
+			<button type="button" class="member-banner-cta" data-action="open-signin">
 				<?php echo esc_html__( 'Sign In for Access', 'skyyrose-flagship' ); ?>
-			</a>
+			</button>
 		</div>
 
 		<!-- Countdown Timer -->
@@ -109,7 +109,7 @@ get_header();
 		<div data-cie-preorder-progress style="max-width:480px; margin:0 auto; padding:0 2rem 1rem;"></div>
 
 		<!-- Gateway Header -->
-		<header class="gateway-header">
+		<div class="gateway-header" role="region" aria-label="<?php esc_attr_e( 'Pre-Order Controls', 'skyyrose-flagship' ); ?>">
 			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="gateway-logo">
 				<?php echo esc_html__( 'SKyyRose', 'skyyrose-flagship' ); ?>
 			</a>
@@ -122,7 +122,7 @@ get_header();
 					<span class="cart-count-badge">0</span>
 				</button>
 			</div>
-		</header>
+		</div><!-- .gateway-header -->
 
 		<!-- Product Section -->
 		<section class="gateway-product-section">
@@ -359,7 +359,9 @@ $gateway_wc_data = array(
 	'cartUrl'     => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
 	'wcActive'    => class_exists( 'WooCommerce' ),
 );
-wp_localize_script( 'skyyrose-template-preorder-gateway', 'skyyRoseGateway', $gateway_wc_data );
+if ( wp_script_is( 'skyyrose-template-preorder-gateway', 'enqueued' ) ) {
+	wp_localize_script( 'skyyrose-template-preorder-gateway', 'skyyRoseGateway', $gateway_wc_data );
+}
 
 get_template_part( 'template-parts/cinematic-toggle' );
 

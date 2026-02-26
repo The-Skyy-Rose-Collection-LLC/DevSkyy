@@ -227,7 +227,8 @@
 					collection: hotspot.dataset.productCollection,
 					sizes:      hotspot.dataset.productSizes,
 					url:        hotspot.dataset.productUrl,
-					propLabel:  hotspot.dataset.propLabel || ''
+					propLabel:  hotspot.dataset.propLabel || '',
+					productId:  hotspot.dataset.productId || ''
 				};
 
 				openPanel(productData);
