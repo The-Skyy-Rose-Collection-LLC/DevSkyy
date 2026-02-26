@@ -208,7 +208,7 @@ get_header();
 			</div>
 			<div class="product-panel-info">
 				<p class="product-panel-collection"></p>
-				<h3 class="product-panel-name" id="product-panel-name"></h3>
+				<h3 class="product-panel-name" id="product-panel-name"><?php esc_html_e( 'Product Details', 'skyyrose-flagship' ); ?></h3>
 				<p class="product-panel-prop"></p>
 				<p class="product-panel-price"></p>
 				<div class="product-panel-sizes" role="group" aria-label="<?php esc_attr_e( 'Available sizes', 'skyyrose-flagship' ); ?>"></div>

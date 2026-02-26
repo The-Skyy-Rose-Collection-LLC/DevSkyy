@@ -134,7 +134,7 @@ get_header();
 			</div>
 
 			<!-- Product Grid -->
-			<div class="product-grid" id="product-grid-panel" role="tabpanel" aria-labelledby="tab-all">
+			<div class="product-grid" id="product-grid-panel" aria-live="polite" aria-label="<?php esc_attr_e( 'Product grid', 'skyyrose-flagship' ); ?>">
 				<?php foreach ( $gateway_products as $product ) :
 					$badge_class = 'badge-' . $product['collection'];
 				?>
@@ -203,7 +203,7 @@ get_header();
 			<span class="modal-360-badge"><?php echo esc_html__( '360 Preview', 'skyyrose-flagship' ); ?></span>
 		</div>
 		<div class="modal-details">
-			<h2 class="modal-product-name" id="modal-product-name"></h2>
+			<h2 class="modal-product-name" id="modal-product-name"><?php esc_html_e( 'Product Details', 'skyyrose-flagship' ); ?></h2>
 			<p class="modal-product-collection"></p>
 			<p class="modal-product-price"></p>
 			<p class="modal-product-desc"></p>
@@ -298,17 +298,17 @@ get_header();
 	</div>
 
 	<!-- Collection Tabs (Fixed Bottom) -->
-	<nav class="collection-tabs" role="tablist" aria-label="<?php esc_attr_e( 'Filter by collection', 'skyyrose-flagship' ); ?>">
-		<button class="collection-tab active" type="button" role="tab" aria-selected="true" data-collection="all" id="tab-all" aria-controls="product-grid-panel">
+	<nav class="collection-tabs" aria-label="<?php esc_attr_e( 'Filter by collection', 'skyyrose-flagship' ); ?>">
+		<button class="collection-tab active" type="button" aria-pressed="true" data-collection="all" id="tab-all">
 			<?php echo esc_html__( 'All', 'skyyrose-flagship' ); ?>
 		</button>
-		<button class="collection-tab" type="button" role="tab" aria-selected="false" data-collection="black-rose" id="tab-black-rose" aria-controls="product-grid-panel">
+		<button class="collection-tab" type="button" aria-pressed="false" data-collection="black-rose" id="tab-black-rose">
 			<?php echo esc_html__( 'Black Rose', 'skyyrose-flagship' ); ?>
 		</button>
-		<button class="collection-tab" type="button" role="tab" aria-selected="false" data-collection="love-hurts" id="tab-love-hurts" aria-controls="product-grid-panel">
+		<button class="collection-tab" type="button" aria-pressed="false" data-collection="love-hurts" id="tab-love-hurts">
 			<?php echo esc_html__( 'Love Hurts', 'skyyrose-flagship' ); ?>
 		</button>
-		<button class="collection-tab" type="button" role="tab" aria-selected="false" data-collection="signature" id="tab-signature" aria-controls="product-grid-panel">
+		<button class="collection-tab" type="button" aria-pressed="false" data-collection="signature" id="tab-signature">
 			<?php echo esc_html__( 'Signature', 'skyyrose-flagship' ); ?>
 		</button>
 	</nav>

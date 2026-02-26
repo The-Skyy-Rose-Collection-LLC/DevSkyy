@@ -116,15 +116,13 @@
 	function activateTab(tab) {
 		var collection = tab.dataset.collection;
 
-		// Update active tab, ARIA state, and tabindex.
+		// Update active tab and ARIA pressed state.
 		tabs.forEach(function (t) {
 			t.classList.remove('active');
-			t.setAttribute('aria-selected', 'false');
-			t.setAttribute('tabindex', '-1');
+			t.setAttribute('aria-pressed', 'false');
 		});
 		tab.classList.add('active');
-		tab.setAttribute('aria-selected', 'true');
-		tab.setAttribute('tabindex', '0');
+		tab.setAttribute('aria-pressed', 'true');
 
 		// Filter cards.
 		cards.forEach(function (card) {
@@ -436,6 +434,13 @@
 			cartSidebar.classList.add('open');
 			cartSidebar.removeAttribute('inert');
 			cartSidebar.setAttribute('aria-hidden', 'false');
+			// Move focus into the cart sidebar for keyboard/AT users.
+			var firstFocusable = cartSidebar.querySelector(
+				'button:not([disabled]), [href], input, [tabindex]:not([tabindex="-1"])'
+			);
+			if (firstFocusable) {
+				setTimeout(function () { firstFocusable.focus(); }, 50);
+			}
 		}
 	}
 

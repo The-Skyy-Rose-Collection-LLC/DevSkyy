@@ -507,13 +507,17 @@ function skyyrose_get_collection_products( $collection ) {
 function skyyrose_get_preorder_products() {
 	$catalog     = skyyrose_get_product_catalog();
 	$collections = array(
-		'black-rose' => array(),
-		'love-hurts' => array(),
-		'signature'  => array(),
+		'black-rose'   => array(),
+		'love-hurts'   => array(),
+		'signature'    => array(),
+		'kids-capsule' => array(),
 	);
 
 	foreach ( $catalog as $product ) {
 		if ( $product['is_preorder'] && $product['published'] ) {
+			if ( ! isset( $collections[ $product['collection'] ] ) ) {
+				$collections[ $product['collection'] ] = array();
+			}
 			$collections[ $product['collection'] ][] = $product;
 		}
 	}
