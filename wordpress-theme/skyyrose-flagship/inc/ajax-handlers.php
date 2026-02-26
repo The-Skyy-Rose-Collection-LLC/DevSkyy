@@ -295,8 +295,22 @@ function skyyrose_ajax_signin() {
 
 	// Rate limiting: max 5 attempts per email per 15 minutes.
 	// Uses email (not IP) because REMOTE_ADDR is the proxy IP on WordPress.com.
-	$cache_key = 'skyyrose_login_attempts_' . md5( strtolower( trim( $email ) ) );
+	$normalized_email = strtolower( trim( $email ) );
+	$cache_key = 'skyyrose_login_attempts_' . md5( $normalized_email );
 	$attempts  = (int) get_transient( $cache_key );
+
+	// Secondary: per-IP bucket as defence-in-depth (wider limit for shared IPs/proxies).
+	$ip_key      = 'skyyrose_login_ip_' . md5( isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : 'unknown' );
+	$ip_attempts = (int) get_transient( $ip_key );
+
+	if ( $ip_attempts >= 20 ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Too many attempts from your network. Please try again later.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
 
 	if ( $attempts >= 5 ) {
 		wp_send_json_error(
@@ -312,6 +326,7 @@ function skyyrose_ajax_signin() {
 
 	if ( is_wp_error( $user ) ) {
 		set_transient( $cache_key, $attempts + 1, 15 * MINUTE_IN_SECONDS );
+		set_transient( $ip_key, $ip_attempts + 1, 15 * MINUTE_IN_SECONDS );
 		wp_send_json_error(
 			array(
 				'message' => esc_html__( 'Invalid email or password. Please try again.', 'skyyrose-flagship' ),

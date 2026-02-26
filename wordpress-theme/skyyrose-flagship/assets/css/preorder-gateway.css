@@ -1316,6 +1316,11 @@
 	flex-shrink: 0;
 }
 
+@keyframes pulse-scarcity-blink {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.3; }
+}
+
 .pulse-scarcity-price--critical .pulse-scarcity-dot {
 	animation: pulse-scarcity-blink 1s ease-in-out infinite;
 }

@@ -148,7 +148,7 @@ $faq_items = array(
 	<div class="film-grain" aria-hidden="true"></div>
 
 	<!-- Page Header -->
-	<section class="contact-hero">
+	<section class="contact-hero" aria-labelledby="contact-hero-title">
 		<div class="contact-hero__container">
 			<div class="contact-hero__decorative" aria-hidden="true">
 				<span class="contact-hero__line contact-hero__line--left"></span>
@@ -157,7 +157,7 @@ $faq_items = array(
 				</svg>
 				<span class="contact-hero__line contact-hero__line--right"></span>
 			</div>
-			<h1 class="contact-hero__title">
+			<h1 id="contact-hero-title" class="contact-hero__title">
 				<?php esc_html_e( "We'd Love to Hear From You", 'skyyrose-flagship' ); ?>
 			</h1>
 			<p class="contact-hero__subtitle">
@@ -359,8 +359,9 @@ $faq_items = array(
 								name="order_number"
 								class="contact-form__input"
 								placeholder="<?php esc_attr_e( 'e.g. SR-2025-123456', 'skyyrose-flagship' ); ?>"
+								aria-describedby="contact-order-number-error"
 							>
-							<span class="contact-form__error" role="alert" aria-live="polite"></span>
+							<span id="contact-order-number-error" class="contact-form__error" role="alert" aria-live="polite"></span>
 						</div>
 					</div>
 

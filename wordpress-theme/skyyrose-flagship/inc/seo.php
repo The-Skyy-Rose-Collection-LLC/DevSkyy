@@ -179,10 +179,10 @@ function skyyrose_organization_schema() {
 		);
 
 		if ( $phone ) {
-			$schema['contactPoint']['telephone'] = $phone;
+			$schema['contactPoint']['telephone'] = sanitize_text_field( $phone );
 		}
 		if ( $email ) {
-			$schema['contactPoint']['email'] = $email;
+			$schema['contactPoint']['email'] = sanitize_email( $email );
 		}
 	}
 
@@ -262,13 +262,13 @@ function skyyrose_get_breadcrumb_trail() {
 		if ( $terms && ! is_wp_error( $terms ) ) {
 			$term = array_shift( $terms );
 			$breadcrumbs[] = array(
-				'title' => $term->name,
+				'title' => wp_strip_all_tags( html_entity_decode( $term->name, ENT_QUOTES, 'UTF-8' ) ),
 				'url'   => get_term_link( $term ),
 			);
 		}
 
 		$breadcrumbs[] = array(
-			'title' => get_the_title(),
+			'title' => wp_strip_all_tags( html_entity_decode( get_the_title(), ENT_QUOTES, 'UTF-8' ) ),
 			'url'   => get_permalink(),
 		);
 	} elseif ( function_exists( 'wc_get_page_id' ) && ( is_post_type_archive( 'product' ) || is_shop() ) ) {
@@ -284,7 +284,7 @@ function skyyrose_get_breadcrumb_trail() {
 
 		$term = get_queried_object();
 		$breadcrumbs[] = array(
-			'title' => $term->name,
+			'title' => wp_strip_all_tags( html_entity_decode( $term->name, ENT_QUOTES, 'UTF-8' ) ),
 			'url'   => get_term_link( $term ),
 		);
 	} elseif ( is_singular( 'post' ) ) {
@@ -292,7 +292,7 @@ function skyyrose_get_breadcrumb_trail() {
 		if ( $categories ) {
 			$category = array_shift( $categories );
 			$breadcrumbs[] = array(
-				'title' => $category->name,
+				'title' => wp_strip_all_tags( html_entity_decode( $category->name, ENT_QUOTES, 'UTF-8' ) ),
 				'url'   => get_category_link( $category->term_id ),
 			);
 		}

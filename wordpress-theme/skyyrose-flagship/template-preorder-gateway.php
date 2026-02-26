@@ -195,7 +195,7 @@ get_header();
 
 	<!-- Product Modal -->
 	<div class="product-modal-overlay" aria-hidden="true"></div>
-	<div class="product-modal" role="dialog" aria-modal="true" aria-hidden="true" inert aria-labelledby="modal-product-name">
+	<div class="product-modal" role="dialog" aria-modal="true" aria-hidden="true" inert aria-labelledby="modal-product-name" aria-label="<?php esc_attr_e( 'Product details', 'skyyrose-flagship' ); ?>">
 		<button class="product-modal-close" type="button" aria-label="<?php esc_attr_e( 'Close', 'skyyrose-flagship' ); ?>">&times;</button>
 		<div class="modal-360-area">
 			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Product preview', 'skyyrose-flagship' ); ?>" width="400" height="400">

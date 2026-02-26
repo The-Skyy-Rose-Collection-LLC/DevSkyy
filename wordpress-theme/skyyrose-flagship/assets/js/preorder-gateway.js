@@ -295,6 +295,9 @@
 
 		// Send to WooCommerce server-side cart if available.
 		if (typeof skyyRoseGateway !== 'undefined' && skyyRoseGateway.wcActive && item.productId) {
+			// Disable checkout until server confirms to prevent race condition.
+			if (checkoutBtn) checkoutBtn.disabled = true;
+
 			var xhr = new XMLHttpRequest();
 			xhr.open('POST', skyyRoseGateway.ajaxUrl, true);
 			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -304,7 +307,10 @@
 				if (xhr.status >= 200 && xhr.status < 300) {
 					try {
 						var resp = JSON.parse(xhr.responseText);
-						if (!resp.success) {
+						if (resp.success) {
+							// Server confirmed — enable checkout.
+							if (checkoutBtn) checkoutBtn.disabled = false;
+						} else {
 							// Server rejected — remove item from local cart and notify user.
 							var idx = cartItems.indexOf(item);
 							if (idx > -1) cartItems.splice(idx, 1);
@@ -312,7 +318,12 @@
 							updateCartUI();
 							showCartNotification('Could not add item. Please try again.');
 						}
-					} catch (e) { /* non-JSON response — keep local state */ }
+					} catch (e) {
+						// Non-JSON response — enable checkout (keep local state).
+						if (checkoutBtn) checkoutBtn.disabled = false;
+					}
+				} else {
+					if (checkoutBtn) checkoutBtn.disabled = false;
 				}
 			};
 
@@ -322,6 +333,7 @@
 				if (idx > -1) cartItems.splice(idx, 1);
 				cartCount = cartItems.length;
 				updateCartUI();
+				if (checkoutBtn) checkoutBtn.disabled = (cartItems.length === 0);
 				showCartNotification('Network error. Please check your connection.');
 			};
 
@@ -561,6 +573,7 @@
 		}
 
 		function hidePopup() {
+			document.removeEventListener('mouseout', onExitIntent);
 			overlay.classList.remove('open');
 			overlay.setAttribute('aria-hidden', 'true');
 			if (incentivePopup) {
