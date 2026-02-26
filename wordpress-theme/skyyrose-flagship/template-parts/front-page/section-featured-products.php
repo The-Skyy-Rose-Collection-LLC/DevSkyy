@@ -38,7 +38,9 @@ foreach ( $featured_skus as $fsku ) {
 	if ( ! $p ) {
 		continue;
 	}
-	$badge_info          = isset( $badge_map[ $fsku ] ) ? $badge_map[ $fsku ] : array( '', '' );
+	$badge_info = isset( $badge_map[ $fsku ] ) ? $badge_map[ $fsku ] : array( '', '' );
+	// Prefer VTON front-model image over flat product shot.
+	$primary_img = ! empty( $p['front_model_image'] ) ? $p['front_model_image'] : $p['image'];
 	$fallback_products[] = array(
 		'badge'      => $badge_info[0],
 		'badge_cls'  => $badge_info[1],
@@ -49,6 +51,7 @@ foreach ( $featured_skus as $fsku ) {
 		'rating'     => 5,
 		'reviews'    => 0,
 		'sku'        => $fsku,
+		'image'      => skyyrose_product_image_uri( $primary_img ),
 	);
 }
 ?>
@@ -275,7 +278,16 @@ foreach ( $featured_skus as $fsku ) {
 
 					<a href="<?php echo esc_url( $product_url ); ?>" class="product-card__image-link">
 						<div class="product-card__image">
-							<div class="product-card__placeholder product-card__placeholder--<?php echo esc_attr( $fp['sku'] ); ?>" aria-hidden="true"></div>
+							<?php if ( ! empty( $fp['image'] ) ) : ?>
+								<img src="<?php echo esc_url( $fp['image'] ); ?>"
+								     alt="<?php echo esc_attr( $fp['name'] ); ?>"
+								     loading="lazy"
+								     width="400"
+								     height="500"
+								     data-fallback="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>" />
+							<?php else : ?>
+								<div class="product-card__placeholder product-card__placeholder--<?php echo esc_attr( $fp['sku'] ); ?>" aria-hidden="true"></div>
+							<?php endif; ?>
 						</div>
 					</a>
 

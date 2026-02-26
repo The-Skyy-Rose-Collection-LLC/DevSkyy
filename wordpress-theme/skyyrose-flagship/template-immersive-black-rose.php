@@ -20,7 +20,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Multi-room scene data.
  * Each room is a full-viewport scene with its own background image and hotspot products.
- * Products are positioned on contextual props within each scene.
+ * Product data (name, price, image, sizes) pulled from centralized catalog.
+ * Scene-specific data (position, prop, prop_label) defined here.
  */
 $black_rose_rooms = array(
 	// Room 1 — Moonlit Courtyard
@@ -29,58 +30,30 @@ $black_rose_rooms = array(
 		'image'    => get_template_directory_uri() . '/assets/scenes/black-rose/black-rose-moonlit-courtyard.jpg',
 		'alt'      => esc_attr__( 'Moonlit garden courtyard with marble statues, black rose topiaries, and ornate fountains', 'skyyrose-flagship' ),
 		'products' => array(
-			array(
-				'id'         => 'br-006',
-				'name'       => esc_html__( 'BLACK Rose Sherpa Jacket', 'skyyrose-flagship' ),
-				'price'      => '$95',
-				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/br-006-sherpa.webp',
-				'url'        => '/?product_id=br-006',
+			skyyrose_immersive_product( 'br-006', array(
 				'left'       => '15',
 				'top'        => '42',
 				'prop'       => 'marble-statue',
 				'prop_label' => esc_html__( 'Draped over marble garden statue', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'br-005',
-				'name'       => esc_html__( 'BLACK Rose Hoodie — Signature Edition', 'skyyrose-flagship' ),
-				'price'      => '$65',
-				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/br-005-hoodie-sig.jpg',
-				'url'        => '/?product_id=br-005',
+			) ),
+			skyyrose_immersive_product( 'br-005', array(
 				'left'       => '38',
 				'top'        => '50',
 				'prop'       => 'fountain-edge',
 				'prop_label' => esc_html__( 'Folded on fountain edge', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'br-002',
-				'name'       => esc_html__( 'BLACK Rose Joggers', 'skyyrose-flagship' ),
-				'price'      => '$50',
-				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/br-002-joggers.jpg',
-				'url'        => '/?product_id=br-002',
+			) ),
+			skyyrose_immersive_product( 'br-002', array(
 				'left'       => '62',
 				'top'        => '55',
 				'prop'       => 'topiary-base',
 				'prop_label' => esc_html__( 'Folded at base of rose topiary', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'br-007',
-				'name'       => esc_html__( 'BLACK Rose × Love Hurts Basketball Shorts', 'skyyrose-flagship' ),
-				'price'      => '$65',
-				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/br-007-shorts.jpg',
-				'url'        => '/?product_id=br-007',
+			) ),
+			skyyrose_immersive_product( 'br-007', array(
 				'left'       => '82',
 				'top'        => '48',
 				'prop'       => 'statue-pedestal',
 				'prop_label' => esc_html__( 'Draped over statue pedestal', 'skyyrose-flagship' ),
-			),
+			) ),
 		),
 	),
 	// Room 2 — Iron Gazebo Garden
@@ -89,58 +62,30 @@ $black_rose_rooms = array(
 		'image'    => get_template_directory_uri() . '/assets/scenes/black-rose/black-rose-iron-gazebo-garden.png',
 		'alt'      => esc_attr__( 'Aerial view of ornate iron gazebo surrounded by rose hedge maze and cobblestone paths under moonlight', 'skyyrose-flagship' ),
 		'products' => array(
-			array(
-				'id'         => 'br-004',
-				'name'       => esc_html__( 'BLACK Rose Hoodie', 'skyyrose-flagship' ),
-				'price'      => '$40',
-				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/br-004-hoodie.jpg',
-				'url'        => '/?product_id=br-004',
+			skyyrose_immersive_product( 'br-004', array(
 				'left'       => '30',
 				'top'        => '40',
 				'prop'       => 'iron-gazebo',
 				'prop_label' => esc_html__( 'Displayed inside iron gazebo', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'br-001',
-				'name'       => esc_html__( 'BLACK Rose Crewneck', 'skyyrose-flagship' ),
-				'price'      => '$35',
-				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/br-001-crewneck.webp',
-				'url'        => '/?product_id=br-001',
+			) ),
+			skyyrose_immersive_product( 'br-001', array(
 				'left'       => '55',
 				'top'        => '35',
 				'prop'       => 'hedge-arch',
 				'prop_label' => esc_html__( 'Hanging from rose hedge archway', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'br-008',
-				'name'       => esc_html__( "Women's BLACK Rose Hooded Dress", 'skyyrose-flagship' ),
-				'price'      => '$120',
-				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'XS,S,M,L,XL,2XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/br-008-hooded-dress.webp',
-				'url'        => '/?product_id=br-008',
+			) ),
+			skyyrose_immersive_product( 'br-008', array(
 				'left'       => '72',
 				'top'        => '50',
 				'prop'       => 'cobblestone-bench',
 				'prop_label' => esc_html__( 'Draped over cobblestone garden bench', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'br-003',
-				'name'       => esc_html__( 'BLACK is Beautiful Jersey', 'skyyrose-flagship' ),
-				'price'      => '$45',
-				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/br-003-jersey.webp',
-				'url'        => '/?product_id=br-003',
+			) ),
+			skyyrose_immersive_product( 'br-003', array(
 				'left'       => '48',
 				'top'        => '60',
 				'prop'       => 'hedge-maze-wall',
 				'prop_label' => esc_html__( 'Displayed on hedge maze wall', 'skyyrose-flagship' ),
-			),
+			) ),
 		),
 	),
 );

@@ -19,7 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Multi-room scene data.
  * 2 rooms from the Love Hurts collection, each a full-viewport scene.
- * Products positioned on contextual props within each ballroom/chamber.
+ * Product data (name, price, image, sizes) pulled from centralized catalog.
+ * Scene-specific data (position, prop, prop_label) defined here.
  *
  * Extra scene images used as CSS backgrounds elsewhere:
  * - love-hurts-crimson-throne-room.png
@@ -34,45 +35,24 @@ $love_hurts_rooms = array(
 		'image'    => get_template_directory_uri() . '/assets/scenes/love-hurts/love-hurts-cathedral-rose-chamber.png',
 		'alt'      => esc_attr__( 'Gothic cathedral with enchanted rose under glass dome, stained glass windows, candelabras, and crimson petals', 'skyyrose-flagship' ),
 		'products' => array(
-			array(
-				'id'         => 'lh-004',
-				'name'       => esc_html__( 'Love Hurts Varsity Jacket', 'skyyrose-flagship' ),
-				'price'      => '$265',
-				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/lh-004-varsity.jpg',
-				'url'        => '/?product_id=lh-004',
+			skyyrose_immersive_product( 'lh-004', array(
 				'left'       => '35',
 				'top'        => '42',
 				'prop'       => 'glass-dome',
 				'prop_label' => esc_html__( 'Draped beside enchanted rose dome', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'lh-001',
-				'name'       => esc_html__( 'The Fannie Pack', 'skyyrose-flagship' ),
-				'price'      => '$65',
-				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'One Size',
-				'image'      => get_template_directory_uri() . '/assets/images/products/lh-001-fannie.webp',
-				'url'        => '/?product_id=lh-001',
+			) ),
+			skyyrose_immersive_product( 'lh-001', array(
 				'left'       => '68',
 				'top'        => '38',
 				'prop'       => 'candelabra',
 				'prop_label' => esc_html__( 'Hung from gothic candelabra stand', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'lh-003',
-				'name'       => esc_html__( 'Love Hurts Basketball Shorts', 'skyyrose-flagship' ),
-				'price'      => '$75',
-				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/lh-003-shorts.jpg',
-				'url'        => '/?product_id=lh-003',
+			) ),
+			skyyrose_immersive_product( 'lh-003', array(
 				'left'       => '52',
 				'top'        => '60',
 				'prop'       => 'stained-glass-alcove',
 				'prop_label' => esc_html__( 'Displayed in stained glass alcove', 'skyyrose-flagship' ),
-			),
+			) ),
 		),
 	),
 	// Room 2 — Gothic Ballroom
@@ -81,32 +61,20 @@ $love_hurts_rooms = array(
 		'image'    => get_template_directory_uri() . '/assets/scenes/love-hurts/love-hurts-gothic-ballroom.png',
 		'alt'      => esc_attr__( 'Gothic chamber with rose under glass dome, purple draped fabrics, pink petals, and candlelit atmosphere', 'skyyrose-flagship' ),
 		'products' => array(
-			array(
-				'id'         => 'lh-002',
+			skyyrose_immersive_product( 'lh-002', array(
 				'name'       => esc_html__( 'Love Hurts Joggers (BLACK)', 'skyyrose-flagship' ),
-				'price'      => '$95',
-				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/lh-002-joggers.webp',
-				'url'        => '/?product_id=lh-002',
 				'left'       => '40',
 				'top'        => '45',
 				'prop'       => 'velvet-drape',
 				'prop_label' => esc_html__( 'Folded on purple velvet drape', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'lh-002b',
+			) ),
+			skyyrose_immersive_product( 'lh-002b', array(
 				'name'       => esc_html__( 'Love Hurts Joggers (WHITE)', 'skyyrose-flagship' ),
-				'price'      => '$95',
-				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/lh-002-joggers.webp',
-				'url'        => '/?product_id=lh-002b',
 				'left'       => '65',
 				'top'        => '48',
 				'prop'       => 'glass-dome',
 				'prop_label' => esc_html__( 'Displayed beside glass dome', 'skyyrose-flagship' ),
-			),
+			) ),
 		),
 	),
 );
