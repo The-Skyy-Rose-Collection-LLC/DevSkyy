@@ -541,6 +541,11 @@
 	color: #fff;
 }
 
+.room-nav-btn:focus-visible {
+	outline: 2px solid var(--rose-gold, #B76E79);
+	outline-offset: 2px;
+}
+
 .room-nav-btn svg {
 	width: 20px;
 	height: 20px;

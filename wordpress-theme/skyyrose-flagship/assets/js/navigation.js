@@ -25,7 +25,7 @@
 	   -------------------------------------------------- */
 
 	var toggle  = document.querySelector('#mobile-menu-toggle, .menu-toggle');
-	var nav     = document.querySelector('.main-navigation');
+	var nav     = document.querySelector('.navbar__nav-wrapper, .main-navigation');
 	var mobilePanel = document.querySelector('#mobile-menu, .mobile-menu');
 	var mobileClose = document.querySelector('#mobile-menu-close, .mobile-menu__close');
 
@@ -59,7 +59,7 @@
 	   Dropdown Keyboard Navigation
 	   -------------------------------------------------- */
 
-	var dropdownToggles = document.querySelectorAll('.main-navigation .menu-item-has-children > a');
+	var dropdownToggles = document.querySelectorAll('.navbar__menu .menu-item-has-children > a, .main-navigation .menu-item-has-children > a');
 
 	dropdownToggles.forEach(function (link) {
 		link.addEventListener('keydown', function (e) {
@@ -75,7 +75,7 @@
 
 	// Close dropdowns on outside click.
 	document.addEventListener('click', function (e) {
-		var openItems = document.querySelectorAll('.main-navigation .focus');
+		var openItems = document.querySelectorAll('.navbar__menu .focus, .main-navigation .focus');
 		openItems.forEach(function (item) {
 			if (!item.contains(e.target)) {
 				item.classList.remove('focus');
@@ -112,9 +112,9 @@
 	   Search Overlay
 	   -------------------------------------------------- */
 
-	var searchToggle = document.querySelector('.header-search-toggle');
+	var searchToggle = document.querySelector('#search-toggle, .navbar__search-btn, .header-search-toggle');
 	var searchOverlay = document.querySelector('.search-overlay');
-	var searchClose = document.querySelector('.search-overlay-close');
+	var searchClose = document.querySelector('#search-close, .search-overlay__close, .search-overlay-close');
 	var searchInput = searchOverlay ? searchOverlay.querySelector('input[type="search"]') : null;
 
 	if (searchToggle && searchOverlay) {
@@ -147,9 +147,11 @@
 	   Smooth Scroll for Anchor Links
 	   -------------------------------------------------- */
 
-	document.querySelectorAll('a[href^="#"]').forEach(function (link) {
+	document.querySelectorAll('a.js-smooth-scroll[href^="#"], .site-header a[href^="#"], .site-footer a[href^="#"]').forEach(function (link) {
 		link.addEventListener('click', function (e) {
-			var target = document.querySelector(link.getAttribute('href'));
+			var href = link.getAttribute('href');
+			if (href === '#' || href.length < 2) return;
+			var target = document.querySelector(href);
 			if (target) {
 				e.preventDefault();
 				target.scrollIntoView({ behavior: 'smooth', block: 'start' });

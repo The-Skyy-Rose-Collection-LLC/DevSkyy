@@ -137,6 +137,11 @@
 		panelOverlay.setAttribute('aria-hidden', 'false');
 		panel.setAttribute('aria-hidden', 'false');
 
+		// Store product ID on panel for cross-script access (immersive-wc-bridge.js).
+		if (data.productId) {
+			panel.dataset.currentProductId = data.productId;
+		}
+
 		// Focus trap: move focus into panel.
 		if (panelClose) panelClose.focus();
 	}

@@ -253,6 +253,21 @@
 			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 			xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
+			xhr.onload = function () {
+				if (xhr.status >= 200 && xhr.status < 300) {
+					try {
+						var resp = JSON.parse(xhr.responseText);
+						if (!resp.success) {
+							// Server rejected — remove item from local cart.
+							var idx = cartItems.indexOf(item);
+							if (idx > -1) cartItems.splice(idx, 1);
+							cartCount = cartItems.length;
+							updateCartUI();
+						}
+					} catch (e) { /* non-JSON response — keep local state */ }
+				}
+			};
+
 			var postData = 'action=skyyrose_immersive_add_to_cart' +
 				'&nonce=' + encodeURIComponent(skyyRoseGateway.nonce) +
 				'&product_id=' + encodeURIComponent(item.productId) +
@@ -431,6 +446,7 @@
 		if (shown) return;
 
 		function showPopup() {
+			shown = '1';
 			overlay.classList.add('open');
 			overlay.setAttribute('aria-hidden', 'false');
 			sessionStorage.setItem('sr_incentive_shown', '1');

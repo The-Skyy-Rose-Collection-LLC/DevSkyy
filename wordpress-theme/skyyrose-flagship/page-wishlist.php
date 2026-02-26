@@ -72,8 +72,8 @@ if ( ! class_exists( 'WooCommerce' ) ) {
 								<a href="<?php echo esc_url( $product->get_permalink() ); ?>">
 									<?php echo wp_kses_post( $product->get_image( 'woocommerce_thumbnail' ) ); ?>
 								</a>
-								<button type="button" class="wishlist-remove" data-product-id="<?php echo esc_attr( $product_id ); ?>" title="<?php esc_attr_e( 'Remove from wishlist', 'skyyrose-flagship' ); ?>">
-									<svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<button type="button" class="wishlist-remove" data-product-id="<?php echo esc_attr( $product_id ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Remove %s from wishlist', 'skyyrose-flagship' ), $product->get_name() ) ); ?>">
+									<svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 										<path d="M12.5 3.5L3.5 12.5M3.5 3.5L12.5 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
 									</svg>
 								</button>

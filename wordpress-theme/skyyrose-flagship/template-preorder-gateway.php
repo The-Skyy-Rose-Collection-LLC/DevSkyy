@@ -322,7 +322,9 @@ get_header();
 				<form class="incentive-popup-form" method="post" action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>">
 					<input type="hidden" name="action" value="skyyrose_incentive_signup">
 					<?php wp_nonce_field( 'skyyrose_incentive', 'skyyrose_incentive_nonce' ); ?>
+					<label for="incentive-email" class="screen-reader-text"><?php esc_html_e( 'Email address', 'skyyrose-flagship' ); ?></label>
 					<input
+						id="incentive-email"
 						class="incentive-popup-input"
 						type="email"
 						name="email"
@@ -330,7 +332,9 @@ get_header();
 						required
 						autocomplete="email"
 					>
+					<label for="incentive-phone" class="screen-reader-text"><?php esc_html_e( 'Phone number (optional)', 'skyyrose-flagship' ); ?></label>
 					<input
+						id="incentive-phone"
 						class="incentive-popup-input"
 						type="tel"
 						name="phone"
@@ -350,7 +354,7 @@ get_header();
 // Pass WooCommerce data to the gateway script (assets already enqueued by inc/enqueue.php).
 $gateway_wc_data = array(
 	'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
-	'nonce'       => wp_create_nonce( 'skyyrose_immersive_cart' ),
+	'nonce'       => wp_create_nonce( 'skyyrose-immersive-nonce' ),
 	'checkoutUrl' => function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/checkout/' ),
 	'cartUrl'     => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
 	'wcActive'    => class_exists( 'WooCommerce' ),

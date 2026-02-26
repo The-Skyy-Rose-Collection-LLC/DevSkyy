@@ -187,7 +187,7 @@ get_header();
 				></button>
 			<?php endforeach; ?>
 		</div>
-		<div class="room-name"><?php echo esc_html( $signature_rooms[0]['name'] ); ?></div>
+		<div class="room-name" aria-live="polite" aria-atomic="true"><?php echo esc_html( $signature_rooms[0]['name'] ); ?></div>
 
 		<!-- Hotspot Containers — Products placed on contextual props -->
 		<?php foreach ( $signature_rooms as $room_index => $room ) : ?>

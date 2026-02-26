@@ -269,9 +269,10 @@ $faq_items = array(
 								required
 								autocomplete="given-name"
 								aria-required="true"
+								aria-describedby="contact-first-name-error"
 								placeholder="<?php esc_attr_e( 'Your first name', 'skyyrose-flagship' ); ?>"
 							>
-							<span class="contact-form__error" role="alert" aria-live="polite"></span>
+							<span id="contact-first-name-error" class="contact-form__error" role="alert" aria-live="polite"></span>
 						</div>
 						<div class="contact-form__group">
 							<label for="contact-last-name" class="contact-form__label">
@@ -285,9 +286,10 @@ $faq_items = array(
 								required
 								autocomplete="family-name"
 								aria-required="true"
+								aria-describedby="contact-last-name-error"
 								placeholder="<?php esc_attr_e( 'Your last name', 'skyyrose-flagship' ); ?>"
 							>
-							<span class="contact-form__error" role="alert" aria-live="polite"></span>
+							<span id="contact-last-name-error" class="contact-form__error" role="alert" aria-live="polite"></span>
 						</div>
 					</div>
 
@@ -304,9 +306,10 @@ $faq_items = array(
 								required
 								autocomplete="email"
 								aria-required="true"
+								aria-describedby="contact-email-error"
 								placeholder="<?php esc_attr_e( 'you@example.com', 'skyyrose-flagship' ); ?>"
 							>
-							<span class="contact-form__error" role="alert" aria-live="polite"></span>
+							<span id="contact-email-error" class="contact-form__error" role="alert" aria-live="polite"></span>
 						</div>
 						<div class="contact-form__group">
 							<label for="contact-phone" class="contact-form__label">
@@ -318,9 +321,10 @@ $faq_items = array(
 								name="phone"
 								class="contact-form__input"
 								autocomplete="tel"
+								aria-describedby="contact-phone-error"
 								placeholder="<?php esc_attr_e( '(555) 123-4567', 'skyyrose-flagship' ); ?>"
 							>
-							<span class="contact-form__error" role="alert" aria-live="polite"></span>
+							<span id="contact-phone-error" class="contact-form__error" role="alert" aria-live="polite"></span>
 						</div>
 					</div>
 
@@ -335,6 +339,7 @@ $faq_items = array(
 								class="contact-form__select"
 								required
 								aria-required="true"
+								aria-describedby="contact-subject-error"
 							>
 								<?php foreach ( $subject_options as $value => $label ) : ?>
 									<option value="<?php echo esc_attr( $value ); ?>">
@@ -342,7 +347,7 @@ $faq_items = array(
 									</option>
 								<?php endforeach; ?>
 							</select>
-							<span class="contact-form__error" role="alert" aria-live="polite"></span>
+							<span id="contact-subject-error" class="contact-form__error" role="alert" aria-live="polite"></span>
 						</div>
 						<div class="contact-form__group contact-form__group--order-number" id="order-number-group">
 							<label for="contact-order-number" class="contact-form__label">
@@ -417,9 +422,10 @@ $faq_items = array(
 							class="contact-form__textarea"
 							required
 							aria-required="true"
+							aria-describedby="contact-message-error"
 							placeholder="<?php esc_attr_e( "Tell us what's on your mind. We're all ears...", 'skyyrose-flagship' ); ?>"
 						></textarea>
-						<span class="contact-form__error" role="alert" aria-live="polite"></span>
+						<span id="contact-message-error" class="contact-form__error" role="alert" aria-live="polite"></span>
 					</div>
 
 					<div class="contact-form__group">
