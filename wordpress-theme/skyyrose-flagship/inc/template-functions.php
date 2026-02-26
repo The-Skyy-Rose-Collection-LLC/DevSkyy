@@ -617,6 +617,48 @@ function skyyrose_svg_icon( $name ) {
 }
 
 /*--------------------------------------------------------------
+ * Social Media Links (Single Source of Truth)
+ *--------------------------------------------------------------*/
+
+/**
+ * Get the centralized social media links array.
+ *
+ * All templates (footer, contact, etc.) should call this function
+ * instead of hardcoding social URLs. Returns a new array each call.
+ *
+ * @since 3.2.2
+ * @return array Associative array of social links keyed by platform.
+ */
+function skyyrose_get_social_links() {
+	return array(
+		'instagram' => array(
+			'url'   => 'https://instagram.com/theskyyrosecollection',
+			'label' => __( 'Instagram', 'skyyrose-flagship' ),
+		),
+		'tiktok'    => array(
+			'url'   => 'https://tiktok.com/@skyyrosecollection',
+			'label' => __( 'TikTok', 'skyyrose-flagship' ),
+		),
+		'twitter'   => array(
+			'url'   => 'https://twitter.com/skyyrosellc',
+			'label' => __( 'X (Twitter)', 'skyyrose-flagship' ),
+		),
+		'facebook'  => array(
+			'url'   => 'https://facebook.com/skyyrosecollection',
+			'label' => __( 'Facebook', 'skyyrose-flagship' ),
+		),
+		'youtube'   => array(
+			'url'   => 'https://youtube.com/@skyyrosecollection',
+			'label' => __( 'YouTube', 'skyyrose-flagship' ),
+		),
+		'pinterest' => array(
+			'url'   => 'https://pinterest.com/skyyrosecollection',
+			'label' => __( 'Pinterest', 'skyyrose-flagship' ),
+		),
+	);
+}
+
+/*--------------------------------------------------------------
  * Navigation Fallback
  *--------------------------------------------------------------*/
 

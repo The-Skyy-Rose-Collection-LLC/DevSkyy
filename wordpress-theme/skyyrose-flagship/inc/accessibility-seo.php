@@ -483,7 +483,7 @@ function skyyrose_open_graph_tags() {
 	if ( is_singular() ) {
 		global $post;
 
-		echo '<meta property="og:type" content="' . ( is_singular( 'product' ) ? 'product' : 'article' ) . '" />' . "\n";
+		echo '<meta property="og:type" content="' . esc_attr( is_singular( 'product' ) ? 'product' : 'article' ) . '" />' . "\n";
 		echo '<meta property="og:title" content="' . esc_attr( get_the_title() ) . '" />' . "\n";
 		echo '<meta property="og:description" content="' . esc_attr( wp_strip_all_tags( get_the_excerpt() ) ) . '" />' . "\n";
 		echo '<meta property="og:url" content="' . esc_url( get_permalink() ) . '" />' . "\n";
@@ -502,7 +502,7 @@ function skyyrose_open_graph_tags() {
 			if ( $product ) {
 				echo '<meta property="product:price:amount" content="' . esc_attr( $product->get_price() ) . '" />' . "\n";
 				echo '<meta property="product:price:currency" content="' . esc_attr( get_woocommerce_currency() ) . '" />' . "\n";
-				echo '<meta property="product:availability" content="' . ( $product->is_in_stock() ? 'in stock' : 'out of stock' ) . '" />' . "\n";
+				echo '<meta property="product:availability" content="' . esc_attr( $product->is_in_stock() ? 'in stock' : 'out of stock' ) . '" />' . "\n";
 			}
 		}
 	} elseif ( is_front_page() ) {

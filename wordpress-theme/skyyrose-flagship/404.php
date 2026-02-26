@@ -116,33 +116,25 @@ if ( class_exists( 'WooCommerce' ) ) {
 }
 
 // Static fallback when WooCommerce is inactive or no products found.
+// Source from centralized catalog so prices stay in sync.
 if ( empty( $skyyrose_trending_products ) ) {
-	$skyyrose_trending_products = array(
-		array(
-			'name'  => 'BLACK Rose Crewneck',
-			'price' => '$120',
-			'link'  => home_url( '/product/black-rose-crewneck/' ),
-			'image' => '',
-		),
-		array(
-			'name'  => 'Love Hurts Varsity Jacket',
-			'price' => '$185',
-			'link'  => home_url( '/product/love-hurts-varsity-jacket/' ),
-			'image' => '',
-		),
-		array(
-			'name'  => 'The Signature Tee',
-			'price' => '$65',
-			'link'  => home_url( '/product/the-signature-tee/' ),
-			'image' => '',
-		),
-		array(
-			'name'  => 'The Bay Set',
-			'price' => '$210',
-			'link'  => home_url( '/product/the-bay-set/' ),
-			'image' => '',
-		),
-	);
+	$skyyrose_404_skus = array( 'br-001', 'lh-004', 'sg-002', 'sg-001' );
+	foreach ( $skyyrose_404_skus as $skyyrose_404_sku ) {
+		$skyyrose_404_product = skyyrose_get_product( $skyyrose_404_sku );
+		if ( $skyyrose_404_product ) {
+			$skyyrose_404_image = ! empty( $skyyrose_404_product['front_model_image'] )
+				? get_theme_file_uri( $skyyrose_404_product['front_model_image'] )
+				: ( ! empty( $skyyrose_404_product['image'] )
+					? get_theme_file_uri( $skyyrose_404_product['image'] )
+					: '' );
+			$skyyrose_trending_products[] = array(
+				'name'  => $skyyrose_404_product['name'],
+				'price' => skyyrose_format_price( $skyyrose_404_product ),
+				'link'  => home_url( '/preorder/' ),
+				'image' => $skyyrose_404_image,
+			);
+		}
+	}
 }
 ?>
 
