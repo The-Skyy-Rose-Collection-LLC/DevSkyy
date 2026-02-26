@@ -149,48 +149,17 @@ function skyyrose_woocommerce_accessibility() {
 add_action( 'init', 'skyyrose_woocommerce_accessibility' );
 
 /**
- * Add landmark roles to main content areas.
+ * Landmark roles — handled natively by HTML5 semantic elements.
+ *
+ * HTML5 elements (<header>, <nav>, <main>, <footer>, <aside>) carry
+ * implicit ARIA roles in all modern browsers.  The previous inline
+ * <script> that assigned roles dynamically was removed in v3.2.2:
+ * it bypassed wp_enqueue_script(), blocked CSP tightening, and
+ * duplicated work the browser already does natively.
  *
  * @since 1.0.0
+ * @since 3.2.2 Removed — HTML5 implicit roles are sufficient.
  */
-function skyyrose_add_landmark_roles() {
-	echo '<script>
-		document.addEventListener("DOMContentLoaded", function() {
-			// Add main role if not present
-			var content = document.getElementById("content");
-			if (content && !content.hasAttribute("role")) {
-				content.setAttribute("role", "main");
-			}
-
-			// Add navigation role to nav elements
-			var navs = document.querySelectorAll("nav:not([role])");
-			navs.forEach(function(nav) {
-				nav.setAttribute("role", "navigation");
-			});
-
-			// Add complementary role to sidebars
-			var sidebars = document.querySelectorAll(".sidebar, .widget-area");
-			sidebars.forEach(function(sidebar) {
-				if (!sidebar.hasAttribute("role")) {
-					sidebar.setAttribute("role", "complementary");
-				}
-			});
-
-			// Add contentinfo role to footer
-			var footer = document.querySelector(".site-footer, footer");
-			if (footer && !footer.hasAttribute("role")) {
-				footer.setAttribute("role", "contentinfo");
-			}
-
-			// Add banner role to header
-			var header = document.querySelector(".site-header, header");
-			if (header && !header.hasAttribute("role")) {
-				header.setAttribute("role", "banner");
-			}
-		});
-	</script>';
-}
-add_action( 'wp_footer', 'skyyrose_add_landmark_roles' );
 
 /**
  * Add dns-prefetch for external resources used by WooCommerce.

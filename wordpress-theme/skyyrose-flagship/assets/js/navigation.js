@@ -24,10 +24,10 @@
 	   Hamburger Toggle (Mobile)
 	   -------------------------------------------------- */
 
-	var toggle  = document.querySelector('.menu-toggle');
+	var toggle  = document.querySelector('#mobile-menu-toggle, .menu-toggle');
 	var nav     = document.querySelector('.main-navigation');
-	var mobilePanel = document.querySelector('.mobile-nav-panel');
-	var mobileClose = document.querySelector('.mobile-nav-close');
+	var mobilePanel = document.querySelector('#mobile-menu, .mobile-menu');
+	var mobileClose = document.querySelector('#mobile-menu-close, .mobile-menu__close');
 
 	if (toggle && nav) {
 		toggle.addEventListener('click', function () {

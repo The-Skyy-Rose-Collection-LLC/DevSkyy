@@ -7,6 +7,25 @@
  */
 
 get_header();
+
+if ( ! class_exists( 'WooCommerce' ) ) {
+	?>
+	<main id="primary" class="site-main wishlist-page">
+		<div class="container">
+			<div class="wishlist-empty">
+				<h2 class="wishlist-empty-title"><?php esc_html_e( 'Wishlist Unavailable', 'skyyrose-flagship' ); ?></h2>
+				<p class="wishlist-empty-text"><?php esc_html_e( 'The wishlist feature requires WooCommerce to be active.', 'skyyrose-flagship' ); ?></p>
+				<div class="wishlist-empty-actions">
+					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="button alt"><?php esc_html_e( 'Return Home', 'skyyrose-flagship' ); ?></a>
+				</div>
+			</div>
+		</div>
+	</main>
+	<?php
+	get_sidebar();
+	get_footer();
+	return;
+}
 ?>
 
 <main id="primary" class="site-main wishlist-page">
@@ -118,7 +137,7 @@ get_header();
 					<?php esc_html_e( 'Save your favorite items here to purchase later or keep track of items you love.', 'skyyrose-flagship' ); ?>
 				</p>
 				<div class="wishlist-empty-actions">
-					<a href="<?php echo esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ); ?>" class="button alt">
+					<a href="<?php echo esc_url( function_exists( 'wc_get_page_id' ) ? get_permalink( wc_get_page_id( 'shop' ) ) : home_url( '/shop/' ) ); ?>" class="button alt">
 						<?php esc_html_e( 'Start Shopping', 'skyyrose-flagship' ); ?>
 					</a>
 				</div>

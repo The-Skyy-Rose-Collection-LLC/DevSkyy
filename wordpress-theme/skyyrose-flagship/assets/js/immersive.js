@@ -12,16 +12,7 @@
 (function () {
 	'use strict';
 
-	/* --------------------------------------------------
-	   Image Fallback (CSP-safe replacement for inline onerror)
-	   -------------------------------------------------- */
-
-	document.addEventListener('error', function (e) {
-		if (e.target.tagName === 'IMG' && e.target.dataset.fallback) {
-			e.target.src = e.target.dataset.fallback;
-			delete e.target.dataset.fallback;
-		}
-	}, true);
+	/* Image fallback handled by navigation.js (site-wide). */
 
 	/* --------------------------------------------------
 	   DOM References
@@ -632,11 +623,7 @@
 		if (typeof wc_add_to_cart_params !== 'undefined' && wc_add_to_cart_params.wc_ajax_url) {
 			return wc_add_to_cart_params.wc_ajax_url.toString().replace('%%endpoint%%', 'add_to_cart');
 		}
-		// Fallback: check if WooCommerce is likely active via body class.
-		if (document.body.classList.contains('woocommerce') ||
-			document.body.classList.contains('woocommerce-page')) {
-			return window.location.origin + '/';
-		}
+		// No fallback — WP.com routing requires the localized URL.
 		return null;
 	}
 

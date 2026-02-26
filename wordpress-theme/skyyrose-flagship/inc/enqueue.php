@@ -164,7 +164,13 @@ function skyyrose_enqueue_global_scripts() {
  */
 function skyyrose_localize_scripts() {
 
-	$handle = wp_script_is( 'skyyrose-navigation', 'enqueued' ) ? 'skyyrose-navigation' : 'jquery';
+	// navigation.js is always enqueued (see skyyrose_scripts); fall back to
+	// jquery only as a last resort to ensure skyyRoseData is always available.
+	$handle = 'skyyrose-navigation';
+	if ( ! wp_script_is( $handle, 'enqueued' ) ) {
+		wp_enqueue_script( 'jquery' );
+		$handle = 'jquery';
+	}
 
 	wp_localize_script(
 		$handle,

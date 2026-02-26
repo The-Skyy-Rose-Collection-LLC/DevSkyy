@@ -284,10 +284,21 @@
 			function (data) {
 				showToast(data.message || 'Added to cart!');
 
-				// Update cart count badge via fragments.
+				// Update cart count badge via WC fragments (selector allowlist).
 				if (data.fragments) {
+					var allowedSelectors = [
+						'.cart-count-badge', '.navbar__cart-badge',
+						'.cart-contents', '.widget_shopping_cart_content',
+						'div.widget_shopping_cart_content'
+					];
 					for (var selector in data.fragments) {
-						if (data.fragments.hasOwnProperty(selector)) {
+						if (!data.fragments.hasOwnProperty(selector)) continue;
+						var isAllowed = false;
+						for (var a = 0; a < allowedSelectors.length; a++) {
+							if (selector === allowedSelectors[a]) { isAllowed = true; break; }
+						}
+						if (!isAllowed) continue;
+						try {
 							var targets = document.querySelectorAll(selector);
 							for (var i = 0; i < targets.length; i++) {
 								var temp = document.createElement('div');
@@ -296,7 +307,7 @@
 									targets[i].parentNode.replaceChild(temp.firstChild, targets[i]);
 								}
 							}
-						}
+						} catch (e) { /* invalid selector — skip */ }
 					}
 				}
 

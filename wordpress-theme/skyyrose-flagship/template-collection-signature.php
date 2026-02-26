@@ -69,7 +69,8 @@ function skyyrose_get_signature_products() {
 			// Split set into tee and shorts.
 			$display_products[] = array(
 				'sku'        => $p['sku'] . '-tee',
-				'name'       => $p['name'] . ' — Tee',
+				/* translators: %s: product set name */
+			'name'       => sprintf( __( '%s — Tee', 'skyyrose-flagship' ), $p['name'] ),
 				'price'      => '$40',
 				'desc'       => $p['description'],
 				'badge'      => $p['badge'],
@@ -81,7 +82,8 @@ function skyyrose_get_signature_products() {
 				: skyyrose_product_image_uri( 'assets/images/products/sg-010-bridge-shorts.webp' );
 			$display_products[] = array(
 				'sku'        => $p['sku'] . '-shorts',
-				'name'       => $p['name'] . ' — Shorts',
+				/* translators: %s: product set name */
+			'name'       => sprintf( __( '%s — Shorts', 'skyyrose-flagship' ), $p['name'] ),
 				'price'      => '$50',
 				'desc'       => $p['description'],
 				'badge'      => $p['badge'],

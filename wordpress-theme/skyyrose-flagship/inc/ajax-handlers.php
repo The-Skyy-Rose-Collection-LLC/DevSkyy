@@ -308,7 +308,7 @@ function skyyrose_ajax_signin() {
 	delete_transient( $cache_key );
 
 	// Set authentication cookies.
-	$remember = ! empty( $_POST['remember'] );
+	$remember = isset( $_POST['remember'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['remember'] ) );
 	wp_set_auth_cookie( $user->ID, $remember );
 
 	wp_send_json_success(
@@ -320,3 +320,16 @@ function skyyrose_ajax_signin() {
 	return;
 }
 add_action( 'wp_ajax_nopriv_skyyrose_signin', 'skyyrose_ajax_signin' );
+
+// Logged-in users hitting the sign-in form get a graceful redirect.
+add_action(
+	'wp_ajax_skyyrose_signin',
+	function () {
+		wp_send_json_success(
+			array(
+				'message'      => esc_html__( 'You are already signed in.', 'skyyrose-flagship' ),
+				'redirect_url' => home_url( '/' ),
+			)
+		);
+	}
+);

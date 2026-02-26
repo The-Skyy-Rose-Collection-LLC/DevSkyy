@@ -73,10 +73,10 @@ function skyyrose_get_love_hurts_products() {
 		if ( 'lh-002' === $p['sku'] ) {
 			$display_products[] = array(
 				'sku'        => 'lh-002b',
-				'name'       => 'Love Hurts Joggers (WHITE)',
+				'name'       => __( 'Love Hurts Joggers (WHITE)', 'skyyrose-flagship' ),
 				'price'      => skyyrose_format_price( $p ),
 				'desc'       => 'The same Oakland fire in a fresh white colorway — embroidered rose, tapered fit',
-				'badge'      => 'New',
+				'badge'      => __( 'New', 'skyyrose-flagship' ),
 				'image'      => skyyrose_product_image_uri( $primary_img ),
 				'back_image' => '',
 			);

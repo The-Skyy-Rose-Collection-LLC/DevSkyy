@@ -840,15 +840,18 @@
 	function handleCrossSellAdd(product, btn) {
 		trackEvent('journey_crosssell_add', { sku: product.sku, name: product.name });
 
-		// Attempt WooCommerce AJAX add.
-		var wcUrl = getWcAjaxUrl();
-		if (wcUrl && product.sku) {
+		// Use the theme's AJAX handler which accepts SKU (not numeric product_id).
+		var ajaxUrl = (typeof skyyRoseData !== 'undefined' && skyyRoseData.ajaxUrl)
+			? skyyRoseData.ajaxUrl
+			: null;
+
+		if (ajaxUrl && product.sku) {
 			btn.disabled = true;
 			var originalText = btn.textContent;
 			btn.textContent = '...';
 
 			var xhr = new XMLHttpRequest();
-			xhr.open('POST', wcUrl, true);
+			xhr.open('POST', ajaxUrl, true);
 			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 			xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
@@ -857,7 +860,7 @@
 				if (xhr.status >= 200 && xhr.status < 300) {
 					try {
 						var resp = JSON.parse(xhr.responseText);
-						if (!resp.error) {
+						if (resp.success) {
 							showAddedState(btn, originalText);
 							if (typeof jQuery !== 'undefined') {
 								jQuery(document.body).trigger('wc_fragment_refresh');
@@ -875,9 +878,10 @@
 			};
 
 			xhr.send(
-				'wc-ajax=add_to_cart' +
-				'&product_id=' + encodeURIComponent(product.sku) +
-				'&quantity=1'
+				'action=skyyrose_immersive_add_to_cart' +
+				'&sku=' + encodeURIComponent(product.sku) +
+				'&quantity=1' +
+				'&nonce=' + encodeURIComponent(typeof skyyRoseData !== 'undefined' ? skyyRoseData.nonce : '')
 			);
 		} else {
 			// No WooCommerce — visual feedback only.
@@ -894,21 +898,8 @@
 		}, 2200);
 	}
 
-	/* --------------------------------------------------
-	   WooCommerce AJAX URL helper
-	   (mirrors the helper in immersive.js / cross-sell-engine.js)
-	   -------------------------------------------------- */
-
-	function getWcAjaxUrl() {
-		if (typeof wc_add_to_cart_params !== 'undefined' && wc_add_to_cart_params.wc_ajax_url) {
-			return wc_add_to_cart_params.wc_ajax_url.toString().replace('%%endpoint%%', 'add_to_cart');
-		}
-		if (document.body.classList.contains('woocommerce') ||
-			document.body.classList.contains('woocommerce-page')) {
-			return window.location.origin + '/';
-		}
-		return null;
-	}
+	/* WooCommerce add-to-cart now routed through skyyRoseData.ajaxUrl
+	   via skyyrose_immersive_add_to_cart action (accepts SKU). */
 
 	/* --------------------------------------------------
 	   Touch scroll enhancement for cross-sell track

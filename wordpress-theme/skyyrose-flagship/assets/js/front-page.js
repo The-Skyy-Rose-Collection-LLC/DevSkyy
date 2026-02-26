@@ -146,33 +146,61 @@
 
 		form.addEventListener('submit', function (e) {
 			e.preventDefault();
-			var email = form.querySelector('input[type="email"]');
+			var emailInput = form.querySelector('input[type="email"]');
 			var btn = form.querySelector('button[type="submit"]');
 
-			if (!email || !email.value) return;
+			if (!emailInput || !emailInput.value) return;
 
 			if (btn) {
 				btn.textContent = 'Joining...';
 				btn.disabled = true;
 			}
 
-			// Simulate API call (replace with real endpoint).
-			setTimeout(function () {
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', form.action || (typeof skyyRoseData !== 'undefined' ? skyyRoseData.ajaxUrl : ''), true);
+			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+			xhr.onload = function () {
+				if (xhr.status >= 200 && xhr.status < 300) {
+					try {
+						var resp = JSON.parse(xhr.responseText);
+						if (resp.success) {
+							if (btn) {
+								btn.textContent = 'Welcome to the Family!';
+								btn.classList.add('success');
+							}
+							if (emailInput) emailInput.value = '';
+							setTimeout(function () {
+								if (btn) {
+									btn.textContent = 'Join the Family';
+									btn.disabled = false;
+									btn.classList.remove('success');
+								}
+							}, 3000);
+							return;
+						}
+					} catch (_) { /* fall through */ }
+				}
 				if (btn) {
-					btn.textContent = 'Welcome to the Family!';
-					btn.classList.add('success');
+					btn.textContent = 'Try Again';
+					btn.disabled = false;
 				}
-				if (email) {
-					email.value = '';
+			};
+
+			xhr.onerror = function () {
+				if (btn) {
+					btn.textContent = 'Try Again';
+					btn.disabled = false;
 				}
-				setTimeout(function () {
-					if (btn) {
-						btn.textContent = 'Join the Family';
-						btn.disabled = false;
-						btn.classList.remove('success');
-					}
-				}, 3000);
-			}, 1000);
+			};
+
+			var formData = new FormData(form);
+			var params = [];
+			formData.forEach(function (value, key) {
+				params.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+			});
+			xhr.send(params.join('&'));
 		});
 	}
 
