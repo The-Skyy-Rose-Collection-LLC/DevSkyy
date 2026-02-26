@@ -24,7 +24,6 @@
 	max-width: 280px;
 	height: auto;
 	transform-style: preserve-3d;
-	will-change: transform;
 }
 
 /* ---------------------------------------------------------------
@@ -34,6 +33,7 @@
 .collection-logo-3d--black-rose img {
 	animation: rotateBlackRose 8s linear infinite;
 	filter: drop-shadow(0 0 30px rgba(192, 192, 192, 0.3));
+	will-change: transform;
 }
 
 @keyframes rotateBlackRose {
@@ -48,6 +48,7 @@
 .collection-logo-3d--love-hurts img {
 	animation: rotateLoveHurts 6s linear infinite;
 	filter: drop-shadow(0 0 30px rgba(220, 20, 60, 0.3));
+	will-change: transform;
 }
 
 @keyframes rotateLoveHurts {
@@ -62,6 +63,7 @@
 .collection-logo-3d--signature img {
 	animation: rotateSignature 7s linear infinite;
 	filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.3));
+	will-change: transform;
 }
 
 @keyframes rotateSignature {
@@ -457,6 +459,7 @@
 	.collection-logo-3d--love-hurts img,
 	.collection-logo-3d--signature img {
 		animation: none;
+		will-change: auto;
 	}
 
 	.fade-in-up {

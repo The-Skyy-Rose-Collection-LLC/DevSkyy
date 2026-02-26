@@ -475,6 +475,7 @@
 		function showPopup() {
 			if (shown) return;
 			shown = '1';
+			document.removeEventListener('mouseout', onExitIntent);
 			overlay.classList.add('open');
 			overlay.setAttribute('aria-hidden', 'false');
 			sessionStorage.setItem('sr_incentive_shown', '1');
@@ -485,17 +486,16 @@
 			overlay.setAttribute('aria-hidden', 'true');
 		}
 
-		// Show after 15 seconds
-		setTimeout(showPopup, 15000);
-
 		// Exit intent on desktop — removed after trigger to avoid needless event checks.
 		function onExitIntent(e) {
 			if (e.clientY < 5 && !shown) {
 				showPopup();
-				document.removeEventListener('mouseout', onExitIntent);
 			}
 		}
 		document.addEventListener('mouseout', onExitIntent);
+
+		// Show after 15 seconds if not already shown.
+		setTimeout(showPopup, 15000);
 
 		if (closeBtn) {
 			closeBtn.addEventListener('click', hidePopup);
