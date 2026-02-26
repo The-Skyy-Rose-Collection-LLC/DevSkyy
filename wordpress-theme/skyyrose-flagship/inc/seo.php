@@ -106,7 +106,7 @@ function skyyrose_product_schema() {
 		}
 	}
 
-	echo '<script type="application/ld+json">' . wp_json_encode( $schema ) . '</script>' . "\n";
+	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-encoded with JSON_HEX_TAG preventing script injection.
 }
 add_action( 'wp_head', 'skyyrose_product_schema' );
 
@@ -189,7 +189,7 @@ function skyyrose_organization_schema() {
 	// Remove null fields (e.g., logo when no custom logo is set).
 	$schema = array_filter( $schema, function ( $v ) { return null !== $v; } );
 
-	echo '<script type="application/ld+json">' . wp_json_encode( $schema ) . '</script>' . "\n";
+	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-encoded with JSON_HEX_TAG preventing script injection.
 }
 add_action( 'wp_head', 'skyyrose_organization_schema' );
 
@@ -233,7 +233,7 @@ function skyyrose_breadcrumb_schema() {
 		$position++;
 	}
 
-	echo '<script type="application/ld+json">' . wp_json_encode( $schema ) . '</script>' . "\n";
+	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-encoded with JSON_HEX_TAG preventing script injection.
 }
 add_action( 'wp_head', 'skyyrose_breadcrumb_schema' );
 
@@ -649,6 +649,6 @@ function skyyrose_collection_schema() {
 		'url'         => is_tax( 'product_cat' ) ? get_term_link( $term ) : get_post_type_archive_link( 'product' ),
 	);
 
-	echo '<script type="application/ld+json">' . wp_json_encode( $schema ) . '</script>' . "\n";
+	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-encoded with JSON_HEX_TAG preventing script injection.
 }
 add_action( 'wp_head', 'skyyrose_collection_schema' );

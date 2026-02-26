@@ -116,7 +116,8 @@ $skyyrose_br_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	<!-- ============================================================
 	     COLLECTION STORY
 	     ============================================================ -->
-	<section class="collection-story" id="story">
+	<section class="collection-story" id="story" aria-labelledby="story-heading">
+		<h2 id="story-heading" class="screen-reader-text"><?php esc_html_e( 'Collection Story', 'skyyrose-flagship' ); ?></h2>
 		<p class="collection-story__text">
 			<?php echo esc_html__( 'Born from moonlit gardens and shadowed cathedrals, the Black Rose collection is an ode to those who find beauty in the dark. Each piece is woven with gothic elegance — deep blacks punctuated by silver moonlight accents, roses that bloom only after midnight. This is not fashion for the faint of heart. It is armor for the bold, the defiant, the eternally romantic.', 'skyyrose-flagship' ); ?>
 		</p>

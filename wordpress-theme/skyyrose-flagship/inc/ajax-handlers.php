@@ -60,12 +60,31 @@ function skyyrose_ajax_contact_submit() {
 	$order_number      = str_replace( array( "\r", "\n", "\t" ), '', mb_substr( sanitize_text_field( wp_unslash( $_POST['order_number'] ?? '' ) ), 0, 50 ) );
 	$preferred_contact = sanitize_key( wp_unslash( $_POST['preferred_contact'] ?? 'email' ) );
 
+	// Referral source — marketing attribution.
+	$referral_raw    = sanitize_key( wp_unslash( $_POST['referral_source'] ?? '' ) );
+	$referral_labels = array(
+		'instagram'       => 'Instagram',
+		'tiktok'          => 'TikTok',
+		'twitter'         => 'Twitter / X',
+		'facebook'        => 'Facebook',
+		'youtube'         => 'YouTube',
+		'google-search'   => 'Google Search',
+		'friend-referral' => 'Friend or Family',
+		'press-article'   => 'Press / Article',
+		'event'           => 'Event or Pop-Up',
+		'other'           => 'Other',
+	);
+	$referral_source = isset( $referral_labels[ $referral_raw ] ) ? $referral_labels[ $referral_raw ] : '';
+
 	// Map subject slugs to human-readable labels.
 	$subject_labels = array(
 		'general-inquiry'    => __( 'General Inquiry', 'skyyrose-flagship' ),
 		'order-status'       => __( 'Order Status', 'skyyrose-flagship' ),
 		'returns-exchanges'  => __( 'Returns & Exchanges', 'skyyrose-flagship' ),
+		'wholesale-inquiry'  => __( 'Wholesale Inquiry', 'skyyrose-flagship' ),
+		'press-media'        => __( 'Press & Media', 'skyyrose-flagship' ),
 		'collaboration'      => __( 'Collaboration', 'skyyrose-flagship' ),
+		'custom-orders'      => __( 'Custom Orders', 'skyyrose-flagship' ),
 		'press'              => __( 'Press', 'skyyrose-flagship' ),
 		'other'              => __( 'Other', 'skyyrose-flagship' ),
 	);
@@ -97,12 +116,13 @@ function skyyrose_ajax_contact_submit() {
 		: __( '[SkyyRose Contact] New Message', 'skyyrose-flagship' );
 
 	$body = sprintf(
-		"Name: %s\nEmail: %s\nPhone: %s\nOrder Number: %s\nPreferred Contact: %s\n\nMessage:\n%s",
+		"Name: %s\nEmail: %s\nPhone: %s\nOrder Number: %s\nPreferred Contact: %s\nReferral Source: %s\n\nMessage:\n%s",
 		$name,
 		$email,
 		$phone,
 		$order_number,
 		$preferred_contact,
+		$referral_source ? $referral_source : 'Not specified',
 		$message
 	);
 
@@ -335,8 +355,9 @@ function skyyrose_ajax_signin() {
 		return;
 	}
 
-	// Clear rate-limit counter on successful login.
+	// Clear both rate-limit counters on successful login.
 	delete_transient( $cache_key );
+	delete_transient( $ip_key );
 
 	// Initialize session and set authentication cookies.
 	$remember = isset( $_POST['remember'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['remember'] ) );

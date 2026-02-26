@@ -199,6 +199,7 @@ get_header();
 						class="hotspot hotspot--prop-<?php echo esc_attr( $product['prop'] ); ?>"
 						style="left: <?php echo esc_attr( $product['left'] ); ?>%; top: <?php echo esc_attr( $product['top'] ); ?>%;"
 						data-product-id="<?php echo esc_attr( $product['id'] ); ?>"
+						data-product-sku="<?php echo esc_attr( $product['id'] ); ?>"
 						data-product-name="<?php echo esc_attr( $product['name'] ); ?>"
 						data-product-price="<?php echo esc_attr( $product['price'] ); ?>"
 						data-product-image="<?php echo esc_url( $product['image'] ); ?>"
