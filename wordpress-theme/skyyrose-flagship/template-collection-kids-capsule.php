@@ -81,6 +81,7 @@ $skyyrose_kc_shop_url   = function_exists( 'wc_get_page_permalink' ) ? wc_get_pa
 $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg' );
 ?>
 
+<main id="primary" class="site-main" role="main">
 <div class="collection--kids-capsule" data-collection="kids-capsule">
 
 	<!-- ============================================================
@@ -342,5 +343,6 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 	</section>
 
 </div><!-- .collection--kids-capsule -->
+</main><!-- #primary -->
 
 <?php get_footer(); ?>
