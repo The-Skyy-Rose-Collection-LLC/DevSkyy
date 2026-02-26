@@ -111,6 +111,8 @@
 	   -------------------------------------------------- */
 
 	var previousFocusEl = null;
+	var focusTrapHandler = null;
+	var focusTrapContainer = null;
 
 	function trapFocus(container) {
 		var focusable = container.querySelectorAll(
@@ -120,7 +122,12 @@
 		var first = focusable[0];
 		var last  = focusable[focusable.length - 1];
 
-		container.addEventListener('keydown', function (e) {
+		// Remove any previously attached handler to prevent accumulation.
+		if (focusTrapHandler && focusTrapContainer) {
+			focusTrapContainer.removeEventListener('keydown', focusTrapHandler);
+		}
+
+		focusTrapHandler = function (e) {
 			if (e.key !== 'Tab') return;
 			if (e.shiftKey) {
 				if (document.activeElement === first) {
@@ -133,8 +140,10 @@
 					first.focus();
 				}
 			}
-		});
+		};
 
+		focusTrapContainer = container;
+		container.addEventListener('keydown', focusTrapHandler);
 		first.focus();
 	}
 
@@ -175,7 +184,15 @@
 	}
 
 	function closeModal() {
-		if (modalOverlay) modalOverlay.classList.remove('open');
+		if (modalOverlay) {
+			modalOverlay.classList.remove('open');
+			// Clean up focus trap handler to prevent accumulation.
+			if (focusTrapHandler && focusTrapContainer) {
+				focusTrapContainer.removeEventListener('keydown', focusTrapHandler);
+				focusTrapHandler = null;
+				focusTrapContainer = null;
+			}
+		}
 		if (previousFocusEl) {
 			previousFocusEl.focus();
 			previousFocusEl = null;
@@ -446,6 +463,7 @@
 		if (shown) return;
 
 		function showPopup() {
+			if (shown) return;
 			shown = '1';
 			overlay.classList.add('open');
 			overlay.setAttribute('aria-hidden', 'false');

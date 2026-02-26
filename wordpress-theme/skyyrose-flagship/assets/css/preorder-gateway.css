@@ -773,7 +773,8 @@
 }
 
 .signin-input:focus {
-	outline: none;
+	outline: 2px solid var(--rose-gold, #B76E79);
+	outline-offset: -2px;
 	border-color: var(--rose-gold, #B76E79);
 }
 
@@ -1155,7 +1156,8 @@
 }
 
 .incentive-popup-input:focus {
-	outline: none;
+	outline: 2px solid var(--rose-gold, #B76E79);
+	outline-offset: -2px;
 	border-color: var(--rose-gold, #B76E79);
 }
 
