@@ -57,13 +57,15 @@ function skyyrose_get_love_hurts_products() {
 	$display_products = array();
 
 	foreach ( $catalog_products as $p ) {
+		// Prefer VTON front-model image over flat product shot.
+		$primary_img = ! empty( $p['front_model_image'] ) ? $p['front_model_image'] : $p['image'];
 		$display_products[] = array(
 			'sku'        => $p['sku'],
 			'name'       => $p['name'],
 			'price'      => skyyrose_format_price( $p ),
 			'desc'       => $p['description'],
 			'badge'      => $p['badge'],
-			'image'      => skyyrose_product_image_uri( $p['image'] ),
+			'image'      => skyyrose_product_image_uri( $primary_img ),
 			'back_image' => ! empty( $p['back_image'] ) ? skyyrose_product_image_uri( $p['back_image'] ) : '',
 		);
 
@@ -75,7 +77,7 @@ function skyyrose_get_love_hurts_products() {
 				'price'      => skyyrose_format_price( $p ),
 				'desc'       => 'The same Oakland fire in a fresh white colorway — embroidered rose, tapered fit',
 				'badge'      => 'New',
-				'image'      => skyyrose_product_image_uri( $p['image'] ),
+				'image'      => skyyrose_product_image_uri( $primary_img ),
 				'back_image' => '',
 			);
 		}
