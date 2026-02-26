@@ -15,56 +15,42 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Static fallback product data — used when WooCommerce has no featured
- * products OR when WooCommerce is not active. Defined once to eliminate
- * the duplicate arrays that existed in the original front-page.php.
+ * Static fallback product data — sourced from the centralized catalog
+ * (inc/product-catalog.php) to guarantee price/name consistency.
+ * Used when WooCommerce has no featured products or is not active.
  */
-$fallback_products = array(
-	array(
-		'badge'      => __( 'New', 'skyyrose-flagship' ),
-		'badge_cls'  => 'product-card__badge--new',
-		'collection' => __( 'Black Rose', 'skyyrose-flagship' ),
-		'name'       => __( 'BLACK Rose Crewneck', 'skyyrose-flagship' ),
-		'desc'       => __( 'Premium heavyweight crewneck with embroidered metallic silver rose detailing on chest.', 'skyyrose-flagship' ),
-		'price'      => '$120',
-		'rating'     => 5,
-		'reviews'    => 24,
-		'sku'        => 'br-001',
-	),
-	array(
-		'badge'      => __( 'Limited', 'skyyrose-flagship' ),
-		'badge_cls'  => 'product-card__badge--limited',
-		'collection' => __( 'Love Hurts', 'skyyrose-flagship' ),
-		'name'       => __( 'The Fannie', 'skyyrose-flagship' ),
-		'desc'       => __( 'Our signature piece honoring the Hurts family name. Crimson embroidery on premium black cotton.', 'skyyrose-flagship' ),
-		'price'      => '$145',
-		'rating'     => 5,
-		'reviews'    => 18,
-		'sku'        => 'lh-001',
-	),
-	array(
-		'badge'      => '',
-		'badge_cls'  => '',
-		'collection' => __( 'Signature', 'skyyrose-flagship' ),
-		'name'       => __( 'The Bay Set', 'skyyrose-flagship' ),
-		'desc'       => __( 'Complete matching set in rose gold tones. Hoodie and joggers crafted from premium French terry.', 'skyyrose-flagship' ),
-		'price'      => '$295',
-		'rating'     => 4,
-		'reviews'    => 31,
-		'sku'        => 'sg-001',
-	),
-	array(
-		'badge'      => __( 'New', 'skyyrose-flagship' ),
-		'badge_cls'  => 'product-card__badge--new',
-		'collection' => __( 'Black Rose', 'skyyrose-flagship' ),
-		'name'       => __( 'BLACK Rose Hoodie', 'skyyrose-flagship' ),
-		'desc'       => __( 'Heavyweight pullover hoodie with oversized silicone rose applique and silver-tipped drawstrings.', 'skyyrose-flagship' ),
-		'price'      => '$165',
-		'rating'     => 5,
-		'reviews'    => 42,
-		'sku'        => 'br-004',
-	),
+$featured_skus = array( 'br-006', 'lh-001', 'sg-001', 'sg-008' );
+$badge_map     = array(
+	'br-006' => array( __( 'Pre-Order', 'skyyrose-flagship' ), 'product-card__badge--limited' ),
+	'lh-001' => array( __( 'Pre-Order', 'skyyrose-flagship' ), 'product-card__badge--limited' ),
+	'sg-001' => array( __( 'Pre-Order', 'skyyrose-flagship' ), 'product-card__badge--limited' ),
+	'sg-008' => array( __( 'Pre-Order', 'skyyrose-flagship' ), 'product-card__badge--limited' ),
 );
+$collection_labels = array(
+	'black-rose' => __( 'Black Rose', 'skyyrose-flagship' ),
+	'love-hurts' => __( 'Love Hurts', 'skyyrose-flagship' ),
+	'signature'  => __( 'Signature', 'skyyrose-flagship' ),
+);
+
+$fallback_products = array();
+foreach ( $featured_skus as $fsku ) {
+	$p = skyyrose_get_product( $fsku );
+	if ( ! $p ) {
+		continue;
+	}
+	$badge_info          = isset( $badge_map[ $fsku ] ) ? $badge_map[ $fsku ] : array( '', '' );
+	$fallback_products[] = array(
+		'badge'      => $badge_info[0],
+		'badge_cls'  => $badge_info[1],
+		'collection' => isset( $collection_labels[ $p['collection'] ] ) ? $collection_labels[ $p['collection'] ] : $p['collection'],
+		'name'       => $p['name'],
+		'desc'       => $p['description'],
+		'price'      => skyyrose_format_price( $p ),
+		'rating'     => 5,
+		'reviews'    => 0,
+		'sku'        => $fsku,
+	);
+}
 ?>
 
 <section class="featured" aria-labelledby="featured-heading">
