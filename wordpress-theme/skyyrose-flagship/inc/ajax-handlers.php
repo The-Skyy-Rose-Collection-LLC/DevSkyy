@@ -69,7 +69,7 @@ function skyyrose_ajax_contact_submit() {
 		'press'              => __( 'Press', 'skyyrose-flagship' ),
 		'other'              => __( 'Other', 'skyyrose-flagship' ),
 	);
-	$subject = isset( $subject_labels[ $subject_raw ] ) ? $subject_labels[ $subject_raw ] : $subject_raw;
+	$subject = isset( $subject_labels[ $subject_raw ] ) ? $subject_labels[ $subject_raw ] : $subject_labels['other'];
 
 	// Validate required fields.
 	if ( empty( $name ) || empty( $email ) || empty( $message ) ) {

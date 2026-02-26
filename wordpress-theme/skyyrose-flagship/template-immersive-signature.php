@@ -192,7 +192,7 @@ get_header();
 
 		<!-- Hotspot Containers — Products placed on contextual props -->
 		<?php foreach ( $signature_rooms as $room_index => $room ) : ?>
-			<div class="hotspot-container" <?php echo 0 !== $room_index ? 'aria-hidden="true" style="display:none;"' : ''; ?>>
+			<div class="hotspot-container" <?php echo 0 !== $room_index ? 'aria-hidden="true" inert style="display:none;"' : ''; ?>>
 				<?php foreach ( $room['products'] as $product ) : ?>
 					<a
 						href="<?php echo esc_url( $product['url'] ); ?>"
@@ -241,7 +241,7 @@ get_header();
 
 	<!-- Product Detail Panel (Glassmorphism Slide-Up) -->
 	<div class="product-panel-overlay" aria-hidden="true"></div>
-	<div class="product-panel" role="dialog" aria-modal="true" aria-hidden="true" inert aria-labelledby="product-panel-name" aria-label="<?php esc_attr_e( 'Product details', 'skyyrose-flagship' ); ?>">
+	<div class="product-panel" role="dialog" aria-modal="true" aria-hidden="true" inert aria-labelledby="product-panel-name">
 		<button class="product-panel-close" type="button" aria-label="<?php esc_attr_e( 'Close product details', 'skyyrose-flagship' ); ?>">&times;</button>
 		<div class="product-panel-inner">
 			<div class="product-panel-thumb">

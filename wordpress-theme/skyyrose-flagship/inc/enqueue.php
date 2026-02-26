@@ -601,7 +601,7 @@ function skyyrose_enqueue_model_viewer() {
  */
 function skyyrose_model_viewer_module_type( $tag, $handle ) {
 	if ( 'google-model-viewer' === $handle ) {
-		$tag = str_replace( '<script ', '<script type="module" crossorigin="anonymous" integrity="sha384-0BjW+rxF7Fz3QbhuW5QgwRN9lvXlkzJq7lGHbKev/5ETzSPb62mYgU/PtCrIHYqy" ', $tag );
+		$tag = str_replace( '<script ', '<script type="module" crossorigin="anonymous" ', $tag );
 		return $tag;
 	}
 	return $tag;

@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 function skyyrose_product_schema() {
-	if ( ! is_singular( 'product' ) ) {
+	if ( ! is_singular( 'product' ) || ! function_exists( 'get_woocommerce_currency' ) ) {
 		return;
 	}
 
@@ -283,10 +283,12 @@ function skyyrose_get_breadcrumb_trail() {
 		);
 
 		$term = get_queried_object();
-		$breadcrumbs[] = array(
-			'title' => wp_strip_all_tags( html_entity_decode( $term->name, ENT_QUOTES, 'UTF-8' ) ),
-			'url'   => get_term_link( $term ),
-		);
+		if ( $term instanceof WP_Term ) {
+			$breadcrumbs[] = array(
+				'title' => wp_strip_all_tags( html_entity_decode( $term->name, ENT_QUOTES, 'UTF-8' ) ),
+				'url'   => get_term_link( $term ),
+			);
+		}
 	} elseif ( is_singular( 'post' ) ) {
 		$categories = get_the_category();
 		if ( $categories ) {
@@ -397,9 +399,9 @@ function skyyrose_open_graph_tags() {
 		}
 
 		// Product-specific OG tags.
-		if ( is_singular( 'product' ) ) {
+		if ( is_singular( 'product' ) && function_exists( 'wc_get_product' ) ) {
 			$product = wc_get_product( $post->ID );
-			if ( $product ) {
+			if ( $product && function_exists( 'get_woocommerce_currency' ) ) {
 				echo '<meta property="product:price:amount" content="' . esc_attr( $product->get_price() ) . '" />' . "\n";
 				echo '<meta property="product:price:currency" content="' . esc_attr( get_woocommerce_currency() ) . '" />' . "\n";
 				echo '<meta property="product:availability" content="' . esc_attr( $product->is_in_stock() ? 'in stock' : 'out of stock' ) . '" />' . "\n";
@@ -479,10 +481,18 @@ function skyyrose_canonical_url() {
 		echo '<link rel="canonical" href="' . esc_url( get_permalink() ) . '" />' . "\n";
 	} elseif ( is_front_page() ) {
 		echo '<link rel="canonical" href="' . esc_url( home_url( '/' ) ) . '" />' . "\n";
-	} elseif ( is_post_type_archive( 'product' ) || is_shop() ) {
-		echo '<link rel="canonical" href="' . esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ) . '" />' . "\n";
+	} elseif ( function_exists( 'is_shop' ) && ( is_post_type_archive( 'product' ) || is_shop() ) ) {
+		if ( function_exists( 'wc_get_page_id' ) ) {
+			echo '<link rel="canonical" href="' . esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ) . '" />' . "\n";
+		}
 	} elseif ( is_tax() || is_category() || is_tag() ) {
-		echo '<link rel="canonical" href="' . esc_url( get_term_link( get_queried_object() ) ) . '" />' . "\n";
+		$queried = get_queried_object();
+		if ( $queried instanceof WP_Term ) {
+			$term_link = get_term_link( $queried );
+			if ( ! is_wp_error( $term_link ) ) {
+				echo '<link rel="canonical" href="' . esc_url( $term_link ) . '" />' . "\n";
+			}
+		}
 	}
 }
 add_action( 'wp_head', 'skyyrose_canonical_url', 1 );

@@ -35,7 +35,7 @@ foreach ( $preorder_groups as $collection_slug => $products ) {
 		$gateway_products[] = array(
 			'id'               => $p['sku'],
 			'name'             => $p['name'],
-			'price'            => ( function_exists( 'get_woocommerce_currency_symbol' ) ? get_woocommerce_currency_symbol() : '$' ) . number_format( $p['price'], 0 ),
+			'price'            => ( function_exists( 'get_woocommerce_currency_symbol' ) ? html_entity_decode( get_woocommerce_currency_symbol(), ENT_QUOTES, 'UTF-8' ) : '$' ) . number_format( $p['price'], 0 ),
 			'collection'       => $p['collection'],
 			'collection_label' => isset( $collection_labels[ $p['collection'] ] )
 				? $collection_labels[ $p['collection'] ]
@@ -140,6 +140,7 @@ get_header();
 				?>
 					<article
 						class="product-grid-card"
+						aria-label="<?php echo esc_attr( $product['name'] . ' — ' . $product['price'] ); ?>"
 						data-collection="<?php echo esc_attr( $product['collection'] ); ?>"
 						data-product-id="<?php echo esc_attr( $product['id'] ); ?>"
 						data-product-name="<?php echo esc_attr( $product['name'] ); ?>"
@@ -195,7 +196,7 @@ get_header();
 
 	<!-- Product Modal -->
 	<div class="product-modal-overlay" aria-hidden="true"></div>
-	<div class="product-modal" role="dialog" aria-modal="true" aria-hidden="true" inert aria-labelledby="modal-product-name" aria-label="<?php esc_attr_e( 'Product details', 'skyyrose-flagship' ); ?>">
+	<div class="product-modal" role="dialog" aria-modal="true" aria-hidden="true" inert aria-labelledby="modal-product-name">
 		<button class="product-modal-close" type="button" aria-label="<?php esc_attr_e( 'Close', 'skyyrose-flagship' ); ?>">&times;</button>
 		<div class="modal-360-area">
 			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Product preview', 'skyyrose-flagship' ); ?>" width="400" height="400">

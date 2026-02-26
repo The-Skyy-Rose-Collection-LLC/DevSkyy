@@ -592,6 +592,14 @@ function skyyrose_product_url( $sku ) {
  */
 function skyyrose_immersive_product( $sku, $scene ) {
 
+	// Validate required scene keys.
+	$required_keys = array( 'left', 'top', 'prop', 'prop_label' );
+	foreach ( $required_keys as $key ) {
+		if ( ! isset( $scene[ $key ] ) ) {
+			return array();
+		}
+	}
+
 	// For split/variant SKUs like 'sg-001-tee' or 'lh-002b', look up the parent.
 	$parent_sku = preg_replace( '/-(tee|shorts)$/', '', $sku );
 	$parent_sku = preg_replace( '/([a-z]{2}-\d{3})[a-z]$/', '$1', $parent_sku );

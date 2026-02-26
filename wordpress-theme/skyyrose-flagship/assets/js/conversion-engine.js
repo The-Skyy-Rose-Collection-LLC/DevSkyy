@@ -97,14 +97,25 @@
 		// Skip social proof toasts on checkout page — WCAG 2.2.2 compliance.
 		if (document.body.classList.contains('woocommerce-checkout')) return;
 
-		toastContainer = createElement('div', 'cie-toast-container');
-		toastContainer.setAttribute('aria-live', 'polite');
-		toastContainer.setAttribute('role', 'status');
-		document.body.appendChild(toastContainer);
+		if (!toastContainer) {
+			toastContainer = createElement('div', 'cie-toast-container');
+			toastContainer.setAttribute('aria-live', 'polite');
+			toastContainer.setAttribute('role', 'status');
+			document.body.appendChild(toastContainer);
+		}
 
 		// Show first toast after a delay. Clear existing timer if double-init.
 		if (toastTimer) clearTimeout(toastTimer);
 		toastTimer = setTimeout(showNextToast, 6000);
+
+		// Pause toast cycle when tab is hidden to avoid DOM accumulation.
+		document.addEventListener('visibilitychange', function () {
+			if (document.hidden) {
+				if (toastTimer) { clearTimeout(toastTimer); toastTimer = null; }
+			} else if (!toastTimer) {
+				toastTimer = setTimeout(showNextToast, CONFIG.toastInterval);
+			}
+		});
 	}
 
 	function showNextToast() {

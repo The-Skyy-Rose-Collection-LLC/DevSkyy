@@ -852,7 +852,8 @@
 			? skyyRoseData.ajaxUrl
 			: null;
 
-		if (ajaxUrl && product.sku) {
+		var nonce = (typeof skyyRoseData !== 'undefined') ? skyyRoseData.nonce : '';
+		if (ajaxUrl && nonce && product.sku) {
 			btn.disabled = true;
 			var originalText = btn.textContent;
 			btn.textContent = '...';
@@ -888,7 +889,7 @@
 				'action=skyyrose_immersive_add_to_cart' +
 				'&sku=' + encodeURIComponent(product.sku) +
 				'&quantity=1' +
-				'&nonce=' + encodeURIComponent(typeof skyyRoseData !== 'undefined' ? skyyRoseData.nonce : '')
+				'&nonce=' + encodeURIComponent(nonce)
 			);
 		} else {
 			// No WooCommerce — visual feedback only.

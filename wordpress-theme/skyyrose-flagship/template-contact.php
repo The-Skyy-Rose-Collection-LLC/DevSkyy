@@ -243,7 +243,7 @@ $faq_items = array(
 					<input type="hidden" name="action" value="skyyrose_contact_submit">
 
 					<!-- Honeypot field for bot detection -->
-					<div class="contact-form__hp" aria-hidden="true">
+					<div class="contact-form__hp" aria-hidden="true" inert>
 						<label for="contact-website">
 							<?php esc_html_e( 'Website', 'skyyrose-flagship' ); ?>
 						</label>

@@ -585,13 +585,14 @@
 		// Exit intent on desktop — removed after trigger to avoid needless event checks.
 		function onExitIntent(e) {
 			if (e.clientY < 5 && !shown) {
+				clearTimeout(popupTimerId);
 				showPopup();
 			}
 		}
 		document.addEventListener('mouseout', onExitIntent);
 
 		// Show after 15 seconds if not already shown.
-		setTimeout(showPopup, 15000);
+		var popupTimerId = setTimeout(showPopup, 15000);
 
 		if (closeBtn) {
 			closeBtn.addEventListener('click', hidePopup);
@@ -613,9 +614,11 @@
 				}
 				var formData = new FormData(form);
 				var xhr = new XMLHttpRequest();
-				var ajaxUrl = (window.skyyRoseData && window.skyyRoseData.ajaxUrl)
-					? window.skyyRoseData.ajaxUrl
-					: form.getAttribute('action');
+				var ajaxUrl = window.skyyRoseData && window.skyyRoseData.ajaxUrl;
+				if (!ajaxUrl) {
+					if (submitBtn) { submitBtn.textContent = 'Try Again'; submitBtn.disabled = false; }
+					return;
+				}
 				xhr.open('POST', ajaxUrl, true);
 				xhr.onload = function () {
 					try {
