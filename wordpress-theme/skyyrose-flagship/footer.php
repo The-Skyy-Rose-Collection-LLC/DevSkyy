@@ -171,11 +171,7 @@
 			<div class="footer-copyright__container">
 				<p class="footer-copyright__text">
 					<?php
-					printf(
-						/* translators: %s: current year */
-						esc_html__( '&copy; %s The Skyy Rose Collection LLC. All rights reserved.', 'skyyrose-flagship' ),
-						esc_html( gmdate( 'Y' ) )
-					);
+					echo '&copy; ' . esc_html( gmdate( 'Y' ) ) . ' ' . esc_html__( 'The Skyy Rose Collection LLC. All rights reserved.', 'skyyrose-flagship' );
 					?>
 				</p>
 				<?php if ( has_nav_menu( 'footer' ) ) : ?>

@@ -35,7 +35,14 @@ $defaults = array(
 
 $args = wp_parse_args( $args ?? array(), $defaults );
 
-$has_glb    = ! empty( $args['glb_src'] ) && file_exists( SKYYROSE_DIR . '/assets/' . ltrim( str_replace( SKYYROSE_ASSETS_URI, '', $args['glb_src'] ), '/' ) );
+$glb_relative = ltrim( str_replace( SKYYROSE_ASSETS_URI, '', $args['glb_src'] ?? '' ), '/' );
+$glb_realbase = realpath( SKYYROSE_DIR . '/assets/' );
+$glb_realpath = $glb_relative ? realpath( SKYYROSE_DIR . '/assets/' . $glb_relative ) : false;
+$has_glb      = ! empty( $glb_relative )
+	&& false !== $glb_realpath
+	&& false !== $glb_realbase
+	&& 0 === strpos( $glb_realpath, $glb_realbase . DIRECTORY_SEPARATOR )
+	&& file_exists( $glb_realpath );
 $extra_class = ! empty( $args['class'] ) ? ' ' . sanitize_html_class( $args['class'] ) : '';
 ?>
 

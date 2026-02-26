@@ -160,7 +160,7 @@ foreach ( $featured_skus as $fsku ) {
 							</span>
 						<?php endif; ?>
 
-						<a href="<?php the_permalink(); ?>" class="product-card__image-link">
+						<a href="<?php echo esc_url( get_permalink() ); ?>" class="product-card__image-link">
 							<div class="product-card__image">
 								<?php
 								if ( has_post_thumbnail() ) {
@@ -182,7 +182,7 @@ foreach ( $featured_skus as $fsku ) {
 						</a>
 
 						<div class="product-card__actions" aria-label="<?php esc_attr_e( 'Quick actions', 'skyyrose-flagship' ); ?>">
-							<a href="<?php the_permalink(); ?>" class="product-card__action-btn" aria-label="<?php esc_attr_e( 'Quick View', 'skyyrose-flagship' ); ?>" title="<?php esc_attr_e( 'Quick View', 'skyyrose-flagship' ); ?>">
+							<a href="<?php echo esc_url( get_permalink() ); ?>" class="product-card__action-btn" aria-label="<?php esc_attr_e( 'Quick View', 'skyyrose-flagship' ); ?>" title="<?php esc_attr_e( 'Quick View', 'skyyrose-flagship' ); ?>">
 								<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 									<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
 									<circle cx="12" cy="12" r="3"/>
@@ -211,8 +211,8 @@ foreach ( $featured_skus as $fsku ) {
 								</p>
 							<?php endif; ?>
 							<h3 class="product-card__name">
-								<a href="<?php the_permalink(); ?>">
-									<?php the_title(); ?>
+								<a href="<?php echo esc_url( get_permalink() ); ?>">
+									<?php echo esc_html( get_the_title() ); ?>
 								</a>
 							</h3>
 
@@ -248,10 +248,10 @@ foreach ( $featured_skus as $fsku ) {
 							</div>
 
 							<div class="product-card__buttons">
-								<a href="<?php the_permalink(); ?>" class="btn btn--sm btn--primary">
+								<a href="<?php echo esc_url( get_permalink() ); ?>" class="btn btn--sm btn--primary">
 									<?php esc_html_e( 'Shop Now', 'skyyrose-flagship' ); ?>
 								</a>
-								<a href="<?php the_permalink(); ?>" class="btn btn--sm btn--ghost">
+								<a href="<?php echo esc_url( get_permalink() ); ?>" class="btn btn--sm btn--ghost">
 									<?php esc_html_e( 'Quick View', 'skyyrose-flagship' ); ?>
 								</a>
 							</div>

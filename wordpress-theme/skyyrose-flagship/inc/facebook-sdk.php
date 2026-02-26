@@ -24,7 +24,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! defined( 'SKYYROSE_FB_APP_ID' ) ) {
 	define( 'SKYYROSE_FB_APP_ID', get_option( 'skyyrose_fb_app_id', '860288763161770' ) );
 }
-define( 'SKYYROSE_FB_SDK_VERSION', 'v18.0' );
+if ( ! defined( 'SKYYROSE_FB_SDK_VERSION' ) ) {
+	define( 'SKYYROSE_FB_SDK_VERSION', 'v18.0' );
+}
 
 /**
  * Inject Facebook Pixel base code into <head>.

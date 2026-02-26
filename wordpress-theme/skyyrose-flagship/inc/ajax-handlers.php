@@ -49,12 +49,14 @@ function skyyrose_ajax_contact_submit() {
 		return;
 	}
 
-	// Sanitize input fields.
-	$name    = sanitize_text_field( wp_unslash( $_POST['name'] ?? '' ) );
-	$email   = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
-	$phone   = sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) );
-	$subject = sanitize_text_field( wp_unslash( $_POST['subject'] ?? '' ) );
-	$message = sanitize_textarea_field( wp_unslash( $_POST['message'] ?? '' ) );
+	// Sanitize input fields (contact form sends first_name + last_name).
+	$first_name = sanitize_text_field( wp_unslash( $_POST['first_name'] ?? '' ) );
+	$last_name  = sanitize_text_field( wp_unslash( $_POST['last_name'] ?? '' ) );
+	$name       = trim( $first_name . ' ' . $last_name );
+	$email      = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
+	$phone      = sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) );
+	$subject    = sanitize_text_field( wp_unslash( $_POST['subject'] ?? '' ) );
+	$message    = sanitize_textarea_field( wp_unslash( $_POST['message'] ?? '' ) );
 
 	// Validate required fields.
 	if ( empty( $name ) || empty( $email ) || empty( $message ) ) {
@@ -89,9 +91,11 @@ function skyyrose_ajax_contact_submit() {
 		$message
 	);
 
-	$headers = array(
+	// Strip newlines from $name to prevent email header injection.
+	$safe_name = str_replace( array( "\r", "\n", "\t" ), '', $name );
+	$headers   = array(
 		'Content-Type: text/plain; charset=UTF-8',
-		sprintf( 'Reply-To: %s <%s>', $name, $email ),
+		sprintf( 'Reply-To: %s <%s>', $safe_name, $email ),
 	);
 
 	$sent = wp_mail( $to, $subject, $body, $headers );
@@ -260,20 +264,6 @@ function skyyrose_ajax_signin() {
 		return;
 	}
 
-	// Rate limiting: max 5 attempts per IP per 15 minutes.
-	$ip        = sanitize_text_field( $_SERVER['REMOTE_ADDR'] ?? '' );
-	$cache_key = 'skyyrose_login_attempts_' . md5( $ip );
-	$attempts  = (int) get_transient( $cache_key );
-
-	if ( $attempts >= 5 ) {
-		wp_send_json_error(
-			array(
-				'message' => esc_html__( 'Too many login attempts. Please try again in 15 minutes.', 'skyyrose-flagship' ),
-			)
-		);
-		return;
-	}
-
 	// Sanitize input.
 	$email    = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
 	$password = isset( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : '';
@@ -282,6 +272,20 @@ function skyyrose_ajax_signin() {
 		wp_send_json_error(
 			array(
 				'message' => esc_html__( 'Please enter both email and password.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
+
+	// Rate limiting: max 5 attempts per email per 15 minutes.
+	// Uses email (not IP) because REMOTE_ADDR is the proxy IP on WordPress.com.
+	$cache_key = 'skyyrose_login_attempts_' . md5( $email );
+	$attempts  = (int) get_transient( $cache_key );
+
+	if ( $attempts >= 5 ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Too many login attempts. Please try again in 15 minutes.', 'skyyrose-flagship' ),
 			)
 		);
 		return;

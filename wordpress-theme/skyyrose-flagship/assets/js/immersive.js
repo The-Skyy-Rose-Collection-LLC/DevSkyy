@@ -113,7 +113,14 @@
 		if (panelCol)     panelCol.textContent = data.collection || '';
 		if (panelProp)    panelProp.textContent = data.propLabel || '';
 		if (panelProp)    panelProp.style.display = data.propLabel ? '' : 'none';
-		if (panelDetails) panelDetails.href = data.url || '#';
+		if (panelDetails) {
+			if (data.url && data.url !== '#') {
+				panelDetails.href = data.url;
+				panelDetails.style.display = '';
+			} else {
+				panelDetails.style.display = 'none';
+			}
+		}
 
 		// Populate sizes
 		if (panelSizes) {

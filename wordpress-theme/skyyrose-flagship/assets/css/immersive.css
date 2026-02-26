@@ -792,8 +792,40 @@
 /* Signature — Rose Gold beacons (default) */
 
 /* ==================================================
-   RESPONSIVE — Mobile
+   RESPONSIVE — Tablet & Mobile
    ================================================== */
+
+/* Tablet — constrained product panel, keep labels visible */
+@media (max-width: 1024px) and (min-width: 769px) {
+	.product-panel {
+		max-height: 70vh;
+		width: 480px;
+		margin: 0 auto;
+	}
+
+	.product-panel-inner {
+		padding: 2rem;
+		gap: 1.5rem;
+	}
+
+	.product-panel-thumb {
+		max-width: 280px;
+	}
+
+	.hotspot {
+		width: 52px;
+		height: 52px;
+	}
+
+	.scene-title-overlay h1 {
+		font-size: clamp(2rem, 5vw, 3rem);
+	}
+
+	.room-nav-btn {
+		width: 48px;
+		height: 48px;
+	}
+}
 
 @media (max-width: 768px) {
 	.room-nav-btn {

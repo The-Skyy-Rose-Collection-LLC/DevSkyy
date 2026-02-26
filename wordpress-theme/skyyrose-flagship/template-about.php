@@ -348,7 +348,7 @@ $founder_signature = get_theme_mod( 'about_founder_signature', '&mdash; The Foun
 							);
 							?>
 						</p>
-						<a href="<?php echo esc_url( home_url( '/collection/' . $collection['slug'] . '/' ) ); ?>" class="about-collections__card-link">
+						<a href="<?php echo esc_url( home_url( '/collection-' . $collection['slug'] . '/' ) ); ?>" class="about-collections__card-link">
 							<?php
 							/* translators: %s: collection name */
 							printf( esc_html__( 'Explore %s', 'skyyrose-flagship' ), esc_html( $collection['name'] ) );
