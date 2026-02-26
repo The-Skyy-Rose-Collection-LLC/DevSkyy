@@ -86,20 +86,23 @@ add_action( 'send_headers', 'skyyrose_send_security_headers' );
  *--------------------------------------------------------------*/
 
 /**
- * Disable XML-RPC except for Jetpack.
+ * Disable XML-RPC unconditionally.
  *
- * Jetpack requires XML-RPC (jetpack.* methods) to communicate with
- * WordPress.com. We allow Jetpack through but block everything else
- * to prevent brute-force and DDoS attacks.
+ * Jetpack 10.x+ communicates via the REST API, not XML-RPC.
+ * The xmlrpc_methods filter below further restricts to jetpack.*
+ * methods as a defence-in-depth measure in case this filter is
+ * removed by a third-party plugin.
+ *
+ * Previous implementation checked defined('JETPACK__VERSION') and
+ * returned true, which re-enabled XML-RPC for ALL callers whenever
+ * Jetpack was merely installed — exposing the site to brute-force
+ * and pingback DDoS attacks.  Fixed in v3.2.2.
  *
  * @since 1.0.0
  * @since 3.2.1 Whitelisted Jetpack methods.
+ * @since 3.2.2 Disabled unconditionally — Jetpack uses REST API.
  */
 function skyyrose_xmlrpc_enabled( $enabled ) {
-	// Allow XML-RPC when Jetpack is making the request.
-	if ( defined( 'JETPACK__VERSION' ) ) {
-		return true;
-	}
 	return false;
 }
 add_filter( 'xmlrpc_enabled', 'skyyrose_xmlrpc_enabled' );

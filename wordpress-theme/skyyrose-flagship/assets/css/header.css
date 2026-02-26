@@ -303,12 +303,16 @@
 	flex: 1;
 	background: transparent;
 	border: none;
-	outline: none;
 	font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
 	font-size: clamp(1.25rem, 3vw, 2rem);
 	font-weight: 400;
 	color: #fff;
 	padding: 0.5rem 0;
+}
+
+.search-overlay__input:focus {
+	outline: 2px solid var(--color-rose-gold, #B76E79);
+	outline-offset: 2px;
 }
 
 .search-overlay__input::placeholder {
