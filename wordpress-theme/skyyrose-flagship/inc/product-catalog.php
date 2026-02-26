@@ -508,7 +508,9 @@ function skyyrose_format_price( $product ) {
 		return esc_html__( 'Coming Soon', 'skyyrose-flagship' );
 	}
 
-	return '$' . number_format( $product['price'], 2 );
+	// Use zero decimal places — all prices are whole-dollar and $95 reads
+	// cleaner than $95.00 for a luxury fashion brand.
+	return '$' . number_format( $product['price'], 0 );
 }
 
 /**
