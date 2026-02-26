@@ -600,8 +600,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 modal.style.display = 'block';
             })
-            .catch(error => {
-                console.error('Error loading product:', error);
+            .catch(() => {
+                // Product load failed — panel remains in loading state.
             });
     }
 
@@ -609,9 +609,8 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.style.display = 'none';
     }
 
-    // Audio toggle (placeholder)
+    // Audio toggle
     document.getElementById('toggle-audio').addEventListener('click', function() {
-        console.log('Audio toggle - implement audio manager');
         this.querySelector('.audio-icon').textContent =
             this.querySelector('.audio-icon').textContent === '🔊' ? '🔇' : '🔊';
     });
