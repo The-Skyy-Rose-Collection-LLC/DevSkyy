@@ -61,14 +61,16 @@ function skyyrose_get_signature_products() {
 	$set_skus = array( 'sg-001', 'sg-002' );
 
 	foreach ( $catalog_products as $p ) {
-		$img_uri = skyyrose_product_image_uri( $p['image'] );
+		// Prefer VTON front-model image over flat product shot.
+		$primary_img = ! empty( $p['front_model_image'] ) ? $p['front_model_image'] : $p['image'];
+		$img_uri     = skyyrose_product_image_uri( $primary_img );
 
 		if ( in_array( $p['sku'], $set_skus, true ) ) {
 			// Split set into tee and shorts.
 			$display_products[] = array(
 				'sku'        => $p['sku'] . '-tee',
 				'name'       => $p['name'] . ' — Tee',
-				'price'      => '$40.00',
+				'price'      => '$40',
 				'desc'       => $p['description'],
 				'badge'      => $p['badge'],
 				'image'      => $img_uri,
@@ -80,7 +82,7 @@ function skyyrose_get_signature_products() {
 			$display_products[] = array(
 				'sku'        => $p['sku'] . '-shorts',
 				'name'       => $p['name'] . ' — Shorts',
-				'price'      => '$50.00',
+				'price'      => '$50',
 				'desc'       => $p['description'],
 				'badge'      => $p['badge'],
 				'image'      => $shorts_img,

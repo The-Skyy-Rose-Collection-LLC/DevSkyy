@@ -22,9 +22,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Multi-room scene data with hotspot products per room.
- * Products placed on props visible in the actual scene images:
- * glass orbs, marble pedestals, gold-lit display frames, clothing racks,
- * display tables — not floating in air.
+ * Product data (name, price, image, sizes) pulled from centralized catalog.
+ * Scene-specific data (position, prop, prop_label) and split-SKU overrides defined here.
  *
  * Scene images:
  * - signature-waterfront-runway.png (Bay Bridge waterfront at night)
@@ -38,87 +37,56 @@ $signature_rooms = array(
 		'alt'      => esc_attr__( 'Bay Bridge waterfront at night with black marble platform floating over water, gold-lit LED display frames with hanging garments, glass orb display case, and stepped marble pedestals', 'skyyrose-flagship' ),
 		'products' => array(
 			// Glass orb display case (left)
-			array(
-				'id'         => 'sg-009',
-				'name'       => esc_html__( 'The Sherpa Jacket', 'skyyrose-flagship' ),
-				'price'      => '$80',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-009-sherpa-jacket.webp',
-				'url'        => '/?product_id=sg-009',
+			skyyrose_immersive_product( 'sg-009', array(
 				'left'       => '15',
 				'top'        => '42',
 				'prop'       => 'glass-orb',
 				'prop_label' => esc_html__( 'Inside glass orb display case', 'skyyrose-flagship' ),
-			),
+			) ),
 			// Gold-lit display frames (center) — sg-002 split into tee + shorts
-			array(
-				'id'         => 'sg-002-tee',
+			skyyrose_immersive_product( 'sg-002-tee', array(
 				'name'       => esc_html__( 'Stay Golden Set — Tee', 'skyyrose-flagship' ),
 				'price'      => '$40',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
 				'sizes'      => 'XS,S,M,L,XL,2XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-002-stay-golden-tee.jpg',
-				'url'        => '/?product_id=sg-002-tee',
 				'left'       => '42',
 				'top'        => '35',
 				'prop'       => 'gold-display-frame',
 				'prop_label' => esc_html__( 'Hanging in gold-lit LED display frame', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'sg-002-shorts',
+			) ),
+			skyyrose_immersive_product( 'sg-002-shorts', array(
 				'name'       => esc_html__( 'Stay Golden Set — Shorts', 'skyyrose-flagship' ),
 				'price'      => '$50',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
 				'sizes'      => 'S,M,L,XL,2XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-010-bridge-shorts.webp',
-				'url'        => '/?product_id=sg-002-shorts',
+				'image'      => get_theme_file_uri( 'assets/images/products/sg-010-bridge-shorts.webp' ),
 				'left'       => '50',
 				'top'        => '38',
 				'prop'       => 'gold-display-frame',
 				'prop_label' => esc_html__( 'Hanging in gold-lit LED display frame', 'skyyrose-flagship' ),
-			),
-			// Gold-lit display frame (right) — Mint & Lavender Hoodie
-			array(
-				'id'         => 'sg-006',
-				'name'       => esc_html__( 'Mint & Lavender Hoodie', 'skyyrose-flagship' ),
-				'price'      => '$45',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-006-mint-lavender-hoodie.jpg',
-				'url'        => '/?product_id=sg-006',
+			) ),
+			// Gold-lit display frame (right)
+			skyyrose_immersive_product( 'sg-006', array(
 				'left'       => '62',
 				'top'        => '36',
 				'prop'       => 'gold-display-frame',
 				'prop_label' => esc_html__( 'Hanging in gold-lit LED display frame', 'skyyrose-flagship' ),
-			),
+			) ),
 			// Featured marble pedestal (right) — sg-001 split into tee + shorts
-			array(
-				'id'         => 'sg-001-tee',
+			skyyrose_immersive_product( 'sg-001-tee', array(
 				'name'       => esc_html__( 'The Bay Set — Tee', 'skyyrose-flagship' ),
 				'price'      => '$40',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-001-bay-set.webp',
-				'url'        => '/?product_id=sg-001-tee',
 				'left'       => '75',
 				'top'        => '50',
 				'prop'       => 'marble-pedestal',
 				'prop_label' => esc_html__( 'Featured on stepped marble pedestal', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'sg-001-shorts',
+			) ),
+			skyyrose_immersive_product( 'sg-001-shorts', array(
 				'name'       => esc_html__( 'The Bay Set — Shorts', 'skyyrose-flagship' ),
 				'price'      => '$50',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-001-bay-set.webp',
-				'url'        => '/?product_id=sg-001-shorts',
 				'left'       => '82',
 				'top'        => '58',
 				'prop'       => 'marble-pedestal',
 				'prop_label' => esc_html__( 'On lower marble pedestal step', 'skyyrose-flagship' ),
-			),
+			) ),
 		),
 	),
 	// Room 2 — Golden Gate Showroom
@@ -127,62 +95,35 @@ $signature_rooms = array(
 		'image'    => get_template_directory_uri() . '/assets/scenes/signature/signature-golden-gate-showroom.png',
 		'alt'      => esc_attr__( 'Golden Gate Bridge sunset showroom with floor-to-ceiling panoramic windows, black marble interior with gold LED trim, clothing racks, marble pedestals, and dramatic sunset sky', 'skyyrose-flagship' ),
 		'products' => array(
-			// Left wall clothing rack — The Signature Tee (Orchid)
-			array(
-				'id'         => 'sg-003',
-				'name'       => esc_html__( 'The Signature Tee (Orchid)', 'skyyrose-flagship' ),
-				'price'      => '$15',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-012-label-tee-orchid.webp',
-				'url'        => '/?product_id=sg-003',
+			// Left wall clothing rack — sg-003 uses sg-012 image (no sg-003 source image available)
+			skyyrose_immersive_product( 'sg-003', array(
+				'image'      => get_theme_file_uri( 'assets/images/products/sg-012-label-tee-orchid.webp' ),
 				'left'       => '18',
 				'top'        => '38',
 				'prop'       => 'clothing-rack',
 				'prop_label' => esc_html__( 'Hanging on left wall clothing rack', 'skyyrose-flagship' ),
-			),
-			// Center marble display table — Stay Golden Tee (Classic)
-			array(
-				'id'         => 'sg-005',
-				'name'       => esc_html__( 'Stay Golden Tee (Classic)', 'skyyrose-flagship' ),
-				'price'      => '$40',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'XS,S,M,L,XL,2XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-005-stay-golden-tee.webp',
-				'url'        => '/?product_id=sg-005',
+			) ),
+			// Center marble display table
+			skyyrose_immersive_product( 'sg-005', array(
 				'left'       => '50',
 				'top'        => '52',
 				'prop'       => 'marble-display-table',
 				'prop_label' => esc_html__( 'Featured on center marble display table', 'skyyrose-flagship' ),
-			),
-			// Left marble pedestal — The Signature Beanie
-			array(
-				'id'         => 'sg-007',
-				'name'       => esc_html__( 'The Signature Beanie', 'skyyrose-flagship' ),
-				'price'      => '$25',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => esc_html__( 'One Size', 'skyyrose-flagship' ),
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-007-signature-beanie.webp',
-				'url'        => '/?product_id=sg-007',
+			) ),
+			// Left marble pedestal
+			skyyrose_immersive_product( 'sg-007', array(
 				'left'       => '32',
 				'top'        => '48',
 				'prop'       => 'marble-pedestal',
 				'prop_label' => esc_html__( 'On left marble pedestal', 'skyyrose-flagship' ),
-			),
-			// Right wall clothing rack — The Bridge Series Shorts
-			array(
-				'id'         => 'sg-010',
-				'name'       => esc_html__( 'The Bridge Series Shorts', 'skyyrose-flagship' ),
-				'price'      => '$25',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-010-bridge-shorts.webp',
-				'url'        => '/?product_id=sg-010',
+			) ),
+			// Right wall clothing rack
+			skyyrose_immersive_product( 'sg-010', array(
 				'left'       => '78',
 				'top'        => '38',
 				'prop'       => 'clothing-rack',
 				'prop_label' => esc_html__( 'Hanging on right wall clothing rack', 'skyyrose-flagship' ),
-			),
+			) ),
 		),
 	),
 );

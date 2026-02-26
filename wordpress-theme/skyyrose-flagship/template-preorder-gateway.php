@@ -40,7 +40,7 @@ foreach ( $preorder_groups as $collection_slug => $products ) {
 			'collection_label' => $collection_labels[ $p['collection'] ],
 			'sizes'            => str_replace( '|', ',', $p['sizes'] ),
 			'desc'             => esc_html( $p['description'] ),
-			'image'            => skyyrose_product_image_uri( $p['image'] ),
+			'image'            => skyyrose_product_image_uri( ! empty( $p['front_model_image'] ) ? $p['front_model_image'] : $p['image'] ),
 			'edition'          => (string) $p['edition_size'],
 		);
 	}
