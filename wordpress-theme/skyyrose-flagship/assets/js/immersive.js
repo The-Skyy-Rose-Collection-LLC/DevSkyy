@@ -154,6 +154,9 @@
 		panelOverlay.setAttribute('aria-hidden', 'true');
 		panel.setAttribute('aria-hidden', 'true');
 
+		// Clear stale product ID so the bridge doesn't add-to-cart for a previously viewed product.
+		delete panel.dataset.currentProductId;
+
 		// Restore focus to the hotspot that opened the panel.
 		if (lastFocused) {
 			lastFocused.focus();

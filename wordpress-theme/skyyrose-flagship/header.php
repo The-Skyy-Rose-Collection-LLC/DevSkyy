@@ -56,7 +56,7 @@
 				</div>
 
 				<!-- Desktop Navigation -->
-				<div class="navbar__nav-wrapper" role="navigation">
+				<div class="navbar__nav-wrapper">
 					<?php
 					wp_nav_menu(
 						array(

@@ -29,10 +29,18 @@
 		sparkle.addEventListener('animationend', function () {
 			sparkle.remove();
 		});
+
+		// Fallback removal if animationend never fires (e.g. prefers-reduced-motion).
+		setTimeout(function () {
+			if (sparkle.parentNode) sparkle.remove();
+		}, 5000);
 	}
 
 	function initSparkles() {
 		if (!sparkleContainer) return;
+
+		// Skip sparkles entirely when user prefers reduced motion.
+		if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
 		// Initial burst.
 		for (var i = 0; i < 12; i++) {

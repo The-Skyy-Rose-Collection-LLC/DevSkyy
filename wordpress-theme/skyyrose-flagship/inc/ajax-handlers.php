@@ -54,9 +54,11 @@ function skyyrose_ajax_contact_submit() {
 	$last_name  = sanitize_text_field( wp_unslash( $_POST['last_name'] ?? '' ) );
 	$name       = trim( $first_name . ' ' . $last_name );
 	$email      = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
-	$phone      = sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) );
-	$subject    = sanitize_text_field( wp_unslash( $_POST['subject'] ?? '' ) );
-	$message    = sanitize_textarea_field( wp_unslash( $_POST['message'] ?? '' ) );
+	$phone             = sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) );
+	$subject           = sanitize_text_field( wp_unslash( $_POST['subject'] ?? '' ) );
+	$message           = sanitize_textarea_field( wp_unslash( $_POST['message'] ?? '' ) );
+	$order_number      = sanitize_text_field( wp_unslash( $_POST['order_number'] ?? '' ) );
+	$preferred_contact = sanitize_key( wp_unslash( $_POST['preferred_contact'] ?? 'email' ) );
 
 	// Validate required fields.
 	if ( empty( $name ) || empty( $email ) || empty( $message ) ) {
@@ -84,18 +86,21 @@ function skyyrose_ajax_contact_submit() {
 		: __( '[SkyyRose Contact] New Message', 'skyyrose-flagship' );
 
 	$body = sprintf(
-		"Name: %s\nEmail: %s\nPhone: %s\n\nMessage:\n%s",
+		"Name: %s\nEmail: %s\nPhone: %s\nOrder Number: %s\nPreferred Contact: %s\n\nMessage:\n%s",
 		$name,
 		$email,
 		$phone,
+		$order_number,
+		$preferred_contact,
 		$message
 	);
 
-	// Strip newlines from $name to prevent email header injection.
-	$safe_name = str_replace( array( "\r", "\n", "\t" ), '', $name );
-	$headers   = array(
+	// Strip newlines from $name and $email to prevent email header injection.
+	$safe_name  = str_replace( array( "\r", "\n", "\t" ), '', $name );
+	$safe_email = str_replace( array( "\r", "\n", "\t" ), '', $email );
+	$headers    = array(
 		'Content-Type: text/plain; charset=UTF-8',
-		sprintf( 'Reply-To: %s <%s>', $safe_name, $email ),
+		sprintf( 'Reply-To: %s <%s>', $safe_name, $safe_email ),
 	);
 
 	$sent = wp_mail( $to, $subject, $body, $headers );

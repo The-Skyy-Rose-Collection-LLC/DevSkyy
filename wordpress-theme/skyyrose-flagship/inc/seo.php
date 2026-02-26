@@ -100,7 +100,7 @@ function skyyrose_product_schema() {
 						'ratingValue' => $rating,
 					),
 					'reviewBody'    => wp_strip_all_tags( $review->comment_content ),
-					'datePublished' => $review->comment_date,
+					'datePublished' => mysql2date( 'c', $review->comment_date ),
 				);
 			}
 		}

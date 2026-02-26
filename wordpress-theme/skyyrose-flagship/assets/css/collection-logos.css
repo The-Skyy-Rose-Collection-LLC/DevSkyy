@@ -458,4 +458,10 @@
 	.collection-logo-3d--signature img {
 		animation: none;
 	}
+
+	.fade-in-up {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
 }
