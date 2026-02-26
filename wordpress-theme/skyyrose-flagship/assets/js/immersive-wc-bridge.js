@@ -406,8 +406,13 @@
 			var size = '';
 
 			// Read product SKU from panel data attribute (set by immersive.js openPanel).
-			if (panel.dataset.currentProductId) {
-				productSku = panel.dataset.currentProductId;
+			// Prefer currentProductSku (actual SKU string) over currentProductId (numeric WC ID).
+			if (panel.dataset.currentProductSku) {
+				productSku = panel.dataset.currentProductSku;
+			} else if (panel.dataset.currentProductId) {
+				// Fallback: resolve numeric ID to SKU via hotspot data-product-sku attribute.
+				var matchingHotspot = document.querySelector('.hotspot[data-product-id="' + panel.dataset.currentProductId + '"]');
+				productSku = matchingHotspot ? (matchingHotspot.getAttribute('data-product-sku') || '') : '';
 			}
 
 			// Fall back: focused or active hotspot.
