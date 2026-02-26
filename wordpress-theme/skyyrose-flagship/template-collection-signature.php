@@ -168,8 +168,7 @@ $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 				$skyyrose_p_image = ! empty( $skyyrose_product['image'] ) ? $skyyrose_product['image'] : $skyyrose_sg_placeholder;
 				?>
 				<a href="<?php echo esc_url( $skyyrose_p_url ); ?>"
-				   class="collection-product-card"
-				   aria-label="<?php echo esc_attr( $skyyrose_product['name'] ); ?>">
+				   class="collection-product-card">
 
 					<?php if ( ! empty( $skyyrose_product['badge'] ) ) : ?>
 						<span class="collection-product-card__badge">
