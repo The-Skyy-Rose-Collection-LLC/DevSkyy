@@ -289,7 +289,8 @@
 					var allowedSelectors = [
 						'.cart-count-badge', '.navbar__cart-badge',
 						'.cart-contents', '.widget_shopping_cart_content',
-						'div.widget_shopping_cart_content'
+						'div.widget_shopping_cart_content',
+						'.cart-count', '.cart-subtotal'
 					];
 					for (var selector in data.fragments) {
 						if (!data.fragments.hasOwnProperty(selector)) continue;
@@ -384,17 +385,23 @@
 			var productId = null;
 			var size = '';
 
-			// Get product ID from the currently focused hotspot's data.
-			var activeHotspot = document.querySelector('.hotspot:focus, .hotspot[aria-current="true"]');
-			if (activeHotspot) {
-				productId = activeHotspot.getAttribute('data-product-id');
+			// Read product ID from panel data attribute (set by immersive.js openPanel).
+			if (panel.dataset.currentProductId) {
+				productId = panel.dataset.currentProductId;
+			}
+
+			// Fall back: focused or active hotspot.
+			if (!productId) {
+				var activeHotspot = document.querySelector('.hotspot:focus, .hotspot[aria-current="true"]');
+				if (activeHotspot) {
+					productId = activeHotspot.getAttribute('data-product-id');
+				}
 			}
 
 			// Fall back: check the panel's view-details link for product context.
 			if (!productId) {
 				var detailsLink = panel.querySelector('.btn-view-details');
 				if (detailsLink && detailsLink.href) {
-					// Product ID may be stored in a data attribute by applyLiveData.
 					var allHotspots = document.querySelectorAll('.hotspot[data-product-url]');
 					for (var i = 0; i < allHotspots.length; i++) {
 						if (allHotspots[i].getAttribute('data-product-url') === detailsLink.href) {

@@ -138,7 +138,7 @@ get_header();
 				></button>
 			<?php endforeach; ?>
 		</div>
-		<div class="room-name"><?php echo esc_html( $love_hurts_rooms[0]['name'] ); ?></div>
+		<div class="room-name" aria-live="polite" aria-atomic="true"><?php echo esc_html( $love_hurts_rooms[0]['name'] ); ?></div>
 
 		<!-- Hotspot Containers — One per room -->
 		<?php foreach ( $love_hurts_rooms as $room_index => $room ) : ?>

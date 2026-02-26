@@ -309,8 +309,15 @@
 	transition: all 0.25s ease;
 }
 
-.product-grid-card:hover .product-grid-wishlist {
+.product-grid-card:hover .product-grid-wishlist,
+.product-grid-card:focus-within .product-grid-wishlist {
 	opacity: 1;
+}
+
+.product-grid-wishlist:focus-visible {
+	opacity: 1;
+	outline: 2px solid var(--rose-gold, #B76E79);
+	outline-offset: 2px;
 }
 
 .product-grid-wishlist:hover {
