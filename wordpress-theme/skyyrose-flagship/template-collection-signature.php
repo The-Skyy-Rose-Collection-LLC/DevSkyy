@@ -210,7 +210,7 @@ $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	     IMMERSIVE CTA
 	     ============================================================ -->
 	<section class="collection-immersive-cta">
-		<a href="<?php echo esc_url( home_url( '/immersive/signature/' ) ); ?>"
+		<a href="<?php echo esc_url( home_url( '/experience-signature/' ) ); ?>"
 		   class="collection-immersive-cta__link">
 			<?php echo esc_html__( 'Enter the 3D Experience', 'skyyrose-flagship' ); ?>
 		</a>

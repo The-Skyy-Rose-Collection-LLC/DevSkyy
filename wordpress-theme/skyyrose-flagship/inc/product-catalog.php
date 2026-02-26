@@ -302,7 +302,7 @@ function skyyrose_get_product_catalog() {
 			'collection'        => 'signature',
 			'description'       => 'The essential SkyyRose tee in a rich orchid colorway. Soft cotton with embroidered rose.',
 			'badge'             => '',
-			'image'             => $img . '/sg-003-pink-smoke-crewneck.jpg',
+			'image'             => $img . '/sg-012-label-tee-orchid.webp',
 			'front_model_image' => '',
 			'back_image'        => '',
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
@@ -429,7 +429,7 @@ function skyyrose_get_product_catalog() {
 			'price'             => 30.00,
 			'collection'        => 'signature',
 			'description'       => 'The original SkyyRose label tee in clean white. Minimal design with signature branding.',
-			'badge'             => 'Draft',
+			'badge'             => 'New',
 			'image'             => $img . '/sg-011-label-tee-white.webp',
 			'front_model_image' => '',
 			'back_image'        => '',
@@ -445,7 +445,7 @@ function skyyrose_get_product_catalog() {
 			'price'             => 30.00,
 			'collection'        => 'signature',
 			'description'       => 'The original SkyyRose label tee in rich orchid. Minimal design with signature branding.',
-			'badge'             => 'Draft',
+			'badge'             => 'New',
 			'image'             => $img . '/sg-012-label-tee-orchid.webp',
 			'front_model_image' => $img . '/sg-012-front-model.webp',
 			'back_image'        => '',
@@ -510,7 +510,7 @@ function skyyrose_get_preorder_products() {
 	);
 
 	foreach ( $catalog as $product ) {
-		if ( $product['is_preorder'] ) {
+		if ( $product['is_preorder'] && $product['published'] ) {
 			$collections[ $product['collection'] ][] = $product;
 		}
 	}
@@ -547,9 +547,31 @@ function skyyrose_format_price( $product ) {
  */
 function skyyrose_product_image_uri( $image_path ) {
 	if ( empty( $image_path ) ) {
-		return get_theme_file_uri( 'assets/images/products/placeholder.jpg' );
+		return get_theme_file_uri( 'assets/images/placeholder-product.jpg' );
 	}
 	return get_theme_file_uri( $image_path );
+}
+
+/**
+ * Get the best available URL for a product.
+ *
+ * Uses WooCommerce permalink if product exists, falls back to pre-order page.
+ *
+ * @since  3.2.3
+ * @param  string $sku Product SKU.
+ * @return string Product URL.
+ */
+function skyyrose_product_url( $sku ) {
+	if ( function_exists( 'wc_get_product_id_by_sku' ) ) {
+		// Strip variant suffixes for WC lookup.
+		$lookup_sku = preg_replace( '/-(tee|shorts)$/', '', $sku );
+		$lookup_sku = preg_replace( '/([a-z]{2}-\d{3})[a-z]$/', '$1', $lookup_sku );
+		$product_id = wc_get_product_id_by_sku( $lookup_sku );
+		if ( $product_id ) {
+			return get_permalink( $product_id );
+		}
+	}
+	return home_url( '/pre-order/#' . sanitize_title( $sku ) );
 }
 
 /**
@@ -567,8 +589,9 @@ function skyyrose_product_image_uri( $image_path ) {
  */
 function skyyrose_immersive_product( $sku, $scene ) {
 
-	// For split SKUs like 'sg-001-tee', look up the parent 'sg-001'.
+	// For split/variant SKUs like 'sg-001-tee' or 'lh-002b', look up the parent.
 	$parent_sku = preg_replace( '/-(tee|shorts)$/', '', $sku );
+	$parent_sku = preg_replace( '/([a-z]{2}-\d{3})[a-z]$/', '$1', $parent_sku );
 	$product    = skyyrose_get_product( $parent_sku );
 
 	// Determine the best display image: front-model VTON > flat product.
@@ -610,7 +633,7 @@ function skyyrose_immersive_product( $sku, $scene ) {
 		'image'      => isset( $scene['image'] )
 			? $scene['image']
 			: ( $display_image ? get_theme_file_uri( $display_image ) : '' ),
-		'url'        => '/?product_id=' . $sku,
+		'url'        => skyyrose_product_url( $sku ),
 		'left'       => $scene['left'],
 		'top'        => $scene['top'],
 		'prop'       => $scene['prop'],

@@ -17,8 +17,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Facebook App & Pixel configuration.
+ *
+ * App ID is read from wp_options for easy admin updates.
+ * SDK version is safe to keep as a constant.
  */
-define( 'SKYYROSE_FB_APP_ID', '860288763161770' );
+if ( ! defined( 'SKYYROSE_FB_APP_ID' ) ) {
+	define( 'SKYYROSE_FB_APP_ID', get_option( 'skyyrose_fb_app_id', '860288763161770' ) );
+}
 define( 'SKYYROSE_FB_SDK_VERSION', 'v18.0' );
 
 /**
