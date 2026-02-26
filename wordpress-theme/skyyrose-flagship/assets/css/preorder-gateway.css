@@ -1252,3 +1252,42 @@
 	outline: 2px solid var(--rose-gold, #B76E79);
 	outline-offset: 2px;
 }
+
+/* Scarcity pricing indicator — inline styles replaced with CSS classes */
+.pulse-scarcity-price {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	padding: 3px 0;
+	margin-top: 4px;
+	font-family: var(--font-body, Inter, sans-serif);
+	font-size: 0.6rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+}
+
+.pulse-scarcity-price--low {
+	color: #D97706; /* WCAG 4.5:1 on #0a0a0a */
+}
+
+.pulse-scarcity-price--critical {
+	color: #DC143C;
+}
+
+.pulse-scarcity-dot {
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: currentColor;
+	flex-shrink: 0;
+}
+
+.pulse-scarcity-price--critical .pulse-scarcity-dot {
+	animation: pulse-scarcity-blink 1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.pulse-scarcity-dot {
+		animation: none;
+	}
+}

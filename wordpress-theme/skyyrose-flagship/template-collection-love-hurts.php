@@ -70,6 +70,9 @@ function skyyrose_get_love_hurts_products() {
 		);
 
 		// Insert white joggers variant after the black joggers.
+		// NOTE: lh-002b has no dedicated white-colorway image yet. Use the flat
+		// product image (not front-model VTON) as a neutral stand-in until a
+		// white variant WebP is available.
 		if ( 'lh-002' === $p['sku'] ) {
 			$display_products[] = array(
 				'sku'        => 'lh-002b',
@@ -77,7 +80,7 @@ function skyyrose_get_love_hurts_products() {
 				'price'      => skyyrose_format_price( $p ),
 				'desc'       => __( 'The same Oakland fire in a fresh white colorway — embroidered rose, tapered fit', 'skyyrose-flagship' ),
 				'badge'      => __( 'New', 'skyyrose-flagship' ),
-				'image'      => skyyrose_product_image_uri( $primary_img ),
+				'image'      => skyyrose_product_image_uri( $p['image'] ),
 				'back_image' => '',
 			);
 		}

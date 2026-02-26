@@ -260,9 +260,12 @@
 	font-weight: 600;
 }
 
-/* Reduced motion — WooCommerce base */
+/* Reduced motion — WooCommerce elements only (scoped to avoid overriding
+   per-component reduced-motion rules in other stylesheets) */
 @media (prefers-reduced-motion: reduce) {
-	* {
+	.woocommerce *,
+	.wc-block-grid *,
+	.skyy-product-card * {
 		transition-duration: 0.01ms !important;
 		animation-duration: 0.01ms !important;
 	}

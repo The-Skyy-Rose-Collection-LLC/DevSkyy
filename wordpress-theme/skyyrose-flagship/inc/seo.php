@@ -249,7 +249,7 @@ function skyyrose_get_breadcrumb_trail() {
 		),
 	);
 
-	if ( is_singular( 'product' ) ) {
+	if ( is_singular( 'product' ) && function_exists( 'wc_get_page_id' ) ) {
 		$breadcrumbs[] = array(
 			'title' => __( 'Shop', 'skyyrose-flagship' ),
 			'url'   => get_permalink( wc_get_page_id( 'shop' ) ),
@@ -268,12 +268,12 @@ function skyyrose_get_breadcrumb_trail() {
 			'title' => get_the_title(),
 			'url'   => get_permalink(),
 		);
-	} elseif ( is_post_type_archive( 'product' ) || is_shop() ) {
+	} elseif ( function_exists( 'wc_get_page_id' ) && ( is_post_type_archive( 'product' ) || is_shop() ) ) {
 		$breadcrumbs[] = array(
 			'title' => __( 'Shop', 'skyyrose-flagship' ),
 			'url'   => get_permalink( wc_get_page_id( 'shop' ) ),
 		);
-	} elseif ( is_tax( 'product_cat' ) ) {
+	} elseif ( function_exists( 'wc_get_page_id' ) && is_tax( 'product_cat' ) ) {
 		$breadcrumbs[] = array(
 			'title' => __( 'Shop', 'skyyrose-flagship' ),
 			'url'   => get_permalink( wc_get_page_id( 'shop' ) ),

@@ -295,6 +295,8 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
+		// NOTE: sg-003 has no dedicated product image; using sg-012 orchid tee
+		// as visual stand-in until sg-003-signature-tee-orchid.webp is available.
 		'sg-003' => array(
 			'sku'               => 'sg-003',
 			'name'              => 'The Signature Tee (Orchid)',

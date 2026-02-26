@@ -27,17 +27,17 @@ function skyyrose_get_kids_capsule_products() {
 	$static_products = array(
 		array(
 			'sku'   => 'kids-001',
-			'name'  => 'Kids Colorblock Hoodie Set — Purple/Pink',
-			'price' => '$65.00',
-			'desc'  => 'Cozy colorblock hoodie and jogger set in playful purple and pink',
-			'badge' => 'New',
+			'name'  => __( 'Kids Colorblock Hoodie Set — Purple/Pink', 'skyyrose-flagship' ),
+			'price' => '$65',
+			'desc'  => __( 'Cozy colorblock hoodie and jogger set in playful purple and pink', 'skyyrose-flagship' ),
+			'badge' => __( 'New', 'skyyrose-flagship' ),
 		),
 		array(
 			'sku'   => 'kids-002',
-			'name'  => 'Kids Colorblock Hoodie Set — Black/Red/White',
-			'price' => '$65.00',
-			'desc'  => 'Bold colorblock hoodie and jogger set in classic black, red, and white',
-			'badge' => 'New',
+			'name'  => __( 'Kids Colorblock Hoodie Set — Black/Red/White', 'skyyrose-flagship' ),
+			'price' => '$65',
+			'desc'  => __( 'Bold colorblock hoodie and jogger set in classic black, red, and white', 'skyyrose-flagship' ),
+			'badge' => __( 'New', 'skyyrose-flagship' ),
 		),
 	);
 
@@ -187,14 +187,14 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 	<!-- ============================================================
 	     PRODUCT GRID
 	     ============================================================ -->
-	<section id="products" class="collection-products">
+	<section id="products" class="collection-products" aria-labelledby="kids-products-heading">
 		<div class="collection-products__header fade-in-up">
 			<span class="collection-products__label">
-				<?php echo esc_html__( 'The Collection', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'The Collection', 'skyyrose-flagship' ); ?>
 			</span>
 
-			<h2 class="collection-products__title">
-				<?php echo esc_html__( 'KIDS CAPSULE Pieces', 'skyyrose-flagship' ); ?>
+			<h2 id="kids-products-heading" class="collection-products__title">
+				<?php esc_html_e( 'KIDS CAPSULE Pieces', 'skyyrose-flagship' ); ?>
 			</h2>
 
 			<p class="collection-products__count">

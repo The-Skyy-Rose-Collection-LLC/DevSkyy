@@ -188,6 +188,12 @@
 	transition: transform 0.25s ease;
 }
 
+.hotspot:focus-visible {
+	outline: 2px solid var(--rose-gold, #B76E79);
+	outline-offset: 4px;
+	border-radius: 50%;
+}
+
 .hotspot:hover .hotspot-beacon,
 .hotspot:focus-visible .hotspot-beacon {
 	transform: scale(1.3);

@@ -505,17 +505,35 @@
 			if (e.target === overlay) hidePopup();
 		});
 
-		// Handle form submission
+		// Handle form submission — send to AJAX handler
 		var form = overlay.querySelector('.incentive-popup-form');
 		if (form) {
 			form.addEventListener('submit', function (e) {
 				e.preventDefault();
 				var submitBtn = form.querySelector('.incentive-popup-submit');
 				if (submitBtn) {
-					submitBtn.textContent = 'Welcome to the Inner Circle!';
+					submitBtn.textContent = 'Joining...';
 					submitBtn.disabled = true;
 				}
-				setTimeout(hidePopup, 2000);
+				var formData = new FormData(form);
+				var xhr = new XMLHttpRequest();
+				var ajaxUrl = (window.skyyRoseData && window.skyyRoseData.ajaxUrl)
+					? window.skyyRoseData.ajaxUrl
+					: form.getAttribute('action');
+				xhr.open('POST', ajaxUrl, true);
+				xhr.onload = function () {
+					if (submitBtn) {
+						submitBtn.textContent = 'Welcome to the Inner Circle!';
+					}
+					setTimeout(hidePopup, 2000);
+				};
+				xhr.onerror = function () {
+					if (submitBtn) {
+						submitBtn.textContent = 'Welcome to the Inner Circle!';
+					}
+					setTimeout(hidePopup, 2000);
+				};
+				xhr.send(formData);
 			});
 		}
 	}
@@ -636,21 +654,10 @@
 			var remaining = Math.floor(Math.random() * 12) + 3;
 			var el = document.createElement('div');
 			el.className = 'pulse-scarcity-price';
-			el.style.cssText =
-				'display:inline-flex;align-items:center;gap:0.3rem;' +
-				'padding:3px 0;margin-top:4px;' +
-				'font-family:var(--font-body,Montserrat,sans-serif);' +
-				'font-size:0.6rem;font-weight:600;' +
-				'letter-spacing:0.04em;' +
-				'color:' + (remaining <= 5 ? '#DC143C' : '#FFA500') + ';';
+			el.className = 'pulse-scarcity-price' + (remaining <= 5 ? ' pulse-scarcity-price--critical' : ' pulse-scarcity-price--low');
 
 			var dot = document.createElement('span');
-			dot.style.cssText =
-				'width:5px;height:5px;border-radius:50%;' +
-				'background:currentColor;flex-shrink:0;';
-			if (remaining <= 5) {
-				dot.style.animation = 'pulse-scarcity-blink 1s ease-in-out infinite';
-			}
+			dot.className = 'pulse-scarcity-dot';
 
 			el.appendChild(dot);
 			el.appendChild(document.createTextNode(

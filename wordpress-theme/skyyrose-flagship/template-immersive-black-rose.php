@@ -145,6 +145,7 @@ get_header();
 				<button
 					class="room-dot<?php echo 0 === $index ? ' active' : ''; ?>"
 					type="button"
+					aria-pressed="<?php echo 0 === $index ? 'true' : 'false'; ?>"
 					aria-label="<?php echo esc_attr( sprintf( __( 'Room %1$d of %2$d: %3$s', 'skyyrose-flagship' ), $index + 1, count( $black_rose_rooms ), $room['name'] ) ); ?>"
 				></button>
 			<?php endforeach; ?>
@@ -153,7 +154,7 @@ get_header();
 
 		<!-- Hotspot Containers — One per room, products on contextual props -->
 		<?php foreach ( $black_rose_rooms as $room_index => $room ) : ?>
-			<div class="hotspot-container" <?php echo 0 !== $room_index ? 'style="display:none;"' : ''; ?>>
+			<div class="hotspot-container" <?php echo 0 !== $room_index ? 'aria-hidden="true" style="display:none;"' : ''; ?>>
 				<?php foreach ( $room['products'] as $product ) : ?>
 					<a
 						href="<?php echo esc_url( $product['url'] ); ?>"
@@ -202,7 +203,7 @@ get_header();
 
 	<!-- Product Detail Panel (Glassmorphism Slide-Up) -->
 	<div class="product-panel-overlay" aria-hidden="true"></div>
-	<aside class="product-panel" role="dialog" aria-modal="true" aria-hidden="true" aria-label="<?php esc_attr_e( 'Product Details', 'skyyrose-flagship' ); ?>">
+	<aside class="product-panel" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="product-panel-name">
 		<button class="product-panel-close" type="button" aria-label="<?php esc_attr_e( 'Close product details', 'skyyrose-flagship' ); ?>">&times;</button>
 		<div class="product-panel-inner">
 			<div class="product-panel-thumb">
@@ -210,7 +211,7 @@ get_header();
 			</div>
 			<div class="product-panel-info">
 				<p class="product-panel-collection"></p>
-				<h3 class="product-panel-name"></h3>
+				<h3 class="product-panel-name" id="product-panel-name"></h3>
 				<p class="product-panel-prop"></p>
 				<p class="product-panel-price"></p>
 				<div class="product-panel-sizes" role="group" aria-label="<?php esc_attr_e( 'Available sizes', 'skyyrose-flagship' ); ?>"></div>
