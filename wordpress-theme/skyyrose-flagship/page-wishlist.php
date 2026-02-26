@@ -126,7 +126,7 @@ if ( ! class_exists( 'WooCommerce' ) ) {
 
 			<div class="wishlist-empty">
 				<div class="wishlist-empty-icon">
-					<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
 						<path d="M40 70C55.464 70 68 57.464 68 42C68 26.536 55.464 14 40 14C24.536 14 12 26.536 12 42C12 57.464 24.536 70 40 70Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 						<path d="M40 26.667V42L48.889 46.444" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 						<path d="M58.333 20L68 10M22 20L12 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

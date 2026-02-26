@@ -35,6 +35,7 @@
 		if (mobilePanel) {
 			mobilePanel.classList.remove('open');
 			mobilePanel.setAttribute('aria-hidden', 'true');
+			mobilePanel.setAttribute('inert', '');
 		}
 		document.body.classList.remove('mobile-nav-open');
 		if (toggle) {
@@ -58,6 +59,11 @@
 			if (mobilePanel) {
 				mobilePanel.classList.toggle('open');
 				mobilePanel.setAttribute('aria-hidden', String(expanded));
+				if (expanded) {
+					mobilePanel.setAttribute('inert', '');
+				} else {
+					mobilePanel.removeAttribute('inert');
+				}
 				document.body.classList.toggle('mobile-nav-open');
 
 				// WCAG 2.4.3: Move focus into mobile menu when it opens.
@@ -145,24 +151,31 @@
 		searchToggle.addEventListener('click', function () {
 			searchOverlay.classList.add('open');
 			searchOverlay.setAttribute('aria-hidden', 'false');
+			searchOverlay.removeAttribute('inert');
 			if (searchInput) {
 				setTimeout(function () { searchInput.focus(); }, 100);
 			}
 		});
 	}
 
-	if (searchClose && searchOverlay) {
-		searchClose.addEventListener('click', function () {
+	function closeSearchOverlay() {
+		if (searchOverlay) {
 			searchOverlay.classList.remove('open');
 			searchOverlay.setAttribute('aria-hidden', 'true');
+			searchOverlay.setAttribute('inert', '');
+		}
+	}
+
+	if (searchClose && searchOverlay) {
+		searchClose.addEventListener('click', function () {
+			closeSearchOverlay();
 		});
 	}
 
 	// Close search on Escape.
 	document.addEventListener('keydown', function (e) {
 		if (e.key === 'Escape' && searchOverlay && searchOverlay.classList.contains('open')) {
-			searchOverlay.classList.remove('open');
-			searchOverlay.setAttribute('aria-hidden', 'true');
+			closeSearchOverlay();
 			if (searchToggle) searchToggle.focus();
 		}
 	});

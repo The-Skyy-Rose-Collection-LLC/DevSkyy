@@ -380,6 +380,20 @@ function skyyrose_enqueue_template_scripts() {
 				true
 			);
 		}
+
+		// Localize preorder gateway with WooCommerce cart sync data.
+		if ( 'preorder-gateway' === $slug && wp_script_is( $handle, 'enqueued' ) ) {
+			wp_localize_script(
+				$handle,
+				'skyyRoseGateway',
+				array(
+					'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
+					'nonce'       => wp_create_nonce( 'skyyrose-immersive-nonce' ),
+					'wcActive'    => class_exists( 'WooCommerce' ),
+					'checkoutUrl' => function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/checkout/' ),
+				)
+			);
+		}
 	}
 }
 
@@ -601,6 +615,8 @@ function skyyrose_enqueue_model_viewer() {
  */
 function skyyrose_model_viewer_module_type( $tag, $handle ) {
 	if ( 'google-model-viewer' === $handle ) {
+		// Remove existing type attribute before adding type="module" to avoid duplication.
+		$tag = preg_replace( '/(<script)\s+type=[\'"]text\/javascript[\'"]/', '$1', $tag );
 		$tag = str_replace( '<script ', '<script type="module" crossorigin="anonymous" ', $tag );
 		return $tag;
 	}

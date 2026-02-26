@@ -26,8 +26,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function skyyrose_send_security_headers() {
 
-	// Skip admin pages (would break WP admin which loads inline scripts).
-	if ( is_admin() ) {
+	// Skip admin page loads but not AJAX requests (they need CSP protection too).
+	if ( is_admin() && ! wp_doing_ajax() ) {
 		return;
 	}
 
