@@ -83,10 +83,10 @@
 			{ sku: 'br-008', name: "Women's BLACK Rose Hooded Dress",             price: 'TBD',   image: '', url: '/pre-order/#br-008' },
 		],
 		'love-hurts': [
-			{ sku: 'lh-001', name: 'The Fannie',                      price: '$70',  image: '', url: '/pre-order/#lh-001' },
-			{ sku: 'lh-002', name: 'Love Hurts Joggers (BLACK)',       price: '$67',  image: '', url: '/pre-order/#lh-002' },
-			{ sku: 'lh-002b', name: 'Love Hurts Joggers (WHITE)',      price: '$67',  image: '', url: '/pre-order/#lh-002b' },
-			{ sku: 'lh-003', name: 'Love Hurts Basketball Shorts',     price: '$55',  image: '', url: '/pre-order/#lh-003' },
+			{ sku: 'lh-001', name: 'The Fannie Pack',                  price: '$65',  image: '', url: '/pre-order/#lh-001' },
+			{ sku: 'lh-002', name: 'Love Hurts Joggers (BLACK)',       price: '$95',  image: '', url: '/pre-order/#lh-002' },
+			{ sku: 'lh-002b', name: 'Love Hurts Joggers (WHITE)',      price: '$95',  image: '', url: '/pre-order/#lh-002b' },
+			{ sku: 'lh-003', name: 'Love Hurts Basketball Shorts',     price: '$75',  image: '', url: '/pre-order/#lh-003' },
 			{ sku: 'lh-004', name: 'Love Hurts Varsity Jacket',        price: 'DRAFT', image: '', url: '/pre-order/#lh-004' },
 		],
 		'signature': [

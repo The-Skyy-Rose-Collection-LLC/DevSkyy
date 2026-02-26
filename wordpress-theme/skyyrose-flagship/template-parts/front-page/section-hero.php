@@ -29,14 +29,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<!-- Brand Name — Upscale Script with Animated Reveal -->
 		<h1 class="hero__brand-name" aria-label="<?php esc_attr_e( 'SkyyRose', 'skyyrose-flagship' ); ?>">
-			<span class="hero__brand-letter" style="--i:0">S</span><span
-				class="hero__brand-letter" style="--i:1">K</span><span
-				class="hero__brand-letter" style="--i:2">Y</span><span
-				class="hero__brand-letter" style="--i:3">Y</span><span
-				class="hero__brand-letter hero__brand-letter--rose" style="--i:4">R</span><span
-				class="hero__brand-letter hero__brand-letter--rose" style="--i:5">O</span><span
-				class="hero__brand-letter hero__brand-letter--rose" style="--i:6">S</span><span
-				class="hero__brand-letter hero__brand-letter--rose" style="--i:7">E</span>
+			<span class="hero__brand-letter" aria-hidden="true" style="--i:0">S</span><span
+				class="hero__brand-letter" aria-hidden="true" style="--i:1">K</span><span
+				class="hero__brand-letter" aria-hidden="true" style="--i:2">Y</span><span
+				class="hero__brand-letter" aria-hidden="true" style="--i:3">Y</span><span
+				class="hero__brand-letter hero__brand-letter--rose" aria-hidden="true" style="--i:4">R</span><span
+				class="hero__brand-letter hero__brand-letter--rose" aria-hidden="true" style="--i:5">O</span><span
+				class="hero__brand-letter hero__brand-letter--rose" aria-hidden="true" style="--i:6">S</span><span
+				class="hero__brand-letter hero__brand-letter--rose" aria-hidden="true" style="--i:7">E</span>
 		</h1>
 
 		<!-- Rose gold divider line with expand animation -->

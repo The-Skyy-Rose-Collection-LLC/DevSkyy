@@ -294,13 +294,17 @@
 		// Swap hotspot containers
 		if (hotspotGroups.length > 1) {
 			hotspotGroups[currentRoom].style.display = 'none';
+			hotspotGroups[currentRoom].setAttribute('aria-hidden', 'true');
 			hotspotGroups[index].style.display = '';
+			hotspotGroups[index].removeAttribute('aria-hidden');
 		}
 
 		// Update dots
 		if (dots.length > 0) {
 			dots[currentRoom].classList.remove('active');
+			dots[currentRoom].setAttribute('aria-pressed', 'false');
 			dots[index].classList.add('active');
+			dots[index].setAttribute('aria-pressed', 'true');
 		}
 
 		// Update room name
@@ -437,6 +441,10 @@
 		var isTouchDevice = window.matchMedia('(hover: none)').matches;
 		if (isTouchDevice) return;
 
+		// Honour prefers-reduced-motion.
+		var motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+		if (motionQuery.matches) return;
+
 		var parallaxStrength = 0.025; // 2.5% max shift
 		var ticking = false;
 		var targetX = 0;
@@ -539,7 +547,8 @@
 	   This section only maintains shared state used by hotspot click.
 	   -------------------------------------------------- */
 
-	var currentProductId = null;
+	// NOTE: Cross-script product ID communication is handled via
+	// panel.dataset.currentProductId (set in openPanel, read by bridge).
 
 	function showCartNotification(message) {
 		// Reuse existing notification or create one.
