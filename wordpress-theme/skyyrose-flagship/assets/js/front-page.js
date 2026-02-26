@@ -58,6 +58,15 @@
 				if (e.matches) clearInterval(sparkleInterval);
 			});
 		}
+
+		// Suspend sparkles when tab is backgrounded to avoid DOM node accumulation.
+		document.addEventListener('visibilitychange', function () {
+			if (document.hidden) {
+				clearInterval(sparkleInterval);
+			} else if (!motionQuery || !motionQuery.matches) {
+				sparkleInterval = setInterval(createSparkle, 400);
+			}
+		});
 	}
 
 	/* --------------------------------------------------

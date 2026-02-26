@@ -136,7 +136,17 @@
 		panel.classList.add('open');
 		panelOverlay.classList.add('open');
 		panelOverlay.setAttribute('aria-hidden', 'false');
+		panel.removeAttribute('inert');
 		panel.setAttribute('aria-hidden', 'false');
+
+		// Update View Details link with product URL if available.
+		var viewDetailsLink = panel.querySelector('.btn-view-details');
+		if (viewDetailsLink && data.url) {
+			viewDetailsLink.href = data.url;
+			viewDetailsLink.style.display = '';
+		} else if (viewDetailsLink && !data.url) {
+			viewDetailsLink.style.display = 'none';
+		}
 
 		// Store product ID on panel for cross-script access (immersive-wc-bridge.js).
 		if (data.productId) {
@@ -153,6 +163,7 @@
 		panel.classList.remove('open');
 		panelOverlay.classList.remove('open');
 		panelOverlay.setAttribute('aria-hidden', 'true');
+		panel.setAttribute('inert', '');
 		panel.setAttribute('aria-hidden', 'true');
 
 		// Clear stale product ID so the bridge doesn't add-to-cart for a previously viewed product.
