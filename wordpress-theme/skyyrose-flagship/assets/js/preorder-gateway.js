@@ -523,7 +523,9 @@
 		var priceEls = document.querySelectorAll('.product-grid-price');
 		if (priceEls.length === 0) return;
 
-		var launchDate = new Date('2026-04-01T00:00:00').getTime();
+		var timerEl = document.querySelector('.countdown-timer');
+		var deadlineStr = (timerEl && timerEl.dataset.launchDate) || '2026-04-01T00:00:00';
+		var launchDate = new Date(deadlineStr).getTime();
 		var countdownEls = [];
 
 		priceEls.forEach(function (priceEl) {

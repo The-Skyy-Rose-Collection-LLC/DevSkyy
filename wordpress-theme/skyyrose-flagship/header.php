@@ -73,6 +73,7 @@
 				</div>
 
 				<!-- Header Actions (Search, Account, Cart) -->
+				<?php $cart_count = 0; ?>
 				<div class="navbar__actions">
 					<!-- Search Button -->
 					<button

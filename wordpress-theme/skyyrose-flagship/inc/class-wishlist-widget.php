@@ -40,10 +40,10 @@ class SkyyRose_Wishlist_Widget extends WP_Widget {
 		$limit       = ! empty( $instance['limit'] ) ? absint( $instance['limit'] ) : 5;
 		$show_button = ! empty( $instance['show_button'] ) ? $instance['show_button'] : 'yes';
 
-		echo $args['before_widget'];
+		echo $args['before_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Standard widget wrapper from register_sidebar().
 
 		if ( ! empty( $title ) ) {
-			echo $args['before_title'] . esc_html( $title ) . $args['after_title'];
+			echo $args['before_title'] . esc_html( $title ) . $args['after_title']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Standard widget title wrapper from register_sidebar().
 		}
 
 		$wishlist = skyyrose_get_wishlist_items();
@@ -62,7 +62,7 @@ class SkyyRose_Wishlist_Widget extends WP_Widget {
 					<li class="wishlist-widget-item">
 						<div class="wishlist-widget-item-image">
 							<a href="<?php echo esc_url( $product->get_permalink() ); ?>">
-								<?php echo $product->get_image( 'thumbnail' ); ?>
+								<?php echo wp_kses_post( $product->get_image( 'thumbnail' ) ); ?>
 							</a>
 						</div>
 						<div class="wishlist-widget-item-info">
@@ -72,7 +72,7 @@ class SkyyRose_Wishlist_Widget extends WP_Widget {
 								</a>
 							</h4>
 							<div class="wishlist-widget-item-price">
-								<?php echo $product->get_price_html(); ?>
+								<?php echo wp_kses_post( $product->get_price_html() ); ?>
 							</div>
 						</div>
 					</li>
@@ -95,7 +95,7 @@ class SkyyRose_Wishlist_Widget extends WP_Widget {
 			<?php
 		}
 
-		echo $args['after_widget'];
+		echo $args['after_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Standard widget wrapper from register_sidebar().
 	}
 
 	/**
