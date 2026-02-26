@@ -267,7 +267,7 @@ foreach ( $featured_skus as $fsku ) {
 		// Static fallback: render when WooCommerce is missing or has no products.
 		if ( ! $has_woo_products ) :
 			foreach ( $fallback_products as $fp ) :
-				$product_url = home_url( '/product/' . sanitize_title( $fp['name'] ) . '/' );
+				$product_url = home_url( '/pre-order/' );
 				?>
 				<article class="product-card js-scroll-reveal" aria-label="<?php echo esc_attr( $fp['name'] ); ?>">
 					<?php if ( $fp['badge'] ) : ?>

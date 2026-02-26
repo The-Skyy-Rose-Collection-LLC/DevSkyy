@@ -142,7 +142,7 @@ $faq_items = array(
 );
 ?>
 
-<main id="primary" class="site-main contact-page">
+<main id="primary" class="site-main contact-page" role="main" tabindex="-1">
 
 	<!-- Film Grain Overlay -->
 	<div class="film-grain" aria-hidden="true"></div>

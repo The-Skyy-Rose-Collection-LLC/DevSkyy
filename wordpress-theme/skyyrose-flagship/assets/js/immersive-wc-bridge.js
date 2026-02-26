@@ -201,7 +201,10 @@
 
 		// Update data attributes with live values.
 		if (data.name) hotspot.setAttribute('data-product-name', data.name);
-		if (data.price) hotspot.setAttribute('data-product-price', '$' + data.price);
+		if (data.price) {
+			var rawPrice = String(data.price).replace(/^\$/, '');
+			hotspot.setAttribute('data-product-price', '$' + rawPrice);
+		}
 		if (data.image_url) hotspot.setAttribute('data-product-image', data.image_url);
 		if (data.permalink) hotspot.setAttribute('data-product-url', data.permalink);
 		if (data.id) hotspot.setAttribute('data-product-id', data.id);
@@ -212,7 +215,7 @@
 		}
 
 		// Sync price if it changed and the product panel is showing this item.
-		var newPrice = '$' + data.price;
+		var newPrice = '$' + String(data.price || '').replace(/^\$/, '');
 		if (oldPrice && oldPrice !== newPrice) {
 			syncPriceDisplay(hotspot, newPrice);
 		}

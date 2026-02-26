@@ -229,6 +229,10 @@
 		var el = document.querySelector('.js-rotating-text');
 		if (!el || !el.dataset.texts) return;
 
+		// Respect prefers-reduced-motion — inline opacity transition overrides CSS rules.
+		var motionQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+		if (motionQuery && motionQuery.matches) return;
+
 		var texts;
 		try {
 			texts = JSON.parse(el.dataset.texts);
@@ -240,7 +244,7 @@
 
 		var currentIndex = 0;
 
-		setInterval(function () {
+		var rotatingInterval = setInterval(function () {
 			el.style.opacity = '0';
 			setTimeout(function () {
 				currentIndex = (currentIndex + 1) % texts.length;
@@ -248,6 +252,16 @@
 				el.style.opacity = '1';
 			}, 300);
 		}, 3000);
+
+		// Stop if user enables reduced-motion mid-session.
+		if (motionQuery && motionQuery.addEventListener) {
+			motionQuery.addEventListener('change', function (e) {
+				if (e.matches) {
+					clearInterval(rotatingInterval);
+					el.style.opacity = '1';
+				}
+			});
+		}
 	}
 
 	/* --------------------------------------------------

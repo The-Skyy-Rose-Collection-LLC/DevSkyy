@@ -201,7 +201,8 @@
 	background: rgba(183, 110, 121, 0.1);
 }
 
-.navbar__action-btn:focus-visible {
+.navbar__action-btn:focus-visible,
+.navbar__hamburger:focus-visible {
 	outline: 2px solid var(--color-rose-gold, #B76E79);
 	outline-offset: 2px;
 }

@@ -10,7 +10,7 @@ get_header();
 
 if ( ! class_exists( 'WooCommerce' ) ) {
 	?>
-	<main id="primary" class="site-main wishlist-page">
+	<main id="primary" class="site-main wishlist-page" role="main" tabindex="-1">
 		<div class="container">
 			<div class="wishlist-empty">
 				<h2 class="wishlist-empty-title"><?php esc_html_e( 'Wishlist Unavailable', 'skyyrose-flagship' ); ?></h2>
@@ -28,7 +28,7 @@ if ( ! class_exists( 'WooCommerce' ) ) {
 }
 ?>
 
-<main id="primary" class="site-main wishlist-page">
+<main id="primary" class="site-main wishlist-page" role="main" tabindex="-1">
 	<div class="container">
 
 		<header class="page-header">

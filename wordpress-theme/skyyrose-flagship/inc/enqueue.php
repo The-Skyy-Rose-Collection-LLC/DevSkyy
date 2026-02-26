@@ -265,6 +265,7 @@ function skyyrose_enqueue_template_styles() {
 	$base_css_uri = SKYYROSE_ASSETS_URI . '/css';
 	$base_css_dir = SKYYROSE_DIR . '/assets/css';
 	$global_deps  = array( 'skyyrose-design-tokens' );
+	$use_min      = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
 	$template_styles = array(
 		'front-page'      => 'front-page.css',
@@ -723,7 +724,6 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-velocity-scroll',
 		'skyyrose-analytics-beacon',
 		'skyyrose-immersive-wc-bridge',
-		'google-model-viewer',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) && strpos( $tag, ' defer' ) === false ) {

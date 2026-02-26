@@ -211,7 +211,7 @@ $founder_vision = '&ldquo;The future of SkyyRose is bigger than clothing. It\'s 
 $founder_signature = get_theme_mod( 'about_founder_signature', '&mdash; The Founder, SkyyRose' );
 ?>
 
-<main id="primary" class="site-main about-page" role="main">
+<main id="primary" class="site-main about-page" role="main" tabindex="-1">
 
 	<!-- ============================================
 	     HERO -- Gradient mesh with radial glow

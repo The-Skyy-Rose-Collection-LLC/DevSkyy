@@ -138,7 +138,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 }
 ?>
 
-<main id="primary" class="error-404-page" role="main">
+<main id="primary" class="error-404-page" role="main" tabindex="-1">
 
 	<!-- Floating Orbs (background ambience) -->
 	<div class="error-404-orbs" aria-hidden="true">
