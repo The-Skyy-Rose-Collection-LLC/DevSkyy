@@ -136,7 +136,9 @@ function skyyrose_woocommerce_accessibility() {
 
 	// Add ARIA labels to cart items.
 	add_filter( 'woocommerce_cart_item_remove_link', function( $link, $cart_item_key ) {
-		$product_name = get_the_title( $link );
+		$cart         = WC()->cart ? WC()->cart->get_cart() : array();
+		$cart_item    = isset( $cart[ $cart_item_key ] ) ? $cart[ $cart_item_key ] : null;
+		$product_name = $cart_item && isset( $cart_item['data'] ) ? $cart_item['data']->get_name() : '';
 		return str_replace(
 			'class="remove"',
 			'class="remove" aria-label="' . esc_attr( sprintf( __( 'Remove %s from cart', 'skyyrose-flagship' ), $product_name ) ) . '"',
@@ -232,6 +234,9 @@ add_action( 'admin_menu', 'skyyrose_accessibility_testing_page' );
  * @since 1.0.0
  */
 function skyyrose_accessibility_testing_page_content() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( esc_html__( 'You do not have permission to access this page.', 'skyyrose-flagship' ) );
+	}
 	?>
 	<div class="wrap">
 		<h1><?php esc_html_e( 'Accessibility & SEO Tools', 'skyyrose-flagship' ); ?></h1>

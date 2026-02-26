@@ -23,6 +23,7 @@ get_header();
 		<?php if ( ! empty( $wishlist ) ) : ?>
 
 			<div class="wishlist-actions">
+				<?php wp_nonce_field( 'skyyrose_wishlist_action', 'skyyrose_wishlist_nonce' ); ?>
 				<button type="button" class="button alt wishlist-move-all" data-action="move-all">
 					<?php esc_html_e( 'Move All to Cart', 'skyyrose-flagship' ); ?>
 				</button>
