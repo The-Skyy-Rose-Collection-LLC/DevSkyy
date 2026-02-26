@@ -17,10 +17,10 @@ get_header();
 	<section class="hero luxury-hero">
 		<div class="hero-content">
 			<h1 class="hero-title fade-in"><?php esc_html_e( 'Luxury Grows from Concrete.', 'skyyrose-flagship' ); ?></h1>
-			<p class="hero-subtitle fade-in">Oakland luxury streetwear crafted with passion, designed to make a statement</p>
+			<p class="hero-subtitle fade-in"><?php esc_html_e( 'Oakland luxury streetwear crafted with passion, designed to make a statement', 'skyyrose-flagship' ); ?></p>
 			<div class="hero-actions fade-in">
-				<a href="/collections" class="btn btn-primary">Explore Collections</a>
-				<a href="/about" class="btn btn-outline">Our Story</a>
+				<a href="<?php echo esc_url( home_url( '/collections/' ) ); ?>" class="btn btn-primary"><?php esc_html_e( 'Explore Collections', 'skyyrose-flagship' ); ?></a>
+				<a href="<?php echo esc_url( home_url( '/about/' ) ); ?>" class="btn btn-outline"><?php esc_html_e( 'Our Story', 'skyyrose-flagship' ); ?></a>
 			</div>
 		</div>
 	</section>
@@ -85,7 +85,7 @@ get_header();
 					<h2 class="section-title"><?php esc_html_e( 'Crafted with Passion', 'skyyrose-flagship' ); ?></h2>
 					<p><?php esc_html_e( 'Born in Oakland, SkyyRose is luxury streetwear that tells a story. Every stitch is a statement, every drop a declaration of self-expression and defiant elegance.', 'skyyrose-flagship' ); ?></p>
 					<p><?php esc_html_e( 'Our collections blend gothic romance, raw emotion, and West Coast prestige into premium garments designed for those who refuse to blend in.', 'skyyrose-flagship' ); ?></p>
-					<a href="/about" class="btn btn-outline"><?php esc_html_e( 'Learn More', 'skyyrose-flagship' ); ?></a>
+					<a href="<?php echo esc_url( home_url( '/about/' ) ); ?>" class="btn btn-outline"><?php esc_html_e( 'Learn More', 'skyyrose-flagship' ); ?></a>
 				</div>
 				<div class="about-image">
 					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'SkyyRose Luxury Streetwear', 'skyyrose-flagship' ); ?>" width="600" height="400" loading="lazy">
@@ -134,7 +134,7 @@ get_header();
 		<div class="container text-center">
 			<h2 class="section-title"><?php esc_html_e( 'Ready to Make Your Statement?', 'skyyrose-flagship' ); ?></h2>
 			<p class="section-subtitle"><?php esc_html_e( 'Pre-order the latest drops before they sell out', 'skyyrose-flagship' ); ?></p>
-			<a href="/pre-order" class="btn btn-primary btn-large"><?php esc_html_e( 'Pre-Order Now', 'skyyrose-flagship' ); ?></a>
+			<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="btn btn-primary btn-large"><?php esc_html_e( 'Pre-Order Now', 'skyyrose-flagship' ); ?></a>
 		</div>
 	</section>
 

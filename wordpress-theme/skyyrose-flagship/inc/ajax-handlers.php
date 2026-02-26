@@ -174,6 +174,68 @@ add_action( 'wp_ajax_skyyrose_newsletter_subscribe', 'skyyrose_ajax_newsletter_s
 add_action( 'wp_ajax_nopriv_skyyrose_newsletter_subscribe', 'skyyrose_ajax_newsletter_subscribe' );
 
 /*--------------------------------------------------------------
+ * Incentive Popup Signup (Pre-Order Gateway)
+ *--------------------------------------------------------------*/
+
+/**
+ * Handle incentive popup AJAX submission.
+ *
+ * Verifies nonce, sanitizes email and optional phone,
+ * fires action hook for plugins to handle the signup.
+ *
+ * @since 3.2.0
+ * @return void
+ */
+function skyyrose_ajax_incentive_signup() {
+	// Verify nonce.
+	if ( ! isset( $_POST['skyyrose_incentive_nonce'] ) ||
+		! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['skyyrose_incentive_nonce'] ) ), 'skyyrose_incentive' ) ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
+
+	// Sanitize and validate email.
+	$email = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
+
+	if ( ! is_email( $email ) ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Please enter a valid email address.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
+
+	// Sanitize optional phone.
+	$phone = sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) );
+
+	/**
+	 * Fires when a user signs up via the incentive popup.
+	 *
+	 * Plugins can hook into this action to handle the signup
+	 * (e.g., Mailchimp, Sendinblue, custom storage).
+	 *
+	 * @since 3.2.0
+	 * @param string $email The sanitized subscriber email address.
+	 * @param string $phone The sanitized phone number (may be empty).
+	 */
+	do_action( 'skyyrose_incentive_signup', $email, $phone );
+
+	wp_send_json_success(
+		array(
+			'message' => esc_html__( 'You are in! Check your inbox for your 25% discount code and early access details.', 'skyyrose-flagship' ),
+		)
+	);
+	return;
+}
+add_action( 'wp_ajax_skyyrose_incentive_signup', 'skyyrose_ajax_incentive_signup' );
+add_action( 'wp_ajax_nopriv_skyyrose_incentive_signup', 'skyyrose_ajax_incentive_signup' );
+
+/*--------------------------------------------------------------
  * Sign In
  *--------------------------------------------------------------*/
 

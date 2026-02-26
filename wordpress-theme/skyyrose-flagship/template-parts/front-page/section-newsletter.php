@@ -39,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<input
 				type="email"
 				id="newsletter-email"
-				name="newsletter_email"
+				name="email"
 				class="newsletter__input"
 				placeholder="<?php esc_attr_e( 'Enter your email', 'skyyrose-flagship' ); ?>"
 				required
