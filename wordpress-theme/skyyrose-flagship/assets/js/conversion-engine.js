@@ -43,6 +43,9 @@
 		exitIntentCooldown: 86400000, // 24h between exit-intent shows
 	};
 
+	// Track all intervals for potential cleanup.
+	var cleanupIntervals = [];
+
 	/* --------------------------------------------------
 	   Utility
 	   -------------------------------------------------- */
@@ -91,13 +94,17 @@
 	var toastTimer = null;
 
 	function initSocialProofToasts() {
+		// Skip social proof toasts on checkout page — WCAG 2.2.2 compliance.
+		if (document.body.classList.contains('woocommerce-checkout')) return;
+
 		toastContainer = createElement('div', 'cie-toast-container');
 		toastContainer.setAttribute('aria-live', 'polite');
 		toastContainer.setAttribute('role', 'status');
 		document.body.appendChild(toastContainer);
 
-		// Show first toast after a delay
-		setTimeout(showNextToast, 6000);
+		// Show first toast after a delay. Clear existing timer if double-init.
+		if (toastTimer) clearTimeout(toastTimer);
+		toastTimer = setTimeout(showNextToast, 6000);
 	}
 
 	function showNextToast() {
@@ -182,8 +189,8 @@
 			viewer.appendChild(countEl);
 			target.appendChild(viewer);
 
-			// Update periodically
-			setInterval(function () {
+			// Update periodically — store reference for cleanup.
+			var viewerInt = setInterval(function () {
 				var delta = randomInt(-3, 4);
 				count = Math.max(baseCount - 5, Math.min(baseCount + CONFIG.viewerVariance + 5, count + delta));
 				countEl.textContent = count + ' viewing now';
@@ -192,6 +199,7 @@
 					countEl.classList.remove('bumped');
 				}, 300);
 			}, CONFIG.viewerUpdateInterval);
+			cleanupIntervals.push(viewerInt);
 		});
 	}
 
@@ -529,8 +537,8 @@
 		roomViewers.appendChild(text);
 		scene.appendChild(roomViewers);
 
-		// Update periodically
-		setInterval(function () {
+		// Update periodically — store reference for cleanup.
+		var roomInt = setInterval(function () {
 			var delta = randomInt(-2, 3);
 			count = Math.max(CONFIG.viewerBase - 3, count + delta);
 			while (roomViewers.childNodes.length > 1) {
@@ -538,6 +546,7 @@
 			}
 			roomViewers.appendChild(document.createTextNode(' ' + count + ' exploring right now'));
 		}, CONFIG.viewerUpdateInterval);
+		cleanupIntervals.push(roomInt);
 	}
 
 	/* --------------------------------------------------

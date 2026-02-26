@@ -71,6 +71,11 @@ function skyyrose_add_to_wishlist( $product_id ) {
 		$wishlist = is_array( $wishlist ) ? $wishlist : array();
 	}
 
+	// Cap wishlist at 50 items to prevent unbounded growth (CLAUDE.md: no unbounded data structures).
+	if ( count( $wishlist ) >= 50 ) {
+		return false;
+	}
+
 	if ( ! in_array( $product_id, $wishlist, true ) ) {
 		$wishlist[] = $product_id;
 
@@ -461,7 +466,14 @@ function skyyrose_register_wishlist_rest_routes() {
 			);
 		}
 		$nonce = $request->get_header( 'X-WP-Nonce' );
-		return $nonce && wp_verify_nonce( $nonce, 'wp_rest' );
+		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+			return new WP_Error(
+				'rest_invalid_nonce',
+				esc_html__( 'Invalid or expired nonce.', 'skyyrose-flagship' ),
+				array( 'status' => 401 )
+			);
+		}
+		return true;
 	};
 
 	// Get wishlist items.
