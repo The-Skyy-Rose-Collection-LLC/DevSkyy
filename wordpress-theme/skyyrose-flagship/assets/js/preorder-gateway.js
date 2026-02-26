@@ -256,6 +256,24 @@
 	}
 
 	/* --------------------------------------------------
+	   Cart Notification
+	   -------------------------------------------------- */
+
+	function showCartNotification(message) {
+		var msgEl = document.querySelector('.cart-empty-msg');
+		if (msgEl) {
+			var p = msgEl.querySelector('p');
+			if (p) {
+				p.textContent = message;
+				msgEl.style.display = '';
+				setTimeout(function () {
+					p.textContent = '';
+				}, 5000);
+			}
+		}
+	}
+
+	/* --------------------------------------------------
 	   Cart
 	   -------------------------------------------------- */
 
@@ -277,22 +295,24 @@
 					try {
 						var resp = JSON.parse(xhr.responseText);
 						if (!resp.success) {
-							// Server rejected — remove item from local cart.
+							// Server rejected — remove item from local cart and notify user.
 							var idx = cartItems.indexOf(item);
 							if (idx > -1) cartItems.splice(idx, 1);
 							cartCount = cartItems.length;
 							updateCartUI();
+							showCartNotification('Could not add item. Please try again.');
 						}
 					} catch (e) { /* non-JSON response — keep local state */ }
 				}
 			};
 
 			xhr.onerror = function () {
-				// Network failure — remove optimistically added item.
+				// Network failure — remove optimistically added item and notify user.
 				var idx = cartItems.indexOf(item);
 				if (idx > -1) cartItems.splice(idx, 1);
 				cartCount = cartItems.length;
 				updateCartUI();
+				showCartNotification('Network error. Please check your connection.');
 			};
 
 			var postData = 'action=skyyrose_immersive_add_to_cart' +
@@ -620,6 +640,8 @@
 			return n < 10 ? '0' + n : '' + n;
 		}
 
+		var urgencyInterval = null;
+
 		function tickUrgency() {
 			var now = Date.now();
 			var diff = Math.max(0, launchDate - now);
@@ -635,10 +657,14 @@
 					countdownEls[i].textContent = text;
 				}
 			}
+
+			if (diff === 0 && urgencyInterval) {
+				clearInterval(urgencyInterval);
+			}
 		}
 
 		tickUrgency();
-		setInterval(tickUrgency, 60000);
+		urgencyInterval = setInterval(tickUrgency, 60000);
 	}
 
 	/* --------------------------------------------------

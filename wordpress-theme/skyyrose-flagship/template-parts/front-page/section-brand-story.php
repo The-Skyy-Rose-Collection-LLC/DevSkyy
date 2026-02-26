@@ -80,7 +80,7 @@ $brand_stats = array(
 			</a>
 		</div>
 
-		<div class="brand-story__visual js-scroll-reveal" aria-hidden="true">
+		<div class="brand-story__visual js-scroll-reveal">
 			<?php
 			// Use a curated brand image if available via the customizer.
 			$brand_story_image_id = get_theme_mod( 'skyyrose_brand_story_image', 0 );

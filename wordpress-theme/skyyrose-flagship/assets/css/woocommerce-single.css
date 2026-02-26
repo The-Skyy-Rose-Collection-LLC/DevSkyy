@@ -244,6 +244,15 @@
 	box-shadow: 0 0 12px var(--skyy-woo-accent-glow);
 }
 
+.skyy-single-product__color-swatch:focus-visible,
+.skyy-single-product__size-btn:focus-visible,
+.skyy-single-product__qty-btn:focus-visible,
+.skyy-single-product__accordion-trigger:focus-visible,
+.skyy-single-product__add-to-cart:focus-visible {
+	outline: 2px solid var(--skyy-woo-accent);
+	outline-offset: 2px;
+}
+
 /* Size Buttons */
 .skyy-single-product__size-buttons {
 	display: flex;

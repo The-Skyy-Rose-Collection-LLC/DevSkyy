@@ -295,8 +295,9 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		// NOTE: sg-003 has no dedicated product image; using sg-012 orchid tee
-		// as visual stand-in until sg-003-signature-tee-orchid.webp is available.
+		// NOTE: sg-003 shares the sg-012 orchid tee image. DO NOT publish until
+		// a distinct product image exists — showing two SKUs with identical images
+		// at different price points ($15 vs $30) confuses customers in the gateway.
 		'sg-003' => array(
 			'sku'               => 'sg-003',
 			'name'              => 'The Signature Tee (Orchid)',
@@ -310,8 +311,8 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Orchid',
 			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
+			'published'         => false,
+			'is_preorder'       => false,
 		),
 		'sg-004' => array(
 			'sku'               => 'sg-004',

@@ -907,6 +907,11 @@
 	background: var(--rose-gold, #B76E79);
 }
 
+.collection-tab:focus-visible {
+	outline: 2px solid var(--rose-gold, #B76E79);
+	outline-offset: -2px;
+}
+
 /* ==================================================
    RESPONSIVE
    ================================================== */
