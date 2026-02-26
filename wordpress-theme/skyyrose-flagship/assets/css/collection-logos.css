@@ -452,7 +452,10 @@
    --------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-	.collection-logo-3d img {
+	.collection-logo-3d img,
+	.collection-logo-3d--black-rose img,
+	.collection-logo-3d--love-hurts img,
+	.collection-logo-3d--signature img {
 		animation: none;
 	}
 }
