@@ -391,6 +391,7 @@ function skyyrose_enqueue_template_scripts() {
 					'nonce'       => wp_create_nonce( 'skyyrose-immersive-nonce' ),
 					'wcActive'    => class_exists( 'WooCommerce' ),
 					'checkoutUrl' => function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/checkout/' ),
+					'cartUrl'     => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
 				)
 			);
 		}
