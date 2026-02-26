@@ -605,6 +605,11 @@ function skyyrose_immersive_product( $sku, $scene ) {
 	$parent_sku = preg_replace( '/([a-z]{2}-\d{3})[a-z]$/', '$1', $parent_sku );
 	$product    = skyyrose_get_product( $parent_sku );
 
+	// Skip unpublished products.
+	if ( $product && isset( $product['published'] ) && ! $product['published'] ) {
+		return array();
+	}
+
 	// Determine the best display image: front-model VTON > flat product.
 	$display_image = '';
 	if ( $product ) {

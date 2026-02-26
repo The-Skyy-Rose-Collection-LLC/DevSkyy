@@ -80,12 +80,18 @@ $love_hurts_rooms = array(
 	),
 );
 
+// Remove empty entries (unpublished products filtered by skyyrose_immersive_product()).
+foreach ( $love_hurts_rooms as &$room ) {
+	$room['products'] = array_values( array_filter( $room['products'] ) );
+}
+unset( $room );
+
 get_header();
 ?>
 
 <main id="primary" class="site-main immersive-page" role="main" tabindex="-1">
 
-	<div class="immersive-scene immersive-love-hurts" role="region" aria-label="<?php esc_attr_e( 'Love Hurts Collection — The Ballroom', 'skyyrose-flagship' ); ?>">
+	<div class="immersive-scene immersive-love-hurts" role="region" aria-labelledby="scene-title">
 
 		<!-- Loading Screen -->
 		<div class="scene-loading" aria-hidden="true">
@@ -174,7 +180,7 @@ get_header();
 
 		<!-- Scene Title -->
 		<div class="scene-title-overlay">
-			<h1><?php echo esc_html__( 'The Ballroom', 'skyyrose-flagship' ); ?></h1>
+			<h1 id="scene-title"><?php echo esc_html__( 'The Ballroom', 'skyyrose-flagship' ); ?></h1>
 			<p class="scene-subtitle"><?php echo esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ); ?></p>
 			<p class="scene-tagline"><?php echo esc_html__( 'Luxury Grows from Concrete.', 'skyyrose-flagship' ); ?></p>
 		</div>

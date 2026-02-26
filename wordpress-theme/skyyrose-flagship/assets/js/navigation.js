@@ -39,6 +39,7 @@
 		document.body.classList.remove('mobile-nav-open');
 		if (toggle) {
 			toggle.setAttribute('aria-expanded', 'false');
+			toggle.focus();
 		}
 		if (nav) {
 			nav.classList.remove('toggled');
