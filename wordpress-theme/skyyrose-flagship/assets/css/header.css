@@ -353,6 +353,12 @@
 	color: #fff;
 }
 
+.search-overlay__submit:focus-visible,
+.search-overlay__close:focus-visible {
+	outline: 2px solid #B76E79;
+	outline-offset: 2px;
+}
+
 /* ==================================================
    MOBILE MENU — Slide-in Panel
    ================================================== */
@@ -511,6 +517,16 @@
 
 .mobile-menu__link:hover {
 	color: #B76E79;
+}
+
+.mobile-menu__close:focus-visible,
+.mobile-menu__link:focus-visible,
+.mobile-menu__list > li > a:focus-visible,
+.mobile-menu__nav > ul > li > a:focus-visible,
+.mobile-menu__list .sub-menu a:focus-visible,
+.mobile-menu__nav ul .sub-menu a:focus-visible {
+	outline: 2px solid #B76E79;
+	outline-offset: 2px;
 }
 
 .mobile-menu__badge {

@@ -67,8 +67,8 @@ function skyyrose_send_security_headers() {
 	// Prevent clickjacking.
 	header( 'X-Frame-Options: SAMEORIGIN' );
 
-	// Enforce HTTPS via HSTS (1 year including subdomains).
-	header( 'Strict-Transport-Security: max-age=31536000; includeSubDomains' );
+	// Enforce HTTPS via HSTS (1 year including subdomains, preload-ready).
+	header( 'Strict-Transport-Security: max-age=31536000; includeSubDomains; preload' );
 
 	// Disable legacy XSS auditor (can introduce vulnerabilities in modern browsers).
 	header( 'X-XSS-Protection: 0' );

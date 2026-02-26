@@ -158,4 +158,58 @@
 			}
 		});
 	});
+
+	/* --------------------------------------------------
+	   Footer Newsletter AJAX (site-wide)
+	   Handles the footer newsletter form on all pages.
+	   The front-page.js handles .js-newsletter-form separately.
+	   -------------------------------------------------- */
+
+	var footerForm = document.querySelector('.footer-newsletter__form');
+	if (footerForm) {
+		footerForm.addEventListener('submit', function (e) {
+			e.preventDefault();
+			var emailInput = footerForm.querySelector('input[type="email"]');
+			var btn = footerForm.querySelector('button[type="submit"]');
+			if (!emailInput || !emailInput.value) return;
+
+			if (btn) {
+				btn.disabled = true;
+				btn.textContent = 'Subscribing...';
+			}
+
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', footerForm.action || '', true);
+			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+			xhr.onload = function () {
+				if (xhr.status >= 200 && xhr.status < 300) {
+					try {
+						var resp = JSON.parse(xhr.responseText);
+						if (resp.success) {
+							if (btn) { btn.textContent = 'Welcome!'; }
+							if (emailInput) emailInput.value = '';
+							setTimeout(function () {
+								if (btn) { btn.textContent = 'Subscribe'; btn.disabled = false; }
+							}, 3000);
+							return;
+						}
+					} catch (_) { /* fall through */ }
+				}
+				if (btn) { btn.textContent = 'Try Again'; btn.disabled = false; }
+			};
+
+			xhr.onerror = function () {
+				if (btn) { btn.textContent = 'Try Again'; btn.disabled = false; }
+			};
+
+			var formData = new FormData(footerForm);
+			var params = [];
+			formData.forEach(function (value, key) {
+				params.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+			});
+			xhr.send(params.join('&'));
+		});
+	}
 })();
