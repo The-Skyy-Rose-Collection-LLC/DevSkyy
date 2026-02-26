@@ -160,243 +160,28 @@ foreach ( $skyyrose_import_attributes as $taxonomy => $attr_data ) {
 WP_CLI::log( '' );
 
 /*--------------------------------------------------------------
- * Step 3: Define the Product Catalog
+ * Step 3: Build Product List from Centralized Catalog
+ *
+ * Sources all product data from inc/product-catalog.php — the single
+ * source of truth. No duplicate product arrays.
  *--------------------------------------------------------------*/
 
-$skyyrose_import_products = array(
+$skyyrose_import_catalog  = skyyrose_get_product_catalog();
+$skyyrose_import_products = array();
 
-	// =============================================
-	// BLACK ROSE COLLECTION
-	// =============================================
-	array(
-		'sku'               => 'br-001',
-		'name'              => 'BLACK Rose Crewneck',
-		'price'             => '35.00',
-		'status'            => 'draft',
-		'category'          => 'black-rose',
-		'sizes'             => array( 'S', 'M', 'L', 'XL', '2XL', '3XL' ),
-		'color'             => 'Black',
-		'description'       => 'Premium heavyweight crewneck with embroidered rose detail',
-		'short_description' => 'Gothic luxury blooms in twilight. Embroidered with defiant elegance, a dark romance woven in every thread.',
-	),
-	array(
-		'sku'               => 'br-002',
-		'name'              => 'BLACK Rose Joggers',
-		'price'             => '50.00',
-		'status'            => 'publish',
-		'category'          => 'black-rose',
-		'sizes'             => array( 'S', 'M', 'L', 'XL', '2XL', '3XL' ),
-		'color'             => 'Black',
-		'description'       => 'Tailored jogger silhouette in deep black',
-		'short_description' => 'Twilight comfort meets gothic romance. Embroidered black roses bloom on soft fabric.',
-	),
-	array(
-		'sku'               => 'br-003',
-		'name'              => 'BLACK is Beautiful Jersey',
-		'price'             => '45.00',
-		'status'            => 'draft',
-		'category'          => 'black-rose',
-		'sizes'             => array( 'S', 'M', 'L', 'XL', '2XL', '3XL' ),
-		'color'             => 'Black',
-		'description'       => 'Statement athletic jersey with bold branding',
-		'short_description' => 'A bold statement in luxury athletic wear. Black is beautiful, and this jersey proves it.',
-	),
-	array(
-		'sku'               => 'br-004',
-		'name'              => 'BLACK Rose Hoodie',
-		'price'             => '40.00',
-		'status'            => 'publish',
-		'category'          => 'black-rose',
-		'sizes'             => array( 'S', 'M', 'L', 'XL', '2XL', '3XL' ),
-		'color'             => 'Black',
-		'description'       => 'Classic pullover hoodie with silver accents',
-		'short_description' => 'Gothic luxury in twilight shadows. Intricate embroidery captures the bloom of darkness.',
-	),
-	array(
-		'sku'               => 'br-005',
-		'name'              => 'BLACK Rose Hoodie — Signature Edition',
-		'price'             => '65.00',
-		'status'            => 'publish',
-		'category'          => 'black-rose',
-		'sizes'             => array( 'S', 'M', 'L', 'XL', '2XL', '3XL' ),
-		'color'             => 'Black',
-		'description'       => 'Elevated hoodie with signature detailing',
-		'short_description' => 'The definitive Black Rose hoodie. Signature edition with premium detailing and numbered tag.',
-	),
-	array(
-		'sku'               => 'br-006',
-		'name'              => 'BLACK Rose Sherpa Jacket',
-		'price'             => '95.00',
-		'status'            => 'publish',
-		'category'          => 'black-rose',
-		'sizes'             => array( 'S', 'M', 'L', 'XL', '2XL', '3XL' ),
-		'color'             => 'Black',
-		'description'       => 'Luxe sherpa-lined outerwear with embroidered rose',
-		'short_description' => 'Lustrous black satin with plush Sherpa lining, crowned by an exquisite embroidered rose.',
-	),
-	array(
-		'sku'               => 'br-007',
-		'name'              => 'BLACK Rose x Love Hurts Basketball Shorts',
-		'price'             => '65.00',
-		'status'            => 'publish',
-		'category'          => 'black-rose',
-		'sizes'             => array( 'S', 'M', 'L', 'XL', '2XL', '3XL' ),
-		'color'             => 'Black',
-		'description'       => 'Cross-collection collaboration piece',
-		'short_description' => 'Two worlds collide. A cross-collection collaboration merging Black Rose darkness with Love Hurts fire.',
-	),
-	array(
-		'sku'               => 'br-008',
-		'name'              => "Women's BLACK Rose Hooded Dress",
-		'price'             => '120.00',
-		'status'            => 'draft',
-		'category'          => 'black-rose',
-		'sizes'             => array( 'XS', 'S', 'M', 'L', 'XL', '2XL' ),
-		'color'             => 'Black',
-		'description'       => 'Feminine hooded dress with gothic silhouette',
-		'short_description' => 'Intricate black rose embroidery and a silhouette of gothic mystery. Designed for the fearless.',
-	),
-
-	// =============================================
-	// LOVE HURTS COLLECTION
-	// =============================================
-	array(
-		'sku'               => 'lh-001',
-		'name'              => 'The Fannie Pack',
-		'price'             => '65.00',
-		'status'            => 'publish',
-		'category'          => 'love-hurts',
-		'sizes'             => array( 'One Size' ),
-		'color'             => 'Black',
-		'description'       => 'Premium fanny pack with Love Hurts branding',
-		'short_description' => 'Luxury fanny pack embodying Oakland grit, passion, and the defiant bloom of a street rose.',
-	),
-	array(
-		'sku'               => 'lh-002',
-		'name'              => 'Love Hurts Joggers',
-		'price'             => '95.00',
-		'status'            => 'publish',
-		'category'          => 'love-hurts',
-		'sizes'             => array( 'S', 'M', 'L', 'XL', '2XL', '3XL' ),
-		'color'             => 'Black',
-		'description'       => 'Gothic-inspired joggers in deep black',
-		'short_description' => 'Oakland grit meets luxury. Feel the fire with the embroidered rose, a symbol of passion.',
-	),
-	array(
-		'sku'               => 'lh-003',
-		'name'              => 'Love Hurts Basketball Shorts',
-		'price'             => '75.00',
-		'status'            => 'publish',
-		'category'          => 'love-hurts',
-		'sizes'             => array( 'S', 'M', 'L', 'XL', '2XL', '3XL' ),
-		'color'             => 'Black',
-		'description'       => 'Athletic shorts with Love Hurts embroidery',
-		'short_description' => 'Oakland-inspired luxury streetwear. Defiant rose design on breathable mesh.',
-	),
-	array(
-		'sku'               => 'lh-004',
-		'name'              => 'Love Hurts Varsity Jacket',
-		'price'             => '265.00',
-		'status'            => 'draft',
-		'category'          => 'love-hurts',
-		'sizes'             => array( 'S', 'M', 'L', 'XL', '2XL', '3XL' ),
-		'color'             => 'Black',
-		'description'       => 'Premium varsity jacket with custom patches',
-		'short_description' => 'Oakland street couture. Satin, bold fire-red script, hidden rose garden in hood.',
-	),
-
-	// =============================================
-	// SIGNATURE COLLECTION
-	// =============================================
-	array(
-		'sku'               => 'sg-001',
-		'name'              => 'The Bay Set',
-		'price'             => '195.00',
-		'status'            => 'publish',
-		'category'          => 'signature',
-		'sizes'             => array( 'S', 'M', 'L', 'XL', '2XL', '3XL' ),
-		'color'             => 'Blue',
-		'description'       => 'Premium matching set inspired by the Bay Area',
-		'short_description' => 'Embody West Coast luxury with this exclusive ensemble. Iconic blue rose and vibrant Bay Area skyline.',
-	),
-	array(
-		'sku'               => 'sg-002',
-		'name'              => 'Stay Golden Tee',
-		'price'             => '65.00',
-		'status'            => 'publish',
-		'category'          => 'signature',
-		'sizes'             => array( 'XS', 'S', 'M', 'L', 'XL', '2XL' ),
-		'color'             => 'Gold',
-		'description'       => 'Vintage-inspired tee with golden graphics',
-		'short_description' => 'Embrace West Coast prestige. Luxurious statement of Bay Area style featuring signature rose.',
-	),
-	array(
-		'sku'               => 'sg-003',
-		'name'              => 'The Signature Tee (Orchid)',
-		'price'             => '15.00',
-		'status'            => 'publish',
-		'category'          => 'signature',
-		'sizes'             => array( 'S', 'M', 'L', 'XL', '2XL', '3XL' ),
-		'color'             => 'Orchid',
-		'description'       => 'Core tee in orchid colorway',
-		'short_description' => 'The essential SkyyRose tee in a rich orchid colorway. Soft cotton with embroidered rose.',
-	),
-	array(
-		'sku'               => 'sg-005',
-		'name'              => 'Stay Golden Tee (Classic)',
-		'price'             => '40.00',
-		'status'            => 'publish',
-		'category'          => 'signature',
-		'sizes'             => array( 'XS', 'S', 'M', 'L', 'XL', '2XL' ),
-		'color'             => 'Gold',
-		'description'       => 'Classic edition of the Stay Golden tee',
-		'short_description' => 'The classic Stay Golden silhouette. Timeless Bay Area luxury in every stitch.',
-	),
-	array(
-		'sku'               => 'sg-006',
-		'name'              => 'Mint & Lavender Hoodie',
-		'price'             => '45.00',
-		'status'            => 'publish',
-		'category'          => 'signature',
-		'sizes'             => array( 'S', 'M', 'L', 'XL', '2XL', '3XL' ),
-		'color'             => 'Mint/Lavender',
-		'description'       => 'Pastel colorblock hoodie',
-		'short_description' => 'Sweet pastel vibes meet streetwear luxury. Mint and lavender colorblock with signature rose detail.',
-	),
-	array(
-		'sku'               => 'sg-007',
-		'name'              => 'The Signature Beanie',
-		'price'             => '25.00',
-		'status'            => 'publish',
-		'category'          => 'signature',
-		'sizes'             => array( 'One Size' ),
-		'color'             => 'Black',
-		'description'       => 'Knit beanie with embroidered signature rose',
-		'short_description' => 'Classic fitted beanie with embroidered signature rose. West Coast luxury meets everyday warmth.',
-	),
-	array(
-		'sku'               => 'sg-009',
-		'name'              => 'The Sherpa Jacket',
-		'price'             => '80.00',
-		'status'            => 'publish',
-		'category'          => 'signature',
-		'sizes'             => array( 'S', 'M', 'L', 'XL', '2XL', '3XL' ),
-		'color'             => 'Cream',
-		'description'       => 'Sherpa-lined jacket in signature colorway',
-		'short_description' => 'Plush sherpa warmth in the SkyyRose signature colorway. Luxury outerwear for the West Coast.',
-	),
-	array(
-		'sku'               => 'sg-010',
-		'name'              => 'The Bridge Series Shorts',
-		'price'             => '25.00',
-		'status'            => 'publish',
-		'category'          => 'signature',
-		'sizes'             => array( 'S', 'M', 'L', 'XL', '2XL' ),
-		'color'             => 'Navy',
-		'description'       => 'Athletic shorts from the Bridge collection',
-		'short_description' => 'From the Bridge Series. Athletic shorts celebrating the iconic Bay Area bridges.',
-	),
-);
+foreach ( $skyyrose_import_catalog as $catalog_product ) {
+	$skyyrose_import_products[] = array(
+		'sku'               => $catalog_product['sku'],
+		'name'              => $catalog_product['name'],
+		'price'             => number_format( $catalog_product['price'], 2, '.', '' ),
+		'status'            => $catalog_product['published'] ? 'publish' : 'draft',
+		'category'          => $catalog_product['collection'],
+		'sizes'             => explode( '|', $catalog_product['sizes'] ),
+		'color'             => $catalog_product['color'],
+		'description'       => $catalog_product['description'],
+		'short_description' => $catalog_product['description'],
+	);
+}
 
 /*--------------------------------------------------------------
  * Step 4: Create Products
