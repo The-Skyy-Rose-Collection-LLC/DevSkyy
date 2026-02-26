@@ -284,6 +284,12 @@ function skyyrose_enqueue_template_styles() {
 	if ( isset( $template_styles[ $slug ] ) ) {
 		$css_file = $template_styles[ $slug ];
 		$handle   = 'skyyrose-template-' . sanitize_title( pathinfo( $css_file, PATHINFO_FILENAME ) );
+		$min_file = str_replace( '.css', '.min.css', $css_file );
+
+		// Prefer minified version in production.
+		if ( $use_min && file_exists( $base_css_dir . '/' . $min_file ) ) {
+			$css_file = $min_file;
+		}
 
 		if ( file_exists( $base_css_dir . '/' . $css_file ) ) {
 			wp_enqueue_style(
@@ -305,6 +311,12 @@ function skyyrose_enqueue_template_styles() {
 	if ( isset( $woo_page_styles[ $slug ] ) ) {
 		$woo_file   = $woo_page_styles[ $slug ];
 		$woo_handle = 'skyyrose-' . sanitize_title( pathinfo( $woo_file, PATHINFO_FILENAME ) );
+		$woo_min    = str_replace( '.css', '.min.css', $woo_file );
+
+		// Prefer minified version in production.
+		if ( $use_min && file_exists( $base_css_dir . '/' . $woo_min ) ) {
+			$woo_file = $woo_min;
+		}
 
 		if ( file_exists( $base_css_dir . '/' . $woo_file ) ) {
 			wp_enqueue_style(
