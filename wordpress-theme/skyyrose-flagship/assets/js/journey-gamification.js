@@ -628,9 +628,16 @@
 		var text = document.createElement('div');
 		text.className = 'jge-achievement-bar__text';
 		if (isComplete) {
-			text.innerHTML = '<strong>Journey Complete!</strong> You explored all ' + totalRooms + ' rooms';
+			var strong1 = document.createElement('strong');
+			strong1.textContent = 'Journey Complete!';
+			text.appendChild(strong1);
+			text.appendChild(document.createTextNode(' You explored all ' + parseInt(totalRooms, 10) + ' rooms'));
 		} else {
-			text.innerHTML = 'Explored <strong>' + visitedCount + '/' + totalRooms + '</strong> rooms';
+			text.appendChild(document.createTextNode('Explored '));
+			var strong2 = document.createElement('strong');
+			strong2.textContent = parseInt(visitedCount, 10) + '/' + parseInt(totalRooms, 10);
+			text.appendChild(strong2);
+			text.appendChild(document.createTextNode(' rooms'));
 		}
 		bar.appendChild(text);
 

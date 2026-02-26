@@ -1271,7 +1271,7 @@
 }
 
 .pulse-scarcity-price--critical {
-	color: #DC143C;
+	color: #F44747; /* WCAG 4.7:1 on #0a0a0a */
 }
 
 .pulse-scarcity-dot {

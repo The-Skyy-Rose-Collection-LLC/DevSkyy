@@ -58,8 +58,8 @@ function skyyrose_product_schema() {
 		),
 	);
 
-	// Add brand if available.
-	$brand = get_post_meta( $product->get_id(), '_product_brand', true );
+	// Add brand if available (sanitize for safe JSON-LD output).
+	$brand = sanitize_text_field( get_post_meta( $product->get_id(), '_product_brand', true ) );
 	if ( $brand ) {
 		$schema['brand'] = array(
 			'@type' => 'Brand',

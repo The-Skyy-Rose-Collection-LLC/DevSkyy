@@ -44,10 +44,11 @@
 	var dots          = scene ? Array.from(scene.querySelectorAll('.room-dot')) : [];
 	var roomNameEl    = scene ? scene.querySelector('.room-name') : null;
 
-	var currentRoom     = 0;
-	var totalRooms      = layers.length;
-	var isTransitioning = false;
-	var lastFocused     = null;
+	var currentRoom      = 0;
+	var totalRooms       = layers.length;
+	var isTransitioning  = false;
+	var lastFocused      = null;
+	var currentProductId = null;
 
 	/* --------------------------------------------------
 	   Loading Screen

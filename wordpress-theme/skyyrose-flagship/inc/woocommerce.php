@@ -401,7 +401,7 @@ function skyyrose_save_product_3d_model( $post_id ) {
 	}
 
 	if ( isset( $_POST['skyyrose_product_3d_model'] ) ) {
-		$url = esc_url_raw( wp_unslash( $_POST['skyyrose_product_3d_model'] ) );
+		$url = esc_url_raw( wp_unslash( $_POST['skyyrose_product_3d_model'] ), array( 'https', 'http' ) );
 		update_post_meta( $post_id, '_product_3d_model', $url );
 	}
 }
@@ -579,15 +579,22 @@ function skyyrose_save_preorder_meta( $post_id ) {
 		update_post_meta( $post_id, '_preorder_available', $available );
 	}
 
-	// Expected ship date.
+	// Expected ship date — validate YYYY-MM-DD format.
 	if ( isset( $_POST['skyyrose_ship_date'] ) ) {
 		$date = sanitize_text_field( wp_unslash( $_POST['skyyrose_ship_date'] ) );
+		if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $date ) || false === strtotime( $date ) ) {
+			$date = '';
+		}
 		update_post_meta( $post_id, '_preorder_ship_date', $date );
 	}
 
-	// Pre-order price.
+	// Pre-order price — validate non-negative number.
 	if ( isset( $_POST['skyyrose_preorder_price'] ) ) {
 		$price = sanitize_text_field( wp_unslash( $_POST['skyyrose_preorder_price'] ) );
+		if ( '' !== $price ) {
+			$price = floatval( $price );
+			$price = ( $price >= 0 ) ? $price : '';
+		}
 		update_post_meta( $post_id, '_preorder_price', $price );
 	}
 }

@@ -58,6 +58,11 @@
 				mobilePanel.classList.toggle('open');
 				mobilePanel.setAttribute('aria-hidden', String(expanded));
 				document.body.classList.toggle('mobile-nav-open');
+
+				// WCAG 2.4.3: Move focus into mobile menu when it opens.
+				if (!expanded && mobileClose) {
+					mobileClose.focus();
+				}
 			}
 			if (mobileOverlay) {
 				mobileOverlay.classList.toggle('open');

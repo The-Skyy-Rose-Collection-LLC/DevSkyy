@@ -441,6 +441,8 @@
 			return n < 10 ? '0' + n : '' + n;
 		}
 
+		var tickInterval;
+
 		function tick() {
 			var now  = Date.now();
 			var diff = Math.max(0, launchDate - now);
@@ -454,10 +456,14 @@
 			if (hoursEl)   hoursEl.textContent   = pad(hours);
 			if (minutesEl) minutesEl.textContent  = pad(minutes);
 			if (secondsEl) secondsEl.textContent  = pad(seconds);
+
+			if (diff === 0 && tickInterval) {
+				clearInterval(tickInterval);
+			}
 		}
 
 		tick();
-		setInterval(tick, 1000);
+		tickInterval = setInterval(tick, 1000);
 	}
 
 	/* --------------------------------------------------
@@ -529,9 +535,9 @@
 				};
 				xhr.onerror = function () {
 					if (submitBtn) {
-						submitBtn.textContent = 'Welcome to the Inner Circle!';
+						submitBtn.textContent = 'Something went wrong. Try again.';
+						submitBtn.disabled = false;
 					}
-					setTimeout(hidePopup, 2000);
 				};
 				xhr.send(formData);
 			});
@@ -653,7 +659,6 @@
 
 			var remaining = Math.floor(Math.random() * 12) + 3;
 			var el = document.createElement('div');
-			el.className = 'pulse-scarcity-price';
 			el.className = 'pulse-scarcity-price' + (remaining <= 5 ? ' pulse-scarcity-price--critical' : ' pulse-scarcity-price--low');
 
 			var dot = document.createElement('span');
