@@ -79,30 +79,19 @@
 					</p>
 					<div class="footer-brand__social" aria-label="<?php esc_attr_e( 'Social Media Links', 'skyyrose-flagship' ); ?>">
 						<?php
-						$social_links = array(
-							'instagram' => array(
-								'url'   => 'https://instagram.com/theskyyrosecollection',
-								'label' => __( 'Instagram', 'skyyrose-flagship' ),
-								'icon'  => '<path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2Z"/><circle cx="12" cy="12" r="3.5"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>',
-							),
-							'tiktok'    => array(
-								'url'   => 'https://tiktok.com/@skyyrosecollection',
-								'label' => __( 'TikTok', 'skyyrose-flagship' ),
-								'icon'  => '<path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>',
-							),
-							'twitter'   => array(
-								'url'   => 'https://twitter.com/skyyrosellc',
-								'label' => __( 'X (Twitter)', 'skyyrose-flagship' ),
-								'icon'  => '<path d="M4 4l11.733 16h4.267l-11.733 -16z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/>',
-							),
-							'facebook'  => array(
-								'url'   => 'https://facebook.com/skyyrosecollection',
-								'label' => __( 'Facebook', 'skyyrose-flagship' ),
-								'icon'  => '<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',
-							),
+						$social_icons = array(
+							'instagram' => '<path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2Z"/><circle cx="12" cy="12" r="3.5"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>',
+							'tiktok'    => '<path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>',
+							'twitter'   => '<path d="M4 4l11.733 16h4.267l-11.733 -16z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/>',
+							'facebook'  => '<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',
 						);
+						$social_links = skyyrose_get_social_links();
 
-						foreach ( $social_links as $platform => $data ) :
+						foreach ( $social_icons as $platform => $icon ) :
+							if ( ! isset( $social_links[ $platform ] ) ) {
+								continue;
+							}
+							$data = $social_links[ $platform ];
 							?>
 							<a
 								href="<?php echo esc_url( $data['url'] ); ?>"
@@ -112,7 +101,7 @@
 								rel="noopener noreferrer"
 							>
 								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-									<?php echo $data['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SVG markup. ?>
+									<?php echo $icon; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SVG markup. ?>
 								</svg>
 							</a>
 						<?php endforeach; ?>
@@ -161,31 +150,16 @@
 				<div class="footer-grid__col footer-grid__col--social">
 					<h4 class="footer-grid__heading"><?php esc_html_e( 'Connect', 'skyyrose-flagship' ); ?></h4>
 					<ul class="footer-grid__list">
-						<li>
-							<a href="https://instagram.com/theskyyrosecollection" target="_blank" rel="noopener noreferrer">
-								<?php esc_html_e( 'Instagram', 'skyyrose-flagship' ); ?>
-							</a>
-						</li>
-						<li>
-							<a href="https://tiktok.com/@skyyrosecollection" target="_blank" rel="noopener noreferrer">
-								<?php esc_html_e( 'TikTok', 'skyyrose-flagship' ); ?>
-							</a>
-						</li>
-						<li>
-							<a href="https://twitter.com/skyyrosellc" target="_blank" rel="noopener noreferrer">
-								<?php esc_html_e( 'X (Twitter)', 'skyyrose-flagship' ); ?>
-							</a>
-						</li>
-						<li>
-							<a href="https://facebook.com/skyyrosecollection" target="_blank" rel="noopener noreferrer">
-								<?php esc_html_e( 'Facebook', 'skyyrose-flagship' ); ?>
-							</a>
-						</li>
-						<li>
-							<a href="https://pinterest.com/skyyrosecollection" target="_blank" rel="noopener noreferrer">
-								<?php esc_html_e( 'Pinterest', 'skyyrose-flagship' ); ?>
-							</a>
-						</li>
+						<?php
+						$connect_links = skyyrose_get_social_links();
+						foreach ( $connect_links as $data ) :
+							?>
+							<li>
+								<a href="<?php echo esc_url( $data['url'] ); ?>" target="_blank" rel="noopener noreferrer">
+									<?php echo esc_html( $data['label'] ); ?>
+								</a>
+							</li>
+						<?php endforeach; ?>
 					</ul>
 				</div>
 

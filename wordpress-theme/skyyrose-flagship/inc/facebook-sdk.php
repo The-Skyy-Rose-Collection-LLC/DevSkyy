@@ -45,7 +45,7 @@ s.parentNode.insertBefore(t,s)}(window, document,'script',
 fbq('init', '<?php echo esc_js( SKYYROSE_FB_APP_ID ); ?>');
 fbq('track', 'PageView');
 </script>
-<noscript><img height="1" width="1" style="display:none"
+<noscript><img height="1" width="1" style="display:none" alt=""
 src="https://www.facebook.com/tr?id=<?php echo esc_attr( SKYYROSE_FB_APP_ID ); ?>&ev=PageView&noscript=1"
 /></noscript>
 <!-- End Facebook Pixel Code -->
