@@ -618,17 +618,19 @@ function skyyrose_immersive_product( $sku, $scene ) {
 	}
 
 	// Build the entry — scene overrides win for name/price/image/sizes.
+	// Return raw strings — templates apply esc_html()/esc_attr() at output time.
+	// Do NOT pre-escape here or templates will double-encode via esc_attr().
 	return array(
 		'id'         => $sku,
 		'name'       => isset( $scene['name'] )
 			? $scene['name']
-			: ( $product ? esc_html( $product['name'] ) : $sku ),
+			: ( $product ? $product['name'] : $sku ),
 		'price'      => isset( $scene['price'] )
 			? $scene['price']
 			: ( $product ? skyyrose_format_price( $product ) : '' ),
 		'collection' => isset( $scene['collection'] )
 			? $scene['collection']
-			: esc_html( $collection_label ),
+			: $collection_label,
 		'sizes'      => isset( $scene['sizes'] )
 			? $scene['sizes']
 			: ( $product ? str_replace( '|', ',', $product['sizes'] ) : '' ),

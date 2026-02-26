@@ -274,7 +274,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 
 					// Fallback URL and explore text.
 					if ( '#' === $skyyrose_link || is_wp_error( $skyyrose_link ) ) {
-						$skyyrose_link  = home_url( '/collection/' . $skyyrose_collection['slug'] . '/' );
+						$skyyrose_link  = home_url( '/collection-' . $skyyrose_collection['slug'] . '/' );
 						$skyyrose_count = __( 'Explore', 'skyyrose-flagship' );
 					}
 					?>

@@ -37,7 +37,9 @@ foreach ( $preorder_groups as $collection_slug => $products ) {
 			'name'             => $p['name'],
 			'price'            => '$' . number_format( $p['price'], 0 ),
 			'collection'       => $p['collection'],
-			'collection_label' => $collection_labels[ $p['collection'] ],
+			'collection_label' => isset( $collection_labels[ $p['collection'] ] )
+				? $collection_labels[ $p['collection'] ]
+				: esc_html( ucwords( str_replace( '-', ' ', $p['collection'] ) ) ),
 			'sizes'            => str_replace( '|', ',', $p['sizes'] ),
 			'desc'             => $p['description'],
 			'image'            => skyyrose_product_image_uri( ! empty( $p['front_model_image'] ) ? $p['front_model_image'] : $p['image'] ),
@@ -193,14 +195,14 @@ get_header();
 
 	<!-- Product Modal -->
 	<div class="product-modal-overlay" aria-hidden="true">
-		<div class="product-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-label="<?php esc_attr_e( 'Product details', 'skyyrose-flagship' ); ?>">
+		<div class="product-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modal-product-name">
 			<button class="product-modal-close" type="button" aria-label="<?php esc_attr_e( 'Close', 'skyyrose-flagship' ); ?>">&times;</button>
 			<div class="modal-360-area">
 				<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Product preview', 'skyyrose-flagship' ); ?>" width="400" height="400">
 				<span class="modal-360-badge"><?php echo esc_html__( '360 Preview', 'skyyrose-flagship' ); ?></span>
 			</div>
 			<div class="modal-details">
-				<h2 class="modal-product-name"></h2>
+				<h2 class="modal-product-name" id="modal-product-name"></h2>
 				<p class="modal-product-collection"></p>
 				<p class="modal-product-price"></p>
 				<p class="modal-product-desc"></p>
