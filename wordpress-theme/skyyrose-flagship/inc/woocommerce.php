@@ -257,6 +257,10 @@ function skyyrose_woocommerce_localize_scripts() {
 		return;
 	}
 
+	if ( ! function_exists( 'wc_get_cart_url' ) ) {
+		return;
+	}
+
 	wp_localize_script(
 		'skyyrose-template-woocommerce',
 		'skyyRoseWoo',

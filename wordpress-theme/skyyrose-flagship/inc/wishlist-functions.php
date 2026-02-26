@@ -558,6 +558,10 @@ function skyyrose_rest_get_wishlist( $request ) {
 	$wishlist = skyyrose_get_wishlist_items();
 	$products = array();
 
+	if ( ! function_exists( 'wc_get_product' ) ) {
+		return new WP_REST_Response( array( 'items' => array(), 'count' => 0 ), 200 );
+	}
+
 	foreach ( $wishlist as $product_id ) {
 		$product = wc_get_product( $product_id );
 		if ( $product ) {
