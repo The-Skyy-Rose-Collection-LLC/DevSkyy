@@ -61,6 +61,10 @@ function skyyrose_get_signature_products() {
 	$set_skus = array( 'sg-001', 'sg-002' );
 
 	foreach ( $catalog_products as $p ) {
+		// Skip unpublished products.
+		if ( empty( $p['published'] ) ) {
+			continue;
+		}
 		// Prefer VTON front-model image over flat product shot.
 		$primary_img = ! empty( $p['front_model_image'] ) ? $p['front_model_image'] : $p['image'];
 		$img_uri     = skyyrose_product_image_uri( $primary_img );
@@ -76,6 +80,7 @@ function skyyrose_get_signature_products() {
 				'badge'      => $p['badge'],
 				'image'      => $img_uri,
 				'back_image' => '',
+				'url'        => skyyrose_product_url( $p['sku'] ),
 			);
 			$shorts_img = 'sg-001' === $p['sku']
 				? $img_uri
@@ -89,6 +94,7 @@ function skyyrose_get_signature_products() {
 				'badge'      => $p['badge'],
 				'image'      => $shorts_img,
 				'back_image' => '',
+				'url'        => skyyrose_product_url( $p['sku'] ),
 			);
 		} else {
 			$display_products[] = array(
@@ -99,6 +105,7 @@ function skyyrose_get_signature_products() {
 				'badge'      => $p['badge'],
 				'image'      => $img_uri,
 				'back_image' => ! empty( $p['back_image'] ) ? skyyrose_product_image_uri( $p['back_image'] ) : '',
+				'url'        => skyyrose_product_url( $p['sku'] ),
 			);
 		}
 	}

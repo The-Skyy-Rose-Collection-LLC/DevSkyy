@@ -364,8 +364,11 @@ function skyyrose_ajax_signin() {
 	wp_set_current_user( $user->ID );
 	wp_set_auth_cookie( $user->ID, $remember );
 
-	/** Fires after a user signs in via AJAX — triggers WooCommerce session merge. */
-	do_action( 'wp_login', $user->user_login, $user );
+	// Fire WooCommerce-specific hook for guest-to-customer cart merge.
+	// Avoid do_action('wp_login') which causes double-processing with security plugins.
+	if ( function_exists( 'WC' ) && WC()->session ) {
+		do_action( 'woocommerce_set_cart_cookies', true );
+	}
 
 	wp_send_json_success(
 		array(

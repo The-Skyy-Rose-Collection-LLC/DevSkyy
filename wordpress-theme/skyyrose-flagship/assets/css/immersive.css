@@ -593,6 +593,12 @@
 	border-color: rgba(255, 255, 255, 0.7);
 }
 
+.room-dot:focus-visible {
+	outline: 2px solid var(--rose-gold, #B76E79);
+	outline-offset: 3px;
+	border-color: var(--rose-gold, #B76E79);
+}
+
 .room-name {
 	position: absolute;
 	bottom: 70px;
