@@ -261,19 +261,19 @@
 	 * Add a product to the WooCommerce cart via the dedicated immersive
 	 * AJAX endpoint. Shows a toast notification on success.
 	 *
-	 * @param {number}      productId  WooCommerce product ID.
+	 * @param {string}      sku        Product SKU (e.g., 'br-006').
 	 * @param {string|null} size       Optional size attribute value.
 	 * @param {Function}    onComplete Called when the request finishes (success or error).
 	 */
-	function liveAddToCart(productId, size, onComplete) {
-		if (!productId) {
+	function liveAddToCart(sku, size, onComplete) {
+		if (!sku) {
 			showToast('Unable to add item. Please try from the product page.');
 			if (onComplete) onComplete(false);
 			return;
 		}
 
 		var params = {
-			product_id: productId,
+			sku: sku,
 			quantity: 1,
 		};
 
@@ -360,6 +360,8 @@
 	 *
 	 * @param {string} message The message to display.
 	 */
+	var toastTimer = 0;
+
 	function showToast(message) {
 		var notification = document.querySelector('.immersive-cart-notification');
 
@@ -374,7 +376,9 @@
 		notification.textContent = message;
 		notification.classList.add('visible');
 
-		setTimeout(function () {
+		// Clear any pending hide so rapid calls don't cut the new toast short.
+		clearTimeout(toastTimer);
+		toastTimer = setTimeout(function () {
 			notification.classList.remove('visible');
 		}, 3500);
 	}
@@ -384,13 +388,9 @@
 	   -------------------------------------------------- */
 
 	/**
-	 * Override the existing product panel add-to-cart button to use
-	 * the dedicated immersive AJAX endpoint instead of the generic
-	 * WooCommerce wc-ajax endpoint.
-	 *
-	 * This does not remove the original listener in immersive.js;
-	 * it attaches a capturing listener that prevents propagation
-	 * when the bridge is active.
+	 * Override the product panel add-to-cart button to use the
+	 * dedicated immersive AJAX endpoint (SKU-based) instead of
+	 * the generic WooCommerce wc-ajax endpoint.
 	 */
 	function interceptAddToCart() {
 		var panel = document.querySelector('.product-panel');
@@ -401,32 +401,35 @@
 
 		addBtn.addEventListener('click', function (e) {
 			e.preventDefault();
-			e.stopImmediatePropagation();
 
-			var productId = null;
+			var productSku = '';
 			var size = '';
 
-			// Read product ID from panel data attribute (set by immersive.js openPanel).
+			// Read product SKU from panel data attribute (set by immersive.js openPanel).
 			if (panel.dataset.currentProductId) {
-				productId = panel.dataset.currentProductId;
+				productSku = panel.dataset.currentProductId;
 			}
 
 			// Fall back: focused or active hotspot.
-			if (!productId) {
+			if (!productSku) {
 				var activeHotspot = document.querySelector('.hotspot:focus, .hotspot[aria-current="true"]');
 				if (activeHotspot) {
-					productId = activeHotspot.getAttribute('data-product-id');
+					productSku = activeHotspot.getAttribute('data-product-sku')
+						|| activeHotspot.getAttribute('data-product-id')
+						|| '';
 				}
 			}
 
 			// Fall back: check the panel's view-details link for product context.
-			if (!productId) {
+			if (!productSku) {
 				var detailsLink = panel.querySelector('.btn-view-details');
 				if (detailsLink && detailsLink.href) {
-					var allHotspots = document.querySelectorAll('.hotspot[data-product-url]');
+					var allHotspots = document.querySelectorAll('.hotspot[data-product-sku], .hotspot[data-product-id]');
 					for (var i = 0; i < allHotspots.length; i++) {
 						if (allHotspots[i].getAttribute('data-product-url') === detailsLink.href) {
-							productId = allHotspots[i].getAttribute('data-product-id');
+							productSku = allHotspots[i].getAttribute('data-product-sku')
+								|| allHotspots[i].getAttribute('data-product-id')
+								|| '';
 							break;
 						}
 					}
@@ -442,7 +445,7 @@
 				}
 			}
 
-			if (!productId) {
+			if (!productSku) {
 				showToast('Please visit the product page to add this item.');
 				return;
 			}
@@ -452,7 +455,7 @@
 			var originalText = addBtn.textContent;
 			addBtn.textContent = 'Adding...';
 
-			liveAddToCart(productId, size, function (success) {
+			liveAddToCart(productSku, size, function (success) {
 				addBtn.disabled = false;
 				if (success) {
 					addBtn.textContent = 'Added!';
@@ -463,7 +466,7 @@
 					addBtn.textContent = originalText;
 				}
 			});
-		}, true); // Capture phase — prevents WooCommerce default handler from double-firing.
+		}); // Bubble phase — sole add-to-cart handler (immersive.js initAddToCart removed in v3.2.4).
 	}
 
 	/* --------------------------------------------------

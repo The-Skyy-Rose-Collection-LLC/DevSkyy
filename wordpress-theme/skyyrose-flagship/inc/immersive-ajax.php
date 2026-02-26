@@ -230,10 +230,19 @@ function skyyrose_ajax_immersive_add_to_cart() {
 		return;
 	}
 
-	// Sanitize inputs.
+	// Sanitize inputs — accept either numeric product_id or SKU string.
 	$product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+	$sku        = isset( $_POST['sku'] ) ? sanitize_text_field( wp_unslash( $_POST['sku'] ) ) : '';
 	$quantity   = isset( $_POST['quantity'] ) ? absint( $_POST['quantity'] ) : 1;
 	$size       = isset( $_POST['attribute_pa_size'] ) ? sanitize_text_field( wp_unslash( $_POST['attribute_pa_size'] ) ) : '';
+
+	// Resolve SKU to product ID if needed.
+	if ( ! $product_id && $sku && function_exists( 'wc_get_product_id_by_sku' ) ) {
+		// Strip variant suffixes for WC lookup (e.g., 'sg-001-tee' → 'sg-001').
+		$lookup_sku = preg_replace( '/-(tee|shorts)$/', '', $sku );
+		$lookup_sku = preg_replace( '/([a-z]{2}-\d{3})[a-z]$/', '$1', $lookup_sku );
+		$product_id = wc_get_product_id_by_sku( $lookup_sku );
+	}
 
 	if ( ! $product_id ) {
 		wp_send_json_error(

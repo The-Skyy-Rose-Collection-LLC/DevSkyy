@@ -265,7 +265,7 @@ $founder_signature = get_theme_mod( 'about_founder_signature', '&mdash; The Foun
 			?>
 			<div class="<?php echo esc_attr( $grid_class ); ?>">
 
-				<figure class="about-story__image about-reveal <?php echo esc_attr( $story['reverse'] ? 'about-reveal--right' : 'about-reveal--left' ); ?> <?php echo esc_attr( $delay_class ); ?>">
+				<figure class="about-story__image about-reveal <?php echo esc_attr( $story['reverse'] ? 'about-reveal--right' : 'about-reveal--left' ); ?> <?php echo esc_attr( $delay_class ); ?>" aria-hidden="true">
 					<?php
 					/*
 					 * Image placeholder. When actual brand photography is uploaded,
@@ -461,7 +461,7 @@ $founder_signature = get_theme_mod( 'about_founder_signature', '&mdash; The Foun
 	<section class="about-founder" aria-label="<?php esc_attr_e( 'Founder Message', 'skyyrose-flagship' ); ?>">
 		<div class="about-founder__inner">
 
-			<figure class="about-founder__portrait about-reveal about-reveal--left">
+			<figure class="about-founder__portrait about-reveal about-reveal--left" aria-hidden="true">
 				<?php
 				/*
 				 * Founder portrait placeholder. When uploaded, replace with:
