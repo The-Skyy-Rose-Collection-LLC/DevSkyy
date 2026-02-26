@@ -50,7 +50,7 @@ get_header();
 
 							<div class="product-image">
 								<a href="<?php echo esc_url( $product->get_permalink() ); ?>">
-									<?php echo $product->get_image( 'woocommerce_thumbnail' ); ?>
+									<?php echo wp_kses_post( $product->get_image( 'woocommerce_thumbnail' ) ); ?>
 								</a>
 								<button type="button" class="wishlist-remove" data-product-id="<?php echo esc_attr( $product_id ); ?>" title="<?php esc_attr_e( 'Remove from wishlist', 'skyyrose-flagship' ); ?>">
 									<svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -73,7 +73,7 @@ get_header();
 								<?php endif; ?>
 
 								<div class="product-price">
-									<?php echo $product->get_price_html(); ?>
+									<?php echo wp_kses_post( $product->get_price_html() ); ?>
 								</div>
 
 								<div class="product-meta">

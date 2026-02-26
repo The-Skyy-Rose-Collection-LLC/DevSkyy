@@ -350,7 +350,7 @@ function skyyrose_get_product_catalog() {
 			'collection'        => 'signature',
 			'description'       => 'Sweet pastel vibes meet streetwear luxury. Mint and lavender colorblock with signature rose detail.',
 			'badge'             => 'New',
-			'image'             => $img . '/sg-006-mint-lavender-hoodie.jpg',
+			'image'             => $img . '/sg-006-mint-lavender-hoodie.webp',
 			'front_model_image' => '',
 			'back_image'        => '',
 			'sizes'             => 'S|M|L|XL|2XL|3XL',

@@ -141,7 +141,7 @@
 	   -------------------------------------------------- */
 
 	function initNewsletter() {
-		var form = document.querySelector('.newsletter-form');
+		var form = document.querySelector('.js-newsletter-form');
 		if (!form) return;
 
 		form.addEventListener('submit', function (e) {
