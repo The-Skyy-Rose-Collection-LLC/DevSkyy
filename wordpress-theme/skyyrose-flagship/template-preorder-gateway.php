@@ -142,7 +142,6 @@ get_header();
 				?>
 					<article
 						class="product-grid-card"
-						aria-label="<?php echo esc_attr( $product['name'] . ' — ' . $product['price'] ); ?>"
 						data-collection="<?php echo esc_attr( $product['collection'] ); ?>"
 						data-product-id="<?php echo esc_attr( $product['id'] ); ?>"
 						data-product-name="<?php echo esc_attr( $product['name'] ); ?>"
@@ -199,7 +198,7 @@ get_header();
 	<!-- Product Modal -->
 	<div class="product-modal-overlay" aria-hidden="true"></div>
 	<div class="product-modal" id="product-modal-dialog" role="dialog" aria-modal="true" aria-hidden="true" inert aria-labelledby="modal-product-name">
-		<button class="product-modal-close" type="button" aria-label="<?php esc_attr_e( 'Close', 'skyyrose-flagship' ); ?>">&times;</button>
+		<button class="product-modal-close" type="button" aria-label="<?php esc_attr_e( 'Close product details', 'skyyrose-flagship' ); ?>">&times;</button>
 		<div class="modal-360-area">
 			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Product preview', 'skyyrose-flagship' ); ?>" width="400" height="400">
 			<span class="modal-360-badge"><?php echo esc_html__( '360 Preview', 'skyyrose-flagship' ); ?></span>
@@ -209,8 +208,8 @@ get_header();
 			<p class="modal-product-collection"></p>
 			<p class="modal-product-price"></p>
 			<p class="modal-product-desc"></p>
-			<p class="modal-sizes-label"><?php echo esc_html__( 'Select Size', 'skyyrose-flagship' ); ?></p>
-			<div class="modal-sizes" role="group" aria-label="<?php esc_attr_e( 'Available sizes', 'skyyrose-flagship' ); ?>"></div>
+			<p class="modal-sizes-label" id="modal-sizes-label"><?php echo esc_html__( 'Select Size', 'skyyrose-flagship' ); ?></p>
+			<div class="modal-sizes" role="group" aria-labelledby="modal-sizes-label"></div>
 			<div class="modal-actions">
 				<button class="modal-add-to-cart" type="button"><?php echo esc_html__( 'Add to Cart', 'skyyrose-flagship' ); ?></button>
 				<button class="modal-wishlist-btn" type="button" aria-label="<?php esc_attr_e( 'Add to wishlist', 'skyyrose-flagship' ); ?>">
@@ -318,7 +317,7 @@ get_header();
 	<!-- Exclusive Incentive Popup — triggers after 15s or on exit intent -->
 	<div class="incentive-popup-overlay" aria-hidden="true"></div>
 	<div class="incentive-popup" id="incentive-popup-dialog" role="dialog" aria-modal="true" aria-hidden="true" inert aria-label="<?php esc_attr_e( 'Exclusive early access offer', 'skyyrose-flagship' ); ?>">
-			<button class="incentive-popup-close" type="button" aria-label="<?php esc_attr_e( 'Close', 'skyyrose-flagship' ); ?>">&times;</button>
+			<button class="incentive-popup-close" type="button" aria-label="<?php esc_attr_e( 'Close early access offer', 'skyyrose-flagship' ); ?>">&times;</button>
 			<div class="incentive-popup-content">
 				<div class="incentive-popup-monogram"><?php echo esc_html__( 'SR', 'skyyrose-flagship' ); ?></div>
 				<h3 class="incentive-popup-title"><?php echo esc_html__( 'Unlock Early Access', 'skyyrose-flagship' ); ?></h3>

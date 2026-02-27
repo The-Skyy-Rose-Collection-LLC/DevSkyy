@@ -36,9 +36,9 @@ function skyyrose_product_schema() {
 		return;
 	}
 
-	global $product;
+	$product = function_exists( 'wc_get_product' ) ? wc_get_product( get_the_ID() ) : null;
 
-	if ( ! is_a( $product, 'WC_Product' ) ) {
+	if ( ! $product ) {
 		return;
 	}
 

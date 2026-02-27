@@ -394,7 +394,15 @@ function skyyrose_ajax_move_to_cart() {
 	}
 }
 add_action( 'wp_ajax_skyyrose_move_to_cart', 'skyyrose_ajax_move_to_cart' );
-// nopriv removed: cart mutations require authentication (guest sessions can't persist wishlists).
+// Guest move-to-cart: return auth-required error so JS can redirect to login.
+add_action( 'wp_ajax_nopriv_skyyrose_move_to_cart', function() {
+	wp_send_json_error(
+		array(
+			'message'       => esc_html__( 'Please sign in to move items to cart.', 'skyyrose-flagship' ),
+			'require_login' => true,
+		)
+	);
+} );
 
 /**
  * AJAX handler: Clear wishlist.

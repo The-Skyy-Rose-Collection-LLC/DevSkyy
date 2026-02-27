@@ -730,6 +730,11 @@
 				formData.forEach(function (value, key) {
 					params.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
 				});
+				// Ensure nonce is included for server-side verification.
+				var nonce = window.skyyRoseData && window.skyyRoseData.nonce;
+				if (nonce && params.join('').indexOf('nonce') === -1) {
+					params.push('nonce=' + encodeURIComponent(nonce));
+				}
 				xhr.send(params.join('&'));
 			});
 		}
@@ -843,6 +848,16 @@
 
 		tickUrgency();
 		urgencyInterval = setInterval(tickUrgency, 60000);
+
+		// Pause/resume urgency countdown when tab visibility changes.
+		document.addEventListener('visibilitychange', function () {
+			if (document.hidden) {
+				if (urgencyInterval) { clearInterval(urgencyInterval); urgencyInterval = null; }
+			} else {
+				tickUrgency();
+				if (!urgencyInterval) { urgencyInterval = setInterval(tickUrgency, 60000); }
+			}
+		});
 	}
 
 	/* --------------------------------------------------

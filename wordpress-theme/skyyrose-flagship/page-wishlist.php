@@ -69,7 +69,8 @@ if ( ! class_exists( 'WooCommerce' ) ) {
 						<div class="product-card-inner">
 
 							<div class="product-image">
-								<a href="<?php echo esc_url( $product->get_permalink() ); ?>">
+								<a href="<?php echo esc_url( $product->get_permalink() ); ?>"
+								aria-label="<?php echo esc_attr( sprintf( __( 'View %s', 'skyyrose-flagship' ), $product->get_name() ) ); ?>">
 									<?php echo wp_kses_post( $product->get_image( 'woocommerce_thumbnail' ) ); ?>
 								</a>
 								<button type="button" class="wishlist-remove" data-product-id="<?php echo esc_attr( $product_id ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Remove %s from wishlist', 'skyyrose-flagship' ), $product->get_name() ) ); ?>">

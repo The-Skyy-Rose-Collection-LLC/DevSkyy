@@ -27,6 +27,7 @@
 	var titleOverlay  = document.querySelector('.scene-title-overlay');
 
 	// Product panel
+	var currentProductId = null;
 	var panelOverlay  = document.querySelector('.product-panel-overlay');
 	var panel         = document.querySelector('.product-panel');
 	var panelClose    = document.querySelector('.product-panel-close');
@@ -85,10 +86,13 @@
 	   Title Auto-Hide
 	   -------------------------------------------------- */
 
+	var titleHideTimer = null;
+
 	function initTitleAutoHide() {
 		if (!titleOverlay) return;
-		setTimeout(function () {
+		titleHideTimer = setTimeout(function () {
 			titleOverlay.classList.add('hidden');
+			titleHideTimer = null;
 		}, 4000);
 	}
 

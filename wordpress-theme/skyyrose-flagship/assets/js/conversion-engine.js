@@ -61,8 +61,6 @@
 			Object.keys(attrs).forEach(function (key) {
 				if (key === 'textContent') {
 					el.textContent = attrs[key];
-				} else if (key === 'innerHTML') {
-					el.innerHTML = attrs[key];
 				} else {
 					el.setAttribute(key, attrs[key]);
 				}
@@ -675,10 +673,12 @@
 			cleanupIntervals.forEach(function (id) {
 				clearInterval(id);
 			});
-		} else {
-			// Intervals are cleared, not resumable. Re-init viewer counters on next page interaction.
-			// For now, just clear the array so stale IDs aren't re-cleared.
 			cleanupIntervals.length = 0;
+		} else {
+			// Re-init viewer counters when tab becomes visible again.
+			// This restarts intervals that were cleared when the tab was hidden.
+			initLiveViewerCounter();
+			initRoomViewers();
 		}
 	});
 

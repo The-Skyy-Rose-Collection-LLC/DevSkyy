@@ -217,7 +217,7 @@ function skyyrose_breadcrumbs() {
 	);
 
 	// WooCommerce product pages.
-	if ( function_exists( 'is_product' ) && is_product() ) {
+	if ( function_exists( 'is_product' ) && function_exists( 'wc_get_page_id' ) && is_product() ) {
 		$items[] = array(
 			'title' => esc_html__( 'Shop', 'skyyrose-flagship' ),
 			'url'   => get_permalink( wc_get_page_id( 'shop' ) ),
@@ -236,7 +236,7 @@ function skyyrose_breadcrumbs() {
 			'title' => get_the_title(),
 			'url'   => '',
 		);
-	} elseif ( function_exists( 'is_shop' ) && ( is_shop() || is_product_category() || is_product_tag() ) ) {
+	} elseif ( function_exists( 'is_shop' ) && function_exists( 'wc_get_page_id' ) && ( is_shop() || is_product_category() || is_product_tag() ) ) {
 		// WooCommerce archive pages.
 		$items[] = array(
 			'title' => esc_html__( 'Shop', 'skyyrose-flagship' ),

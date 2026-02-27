@@ -348,18 +348,10 @@ function skyyrose_ajax_signin() {
 	$cache_key = 'skyyrose_login_attempts_' . md5( $normalized_email );
 	$attempts  = (int) get_transient( $cache_key );
 
-	// Secondary: per-IP bucket as defence-in-depth (wider limit for shared IPs/proxies).
-	$ip_key      = 'skyyrose_login_ip_' . md5( isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : 'unknown' );
-	$ip_attempts = (int) get_transient( $ip_key );
-
-	if ( $ip_attempts >= 20 ) {
-		wp_send_json_error(
-			array(
-				'message' => esc_html__( 'Too many attempts from your network. Please try again later.', 'skyyrose-flagship' ),
-			)
-		);
-		return;
-	}
+	// Per-IP rate limiting removed: on WordPress.com (and all proxy environments),
+	// REMOTE_ADDR is the proxy IP — shared by ALL users. A per-IP bucket of 20
+	// would lock out every user sitewide after 20 total login attempts.
+	// The per-email bucket (5 attempts / 15 min) is sufficient defence.
 
 	if ( $attempts >= 5 ) {
 		wp_send_json_error(
@@ -375,7 +367,6 @@ function skyyrose_ajax_signin() {
 
 	if ( is_wp_error( $user ) ) {
 		set_transient( $cache_key, $attempts + 1, 15 * MINUTE_IN_SECONDS );
-		set_transient( $ip_key, $ip_attempts + 1, 15 * MINUTE_IN_SECONDS );
 		wp_send_json_error(
 			array(
 				'message' => esc_html__( 'Invalid email or password. Please try again.', 'skyyrose-flagship' ),
@@ -384,9 +375,8 @@ function skyyrose_ajax_signin() {
 		return;
 	}
 
-	// Clear both rate-limit counters on successful login.
+	// Clear rate-limit counter on successful login.
 	delete_transient( $cache_key );
-	delete_transient( $ip_key );
 
 	// Initialize session and set authentication cookies.
 	$remember = isset( $_POST['remember'] ) && '1' === sanitize_text_field( wp_unslash( $_POST['remember'] ) );

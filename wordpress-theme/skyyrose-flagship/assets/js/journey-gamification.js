@@ -503,6 +503,8 @@
 			if (e.target === overlay) dismiss();
 		});
 		document.addEventListener('keydown', keyHandler);
+		// Clean up document-level listener if user navigates away while modal is open.
+		window.addEventListener('beforeunload', dismiss);
 
 		// Show with animation.
 		requestAnimationFrame(function () {
