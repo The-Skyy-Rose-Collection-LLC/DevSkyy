@@ -563,3 +563,59 @@ class TestPipelineBridgeTools:
         assert call_kwargs.kwargs["version"] == "1.0.0"
         assert len(call_kwargs.kwargs["tools"]) == 15
         assert server is not None
+
+
+class TestWordPressBridgeAgent:
+    """Tests for the agent entry point."""
+
+    def test_agent_initialization(self):
+        from agents.wordpress_bridge.agent import WordPressBridgeAgent
+
+        agent = WordPressBridgeAgent()
+        assert agent.model == "claude-opus-4-6"
+        assert agent.mcp_server is not None
+        assert agent.correlation_id is None
+
+    def test_agent_with_custom_model(self):
+        from agents.wordpress_bridge.agent import WordPressBridgeAgent
+
+        agent = WordPressBridgeAgent(model="claude-sonnet-4-6", correlation_id="test-123")
+        assert agent.model == "claude-sonnet-4-6"
+        assert agent.correlation_id == "test-123"
+
+    def test_agent_options_contain_mcp_server(self):
+        from agents.wordpress_bridge.agent import WordPressBridgeAgent
+
+        agent = WordPressBridgeAgent()
+        options = agent.get_options()
+        assert options.mcp_servers is not None
+        assert "wordpress_bridge" in options.mcp_servers
+
+    def test_agent_options_system_prompt(self):
+        from agents.wordpress_bridge.agent import WordPressBridgeAgent
+
+        agent = WordPressBridgeAgent()
+        options = agent.get_options()
+        assert "SkyyRose" in options.system_prompt
+        assert "Luxury Grows from Concrete" in options.system_prompt
+
+    def test_agent_options_adaptive_thinking(self):
+        from agents.wordpress_bridge.agent import WordPressBridgeAgent
+
+        agent = WordPressBridgeAgent()
+        options = agent.get_options()
+        assert options.thinking == {"type": "adaptive"}
+
+    def test_agent_options_permission_mode(self):
+        from agents.wordpress_bridge.agent import WordPressBridgeAgent
+
+        agent = WordPressBridgeAgent()
+        options = agent.get_options(permission_mode="default")
+        assert options.permission_mode == "default"
+
+    def test_run_agent_is_async_generator(self):
+        import inspect
+
+        from agents.wordpress_bridge.agent import run_agent
+
+        assert inspect.isasyncgenfunction(run_agent)
