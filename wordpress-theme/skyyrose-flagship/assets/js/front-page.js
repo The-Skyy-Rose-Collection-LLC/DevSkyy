@@ -225,6 +225,11 @@
 			formData.forEach(function (value, key) {
 				params.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
 			});
+			// Ensure nonce is included for server-side CSRF verification.
+			var nonce = typeof skyyRoseData !== 'undefined' && skyyRoseData.nonce;
+			if (nonce && params.join('').indexOf('nonce') === -1) {
+				params.push('nonce=' + encodeURIComponent(nonce));
+			}
 			xhr.send(params.join('&'));
 		});
 	}

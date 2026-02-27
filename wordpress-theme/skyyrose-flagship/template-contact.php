@@ -242,15 +242,16 @@ $faq_items = array(
 					<?php wp_nonce_field( 'skyyrose_contact_form', 'skyyrose_contact_nonce' ); ?>
 					<input type="hidden" name="action" value="skyyrose_contact_submit">
 
-					<!-- Honeypot field for bot detection -->
-					<div class="contact-form__hp" aria-hidden="true" inert>
-						<label for="contact-website">
+					<!-- Honeypot field for bot detection — display:none removes from both visual and accessibility trees -->
+					<div class="contact-form__hp" style="display:none;" aria-hidden="true">
+						<label for="contact-website" aria-hidden="true">
 							<?php esc_html_e( 'Website', 'skyyrose-flagship' ); ?>
 						</label>
 						<input
 							type="text"
 							id="contact-website"
 							name="website"
+							aria-hidden="true"
 							tabindex="-1"
 							autocomplete="off"
 						>

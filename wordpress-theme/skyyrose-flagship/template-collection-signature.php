@@ -58,7 +58,8 @@ function skyyrose_get_signature_products() {
 	$display_products = array();
 
 	// SKUs that represent sets — split into tee + shorts for collection display.
-	$set_skus = array( 'sg-001', 'sg-002' );
+	// sg-002 (Stay Golden Tee) is a standalone tee, NOT a set — only sg-001 (The Bay Set) is split.
+	$set_skus = array( 'sg-001' );
 
 	foreach ( $catalog_products as $p ) {
 		// Skip unpublished products.
