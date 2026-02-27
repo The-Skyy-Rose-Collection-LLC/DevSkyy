@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { getWordPressOperationsManager } from '@/lib/wordpress/operations-manager'
 import { getWordPressMenuManager } from '@/lib/wordpress/menu-manager'
+import { useWordPressAgent } from '@/lib/wordpress/agent-client'
 import {
   Globe,
   FileText,
@@ -24,7 +25,9 @@ import {
   Trash2,
   Edit,
   CheckCircle2,
-  XCircle
+  XCircle,
+  Bot,
+  Square
 } from 'lucide-react'
 
 export default function WordPressAdminPage() {
@@ -41,6 +44,9 @@ export default function WordPressAdminPage() {
   const [media, setMedia] = useState<any[]>([])
   const [users, setUsers] = useState<any[]>([])
   const [menus, setMenus] = useState<any[]>([])
+  const [selectedCollection, setSelectedCollection] = useState('black-rose')
+
+  const { status: agentStatus, messages: agentMessages, execute: agentExecute, abort: agentAbort, reset: agentReset } = useWordPressAgent()
 
   useEffect(() => {
     const manager = getWordPressOperationsManager()
@@ -155,7 +161,7 @@ export default function WordPressAdminPage() {
 
       {/* Operations Tabs */}
       <Tabs defaultValue="posts" className="space-y-6">
-        <TabsList className="grid grid-cols-7 w-full">
+        <TabsList className="grid grid-cols-8 w-full">
           <TabsTrigger value="posts">
             <FileText className="mr-2 h-4 w-4" />
             Posts
@@ -183,6 +189,10 @@ export default function WordPressAdminPage() {
           <TabsTrigger value="menus" onClick={loadMenus}>
             <Globe className="mr-2 h-4 w-4" />
             Menus
+          </TabsTrigger>
+          <TabsTrigger value="agent">
+            <Bot className="mr-2 h-4 w-4" />
+            Agent
           </TabsTrigger>
         </TabsList>
 
@@ -466,6 +476,152 @@ export default function WordPressAdminPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Agent */}
+        <TabsContent value="agent">
+          <div className="space-y-6">
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Agent Actions</CardTitle>
+                <CardDescription>
+                  AI-powered WordPress operations via Claude Agent SDK
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-3 gap-3">
+                  <Button
+                    onClick={() => agentExecute("health_check", "Check WordPress and WooCommerce connectivity. Report site status, API version, and any issues.")}
+                    disabled={agentStatus === "running"}
+                    variant="outline"
+                  >
+                    <Activity className="mr-2 h-4 w-4" />
+                    Health Check
+                  </Button>
+                  <Button
+                    onClick={() => agentExecute("sync_collection", `Sync all ${selectedCollection} products to WooCommerce. First check connectivity with wp_health_check, then use wp_sync_collection.`, { collection: selectedCollection })}
+                    disabled={agentStatus === "running"}
+                    variant="outline"
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Sync Collection
+                  </Button>
+                  <Button
+                    onClick={() => agentExecute("get_pipeline_status", "Get the current status of all 9 dashboard pipelines.")}
+                    disabled={agentStatus === "running"}
+                    variant="outline"
+                  >
+                    <Settings className="mr-2 h-4 w-4" />
+                    Pipeline Status
+                  </Button>
+                </div>
+
+                {/* Collection Selector */}
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-400">Collection:</span>
+                  {["black-rose", "love-hurts", "signature"].map((col) => (
+                    <Button
+                      key={col}
+                      size="sm"
+                      variant={selectedCollection === col ? "default" : "outline"}
+                      onClick={() => setSelectedCollection(col)}
+                      className="capitalize"
+                    >
+                      {col.replace("-", " ")}
+                    </Button>
+                  ))}
+                </div>
+
+                {/* Custom Prompt */}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Ask the agent anything about WordPress..."
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && e.currentTarget.value.trim()) {
+                        agentExecute("custom", e.currentTarget.value.trim());
+                        e.currentTarget.value = "";
+                      }
+                    }}
+                    disabled={agentStatus === "running"}
+                    className="flex-1"
+                  />
+                  {agentStatus === "running" && (
+                    <Button variant="destructive" onClick={agentAbort}>
+                      <Square className="mr-2 h-4 w-4" />
+                      Stop
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Agent Messages Stream */}
+            {agentMessages.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-sm">Agent Output</CardTitle>
+                    <div className="flex items-center gap-2">
+                      {agentStatus === "running" && (
+                        <Badge className="bg-blue-500/20 text-blue-400 animate-pulse">
+                          Running...
+                        </Badge>
+                      )}
+                      {agentStatus === "done" && (
+                        <Badge className="bg-green-500/20 text-green-400">
+                          Complete
+                        </Badge>
+                      )}
+                      {agentStatus === "error" && (
+                        <Badge className="bg-red-500/20 text-red-400">
+                          Error
+                        </Badge>
+                      )}
+                      <Button size="sm" variant="ghost" onClick={agentReset}>
+                        Clear
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 max-h-96 overflow-y-auto font-mono text-sm">
+                    {agentMessages.map((msg, i) => (
+                      <div
+                        key={i}
+                        className={`p-2 rounded ${
+                          msg.type === "thinking"
+                            ? "bg-gray-800/50 text-gray-400 italic"
+                            : msg.type === "tool_use"
+                              ? "bg-blue-900/20 text-blue-300"
+                              : msg.type === "error"
+                                ? "bg-red-900/20 text-red-300"
+                                : msg.type === "result"
+                                  ? "bg-green-900/20 text-green-300"
+                                  : "bg-gray-900/50 text-gray-200"
+                        }`}
+                      >
+                        <span className="text-xs uppercase text-gray-500 mr-2">
+                          [{msg.type}]
+                        </span>
+                        {msg.tool && (
+                          <Badge variant="outline" className="mr-2 text-xs">
+                            {msg.tool}
+                          </Badge>
+                        )}
+                        {msg.content}
+                        {msg.cost_usd !== undefined && msg.cost_usd !== null && (
+                          <span className="text-xs text-gray-500 ml-2">
+                            (${msg.cost_usd.toFixed(3)})
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </TabsContent>
       </Tabs>
     </div>
