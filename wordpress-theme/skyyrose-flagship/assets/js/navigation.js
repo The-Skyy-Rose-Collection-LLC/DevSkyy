@@ -150,11 +150,15 @@
 	var searchClose = document.querySelector('#search-close, .search-overlay__close, .search-overlay-close');
 	var searchInput = searchOverlay ? searchOverlay.querySelector('input[type="search"]') : null;
 
+	var pageWrap = document.getElementById('page');
+
 	if (searchToggle && searchOverlay) {
 		searchToggle.addEventListener('click', function () {
 			searchOverlay.classList.add('open');
 			searchOverlay.setAttribute('aria-hidden', 'false');
 			searchOverlay.removeAttribute('inert');
+			// Make background inert so focus is trapped inside the overlay.
+			if (pageWrap) pageWrap.setAttribute('inert', '');
 			if (searchInput) {
 				setTimeout(function () { searchInput.focus(); }, 100);
 			}
@@ -167,6 +171,7 @@
 			searchOverlay.setAttribute('aria-hidden', 'true');
 			searchOverlay.setAttribute('inert', '');
 		}
+		if (pageWrap) pageWrap.removeAttribute('inert');
 	}
 
 	if (searchClose && searchOverlay) {

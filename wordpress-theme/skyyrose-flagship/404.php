@@ -16,67 +16,67 @@ get_header();
 $skyyrose_collections = array(
 	array(
 		'slug'        => 'black-rose',
-		'label'       => 'Black Rose',
+		'label'       => __( 'Black Rose', 'skyyrose-flagship' ),
 		'accent'      => '#C0C0C0',
 		'glow'        => 'rgba(192, 192, 192, 0.3)',
-		'tagline'     => 'Gothic elegance, dark romance',
-		'description' => 'Monochromatic pieces that channel mystery and silver-toned refinement.',
+		'tagline'     => __( 'Gothic elegance, dark romance', 'skyyrose-flagship' ),
+		'description' => __( 'Monochromatic pieces that channel mystery and silver-toned refinement.', 'skyyrose-flagship' ),
 	),
 	array(
 		'slug'        => 'love-hurts',
-		'label'       => 'Love Hurts',
+		'label'       => __( 'Love Hurts', 'skyyrose-flagship' ),
 		'accent'      => '#DC143C',
 		'glow'        => 'rgba(220, 20, 60, 0.3)',
-		'tagline'     => 'Dramatic, passionate, fearless',
-		'description' => 'Bold crimson statements for those who wear their heart on their sleeve.',
+		'tagline'     => __( 'Dramatic, passionate, fearless', 'skyyrose-flagship' ),
+		'description' => __( 'Bold crimson statements for those who wear their heart on their sleeve.', 'skyyrose-flagship' ),
 	),
 	array(
 		'slug'        => 'signature',
-		'label'       => 'Signature',
+		'label'       => __( 'Signature', 'skyyrose-flagship' ),
 		'accent'      => '#B76E79',
 		'glow'        => 'rgba(183, 110, 121, 0.3)',
-		'tagline'     => 'Elevated, confident, refined',
-		'description' => 'Rose gold and gold luxe essentials that define the brand.',
+		'tagline'     => __( 'Elevated, confident, refined', 'skyyrose-flagship' ),
+		'description' => __( 'Rose gold and gold luxe essentials that define the brand.', 'skyyrose-flagship' ),
 	),
 	array(
 		'slug'        => 'kids-capsule',
-		'label'       => 'Kids Capsule',
+		'label'       => __( 'Kids Capsule', 'skyyrose-flagship' ),
 		'accent'      => '#FFB6C1',
 		'glow'        => 'rgba(255, 182, 193, 0.3)',
-		'tagline'     => 'Joyful luxury, playful sophistication',
-		'description' => 'Mini versions of our signature pieces for the youngest trendsetters.',
+		'tagline'     => __( 'Joyful luxury, playful sophistication', 'skyyrose-flagship' ),
+		'description' => __( 'Mini versions of our signature pieces for the youngest trendsetters.', 'skyyrose-flagship' ),
 	),
 );
 
 // Quick navigation links: label, url path, SVG icon.
 $skyyrose_quick_links = array(
 	array(
-		'label' => 'Shop All',
+		'label' => __( 'Shop All', 'skyyrose-flagship' ),
 		'path'  => '/shop/',
 		'icon'  => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>',
 	),
 	array(
-		'label' => 'New Arrivals',
+		'label' => __( 'New Arrivals', 'skyyrose-flagship' ),
 		'path'  => '/shop/?orderby=date',
 		'icon'  => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
 	),
 	array(
-		'label' => 'Best Sellers',
+		'label' => __( 'Best Sellers', 'skyyrose-flagship' ),
 		'path'  => '/shop/?orderby=popularity',
 		'icon'  => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>',
 	),
 	array(
-		'label' => 'Contact Us',
+		'label' => __( 'Contact Us', 'skyyrose-flagship' ),
 		'path'  => '/contact/',
 		'icon'  => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
 	),
 	array(
-		'label' => 'About Us',
+		'label' => __( 'About Us', 'skyyrose-flagship' ),
 		'path'  => '/about/',
 		'icon'  => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
 	),
 	array(
-		'label' => 'FAQ',
+		'label' => __( 'FAQ', 'skyyrose-flagship' ),
 		'path'  => '/contact/#faq',
 		'icon'  => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
 	),
@@ -111,8 +111,8 @@ if ( class_exists( 'WooCommerce' ) ) {
 				);
 			}
 		}
-		wp_reset_postdata();
 	}
+	wp_reset_postdata();
 }
 
 // Static fallback when WooCommerce is inactive or no products found.

@@ -43,21 +43,15 @@ $signature_rooms = array(
 				'prop'       => 'glass-orb',
 				'prop_label' => __( 'Inside glass orb display case', 'skyyrose-flagship' ),
 			) ),
-			// Gold-lit display frames (center) — sg-002 split into tee + shorts
-			skyyrose_immersive_product( 'sg-002-tee', array(
-				'name'       => __( 'Stay Golden Set — Tee', 'skyyrose-flagship' ),
-				'price'      => '$40',
-				'sizes'      => 'XS,S,M,L,XL,2XL',
+			// Gold-lit display frames (center) — sg-002 (Stay Golden Tee, $65 catalog)
+			skyyrose_immersive_product( 'sg-002', array(
 				'left'       => '42',
 				'top'        => '35',
 				'prop'       => 'gold-display-frame',
 				'prop_label' => __( 'Hanging in gold-lit LED display frame', 'skyyrose-flagship' ),
 			) ),
-			skyyrose_immersive_product( 'sg-002-shorts', array(
-				'name'       => __( 'Stay Golden Set — Shorts', 'skyyrose-flagship' ),
-				'price'      => '$50',
-				'sizes'      => 'S,M,L,XL,2XL',
-				'image'      => get_theme_file_uri( 'assets/images/products/sg-010-bridge-shorts.webp' ),
+			// sg-010 (Bridge Shorts) displayed alongside
+			skyyrose_immersive_product( 'sg-010', array(
 				'left'       => '50',
 				'top'        => '38',
 				'prop'       => 'gold-display-frame',
@@ -70,18 +64,15 @@ $signature_rooms = array(
 				'prop'       => 'gold-display-frame',
 				'prop_label' => __( 'Hanging in gold-lit LED display frame', 'skyyrose-flagship' ),
 			) ),
-			// Featured marble pedestal (right) — sg-001 split into tee + shorts
-			skyyrose_immersive_product( 'sg-001-tee', array(
-				'name'       => __( 'The Bay Set — Tee', 'skyyrose-flagship' ),
-				'price'      => '$40',
+			// Featured marble pedestal (right) — sg-001 The Bay Set ($195 catalog)
+			skyyrose_immersive_product( 'sg-001', array(
 				'left'       => '75',
 				'top'        => '50',
 				'prop'       => 'marble-pedestal',
 				'prop_label' => __( 'Featured on stepped marble pedestal', 'skyyrose-flagship' ),
 			) ),
-			skyyrose_immersive_product( 'sg-001-shorts', array(
-				'name'       => __( 'The Bay Set — Shorts', 'skyyrose-flagship' ),
-				'price'      => '$50',
+			// sg-008 Signature Crop Hoodie — displayed on lower pedestal step
+			skyyrose_immersive_product( 'sg-008', array(
 				'left'       => '82',
 				'top'        => '58',
 				'prop'       => 'marble-pedestal',

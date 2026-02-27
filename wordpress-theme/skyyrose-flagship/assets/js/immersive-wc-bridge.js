@@ -322,9 +322,12 @@
 								}
 							} else {
 								// Trusted WooCommerce widget content — standard WC fragment pattern.
+								// Defense-in-depth: reject any fragment containing <script> tags.
+								var rawFragment = data.fragments[selector];
+								if (typeof rawFragment !== 'string' || /<script/i.test(rawFragment)) continue;
 								for (var j = 0; j < targets.length; j++) {
 									var tmp = document.createElement('div');
-									tmp.innerHTML = data.fragments[selector];
+									tmp.innerHTML = rawFragment;
 									if (tmp.firstChild) {
 										targets[j].parentNode.replaceChild(tmp.firstChild, targets[j]);
 									}

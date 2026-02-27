@@ -73,7 +73,7 @@ $insta_posts = array(
 				class="instagram-feed__item js-scroll-reveal"
 				target="_blank"
 				rel="noopener noreferrer"
-				aria-label="<?php echo esc_attr( $post['alt'] ); ?>"
+				aria-label="<?php echo esc_attr( sprintf( __( 'View %s on Instagram', 'skyyrose-flagship' ), $post['alt'] ) ); ?>"
 			>
 				<div class="instagram-feed__image" style="background: <?php echo esc_attr( $post['gradient'] ); ?>;" aria-hidden="true">
 					<svg class="instagram-feed__placeholder-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.2" aria-hidden="true" focusable="false">
