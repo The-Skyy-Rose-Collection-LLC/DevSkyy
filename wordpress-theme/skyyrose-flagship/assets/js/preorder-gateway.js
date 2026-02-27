@@ -52,9 +52,11 @@
 	var actionBtns = Array.from(document.querySelectorAll('[data-action]'));
 
 	// Cart state
+	var MAX_CART_ITEMS = 50;
 	var cartItems = [];
 	var cartCount = 0;
 	var currentProductId = null;
+	var loadingInterval = null;
 
 	/* --------------------------------------------------
 	   Loading Screen
@@ -64,11 +66,12 @@
 		if (!loadingScreen || !progressBar) return;
 
 		var progress = 0;
-		var interval = setInterval(function () {
+		loadingInterval = setInterval(function () {
 			progress += Math.random() * 20 + 5;
 			if (progress >= 100) {
 				progress = 100;
-				clearInterval(interval);
+				clearInterval(loadingInterval);
+				loadingInterval = null;
 				setTimeout(function () {
 					loadingScreen.classList.add('hidden');
 				}, 400);
@@ -333,6 +336,10 @@
 	   -------------------------------------------------- */
 
 	function addToCart(item) {
+		if (cartItems.length >= MAX_CART_ITEMS) {
+			showCartNotification('Cart limit reached. Please proceed to checkout.');
+			return;
+		}
 		cartItems.push(item);
 		cartCount = cartItems.length;
 		updateCartUI();

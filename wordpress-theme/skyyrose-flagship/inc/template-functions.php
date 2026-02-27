@@ -227,7 +227,7 @@ function skyyrose_breadcrumbs() {
 		if ( $terms && ! is_wp_error( $terms ) ) {
 			$term    = $terms[0];
 			$items[] = array(
-				'title' => $term->name,
+				'title' => wp_strip_all_tags( html_entity_decode( $term->name, ENT_QUOTES, 'UTF-8' ) ),
 				'url'   => get_term_link( $term ),
 			);
 		}
@@ -245,10 +245,12 @@ function skyyrose_breadcrumbs() {
 
 		if ( is_product_category() ) {
 			$term    = get_queried_object();
-			$items[] = array(
-				'title' => $term->name,
-				'url'   => '',
-			);
+			if ( $term instanceof WP_Term ) {
+				$items[] = array(
+					'title' => wp_strip_all_tags( html_entity_decode( $term->name, ENT_QUOTES, 'UTF-8' ) ),
+					'url'   => '',
+				);
+			}
 		}
 	} elseif ( is_page() ) {
 		// Regular pages.
