@@ -83,7 +83,7 @@ endif;
 $skyyrose_br_products    = skyyrose_get_black_rose_products();
 $skyyrose_br_shop_url    = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : '/shop';
 $skyyrose_br_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg' );
-$skyyrose_br_logo_url    = esc_url( get_template_directory_uri() . '/assets/branding/black-rose-logo.png' );
+$skyyrose_br_logo_url    = esc_url( get_template_directory_uri() . '/assets/branding/black-rose-logo.webp' );
 $skyyrose_br_scene_url   = esc_url( get_template_directory_uri() . '/assets/scenes/black-rose/black-rose-marble-rotunda.png' );
 ?>
 
