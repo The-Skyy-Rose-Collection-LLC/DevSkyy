@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*--------------------------------------------------------------
  * Theme Constants
  *--------------------------------------------------------------*/
-define( 'SKYYROSE_VERSION', '3.2.1' );
+define( 'SKYYROSE_VERSION', '3.2.2' );
 define( 'SKYYROSE_DIR', get_template_directory() );
 define( 'SKYYROSE_URI', get_template_directory_uri() );
 
@@ -116,6 +116,24 @@ $skyyrose_brand_styles_path = SKYYROSE_DIR . '/inc/enqueue-brand-styles.php';
 if ( file_exists( $skyyrose_brand_styles_path ) ) {
 	require_once $skyyrose_brand_styles_path;
 }
+
+/*--------------------------------------------------------------
+ * Force Page Templates
+ *
+ * WordPress.com's block theme layer can override classic template
+ * resolution. This filter ensures our custom page templates load
+ * correctly for specific pages.
+ *--------------------------------------------------------------*/
+add_filter( 'template_include', function ( $template ) {
+	// Collections "Shop All" page → skyyrose-canvas.php
+	if ( is_page( 9327 ) ) {
+		$canvas = SKYYROSE_DIR . '/skyyrose-canvas.php';
+		if ( file_exists( $canvas ) ) {
+			return $canvas;
+		}
+	}
+	return $template;
+}, 99 );
 
 /*--------------------------------------------------------------
  * Brand Mascot Widget

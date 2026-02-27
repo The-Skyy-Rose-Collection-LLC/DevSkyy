@@ -232,10 +232,9 @@
 <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
 <!-- Luxury Cursor (desktop only, hidden from assistive tech) -->
-<div class="luxury-cursor" aria-hidden="true">
-	<div class="luxury-cursor__dot"></div>
-</div>
-<div class="luxury-cursor__trail" aria-hidden="true"></div>
+<div class="luxury-cursor-ring" aria-hidden="true"></div>
+<div class="luxury-cursor-dot" aria-hidden="true"></div>
+<div class="luxury-cursor-trail" aria-hidden="true"></div>
 
 <?php wp_footer(); ?>
 
