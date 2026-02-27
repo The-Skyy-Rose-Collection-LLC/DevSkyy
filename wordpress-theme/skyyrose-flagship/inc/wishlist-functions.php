@@ -422,7 +422,7 @@ function skyyrose_ajax_clear_wishlist() {
 	}
 }
 add_action( 'wp_ajax_skyyrose_clear_wishlist', 'skyyrose_ajax_clear_wishlist' );
-add_action( 'wp_ajax_nopriv_skyyrose_clear_wishlist', 'skyyrose_ajax_clear_wishlist' );
+// nopriv removed: clear_wishlist is a destructive mutation. Matches move_to_cart/move_all_to_cart pattern.
 
 /**
  * AJAX handler: Move all to cart.
@@ -464,19 +464,14 @@ add_action( 'wp_ajax_skyyrose_move_all_to_cart', 'skyyrose_ajax_move_all_to_cart
  */
 function skyyrose_register_wishlist_rest_routes() {
 	// Permission callback — all wishlist REST operations require authentication.
+	// WordPress core already verifies X-WP-Nonce via rest_cookie_check_errors().
+	// Manual nonce check removed: it blocked Application Passwords, OAuth tokens,
+	// and any non-cookie auth method that doesn't send X-WP-Nonce.
 	$permission_callback = function( WP_REST_Request $request ) {
 		if ( ! is_user_logged_in() ) {
 			return new WP_Error(
 				'rest_forbidden',
 				esc_html__( 'Wishlist requires authentication.', 'skyyrose-flagship' ),
-				array( 'status' => 401 )
-			);
-		}
-		$nonce = $request->get_header( 'X-WP-Nonce' );
-		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-			return new WP_Error(
-				'rest_invalid_nonce',
-				esc_html__( 'Invalid or expired nonce.', 'skyyrose-flagship' ),
 				array( 'status' => 401 )
 			);
 		}

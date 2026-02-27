@@ -49,21 +49,21 @@
 			setTimeout(createSparkle, i * 150);
 		}
 
-		// Ongoing sparkles — store reference so it can be cleared.
-		var sparkleInterval = setInterval(createSparkle, 400);
+		// Ongoing sparkles — use wrapper object to avoid stale closure references.
+		var sparkleState = { interval: setInterval(createSparkle, 400) };
 
 		// Stop sparkles if user enables reduced motion mid-session.
 		if (motionQuery && motionQuery.addEventListener) {
 			motionQuery.addEventListener('change', function (e) {
-				if (e.matches) clearInterval(sparkleInterval);
+				if (e.matches) clearInterval(sparkleState.interval);
 			});
 		}
 
 		// Suspend sparkles when tab is backgrounded to avoid DOM node accumulation.
 		document.addEventListener('visibilitychange', function () {
-			clearInterval(sparkleInterval);
+			clearInterval(sparkleState.interval);
 			if (!document.hidden && (!motionQuery || !motionQuery.matches)) {
-				sparkleInterval = setInterval(createSparkle, 400);
+				sparkleState.interval = setInterval(createSparkle, 400);
 			}
 		});
 	}

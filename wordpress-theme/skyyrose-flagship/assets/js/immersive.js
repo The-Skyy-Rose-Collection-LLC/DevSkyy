@@ -48,7 +48,8 @@
 	var totalRooms       = layers.length;
 	var isTransitioning  = false;
 	var lastFocused      = null;
-	var currentProductId = null;
+	// Product ID/SKU for WC bridge communication is stored on panel.dataset.currentProductId
+	// and panel.dataset.currentProductSku — see openPanel().
 
 	/* --------------------------------------------------
 	   Loading Screen
@@ -558,6 +559,8 @@
 		// Also listen for Escape to exit cinematic mode.
 		document.addEventListener('keydown', function (e) {
 			if (e.key === 'Escape' && scene.classList.contains('cinematic-active')) {
+				// Yield to the product-panel Escape handler when panel is open.
+				if (panel && panel.classList.contains('open')) return;
 				scene.classList.remove('cinematic-active');
 				// Sync body state too.
 				document.body.classList.remove('cinematic-mode');

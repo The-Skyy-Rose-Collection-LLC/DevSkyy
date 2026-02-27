@@ -80,13 +80,13 @@ $collections = array(
 						<?php echo esc_html( $collection['description'] ); ?>
 					</p>
 					<div class="collections__card-actions">
-						<a href="<?php echo esc_url( $collection_url ); ?>" class="btn btn--collection">
+						<a href="<?php echo esc_url( $collection_url ); ?>" class="btn btn--collection" aria-label="<?php echo esc_attr( sprintf( __( 'Shop %s Collection', 'skyyrose-flagship' ), $collection['name'] ) ); ?>">
 							<?php esc_html_e( 'Shop Collection', 'skyyrose-flagship' ); ?>
 							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 								<path d="M5 12h14M12 5l7 7-7 7"/>
 							</svg>
 						</a>
-						<a href="<?php echo esc_url( home_url( '/experience-' . $collection['slug'] . '/' ) ); ?>" class="btn btn--immersive">
+						<a href="<?php echo esc_url( home_url( '/experience-' . $collection['slug'] . '/' ) ); ?>" class="btn btn--immersive" aria-label="<?php echo esc_attr( sprintf( __( '%s Immersive Experience', 'skyyrose-flagship' ), $collection['name'] ) ); ?>">
 							<?php esc_html_e( 'Immersive Experience', 'skyyrose-flagship' ); ?>
 						</a>
 					</div>

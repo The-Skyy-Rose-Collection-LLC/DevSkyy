@@ -42,15 +42,9 @@
 							loading="eager"
 						>
 						<span class="navbar__brand-text">
-							<?php if ( is_front_page() && is_home() ) : ?>
-								<h1 class="navbar__site-title">
-									<span class="navbar__gradient-text"><?php esc_html_e( 'SKYY ROSE', 'skyyrose-flagship' ); ?></span>
-								</h1>
-							<?php else : ?>
-								<span class="navbar__site-title">
-									<span class="navbar__gradient-text"><?php esc_html_e( 'SKYY ROSE', 'skyyrose-flagship' ); ?></span>
-								</span>
-							<?php endif; ?>
+							<span class="navbar__site-title">
+								<span class="navbar__gradient-text"><?php esc_html_e( 'SKYY ROSE', 'skyyrose-flagship' ); ?></span>
+							</span>
 						</span>
 					</a>
 				</div>
@@ -108,8 +102,8 @@
 					</a>
 
 					<!-- Cart -->
-					<?php if ( class_exists( 'WooCommerce' ) ) : ?>
-						<?php $cart_count = WC()->cart ? WC()->cart->get_cart_contents_count() : 0; ?>
+					<?php if ( class_exists( 'WooCommerce' ) && function_exists( 'WC' ) && WC() && WC()->cart ) : ?>
+						<?php $cart_count = WC()->cart->get_cart_contents_count(); ?>
 						<a
 							href="<?php echo esc_url( wc_get_cart_url() ); ?>"
 							class="navbar__action-btn navbar__cart-btn"

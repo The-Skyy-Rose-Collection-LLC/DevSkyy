@@ -163,6 +163,11 @@
 	color: #fff;
 }
 
+.gateway-action-btn:focus-visible {
+	outline: 2px solid var(--rose-gold, #B76E79);
+	outline-offset: 3px;
+}
+
 .cart-count-badge {
 	position: absolute;
 	top: -4px;
@@ -616,6 +621,11 @@
 	color: rgba(255, 255, 255, 0.5);
 	font-size: 1.5rem;
 	cursor: pointer;
+	min-width: 44px;
+	min-height: 44px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .cart-items-list {
@@ -770,6 +780,11 @@
 	color: rgba(255, 255, 255, 0.5);
 	font-size: 1.5rem;
 	cursor: pointer;
+	min-width: 44px;
+	min-height: 44px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .signin-body {

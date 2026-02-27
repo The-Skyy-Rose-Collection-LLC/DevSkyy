@@ -126,7 +126,8 @@ if ( file_exists( $skyyrose_brand_styles_path ) ) {
  *--------------------------------------------------------------*/
 add_filter( 'template_include', function ( $template ) {
 	// Collections "Shop All" page → skyyrose-canvas.php
-	if ( is_page( 9327 ) ) {
+	// Uses slug matching instead of hardcoded page ID (IDs differ between environments).
+	if ( is_page( 'collections' ) ) {
 		$canvas = SKYYROSE_DIR . '/skyyrose-canvas.php';
 		if ( file_exists( $canvas ) ) {
 			return $canvas;

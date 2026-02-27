@@ -127,13 +127,22 @@
 		tab.setAttribute('tabindex', '0');
 
 		// Filter cards.
+		var visibleCount = 0;
 		cards.forEach(function (card) {
 			if (collection === 'all' || card.dataset.collection === collection) {
 				card.classList.remove('hidden');
+				visibleCount++;
 			} else {
 				card.classList.add('hidden');
 			}
 		});
+
+		// Announce filter result to screen readers via status region.
+		var statusEl = document.querySelector('.product-grid-status');
+		if (statusEl) {
+			var label = tab.textContent.trim();
+			statusEl.textContent = 'Showing ' + visibleCount + ' products for ' + label;
+		}
 	}
 
 	/* --------------------------------------------------
@@ -596,27 +605,65 @@
 		var shown = sessionStorage.getItem('sr_incentive_shown');
 		if (shown) return;
 
+		var _incentivePreviousFocus = null;
+
 		function showPopup() {
 			if (shown) return;
 			shown = '1';
 			clearTimeout(popupTimerId);
 			document.removeEventListener('mouseout', onExitIntent);
+			// WCAG 2.4.3: Store previous focus to restore on close.
+			_incentivePreviousFocus = document.activeElement;
 			overlay.classList.add('open');
 			overlay.setAttribute('aria-hidden', 'false');
 			if (incentivePopup) {
 				incentivePopup.removeAttribute('inert');
 				incentivePopup.setAttribute('aria-hidden', 'false');
+				// Ensure dialog semantics.
+				if (!incentivePopup.getAttribute('role')) {
+					incentivePopup.setAttribute('role', 'dialog');
+					incentivePopup.setAttribute('aria-modal', 'true');
+					incentivePopup.setAttribute('aria-label', 'Exclusive offer');
+				}
 			}
 			sessionStorage.setItem('sr_incentive_shown', '1');
+			// Move focus into the popup for keyboard/AT users.
+			if (closeBtn) closeBtn.focus();
+			// WCAG 2.4.3: Focus trap within the popup.
+			if (incentivePopup) incentivePopup.addEventListener('keydown', _incentiveTrapFocus);
 		}
 
 		function hidePopup() {
 			document.removeEventListener('mouseout', onExitIntent);
+			if (incentivePopup) incentivePopup.removeEventListener('keydown', _incentiveTrapFocus);
 			overlay.classList.remove('open');
 			overlay.setAttribute('aria-hidden', 'true');
 			if (incentivePopup) {
 				incentivePopup.setAttribute('inert', '');
 				incentivePopup.setAttribute('aria-hidden', 'true');
+			}
+			// WCAG 2.4.3: Restore focus to the element that was active before.
+			if (_incentivePreviousFocus && _incentivePreviousFocus.focus) {
+				_incentivePreviousFocus.focus();
+				_incentivePreviousFocus = null;
+			}
+		}
+
+		function _incentiveTrapFocus(e) {
+			if (e.key !== 'Tab' && e.keyCode !== 9) {
+				if (e.key === 'Escape' || e.keyCode === 27) hidePopup();
+				return;
+			}
+			var focusable = incentivePopup.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+			if (focusable.length === 0) return;
+			var first = focusable[0];
+			var last = focusable[focusable.length - 1];
+			if (e.shiftKey && document.activeElement === first) {
+				e.preventDefault();
+				last.focus();
+			} else if (!e.shiftKey && document.activeElement === last) {
+				e.preventDefault();
+				first.focus();
 			}
 		}
 
@@ -716,9 +763,11 @@
 
 			var badge = document.createElement('span');
 			badge.className = 'pulse-trending-badge';
-			badge.innerHTML =
-				'<span class="pulse-trending-badge__fire">\ud83d\udd25</span>' +
-				'Trending';
+			var fireIcon = document.createElement('span');
+			fireIcon.className = 'pulse-trending-badge__fire';
+			fireIcon.textContent = '\ud83d\udd25';
+			badge.appendChild(fireIcon);
+			badge.appendChild(document.createTextNode('Trending'));
 
 			var style = window.getComputedStyle(imageContainer);
 			if (style.position === 'static') {
@@ -749,13 +798,18 @@
 
 			var el = document.createElement('div');
 			el.className = 'pulse-urgency-countdown';
-			el.innerHTML =
-				'<span class="pulse-urgency-countdown__icon">\u23f0</span>' +
-				'Pre-order closes in ' +
-				'<span class="pulse-urgency-countdown__time">--d --h --m</span>';
+			var clockIcon = document.createElement('span');
+			clockIcon.className = 'pulse-urgency-countdown__icon';
+			clockIcon.textContent = '\u23f0';
+			el.appendChild(clockIcon);
+			el.appendChild(document.createTextNode('Pre-order closes in '));
+			var timeSpan = document.createElement('span');
+			timeSpan.className = 'pulse-urgency-countdown__time';
+			timeSpan.textContent = '--d --h --m';
+			el.appendChild(timeSpan);
 
 			parent.appendChild(el);
-			countdownEls.push(el.querySelector('.pulse-urgency-countdown__time'));
+			countdownEls.push(timeSpan);
 		});
 
 		if (countdownEls.length === 0) return;

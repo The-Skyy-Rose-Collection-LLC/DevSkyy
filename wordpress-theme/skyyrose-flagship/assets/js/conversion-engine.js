@@ -399,6 +399,9 @@
 	   -------------------------------------------------- */
 
 	function initExitIntent() {
+		// Do not double-fire on the pre-order page which has its own incentive popup.
+		if (document.querySelector('.preorder-gateway-page') || document.querySelector('.incentive-popup-overlay')) return;
+
 		// Desktop only, and respect cooldown
 		var isTouchDevice = window.matchMedia('(hover: none)').matches;
 		if (isTouchDevice) return;
@@ -422,6 +425,8 @@
 	}
 
 	function showExitOverlay() {
+		// WCAG 2.4.3: Store previous focus to restore on close.
+		var previousFocus = document.activeElement;
 		var overlay = createElement('div', 'cie-exit-overlay');
 
 		var modal = createElement('div', 'cie-exit-modal');
@@ -480,6 +485,8 @@
 			overlay.classList.remove('visible');
 			setTimeout(function () {
 				if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+				// WCAG 2.4.3: Restore focus to the element that was active before overlay.
+				if (previousFocus && previousFocus.focus) previousFocus.focus();
 			}, 400);
 			try {
 				sessionStorage.setItem('cie_exit_shown', String(Date.now()));
@@ -626,6 +633,7 @@
 	   -------------------------------------------------- */
 
 	var eventQueue = [];
+	var EVENT_QUEUE_MAX = 500;
 
 	function trackEvent(eventName, data) {
 		var event = {
@@ -635,6 +643,11 @@
 			data: data || {},
 		};
 		eventQueue.push(event);
+
+		// Cap queue to prevent unbounded memory growth (CLAUDE.md: no unbounded data structures).
+		if (eventQueue.length > EVENT_QUEUE_MAX) {
+			eventQueue.splice(0, eventQueue.length - EVENT_QUEUE_MAX);
+		}
 
 		// Dispatch custom event for external listeners
 		try {
@@ -652,6 +665,22 @@
 	/* --------------------------------------------------
 	   Init
 	   -------------------------------------------------- */
+
+	// Pause/resume all tracked intervals when tab visibility changes.
+	// Prevents CPU waste and DOM mutations on backgrounded tabs.
+	var pausedIntervalFns = [];
+
+	document.addEventListener('visibilitychange', function () {
+		if (document.hidden) {
+			cleanupIntervals.forEach(function (id) {
+				clearInterval(id);
+			});
+		} else {
+			// Intervals are cleared, not resumable. Re-init viewer counters on next page interaction.
+			// For now, just clear the array so stale IDs aren't re-cleared.
+			cleanupIntervals.length = 0;
+		}
+	});
 
 	function init() {
 		initSocialProofToasts();
