@@ -12,11 +12,21 @@
 	// Skip on touch-primary devices.
 	if (window.matchMedia('(hover: none)').matches) return;
 
-	var ring = document.querySelector('.luxury-cursor-ring');
-	var dot  = document.querySelector('.luxury-cursor-dot');
-	var trail = document.querySelector('.luxury-cursor-trail');
+	// Create cursor elements if they don't exist (handles cached HTML).
+	function ensureElement(className) {
+		var el = document.querySelector('.' + className);
+		if (!el) {
+			el = document.createElement('div');
+			el.className = className;
+			el.setAttribute('aria-hidden', 'true');
+			document.body.appendChild(el);
+		}
+		return el;
+	}
 
-	if (!ring || !dot) return;
+	var ring  = ensureElement('luxury-cursor-ring');
+	var dot   = ensureElement('luxury-cursor-dot');
+	var trail = ensureElement('luxury-cursor-trail');
 
 	var mouseX = 0;
 	var mouseY = 0;

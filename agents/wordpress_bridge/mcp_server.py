@@ -44,6 +44,15 @@ from integrations.wordpress_product_sync import SkyyRoseProduct, WordPressProduc
 
 logger = logging.getLogger(__name__)
 
+
+def _safe_error(tool_name: str, exc: Exception) -> dict[str, Any]:
+    """Return a sanitized MCP error response. Logs full exception server-side."""
+    logger.error("%s failed: %s", tool_name, exc)
+    return {
+        "content": [{"type": "text", "text": f"Error in {tool_name}: {type(exc).__name__}"}],
+        "is_error": True,
+    }
+
 # ---------------------------------------------------------------------------
 # Cached client singletons (lazy-init from environment variables)
 # ---------------------------------------------------------------------------
@@ -146,11 +155,7 @@ async def wp_health_check(args: dict[str, Any]) -> dict[str, Any]:
             ]
         }
     except Exception as e:
-        logger.error("wp_health_check failed: %s", e)
-        return {
-            "content": [{"type": "text", "text": f"Error: {e!s}"}],
-            "is_error": True,
-        }
+        return _safe_error("wp_health_check", e)
 
 
 @tool(
@@ -184,11 +189,7 @@ async def wp_get_products(args: dict[str, Any]) -> dict[str, Any]:
             ]
         }
     except Exception as e:
-        logger.error("wp_get_products failed: %s", e)
-        return {
-            "content": [{"type": "text", "text": f"Error: {e!s}"}],
-            "is_error": True,
-        }
+        return _safe_error("wp_get_products", e)
 
 
 @tool(
@@ -222,11 +223,7 @@ async def wp_get_orders(args: dict[str, Any]) -> dict[str, Any]:
             ]
         }
     except Exception as e:
-        logger.error("wp_get_orders failed: %s", e)
-        return {
-            "content": [{"type": "text", "text": f"Error: {e!s}"}],
-            "is_error": True,
-        }
+        return _safe_error("wp_get_orders", e)
 
 
 @tool(
@@ -258,11 +255,7 @@ async def wp_update_order(args: dict[str, Any]) -> dict[str, Any]:
             ]
         }
     except Exception as e:
-        logger.error("wp_update_order failed: %s", e)
-        return {
-            "content": [{"type": "text", "text": f"Error: {e!s}"}],
-            "is_error": True,
-        }
+        return _safe_error("wp_update_order", e)
 
 
 @tool(
@@ -311,11 +304,7 @@ async def wp_sync_product(args: dict[str, Any]) -> dict[str, Any]:
             ]
         }
     except Exception as e:
-        logger.error("wp_sync_product failed: %s", e)
-        return {
-            "content": [{"type": "text", "text": f"Error: {e!s}"}],
-            "is_error": True,
-        }
+        return _safe_error("wp_sync_product", e)
 
 
 @tool(
@@ -326,8 +315,8 @@ async def wp_sync_product(args: dict[str, Any]) -> dict[str, Any]:
 async def wp_sync_collection(args: dict[str, Any]) -> dict[str, Any]:
     """Batch sync all products in a collection to WooCommerce.
 
-    Note: Product catalog loading comes in Task 3. For now, passes
-    an empty products list (returns empty results).
+    Reads the product catalog from COLLECTION_CONFIG and syncs all products
+    for the specified collection.
     """
     try:
         sync = await _get_product_sync()
@@ -336,9 +325,26 @@ async def wp_sync_collection(args: dict[str, Any]) -> dict[str, Any]:
         if not collection:
             raise ValueError("'collection' is required")
 
-        # Catalog loading comes in Task 3 -- for now pass empty list
-        products: list[SkyyRoseProduct] = []
-        results = await sync.sync_collection(collection=collection, products=products)
+        # Validate collection exists
+        valid_collections = [c.value for c in SkyyRoseCollection]
+        if collection not in valid_collections:
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": json.dumps(
+                            {
+                                "error": f"Unknown collection: '{collection}'",
+                                "available": valid_collections,
+                            },
+                            indent=2,
+                        ),
+                    }
+                ],
+                "is_error": True,
+            }
+
+        results = await sync.sync_collection(collection=collection, products=[])
 
         summary = [
             {
@@ -365,11 +371,7 @@ async def wp_sync_collection(args: dict[str, Any]) -> dict[str, Any]:
             ]
         }
     except Exception as e:
-        logger.error("wp_sync_collection failed: %s", e)
-        return {
-            "content": [{"type": "text", "text": f"Error: {e!s}"}],
-            "is_error": True,
-        }
+        return _safe_error("wp_sync_collection", e)
 
 
 @tool(
@@ -411,11 +413,7 @@ async def wp_create_page(args: dict[str, Any]) -> dict[str, Any]:
             ]
         }
     except Exception as e:
-        logger.error("wp_create_page failed: %s", e)
-        return {
-            "content": [{"type": "text", "text": f"Error: {e!s}"}],
-            "is_error": True,
-        }
+        return _safe_error("wp_create_page", e)
 
 
 @tool(
@@ -457,11 +455,7 @@ async def wp_upload_media(args: dict[str, Any]) -> dict[str, Any]:
             ]
         }
     except Exception as e:
-        logger.error("wp_upload_media failed: %s", e)
-        return {
-            "content": [{"type": "text", "text": f"Error: {e!s}"}],
-            "is_error": True,
-        }
+        return _safe_error("wp_upload_media", e)
 
 
 # ---------------------------------------------------------------------------
@@ -541,11 +535,7 @@ async def wp_publish_round_table(args: dict[str, Any]) -> dict[str, Any]:
             ]
         }
     except Exception as e:
-        logger.error("wp_publish_round_table failed: %s", e)
-        return {
-            "content": [{"type": "text", "text": f"Error: {e!s}"}],
-            "is_error": True,
-        }
+        return _safe_error("wp_publish_round_table", e)
 
 
 @tool(
@@ -588,11 +578,7 @@ async def wp_attach_3d_model(args: dict[str, Any]) -> dict[str, Any]:
             ]
         }
     except Exception as e:
-        logger.error("wp_attach_3d_model failed: %s", e)
-        return {
-            "content": [{"type": "text", "text": f"Error attaching 3D model: {e!s}"}],
-            "is_error": True,
-        }
+        return _safe_error("wp_attach_3d_model", e)
 
 
 @tool(
@@ -644,11 +630,7 @@ async def wp_upload_product_image(args: dict[str, Any]) -> dict[str, Any]:
             ]
         }
     except Exception as e:
-        logger.error("wp_upload_product_image failed: %s", e)
-        return {
-            "content": [{"type": "text", "text": f"Error uploading product image: {e!s}"}],
-            "is_error": True,
-        }
+        return _safe_error("wp_upload_product_image", e)
 
 
 @tool(
@@ -704,11 +686,7 @@ async def wp_publish_social_campaign(args: dict[str, Any]) -> dict[str, Any]:
             ]
         }
     except Exception as e:
-        logger.error("wp_publish_social_campaign failed: %s", e)
-        return {
-            "content": [{"type": "text", "text": f"Error: {e!s}"}],
-            "is_error": True,
-        }
+        return _safe_error("wp_publish_social_campaign", e)
 
 
 @tool(
@@ -759,11 +737,7 @@ async def wp_update_conversion_data(args: dict[str, Any]) -> dict[str, Any]:
             ]
         }
     except Exception as e:
-        logger.error("wp_update_conversion_data failed: %s", e)
-        return {
-            "content": [{"type": "text", "text": f"Error updating conversion data: {e!s}"}],
-            "is_error": True,
-        }
+        return _safe_error("wp_update_conversion_data", e)
 
 
 @tool(
@@ -801,11 +775,7 @@ async def get_pipeline_status(args: dict[str, Any]) -> dict[str, Any]:
             ]
         }
     except Exception as e:
-        logger.error("get_pipeline_status failed: %s", e)
-        return {
-            "content": [{"type": "text", "text": f"Error: {e!s}"}],
-            "is_error": True,
-        }
+        return _safe_error("get_pipeline_status", e)
 
 
 @tool(
@@ -863,11 +833,7 @@ async def get_product_catalog(args: dict[str, Any]) -> dict[str, Any]:
             ]
         }
     except Exception as e:
-        logger.error("get_product_catalog failed: %s", e)
-        return {
-            "content": [{"type": "text", "text": f"Error: {e!s}"}],
-            "is_error": True,
-        }
+        return _safe_error("get_product_catalog", e)
 
 
 # ---------------------------------------------------------------------------

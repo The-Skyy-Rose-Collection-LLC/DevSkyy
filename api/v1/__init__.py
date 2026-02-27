@@ -41,6 +41,7 @@ from api.v1.training_status import training_router
 from api.v1.woocommerce_webhooks import router as woocommerce_webhooks_router
 from api.v1.wordpress import router as wordpress_router
 from api.v1.social_media import router as social_media_router
+from api.v1.wordpress_agent import router as wordpress_agent_router
 from api.v1.wordpress_theme import router as wordpress_theme_router
 
 __all__ = [
@@ -61,6 +62,7 @@ __all__ = [
     "orchestration_router",
     "social_media_router",
     "woocommerce_webhooks_router",
+    "wordpress_agent_router",
     "wordpress_router",
     "wordpress_theme_router",
     "training_router",

@@ -284,7 +284,7 @@ class TestWordPressCoreTools:
             result = await wp_health_check.handler({})
 
         assert result.get("is_error") is True
-        assert "Missing env vars" in result["content"][0]["text"]
+        assert "ValueError" in result["content"][0]["text"]
 
 
 class TestPipelineBridgeTools:

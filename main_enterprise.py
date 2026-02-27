@@ -76,6 +76,7 @@ from api.v1 import (
     orchestration_router,
     sync_router,
     training_router,
+    wordpress_agent_router,
     wordpress_theme_router,
 )
 from api.v1.ai_enhancement import router as ai_enhancement_router
@@ -1018,6 +1019,9 @@ app.include_router(sync_router, prefix="/api/v1")
 # WordPress/WooCommerce v1 API (test-connection, products, orders endpoints)
 # TODO: Define wordpress_v1_router or use wordpress_router instead
 # app.include_router(wordpress_v1_router, prefix="/api/v1")
+
+# WordPress Bridge Agent (SSE streaming + webhook dispatch)
+app.include_router(wordpress_agent_router, prefix="/api/v1")
 
 # WordPress theme generation
 app.include_router(wordpress_theme_router, prefix="/api/v1")
