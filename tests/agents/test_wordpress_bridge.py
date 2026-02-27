@@ -10,6 +10,8 @@ import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 
 class TestWordPressCoreTools:
@@ -619,3 +621,171 @@ class TestWordPressBridgeAgent:
         from agents.wordpress_bridge.agent import run_agent
 
         assert inspect.isasyncgenfunction(run_agent)
+
+
+class TestWordPressAgentEndpoint:
+    """Tests for the FastAPI SSE endpoint."""
+
+    @pytest.fixture
+    def app(self):
+        from api.v1.wordpress_agent import router
+
+        app = FastAPI()
+        app.include_router(router, prefix="/api/v1")
+        return app
+
+    @pytest.fixture
+    def client(self, app):
+        return TestClient(app)
+
+    def test_execute_endpoint_rejects_missing_prompt(self, client):
+        """Should return 422 for missing prompt."""
+        response = client.post("/api/v1/agent/execute", json={"intent": "test"})
+        assert response.status_code == 422
+
+    def test_execute_endpoint_rejects_empty_prompt(self, client):
+        """Should return 422 for empty prompt."""
+        response = client.post(
+            "/api/v1/agent/execute", json={"intent": "test", "prompt": ""}
+        )
+        assert response.status_code == 422
+
+    def test_execute_endpoint_returns_sse_stream(self, client):
+        """Should return SSE content type."""
+
+        async def mock_run_agent(prompt, **kwargs):
+            yield {"type": "thinking", "content": "Checking..."}
+            yield {
+                "type": "result",
+                "content": "Done",
+                "session_id": "s-123",
+                "cost_usd": 0.02,
+            }
+
+        with patch("api.v1.wordpress_agent.run_agent", mock_run_agent):
+            response = client.post(
+                "/api/v1/agent/execute",
+                json={"intent": "health_check", "prompt": "Check connectivity"},
+            )
+            assert response.status_code == 200
+            assert "text/event-stream" in response.headers.get("content-type", "")
+            body = response.text
+            assert "data:" in body
+            assert "[DONE]" in body
+
+    def test_execute_endpoint_streams_events(self, client):
+        """Should stream multiple events then DONE."""
+
+        async def mock_run_agent(prompt, **kwargs):
+            yield {"type": "text", "content": "Hello"}
+            yield {"type": "result", "content": "Finished"}
+
+        with patch("api.v1.wordpress_agent.run_agent", mock_run_agent):
+            response = client.post(
+                "/api/v1/agent/execute",
+                json={"intent": "test", "prompt": "Test prompt"},
+            )
+            lines = [l for l in response.text.split("\n") if l.startswith("data:")]
+            # Should have at least 3 data lines: 2 events + [DONE]
+            assert len(lines) >= 3
+
+    def test_execute_endpoint_handles_agent_error(self, client):
+        """Should stream error event when agent raises."""
+
+        async def mock_run_agent(prompt, **kwargs):
+            raise RuntimeError("Agent crashed")
+            yield  # noqa: unreachable — makes this an async generator
+
+        with patch("api.v1.wordpress_agent.run_agent", mock_run_agent):
+            response = client.post(
+                "/api/v1/agent/execute",
+                json={"intent": "test", "prompt": "Trigger error"},
+            )
+            assert response.status_code == 200  # SSE always returns 200
+            assert "error" in response.text
+            assert "[DONE]" in response.text
+
+    def test_webhook_dispatch_formats_order(self, client):
+        """Webhook dispatch should format order topic correctly."""
+        mock_execute = AsyncMock(
+            return_value={"result": "Order processed", "session_id": "s-1"}
+        )
+
+        with patch("api.v1.wordpress_agent.WordPressBridgeAgent") as MockAgent:
+            instance = MockAgent.return_value
+            instance.execute = mock_execute
+            response = client.post(
+                "/api/v1/agent/webhooks/dispatch",
+                json={
+                    "topic": "order.created",
+                    "payload": {
+                        "id": 1234,
+                        "total": "178.00",
+                        "line_items": [
+                            {"name": "Black Rose Sherpa", "quantity": 2}
+                        ],
+                    },
+                },
+            )
+            assert response.status_code == 200
+            data = response.json()
+            assert data["status"] == "processed"
+            assert data["topic"] == "order.created"
+            # Verify agent was called with a prompt containing order info
+            call_args = mock_execute.call_args
+            assert "1234" in call_args[0][0]
+
+    def test_webhook_dispatch_handles_product_topic(self, client):
+        """Webhook dispatch should handle product topics."""
+        mock_execute = AsyncMock(
+            return_value={"result": "Synced", "session_id": "s-2"}
+        )
+
+        with patch("api.v1.wordpress_agent.WordPressBridgeAgent") as MockAgent:
+            instance = MockAgent.return_value
+            instance.execute = mock_execute
+            response = client.post(
+                "/api/v1/agent/webhooks/dispatch",
+                json={
+                    "topic": "product.updated",
+                    "payload": {"id": 42, "name": "Love Hurts Tee"},
+                },
+            )
+            assert response.status_code == 200
+            data = response.json()
+            assert data["status"] == "processed"
+
+    def test_webhook_dispatch_handles_unknown_topic(self, client):
+        """Webhook dispatch should handle unknown topics gracefully."""
+        mock_execute = AsyncMock(
+            return_value={"result": "Handled", "session_id": "s-3"}
+        )
+
+        with patch("api.v1.wordpress_agent.WordPressBridgeAgent") as MockAgent:
+            instance = MockAgent.return_value
+            instance.execute = mock_execute
+            response = client.post(
+                "/api/v1/agent/webhooks/dispatch",
+                json={
+                    "topic": "coupon.created",
+                    "payload": {"id": 99, "code": "SKYYROSE10"},
+                },
+            )
+            assert response.status_code == 200
+            data = response.json()
+            assert data["status"] == "processed"
+
+    def test_webhook_dispatch_returns_500_on_agent_failure(self, client):
+        """Webhook dispatch should return 500 when agent fails."""
+        with patch("api.v1.wordpress_agent.WordPressBridgeAgent") as MockAgent:
+            instance = MockAgent.return_value
+            instance.execute = AsyncMock(side_effect=RuntimeError("Agent down"))
+            response = client.post(
+                "/api/v1/agent/webhooks/dispatch",
+                json={
+                    "topic": "order.created",
+                    "payload": {"id": 1},
+                },
+            )
+            assert response.status_code == 500
+            assert response.json()["detail"] == "Internal server error"
