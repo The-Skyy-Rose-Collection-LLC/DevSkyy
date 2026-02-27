@@ -416,11 +416,11 @@ class TestDefaultRouting:
         route = director.router.resolve("design_system")
         assert route.provider == "google"
 
-    def test_qa_uses_haiku(self) -> None:
+    def test_qa_uses_grok(self) -> None:
         director = Director.from_config()
         route = director.router.resolve("qa")
-        assert route.provider == "anthropic"
-        assert "haiku" in route.model
+        assert route.provider == "xai"
+        assert "grok" in route.model
 
 
 # ---------------------------------------------------------------------------
