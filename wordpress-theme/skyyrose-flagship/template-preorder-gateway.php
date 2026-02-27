@@ -133,8 +133,10 @@ get_header();
 				<p><?php echo esc_html__( 'Luxury Grows from Concrete.', 'skyyrose-flagship' ); ?></p>
 			</div>
 
+			<!-- Status region for filter announcements (screen readers only) -->
+			<div class="product-grid-status screen-reader-text" role="status" aria-live="polite" aria-atomic="true"></div>
 			<!-- Product Grid -->
-			<div class="product-grid" id="product-grid-panel" aria-live="polite" aria-label="<?php esc_attr_e( 'Product grid', 'skyyrose-flagship' ); ?>">
+			<div class="product-grid" id="product-grid-panel" aria-label="<?php esc_attr_e( 'Product grid', 'skyyrose-flagship' ); ?>">
 				<?php foreach ( $gateway_products as $product ) :
 					$badge_class = 'badge-' . $product['collection'];
 				?>
@@ -220,9 +222,9 @@ get_header();
 
 	<!-- Cart Sidebar -->
 	<div class="cart-sidebar-overlay" aria-hidden="true"></div>
-	<div class="cart-sidebar" id="cart-sidebar-dialog" role="dialog" aria-modal="true" aria-hidden="true" inert aria-label="<?php esc_attr_e( 'Shopping cart', 'skyyrose-flagship' ); ?>">
+	<div class="cart-sidebar" id="cart-sidebar-dialog" role="dialog" aria-modal="true" aria-hidden="true" inert aria-labelledby="cart-sidebar-title">
 		<div class="cart-sidebar-header">
-			<h3 class="cart-sidebar-title"><?php echo esc_html__( 'Your Cart', 'skyyrose-flagship' ); ?></h3>
+			<h3 class="cart-sidebar-title" id="cart-sidebar-title"><?php echo esc_html__( 'Your Cart', 'skyyrose-flagship' ); ?></h3>
 			<button class="cart-sidebar-close" type="button" aria-label="<?php esc_attr_e( 'Close cart', 'skyyrose-flagship' ); ?>">&times;</button>
 		</div>
 		<div class="cart-items-list">

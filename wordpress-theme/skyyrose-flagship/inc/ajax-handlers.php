@@ -181,8 +181,22 @@ function skyyrose_ajax_newsletter_subscribe() {
 		return;
 	}
 
-	// Sanitize and validate email.
+	// Sanitize and validate email first (needed for email-based rate limiting).
 	$email = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
+
+	// Rate limiting: max 5 newsletter signups per email per 15 minutes.
+	// Uses email (not IP) because REMOTE_ADDR is the proxy IP on WordPress.com.
+	$email_key = 'skyyrose_newsletter_' . md5( strtolower( trim( $email ) ) );
+	$attempts  = (int) get_transient( $email_key );
+	if ( $attempts >= 5 ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Too many requests. Please try again later.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
+	set_transient( $email_key, $attempts + 1, 15 * MINUTE_IN_SECONDS );
 
 	if ( ! is_email( $email ) ) {
 		wp_send_json_error(
@@ -239,8 +253,22 @@ function skyyrose_ajax_incentive_signup() {
 		return;
 	}
 
-	// Sanitize and validate email.
+	// Sanitize and validate email first (needed for email-based rate limiting).
 	$email = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
+
+	// Rate limiting: max 5 incentive signups per email per 15 minutes.
+	// Uses email (not IP) because REMOTE_ADDR is the proxy IP on WordPress.com.
+	$email_key = 'skyyrose_incentive_' . md5( strtolower( trim( $email ) ) );
+	$attempts  = (int) get_transient( $email_key );
+	if ( $attempts >= 5 ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Too many requests. Please try again later.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
+	set_transient( $email_key, $attempts + 1, 15 * MINUTE_IN_SECONDS );
 
 	if ( ! is_email( $email ) ) {
 		wp_send_json_error(

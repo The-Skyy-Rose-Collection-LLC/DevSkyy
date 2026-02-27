@@ -31,6 +31,8 @@ function skyyrose_get_kids_capsule_products() {
 			'price' => '$65',
 			'desc'  => __( 'Cozy colorblock hoodie and jogger set in playful purple and pink', 'skyyrose-flagship' ),
 			'badge' => __( 'New', 'skyyrose-flagship' ),
+			'url'   => home_url( '/pre-order/' ),
+			'image' => SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg',
 		),
 		array(
 			'sku'   => 'kids-002',
@@ -38,6 +40,8 @@ function skyyrose_get_kids_capsule_products() {
 			'price' => '$65',
 			'desc'  => __( 'Bold colorblock hoodie and jogger set in classic black, red, and white', 'skyyrose-flagship' ),
 			'badge' => __( 'New', 'skyyrose-flagship' ),
+			'url'   => home_url( '/pre-order/' ),
+			'image' => SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg',
 		),
 	);
 
