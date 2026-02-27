@@ -310,7 +310,7 @@ function skyyrose_ajax_immersive_add_to_cart() {
 	ob_start();
 	$count = $cart_count;
 	?>
-	<span class="cart-count<?php echo $count > 0 ? ' has-items' : ''; ?>"><?php echo wp_kses_data( $count ); ?></span>
+	<span class="cart-count<?php echo $count > 0 ? ' has-items' : ''; ?>"><?php echo esc_html( absint( $count ) ); ?></span>
 	<?php
 	$cart_count_fragment = ob_get_clean();
 
@@ -438,7 +438,7 @@ function skyyrose_build_product_data( $product ) {
 		'id'           => $product_id,
 		'name'         => $product->get_name(),
 		'price'        => $product->get_price(),
-		'price_html'   => $product->get_price_html(),
+		'price_html'   => wp_kses_post( $product->get_price_html() ),
 		'image_url'    => $image_url ? esc_url( $image_url ) : '',
 		'permalink'    => esc_url( $product->get_permalink() ),
 		'stock_status' => $product->get_stock_status(),

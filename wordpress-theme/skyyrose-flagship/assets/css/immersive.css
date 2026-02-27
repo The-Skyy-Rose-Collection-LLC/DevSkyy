@@ -353,6 +353,12 @@
 	background: rgba(255, 255, 255, 0.15);
 }
 
+.product-panel-close:focus-visible {
+	outline: 2px solid #B76E79;
+	outline-offset: 2px;
+	background: rgba(255, 255, 255, 0.1);
+}
+
 .product-panel-inner {
 	display: flex;
 	gap: 2rem;

@@ -136,12 +136,13 @@ get_header();
 			<!-- Status region for filter announcements (screen readers only) -->
 			<div class="product-grid-status screen-reader-text" role="status" aria-live="polite" aria-atomic="true"></div>
 			<!-- Product Grid -->
-			<div class="product-grid" id="product-grid-panel" aria-label="<?php esc_attr_e( 'Product grid', 'skyyrose-flagship' ); ?>">
+			<div class="product-grid" id="product-grid-panel" role="tabpanel" aria-labelledby="tab-all" aria-label="<?php esc_attr_e( 'Product grid', 'skyyrose-flagship' ); ?>">
 				<?php foreach ( $gateway_products as $product ) :
 					$badge_class = 'badge-' . $product['collection'];
 				?>
 					<article
 						class="product-grid-card"
+						id="product-<?php echo esc_attr( $product['sku'] ); ?>"
 						data-collection="<?php echo esc_attr( $product['collection'] ); ?>"
 						data-product-id="<?php echo esc_attr( $product['id'] ); ?>"
 						data-product-name="<?php echo esc_attr( $product['name'] ); ?>"
@@ -237,7 +238,7 @@ get_header();
 				<span class="cart-total-label"><?php echo esc_html__( 'Total', 'skyyrose-flagship' ); ?></span>
 				<span class="cart-total-amount">$0.00</span>
 			</div>
-			<button class="cart-checkout-btn" type="button"><?php echo esc_html__( 'Proceed to Checkout', 'skyyrose-flagship' ); ?></button>
+			<button class="cart-checkout-btn" type="button" disabled aria-disabled="true"><?php echo esc_html__( 'Proceed to Checkout', 'skyyrose-flagship' ); ?></button>
 		</div>
 	</div>
 
@@ -300,16 +301,16 @@ get_header();
 
 	<!-- Collection Tabs (Fixed Bottom) -->
 	<div class="collection-tabs" role="tablist" aria-label="<?php esc_attr_e( 'Filter by collection', 'skyyrose-flagship' ); ?>">
-		<button class="collection-tab active" type="button" role="tab" aria-selected="true" tabindex="0" data-collection="all" id="tab-all">
+		<button class="collection-tab active" type="button" role="tab" aria-selected="true" aria-controls="product-grid-panel" tabindex="0" data-collection="all" id="tab-all">
 			<?php echo esc_html__( 'All', 'skyyrose-flagship' ); ?>
 		</button>
-		<button class="collection-tab" type="button" role="tab" aria-selected="false" tabindex="-1" data-collection="black-rose" id="tab-black-rose">
+		<button class="collection-tab" type="button" role="tab" aria-selected="false" aria-controls="product-grid-panel" tabindex="-1" data-collection="black-rose" id="tab-black-rose">
 			<?php echo esc_html__( 'Black Rose', 'skyyrose-flagship' ); ?>
 		</button>
-		<button class="collection-tab" type="button" role="tab" aria-selected="false" tabindex="-1" data-collection="love-hurts" id="tab-love-hurts">
+		<button class="collection-tab" type="button" role="tab" aria-selected="false" aria-controls="product-grid-panel" tabindex="-1" data-collection="love-hurts" id="tab-love-hurts">
 			<?php echo esc_html__( 'Love Hurts', 'skyyrose-flagship' ); ?>
 		</button>
-		<button class="collection-tab" type="button" role="tab" aria-selected="false" tabindex="-1" data-collection="signature" id="tab-signature">
+		<button class="collection-tab" type="button" role="tab" aria-selected="false" aria-controls="product-grid-panel" tabindex="-1" data-collection="signature" id="tab-signature">
 			<?php echo esc_html__( 'Signature', 'skyyrose-flagship' ); ?>
 		</button>
 	</div>
