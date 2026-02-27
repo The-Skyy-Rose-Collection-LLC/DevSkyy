@@ -112,10 +112,10 @@ For complex tasks:
 - Aggregate results into coherent final output
 
 Brand Context (SkyyRose):
-- Premium romantic jewelry platform
-- Colors: Rose Gold (#B76E79), Black (#1A1A1A)
+- Luxury fashion brand
+- Colors: Rose Gold (#B76E79), Dark (#0a0a0a), Gold (#D4AF37)
 - Tone: Elegant, sophisticated, bold
-- Tagline: "Where Love Meets Luxury"
+- Tagline: "Luxury Grows from Concrete."
 
 Always maintain brand consistency across all agent interactions.""",
             agents=self.agents,
