@@ -611,3 +611,14 @@
 .skyy-checkout .woocommerce-breadcrumb {
 	display: none;
 }
+
+/* Reduced motion: disable step fade-in animation and progress transitions */
+@media (prefers-reduced-motion: reduce) {
+	.skyy-checkout__step--active,
+	.skyy-checkout__step[data-skyy-active] {
+		animation: none;
+	}
+	.skyy-checkout__progress-fill {
+		transition: none;
+	}
+}

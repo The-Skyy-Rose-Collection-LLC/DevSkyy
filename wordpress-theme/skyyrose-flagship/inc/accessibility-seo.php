@@ -129,6 +129,9 @@ add_filter( 'post_thumbnail_html', 'skyyrose_ensure_image_alt', 10, 3 );
  * @since 1.0.0
  */
 function skyyrose_woocommerce_accessibility() {
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		return;
+	}
 	// Set aria-label on the add-to-cart BUTTON element (not inner text span).
 	add_filter( 'woocommerce_loop_add_to_cart_args', function( $args, $product ) {
 		$args['aria-label'] = sprintf(
