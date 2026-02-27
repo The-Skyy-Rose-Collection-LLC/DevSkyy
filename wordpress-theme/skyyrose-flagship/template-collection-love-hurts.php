@@ -99,7 +99,7 @@ endif;
 $skyyrose_lh_products    = skyyrose_get_love_hurts_products();
 $skyyrose_lh_shop_url    = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : '/shop';
 $skyyrose_lh_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg' );
-$skyyrose_lh_logo_url    = esc_url( get_template_directory_uri() . '/assets/branding/love-hurts-logo.jpg' );
+$skyyrose_lh_logo_url    = esc_url( get_template_directory_uri() . '/assets/branding/love-hurts-logo.webp' );
 $skyyrose_lh_scene_url   = esc_url( get_template_directory_uri() . '/assets/scenes/love-hurts/love-hurts-giant-rose-staircase.png' );
 ?>
 

@@ -117,7 +117,7 @@ endif;
 $skyyrose_sg_products    = skyyrose_get_signature_products();
 $skyyrose_sg_shop_url    = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : '/shop';
 $skyyrose_sg_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg' );
-$skyyrose_sg_logo_url    = esc_url( get_template_directory_uri() . '/assets/branding/signature-logo.jpg' );
+$skyyrose_sg_logo_url    = esc_url( get_template_directory_uri() . '/assets/branding/signature-logo.webp' );
 $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scenes/signature/signature-golden-gate-showroom.png' );
 ?>
 
