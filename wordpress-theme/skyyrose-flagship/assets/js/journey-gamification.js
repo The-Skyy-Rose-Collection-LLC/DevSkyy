@@ -489,6 +489,7 @@
 		}
 
 		function dismiss() {
+			window.removeEventListener('beforeunload', dismiss);
 			document.removeEventListener('keydown', keyHandler);
 			overlay.classList.remove('jge-visible');
 			setTimeout(function () {

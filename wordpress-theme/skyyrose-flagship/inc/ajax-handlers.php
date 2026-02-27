@@ -181,8 +181,18 @@ function skyyrose_ajax_newsletter_subscribe() {
 		return;
 	}
 
-	// Sanitize and validate email first (needed for email-based rate limiting).
+	// Sanitize and validate email BEFORE rate limiting to prevent:
+	// (a) invalid submissions burning rate-limit slots, (b) targeted email lockout attacks.
 	$email = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
+
+	if ( ! is_email( $email ) ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Please enter a valid email address.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
 
 	// Rate limiting: max 5 newsletter signups per email per 15 minutes.
 	// Uses email (not IP) because REMOTE_ADDR is the proxy IP on WordPress.com.
@@ -197,15 +207,6 @@ function skyyrose_ajax_newsletter_subscribe() {
 		return;
 	}
 	set_transient( $email_key, $attempts + 1, 15 * MINUTE_IN_SECONDS );
-
-	if ( ! is_email( $email ) ) {
-		wp_send_json_error(
-			array(
-				'message' => esc_html__( 'Please enter a valid email address.', 'skyyrose-flagship' ),
-			)
-		);
-		return;
-	}
 
 	/**
 	 * Fires when a user subscribes to the newsletter.
@@ -253,8 +254,18 @@ function skyyrose_ajax_incentive_signup() {
 		return;
 	}
 
-	// Sanitize and validate email first (needed for email-based rate limiting).
+	// Sanitize and validate email BEFORE rate limiting to prevent:
+	// (a) invalid submissions burning rate-limit slots, (b) targeted email lockout attacks.
 	$email = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
+
+	if ( ! is_email( $email ) ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Please enter a valid email address.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
 
 	// Rate limiting: max 5 incentive signups per email per 15 minutes.
 	// Uses email (not IP) because REMOTE_ADDR is the proxy IP on WordPress.com.
@@ -269,15 +280,6 @@ function skyyrose_ajax_incentive_signup() {
 		return;
 	}
 	set_transient( $email_key, $attempts + 1, 15 * MINUTE_IN_SECONDS );
-
-	if ( ! is_email( $email ) ) {
-		wp_send_json_error(
-			array(
-				'message' => esc_html__( 'Please enter a valid email address.', 'skyyrose-flagship' ),
-			)
-		);
-		return;
-	}
 
 	// Sanitize optional phone.
 	$phone = sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) );
@@ -383,11 +385,9 @@ function skyyrose_ajax_signin() {
 	wp_set_current_user( $user->ID );
 	wp_set_auth_cookie( $user->ID, $remember );
 
-	// Fire WooCommerce-specific hook for guest-to-customer cart merge.
-	// Avoid do_action('wp_login') which causes double-processing with security plugins.
-	if ( function_exists( 'WC' ) && WC()->session ) {
-		do_action( 'woocommerce_set_cart_cookies', true );
-	}
+	// Fire wp_login action so WooCommerce merges guest cart into the authenticated user's cart.
+	// This hook is required for woocommerce_customer_login / guest-to-customer cart merge.
+	do_action( 'wp_login', $user->user_login, $user );
 
 	wp_send_json_success(
 		array(

@@ -126,6 +126,12 @@
 		tab.setAttribute('aria-selected', 'true');
 		tab.setAttribute('tabindex', '0');
 
+		// Update tabpanel aria-labelledby to track active tab.
+		var gridPanel = document.getElementById('product-grid-panel');
+		if (gridPanel && tab.id) {
+			gridPanel.setAttribute('aria-labelledby', tab.id);
+		}
+
 		// Filter cards.
 		var visibleCount = 0;
 		cards.forEach(function (card) {
@@ -416,6 +422,7 @@
 		// Enable/disable checkout button
 		if (checkoutBtn) {
 			checkoutBtn.disabled = cartCount === 0;
+			checkoutBtn.setAttribute('aria-disabled', cartCount === 0 ? 'true' : 'false');
 		}
 	}
 

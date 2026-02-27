@@ -7,9 +7,11 @@
  * @package SkyyRose_Flagship
  * @since 1.0.0
  */
-(function ($) {
+(function () {
   'use strict';
 
+  if (typeof jQuery === 'undefined') return;
+  var $ = jQuery;
   var config = window.skyyRoseWishlist || {};
 
   /**
@@ -55,7 +57,8 @@
    * @param {string} type    'success' or 'error'.
    */
   function showNotice(message, type) {
-    var $notice = $('<div class="skyyrose-notice skyyrose-notice--' + (type || 'success') + '">' + message + '</div>');
+    var $notice = $('<div>').addClass('skyyrose-notice skyyrose-notice--' + (type || 'success'));
+    $notice.text(message); // Use textContent to prevent XSS from server-supplied messages.
     $('body').append($notice);
     setTimeout(function () {
       $notice.addClass('visible');
@@ -169,4 +172,4 @@
       }
     });
   });
-})(jQuery);
+})();

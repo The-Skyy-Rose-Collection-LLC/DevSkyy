@@ -293,45 +293,21 @@
 						'.cart-count-badge', '.navbar__cart-badge',
 						'.cart-count', '.cart-subtotal'
 					];
-					var htmlSelectors = [
-						'.cart-contents', '.widget_shopping_cart_content',
-						'div.widget_shopping_cart_content'
-					];
 					for (var selector in data.fragments) {
 						if (!data.fragments.hasOwnProperty(selector)) continue;
 						var isNumeric = false;
-						var isHtml = false;
 						for (var a = 0; a < numericSelectors.length; a++) {
 							if (selector === numericSelectors[a]) { isNumeric = true; break; }
 						}
-						if (!isNumeric) {
-							for (var b = 0; b < htmlSelectors.length; b++) {
-								if (selector === htmlSelectors[b]) { isHtml = true; break; }
-							}
-						}
-						if (!isNumeric && !isHtml) continue;
+						if (!isNumeric) continue; // HTML widget selectors handled by WC jQuery fragment refresh below.
 						try {
 							var targets = document.querySelectorAll(selector);
-							if (isNumeric) {
-								// Extract text only — prevents HTML injection in badge values.
-								var temp = document.createElement('div');
-								temp.innerHTML = data.fragments[selector];
-								var text = (temp.textContent || '').trim();
-								for (var i = 0; i < targets.length; i++) {
-									targets[i].textContent = text;
-								}
-							} else {
-								// Trusted WooCommerce widget content — standard WC fragment pattern.
-								// Defense-in-depth: reject any fragment containing <script> tags.
-								var rawFragment = data.fragments[selector];
-								if (typeof rawFragment !== 'string' || /<script/i.test(rawFragment)) continue;
-								for (var j = 0; j < targets.length; j++) {
-									var tmp = document.createElement('div');
-									tmp.innerHTML = rawFragment;
-									if (tmp.firstChild) {
-										targets[j].parentNode.replaceChild(tmp.firstChild, targets[j]);
-									}
-								}
+							// Extract text only — prevents HTML injection in badge values.
+							var temp = document.createElement('div');
+							temp.innerHTML = data.fragments[selector];
+							var text = (temp.textContent || '').trim();
+							for (var i = 0; i < targets.length; i++) {
+								targets[i].textContent = text;
 							}
 						} catch (e) { /* invalid selector — skip */ }
 					}

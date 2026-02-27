@@ -430,7 +430,8 @@ function skyyrose_ajax_clear_wishlist() {
 	}
 }
 add_action( 'wp_ajax_skyyrose_clear_wishlist', 'skyyrose_ajax_clear_wishlist' );
-// nopriv removed: clear_wishlist is a destructive mutation. Matches move_to_cart/move_all_to_cart pattern.
+// Guest wishlists exist via transients — guests must be able to clear their own wishlist.
+add_action( 'wp_ajax_nopriv_skyyrose_clear_wishlist', 'skyyrose_ajax_clear_wishlist' );
 
 /**
  * AJAX handler: Move all to cart.
@@ -748,3 +749,15 @@ function skyyrose_add_wishlist_button_to_single() {
 	get_template_part( 'template-parts/wishlist-button' );
 }
 add_action( 'woocommerce_single_product_summary', 'skyyrose_add_wishlist_button_to_single', 35 );
+
+/**
+ * Clean up wishlist option when a user account is deleted.
+ *
+ * Prevents unbounded wp_options bloat from orphaned wishlist rows.
+ *
+ * @since 3.2.1
+ * @param int $user_id The ID of the user being deleted.
+ */
+add_action( 'delete_user', function( $user_id ) {
+	delete_option( 'wishlist_user_' . absint( $user_id ) );
+} );

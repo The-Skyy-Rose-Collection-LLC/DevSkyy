@@ -187,6 +187,8 @@
 		if (targets.length === 0) return;
 
 		targets.forEach(function (target) {
+			// Guard: skip if already initialized (prevents DOM duplication on tab restore).
+			if (target.querySelector('.cie-viewers')) return;
 			var baseCount = parseInt(target.dataset.cieViewers, 10) || CONFIG.viewerBase;
 			var count = baseCount + randomInt(0, CONFIG.viewerVariance);
 
@@ -576,6 +578,8 @@
 	function initRoomViewers() {
 		var scene = document.querySelector('.immersive-scene');
 		if (!scene) return;
+		// Guard: skip if already initialized (prevents DOM duplication on tab restore).
+		if (scene.querySelector('.cie-room-viewers')) return;
 
 		var count = CONFIG.viewerBase + randomInt(5, CONFIG.viewerVariance);
 		var roomViewers = createElement('div', 'cie-room-viewers');
