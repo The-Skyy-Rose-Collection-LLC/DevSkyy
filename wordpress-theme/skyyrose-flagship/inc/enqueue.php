@@ -241,6 +241,7 @@ function skyyrose_get_current_template_slug() {
 			'template-contact.php'                 => 'contact',
 			'template-preorder-gateway.php'        => 'preorder-gateway',
 			'template-homepage-luxury.php'         => 'front-page',
+			'skyyrose-canvas.php'                  => 'collections-shop',
 		);
 
 		if ( isset( $template_map[ $page_template ] ) ) {
@@ -277,8 +278,9 @@ function skyyrose_enqueue_template_styles() {
 		'shop-archive'    => 'woocommerce.css',
 		'about'           => 'about.css',
 		'contact'         => 'contact.css',
-		'preorder-gateway' => 'preorder-gateway.css',
-		'404'             => '404.css',
+		'preorder-gateway'  => 'preorder-gateway.css',
+		'collections-shop' => 'collections-shop.css',
+		'404'              => '404.css',
 	);
 
 	if ( isset( $template_styles[ $slug ] ) ) {
@@ -361,7 +363,8 @@ function skyyrose_enqueue_template_scripts() {
 		'cart'             => 'woocommerce.js',
 		'checkout'         => 'woocommerce.js',
 		'contact'          => 'contact.js',
-		'preorder-gateway' => 'preorder-gateway.js',
+		'preorder-gateway'  => 'preorder-gateway.js',
+		'collections-shop' => 'collections-shop.js',
 	);
 
 	if ( isset( $template_scripts[ $slug ] ) ) {
@@ -722,6 +725,30 @@ function skyyrose_resource_hints( $urls, $relation_type ) {
 }
 
 /**
+ * Add font-display:swap to Google Fonts stylesheet link tags.
+ *
+ * Legacy callback — originally used when fonts were loaded from Google Fonts CDN.
+ * Fonts are now self-hosted (v3.2.1 GDPR), so this is a safe passthrough.
+ * Kept to prevent fatal errors from orphaned style_loader_tag hook registrations
+ * that may exist on the production server.
+ *
+ * @since  3.0.0
+ * @param  string $html   The link tag HTML.
+ * @param  string $handle The stylesheet handle.
+ * @param  string $href   The stylesheet URL.
+ * @param  string $media  The stylesheet media attribute.
+ * @return string Modified or original link tag.
+ */
+function skyyrose_add_font_display_swap( $html, $handle, $href, $media ) {
+	// Only modify external Google Fonts links (no longer used since v3.2.1).
+	if ( strpos( $href, 'fonts.googleapis.com' ) !== false && strpos( $href, 'display=' ) === false ) {
+		$href_swap = add_query_arg( 'display', 'swap', $href );
+		$html      = str_replace( $href, esc_url( $href_swap ), $html );
+	}
+	return $html;
+}
+
+/**
  * Defer non-critical scripts for better page load performance.
  *
  * @since  3.0.0
@@ -830,6 +857,9 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_luxury_cursor', 12 );
 
 // Dequeue conflicting WooCommerce default styles.
 add_filter( 'woocommerce_enqueue_styles', 'skyyrose_dequeue_woocommerce_styles' );
+
+// Font-display:swap for any remaining Google Fonts links (legacy, safe passthrough).
+add_filter( 'style_loader_tag', 'skyyrose_add_font_display_swap', 10, 4 );
 
 // Defer non-critical scripts.
 add_filter( 'script_loader_tag', 'skyyrose_defer_scripts', 10, 2 );
