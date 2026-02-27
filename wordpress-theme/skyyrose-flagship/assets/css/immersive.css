@@ -1135,7 +1135,8 @@
 	.hotspot-beacon,
 	.hotspot-beacon::before,
 	.scene-film-grain {
-		animation: none;
+		animation: none !important;
+		opacity: 0;
 	}
 
 	.scene-layer,
