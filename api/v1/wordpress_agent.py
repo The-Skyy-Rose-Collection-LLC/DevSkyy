@@ -75,9 +75,9 @@ async def execute_agent(request: AgentExecuteRequest):
                 correlation_id=request.context.get("correlation_id"),
             ):
                 yield f"data: {json.dumps(event)}\n\n"
-        except Exception as e:
+        except Exception:
             logger.exception("Agent execution failed")
-            error_event = {"type": "error", "content": str(e)}
+            error_event = {"type": "error", "content": "Agent execution failed"}
             yield f"data: {json.dumps(error_event)}\n\n"
         yield "data: [DONE]\n\n"
 

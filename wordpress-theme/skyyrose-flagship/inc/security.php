@@ -49,12 +49,14 @@ function skyyrose_send_security_headers() {
 		"img-src 'self' data: blob: https://*.wp.com https://secure.gravatar.com https://i0.wp.com https://i1.wp.com https://i2.wp.com https://*.skyyrose.co https://www.facebook.com",
 		"font-src 'self' data: https://fonts.wp.com https://cdn.jsdelivr.net",
 		"connect-src 'self' https://stats.wp.com https://public-api.wordpress.com https://api.skyyrose.co https://pixel.wp.com https://devskyy.app https://www.facebook.com https://connect.facebook.net",
-		"frame-src 'self' https://www.youtube.com https://player.vimeo.com",
+		"frame-src 'self' https://www.youtube.com https://player.vimeo.com https://widgets.wp.com",
+		"frame-ancestors 'self'",
 		"worker-src 'self' blob:",
 		"child-src 'self' blob:",
 		"object-src 'none'",
 		"base-uri 'self'",
 		"form-action 'self'",
+		"upgrade-insecure-requests",
 	);
 
 	$csp_policy = implode( '; ', $csp_directives );
@@ -208,26 +210,39 @@ function skyyrose_remove_version_query_string( $src ) {
  *--------------------------------------------------------------*/
 
 /**
- * Remove unnecessary meta tags and links from wp_head.
+ * Remove unnecessary meta tags, links, and HTTP headers from wp_head.
  *
  * @since 1.0.0
+ * @since 3.2.2 Remove shortlink from HTTP headers, remove feed links.
  * @return void
  */
 function skyyrose_clean_wp_head() {
-	// Remove shortlink.
+	// Remove shortlink from HTML head and HTTP Link header.
 	remove_action( 'wp_head', 'wp_shortlink_wp_head' );
+	remove_action( 'template_redirect', 'wp_shortlink_header', 11 );
 
 	// Remove REST API discovery link (still accessible, just not advertised).
 	remove_action( 'wp_head', 'rest_output_link_wp_head' );
 
 	// Remove oEmbed discovery links.
 	remove_action( 'wp_head', 'wp_oembed_add_discovery_links' );
+	remove_action( 'wp_head', 'wp_oembed_add_host_js' );
 
 	// Remove emoji detection and inline styles.
 	remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
 	remove_action( 'wp_print_styles', 'print_emoji_styles' );
 	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
 	remove_action( 'admin_print_styles', 'print_emoji_styles' );
+
+	// Remove RSS feed links (not a blog, reduces attack surface).
+	remove_action( 'wp_head', 'feed_links', 2 );
+	remove_action( 'wp_head', 'feed_links_extra', 3 );
+
+	// Remove Windows Live Writer link.
+	remove_action( 'wp_head', 'wlwmanifest_link' );
+
+	// Remove adjacent post links (prev/next).
+	remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head' );
 }
 add_action( 'init', 'skyyrose_clean_wp_head' );
 
@@ -273,6 +288,111 @@ function skyyrose_verify_nonce( $nonce, $action ) {
 function skyyrose_nonce_field( $action, $name = 'skyyrose_nonce', $referrer = true ) {
 	wp_nonce_field( 'skyyrose_' . sanitize_key( $action ), $name, $referrer );
 }
+
+/*--------------------------------------------------------------
+ * REST API User Enumeration Block
+ *
+ * Unauthenticated users must not be able to list usernames,
+ * Gravatar hashes, or admin roles via the REST API.
+ *--------------------------------------------------------------*/
+
+/**
+ * Block REST API user endpoints for unauthenticated requests.
+ *
+ * @since 3.2.2
+ *
+ * @param  WP_REST_Response|WP_Error $response Response object.
+ * @param  WP_REST_Server            $server   Server instance.
+ * @param  WP_REST_Request           $request  Request object.
+ * @return WP_REST_Response|WP_Error Filtered response.
+ */
+function skyyrose_restrict_rest_users( $response, $server, $request ) {
+	$route = $request->get_route();
+
+	// Block /wp/v2/users and /wp/v2/users/N for non-logged-in users.
+	if ( preg_match( '#^/wp/v2/users#', $route ) && ! is_user_logged_in() ) {
+		return new WP_Error(
+			'rest_forbidden',
+			__( 'Access denied.', 'skyyrose-flagship' ),
+			array( 'status' => 403 )
+		);
+	}
+
+	return $response;
+}
+add_filter( 'rest_pre_dispatch', 'skyyrose_restrict_rest_users', 10, 3 );
+
+/**
+ * Remove REST API user link from HTTP headers and HTML head.
+ *
+ * Prevents advertising /wp-json/wp/v2/users/1 in Link headers.
+ *
+ * @since 3.2.2
+ */
+function skyyrose_remove_rest_user_links() {
+	remove_action( 'template_redirect', 'rest_output_link_header', 11 );
+	remove_action( 'wp_head', 'rest_output_link_wp_head', 10 );
+}
+add_action( 'init', 'skyyrose_remove_rest_user_links' );
+
+/*--------------------------------------------------------------
+ * Author Enumeration Block
+ *
+ * Prevent ?author=N from revealing usernames via redirect.
+ *--------------------------------------------------------------*/
+
+/**
+ * Block author archive enumeration for non-logged-in visitors.
+ *
+ * @since 3.2.2
+ * @return void
+ */
+function skyyrose_block_author_enumeration() {
+	if ( is_admin() ) {
+		return;
+	}
+
+	// Block ?author=N query parameter.
+	if ( isset( $_GET['author'] ) && ! is_user_logged_in() ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		wp_safe_redirect( home_url( '/' ), 301 );
+		exit;
+	}
+}
+add_action( 'template_redirect', 'skyyrose_block_author_enumeration', 1 );
+
+/**
+ * Block author archive pages entirely for non-logged-in visitors.
+ *
+ * @since 3.2.2
+ * @return void
+ */
+function skyyrose_block_author_archives() {
+	if ( is_author() && ! is_user_logged_in() ) {
+		wp_safe_redirect( home_url( '/' ), 301 );
+		exit;
+	}
+}
+add_action( 'template_redirect', 'skyyrose_block_author_archives', 1 );
+
+/*--------------------------------------------------------------
+ * Disable File Editor
+ *
+ * Prevent editing theme/plugin files from wp-admin.
+ * Even if an attacker compromises an admin account, they
+ * cannot inject code via Appearance → Theme File Editor.
+ *--------------------------------------------------------------*/
+if ( ! defined( 'DISALLOW_FILE_EDIT' ) ) {
+	define( 'DISALLOW_FILE_EDIT', true );
+}
+
+/*--------------------------------------------------------------
+ * Disable Application Passwords for non-admin users
+ *
+ * Reduces attack surface by restricting REST API auth tokens.
+ *--------------------------------------------------------------*/
+add_filter( 'wp_is_application_passwords_available_for_user', function ( $available, $user ) {
+	return user_can( $user, 'manage_options' );
+}, 10, 2 );
 
 /*--------------------------------------------------------------
  * Input Sanitization Helpers
