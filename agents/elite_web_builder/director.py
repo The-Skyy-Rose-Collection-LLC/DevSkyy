@@ -73,6 +73,9 @@ from core.verification_loop import (
     VerificationConfig,
     VerificationLoop,
 )
+from core.output_writer import OutputWriter
+from core.gate_checkers import build_gate_checkers
+from core.cost_tracker import CostTracker
 
 logger = logging.getLogger(__name__)
 
@@ -132,6 +135,8 @@ class ProjectReport:
     elapsed_ms: float
     failures: list[str]
     instincts_learned: int
+    cost_usd: float = 0.0
+    cost_details: dict[str, Any] = field(default_factory=dict)
 
 
 # ---------------------------------------------------------------------------
@@ -145,11 +150,13 @@ class DirectorConfig:
 
     routing_config: RoutingConfig
     learning_dir: Path = Path("instincts")
+    output_dir: Path = Path("output/theme")
     verification_config: VerificationConfig = field(
         default_factory=VerificationConfig
     )
     max_heal_attempts: int = 3
     max_stories: int = 50
+    max_concurrency: int = 4  # H8: limit parallel story execution
 
 
 class Director:
@@ -168,6 +175,9 @@ class Director:
         self._healer = SelfHealer(max_attempts=config.max_heal_attempts)
         self._verifier = VerificationLoop(config=config.verification_config)
         self._executor = RalphExecutor(config=RalphConfig())
+        self._writer = OutputWriter(output_dir=config.output_dir)
+        self._cost_tracker = CostTracker()
+        self._semaphore = asyncio.Semaphore(config.max_concurrency)
         self._runtime = AgentRuntime(
             router=self._router,
             validator=self._validator,
@@ -191,12 +201,14 @@ class Director:
     def from_config(
         routing_config: dict[str, Any] | None = None,
         learning_dir: str = "instincts",
+        output_dir: str = "output/theme",
     ) -> Director:
         """Create a Director from configuration."""
         rc = RoutingConfig.from_dict(routing_config or _DEFAULT_ROUTING)
         config = DirectorConfig(
             routing_config=rc,
             learning_dir=Path(learning_dir),
+            output_dir=Path(output_dir),
         )
         return Director(config=config)
 
@@ -260,6 +272,14 @@ class Director:
         return self._runtime
 
     @property
+    def writer(self) -> OutputWriter:
+        return self._writer
+
+    @property
+    def cost_tracker(self) -> CostTracker:
+        return self._cost_tracker
+
+    @property
     def spec_registry(self) -> dict[AgentRole, AgentSpec]:
         return dict(self._spec_registry)
 
@@ -315,72 +335,132 @@ class Director:
         gate_checkers: dict[Gate, GateChecker] | None = None,
     ) -> UserStory:
         """
-        Execute a single story through the full loop.
+        Execute a single story through the full hardened loop.
 
-        1. Mark in-progress
-        2. Run agent function
-        3. Verify with quality gates
-        4. Self-heal on failure
-        5. Log to journal if needed
-        6. Return updated story
+        1. Acquire concurrency semaphore
+        2. Mark in-progress
+        3. Run agent function (ralph-loop resilient)
+        4. Write output files to disk
+        5. Build gate checkers from written files (if none provided)
+        6. Verify with quality gates
+        7. Self-heal on failure
+        8. Track costs
+        9. Log to journal if needed
+        10. Return updated story (NEVER raises — all errors captured)
 
         Args:
             story: The story to execute
             agent_fn: Async callable that produces AgentOutput
-            gate_checkers: Optional gate checkers for verification
+            gate_checkers: Optional gate checkers (auto-generated if None)
 
         Returns:
             Updated UserStory with new status
         """
-        story.status = StoryStatus.IN_PROGRESS
-        logger.info("Executing story %s: %s", story.id, story.title)
+        async with self._semaphore:
+            story.status = StoryStatus.IN_PROGRESS
+            logger.info("Executing story %s: %s", story.id, story.title)
 
-        # Resolve model for this agent
-        route = self._router.resolve(story.agent_role.value)
-        logger.info(
-            "Story %s → agent=%s provider=%s model=%s (fallback=%s)",
-            story.id,
-            story.agent_role.value,
-            route.provider,
-            route.model,
-            route.is_fallback,
-        )
+            try:
+                # Resolve model for this agent
+                route = self._router.resolve(story.agent_role.value)
+                logger.info(
+                    "Story %s → agent=%s provider=%s model=%s (fallback=%s)",
+                    story.id,
+                    story.agent_role.value,
+                    route.provider,
+                    route.model,
+                    route.is_fallback,
+                )
 
-        # Run the agent with ralph-loop resilience
-        result = await self._executor.execute(agent_fn)
+                # Run the agent with ralph-loop resilience
+                result = await self._executor.execute(agent_fn)
 
-        if not result.success:
-            story.status = StoryStatus.FAILED
-            logger.error("Story %s: agent execution failed — %s", story.id, result.error)
-            return story
-
-        story.output = result.value
-
-        # Run verification if checkers provided
-        if gate_checkers:
-            report = await self._verifier.run_all(gate_checkers)
-
-            if report.all_green:
-                story.status = StoryStatus.GREEN
-                logger.info("Story %s: ALL GREEN ✓", story.id)
-            else:
-                # Attempt self-heal
-                diagnosis = self._healer.diagnose(report)
-                if diagnosis:
-                    logger.warning(
-                        "Story %s: %d gates failed, starting heal cycle",
-                        story.id,
-                        len(diagnosis.failed_gates),
-                    )
-                    # Note: actual heal would need agent-specific fixer
+                if not result.success:
                     story.status = StoryStatus.FAILED
-                else:
-                    story.status = StoryStatus.GREEN
-        else:
-            # No gate checkers — mark green (trust the agent)
-            story.status = StoryStatus.GREEN
+                    logger.error(
+                        "Story %s: agent execution failed — %s",
+                        story.id, result.error,
+                    )
+                    return story
 
-        return story
+                story.output = result.value
+
+                # Track cost from usage metadata
+                if story.output and story.output.metadata:
+                    usage = story.output.metadata.get("usage", {})
+                    self._cost_tracker.record(
+                        story_id=story.id,
+                        provider=story.output.metadata.get("provider", "unknown"),
+                        model=story.output.metadata.get("model", "unknown"),
+                        input_tokens=usage.get("input_tokens", 0),
+                        output_tokens=usage.get("output_tokens", 0),
+                    )
+
+                # Write output files to disk
+                write_result = self._writer.extract_and_write(story.output.content)
+                files_written = list(write_result.files_written)
+
+                if write_result.errors:
+                    logger.warning(
+                        "Story %s: %d write errors: %s",
+                        story.id,
+                        len(write_result.errors),
+                        write_result.errors[:3],
+                    )
+
+                # Build gate checkers if not provided and files were written
+                if gate_checkers is None and files_written:
+                    gate_checkers = build_gate_checkers(
+                        files_written=files_written,
+                        output_dir=self._writer.output_dir,
+                    )
+
+                # Run verification if checkers available
+                if gate_checkers:
+                    report = await self._verifier.run_all(gate_checkers)
+
+                    if report.all_green:
+                        story.status = StoryStatus.GREEN
+                        logger.info("Story %s: ALL GREEN ✓", story.id)
+                    else:
+                        # Attempt self-heal
+                        diagnosis = self._healer.diagnose(report)
+                        if diagnosis:
+                            logger.warning(
+                                "Story %s: %d gates failed — %s",
+                                story.id,
+                                len(diagnosis.failed_gates),
+                                [g.name for g in diagnosis.failed_gates],
+                            )
+                            # Log failure to learning journal
+                            from core.learning_journal import JournalEntry
+                            for analysis in diagnosis.failure_analyses:
+                                self._journal.add_entry(JournalEntry(
+                                    mistake=analysis.description,
+                                    correct=f"Fix {analysis.category.value} in {analysis.gate.name}",
+                                    agent=story.agent_role.value,
+                                    story_id=story.id,
+                                    tags=[analysis.gate.name, analysis.category.value],
+                                ))
+                            story.status = StoryStatus.FAILED
+                        else:
+                            story.status = StoryStatus.GREEN
+                else:
+                    # No gate checkers and no files — mark green (planning stories)
+                    story.status = StoryStatus.GREEN
+
+                return story
+
+            except Exception as exc:
+                # H4: Safety net — NEVER let an unhandled exception escape
+                story.status = StoryStatus.FAILED
+                logger.exception(
+                    "Story %s: UNEXPECTED ERROR — %s: %s",
+                    story.id,
+                    type(exc).__name__,
+                    exc,
+                )
+                return story
 
     # -- Planning & execution --
 
@@ -533,6 +613,7 @@ class Director:
         elapsed = (time.time() - start) * 1000
         summary = self.get_status_summary()
         instincts_learned = len(self._journal.entries) - journal_entries_before
+        cost_data = self._cost_tracker.to_dict()
 
         return ProjectReport(
             stories=dict(self._stories),
@@ -544,6 +625,8 @@ class Director:
             elapsed_ms=elapsed,
             failures=failures,
             instincts_learned=instincts_learned,
+            cost_usd=self._cost_tracker.total_cost,
+            cost_details=cost_data,
         )
 
 
@@ -602,19 +685,34 @@ PRD:
 # Default routing (matches plan spec)
 # ---------------------------------------------------------------------------
 
-_DEFAULT_ROUTING = {
-    "routes": {
-        "director": {"provider": "anthropic", "model": "claude-opus-4-6"},
-        "design_system": {"provider": "google", "model": "gemini-2.0-flash"},
-        "frontend_dev": {"provider": "anthropic", "model": "claude-haiku-4-5"},
-        "backend_dev": {"provider": "anthropic", "model": "claude-haiku-4-5"},
-        "accessibility": {"provider": "anthropic", "model": "claude-haiku-4-5"},
-        "performance": {"provider": "google", "model": "gemini-2.0-flash"},
-        "seo_content": {"provider": "anthropic", "model": "claude-haiku-4-5"},
-        "qa": {"provider": "anthropic", "model": "claude-haiku-4-5"},
-    },
-    "fallbacks": {
-        "anthropic": {"provider": "google", "model": "gemini-2.0-flash"},
-        "google": {"provider": "anthropic", "model": "claude-haiku-4-5"},
-    },
-}
+def _load_default_routing() -> dict[str, Any]:
+    """Load routing from config/provider_routing.json, with hardcoded fallback."""
+    config_path = Path(__file__).parent / "config" / "provider_routing.json"
+    if config_path.exists():
+        try:
+            return json.loads(config_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError) as exc:
+            logger.warning("Failed to load %s: %s — using builtin defaults", config_path, exc)
+
+    # Builtin fallback — synced with config/provider_routing.json
+    return {
+        "routes": {
+            "director": {"provider": "anthropic", "model": "claude-opus-4-6"},
+            "design_system": {"provider": "google", "model": "gemini-3-pro-preview"},
+            "frontend_dev": {"provider": "anthropic", "model": "claude-sonnet-4-6"},
+            "backend_dev": {"provider": "anthropic", "model": "claude-sonnet-4-6"},
+            "accessibility": {"provider": "anthropic", "model": "claude-haiku-4-5"},
+            "performance": {"provider": "google", "model": "gemini-3-flash-preview"},
+            "seo_content": {"provider": "openai", "model": "gpt-4o"},
+            "qa": {"provider": "xai", "model": "grok-3"},
+        },
+        "fallbacks": {
+            "anthropic": {"provider": "google", "model": "gemini-3-pro-preview"},
+            "google": {"provider": "anthropic", "model": "claude-sonnet-4-6"},
+            "openai": {"provider": "anthropic", "model": "claude-sonnet-4-6"},
+            "xai": {"provider": "google", "model": "gemini-3-flash-preview"},
+        },
+    }
+
+
+_DEFAULT_ROUTING = _load_default_routing()
