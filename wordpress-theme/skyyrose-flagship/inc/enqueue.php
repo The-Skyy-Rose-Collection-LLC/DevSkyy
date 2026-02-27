@@ -783,7 +783,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) && strpos( $tag, ' defer' ) === false ) {
-		return str_replace( ' src', ' defer src', $tag );
+		return preg_replace( '/(<script\b[^>]*)\ssrc=/i', '$1 defer src=', $tag, 1 );
 	}
 
 	return $tag;

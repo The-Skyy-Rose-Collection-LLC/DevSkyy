@@ -398,7 +398,7 @@
 		closeBtn.type = 'button';
 		closeBtn.className = 'jge-reward-modal__close';
 		closeBtn.setAttribute('aria-label', 'Close reward modal');
-		closeBtn.innerHTML = '&#x2715;';
+		closeBtn.textContent = '\u2715';
 		modal.appendChild(closeBtn);
 
 		// Particle container
@@ -414,7 +414,7 @@
 		var icon = document.createElement('div');
 		icon.className = 'jge-reward-modal__icon';
 		icon.setAttribute('aria-hidden', 'true');
-		icon.innerHTML = '&#x2728;'; // sparkles
+		icon.textContent = '\u2728'; // sparkles
 		content.appendChild(icon);
 
 		// Headline
@@ -653,7 +653,7 @@
 		var icon = document.createElement('div');
 		icon.className = 'jge-achievement-bar__icon';
 		icon.setAttribute('aria-hidden', 'true');
-		icon.innerHTML = isComplete ? '&#x2728;' : '&#x1F50D;'; // sparkles or magnifying glass
+		icon.textContent = isComplete ? '\u2728' : '\uD83D\uDD0D'; // sparkles or magnifying glass
 		bar.appendChild(icon);
 
 		// Text

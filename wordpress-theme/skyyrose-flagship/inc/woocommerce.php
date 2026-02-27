@@ -592,12 +592,16 @@ function skyyrose_save_preorder_meta( $post_id ) {
 		update_post_meta( $post_id, '_preorder_ship_date', $date );
 	}
 
-	// Pre-order price — validate non-negative number.
+	// Pre-order price — validate finite, non-negative number with upper bound.
 	if ( isset( $_POST['skyyrose_preorder_price'] ) ) {
 		$price = sanitize_text_field( wp_unslash( $_POST['skyyrose_preorder_price'] ) );
 		if ( '' !== $price ) {
 			$price = floatval( $price );
-			$price = ( $price >= 0 ) ? $price : '';
+			if ( is_finite( $price ) && $price >= 0 && $price < 100000 ) {
+				$price = round( $price, 2 );
+			} else {
+				$price = '';
+			}
 		}
 		update_post_meta( $post_id, '_preorder_price', $price );
 	}

@@ -187,28 +187,35 @@
 		if (targets.length === 0) return;
 
 		targets.forEach(function (target) {
-			// Guard: skip if already initialized (prevents DOM duplication on tab restore).
-			if (target.querySelector('.cie-viewers')) return;
 			var baseCount = parseInt(target.dataset.cieViewers, 10) || CONFIG.viewerBase;
+			var existing = target.querySelector('.cie-viewers');
+			var countEl;
 			var count = baseCount + randomInt(0, CONFIG.viewerVariance);
 
-			var viewer = createElement('div', 'cie-viewers');
-			var dot = createElement('span', 'cie-viewers__dot');
-			var countEl = createElement('span', 'cie-viewers__count');
-			countEl.textContent = count + ' viewing now';
-			viewer.appendChild(dot);
-			viewer.appendChild(countEl);
-			target.appendChild(viewer);
+			if (existing) {
+				// DOM already exists from init — just restart the interval.
+				countEl = existing.querySelector('.cie-viewers__count');
+			} else {
+				var viewer = createElement('div', 'cie-viewers');
+				var dot = createElement('span', 'cie-viewers__dot');
+				countEl = createElement('span', 'cie-viewers__count');
+				countEl.textContent = count + ' viewing now';
+				viewer.appendChild(dot);
+				viewer.appendChild(countEl);
+				target.appendChild(viewer);
+			}
 
 			// Update periodically — store reference for cleanup.
 			var viewerInt = setInterval(function () {
 				var delta = randomInt(-3, 4);
 				count = Math.max(baseCount - 5, Math.min(baseCount + CONFIG.viewerVariance + 5, count + delta));
-				countEl.textContent = count + ' viewing now';
-				countEl.classList.add('bumped');
-				setTimeout(function () {
-					countEl.classList.remove('bumped');
-				}, 300);
+				if (countEl) {
+					countEl.textContent = count + ' viewing now';
+					countEl.classList.add('bumped');
+					setTimeout(function () {
+						countEl.classList.remove('bumped');
+					}, 300);
+				}
 			}, CONFIG.viewerUpdateInterval);
 			cleanupIntervals.push(viewerInt);
 		});
@@ -578,16 +585,22 @@
 	function initRoomViewers() {
 		var scene = document.querySelector('.immersive-scene');
 		if (!scene) return;
-		// Guard: skip if already initialized (prevents DOM duplication on tab restore).
-		if (scene.querySelector('.cie-room-viewers')) return;
 
+		var existing = scene.querySelector('.cie-room-viewers');
+		var roomViewers;
 		var count = CONFIG.viewerBase + randomInt(5, CONFIG.viewerVariance);
-		var roomViewers = createElement('div', 'cie-room-viewers');
-		var dot = createElement('span', 'cie-room-viewers__dot');
-		var text = document.createTextNode(' ' + count + ' exploring right now');
-		roomViewers.appendChild(dot);
-		roomViewers.appendChild(text);
-		scene.appendChild(roomViewers);
+
+		if (existing) {
+			// DOM already exists from init — just restart the interval.
+			roomViewers = existing;
+		} else {
+			roomViewers = createElement('div', 'cie-room-viewers');
+			var dot = createElement('span', 'cie-room-viewers__dot');
+			var text = document.createTextNode(' ' + count + ' exploring right now');
+			roomViewers.appendChild(dot);
+			roomViewers.appendChild(text);
+			scene.appendChild(roomViewers);
+		}
 
 		// Update periodically — store reference for cleanup.
 		var roomInt = setInterval(function () {

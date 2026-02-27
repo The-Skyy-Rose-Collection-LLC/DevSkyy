@@ -27,7 +27,6 @@
 	var titleOverlay  = document.querySelector('.scene-title-overlay');
 
 	// Product panel
-	var currentProductId = null;
 	var panelOverlay  = document.querySelector('.product-panel-overlay');
 	var panel         = document.querySelector('.product-panel');
 	var panelClose    = document.querySelector('.product-panel-close');
@@ -229,9 +228,6 @@
 				e.preventDefault();
 
 				lastFocused = hotspot;
-
-				// Track product ID for add-to-cart.
-				currentProductId = hotspot.dataset.productId || null;
 
 				var productData = {
 					name:       hotspot.dataset.productName,

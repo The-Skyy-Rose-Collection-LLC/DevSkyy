@@ -230,17 +230,15 @@ function skyyrose_clear_wishlist() {
 	$wishlist_key = skyyrose_get_wishlist_key();
 
 	if ( is_user_logged_in() ) {
-		$result = delete_option( $wishlist_key );
+		delete_option( $wishlist_key );
 	} else {
-		$result = delete_transient( $wishlist_key );
+		delete_transient( $wishlist_key );
 	}
 
-	if ( $result ) {
-		// Trigger action for extensions.
-		do_action( 'skyyrose_wishlist_cleared' );
-	}
+	// Always fire action — the wishlist is empty regardless of whether the key existed.
+	do_action( 'skyyrose_wishlist_cleared' );
 
-	return $result;
+	return true;
 }
 
 /**
@@ -718,7 +716,7 @@ function skyyrose_enqueue_wishlist_assets() {
 			'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
 			'nonce'       => wp_create_nonce( 'skyyrose-wishlist-nonce' ),
 			'count'       => skyyrose_get_wishlist_count(),
-			'wishlistUrl' => get_permalink( get_page_by_path( 'wishlist' ) ),
+			'wishlistUrl' => ( $wl_page = get_page_by_path( 'wishlist' ) ) ? get_permalink( $wl_page ) : home_url( '/' ),
 			'i18n'        => array(
 				'addedToWishlist'     => esc_html__( 'Added to wishlist', 'skyyrose-flagship' ),
 				'removedFromWishlist' => esc_html__( 'Removed from wishlist', 'skyyrose-flagship' ),

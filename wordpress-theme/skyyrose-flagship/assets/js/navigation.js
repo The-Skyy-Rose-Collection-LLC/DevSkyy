@@ -31,11 +31,29 @@
 
 	var mobileOverlay = document.querySelector('#mobile-menu-overlay, .mobile-menu__overlay');
 
+	// WCAG 2.4.3: Focus trap for mobile menu (Tab/Shift+Tab cycle within panel).
+	function handleMobileMenuKeydown(e) {
+		if (e.key === 'Escape') { closeMobileMenu(); return; }
+		if (e.key !== 'Tab' || !mobilePanel) return;
+		var focusable = mobilePanel.querySelectorAll(
+			'button, [href], input, select, [tabindex]:not([tabindex="-1"])'
+		);
+		if (!focusable.length) return;
+		var first = focusable[0];
+		var last  = focusable[focusable.length - 1];
+		if (e.shiftKey) {
+			if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+		} else {
+			if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+		}
+	}
+
 	function closeMobileMenu() {
 		if (mobilePanel) {
 			mobilePanel.classList.remove('open');
 			mobilePanel.setAttribute('aria-hidden', 'true');
 			mobilePanel.setAttribute('inert', '');
+			mobilePanel.removeEventListener('keydown', handleMobileMenuKeydown);
 		}
 		document.body.classList.remove('mobile-nav-open');
 		if (toggle) {
@@ -69,9 +87,10 @@
 				}
 				document.body.classList.toggle('mobile-nav-open');
 
-				// WCAG 2.4.3: Move focus into mobile menu when it opens.
+				// WCAG 2.4.3: Move focus into mobile menu when it opens + enable focus trap.
 				if (!expanded && mobileClose) {
 					mobileClose.focus();
+					mobilePanel.addEventListener('keydown', handleMobileMenuKeydown);
 				}
 			}
 			if (mobileOverlay) {

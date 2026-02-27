@@ -302,10 +302,9 @@
 						if (!isNumeric) continue; // HTML widget selectors handled by WC jQuery fragment refresh below.
 						try {
 							var targets = document.querySelectorAll(selector);
-							// Extract text only — prevents HTML injection in badge values.
-							var temp = document.createElement('div');
-							temp.innerHTML = data.fragments[selector];
-							var text = (temp.textContent || '').trim();
+							// Extract text only — strip HTML tags without innerHTML parsing (CSP safe).
+							var rawHtml = String(data.fragments[selector] || '');
+							var text = rawHtml.replace(/<[^>]*>/g, '').trim();
 							for (var i = 0; i < targets.length; i++) {
 								targets[i].textContent = text;
 							}
