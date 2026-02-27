@@ -3,15 +3,24 @@
 Wraps the existing WordPressClient and WordPressProductSync with @tool-decorated
 functions that follow the DevSkyy MCP tool pattern (content/text responses).
 
-Tools:
-    wp_health_check       — Check WordPress/WooCommerce API connectivity
-    wp_get_products       — List WooCommerce products (filterable by collection)
-    wp_get_orders         — List WooCommerce orders (filterable by status)
-    wp_update_order       — Update a WooCommerce order's status
-    wp_sync_product       — Sync a single product to WooCommerce
-    wp_sync_collection    — Batch sync all products in a collection
-    wp_create_page        — Create a WordPress page
-    wp_upload_media       — Upload an image from URL to the media library
+Tools (WordPress Core — 8):
+    wp_health_check           — Check WordPress/WooCommerce API connectivity
+    wp_get_products           — List WooCommerce products (filterable by collection)
+    wp_get_orders             — List WooCommerce orders (filterable by status)
+    wp_update_order           — Update a WooCommerce order's status
+    wp_sync_product           — Sync a single product to WooCommerce
+    wp_sync_collection        — Batch sync all products in a collection
+    wp_create_page            — Create a WordPress page
+    wp_upload_media           — Upload an image from URL to the media library
+
+Tools (Pipeline Bridge — 7):
+    wp_publish_round_table    — Publish LLM Round Table results as WordPress draft
+    wp_attach_3d_model        — Attach GLB 3D model URL to WooCommerce product meta
+    wp_upload_product_image   — Upload generated image and attach to product gallery
+    wp_publish_social_campaign — Publish social media campaign as WordPress draft
+    wp_update_conversion_data — Push conversion metrics to WooCommerce product meta
+    get_pipeline_status       — Get status of all 9 dashboard pipelines
+    get_product_catalog       — Retrieve SkyyRose product catalog (3 collections)
 """
 
 from __future__ import annotations
@@ -19,11 +28,17 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 from typing import Any
 
-from claude_agent_sdk import tool
+from claude_agent_sdk import create_sdk_mcp_server, tool
 
-from integrations.wordpress_client import APIType, WordPressClient
+from integrations.wordpress_client import (
+    COLLECTION_CONFIG,
+    APIType,
+    SkyyRoseCollection,
+    WordPressClient,
+)
 from integrations.wordpress_com_client import create_wordpress_client
 from integrations.wordpress_product_sync import SkyyRoseProduct, WordPressProductSync
 
@@ -447,3 +462,441 @@ async def wp_upload_media(args: dict[str, Any]) -> dict[str, Any]:
             "content": [{"type": "text", "text": f"Error: {e!s}"}],
             "is_error": True,
         }
+
+
+# ---------------------------------------------------------------------------
+# Pipeline Bridge MCP Tools (7)
+# ---------------------------------------------------------------------------
+
+
+def _slugify(text: str) -> str:
+    """Convert text to a URL-safe slug."""
+    slug = text.lower().strip()
+    slug = re.sub(r"[^\w\s-]", "", slug)
+    slug = re.sub(r"[\s_]+", "-", slug)
+    return re.sub(r"-+", "-", slug).strip("-")
+
+
+@tool(
+    "wp_publish_round_table",
+    "Format LLM Round Table competition results as a WordPress draft blog post with winner highlight and ranked entries",
+    {"title": str, "winner": dict, "entries": list},
+)
+async def wp_publish_round_table(args: dict[str, Any]) -> dict[str, Any]:
+    """Publish LLM Round Table results as a WordPress draft page."""
+    try:
+        client = _get_wp_client()
+        title = args.get("title", "")
+        winner = args.get("winner", {})
+        entries = args.get("entries", [])
+
+        if not title:
+            raise ValueError("'title' is required")
+
+        # Sort entries by score descending
+        sorted_entries = sorted(entries, key=lambda e: e.get("score", 0), reverse=True)
+
+        # Build HTML content
+        html_parts = [
+            '<div class="round-table-results">',
+            f'<h2>Winner: {winner.get("provider", "Unknown")}</h2>',
+            f'<p><strong>Score:</strong> {winner.get("score", 0)}/100</p>',
+            f'<blockquote>{winner.get("response", "")}</blockquote>',
+            "<h3>All Entries</h3>",
+            '<table><thead><tr><th>Rank</th><th>Provider</th><th>Score</th></tr></thead><tbody>',
+        ]
+        for rank, entry in enumerate(sorted_entries, 1):
+            html_parts.append(
+                f'<tr><td>{rank}</td><td>{entry.get("provider", "")}</td>'
+                f'<td>{entry.get("score", 0)}</td></tr>'
+            )
+        html_parts.append("</tbody></table></div>")
+        html = "\n".join(html_parts)
+
+        slug = _slugify(title)
+        result = await client.create_page(
+            title=title,
+            slug=slug,
+            content=html,
+            status="draft",
+        )
+
+        page_id = result.get("id", "unknown")
+        edit_url = result.get("link", f"https://skyyrose.co/?p={page_id}")
+
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": json.dumps(
+                        {
+                            "message": f"Round Table results published as draft",
+                            "page_id": page_id,
+                            "edit_url": edit_url,
+                            "entries_count": len(sorted_entries),
+                        },
+                        indent=2,
+                    ),
+                }
+            ]
+        }
+    except Exception as e:
+        logger.error("wp_publish_round_table failed: %s", e)
+        return {
+            "content": [{"type": "text", "text": f"Error: {e!s}"}],
+            "is_error": True,
+        }
+
+
+@tool(
+    "wp_attach_3d_model",
+    "Attach a GLB 3D model URL to a WooCommerce product custom field (_product_3d_model_url)",
+    {"product_id": int, "glb_url": str},
+)
+async def wp_attach_3d_model(args: dict[str, Any]) -> dict[str, Any]:
+    """Attach a GLB 3D model URL to a WooCommerce product."""
+    try:
+        client = _get_wp_client()
+        product_id = args.get("product_id")
+        glb_url = args.get("glb_url", "")
+
+        if not product_id or not glb_url:
+            raise ValueError("Both 'product_id' and 'glb_url' are required")
+
+        # Use the WC REST API to update product meta
+        url = f"{client.wc_base_url}/products/{product_id}"
+        response = await client._client.put(
+            url,
+            json={"meta_data": [{"key": "_product_3d_model_url", "value": glb_url}]},
+            auth=(client.consumer_key, client.consumer_secret),
+        )
+        response.raise_for_status()
+
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": json.dumps(
+                        {
+                            "message": f"3D model attached to product {product_id}",
+                            "product_id": product_id,
+                            "glb_url": glb_url,
+                        },
+                        indent=2,
+                    ),
+                }
+            ]
+        }
+    except Exception as e:
+        logger.error("wp_attach_3d_model failed: %s", e)
+        return {
+            "content": [{"type": "text", "text": f"Error attaching 3D model: {e!s}"}],
+            "is_error": True,
+        }
+
+
+@tool(
+    "wp_upload_product_image",
+    "Upload a generated image to the WordPress media library and attach it to a product gallery",
+    {"product_id": int, "image_url": str, "alt_text": str},
+)
+async def wp_upload_product_image(args: dict[str, Any]) -> dict[str, Any]:
+    """Upload a generated image and attach it to a WooCommerce product gallery."""
+    try:
+        client = _get_wp_client()
+        product_id = args.get("product_id")
+        image_url = args.get("image_url", "")
+        alt_text = args.get("alt_text", "")
+
+        if not product_id or not image_url:
+            raise ValueError("Both 'product_id' and 'image_url' are required")
+
+        # Upload the image to the media library
+        media = await client.upload_media_from_url(
+            image_url=image_url,
+            title=f"Product {product_id} image",
+            alt_text=alt_text,
+        )
+
+        # Attach the uploaded image to the product gallery via WC API
+        url = f"{client.wc_base_url}/products/{product_id}"
+        response = await client._client.put(
+            url,
+            json={"images": [{"id": media.id, "alt": alt_text}]},
+            auth=(client.consumer_key, client.consumer_secret),
+        )
+        response.raise_for_status()
+
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": json.dumps(
+                        {
+                            "message": f"Image uploaded and attached to product {product_id}",
+                            "media_id": media.id,
+                            "media_url": media.url,
+                            "product_id": product_id,
+                        },
+                        indent=2,
+                    ),
+                }
+            ]
+        }
+    except Exception as e:
+        logger.error("wp_upload_product_image failed: %s", e)
+        return {
+            "content": [{"type": "text", "text": f"Error uploading product image: {e!s}"}],
+            "is_error": True,
+        }
+
+
+@tool(
+    "wp_publish_social_campaign",
+    "Format a social media campaign as a WordPress draft blog post",
+    {"title": str, "platform": str, "content": str, "hashtags": list},
+)
+async def wp_publish_social_campaign(args: dict[str, Any]) -> dict[str, Any]:
+    """Publish a social media campaign as a WordPress draft page."""
+    try:
+        client = _get_wp_client()
+        title = args.get("title", "")
+        platform = args.get("platform", "")
+        content = args.get("content", "")
+        hashtags = args.get("hashtags", [])
+
+        if not title:
+            raise ValueError("'title' is required")
+
+        # Build HTML with platform badge, content, and hashtags
+        hashtag_html = " ".join(f"<span class='hashtag'>#{h}</span>" for h in hashtags)
+        html = (
+            f'<div class="social-campaign">'
+            f'<span class="platform-badge">{platform}</span>'
+            f"<div class=\"campaign-content\">{content}</div>"
+            f'<div class="hashtags">{hashtag_html}</div>'
+            f"</div>"
+        )
+
+        slug = _slugify(f"campaign-{platform}-{title}")
+        result = await client.create_page(
+            title=title,
+            slug=slug,
+            content=html,
+            status="draft",
+        )
+
+        page_id = result.get("id", "unknown")
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": json.dumps(
+                        {
+                            "message": f"Social campaign published as draft",
+                            "page_id": page_id,
+                            "platform": platform,
+                            "hashtags": hashtags,
+                        },
+                        indent=2,
+                    ),
+                }
+            ]
+        }
+    except Exception as e:
+        logger.error("wp_publish_social_campaign failed: %s", e)
+        return {
+            "content": [{"type": "text", "text": f"Error: {e!s}"}],
+            "is_error": True,
+        }
+
+
+@tool(
+    "wp_update_conversion_data",
+    "Push conversion metrics and trending scores to WooCommerce product meta fields",
+    {"product_id": int, "trending_score": float, "funnel_data": dict},
+)
+async def wp_update_conversion_data(args: dict[str, Any]) -> dict[str, Any]:
+    """Push conversion metrics to WooCommerce product meta fields."""
+    try:
+        client = _get_wp_client()
+        product_id = args.get("product_id")
+        trending_score = args.get("trending_score", 0.0)
+        funnel_data = args.get("funnel_data", {})
+
+        if not product_id:
+            raise ValueError("'product_id' is required")
+
+        meta_data = [
+            {"key": "_trending_score", "value": str(trending_score)},
+            {"key": "_funnel_views", "value": str(funnel_data.get("views", 0))},
+            {"key": "_funnel_carts", "value": str(funnel_data.get("carts", 0))},
+            {"key": "_funnel_purchases", "value": str(funnel_data.get("purchases", 0))},
+        ]
+
+        url = f"{client.wc_base_url}/products/{product_id}"
+        response = await client._client.put(
+            url,
+            json={"meta_data": meta_data},
+            auth=(client.consumer_key, client.consumer_secret),
+        )
+        response.raise_for_status()
+
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": json.dumps(
+                        {
+                            "message": f"Conversion data updated for product {product_id}",
+                            "product_id": product_id,
+                            "trending_score": trending_score,
+                            "funnel_data": funnel_data,
+                        },
+                        indent=2,
+                    ),
+                }
+            ]
+        }
+    except Exception as e:
+        logger.error("wp_update_conversion_data failed: %s", e)
+        return {
+            "content": [{"type": "text", "text": f"Error updating conversion data: {e!s}"}],
+            "is_error": True,
+        }
+
+
+@tool(
+    "get_pipeline_status",
+    "Get the current status of all 9 dashboard pipelines",
+    {},
+)
+async def get_pipeline_status(args: dict[str, Any]) -> dict[str, Any]:
+    """Get the current status of all 9 dashboard pipelines."""
+    try:
+        pipelines = [
+            {"name": "LLM Round Table", "status": "active", "description": "Multi-LLM competition engine"},
+            {"name": "3D Pipeline", "status": "active", "description": "GLB model generation (Hunyuan3D/TRELLIS)"},
+            {"name": "Imagery Pipeline", "status": "active", "description": "VTON + avatar generation"},
+            {"name": "Products Pipeline", "status": "active", "description": "WooCommerce product sync"},
+            {"name": "Social Media Pipeline", "status": "active", "description": "Campaign content generation"},
+            {"name": "Conversion Pipeline", "status": "active", "description": "Funnel analytics tracking"},
+            {"name": "Orders Pipeline", "status": "active", "description": "WooCommerce order management"},
+            {"name": "Health Pipeline", "status": "active", "description": "System health monitoring"},
+            {"name": "Pipeline Status", "status": "active", "description": "Meta-pipeline status aggregation"},
+        ]
+
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": json.dumps(
+                        {
+                            "total_pipelines": len(pipelines),
+                            "pipelines": pipelines,
+                        },
+                        indent=2,
+                    ),
+                }
+            ]
+        }
+    except Exception as e:
+        logger.error("get_pipeline_status failed: %s", e)
+        return {
+            "content": [{"type": "text", "text": f"Error: {e!s}"}],
+            "is_error": True,
+        }
+
+
+@tool(
+    "get_product_catalog",
+    "Retrieve the full SkyyRose product catalog (21 products across 3 collections)",
+    {"collection": str},
+)
+async def get_product_catalog(args: dict[str, Any]) -> dict[str, Any]:
+    """Retrieve the SkyyRose product catalog by collection."""
+    try:
+        collection_filter = args.get("collection", "")
+
+        catalog = {}
+        for coll_enum, config in COLLECTION_CONFIG.items():
+            coll_name = coll_enum.value
+            if collection_filter and coll_name != collection_filter:
+                continue
+            catalog[coll_name] = {
+                "name": config["name"],
+                "tagline": config.get("tagline", ""),
+                "color_primary": config.get("color_primary", ""),
+                "experience_page": config.get("experience_page", ""),
+                "catalog_page": config.get("catalog_page", ""),
+                "category_id": config.get("category_id"),
+            }
+
+        if not catalog:
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": json.dumps(
+                            {
+                                "message": f"No collection found matching '{collection_filter}'",
+                                "available": [c.value for c in SkyyRoseCollection],
+                            },
+                            indent=2,
+                        ),
+                    }
+                ]
+            }
+
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": json.dumps(
+                        {
+                            "collections_count": len(catalog),
+                            "collections": catalog,
+                        },
+                        indent=2,
+                    ),
+                }
+            ]
+        }
+    except Exception as e:
+        logger.error("get_product_catalog failed: %s", e)
+        return {
+            "content": [{"type": "text", "text": f"Error: {e!s}"}],
+            "is_error": True,
+        }
+
+
+# ---------------------------------------------------------------------------
+# Factory — creates MCP server with all 15 WordPress Bridge tools
+# ---------------------------------------------------------------------------
+
+
+def create_wordpress_tools():
+    """Create MCP server with all 15 WordPress Bridge tools."""
+    return create_sdk_mcp_server(
+        name="wordpress_bridge",
+        version="1.0.0",
+        tools=[
+            # WordPress Core (8)
+            wp_health_check,
+            wp_get_products,
+            wp_get_orders,
+            wp_update_order,
+            wp_sync_product,
+            wp_sync_collection,
+            wp_create_page,
+            wp_upload_media,
+            # Pipeline Bridge (7)
+            wp_publish_round_table,
+            wp_attach_3d_model,
+            wp_upload_product_image,
+            wp_publish_social_campaign,
+            wp_update_conversion_data,
+            get_pipeline_status,
+            get_product_catalog,
+        ],
+    )
