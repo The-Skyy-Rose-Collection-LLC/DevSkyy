@@ -60,7 +60,7 @@
 							'container'       => false,
 							'fallback_cb'     => 'skyyrose_flagship_nav_fallback',
 							'depth'           => 2,
-							'items_wrap'      => '<ul id="%1$s" class="%2$s" role="menubar">%3$s</ul>',
+							'items_wrap'      => '<ul id="%1$s" class="%2$s">%3$s</ul>',
 						)
 					);
 					?>

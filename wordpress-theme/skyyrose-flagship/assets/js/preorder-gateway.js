@@ -321,6 +321,9 @@
 	function showCartNotification(message) {
 		var container = cartSidebar || document.querySelector('.cart-sidebar');
 		if (!container) return;
+		// Remove any existing notification to prevent DOM accumulation on rapid clicks.
+		var existing = container.querySelector('.cart-notification');
+		if (existing) existing.parentNode.removeChild(existing);
 		// Create a dedicated notification element instead of reusing cart-empty-msg.
 		var el = document.createElement('div');
 		el.className = 'cart-notification';
@@ -769,7 +772,8 @@
 				});
 				// Ensure nonce is included for server-side verification.
 				var nonce = window.skyyRoseData && window.skyyRoseData.nonce;
-				if (nonce && params.join('').indexOf('nonce') === -1) {
+				var hasNonce = params.some(function(p) { return p.indexOf('nonce=') === 0; });
+				if (nonce && !hasNonce) {
 					params.push('nonce=' + encodeURIComponent(nonce));
 				}
 				xhr.send(params.join('&'));

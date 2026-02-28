@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
 <div class="size-guide-modal" id="size-guide-modal"
      role="dialog" aria-modal="true"
      aria-label="<?php esc_attr_e( 'Size & Fit Guide', 'skyyrose-flagship' ); ?>"
-     aria-hidden="true" inert>
+     aria-hidden="true" inert tabindex="-1">
 
 	<div class="size-guide-modal__backdrop"></div>
 

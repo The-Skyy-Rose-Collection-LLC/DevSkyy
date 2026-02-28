@@ -136,7 +136,7 @@ get_header();
 			<!-- Status region for filter announcements (screen readers only) -->
 			<div class="product-grid-status screen-reader-text" role="status" aria-live="polite" aria-atomic="true"></div>
 			<!-- Product Grid -->
-			<div class="product-grid" id="product-grid-panel" role="tabpanel" aria-labelledby="tab-all" aria-label="<?php esc_attr_e( 'Product grid', 'skyyrose-flagship' ); ?>">
+			<div class="product-grid" id="product-grid-panel" aria-label="<?php esc_attr_e( 'Product grid', 'skyyrose-flagship' ); ?>" aria-live="polite">
 				<?php foreach ( $gateway_products as $product ) :
 					$badge_class = 'badge-' . $product['collection'];
 				?>
