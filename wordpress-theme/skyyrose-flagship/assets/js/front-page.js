@@ -227,7 +227,8 @@
 			});
 			// Ensure nonce is included for server-side CSRF verification.
 			var nonce = typeof skyyRoseData !== 'undefined' && skyyRoseData.nonce;
-			if (nonce && params.join('').indexOf('nonce') === -1) {
+			var hasNonce = params.some(function(p) { return p.indexOf('nonce=') === 0; });
+			if (nonce && !hasNonce) {
 				params.push('nonce=' + encodeURIComponent(nonce));
 			}
 			xhr.send(params.join('&'));
