@@ -175,5 +175,48 @@ def train_logs(
         console.print(line)
 
 
+# ── Dataset ─────────────────────────────────────────────────────────────
+
+dataset_app = typer.Typer(help="Dataset management.")
+app.add_typer(dataset_app, name="dataset")
+
+
+@dataset_app.command("info")
+def dataset_info(name: str):
+    """Show dataset info from HuggingFace Hub."""
+    api = HfApi(token=config.get_hf_token())
+    repo_id = f"{config.hf_user}/{name}" if "/" not in name else name
+    info = api.dataset_info(repo_id)
+
+    console.print(f"[bold]{info.id}[/bold]")
+    console.print(f"  Downloads: {info.downloads}")
+    console.print(f"  Files: {len(info.siblings)}")
+
+
+@dataset_app.command("push")
+def dataset_push(
+    source: str = typer.Option(..., help="Local directory with images"),
+    name: str = typer.Option(..., help="Dataset name on Hub"),
+):
+    """Upload a local directory as a HuggingFace dataset."""
+    api = HfApi(token=config.get_hf_token())
+    repo_id = f"{config.hf_user}/{name}" if "/" not in name else name
+    source_path = Path(source)
+
+    if not source_path.exists():
+        console.print(f"[red]Source not found: {source}[/red]")
+        raise typer.Exit(code=1)
+
+    api.create_repo(repo_id, repo_type="dataset", exist_ok=True)
+    api.upload_folder(
+        folder_path=str(source_path),
+        repo_id=repo_id,
+        repo_type="dataset",
+        commit_message="Upload dataset via AI CLI",
+    )
+    console.print(f"[green]Pushed to {repo_id}[/green]")
+    console.print(f"  https://huggingface.co/datasets/{repo_id}")
+
+
 if __name__ == "__main__":
     app()
