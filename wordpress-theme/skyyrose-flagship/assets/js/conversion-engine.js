@@ -282,6 +282,8 @@
 
 			target.appendChild(countdown);
 
+			var countdownTimer = 0;
+
 			function updateCountdown() {
 				var now = Date.now();
 				var diff = Math.max(0, endDate.getTime() - now);
@@ -303,12 +305,16 @@
 					countdown.classList.remove('urgent');
 				}
 
-				if (diff > 0) {
-					requestAnimationFrame(function () {
-						setTimeout(updateCountdown, 1000);
-					});
+				if (diff > 0 && !document.hidden) {
+					countdownTimer = setTimeout(updateCountdown, 1000);
 				}
 			}
+
+			// Pause countdown on hidden tab; resume on visible.
+			document.addEventListener('visibilitychange', function () {
+				clearTimeout(countdownTimer);
+				if (!document.hidden) updateCountdown();
+			});
 
 			updateCountdown();
 		});

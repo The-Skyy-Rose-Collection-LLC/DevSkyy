@@ -302,13 +302,15 @@
 						if (!isNumeric) continue; // HTML widget selectors handled by WC jQuery fragment refresh below.
 						try {
 							var targets = document.querySelectorAll(selector);
-							// Extract text only — strip HTML tags without innerHTML parsing (CSP safe).
+							// Extract text only — strip HTML tags (CSP safe, no DOM execution).
 							var rawHtml = String(data.fragments[selector] || '');
 							var text = rawHtml.replace(/<[^>]*>/g, '').trim();
-							// Decode HTML entities (&nbsp; &amp; etc.) safely via textarea.
-							var decoder = document.createElement('textarea');
-							decoder.innerHTML = text;
-							var decoded = decoder.value;
+							// Decode HTML entities (&nbsp; &amp; etc.) safely via DOMParser (no script execution).
+							var decoded = text;
+							try {
+								var doc = new DOMParser().parseFromString(text, 'text/html');
+								decoded = doc.body.textContent || text;
+							} catch (parseErr) { /* DOMParser unavailable — use raw text */ }
 							for (var i = 0; i < targets.length; i++) {
 								targets[i].textContent = decoded;
 							}
@@ -393,7 +395,11 @@
 				productSku = panel.dataset.currentProductSku;
 			} else if (panel.dataset.currentProductId) {
 				// Fallback: resolve numeric ID to SKU via hotspot data-product-sku attribute.
-				var matchingHotspot = document.querySelector('.hotspot[data-product-id="' + panel.dataset.currentProductId + '"]');
+				// Use CSS.escape() to prevent selector injection from untrusted product IDs.
+				var escapedId = typeof CSS !== 'undefined' && CSS.escape
+					? CSS.escape(panel.dataset.currentProductId)
+					: panel.dataset.currentProductId.replace(/[^\w-]/g, '');
+				var matchingHotspot = document.querySelector('.hotspot[data-product-id="' + escapedId + '"]');
 				productSku = matchingHotspot ? (matchingHotspot.getAttribute('data-product-sku') || '') : '';
 			}
 

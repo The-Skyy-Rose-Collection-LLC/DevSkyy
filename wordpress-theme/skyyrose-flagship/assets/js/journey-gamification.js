@@ -488,7 +488,7 @@
 		}
 
 		function dismiss() {
-			window.removeEventListener('beforeunload', dismiss);
+			window.removeEventListener('pagehide', dismiss);
 			document.removeEventListener('keydown', keyHandler);
 			overlay.classList.remove('jge-visible');
 			setTimeout(function () {
@@ -503,8 +503,9 @@
 			if (e.target === overlay) dismiss();
 		});
 		document.addEventListener('keydown', keyHandler);
-		// Clean up document-level listener if user navigates away while modal is open.
-		window.addEventListener('beforeunload', dismiss);
+		// Clean up document-level listener on page navigation.
+		// Use pagehide instead of beforeunload to preserve bfcache eligibility.
+		window.addEventListener('pagehide', dismiss);
 
 		// Show with animation.
 		requestAnimationFrame(function () {

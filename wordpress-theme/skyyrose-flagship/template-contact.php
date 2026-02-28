@@ -29,15 +29,15 @@ $contact_cards = array(
 		'icon'        => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
 		'title'       => __( 'Email Us', 'skyyrose-flagship' ),
 		'description' => __( 'Drop us a line anytime. We read every message personally.', 'skyyrose-flagship' ),
-		'line_1'      => esc_html( $contact_email ),
+		'line_1'      => $contact_email,
 		'line_2'      => 'press@skyyrose.co',
 	),
 	array(
 		'icon'        => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
 		'title'       => __( 'Visit Our Showroom', 'skyyrose-flagship' ),
 		'description' => __( 'Experience the collections in person by appointment.', 'skyyrose-flagship' ),
-		'line_1'      => esc_html( $showroom_line_1 ),
-		'line_2'      => esc_html( $showroom_line_2 ),
+		'line_1'      => $showroom_line_1,
+		'line_2'      => $showroom_line_2,
 	),
 	array(
 		'icon'        => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
@@ -342,8 +342,9 @@ $faq_items = array(
 								aria-required="true"
 								aria-describedby="contact-subject-error"
 							>
+								<?php $is_first_opt = true; ?>
 								<?php foreach ( $subject_options as $value => $label ) : ?>
-									<option value="<?php echo esc_attr( $value ); ?>">
+									<option value="<?php echo esc_attr( $value ); ?>"<?php if ( $is_first_opt && '' === $value ) { echo ' disabled selected'; $is_first_opt = false; } ?>>
 										<?php echo esc_html( $label ); ?>
 									</option>
 								<?php endforeach; ?>
@@ -440,7 +441,7 @@ $faq_items = array(
 							class="contact-form__select"
 						>
 							<?php foreach ( $referral_options as $value => $label ) : ?>
-								<option value="<?php echo esc_attr( $value ); ?>">
+								<option value="<?php echo esc_attr( $value ); ?>"<?php if ( $is_first_opt && '' === $value ) { echo ' disabled selected'; $is_first_opt = false; } ?>>
 									<?php echo esc_html( $label ); ?>
 								</option>
 							<?php endforeach; ?>

@@ -310,8 +310,8 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 	<!-- ============================================================
 	     EXPLORE OTHER COLLECTIONS
 	     ============================================================ -->
-	<section class="collection-explore fade-in-up">
-		<h2 class="collection-explore__heading">
+	<section class="collection-explore fade-in-up" aria-labelledby="kids-capsule-explore-heading">
+		<h2 id="kids-capsule-explore-heading" class="collection-explore__heading">
 			<?php echo esc_html__( 'Explore Other Collections', 'skyyrose-flagship' ); ?>
 		</h2>
 

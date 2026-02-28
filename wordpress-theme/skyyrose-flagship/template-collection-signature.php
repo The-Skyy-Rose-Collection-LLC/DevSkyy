@@ -255,8 +255,8 @@ $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	<!-- ============================================================
 	     EXPLORE OTHER COLLECTIONS
 	     ============================================================ -->
-	<section class="collection-explore fade-in-up">
-		<h2 class="collection-explore__heading">
+	<section class="collection-explore fade-in-up" aria-labelledby="signature-explore-heading">
+		<h2 id="signature-explore-heading" class="collection-explore__heading">
 			<?php echo esc_html__( 'Explore Other Collections', 'skyyrose-flagship' ); ?>
 		</h2>
 
