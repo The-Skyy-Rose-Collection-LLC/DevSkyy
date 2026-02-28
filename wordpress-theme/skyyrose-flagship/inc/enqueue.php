@@ -639,9 +639,9 @@ function skyyrose_enqueue_model_viewer() {
 	// Google model-viewer web component (type="module").
 	wp_enqueue_script(
 		'google-model-viewer',
-		'https://ajax.googleapis.com/ajax/libs/model-viewer/4.0/model-viewer.min.js',
+		'https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js',
 		array(),
-		'4.0',
+		null,
 		true
 	);
 
@@ -804,10 +804,10 @@ function skyyrose_preload_fonts() {
  * @return array Modified URLs.
  */
 function skyyrose_resource_hints( $urls, $relation_type ) {
-	// Preconnect to Google model-viewer CDN (used on avatar pages).
+	// Preconnect to model-viewer CDN (used on avatar pages).
 	if ( 'preconnect' === $relation_type ) {
 		$urls[] = array(
-			'href'        => 'https://ajax.googleapis.com',
+			'href'        => 'https://cdn.jsdelivr.net',
 			'crossorigin' => 'anonymous',
 		);
 	}

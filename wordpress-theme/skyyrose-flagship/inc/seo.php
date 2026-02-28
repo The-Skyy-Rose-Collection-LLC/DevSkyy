@@ -538,34 +538,28 @@ function skyyrose_meta_description() {
 add_action( 'wp_head', 'skyyrose_meta_description', 1 );
 
 /**
- * Optimize title tags.
+ * Override document title for specific pages.
+ *
+ * Uses `pre_get_document_title` at high priority to override before
+ * Jetpack/WordPress.com SEO modules can interfere. Returning a
+ * non-empty string from this filter makes WordPress use it as-is.
  *
  * @since 1.0.0
+ * @since 3.2.3 Switched from wp_title to pre_get_document_title.
  *
- * @param string $title Document title.
- * @return string Modified title.
+ * @param string $title Pre-filtered document title (empty by default).
+ * @return string Full document title or empty to use default.
  */
-function skyyrose_document_title( $title ) {
-	$separator = '|';
+function skyyrose_pre_document_title( $title ) {
 
-	if ( is_feed() ) {
-		return $title;
-	}
-
-	// Add site name to all pages except front page.
-	if ( ! is_front_page() ) {
-		$title .= " $separator " . get_bloginfo( 'name' );
-	}
-
-	// Add page number if paginated.
-	global $paged;
-	if ( $paged >= 2 ) {
-		$title .= " $separator " . sprintf( __( 'Page %s', 'skyyrose-flagship' ), $paged );
+	// Collections "Shop All" page.
+	if ( is_page( array( 'collections', 9327 ) ) ) {
+		return 'Collections — Shop All | ' . get_bloginfo( 'name' );
 	}
 
 	return $title;
 }
-add_filter( 'wp_title', 'skyyrose_document_title', 10, 2 );
+add_filter( 'pre_get_document_title', 'skyyrose_pre_document_title', 99 );
 
 /**
  * Add XML sitemap support.
