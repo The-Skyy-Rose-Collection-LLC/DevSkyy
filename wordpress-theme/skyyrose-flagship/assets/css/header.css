@@ -288,7 +288,8 @@
 	transition: opacity 0.3s ease, visibility 0.3s;
 }
 
-.search-overlay[aria-hidden="false"] {
+.search-overlay[aria-hidden="false"],
+.search-overlay.open {
 	opacity: 1;
 	visibility: visible;
 }
@@ -383,7 +384,8 @@
 	transition: opacity 0.3s ease;
 }
 
-.mobile-menu[aria-hidden="false"] .mobile-menu__overlay {
+.mobile-menu[aria-hidden="false"] .mobile-menu__overlay,
+.mobile-menu__overlay.open {
 	opacity: 1;
 }
 

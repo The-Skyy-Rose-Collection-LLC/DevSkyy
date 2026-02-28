@@ -179,7 +179,7 @@ $faq_items = array(
 				<?php foreach ( $contact_cards as $card ) : ?>
 					<div class="contact-card">
 						<div class="contact-card__icon" aria-hidden="true">
-							<?php echo $card['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SVG markup. ?>
+							<?php echo wp_kses( $card['icon'], skyyrose_svg_kses_allowed() ); ?>
 						</div>
 						<div class="contact-card__content">
 							<h3 class="contact-card__title">
@@ -215,7 +215,7 @@ $faq_items = array(
 								aria-label="<?php echo esc_attr( sprintf( __( 'Follow SkyyRose on %s', 'skyyrose-flagship' ), $social['name'] ) ); ?>"
 							>
 								<span class="contact-social__link-icon" aria-hidden="true">
-									<?php echo $social['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SVG markup. ?>
+									<?php echo wp_kses( $social['icon'], skyyrose_svg_kses_allowed() ); ?>
 								</span>
 								<span class="contact-social__link-name">
 									<?php echo esc_html( $social['name'] ); ?>

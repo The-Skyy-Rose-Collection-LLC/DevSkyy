@@ -261,15 +261,31 @@ function skyyrose_accessibility_testing_page_content() {
 			<input type="url" id="test-url" value="<?php echo esc_url( home_url( '/' ) ); ?>" style="width: 100%; max-width: 600px; padding: 8px; margin-bottom: 10px;">
 
 			<p>
-				<button type="button" class="button button-primary" onclick="window.open('https://wave.webaim.org/report#/' + document.getElementById('test-url').value, '_blank')">
+				<button type="button" class="button button-primary" data-test-tool="wave">
 					<?php esc_html_e( 'Test with WAVE', 'skyyrose-flagship' ); ?>
 				</button>
-				<button type="button" class="button button-primary" onclick="window.open('https://search.google.com/test/rich-results?url=' + encodeURIComponent(document.getElementById('test-url').value), '_blank')">
+				<button type="button" class="button button-primary" data-test-tool="rich-results">
 					<?php esc_html_e( 'Test Rich Results', 'skyyrose-flagship' ); ?>
 				</button>
-				<button type="button" class="button button-primary" onclick="window.open('https://pagespeed.web.dev/report?url=' + encodeURIComponent(document.getElementById('test-url').value), '_blank')">
+				<button type="button" class="button button-primary" data-test-tool="pagespeed">
 					<?php esc_html_e( 'Test PageSpeed', 'skyyrose-flagship' ); ?>
 				</button>
+				<script>
+				(function() {
+					var urls = {
+						'wave': 'https://wave.webaim.org/report#/',
+						'rich-results': 'https://search.google.com/test/rich-results?url=',
+						'pagespeed': 'https://pagespeed.web.dev/report?url='
+					};
+					document.querySelectorAll('[data-test-tool]').forEach(function(btn) {
+						btn.addEventListener('click', function() {
+							var testUrl = document.getElementById('test-url').value;
+							var tool = this.getAttribute('data-test-tool');
+							window.open(urls[tool] + (tool === 'wave' ? testUrl : encodeURIComponent(testUrl)), '_blank');
+						});
+					});
+				})();
+				</script>
 			</p>
 		</div>
 

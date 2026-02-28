@@ -305,8 +305,12 @@
 							// Extract text only — strip HTML tags without innerHTML parsing (CSP safe).
 							var rawHtml = String(data.fragments[selector] || '');
 							var text = rawHtml.replace(/<[^>]*>/g, '').trim();
+							// Decode HTML entities (&nbsp; &amp; etc.) safely via textarea.
+							var decoder = document.createElement('textarea');
+							decoder.innerHTML = text;
+							var decoded = decoder.value;
 							for (var i = 0; i < targets.length; i++) {
-								targets[i].textContent = text;
+								targets[i].textContent = decoded;
 							}
 						} catch (e) { /* invalid selector — skip */ }
 					}

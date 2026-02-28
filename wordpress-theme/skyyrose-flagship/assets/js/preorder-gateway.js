@@ -573,6 +573,13 @@
 	function initKeyboard() {
 		document.addEventListener('keydown', function (e) {
 			if (e.key === 'Escape') {
+				// Close incentive popup first if open (its own trap only fires when focus is inside).
+				var incOverlay = document.querySelector('.incentive-popup-overlay.open');
+				if (incOverlay) {
+					var incClose = document.querySelector('.incentive-popup-close');
+					if (incClose) incClose.click();
+					return;
+				}
 				closeModal();
 				closeCartPanel();
 				closeSigninPanel();
@@ -901,7 +908,7 @@
 		priceEls.forEach(function (priceEl) {
 			var parent = priceEl.parentNode;
 			if (!parent) return;
-			if (parent.querySelector('.pulse-scarcity-price')) return;
+			if (parent.querySelector('.pulse-scarcity-price, .cie-scarcity')) return;
 
 			// Only show on ~40% of products for realism
 			if (Math.random() > 0.4) return;

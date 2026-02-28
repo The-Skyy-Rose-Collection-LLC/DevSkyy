@@ -52,6 +52,7 @@ $social_stats = array(
 					class="social-proof__number js-counter"
 					data-target="<?php echo esc_attr( $stat['value'] ); ?>"
 					data-suffix="<?php echo esc_attr( $stat['suffix'] ); ?>"
+					aria-label="<?php echo esc_attr( number_format( $stat['value'] ) . $stat['suffix'] ); ?>"
 				>
 					<?php echo esc_html( '0' . $stat['suffix'] ); ?>
 				</span>

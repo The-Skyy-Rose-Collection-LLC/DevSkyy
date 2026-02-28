@@ -335,6 +335,16 @@ function skyyrose_ajax_signin() {
 	$email    = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
 	$password = isset( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : '';
 
+	// Cap password length to prevent bcrypt DoS via multi-MB payloads.
+	if ( strlen( $password ) > 4096 ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Invalid email or password. Please try again.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
+
 	if ( empty( $email ) || empty( $password ) ) {
 		wp_send_json_error(
 			array(
