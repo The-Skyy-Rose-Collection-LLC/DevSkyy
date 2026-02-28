@@ -30,15 +30,15 @@
 	   -------------------------------------------------- */
 
 	var PRODUCTS = [
-		{ name: 'BLACK Rose Sherpa Jacket',       price: '$295', collection: 'Black Rose',  image: 'br-006-sherpa.jpg' },
-		{ name: 'BLACK Rose Quarter Zip Fleece',   price: '$175', collection: 'Black Rose',  image: 'br-005-fleece.jpg' },
-		{ name: 'BLACK Rose Beanie',               price: '$45',  collection: 'Black Rose',  image: 'br-007-beanie.jpg' },
-		{ name: 'Love Hurts Varsity Jacket',       price: '$265', collection: 'Love Hurts',  image: 'lh-004-varsity.jpg' },
-		{ name: 'Love Hurts Joggers',              price: '$95',  collection: 'Love Hurts',  image: 'lh-002-joggers.jpg' },
-		{ name: 'Love Hurts Basketball Shorts',    price: '$75',  collection: 'Love Hurts',  image: 'lh-003-shorts.jpg' },
-		{ name: 'Signature Rose Gold Hoodie',      price: '$185', collection: 'Signature',   image: 'sig-001-hoodie.jpg' },
-		{ name: 'Signature Rose Gold Joggers',     price: '$125', collection: 'Signature',   image: 'sig-003-joggers.jpg' },
-		{ name: 'Signature Premium Tee',           price: '$85',  collection: 'Signature',   image: 'sig-002-tee.jpg' },
+		{ name: 'BLACK Rose Sherpa Jacket',        price: '$95',  collection: 'Black Rose',  image: 'br-006-front-model.webp' },
+		{ name: 'BLACK Rose Hoodie',               price: '$40',  collection: 'Black Rose',  image: 'br-004-front-model.webp' },
+		{ name: 'BLACK Rose Joggers',              price: '$50',  collection: 'Black Rose',  image: 'br-002-front-model.webp' },
+		{ name: 'Love Hurts Joggers',              price: '$95',  collection: 'Love Hurts',  image: 'lh-002-front-model.webp' },
+		{ name: 'Love Hurts Basketball Shorts',    price: '$75',  collection: 'Love Hurts',  image: 'lh-003-front-model.webp' },
+		{ name: 'The Bay Set',                     price: '$195', collection: 'Signature',   image: 'sg-001-front-model.webp' },
+		{ name: 'Mint & Lavender Hoodie',          price: '$45',  collection: 'Signature',   image: 'sg-006-front-model.webp' },
+		{ name: 'Signature Crop Hoodie',           price: '$50',  collection: 'Signature',   image: 'sg-008-front-model.webp' },
+		{ name: 'Stay Golden Tee',                 price: '$65',  collection: 'Signature',   image: 'sg-002-front-model.webp' },
 	];
 
 	var FIRST_NAMES = [

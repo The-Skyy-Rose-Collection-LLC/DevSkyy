@@ -86,9 +86,8 @@ $signature_rooms = array(
 		'image'    => get_template_directory_uri() . '/assets/scenes/signature/signature-golden-gate-showroom.png',
 		'alt'      => esc_attr__( 'Golden Gate Bridge sunset showroom with floor-to-ceiling panoramic windows, black marble interior with gold LED trim, clothing racks, marble pedestals, and dramatic sunset sky', 'skyyrose-flagship' ),
 		'products' => array(
-			// Left wall clothing rack — sg-003 uses sg-012 image (no sg-003 source image available)
+			// Left wall clothing rack
 			skyyrose_immersive_product( 'sg-003', array(
-				'image'      => get_theme_file_uri( 'assets/images/products/sg-012-label-tee-orchid.webp' ),
 				'left'       => '18',
 				'top'        => '38',
 				'prop'       => 'clothing-rack',
