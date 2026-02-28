@@ -469,10 +469,10 @@
 		modal.appendChild(subtext);
 		modal.appendChild(cta);
 		modal.appendChild(dismiss);
-		// WCAG: dialog semantics for screen readers.
-		overlay.setAttribute('role', 'dialog');
-		overlay.setAttribute('aria-modal', 'true');
-		overlay.setAttribute('aria-label', 'Special offer');
+		// WCAG: dialog semantics on the modal element (not the backdrop overlay).
+		modal.setAttribute('role', 'dialog');
+		modal.setAttribute('aria-modal', 'true');
+		modal.setAttribute('aria-label', 'Special offer');
 
 		overlay.appendChild(modal);
 		document.body.appendChild(overlay);

@@ -154,6 +154,28 @@ function skyyrose_enqueue_global_scripts() {
 			)
 		);
 	}
+
+	// Brand Ambassador — Skyy Rose chatbot widget (site-wide).
+	$ambassador_css = SKYYROSE_DIR . '/assets/css/brand-ambassador.css';
+	if ( file_exists( $ambassador_css ) && ! is_admin() ) {
+		wp_enqueue_style(
+			'skyyrose-brand-ambassador',
+			SKYYROSE_ASSETS_URI . '/css/brand-ambassador.css',
+			array(),
+			SKYYROSE_VERSION
+		);
+	}
+
+	$ambassador_js = SKYYROSE_DIR . '/assets/js/brand-ambassador.js';
+	if ( file_exists( $ambassador_js ) && ! is_admin() ) {
+		wp_enqueue_script(
+			'skyyrose-brand-ambassador',
+			SKYYROSE_ASSETS_URI . '/js/brand-ambassador.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
 }
 
 /**
@@ -241,6 +263,7 @@ function skyyrose_get_current_template_slug() {
 			'template-contact.php'                 => 'contact',
 			'template-preorder-gateway.php'        => 'preorder-gateway',
 			'template-homepage-luxury.php'         => 'front-page',
+			'template-style-quiz.php'              => 'style-quiz',
 			'skyyrose-canvas.php'                  => 'collections-shop',
 		);
 
@@ -279,6 +302,7 @@ function skyyrose_enqueue_template_styles() {
 		'about'           => 'about.css',
 		'contact'         => 'contact.css',
 		'preorder-gateway'  => 'preorder-gateway.css',
+		'style-quiz'       => 'style-quiz.css',
 		'collections-shop' => 'collections-shop.css',
 		'404'              => '404.css',
 	);
@@ -364,6 +388,7 @@ function skyyrose_enqueue_template_scripts() {
 		'checkout'         => 'woocommerce.js',
 		'contact'          => 'contact.js',
 		'preorder-gateway'  => 'preorder-gateway.js',
+		'style-quiz'       => 'style-quiz.js',
 		'collections-shop' => 'collections-shop.js',
 	);
 
@@ -397,6 +422,31 @@ function skyyrose_enqueue_template_scripts() {
 					'cartUrl'     => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
 				)
 			);
+		}
+
+		// Enqueue immersive WooCommerce bridge + localize skyyRoseImmersive data.
+		if ( 'immersive' === $slug ) {
+			$bridge_path = $base_js_dir . '/immersive-wc-bridge.js';
+			if ( file_exists( $bridge_path ) ) {
+				wp_enqueue_script(
+					'skyyrose-immersive-wc-bridge',
+					$base_js_uri . '/immersive-wc-bridge.js',
+					array( $handle ),
+					SKYYROSE_VERSION,
+					true
+				);
+
+				wp_localize_script(
+					'skyyrose-immersive-wc-bridge',
+					'skyyRoseImmersive',
+					array(
+						'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
+						'nonce'    => wp_create_nonce( 'skyyrose-immersive-nonce' ),
+						'wcActive' => class_exists( 'WooCommerce' ),
+						'cartUrl'  => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
+					)
+				);
+			}
 		}
 	}
 }
@@ -663,6 +713,46 @@ function skyyrose_enqueue_analytics_beacon() {
 }
 
 /**
+ * Enqueue Size & Fit Guide — Interactive Size Chart Modal.
+ *
+ * Loads the size guide CSS and JS on collection and pre-order pages.
+ * The modal HTML is included via get_template_part() in the templates.
+ *
+ * @since 3.10.0
+ * @return void
+ */
+function skyyrose_enqueue_size_guide() {
+
+	$slug            = skyyrose_get_current_template_slug();
+	$size_guide_slugs = array( 'collection', 'preorder-gateway', 'single-product' );
+
+	if ( ! in_array( $slug, $size_guide_slugs, true ) ) {
+		return;
+	}
+
+	$css_path = SKYYROSE_DIR . '/assets/css/size-guide.css';
+	if ( file_exists( $css_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-size-guide',
+			SKYYROSE_ASSETS_URI . '/css/size-guide.css',
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	$js_path = SKYYROSE_DIR . '/assets/js/size-guide.js';
+	if ( file_exists( $js_path ) ) {
+		wp_enqueue_script(
+			'skyyrose-size-guide',
+			SKYYROSE_ASSETS_URI . '/js/size-guide.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+}
+
+/**
  * Dequeue WooCommerce default styles that conflict with theme design.
  *
  * WooCommerce loads 3 default stylesheets. We remove the general and
@@ -780,6 +870,9 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-velocity-scroll',
 		'skyyrose-analytics-beacon',
 		'skyyrose-immersive-wc-bridge',
+		'skyyrose-size-guide',
+		'skyyrose-template-style-quiz',
+		'skyyrose-brand-ambassador',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) && strpos( $tag, ' defer' ) === false ) {
@@ -869,6 +962,9 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_model_viewer', 28 );
 
 // Model Viewer — type="module" attribute for ES module loading.
 add_filter( 'script_loader_tag', 'skyyrose_model_viewer_module_type', 10, 2 );
+
+// Size Guide modal on collection + preorder + single product pages.
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_size_guide', 30 );
 
 // Cross-Sell Engine — only on immersive pages (lightweight, high ROI).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_cross_sell_engine', 40 );
