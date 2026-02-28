@@ -10,6 +10,7 @@ from rich.console import Console
 from rich.table import Table
 
 from scripts.ai_config import AIConfig
+from scripts.ai_providers import PROVIDERS
 
 app = typer.Typer(name="ai", help="SkyyRose AI CLI — train, manage, deploy.")
 spaces_app = typer.Typer(help="HuggingFace Spaces management.")
@@ -105,6 +106,73 @@ def spaces_deploy(name: str):
 
     console.print(f"[green]Deployed to {repo_id}[/green]")
     console.print(f"  https://huggingface.co/spaces/{repo_id}")
+
+
+# ── Train ───────────────────────────────────────────────────────────────
+
+train_app = typer.Typer(help="Training orchestration.")
+app.add_typer(train_app, name="train")
+
+
+@train_app.command("run")
+def train_run(
+    provider: str = typer.Option("replicate", help="Provider: replicate or hf"),
+    steps: int = typer.Option(None, help="Training steps (default: from config)"),
+    gpu: str = typer.Option(None, help="GPU type for HF (default: t4-medium)"),
+):
+    """Start LoRA training run."""
+    if provider not in PROVIDERS:
+        console.print(f"[red]Unknown provider: {provider}. Use 'replicate' or 'hf'.[/red]")
+        raise typer.Exit(code=1)
+
+    run_config = AIConfig(
+        steps=steps or config.steps,
+        default_gpu=gpu or config.default_gpu,
+    )
+
+    console.print(f"[bold]Starting training via {provider}...[/bold]")
+    console.print(f"  Steps: {run_config.steps}")
+    console.print(f"  Dataset: {run_config.dataset}")
+
+    job_id = PROVIDERS[provider].start_training(run_config)
+    console.print(f"[green]Training started! Job: {job_id}[/green]")
+
+
+@train_app.command("status")
+def train_status(
+    provider: str = typer.Option("replicate", help="Provider: replicate or hf"),
+    job_id: str = typer.Option(None, help="Job ID (required for Replicate)"),
+):
+    """Check training status."""
+    if provider not in PROVIDERS:
+        console.print(f"[red]Unknown provider: {provider}[/red]")
+        raise typer.Exit(code=1)
+
+    check_id = job_id or config.trainer_space
+    status = PROVIDERS[provider].get_status(check_id)
+
+    console.print(f"[bold]Training Status ({provider})[/bold]")
+    for key, value in status.items():
+        if key != "logs":
+            console.print(f"  {key}: {value}")
+
+    if "logs" in status and status["logs"]:
+        console.print(f"\n[dim]Last log:[/dim] {status['logs'][-200:]}")
+
+
+@train_app.command("logs")
+def train_logs(
+    provider: str = typer.Option("replicate", help="Provider: replicate or hf"),
+    job_id: str = typer.Option(None, help="Job ID"),
+):
+    """Stream training logs."""
+    if provider not in PROVIDERS:
+        console.print(f"[red]Unknown provider: {provider}[/red]")
+        raise typer.Exit(code=1)
+
+    check_id = job_id or config.trainer_space
+    for line in PROVIDERS[provider].get_logs(check_id):
+        console.print(line)
 
 
 if __name__ == "__main__":
