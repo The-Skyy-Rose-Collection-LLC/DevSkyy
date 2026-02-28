@@ -111,7 +111,7 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 				<?php echo esc_html__( 'Playful Luxury for Growing Stars', 'skyyrose-flagship' ); ?>
 			</p>
 
-			<a href="#products" class="collection-hero__cta">
+			<a href="#kids-capsule-products" class="collection-hero__cta">
 				<?php echo esc_html__( 'Shop for Kids', 'skyyrose-flagship' ); ?>
 			</a>
 		</div>
@@ -122,7 +122,7 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 	<!-- ============================================================
 	     BRAND MASCOT — PRIMARY MASCOT PLACEMENT
 	     ============================================================ -->
-	<section class="collection-mascot" id="mascot" aria-label="<?php esc_attr_e( 'Meet Our SkyyRose Mascot', 'skyyrose-flagship' ); ?>">
+	<section class="collection-mascot" id="kids-capsule-mascot" aria-label="<?php esc_attr_e( 'Meet Our SkyyRose Mascot', 'skyyrose-flagship' ); ?>">
 		<div class="collection-mascot__inner fade-in-up">
 			<div class="collection-mascot__image-wrap">
 				<?php
@@ -156,7 +156,7 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 				<p class="collection-mascot__text">
 					<?php echo esc_html__( 'Our SkyyRose mascot is here to help you explore the Kids Capsule collection. She wears every piece with confidence and style — just like your little one will!', 'skyyrose-flagship' ); ?>
 				</p>
-				<a href="#products" class="collection-mascot__cta">
+				<a href="#kids-capsule-products" class="collection-mascot__cta">
 					<?php echo esc_html__( 'Explore Her Favorites', 'skyyrose-flagship' ); ?> &rarr;
 				</a>
 			</div>
@@ -166,13 +166,13 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 	<!-- ============================================================
 	     COLLECTION STORY
 	     ============================================================ -->
-	<section class="collection-story" id="story" aria-labelledby="story-heading">
+	<section class="collection-story" id="kids-capsule-story" aria-labelledby="kids-capsule-story-heading">
 		<div class="collection-story__inner fade-in-up">
 			<span class="collection-story__label">
 				<?php echo esc_html__( 'The Story', 'skyyrose-flagship' ); ?>
 			</span>
 
-			<h2 id="story-heading" class="collection-story__heading">
+			<h2 id="kids-capsule-story-heading" class="collection-story__heading">
 				<?php echo esc_html__( 'Where Fun Meets Fashion', 'skyyrose-flagship' ); ?>
 			</h2>
 
@@ -191,7 +191,7 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 	<!-- ============================================================
 	     PRODUCT GRID
 	     ============================================================ -->
-	<section id="products" class="collection-products" aria-labelledby="kids-products-heading">
+	<section id="kids-capsule-products" class="collection-products" aria-labelledby="kids-products-heading">
 		<div class="collection-products__header fade-in-up">
 			<span class="collection-products__label">
 				<?php esc_html_e( 'The Collection', 'skyyrose-flagship' ); ?>
@@ -263,6 +263,12 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 				</a>
 			<?php endforeach; ?>
 		</div>
+		<div style="text-align:center; padding:1rem 0 0;">
+			<button class="size-guide-trigger" data-open-size-guide aria-label="<?php esc_attr_e( 'Open size guide', 'skyyrose-flagship' ); ?>">
+				<svg class="size-guide-trigger__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2v20M18 2v20M6 12h12M6 7h12M6 17h12"/></svg>
+				<?php esc_html_e( 'Size Guide', 'skyyrose-flagship' ); ?>
+			</button>
+		</div>
 	</section>
 
 	<!-- ============================================================
@@ -273,7 +279,7 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 	<div data-cie-confidence></div>
 	<div data-cie-preorder-progress style="max-width:480px; margin:0 auto; padding:1rem 2rem;"></div>
 
-	<section class="collection-preorder-cta">
+	<section class="collection-preorder-cta" aria-label="<?php esc_attr_e( 'Pre-order call to action', 'skyyrose-flagship' ); ?>">
 		<div data-cie-countdown="auto" data-cie-countdown-label="<?php esc_attr_e( 'Pre-Order Window', 'skyyrose-flagship' ); ?>" style="display:flex; justify-content:center; margin-bottom:1.5rem;"></div>
 		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"
 		   class="collection-preorder-cta__btn">
@@ -333,7 +339,8 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 				$skyyrose_link = home_url( '/' . $skyyrose_col['slug'] . '/' );
 				?>
 				<a href="<?php echo esc_url( $skyyrose_link ); ?>"
-				   class="collection-explore__link">
+				   class="collection-explore__link"
+				   aria-label="<?php echo esc_attr( sprintf( __( 'Explore the %s collection', 'skyyrose-flagship' ), $skyyrose_col['name'] ) ); ?>">
 					<span class="collection-explore__link-name">
 						<?php echo esc_html( $skyyrose_col['name'] ); ?>
 					</span>
@@ -346,6 +353,9 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 	</section>
 
 </div><!-- .collection--kids-capsule -->
+
+<?php get_template_part( 'template-parts/size-guide-modal' ); ?>
+
 </main><!-- #primary -->
 
 <?php get_footer(); ?>

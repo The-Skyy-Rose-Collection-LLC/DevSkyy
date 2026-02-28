@@ -23,7 +23,7 @@ defined( 'ABSPATH' ) || exit;
 
 	<div class="size-guide-modal__content">
 
-		<button class="size-guide-modal__close"
+		<button type="button" class="size-guide-modal__close"
 		        aria-label="<?php esc_attr_e( 'Close size guide', 'skyyrose-flagship' ); ?>">&times;</button>
 
 		<h2 class="size-guide-modal__title">
@@ -161,7 +161,7 @@ defined( 'ABSPATH' ) || exit;
 				<span class="size-guide-fit-note__badge" style="--note-accent: var(--color-primary, #B76E79)">
 					<?php esc_html_e( 'Signature', 'skyyrose-flagship' ); ?>
 				</span>
-				<p><?php esc_html_e( 'True to size. Classic streetwear fit \u2014 relaxed through the body with a modern taper. Order your usual size.', 'skyyrose-flagship' ); ?></p>
+				<p><?php esc_html_e( 'True to size. Classic streetwear fit — relaxed through the body with a modern taper. Order your usual size.', 'skyyrose-flagship' ); ?></p>
 			</div>
 
 			<div class="size-guide-fit-note" data-collection="black-rose">

@@ -600,3 +600,43 @@
 .skyy-single-product .star-rating span::before {
 	color: var(--skyy-woo-gold);
 }
+
+/* ==================================================
+   PRE-ORDER NOTICE (single product page)
+   ================================================== */
+.skyyrose-preorder-notice {
+	background: linear-gradient(135deg, var(--skyy-woo-bg, #1a1a1a), #2a1a1f);
+	border: 1px solid var(--skyy-woo-accent, #B76E79);
+	border-radius: 12px;
+	padding: 16px 20px;
+	margin: 16px 0;
+}
+
+.skyyrose-preorder-notice__badge {
+	display: inline-block;
+	background: var(--skyy-woo-accent, #B76E79);
+	color: #fff;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	padding: 4px 10px;
+	border-radius: 4px;
+	margin-bottom: 8px;
+}
+
+.skyyrose-preorder-notice__detail {
+	color: #ccc;
+	font-size: 13px;
+	margin-top: 6px;
+}
+
+.skyyrose-preorder-notice__detail strong {
+	color: var(--skyy-woo-accent, #B76E79);
+}
+
+.skyyrose-preorder-notice__ship-date {
+	color: #999;
+	font-size: 12px;
+	margin-top: 4px;
+}

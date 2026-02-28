@@ -775,8 +775,10 @@
 	}
 
 	function buildCrossSellStrip(container, products) {
-		// Clear any existing content.
-		container.innerHTML = '';
+		// Clear any existing content via safe removeChild loop.
+		while (container.firstChild) {
+			container.removeChild(container.firstChild);
+		}
 
 		var wrapper = document.createElement('div');
 		wrapper.className = 'jge-crosssell';

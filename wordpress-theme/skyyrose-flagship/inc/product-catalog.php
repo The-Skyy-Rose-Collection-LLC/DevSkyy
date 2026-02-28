@@ -472,6 +472,7 @@ function skyyrose_get_product_catalog() {
  * @return array|null  Product data array or null if not found.
  */
 function skyyrose_get_product( $sku ) {
+	$sku     = sanitize_key( $sku );
 	$catalog = skyyrose_get_product_catalog();
 	return isset( $catalog[ $sku ] ) ? $catalog[ $sku ] : null;
 }
@@ -484,7 +485,8 @@ function skyyrose_get_product( $sku ) {
  * @return array  Array of product data arrays for the collection.
  */
 function skyyrose_get_collection_products( $collection ) {
-	$catalog  = skyyrose_get_product_catalog();
+	$collection = sanitize_key( $collection );
+	$catalog    = skyyrose_get_product_catalog();
 	$products = array();
 
 	foreach ( $catalog as $product ) {
