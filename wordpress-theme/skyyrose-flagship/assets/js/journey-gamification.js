@@ -92,16 +92,15 @@
 		'signature': [
 			{ sku: 'sg-001-tee',    name: 'The Bay Set \u2014 Tee',       price: '$40',   image: '', url: '/pre-order/#sg-001-tee' },
 			{ sku: 'sg-001-shorts',  name: 'The Bay Set \u2014 Shorts',    price: '$50',   image: '', url: '/pre-order/#sg-001-shorts' },
-			{ sku: 'sg-002-tee',    name: 'Stay Golden Set \u2014 Tee',   price: '$40',   image: '', url: '/pre-order/#sg-002-tee' },
-			{ sku: 'sg-002-shorts',  name: 'Stay Golden Set \u2014 Shorts', price: '$50',   image: '', url: '/pre-order/#sg-002-shorts' },
+			{ sku: 'sg-002', name: 'Stay Golden Tee',   price: '$40',   image: '', url: '/pre-order/#sg-002' },
 			{ sku: 'sg-003', name: 'The Signature Tee (Orchid)',           price: '$15',   image: '', url: '/pre-order/#sg-003' },
 			{ sku: 'sg-005', name: 'Stay Golden Tee',                     price: '$40',   image: '', url: '/pre-order/#sg-005' },
 			{ sku: 'sg-006', name: 'Mint & Lavender Hoodie',              price: '$45',   image: '', url: '/pre-order/#sg-006' },
 			{ sku: 'sg-007', name: 'The Signature Beanie',                price: '$25',   image: '', url: '/pre-order/#sg-007' },
 			{ sku: 'sg-009', name: 'The Sherpa Jacket',                   price: '$80',   image: '', url: '/pre-order/#sg-009' },
 			{ sku: 'sg-010', name: 'The Bridge Series Shorts',            price: '$25',   image: '', url: '/pre-order/#sg-010' },
-			{ sku: 'sg-011', name: 'Original Label Tee (White)',          price: 'DRAFT', image: '', url: '/pre-order/#sg-011' },
-			{ sku: 'sg-012', name: 'Original Label Tee (Orchid)',         price: 'DRAFT', image: '', url: '/pre-order/#sg-012' },
+			{ sku: 'sg-011', name: 'Original Label Tee (White)',          price: '$30', image: '', url: '/pre-order/#sg-011' },
+			{ sku: 'sg-012', name: 'Original Label Tee (Orchid)',         price: '$30', image: '', url: '/pre-order/#sg-012' },
 		],
 	};
 
