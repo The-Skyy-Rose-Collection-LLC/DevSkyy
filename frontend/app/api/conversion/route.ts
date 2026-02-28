@@ -286,8 +286,29 @@ function aggregateMetrics(): AggregatedMetrics {
 }
 
 // ---------------------------------------------------------------------------
+// CORS helpers
+// ---------------------------------------------------------------------------
+
+const ALLOWED_ORIGINS = ['https://skyyrose.co', 'https://www.skyyrose.co'];
+
+function corsHeaders(request?: NextRequest): HeadersInit {
+  const origin = request?.headers.get('origin') ?? '';
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'X-Requested-With, Content-Type, Authorization',
+    'Access-Control-Allow-Credentials': 'true',
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Route handlers
 // ---------------------------------------------------------------------------
+
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, { status: 204, headers: corsHeaders(request) });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -296,7 +317,7 @@ export async function POST(request: NextRequest) {
     if (!Array.isArray(body.events) || body.events.length === 0) {
       return NextResponse.json(
         { success: false, error: 'events array is required' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders(request) }
       );
     }
 
@@ -304,7 +325,7 @@ export async function POST(request: NextRequest) {
     if (body.events.length > 500) {
       return NextResponse.json(
         { success: false, error: 'Maximum 500 events per batch' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders(request) }
       );
     }
 
@@ -328,33 +349,31 @@ export async function POST(request: NextRequest) {
 
     addEvents(validated);
 
-    return NextResponse.json({
-      success: true,
-      accepted: validated.length,
-      total_stored: events.length,
-    });
+    return NextResponse.json(
+      { success: true, accepted: validated.length, total_stored: events.length },
+      { headers: corsHeaders(request) }
+    );
   } catch (error) {
     if (error instanceof SyntaxError) {
       return NextResponse.json(
         { success: false, error: 'Invalid JSON' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders(request) }
       );
     }
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders(request) }
     );
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const metrics = aggregateMetrics();
-    return NextResponse.json({
-      success: true,
-      timestamp: new Date().toISOString(),
-      metrics,
-    });
+    return NextResponse.json(
+      { success: true, timestamp: new Date().toISOString(), metrics },
+      { headers: corsHeaders(request) }
+    );
   } catch {
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
