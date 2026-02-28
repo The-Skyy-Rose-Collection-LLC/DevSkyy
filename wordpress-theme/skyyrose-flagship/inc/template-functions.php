@@ -594,6 +594,45 @@ function skyyrose_svg_icon( $name ) {
 }
 
 /*--------------------------------------------------------------
+ * SVG Sanitization
+ *--------------------------------------------------------------*/
+
+/**
+ * Get wp_kses-safe allowlist for inline SVG icons.
+ *
+ * Use with wp_kses() to sanitize SVG markup in templates:
+ *     echo wp_kses( $icon_svg, skyyrose_svg_kses_allowed() );
+ *
+ * @since 3.2.3
+ * @return array Allowed HTML tags and attributes for SVG elements.
+ */
+function skyyrose_svg_kses_allowed() {
+	return array(
+		'svg'      => array(
+			'width'           => true,
+			'height'          => true,
+			'viewbox'         => true,
+			'fill'            => true,
+			'stroke'          => true,
+			'stroke-width'    => true,
+			'stroke-linecap'  => true,
+			'stroke-linejoin' => true,
+			'class'           => true,
+			'aria-hidden'     => true,
+			'focusable'       => true,
+			'role'            => true,
+			'xmlns'           => true,
+		),
+		'path'     => array( 'd' => true, 'fill' => true, 'stroke' => true ),
+		'circle'   => array( 'cx' => true, 'cy' => true, 'r' => true, 'fill' => true ),
+		'line'     => array( 'x1' => true, 'y1' => true, 'x2' => true, 'y2' => true ),
+		'polyline' => array( 'points' => true ),
+		'polygon'  => array( 'points' => true ),
+		'rect'     => array( 'x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true ),
+	);
+}
+
+/*--------------------------------------------------------------
  * Social Media Links (Single Source of Truth)
  *--------------------------------------------------------------*/
 

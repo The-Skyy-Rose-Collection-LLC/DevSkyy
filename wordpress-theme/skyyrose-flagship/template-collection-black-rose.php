@@ -115,7 +115,7 @@ $skyyrose_br_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 			<?php echo esc_html__( 'Where Darkness Blooms', 'skyyrose-flagship' ); ?>
 		</p>
 
-		<a href="#products" class="collection-hero__cta">
+		<a href="#black-rose-products" class="collection-hero__cta">
 			<?php echo esc_html__( 'Explore Collection', 'skyyrose-flagship' ); ?>
 		</a>
 	</section>
@@ -123,8 +123,8 @@ $skyyrose_br_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	<!-- ============================================================
 	     COLLECTION STORY
 	     ============================================================ -->
-	<section class="collection-story" id="story" aria-labelledby="story-heading">
-		<h2 id="story-heading" class="screen-reader-text"><?php esc_html_e( 'Collection Story', 'skyyrose-flagship' ); ?></h2>
+	<section class="collection-story" id="black-rose-story" aria-labelledby="black-rose-story-heading">
+		<h2 id="black-rose-story-heading" class="screen-reader-text"><?php esc_html_e( 'Collection Story', 'skyyrose-flagship' ); ?></h2>
 		<p class="collection-story__text">
 			<?php echo esc_html__( 'Born from moonlit gardens and shadowed cathedrals, the Black Rose collection is an ode to those who find beauty in the dark. Each piece is woven with gothic elegance — deep blacks punctuated by silver moonlight accents, roses that bloom only after midnight. This is not fashion for the faint of heart. It is armor for the bold, the defiant, the eternally romantic.', 'skyyrose-flagship' ); ?>
 		</p>
@@ -133,8 +133,8 @@ $skyyrose_br_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	<!-- ============================================================
 	     PRODUCT GRID
 	     ============================================================ -->
-	<section id="products" class="collection-products" aria-labelledby="products-heading">
-		<h2 id="products-heading" class="screen-reader-text">
+	<section id="black-rose-products" class="collection-products" aria-labelledby="black-rose-products-heading">
+		<h2 id="black-rose-products-heading" class="screen-reader-text">
 			<?php echo esc_html__( 'Black Rose Products', 'skyyrose-flagship' ); ?>
 		</h2>
 		<div class="collection-grid">
@@ -193,7 +193,7 @@ $skyyrose_br_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	<!-- ============================================================
 	     IMMERSIVE CTA
 	     ============================================================ -->
-	<section class="collection-immersive-cta">
+	<section class="collection-immersive-cta" aria-label="<?php esc_attr_e( 'Immersive 3D experience', 'skyyrose-flagship' ); ?>">
 		<a href="<?php echo esc_url( home_url( '/experience-black-rose/' ) ); ?>"
 		   class="collection-immersive-cta__link"
 		   aria-label="<?php esc_attr_e( 'Enter the Black Rose 3D Experience', 'skyyrose-flagship' ); ?>">
@@ -211,7 +211,7 @@ $skyyrose_br_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	<!-- ============================================================
 	     PRE-ORDER CTA
 	     ============================================================ -->
-	<section class="collection-preorder-cta">
+	<section class="collection-preorder-cta" aria-label="<?php esc_attr_e( 'Pre-order call to action', 'skyyrose-flagship' ); ?>">
 		<div data-cie-countdown="auto" data-cie-countdown-label="<?php esc_attr_e( 'Pre-Order Window', 'skyyrose-flagship' ); ?>" style="display:flex; justify-content:center; margin-bottom:1.5rem;"></div>
 		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"
 		   class="collection-preorder-cta__btn">
@@ -251,7 +251,8 @@ $skyyrose_br_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 				$skyyrose_link = home_url( '/' . $skyyrose_col['slug'] . '/' );
 				?>
 				<a href="<?php echo esc_url( $skyyrose_link ); ?>"
-				   class="collection-explore__link">
+				   class="collection-explore__link"
+				   aria-label="<?php echo esc_attr( sprintf( __( 'Explore the %s collection', 'skyyrose-flagship' ), $skyyrose_col['name'] ) ); ?>">
 					<span class="collection-explore__link-name">
 						<?php echo esc_html( $skyyrose_col['name'] ); ?>
 					</span>

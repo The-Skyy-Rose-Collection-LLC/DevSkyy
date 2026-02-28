@@ -45,6 +45,9 @@
 
 	// Track all intervals for potential cleanup.
 	var cleanupIntervals = [];
+	// Track per-element intervals to prevent duplicates on tab visibility resume.
+	var viewerIntervalMap = new Map();
+	var roomViewerInterval = null;
 
 	/* --------------------------------------------------
 	   Utility
@@ -205,6 +208,11 @@
 				target.appendChild(viewer);
 			}
 
+			// Clear any existing interval for this target before creating a new one.
+			if (viewerIntervalMap.has(target)) {
+				clearInterval(viewerIntervalMap.get(target));
+			}
+
 			// Update periodically — store reference for cleanup.
 			var viewerInt = setInterval(function () {
 				var delta = randomInt(-3, 4);
@@ -217,6 +225,7 @@
 					}, 300);
 				}
 			}, CONFIG.viewerUpdateInterval);
+			viewerIntervalMap.set(target, viewerInt);
 			cleanupIntervals.push(viewerInt);
 		});
 	}
@@ -314,6 +323,8 @@
 		if (targets.length === 0) return;
 
 		targets.forEach(function (target) {
+			// Prevent duplicate scarcity widgets from gateway + CIE running on the same card.
+			if (target.querySelector('.cie-scarcity, .pulse-scarcity-price')) return;
 			var sku = target.dataset.cieStock;
 			var maxStock = parseInt(target.dataset.cieStockMax, 10) || 50;
 			var remaining = CONFIG.stockLevels[sku] || randomInt(3, 20);
@@ -602,6 +613,11 @@
 			scene.appendChild(roomViewers);
 		}
 
+		// Clear any existing room interval before creating a new one.
+		if (roomViewerInterval) {
+			clearInterval(roomViewerInterval);
+		}
+
 		// Update periodically — store reference for cleanup.
 		var roomInt = setInterval(function () {
 			var delta = randomInt(-2, 3);
@@ -611,6 +627,7 @@
 			}
 			roomViewers.appendChild(document.createTextNode(' ' + count + ' exploring right now'));
 		}, CONFIG.viewerUpdateInterval);
+		roomViewerInterval = roomInt;
 		cleanupIntervals.push(roomInt);
 	}
 

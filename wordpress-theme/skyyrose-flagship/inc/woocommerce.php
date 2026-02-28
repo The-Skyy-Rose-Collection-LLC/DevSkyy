@@ -638,23 +638,23 @@ function skyyrose_preorder_single_product_notice() {
 	$ship_date    = get_post_meta( $product->get_id(), '_preorder_ship_date', true );
 	$preorder_px  = get_post_meta( $product->get_id(), '_preorder_price', true );
 
-	echo '<div class="skyyrose-preorder-notice" style="background:linear-gradient(135deg,#1a1a1a,#2a1a1f);border:1px solid #B76E79;border-radius:12px;padding:16px 20px;margin:16px 0;">';
-	echo '<span style="display:inline-block;background:#B76E79;color:#fff;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:4px;margin-bottom:8px;">Pre-Order</span>';
+	echo '<div class="skyyrose-preorder-notice">';
+	echo '<span class="skyyrose-preorder-notice__badge">' . esc_html__( 'Pre-Order', 'skyyrose-flagship' ) . '</span>';
 
 	if ( $edition_size ) {
-		echo '<div style="color:#ccc;font-size:13px;margin-top:6px;">Limited Edition — <strong style="color:#B76E79;">' . esc_html( $edition_size ) . ' pieces</strong>';
+		echo '<div class="skyyrose-preorder-notice__detail">' . esc_html__( 'Limited Edition', 'skyyrose-flagship' ) . ' — <strong>' . esc_html( $edition_size ) . ' ' . esc_html__( 'pieces', 'skyyrose-flagship' ) . '</strong>';
 		if ( $available ) {
-			echo ' · <strong>' . esc_html( $available ) . ' remaining</strong>';
+			echo ' · <strong>' . esc_html( $available ) . ' ' . esc_html__( 'remaining', 'skyyrose-flagship' ) . '</strong>';
 		}
 		echo '</div>';
 	}
 
 	if ( $preorder_px ) {
-		echo '<div style="color:#ccc;font-size:13px;margin-top:4px;">Early Access Price: <strong style="color:#B76E79;">$' . esc_html( $preorder_px ) . '</strong></div>';
+		echo '<div class="skyyrose-preorder-notice__detail">' . esc_html__( 'Early Access Price:', 'skyyrose-flagship' ) . ' <strong>' . esc_html( get_woocommerce_currency_symbol() ) . esc_html( $preorder_px ) . '</strong></div>';
 	}
 
 	if ( $ship_date ) {
-		echo '<div style="color:#999;font-size:12px;margin-top:4px;">Expected Ship Date: ' . esc_html( date_i18n( 'F j, Y', strtotime( $ship_date ) ) ) . '</div>';
+		echo '<div class="skyyrose-preorder-notice__ship-date">' . esc_html__( 'Expected Ship Date:', 'skyyrose-flagship' ) . ' ' . esc_html( date_i18n( 'F j, Y', strtotime( $ship_date ) ) ) . '</div>';
 	}
 
 	echo '</div>';

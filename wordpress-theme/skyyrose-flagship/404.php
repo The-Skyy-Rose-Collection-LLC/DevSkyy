@@ -118,7 +118,7 @@ if ( class_exists( 'WooCommerce' ) ) {
 // Static fallback when WooCommerce is inactive or no products found.
 // Source from centralized catalog so prices stay in sync.
 if ( empty( $skyyrose_trending_products ) ) {
-	// Only published pre-order products — br-001 and lh-004 are drafts.
+	// Only published pre-order products — br-001, br-007, and lh-004 are drafts.
 	$skyyrose_404_skus = array( 'br-006', 'lh-002', 'sg-001', 'sg-008' );
 	foreach ( $skyyrose_404_skus as $skyyrose_404_sku ) {
 		$skyyrose_404_product = skyyrose_get_product( $skyyrose_404_sku );
@@ -362,7 +362,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 						<span class="error-404-nav-icon" aria-hidden="true">
 							<?php
 							// SVG icons are hardcoded above — safe to output.
-							echo $skyyrose_link_item['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Hardcoded SVG.
+							echo wp_kses( $skyyrose_link_item['icon'], skyyrose_svg_kses_allowed() );
 							?>
 						</span>
 						<span class="error-404-nav-label">

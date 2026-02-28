@@ -37,33 +37,33 @@ $story_sections = array(
 	array(
 		'heading'    => __( 'The Dream That Started It All', 'skyyrose-flagship' ),
 		'paragraphs' => array(
-			'SkyyRose was born in 2019 inside a small Oakland apartment, fueled by a dream that luxury fashion had lost its soul. The founder saw an industry obsessed with exclusivity for exclusivity\'s sake&mdash;price tags that locked people out, designs that felt cold and impersonal, brands that forgot that fashion is supposed to make you <em>feel</em> something.',
-			'Growing up on the streets of Oakland taught one fundamental truth: real style comes from authenticity. It comes from wearing your story on your sleeve, literally. Every neighborhood, every corner, every late-night conversation about what it means to dress with intention&mdash;that\'s where SkyyRose found its voice.',
-			'We set out to create something different&mdash;a brand that honors both the raw energy of street culture and the meticulous craftsmanship of luxury fashion. A brand where every piece is designed to be armor for those bold enough to be themselves.',
+			__( 'SkyyRose was born in 2019 inside a small Oakland apartment, fueled by a dream that luxury fashion had lost its soul. The founder saw an industry obsessed with exclusivity for exclusivity\'s sake&mdash;price tags that locked people out, designs that felt cold and impersonal, brands that forgot that fashion is supposed to make you <em>feel</em> something.', 'skyyrose-flagship' ),
+			__( 'Growing up on the streets of Oakland taught one fundamental truth: real style comes from authenticity. It comes from wearing your story on your sleeve, literally. Every neighborhood, every corner, every late-night conversation about what it means to dress with intention&mdash;that\'s where SkyyRose found its voice.', 'skyyrose-flagship' ),
+			__( 'We set out to create something different&mdash;a brand that honors both the raw energy of street culture and the meticulous craftsmanship of luxury fashion. A brand where every piece is designed to be armor for those bold enough to be themselves.', 'skyyrose-flagship' ),
 		),
-		'highlight'  => '&ldquo;We don\'t just make clothes. We craft armor for those bold enough to be themselves.&rdquo;',
-		'image_alt'  => 'SkyyRose brand story &mdash; the dream that started it all in Oakland',
+		'highlight'  => __( '&ldquo;We don\'t just make clothes. We craft armor for those bold enough to be themselves.&rdquo;', 'skyyrose-flagship' ),
+		'image_alt'  => __( 'SkyyRose brand story &mdash; the dream that started it all in Oakland', 'skyyrose-flagship' ),
 		'reverse'    => false,
 	),
 	array(
 		'heading'    => __( 'The Name Behind the Brand', 'skyyrose-flagship' ),
 		'paragraphs' => array(
-			'Every great brand carries meaning in its name, and SkyyRose is no exception. <em>Skyy</em> represents aspiration&mdash;the limitless ceiling above us, the audacity to reach higher than anyone expects. <em>Rose</em> represents beauty rooted in the earth, grounded in reality, growing through the concrete. Together, they embody reaching high while staying grounded.',
-			'The name &ldquo;Love Hurts&rdquo; carries even deeper personal meaning. Hurts is the founder\'s family name, woven into every piece we create. It represents the beautiful pain of growth, the strength found in vulnerability, and the courage to wear your heart openly. When you put on a Love Hurts piece, you\'re carrying a legacy.',
-			'Our philosophy is simple but radical: luxury should be accessible. Fashion should tell a story. Quality should never be compromised. And every single person who wears SkyyRose should feel like the most powerful version of themselves.',
+			__( 'Every great brand carries meaning in its name, and SkyyRose is no exception. <em>Skyy</em> represents aspiration&mdash;the limitless ceiling above us, the audacity to reach higher than anyone expects. <em>Rose</em> represents beauty rooted in the earth, grounded in reality, growing through the concrete. Together, they embody reaching high while staying grounded.', 'skyyrose-flagship' ),
+			__( 'The name &ldquo;Love Hurts&rdquo; carries even deeper personal meaning. Hurts is the founder\'s family name, woven into every piece we create. It represents the beautiful pain of growth, the strength found in vulnerability, and the courage to wear your heart openly. When you put on a Love Hurts piece, you\'re carrying a legacy.', 'skyyrose-flagship' ),
+			__( 'Our philosophy is simple but radical: luxury should be accessible. Fashion should tell a story. Quality should never be compromised. And every single person who wears SkyyRose should feel like the most powerful version of themselves.', 'skyyrose-flagship' ),
 		),
 		'highlight'  => '',
-		'image_alt'  => 'SkyyRose brand story &mdash; sky meets rose, reaching high while staying grounded',
+		'image_alt'  => __( 'SkyyRose brand story &mdash; sky meets rose, reaching high while staying grounded', 'skyyrose-flagship' ),
 		'reverse'    => true,
 	),
 	array(
 		'heading'    => __( 'Crafted with Purpose', 'skyyrose-flagship' ),
 		'paragraphs' => array(
-			'At SkyyRose, we believe in the power of intentional creation. Every fabric is hand-selected for its feel, its durability, its ability to make you look and feel extraordinary. We work with premium materials&mdash;heavyweight cotton, custom-dyed fabrics, embroidered details, silicone appliqu&eacute;s, and laser-engraved leather&mdash;because our community deserves nothing less.',
-			'We are committed to ethical production practices. Our pieces are crafted in small batches, ensuring quality control at every stage. We pay fair wages, we source responsibly, and we reject the fast-fashion model that treats both workers and customers as disposable. When you invest in SkyyRose, you\'re investing in something built to last.',
+			__( 'At SkyyRose, we believe in the power of intentional creation. Every fabric is hand-selected for its feel, its durability, its ability to make you look and feel extraordinary. We work with premium materials&mdash;heavyweight cotton, custom-dyed fabrics, embroidered details, silicone appliqu&eacute;s, and laser-engraved leather&mdash;because our community deserves nothing less.', 'skyyrose-flagship' ),
+			__( 'We are committed to ethical production practices. Our pieces are crafted in small batches, ensuring quality control at every stage. We pay fair wages, we source responsibly, and we reject the fast-fashion model that treats both workers and customers as disposable. When you invest in SkyyRose, you\'re investing in something built to last.', 'skyyrose-flagship' ),
 		),
-		'highlight'  => '&ldquo;Luxury is not a price tag. Luxury is the care poured into every detail, the love woven into every seam.&rdquo;',
-		'image_alt'  => 'SkyyRose brand story &mdash; craftsmanship and quality materials',
+		'highlight'  => __( '&ldquo;Luxury is not a price tag. Luxury is the care poured into every detail, the love woven into every seam.&rdquo;', 'skyyrose-flagship' ),
+		'image_alt'  => __( 'SkyyRose brand story &mdash; craftsmanship and quality materials', 'skyyrose-flagship' ),
 		'reverse'    => false,
 	),
 );
@@ -76,28 +76,28 @@ $collections_story = array(
 		'name'        => __( 'Black Rose', 'skyyrose-flagship' ),
 		'slug'        => 'black-rose',
 		'tagline'     => __( 'Elegance in Darkness', 'skyyrose-flagship' ),
-		'description' => 'The Black Rose Collection finds beauty in contrast&mdash;silver-toned luxury against midnight black, gothic elegance that commands every room. Inspired by the strength of roses that bloom in darkness, each piece is an exercise in refined rebellion. Metallic silver accents meet heavyweight construction, creating streetwear that feels like couture.',
+		'description' => __( 'The Black Rose Collection finds beauty in contrast&mdash;silver-toned luxury against midnight black, gothic elegance that commands every room. Inspired by the strength of roses that bloom in darkness, each piece is an exercise in refined rebellion. Metallic silver accents meet heavyweight construction, creating streetwear that feels like couture.', 'skyyrose-flagship' ),
 		'accent'      => 'silver',
 	),
 	array(
 		'name'        => __( 'Love Hurts', 'skyyrose-flagship' ),
 		'slug'        => 'love-hurts',
 		'tagline'     => __( 'Wear Your Heart Outside', 'skyyrose-flagship' ),
-		'description' => 'The Love Hurts Collection is passion made wearable&mdash;crimson-drenched streetwear that bleeds emotion. Named after the founder\'s family name, every piece carries the weight of vulnerability and the fire of resilience. From varsity jackets to bomber silhouettes, this collection is for those who aren\'t afraid to feel deeply and dress boldly.',
+		'description' => __( 'The Love Hurts Collection is passion made wearable&mdash;crimson-drenched streetwear that bleeds emotion. Named after the founder\'s family name, every piece carries the weight of vulnerability and the fire of resilience. From varsity jackets to bomber silhouettes, this collection is for those who aren\'t afraid to feel deeply and dress boldly.', 'skyyrose-flagship' ),
 		'accent'      => 'crimson',
 	),
 	array(
 		'name'        => __( 'Signature', 'skyyrose-flagship' ),
 		'slug'        => 'signature',
 		'tagline'     => __( 'The Crown Jewel', 'skyyrose-flagship' ),
-		'description' => 'The Signature Collection is where rose gold meets gold&mdash;the ultimate luxury statement. This is SkyyRose at its most refined, its most confident, its most unapologetic. From The Bay Set to the Sherpa Jacket, every piece is designed to be the crown jewel of your wardrobe. This is elevated streetwear for those who know exactly who they are.',
+		'description' => __( 'The Signature Collection is where rose gold meets gold&mdash;the ultimate luxury statement. This is SkyyRose at its most refined, its most confident, its most unapologetic. From The Bay Set to the Sherpa Jacket, every piece is designed to be the crown jewel of your wardrobe. This is elevated streetwear for those who know exactly who they are.', 'skyyrose-flagship' ),
 		'accent'      => 'gold',
 	),
 	array(
 		'name'        => __( 'Kids Capsule', 'skyyrose-flagship' ),
 		'slug'        => 'kids-capsule',
 		'tagline'     => __( 'Passing the Torch', 'skyyrose-flagship' ),
-		'description' => 'The Kids Capsule is about legacy&mdash;passing the torch of self-expression to the next generation. Mini luxury for young trendsetters who deserve to feel just as powerful as their parents. Soft pastels, playful details, and the same uncompromising quality that defines every SkyyRose piece. Because style has no age limit.',
+		'description' => __( 'The Kids Capsule is about legacy&mdash;passing the torch of self-expression to the next generation. Mini luxury for young trendsetters who deserve to feel just as powerful as their parents. Soft pastels, playful details, and the same uncompromising quality that defines every SkyyRose piece. Because style has no age limit.', 'skyyrose-flagship' ),
 		'accent'      => 'pink',
 	),
 );
@@ -109,37 +109,37 @@ $timeline_milestones = array(
 	array(
 		'year'        => '2019',
 		'title'       => __( 'The Dream Begins', 'skyyrose-flagship' ),
-		'description' => 'Late nights in an Oakland apartment, sketching by lamplight. The first SkyyRose designs take shape on paper&mdash;raw, emotional, and unlike anything else in streetwear. A vision crystallizes: luxury fashion that speaks the language of the streets.',
+		'description' => __( 'Late nights in an Oakland apartment, sketching by lamplight. The first SkyyRose designs take shape on paper&mdash;raw, emotional, and unlike anything else in streetwear. A vision crystallizes: luxury fashion that speaks the language of the streets.', 'skyyrose-flagship' ),
 	),
 	array(
 		'year'        => '2020',
 		'title'       => __( 'Against All Odds', 'skyyrose-flagship' ),
-		'description' => 'While the world paused, SkyyRose pressed forward. Launching during a global pandemic wasn\'t the plan, but it proved something essential&mdash;this brand was built on resilience. The setbacks became fuel. The isolation became focus. SkyyRose emerged stronger than the dream that started it.',
+		'description' => __( 'While the world paused, SkyyRose pressed forward. Launching during a global pandemic wasn\'t the plan, but it proved something essential&mdash;this brand was built on resilience. The setbacks became fuel. The isolation became focus. SkyyRose emerged stronger than the dream that started it.', 'skyyrose-flagship' ),
 	),
 	array(
 		'year'        => '2021',
 		'title'       => __( 'Finding Our Voice', 'skyyrose-flagship' ),
-		'description' => 'BLACK ROSE drops to underground acclaim. Limited pieces sell out within hours, proving the demand for authentic luxury streetwear. The Oakland community rallies behind the brand, and word-of-mouth becomes our most powerful marketing tool. SkyyRose isn\'t a brand anymore&mdash;it\'s a movement.',
+		'description' => __( 'BLACK ROSE drops to underground acclaim. Limited pieces sell out within hours, proving the demand for authentic luxury streetwear. The Oakland community rallies behind the brand, and word-of-mouth becomes our most powerful marketing tool. SkyyRose isn\'t a brand anymore&mdash;it\'s a movement.', 'skyyrose-flagship' ),
 	),
 	array(
 		'year'        => '2022',
 		'title'       => __( 'Growing Roots', 'skyyrose-flagship' ),
-		'description' => 'The product line expands, the team grows, and SkyyRose begins to plant deep roots. New silhouettes, new fabrications, new collaborations with local Oakland artists. The brand identity sharpens into focus: dark luxury with a heartbeat. Every piece tells a story, and more people want to be part of it.',
+		'description' => __( 'The product line expands, the team grows, and SkyyRose begins to plant deep roots. New silhouettes, new fabrications, new collaborations with local Oakland artists. The brand identity sharpens into focus: dark luxury with a heartbeat. Every piece tells a story, and more people want to be part of it.', 'skyyrose-flagship' ),
 	),
 	array(
 		'year'        => '2023',
 		'title'       => __( 'Breaking Through', 'skyyrose-flagship' ),
-		'description' => 'LOVE HURTS launches to a global audience, and the emotional resonance is undeniable. Major collaborations bring national recognition. Features in fashion publications. A presence that extends far beyond Oakland while never losing its roots. The Hurts family name reaches hearts worldwide.',
+		'description' => __( 'LOVE HURTS launches to a global audience, and the emotional resonance is undeniable. Major collaborations bring national recognition. Features in fashion publications. A presence that extends far beyond Oakland while never losing its roots. The Hurts family name reaches hearts worldwide.', 'skyyrose-flagship' ),
 	),
 	array(
 		'year'        => '2024',
 		'title'       => __( 'The Flagship Era', 'skyyrose-flagship' ),
-		'description' => 'SIGNATURE completes the vision. Three distinct collections, one unified brand. SkyyRose enters its flagship era with a full digital experience, immersive shopping, and a community that spans continents. The brand doesn\'t just make clothes&mdash;it creates a complete luxury lifestyle.',
+		'description' => __( 'SIGNATURE completes the vision. Three distinct collections, one unified brand. SkyyRose enters its flagship era with a full digital experience, immersive shopping, and a community that spans continents. The brand doesn\'t just make clothes&mdash;it creates a complete luxury lifestyle.', 'skyyrose-flagship' ),
 	),
 	array(
 		'year'        => '2025',
 		'title'       => __( 'The Future Is Now', 'skyyrose-flagship' ),
-		'description' => 'New collections on the horizon. Expanded Kids Capsule. International reach. SkyyRose stands at the intersection of where it\'s been and where it\'s going&mdash;and the future has never looked more radiant. The dream that started in an Oakland apartment now lights up the world.',
+		'description' => __( 'New collections on the horizon. Expanded Kids Capsule. International reach. SkyyRose stands at the intersection of where it\'s been and where it\'s going&mdash;and the future has never looked more radiant. The dream that started in an Oakland apartment now lights up the world.', 'skyyrose-flagship' ),
 	),
 );
 
@@ -163,7 +163,7 @@ $brand_stats = array(
 		'detail' => __( 'From first sketch to flagship', 'skyyrose-flagship' ),
 	),
 	array(
-		'number' => '1000+',
+		'number' => '2500+',
 		'label'  => __( 'Happy Customers', 'skyyrose-flagship' ),
 		'detail' => __( 'A growing global community', 'skyyrose-flagship' ),
 	),
@@ -176,37 +176,37 @@ $brand_values = array(
 	array(
 		'icon'        => '&#x1F339;', /* Rose */
 		'title'       => __( 'Authenticity', 'skyyrose-flagship' ),
-		'description' => 'Every piece tells a real story&mdash;one born from Oakland streets, shaped by lived experience, and refined by an uncompromising vision. We never chase trends or water down our identity for mass appeal. When you wear SkyyRose, you\'re wearing something genuine, something that started as a feeling and became fabric.',
+		'description' => __( 'Every piece tells a real story&mdash;one born from Oakland streets, shaped by lived experience, and refined by an uncompromising vision. We never chase trends or water down our identity for mass appeal. When you wear SkyyRose, you\'re wearing something genuine, something that started as a feeling and became fabric.', 'skyyrose-flagship' ),
 	),
 	array(
 		'icon'        => '&#x2728;', /* Sparkles */
 		'title'       => __( 'Craftsmanship', 'skyyrose-flagship' ),
-		'description' => 'Premium materials meet meticulous construction in every single piece. From heavyweight cotton to custom-dyed fabrics, from embroidered details to laser-engraved leather&mdash;we obsess over quality so you never have to question it. Our pieces are built to outlast seasons, trends, and fast-fashion cycles.',
+		'description' => __( 'Premium materials meet meticulous construction in every single piece. From heavyweight cotton to custom-dyed fabrics, from embroidered details to laser-engraved leather&mdash;we obsess over quality so you never have to question it. Our pieces are built to outlast seasons, trends, and fast-fashion cycles.', 'skyyrose-flagship' ),
 	),
 	array(
 		'icon'        => '&#x1F5A4;', /* Black heart */
 		'title'       => __( 'Community', 'skyyrose-flagship' ),
-		'description' => 'SkyyRose was built by Oakland, for the world. Our roots run deep in the culture, the creativity, and the resilience of the Bay Area. We give back to the communities that raised us, we celebrate the artists who inspire us, and we never forget that a brand is only as strong as the people who believe in it.',
+		'description' => __( 'SkyyRose was built by Oakland, for the world. Our roots run deep in the culture, the creativity, and the resilience of the Bay Area. We give back to the communities that raised us, we celebrate the artists who inspire us, and we never forget that a brand is only as strong as the people who believe in it.', 'skyyrose-flagship' ),
 	),
 	array(
 		'icon'        => '&#x1F4AB;', /* Dizzy / star */
 		'title'       => __( 'Evolution', 'skyyrose-flagship' ),
-		'description' => 'We refuse to stand still. Each collection pushes boundaries further than the last&mdash;new silhouettes, new techniques, new stories to tell. Growth isn\'t comfortable, but it\'s necessary. SkyyRose evolves with its community, always reaching for that next level while staying true to the vision that started it all.',
+		'description' => __( 'We refuse to stand still. Each collection pushes boundaries further than the last&mdash;new silhouettes, new techniques, new stories to tell. Growth isn\'t comfortable, but it\'s necessary. SkyyRose evolves with its community, always reaching for that next level while staying true to the vision that started it all.', 'skyyrose-flagship' ),
 	),
 );
 
 /*--------------------------------------------------------------
  * Founder Section
  *--------------------------------------------------------------*/
-$founder_intro = 'Behind every stitch, every colorway, every collection name is a person who poured their entire heart into building something meaningful. SkyyRose wasn\'t born in a boardroom&mdash;it was born from sleepless nights, hand-drawn sketches, and an unshakable belief that luxury streetwear could be different.';
+$founder_intro = __( 'Behind every stitch, every colorway, every collection name is a person who poured their entire heart into building something meaningful. SkyyRose wasn\'t born in a boardroom&mdash;it was born from sleepless nights, hand-drawn sketches, and an unshakable belief that luxury streetwear could be different.', 'skyyrose-flagship' );
 
 $founder_quotes = array(
-	'&ldquo;When I started SkyyRose, I had one goal: create clothes I actually wanted to wear. Clothes that felt like armor, that made a statement without saying a word. I wanted people to put on a SkyyRose piece and feel invincible&mdash;like they could walk into any room and own it.&rdquo;',
-	'&ldquo;Growing up in Oakland taught me that style is survival. It\'s how you tell the world who you are before you speak. Every fit is a first impression, every outfit is a declaration. That\'s what SkyyRose is about&mdash;giving people the pieces to tell their story without saying a word.&rdquo;',
-	'&ldquo;The LOVE HURTS collection is the most personal to me because it carries my family name. Every piece is a piece of me, shared with everyone brave enough to wear their heart openly. When someone puts on that varsity jacket or that bomber, they\'re carrying my family\'s legacy with them.&rdquo;',
+	__( '&ldquo;When I started SkyyRose, I had one goal: create clothes I actually wanted to wear. Clothes that felt like armor, that made a statement without saying a word. I wanted people to put on a SkyyRose piece and feel invincible&mdash;like they could walk into any room and own it.&rdquo;', 'skyyrose-flagship' ),
+	__( '&ldquo;Growing up in Oakland taught me that style is survival. It\'s how you tell the world who you are before you speak. Every fit is a first impression, every outfit is a declaration. That\'s what SkyyRose is about&mdash;giving people the pieces to tell their story without saying a word.&rdquo;', 'skyyrose-flagship' ),
+	__( '&ldquo;The LOVE HURTS collection is the most personal to me because it carries my family name. Every piece is a piece of me, shared with everyone brave enough to wear their heart openly. When someone puts on that varsity jacket or that bomber, they\'re carrying my family\'s legacy with them.&rdquo;', 'skyyrose-flagship' ),
 );
 
-$founder_vision = '&ldquo;The future of SkyyRose is bigger than clothing. It\'s about building a world where luxury meets authenticity, where street culture gets the respect it deserves, and where every person who wears our pieces feels like the most powerful version of themselves. We\'re just getting started.&rdquo;';
+$founder_vision = __( '&ldquo;The future of SkyyRose is bigger than clothing. It\'s about building a world where luxury meets authenticity, where street culture gets the respect it deserves, and where every person who wears our pieces feels like the most powerful version of themselves. We\'re just getting started.&rdquo;', 'skyyrose-flagship' );
 
 $founder_signature = get_theme_mod( 'about_founder_signature', '&mdash; The Founder, SkyyRose' );
 ?>
@@ -543,7 +543,7 @@ $founder_signature = get_theme_mod( 'about_founder_signature', '&mdash; The Foun
 				<p class="about-community__text">
 					<?php
 					echo wp_kses(
-						'Oakland isn\'t just where SkyyRose was born&mdash;it\'s <em>who</em> we are. The creativity, the resilience, the unapologetic swagger of the Bay Area runs through every thread of our brand. Our community is our foundation, and we never forget that.',
+						__( 'Oakland isn\'t just where SkyyRose was born&mdash;it\'s <em>who</em> we are. The creativity, the resilience, the unapologetic swagger of the Bay Area runs through every thread of our brand. Our community is our foundation, and we never forget that.', 'skyyrose-flagship' ),
 						array(
 							'em'     => array(),
 							'strong' => array(),
@@ -554,7 +554,7 @@ $founder_signature = get_theme_mod( 'about_founder_signature', '&mdash; The Foun
 				<p class="about-community__text">
 					<?php
 					echo wp_kses(
-						'We give back because it\'s in our DNA. Whether it\'s partnering with local Oakland artists, supporting youth creative programs, or spotlighting the voices that inspire our collections&mdash;SkyyRose exists to lift up the community that lifted us. Every purchase supports not just a brand, but a <em>movement</em>.',
+						__( 'We give back because it\'s in our DNA. Whether it\'s partnering with local Oakland artists, supporting youth creative programs, or spotlighting the voices that inspire our collections&mdash;SkyyRose exists to lift up the community that lifted us. Every purchase supports not just a brand, but a <em>movement</em>.', 'skyyrose-flagship' ),
 						array(
 							'em'     => array(),
 							'strong' => array(),
@@ -565,7 +565,7 @@ $founder_signature = get_theme_mod( 'about_founder_signature', '&mdash; The Foun
 				<p class="about-community__text">
 					<?php
 					echo wp_kses(
-						'The SkyyRose community spans from the streets of East Oakland to cities around the world. We are designers and dreamers, hustlers and artists, parents and kids&mdash;united by a belief that fashion should make you feel something real. When you wear SkyyRose, you\'re part of a family.',
+						__( 'The SkyyRose community spans from the streets of East Oakland to cities around the world. We are designers and dreamers, hustlers and artists, parents and kids&mdash;united by a belief that fashion should make you feel something real. When you wear SkyyRose, you\'re part of a family.', 'skyyrose-flagship' ),
 						array(
 							'em'     => array(),
 							'strong' => array(),

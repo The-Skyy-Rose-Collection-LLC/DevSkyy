@@ -150,7 +150,7 @@ $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 			<?php echo esc_html__( 'West Coast Prestige', 'skyyrose-flagship' ); ?>
 		</p>
 
-		<a href="#products" class="collection-hero__cta">
+		<a href="#signature-products" class="collection-hero__cta">
 			<?php echo esc_html__( 'Discover the Line', 'skyyrose-flagship' ); ?>
 		</a>
 	</section>
@@ -158,8 +158,8 @@ $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	<!-- ============================================================
 	     COLLECTION STORY
 	     ============================================================ -->
-	<section class="collection-story" id="story" aria-labelledby="story-heading">
-		<h2 id="story-heading" class="screen-reader-text"><?php esc_html_e( 'Collection Story', 'skyyrose-flagship' ); ?></h2>
+	<section class="collection-story" id="signature-story" aria-labelledby="signature-story-heading">
+		<h2 id="signature-story-heading" class="screen-reader-text"><?php esc_html_e( 'Collection Story', 'skyyrose-flagship' ); ?></h2>
 		<p class="collection-story__text">
 			<?php echo esc_html__( 'The Signature collection is the heart of SKyyRose. It is where our story began — rose gold warmth meeting modern streetwear sensibility. Every piece carries the DNA of the brand: quality fabrics, intentional design, and a commitment to self-expression. From pastel colorblock sets to essential tees, these are the pieces you build your wardrobe around. Timeless by design, luxurious by nature.', 'skyyrose-flagship' ); ?>
 		</p>
@@ -168,8 +168,8 @@ $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	<!-- ============================================================
 	     PRODUCT GRID
 	     ============================================================ -->
-	<section id="products" class="collection-products" aria-labelledby="products-heading">
-		<h2 id="products-heading" class="screen-reader-text">
+	<section id="signature-products" class="collection-products" aria-labelledby="signature-products-heading">
+		<h2 id="signature-products-heading" class="screen-reader-text">
 			<?php echo esc_html__( 'Signature Products', 'skyyrose-flagship' ); ?>
 		</h2>
 		<div class="collection-grid">
@@ -228,7 +228,7 @@ $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	<!-- ============================================================
 	     IMMERSIVE CTA
 	     ============================================================ -->
-	<section class="collection-immersive-cta">
+	<section class="collection-immersive-cta" aria-label="<?php esc_attr_e( 'Immersive 3D experience', 'skyyrose-flagship' ); ?>">
 		<a href="<?php echo esc_url( home_url( '/experience-signature/' ) ); ?>"
 		   class="collection-immersive-cta__link"
 		   aria-label="<?php esc_attr_e( 'Enter the Signature 3D Experience', 'skyyrose-flagship' ); ?>">
@@ -244,7 +244,7 @@ $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	<div data-cie-confidence></div>
 	<div data-cie-preorder-progress style="max-width:480px; margin:0 auto; padding:1rem 2rem;"></div>
 
-	<section class="collection-preorder-cta">
+	<section class="collection-preorder-cta" aria-label="<?php esc_attr_e( 'Pre-order call to action', 'skyyrose-flagship' ); ?>">
 		<div data-cie-countdown="auto" data-cie-countdown-label="<?php esc_attr_e( 'Pre-Order Window', 'skyyrose-flagship' ); ?>" style="display:flex; justify-content:center; margin-bottom:1.5rem;"></div>
 		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"
 		   class="collection-preorder-cta__btn">
@@ -284,7 +284,8 @@ $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 				$skyyrose_link = home_url( '/' . $skyyrose_col['slug'] . '/' );
 				?>
 				<a href="<?php echo esc_url( $skyyrose_link ); ?>"
-				   class="collection-explore__link">
+				   class="collection-explore__link"
+				   aria-label="<?php echo esc_attr( sprintf( __( 'Explore the %s collection', 'skyyrose-flagship' ), $skyyrose_col['name'] ) ); ?>">
 					<span class="collection-explore__link-name">
 						<?php echo esc_html( $skyyrose_col['name'] ); ?>
 					</span>

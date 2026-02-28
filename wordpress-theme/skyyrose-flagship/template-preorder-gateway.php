@@ -80,7 +80,7 @@ get_header();
 		<!-- Countdown Timer -->
 		<div class="preorder-countdown" aria-label="<?php esc_attr_e( 'Pre-order countdown', 'skyyrose-flagship' ); ?>">
 			<span class="countdown-label"><?php echo esc_html__( 'Pre-Order Window Closes In', 'skyyrose-flagship' ); ?></span>
-			<div class="countdown-timer" data-launch-date="<?php echo esc_attr( get_option( 'skyyrose_preorder_deadline', '2026-04-01T00:00:00' ) ); ?>">
+			<div class="countdown-timer" role="timer" data-launch-date="<?php echo esc_attr( get_option( 'skyyrose_preorder_deadline', '2026-04-01T00:00:00' ) ); ?>">
 				<div class="countdown-unit">
 					<span class="countdown-value" data-unit="days">00</span>
 					<span class="countdown-unit-label"><?php echo esc_html__( 'Days', 'skyyrose-flagship' ); ?></span>
@@ -213,7 +213,7 @@ get_header();
 			<p class="modal-sizes-label" id="modal-sizes-label"><?php echo esc_html__( 'Select Size', 'skyyrose-flagship' ); ?></p>
 			<div class="modal-sizes" role="group" aria-labelledby="modal-sizes-label"></div>
 			<div class="modal-actions">
-				<button class="modal-add-to-cart" type="button"><?php echo esc_html__( 'Add to Cart', 'skyyrose-flagship' ); ?></button>
+				<button class="modal-add-to-cart" type="button" aria-describedby="modal-product-name"><?php echo esc_html__( 'Add to Cart', 'skyyrose-flagship' ); ?></button>
 				<button class="modal-wishlist-btn" type="button" aria-label="<?php esc_attr_e( 'Add to wishlist', 'skyyrose-flagship' ); ?>">
 					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
 				</button>

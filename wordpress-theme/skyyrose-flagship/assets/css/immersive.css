@@ -1132,11 +1132,19 @@
 
 @media (prefers-reduced-motion: reduce) {
 	.scene-loading-monogram,
-	.hotspot-beacon,
 	.hotspot-beacon::before,
 	.scene-film-grain {
 		animation: none !important;
 		opacity: 0;
+	}
+
+	.hotspot-beacon {
+		animation: none !important;
+		/* Keep beacon visible — only disable the pulse animation.
+		   Without this, reduced-motion users see no product indicators. */
+		opacity: 1;
+		box-shadow: 0 0 8px rgba(183, 110, 121, 0.5);
+		background: rgba(183, 110, 121, 0.6);
 	}
 
 	.scene-layer,
@@ -1144,10 +1152,6 @@
 	.product-panel-overlay,
 	.scene-loading {
 		transition-duration: 0.01ms;
-	}
-
-	.hotspot-beacon {
-		box-shadow: 0 0 8px rgba(183, 110, 121, 0.5);
 	}
 
 	/* Disable environmental animations */

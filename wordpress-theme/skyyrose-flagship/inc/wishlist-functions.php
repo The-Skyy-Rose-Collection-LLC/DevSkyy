@@ -392,8 +392,9 @@ function skyyrose_ajax_move_to_cart() {
 	}
 }
 add_action( 'wp_ajax_skyyrose_move_to_cart', 'skyyrose_ajax_move_to_cart' );
-// Guest move-to-cart: return auth-required error so JS can redirect to login.
+// Guest move-to-cart: verify nonce first, then return auth-required error so JS can redirect to login.
 add_action( 'wp_ajax_nopriv_skyyrose_move_to_cart', function() {
+	check_ajax_referer( 'skyyrose-wishlist-nonce', 'nonce' );
 	wp_send_json_error(
 		array(
 			'message'       => esc_html__( 'Please sign in to move items to cart.', 'skyyrose-flagship' ),
@@ -438,6 +439,20 @@ add_action( 'wp_ajax_nopriv_skyyrose_clear_wishlist', 'skyyrose_ajax_clear_wishl
  */
 function skyyrose_ajax_move_all_to_cart() {
 	check_ajax_referer( 'skyyrose-wishlist-nonce', 'nonce' );
+
+	// Rate limit: max 3 "move all" operations per user per minute.
+	$user_id  = get_current_user_id();
+	$rate_key = 'skyyrose_move_all_' . $user_id;
+	$attempts = (int) get_transient( $rate_key );
+	if ( $attempts >= 3 ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Too many requests. Please try again shortly.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
+	set_transient( $rate_key, $attempts + 1, MINUTE_IN_SECONDS );
 
 	$result = skyyrose_move_all_to_cart();
 

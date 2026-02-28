@@ -77,7 +77,7 @@
 					<p class="footer-brand__description">
 						<?php esc_html_e( 'Premium fashion collections crafted with passion, designed for those who dare to express their truth.', 'skyyrose-flagship' ); ?>
 					</p>
-					<div class="footer-brand__social" aria-label="<?php esc_attr_e( 'Social Media Links', 'skyyrose-flagship' ); ?>">
+					<nav class="footer-brand__social" aria-label="<?php esc_attr_e( 'Social Media Links', 'skyyrose-flagship' ); ?>">
 						<?php
 						$social_icons = array(
 							'instagram' => '<path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2Z"/><circle cx="12" cy="12" r="3.5"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>',
@@ -137,7 +137,7 @@
 								</svg>
 							</a>
 						<?php endforeach; ?>
-					</div>
+					</nav>
 				</div>
 
 				<!-- Column 2: Shop (1fr) -->
