@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import typer
-from huggingface_hub import HfApi
+from huggingface_hub import HfApi, snapshot_download
 from rich.console import Console
 from rich.table import Table
 
@@ -216,6 +216,59 @@ def dataset_push(
     )
     console.print(f"[green]Pushed to {repo_id}[/green]")
     console.print(f"  https://huggingface.co/datasets/{repo_id}")
+
+
+# ── Model ───────────────────────────────────────────────────────────────
+
+model_app = typer.Typer(help="Model operations.")
+app.add_typer(model_app, name="model")
+
+
+@model_app.command("list")
+def model_list():
+    """List damBruh models on HuggingFace Hub."""
+    api = HfApi(token=config.get_hf_token())
+    models = list(api.list_models(author=config.hf_user))
+
+    table = Table(title=f"Models ({config.hf_user})")
+    table.add_column("Name", style="cyan")
+    table.add_column("Downloads")
+    table.add_column("Tags")
+
+    for model in models:
+        name = model.id.split("/")[-1]
+        downloads = str(getattr(model, "downloads", 0))
+        tags = ", ".join(getattr(model, "tags", [])[:3])
+        table.add_row(name, downloads, tags)
+
+    console.print(table)
+
+
+@model_app.command("info")
+def model_info(name: str):
+    """Show model details."""
+    api = HfApi(token=config.get_hf_token())
+    repo_id = f"{config.hf_user}/{name}" if "/" not in name else name
+    info = api.model_info(repo_id)
+
+    console.print(f"[bold]{info.id}[/bold]")
+    console.print(f"  Downloads: {info.downloads}")
+    console.print(f"  Files: {len(info.siblings)}")
+    for f in info.siblings:
+        size_mb = getattr(f, "size", 0) / 1_000_000
+        console.print(f"    {f.rfilename} ({size_mb:.1f} MB)")
+
+
+@model_app.command("download")
+def model_download(name: str, output: str = typer.Option("./models", help="Local output directory")):
+    """Download model from Hub to local directory."""
+    repo_id = f"{config.hf_user}/{name}" if "/" not in name else name
+    local_dir = snapshot_download(
+        repo_id=repo_id,
+        local_dir=f"{output}/{name}",
+        token=config.get_hf_token(),
+    )
+    console.print(f"[green]Downloaded to {local_dir}[/green]")
 
 
 if __name__ == "__main__":
