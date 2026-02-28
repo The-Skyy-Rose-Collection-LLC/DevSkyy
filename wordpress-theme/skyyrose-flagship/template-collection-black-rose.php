@@ -71,7 +71,9 @@ function skyyrose_get_black_rose_products() {
 			'desc'       => $p['description'],
 			'badge'      => $p['badge'],
 			'image'      => skyyrose_product_image_uri( $primary_img ),
-			'back_image' => ! empty( $p['back_image'] ) ? skyyrose_product_image_uri( $p['back_image'] ) : '',
+			'back_image' => ! empty( $p['back_model_image'] )
+				? skyyrose_product_image_uri( $p['back_model_image'] )
+				: ( ! empty( $p['back_image'] ) ? skyyrose_product_image_uri( $p['back_image'] ) : '' ),
 			'url'        => skyyrose_product_url( $p['sku'] ),
 		);
 	}
@@ -179,6 +181,13 @@ $skyyrose_br_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 				</a>
 			<?php endforeach; ?>
 		</div>
+
+		<div style="text-align:center; padding:1rem 0 0;">
+			<button class="size-guide-trigger" data-open-size-guide aria-label="<?php esc_attr_e( 'Open size guide', 'skyyrose-flagship' ); ?>">
+				<svg class="size-guide-trigger__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2v20M18 2v20M6 12h12M6 7h12M6 17h12"/></svg>
+				<?php esc_html_e( 'Size Guide', 'skyyrose-flagship' ); ?>
+			</button>
+		</div>
 	</section>
 
 	<!-- ============================================================
@@ -255,6 +264,9 @@ $skyyrose_br_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	</section>
 
 </div><!-- .collection--black-rose -->
+
+<?php get_template_part( 'template-parts/size-guide-modal' ); ?>
+
 </main><!-- #primary -->
 
 <?php get_footer(); ?>

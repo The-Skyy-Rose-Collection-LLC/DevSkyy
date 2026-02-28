@@ -22,16 +22,17 @@
 	var tabs     = Array.from(document.querySelectorAll('.collection-tab'));
 	var cards    = Array.from(document.querySelectorAll('.product-grid-card'));
 
-	// Product modal
+	// Product modal — overlay and dialog are siblings in the DOM.
 	var modalOverlay = document.querySelector('.product-modal-overlay');
+	var modalDialog  = document.querySelector('.product-modal');
 	var modalClose   = document.querySelector('.product-modal-close');
-	var modalImage   = modalOverlay ? modalOverlay.querySelector('.modal-360-area img') : null;
-	var modalName    = modalOverlay ? modalOverlay.querySelector('.modal-product-name') : null;
-	var modalCol     = modalOverlay ? modalOverlay.querySelector('.modal-product-collection') : null;
-	var modalPrice   = modalOverlay ? modalOverlay.querySelector('.modal-product-price') : null;
-	var modalDesc    = modalOverlay ? modalOverlay.querySelector('.modal-product-desc') : null;
-	var modalSizes   = modalOverlay ? modalOverlay.querySelector('.modal-sizes') : null;
-	var modalAddBtn  = modalOverlay ? modalOverlay.querySelector('.modal-add-to-cart') : null;
+	var modalImage   = modalDialog ? modalDialog.querySelector('.modal-360-area img') : null;
+	var modalName    = modalDialog ? modalDialog.querySelector('.modal-product-name') : null;
+	var modalCol     = modalDialog ? modalDialog.querySelector('.modal-product-collection') : null;
+	var modalPrice   = modalDialog ? modalDialog.querySelector('.modal-product-price') : null;
+	var modalDesc    = modalDialog ? modalDialog.querySelector('.modal-product-desc') : null;
+	var modalSizes   = modalDialog ? modalDialog.querySelector('.modal-sizes') : null;
+	var modalAddBtn  = modalDialog ? modalDialog.querySelector('.modal-add-to-cart') : null;
 
 	// Cart sidebar
 	var cartOverlay  = document.querySelector('.cart-sidebar-overlay');
@@ -196,7 +197,7 @@
 	}
 
 	// Direct references to sibling dialog elements (not children of overlays).
-	var productModal   = document.querySelector('.product-modal');
+	var productModal   = modalDialog;
 	var incentivePopup = document.querySelector('.incentive-popup');
 
 	function openModal(data) {
@@ -541,11 +542,26 @@
 	   -------------------------------------------------- */
 
 	function initWishlist() {
+		var STORAGE_KEY = 'skyyrose_wishlist';
+		var wishlist = [];
+		try { wishlist = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch (_) {}
+
 		var wishlistBtns = Array.from(document.querySelectorAll('.product-grid-wishlist'));
 		wishlistBtns.forEach(function (btn) {
+			var productId = btn.dataset.productId || '';
+			// Restore active state from localStorage.
+			if (productId && wishlist.indexOf(productId) !== -1) {
+				btn.classList.add('active');
+			}
 			btn.addEventListener('click', function (e) {
 				e.stopPropagation();
 				btn.classList.toggle('active');
+				if (productId) {
+					var idx = wishlist.indexOf(productId);
+					if (idx === -1) { wishlist.push(productId); }
+					else { wishlist.splice(idx, 1); }
+					try { localStorage.setItem(STORAGE_KEY, JSON.stringify(wishlist)); } catch (_) {}
+				}
 			});
 		});
 	}

@@ -147,4 +147,5 @@ add_action( 'wp_footer', function () {
 		return;
 	}
 	get_template_part( 'template-parts/mascot' );
+	get_template_part( 'template-parts/brand-ambassador' );
 } );

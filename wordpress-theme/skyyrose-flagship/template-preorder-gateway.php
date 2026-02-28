@@ -142,8 +142,8 @@ get_header();
 				?>
 					<article
 						class="product-grid-card"
-						id="product-<?php echo esc_attr( $product['sku'] ); ?>"
-						aria-labelledby="product-name-<?php echo esc_attr( $product['sku'] ); ?>"
+						id="product-<?php echo esc_attr( $product['id'] ); ?>"
+						aria-labelledby="product-name-<?php echo esc_attr( $product['id'] ); ?>"
 						data-collection="<?php echo esc_attr( $product['collection'] ); ?>"
 						data-product-id="<?php echo esc_attr( $product['id'] ); ?>"
 						data-product-name="<?php echo esc_attr( $product['name'] ); ?>"
@@ -173,7 +173,7 @@ get_header();
 							</button>
 						</div>
 						<div class="product-grid-details">
-							<h3 class="product-grid-name" id="product-name-<?php echo esc_attr( $product['sku'] ); ?>"><?php echo esc_html( $product['name'] ); ?></h3>
+							<h3 class="product-grid-name" id="product-name-<?php echo esc_attr( $product['id'] ); ?>"><?php echo esc_html( $product['name'] ); ?></h3>
 							<p class="product-grid-price"><?php echo esc_html( $product['price'] ); ?></p>
 							<p class="product-grid-collection-label" data-label="<?php echo esc_attr( $product['collection'] ); ?>">
 								<?php echo esc_html( $product['collection_label'] ); ?>

@@ -196,6 +196,7 @@
 	if (searchClose && searchOverlay) {
 		searchClose.addEventListener('click', function () {
 			closeSearchOverlay();
+			if (searchToggle) searchToggle.focus();
 		});
 	}
 
