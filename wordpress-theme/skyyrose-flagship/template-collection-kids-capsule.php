@@ -290,9 +290,9 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 	<!-- ============================================================
 	     CTA BANNER
 	     ============================================================ -->
-	<section class="collection-cta">
+	<section class="collection-cta" aria-labelledby="kc-cta-heading">
 		<div class="collection-cta__inner fade-in-up">
-			<h2 class="collection-cta__heading">
+			<h2 id="kc-cta-heading" class="collection-cta__heading">
 				<?php echo esc_html__( 'Dress Them Like Stars', 'skyyrose-flagship' ); ?>
 			</h2>
 

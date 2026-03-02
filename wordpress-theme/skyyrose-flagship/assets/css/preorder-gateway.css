@@ -509,7 +509,7 @@
 	font-size: 0.75rem;
 	font-weight: 500;
 	cursor: pointer;
-	transition: all 0.2s ease;
+	transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
 
 .modal-sizes .size-btn:hover,

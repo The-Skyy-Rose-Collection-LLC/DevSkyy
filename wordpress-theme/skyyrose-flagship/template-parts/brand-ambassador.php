@@ -25,7 +25,7 @@ $skyyrose_ambassador_avatar = esc_url( SKYYROSE_ASSETS_URI . '/images/avatar/sky
 	        aria-expanded="false"
 	        aria-controls="sr-ambassador-panel"
 	        aria-label="<?php esc_attr_e( 'Open chat with Skyy Rose, our brand ambassador', 'skyyrose-flagship' ); ?>">
-		<img src="<?php echo $skyyrose_ambassador_avatar; ?>"
+		<img src="<?php echo esc_url( $skyyrose_ambassador_avatar ); ?>"
 		     alt="<?php esc_attr_e( 'Skyy Rose', 'skyyrose-flagship' ); ?>"
 		     class="sr-ambassador__fab-avatar"
 		     width="56" height="56" loading="lazy" />
@@ -46,7 +46,7 @@ $skyyrose_ambassador_avatar = esc_url( SKYYROSE_ASSETS_URI . '/images/avatar/sky
 
 		<!-- Header -->
 		<div class="sr-ambassador__header">
-			<img src="<?php echo $skyyrose_ambassador_avatar; ?>"
+			<img src="<?php echo esc_url( $skyyrose_ambassador_avatar ); ?>"
 			     alt="" class="sr-ambassador__header-avatar"
 			     width="32" height="32" />
 			<div class="sr-ambassador__header-info">
