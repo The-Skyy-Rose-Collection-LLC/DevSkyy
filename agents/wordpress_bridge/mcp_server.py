@@ -325,6 +325,9 @@ async def wp_sync_collection(args: dict[str, Any]) -> dict[str, Any]:
         if not collection:
             raise ValueError("'collection' is required")
 
+        # Normalize hyphens to underscores (frontend uses hyphens, enum uses underscores)
+        collection = collection.replace("-", "_")
+
         # Validate collection exists
         valid_collections = [c.value for c in SkyyRoseCollection]
         if collection not in valid_collections:
