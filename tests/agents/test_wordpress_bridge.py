@@ -201,7 +201,7 @@ class TestWordPressCoreTools:
         assert "is_error" not in result
         text = result["content"][0]["text"]
         data = json.loads(text)
-        assert data["collection"] == "black-rose"
+        assert data["collection"] == "black_rose"
         assert data["synced"] == 2
         mock_sync.sync_collection.assert_awaited_once()
 
