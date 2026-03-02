@@ -143,7 +143,7 @@
 		</nav>
 
 		<!-- Search Overlay -->
-		<div class="search-overlay" id="search-overlay" aria-hidden="true" inert role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Search', 'skyyrose-flagship' ); ?>">
+		<div class="search-overlay" id="search-overlay" aria-hidden="true" inert role="dialog" aria-modal="true" tabindex="-1" aria-label="<?php esc_attr_e( 'Search', 'skyyrose-flagship' ); ?>">
 			<div class="search-overlay__container">
 				<form role="search" method="get" class="search-overlay__form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
 					<label class="screen-reader-text" for="search-overlay-input">
@@ -177,7 +177,7 @@
 		<!-- Mobile Menu Slide-In -->
 		<div class="mobile-menu" id="mobile-menu" aria-hidden="true" inert>
 			<div class="mobile-menu__overlay" id="mobile-menu-overlay" aria-hidden="true"></div>
-			<div class="mobile-menu__panel" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Mobile Navigation', 'skyyrose-flagship' ); ?>">
+			<div class="mobile-menu__panel" role="dialog" aria-modal="true" tabindex="-1" aria-label="<?php esc_attr_e( 'Mobile Navigation', 'skyyrose-flagship' ); ?>">
 				<div class="mobile-menu__header">
 					<span class="mobile-menu__brand navbar__gradient-text"><?php esc_html_e( 'SKYY ROSE', 'skyyrose-flagship' ); ?></span>
 					<button

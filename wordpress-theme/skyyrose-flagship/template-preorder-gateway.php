@@ -136,7 +136,7 @@ get_header();
 			<!-- Status region for filter announcements (screen readers only) -->
 			<div class="product-grid-status screen-reader-text" role="status" aria-live="polite" aria-atomic="true"></div>
 			<!-- Product Grid -->
-			<div class="product-grid" id="product-grid-panel" aria-label="<?php esc_attr_e( 'Product grid', 'skyyrose-flagship' ); ?>" aria-live="polite">
+			<div class="product-grid" id="product-grid-panel" aria-label="<?php esc_attr_e( 'Product grid', 'skyyrose-flagship' ); ?>">
 				<?php foreach ( $gateway_products as $product ) :
 					$badge_class = 'badge-' . $product['collection'];
 				?>
@@ -158,6 +158,7 @@ get_header();
 								src="<?php echo esc_url( $product['image'] ); ?>"
 								alt="<?php echo esc_attr( $product['name'] ); ?>"
 								loading="lazy"
+								width="400" height="500"
 								data-fallback="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>"
 							>
 							<span class="product-grid-badge <?php echo esc_attr( $badge_class ); ?>">
