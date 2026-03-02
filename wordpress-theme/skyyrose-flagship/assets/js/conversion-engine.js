@@ -110,13 +110,17 @@
 		toastTimer = setTimeout(showNextToast, 6000);
 
 		// Pause toast cycle when tab is hidden to avoid DOM accumulation.
-		document.addEventListener('visibilitychange', function () {
-			if (document.hidden) {
-				if (toastTimer) { clearTimeout(toastTimer); toastTimer = null; }
-			} else if (!toastTimer) {
-				toastTimer = setTimeout(showNextToast, CONFIG.toastInterval);
-			}
-		});
+		// Guard: only attach once to prevent accumulation on re-init.
+		if (!initSocialProofToasts._visibilityBound) {
+			initSocialProofToasts._visibilityBound = true;
+			document.addEventListener('visibilitychange', function () {
+				if (document.hidden) {
+					if (toastTimer) { clearTimeout(toastTimer); toastTimer = null; }
+				} else if (!toastTimer) {
+					toastTimer = setTimeout(showNextToast, CONFIG.toastInterval);
+				}
+			});
+		}
 	}
 
 	function showNextToast() {

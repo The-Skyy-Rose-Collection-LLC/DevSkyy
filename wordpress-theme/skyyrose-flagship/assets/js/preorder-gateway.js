@@ -79,6 +79,11 @@
 			}
 			progressBar.style.width = progress + '%';
 		}, 120);
+
+		// Clean up on page hide (bfcache) to prevent detached DOM references.
+		window.addEventListener('pagehide', function () {
+			if (loadingInterval) { clearInterval(loadingInterval); loadingInterval = null; }
+		});
 	}
 
 	/* --------------------------------------------------
