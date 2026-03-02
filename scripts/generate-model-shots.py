@@ -295,6 +295,20 @@ PRODUCT_CATALOG = {
         "type": "bottom",
         "source_override": "sg-d02-skyyrose-shorts-2.jpg",
     },
+    "sg-d03": {
+        "name": "Mint Rose Crewneck + Jogger Set",
+        "desc": "Mint green crewneck sweatshirt and matching joggers with purple rose-growing-from-concrete graphic. Large rose on crewneck front, smaller emblem on jogger thigh. Ribbed cuffs, tapered joggers.",
+        "collection": "signature",
+        "type": "set",
+        "source_override": "sg-d03-mint-crewneck-set.jpg",
+    },
+    "sg-d04": {
+        "name": "Mint Rose Hooded Dress",
+        "desc": "Mint green hooded dress with large purple rose-growing-from-concrete graphic on front. Kangaroo pocket, purple drawstrings, relaxed fit.",
+        "collection": "signature",
+        "type": "dress",
+        "source_override": "sg-d04-mint-hooded-dress.jpg",
+    },
 }
 
 
