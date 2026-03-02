@@ -119,6 +119,27 @@
 				activateTab(tabArr[prev]);
 			}
 		}
+
+		// Arrow key radio navigation (ARIA radiogroup pattern for unit toggle).
+		if (document.activeElement && document.activeElement.getAttribute('role') === 'radio') {
+			var radioArr = Array.from(unitBtns);
+			var rIdx     = radioArr.indexOf(document.activeElement);
+
+			if (rIdx !== -1 && (e.key === 'ArrowRight' || e.key === 'ArrowDown' ||
+			                     e.key === 'ArrowLeft'  || e.key === 'ArrowUp')) {
+				e.preventDefault();
+				var rNext;
+				if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+					rNext = (rIdx + 1) % radioArr.length;
+				} else {
+					rNext = (rIdx - 1 + radioArr.length) % radioArr.length;
+				}
+				radioArr[rIdx].setAttribute('tabindex', '-1');
+				radioArr[rNext].setAttribute('tabindex', '0');
+				radioArr[rNext].focus();
+				switchUnit(radioArr[rNext].dataset.unit);
+			}
+		}
 	}
 
 	/* --------------------------------------------------

@@ -90,6 +90,8 @@
 				// WCAG 2.4.3: Move focus into mobile menu when it opens + enable focus trap.
 				if (!expanded && mobileClose) {
 					mobileClose.focus();
+					// Guard: remove first to prevent duplicate listeners on rapid toggle.
+					mobilePanel.removeEventListener('keydown', handleMobileMenuKeydown);
 					mobilePanel.addEventListener('keydown', handleMobileMenuKeydown);
 				}
 			}
