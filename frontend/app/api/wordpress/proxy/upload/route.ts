@@ -11,8 +11,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const WORDPRESS_URL = process.env.WORDPRESS_URL;
-const WP_CONSUMER_KEY = process.env.WP_CONSUMER_KEY;
-const WP_CONSUMER_SECRET = process.env.WP_CONSUMER_SECRET;
+const WP_CONSUMER_KEY = process.env.WOOCOMMERCE_KEY;
+const WP_CONSUMER_SECRET = process.env.WOOCOMMERCE_SECRET;
 
 export async function POST(request: NextRequest) {
   if (!WORDPRESS_URL || !WP_CONSUMER_KEY || !WP_CONSUMER_SECRET) {

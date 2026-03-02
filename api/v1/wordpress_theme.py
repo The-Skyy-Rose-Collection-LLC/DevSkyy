@@ -35,8 +35,8 @@ async def get_theme_config(
 ):
     """Get current WordPress theme configuration."""
     return ThemeConfig(
-        name="SkyyRose 2025",
-        version="2.0.0",
+        name="skyyrose-flagship",
+        version="3.2.0",
         primary_color="#B76E79",
         enable_3d_viewer=True,
         enable_ar=True,

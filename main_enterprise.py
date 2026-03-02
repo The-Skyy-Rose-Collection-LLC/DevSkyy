@@ -1052,7 +1052,6 @@ from api.v1 import (
     business_router,
     competitors_router,
     descriptions_router,
-    woocommerce_webhooks_router,
 )
 
 # Business analytics (revenue, orders, AOV, funnel)
@@ -1062,7 +1061,6 @@ app.include_router(approval_router, prefix="/api/v1")
 app.include_router(brand_assets_router, prefix="/api/v1")
 app.include_router(competitors_router, prefix="/api/v1")
 app.include_router(descriptions_router, prefix="/api/v1")
-app.include_router(woocommerce_webhooks_router, prefix="/api/v1")
 
 # Dashboard summary API (US-011: unified dashboard data)
 from api.v1.analytics.dashboard import router as analytics_dashboard_router
