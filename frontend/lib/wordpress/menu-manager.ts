@@ -3,11 +3,7 @@
  * Autonomous agent control of WordPress menus and navigation
  */
 
-interface WooCommerceConfig {
-  baseUrl: string
-  consumerKey: string
-  consumerSecret: string
-}
+import { wpProxyFetch } from './proxy-client'
 
 interface MenuItem {
   id?: number
@@ -35,29 +31,17 @@ interface Menu {
 }
 
 export class WordPressMenuManager {
-  private config: WooCommerceConfig
-  private authHeader: string
+  private siteUrl: string
 
-  constructor(config: WooCommerceConfig) {
-    this.config = config
-    const credentials = btoa(`${config.consumerKey}:${config.consumerSecret}`)
-    this.authHeader = `Basic ${credentials}`
+  constructor(config: { baseUrl?: string } = {}) {
+    this.siteUrl = config.baseUrl ?? ''
   }
 
   /**
    * Get all menus
    */
   async getMenus(): Promise<Menu[]> {
-    const endpoint = `${this.config.baseUrl}/index.php?rest_route=/wp/v2/menus`
-    const response = await fetch(endpoint, {
-      headers: { Authorization: this.authHeader }
-    })
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch menus: ${response.status}`)
-    }
-
-    return response.json()
+    return wpProxyFetch('GET', '/wp/v2/menus')
   }
 
   /**
@@ -72,24 +56,13 @@ export class WordPressMenuManager {
    * Get menu items for a specific menu
    */
   async getMenuItems(menuId: number): Promise<MenuItem[]> {
-    const endpoint = `${this.config.baseUrl}/index.php?rest_route=/wp/v2/menu-items&menus=${menuId}`
-    const response = await fetch(endpoint, {
-      headers: { Authorization: this.authHeader }
-    })
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch menu items: ${response.status}`)
-    }
-
-    return response.json()
+    return wpProxyFetch('GET', `/wp/v2/menu-items?menus=${menuId}`)
   }
 
   /**
    * Create a new menu item
    */
   async createMenuItem(menuId: number, item: MenuItem): Promise<MenuItem> {
-    const endpoint = `${this.config.baseUrl}/index.php?rest_route=/wp/v2/menu-items`
-
     const payload = {
       title: item.title,
       url: item.url,
@@ -106,64 +79,21 @@ export class WordPressMenuManager {
       type_label: item.type_label || 'Custom Link'
     }
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: this.authHeader
-      },
-      body: JSON.stringify(payload)
-    })
-
-    if (!response.ok) {
-      const error = await response.text()
-      throw new Error(`Failed to create menu item: ${response.status} ${error}`)
-    }
-
-    return response.json()
+    return wpProxyFetch('POST', '/wp/v2/menu-items', payload)
   }
 
   /**
    * Update an existing menu item
    */
   async updateMenuItem(itemId: number, updates: Partial<MenuItem>): Promise<MenuItem> {
-    const endpoint = `${this.config.baseUrl}/index.php?rest_route=/wp/v2/menu-items/${itemId}`
-
-    const response = await fetch(endpoint, {
-      method: 'POST', // WordPress uses POST for updates
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: this.authHeader
-      },
-      body: JSON.stringify(updates)
-    })
-
-    if (!response.ok) {
-      const error = await response.text()
-      throw new Error(`Failed to update menu item: ${response.status} ${error}`)
-    }
-
-    return response.json()
+    return wpProxyFetch('POST', `/wp/v2/menu-items/${itemId}`, updates)
   }
 
   /**
    * Delete a menu item
    */
   async deleteMenuItem(itemId: number): Promise<boolean> {
-    const endpoint = `${this.config.baseUrl}/index.php?rest_route=/wp/v2/menu-items/${itemId}`
-
-    const response = await fetch(endpoint, {
-      method: 'DELETE',
-      headers: {
-        Authorization: this.authHeader,
-        'X-WP-Force': 'true' // Force delete, skip trash
-      }
-    })
-
-    if (!response.ok) {
-      throw new Error(`Failed to delete menu item: ${response.status}`)
-    }
-
+    await wpProxyFetch('DELETE', `/wp/v2/menu-items/${itemId}`)
     return true
   }
 
@@ -199,7 +129,7 @@ export class WordPressMenuManager {
 
     return this.createMenuItem(menuId, {
       title: collection.name,
-      url: `${this.config.baseUrl}/collection/${collection.slug}`,
+      url: `${this.siteUrl}/collection/${collection.slug}`,
       menu_order: maxOrder + 1,
       object: collection.postId ? 'page' : 'custom',
       object_id: collection.postId || 0,
@@ -267,21 +197,11 @@ export class WordPressMenuManager {
 }
 
 /**
- * Get WordPress menu manager instance
+ * Get WordPress menu manager instance.
+ * Credentials are handled server-side by /api/wordpress/proxy.
  */
-export function getWordPressMenuManager(): WordPressMenuManager | null {
-  const baseUrl = process.env.NEXT_PUBLIC_WORDPRESS_URL
-  const consumerKey = process.env.NEXT_PUBLIC_WP_CONSUMER_KEY
-  const consumerSecret = process.env.NEXT_PUBLIC_WP_CONSUMER_SECRET
-
-  if (!baseUrl || !consumerKey || !consumerSecret) {
-    console.warn('WordPress credentials not configured')
-    return null
-  }
-
+export function getWordPressMenuManager(): WordPressMenuManager {
   return new WordPressMenuManager({
-    baseUrl,
-    consumerKey,
-    consumerSecret
+    baseUrl: process.env.NEXT_PUBLIC_WORDPRESS_URL,
   })
 }
