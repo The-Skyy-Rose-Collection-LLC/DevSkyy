@@ -265,16 +265,15 @@ $founder_signature = get_theme_mod( 'about_founder_signature', '&mdash; The Foun
 			?>
 			<div class="<?php echo esc_attr( $grid_class ); ?>">
 
-				<figure class="about-story__image about-reveal <?php echo esc_attr( $story['reverse'] ? 'about-reveal--right' : 'about-reveal--left' ); ?> <?php echo esc_attr( $delay_class ); ?>" aria-hidden="true">
+				<figure class="about-story__image about-reveal <?php echo esc_attr( $story['reverse'] ? 'about-reveal--right' : 'about-reveal--left' ); ?> <?php echo esc_attr( $delay_class ); ?>">
 					<?php
-					/*
-					 * Image placeholder. When actual brand photography is uploaded,
-					 * replace with:
-					 * <img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/about-story-' . $index . '.jpg' ) ); ?>"
-					 *      alt="<?php echo esc_attr( $story['image_alt'] ); ?>"
-					 *      loading="lazy" width="600" height="500">
-					 */
+					$about_story_img = get_theme_file_path( 'assets/images/about-story-' . $index . '.jpg' );
+					if ( file_exists( $about_story_img ) ) :
 					?>
+						<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/about-story-' . $index . '.jpg' ) ); ?>"
+							 alt="<?php echo esc_attr( $story['image_alt'] ); ?>"
+							 loading="lazy" width="600" height="500">
+					<?php endif; ?>
 				</figure>
 
 				<div class="about-story__content about-reveal <?php echo esc_attr( $story['reverse'] ? 'about-reveal--left' : 'about-reveal--right' ); ?> <?php echo esc_attr( $delay_class ); ?>">
@@ -461,15 +460,15 @@ $founder_signature = get_theme_mod( 'about_founder_signature', '&mdash; The Foun
 	<section class="about-founder" aria-label="<?php esc_attr_e( 'Founder Message', 'skyyrose-flagship' ); ?>">
 		<div class="about-founder__inner">
 
-			<figure class="about-founder__portrait about-reveal about-reveal--left" aria-hidden="true">
+			<figure class="about-founder__portrait about-reveal about-reveal--left">
 				<?php
-				/*
-				 * Founder portrait placeholder. When uploaded, replace with:
-				 * <img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/founder-portrait.jpg' ) ); ?>"
-				 *      alt="<?php esc_attr_e( 'SkyyRose Founder', 'skyyrose-flagship' ); ?>"
-				 *      loading="lazy" width="400" height="500">
-				 */
+				$founder_img = get_theme_file_path( 'assets/images/founder-portrait.jpg' );
+				if ( file_exists( $founder_img ) ) :
 				?>
+					<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/founder-portrait.jpg' ) ); ?>"
+						 alt="<?php esc_attr_e( 'SkyyRose Founder', 'skyyrose-flagship' ); ?>"
+						 loading="lazy" width="400" height="500">
+				<?php endif; ?>
 			</figure>
 
 			<div class="about-founder__text about-reveal about-reveal--right about-reveal--delay-2">
@@ -528,6 +527,96 @@ $founder_signature = get_theme_mod( 'about_founder_signature', '&mdash; The Foun
 				</p>
 			</div>
 
+		</div>
+	</section>
+
+	<!-- ============================================
+	     PRESS & MEDIA -- Featured appearances
+	     ============================================ -->
+	<section class="about-press" aria-label="<?php esc_attr_e( 'Press &amp; Media', 'skyyrose-flagship' ); ?>">
+		<div class="about-press__inner">
+			<div class="about-press__header about-reveal">
+				<span class="section-header__label">
+					<?php esc_html_e( 'As Seen In', 'skyyrose-flagship' ); ?>
+				</span>
+				<h2 class="about-press__heading">
+					<?php esc_html_e( 'Press & Media', 'skyyrose-flagship' ); ?>
+				</h2>
+				<p class="about-press__intro">
+					<?php esc_html_e( 'SkyyRose is making waves beyond fashion — from Oakland studios to media spotlights, the movement speaks for itself.', 'skyyrose-flagship' ); ?>
+				</p>
+			</div>
+
+			<div class="about-press__grid about-reveal about-reveal--delay-1">
+				<?php
+				$press_features = array(
+					array(
+						'image'       => 'press-the-blox-interview.jpg',
+						'video'       => 'video/the-blox-interview.mp4',
+						'outlet'      => __( 'The Blox', 'skyyrose-flagship' ),
+						'title'       => __( 'Founder Feature Interview', 'skyyrose-flagship' ),
+						'description' => __( 'SkyyRose founder Corey Foster sits down with The Blox to discuss building a luxury streetwear brand from Oakland, the meaning behind each collection, and the vision for the future.', 'skyyrose-flagship' ),
+						'link'        => 'https://www.tiktok.com/@skyyroseco',
+						'link_text'   => __( 'Watch on TikTok', 'skyyrose-flagship' ),
+					),
+				);
+
+				foreach ( $press_features as $feature ) :
+					$press_img_path = get_theme_file_path( 'assets/images/' . $feature['image'] );
+					$press_img_url  = get_theme_file_uri( 'assets/images/' . $feature['image'] );
+				?>
+					<article class="about-press__feature">
+						<figure class="about-press__media">
+							<?php
+							$has_video = ! empty( $feature['video'] ) && file_exists( get_theme_file_path( 'assets/' . $feature['video'] ) );
+							if ( $has_video ) :
+							?>
+								<video
+									class="about-press__video"
+									controls
+									preload="metadata"
+									poster="<?php echo esc_url( $press_img_url ); ?>"
+									width="672"
+									height="384"
+								>
+									<source src="<?php echo esc_url( get_theme_file_uri( 'assets/' . $feature['video'] ) ); ?>" type="video/mp4">
+								</video>
+							<?php elseif ( file_exists( $press_img_path ) ) : ?>
+								<img
+									src="<?php echo esc_url( $press_img_url ); ?>"
+									alt="<?php echo esc_attr( $feature['outlet'] . ' — ' . $feature['title'] ); ?>"
+									loading="lazy"
+									width="672"
+									height="384"
+								>
+							<?php endif; ?>
+						</figure>
+						<div class="about-press__content">
+							<span class="about-press__outlet">
+								<?php echo esc_html( $feature['outlet'] ); ?>
+							</span>
+							<h3 class="about-press__title">
+								<?php echo esc_html( $feature['title'] ); ?>
+							</h3>
+							<p class="about-press__description">
+								<?php echo esc_html( $feature['description'] ); ?>
+							</p>
+							<?php if ( ! empty( $feature['link'] ) ) : ?>
+								<a href="<?php echo esc_url( $feature['link'] ); ?>"
+								   class="about-press__link"
+								   target="_blank"
+								   rel="noopener noreferrer">
+									<?php echo esc_html( $feature['link_text'] ); ?>
+									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
+										<line x1="7" y1="17" x2="17" y2="7"/>
+										<polyline points="7 7 17 7 17 17"/>
+									</svg>
+								</a>
+							<?php endif; ?>
+						</div>
+					</article>
+				<?php endforeach; ?>
+			</div>
 		</div>
 	</section>
 
