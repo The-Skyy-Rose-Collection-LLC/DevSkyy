@@ -118,8 +118,29 @@
           }
         ],
         "description": "Warn about console.log statements after edits"
+      },
+      {
+        "matcher": "tool == \"Write\" || tool == \"Edit\" || tool == \"Bash\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/claude-md-tracker/track-changes.sh\""
+          }
+        ],
+        "description": "Track structural changes for CLAUDE.md staleness detection"
       }
     ],
-    "Stop": []
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/claude-md-tracker/session-summary.sh\""
+          }
+        ],
+        "description": "Summarize CLAUDE.md staleness at session end"
+      }
+    ]
   }
 }

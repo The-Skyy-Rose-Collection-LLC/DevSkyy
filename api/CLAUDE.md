@@ -1,21 +1,29 @@
 # DevSkyy API
 
-> Versioned, documented, secure | 35 files
+> Versioned, documented, secure | FastAPI + GraphQL + WebSockets
 
-## Architecture
+## Structure
+
 ```
 api/
-├── versioning.py          # Version management
-└── v1/
-    ├── agents.py          # Agent endpoints
-    ├── analytics.py       # Metrics
-    ├── gdpr.py            # Privacy
-    ├── health.py          # Health checks
-    ├── products.py        # Product CRUD
-    └── wordpress.py       # WP integration
+├── versioning.py              # Version management
+├── graphql_server.py          # GraphQL endpoint (/graphql)
+├── graphql/                   # Strawberry schema, types, resolvers, dataloaders
+├── v1/                        # Versioned REST endpoints (30 modules)
+│   ├── agents.py              # Agent endpoints
+│   ├── analytics.py           # Metrics
+│   ├── gdpr.py                # Privacy
+│   ├── health.py              # Health checks
+│   ├── products.py            # Product CRUD
+│   └── wordpress.py           # WP integration
+├── admin_dashboard.py         # Admin API
+├── webhooks.py                # Webhook handlers
+├── websocket.py               # WebSocket connections
+└── image-processing/          # Image pipeline API
 ```
 
 ## Pattern
+
 ```python
 @router.post("/products", response_model=ProductResponse)
 async def create_product(
@@ -28,16 +36,11 @@ async def create_product(
     return ProductResponse.model_validate(product)
 ```
 
-## BEFORE CODING (MANDATORY)
-1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
-2. **Serena**: Use for codebase navigation and symbol lookup
-3. **Verify**: `pytest -v` after EVERY change
+## Verification
 
-## USE THESE TOOLS
-| Task | Tool |
-|------|------|
-| New endpoints | **Agent**: `tdd-guide` (tests first) |
-| Auth/security | **Agent**: `security-reviewer` (ALWAYS) |
-| API docs | **MCP**: `tool_catalog` |
+```bash
+pytest tests/api/ -v
+pytest tests/integration/ -v
+```
 
 **"Document every endpoint. Type every response."**

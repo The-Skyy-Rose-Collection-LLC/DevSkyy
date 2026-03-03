@@ -1,17 +1,20 @@
 # DevSkyy Database
 
-> Alembic migrations, async sessions | 8 files
+> Alembic migrations, async sessions | SQLAlchemy 2.0
 
-## Architecture
+## Structure
+
 ```
 database/
 ├── engine.py           # Async SQLAlchemy engine
 ├── session.py          # Session management
 ├── models.py           # ORM models
+├── db.py               # Database tables (event_store, products)
 └── repositories/       # Data access layer
 ```
 
 ## Pattern
+
 ```python
 class DatabaseManager:
     def __init__(self, url: str):
@@ -30,18 +33,17 @@ class DatabaseManager:
 ```
 
 ## Migrations
+
 ```bash
 alembic revision --autogenerate -m "Add table"  # Create
 alembic upgrade head                             # Apply
 alembic downgrade -1                             # Rollback
 ```
 
-## BEFORE CODING (MANDATORY)
-1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
-2. **Serena**: Use for codebase navigation and symbol lookup
-3. **Verify**: `pytest -v` after EVERY change
+## Verification
 
-## USE THESE TOOLS
-- **MCP**: `analytics_query` | **Skill**: `backend-patterns`
+```bash
+pytest tests/core/ -v  # Core DB-related tests
+```
 
 **"Every migration is reviewed. Every rollback is planned."**
