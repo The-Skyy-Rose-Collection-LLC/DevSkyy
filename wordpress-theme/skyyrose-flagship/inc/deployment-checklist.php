@@ -876,7 +876,7 @@ function skyyrose_deployment_checklist_page() {
 		</div>
 
 		<div class="skyyrose-deploy-summary">
-			<div class="skyyrose-deploy-summary-score <?php echo $all_passed ? 'all-pass' : 'has-fail'; ?>">
+			<div class="skyyrose-deploy-summary-score <?php echo esc_attr( $all_passed ? 'all-pass' : 'has-fail' ); ?>">
 				<?php echo esc_html( $passed_checks ); ?>/<?php echo esc_html( $total_checks ); ?>
 			</div>
 			<div class="skyyrose-deploy-summary-details">
@@ -910,14 +910,14 @@ function skyyrose_deployment_checklist_page() {
 					</span>
 				</p>
 			</div>
-			<span class="skyyrose-deploy-badge <?php echo $all_passed ? 'ready' : 'not-ready'; ?>">
+			<span class="skyyrose-deploy-badge <?php echo esc_attr( $all_passed ? 'ready' : 'not-ready' ); ?>">
 				<?php echo $all_passed ? esc_html__( 'Ready to Deploy', 'skyyrose-flagship' ) : esc_html__( 'Not Ready', 'skyyrose-flagship' ); ?>
 			</span>
 		</div>
 
 		<?php foreach ( $results as $section_label => $checks ) : ?>
 			<div class="skyyrose-deploy-section">
-				<div class="skyyrose-deploy-section-header" onclick="this.parentElement.classList.toggle('collapsed')">
+				<div class="skyyrose-deploy-section-header" role="button" tabindex="0">
 					<h3><?php echo esc_html( $section_label ); ?></h3>
 					<span class="skyyrose-deploy-section-toggle">&#9660;</span>
 				</div>
@@ -956,5 +956,18 @@ function skyyrose_deployment_checklist_page() {
 		</div>
 
 	</div>
+	<script>
+	document.querySelectorAll('.skyyrose-deploy-section-header').forEach(function(el) {
+		el.addEventListener('click', function() {
+			this.parentElement.classList.toggle('collapsed');
+		});
+		el.addEventListener('keydown', function(e) {
+			if (e.key === 'Enter' || e.key === ' ') {
+				e.preventDefault();
+				this.parentElement.classList.toggle('collapsed');
+			}
+		});
+	});
+	</script>
 	<?php
 }
