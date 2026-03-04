@@ -437,6 +437,162 @@
 }
 
 /* ==================================================
+   SORT / FILTER TOOLBAR
+   ================================================== */
+
+.col-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 24px;
+	margin-bottom: 40px;
+	padding: 16px 20px;
+	border: 1px solid rgba(var(--col-accent-rgb, 192, 192, 192), .04);
+	background: rgba(255, 255, 255, .01);
+}
+
+.col-toolbar__label {
+	font-family: 'Space Mono', monospace;
+	font-size: 8px;
+	letter-spacing: 4px;
+	text-transform: uppercase;
+	color: #555;
+	margin-right: 8px;
+}
+
+.col-toolbar__select {
+	background: rgba(255, 255, 255, .03);
+	border: 1px solid rgba(var(--col-accent-rgb, 192, 192, 192), .08);
+	color: #bbb;
+	font-family: 'Bebas Neue', sans-serif;
+	font-size: 13px;
+	letter-spacing: 2px;
+	padding: 8px 28px 8px 12px;
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 10px center;
+	cursor: pointer;
+	transition: border-color .3s;
+}
+
+.col-toolbar__select:hover,
+.col-toolbar__select:focus {
+	border-color: var(--col-accent, #C0C0C0);
+	outline: none;
+}
+
+.col-toolbar__filter {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.col-toolbar__range {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.col-toolbar__currency {
+	font-family: 'Space Mono', monospace;
+	font-size: 10px;
+	color: #555;
+}
+
+.col-toolbar__input {
+	width: 64px;
+	padding: 8px 8px;
+	background: rgba(255, 255, 255, .03);
+	border: 1px solid rgba(var(--col-accent-rgb, 192, 192, 192), .08);
+	color: #bbb;
+	font-family: 'Bebas Neue', sans-serif;
+	font-size: 13px;
+	letter-spacing: 1px;
+	text-align: center;
+	transition: border-color .3s;
+}
+
+.col-toolbar__input:hover,
+.col-toolbar__input:focus {
+	border-color: var(--col-accent, #C0C0C0);
+	outline: none;
+}
+
+.col-toolbar__input::placeholder { color: #444; }
+
+.col-toolbar__dash {
+	color: #444;
+	font-size: 11px;
+}
+
+.col-toolbar__wishlist-count {
+	margin-left: auto;
+}
+
+.col-toolbar__wl-link {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-family: 'Space Mono', monospace;
+	font-size: 9px;
+	letter-spacing: 2px;
+	color: #666;
+	transition: color .3s;
+}
+
+.col-toolbar__wl-link:hover { color: var(--col-accent, #C0C0C0); }
+
+.col-toolbar__wl-icon {
+	width: 18px;
+	height: 18px;
+}
+
+.col-toolbar__wl-num {
+	min-width: 14px;
+	text-align: center;
+}
+
+/* ==================================================
+   WISHLIST HEART (on product cards)
+   ================================================== */
+
+.col-card__heart {
+	position: absolute;
+	top: 50px;
+	right: 14px;
+	width: 36px;
+	height: 36px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, .5);
+	border: 1px solid rgba(255, 255, 255, .06);
+	backdrop-filter: blur(8px);
+	z-index: 3;
+	cursor: pointer;
+	transition: all .3s;
+	padding: 0;
+}
+
+.col-card__heart svg {
+	width: 16px;
+	height: 16px;
+	color: #888;
+	transition: all .3s;
+}
+
+.col-card__heart:hover svg { color: #DC143C; }
+
+.col-card__heart[aria-pressed="true"] svg {
+	color: #DC143C;
+	fill: #DC143C;
+}
+
+.col-card__heart[aria-pressed="true"] {
+	border-color: rgba(220, 20, 60, .2);
+}
+
+/* ==================================================
    CATALOG GRID
    ================================================== */
 
@@ -1038,6 +1194,7 @@
 	.col-feat__inner { gap: 48px; }
 	.col-catalog { padding: 80px 40px; }
 	.col-grid { grid-template-columns: repeat(2, 1fr); }
+	.col-toolbar { flex-wrap: wrap; }
 }
 
 @media (max-width: 600px) {
@@ -1047,6 +1204,12 @@
 	.col-featured { padding: 80px 20px; }
 	.col-catalog { padding: 60px 16px; }
 	.col-grid { grid-template-columns: 1fr; }
+	.col-toolbar { flex-direction: column; align-items: stretch; gap: 12px; padding: 12px 14px; }
+	.col-toolbar__sort,
+	.col-toolbar__filter { display: flex; align-items: center; }
+	.col-toolbar__select { flex: 1; }
+	.col-toolbar__range { flex: 1; }
+	.col-toolbar__wishlist-count { margin-left: 0; align-self: flex-end; }
 	.col-nl { padding: 80px 16px; }
 	.col-nl__form { flex-direction: column; }
 	.col-nl__input {

@@ -266,6 +266,46 @@ get_header();
 				<?php echo wp_kses_post( $col['meta_pieces'] . ' &mdash; ' . $col['meta_price_range'] ); ?>
 			</span>
 		</div>
+
+		<!-- Sort / Filter Toolbar -->
+		<div class="col-toolbar col-rv" role="toolbar" aria-label="<?php esc_attr_e( 'Sort and filter products', 'skyyrose-flagship' ); ?>">
+			<div class="col-toolbar__sort">
+				<label for="col-sort" class="col-toolbar__label"><?php esc_html_e( 'Sort', 'skyyrose-flagship' ); ?></label>
+				<select id="col-sort" class="col-toolbar__select" aria-label="<?php esc_attr_e( 'Sort products', 'skyyrose-flagship' ); ?>">
+					<option value="default"><?php esc_html_e( 'Default', 'skyyrose-flagship' ); ?></option>
+					<option value="price-asc"><?php esc_html_e( 'Price: Low → High', 'skyyrose-flagship' ); ?></option>
+					<option value="price-desc"><?php esc_html_e( 'Price: High → Low', 'skyyrose-flagship' ); ?></option>
+					<option value="name-asc"><?php esc_html_e( 'Name: A → Z', 'skyyrose-flagship' ); ?></option>
+					<option value="name-desc"><?php esc_html_e( 'Name: Z → A', 'skyyrose-flagship' ); ?></option>
+				</select>
+			</div>
+			<div class="col-toolbar__filter">
+				<label class="col-toolbar__label"><?php esc_html_e( 'Price', 'skyyrose-flagship' ); ?></label>
+				<div class="col-toolbar__range">
+					<span class="col-toolbar__currency">$</span>
+					<input type="number" id="col-price-min" class="col-toolbar__input"
+					       placeholder="<?php esc_attr_e( 'Min', 'skyyrose-flagship' ); ?>"
+					       min="0" step="1"
+					       aria-label="<?php esc_attr_e( 'Minimum price', 'skyyrose-flagship' ); ?>">
+					<span class="col-toolbar__dash">&mdash;</span>
+					<span class="col-toolbar__currency">$</span>
+					<input type="number" id="col-price-max" class="col-toolbar__input"
+					       placeholder="<?php esc_attr_e( 'Max', 'skyyrose-flagship' ); ?>"
+					       min="0" step="1"
+					       aria-label="<?php esc_attr_e( 'Maximum price', 'skyyrose-flagship' ); ?>">
+				</div>
+			</div>
+			<div class="col-toolbar__wishlist-count" aria-live="polite">
+				<a href="<?php echo esc_url( home_url( '/wishlist/' ) ); ?>" class="col-toolbar__wl-link"
+				   aria-label="<?php esc_attr_e( 'View wishlist', 'skyyrose-flagship' ); ?>">
+					<svg class="col-toolbar__wl-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+						<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+					</svg>
+					<span class="col-toolbar__wl-num" id="col-wl-count">0</span>
+				</a>
+			</div>
+		</div>
+
 		<div class="col-grid">
 			<?php
 			$card_delay = 0;
@@ -290,7 +330,14 @@ get_header();
 						<?php if ( $product['is_preorder'] ) : ?>
 							<span class="col-card__pre"><?php esc_html_e( 'Pre-Order', 'skyyrose-flagship' ); ?></span>
 						<?php endif; ?>
-						<div class="col-card__hover"><span><?php esc_html_e( 'VIEW PIECE', 'skyyrose-flagship' ); ?></span></div>
+						<button class="col-card__heart" data-wishlist-id="<?php echo esc_attr( $product['sku'] ); ?>"
+					        aria-label="<?php echo esc_attr( sprintf( __( 'Add %s to wishlist', 'skyyrose-flagship' ), $product['name'] ) ); ?>"
+					        aria-pressed="false">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+							<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+						</svg>
+					</button>
+					<div class="col-card__hover"><span><?php esc_html_e( 'VIEW PIECE', 'skyyrose-flagship' ); ?></span></div>
 					</div>
 					<div class="col-card__body">
 						<h3 class="col-card__name"><?php echo esc_html( $product['name'] ); ?></h3>

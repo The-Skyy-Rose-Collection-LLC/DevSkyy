@@ -282,7 +282,181 @@
 	}
 
 	/* --------------------------------------------------
-	   5. Escape Key Handler
+	   5. Sort & Filter (client-side)
+	   -------------------------------------------------- */
+
+	var originalOrder = [];
+
+	function initSortFilter() {
+		var grid = document.querySelector('.col-grid');
+		var sortSelect = document.getElementById('col-sort');
+		var minInput = document.getElementById('col-price-min');
+		var maxInput = document.getElementById('col-price-max');
+
+		if (!grid || !sortSelect) return;
+
+		/* Capture original DOM order. */
+		var cards = grid.querySelectorAll('.col-card');
+		cards.forEach(function (card, i) {
+			card.setAttribute('data-original-index', i);
+			var pid = card.getAttribute('data-product-id');
+			var product = null;
+			for (var j = 0; j < products.length; j++) {
+				if (products[j].id === pid || products[j].sku === pid) {
+					product = products[j];
+					break;
+				}
+			}
+			if (product) {
+				card.setAttribute('data-price', product.price || 0);
+				card.setAttribute('data-name', (product.name || '').toLowerCase());
+			}
+			originalOrder.push(card);
+		});
+
+		function applySort() {
+			var sortVal = sortSelect.value;
+			var cardsArr = Array.prototype.slice.call(grid.querySelectorAll('.col-card'));
+
+			cardsArr.sort(function (a, b) {
+				switch (sortVal) {
+					case 'price-asc':
+						return parseFloat(a.getAttribute('data-price') || 0) - parseFloat(b.getAttribute('data-price') || 0);
+					case 'price-desc':
+						return parseFloat(b.getAttribute('data-price') || 0) - parseFloat(a.getAttribute('data-price') || 0);
+					case 'name-asc':
+						return (a.getAttribute('data-name') || '').localeCompare(b.getAttribute('data-name') || '');
+					case 'name-desc':
+						return (b.getAttribute('data-name') || '').localeCompare(a.getAttribute('data-name') || '');
+					default:
+						return parseInt(a.getAttribute('data-original-index') || 0, 10) -
+						       parseInt(b.getAttribute('data-original-index') || 0, 10);
+				}
+			});
+
+			/* Re-append in sorted order (preserves event listeners). */
+			cardsArr.forEach(function (card) { grid.appendChild(card); });
+		}
+
+		function applyFilter() {
+			var minVal = minInput && minInput.value !== '' ? parseFloat(minInput.value) : 0;
+			var maxVal = maxInput && maxInput.value !== '' ? parseFloat(maxInput.value) : Infinity;
+			var cards = grid.querySelectorAll('.col-card');
+			var visible = 0;
+
+			cards.forEach(function (card) {
+				var price = parseFloat(card.getAttribute('data-price') || 0);
+				if (price >= minVal && price <= maxVal) {
+					card.style.display = '';
+					visible++;
+				} else {
+					card.style.display = 'none';
+				}
+			});
+
+			/* Update visible count. */
+			var countEl = document.querySelector('.col-catalog__count');
+			if (countEl && visible < cards.length) {
+				countEl.textContent = visible + ' of ' + cards.length + ' pieces shown';
+			} else if (countEl) {
+				countEl.textContent = '';
+			}
+		}
+
+		sortSelect.addEventListener('change', function () {
+			applySort();
+			applyFilter();
+		});
+
+		var filterTimer = null;
+		function debouncedFilter() {
+			clearTimeout(filterTimer);
+			filterTimer = setTimeout(function () {
+				applyFilter();
+			}, 300);
+		}
+
+		if (minInput) minInput.addEventListener('input', debouncedFilter);
+		if (maxInput) maxInput.addEventListener('input', debouncedFilter);
+	}
+
+	/* --------------------------------------------------
+	   6. Wishlist Hearts (localStorage)
+	   -------------------------------------------------- */
+
+	var WISHLIST_KEY = 'skyyrose_wishlist';
+
+	function getWishlist() {
+		try {
+			return JSON.parse(localStorage.getItem(WISHLIST_KEY)) || [];
+		} catch (e) {
+			return [];
+		}
+	}
+
+	function saveWishlist(list) {
+		try {
+			localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
+		} catch (e) { /* storage full or private mode */ }
+	}
+
+	function updateWishlistCount() {
+		var countEl = document.getElementById('col-wl-count');
+		if (countEl) {
+			countEl.textContent = getWishlist().length;
+		}
+	}
+
+	function initWishlist() {
+		var wishlist = getWishlist();
+
+		/* Mark already-wishlisted items. */
+		var hearts = document.querySelectorAll('.col-card__heart');
+		hearts.forEach(function (btn) {
+			var pid = btn.getAttribute('data-wishlist-id');
+			if (wishlist.indexOf(pid) !== -1) {
+				btn.setAttribute('aria-pressed', 'true');
+			}
+		});
+
+		updateWishlistCount();
+
+		/* Event delegation on the grid. */
+		var catalog = document.querySelector('.col-catalog');
+		if (!catalog) return;
+
+		catalog.addEventListener('click', function (e) {
+			var heartBtn = e.target.closest('.col-card__heart');
+			if (!heartBtn) return;
+
+			e.preventDefault();
+			e.stopPropagation(); /* Prevent card click → modal open. */
+
+			var pid = heartBtn.getAttribute('data-wishlist-id');
+			if (!pid) return;
+
+			var wl = getWishlist();
+			var idx = wl.indexOf(pid);
+
+			if (idx === -1) {
+				wl.push(pid);
+				heartBtn.setAttribute('aria-pressed', 'true');
+				heartBtn.setAttribute('aria-label',
+					heartBtn.getAttribute('aria-label').replace('Add', 'Remove'));
+			} else {
+				wl.splice(idx, 1);
+				heartBtn.setAttribute('aria-pressed', 'false');
+				heartBtn.setAttribute('aria-label',
+					heartBtn.getAttribute('aria-label').replace('Remove', 'Add'));
+			}
+
+			saveWishlist(wl);
+			updateWishlistCount();
+		});
+	}
+
+	/* --------------------------------------------------
+	   7. Escape Key Handler
 	   -------------------------------------------------- */
 
 	function initEscapeKey() {
@@ -302,6 +476,8 @@
 		initFeaturedSizes();
 		initModal();
 		initNewsletter();
+		initSortFilter();
+		initWishlist();
 		initEscapeKey();
 	}
 
