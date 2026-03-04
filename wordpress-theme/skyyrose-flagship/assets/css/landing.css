@@ -67,51 +67,6 @@
 	padding: 12px 32px;
 }
 
-.lp-nav__brand {
-	font-family: var(--fd, 'Cinzel', serif);
-	font-size: 13px;
-	letter-spacing: 8px;
-	text-transform: uppercase;
-	color: var(--lp-accent);
-}
-
-.lp-nav__links {
-	display: flex;
-	gap: 28px;
-}
-
-.lp-nav__links a {
-	font-family: var(--fm, 'Space Mono', monospace);
-	font-size: 10px;
-	letter-spacing: 3px;
-	text-transform: uppercase;
-	color: var(--lp-text-dim);
-	text-decoration: none;
-	transition: color 0.3s;
-}
-
-.lp-nav__links a:hover {
-	color: var(--lp-accent);
-}
-
-.lp-nav__bag {
-	font-family: var(--fc, 'Bebas Neue', sans-serif);
-	font-size: 13px;
-	letter-spacing: 3px;
-	color: var(--lp-text);
-	background: none;
-	border: 1px solid rgba(245, 230, 211, 0.2);
-	padding: 8px 20px;
-	cursor: pointer;
-	transition: all 0.3s;
-	text-decoration: none;
-}
-
-.lp-nav__bag:hover {
-	border-color: var(--lp-accent);
-	color: var(--lp-accent);
-}
-
 /* ═══════════════════════════════════════════════
    SECTION BASE
    ═══════════════════════════════════════════════ */
@@ -217,15 +172,6 @@
 	animation: lp-fade-up 1s var(--lp-ease) 0.5s forwards;
 }
 
-.lp-hero__subtitle {
-	font-family: var(--fb, 'Cormorant Garamond', serif);
-	font-size: clamp(16px, 2vw, 22px);
-	color: var(--lp-text-dim);
-	max-width: 560px;
-	margin: 0 auto 32px;
-	opacity: 0;
-	animation: lp-fade-up 0.8s var(--lp-ease) 0.7s forwards;
-}
 
 .lp-hero__cta {
 	display: flex;
@@ -891,31 +837,6 @@
 }
 
 /* ═══════════════════════════════════════════════
-   FOOTER (minimal, landing-specific)
-   ═══════════════════════════════════════════════ */
-.lp-footer {
-	padding: 40px 0;
-	text-align: center;
-	border-top: 1px solid rgba(245, 230, 211, 0.06);
-}
-
-.lp-footer__brand {
-	font-family: var(--fd, 'Cinzel', serif);
-	font-size: 12px;
-	letter-spacing: 6px;
-	text-transform: uppercase;
-	color: var(--lp-accent);
-	margin-bottom: 8px;
-}
-
-.lp-footer__copy {
-	font-family: var(--fm, 'Space Mono', monospace);
-	font-size: 9px;
-	letter-spacing: 2px;
-	color: var(--lp-text-dim);
-}
-
-/* ═══════════════════════════════════════════════
    BONUS: SOCIAL PROOF NOTIFICATION TOAST
    ═══════════════════════════════════════════════ */
 .lp-toast {
@@ -1093,9 +1014,6 @@
 		grid-template-columns: 1fr;
 	}
 
-	.lp-nav__links {
-		display: none;
-	}
 }
 
 /* ═══════════════════════════════════════════════
@@ -1145,7 +1063,6 @@
 
 	.lp-hero__eyebrow,
 	.lp-hero__title,
-	.lp-hero__subtitle,
 	.lp-hero__cta,
 	.lp-countdown {
 		opacity: 1;
