@@ -9,6 +9,130 @@
 
 ---
 
+## PRIORITY: New Homepage Build (Do This FIRST)
+
+Source: `docs/elite-web-builder-package/homepage/skyyrose-homepage-v2.html`
+
+- [x] Query Context7 for WordPress conditional enqueue, WooCommerce `wc_get_products()`, `antispambot()`, AJAX API
+  - Context7: `/websites/developer_wordpress_reference_classes` → `wp_enqueue_style conditional loading antispambot` → partially relevant (block-focused)
+  - Context7: `/woocommerce/woocommerce` → `wc_get_products category query` → current, excellent results
+  - Fallback: None needed — WooCommerce docs were comprehensive
+- [x] Read source HTML completely (530 lines, 12 sections)
+  - 856KB file, 530 lines, 5 base64 images (~600KB total embedded)
+  - Sections: loader, nav, hero, press, marquee, story, quote, collections, lookbook, craft, newsletter, footer
+- [x] Extract CSS to `assets/css/homepage-v2.css` (clean up minification, organize with comments)
+  - Expanded minified CSS into well-organized, commented sections (~900 lines)
+  - Fixed mobile newsletter border gap: added `margin-bottom: -1px` on `.nl-input`
+  - Scoped body styles under `.homepage-v2` class
+- [x] Extract JS to `assets/js/homepage-v2.js` (replace all inline `onclick` with `addEventListener`)
+  - Replaced ALL onclick handlers with addEventListener (CSP compliant)
+  - IIFE pattern, WordPress AJAX integration via `skyyrose_homepage` localized object
+  - Newsletter uses existing `wp_ajax_skyyrose_newsletter_subscribe` handler
+- [x] Extract base64 images (hero bg, story img, 3 collection card imgs) to `assets/images/` as WebP
+  - Saved 5 images as JPG, then converted to WebP: hero-bg (234KB), story-founder (55KB), 3 collection cards (73-142KB)
+  - Total: ~582KB WebP vs ~600KB base64 — and now cacheable by browser
+- [x] Rebuild `front-page.php` from HTML → WordPress PHP (replace current content)
+  - Complete rewrite: 12-section cinematic homepage replacing old collection-per-section layout
+  - New design: collection CARDS linking to separate pages instead of inline product grids
+- [x] Fix cosmetic: remove `&shy;` from "Signature" collection card name
+  - Signature now renders without soft hyphen in the PHP template
+- [x] Fix cosmetic: verify newsletter form mobile borders are seamless (test at 768px)
+  - CSS fix: `.nl-input { margin-bottom: -1px }` on mobile to collapse border seam
+- [x] Fix cosmetic: remove Cloudflare email-decode script, use `antispambot()` instead
+  - No Cloudflare JS included; footer contact uses `antispambot('info@skyyrose.co')`
+- [x] Replace lookbook placeholders with real images from `assets/images/products/` and `assets/images/customers/`
+  - 5 real images: 3 customer photos (varsity, kid hoodie, beanie), 2 product renders (br-d01, br-d02)
+- [x] Wire collection cards to WooCommerce data (real product counts + price ranges)
+  - `wc_get_products()` with `category` filter and `paginate => true` for counts
+  - Price ranges calculated from actual product prices
+  - Fallback static values when WooCommerce is not active
+- [x] Wire newsletter form to WordPress AJAX (`wp_ajax_skyyrose_newsletter`)
+  - Matched existing handler: action=`skyyrose_newsletter_subscribe`, nonce field=`skyyrose_newsletter_nonce`
+  - Localized via `wp_localize_script` in `inc/enqueue.php`
+- [x] Wire cart button to WooCommerce cart page
+  - Nav bag button redirects to `wc_get_cart_url()` via localized JS
+  - Mobile menu includes WooCommerce cart link
+- [x] Add conditional enqueue in `functions.php` (homepage-v2.css + homepage-v2.js only on front page)
+  - Updated template styles/scripts maps: `'front-page' => 'homepage-v2.css'` and `'homepage-v2.js'`
+  - Added `wp_localize_script` for homepage data (ajax_url, newsletter_nonce, cart_url)
+  - Added Instrument Serif + Playfair Display to Google Fonts enqueue
+  - Added `homepage-v2` body class via `skyyrose_custom_body_classes` filter
+- [/] Split sections into `template-parts/front-page/` partials where sensible
+  - DEFERRED to next iteration — all 12 sections are inline for now, will extract later
+- [x] Add JSON-LD Organization structured data
+  - Added at bottom of front-page.php via `wp_json_encode()` — Organization schema with founder, address, sameAs
+- [x] Add proper escaping (`esc_html()`, `esc_attr()`, `esc_url()`) on all output
+  - Every output uses appropriate escaping: `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()`, `antispambot()`
+- [ ] FREE RANGE: Add 2 industry-proven bonus features
+- [/] Commit: `feat(theme): rebuild front-page.php from updated homepage design v2`
+
+---
+
+## IMPROVEMENT 1: Asset Pipeline — Conditional CSS/JS + Minification (Do SECOND)
+
+- [ ] Audit `inc/enqueue.php` — list every `wp_enqueue_style`/`wp_enqueue_script` call and which pages it loads on
+  - Context7: `_____` → `_____` → [status]
+- [ ] Restructure enqueue — wrap EVERY non-global asset in `is_front_page()`, `is_page_template()`, `is_singular('product')`, etc.
+  - Global ONLY: style.css, main.css, design-tokens.css, header.css, footer.css, navigation.js, Google Fonts
+  - Everything else = conditional per template
+- [ ] Generate `.min.css` for all CSS files: `npx csso-cli "$f" -o "${f%.css}.min.css"`
+- [ ] Generate `.min.js` for all JS files: `npx terser "$f" --compress --mangle -o "${f%.js}.min.js"`
+- [ ] Update enqueue to serve `.min` versions when `SCRIPT_DEBUG` is false
+- [ ] Bundle engine CSS: `aurora-engine + pulse-engine + velocity-scroll + the-pulse` → `engines-bundle.css`
+- [ ] Bundle personalization CSS: `adaptive-personalization + journey-gamification` → `personalization-bundle.css`
+- [ ] Verify: load homepage, check Network tab — only homepage-specific assets should load
+- [ ] Commit: `perf(theme): conditional CSS/JS enqueue + minification pipeline`
+
+---
+
+## IMPROVEMENT 2: Image Optimization (Do THIRD)
+
+- [ ] Check if `skyyrose-monogram-hero.webm` and `.mp4` already exist — if not, generate via ffmpeg
+  - Context7: `_____` → `_____` → [status]
+- [ ] Batch convert scene PNGs → WebP: `cwebp -q 82 -resize 1920 0` (target <500KB each)
+- [ ] Audit `assets/images/products/` for files >500KB — resize oversized ones
+- [ ] Find and log duplicate formats (same image as PNG + JPG + WebP) — note which to keep
+- [ ] Add `loading="lazy" decoding="async"` to ALL `<img>` tags below the fold across ALL templates
+- [ ] Add `fetchpriority="high"` to hero/above-fold images
+- [ ] Add `width` and `height` attributes to all `<img>` tags (prevents CLS)
+- [ ] Verify: run `find assets/ -type f -size +1M` — nothing over 1MB except the original GIF
+- [ ] Commit: `perf(theme): optimize images — GIF→video, PNG→WebP, lazy loading`
+
+---
+
+## IMPROVEMENT 3: CSS Architecture — Design System Extraction (Do FOURTH)
+
+- [ ] Audit duplication: count files defining `.rv{`, `.grain{`, `.vignette{`, `--ff-brand`
+  - Context7: `_____` → `_____` → [status]
+- [ ] Create `assets/css/system/tokens.css` — ALL CSS custom properties (single source of truth)
+- [ ] Create `assets/css/system/base.css` — resets, scrollbar, img/a/button defaults, grain, vignette, body
+- [ ] Create `assets/css/system/animations.css` — ALL reveal classes (.rv, .rv-d1–d6), shared @keyframes
+- [ ] Create `assets/css/system/components.css` — shared cards, buttons, forms, modals
+- [ ] Remove duplicated definitions from page-specific CSS files (they now inherit from system/)
+- [ ] Update `inc/enqueue.php` — load system/ CSS globally, page CSS as conditional overrides with dependency chains
+- [ ] Add documentation comment block to EVERY engine CSS file (what it does, where it's used, dependencies)
+- [ ] Dead CSS audit: grep each CSS file for selectors no PHP template references — remove dead selectors
+- [ ] Verify: homepage still renders correctly after extraction
+- [ ] Commit: `refactor(theme): extract design system CSS, deduplicate, document engines`
+
+---
+
+## VERIFICATION: Full Theme Validation (Do LAST)
+
+- [ ] Run `find assets/css/ -name "*.css" | wc -l` — document new file count (target: fewer than 53)
+- [ ] Run `find assets/ -type f -size +1M` — no image over 1MB (except original GIF)
+- [ ] Load homepage — verify Network tab shows ONLY homepage assets loading
+- [ ] Load a collection page — verify NO homepage CSS/JS loads
+- [ ] Load single product — verify collection-specific + product assets only
+- [ ] Verify all 3 landing pages render (no missing CSS from deduplication)
+- [ ] Verify immersive pages STILL WORK (untouched)
+- [ ] Verify mobile responsive on homepage (768px breakpoint)
+- [ ] Verify no console errors on any page
+- [ ] Run `grep -rn "console.log" assets/js/ | grep -v ".min.js" | grep -v "debug"` — should be 0 unguarded
+- [ ] Final commit: `chore(theme): full validation pass — conditional loading, optimized images, design system`
+
+---
+
 ## SECTION 1: Foundation & Configuration (Iterations 1-4)
 
 - [x] Read entire design package (all 12 HTML files + WP overlay files)

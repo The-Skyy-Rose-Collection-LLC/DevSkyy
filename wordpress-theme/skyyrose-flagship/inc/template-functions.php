@@ -365,6 +365,11 @@ function skyyrose_custom_body_classes( $classes ) {
 		$classes[] = 'has-header-image';
 	}
 
+	// Homepage V2 body class for CSS scoping.
+	if ( is_front_page() ) {
+		$classes[] = 'homepage-v2';
+	}
+
 	return $classes;
 }
 add_filter( 'body_class', 'skyyrose_custom_body_classes' );

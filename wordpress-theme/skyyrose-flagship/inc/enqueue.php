@@ -48,6 +48,8 @@ function skyyrose_enqueue_google_fonts() {
 		'family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600',
 		'family=Bebas+Neue',
 		'family=Space+Mono:wght@400;700',
+		'family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700',
+		'family=Instrument+Serif:ital@0;1',
 		'display=swap',
 	) );
 
@@ -360,6 +362,19 @@ function skyyrose_localize_scripts() {
 			'assetsUri' => SKYYROSE_ASSETS_URI,
 		)
 	);
+
+	// Homepage V2 — localize AJAX URL, nonce, and cart URL for homepage-v2.js.
+	if ( is_front_page() && wp_script_is( 'skyyrose-template-homepage-v2', 'enqueued' ) ) {
+		wp_localize_script(
+			'skyyrose-template-homepage-v2',
+			'skyyrose_homepage',
+			array(
+				'ajax_url'         => admin_url( 'admin-ajax.php' ),
+				'newsletter_nonce' => wp_create_nonce( 'skyyrose_newsletter' ),
+				'cart_url'         => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
+			)
+		);
+	}
 }
 
 /**
@@ -451,7 +466,7 @@ function skyyrose_enqueue_template_styles() {
 	$use_min      = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
 	$template_styles = array(
-		'front-page'      => 'homepage.css',
+		'front-page'      => 'homepage-v2.css',
 		'collection'      => 'collections.css',
 		'collection-v4'   => 'collection-v4.css',
 		'immersive'       => 'immersive.css',
@@ -541,7 +556,7 @@ function skyyrose_enqueue_template_scripts() {
 	$base_js_dir = SKYYROSE_DIR . '/assets/js';
 
 	$template_scripts = array(
-		'front-page'       => 'homepage.js',
+		'front-page'       => 'homepage-v2.js',
 		'collection'       => 'collections.js',
 		'collection-v4'    => 'collection-v4.js',
 		'immersive'        => 'immersive.js',
