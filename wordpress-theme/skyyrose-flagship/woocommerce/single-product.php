@@ -1,15 +1,21 @@
 <?php
 /**
- * Single Product Page - Dark Luxury Design
+ * SkyyRose Single Product Page — Elite Web Builder v4.0.0
  *
- * Overrides WooCommerce templates/single-product.php.
- * Features: sticky gallery, color/size selectors, quantity controls,
- * accordions, related products, collection-specific gradient overlay.
+ * WooCommerce template override. Detects collection category and
+ * loads the appropriate collection-skinned product template.
+ * Falls back to BLACK ROSE aesthetic for uncategorized products.
  *
- * @see     https://woocommerce.com/document/template-structure/
+ * Three visual worlds:
+ *   Black Rose  — silver / monochrome (#C0C0C0)
+ *   Love Hurts  — crimson / gothic (#DC143C)
+ *   Signature   — gold / opulence (#D4AF37)
+ *
  * @package SkyyRose_Flagship
- * @since   2.0.0
- * @version 1.6.4
+ * @since   4.0.0
+ * @version 4.0.0
+ *
+ * @see https://woocommerce.com/document/template-structure/
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -19,7 +25,7 @@ get_header( 'shop' );
 /**
  * Hook: woocommerce_before_main_content.
  *
- * @hooked woocommerce_output_content_wrapper - 10 (outputs opening divs for the content)
+ * @hooked woocommerce_output_content_wrapper - 10
  * @hooked woocommerce_breadcrumb - 20 (removed by theme)
  */
 do_action( 'woocommerce_before_main_content' );
@@ -33,67 +39,46 @@ while ( have_posts() ) :
 		continue;
 	}
 
-	$product_id   = $product->get_id();
+	// Collection detection and config.
+	$collection = skyyrose_get_product_collection();
+	$config     = skyyrose_collection_config( $collection );
+	$meta       = skyyrose_get_product_meta();
+	$related    = skyyrose_get_related_products_by_category( get_the_ID(), 4 );
+
+	// Product data.
 	$gallery_ids  = $product->get_gallery_image_ids();
-	$main_image   = $product->get_image_id();
-	$all_images   = $main_image ? array_merge( array( $main_image ), $gallery_ids ) : $gallery_ids;
-	$product_cats = get_the_terms( $product_id, 'product_cat' );
+	$main_image   = wp_get_attachment_url( $product->get_image_id() );
+	$is_variable  = $product->is_type( 'variable' );
+	$price_html   = $product->get_price_html();
+	$stock_status = $product->get_stock_status();
+	$sku          = $product->get_sku();
 
-	// Determine collection for gradient overlay and accent color.
-	$collection       = 'signature';
-	$collection_class = 'collection-signature';
-	if ( $product_cats && ! is_wp_error( $product_cats ) ) {
-		foreach ( $product_cats as $cat ) {
-			if ( false !== strpos( $cat->slug, 'black-rose' ) ) {
-				$collection       = 'black-rose';
-				$collection_class = 'collection-black-rose';
-				break;
-			}
-			if ( false !== strpos( $cat->slug, 'love-hurts' ) ) {
-				$collection       = 'love-hurts';
-				$collection_class = 'collection-love-hurts';
-				break;
-			}
-			if ( false !== strpos( $cat->slug, 'signature' ) ) {
-				$collection       = 'signature';
-				$collection_class = 'collection-signature';
-				break;
-			}
-		}
+	// Breadcrumb data.
+	$shop_url   = get_permalink( wc_get_page_id( 'shop' ) );
+	$categories = get_the_terms( get_the_ID(), 'product_cat' );
+	$cat_link   = '';
+	$cat_name   = $config['label'];
+	if ( $categories && ! is_wp_error( $categories ) ) {
+		$cat_link = get_term_link( $categories[0] );
+		$cat_name = $categories[0]->name;
 	}
-
-	// Get product attributes for color/size selectors.
-	$color_attribute = $product->get_attribute( 'pa_color' );
-	$size_attribute  = $product->get_attribute( 'pa_size' );
-	$colors          = $color_attribute ? array_map( 'trim', explode( ',', $color_attribute ) ) : array();
-	$sizes           = $size_attribute ? array_map( 'trim', explode( ',', $size_attribute ) ) : array();
-
-	// Fallback sizes if none set.
-	if ( empty( $sizes ) && $product->is_type( 'variable' ) ) {
-		$available_variations = $product->get_available_variations();
-		foreach ( $available_variations as $variation ) {
-			if ( isset( $variation['attributes']['attribute_pa_size'] ) ) {
-				$size_val = $variation['attributes']['attribute_pa_size'];
-				if ( ! in_array( $size_val, $sizes, true ) ) {
-					$sizes[] = $size_val;
-				}
-			}
-		}
-	}
-
-	// Product meta for accordions.
-	$product_details  = $product->get_description();
-	$short_desc       = $product->get_short_description();
-	$sizing_guide     = get_post_meta( $product_id, '_sizing_guide', true );
-	$shipping_returns = get_post_meta( $product_id, '_shipping_returns', true );
 	?>
 
-	<div class="skyy-single-product <?php echo esc_attr( $collection_class ); ?>"
-		 data-collection="<?php echo esc_attr( $collection ); ?>"
-		 data-product-id="<?php echo esc_attr( $product_id ); ?>">
+	<style>
+	:root {
+		--sr-accent: <?php echo esc_attr( $config['accent'] ); ?>;
+		--sr-accent-rgb: <?php echo esc_attr( $config['accent_rgb'] ); ?>;
+		--sr-bg: <?php echo esc_attr( $config['bg'] ); ?>;
+		--sr-bg-alt: <?php echo esc_attr( $config['bg_alt'] ); ?>;
+		--sr-text: <?php echo esc_attr( $config['text'] ); ?>;
+		--sr-dim: <?php echo esc_attr( $config['dim'] ); ?>;
+		--sr-gradient: <?php echo esc_attr( $config['gradient'] ); ?>;
+		--sr-cta-color: <?php echo esc_attr( $config['cta_color'] ); ?>;
+	}
+	</style>
 
-		<!-- Collection gradient overlay -->
-		<div class="skyy-single-product__gradient-overlay" aria-hidden="true"></div>
+	<main id="product-<?php the_ID(); ?>" <?php wc_product_class( 'sr-product', $product ); ?>
+	      data-collection="<?php echo esc_attr( $collection ); ?>">
 
 		<?php
 		/**
@@ -104,416 +89,319 @@ while ( have_posts() ) :
 		do_action( 'woocommerce_before_single_product' );
 		?>
 
-		<div class="skyy-single-product__container">
-
-			<!-- GALLERY (Sticky) -->
-			<div class="skyy-single-product__gallery" data-skyy-gallery>
-
-				<div class="skyy-single-product__gallery-main">
-					<?php if ( ! empty( $all_images ) ) : ?>
-						<?php
-						$main_src  = wp_get_attachment_image_url( $all_images[0], 'woocommerce_single' );
-						$main_full = wp_get_attachment_image_url( $all_images[0], 'full' );
-						?>
-						<img id="skyy-gallery-main-img"
-							 src="<?php echo esc_url( $main_src ); ?>"
-							 data-full="<?php echo esc_url( $main_full ); ?>"
-							 alt="<?php echo esc_attr( $product->get_name() ); ?>"
-							 class="skyy-single-product__gallery-main-img" />
-					<?php else : ?>
-						<?php echo wp_kses_post( wc_placeholder_img( 'woocommerce_single' ) ); ?>
-					<?php endif; ?>
-				</div>
-
-				<?php if ( count( $all_images ) > 1 ) : ?>
-					<div class="skyy-single-product__gallery-thumbs">
-						<?php foreach ( array_slice( $all_images, 0, 4 ) as $index => $image_id ) : ?>
-							<?php
-							$thumb_src = wp_get_attachment_image_url( $image_id, 'woocommerce_gallery_thumbnail' );
-							$full_src  = wp_get_attachment_image_url( $image_id, 'woocommerce_single' );
-							$full_url  = wp_get_attachment_image_url( $image_id, 'full' );
-							$alt       = get_post_meta( $image_id, '_wp_attachment_image_alt', true );
-							?>
-							<button type="button"
-									class="skyy-single-product__gallery-thumb<?php echo 0 === $index ? ' is-active' : ''; ?>"
-									data-src="<?php echo esc_url( $full_src ); ?>"
-									data-full="<?php echo esc_url( $full_url ); ?>"
-									aria-label="<?php printf( esc_attr__( 'View image %d', 'skyyrose-flagship' ), $index + 1 ); ?>">
-								<img src="<?php echo esc_url( $thumb_src ); ?>"
-									 alt="<?php echo esc_attr( $alt ? $alt : $product->get_name() ); ?>"
-									 loading="lazy" />
-							</button>
-						<?php endforeach; ?>
-					</div>
+		<!-- BREADCRUMB -->
+		<nav class="sr-breadcrumb" aria-label="<?php esc_attr_e( 'Breadcrumb', 'skyyrose-flagship' ); ?>">
+			<div class="sr-container">
+				<a href="<?php echo esc_url( home_url( '/' ) ); ?>">SkyyRose</a>
+				<span class="sr-bc-sep">/</span>
+				<a href="<?php echo esc_url( $shop_url ); ?>"><?php esc_html_e( 'Shop', 'skyyrose-flagship' ); ?></a>
+				<span class="sr-bc-sep">/</span>
+				<?php if ( $cat_link && ! is_wp_error( $cat_link ) ) : ?>
+					<a href="<?php echo esc_url( $cat_link ); ?>"><?php echo esc_html( $cat_name ); ?></a>
+					<span class="sr-bc-sep">/</span>
 				<?php endif; ?>
-
-				<?php
-				/**
-				 * Hook: woocommerce_product_thumbnails.
-				 */
-				do_action( 'woocommerce_product_thumbnails' );
-				?>
+				<span class="sr-bc-current"><?php the_title(); ?></span>
 			</div>
+		</nav>
 
-			<!-- PRODUCT INFO PANEL -->
-			<div class="skyy-single-product__info">
+		<!-- PRODUCT HERO — Split Layout -->
+		<section class="sr-hero">
+			<div class="sr-container sr-hero-grid">
 
-				<?php
-				/**
-				 * Hook: woocommerce_single_product_summary.
-				 *
-				 * @hooked woocommerce_template_single_title - 5
-				 * @hooked woocommerce_template_single_rating - 10
-				 * @hooked woocommerce_template_single_price - 10
-				 * @hooked woocommerce_template_single_excerpt - 20
-				 * @hooked woocommerce_template_single_add_to_cart - 30
-				 * @hooked woocommerce_template_single_meta - 40
-				 * @hooked woocommerce_template_single_sharing - 50
-				 */
-				?>
+				<!-- Gallery Column -->
+				<div class="sr-gallery" data-gallery>
+					<!-- Main Image -->
+					<div class="sr-gallery-main">
+						<?php if ( $meta['limited'] ) : ?>
+							<span class="sr-badge-limited"><?php
+								esc_html_e( 'Limited Edition', 'skyyrose-flagship' );
+								if ( $meta['edition_of'] ) {
+									echo ' &mdash; ' . intval( $meta['edition_of'] ) . ' pieces';
+								}
+							?></span>
+						<?php endif; ?>
 
-				<!-- Breadcrumb / Collection tag -->
-				<div class="skyy-single-product__collection-tag">
-					<?php if ( $product_cats && ! is_wp_error( $product_cats ) ) : ?>
-						<a href="<?php echo esc_url( get_term_link( $product_cats[0] ) ); ?>"
-						   class="skyy-single-product__collection-link">
-							<?php echo esc_html( $product_cats[0]->name ); ?>
-						</a>
+						<span class="sr-badge-collection"><?php echo esc_html( $config['label'] ); ?></span>
+
+						<?php if ( $main_image ) : ?>
+							<img src="<?php echo esc_url( $main_image ); ?>"
+							     alt="<?php echo esc_attr( $product->get_name() ); ?>"
+							     class="sr-gallery-img sr-gallery-active"
+							     id="srMainImg"
+							     loading="eager">
+						<?php else : ?>
+							<div class="sr-gallery-placeholder">
+								<span class="sr-gallery-letter"><?php echo esc_html( mb_substr( $product->get_name(), 0, 1 ) ); ?></span>
+							</div>
+						<?php endif; ?>
+
+						<!-- Zoom overlay -->
+						<div class="sr-gallery-zoom" id="srZoom" aria-hidden="true"></div>
+					</div>
+
+					<!-- Thumbnails -->
+					<?php if ( ! empty( $gallery_ids ) ) : ?>
+						<div class="sr-gallery-thumbs">
+							<?php if ( $main_image ) : ?>
+								<button class="sr-thumb sr-thumb-active" data-img="<?php echo esc_url( $main_image ); ?>"
+								        aria-label="<?php esc_attr_e( 'Main product image', 'skyyrose-flagship' ); ?>">
+									<img src="<?php echo esc_url( $main_image ); ?>" alt="" loading="lazy">
+								</button>
+							<?php endif; ?>
+							<?php foreach ( $gallery_ids as $gid ) :
+								$gurl = wp_get_attachment_url( $gid );
+								if ( ! $gurl ) {
+									continue;
+								}
+							?>
+								<button class="sr-thumb" data-img="<?php echo esc_url( $gurl ); ?>"
+								        aria-label="<?php printf( esc_attr__( 'View image %d', 'skyyrose-flagship' ), $gid ); ?>">
+									<img src="<?php echo esc_url( $gurl ); ?>" alt="" loading="lazy">
+								</button>
+							<?php endforeach; ?>
+						</div>
 					<?php endif; ?>
 				</div>
 
-				<!-- Title -->
-				<h1 class="skyy-single-product__title">
-					<?php echo esc_html( $product->get_name() ); ?>
-				</h1>
+				<!-- Info Column -->
+				<div class="sr-info">
+					<div class="sr-info-inner">
+						<!-- Collection badge -->
+						<p class="sr-info-collection"><?php echo esc_html( $config['label'] ); ?> COLLECTION</p>
 
-				<!-- Price -->
-				<div class="skyy-single-product__price">
-					<?php echo wp_kses_post( $product->get_price_html() ); ?>
+						<!-- Product name -->
+						<h1 class="sr-info-name"><?php the_title(); ?></h1>
+
+						<!-- Price -->
+						<div class="sr-info-price"><?php echo $price_html; // phpcs:ignore WordPress.Security.EscapeOutput ?></div>
+
+						<!-- Short description -->
+						<?php if ( $product->get_short_description() ) : ?>
+							<div class="sr-info-desc">
+								<?php echo wp_kses_post( $product->get_short_description() ); ?>
+							</div>
+						<?php endif; ?>
+
+						<!-- Spec table -->
+						<?php if ( $meta['material'] || $meta['fit'] || $meta['detail'] ) : ?>
+							<div class="sr-info-specs">
+								<?php if ( $meta['material'] ) : ?>
+									<div class="sr-spec">
+										<span class="sr-spec-label"><?php esc_html_e( 'Material', 'skyyrose-flagship' ); ?></span>
+										<span class="sr-spec-value"><?php echo esc_html( $meta['material'] ); ?></span>
+									</div>
+								<?php endif; ?>
+								<?php if ( $meta['fit'] ) : ?>
+									<div class="sr-spec">
+										<span class="sr-spec-label"><?php esc_html_e( 'Fit', 'skyyrose-flagship' ); ?></span>
+										<span class="sr-spec-value"><?php echo esc_html( $meta['fit'] ); ?></span>
+									</div>
+								<?php endif; ?>
+								<?php if ( $meta['detail'] ) : ?>
+									<div class="sr-spec">
+										<span class="sr-spec-label"><?php esc_html_e( 'Detail', 'skyyrose-flagship' ); ?></span>
+										<span class="sr-spec-value"><?php echo esc_html( $meta['detail'] ); ?></span>
+									</div>
+								<?php endif; ?>
+								<?php if ( $sku ) : ?>
+									<div class="sr-spec">
+										<span class="sr-spec-label"><?php esc_html_e( 'SKU', 'skyyrose-flagship' ); ?></span>
+										<span class="sr-spec-value"><?php echo esc_html( $sku ); ?></span>
+									</div>
+								<?php endif; ?>
+							</div>
+						<?php endif; ?>
+
+						<!-- Add to Cart Form -->
+						<div class="sr-atc-wrap" id="sr-atc-anchor">
+							<?php
+							// Remove default WC hooks — we control the layout.
+							remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
+
+							// Output the appropriate add-to-cart template.
+							if ( $is_variable ) {
+								woocommerce_variable_add_to_cart();
+							} else {
+								woocommerce_simple_add_to_cart();
+							}
+							?>
+						</div>
+
+						<!-- Stock status -->
+						<div class="sr-stock sr-stock-<?php echo esc_attr( $stock_status ); ?>">
+							<?php if ( 'instock' === $stock_status ) : ?>
+								<span class="sr-stock-dot"></span> <?php esc_html_e( 'In Stock — Ready to Ship', 'skyyrose-flagship' ); ?>
+							<?php elseif ( 'onbackorder' === $stock_status ) : ?>
+								<span class="sr-stock-dot"></span> <?php esc_html_e( 'Pre-Order — Ships Spring 2026', 'skyyrose-flagship' ); ?>
+							<?php else : ?>
+								<span class="sr-stock-dot"></span> <?php esc_html_e( 'Sold Out', 'skyyrose-flagship' ); ?>
+							<?php endif; ?>
+						</div>
+
+						<!-- Trust signals -->
+						<div class="sr-trust">
+							<div class="sr-trust-item">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+								<span><?php esc_html_e( 'Secure Checkout', 'skyyrose-flagship' ); ?></span>
+							</div>
+							<div class="sr-trust-item">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+								<span><?php esc_html_e( 'Free Shipping $150+', 'skyyrose-flagship' ); ?></span>
+							</div>
+							<div class="sr-trust-item">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 12a9 9 0 1018 0 9 9 0 00-18 0z"/><path d="M12 8v4l3 3"/></svg>
+								<span><?php esc_html_e( '30-Day Returns', 'skyyrose-flagship' ); ?></span>
+							</div>
+						</div>
+					</div>
 				</div>
+			</div>
+		</section>
 
-				<!-- Short Description -->
-				<?php if ( $short_desc ) : ?>
-					<div class="skyy-single-product__description">
-						<?php echo wp_kses_post( $short_desc ); ?>
-					</div>
-				<?php endif; ?>
+		<!-- PRODUCT DETAILS ACCORDION -->
+		<section class="sr-details">
+			<div class="sr-container">
+				<div class="sr-details-grid">
 
-				<!-- Rating -->
-				<?php if ( wc_review_ratings_enabled() && $product->get_average_rating() ) : ?>
-					<div class="skyy-single-product__rating">
-						<?php woocommerce_template_single_rating(); ?>
-					</div>
-				<?php endif; ?>
-
-				<form class="skyy-single-product__form cart"
-					  action="<?php echo esc_url( apply_filters( 'woocommerce_add_to_cart_form_action', $product->get_permalink() ) ); ?>"
-					  method="post"
-					  enctype="multipart/form-data"
-					  data-product_id="<?php echo esc_attr( $product_id ); ?>">
-
-					<?php
-					/**
-					 * Hook: woocommerce_before_add_to_cart_form.
-					 */
-					do_action( 'woocommerce_before_add_to_cart_form' );
-					?>
-
-					<!-- COLOR SELECTOR -->
-					<?php if ( ! empty( $colors ) ) : ?>
-						<div class="skyy-single-product__option-group">
-							<label class="skyy-single-product__option-label">
-								<?php esc_html_e( 'Color', 'skyyrose-flagship' ); ?>
-								<span class="skyy-single-product__option-selected" data-skyy-color-name>
-									<?php echo esc_html( $colors[0] ); ?>
-								</span>
-							</label>
-							<div class="skyy-single-product__color-swatches" role="radiogroup"
-								 aria-label="<?php esc_attr_e( 'Color options', 'skyyrose-flagship' ); ?>">
-								<?php foreach ( $colors as $idx => $color_name ) : ?>
-									<?php
-									$color_slug = sanitize_title( $color_name );
-									$color_hex  = get_term_meta(
-										get_term_by( 'slug', $color_slug, 'pa_color' ) ? get_term_by( 'slug', $color_slug, 'pa_color' )->term_id : 0,
-										'color_hex',
-										true
-									);
-									if ( ! $color_hex ) {
-										// Fallback color map for common names.
-										$color_map = array(
-											'black'     => '#000000',
-											'white'     => '#FFFFFF',
-											'red'       => '#DC143C',
-											'rose-gold' => '#B76E79',
-											'gold'      => '#D4AF37',
-											'silver'    => '#C0C0C0',
-											'navy'      => '#1B1B3A',
-											'mauve'     => '#D8A7B1',
-											'crimson'   => '#DC143C',
-										);
-										$color_hex = isset( $color_map[ $color_slug ] ) ? $color_map[ $color_slug ] : '#666666';
-									}
-									?>
-									<button type="button"
-											class="skyy-single-product__color-swatch<?php echo 0 === $idx ? ' is-active' : ''; ?>"
-											data-color="<?php echo esc_attr( $color_slug ); ?>"
-											data-color-name="<?php echo esc_attr( $color_name ); ?>"
-											style="background-color: <?php echo esc_attr( $color_hex ); ?>;"
-											role="radio"
-											aria-checked="<?php echo 0 === $idx ? 'true' : 'false'; ?>"
-											aria-label="<?php echo esc_attr( $color_name ); ?>">
-										<span class="screen-reader-text"><?php echo esc_html( $color_name ); ?></span>
-									</button>
-								<?php endforeach; ?>
-							</div>
-							<input type="hidden" name="attribute_pa_color"
-								   value="<?php echo esc_attr( sanitize_title( $colors[0] ) ); ?>"
-								   data-skyy-color-input />
-						</div>
-					<?php endif; ?>
-
-					<!-- SIZE SELECTOR -->
-					<?php if ( ! empty( $sizes ) ) : ?>
-						<div class="skyy-single-product__option-group">
-							<label class="skyy-single-product__option-label">
-								<?php esc_html_e( 'Size', 'skyyrose-flagship' ); ?>
-							</label>
-							<div class="skyy-single-product__size-buttons" role="radiogroup"
-								 aria-label="<?php esc_attr_e( 'Size options', 'skyyrose-flagship' ); ?>">
-								<?php foreach ( $sizes as $idx => $size_name ) : ?>
-									<button type="button"
-											class="skyy-single-product__size-btn<?php echo 0 === $idx ? ' is-active' : ''; ?>"
-											data-size="<?php echo esc_attr( sanitize_title( $size_name ) ); ?>"
-											role="radio"
-											aria-checked="<?php echo 0 === $idx ? 'true' : 'false'; ?>"
-											aria-label="<?php echo esc_attr( strtoupper( $size_name ) ); ?>">
-										<?php echo esc_html( strtoupper( $size_name ) ); ?>
-									</button>
-								<?php endforeach; ?>
-							</div>
-							<input type="hidden" name="attribute_pa_size"
-								   value="<?php echo esc_attr( sanitize_title( $sizes[0] ) ); ?>"
-								   data-skyy-size-input />
-						</div>
-					<?php endif; ?>
-
-					<!-- QUANTITY CONTROLS -->
-					<div class="skyy-single-product__option-group">
-						<label class="skyy-single-product__option-label" for="skyy-quantity">
-							<?php esc_html_e( 'Quantity', 'skyyrose-flagship' ); ?>
-						</label>
-						<div class="skyy-single-product__quantity-wrap">
-							<button type="button" class="skyy-single-product__qty-btn skyy-single-product__qty-btn--minus"
-									aria-label="<?php esc_attr_e( 'Decrease quantity', 'skyyrose-flagship' ); ?>">
-								<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-									<path d="M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-								</svg>
+					<!-- Full Description -->
+					<?php if ( $product->get_description() ) : ?>
+						<div class="sr-accordion" data-accordion>
+							<button class="sr-accordion-trigger" aria-expanded="true">
+								<span><?php esc_html_e( 'Description', 'skyyrose-flagship' ); ?></span>
+								<span class="sr-accordion-icon">&minus;</span>
 							</button>
-							<input type="number"
-								   id="skyy-quantity"
-								   class="skyy-single-product__qty-input"
-								   name="quantity"
-								   value="1"
-								   min="1"
-								   max="<?php echo esc_attr( $product->get_max_purchase_quantity() > 0 ? $product->get_max_purchase_quantity() : 99 ); ?>"
-								   step="1"
-								   inputmode="numeric"
-								   aria-label="<?php esc_attr_e( 'Product quantity', 'skyyrose-flagship' ); ?>" />
-							<button type="button" class="skyy-single-product__qty-btn skyy-single-product__qty-btn--plus"
-									aria-label="<?php esc_attr_e( 'Increase quantity', 'skyyrose-flagship' ); ?>">
-								<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-									<path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-								</svg>
-							</button>
+							<div class="sr-accordion-content sr-accordion-open">
+								<?php echo wp_kses_post( $product->get_description() ); ?>
+							</div>
 						</div>
-					</div>
-
-					<?php
-					/**
-					 * Hook: woocommerce_before_add_to_cart_button.
-					 */
-					do_action( 'woocommerce_before_add_to_cart_button' );
-					?>
-
-					<!-- ADD TO CART BUTTON -->
-					<?php if ( $product->is_purchasable() && $in_stock = $product->is_in_stock() ) : ?>
-						<button type="submit"
-								name="add-to-cart"
-								value="<?php echo esc_attr( $product_id ); ?>"
-								class="skyy-single-product__add-to-cart single_add_to_cart_button button alt">
-							<span class="skyy-single-product__add-to-cart-text">
-								<?php echo esc_html( $product->single_add_to_cart_text() ); ?>
-							</span>
-							<span class="skyy-single-product__add-to-cart-price">
-								<?php echo wp_kses_post( $product->get_price_html() ); ?>
-							</span>
-						</button>
-					<?php else : ?>
-						<button type="button" class="skyy-single-product__add-to-cart is-disabled" disabled>
-							<?php esc_html_e( 'Out of Stock', 'skyyrose-flagship' ); ?>
-						</button>
 					<?php endif; ?>
 
-					<?php
-					/**
-					 * Hook: woocommerce_after_add_to_cart_button.
-					 */
-					do_action( 'woocommerce_after_add_to_cart_button' );
-
-					/**
-					 * Hook: woocommerce_after_add_to_cart_form.
-					 */
-					do_action( 'woocommerce_after_add_to_cart_form' );
-					?>
-
-					<?php if ( $product->is_type( 'variable' ) ) : ?>
-						<input type="hidden" name="variation_id" value="0" data-skyy-variation-id />
-						<input type="hidden" name="product_id" value="<?php echo esc_attr( $product_id ); ?>" />
-					<?php endif; ?>
-
-				</form>
-
-				<!-- ACCORDIONS -->
-				<div class="skyy-single-product__accordions" data-skyy-accordions>
-
-					<!-- Details -->
-					<div class="skyy-single-product__accordion">
-						<button type="button"
-								class="skyy-single-product__accordion-trigger"
-								aria-expanded="false"
-								aria-controls="skyy-accordion-details">
-							<span><?php esc_html_e( 'Details', 'skyyrose-flagship' ); ?></span>
-							<svg class="skyy-single-product__accordion-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-								<path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-							</svg>
-						</button>
-						<div id="skyy-accordion-details"
-							 class="skyy-single-product__accordion-panel"
-							 role="region"
-							 hidden>
-							<div class="skyy-single-product__accordion-content">
-								<?php if ( $product_details ) : ?>
-									<?php echo wp_kses_post( $product_details ); ?>
-								<?php else : ?>
-									<p><?php esc_html_e( 'Product details coming soon.', 'skyyrose-flagship' ); ?></p>
+					<!-- Materials & Care -->
+					<?php if ( $meta['material'] || $meta['care'] || $meta['made_in'] ) : ?>
+						<div class="sr-accordion" data-accordion>
+							<button class="sr-accordion-trigger" aria-expanded="false">
+								<span><?php esc_html_e( 'Materials & Care', 'skyyrose-flagship' ); ?></span>
+								<span class="sr-accordion-icon">+</span>
+							</button>
+							<div class="sr-accordion-content">
+								<?php if ( $meta['material'] ) : ?>
+									<p><strong><?php esc_html_e( 'Material:', 'skyyrose-flagship' ); ?></strong> <?php echo esc_html( $meta['material'] ); ?></p>
+								<?php endif; ?>
+								<?php if ( $meta['made_in'] ) : ?>
+									<p><strong><?php esc_html_e( 'Made in:', 'skyyrose-flagship' ); ?></strong> <?php echo esc_html( $meta['made_in'] ); ?></p>
+								<?php endif; ?>
+								<?php if ( $meta['care'] ) : ?>
+									<p><strong><?php esc_html_e( 'Care:', 'skyyrose-flagship' ); ?></strong> <?php echo esc_html( $meta['care'] ); ?></p>
 								<?php endif; ?>
 							</div>
 						</div>
-					</div>
+					<?php endif; ?>
 
-					<!-- Sizing Guide -->
-					<div class="skyy-single-product__accordion">
-						<button type="button"
-								class="skyy-single-product__accordion-trigger"
-								aria-expanded="false"
-								aria-controls="skyy-accordion-sizing">
-							<span><?php esc_html_e( 'Sizing Guide', 'skyyrose-flagship' ); ?></span>
-							<svg class="skyy-single-product__accordion-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-								<path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-							</svg>
+					<!-- Size Guide -->
+					<div class="sr-accordion" data-accordion>
+						<button class="sr-accordion-trigger" aria-expanded="false">
+							<span><?php esc_html_e( 'Size Guide', 'skyyrose-flagship' ); ?></span>
+							<span class="sr-accordion-icon">+</span>
 						</button>
-						<div id="skyy-accordion-sizing"
-							 class="skyy-single-product__accordion-panel"
-							 role="region"
-							 hidden>
-							<div class="skyy-single-product__accordion-content">
-								<?php if ( $sizing_guide ) : ?>
-									<?php echo wp_kses_post( $sizing_guide ); ?>
-								<?php else : ?>
-									<table class="skyy-sizing-table">
-										<thead>
-											<tr>
-												<th><?php esc_html_e( 'Size', 'skyyrose-flagship' ); ?></th>
-												<th><?php esc_html_e( 'Chest', 'skyyrose-flagship' ); ?></th>
-												<th><?php esc_html_e( 'Waist', 'skyyrose-flagship' ); ?></th>
-												<th><?php esc_html_e( 'Length', 'skyyrose-flagship' ); ?></th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr><td>S</td><td>36"</td><td>28"</td><td>27"</td></tr>
-											<tr><td>M</td><td>38"</td><td>30"</td><td>28"</td></tr>
-											<tr><td>L</td><td>40"</td><td>32"</td><td>29"</td></tr>
-											<tr><td>XL</td><td>42"</td><td>34"</td><td>30"</td></tr>
-											<tr><td>XXL</td><td>44"</td><td>36"</td><td>31"</td></tr>
-										</tbody>
-									</table>
-								<?php endif; ?>
-							</div>
+						<div class="sr-accordion-content">
+							<p><?php esc_html_e( 'All SkyyRose pieces are designed gender-neutral. We recommend ordering your usual size for a standard fit, or sizing up for an oversized look.', 'skyyrose-flagship' ); ?></p>
+							<p><?php
+								printf(
+									/* translators: %s: contact email */
+									esc_html__( 'Need help? Email %s with your height and weight for a personal recommendation.', 'skyyrose-flagship' ),
+									'<a href="mailto:corey@skyyrose.co">corey@skyyrose.co</a>'
+								);
+							?></p>
 						</div>
 					</div>
 
 					<!-- Shipping & Returns -->
-					<div class="skyy-single-product__accordion">
-						<button type="button"
-								class="skyy-single-product__accordion-trigger"
-								aria-expanded="false"
-								aria-controls="skyy-accordion-shipping">
+					<div class="sr-accordion" data-accordion>
+						<button class="sr-accordion-trigger" aria-expanded="false">
 							<span><?php esc_html_e( 'Shipping & Returns', 'skyyrose-flagship' ); ?></span>
-							<svg class="skyy-single-product__accordion-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
-								<path d="M5 8l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-							</svg>
+							<span class="sr-accordion-icon">+</span>
 						</button>
-						<div id="skyy-accordion-shipping"
-							 class="skyy-single-product__accordion-panel"
-							 role="region"
-							 hidden>
-							<div class="skyy-single-product__accordion-content">
-								<?php if ( $shipping_returns ) : ?>
-									<?php echo wp_kses_post( $shipping_returns ); ?>
-								<?php else : ?>
-									<ul>
-										<li><?php esc_html_e( 'Free shipping on orders over $150', 'skyyrose-flagship' ); ?></li>
-										<li><?php esc_html_e( 'Standard shipping: 5-7 business days', 'skyyrose-flagship' ); ?></li>
-										<li><?php esc_html_e( 'Express shipping: 2-3 business days', 'skyyrose-flagship' ); ?></li>
-										<li><?php esc_html_e( 'Returns accepted within 30 days', 'skyyrose-flagship' ); ?></li>
-										<li><?php esc_html_e( 'Items must be unworn with original tags', 'skyyrose-flagship' ); ?></li>
-									</ul>
-								<?php endif; ?>
-							</div>
+						<div class="sr-accordion-content">
+							<p><?php esc_html_e( 'Free shipping on orders over $150. Standard delivery 5-7 business days. Expedited options available at checkout.', 'skyyrose-flagship' ); ?></p>
+							<p><?php esc_html_e( '30-day return policy on unworn items with original tags. Pre-order items ship on the announced date.', 'skyyrose-flagship' ); ?></p>
 						</div>
 					</div>
-
 				</div>
+			</div>
+		</section>
 
-				<?php
-				/**
-				 * Hook: woocommerce_single_product_summary.
-				 */
-				do_action( 'woocommerce_single_product_summary' );
-				?>
-
-			</div><!-- .skyy-single-product__info -->
-
-		</div><!-- .skyy-single-product__container -->
-
-		<!-- RELATED PRODUCTS: 4-card grid -->
-		<?php
-		$related_ids = wc_get_related_products( $product_id, 4 );
-		if ( ! empty( $related_ids ) ) :
-			?>
-			<section class="skyy-single-product__related" aria-label="<?php esc_attr_e( 'Related Products', 'skyyrose-flagship' ); ?>">
-				<div class="skyy-single-product__related-container">
-					<h2 class="skyy-single-product__related-title">
-						<?php esc_html_e( 'You May Also Like', 'skyyrose-flagship' ); ?>
-					</h2>
-					<div class="skyy-single-product__related-grid">
-						<?php
-						$related_products = array_map( 'wc_get_product', $related_ids );
-						foreach ( $related_products as $related_product ) :
-							if ( ! $related_product || ! $related_product->is_visible() ) {
-								continue;
-							}
-							$GLOBALS['product'] = $related_product; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
-							setup_postdata( $related_product->get_id() );
-							wc_get_template_part( 'content', 'product' );
-						endforeach;
-						wp_reset_postdata();
-						$GLOBALS['product'] = $product; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		<!-- COLLECTION PRODUCTS (Related) -->
+		<?php if ( ! empty( $related ) ) : ?>
+			<section class="sr-related" aria-label="<?php esc_attr_e( 'Related Products', 'skyyrose-flagship' ); ?>">
+				<div class="sr-container">
+					<div class="sr-related-head">
+						<h2 class="sr-related-title"><?php
+							printf(
+								/* translators: %s: collection name */
+								esc_html__( 'More from %s', 'skyyrose-flagship' ),
+								esc_html( $config['label'] )
+							);
+						?></h2>
+						<?php if ( $cat_link && ! is_wp_error( $cat_link ) ) : ?>
+							<a href="<?php echo esc_url( $cat_link ); ?>" class="sr-related-link">
+								<?php esc_html_e( 'View Full Collection', 'skyyrose-flagship' ); ?> &rarr;
+							</a>
+						<?php endif; ?>
+					</div>
+					<div class="sr-related-grid">
+						<?php foreach ( $related as $rel_product ) :
+							$rel_img  = wp_get_attachment_url( $rel_product->get_image_id() );
+							$rel_link = get_permalink( $rel_product->get_id() );
 						?>
+							<a href="<?php echo esc_url( $rel_link ); ?>" class="sr-related-card">
+								<div class="sr-related-img">
+									<?php if ( $rel_img ) : ?>
+										<img src="<?php echo esc_url( $rel_img ); ?>"
+										     alt="<?php echo esc_attr( $rel_product->get_name() ); ?>"
+										     loading="lazy">
+									<?php else : ?>
+										<span class="sr-related-letter"><?php echo esc_html( mb_substr( $rel_product->get_name(), 0, 1 ) ); ?></span>
+									<?php endif; ?>
+									<span class="sr-related-badge"><?php echo esc_html( $config['label'] ); ?></span>
+									<div class="sr-related-hov"><span><?php esc_html_e( 'View Piece', 'skyyrose-flagship' ); ?></span></div>
+								</div>
+								<div class="sr-related-body">
+									<h3 class="sr-related-name"><?php echo esc_html( $rel_product->get_name() ); ?></h3>
+									<span class="sr-related-price"><?php echo $rel_product->get_price_html(); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+								</div>
+							</a>
+						<?php endforeach; ?>
 					</div>
 				</div>
 			</section>
 		<?php endif; ?>
+
+		<!-- COLLECTION CTA BANNER -->
+		<section class="sr-cta-banner">
+			<div class="sr-container sr-cta-inner">
+				<div class="sr-cta-text">
+					<p class="sr-cta-eye"><?php echo esc_html( $config['badge_text'] ); ?></p>
+					<h2 class="sr-cta-title"><?php echo esc_html( $config['label'] ); ?></h2>
+					<p class="sr-cta-tagline"><?php echo esc_html( $config['tagline'] ); ?></p>
+				</div>
+				<?php if ( $cat_link && ! is_wp_error( $cat_link ) ) : ?>
+					<a href="<?php echo esc_url( $cat_link ); ?>" class="sr-cta-btn">
+						<?php esc_html_e( 'Shop Full Collection', 'skyyrose-flagship' ); ?>
+					</a>
+				<?php endif; ?>
+			</div>
+		</section>
+
+		<!-- STICKY ADD TO CART (mobile + scroll) -->
+		<div class="sr-sticky-atc" id="srStickyATC" aria-hidden="true">
+			<div class="sr-container sr-sticky-inner">
+				<div class="sr-sticky-info">
+					<span class="sr-sticky-name"><?php the_title(); ?></span>
+					<span class="sr-sticky-price"><?php echo $price_html; // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+				</div>
+				<a href="#sr-atc-anchor" class="sr-sticky-btn"><?php esc_html_e( 'Add to Bag', 'skyyrose-flagship' ); ?></a>
+			</div>
+		</div>
 
 		<?php
 		/**
@@ -522,9 +410,7 @@ while ( have_posts() ) :
 		do_action( 'woocommerce_after_single_product' );
 		?>
 
-		<?php get_template_part( 'template-parts/cinematic-toggle' ); ?>
-
-	</div><!-- .skyy-single-product -->
+	</main>
 
 	<?php
 endwhile;
@@ -532,7 +418,7 @@ endwhile;
 /**
  * Hook: woocommerce_after_main_content.
  *
- * @hooked woocommerce_output_content_wrapper_end - 10 (outputs closing divs for the content)
+ * @hooked woocommerce_output_content_wrapper_end - 10
  */
 do_action( 'woocommerce_after_main_content' );
 
