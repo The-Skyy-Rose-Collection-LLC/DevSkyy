@@ -2,11 +2,15 @@
 /**
  * Template Name: About
  *
- * Brand story page for SkyyRose — born in Oakland, built with love.
- * Sections: Hero, Story, Collections, Timeline, Stats, Values, Founder, Community.
+ * Cinematic chapter-based brand story page for SkyyRose.
+ * Design: Elite Web Builder v4 — editorial documentary style.
+ *
+ * Sections: Hero → Chapter I (Origin) → Chapter II (Values) →
+ *           Chapter III (Timeline) → Chapter IV (Press Room) →
+ *           Mission Banner → Community.
  *
  * @package SkyyRose_Flagship
- * @since   3.3.0
+ * @since   4.0.0
  */
 
 // Prevent direct access.
@@ -17,662 +21,374 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 
 /*--------------------------------------------------------------
- * Customizer / Theme Mod Defaults
- *
- * Allow the site owner to override brand copy via Customizer.
- * Fallbacks match the canonical source HTML.
+ * Hero Section Data
  *--------------------------------------------------------------*/
-$hero_label       = get_theme_mod( 'about_hero_label', 'Our Story' );
-$hero_title       = get_theme_mod( 'about_hero_title', 'Born in Oakland,<br>Built with Love' );
-$hero_tagline     = get_theme_mod( 'about_hero_tagline', 'Where the sky meets the rose &mdash; luxury streetwear rooted in Oakland, CA' );
-$hero_description = get_theme_mod(
-	'about_hero_description',
-	'SkyyRose isn\'t just a brand&mdash;it\'s a movement. Born from the vibrant streets of Oakland, California, we pour love into every stitch, every silhouette, every story. We blend authentic street culture with luxury craftsmanship to create pieces that make you feel powerful, beautiful, and unapologetically yourself.'
+$hero_eyebrow = get_theme_mod( 'about_hero_eyebrow', 'Oakland, California &mdash; Est. 2020' );
+$hero_title    = get_theme_mod( 'about_hero_title', 'Named After<br>a Daughter.' );
+$hero_title_2  = get_theme_mod( 'about_hero_title_2', 'Built by<br>a Father.' );
+$hero_sub      = get_theme_mod(
+	'about_hero_sub',
+	'The Skyy Rose Collection is what happens when a single father from Oakland decides his daughter deserves a different story.'
 );
 
 /*--------------------------------------------------------------
- * Story Sections Data (immutable array -- never mutated)
+ * Chapter I — The Origin
  *--------------------------------------------------------------*/
-$story_sections = array(
-	array(
-		'heading'    => __( 'The Dream That Started It All', 'skyyrose-flagship' ),
-		'paragraphs' => array(
-			__( 'SkyyRose was born in 2019 inside a small Oakland apartment, fueled by a dream that luxury fashion had lost its soul. The founder saw an industry obsessed with exclusivity for exclusivity\'s sake&mdash;price tags that locked people out, designs that felt cold and impersonal, brands that forgot that fashion is supposed to make you <em>feel</em> something.', 'skyyrose-flagship' ),
-			__( 'Growing up on the streets of Oakland taught one fundamental truth: real style comes from authenticity. It comes from wearing your story on your sleeve, literally. Every neighborhood, every corner, every late-night conversation about what it means to dress with intention&mdash;that\'s where SkyyRose found its voice.', 'skyyrose-flagship' ),
-			__( 'We set out to create something different&mdash;a brand that honors both the raw energy of street culture and the meticulous craftsmanship of luxury fashion. A brand where every piece is designed to be armor for those bold enough to be themselves.', 'skyyrose-flagship' ),
-		),
-		'highlight'  => __( '&ldquo;We don\'t just make clothes. We craft armor for those bold enough to be themselves.&rdquo;', 'skyyrose-flagship' ),
-		'image_alt'  => __( 'SkyyRose brand story &mdash; the dream that started it all in Oakland', 'skyyrose-flagship' ),
-		'reverse'    => false,
-	),
-	array(
-		'heading'    => __( 'The Name Behind the Brand', 'skyyrose-flagship' ),
-		'paragraphs' => array(
-			__( 'Every great brand carries meaning in its name, and SkyyRose is no exception. <em>Skyy</em> represents aspiration&mdash;the limitless ceiling above us, the audacity to reach higher than anyone expects. <em>Rose</em> represents beauty rooted in the earth, grounded in reality, growing through the concrete. Together, they embody reaching high while staying grounded.', 'skyyrose-flagship' ),
-			__( 'The name &ldquo;Love Hurts&rdquo; carries even deeper personal meaning. Hurts is the founder\'s family name, woven into every piece we create. It represents the beautiful pain of growth, the strength found in vulnerability, and the courage to wear your heart openly. When you put on a Love Hurts piece, you\'re carrying a legacy.', 'skyyrose-flagship' ),
-			__( 'Our philosophy is simple but radical: luxury should be accessible. Fashion should tell a story. Quality should never be compromised. And every single person who wears SkyyRose should feel like the most powerful version of themselves.', 'skyyrose-flagship' ),
-		),
-		'highlight'  => '',
-		'image_alt'  => __( 'SkyyRose brand story &mdash; sky meets rose, reaching high while staying grounded', 'skyyrose-flagship' ),
-		'reverse'    => true,
-	),
-	array(
-		'heading'    => __( 'Crafted with Purpose', 'skyyrose-flagship' ),
-		'paragraphs' => array(
-			__( 'At SkyyRose, we believe in the power of intentional creation. Every fabric is hand-selected for its feel, its durability, its ability to make you look and feel extraordinary. We work with premium materials&mdash;heavyweight cotton, custom-dyed fabrics, embroidered details, silicone appliqu&eacute;s, and laser-engraved leather&mdash;because our community deserves nothing less.', 'skyyrose-flagship' ),
-			__( 'We are committed to ethical production practices. Our pieces are crafted in small batches, ensuring quality control at every stage. We pay fair wages, we source responsibly, and we reject the fast-fashion model that treats both workers and customers as disposable. When you invest in SkyyRose, you\'re investing in something built to last.', 'skyyrose-flagship' ),
-		),
-		'highlight'  => __( '&ldquo;Luxury is not a price tag. Luxury is the care poured into every detail, the love woven into every seam.&rdquo;', 'skyyrose-flagship' ),
-		'image_alt'  => __( 'SkyyRose brand story &mdash; craftsmanship and quality materials', 'skyyrose-flagship' ),
-		'reverse'    => false,
-	),
+$origin_quote  = __( '&ldquo;You ask me this four years ago, I never would&rsquo;ve thought I&rsquo;d be here. I had no drive, lost it all, baby on the way, and was broke. But we knew we had to get it by any means necessary.&rdquo;', 'skyyrose-flagship' );
+$origin_cite   = __( '&mdash; Corey Foster, Founder &amp; CEO', 'skyyrose-flagship' );
+$origin_paragraphs = array(
+	__( 'In the heart of Oakland&rsquo;s toughest neighborhoods, where opportunities are scarce and the wrong path is always the easiest one, <strong>Corey Foster</strong> made a choice. With a daughter on the way, no savings, and a community that had already claimed too many people he loved &mdash; he decided to build something.', 'skyyrose-flagship' ),
+	__( 'Not a hustle. Not a side project. A <strong>legacy</strong>.', 'skyyrose-flagship' ),
+	__( 'He named it after the reason he couldn&rsquo;t fail: his daughter, <strong>Skyy Rose</strong>. What started as a father&rsquo;s promise became a brand that would redefine what luxury streetwear looks like when it comes from somewhere real.', 'skyyrose-flagship' ),
+	__( 'The road was brutal. Failed websites. Manufacturers who took money and delivered nothing. Balancing 3 AM feedings with business plans written on a phone screen. Zero support. Zero guarantees. But Corey had something no setback could take &mdash; <strong>a reason bigger than himself</strong>.', 'skyyrose-flagship' ),
 );
 
 /*--------------------------------------------------------------
- * Collections Story Data (immutable array)
- *--------------------------------------------------------------*/
-$collections_story = array(
-	array(
-		'name'        => __( 'Black Rose', 'skyyrose-flagship' ),
-		'slug'        => 'black-rose',
-		'tagline'     => __( 'Elegance in Darkness', 'skyyrose-flagship' ),
-		'description' => __( 'The Black Rose Collection finds beauty in contrast&mdash;silver-toned luxury against midnight black, gothic elegance that commands every room. Inspired by the strength of roses that bloom in darkness, each piece is an exercise in refined rebellion. Metallic silver accents meet heavyweight construction, creating streetwear that feels like couture.', 'skyyrose-flagship' ),
-		'accent'      => 'silver',
-	),
-	array(
-		'name'        => __( 'Love Hurts', 'skyyrose-flagship' ),
-		'slug'        => 'love-hurts',
-		'tagline'     => __( 'Wear Your Heart Outside', 'skyyrose-flagship' ),
-		'description' => __( 'The Love Hurts Collection is passion made wearable&mdash;crimson-drenched streetwear that bleeds emotion. Named after the founder\'s family name, every piece carries the weight of vulnerability and the fire of resilience. From varsity jackets to bomber silhouettes, this collection is for those who aren\'t afraid to feel deeply and dress boldly.', 'skyyrose-flagship' ),
-		'accent'      => 'crimson',
-	),
-	array(
-		'name'        => __( 'Signature', 'skyyrose-flagship' ),
-		'slug'        => 'signature',
-		'tagline'     => __( 'The Crown Jewel', 'skyyrose-flagship' ),
-		'description' => __( 'The Signature Collection is where rose gold meets gold&mdash;the ultimate luxury statement. This is SkyyRose at its most refined, its most confident, its most unapologetic. From The Bay Set to the Sherpa Jacket, every piece is designed to be the crown jewel of your wardrobe. This is elevated streetwear for those who know exactly who they are.', 'skyyrose-flagship' ),
-		'accent'      => 'gold',
-	),
-	array(
-		'name'        => __( 'Kids Capsule', 'skyyrose-flagship' ),
-		'slug'        => 'kids-capsule',
-		'tagline'     => __( 'Passing the Torch', 'skyyrose-flagship' ),
-		'description' => __( 'The Kids Capsule is about legacy&mdash;passing the torch of self-expression to the next generation. Mini luxury for young trendsetters who deserve to feel just as powerful as their parents. Soft pastels, playful details, and the same uncompromising quality that defines every SkyyRose piece. Because style has no age limit.', 'skyyrose-flagship' ),
-		'accent'      => 'pink',
-	),
-);
-
-/*--------------------------------------------------------------
- * Timeline Milestones (immutable array)
- *--------------------------------------------------------------*/
-$timeline_milestones = array(
-	array(
-		'year'        => '2019',
-		'title'       => __( 'The Dream Begins', 'skyyrose-flagship' ),
-		'description' => __( 'Late nights in an Oakland apartment, sketching by lamplight. The first SkyyRose designs take shape on paper&mdash;raw, emotional, and unlike anything else in streetwear. A vision crystallizes: luxury fashion that speaks the language of the streets.', 'skyyrose-flagship' ),
-	),
-	array(
-		'year'        => '2020',
-		'title'       => __( 'Against All Odds', 'skyyrose-flagship' ),
-		'description' => __( 'While the world paused, SkyyRose pressed forward. Launching during a global pandemic wasn\'t the plan, but it proved something essential&mdash;this brand was built on resilience. The setbacks became fuel. The isolation became focus. SkyyRose emerged stronger than the dream that started it.', 'skyyrose-flagship' ),
-	),
-	array(
-		'year'        => '2021',
-		'title'       => __( 'Finding Our Voice', 'skyyrose-flagship' ),
-		'description' => __( 'BLACK ROSE drops to underground acclaim. Limited pieces sell out within hours, proving the demand for authentic luxury streetwear. The Oakland community rallies behind the brand, and word-of-mouth becomes our most powerful marketing tool. SkyyRose isn\'t a brand anymore&mdash;it\'s a movement.', 'skyyrose-flagship' ),
-	),
-	array(
-		'year'        => '2022',
-		'title'       => __( 'Growing Roots', 'skyyrose-flagship' ),
-		'description' => __( 'The product line expands, the team grows, and SkyyRose begins to plant deep roots. New silhouettes, new fabrications, new collaborations with local Oakland artists. The brand identity sharpens into focus: dark luxury with a heartbeat. Every piece tells a story, and more people want to be part of it.', 'skyyrose-flagship' ),
-	),
-	array(
-		'year'        => '2023',
-		'title'       => __( 'Breaking Through', 'skyyrose-flagship' ),
-		'description' => __( 'LOVE HURTS launches to a global audience, and the emotional resonance is undeniable. Major collaborations bring national recognition. Features in fashion publications. A presence that extends far beyond Oakland while never losing its roots. The Hurts family name reaches hearts worldwide.', 'skyyrose-flagship' ),
-	),
-	array(
-		'year'        => '2024',
-		'title'       => __( 'The Flagship Era', 'skyyrose-flagship' ),
-		'description' => __( 'SIGNATURE completes the vision. Three distinct collections, one unified brand. SkyyRose enters its flagship era with a full digital experience, immersive shopping, and a community that spans continents. The brand doesn\'t just make clothes&mdash;it creates a complete luxury lifestyle.', 'skyyrose-flagship' ),
-	),
-	array(
-		'year'        => '2025',
-		'title'       => __( 'The Future Is Now', 'skyyrose-flagship' ),
-		'description' => __( 'New collections on the horizon. Expanded Kids Capsule. International reach. SkyyRose stands at the intersection of where it\'s been and where it\'s going&mdash;and the future has never looked more radiant. The dream that started in an Oakland apartment now lights up the world.', 'skyyrose-flagship' ),
-	),
-);
-
-/*--------------------------------------------------------------
- * Brand Stats (immutable array)
- *--------------------------------------------------------------*/
-$brand_stats = array(
-	array(
-		'number' => '28+',
-		'label'  => __( 'Products Designed', 'skyyrose-flagship' ),
-		'detail' => __( 'Across four distinct collections', 'skyyrose-flagship' ),
-	),
-	array(
-		'number' => '4',
-		'label'  => __( 'Collections Launched', 'skyyrose-flagship' ),
-		'detail' => __( 'Each with its own soul and story', 'skyyrose-flagship' ),
-	),
-	array(
-		'number' => '6',
-		'label'  => __( 'Years of Dedication', 'skyyrose-flagship' ),
-		'detail' => __( 'From first sketch to flagship', 'skyyrose-flagship' ),
-	),
-	array(
-		'number' => '2500+',
-		'label'  => __( 'Happy Customers', 'skyyrose-flagship' ),
-		'detail' => __( 'A growing global community', 'skyyrose-flagship' ),
-	),
-);
-
-/*--------------------------------------------------------------
- * Brand Values (immutable array)
+ * Chapter II — Values (6 pillars)
  *--------------------------------------------------------------*/
 $brand_values = array(
 	array(
-		'icon'        => '&#x1F339;', /* Rose */
-		'title'       => __( 'Authenticity', 'skyyrose-flagship' ),
-		'description' => __( 'Every piece tells a real story&mdash;one born from Oakland streets, shaped by lived experience, and refined by an uncompromising vision. We never chase trends or water down our identity for mass appeal. When you wear SkyyRose, you\'re wearing something genuine, something that started as a feeling and became fabric.', 'skyyrose-flagship' ),
+		'icon'  => '&#9830;',
+		'title' => __( 'Gender-Neutral Pioneer', 'skyyrose-flagship' ),
+		'text'  => __( 'One of the first Bay Area brands to design clothing that transcends gender and age. Fashion without boundaries &mdash; for anyone with taste.', 'skyyrose-flagship' ),
 	),
 	array(
-		'icon'        => '&#x2728;', /* Sparkles */
-		'title'       => __( 'Craftsmanship', 'skyyrose-flagship' ),
-		'description' => __( 'Premium materials meet meticulous construction in every single piece. From heavyweight cotton to custom-dyed fabrics, from embroidered details to laser-engraved leather&mdash;we obsess over quality so you never have to question it. Our pieces are built to outlast seasons, trends, and fast-fashion cycles.', 'skyyrose-flagship' ),
+		'icon'  => '&#10022;',
+		'title' => __( 'Oakland Authenticity', 'skyyrose-flagship' ),
+		'text'  => __( 'Culture created, not imported. Every piece carries the resilience of the Town &mdash; where beauty and grit coexist without apology.', 'skyyrose-flagship' ),
 	),
 	array(
-		'icon'        => '&#x1F5A4;', /* Black heart */
-		'title'       => __( 'Community', 'skyyrose-flagship' ),
-		'description' => __( 'SkyyRose was built by Oakland, for the world. Our roots run deep in the culture, the creativity, and the resilience of the Bay Area. We give back to the communities that raised us, we celebrate the artists who inspire us, and we never forget that a brand is only as strong as the people who believe in it.', 'skyyrose-flagship' ),
+		'icon'  => '&#9829;',
+		'title' => __( 'Family at the Core', 'skyyrose-flagship' ),
+		'text'  => __( 'Named after a daughter. Built by a father. &ldquo;Hurts&rdquo; is our family name. This brand isn&rsquo;t a business strategy &mdash; it&rsquo;s a bloodline.', 'skyyrose-flagship' ),
 	),
 	array(
-		'icon'        => '&#x1F4AB;', /* Dizzy / star */
-		'title'       => __( 'Evolution', 'skyyrose-flagship' ),
-		'description' => __( 'We refuse to stand still. Each collection pushes boundaries further than the last&mdash;new silhouettes, new techniques, new stories to tell. Growth isn\'t comfortable, but it\'s necessary. SkyyRose evolves with its community, always reaching for that next level while staying true to the vision that started it all.', 'skyyrose-flagship' ),
+		'icon'  => '&#9733;',
+		'title' => __( 'Quality Over Quantity', 'skyyrose-flagship' ),
+		'text'  => __( 'Every garment is crafted with meticulous attention to detail. This isn&rsquo;t fast fashion. This is armor &mdash; designed to last and built to make a statement.', 'skyyrose-flagship' ),
+	),
+	array(
+		'icon'  => '&#9650;',
+		'title' => __( 'Black-Owned, Community Built', 'skyyrose-flagship' ),
+		'text'  => __( 'A source of pride and inspiration for Oakland. Representing cultural heritage and future potential in every stitch.', 'skyyrose-flagship' ),
+	),
+	array(
+		'icon'  => '&#8962;',
+		'title' => __( 'Integrity Over Shortcuts', 'skyyrose-flagship' ),
+		'text'  => __( 'Where many in the community were led astray, Corey chose the harder path. Every decision reflects the values he&rsquo;s teaching his daughter.', 'skyyrose-flagship' ),
 	),
 );
 
 /*--------------------------------------------------------------
- * Founder Section
+ * Chapter III — Timeline Milestones
  *--------------------------------------------------------------*/
-$founder_intro = __( 'Behind every stitch, every colorway, every collection name is a person who poured their entire heart into building something meaningful. SkyyRose wasn\'t born in a boardroom&mdash;it was born from sleepless nights, hand-drawn sketches, and an unshakable belief that luxury streetwear could be different.', 'skyyrose-flagship' );
-
-$founder_quotes = array(
-	__( '&ldquo;When I started SkyyRose, I had one goal: create clothes I actually wanted to wear. Clothes that felt like armor, that made a statement without saying a word. I wanted people to put on a SkyyRose piece and feel invincible&mdash;like they could walk into any room and own it.&rdquo;', 'skyyrose-flagship' ),
-	__( '&ldquo;Growing up in Oakland taught me that style is survival. It\'s how you tell the world who you are before you speak. Every fit is a first impression, every outfit is a declaration. That\'s what SkyyRose is about&mdash;giving people the pieces to tell their story without saying a word.&rdquo;', 'skyyrose-flagship' ),
-	__( '&ldquo;The LOVE HURTS collection is the most personal to me because it carries my family name. Every piece is a piece of me, shared with everyone brave enough to wear their heart openly. When someone puts on that varsity jacket or that bomber, they\'re carrying my family\'s legacy with them.&rdquo;', 'skyyrose-flagship' ),
+$timeline_milestones = array(
+	array(
+		'year'  => '2020',
+		'event' => __( 'The Promise', 'skyyrose-flagship' ),
+		'desc'  => __( 'With his daughter Skyy Rose on the way, Corey commits to building a brand that would support his family and inspire his community. The Skyy Rose Collection is born from a father&rsquo;s determination.', 'skyyrose-flagship' ),
+	),
+	array(
+		'year'  => '2021',
+		'event' => __( 'The Grind', 'skyyrose-flagship' ),
+		'desc'  => __( 'Multiple website failures. Scam manufacturers. Sleepless nights balancing fatherhood and business. Every setback becomes fuel. The brand takes shape through sheer persistence.', 'skyyrose-flagship' ),
+	),
+	array(
+		'year'  => '2022',
+		'event' => __( 'Breaking Through', 'skyyrose-flagship' ),
+		'desc'  => __( 'The collection launches online. Word spreads through Oakland, then the Bay Area. Three distinct collections emerge: BLACK ROSE, LOVE HURTS, and SIGNATURE &mdash; each a world of its own.', 'skyyrose-flagship' ),
+	),
+	array(
+		'year'  => '2023',
+		'event' => __( 'National Recognition', 'skyyrose-flagship' ),
+		'desc'  => __( 'Featured in Maxim&rsquo;s &ldquo;14 Game-Changing Entrepreneurs to Watch.&rdquo; Spotlighted on The Blox. The children&rsquo;s collection launches in March to celebrate Skyy Rose&rsquo;s birthday.', 'skyyrose-flagship' ),
+	),
+	array(
+		'year'  => '2024',
+		'event' => __( 'Award-Winning', 'skyyrose-flagship' ),
+		'desc'  => __( 'Wins Best Bay Area Clothing Line from Best of Best Review. Featured in San Francisco Post, CEO Weekly. The brand&rsquo;s story resonates nationally as proof that vision and fatherhood can coexist at the highest level.', 'skyyrose-flagship' ),
+	),
+	array(
+		'year'  => '2025&ndash;26',
+		'event' => __( 'Full-Stack Luxury', 'skyyrose-flagship' ),
+		'desc'  => __( 'Custom marketplace platform. AI-powered operations. Three collection worlds with dedicated product experiences. SkyyRose evolves from a brand into a complete luxury ecosystem.', 'skyyrose-flagship' ),
+	),
 );
 
-$founder_vision = __( '&ldquo;The future of SkyyRose is bigger than clothing. It\'s about building a world where luxury meets authenticity, where street culture gets the respect it deserves, and where every person who wears our pieces feels like the most powerful version of themselves. We\'re just getting started.&rdquo;', 'skyyrose-flagship' );
+/*--------------------------------------------------------------
+ * Chapter IV — Press Features
+ *--------------------------------------------------------------*/
+$youtube_embed_id = get_theme_mod( 'about_youtube_id', 'Ja11W-g34Zo' );
 
-$founder_signature = get_theme_mod( 'about_founder_signature', '&mdash; The Founder, SkyyRose' );
+$press_features = array(
+	array(
+		'src'      => __( 'Maxim', 'skyyrose-flagship' ),
+		'year'     => __( 'February 2023', 'skyyrose-flagship' ),
+		'headline' => __( '&ldquo;14 Game-Changing Entrepreneurs to Watch in 2023&rdquo;', 'skyyrose-flagship' ),
+		'excerpt'  => __( 'Maxim spotlighted Corey Foster alongside tech founders and multimillion-dollar CEOs as one of the year&rsquo;s most compelling entrepreneurs &mdash; recognizing the SkyyRose Collection as a rising force in streetwear built on resilience and authenticity.', 'skyyrose-flagship' ),
+		'url'      => 'https://www.maxim.com/partner/14-game-changing-entrepreneurs-to-watch-in-2023/',
+	),
+	array(
+		'src'      => __( 'CEO Weekly', 'skyyrose-flagship' ),
+		'year'     => __( 'October 2024', 'skyyrose-flagship' ),
+		'headline' => __( '&ldquo;The Unyielding Journey of a Single Father and Entrepreneur&rdquo;', 'skyyrose-flagship' ),
+		'excerpt'  => __( 'CEO Weekly profiled the full arc of Corey&rsquo;s journey &mdash; from growing up in an environment where crime was the norm, to building a brand that embodies hope and hard work while maintaining integrity every step of the way.', 'skyyrose-flagship' ),
+		'url'      => 'https://ceoweekly.com/the-unyielding-journey-of-a-single-father-and-entrepreneur/',
+	),
+	array(
+		'src'      => __( 'San Francisco Post', 'skyyrose-flagship' ),
+		'year'     => __( 'August 2024', 'skyyrose-flagship' ),
+		'headline' => __( '&ldquo;From Oakland&rsquo;s Streets to Fashion Heights&rdquo;', 'skyyrose-flagship' ),
+		'excerpt'  => __( 'The San Francisco Post chronicled how the brand pioneered gender-neutral fashion in the Bay Area, creating a line that transcends societal boundaries with versatile, stylish pieces accessible to all &mdash; rooted in Oakland&rsquo;s cultural landscape.', 'skyyrose-flagship' ),
+		'url'      => 'https://sanfranciscopost.com/the-skyy-rose-collection-from-oaklands-streets-to-fashion-heights/',
+	),
+	array(
+		'src'      => __( 'Best of Best Review', 'skyyrose-flagship' ),
+		'year'     => __( 'August 2024', 'skyyrose-flagship' ),
+		'headline' => __( '&ldquo;Best Bay Area Clothing Line Award 2024&rdquo;', 'skyyrose-flagship' ),
+		'excerpt'  => __( 'SkyyRose was honored with the Best Bay Area Clothing Line award, recognizing the brand&rsquo;s exceptional contribution to fashion &mdash; citing authenticity, innovation in gender-neutral design, quality craftsmanship, and community impact as deciding factors.', 'skyyrose-flagship' ),
+		'url'      => 'https://bestofbestreview.com/awards/the-skyy-rose-collection-best-bay-area-clothing-line-award-2024',
+	),
+);
+
+/*--------------------------------------------------------------
+ * Allowed HTML tags for wp_kses
+ *--------------------------------------------------------------*/
+$allowed_inline = array(
+	'em'     => array(),
+	'strong' => array(),
+	'br'     => array(),
+);
+
+$arrow_svg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
 ?>
 
-<main id="primary" class="site-main about-page" role="main" tabindex="-1">
+<main id="primary" class="site-main abt-page" role="main" tabindex="-1">
 
-	<!-- ============================================
-	     HERO -- Gradient mesh with radial glow
-	     ============================================ -->
-	<section class="about-hero" aria-label="<?php esc_attr_e( 'About SkyyRose', 'skyyrose-flagship' ); ?>">
-		<div class="about-hero__mesh" aria-hidden="true"></div>
-		<div class="about-hero__content about-reveal">
-			<span class="about-hero__label">
-				<?php echo esc_html( $hero_label ); ?>
-			</span>
-			<h1 class="about-hero__title">
-				<?php
-				// Title may contain <br> for line breaks -- allow only <br>.
-				echo wp_kses( $hero_title, array( 'br' => array() ) );
-				?>
+	<!-- ═══ HERO — Cinematic Full-Bleed ═══ -->
+	<section class="abt-hero" aria-label="<?php esc_attr_e( 'About SkyyRose', 'skyyrose-flagship' ); ?>">
+		<div class="abt-hero__img" aria-hidden="true">
+			<?php
+			$hero_img = get_theme_file_path( 'assets/images/about-story-0.jpg' );
+			if ( file_exists( $hero_img ) ) :
+			?>
+				<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/about-story-0.jpg' ) ); ?>"
+					 alt="<?php esc_attr_e( 'SkyyRose — luxury streetwear born in Oakland', 'skyyrose-flagship' ); ?>"
+					 loading="eager" width="1920" height="1080">
+			<?php endif; ?>
+		</div>
+		<div class="abt-hero__overlay" aria-hidden="true"></div>
+		<div class="abt-hero__content">
+			<p class="abt-hero__eyebrow rv">
+				<?php echo wp_kses( $hero_eyebrow, $allowed_inline ); ?>
+			</p>
+			<h1 class="abt-hero__title rv rv-d1">
+				<span><?php echo wp_kses( $hero_title, $allowed_inline ); ?></span>
+				<?php echo wp_kses( $hero_title_2, $allowed_inline ); ?>
 			</h1>
-			<p class="about-hero__tagline">
-				<?php
-				echo wp_kses(
-					$hero_tagline,
-					array(
-						'em'     => array(),
-						'strong' => array(),
-					)
-				);
-				?>
+			<p class="abt-hero__sub rv rv-d2">
+				<?php echo wp_kses( $hero_sub, $allowed_inline ); ?>
 			</p>
-			<p class="about-hero__description">
-				<?php
-				echo wp_kses(
-					$hero_description,
-					array(
-						'em'     => array(),
-						'strong' => array(),
-					)
-				);
-				?>
-			</p>
+		</div>
+		<div class="abt-hero__scroll rv rv-d3" aria-hidden="true">
+			<span><?php esc_html_e( 'Scroll', 'skyyrose-flagship' ); ?></span>
+			<div class="abt-hero__scroll-line"></div>
 		</div>
 	</section>
 
-	<!-- ============================================
-	     STORY SECTIONS -- Alternating 2-column grid
-	     ============================================ -->
-	<section class="about-story" aria-label="<?php esc_attr_e( 'Our Story', 'skyyrose-flagship' ); ?>">
-		<?php
-		foreach ( $story_sections as $index => $story ) :
-			$grid_class  = 'about-story__grid';
-			$grid_class .= $story['reverse'] ? ' about-story__grid--reverse' : '';
-			$delay_class = 'about-reveal--delay-' . ( $index + 1 );
-			?>
-			<div class="<?php echo esc_attr( $grid_class ); ?>">
+	<!-- ═══ CHAPTER I — The Origin ═══ -->
+	<section class="abt-chapter abt-origin" id="origin" aria-label="<?php esc_attr_e( 'The Origin Story', 'skyyrose-flagship' ); ?>">
+		<span class="abt-chapter__num" aria-hidden="true">01</span>
+		<div class="abt-chapter__container">
+			<p class="abt-chapter__label rv"><?php esc_html_e( 'Chapter I', 'skyyrose-flagship' ); ?></p>
+			<h2 class="abt-chapter__title rv rv-d1">
+				<?php echo wp_kses( __( 'From Concrete<br>to Collection', 'skyyrose-flagship' ), $allowed_inline ); ?>
+			</h2>
 
-				<figure class="about-story__image about-reveal <?php echo esc_attr( $story['reverse'] ? 'about-reveal--right' : 'about-reveal--left' ); ?> <?php echo esc_attr( $delay_class ); ?>">
-					<?php
-					$about_story_img = get_theme_file_path( 'assets/images/about-story-' . $index . '.jpg' );
-					if ( file_exists( $about_story_img ) ) :
-					?>
-						<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/about-story-' . $index . '.jpg' ) ); ?>"
-							 alt="<?php echo esc_attr( $story['image_alt'] ); ?>"
-							 loading="lazy" width="600" height="500">
-					<?php endif; ?>
-				</figure>
-
-				<div class="about-story__content about-reveal <?php echo esc_attr( $story['reverse'] ? 'about-reveal--left' : 'about-reveal--right' ); ?> <?php echo esc_attr( $delay_class ); ?>">
-					<h2 class="about-story__heading">
-						<?php echo esc_html( $story['heading'] ); ?>
-					</h2>
-
-					<?php foreach ( $story['paragraphs'] as $paragraph ) : ?>
-						<p class="about-story__text">
-							<?php
-							echo wp_kses(
-								$paragraph,
-								array(
-									'em'     => array(),
-									'strong' => array(),
-								)
-							);
-							?>
-						</p>
-					<?php endforeach; ?>
-
-					<?php if ( ! empty( $story['highlight'] ) ) : ?>
-						<blockquote class="about-story__highlight">
-							<?php
-							echo wp_kses(
-								$story['highlight'],
-								array(
-									'em'     => array(),
-									'strong' => array(),
-								)
-							);
-							?>
-						</blockquote>
-					<?php endif; ?>
+			<div class="abt-origin__grid">
+				<div class="abt-origin__quote rv rv-d2">
+					<blockquote>
+						<?php echo wp_kses( $origin_quote, $allowed_inline ); ?>
+					</blockquote>
+					<cite><?php echo wp_kses( $origin_cite, $allowed_inline ); ?></cite>
 				</div>
-
+				<div class="abt-origin__text rv rv-d3">
+					<?php foreach ( $origin_paragraphs as $para ) : ?>
+						<p><?php echo wp_kses( $para, $allowed_inline ); ?></p>
+					<?php endforeach; ?>
+				</div>
 			</div>
-		<?php endforeach; ?>
+		</div>
 	</section>
 
-	<!-- ============================================
-	     COLLECTIONS STORY -- What each collection means
-	     ============================================ -->
-	<section class="about-collections" aria-label="<?php esc_attr_e( 'Our Collections', 'skyyrose-flagship' ); ?>">
-		<div class="about-collections__inner">
-			<h2 class="about-collections__heading about-reveal">
-				<?php esc_html_e( 'The Collections', 'skyyrose-flagship' ); ?>
+	<!-- ═══ CHAPTER II — Values ═══ -->
+	<section class="abt-chapter abt-values" aria-label="<?php esc_attr_e( 'Our Values', 'skyyrose-flagship' ); ?>">
+		<span class="abt-chapter__num" aria-hidden="true">02</span>
+		<div class="abt-chapter__container">
+			<p class="abt-chapter__label rv"><?php esc_html_e( 'Chapter II', 'skyyrose-flagship' ); ?></p>
+			<h2 class="abt-chapter__title rv rv-d1">
+				<?php echo wp_kses( __( 'What We<br>Stand On', 'skyyrose-flagship' ), $allowed_inline ); ?>
 			</h2>
-			<p class="about-collections__intro about-reveal about-reveal--delay-1">
-				<?php esc_html_e( 'Each SkyyRose collection is a world unto itself -- a distinct voice, a unique mood, a story waiting to be worn. Together, they form the complete SkyyRose universe.', 'skyyrose-flagship' ); ?>
-			</p>
 
-			<div class="about-collections__grid">
-				<?php foreach ( $collections_story as $col_index => $collection ) : ?>
-					<article class="about-collections__card about-collections__card--<?php echo esc_attr( $collection['accent'] ); ?> about-reveal about-reveal--delay-<?php echo esc_attr( $col_index + 1 ); ?>">
-						<div class="about-collections__card-accent" aria-hidden="true"></div>
-						<h3 class="about-collections__card-name">
-							<?php echo esc_html( $collection['name'] ); ?>
-						</h3>
-						<span class="about-collections__card-tagline">
-							<?php echo esc_html( $collection['tagline'] ); ?>
-						</span>
-						<p class="about-collections__card-description">
+			<div class="abt-values__grid">
+				<?php foreach ( $brand_values as $vi => $val ) :
+					$delay = 'rv-d' . ( ( $vi % 3 ) + 1 );
+				?>
+					<div class="abt-val-card rv <?php echo esc_attr( $delay ); ?>">
+						<div class="abt-val-card__icon" aria-hidden="true">
 							<?php
-							echo wp_kses(
-								$collection['description'],
-								array(
-									'em'     => array(),
-									'strong' => array(),
-								)
-							);
+							// HTML entity for decorative icon — safe to output unescaped.
+							echo $val['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 							?>
-						</p>
-						<a href="<?php echo esc_url( home_url( '/collection-' . $collection['slug'] . '/' ) ); ?>" class="about-collections__card-link">
-							<?php
-							/* translators: %s: collection name */
-							printf( esc_html__( 'Explore %s', 'skyyrose-flagship' ), esc_html( $collection['name'] ) );
-							?>
-							<span aria-hidden="true">&rarr;</span>
-						</a>
-					</article>
+						</div>
+						<h3 class="abt-val-card__title"><?php echo esc_html( $val['title'] ); ?></h3>
+						<p class="abt-val-card__text"><?php echo wp_kses( $val['text'], $allowed_inline ); ?></p>
+					</div>
 				<?php endforeach; ?>
 			</div>
 		</div>
 	</section>
 
-	<!-- ============================================
-	     TIMELINE -- 2019-2025 milestones
-	     ============================================ -->
-	<section class="about-timeline" aria-label="<?php esc_attr_e( 'Our Journey', 'skyyrose-flagship' ); ?>">
-		<h2 class="about-timeline__heading about-reveal">
-			<?php esc_html_e( 'Our Journey', 'skyyrose-flagship' ); ?>
-		</h2>
-		<p class="about-timeline__subheading about-reveal about-reveal--delay-1">
-			<?php esc_html_e( 'From a dream sketched in Oakland to a global movement -- every year has shaped who we are.', 'skyyrose-flagship' ); ?>
-		</p>
+	<!-- ═══ CHAPTER III — Timeline ═══ -->
+	<section class="abt-chapter abt-timeline" aria-label="<?php esc_attr_e( 'Our Journey', 'skyyrose-flagship' ); ?>">
+		<span class="abt-chapter__num" aria-hidden="true">03</span>
+		<div class="abt-chapter__container">
+			<p class="abt-chapter__label rv"><?php esc_html_e( 'Chapter III', 'skyyrose-flagship' ); ?></p>
+			<h2 class="abt-chapter__title rv rv-d1"><?php esc_html_e( 'The Journey', 'skyyrose-flagship' ); ?></h2>
 
-		<div class="about-timeline__track" role="list">
-			<?php foreach ( $timeline_milestones as $milestone_index => $milestone ) : ?>
-				<div class="about-timeline__item about-reveal about-reveal--delay-<?php echo esc_attr( min( $milestone_index + 1, 5 ) ); ?>" role="listitem">
-					<div class="about-timeline__content">
-						<span class="about-timeline__year">
-							<?php echo esc_html( $milestone['year'] ); ?>
-						</span>
-						<h3><?php echo esc_html( $milestone['title'] ); ?></h3>
-						<p>
-							<?php
-							echo wp_kses(
-								$milestone['description'],
-								array(
-									'em'     => array(),
-									'strong' => array(),
-								)
-							);
-							?>
-						</p>
+			<div class="abt-tl__track" role="list">
+				<?php foreach ( $timeline_milestones as $ms ) : ?>
+					<div class="abt-tl__node rv" role="listitem">
+						<div class="abt-tl__year"><?php echo wp_kses( $ms['year'], $allowed_inline ); ?></div>
+						<h3 class="abt-tl__event"><?php echo esc_html( $ms['event'] ); ?></h3>
+						<p class="abt-tl__desc"><?php echo wp_kses( $ms['desc'], $allowed_inline ); ?></p>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	</section>
+
+	<!-- ═══ CHAPTER IV — Press Room ═══ -->
+	<section class="abt-chapter abt-press" aria-label="<?php esc_attr_e( 'Press &amp; Media', 'skyyrose-flagship' ); ?>">
+		<span class="abt-chapter__num" aria-hidden="true">04</span>
+		<div class="abt-chapter__container">
+			<p class="abt-chapter__label rv"><?php esc_html_e( 'Chapter IV', 'skyyrose-flagship' ); ?></p>
+			<h2 class="abt-chapter__title rv rv-d1"><?php esc_html_e( 'As Seen In', 'skyyrose-flagship' ); ?></h2>
+			<p class="abt-press__intro rv rv-d2">
+				<?php esc_html_e( 'The SkyyRose story has been recognized by national and regional publications for its authenticity, innovation, and the power of its origin.', 'skyyrose-flagship' ); ?>
+			</p>
+
+			<!-- Featured Video -->
+			<?php if ( ! empty( $youtube_embed_id ) ) : ?>
+				<div class="abt-press__video-wrap rv rv-d3">
+					<div class="abt-press__video-header">
+						<span><?php esc_html_e( 'Featured Video', 'skyyrose-flagship' ); ?></span>
+						<div class="abt-press__video-line" aria-hidden="true"></div>
+					</div>
+					<div class="abt-press__video-embed">
+						<iframe
+							src="<?php echo esc_url( 'https://www.youtube.com/embed/' . $youtube_embed_id . '?rel=0&modestbranding=1&color=white' ); ?>"
+							title="<?php esc_attr_e( 'SkyyRose Collection — Featured Video', 'skyyrose-flagship' ); ?>"
+							frameborder="0"
+							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+							allowfullscreen
+							loading="lazy">
+						</iframe>
 					</div>
 				</div>
-			<?php endforeach; ?>
+			<?php endif; ?>
 		</div>
-	</section>
 
-	<!-- ============================================
-	     BRAND STATS -- Key numbers
-	     ============================================ -->
-	<section class="about-stats" aria-label="<?php esc_attr_e( 'Brand Statistics', 'skyyrose-flagship' ); ?>">
-		<div class="about-stats__inner">
-			<?php foreach ( $brand_stats as $stat_index => $stat ) : ?>
-				<div class="about-stats__item about-reveal about-reveal--delay-<?php echo esc_attr( $stat_index + 1 ); ?>">
-					<span class="about-stats__number">
-						<?php echo esc_html( $stat['number'] ); ?>
-					</span>
-					<span class="about-stats__label">
-						<?php echo esc_html( $stat['label'] ); ?>
-					</span>
-					<span class="about-stats__detail">
-						<?php echo esc_html( $stat['detail'] ); ?>
-					</span>
-				</div>
-			<?php endforeach; ?>
-		</div>
-	</section>
-
-	<!-- ============================================
-	     VALUES -- 4 cards grid with expanded content
-	     ============================================ -->
-	<section class="about-values" aria-label="<?php esc_attr_e( 'Our Values', 'skyyrose-flagship' ); ?>">
-		<h2 class="about-values__heading about-reveal">
-			<?php esc_html_e( 'What We Stand For', 'skyyrose-flagship' ); ?>
-		</h2>
-		<p class="about-values__subheading about-reveal about-reveal--delay-1">
-			<?php esc_html_e( 'Four principles guide everything we create. They are not just words -- they are promises woven into every piece.', 'skyyrose-flagship' ); ?>
-		</p>
-
-		<div class="about-values__grid">
-			<?php foreach ( $brand_values as $value_index => $value ) : ?>
-				<article class="about-values__card about-reveal about-reveal--delay-<?php echo esc_attr( $value_index + 1 ); ?>">
-					<span class="about-values__icon" aria-hidden="true">
-						<?php
-						// HTML entities for emoji icons -- safe to output.
-						echo $value['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- intentional HTML entity.
-						?>
-					</span>
-					<h3><?php echo esc_html( $value['title'] ); ?></h3>
-					<p>
-						<?php
-						echo wp_kses(
-							$value['description'],
-							array(
-								'em'     => array(),
-								'strong' => array(),
-							)
-						);
-						?>
-					</p>
+		<!-- Horizontal Scroll Press Cards -->
+		<div class="abt-press__scroll" id="pressScroll">
+			<?php foreach ( $press_features as $pi => $pf ) :
+				$delay = 'rv-d' . min( $pi + 1, 4 );
+			?>
+				<article class="abt-press-card rv <?php echo esc_attr( $delay ); ?>">
+					<div class="abt-press-card__inner">
+						<p class="abt-press-card__src"><?php echo esc_html( $pf['src'] ); ?></p>
+						<p class="abt-press-card__year"><?php echo esc_html( $pf['year'] ); ?></p>
+						<h3 class="abt-press-card__headline">
+							<?php echo wp_kses( $pf['headline'], $allowed_inline ); ?>
+						</h3>
+						<p class="abt-press-card__excerpt">
+							<?php echo wp_kses( $pf['excerpt'], $allowed_inline ); ?>
+						</p>
+						<?php if ( ! empty( $pf['url'] ) ) : ?>
+							<a href="<?php echo esc_url( $pf['url'] ); ?>"
+							   class="abt-press-card__link"
+							   target="_blank"
+							   rel="noopener noreferrer">
+								<?php esc_html_e( 'Read Article', 'skyyrose-flagship' ); ?>
+								<?php echo $arrow_svg; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG ?>
+							</a>
+						<?php endif; ?>
+					</div>
 				</article>
 			<?php endforeach; ?>
+			<div class="abt-press__scroll-spacer" aria-hidden="true"></div>
 		</div>
-	</section>
 
-	<!-- ============================================
-	     FOUNDER -- Portrait + rich bio
-	     ============================================ -->
-	<section class="about-founder" aria-label="<?php esc_attr_e( 'Founder Message', 'skyyrose-flagship' ); ?>">
-		<div class="about-founder__inner">
-
-			<figure class="about-founder__portrait about-reveal about-reveal--left">
-				<?php
-				$founder_img = get_theme_file_path( 'assets/images/founder-portrait.jpg' );
-				if ( file_exists( $founder_img ) ) :
-				?>
-					<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/founder-portrait.jpg' ) ); ?>"
-						 alt="<?php esc_attr_e( 'SkyyRose Founder', 'skyyrose-flagship' ); ?>"
-						 loading="lazy" width="400" height="500">
-				<?php endif; ?>
-			</figure>
-
-			<div class="about-founder__text about-reveal about-reveal--right about-reveal--delay-2">
-				<h2 class="about-founder__heading">
-					<?php esc_html_e( 'A Message from Our Founder', 'skyyrose-flagship' ); ?>
-				</h2>
-
-				<p class="about-founder__intro">
-					<?php
-					echo wp_kses(
-						$founder_intro,
-						array(
-							'em'     => array(),
-							'strong' => array(),
-						)
-					);
-					?>
-				</p>
-
-				<?php foreach ( $founder_quotes as $quote ) : ?>
-					<p class="about-founder__quote">
-						<?php
-						echo wp_kses(
-							$quote,
-							array(
-								'em'     => array(),
-								'strong' => array(),
-							)
-						);
-						?>
-					</p>
-				<?php endforeach; ?>
-
-				<blockquote class="about-founder__vision">
-					<?php
-					echo wp_kses(
-						$founder_vision,
-						array(
-							'em'     => array(),
-							'strong' => array(),
-						)
-					);
-					?>
-				</blockquote>
-
-				<p class="about-founder__signature">
-					<?php
-					echo wp_kses(
-						$founder_signature,
-						array(
-							'em'     => array(),
-							'strong' => array(),
-						)
-					);
-					?>
-				</p>
-			</div>
-
-		</div>
-	</section>
-
-	<!-- ============================================
-	     PRESS & MEDIA -- Featured appearances
-	     ============================================ -->
-	<section class="about-press" aria-label="<?php esc_attr_e( 'Press &amp; Media', 'skyyrose-flagship' ); ?>">
-		<div class="about-press__inner">
-			<div class="about-press__header about-reveal">
-				<span class="section-header__label">
-					<?php esc_html_e( 'As Seen In', 'skyyrose-flagship' ); ?>
-				</span>
-				<h2 class="about-press__heading">
-					<?php esc_html_e( 'Press & Media', 'skyyrose-flagship' ); ?>
-				</h2>
-				<p class="about-press__intro">
-					<?php esc_html_e( 'SkyyRose is making waves beyond fashion — from Oakland studios to media spotlights, the movement speaks for itself.', 'skyyrose-flagship' ); ?>
-				</p>
-			</div>
-
-			<div class="about-press__grid about-reveal about-reveal--delay-1">
-				<?php
-				$press_features = array(
-					array(
-						'image'       => 'press-the-blox-interview.jpg',
-						'video'       => 'video/the-blox-interview.mp4',
-						'outlet'      => __( 'The Blox', 'skyyrose-flagship' ),
-						'title'       => __( 'Founder Feature Interview', 'skyyrose-flagship' ),
-						'description' => __( 'SkyyRose founder Corey Foster sits down with The Blox to discuss building a luxury streetwear brand from Oakland, the meaning behind each collection, and the vision for the future.', 'skyyrose-flagship' ),
-						'link'        => 'https://www.tiktok.com/@skyyroseco',
-						'link_text'   => __( 'Watch on TikTok', 'skyyrose-flagship' ),
-					),
-				);
-
-				foreach ( $press_features as $feature ) :
-					$press_img_path = get_theme_file_path( 'assets/images/' . $feature['image'] );
-					$press_img_url  = get_theme_file_uri( 'assets/images/' . $feature['image'] );
-				?>
-					<article class="about-press__feature">
-						<figure class="about-press__media">
-							<?php
-							$has_video = ! empty( $feature['video'] ) && file_exists( get_theme_file_path( 'assets/' . $feature['video'] ) );
-							if ( $has_video ) :
-							?>
-								<video
-									class="about-press__video"
-									controls
-									preload="metadata"
-									poster="<?php echo esc_url( $press_img_url ); ?>"
-									width="672"
-									height="384"
-								>
-									<source src="<?php echo esc_url( get_theme_file_uri( 'assets/' . $feature['video'] ) ); ?>" type="video/mp4">
-								</video>
-							<?php elseif ( file_exists( $press_img_path ) ) : ?>
-								<img
-									src="<?php echo esc_url( $press_img_url ); ?>"
-									alt="<?php echo esc_attr( $feature['outlet'] . ' — ' . $feature['title'] ); ?>"
-									loading="lazy"
-									width="672"
-									height="384"
-								>
-							<?php endif; ?>
-						</figure>
-						<div class="about-press__content">
-							<span class="about-press__outlet">
-								<?php echo esc_html( $feature['outlet'] ); ?>
-							</span>
-							<h3 class="about-press__title">
-								<?php echo esc_html( $feature['title'] ); ?>
-							</h3>
-							<p class="about-press__description">
-								<?php echo esc_html( $feature['description'] ); ?>
-							</p>
-							<?php if ( ! empty( $feature['link'] ) ) : ?>
-								<a href="<?php echo esc_url( $feature['link'] ); ?>"
-								   class="about-press__link"
-								   target="_blank"
-								   rel="noopener noreferrer">
-									<?php echo esc_html( $feature['link_text'] ); ?>
-									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false">
-										<line x1="7" y1="17" x2="17" y2="7"/>
-										<polyline points="7 7 17 7 17 17"/>
-									</svg>
-								</a>
-							<?php endif; ?>
-						</div>
-					</article>
-				<?php endforeach; ?>
+		<div class="abt-chapter__container">
+			<div class="abt-press__hint rv" aria-hidden="true">
+				<div class="abt-press__hint-line"></div>
+				<span><?php esc_html_e( 'Scroll to explore', 'skyyrose-flagship' ); ?></span>
 			</div>
 		</div>
 	</section>
 
-	<!-- ============================================
-	     COMMUNITY -- Oakland roots, giving back
-	     ============================================ -->
-	<section class="about-community" aria-label="<?php esc_attr_e( 'Our Community', 'skyyrose-flagship' ); ?>">
-		<div class="about-community__inner">
-			<div class="about-community__content about-reveal">
-				<h2 class="about-community__heading">
+	<!-- ═══ MISSION BANNER ═══ -->
+	<section class="abt-mission" aria-label="<?php esc_attr_e( 'Our Mission', 'skyyrose-flagship' ); ?>">
+		<div class="rv">
+			<p class="abt-chapter__label" style="text-align:center;margin-bottom:24px">
+				<?php esc_html_e( 'The Mission', 'skyyrose-flagship' ); ?>
+			</p>
+			<h2 class="abt-mission__tagline">
+				<?php echo wp_kses( __( 'Luxury Grows<br>from Concrete', 'skyyrose-flagship' ), $allowed_inline ); ?>
+			</h2>
+			<p class="abt-mission__sub">
+				<?php esc_html_e( 'Where Bay Area authenticity meets high-fashion aesthetics. Where a father\'s love becomes a brand\'s foundation. Where fashion is a force for change.', 'skyyrose-flagship' ); ?>
+			</p>
+			<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="abt-mission__cta">
+				<?php esc_html_e( 'Shop the Collection', 'skyyrose-flagship' ); ?>
+			</a>
+		</div>
+	</section>
+
+	<!-- ═══ COMMUNITY — Oakland Roots ═══ -->
+	<section class="abt-community" aria-label="<?php esc_attr_e( 'Our Community', 'skyyrose-flagship' ); ?>">
+		<div class="abt-community__inner">
+			<div class="abt-community__content rv">
+				<h2 class="abt-community__heading">
 					<?php esc_html_e( 'Rooted in Oakland, Connected to the World', 'skyyrose-flagship' ); ?>
 				</h2>
-				<p class="about-community__text">
+				<p class="abt-community__text">
 					<?php
 					echo wp_kses(
 						__( 'Oakland isn\'t just where SkyyRose was born&mdash;it\'s <em>who</em> we are. The creativity, the resilience, the unapologetic swagger of the Bay Area runs through every thread of our brand. Our community is our foundation, and we never forget that.', 'skyyrose-flagship' ),
-						array(
-							'em'     => array(),
-							'strong' => array(),
-						)
+						$allowed_inline
 					);
 					?>
 				</p>
-				<p class="about-community__text">
+				<p class="abt-community__text">
 					<?php
 					echo wp_kses(
-						__( 'We give back because it\'s in our DNA. Whether it\'s partnering with local Oakland artists, supporting youth creative programs, or spotlighting the voices that inspire our collections&mdash;SkyyRose exists to lift up the community that lifted us. Every purchase supports not just a brand, but a <em>movement</em>.', 'skyyrose-flagship' ),
-						array(
-							'em'     => array(),
-							'strong' => array(),
-						)
-					);
-					?>
-				</p>
-				<p class="about-community__text">
-					<?php
-					echo wp_kses(
-						__( 'The SkyyRose community spans from the streets of East Oakland to cities around the world. We are designers and dreamers, hustlers and artists, parents and kids&mdash;united by a belief that fashion should make you feel something real. When you wear SkyyRose, you\'re part of a family.', 'skyyrose-flagship' ),
-						array(
-							'em'     => array(),
-							'strong' => array(),
-						)
+						__( 'We give back because it\'s in our DNA. Whether it\'s partnering with local Oakland artists, supporting youth creative programs, or spotlighting the voices that inspire our collections&mdash;SkyyRose exists to lift up the community that lifted us.', 'skyyrose-flagship' ),
+						$allowed_inline
 					);
 					?>
 				</p>
 			</div>
-			<div class="about-community__pillars about-reveal about-reveal--delay-2">
-				<div class="about-community__pillar">
+			<div class="abt-community__pillars rv rv-d2">
+				<div class="abt-community__pillar">
 					<h3><?php esc_html_e( 'Local Artists', 'skyyrose-flagship' ); ?></h3>
 					<p><?php esc_html_e( 'Collaborating with Oakland creatives to bring fresh perspectives to every collection and campaign.', 'skyyrose-flagship' ); ?></p>
 				</div>
-				<div class="about-community__pillar">
+				<div class="abt-community__pillar">
 					<h3><?php esc_html_e( 'Youth Programs', 'skyyrose-flagship' ); ?></h3>
 					<p><?php esc_html_e( 'Supporting the next generation of designers and entrepreneurs through mentorship and creative workshops.', 'skyyrose-flagship' ); ?></p>
 				</div>
-				<div class="about-community__pillar">
+				<div class="abt-community__pillar">
 					<h3><?php esc_html_e( 'Sustainable Future', 'skyyrose-flagship' ); ?></h3>
 					<p><?php esc_html_e( 'Committed to responsible production, ethical sourcing, and building a brand that respects both people and planet.', 'skyyrose-flagship' ); ?></p>
 				</div>

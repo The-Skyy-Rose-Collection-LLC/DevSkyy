@@ -60,6 +60,19 @@
 
 ---
 
+## SECTION 1B: Brand Asset Optimization & Injection
+
+- [ ] Optimize animated monogram GIF → WebM + MP4 (<2MB each)
+- [ ] Generate resized logo set (nav 40-60px, hero 300-400px, thumb 120px)
+- [ ] Fix white-bg logos (Love Hurts + Signature) — transparent or mix-blend-mode
+- [ ] Inject SR monogram into `header.php` nav (img + text, shrink on scroll, mobile=icon only)
+- [ ] Inject collection logos as BACKGROUND for email/newsletter capture sections (NOT collection heroes)
+- [ ] Collection page heroes: KEEP existing scene images — do NOT replace with logos
+- [ ] Set favicon to `sr-monogram-favicon.png`
+- [ ] Set OG image fallback to monogram
+
+---
+
 ## SECTION 2: Homepage Makeover (Iterations 5-8)
 
 - [x] Convert homepage/index.html → front-page.php
