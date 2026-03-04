@@ -70,6 +70,7 @@ coverage/
 .env.skyyrose-experiences
 .env.staging
 .env.production
+.env.wordpress
 !.env.example
 secrets/
 credentials/
