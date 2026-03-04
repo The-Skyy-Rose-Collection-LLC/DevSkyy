@@ -265,6 +265,9 @@ function skyyrose_get_current_template_slug() {
 			'template-homepage-luxury.php'         => 'front-page',
 			'template-style-quiz.php'              => 'style-quiz',
 			'skyyrose-canvas.php'                  => 'collections-shop',
+			'template-landing-black-rose.php'      => 'landing',
+			'template-landing-love-hurts.php'      => 'landing',
+			'template-landing-signature.php'       => 'landing',
 		);
 
 		if ( isset( $template_map[ $page_template ] ) ) {
@@ -304,6 +307,7 @@ function skyyrose_enqueue_template_styles() {
 		'preorder-gateway'  => 'preorder-gateway.css',
 		'style-quiz'       => 'style-quiz.css',
 		'collections-shop' => 'collections-shop.css',
+		'landing'          => 'landing.css',
 		'404'              => '404.css',
 	);
 
@@ -390,6 +394,7 @@ function skyyrose_enqueue_template_scripts() {
 		'preorder-gateway'  => 'preorder-gateway.js',
 		'style-quiz'       => 'style-quiz.js',
 		'collections-shop' => 'collections-shop.js',
+		'landing'          => 'landing-engine.js',
 	);
 
 	if ( isset( $template_scripts[ $slug ] ) ) {
@@ -873,6 +878,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-size-guide',
 		'skyyrose-template-style-quiz',
 		'skyyrose-brand-ambassador',
+		'skyyrose-template-landing-engine',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) && strpos( $tag, ' defer' ) === false ) {

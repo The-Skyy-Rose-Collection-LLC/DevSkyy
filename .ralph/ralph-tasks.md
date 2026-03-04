@@ -1,78 +1,188 @@
-# Ralph Tasks — Elite Web Builder Full Site Build
+# Ralph Tasks — Elite Web Builder v2 Full Website Makeover
 
 ## INSTRUCTIONS
 - Update this file AFTER EVERY ITERATION with progress
 - Mark tasks [x] when complete, [/] when in progress, [ ] when pending
-- Add notes under each task about what was done
+- Add Context7 query logs under each task
+- Add notes about what was done and any decisions made
+- NEVER DELETE THIS FILE
 
-## Phase 1: Audit & Inventory
-- [x] Read every template file in wordpress-theme/skyyrose-flagship/
-  - Done: iterations 1-13, all templates read and built
-- [x] Inventory all product images in assets/images/products/ — identify missing shots
-  - Done: 26 single-angle shots cataloged, 6 placeholder-only products identified
-- [x] Audit menus registered in functions.php
-  - Done: primary, footer, mobile, collection menus all registered in inc/menu-setup.php
-- [x] Audit SEO tags across all templates (title, meta, OG, JSON-LD)
-  - Done: inc/seo.php + inc/accessibility-seo.php handle all SEO
+---
 
-## Phase 2: AI Model Imagery (50 images)
-- [/] Black Rose collection — 8 products x front+back = 16 images
-  - 4 front-model VTON done (br-001, br-003, br-006, br-008), 0 back views (HF auth blocked)
-  - 4 products placeholder-only (br-002, br-004, br-005, br-007)
-- [/] Love Hurts collection — 5 products x front+back = 10 images
-  - 2 front-model VTON done (lh-002, lh-005), 0 back views (HF auth blocked)
-  - 2 products placeholder-only (lh-003, lh-004)
-- [/] Signature collection — 12 products x front+back = 24 images
-  - 7 front-model VTON done (sg-001, sg-004, sg-005, sg-006, sg-008, sg-009, sg-010, sg-012)
-  - sg-011 VTON low quality (10 KB, needs regen with HF auth)
-- [ ] Verify all images generated and placed in correct directories
-  - BLOCKED: All VTON/3D providers need `huggingface-cli login` for ZeroGPU quota
+## SECTION 1: Foundation & Configuration (Iterations 1-4)
 
-## Phase 3: Content Build — Page by Page
-- [x] front-page.php — hero, collections preview, social proof, pre-order CTA
-- [x] template-collection-black-rose.php — full editorial content
-- [x] template-collection-love-hurts.php — full editorial content
-- [x] template-collection-signature.php — full editorial content
-- [x] template-collection-kids-capsule.php — full editorial content (iteration 48: added url+image to static)
-- [x] template-immersive-black-rose.php — 3D storytelling content
-- [x] template-immersive-love-hurts.php — 3D storytelling content
-- [x] template-immersive-signature.php — 3D storytelling content (iteration 48: fixed split-SKU prices)
-- [x] template-preorder-gateway.php — all products, pricing, cart
-- [x] header.php — polished nav, mobile menu (iteration 48: WC cart null safety)
-- [x] footer.php — social links, newsletter, brand footer
-- [x] 404.php, search.php, single.php, page.php — polish (iteration 48: i18n wrapped)
+- [ ] Read entire design package (all 12 HTML files + WP overlay files)
+- [ ] Merge new functions.php with existing (keep all existing hooks, add new)
+- [ ] Update style.css theme header to v4.0.0
+- [ ] Deploy assets/css/main.css (new global stylesheet)
+- [ ] Set up navigation menus (primary, footer, collection, mobile hamburger)
+- [ ] SEO base setup (OG tags, JSON-LD, canonical URLs, meta descriptions)
+- [ ] Configuration (conditional wp_enqueue, Google Fonts preconnect, critical CSS, reduced-motion)
+- [ ] **BONUS ROUND**: Add 2 industry-proven features (your choice — explain why)
 
-## Phase 4: Menus & Navigation
-- [x] Register all menus in functions.php (primary, footer, mobile, collection)
-- [x] Nav walkers working correctly
-- [x] Mobile hamburger menu functional
-- [x] Breadcrumbs on interior pages
-- [x] Verify all internal links resolve
+**Context7 Queries:**
+- [ ] WordPress register_nav_menus
+- [ ] WordPress wp_enqueue_style / wp_enqueue_script
+- [ ] WordPress add_theme_support
+- [ ] WooCommerce theme support hooks
 
-## Phase 5: SEO Optimization
-- [x] Unique title tags + meta descriptions per template
-- [x] Open Graph tags (og:title, og:description, og:image) on every page
-- [x] JSON-LD structured data (Organization, Product, BreadcrumbList)
-- [x] Single H1 per page, proper heading hierarchy
-- [x] Alt text on ALL images
-- [x] Canonical URLs
+---
 
-## Phase 6: Marketplace Polish
-- [x] Design tokens consistent (#B76E79, #0a0a0a, #D4AF37)
-- [x] Luxury micro-interactions (hover, scroll, parallax)
-- [x] Responsive across mobile/tablet/desktop/ultrawide
-- [x] WCAG 2.1 AA accessibility (ARIA, focus, keyboard nav) — 48 iterations of fixes
-- [x] Performance: lazy loading, critical CSS, optimized fonts
-- [x] Security: output escaping, CSP headers, rate limiting
+## SECTION 2: Homepage Makeover (Iterations 5-8)
 
-## Phase 7: Verification
-- [x] Run all 8 gate checkers on modified files — 3 parallel code review agents every iteration
-- [ ] pytest -v passes — no WordPress-specific pytest suite configured
-- [ ] Final cost report from cost_tracker
+- [ ] Convert homepage/index.html → front-page.php
+- [ ] Extract CSS → assets/css/homepage.css
+- [ ] Extract JS → assets/js/homepage.js
+- [ ] Replace hardcoded products with WooCommerce queries
+- [ ] Replace base64 images with asset references
+- [ ] Add AJAX add-to-cart functionality
+- [ ] Create template parts for reusable sections
+- [ ] Conditional enqueue for homepage assets
+- [ ] **BONUS ROUND**: Add 2 industry-proven features (your choice — explain why)
 
-## Iteration 48 Summary (2026-02-27)
-- 10 CRITICAL + 5 HIGH fixes across 12 files
-- PHP: wishlist nopriv, REST nonce, rate limiting, WC null safety, slug-based page detection
-- JS: eventQueue cap, interval cleanup, focus restoration, Escape key priority, search overlay inert trap, innerHTML→DOM API
-- Templates: i18n wrapping (404 + about), Kids Capsule static data, split-SKU price mismatch
-- All 8 PHP files pass lint, all 12 files SFTP deployed to skyyrose.co
+**Context7 Queries:**
+- [ ] WooCommerce wc_get_products()
+- [ ] WordPress template parts (get_template_part)
+- [ ] WooCommerce AJAX add-to-cart
+
+---
+
+## SECTION 3: Landing Pages — Conversion Engines (Iterations 9-14)
+
+- [x] Create template-landing-black-rose.php from lp-black-rose.html
+  - **Iteration 9**: Full 8-section conversion framework implemented
+  - Uses `skyyrose_get_collection_products('black-rose')` for dynamic product data
+  - CSS custom properties for collection theming (`--lp-accent: #C0C0C0`)
+  - All text properly escaped (`esc_html()`, `esc_attr()`, `esc_url()`)
+  - ARIA labels on all sections, FAQ buttons use `<button>` with `aria-expanded`
+  - Product grid shows cost-per-wear calculator and scarcity indicators
+- [ ] Create template-landing-love-hurts.php from lp-love-hurts.html
+- [ ] Create template-landing-signature.php from lp-signature.html
+- [x] Extract CSS → assets/css/landing.css (SHARED — single file, collection-specific via CSS vars)
+  - **Architecture decision**: One `landing.css` instead of 3 per-collection files
+  - CSS custom properties `--lp-accent` and `--lp-accent-rgb` set per template
+  - Responsive breakpoints at 768px (tablet) and 480px (mobile)
+  - `prefers-reduced-motion` support for all animations
+- [x] Extract JS → assets/js/landing-engine.js (shared: countdown, scarcity, parallax, FAQ accordion)
+  - **Iteration 9**: All 6 features implemented:
+    1. IntersectionObserver scroll-reveal
+    2. Nav scroll state (compact on scroll)
+    3. FAQ accordion (single-open, keyboard accessible)
+    4. Countdown timer (reads `data-countdown-end` or sessionStorage fallback)
+    5. Parallax break images
+    6. Newsletter AJAX form (hooks into `skyyrose_ajax_newsletter_subscribe`)
+- [x] Implement 8-section conversion framework on each page (Black Rose done)
+- [x] Hook countdown to get_option('skyyrose_preorder_deadline')
+- [x] Hook email capture to admin-ajax.php with nonce
+  - Uses existing `skyyrose_ajax_newsletter_subscribe` handler
+  - Nonce from `wp_nonce_field('skyyrose_newsletter')` in form + `skyyRoseData.nonce` in JS
+- [x] Conditional enqueue for landing page assets
+  - Added to `skyyrose_get_current_template_slug()` template map (lines 268-270)
+  - Added `'landing' => 'landing.css'` to template styles (line 310)
+  - Added `'landing' => 'landing-engine.js'` to template scripts (line 397)
+  - Added `'skyyrose-template-landing-engine'` to defer handles (line 881)
+- [ ] **BONUS ROUND**: Add 2 industry-proven features (your choice — explain why)
+
+**Context7 Queries:**
+- [x] WordPress Hooks (library: `/websites/developer_wordpress_reference_hooks`) — wp_ajax handlers, nonce, admin-post patterns
+- [x] WooCommerce (library: `/woocommerce/woocommerce`) — wc_get_products by category, stock_status, pagination
+- [ ] WordPress nonce verification (wp_nonce_field, check_ajax_referer) — covered via WordPress Hooks query above
+
+---
+
+## SECTION 4: Collection Pages — Full Product Showcases (Iterations 15-18)
+
+- [ ] Replace template-collection-black-rose.php with new design
+- [ ] Replace template-collection-love-hurts.php with new design
+- [ ] Replace template-collection-signature.php with new design
+- [ ] Verify template-collection-kids-capsule.php nav links work
+- [ ] Product grid with hover effects and quick-view capability
+- [ ] Sort/filter controls
+- [ ] Cross-collection navigation
+- [ ] Pre-order CTA section
+- [ ] Link to immersive experience (DO NOT MODIFY immersive pages)
+- [ ] **BONUS ROUND**: Add 2 industry-proven features (your choice — explain why)
+
+**Context7 Queries:**
+- [ ] WooCommerce product queries by category
+- [ ] WordPress taxonomy queries (get_terms, WP_Term_Query)
+
+---
+
+## SECTION 5: Single Product Pages (Iterations 19-22)
+
+- [ ] Deploy woocommerce/single-product.php (collection-aware)
+- [ ] Deploy inc/wc-product-functions.php (helpers)
+- [ ] Deploy assets/css/single-product.css
+- [ ] Deploy assets/js/single-product.js
+- [ ] Verify collection detection (Black Rose=silver, Love Hurts=crimson, Signature=gold)
+- [ ] Image gallery, size selector, AJAX cart, tabs
+- [ ] Related products from same collection
+- [ ] Conditional enqueue for single product assets
+- [ ] **BONUS ROUND**: Add 2 industry-proven features (your choice — explain why)
+
+**Context7 Queries:**
+- [ ] WooCommerce single product hooks
+- [ ] WooCommerce woocommerce_before_single_product
+- [ ] WooCommerce product gallery / variations API
+
+---
+
+## SECTION 6: About Page + Global Polish (Iterations 23-26)
+
+- [ ] Convert homepage/about.html → template-about.php (replace existing)
+- [ ] Cinematic hero with parallax
+- [ ] Founder story timeline
+- [ ] YouTube embed (The Blox interview)
+- [ ] Press room with logos
+- [ ] Verify ALL menu links work (primary, footer, collection, mobile)
+- [ ] Verify breadcrumb navigation across all pages
+- [ ] Test WooCommerce cart flow end-to-end
+- [ ] Responsive design audit (mobile, tablet, desktop)
+- [ ] Performance pass (lazy-load, defer, minify)
+- [ ] Accessibility pass (ARIA, focus, keyboard nav)
+- [ ] 404 page consistency with new design language
+- [ ] **BONUS ROUND**: Add 2 industry-proven features (your choice — explain why)
+
+**Context7 Queries:**
+- [ ] WordPress breadcrumbs
+- [ ] WooCommerce cart fragments
+- [ ] WordPress responsive/mobile best practices
+
+---
+
+## SECTION 7: SEO, Config Lockdown & Final QA (Iterations 27-30)
+
+- [ ] SEO final pass: every page has title, meta desc, OG image/title/desc
+- [ ] JSON-LD: Organization (homepage), Product (each product), BreadcrumbList (all pages)
+- [ ] Robots.txt configuration
+- [ ] Canonical URLs audit
+- [ ] Internal linking audit (every page links to 2+ other pages)
+- [ ] Image alt text audit (every img has descriptive alt)
+- [ ] Page speed: critical CSS, font-display swap, image optimization
+- [ ] Verify all wp_enqueue calls are conditional per template
+- [ ] Verify security headers intact (inc/security.php)
+- [ ] Verify AJAX nonce verification on all handlers
+- [ ] Verify no inline onerror handlers (CSP compliance)
+- [ ] Verify index.php?rest_route= used everywhere (not /wp-json/)
+- [ ] Final QA checklist (see ralph-context.md Section 7)
+- [ ] **BONUS ROUND**: Add 2 FINAL industry-proven features (your choice — explain why)
+
+**Context7 Queries:**
+- [ ] Schema.org structured data (JSON-LD)
+- [ ] WordPress robots.txt / canonical
+- [ ] Core Web Vitals best practices
+
+---
+
+## Serena Memory Updates
+- [ ] After Section 1: Save foundation decisions
+- [ ] After Section 3: Save conversion framework decisions
+- [ ] After Section 5: Save product page architecture
+- [ ] After Section 7: Save final site map and config
+
+## Code Reviews
+- [ ] After Section 1: Run code-reviewer agent
+- [ ] After Section 3: Run code-reviewer agent
+- [ ] After Section 5: Run code-reviewer agent
+- [ ] After Section 7: Run code-reviewer + security-reviewer agents
