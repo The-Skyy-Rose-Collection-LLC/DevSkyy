@@ -134,7 +134,7 @@ function skyyrose_get_menu_definitions() {
 				),
 				array(
 					'title' => __( 'Pre-Order', 'skyyrose-flagship' ),
-					'url'   => '/preorder/',
+					'url'   => '/pre-order/',
 				),
 				array(
 					'title' => __( 'About', 'skyyrose-flagship' ),
@@ -159,11 +159,7 @@ function skyyrose_get_menu_definitions() {
 				),
 				array(
 					'title' => __( 'FAQ', 'skyyrose-flagship' ),
-					'url'   => '/faq/',
-				),
-				array(
-					'title' => __( 'Shipping & Returns', 'skyyrose-flagship' ),
-					'url'   => '/shipping-returns/',
+					'url'   => '/contact/#faq',
 				),
 				array(
 					'title' => __( 'Privacy Policy', 'skyyrose-flagship' ),
@@ -192,7 +188,7 @@ function skyyrose_get_menu_definitions() {
 				),
 				array(
 					'title' => __( 'Pre-Order', 'skyyrose-flagship' ),
-					'url'   => '/preorder/',
+					'url'   => '/pre-order/',
 				),
 			),
 		),
@@ -201,15 +197,15 @@ function skyyrose_get_menu_definitions() {
 			'items' => array(
 				array(
 					'title' => __( 'FAQ', 'skyyrose-flagship' ),
-					'url'   => '/faq/',
+					'url'   => '/contact/#faq',
 				),
 				array(
-					'title' => __( 'Shipping & Returns', 'skyyrose-flagship' ),
-					'url'   => '/shipping-returns/',
-				),
-				array(
-					'title' => __( 'Contact', 'skyyrose-flagship' ),
+					'title' => __( 'Contact Us', 'skyyrose-flagship' ),
 					'url'   => '/contact/',
+				),
+				array(
+					'title' => __( 'Pre-Order', 'skyyrose-flagship' ),
+					'url'   => '/pre-order/',
 				),
 			),
 		),
@@ -251,7 +247,7 @@ function skyyrose_get_menu_definitions() {
 				),
 				array(
 					'title' => __( 'Pre-Order', 'skyyrose-flagship' ),
-					'url'   => '/preorder/',
+					'url'   => '/pre-order/',
 				),
 				array(
 					'title' => __( 'About', 'skyyrose-flagship' ),
@@ -260,6 +256,10 @@ function skyyrose_get_menu_definitions() {
 				array(
 					'title' => __( 'Contact', 'skyyrose-flagship' ),
 					'url'   => '/contact/',
+				),
+				array(
+					'title' => __( 'Wishlist', 'skyyrose-flagship' ),
+					'url'   => '/wishlist/',
 				),
 			),
 		),
@@ -309,13 +309,14 @@ add_action( 'after_switch_theme', 'skyyrose_setup_menus' );
 
 // Also run on `init` with a one-time flag so menus are created
 // even if theme was already active before this file was deployed.
+// Bump version to v400 to re-run with corrected URLs.
 add_action(
 	'init',
 	function () {
-		if ( get_option( 'skyyrose_menus_setup_v320' ) ) {
+		if ( get_option( 'skyyrose_menus_setup_v400' ) ) {
 			return;
 		}
 		skyyrose_setup_menus();
-		update_option( 'skyyrose_menus_setup_v320', true );
+		update_option( 'skyyrose_menus_setup_v400', true );
 	}
 );

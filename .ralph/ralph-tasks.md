@@ -742,6 +742,67 @@
 
 ---
 
+## SECTION 8: End-to-End WordPress Setup (Iteration 22)
+
+- [x] Create inc/theme-activation-setup.php — programmatic WordPress setup on theme activation
+  - **Iteration 22**: New module with 5 orchestrated functions:
+    1. `skyyrose_get_required_pages()` — defines 17 pages with template assignments
+    2. `skyyrose_create_required_pages()` — creates pages via `wp_insert_post()`, assigns `_wp_page_template` meta
+    3. `skyyrose_configure_reading_settings()` — sets static front page (`show_on_front` + `page_on_front`)
+    4. `skyyrose_configure_site_options()` — blog description, permalink structure, timezone, date format, pre-order deadline
+    5. `skyyrose_configure_woocommerce_settings()` — creates/assigns shop/cart/checkout/my-account pages, sets currency/guest checkout/stock management/image sizes
+  - Runs on `after_switch_theme` (fresh activation) + versioned `init` flag (existing sites)
+  - Version flag `SKYYROSE_SETUP_VERSION = '4.0.0'` — bump to re-run on updates
+  - All existence checks prevent duplicate creation
+  - Uses `sanitize_file_name()` on template names for security
+- [x] Wire into functions.php core includes array
+  - Added `/inc/theme-activation-setup.php` to `$skyyrose_core_includes`
+- [x] Fix menu-setup.php slug inconsistencies and dead links
+  - Fixed `/preorder/` → `/pre-order/` (3 menus: primary, footer-shop, mobile) — matches all template links
+  - Fixed `/faq/` → `/contact/#faq` (2 menus: footer, footer-help) — no standalone FAQ page
+  - Removed duplicate "Shipping & Returns" → `/contact/` from footer (was identical to Contact link)
+  - Replaced footer-help "Shipping & Returns" with "Pre-Order" (useful cross-sell)
+  - Added "Wishlist" `/wishlist/` to mobile menu (per directive)
+  - Bumped version flag `v320` → `v400` to re-create corrected menus on existing sites
+- [x] Verified: product-taxonomy.php already handles WooCommerce categories (black-rose, love-hurts, signature, kids-capsule) + 16 product tags
+- [x] Verified: menu-setup.php already handles 8 menu locations with `after_switch_theme` + `init` flag
+
+**Pages created by theme-activation-setup.php:**
+
+| Page | Slug | Template |
+|------|------|----------|
+| Home | `home` | `front-page.php` |
+| About | `about` | `template-about.php` |
+| Contact | `contact` | `template-contact.php` |
+| Pre-Order | `pre-order` | `template-preorder-gateway.php` |
+| Black Rose Collection | `collection-black-rose` | `template-collection-black-rose.php` |
+| Love Hurts Collection | `collection-love-hurts` | `template-collection-love-hurts.php` |
+| Signature Collection | `collection-signature` | `template-collection-signature.php` |
+| Kids Capsule | `collection-kids-capsule` | `template-collection-kids-capsule.php` |
+| Black Rose Landing | `landing-black-rose` | `template-landing-black-rose.php` |
+| Love Hurts Landing | `landing-love-hurts` | `template-landing-love-hurts.php` |
+| Signature Landing | `landing-signature` | `template-landing-signature.php` |
+| Black Rose Experience | `experience-black-rose` | `template-immersive-black-rose.php` |
+| Love Hurts Experience | `experience-love-hurts` | `template-immersive-love-hurts.php` |
+| Signature Experience | `experience-signature` | `template-immersive-signature.php` |
+| Wishlist | `wishlist` | `page-wishlist.php` |
+| Style Quiz | `style-quiz` | `template-style-quiz.php` |
+
+**WooCommerce pages (created if missing):** Shop, Cart, Checkout, My Account
+
+**Context7 Queries (Iteration 22):**
+- [x] WordPress Hooks (`/websites/developer_wordpress_reference_hooks`) — after_switch_theme, wp_insert_post, update_option, set_theme_mod, page template meta
+- [x] WooCommerce (`/woocommerce/woocommerce`) — wp_insert_term product_cat, WooCommerce page settings, product category creation
+
+**New Files Created (Iteration 22):**
+- `inc/theme-activation-setup.php` — ~280 lines, full WordPress setup automation
+
+**Files Modified (Iteration 22):**
+- `functions.php` — added `theme-activation-setup.php` to core includes
+- `inc/menu-setup.php` — fixed 7 dead/mismatched URLs, added Wishlist to mobile menu, bumped version flag
+
+---
+
 ## Serena Memory Updates
 - [ ] After Section 1: Save foundation decisions
 - [ ] After Section 3: Save conversion framework decisions
