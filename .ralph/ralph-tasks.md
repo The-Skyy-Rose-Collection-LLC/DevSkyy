@@ -410,13 +410,54 @@
 
 ---
 
-## SECTION 6: About Page + Global Polish (Iterations 23-26)
+## SECTION 6: About Page + Global Polish (Iterations 18-22)
 
-- [ ] Convert homepage/about.html → template-about.php (replace existing)
-- [ ] Cinematic hero with parallax
-- [ ] Founder story timeline
-- [ ] YouTube embed (The Blox interview)
-- [ ] Press room with logos
+- [x] Convert homepage/about.html → template-about.php (replace existing)
+  - **Pre-existing**: `template-about.php` already rewritten in a prior iteration (v4.0.0)
+  - Sections: Hero (full-bleed image) → Chapter I (Origin/founder quote) → Chapter II (6 values pillars) → Chapter III (Timeline 2020-2026) → Chapter IV (Press Room + YouTube + horizontal scroll cards) → Mission Banner → Community (Oakland roots)
+  - All text properly escaped (`esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses()`)
+  - Hero image: `about-story-0.jpg` with cinematic gradient overlay
+  - YouTube embed: `Ja11W-g34Zo` (The Blox interview), privacy-enhanced params (`rel=0`, `modestbranding=1`)
+  - Theme mods for hero text (`about_hero_eyebrow`, `about_hero_title`, etc.)
+  - Press features: Maxim, CEO Weekly, San Francisco Post, Best of Best Review (all with external links)
+- [x] Cinematic hero with parallax
+  - **Iteration 18**: Hero parallax via `about.js` — subtle `translateY()` on scroll using `requestAnimationFrame`, disabled for `prefers-reduced-motion`
+  - Hero image zoom keyframe (`abt-heroZoom`) in CSS: `scale(1.08)` → `scale(1)` over 25s
+- [x] Founder story timeline
+  - **Pre-existing**: 6 milestones (2020 The Promise → 2025-26 Full-Stack Luxury)
+  - Timeline dots with hover glow effect, `role="list"` / `role="listitem"` for accessibility
+- [x] YouTube embed (The Blox interview)
+  - **Pre-existing**: Responsive 16:9 embed via `padding-bottom: 56.25%` technique
+  - Lazy-loaded iframe with `loading="lazy"`, no cookie tracking params
+- [x] Press room with logos
+  - **Pre-existing**: 4 press cards in horizontal scroll with `scroll-snap-type: x mandatory`
+  - **Iteration 18**: Added drag-to-scroll JS for desktop (grab cursor, momentum scroll)
+  - Auto-offset hint on load (scrollLeft = 20 after 1.2s delay)
+- [/] Fix CSS/JS mismatch — about.css used wrong class prefix
+  - **Iteration 18**: CRITICAL FIX — existing `about.css` used `about-*` classes but `template-about.php` uses `abt-*` classes. Complete CSS rewrite (~700 lines) to match template:
+    - Hero: `.abt-hero`, `.abt-hero__img`, `.abt-hero__overlay`, `.abt-hero__content`, `.abt-hero__eyebrow`, `.abt-hero__title`, `.abt-hero__sub`, `.abt-hero__scroll`
+    - Chapter system: `.abt-chapter`, `.abt-chapter__num`, `.abt-chapter__container`, `.abt-chapter__label`, `.abt-chapter__title`
+    - Origin: `.abt-origin`, `.abt-origin__grid`, `.abt-origin__quote`, `.abt-origin__text`
+    - Values: `.abt-values`, `.abt-values__grid`, `.abt-val-card`, `.abt-val-card__icon`, `.abt-val-card__title`, `.abt-val-card__text`
+    - Timeline: `.abt-timeline`, `.abt-tl__track`, `.abt-tl__node`, `.abt-tl__year`, `.abt-tl__event`, `.abt-tl__desc`
+    - Press: `.abt-press`, `.abt-press__video-wrap`, `.abt-press__video-embed`, `.abt-press__scroll`, `.abt-press-card`
+    - Mission: `.abt-mission`, `.abt-mission__tagline`, `.abt-mission__sub`, `.abt-mission__cta`
+    - Community: `.abt-community`, `.abt-community__inner`, `.abt-community__pillars`, `.abt-community__pillar`
+    - Scroll reveal system: `.rv` → `.vis` transition-based (driven by JS IntersectionObserver)
+    - Rose gold shimmer on mission tagline (`abt-shimmer` keyframe)
+    - Responsive: 1024px, 768px, 480px breakpoints
+    - `prefers-reduced-motion` support, print stylesheet
+- [x] Create about.js (previously missing)
+  - **Iteration 18**: New file `assets/js/about.js` (~120 lines IIFE):
+    1. IntersectionObserver scroll-reveal (`.rv` → `.vis`, threshold 0.06, rootMargin -40px)
+    2. Press card drag-to-scroll (mousedown/mousemove/mouseup, 1.5x velocity multiplier)
+    3. Hero parallax (0.15 factor, RAF-throttled, hero viewport range only)
+    - Graceful fallback: reveals all elements if IntersectionObserver unsupported
+    - Respects `prefers-reduced-motion` (all animations skipped)
+- [x] Register about.js in enqueue.php
+  - **Iteration 18**: Added `'about' => 'about.js'` to `$template_scripts` array
+  - Added `'skyyrose-template-about'` to `$defer_handles` array
+  - No external dependencies (vanilla JS, no jQuery)
 - [ ] Verify ALL menu links work (primary, footer, collection, mobile)
 - [ ] Verify breadcrumb navigation across all pages
 - [ ] Test WooCommerce cart flow end-to-end
@@ -426,7 +467,16 @@
 - [ ] 404 page consistency with new design language
 - [ ] **BONUS ROUND**: Add 2 industry-proven features (your choice — explain why)
 
-**Context7 Queries:**
+**New Files Created (Iteration 18):**
+- `assets/js/about.js` — ~120 lines, scroll-reveal + drag-scroll + parallax
+
+**Files Modified (Iteration 18):**
+- `assets/css/about.css` — complete rewrite (~700 lines) to match `abt-*` class prefix
+- `inc/enqueue.php` — 2 edits: template scripts map + defer handles
+
+**Context7 Queries (Iteration 18):**
+- [x] WordPress custom page template PHP — `wp_enqueue_style` conditional loading (via WebSearch fallback — Context7 MCP unavailable)
+- [x] WordPress YouTube embed responsive oembed — privacy-enhanced, GDPR compliance (via WebSearch fallback)
 - [ ] WordPress breadcrumbs
 - [ ] WooCommerce cart fragments
 - [ ] WordPress responsive/mobile best practices
