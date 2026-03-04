@@ -45,9 +45,9 @@ function skyyrose_send_security_headers() {
 	$csp_directives = array(
 		"default-src 'self'",
 		"script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.babylonjs.com https://stats.wp.com https://widgets.wp.com https://s0.wp.com https://cdn.elementor.com https://ajax.googleapis.com https://unpkg.com https://connect.facebook.net blob:",
-		"style-src 'self' 'unsafe-inline' https://fonts-api.wp.com https://fonts.wp.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
+		"style-src 'self' 'unsafe-inline' https://fonts-api.wp.com https://fonts.wp.com https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
 		"img-src 'self' data: blob: https://*.wp.com https://secure.gravatar.com https://i0.wp.com https://i1.wp.com https://i2.wp.com https://*.skyyrose.co https://www.facebook.com",
-		"font-src 'self' data: https://fonts.wp.com https://cdn.jsdelivr.net",
+		"font-src 'self' data: https://fonts.wp.com https://fonts.gstatic.com https://cdn.jsdelivr.net",
 		"connect-src 'self' https://stats.wp.com https://public-api.wordpress.com https://api.skyyrose.co https://pixel.wp.com https://devskyy.app https://www.facebook.com https://connect.facebook.net",
 		"frame-src 'self' https://www.youtube.com https://player.vimeo.com https://widgets.wp.com",
 		"frame-ancestors 'self'",
@@ -243,6 +243,9 @@ function skyyrose_clean_wp_head() {
 
 	// Remove adjacent post links (prev/next).
 	remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head' );
+
+	// Remove core rel_canonical — theme outputs its own via skyyrose_canonical_url().
+	remove_action( 'wp_head', 'rel_canonical' );
 }
 add_action( 'init', 'skyyrose_clean_wp_head' );
 

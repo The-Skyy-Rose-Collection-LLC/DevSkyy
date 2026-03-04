@@ -382,20 +382,30 @@ function skyyrose_open_graph_tags() {
 		return;
 	}
 
+	$site_name = get_bloginfo( 'name' );
+
+	// Locale — always output.
+	echo '<meta property="og:locale" content="' . esc_attr( get_locale() ) . '" />' . "\n";
+	echo '<meta property="og:site_name" content="' . esc_attr( $site_name ) . '" />' . "\n";
+
+	// Fallback OG image (brand monogram).
+	$fallback_og_image = get_template_directory_uri() . '/assets/images/sr-monogram-hero.png';
+
 	if ( is_singular() ) {
 		global $post;
 
 		echo '<meta property="og:type" content="' . esc_attr( is_singular( 'product' ) ? 'product' : 'article' ) . '" />' . "\n";
-		echo '<meta property="og:title" content="' . esc_attr( get_the_title() ) . '" />' . "\n";
+		echo '<meta property="og:title" content="' . esc_attr( get_the_title() . ' | ' . $site_name ) . '" />' . "\n";
 		echo '<meta property="og:description" content="' . esc_attr( wp_strip_all_tags( get_the_excerpt() ) ) . '" />' . "\n";
 		echo '<meta property="og:url" content="' . esc_url( get_permalink() ) . '" />' . "\n";
-		echo '<meta property="og:site_name" content="' . esc_attr( get_bloginfo( 'name' ) ) . '" />' . "\n";
 
 		if ( has_post_thumbnail() ) {
 			$image_url = get_the_post_thumbnail_url( $post->ID, 'full' );
 			echo '<meta property="og:image" content="' . esc_url( $image_url ) . '" />' . "\n";
 			echo '<meta property="og:image:width" content="1200" />' . "\n";
 			echo '<meta property="og:image:height" content="630" />' . "\n";
+		} else {
+			echo '<meta property="og:image" content="' . esc_url( $fallback_og_image ) . '" />' . "\n";
 		}
 
 		// Product-specific OG tags.
@@ -409,16 +419,44 @@ function skyyrose_open_graph_tags() {
 		}
 	} elseif ( is_front_page() ) {
 		echo '<meta property="og:type" content="website" />' . "\n";
-		echo '<meta property="og:title" content="' . esc_attr( get_bloginfo( 'name' ) ) . '" />' . "\n";
+		echo '<meta property="og:title" content="' . esc_attr( $site_name . ' — Luxury Grows from Concrete.' ) . '" />' . "\n";
 		echo '<meta property="og:description" content="' . esc_attr( get_bloginfo( 'description' ) ) . '" />' . "\n";
 		echo '<meta property="og:url" content="' . esc_url( home_url( '/' ) ) . '" />' . "\n";
-		echo '<meta property="og:site_name" content="' . esc_attr( get_bloginfo( 'name' ) ) . '" />' . "\n";
 
 		$logo_id = get_theme_mod( 'custom_logo' );
 		if ( $logo_id ) {
-			$logo_url = wp_get_attachment_url( $logo_id );
-			echo '<meta property="og:image" content="' . esc_url( $logo_url ) . '" />' . "\n";
+			echo '<meta property="og:image" content="' . esc_url( wp_get_attachment_url( $logo_id ) ) . '" />' . "\n";
+		} else {
+			echo '<meta property="og:image" content="' . esc_url( $fallback_og_image ) . '" />' . "\n";
 		}
+	} elseif ( is_tax( 'product_cat' ) ) {
+		$term = get_queried_object();
+		echo '<meta property="og:type" content="website" />' . "\n";
+		echo '<meta property="og:title" content="' . esc_attr( $term->name . ' Collection | ' . $site_name ) . '" />' . "\n";
+		$desc = term_description( $term->term_id );
+		echo '<meta property="og:description" content="' . esc_attr( wp_strip_all_tags( $desc ?: 'Shop the ' . $term->name . ' collection from SkyyRose.' ) ) . '" />' . "\n";
+		$term_link = get_term_link( $term );
+		if ( ! is_wp_error( $term_link ) ) {
+			echo '<meta property="og:url" content="' . esc_url( $term_link ) . '" />' . "\n";
+		}
+		echo '<meta property="og:image" content="' . esc_url( $fallback_og_image ) . '" />' . "\n";
+	} elseif ( function_exists( 'is_shop' ) && is_shop() ) {
+		echo '<meta property="og:type" content="website" />' . "\n";
+		echo '<meta property="og:title" content="' . esc_attr( 'Shop | ' . $site_name ) . '" />' . "\n";
+		echo '<meta property="og:description" content="' . esc_attr( 'Premium streetwear and luxury fashion. Luxury Grows from Concrete.' ) . '" />' . "\n";
+		echo '<meta property="og:url" content="' . esc_url( get_permalink( wc_get_page_id( 'shop' ) ) ) . '" />' . "\n";
+		echo '<meta property="og:image" content="' . esc_url( $fallback_og_image ) . '" />' . "\n";
+	} elseif ( is_category() || is_tag() ) {
+		$term = get_queried_object();
+		echo '<meta property="og:type" content="website" />' . "\n";
+		echo '<meta property="og:title" content="' . esc_attr( $term->name . ' | ' . $site_name ) . '" />' . "\n";
+		$desc = term_description( $term->term_id );
+		echo '<meta property="og:description" content="' . esc_attr( wp_strip_all_tags( $desc ?: $site_name ) ) . '" />' . "\n";
+		$term_link = get_term_link( $term );
+		if ( ! is_wp_error( $term_link ) ) {
+			echo '<meta property="og:url" content="' . esc_url( $term_link ) . '" />' . "\n";
+		}
+		echo '<meta property="og:image" content="' . esc_url( $fallback_og_image ) . '" />' . "\n";
 	}
 }
 add_action( 'wp_head', 'skyyrose_open_graph_tags' );
@@ -443,23 +481,32 @@ function skyyrose_twitter_card_tags() {
 		echo '<meta name="twitter:site" content="@' . esc_attr( str_replace( '@', '', $twitter_handle ) ) . '" />' . "\n";
 	}
 
+	$fallback_image = get_template_directory_uri() . '/assets/images/sr-monogram-hero.png';
+
 	if ( is_singular() ) {
 		echo '<meta name="twitter:title" content="' . esc_attr( get_the_title() ) . '" />' . "\n";
 		echo '<meta name="twitter:description" content="' . esc_attr( wp_strip_all_tags( get_the_excerpt() ) ) . '" />' . "\n";
 
 		if ( has_post_thumbnail() ) {
-			$image_url = get_the_post_thumbnail_url( get_the_ID(), 'full' );
-			echo '<meta name="twitter:image" content="' . esc_url( $image_url ) . '" />' . "\n";
+			echo '<meta name="twitter:image" content="' . esc_url( get_the_post_thumbnail_url( get_the_ID(), 'full' ) ) . '" />' . "\n";
+		} else {
+			echo '<meta name="twitter:image" content="' . esc_url( $fallback_image ) . '" />' . "\n";
 		}
 	} elseif ( is_front_page() ) {
-		echo '<meta name="twitter:title" content="' . esc_attr( get_bloginfo( 'name' ) ) . '" />' . "\n";
+		echo '<meta name="twitter:title" content="' . esc_attr( get_bloginfo( 'name' ) . ' — Luxury Grows from Concrete.' ) . '" />' . "\n";
 		echo '<meta name="twitter:description" content="' . esc_attr( get_bloginfo( 'description' ) ) . '" />' . "\n";
 
 		$logo_id = get_theme_mod( 'custom_logo' );
-		if ( $logo_id ) {
-			$logo_url = wp_get_attachment_url( $logo_id );
-			echo '<meta name="twitter:image" content="' . esc_url( $logo_url ) . '" />' . "\n";
-		}
+		echo '<meta name="twitter:image" content="' . esc_url( $logo_id ? wp_get_attachment_url( $logo_id ) : $fallback_image ) . '" />' . "\n";
+	} elseif ( is_tax( 'product_cat' ) ) {
+		$term = get_queried_object();
+		echo '<meta name="twitter:title" content="' . esc_attr( $term->name . ' Collection | SkyyRose' ) . '" />' . "\n";
+		echo '<meta name="twitter:description" content="' . esc_attr( wp_strip_all_tags( term_description( $term->term_id ) ?: 'Shop the ' . $term->name . ' collection.' ) ) . '" />' . "\n";
+		echo '<meta name="twitter:image" content="' . esc_url( $fallback_image ) . '" />' . "\n";
+	} elseif ( function_exists( 'is_shop' ) && is_shop() ) {
+		echo '<meta name="twitter:title" content="Shop | SkyyRose" />' . "\n";
+		echo '<meta name="twitter:description" content="Premium streetwear and luxury fashion. Luxury Grows from Concrete." />' . "\n";
+		echo '<meta name="twitter:image" content="' . esc_url( $fallback_image ) . '" />' . "\n";
 	}
 }
 add_action( 'wp_head', 'skyyrose_twitter_card_tags' );
@@ -513,7 +560,28 @@ function skyyrose_meta_description() {
 	$description = '';
 
 	if ( is_singular() ) {
-		$description = get_the_excerpt();
+		// Custom template meta descriptions (155 chars max, CTA-driven).
+		if ( is_page() ) {
+			$template     = get_page_template_slug();
+			$descriptions = array(
+				'template-landing-black-rose.php'   => 'Shop the Black Rose Collection — gothic luxury streetwear. Limited edition pieces crafted in Oakland. Free shipping over $150.',
+				'template-landing-love-hurts.php'    => 'Discover Love Hurts — named after a bloodline, designed for survivors. Crimson luxury fashion from SkyyRose. Pre-order now.',
+				'template-landing-signature.php'     => 'The Signature Collection — everyday luxury essentials. Foundation wardrobe pieces built to last. Shop SkyyRose.',
+				'template-collection-black-rose.php' => 'Browse the full Black Rose Collection. Limited edition gothic streetwear — hockey jerseys, basketball jerseys, and more.',
+				'template-collection-love-hurts.php' => 'Browse the full Love Hurts Collection. Crimson luxury fashion — fanny packs, apparel, and accessories from SkyyRose.',
+				'template-collection-signature.php'  => 'Browse the full Signature Collection. Everyday luxury — windbreakers, shorts, beanies, and essentials from SkyyRose.',
+				'template-about.php'                 => 'The SkyyRose story — Luxury Grows from Concrete. Founded in Oakland, building premium streetwear for the culture.',
+				'template-preorder-gateway.php'      => 'Secure your SkyyRose pieces before they drop. Pre-order limited edition streetwear and luxury fashion.',
+				'template-contact.php'               => 'Get in touch with SkyyRose. Questions about orders, sizing, collaborations, or press inquiries? We are here to help.',
+			);
+			if ( $template && isset( $descriptions[ $template ] ) ) {
+				$description = $descriptions[ $template ];
+			}
+		}
+
+		if ( empty( $description ) ) {
+			$description = get_the_excerpt();
+		}
 		if ( empty( $description ) ) {
 			$description = wp_trim_words( get_the_content(), 30, '...' );
 		}
@@ -525,6 +593,8 @@ function skyyrose_meta_description() {
 		$description = tag_description();
 	} elseif ( is_tax( 'product_cat' ) ) {
 		$description = term_description();
+	} elseif ( function_exists( 'is_shop' ) && is_shop() ) {
+		$description = 'Shop premium streetwear and luxury fashion from SkyyRose. Luxury Grows from Concrete. Oakland, CA.';
 	}
 
 	if ( ! empty( $description ) ) {
@@ -551,10 +621,33 @@ add_action( 'wp_head', 'skyyrose_meta_description', 1 );
  * @return string Full document title or empty to use default.
  */
 function skyyrose_pre_document_title( $title ) {
+	$brand = get_bloginfo( 'name' );
 
 	// Collections "Shop All" page.
 	if ( is_page( array( 'collections', 9327 ) ) ) {
-		return 'Collections — Shop All | ' . get_bloginfo( 'name' );
+		return 'Collections — Shop All | ' . $brand;
+	}
+
+	// Custom template page titles (optimized for SEO).
+	if ( is_page() ) {
+		$template = get_page_template_slug();
+		$titles   = array(
+			'template-landing-black-rose.php'      => 'Black Rose Collection — Gothic Luxury Streetwear | ' . $brand,
+			'template-landing-love-hurts.php'       => 'Love Hurts Collection — Named After a Bloodline | ' . $brand,
+			'template-landing-signature.php'        => 'The Signature Collection — Foundation Wardrobe | ' . $brand,
+			'template-collection-black-rose.php'    => 'Shop Black Rose — Limited Edition Streetwear | ' . $brand,
+			'template-collection-love-hurts.php'    => 'Shop Love Hurts — Crimson Luxury Fashion | ' . $brand,
+			'template-collection-signature.php'     => 'Shop Signature — Everyday Luxury Essentials | ' . $brand,
+			'template-about.php'                    => 'Our Story — Luxury Grows from Concrete | ' . $brand,
+			'template-preorder-gateway.php'         => 'Pre-Order — Secure Your Pieces | ' . $brand,
+			'template-contact.php'                  => 'Contact Us | ' . $brand,
+			'page-wishlist.php'                     => 'Your Wishlist | ' . $brand,
+			'template-style-quiz.php'               => 'Style Quiz — Find Your Collection | ' . $brand,
+		);
+
+		if ( $template && isset( $titles[ $template ] ) ) {
+			return $titles[ $template ];
+		}
 	}
 
 	return $title;

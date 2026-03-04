@@ -145,20 +145,25 @@ while ( have_posts() ) :
 							<?php if ( $main_image ) : ?>
 								<button class="sr-thumb sr-thumb-active" data-img="<?php echo esc_url( $main_image ); ?>"
 								        aria-label="<?php esc_attr_e( 'Main product image', 'skyyrose-flagship' ); ?>">
-									<img src="<?php echo esc_url( $main_image ); ?>" alt="" loading="lazy">
+									<img src="<?php echo esc_url( $main_image ); ?>" alt="<?php echo esc_attr( $product->get_name() . ' — main view' ); ?>" loading="lazy">
 								</button>
 							<?php endif; ?>
-							<?php foreach ( $gallery_ids as $gid ) :
+							<?php
+							$sr_thumb_idx = 2;
+							foreach ( $gallery_ids as $gid ) :
 								$gurl = wp_get_attachment_url( $gid );
 								if ( ! $gurl ) {
 									continue;
 								}
+								$sr_galt = wp_get_attachment_caption( $gid ) ?: ( $product->get_name() . ' — view ' . $sr_thumb_idx );
 							?>
 								<button class="sr-thumb" data-img="<?php echo esc_url( $gurl ); ?>"
-								        aria-label="<?php printf( esc_attr__( 'View image %d', 'skyyrose-flagship' ), $gid ); ?>">
-									<img src="<?php echo esc_url( $gurl ); ?>" alt="" loading="lazy">
+								        aria-label="<?php printf( esc_attr__( 'View image %d', 'skyyrose-flagship' ), $sr_thumb_idx ); ?>">
+									<img src="<?php echo esc_url( $gurl ); ?>" alt="<?php echo esc_attr( $sr_galt ); ?>" loading="lazy">
 								</button>
-							<?php endforeach; ?>
+							<?php
+							$sr_thumb_idx++;
+							endforeach; ?>
 						</div>
 					<?php endif; ?>
 				</div>
