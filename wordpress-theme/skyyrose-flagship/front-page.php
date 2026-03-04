@@ -99,16 +99,28 @@ $skyyrose_dividers = array(
 		<div class="hero-particles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
 		<div class="hero-content">
 			<div class="hero-monogram">
-				<img
-					src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/sr-monogram-hero.png' ); ?>"
-					alt="<?php esc_attr_e( 'SkyyRose Monogram', 'skyyrose-flagship' ); ?>"
-					class="hero-monogram__img"
-					width="400"
-					height="400"
-					loading="eager"
-					fetchpriority="high"
-					decoding="async"
+				<video
+					class="hero-monogram__video"
+					autoplay
+					muted
+					loop
+					playsinline
+					poster="<?php echo esc_url( get_template_directory_uri() . '/assets/images/sr-monogram-hero.png' ); ?>"
+					width="640"
+					height="360"
+					aria-label="<?php esc_attr_e( 'SkyyRose animated monogram reveal', 'skyyrose-flagship' ); ?>"
 				>
+					<source src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/skyyrose-monogram-hero.webm' ); ?>" type="video/webm">
+					<source src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/skyyrose-monogram-hero.mp4' ); ?>" type="video/mp4">
+					<img
+						src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/sr-monogram-hero.png' ); ?>"
+						alt="<?php esc_attr_e( 'SkyyRose Monogram', 'skyyrose-flagship' ); ?>"
+						class="hero-monogram__img"
+						width="400"
+						height="400"
+						loading="eager"
+					>
+				</video>
 			</div>
 			<h1 class="hero-title"><?php echo esc_html( 'SKYYROSE' ); ?></h1>
 			<p class="hero-tagline"><?php echo esc_html( 'Luxury Grows from Concrete.' ); ?></p>

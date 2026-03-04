@@ -229,6 +229,14 @@
 	animation: fadeUp 1s var(--ease-out) forwards 0.2s;
 }
 
+.hero-monogram__video {
+	width: clamp(200px, 30vw, 400px);
+	height: auto;
+	filter: drop-shadow(0 0 60px rgba(183, 110, 121, 0.2));
+	object-fit: contain;
+	pointer-events: none;
+}
+
 .hero-monogram__img {
 	width: clamp(200px, 30vw, 400px);
 	height: auto;
@@ -1420,6 +1428,7 @@
 }
 
 @media (max-width: 600px) {
+	.hero-monogram__video,
 	.hero-monogram__img { width: clamp(160px, 40vw, 260px); }
 	.hero-cta-row { flex-direction: column; align-items: center; }
 	.hero-cta { width: 220px; text-align: center; }
