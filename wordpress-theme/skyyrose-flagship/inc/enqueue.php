@@ -372,9 +372,9 @@ function skyyrose_get_current_template_slug() {
 
 	if ( ! empty( $page_template ) ) {
 		$template_map = array(
-			'template-collection-black-rose.php'   => 'collection',
-			'template-collection-love-hurts.php'   => 'collection',
-			'template-collection-signature.php'    => 'collection',
+			'template-collection-black-rose.php'   => 'collection-v4',
+			'template-collection-love-hurts.php'   => 'collection-v4',
+			'template-collection-signature.php'    => 'collection-v4',
 			'template-collection-kids-capsule.php' => 'collection',
 			'template-immersive-black-rose.php'    => 'immersive',
 			'template-immersive-love-hurts.php'    => 'immersive',
@@ -417,6 +417,7 @@ function skyyrose_enqueue_template_styles() {
 	$template_styles = array(
 		'front-page'      => 'homepage.css',
 		'collection'      => 'collections.css',
+		'collection-v4'   => 'collection-v4.css',
 		'immersive'       => 'immersive.css',
 		'single-product'  => 'woocommerce.css',
 		'cart'            => 'woocommerce.css',
@@ -506,6 +507,7 @@ function skyyrose_enqueue_template_scripts() {
 	$template_scripts = array(
 		'front-page'       => 'homepage.js',
 		'collection'       => 'collections.js',
+		'collection-v4'    => 'collection-v4.js',
 		'immersive'        => 'immersive.js',
 		'single-product'   => 'woocommerce.js',
 		'cart'             => 'woocommerce.js',
@@ -1008,6 +1010,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-template-style-quiz',
 		'skyyrose-brand-ambassador',
 		'skyyrose-template-landing-engine',
+		'skyyrose-template-collection-v4',
 		'skyyrose-progressive-images',
 		'skyyrose-smart-prefetch',
 		'skyyrose-exit-intent',
