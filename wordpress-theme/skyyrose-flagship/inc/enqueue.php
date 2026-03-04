@@ -517,6 +517,7 @@ function skyyrose_enqueue_template_scripts() {
 		'style-quiz'       => 'style-quiz.js',
 		'collections-shop' => 'collections-shop.js',
 		'landing'          => 'landing-engine.js',
+		'about'            => 'about.js',
 	);
 
 	if ( isset( $template_scripts[ $slug ] ) ) {
@@ -1017,6 +1018,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-exit-intent',
 		'skyyrose-urgency-banner',
 		'skyyrose-template-single-product',
+		'skyyrose-template-about',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) && strpos( $tag, ' defer' ) === false ) {
