@@ -621,27 +621,124 @@
 
 ---
 
-## SECTION 7: SEO, Config Lockdown & Final QA (Iterations 27-30)
+## SECTION 7: SEO, Config Lockdown & Final QA (Iteration 21)
 
-- [ ] SEO final pass: every page has title, meta desc, OG image/title/desc
-- [ ] JSON-LD: Organization (homepage), Product (each product), BreadcrumbList (all pages)
-- [ ] Robots.txt configuration
-- [ ] Canonical URLs audit
-- [ ] Internal linking audit (every page links to 2+ other pages)
-- [ ] Image alt text audit (every img has descriptive alt)
-- [ ] Page speed: critical CSS, font-display swap, image optimization
-- [ ] Verify all wp_enqueue calls are conditional per template
-- [ ] Verify security headers intact (inc/security.php)
-- [ ] Verify AJAX nonce verification on all handlers
-- [ ] Verify no inline onerror handlers (CSP compliance)
-- [ ] Verify index.php?rest_route= used everywhere (not /wp-json/)
-- [ ] Final QA checklist (see ralph-context.md Section 7)
-- [ ] **BONUS ROUND**: Add 2 FINAL industry-proven features (your choice — explain why)
+- [x] SEO final pass: every page has title, meta desc, OG image/title/desc
+  - **Iteration 21**: Enhanced `skyyrose_open_graph_tags()` in `seo.php`:
+    - Added `og:locale` on every page
+    - Added `og:site_name` (was duplicated per branch, now single top-level)
+    - Added fallback OG image (`sr-monogram-hero.png`) when no post thumbnail
+    - Added OG coverage for `is_tax('product_cat')`, `is_shop()`, `is_category()`/`is_tag()`
+    - OG title now includes `| SkyyRose` suffix for brand consistency
+  - Enhanced `skyyrose_twitter_card_tags()`: added fallback image, archive/tax/shop coverage
+  - Enhanced `skyyrose_pre_document_title()`: optimized titles for 11 custom templates (landing, collection, about, pre-order, contact, wishlist, style-quiz)
+  - Enhanced `skyyrose_meta_description()`: CTA-driven meta descriptions for 9 custom templates + shop page
+- [x] JSON-LD: Organization (homepage), Product (each product), BreadcrumbList (all pages)
+  - **Pre-existing** from earlier iterations — already comprehensive:
+    - `skyyrose_product_schema()` — Product + Offer + AggregateRating + Review (line 29-111)
+    - `skyyrose_organization_schema()` — Organization + Brand + ContactPoint + sameAs (line 121-194)
+    - `skyyrose_breadcrumb_schema()` — BreadcrumbList + ListItem (line 203-238)
+    - `skyyrose_collection_schema()` — CollectionPage for product categories (line 626-648)
+    - All use `wp_json_encode()` with `JSON_HEX_TAG` for safe output
+    - All defer to Yoast SEO when active (no duplication)
+- [x] Robots.txt configuration
+  - **Pre-existing**: `skyyrose_robots_meta()` — noindex on search/404, noindex+nofollow on attachments
+  - WordPress.com auto-manages `/robots.txt` and `/sitemap.xml`
+  - `skyyrose_add_sitemap_support()` enables core sitemaps
+  - `skyyrose_filter_product_sitemap()` adds product images to sitemap entries
+- [x] Canonical URLs audit
+  - **Pre-existing**: `skyyrose_canonical_url()` covers singular, front-page, shop, tax/category/tag
+  - **Iteration 21**: Removed duplicate WordPress core `rel_canonical` via `remove_action('wp_head', 'rel_canonical')` in `security.php`
+  - Prevents double canonical tags on every page
+- [x] Internal linking audit (every page links to 2+ other pages)
+  - All landing pages link to: collection pages, pre-order, other collections, about, immersive experiences
+  - Collection pages link to: other collections, kids capsule, product pages, immersive CTA, pre-order
+  - Single product pages link to: collection page, related products (4 cards), full collection CTA
+  - Homepage links to: all 3 collections, pre-order, about, newsletter
+  - About page links to: collections, pre-order, press room, YouTube embed
+  - All pages share: primary nav (6 links), footer nav (7 links), cross-collection nav
+- [x] Image alt text audit (every img has descriptive alt)
+  - **Iteration 21**: Fixed product page thumbnails in `single-product.php`:
+    - Main thumbnail: `alt="Product Name — main view"`
+    - Gallery thumbnails: `alt="Product Name — view N"` (uses `wp_get_attachment_caption()` with fallback)
+    - Counter variable `$sr_thumb_idx` for sequential numbering
+  - Decorative images correctly use `alt=""` inside `aria-hidden="true"` containers (parallax, email capture logos)
+  - Full audit: 0 `<img>` tags missing `alt` attribute across all 60+ PHP templates
+- [x] Page speed: critical CSS, font-display swap, image optimization
+  - `font-display: swap` on all 4 `@font-face` rules in `fonts.css`
+  - `skyyrose_add_font_display_swap()` in `enqueue.php` adds `font-display=swap` to Google Fonts CDN URLs
+  - `fetchpriority="high"` + `decoding="async"` on hero images (header, about, single-product)
+  - `loading="lazy"` on all below-fold images
+  - Conditional enqueue: only template-specific CSS/JS loaded per page (14 CSS + 13 JS template mappings)
+  - Script deferral: 34 scripts in `$defer_handles` array
+  - File existence checks on every `wp_enqueue_*` call (prevents silent 404s)
+- [x] Verify all wp_enqueue calls are conditional per template
+  - **Iteration 21**: Full audit confirmed 14 CSS + 13 JS template mappings + conditional loaders
+  - Safe fallback: unmapped templates only load global assets
+  - File existence check before every enqueue
+  - WooCommerce dependency chaining (jQuery + wc-add-to-cart-variation)
+- [x] Verify security headers intact (inc/security.php)
+  - **Iteration 21**: CSP audit found MISSING Google Fonts domains:
+    - Added `https://fonts.googleapis.com` to `style-src` (for Google Fonts CSS)
+    - Added `https://fonts.gstatic.com` to `font-src` (for `.woff2` font files)
+    - Without this fix, font loading would be blocked by CSP on the live site
+  - All other headers confirmed: X-Content-Type-Options, X-Frame-Options, HSTS, XSS-Protection, Referrer-Policy, Permissions-Policy
+- [x] Verify AJAX nonce verification on all handlers
+  - All 13+ AJAX handlers have nonce checks:
+    - `ajax-handlers.php`: 4 handlers (contact, newsletter, incentive, signin) — all use `wp_verify_nonce()`
+    - `wishlist-functions.php`: 6 handlers — all use `check_ajax_referer()`
+    - `woocommerce.php`: 3 handlers (3D model, cart count, preorder) — all verified
+    - `immersive-ajax.php`: 3 handlers — all use `wp_verify_nonce()`
+- [x] Verify no inline onerror handlers (CSP compliance)
+  - All `onerror` references are in `.js` files as `xhr.onerror` (XHR error handlers) — NOT inline HTML attributes
+  - `navigation.js` explicitly notes "CSP-safe replacement for inline onerror"
+- [x] Verify index.php?rest_route= used everywhere (not /wp-json/)
+  - Grep confirmed: only `wp_json_encode()` (PHP function) appears — NO `/wp-json/` URL paths in templates
+  - `security.php:328` reference is a comment about removing the Link header
+- [x] Final QA checklist
+  - [x] Homepage: `front-page.php` (20KB) — hero with monogram, collections, products, newsletter ✅
+  - [x] Landing pages: 3 templates (18-19KB each) — 8-section conversion framework ✅
+  - [x] Collection pages: 3 templates via shared `template-parts/collection-page-v4.php` — product grids ✅
+  - [x] Single product: `woocommerce/single-product.php` (22KB) — collection-aware theming ✅
+  - [x] About page: `template-about.php` (21KB) — cinematic hero, timeline, video embed ✅
+  - [x] Pre-order gateway: untouched, existing functionality preserved ✅
+  - [x] Cart/checkout: WooCommerce native + AJAX fragments + cart count ✅
+  - [x] Mobile responsive: audit done iteration 20, 480px breakpoints added ✅
+  - [x] Menu links: all fixed iteration 19, verified primary/footer/collection/mobile ✅
+  - [x] Immersive pages: NOT modified (confirmed via `git diff --name-only`) ✅
+  - [x] All images: `alt` attribute on every `<img>` tag (0 missing) ✅
+  - [x] OG/Twitter/meta: on all page types (singular, front, archive, tax, shop) ✅
+  - [x] JSON-LD: Product, Organization, BreadcrumbList, CollectionPage — all valid ✅
+  - [x] Security: CSP (with Google Fonts fix), HSTS, nonces on all AJAX, no inline onerror ✅
+- [x] **BONUS ROUND**: Add 2 FINAL industry-proven features
+  - **Iteration 21**: Added **Web Vitals Performance Monitor** (SEO Ranking Protection)
+    - `assets/js/web-vitals-monitor.js` — tracks LCP, FID, INP, CLS using native PerformanceObserver API
+    - Dev mode: color-coded console logs (green=good, yellow=needs-improvement, red=poor)
+    - Production: beacons metrics to analytics endpoint via `navigator.sendBeacon()`
+    - Uses Google's official thresholds: LCP<2500ms, INP<200ms, CLS<0.1
+    - WHY: Google's Page Experience signal uses Core Web Vitals for search ranking. Without monitoring, performance regressions silently tank SEO. This is the same pattern used by Vercel Analytics, Shopify Lighthouse CI, and web.dev. Zero dependencies, <2KB.
+  - **Iteration 21**: Added **Schema Validator** (Rich Snippet Eligibility Checker)
+    - `assets/js/schema-validator.js` — dev-mode JSON-LD structured data validator
+    - Parses all `<script type="application/ld+json">` blocks, validates required fields per schema type
+    - Checks: Product (name, offers), Offer (price, currency, availability), Organization (name, url), BreadcrumbList (items), CollectionPage (name, url)
+    - Also checks recommended fields (image, description, brand) as warnings
+    - Only loads when `WP_DEBUG` is true — zero production overhead
+    - WHY: Rich snippets (star ratings, price badges) drive 30%+ more SERP clicks than plain listings. Broken JSON-LD silently loses this advantage. Google's Structured Data Testing Tool is external; this runs on every page load in dev mode, catching issues before they reach production.
+  - Both registered in `enqueue.php` as deferred global scripts
 
-**Context7 Queries:**
-- [ ] Schema.org structured data (JSON-LD)
-- [ ] WordPress robots.txt / canonical
-- [ ] Core Web Vitals best practices
+**Context7 Queries (Iteration 21):**
+- [x] WordPress Hooks (`/websites/developer_wordpress_reference_hooks`) — wp_head hooks for SEO meta tags, canonical URLs, JSON-LD, robots meta
+- [x] WooCommerce (`/woocommerce/woocommerce`) — product structured data JSON-LD schema.org, `woocommerce_structured_data_product` filter, offer markup
+
+**New Files Created (Iteration 21):**
+- `assets/js/web-vitals-monitor.js` — ~140 lines, LCP/FID/INP/CLS tracking
+- `assets/js/schema-validator.js` — ~145 lines, dev-mode JSON-LD validator
+
+**Files Modified (Iteration 21):**
+- `inc/seo.php` — enhanced OG tags (+archive/tax/shop), Twitter Cards (+fallback), meta descriptions (+9 templates), page titles (+11 templates), removed dup `og:site_name`
+- `inc/security.php` — added `fonts.googleapis.com` to style-src CSP, `fonts.gstatic.com` to font-src, removed core `rel_canonical`
+- `inc/enqueue.php` — registered web-vitals + schema-validator scripts, added to defer handles
+- `woocommerce/single-product.php` — fixed thumbnail alt text (product name + view number)
 
 ---
 

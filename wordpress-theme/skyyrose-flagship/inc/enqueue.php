@@ -251,6 +251,30 @@ function skyyrose_enqueue_global_scripts() {
 		);
 	}
 
+	// Web Vitals Monitor — tracks LCP, FID/INP, CLS for SEO (v4.0.0 S7 bonus).
+	$vitals_js = SKYYROSE_DIR . '/assets/js/web-vitals-monitor.js';
+	if ( file_exists( $vitals_js ) && ! is_admin() ) {
+		wp_enqueue_script(
+			'skyyrose-web-vitals',
+			SKYYROSE_ASSETS_URI . '/js/web-vitals-monitor.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+
+	// Schema Validator — dev-mode JSON-LD checker (v4.0.0 S7 bonus).
+	$schema_js = SKYYROSE_DIR . '/assets/js/schema-validator.js';
+	if ( file_exists( $schema_js ) && ! is_admin() && ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
+		wp_enqueue_script(
+			'skyyrose-schema-validator',
+			SKYYROSE_ASSETS_URI . '/js/schema-validator.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+
 	// Exit-intent overlay — captures abandoning visitors with newsletter/pre-order CTA (v4.0.0 S2 bonus).
 	$exit_css = SKYYROSE_DIR . '/assets/css/exit-intent.css';
 	if ( file_exists( $exit_css ) && ! is_admin() ) {
@@ -1032,6 +1056,8 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-urgency-banner',
 		'skyyrose-template-single-product',
 		'skyyrose-template-about',
+		'skyyrose-web-vitals',
+		'skyyrose-schema-validator',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) && strpos( $tag, ' defer' ) === false ) {
