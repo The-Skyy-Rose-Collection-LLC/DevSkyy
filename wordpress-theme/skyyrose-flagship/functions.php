@@ -55,6 +55,7 @@ $skyyrose_core_includes = array(
 	'/inc/branded-content.php',
 	'/inc/facebook-sdk.php',
 	'/inc/menu-setup.php',
+	'/inc/theme-activation-setup.php',
 );
 
 foreach ( $skyyrose_core_includes as $skyyrose_file ) {
