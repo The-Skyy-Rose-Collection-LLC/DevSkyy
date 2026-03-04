@@ -33,6 +33,33 @@ function skyyrose_enqueue_local_fonts() {
 }
 
 /**
+ * Enqueue Google Fonts CDN for Elite Web Builder brand typography.
+ *
+ * Loads Cinzel, Cormorant Garamond, Space Mono, and Bebas Neue.
+ * Playfair Display is already self-hosted; Inter is the system body font.
+ * These fonts power the landing pages, collection pages, and single product pages.
+ *
+ * @since 4.0.0
+ * @return void
+ */
+function skyyrose_enqueue_google_fonts() {
+	$font_families = implode( '&', array(
+		'family=Cinzel:wght@400;500;600;700;800;900',
+		'family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600',
+		'family=Bebas+Neue',
+		'family=Space+Mono:wght@400;700',
+		'display=swap',
+	) );
+
+	wp_enqueue_style(
+		'skyyrose-google-fonts',
+		'https://fonts.googleapis.com/css2?' . $font_families,
+		array(),
+		null
+	);
+}
+
+/**
  * Enqueue global styles that load on every page.
  *
  * @since 3.0.0
@@ -47,6 +74,17 @@ function skyyrose_enqueue_global_styles() {
 		array(),
 		SKYYROSE_VERSION
 	);
+
+	// Elite Web Builder global styles: font vars, grain overlay, sr-container.
+	$main_css_path = SKYYROSE_DIR . '/assets/css/main.css';
+	if ( file_exists( $main_css_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-main',
+			SKYYROSE_ASSETS_URI . '/css/main.css',
+			array( 'skyyrose-style', 'skyyrose-google-fonts' ),
+			SKYYROSE_VERSION
+		);
+	}
 
 	// Design tokens: CSS custom properties for colors, spacing, typography.
 	wp_enqueue_style(
@@ -815,6 +853,15 @@ function skyyrose_resource_hints( $urls, $relation_type ) {
 			'href'        => 'https://cdn.jsdelivr.net',
 			'crossorigin' => 'anonymous',
 		);
+		// Google Fonts preconnect (v4.0.0 — brand typography for Elite Web Builder).
+		$urls[] = array(
+			'href'        => 'https://fonts.googleapis.com',
+			'crossorigin' => '',
+		);
+		$urls[] = array(
+			'href'        => 'https://fonts.gstatic.com',
+			'crossorigin' => 'anonymous',
+		);
 	}
 	return $urls;
 }
@@ -929,6 +976,9 @@ add_action( 'wp_head', 'skyyrose_preload_fonts', 3 );
 
 // Self-hosted fonts (priority 5 so they load before template styles).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_local_fonts', 5 );
+
+// Google Fonts CDN — brand typography for Elite Web Builder design (priority 6).
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_google_fonts', 6 );
 
 // Global styles (priority 10 - default).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_global_styles', 10 );
