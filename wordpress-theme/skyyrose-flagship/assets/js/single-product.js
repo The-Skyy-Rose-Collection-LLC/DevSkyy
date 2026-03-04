@@ -166,6 +166,96 @@
     });
 
     /* ════════════════════════════════════════
+       Social Share Buttons
+       ════════════════════════════════════════ */
+    // Web Share API on mobile (native share sheet).
+    var nativeBtn = document.querySelector('.sr-share-native');
+    if (nativeBtn && navigator.share) {
+        nativeBtn.style.display = '';
+        nativeBtn.addEventListener('click', function() {
+            navigator.share({
+                title: nativeBtn.dataset.title,
+                text: nativeBtn.dataset.text,
+                url: nativeBtn.dataset.url
+            }).catch(function() { /* user cancelled — noop */ });
+        });
+    }
+
+    // Copy link button.
+    var copyBtn = document.querySelector('.sr-share-copy');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', function() {
+            var url = copyBtn.dataset.url;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(function() {
+                    copyBtn.classList.add('sr-share-copied');
+                    setTimeout(function() { copyBtn.classList.remove('sr-share-copied'); }, 2000);
+                });
+            }
+        });
+    }
+
+    /* ════════════════════════════════════════
+       Recently Viewed Products (localStorage)
+       ════════════════════════════════════════ */
+    var RV_KEY = 'sr_recently_viewed';
+    var RV_MAX = 8;
+
+    // Track current product.
+    var rvJson = document.getElementById('sr-rv-product');
+    if (rvJson) {
+        try {
+            var current = JSON.parse(rvJson.textContent);
+            var viewed = JSON.parse(localStorage.getItem(RV_KEY) || '[]');
+
+            // Remove duplicate (same product ID).
+            viewed = viewed.filter(function(p) { return p.id !== current.id; });
+
+            // Prepend current product.
+            viewed.unshift(current);
+
+            // Cap at max.
+            if (viewed.length > RV_MAX) viewed = viewed.slice(0, RV_MAX);
+
+            localStorage.setItem(RV_KEY, JSON.stringify(viewed));
+        } catch (e) { /* localStorage quota — noop */ }
+    }
+
+    // Render recently viewed carousel (exclude current product).
+    var rvSection = document.querySelector('.sr-recently-viewed');
+    var rvGrid = rvSection ? rvSection.querySelector('.sr-rv-grid') : null;
+
+    if (rvSection && rvGrid) {
+        try {
+            var items = JSON.parse(localStorage.getItem(RV_KEY) || '[]');
+            var currentId = rvJson ? JSON.parse(rvJson.textContent).id : null;
+
+            // Filter out current product.
+            var others = items.filter(function(p) { return p.id !== currentId; });
+
+            if (others.length > 0) {
+                var html = '';
+                others.slice(0, 6).forEach(function(p) {
+                    html += '<a href="' + p.url + '" class="sr-rv-card">' +
+                        '<div class="sr-rv-img">' +
+                            (p.image ?
+                                '<img src="' + p.image + '" alt="' + p.name + '" loading="lazy">' :
+                                '<span class="sr-rv-letter">' + p.name.charAt(0) + '</span>') +
+                            '<span class="sr-rv-badge">' + p.badge + '</span>' +
+                        '</div>' +
+                        '<div class="sr-rv-body">' +
+                            '<h3 class="sr-rv-name">' + p.name + '</h3>' +
+                            '<span class="sr-rv-price">' + p.price + '</span>' +
+                        '</div>' +
+                    '</a>';
+                });
+                rvGrid.innerHTML = html;
+                rvSection.style.display = '';
+            }
+        } catch (e) { /* parse error — section stays hidden */ }
+    }
+
+    /* ════════════════════════════════════════
        Scroll Reveal Animations
        ════════════════════════════════════════ */
     if ('IntersectionObserver' in window &&
@@ -182,7 +272,7 @@
         }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
 
         document.querySelectorAll(
-            '.sr-related-card, .sr-accordion, .sr-cta-banner, .sr-related-head'
+            '.sr-related-card, .sr-accordion, .sr-cta-banner, .sr-related-head, .sr-rv-card, .sr-rv-head'
         ).forEach(function(el) {
             el.style.opacity = '0';
             el.style.transform = 'translateY(30px)';
