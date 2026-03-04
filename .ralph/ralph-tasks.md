@@ -56,8 +56,27 @@
   - All text properly escaped (`esc_html()`, `esc_attr()`, `esc_url()`)
   - ARIA labels on all sections, FAQ buttons use `<button>` with `aria-expanded`
   - Product grid shows cost-per-wear calculator and scarcity indicators
-- [ ] Create template-landing-love-hurts.php from lp-love-hurts.html
-- [ ] Create template-landing-signature.php from lp-signature.html
+- [x] Create template-landing-love-hurts.php from lp-love-hurts.html
+  - **Iteration 10**: Full 8-section conversion framework implemented
+  - Accent color: `#DC143C` (crimson), `--lp-accent-rgb: 220, 20, 60`
+  - Hero: "Named After a Bloodline — Designed for Survivors"
+  - Unique content: founder's family name "Hurts", emotional/vulnerability theme
+  - Reviews from Aaliyah M. (Chicago), Tyler J. (Oakland), Kevin L. (Houston)
+  - FAQ covers origin of name, DTG printing, sizing, returns, seasonal rotation
+  - Lookbook: 5 images from `scenes/love-hurts/` (shrine, staircase, dome, ballroom, chamber)
+  - Email capture: "Join 8,200+ people who wear their story"
+- [x] Create template-landing-signature.php from lp-signature.html
+  - **Iteration 10**: Full 8-section conversion framework implemented
+  - Accent color: `#D4AF37` (gold), `--lp-accent-rgb: 212, 175, 55`
+  - Hero: "Foundation Wardrobe — Built to Last"
+  - Unique content: everyday wardrobe, not limited-edition, restocking model
+  - Cost-per-wear uses 3 wears/week (156/year) vs Black Rose's 2 wears/week
+  - Added "Always Available" green dot variant (`.lp-scarcity__dot--green`) to landing.css
+  - "Bestseller" badge for top products instead of scarcity countdown
+  - Reviews from Chris W. (SF), Priya N. (Brooklyn), Andre C. (Oakland)
+  - FAQ differentiates Signature from Black Rose (restocking vs limited)
+  - Lookbook: scenes from `scenes/signature/` + about images
+  - Email capture: "Join 15,800+ members in the SkyyRose community"
 - [x] Extract CSS → assets/css/landing.css (SHARED — single file, collection-specific via CSS vars)
   - **Architecture decision**: One `landing.css` instead of 3 per-collection files
   - CSS custom properties `--lp-accent` and `--lp-accent-rgb` set per template
@@ -71,7 +90,7 @@
     4. Countdown timer (reads `data-countdown-end` or sessionStorage fallback)
     5. Parallax break images
     6. Newsletter AJAX form (hooks into `skyyrose_ajax_newsletter_subscribe`)
-- [x] Implement 8-section conversion framework on each page (Black Rose done)
+- [x] Implement 8-section conversion framework on all 3 pages (Black Rose iter 9, Love Hurts + Signature iter 10)
 - [x] Hook countdown to get_option('skyyrose_preorder_deadline')
 - [x] Hook email capture to admin-ajax.php with nonce
   - Uses existing `skyyrose_ajax_newsletter_subscribe` handler
@@ -86,7 +105,9 @@
 **Context7 Queries:**
 - [x] WordPress Hooks (library: `/websites/developer_wordpress_reference_hooks`) — wp_ajax handlers, nonce, admin-post patterns
 - [x] WooCommerce (library: `/woocommerce/woocommerce`) — wc_get_products by category, stock_status, pagination
-- [ ] WordPress nonce verification (wp_nonce_field, check_ajax_referer) — covered via WordPress Hooks query above
+- [x] WordPress nonce verification (wp_nonce_field, check_ajax_referer) — covered via WordPress Hooks query above
+- [x] WordPress Classes (library: `/websites/developer_wordpress_reference_classes`) — esc_html, esc_attr, esc_url escaping, wp_nonce_field
+- [x] WooCommerce (library: `/woocommerce/woocommerce`) — wc_get_products by category slug, stock_quantity, stock_status
 
 ---
 

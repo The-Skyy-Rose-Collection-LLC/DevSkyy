@@ -514,6 +514,15 @@
 	animation: lp-pulse 1.5s infinite;
 }
 
+.lp-scarcity__dot--green {
+	background: #2ecc71;
+	animation: none;
+}
+
+.lp-scarcity--available .lp-scarcity__text {
+	color: #2ecc71;
+}
+
 .lp-scarcity__text {
 	font-family: var(--fm, 'Space Mono', monospace);
 	font-size: 10px;
