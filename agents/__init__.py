@@ -2,28 +2,27 @@
 DevSkyy Agents Module
 =====================
 
-6 SuperAgents with 17 prompt engineering techniques, ML capabilities,
-self-learning modules, and LLM Round Table integration.
+Hierarchical agent system: 8 Core Agents + 1 Orchestrator.
 
-SuperAgents:
-- CommerceAgent: E-commerce, products, orders, inventory, pricing
-- CreativeAgent: 3D assets, images, virtual try-on, videos
-- MarketingAgent: Content, campaigns, SEO, social media
-- SupportAgent: Customer service, tickets, FAQs
-- OperationsAgent: WordPress, deployment, monitoring
-- AnalyticsAgent: Reports, forecasting, insights
+Core Agents (agents/core/):
+    Orchestrator → routes, escalates, Round Table consensus
+    ├── CommerceCoreAgent    — products, orders, pricing, inventory
+    ├── ContentCoreAgent     — pages, blogs, SEO, copy
+    ├── CreativeCoreAgent    — design system, brand, assets
+    ├── MarketingCoreAgent   — campaigns, social, audience
+    ├── OperationsCoreAgent  — deploy, security, health, code quality
+    ├── AnalyticsCoreAgent   — data, trends, conversion
+    ├── ImageryCoreAgent     — photos, VTON, 3D models
+    └── WebBuilderCoreAgent  — theme generation, deployment
 
-Specialized Agents:
-- FashnTryOnAgent: Virtual try-on using FASHN API
-- TripoAssetAgent: 3D model generation using Tripo3D API
-- WordPressAssetAgent: WordPress media upload and management
-- SecurityOpsAgent: Vulnerability scanning, auto-remediation, compliance reporting
+Legacy Agents (backward compat — still importable):
+- CommerceAgent, CreativeAgent, MarketingAgent, etc.
+- FashnTryOnAgent, TripoAssetAgent, MeshyAgent, etc.
 
-All agents extend EnhancedSuperAgent and include:
-- 17 prompt engineering techniques
-- ML capabilities per agent type
-- Self-learning optimization
-- LLM Round Table competition
+Universal Self-Healing:
+- Every agent inherits SelfHealingMixin
+- diagnose() → heal() → health_check() → circuit_breaker()
+- Escalation: sub-agent → core → orchestrator → human
 
 Note: Imports are guarded with try/except so missing optional dependencies
 (wordpress, adk, etc.) don't block the entire package from loading.
@@ -33,7 +32,26 @@ import logging as _logging
 
 _logger = _logging.getLogger(__name__)
 
-# --- Guarded imports: missing deps log a warning instead of crashing ---
+# --- Core Agent Hierarchy (NEW) ---
+
+try:
+    from .core import (
+        CircuitBreakerState,
+        CoreAgent,
+        CoreAgentType,
+        Diagnosis,
+        FailureCategory,
+        HealCycleResult,
+        HealResult,
+        HealthStatus,
+        Orchestrator,
+        SelfHealingMixin,
+        SubAgent,
+    )
+except ImportError as _e:
+    _logger.debug("Core agent hierarchy unavailable: %s", _e)
+
+# --- Legacy agents (backward compat) ---
 
 try:
     from .analytics_agent import AnalyticsAgent
@@ -219,7 +237,19 @@ except ImportError as _e:
     _logger.debug("WordPressAssetAgent unavailable: %s", _e)
 
 __all__ = [
-    # Enhanced Super Agent - Types
+    # Core Agent Hierarchy (NEW)
+    "SelfHealingMixin",
+    "CoreAgent",
+    "CoreAgentType",
+    "SubAgent",
+    "Orchestrator",
+    "FailureCategory",
+    "CircuitBreakerState",
+    "Diagnosis",
+    "HealResult",
+    "HealCycleResult",
+    "HealthStatus",
+    # Enhanced Super Agent - Types (Legacy)
     "SuperAgentType",
     "TaskCategory",
     "LLMProvider",
