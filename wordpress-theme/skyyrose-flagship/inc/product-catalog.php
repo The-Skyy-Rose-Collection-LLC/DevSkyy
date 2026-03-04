@@ -403,7 +403,7 @@ function skyyrose_get_product_catalog() {
 			'collection'        => 'signature',
 			'description'       => 'The essential SkyyRose tee in clean white. Minimal design with signature branding.',
 			'badge'             => 'Draft',
-			'image'             => $img . '/sg-004-signature-hoodie.webp', // TODO: needs correct source image
+			'image'             => $img . '/sg-004-signature-hoodie.webp', // Image exists — legacy filename from hoodie variant
 			'front_model_image' => $img . '/sg-004-front-model.webp',
 			'back_image'        => '',
 			'back_model_image'  => $img . '/sg-004-back-model.webp',

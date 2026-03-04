@@ -200,6 +200,7 @@ function skyyrose_add_product_meta_fields() {
 		'type'        => 'number',
 	) );
 
+	wp_nonce_field( 'skyyrose_product_meta', 'skyyrose_product_meta_nonce' );
 	echo '</div>';
 }
 add_action( 'woocommerce_product_options_general_product_data', 'skyyrose_add_product_meta_fields' );
@@ -207,12 +208,20 @@ add_action( 'woocommerce_product_options_general_product_data', 'skyyrose_add_pr
 /**
  * Save custom product meta fields.
  *
+ * Verifies our own nonce as defense-in-depth (WooCommerce also checks its
+ * nonce before firing `woocommerce_process_product_meta`).
+ *
  * @since 4.0.0
  *
  * @param int $post_id Product post ID.
  * @return void
  */
 function skyyrose_save_product_meta_fields( $post_id ) {
+	if ( ! isset( $_POST['skyyrose_product_meta_nonce'] ) ||
+	     ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['skyyrose_product_meta_nonce'] ) ), 'skyyrose_product_meta' ) ) {
+		return;
+	}
+
 	$fields = array(
 		'_skyyrose_material',
 		'_skyyrose_fit',
@@ -224,7 +233,7 @@ function skyyrose_save_product_meta_fields( $post_id ) {
 	);
 
 	foreach ( $fields as $field ) {
-		if ( isset( $_POST[ $field ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+		if ( isset( $_POST[ $field ] ) ) {
 			update_post_meta( $post_id, $field, sanitize_text_field( wp_unslash( $_POST[ $field ] ) ) );
 		}
 	}

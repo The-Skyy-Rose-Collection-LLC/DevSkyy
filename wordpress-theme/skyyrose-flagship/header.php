@@ -120,7 +120,7 @@
 								<path d="M3 6h18"/>
 								<path d="M16 10a4 4 0 0 1-8 0"/>
 							</svg>
-							<span class="navbar__cart-badge<?php echo $cart_count > 0 ? ' navbar__cart-badge--visible' : ''; ?>">
+							<span class="navbar__cart-badge<?php echo esc_attr( $cart_count > 0 ? ' navbar__cart-badge--visible' : '' ); ?>">
 								<?php echo esc_html( $cart_count ); ?>
 							</span>
 						</a>
