@@ -1255,3 +1255,56 @@
 	.nl-form { flex-direction: column; }
 	.nl-input { border-right: 1px solid var(--glass); border-bottom: none; margin-bottom: -1px; }
 }
+
+/* ─── BONUS: Scroll Progress Indicator ─── */
+.scroll-progress {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 0%;
+	height: 3px;
+	background: linear-gradient(90deg, var(--rose), var(--gold));
+	z-index: 10000;
+	transition: none;
+	pointer-events: none;
+}
+
+/* ─── BONUS: Back-to-Top Button ─── */
+.back-to-top {
+	position: fixed;
+	bottom: 32px;
+	right: 32px;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	background: var(--rose);
+	color: var(--dark);
+	border: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(12px);
+	transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, background 0.2s ease;
+	z-index: 9999;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+.back-to-top.visible {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+.back-to-top:hover {
+	background: var(--gold);
+}
+.back-to-top svg {
+	width: 20px;
+	height: 20px;
+	fill: currentColor;
+}
+
+@media (max-width: 768px) {
+	.back-to-top { bottom: 20px; right: 20px; width: 40px; height: 40px; }
+}

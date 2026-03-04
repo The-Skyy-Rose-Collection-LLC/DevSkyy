@@ -268,4 +268,49 @@
 			}
 		} );
 	} )();
+
+	/* ======================================================================
+	   SCROLL PROGRESS — Rose-gold bar at top of page
+	   ====================================================================== */
+	( function initScrollProgress() {
+		var bar = document.querySelector( '.scroll-progress' );
+		if ( ! bar ) {
+			return;
+		}
+		var progressTick = false;
+		window.addEventListener( 'scroll', function () {
+			if ( ! progressTick ) {
+				requestAnimationFrame( function () {
+					var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+					var pct = docHeight > 0 ? ( window.scrollY / docHeight ) * 100 : 0;
+					bar.style.width = pct + '%';
+					progressTick = false;
+				} );
+				progressTick = true;
+			}
+		} );
+	} )();
+
+	/* ======================================================================
+	   BACK TO TOP — Appears after scrolling past hero
+	   ====================================================================== */
+	( function initBackToTop() {
+		var btn = document.querySelector( '.back-to-top' );
+		if ( ! btn ) {
+			return;
+		}
+		var bttTick = false;
+		window.addEventListener( 'scroll', function () {
+			if ( ! bttTick ) {
+				requestAnimationFrame( function () {
+					btn.classList.toggle( 'visible', window.scrollY > window.innerHeight );
+					bttTick = false;
+				} );
+				bttTick = true;
+			}
+		} );
+		btn.addEventListener( 'click', function () {
+			window.scrollTo( { top: 0, behavior: 'smooth' } );
+		} );
+	} )();
 } )();
