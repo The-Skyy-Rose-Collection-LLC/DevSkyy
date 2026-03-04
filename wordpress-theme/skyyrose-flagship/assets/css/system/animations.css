@@ -1,0 +1,122 @@
+/**
+ * SkyyRose Design System — Scroll Reveal Animations
+ *
+ * Single source of truth for the .rv scroll-reveal system.
+ * Replaces duplicate definitions across homepage.css, homepage-v2.css,
+ * landing.css. About page retains scoped override (.abt-page .rv).
+ *
+ * Trigger classes: .vis (primary) and .visible (alias for backward compat)
+ * Variants: .rv-left, .rv-right, .rv-scale
+ * Delays: .rv-d1 through .rv-d6
+ *
+ * Depends on: design-tokens.css (--transition-spring)
+ * Used on: Every page with IntersectionObserver scroll-reveal
+ * Load: Global via inc/enqueue.php
+ *
+ * @package SkyyRose_Flagship
+ * @since   4.1.0
+ */
+
+/* ═══════════════════════════════════════════════
+   EASING TOKENS (reveal-specific)
+   ═══════════════════════════════════════════════ */
+:root {
+	--rv-ease: cubic-bezier(.16, 1, .3, 1);
+	--rv-duration: 0.9s;
+	--rv-distance: 40px;
+}
+
+/* ═══════════════════════════════════════════════
+   BASE REVEAL — fade up
+   ═══════════════════════════════════════════════ */
+.rv {
+	opacity: 0;
+	transform: translateY(var(--rv-distance));
+	transition: opacity var(--rv-duration) var(--rv-ease),
+	            transform var(--rv-duration) var(--rv-ease);
+}
+
+/* Trigger: supports both .vis and .visible for backward compatibility */
+.rv.vis,
+.rv.visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* ═══════════════════════════════════════════════
+   DIRECTIONAL VARIANTS
+   ═══════════════════════════════════════════════ */
+.rv-left {
+	opacity: 0;
+	transform: translateX(calc(-1 * var(--rv-distance)));
+	transition: opacity var(--rv-duration) var(--rv-ease),
+	            transform var(--rv-duration) var(--rv-ease);
+}
+
+.rv-left.vis,
+.rv-left.visible {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+.rv-right {
+	opacity: 0;
+	transform: translateX(var(--rv-distance));
+	transition: opacity var(--rv-duration) var(--rv-ease),
+	            transform var(--rv-duration) var(--rv-ease);
+}
+
+.rv-right.vis,
+.rv-right.visible {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+/* ═══════════════════════════════════════════════
+   SCALE VARIANT
+   ═══════════════════════════════════════════════ */
+.rv-scale {
+	opacity: 0;
+	transform: scale(.95);
+	transition: opacity var(--rv-duration) var(--rv-ease),
+	            transform var(--rv-duration) var(--rv-ease);
+}
+
+.rv-scale.vis,
+.rv-scale.visible {
+	opacity: 1;
+	transform: scale(1);
+}
+
+/* ═══════════════════════════════════════════════
+   STAGGER DELAYS (d1–d6)
+   ═══════════════════════════════════════════════ */
+.rv-d1 { transition-delay: .1s; }
+.rv-d2 { transition-delay: .2s; }
+.rv-d3 { transition-delay: .3s; }
+.rv-d4 { transition-delay: .4s; }
+.rv-d5 { transition-delay: .5s; }
+.rv-d6 { transition-delay: .6s; }
+
+/* ═══════════════════════════════════════════════
+   REDUCED MOTION — respects user preference
+   ═══════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+	.rv,
+	.rv-left,
+	.rv-right,
+	.rv-scale {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+
+	.rv-d1,
+	.rv-d2,
+	.rv-d3,
+	.rv-d4,
+	.rv-d5,
+	.rv-d6 {
+		transition-delay: 0s;
+	}
+}

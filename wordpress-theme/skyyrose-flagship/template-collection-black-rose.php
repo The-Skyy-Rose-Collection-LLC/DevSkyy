@@ -24,13 +24,13 @@ $collection_config = array(
 	'meta_pieces'       => '',
 	'meta_price_range'  => '',
 	'meta_edition'      => __( 'Limited Edition', 'skyyrose-flagship' ),
-	'hero_image'        => SKYYROSE_ASSETS_URI . '/scenes/black-rose/black-rose-marble-rotunda.png',
+	'hero_image'        => SKYYROSE_ASSETS_URI . '/scenes/black-rose/black-rose-marble-rotunda.webp',
 
 	'manifesto_eye'     => __( 'The Philosophy', 'skyyrose-flagship' ),
 	'manifesto_heading' => __( 'Limited Drops.<br>Unlimited Vision.', 'skyyrose-flagship' ),
 	'manifesto_body'    => '<p>' . esc_html__( 'Born from moonlit gardens and shadowed cathedrals, the Black Rose collection is an ode to those who find beauty in the dark. Each piece is woven with gothic elegance — deep blacks punctuated by silver moonlight accents, roses that bloom only after midnight.', 'skyyrose-flagship' ) . '</p>'
 		. '<p>' . esc_html__( 'This is not fashion for the faint of heart. It is armor for the bold, the defiant, the eternally romantic. Limited drops. Once they are gone, they are gone.', 'skyyrose-flagship' ) . '</p>',
-	'manifesto_scene'   => SKYYROSE_ASSETS_URI . '/scenes/black-rose/black-rose-moonlit-courtyard.png',
+	'manifesto_scene'   => SKYYROSE_ASSETS_URI . '/scenes/black-rose/black-rose-moonlit-courtyard.webp',
 
 	'featured_sku'      => 'br-d02',
 

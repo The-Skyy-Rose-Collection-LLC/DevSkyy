@@ -48,7 +48,7 @@ $skyyrose_ambassador_avatar = esc_url( SKYYROSE_ASSETS_URI . '/images/avatar/sky
 		<div class="sr-ambassador__header">
 			<img src="<?php echo esc_url( $skyyrose_ambassador_avatar ); ?>"
 			     alt="" class="sr-ambassador__header-avatar"
-			     width="32" height="32" />
+			     width="32" height="32" loading="lazy" />
 			<div class="sr-ambassador__header-info">
 				<strong><?php esc_html_e( 'Skyy Rose', 'skyyrose-flagship' ); ?></strong>
 				<span class="sr-ambassador__header-status"><?php esc_html_e( 'Brand Ambassador', 'skyyrose-flagship' ); ?></span>

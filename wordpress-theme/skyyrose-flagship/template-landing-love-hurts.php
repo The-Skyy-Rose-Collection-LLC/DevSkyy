@@ -28,8 +28,8 @@ $collection_slug  = 'love-hurts';
 $collection_name  = 'LOVE HURTS';
 $accent_color     = '#DC143C';
 $accent_rgb       = '220, 20, 60';
-$hero_image       = SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-crimson-throne-room.png';
-$parallax_image   = SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-gothic-ballroom.png';
+$hero_image       = SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-crimson-throne-room.webp';
+$parallax_image   = SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-gothic-ballroom.webp';
 
 // Fetch products from centralized catalog.
 $products = skyyrose_get_collection_products( $collection_slug );
@@ -218,8 +218,8 @@ get_header();
 		<div class="lp-lookbook__grid">
 			<?php
 			$lookbook_images = array(
-				array( 'src' => SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-enchanted-rose-shrine.png', 'alt' => 'Love Hurts enchanted rose shrine editorial' ),
-				array( 'src' => SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-giant-rose-staircase.png', 'alt' => 'Love Hurts giant rose staircase lookbook' ),
+				array( 'src' => SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-enchanted-rose-shrine.webp', 'alt' => 'Love Hurts enchanted rose shrine editorial' ),
+				array( 'src' => SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-giant-rose-staircase.webp', 'alt' => 'Love Hurts giant rose staircase lookbook' ),
 				array( 'src' => SKYYROSE_ASSETS_URI . '/scenes/love-hurts/enchanted-rose-dome-globe.jpg',       'alt' => 'Love Hurts enchanted rose dome' ),
 			);
 
@@ -235,12 +235,12 @@ get_header();
 
 		<div class="lp-lookbook__wide">
 			<div class="lp-lookbook__item rv">
-				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-reflective-ballroom.png' ); ?>"
+				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-reflective-ballroom.webp' ); ?>"
 				     alt="Love Hurts reflective ballroom wide editorial shot" loading="lazy" width="800" height="450">
 				<div class="lp-lookbook__caption"><span>Love Hurts &mdash; Fall 2026</span></div>
 			</div>
 			<div class="lp-lookbook__item rv rv-d1">
-				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-cathedral-rose-chamber.png' ); ?>"
+				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-cathedral-rose-chamber.webp' ); ?>"
 				     alt="Love Hurts cathedral rose chamber" loading="lazy" width="400" height="225">
 			</div>
 		</div>

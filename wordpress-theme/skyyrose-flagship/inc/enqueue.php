@@ -107,6 +107,17 @@ function skyyrose_enqueue_global_styles() {
 		);
 	}
 
+	// Animations: unified scroll-reveal system (.rv, .rv-left, .rv-right, .rv-scale).
+	$animations_path = SKYYROSE_DIR . '/assets/css/system/animations.css';
+	if ( file_exists( $animations_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-animations',
+			SKYYROSE_ASSETS_URI . '/css/system/animations.css',
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
 	// Header: navbar, search overlay, mobile menu, dropdowns.
 	$header_path = SKYYROSE_DIR . '/assets/css/header.css';
 	if ( file_exists( $header_path ) ) {
