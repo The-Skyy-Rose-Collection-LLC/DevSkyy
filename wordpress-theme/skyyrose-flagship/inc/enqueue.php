@@ -214,6 +214,88 @@ function skyyrose_enqueue_global_scripts() {
 			true
 		);
 	}
+
+	// Progressive image loading — blur-up effect for product images (v4.0.0 bonus).
+	$progressive_js = SKYYROSE_DIR . '/assets/js/progressive-images.js';
+	if ( file_exists( $progressive_js ) && ! is_admin() ) {
+		wp_enqueue_script(
+			'skyyrose-progressive-images',
+			SKYYROSE_ASSETS_URI . '/js/progressive-images.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+
+	// Smart link prefetching — preloads pages on hover for instant navigation (v4.0.0 bonus).
+	$prefetch_js = SKYYROSE_DIR . '/assets/js/smart-prefetch.js';
+	if ( file_exists( $prefetch_js ) && ! is_admin() ) {
+		wp_enqueue_script(
+			'skyyrose-smart-prefetch',
+			SKYYROSE_ASSETS_URI . '/js/smart-prefetch.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+
+	// Exit-intent overlay — captures abandoning visitors with newsletter/pre-order CTA (v4.0.0 S2 bonus).
+	$exit_css = SKYYROSE_DIR . '/assets/css/exit-intent.css';
+	if ( file_exists( $exit_css ) && ! is_admin() ) {
+		wp_enqueue_style(
+			'skyyrose-exit-intent',
+			SKYYROSE_ASSETS_URI . '/css/exit-intent.css',
+			array(),
+			SKYYROSE_VERSION
+		);
+	}
+
+	$exit_js = SKYYROSE_DIR . '/assets/js/exit-intent.js';
+	if ( file_exists( $exit_js ) && ! is_admin() ) {
+		wp_enqueue_script(
+			'skyyrose-exit-intent',
+			SKYYROSE_ASSETS_URI . '/js/exit-intent.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+
+	// Urgency countdown banner — live pre-order deadline timer (v4.0.0 S2 bonus).
+	$urgency_css = SKYYROSE_DIR . '/assets/css/urgency-banner.css';
+	if ( file_exists( $urgency_css ) && ! is_admin() ) {
+		wp_enqueue_style(
+			'skyyrose-urgency-banner',
+			SKYYROSE_ASSETS_URI . '/css/urgency-banner.css',
+			array(),
+			SKYYROSE_VERSION
+		);
+	}
+
+	$urgency_js = SKYYROSE_DIR . '/assets/js/urgency-banner.js';
+	if ( file_exists( $urgency_js ) && ! is_admin() ) {
+		wp_enqueue_script(
+			'skyyrose-urgency-banner',
+			SKYYROSE_ASSETS_URI . '/js/urgency-banner.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+
+		// Pass deadline from WordPress option (set via admin or wp-cli).
+		$preorder_deadline = get_option( 'skyyrose_preorder_deadline', '' );
+		if ( ! $preorder_deadline ) {
+			// Fallback: 30 days from now if no deadline is set.
+			$preorder_deadline = gmdate( 'c', strtotime( '+30 days' ) );
+		}
+
+		wp_localize_script( 'skyyrose-urgency-banner', 'skyyRoseUrgency', array(
+			'deadline' => $preorder_deadline,
+			'message'  => __( 'Pre-Order closes in', 'skyyrose-flagship' ),
+			'ctaUrl'   => home_url( '/pre-order/' ),
+			'ctaText'  => __( 'Shop Now', 'skyyrose-flagship' ),
+		) );
+	}
 }
 
 /**
@@ -333,7 +415,7 @@ function skyyrose_enqueue_template_styles() {
 	$use_min      = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
 	$template_styles = array(
-		'front-page'      => 'front-page.css',
+		'front-page'      => 'homepage.css',
 		'collection'      => 'collections.css',
 		'immersive'       => 'immersive.css',
 		'single-product'  => 'woocommerce.css',
@@ -422,7 +504,7 @@ function skyyrose_enqueue_template_scripts() {
 	$base_js_dir = SKYYROSE_DIR . '/assets/js';
 
 	$template_scripts = array(
-		'front-page'       => 'front-page.js',
+		'front-page'       => 'homepage.js',
 		'collection'       => 'collections.js',
 		'immersive'        => 'immersive.js',
 		'single-product'   => 'woocommerce.js',
@@ -902,7 +984,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 
 	$defer_handles = array(
 		'skyyrose-navigation',
-		'skyyrose-template-front-page',
+		'skyyrose-template-homepage',
 		'skyyrose-template-collections',
 		'skyyrose-template-immersive',
 		'skyyrose-template-woocommerce',
@@ -926,6 +1008,10 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-template-style-quiz',
 		'skyyrose-brand-ambassador',
 		'skyyrose-template-landing-engine',
+		'skyyrose-progressive-images',
+		'skyyrose-smart-prefetch',
+		'skyyrose-exit-intent',
+		'skyyrose-urgency-banner',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) && strpos( $tag, ' defer' ) === false ) {

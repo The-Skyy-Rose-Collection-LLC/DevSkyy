@@ -99,3 +99,23 @@ button {
 	--fc: 'Bebas Neue', sans-serif;              /* CTA / condensed */
 	--fp: 'Playfair Display', Georgia, serif;    /* Premium / accents */
 }
+
+/* ═══════════════════════════════════════════════
+   PROGRESSIVE IMAGE LOADING (blur-up)
+   ═══════════════════════════════════════════════ */
+img.sr-progressive {
+	filter: blur(12px);
+	transition: filter 0.5s ease-out;
+	will-change: filter;
+}
+
+img.sr-progressive--loaded {
+	filter: blur(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	img.sr-progressive {
+		filter: none;
+		transition: none;
+	}
+}
