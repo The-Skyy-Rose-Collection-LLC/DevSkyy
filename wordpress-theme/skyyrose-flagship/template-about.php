@@ -174,7 +174,7 @@ $arrow_svg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke
 			?>
 				<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/about-story-0.jpg' ) ); ?>"
 					 alt="<?php esc_attr_e( 'SkyyRose — luxury streetwear born in Oakland', 'skyyrose-flagship' ); ?>"
-					 loading="eager" width="1920" height="1080">
+					 loading="eager" fetchpriority="high" decoding="async" width="1920" height="1080">
 			<?php endif; ?>
 		</div>
 		<div class="abt-hero__overlay" aria-hidden="true"></div>

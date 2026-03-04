@@ -433,8 +433,9 @@
   - **Pre-existing**: 4 press cards in horizontal scroll with `scroll-snap-type: x mandatory`
   - **Iteration 18**: Added drag-to-scroll JS for desktop (grab cursor, momentum scroll)
   - Auto-offset hint on load (scrollLeft = 20 after 1.2s delay)
-- [/] Fix CSS/JS mismatch — about.css used wrong class prefix
+- [x] Fix CSS/JS mismatch — about.css used wrong class prefix
   - **Iteration 18**: CRITICAL FIX — existing `about.css` used `about-*` classes but `template-about.php` uses `abt-*` classes. Complete CSS rewrite (~700 lines) to match template:
+  - **Iteration 19**: Verified fix — all `abt-*` classes in CSS match template-about.php ✅
     - Hero: `.abt-hero`, `.abt-hero__img`, `.abt-hero__overlay`, `.abt-hero__content`, `.abt-hero__eyebrow`, `.abt-hero__title`, `.abt-hero__sub`, `.abt-hero__scroll`
     - Chapter system: `.abt-chapter`, `.abt-chapter__num`, `.abt-chapter__container`, `.abt-chapter__label`, `.abt-chapter__title`
     - Origin: `.abt-origin`, `.abt-origin__grid`, `.abt-origin__quote`, `.abt-origin__text`
@@ -458,14 +459,53 @@
   - **Iteration 18**: Added `'about' => 'about.js'` to `$template_scripts` array
   - Added `'skyyrose-template-about'` to `$defer_handles` array
   - No external dependencies (vanilla JS, no jQuery)
-- [ ] Verify ALL menu links work (primary, footer, collection, mobile)
-- [ ] Verify breadcrumb navigation across all pages
-- [ ] Test WooCommerce cart flow end-to-end
-- [ ] Responsive design audit (mobile, tablet, desktop)
-- [ ] Performance pass (lazy-load, defer, minify)
-- [ ] Accessibility pass (ARIA, focus, keyboard nav)
-- [ ] 404 page consistency with new design language
-- [ ] **BONUS ROUND**: Add 2 industry-proven features (your choice — explain why)
+- [x] Verify ALL menu links work (primary, footer, collection, mobile)
+  - **Iteration 19**: Footer "Help" links pointed to non-existent pages (`/faq/`, `/shipping/`, `/size-guide/`, `/care-instructions/`)
+  - Fixed: Consolidated links to Contact page (`/contact/` and `/contact/#faq`) where the FAQ section lives
+  - Primary nav, mobile nav, collection cross-nav all verified — use `wp_nav_menu()` with proper theme locations
+  - Footer legal links verified — `/privacy-policy/`, `/terms-of-service/`, `/refund-policy/`, `/accessibility/`
+- [x] Verify breadcrumb navigation across all pages
+  - **Iteration 19**: Verified `skyyrose_breadcrumb()` in `seo.php:331` — hooked to `skyyrose_after_header` at priority 10
+  - Calls `skyyrose_get_breadcrumb_trail()` (`seo.php:247`) — covers: products (Home → Shop → Category → Product), shop archives, product categories, pages, posts, categories, search
+  - Schema.org BreadcrumbList microdata on all breadcrumbs (`itemscope`, `itemtype`, `itemprop`)
+  - Skips front page (correct behavior)
+  - `aria-current="page"` on last breadcrumb item ✅
+  - Duplicate `skyyrose_breadcrumbs()` in `template-functions.php:205` is dead code (not hooked) — noted for cleanup
+- [/] Test WooCommerce cart flow end-to-end
+  - **Iteration 19**: Cannot test live (no WooCommerce instance available), but verified:
+    - `header.php` cart badge uses `WC()->cart->get_cart_contents_count()` with proper null checks
+    - `single-product.php` uses WooCommerce native `woocommerce_simple_add_to_cart()` / `woocommerce_variable_add_to_cart()`
+    - AJAX cart feedback in `single-product.js` listens to jQuery `added_to_cart` event
+    - Cart URL via `wc_get_cart_url()`, checkout via `wc_get_checkout_url()` — all properly escaped
+    - WooCommerce cart fragments (`wc_add_to_cart_fragments`) hooked in `inc/woocommerce.php:166`
+- [ ] Responsive design audit (mobile, tablet, desktop) — deferred to iteration 20
+- [x] Performance pass (lazy-load, defer, minify)
+  - **Iteration 19**: Added `fetchpriority="high"` to hero images:
+    - `header.php`: navbar monogram (`sr-monogram.png`) — first painted element on every page
+    - `template-about.php`: hero image (`about-story-0.jpg`) — LCP element
+    - `woocommerce/single-product.php`: main product image — LCP on product pages
+  - Added `decoding="async"` to same images — prevents image decoding from blocking main thread
+  - Verified existing: `loading="lazy"` on below-fold images ✅, script defer via `skyyrose_defer_scripts()` ✅
+  - Verified: Google Fonts has `display=swap` ✅, font preloading in `wp_head` ✅
+  - Verified: Conditional enqueue system loads only needed CSS/JS per template ✅
+- [x] Accessibility pass (ARIA, focus, keyboard nav)
+  - **Iteration 19**: Added `role="menuitem"` via `nav_menu_link_attributes` filter in `accessibility-seo.php`
+    - Per WordPress developer docs (Context7): adds semantic role to all `<a>` elements in `wp_nav_menu()`
+  - **CRITICAL FIX**: Added `:focus-visible` styles to landing.css and homepage.css
+    - Landing: `.lp-btn--primary`, `.lp-btn--outline`, `.lp-btn--add-to-bag`, `.lp-faq__question`, `.lp-email-capture__btn`
+    - Homepage: `.hero-cta`, `.hero-cta-primary`, `.nl-submit`
+    - Landing global catch-all: `.lp-page a/button/input/[tabindex]:focus-visible` with `outline: 2px solid var(--lp-accent)`
+    - Without these, keyboard-only users had NO visible focus indicators on interactive elements
+  - Verified existing: Focus trap in mobile menu ✅, `inert` on closed overlays ✅, `aria-expanded` toggles ✅
+  - Verified: Skip-link in header.php ✅, ARIA live regions in footer ✅, image alt enforcement filter ✅
+  - Verified: WooCommerce accessibility hooks (add-to-cart labels, cart item remove labels) ✅
+- [x] 404 page consistency with new design language
+  - **Iteration 19**: Fixed Signature collection accent color bug:
+    - Was: `#B76E79` (rose gold) — incorrect, that's the brand primary color
+    - Now: `#D4AF37` (gold) — matches brand constants for Signature collection
+    - Also fixed glow color: `rgba(212, 175, 55, 0.3)` and updated description text
+  - Verified: 404 page uses same design tokens, brand colors, collection cards, search, newsletter ✅
+- [ ] **BONUS ROUND**: Add 2 industry-proven features (your choice — explain why) — deferred to iteration 20
 
 **New Files Created (Iteration 18):**
 - `assets/js/about.js` — ~120 lines, scroll-reveal + drag-scroll + parallax
@@ -474,12 +514,23 @@
 - `assets/css/about.css` — complete rewrite (~700 lines) to match `abt-*` class prefix
 - `inc/enqueue.php` — 2 edits: template scripts map + defer handles
 
+**Files Modified (Iteration 19):**
+- `404.php` — fixed Signature accent color `#B76E79` → `#D4AF37`, updated glow + description
+- `footer.php` — fixed dead Help links (`/faq/` → `/contact/#faq`, `/shipping/` → `/contact/`, etc.)
+- `inc/accessibility-seo.php` — added `skyyrose_add_menuitem_role()` filter for ARIA `role="menuitem"` on nav links
+- `template-about.php` — added `fetchpriority="high"` + `decoding="async"` to hero image
+- `woocommerce/single-product.php` — added `fetchpriority="high"` + `decoding="async"` to main product image
+- `header.php` — added `fetchpriority="high"` + `decoding="async"` to navbar monogram
+- `assets/css/landing.css` — added `:focus-visible` states on all interactive elements + global catch-all rule
+- `assets/css/homepage.css` — added `:focus-visible` states on hero CTAs, newsletter submit
+
 **Context7 Queries (Iteration 18):**
 - [x] WordPress custom page template PHP — `wp_enqueue_style` conditional loading (via WebSearch fallback — Context7 MCP unavailable)
 - [x] WordPress YouTube embed responsive oembed — privacy-enhanced, GDPR compliance (via WebSearch fallback)
-- [ ] WordPress breadcrumbs
-- [ ] WooCommerce cart fragments
-- [ ] WordPress responsive/mobile best practices
+
+**Context7 Queries (Iteration 19):**
+- [x] WordPress Hooks (`/websites/developer_wordpress_reference_hooks`) — nav_menu_link_attributes filter, ARIA role="menuitem", navigation_markup_template, breadcrumbs
+- [x] WooCommerce (`/woocommerce/woocommerce`) — woocommerce_add_to_cart action, Store API cart/add-item, cart fragments, AJAX add-to-cart
 
 ---
 

@@ -40,6 +40,8 @@
 							width="48"
 							height="48"
 							loading="eager"
+							fetchpriority="high"
+							decoding="async"
 						>
 						<span class="navbar__brand-text">
 							<span class="navbar__site-title">

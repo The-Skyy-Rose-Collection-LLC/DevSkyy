@@ -23,6 +23,15 @@
 	--lp-ease: cubic-bezier(0.19, 1, 0.22, 1);
 }
 
+/* Global focus-visible fallback — WCAG 2.1 AA keyboard visibility. */
+.lp-page a:focus-visible,
+.lp-page button:focus-visible,
+.lp-page input:focus-visible,
+.lp-page [tabindex]:focus-visible {
+	outline: 2px solid var(--lp-accent);
+	outline-offset: 2px;
+}
+
 /* ═══════════════════════════════════════════════
    GRAIN OVERLAY (luxury texture)
    ═══════════════════════════════════════════════ */
@@ -279,7 +288,8 @@
 	color: #0A0A0A;
 }
 
-.lp-btn--primary:hover {
+.lp-btn--primary:hover,
+.lp-btn--primary:focus-visible {
 	transform: translateY(-2px);
 	box-shadow: 0 8px 30px rgba(var(--lp-accent-rgb), 0.3);
 }
@@ -290,7 +300,8 @@
 	border: 1px solid rgba(245, 230, 211, 0.3);
 }
 
-.lp-btn--outline:hover {
+.lp-btn--outline:hover,
+.lp-btn--outline:focus-visible {
 	border-color: var(--lp-accent);
 	color: var(--lp-accent);
 }
@@ -311,7 +322,8 @@
 	margin-top: 12px;
 }
 
-.lp-btn--add-to-bag:hover {
+.lp-btn--add-to-bag:hover,
+.lp-btn--add-to-bag:focus-visible {
 	background: var(--lp-accent);
 	color: #0A0A0A;
 	border-color: var(--lp-accent);
@@ -734,8 +746,14 @@
 	text-align: left;
 }
 
-.lp-faq__question:hover {
+.lp-faq__question:hover,
+.lp-faq__question:focus-visible {
 	color: var(--lp-accent);
+}
+
+.lp-faq__question:focus-visible {
+	outline: 2px solid var(--lp-accent);
+	outline-offset: 2px;
 }
 
 .lp-faq__question::after {
@@ -810,9 +828,15 @@
 	transition: all 0.3s;
 }
 
-.lp-email-capture__btn:hover {
+.lp-email-capture__btn:hover,
+.lp-email-capture__btn:focus-visible {
 	background: transparent;
 	color: var(--lp-accent);
+}
+
+.lp-email-capture__btn:focus-visible {
+	outline: 2px solid var(--lp-accent);
+	outline-offset: 2px;
 }
 
 .lp-email-capture__btn:disabled {
