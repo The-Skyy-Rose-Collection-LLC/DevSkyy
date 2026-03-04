@@ -41,45 +41,7 @@
 	background: radial-gradient(ellipse at center, transparent 40%, rgba(5, 2, 8, .55));
 }
 
-/* ═══════════════════════════════════════════════
-   SCROLL-REVEAL ANIMATIONS
-   ═══════════════════════════════════════════════ */
-.rv {
-	opacity: 0;
-	transform: translateY(50px);
-	transition: opacity 1.1s var(--ease-out), transform 1.1s var(--ease-out);
-}
-
-.rv.vis { opacity: 1; transform: translateY(0); }
-.rv-d1 { transition-delay: .12s; }
-.rv-d2 { transition-delay: .24s; }
-.rv-d3 { transition-delay: .36s; }
-.rv-d4 { transition-delay: .48s; }
-.rv-d5 { transition-delay: .6s; }
-
-.rv-left {
-	opacity: 0;
-	transform: translateX(-60px);
-	transition: opacity 1s var(--ease-out), transform 1s var(--ease-out);
-}
-
-.rv-left.vis { opacity: 1; transform: translateX(0); }
-
-.rv-right {
-	opacity: 0;
-	transform: translateX(60px);
-	transition: opacity 1s var(--ease-out), transform 1s var(--ease-out);
-}
-
-.rv-right.vis { opacity: 1; transform: translateX(0); }
-
-@media (prefers-reduced-motion: reduce) {
-	.rv, .rv-left, .rv-right {
-		opacity: 1;
-		transform: none;
-		transition: none;
-	}
-}
+/* Scroll-reveal (.rv) — now in system/animations.css */
 
 /* ═══════════════════════════════════════════════
    CINEMATIC LOADER

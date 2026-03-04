@@ -24,13 +24,13 @@ $collection_config = array(
 	'meta_pieces'       => '',
 	'meta_price_range'  => '',
 	'meta_edition'      => __( 'Foundation Wardrobe', 'skyyrose-flagship' ),
-	'hero_image'        => SKYYROSE_ASSETS_URI . '/scenes/signature/signature-golden-gate-showroom.png',
+	'hero_image'        => SKYYROSE_ASSETS_URI . '/scenes/signature/signature-golden-gate-showroom.webp',
 
 	'manifesto_eye'     => __( 'The Standard', 'skyyrose-flagship' ),
 	'manifesto_heading' => __( 'Start Here.<br>Build Everything.', 'skyyrose-flagship' ),
 	'manifesto_body'    => '<p>' . esc_html__( 'Clean lines. Quality materials. Pieces that work as hard as you do. No logos screaming for attention. Just clothes that fit right and last.', 'skyyrose-flagship' ) . '</p>'
 		. '<p>' . esc_html__( 'Signature is the foundation — Italian wool-blends, premium cotton, rose-gold hardware. Grand ballroom energy in everyday wear. Timeless pieces built for the long game.', 'skyyrose-flagship' ) . '</p>',
-	'manifesto_scene'   => SKYYROSE_ASSETS_URI . '/scenes/signature/signature-waterfront-runway.png',
+	'manifesto_scene'   => SKYYROSE_ASSETS_URI . '/scenes/signature/signature-waterfront-runway.webp',
 
 	'featured_sku'      => 'sg-d01',
 

@@ -203,7 +203,7 @@ get_header();
 	<div class="product-modal" id="product-modal-dialog" role="dialog" aria-modal="true" aria-hidden="true" inert aria-labelledby="modal-product-name" tabindex="-1">
 		<button class="product-modal-close" type="button" aria-label="<?php esc_attr_e( 'Close product details', 'skyyrose-flagship' ); ?>">&times;</button>
 		<div class="modal-360-area">
-			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Product preview', 'skyyrose-flagship' ); ?>" width="400" height="400">
+			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Product preview', 'skyyrose-flagship' ); ?>" width="400" height="400" loading="lazy">
 			<span class="modal-360-badge"><?php echo esc_html__( '360 Preview', 'skyyrose-flagship' ); ?></span>
 		</div>
 		<div class="modal-details">

@@ -24,13 +24,13 @@ $collection_config = array(
 	'meta_pieces'       => '',
 	'meta_price_range'  => '',
 	'meta_edition'      => __( 'Family Legacy', 'skyyrose-flagship' ),
-	'hero_image'        => SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-crimson-throne-room.png',
+	'hero_image'        => SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-crimson-throne-room.webp',
 
 	'manifesto_eye'     => __( 'The Story', 'skyyrose-flagship' ),
 	'manifesto_heading' => __( 'Named For Family.<br>Made For Feeling.', 'skyyrose-flagship' ),
 	'manifesto_body'    => '<p>' . esc_html__( '"Hurts" is the founder\'s family name. This collection carries that weight — raw emotion transformed into wearable art.', 'skyyrose-flagship' ) . '</p>'
 		. '<p>' . esc_html__( 'Gothic castle halls, crimson fire, rose petals on stone floors. Every thread channels the beauty in pain, the strength in vulnerability. Some things you don\'t hide. You wear them.', 'skyyrose-flagship' ) . '</p>',
-	'manifesto_scene'   => SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-gothic-ballroom.png',
+	'manifesto_scene'   => SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-gothic-ballroom.webp',
 
 	'featured_sku'      => 'lh-001',
 

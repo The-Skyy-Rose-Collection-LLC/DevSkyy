@@ -28,8 +28,8 @@ $collection_slug  = 'signature';
 $collection_name  = 'SIGNATURE';
 $accent_color     = '#D4AF37';
 $accent_rgb       = '212, 175, 55';
-$hero_image       = SKYYROSE_ASSETS_URI . '/scenes/signature/signature-golden-gate-showroom.png';
-$parallax_image   = SKYYROSE_ASSETS_URI . '/scenes/signature/signature-waterfront-runway.png';
+$hero_image       = SKYYROSE_ASSETS_URI . '/scenes/signature/signature-golden-gate-showroom.webp';
+$parallax_image   = SKYYROSE_ASSETS_URI . '/scenes/signature/signature-waterfront-runway.webp';
 
 // Fetch products from centralized catalog.
 $products = skyyrose_get_collection_products( $collection_slug );
@@ -230,8 +230,8 @@ get_header();
 		<div class="lp-lookbook__grid">
 			<?php
 			$lookbook_images = array(
-				array( 'src' => SKYYROSE_ASSETS_URI . '/scenes/signature/signature-golden-gate-showroom.png', 'alt' => 'Signature Golden Gate showroom editorial' ),
-				array( 'src' => SKYYROSE_ASSETS_URI . '/scenes/signature/signature-waterfront-runway.png',    'alt' => 'Signature waterfront runway lookbook' ),
+				array( 'src' => SKYYROSE_ASSETS_URI . '/scenes/signature/signature-golden-gate-showroom.webp', 'alt' => 'Signature Golden Gate showroom editorial' ),
+				array( 'src' => SKYYROSE_ASSETS_URI . '/scenes/signature/signature-waterfront-runway.webp',    'alt' => 'Signature waterfront runway lookbook' ),
 				array( 'src' => SKYYROSE_ASSETS_URI . '/images/about-story-2.jpg',                            'alt' => 'Signature Oakland streetwear editorial' ),
 			);
 
@@ -247,7 +247,7 @@ get_header();
 
 		<div class="lp-lookbook__wide">
 			<div class="lp-lookbook__item rv">
-				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/scenes/signature/signature-golden-gate-showroom.png' ); ?>"
+				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/scenes/signature/signature-golden-gate-showroom.webp' ); ?>"
 				     alt="Signature wide editorial shot — Bay Area luxury" loading="lazy" width="800" height="450">
 				<div class="lp-lookbook__caption"><span>Signature &mdash; Year-Round</span></div>
 			</div>
