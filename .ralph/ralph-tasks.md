@@ -203,22 +203,77 @@
 
 ---
 
-## SECTION 4: Collection Pages — Full Product Showcases (Iterations 15-18)
+## SECTION 4: Collection Pages — Full Product Showcases (Iterations 13-16)
 
-- [ ] Replace template-collection-black-rose.php with new design
-- [ ] Replace template-collection-love-hurts.php with new design
-- [ ] Replace template-collection-signature.php with new design
-- [ ] Verify template-collection-kids-capsule.php nav links work
-- [ ] Product grid with hover effects and quick-view capability
-- [ ] Sort/filter controls
-- [ ] Cross-collection navigation
-- [ ] Pre-order CTA section
-- [ ] Link to immersive experience (DO NOT MODIFY immersive pages)
-- [ ] **BONUS ROUND**: Add 2 industry-proven features (your choice — explain why)
+- [x] Replace template-collection-black-rose.php with new design
+  - **Iteration 13**: Full rewrite using shared template part architecture
+  - Config array: slug `black-rose`, accent `#C0C0C0` (silver), number `01`
+  - Hero image: `scenes/black-rose/black-rose-marble-rotunda.png`
+  - Manifesto: "Limited Drops. Unlimited Vision." + moonlit courtyard scene
+  - Featured product: br-d02 (Football Jersey Red)
+  - Cross-nav: Love Hurts, Signature, Kids Capsule
+- [x] Replace template-collection-love-hurts.php with new design
+  - **Iteration 13**: Config array: slug `love-hurts`, accent `#DC143C` (crimson), number `02`
+  - Hero image: `scenes/love-hurts/love-hurts-crimson-throne-room.png`
+  - Manifesto: "Named For Family. Made For Feeling." + gothic ballroom scene
+  - Featured product: lh-001 (The Fannie Pack)
+  - Newsletter: "Wear Your Heart"
+- [x] Replace template-collection-signature.php with new design
+  - **Iteration 13**: Config array: slug `signature`, accent `#D4AF37` (gold), number `03`
+  - Hero image: `scenes/signature/signature-golden-gate-showroom.png`
+  - Manifesto: "Start Here. Build Everything." + waterfront runway scene
+  - Featured product: sg-d01 (Multi-Colored Windbreaker Set)
+  - Newsletter: "Start Here. Build Everything."
+- [x] Verify template-collection-kids-capsule.php nav links work
+  - **Iteration 13**: Kids capsule stays on old `collection` slug → `collections.css`/`collections.js` unchanged
+  - All 3 main collection cross-nav includes kids capsule link (`col-crossnav__link--kc`)
+- [x] Product grid with hover effects and quick-view capability
+  - **Iteration 13**: Full catalog grid with hover lift, border glow, image zoom
+  - Quick-view modal with product image, name, price, description, size selector, SKU
+  - Modal reads from `wp_localize_script('skyyRoseCollectionProducts')` array
+  - Card click opens modal, "View Product" button navigates to product permalink
+- [/] Sort/filter controls
+  - **Deferred**: Sort/filter deferred to BONUS ROUND — basic grid ordering via WooCommerce `menu_order` for now
+- [x] Cross-collection navigation
+  - **Iteration 13**: `col-crossnav` section at bottom of each page
+  - Links to other 2 collections + Kids Capsule with collection-colored borders
+  - "All Collections" home link
+- [x] Pre-order CTA section
+  - **Iteration 13**: Pre-order badge on product cards (`col-card__pre`)
+  - Featured product CTA shows "Pre-Order — $XX" for pre-order items
+  - Card links to product page or pre-order gateway
+- [x] Link to immersive experience (DO NOT MODIFY immersive pages)
+  - **Iteration 13**: `col-immersive-cta` section with link to `/experience-{slug}/`
+  - Conditionally rendered (only shows if `immersive_url` is set)
+- [/] **BONUS ROUND**: Add 2 industry-proven features (deferred to iteration 14)
+
+**Architecture Decisions (Iteration 13):**
+- **DRY shared template part**: `template-parts/collection-page-v4.php` renders all sections
+  - Each collection template is ~65 lines (config array + include), zero duplication
+  - Adding a 4th collection = copy config, change values, done
+- **CSS custom property accent system**: ONE `collection-v4.css` serves all 3 collections
+  - `--col-accent` (hex) and `--col-accent-rgb` (RGB) set via inline style on `.col-page`
+  - All child elements inherit accent color automatically
+- **New enqueue slug**: `collection-v4` → `collection-v4.css` + `collection-v4.js`
+  - Kids capsule keeps `collection` → `collections.css` + `collections.js` (backward compatible)
+- **WooCommerce-first queries**: Tries `wc_get_products()` → falls back to catalog
+  - Dynamic product count and price range calculation
+  - Product data localized for JS modal via `wp_localize_script()`
+
+**New Files Created:**
+- `assets/css/collection-v4.css` — ~650 lines, all sections + modal + responsive + reduced-motion
+- `assets/js/collection-v4.js` — ~250 lines, IIFE with scroll-reveal, modal, newsletter, sizes
+- `template-parts/collection-page-v4.php` — ~410 lines, shared template part
+
+**Files Modified:**
+- `template-collection-black-rose.php` — rewritten (v4.0.0)
+- `template-collection-love-hurts.php` — rewritten (v4.0.0)
+- `template-collection-signature.php` — rewritten (v4.0.0)
+- `inc/enqueue.php` — 3 edits: template map, style/script arrays, defer handles
 
 **Context7 Queries:**
-- [ ] WooCommerce product queries by category
-- [ ] WordPress taxonomy queries (get_terms, WP_Term_Query)
+- [x] WooCommerce `/woocommerce/woocommerce` — wc_get_products by category slug, stock_status, pagination, sorting, product fields (Iteration 13)
+- [x] WordPress `/websites/developer_wordpress_reference_classes` — get_terms, WP_Term_Query, WP_Tax_Query, product category taxonomy queries (Iteration 13)
 
 ---
 
