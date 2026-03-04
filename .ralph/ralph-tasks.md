@@ -297,22 +297,85 @@
 
 ---
 
-## SECTION 5: Single Product Pages (Iterations 19-22)
+## SECTION 5: Single Product Pages (Iterations 15-18)
 
-- [ ] Deploy woocommerce/single-product.php (collection-aware)
-- [ ] Deploy inc/wc-product-functions.php (helpers)
-- [ ] Deploy assets/css/single-product.css
-- [ ] Deploy assets/js/single-product.js
-- [ ] Verify collection detection (Black Rose=silver, Love Hurts=crimson, Signature=gold)
-- [ ] Image gallery, size selector, AJAX cart, tabs
-- [ ] Related products from same collection
-- [ ] Conditional enqueue for single product assets
-- [ ] **BONUS ROUND**: Add 2 industry-proven features (your choice — explain why)
+- [x] Deploy woocommerce/single-product.php (collection-aware)
+  - **Iteration 15**: Full rewrite (v4.0.0) — collection-aware via `skyyrose_get_product_collection()`
+  - Uses `skyyrose_collection_config()` to inject CSS custom properties per collection
+  - WooCommerce wrapper hooks preserved (`woocommerce_before_main_content`, `woocommerce_after_main_content`)
+  - Custom breadcrumb nav: SkyyRose / Shop / {Collection} / {Product}
+  - Split-grid hero: gallery column (4:5 aspect) + info column (sticky on desktop)
+  - Gallery zoom overlay on desktop hover (`background-size: 200%`)
+  - Thumbnail switcher with active state
+  - Limited Edition badge + collection badge on gallery
+  - Spec table: Material, Fit, Detail, SKU from custom meta fields
+  - WooCommerce add-to-cart (simple + variable) via `woocommerce_simple_add_to_cart()` / `woocommerce_variable_add_to_cart()`
+  - Stock status with pulsing dot (instock=green, backorder=accent, outofstock=red)
+  - Trust signals: Secure Checkout, Free Shipping $150+, 30-Day Returns
+  - Product details accordion: Description (open), Materials & Care, Size Guide, Shipping & Returns
+  - Related products from same collection via `skyyrose_get_related_products_by_category()`
+  - Collection CTA banner: "Shop Full Collection" with accent gradient
+  - Sticky add-to-cart bar: appears when ATC form scrolls out of viewport
+  - All text properly escaped (`esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()`)
+  - ARIA labels on all interactive elements for accessibility
+  - Adapted function call: `skyyrose_get_collection_products()` → `skyyrose_get_related_products_by_category()` (renamed in iteration 11)
+- [x] Deploy inc/wc-product-functions.php (helpers)
+  - **Pre-existing** from iteration 11: already has `skyyrose_get_product_collection()`, `skyyrose_collection_config()`, `skyyrose_get_product_meta()`, `skyyrose_get_related_products_by_category()`
+  - **Iteration 15**: Refactored `skyyrose_enqueue_product_assets()` → `skyyrose_localize_product_data()`
+  - Removed duplicate CSS/JS enqueue (now handled by template system in enqueue.php)
+  - Kept `wp_localize_script()` with handle `skyyrose-template-single-product` to match template system convention
+  - Passes: `ajax_url`, `nonce`, `collection`, `config`, `cart_url` to JavaScript
+- [x] Deploy assets/css/single-product.css
+  - **Iteration 15**: ~910 lines of collection-aware CSS
+  - Sections: foundation, breadcrumb, hero split-grid, gallery (zoom, thumbs, badges), info (collection badge, name, price, desc, specs), add-to-cart WC overrides (variations, swatches, quantity, CTA button), stock status, trust signals, accordion, related products, CTA banner, sticky ATC bar, WC overrides (hide defaults), responsive (1024/768/480 breakpoints), `prefers-reduced-motion` support
+  - All colors via CSS custom properties: `--sr-accent`, `--sr-accent-rgb`, `--sr-bg`, `--sr-bg-alt`, `--sr-text`, `--sr-dim`, `--sr-gradient`, `--sr-cta-color`
+  - Namespaced keyframes: `sr-pulse` (stock dot animation)
+- [x] Deploy assets/js/single-product.js
+  - **Iteration 15**: ~170 lines IIFE with jQuery dependency
+  - 6 modules: gallery zoom (desktop only, touch-disabled), thumbnail switcher (opacity fade), WC variation image swap (`found_variation`/`reset_image` events), accordion (single-item toggle with aria-expanded), sticky ATC bar (requestAnimationFrame scroll listener), AJAX cart feedback ("ADDED TO BAG" confirmation)
+  - Scroll reveals: IntersectionObserver on related cards, accordion, CTA banner
+  - Respects `prefers-reduced-motion` (skips scroll reveal setup entirely)
+- [x] Verify collection detection (Black Rose=silver, Love Hurts=crimson, Signature=gold)
+  - Template sets CSS custom properties from `skyyrose_collection_config()` output
+  - Three visual worlds: black-rose (#C0C0C0 silver), love-hurts (#DC143C crimson), signature (#D4AF37 gold)
+  - Fallback: uncategorized products get Black Rose aesthetic
+- [x] Image gallery, size selector, AJAX cart, tabs
+  - Gallery: main image + zoom + thumbnails; WC variation image swap
+  - Size selector: handled by WooCommerce's own variation form (styled via CSS overrides)
+  - AJAX cart: WC native add-to-cart + jQuery `added_to_cart` event for feedback
+  - Tabs: replaced with accordion pattern (Description, Materials & Care, Size Guide, Shipping & Returns)
+- [x] Related products from same collection
+  - Uses `skyyrose_get_related_products_by_category()` — queries WP_Query with product_cat tax_query
+  - 4-card grid with hover lift, image zoom, "View Piece" overlay
+  - "View Full Collection" link to category page
+- [x] Conditional enqueue for single product assets
+  - **Iteration 15**: Updated `enqueue.php` with 4 edits:
+    1. `template_styles['single-product']` → `'single-product.css'` (was `woocommerce.css`)
+    2. Removed `woo_page_styles['single-product']` entry (was `woocommerce-single.css`)
+    3. `template_scripts['single-product']` → `'single-product.js'` (was `woocommerce.js`)
+    4. Updated JS deps check to include `single-product.js` (jQuery + wc-add-to-cart-variation)
+    5. Added `'skyyrose-template-single-product'` to `$defer_handles` array
+  - Cart/checkout pages still use `woocommerce.css`/`woocommerce.js` (only single-product changed)
+- [/] **BONUS ROUND**: Add 2 industry-proven features (your choice — explain why)
+  - Deferred to iteration 16
+
+**Architecture Decisions (Iteration 15):**
+- **Separated enqueue from localize**: `enqueue.php` handles file loading (CSS/JS), `wc-product-functions.php` handles data injection (`wp_localize_script`). Avoids double-registration anti-pattern.
+- **Handle convention**: Template system uses `skyyrose-template-{filename-stem}`, so single-product.js → `skyyrose-template-single-product`. All localize calls must match this.
+- **CSS custom property theming**: Collection config injected as inline `<style>` block in the template, not via PHP-generated CSS file. Faster (no extra HTTP request) and allows WooCommerce to re-render without page reload.
+
+**New Files Created:**
+- `assets/css/single-product.css` — ~910 lines, collection-aware product page styles
+- `assets/js/single-product.js` — ~170 lines, gallery/accordion/sticky-ATC/AJAX-cart
+
+**Files Modified:**
+- `woocommerce/single-product.php` — rewritten (v4.0.0, was v2.0.0/1.6.4)
+- `inc/wc-product-functions.php` — refactored enqueue → localize-only
+- `inc/enqueue.php` — 5 edits: template maps, JS deps, defer handles
 
 **Context7 Queries:**
-- [ ] WooCommerce single product hooks
-- [ ] WooCommerce woocommerce_before_single_product
-- [ ] WooCommerce product gallery / variations API
+- [x] WooCommerce `/woocommerce/woocommerce` — single product template override, hooks (woocommerce_single_product_summary, woocommerce_before_add_to_cart_form), wc_product_class, variations (Iteration 15)
+- [x] WordPress `/websites/developer_wordpress_reference_hooks` — wp_enqueue_scripts, conditional enqueue, is_product, wp_localize_script (Iteration 15)
 
 ---
 

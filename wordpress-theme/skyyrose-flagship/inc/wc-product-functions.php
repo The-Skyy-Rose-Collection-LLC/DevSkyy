@@ -282,52 +282,35 @@ function skyyrose_get_related_products_by_category( $product_id = null, $limit =
 }
 
 /**
- * Enqueue single product page assets with collection config.
+ * Localize single product page script with collection config.
  *
- * Loads single-product.css and single-product.js, and passes the
- * collection configuration to JavaScript for collection-aware theming.
+ * CSS/JS enqueue is handled by the template-based system in enqueue.php.
+ * This function adds the collection-aware data (colors, AJAX URL, nonce)
+ * that JavaScript needs for collection theming and cart interactions.
  *
  * @since 4.0.0
  * @return void
  */
-function skyyrose_enqueue_product_assets() {
+function skyyrose_localize_product_data() {
 	if ( ! function_exists( 'is_product' ) || ! is_product() ) {
 		return;
 	}
 
-	$css_path = SKYYROSE_DIR . '/assets/css/single-product.css';
-	if ( file_exists( $css_path ) ) {
-		wp_enqueue_style(
-			'skyyrose-single-product',
-			SKYYROSE_ASSETS_URI . '/css/single-product.css',
-			array(),
-			SKYYROSE_VERSION
-		);
-	}
+	// Handle matches the template system: 'skyyrose-template-' + filename stem.
+	$handle = 'skyyrose-template-single-product';
 
-	$js_path = SKYYROSE_DIR . '/assets/js/single-product.js';
-	if ( file_exists( $js_path ) ) {
-		wp_enqueue_script(
-			'skyyrose-single-product',
-			SKYYROSE_ASSETS_URI . '/js/single-product.js',
-			array( 'jquery', 'wc-add-to-cart-variation' ),
-			SKYYROSE_VERSION,
-			true
-		);
+	$collection = skyyrose_get_product_collection();
+	$config     = skyyrose_collection_config( $collection );
 
-		$collection = skyyrose_get_product_collection();
-		$config     = skyyrose_collection_config( $collection );
-
-		wp_localize_script( 'skyyrose-single-product', 'skyyrose', array(
-			'ajax_url'   => admin_url( 'admin-ajax.php' ),
-			'nonce'      => wp_create_nonce( 'skyyrose-nonce' ),
-			'collection' => $collection,
-			'config'     => $config,
-			'cart_url'   => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
-		) );
-	}
+	wp_localize_script( $handle, 'skyyrose', array(
+		'ajax_url'   => admin_url( 'admin-ajax.php' ),
+		'nonce'      => wp_create_nonce( 'skyyrose-nonce' ),
+		'collection' => $collection,
+		'config'     => $config,
+		'cart_url'   => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
+	) );
 }
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_product_assets', 25 );
+add_action( 'wp_enqueue_scripts', 'skyyrose_localize_product_data', 25 );
 
 /**
  * Add collection-specific body class on single product pages.

@@ -419,7 +419,7 @@ function skyyrose_enqueue_template_styles() {
 		'collection'      => 'collections.css',
 		'collection-v4'   => 'collection-v4.css',
 		'immersive'       => 'immersive.css',
-		'single-product'  => 'woocommerce.css',
+		'single-product'  => 'single-product.css',
 		'cart'            => 'woocommerce.css',
 		'checkout'        => 'woocommerce.css',
 		'shop-archive'    => 'woocommerce.css',
@@ -454,7 +454,7 @@ function skyyrose_enqueue_template_styles() {
 
 	// WooCommerce page-specific CSS (loaded ON TOP of the base woocommerce.css).
 	$woo_page_styles = array(
-		'single-product' => 'woocommerce-single.css',
+		// single-product.css is the primary stylesheet (replaces woocommerce-single.css).
 		'cart'           => 'woocommerce-cart.css',
 		'checkout'       => 'woocommerce-checkout.css',
 	);
@@ -509,7 +509,7 @@ function skyyrose_enqueue_template_scripts() {
 		'collection'       => 'collections.js',
 		'collection-v4'    => 'collection-v4.js',
 		'immersive'        => 'immersive.js',
-		'single-product'   => 'woocommerce.js',
+		'single-product'   => 'single-product.js',
 		'cart'             => 'woocommerce.js',
 		'checkout'         => 'woocommerce.js',
 		'contact'          => 'contact.js',
@@ -523,8 +523,9 @@ function skyyrose_enqueue_template_scripts() {
 		$js_file = $template_scripts[ $slug ];
 		$handle  = 'skyyrose-template-' . sanitize_title( pathinfo( $js_file, PATHINFO_FILENAME ) );
 
-		// WooCommerce JS depends on jQuery for cart/checkout/gallery interactions.
-		$js_deps = ( 'woocommerce.js' === $js_file ) ? array( 'jquery' ) : array();
+		// WooCommerce + single-product JS depend on jQuery for cart/gallery interactions.
+		$wc_js_files = array( 'woocommerce.js', 'single-product.js' );
+		$js_deps     = in_array( $js_file, $wc_js_files, true ) ? array( 'jquery', 'wc-add-to-cart-variation' ) : array();
 
 		if ( file_exists( $base_js_dir . '/' . $js_file ) ) {
 			wp_enqueue_script(
@@ -1015,6 +1016,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-smart-prefetch',
 		'skyyrose-exit-intent',
 		'skyyrose-urgency-banner',
+		'skyyrose-template-single-product',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) && strpos( $tag, ' defer' ) === false ) {
