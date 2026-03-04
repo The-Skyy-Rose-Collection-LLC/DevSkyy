@@ -1143,6 +1143,29 @@
 }
 
 /* ==================================================
+   FOCUS VISIBLE — Keyboard Accessibility
+   ================================================== */
+
+.abt-mission__cta:focus-visible {
+	outline: 2px solid var(--rose-gold, #B76E79);
+	outline-offset: 3px;
+}
+
+.abt-press-card a:focus-visible,
+.abt-community a:focus-visible {
+	outline: 2px solid var(--rose-gold, #B76E79);
+	outline-offset: 2px;
+}
+
+/* Global catch-all for any missed interactive elements */
+.abt-page a:focus-visible,
+.abt-page button:focus-visible,
+.abt-page [tabindex]:focus-visible {
+	outline: 2px solid var(--rose-gold, #B76E79);
+	outline-offset: 2px;
+}
+
+/* ==================================================
    REDUCED MOTION — Accessibility
    ================================================== */
 

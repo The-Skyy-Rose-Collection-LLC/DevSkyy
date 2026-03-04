@@ -98,12 +98,23 @@ $skyyrose_dividers = array(
 		<div class="hero-frame" aria-hidden="true"></div>
 		<div class="hero-particles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
 		<div class="hero-content">
-			<h1 class="hero-title"><?php echo esc_html( 'SkyyRose' ); ?></h1>
-			<div class="hero-rule" aria-hidden="true"></div>
-			<p class="hero-subtitle"><?php echo esc_html( 'Where Oakland meets the world. Where streets meet luxury.' ); ?></p>
+			<div class="hero-monogram">
+				<img
+					src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/sr-monogram-hero.png' ); ?>"
+					alt="<?php esc_attr_e( 'SkyyRose Monogram', 'skyyrose-flagship' ); ?>"
+					class="hero-monogram__img"
+					width="400"
+					height="400"
+					loading="eager"
+					fetchpriority="high"
+					decoding="async"
+				>
+			</div>
+			<h1 class="hero-title"><?php echo esc_html( 'SKYYROSE' ); ?></h1>
+			<p class="hero-tagline"><?php echo esc_html( 'Luxury Grows from Concrete.' ); ?></p>
 			<div class="hero-cta-row">
-				<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="hero-cta hero-cta-primary"><?php esc_html_e( 'Shop Now', 'skyyrose-flagship' ); ?></a>
-				<a href="#story" class="hero-cta"><?php esc_html_e( 'Our Story', 'skyyrose-flagship' ); ?></a>
+				<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="hero-cta hero-cta-primary"><?php esc_html_e( 'SHOP NOW', 'skyyrose-flagship' ); ?></a>
+				<a href="#collections-start" class="hero-cta"><?php esc_html_e( 'EXPLORE', 'skyyrose-flagship' ); ?></a>
 			</div>
 		</div>
 		<div class="hero-scroll" aria-hidden="true">
