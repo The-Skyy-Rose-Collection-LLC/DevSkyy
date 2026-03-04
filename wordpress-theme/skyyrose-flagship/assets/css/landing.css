@@ -792,6 +792,30 @@
 	text-align: center;
 	padding: 80px 24px;
 	background: linear-gradient(180deg, transparent 0%, rgba(var(--lp-accent-rgb), 0.05) 100%);
+	position: relative;
+	overflow: hidden;
+}
+
+.lp-email-capture__bg-logo {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 320px;
+	height: auto;
+	opacity: 0.12;
+	z-index: 0;
+	pointer-events: none;
+	filter: blur(1px);
+}
+
+.lp-email-capture .lp-eyebrow,
+.lp-email-capture .lp-heading,
+.lp-email-capture__form,
+.lp-email-capture__message,
+.lp-email-capture__note {
+	position: relative;
+	z-index: 1;
 }
 
 .lp-email-capture__form {

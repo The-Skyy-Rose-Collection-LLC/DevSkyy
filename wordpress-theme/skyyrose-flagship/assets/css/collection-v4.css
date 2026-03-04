@@ -1222,6 +1222,78 @@
 	.col-hero__meta { flex-wrap: wrap; gap: 16px; }
 }
 
+@media (max-width: 480px) {
+	.col-hero__content { padding: 0 16px 36px; }
+	.col-hero__title { font-size: clamp(24px, 7vw, 36px); letter-spacing: 2px; }
+	.col-mf__title { font-size: 22px; }
+	.col-mf__text { padding: 36px 16px; }
+	.col-catalog { padding: 48px 12px; }
+	.col-nl { padding: 60px 12px; }
+	.col-nl__title { font-size: 28px; letter-spacing: 3px; }
+	.col-modal__body { padding: 24px 20px; }
+	.col-modal__name { font-size: 20px; letter-spacing: 2px; }
+	.col-modal__price { font-size: 28px; letter-spacing: 3px; }
+	.col-modal__desc { font-size: 14px; }
+	.col-modal__actions { flex-direction: column; }
+	.col-crossnav { padding: 24px 16px; }
+}
+
+/* ==================================================
+   FOCUS VISIBLE — Keyboard Accessibility
+   ================================================== */
+
+.col-hero__cta:focus-visible,
+.col-feat__add:focus-visible,
+.col-nl__btn:focus-visible,
+.col-modal__add:focus-visible,
+.col-modal__back:focus-visible {
+	outline: 2px solid var(--col-accent, #C0C0C0);
+	outline-offset: 3px;
+}
+
+.col-modal__close:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 2px;
+}
+
+.col-modal__sz:focus-visible {
+	outline: 2px solid var(--col-accent, #C0C0C0);
+	outline-offset: 1px;
+}
+
+.col-card:focus-visible {
+	outline: 2px solid var(--col-accent, #C0C0C0);
+	outline-offset: 2px;
+	border-color: var(--col-accent, #C0C0C0);
+}
+
+.col-toolbar__select:focus-visible,
+.col-toolbar__range input:focus-visible {
+	outline: 2px solid var(--col-accent, #C0C0C0);
+	outline-offset: 1px;
+}
+
+.col-wishlist-btn:focus-visible {
+	outline: 2px solid var(--col-accent, #C0C0C0);
+	outline-offset: 2px;
+}
+
+.col-crossnav__link:focus-visible,
+.col-immersive-cta a:focus-visible {
+	outline: 2px solid var(--col-accent, #C0C0C0);
+	outline-offset: 3px;
+}
+
+/* Global catch-all for any missed interactive elements */
+.col-page a:focus-visible,
+.col-page button:focus-visible,
+.col-page input:focus-visible,
+.col-page select:focus-visible,
+.col-page [tabindex]:focus-visible {
+	outline: 2px solid var(--col-accent, #C0C0C0);
+	outline-offset: 2px;
+}
+
 /* ==================================================
    REDUCED MOTION
    ================================================== */

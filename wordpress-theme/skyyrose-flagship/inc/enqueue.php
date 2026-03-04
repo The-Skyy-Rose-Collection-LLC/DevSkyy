@@ -239,6 +239,18 @@ function skyyrose_enqueue_global_scripts() {
 		);
 	}
 
+	// Scroll enhancements — progress indicator + back-to-top button (v4.0.0 S6 bonus).
+	$scroll_js = SKYYROSE_DIR . '/assets/js/scroll-enhancements.js';
+	if ( file_exists( $scroll_js ) && ! is_admin() ) {
+		wp_enqueue_script(
+			'skyyrose-scroll-enhancements',
+			SKYYROSE_ASSETS_URI . '/js/scroll-enhancements.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+
 	// Exit-intent overlay — captures abandoning visitors with newsletter/pre-order CTA (v4.0.0 S2 bonus).
 	$exit_css = SKYYROSE_DIR . '/assets/css/exit-intent.css';
 	if ( file_exists( $exit_css ) && ! is_admin() ) {
@@ -1015,6 +1027,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-template-collection-v4',
 		'skyyrose-progressive-images',
 		'skyyrose-smart-prefetch',
+		'skyyrose-scroll-enhancements',
 		'skyyrose-exit-intent',
 		'skyyrose-urgency-banner',
 		'skyyrose-template-single-product',

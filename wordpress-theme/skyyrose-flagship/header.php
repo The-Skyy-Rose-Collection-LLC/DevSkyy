@@ -34,11 +34,11 @@
 				<div class="navbar__brand">
 					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="navbar__logo-link" rel="home" aria-label="<?php esc_attr_e( 'SkyyRose Home', 'skyyrose-flagship' ); ?>">
 						<img
-							src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/sr-monogram.png' ); ?>"
+							src="<?php echo esc_url( get_template_directory_uri() . '/assets/branding/skyyrose-monogram-nav.webp' ); ?>"
 							alt="<?php esc_attr_e( 'SR Monogram', 'skyyrose-flagship' ); ?>"
 							class="navbar__monogram"
-							width="48"
-							height="48"
+							width="50"
+							height="50"
 							loading="eager"
 							fetchpriority="high"
 							decoding="async"

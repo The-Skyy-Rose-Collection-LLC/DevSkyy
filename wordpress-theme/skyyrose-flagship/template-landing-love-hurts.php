@@ -366,6 +366,8 @@ get_header();
      SECTION 8: EMAIL CAPTURE
      ════════════════════════════════════════════════ -->
 <section class="lp-email-capture" aria-label="Newsletter Signup">
+	<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/branding/love-hurts-logo-hero-transparent.png' ); ?>"
+		alt="" aria-hidden="true" class="lp-email-capture__bg-logo" loading="lazy">
 	<div class="lp-eyebrow rv">Stay Connected</div>
 	<h2 class="lp-heading rv rv-d1">New Stories Drop Monthly</h2>
 

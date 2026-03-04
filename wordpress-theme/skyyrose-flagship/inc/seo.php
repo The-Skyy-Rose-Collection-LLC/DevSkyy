@@ -646,3 +646,26 @@ function skyyrose_collection_schema() {
 	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-encoded with JSON_HEX_TAG preventing script injection.
 }
 add_action( 'wp_head', 'skyyrose_collection_schema' );
+
+/**
+ * Output favicon and touch icon tags.
+ *
+ * Uses the SR monogram favicon from the theme's assets. WordPress's
+ * Site Icon customizer setting takes priority if configured — this
+ * serves as the theme-level fallback.
+ *
+ * @since 4.0.0
+ */
+function skyyrose_favicon_tags() {
+	// Skip if the user has set a Site Icon via Customizer.
+	if ( has_site_icon() ) {
+		return;
+	}
+
+	$uri = get_template_directory_uri();
+	?>
+	<link rel="icon" type="image/png" sizes="32x32" href="<?php echo esc_url( $uri . '/assets/images/sr-monogram-favicon.png' ); ?>">
+	<link rel="apple-touch-icon" sizes="180x180" href="<?php echo esc_url( $uri . '/assets/branding/skyyrose-monogram-footer.webp' ); ?>">
+	<?php
+}
+add_action( 'wp_head', 'skyyrose_favicon_tags', 2 );

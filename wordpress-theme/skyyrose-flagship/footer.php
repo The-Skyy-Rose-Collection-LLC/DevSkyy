@@ -236,6 +236,18 @@
 <div class="luxury-cursor-dot" aria-hidden="true"></div>
 <div class="luxury-cursor-trail" aria-hidden="true"></div>
 
+<!-- Scroll Progress Indicator -->
+<div class="sr-scroll-progress" aria-hidden="true">
+	<div class="sr-scroll-progress__bar"></div>
+</div>
+
+<!-- Back to Top -->
+<button class="sr-back-to-top" aria-label="<?php esc_attr_e( 'Back to top', 'skyyrose-flagship' ); ?>" type="button">
+	<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+		<polyline points="18 15 12 9 6 15"/>
+	</svg>
+</button>
+
 <?php wp_footer(); ?>
 
 </body>
