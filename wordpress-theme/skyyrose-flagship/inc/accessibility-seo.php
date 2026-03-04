@@ -65,6 +65,27 @@ function skyyrose_nav_menu_aria_labels( $args ) {
 add_filter( 'wp_nav_menu_args', 'skyyrose_nav_menu_aria_labels' );
 
 /**
+ * Add ARIA role="menuitem" to navigation menu link attributes.
+ *
+ * Enhances accessibility by providing semantic meaning to menu item links
+ * for assistive technologies. Per WordPress developer docs (Context7):
+ * the `nav_menu_link_attributes` filter modifies `<a>` attributes in menus.
+ *
+ * @since 4.0.0
+ *
+ * @param array    $atts  Link attributes (href, title, target, rel, etc.).
+ * @param WP_Post  $item  The current menu item object.
+ * @param stdClass $args  Menu arguments from wp_nav_menu().
+ * @param int      $depth Depth of the menu item (0 = top-level).
+ * @return array Modified attributes with role="menuitem".
+ */
+function skyyrose_add_menuitem_role( $atts, $item, $args, $depth ) {
+	$atts['role'] = 'menuitem';
+	return $atts;
+}
+add_filter( 'nav_menu_link_attributes', 'skyyrose_add_menuitem_role', 10, 4 );
+
+/**
  * Enqueue accessibility JavaScript file.
  *
  * @since 1.0.0

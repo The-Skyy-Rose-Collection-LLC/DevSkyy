@@ -128,7 +128,7 @@ while ( have_posts() ) :
 							     alt="<?php echo esc_attr( $product->get_name() ); ?>"
 							     class="sr-gallery-img sr-gallery-active"
 							     id="srMainImg"
-							     loading="eager">
+							     loading="eager" fetchpriority="high" decoding="async">
 						<?php else : ?>
 							<div class="sr-gallery-placeholder">
 								<span class="sr-gallery-letter"><?php echo esc_html( mb_substr( $product->get_name(), 0, 1 ) ); ?></span>

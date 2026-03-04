@@ -33,10 +33,10 @@ $skyyrose_collections = array(
 	array(
 		'slug'        => 'signature',
 		'label'       => __( 'Signature', 'skyyrose-flagship' ),
-		'accent'      => '#B76E79',
-		'glow'        => 'rgba(183, 110, 121, 0.3)',
+		'accent'      => '#D4AF37',
+		'glow'        => 'rgba(212, 175, 55, 0.3)',
 		'tagline'     => __( 'Elevated, confident, refined', 'skyyrose-flagship' ),
-		'description' => __( 'Rose gold and gold luxe essentials that define the brand.', 'skyyrose-flagship' ),
+		'description' => __( 'Gold luxe essentials for building the foundation wardrobe.', 'skyyrose-flagship' ),
 	),
 	array(
 		'slug'        => 'kids-capsule',
