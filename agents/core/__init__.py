@@ -52,6 +52,11 @@ try:
 except ImportError as _e:
     _logger.debug("Orchestrator unavailable: %s", _e)
 
+try:
+    from .shared.wp_ai_bridge import WordPressAIBridge
+except ImportError as _e:
+    _logger.debug("WordPressAIBridge unavailable: %s", _e)
+
 __all__ = [
     # Base
     "SelfHealingMixin",
@@ -67,4 +72,6 @@ __all__ = [
     "HealResult",
     "HealCycleResult",
     "HealthStatus",
+    # Shared capabilities
+    "WordPressAIBridge",
 ]

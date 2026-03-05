@@ -35,6 +35,21 @@ class AnalyticsCoreAgent(CoreAgent):
     def __init__(self, *, correlation_id: str | None = None, **kwargs: Any) -> None:
         super().__init__(correlation_id=correlation_id, **kwargs)
         self._legacy_agent: Any = None
+        self._register_sub_agents()
+
+    def _register_sub_agents(self) -> None:
+        """Auto-register consolidated sub-agents with aliases."""
+        try:
+            from agents.core.analytics.sub_agents.analytics_ops import (
+                AnalyticsOpsSubAgent,
+            )
+
+            agent = AnalyticsOpsSubAgent()
+            self.register_sub_agent("analytics_ops", agent)
+            for alias in AnalyticsOpsSubAgent.ALIASES:
+                self.register_sub_agent(alias, agent)
+        except ImportError:
+            logger.debug("[%s] AnalyticsOpsSubAgent unavailable", self.name)
 
     def _get_legacy_agent(self) -> Any:
         if self._legacy_agent is None:

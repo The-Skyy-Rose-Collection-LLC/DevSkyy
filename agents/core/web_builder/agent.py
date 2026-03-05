@@ -49,6 +49,19 @@ class WebBuilderCoreAgent(CoreAgent):
     def __init__(self, *, correlation_id: str | None = None, **kwargs: Any) -> None:
         super().__init__(correlation_id=correlation_id, **kwargs)
         self._director: Any = None
+        self._register_sub_agents()
+
+    def _register_sub_agents(self) -> None:
+        """Auto-register consolidated web dev sub-agent with aliases."""
+        try:
+            from agents.core.web_builder.sub_agents.web_dev import WebDevSubAgent
+
+            agent = WebDevSubAgent()
+            self.register_sub_agent("web_dev", agent)
+            for alias in WebDevSubAgent.ALIASES:
+                self.register_sub_agent(alias, agent)
+        except ImportError:
+            logger.debug("[%s] WebDevSubAgent unavailable", self.name)
 
     def _get_director(self) -> Any:
         """Lazy-load the Elite Web Builder Director."""

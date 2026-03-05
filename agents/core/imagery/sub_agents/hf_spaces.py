@@ -10,13 +10,10 @@ Capabilities: HF Spaces orchestration, quota management, health checks.
 
 from __future__ import annotations
 
-import logging
 from typing import Any
 
 from agents.core.base import CoreAgentType
 from agents.core.sub_agent import SubAgent
-
-logger = logging.getLogger(__name__)
 
 
 class HfSpacesSubAgent(SubAgent):
@@ -31,26 +28,16 @@ class HfSpacesSubAgent(SubAgent):
         "health_check",
     ]
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
-        self._legacy_orchestrator: Any = None
-
-    def _get_legacy(self) -> Any:
-        if self._legacy_orchestrator is None:
-            try:
-                from agents.skyyrose_spaces_orchestrator import SpacesOrchestrator
-
-                self._legacy_orchestrator = SpacesOrchestrator()
-            except (ImportError, AttributeError):
-                logger.warning("[%s] Legacy SpacesOrchestrator unavailable", self.name)
-        return self._legacy_orchestrator
+    system_prompt = (
+        "You are the HuggingFace Spaces orchestrator for SkyyRose/DevSkyy. "
+        "You manage GPU-accelerated inference spaces for image generation, VTON, "
+        "and 3D model creation. You handle quota management, space health checks, "
+        "and workload routing across HF Spaces. Return structured orchestration "
+        "plans with space IDs, GPU requirements, and fallback strategies."
+    )
 
     async def execute(self, task: str, **kwargs: Any) -> dict[str, Any]:
-        legacy = self._get_legacy()
-        if legacy and hasattr(legacy, "execute"):
-            result = await legacy.execute(task, **kwargs)
-            return {"success": True, "result": result}
-        return {"success": False, "error": "SpacesOrchestrator not available"}
+        return await self._llm_execute(task)
 
 
 __all__ = ["HfSpacesSubAgent"]

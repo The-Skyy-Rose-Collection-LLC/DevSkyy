@@ -48,32 +48,32 @@ $origin_paragraphs = array(
  *--------------------------------------------------------------*/
 $brand_values = array(
 	array(
-		'icon'  => '&#9830;',
+		'icon'  => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
 		'title' => __( 'Gender-Neutral Pioneer', 'skyyrose-flagship' ),
 		'text'  => __( 'One of the first Bay Area brands to design clothing that transcends gender and age. Fashion without boundaries &mdash; for anyone with taste.', 'skyyrose-flagship' ),
 	),
 	array(
-		'icon'  => '&#10022;',
+		'icon'  => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
 		'title' => __( 'Oakland Authenticity', 'skyyrose-flagship' ),
 		'text'  => __( 'Culture created, not imported. Every piece carries the resilience of the Town &mdash; where beauty and grit coexist without apology.', 'skyyrose-flagship' ),
 	),
 	array(
-		'icon'  => '&#9829;',
+		'icon'  => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
 		'title' => __( 'Family at the Core', 'skyyrose-flagship' ),
 		'text'  => __( 'Named after a daughter. Built by a father. &ldquo;Hurts&rdquo; is our family name. This brand isn&rsquo;t a business strategy &mdash; it&rsquo;s a bloodline.', 'skyyrose-flagship' ),
 	),
 	array(
-		'icon'  => '&#9733;',
+		'icon'  => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
 		'title' => __( 'Quality Over Quantity', 'skyyrose-flagship' ),
 		'text'  => __( 'Every garment is crafted with meticulous attention to detail. This isn&rsquo;t fast fashion. This is armor &mdash; designed to last and built to make a statement.', 'skyyrose-flagship' ),
 	),
 	array(
-		'icon'  => '&#9650;',
+		'icon'  => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><path d="M12 2v1"/></svg>',
 		'title' => __( 'Black-Owned, Community Built', 'skyyrose-flagship' ),
 		'text'  => __( 'A source of pride and inspiration for Oakland. Representing cultural heritage and future potential in every stitch.', 'skyyrose-flagship' ),
 	),
 	array(
-		'icon'  => '&#8962;',
+		'icon'  => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
 		'title' => __( 'Integrity Over Shortcuts', 'skyyrose-flagship' ),
 		'text'  => __( 'Where many in the community were led astray, Corey chose the harder path. Every decision reflects the values he&rsquo;s teaching his daughter.', 'skyyrose-flagship' ),
 	),

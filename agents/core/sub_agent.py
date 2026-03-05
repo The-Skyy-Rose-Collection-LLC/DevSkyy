@@ -9,6 +9,7 @@ Sub-agents:
 - Self-heal independently (3 attempts)
 - Escalate to their parent core agent on failure
 - Report health back to the core agent
+- Call LLMs via _llm_execute() (routes through UnifiedLLMClient)
 
 Example:
     class SocialMediaSubAgent(SubAgent):
@@ -16,8 +17,7 @@ Example:
         parent_type = CoreAgentType.MARKETING
 
         async def execute(self, task, **kwargs):
-            # ... post scheduling, engagement tracking, etc.
-            return {"success": True, "posts_scheduled": 5}
+            return await self._llm_execute(task, system_prompt="You are a social media expert.")
 """
 
 from __future__ import annotations
@@ -32,6 +32,19 @@ from .base import CoreAgentType, SelfHealingMixin
 
 logger = logging.getLogger(__name__)
 
+# Lazy-initialized singleton
+_llm_client: Any = None
+
+
+def _get_llm_client():
+    """Lazy-initialize UnifiedLLMClient singleton."""
+    global _llm_client
+    if _llm_client is None:
+        from llm.unified_llm_client import UnifiedLLMClient
+
+        _llm_client = UnifiedLLMClient()
+    return _llm_client
+
 
 class SubAgent(SelfHealingMixin):
     """
@@ -42,6 +55,7 @@ class SubAgent(SelfHealingMixin):
     - Has a specific capability within the domain
     - Self-heals independently before escalating
     - Can be swapped out by the parent if circuit breaker opens
+    - Calls LLMs via _llm_execute() with automatic routing
 
     Subclasses must implement:
     - execute(task, **kwargs) → dict[str, Any]
@@ -57,6 +71,9 @@ class SubAgent(SelfHealingMixin):
     capabilities: list[str] = []
     description: str = ""
 
+    # Override in subclass to set a default system prompt for LLM calls
+    system_prompt: str = ""
+
     def __init__(
         self,
         *,
@@ -67,6 +84,87 @@ class SubAgent(SelfHealingMixin):
         self.parent = parent
         self.correlation_id = correlation_id
         self.__init_healing__()
+
+    # -------------------------------------------------------------------------
+    # LLM Execution (available to all sub-agents)
+    # -------------------------------------------------------------------------
+
+    async def _llm_execute(
+        self,
+        task: str,
+        *,
+        system_prompt: str | None = None,
+        temperature: float = 0.7,
+        max_tokens: int = 2048,
+        execution_mode: str = "balanced",
+        preferred_provider: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        Execute an LLM call via UnifiedLLMClient.
+
+        All sub-agents can use this to make real LLM calls with:
+        - Automatic provider routing (Anthropic → OpenAI → Google fallback)
+        - Task classification & prompt technique selection
+        - Circuit breaker per provider
+        - Cost optimization
+
+        Args:
+            task: The user-facing task/prompt.
+            system_prompt: Override the class-level system_prompt.
+            temperature: Sampling temperature (0.0 - 2.0).
+            max_tokens: Max output tokens.
+            execution_mode: "fast", "balanced", or "round_table".
+            preferred_provider: Force a specific provider.
+
+        Returns:
+            {"success": True, "result": "...", "provider": "...", "model": "...", ...}
+        """
+        from llm.base import Message, ModelProvider
+        from llm.unified_llm_client import ExecutionMode, LLMRequest
+
+        client = _get_llm_client()
+
+        sys = system_prompt or self.system_prompt
+        messages = []
+        if sys:
+            messages.append(Message.system(sys))
+        messages.append(Message.user(task))
+
+        # Map string to enum
+        mode_map = {
+            "fast": ExecutionMode.FAST,
+            "balanced": ExecutionMode.BALANCED,
+            "round_table": ExecutionMode.ROUND_TABLE,
+        }
+
+        provider = None
+        if preferred_provider:
+            try:
+                provider = ModelProvider(preferred_provider)
+            except ValueError:
+                pass
+
+        request = LLMRequest(
+            messages=messages,
+            task_description=task,
+            execution_mode=mode_map.get(execution_mode, ExecutionMode.BALANCED),
+            preferred_provider=provider,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            correlation_id=self.correlation_id,
+        )
+
+        response = await client.complete(request)
+
+        return {
+            "success": True,
+            "result": response.content,
+            "provider": response.provider_used.value,
+            "model": response.model_used,
+            "technique": response.technique_used.value if response.technique_used else None,
+            "latency_ms": response.total_latency_ms,
+            "agent": self.name,
+        }
 
     @abstractmethod
     async def execute(self, task: str, **kwargs: Any) -> dict[str, Any]:

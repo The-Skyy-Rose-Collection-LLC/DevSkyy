@@ -36,6 +36,39 @@ class OperationsCoreAgent(CoreAgent):
     def __init__(self, *, correlation_id: str | None = None, **kwargs: Any) -> None:
         super().__init__(correlation_id=correlation_id, **kwargs)
         self._legacy_agent: Any = None
+        self._register_sub_agents()
+
+    def _register_sub_agents(self) -> None:
+        """Auto-register consolidated sub-agents with aliases."""
+        try:
+            from agents.core.operations.sub_agents.deploy_health import (
+                DeployHealthSubAgent,
+            )
+
+            agent = DeployHealthSubAgent()
+            self.register_sub_agent("deploy_health", agent)
+            for alias in DeployHealthSubAgent.ALIASES:
+                self.register_sub_agent(alias, agent)
+        except ImportError:
+            logger.debug("[%s] DeployHealthSubAgent unavailable", self.name)
+
+        try:
+            from agents.core.operations.sub_agents.security_monitor import (
+                SecurityMonitorSubAgent,
+            )
+
+            self.register_sub_agent("security_monitor", SecurityMonitorSubAgent())
+        except ImportError:
+            logger.debug("[%s] SecurityMonitorSubAgent unavailable", self.name)
+
+        try:
+            from agents.core.operations.sub_agents.coding_doctor import (
+                CodingDoctorSubAgent,
+            )
+
+            self.register_sub_agent("coding_doctor", CodingDoctorSubAgent())
+        except ImportError:
+            logger.debug("[%s] CodingDoctorSubAgent unavailable", self.name)
 
     def _get_legacy_agent(self) -> Any:
         if self._legacy_agent is None:

@@ -35,6 +35,30 @@ class ContentCoreAgent(CoreAgent):
     def __init__(self, *, correlation_id: str | None = None, **kwargs: Any) -> None:
         super().__init__(correlation_id=correlation_id, **kwargs)
         self._legacy_agent: Any = None
+        self._register_sub_agents()
+
+    def _register_sub_agents(self) -> None:
+        """Auto-register consolidated sub-agents with aliases."""
+        try:
+            from agents.core.content.sub_agents.collection_content import (
+                CollectionContentSubAgent,
+            )
+
+            self.register_sub_agent("collection_content", CollectionContentSubAgent())
+        except ImportError:
+            logger.debug("[%s] CollectionContentSubAgent unavailable", self.name)
+
+        try:
+            from agents.core.content.sub_agents.seo_copywriter import (
+                SeoCopywriterSubAgent,
+            )
+
+            agent = SeoCopywriterSubAgent()
+            self.register_sub_agent("seo_copywriter", agent)
+            for alias in SeoCopywriterSubAgent.ALIASES:
+                self.register_sub_agent(alias, agent)
+        except ImportError:
+            logger.debug("[%s] SeoCopywriterSubAgent unavailable", self.name)
 
     def _get_legacy_agent(self) -> Any:
         if self._legacy_agent is None:

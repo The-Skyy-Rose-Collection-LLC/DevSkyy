@@ -10,13 +10,10 @@ Capabilities: Vulnerability scanning, dependency updates, compliance reporting.
 
 from __future__ import annotations
 
-import logging
 from typing import Any
 
 from agents.core.base import CoreAgentType
 from agents.core.sub_agent import SubAgent
-
-logger = logging.getLogger(__name__)
 
 
 class SecurityMonitorSubAgent(SubAgent):
@@ -32,26 +29,16 @@ class SecurityMonitorSubAgent(SubAgent):
         "auto_patch",
     ]
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
-        self._legacy_agent: Any = None
-
-    def _get_legacy(self) -> Any:
-        if self._legacy_agent is None:
-            try:
-                from agents.security_ops_agent import SecurityOpsAgent
-
-                self._legacy_agent = SecurityOpsAgent()
-            except ImportError:
-                logger.warning("[%s] Legacy SecurityOpsAgent unavailable", self.name)
-        return self._legacy_agent
+    system_prompt = (
+        "You are the Security Operations specialist for SkyyRose/DevSkyy. "
+        "You scan for vulnerabilities (OWASP Top 10), audit dependencies, "
+        "check compliance (PCI-DSS for e-commerce, GDPR for EU customers), "
+        "and recommend security patches. Return findings with severity levels "
+        "(CRITICAL/HIGH/MEDIUM/LOW) and remediation steps."
+    )
 
     async def execute(self, task: str, **kwargs: Any) -> dict[str, Any]:
-        legacy = self._get_legacy()
-        if legacy and hasattr(legacy, "execute"):
-            result = await legacy.execute(task, **kwargs)
-            return {"success": True, "result": result}
-        return {"success": False, "error": "SecurityOpsAgent not available"}
+        return await self._llm_execute(task)
 
 
 __all__ = ["SecurityMonitorSubAgent"]

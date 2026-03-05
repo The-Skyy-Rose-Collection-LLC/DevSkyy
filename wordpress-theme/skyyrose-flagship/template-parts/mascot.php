@@ -107,19 +107,19 @@ if ( file_exists( $skyyrose_mascot_dir . $skyyrose_context_file ) ) {
 			<!-- Dynamic content based on page context -->
 			<div class="skyyrose-mascot__actions">
 				<a href="<?php echo esc_url( home_url( '/shop/' ) ); ?>" class="skyyrose-mascot__action">
-					<span class="skyyrose-mascot__action-icon">&#x1f6cd;</span>
+					<span class="skyyrose-mascot__action-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
 					<span><?php esc_html_e( 'Shop Collections', 'skyyrose-flagship' ); ?></span>
 				</a>
 				<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="skyyrose-mascot__action skyyrose-mascot__action--highlight">
-					<span class="skyyrose-mascot__action-icon">&#x2728;</span>
+					<span class="skyyrose-mascot__action-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
 					<span><?php esc_html_e( 'Pre-Order Now', 'skyyrose-flagship' ); ?></span>
 				</a>
 				<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="skyyrose-mascot__action">
-					<span class="skyyrose-mascot__action-icon">&#x1f4ac;</span>
+					<span class="skyyrose-mascot__action-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
 					<span><?php esc_html_e( 'Get Help', 'skyyrose-flagship' ); ?></span>
 				</a>
 				<a href="<?php echo esc_url( home_url( '/about/' ) ); ?>" class="skyyrose-mascot__action">
-					<span class="skyyrose-mascot__action-icon">&#x1f48e;</span>
+					<span class="skyyrose-mascot__action-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
 					<span><?php esc_html_e( 'Our Story', 'skyyrose-flagship' ); ?></span>
 				</a>
 			</div>

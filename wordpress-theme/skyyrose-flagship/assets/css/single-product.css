@@ -518,7 +518,7 @@
 .sr-accordion-icon {
     font-family: 'Space Mono', monospace;
     font-size: 16px;
-    color: rgba(var(--sr-accent-rgb), .3);
+    color: rgba(var(--sr-accent-rgb), .5);
     transition: color .3s;
 }
 
@@ -535,7 +535,7 @@
 }
 
 .sr-accordion-content.sr-accordion-open {
-    max-height: 600px;
+    max-height: 2000px;
     padding: 0 0 28px;
 }
 

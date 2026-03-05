@@ -12,13 +12,10 @@ Self-Healing: Provider failover chain (FASHN → WeShopAI → IDM-VTON).
 
 from __future__ import annotations
 
-import logging
 from typing import Any
 
 from agents.core.base import CoreAgentType, FailureCategory, HealResult
 from agents.core.sub_agent import SubAgent
-
-logger = logging.getLogger(__name__)
 
 
 class FashnVtonSubAgent(SubAgent):
@@ -33,26 +30,16 @@ class FashnVtonSubAgent(SubAgent):
         "model_pose",
     ]
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
-        self._legacy_agent: Any = None
-
-    def _get_legacy(self) -> Any:
-        if self._legacy_agent is None:
-            try:
-                from agents.fashn_agent import FashnTryOnAgent
-
-                self._legacy_agent = FashnTryOnAgent()
-            except ImportError:
-                logger.warning("[%s] Legacy FashnTryOnAgent unavailable", self.name)
-        return self._legacy_agent
+    system_prompt = (
+        "You are the Virtual Try-On specialist for SkyyRose luxury fashion. "
+        "You orchestrate FASHN API calls for garment-on-model compositing, "
+        "with failover to WeShopAI and IDM-VTON. You handle pose selection, "
+        "garment segmentation parameters, and output quality settings. "
+        "Return structured API call plans with parameters and fallback strategies."
+    )
 
     async def execute(self, task: str, **kwargs: Any) -> dict[str, Any]:
-        legacy = self._get_legacy()
-        if legacy and hasattr(legacy, "execute"):
-            result = await legacy.execute(task, **kwargs)
-            return {"success": True, "result": result}
-        return {"success": False, "error": "FashnTryOnAgent not available"}
+        return await self._llm_execute(task)
 
     async def _apply_fix(self, diagnosis: Any) -> HealResult:
         """Provider failover: FASHN → WeShopAI → IDM-VTON."""

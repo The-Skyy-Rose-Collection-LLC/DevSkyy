@@ -41,6 +41,7 @@ $GLOBALS['concatenate_scripts'] = false;
  * Core Includes (always loaded)
  *--------------------------------------------------------------*/
 $skyyrose_core_includes = array(
+	'/inc/ai-providers.php',
 	'/inc/theme-setup.php',
 	'/inc/product-catalog.php',
 	'/inc/enqueue.php',

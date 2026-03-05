@@ -32,10 +32,20 @@
 	--dark-gray: #333333;
 	--black: #000000;
 
-	/* Typography */
+	/* Typography — Parent Brand */
 	--font-heading: 'Playfair Display', Georgia, serif;
-	--font-body: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+	--font-body: 'Cormorant Garamond', Georgia, serif;
 	--font-accent: 'Playfair Display', Georgia, serif;
+	--font-mono: 'Space Mono', 'Courier New', monospace;
+	--font-nav: 'Space Mono', 'Courier New', monospace;
+
+	/* Typography — Sub-Brand Fonts (applied via collection-colors.css) */
+	--font-love-hurts-display: 'Oswald', 'Arial Narrow', sans-serif;
+	--font-love-hurts-body: 'Barlow', 'Helvetica Neue', sans-serif;
+	--font-black-rose-display: 'Cinzel', 'Times New Roman', serif;
+	--font-black-rose-body: 'Cormorant', 'Cormorant Garamond', Georgia, serif;
+	--font-signature-display: 'Cormorant Garamond', Georgia, serif;
+	--font-signature-body: 'Cormorant Garamond', Georgia, serif;
 
 	/* Font Weights */
 	--weight-light: 300;

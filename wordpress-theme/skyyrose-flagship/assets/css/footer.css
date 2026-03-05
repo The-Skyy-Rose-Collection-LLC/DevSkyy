@@ -200,7 +200,7 @@
 
 .footer-copyright__text {
 	font-size: 0.8125rem;
-	color: rgba(255, 255, 255, 0.3);
+	color: rgba(255, 255, 255, 0.5);
 	margin: 0;
 }
 
@@ -216,7 +216,7 @@
 
 .footer-copyright__menu a {
 	font-size: 0.75rem;
-	color: rgba(255, 255, 255, 0.3);
+	color: rgba(255, 255, 255, 0.5);
 	text-decoration: none;
 	transition: color 0.2s ease;
 }

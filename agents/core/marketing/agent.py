@@ -35,6 +35,30 @@ class MarketingCoreAgent(CoreAgent):
     def __init__(self, *, correlation_id: str | None = None, **kwargs: Any) -> None:
         super().__init__(correlation_id=correlation_id, **kwargs)
         self._legacy_agent: Any = None
+        self._register_sub_agents()
+
+    def _register_sub_agents(self) -> None:
+        """Auto-register consolidated sub-agents with aliases."""
+        try:
+            from agents.core.marketing.sub_agents.social_media import (
+                SocialMediaSubAgent,
+            )
+
+            self.register_sub_agent("social_media", SocialMediaSubAgent())
+        except ImportError:
+            logger.debug("[%s] SocialMediaSubAgent unavailable", self.name)
+
+        try:
+            from agents.core.marketing.sub_agents.campaign_ops import (
+                CampaignOpsSubAgent,
+            )
+
+            agent = CampaignOpsSubAgent()
+            self.register_sub_agent("campaign_ops", agent)
+            for alias in CampaignOpsSubAgent.ALIASES:
+                self.register_sub_agent(alias, agent)
+        except ImportError:
+            logger.debug("[%s] CampaignOpsSubAgent unavailable", self.name)
 
     def _get_legacy_agent(self) -> Any:
         if self._legacy_agent is None:

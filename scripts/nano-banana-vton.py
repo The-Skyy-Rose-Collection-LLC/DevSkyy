@@ -44,6 +44,7 @@ PRODUCTS_DIR = (
 )
 
 MODEL_ID = "gemini-2.5-flash-image"
+IMAGEN_MODEL_ID = "imagen-4.0-ultra-generate-001"
 MIN_FILE_SIZE_KB = 50
 MAX_RETRIES = 3
 RETRY_DELAY_SEC = 5
@@ -51,7 +52,7 @@ RETRY_DELAY_SEC = 5
 # -- Product catalog ---------------------------------------------------------
 
 PRODUCT_CATALOG = {
-    "br-001": {"name": "BLACK Rose Crewneck", "collection": "black-rose"},
+    "br-001": {"name": "BLACK Rose Crewneck Set", "collection": "black-rose", "source_override": "br-001-techflat-v4.jpg"},
     "br-002": {"name": "BLACK Rose Joggers", "collection": "black-rose", "source_override": "br-002-joggers-source.jpg"},
     "br-003": {"name": "BLACK is Beautiful Jersey", "collection": "black-rose"},
     "br-004": {"name": "BLACK Rose Hoodie", "collection": "black-rose", "source_override": "br-004-hoodie-source.jpg"},
@@ -82,21 +83,37 @@ PRODUCT_CATALOG = {
     },
     "lh-001": {"name": "The Fannie Pack", "collection": "love-hurts"},
     "lh-002": {"name": "Love Hurts Joggers (Black)", "collection": "love-hurts"},
-    "lh-003": {"name": "Love Hurts Basketball Shorts", "collection": "love-hurts"},
+    "lh-003": {"name": "Love Hurts Track Pants", "collection": "love-hurts", "source_override": "lh-003-techflat-v4.jpg"},
     "lh-004": {"name": "Love Hurts Varsity Jacket", "collection": "love-hurts"},
     "lh-005": {"name": "Love Hurts Windbreaker", "collection": "love-hurts"},
     "sg-001": {"name": "The Bay Set", "collection": "signature"},
-    "sg-002": {"name": "Stay Golden Set", "collection": "signature"},
+    "sg-002": {"name": "Signature Purple Rose Tee + Bridge Shorts Set", "collection": "signature", "source_override": "sg-002-techflat-v4.jpg"},
     "sg-003": {"name": "The Signature Tee (Orchid)", "collection": "signature"},
     "sg-004": {"name": "Signature Tee (White)", "collection": "signature"},
     "sg-005": {"name": "Stay Golden Tee", "collection": "signature"},
     "sg-006": {"name": "Mint & Lavender Hoodie", "collection": "signature"},
-    "sg-007": {"name": "The Signature Beanie (Red)", "collection": "signature"},
+    "sg-007": {"name": "The Signature Beanie (Black)", "collection": "signature", "source_override": "sg-007-techflat-v4.jpg"},
     "sg-008": {"name": "The Signature Beanie", "collection": "signature"},
     "sg-009": {"name": "The Sherpa Jacket", "collection": "signature"},
     "sg-010": {"name": "The Bridge Series Shorts", "collection": "signature"},
     "sg-011": {"name": "Original Label Tee (White)", "collection": "signature"},
     "sg-012": {"name": "Original Label Tee (Orchid)", "collection": "signature"},
+    # New SG design mockups
+    "sg-d01": {
+        "name": "Pastel V-Chevron Windbreaker Set",
+        "collection": "signature",
+        "source_override": "sg-d01-techflat-v4.jpg",
+    },
+    "sg-d03": {
+        "name": "Mint Green Crewneck Set",
+        "collection": "signature",
+        "source_override": "sg-d03-techflat-v4.jpg",
+    },
+    "sg-d04": {
+        "name": "Mint Green Hooded Dress",
+        "collection": "signature",
+        "source_override": "sg-d04-techflat-v4.jpg",
+    },
 }
 
 # SKUs that are accessories (not wearable on a model's body)
@@ -105,13 +122,154 @@ ACCESSORY_SKUS = {"lh-001", "sg-007", "sg-008"}
 # SKUs with known bad source images (AI-generated VTON or wrong product photo).
 # These are skipped by default. Remove a SKU once a real flat-lay photo is available.
 BAD_SOURCE_SKUS = {
-    "br-001",   # Source is a beanie, should be crewneck
-    "lh-003",   # Source is AI-generated VTON (not flat-lay)
-    "sg-002",   # Source is AI-generated VTON (not flat-lay)
     "sg-003",   # Source is AI-generated VTON (not flat-lay)
     "sg-004",   # Source shows blue shorts, should be white tee
     "sg-008",   # Source shows crop hoodie, should be beanie
 }
+# Fixed in v4: br-001, lh-003, sg-002, sg-007 now have proper tech flat overrides
+
+# -- Imagen 4 Ultra: text-heavy product descriptions -------------------------
+# These products have prominent text ("BLACK IS BEAUTIFUL") that Gemini drops.
+# Imagen Ultra renders text accurately from pure text prompts (no reference img).
+
+TEXT_HEAVY_SKUS = {"br-003", "br-d01", "br-d02", "br-d03", "br-d04"}
+
+IMAGEN_PRODUCT_DESCRIPTIONS = {
+    "br-003": {
+        "garment": "baseball jersey",
+        "details": (
+            "A luxury streetwear baseball jersey in San Francisco Giants style. "
+            "Primary color: black body. Orange and cream pinstripe details. "
+            "Large white text 'BLACK IS BEAUTIFUL' across the chest in bold "
+            "block sports lettering. Black Rose Collection 'BR' monogram logo "
+            "on the left chest. Full button-down front. Rose gold (#B76E79) "
+            "accent stitching. Black sleeves with orange trim."
+        ),
+        "back_details": (
+            "Back of a black baseball jersey (San Francisco Giants style). "
+            "The body color is black with orange pinstripe accents. "
+            "Large white text 'BLACK IS BEAUTIFUL' across the upper back "
+            "in bold block lettering. Large white number below the text. "
+            "Rose gold (#B76E79) accent details. Black Rose Collection logo "
+            "between the shoulder blades. Orange trim on sleeves."
+        ),
+    },
+    "br-d01": {
+        "garment": "ice hockey jersey",
+        "details": (
+            "A luxury streetwear ice hockey jersey. Primary color: teal/dark cyan "
+            "body. V-neck collar with black and white striping. Bold white text "
+            "'BLACK IS BEAUTIFUL' across the chest in large block sports lettering. "
+            "Number on both sleeves. Black Rose Collection patch on shoulder. "
+            "Teal base with black and white horizontal stripe bands at the waist "
+            "and sleeves. Rose gold (#B76E79) accent stitching."
+        ),
+        "back_details": (
+            "Back of a teal/dark cyan ice hockey jersey. The body color is "
+            "teal throughout. Large white text 'BLACK IS BEAUTIFUL' across "
+            "the upper back. Large white number below the text — left digit "
+            "filled with rose floral pattern, right digit plain white. "
+            "Black and white horizontal stripe bands at waist. Hockey "
+            "championship patch on the nape. Teal body color."
+        ),
+    },
+    "br-d02": {
+        "garment": "American football jersey",
+        "details": (
+            "A luxury streetwear American football jersey. Primary color: deep red "
+            "body. White number '80' on the front in large bold sports font. "
+            "V-neck collar with white trim. 'BLACK IS BEAUTIFUL' text across "
+            "the chest above the number. Short sleeves with white and black "
+            "striping. Black Rose Collection NFL-style patch on the shoulder. "
+            "Rose gold (#B76E79) accent stitching. Mesh texture fabric."
+        ),
+        "back_details": (
+            "Back of a deep red American football jersey. The body color is "
+            "deep red (same as the front). Large white number '80' and "
+            "'BLACK IS BEAUTIFUL' text across the upper back in bold white "
+            "block lettering. The '8' digit has an alternating rose floral "
+            "fill pattern, the '0' digit is plain white. Short sleeves with "
+            "white and black striping. Mesh texture fabric. Red body throughout."
+        ),
+    },
+    "br-d03": {
+        "garment": "American football jersey",
+        "details": (
+            "A luxury streetwear American football jersey. Primary color: white "
+            "body. Black number '32' on the front in large bold sports font. "
+            "V-neck collar with black trim. 'BLACK IS BEAUTIFUL' text in black "
+            "across the chest above the number. Short sleeves with black and "
+            "red striping. Black Rose Collection NFL-style patch on the shoulder. "
+            "Rose gold (#B76E79) accent stitching. Mesh texture fabric."
+        ),
+        "back_details": (
+            "Back of a white American football jersey. The body color is white "
+            "throughout. Large black number '32' and 'BLACK IS BEAUTIFUL' text "
+            "across the upper back in bold black block lettering. The '3' digit "
+            "has a rose floral fill pattern, the '2' digit is plain black. "
+            "Short sleeves with black and red striping. Mesh texture fabric. "
+            "White body color throughout."
+        ),
+    },
+    "br-d04": {
+        "garment": "basketball jersey",
+        "details": (
+            "A luxury streetwear basketball jersey / tank top. Primary color: "
+            "black body. Gold/yellow number on the front in large bold sports "
+            "font. Wide shoulder straps. 'BLACK IS BEAUTIFUL' text in gold "
+            "across the chest. Deep scoop neck. Black Rose Collection "
+            "NBA-style patch. Rose gold (#B76E79) accent trim. Gold (#D4AF37) "
+            "side piping and armhole trim."
+        ),
+        "back_details": (
+            "Back of a black basketball jersey / tank top. The body color is "
+            "black throughout. Large gold number and 'BLACK IS BEAUTIFUL' text "
+            "across the upper back in bold gold block lettering. One digit has "
+            "alternating rose floral fill pattern, the other is plain gold. "
+            "Wide shoulder straps. Gold (#D4AF37) trim at armholes and neckline. "
+            "Black body color."
+        ),
+    },
+}
+
+
+def imagen_render_prompt(sku: str, view: str) -> str:
+    """Build a detailed Imagen prompt for text-heavy products."""
+    desc = IMAGEN_PRODUCT_DESCRIPTIONS[sku]
+    garment = desc["garment"]
+
+    if view in ("render3d_front", "front"):
+        return (
+            f"Professional e-commerce product photography of a {garment} on an "
+            f"invisible mannequin / ghost mannequin, FRONT VIEW. "
+            f"{desc['details']} "
+            "Light gray (#E8E8E8) studio background with subtle floor reflection. "
+            "Professional product photography lighting — soft key light from "
+            "upper-left, fill light from right, slight rim light. "
+            "Photorealistic, showing natural 3D shape and drape of the fabric. "
+            "All text must be perfectly legible and spelled correctly. "
+            "Luxury streetwear brand, premium quality."
+        )
+    elif view in ("render3d_back", "back"):
+        return (
+            f"Professional e-commerce product photography of a {garment} on an "
+            f"invisible mannequin / ghost mannequin, BACK VIEW. "
+            f"{desc['back_details']} "
+            "Light gray (#E8E8E8) studio background with subtle floor reflection. "
+            "Professional product photography lighting. "
+            "Photorealistic, showing natural 3D shape and drape of the fabric. "
+            "All text must be perfectly legible and spelled correctly. "
+            "Luxury streetwear brand, premium quality."
+        )
+    else:  # branding
+        return (
+            f"Cinematic luxury editorial product shot of a {garment} on an "
+            f"invisible mannequin. {desc['details']} "
+            "Dark moody studio background — black marble surface, dramatic "
+            "shadows, rose gold (#B76E79) accent lighting. Gothic luxury "
+            "aesthetic. All text on the garment must be perfectly legible. "
+            "Cinematic composition, slight floor reflection."
+        )
 
 
 def find_source_image(sku: str) -> Path | None:
@@ -458,6 +616,62 @@ def generate_image(
     return None
 
 
+def generate_image_imagen(
+    client,
+    sku: str,
+    view: str,
+    attempt: int = 1,
+) -> bytes | None:
+    """Generate a single image using Imagen 4 Ultra (text-to-image, no reference).
+
+    Best for products with prominent text that Gemini struggles with.
+    Returns WebP image bytes on success, None on failure.
+    """
+    from google.genai import types
+
+    prompt = imagen_render_prompt(sku, view)
+
+    if attempt > 1:
+        prompt += (
+            " CRITICAL: All text on the garment must be spelled exactly as "
+            "described. Do not omit, abbreviate, or alter any words."
+        )
+
+    try:
+        response = client.models.generate_images(
+            model=IMAGEN_MODEL_ID,
+            prompt=prompt,
+            config=types.GenerateImagesConfig(
+                number_of_images=1,
+                aspect_ratio="3:4",
+                person_generation="allow_adult",
+            ),
+        )
+    except Exception as exc:
+        log.error("Imagen API call failed (attempt %d): %s", attempt, exc)
+        return None
+
+    if not response or not response.generated_images:
+        log.warning("Empty Imagen response (attempt %d)", attempt)
+        return None
+
+    img = response.generated_images[0]
+    if hasattr(img, "image") and hasattr(img.image, "image_bytes"):
+        raw_bytes = img.image.image_bytes
+        # Imagen returns PNG — convert to WebP for consistency
+        try:
+            from PIL import Image
+            pil_img = Image.open(io.BytesIO(raw_bytes))
+            buf = io.BytesIO()
+            pil_img.save(buf, format="WEBP", quality=92)
+            return buf.getvalue()
+        except Exception:
+            return raw_bytes  # fallback: save as-is
+
+    log.warning("No image data in Imagen response (attempt %d)", attempt)
+    return None
+
+
 def quality_gate(image_bytes: bytes, sku: str, view: str) -> bool:
     """Check if generated image passes quality requirements."""
     size_kb = len(image_bytes) / 1024
@@ -509,17 +723,38 @@ def get_output_filename(sku: str, view: str) -> str:
     return f"{sku}-{view}-model.webp" if view != "branding" else f"{sku}-branding.webp"
 
 
-def process_product(client, product: dict, views: list[str]) -> dict:
-    """Generate images for a single product. Returns results dict."""
+def process_product(client, product: dict, views: list[str], engine: str = "gemini") -> dict:
+    """Generate images for a single product. Returns results dict.
+
+    engine: "gemini" (reference-based) | "imagen" (text-to-image, text-heavy) | "auto"
+    In auto mode, uses Imagen Ultra for TEXT_HEAVY_SKUS, Gemini for everything else.
+    """
     sku = product["sku"]
     name = product["name"]
     src = product["source_image"]
     results = {"sku": sku, "name": name, "views": {}}
 
-    if not src:
+    # Determine which engine to use for this product
+    use_imagen = (
+        engine == "imagen"
+        or (engine == "auto" and sku in TEXT_HEAVY_SKUS)
+    )
+
+    if not use_imagen and not src:
         log.warning("SKIP %s (%s): no source image found", sku, name)
         results["status"] = "no_source"
         return results
+
+    if use_imagen and sku not in IMAGEN_PRODUCT_DESCRIPTIONS:
+        log.warning("SKIP %s: no Imagen description defined, falling back to Gemini", sku)
+        use_imagen = False
+        if not src:
+            log.warning("SKIP %s (%s): no source image and no Imagen desc", sku, name)
+            results["status"] = "no_source"
+            return results
+
+    engine_label = "Imagen Ultra" if use_imagen else "Gemini"
+    log.info("Engine: %s for %s", engine_label, sku)
 
     for view in views:
         # Accessories skip back-model view
@@ -528,18 +763,20 @@ def process_product(client, product: dict, views: list[str]) -> dict:
             results["views"][view] = "skipped_accessory"
             continue
 
-        prompt = get_prompt(product, view)
         out_path = PRODUCTS_DIR / get_output_filename(sku, view)
-
-        log.info("Generating %s %s (%s)...", sku, view, name)
+        log.info("Generating %s %s (%s) [%s]...", sku, view, name, engine_label)
 
         success = False
         for attempt in range(1, MAX_RETRIES + 1):
-            image_bytes = generate_image(client, src, prompt, attempt)
+            if use_imagen:
+                image_bytes = generate_image_imagen(client, sku, view, attempt)
+            else:
+                prompt = get_prompt(product, view)
+                image_bytes = generate_image(client, src, prompt, attempt)
 
             if image_bytes and quality_gate(image_bytes, sku, view):
                 out_path.write_bytes(image_bytes)
-                log.info("SAVED %s (%.1fKB)", out_path.name, len(image_bytes) / 1024)
+                log.info("SAVED %s (%.1fKB) [%s]", out_path.name, len(image_bytes) / 1024, engine_label)
                 results["views"][view] = "success"
                 success = True
                 break
@@ -634,15 +871,27 @@ def cmd_generate(args):
     client = genai.Client(api_key=api_key)
     products = load_products(args.sku, include_bad=args.include_bad)
     views = resolve_views(args.step)
+    engine = args.engine
+
+    engine_label = {
+        "gemini": f"Gemini ({MODEL_ID})",
+        "imagen": f"Imagen Ultra ({IMAGEN_MODEL_ID})",
+        "auto": f"Auto (Gemini + Imagen Ultra for {len(TEXT_HEAVY_SKUS)} text-heavy SKUs)",
+    }[engine]
 
     log.info(
-        "Starting generation: %d products, views=%s, model=%s",
-        len(products), views, MODEL_ID,
+        "Starting generation: %d products, views=%s, engine=%s",
+        len(products), views, engine_label,
     )
 
     all_results = []
     for i, product in enumerate(products, 1):
-        if not product["source_image"]:
+        # In Imagen/auto mode, text-heavy products don't need source images
+        use_imagen = (
+            engine == "imagen"
+            or (engine == "auto" and product["sku"] in TEXT_HEAVY_SKUS)
+        )
+        if not use_imagen and not product["source_image"]:
             log.warning(
                 "[%d/%d] SKIP %s: no source image",
                 i, len(products), product["sku"],
@@ -656,7 +905,7 @@ def cmd_generate(args):
             "[%d/%d] Processing %s (%s)",
             i, len(products), product["sku"], product["name"],
         )
-        result = process_product(client, product, views)
+        result = process_product(client, product, views, engine=engine)
         all_results.append(result)
 
         # Rate limit between products
@@ -724,6 +973,17 @@ def main():
         choices=["front", "back", "branding", "models", "all", "render3d", "render3d_front", "render3d_back"],
         default="all",
         help="What to generate: front, back, branding, models (front+back), all, render3d (3D product shots)",
+    )
+    parser.add_argument(
+        "--engine",
+        type=str,
+        choices=["gemini", "imagen", "auto"],
+        default="gemini",
+        help=(
+            "Image generation engine: gemini (reference-based, default), "
+            "imagen (Imagen 4 Ultra, text-to-image for text-heavy products), "
+            "auto (Imagen for text-heavy SKUs, Gemini for everything else)"
+        ),
     )
     parser.add_argument(
         "--model",

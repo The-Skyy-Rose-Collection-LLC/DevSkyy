@@ -288,25 +288,25 @@ get_header();
 
 		<div class="lp-craft__grid">
 			<div class="lp-craft-card rv">
-				<div class="lp-craft-card__icon" aria-hidden="true">&#11035;</div>
+				<div class="lp-craft-card__icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C0C0C0" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
 				<div class="lp-craft-card__title">380gsm French Terry</div>
 				<div class="lp-craft-card__desc">2&times; the weight of typical streetwear. Pick it up &mdash; you&rsquo;ll feel the difference.</div>
 			</div>
 
 			<div class="lp-craft-card rv rv-d1">
-				<div class="lp-craft-card__icon" aria-hidden="true">&#128290;</div>
+				<div class="lp-craft-card__icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C0C0C0" stroke-width="1.5"><path d="M4 7V4h16v3M9 20h6M12 4v16"/><path d="M8 4l4-2 4 2"/></svg></div>
 				<div class="lp-craft-card__title">Numbered Authentication</div>
 				<div class="lp-craft-card__desc">Every piece comes with a numbered card. You own #47 of 200. That&rsquo;s yours.</div>
 			</div>
 
 			<div class="lp-craft-card rv rv-d2">
-				<div class="lp-craft-card__icon" aria-hidden="true">&#9986;&#65039;</div>
+				<div class="lp-craft-card__icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C0C0C0" stroke-width="1.5"><circle cx="6" cy="6" r="3"/><path d="M8.12 8.12L12 12"/><circle cx="18" cy="18" r="3"/><path d="M15.88 15.88L12 12"/></svg></div>
 				<div class="lp-craft-card__title">Double-Stitched Seams</div>
 				<div class="lp-craft-card__desc">Reinforced at every stress point. Outlasts every &ldquo;premium&rdquo; piece that disappointed you.</div>
 			</div>
 
 			<div class="lp-craft-card rv rv-d3">
-				<div class="lp-craft-card__icon" aria-hidden="true">&#128420;</div>
+				<div class="lp-craft-card__icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C0C0C0" stroke-width="1.5"><path d="M18.36 6.64A9 9 0 1 1 5.64 6.64"/><path d="M12 2v4"/><circle cx="12" cy="12" r="1"/></svg></div>
 				<div class="lp-craft-card__title">Never Restocked</div>
 				<div class="lp-craft-card__desc">When 200 sell, the style is retired. No reprints. No exceptions.</div>
 			</div>

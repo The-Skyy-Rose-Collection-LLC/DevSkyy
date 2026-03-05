@@ -545,7 +545,7 @@ function skyyrose_get_product_catalog() {
 		'sg-d01' => array(
 			'sku'               => 'sg-d01',
 			'name'              => 'The Multi-Colored Windbreaker Set',
-			'price'             => 0.00,
+			'price'             => 75.00,
 			'collection'        => 'signature',
 			'description'       => 'Pastel V-chevron windbreaker set — hooded zip jacket and matching jogger pants in white with pink, yellow, lavender, and green stripes. Sold separately.',
 			'badge'             => 'Pre-Order',
