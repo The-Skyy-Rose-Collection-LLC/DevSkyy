@@ -43,6 +43,26 @@ class ImageryCoreAgent(CoreAgent):
         super().__init__(correlation_id=correlation_id, **kwargs)
         self._legacy_imagery: Any = None
         self._legacy_product: Any = None
+        self._register_sub_agents()
+
+    def _register_sub_agents(self) -> None:
+        """Auto-register all imagery sub-agents."""
+        sub_agents = {
+            "gemini_image": ("agents.core.imagery.sub_agents.gemini_image", "GeminiImageSubAgent"),
+            "fashn_vton": ("agents.core.imagery.sub_agents.fashn_vton", "FashnVtonSubAgent"),
+            "tripo_3d": ("agents.core.imagery.sub_agents.tripo_3d", "Tripo3dSubAgent"),
+            "meshy_3d": ("agents.core.imagery.sub_agents.meshy_3d", "Meshy3dSubAgent"),
+            "hf_spaces": ("agents.core.imagery.sub_agents.hf_spaces", "HfSpacesSubAgent"),
+        }
+        for name, (module_path, class_name) in sub_agents.items():
+            try:
+                import importlib
+
+                mod = importlib.import_module(module_path)
+                cls = getattr(mod, class_name)
+                self.register_sub_agent(name, cls())
+            except (ImportError, AttributeError):
+                logger.debug("[%s] %s unavailable", self.name, class_name)
 
     def _get_legacy_imagery(self) -> Any:
         if self._legacy_imagery is None:

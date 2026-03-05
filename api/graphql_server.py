@@ -46,6 +46,6 @@ async def _get_context(request: Request) -> dict[str, Any]:
 # Mount Strawberry GraphQL as a FastAPI sub-router
 graphql_router = GraphQLRouter(
     schema,
-    graphiql=_graphiql_enabled,
+    graphql_ide="graphiql" if _graphiql_enabled else None,
     context_getter=_get_context,
 )

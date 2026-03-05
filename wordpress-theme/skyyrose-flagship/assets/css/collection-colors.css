@@ -1,23 +1,169 @@
 /**
- * SkyyRose Collection Color Themes
+ * SkyyRose Collection Themes — Colors, Typography & Animated Text
  *
- * Collection-specific color schemes and styling.
+ * Each collection is a sub-brand with its own visual DNA:
+ *   - Signature:  Gold calligraphy, Cormorant Garamond, warm gold sweep
+ *   - Love Hurts: Graffiti street, Oswald + Barlow, crimson heartbeat pulse
+ *   - Black Rose: Gothic luxury, Cinzel + Cormorant, silver shimmer on stone
  *
  * @package SkyyRose_Flagship
- * @since 2.0.0
+ * @since   4.1.0
  */
 
 /* ==================================================
+   KEYFRAME ANIMATIONS
+   ================================================== */
+
+/* Gold Sweep — warm metallic glint for Signature */
+@keyframes goldSweep {
+	0% { background-position: -200% center; }
+	100% { background-position: 200% center; }
+}
+
+/* Silver Shimmer — cold light across stone for Black Rose */
+@keyframes silverShimmer {
+	0% { background-position: -200% center; }
+	100% { background-position: 200% center; }
+}
+
+/* Heartbeat Pulse — crimson glow throb for Love Hurts */
+@keyframes heartbeatPulse {
+	0%, 100% { text-shadow: 0 0 8px rgba(220, 20, 60, 0.2); }
+	14% { text-shadow: 0 0 20px rgba(220, 20, 60, 0.6), 0 0 40px rgba(220, 20, 60, 0.3); }
+	28% { text-shadow: 0 0 8px rgba(220, 20, 60, 0.2); }
+	42% { text-shadow: 0 0 16px rgba(220, 20, 60, 0.5), 0 0 32px rgba(220, 20, 60, 0.2); }
+}
+
+/* Crimson Drip — subtle downward glow shift */
+@keyframes crimsonDrip {
+	0% { text-shadow: 0 0 10px rgba(220, 20, 60, 0.3), 0 2px 4px rgba(220, 20, 60, 0.1); }
+	50% { text-shadow: 0 4px 16px rgba(220, 20, 60, 0.5), 0 8px 24px rgba(220, 20, 60, 0.2); }
+	100% { text-shadow: 0 0 10px rgba(220, 20, 60, 0.3), 0 2px 4px rgba(220, 20, 60, 0.1); }
+}
+
+/* Rose Gold Breathe — gentle warmth for parent brand */
+@keyframes roseGoldBreathe {
+	0%, 100% { text-shadow: 0 0 6px rgba(183, 110, 121, 0.15); }
+	50% { text-shadow: 0 0 20px rgba(183, 110, 121, 0.35), 0 0 40px rgba(212, 175, 55, 0.15); }
+}
+
+/* Rose Bloom — the Signature rose unfurls on load */
+@keyframes roseBloom {
+	0% {
+		opacity: 0;
+		transform: scale(0.3) rotate(-45deg);
+		filter: blur(8px) drop-shadow(0 0 0 transparent);
+	}
+	40% {
+		opacity: 0.7;
+		transform: scale(0.85) rotate(-8deg);
+		filter: blur(2px) drop-shadow(0 0 10px rgba(183, 110, 121, 0.3));
+	}
+	70% {
+		opacity: 1;
+		transform: scale(1.08) rotate(3deg);
+		filter: blur(0) drop-shadow(0 0 20px rgba(183, 110, 121, 0.5));
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1) rotate(0deg);
+		filter: blur(0) drop-shadow(0 4px 16px rgba(183, 110, 121, 0.3));
+	}
+}
+
+/* Rose Glow — continuous soft breathing warmth */
+@keyframes roseGlow {
+	0%, 100% {
+		filter: drop-shadow(0 4px 16px rgba(183, 110, 121, 0.3))
+		        drop-shadow(0 0 8px rgba(212, 175, 55, 0.1));
+	}
+	50% {
+		filter: drop-shadow(0 4px 24px rgba(183, 110, 121, 0.6))
+		        drop-shadow(0 0 40px rgba(212, 175, 55, 0.25));
+	}
+}
+
+/* Rose Spin — very slow continuous rotation for living feel */
+@keyframes roseSpin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+/* Petal Float — individual petals drifting down */
+@keyframes petalFloat {
+	0% {
+		opacity: 0;
+		transform: translate(0, -20px) rotate(0deg) scale(0.6);
+	}
+	10% { opacity: 0.8; }
+	90% { opacity: 0.6; }
+	100% {
+		opacity: 0;
+		transform: translate(var(--petal-drift, 40px), 100vh) rotate(var(--petal-rotation, 360deg)) scale(0.3);
+	}
+}
+
+/* Petal Sway — horizontal sine-wave sway for each petal */
+@keyframes petalSway {
+	0%, 100% { margin-left: 0; }
+	25% { margin-left: 15px; }
+	75% { margin-left: -15px; }
+}
+
+/* ==================================================
    SIGNATURE COLLECTION
-   Rose Gold + Gold + Silver
+   Rose Gold + Gold · Cormorant Garamond · Gold Sweep
    ================================================== */
 
 .collection-signature,
-body.page-template-template-signature-collection {
+body.page-template-template-signature-collection,
+body.page-template-template-collection-signature,
+body.page-template-template-landing-signature {
 	--collection-primary: var(--rose-gold);
 	--collection-secondary: var(--gold);
 	--collection-accent: var(--silver);
 	--collection-gradient: var(--gradient-signature);
+	--collection-font-display: 'Cormorant Garamond', Georgia, serif;
+	--collection-font-body: 'Cormorant Garamond', Georgia, serif;
+	--collection-font-weight-display: 500;
+	--collection-font-weight-body: 300;
+	--collection-letter-spacing: 0.02em;
+}
+
+.collection-signature h1,
+.collection-signature h2,
+.collection-signature h3,
+.collection-signature .collection-title,
+.collection-signature .hero-title {
+	font-family: var(--collection-font-display);
+	font-weight: var(--collection-font-weight-display);
+	letter-spacing: var(--collection-letter-spacing);
+}
+
+.collection-signature p,
+.collection-signature .product-description,
+.collection-signature .card-description {
+	font-family: var(--collection-font-body);
+	font-weight: var(--collection-font-weight-body);
+	line-height: var(--leading-relaxed, 1.75);
+}
+
+/* Gold Sweep on headings */
+.collection-signature .collection-title,
+.collection-signature .hero-title {
+	background: linear-gradient(
+		90deg,
+		#B76E79 0%,
+		#D4AF37 25%,
+		#F5E6A3 50%,
+		#D4AF37 75%,
+		#B76E79 100%
+	);
+	background-size: 200% 100%;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	animation: goldSweep 6s ease-in-out infinite;
 }
 
 .collection-signature .hero {
@@ -25,11 +171,17 @@ body.page-template-template-signature-collection {
 }
 
 .collection-signature .btn-primary {
+	font-family: var(--collection-font-display);
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
 	background: var(--gradient-signature);
 }
 
 .collection-signature .section-subtitle {
 	color: var(--rose-gold);
+	font-family: var(--collection-font-display);
+	font-style: italic;
 }
 
 .collection-signature .card:hover {
@@ -38,15 +190,55 @@ body.page-template-template-signature-collection {
 
 /* ==================================================
    LOVE HURTS COLLECTION
-   Crimson + Rose Gold
+   Crimson + Rose Gold · Oswald + Barlow · Heartbeat Pulse
    ================================================== */
 
 .collection-love-hurts,
-body.page-template-template-love-hurts {
+body.page-template-template-love-hurts,
+body.page-template-template-collection-love-hurts,
+body.page-template-template-landing-love-hurts {
 	--collection-primary: var(--crimson);
 	--collection-secondary: var(--rose-gold);
 	--collection-accent: var(--mauve);
 	--collection-gradient: var(--gradient-love-hurts);
+	--collection-font-display: 'Oswald', 'Arial Narrow', sans-serif;
+	--collection-font-body: 'Barlow', 'Helvetica Neue', sans-serif;
+	--collection-font-weight-display: 700;
+	--collection-font-weight-body: 400;
+	--collection-letter-spacing: 0.04em;
+}
+
+.collection-love-hurts h1,
+.collection-love-hurts h2,
+.collection-love-hurts h3,
+.collection-love-hurts .collection-title,
+.collection-love-hurts .hero-title {
+	font-family: var(--collection-font-display);
+	font-weight: var(--collection-font-weight-display);
+	letter-spacing: var(--collection-letter-spacing);
+	text-transform: uppercase;
+}
+
+.collection-love-hurts p,
+.collection-love-hurts .product-description,
+.collection-love-hurts .card-description {
+	font-family: var(--collection-font-body);
+	font-weight: var(--collection-font-weight-body);
+	line-height: var(--leading-normal, 1.6);
+}
+
+/* Heartbeat Pulse on headings */
+.collection-love-hurts .collection-title,
+.collection-love-hurts .hero-title {
+	color: #fff;
+	-webkit-text-fill-color: #fff;
+	animation: heartbeatPulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Crimson drip on hover */
+.collection-love-hurts .collection-title:hover,
+.collection-love-hurts .hero-title:hover {
+	animation: crimsonDrip 1.5s ease-in-out infinite;
 }
 
 .collection-love-hurts .hero {
@@ -54,11 +246,19 @@ body.page-template-template-love-hurts {
 }
 
 .collection-love-hurts .btn-primary {
+	font-family: var(--collection-font-display);
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
 	background: linear-gradient(135deg, var(--crimson) 0%, var(--rose-gold) 100%);
 }
 
 .collection-love-hurts .section-subtitle {
 	color: var(--crimson);
+	font-family: var(--collection-font-body);
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
 }
 
 .collection-love-hurts .card:hover {
@@ -67,6 +267,7 @@ body.page-template-template-love-hurts {
 
 .collection-love-hurts a {
 	color: var(--crimson);
+	transition: color var(--transition-fast, 0.15s ease-in-out);
 }
 
 .collection-love-hurts a:hover {
@@ -75,15 +276,59 @@ body.page-template-template-love-hurts {
 
 /* ==================================================
    BLACK ROSE COLLECTION
-   Silver + Black
+   Silver + Black · Cinzel + Cormorant · Silver Shimmer
    ================================================== */
 
 .collection-black-rose,
-body.page-template-template-black-rose {
+body.page-template-template-black-rose,
+body.page-template-template-collection-black-rose,
+body.page-template-template-landing-black-rose {
 	--collection-primary: var(--black);
 	--collection-secondary: var(--silver);
 	--collection-accent: var(--mid-gray);
 	--collection-gradient: var(--gradient-black-rose);
+	--collection-font-display: 'Cinzel', 'Times New Roman', serif;
+	--collection-font-body: 'Cormorant', 'Cormorant Garamond', Georgia, serif;
+	--collection-font-weight-display: 700;
+	--collection-font-weight-body: 400;
+	--collection-letter-spacing: 0.08em;
+}
+
+.collection-black-rose h1,
+.collection-black-rose h2,
+.collection-black-rose h3,
+.collection-black-rose .collection-title,
+.collection-black-rose .hero-title {
+	font-family: var(--collection-font-display);
+	font-weight: var(--collection-font-weight-display);
+	letter-spacing: var(--collection-letter-spacing);
+	text-transform: uppercase;
+}
+
+.collection-black-rose p,
+.collection-black-rose .product-description,
+.collection-black-rose .card-description {
+	font-family: var(--collection-font-body);
+	font-weight: var(--collection-font-weight-body);
+	line-height: var(--leading-normal, 1.6);
+}
+
+/* Silver Shimmer on headings */
+.collection-black-rose .collection-title,
+.collection-black-rose .hero-title {
+	background: linear-gradient(
+		90deg,
+		#C0C0C0 0%,
+		#E8E8E8 20%,
+		#FFFFFF 50%,
+		#E8E8E8 80%,
+		#C0C0C0 100%
+	);
+	background-size: 200% 100%;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	animation: silverShimmer 8s ease-in-out infinite;
 }
 
 .collection-black-rose .hero {
@@ -91,11 +336,21 @@ body.page-template-template-black-rose {
 }
 
 .collection-black-rose .btn-primary {
+	font-family: var(--collection-font-display);
+	font-weight: 600;
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	font-size: 0.8em;
 	background: linear-gradient(135deg, var(--black) 0%, var(--silver) 100%);
 }
 
 .collection-black-rose .section-subtitle {
 	color: var(--silver);
+	font-family: var(--collection-font-display);
+	font-weight: 400;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	font-size: 0.75em;
 }
 
 .collection-black-rose .card:hover {
@@ -103,22 +358,18 @@ body.page-template-template-black-rose {
 }
 
 .collection-black-rose a {
-	color: var(--black);
+	color: var(--silver);
+	transition: color var(--transition-fast, 0.15s ease-in-out);
 }
 
 .collection-black-rose a:hover {
-	color: var(--silver);
-}
-
-.collection-black-rose h1,
-.collection-black-rose h2,
-.collection-black-rose h3 {
-	color: var(--black);
+	color: #fff;
+	text-shadow: 0 0 8px rgba(192, 192, 192, 0.4);
 }
 
 /* ==================================================
    PREORDER COLLECTION
-   Mauve + Rose Gold
+   Mauve + Rose Gold · Inherits Parent Brand Typography
    ================================================== */
 
 .collection-preorder {
@@ -126,6 +377,14 @@ body.page-template-template-black-rose {
 	--collection-secondary: var(--rose-gold);
 	--collection-accent: var(--gold);
 	--collection-gradient: linear-gradient(135deg, var(--mauve) 0%, var(--rose-gold) 100%);
+	--collection-font-display: 'Playfair Display', Georgia, serif;
+	--collection-font-body: 'Cormorant Garamond', Georgia, serif;
+}
+
+.collection-preorder .collection-title,
+.collection-preorder .hero-title {
+	font-family: var(--collection-font-display);
+	animation: roseGoldBreathe 4s ease-in-out infinite;
 }
 
 .collection-preorder .hero {
@@ -163,10 +422,6 @@ body.page-template-template-black-rose {
 [class*="collection-"] .collection-title {
 	font-size: var(--text-3xl);
 	margin-bottom: var(--space-lg);
-	background: var(--collection-gradient);
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-	background-clip: text;
 }
 
 [class*="collection-"] .collection-card {
@@ -205,7 +460,7 @@ body.page-template-template-black-rose {
 }
 
 .collection-black-rose .product-card {
-	border-top: 3px solid var(--black);
+	border-top: 3px solid var(--silver);
 }
 
 .collection-preorder .product-card {
@@ -218,22 +473,297 @@ body.page-template-template-black-rose {
 
 .collection-signature .price {
 	color: var(--rose-gold);
+	font-family: var(--collection-font-display, inherit);
 	font-weight: var(--weight-bold);
 }
 
 .collection-love-hurts .price {
 	color: var(--crimson);
+	font-family: var(--collection-font-display, inherit);
 	font-weight: var(--weight-bold);
 }
 
 .collection-black-rose .price {
-	color: var(--black);
+	color: var(--silver);
+	font-family: var(--collection-font-display, inherit);
 	font-weight: var(--weight-bold);
+	letter-spacing: 0.05em;
 }
 
 .collection-preorder .price {
 	color: var(--mauve);
 	font-weight: var(--weight-bold);
+}
+
+/* ==================================================
+   ANIMATED LOGO HERO (per-collection hero image)
+   ================================================== */
+
+.collection-logo-hero {
+	display: block;
+	margin: 0 auto var(--space-xl);
+	max-width: 100%;
+	height: auto;
+	filter: drop-shadow(0 4px 24px rgba(0, 0, 0, 0.5));
+	opacity: 0;
+	transform: translateY(20px) scale(0.95);
+	animation: logoReveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+}
+
+@keyframes logoReveal {
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+/* Signature: warm gold drop-shadow */
+.collection-signature .collection-logo-hero {
+	filter: drop-shadow(0 4px 24px rgba(212, 175, 55, 0.4));
+	max-width: 600px;
+}
+
+/* ==================================================
+   SIGNATURE ROSE — Animated Rose Element
+   The rose replaces the "o" in "Rose" in the Signature logo.
+   It blooms on load, then breathes with a soft glow.
+   ================================================== */
+
+/* Container: positions the rose over the logo text */
+.signature-rose-wrapper {
+	position: relative;
+	display: inline-block;
+}
+
+/* The rose image itself */
+.signature-rose {
+	display: block;
+	width: 80px;
+	height: auto;
+	animation: roseBloom 1.8s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both,
+	           roseGlow 4s ease-in-out 2.4s infinite;
+	will-change: transform, filter, opacity;
+	transform-origin: center center;
+}
+
+/* Larger rose for hero banners */
+.signature-rose--hero {
+	width: 120px;
+}
+
+/* When used inline in the logo hero (overlaying where "o" would be) */
+.signature-logo-composite {
+	position: relative;
+	display: inline-block;
+	max-width: 600px;
+	margin: 0 auto var(--space-xl);
+}
+
+.signature-logo-composite .collection-logo-hero {
+	display: block;
+	width: 100%;
+	height: auto;
+	margin-bottom: 0;
+}
+
+.signature-logo-composite .signature-rose {
+	position: absolute;
+	/* Positioned to overlay where the "o" sits in the logo */
+	top: 38%;
+	left: 66%;
+	transform-origin: center center;
+	width: 12%;
+}
+
+/* ==================================================
+   FLOATING PETALS — CSS-only particle effect
+   Petals drift downward through the Signature hero section.
+   Each petal is a pseudo-element or a <span> with staggered delays.
+   ================================================== */
+
+.signature-petals {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	pointer-events: none;
+	z-index: 2;
+}
+
+.signature-petals .petal {
+	position: absolute;
+	top: -5%;
+	width: 12px;
+	height: 14px;
+	background: radial-gradient(
+		ellipse at 30% 30%,
+		rgba(212, 167, 177, 0.9) 0%,
+		rgba(183, 110, 121, 0.7) 50%,
+		rgba(183, 110, 121, 0.3) 100%
+	);
+	border-radius: 50% 0 50% 50%;
+	opacity: 0;
+	animation:
+		petalFloat var(--petal-duration, 8s) ease-in var(--petal-delay, 0s) infinite,
+		petalSway 3s ease-in-out var(--petal-delay, 0s) infinite;
+	will-change: transform, opacity;
+}
+
+/* 8 petals with staggered positions, sizes, and timing */
+.signature-petals .petal:nth-child(1) {
+	left: 10%;
+	--petal-duration: 9s;
+	--petal-delay: 0s;
+	--petal-drift: 30px;
+	--petal-rotation: 420deg;
+	width: 10px; height: 12px;
+}
+
+.signature-petals .petal:nth-child(2) {
+	left: 25%;
+	--petal-duration: 11s;
+	--petal-delay: 2s;
+	--petal-drift: -25px;
+	--petal-rotation: -380deg;
+	width: 14px; height: 16px;
+}
+
+.signature-petals .petal:nth-child(3) {
+	left: 45%;
+	--petal-duration: 8s;
+	--petal-delay: 4s;
+	--petal-drift: 50px;
+	--petal-rotation: 300deg;
+	width: 8px; height: 10px;
+}
+
+.signature-petals .petal:nth-child(4) {
+	left: 60%;
+	--petal-duration: 10s;
+	--petal-delay: 1s;
+	--petal-drift: -40px;
+	--petal-rotation: 500deg;
+	width: 11px; height: 13px;
+}
+
+.signature-petals .petal:nth-child(5) {
+	left: 75%;
+	--petal-duration: 12s;
+	--petal-delay: 3.5s;
+	--petal-drift: 20px;
+	--petal-rotation: -450deg;
+	width: 9px; height: 11px;
+}
+
+.signature-petals .petal:nth-child(6) {
+	left: 88%;
+	--petal-duration: 9.5s;
+	--petal-delay: 5s;
+	--petal-drift: -35px;
+	--petal-rotation: 340deg;
+	width: 13px; height: 15px;
+}
+
+.signature-petals .petal:nth-child(7) {
+	left: 35%;
+	--petal-duration: 10.5s;
+	--petal-delay: 6.5s;
+	--petal-drift: 45px;
+	--petal-rotation: -290deg;
+	width: 7px; height: 9px;
+}
+
+.signature-petals .petal:nth-child(8) {
+	left: 55%;
+	--petal-duration: 8.5s;
+	--petal-delay: 7s;
+	--petal-drift: -50px;
+	--petal-rotation: 410deg;
+	width: 15px; height: 17px;
+}
+
+/* Love Hurts: crimson glow */
+.collection-love-hurts .collection-logo-hero {
+	filter: drop-shadow(0 4px 24px rgba(220, 20, 60, 0.4));
+	max-width: 500px;
+}
+
+/* Black Rose: silver moonlight */
+.collection-black-rose .collection-logo-hero {
+	filter: drop-shadow(0 4px 24px rgba(192, 192, 192, 0.3));
+	max-width: 500px;
+}
+
+/* Split logo animation for Love Hurts (Love + Hurts as separate images) */
+.collection-love-hurts .logo-love {
+	opacity: 0;
+	transform: translateX(-40px) rotate(-3deg);
+	animation: lovePieceIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+}
+
+.collection-love-hurts .logo-hurts {
+	opacity: 0;
+	transform: translateX(40px) rotate(2deg);
+	animation: hurtsPieceIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.5s forwards;
+}
+
+@keyframes lovePieceIn {
+	to {
+		opacity: 1;
+		transform: translateX(0) rotate(0deg);
+	}
+}
+
+@keyframes hurtsPieceIn {
+	to {
+		opacity: 1;
+		transform: translateX(0) rotate(0deg);
+	}
+}
+
+/* ==================================================
+   REDUCED MOTION
+   ================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	.collection-signature .collection-title,
+	.collection-signature .hero-title,
+	.collection-black-rose .collection-title,
+	.collection-black-rose .hero-title {
+		animation: none;
+	}
+
+	.collection-love-hurts .collection-title,
+	.collection-love-hurts .hero-title {
+		animation: none;
+		text-shadow: 0 0 12px rgba(220, 20, 60, 0.3);
+	}
+
+	.collection-preorder .collection-title,
+	.collection-preorder .hero-title {
+		animation: none;
+	}
+
+	.collection-logo-hero,
+	.collection-love-hurts .logo-love,
+	.collection-love-hurts .logo-hurts {
+		animation: none;
+		opacity: 1;
+		transform: none;
+	}
+
+	.signature-rose {
+		animation: none;
+		opacity: 1;
+		filter: drop-shadow(0 4px 16px rgba(183, 110, 121, 0.3));
+	}
+
+	.signature-petals .petal {
+		animation: none;
+		display: none;
+	}
 }
 
 /* ==================================================
@@ -248,5 +778,28 @@ body.page-template-template-black-rose {
 	[class*="collection-"] .collection-badge {
 		font-size: var(--text-xs);
 		padding: var(--space-xs) var(--space-sm);
+	}
+
+	.collection-logo-hero {
+		max-width: 80vw !important;
+	}
+
+	.collection-love-hurts h1,
+	.collection-love-hurts h2 {
+		font-size: var(--text-2xl);
+	}
+
+	.collection-black-rose h1,
+	.collection-black-rose h2 {
+		letter-spacing: 0.04em;
+	}
+
+	.signature-rose { width: 60px; }
+	.signature-rose--hero { width: 80px; }
+	.signature-logo-composite { max-width: 90vw; }
+
+	.signature-petals .petal {
+		width: 8px !important;
+		height: 10px !important;
 	}
 }

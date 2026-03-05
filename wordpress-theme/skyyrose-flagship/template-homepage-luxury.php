@@ -103,25 +103,25 @@ get_header();
 
 			<div class="features-grid">
 				<div class="feature-card card">
-					<div class="feature-icon" aria-hidden="true">&#10024;</div>
+					<div class="feature-icon" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--rose-gold, #B76E79)" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
 					<h3 class="card-title"><?php esc_html_e( 'Premium Quality', 'skyyrose-flagship' ); ?></h3>
 					<p class="card-description"><?php esc_html_e( 'Heavyweight fabrics, custom embroidery, and meticulous construction.', 'skyyrose-flagship' ); ?></p>
 				</div>
 
 				<div class="feature-card card">
-					<div class="feature-icon" aria-hidden="true">&#127912;</div>
+					<div class="feature-icon" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--rose-gold, #B76E79)" stroke-width="1.5"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 7 7 7 7m11-2.5A2.5 2.5 0 0 0 18 4h-1.5C14 4 14 7 14 7m-6.5 4h9v2c0 3.5-2 6.5-4.5 6.5S7.5 18.5 7.5 15v-2Z"/><path d="M5 22h14M12 17v5"/></svg></div>
 					<h3 class="card-title"><?php esc_html_e( 'Limited Editions', 'skyyrose-flagship' ); ?></h3>
 					<p class="card-description"><?php esc_html_e( 'Each drop is numbered and limited. Once they are gone, they are gone.', 'skyyrose-flagship' ); ?></p>
 				</div>
 
 				<div class="feature-card card">
-					<div class="feature-icon" aria-hidden="true">&#128142;</div>
+					<div class="feature-icon" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--rose-gold, #B76E79)" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10" r="3"/></svg></div>
 					<h3 class="card-title"><?php esc_html_e( 'Immersive Experiences', 'skyyrose-flagship' ); ?></h3>
 					<p class="card-description"><?php esc_html_e( 'Explore collections through 3D immersive rooms before you buy.', 'skyyrose-flagship' ); ?></p>
 				</div>
 
 				<div class="feature-card card">
-					<div class="feature-icon" aria-hidden="true">&#128666;</div>
+					<div class="feature-icon" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--rose-gold, #B76E79)" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
 					<h3 class="card-title"><?php esc_html_e( 'Free Shipping', 'skyyrose-flagship' ); ?></h3>
 					<p class="card-description"><?php esc_html_e( 'Complimentary shipping on all orders over $100.', 'skyyrose-flagship' ); ?></p>
 				</div>

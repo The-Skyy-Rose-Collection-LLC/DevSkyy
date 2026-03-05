@@ -10,13 +10,10 @@ Capabilities: AI image generation via Google Gemini (Flash/Pro).
 
 from __future__ import annotations
 
-import logging
 from typing import Any
 
 from agents.core.base import CoreAgentType
 from agents.core.sub_agent import SubAgent
-
-logger = logging.getLogger(__name__)
 
 
 class GeminiImageSubAgent(SubAgent):
@@ -32,28 +29,16 @@ class GeminiImageSubAgent(SubAgent):
         "scene_generation",
     ]
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
-        self._legacy_agent: Any = None
-
-    def _get_legacy(self) -> Any:
-        if self._legacy_agent is None:
-            try:
-                from agents.skyyrose_imagery_agent import SkyyRoseImageryAgent
-                from adk.base import AgentConfig
-
-                config = AgentConfig(name="imagery", description="Image generation")
-                self._legacy_agent = SkyyRoseImageryAgent(config)
-            except ImportError:
-                logger.warning("[%s] Legacy SkyyRoseImageryAgent unavailable", self.name)
-        return self._legacy_agent
+    system_prompt = (
+        "You are the AI Image Generation specialist for SkyyRose luxury fashion. "
+        "You create detailed image generation prompts for product renders, theme imagery, "
+        "and scene compositions using Gemini Flash/Pro. Brand aesthetic: dark luxury, "
+        "rose gold accents (#B76E79), dramatic lighting, editorial fashion photography style. "
+        "Return structured prompts with style, composition, lighting, and mood directives."
+    )
 
     async def execute(self, task: str, **kwargs: Any) -> dict[str, Any]:
-        legacy = self._get_legacy()
-        if legacy and hasattr(legacy, "execute"):
-            result = await legacy.execute(task, **kwargs)
-            return {"success": True, "result": result}
-        return {"success": False, "error": "SkyyRoseImageryAgent not available"}
+        return await self._llm_execute(task)
 
 
 __all__ = ["GeminiImageSubAgent"]

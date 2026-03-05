@@ -10,13 +10,10 @@ Capabilities: WordPress media upload, product asset management, gallery creation
 
 from __future__ import annotations
 
-import logging
 from typing import Any
 
 from agents.core.base import CoreAgentType
 from agents.core.sub_agent import SubAgent
-
-logger = logging.getLogger(__name__)
 
 
 class WordPressAssetsSubAgent(SubAgent):
@@ -32,26 +29,15 @@ class WordPressAssetsSubAgent(SubAgent):
         "3d_model_upload",
     ]
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
-        self._legacy_agent: Any = None
-
-    def _get_legacy(self) -> Any:
-        if self._legacy_agent is None:
-            try:
-                from agents.wordpress_asset_agent import WordPressAssetAgent
-
-                self._legacy_agent = WordPressAssetAgent()
-            except ImportError:
-                logger.warning("[%s] Legacy WordPressAssetAgent unavailable", self.name)
-        return self._legacy_agent
+    system_prompt = (
+        "You are the WordPress Assets specialist for SkyyRose luxury fashion. "
+        "You manage media uploads, product image galleries, and 3D model assets "
+        "on the WordPress/WooCommerce site (skyyrose.co). You know WordPress REST API "
+        "media endpoints and gallery shortcodes. Respond with actionable steps and API calls."
+    )
 
     async def execute(self, task: str, **kwargs: Any) -> dict[str, Any]:
-        legacy = self._get_legacy()
-        if legacy and hasattr(legacy, "execute"):
-            result = await legacy.execute(task, **kwargs)
-            return {"success": True, "result": result}
-        return {"success": False, "error": "WordPressAssetAgent not available"}
+        return await self._llm_execute(task)
 
 
 __all__ = ["WordPressAssetsSubAgent"]

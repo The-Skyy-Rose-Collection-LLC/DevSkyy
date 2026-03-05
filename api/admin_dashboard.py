@@ -649,6 +649,65 @@ class SyncJobListResponse(BaseModel):
     total: int = 0
 
 
+# =============================================================================
+# WordPress AI SDK Bridge — Provider Status
+# =============================================================================
+
+
+class AIProviderStatus(BaseModel):
+    """Status of a single AI provider."""
+
+    provider: str
+    configured: bool = False
+    round_table_name: str = ""
+    capabilities: list[str] = Field(default_factory=list)
+
+
+class AIBridgeStatus(BaseModel):
+    """WordPress AI SDK bridge status for the dashboard."""
+
+    healthy: bool
+    circuit_breaker: str
+    providers: list[AIProviderStatus]
+    round_table_mapping: dict[str, str]
+
+
+@admin_dashboard_router.get("/ai-providers", response_model=AIBridgeStatus)
+async def get_ai_provider_status(
+    _user: TokenPayload = Depends(require_admin),
+) -> AIBridgeStatus:
+    """Get WordPress AI SDK provider status for the admin dashboard."""
+    from agents.core.shared.wp_ai_bridge import (
+        ROUND_TABLE_TO_WP_SDK,
+        WP_SDK_TO_ROUND_TABLE,
+        WordPressAIBridge,
+    )
+
+    bridge = WordPressAIBridge()
+    health = bridge.health_check()
+    card = bridge.to_dashboard_card()
+
+    providers = []
+    for wp_id, info in card.get("providers", {}).items():
+        providers.append(
+            AIProviderStatus(
+                provider=wp_id,
+                configured=True,  # Will be updated with live status
+                round_table_name=WP_SDK_TO_ROUND_TABLE.get(wp_id, ""),
+                capabilities=["text_generation"]
+                + (["image_generation"] if wp_id != "anthropic" else [])
+                + ["function_calling"],
+            )
+        )
+
+    return AIBridgeStatus(
+        healthy=health.healthy,
+        circuit_breaker=health.circuit_breaker,
+        providers=providers,
+        round_table_mapping=dict(ROUND_TABLE_TO_WP_SDK),
+    )
+
+
 # Note: AdminDataStore is defined above as a separate class from AdminAssetStore
 # AdminAssetStore: works with Asset3D, FidelityReport, PipelineInfo
 # AdminDataStore: works with products, sync_jobs, orders

@@ -648,7 +648,7 @@ body.mood-golden .immersive-scene::after {
 	justify-content: center;
 	border: none;
 	background: transparent;
-	color: rgba(255, 255, 255, 0.3);
+	color: rgba(255, 255, 255, 0.5);
 	font-size: 0.9rem;
 	cursor: pointer;
 	border-radius: 50%;

@@ -184,6 +184,27 @@ get_header();
 				</a>
 			</div>
 		</div>
+
+		<?php if ( 'signature' === $col['slug'] ) : ?>
+		<!-- Animated rose bloom -->
+		<picture class="signature-rose signature-rose--hero" aria-hidden="true" style="position:absolute;bottom:12%;right:8%;z-index:3;">
+			<source srcset="<?php echo esc_url( get_template_directory_uri() . '/assets/branding/signature-rose-hero.webp' ); ?>" type="image/webp">
+			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/branding/signature-rose-hero.png' ); ?>"
+			     alt="" width="120" height="128" loading="eager">
+		</picture>
+
+		<!-- Floating petals -->
+		<div class="signature-petals" aria-hidden="true">
+			<span class="petal"></span>
+			<span class="petal"></span>
+			<span class="petal"></span>
+			<span class="petal"></span>
+			<span class="petal"></span>
+			<span class="petal"></span>
+			<span class="petal"></span>
+			<span class="petal"></span>
+		</div>
+		<?php endif; ?>
 	</section>
 
 	<!-- ============================================================

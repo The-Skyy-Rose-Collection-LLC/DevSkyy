@@ -1028,7 +1028,7 @@
 }
 
 .instagram-feed__placeholder-icon {
-	color: rgba(255, 255, 255, 0.2);
+	color: rgba(255, 255, 255, 0.4);
 }
 
 .instagram-feed__cta {
@@ -1058,7 +1058,7 @@
 	font-weight: 500;
 	letter-spacing: 0.15em;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.3);
+	color: rgba(255, 255, 255, 0.5);
 	margin-bottom: 1.5rem;
 }
 

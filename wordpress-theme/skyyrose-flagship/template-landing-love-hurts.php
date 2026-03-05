@@ -287,25 +287,25 @@ get_header();
 
 		<div class="lp-craft__grid">
 			<div class="lp-craft-card rv">
-				<div class="lp-craft-card__icon" aria-hidden="true">&#10084;&#65039;</div>
+				<div class="lp-craft-card__icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#DC143C" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
 				<div class="lp-craft-card__title">Meaning in Every Stitch</div>
 				<div class="lp-craft-card__desc">Every graphic tells a story. Heartbreak, loss, rebuilding &mdash; etched into fabric, not printed on as a marketing trend.</div>
 			</div>
 
 			<div class="lp-craft-card rv rv-d1">
-				<div class="lp-craft-card__icon" aria-hidden="true">&#127912;</div>
+				<div class="lp-craft-card__icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#DC143C" stroke-width="1.5"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></div>
 				<div class="lp-craft-card__title">Fade-Proof Graphics</div>
 				<div class="lp-craft-card__desc">DTG printing embeds ink into fibers. 50+ washes, same intensity. Your story doesn&rsquo;t fade.</div>
 			</div>
 
 			<div class="lp-craft-card rv rv-d2">
-				<div class="lp-craft-card__icon" aria-hidden="true">&#128156;</div>
+				<div class="lp-craft-card__icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#B76E79" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/><path d="M12 5.67V12"/><path d="M8 10h8"/></svg></div>
 				<div class="lp-craft-card__title">Emotional Design Process</div>
 				<div class="lp-craft-card__desc">Each piece starts as a personal journal entry. Real emotion, real experience &mdash; translated into wearable art.</div>
 			</div>
 
 			<div class="lp-craft-card rv rv-d3">
-				<div class="lp-craft-card__icon" aria-hidden="true">&#9733;</div>
+				<div class="lp-craft-card__icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#DC143C" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
 				<div class="lp-craft-card__title">Premium Weight Cotton</div>
 				<div class="lp-craft-card__desc">330gsm+ cotton blend. Heavy enough to feel like armor. Soft enough to live in every day.</div>
 			</div>

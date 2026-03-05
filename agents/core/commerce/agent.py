@@ -39,9 +39,38 @@ class CommerceCoreAgent(CoreAgent):
 
     def __init__(self, *, correlation_id: str | None = None, **kwargs: Any) -> None:
         super().__init__(correlation_id=correlation_id, **kwargs)
-
-        # Lazy-load the existing CommerceAgent to preserve backward compat
         self._legacy_agent: Any = None
+        self._register_sub_agents()
+
+    def _register_sub_agents(self) -> None:
+        """Auto-register consolidated sub-agents with aliases."""
+        try:
+            from agents.core.commerce.sub_agents.product_ops import ProductOpsSubAgent
+
+            agent = ProductOpsSubAgent()
+            self.register_sub_agent("product_ops", agent)
+            for alias in ProductOpsSubAgent.ALIASES:
+                self.register_sub_agent(alias, agent)
+        except ImportError:
+            logger.debug("[%s] ProductOpsSubAgent unavailable", self.name)
+
+        try:
+            from agents.core.commerce.sub_agents.wordpress_assets import (
+                WordPressAssetsSubAgent,
+            )
+
+            self.register_sub_agent("wordpress_assets", WordPressAssetsSubAgent())
+        except ImportError:
+            logger.debug("[%s] WordPressAssetsSubAgent unavailable", self.name)
+
+        try:
+            from agents.core.commerce.sub_agents.wordpress_bridge import (
+                WordPressBridgeSubAgent,
+            )
+
+            self.register_sub_agent("wordpress_bridge", WordPressBridgeSubAgent())
+        except ImportError:
+            logger.debug("[%s] WordPressBridgeSubAgent unavailable", self.name)
 
     def _get_legacy_agent(self) -> Any:
         """Lazy-load the existing CommerceAgent."""

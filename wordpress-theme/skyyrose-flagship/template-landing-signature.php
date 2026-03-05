@@ -93,6 +93,25 @@ get_header();
 			<a href="#story" class="lp-btn lp-btn--outline">Why Signature</a>
 		</div>
 	</div>
+
+	<!-- Animated rose bloom -->
+	<picture class="signature-rose signature-rose--hero" aria-hidden="true" style="position:absolute;bottom:10%;right:6%;z-index:3;">
+		<source srcset="<?php echo esc_url( get_template_directory_uri() . '/assets/branding/signature-rose-hero.webp' ); ?>" type="image/webp">
+		<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/branding/signature-rose-hero.png' ); ?>"
+		     alt="" width="120" height="128" loading="eager">
+	</picture>
+
+	<!-- Floating petals -->
+	<div class="signature-petals" aria-hidden="true">
+		<span class="petal"></span>
+		<span class="petal"></span>
+		<span class="petal"></span>
+		<span class="petal"></span>
+		<span class="petal"></span>
+		<span class="petal"></span>
+		<span class="petal"></span>
+		<span class="petal"></span>
+	</div>
 </section>
 
 <!-- Press logos bar -->
@@ -299,25 +318,25 @@ get_header();
 
 		<div class="lp-craft__grid">
 			<div class="lp-craft-card rv">
-				<div class="lp-craft-card__icon" aria-hidden="true">&#127942;</div>
+				<div class="lp-craft-card__icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.5"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 7 7 7 7m11-2.5A2.5 2.5 0 0 0 18 4h-1.5C14 4 14 7 14 7m-6.5 4h9v2c0 3.5-2 6.5-4.5 6.5S7.5 18.5 7.5 15v-2Z"/><path d="M5 22h14M12 17v5"/></svg></div>
 				<div class="lp-craft-card__title">Award-Winning Quality</div>
 				<div class="lp-craft-card__desc">Same obsessive craftsmanship as our limited drops. The difference? You can wear SIGNATURE every single day.</div>
 			</div>
 
 			<div class="lp-craft-card rv rv-d1">
-				<div class="lp-craft-card__icon" aria-hidden="true">&#11035;</div>
+				<div class="lp-craft-card__icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
 				<div class="lp-craft-card__title">300gsm+ Construction</div>
 				<div class="lp-craft-card__desc">Heavier than anything in your closet. Premium cotton that gets softer with every wash, never thinner.</div>
 			</div>
 
 			<div class="lp-craft-card rv rv-d2">
-				<div class="lp-craft-card__icon" aria-hidden="true">&#128260;</div>
+				<div class="lp-craft-card__icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.5"><path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg></div>
 				<div class="lp-craft-card__title">Designed to Restock</div>
 				<div class="lp-craft-card__desc">Core styles always available. New colorways drop seasonally. Your foundation wardrobe, always accessible.</div>
 			</div>
 
 			<div class="lp-craft-card rv rv-d3">
-				<div class="lp-craft-card__icon" aria-hidden="true">&#127753;</div>
+				<div class="lp-craft-card__icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="1.5"><path d="M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11m16-11v11m-9-11v11m-4-11v11m8-11v11"/></svg></div>
 				<div class="lp-craft-card__title">Oakland DNA</div>
 				<div class="lp-craft-card__desc">Bay Area born and bred. Every piece carries the spirit of Oakland &mdash; resilient, authentic, unapologetically real.</div>
 			</div>

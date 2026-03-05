@@ -184,5 +184,4 @@ class SkyyRose_Three_Viewer_Widget extends \Elementor\Widget_Base {
 	}
 }
 
-// Register the widget.
-\Elementor\Plugin::instance()->widgets_manager->register_widget_type( new SkyyRose_Three_Viewer_Widget() );
+// Registration handled centrally by inc/elementor.php via the modern register() API.

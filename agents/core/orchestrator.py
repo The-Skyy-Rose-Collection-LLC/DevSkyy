@@ -21,6 +21,7 @@ from typing import Any
 from agents.errors import AgentError, ErrorCategory
 
 from .base import CoreAgent, CoreAgentType, HealthStatus, SelfHealingMixin
+from .shared.wp_ai_bridge import WordPressAIBridge
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +70,7 @@ class Orchestrator(SelfHealingMixin):
         self._core_agents: dict[CoreAgentType, CoreAgent] = {}
         self._budget_limit_usd: float | None = None
         self._budget_spent_usd: float = 0.0
+        self._wp_ai_bridge = WordPressAIBridge(correlation_id=correlation_id)
 
     # -------------------------------------------------------------------------
     # Agent Registration
@@ -86,6 +88,11 @@ class Orchestrator(SelfHealingMixin):
     def get_core_agent(self, agent_type: CoreAgentType) -> CoreAgent | None:
         """Get a registered core agent by type."""
         return self._core_agents.get(agent_type)
+
+    @property
+    def ai_bridge(self) -> WordPressAIBridge:
+        """WordPress AI SDK bridge — available to all agents."""
+        return self._wp_ai_bridge
 
     def set_budget_limit(self, limit_usd: float) -> None:
         """Set the maximum budget for autonomous operations."""
@@ -123,12 +130,23 @@ class Orchestrator(SelfHealingMixin):
         Route a task to the appropriate core agent.
 
         Steps:
-        1. Determine target agent via routing rules
-        2. Check budget limits
-        3. Check circuit breaker on target agent
-        4. Execute via the core agent's execute_safe()
-        5. Handle escalation if the core agent fails
+        1. Check if task is an AI generation request → route to AI bridge
+        2. Determine target agent via routing rules
+        3. Check budget limits
+        4. Check circuit breaker on target agent
+        5. Execute via the core agent's execute_safe()
+        6. Handle escalation if the core agent fails
         """
+        # AI generation tasks route directly to the WordPress AI bridge
+        task_lower = task.lower()
+        if any(kw in task_lower for kw in [
+            "ai generate", "ai text", "ai image", "ai status",
+            "generate description", "generate copy", "generate image",
+            "wp ai", "wordpress ai",
+        ]):
+            logger.info("[orchestrator] Routing to WordPress AI bridge: %s", task[:100])
+            return await self._wp_ai_bridge.execute_safe(task, **kwargs)
+
         target_type = self.route_task(task)
         agent = self._core_agents.get(target_type)
 
@@ -256,9 +274,13 @@ class Orchestrator(SelfHealingMixin):
                 if status.healthy:
                     total_healthy += 1
 
+        # Include AI bridge health
+        ai_bridge_health = self._wp_ai_bridge.health_check()
+
         return {
             "orchestrator": self.health_check().__dict__,
             "agents": {k: v.__dict__ for k, v in agent_health.items()},
+            "wp_ai_bridge": ai_bridge_health.__dict__,
             "summary": {
                 "total_agents": total_agents,
                 "healthy_agents": total_healthy,
@@ -302,6 +324,20 @@ class Orchestrator(SelfHealingMixin):
                         "to": sub["id"],
                         "type": "delegates",
                     })
+
+        # Add AI bridge as a shared node
+        ai_node = self._wp_ai_bridge.to_dashboard_card()
+        nodes.append({
+            "id": "wp_ai_bridge",
+            "type": "shared",
+            "label": "WordPress AI Bridge",
+            "healthy": ai_node["healthy"],
+        })
+        connections.append({
+            "from": "orchestrator",
+            "to": "wp_ai_bridge",
+            "type": "shared_capability",
+        })
 
         return {
             "nodes": nodes,
