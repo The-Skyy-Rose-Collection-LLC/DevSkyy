@@ -500,6 +500,34 @@ label {
 
 .site-content {
 	padding: var(--space-lg, 2rem) 0;
+	padding-top: var(--header-height, 72px);
+}
+
+/* Full-bleed hero pages handle their own offset — reset the header padding */
+.homepage-v2 .site-content,
+.page-template-template-homepage-luxury .site-content,
+.page-template-template-landing-black-rose .site-content,
+.page-template-template-landing-love-hurts .site-content,
+.page-template-template-landing-signature .site-content,
+.page-template-template-love-hurts .site-content,
+.page-template-template-immersive-black-rose .site-content,
+.page-template-template-immersive-love-hurts .site-content,
+.page-template-template-immersive-signature .site-content,
+.page-template-skyyrose-canvas .site-content {
+	padding-top: 0;
+}
+
+/*
+ * Homepage V2 — hide official header/footer.
+ * front-page.php provides its own cinematic nav (.nav) and footer (.ft)
+ * designed for the homepage scroll experience. Without these rules,
+ * both official + homepage navs render simultaneously (z-index clash).
+ */
+.homepage-v2 .site-header,
+.homepage-v2 .site-footer,
+.homepage-v2 .sr-scroll-progress,
+.homepage-v2 .sr-back-to-top {
+	display: none;
 }
 
 .content-area {
@@ -1029,6 +1057,7 @@ label {
 
 	.site-content {
 		padding: var(--space-xl, 3rem) 0;
+		padding-top: var(--header-height, 72px);
 	}
 }
 

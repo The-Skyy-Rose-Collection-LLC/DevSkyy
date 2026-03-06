@@ -25,6 +25,7 @@ $collection_config = array(
 	'meta_price_range'  => '',
 	'meta_edition'      => __( 'Foundation Wardrobe', 'skyyrose-flagship' ),
 	'hero_image'        => SKYYROSE_ASSETS_URI . '/scenes/signature/signature-golden-gate-showroom.webp',
+	'hero_logo'         => get_template_directory_uri() . '/assets/branding/signature-logo-hero-transparent.png',
 
 	'manifesto_eye'     => __( 'The Standard', 'skyyrose-flagship' ),
 	'manifesto_heading' => __( 'Start Here.<br>Build Everything.', 'skyyrose-flagship' ),

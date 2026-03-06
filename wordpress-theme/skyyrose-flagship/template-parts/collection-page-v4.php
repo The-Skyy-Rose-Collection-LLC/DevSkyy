@@ -28,6 +28,7 @@ $col = wp_parse_args(
 		'meta_price_range'  => '',
 		'meta_edition'      => '',
 		'hero_image'        => '',
+		'hero_logo'         => '',
 		'manifesto_eye'     => '',
 		'manifesto_heading' => '',
 		'manifesto_body'    => '',
@@ -168,7 +169,16 @@ get_header();
 			<p class="col-hero__num">
 				<?php echo esc_html( sprintf( __( 'Collection %s', 'skyyrose-flagship' ), $col['number'] ) ); ?>
 			</p>
+			<?php if ( ! empty( $col['hero_logo'] ) ) : ?>
+			<h1 class="col-hero__name">
+				<span class="screen-reader-text"><?php echo wp_kses_post( $col['name'] ); ?></span>
+				<img class="col-hero__logo" aria-hidden="true"
+				     src="<?php echo esc_url( $col['hero_logo'] ); ?>"
+				     alt="" loading="eager">
+			</h1>
+		<?php else : ?>
 			<h1 class="col-hero__name"><?php echo wp_kses_post( $col['name'] ); ?></h1>
+		<?php endif; ?>
 			<p class="col-hero__tag"><?php echo esc_html( $col['tagline'] ); ?></p>
 			<div class="col-hero__meta">
 				<span><?php echo wp_kses_post( $col['meta_pieces'] ); ?></span>

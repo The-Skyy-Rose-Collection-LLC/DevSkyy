@@ -365,15 +365,33 @@
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	background-clip: text;
-	animation: gradShift 8s ease-in-out infinite, heroIn 1.2s var(--ease) .3s forwards;
+	animation: gradShift 8s ease-in-out infinite;
 	filter: drop-shadow(0 4px 60px rgba(183, 110, 121, .12));
+	display: inline-flex;
+}
+
+/* Individual letter reveal — JS splits text into .hero-letter spans */
+.hero-letter {
+	display: inline-block;
 	opacity: 0;
-	transform: translateY(24px) scale(.98);
+	transform: translateY(32px) scale(.92);
+	animation: letterIn .7s var(--ease) forwards;
+}
+
+@keyframes letterIn {
+	to { opacity: 1; transform: translateY(0) scale(1); }
 }
 @keyframes gradShift {
 	0% { background-position: 0% 50%; }
 	50% { background-position: 100% 50%; }
 	100% { background-position: 0% 50%; }
+}
+
+/* Fallback — if JS doesn't split, show title as-is */
+.hero-title:not(:has(.hero-letter)) {
+	opacity: 0;
+	animation: gradShift 8s ease-in-out infinite, heroIn 1.2s var(--ease) .3s forwards;
+	transform: translateY(24px) scale(.98);
 }
 @keyframes heroIn {
 	to { opacity: 1; transform: translateY(0) scale(1); }

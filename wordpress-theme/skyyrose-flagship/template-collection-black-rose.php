@@ -25,6 +25,7 @@ $collection_config = array(
 	'meta_price_range'  => '',
 	'meta_edition'      => __( 'Limited Edition', 'skyyrose-flagship' ),
 	'hero_image'        => SKYYROSE_ASSETS_URI . '/scenes/black-rose/black-rose-marble-rotunda.webp',
+	'hero_logo'         => get_template_directory_uri() . '/assets/branding/black-rose-logo-hero-transparent.png',
 
 	'manifesto_eye'     => __( 'The Philosophy', 'skyyrose-flagship' ),
 	'manifesto_heading' => __( 'Limited Drops.<br>Unlimited Vision.', 'skyyrose-flagship' ),

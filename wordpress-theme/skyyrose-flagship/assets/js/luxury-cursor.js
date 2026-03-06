@@ -28,6 +28,10 @@
 	var dot   = ensureElement('luxury-cursor-dot');
 	var trail = ensureElement('luxury-cursor-trail');
 
+	// Signal to CSS that the custom cursor is active.
+	// Without this class, cursor:none won't apply (progressive enhancement).
+	document.body.classList.add('luxury-cursor-active');
+
 	var mouseX = 0;
 	var mouseY = 0;
 	var ringX = 0;

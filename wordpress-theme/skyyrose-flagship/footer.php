@@ -231,10 +231,7 @@
 <!-- Toast Notification Container -->
 <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-<!-- Luxury Cursor (desktop only, hidden from assistive tech) -->
-<div class="luxury-cursor-ring" aria-hidden="true"></div>
-<div class="luxury-cursor-dot" aria-hidden="true"></div>
-<div class="luxury-cursor-trail" aria-hidden="true"></div>
+<!-- Luxury Cursor elements created dynamically by luxury-cursor.js -->
 
 <!-- Scroll Progress Indicator -->
 <div class="sr-scroll-progress" aria-hidden="true">

@@ -67,7 +67,12 @@ get_header();
 
 	<div class="lp-hero__content">
 		<div class="lp-hero__eyebrow">Limited Edition &mdash; 200 Pieces Per Style</div>
-		<h1 class="lp-hero__title"><?php echo esc_html( $collection_name ); ?></h1>
+		<h1 class="lp-hero__title">
+			<span class="screen-reader-text"><?php echo esc_html( $collection_name ); ?></span>
+			<img class="lp-hero__logo" aria-hidden="true"
+			     src="<?php echo esc_url( get_template_directory_uri() . '/assets/branding/black-rose-logo-hero-transparent.png' ); ?>"
+			     alt="" width="520" height="240" loading="eager">
+		</h1>
 
 		<div class="lp-countdown"<?php echo $countdown_attr; ?>>
 			<div class="lp-countdown__unit">

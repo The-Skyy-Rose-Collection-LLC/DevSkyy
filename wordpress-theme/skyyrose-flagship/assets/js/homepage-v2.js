@@ -40,6 +40,28 @@
 	} )();
 
 	/* ======================================================================
+	   HERO LETTER REVEAL — Split title into staggered <span> letters
+	   ====================================================================== */
+	( function initLetterReveal() {
+		var title = document.querySelector( '.hero-title' );
+		if ( ! title ) {
+			return;
+		}
+		var text = title.textContent.trim();
+		title.textContent = '';
+		title.setAttribute( 'aria-label', text );
+
+		for ( var i = 0; i < text.length; i++ ) {
+			var span = document.createElement( 'span' );
+			span.className = 'hero-letter';
+			span.textContent = text[ i ];
+			span.style.animationDelay = ( 0.3 + i * 0.08 ) + 's';
+			span.setAttribute( 'aria-hidden', 'true' );
+			title.appendChild( span );
+		}
+	} )();
+
+	/* ======================================================================
 	   NAV SCROLL — Toggle .scrolled class on main nav
 	   ====================================================================== */
 	( function initNavScroll() {

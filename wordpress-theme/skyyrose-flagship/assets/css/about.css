@@ -113,7 +113,7 @@
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	object-position: center 15%;
+	object-position: center 10%;
 	animation: abt-heroZoom 25s ease-out forwards;
 }
 
@@ -309,6 +309,69 @@
 .abt-origin__text strong {
 	color: rgba(245, 230, 211, 0.55);
 	font-weight: 500;
+}
+
+/* ==================================================
+   FOUNDER PORTRAIT (inside Origin quote column)
+   ================================================== */
+
+.abt-origin__portrait {
+	margin: 40px 0 0;
+	position: relative;
+}
+
+.abt-origin__portrait img {
+	width: 100%;
+	aspect-ratio: 4 / 5;
+	object-fit: cover;
+	object-position: center 20%;
+	filter: grayscale(0.3) contrast(1.05);
+	transition: filter 0.6s ease;
+}
+
+.abt-origin__portrait:hover img {
+	filter: grayscale(0) contrast(1);
+}
+
+.abt-origin__portrait figcaption {
+	font-family: 'Space Mono', monospace;
+	font-size: 7px;
+	letter-spacing: 4px;
+	text-transform: uppercase;
+	color: rgba(183, 110, 121, 0.25);
+	margin-top: 12px;
+}
+
+/* ==================================================
+   CINEMATIC PHOTO DIVIDERS (between chapters)
+   ================================================== */
+
+.abt-divider {
+	position: relative;
+	width: 100%;
+	height: clamp(200px, 30vw, 400px);
+	overflow: hidden;
+}
+
+.abt-divider img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	filter: grayscale(0.2) contrast(1.1);
+}
+
+.abt-divider__overlay {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		to bottom,
+		#0A0A0A 0%,
+		rgba(10, 10, 10, 0.2) 15%,
+		rgba(10, 10, 10, 0.2) 85%,
+		#0A0A0A 100%
+	);
+	pointer-events: none;
 }
 
 /* ==================================================
@@ -531,6 +594,35 @@
 	width: 100%;
 	height: 100%;
 	border: none;
+}
+
+/* Press Photo */
+.abt-press__photo {
+	margin-bottom: 56px;
+	position: relative;
+	overflow: hidden;
+}
+
+.abt-press__photo img {
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+	object-position: center;
+	filter: contrast(1.05);
+	transition: transform 0.8s ease;
+}
+
+.abt-press__photo:hover img {
+	transform: scale(1.02);
+}
+
+.abt-press__photo figcaption {
+	font-family: 'Space Mono', monospace;
+	font-size: 7px;
+	letter-spacing: 4px;
+	text-transform: uppercase;
+	color: rgba(183, 110, 121, 0.25);
+	margin-top: 12px;
 }
 
 /* Horizontal Editorial Scroll */
@@ -815,6 +907,52 @@
 }
 
 /* ==================================================
+   CUSTOMER GALLERY (inside Community section)
+   ================================================== */
+
+.abt-community__gallery {
+	grid-column: 1 / -1;
+	margin-top: 48px;
+	padding-top: 48px;
+	border-top: 1px solid rgba(183, 110, 121, 0.06);
+}
+
+.abt-community__gallery-label {
+	font-family: 'Space Mono', monospace;
+	font-size: 7px;
+	letter-spacing: 6px;
+	text-transform: uppercase;
+	color: rgba(183, 110, 121, 0.3);
+	margin-bottom: 24px;
+	text-align: center;
+}
+
+.abt-community__photos {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 3px;
+}
+
+.abt-community__photo {
+	position: relative;
+	overflow: hidden;
+	aspect-ratio: 4 / 5;
+}
+
+.abt-community__photo img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	filter: grayscale(0.15) contrast(1.05);
+	transition: filter 0.5s ease, transform 0.5s ease;
+}
+
+.abt-community__photo:hover img {
+	filter: grayscale(0) contrast(1);
+	transform: scale(1.04);
+}
+
+/* ==================================================
    RESPONSIVE — 1024px (Tablet Landscape)
    ================================================== */
 
@@ -858,6 +996,10 @@
 
 	.abt-press-card {
 		flex: 0 0 320px;
+	}
+
+	.abt-community__photos {
+		grid-template-columns: repeat(2, 1fr);
 	}
 }
 
@@ -947,6 +1089,10 @@
 
 	.abt-press__video-embed {
 		padding-bottom: 56.25%;
+	}
+
+	.abt-divider {
+		height: clamp(160px, 25vw, 280px);
 	}
 
 	.abt-mission {
@@ -1119,6 +1265,18 @@
 	.abt-community__inner {
 		padding: 0 16px;
 		gap: 32px;
+	}
+
+	.abt-community__photos {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.abt-divider {
+		height: clamp(120px, 30vw, 200px);
+	}
+
+	.abt-origin__portrait {
+		margin-top: 32px;
 	}
 
 	.abt-community__heading {
