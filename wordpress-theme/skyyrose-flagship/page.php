@@ -1,32 +1,49 @@
 <?php
 /**
- * The template for displaying all pages
+ * The template for displaying all pages.
+ *
+ * Dark luxury page layout with brand-consistent typography
+ * and spacing. Falls back to this for any page without a
+ * custom page template assigned.
  *
  * @package SkyyRose_Flagship
- * @since 1.0.0
+ * @since   4.2.0
  */
 
 get_header();
 ?>
 
-<main id="primary" class="site-main">
+<main id="primary" class="site-main skr-page" role="main" tabindex="-1">
+	<div class="skr-page__inner">
+		<?php
+		while ( have_posts() ) :
+			the_post();
+		?>
+		<article id="post-<?php the_ID(); ?>" <?php post_class( 'skr-page__article' ); ?>>
+			<header class="skr-page__header">
+				<?php the_title( '<h1 class="skr-page__title">', '</h1>' ); ?>
+			</header>
 
-	<?php
-	while ( have_posts() ) :
-		the_post();
+			<div class="skr-page__content entry-content">
+				<?php
+				the_content();
 
-		get_template_part( 'template-parts/content/content', 'page' );
+				wp_link_pages( array(
+					'before' => '<nav class="skr-page-links" aria-label="' . esc_attr__( 'Page navigation', 'skyyrose-flagship' ) . '">',
+					'after'  => '</nav>',
+				) );
+				?>
+			</div>
+		</article>
+		<?php
+			if ( comments_open() || get_comments_number() ) :
+				comments_template();
+			endif;
 
-		// If comments are open or we have at least one comment, load up the comment template.
-		if ( comments_open() || get_comments_number() ) :
-			comments_template();
-		endif;
-
-	endwhile; // End of the loop.
-	?>
-
-</main><!-- #primary -->
+		endwhile;
+		?>
+	</div>
+</main>
 
 <?php
-get_sidebar();
 get_footer();

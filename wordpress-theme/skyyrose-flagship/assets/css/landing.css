@@ -172,6 +172,83 @@
 	animation: lp-fade-up 1s var(--lp-ease) 0.5s forwards;
 }
 
+/* --- Letter Logo in Hero --- */
+.lp-hero__logo {
+	display: block;
+	max-width: clamp(280px, 50vw, 520px);
+	height: auto;
+	margin-inline: auto;
+	filter: drop-shadow(0 4px 30px rgba(0, 0, 0, 0.6))
+	        drop-shadow(0 0 60px rgba(var(--lp-accent-rgb), 0.15));
+}
+
+/* Split letter logos (Love + Hurts as separate words) */
+.lp-hero__logo--split {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: clamp(0px, 1vw, 8px);
+}
+
+.lp-hero__logo-word {
+	display: block;
+	max-width: clamp(240px, 45vw, 420px);
+	height: auto;
+	filter: drop-shadow(0 4px 30px rgba(0, 0, 0, 0.6))
+	        drop-shadow(0 0 40px rgba(var(--lp-accent-rgb), 0.2));
+}
+
+.lp-hero__logo-word--love {
+	animation: lp-logo-love 1.2s var(--lp-ease) 0.3s both;
+}
+
+.lp-hero__logo-word--hurts {
+	animation: lp-logo-hurts 1.2s var(--lp-ease) 0.6s both;
+}
+
+@keyframes lp-logo-love {
+	from {
+		opacity: 0;
+		transform: translateX(-40px) scale(0.9);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0) scale(1);
+	}
+}
+
+@keyframes lp-logo-hurts {
+	from {
+		opacity: 0;
+		transform: translateX(40px) scale(0.9);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0) scale(1);
+	}
+}
+
+/* Email capture background logo */
+.lp-email-capture__bg-logo {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	max-width: 60%;
+	opacity: 0.04;
+	pointer-events: none;
+	filter: grayscale(1);
+}
+
+@media (max-width: 768px) {
+	.lp-hero__logo {
+		max-width: clamp(200px, 70vw, 360px);
+	}
+
+	.lp-hero__logo-word {
+		max-width: clamp(180px, 60vw, 320px);
+	}
+}
 
 .lp-hero__cta {
 	display: flex;

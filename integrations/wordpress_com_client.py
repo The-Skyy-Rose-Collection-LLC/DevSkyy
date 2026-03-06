@@ -360,22 +360,34 @@ class WordPressComClient:
 
 async def create_wordpress_client(
     site_url: str,
-    api_token: str,
+    api_token: str | None = None,
     consumer_key: str | None = None,
     consumer_secret: str | None = None,
+    *,
+    username: str | None = None,
+    app_password: str | None = None,
 ) -> WordPressComClient:
     """Create WordPress.com client.
+
+    Supports OAuth2 (api_token) or Application Password (username + app_password).
 
     Args:
         site_url: WordPress.com site URL
         api_token: WordPress.com OAuth2 access token
         consumer_key: Optional WooCommerce consumer key
         consumer_secret: Optional WooCommerce consumer secret
+        username: WordPress username (for Application Password auth)
+        app_password: WordPress Application Password
 
     Returns:
         Configured WordPress.com client
     """
-    wp_config = WordPressConfig(site_url=site_url, api_token=api_token)
+    wp_config = WordPressConfig(
+        site_url=site_url,
+        api_token=api_token or None,
+        username=username or None,
+        app_password=app_password or None,
+    )
 
     woo_config = None
     if consumer_key and consumer_secret:

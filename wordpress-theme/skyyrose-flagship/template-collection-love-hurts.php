@@ -25,6 +25,7 @@ $collection_config = array(
 	'meta_price_range'  => '',
 	'meta_edition'      => __( 'Family Legacy', 'skyyrose-flagship' ),
 	'hero_image'        => SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-crimson-throne-room.webp',
+	'hero_logo'         => get_template_directory_uri() . '/assets/branding/love-hurts-logo-hero-transparent.png',
 
 	'manifesto_eye'     => __( 'The Story', 'skyyrose-flagship' ),
 	'manifesto_heading' => __( 'Named For Family.<br>Made For Feeling.', 'skyyrose-flagship' ),

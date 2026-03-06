@@ -1013,7 +1013,7 @@ def _create_auth_router():
             Tuple of (user_id, roles) if valid, None if invalid
         """
         try:
-            from database import UserRepository, get_db
+            from database.db import UserRepository, get_db
 
             # Get database session
             async for db in get_db():
@@ -1188,6 +1188,79 @@ def _create_auth_router():
             "issued_at": user.iat.isoformat() if user.iat else None,
             "expires_at": user.exp.isoformat() if user.exp else None,
         }
+
+    @router.post("/register", status_code=status.HTTP_201_CREATED)
+    async def register_user(user_data: UserCreate):
+        """
+        Register a new user account.
+
+        - Validates password strength (OWASP rules)
+        - Hashes password with Argon2id
+        - Creates user in database
+        - Returns access + refresh tokens
+        """
+        import uuid
+
+        try:
+            from database.db import UserRepository, get_db
+
+            async for db in get_db():
+                repo = UserRepository(db)
+
+                # Check if username or email already exists
+                existing = await repo.get_by_username(user_data.username)
+                if existing:
+                    raise HTTPException(
+                        status_code=status.HTTP_409_CONFLICT,
+                        detail="Username already registered",
+                    )
+                existing = await repo.get_by_email(user_data.email)
+                if existing:
+                    raise HTTPException(
+                        status_code=status.HTTP_409_CONFLICT,
+                        detail="Email already registered",
+                    )
+
+                # Hash password and create user
+                hashed = password_manager.hash_password(user_data.password)
+                user_id = str(uuid.uuid4())
+                role = user_data.roles[0].value if user_data.roles else UserRole.API_USER.value
+
+                from database.db import User as UserModel
+
+                new_user = UserModel(
+                    id=user_id,
+                    email=user_data.email,
+                    username=user_data.username,
+                    hashed_password=hashed,
+                    role=role,
+                    is_active=True,
+                    is_verified=False,
+                )
+                db.add(new_user)
+                await db.commit()
+
+                # Generate tokens
+                tokens = jwt_manager.create_token_pair(
+                    user_id=user_id,
+                    roles=[role],
+                )
+
+                logger.info(f"New user registered: {user_data.username}")
+                return {
+                    "message": "User registered successfully",
+                    "user_id": user_id,
+                    **tokens.model_dump(),
+                }
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Registration error: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Registration failed",
+            )
 
     return router
 

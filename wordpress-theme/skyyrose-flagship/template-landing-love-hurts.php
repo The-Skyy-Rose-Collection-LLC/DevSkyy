@@ -67,7 +67,17 @@ get_header();
 
 	<div class="lp-hero__content">
 		<div class="lp-hero__eyebrow">Named After a Bloodline &mdash; Designed for Survivors</div>
-		<h1 class="lp-hero__title"><?php echo esc_html( $collection_name ); ?></h1>
+		<h1 class="lp-hero__title">
+			<span class="screen-reader-text"><?php echo esc_html( $collection_name ); ?></span>
+			<span class="lp-hero__logo lp-hero__logo--split" aria-hidden="true">
+				<img class="lp-hero__logo-word lp-hero__logo-word--love"
+				     src="<?php echo esc_url( get_template_directory_uri() . '/assets/branding/love-hurts-love-hero.webp' ); ?>"
+				     alt="" width="420" height="200" loading="eager">
+				<img class="lp-hero__logo-word lp-hero__logo-word--hurts"
+				     src="<?php echo esc_url( get_template_directory_uri() . '/assets/branding/love-hurts-hurts-hero.webp' ); ?>"
+				     alt="" width="420" height="200" loading="eager">
+			</span>
+		</h1>
 
 		<div class="lp-countdown"<?php echo $countdown_attr; ?>>
 			<div class="lp-countdown__unit">

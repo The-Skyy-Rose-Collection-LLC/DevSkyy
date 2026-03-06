@@ -249,6 +249,11 @@ from api.v1.pipeline import router as pipeline_router
 
 app.include_router(pipeline_router, prefix="/api/v1")
 
+# Authentication
+from security.jwt_oauth2_auth import auth_router
+
+app.include_router(auth_router)
+
 # GraphQL
 from api.graphql_server import graphql_router
 

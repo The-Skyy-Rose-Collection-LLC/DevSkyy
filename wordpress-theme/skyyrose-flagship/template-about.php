@@ -169,10 +169,29 @@ $arrow_svg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke
 	<section class="abt-hero" aria-label="<?php esc_attr_e( 'About SkyyRose', 'skyyrose-flagship' ); ?>">
 		<div class="abt-hero__img" aria-hidden="true">
 			<?php
-			$hero_img = get_theme_file_path( 'assets/images/about-story-0.jpg' );
-			if ( file_exists( $hero_img ) ) :
+			// Hero image: prioritize about-hero.jpg (Skyy Rose portrait),
+			// fall back to about-story-0.jpg (founder at work).
+			$hero_img_custom = get_theme_mod( 'about_hero_image', '' );
+			$hero_candidates = array(
+				'assets/images/about-hero.jpg',
+				'assets/images/about-story-0.jpg',
+			);
+
+			$hero_src = '';
+			if ( ! empty( $hero_img_custom ) ) {
+				$hero_src = $hero_img_custom;
+			} else {
+				foreach ( $hero_candidates as $candidate ) {
+					if ( file_exists( get_theme_file_path( $candidate ) ) ) {
+						$hero_src = get_theme_file_uri( $candidate );
+						break;
+					}
+				}
+			}
+
+			if ( ! empty( $hero_src ) ) :
 			?>
-				<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/about-story-0.jpg' ) ); ?>"
+				<img src="<?php echo esc_url( $hero_src ); ?>"
 					 alt="<?php esc_attr_e( 'SkyyRose — luxury streetwear born in Oakland', 'skyyrose-flagship' ); ?>"
 					 loading="eager" fetchpriority="high" decoding="async" width="1920" height="1080">
 			<?php endif; ?>
@@ -211,6 +230,18 @@ $arrow_svg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke
 						<?php echo wp_kses( $origin_quote, $allowed_inline ); ?>
 					</blockquote>
 					<cite><?php echo wp_kses( $origin_cite, $allowed_inline ); ?></cite>
+
+					<?php
+					$founder_img = get_theme_file_path( 'assets/images/founder-portrait.jpg' );
+					if ( file_exists( $founder_img ) ) :
+					?>
+						<figure class="abt-origin__portrait rv rv-d3">
+							<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/founder-portrait.jpg' ) ); ?>"
+								 alt="<?php esc_attr_e( 'Corey Foster — Founder & CEO of SkyyRose', 'skyyrose-flagship' ); ?>"
+								 loading="lazy" width="600" height="750">
+							<figcaption><?php esc_html_e( 'Corey Foster, Founder & CEO', 'skyyrose-flagship' ); ?></figcaption>
+						</figure>
+					<?php endif; ?>
 				</div>
 				<div class="abt-origin__text rv rv-d3">
 					<?php foreach ( $origin_paragraphs as $para ) : ?>
@@ -220,6 +251,18 @@ $arrow_svg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke
 			</div>
 		</div>
 	</section>
+
+	<!-- ═══ PHOTO DIVIDER — Story 1 ═══ -->
+	<?php
+	$story1_img = get_theme_file_path( 'assets/images/about-story-1.jpg' );
+	if ( file_exists( $story1_img ) ) :
+	?>
+		<div class="abt-divider rv" aria-hidden="true">
+			<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/about-story-1.jpg' ) ); ?>"
+				 alt="" loading="lazy" width="1920" height="600">
+			<div class="abt-divider__overlay"></div>
+		</div>
+	<?php endif; ?>
 
 	<!-- ═══ CHAPTER II — Values ═══ -->
 	<section class="abt-chapter abt-values" aria-label="<?php esc_attr_e( 'Our Values', 'skyyrose-flagship' ); ?>">
@@ -249,6 +292,18 @@ $arrow_svg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke
 		</div>
 	</section>
 
+	<!-- ═══ PHOTO DIVIDER — Story 2 ═══ -->
+	<?php
+	$story2_img = get_theme_file_path( 'assets/images/about-story-2.jpg' );
+	if ( file_exists( $story2_img ) ) :
+	?>
+		<div class="abt-divider rv" aria-hidden="true">
+			<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/about-story-2.jpg' ) ); ?>"
+				 alt="" loading="lazy" width="1920" height="600">
+			<div class="abt-divider__overlay"></div>
+		</div>
+	<?php endif; ?>
+
 	<!-- ═══ CHAPTER III — Timeline ═══ -->
 	<section class="abt-chapter abt-timeline" aria-label="<?php esc_attr_e( 'Our Journey', 'skyyrose-flagship' ); ?>">
 		<span class="abt-chapter__num" aria-hidden="true">03</span>
@@ -277,6 +332,19 @@ $arrow_svg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke
 			<p class="abt-press__intro rv rv-d2">
 				<?php esc_html_e( 'The SkyyRose story has been recognized by national and regional publications for its authenticity, innovation, and the power of its origin.', 'skyyrose-flagship' ); ?>
 			</p>
+
+			<!-- Press Photo — The Blox Interview -->
+			<?php
+			$press_img = get_theme_file_path( 'assets/images/press-the-blox-interview.jpg' );
+			if ( file_exists( $press_img ) ) :
+			?>
+				<figure class="abt-press__photo rv rv-d2">
+					<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/press-the-blox-interview.jpg' ) ); ?>"
+						 alt="<?php esc_attr_e( 'Corey Foster interviewed on The Blox', 'skyyrose-flagship' ); ?>"
+						 loading="lazy" width="1200" height="675">
+					<figcaption><?php esc_html_e( 'Corey Foster on The Blox — discussing the SkyyRose story', 'skyyrose-flagship' ); ?></figcaption>
+				</figure>
+			<?php endif; ?>
 
 			<!-- Featured Video -->
 			<?php if ( ! empty( $youtube_embed_id ) ) : ?>
@@ -394,6 +462,57 @@ $arrow_svg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke
 				</div>
 			</div>
 		</div>
+
+		<!-- Customer Photos — Real People, Real SkyyRose -->
+		<?php
+		$customer_photos = array(
+			array(
+				'file' => 'customer-kid-black-rose-hoodie-enhanced.webp',
+				'alt'  => __( 'Young fan wearing Black Rose hoodie', 'skyyrose-flagship' ),
+			),
+			array(
+				'file' => 'customer-love-hurts-varsity-enhanced.webp',
+				'alt'  => __( 'Customer in Love Hurts varsity jacket', 'skyyrose-flagship' ),
+			),
+			array(
+				'file' => 'customer-rose-hoodie-beanie-enhanced.webp',
+				'alt'  => __( 'Customer wearing rose hoodie and beanie', 'skyyrose-flagship' ),
+			),
+			array(
+				'file' => 'customer-love-hurts-shorts-enhanced.webp',
+				'alt'  => __( 'Customer in Love Hurts shorts', 'skyyrose-flagship' ),
+			),
+		);
+
+		$has_photos = false;
+		foreach ( $customer_photos as $photo ) {
+			if ( file_exists( get_theme_file_path( 'assets/images/customers/' . $photo['file'] ) ) ) {
+				$has_photos = true;
+				break;
+			}
+		}
+
+		if ( $has_photos ) :
+		?>
+			<div class="abt-community__gallery rv rv-d3">
+				<p class="abt-community__gallery-label"><?php esc_html_e( 'The SkyyRose Family', 'skyyrose-flagship' ); ?></p>
+				<div class="abt-community__photos">
+					<?php foreach ( $customer_photos as $photo ) :
+						$photo_path = get_theme_file_path( 'assets/images/customers/' . $photo['file'] );
+						if ( file_exists( $photo_path ) ) :
+					?>
+						<figure class="abt-community__photo">
+							<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/customers/' . $photo['file'] ) ); ?>"
+								 alt="<?php echo esc_attr( $photo['alt'] ); ?>"
+								 loading="lazy" width="400" height="500">
+						</figure>
+					<?php
+						endif;
+					endforeach;
+					?>
+				</div>
+			</div>
+		<?php endif; ?>
 	</section>
 
 </main><!-- #primary -->

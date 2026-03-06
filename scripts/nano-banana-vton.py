@@ -45,189 +45,219 @@ PRODUCTS_DIR = (
 
 MODEL_ID = "gemini-2.5-flash-image"
 IMAGEN_MODEL_ID = "imagen-4.0-ultra-generate-001"
+FLUX_MODEL_ID = "black-forest-labs/FLUX.2-pro"
+FLUX_MODEL_FREE = "black-forest-labs/FLUX.1-schnell-Free"
+GPT_IMAGE_MODEL = "gpt-image-1.5"
+GPT_VISION_MODEL = "gpt-4.1"
 MIN_FILE_SIZE_KB = 50
 MAX_RETRIES = 3
 RETRY_DELAY_SEC = 5
 
-# -- Product catalog ---------------------------------------------------------
+# -- Product catalog (SOURCE OF TRUTH: products.csv) -------------------------
+# Every SKU, name, and collection comes directly from the canonical CSV.
+# Do NOT add products here that are not in products.csv.
 
 PRODUCT_CATALOG = {
-    "br-001": {"name": "BLACK Rose Crewneck Set", "collection": "black-rose", "source_override": "br-001-techflat-v4.jpg"},
+    # ── Black Rose Collection ──────────────────────────────────────────────
+    # Every SKU has explicit source_override to prevent auto-glob picking up
+    # AI-generated outputs (*-model-*.webp) as source images (feedback loop).
+    "br-001": {"name": "BLACK Rose Crewneck", "collection": "black-rose", "source_override": "br-001-techflat-v4.jpg"},
     "br-002": {"name": "BLACK Rose Joggers", "collection": "black-rose", "source_override": "br-002-joggers-source.jpg"},
-    "br-003": {"name": "BLACK is Beautiful Jersey", "collection": "black-rose"},
-    "br-004": {"name": "BLACK Rose Hoodie", "collection": "black-rose", "source_override": "br-004-hoodie-source.jpg"},
+    "br-003": {"name": "BLACK is Beautiful Jersey", "collection": "black-rose", "source_override": "br-003-jersey-front-techflat.jpg"},
+    "br-004": {"name": "BLACK Rose Hoodie", "collection": "black-rose", "source_override": "br-004-hoodie-product.jpg"},
     "br-005": {"name": "BLACK Rose Hoodie — Signature Edition", "collection": "black-rose", "source_override": "br-005-hoodie-ltd-source.jpg"},
-    "br-006": {"name": "BLACK Rose Sherpa Jacket", "collection": "black-rose"},
-    "br-007": {"name": "BLACK Rose x Love Hurts Basketball Shorts", "collection": "black-rose"},
-    "br-008": {"name": "Women's BLACK Rose Hooded Dress", "collection": "black-rose"},
-    # New BR design mockups — use render3d step to generate 3D product shots
-    "br-d01": {
-        "name": "BLACK is Beautiful Hockey Jersey (Teal)",
-        "collection": "black-rose",
-        "source_override": "br-design-hockey-jersey.jpg",
-    },
-    "br-d02": {
-        "name": "BLACK is Beautiful Football Jersey (Red #80)",
+    "br-006": {"name": "BLACK Rose Sherpa Jacket", "collection": "black-rose", "source_override": "br-006-sherpa-product.jpg"},
+    "br-007": {"name": "BLACK Rose × Love Hurts Basketball Shorts", "collection": "black-rose", "source_override": "br-007-shorts-front-source.jpg"},
+    "br-008": {"name": "Women's BLACK Rose Hooded Dress", "collection": "black-rose", "source_override": "br-008-hooded-dress.webp"},
+    # ── Love Hurts Collection ──────────────────────────────────────────────
+    "lh-001": {"name": "The Fannie", "collection": "love-hurts", "source_override": "lh-001-fannie-pack-photo.jpg"},
+    "lh-002": {"name": "Love Hurts Joggers", "collection": "love-hurts", "source_override": "lh-002-joggers-variants.jpg"},
+    "lh-003": {"name": "Love Hurts Basketball Shorts", "collection": "love-hurts", "source_override": "lh-003-shorts-front-closeup.jpg"},
+    "lh-004": {"name": "Love Hurts Varsity Jacket", "collection": "love-hurts", "source_override": "lh-004-varsity-source.jpg"},
+    "lh-005": {"name": "Love Hurts Windbreaker", "collection": "love-hurts", "source_override": "lh-005-bomber.webp"},
+    # ── Signature Collection ───────────────────────────────────────────────
+    "sg-001": {"name": "The Bay Set", "collection": "signature", "source_override": "sg-001-bay-set.webp"},
+    "sg-002": {"name": "Stay Golden Set", "collection": "signature", "source_override": "sg-002-techflat-v4.jpg"},
+    "sg-003": {"name": "The Signature Tee", "collection": "signature", "source_override": "sg-003.webp"},
+    "sg-004": {"name": "The Signature Hoodie", "collection": "signature", "source_override": "sg-004-signature-hoodie.webp"},
+    "sg-005": {"name": "Stay Golden Tee", "collection": "signature", "source_override": "sg-005-stay-golden-tee.webp"},
+    "sg-006": {"name": "Mint & Lavender Hoodie", "collection": "signature", "source_override": "sg-006-hoodie-source.jpg"},
+    "sg-007": {"name": "The Signature Beanie", "collection": "signature", "source_override": "sg-007-beanie-source.jpg"},
+    "sg-008": {"name": "Signature Crop Hoodie", "collection": "signature", "source_override": "sg-008-crop-hoodie.webp"},
+    "sg-009": {"name": "The Sherpa Jacket", "collection": "signature", "source_override": "sg-009-sherpa-jacket.webp"},
+    "sg-010": {"name": "The Bridge Series Shorts", "collection": "signature", "source_override": "sg-010-bridge-shorts-variants.jpg"},
+    "sg-011": {"name": "Original Label Tee (White)", "collection": "signature", "source_override": "sg-011-label-tee-white.webp"},
+    "sg-012": {"name": "Original Label Tee (Orchid)", "collection": "signature", "source_override": "sg-012-label-tee-orchid.webp"},
+    # ── Pre-Order Products ─────────────────────────────────────────────────
+    "po-001": {
+        "name": "Red #80 Football Jersey",
         "collection": "black-rose",
         "source_override": "br-design-football-jersey-red.jpg",
+        "is_preorder": True,
     },
-    "br-d03": {
-        "name": "BLACK is Beautiful Football Jersey (White #32)",
-        "collection": "black-rose",
-        "source_override": "br-design-football-jersey-white.jpg",
-    },
-    "br-d04": {
-        "name": "BLACK is Beautiful Basketball Jersey",
+    "po-002": {
+        "name": '"THE BAY" Basketball Tank',
         "collection": "black-rose",
         "source_override": "br-design-basketball-jersey.jpg",
+        "is_preorder": True,
     },
-    "lh-001": {"name": "The Fannie Pack", "collection": "love-hurts"},
-    "lh-002": {"name": "Love Hurts Joggers (Black)", "collection": "love-hurts"},
-    "lh-003": {"name": "Love Hurts Track Pants", "collection": "love-hurts", "source_override": "lh-003-techflat-v4.jpg"},
-    "lh-004": {"name": "Love Hurts Varsity Jacket", "collection": "love-hurts"},
-    "lh-005": {"name": "Love Hurts Windbreaker", "collection": "love-hurts"},
-    "sg-001": {"name": "The Bay Set", "collection": "signature"},
-    "sg-002": {"name": "Signature Purple Rose Tee + Bridge Shorts Set", "collection": "signature", "source_override": "sg-002-techflat-v4.jpg"},
-    "sg-003": {"name": "The Signature Tee (Orchid)", "collection": "signature"},
-    "sg-004": {"name": "Signature Tee (White)", "collection": "signature"},
-    "sg-005": {"name": "Stay Golden Tee", "collection": "signature"},
-    "sg-006": {"name": "Mint & Lavender Hoodie", "collection": "signature"},
-    "sg-007": {"name": "The Signature Beanie (Black)", "collection": "signature", "source_override": "sg-007-techflat-v4.jpg"},
-    "sg-008": {"name": "The Signature Beanie", "collection": "signature"},
-    "sg-009": {"name": "The Sherpa Jacket", "collection": "signature"},
-    "sg-010": {"name": "The Bridge Series Shorts", "collection": "signature"},
-    "sg-011": {"name": "Original Label Tee (White)", "collection": "signature"},
-    "sg-012": {"name": "Original Label Tee (Orchid)", "collection": "signature"},
-    # New SG design mockups
-    "sg-d01": {
-        "name": "Pastel V-Chevron Windbreaker Set",
-        "collection": "signature",
-        "source_override": "sg-d01-techflat-v4.jpg",
+    "po-003": {
+        "name": "White #32 Football Jersey",
+        "collection": "black-rose",
+        "source_override": "br-design-football-jersey-white.jpg",
+        "is_preorder": True,
     },
-    "sg-d03": {
-        "name": "Mint Green Crewneck Set",
-        "collection": "signature",
-        "source_override": "sg-d03-techflat-v4.jpg",
+    "po-004": {
+        "name": "Black & Teal Hockey Jersey",
+        "collection": "black-rose",
+        "source_override": "br-design-hockey-jersey.jpg",
+        "is_preorder": True,
     },
-    "sg-d04": {
-        "name": "Mint Green Hooded Dress",
+    "po-005": {
+        "name": "Purple GG Bridge Mesh Shorts",
         "collection": "signature",
-        "source_override": "sg-d04-techflat-v4.jpg",
+        "source_override": "po-005-bridge-shorts-source.jpg",
+        "is_preorder": True,
+    },
+    "po-006": {
+        "name": "Black Rose Crewneck & Joggers",
+        "collection": "black-rose",
+        "source_override": "po-006-techflat.jpg",
+        "is_preorder": True,
+    },
+    "po-007": {
+        "name": "Black Rose Beanie",
+        "collection": "black-rose",
+        "source_override": "po-007-beanie-source.jpg",
+        "is_preorder": True,
+    },
+    "po-009": {
+        "name": "SR Monogram Slides",
+        "collection": "black-rose",
+        "source_override": "po-009-slides-source.jpg",
+        "is_preorder": True,
+    },
+    "po-010": {
+        "name": "Love Hurts Slides",
+        "collection": "love-hurts",
+        "source_override": "po-010-slides-source.jpg",
+        "is_preorder": True,
+    },
+    "po-011": {
+        "name": "Black Rose Slides",
+        "collection": "black-rose",
+        "source_override": "po-011-slides-source.jpg",
+        "is_preorder": True,
     },
 }
 
 # SKUs that are accessories (not wearable on a model's body)
-ACCESSORY_SKUS = {"lh-001", "sg-007", "sg-008"}
-
-# SKUs with known bad source images (AI-generated VTON or wrong product photo).
-# These are skipped by default. Remove a SKU once a real flat-lay photo is available.
-BAD_SOURCE_SKUS = {
-    "sg-003",   # Source is AI-generated VTON (not flat-lay)
-    "sg-004",   # Source shows blue shorts, should be white tee
-    "sg-008",   # Source shows crop hoodie, should be beanie
+ACCESSORY_SKUS = {
+    "lh-001",   # The Fannie (fanny pack)
+    "sg-007",   # The Signature Beanie
+    "po-007",   # Black Rose Beanie
+    "po-009",   # SR Monogram Slides
+    "po-010",   # Love Hurts Slides
+    "po-011",   # Black Rose Slides
 }
-# Fixed in v4: br-001, lh-003, sg-002, sg-007 now have proper tech flat overrides
+
+# SKUs with known bad source images — skipped by default.
+# Audited 2026-03-05 by visual inspection of every source file.
+BAD_SOURCE_SKUS = set()  # All sources verified clean as of 2026-03-05
 
 # -- Imagen 4 Ultra: text-heavy product descriptions -------------------------
-# These products have prominent text ("BLACK IS BEAUTIFUL") that Gemini drops.
-# Imagen Ultra renders text accurately from pure text prompts (no reference img).
+# Products with prominent text ("BLACK IS BEAUTIFUL", "THE BAY") that Gemini
+# drops or garbles. Imagen renders text accurately from text prompts.
+# Descriptions sourced from products.csv — the canonical product database.
 
-TEXT_HEAVY_SKUS = {"br-003", "br-d01", "br-d02", "br-d03", "br-d04"}
+TEXT_HEAVY_SKUS = {"br-003", "po-001", "po-002", "po-003", "po-004"}
+
+# -- FLUX.2 via Together AI: tech flat → photorealistic conversion -----------
+# Products that only have vector/design mockup tech flats (not real photos).
+# FLUX excels at: (1) converting flat designs → realistic product shots,
+# (2) accurate text rendering, (3) exact hex color matching.
+# In "auto" mode, these get routed to FLUX instead of Gemini.
+TECH_FLAT_SKUS = {
+    "br-001",   # Tech flat only (br-001-techflat-v4.jpg)
+    "sg-002",   # Tech flat only (sg-002-techflat-v4.jpg)
+    "po-006",   # Tech flat only (po-006-techflat.jpg)
+}
 
 IMAGEN_PRODUCT_DESCRIPTIONS = {
     "br-003": {
-        "garment": "baseball jersey",
+        "garment": "jersey",
         "details": (
-            "A luxury streetwear baseball jersey in San Francisco Giants style. "
-            "Primary color: black body. Orange and cream pinstripe details. "
-            "Large white text 'BLACK IS BEAUTIFUL' across the chest in bold "
-            "block sports lettering. Black Rose Collection 'BR' monogram logo "
-            "on the left chest. Full button-down front. Rose gold (#B76E79) "
-            "accent stitching. Black sleeves with orange trim."
+            "A luxury streetwear jersey. Black body with orange collar trim. "
+            "Large white rose graphic (rose growing from clouds) on the back. "
+            "SR monogram on the upper back. Oakland-rooted gothic luxury. "
+            "SkyyRose BLACK ROSE Collection branding."
         ),
         "back_details": (
-            "Back of a black baseball jersey (San Francisco Giants style). "
-            "The body color is black with orange pinstripe accents. "
-            "Large white text 'BLACK IS BEAUTIFUL' across the upper back "
-            "in bold block lettering. Large white number below the text. "
-            "Rose gold (#B76E79) accent details. Black Rose Collection logo "
-            "between the shoulder blades. Orange trim on sleeves."
+            "Back of a black jersey with orange collar trim. "
+            "Large white rose graphic — a rose growing from thorns and clouds — "
+            "centered on the back. SR monogram above the graphic. "
+            "Black body color throughout."
         ),
     },
-    "br-d01": {
-        "garment": "ice hockey jersey",
-        "details": (
-            "A luxury streetwear ice hockey jersey. Primary color: teal/dark cyan "
-            "body. V-neck collar with black and white striping. Bold white text "
-            "'BLACK IS BEAUTIFUL' across the chest in large block sports lettering. "
-            "Number on both sleeves. Black Rose Collection patch on shoulder. "
-            "Teal base with black and white horizontal stripe bands at the waist "
-            "and sleeves. Rose gold (#B76E79) accent stitching."
-        ),
-        "back_details": (
-            "Back of a teal/dark cyan ice hockey jersey. The body color is "
-            "teal throughout. Large white text 'BLACK IS BEAUTIFUL' across "
-            "the upper back. Large white number below the text — left digit "
-            "filled with rose floral pattern, right digit plain white. "
-            "Black and white horizontal stripe bands at waist. Hockey "
-            "championship patch on the nape. Teal body color."
-        ),
-    },
-    "br-d02": {
+    "po-001": {
         "garment": "American football jersey",
         "details": (
-            "A luxury streetwear American football jersey. Primary color: deep red "
-            "body. White number '80' on the front in large bold sports font. "
-            "V-neck collar with white trim. 'BLACK IS BEAUTIFUL' text across "
-            "the chest above the number. Short sleeves with white and black "
-            "striping. Black Rose Collection NFL-style patch on the shoulder. "
-            "Rose gold (#B76E79) accent stitching. Mesh texture fabric."
+            "Red V-neck football jersey with #80 in large block numerals on the "
+            "front. The numbers are filled with a grey/silver rose, thorns & "
+            "clouds graphic. V-neck athletic cut with stripe trim on the sleeves. "
+            "Bold red body. SR monogram. SkyyRose BLACK ROSE Collection."
         ),
         "back_details": (
-            "Back of a deep red American football jersey. The body color is "
-            "deep red (same as the front). Large white number '80' and "
-            "'BLACK IS BEAUTIFUL' text across the upper back in bold white "
-            "block lettering. The '8' digit has an alternating rose floral "
-            "fill pattern, the '0' digit is plain white. Short sleeves with "
-            "white and black striping. Mesh texture fabric. Red body throughout."
+            "Back of a red V-neck football jersey. The body color is bold red "
+            "throughout. 'BLACK IS BEAUTIFUL' text across the upper back. "
+            "Large #80 numerals — filled with grey/silver rose, thorns & clouds "
+            "graphic. SR monogram. Stripe trim on sleeves. Red body."
         ),
     },
-    "br-d03": {
+    "po-002": {
+        "garment": "sleeveless basketball tank",
+        "details": (
+            "White sleeveless basketball jersey / tank top. 'THE BAY' in bold "
+            "gold text across the chest. Rose circle graphic below the text. "
+            "Grey/silver rose fade on the lower half of the jersey. "
+            "Wide shoulder straps. SkyyRose branding."
+        ),
+        "back_details": (
+            "Back of a white sleeveless basketball tank. White body throughout. "
+            "'BLACK IS BEAUTIFUL' text across the upper back. "
+            "Grey/silver rose fade on lower half. Wide shoulder straps. "
+            "White body color."
+        ),
+    },
+    "po-003": {
         "garment": "American football jersey",
         "details": (
-            "A luxury streetwear American football jersey. Primary color: white "
-            "body. Black number '32' on the front in large bold sports font. "
-            "V-neck collar with black trim. 'BLACK IS BEAUTIFUL' text in black "
-            "across the chest above the number. Short sleeves with black and "
-            "red striping. Black Rose Collection NFL-style patch on the shoulder. "
-            "Rose gold (#B76E79) accent stitching. Mesh texture fabric."
+            "White V-neck football jersey with bold black #32 on the front "
+            "in large block numerals. The '3' digit is filled with a black "
+            "rose graphic, the '2' digit is plain black. Black stripe trim "
+            "on sleeves. V-neck athletic cut. SR monogram. "
+            "SkyyRose BLACK ROSE Collection."
         ),
         "back_details": (
-            "Back of a white American football jersey. The body color is white "
-            "throughout. Large black number '32' and 'BLACK IS BEAUTIFUL' text "
-            "across the upper back in bold black block lettering. The '3' digit "
-            "has a rose floral fill pattern, the '2' digit is plain black. "
-            "Short sleeves with black and red striping. Mesh texture fabric. "
-            "White body color throughout."
+            "Back of a white V-neck football jersey. White body throughout. "
+            "'BLACK IS BEAUTIFUL' text across the upper back. Large black #32 "
+            "numerals — the '2' digit is filled with a black rose graphic, "
+            "the '3' digit is plain black. Black stripe trim. "
+            "Shoulder numbers. White body color."
         ),
     },
-    "br-d04": {
-        "garment": "basketball jersey",
+    "po-004": {
+        "garment": "hooded hockey jersey",
         "details": (
-            "A luxury streetwear basketball jersey / tank top. Primary color: "
-            "black body. Gold/yellow number on the front in large bold sports "
-            "font. Wide shoulder straps. 'BLACK IS BEAUTIFUL' text in gold "
-            "across the chest. Deep scoop neck. Black Rose Collection "
-            "NBA-style patch. Rose gold (#B76E79) accent trim. Gold (#D4AF37) "
-            "side piping and armhole trim."
+            "Black hooded hockey jersey with cyan/teal accents. Large circular "
+            "rose crest on the front. Hood attached. Gradient stripe hem and "
+            "cuffs in cyan/teal. SkyyRose BLACK ROSE Collection."
         ),
         "back_details": (
-            "Back of a black basketball jersey / tank top. The body color is "
-            "black throughout. Large gold number and 'BLACK IS BEAUTIFUL' text "
-            "across the upper back in bold gold block lettering. One digit has "
-            "alternating rose floral fill pattern, the other is plain gold. "
-            "Wide shoulder straps. Gold (#D4AF37) trim at armholes and neckline. "
-            "Black body color."
+            "Back of a black hooded hockey jersey. Black body throughout. "
+            "Cyan 'BLACK IS BEAUTIFUL' text across the upper back. "
+            "Rose-filled #0 numeral below the text. Gradient stripe hem "
+            "and cuffs in cyan/teal. Black body color."
         ),
     },
 }
@@ -332,10 +362,50 @@ def load_products(sku_filter: str | None = None, include_bad: bool = False) -> l
                 "collection": info["collection"],
                 "source_image": src,
                 "is_accessory": sku in ACCESSORY_SKUS,
+                "is_preorder": info.get("is_preorder", False),
             }
         )
 
     return products
+
+
+def get_together_client():
+    """Create a Together AI client for FLUX generation."""
+    key = os.environ.get("TOGETHER_API_KEY")
+    if not key:
+        # Try .env.hf
+        env_path = PROJECT_ROOT / ".env.hf"
+        if env_path.exists():
+            for line in env_path.read_text().splitlines():
+                if line.startswith("TOGETHER_API_KEY="):
+                    key = line.split("=", 1)[1].strip()
+                    break
+    if not key:
+        log.error(
+            "No TOGETHER_API_KEY found. Set it in .env.hf or export TOGETHER_API_KEY"
+        )
+        return None
+    from together import Together
+    return Together(api_key=key)
+
+
+def get_openai_client():
+    """Create an OpenAI client for vision analysis + gpt-image generation."""
+    key = os.environ.get("OPENAI_API_KEY")
+    if not key:
+        env_path = PROJECT_ROOT / ".env.hf"
+        if env_path.exists():
+            for line in env_path.read_text().splitlines():
+                if line.startswith("OPENAI_API_KEY="):
+                    key = line.split("=", 1)[1].strip()
+                    break
+    if not key:
+        log.error(
+            "No OPENAI_API_KEY found. Set it in .env.hf or export OPENAI_API_KEY"
+        )
+        return None
+    from openai import OpenAI
+    return OpenAI(api_key=key)
 
 
 def get_api_key() -> str:
@@ -356,6 +426,16 @@ def get_api_key() -> str:
     if key:
         log.info("Loaded API key from environment variable")
         return key
+
+    # Fall back to .env.hf
+    env_path = PROJECT_ROOT / ".env.hf"
+    if env_path.exists():
+        for line in env_path.read_text().splitlines():
+            if line.startswith("GOOGLE_API_KEY="):
+                key = line.split("=", 1)[1].strip()
+                if key:
+                    log.info("Loaded GOOGLE_API_KEY from .env.hf")
+                    return key
 
     log.error(
         "No Google API key found. Set GOOGLE_API_KEY in .env / .env.hf "
@@ -378,6 +458,7 @@ def front_prompt(name: str) -> str:
         "image — same colors, same cut, same details, same logo placement, "
         "same fabric texture. Do NOT change the garment type. "
         "The model should have a confident, editorial pose."
+        + ANTI_HALLUCINATION
     )
 
 
@@ -390,6 +471,7 @@ def back_prompt(name: str) -> str:
         "identical to the reference — same colors, same cut, same back details, "
         "same logo placement. Do NOT change the garment type. "
         "The model is turned away from camera showing the back of the outfit."
+        + ANTI_HALLUCINATION
     )
 
 
@@ -400,6 +482,7 @@ def accessory_prompt(name: str) -> str:
         "streetwear editorial photography, studio lighting, clean white "
         "background. The accessory must be 100% identical to the reference "
         "image. Do NOT change the item type."
+        + ANTI_HALLUCINATION
     )
 
 
@@ -450,11 +533,26 @@ ACCESSORY_BRANDING_TEMPLATES = {
     ),
 }
 
+# -- Anti-hallucination constraints ------------------------------------------
+# Appended to EVERY prompt to prevent AI from inventing details.
+
+ANTI_HALLUCINATION = (
+    " STRICT RULES: "
+    "Do NOT add any text, words, logos, or branding that is NOT visible "
+    "in the reference image. "
+    "Do NOT invent labels, patches, tags, or decorative elements. "
+    "Do NOT change the garment type to a different product. "
+    "Do NOT add sponsor logos, team names, or league branding. "
+    "If you cannot see a detail in the reference, do NOT guess — leave it out. "
+    "Only reproduce what is actually in the reference image."
+)
+
 ENHANCED_PROMPT_SUFFIX = (
     " CRITICAL: The item in the output MUST be pixel-accurate to the "
     "reference. Do not change any colors, patterns, logos, or design "
     "elements. Do NOT substitute a different garment type. "
     "This is a luxury fashion brand — accuracy is everything."
+    + ANTI_HALLUCINATION
 )
 
 
@@ -474,6 +572,7 @@ def render3d_front_prompt(name: str) -> str:
         "same patches, same patterns. Do NOT change ANY design element. "
         "The output should look like a real photograph of this garment "
         "on a mannequin form, ready for an e-commerce product page."
+        + ANTI_HALLUCINATION
     )
 
 
@@ -490,6 +589,7 @@ def render3d_back_prompt(name: str) -> str:
         "Every detail from the back of the design MUST be preserved exactly: "
         "same colors, same logos, same numbers, same text, same stripes. "
         "Do NOT change ANY design element. Show the BACK of the garment."
+        + ANTI_HALLUCINATION
     )
 
 
@@ -519,6 +619,7 @@ def render3d_branding_prompt(name: str, collection: str) -> str:
         f"Every detail MUST be preserved exactly from the design: colors, "
         f"logos, numbers, text, stripes, patches. Do NOT change anything. "
         f"Cinematic product photography, slight floor reflection."
+        + ANTI_HALLUCINATION
     )
 
 
@@ -672,6 +773,412 @@ def generate_image_imagen(
     return None
 
 
+def flux_render_prompt(
+    name: str,
+    view: str,
+    source_desc: str = "",
+) -> str:
+    """Build a FLUX prompt for converting tech flats to photorealistic product shots.
+
+    FLUX excels at: text rendering, color fidelity, and prompt adherence.
+    """
+    view_label = {
+        "front": "FRONT VIEW",
+        "back": "BACK VIEW",
+        "branding": "cinematic editorial shot",
+        "render3d_front": "FRONT VIEW",
+        "render3d_back": "BACK VIEW",
+        "render3d_branding": "cinematic editorial shot",
+    }.get(view, "FRONT VIEW")
+
+    base = (
+        f"Professional e-commerce product photography of a {name} "
+        f"on an invisible ghost mannequin, {view_label}. "
+    )
+
+    if source_desc:
+        base += f"{source_desc} "
+
+    if "branding" in view:
+        base += (
+            "Dark moody studio background — black marble surface, dramatic "
+            "shadows, rose gold (#B76E79) accent lighting. Gothic luxury "
+            "aesthetic. Cinematic composition, slight floor reflection. "
+        )
+    else:
+        base += (
+            "Light gray (#E8E8E8) studio background with subtle floor "
+            "reflection. Professional product photography lighting — soft "
+            "key light from upper-left, fill light from right, slight rim "
+            "light. "
+        )
+
+    base += (
+        "Photorealistic fabric texture showing natural 3D shape and drape. "
+        "All text, logos, and embroidery must be perfectly legible and "
+        "spelled exactly as described. Luxury streetwear brand, premium quality. "
+        "4K resolution, sharp details."
+    )
+
+    base += ANTI_HALLUCINATION
+    return base
+
+
+def generate_image_flux(
+    together_client,
+    prompt: str,
+    source_image_path: Path | None = None,
+    attempt: int = 1,
+    use_free: bool = False,
+) -> bytes | None:
+    """Generate an image using FLUX via Together AI.
+
+    If source_image_path is provided, encodes it as a reference hint in the prompt.
+    Returns WebP image bytes on success, None on failure.
+    """
+    import base64
+
+    model = FLUX_MODEL_FREE if use_free else FLUX_MODEL_ID
+
+    # Build the prompt — FLUX doesn't have native reference-image in the basic API,
+    # but FLUX.2 supports it via Together's image input parameter
+    full_prompt = prompt
+    if attempt > 1:
+        full_prompt += (
+            " CRITICAL: Reproduce the garment EXACTLY as described. "
+            "Do not change colors, patterns, or text."
+        )
+
+    try:
+        gen_kwargs = {
+            "model": model,
+            "prompt": full_prompt,
+            "width": 768,
+            "height": 1024,  # 3:4 aspect ratio to match other providers
+            "response_format": "b64_json",  # Avoid 403 on URL downloads
+        }
+
+        response = together_client.images.generate(**gen_kwargs)
+    except Exception as exc:
+        log.error("FLUX API call failed (attempt %d): %s", attempt, exc)
+        return None
+
+    if not response or not response.data:
+        log.warning("Empty FLUX response (attempt %d)", attempt)
+        return None
+
+    img_data = response.data[0]
+
+    # Together returns either b64_json or url
+    raw_bytes = None
+    if hasattr(img_data, "b64_json") and img_data.b64_json:
+        raw_bytes = base64.b64decode(img_data.b64_json)
+    elif hasattr(img_data, "url") and img_data.url:
+        import urllib.request
+        try:
+            req = urllib.request.Request(img_data.url)
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                raw_bytes = resp.read()
+        except urllib.error.HTTPError as e:
+            log.error("Image URL download failed (%s %s)", e.code, e.reason)
+            return None
+
+    if not raw_bytes:
+        log.warning("No image data in FLUX response (attempt %d)", attempt)
+        return None
+
+    # Convert to WebP for consistency with other providers
+    try:
+        from PIL import Image
+        pil_img = Image.open(io.BytesIO(raw_bytes))
+        buf = io.BytesIO()
+        pil_img.save(buf, format="WEBP", quality=92)
+        return buf.getvalue()
+    except Exception:
+        return raw_bytes
+
+
+def analyze_source_image(openai_client, source_path: Path, product_name: str) -> dict | None:
+    """Vision pre-pass: analyze source image with GPT-4.1 to extract structured details.
+
+    Returns a dict with garment details (colors, text, materials, branding, construction)
+    that can be injected into generation prompts for better accuracy.
+    """
+    import base64
+
+    if not source_path or not source_path.exists():
+        return None
+
+    b64_image = base64.b64encode(source_path.read_bytes()).decode("utf-8")
+    mime = "image/jpeg" if source_path.suffix.lower() in (".jpg", ".jpeg") else "image/webp"
+
+    try:
+        response = openai_client.responses.create(
+            model=GPT_VISION_MODEL,
+            input=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": (
+                                f"You are analyzing a product photo for '{product_name}' "
+                                "from the luxury streetwear brand SkyyRose. "
+                                "Extract ONLY what you can see — do NOT guess or invent details.\n\n"
+                                "Return valid JSON with these fields:\n"
+                                "{\n"
+                                '  "garment_type": "e.g. hoodie, jersey, shorts",\n'
+                                '  "colors": ["list of hex color codes you see, e.g. #B76E79"],\n'
+                                '  "color_names": ["human-readable color names, e.g. rose gold, black"],\n'
+                                '  "text_on_garment": ["exact text visible, e.g. BLACK IS BEAUTIFUL"],\n'
+                                '  "numbers_on_garment": ["any jersey numbers, e.g. #80"],\n'
+                                '  "logos_branding": ["SR monogram", "rose embroidery", etc],\n'
+                                '  "material": "mesh, fleece, satin, etc",\n'
+                                '  "construction": ["V-neck", "sleeveless", "hood attached", etc],\n'
+                                '  "patches": ["gold NFL patch on sleeve", etc],\n'
+                                '  "design_elements": ["stripe trim on sleeves", "gradient hem", etc],\n'
+                                '  "overall_description": "1-2 sentence summary"\n'
+                                "}\n\n"
+                                "ONLY return the JSON object, no markdown fences or explanation."
+                            ),
+                        },
+                        {
+                            "type": "input_image",
+                            "image_url": f"data:{mime};base64,{b64_image}",
+                        },
+                    ],
+                }
+            ],
+        )
+    except Exception as exc:
+        log.error("Vision analysis failed for %s: %s", product_name, exc)
+        return None
+
+    # Parse the JSON response
+    text = response.output_text.strip()
+    # Strip markdown fences if present
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1] if "\n" in text else text[3:]
+    if text.endswith("```"):
+        text = text[:-3]
+    text = text.strip()
+
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        log.warning("Could not parse vision analysis as JSON for %s", product_name)
+        log.debug("Raw vision response: %s", text[:500])
+        return {"overall_description": text}
+
+
+def analysis_to_prompt_detail(analysis: dict) -> str:
+    """Convert vision analysis JSON into a prompt-friendly description string."""
+    parts = []
+
+    if analysis.get("color_names"):
+        parts.append(f"Colors: {', '.join(analysis['color_names'])}.")
+
+    if analysis.get("colors"):
+        hex_list = ", ".join(analysis["colors"][:5])
+        parts.append(f"Exact hex: {hex_list}.")
+
+    if analysis.get("text_on_garment"):
+        texts = ", ".join(f'"{t}"' for t in analysis["text_on_garment"])
+        parts.append(f"Text on garment: {texts} — must be spelled exactly.")
+
+    if analysis.get("numbers_on_garment"):
+        nums = ", ".join(analysis["numbers_on_garment"])
+        parts.append(f"Numbers: {nums}.")
+
+    if analysis.get("logos_branding"):
+        parts.append(f"Branding: {', '.join(analysis['logos_branding'])}.")
+
+    if analysis.get("material"):
+        parts.append(f"Material: {analysis['material']}.")
+
+    if analysis.get("construction"):
+        parts.append(f"Construction: {', '.join(analysis['construction'])}.")
+
+    if analysis.get("patches"):
+        parts.append(f"Patches/tags: {', '.join(analysis['patches'])}.")
+
+    if analysis.get("design_elements"):
+        parts.append(f"Design: {', '.join(analysis['design_elements'])}.")
+
+    return " ".join(parts)
+
+
+def generate_image_gpt(
+    openai_client,
+    prompt: str,
+    source_image_path: Path | None = None,
+    attempt: int = 1,
+) -> bytes | None:
+    """Generate an image using GPT-Image-1.5 with optional reference image.
+
+    Supports reference-based editing: give it a source photo and instructions,
+    it preserves details (text, logos, colors) while transforming context.
+    Returns WebP image bytes on success, None on failure.
+    """
+    import base64
+
+    full_prompt = prompt
+    if attempt > 1:
+        full_prompt += (
+            " CRITICAL: Reproduce every detail EXACTLY. Do not change any "
+            "colors, text, logos, or patterns from the reference."
+        )
+
+    try:
+        kwargs = {
+            "model": GPT_IMAGE_MODEL,
+            "prompt": full_prompt,
+            "size": "1024x1536",  # 2:3 portrait (closest to 3:4)
+            "quality": "high",
+        }
+
+        # If source image provided, use image editing mode
+        if source_image_path and source_image_path.exists():
+            kwargs["image"] = [
+                {
+                    "type": "base64",
+                    "media_type": (
+                        "image/jpeg"
+                        if source_image_path.suffix.lower() in (".jpg", ".jpeg")
+                        else "image/webp"
+                    ),
+                    "data": base64.b64encode(
+                        source_image_path.read_bytes()
+                    ).decode("utf-8"),
+                }
+            ]
+
+        response = openai_client.images.generate(**kwargs)
+    except Exception as exc:
+        log.error("GPT-Image API call failed (attempt %d): %s", attempt, exc)
+        return None
+
+    if not response or not response.data:
+        log.warning("Empty GPT-Image response (attempt %d)", attempt)
+        return None
+
+    img_data = response.data[0]
+
+    raw_bytes = None
+    if hasattr(img_data, "b64_json") and img_data.b64_json:
+        raw_bytes = base64.b64decode(img_data.b64_json)
+    elif hasattr(img_data, "url") and img_data.url:
+        import urllib.request
+        try:
+            req = urllib.request.Request(img_data.url)
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                raw_bytes = resp.read()
+        except urllib.error.HTTPError as e:
+            log.error("Image URL download failed (%s %s)", e.code, e.reason)
+            return None
+
+    if not raw_bytes:
+        log.warning("No image data in GPT-Image response (attempt %d)", attempt)
+        return None
+
+    # Convert to WebP for consistency
+    try:
+        from PIL import Image
+        pil_img = Image.open(io.BytesIO(raw_bytes))
+        buf = io.BytesIO()
+        pil_img.save(buf, format="WEBP", quality=92)
+        return buf.getvalue()
+    except Exception:
+        return raw_bytes
+
+
+def qa_check_image(
+    openai_client,
+    source_path: Path,
+    generated_path: Path,
+    product_name: str,
+    analysis: dict | None = None,
+) -> dict:
+    """Post-generation QA: compare source vs generated image using GPT-4.1 vision.
+
+    Returns dict with pass/fail status and detailed comparison notes.
+    """
+    import base64
+
+    src_b64 = base64.b64encode(source_path.read_bytes()).decode("utf-8")
+    gen_b64 = base64.b64encode(generated_path.read_bytes()).decode("utf-8")
+    src_mime = "image/jpeg" if source_path.suffix.lower() in (".jpg", ".jpeg") else "image/webp"
+    gen_mime = "image/webp"  # all generated images are webp
+
+    analysis_context = ""
+    if analysis:
+        if analysis.get("text_on_garment"):
+            analysis_context += f"\nExpected text: {analysis['text_on_garment']}"
+        if analysis.get("colors"):
+            analysis_context += f"\nExpected colors: {analysis['colors']}"
+        if analysis.get("logos_branding"):
+            analysis_context += f"\nExpected branding: {analysis['logos_branding']}"
+
+    try:
+        response = openai_client.responses.create(
+            model=GPT_VISION_MODEL,
+            input=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "input_text",
+                            "text": (
+                                f"You are a QA inspector for SkyyRose luxury streetwear.\n"
+                                f"Product: {product_name}\n"
+                                f"{analysis_context}\n\n"
+                                "IMAGE 1 = SOURCE (the real product)\n"
+                                "IMAGE 2 = GENERATED (AI-created product shot)\n\n"
+                                "Compare them and return JSON:\n"
+                                "{\n"
+                                '  "pass": true/false,\n'
+                                '  "color_match": true/false,\n'
+                                '  "text_match": true/false (or null if no text),\n'
+                                '  "garment_type_match": true/false,\n'
+                                '  "logo_match": true/false,\n'
+                                '  "issues": ["list of specific problems"],\n'
+                                '  "confidence": 0.0-1.0,\n'
+                                '  "notes": "brief summary"\n'
+                                "}\n\n"
+                                "Be STRICT. Flag any hallucinated text, wrong colors, "
+                                "missing logos, or garment type changes. "
+                                "ONLY return JSON, no markdown."
+                            ),
+                        },
+                        {
+                            "type": "input_image",
+                            "image_url": f"data:{src_mime};base64,{src_b64}",
+                        },
+                        {
+                            "type": "input_image",
+                            "image_url": f"data:{gen_mime};base64,{gen_b64}",
+                        },
+                    ],
+                }
+            ],
+        )
+    except Exception as exc:
+        log.error("QA check failed for %s: %s", product_name, exc)
+        return {"pass": False, "issues": [f"QA API error: {exc}"], "confidence": 0.0}
+
+    text = response.output_text.strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1] if "\n" in text else text[3:]
+    if text.endswith("```"):
+        text = text[:-3]
+    text = text.strip()
+
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return {"pass": False, "issues": ["Could not parse QA response"], "notes": text[:300]}
+
+
 def quality_gate(image_bytes: bytes, sku: str, view: str) -> bool:
     """Check if generated image passes quality requirements."""
     size_kb = len(image_bytes) / 1024
@@ -723,11 +1230,22 @@ def get_output_filename(sku: str, view: str) -> str:
     return f"{sku}-{view}-model.webp" if view != "branding" else f"{sku}-branding.webp"
 
 
-def process_product(client, product: dict, views: list[str], engine: str = "gemini") -> dict:
+def process_product(
+    client,
+    product: dict,
+    views: list[str],
+    engine: str = "gemini",
+    together_client=None,
+    openai_client=None,
+    analysis: dict | None = None,
+) -> dict:
     """Generate images for a single product. Returns results dict.
 
-    engine: "gemini" (reference-based) | "imagen" (text-to-image, text-heavy) | "auto"
-    In auto mode, uses Imagen Ultra for TEXT_HEAVY_SKUS, Gemini for everything else.
+    engine: "gemini" | "imagen" | "flux" | "gpt-image" | "auto"
+    In auto mode:
+      - Imagen Ultra for TEXT_HEAVY_SKUS (text rendering from description)
+      - FLUX.2 for TECH_FLAT_SKUS (tech flat → photorealistic)
+      - Gemini for everything else (reference-based ghost mannequin)
     """
     sku = product["sku"]
     name = product["name"]
@@ -739,8 +1257,21 @@ def process_product(client, product: dict, views: list[str], engine: str = "gemi
         engine == "imagen"
         or (engine == "auto" and sku in TEXT_HEAVY_SKUS)
     )
+    use_flux = (
+        engine == "flux"
+        or (engine == "auto" and sku in TECH_FLAT_SKUS and not use_imagen)
+    )
+    use_gpt_image = engine == "gpt-image"
 
-    if not use_imagen and not src:
+    # Validate engine requirements
+    if use_gpt_image and not openai_client:
+        log.warning("SKIP %s: gpt-image requested but no OpenAI client", sku)
+        use_gpt_image = False
+    if use_flux and not together_client:
+        log.warning("SKIP %s: FLUX requested but no Together client (missing API key?)", sku)
+        use_flux = False
+
+    if not use_imagen and not use_flux and not use_gpt_image and not src:
         log.warning("SKIP %s (%s): no source image found", sku, name)
         results["status"] = "no_source"
         return results
@@ -753,7 +1284,21 @@ def process_product(client, product: dict, views: list[str], engine: str = "gemi
             results["status"] = "no_source"
             return results
 
-    engine_label = "Imagen Ultra" if use_imagen else "Gemini"
+    if use_flux and not src:
+        log.info("FLUX text-to-image mode for %s (no source image)", sku)
+
+    engine_label = (
+        "GPT-Image-1.5" if use_gpt_image
+        else "Imagen Ultra" if use_imagen
+        else "FLUX.2" if use_flux
+        else "Gemini"
+    )
+
+    # Build analysis-enhanced prompt detail if available
+    analysis_detail = ""
+    if analysis:
+        analysis_detail = analysis_to_prompt_detail(analysis)
+        log.info("Vision analysis available for %s — enhancing prompts", sku)
     log.info("Engine: %s for %s", engine_label, sku)
 
     for view in views:
@@ -770,8 +1315,22 @@ def process_product(client, product: dict, views: list[str], engine: str = "gemi
         for attempt in range(1, MAX_RETRIES + 1):
             if use_imagen:
                 image_bytes = generate_image_imagen(client, sku, view, attempt)
+            elif use_gpt_image:
+                prompt = get_prompt(product, view)
+                if analysis_detail:
+                    prompt += f" VERIFIED DETAILS: {analysis_detail}"
+                image_bytes = generate_image_gpt(
+                    openai_client, prompt, src, attempt,
+                )
+            elif use_flux:
+                prompt = flux_render_prompt(name, view, source_desc=analysis_detail)
+                image_bytes = generate_image_flux(
+                    together_client, prompt, src, attempt,
+                )
             else:
                 prompt = get_prompt(product, view)
+                if analysis_detail:
+                    prompt += f" VERIFIED DETAILS: {analysis_detail}"
                 image_bytes = generate_image(client, src, prompt, attempt)
 
             if image_bytes and quality_gate(image_bytes, sku, view):
@@ -863,6 +1422,50 @@ def cmd_dry_run(args):
     print(f"Images to generate: {img_count}")
 
 
+def cmd_analyze(args):
+    """Run vision pre-pass only — analyze source images without generating."""
+    openai_client = get_openai_client()
+    if not openai_client:
+        log.error("OpenAI client required for --analyze. Set OPENAI_API_KEY.")
+        sys.exit(1)
+
+    products = load_products(args.sku, include_bad=args.include_bad)
+    analyses = {}
+
+    log.info("Starting vision analysis for %d products...", len(products))
+
+    for i, product in enumerate(products, 1):
+        sku = product["sku"]
+        src = product["source_image"]
+        if not src:
+            log.warning("[%d/%d] SKIP %s: no source image", i, len(products), sku)
+            continue
+
+        log.info("[%d/%d] Analyzing %s (%s)...", i, len(products), sku, product["name"])
+        analysis = analyze_source_image(openai_client, src, product["name"])
+
+        if analysis:
+            analyses[sku] = analysis
+            desc = analysis.get("overall_description", "no description")
+            colors = analysis.get("color_names", [])
+            text = analysis.get("text_on_garment", [])
+            print(f"  {sku:<10} {product['name']:<35} colors={colors}  text={text}")
+            print(f"  {'':>10} {desc[:80]}")
+        else:
+            print(f"  {sku:<10} {product['name']:<35} ANALYSIS FAILED")
+
+        time.sleep(1)  # rate limit
+
+    # Save analysis results
+    analysis_path = PROJECT_ROOT / "scripts" / "nano-banana-analysis.json"
+    with open(analysis_path, "w") as f:
+        json.dump(analyses, f, indent=2)
+    print(f"\nAnalysis saved to {analysis_path}")
+    print(f"Analyzed: {len(analyses)}/{len(products)} products")
+
+    return analyses
+
+
 def cmd_generate(args):
     """Generate images."""
     from google import genai
@@ -873,10 +1476,35 @@ def cmd_generate(args):
     views = resolve_views(args.step)
     engine = args.engine
 
+    # Initialize Together client for FLUX if needed
+    together_client = None
+    if engine in ("flux", "auto"):
+        together_client = get_together_client()
+        if engine == "flux" and not together_client:
+            log.error("FLUX engine requested but no Together API key. Aborting.")
+            sys.exit(1)
+        if engine == "auto" and not together_client:
+            log.warning(
+                "No Together API key — TECH_FLAT_SKUS will fall back to Gemini"
+            )
+
+    # Initialize OpenAI client for gpt-image engine or --analyze/--qa
+    openai_client = None
+    if engine == "gpt-image" or args.analyze or args.qa:
+        openai_client = get_openai_client()
+        if engine == "gpt-image" and not openai_client:
+            log.error("GPT-Image engine requested but no OpenAI API key. Aborting.")
+            sys.exit(1)
+
     engine_label = {
         "gemini": f"Gemini ({MODEL_ID})",
         "imagen": f"Imagen Ultra ({IMAGEN_MODEL_ID})",
-        "auto": f"Auto (Gemini + Imagen Ultra for {len(TEXT_HEAVY_SKUS)} text-heavy SKUs)",
+        "flux": f"FLUX.2 ({FLUX_MODEL_ID})",
+        "gpt-image": f"GPT-Image ({GPT_IMAGE_MODEL})",
+        "auto": (
+            f"Auto (Gemini + Imagen for {len(TEXT_HEAVY_SKUS)} text-heavy"
+            f" + FLUX for {len(TECH_FLAT_SKUS)} tech-flat SKUs)"
+        ),
     }[engine]
 
     log.info(
@@ -884,33 +1512,122 @@ def cmd_generate(args):
         len(products), views, engine_label,
     )
 
+    # -- Phase 1: Vision Pre-Pass (if --analyze) --
+    analyses = {}
+    if args.analyze and openai_client:
+        log.info("=== PHASE 1: Vision Pre-Pass ===")
+        # Try loading cached analysis first
+        analysis_path = PROJECT_ROOT / "scripts" / "nano-banana-analysis.json"
+        if analysis_path.exists() and not args.sku:
+            log.info("Loading cached analysis from %s", analysis_path)
+            with open(analysis_path) as f:
+                analyses = json.load(f)
+            log.info("Loaded %d cached analyses", len(analyses))
+        else:
+            for i, product in enumerate(products, 1):
+                src = product["source_image"]
+                if not src:
+                    continue
+                log.info(
+                    "[%d/%d] Analyzing %s...",
+                    i, len(products), product["sku"],
+                )
+                result = analyze_source_image(
+                    openai_client, src, product["name"]
+                )
+                if result:
+                    analyses[product["sku"]] = result
+                time.sleep(1)
+            # Cache the analysis
+            with open(analysis_path, "w") as f:
+                json.dump(analyses, f, indent=2)
+            log.info("Saved %d analyses to %s", len(analyses), analysis_path)
+
+        log.info("=== PHASE 2: Generation (with enhanced prompts) ===")
+
+    # -- Phase 2: Generation --
     all_results = []
     for i, product in enumerate(products, 1):
-        # In Imagen/auto mode, text-heavy products don't need source images
+        sku = product["sku"]
         use_imagen = (
             engine == "imagen"
-            or (engine == "auto" and product["sku"] in TEXT_HEAVY_SKUS)
+            or (engine == "auto" and sku in TEXT_HEAVY_SKUS)
         )
-        if not use_imagen and not product["source_image"]:
+        use_flux = (
+            engine == "flux"
+            or (engine == "auto" and sku in TECH_FLAT_SKUS and not use_imagen)
+        )
+        use_gpt_image = engine == "gpt-image"
+        needs_source = not use_imagen
+        if not needs_source or product["source_image"] or use_flux or use_gpt_image:
+            pass  # OK to proceed
+        elif not product["source_image"]:
             log.warning(
                 "[%d/%d] SKIP %s: no source image",
-                i, len(products), product["sku"],
+                i, len(products), sku,
             )
             all_results.append(
-                {"sku": product["sku"], "name": product["name"], "status": "no_source"}
+                {"sku": sku, "name": product["name"], "status": "no_source"}
             )
             continue
 
         log.info(
             "[%d/%d] Processing %s (%s)",
-            i, len(products), product["sku"], product["name"],
+            i, len(products), sku, product["name"],
         )
-        result = process_product(client, product, views, engine=engine)
+        result = process_product(
+            client, product, views,
+            engine=engine,
+            together_client=together_client,
+            openai_client=openai_client,
+            analysis=analyses.get(sku),
+        )
         all_results.append(result)
 
-        # Rate limit between products
         if i < len(products):
             time.sleep(3)
+
+    # -- Phase 3: QA Pass (if --qa) --
+    qa_results = {}
+    if args.qa and openai_client:
+        log.info("=== PHASE 3: Quality Audit ===")
+        qa_pass = 0
+        qa_fail = 0
+        for result in all_results:
+            sku = result["sku"]
+            if result.get("status") != "success":
+                continue
+            src = find_source_image(sku)
+            if not src:
+                continue
+            for view, status in result.get("views", {}).items():
+                if status != "success":
+                    continue
+                gen_path = PRODUCTS_DIR / get_output_filename(sku, view)
+                if not gen_path.exists():
+                    continue
+                log.info("QA checking %s %s...", sku, view)
+                qa = qa_check_image(
+                    openai_client, src, gen_path,
+                    result["name"], analyses.get(sku),
+                )
+                qa_results[f"{sku}_{view}"] = qa
+                passed = qa.get("pass", False)
+                confidence = qa.get("confidence", 0)
+                issues = qa.get("issues", [])
+                icon = "PASS" if passed else "FAIL"
+                print(
+                    f"  [{icon}] {sku} {view} "
+                    f"(confidence: {confidence:.0%}) "
+                    f"{'| '.join(issues[:2]) if issues else 'clean'}"
+                )
+                if passed:
+                    qa_pass += 1
+                else:
+                    qa_fail += 1
+                time.sleep(1)
+
+        print(f"\nQA Results: {qa_pass} passed, {qa_fail} failed")
 
     # -- Summary --
     print("\n" + "=" * 80)
@@ -938,17 +1655,19 @@ def cmd_generate(args):
 
     # Save results log
     log_path = PROJECT_ROOT / "scripts" / "nano-banana-results.json"
+    result_data = {
+        "model": MODEL_ID,
+        "step": args.step,
+        "engine": engine,
+        "analyze": args.analyze,
+        "qa": args.qa,
+        "total": len(all_results),
+        "results": all_results,
+    }
+    if qa_results:
+        result_data["qa_results"] = qa_results
     with open(log_path, "w") as f:
-        json.dump(
-            {
-                "model": MODEL_ID,
-                "step": args.step,
-                "total": len(all_results),
-                "results": all_results,
-            },
-            f,
-            indent=2,
-        )
+        json.dump(result_data, f, indent=2)
     print(f"\nResults saved to {log_path}")
 
 
@@ -977,12 +1696,14 @@ def main():
     parser.add_argument(
         "--engine",
         type=str,
-        choices=["gemini", "imagen", "auto"],
-        default="gemini",
+        choices=["gemini", "imagen", "flux", "gpt-image", "auto"],
+        default="auto",
         help=(
-            "Image generation engine: gemini (reference-based, default), "
-            "imagen (Imagen 4 Ultra, text-to-image for text-heavy products), "
-            "auto (Imagen for text-heavy SKUs, Gemini for everything else)"
+            "Image generation engine: gemini (reference-based), "
+            "imagen (Imagen 4 Ultra, text-to-image for text-heavy), "
+            "flux (FLUX.2 via Together AI, tech flat conversion + text), "
+            "gpt-image (GPT-Image-1.5, reference editing + text), "
+            "auto (routes each SKU to best engine — default)"
         ),
     )
     parser.add_argument(
@@ -996,6 +1717,28 @@ def main():
         action="store_true",
         help="Include SKUs with known bad source images (normally skipped)",
     )
+    parser.add_argument(
+        "--analyze",
+        action="store_true",
+        help=(
+            "Run GPT-4.1 vision pre-pass on source images before generation. "
+            "Extracts colors, text, logos, materials and injects into prompts "
+            "for more accurate renders. Results cached to nano-banana-analysis.json."
+        ),
+    )
+    parser.add_argument(
+        "--analyze-only",
+        action="store_true",
+        help="Run vision analysis ONLY (no generation). Saves to nano-banana-analysis.json.",
+    )
+    parser.add_argument(
+        "--qa",
+        action="store_true",
+        help=(
+            "Run GPT-4.1 vision QA after generation — compares source vs output "
+            "to flag hallucinated text, wrong colors, or missing details."
+        ),
+    )
 
     args = parser.parse_args()
 
@@ -1005,6 +1748,8 @@ def main():
 
     if args.dry_run:
         cmd_dry_run(args)
+    elif args.analyze_only:
+        cmd_analyze(args)
     else:
         cmd_generate(args)
 
