@@ -1,0 +1,12 @@
+{
+  "total": 1,
+  "success": 0,
+  "failed": 1,
+  "results": [
+    {
+      "sku": "br-001",
+      "name": "BLACK Rose Crewneck",
+      "status": "failed"
+    }
+  ]
+}

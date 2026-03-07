@@ -434,9 +434,11 @@ class SelfHealingMixin:
 
         return HealthStatus(
             agent_name=getattr(self, "name", self.__class__.__name__),
-            agent_type=getattr(self, "core_type", CoreAgentType.ORCHESTRATOR).value
-            if hasattr(self, "core_type")
-            else "unknown",
+            agent_type=(
+                getattr(self, "core_type", CoreAgentType.ORCHESTRATOR).value
+                if hasattr(self, "core_type")
+                else "unknown"
+            ),
             healthy=self._circuit_state == CircuitBreakerState.CLOSED,
             circuit_breaker=self._circuit_state.value,
             consecutive_failures=self._consecutive_failures,
