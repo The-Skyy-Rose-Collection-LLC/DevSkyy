@@ -1417,4 +1417,157 @@ All 5 task groups complete. All 10+ sections complete. Zero outstanding issues. 
 
 All 5 task groups complete. All 10+ sections complete. Zero outstanding issues. Verified across 12 consecutive iterations. Task genuinely complete.
 
+---
+---
+
+# PHASE 2: Site Rebuild + Immersive Scene Generation (March 2026)
+
+> Phase 1 (Elite Web Builder v2 makeover) is COMPLETE above.
+> Phase 2 starts here. Same rules apply — Context7 HARD GATE, update after EVERY iteration, NEVER delete this file.
+
+---
+
+## TASK 1: Regenerate Stale .min.css Files (Do FIRST — Quick Win)
+
+- [ ] Identify all `.min.css` files older than their source `.css` counterparts
+  - Run: `for f in assets/css/*.css; do [[ "$f" != *.min.css ]] && min="${f%.css}.min.css" && [[ -f "$min" ]] && [[ "$f" -nt "$min" ]] && echo "STALE: $min"; done`
+- [ ] Regenerate ALL stale `.min.css` files via csso-cli
+  - Run: `for f in assets/css/*.css; do [[ "$f" != *.min.css ]] && npx csso-cli "$f" -o "${f%.css}.min.css"; done`
+- [ ] Regenerate ALL stale `.min.js` files via terser
+  - Run: `for f in assets/js/*.js; do [[ "$f" != *.min.js ]] && npx terser "$f" --compress --mangle -o "${f%.js}.min.js"; done`
+- [ ] Verify: `find assets/ -name "*.min.*" | wc -l` — count matches previous total
+- [ ] Commit: `chore(theme): regenerate stale minified assets`
+
+---
+
+## TASK 2: Create Experiences Hub Page (Do SECOND — Fixes Menu 404)
+
+Menu links to `/experiences/` but the page doesn't exist.
+
+- [ ] Query Context7 for WordPress custom page templates + `page_template` meta key
+- [ ] Query Context7 for WordPress `get_pages()` or `WP_Query` for page listings
+- [ ] Create `template-experiences.php` with `/* Template Name: Experiences */` header
+  - Layout: full-width hero with title "EXPERIENCES" + subtitle
+  - Grid of 3 immersive room cards (Black Rose, Love Hurts, Signature)
+  - Each card: scene image background, collection name, "Enter Room" CTA
+  - Cards link to existing immersive pages (`/immersive-black-rose/`, `/immersive-love-hurts/`, `/immersive-signature/`)
+  - Brand styling: dark luxury, cinematic, rose gold accents
+- [ ] Create `assets/css/experiences.css` — page-specific styles
+- [ ] Generate `assets/css/experiences.min.css` via csso-cli
+- [ ] Add conditional enqueue in `inc/enqueue.php`: `'experiences' => 'experiences.css'`
+- [ ] Add to `skyyrose_get_current_template_slug()` mapping
+- [ ] Register page creation in `inc/theme-activation-setup.php` (version flag so it only runs once)
+- [ ] Verify: `/experiences/` loads with correct template, no 404
+- [ ] Commit: `feat(theme): add Experiences hub page template`
+
+---
+
+## TASK 3: Create Collections Hub Page (Do THIRD — Fixes Menu 404)
+
+Menu links to `/collections/` but the page doesn't exist.
+
+- [ ] Query Context7 for WooCommerce `wc_get_products()` category aggregation + product counts
+- [ ] Create `template-collections.php` with `/* Template Name: Collections */` header
+  - Layout: full-width hero with title "COLLECTIONS"
+  - Grid of 3 collection cards (Black Rose, Love Hurts, Signature)
+  - Each card: scene image, collection name, product count (dynamic from WooCommerce), price range
+  - Cards link to existing collection pages (`/collection-black-rose/`, `/collection-love-hurts/`, `/collection-signature/`)
+  - Pull real data: `wc_get_products(['category' => [$slug], 'paginate' => true])` for counts
+  - Brand styling: dark luxury, collection accent colors (Silver, Crimson, Gold)
+- [ ] Create `assets/css/collections-hub.css` — page-specific styles (NOT `collections.css` to avoid confusion with `collection-v4.css`)
+- [ ] Generate `assets/css/collections-hub.min.css`
+- [ ] Add conditional enqueue in `inc/enqueue.php`
+- [ ] Add to `skyyrose_get_current_template_slug()` mapping
+- [ ] Register page creation in `inc/theme-activation-setup.php`
+- [ ] Verify: `/collections/` loads, shows real product counts from WooCommerce
+- [ ] Commit: `feat(theme): add Collections hub page template`
+
+---
+
+## TASK 4: Deduplicate homepage.css & collection-v4.css (Do FOURTH)
+
+~60% overlap in reveal animations, grid layouts, typography between these two files.
+
+- [ ] Query Context7 for CSS architecture best practices (BEM, ITCSS, design tokens)
+- [ ] Audit both files side-by-side — list every shared selector/rule
+  - Focus on: `.rv` reveal classes, grid layouts, typography scales, color definitions
+- [ ] Identify what's already in `assets/css/system/animations.css` vs still duplicated
+- [ ] Extract remaining shared rules to appropriate `system/` file (extend existing, don't create new)
+- [ ] Remove duplicated definitions from `homepage.css`
+- [ ] Remove duplicated definitions from `collection-v4.css`
+- [ ] Regenerate `.min.css` for ALL modified files
+- [ ] Verify: homepage renders correctly after extraction
+- [ ] Verify: all 3 collection pages render correctly after extraction
+- [ ] Commit: `refactor(theme): deduplicate homepage + collection CSS into shared system`
+
+---
+
+## TASK 5: Fix Mobile Nav Dropdown Behavior (Do FIFTH)
+
+First tap on parent menu items should expand submenu, second tap should navigate.
+
+- [ ] Query Context7 for WordPress `wp_nav_menu` walker classes + mobile nav accessibility
+- [ ] Read `assets/js/navigation.js` lines 112-138 (current `.focus` toggle logic)
+- [ ] Fix: add `aria-expanded` attribute toggle on parent items with children
+- [ ] Fix: prevent default navigation on first tap for parent items (only expand submenu)
+- [ ] Fix: allow navigation on second tap (submenu already visible)
+- [ ] Add CSS for `[aria-expanded="true"]` submenu visibility
+- [ ] Regenerate `navigation.min.js`
+- [ ] Test: mobile viewport (375px, 768px) — tap parent → submenu expands → tap again → navigates
+- [ ] Commit: `fix(theme): mobile nav two-tap behavior + aria-expanded`
+
+---
+
+## TASK 6: Generate Immersive Scenes (Do AFTER Site Rebuild)
+
+Use `scripts/gemini_scene_gen.py` with `.venv-imagery` virtualenv.
+Model: `gemini-3-pro-image-preview` ($0.08/image, 4K, 3D volumetric depth).
+
+### Scene 1: Black Rose — Rooftop Garden
+- [ ] Activate venv: `source .venv-imagery/bin/activate`
+- [ ] Dry run: `python scripts/gemini_scene_gen.py --scene black-rose-rooftop-garden --dry-run`
+- [ ] Generate: `python scripts/gemini_scene_gen.py --scene black-rose-rooftop-garden --variants 3`
+- [ ] Review outputs in `wordpress-theme/skyyrose-flagship/assets/scenes/black-rose/`
+- [ ] Pick best variant, refine prompt in script if needed, regenerate
+- [ ] Convert to WebP: `cwebp -q 85 *.png -o *.webp`
+- [ ] Iterate until scene has: Bay Bridge lit up, clear night sky, products physically present on furniture
+
+### Scene 2: Love Hurts — Cathedral Rose Chamber
+- [ ] Dry run: `python scripts/gemini_scene_gen.py --scene love-hurts-cathedral-rose-chamber --dry-run`
+- [ ] Generate: `python scripts/gemini_scene_gen.py --scene love-hurts-cathedral-rose-chamber --variants 3`
+- [ ] Review outputs in `wordpress-theme/skyyrose-flagship/assets/scenes/love-hurts/`
+- [ ] Pick best variant, refine prompt if needed, regenerate
+- [ ] Convert to WebP
+- [ ] Iterate until scene has: enchanted rose dome, stained glass crimson light, products on stone/candelabra
+
+### Scene 3: Signature — Golden Gate Showroom
+- [ ] Dry run: `python scripts/gemini_scene_gen.py --scene signature-golden-gate-showroom --dry-run`
+- [ ] Generate: `python scripts/gemini_scene_gen.py --scene signature-golden-gate-showroom --variants 3`
+- [ ] Review outputs in `wordpress-theme/skyyrose-flagship/assets/scenes/signature/`
+- [ ] Pick best variant, refine prompt if needed, regenerate
+- [ ] Convert to WebP
+- [ ] Iterate until scene has: Golden Gate at sunset (NOT Bay Bridge), gold LED showroom, products on racks/pedestals
+
+### After All Scenes Generated:
+- [ ] Update immersive template references to new `-v2` filenames
+- [ ] Verify hotspot positions align with product locations in new images
+- [ ] Test in browser at desktop (1920px) and mobile (375px) viewports
+- [ ] Commit: `feat(theme): generate v2 immersive scenes via Gemini 3 Pro`
+
+---
+
+## PHASE 2 VERIFICATION (Do LAST)
+
+- [ ] `/experiences/` loads — no 404
+- [ ] `/collections/` loads — shows real WooCommerce product counts
+- [ ] All `.min.css` files are fresh (not stale)
+- [ ] Mobile nav: first tap = expand, second tap = navigate
+- [ ] Homepage renders correctly after CSS deduplication
+- [ ] Collection pages render correctly after CSS deduplication
+- [ ] All 3 new scene images present in `assets/scenes/` as WebP
+- [ ] Immersive pages still work with new scene images
+- [ ] No console errors on any page
+- [ ] `git status` — clean working tree
+- [ ] Final commit: `chore(theme): phase 2 complete — site rebuild + scene generation`
+
 **ALL CHECKS GREEN — TASK COMPLETE**
