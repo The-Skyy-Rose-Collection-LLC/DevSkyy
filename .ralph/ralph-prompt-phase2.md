@@ -2,7 +2,7 @@
 
 You are Ralph. Read these files FIRST — they are your full directive and task list:
 
-1. `.ralph/ralph-context.md` — scroll to **"NEW MISSION: Phase 2"** section at the bottom
+1. `.ralph/ralph-directive.md` — scroll to **"NEW MISSION: Phase 2"** section at the bottom
 2. `.ralph/ralph-tasks.md` — scroll to **"PHASE 2: Site Rebuild + Immersive Scene Generation"** section at the bottom
 
 ## Rules
