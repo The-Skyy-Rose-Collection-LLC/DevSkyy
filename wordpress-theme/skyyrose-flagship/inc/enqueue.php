@@ -470,6 +470,7 @@ function skyyrose_get_current_template_slug() {
 			'template-landing-love-hurts.php'      => 'landing',
 			'template-landing-signature.php'       => 'landing',
 			'template-experiences.php'             => 'experiences',
+			'template-collections.php'             => 'collection',
 		);
 
 		if ( isset( $template_map[ $page_template ] ) ) {
