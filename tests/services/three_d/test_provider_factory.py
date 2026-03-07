@@ -4,6 +4,7 @@
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+
 from services.three_d.provider_factory import (
     FactoryConfig,
     ProviderConfig,

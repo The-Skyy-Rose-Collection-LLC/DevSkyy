@@ -22,6 +22,7 @@ from decimal import Decimal
 from typing import Any
 
 import pytest
+
 from services.analytics.alert_engine import (
     AlertConfig,
     AlertConfigNotFoundError,
