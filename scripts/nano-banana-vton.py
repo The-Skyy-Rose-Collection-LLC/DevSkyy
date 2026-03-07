@@ -35,12 +35,7 @@ log = logging.getLogger("nano-banana-vton")
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 PRODUCTS_DIR = (
-    PROJECT_ROOT
-    / "wordpress-theme"
-    / "skyyrose-flagship"
-    / "assets"
-    / "images"
-    / "products"
+    PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
 )
 
 MODEL_ID = "gemini-2.5-flash-image"
@@ -61,33 +56,133 @@ PRODUCT_CATALOG = {
     # ── Black Rose Collection ──────────────────────────────────────────────
     # Every SKU has explicit source_override to prevent auto-glob picking up
     # AI-generated outputs (*-model-*.webp) as source images (feedback loop).
-    "br-001": {"name": "BLACK Rose Crewneck", "collection": "black-rose", "source_override": "br-001-techflat-v4.jpg"},
-    "br-002": {"name": "BLACK Rose Joggers", "collection": "black-rose", "source_override": "br-002-joggers-source.jpg"},
-    "br-003": {"name": "BLACK is Beautiful Jersey", "collection": "black-rose", "source_override": "br-003-jersey-front-techflat.jpg"},
-    "br-004": {"name": "BLACK Rose Hoodie", "collection": "black-rose", "source_override": "br-004-hoodie-product.jpg"},
-    "br-005": {"name": "BLACK Rose Hoodie — Signature Edition", "collection": "black-rose", "source_override": "br-005-hoodie-ltd-source.jpg"},
-    "br-006": {"name": "BLACK Rose Sherpa Jacket", "collection": "black-rose", "source_override": "br-006-sherpa-product.jpg"},
-    "br-007": {"name": "BLACK Rose × Love Hurts Basketball Shorts", "collection": "black-rose", "source_override": "br-007-shorts-front-source.jpg"},
-    "br-008": {"name": "Women's BLACK Rose Hooded Dress", "collection": "black-rose", "source_override": "br-008-hooded-dress.webp"},
+    "br-001": {
+        "name": "BLACK Rose Crewneck",
+        "collection": "black-rose",
+        "source_override": "br-001-techflat-v4.jpg",
+    },
+    "br-002": {
+        "name": "BLACK Rose Joggers",
+        "collection": "black-rose",
+        "source_override": "br-002-joggers-source.jpg",
+    },
+    "br-003": {
+        "name": "BLACK is Beautiful Jersey",
+        "collection": "black-rose",
+        "source_override": "br-003-jersey-front-techflat.jpg",
+    },
+    "br-004": {
+        "name": "BLACK Rose Hoodie",
+        "collection": "black-rose",
+        "source_override": "br-004-hoodie-product.jpg",
+    },
+    "br-005": {
+        "name": "BLACK Rose Hoodie — Signature Edition",
+        "collection": "black-rose",
+        "source_override": "br-005-hoodie-ltd-source.jpg",
+    },
+    "br-006": {
+        "name": "BLACK Rose Sherpa Jacket",
+        "collection": "black-rose",
+        "source_override": "br-006-sherpa-product.jpg",
+    },
+    "br-007": {
+        "name": "BLACK Rose × Love Hurts Basketball Shorts",
+        "collection": "black-rose",
+        "source_override": "br-007-shorts-front-source.jpg",
+    },
+    "br-008": {
+        "name": "Women's BLACK Rose Hooded Dress",
+        "collection": "black-rose",
+        "source_override": "br-008-hooded-dress.webp",
+    },
     # ── Love Hurts Collection ──────────────────────────────────────────────
-    "lh-001": {"name": "The Fannie", "collection": "love-hurts", "source_override": "lh-001-fannie-pack-photo.jpg"},
-    "lh-002": {"name": "Love Hurts Joggers", "collection": "love-hurts", "source_override": "lh-002-joggers-variants.jpg"},
-    "lh-003": {"name": "Love Hurts Basketball Shorts", "collection": "love-hurts", "source_override": "lh-003-shorts-front-closeup.jpg"},
-    "lh-004": {"name": "Love Hurts Varsity Jacket", "collection": "love-hurts", "source_override": "lh-004-varsity-source.jpg"},
-    "lh-005": {"name": "Love Hurts Windbreaker", "collection": "love-hurts", "source_override": "lh-005-bomber.webp"},
+    "lh-001": {
+        "name": "The Fannie",
+        "collection": "love-hurts",
+        "source_override": "lh-001-fannie-pack-photo.jpg",
+    },
+    "lh-002": {
+        "name": "Love Hurts Joggers",
+        "collection": "love-hurts",
+        "source_override": "lh-002-joggers-variants.jpg",
+    },
+    "lh-003": {
+        "name": "Love Hurts Basketball Shorts",
+        "collection": "love-hurts",
+        "source_override": "lh-003-shorts-front-closeup.jpg",
+    },
+    "lh-004": {
+        "name": "Love Hurts Varsity Jacket",
+        "collection": "love-hurts",
+        "source_override": "lh-004-varsity-source.jpg",
+    },
+    "lh-005": {
+        "name": "Love Hurts Windbreaker",
+        "collection": "love-hurts",
+        "source_override": "lh-005-bomber.webp",
+    },
     # ── Signature Collection ───────────────────────────────────────────────
-    "sg-001": {"name": "The Bay Set", "collection": "signature", "source_override": "sg-001-bay-set.webp"},
-    "sg-002": {"name": "Stay Golden Set", "collection": "signature", "source_override": "sg-002-techflat-v4.jpg"},
-    "sg-003": {"name": "The Signature Tee", "collection": "signature", "source_override": "sg-003.webp"},
-    "sg-004": {"name": "The Signature Hoodie", "collection": "signature", "source_override": "sg-004-signature-hoodie.webp"},
-    "sg-005": {"name": "Stay Golden Tee", "collection": "signature", "source_override": "sg-005-stay-golden-tee.webp"},
-    "sg-006": {"name": "Mint & Lavender Hoodie", "collection": "signature", "source_override": "sg-006-hoodie-source.jpg"},
-    "sg-007": {"name": "The Signature Beanie", "collection": "signature", "source_override": "sg-007-beanie-source.jpg"},
-    "sg-008": {"name": "Signature Crop Hoodie", "collection": "signature", "source_override": "sg-008-crop-hoodie.webp"},
-    "sg-009": {"name": "The Sherpa Jacket", "collection": "signature", "source_override": "sg-009-sherpa-jacket.webp"},
-    "sg-010": {"name": "The Bridge Series Shorts", "collection": "signature", "source_override": "sg-010-bridge-shorts-variants.jpg"},
-    "sg-011": {"name": "Original Label Tee (White)", "collection": "signature", "source_override": "sg-011-label-tee-white.webp"},
-    "sg-012": {"name": "Original Label Tee (Orchid)", "collection": "signature", "source_override": "sg-012-label-tee-orchid.webp"},
+    "sg-001": {
+        "name": "The Bay Set",
+        "collection": "signature",
+        "source_override": "sg-001-bay-set.webp",
+    },
+    "sg-002": {
+        "name": "Stay Golden Set",
+        "collection": "signature",
+        "source_override": "sg-002-techflat-v4.jpg",
+    },
+    "sg-003": {
+        "name": "The Signature Tee",
+        "collection": "signature",
+        "source_override": "sg-003.webp",
+    },
+    "sg-004": {
+        "name": "The Signature Hoodie",
+        "collection": "signature",
+        "source_override": "sg-004-signature-hoodie.webp",
+    },
+    "sg-005": {
+        "name": "Stay Golden Tee",
+        "collection": "signature",
+        "source_override": "sg-005-stay-golden-tee.webp",
+    },
+    "sg-006": {
+        "name": "Mint & Lavender Hoodie",
+        "collection": "signature",
+        "source_override": "sg-006-hoodie-source.jpg",
+    },
+    "sg-007": {
+        "name": "The Signature Beanie",
+        "collection": "signature",
+        "source_override": "sg-007-beanie-source.jpg",
+    },
+    "sg-008": {
+        "name": "Signature Crop Hoodie",
+        "collection": "signature",
+        "source_override": "sg-008-crop-hoodie.webp",
+    },
+    "sg-009": {
+        "name": "The Sherpa Jacket",
+        "collection": "signature",
+        "source_override": "sg-009-sherpa-jacket.webp",
+    },
+    "sg-010": {
+        "name": "The Bridge Series Shorts",
+        "collection": "signature",
+        "source_override": "sg-010-bridge-shorts-variants.jpg",
+    },
+    "sg-011": {
+        "name": "Original Label Tee (White)",
+        "collection": "signature",
+        "source_override": "sg-011-label-tee-white.webp",
+    },
+    "sg-012": {
+        "name": "Original Label Tee (Orchid)",
+        "collection": "signature",
+        "source_override": "sg-012-label-tee-orchid.webp",
+    },
     # ── Pre-Order Products ─────────────────────────────────────────────────
     "po-001": {
         "name": "Red #80 Football Jersey",
@@ -153,12 +248,12 @@ PRODUCT_CATALOG = {
 
 # SKUs that are accessories (not wearable on a model's body)
 ACCESSORY_SKUS = {
-    "lh-001",   # The Fannie (fanny pack)
-    "sg-007",   # The Signature Beanie
-    "po-007",   # Black Rose Beanie
-    "po-009",   # SR Monogram Slides
-    "po-010",   # Love Hurts Slides
-    "po-011",   # Black Rose Slides
+    "lh-001",  # The Fannie (fanny pack)
+    "sg-007",  # The Signature Beanie
+    "po-007",  # Black Rose Beanie
+    "po-009",  # SR Monogram Slides
+    "po-010",  # Love Hurts Slides
+    "po-011",  # Black Rose Slides
 }
 
 # SKUs with known bad source images — skipped by default.
@@ -178,9 +273,9 @@ TEXT_HEAVY_SKUS = {"br-003", "po-001", "po-002", "po-003", "po-004"}
 # (2) accurate text rendering, (3) exact hex color matching.
 # In "auto" mode, these get routed to FLUX instead of Gemini.
 TECH_FLAT_SKUS = {
-    "br-001",   # Tech flat only (br-001-techflat-v4.jpg)
-    "sg-002",   # Tech flat only (sg-002-techflat-v4.jpg)
-    "po-006",   # Tech flat only (po-006-techflat.jpg)
+    "br-001",  # Tech flat only (br-001-techflat-v4.jpg)
+    "sg-002",  # Tech flat only (sg-002-techflat-v4.jpg)
+    "po-006",  # Tech flat only (po-006-techflat.jpg)
 }
 
 IMAGEN_PRODUCT_DESCRIPTIONS = {
@@ -313,9 +408,7 @@ def find_source_image(sku: str) -> Path | None:
         log.warning("source_override %s not found for %s", info["source_override"], sku)
         return None
 
-    candidates = list(PRODUCTS_DIR.glob(f"{sku}*.webp")) + list(
-        PRODUCTS_DIR.glob(f"{sku}*.jpg")
-    )
+    candidates = list(PRODUCTS_DIR.glob(f"{sku}*.webp")) + list(PRODUCTS_DIR.glob(f"{sku}*.jpg"))
     # Filter out generated shots — we want flat-lay/product source only
     source_candidates = [
         p
@@ -381,11 +474,10 @@ def get_together_client():
                     key = line.split("=", 1)[1].strip()
                     break
     if not key:
-        log.error(
-            "No TOGETHER_API_KEY found. Set it in .env.hf or export TOGETHER_API_KEY"
-        )
+        log.error("No TOGETHER_API_KEY found. Set it in .env.hf or export TOGETHER_API_KEY")
         return None
     from together import Together
+
     return Together(api_key=key)
 
 
@@ -400,11 +492,10 @@ def get_openai_client():
                     key = line.split("=", 1)[1].strip()
                     break
     if not key:
-        log.error(
-            "No OPENAI_API_KEY found. Set it in .env.hf or export OPENAI_API_KEY"
-        )
+        log.error("No OPENAI_API_KEY found. Set it in .env.hf or export OPENAI_API_KEY")
         return None
     from openai import OpenAI
+
     return OpenAI(api_key=key)
 
 
@@ -457,8 +548,7 @@ def front_prompt(name: str) -> str:
         "background. The garment must be 100% identical to the reference "
         "image — same colors, same cut, same details, same logo placement, "
         "same fabric texture. Do NOT change the garment type. "
-        "The model should have a confident, editorial pose."
-        + ANTI_HALLUCINATION
+        "The model should have a confident, editorial pose." + ANTI_HALLUCINATION
     )
 
 
@@ -470,8 +560,7 @@ def back_prompt(name: str) -> str:
         "studio lighting, clean white background. The garment must be 100% "
         "identical to the reference — same colors, same cut, same back details, "
         "same logo placement. Do NOT change the garment type. "
-        "The model is turned away from camera showing the back of the outfit."
-        + ANTI_HALLUCINATION
+        "The model is turned away from camera showing the back of the outfit." + ANTI_HALLUCINATION
     )
 
 
@@ -481,8 +570,7 @@ def accessory_prompt(name: str) -> str:
         f"model wearing/holding this EXACT {name}, front-facing, luxury "
         "streetwear editorial photography, studio lighting, clean white "
         "background. The accessory must be 100% identical to the reference "
-        "image. Do NOT change the item type."
-        + ANTI_HALLUCINATION
+        "image. Do NOT change the item type." + ANTI_HALLUCINATION
     )
 
 
@@ -551,8 +639,7 @@ ENHANCED_PROMPT_SUFFIX = (
     " CRITICAL: The item in the output MUST be pixel-accurate to the "
     "reference. Do not change any colors, patterns, logos, or design "
     "elements. Do NOT substitute a different garment type. "
-    "This is a luxury fashion brand — accuracy is everything."
-    + ANTI_HALLUCINATION
+    "This is a luxury fashion brand — accuracy is everything." + ANTI_HALLUCINATION
 )
 
 
@@ -571,8 +658,7 @@ def render3d_front_prompt(name: str) -> str:
         "same colors, same logos, same numbers, same text, same stripes, "
         "same patches, same patterns. Do NOT change ANY design element. "
         "The output should look like a real photograph of this garment "
-        "on a mannequin form, ready for an e-commerce product page."
-        + ANTI_HALLUCINATION
+        "on a mannequin form, ready for an e-commerce product page." + ANTI_HALLUCINATION
     )
 
 
@@ -588,8 +674,7 @@ def render3d_back_prompt(name: str) -> str:
         "subtle floor reflection. Professional product photography lighting. "
         "Every detail from the back of the design MUST be preserved exactly: "
         "same colors, same logos, same numbers, same text, same stripes. "
-        "Do NOT change ANY design element. Show the BACK of the garment."
-        + ANTI_HALLUCINATION
+        "Do NOT change ANY design element. Show the BACK of the garment." + ANTI_HALLUCINATION
     )
 
 
@@ -618,8 +703,7 @@ def render3d_branding_prompt(name: str, collection: str) -> str:
         f"{vibe} "
         f"Every detail MUST be preserved exactly from the design: colors, "
         f"logos, numbers, text, stripes, patches. Do NOT change anything. "
-        f"Cinematic product photography, slight floor reflection."
-        + ANTI_HALLUCINATION
+        f"Cinematic product photography, slight floor reflection." + ANTI_HALLUCINATION
     )
 
 
@@ -706,6 +790,7 @@ def generate_image(
         if part.inline_data:
             # as_image() returns a genai Image — .save() takes a file path
             import tempfile
+
             with tempfile.NamedTemporaryFile(suffix=".webp", delete=False) as tmp:
                 tmp_path = tmp.name
             part.as_image().save(tmp_path)
@@ -762,6 +847,7 @@ def generate_image_imagen(
         # Imagen returns PNG — convert to WebP for consistency
         try:
             from PIL import Image
+
             pil_img = Image.open(io.BytesIO(raw_bytes))
             buf = io.BytesIO()
             pil_img.save(buf, format="WEBP", quality=92)
@@ -875,6 +961,7 @@ def generate_image_flux(
         raw_bytes = base64.b64decode(img_data.b64_json)
     elif hasattr(img_data, "url") and img_data.url:
         import urllib.request
+
         try:
             req = urllib.request.Request(img_data.url)
             with urllib.request.urlopen(req, timeout=30) as resp:
@@ -890,6 +977,7 @@ def generate_image_flux(
     # Convert to WebP for consistency with other providers
     try:
         from PIL import Image
+
         pil_img = Image.open(io.BytesIO(raw_bytes))
         buf = io.BytesIO()
         pil_img.save(buf, format="WEBP", quality=92)
@@ -1047,9 +1135,7 @@ def generate_image_gpt(
                         if source_image_path.suffix.lower() in (".jpg", ".jpeg")
                         else "image/webp"
                     ),
-                    "data": base64.b64encode(
-                        source_image_path.read_bytes()
-                    ).decode("utf-8"),
+                    "data": base64.b64encode(source_image_path.read_bytes()).decode("utf-8"),
                 }
             ]
 
@@ -1069,6 +1155,7 @@ def generate_image_gpt(
         raw_bytes = base64.b64decode(img_data.b64_json)
     elif hasattr(img_data, "url") and img_data.url:
         import urllib.request
+
         try:
             req = urllib.request.Request(img_data.url)
             with urllib.request.urlopen(req, timeout=30) as resp:
@@ -1084,6 +1171,7 @@ def generate_image_gpt(
     # Convert to WebP for consistency
     try:
         from PIL import Image
+
         pil_img = Image.open(io.BytesIO(raw_bytes))
         buf = io.BytesIO()
         pil_img.save(buf, format="WEBP", quality=92)
@@ -1185,7 +1273,10 @@ def quality_gate(image_bytes: bytes, sku: str, view: str) -> bool:
     if size_kb < MIN_FILE_SIZE_KB:
         log.warning(
             "REJECT %s %s: %.1fKB < %dKB minimum",
-            sku, view, size_kb, MIN_FILE_SIZE_KB,
+            sku,
+            view,
+            size_kb,
+            MIN_FILE_SIZE_KB,
         )
         return False
     log.info("PASS %s %s: %.1fKB", sku, view, size_kb)
@@ -1208,9 +1299,7 @@ def get_prompt(product: dict, view: str) -> str:
 
     if view == "branding":
         if is_accessory:
-            tpl = ACCESSORY_BRANDING_TEMPLATES.get(
-                collection, BRANDING_TEMPLATES[collection]
-            )
+            tpl = ACCESSORY_BRANDING_TEMPLATES.get(collection, BRANDING_TEMPLATES[collection])
             return tpl.format(name=name)
         return BRANDING_TEMPLATES[collection].format(name=name)
 
@@ -1253,14 +1342,8 @@ def process_product(
     results = {"sku": sku, "name": name, "views": {}}
 
     # Determine which engine to use for this product
-    use_imagen = (
-        engine == "imagen"
-        or (engine == "auto" and sku in TEXT_HEAVY_SKUS)
-    )
-    use_flux = (
-        engine == "flux"
-        or (engine == "auto" and sku in TECH_FLAT_SKUS and not use_imagen)
-    )
+    use_imagen = engine == "imagen" or (engine == "auto" and sku in TEXT_HEAVY_SKUS)
+    use_flux = engine == "flux" or (engine == "auto" and sku in TECH_FLAT_SKUS and not use_imagen)
     use_gpt_image = engine == "gpt-image"
 
     # Validate engine requirements
@@ -1288,9 +1371,12 @@ def process_product(
         log.info("FLUX text-to-image mode for %s (no source image)", sku)
 
     engine_label = (
-        "GPT-Image-1.5" if use_gpt_image
-        else "Imagen Ultra" if use_imagen
-        else "FLUX.2" if use_flux
+        "GPT-Image-1.5"
+        if use_gpt_image
+        else "Imagen Ultra"
+        if use_imagen
+        else "FLUX.2"
+        if use_flux
         else "Gemini"
     )
 
@@ -1320,12 +1406,18 @@ def process_product(
                 if analysis_detail:
                     prompt += f" VERIFIED DETAILS: {analysis_detail}"
                 image_bytes = generate_image_gpt(
-                    openai_client, prompt, src, attempt,
+                    openai_client,
+                    prompt,
+                    src,
+                    attempt,
                 )
             elif use_flux:
                 prompt = flux_render_prompt(name, view, source_desc=analysis_detail)
                 image_bytes = generate_image_flux(
-                    together_client, prompt, src, attempt,
+                    together_client,
+                    prompt,
+                    src,
+                    attempt,
                 )
             else:
                 prompt = get_prompt(product, view)
@@ -1335,7 +1427,9 @@ def process_product(
 
             if image_bytes and quality_gate(image_bytes, sku, view):
                 out_path.write_bytes(image_bytes)
-                log.info("SAVED %s (%.1fKB) [%s]", out_path.name, len(image_bytes) / 1024, engine_label)
+                log.info(
+                    "SAVED %s (%.1fKB) [%s]", out_path.name, len(image_bytes) / 1024, engine_label
+                )
                 results["views"][view] = "success"
                 success = True
                 break
@@ -1343,7 +1437,10 @@ def process_product(
             if attempt < MAX_RETRIES:
                 log.info(
                     "Retry %d/%d for %s %s...",
-                    attempt + 1, MAX_RETRIES, sku, view,
+                    attempt + 1,
+                    MAX_RETRIES,
+                    sku,
+                    view,
                 )
                 time.sleep(RETRY_DELAY_SEC)
 
@@ -1484,9 +1581,7 @@ def cmd_generate(args):
             log.error("FLUX engine requested but no Together API key. Aborting.")
             sys.exit(1)
         if engine == "auto" and not together_client:
-            log.warning(
-                "No Together API key — TECH_FLAT_SKUS will fall back to Gemini"
-            )
+            log.warning("No Together API key — TECH_FLAT_SKUS will fall back to Gemini")
 
     # Initialize OpenAI client for gpt-image engine or --analyze/--qa
     openai_client = None
@@ -1509,7 +1604,9 @@ def cmd_generate(args):
 
     log.info(
         "Starting generation: %d products, views=%s, engine=%s",
-        len(products), views, engine_label,
+        len(products),
+        views,
+        engine_label,
     )
 
     # -- Phase 1: Vision Pre-Pass (if --analyze) --
@@ -1530,11 +1627,11 @@ def cmd_generate(args):
                     continue
                 log.info(
                     "[%d/%d] Analyzing %s...",
-                    i, len(products), product["sku"],
+                    i,
+                    len(products),
+                    product["sku"],
                 )
-                result = analyze_source_image(
-                    openai_client, src, product["name"]
-                )
+                result = analyze_source_image(openai_client, src, product["name"])
                 if result:
                     analyses[product["sku"]] = result
                 time.sleep(1)
@@ -1549,13 +1646,9 @@ def cmd_generate(args):
     all_results = []
     for i, product in enumerate(products, 1):
         sku = product["sku"]
-        use_imagen = (
-            engine == "imagen"
-            or (engine == "auto" and sku in TEXT_HEAVY_SKUS)
-        )
-        use_flux = (
-            engine == "flux"
-            or (engine == "auto" and sku in TECH_FLAT_SKUS and not use_imagen)
+        use_imagen = engine == "imagen" or (engine == "auto" and sku in TEXT_HEAVY_SKUS)
+        use_flux = engine == "flux" or (
+            engine == "auto" and sku in TECH_FLAT_SKUS and not use_imagen
         )
         use_gpt_image = engine == "gpt-image"
         needs_source = not use_imagen
@@ -1564,19 +1657,24 @@ def cmd_generate(args):
         elif not product["source_image"]:
             log.warning(
                 "[%d/%d] SKIP %s: no source image",
-                i, len(products), sku,
+                i,
+                len(products),
+                sku,
             )
-            all_results.append(
-                {"sku": sku, "name": product["name"], "status": "no_source"}
-            )
+            all_results.append({"sku": sku, "name": product["name"], "status": "no_source"})
             continue
 
         log.info(
             "[%d/%d] Processing %s (%s)",
-            i, len(products), sku, product["name"],
+            i,
+            len(products),
+            sku,
+            product["name"],
         )
         result = process_product(
-            client, product, views,
+            client,
+            product,
+            views,
             engine=engine,
             together_client=together_client,
             openai_client=openai_client,
@@ -1608,8 +1706,11 @@ def cmd_generate(args):
                     continue
                 log.info("QA checking %s %s...", sku, view)
                 qa = qa_check_image(
-                    openai_client, src, gen_path,
-                    result["name"], analyses.get(sku),
+                    openai_client,
+                    src,
+                    gen_path,
+                    result["name"],
+                    analyses.get(sku),
                 )
                 qa_results[f"{sku}_{view}"] = qa
                 passed = qa.get("pass", False)
@@ -1645,8 +1746,10 @@ def cmd_generate(args):
 
     for r in all_results:
         icon = {
-            "success": "OK", "partial": "PARTIAL",
-            "failed": "FAIL", "no_source": "SKIP",
+            "success": "OK",
+            "partial": "PARTIAL",
+            "failed": "FAIL",
+            "no_source": "SKIP",
         }.get(r.get("status", "?"), "?")
         views_str = ""
         if "views" in r:
@@ -1689,7 +1792,16 @@ def main():
     parser.add_argument(
         "--step",
         type=str,
-        choices=["front", "back", "branding", "models", "all", "render3d", "render3d_front", "render3d_back"],
+        choices=[
+            "front",
+            "back",
+            "branding",
+            "models",
+            "all",
+            "render3d",
+            "render3d_front",
+            "render3d_back",
+        ],
         default="all",
         help="What to generate: front, back, branding, models (front+back), all, render3d (3D product shots)",
     )

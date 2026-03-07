@@ -22,7 +22,7 @@ import base64
 import logging
 import os
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import httpx
@@ -107,7 +107,7 @@ class GeminiContentFilterError(GeminiError):
 # =============================================================================
 
 
-class GeminiModel(str, Enum):
+class GeminiModel(StrEnum):
     """Available Gemini models.
 
     Nano Banana = Gemini's native image generation.
@@ -134,7 +134,7 @@ class GeminiModel(str, Enum):
         return cls.PRO_IMAGE
 
 
-class ImageSize(str, Enum):
+class ImageSize(StrEnum):
     """Output image sizes for Gemini 3 Pro Image."""
 
     SIZE_1K = "1K"  # 1024 max dimension
@@ -142,7 +142,7 @@ class ImageSize(str, Enum):
     SIZE_4K = "4K"  # 4096 max dimension (Pro only)
 
 
-class AspectRatio(str, Enum):
+class AspectRatio(StrEnum):
     """Supported aspect ratios for image generation."""
 
     SQUARE = "1:1"
@@ -350,7 +350,7 @@ class GeminiClient:
 
     def _build_url(self, model: str, action: str = "generateContent") -> str:
         """Build API URL."""
-        return f"{self.config.base_url}/models/{model}:{action}" f"?key={self.config.api_key}"
+        return f"{self.config.base_url}/models/{model}:{action}?key={self.config.api_key}"
 
     async def _request(
         self,
@@ -586,7 +586,7 @@ Do NOT mention any prices or sizing."""
 
         # Add reference images first (up to 14 for Pro)
         max_refs = 14 if "pro" in model.value.lower() else 2
-        for i, ref_image in enumerate(request.reference_images[:max_refs]):
+        for _i, ref_image in enumerate(request.reference_images[:max_refs]):
             if ref_image.base64_data:
                 parts.append(
                     {
@@ -841,7 +841,7 @@ Only modify: {edit_instruction}"""
         """Check Gemini API health."""
         try:
             # Simple text generation to verify API key works
-            response = await self._request(
+            _response = await self._request(
                 self.config.vision_model.value,
                 [{"parts": [{"text": "Hello"}]}],
                 generation_config={"maxOutputTokens": 5},

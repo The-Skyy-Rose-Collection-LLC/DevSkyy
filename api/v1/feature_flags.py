@@ -9,7 +9,6 @@ Protected by admin role.
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -111,7 +110,7 @@ async def delete_flag(flag_name: str) -> dict[str, str]:
     """Delete a feature flag."""
     from core.feature_flags.flag_manager import flag_manager
 
-    if hasattr(flag_manager, 'delete_flag'):
+    if hasattr(flag_manager, "delete_flag"):
         flag_manager.delete_flag(flag_name)
     else:
         # In-memory only: just remove from dict

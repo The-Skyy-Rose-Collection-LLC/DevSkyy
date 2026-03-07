@@ -23,7 +23,7 @@ import os
 import subprocess
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 import httpx
@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class ProcessStatus(str, Enum):
+class ProcessStatus(StrEnum):
     """MCP server process status."""
 
     STOPPED = "stopped"
@@ -50,7 +50,7 @@ class ProcessStatus(str, Enum):
     RESTARTING = "restarting"
 
 
-class RestartPolicy(str, Enum):
+class RestartPolicy(StrEnum):
     """Process restart behavior on failure."""
 
     NEVER = "never"

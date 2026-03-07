@@ -63,8 +63,8 @@ class MarketingCoreAgent(CoreAgent):
     def _get_legacy_agent(self) -> Any:
         if self._legacy_agent is None:
             try:
-                from agents.marketing_agent import MarketingAgent
                 from adk.base import AgentConfig
+                from agents.marketing_agent import MarketingAgent
 
                 config = AgentConfig(name="marketing", description="Marketing operations")
                 self._legacy_agent = MarketingAgent(config)

@@ -2,17 +2,15 @@
 
 from __future__ import annotations
 
-import pytest
 from pathlib import Path
 
+import pytest
+
 from core.output_writer import (
-    ALLOWED_EXTENSIONS,
     MAX_FILE_SIZE,
     ExtractedFile,
     OutputWriter,
-    WriteResult,
 )
-
 
 # ---------------------------------------------------------------------------
 # ExtractedFile
@@ -49,25 +47,25 @@ class TestExtractFiles:
         assert "<?php" in files[0].content
 
     def test_pattern_2_comment_css(self) -> None:
-        content = '```css\n/* file: assets/css/luxury.css */\nbody { color: red; }\n```'
+        content = "```css\n/* file: assets/css/luxury.css */\nbody { color: red; }\n```"
         files = OutputWriter.extract_files(content)
         assert len(files) == 1
         assert files[0].path == "assets/css/luxury.css"
 
     def test_pattern_2_comment_js(self) -> None:
-        content = '```javascript\n// file: assets/js/main.js\nconst x = 1;\n```'
+        content = "```javascript\n// file: assets/js/main.js\nconst x = 1;\n```"
         files = OutputWriter.extract_files(content)
         assert len(files) == 1
         assert files[0].path == "assets/js/main.js"
 
     def test_pattern_2_comment_python(self) -> None:
-        content = '```python\n# file: utils.py\ndef foo(): pass\n```'
+        content = "```python\n# file: utils.py\ndef foo(): pass\n```"
         files = OutputWriter.extract_files(content)
         assert len(files) == 1
         assert files[0].path == "utils.py"
 
     def test_pattern_2_comment_html(self) -> None:
-        content = '```html\n<!-- file: index.html -->\n<div>hi</div>\n```'
+        content = "```html\n<!-- file: index.html -->\n<div>hi</div>\n```"
         files = OutputWriter.extract_files(content)
         assert len(files) == 1
         assert files[0].path == "index.html"
@@ -79,16 +77,16 @@ class TestExtractFiles:
         assert files[0].path == "theme.json"
 
     def test_pattern_4_bold_path_then_fence(self) -> None:
-        content = '**`style.css`**\n\n```css\nbody { margin: 0; }\n```'
+        content = "**`style.css`**\n\n```css\nbody { margin: 0; }\n```"
         files = OutputWriter.extract_files(content)
         assert len(files) == 1
         assert files[0].path == "style.css"
 
     def test_multiple_files(self) -> None:
         content = (
-            '```php:functions.php\n<?php\n```\n\n'
-            '```css:style.css\nbody{}\n```\n\n'
-            '### File: theme.json\n```json\n{}\n```'
+            "```php:functions.php\n<?php\n```\n\n"
+            "```css:style.css\nbody{}\n```\n\n"
+            "### File: theme.json\n```json\n{}\n```"
         )
         files = OutputWriter.extract_files(content)
         assert len(files) == 3
@@ -107,16 +105,13 @@ class TestExtractFiles:
         assert OutputWriter.extract_files(content) == []
 
     def test_deduplication_last_wins(self) -> None:
-        content = (
-            '```php:functions.php\n<?php // v1\n```\n\n'
-            '```php:functions.php\n<?php // v2\n```'
-        )
+        content = "```php:functions.php\n<?php // v1\n```\n\n```php:functions.php\n<?php // v2\n```"
         files = OutputWriter.extract_files(content)
         assert len(files) == 1
         assert "v2" in files[0].content
 
     def test_nested_path(self) -> None:
-        content = '```css:assets/css/components/header.css\n.header{}\n```'
+        content = "```css:assets/css/components/header.css\n.header{}\n```"
         files = OutputWriter.extract_files(content)
         assert len(files) == 1
         assert files[0].path == "assets/css/components/header.css"
@@ -207,19 +202,13 @@ class TestWriteFile:
 
     def test_tracks_written_files(self, tmp_path: Path) -> None:
         writer = OutputWriter(output_dir=tmp_path)
-        writer.write_file(
-            ExtractedFile(path="a.php", content="<?php", language="php")
-        )
-        writer.write_file(
-            ExtractedFile(path="b.css", content="body{}", language="css")
-        )
+        writer.write_file(ExtractedFile(path="a.php", content="<?php", language="php"))
+        writer.write_file(ExtractedFile(path="b.css", content="body{}", language="css"))
         assert writer.written_files == ["a.php", "b.css"]
 
     def test_reset_clears_tracker(self, tmp_path: Path) -> None:
         writer = OutputWriter(output_dir=tmp_path)
-        writer.write_file(
-            ExtractedFile(path="a.php", content="<?php", language="php")
-        )
+        writer.write_file(ExtractedFile(path="a.php", content="<?php", language="php"))
         assert len(writer.written_files) == 1
         writer.reset()
         assert len(writer.written_files) == 0
@@ -235,7 +224,7 @@ class TestExtractAndWrite:
         writer = OutputWriter(output_dir=tmp_path)
         content = (
             '```php:functions.php\n<?php\nadd_action("init", function() {});\n```\n\n'
-            '```css:assets/css/luxury.css\nbody { background: #0A0A0A; }\n```\n\n'
+            "```css:assets/css/luxury.css\nbody { background: #0A0A0A; }\n```\n\n"
             '### File: theme.json\n```json\n{"version": 3}\n```'
         )
         result = writer.extract_and_write(content)
@@ -260,10 +249,7 @@ class TestExtractAndWrite:
 
     def test_mixed_valid_and_invalid(self, tmp_path: Path) -> None:
         writer = OutputWriter(output_dir=tmp_path)
-        content = (
-            '```php:valid.php\n<?php echo 1;\n```\n\n'
-            '```php:../evil.php\n<?php evil();\n```'
-        )
+        content = "```php:valid.php\n<?php echo 1;\n```\n\n```php:../evil.php\n<?php evil();\n```"
         result = writer.extract_and_write(content)
         assert "valid.php" in result.files_written
         assert "../evil.php" in result.files_skipped

@@ -13,7 +13,7 @@ import logging
 import random
 import time
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -45,7 +45,7 @@ _app_start_time: float = time.time()
 # =============================================================================
 
 
-class TimeRange(str, Enum):
+class TimeRange(StrEnum):
     """Time range for health metrics queries."""
 
     ONE_HOUR = "1h"
@@ -54,7 +54,7 @@ class TimeRange(str, Enum):
     THIRTY_DAYS = "30d"
 
 
-class SystemStatus(str, Enum):
+class SystemStatus(StrEnum):
     """System health status levels."""
 
     HEALTHY = "healthy"
@@ -455,7 +455,7 @@ async def get_api_performance(
         total_errors = 0
         total_duration = 0.0
 
-        for key, data in endpoint_metrics.items():
+        for _key, data in endpoint_metrics.items():
             req_count = data["request_count"]
             err_count = data["error_count"]
             duration = data["total_duration"]

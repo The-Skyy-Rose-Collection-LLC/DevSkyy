@@ -18,8 +18,6 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from agents.errors import AgentError, ErrorCategory
-
 from .base import CoreAgent, CoreAgentType, HealthStatus, SelfHealingMixin
 from .shared.wp_ai_bridge import WordPressAIBridge
 
@@ -28,22 +26,26 @@ logger = logging.getLogger(__name__)
 
 # Task routing: keywords → core agent type
 _ROUTING_RULES: list[tuple[list[str], CoreAgentType]] = [
-    (["product", "order", "inventory", "price", "payment", "cart", "woocommerce"],
-     CoreAgentType.COMMERCE),
-    (["content", "copy", "blog", "seo", "page", "description", "text"],
-     CoreAgentType.CONTENT),
-    (["design", "brand", "visual", "logo", "creative", "style", "color"],
-     CoreAgentType.CREATIVE),
-    (["campaign", "social", "marketing", "email", "audience", "ad"],
-     CoreAgentType.MARKETING),
-    (["deploy", "security", "health", "monitor", "build", "ci", "code quality"],
-     CoreAgentType.OPERATIONS),
-    (["analytics", "data", "report", "forecast", "trend", "conversion", "metric"],
-     CoreAgentType.ANALYTICS),
-    (["image", "photo", "3d", "model", "render", "vton", "try-on", "asset"],
-     CoreAgentType.IMAGERY),
-    (["theme", "template", "wordpress", "web build", "site", "page template"],
-     CoreAgentType.WEB_BUILDER),
+    (
+        ["product", "order", "inventory", "price", "payment", "cart", "woocommerce"],
+        CoreAgentType.COMMERCE,
+    ),
+    (["content", "copy", "blog", "seo", "page", "description", "text"], CoreAgentType.CONTENT),
+    (["design", "brand", "visual", "logo", "creative", "style", "color"], CoreAgentType.CREATIVE),
+    (["campaign", "social", "marketing", "email", "audience", "ad"], CoreAgentType.MARKETING),
+    (
+        ["deploy", "security", "health", "monitor", "build", "ci", "code quality"],
+        CoreAgentType.OPERATIONS,
+    ),
+    (
+        ["analytics", "data", "report", "forecast", "trend", "conversion", "metric"],
+        CoreAgentType.ANALYTICS,
+    ),
+    (["image", "photo", "3d", "model", "render", "vton", "try-on", "asset"], CoreAgentType.IMAGERY),
+    (
+        ["theme", "template", "wordpress", "web build", "site", "page template"],
+        CoreAgentType.WEB_BUILDER,
+    ),
 ]
 
 
@@ -139,11 +141,20 @@ class Orchestrator(SelfHealingMixin):
         """
         # AI generation tasks route directly to the WordPress AI bridge
         task_lower = task.lower()
-        if any(kw in task_lower for kw in [
-            "ai generate", "ai text", "ai image", "ai status",
-            "generate description", "generate copy", "generate image",
-            "wp ai", "wordpress ai",
-        ]):
+        if any(
+            kw in task_lower
+            for kw in [
+                "ai generate",
+                "ai text",
+                "ai image",
+                "ai status",
+                "generate description",
+                "generate copy",
+                "generate image",
+                "wp ai",
+                "wordpress ai",
+            ]
+        ):
             logger.info("[orchestrator] Routing to WordPress AI bridge: %s", task[:100])
             return await self._wp_ai_bridge.execute_safe(task, **kwargs)
 
@@ -188,11 +199,9 @@ class Orchestrator(SelfHealingMixin):
 
         return result
 
-    async def _route_to_any_available(
-        self, task: str, **kwargs: Any
-    ) -> dict[str, Any]:
+    async def _route_to_any_available(self, task: str, **kwargs: Any) -> dict[str, Any]:
         """Try routing to any available agent as fallback."""
-        for agent_type, agent in self._core_agents.items():
+        for _agent_type, agent in self._core_agents.items():
             if isinstance(agent, SelfHealingMixin) and not agent.circuit_breaker_allows():
                 continue
 
@@ -248,9 +257,7 @@ class Orchestrator(SelfHealingMixin):
             "error": "All core agents failed — human intervention required",
             "requires_human_approval": True,
             "original_failure": original_result,
-            "agents_tried": [
-                a.name for a in self._core_agents.values()
-            ],
+            "agents_tried": [a.name for a in self._core_agents.values()],
         }
 
     # -------------------------------------------------------------------------
@@ -307,37 +314,45 @@ class Orchestrator(SelfHealingMixin):
         ]
         connections = []
 
-        for agent_type, agent in self._core_agents.items():
+        for _agent_type, agent in self._core_agents.items():
             if hasattr(agent, "to_portal_node"):
                 node = agent.to_portal_node()
                 nodes.append(node)
-                connections.append({
-                    "from": "orchestrator",
-                    "to": node["id"],
-                    "type": "manages",
-                })
+                connections.append(
+                    {
+                        "from": "orchestrator",
+                        "to": node["id"],
+                        "type": "manages",
+                    }
+                )
 
                 # Add sub-agent nodes
                 for sub in node.get("sub_agents", []):
-                    connections.append({
-                        "from": node["id"],
-                        "to": sub["id"],
-                        "type": "delegates",
-                    })
+                    connections.append(
+                        {
+                            "from": node["id"],
+                            "to": sub["id"],
+                            "type": "delegates",
+                        }
+                    )
 
         # Add AI bridge as a shared node
         ai_node = self._wp_ai_bridge.to_dashboard_card()
-        nodes.append({
-            "id": "wp_ai_bridge",
-            "type": "shared",
-            "label": "WordPress AI Bridge",
-            "healthy": ai_node["healthy"],
-        })
-        connections.append({
-            "from": "orchestrator",
-            "to": "wp_ai_bridge",
-            "type": "shared_capability",
-        })
+        nodes.append(
+            {
+                "id": "wp_ai_bridge",
+                "type": "shared",
+                "label": "WordPress AI Bridge",
+                "healthy": ai_node["healthy"],
+            }
+        )
+        connections.append(
+            {
+                "from": "orchestrator",
+                "to": "wp_ai_bridge",
+                "type": "shared_capability",
+            }
+        )
 
         return {
             "nodes": nodes,

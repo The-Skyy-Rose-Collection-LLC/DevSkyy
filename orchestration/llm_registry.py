@@ -21,7 +21,7 @@ References:
 
 import logging
 import os
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel
 
@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class ModelProvider(str, Enum):
+class ModelProvider(StrEnum):
     """LLM providers"""
 
     OPENAI = "openai"
@@ -44,7 +44,7 @@ class ModelProvider(str, Enum):
     GROQ = "groq"
 
 
-class ModelTier(str, Enum):
+class ModelTier(StrEnum):
     """Model performance tiers"""
 
     FLAGSHIP = "flagship"  # Best quality, highest cost
@@ -53,7 +53,7 @@ class ModelTier(str, Enum):
     SPECIALIZED = "specialized"  # Task-specific
 
 
-class ModelCapability(str, Enum):
+class ModelCapability(StrEnum):
     """Model capabilities"""
 
     # Core capabilities

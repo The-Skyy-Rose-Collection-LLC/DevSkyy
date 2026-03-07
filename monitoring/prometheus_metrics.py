@@ -271,18 +271,10 @@ def record_llm_tokens(
         output_tokens: Number of output tokens
     """
     if input_tokens > 0:
-        mcp_llm_tokens.labels(
-            provider=provider,
-            model=model,
-            type="input"
-        ).inc(input_tokens)
+        mcp_llm_tokens.labels(provider=provider, model=model, type="input").inc(input_tokens)
 
     if output_tokens > 0:
-        mcp_llm_tokens.labels(
-            provider=provider,
-            model=model,
-            type="output"
-        ).inc(output_tokens)
+        mcp_llm_tokens.labels(provider=provider, model=model, type="output").inc(output_tokens)
 
 
 def record_3d_generation(status: str = "success"):
@@ -350,11 +342,13 @@ def set_server_info(version: str, backend: str, python_version: str):
         backend: Backend type (fastmcp, mcp)
         python_version: Python version string
     """
-    mcp_server_info.info({
-        "version": version,
-        "backend": backend,
-        "python_version": python_version,
-    })
+    mcp_server_info.info(
+        {
+            "version": version,
+            "backend": backend,
+            "python_version": python_version,
+        }
+    )
 
 
 def update_server_uptime(uptime_seconds: float):
@@ -405,6 +399,7 @@ def monitored_tool(func: Callable) -> Callable:
 # ============================================================================
 # INITIALIZATION
 # ============================================================================
+
 
 def initialize_metrics():
     """

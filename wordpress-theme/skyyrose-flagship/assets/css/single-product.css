@@ -97,7 +97,7 @@
 
 .sr-gallery-letter {
     font-family: 'Cinzel', serif;
-    font-size: 200px;
+    font-size: clamp(80px, 14vw, 200px);
     color: rgba(var(--sr-accent-rgb), .03);
 }
 
@@ -210,7 +210,7 @@
 
 .sr-info-price {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 42px;
+    font-size: clamp(28px, 4vw, 42px);
     letter-spacing: 4px;
     color: var(--sr-accent);
     margin-bottom: 24px;
@@ -638,7 +638,7 @@
 
 .sr-related-letter {
     font-family: 'Cinzel', serif;
-    font-size: 72px;
+    font-size: clamp(36px, 6vw, 72px);
     color: rgba(var(--sr-accent-rgb), .03);
 }
 
@@ -1046,7 +1046,7 @@
     width: 100%;
     height: 100%;
     font-family: var(--fd, 'Cinzel', serif);
-    font-size: 42px;
+    font-size: clamp(28px, 4vw, 42px);
     color: rgba(var(--sr-accent-rgb), .3);
 }
 

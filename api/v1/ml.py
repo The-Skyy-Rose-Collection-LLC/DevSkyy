@@ -10,7 +10,7 @@ Version: 1.0.0
 import asyncio
 import logging
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -32,7 +32,7 @@ router = APIRouter(prefix="/ml", tags=["Machine Learning"])
 # =============================================================================
 
 
-class MLModelType(str, Enum):
+class MLModelType(StrEnum):
     """Machine learning model types."""
 
     TREND_PREDICTION = "trend_prediction"

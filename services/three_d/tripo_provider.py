@@ -320,7 +320,7 @@ class TripoProvider:
 
             # Check if Tripo SDK is available
             try:
-                from tripo3d import TripoClient
+                from tripo3d import TripoClient  # noqa: F401
 
                 TRIPO_SDK_AVAILABLE = True
             except ImportError:

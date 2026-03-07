@@ -27,7 +27,9 @@ from pathlib import Path
 from PIL import Image
 
 PROJECT_ROOT = Path(__file__).parent.parent
-PRODUCTS_DIR = PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
+PRODUCTS_DIR = (
+    PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
+)
 DATASET_DIR = PROJECT_ROOT / "datasets" / "skyyrose_lora_v4"
 IMAGES_DIR = DATASET_DIR / "images"
 CAPTIONS_DIR = DATASET_DIR / "captions"
@@ -165,7 +167,6 @@ PRODUCTS = {
         "techflat": "br-d04-techflat.jpeg",
         "model_shots": ["br-d04-model-f.webp", "br-d04-model-m.webp"],
     },
-
     # ═══ LOVE HURTS COLLECTION ═══
     "lh-002": {
         "trigger": "skyyrose_lh002",
@@ -208,10 +209,10 @@ PRODUCTS = {
         "techflat": "lh-003-techflat.jpeg",
         # Gemini vision: lh-002 model shots are ACTUALLY wearing lh-003 (80-90%)
         "model_shots": [
-            "lh-002-back-model.webp",   # Mislabeled as lh-002, actually lh-003 (85%)
+            "lh-002-back-model.webp",  # Mislabeled as lh-002, actually lh-003 (85%)
             "lh-002-front-model.webp",  # Mislabeled as lh-002, actually lh-003 (90%)
-            "lh-002-model-f.webp",      # Mislabeled as lh-002, actually lh-003 (80%)
-            "lh-002-model-m.webp",      # Mislabeled as lh-002, actually lh-003 (80%)
+            "lh-002-model-f.webp",  # Mislabeled as lh-002, actually lh-003 (80%)
+            "lh-002-model-m.webp",  # Mislabeled as lh-002, actually lh-003 (80%)
         ],
     },
     "lh-004": {
@@ -260,7 +261,6 @@ PRODUCTS = {
         "techflat": "lh-005-techflat-purple.jpeg",
         "model_shots": [],
     },
-
     # ═══ SIGNATURE COLLECTION ═══
     "sg-002": {
         "trigger": "skyyrose_sg002",
@@ -274,7 +274,7 @@ PRODUCTS = {
         "techflat": "sg-002-techflat.jpeg",
         # Gemini vision: sg-005 model shots are ACTUALLY wearing sg-002 (90%)
         "model_shots": [
-            "sg-005-back-model.webp",   # Mislabeled as sg-005, actually sg-002 (90%)
+            "sg-005-back-model.webp",  # Mislabeled as sg-005, actually sg-002 (90%)
             "sg-005-front-model.webp",  # Mislabeled as sg-005, actually sg-002 (90%)
         ],
     },
@@ -439,13 +439,15 @@ def main():
                 # Tech flats get extra weight: repeat caption 3x for emphasis
                 tech_caption = f"{product['caption']}, technical flat lay illustration, product design reference"
                 write_caption(img_name, tech_caption)
-                metadata_entries.append({
-                    "file_name": img_name,
-                    "text": tech_caption,
-                    "sku": sku,
-                    "type": "techflat",
-                    "trigger": product["trigger"],
-                })
+                metadata_entries.append(
+                    {
+                        "file_name": img_name,
+                        "text": tech_caption,
+                        "sku": sku,
+                        "type": "techflat",
+                        "trigger": product["trigger"],
+                    }
+                )
                 product_images += 1
                 print(f"  + techflat: {product['techflat']}")
         else:
@@ -457,15 +459,19 @@ def main():
             if model_path.exists():
                 img_name = f"{sku}-{model_file.replace('.webp', '.jpg')}"
                 if copy_and_prepare_image(model_path, img_name):
-                    model_caption = f"{product['caption']}, fashion model wearing the garment, full body shot"
+                    model_caption = (
+                        f"{product['caption']}, fashion model wearing the garment, full body shot"
+                    )
                     write_caption(img_name, model_caption)
-                    metadata_entries.append({
-                        "file_name": img_name,
-                        "text": model_caption,
-                        "sku": sku,
-                        "type": "model_shot",
-                        "trigger": product["trigger"],
-                    })
+                    metadata_entries.append(
+                        {
+                            "file_name": img_name,
+                            "text": model_caption,
+                            "sku": sku,
+                            "type": "model_shot",
+                            "trigger": product["trigger"],
+                        }
+                    )
                     product_images += 1
                     print(f"  + model: {model_file}")
             else:
@@ -481,17 +487,22 @@ def main():
     if alt_windbreaker.exists() and not (IMAGES_DIR / "sg-d01-techflat.jpg").exists():
         img_name = "sg-d01-techflat.jpg"
         if copy_and_prepare_image(alt_windbreaker, img_name):
-            caption = PRODUCTS["sg-d01"]["caption"] + ", technical flat lay illustration, product design reference"
+            caption = (
+                PRODUCTS["sg-d01"]["caption"]
+                + ", technical flat lay illustration, product design reference"
+            )
             write_caption(img_name, caption)
-            metadata_entries.append({
-                "file_name": img_name,
-                "text": caption,
-                "sku": "sg-d01",
-                "type": "techflat",
-                "trigger": PRODUCTS["sg-d01"]["trigger"],
-            })
+            metadata_entries.append(
+                {
+                    "file_name": img_name,
+                    "text": caption,
+                    "sku": "sg-d01",
+                    "type": "techflat",
+                    "trigger": PRODUCTS["sg-d01"]["trigger"],
+                }
+            )
             total_images += 1
-            print(f"\n  + alt techflat: sg-d01-windbreaker-set-techflat.jpg")
+            print("\n  + alt techflat: sg-d01-windbreaker-set-techflat.jpg")
 
     # Write metadata.jsonl
     metadata_path = DATASET_DIR / "metadata.jsonl"

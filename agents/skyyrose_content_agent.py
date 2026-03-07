@@ -18,7 +18,7 @@ import os
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from adk.base import ADKProvider, AgentResult, AgentStatus
@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class ContentType(str, Enum):
+class ContentType(StrEnum):
     """Types of WordPress content."""
 
     PAGE = "page"
@@ -48,7 +48,7 @@ class ContentType(str, Enum):
     EMAIL_CAMPAIGN = "email_campaign"
 
 
-class ContentStatus(str, Enum):
+class ContentStatus(StrEnum):
     """Content lifecycle status."""
 
     DRAFTED = "drafted"
@@ -211,15 +211,15 @@ VISUAL IDENTITY:
   Primary: {self.primary_color} | Secondary: {self.secondary_color} | Accent: {self.accent_gold}
 
 VOICE & TONE:
-  Embody: {', '.join(self.tone_descriptors)}
-  Avoid: {', '.join(self.tone_avoid)}
+  Embody: {", ".join(self.tone_descriptors)}
+  Avoid: {", ".join(self.tone_avoid)}
 
 COLLECTIONS:
 {collections_text}
 
 SITE CONTEXT:
-  Existing Pages: {', '.join(self.existing_pages) if self.existing_pages else 'N/A'}
-  Navigation: {json.dumps(self.site_navigation_structure) if self.site_navigation_structure else 'Standard'}
+  Existing Pages: {", ".join(self.existing_pages) if self.existing_pages else "N/A"}
+  Navigation: {json.dumps(self.site_navigation_structure) if self.site_navigation_structure else "Standard"}
 {learning_context}
 """
 
@@ -549,7 +549,7 @@ SEO Rules:
 
         # System message: brand DNA as context
         system_content = (
-            f"{self.SYSTEM_PROMPT}\n\n" f"{'=' * 60}\n" f"{dna.to_prompt_context()}\n" f"{'=' * 60}"
+            f"{self.SYSTEM_PROMPT}\n\n{'=' * 60}\n{dna.to_prompt_context()}\n{'=' * 60}"
         )
 
         # Collection-specific brand context

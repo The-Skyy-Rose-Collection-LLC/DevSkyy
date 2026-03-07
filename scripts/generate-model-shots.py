@@ -322,8 +322,12 @@ def find_source_image(sku):
 
     candidates = list(PRODUCTS_DIR.glob(f"{sku}*.webp")) + list(PRODUCTS_DIR.glob(f"{sku}*.jpg"))
     real = [
-        p for p in candidates
-        if not any(x in p.stem for x in ["-render", "-front-model", "-back-model", "-branding", "-model-m", "-model-f"])
+        p
+        for p in candidates
+        if not any(
+            x in p.stem
+            for x in ["-render", "-front-model", "-back-model", "-branding", "-model-m", "-model-f"]
+        )
     ]
     if not real:
         return None
@@ -349,21 +353,21 @@ def build_prompt(sku, gender, model_idx, bg_idx):
     # Accessories get styled differently
     if product_type == "accessory":
         if "beanie" in product_name.lower():
-            wear_desc = f"wearing this EXACT beanie on their head, styled casually"
+            wear_desc = "wearing this EXACT beanie on their head, styled casually"
         elif "fannie" in product_name.lower() or "fanny" in product_name.lower():
-            wear_desc = f"wearing this EXACT crossbody bag across their chest, styled with a plain black tee and jeans"
+            wear_desc = "wearing this EXACT crossbody bag across their chest, styled with a plain black tee and jeans"
         else:
-            wear_desc = f"holding/wearing this EXACT accessory, styled casually"
+            wear_desc = "holding/wearing this EXACT accessory, styled casually"
     elif product_type == "bottom":
         wear_desc = f"wearing these EXACT {product_name}, paired with a plain black tee on top"
     elif product_type == "set":
-        wear_desc = f"wearing this EXACT matching set (top and bottom together)"
+        wear_desc = "wearing this EXACT matching set (top and bottom together)"
     elif product_type == "dress":
-        wear_desc = f"wearing this EXACT dress"
+        wear_desc = "wearing this EXACT dress"
     elif product_type == "outerwear":
-        wear_desc = f"wearing this EXACT jacket/outerwear piece over a plain black tee"
+        wear_desc = "wearing this EXACT jacket/outerwear piece over a plain black tee"
     else:
-        wear_desc = f"wearing this EXACT top"
+        wear_desc = "wearing this EXACT top"
 
     prompt = (
         f"Full-body fashion editorial photograph of a {model_desc}, "
@@ -399,7 +403,9 @@ def init_client():
     return genai.Client(api_key=api_key), GenerateContentConfig, ImageConfig
 
 
-def generate_model_shot(client, GenConfig, ImgConfig, sku, gender, model_idx, bg_idx, dry_run=False):
+def generate_model_shot(
+    client, GenConfig, ImgConfig, sku, gender, model_idx, bg_idx, dry_run=False
+):
     """Generate a single model shot."""
     from PIL import Image
 
@@ -407,7 +413,11 @@ def generate_model_shot(client, GenConfig, ImgConfig, sku, gender, model_idx, bg
     output_path = PRODUCTS_DIR / f"{sku}-model-{suffix}.webp"
 
     if output_path.exists() and output_path.stat().st_size / 1024 >= MIN_FILE_SIZE_KB:
-        log.info("  SKIP: %s already exists (%.1f KB)", output_path.name, output_path.stat().st_size / 1024)
+        log.info(
+            "  SKIP: %s already exists (%.1f KB)",
+            output_path.name,
+            output_path.stat().st_size / 1024,
+        )
         return "skipped"
 
     prompt = build_prompt(sku, gender, model_idx, bg_idx)
@@ -455,7 +465,13 @@ def generate_model_shot(client, GenConfig, ImgConfig, sku, gender, model_idx, bg
                         output_path.unlink()
                         time.sleep(RETRY_DELAY_SEC)
                         break
-                    log.info("  SUCCESS: %s (%.1f KB, %dx%d)", output_path.name, kb, img.width, img.height)
+                    log.info(
+                        "  SUCCESS: %s (%.1f KB, %dx%d)",
+                        output_path.name,
+                        kb,
+                        img.width,
+                        img.height,
+                    )
                     return "success"
 
         except Exception as e:
@@ -470,10 +486,14 @@ def generate_model_shot(client, GenConfig, ImgConfig, sku, gender, model_idx, bg
 def main():
     parser = argparse.ArgumentParser(description="Generate diverse model shots")
     parser.add_argument("--sku", help="Generate for specific SKU only")
-    parser.add_argument("--gender", choices=["m", "f"], help="Generate only men's (m) or women's (f)")
+    parser.add_argument(
+        "--gender", choices=["m", "f"], help="Generate only men's (m) or women's (f)"
+    )
     parser.add_argument("--all", action="store_true", help="Generate all")
     parser.add_argument("--dry-run", action="store_true", help="List what would be generated")
-    parser.add_argument("--skip-existing", action="store_true", default=True, help="Skip existing files (default)")
+    parser.add_argument(
+        "--skip-existing", action="store_true", default=True, help="Skip existing files (default)"
+    )
     args = parser.parse_args()
 
     if not args.sku and not args.all and not args.dry_run:
@@ -490,7 +510,12 @@ def main():
 
     log.info("=" * 60)
     log.info("DIVERSE MODEL SHOT GENERATOR")
-    log.info("Products: %d | Genders: %s | Total: ~%d shots", len(skus), genders, len(skus) * len(genders))
+    log.info(
+        "Products: %d | Genders: %s | Total: ~%d shots",
+        len(skus),
+        genders,
+        len(skus) * len(genders),
+    )
     log.info("=" * 60)
 
     for i, sku in enumerate(skus):
@@ -506,12 +531,17 @@ def main():
             log.info("  %s model shot:", gender_label)
 
             # Cycle through diverse models and backgrounds
-            model_idx = (i * 2 + (0 if gender == "m" else 1))
+            model_idx = i * 2 + (0 if gender == "m" else 1)
             bg_idx = i
 
             result = generate_model_shot(
-                client, GenConfig, ImgConfig,
-                sku, gender, model_idx, bg_idx,
+                client,
+                GenConfig,
+                ImgConfig,
+                sku,
+                gender,
+                model_idx,
+                bg_idx,
                 dry_run=args.dry_run,
             )
             total[result] += 1
@@ -526,7 +556,10 @@ def main():
     log.info("\n" + "=" * 60)
     log.info(
         "FINAL: %d success, %d failed, %d skipped (of %d)",
-        total["success"], total["failed"], total["skipped"], job_count,
+        total["success"],
+        total["failed"],
+        total["skipped"],
+        job_count,
     )
     log.info("=" * 60)
 

@@ -122,7 +122,7 @@ class WebBuilderCoreAgent(CoreAgent):
         try:
             from agents.elite_web_builder.core.self_healer import SelfHealer
 
-            healer = SelfHealer(max_attempts=2)
+            _healer = SelfHealer(max_attempts=2)
             # Use the existing healer's categorization logic
             logger.info("[%s] Using Elite Web Builder SelfHealer", self.name)
             return HealResult(

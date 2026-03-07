@@ -2,20 +2,20 @@
 
 from __future__ import annotations
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 from core.gate_checkers import (
     build_gate_checkers,
-    check_build,
-    check_lint,
-    check_security,
-    check_diff,
     check_a11y,
+    check_build,
+    check_diff,
+    check_lint,
     check_perf,
+    check_security,
 )
 from core.verification_loop import Gate, GateStatus
-
 
 # ---------------------------------------------------------------------------
 # BUILD gate
@@ -214,9 +214,7 @@ class TestCheckA11y:
 
     @pytest.mark.asyncio
     async def test_img_without_alt(self, tmp_path: Path) -> None:
-        (tmp_path / "page.html").write_text(
-            '<html lang="en"><body><img src="x.jpg"></body></html>'
-        )
+        (tmp_path / "page.html").write_text('<html lang="en"><body><img src="x.jpg"></body></html>')
         result = await check_a11y(["page.html"], tmp_path)
         assert result.status == GateStatus.FAILED
         assert "alt" in result.details[0].lower()
@@ -229,9 +227,7 @@ class TestCheckA11y:
 
     @pytest.mark.asyncio
     async def test_php_templates_checked(self, tmp_path: Path) -> None:
-        (tmp_path / "page.php").write_text(
-            '<?php get_header(); ?><img src="x.jpg">'
-        )
+        (tmp_path / "page.php").write_text('<?php get_header(); ?><img src="x.jpg">')
         result = await check_a11y(["page.php"], tmp_path)
         assert result.status == GateStatus.FAILED
 

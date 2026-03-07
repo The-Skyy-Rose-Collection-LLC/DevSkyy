@@ -1,4 +1,5 @@
 """Tests for AI CLI spaces subcommand."""
+
 from unittest.mock import MagicMock, patch
 
 from typer.testing import CliRunner

@@ -23,7 +23,7 @@ Created: 2026-01-08
 Status: Phase 2 - Prompt Optimization
 """
 
-from enum import Enum
+from enum import StrEnum
 
 import structlog
 
@@ -32,7 +32,7 @@ from orchestration.brand_context import BrandContextInjector, Collection
 logger = structlog.get_logger(__name__)
 
 
-class VisualUseCase(str, Enum):
+class VisualUseCase(StrEnum):
     """Visual generation use cases for template selection."""
 
     PRODUCT_PHOTOGRAPHY = "product_photography"
@@ -43,7 +43,7 @@ class VisualUseCase(str, Enum):
     SOCIAL_MEDIA = "social_media"
 
 
-class CameraAngle(str, Enum):
+class CameraAngle(StrEnum):
     """Camera angle specifications for product photography."""
 
     STRAIGHT_ON = "straight-on at eye level"
@@ -54,7 +54,7 @@ class CameraAngle(str, Enum):
     WIDE_ANGLE = "wide-angle establishing shot"
 
 
-class LightingSetup(str, Enum):
+class LightingSetup(StrEnum):
     """Professional lighting setups for product photography."""
 
     THREE_POINT_SOFTBOX = "three-point softbox setup"

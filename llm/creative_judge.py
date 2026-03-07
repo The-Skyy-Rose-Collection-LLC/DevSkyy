@@ -27,7 +27,7 @@ Usage:
 import json
 import logging
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -151,7 +151,7 @@ JUDGE_OUTPUT_SCHEMA = {
 }
 
 
-class Verdict(str, Enum):
+class Verdict(StrEnum):
     """Final verdict classification."""
 
     ELITE = "ELITE"  # 90-100: Exceptional, production-ready

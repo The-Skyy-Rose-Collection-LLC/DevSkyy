@@ -4,7 +4,7 @@ Handles batch 3D model generation with fidelity tracking and provider management
 """
 
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -23,7 +23,7 @@ require_developer = RoleChecker([UserRole.ADMIN, UserRole.DEVELOPER])
 # =============================================================================
 
 
-class JobStatus(str, Enum):
+class JobStatus(StrEnum):
     """Status of a 3D generation job."""
 
     PENDING = "pending"
@@ -33,7 +33,7 @@ class JobStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class QualityTier(str, Enum):
+class QualityTier(StrEnum):
     """Quality tier for 3D generation."""
 
     DRAFT = "draft"
@@ -41,7 +41,7 @@ class QualityTier(str, Enum):
     HIGH = "high"
 
 
-class Provider(str, Enum):
+class Provider(StrEnum):
     """3D generation provider."""
 
     TRIPO = "tripo"

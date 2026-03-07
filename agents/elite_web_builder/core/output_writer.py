@@ -35,7 +35,7 @@ from __future__ import annotations
 
 import logging
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -45,15 +45,41 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 # Only these extensions may be written (security)
-ALLOWED_EXTENSIONS: frozenset[str] = frozenset({
-    ".php", ".css", ".js", ".json", ".html", ".htm", ".svg",
-    ".txt", ".md", ".xml", ".map", ".scss", ".less",
-    ".ts", ".tsx", ".jsx", ".vue",
-    ".liquid", ".twig", ".hbs",
-    ".yml", ".yaml", ".toml",
-    ".sh", ".bash",
-    ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico",  # for base64 decode later
-})
+ALLOWED_EXTENSIONS: frozenset[str] = frozenset(
+    {
+        ".php",
+        ".css",
+        ".js",
+        ".json",
+        ".html",
+        ".htm",
+        ".svg",
+        ".txt",
+        ".md",
+        ".xml",
+        ".map",
+        ".scss",
+        ".less",
+        ".ts",
+        ".tsx",
+        ".jsx",
+        ".vue",
+        ".liquid",
+        ".twig",
+        ".hbs",
+        ".yml",
+        ".yaml",
+        ".toml",
+        ".sh",
+        ".bash",
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".gif",
+        ".webp",
+        ".ico",  # for base64 decode later
+    }
+)
 
 # Maximum file size (bytes) — reject absurdly large outputs
 MAX_FILE_SIZE: int = 2 * 1024 * 1024  # 2 MB

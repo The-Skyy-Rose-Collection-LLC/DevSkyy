@@ -32,14 +32,12 @@ from abc import abstractmethod
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from agents.errors import (
     AgentError,
     ErrorCategory,
-    classify_exception,
-    wrap_exception,
 )
 
 logger = logging.getLogger(__name__)
@@ -50,7 +48,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class CoreAgentType(str, Enum):
+class CoreAgentType(StrEnum):
     """All 8 core agent domains + orchestrator."""
 
     COMMERCE = "commerce"
@@ -64,7 +62,7 @@ class CoreAgentType(str, Enum):
     ORCHESTRATOR = "orchestrator"
 
 
-class FailureCategory(str, Enum):
+class FailureCategory(StrEnum):
     """How a failure should be routed for healing."""
 
     CODE_BUG = "code_bug"
@@ -75,11 +73,11 @@ class FailureCategory(str, Enum):
     PROVIDER_DOWN = "provider_down"
 
 
-class CircuitBreakerState(str, Enum):
+class CircuitBreakerState(StrEnum):
     """Circuit breaker states per agent."""
 
-    CLOSED = "closed"        # Normal operation
-    OPEN = "open"            # Failing — stop attempting
+    CLOSED = "closed"  # Normal operation
+    OPEN = "open"  # Failing — stop attempting
     HALF_OPEN = "half_open"  # Cooldown expired — testing one request
 
 
@@ -251,7 +249,8 @@ class SelfHealingMixin:
 
         # Check learning journal for past successful fixes
         past_fixes = [
-            entry for entry in self._heal_journal.values()
+            entry
+            for entry in self._heal_journal.values()
             if entry.category == category and entry.action_taken
         ]
         if past_fixes:
@@ -709,8 +708,7 @@ class CoreAgent(SelfHealingMixin):
                 "error": str(exc),
                 "heal_attempted": True,
                 "heal_history": [
-                    {"success": h.success, "message": h.message}
-                    for h in heal_result.history
+                    {"success": h.success, "message": h.message} for h in heal_result.history
                 ],
                 "escalation_needed": heal_result.escalation_needed,
             }

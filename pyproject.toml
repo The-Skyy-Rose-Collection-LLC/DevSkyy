@@ -349,19 +349,35 @@ select = [
 ]
 ignore = [
     "E501",   # line too long (handled by black)
+    "E402",   # module import not at top (intentional: try/except optional deps)
+    "E722",   # bare except (intentional in optional import blocks)
+    "E741",   # ambiguous variable name (e, l, I — context makes clear)
     "B008",   # do not perform function calls in argument defaults
     "B904",   # raise without from inside except
     "ARG001", # unused function argument (common with FastAPI dependencies)
     "ARG002", # unused method argument (common with API handlers)
+    "ARG005", # unused lambda argument (common with callback signatures)
     "SIM102", # nested if statements (sometimes more readable)
+    "SIM105", # suppressible exception (contextlib.suppress not always clearer)
+    "SIM115", # open file with context handler (scripts use explicit close)
+    "SIM116", # if-else instead of dict lookup (readability preference)
+    "SIM117", # multiple with statements (sometimes more readable)
+    "SIM108", # if-else block instead of ternary (readability preference)
+    "SIM118", # key in dict.keys() (explicit is fine)
+    "B007",   # unused loop control variable (use _ prefix convention)
+    "B017",   # assert-raises-exception (tests use broad exception matching)
+    "C401",   # unnecessary generator in set() (readability preference)
+    "C408",   # unnecessary collection call (dict() vs {})
+    "UP028",  # yield in for loop (clarity over brevity)
 ]
 
 [tool.ruff.lint.isort]
 known-first-party = ["core", "api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["ARG001", "ARG002"]
+"tests/*" = ["ARG001", "ARG002", "B017", "F841"]
 "**/conftest.py" = ["ARG001"]
+"scripts/*" = ["F841", "B007"]
 
 # =============================================================================
 # Black Configuration

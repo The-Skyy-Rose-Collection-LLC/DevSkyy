@@ -26,7 +26,7 @@ import uuid
 from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -57,7 +57,7 @@ DEFAULT_WEEKLY_CHECK_INTERVAL_SECONDS = 60  # Check every minute for Sunday midn
 # =============================================================================
 
 
-class RollupGranularity(str, Enum):
+class RollupGranularity(StrEnum):
     """Granularity levels for rollup aggregations."""
 
     MINUTE = "minute"
@@ -67,7 +67,7 @@ class RollupGranularity(str, Enum):
     MONTH = "month"
 
 
-class RollupDimension(str, Enum):
+class RollupDimension(StrEnum):
     """Dimensions for rollup aggregations."""
 
     EVENT_TYPE = "event_type"

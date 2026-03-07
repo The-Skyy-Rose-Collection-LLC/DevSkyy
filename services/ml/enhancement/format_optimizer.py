@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import io
 import logging
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import httpx
@@ -62,7 +62,7 @@ SOCIAL_VARIANTS = {
 # =============================================================================
 
 
-class OutputFormat(str, Enum):
+class OutputFormat(StrEnum):
     """Supported output formats."""
 
     WEBP = "webp"

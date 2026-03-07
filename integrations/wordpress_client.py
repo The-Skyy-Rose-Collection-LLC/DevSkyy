@@ -13,7 +13,7 @@ import hmac
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Literal
 
 import httpx
@@ -22,14 +22,14 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger(__name__)
 
 
-class APIType(str, Enum):
+class APIType(StrEnum):
     """WordPress API types."""
 
     WPCOM = "wpcom"  # WordPress.com managed (uses index.php?rest_route=)
     SELF_HOSTED = "self_hosted"  # Self-hosted (uses /wp-json/)
 
 
-class SkyyRoseCollection(str, Enum):
+class SkyyRoseCollection(StrEnum):
     """SkyyRose collection identifiers."""
 
     SIGNATURE = "signature"

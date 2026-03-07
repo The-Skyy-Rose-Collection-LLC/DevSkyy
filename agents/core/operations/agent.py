@@ -73,8 +73,8 @@ class OperationsCoreAgent(CoreAgent):
     def _get_legacy_agent(self) -> Any:
         if self._legacy_agent is None:
             try:
-                from agents.operations_agent import OperationsAgent
                 from adk.base import AgentConfig
+                from agents.operations_agent import OperationsAgent
 
                 config = AgentConfig(name="operations", description="Operations")
                 self._legacy_agent = OperationsAgent(config)

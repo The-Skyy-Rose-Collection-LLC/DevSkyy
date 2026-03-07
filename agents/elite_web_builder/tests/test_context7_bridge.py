@@ -226,7 +226,10 @@ class TestQueryDocs:
                     "codeId": "https://nextjs.org/docs/app/getting-started",
                     "pageTitle": "Getting Started",
                     "codeList": [
-                        {"language": "typescript", "code": "export default function RootLayout() {}"}
+                        {
+                            "language": "typescript",
+                            "code": "export default function RootLayout() {}",
+                        }
                     ],
                 }
             ],
@@ -339,8 +342,10 @@ class TestLookup:
             source_url="https://nextjs.org/docs",
         )
 
-        with patch.object(bridge, "resolve_library", new_callable=AsyncMock, return_value=lib), \
-             patch.object(bridge, "query_docs", new_callable=AsyncMock, return_value=[snip]):
+        with (
+            patch.object(bridge, "resolve_library", new_callable=AsyncMock, return_value=lib),
+            patch.object(bridge, "query_docs", new_callable=AsyncMock, return_value=[snip]),
+        ):
             result = await bridge.lookup("next.js", "how does routing work")
 
         assert result["library"].id == "/vercel/next.js"
@@ -365,7 +370,9 @@ class TestErrorHandling:
         bridge = Context7Bridge()
         mock_resp = MagicMock()
         mock_resp.status = 429
-        mock_resp.text = AsyncMock(return_value='{"error":"rate_limited","message":"Too many requests"}')
+        mock_resp.text = AsyncMock(
+            return_value='{"error":"rate_limited","message":"Too many requests"}'
+        )
         mock_resp.raise_for_status = MagicMock(side_effect=Exception("429"))
 
         with patch("aiohttp.ClientSession") as mock_session_cls:

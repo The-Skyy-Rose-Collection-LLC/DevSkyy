@@ -34,7 +34,7 @@ import logging
 import sys
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -94,7 +94,7 @@ def get_logger(component: str = "") -> CompatLogger:
 # ============================================================================
 
 
-class ValidationStatus(str, Enum):
+class ValidationStatus(StrEnum):
     """Validation result status."""
 
     PASS = "pass"

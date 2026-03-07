@@ -1,0 +1,14 @@
+{
+  "provider": "fal",
+  "total": 1,
+  "results": [
+    {
+      "sku": "br-004",
+      "name": "BLACK Rose Hoodie",
+      "status": "success",
+      "provider": "fal.ai",
+      "size_kb": 17234.8,
+      "output": "wordpress-theme/skyyrose-flagship/assets/3d/br-004.glb"
+    }
+  ]
+}

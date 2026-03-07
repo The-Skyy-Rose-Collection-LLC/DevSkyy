@@ -15,51 +15,48 @@ from dotenv import load_dotenv
 from google import genai
 
 # Load environment variables
-load_dotenv(Path(__file__).parent.parent / '.env')
+load_dotenv(Path(__file__).parent.parent / ".env")
 
 
 class GeminiClient:
     """Google Gemini AI client with rate limiting and error handling"""
 
     def __init__(self, api_key: str | None = None, **options):
-        self.api_key = api_key or os.getenv('GEMINI_API_KEY')
+        self.api_key = api_key or os.getenv("GEMINI_API_KEY")
 
         if not self.api_key:
-            raise ValueError('Gemini API key is required. Set GEMINI_API_KEY in .env file')
+            raise ValueError("Gemini API key is required. Set GEMINI_API_KEY in .env file")
 
         # Initialize new SDK client
         self.client = genai.Client(api_key=self.api_key)
 
         # Load settings
-        settings_path = Path(__file__).parent.parent / 'config' / 'settings.json'
+        settings_path = Path(__file__).parent.parent / "config" / "settings.json"
         with open(settings_path) as f:
             self.settings = json.load(f)
 
         # Load model configurations
-        models_path = Path(__file__).parent.parent / 'config' / 'models.json'
+        models_path = Path(__file__).parent.parent / "config" / "models.json"
         with open(models_path) as f:
             self.model_configs = json.load(f)
 
-        self.default_model = options.get('model', self.settings['defaultModel'])
+        self.default_model = options.get("model", self.settings["defaultModel"])
 
         # Generation config
         self.generation_config = {
-            **self.settings['generationConfig'],
-            **options.get('generation_config', {})
+            **self.settings["generationConfig"],
+            **options.get("generation_config", {}),
         }
 
         # Safety settings (new SDK format)
         self.safety_settings = [
-            {
-                'category': s['category'],
-                'threshold': s['threshold']
-            }
-            for s in self.settings['safetySettings']
+            {"category": s["category"], "threshold": s["threshold"]}
+            for s in self.settings["safetySettings"]
         ]
 
         # Rate limiting
         self.last_request_time = 0
-        self.min_request_interval = 60.0 / self.settings['rateLimit']['requestsPerMinute']
+        self.min_request_interval = 60.0 / self.settings["rateLimit"]["requestsPerMinute"]
 
     def _rate_limit(self):
         """Apply rate limiting"""
@@ -72,12 +69,7 @@ class GeminiClient:
 
         self.last_request_time = time.time()
 
-    def generate_content(
-        self,
-        prompt: str,
-        model: str | None = None,
-        **config
-    ) -> dict[str, Any]:
+    def generate_content(self, prompt: str, model: str | None = None, **config) -> dict[str, Any]:
         """Generate content from text prompt"""
         self._rate_limit()
 
@@ -90,28 +82,31 @@ class GeminiClient:
                 config={
                     **self.generation_config,
                     **config,
-                    'safety_settings': self.safety_settings
-                }
+                    "safety_settings": self.safety_settings,
+                },
             )
 
             return {
-                'text': response.text,
-                'candidates': [c.to_dict() for c in response.candidates] if hasattr(response, 'candidates') else [],
-                'prompt_feedback': response.prompt_feedback.to_dict() if hasattr(response, 'prompt_feedback') else None,
-                'usage_metadata': {
-                    'prompt_token_count': response.usage_metadata.prompt_token_count,
-                    'candidates_token_count': response.usage_metadata.candidates_token_count,
-                    'total_token_count': response.usage_metadata.total_token_count
-                } if hasattr(response, 'usage_metadata') else None
+                "text": response.text,
+                "candidates": [c.to_dict() for c in response.candidates]
+                if hasattr(response, "candidates")
+                else [],
+                "prompt_feedback": response.prompt_feedback.to_dict()
+                if hasattr(response, "prompt_feedback")
+                else None,
+                "usage_metadata": {
+                    "prompt_token_count": response.usage_metadata.prompt_token_count,
+                    "candidates_token_count": response.usage_metadata.candidates_token_count,
+                    "total_token_count": response.usage_metadata.total_token_count,
+                }
+                if hasattr(response, "usage_metadata")
+                else None,
             }
         except Exception as e:
             return self._handle_error(e)
 
     def generate_content_stream(
-        self,
-        prompt: str,
-        model: str | None = None,
-        **config
+        self, prompt: str, model: str | None = None, **config
     ) -> Generator[dict[str, Any], None, None]:
         """Generate content with streaming"""
         self._rate_limit()
@@ -125,29 +120,20 @@ class GeminiClient:
                 config={
                     **self.generation_config,
                     **config,
-                    'safety_settings': self.safety_settings
-                }
+                    "safety_settings": self.safety_settings,
+                },
             )
 
             for chunk in stream:
-                yield {
-                    'text': chunk.text if hasattr(chunk, 'text') else '',
-                    'done': False
-                }
+                yield {"text": chunk.text if hasattr(chunk, "text") else "", "done": False}
 
             # Final chunk
-            yield {
-                'text': '',
-                'done': True
-            }
+            yield {"text": "", "done": True}
         except Exception as e:
             raise self._handle_error(e)
 
     def start_chat(
-        self,
-        history: list[dict[str, str]] | None = None,
-        model: str | None = None,
-        **config
+        self, history: list[dict[str, str]] | None = None, model: str | None = None, **config
     ):
         """Start a chat conversation"""
         model_name = model or self.default_model
@@ -164,36 +150,23 @@ class GeminiClient:
                 # Build contents from history
                 contents = []
                 for msg in self.history:
-                    contents.append({
-                        'role': msg['role'],
-                        'parts': [{'text': msg['content']}]
-                    })
-                contents.append({
-                    'role': 'user',
-                    'parts': [{'text': message}]
-                })
+                    contents.append({"role": msg["role"], "parts": [{"text": msg["content"]}]})
+                contents.append({"role": "user", "parts": [{"text": message}]})
 
                 response = self.client.models.generate_content(
                     model=self.model,
                     contents=contents,
-                    config={
-                        **self.generation_config,
-                        'safety_settings': self.safety_settings
-                    }
+                    config={**self.generation_config, "safety_settings": self.safety_settings},
                 )
 
                 # Update history
-                self.history.append({'role': 'user', 'content': message})
-                self.history.append({'role': 'model', 'content': response.text})
+                self.history.append({"role": "user", "content": message})
+                self.history.append({"role": "model", "content": response.text})
 
                 return response
 
         return ChatSession(
-            self.client,
-            model_name,
-            history,
-            self.generation_config,
-            self.safety_settings
+            self.client, model_name, history, self.generation_config, self.safety_settings
         )
 
     def analyze_image(
@@ -201,43 +174,35 @@ class GeminiClient:
         image_path: str | None = None,
         image_data: Any | None = None,
         prompt: str = "Describe this image",
-        model: str = 'gemini-2.5-flash'
+        model: str = "gemini-2.5-flash",
     ) -> dict[str, Any]:
         """Analyze an image"""
         self._rate_limit()
 
         if image_path:
             from PIL import Image
+
             image = Image.open(image_path)
         elif image_data:
             image = image_data
         else:
-            raise ValueError('Either image_path or image_data must be provided')
+            raise ValueError("Either image_path or image_data must be provided")
 
         try:
             response = self.client.models.generate_content(
                 model=model,
-                contents=[
-                    {
-                        'role': 'user',
-                        'parts': [
-                            {'text': prompt},
-                            {'inline_data': image}
-                        ]
-                    }
-                ],
-                config={
-                    **self.generation_config,
-                    'safety_settings': self.safety_settings
-                }
+                contents=[{"role": "user", "parts": [{"text": prompt}, {"inline_data": image}]}],
+                config={**self.generation_config, "safety_settings": self.safety_settings},
             )
 
             return {
-                'text': response.text,
-                'candidates': [c.to_dict() for c in response.candidates] if hasattr(response, 'candidates') else [],
-                'usage_metadata': {
-                    'total_token_count': response.usage_metadata.total_token_count
-                } if hasattr(response, 'usage_metadata') else None
+                "text": response.text,
+                "candidates": [c.to_dict() for c in response.candidates]
+                if hasattr(response, "candidates")
+                else [],
+                "usage_metadata": {"total_token_count": response.usage_metadata.total_token_count}
+                if hasattr(response, "usage_metadata")
+                else None,
             }
         except Exception as e:
             return self._handle_error(e)
@@ -247,59 +212,49 @@ class GeminiClient:
         model_name = model or self.default_model
 
         try:
-            result = self.client.models.count_tokens(
-                model=model_name,
-                contents=text
-            )
+            result = self.client.models.count_tokens(model=model_name, contents=text)
             return result.total_tokens
         except Exception as e:
             return self._handle_error(e)
 
-    def embed_content(self, text: str, model: str = 'text-embedding-004') -> list[float]:
+    def embed_content(self, text: str, model: str = "text-embedding-004") -> list[float]:
         """Embed text for semantic search"""
         self._rate_limit()
 
         try:
-            result = self.client.models.embed_content(
-                model=model,
-                content=text
-            )
+            result = self.client.models.embed_content(model=model, content=text)
             return result.embedding.values
         except Exception as e:
             return self._handle_error(e)
 
     def _handle_error(self, error: Exception) -> dict[str, Any]:
         """Handle API errors"""
-        error_response = {
-            'error': True,
-            'message': str(error),
-            'type': type(error).__name__
-        }
+        error_response = {"error": True, "message": str(error), "type": type(error).__name__}
 
         error_msg = str(error).lower()
 
-        if 'api key' in error_msg or 'authentication' in error_msg:
-            error_response['type'] = 'AuthenticationError'
-            error_response['message'] = 'Invalid API key. Check your GEMINI_API_KEY'
-        elif 'quota' in error_msg or 'rate limit' in error_msg:
-            error_response['type'] = 'RateLimitError'
-            error_response['message'] = 'Rate limit exceeded. Please wait and retry'
-        elif 'safety' in error_msg:
-            error_response['type'] = 'SafetyError'
-            error_response['message'] = 'Content blocked by safety filters'
+        if "api key" in error_msg or "authentication" in error_msg:
+            error_response["type"] = "AuthenticationError"
+            error_response["message"] = "Invalid API key. Check your GEMINI_API_KEY"
+        elif "quota" in error_msg or "rate limit" in error_msg:
+            error_response["type"] = "RateLimitError"
+            error_response["message"] = "Rate limit exceeded. Please wait and retry"
+        elif "safety" in error_msg:
+            error_response["type"] = "SafetyError"
+            error_response["message"] = "Content blocked by safety filters"
 
-        if self.settings['logging']['logRequests']:
+        if self.settings["logging"]["logRequests"]:
             print(f"Gemini API Error: {error_response}")
 
         raise Exception(error_response)
 
     def get_available_models(self) -> list[dict[str, Any]]:
         """Get available models from config"""
-        return self.model_configs['models']
+        return self.model_configs["models"]
 
     def get_recommended_model(self, task_type: str) -> str:
         """Get recommended model for task"""
-        return self.model_configs['modelSelection'].get(task_type, self.default_model)
+        return self.model_configs["modelSelection"].get(task_type, self.default_model)
 
     def list_models(self):
         """List models from API"""

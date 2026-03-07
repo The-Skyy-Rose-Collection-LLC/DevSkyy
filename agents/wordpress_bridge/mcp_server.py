@@ -53,6 +53,7 @@ def _safe_error(tool_name: str, exc: Exception) -> dict[str, Any]:
         "is_error": True,
     }
 
+
 # ---------------------------------------------------------------------------
 # Cached client singletons (lazy-init from environment variables)
 # ---------------------------------------------------------------------------
@@ -496,16 +497,16 @@ async def wp_publish_round_table(args: dict[str, Any]) -> dict[str, Any]:
         # Build HTML content
         html_parts = [
             '<div class="round-table-results">',
-            f'<h2>Winner: {winner.get("provider", "Unknown")}</h2>',
-            f'<p><strong>Score:</strong> {winner.get("score", 0)}/100</p>',
-            f'<blockquote>{winner.get("response", "")}</blockquote>',
+            f"<h2>Winner: {winner.get('provider', 'Unknown')}</h2>",
+            f"<p><strong>Score:</strong> {winner.get('score', 0)}/100</p>",
+            f"<blockquote>{winner.get('response', '')}</blockquote>",
             "<h3>All Entries</h3>",
-            '<table><thead><tr><th>Rank</th><th>Provider</th><th>Score</th></tr></thead><tbody>',
+            "<table><thead><tr><th>Rank</th><th>Provider</th><th>Score</th></tr></thead><tbody>",
         ]
         for rank, entry in enumerate(sorted_entries, 1):
             html_parts.append(
-                f'<tr><td>{rank}</td><td>{entry.get("provider", "")}</td>'
-                f'<td>{entry.get("score", 0)}</td></tr>'
+                f"<tr><td>{rank}</td><td>{entry.get('provider', '')}</td>"
+                f"<td>{entry.get('score', 0)}</td></tr>"
             )
         html_parts.append("</tbody></table></div>")
         html = "\n".join(html_parts)
@@ -527,7 +528,7 @@ async def wp_publish_round_table(args: dict[str, Any]) -> dict[str, Any]:
                     "type": "text",
                     "text": json.dumps(
                         {
-                            "message": f"Round Table results published as draft",
+                            "message": "Round Table results published as draft",
                             "page_id": page_id,
                             "edit_url": edit_url,
                             "entries_count": len(sorted_entries),
@@ -658,7 +659,7 @@ async def wp_publish_social_campaign(args: dict[str, Any]) -> dict[str, Any]:
         html = (
             f'<div class="social-campaign">'
             f'<span class="platform-badge">{platform}</span>'
-            f"<div class=\"campaign-content\">{content}</div>"
+            f'<div class="campaign-content">{content}</div>'
             f'<div class="hashtags">{hashtag_html}</div>'
             f"</div>"
         )
@@ -678,7 +679,7 @@ async def wp_publish_social_campaign(args: dict[str, Any]) -> dict[str, Any]:
                     "type": "text",
                     "text": json.dumps(
                         {
-                            "message": f"Social campaign published as draft",
+                            "message": "Social campaign published as draft",
                             "page_id": page_id,
                             "platform": platform,
                             "hashtags": hashtags,
@@ -752,15 +753,51 @@ async def get_pipeline_status(args: dict[str, Any]) -> dict[str, Any]:
     """Get the current status of all 9 dashboard pipelines."""
     try:
         pipelines = [
-            {"name": "LLM Round Table", "status": "active", "description": "Multi-LLM competition engine"},
-            {"name": "3D Pipeline", "status": "active", "description": "GLB model generation (Hunyuan3D/TRELLIS)"},
-            {"name": "Imagery Pipeline", "status": "active", "description": "VTON + avatar generation"},
-            {"name": "Products Pipeline", "status": "active", "description": "WooCommerce product sync"},
-            {"name": "Social Media Pipeline", "status": "active", "description": "Campaign content generation"},
-            {"name": "Conversion Pipeline", "status": "active", "description": "Funnel analytics tracking"},
-            {"name": "Orders Pipeline", "status": "active", "description": "WooCommerce order management"},
-            {"name": "Health Pipeline", "status": "active", "description": "System health monitoring"},
-            {"name": "Pipeline Status", "status": "active", "description": "Meta-pipeline status aggregation"},
+            {
+                "name": "LLM Round Table",
+                "status": "active",
+                "description": "Multi-LLM competition engine",
+            },
+            {
+                "name": "3D Pipeline",
+                "status": "active",
+                "description": "GLB model generation (Hunyuan3D/TRELLIS)",
+            },
+            {
+                "name": "Imagery Pipeline",
+                "status": "active",
+                "description": "VTON + avatar generation",
+            },
+            {
+                "name": "Products Pipeline",
+                "status": "active",
+                "description": "WooCommerce product sync",
+            },
+            {
+                "name": "Social Media Pipeline",
+                "status": "active",
+                "description": "Campaign content generation",
+            },
+            {
+                "name": "Conversion Pipeline",
+                "status": "active",
+                "description": "Funnel analytics tracking",
+            },
+            {
+                "name": "Orders Pipeline",
+                "status": "active",
+                "description": "WooCommerce order management",
+            },
+            {
+                "name": "Health Pipeline",
+                "status": "active",
+                "description": "System health monitoring",
+            },
+            {
+                "name": "Pipeline Status",
+                "status": "active",
+                "description": "Meta-pipeline status aggregation",
+            },
         ]
 
         return {

@@ -52,8 +52,8 @@ _ALLOWED_BACKEND_SCHEMES = {"http", "https"}
 # private range IPs (10.x, 172.16.x, 192.168.x), file:// etc.
 _INTERNAL_HOST_RE = re.compile(
     r"^[a-zA-Z0-9][a-zA-Z0-9_-]*"  # hostname or service name
-    r"(-service)?"                   # optional "-service" suffix
-    r"(:\d{1,5})?$"                  # optional port
+    r"(-service)?"  # optional "-service" suffix
+    r"(:\d{1,5})?$"  # optional port
     r"|^localhost(:\d{1,5})?$"
     r"|^127\.0\.0\.1(:\d{1,5})?$",
     re.VERBOSE,
@@ -70,9 +70,9 @@ logger = logging.getLogger(__name__)
 class CircuitState(Enum):
     """Three-state circuit breaker FSM."""
 
-    CLOSED = "closed"       # Normal: all requests pass through
-    OPEN = "open"           # Tripped: requests fail fast (no backend call)
-    HALF_OPEN = "half_open" # Recovering: one probe request allowed
+    CLOSED = "closed"  # Normal: all requests pass through
+    OPEN = "open"  # Tripped: requests fail fast (no backend call)
+    HALF_OPEN = "half_open"  # Recovering: one probe request allowed
 
 
 @dataclass
@@ -136,12 +136,14 @@ class CircuitBreaker:
         """Record a failed request. May open a CLOSED or HALF_OPEN circuit."""
         self._window.append(False)
         if self._state in (CircuitState.CLOSED, CircuitState.HALF_OPEN):
-            if len(self._window) >= self.window_size and self.failure_rate >= self.failure_threshold:
+            if (
+                len(self._window) >= self.window_size
+                and self.failure_rate >= self.failure_threshold
+            ):
                 self._state = CircuitState.OPEN
                 self._opened_at = time.monotonic()
                 logger.warning(
-                    f"Circuit {self.name!r}: tripped OPEN "
-                    f"(failure_rate={self.failure_rate:.0%})"
+                    f"Circuit {self.name!r}: tripped OPEN (failure_rate={self.failure_rate:.0%})"
                 )
 
     def reset(self) -> None:
@@ -245,8 +247,8 @@ class RouteConfig:
     path_prefix: str
     backend_url: str
     circuit_breaker: CircuitBreaker = field(default_factory=lambda: CircuitBreaker(name="default"))
-    timeout: float = 30.0        # Request timeout in seconds
-    strip_prefix: bool = False   # If True, remove path_prefix before forwarding
+    timeout: float = 30.0  # Request timeout in seconds
+    strip_prefix: bool = False  # If True, remove path_prefix before forwarding
 
 
 # ---------------------------------------------------------------------------
@@ -287,8 +289,7 @@ class APIGateway:
         parsed = urlparse(url)
         if parsed.scheme not in _ALLOWED_BACKEND_SCHEMES:
             raise ValueError(
-                f"Backend URL scheme {parsed.scheme!r} not allowed. "
-                f"Use http or https."
+                f"Backend URL scheme {parsed.scheme!r} not allowed. Use http or https."
             )
         netloc = parsed.netloc
         if not netloc:
@@ -393,9 +394,7 @@ class APIGateway:
 
         # 3. Circuit breaker check
         if route.circuit_breaker.is_open:
-            logger.warning(
-                f"Gateway: circuit OPEN for {route.path_prefix!r} — failing fast"
-            )
+            logger.warning(f"Gateway: circuit OPEN for {route.path_prefix!r} — failing fast")
             return {
                 "status_code": 503,
                 "body": b"Service temporarily unavailable (circuit open)",
@@ -406,13 +405,13 @@ class APIGateway:
         # 4. Normalize and validate path — prevent path traversal
         target_path = path
         if route.strip_prefix:
-            target_path = path[len(route.path_prefix):]
+            target_path = path[len(route.path_prefix) :]
 
         # posixpath.normpath collapses ../ sequences.
         # After normalization we must verify the path still starts with the
         # route prefix — traversal like /products/../../admin resolves to
         # /admin, which escapes the intended route scope.
-        raw_for_check = path  # keep the original for the prefix check
+        _raw_for_check = path  # keep the original for the prefix check
         normalized = posixpath.normpath(target_path or "/")
         if not normalized.startswith("/"):
             normalized = "/" + normalized

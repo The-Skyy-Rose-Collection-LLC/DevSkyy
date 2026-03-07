@@ -27,10 +27,14 @@ logging.basicConfig(
 log = logging.getLogger("skyyrose-ai-pipeline")
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-PRODUCTS_DIR = PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
+PRODUCTS_DIR = (
+    PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
+)
 MODELS_DIR = PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "models"
 AVATAR_DIR = PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "avatar"
-CANONICAL_MAP = PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "canonical-images.json"
+CANONICAL_MAP = (
+    PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "canonical-images.json"
+)
 
 
 def load_product_catalog():
@@ -41,18 +45,23 @@ def load_product_catalog():
     products = []
     for sku, info in data.get("products", {}).items():
         # Only process products that have real images (not placeholder-only)
-        if info.get("status", "").startswith("webp_downloaded") or info.get("status") == "jpg_downloaded":
+        if (
+            info.get("status", "").startswith("webp_downloaded")
+            or info.get("status") == "jpg_downloaded"
+        ):
             # Find the best available image
             img_file = info.get("local_webp") or info.get("local_jpg")
             if img_file:
                 img_path = PRODUCTS_DIR / img_file
                 if img_path.exists():
-                    products.append({
-                        "sku": sku,
-                        "name": info["name"],
-                        "collection": info["collection"],
-                        "image": str(img_path),
-                    })
+                    products.append(
+                        {
+                            "sku": sku,
+                            "name": info["name"],
+                            "collection": info["collection"],
+                            "image": str(img_path),
+                        }
+                    )
                 else:
                     log.warning("Image not found for %s: %s", sku, img_path)
         else:
@@ -84,7 +93,8 @@ def step_avatar():
             "Reference face image not found at %s. "
             "Please provide a reference face image (e.g., a stock model photo) "
             "and save it as %s before running this step.",
-            ref_face, ref_face,
+            ref_face,
+            ref_face,
         )
         log.info(
             "TIP: Use a royalty-free stock photo of a fashion model. "
@@ -121,6 +131,7 @@ def step_avatar():
         if result and len(result) > 0:
             # result is typically a filepath to the generated image
             from shutil import copy2
+
             output_path = result[0] if isinstance(result, (list, tuple)) else result
             copy2(output_path, str(avatar_front))
             log.info("Avatar front saved: %s", avatar_front)
@@ -148,6 +159,7 @@ def step_avatar():
             )
             if result:
                 from shutil import copy2
+
                 output_path = result[0] if isinstance(result, (list, tuple)) else result
                 copy2(output_path, str(avatar_front))
                 log.info("Avatar front (PuLID) saved: %s", avatar_front)
@@ -175,6 +187,7 @@ def step_avatar():
         )
         if back_result:
             from shutil import copy2
+
             output_path = back_result[0] if isinstance(back_result, (list, tuple)) else back_result
             copy2(output_path, str(avatar_back))
             log.info("Avatar back saved: %s", avatar_back)
@@ -273,11 +286,18 @@ def step_vton(products):
                         dict(background=handle_file(str(avatar_front)), layers=[], composite=None),
                         handle_file(garment_path),
                         "Virtual try-on of luxury streetwear garment on fashion model",
-                        True, True, 30, 42,
+                        True,
+                        True,
+                        30,
+                        42,
                         api_name="/tryon",
                     )
                     if front_result:
-                        out = front_result[0] if isinstance(front_result, (list, tuple)) else front_result
+                        out = (
+                            front_result[0]
+                            if isinstance(front_result, (list, tuple))
+                            else front_result
+                        )
                         img = Image.open(out)
                         img.save(str(output_front), "WEBP", quality=90)
                         size_kb = output_front.stat().st_size / 1024
@@ -338,16 +358,23 @@ def step_3d_avatar():
             # generation_all returns (file1, file2, html, mesh_stats, seed)
             # file1 or file2 should be the GLB
             from shutil import copy2
-            for item in (result if isinstance(result, (list, tuple)) else [result]):
+
+            for item in result if isinstance(result, (list, tuple)) else [result]:
                 if isinstance(item, str) and item.endswith((".glb", ".obj", ".ply")):
                     copy2(item, str(glb_output))
-                    log.info("3D avatar saved: %s (%.1f KB)", glb_output, glb_output.stat().st_size / 1024)
+                    log.info(
+                        "3D avatar saved: %s (%.1f KB)",
+                        glb_output,
+                        glb_output.stat().st_size / 1024,
+                    )
                     return str(glb_output)
             # If no GLB extension found, take the first file path
             output_path = result[0] if isinstance(result, (list, tuple)) else result
             if isinstance(output_path, str) and os.path.isfile(output_path):
                 copy2(output_path, str(glb_output))
-                log.info("3D avatar saved: %s (%.1f KB)", glb_output, glb_output.stat().st_size / 1024)
+                log.info(
+                    "3D avatar saved: %s (%.1f KB)", glb_output, glb_output.stat().st_size / 1024
+                )
                 return str(glb_output)
             log.error("Hunyuan3D returned unexpected result: %s", type(result))
         else:
@@ -363,6 +390,7 @@ def step_3d_avatar():
             )
             if result:
                 from shutil import copy2
+
                 output_path = result if isinstance(result, str) else result[0]
                 if isinstance(output_path, str) and os.path.isfile(output_path):
                     copy2(output_path, str(glb_output))

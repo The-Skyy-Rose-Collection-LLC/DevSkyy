@@ -21,7 +21,7 @@ collect_ignore_glob = []
 
 # Check if wordpress module exists
 try:
-    import wordpress
+    import wordpress  # noqa: F401
 except ImportError:
     # WordPress module being rebuilt - skip ALL dependent tests
     collect_ignore_glob.extend(

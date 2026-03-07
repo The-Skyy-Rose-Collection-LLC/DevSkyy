@@ -44,9 +44,7 @@ class TestGraphQLProductQuery:
         mock_product.is_active = True
         mock_product.images_json = '["br-001-front.jpg"]'
 
-        with patch(
-            "api.graphql.schema.ProductDataLoader"
-        ) as mock_loader_cls:
+        with patch("api.graphql.schema.ProductDataLoader") as mock_loader_cls:
             mock_loader = MagicMock()
             mock_loader.load = AsyncMock(return_value=mock_product)
             mock_loader_cls.return_value = mock_loader
@@ -120,13 +118,16 @@ class TestGraphQLProductQuery:
             make_mock_product("br-002", "Black Rose Hoodie", 89.99),
         ]
 
-        with patch(
-            "api.graphql.resolvers.product_resolver.get_products_from_db",
-            new_callable=AsyncMock,
-        ) as mock_get, patch(
-            "api.graphql.schema.get_products_from_db",
-            new_callable=AsyncMock,
-        ) as mock_get2:
+        with (
+            patch(
+                "api.graphql.resolvers.product_resolver.get_products_from_db",
+                new_callable=AsyncMock,
+            ) as mock_get,
+            patch(
+                "api.graphql.schema.get_products_from_db",
+                new_callable=AsyncMock,
+            ) as mock_get2,
+        ):
             mock_get.return_value = mock_products
             mock_get2.return_value = mock_products
 

@@ -15,13 +15,13 @@ import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class PerformanceTrend(str, Enum):
+class PerformanceTrend(StrEnum):
     """Provider performance trend classification."""
 
     IMPROVING = "improving"

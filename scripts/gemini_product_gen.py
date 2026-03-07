@@ -263,7 +263,7 @@ FLAT_PROMPTS = [
         "CRITICAL — the product must match these EXACT details: {description} "
         "Every color, pattern, logo, text, stripe, and design element must be "
         "pixel-accurate to the reference image. Do NOT change any detail. "
-        "Clean, sharp, high-resolution product photo."
+        "Clean, sharp, high-resolution product photo.",
     ),
     # Variant 2: Light gray studio
     (
@@ -274,7 +274,7 @@ FLAT_PROMPTS = [
         "Professional product photography with soft studio lighting. "
         "CRITICAL — the product must match these EXACT details: {description} "
         "Every color, pattern, logo, text, and design element must be identical "
-        "to the reference image. Premium e-commerce quality."
+        "to the reference image. Premium e-commerce quality.",
     ),
     # Variant 3: Lifestyle flat lay (styled)
     (
@@ -284,7 +284,7 @@ FLAT_PROMPTS = [
         "with subtle styling props — a small plant, sunglasses, or watch nearby. "
         "Overhead shot, luxury lifestyle product photography. "
         "CRITICAL — the product must match these EXACT details: {description} "
-        "The garment is the hero of the shot. Premium brand aesthetic."
+        "The garment is the hero of the shot. Premium brand aesthetic.",
     ),
 ]
 
@@ -298,7 +298,7 @@ MODEL_PROMPTS = {
             "The garment must match these EXACT details: {description} "
             "Do NOT change the garment type, colors, patterns, or any design element. "
             "Luxury streetwear editorial photography. The model should complement "
-            "the dark, bold aesthetic of the Black Rose Collection."
+            "the dark, bold aesthetic of the Black Rose Collection.",
         ),
         (
             "model-editorial",
@@ -307,7 +307,7 @@ MODEL_PROMPTS = {
             "Gothic luxury aesthetic. 3/4 body shot. "
             "The garment must match these EXACT details: {description} "
             "Do NOT change ANY design element. Cinematic composition, deep blacks, "
-            "dramatic contrast. The model exudes confidence and edge."
+            "dramatic contrast. The model exudes confidence and edge.",
         ),
     ],
     "love-hurts": [
@@ -318,7 +318,7 @@ MODEL_PROMPTS = {
             "Studio lighting, clean white background. "
             "The garment must match these EXACT details: {description} "
             "Do NOT change the garment type, colors, patterns, or any design element. "
-            "Luxury streetwear editorial photography."
+            "Luxury streetwear editorial photography.",
         ),
         (
             "model-editorial",
@@ -327,7 +327,7 @@ MODEL_PROMPTS = {
             "3/4 body shot. "
             "The garment must match these EXACT details: {description} "
             "Do NOT change ANY design element. Cinematic composition, "
-            "passionate energy. Deep reds and warm tones."
+            "passionate energy. Deep reds and warm tones.",
         ),
     ],
     "signature": [
@@ -338,7 +338,7 @@ MODEL_PROMPTS = {
             "Studio lighting, clean white background. "
             "The garment must match these EXACT details: {description} "
             "Do NOT change the garment type, colors, patterns, or any design element. "
-            "Luxury streetwear editorial photography."
+            "Luxury streetwear editorial photography.",
         ),
         (
             "model-editorial",
@@ -347,7 +347,7 @@ MODEL_PROMPTS = {
             "golden hour lighting. 3/4 body shot. "
             "The garment must match these EXACT details: {description} "
             "Do NOT change ANY design element. California luxury vibes, "
-            "warm golden tones. Cinematic street style."
+            "warm golden tones. Cinematic street style.",
         ),
     ],
 }
@@ -358,6 +358,7 @@ MODEL_PROMPTS = {
 def get_client():
     """Initialize Gemini client."""
     from google import genai
+
     key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
     if not key:
         log.error("No GOOGLE_API_KEY found. Set in .env or .env.hf")
@@ -368,6 +369,7 @@ def get_client():
 def enhance_source(image_path: Path):
     """Upscale and sharpen source tech flat for better Gemini reference."""
     from PIL import Image, ImageEnhance, ImageFilter
+
     img = Image.open(image_path).convert("RGB")
     w, h = img.size
     short_edge = min(w, h)
@@ -418,6 +420,7 @@ def generate_image(client, source_img, prompt: str, attempt: int = 1) -> bytes |
     for part in response.parts:
         if part.inline_data:
             import tempfile
+
             with tempfile.NamedTemporaryFile(suffix=".webp", delete=False) as tmp:
                 tmp_path = tmp.name
             part.as_image().save(tmp_path)
@@ -503,12 +506,15 @@ def process_product(client, sku: str, product: dict, modes: list[str], num_varia
 def main():
     parser = argparse.ArgumentParser(description="Gemini product image generator for SkyyRose")
     parser.add_argument("--sku", help="Specific SKU to generate (default: all)")
-    parser.add_argument("--mode", choices=["flat", "model", "both"], default="both",
-                        help="Generation mode")
-    parser.add_argument("--variants", type=int, default=2,
-                        help="Number of variants per mode (1-3, default: 2)")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Show what would be generated without calling API")
+    parser.add_argument(
+        "--mode", choices=["flat", "model", "both"], default="both", help="Generation mode"
+    )
+    parser.add_argument(
+        "--variants", type=int, default=2, help="Number of variants per mode (1-3, default: 2)"
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Show what would be generated without calling API"
+    )
     args = parser.parse_args()
 
     modes = ["flat", "model"] if args.mode == "both" else [args.mode]
@@ -534,8 +540,10 @@ def main():
     print("=" * 70)
     print("  SKYYROSE GEMINI PRODUCT GENERATOR")
     print(f"  Model: {MODEL_ID}")
-    print(f"  Products: {len(skus)} | Modes: {', '.join(modes)} | "
-          f"Variants: {num_variants} | Total: ~{total_images} images")
+    print(
+        f"  Products: {len(skus)} | Modes: {', '.join(modes)} | "
+        f"Variants: {num_variants} | Total: ~{total_images} images"
+    )
     print("=" * 70)
 
     if args.dry_run:
@@ -549,7 +557,9 @@ def main():
                     print(f"    -> {sku}-{name}.webp")
             if "model" in modes:
                 collection = product["collection"]
-                for name, _ in MODEL_PROMPTS.get(collection, MODEL_PROMPTS["signature"])[:num_variants]:
+                for name, _ in MODEL_PROMPTS.get(collection, MODEL_PROMPTS["signature"])[
+                    :num_variants
+                ]:
                     print(f"    -> {sku}-{name}.webp")
         print(f"\n  Dry run complete. {total_images} images would be generated.")
         return 0
@@ -571,7 +581,8 @@ def main():
 
     # Summary
     total_success = sum(
-        1 for sku_results in all_results.values()
+        1
+        for sku_results in all_results.values()
         for r in sku_results.values()
         if isinstance(r, dict) and r.get("status") == "success"
     )
@@ -584,7 +595,7 @@ def main():
     print("=" * 70)
 
     if total_success > 0:
-        print(f"\n  View results:")
+        print("\n  View results:")
         print(f"    open {OUTPUT_DIR}")
 
     return 0 if total_success == total_attempted else 1

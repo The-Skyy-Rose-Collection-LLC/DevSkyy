@@ -80,10 +80,9 @@ class WordPressAIBridge(SubAgent):
         **kwargs: Any,
     ) -> None:
         super().__init__(correlation_id=correlation_id, **kwargs)
-        self._wp_url = (
-            wp_url
-            or os.environ.get("WORDPRESS_URL", "https://skyyrose.co")
-        ).rstrip("/")
+        self._wp_url = (wp_url or os.environ.get("WORDPRESS_URL", "https://skyyrose.co")).rstrip(
+            "/"
+        )
         self._wp_auth_user = wp_auth_user or os.environ.get("WP_AUTH_USER")
         self._wp_auth_pass = wp_auth_pass or os.environ.get("WP_AUTH_PASS")
         self._provider_cache: dict[str, Any] | None = None
@@ -253,15 +252,19 @@ class WordPressAIBridge(SubAgent):
             return await self.provider_status()
 
         # Image generation
-        if any(kw in task_lower for kw in ["image", "picture", "photo", "visual", "dalle", "imagen"]):
+        if any(
+            kw in task_lower for kw in ["image", "picture", "photo", "visual", "dalle", "imagen"]
+        ):
             provider = kwargs.get("provider")
             return await self.generate_image(task, provider=provider)
 
         # Default: text generation
         provider = kwargs.get("provider")
-        return await self.generate_text(task, provider=provider, **{
-            k: v for k, v in kwargs.items() if k in ("model", "temperature", "max_tokens")
-        })
+        return await self.generate_text(
+            task,
+            provider=provider,
+            **{k: v for k, v in kwargs.items() if k in ("model", "temperature", "max_tokens")},
+        )
 
     # -------------------------------------------------------------------------
     # Round Table Integration

@@ -112,7 +112,7 @@ async def generate_description(
         result = await pipeline.generate_description(request)
 
         logger.info(
-            f"Generated description: {result.word_count} words " f"in {result.processing_time_ms}ms"
+            f"Generated description: {result.word_count} words in {result.processing_time_ms}ms"
         )
 
         return result
@@ -159,8 +159,7 @@ async def generate_batch_descriptions(
     """
     try:
         logger.info(
-            f"Starting batch description: {len(request.requests)} images "
-            f"(user: {current_user.sub})"
+            f"Starting batch description: {len(request.requests)} images (user: {current_user.sub})"
         )
 
         # Process batch

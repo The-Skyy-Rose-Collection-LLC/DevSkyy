@@ -46,6 +46,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 @dataclass
 class HealthStatus:
     """Health status for a component."""
+
     component: str
     status: str  # healthy, degraded, unhealthy
     latency_ms: float | None = None
@@ -60,6 +61,7 @@ class HealthStatus:
 @dataclass
 class HealthThresholds:
     """Health check thresholds."""
+
     healthy_latency_ms: float = 1000  # < 1s is healthy
     degraded_latency_ms: float = 5000  # < 5s is degraded
     timeout_seconds: float = 30  # > 30s is timeout
@@ -305,13 +307,15 @@ class MCPHealthMonitor:
             }
 
             if status.error:
-                message["blocks"].append({
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": f"*Error:*\n```{status.error}```",
-                    },
-                })
+                message["blocks"].append(
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": f"*Error:*\n```{status.error}```",
+                        },
+                    }
+                )
 
             await self.client.post(slack_webhook, json=message)
             print(f"📨 Alert sent for {component}")

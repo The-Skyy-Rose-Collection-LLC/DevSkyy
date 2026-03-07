@@ -151,9 +151,7 @@ class ProductServicer:
 
             await bus.execute(cmd)
             # Return the newly created product
-            return await self.GetProduct(
-                _SimpleRequest(sku=request.sku), context
-            )
+            return await self.GetProduct(_SimpleRequest(sku=request.sku), context)
 
         except ValueError as exc:
             await self._set_invalid_argument(context, str(exc))
@@ -188,9 +186,7 @@ class ProductServicer:
             store = EventStore()
             await store.append(event)
 
-            return await self.GetProduct(
-                _SimpleRequest(sku=request.sku), context
-            )
+            return await self.GetProduct(_SimpleRequest(sku=request.sku), context)
 
         except Exception as exc:
             logger.error(f"UpdateProductPrice error: {exc}", exc_info=True)
@@ -204,7 +200,9 @@ class ProductServicer:
     def _product_to_dict(self, product: Any) -> dict[str, Any]:
         """Convert ORM Product to a plain dict (proto-compatible)."""
         try:
-            images = json.loads(product.images_json) if getattr(product, "images_json", None) else []
+            images = (
+                json.loads(product.images_json) if getattr(product, "images_json", None) else []
+            )
         except (json.JSONDecodeError, TypeError):
             images = []
 
@@ -226,6 +224,7 @@ class ProductServicer:
         if context is not None and hasattr(context, "set_code"):
             try:
                 import grpc
+
                 context.set_code(grpc.StatusCode.NOT_FOUND)
                 context.set_details(detail)
             except ImportError:
@@ -237,6 +236,7 @@ class ProductServicer:
         if context is not None and hasattr(context, "set_code"):
             try:
                 import grpc
+
                 context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
                 context.set_details(detail)
             except ImportError:
@@ -248,6 +248,7 @@ class ProductServicer:
         if context is not None and hasattr(context, "set_code"):
             try:
                 import grpc
+
                 context.set_code(grpc.StatusCode.INTERNAL)
                 context.set_details(detail)
             except ImportError:
@@ -290,9 +291,7 @@ async def serve(port: int = GRPC_PORT) -> None:
         try:
             from grpc_server.generated import product_pb2_grpc
 
-            product_pb2_grpc.add_ProductServiceServicer_to_server(
-                ProductServicer(), server
-            )
+            product_pb2_grpc.add_ProductServiceServicer_to_server(ProductServicer(), server)
             logger.info("gRPC ProductService registered with generated stubs")
         except ImportError:
             logger.warning(
@@ -313,9 +312,7 @@ async def serve(port: int = GRPC_PORT) -> None:
                     certificate_chain = f.read()
                 with open(tls_key_path, "rb") as f:
                     private_key = f.read()
-                server_credentials = grpc.ssl_server_credentials(
-                    [(private_key, certificate_chain)]
-                )
+                server_credentials = grpc.ssl_server_credentials([(private_key, certificate_chain)])
                 server.add_secure_port(f"0.0.0.0:{port}", server_credentials)
                 logger.info(f"gRPC server started with TLS on port {port}")
             except OSError as tls_err:
@@ -332,9 +329,7 @@ async def serve(port: int = GRPC_PORT) -> None:
         await server.wait_for_termination()
 
     except ImportError:
-        logger.error(
-            "grpcio not installed. Install with: pip install grpcio grpcio-tools protobuf"
-        )
+        logger.error("grpcio not installed. Install with: pip install grpcio grpcio-tools protobuf")
         raise
 
 

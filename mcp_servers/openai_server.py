@@ -52,7 +52,7 @@ Usage:
 
 import json
 import os
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Literal
 
 try:
@@ -114,14 +114,14 @@ mcp = FastMCP(
 # =============================================================================
 
 
-class ResponseFormat(str, Enum):
+class ResponseFormat(StrEnum):
     """Output format for tool responses."""
 
     MARKDOWN = "markdown"
     JSON = "json"
 
 
-class OpenAIModel(str, Enum):
+class OpenAIModel(StrEnum):
     """Supported OpenAI models."""
 
     GPT4O = "gpt-4o"
@@ -129,7 +129,7 @@ class OpenAIModel(str, Enum):
     O1_PREVIEW = "o1-preview"
 
 
-class TaskType(str, Enum):
+class TaskType(StrEnum):
     """Task categories for optimal model selection."""
 
     CODE_GENERATION = "code_generation"

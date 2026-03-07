@@ -240,10 +240,7 @@ def start_metrics_server_background(port: int = METRICS_PORT, host: str = METRIC
         Thread: The background thread running the server
     """
     thread = Thread(
-        target=start_metrics_server,
-        args=(port, host),
-        daemon=True,
-        name="MetricsServer"
+        target=start_metrics_server, args=(port, host), daemon=True, name="MetricsServer"
     )
     thread.start()
     return thread

@@ -154,8 +154,7 @@ class TestProductDataLoader:
         """
         # Arrange
         mock_products = [
-            MockProduct(f"br-{i:03d}", f"Product {i}", float(i * 10))
-            for i in range(1, 11)
+            MockProduct(f"br-{i:03d}", f"Product {i}", float(i * 10)) for i in range(1, 11)
         ]
 
         # Create mock session

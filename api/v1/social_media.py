@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
-from typing import Any, Literal, Optional
+from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field, field_validator
@@ -90,7 +90,7 @@ class GenerateCampaignRequest(BaseModel):
         ge=1,
         le=20,
     )
-    platforms: Optional[list[Literal["instagram", "tiktok", "twitter", "facebook"]]] = Field(
+    platforms: list[Literal["instagram", "tiktok", "twitter", "facebook"]] | None = Field(
         default=None,
         description="Platforms to target (default: all 4)",
     )
@@ -154,13 +154,13 @@ class SocialPostResponse(BaseModel):
     media_urls: list[str]
     product_sku: str
     collection: str
-    scheduled_at: Optional[str] = None
-    published_at: Optional[str] = None
+    scheduled_at: str | None = None
+    published_at: str | None = None
     status: str
     engagement: dict[str, int] = Field(default_factory=dict)
     media_recommendations: dict[str, str] = Field(default_factory=dict)
-    scheduling_recommendation: Optional[str] = None
-    created_at: Optional[str] = None
+    scheduling_recommendation: str | None = None
+    created_at: str | None = None
 
 
 class CampaignResponse(BaseModel):
@@ -179,12 +179,12 @@ class PlatformAnalyticsResponse(BaseModel):
 
     posts: int = 0
     likes: int = 0
-    comments: Optional[int] = None
+    comments: int | None = None
     shares: int = 0
-    reach: Optional[int] = None
-    views: Optional[int] = None
-    retweets: Optional[int] = None
-    impressions: Optional[int] = None
+    reach: int | None = None
+    views: int | None = None
+    retweets: int | None = None
+    impressions: int | None = None
 
 
 class AnalyticsResponse(BaseModel):
@@ -270,7 +270,10 @@ async def generate_post(
     """
     logger.info(
         "Generating social post: sku=%s, platform=%s, type=%s, user=%s",
-        request.product_sku, request.platform, request.content_type, user.sub,
+        request.product_sku,
+        request.platform,
+        request.content_type,
+        user.sub,
     )
 
     try:
@@ -335,7 +338,9 @@ async def generate_campaign(
     """
     logger.info(
         "Generating campaign: collection=%s, name=%s, user=%s",
-        request.collection, request.campaign_name, user.sub,
+        request.collection,
+        request.campaign_name,
+        user.sub,
     )
 
     try:
@@ -455,7 +460,9 @@ async def schedule_post(
     """
     logger.info(
         "Scheduling post: id=%s, at=%s, user=%s",
-        request.post_id, request.scheduled_at, user.sub,
+        request.post_id,
+        request.scheduled_at,
+        user.sub,
     )
 
     try:
@@ -519,7 +526,8 @@ async def publish_post(
     """
     logger.info(
         "Publishing post: id=%s, user=%s",
-        request.post_id, user.sub,
+        request.post_id,
+        user.sub,
     )
 
     try:

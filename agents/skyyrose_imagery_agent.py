@@ -14,7 +14,7 @@ import logging
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from adk.base import ADKProvider, AgentResult, AgentStatus
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class ImageryPurpose(str, Enum):
+class ImageryPurpose(StrEnum):
     """Purpose of generated imagery."""
 
     HERO_BANNER = "hero_banner"
@@ -43,7 +43,7 @@ class ImageryPurpose(str, Enum):
     BACKGROUND = "background"
 
 
-class ModelPose(str, Enum):
+class ModelPose(StrEnum):
     """AI model pose styles."""
 
     EDITORIAL = "editorial"

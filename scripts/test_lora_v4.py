@@ -22,7 +22,6 @@ Usage:
 import argparse
 import json
 import os
-import sys
 import time
 from pathlib import Path
 
@@ -43,7 +42,9 @@ for env_file in [PROJECT_ROOT / ".env", PROJECT_ROOT / ".env.hf"]:
                         os.environ.setdefault(key.strip(), value)
 
 # LoRA v4 model info
-MODEL_VERSION = "devskyy/skyyrose-lora-v4:8bf4de484c4d21064ce79f43d0ffc7942f444c5b2e2e1c112aa1463743fb232a"
+MODEL_VERSION = (
+    "devskyy/skyyrose-lora-v4:8bf4de484c4d21064ce79f43d0ffc7942f444c5b2e2e1c112aa1463743fb232a"
+)
 API_BASE = "https://api.replicate.com/v1"
 
 # Test prompts per SKU — each uses the per-SKU trigger word
@@ -160,9 +161,7 @@ def poll_prediction(api_token: str, prediction_id: str) -> dict:
         data = resp.json()
         status = data.get("status", "unknown")
 
-        if status == "succeeded":
-            return data
-        elif status in ("failed", "canceled"):
+        if status == "succeeded" or status in ("failed", "canceled"):
             return data
 
         time.sleep(2)
@@ -185,8 +184,12 @@ def download_image(url: str, output_path: Path) -> bool:
 def main():
     parser = argparse.ArgumentParser(description="Test SkyyRose LoRA v4 generation")
     parser.add_argument("--skus", nargs="+", help="Specific SKUs to test (default: all)")
-    parser.add_argument("--mode", choices=["flat", "model", "both"], default="both",
-                        help="Generation mode: flat (product only), model (on person), both")
+    parser.add_argument(
+        "--mode",
+        choices=["flat", "model", "both"],
+        default="both",
+        help="Generation mode: flat (product only), model (on person), both",
+    )
     args = parser.parse_args()
 
     api_token = os.environ.get("REPLICATE_API_TOKEN")
@@ -255,10 +258,10 @@ def main():
                             "url": url,
                         }
                     else:
-                        print(f" → download failed")
+                        print(" → download failed")
                         results[f"{sku}-{mode}"] = {"error": "download failed", "url": url}
                 else:
-                    print(f" → no output")
+                    print(" → no output")
                     results[f"{sku}-{mode}"] = {"error": "no output URLs"}
             else:
                 error = result.get("error", "unknown")
@@ -284,7 +287,7 @@ def main():
     print("=" * 70)
 
     if successes > 0:
-        print(f"\n  View results:")
+        print("\n  View results:")
         print(f"    open {output_dir}")
 
     return 0 if failures == 0 else 1

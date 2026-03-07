@@ -18,7 +18,7 @@ import logging
 import os
 import uuid
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -39,7 +39,7 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 # =============================================================================
 
 
-class VisualProvider(str, Enum):
+class VisualProvider(StrEnum):
     """Visual generation provider."""
 
     GOOGLE_IMAGEN = "google_imagen"
@@ -47,7 +47,7 @@ class VisualProvider(str, Enum):
     AUTO = "auto"  # Best available
 
 
-class ImageStyle(str, Enum):
+class ImageStyle(StrEnum):
     """Product photography styles."""
 
     PRODUCT_STUDIO = "product_studio"  # Clean white background
@@ -57,7 +57,7 @@ class ImageStyle(str, Enum):
     DETAIL = "detail"  # Close-up detail shot
 
 
-class JobStatus(str, Enum):
+class JobStatus(StrEnum):
     QUEUED = "queued"
     PROCESSING = "processing"
     COMPLETED = "completed"
@@ -412,7 +412,7 @@ async def generate_batch_photos(
 # =============================================================================
 
 
-class EnhancementType(str, Enum):
+class EnhancementType(StrEnum):
     """Type of image enhancement."""
 
     UPSCALE = "upscale"  # 2x-4x resolution increase

@@ -31,7 +31,7 @@ from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from functools import wraps
 from typing import Any, TypeVar
 
@@ -111,7 +111,7 @@ class JWTConfig:
 # =============================================================================
 
 
-class UserRole(str, Enum):
+class UserRole(StrEnum):
     """RBAC Roles - ordered by privilege level."""
 
     SUPER_ADMIN = "super_admin"  # Full system access
@@ -133,7 +133,7 @@ ROLE_HIERARCHY: dict[UserRole, int] = {
 }
 
 
-class TokenType(str, Enum):
+class TokenType(StrEnum):
     """Token types for different purposes."""
 
     ACCESS = "access"

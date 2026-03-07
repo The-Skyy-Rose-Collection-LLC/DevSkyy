@@ -23,7 +23,7 @@ import logging
 import os
 import uuid
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING, Any
 
 import httpx
@@ -53,7 +53,7 @@ SEVERITY_ORDER = ["info", "low", "medium", "high", "critical"]
 # =============================================================================
 
 
-class NotificationChannel(str, Enum):
+class NotificationChannel(StrEnum):
     """Notification delivery channels."""
 
     EMAIL = "email"
@@ -62,7 +62,7 @@ class NotificationChannel(str, Enum):
     IN_APP = "in_app"
 
 
-class AlertSeverity(str, Enum):
+class AlertSeverity(StrEnum):
     """Alert severity levels."""
 
     INFO = "info"
@@ -72,7 +72,7 @@ class AlertSeverity(str, Enum):
     CRITICAL = "critical"
 
 
-class NotificationStatus(str, Enum):
+class NotificationStatus(StrEnum):
     """Notification status values."""
 
     PENDING = "pending"

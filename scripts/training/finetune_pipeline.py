@@ -31,7 +31,7 @@ import os
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -65,14 +65,14 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class TrainingProvider(str, Enum):
+class TrainingProvider(StrEnum):
     """Training providers."""
 
     REPLICATE = "replicate"
     HUGGINGFACE = "huggingface"
 
 
-class ModelType(str, Enum):
+class ModelType(StrEnum):
     """Model types for fine-tuning."""
 
     IMAGE_LORA = "image_lora"

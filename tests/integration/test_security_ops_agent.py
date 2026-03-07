@@ -34,7 +34,9 @@ class TestVulnerabilityScanning:
         """Test Python vulnerability scan with no vulnerabilities."""
         mock_subprocess.return_value = MagicMock(
             returncode=0,
-            stdout=json.dumps({"dependencies": [{"name": "requests", "version": "2.31.0", "vulns": []}]}),
+            stdout=json.dumps(
+                {"dependencies": [{"name": "requests", "version": "2.31.0", "vulns": []}]}
+            ),
             stderr="",
         )
 
@@ -195,7 +197,10 @@ class TestErrorHandling:
 class TestRealWorldIntegration:
     """Real integration tests requiring actual tools."""
 
-    @pytest.mark.skipif("not config.getoption('--run-integration', default=False)", reason="Requires --run-integration flag")
+    @pytest.mark.skipif(
+        "not config.getoption('--run-integration', default=False)",
+        reason="Requires --run-integration flag",
+    )
     @pytest.mark.asyncio
     async def test_real_pip_audit(self):
         """Test with real pip-audit on actual repository."""
@@ -206,7 +211,10 @@ class TestRealWorldIntegration:
         # Should have 0 vulnerabilities after our fixes
         assert result["count"] == 0
 
-    @pytest.mark.skipif("not config.getoption('--run-integration', default=False)", reason="Requires --run-integration flag")
+    @pytest.mark.skipif(
+        "not config.getoption('--run-integration', default=False)",
+        reason="Requires --run-integration flag",
+    )
     @pytest.mark.asyncio
     async def test_real_dependabot_check(self):
         """Test with real GitHub Dependabot API."""

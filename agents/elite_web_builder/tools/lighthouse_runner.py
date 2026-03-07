@@ -142,11 +142,13 @@ def _extract_failed_audits(
         if score is None:
             continue
         if score < 1:
-            failed.append({
-                "id": audit_data.get("id", audit_id),
-                "title": audit_data.get("title", audit_id),
-                "score": score,
-            })
+            failed.append(
+                {
+                    "id": audit_data.get("id", audit_id),
+                    "title": audit_data.get("title", audit_id),
+                    "score": score,
+                }
+            )
     return failed
 
 
@@ -159,15 +161,11 @@ def _parse_report(
     try:
         data = json.loads(raw_json)
     except (json.JSONDecodeError, TypeError) as exc:
-        raise LighthouseError(
-            f"Failed to parse Lighthouse JSON output: {exc}"
-        ) from exc
+        raise LighthouseError(f"Failed to parse Lighthouse JSON output: {exc}") from exc
 
     categories = data.get("categories")
     if categories is None:
-        raise LighthouseError(
-            "Missing 'categories' key in Lighthouse report"
-        )
+        raise LighthouseError("Missing 'categories' key in Lighthouse report")
 
     audits_raw = data.get("audits", {})
 
@@ -211,9 +209,7 @@ def run_lighthouse(
     if not url or not url.strip():
         raise ValueError("url must not be empty")
     if device not in VALID_DEVICES:
-        raise ValueError(
-            f"device must be one of {sorted(VALID_DEVICES)}, got '{device}'"
-        )
+        raise ValueError(f"device must be one of {sorted(VALID_DEVICES)}, got '{device}'")
 
     cmd = _build_command(url.strip(), categories, device)
     timestamp = _get_timestamp()
@@ -227,18 +223,14 @@ def run_lighthouse(
         )
     except FileNotFoundError as exc:
         raise LighthouseError(
-            "Lighthouse is not installed. "
-            "Install with: npm install -g lighthouse"
+            "Lighthouse is not installed. Install with: npm install -g lighthouse"
         ) from exc
     except subprocess.TimeoutExpired as exc:
-        raise LighthouseError(
-            f"Lighthouse timed out after {LIGHTHOUSE_TIMEOUT_SECONDS}s"
-        ) from exc
+        raise LighthouseError(f"Lighthouse timed out after {LIGHTHOUSE_TIMEOUT_SECONDS}s") from exc
 
     if proc.returncode != 0:
         raise LighthouseError(
-            f"Lighthouse exited with exit code {proc.returncode}: "
-            f"{proc.stderr.strip()}"
+            f"Lighthouse exited with exit code {proc.returncode}: {proc.stderr.strip()}"
         )
 
     return _parse_report(proc.stdout, url.strip(), timestamp)
@@ -324,10 +316,7 @@ def format_report(result: LighthouseResult) -> str:
         lines.append("")
         for audit in result.audits:
             score_pct = round(audit["score"] * 100) if audit["score"] else 0
-            lines.append(
-                f"- [{audit['id']}] {audit['title']} "
-                f"(score: {score_pct}%)"
-            )
+            lines.append(f"- [{audit['id']}] {audit['title']} (score: {score_pct}%)")
     else:
         lines.append("## Audits")
         lines.append("")

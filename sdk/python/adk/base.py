@@ -18,7 +18,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -30,6 +30,7 @@ def _get_tracer():
     """Lazy-load tracer to avoid circular import (adk ← core → adk)."""
     try:
         from core.telemetry.tracer import get_tracer
+
         return get_tracer("adk.agent")
     except ImportError:
         return None
@@ -56,7 +57,7 @@ class _NullSpanCtx:
 # =============================================================================
 
 
-class ADKProvider(str, Enum):
+class ADKProvider(StrEnum):
     """Supported ADK frameworks"""
 
     GOOGLE = "google_adk"  # Google Agent Development Kit
@@ -67,7 +68,7 @@ class ADKProvider(str, Enum):
     LANGGRAPH = "langgraph"  # LangGraph
 
 
-class AgentCapability(str, Enum):
+class AgentCapability(StrEnum):
     """Agent capabilities"""
 
     # Core capabilities
@@ -97,7 +98,7 @@ class AgentCapability(str, Enum):
     VIRTUAL_TRYON = "virtual_tryon"
 
 
-class AgentStatus(str, Enum):
+class AgentStatus(StrEnum):
     """Agent execution status"""
 
     IDLE = "idle"
@@ -107,7 +108,7 @@ class AgentStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class ModelTier(str, Enum):
+class ModelTier(StrEnum):
     """Model performance tier"""
 
     FLAGSHIP = "flagship"  # GPT-4o, Claude Opus, Gemini Ultra
@@ -294,9 +295,7 @@ class BaseDevSkyyAgent(ABC):
         tracer = _get_tracer()
 
         span_ctx = (
-            tracer.start_as_current_span(f"agent.run.{self.name}")
-            if tracer
-            else _NullSpanCtx()
+            tracer.start_as_current_span(f"agent.run.{self.name}") if tracer else _NullSpanCtx()
         )
 
         with span_ctx as span:
