@@ -107,8 +107,8 @@ def analyze_with_gpt4_vision(sku: str, view: str = "front") -> dict[str, Any]:
 
 Your specialty: Ultra-detailed garment specifications with pixel-level accuracy.
 
-PRODUCT: {override.get('name', sku)}
-COLLECTION: {override.get('collection', 'unknown')}
+PRODUCT: {override.get("name", sku)}
+COLLECTION: {override.get("collection", "unknown")}
 
 ANALYZE THIS PRODUCT PHOTO:
 
@@ -148,21 +148,23 @@ RETURN: Detailed technical specifications in clear paragraphs. Be EXTREMELY spec
 
         response = openai_client.chat.completions.create(
             model="gpt-4o",
-            messages=[{
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt},
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/jpeg;base64,{image_data}",
-                            "detail": "high"
-                        }
-                    }
-                ]
-            }],
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{image_data}",
+                                "detail": "high",
+                            },
+                        },
+                    ],
+                }
+            ],
             max_tokens=1500,
-            temperature=0.2
+            temperature=0.2,
         )
 
         analysis = response.choices[0].message.content
@@ -175,7 +177,7 @@ RETURN: Detailed technical specifications in clear paragraphs. Be EXTREMELY spec
             "view": view,
             "analysis": analysis,
             "char_count": len(analysis),
-            "specialty": "ultra_detailed_specs"
+            "specialty": "ultra_detailed_specs",
         }
     except Exception as exc:
         return {"status": "error", "provider": "openai", "error": str(exc)}
@@ -217,7 +219,7 @@ def analyze_with_gemini_flash(sku: str, view: str = "front") -> dict[str, Any]:
 
 Your specialty: Brand consistency, pattern recognition, quick technical assessment.
 
-PRODUCT: {override.get('name', sku)}
+PRODUCT: {override.get("name", sku)}
 COLLECTION: {collection}
 
 VERIFY THIS PRODUCT PHOTO:
@@ -248,12 +250,9 @@ RETURN: Concise technical assessment focused on brand consistency and generation
             contents=[
                 prompt,
                 genai_types.Part(
-                    inline_data=genai_types.Blob(
-                        mime_type="image/jpeg",
-                        data=image_data
-                    )
-                )
-            ]
+                    inline_data=genai_types.Blob(mime_type="image/jpeg", data=image_data)
+                ),
+            ],
         )
 
         analysis = response.text
@@ -266,16 +265,14 @@ RETURN: Concise technical assessment focused on brand consistency and generation
             "view": view,
             "analysis": analysis,
             "char_count": len(analysis),
-            "specialty": "brand_consistency_check"
+            "specialty": "brand_consistency_check",
         }
     except Exception as exc:
         return {"status": "error", "provider": "google", "error": str(exc)}
 
 
 def synthesize_vision_analysis(
-    gpt4_analysis: str,
-    gemini_analysis: str,
-    sku: str
+    gpt4_analysis: str, gemini_analysis: str, sku: str
 ) -> dict[str, Any]:
     """
     Vision Synthesizer: Claude Sonnet - Combines multi-provider analyses into unified spec.
@@ -336,10 +333,7 @@ Be precise, technical, and comprehensive."""
             model="claude-sonnet-4-20250514",
             max_tokens=2000,
             temperature=0.3,
-            messages=[{
-                "role": "user",
-                "content": prompt
-            }]
+            messages=[{"role": "user", "content": prompt}],
         )
 
         synthesis = response.content[0].text
@@ -351,7 +345,7 @@ Be precise, technical, and comprehensive."""
             "sku": sku,
             "synthesis": synthesis,
             "char_count": len(synthesis),
-            "specialty": "vision_synthesis"
+            "specialty": "vision_synthesis",
         }
     except Exception as exc:
         return {"status": "error", "provider": "anthropic", "error": str(exc)}
@@ -363,9 +357,7 @@ Be precise, technical, and comprehensive."""
 
 
 def generate_with_gemini_pro_image(
-    sku: str,
-    unified_spec: str,
-    view: str = "front"
+    sku: str, unified_spec: str, view: str = "front"
 ) -> dict[str, Any]:
     """
     Generator 1: Gemini 3 Pro Image - Primary 4K generation.
@@ -393,13 +385,13 @@ def generate_with_gemini_pro_image(
             "black-rose": "Gothic romance, mysterious elegance. Rose gold #B76E79 accents.",
             "love-hurts": "Raw street intensity. Deep crimson #8B0000, Oakland pride.",
             "signature": "Editorial prestige. Champagne gold #D4AF37 luxury.",
-            "kids-capsule": "Joyful luxury. Vibrant, SPECIAL, premium quality."
+            "kids-capsule": "Joyful luxury. Vibrant, SPECIAL, premium quality.",
         }
 
         view_instructions = (
             "Model facing AWAY from camera, showing BACK of garment. Back of head and shoulders visible."
-            if view == "back" else
-            "Model facing FORWARD toward camera, showing FRONT of garment. Face visible, confident expression."
+            if view == "back"
+            else "Model facing FORWARD toward camera, showing FRONT of garment. Face visible, confident expression."
         )
 
         prompt = f"""You are Gemini 3 Pro Image, SkyyRose's PRIMARY FASHION PHOTOGRAPHER.
@@ -442,19 +434,13 @@ Generate the image now."""
             contents=[
                 prompt,
                 genai_types.Part(
-                    inline_data=genai_types.Blob(
-                        mime_type="image/jpeg",
-                        data=ref_image_data
-                    )
-                )
+                    inline_data=genai_types.Blob(mime_type="image/jpeg", data=ref_image_data)
+                ),
             ],
             config=genai_types.GenerateContentConfig(
                 response_modalities=["TEXT", "IMAGE"],
-                image_config=genai_types.ImageConfig(
-                    aspect_ratio="3:4",
-                    image_size="4K"
-                )
-            )
+                image_config=genai_types.ImageConfig(aspect_ratio="3:4", image_size="4K"),
+            ),
         )
 
         # Extract image
@@ -477,7 +463,7 @@ Generate the image now."""
                     "view": view,
                     "output_path": str(output_path),
                     "resolution": "4K",
-                    "specialty": "editorial_fashion"
+                    "specialty": "editorial_fashion",
                 }
 
         return {"status": "error", "error": "No image data in response"}
@@ -485,11 +471,7 @@ Generate the image now."""
         return {"status": "error", "provider": "google", "error": str(exc)}
 
 
-def generate_with_dalle3(
-    sku: str,
-    unified_spec: str,
-    view: str = "front"
-) -> dict[str, Any]:
+def generate_with_dalle3(sku: str, unified_spec: str, view: str = "front") -> dict[str, Any]:
     """
     Generator 2: DALL-E 3 - Backup/alternative generation.
 
@@ -524,12 +506,13 @@ CRITICAL: Exact garment replication - all logos, colors, details must match spec
             prompt=prompt,
             size="1024x1792",  # Closest to 3:4
             quality="hd",
-            n=1
+            n=1,
         )
 
         # Download the image
         image_url = response.data[0].url
         import requests
+
         image_response = requests.get(image_url)
 
         output_dir = OUTPUT_DIR / sku
@@ -546,7 +529,7 @@ CRITICAL: Exact garment replication - all logos, colors, details must match spec
             "view": view,
             "output_path": str(output_path),
             "resolution": "HD",
-            "specialty": "creative_interpretation"
+            "specialty": "creative_interpretation",
         }
     except Exception as exc:
         return {"status": "error", "provider": "openai", "error": str(exc)}
@@ -569,11 +552,11 @@ def prepare_image_for_verification(image_path: str) -> tuple[bytes, str]:
     img = Image.open(image_path)
 
     # Convert to RGB if needed
-    if img.mode in ('RGBA', 'LA', 'P'):
-        background = Image.new('RGB', img.size, (255, 255, 255))
-        if img.mode == 'P':
-            img = img.convert('RGBA')
-        background.paste(img, mask=img.split()[-1] if img.mode in ('RGBA', 'LA') else None)
+    if img.mode in ("RGBA", "LA", "P"):
+        background = Image.new("RGB", img.size, (255, 255, 255))
+        if img.mode == "P":
+            img = img.convert("RGBA")
+        background.paste(img, mask=img.split()[-1] if img.mode in ("RGBA", "LA") else None)
         img = background
 
     # Resize if too large (max 1568px for Claude, similar for others)
@@ -585,7 +568,7 @@ def prepare_image_for_verification(image_path: str) -> tuple[bytes, str]:
 
     # Convert to JPEG
     img_buffer = io.BytesIO()
-    img.save(img_buffer, format='JPEG', quality=85, optimize=True)
+    img.save(img_buffer, format="JPEG", quality=85, optimize=True)
     img_buffer.seek(0)
     img_bytes = img_buffer.read()
     image_data = base64.b64encode(img_bytes).decode("utf-8")
@@ -593,11 +576,7 @@ def prepare_image_for_verification(image_path: str) -> tuple[bytes, str]:
     return img_bytes, image_data
 
 
-def verify_with_claude(
-    sku: str,
-    image_path: str,
-    unified_spec: str
-) -> dict[str, Any]:
+def verify_with_claude(sku: str, image_path: str, unified_spec: str) -> dict[str, Any]:
     """
     Quality Agent: Claude Sonnet - Verifies generated image matches specifications.
 
@@ -612,11 +591,11 @@ def verify_with_claude(
         img = Image.open(image_path)
 
         # Convert to RGB if needed (remove alpha channel)
-        if img.mode in ('RGBA', 'LA', 'P'):
-            background = Image.new('RGB', img.size, (255, 255, 255))
-            if img.mode == 'P':
-                img = img.convert('RGBA')
-            background.paste(img, mask=img.split()[-1] if img.mode in ('RGBA', 'LA') else None)
+        if img.mode in ("RGBA", "LA", "P"):
+            background = Image.new("RGB", img.size, (255, 255, 255))
+            if img.mode == "P":
+                img = img.convert("RGBA")
+            background.paste(img, mask=img.split()[-1] if img.mode in ("RGBA", "LA") else None)
             img = background
 
         # Resize if too large (Claude supports up to 1568px on longest side)
@@ -628,7 +607,7 @@ def verify_with_claude(
 
         # Convert to JPEG bytes with reasonable quality
         img_buffer = io.BytesIO()
-        img.save(img_buffer, format='JPEG', quality=85, optimize=True)
+        img.save(img_buffer, format="JPEG", quality=85, optimize=True)
         img_buffer.seek(0)
         image_data = base64.b64encode(img_buffer.read()).decode("utf-8")
 
@@ -676,23 +655,22 @@ RETURN JSON:
             model="claude-sonnet-4-20250514",
             max_tokens=1500,
             temperature=0.3,
-            messages=[{
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image",
-                        "source": {
-                            "type": "base64",
-                            "media_type": "image/jpeg",
-                            "data": image_data
-                        }
-                    },
-                    {
-                        "type": "text",
-                        "text": prompt
-                    }
-                ]
-            }]
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": "image/jpeg",
+                                "data": image_data,
+                            },
+                        },
+                        {"type": "text", "text": prompt},
+                    ],
+                }
+            ],
         )
 
         verification_text = response.content[0].text
@@ -718,7 +696,7 @@ RETURN JSON:
             "model": "claude-sonnet-4-20250514",
             "sku": sku,
             "verification": verification_result,
-            "image_path": image_path
+            "image_path": image_path,
         }
     except Exception as exc:
         return {"status": "error", "provider": "anthropic", "error": str(exc)}
@@ -730,9 +708,7 @@ RETURN JSON:
 
 
 def orchestrate_image_production(
-    sku: str,
-    view: str = "front",
-    use_both_generators: bool = False
+    sku: str, view: str = "front", use_both_generators: bool = False
 ) -> dict[str, Any]:
     """
     Coordinator: Orchestrates the full multi-provider pipeline.
@@ -744,15 +720,11 @@ def orchestrate_image_production(
     4. Quality verification (Claude Sonnet)
     5. Auto-regeneration if needed
     """
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"📦 {sku.upper()} - {view} view")
-    print('='*60)
+    print("=" * 60)
 
-    report = {
-        "sku": sku,
-        "view": view,
-        "pipeline_stages": []
-    }
+    report = {"sku": sku, "view": view, "pipeline_stages": []}
 
     # Stage 1: Multi-Provider Vision Analysis
     print("\n🔍 Stage 1: Multi-Provider Vision Analysis")
@@ -780,9 +752,7 @@ def orchestrate_image_production(
         # Stage 2: Vision Synthesis
         print("\n🧠 Stage 2: Vision Synthesis (Claude Sonnet)")
         synthesis_result = synthesize_vision_analysis(
-            gpt4_result["analysis"],
-            gemini_result["analysis"],
-            sku
+            gpt4_result["analysis"], gemini_result["analysis"], sku
         )
         report["pipeline_stages"].append({"stage": "claude_synthesis", "result": synthesis_result})
 
@@ -829,7 +799,9 @@ def orchestrate_image_production(
     # Stage 4: Quality Verification
     print("\n✅ Stage 4: Quality Verification (Claude Sonnet)")
     verification_result = verify_with_claude(sku, primary_image, unified_spec)
-    report["pipeline_stages"].append({"stage": "claude_verification", "result": verification_result})
+    report["pipeline_stages"].append(
+        {"stage": "claude_verification", "result": verification_result}
+    )
 
     if verification_result["status"] == "error":
         print(f"  ⚠️  Verification failed: {verification_result['error']}")
@@ -895,10 +867,10 @@ def cmd_generate_batch(product_ids: list[str] | None = None) -> None:
 
     # Summary
     successful = sum(1 for r in results if r.get("status") == "success")
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("✨ Batch Complete!")
     print(f"✅ Successful: {successful}/{len(product_ids)}")
-    print('='*60)
+    print("=" * 60)
 
 
 def cmd_interactive() -> None:
@@ -989,10 +961,14 @@ def main() -> None:
     required_keys = {
         "GEMINI_API_KEY": os.getenv("GEMINI_API_KEY"),
         "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY"),
-        "ANTHROPIC_API_KEY": os.getenv("ANTHROPIC_API_KEY")
+        "ANTHROPIC_API_KEY": os.getenv("ANTHROPIC_API_KEY"),
     }
 
-    missing = [k for k, v in required_keys.items() if not v or v.startswith("sk-proj-...") or v.startswith("AIza...")]
+    missing = [
+        k
+        for k, v in required_keys.items()
+        if not v or v.startswith("sk-proj-...") or v.startswith("AIza...")
+    ]
     if missing:
         print(f"❌ Missing API keys: {', '.join(missing)}", file=sys.stderr)
         print("Set them in .env or export as environment variables", file=sys.stderr)

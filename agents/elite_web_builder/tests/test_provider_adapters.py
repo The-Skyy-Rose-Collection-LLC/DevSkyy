@@ -34,7 +34,9 @@ class TestLLMMessage:
 class TestLLMResponse:
     def test_frozen(self):
         resp = LLMResponse(
-            text="Hello", provider="anthropic", model="claude-sonnet-4-6",
+            text="Hello",
+            provider="anthropic",
+            model="claude-sonnet-4-6",
             usage={"input_tokens": 10, "output_tokens": 5},
         )
         with pytest.raises(AttributeError):
@@ -42,7 +44,9 @@ class TestLLMResponse:
 
     def test_fields(self):
         resp = LLMResponse(
-            text="response", provider="google", model="gemini-3-pro",
+            text="response",
+            provider="google",
+            model="gemini-3-pro",
             usage={"input_tokens": 100, "output_tokens": 50},
         )
         assert resp.text == "response"
@@ -154,7 +158,9 @@ class TestGoogleAdapter:
             },
         }
 
-        with patch.object(adapter, "_call_gemini_rest", new_callable=AsyncMock, return_value=mock_response):
+        with patch.object(
+            adapter, "_call_gemini_rest", new_callable=AsyncMock, return_value=mock_response
+        ):
             result = await adapter.call(
                 model="gemini-3-pro-preview",
                 messages=[
@@ -174,7 +180,9 @@ class TestGoogleAdapter:
 
         mock_response = {"candidates": []}
 
-        with patch.object(adapter, "_call_gemini_rest", new_callable=AsyncMock, return_value=mock_response):
+        with patch.object(
+            adapter, "_call_gemini_rest", new_callable=AsyncMock, return_value=mock_response
+        ):
             with pytest.raises(ValueError, match="empty"):
                 await adapter.call(
                     model="gemini-3-pro-preview",

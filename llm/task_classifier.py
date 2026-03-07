@@ -19,7 +19,7 @@ from __future__ import annotations
 import hashlib
 import logging
 import time
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class TaskCategory(str, Enum):
+class TaskCategory(StrEnum):
     """Task categories for intelligent routing and technique selection."""
 
     REASONING = "reasoning"
@@ -56,7 +56,7 @@ class TaskCategory(str, Enum):
     TRANSLATION = "translation"
 
 
-class PromptTechnique(str, Enum):
+class PromptTechnique(StrEnum):
     """Recommended prompt engineering techniques."""
 
     CHAIN_OF_THOUGHT = "chain_of_thought"

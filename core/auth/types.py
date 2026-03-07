@@ -13,10 +13,10 @@ Standards:
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 
-class UserRole(str, Enum):
+class UserRole(StrEnum):
     """
     RBAC Roles - ordered by privilege level.
 
@@ -48,7 +48,7 @@ class UserRole(str, Enum):
         return self.value
 
 
-class TokenType(str, Enum):
+class TokenType(StrEnum):
     """
     Token types for different authentication purposes.
 
@@ -77,7 +77,7 @@ class TokenType(str, Enum):
         return self.value
 
 
-class AuthStatus(str, Enum):
+class AuthStatus(StrEnum):
     """
     Authentication status codes for auth operations.
 
@@ -97,7 +97,7 @@ class AuthStatus(str, Enum):
         return self.value
 
 
-class AuthErrorCode(str, Enum):
+class AuthErrorCode(StrEnum):
     """
     Error codes for authentication failures.
 
@@ -121,7 +121,7 @@ class AuthErrorCode(str, Enum):
         return self.value
 
 
-class Permission(str, Enum):
+class Permission(StrEnum):
     """
     Fine-grained permissions for resource access control.
 
@@ -166,7 +166,7 @@ class Permission(str, Enum):
         return self.value
 
 
-class SubscriptionTier(str, Enum):
+class SubscriptionTier(StrEnum):
     """
     Subscription tiers for rate limiting and feature access.
 

@@ -10,7 +10,6 @@ Usage:
     python3 scripts/verify_pipelines.py
 """
 
-import importlib
 import os
 import sys
 from pathlib import Path
@@ -54,6 +53,7 @@ def load_env():
     """Load .env files in priority order (same as elite_web_builder/run.py)."""
     try:
         from dotenv import load_dotenv
+
         for p in ["skyyrose/.env", ".env", "gemini/.env"]:
             full = project_root / p
             if full.exists():
@@ -114,18 +114,19 @@ def verify_visual_generation() -> tuple[bool, list[str]]:
     print()
     try:
         from agents.visual_generation import (  # noqa: F401
-            VisualGenerationRouter,
-            VisualProvider,
-            GenerationType,
+            SKYYROSE_BRAND_DNA,
+            ConversationEditor,
             GenerationRequest,
             GenerationResult,
+            GenerationType,
             GoogleImagenClient,
             GoogleVeoClient,
             HuggingFaceFluxClient,
             ReplicateLoRAClient,
-            ConversationEditor,
-            SKYYROSE_BRAND_DNA,
+            VisualGenerationRouter,
+            VisualProvider,
         )
+
         ok("All core classes imported successfully")
 
         # Verify enums
@@ -152,11 +153,12 @@ def verify_visual_generation() -> tuple[bool, list[str]]:
     # Check ReferenceImageManager
     try:
         from agents.visual_generation.reference_manager import (  # noqa: F401
-            ReferenceImageManager,
-            ThoughtSignatureManager,
             ReferenceImage,
+            ReferenceImageManager,
             ReferenceType,
+            ThoughtSignatureManager,
         )
+
         ok("ReferenceImageManager imported (validates up to 14 images)")
     except ImportError as e:
         fail(f"ReferenceImageManager import: {e}")
@@ -166,11 +168,12 @@ def verify_visual_generation() -> tuple[bool, list[str]]:
     # Check prompt optimizer
     try:
         from agents.visual_generation.prompt_optimizer import (  # noqa: F401
+            CollectionPromptBuilder,
+            GeminiNegativePromptEngine,
             GeminiPromptOptimizer,
             GeminiTreeOfThoughtsVisual,
-            GeminiNegativePromptEngine,
-            CollectionPromptBuilder,
         )
+
         ok("GeminiPromptOptimizer imported (4 prompt patterns)")
     except ImportError as e:
         fail(f"Prompt optimizer import: {e}")
@@ -180,10 +183,11 @@ def verify_visual_generation() -> tuple[bool, list[str]]:
     # Check gemini native
     try:
         from agents.visual_generation.gemini_native import (  # noqa: F401
-            GeminiNativeImageClient,
             GeminiFlashImageClient,
+            GeminiNativeImageClient,
             GeminiProImageClient,
         )
+
         ok("Gemini native clients imported (Flash + Pro)")
     except ImportError as e:
         fail(f"Gemini native import: {e}")
@@ -206,6 +210,7 @@ def verify_visual_generation() -> tuple[bool, list[str]]:
 def _run_in_ewb(code: str) -> tuple[bool, str]:
     """Run Python code with EWB root as CWD (matching how run.py works)."""
     import subprocess
+
     ewb_root = str(project_root / "agents" / "elite_web_builder")
     result = subprocess.run(
         [sys.executable, "-c", code],
@@ -259,8 +264,7 @@ def verify_elite_web_builder() -> tuple[bool, list[str]]:
 
     # Check model router
     passed, output = _run_in_ewb(
-        "from core.model_router import ModelRouter, ProviderStatus, RoutingConfig; "
-        "print('OK')"
+        "from core.model_router import ModelRouter, ProviderStatus, RoutingConfig; print('OK')"
     )
     if passed and "OK" in output:
         ok("ModelRouter imported (health-aware routing)")
@@ -271,6 +275,7 @@ def verify_elite_web_builder() -> tuple[bool, list[str]]:
 
     # Check routing config
     import json
+
     routing_path = project_root / "agents/elite_web_builder/config/provider_routing.json"
     if routing_path.exists():
         config = json.loads(routing_path.read_text())

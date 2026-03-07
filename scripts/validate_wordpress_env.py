@@ -37,11 +37,12 @@ load_dotenv("/Users/coreyfoster/DevSkyy/.env")
 
 class Colors:
     """ANSI color codes."""
-    GREEN = '\033[0;32m'
-    YELLOW = '\033[1;33m'
-    RED = '\033[0;31m'
-    BLUE = '\033[0;34m'
-    NC = '\033[0m'  # No Color
+
+    GREEN = "\033[0;32m"
+    YELLOW = "\033[1;33m"
+    RED = "\033[0;31m"
+    BLUE = "\033[0;34m"
+    NC = "\033[0m"  # No Color
 
 
 def run_wp_cli(command: str) -> tuple[bool, str]:
@@ -52,7 +53,9 @@ def run_wp_cli(command: str) -> tuple[bool, str]:
     if not wp_path or not wp_cli:
         return False, "WP-CLI path not configured"
 
-    full_command = f'cd {wp_path} && php {wp_cli} {command} --allow-root 2>&1 | grep -v "Deprecated:"'
+    full_command = (
+        f'cd {wp_path} && php {wp_cli} {command} --allow-root 2>&1 | grep -v "Deprecated:"'
+    )
 
     try:
         result = subprocess.run(
@@ -146,7 +149,7 @@ def validate_theme() -> bool:
     print_check(f"Theme '{theme_name}' active", is_active)
 
     # Get theme version
-    success, version = run_wp_cli(f"eval 'echo wp_get_theme(\"{theme_name}\")->get(\"Version\");'")
+    success, version = run_wp_cli(f'eval \'echo wp_get_theme("{theme_name}")->get("Version");\'')
     if success:
         expected_version = os.getenv("THEME_VERSION", "2.0.0")
         version_match = version == expected_version
@@ -223,10 +226,12 @@ def validate_database() -> bool:
 
     if db_connected:
         # Get database size
-        success, output = run_wp_cli('db query "SELECT COUNT(*) FROM wordpress.wp_posts WHERE post_type=\'page\' AND post_status=\'publish\';"')
+        success, output = run_wp_cli(
+            "db query \"SELECT COUNT(*) FROM wordpress.wp_posts WHERE post_type='page' AND post_status='publish';\""
+        )
         if success:
             try:
-                page_count = int(output.split('\n')[-1])
+                page_count = int(output.split("\n")[-1])
                 has_pages = page_count > 0
                 print_check("Published pages", has_pages, f"{page_count} pages")
             except:
@@ -237,9 +242,9 @@ def validate_database() -> bool:
 
 def main():
     """Main validation function."""
-    print(f"{Colors.BLUE}{'='*60}{Colors.NC}")
+    print(f"{Colors.BLUE}{'=' * 60}{Colors.NC}")
     print(f"{Colors.BLUE}  SkyyRose WordPress Environment Validation{Colors.NC}")
-    print(f"{Colors.BLUE}{'='*60}{Colors.NC}")
+    print(f"{Colors.BLUE}{'=' * 60}{Colors.NC}")
 
     # Run all validations
     env = validate_environment_variables()
@@ -251,9 +256,9 @@ def main():
     db_valid = validate_database()
 
     # Summary
-    print(f"\n{Colors.BLUE}{'='*60}{Colors.NC}")
+    print(f"\n{Colors.BLUE}{'=' * 60}{Colors.NC}")
     print(f"{Colors.BLUE}  Summary{Colors.NC}")
-    print(f"{Colors.BLUE}{'='*60}{Colors.NC}")
+    print(f"{Colors.BLUE}{'=' * 60}{Colors.NC}")
 
     all_checks = [
         ("Environment Variables", bool(env)),
@@ -278,7 +283,9 @@ def main():
         print(f"\n{Colors.BLUE}Ready URLs:{Colors.NC}")
         print("  • Homepage: http://localhost:8881")
         print("  • Admin: http://localhost:8881/wp-admin/")
-        print(f"  • Edit with Elementor: http://localhost:8881/wp-admin/post.php?post={os.getenv('PAGE_ID_HOME', '12')}&action=elementor")
+        print(
+            f"  • Edit with Elementor: http://localhost:8881/wp-admin/post.php?post={os.getenv('PAGE_ID_HOME', '12')}&action=elementor"
+        )
         return 0
     else:
         print(f"{Colors.RED}✗ Environment configuration has issues{Colors.NC}")

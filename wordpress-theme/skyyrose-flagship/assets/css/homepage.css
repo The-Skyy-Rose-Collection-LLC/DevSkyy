@@ -478,7 +478,7 @@
 
 .stat-num {
 	font-family: var(--fc);
-	font-size: 40px;
+	font-size: clamp(28px, 3.5vw, 40px);
 	letter-spacing: 4px;
 	color: var(--rose-gold, #B76E79);
 }
@@ -859,7 +859,7 @@
 
 .cl-feat-letter {
 	font-family: var(--fd);
-	font-size: 200px;
+	font-size: clamp(80px, 14vw, 200px);
 	letter-spacing: 8px;
 	transition: all 1.5s var(--ease-out);
 	user-select: none;
@@ -908,7 +908,7 @@
 
 .cl-feat-price {
 	font-family: var(--fc);
-	font-size: 48px;
+	font-size: clamp(32px, 4vw, 48px);
 	letter-spacing: 4px;
 	margin-bottom: 24px;
 }
@@ -1092,7 +1092,7 @@
 
 .cl-card-letter {
 	font-family: var(--fd);
-	font-size: 72px;
+	font-size: clamp(36px, 6vw, 72px);
 	letter-spacing: 6px;
 	transition: all .8s var(--ease-out);
 	user-select: none;

@@ -35,7 +35,7 @@ import json
 import logging
 import re
 from collections.abc import Callable
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel
@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class PromptTechnique(str, Enum):
+class PromptTechnique(StrEnum):
     """Prompting techniques"""
 
     ROLE_BASED = "role_based"
@@ -70,7 +70,7 @@ class PromptTechnique(str, Enum):
     ENSEMBLE = "ensemble"
 
 
-class OutputFormat(str, Enum):
+class OutputFormat(StrEnum):
     """Output format types"""
 
     TEXT = "text"

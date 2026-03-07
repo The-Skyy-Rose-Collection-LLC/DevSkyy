@@ -25,7 +25,7 @@ import uuid
 from collections.abc import Mapping
 from datetime import UTC, datetime
 from decimal import Decimal
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -56,7 +56,7 @@ MAX_BUFFER_OVERFLOW = 5000  # Hard limit to prevent memory exhaustion on flush f
 # =============================================================================
 
 
-class EventType(str, Enum):
+class EventType(StrEnum):
     """Types of analytics events."""
 
     API_REQUEST = "api_request"

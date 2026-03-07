@@ -26,11 +26,13 @@ def executor() -> RalphExecutor:
 
 @pytest.fixture
 def custom_executor() -> RalphExecutor:
-    return RalphExecutor(config=RalphConfig(
-        max_attempts=5,
-        base_delay=0.5,
-        max_delay=30.0,
-    ))
+    return RalphExecutor(
+        config=RalphConfig(
+            max_attempts=5,
+            base_delay=0.5,
+            max_delay=30.0,
+        )
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -136,9 +138,7 @@ class TestExecuteWithFallback:
         fallback1 = AsyncMock(side_effect=RuntimeError("also down"))
         fallback2 = AsyncMock(side_effect=RuntimeError("all down"))
 
-        result = await executor.execute_with_fallback(
-            primary, [fallback1, fallback2]
-        )
+        result = await executor.execute_with_fallback(primary, [fallback1, fallback2])
         assert result.success is False
 
     @pytest.mark.asyncio
@@ -147,9 +147,7 @@ class TestExecuteWithFallback:
         fallback1 = AsyncMock(side_effect=RuntimeError("also down"))
         fallback2 = AsyncMock(return_value="third-time")
 
-        result = await executor.execute_with_fallback(
-            primary, [fallback1, fallback2]
-        )
+        result = await executor.execute_with_fallback(primary, [fallback1, fallback2])
         assert result.success is True
         assert result.value == "third-time"
 

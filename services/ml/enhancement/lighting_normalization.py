@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import io
 import logging
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import httpx
@@ -57,7 +57,7 @@ MAX_COLOR_DELTA_E = 2.0
 # =============================================================================
 
 
-class LightingIntensity(str, Enum):
+class LightingIntensity(StrEnum):
     """Intensity levels for lighting normalization."""
 
     SUBTLE = "subtle"

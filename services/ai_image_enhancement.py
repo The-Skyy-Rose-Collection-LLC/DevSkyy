@@ -185,9 +185,7 @@ class LuxuryImageEnhancer:
             "caption": ci.generate_caption(image),
         }
 
-    async def apply_luxury_filter(
-        self, image_path: str, output_path: str
-    ) -> None:
+    async def apply_luxury_filter(self, image_path: str, output_path: str) -> None:
         """
         Apply SkyyRose luxury color grading
 
@@ -304,7 +302,7 @@ class LuxuryImageEnhancer:
 
                 # Upscale
                 if upscale:
-                    upscaled_url = await self.upscale_image(current_path)
+                    _upscaled_url = await self.upscale_image(current_path)
                     # Download upscaled image
                     # (implementation depends on your download utility)
                     pass
@@ -315,19 +313,23 @@ class LuxuryImageEnhancer:
                     await self.apply_luxury_filter(current_path, str(filtered_path))
                     current_path = str(filtered_path)
 
-                results.append({
-                    "input": str(image_file),
-                    "output": current_path,
-                    "success": True,
-                })
+                results.append(
+                    {
+                        "input": str(image_file),
+                        "output": current_path,
+                        "success": True,
+                    }
+                )
 
             except Exception as e:
                 print(f"Error processing {image_file.name}: {e}")
-                results.append({
-                    "input": str(image_file),
-                    "success": False,
-                    "error": str(e),
-                })
+                results.append(
+                    {
+                        "input": str(image_file),
+                        "success": False,
+                        "error": str(e),
+                    }
+                )
 
         return results
 
@@ -341,13 +343,13 @@ async def main():
     )
 
     # Remove background
-    img = await enhancer.remove_background("product.jpg", "product_nobg.png")
+    _img = await enhancer.remove_background("product.jpg", "product_nobg.png")
 
     # Upscale image
-    upscaled_url = await enhancer.upscale_image("product.jpg", scale=4)
+    _upscaled_url = await enhancer.upscale_image("product.jpg", scale=4)
 
     # Generate new product image
-    generated_url = await enhancer.generate_product_image(
+    _generated_url = await enhancer.generate_product_image(
         "black rose leather jacket with metallic details",
         model="flux",
     )

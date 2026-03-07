@@ -14,7 +14,6 @@ Works from any subdirectory in the project.
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 

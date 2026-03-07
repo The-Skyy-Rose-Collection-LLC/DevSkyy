@@ -20,7 +20,7 @@ import logging
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".tiff", ".bmp"}
 
 
-class PhotoQuality(str, Enum):
+class PhotoQuality(StrEnum):
     """Overall photo quality rating."""
 
     EXCELLENT = "excellent"  # Ready for 3D generation

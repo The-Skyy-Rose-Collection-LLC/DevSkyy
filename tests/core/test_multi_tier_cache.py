@@ -65,8 +65,10 @@ class TestMultiTierCache:
         # Arrange: mock L2 Redis to have value, L1 is cold
         cached_value = {"sku": "br-002", "price": 89.99}
 
-        with patch.object(cache, "_l2_get", new_callable=AsyncMock) as mock_l2_get, \
-             patch.object(cache, "_l2_set", new_callable=AsyncMock) as mock_l2_set:
+        with (
+            patch.object(cache, "_l2_get", new_callable=AsyncMock) as mock_l2_get,
+            patch.object(cache, "_l2_set", new_callable=AsyncMock) as mock_l2_set,
+        ):
             mock_l2_get.return_value = cached_value
 
             # Act: First get (L1 cold, L2 warm)

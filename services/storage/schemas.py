@@ -10,7 +10,7 @@ Version: 1.0.0
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -20,7 +20,7 @@ from pydantic import BaseModel, Field
 # =============================================================================
 
 
-class RetentionPolicy(str, Enum):
+class RetentionPolicy(StrEnum):
     """Retention policy for asset versions."""
 
     KEEP_ALL = "keep_all"  # Keep all versions forever
@@ -28,7 +28,7 @@ class RetentionPolicy(str, Enum):
     KEEP_DAYS = "keep_days"  # Keep versions for N days
 
 
-class VersionStatus(str, Enum):
+class VersionStatus(StrEnum):
     """Status of an asset version."""
 
     ACTIVE = "active"  # Current version in use

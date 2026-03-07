@@ -25,7 +25,7 @@ from abc import abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import structlog
@@ -97,7 +97,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class SuperAgentType(str, Enum):
+class SuperAgentType(StrEnum):
     """Types of super agents"""
 
     COMMERCE = "commerce"
@@ -108,7 +108,7 @@ class SuperAgentType(str, Enum):
     ANALYTICS = "analytics"
 
 
-class TaskCategory(str, Enum):
+class TaskCategory(StrEnum):
     """Task categories for technique auto-selection"""
 
     REASONING = "reasoning"
@@ -125,7 +125,7 @@ class TaskCategory(str, Enum):
     OPTIMIZATION = "optimization"
 
 
-class LLMProvider(str, Enum):
+class LLMProvider(StrEnum):
     """LLM providers for Round Table"""
 
     CLAUDE = "claude"

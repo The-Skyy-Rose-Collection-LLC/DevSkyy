@@ -25,7 +25,7 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
-from enum import Enum
+from enum import StrEnum
 from functools import wraps
 
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, Response, status
@@ -72,7 +72,7 @@ class VersionConfig:
     include_deprecation_header: bool = True
 
 
-class VersionStatus(str, Enum):
+class VersionStatus(StrEnum):
     """API version lifecycle status"""
 
     CURRENT = "current"  # Latest stable version

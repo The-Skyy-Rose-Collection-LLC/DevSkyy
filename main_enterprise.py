@@ -155,15 +155,15 @@ async def security_headers_middleware(request: Request, call_next):
 # =============================================================================
 
 # Core dashboard & agent routers
-from api.dashboard import dashboard_router
-from api.tasks import tasks_router
-from api.round_table import round_table_router
-from api.brand import brand_router
-from api.tools import tools_router
-from api.three_d import three_d_router
-from api.visual import visual_router
-from api.agents import agents_router
 from api.admin_dashboard import admin_dashboard_router
+from api.agents import agents_router
+from api.brand import brand_router
+from api.dashboard import dashboard_router
+from api.round_table import round_table_router
+from api.tasks import tasks_router
+from api.three_d import three_d_router
+from api.tools import tools_router
+from api.visual import visual_router
 
 app.include_router(dashboard_router, prefix="/api/v1")
 app.include_router(tasks_router, prefix="/api/v1")
@@ -177,9 +177,9 @@ app.include_router(admin_dashboard_router, prefix="/api/v1")
 
 # WordPress & e-commerce
 from api.ar_sessions import ar_sessions_router
-from api.virtual_tryon import virtual_tryon_router
 from api.elementor_3d import elementor_3d_router
 from api.gdpr import gdpr_router
+from api.virtual_tryon import virtual_tryon_router
 from api.webhooks import webhook_router
 from api.websocket import ws_router
 

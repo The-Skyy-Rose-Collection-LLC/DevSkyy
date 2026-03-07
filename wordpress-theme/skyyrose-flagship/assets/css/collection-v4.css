@@ -302,7 +302,7 @@
 
 .col-feat__vis-letter {
 	font-family: 'Cinzel', serif;
-	font-size: 220px;
+	font-size: clamp(80px, 15vw, 220px);
 	color: rgba(var(--col-accent-rgb, 192, 192, 192), .03);
 	transition: all 1.5s;
 	user-select: none;
@@ -360,7 +360,7 @@
 
 .col-feat__price {
 	font-family: 'Bebas Neue', sans-serif;
-	font-size: 52px;
+	font-size: clamp(32px, 4.5vw, 52px);
 	letter-spacing: 4px;
 	color: var(--col-accent, #C0C0C0);
 	margin-bottom: 24px;
@@ -658,7 +658,7 @@
 
 .col-card__letter {
 	font-family: 'Cinzel', serif;
-	font-size: 72px;
+	font-size: clamp(36px, 6vw, 72px);
 	color: rgba(var(--col-accent-rgb, 192, 192, 192), .03);
 	transition: all .8s;
 	user-select: none;
@@ -1061,7 +1061,7 @@
 
 .col-modal__letter {
 	font-family: 'Cinzel', serif;
-	font-size: 96px;
+	font-size: clamp(48px, 8vw, 96px);
 	color: rgba(var(--col-accent-rgb, 192, 192, 192), .03);
 }
 

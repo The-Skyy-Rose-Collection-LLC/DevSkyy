@@ -28,7 +28,7 @@ import uuid
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class ToolCategory(str, Enum):
+class ToolCategory(StrEnum):
     """Tool functional categories."""
 
     CONTENT = "content"
@@ -58,7 +58,7 @@ class ToolCategory(str, Enum):
     SECURITY = "security"
 
 
-class ToolSeverity(str, Enum):
+class ToolSeverity(StrEnum):
     """
     Tool risk/severity levels.
 
@@ -72,7 +72,7 @@ class ToolSeverity(str, Enum):
     DESTRUCTIVE = "destructive"  # Irreversible actions, requires confirmation
 
 
-class ParameterType(str, Enum):
+class ParameterType(StrEnum):
     """JSON Schema parameter types."""
 
     STRING = "string"
@@ -83,7 +83,7 @@ class ParameterType(str, Enum):
     OBJECT = "object"
 
 
-class ExecutionStatus(str, Enum):
+class ExecutionStatus(StrEnum):
     """Tool execution status."""
 
     PENDING = "pending"

@@ -212,7 +212,7 @@
 
 .abt-chapter__num {
 	font-family: 'Bebas Neue', sans-serif;
-	font-size: 180px;
+	font-size: clamp(60px, 12vw, 180px);
 	letter-spacing: 10px;
 	color: rgba(183, 110, 121, 0.03);
 	position: absolute;
@@ -503,7 +503,7 @@
 
 .abt-tl__year {
 	font-family: 'Bebas Neue', sans-serif;
-	font-size: 48px;
+	font-size: clamp(32px, 4vw, 48px);
 	letter-spacing: 4px;
 	color: rgba(183, 110, 121, 0.12);
 	margin-bottom: 8px;
@@ -970,7 +970,6 @@
 	}
 
 	.abt-chapter__num {
-		font-size: 120px;
 		right: 48px;
 	}
 
@@ -1033,7 +1032,6 @@
 	}
 
 	.abt-chapter__num {
-		font-size: 80px;
 		right: 24px;
 		top: 32px;
 	}
@@ -1152,7 +1150,6 @@
 	}
 
 	.abt-chapter__num {
-		font-size: 60px;
 		right: 16px;
 		top: 20px;
 	}

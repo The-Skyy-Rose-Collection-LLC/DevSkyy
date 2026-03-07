@@ -118,7 +118,7 @@ class TestFlagEvaluation:
         """Explicitly whitelisted users always get the feature."""
         manager.create_flag(
             "internal_feature",
-            rollout_percentage=0,   # Disabled for everyone...
+            rollout_percentage=0,  # Disabled for everyone...
             enabled_for_users=["dev@devskyy.com"],  # ...except this user
         )
         assert manager.is_enabled("internal_feature", user_id="dev@devskyy.com") is True
@@ -128,7 +128,7 @@ class TestFlagEvaluation:
         """Explicitly blacklisted users never get the feature."""
         manager.create_flag(
             "new_checkout",
-            rollout_percentage=100,   # Enabled for everyone...
+            rollout_percentage=100,  # Enabled for everyone...
             disabled_for_users=["blocked@example.com"],  # ...except this user
         )
         assert manager.is_enabled("new_checkout", user_id="blocked@example.com") is False
@@ -161,14 +161,10 @@ class TestFlagEvaluation:
         manager.create_flag("half_rollout", rollout_percentage=50)
 
         users = [f"user-{i}" for i in range(1000)]
-        enabled_count = sum(
-            1 for u in users if manager.is_enabled("half_rollout", user_id=u)
-        )
+        enabled_count = sum(1 for u in users if manager.is_enabled("half_rollout", user_id=u))
 
         # Expect roughly 50% — allow ±8% tolerance
-        assert 420 <= enabled_count <= 580, (
-            f"Expected ~500/1000 enabled, got {enabled_count}"
-        )
+        assert 420 <= enabled_count <= 580, f"Expected ~500/1000 enabled, got {enabled_count}"
 
     def test_different_flags_hash_independently(self, manager):
         """

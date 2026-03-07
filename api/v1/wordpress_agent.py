@@ -31,12 +31,8 @@ router = APIRouter(prefix="/agent", tags=["wordpress-agent"])
 class AgentExecuteRequest(BaseModel):
     """Request body for agent execution."""
 
-    intent: str = Field(
-        ..., description="Operation intent (e.g., sync_collection, health_check)"
-    )
-    prompt: str = Field(
-        ..., min_length=1, description="Natural language instruction for the agent"
-    )
+    intent: str = Field(..., description="Operation intent (e.g., sync_collection, health_check)")
+    prompt: str = Field(..., min_length=1, description="Natural language instruction for the agent")
     context: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional context (collection, source, etc.)",
@@ -46,9 +42,7 @@ class AgentExecuteRequest(BaseModel):
 class WebhookDispatchRequest(BaseModel):
     """Request body for WooCommerce webhook dispatch."""
 
-    topic: str = Field(
-        ..., description="Webhook topic (e.g., order.created, order.updated)"
-    )
+    topic: str = Field(..., description="Webhook topic (e.g., order.created, order.updated)")
     payload: dict[str, Any] = Field(
         default_factory=dict, description="Raw webhook payload from WooCommerce"
     )
@@ -128,10 +122,7 @@ async def dispatch_webhook(request: WebhookDispatchRequest):
             "Review and sync if needed."
         )
     else:
-        prompt = (
-            f"Received webhook '{topic}'. "
-            f"Payload summary: {json.dumps(payload)[:500]}"
-        )
+        prompt = f"Received webhook '{topic}'. Payload summary: {json.dumps(payload)[:500]}"
 
     try:
         agent = WordPressBridgeAgent()

@@ -177,9 +177,7 @@ class TestPipelineSavingsEstimation:
             assert savings.orchestration_tokens_saved > 0, (
                 f"{pipeline_type.value} should save tokens"
             )
-            assert savings.savings_pct > 0, (
-                f"{pipeline_type.value} should have positive savings %"
-            )
+            assert savings.savings_pct > 0, f"{pipeline_type.value} should have positive savings %"
 
 
 # ============================================================================
@@ -428,7 +426,9 @@ class TestADKAvailability:
 
 
 @pytest.mark.skipif(
-    not __import__("adk.workflow_agents", fromlist=["ADK_WORKFLOW_AVAILABLE"]).ADK_WORKFLOW_AVAILABLE,
+    not __import__(
+        "adk.workflow_agents", fromlist=["ADK_WORKFLOW_AVAILABLE"]
+    ).ADK_WORKFLOW_AVAILABLE,
     reason="Google ADK not installed",
 )
 class TestWithADK:

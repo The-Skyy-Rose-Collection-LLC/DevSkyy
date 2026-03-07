@@ -63,8 +63,8 @@ class ContentCoreAgent(CoreAgent):
     def _get_legacy_agent(self) -> Any:
         if self._legacy_agent is None:
             try:
-                from agents.skyyrose_content_agent import SkyyRoseContentAgent
                 from adk.base import AgentConfig
+                from agents.skyyrose_content_agent import SkyyRoseContentAgent
 
                 config = AgentConfig(name="content", description="Content operations")
                 self._legacy_agent = SkyyRoseContentAgent(config)

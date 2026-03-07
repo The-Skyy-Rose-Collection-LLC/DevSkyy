@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -62,7 +62,7 @@ router = APIRouter(prefix="/brand-assets", tags=["Brand Assets"])
 # =============================================================================
 
 
-class BrandAssetCategory(str, Enum):
+class BrandAssetCategory(StrEnum):
     """Category of brand asset."""
 
     PRODUCT = "product"
@@ -73,7 +73,7 @@ class BrandAssetCategory(str, Enum):
     COLOR_REFERENCE = "color_reference"
 
 
-class AssetApprovalStatus(str, Enum):
+class AssetApprovalStatus(StrEnum):
     """Approval status for brand assets."""
 
     PENDING = "pending"
@@ -81,7 +81,7 @@ class AssetApprovalStatus(str, Enum):
     REJECTED = "rejected"
 
 
-class IngestionJobStatus(str, Enum):
+class IngestionJobStatus(StrEnum):
     """Status of bulk ingestion job."""
 
     PENDING = "pending"
@@ -91,7 +91,7 @@ class IngestionJobStatus(str, Enum):
     PARTIAL = "partial"
 
 
-class TrainingReadinessStatus(str, Enum):
+class TrainingReadinessStatus(StrEnum):
     """Training readiness status."""
 
     READY = "ready"

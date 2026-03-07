@@ -158,9 +158,9 @@ def write_rotation_log(backup_dir: Path, changes: dict[str, str]) -> None:
     timestamp = datetime.now(UTC).isoformat()
 
     with open(log_path, "a") as f:
-        f.write(f"\n{'='*60}\n")
+        f.write(f"\n{'=' * 60}\n")
         f.write(f"Rotation Event: {timestamp}\n")
-        f.write(f"{'='*60}\n")
+        f.write(f"{'=' * 60}\n")
         f.write(
             f"ENCRYPTION_MASTER_KEY: {'rotated' if changes['old_encryption_key'] else 'added'}\n"
         )

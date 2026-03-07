@@ -4,6 +4,7 @@ The @tool decorator from claude_agent_sdk wraps each function into an
 SdkMcpTool object. The original async function is accessible via the
 .handler attribute.
 """
+
 from __future__ import annotations
 
 import json
@@ -139,9 +140,7 @@ class TestWordPressCoreTools:
         ):
             from agents.wordpress_bridge.mcp_server import wp_update_order
 
-            result = await wp_update_order.handler(
-                {"order_id": 100, "status": "completed"}
-            )
+            result = await wp_update_order.handler({"order_id": 100, "status": "completed"})
 
         assert "is_error" not in result
         text = result["content"][0]["text"]
@@ -551,9 +550,7 @@ class TestPipelineBridgeTools:
 
     def test_create_wordpress_tools_returns_server(self):
         """create_wordpress_tools should return a configured MCP server with 15 tools."""
-        with patch(
-            "agents.wordpress_bridge.mcp_server.create_sdk_mcp_server"
-        ) as mock_create:
+        with patch("agents.wordpress_bridge.mcp_server.create_sdk_mcp_server") as mock_create:
             mock_create.return_value = MagicMock(name="wordpress_bridge")
             from agents.wordpress_bridge.mcp_server import create_wordpress_tools
 
@@ -645,9 +642,7 @@ class TestWordPressAgentEndpoint:
 
     def test_execute_endpoint_rejects_empty_prompt(self, client):
         """Should return 422 for empty prompt."""
-        response = client.post(
-            "/api/v1/agent/execute", json={"intent": "test", "prompt": ""}
-        )
+        response = client.post("/api/v1/agent/execute", json={"intent": "test", "prompt": ""})
         assert response.status_code == 422
 
     def test_execute_endpoint_returns_sse_stream(self, client):
@@ -694,7 +689,7 @@ class TestWordPressAgentEndpoint:
 
         async def mock_run_agent(prompt, **kwargs):
             raise RuntimeError("Agent crashed")
-            yield  # noqa: unreachable — makes this an async generator
+            yield  # noqa: F541, E501 — makes this an async generator
 
         with patch("api.v1.wordpress_agent.run_agent", mock_run_agent):
             response = client.post(
@@ -707,9 +702,7 @@ class TestWordPressAgentEndpoint:
 
     def test_webhook_dispatch_formats_order(self, client):
         """Webhook dispatch should format order topic correctly."""
-        mock_execute = AsyncMock(
-            return_value={"result": "Order processed", "session_id": "s-1"}
-        )
+        mock_execute = AsyncMock(return_value={"result": "Order processed", "session_id": "s-1"})
 
         with patch("api.v1.wordpress_agent.WordPressBridgeAgent") as MockAgent:
             instance = MockAgent.return_value
@@ -721,9 +714,7 @@ class TestWordPressAgentEndpoint:
                     "payload": {
                         "id": 1234,
                         "total": "178.00",
-                        "line_items": [
-                            {"name": "Black Rose Sherpa", "quantity": 2}
-                        ],
+                        "line_items": [{"name": "Black Rose Sherpa", "quantity": 2}],
                     },
                 },
             )
@@ -737,9 +728,7 @@ class TestWordPressAgentEndpoint:
 
     def test_webhook_dispatch_handles_product_topic(self, client):
         """Webhook dispatch should handle product topics."""
-        mock_execute = AsyncMock(
-            return_value={"result": "Synced", "session_id": "s-2"}
-        )
+        mock_execute = AsyncMock(return_value={"result": "Synced", "session_id": "s-2"})
 
         with patch("api.v1.wordpress_agent.WordPressBridgeAgent") as MockAgent:
             instance = MockAgent.return_value
@@ -757,9 +746,7 @@ class TestWordPressAgentEndpoint:
 
     def test_webhook_dispatch_handles_unknown_topic(self, client):
         """Webhook dispatch should handle unknown topics gracefully."""
-        mock_execute = AsyncMock(
-            return_value={"result": "Handled", "session_id": "s-3"}
-        )
+        mock_execute = AsyncMock(return_value={"result": "Handled", "session_id": "s-3"})
 
         with patch("api.v1.wordpress_agent.WordPressBridgeAgent") as MockAgent:
             instance = MockAgent.return_value

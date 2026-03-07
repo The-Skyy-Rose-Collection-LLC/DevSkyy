@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Unified AI CLI for SkyyRose — training, datasets, Spaces, models."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -260,7 +261,9 @@ def model_info(name: str):
 
 
 @model_app.command("download")
-def model_download(name: str, output: str = typer.Option("./models", help="Local output directory")):
+def model_download(
+    name: str, output: str = typer.Option("./models", help="Local output directory")
+):
     """Download model from Hub to local directory."""
     repo_id = f"{config.hf_user}/{name}" if "/" not in name else name
     local_dir = snapshot_download(

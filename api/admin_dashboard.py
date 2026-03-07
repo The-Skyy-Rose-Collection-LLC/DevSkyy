@@ -18,7 +18,7 @@ Version: 1.0.0
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -39,7 +39,7 @@ require_admin = RoleChecker([UserRole.ADMIN])
 # =============================================================================
 
 
-class AssetType(str, Enum):
+class AssetType(StrEnum):
     """Types of assets managed by the platform."""
 
     MODEL_3D = "3d_model"
@@ -48,7 +48,7 @@ class AssetType(str, Enum):
     TEXTURE = "texture"
 
 
-class AssetStatus(str, Enum):
+class AssetStatus(StrEnum):
     """Status of an asset in the pipeline."""
 
     PENDING = "pending"
@@ -58,7 +58,7 @@ class AssetStatus(str, Enum):
     ARCHIVED = "archived"
 
 
-class PipelineType(str, Enum):
+class PipelineType(StrEnum):
     """Types of processing pipelines."""
 
     MODEL_GENERATION = "model_generation"
@@ -67,7 +67,7 @@ class PipelineType(str, Enum):
     SYNC = "sync"
 
 
-class PipelineStatus(str, Enum):
+class PipelineStatus(StrEnum):
     """Status of a pipeline run."""
 
     QUEUED = "queued"
@@ -77,7 +77,7 @@ class PipelineStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class SyncChannel(str, Enum):
+class SyncChannel(StrEnum):
     """E-commerce sync channels."""
 
     WORDPRESS = "wordpress"
@@ -85,7 +85,7 @@ class SyncChannel(str, Enum):
     SHOPIFY = "shopify"
 
 
-class SyncStatus(str, Enum):
+class SyncStatus(StrEnum):
     """Status of a sync operation."""
 
     PENDING = "pending"
@@ -688,7 +688,7 @@ async def get_ai_provider_status(
     card = bridge.to_dashboard_card()
 
     providers = []
-    for wp_id, info in card.get("providers", {}).items():
+    for wp_id, _info in card.get("providers", {}).items():
         providers.append(
             AIProviderStatus(
                 provider=wp_id,

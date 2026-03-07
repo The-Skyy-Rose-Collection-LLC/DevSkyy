@@ -19,7 +19,7 @@ Version: 1.0.0
 
 import logging
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -27,7 +27,7 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger(__name__)
 
 
-class SecurityEventType(str, Enum):
+class SecurityEventType(StrEnum):
     """Security-specific webhook event types"""
 
     # Authentication Events
@@ -71,7 +71,7 @@ class SecurityEventType(str, Enum):
     PRIVILEGE_ESCALATION = "security.privilege.escalation"
 
 
-class SecurityEventSeverity(str, Enum):
+class SecurityEventSeverity(StrEnum):
     """Security event severity levels"""
 
     CRITICAL = "critical"  # Immediate action required

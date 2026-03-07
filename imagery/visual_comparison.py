@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 import numpy as np
@@ -50,7 +50,7 @@ except ImportError:
     logger.warning("OpenCV not available. Color histogram comparison disabled.")
 
 
-class ComparisonConfidence(str, Enum):
+class ComparisonConfidence(StrEnum):
     """Confidence level of comparison result."""
 
     HIGH = "high"

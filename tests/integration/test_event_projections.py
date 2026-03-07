@@ -1,9 +1,11 @@
 """Integration tests for CQRS event projections."""
-import json
-import pytest
+
 from unittest.mock import AsyncMock, MagicMock, patch
-from core.events.event_store import Event
+
+import pytest
+
 from core.events.event_handlers import ProductEventHandler
+from core.events.event_store import Event
 
 
 @pytest.fixture
@@ -72,8 +74,7 @@ class TestProductCreatedProjection:
             },
         )
 
-        with patch(PATCH_DB, return_value=mock_db), \
-             patch(PATCH_CACHE, new_callable=AsyncMock):
+        with patch(PATCH_DB, return_value=mock_db), patch(PATCH_CACHE, new_callable=AsyncMock):
             await handler.handle(event)
 
         # Verify a new product was added to the session
@@ -90,8 +91,7 @@ class TestProductPriceChangedProjection:
             data={"new_price": 89.99},
         )
 
-        with patch(PATCH_DB, return_value=mock_db), \
-             patch(PATCH_CACHE, new_callable=AsyncMock):
+        with patch(PATCH_DB, return_value=mock_db), patch(PATCH_CACHE, new_callable=AsyncMock):
             await handler.handle(event)
 
         assert mock_product.price == 89.99
@@ -109,8 +109,7 @@ class TestProductDeactivatedProjection:
             data={},
         )
 
-        with patch(PATCH_DB, return_value=mock_db), \
-             patch(PATCH_CACHE, new_callable=AsyncMock):
+        with patch(PATCH_DB, return_value=mock_db), patch(PATCH_CACHE, new_callable=AsyncMock):
             await handler.handle(event)
 
         assert mock_product.is_active is False
@@ -128,8 +127,7 @@ class TestProductActivatedProjection:
             data={},
         )
 
-        with patch(PATCH_DB, return_value=mock_db), \
-             patch(PATCH_CACHE, new_callable=AsyncMock):
+        with patch(PATCH_DB, return_value=mock_db), patch(PATCH_CACHE, new_callable=AsyncMock):
             await handler.handle(event)
 
         assert mock_product.is_active is True
@@ -145,8 +143,7 @@ class TestProductNameChangedProjection:
             data={"name": "New Name"},
         )
 
-        with patch(PATCH_DB, return_value=mock_db), \
-             patch(PATCH_CACHE, new_callable=AsyncMock):
+        with patch(PATCH_DB, return_value=mock_db), patch(PATCH_CACHE, new_callable=AsyncMock):
             await handler.handle(event)
 
         assert mock_product.name == "New Name"
@@ -163,8 +160,7 @@ class TestFieldWhitelist:
     @pytest.mark.asyncio
     async def test_accepts_allowed_field(self, handler, mock_db, mock_product):
         """_update_product_field should accept whitelisted fields."""
-        with patch(PATCH_DB, return_value=mock_db), \
-             patch(PATCH_CACHE, new_callable=AsyncMock):
+        with patch(PATCH_DB, return_value=mock_db), patch(PATCH_CACHE, new_callable=AsyncMock):
             await handler._update_product_field("prod-001", "description", "New desc")
 
         assert mock_product.description == "New desc"

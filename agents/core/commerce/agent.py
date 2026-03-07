@@ -76,8 +76,8 @@ class CommerceCoreAgent(CoreAgent):
         """Lazy-load the existing CommerceAgent."""
         if self._legacy_agent is None:
             try:
-                from agents.commerce_agent import CommerceAgent
                 from adk.base import AgentConfig
+                from agents.commerce_agent import CommerceAgent
 
                 config = AgentConfig(
                     name="commerce",

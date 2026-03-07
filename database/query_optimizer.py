@@ -103,8 +103,7 @@ class QueryOptimizer:
                         max_time_ms = float(time_part.split("..")[1])
                         if max_time_ms > 100:
                             logger.warning(
-                                f"Slow query detected ({max_time_ms:.1f}ms): "
-                                f"{sql[:100]}..."
+                                f"Slow query detected ({max_time_ms:.1f}ms): {sql[:100]}..."
                             )
                     except (IndexError, ValueError):
                         pass

@@ -18,16 +18,18 @@ from core.model_router import ModelRouter, RoutingConfig
 
 @pytest.fixture
 def routing_config():
-    return RoutingConfig.from_dict({
-        "routes": {
-            "frontend_dev": {"provider": "anthropic", "model": "claude-sonnet-4-6"},
-            "design_system": {"provider": "google", "model": "gemini-3-pro-preview"},
-        },
-        "fallbacks": {
-            "anthropic": {"provider": "google", "model": "gemini-3-pro-preview"},
-            "google": {"provider": "anthropic", "model": "claude-sonnet-4-6"},
-        },
-    })
+    return RoutingConfig.from_dict(
+        {
+            "routes": {
+                "frontend_dev": {"provider": "anthropic", "model": "claude-sonnet-4-6"},
+                "design_system": {"provider": "google", "model": "gemini-3-pro-preview"},
+            },
+            "fallbacks": {
+                "anthropic": {"provider": "google", "model": "gemini-3-pro-preview"},
+                "google": {"provider": "anthropic", "model": "claude-sonnet-4-6"},
+            },
+        }
+    )
 
 
 @pytest.fixture
@@ -95,12 +97,14 @@ class TestBuildMessages:
     def test_includes_learning_context(self, runtime, frontend_spec, journal):
         from core.learning_journal import JournalEntry
 
-        journal.add_entry(JournalEntry(
-            mistake="Used hardcoded colors",
-            correct="Use CSS custom properties",
-            agent="frontend_dev",
-            story_id="US-001",
-        ))
+        journal.add_entry(
+            JournalEntry(
+                mistake="Used hardcoded colors",
+                correct="Use CSS custom properties",
+                agent="frontend_dev",
+                story_id="US-001",
+            )
+        )
 
         messages = runtime._build_messages(frontend_spec, "Style the header")
         system_content = messages[0].content

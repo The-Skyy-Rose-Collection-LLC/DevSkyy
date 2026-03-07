@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from core.cost_tracker import CostTracker, CostSummary, TokenRecord
+from core.cost_tracker import CostSummary, CostTracker, TokenRecord
 
 
 class TestComputeCost:
@@ -98,6 +98,7 @@ class TestSummary:
 class TestToDict:
     def test_serializable(self) -> None:
         import json
+
         tracker = CostTracker()
         tracker.record("US-001", "anthropic", "claude-sonnet-4-6", 1000, 2000)
         data = tracker.to_dict()

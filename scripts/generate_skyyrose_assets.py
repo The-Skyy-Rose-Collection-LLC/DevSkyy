@@ -115,7 +115,7 @@ CONSTRUCTION DETAILS:
 - Base garment: {garment_base}
 - Style elements: {base_style}
 - Design keywords: {keywords}
-- Color specification: {colors if colors else 'as described'}
+- Color specification: {colors if colors else "as described"}
 
 CRITICAL REQUIREMENTS FOR EXACT REPLICA:
 1. Hyper-realistic fabric texture with visible weave/knit pattern

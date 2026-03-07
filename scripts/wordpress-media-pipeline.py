@@ -40,11 +40,11 @@ class WordPressMediaPipeline:
         enhancer: LuxuryImageEnhancer,
         output_dir: str | None = None,
     ):
-        self.wp_url = wp_url.rstrip('/')
+        self.wp_url = wp_url.rstrip("/")
         self.wp_username = wp_username
         self.wp_password = wp_password
         self.enhancer = enhancer
-        self.output_dir = Path(output_dir) if output_dir else Path('./enhanced_media')
+        self.output_dir = Path(output_dir) if output_dir else Path("./enhanced_media")
         self.output_dir.mkdir(exist_ok=True)
 
         # WordPress REST API endpoints
@@ -70,9 +70,9 @@ class WordPressMediaPipeline:
             response = requests.get(
                 self.media_endpoint,
                 params={
-                    'per_page': per_page,
-                    'page': page,
-                    'media_type': 'image',
+                    "per_page": per_page,
+                    "page": page,
+                    "media_type": "image",
                 },
                 auth=(self.wp_username, self.wp_password),
             )
@@ -90,7 +90,7 @@ class WordPressMediaPipeline:
             page += 1
 
             # Check if there are more pages
-            total_pages = int(response.headers.get('X-WP-TotalPages', 1))
+            total_pages = int(response.headers.get("X-WP-TotalPages", 1))
             if page > total_pages:
                 break
 
@@ -135,7 +135,7 @@ class WordPressMediaPipeline:
         try:
             response = requests.post(
                 f"{self.media_endpoint}/{media_id}",
-                json={'meta': metadata},
+                json={"meta": metadata},
                 auth=(self.wp_username, self.wp_password),
             )
 
@@ -155,9 +155,9 @@ class WordPressMediaPipeline:
         Returns:
             Processing result
         """
-        media_id = media_item['id']
-        title = media_item['title']['rendered']
-        source_url = media_item['source_url']
+        media_id = media_item["id"]
+        title = media_item["title"]["rendered"]
+        source_url = media_item["source_url"]
 
         print(f"Processing: {title} (ID: {media_id})")
 
@@ -167,10 +167,10 @@ class WordPressMediaPipeline:
 
         if not local_path:
             return {
-                'id': media_id,
-                'title': title,
-                'success': False,
-                'error': 'Download failed',
+                "id": media_id,
+                "title": title,
+                "success": False,
+                "error": "Download failed",
             }
 
         try:
@@ -183,27 +183,27 @@ class WordPressMediaPipeline:
 
             # Update WordPress metadata
             metadata = {
-                '_skyyrose_enhancement_status': 'completed',
-                '_skyyrose_enhanced_at': '',
-                '_skyyrose_blurhash': blurhash_result.get('fast_prompt', ''),
+                "_skyyrose_enhancement_status": "completed",
+                "_skyyrose_enhanced_at": "",
+                "_skyyrose_blurhash": blurhash_result.get("fast_prompt", ""),
             }
 
             self.update_media_metadata(media_id, metadata)
 
             return {
-                'id': media_id,
-                'title': title,
-                'success': True,
-                'enhanced_path': enhanced_path,
-                'blurhash': blurhash_result.get('fast_prompt', ''),
+                "id": media_id,
+                "title": title,
+                "success": True,
+                "enhanced_path": enhanced_path,
+                "blurhash": blurhash_result.get("fast_prompt", ""),
             }
 
         except Exception as e:
             return {
-                'id': media_id,
-                'title': title,
-                'success': False,
-                'error': str(e),
+                "id": media_id,
+                "title": title,
+                "success": False,
+                "error": str(e),
             }
 
     async def process_all_media(
@@ -248,19 +248,19 @@ class WordPressMediaPipeline:
             results: List of processing results
         """
         total = len(results)
-        success = sum(1 for r in results if r['success'])
+        success = sum(1 for r in results if r["success"])
         failed = total - success
 
         print("\n" + "=" * 60)
         print("PROCESSING REPORT")
         print("=" * 60)
         print(f"Total images processed: {total}")
-        print(f"Successfully enhanced: {success} ({success/total*100:.1f}%)")
-        print(f"Failed: {failed} ({failed/total*100:.1f}%)")
+        print(f"Successfully enhanced: {success} ({success / total * 100:.1f}%)")
+        print(f"Failed: {failed} ({failed / total * 100:.1f}%)")
         print("=" * 60)
 
         # Save detailed report
-        report_path = self.output_dir / 'enhancement_report.json'
+        report_path = self.output_dir / "enhancement_report.json"
         report_path.write_text(json.dumps(results, indent=2))
         print(f"\nDetailed report saved to: {report_path}")
 
@@ -268,57 +268,57 @@ class WordPressMediaPipeline:
 async def main():
     """Main entry point"""
     parser = argparse.ArgumentParser(
-        description='Batch process WordPress media with AI enhancement'
+        description="Batch process WordPress media with AI enhancement"
     )
     parser.add_argument(
-        '--wp-url',
+        "--wp-url",
         required=True,
-        help='WordPress site URL (e.g., https://skyyrose.co)',
+        help="WordPress site URL (e.g., https://skyyrose.co)",
     )
     parser.add_argument(
-        '--wp-username',
+        "--wp-username",
         required=True,
-        help='WordPress username',
+        help="WordPress username",
     )
     parser.add_argument(
-        '--wp-password',
+        "--wp-password",
         required=True,
-        help='WordPress application password',
+        help="WordPress application password",
     )
     parser.add_argument(
-        '--output-dir',
-        default='./enhanced_media',
-        help='Output directory for enhanced images',
+        "--output-dir",
+        default="./enhanced_media",
+        help="Output directory for enhanced images",
     )
     parser.add_argument(
-        '--replicate-key',
-        help='Replicate API key',
+        "--replicate-key",
+        help="Replicate API key",
     )
     parser.add_argument(
-        '--fal-key',
-        help='FAL API key',
+        "--fal-key",
+        help="FAL API key",
     )
     parser.add_argument(
-        '--stability-key',
-        help='Stability AI API key',
+        "--stability-key",
+        help="Stability AI API key",
     )
     parser.add_argument(
-        '--together-key',
-        help='Together AI API key',
+        "--together-key",
+        help="Together AI API key",
     )
     parser.add_argument(
-        '--runway-key',
-        help='RunwayML API key',
+        "--runway-key",
+        help="RunwayML API key",
     )
     parser.add_argument(
-        '--remove-bg',
-        action='store_true',
-        help='Remove backgrounds from images',
+        "--remove-bg",
+        action="store_true",
+        help="Remove backgrounds from images",
     )
     parser.add_argument(
-        '--upscale',
-        action='store_true',
-        help='Upscale images 4x',
+        "--upscale",
+        action="store_true",
+        help="Upscale images 4x",
     )
 
     args = parser.parse_args()
@@ -353,5 +353,5 @@ async def main():
     pipeline.generate_report(results)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

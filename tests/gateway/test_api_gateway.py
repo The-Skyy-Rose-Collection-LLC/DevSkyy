@@ -47,7 +47,9 @@ class TestCircuitBreaker:
 
     def test_success_in_half_open_closes_circuit(self):
         """A success in HALF_OPEN state transitions circuit back to CLOSED."""
-        cb = CircuitBreaker(name="test", failure_threshold=0.5, window_size=4, recovery_timeout=0.01)
+        cb = CircuitBreaker(
+            name="test", failure_threshold=0.5, window_size=4, recovery_timeout=0.01
+        )
 
         # Trip circuit
         for _ in range(4):
@@ -64,7 +66,9 @@ class TestCircuitBreaker:
 
     def test_failure_in_half_open_reopens_circuit(self):
         """A failure in HALF_OPEN state re-opens the circuit immediately."""
-        cb = CircuitBreaker(name="test", failure_threshold=0.5, window_size=4, recovery_timeout=0.01)
+        cb = CircuitBreaker(
+            name="test", failure_threshold=0.5, window_size=4, recovery_timeout=0.01
+        )
 
         # Trip circuit
         for _ in range(4):

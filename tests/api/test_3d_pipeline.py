@@ -85,7 +85,6 @@ class TestBatchGeneration:
     async def test_batch_generation_quality_tiers(self, client, auth_headers):
         """Test different quality tiers."""
         for quality in ["draft", "standard", "high"]:
-
             response = await client.post(
                 "/api/v1/pipeline/batch-generate",
                 json={"asset_ids": ["asset-1"], "provider": "tripo", "quality": quality},

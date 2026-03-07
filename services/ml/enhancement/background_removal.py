@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import hashlib
 import logging
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import httpx
@@ -53,7 +53,7 @@ FALLBACK_MODELS = [
 # =============================================================================
 
 
-class BackgroundType(str, Enum):
+class BackgroundType(StrEnum):
     """Background replacement type."""
 
     TRANSPARENT = "transparent"

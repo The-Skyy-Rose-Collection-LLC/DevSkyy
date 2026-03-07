@@ -6,7 +6,6 @@ Resolver functions for product queries using DataLoader for efficient batching.
 List queries use @cached (5 min TTL) to avoid repeated DB calls for the same filters.
 """
 
-
 from sqlalchemy import select
 
 from core.caching.multi_tier_cache import cached

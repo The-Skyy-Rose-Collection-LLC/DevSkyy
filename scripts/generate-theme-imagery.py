@@ -290,6 +290,7 @@ MASCOT_IMAGES = [
 
 # ── Generation Engine ───────────────────────────────────────────────────────
 
+
 def init_client():
     """Initialize Google GenAI client."""
     try:
@@ -317,7 +318,15 @@ def init_client():
     return client, GenerateContentConfig, ImageConfig
 
 
-def generate_image(client, GenerateContentConfig, ImageConfig, prompt, output_path, aspect_ratio="1:1", reference_image=None):
+def generate_image(
+    client,
+    GenerateContentConfig,
+    ImageConfig,
+    prompt,
+    output_path,
+    aspect_ratio="1:1",
+    reference_image=None,
+):
     """Generate a single image with retry logic."""
     from PIL import Image
 
@@ -383,7 +392,13 @@ def generate_image(client, GenerateContentConfig, ImageConfig, prompt, output_pa
                 time.sleep(RETRY_DELAY_SEC)
                 continue
 
-            log.info("  SUCCESS: %s (%.1f KB, %dx%d)", output_path.name, file_size_kb, img.width, img.height)
+            log.info(
+                "  SUCCESS: %s (%.1f KB, %dx%d)",
+                output_path.name,
+                file_size_kb,
+                img.width,
+                img.height,
+            )
             return True
 
         except Exception as e:
@@ -423,8 +438,13 @@ def run_category(client, GenerateContentConfig, ImageConfig, images, category_na
 
         ref_image = img_def.get("reference_image")
         success = generate_image(
-            client, GenerateContentConfig, ImageConfig,
-            img_def["prompt"], output_path, aspect, ref_image,
+            client,
+            GenerateContentConfig,
+            ImageConfig,
+            img_def["prompt"],
+            output_path,
+            aspect,
+            ref_image,
         )
 
         if success:
@@ -441,14 +461,18 @@ def run_category(client, GenerateContentConfig, ImageConfig, images, category_na
     log.info("-" * 40)
     log.info(
         "RESULTS: %d success, %d failed, %d skipped",
-        results["success"], results["failed"], results["skipped"],
+        results["success"],
+        results["failed"],
+        results["skipped"],
     )
     return results
 
 
 def main():
     parser = argparse.ArgumentParser(description="Generate SkyyRose theme imagery")
-    parser.add_argument("--category", choices=["about", "instagram", "mascot"], help="Generate specific category")
+    parser.add_argument(
+        "--category", choices=["about", "instagram", "mascot"], help="Generate specific category"
+    )
     parser.add_argument("--all", action="store_true", help="Generate all categories")
     parser.add_argument("--dry-run", action="store_true", help="List what would be generated")
     args = parser.parse_args()
@@ -474,14 +498,18 @@ def main():
 
     for cat in run_list:
         images, label = categories[cat]
-        results = run_category(client, GenerateContentConfig, ImageConfig, images, label, dry_run=args.dry_run)
+        results = run_category(
+            client, GenerateContentConfig, ImageConfig, images, label, dry_run=args.dry_run
+        )
         for k in total:
             total[k] += results[k]
 
     log.info("=" * 60)
     log.info(
         "TOTAL: %d success, %d failed, %d skipped (of %d)",
-        total["success"], total["failed"], total["skipped"],
+        total["success"],
+        total["failed"],
+        total["skipped"],
         total["success"] + total["failed"] + total["skipped"],
     )
     log.info("=" * 60)

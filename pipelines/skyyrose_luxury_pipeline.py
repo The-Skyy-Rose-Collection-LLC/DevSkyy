@@ -13,7 +13,7 @@ import json
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -22,7 +22,7 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger(__name__)
 
 
-class DeploymentStage(str, Enum):
+class DeploymentStage(StrEnum):
     """Pipeline deployment stages."""
 
     PHOTOGRAPHY = "photography"
@@ -35,7 +35,7 @@ class DeploymentStage(str, Enum):
     COMPLETE = "complete"
 
 
-class QualityLevel(str, Enum):
+class QualityLevel(StrEnum):
     """Quality level presets."""
 
     DRAFT = "draft"

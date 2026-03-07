@@ -40,9 +40,19 @@ class TestStreamProcessorEventDispatch:
         product_interest[product_id][interaction_type]
         """
         p = _make_processor()
-        await p.process_event({"type": "product_interaction", "product_id": "br-001", "interaction_type": "view"})
-        await p.process_event({"type": "product_interaction", "product_id": "br-001", "interaction_type": "add_to_cart"})
-        await p.process_event({"type": "product_interaction", "product_id": "br-001", "interaction_type": "view"})
+        await p.process_event(
+            {"type": "product_interaction", "product_id": "br-001", "interaction_type": "view"}
+        )
+        await p.process_event(
+            {
+                "type": "product_interaction",
+                "product_id": "br-001",
+                "interaction_type": "add_to_cart",
+            }
+        )
+        await p.process_event(
+            {"type": "product_interaction", "product_id": "br-001", "interaction_type": "view"}
+        )
 
         stats = p.get_stats()
         br001 = stats["product_interest"]["br-001"]
@@ -54,18 +64,22 @@ class TestStreamProcessorEventDispatch:
         order_completed events aggregate revenue into hour-level buckets.
         """
         p = _make_processor()
-        await p.process_event({
-            "type": "order_completed",
-            "order_id": "ord-1",
-            "amount": 79.99,
-            "timestamp": "2026-02-20T14:35:00",
-        })
-        await p.process_event({
-            "type": "order_completed",
-            "order_id": "ord-2",
-            "amount": 120.00,
-            "timestamp": "2026-02-20T14:50:00",
-        })
+        await p.process_event(
+            {
+                "type": "order_completed",
+                "order_id": "ord-1",
+                "amount": 79.99,
+                "timestamp": "2026-02-20T14:35:00",
+            }
+        )
+        await p.process_event(
+            {
+                "type": "order_completed",
+                "order_id": "ord-2",
+                "amount": 120.00,
+                "timestamp": "2026-02-20T14:50:00",
+            }
+        )
 
         stats = p.get_stats()
         hour_14 = stats["revenue_by_hour"]["2026-02-20T14"]

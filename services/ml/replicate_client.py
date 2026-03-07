@@ -26,7 +26,7 @@ import os
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import httpx
@@ -114,7 +114,7 @@ class ReplicateTimeoutError(ReplicateError):
 # =============================================================================
 
 
-class ReplicatePredictionStatus(str, Enum):
+class ReplicatePredictionStatus(StrEnum):
     """Status of a Replicate prediction."""
 
     STARTING = "starting"

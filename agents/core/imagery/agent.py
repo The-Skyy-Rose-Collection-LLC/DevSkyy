@@ -67,8 +67,8 @@ class ImageryCoreAgent(CoreAgent):
     def _get_legacy_imagery(self) -> Any:
         if self._legacy_imagery is None:
             try:
-                from agents.skyyrose_imagery_agent import SkyyRoseImageryAgent
                 from adk.base import AgentConfig
+                from agents.skyyrose_imagery_agent import SkyyRoseImageryAgent
 
                 config = AgentConfig(name="imagery", description="Imagery operations")
                 self._legacy_imagery = SkyyRoseImageryAgent(config)

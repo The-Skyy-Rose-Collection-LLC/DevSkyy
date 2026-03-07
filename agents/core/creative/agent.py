@@ -55,8 +55,8 @@ class CreativeCoreAgent(CoreAgent):
     def _get_legacy_agent(self) -> Any:
         if self._legacy_agent is None:
             try:
-                from agents.creative_agent import CreativeAgent
                 from adk.base import AgentConfig
+                from agents.creative_agent import CreativeAgent
 
                 config = AgentConfig(name="creative", description="Creative operations")
                 self._legacy_agent = CreativeAgent(config)

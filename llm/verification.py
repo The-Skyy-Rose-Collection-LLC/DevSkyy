@@ -18,7 +18,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class VerificationDecision(str, Enum):
+class VerificationDecision(StrEnum):
     """Verification result decision."""
 
     APPROVED = "approved"  # Code is production-ready
@@ -40,7 +40,7 @@ class VerificationDecision(str, Enum):
     NEEDS_FIXES = "needs_fixes"  # Code has minor issues, provide fixes
 
 
-class IssueLevel(str, Enum):
+class IssueLevel(StrEnum):
     """Severity level of code issues."""
 
     CRITICAL = "critical"  # Security, correctness, breaking changes

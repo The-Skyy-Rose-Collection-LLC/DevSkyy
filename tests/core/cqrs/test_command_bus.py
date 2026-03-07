@@ -111,6 +111,7 @@ class TestCommandBus:
         If a handler raises ValueError (validation failure),
         the CommandBus propagates it. No events are persisted.
         """
+
         async def strict_handler(cmd: Command):
             if not cmd.data.get("sku"):
                 raise ValueError("sku is required")

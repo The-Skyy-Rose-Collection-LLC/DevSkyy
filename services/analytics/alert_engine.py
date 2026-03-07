@@ -25,7 +25,7 @@ import logging
 import uuid
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Protocol
 
 from pydantic import BaseModel, Field
@@ -56,7 +56,7 @@ DEFAULT_COOLDOWN_SECONDS = 300
 # =============================================================================
 
 
-class ConditionType(str, Enum):
+class ConditionType(StrEnum):
     """Types of alert conditions."""
 
     THRESHOLD = "threshold"
@@ -64,7 +64,7 @@ class ConditionType(str, Enum):
     RATE = "rate"
 
 
-class ConditionOperator(str, Enum):
+class ConditionOperator(StrEnum):
     """Operators for condition evaluation."""
 
     GT = "gt"
@@ -75,7 +75,7 @@ class ConditionOperator(str, Enum):
     NEQ = "neq"
 
 
-class AlertSeverity(str, Enum):
+class AlertSeverity(StrEnum):
     """Alert severity levels."""
 
     INFO = "info"
@@ -83,7 +83,7 @@ class AlertSeverity(str, Enum):
     CRITICAL = "critical"
 
 
-class AlertStatus(str, Enum):
+class AlertStatus(StrEnum):
     """Alert status values."""
 
     TRIGGERED = "triggered"
@@ -356,7 +356,8 @@ class AlertEvaluationEngine:
         configs: list[AlertConfig] = []
 
         async with self._session_factory() as session:
-            result = await session.execute(text("""
+            result = await session.execute(
+                text("""
                     SELECT id, name, description, metric_name, condition_type,
                            condition_operator, threshold_value, threshold_unit,
                            window_duration_seconds, evaluation_interval_seconds,
@@ -365,7 +366,8 @@ class AlertEvaluationEngine:
                            created_by, updated_by, created_at, updated_at
                     FROM alert_configs
                     WHERE is_enabled = true
-                """))
+                """)
+            )
             rows = result.fetchall()
 
             for row in rows:

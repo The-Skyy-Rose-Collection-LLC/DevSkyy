@@ -27,8 +27,8 @@ import uuid
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
-from enum import Enum
-from typing import Any, Optional
+from enum import StrEnum
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +48,7 @@ BRAND_ORIGIN = "Oakland, CA"
 BRAND_SITE = "skyyrose.co"
 
 
-class Platform(str, Enum):
+class Platform(StrEnum):
     """Supported social media platforms."""
 
     INSTAGRAM = "instagram"
@@ -57,7 +57,7 @@ class Platform(str, Enum):
     FACEBOOK = "facebook"
 
 
-class ContentType(str, Enum):
+class ContentType(StrEnum):
     """Social media content types."""
 
     PRODUCT_LAUNCH = "product_launch"
@@ -67,7 +67,7 @@ class ContentType(str, Enum):
     ENGAGEMENT = "engagement"
 
 
-class PostStatus(str, Enum):
+class PostStatus(StrEnum):
     """Post lifecycle status."""
 
     DRAFT = "draft"
@@ -201,10 +201,18 @@ COLLECTIONS: dict[str, dict[str, Any]] = {
         "tone": "Mysterious, commanding, unapologetically dark",
         "color_palette": ["#1A1A1A", "#C0C0C0", "#8B0000"],
         "hashtags": [
-            "#SkyyRose", "#BlackRoseCollection", "#GothicLuxury",
-            "#DarkRomance", "#WhereLoveMeetsLuxury", "#DarkAesthetic",
-            "#WearableArt", "#LuxuryStreetwear", "#BayAreaFashion",
-            "#LimitedEdition", "#DarkElegance", "#SkyyRoseBlackRose",
+            "#SkyyRose",
+            "#BlackRoseCollection",
+            "#GothicLuxury",
+            "#DarkRomance",
+            "#WhereLoveMeetsLuxury",
+            "#DarkAesthetic",
+            "#WearableArt",
+            "#LuxuryStreetwear",
+            "#BayAreaFashion",
+            "#LimitedEdition",
+            "#DarkElegance",
+            "#SkyyRoseBlackRose",
         ],
         "caption_hooks": [
             "From the shadows, beauty rises.",
@@ -221,10 +229,18 @@ COLLECTIONS: dict[str, dict[str, Any]] = {
         "tone": "Passionate, vulnerable yet fierce, authentic",
         "color_palette": ["#B76E79", "#FF1744", "#1A1A1A"],
         "hashtags": [
-            "#SkyyRose", "#LoveHurts", "#OaklandFashion",
-            "#WhereLoveMeetsLuxury", "#GritAndGrace", "#UrbanLuxury",
-            "#BayAreaStyle", "#StreetwearFashion", "#Authentic",
-            "#PassionWearable", "#LoveHurtsCollection", "#SkyyRoseLH",
+            "#SkyyRose",
+            "#LoveHurts",
+            "#OaklandFashion",
+            "#WhereLoveMeetsLuxury",
+            "#GritAndGrace",
+            "#UrbanLuxury",
+            "#BayAreaStyle",
+            "#StreetwearFashion",
+            "#Authentic",
+            "#PassionWearable",
+            "#LoveHurtsCollection",
+            "#SkyyRoseLH",
         ],
         "caption_hooks": [
             "Love hurts. But it looks incredible.",
@@ -241,10 +257,18 @@ COLLECTIONS: dict[str, dict[str, Any]] = {
         "tone": "Confident, aspirational, effortlessly cool",
         "color_palette": ["#C9A962", "#1A1A1A", "#FFFFFF"],
         "hashtags": [
-            "#SkyyRose", "#SignatureCollection", "#LuxuryFashion",
-            "#WhereLoveMeetsLuxury", "#BayAreaLuxury", "#WestCoastStyle",
-            "#CoutureStreetwear", "#ElevatedStyle", "#PrestigeWear",
-            "#StayGolden", "#SignatureSkyy", "#TheSignature",
+            "#SkyyRose",
+            "#SignatureCollection",
+            "#LuxuryFashion",
+            "#WhereLoveMeetsLuxury",
+            "#BayAreaLuxury",
+            "#WestCoastStyle",
+            "#CoutureStreetwear",
+            "#ElevatedStyle",
+            "#PrestigeWear",
+            "#StayGolden",
+            "#SignatureSkyy",
+            "#TheSignature",
         ],
         "caption_hooks": [
             "Signature. Not just a name \u2014 a standard.",
@@ -333,13 +357,13 @@ class SocialPost:
     media_urls: list[str] = field(default_factory=list)
     product_sku: str = ""
     collection: str = ""
-    scheduled_at: Optional[str] = None
-    published_at: Optional[str] = None
+    scheduled_at: str | None = None
+    published_at: str | None = None
     status: str = PostStatus.DRAFT
     engagement: dict[str, int] = field(default_factory=dict)
     media_recommendations: dict[str, str] = field(default_factory=dict)
-    scheduling_recommendation: Optional[str] = None
-    correlation_id: Optional[str] = None
+    scheduling_recommendation: str | None = None
+    correlation_id: str | None = None
     created_at: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
 
     def __post_init__(self) -> None:
@@ -378,7 +402,7 @@ class Campaign:
     posts: list[SocialPost] = field(default_factory=list)
     created_at: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
     status: str = "draft"
-    correlation_id: Optional[str] = None
+    correlation_id: str | None = None
 
     def __post_init__(self) -> None:
         if not self.id:
@@ -428,9 +452,9 @@ class SocialMediaAgent:
 
     def __init__(
         self,
-        product_data_path: Optional[str] = None,
+        product_data_path: str | None = None,
         *,
-        correlation_id: Optional[str] = None,
+        correlation_id: str | None = None,
     ) -> None:
         self._correlation_id = correlation_id
         self._product_data_path = product_data_path or os.path.join(
@@ -466,7 +490,7 @@ class SocialMediaAgent:
         """Load supplemental product data from JSON file."""
         try:
             if os.path.exists(self._product_data_path):
-                with open(self._product_data_path, "r") as f:
+                with open(self._product_data_path) as f:
                     self._external_products = json.load(f)
                 logger.info(
                     "Loaded %d external products for social media agent",
@@ -480,7 +504,7 @@ class SocialMediaAgent:
         except (json.JSONDecodeError, OSError) as exc:
             logger.error("Failed to load external product data: %s", exc)
 
-    def _get_product(self, sku: str) -> Optional[dict[str, Any]]:
+    def _get_product(self, sku: str) -> dict[str, Any] | None:
         """Get product by SKU from catalog or external data."""
         # Check built-in catalog first
         if sku in PRODUCT_CATALOG:
@@ -488,10 +512,13 @@ class SocialMediaAgent:
             # Merge external data if available
             if sku in self._external_products:
                 external = self._external_products[sku]
-                product.update({
-                    k: v for k, v in external.items()
-                    if k not in ("name", "collection")  # Don't override core fields
-                })
+                product.update(
+                    {
+                        k: v
+                        for k, v in external.items()
+                        if k not in ("name", "collection")  # Don't override core fields
+                    }
+                )
             return product
         # Fall back to external data
         if sku in self._external_products:
@@ -508,7 +535,7 @@ class SocialMediaAgent:
         platform: str,
         content_type: str,
         *,
-        correlation_id: Optional[str] = None,
+        correlation_id: str | None = None,
     ) -> str:
         """Generate a platform-optimized caption with SkyyRose brand voice.
 
@@ -569,9 +596,11 @@ class SocialMediaAgent:
             if short_desc:
                 caption_parts.append(f"\n\n{short_desc[:500]}")
             caption_parts.append(f"\n\n{BRAND_TAGLINE}")
-            cta = CONTENT_TEMPLATES.get(
-                content_type, CONTENT_TEMPLATES[ContentType.PRODUCT_LAUNCH]
-            ).get("cta", "").format(site=BRAND_SITE)
+            cta = (
+                CONTENT_TEMPLATES.get(content_type, CONTENT_TEMPLATES[ContentType.PRODUCT_LAUNCH])
+                .get("cta", "")
+                .format(site=BRAND_SITE)
+            )
             if cta:
                 caption_parts.append(f"\n\n{cta}")
 
@@ -582,10 +611,12 @@ class SocialMediaAgent:
             caption_parts.append(f"\n\n{collection['mood']}")
             if short_desc:
                 caption_parts.append(f"\n\n{short_desc[:800]}")
-            caption_parts.append(f"\n\n\"{BRAND_TAGLINE}\" \u2014 {BRAND_NAME}")
-            cta = CONTENT_TEMPLATES.get(
-                content_type, CONTENT_TEMPLATES[ContentType.PRODUCT_LAUNCH]
-            ).get("cta", "").format(site=BRAND_SITE)
+            caption_parts.append(f'\n\n"{BRAND_TAGLINE}" \u2014 {BRAND_NAME}')
+            cta = (
+                CONTENT_TEMPLATES.get(content_type, CONTENT_TEMPLATES[ContentType.PRODUCT_LAUNCH])
+                .get("cta", "")
+                .format(site=BRAND_SITE)
+            )
             if cta:
                 caption_parts.append(f"\n\n{cta}")
 
@@ -693,8 +724,8 @@ class SocialMediaAgent:
         platform: str,
         content_type: str = ContentType.PRODUCT_LAUNCH,
         *,
-        correlation_id: Optional[str] = None,
-    ) -> Optional[SocialPost]:
+        correlation_id: str | None = None,
+    ) -> SocialPost | None:
         """Generate a social media post for a product on a specific platform.
 
         Args:
@@ -712,7 +743,8 @@ class SocialMediaAgent:
         if platform not in PLATFORMS:
             logger.error(
                 "Unknown platform: %s [correlation_id=%s]",
-                platform, cid,
+                platform,
+                cid,
             )
             return None
 
@@ -721,7 +753,8 @@ class SocialMediaAgent:
         if not product:
             logger.error(
                 "Product not found: %s [correlation_id=%s]",
-                product_sku, cid,
+                product_sku,
+                cid,
             )
             return None
 
@@ -729,7 +762,9 @@ class SocialMediaAgent:
 
         # Generate caption
         caption = self._generate_caption(
-            product, platform, content_type,
+            product,
+            platform,
+            content_type,
             correlation_id=cid,
         )
 
@@ -762,7 +797,11 @@ class SocialMediaAgent:
 
         logger.info(
             "Generated %s post for %s on %s: %s [correlation_id=%s]",
-            content_type, product_sku, platform, post.id, cid,
+            content_type,
+            product_sku,
+            platform,
+            post.id,
+            cid,
         )
         return post
 
@@ -776,8 +815,8 @@ class SocialMediaAgent:
         campaign_name: str = "Collection Drop",
         *,
         max_products: int = 5,
-        platforms: Optional[list[str]] = None,
-        correlation_id: Optional[str] = None,
+        platforms: list[str] | None = None,
+        correlation_id: str | None = None,
     ) -> Campaign:
         """Generate a multi-platform campaign for an entire collection.
 
@@ -796,12 +835,16 @@ class SocialMediaAgent:
         """
         cid = correlation_id or self._correlation_id
         target_platforms = platforms or [
-            Platform.INSTAGRAM, Platform.TIKTOK, Platform.TWITTER, Platform.FACEBOOK,
+            Platform.INSTAGRAM,
+            Platform.TIKTOK,
+            Platform.TWITTER,
+            Platform.FACEBOOK,
         ]
 
         # Find products in collection
         collection_products = [
-            (sku, prod) for sku, prod in PRODUCT_CATALOG.items()
+            (sku, prod)
+            for sku, prod in PRODUCT_CATALOG.items()
             if prod.get("collection") == collection
         ]
 
@@ -814,7 +857,8 @@ class SocialMediaAgent:
         if not collection_products:
             logger.warning(
                 "No products found for collection: %s [correlation_id=%s]",
-                collection, cid,
+                collection,
+                cid,
             )
             return campaign
 
@@ -837,7 +881,10 @@ class SocialMediaAgent:
 
         logger.info(
             "Generated campaign '%s' with %d posts for %s [correlation_id=%s]",
-            campaign_name, len(campaign.posts), collection, cid,
+            campaign_name,
+            len(campaign.posts),
+            collection,
+            cid,
         )
         return campaign
 
@@ -850,7 +897,7 @@ class SocialMediaAgent:
         post_id: str,
         scheduled_at: str,
         *,
-        correlation_id: Optional[str] = None,
+        correlation_id: str | None = None,
     ) -> bool:
         """Schedule a post for publishing at a specific time.
 
@@ -867,7 +914,8 @@ class SocialMediaAgent:
         if post_id not in self._post_queue:
             logger.error(
                 "Post not found for scheduling: %s [correlation_id=%s]",
-                post_id, cid,
+                post_id,
+                cid,
             )
             return False
 
@@ -877,7 +925,9 @@ class SocialMediaAgent:
 
         logger.info(
             "Scheduled post %s for %s [correlation_id=%s]",
-            post_id, scheduled_at, cid,
+            post_id,
+            scheduled_at,
+            cid,
         )
         return True
 
@@ -885,7 +935,7 @@ class SocialMediaAgent:
         self,
         post_id: str,
         *,
-        correlation_id: Optional[str] = None,
+        correlation_id: str | None = None,
     ) -> bool:
         """Publish a post (stub for actual platform API integration).
 
@@ -905,7 +955,8 @@ class SocialMediaAgent:
         if post_id not in self._post_queue:
             logger.error(
                 "Post not found for publishing: %s [correlation_id=%s]",
-                post_id, cid,
+                post_id,
+                cid,
             )
             return False
 
@@ -924,7 +975,9 @@ class SocialMediaAgent:
 
         logger.info(
             "Published post %s on %s [correlation_id=%s]",
-            post_id, post.platform, cid,
+            post_id,
+            post.platform,
+            cid,
         )
         return True
 
@@ -948,14 +1001,12 @@ class SocialMediaAgent:
         """
         return {
             "platforms": dict(self._analytics),
-            "total_posts": sum(
-                stats.get("posts", 0) for stats in self._analytics.values()
-            ),
+            "total_posts": sum(stats.get("posts", 0) for stats in self._analytics.values()),
             "total_queue": len(self._post_queue),
             "total_published": len(self._published),
         }
 
-    def get_post(self, post_id: str) -> Optional[dict[str, Any]]:
+    def get_post(self, post_id: str) -> dict[str, Any] | None:
         """Get a specific post by ID from queue or published.
 
         Args:
@@ -970,7 +1021,7 @@ class SocialMediaAgent:
             return self._published[post_id].to_dict()
         return None
 
-    def get_platform_config(self, platform: str) -> Optional[dict[str, Any]]:
+    def get_platform_config(self, platform: str) -> dict[str, Any] | None:
         """Get configuration for a specific platform.
 
         Args:
@@ -981,7 +1032,7 @@ class SocialMediaAgent:
         """
         return PLATFORMS.get(platform)
 
-    def get_collection_context(self, collection: str) -> Optional[dict[str, Any]]:
+    def get_collection_context(self, collection: str) -> dict[str, Any] | None:
         """Get brand context for a specific collection.
 
         Args:

@@ -26,7 +26,7 @@ import logging
 import os
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -47,7 +47,7 @@ MAX_PARALLEL_INGESTION = int(os.getenv("MAX_PARALLEL_INGESTION", "5"))
 # =============================================================================
 
 
-class DocumentType(str, Enum):
+class DocumentType(StrEnum):
     """Supported document types."""
 
     MARKDOWN = "markdown"

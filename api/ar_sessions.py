@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 import uuid
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query, WebSocket, WebSocketDisconnect
@@ -37,7 +37,7 @@ ar_sessions_router = APIRouter(prefix="/ar", tags=["AR Sessions"])
 # =============================================================================
 
 
-class ARMode(str, Enum):
+class ARMode(StrEnum):
     """AR experience mode."""
 
     WEBXR = "webxr"  # Native AR (ARCore/ARKit)
@@ -45,7 +45,7 @@ class ARMode(str, Enum):
     PREVIEW = "preview"  # Non-AR 3D preview
 
 
-class CollectionType(str, Enum):
+class CollectionType(StrEnum):
     """SkyyRose collection types."""
 
     BLACK_ROSE = "black_rose"
@@ -53,7 +53,7 @@ class CollectionType(str, Enum):
     SIGNATURE = "signature"
 
 
-class SessionStatus(str, Enum):
+class SessionStatus(StrEnum):
     """AR session status."""
 
     ACTIVE = "active"

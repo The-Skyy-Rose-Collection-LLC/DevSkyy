@@ -3,13 +3,13 @@
 Handles syncing approved media assets between DevSkyy and WordPress.
 """
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 
-class SyncStatus(str, Enum):
+class SyncStatus(StrEnum):
     """Status of synchronization operations."""
 
     PENDING = "pending"

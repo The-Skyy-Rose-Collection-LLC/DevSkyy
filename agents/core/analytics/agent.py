@@ -54,8 +54,8 @@ class AnalyticsCoreAgent(CoreAgent):
     def _get_legacy_agent(self) -> Any:
         if self._legacy_agent is None:
             try:
-                from agents.analytics_agent import AnalyticsAgent
                 from adk.base import AgentConfig
+                from agents.analytics_agent import AnalyticsAgent
 
                 config = AgentConfig(name="analytics", description="Analytics operations")
                 self._legacy_agent = AnalyticsAgent(config)

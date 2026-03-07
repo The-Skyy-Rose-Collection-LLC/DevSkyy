@@ -25,7 +25,7 @@ import os
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -44,7 +44,7 @@ from imagery.model_fidelity import (
 logger = logging.getLogger(__name__)
 
 
-class ThreeDProvider(str, Enum):
+class ThreeDProvider(StrEnum):
     """Supported 3D generation providers."""
 
     TRELLIS = "trellis"  # HuggingFace TRELLIS (preferred)
@@ -54,7 +54,7 @@ class ThreeDProvider(str, Enum):
     AUTO = "auto"  # Automatic provider selection with fallback chain
 
 
-class ModelFormat(str, Enum):
+class ModelFormat(StrEnum):
     """Supported 3D model formats."""
 
     GLB = "glb"
@@ -65,7 +65,7 @@ class ModelFormat(str, Enum):
     STL = "stl"
 
 
-class GenerationQuality(str, Enum):
+class GenerationQuality(StrEnum):
     """Quality presets for generation."""
 
     DRAFT = "draft"  # Fast, lower quality

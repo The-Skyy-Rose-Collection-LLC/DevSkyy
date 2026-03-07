@@ -23,7 +23,7 @@ import uuid
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel
@@ -49,7 +49,7 @@ DEFAULT_TIMEOUT_SECONDS = 120
 # =============================================================================
 
 
-class PipelineStage(str, Enum):
+class PipelineStage(StrEnum):
     """Stages in the enhancement pipeline."""
 
     INGEST = "ingest"
@@ -61,7 +61,7 @@ class PipelineStage(str, Enum):
     COMPLETE = "complete"
 
 
-class PipelineStatus(str, Enum):
+class PipelineStatus(StrEnum):
     """Status of a pipeline job."""
 
     PENDING = "pending"
@@ -72,7 +72,7 @@ class PipelineStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class ProcessingProfile(str, Enum):
+class ProcessingProfile(StrEnum):
     """Predefined processing profiles."""
 
     FULL = "full"  # All stages

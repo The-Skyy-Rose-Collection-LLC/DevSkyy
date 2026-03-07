@@ -18,7 +18,7 @@ import os
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -28,7 +28,7 @@ import httpx
 logger = logging.getLogger(__name__)
 
 
-class SkyyRoseCollection(str, Enum):
+class SkyyRoseCollection(StrEnum):
     """SkyyRose collection types."""
 
     SIGNATURE = "SIGNATURE"
@@ -36,7 +36,7 @@ class SkyyRoseCollection(str, Enum):
     LOVE_HURTS = "LOVE_HURTS"
 
 
-class GarmentType(str, Enum):
+class GarmentType(StrEnum):
     """Supported garment types."""
 
     HOODIE = "hoodie"

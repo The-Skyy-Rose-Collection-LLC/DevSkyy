@@ -119,7 +119,9 @@ def upload_to_huggingface(zip_path: Path) -> str:
         repo_type="dataset",
     )
 
-    download_url = f"https://huggingface.co/datasets/{repo_id}/resolve/main/training/skyyrose_v4_training.zip"
+    download_url = (
+        f"https://huggingface.co/datasets/{repo_id}/resolve/main/training/skyyrose_v4_training.zip"
+    )
     print(f"  Uploaded: {download_url}")
     return download_url
 
@@ -140,12 +142,12 @@ def start_training(data_url: str) -> dict:
     training_input = {
         "input_images": data_url,
         "trigger_word": "skyyrose",  # Global trigger; per-SKU triggers are in captions
-        "steps": 1500,               # More steps for per-product learning (v3 used 1000)
-        "lora_rank": 32,             # Higher rank for more detail capacity (v3 used 16)
+        "steps": 1500,  # More steps for per-product learning (v3 used 1000)
+        "lora_rank": 32,  # Higher rank for more detail capacity (v3 used 16)
         "optimizer": "adamw8bit",
         "batch_size": 1,
         "resolution": "512,768,1024",
-        "autocaption": False,         # We provide our own per-SKU captions
+        "autocaption": False,  # We provide our own per-SKU captions
         "autocaption_prefix": "",
         "lr_scheduler": "constant",
         "learning_rate": 0.0004,
@@ -171,14 +173,14 @@ def start_training(data_url: str) -> dict:
         else:
             # Fallback to known working version from v3
             trainer_version = "26dce37af90b9d997eeb970d92e47de3064d46c300504ae376c75bef6a9022d2"
-            print(f"  Using fallback trainer version")
+            print("  Using fallback trainer version")
     else:
         trainer_version = "26dce37af90b9d997eeb970d92e47de3064d46c300504ae376c75bef6a9022d2"
-        print(f"  Using fallback trainer version")
+        print("  Using fallback trainer version")
 
     print("\n  Training configuration:")
     print(f"    Model:         {trainer_owner}/{trainer_model}")
-    print(f"    Destination:   devskyy/skyyrose-lora-v4")
+    print("    Destination:   devskyy/skyyrose-lora-v4")
     print(f"    Steps:         {training_input['steps']}")
     print(f"    LoRA Rank:     {training_input['lora_rank']}")
     print(f"    Resolution:    {training_input['resolution']}")
@@ -253,7 +255,7 @@ def monitor_training(training_id: str, api_token: str | None = None):
             time.sleep(30)
 
     except KeyboardInterrupt:
-        print(f"\n\nMonitoring stopped. Training continues in background.")
+        print("\n\nMonitoring stopped. Training continues in background.")
         print(f"Resume: python scripts/train_lora_v4_replicate.py --monitor {training_id}")
         return None
 
@@ -310,7 +312,9 @@ def main():
     parser = argparse.ArgumentParser(description="Train SkyyRose LoRA v4 on Replicate")
     parser.add_argument("--dry-run", action="store_true", help="Build zip only, don't train")
     parser.add_argument("--monitor", type=str, help="Monitor existing training by ID")
-    parser.add_argument("--skip-upload", action="store_true", help="Skip HF upload, use existing URL")
+    parser.add_argument(
+        "--skip-upload", action="store_true", help="Skip HF upload, use existing URL"
+    )
     args = parser.parse_args()
 
     print("=" * 70)

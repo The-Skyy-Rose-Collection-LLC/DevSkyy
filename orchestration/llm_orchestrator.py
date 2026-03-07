@@ -15,7 +15,7 @@ Features:
 
 import logging
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel
@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class TaskType(str, Enum):
+class TaskType(StrEnum):
     """Task types for routing"""
 
     # General
@@ -83,7 +83,7 @@ class TaskType(str, Enum):
     MEDIA_GENERATION = "media_generation"
 
 
-class RoutingStrategy(str, Enum):
+class RoutingStrategy(StrEnum):
     """Routing strategies"""
 
     QUALITY = "quality"  # Best quality, ignore cost
@@ -93,7 +93,7 @@ class RoutingStrategy(str, Enum):
     SPECIFIC = "specific"  # Use specific model
 
 
-class Priority(str, Enum):
+class Priority(StrEnum):
     """Request priority"""
 
     LOW = "low"

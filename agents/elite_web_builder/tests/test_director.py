@@ -231,15 +231,9 @@ class TestDirectorStoryManagement:
 
     def test_get_status_summary(self) -> None:
         director = self._make_director()
-        s1 = UserStory(
-            id="US-001", title="A", description="A", agent_role=AgentRole.QA
-        )
-        s2 = UserStory(
-            id="US-002", title="B", description="B", agent_role=AgentRole.QA
-        )
-        s3 = UserStory(
-            id="US-003", title="C", description="C", agent_role=AgentRole.QA
-        )
+        s1 = UserStory(id="US-001", title="A", description="A", agent_role=AgentRole.QA)
+        s2 = UserStory(id="US-002", title="B", description="B", agent_role=AgentRole.QA)
+        s3 = UserStory(id="US-003", title="C", description="C", agent_role=AgentRole.QA)
         s1.status = StoryStatus.GREEN
         s2.status = StoryStatus.FAILED
         director.add_stories([s1, s2, s3])
@@ -251,9 +245,7 @@ class TestDirectorStoryManagement:
 
     def test_in_progress_not_ready(self) -> None:
         director = self._make_director()
-        s = UserStory(
-            id="US-001", title="A", description="A", agent_role=AgentRole.QA
-        )
+        s = UserStory(id="US-001", title="A", description="A", agent_role=AgentRole.QA)
         s.status = StoryStatus.IN_PROGRESS
         director.add_stories([s])
         ready = director.get_ready_stories()
@@ -340,9 +332,7 @@ class TestDirectorExecution:
         director.add_stories([story])
 
         async def agent_fn() -> AgentOutput:
-            return AgentOutput(
-                agent="frontend_dev", story_id="US-001", content="<div>OK</div>"
-            )
+            return AgentOutput(agent="frontend_dev", story_id="US-001", content="<div>OK</div>")
 
         async def build_checker() -> GateResult:
             return GateResult(gate=Gate.BUILD, status=GateStatus.PASSED, message="OK")
@@ -364,9 +354,7 @@ class TestDirectorExecution:
         director.add_stories([story])
 
         async def agent_fn() -> AgentOutput:
-            return AgentOutput(
-                agent="frontend_dev", story_id="US-001", content="bad code"
-            )
+            return AgentOutput(agent="frontend_dev", story_id="US-001", content="bad code")
 
         async def lint_checker() -> GateResult:
             return GateResult(
@@ -567,9 +555,7 @@ class TestDirectorRuntimeIntegration:
             )
 
         with patch("agents.runtime.get_adapter", return_value=mock_adapter):
-            result = await director.run_story(
-                story, gate_checkers={Gate.A11Y: a11y_checker}
-            )
+            result = await director.run_story(story, gate_checkers={Gate.A11Y: a11y_checker})
 
         assert result.status == StoryStatus.GREEN
 
