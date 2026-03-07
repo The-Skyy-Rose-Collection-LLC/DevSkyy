@@ -12,6 +12,26 @@ You are Ralph. Read these files FIRST — they are your full directive and task 
 - **NEVER delete** `.ralph/ralph-context.md` or `.ralph/ralph-tasks.md`
 - Immersive templates ARE in scope — you may edit them
 
+## Git — COMMIT & PUSH AFTER EVERY ITERATION
+
+**MANDATORY**: After making ANY file changes in an iteration, commit and push to main:
+```bash
+cd /Users/theceo/DevSkyy && git add -A && git commit -m "<type>: <description>" && git push origin main
+```
+Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
+Do NOT skip this step. Every iteration that produces file changes MUST end with a commit + push.
+
+## Credentials — Already Available
+
+All credentials are pre-loaded via `.env` files. Use them as needed:
+- `.env` — Main config (DB, CORS, API keys: Google AI, Anthropic, Replicate)
+- `.env.wordpress` — WordPress SSH/SFTP deployment (host: `ssh.wp.com`, user: `skyyrose.wordpress.com`)
+- `.env.hf` — AI/ML keys (OpenAI, Together, FAL, Meshy)
+- `frontend/.env.local` — Frontend WordPress/WooCommerce config
+
+WordPress deployment: `ssh skyyrose.wordpress.com@ssh.wp.com` or SFTP same creds.
+Theme path on server: `/htdocs/wp-content/themes/skyyrose-flagship`
+
 ## Task Order
 
 1. Regenerate stale `.min.css` / `.min.js` files

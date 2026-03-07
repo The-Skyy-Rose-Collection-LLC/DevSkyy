@@ -10,8 +10,13 @@ Two-step pipeline:
 Model: gemini-2.5-flash-image (image gen) + gemini-2.5-flash (vision)
 """
 
-import os, sys, time, base64, json
+import base64
+import json
+import os
+import sys
+import time
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv()

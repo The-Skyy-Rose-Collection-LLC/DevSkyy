@@ -139,7 +139,7 @@ class WordPressAssetAgent(EnhancedSuperAgent):
 
     def get_capabilities(self) -> list[Any]:
         """Return agent capabilities for compatibility with tests."""
-        from agents.base_legacy import AgentCapability as LegacyCapability
+        from agents.core.base import AgentCapability as LegacyCapability
 
         return [
             LegacyCapability.WORDPRESS_MANAGEMENT,

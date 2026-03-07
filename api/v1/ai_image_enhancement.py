@@ -13,9 +13,9 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, Field
+from services.ai_image_enhancement import LuxuryImageEnhancer
 
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
-from services.ai_image_enhancement import LuxuryImageEnhancer
 
 router = APIRouter(prefix="/ai/image-enhancement", tags=["AI Image Enhancement"])
 

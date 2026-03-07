@@ -738,6 +738,19 @@ class CoreAgent(SelfHealingMixin):
         }
 
 
+# Re-exports from legacy base for backward compatibility
+from agents.base_legacy import (
+    AgentCapability,
+    AgentConfig,
+    AgentStatus,
+    ExecutionResult,
+    LLMCategory,
+    PlanStep,
+    RetrievalContext,
+    SuperAgent,
+    ValidationResult,
+)
+
 __all__ = [
     "CoreAgentType",
     "FailureCategory",
@@ -750,4 +763,14 @@ __all__ = [
     "categorize_failure",
     "SelfHealingMixin",
     "CoreAgent",
+    # Legacy re-exports
+    "AgentCapability",
+    "AgentConfig",
+    "AgentStatus",
+    "ExecutionResult",
+    "LLMCategory",
+    "PlanStep",
+    "RetrievalContext",
+    "SuperAgent",
+    "ValidationResult",
 ]
