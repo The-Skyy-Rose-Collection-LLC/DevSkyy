@@ -21,7 +21,7 @@ from agents import (
     WordPressAssetAgent,
     WordPressAssetConfig,
 )
-from agents.base_legacy import AgentCapability
+from agents.core.base import AgentCapability
 from orchestration.asset_pipeline import (
     AssetPipelineResult,
     PipelineConfig,

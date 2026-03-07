@@ -57,6 +57,11 @@ try:
 except ImportError as _e:
     _logger.debug("WordPressAIBridge unavailable: %s", _e)
 
+try:
+    from .factory import create_orchestrator
+except ImportError as _e:
+    _logger.debug("Factory unavailable: %s", _e)
+
 __all__ = [
     # Base
     "SelfHealingMixin",
@@ -74,4 +79,6 @@ __all__ = [
     "HealthStatus",
     # Shared capabilities
     "WordPressAIBridge",
+    # Factory
+    "create_orchestrator",
 ]

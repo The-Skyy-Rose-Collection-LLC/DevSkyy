@@ -1429,14 +1429,14 @@ All 5 task groups complete. All 10+ sections complete. Zero outstanding issues. 
 
 ## TASK 1: Regenerate Stale .min.css Files (Do FIRST — Quick Win)
 
-- [ ] Identify all `.min.css` files older than their source `.css` counterparts
+- [x] Identify all `.min.css` files older than their source `.css` counterparts
   - Run: `for f in assets/css/*.css; do [[ "$f" != *.min.css ]] && min="${f%.css}.min.css" && [[ -f "$min" ]] && [[ "$f" -nt "$min" ]] && echo "STALE: $min"; done`
-- [ ] Regenerate ALL stale `.min.css` files via csso-cli
+- [x] Regenerate ALL stale `.min.css` files via csso-cli
   - Run: `for f in assets/css/*.css; do [[ "$f" != *.min.css ]] && npx csso-cli "$f" -o "${f%.css}.min.css"; done`
-- [ ] Regenerate ALL stale `.min.js` files via terser
+- [x] Regenerate ALL stale `.min.js` files via terser
   - Run: `for f in assets/js/*.js; do [[ "$f" != *.min.js ]] && npx terser "$f" --compress --mangle -o "${f%.js}.min.js"; done`
 - [ ] Verify: `find assets/ -name "*.min.*" | wc -l` — count matches previous total
-- [ ] Commit: `chore(theme): regenerate stale minified assets`
+- [x] Commit: `chore(theme): regenerate stale minified assets`
 
 ---
 

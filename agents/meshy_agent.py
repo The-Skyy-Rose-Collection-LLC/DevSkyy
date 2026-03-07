@@ -33,7 +33,7 @@ from typing import Any
 import httpx
 from pydantic import BaseModel, Field
 
-from agents.base_legacy import (
+from agents.core.base import (
     AgentCapability,
     AgentConfig,
     ExecutionResult,

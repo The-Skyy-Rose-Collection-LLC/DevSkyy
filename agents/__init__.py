@@ -192,6 +192,10 @@ try:
     from .tripo_agent import (
         COLLECTION_PROMPTS,
         GARMENT_TEMPLATES,
+    )
+    from .tripo_agent import SKYYROSE_BRAND_DNA as TRIPO_BRAND_DNA
+    from .tripo_agent import GenerationResult as TripoGenerationResult
+    from .tripo_agent import (
         ModelFormat,
         ModelStyle,
         TripoAssetAgent,
@@ -199,8 +203,6 @@ try:
         TripoTask,
         TripoTaskStatus,
     )
-    from .tripo_agent import SKYYROSE_BRAND_DNA as TRIPO_BRAND_DNA
-    from .tripo_agent import GenerationResult as TripoGenerationResult
 except ImportError as _e:
     _logger.debug("TripoAssetAgent unavailable: %s", _e)
 

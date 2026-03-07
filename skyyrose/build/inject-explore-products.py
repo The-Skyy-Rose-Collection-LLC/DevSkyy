@@ -6,8 +6,8 @@ and applies drakerelated.com-style enhancements.
 """
 
 import json
-import re
 import os
+import re
 import sys
 
 # ── Product Data ──────────────────────────────────────────────────────────────

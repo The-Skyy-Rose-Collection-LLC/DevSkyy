@@ -39,7 +39,7 @@ except ImportError:
     TRIPO_SDK_AVAILABLE = False
     TaskStatus = None
 
-from agents.base_legacy import (
+from agents.core.base import (
     AgentCapability,
     AgentConfig,
     ExecutionResult,
