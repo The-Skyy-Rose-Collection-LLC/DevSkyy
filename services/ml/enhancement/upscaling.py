@@ -19,13 +19,13 @@ from typing import Any
 
 import httpx
 from pydantic import BaseModel
-from services.ml.replicate_client import ReplicateClient, ReplicateConfig
 
 from errors.production_errors import (
     DevSkyError,
     DevSkyErrorCode,
     DevSkyErrorSeverity,
 )
+from services.ml.replicate_client import ReplicateClient, ReplicateConfig
 
 logger = logging.getLogger(__name__)
 

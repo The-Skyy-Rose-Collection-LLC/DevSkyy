@@ -18,6 +18,9 @@ from director import (
     StoryStatus,
     UserStory,
 )
+from tools.contrast_checker import check_contrast
+from tools.spacing_scale import generate_spacing_scale
+from tools.type_scale import generate_type_scale
 
 from agents.base import AgentOutput, AgentRole
 from agents.design_system import DESIGN_SYSTEM_SPEC
@@ -32,9 +35,6 @@ from core.verification_loop import (
     VerificationConfig,
     VerificationLoop,
 )
-from tools.contrast_checker import check_contrast
-from tools.spacing_scale import generate_spacing_scale
-from tools.type_scale import generate_type_scale
 
 # ---------------------------------------------------------------------------
 # Fixtures

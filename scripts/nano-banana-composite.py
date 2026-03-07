@@ -510,7 +510,23 @@ def inpaint_gpt(
     log.info("  L1: GPT Image 1.5 (OpenAI REST API — httpx)...")
 
     try:
-        image_bytes = image_path.read_bytes()
+        # Convert source to PNG (OpenAI requires PNG for DALL-E 2, preferred for GPT Image)
+        from PIL import Image as PILImage
+
+        src_img = PILImage.open(image_path).convert("RGBA")
+        # DALL-E 2 requires square images; resize if needed for that model
+        png_buf = io.BytesIO()
+        src_img.save(png_buf, format="PNG")
+        image_bytes = png_buf.getvalue()
+
+        if len(image_bytes) > 4 * 1024 * 1024:
+            # Resize down to fit 4MB limit
+            scale = (4 * 1024 * 1024 / len(image_bytes)) ** 0.5
+            new_size = (int(src_img.width * scale), int(src_img.height * scale))
+            src_img = src_img.resize(new_size, PILImage.LANCZOS)
+            png_buf = io.BytesIO()
+            src_img.save(png_buf, format="PNG")
+            image_bytes = png_buf.getvalue()
 
         # Try gpt-image-1, then dall-e-2 as fallback
         for model in ("gpt-image-1", "dall-e-2"):

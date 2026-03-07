@@ -1440,7 +1440,6 @@ class TestImageryCoreRouting:
         a._sub_agents["meshy_3d"] = _make_mock_sub("meshy_3d")
         # delegate calls execute_safe on sub, but the routing is via self.delegate
         # We need to mock delegate to simulate tripo failure then meshy success
-        from unittest.mock import call
 
         call_count = 0
         original_delegate = a.delegate

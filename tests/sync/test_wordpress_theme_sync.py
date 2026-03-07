@@ -7,8 +7,8 @@ from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from services.approval_queue_manager import ApprovalItem, ApprovalStatus
 
+from services.approval_queue_manager import ApprovalItem, ApprovalStatus
 from sync.wordpress_media_approval_sync import (
     BatchSyncResult,
     SyncResult,
