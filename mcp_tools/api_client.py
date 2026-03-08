@@ -5,9 +5,6 @@ import traceback
 from typing import Any
 
 import httpx
-
-from mcp_tools.server import API_BASE_URL, API_KEY, CHARACTER_LIMIT, REQUEST_TIMEOUT, logger
-from mcp_tools.types import ResponseFormat
 from utils.logging_utils import (
     get_correlation_id,
     log_api_request,
@@ -17,6 +14,9 @@ from utils.logging_utils import (
 )
 from utils.rate_limiting import check_rate_limit
 from utils.request_deduplication import deduplicate_request
+
+from mcp_tools.server import API_BASE_URL, API_KEY, CHARACTER_LIMIT, REQUEST_TIMEOUT, logger
+from mcp_tools.types import ResponseFormat
 
 
 async def _make_api_request(
