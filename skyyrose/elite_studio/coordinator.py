@@ -15,6 +15,7 @@ import json
 import time
 from typing import Any, Protocol
 
+from .agents.compositor_agent import CompositorAgent
 from .agents.generator_agent import GeneratorAgent
 from .agents.quality_agent import QualityAgent
 from .agents.vision_agent import VisionAgent
@@ -91,6 +92,7 @@ class Coordinator:
         vision  -> VisionAgent  (Gemini Flash + OpenAI GPT-4o)
         gen     -> GeneratorAgent  (Gemini 3 Pro)
         qc      -> QualityAgent  (Claude Sonnet)
+        comp    -> CompositorAgent  (Opus + FLUX, optional)
     """
 
     def __init__(
@@ -98,11 +100,13 @@ class Coordinator:
         vision: VisionAgent | None = None,
         generator: GeneratorAgent | None = None,
         quality: QualityAgent | None = None,
+        compositor: CompositorAgent | None = None,
         logger: Logger | None = None,
     ):
         self.vision = vision or VisionAgent()
         self.generator = generator or GeneratorAgent()
         self.quality = quality or QualityAgent()
+        self.compositor = compositor
         self.log = logger or PrintLogger()
 
     def produce(self, sku: str, view: str = "front") -> ProductionResult:
@@ -173,6 +177,38 @@ class Coordinator:
         else:
             self.log.info(f"QC skipped ({qc_result.error})")
 
+        # Step 4: Scene Compositing (optional)
+        comp_result = None
+        if self.compositor and gen_result.success:
+            self.log.step(4, 4, "Scene Compositing")
+            try:
+                from .agents.compositor_agent import SCENE_LOOKBOOK
+                from .utils import discover_scene_images
+
+                # Find scenes for this SKU
+                for scene_name, sku_map in SCENE_LOOKBOOK.items():
+                    if sku in sku_map:
+                        scenes = discover_scene_images(
+                            scene_name.rsplit("-", 2)[0]
+                            if scene_name.count("-") > 2
+                            else scene_name
+                        )
+                        if scenes:
+                            comp_result = self.compositor.composite(
+                                sku=sku,
+                                scene_image_path=str(scenes[0]),
+                                model_image_path=gen_result.output_path,
+                                collection=scene_name.rsplit("-", 2)[0],
+                                scene_name=scene_name,
+                            )
+                            if comp_result.success:
+                                self.log.ok(f"Composited: {comp_result.output_path}")
+                            else:
+                                self.log.info(f"Compositing skipped: {comp_result.error}")
+                        break
+            except Exception as exc:
+                self.log.info(f"Compositing skipped: {exc}")
+
         self.log.separator()
         self.log.info(f"COMPLETE: {sku.upper()}")
         self.log.separator()
@@ -185,6 +221,7 @@ class Coordinator:
             vision=vision_result,
             generation=gen_result,
             quality=qc_result,
+            compositing=comp_result,
         )
 
     def produce_batch(

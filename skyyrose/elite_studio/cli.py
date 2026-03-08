@@ -13,30 +13,34 @@ from __future__ import annotations
 import argparse
 import sys
 
+from .agents.compositor_agent import CompositorAgent
 from .agents.generator_agent import GeneratorAgent
 from .agents.quality_agent import QualityAgent
 from .agents.vision_agent import VisionAgent
-from .config import OUTPUT_DIR
+from .config import OUTPUT_DIR, PRODUCT_IMAGES_DIR
 from .coordinator import Coordinator
-from .utils import discover_all_skus
+from .utils import discover_all_skus, discover_scene_images
 
 
-def build_team() -> Coordinator:
+def build_team(with_compositor: bool = False) -> Coordinator:
     """Build the default agent team."""
     return Coordinator(
         vision=VisionAgent(),
         generator=GeneratorAgent(),
         quality=QualityAgent(),
+        compositor=CompositorAgent() if with_compositor else None,
     )
 
 
 def cmd_produce(args: argparse.Namespace) -> None:
     """Produce a single product."""
-    team = build_team()
+    team = build_team(with_compositor=getattr(args, "composite", False))
     result = team.produce(args.sku, args.view)
     print(f"\nResult: {result.status}")
     if result.output_path:
         print(f"Output: {result.output_path}")
+    if result.compositing and result.compositing.success:
+        print(f"Composited: {result.compositing.output_path}")
     if result.error:
         print(f"Error: {result.error}")
 
@@ -91,6 +95,61 @@ def cmd_status(args: argparse.Namespace) -> None:
             print(f"  {sku}")
 
 
+def cmd_composite(args: argparse.Namespace) -> None:
+    """Run standalone scene compositing for a SKU."""
+    from .agents.compositor_agent import SCENE_LOOKBOOK
+
+    agent = CompositorAgent()
+    scene_name = args.scene
+    collection = args.collection or scene_name.rsplit("-", 2)[0]
+
+    # Find model image
+    model_image = args.model_image
+    if not model_image:
+        sku_map = SCENE_LOOKBOOK.get(scene_name, {})
+        filename = sku_map.get(args.sku, "")
+        if filename and filename != "lookbook":
+            candidate = PRODUCT_IMAGES_DIR / collection / filename
+            if candidate.exists():
+                model_image = str(candidate)
+        if not model_image:
+            # Try glob
+            candidates = sorted((PRODUCT_IMAGES_DIR / collection).glob(f"{args.sku}-*.*"))
+            if candidates:
+                model_image = str(candidates[0])
+
+    if not model_image:
+        print(f"Error: No model image found for {args.sku}")
+        sys.exit(1)
+
+    # Find scene image
+    scene_image = args.scene_image
+    if not scene_image:
+        scenes = discover_scene_images(collection)
+        if scenes:
+            scene_image = str(scenes[0])
+
+    if not scene_image:
+        print(f"Error: No scene image found for {scene_name}")
+        sys.exit(1)
+
+    result = agent.composite(
+        sku=args.sku,
+        scene_image_path=scene_image,
+        model_image_path=model_image,
+        collection=collection,
+        scene_name=scene_name,
+    )
+
+    print(f"\nResult: {'success' if result.success else 'failed'}")
+    if result.output_path:
+        print(f"Output: {result.output_path}")
+    if result.qa_status:
+        print(f"QA: {result.qa_status}")
+    if result.error:
+        print(f"Error: {result.error}")
+
+
 def main(argv: list[str] | None = None) -> None:
     """CLI main entry point."""
     parser = argparse.ArgumentParser(
@@ -118,6 +177,23 @@ def main(argv: list[str] | None = None) -> None:
     # status
     sub.add_parser("status", help="Show generation status")
 
+    # composite (standalone)
+    p_composite = sub.add_parser("composite", help="Composite a SKU into a scene")
+    p_composite.add_argument("sku", help="Product SKU (e.g., br-001)")
+    p_composite.add_argument(
+        "--scene", required=True, help="Scene name (e.g., black-rose-rooftop-garden)"
+    )
+    p_composite.add_argument("--scene-image", help="Path to scene background image")
+    p_composite.add_argument("--model-image", help="Path to model/product image")
+    p_composite.add_argument("--collection", help="Collection name (auto-detected from scene)")
+
+    # Add --composite flag to produce
+    p_produce.add_argument(
+        "--composite",
+        action="store_true",
+        help="Run scene compositing after generation",
+    )
+
     args = parser.parse_args(argv)
 
     if not args.command:
@@ -130,3 +206,5 @@ def main(argv: list[str] | None = None) -> None:
         cmd_batch(args)
     elif args.command == "status":
         cmd_status(args)
+    elif args.command == "composite":
+        cmd_composite(args)
