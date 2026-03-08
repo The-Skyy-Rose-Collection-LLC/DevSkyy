@@ -32,7 +32,7 @@ PRODUCTS_DIR = THEME_DIR / "assets" / "images" / "products"
 SCENES_DIR = THEME_DIR / "assets" / "scenes"
 
 FAL_KEY = os.environ.get("FAL_KEY", "")
-FAL_ENDPOINT = "https://queue.fal.run/fal-ai/bria/product-shot"
+FAL_ENDPOINT = "https://fal.run/fal-ai/bria/product-shot"
 
 # --- Scene definitions ---
 SCENES = {
@@ -114,9 +114,11 @@ def call_fal_product_shot(
     payload = json.dumps(
         {
             "image_url": f"data:{p_mime};base64,{product_b64}",
-            "scene_image_url": f"data:{s_mime};base64,{scene_b64}",
+            "ref_image_url": f"data:{s_mime};base64,{scene_b64}",
             "scene_description": f"Luxury fashion showroom. Place the clothing item {placement}. Photorealistic lighting, high-end retail environment.",
-            "optimize_description": True,
+            "placement_type": "automatic",
+            "num_results": 1,
+            "fast": False,
         }
     ).encode("utf-8")
 
@@ -131,9 +133,7 @@ def call_fal_product_shot(
             with urllib.request.urlopen(req, timeout=120) as resp:
                 result = json.loads(resp.read().decode("utf-8"))
 
-            # FAL queue API — poll for result
-            if "request_id" in result:
-                return poll_fal_result(result["request_id"], retries)
+            # Synchronous endpoint returns result directly
             return result
 
         except urllib.error.HTTPError as e:
