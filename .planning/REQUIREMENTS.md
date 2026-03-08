@@ -1,0 +1,115 @@
+# Requirements: Production Armor & WordPress Build Autonomy
+
+**Defined:** 2026-03-08
+**Core Value:** No agent-written code can reach production without passing automated quality gates at every layer — local, CI, PR, and post-deploy.
+
+## v1 Requirements
+
+### Git Hooks
+
+- [ ] **HOOK-01**: Pre-commit runs ESLint on staged JS/TS files and blocks commit on errors
+- [ ] **HOOK-02**: Pre-commit runs Ruff + Black + isort on staged Python files and blocks commit on errors
+- [ ] **HOOK-03**: Pre-commit runs tsc (TypeScript) type checking on staged frontend files and blocks commit on errors
+- [ ] **HOOK-04**: Pre-commit runs mypy type checking on staged Python files and blocks commit on errors
+- [ ] **HOOK-05**: Pre-commit runs php -l syntax check on staged PHP files and blocks commit on errors
+- [ ] **HOOK-06**: Pre-commit runs fast unit tests on changed files and blocks commit on failures
+- [ ] **HOOK-07**: Husky v9 replaces broken v4 config in WordPress theme package.json
+- [ ] **HOOK-08**: All hooks complete in under 30 seconds on a typical commit
+
+### CI Enforcement
+
+- [ ] **CI-01**: All 17 `continue-on-error: true` directives removed from ci.yml, security-gate.yml, dast-scan.yml
+- [ ] **CI-02**: Underlying lint/type/format failures fixed so CI passes without soft failures
+- [ ] **CI-03**: PHP syntax validation step added to CI pipeline for WordPress theme files
+- [ ] **CI-04**: CI runs WordPress theme build (npm run build) and validates output
+- [ ] **CI-05**: CI detects minification drift — fails if .min files don't match freshly built output
+
+### PR Protection
+
+- [ ] **PR-01**: All CI status checks required to pass before PR can merge to main
+- [ ] **PR-02**: PR branch must be up-to-date with main before merge is allowed
+
+### WordPress Build Pipeline
+
+- [ ] **BUILD-01**: All 24 JS files in WordPress theme pass through webpack minification
+- [ ] **BUILD-02**: All 31 CSS files in WordPress theme pass through clean-css minification
+- [ ] **BUILD-03**: Source maps generated for development debugging
+- [ ] **BUILD-04**: Single `npm run build` command produces all .min files from source
+
+### Deploy Automation
+
+- [ ] **DEPLOY-01**: Deploy script transfers built theme files to production server via rsync over SSH
+- [ ] **DEPLOY-02**: Deploy script enables WP-CLI maintenance mode before file transfer
+- [ ] **DEPLOY-03**: Deploy script disables maintenance mode and flushes cache after transfer
+- [ ] **DEPLOY-04**: Post-deploy deep health check verifies page content (not just HTTP 200)
+- [ ] **DEPLOY-05**: Single command runs the full deploy pipeline (build → transfer → verify)
+- [ ] **DEPLOY-06**: Deploy dry-run mode validates without actually shipping to production
+- [ ] **DEPLOY-07**: Deploy script has try/finally safety — maintenance mode always gets disabled even on failure
+
+## v2 Requirements
+
+### Enhanced Protection
+
+- **PROT-01**: Block direct pushes to main (require PR for all changes)
+- **PROT-02**: Block force pushes to main (prevent history rewriting)
+- **PROT-03**: Auto-rollback on failed health check
+- **PROT-04**: Agent-aware hook messaging (parseable error output for AI agents)
+- **PROT-05**: Automatic theme version bump on deploy
+
+### Monitoring
+
+- **MON-01**: Deploy history log (who deployed, when, what version)
+- **MON-02**: Health check dashboard/notifications
+- **MON-03**: CI failure trend tracking
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Human code review requirement | Agents operate autonomously — CI is the reviewer |
+| Coverage threshold gates | Adds complexity without clear value for agent workflows |
+| Staging environment | Deploy directly to production with verification — simpler for family business |
+| PHPCS/WordPress coding standards | Would generate hundreds of warnings on existing theme code |
+| Docker-based CI | Unnecessary complexity — native runners sufficient |
+| Mobile app CI | Future milestone — no native app exists yet |
+| pre-commit (Python tool) | Wrong ecosystem — Husky is npm-native for this monorepo |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| HOOK-01 | — | Pending |
+| HOOK-02 | — | Pending |
+| HOOK-03 | — | Pending |
+| HOOK-04 | — | Pending |
+| HOOK-05 | — | Pending |
+| HOOK-06 | — | Pending |
+| HOOK-07 | — | Pending |
+| HOOK-08 | — | Pending |
+| CI-01 | — | Pending |
+| CI-02 | — | Pending |
+| CI-03 | — | Pending |
+| CI-04 | — | Pending |
+| CI-05 | — | Pending |
+| PR-01 | — | Pending |
+| PR-02 | — | Pending |
+| BUILD-01 | — | Pending |
+| BUILD-02 | — | Pending |
+| BUILD-03 | — | Pending |
+| BUILD-04 | — | Pending |
+| DEPLOY-01 | — | Pending |
+| DEPLOY-02 | — | Pending |
+| DEPLOY-03 | — | Pending |
+| DEPLOY-04 | — | Pending |
+| DEPLOY-05 | — | Pending |
+| DEPLOY-06 | — | Pending |
+| DEPLOY-07 | — | Pending |
+
+**Coverage:**
+- v1 requirements: 26 total
+- Mapped to phases: 0
+- Unmapped: 26 (pending roadmap creation)
+
+---
+*Requirements defined: 2026-03-08*
+*Last updated: 2026-03-08 after initial definition*
