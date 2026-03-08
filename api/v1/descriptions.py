@@ -13,6 +13,8 @@ import logging
 from typing import Any
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
+
+from security.jwt_oauth2_auth import TokenPayload, get_current_user
 from services.ml.image_description_pipeline import (
     ImageDescriptionPipeline,
     VisionModelClient,
@@ -28,8 +30,6 @@ from services.ml.schemas.description import (
     ProductType,
     VisionModel,
 )
-
-from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 logger = logging.getLogger(__name__)
 

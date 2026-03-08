@@ -497,8 +497,8 @@ def inpaint_gpt(
     multipart/form-data. Bypasses OpenAI SDK (broken on Python 3.14) —
     calls the REST API directly with httpx.
 
-    GPT Image uses soft masking — it regenerates the entire image. We
-    composite the original unmasked region back on top via Pillow post-process.
+    DALL-E 2 requires: square PNG, same dimensions for image+mask, <4MB each.
+    gpt-image-1 is more flexible but may not be available on all accounts.
     """
     import httpx
 
@@ -507,32 +507,42 @@ def inpaint_gpt(
         log.warning("  GPT skipped: no OPENAI_API_KEY")
         return None
 
-    log.info("  L1: GPT Image 1.5 (OpenAI REST API — httpx)...")
+    log.info("  L1: GPT Image (OpenAI REST API — httpx)...")
 
     try:
-        # Convert source to PNG (OpenAI requires PNG for DALL-E 2, preferred for GPT Image)
         from PIL import Image as PILImage
 
         src_img = PILImage.open(image_path).convert("RGBA")
-        # DALL-E 2 requires square images; resize if needed for that model
-        png_buf = io.BytesIO()
-        src_img.save(png_buf, format="PNG")
-        image_bytes = png_buf.getvalue()
+        mask_img = PILImage.open(io.BytesIO(mask_rgba_bytes)).convert("RGBA")
 
-        if len(image_bytes) > 4 * 1024 * 1024:
-            # Resize down to fit 4MB limit
-            scale = (4 * 1024 * 1024 / len(image_bytes)) ** 0.5
-            new_size = (int(src_img.width * scale), int(src_img.height * scale))
-            src_img = src_img.resize(new_size, PILImage.LANCZOS)
-            png_buf = io.BytesIO()
-            src_img.save(png_buf, format="PNG")
-            image_bytes = png_buf.getvalue()
-
-        # Try gpt-image-1, then dall-e-2 as fallback
+        # Try gpt-image-1 first (flexible sizes), then dall-e-2 (square only)
         for model in ("gpt-image-1", "dall-e-2"):
+            target_size = (1024, 1024)  # Works for both models
+
+            # Resize image to target
+            img_resized = src_img.resize(target_size, PILImage.LANCZOS)
+            img_buf = io.BytesIO()
+            img_buf_fmt = "PNG"
+            img_resized.save(img_buf, format=img_buf_fmt)
+            image_bytes = img_buf.getvalue()
+
+            # Resize mask to SAME dimensions as image (critical for DALL-E 2)
+            mask_resized = mask_img.resize(target_size, PILImage.LANCZOS)
+            mask_buf = io.BytesIO()
+            mask_resized.save(mask_buf, format="PNG")
+            mask_bytes = mask_buf.getvalue()
+
+            log.info(
+                "  Trying %s — image=%dKB mask=%dKB (both %dx%d)",
+                model,
+                len(image_bytes) // 1024,
+                len(mask_bytes) // 1024,
+                *target_size,
+            )
+
             files = [
                 ("image", ("render.png", image_bytes, "image/png")),
-                ("mask", ("mask.png", mask_rgba_bytes, "image/png")),
+                ("mask", ("mask.png", mask_bytes, "image/png")),
             ]
             data = {
                 "model": model,
@@ -553,6 +563,10 @@ def inpaint_gpt(
             if resp.status_code == 400 and "invalid_value" in resp.text.lower():
                 log.info("  %s not available, trying fallback...", model)
                 continue
+
+            if resp.status_code == 400:
+                log.warning("  GPT %s failed (%d): %s", model, resp.status_code, resp.text[:300])
+                continue  # Try next model instead of giving up
 
             if not resp.is_success:
                 log.warning("  GPT failed (%d): %s", resp.status_code, resp.text[:300])
@@ -577,6 +591,10 @@ def inpaint_reve(
 
     No mask support. Uses remix mode with reference image for brand guidance.
     Best for: embossed, chenille, embroidered, sherpa textures.
+
+    Two models available:
+        reve/edit-image       — single image edit (image_url param)
+        reve/remix-edit-image — multi-image remix (image_urls array)
     """
     import httpx
 
@@ -587,41 +605,70 @@ def inpaint_reve(
 
     log.info("  L2: Reve (AIML API — remix with reference)...")
 
-    try:
-        resp = httpx.post(
-            "https://api.aimlapi.com/v1/images/generations",
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
-            json={
+    # Try remix first (uses reference), then single-edit as fallback
+    models_payloads = [
+        (
+            "reve/remix-edit-image",
+            {
                 "model": "reve/remix-edit-image",
                 "image_urls": [image_url, reference_url],
                 "prompt": (
-                    f"Take the model wearing the garment from <img>0</img> and replace "
-                    f"the logo/branding region with the EXACT logo from <img>1</img>. "
+                    f"Take the garment from <img>0</img> and replace the logo/branding "
+                    f"region with the EXACT logo from <img>1</img>. "
                     f"{prompt} "
                     f"Keep the rest of the image identical. Photorealistic quality."
                 ),
                 "aspect_ratio": "3:4",
-                "convert_base64_to_url": True,
             },
-            timeout=120,
-        )
+        ),
+        (
+            "reve/edit-image",
+            {
+                "model": "reve/edit-image",
+                "image_url": image_url,
+                "prompt": (
+                    f"Replace the logo/branding on this garment with the correct brand logo. "
+                    f"{prompt} "
+                    f"Photorealistic fabric texture. Keep everything else identical."
+                ),
+                "aspect_ratio": "3:4",
+            },
+        ),
+    ]
 
-        if not resp.is_success:
-            log.warning("  Reve failed (%d): %s", resp.status_code, resp.text[:300])
-            return None
+    for model_name, payload in models_payloads:
+        try:
+            log.info("  Trying %s...", model_name)
+            resp = httpx.post(
+                "https://api.aimlapi.com/v1/images/generations",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+                timeout=120,
+            )
 
-        data = resp.json()
-        if data.get("data") and data["data"][0].get("url"):
-            img_url = data["data"][0]["url"]
-            img_resp = httpx.get(img_url, timeout=30)
-            img_resp.raise_for_status()
-            return img_resp.content
+            if resp.status_code == 500 and "api key" in resp.text.lower():
+                log.warning("  Reve API key rejected — verify AIML_API_KEY is valid")
+                return None  # No point trying fallback with same key
 
-    except Exception as exc:
-        log.warning("  Reve failed: %s", exc)
+            if not resp.is_success:
+                log.warning(
+                    "  Reve %s failed (%d): %s", model_name, resp.status_code, resp.text[:300]
+                )
+                continue  # Try next model
+
+            data = resp.json()
+            if data.get("data") and data["data"][0].get("url"):
+                img_url = data["data"][0]["url"]
+                img_resp = httpx.get(img_url, timeout=30)
+                img_resp.raise_for_status()
+                log.info("  Reve succeeded via %s", model_name)
+                return img_resp.content
+
+        except Exception as exc:
+            log.warning("  Reve %s failed: %s", model_name, exc)
     return None
 
 
@@ -1171,6 +1218,7 @@ def run_pipeline(args):
 
         result_bytes = None
         provider_used = None
+        qa = None
 
         for provider_key in provider_order:
             pinfo = PROVIDERS.get(provider_key, {})
@@ -1207,10 +1255,30 @@ def run_pipeline(args):
                         qa.get("issues", []),
                     )
 
-                    if not qa.get("pass", True) and qa.get("score", 100) < 50:
+                    if qa.get("score", 100) < 70:
+                        # ── Deep QA: get prompt refinement ──
                         log.warning(
-                            "  QA FAILED (score %d) — trying next provider", qa.get("score", 0)
+                            "  QA FAILED (score %d) — running deep analysis for prompt fix...",
+                            qa.get("score", 0),
                         )
+                        ref_bytes = source_path.read_bytes()
+                        deep = vision_qa_deep(client, result_bytes, ref_bytes, name, treatment)
+                        prompt_fix = deep.get("prompt_fix", "")
+                        if prompt_fix:
+                            log.info("  Deep QA prompt fix: %s", prompt_fix)
+                            # Rebuild prompt with QA feedback for next provider
+                            issues_text = "; ".join(qa.get("issues", []))
+                            prompt = (
+                                f"{build_prompt(name, treatment)} "
+                                f"CRITICAL: Previous attempt had these issues: {issues_text}. "
+                                f"Specific fix needed: {prompt_fix}"
+                            )
+                            log.info("  Enhanced prompt for next provider")
+                        else:
+                            # Even without deep fix, add issues to prompt
+                            issues_text = "; ".join(qa.get("issues", []))
+                            if issues_text:
+                                prompt = f"{build_prompt(name, treatment)} IMPORTANT: {issues_text}"
                         result_bytes = None
                         provider_used = None
                         continue
@@ -1231,16 +1299,19 @@ def run_pipeline(args):
                 PROVIDERS.get(provider_used, {}).get("name", provider_used),
                 tier,
             )
-            all_results.append(
-                {
-                    "sku": sku,
-                    "name": name,
-                    "status": "success",
-                    "provider": provider_used,
-                    "tier": tier,
-                    "size_kb": round(size / 1024, 1),
-                }
-            )
+            result_entry = {
+                "sku": sku,
+                "name": name,
+                "status": "success",
+                "provider": provider_used,
+                "tier": tier,
+                "size_kb": round(size / 1024, 1),
+            }
+            if not args.no_qa and qa:
+                result_entry["qa_score"] = qa.get("score", 0)
+                result_entry["qa_pass"] = qa.get("pass", True)
+                result_entry["qa_issues"] = qa.get("issues", [])
+            all_results.append(result_entry)
             success += 1
         else:
             log.error("  FAILED %s — all providers exhausted", sku)

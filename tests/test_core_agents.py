@@ -1559,8 +1559,9 @@ class TestWebBuilderApplyFix:
 
         a = WebBuilderCoreAgent()
         diag = Diagnosis(
-            error=RuntimeError("build fail"),
-            failure_category=FailureCategory.LOGIC_ERROR,
+            failure_category=FailureCategory.CODE_BUG,
+            description="build fail",
+            suggested_actions=["fix build"],
         )
         # _apply_fix tries to import SelfHealer — will fail, falls back to super()
         result = await a._apply_fix(diag)
@@ -1580,8 +1581,9 @@ class TestImageryApplyFix:
         mock_sub.circuit_breaker_allows = MagicMock(return_value=True)
         a._sub_agents["meshy_3d"] = mock_sub
         diag = Diagnosis(
-            error=RuntimeError("provider down"),
             failure_category=FailureCategory.PROVIDER_DOWN,
+            description="provider down",
+            suggested_actions=["failover"],
         )
         result = await a._apply_fix(diag)
         assert result.success
@@ -1594,8 +1596,9 @@ class TestImageryApplyFix:
         a = ImageryCoreAgent()
         a._sub_agents.clear()
         diag = Diagnosis(
-            error=RuntimeError("logic issue"),
-            failure_category=FailureCategory.LOGIC_ERROR,
+            failure_category=FailureCategory.CODE_BUG,
+            description="logic issue",
+            suggested_actions=["debug"],
         )
         result = await a._apply_fix(diag)
         assert isinstance(result, HealResult)
@@ -1610,8 +1613,9 @@ class TestFashnVtonSubAgent:
 
         a = FashnVtonSubAgent()
         diag = Diagnosis(
-            error=RuntimeError("fashn down"),
             failure_category=FailureCategory.PROVIDER_DOWN,
+            description="fashn down",
+            suggested_actions=["switch provider"],
         )
         result = await a._apply_fix(diag)
         assert result.success
@@ -1623,8 +1627,9 @@ class TestFashnVtonSubAgent:
 
         a = FashnVtonSubAgent()
         diag = Diagnosis(
-            error=RuntimeError("bad logic"),
-            failure_category=FailureCategory.LOGIC_ERROR,
+            failure_category=FailureCategory.CODE_BUG,
+            description="bad logic",
+            suggested_actions=["fix"],
         )
         result = await a._apply_fix(diag)
         assert isinstance(result, HealResult)
@@ -1646,8 +1651,9 @@ class TestSubAgentLlmAndEscalation:
         old = sa_mod._llm_client
         sa_mod._llm_client = None
         try:
-            with patch("agents.core.sub_agent.UnifiedLLMClient") as mock_cls:
-                mock_cls.return_value = MagicMock()
+            with patch(
+                "llm.unified_llm_client.UnifiedLLMClient", return_value=MagicMock()
+            ) as mock_cls:
                 client = sa_mod._get_llm_client()
                 assert client is not None
                 mock_cls.assert_called_once()
@@ -1677,7 +1683,10 @@ class TestSubAgentLlmAndEscalation:
         try:
             mock_client = AsyncMock()
             mock_client.complete = AsyncMock(return_value=mock_response)
-            with patch("agents.core.sub_agent.UnifiedLLMClient", return_value=mock_client):
+            with patch(
+                "llm.unified_llm_client.UnifiedLLMClient",
+                return_value=mock_client,
+            ):
                 result = await a._llm_execute(
                     "test task",
                     system_prompt="Custom system",
@@ -1837,3 +1846,197 @@ class TestAnalyticsRouting:
                 setattr(a, meth, lambda: None)
         r = await a.execute("zzz unmatched gibberish")
         assert not r["success"]
+
+
+# =============================================================================
+# ImportError branches in _register_sub_agents() and _get_legacy_agent()
+# =============================================================================
+
+
+class TestImportErrorBranches:
+    """Force ImportError on sub-agent and legacy imports to cover except branches."""
+
+    @pytest.mark.asyncio
+    async def test_content_sub_agents_import_error(self):
+        with patch.dict(
+            "sys.modules",
+            {
+                "agents.core.content.sub_agents.collection_content": None,
+                "agents.core.content.sub_agents.seo_copywriter": None,
+            },
+        ):
+            import agents.core.content.agent as mod
+
+            importlib.reload(mod)
+            a = mod.ContentCoreAgent()
+            assert len(a._sub_agents) == 0
+        importlib.reload(mod)
+
+    @pytest.mark.asyncio
+    async def test_content_legacy_import_error(self):
+        from agents.core.content.agent import ContentCoreAgent
+
+        a = ContentCoreAgent()
+        a._legacy_agent = None
+        with patch.dict("sys.modules", {"agents.skyyrose_content_agent": None}):
+            result = a._get_legacy_agent()
+            assert result is None
+
+    @pytest.mark.asyncio
+    async def test_creative_sub_agents_import_error(self):
+        with patch.dict(
+            "sys.modules",
+            {"agents.core.creative.sub_agents.brand_creative": None},
+        ):
+            import agents.core.creative.agent as mod
+
+            importlib.reload(mod)
+            a = mod.CreativeCoreAgent()
+            assert len(a._sub_agents) == 0
+        importlib.reload(mod)
+
+    @pytest.mark.asyncio
+    async def test_creative_legacy_import_error(self):
+        from agents.core.creative.agent import CreativeCoreAgent
+
+        a = CreativeCoreAgent()
+        a._legacy_agent = None
+        with patch.dict("sys.modules", {"agents.creative_agent": None}):
+            result = a._get_legacy_agent()
+            assert result is None
+
+    @pytest.mark.asyncio
+    async def test_marketing_sub_agents_import_error(self):
+        with patch.dict(
+            "sys.modules",
+            {
+                "agents.core.marketing.sub_agents.social_media": None,
+                "agents.core.marketing.sub_agents.campaign_ops": None,
+            },
+        ):
+            import agents.core.marketing.agent as mod
+
+            importlib.reload(mod)
+            a = mod.MarketingCoreAgent()
+            assert len(a._sub_agents) == 0
+        importlib.reload(mod)
+
+    @pytest.mark.asyncio
+    async def test_marketing_legacy_import_error(self):
+        from agents.core.marketing.agent import MarketingCoreAgent
+
+        a = MarketingCoreAgent()
+        a._legacy_agent = None
+        with patch.dict("sys.modules", {"agents.marketing_agent": None}):
+            result = a._get_legacy_agent()
+            assert result is None
+
+    @pytest.mark.asyncio
+    async def test_operations_sub_agents_import_error(self):
+        with patch.dict(
+            "sys.modules",
+            {
+                "agents.core.operations.sub_agents.deploy_health": None,
+                "agents.core.operations.sub_agents.security_monitor": None,
+                "agents.core.operations.sub_agents.coding_doctor": None,
+            },
+        ):
+            import agents.core.operations.agent as mod
+
+            importlib.reload(mod)
+            a = mod.OperationsCoreAgent()
+            assert len(a._sub_agents) == 0
+        importlib.reload(mod)
+
+    @pytest.mark.asyncio
+    async def test_operations_legacy_import_error(self):
+        from agents.core.operations.agent import OperationsCoreAgent
+
+        a = OperationsCoreAgent()
+        a._legacy_agent = None
+        with patch.dict("sys.modules", {"agents.operations_agent": None}):
+            result = a._get_legacy_agent()
+            assert result is None
+
+    @pytest.mark.asyncio
+    async def test_analytics_sub_agents_import_error(self):
+        with patch.dict(
+            "sys.modules",
+            {"agents.core.analytics.sub_agents.analytics_ops": None},
+        ):
+            import agents.core.analytics.agent as mod
+
+            importlib.reload(mod)
+            a = mod.AnalyticsCoreAgent()
+            assert len(a._sub_agents) == 0
+        importlib.reload(mod)
+
+    @pytest.mark.asyncio
+    async def test_analytics_legacy_import_error(self):
+        from agents.core.analytics.agent import AnalyticsCoreAgent
+
+        a = AnalyticsCoreAgent()
+        a._legacy_agent = None
+        with patch.dict("sys.modules", {"agents.analytics_agent": None}):
+            result = a._get_legacy_agent()
+            assert result is None
+
+    @pytest.mark.asyncio
+    async def test_imagery_legacy_import_error(self):
+        from agents.core.imagery.agent import ImageryCoreAgent
+
+        a = ImageryCoreAgent()
+        a._legacy_imagery = None
+        with patch.dict("sys.modules", {"agents.skyyrose_imagery_agent": None}):
+            result = a._get_legacy_imagery()
+            assert result is None
+
+    @pytest.mark.asyncio
+    async def test_commerce_sub_agents_import_error(self):
+        with patch.dict(
+            "sys.modules",
+            {
+                "agents.core.commerce.sub_agents.product_ops": None,
+                "agents.core.commerce.sub_agents.wordpress_assets": None,
+                "agents.core.commerce.sub_agents.wordpress_bridge": None,
+            },
+        ):
+            import agents.core.commerce.agent as mod
+
+            importlib.reload(mod)
+            a = mod.CommerceCoreAgent()
+            assert len(a._sub_agents) == 0
+        importlib.reload(mod)
+
+    @pytest.mark.asyncio
+    async def test_commerce_legacy_import_error(self):
+        from agents.core.commerce.agent import CommerceCoreAgent
+
+        a = CommerceCoreAgent()
+        a._legacy_agent = None
+        with patch.dict("sys.modules", {"agents.commerce_agent": None}):
+            result = a._get_legacy_agent()
+            assert result is None
+
+    @pytest.mark.asyncio
+    async def test_web_builder_sub_agents_import_error(self):
+        with patch.dict(
+            "sys.modules",
+            {"agents.core.web_builder.sub_agents.web_dev": None},
+        ):
+            import agents.core.web_builder.agent as mod
+
+            importlib.reload(mod)
+            a = mod.WebBuilderCoreAgent()
+            assert len(a._sub_agents) == 0
+        importlib.reload(mod)
+
+    @pytest.mark.asyncio
+    async def test_web_builder_director_import_error(self):
+        from agents.core.web_builder.agent import WebBuilderCoreAgent
+
+        a = WebBuilderCoreAgent()
+        a._director = None
+        with patch.dict("sys.modules", {"agents.elite_web_builder.director": None}):
+            result = a._get_director()
+            assert result is None
