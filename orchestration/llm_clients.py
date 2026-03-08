@@ -27,7 +27,7 @@ import os
 from abc import ABC, abstractmethod
 from collections.abc import AsyncIterator
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import cohere
@@ -68,7 +68,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class MessageRole(str, Enum):
+class MessageRole(StrEnum):
     """Message roles"""
 
     SYSTEM = "system"

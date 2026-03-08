@@ -14,7 +14,7 @@ Comprehensive Personally Identifiable Information (PII) protection:
 import re
 import secrets
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -22,7 +22,7 @@ from pydantic import BaseModel, Field
 from .aes256_gcm_encryption import FieldEncryption
 
 
-class PIIType(str, Enum):
+class PIIType(StrEnum):
     """Types of PII data"""
 
     EMAIL = "email"
@@ -41,7 +41,7 @@ class PIIType(str, Enum):
     FINANCIAL = "financial"
 
 
-class PIIClassification(str, Enum):
+class PIIClassification(StrEnum):
     """PII sensitivity classification"""
 
     PUBLIC = "public"

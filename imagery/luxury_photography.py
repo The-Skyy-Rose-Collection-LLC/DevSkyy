@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -21,7 +21,7 @@ from PIL import Image, ImageEnhance, ImageFilter
 logger = logging.getLogger(__name__)
 
 
-class ShotType(str, Enum):
+class ShotType(StrEnum):
     """Types of product shots."""
 
     HERO = "hero"
@@ -36,7 +36,7 @@ class ShotType(str, Enum):
     PACKAGING = "packaging"
 
 
-class LightingPreset(str, Enum):
+class LightingPreset(StrEnum):
     """Professional lighting presets."""
 
     STUDIO_DRAMATIC = "studio_dramatic"
@@ -48,7 +48,7 @@ class LightingPreset(str, Enum):
     SOFT_COMMERCIAL = "soft_commercial"
 
 
-class ColorGrade(str, Enum):
+class ColorGrade(StrEnum):
     """Color grading profiles."""
 
     LUXURY_NEUTRAL = "luxury_neutral"

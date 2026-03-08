@@ -14,7 +14,7 @@ import os
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from services.three_d.provider_interface import (
@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class ProviderPriority(str, Enum):
+class ProviderPriority(StrEnum):
     """Provider priority levels."""
 
     PRIMARY = "primary"

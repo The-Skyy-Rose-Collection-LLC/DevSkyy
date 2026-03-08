@@ -79,6 +79,11 @@
 			}
 			progressBar.style.width = progress + '%';
 		}, 120);
+
+		// Clean up on page hide (bfcache) to prevent detached DOM references.
+		window.addEventListener('pagehide', function () {
+			if (loadingInterval) { clearInterval(loadingInterval); loadingInterval = null; }
+		});
 	}
 
 	/* --------------------------------------------------
@@ -846,7 +851,7 @@
 			el.className = 'pulse-urgency-countdown';
 			var clockIcon = document.createElement('span');
 			clockIcon.className = 'pulse-urgency-countdown__icon';
-			clockIcon.textContent = '\u23f0';
+			clockIcon.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>';
 			el.appendChild(clockIcon);
 			el.appendChild(document.createTextNode('Pre-order closes in '));
 			var timeSpan = document.createElement('span');

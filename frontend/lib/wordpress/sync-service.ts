@@ -3,11 +3,7 @@
  * Syncs LLM Round Table results to WordPress posts
  */
 
-interface WooCommerceConfig {
-  baseUrl: string;
-  consumerKey: string;
-  consumerSecret: string;
-}
+import { wpProxyFetch } from './proxy-client';
 
 interface RoundTableResult {
   id: string;
@@ -55,24 +51,14 @@ interface WordPressPost {
 }
 
 export class WordPressSyncService {
-  private config: WooCommerceConfig;
-  private authHeader: string;
-
-  constructor(config: WooCommerceConfig) {
-    this.config = config;
-    // Create Basic Auth header
-    const credentials = btoa(`${config.consumerKey}:${config.consumerSecret}`);
-    this.authHeader = `Basic ${credentials}`;
-  }
-
   /**
    * Sync Round Table result to WordPress as a post
    */
   async syncRoundTableResult(
     result: RoundTableResult,
     options?: {
-      status?: 'draft' | 'publish'
-      title?: string
+      status?: 'draft' | 'publish';
+      title?: string;
     }
   ): Promise<{ success: boolean; postId?: number; error?: string }> {
     try {
@@ -88,7 +74,7 @@ export class WordPressSyncService {
         post.title = options.title;
       }
 
-      const response = await this.createWordPressPost(post);
+      const response = await wpProxyFetch('POST', '/wp/v2/posts', post);
 
       return {
         success: true,
@@ -170,30 +156,6 @@ export class WordPressSyncService {
   }
 
   /**
-   * Create WordPress post via REST API
-   */
-  private async createWordPressPost(post: WordPressPost): Promise<any> {
-    // Use index.php?rest_route= for WordPress.com compatibility
-    const endpoint = `${this.config.baseUrl}/index.php?rest_route=/wp/v2/posts`;
-
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: this.authHeader,
-      },
-      body: JSON.stringify(post),
-    });
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`WordPress API error: ${response.status} ${error}`);
-    }
-
-    return response.json();
-  }
-
-  /**
    * Get sync status for a result
    */
   async getSyncStatus(resultId: string): Promise<{ synced: boolean; postId?: number; error?: string }> {
@@ -206,9 +168,14 @@ export class WordPressSyncService {
    * Escape HTML for safe rendering
    */
   private escapeHtml(text: string): string {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+    const map: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;',
+    };
+    return text.replace(/[&<>"']/g, (c) => map[c]);
   }
 
   /**
@@ -216,18 +183,7 @@ export class WordPressSyncService {
    */
   async testConnection(): Promise<{ success: boolean; error?: string }> {
     try {
-      const endpoint = `${this.config.baseUrl}/index.php?rest_route=/wp/v2/posts`;
-      const response = await fetch(endpoint, {
-        method: 'GET',
-        headers: {
-          Authorization: this.authHeader,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Connection failed: ${response.status}`);
-      }
-
+      await wpProxyFetch('GET', '/wp/v2/posts');
       return { success: true };
     } catch (error) {
       return {
@@ -239,21 +195,9 @@ export class WordPressSyncService {
 }
 
 /**
- * Get WordPress sync service instance
+ * Get WordPress sync service instance.
+ * Credentials are handled server-side by /api/wordpress/proxy.
  */
-export function getWordPressSyncService(): WordPressSyncService | null {
-  const baseUrl = process.env.NEXT_PUBLIC_WORDPRESS_URL;
-  const consumerKey = process.env.NEXT_PUBLIC_WP_CONSUMER_KEY;
-  const consumerSecret = process.env.NEXT_PUBLIC_WP_CONSUMER_SECRET;
-
-  if (!baseUrl || !consumerKey || !consumerSecret) {
-    console.warn('WordPress credentials not configured');
-    return null;
-  }
-
-  return new WordPressSyncService({
-    baseUrl,
-    consumerKey,
-    consumerSecret,
-  });
+export function getWordPressSyncService(): WordPressSyncService {
+  return new WordPressSyncService();
 }

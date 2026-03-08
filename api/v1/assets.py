@@ -14,14 +14,12 @@ Version: 1.0.0
 import io
 import logging
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
 from pydantic import BaseModel, Field
-
-from security.jwt_oauth2_auth import TokenPayload, get_current_user
 from services.storage import (
     AssetInfo,
     AssetNotFoundError,
@@ -33,6 +31,8 @@ from services.storage import (
     VersionListResponse,
     VersionNotFoundError,
 )
+
+from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ MIN_IMAGE_DIMENSION = 100
 # =============================================================================
 
 
-class JobStatus(str, Enum):
+class JobStatus(StrEnum):
     """Status of a processing job."""
 
     PENDING = "pending"
@@ -63,7 +63,7 @@ class JobStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class ProcessingProfile(str, Enum):
+class ProcessingProfile(StrEnum):
     """Available processing profiles."""
 
     FULL = "full"
@@ -72,7 +72,7 @@ class ProcessingProfile(str, Enum):
     REFORMAT = "reformat"
 
 
-class ImageSource(str, Enum):
+class ImageSource(StrEnum):
     """Source of the image."""
 
     API = "api"

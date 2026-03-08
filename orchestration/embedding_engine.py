@@ -21,7 +21,7 @@ import logging
 import os
 from abc import ABC, abstractmethod
 from collections import OrderedDict
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -133,7 +133,7 @@ def get_embedding_cache() -> EmbeddingCache:
 # =============================================================================
 
 
-class EmbeddingProvider(str, Enum):
+class EmbeddingProvider(StrEnum):
     """Supported embedding providers."""
 
     SENTENCE_TRANSFORMERS = "sentence_transformers"

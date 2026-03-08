@@ -13,7 +13,7 @@ import hashlib
 import json
 import logging
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -40,7 +40,7 @@ CACHE_TTL_BUSINESS = 300  # 5 minutes for business metrics
 # =============================================================================
 
 
-class DashboardSection(str, Enum):
+class DashboardSection(StrEnum):
     """Available dashboard sections."""
 
     HEALTH = "health"
@@ -49,7 +49,7 @@ class DashboardSection(str, Enum):
     ALERTS = "alerts"
 
 
-class AlertSeverity(str, Enum):
+class AlertSeverity(StrEnum):
     """Alert severity levels."""
 
     CRITICAL = "critical"
@@ -57,7 +57,7 @@ class AlertSeverity(str, Enum):
     INFO = "info"
 
 
-class PipelineStatus(str, Enum):
+class PipelineStatus(StrEnum):
     """ML Pipeline status values."""
 
     RUNNING = "running"

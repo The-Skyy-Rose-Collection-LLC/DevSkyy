@@ -14,15 +14,16 @@ import logging
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
+
+from services.three_d.gemini_provider import GeminiImageProvider
+from services.three_d.provider_factory import ThreeDProviderFactory, get_provider_factory
+from services.three_d.provider_interface import QualityLevel, ThreeDRequest
 
 from adk.base import ADKProvider, AgentResult, AgentStatus
 from agents.base_super_agent import EnhancedSuperAgent, SuperAgentType
 from orchestration.brand_context import BrandContextInjector, Collection
-from services.three_d.gemini_provider import GeminiImageProvider
-from services.three_d.provider_factory import ThreeDProviderFactory, get_provider_factory
-from services.three_d.provider_interface import QualityLevel, ThreeDRequest
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class ImageryPurpose(str, Enum):
+class ImageryPurpose(StrEnum):
     """Purpose of generated imagery."""
 
     HERO_BANNER = "hero_banner"
@@ -43,7 +44,7 @@ class ImageryPurpose(str, Enum):
     BACKGROUND = "background"
 
 
-class ModelPose(str, Enum):
+class ModelPose(StrEnum):
     """AI model pose styles."""
 
     EDITORIAL = "editorial"

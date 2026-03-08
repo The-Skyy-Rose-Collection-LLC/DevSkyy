@@ -509,7 +509,7 @@
 	font-size: 0.75rem;
 	font-weight: 500;
 	cursor: pointer;
-	transition: all 0.2s ease;
+	transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
 
 .modal-sizes .size-btn:hover,
@@ -847,7 +847,7 @@
 
 .signin-divider {
 	text-align: center;
-	color: rgba(255, 255, 255, 0.2);
+	color: rgba(255, 255, 255, 0.5);
 	font-size: 0.8rem;
 	margin: 2rem 0;
 	position: relative;
@@ -1064,7 +1064,7 @@
 .countdown-separator {
 	font-size: 1.5rem;
 	font-weight: 300;
-	color: rgba(255, 255, 255, 0.2);
+	color: rgba(255, 255, 255, 0.5);
 	margin-top: -12px;
 }
 
@@ -1211,7 +1211,7 @@
 }
 
 .incentive-popup-input::placeholder {
-	color: rgba(255, 255, 255, 0.3);
+	color: rgba(255, 255, 255, 0.5);
 }
 
 .incentive-popup-submit {
@@ -1238,7 +1238,7 @@
 	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.65rem;
 	font-weight: 300;
-	color: rgba(255, 255, 255, 0.3);
+	color: rgba(255, 255, 255, 0.5);
 	margin: 1rem 0 0;
 }
 

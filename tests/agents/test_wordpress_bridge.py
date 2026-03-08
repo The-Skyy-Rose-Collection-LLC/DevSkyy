@@ -689,7 +689,7 @@ class TestWordPressAgentEndpoint:
 
         async def mock_run_agent(prompt, **kwargs):
             raise RuntimeError("Agent crashed")
-            yield  # noqa: unreachable — makes this an async generator
+            yield  # noqa: F541, E501 — makes this an async generator
 
         with patch("api.v1.wordpress_agent.run_agent", mock_run_agent):
             response = client.post(

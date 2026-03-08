@@ -118,8 +118,49 @@
           }
         ],
         "description": "Warn about console.log statements after edits"
+      },
+      {
+        "matcher": "tool == \"Edit\" && tool_input.file_path matches \"\\\\.py$\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\n# Auto-format Python files with ruff after edits\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  repo_root=$(git -C \"$(dirname \"$file_path\")\" rev-parse --show-toplevel 2>/dev/null || echo '.')\n  if command -v ruff >/dev/null 2>&1; then\n    ruff check --fix --quiet \"$file_path\" 2>&1 | head -5 >&2\n    ruff format --quiet \"$file_path\" 2>/dev/null\n  fi\nfi\necho \"$input\""
+          }
+        ],
+        "description": "Auto-format Python files with ruff after edits"
+      },
+      {
+        "matcher": "tool == \"Edit\" && tool_input.file_path matches \"\\\\.py$\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\n# Warn about print() statements in Python files\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  prints=$(grep -n '\\bprint(' \"$file_path\" 2>/dev/null | grep -v '# noqa' || true)\n  if [ -n \"$prints\" ]; then\n    echo \"[Hook] WARNING: print() found in $file_path\" >&2\n    echo \"$prints\" | head -5 >&2\n    echo \"[Hook] Use logging module or remove before committing\" >&2\n  fi\nfi\necho \"$input\""
+          }
+        ],
+        "description": "Warn about print() statements in Python files after edits"
+      },
+      {
+        "matcher": "tool == \"Write\" || tool == \"Edit\" || tool == \"Bash\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/claude-md-tracker/track-changes.sh\""
+          }
+        ],
+        "description": "Track structural changes for CLAUDE.md staleness detection"
       }
     ],
-    "Stop": []
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/claude-md-tracker/session-summary.sh\""
+          }
+        ],
+        "description": "Summarize CLAUDE.md staleness at session end"
+      }
+    ]
   }
 }

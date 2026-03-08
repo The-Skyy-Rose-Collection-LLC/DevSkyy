@@ -405,7 +405,7 @@
 /* Placeholder */
 .contact-form__input::placeholder,
 .contact-form__textarea::placeholder {
-	color: rgba(255, 255, 255, 0.3);
+	color: rgba(255, 255, 255, 0.5);
 }
 
 /* ==========================================================================

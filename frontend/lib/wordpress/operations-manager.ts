@@ -3,10 +3,11 @@
  * Complete WordPress REST API operations suite
  */
 
-interface WooCommerceConfig {
-  baseUrl: string
-  consumerKey: string
-  consumerSecret: string
+import { wpProxyFetch } from './proxy-client'
+
+interface WordPressManagerConfig {
+  /** WordPress site URL — used for display links only, not API calls. */
+  baseUrl?: string
 }
 
 // ============================================================================
@@ -124,13 +125,10 @@ interface WordPressSettings {
 // ============================================================================
 
 export class WordPressOperationsManager {
-  private config: WooCommerceConfig
-  private authHeader: string
+  private siteUrl: string
 
-  constructor(config: WooCommerceConfig) {
-    this.config = config
-    const credentials = btoa(`${config.consumerKey}:${config.consumerSecret}`)
-    this.authHeader = `Basic ${credentials}`
+  constructor(config: WordPressManagerConfig = {}) {
+    this.siteUrl = config.baseUrl ?? ''
   }
 
   // ==========================================================================
@@ -282,12 +280,8 @@ export class WordPressOperationsManager {
       })
     }
 
-    const endpoint = `${this.config.baseUrl}/index.php?rest_route=/wp/v2/media`
-    const response = await fetch(endpoint, {
+    const response = await fetch('/api/wordpress/proxy/upload', {
       method: 'POST',
-      headers: {
-        Authorization: this.authHeader,
-      },
       body: formData,
     })
 
@@ -548,28 +542,7 @@ export class WordPressOperationsManager {
   // ==========================================================================
 
   private async request(method: string, endpoint: string, body?: any): Promise<any> {
-    const url = `${this.config.baseUrl}/index.php?rest_route=${endpoint}`
-
-    const options: RequestInit = {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: this.authHeader,
-      },
-    }
-
-    if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
-      options.body = JSON.stringify(body)
-    }
-
-    const response = await fetch(url, options)
-
-    if (!response.ok) {
-      const error = await response.text()
-      throw new Error(`WordPress API error: ${response.status} ${error}`)
-    }
-
-    return response.json()
+    return wpProxyFetch(method, endpoint, body)
   }
 
   private buildQuery(params?: Record<string, any>): string {
@@ -614,21 +587,11 @@ export class WordPressOperationsManager {
 }
 
 /**
- * Get WordPress operations manager instance
+ * Get WordPress operations manager instance.
+ * Credentials are handled server-side by /api/wordpress/proxy.
  */
-export function getWordPressOperationsManager(): WordPressOperationsManager | null {
-  const baseUrl = process.env.NEXT_PUBLIC_WORDPRESS_URL
-  const consumerKey = process.env.NEXT_PUBLIC_WP_CONSUMER_KEY
-  const consumerSecret = process.env.NEXT_PUBLIC_WP_CONSUMER_SECRET
-
-  if (!baseUrl || !consumerKey || !consumerSecret) {
-    console.warn('WordPress credentials not configured')
-    return null
-  }
-
+export function getWordPressOperationsManager(): WordPressOperationsManager {
   return new WordPressOperationsManager({
-    baseUrl,
-    consumerKey,
-    consumerSecret
+    baseUrl: process.env.NEXT_PUBLIC_WORDPRESS_URL,
   })
 }

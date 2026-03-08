@@ -19,7 +19,7 @@ with SkyyRose brand assets (NO EXCEPTIONS)
 
 import logging
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from adk.base import (
@@ -49,7 +49,7 @@ from .multimodal_capabilities import (
 logger = logging.getLogger(__name__)
 
 
-class VisualProvider(str, Enum):
+class VisualProvider(StrEnum):
     """Visual generation providers"""
 
     GOOGLE_IMAGEN = "google_imagen"
@@ -59,7 +59,7 @@ class VisualProvider(str, Enum):
     FASHN = "fashn"
 
 
-class VisualTaskType(str, Enum):
+class VisualTaskType(StrEnum):
     """Types of visual tasks"""
 
     IMAGE_FROM_TEXT = "image_from_text"

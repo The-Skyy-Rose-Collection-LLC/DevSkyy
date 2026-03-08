@@ -18,7 +18,7 @@ import os
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from adk.base import ADKProvider, AgentResult, AgentStatus
@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class ContentType(str, Enum):
+class ContentType(StrEnum):
     """Types of WordPress content."""
 
     PAGE = "page"
@@ -48,7 +48,7 @@ class ContentType(str, Enum):
     EMAIL_CAMPAIGN = "email_campaign"
 
 
-class ContentStatus(str, Enum):
+class ContentStatus(StrEnum):
     """Content lifecycle status."""
 
     DRAFTED = "drafted"

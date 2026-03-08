@@ -34,12 +34,14 @@
 				<div class="navbar__brand">
 					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="navbar__logo-link" rel="home" aria-label="<?php esc_attr_e( 'SkyyRose Home', 'skyyrose-flagship' ); ?>">
 						<img
-							src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/sr-monogram.png' ); ?>"
+							src="<?php echo esc_url( get_template_directory_uri() . '/assets/branding/skyyrose-monogram-nav.webp' ); ?>"
 							alt="<?php esc_attr_e( 'SR Monogram', 'skyyrose-flagship' ); ?>"
 							class="navbar__monogram"
-							width="48"
-							height="48"
+							width="50"
+							height="50"
 							loading="eager"
+							fetchpriority="high"
+							decoding="async"
 						>
 						<span class="navbar__brand-text">
 							<span class="navbar__site-title">
@@ -118,7 +120,7 @@
 								<path d="M3 6h18"/>
 								<path d="M16 10a4 4 0 0 1-8 0"/>
 							</svg>
-							<span class="navbar__cart-badge<?php echo $cart_count > 0 ? ' navbar__cart-badge--visible' : ''; ?>">
+							<span class="navbar__cart-badge<?php echo esc_attr( $cart_count > 0 ? ' navbar__cart-badge--visible' : '' ); ?>">
 								<?php echo esc_html( $cart_count ); ?>
 							</span>
 						</a>
@@ -143,7 +145,7 @@
 		</nav>
 
 		<!-- Search Overlay -->
-		<div class="search-overlay" id="search-overlay" aria-hidden="true" inert role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Search', 'skyyrose-flagship' ); ?>">
+		<div class="search-overlay" id="search-overlay" aria-hidden="true" inert role="dialog" aria-modal="true" tabindex="-1" aria-label="<?php esc_attr_e( 'Search', 'skyyrose-flagship' ); ?>">
 			<div class="search-overlay__container">
 				<form role="search" method="get" class="search-overlay__form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
 					<label class="screen-reader-text" for="search-overlay-input">
@@ -177,7 +179,7 @@
 		<!-- Mobile Menu Slide-In -->
 		<div class="mobile-menu" id="mobile-menu" aria-hidden="true" inert>
 			<div class="mobile-menu__overlay" id="mobile-menu-overlay" aria-hidden="true"></div>
-			<div class="mobile-menu__panel" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Mobile Navigation', 'skyyrose-flagship' ); ?>">
+			<div class="mobile-menu__panel" role="dialog" aria-modal="true" tabindex="-1" aria-label="<?php esc_attr_e( 'Mobile Navigation', 'skyyrose-flagship' ); ?>">
 				<div class="mobile-menu__header">
 					<span class="mobile-menu__brand navbar__gradient-text"><?php esc_html_e( 'SKYY ROSE', 'skyyrose-flagship' ); ?></span>
 					<button

@@ -9,9 +9,9 @@ from pathlib import Path
 
 import blurhash
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from services.ai_image_enhancement import LuxuryImageEnhancer
 
 from core.auth.interfaces import requires_api_key
-from services.ai_image_enhancement import LuxuryImageEnhancer
 
 router = APIRouter(prefix="/ai", tags=["AI Enhancement"])
 
@@ -61,7 +61,7 @@ async def enhance_image(
         # Remove background if requested
         if remove_background:
             bg_removed_path = temp_dir / f"nobg_{timestamp}_{file.filename}"
-            img = await enhancer.remove_background(current_path, str(bg_removed_path))
+            _img = await enhancer.remove_background(current_path, str(bg_removed_path))
             current_path = str(bg_removed_path)
 
         # Apply luxury filter

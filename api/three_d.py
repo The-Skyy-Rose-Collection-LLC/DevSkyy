@@ -22,7 +22,7 @@ import shutil
 import time
 import uuid
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -51,7 +51,7 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 # =============================================================================
 
 
-class ModelProvider(str, Enum):
+class ModelProvider(StrEnum):
     """3D generation provider."""
 
     # Direct providers
@@ -70,7 +70,7 @@ class ModelProvider(str, Enum):
     ROUND_TABLE = "round_table"  # All compete, A/B test winner
 
 
-class JobStatus(str, Enum):
+class JobStatus(StrEnum):
     """Generation job status."""
 
     QUEUED = "queued"

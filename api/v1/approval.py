@@ -23,8 +23,6 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
-
-from security.jwt_oauth2_auth import TokenPayload, get_current_user
 from services.approval_queue_manager import (
     ApprovalAction,
     ApprovalActionRequest,
@@ -42,6 +40,8 @@ from services.approval_queue_manager import (
     RevisionQueueResponse,
     get_approval_manager,
 )
+
+from security.jwt_oauth2_auth import TokenPayload, get_current_user
 from sync.wordpress_media_approval_sync import (
     BatchSyncResult,
     WordPressMediaApprovalSync,

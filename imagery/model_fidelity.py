@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -61,7 +61,7 @@ MINIMUM_TEXTURE_RESOLUTION = 1024  # 1024x1024 minimum
 ACCEPTABLE_UV_COVERAGE = 0.85  # 85% UV coverage
 
 
-class FidelityCategory(str, Enum):
+class FidelityCategory(StrEnum):
     """Categories of fidelity assessment."""
 
     MESH_INTEGRITY = "mesh_integrity"
@@ -70,7 +70,7 @@ class FidelityCategory(str, Enum):
     VISUAL_ACCURACY = "visual_accuracy"
 
 
-class FidelityGrade(str, Enum):
+class FidelityGrade(StrEnum):
     """Fidelity grade classifications."""
 
     EXCELLENT = "excellent"  # 95-100%

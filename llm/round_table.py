@@ -27,7 +27,7 @@ from collections import OrderedDict
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -51,7 +51,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class LLMProvider(str, Enum):
+class LLMProvider(StrEnum):
     """LLM providers participating in Round Table."""
 
     CLAUDE = "claude"
@@ -62,7 +62,7 @@ class LLMProvider(str, Enum):
     COHERE = "cohere"
 
 
-class CompetitionStatus(str, Enum):
+class CompetitionStatus(StrEnum):
     """Status of a Round Table competition."""
 
     PENDING = "pending"

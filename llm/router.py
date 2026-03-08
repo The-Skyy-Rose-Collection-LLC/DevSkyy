@@ -17,7 +17,7 @@ import asyncio
 import logging
 import time
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from core.telemetry.tracer import get_tracer
@@ -134,7 +134,7 @@ except ImportError:
     pass
 
 
-class RoutingStrategy(str, Enum):
+class RoutingStrategy(StrEnum):
     """Routing strategy for provider selection."""
 
     PRIORITY = "priority"  # Use priority order

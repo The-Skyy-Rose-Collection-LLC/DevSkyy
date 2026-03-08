@@ -41,7 +41,7 @@ import os
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -119,7 +119,7 @@ except ImportError:
 # =============================================================================
 
 
-class ProductCategory(str, Enum):
+class ProductCategory(StrEnum):
     """Product category for pipeline routing."""
 
     APPAREL = "apparel"  # Clothing - uses both Tripo3D and FASHN
@@ -127,7 +127,7 @@ class ProductCategory(str, Enum):
     FOOTWEAR = "footwear"  # Shoes - Tripo3D only
 
 
-class PipelineStage(str, Enum):
+class PipelineStage(StrEnum):
     """Pipeline execution stages."""
 
     INITIALIZED = "initialized"
@@ -138,7 +138,7 @@ class PipelineStage(str, Enum):
     FAILED = "failed"
 
 
-class Primary3DGenerator(str, Enum):
+class Primary3DGenerator(StrEnum):
     """Primary 3D generator selection."""
 
     HUGGINGFACE = "huggingface"  # Use HuggingFace models (recommended for quality)
@@ -227,7 +227,7 @@ ProgressCallback = Callable[["ProgressEvent"], None]
 AsyncProgressCallback = Callable[["ProgressEvent"], "asyncio.coroutine[None]"]
 
 
-class ProgressEventType(str, Enum):
+class ProgressEventType(StrEnum):
     """Progress event types for WebSocket tracking."""
 
     BATCH_STARTED = "batch_started"

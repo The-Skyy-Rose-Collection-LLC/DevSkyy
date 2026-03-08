@@ -26,7 +26,7 @@ import logging
 import os
 from abc import ABC, abstractmethod
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -35,7 +35,7 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger(__name__)
 
 
-class SecretBackendType(str, Enum):
+class SecretBackendType(StrEnum):
     """Types of secrets backends"""
 
     AWS_SECRETS_MANAGER = "aws_secrets_manager"

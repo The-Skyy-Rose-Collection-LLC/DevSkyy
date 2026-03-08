@@ -9,11 +9,12 @@ from collections.abc import Callable
 from functools import wraps
 from typing import ParamSpec, TypeVar
 
-from mcp_tools.server import logger
 from utils.logging_utils import get_correlation_id, set_correlation_id
 from utils.rate_limiting import check_rate_limit
 from utils.request_deduplication import deduplicate_request
 from utils.security_utils import SecurityError, validate_request_params
+
+from mcp_tools.server import logger
 
 P = ParamSpec("P")
 T = TypeVar("T")

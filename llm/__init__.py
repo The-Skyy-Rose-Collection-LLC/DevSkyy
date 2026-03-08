@@ -44,8 +44,8 @@ Usage:
     )
 """
 
+from .base import BaseLLMClient  # Enums; Models; Base Client
 from .base import (
-    BaseLLMClient,  # Enums; Models; Base Client
     CompletionResponse,
     Message,
     MessageRole,
@@ -92,6 +92,9 @@ from .providers import (
 from .round_table import (
     ABTestResult,
     CompetitionStatus,
+)
+from .round_table import LLMProvider as RoundTableProvider
+from .round_table import (
     LLMResponse,
     LLMRoundTable,
     ResponseScorer,
@@ -101,7 +104,6 @@ from .round_table import (
     RoundTableResult,
     create_round_table,
 )
-from .round_table import LLMProvider as RoundTableProvider
 from .router import (
     PROVIDER_CONFIGS,
     LLMRouter,

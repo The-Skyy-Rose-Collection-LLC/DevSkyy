@@ -180,16 +180,14 @@ class TestGoogleAdapter:
 
         mock_response = {"candidates": []}
 
-        with (
-            patch.object(
-                adapter, "_call_gemini_rest", new_callable=AsyncMock, return_value=mock_response
-            ),
-            pytest.raises(ValueError, match="empty"),
+        with patch.object(
+            adapter, "_call_gemini_rest", new_callable=AsyncMock, return_value=mock_response
         ):
-            await adapter.call(
-                model="gemini-3-pro-preview",
-                messages=[LLMMessage(role="user", content="test")],
-            )
+            with pytest.raises(ValueError, match="empty"):
+                await adapter.call(
+                    model="gemini-3-pro-preview",
+                    messages=[LLMMessage(role="user", content="test")],
+                )
 
 
 # ---------------------------------------------------------------------------

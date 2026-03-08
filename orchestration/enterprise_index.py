@@ -24,7 +24,7 @@ import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import httpx
@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class IndexProvider(str, Enum):
+class IndexProvider(StrEnum):
     """Supported enterprise index providers."""
 
     GITHUB_ENTERPRISE = "github_enterprise"
@@ -47,7 +47,7 @@ class IndexProvider(str, Enum):
     BITBUCKET = "bitbucket"
 
 
-class SearchLanguage(str, Enum):
+class SearchLanguage(StrEnum):
     """Programming language filters."""
 
     PYTHON = "python"

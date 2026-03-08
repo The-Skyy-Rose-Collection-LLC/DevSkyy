@@ -1,0 +1,223 @@
+/**
+ * SkyyRose Flagship — Elite Web Builder Global Styles
+ *
+ * Supplementary global reset and utility classes for the Elite Web Builder
+ * design system. Loads after design-tokens.css and before template CSS.
+ *
+ * @package SkyyRose_Flagship
+ * @since   4.0.0
+ */
+
+/* ═══════════════════════════════════════════════
+   GLOBAL RESET (supplement to style.css)
+   ═══════════════════════════════════════════════ */
+*, *::before, *::after {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+body {
+	-webkit-font-smoothing: antialiased;
+	overflow-x: hidden;
+	line-height: 1.6;
+	background: #000;
+	color: #fff;
+	font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+img {
+	max-width: 100%;
+	display: block;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+button {
+	font-family: inherit;
+	cursor: pointer;
+	border: none;
+	background: none;
+	color: inherit;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+	width: 2px;
+}
+
+::-webkit-scrollbar-track {
+	background: #000;
+}
+
+::-webkit-scrollbar-thumb {
+	background: rgba(183, 110, 121, 0.2);
+}
+
+/* ═══════════════════════════════════════════════
+   GRAIN OVERLAY (luxury film texture)
+   ═══════════════════════════════════════════════ */
+.grain {
+	position: fixed;
+	inset: 0;
+	z-index: 9500;
+	pointer-events: none;
+	opacity: 0.03;
+	mix-blend-mode: overlay;
+	background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ═══════════════════════════════════════════════
+   CONTAINER UTILITY (.sr-container)
+   ═══════════════════════════════════════════════ */
+.sr-container {
+	max-width: 1400px;
+	margin: 0 auto;
+	padding: 0 48px;
+}
+
+@media (max-width: 768px) {
+	.sr-container {
+		padding: 0 20px;
+	}
+}
+
+/* ═══════════════════════════════════════════════
+   FONT FAMILY SHORTHAND VARIABLES
+   ═══════════════════════════════════════════════ */
+:root {
+	--fd: 'Cinzel', serif;                       /* Display / headings */
+	--fb: 'Cormorant Garamond', Georgia, serif;  /* Body / editorial */
+	--fm: 'Space Mono', monospace;               /* Mono / labels */
+	--fc: 'Bebas Neue', sans-serif;              /* CTA / condensed */
+	--fp: 'Playfair Display', Georgia, serif;    /* Premium / accents */
+}
+
+/* ═══════════════════════════════════════════════
+   PROGRESSIVE IMAGE LOADING (blur-up)
+   ═══════════════════════════════════════════════ */
+img.sr-progressive {
+	filter: blur(12px);
+	transition: filter 0.5s ease-out;
+	will-change: filter;
+}
+
+img.sr-progressive--loaded {
+	filter: blur(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	img.sr-progressive {
+		filter: none;
+		transition: none;
+	}
+}
+
+/* ═══════════════════════════════════════════════
+   SCROLL PROGRESS INDICATOR
+   ═══════════════════════════════════════════════ */
+.sr-scroll-progress {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 3px;
+	z-index: 10000;
+	pointer-events: none;
+	background: transparent;
+}
+
+.sr-scroll-progress__bar {
+	height: 100%;
+	width: 0;
+	background: linear-gradient(90deg, #B76E79, #D4AF37, #B76E79);
+	background-size: 200% 100%;
+	transition: width 0.1s linear;
+	will-change: width;
+}
+
+/* WordPress admin bar offset */
+.admin-bar .sr-scroll-progress {
+	top: 32px;
+}
+
+@media (max-width: 782px) {
+	.admin-bar .sr-scroll-progress {
+		top: 46px;
+	}
+}
+
+/* ═══════════════════════════════════════════════
+   BACK TO TOP BUTTON
+   ═══════════════════════════════════════════════ */
+.sr-back-to-top {
+	position: fixed;
+	bottom: 32px;
+	right: 32px;
+	z-index: 9400;
+	width: 48px;
+	height: 48px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	border: 1px solid rgba(183, 110, 121, 0.3);
+	background: rgba(10, 10, 10, 0.85);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	color: #B76E79;
+	cursor: pointer;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(12px);
+	transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease,
+	            background 0.2s ease, border-color 0.2s ease;
+}
+
+.sr-back-to-top.visible {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+
+.sr-back-to-top:hover {
+	background: rgba(183, 110, 121, 0.15);
+	border-color: rgba(183, 110, 121, 0.6);
+	color: #fff;
+}
+
+.sr-back-to-top:focus-visible {
+	outline: 2px solid #B76E79;
+	outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+	.sr-back-to-top {
+		bottom: 20px;
+		right: 20px;
+		width: 42px;
+		height: 42px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.sr-scroll-progress__bar {
+		transition: none;
+	}
+
+	.sr-back-to-top {
+		transition: opacity 0.01ms, visibility 0.01ms;
+		transform: none;
+	}
+
+	.sr-back-to-top.visible {
+		transform: none;
+	}
+}

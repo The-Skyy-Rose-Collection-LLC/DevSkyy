@@ -18,7 +18,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -57,7 +57,7 @@ class _NullSpanCtx:
 # =============================================================================
 
 
-class ADKProvider(str, Enum):
+class ADKProvider(StrEnum):
     """Supported ADK frameworks"""
 
     GOOGLE = "google_adk"  # Google Agent Development Kit
@@ -68,7 +68,7 @@ class ADKProvider(str, Enum):
     LANGGRAPH = "langgraph"  # LangGraph
 
 
-class AgentCapability(str, Enum):
+class AgentCapability(StrEnum):
     """Agent capabilities"""
 
     # Core capabilities
@@ -98,7 +98,7 @@ class AgentCapability(str, Enum):
     VIRTUAL_TRYON = "virtual_tryon"
 
 
-class AgentStatus(str, Enum):
+class AgentStatus(StrEnum):
     """Agent execution status"""
 
     IDLE = "idle"
@@ -108,7 +108,7 @@ class AgentStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class ModelTier(str, Enum):
+class ModelTier(StrEnum):
     """Model performance tier"""
 
     FLAGSHIP = "flagship"  # GPT-4o, Claude Opus, Gemini Ultra

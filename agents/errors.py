@@ -13,7 +13,7 @@ Provides:
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 # =============================================================================
@@ -21,7 +21,7 @@ from typing import Any
 # =============================================================================
 
 
-class ErrorCategory(str, Enum):
+class ErrorCategory(StrEnum):
     """Categories of agent errors for handling."""
 
     CONFIGURATION = "configuration"  # Missing/invalid config
@@ -37,7 +37,7 @@ class ErrorCategory(str, Enum):
     UNKNOWN = "unknown"  # Unexpected errors
 
 
-class ErrorSeverity(str, Enum):
+class ErrorSeverity(StrEnum):
     """Severity levels for errors."""
 
     LOW = "low"  # Warnings, non-critical

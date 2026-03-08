@@ -52,7 +52,7 @@ import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -67,7 +67,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class HealthCheckType(str, Enum):
+class HealthCheckType(StrEnum):
     """Types of health checks"""
 
     FULL = "full"
@@ -80,7 +80,7 @@ class HealthCheckType(str, Enum):
     FINANCE = "finance"
 
 
-class SeverityLevel(str, Enum):
+class SeverityLevel(StrEnum):
     """Issue severity levels"""
 
     CRITICAL = "critical"
@@ -90,7 +90,7 @@ class SeverityLevel(str, Enum):
     INFO = "info"
 
 
-class IssueCategory(str, Enum):
+class IssueCategory(StrEnum):
     """Categories of code issues"""
 
     SECURITY = "security"
@@ -108,7 +108,7 @@ class IssueCategory(str, Enum):
     DATABASE = "database"
 
 
-class HealingAction(str, Enum):
+class HealingAction(StrEnum):
     """Types of self-healing actions"""
 
     AUTO_FORMAT = "auto_format"

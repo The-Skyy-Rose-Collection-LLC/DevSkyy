@@ -21,7 +21,7 @@ import logging
 from abc import ABC, abstractmethod
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import httpx
@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class MessageRole(str, Enum):
+class MessageRole(StrEnum):
     """Message roles in conversations."""
 
     SYSTEM = "system"
@@ -52,7 +52,7 @@ class MessageRole(str, Enum):
     TOOL = "tool"
 
 
-class ModelProvider(str, Enum):
+class ModelProvider(StrEnum):
     """Supported LLM providers."""
 
     OPENAI = "openai"
@@ -65,7 +65,7 @@ class ModelProvider(str, Enum):
     LITELLM = "litellm"
 
 
-class CallerType(str, Enum):
+class CallerType(StrEnum):
     """
     Tool caller type for Programmatic Tool Calling (PTC).
 

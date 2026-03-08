@@ -13,8 +13,6 @@ import logging
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-
-from security.jwt_oauth2_auth import TokenPayload, get_current_user
 from services.competitive.competitor_analysis import (
     CompetitorAnalysisService,
     _competitor_assets,
@@ -35,6 +33,8 @@ from services.competitive.schemas import (
     StyleAnalyticsResponse,
     StyleCategory,
 )
+
+from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 logger = logging.getLogger(__name__)
 

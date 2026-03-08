@@ -15,7 +15,7 @@ import logging
 import os
 import secrets
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -23,7 +23,7 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger(__name__)
 
 
-class SecretType(str, Enum):
+class SecretType(StrEnum):
     """Types of secrets"""
 
     API_KEY = "api_key"
