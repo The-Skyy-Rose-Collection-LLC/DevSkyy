@@ -278,6 +278,20 @@ TECH_FLAT_SKUS = {
     "po-006",  # Tech flat only (po-006-techflat.jpg)
 }
 
+# -- Logo treatment metadata (real product material) -------------------------
+# Used by --step composite to tell Gemini what the REAL logo looks like.
+# Products not listed get a generic "match the reference" prompt.
+LOGO_TREATMENTS = {
+    "br-001": "embossed — pressed into the fabric creating a raised, dimensional rose texture with subtle shadow",
+    "br-002": "silicone rubber cut-out — raised 3D rubber logo with clean-cut edges standing proud of the fabric",
+    "br-004": "embossed — pressed into the hoodie fabric creating a dimensional rose with visible depth",
+    "br-005": "embossed — pressed into the hoodie fabric creating a dimensional rose with visible depth",
+    "br-006": "embroidered — stitched thread forming the rose logo with visible thread texture on sherpa fabric",
+    "sg-003": "screen-printed — flat ink application with clean edges on cotton tee",
+    "sg-004": "embroidered — stitched logo on hoodie with raised thread texture",
+    "sg-005": "screen-printed — flat ink on cotton tee",
+}
+
 IMAGEN_PRODUCT_DESCRIPTIONS = {
     "br-003": {
         "garment": "jersey",
@@ -641,6 +655,88 @@ ENHANCED_PROMPT_SUFFIX = (
     "elements. Do NOT substitute a different garment type. "
     "This is a luxury fashion brand — accuracy is everything." + ANTI_HALLUCINATION
 )
+
+
+# -- Composite prompts --------------------------------------------------------
+# For --step composite: merge real product branding into AI lifestyle shots.
+
+
+def composite_prompt(name: str, sku: str, view: str = "front") -> str:
+    """Build a prompt for compositing real branding onto an AI lifestyle shot."""
+    treatment = LOGO_TREATMENTS.get(sku, "")
+    treatment_note = f" The real product's logo/branding is {treatment}." if treatment else ""
+    return (
+        f"I am providing TWO images. "
+        f"IMAGE 1 (the AI render): A professional fashion photo of a model wearing a {name}. "
+        f"This is the composition, pose, lighting, and background you MUST keep. "
+        f"IMAGE 2 (the REAL product): The actual {name} showing the TRUE logo, branding, "
+        f"and material treatment.{treatment_note} "
+        f"YOUR TASK: Generate a new image that keeps the EXACT same model, pose, body position, "
+        f"lighting, and background from Image 1 — but corrects the garment's logo and branding "
+        f"details to match Image 2 exactly. The logo must look like the REAL material "
+        f"(embossed, silicone rubber, embroidered, screen-printed, etc.) — NOT a flat printed graphic. "
+        f"Pay close attention to: logo placement, size, dimensionality, material texture, and color. "
+        f"Everything about the model and background stays IDENTICAL. Only the garment branding changes."
+    )
+
+
+def generate_composite(
+    client,
+    ai_render_path: Path,
+    source_image_path: Path,
+    prompt: str,
+) -> bytes | None:
+    """Generate a composite image: AI lifestyle + real product branding.
+
+    Sends both images to Gemini and asks it to merge accurate branding
+    from the real product into the AI lifestyle shot's composition.
+
+    Returns WebP image bytes on success, None on failure.
+    """
+    from google.genai import types
+    from PIL import Image as PILImage
+
+    # Load both images
+    ai_img = PILImage.open(ai_render_path).convert("RGB")
+    src_img = enhance_source_image(source_image_path)
+
+    try:
+        response = client.models.generate_content(
+            model=MODEL_ID,
+            contents=[
+                "IMAGE 1 — the AI-generated lifestyle photo (keep this composition):",
+                ai_img,
+                "IMAGE 2 — the REAL product reference (match this branding exactly):",
+                src_img,
+                prompt,
+            ],
+            config=types.GenerateContentConfig(
+                response_modalities=["IMAGE"],
+            ),
+        )
+    except Exception as exc:
+        log.error("Composite API call failed: %s", exc)
+        return None
+
+    if not response or not response.parts:
+        log.warning("Empty response from composite API")
+        return None
+
+    for part in response.parts:
+        if hasattr(part, "inline_data") and part.inline_data:
+            raw = part.inline_data.data
+            if isinstance(raw, str):
+                import base64
+
+                raw = base64.b64decode(raw)
+            # Convert to WebP
+            img = PILImage.open(io.BytesIO(raw))
+            buf = io.BytesIO()
+            img.save(buf, format="WEBP", quality=92)
+            return buf.getvalue()
+
+    log.warning("No image in composite response")
+    return None
 
 
 def render3d_front_prompt(name: str) -> str:
@@ -1564,6 +1660,148 @@ def cmd_analyze(args):
     return analyses
 
 
+def cmd_composite(args):
+    """Composite real branding onto AI-generated lifestyle shots.
+
+    For each product, takes the existing AI render (front-model.webp) and the
+    real product source image, sends both to Gemini, and asks it to fix the
+    logo/branding to match the real material treatment (embossed, silicone
+    rubber, etc.) while keeping the lifestyle composition.
+    """
+    from google import genai
+
+    api_key = get_api_key()
+    client = genai.Client(api_key=api_key)
+    products = load_products(args.sku, include_bad=args.include_bad)
+
+    # Determine which views to composite
+    composite_views = ["front"]
+    if args.step == "composite_all":
+        composite_views = ["front", "back", "branding"]
+
+    log.info(
+        "Starting composite: %d products, views=%s, model=%s",
+        len(products),
+        composite_views,
+        MODEL_ID,
+    )
+
+    all_results = []
+    success_count = 0
+    skip_count = 0
+
+    for i, product in enumerate(products, 1):
+        sku = product["sku"]
+        name = product["name"]
+        source = product["source_image"]
+
+        if not source:
+            log.warning("[%d/%d] SKIP %s: no source image", i, len(products), sku)
+            all_results.append({"sku": sku, "name": name, "status": "no_source"})
+            skip_count += 1
+            continue
+
+        results = {"sku": sku, "name": name, "views": {}}
+
+        for view in composite_views:
+            # Find the existing AI render
+            view_suffix = {
+                "front": "front-model.webp",
+                "back": "back-model.webp",
+                "branding": "branding.webp",
+            }[view]
+            ai_render = PRODUCTS_DIR / f"{sku}-{view_suffix}"
+
+            if not ai_render.exists():
+                log.warning(
+                    "[%d/%d] SKIP %s %s: no AI render at %s",
+                    i,
+                    len(products),
+                    sku,
+                    view,
+                    ai_render.name,
+                )
+                results["views"][view] = "no_ai_render"
+                continue
+
+            log.info(
+                "[%d/%d] Compositing %s %s — merging real branding...",
+                i,
+                len(products),
+                sku,
+                view,
+            )
+
+            prompt = composite_prompt(name, sku, view)
+            image_bytes = None
+
+            for attempt in range(1, MAX_RETRIES + 1):
+                image_bytes = generate_composite(client, ai_render, source, prompt)
+
+                if image_bytes and quality_gate(image_bytes, sku, f"composite_{view}"):
+                    break
+
+                if attempt < MAX_RETRIES:
+                    log.info("Retry %d/%d for %s %s", attempt, MAX_RETRIES, sku, view)
+                    time.sleep(RETRY_DELAY_SEC)
+                image_bytes = None
+
+            if image_bytes:
+                # Save as composite version (don't overwrite originals)
+                out_path = PRODUCTS_DIR / f"{sku}-composite-{view}.webp"
+                out_path.write_bytes(image_bytes)
+                size_kb = len(image_bytes) / 1024
+                log.info(
+                    "  -> Saved %s (%.0fKB)",
+                    out_path.name,
+                    size_kb,
+                )
+                results["views"][view] = "success"
+            else:
+                log.error("  FAILED %s %s after %d attempts", sku, view, MAX_RETRIES)
+                results["views"][view] = "failed"
+
+            # Rate limit
+            time.sleep(3)
+
+        # Status
+        view_statuses = list(results["views"].values())
+        if all(v == "success" for v in view_statuses):
+            results["status"] = "success"
+            success_count += 1
+        elif any(v == "success" for v in view_statuses):
+            results["status"] = "partial"
+            success_count += 1
+        else:
+            results["status"] = "failed"
+
+        all_results.append(results)
+
+    # Summary
+    log.info("=" * 60)
+    log.info(
+        "COMPOSITE COMPLETE: %d/%d products, %d skipped",
+        success_count,
+        len(products) - skip_count,
+        skip_count,
+    )
+
+    # Save results
+    results_path = PROJECT_ROOT / "scripts" / "nano-banana-composite-results.json"
+    with open(results_path, "w") as f:
+        json.dump(
+            {
+                "model": MODEL_ID,
+                "step": args.step,
+                "total": len(products),
+                "results": all_results,
+            },
+            f,
+            indent=2,
+        )
+    log.info("Results saved to %s", results_path)
+
+
 def cmd_generate(args):
     """Generate images."""
     from google import genai
@@ -1802,9 +2040,15 @@ def main():
             "render3d",
             "render3d_front",
             "render3d_back",
+            "composite",
+            "composite_all",
         ],
         default="all",
-        help="What to generate: front, back, branding, models (front+back), all, render3d (3D product shots)",
+        help=(
+            "What to generate: front, back, branding, models (front+back), all, "
+            "render3d (3D product shots), composite (fix logos on front renders), "
+            "composite_all (fix logos on all renders)"
+        ),
     )
     parser.add_argument(
         "--engine",
@@ -1863,6 +2107,8 @@ def main():
         cmd_dry_run(args)
     elif args.analyze_only:
         cmd_analyze(args)
+    elif args.step in ("composite", "composite_all"):
+        cmd_composite(args)
     else:
         cmd_generate(args)
 
