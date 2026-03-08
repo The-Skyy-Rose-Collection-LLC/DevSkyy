@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 from core.output_writer import (
     ALLOWED_EXTENSIONS,
@@ -12,7 +13,6 @@ from core.output_writer import (
     OutputWriter,
     WriteResult,
 )
-
 
 # ---------------------------------------------------------------------------
 # ExtractedFile

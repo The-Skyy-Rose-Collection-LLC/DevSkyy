@@ -7,8 +7,8 @@ from unittest.mock import patch
 
 import pytest
 
-from skyyrose.elite_studio.models import ProductData
 from skyyrose.elite_studio import utils
+from skyyrose.elite_studio.models import ProductData
 
 
 class TestLoadProductData:

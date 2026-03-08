@@ -94,8 +94,9 @@ def resize_for_claude(image_path: str, max_size: int = 1568) -> str:
 
     Returns base64 JPEG string, resized to fit within max_size pixels.
     """
-    from PIL import Image
     import io
+
+    from PIL import Image
 
     img = Image.open(image_path)
 

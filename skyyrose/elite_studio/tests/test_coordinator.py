@@ -215,9 +215,9 @@ class TestPrintSummary:
 class TestCoordinatorInit:
     def test_default_agents(self):
         coord = Coordinator()
-        from skyyrose.elite_studio.agents.vision_agent import VisionAgent
         from skyyrose.elite_studio.agents.generator_agent import GeneratorAgent
         from skyyrose.elite_studio.agents.quality_agent import QualityAgent
+        from skyyrose.elite_studio.agents.vision_agent import VisionAgent
 
         assert isinstance(coord.vision, VisionAgent)
         assert isinstance(coord.generator, GeneratorAgent)

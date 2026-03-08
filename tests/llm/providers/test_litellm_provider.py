@@ -7,8 +7,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from llm.base import Message, ModelProvider, CompletionResponse
-from llm.providers.litellm_provider import LiteLLMClient, _PROVIDER_MODEL_MAP
+from llm.base import CompletionResponse, Message, ModelProvider
+from llm.providers.litellm_provider import _PROVIDER_MODEL_MAP, LiteLLMClient
 
 
 class TestModelStringMapping:

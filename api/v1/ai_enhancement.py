@@ -9,9 +9,9 @@ from pathlib import Path
 
 import blurhash
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from services.ai_image_enhancement import LuxuryImageEnhancer
 
 from core.auth.interfaces import requires_api_key
-from services.ai_image_enhancement import LuxuryImageEnhancer
 
 router = APIRouter(prefix="/ai", tags=["AI Enhancement"])
 

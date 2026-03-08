@@ -4,18 +4,18 @@ Quick enhancement pipeline for all source product photos
 Reads actual files from source-products/, applies ecommerce enhancements
 """
 import sys
-from pathlib import Path
 from glob import glob
+from pathlib import Path
 
 try:
-    from rembg import remove, new_session
+    from rembg import new_session, remove
     REMBG_OK = True
 except ImportError:
     REMBG_OK = False
     print("⚠️  rembg not found — background removal disabled")
 
 try:
-    from PIL import Image, ImageFilter, ImageEnhance, ImageOps
+    from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 except ImportError:
     print("❌ Pillow required: pip3 install Pillow")
     sys.exit(1)

@@ -4,12 +4,13 @@ VTON generation for sg-006 and sg-011 using FASHN VTON v1.5 on HuggingFace.
 Falls back to IDM-VTON (yisol/IDM-VTON) if FASHN fails.
 Outputs saved as WebP to existing product image paths.
 """
-import sys
 import os
 import shutil
+import sys
 from pathlib import Path
-from PIL import Image
+
 from gradio_client import Client, handle_file
+from PIL import Image
 
 BASE = Path("/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship")
 AVATAR = BASE / "assets/images/avatar/skyyrose-model-front.png"

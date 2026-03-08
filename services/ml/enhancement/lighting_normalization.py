@@ -23,13 +23,13 @@ import httpx
 import numpy as np
 from PIL import Image
 from pydantic import BaseModel
+from services.ml.replicate_client import ReplicateClient, ReplicateConfig
 
 from errors.production_errors import (
     DevSkyError,
     DevSkyErrorCode,
     DevSkyErrorSeverity,
 )
-from services.ml.replicate_client import ReplicateClient, ReplicateConfig
 
 logger = logging.getLogger(__name__)
 

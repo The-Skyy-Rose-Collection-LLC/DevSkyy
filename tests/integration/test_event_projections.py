@@ -1,9 +1,11 @@
 """Integration tests for CQRS event projections."""
 import json
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from core.events.event_store import Event
+
+import pytest
+
 from core.events.event_handlers import ProductEventHandler
+from core.events.event_store import Event
 
 
 @pytest.fixture
