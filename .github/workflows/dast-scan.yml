@@ -1,19 +1,8 @@
+# DISABLED: staging/ scripts (run_dast_scan.sh, compare_baseline.py) do not exist yet
 name: DAST Security Scan
 
 on:
-  # Run on every push to staging
-  push:
-    branches:
-      - staging
-  # Run on pull requests targeting main
-  pull_request:
-    branches:
-      - main
-  # Allow manual trigger
   workflow_dispatch:
-  # Schedule weekly scans
-  schedule:
-    - cron: '0 2 * * 1' # Every Monday at 2 AM UTC
 
 env:
   STAGING_URL: https://staging.skyyrose.com
