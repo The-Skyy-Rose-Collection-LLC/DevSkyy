@@ -12,7 +12,7 @@ This roadmap delivers a 4-layer defense system (hooks, CI, PR gates, deploy veri
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: CI Failure Triage & Fix** - Remove 17 continue-on-error directives and fix the underlying failures they mask
+- [x] **Phase 1: CI Failure Triage & Fix** - Remove 17 continue-on-error directives and fix the underlying failures they mask
 - [ ] **Phase 2: Husky Foundation** - Replace broken Husky v4 config with working v9 setup at monorepo root
 - [ ] **Phase 3: Pre-commit Hook Checks** - Wire up lint, type-check, PHP syntax, and fast tests on staged files
 - [ ] **Phase 4: PR Branch Protection** - Block merges to main unless all CI checks pass
@@ -34,8 +34,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md -- Fix underlying lint/format/type/test failures (black, isort, ruff, mypy, ESLint, tsc)
-- [ ] 01-02-PLAN.md -- Remove all 17 continue-on-error directives from ci.yml, security-gate.yml, dast-scan.yml
+- [x] 01-01-PLAN.md -- Fix underlying lint/format/type/test failures (black, isort, ruff, mypy, ESLint, tsc)
+- [x] 01-02-PLAN.md -- Remove all 17 continue-on-error directives from ci.yml, security-gate.yml, dast-scan.yml
 
 ### Phase 2: Husky Foundation
 **Goal**: Git hooks infrastructure is installed and functional at the monorepo root
@@ -143,7 +143,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. CI Failure Triage & Fix | 0/2 | Not started | - |
+| 1. CI Failure Triage & Fix | 2/2 | Complete | 2026-03-08 |
 | 2. Husky Foundation | 0/1 | Not started | - |
 | 3. Pre-commit Hook Checks | 0/2 | Not started | - |
 | 4. PR Branch Protection | 0/1 | Not started | - |

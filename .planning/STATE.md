@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-03-08T22:28:12.000Z"
-last_activity: 2026-03-08 -- Completed Plan 01 (fix underlying lint/format/type-check failures)
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-03-08T22:35:18.000Z"
+last_activity: 2026-03-08 -- Completed Plan 02 (remove all 17 continue-on-error directives)
 progress:
   total_phases: 8
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
-  percent: 6
+  completed_plans: 2
+  percent: 13
 ---
 
 # Project State
@@ -25,29 +25,29 @@ See: .planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: 1 of 8 (CI Failure Triage & Fix)
-Plan: 1 of 2 in current phase
-Status: Executing
-Last activity: 2026-03-08 -- Completed Plan 01 (fix underlying lint/format/type-check failures)
+Phase: 1 of 8 (CI Failure Triage & Fix) -- COMPLETE
+Plan: 2 of 2 in current phase (phase complete)
+Status: Phase 1 complete, ready for Phase 2
+Last activity: 2026-03-08 -- Completed Plan 02 (remove all 17 continue-on-error directives)
 
-Progress: [█░░░░░░░░░] 6%
+Progress: [██░░░░░░░░] 13%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 61min
-- Total execution time: 1.0 hours
+- Total plans completed: 2
+- Average duration: 32min
+- Total execution time: 1.1 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-ci-failure-triage-fix | 1/2 | 61min | 61min |
+| 01-ci-failure-triage-fix | 2/2 | 64min | 32min |
 
 **Recent Trend:**
-- Last 5 plans: 61min
-- Trend: baseline
+- Last 5 plans: 61min, 3min
+- Trend: accelerating
 
 *Updated after each plan completion*
 
@@ -64,19 +64,21 @@ Recent decisions affecting current work:
 - [01-01]: mypy.ini is canonical config; pyproject.toml [tool.mypy] removed (avoids dual-config ambiguity)
 - [01-01]: 2094 pre-existing mypy type errors disabled via error codes (hidden by duplicate module crash since project start)
 - [01-01]: ESLint flat config without FlatCompat; ajv override removed from frontend package.json
+- [01-02]: Deploy tag restructured with if: success() and || echo on push (tag creation hard-fails, push failure informational)
+- [01-02]: Gitleaks/TruffleHog are hard failures -- secrets in code must never be silently swallowed
+- [01-02]: License allowlist includes LGPL (permissive for library usage) but blocks GPL-3.0/AGPL-3.0 (full copyleft)
+- [01-02]: DAST early-exit guards use ::notice:: (not ::warning::) since missing scripts are expected during provisioning
 
 ### Pending Todos
 
 None yet.
 
 ### Blockers/Concerns
-
-- [Phase 1]: The 17 continue-on-error directives mask real failures -- triage needed to determine fix scope before removal
 - [Phase 5]: Existing .min files may differ from fresh build output -- expect a large diff when build pipeline covers all 55 files
 - [Phase 7]: WordPress server SSH access and WP-CLI version need validation before deploy script development
 
 ## Session Continuity
 
-Last session: 2026-03-08T22:28:12Z
-Stopped at: Completed 01-01-PLAN.md
-Resume file: .planning/phases/01-ci-failure-triage-fix/01-02-PLAN.md
+Last session: 2026-03-08T22:35:18Z
+Stopped at: Completed 01-02-PLAN.md (Phase 1 complete)
+Resume file: Phase 2 (next phase)
