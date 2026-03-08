@@ -31,11 +31,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. Running the CI pipeline on main with a deliberately broken lint rule causes the workflow to fail (red status), not warn
   2. All existing CI workflow runs on main pass green without any continue-on-error directives present
   3. A commit with a Python type error (mypy) or a JS lint error (ESLint) fails CI within the appropriate job
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md -- Fix underlying lint/format/type/test failures (black, isort, ruff, mypy, ESLint, tsc)
+- [ ] 01-02-PLAN.md -- Remove all 17 continue-on-error directives from ci.yml, security-gate.yml, dast-scan.yml
 
 ### Phase 2: Husky Foundation
 **Goal**: Git hooks infrastructure is installed and functional at the monorepo root
