@@ -85,7 +85,7 @@ function skyyrose_render_interactive_grid( $products, $collection_config ) {
 	if ( wp_script_is( 'skyyrose-interactive-cards', 'enqueued' ) ) {
 		wp_add_inline_script(
 			'skyyrose-interactive-cards',
-			'window.skyyRoseInteractiveProducts = ' . wp_json_encode( $products ) . ';',
+			'window.skyyRoseCollectionProducts = ' . wp_json_encode( $products ) . ';',
 			'before'
 		);
 	}
@@ -190,6 +190,10 @@ function skyyrose_enqueue_interactive_cards() {
 			SKYYROSE_VERSION,
 			true
 		);
+
+		wp_localize_script( 'skyyrose-interactive-cards', 'skyyRoseCards', array(
+			'nonce' => wp_create_nonce( 'skyyrose-immersive-nonce' ),
+		) );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_interactive_cards', 35 );

@@ -16,10 +16,11 @@
 	   ----------------------------------------------- */
 
 	const data     = window.skyyRoseData              || {};
+	const cards    = window.skyyRoseCards             || {};
 	const products = window.skyyRoseCollectionProducts || [];
 
 	const AJAX_URL   = data.ajaxUrl   || '';
-	const NONCE      = data.nonce     || '';
+	const NONCE      = cards.nonce    || data.nonce || '';
 	const ASSETS_URI = data.assetsUri || '';
 
 	const SNAP_DURATION_MS  = 380;
@@ -385,8 +386,8 @@
 			const fd = new FormData();
 			fd.append('action', 'skyyrose_immersive_add_to_cart');
 			fd.append('nonce', NONCE);
-			fd.append('product_sku', sku);
-			fd.append('size', size);
+			fd.append('sku', sku);
+			fd.append('attribute_pa_size', size);
 
 			postAjax(AJAX_URL, fd)
 				.then(function (json) {
