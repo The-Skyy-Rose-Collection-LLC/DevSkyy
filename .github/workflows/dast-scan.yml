@@ -52,9 +52,12 @@ jobs:
           NUCLEI_TIMEOUT: 30m
           RUN_PARALLEL: true
         run: |
+          if [ ! -f "staging/run_dast_scan.sh" ]; then
+            echo "::notice::DAST scan script (staging/run_dast_scan.sh) not yet provisioned. Skipping."
+            exit 0
+          fi
           chmod +x staging/run_dast_scan.sh
-          ./staging/run_dast_scan.sh || echo "scan_failed=true" >> $GITHUB_OUTPUT
-        continue-on-error: true
+          ./staging/run_dast_scan.sh
 
       - name: Upload ZAP HTML Report
         if: always()
@@ -91,18 +94,23 @@ jobs:
       - name: Compare with baseline
         if: always()
         run: |
-          LATEST_COMBINED=$(ls -t ${{ env.REPORTS_DIR }}/combined_vulnerability_report_*.json | head -1)
+          LATEST_COMBINED=$(ls -t ${{ env.REPORTS_DIR }}/combined_vulnerability_report_*.json 2>/dev/null | head -1)
           BASELINE="${{ env.REPORTS_DIR }}/vulnerability_baseline.json"
 
-          if [ -f "$BASELINE" ] && [ -f "$LATEST_COMBINED" ]; then
-            python3 staging/compare_baseline.py \
-              "$LATEST_COMBINED" \
-              "$BASELINE" \
-              "${{ env.REPORTS_DIR }}/vulnerability_delta_$(date +%Y%m%d_%H%M%S).json"
-          else
-            echo "No baseline found, skipping comparison"
+          if [ ! -f "$BASELINE" ] || [ -z "$LATEST_COMBINED" ] || [ ! -f "$LATEST_COMBINED" ]; then
+            echo "::notice::No baseline or scan report found, skipping comparison."
+            exit 0
           fi
-        continue-on-error: true
+
+          if [ ! -f "staging/compare_baseline.py" ]; then
+            echo "::notice::Baseline comparison script (staging/compare_baseline.py) not yet provisioned. Skipping."
+            exit 0
+          fi
+
+          python3 staging/compare_baseline.py \
+            "$LATEST_COMBINED" \
+            "$BASELINE" \
+            "${{ env.REPORTS_DIR }}/vulnerability_delta_$(date +%Y%m%d_%H%M%S).json"
 
       - name: Generate summary report
         if: always()
