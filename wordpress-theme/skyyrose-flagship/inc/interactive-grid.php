@@ -61,8 +61,20 @@ function skyyrose_render_interactive_grid( $products, $collection_config ) {
 		$sku    = isset( $product['sku'] ) ? $product['sku'] : '';
 		$images = skyyrose_get_product_render_images( $sku );
 
+		// Normalize catalog fields → template fields.
+		$normalized = $product;
+		if ( ! isset( $normalized['desc'] ) && isset( $normalized['description'] ) ) {
+			$normalized['desc'] = $normalized['description'];
+		}
+		if ( empty( $normalized['url'] ) && function_exists( 'skyyrose_product_url' ) ) {
+			$normalized['url'] = skyyrose_product_url( $sku );
+		}
+		if ( empty( $normalized['price_display'] ) && function_exists( 'skyyrose_format_price' ) ) {
+			$normalized['price_display'] = skyyrose_format_price( $product );
+		}
+
 		get_template_part( 'template-parts/interactive-product-card', null, array(
-			'product'    => $product,
+			'product'    => $normalized,
 			'images'     => $images,
 			'collection' => $col,
 		) );
@@ -111,8 +123,20 @@ function skyyrose_render_preorder_grid( $products, $collection_config, $reveal_a
 	echo '<div class="ipc-grid ipc-grid--preorder" data-collection="' . esc_attr( $col['slug'] ) . '">';
 
 	foreach ( $preorder_products as $product ) {
+		// Normalize catalog fields → template fields.
+		$normalized = $product;
+		if ( ! isset( $normalized['desc'] ) && isset( $normalized['description'] ) ) {
+			$normalized['desc'] = $normalized['description'];
+		}
+		if ( empty( $normalized['url'] ) && function_exists( 'skyyrose_product_url' ) ) {
+			$normalized['url'] = skyyrose_product_url( isset( $product['sku'] ) ? $product['sku'] : '' );
+		}
+		if ( empty( $normalized['price_display'] ) && function_exists( 'skyyrose_format_price' ) ) {
+			$normalized['price_display'] = skyyrose_format_price( $product );
+		}
+
 		get_template_part( 'template-parts/preorder-reveal-card', null, array(
-			'product'    => $product,
+			'product'    => $normalized,
 			'collection' => $col,
 			'reveal_at'  => $reveal_at,
 		) );
@@ -168,3 +192,4 @@ function skyyrose_enqueue_interactive_cards() {
 		);
 	}
 }
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_interactive_cards', 35 );
