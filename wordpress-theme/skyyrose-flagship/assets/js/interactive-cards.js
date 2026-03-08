@@ -216,10 +216,27 @@
 		if (!grid) return;
 
 		let rafId = 0;
+		let activeCard = null;
+
+		function resetCard(card) {
+			if (!card) return;
+			cancelAnimationFrame(rafId);
+			card.style.transition = 'transform 300ms ease-out';
+			card.style.transform = 'translateY(0)';
+			setTimeout(function () {
+				card.style.transition = '';
+				card.style.transform = '';
+			}, 310);
+		}
 
 		grid.addEventListener('mousemove', function (e) {
 			const card = e.target.closest('.ipc');
 			if (!card || card.getAttribute('data-glb-src')) return;
+
+			if (activeCard && activeCard !== card) {
+				resetCard(activeCard);
+			}
+			activeCard = card;
 
 			const rect = card.getBoundingClientRect();
 			const rx = ((e.clientY - rect.top - rect.height / 2) / (rect.height / 2)) * -8;
@@ -231,16 +248,9 @@
 			});
 		}, { passive: true });
 
-		grid.addEventListener('mouseleave', function (e) {
-			const card = e.target.closest('.ipc');
-			if (!card) return;
-			cancelAnimationFrame(rafId);
-			card.style.transition = 'transform 300ms ease-out';
-			card.style.transform = 'translateY(0)';
-			setTimeout(function () {
-				card.style.transition = '';
-				card.style.transform = '';
-			}, 310);
+		grid.addEventListener('mouseleave', function () {
+			resetCard(activeCard);
+			activeCard = null;
 		}, { passive: true });
 	}
 
@@ -368,6 +378,8 @@
 		const grid = document.querySelector('.ipc-grid');
 		if (!grid) return;
 
+		const inFlight = new Set();
+
 		grid.addEventListener('click', function (e) {
 			const btn = e.target.closest('.ipc__buy-btn');
 			if (!btn || btn.disabled) return;
@@ -376,9 +388,11 @@
 			if (!card) return;
 
 			const sku = card.getAttribute('data-product-sku') || '';
+			if (inFlight.has(sku)) return;
 			const size = card.dataset.selectedSize || '';
 			const originalText = btn.textContent;
 
+			inFlight.add(sku);
 			btn.disabled = true;
 			btn.classList.add('ipc__buy-btn--loading');
 			btn.textContent = 'Adding\u2026';
@@ -415,10 +429,12 @@
 						btn.classList.remove('ipc__buy-btn--added', 'ipc__buy-btn--error');
 						btn.textContent = originalText;
 						btn.disabled = false;
+						inFlight.delete(sku);
 					}, BUY_RESET_MS);
 				})
 				.catch(function () {
 					btn.classList.remove('ipc__buy-btn--loading');
+					inFlight.delete(sku);
 
 					// Fallback: navigate to product page.
 					const link = card.querySelector('.ipc__title a');
