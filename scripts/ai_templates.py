@@ -1,4 +1,5 @@
 """Embedded HF Space templates for AI CLI."""
+
 from __future__ import annotations
 
 from scripts.ai_config import AIConfig

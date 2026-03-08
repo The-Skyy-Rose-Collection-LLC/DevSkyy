@@ -79,9 +79,7 @@ class FeatureFlag:
 
     def __post_init__(self) -> None:
         if not 0 <= self.rollout_percentage <= 100:
-            raise ValueError(
-                f"rollout_percentage must be 0–100, got {self.rollout_percentage}"
-            )
+            raise ValueError(f"rollout_percentage must be 0–100, got {self.rollout_percentage}")
 
 
 # ---------------------------------------------------------------------------
@@ -132,10 +130,7 @@ class FlagManager:
             metadata=dict(metadata or {}),
         )
         self._flags[name] = flag
-        logger.debug(
-            f"Flag {name!r} created: enabled={enabled}, "
-            f"rollout={rollout_percentage}%"
-        )
+        logger.debug(f"Flag {name!r} created: enabled={enabled}, rollout={rollout_percentage}%")
         return flag
 
     def set_flag(self, flag: FeatureFlag) -> None:
@@ -290,8 +285,12 @@ class FlagManager:
         # Whitelist allowed keys — reject unknown fields to prevent injection
         # if config source is an external file or API endpoint.
         _ALLOWED_KEYS = {
-            "enabled", "rollout_percentage", "enabled_for_users",
-            "disabled_for_users", "description", "metadata",
+            "enabled",
+            "rollout_percentage",
+            "enabled_for_users",
+            "disabled_for_users",
+            "description",
+            "metadata",
         }
         for name, settings in config.items():
             if not isinstance(settings, dict):
@@ -328,6 +327,7 @@ class RedisFlagManager(FlagManager):
         if self._redis is None and self._redis_url:
             try:
                 import redis
+
                 self._redis = redis.from_url(self._redis_url, decode_responses=True)
             except Exception as e:
                 logger.warning(f"Redis unavailable for feature flags: {e}")
@@ -339,14 +339,20 @@ class RedisFlagManager(FlagManager):
         r = self._get_redis()
         if r:
             try:
-                r.hset("feature_flags", flag.name, json.dumps({
-                    "name": flag.name,
-                    "enabled": flag.enabled,
-                    "rollout_percentage": flag.rollout_percentage,
-                    "enabled_for_users": list(flag.enabled_for_users),
-                    "disabled_for_users": list(flag.disabled_for_users),
-                    "kill_switch": flag.kill_switch,
-                }))
+                r.hset(
+                    "feature_flags",
+                    flag.name,
+                    json.dumps(
+                        {
+                            "name": flag.name,
+                            "enabled": flag.enabled,
+                            "rollout_percentage": flag.rollout_percentage,
+                            "enabled_for_users": list(flag.enabled_for_users),
+                            "disabled_for_users": list(flag.disabled_for_users),
+                            "kill_switch": flag.kill_switch,
+                        }
+                    ),
+                )
             except Exception as e:
                 logger.warning(f"Failed to persist flag to Redis: {e}")
 

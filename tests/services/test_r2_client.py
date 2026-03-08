@@ -25,6 +25,7 @@ import pytest
 
 boto3 = pytest.importorskip("boto3", reason="boto3 not installed")
 from botocore.exceptions import ClientError  # noqa: E402
+
 from services.storage.r2_client import (
     AssetCategory,
     R2Client,

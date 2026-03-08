@@ -39,9 +39,7 @@ class TestRetryOnTransient:
 
     @patch("skyyrose.elite_studio.retry.time.sleep")
     def test_retry_on_transient_then_succeed(self, mock_sleep):
-        fn = MagicMock(
-            side_effect=[Exception("timed out"), "recovered"]
-        )
+        fn = MagicMock(side_effect=[Exception("timed out"), "recovered"])
         result = retry_on_transient(fn, label="[test]")
         assert result == "recovered"
         assert fn.call_count == 2
@@ -55,25 +53,19 @@ class TestRetryOnTransient:
 
     @patch("skyyrose.elite_studio.retry.time.sleep")
     def test_all_retries_exhausted(self, mock_sleep):
-        fn = MagicMock(
-            side_effect=[Exception("timed out"), Exception("timed out again")]
-        )
+        fn = MagicMock(side_effect=[Exception("timed out"), Exception("timed out again")])
         with pytest.raises(Exception, match="timed out again"):
             retry_on_transient(fn, label="[test]", max_retries=2)
         assert fn.call_count == 2
 
     @patch("skyyrose.elite_studio.retry.time.sleep")
     def test_custom_delay(self, mock_sleep):
-        fn = MagicMock(
-            side_effect=[Exception("503 error"), "ok"]
-        )
+        fn = MagicMock(side_effect=[Exception("503 error"), "ok"])
         retry_on_transient(fn, label="[test]", delay=10.0)
         mock_sleep.assert_called_once_with(10.0)
 
     @patch("skyyrose.elite_studio.retry.time.sleep")
     def test_no_label_still_works(self, mock_sleep):
-        fn = MagicMock(
-            side_effect=[Exception("timeout"), "ok"]
-        )
+        fn = MagicMock(side_effect=[Exception("timeout"), "ok"])
         result = retry_on_transient(fn)  # no label
         assert result == "ok"

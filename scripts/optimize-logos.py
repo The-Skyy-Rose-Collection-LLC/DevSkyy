@@ -76,14 +76,14 @@ def step_enhance(src_path: str, out_path: str, prompt: str) -> str:
         prompt=prompt,
         negative_prompt="blurry, low quality, pixelated, artifacts, noise, jpeg artifacts, washed out",
         seed=42,
-        upscale_factor=4,       # 4x upscale for max resolution
+        upscale_factor=4,  # 4x upscale for max resolution
         controlnet_scale=0.6,
         controlnet_decay=1.0,
         condition_scale=6,
         tile_width=112,
         tile_height=144,
         denoise_strength=0.30,  # slightly lower to preserve original detail
-        num_inference_steps=20, # more steps for better quality
+        num_inference_steps=20,  # more steps for better quality
         solver="DDIM",
         api_name="/process",
     )
@@ -121,24 +121,28 @@ def process_logo(logo: dict):
 
     src_size = os.path.getsize(src)
     img = Image.open(src)
-    print(f"\n{'='*55}")
+    print(f"\n{'=' * 55}")
     print(f"  {name}")
-    print(f"  Source: {img.size[0]}x{img.size[1]}, {src_size/1024:.1f}KB")
-    print(f"{'='*55}")
+    print(f"  Source: {img.size[0]}x{img.size[1]}, {src_size / 1024:.1f}KB")
+    print(f"{'=' * 55}")
 
     # Step 1: Remove background
     print("  [1/3] AI background removal (BRIA-RMBG-2.0)...")
     nobg_path = str(WORK_DIR / f"{name}-nobg.png")
     step_remove_bg(src, nobg_path)
     nobg_img = Image.open(nobg_path)
-    print(f"        → {nobg_img.size[0]}x{nobg_img.size[1]}, {os.path.getsize(nobg_path)/1024:.1f}KB")
+    print(
+        f"        → {nobg_img.size[0]}x{nobg_img.size[1]}, {os.path.getsize(nobg_path) / 1024:.1f}KB"
+    )
 
     # Step 2: AI enhance + 4x upscale
     print("  [2/3] AI enhance + 4x upscale (finegrain)...")
     enhanced_path = str(WORK_DIR / f"{name}-enhanced.png")
     step_enhance(nobg_path, enhanced_path, logo["prompt"])
     enh_img = Image.open(enhanced_path)
-    print(f"        → {enh_img.size[0]}x{enh_img.size[1]}, {os.path.getsize(enhanced_path)/1024:.1f}KB")
+    print(
+        f"        → {enh_img.size[0]}x{enh_img.size[1]}, {os.path.getsize(enhanced_path) / 1024:.1f}KB"
+    )
 
     # Step 3: Sharpen + WebP
     print("  [3/3] Sharpen + high-quality transparent WebP...")
@@ -146,7 +150,7 @@ def process_logo(logo: dict):
     step_finalize(enhanced_path, webp_path)
     final_img = Image.open(webp_path)
     final_size = os.path.getsize(webp_path)
-    print(f"        → {final_img.size[0]}x{final_img.size[1]}, {final_size/1024:.1f}KB")
+    print(f"        → {final_img.size[0]}x{final_img.size[1]}, {final_size / 1024:.1f}KB")
     print(f"  ✓ {name}.webp")
 
 

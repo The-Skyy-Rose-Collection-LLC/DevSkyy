@@ -25,6 +25,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 @dataclass
 class HealthCheckResult:
     """Health check result for a single component."""
+
     component: str
     status: str  # ✅ | ⚠️ | ❌
     message: str
@@ -35,6 +36,7 @@ class HealthCheckResult:
 @dataclass
 class PageCheck:
     """Page functionality check result."""
+
     url: str
     page_type: str  # static | interactive | catalog | woocommerce
     status_code: int = 0
@@ -49,7 +51,7 @@ class WordPressHealthCheck:
     """WordPress health check orchestrator."""
 
     def __init__(self, site_url: str):
-        self.site_url = site_url.rstrip('/')
+        self.site_url = site_url.rstrip("/")
         self.results: list[HealthCheckResult] = []
         self.pages: list[PageCheck] = []
         self.theme_dir = Path(__file__).parent.parent / "wordpress-theme" / "skyyrose-2025"
@@ -86,30 +88,36 @@ class WordPressHealthCheck:
 
                 if response.status_code == 200:
                     data = response.json()
-                    wp_version = data.get('name', 'Unknown')
+                    wp_version = data.get("name", "Unknown")
 
-                    self.results.append(HealthCheckResult(
-                        component="WordPress Core",
-                        status="✅",
-                        message="WordPress accessible via REST API",
-                        details={"version": wp_version},
-                        priority="HIGH"
-                    ))
+                    self.results.append(
+                        HealthCheckResult(
+                            component="WordPress Core",
+                            status="✅",
+                            message="WordPress accessible via REST API",
+                            details={"version": wp_version},
+                            priority="HIGH",
+                        )
+                    )
                 else:
-                    self.results.append(HealthCheckResult(
-                        component="WordPress Core",
-                        status="⚠️",
-                        message=f"REST API returned {response.status_code}",
-                        priority="HIGH"
-                    ))
+                    self.results.append(
+                        HealthCheckResult(
+                            component="WordPress Core",
+                            status="⚠️",
+                            message=f"REST API returned {response.status_code}",
+                            priority="HIGH",
+                        )
+                    )
 
         except Exception as e:
-            self.results.append(HealthCheckResult(
-                component="WordPress Core",
-                status="❌",
-                message=f"Failed to connect: {str(e)}",
-                priority="CRITICAL"
-            ))
+            self.results.append(
+                HealthCheckResult(
+                    component="WordPress Core",
+                    status="❌",
+                    message=f"Failed to connect: {str(e)}",
+                    priority="CRITICAL",
+                )
+            )
 
         # Check theme files locally
         if self.theme_dir.exists():
@@ -118,18 +126,20 @@ class WordPressHealthCheck:
                 with open(style_css) as f:
                     content = f.read()
                     version = None
-                    for line in content.split('\n'):
-                        if line.startswith('Version:'):
-                            version = line.split('Version:')[1].strip()
+                    for line in content.split("\n"):
+                        if line.startswith("Version:"):
+                            version = line.split("Version:")[1].strip()
                             break
 
-                self.results.append(HealthCheckResult(
-                    component="SkyyRose Theme",
-                    status="✅",
-                    message=f"Local theme version: {version}",
-                    details={"version": version, "php_files": 35},
-                    priority="HIGH"
-                ))
+                self.results.append(
+                    HealthCheckResult(
+                        component="SkyyRose Theme",
+                        status="✅",
+                        message=f"Local theme version: {version}",
+                        details={"version": version, "php_files": 35},
+                        priority="HIGH",
+                    )
+                )
 
     async def check_all_pages(self):
         """Check all pages (static, interactive, catalog, WooCommerce)."""
@@ -141,17 +151,14 @@ class WordPressHealthCheck:
             PageCheck(f"{self.site_url}/", "static"),
             PageCheck(f"{self.site_url}/about/", "static"),
             PageCheck(f"{self.site_url}/contact/", "static"),
-
             # Interactive Pages (3D Immersive)
             PageCheck(f"{self.site_url}/black-rose-experience/", "interactive"),
             PageCheck(f"{self.site_url}/love-hurts-experience/", "interactive"),
             PageCheck(f"{self.site_url}/signature-experience/", "interactive"),
-
             # Catalog Pages (Shopping)
             PageCheck(f"{self.site_url}/collection-black-rose/", "catalog"),
             PageCheck(f"{self.site_url}/collection-love-hurts/", "catalog"),
             PageCheck(f"{self.site_url}/collection-signature/", "catalog"),
-
             # WooCommerce Pages
             PageCheck(f"{self.site_url}/shop/", "woocommerce"),
             PageCheck(f"{self.site_url}/cart/", "woocommerce"),
@@ -169,21 +176,26 @@ class WordPressHealthCheck:
 
         status = "✅" if working_pages == total_pages else "⚠️" if working_pages > 0 else "❌"
 
-        self.results.append(HealthCheckResult(
-            component="Page Functionality",
-            status=status,
-            message=f"{working_pages}/{total_pages} pages accessible",
-            details={"pages": [
-                {
-                    "url": p.url,
-                    "type": p.page_type,
-                    "status": p.status,
-                    "status_code": p.status_code,
-                    "load_time": f"{p.load_time:.2f}s"
-                } for p in self.pages
-            ]},
-            priority="CRITICAL"
-        ))
+        self.results.append(
+            HealthCheckResult(
+                component="Page Functionality",
+                status=status,
+                message=f"{working_pages}/{total_pages} pages accessible",
+                details={
+                    "pages": [
+                        {
+                            "url": p.url,
+                            "type": p.page_type,
+                            "status": p.status,
+                            "status_code": p.status_code,
+                            "load_time": f"{p.load_time:.2f}s",
+                        }
+                        for p in self.pages
+                    ]
+                },
+                priority="CRITICAL",
+            )
+        )
 
     async def _check_page(self, client: httpx.AsyncClient, page: PageCheck) -> PageCheck:
         """Check individual page."""
@@ -198,9 +210,9 @@ class WordPressHealthCheck:
 
                 # Basic checks
                 html = response.text.lower()
-                page.images_ok = 'img' in html or 'background' in html
-                page.js_ok = '<script' in html
-                page.forms_ok = '<form' in html or page.page_type != "woocommerce"
+                page.images_ok = "img" in html or "background" in html
+                page.js_ok = "<script" in html
+                page.forms_ok = "<form" in html or page.page_type != "woocommerce"
 
             elif response.status_code in [301, 302, 307, 308]:
                 page.status = "⚠️"  # Redirect
@@ -234,42 +246,50 @@ class WordPressHealthCheck:
                 missing_templates.append(template)
 
         if missing_templates:
-            self.results.append(HealthCheckResult(
-                component="Custom Templates",
-                status="❌",
-                message=f"Missing {len(missing_templates)} template files",
-                details={"missing": missing_templates},
-                priority="HIGH"
-            ))
+            self.results.append(
+                HealthCheckResult(
+                    component="Custom Templates",
+                    status="❌",
+                    message=f"Missing {len(missing_templates)} template files",
+                    details={"missing": missing_templates},
+                    priority="HIGH",
+                )
+            )
         else:
-            self.results.append(HealthCheckResult(
-                component="Custom Templates",
-                status="✅",
-                message=f"All {len(template_files)} custom templates present",
-                priority="MEDIUM"
-            ))
+            self.results.append(
+                HealthCheckResult(
+                    component="Custom Templates",
+                    status="✅",
+                    message=f"All {len(template_files)} custom templates present",
+                    priority="MEDIUM",
+                )
+            )
 
         # Check Elementor widgets
         widget_dir = self.theme_dir / "elementor-widgets"
         if widget_dir.exists():
             widgets = list(widget_dir.glob("*.php"))
-            self.results.append(HealthCheckResult(
-                component="Elementor Widgets",
-                status="✅",
-                message=f"Found {len(widgets)} custom widgets",
-                details={"widgets": [w.name for w in widgets]},
-                priority="MEDIUM"
-            ))
+            self.results.append(
+                HealthCheckResult(
+                    component="Elementor Widgets",
+                    status="✅",
+                    message=f"Found {len(widgets)} custom widgets",
+                    details={"widgets": [w.name for w in widgets]},
+                    priority="MEDIUM",
+                )
+            )
 
         # Check custom CSS
         css_files = list(self.theme_dir.glob("assets/css/*.css"))
         if css_files:
-            self.results.append(HealthCheckResult(
-                component="Custom CSS",
-                status="✅",
-                message=f"Found {len(css_files)} custom CSS files",
-                priority="LOW"
-            ))
+            self.results.append(
+                HealthCheckResult(
+                    component="Custom CSS",
+                    status="✅",
+                    message=f"Found {len(css_files)} custom CSS files",
+                    priority="LOW",
+                )
+            )
 
     async def check_links(self):
         """Validate internal and external links."""
@@ -290,13 +310,15 @@ class WordPressHealthCheck:
         working_links = sum(1 for r in results if r)
         status = "✅" if working_links == len(cdn_links) else "⚠️"
 
-        self.results.append(HealthCheckResult(
-            component="CDN Links",
-            status=status,
-            message=f"{working_links}/{len(cdn_links)} CDN links accessible",
-            details={"links": cdn_links},
-            priority="MEDIUM"
-        ))
+        self.results.append(
+            HealthCheckResult(
+                component="CDN Links",
+                status=status,
+                message=f"{working_links}/{len(cdn_links)} CDN links accessible",
+                details={"links": cdn_links},
+                priority="MEDIUM",
+            )
+        )
 
     async def _check_link(self, client: httpx.AsyncClient, url: str) -> bool:
         """Check if link is accessible."""
@@ -327,7 +349,7 @@ class WordPressHealthCheck:
         print("-" * 83)
 
         for page in self.pages:
-            url_display = page.url.replace(self.site_url, '')[:48]
+            url_display = page.url.replace(self.site_url, "")[:48]
             print(f"{page.page_type:<15} {url_display:<50} {page.status:<8} {page.load_time:.2f}s")
 
         # Detailed Findings
@@ -346,7 +368,7 @@ class WordPressHealthCheck:
         priority_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3}
         sorted_results = sorted(
             [r for r in self.results if r.status != "✅"],
-            key=lambda x: priority_order.get(x.priority, 99)
+            key=lambda x: priority_order.get(x.priority, 99),
         )
 
         for i, result in enumerate(sorted_results, 1):
@@ -377,8 +399,9 @@ class WordPressHealthCheck:
                     "status": r.status,
                     "message": r.message,
                     "priority": r.priority,
-                    "details": r.details
-                } for r in self.results
+                    "details": r.details,
+                }
+                for r in self.results
             ],
             "pages": [
                 {
@@ -386,9 +409,10 @@ class WordPressHealthCheck:
                     "type": p.page_type,
                     "status": p.status,
                     "status_code": p.status_code,
-                    "load_time": p.load_time
-                } for p in self.pages
-            ]
+                    "load_time": p.load_time,
+                }
+                for p in self.pages
+            ],
         }
 
 
@@ -405,7 +429,7 @@ async def main():
     report = await checker.run_full_check()
 
     if args.output:
-        with open(args.output, 'w') as f:
+        with open(args.output, "w") as f:
             json.dump(report, f, indent=2)
         print(f"\n📄 Report saved to: {args.output}")
 

@@ -72,7 +72,9 @@ class TestProductEventHandler:
             data={"reason": "discontinued"},
         )
 
-        with patch.object(handler, "_deactivate_product", new_callable=AsyncMock) as mock_deactivate:
+        with patch.object(
+            handler, "_deactivate_product", new_callable=AsyncMock
+        ) as mock_deactivate:
             await handler.handle(event)
             mock_deactivate.assert_called_once_with("prod-abc")
 

@@ -148,7 +148,7 @@ def _has_double_slashes_in_path(url: str) -> bool:
     stripped = url
     for proto in ("https://", "http://"):
         if stripped.startswith(proto):
-            stripped = stripped[len(proto):]
+            stripped = stripped[len(proto) :]
             break
     return "//" in stripped
 
@@ -210,10 +210,7 @@ class GroundTruthValidator:
         claims: list[tuple[ClaimType, str, dict[str, Any]]],
     ) -> list[ValidationResult]:
         """Verify multiple claims. Returns results in same order."""
-        return [
-            self.verify_claim(ct, val, ctx)
-            for ct, val, ctx in claims
-        ]
+        return [self.verify_claim(ct, val, ctx) for ct, val, ctx in claims]
 
     def verify_all_or_fail(
         self,
@@ -251,9 +248,7 @@ class GroundTruthValidator:
 # ---------------------------------------------------------------------------
 
 
-def _verify_file_exists(
-    claim_type: ClaimType, value: str, ctx: dict[str, Any]
-) -> ValidationResult:
+def _verify_file_exists(claim_type: ClaimType, value: str, ctx: dict[str, Any]) -> ValidationResult:
     """Check that a file or directory exists on disk."""
     # Guard: empty / whitespace-only paths
     if not value or not value.strip():
@@ -283,9 +278,7 @@ def _verify_file_exists(
     )
 
 
-def _verify_color_value(
-    claim_type: ClaimType, value: str, ctx: dict[str, Any]
-) -> ValidationResult:
+def _verify_color_value(claim_type: ClaimType, value: str, ctx: dict[str, Any]) -> ValidationResult:
     """Validate CSS color format (hex, rgb, hsl) with range checks."""
     if _is_valid_color(value):
         return ValidationResult(
@@ -304,9 +297,7 @@ def _verify_color_value(
     )
 
 
-def _verify_css_value(
-    claim_type: ClaimType, value: str, ctx: dict[str, Any]
-) -> ValidationResult:
+def _verify_css_value(claim_type: ClaimType, value: str, ctx: dict[str, Any]) -> ValidationResult:
     """Check that a CSS custom property exists in a given file."""
     file_path = ctx.get("file")
     if not file_path:
@@ -346,9 +337,7 @@ def _verify_css_value(
     )
 
 
-def _verify_font_name(
-    claim_type: ClaimType, value: str, ctx: dict[str, Any]
-) -> ValidationResult:
+def _verify_font_name(claim_type: ClaimType, value: str, ctx: dict[str, Any]) -> ValidationResult:
     """Check that a font name is registered in theme.json."""
     theme_path = ctx.get("theme_json")
     if not theme_path:
@@ -382,12 +371,7 @@ def _verify_font_name(
         )
 
     # Navigate to fontFamilies
-    font_families = (
-        theme_data
-        .get("settings", {})
-        .get("typography", {})
-        .get("fontFamilies", [])
-    )
+    font_families = theme_data.get("settings", {}).get("typography", {}).get("fontFamilies", [])
     registered_names = {f.get("name", "") for f in font_families}
 
     if value in registered_names:
@@ -489,9 +473,7 @@ def _verify_api_endpoint(
     )
 
 
-def _verify_import_path(
-    claim_type: ClaimType, value: str, ctx: dict[str, Any]
-) -> ValidationResult:
+def _verify_import_path(claim_type: ClaimType, value: str, ctx: dict[str, Any]) -> ValidationResult:
     """Check that a Python/JS import path could resolve."""
     # Guard: empty import path
     if not value or not value.strip():
@@ -527,9 +509,7 @@ def _verify_import_path(
     )
 
 
-def _verify_php_syntax(
-    claim_type: ClaimType, value: str, ctx: dict[str, Any]
-) -> ValidationResult:
+def _verify_php_syntax(claim_type: ClaimType, value: str, ctx: dict[str, Any]) -> ValidationResult:
     """Check PHP file syntax (bracket matching + opening tag).
 
     Checks:

@@ -1652,10 +1652,7 @@ def _create_provider_generator(provider: LLMProvider, model: str, api_key: str) 
                 # Using LLAMA enum for Grok (XAI) - OpenAI-compatible API
                 import openai
 
-                client = openai.AsyncOpenAI(
-                    api_key=api_key,
-                    base_url="https://api.x.ai/v1"
-                )
+                client = openai.AsyncOpenAI(api_key=api_key, base_url="https://api.x.ai/v1")
                 response = await client.chat.completions.create(
                     model=model,
                     max_tokens=2048,
@@ -1724,10 +1721,10 @@ def _estimate_cost(provider: LLMProvider, tokens: int) -> float:
     """Estimate cost based on provider and tokens (updated 2026-02-19)."""
     # Approximate costs per 1K tokens (blended input/output)
     costs_per_1k = {
-        LLMProvider.CLAUDE: 0.009,      # claude-sonnet-4-6: $3/$15 per 1M tokens
-        LLMProvider.GPT4: 0.01,          # gpt-4o: $2.50/$10 per 1M tokens
-        LLMProvider.GEMINI: 0.0001,      # gemini-3-flash-preview: free tier / very low cost
-        LLMProvider.LLAMA: 0.002,        # grok-3-mini: ~$2 per 1M tokens
+        LLMProvider.CLAUDE: 0.009,  # claude-sonnet-4-6: $3/$15 per 1M tokens
+        LLMProvider.GPT4: 0.01,  # gpt-4o: $2.50/$10 per 1M tokens
+        LLMProvider.GEMINI: 0.0001,  # gemini-3-flash-preview: free tier / very low cost
+        LLMProvider.LLAMA: 0.002,  # grok-3-mini: ~$2 per 1M tokens
     }
     return (tokens / 1000) * costs_per_1k.get(provider, 0.005)
 

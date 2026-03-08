@@ -59,11 +59,13 @@ def init_telemetry(service_name: str = "devskyy-api") -> None:
             ConsoleSpanExporter,
         )
 
-        resource = Resource.create({
-            "service.name": os.getenv("OTEL_SERVICE_NAME", service_name),
-            "service.version": "3.2.0",
-            "deployment.environment": os.getenv("ENVIRONMENT", "development"),
-        })
+        resource = Resource.create(
+            {
+                "service.name": os.getenv("OTEL_SERVICE_NAME", service_name),
+                "service.version": "3.2.0",
+                "deployment.environment": os.getenv("ENVIRONMENT", "development"),
+            }
+        )
 
         provider = TracerProvider(resource=resource)
 
@@ -74,6 +76,7 @@ def init_telemetry(service_name: str = "devskyy-api") -> None:
                 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import (
                     OTLPSpanExporter,
                 )
+
                 exporter = OTLPSpanExporter(endpoint=otlp_endpoint)
                 provider.add_span_processor(BatchSpanProcessor(exporter))
                 logger.info(f"OTel OTLP exporter configured: {otlp_endpoint}")
@@ -83,7 +86,9 @@ def init_telemetry(service_name: str = "devskyy-api") -> None:
         else:
             # Console exporter for development
             provider.add_span_processor(BatchSpanProcessor(ConsoleSpanExporter()))
-            logger.info("OTel console exporter configured (set OTEL_EXPORTER_OTLP_ENDPOINT for OTLP)")
+            logger.info(
+                "OTel console exporter configured (set OTEL_EXPORTER_OTLP_ENDPOINT for OTLP)"
+            )
 
         trace.set_tracer_provider(provider)
         _initialized = True
@@ -105,6 +110,7 @@ def get_tracer(name: str = __name__) -> Any:
     """
     try:
         from opentelemetry import trace
+
         return trace.get_tracer(name)
     except ImportError:
         return _NoOpTracer()

@@ -13,7 +13,6 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from PIL import Image
-
 from tools.screenshot_diff import (
     DiffResult,
     capture_screenshot,
@@ -134,12 +133,8 @@ class TestCompareIdentical:
         assert os.path.exists(result.diff_path)
 
     def test_identical_large_images(self, tmp_path: Path) -> None:
-        baseline = _save_solid_image(
-            tmp_path / "baseline.png", "green", size=(500, 500)
-        )
-        current = _save_solid_image(
-            tmp_path / "current.png", "green", size=(500, 500)
-        )
+        baseline = _save_solid_image(tmp_path / "baseline.png", "green", size=(500, 500))
+        current = _save_solid_image(tmp_path / "current.png", "green", size=(500, 500))
 
         result = compare_screenshots(str(baseline), str(current))
         assert result.diff_percentage == 0.0
@@ -210,12 +205,8 @@ class TestCompareDifferent:
 
 class TestCompareSizeMismatch:
     def test_different_sizes_resizes_current(self, tmp_path: Path) -> None:
-        baseline = _save_solid_image(
-            tmp_path / "baseline.png", "red", size=(200, 200)
-        )
-        current = _save_solid_image(
-            tmp_path / "current.png", "red", size=(100, 100)
-        )
+        baseline = _save_solid_image(tmp_path / "baseline.png", "red", size=(200, 200))
+        current = _save_solid_image(tmp_path / "current.png", "red", size=(100, 100))
 
         result = compare_screenshots(str(baseline), str(current))
 
@@ -223,12 +214,8 @@ class TestCompareSizeMismatch:
         assert result.dimensions == (200, 200)
 
     def test_different_sizes_still_compares(self, tmp_path: Path) -> None:
-        baseline = _save_solid_image(
-            tmp_path / "baseline.png", "red", size=(200, 200)
-        )
-        current = _save_solid_image(
-            tmp_path / "current.png", "blue", size=(150, 150)
-        )
+        baseline = _save_solid_image(tmp_path / "baseline.png", "red", size=(200, 200))
+        current = _save_solid_image(tmp_path / "current.png", "blue", size=(150, 150))
 
         result = compare_screenshots(str(baseline), str(current))
 
@@ -272,9 +259,7 @@ class TestCompareErrors:
 
 class TestCaptureScreenshot:
     @patch("tools.screenshot_diff.subprocess.run")
-    def test_capture_calls_playwright(
-        self, mock_run: MagicMock, tmp_path: Path
-    ) -> None:
+    def test_capture_calls_playwright(self, mock_run: MagicMock, tmp_path: Path) -> None:
         mock_run.return_value = MagicMock(returncode=0)
         output = tmp_path / "shot.png"
 
@@ -287,9 +272,7 @@ class TestCaptureScreenshot:
         assert "playwright" in cmd[0] or "npx" in cmd[0]
 
     @patch("tools.screenshot_diff.subprocess.run")
-    def test_capture_with_custom_viewport(
-        self, mock_run: MagicMock, tmp_path: Path
-    ) -> None:
+    def test_capture_with_custom_viewport(self, mock_run: MagicMock, tmp_path: Path) -> None:
         mock_run.return_value = MagicMock(returncode=0)
         output = tmp_path / "shot.png"
         viewport = {"width": 1920, "height": 1080}
@@ -302,9 +285,7 @@ class TestCaptureScreenshot:
         assert "1920" in cmd_str
 
     @patch("tools.screenshot_diff.subprocess.run")
-    def test_capture_default_viewport(
-        self, mock_run: MagicMock, tmp_path: Path
-    ) -> None:
+    def test_capture_default_viewport(self, mock_run: MagicMock, tmp_path: Path) -> None:
         mock_run.return_value = MagicMock(returncode=0)
         output = tmp_path / "shot.png"
 
@@ -316,15 +297,11 @@ class TestCaptureScreenshot:
         assert "1280" in cmd_str
 
     @patch("tools.screenshot_diff.subprocess.run")
-    def test_capture_failure_raises(
-        self, mock_run: MagicMock, tmp_path: Path
-    ) -> None:
+    def test_capture_failure_raises(self, mock_run: MagicMock, tmp_path: Path) -> None:
         mock_run.return_value = MagicMock(returncode=1, stderr="failed")
 
         with pytest.raises(RuntimeError, match="Screenshot capture failed"):
-            capture_screenshot(
-                "https://example.com", str(tmp_path / "shot.png")
-            )
+            capture_screenshot("https://example.com", str(tmp_path / "shot.png"))
 
     def test_capture_empty_url_raises(self, tmp_path: Path) -> None:
         with pytest.raises(ValueError, match="url"):
@@ -342,9 +319,7 @@ class TestCaptureScreenshot:
 
 class TestRunVisualRegression:
     @patch("tools.screenshot_diff.capture_screenshot")
-    def test_no_baseline_creates_new(
-        self, mock_capture: MagicMock, tmp_path: Path
-    ) -> None:
+    def test_no_baseline_creates_new(self, mock_capture: MagicMock, tmp_path: Path) -> None:
         baselines_dir = tmp_path / "baselines"
         baselines_dir.mkdir()
         output_dir = tmp_path / "output"
@@ -398,9 +373,7 @@ class TestRunVisualRegression:
         assert result.diff_percentage > 0.0
 
     @patch("tools.screenshot_diff.capture_screenshot")
-    def test_with_matching_baseline_passes(
-        self, mock_capture: MagicMock, tmp_path: Path
-    ) -> None:
+    def test_with_matching_baseline_passes(self, mock_capture: MagicMock, tmp_path: Path) -> None:
         baselines_dir = tmp_path / "baselines"
         baselines_dir.mkdir()
         output_dir = tmp_path / "output"
@@ -427,9 +400,7 @@ class TestRunVisualRegression:
         assert result.diff_percentage == 0.0
 
     @patch("tools.screenshot_diff.capture_screenshot")
-    def test_custom_threshold(
-        self, mock_capture: MagicMock, tmp_path: Path
-    ) -> None:
+    def test_custom_threshold(self, mock_capture: MagicMock, tmp_path: Path) -> None:
         baselines_dir = tmp_path / "baselines"
         baselines_dir.mkdir()
         output_dir = tmp_path / "output"

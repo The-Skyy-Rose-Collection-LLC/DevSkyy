@@ -5,8 +5,6 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-import pytest
-
 from skyyrose.elite_studio import utils
 from skyyrose.elite_studio.models import ProductData
 
@@ -88,7 +86,6 @@ class TestGetReferenceImagePath:
                 result = utils.get_reference_image_path("br-001", "front")
 
         # Check filename only — tmp_path dirs can contain "back" as substring
-        from pathlib import Path
         filename = Path(result).name
         assert "detail" in filename
         assert "back" not in filename

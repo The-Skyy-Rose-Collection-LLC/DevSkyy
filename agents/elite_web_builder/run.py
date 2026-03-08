@@ -36,8 +36,8 @@ PROJECT_ROOT = ROOT.parent.parent  # DevSkyy/
 try:
     from dotenv import load_dotenv
 
-    load_dotenv(PROJECT_ROOT / "skyyrose" / ".env")       # Base (may have stale keys)
-    load_dotenv(PROJECT_ROOT / ".env", override=True)      # Root overrides (full Anthropic key)
+    load_dotenv(PROJECT_ROOT / "skyyrose" / ".env")  # Base (may have stale keys)
+    load_dotenv(PROJECT_ROOT / ".env", override=True)  # Root overrides (full Anthropic key)
     load_dotenv(PROJECT_ROOT / "gemini" / ".env", override=True)  # Live Gemini key
 except ImportError:
     pass  # dotenv not required if env vars already set
@@ -50,9 +50,7 @@ _REQUIRED_KEYS = {
 }
 
 _missing_keys = [
-    f"  {k} — needed for: {desc}"
-    for k, desc in _REQUIRED_KEYS.items()
-    if not os.getenv(k)
+    f"  {k} — needed for: {desc}" for k, desc in _REQUIRED_KEYS.items() if not os.getenv(k)
 ]
 if _missing_keys:
     print("\n  Elite Web Builder — missing API keys:\n")

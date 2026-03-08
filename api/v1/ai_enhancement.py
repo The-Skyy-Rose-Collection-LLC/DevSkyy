@@ -9,9 +9,9 @@ from pathlib import Path
 
 import blurhash
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
-from services.ai_image_enhancement import LuxuryImageEnhancer
 
 from core.auth.interfaces import requires_api_key
+from services.ai_image_enhancement import LuxuryImageEnhancer
 
 router = APIRouter(prefix="/ai", tags=["AI Enhancement"])
 
@@ -41,11 +41,8 @@ async def enhance_image(
     Returns:
         Enhanced image details and metadata
     """
-    if not file.content_type.startswith('image/'):
-        raise HTTPException(
-            status_code=400,
-            detail="File must be an image"
-        )
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
 
     # Create temp directory
     temp_dir = Path("/tmp/skyyrose_enhancement")
@@ -96,10 +93,7 @@ async def enhance_image(
         }
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Enhancement failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Enhancement failed: {str(e)}")
 
 
 @router.post("/generate-blurhash")
@@ -118,11 +112,8 @@ async def generate_blurhash_endpoint(
     Returns:
         Blurhash string
     """
-    if not file.content_type.startswith('image/'):
-        raise HTTPException(
-            status_code=400,
-            detail="File must be an image"
-        )
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
 
     # Create temp directory
     temp_dir = Path("/tmp/skyyrose_blurhash")
@@ -145,10 +136,7 @@ async def generate_blurhash_endpoint(
         }
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Blurhash generation failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Blurhash generation failed: {str(e)}")
     finally:
         # Cleanup
         if input_path.exists():
@@ -171,11 +159,8 @@ async def interrogate_image(
     Returns:
         Image analysis and prompts
     """
-    if not file.content_type.startswith('image/'):
-        raise HTTPException(
-            status_code=400,
-            detail="File must be an image"
-        )
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
 
     # Create temp directory
     temp_dir = Path("/tmp/skyyrose_interrogate")
@@ -198,10 +183,7 @@ async def interrogate_image(
         }
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Image interrogation failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Image interrogation failed: {str(e)}")
     finally:
         # Cleanup
         if input_path.exists():
@@ -244,10 +226,7 @@ async def generate_product_image(
         }
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Image generation failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Image generation failed: {str(e)}")
 
 
 @router.post("/create-product-video")
@@ -268,11 +247,8 @@ async def create_product_video(
     Returns:
         Video URL
     """
-    if not file.content_type.startswith('image/'):
-        raise HTTPException(
-            status_code=400,
-            detail="File must be an image"
-        )
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
 
     # Create temp directory
     temp_dir = Path("/tmp/skyyrose_video")
@@ -299,10 +275,7 @@ async def create_product_video(
         }
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Video creation failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Video creation failed: {str(e)}")
     finally:
         # Cleanup
         if input_path.exists():
@@ -334,7 +307,9 @@ async def get_enhancement_status(
     }
 
 
-def generate_blurhash_from_path(image_path: str, components_x: int = 4, components_y: int = 3) -> str:
+def generate_blurhash_from_path(
+    image_path: str, components_x: int = 4, components_y: int = 3
+) -> str:
     """
     Generate blurhash from image file path
 
@@ -350,7 +325,7 @@ def generate_blurhash_from_path(image_path: str, components_x: int = 4, componen
 
     try:
         img = Image.open(image_path)
-        img = img.convert('RGB')
+        img = img.convert("RGB")
 
         # Resize for performance (max 256px on longest side)
         max_size = 256

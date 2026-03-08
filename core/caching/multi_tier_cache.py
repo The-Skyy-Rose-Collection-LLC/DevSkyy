@@ -255,6 +255,7 @@ def cached(ttl: int = 300, key_prefix: str = "") -> Callable:
         async def get_product(sku: str) -> dict:
             return await db.find_product(sku)
     """
+
     # Each decorated function gets its own isolated cache
     # to avoid cross-function key collisions
     def decorator(func: Callable) -> Callable:
@@ -270,9 +271,9 @@ def cached(ttl: int = 300, key_prefix: str = "") -> Callable:
             }
             # 32 hex chars = 128 bits — reduces birthday collision probability
             # from ~1/2^32 (16 hex, 65k keys) to ~1/2^64 (32 hex, negligible)
-            key_hash = hashlib.sha256(
-                json.dumps(key_data, sort_keys=True).encode()
-            ).hexdigest()[:32]
+            key_hash = hashlib.sha256(json.dumps(key_data, sort_keys=True).encode()).hexdigest()[
+                :32
+            ]
             cache_key = f"{prefix}:{key_hash}"
 
             # Check cache
@@ -291,8 +292,10 @@ def cached(ttl: int = 300, key_prefix: str = "") -> Callable:
 
         # Expose cache instance for testing/invalidation
         wrapper.cache = func_cache  # type: ignore[attr-defined]
-        wrapper.cache_invalidate = lambda *a, **k: func_cache.invalidate(  # type: ignore[attr-defined]
-            f"{prefix}:{hashlib.sha256(json.dumps({'args': [str(x) for x in a], 'kwargs': {kk: str(vv) for kk, vv in sorted(k.items())}}, sort_keys=True).encode()).hexdigest()[:32]}"
+        wrapper.cache_invalidate = (
+            lambda *a, **k: func_cache.invalidate(  # type: ignore[attr-defined]
+                f"{prefix}:{hashlib.sha256(json.dumps({'args': [str(x) for x in a], 'kwargs': {kk: str(vv) for kk, vv in sorted(k.items())}}, sort_keys=True).encode()).hexdigest()[:32]}"
+            )
         )
 
         return wrapper

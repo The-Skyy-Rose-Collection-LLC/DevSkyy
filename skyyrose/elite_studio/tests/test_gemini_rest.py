@@ -3,8 +3,6 @@
 import base64
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from skyyrose.elite_studio import gemini_rest
 
 
@@ -70,9 +68,7 @@ class TestAnalyzeVision:
     def test_success(self, _mock_key, mock_post):
         mock_resp = MagicMock()
         mock_resp.json.return_value = {
-            "candidates": [
-                {"content": {"parts": [{"text": "Detailed garment analysis..."}]}}
-            ]
+            "candidates": [{"content": {"parts": [{"text": "Detailed garment analysis..."}]}}]
         }
         mock_resp.raise_for_status = MagicMock()
         mock_post.return_value = mock_resp
@@ -156,13 +152,7 @@ class TestGenerateImage:
     def test_no_image_in_response(self, _mock_key, mock_post):
         mock_resp = MagicMock()
         mock_resp.json.return_value = {
-            "candidates": [
-                {
-                    "content": {
-                        "parts": [{"text": "I cannot generate that image."}]
-                    }
-                }
-            ]
+            "candidates": [{"content": {"parts": [{"text": "I cannot generate that image."}]}}]
         }
         mock_resp.raise_for_status = MagicMock()
         mock_post.return_value = mock_resp

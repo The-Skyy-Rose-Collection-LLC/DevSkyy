@@ -85,8 +85,10 @@ class TestEventStore:
         """
         event = Event(event_type="ProductCreated", aggregate_id="p-1", data={})
 
-        with patch.object(store, "_persist", new_callable=AsyncMock), \
-             patch.object(store, "_publish", new_callable=AsyncMock) as mock_publish:
+        with (
+            patch.object(store, "_persist", new_callable=AsyncMock),
+            patch.object(store, "_publish", new_callable=AsyncMock) as mock_publish,
+        ):
             await store.append(event)
             mock_publish.assert_called_once_with(event)
 
@@ -121,7 +123,7 @@ class TestEventStore:
                 event_id=str(uuid.uuid4()),
                 event_type="ProductActivated",
                 aggregate_id=agg_id,
-                data_json='{}',
+                data_json="{}",
                 timestamp=ts3,
                 version=3,
             ),

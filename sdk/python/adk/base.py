@@ -30,6 +30,7 @@ def _get_tracer():
     """Lazy-load tracer to avoid circular import (adk ← core → adk)."""
     try:
         from core.telemetry.tracer import get_tracer
+
         return get_tracer("adk.agent")
     except ImportError:
         return None
@@ -294,9 +295,7 @@ class BaseDevSkyyAgent(ABC):
         tracer = _get_tracer()
 
         span_ctx = (
-            tracer.start_as_current_span(f"agent.run.{self.name}")
-            if tracer
-            else _NullSpanCtx()
+            tracer.start_as_current_span(f"agent.run.{self.name}") if tracer else _NullSpanCtx()
         )
 
         with span_ctx as span:

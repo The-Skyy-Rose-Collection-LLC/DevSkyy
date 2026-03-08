@@ -185,9 +185,7 @@ class EventStore:
         """Publish event to in-process handlers."""
         await self._event_bus.publish(event)
 
-    async def _load_records(
-        self, aggregate_id: str, event_type: str | None = None
-    ) -> list[Any]:
+    async def _load_records(self, aggregate_id: str, event_type: str | None = None) -> list[Any]:
         """Load EventRecords from database. Override in tests."""
         from sqlalchemy import select
 
@@ -205,9 +203,7 @@ class EventStore:
             result = await session.execute(query)
             return list(result.scalars().all())
 
-    async def get_events(
-        self, aggregate_id: str, event_type: str | None = None
-    ) -> list[Event]:
+    async def get_events(self, aggregate_id: str, event_type: str | None = None) -> list[Event]:
         """
         Retrieve all events for an aggregate in chronological order.
 

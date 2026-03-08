@@ -151,9 +151,7 @@ class DirectorConfig:
     routing_config: RoutingConfig
     learning_dir: Path = Path("instincts")
     output_dir: Path = Path("output/theme")
-    verification_config: VerificationConfig = field(
-        default_factory=VerificationConfig
-    )
+    verification_config: VerificationConfig = field(default_factory=VerificationConfig)
     max_heal_attempts: int = 3
     max_stories: int = 50
     max_concurrency: int = 4  # H8: limit parallel story execution
@@ -226,7 +224,10 @@ class Director:
             if story.status != StoryStatus.PENDING:
                 continue
             deps_met = all(
-                self._stories.get(dep, UserStory(id=dep, title="", description="", agent_role=AgentRole.DIRECTOR)).status == StoryStatus.GREEN
+                self._stories.get(
+                    dep, UserStory(id=dep, title="", description="", agent_role=AgentRole.DIRECTOR)
+                ).status
+                == StoryStatus.GREEN
                 for dep in story.depends_on
             )
             if deps_met:
@@ -379,7 +380,8 @@ class Director:
                     story.status = StoryStatus.FAILED
                     logger.error(
                         "Story %s: agent execution failed — %s",
-                        story.id, result.error,
+                        story.id,
+                        result.error,
                     )
                     return story
 
@@ -434,14 +436,17 @@ class Director:
                             )
                             # Log failure to learning journal
                             from core.learning_journal import JournalEntry
+
                             for analysis in diagnosis.failure_analyses:
-                                self._journal.add_entry(JournalEntry(
-                                    mistake=analysis.description,
-                                    correct=f"Fix {analysis.category.value} in {analysis.gate.name}",
-                                    agent=story.agent_role.value,
-                                    story_id=story.id,
-                                    tags=[analysis.gate.name, analysis.category.value],
-                                ))
+                                self._journal.add_entry(
+                                    JournalEntry(
+                                        mistake=analysis.description,
+                                        correct=f"Fix {analysis.category.value} in {analysis.gate.name}",
+                                        agent=story.agent_role.value,
+                                        story_id=story.id,
+                                        tags=[analysis.gate.name, analysis.category.value],
+                                    )
+                                )
                             story.status = StoryStatus.FAILED
                         else:
                             story.status = StoryStatus.GREEN
@@ -477,7 +482,10 @@ class Director:
 
         # Strip markdown code fences and retry
         defenced = re.sub(
-            r"^```(?:json)?\s*\n?", "", stripped, count=1,
+            r"^```(?:json)?\s*\n?",
+            "",
+            stripped,
+            count=1,
         )
         defenced = re.sub(r"\n?```\s*$", "", defenced, count=1)
 
@@ -509,19 +517,20 @@ class Director:
             role_str = entry.get("agent_role", "")
             if role_str not in role_values:
                 raise PlanningError(
-                    f"Unknown agent_role '{role_str}'. "
-                    f"Valid roles: {sorted(role_values)}",
+                    f"Unknown agent_role '{role_str}'. Valid roles: {sorted(role_values)}",
                     raw_response=json.dumps(entry),
                 )
 
-            stories.append(UserStory(
-                id=entry["id"],
-                title=entry["title"],
-                description=entry["description"],
-                agent_role=AgentRole(role_str),
-                depends_on=entry.get("depends_on", []),
-                acceptance_criteria=entry.get("acceptance_criteria", []),
-            ))
+            stories.append(
+                UserStory(
+                    id=entry["id"],
+                    title=entry["title"],
+                    description=entry["description"],
+                    agent_role=AgentRole(role_str),
+                    depends_on=entry.get("depends_on", []),
+                    acceptance_criteria=entry.get("acceptance_criteria", []),
+                )
+            )
 
         dependency_order = data.get("dependency_order", [s.id for s in stories])
         return PRDBreakdown(stories=stories, dependency_order=dependency_order)
@@ -577,15 +586,11 @@ class Director:
             ready = self.get_ready_stories()
             if not ready:
                 # Check for deadlocked stories (still pending but unresolvable)
-                pending = [
-                    s for s in self._stories.values()
-                    if s.status == StoryStatus.PENDING
-                ]
+                pending = [s for s in self._stories.values() if s.status == StoryStatus.PENDING]
                 if pending:
                     failures.append(
                         "Dependency cycle detected — "
-                        f"{len(pending)} stories stuck: "
-                        + ", ".join(s.id for s in pending)
+                        f"{len(pending)} stories stuck: " + ", ".join(s.id for s in pending)
                     )
                 break
 
@@ -601,13 +606,9 @@ class Director:
             )
             for i, result in enumerate(results):
                 if isinstance(result, BaseException):
-                    failures.append(
-                        f"{ready[i].id}: {ready[i].title} — ERROR: {result}"
-                    )
+                    failures.append(f"{ready[i].id}: {ready[i].title} — ERROR: {result}")
                 elif result.status == StoryStatus.FAILED:
-                    failures.append(
-                        f"{result.id}: {result.title} — FAILED"
-                    )
+                    failures.append(f"{result.id}: {result.title} — FAILED")
 
         # Step 4: Build report
         elapsed = (time.time() - start) * 1000
@@ -618,10 +619,7 @@ class Director:
         return ProjectReport(
             stories=dict(self._stories),
             status_summary=summary,
-            all_green=all(
-                s.status == StoryStatus.GREEN
-                for s in self._stories.values()
-            ),
+            all_green=all(s.status == StoryStatus.GREEN for s in self._stories.values()),
             elapsed_ms=elapsed,
             failures=failures,
             instincts_learned=instincts_learned,
@@ -684,6 +682,7 @@ PRD:
 # ---------------------------------------------------------------------------
 # Default routing (matches plan spec)
 # ---------------------------------------------------------------------------
+
 
 def _load_default_routing() -> dict[str, Any]:
     """Load routing from config/provider_routing.json, with hardcoded fallback."""

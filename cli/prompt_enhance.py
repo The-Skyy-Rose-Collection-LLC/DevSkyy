@@ -846,7 +846,7 @@ class PromptEnhancer:
 ## Analysis
 - Task Type: {analysis.task_type.value}
 - Clarity Score: {analysis.clarity_score}/100
-- Missing Elements: {', '.join(analysis.missing_elements) or 'None'}
+- Missing Elements: {", ".join(analysis.missing_elements) or "None"}
 
 ## Techniques to Apply
 {technique_instructions}
@@ -1116,7 +1116,7 @@ def _show_stats() -> None:
     click.echo(f"\nTotal enhancements: {total}")
     click.echo("\nBy task type:")
     for mode, count in sorted(modes.items(), key=lambda x: -x[1]):
-        click.echo(f"  {mode}: {count} ({count*100//total}%)")
+        click.echo(f"  {mode}: {count} ({count * 100 // total}%)")
 
     click.echo("\nTechniques used:")
     for tech, count in sorted(techniques.items(), key=lambda x: -x[1]):

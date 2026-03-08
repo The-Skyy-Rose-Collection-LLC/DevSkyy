@@ -40,6 +40,7 @@ class QualityAgent:
         prompt = self._build_qc_prompt(expected_spec)
 
         try:
+
             def _call():
                 image_b64 = resize_for_claude(image_path)
                 client = get_anthropic_client()

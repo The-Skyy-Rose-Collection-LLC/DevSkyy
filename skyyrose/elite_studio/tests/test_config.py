@@ -1,9 +1,5 @@
 """Tests for config — paths, constants, and lazy client factories."""
 
-from unittest.mock import patch
-
-import pytest
-
 from skyyrose.elite_studio import config
 
 

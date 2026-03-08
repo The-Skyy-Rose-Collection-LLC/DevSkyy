@@ -2,9 +2,6 @@
 
 import pytest
 
-from skyyrose.elite_studio.agents.generator_agent import GeneratorAgent
-from skyyrose.elite_studio.agents.quality_agent import QualityAgent
-from skyyrose.elite_studio.agents.vision_agent import VisionAgent
 from skyyrose.elite_studio.coordinator import Coordinator, NullLogger
 from skyyrose.elite_studio.models import (
     GenerationResult,
@@ -20,9 +17,7 @@ from skyyrose.elite_studio.models import (
 # ---------------------------------------------------------------------------
 
 
-def make_product(
-    sku: str = "br-001", collection: str = "black-rose", **kwargs
-) -> ProductData:
+def make_product(sku: str = "br-001", collection: str = "black-rose", **kwargs) -> ProductData:
     """Create a test ProductData."""
     return ProductData(sku=sku, collection=collection, **kwargs)
 

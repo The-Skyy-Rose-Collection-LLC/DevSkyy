@@ -17,7 +17,7 @@ from ..config import (
     get_openai_client,
 )
 from ..models import SynthesizedVision, VisionAnalysis
-from ..retry import is_transient_error, retry_on_transient
+from ..retry import retry_on_transient
 from ..utils import get_reference_image_path, image_to_base64, load_product_data
 
 
@@ -123,6 +123,7 @@ class VisionAgent:
         from .. import gemini_rest
 
         try:
+
             def _call():
                 result = gemini_rest.analyze_vision(
                     model=VISION_GEMINI_MODEL,
@@ -152,6 +153,7 @@ class VisionAgent:
     def _analyze_openai(self, prompt: str, image_b64: str) -> VisionAnalysis:
         """Run OpenAI GPT-4o vision analysis with retry."""
         try:
+
             def _call():
                 client = get_openai_client()
                 response = client.chat.completions.create(
@@ -207,8 +209,7 @@ class VisionAgent:
         sections: list[str] = []
         for result in successful:
             sections.append(
-                f"=== {result.provider.upper()} ANALYSIS ({result.model}) ===\n"
-                f"{result.analysis}"
+                f"=== {result.provider.upper()} ANALYSIS ({result.model}) ===\n{result.analysis}"
             )
 
         return (

@@ -57,22 +57,16 @@ class TestAllSpecs:
 
     def test_all_specs_have_prompts(self) -> None:
         for spec in ALL_SPECS:
-            assert len(spec.system_prompt) > 50, (
-                f"{spec.name} prompt too short"
-            )
+            assert len(spec.system_prompt) > 50, f"{spec.name} prompt too short"
 
     def test_all_specs_have_capabilities(self) -> None:
         for spec in ALL_SPECS:
-            assert len(spec.capabilities) >= 3, (
-                f"{spec.name} needs at least 3 capabilities"
-            )
+            assert len(spec.capabilities) >= 3, f"{spec.name} needs at least 3 capabilities"
 
     def test_capabilities_have_tags(self) -> None:
         for spec in ALL_SPECS:
             for cap in spec.capabilities:
-                assert len(cap.tags) > 0, (
-                    f"{spec.name}/{cap.name} has no tags"
-                )
+                assert len(cap.tags) > 0, f"{spec.name}/{cap.name} has no tags"
 
 
 # ---------------------------------------------------------------------------

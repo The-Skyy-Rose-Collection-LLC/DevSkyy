@@ -5,11 +5,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from skyyrose.elite_studio.coordinator import Coordinator, NullLogger
-from skyyrose.elite_studio.models import (
-    GenerationResult,
-    QualityVerification,
-    SynthesizedVision,
-)
 
 from .conftest import (
     make_generation_result,
@@ -58,8 +53,10 @@ class TestCoordinatorProduce:
 
     def test_vision_failure(self, coordinator, mock_vision):
         mock_vision.analyze.return_value = make_synthesized_vision(
-            success=False, error="All providers failed",
-            unified_spec="", providers_used=(),
+            success=False,
+            error="All providers failed",
+            unified_spec="",
+            providers_used=(),
         )
 
         result = coordinator.produce("br-001")
@@ -72,7 +69,9 @@ class TestCoordinatorProduce:
             providers_used=("gemini",),
         )
         mock_generator.generate.return_value = make_generation_result(
-            success=False, error="Timeout", output_path="",
+            success=False,
+            error="Timeout",
+            output_path="",
         )
 
         result = coordinator.produce("br-001")
@@ -86,7 +85,9 @@ class TestCoordinatorProduce:
         )
         mock_generator.generate.return_value = make_generation_result()
         mock_quality.verify.return_value = make_quality_verification(
-            success=False, overall_status="", recommendation="",
+            success=False,
+            overall_status="",
+            recommendation="",
             error="Claude overloaded",
         )
 
@@ -96,7 +97,8 @@ class TestCoordinatorProduce:
 
     def test_generator_receives_spec(self, coordinator, mock_vision, mock_generator, mock_quality):
         mock_vision.analyze.return_value = make_synthesized_vision(
-            unified_spec="THE EXACT SPEC", providers_used=("gemini",),
+            unified_spec="THE EXACT SPEC",
+            providers_used=("gemini",),
         )
         mock_generator.generate.return_value = make_generation_result(
             output_path="/tmp/test.jpg",
@@ -115,7 +117,9 @@ class TestCoordinatorProduce:
 class TestCoordinatorBatch:
     @patch("skyyrose.elite_studio.coordinator.time.sleep")
     @patch("skyyrose.elite_studio.coordinator.discover_all_skus")
-    def test_batch_all(self, mock_discover, mock_sleep, coordinator, mock_vision, mock_generator, mock_quality):
+    def test_batch_all(
+        self, mock_discover, mock_sleep, coordinator, mock_vision, mock_generator, mock_quality
+    ):
         mock_discover.return_value = ["br-001", "br-002"]
 
         mock_vision.analyze.return_value = make_synthesized_vision(
@@ -192,6 +196,7 @@ class TestWriteReport:
         assert report_path.exists()
 
         import json
+
         data = json.loads(report_path.read_text())
         assert len(data) == 2
         assert data[0]["id"] == "br-001"

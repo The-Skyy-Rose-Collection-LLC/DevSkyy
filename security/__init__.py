@@ -26,16 +26,14 @@ from .aes256_gcm_encryption import (
     EncryptionError,
     FieldEncryption,
     KeyDerivation,
-)
-from .aes256_gcm_encryption import KeyError as EncryptionKeyError
-from .aes256_gcm_encryption import (
     KeyVersion,
     data_masker,
     encryption,
     field_encryption,
 )
-from .jwt_oauth2_auth import JWTConfig  # Config; Enums; Models; Classes; Dependencies; Instances
+from .aes256_gcm_encryption import KeyError as EncryptionKeyError
 from .jwt_oauth2_auth import (
+    JWTConfig,  # Config; Enums; Models; Classes; Dependencies; Instances
     JWTManager,
     PasswordManager,
     RateLimiter,

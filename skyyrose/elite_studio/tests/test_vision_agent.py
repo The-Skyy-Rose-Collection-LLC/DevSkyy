@@ -35,14 +35,22 @@ class TestVisionAgentAnalyze:
         # Mock both providers
         agent._analyze_gemini = MagicMock(
             return_value=MagicMock(
-                success=True, provider="google", model="flash",
-                analysis="Gemini analysis", char_count=15, error=""
+                success=True,
+                provider="google",
+                model="flash",
+                analysis="Gemini analysis",
+                char_count=15,
+                error="",
             )
         )
         agent._analyze_openai = MagicMock(
             return_value=MagicMock(
-                success=True, provider="openai", model="gpt-4o",
-                analysis="OpenAI analysis", char_count=15, error=""
+                success=True,
+                provider="openai",
+                model="gpt-4o",
+                analysis="OpenAI analysis",
+                char_count=15,
+                error="",
             )
         )
 
@@ -65,14 +73,22 @@ class TestVisionAgentAnalyze:
 
         agent._analyze_gemini = MagicMock(
             return_value=MagicMock(
-                success=True, provider="google", model="flash",
-                analysis="Gemini only", char_count=11, error=""
+                success=True,
+                provider="google",
+                model="flash",
+                analysis="Gemini only",
+                char_count=11,
+                error="",
             )
         )
         agent._analyze_openai = MagicMock(
             return_value=MagicMock(
-                success=False, provider="openai", model="gpt-4o",
-                analysis="", char_count=0, error="Rate limited"
+                success=False,
+                provider="openai",
+                model="gpt-4o",
+                analysis="",
+                char_count=0,
+                error="Rate limited",
             )
         )
 
@@ -94,14 +110,22 @@ class TestVisionAgentAnalyze:
 
         agent._analyze_gemini = MagicMock(
             return_value=MagicMock(
-                success=False, provider="google", model="flash",
-                analysis="", char_count=0, error="Timeout"
+                success=False,
+                provider="google",
+                model="flash",
+                analysis="",
+                char_count=0,
+                error="Timeout",
             )
         )
         agent._analyze_openai = MagicMock(
             return_value=MagicMock(
-                success=True, provider="openai", model="gpt-4o",
-                analysis="OpenAI only", char_count=11, error=""
+                success=True,
+                provider="openai",
+                model="gpt-4o",
+                analysis="OpenAI only",
+                char_count=11,
+                error="",
             )
         )
 
@@ -122,14 +146,22 @@ class TestVisionAgentAnalyze:
 
         agent._analyze_gemini = MagicMock(
             return_value=MagicMock(
-                success=False, provider="google", model="flash",
-                analysis="", char_count=0, error="Gemini down"
+                success=False,
+                provider="google",
+                model="flash",
+                analysis="",
+                char_count=0,
+                error="Gemini down",
             )
         )
         agent._analyze_openai = MagicMock(
             return_value=MagicMock(
-                success=False, provider="openai", model="gpt-4o",
-                analysis="", char_count=0, error="OpenAI down"
+                success=False,
+                provider="openai",
+                model="gpt-4o",
+                analysis="",
+                char_count=0,
+                error="OpenAI down",
             )
         )
 
@@ -217,9 +249,7 @@ class TestVisionAgentSynthesize:
     def test_single_result(self, agent):
         from skyyrose.elite_studio.models import VisionAnalysis
 
-        results = [
-            VisionAnalysis(success=True, provider="google", model="flash", analysis="Solo")
-        ]
+        results = [VisionAnalysis(success=True, provider="google", model="flash", analysis="Solo")]
         unified = agent._synthesize(results, ["gemini"])
         assert unified == "Solo"
 

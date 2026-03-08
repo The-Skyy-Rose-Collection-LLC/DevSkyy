@@ -21,7 +21,9 @@ class TestQualityAgent:
         # Mock Claude response with valid JSON
         mock_response = MagicMock()
         mock_response.content = [MagicMock()]
-        mock_response.content[0].text = '{"overall_status": "pass", "logo_accuracy": {"status": "pass", "notes": "exact"}, "garment_accuracy": {"status": "pass", "notes": "good"}, "photo_quality": {"status": "pass", "notes": "clean"}, "recommendation": "approve"}'
+        mock_response.content[
+            0
+        ].text = '{"overall_status": "pass", "logo_accuracy": {"status": "pass", "notes": "exact"}, "garment_accuracy": {"status": "pass", "notes": "good"}, "photo_quality": {"status": "pass", "notes": "clean"}, "recommendation": "approve"}'
 
         mock_claude = MagicMock()
         mock_claude.messages.create.return_value = mock_response
@@ -39,7 +41,9 @@ class TestQualityAgent:
 
         mock_response = MagicMock()
         mock_response.content = [MagicMock()]
-        mock_response.content[0].text = '```json\n{"overall_status": "fail", "logo_accuracy": {"status": "fail", "notes": "wrong"}, "garment_accuracy": {"status": "warn", "notes": "close"}, "photo_quality": {"status": "pass", "notes": "ok"}, "recommendation": "regenerate"}\n```'
+        mock_response.content[
+            0
+        ].text = '```json\n{"overall_status": "fail", "logo_accuracy": {"status": "fail", "notes": "wrong"}, "garment_accuracy": {"status": "warn", "notes": "close"}, "photo_quality": {"status": "pass", "notes": "ok"}, "recommendation": "regenerate"}\n```'
 
         mock_claude = MagicMock()
         mock_claude.messages.create.return_value = mock_response
@@ -57,7 +61,9 @@ class TestQualityAgent:
 
         mock_response = MagicMock()
         mock_response.content = [MagicMock()]
-        mock_response.content[0].text = "The image looks great overall but I can't provide structured JSON."
+        mock_response.content[
+            0
+        ].text = "The image looks great overall but I can't provide structured JSON."
 
         mock_claude = MagicMock()
         mock_claude.messages.create.return_value = mock_response

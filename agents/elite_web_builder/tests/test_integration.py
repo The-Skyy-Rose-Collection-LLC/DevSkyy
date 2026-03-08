@@ -18,6 +18,9 @@ from director import (
     StoryStatus,
     UserStory,
 )
+from tools.contrast_checker import check_contrast
+from tools.spacing_scale import generate_spacing_scale
+from tools.type_scale import generate_type_scale
 
 from agents.base import AgentOutput, AgentRole
 from agents.design_system import DESIGN_SYSTEM_SPEC
@@ -32,9 +35,6 @@ from core.verification_loop import (
     VerificationConfig,
     VerificationLoop,
 )
-from tools.contrast_checker import check_contrast
-from tools.spacing_scale import generate_spacing_scale
-from tools.type_scale import generate_type_scale
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -93,9 +93,7 @@ def mini_prd_stories() -> list[UserStory]:
 class TestStoryLifecycle:
     """Test the full story lifecycle: pending → in_progress → green."""
 
-    def test_dependency_order(
-        self, director: Director, mini_prd_stories: list[UserStory]
-    ) -> None:
+    def test_dependency_order(self, director: Director, mini_prd_stories: list[UserStory]) -> None:
         """Stories execute in dependency order."""
         director.add_stories(mini_prd_stories)
 
@@ -121,9 +119,7 @@ class TestStoryLifecycle:
         ready = director.get_ready_stories()
         assert len(ready) == 0
 
-    def test_status_summary(
-        self, director: Director, mini_prd_stories: list[UserStory]
-    ) -> None:
+    def test_status_summary(self, director: Director, mini_prd_stories: list[UserStory]) -> None:
         director.add_stories(mini_prd_stories)
         mini_prd_stories[0].status = StoryStatus.GREEN
         mini_prd_stories[1].status = StoryStatus.IN_PROGRESS
@@ -170,7 +166,8 @@ class TestAgentExecutionPipeline:
             result = check_contrast("#B76E79", "#FFFFFF")
             if result.aa_large:
                 return GateResult(
-                    gate=Gate.A11Y, status=GateStatus.PASSED,
+                    gate=Gate.A11Y,
+                    status=GateStatus.PASSED,
                     message=f"Rose gold contrast {result.ratio}:1 passes AA-Large",
                 )
             return GateResult(
@@ -187,9 +184,7 @@ class TestAgentExecutionPipeline:
         assert "B76E79" in result.output.content
 
     @pytest.mark.asyncio
-    async def test_frontend_story_with_multiple_gates(
-        self, director: Director
-    ) -> None:
+    async def test_frontend_story_with_multiple_gates(self, director: Director) -> None:
         """Frontend story passes build + lint + a11y gates."""
         story = UserStory(
             id="US-002",
@@ -217,9 +212,7 @@ class TestAgentExecutionPipeline:
         assert result.status == StoryStatus.GREEN
 
     @pytest.mark.asyncio
-    async def test_failed_story_triggers_heal_attempt(
-        self, director: Director
-    ) -> None:
+    async def test_failed_story_triggers_heal_attempt(self, director: Director) -> None:
         """A failing gate triggers the self-heal cycle."""
         story = UserStory(
             id="US-003",
@@ -540,9 +533,7 @@ class TestFullPipeline:
 # ---------------------------------------------------------------------------
 
 
-async def _make_gate_result(
-    gate: Gate, passed: bool, message: str = "OK"
-) -> GateResult:
+async def _make_gate_result(gate: Gate, passed: bool, message: str = "OK") -> GateResult:
     return GateResult(
         gate=gate,
         status=GateStatus.PASSED if passed else GateStatus.FAILED,

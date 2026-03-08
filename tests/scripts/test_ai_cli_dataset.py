@@ -1,4 +1,5 @@
 """Tests for AI CLI dataset subcommand."""
+
 from unittest.mock import MagicMock, patch
 
 from typer.testing import CliRunner

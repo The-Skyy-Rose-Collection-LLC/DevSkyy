@@ -1,4 +1,5 @@
 """Tests for AI CLI train subcommand."""
+
 from unittest.mock import MagicMock, patch
 
 from typer.testing import CliRunner
@@ -44,7 +45,10 @@ def test_train_status():
     with patch.dict("os.environ", {"REPLICATE_API_TOKEN": "r8_test"}):
         with patch("scripts.ai.PROVIDERS") as mock_providers:
             mock_provider = MagicMock()
-            mock_provider.get_status.return_value = {"status": "succeeded", "logs": "Step 1000/1000"}
+            mock_provider.get_status.return_value = {
+                "status": "succeeded",
+                "logs": "Step 1000/1000",
+            }
             mock_providers.__getitem__ = MagicMock(return_value=mock_provider)
             mock_providers.__contains__ = MagicMock(return_value=True)
             result = runner.invoke(

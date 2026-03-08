@@ -225,6 +225,7 @@ async def lifespan(app: FastAPI):
     # Initialize OpenTelemetry tracing
     try:
         from core.telemetry.tracer import init_telemetry
+
         init_telemetry(service_name="devskyy-api")
         log.info("opentelemetry_initialized")
     except Exception as e:

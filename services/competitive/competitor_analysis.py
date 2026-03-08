@@ -195,9 +195,7 @@ class CompetitorAnalysisService:
 
         _competitor_assets[asset.id] = asset
 
-        logger.info(
-            f"Uploaded competitor asset: {asset.id} " f"(competitor: {request.competitor_id})"
-        )
+        logger.info(f"Uploaded competitor asset: {asset.id} (competitor: {request.competitor_id})")
         return asset
 
     async def get_asset(self, asset_id: str) -> CompetitorAsset | None:

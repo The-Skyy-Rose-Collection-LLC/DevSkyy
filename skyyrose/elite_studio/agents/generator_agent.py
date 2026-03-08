@@ -13,7 +13,7 @@ from ..config import (
     OUTPUT_DIR,
 )
 from ..models import GenerationResult
-from ..retry import is_transient_error, retry_on_transient
+from ..retry import retry_on_transient
 from ..utils import get_reference_image_path, image_to_base64
 
 
@@ -55,6 +55,7 @@ class GeneratorAgent:
         from .. import gemini_rest
 
         try:
+
             def _call():
                 result = gemini_rest.generate_image(
                     model=GENERATION_MODEL,

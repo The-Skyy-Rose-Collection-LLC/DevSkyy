@@ -185,9 +185,7 @@ class LuxuryImageEnhancer:
             "caption": ci.generate_caption(image),
         }
 
-    async def apply_luxury_filter(
-        self, image_path: str, output_path: str
-    ) -> None:
+    async def apply_luxury_filter(self, image_path: str, output_path: str) -> None:
         """
         Apply SkyyRose luxury color grading
 
@@ -315,19 +313,23 @@ class LuxuryImageEnhancer:
                     await self.apply_luxury_filter(current_path, str(filtered_path))
                     current_path = str(filtered_path)
 
-                results.append({
-                    "input": str(image_file),
-                    "output": current_path,
-                    "success": True,
-                })
+                results.append(
+                    {
+                        "input": str(image_file),
+                        "output": current_path,
+                        "success": True,
+                    }
+                )
 
             except Exception as e:
                 print(f"Error processing {image_file.name}: {e}")
-                results.append({
-                    "input": str(image_file),
-                    "success": False,
-                    "error": str(e),
-                })
+                results.append(
+                    {
+                        "input": str(image_file),
+                        "success": False,
+                        "error": str(e),
+                    }
+                )
 
         return results
 

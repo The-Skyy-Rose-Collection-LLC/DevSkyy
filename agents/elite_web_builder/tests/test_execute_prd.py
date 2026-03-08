@@ -22,19 +22,22 @@ from agents.provider_adapters import LLMResponse
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _valid_planning_json(num_stories: int = 2) -> str:
     """Build a valid JSON string mimicking LLM planning output."""
     stories = []
     for i in range(1, num_stories + 1):
         sid = f"US-{i:03d}"
-        stories.append({
-            "id": sid,
-            "title": f"Story {i}",
-            "description": f"Do thing {i}",
-            "agent_role": "design_system" if i == 1 else "frontend_dev",
-            "depends_on": [] if i == 1 else [f"US-{i-1:03d}"],
-            "acceptance_criteria": [f"Criterion {i}a"],
-        })
+        stories.append(
+            {
+                "id": sid,
+                "title": f"Story {i}",
+                "description": f"Do thing {i}",
+                "agent_role": "design_system" if i == 1 else "frontend_dev",
+                "depends_on": [] if i == 1 else [f"US-{i - 1:03d}"],
+                "acceptance_criteria": [f"Criterion {i}a"],
+            }
+        )
     order = [f"US-{i:03d}" for i in range(1, num_stories + 1)]
     return json.dumps({"stories": stories, "dependency_order": order})
 
@@ -94,10 +97,15 @@ class TestProjectReport:
 
     def test_all_green_true(self) -> None:
         report = ProjectReport(
-            stories={"US-001": UserStory(
-                id="US-001", title="A", description="A",
-                agent_role=AgentRole.QA, status=StoryStatus.GREEN,
-            )},
+            stories={
+                "US-001": UserStory(
+                    id="US-001",
+                    title="A",
+                    description="A",
+                    agent_role=AgentRole.QA,
+                    status=StoryStatus.GREEN,
+                )
+            },
             status_summary={"green": 1},
             all_green=True,
             elapsed_ms=50.0,
@@ -198,12 +206,14 @@ class TestBuildBreakdown:
 
     def test_unknown_agent_role_raises(self) -> None:
         data = {
-            "stories": [{
-                "id": "US-001",
-                "title": "X",
-                "description": "X",
-                "agent_role": "nonexistent_role",
-            }],
+            "stories": [
+                {
+                    "id": "US-001",
+                    "title": "X",
+                    "description": "X",
+                    "agent_role": "nonexistent_role",
+                }
+            ],
             "dependency_order": ["US-001"],
         }
         with pytest.raises(PlanningError, match="nonexistent_role"):
@@ -211,12 +221,14 @@ class TestBuildBreakdown:
 
     def test_depends_on_defaults_to_empty(self) -> None:
         data = {
-            "stories": [{
-                "id": "US-001",
-                "title": "X",
-                "description": "X",
-                "agent_role": "qa",
-            }],
+            "stories": [
+                {
+                    "id": "US-001",
+                    "title": "X",
+                    "description": "X",
+                    "agent_role": "qa",
+                }
+            ],
             "dependency_order": ["US-001"],
         }
         breakdown = Director._build_breakdown(data, max_stories=50)
@@ -224,12 +236,14 @@ class TestBuildBreakdown:
 
     def test_acceptance_criteria_defaults_to_empty(self) -> None:
         data = {
-            "stories": [{
-                "id": "US-001",
-                "title": "X",
-                "description": "X",
-                "agent_role": "qa",
-            }],
+            "stories": [
+                {
+                    "id": "US-001",
+                    "title": "X",
+                    "description": "X",
+                    "agent_role": "qa",
+                }
+            ],
             "dependency_order": ["US-001"],
         }
         breakdown = Director._build_breakdown(data, max_stories=50)
@@ -332,17 +346,21 @@ class TestExecutePrd:
         director = Director.from_config()
 
         # Phase 1: planning returns 1 story (design_system, no deps)
-        planning_json = json.dumps({
-            "stories": [{
-                "id": "US-001",
-                "title": "Tokens",
-                "description": "Create tokens",
-                "agent_role": "design_system",
-                "depends_on": [],
-                "acceptance_criteria": [],
-            }],
-            "dependency_order": ["US-001"],
-        })
+        planning_json = json.dumps(
+            {
+                "stories": [
+                    {
+                        "id": "US-001",
+                        "title": "Tokens",
+                        "description": "Create tokens",
+                        "agent_role": "design_system",
+                        "depends_on": [],
+                        "acceptance_criteria": [],
+                    }
+                ],
+                "dependency_order": ["US-001"],
+            }
+        )
 
         # Phase 2: story execution returns content
         call_count = 0
@@ -380,17 +398,21 @@ class TestExecutePrd:
     async def test_failed_story_captured_in_failures_list(self) -> None:
         director = Director.from_config()
 
-        planning_json = json.dumps({
-            "stories": [{
-                "id": "US-001",
-                "title": "Broken task",
-                "description": "Will fail",
-                "agent_role": "design_system",
-                "depends_on": [],
-                "acceptance_criteria": [],
-            }],
-            "dependency_order": ["US-001"],
-        })
+        planning_json = json.dumps(
+            {
+                "stories": [
+                    {
+                        "id": "US-001",
+                        "title": "Broken task",
+                        "description": "Will fail",
+                        "agent_role": "design_system",
+                        "depends_on": [],
+                        "acceptance_criteria": [],
+                    }
+                ],
+                "dependency_order": ["US-001"],
+            }
+        )
 
         call_count = 0
 
@@ -444,25 +466,27 @@ class TestExecutePrd:
     async def test_stories_snapshot_in_report(self) -> None:
         director = Director.from_config()
 
-        planning_json = json.dumps({
-            "stories": [
-                {
-                    "id": "US-001",
-                    "title": "Design",
-                    "description": "Tokens",
-                    "agent_role": "design_system",
-                    "depends_on": [],
-                },
-                {
-                    "id": "US-002",
-                    "title": "Frontend",
-                    "description": "Build pages",
-                    "agent_role": "frontend_dev",
-                    "depends_on": ["US-001"],
-                },
-            ],
-            "dependency_order": ["US-001", "US-002"],
-        })
+        planning_json = json.dumps(
+            {
+                "stories": [
+                    {
+                        "id": "US-001",
+                        "title": "Design",
+                        "description": "Tokens",
+                        "agent_role": "design_system",
+                        "depends_on": [],
+                    },
+                    {
+                        "id": "US-002",
+                        "title": "Frontend",
+                        "description": "Build pages",
+                        "agent_role": "frontend_dev",
+                        "depends_on": ["US-001"],
+                    },
+                ],
+                "dependency_order": ["US-001", "US-002"],
+            }
+        )
 
         call_count = 0
 
@@ -500,12 +524,18 @@ class TestExecutePrd:
         # Manually set up a cycle: A depends on B, B depends on A
         # (bypass planning since we need a specific invalid state)
         s1 = UserStory(
-            id="US-001", title="A", description="A",
-            agent_role=AgentRole.DESIGN_SYSTEM, depends_on=["US-002"],
+            id="US-001",
+            title="A",
+            description="A",
+            agent_role=AgentRole.DESIGN_SYSTEM,
+            depends_on=["US-002"],
         )
         s2 = UserStory(
-            id="US-002", title="B", description="B",
-            agent_role=AgentRole.FRONTEND_DEV, depends_on=["US-001"],
+            id="US-002",
+            title="B",
+            description="B",
+            agent_role=AgentRole.FRONTEND_DEV,
+            depends_on=["US-001"],
         )
         director.add_stories([s1, s2])
 
@@ -519,10 +549,7 @@ class TestExecutePrd:
             ready = director.get_ready_stories()
             if not ready:
                 # Both stories are still PENDING — this IS the cycle
-                pending = [
-                    s for s in director._stories.values()
-                    if s.status == StoryStatus.PENDING
-                ]
+                pending = [s for s in director._stories.values() if s.status == StoryStatus.PENDING]
                 if pending:
                     deadlocked = True
                 break
@@ -537,10 +564,12 @@ class TestExecutePrd:
     async def test_empty_prd_produces_empty_report(self) -> None:
         director = Director.from_config()
 
-        planning_json = json.dumps({
-            "stories": [],
-            "dependency_order": [],
-        })
+        planning_json = json.dumps(
+            {
+                "stories": [],
+                "dependency_order": [],
+            }
+        )
         mock_adapter = _make_mock_adapter(text=planning_json)
 
         with patch("agents.runtime.get_adapter", return_value=mock_adapter):
@@ -562,10 +591,14 @@ class TestDirectorConfigMaxStories:
 
     def test_custom_max_stories_stored(self) -> None:
         from core.model_router import RoutingConfig
-        rc = RoutingConfig.from_dict({
-            "routes": {"director": {"provider": "anthropic", "model": "claude-opus-4-6"}},
-            "fallbacks": {"anthropic": {"provider": "google", "model": "gemini-3-pro-preview"}},
-        })
+
+        rc = RoutingConfig.from_dict(
+            {
+                "routes": {"director": {"provider": "anthropic", "model": "claude-opus-4-6"}},
+                "fallbacks": {"anthropic": {"provider": "google", "model": "gemini-3-pro-preview"}},
+            }
+        )
         from director import DirectorConfig
+
         config = DirectorConfig(routing_config=rc, max_stories=10)
         assert config.max_stories == 10

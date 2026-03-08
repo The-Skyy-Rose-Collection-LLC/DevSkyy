@@ -40,6 +40,7 @@ logger = logging.getLogger(__name__)
 # Fix: create a custom httpx.Client with HTTP proxy only (no SOCKS).
 # ---------------------------------------------------------------------------
 
+
 def _make_httpx_client(timeout: float = 600.0) -> Any:
     """Create an httpx.Client using HTTP proxy, bypassing SOCKS.
 
@@ -50,7 +51,12 @@ def _make_httpx_client(timeout: float = 600.0) -> Any:
     """
     import httpx
 
-    http_proxy = os.getenv("HTTPS_PROXY") or os.getenv("HTTP_PROXY") or os.getenv("https_proxy") or os.getenv("http_proxy")
+    http_proxy = (
+        os.getenv("HTTPS_PROXY")
+        or os.getenv("HTTP_PROXY")
+        or os.getenv("https_proxy")
+        or os.getenv("http_proxy")
+    )
 
     transport = None
     if http_proxy and not http_proxy.startswith("socks"):
@@ -93,9 +99,7 @@ class LLMResponse:
 class ProviderAdapter(Protocol):
     """Interface that all provider adapters must implement."""
 
-    async def call(
-        self, model: str, messages: list[LLMMessage]
-    ) -> LLMResponse: ...
+    async def call(self, model: str, messages: list[LLMMessage]) -> LLMResponse: ...
 
 
 # ---------------------------------------------------------------------------
@@ -119,9 +123,7 @@ class AnthropicAdapter:
             http_client=_make_httpx_client(timeout=600.0),
         )
 
-    async def call(
-        self, model: str, messages: list[LLMMessage]
-    ) -> LLMResponse:
+    async def call(self, model: str, messages: list[LLMMessage]) -> LLMResponse:
         """Call Anthropic Messages API via streaming.
 
         Anthropic requires system prompt as a separate parameter,
@@ -176,9 +178,7 @@ _GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 class GoogleAdapter:
     """Adapter for Google Gemini API via REST."""
 
-    async def _call_gemini_rest(
-        self, model: str, contents: list[dict[str, Any]]
-    ) -> dict[str, Any]:
+    async def _call_gemini_rest(self, model: str, contents: list[dict[str, Any]]) -> dict[str, Any]:
         """Call Gemini REST API directly (avoids SDK import issues).
 
         Uses explicit HTTP proxy handler to bypass SOCKS proxy that
@@ -205,23 +205,21 @@ class GoogleAdapter:
             or os.getenv("http_proxy")
         )
         if http_proxy and not http_proxy.startswith("socks"):
-            proxy_handler = urllib.request.ProxyHandler({
-                "https": http_proxy,
-                "http": http_proxy,
-            })
+            proxy_handler = urllib.request.ProxyHandler(
+                {
+                    "https": http_proxy,
+                    "http": http_proxy,
+                }
+            )
             opener = urllib.request.build_opener(proxy_handler)
         else:
             # No SOCKS — use default opener (no proxy)
-            opener = urllib.request.build_opener(
-                urllib.request.ProxyHandler({})
-            )
+            opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
         with opener.open(req, timeout=300) as resp:
             return json.loads(resp.read().decode("utf-8"))
 
-    async def call(
-        self, model: str, messages: list[LLMMessage]
-    ) -> LLMResponse:
+    async def call(self, model: str, messages: list[LLMMessage]) -> LLMResponse:
         """Call Gemini API.
 
         Gemini uses a different message format: system instruction is
@@ -240,10 +238,12 @@ class GoogleAdapter:
                 # Prepend system to first user message
                 if role == "user" and system_text and not contents:
                     text = f"{system_text}\n\n---\n\n{text}"
-                contents.append({
-                    "role": role,
-                    "parts": [{"text": text}],
-                })
+                contents.append(
+                    {
+                        "role": role,
+                        "parts": [{"text": text}],
+                    }
+                )
 
         response = await self._call_gemini_rest(model, contents)
 
@@ -285,16 +285,11 @@ class OpenAIAdapter:
             http_client=_make_httpx_client(timeout=300.0),
         )
 
-    async def call(
-        self, model: str, messages: list[LLMMessage]
-    ) -> LLMResponse:
+    async def call(self, model: str, messages: list[LLMMessage]) -> LLMResponse:
         """Call OpenAI Chat Completions API."""
         client = self._get_client()
 
-        oai_messages = [
-            {"role": msg.role, "content": msg.content}
-            for msg in messages
-        ]
+        oai_messages = [{"role": msg.role, "content": msg.content} for msg in messages]
 
         response = client.chat.completions.create(
             model=model,
@@ -336,16 +331,11 @@ class XAIAdapter:
             http_client=_make_httpx_client(timeout=300.0),
         )
 
-    async def call(
-        self, model: str, messages: list[LLMMessage]
-    ) -> LLMResponse:
+    async def call(self, model: str, messages: list[LLMMessage]) -> LLMResponse:
         """Call xAI's OpenAI-compatible API."""
         client = self._get_client()
 
-        oai_messages = [
-            {"role": msg.role, "content": msg.content}
-            for msg in messages
-        ]
+        oai_messages = [{"role": msg.role, "content": msg.content} for msg in messages]
 
         response = client.chat.completions.create(
             model=model,
@@ -390,8 +380,5 @@ def get_adapter(provider: str) -> ProviderAdapter:
     """
     adapter_cls = _ADAPTERS.get(provider)
     if adapter_cls is None:
-        raise ValueError(
-            f"Unknown provider: '{provider}'. "
-            f"Available: {sorted(_ADAPTERS.keys())}"
-        )
+        raise ValueError(f"Unknown provider: '{provider}'. Available: {sorted(_ADAPTERS.keys())}")
     return adapter_cls()

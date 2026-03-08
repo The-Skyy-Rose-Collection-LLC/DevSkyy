@@ -290,9 +290,7 @@ class ProviderClients:
     @property
     def anthropic_async(self) -> anthropic.AsyncAnthropic:
         if self._anthropic_async is None:
-            self._anthropic_async = anthropic.AsyncAnthropic(
-                api_key=os.getenv("ANTHROPIC_API_KEY")
-            )
+            self._anthropic_async = anthropic.AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
         return self._anthropic_async
 
 
@@ -512,8 +510,8 @@ class VisionPipeline:
 
         prompt = f"""Analyze this SkyyRose product photo in extreme detail.
 
-PRODUCT: {product_data.get('garmentTypeLock', product_data.get('sku', '').upper())}
-COLLECTION: {product_data.get('collection', 'unknown')}
+PRODUCT: {product_data.get("garmentTypeLock", product_data.get("sku", "").upper())}
+COLLECTION: {product_data.get("collection", "unknown")}
 
 Provide ultra-detailed garment specifications:
 1. Construction details (silhouette, fit, cut, length, sleeves, neckline)
@@ -572,20 +570,18 @@ Be extremely detailed - this drives AI generation accuracy."""
     ) -> tuple[ProviderAnalysis, StageMetrics]:
         """Gemini 3 Flash — Brand consistency verification."""
         start = time.monotonic()
-        metric = StageMetrics(
-            stage="vision", provider="google", model="gemini-3-flash-preview"
-        )
+        metric = StageMetrics(stage="vision", provider="google", model="gemini-3-flash-preview")
 
         image_base64 = image_to_base64(image_path)
 
         prompt = f"""Verify this SkyyRose product matches brand standards.
 
-PRODUCT: {product_data.get('garmentTypeLock', product_data.get('sku', '').upper())}
-COLLECTION: {product_data.get('collection', 'unknown')}
+PRODUCT: {product_data.get("garmentTypeLock", product_data.get("sku", "").upper())}
+COLLECTION: {product_data.get("collection", "unknown")}
 
 Check:
 1. Brand consistency - Does it match SkyyRose aesthetic?
-2. Collection alignment - Fits {product_data.get('collection')} theme?
+2. Collection alignment - Fits {product_data.get("collection")} theme?
 3. Logo/branding technique - What method? (embroidered, silicone, printed, etc.)
 4. Quality markers - Premium construction indicators
 5. Critical elements for AI replication
@@ -640,7 +636,7 @@ Be specific about branding techniques."""
 
         prompt = f"""Critically analyze this SkyyRose product photo.
 
-PRODUCT: {product_data.get('garmentTypeLock', product_data.get('sku', '').upper())}
+PRODUCT: {product_data.get("garmentTypeLock", product_data.get("sku", "").upper())}
 
 Provide:
 1. Critical assessment - Any issues for AI replication?
@@ -769,9 +765,7 @@ class GenerationPipeline:
 
         # Fallback to DALL-E 3
         try:
-            dalle_result = await self._generate_dalle3(
-                vision_spec, correlation_id=correlation_id
-            )
+            dalle_result = await self._generate_dalle3(vision_spec, correlation_id=correlation_id)
             result.output_path = dalle_result["output_path"]
             result.provider = "openai"
             result.model = "dall-e-3"
@@ -780,9 +774,7 @@ class GenerationPipeline:
             return result
         except Exception as exc:
             logger.error("[%s] DALL-E 3 fallback also failed: %s", correlation_id, exc)
-            raise RuntimeError(
-                f"All generation providers failed for {vision_spec.sku}"
-            ) from exc
+            raise RuntimeError(f"All generation providers failed for {vision_spec.sku}") from exc
 
     async def _generate_gemini(
         self,
@@ -799,9 +791,7 @@ class GenerationPipeline:
 
         image_path = get_reference_image_path(vision_spec.sku, vision_spec.view)
         if not image_path:
-            raise FileNotFoundError(
-                f"No reference image for {vision_spec.sku} {vision_spec.view}"
-            )
+            raise FileNotFoundError(f"No reference image for {vision_spec.sku} {vision_spec.view}")
 
         ref_image_base64 = image_to_base64(image_path)
 
@@ -852,9 +842,7 @@ Generate the image."""
 
         # Extract generated image
         output_path = (
-            OUTPUT_DIR
-            / vision_spec.sku
-            / f"{vision_spec.sku}-model-{vision_spec.view}-gemini.jpg"
+            OUTPUT_DIR / vision_spec.sku / f"{vision_spec.sku}-model-{vision_spec.view}-gemini.jpg"
         )
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -904,9 +892,7 @@ View: {vision_spec.view} angle. Premium quality, photorealistic."""
         import urllib.request
 
         output_path = (
-            OUTPUT_DIR
-            / vision_spec.sku
-            / f"{vision_spec.sku}-model-{vision_spec.view}-dalle3.jpg"
+            OUTPUT_DIR / vision_spec.sku / f"{vision_spec.sku}-model-{vision_spec.view}-dalle3.jpg"
         )
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -1053,15 +1039,13 @@ Inspect the image and return ONLY valid JSON (no markdown):
     ) -> tuple[dict, StageMetrics]:
         """Gemini Flash — Brand consistency verification."""
         start = time.monotonic()
-        metric = StageMetrics(
-            stage="quality", provider="google", model="gemini-3-flash-preview"
-        )
+        metric = StageMetrics(stage="quality", provider="google", model="gemini-3-flash-preview")
 
         image_base64 = image_to_base64(image_path)
 
         prompt = f"""Brand QC: Verify this AI-generated fashion photo matches SkyyRose brand standards.
 
-COLLECTION: {vision_spec.sku.split('-')[0].upper()}
+COLLECTION: {vision_spec.sku.split("-")[0].upper()}
 
 Return ONLY valid JSON (no markdown):
 {{
@@ -1180,9 +1164,7 @@ class EliteStudioOrchestrator:
         try:
             # Stage 1: Vision Analysis
             logger.info("[%s] Stage 1/3: Vision Analysis", cid)
-            vision_spec = await self.vision.analyze(
-                sku, view, correlation_id=cid
-            )
+            vision_spec = await self.vision.analyze(sku, view, correlation_id=cid)
             result.vision_spec = vision_spec
             result.all_metrics.extend(vision_spec.metrics)
 
@@ -1277,9 +1259,7 @@ class EliteStudioOrchestrator:
 
             # Rate-limit delay between products (not after the last one)
             if i < total:
-                logger.info(
-                    "Rate limit pause: %.0fs before next product", BATCH_DELAY_SECONDS
-                )
+                logger.info("Rate limit pause: %.0fs before next product", BATCH_DELAY_SECONDS)
                 await asyncio.sleep(BATCH_DELAY_SECONDS)
 
         # Summary
@@ -1318,9 +1298,7 @@ class EliteStudioOrchestrator:
             str(result.attempts),
             result.output_path[-40:] if result.output_path else "N/A",
             f"{result.total_latency_ms:.0f}ms",
-            result.quality_report.overall_status.value
-            if result.quality_report
-            else "N/A",
+            result.quality_report.overall_status.value if result.quality_report else "N/A",
         )
 
 
@@ -1347,9 +1325,7 @@ def tool_analyze_product(sku: str, view: str = "front") -> dict[str, Any]:
     """
     try:
         cid = str(uuid.uuid4())[:8]
-        spec = asyncio.run(
-            _orchestrator.vision.analyze(sku, view, correlation_id=cid)
-        )
+        spec = asyncio.run(_orchestrator.vision.analyze(sku, view, correlation_id=cid))
         return {
             "success": True,
             "sku": sku,
@@ -1484,8 +1460,7 @@ def build_elite_coordinator():  # -> LlmAgent
     """Build the Elite Production Coordinator ADK agent."""
     if not ADK_AVAILABLE:
         raise ImportError(
-            "google-adk is required for ADK agent mode. "
-            "Install it with: pip install google-adk"
+            "google-adk is required for ADK agent mode. Install it with: pip install google-adk"
         )
     return LlmAgent(
         name="elite_production_coordinator",
@@ -1535,11 +1510,7 @@ def run_adk_session(task: str) -> str:
     ):
         if event.is_final_response():
             if event.content and event.content.parts:
-                texts = [
-                    p.text
-                    for p in event.content.parts
-                    if hasattr(p, "text") and p.text
-                ]
+                texts = [p.text for p in event.content.parts if hasattr(p, "text") and p.text]
                 final_response = "\n".join(texts)
 
     return final_response
@@ -1576,9 +1547,7 @@ def cmd_batch(args: argparse.Namespace) -> None:
         sys.exit(1)
 
     logger.info("Found %d products to process", len(skus))
-    results = asyncio.run(
-        _orchestrator.produce_batch(skus, args.view)
-    )
+    results = asyncio.run(_orchestrator.produce_batch(skus, args.view))
 
     # Summary
     succeeded = [r for r in results if r.status == "completed" and r.output_path]
@@ -1596,9 +1565,7 @@ def cmd_batch(args: argparse.Namespace) -> None:
 def cmd_audit(args: argparse.Namespace) -> None:
     """Run vision analysis only (no generation) for a product."""
     cid = str(uuid.uuid4())[:8]
-    spec = asyncio.run(
-        _orchestrator.vision.analyze(args.sku, args.view, correlation_id=cid)
-    )
+    spec = asyncio.run(_orchestrator.vision.analyze(args.sku, args.view, correlation_id=cid))
 
     logger.info("\n=== VISION AUDIT: %s (%s) ===", args.sku.upper(), args.view)
     logger.info("Providers: %d analyses", len(spec.provider_analyses))
@@ -1668,33 +1635,25 @@ Examples:
   %(prog)s agent produce br-001 front        ADK agent mode
         """,
     )
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable debug logging"
-    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Enable debug logging")
 
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
     # produce
     p_produce = subparsers.add_parser("produce", help="Produce a single product image")
     p_produce.add_argument("sku", help="Product SKU (e.g., br-001)")
-    p_produce.add_argument(
-        "--view", default="front", choices=["front", "back"], help="View angle"
-    )
+    p_produce.add_argument("--view", default="front", choices=["front", "back"], help="View angle")
 
     # batch
     p_batch = subparsers.add_parser("batch", help="Batch produce multiple products")
     p_batch.add_argument("--all", action="store_true", help="Process all products")
     p_batch.add_argument("--collection", help="Filter by collection name")
-    p_batch.add_argument(
-        "--view", default="front", choices=["front", "back"], help="View angle"
-    )
+    p_batch.add_argument("--view", default="front", choices=["front", "back"], help="View angle")
 
     # audit
     p_audit = subparsers.add_parser("audit", help="Vision analysis only (no generation)")
     p_audit.add_argument("sku", help="Product SKU")
-    p_audit.add_argument(
-        "--view", default="front", choices=["front", "back"], help="View angle"
-    )
+    p_audit.add_argument("--view", default="front", choices=["front", "back"], help="View angle")
 
     # status
     subparsers.add_parser("status", help="Show studio status and available products")

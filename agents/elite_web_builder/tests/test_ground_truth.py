@@ -40,25 +40,25 @@ def temp_dir(tmp_path: Path) -> Path:
 
     # Theme JSON
     (tmp_path / "theme.json").write_text(
-        json.dumps({
-            "settings": {
-                "typography": {
-                    "fontFamilies": [
-                        {"slug": "playfair-display", "name": "Playfair Display"},
-                        {"slug": "montserrat", "name": "Montserrat"},
-                    ]
+        json.dumps(
+            {
+                "settings": {
+                    "typography": {
+                        "fontFamilies": [
+                            {"slug": "playfair-display", "name": "Playfair Display"},
+                            {"slug": "montserrat", "name": "Montserrat"},
+                        ]
+                    }
                 }
             }
-        })
+        )
     )
 
     # Corrupt theme JSON
     (tmp_path / "bad-theme.json").write_text("{not valid json at all")
 
     # Valid PHP
-    (tmp_path / "component.php").write_text(
-        '<?php\nfunction hello() {\n  echo "Hello";\n}\n'
-    )
+    (tmp_path / "component.php").write_text('<?php\nfunction hello() {\n  echo "Hello";\n}\n')
 
     # Broken PHP — mismatched brackets
     (tmp_path / "broken.php").write_text("<?php\nfunction broken( {\n")
@@ -104,8 +104,14 @@ def temp_dir(tmp_path: Path) -> Path:
 class TestClaimType:
     def test_all_claim_types_exist(self) -> None:
         expected = {
-            "FILE_EXISTS", "CSS_VALUE", "COLOR_VALUE", "FONT_NAME",
-            "API_ENDPOINT", "IMPORT_PATH", "PHP_SYNTAX", "HTML_VALIDITY",
+            "FILE_EXISTS",
+            "CSS_VALUE",
+            "COLOR_VALUE",
+            "FONT_NAME",
+            "API_ENDPOINT",
+            "IMPORT_PATH",
+            "PHP_SYNTAX",
+            "HTML_VALIDITY",
             "JSON_VALIDITY",
         }
         actual = {ct.name for ct in ClaimType}
@@ -412,7 +418,7 @@ class TestJSONValidity:
     def test_invalid_json(self, validator: GroundTruthValidator) -> None:
         result = validator.verify_claim(
             ClaimType.JSON_VALIDITY,
-            '{key: value}',
+            "{key: value}",
         )
         assert result.valid is False
         assert "json" in result.message.lower()
@@ -424,7 +430,7 @@ class TestJSONValidity:
 
     def test_json_array(self, validator: GroundTruthValidator) -> None:
         """JSON arrays are valid."""
-        result = validator.verify_claim(ClaimType.JSON_VALIDITY, '[1, 2, 3]')
+        result = validator.verify_claim(ClaimType.JSON_VALIDITY, "[1, 2, 3]")
         assert result.valid is True
 
     def test_long_json_truncated_in_value(self, validator: GroundTruthValidator) -> None:
@@ -442,7 +448,9 @@ class TestJSONValidity:
 
 class TestAPIEndpoint:
     def test_valid_https_endpoint(self, validator: GroundTruthValidator) -> None:
-        result = validator.verify_claim(ClaimType.API_ENDPOINT, "https://api.skyyrose.co/v1/products")
+        result = validator.verify_claim(
+            ClaimType.API_ENDPOINT, "https://api.skyyrose.co/v1/products"
+        )
         assert result.valid is True
 
     def test_valid_http_endpoint(self, validator: GroundTruthValidator) -> None:
@@ -460,7 +468,9 @@ class TestAPIEndpoint:
 
     def test_rejects_spaces_in_url(self, validator: GroundTruthValidator) -> None:
         """URLs with spaces are hallucinated."""
-        result = validator.verify_claim(ClaimType.API_ENDPOINT, "https://api.example.com/path with spaces")
+        result = validator.verify_claim(
+            ClaimType.API_ENDPOINT, "https://api.example.com/path with spaces"
+        )
         assert result.valid is False
 
     def test_rejects_empty_string(self, validator: GroundTruthValidator) -> None:
@@ -473,7 +483,9 @@ class TestAPIEndpoint:
 
     def test_rejects_double_slashes_in_path(self, validator: GroundTruthValidator) -> None:
         """Double slashes in path (not protocol) are suspicious."""
-        result = validator.verify_claim(ClaimType.API_ENDPOINT, "https://api.example.com//v1//products")
+        result = validator.verify_claim(
+            ClaimType.API_ENDPOINT, "https://api.example.com//v1//products"
+        )
         assert result.valid is False
 
     def test_wordpress_rest_route(self, validator: GroundTruthValidator) -> None:
@@ -712,7 +724,9 @@ class TestInputSanitization:
 
 
 class TestVerifyAllOrFail:
-    def test_all_pass_returns_results(self, validator: GroundTruthValidator, temp_dir: Path) -> None:
+    def test_all_pass_returns_results(
+        self, validator: GroundTruthValidator, temp_dir: Path
+    ) -> None:
         claims = [
             (ClaimType.FILE_EXISTS, str(temp_dir / "styles.css"), {}),
             (ClaimType.COLOR_VALUE, "#B76E79", {}),
@@ -774,7 +788,9 @@ class TestValidationSummary:
         results = [
             ValidationResult(valid=True, claim_type=ClaimType.FILE_EXISTS, value="a", message="ok"),
             ValidationResult(valid=True, claim_type=ClaimType.COLOR_VALUE, value="b", message="ok"),
-            ValidationResult(valid=False, claim_type=ClaimType.JSON_VALIDITY, value="c", message="bad"),
+            ValidationResult(
+                valid=False, claim_type=ClaimType.JSON_VALIDITY, value="c", message="bad"
+            ),
         ]
         summary = validator.summarize(results)
         assert summary["total"] == 3

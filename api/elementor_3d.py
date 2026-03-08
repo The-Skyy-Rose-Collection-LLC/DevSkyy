@@ -62,7 +62,7 @@ async def create_widget(
     embed_code = f"""
 <div id="elementor-3d-{config.widget_id}"
      data-model="{config.model_url}"
-     data-thumbnail="{config.thumbnail_url or ''}"
+     data-thumbnail="{config.thumbnail_url or ""}"
      data-autoplay="{str(config.autoplay).lower()}"
      data-bg-color="{config.background_color}"
      class="skyyrose-3d-viewer">

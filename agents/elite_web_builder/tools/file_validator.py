@@ -24,13 +24,13 @@ class FileValidationResult:
 
 # Secret patterns (regex)
 _SECRET_PATTERNS = [
-    (r'(?:sk-proj-|sk-)[A-Za-z0-9]{20,}', "OpenAI API key"),
-    (r'AIza[A-Za-z0-9_-]{35}', "Google API key"),
-    (r'sk_live_[A-Za-z0-9]{24,}', "Stripe live key"),
-    (r'sk_test_[A-Za-z0-9]{24,}', "Stripe test key"),
-    (r'ghp_[A-Za-z0-9]{36}', "GitHub personal token"),
-    (r'xai-[A-Za-z0-9]{20,}', "xAI API key"),
-    (r'AKIA[A-Z0-9]{16}', "AWS access key"),
+    (r"(?:sk-proj-|sk-)[A-Za-z0-9]{20,}", "OpenAI API key"),
+    (r"AIza[A-Za-z0-9_-]{35}", "Google API key"),
+    (r"sk_live_[A-Za-z0-9]{24,}", "Stripe live key"),
+    (r"sk_test_[A-Za-z0-9]{24,}", "Stripe test key"),
+    (r"ghp_[A-Za-z0-9]{36}", "GitHub personal token"),
+    (r"xai-[A-Za-z0-9]{20,}", "xAI API key"),
+    (r"AKIA[A-Z0-9]{16}", "AWS access key"),
 ]
 
 

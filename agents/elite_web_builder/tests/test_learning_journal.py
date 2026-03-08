@@ -77,36 +77,63 @@ class TestJournalOperations:
 
     def test_add_multiple_entries(self, journal: LearningJournal) -> None:
         for i in range(5):
-            journal.add_entry(JournalEntry(
-                mistake=f"Mistake {i}",
-                correct=f"Correct {i}",
-                agent="qa",
-                story_id=f"US-{i:03d}",
-            ))
+            journal.add_entry(
+                JournalEntry(
+                    mistake=f"Mistake {i}",
+                    correct=f"Correct {i}",
+                    agent="qa",
+                    story_id=f"US-{i:03d}",
+                )
+            )
         assert len(journal.entries) == 5
 
     def test_query_by_agent(self, journal: LearningJournal) -> None:
-        journal.add_entry(JournalEntry(
-            mistake="m1", correct="c1", agent="frontend_dev", story_id="US-001",
-        ))
-        journal.add_entry(JournalEntry(
-            mistake="m2", correct="c2", agent="backend_dev", story_id="US-002",
-        ))
-        journal.add_entry(JournalEntry(
-            mistake="m3", correct="c3", agent="frontend_dev", story_id="US-003",
-        ))
+        journal.add_entry(
+            JournalEntry(
+                mistake="m1",
+                correct="c1",
+                agent="frontend_dev",
+                story_id="US-001",
+            )
+        )
+        journal.add_entry(
+            JournalEntry(
+                mistake="m2",
+                correct="c2",
+                agent="backend_dev",
+                story_id="US-002",
+            )
+        )
+        journal.add_entry(
+            JournalEntry(
+                mistake="m3",
+                correct="c3",
+                agent="frontend_dev",
+                story_id="US-003",
+            )
+        )
         results = journal.query(agent="frontend_dev")
         assert len(results) == 2
 
     def test_query_by_tag(self, journal: LearningJournal) -> None:
-        journal.add_entry(JournalEntry(
-            mistake="m1", correct="c1", agent="design_system",
-            story_id="US-001", tags=["color", "brand"],
-        ))
-        journal.add_entry(JournalEntry(
-            mistake="m2", correct="c2", agent="design_system",
-            story_id="US-002", tags=["typography"],
-        ))
+        journal.add_entry(
+            JournalEntry(
+                mistake="m1",
+                correct="c1",
+                agent="design_system",
+                story_id="US-001",
+                tags=["color", "brand"],
+            )
+        )
+        journal.add_entry(
+            JournalEntry(
+                mistake="m2",
+                correct="c2",
+                agent="design_system",
+                story_id="US-002",
+                tags=["typography"],
+            )
+        )
         results = journal.query(tag="color")
         assert len(results) == 1
         assert results[0].tags is not None and "color" in results[0].tags
@@ -152,13 +179,15 @@ class TestInstinctExtraction:
     def test_extract_instincts_from_repeated_mistakes(self, journal: LearningJournal) -> None:
         """Same mistake 3+ times → instinct."""
         for i in range(3):
-            journal.add_entry(JournalEntry(
-                mistake="Forgot to validate input",
-                correct="Always validate at boundaries",
-                agent="backend_dev",
-                story_id=f"US-{i:03d}",
-                tags=["validation"],
-            ))
+            journal.add_entry(
+                JournalEntry(
+                    mistake="Forgot to validate input",
+                    correct="Always validate at boundaries",
+                    agent="backend_dev",
+                    story_id=f"US-{i:03d}",
+                    tags=["validation"],
+                )
+            )
         instincts = journal.extract_instincts(min_occurrences=3)
         assert len(instincts) >= 1
         # At exactly min_occurrences, confidence starts at 0.3 (tentative)
@@ -166,24 +195,28 @@ class TestInstinctExtraction:
 
     def test_extract_instincts_below_threshold(self, journal: LearningJournal) -> None:
         """Not enough repetitions → no instinct."""
-        journal.add_entry(JournalEntry(
-            mistake="One-time mistake",
-            correct="One-time fix",
-            agent="qa",
-            story_id="US-001",
-        ))
+        journal.add_entry(
+            JournalEntry(
+                mistake="One-time mistake",
+                correct="One-time fix",
+                agent="qa",
+                story_id="US-001",
+            )
+        )
         instincts = journal.extract_instincts(min_occurrences=3)
         assert len(instincts) == 0
 
     def test_instinct_has_rule(self, journal: LearningJournal) -> None:
         for i in range(3):
-            journal.add_entry(JournalEntry(
-                mistake="Used hardcoded path",
-                correct="Use config variable",
-                agent="frontend_dev",
-                story_id=f"US-{i:03d}",
-                tags=["config"],
-            ))
+            journal.add_entry(
+                JournalEntry(
+                    mistake="Used hardcoded path",
+                    correct="Use config variable",
+                    agent="frontend_dev",
+                    story_id=f"US-{i:03d}",
+                    tags=["config"],
+                )
+            )
         instincts = journal.extract_instincts(min_occurrences=3)
         assert len(instincts) >= 1
         assert "hardcoded" in instincts[0].rule.lower() or "config" in instincts[0].rule.lower()
@@ -196,12 +229,14 @@ class TestInstinctExtraction:
 
 class TestContextGeneration:
     def test_generate_agent_context(self, journal: LearningJournal) -> None:
-        journal.add_entry(JournalEntry(
-            mistake="Used wrong API",
-            correct="Use REST API v2",
-            agent="backend_dev",
-            story_id="US-001",
-        ))
+        journal.add_entry(
+            JournalEntry(
+                mistake="Used wrong API",
+                correct="Use REST API v2",
+                agent="backend_dev",
+                story_id="US-001",
+            )
+        )
         context = journal.generate_context(agent="backend_dev")
         assert isinstance(context, str)
         assert "wrong API" in context or "REST API v2" in context
