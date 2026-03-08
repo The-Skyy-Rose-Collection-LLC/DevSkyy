@@ -12,8 +12,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-
-from api.v1.approval import router
 from services.approval_queue_manager import (
     ApprovalItem,
     ApprovalQueueManager,
@@ -24,6 +22,8 @@ from services.approval_queue_manager import (
     RevisionPriority,
     RevisionQueueResponse,
 )
+
+from api.v1.approval import router
 
 # =============================================================================
 # Fixtures

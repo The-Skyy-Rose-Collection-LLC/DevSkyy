@@ -15,7 +15,6 @@ from skyyrose.elite_studio.models import (
     VisionAnalysis,
 )
 
-
 # ---------------------------------------------------------------------------
 # Model factories — immutable, consistent test data
 # ---------------------------------------------------------------------------

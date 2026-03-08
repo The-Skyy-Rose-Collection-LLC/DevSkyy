@@ -12,8 +12,6 @@ from unittest.mock import MagicMock
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-
-from api.v1.competitors import router
 from services.competitive.competitor_analysis import (
     _competitor_assets,
     _competitors,
@@ -24,6 +22,8 @@ from services.competitive.schemas import (
     ExtractedAttributes,
     StyleCategory,
 )
+
+from api.v1.competitors import router
 
 # =============================================================================
 # Fixtures

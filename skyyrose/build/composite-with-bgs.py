@@ -15,9 +15,10 @@ Usage:
 """
 
 import sys
-from pathlib import Path
-from PIL import Image, ImageFilter, ImageEnhance
 import time
+from pathlib import Path
+
+from PIL import Image, ImageEnhance, ImageFilter
 
 ROOT     = Path(__file__).parent.parent
 ECOM_DIR = ROOT / "assets/images/products-ecom"

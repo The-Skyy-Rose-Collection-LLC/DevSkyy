@@ -11,7 +11,6 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, patch
 
 import pytest
-
 from services.ml.gemini_client import (
     GeminiClient,
     GeneratedImage,

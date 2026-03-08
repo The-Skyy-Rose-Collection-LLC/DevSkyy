@@ -9,8 +9,8 @@ Uses HF token for authenticated GPU quota.
 """
 
 import os
-import sys
 import shutil
+import sys
 from pathlib import Path
 
 VENV = Path("/Users/theceo/DevSkyy/.venv-imagery")
@@ -19,7 +19,7 @@ sys.path.insert(0, str(VENV / "lib/python3.13/site-packages"))
 os.environ.setdefault("HF_TOKEN", os.getenv("HF_TOKEN", ""))
 
 from gradio_client import Client, handle_file
-from PIL import Image, ImageFilter, ImageEnhance
+from PIL import Image, ImageEnhance, ImageFilter
 
 OUT_DIR = Path("/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/branding")
 WORK_DIR = Path("/tmp/skyyrose-logo-pipeline")

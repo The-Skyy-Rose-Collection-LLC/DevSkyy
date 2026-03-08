@@ -18,21 +18,21 @@ Usage:
   python3 build/ecommerce-process.py --no-rembg  # skip bg removal
 """
 
-import sys
 import os
 import re
+import sys
 import time
 from pathlib import Path
 
 try:
-    from rembg import remove, new_session
+    from rembg import new_session, remove
     REMBG_OK = True
 except ImportError:
     REMBG_OK = False
     print("⚠️  rembg not found — background removal disabled")
 
 try:
-    from PIL import Image, ImageFilter, ImageEnhance, ImageOps, ImageDraw
+    from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageOps
     PIL_OK = True
 except ImportError:
     PIL_OK = False
@@ -40,8 +40,8 @@ except ImportError:
     sys.exit(1)
 
 import io
-import subprocess
 import json
+import subprocess
 
 # ── Paths ─────────────────────────────────────────────────────────────────
 ROOT      = Path(__file__).parent.parent

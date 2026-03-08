@@ -7,7 +7,6 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from PIL import Image
-
 from services.ml.enhancement.authenticity_validator import (
     HASH_SIZE,
     MAX_DELTA_E,

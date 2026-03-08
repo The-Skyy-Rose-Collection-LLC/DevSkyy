@@ -114,17 +114,17 @@ def verify_visual_generation() -> tuple[bool, list[str]]:
     print()
     try:
         from agents.visual_generation import (  # noqa: F401
-            VisualGenerationRouter,
-            VisualProvider,
-            GenerationType,
+            SKYYROSE_BRAND_DNA,
+            ConversationEditor,
             GenerationRequest,
             GenerationResult,
+            GenerationType,
             GoogleImagenClient,
             GoogleVeoClient,
             HuggingFaceFluxClient,
             ReplicateLoRAClient,
-            ConversationEditor,
-            SKYYROSE_BRAND_DNA,
+            VisualGenerationRouter,
+            VisualProvider,
         )
         ok("All core classes imported successfully")
 
@@ -152,10 +152,10 @@ def verify_visual_generation() -> tuple[bool, list[str]]:
     # Check ReferenceImageManager
     try:
         from agents.visual_generation.reference_manager import (  # noqa: F401
-            ReferenceImageManager,
-            ThoughtSignatureManager,
             ReferenceImage,
+            ReferenceImageManager,
             ReferenceType,
+            ThoughtSignatureManager,
         )
         ok("ReferenceImageManager imported (validates up to 14 images)")
     except ImportError as e:
@@ -166,10 +166,10 @@ def verify_visual_generation() -> tuple[bool, list[str]]:
     # Check prompt optimizer
     try:
         from agents.visual_generation.prompt_optimizer import (  # noqa: F401
+            CollectionPromptBuilder,
+            GeminiNegativePromptEngine,
             GeminiPromptOptimizer,
             GeminiTreeOfThoughtsVisual,
-            GeminiNegativePromptEngine,
-            CollectionPromptBuilder,
         )
         ok("GeminiPromptOptimizer imported (4 prompt patterns)")
     except ImportError as e:
@@ -180,8 +180,8 @@ def verify_visual_generation() -> tuple[bool, list[str]]:
     # Check gemini native
     try:
         from agents.visual_generation.gemini_native import (  # noqa: F401
-            GeminiNativeImageClient,
             GeminiFlashImageClient,
+            GeminiNativeImageClient,
             GeminiProImageClient,
         )
         ok("Gemini native clients imported (Flash + Pro)")

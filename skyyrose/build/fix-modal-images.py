@@ -5,8 +5,8 @@ Rewrites modal structure and product image mapping in all 3 explore pages.
 """
 
 import json
-import re
 import os
+import re
 
 # ─────────────────────────────────────────────
 # 1. Product arrays

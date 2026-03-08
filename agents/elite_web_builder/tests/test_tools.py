@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import pytest
+
 from tools.contrast_checker import (
     check_contrast,
     hex_to_rgb,

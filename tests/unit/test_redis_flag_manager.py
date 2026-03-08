@@ -1,8 +1,10 @@
 """Unit tests for RedisFlagManager."""
 import json
-import pytest
 from unittest.mock import MagicMock, patch
-from core.feature_flags.flag_manager import FlagManager, FeatureFlag
+
+import pytest
+
+from core.feature_flags.flag_manager import FeatureFlag, FlagManager
 
 
 class TestRedisFlagManager:

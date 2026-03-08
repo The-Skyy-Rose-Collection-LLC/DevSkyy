@@ -23,7 +23,6 @@ from .config import BATCH_DELAY_SECONDS, OUTPUT_DIR
 from .models import ProductionResult, SynthesizedVision
 from .utils import discover_all_skus
 
-
 # ---------------------------------------------------------------------------
 # Logger protocol — decouples presentation from orchestration
 # ---------------------------------------------------------------------------

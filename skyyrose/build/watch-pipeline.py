@@ -20,17 +20,17 @@ Auto-processes via: python3 build/ecommerce-process.py {product_id}
 Then composites:   python3 build/composite-with-bgs.py {product_id}
 """
 
+import hashlib
+import json
+import subprocess
 import sys
 import time
-import subprocess
-import json
-import hashlib
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 try:
-    from watchdog.observers import Observer
     from watchdog.events import FileSystemEventHandler
+    from watchdog.observers import Observer
 except ImportError:
     print("❌ watchdog not installed. Run: pip3 install watchdog")
     sys.exit(1)

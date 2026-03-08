@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from core.cost_tracker import CostTracker, CostSummary, TokenRecord
+from core.cost_tracker import CostSummary, CostTracker, TokenRecord
 
 
 class TestComputeCost:

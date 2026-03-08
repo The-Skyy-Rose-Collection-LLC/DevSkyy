@@ -2,20 +2,20 @@
 
 from __future__ import annotations
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 from core.gate_checkers import (
     build_gate_checkers,
-    check_build,
-    check_lint,
-    check_security,
-    check_diff,
     check_a11y,
+    check_build,
+    check_diff,
+    check_lint,
     check_perf,
+    check_security,
 )
 from core.verification_loop import Gate, GateStatus
-
 
 # ---------------------------------------------------------------------------
 # BUILD gate
