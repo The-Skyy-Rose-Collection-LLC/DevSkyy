@@ -70,6 +70,7 @@
 	aspect-ratio: 3 / 4;
 	transform-style: preserve-3d;
 	transform: rotateY(var(--cube-rotation, 0deg));
+	will-change: transform;
 	touch-action: pan-y;
 	cursor: grab;
 }
@@ -382,6 +383,10 @@
 	.ipc-grid { grid-template-columns: 1fr; }
 }
 
+.ipc-grid--preorder {
+	gap: 32px;
+}
+
 /* ==========================================================================
    11. Pre-Order Reveal Card
    ========================================================================== */
@@ -477,6 +482,12 @@
 	z-index: 6;
 }
 
+.prc__info {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
 .prc__content {
 	padding: 20px;
 }
@@ -565,13 +576,6 @@
 	filter: brightness(1.1);
 }
 
-.prc__size-label {
-	font-family: 'Bebas Neue', sans-serif;
-	font-size: 11px;
-	letter-spacing: 2px;
-	color: #888;
-	text-transform: uppercase;
-}
 
 /* Particle burst (JS-created) */
 @keyframes prc-particle-burst {
@@ -676,4 +680,8 @@
 	.ipc__actions {
 		opacity: 1;
 	}
+}
+
+.ipc:focus-within .ipc__actions {
+	opacity: 1;
 }
