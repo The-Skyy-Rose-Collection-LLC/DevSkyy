@@ -79,7 +79,7 @@
 
 .loader-sub {
 	font-family: var(--fm);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--rose-gold, #B76E79);
@@ -340,7 +340,7 @@
 
 .hero-scroll span {
 	font-family: var(--fm);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 5px;
 	text-transform: uppercase;
 	color: var(--fog);
@@ -430,7 +430,7 @@
 
 .story-eyebrow {
 	font-family: var(--fm);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--rose-gold, #B76E79);
@@ -488,7 +488,7 @@
 
 .stat-label {
 	font-family: var(--fm);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
 	color: var(--haze);
@@ -527,7 +527,7 @@
 
 .story-float-tag .ft-label {
 	font-family: var(--fm);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
 	color: var(--rose-gold, #B76E79);
@@ -579,7 +579,7 @@
 	position: relative;
 	z-index: 2;
 	font-family: var(--fm);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--fog);
@@ -628,7 +628,7 @@
 
 .cl-hero-num {
 	font-family: var(--fm);
-	font-size: 9px;
+	font-size: 11px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	margin-bottom: 16px;
@@ -668,14 +668,14 @@
 	gap: 32px;
 	margin-top: 32px;
 	font-family: var(--fm);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
 }
 
 .cl-hero-scroll {
 	font-family: var(--fm);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 5px;
 	text-transform: uppercase;
 	position: absolute;
@@ -749,7 +749,7 @@
 
 .cl-mf-eyebrow {
 	font-family: var(--fm);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	margin-bottom: 24px;
@@ -875,7 +875,7 @@
 	top: 20px;
 	left: 20px;
 	font-family: var(--fm);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	padding: 6px 14px;
@@ -887,14 +887,14 @@
 	bottom: 20px;
 	right: 20px;
 	font-family: var(--fm);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 }
 
 .cl-feat-col {
 	font-family: var(--fm);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	margin-bottom: 16px;
@@ -939,7 +939,7 @@
 	display: flex;
 	gap: 12px;
 	font-family: var(--fm);
-	font-size: 9px;
+	font-size: 11px;
 	letter-spacing: 2px;
 }
 
@@ -1060,7 +1060,7 @@
 
 .cl-catalog-count {
 	font-family: var(--fm);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
 }
@@ -1108,7 +1108,7 @@
 	top: 14px;
 	left: 14px;
 	font-family: var(--fm);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	padding: 4px 10px;
@@ -1120,7 +1120,7 @@
 	top: 14px;
 	right: 14px;
 	font-family: var(--fm);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 2px;
 	text-transform: uppercase;
 	padding: 4px 10px;
@@ -1180,7 +1180,7 @@
 
 .cl-card-btn {
 	font-family: var(--fm);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	padding: 10px 18px;
@@ -1297,7 +1297,7 @@
 
 .nl-eyebrow {
 	font-family: var(--fm);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--rose-gold, #B76E79);
@@ -1365,7 +1365,7 @@
 
 .nl-note {
 	font-family: var(--fm);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	color: var(--fog);

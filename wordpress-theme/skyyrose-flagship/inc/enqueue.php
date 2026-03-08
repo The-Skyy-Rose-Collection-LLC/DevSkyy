@@ -15,12 +15,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Enqueue self-hosted fonts (Inter + Playfair Display).
+ * Enqueue self-hosted fonts (all brand typography).
  *
- * GDPR-compliant: no external requests to Google Fonts.
- * Font files are served from assets/fonts/ as woff2 variable fonts.
+ * GDPR-compliant: zero external requests to Google Fonts.
+ * All 9 font families served locally from assets/fonts/ as woff2.
+ * Fonts: Inter, Playfair Display, Cinzel, Cormorant Garamond,
+ *        Oswald, Barlow, Bebas Neue, Space Mono, Instrument Serif.
  *
  * @since 3.2.1
+ * @updated 4.1.0 — self-hosted all Google Fonts families
  * @return void
  */
 function skyyrose_enqueue_local_fonts() {
@@ -29,37 +32,6 @@ function skyyrose_enqueue_local_fonts() {
 		SKYYROSE_ASSETS_URI . '/css/fonts.css',
 		array(),
 		SKYYROSE_VERSION
-	);
-}
-
-/**
- * Enqueue Google Fonts CDN for Elite Web Builder brand typography.
- *
- * Loads Cinzel, Cormorant Garamond, Space Mono, and Bebas Neue.
- * Playfair Display is already self-hosted; Inter is the system body font.
- * These fonts power the landing pages, collection pages, and single product pages.
- *
- * @since 4.0.0
- * @return void
- */
-function skyyrose_enqueue_google_fonts() {
-	// Playfair Display removed — already self-hosted in assets/css/fonts.css.
-	$font_families = implode( '&', array(
-		'family=Cinzel:wght@400;500;600;700;800;900',
-		'family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600',
-		'family=Oswald:wght@400;500;600;700',
-		'family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400',
-		'family=Bebas+Neue',
-		'family=Space+Mono:wght@400;700',
-		'family=Instrument+Serif:ital@0;1',
-		'display=swap',
-	) );
-
-	wp_enqueue_style(
-		'skyyrose-google-fonts',
-		'https://fonts.googleapis.com/css2?' . $font_families,
-		array(),
-		null
 	);
 }
 
@@ -89,7 +61,7 @@ function skyyrose_enqueue_global_styles() {
 		wp_enqueue_style(
 			'skyyrose-main',
 			$base_uri . '/' . $main_file,
-			array( 'skyyrose-style', 'skyyrose-google-fonts' ),
+			array( 'skyyrose-style', 'skyyrose-fonts' ),
 			SKYYROSE_VERSION
 		);
 	}
@@ -1054,8 +1026,8 @@ function skyyrose_preload_fonts() {
 /**
  * Resource hints for external services.
  *
- * Google Fonts preconnects removed in 3.2.1 (fonts self-hosted for GDPR).
- * Kept as filter hook point for future external service preconnects.
+ * All Google Fonts preconnects removed — fonts fully self-hosted since 4.1.0.
+ * Only external preconnect remaining: cdn.jsdelivr.net (model-viewer CDN).
  *
  * @since  3.2.1
  * @param  array  $urls          URLs to print for resource hint.
@@ -1069,41 +1041,9 @@ function skyyrose_resource_hints( $urls, $relation_type ) {
 			'href'        => 'https://cdn.jsdelivr.net',
 			'crossorigin' => 'anonymous',
 		);
-		// Google Fonts preconnect (v4.0.0 — brand typography for Elite Web Builder).
-		$urls[] = array(
-			'href'        => 'https://fonts.googleapis.com',
-			'crossorigin' => '',
-		);
-		$urls[] = array(
-			'href'        => 'https://fonts.gstatic.com',
-			'crossorigin' => 'anonymous',
-		);
+		// Google Fonts preconnects removed in 4.1.0 — all fonts self-hosted.
 	}
 	return $urls;
-}
-
-/**
- * Add font-display:swap to Google Fonts stylesheet link tags.
- *
- * Legacy callback — originally used when fonts were loaded from Google Fonts CDN.
- * Fonts are now self-hosted (v3.2.1 GDPR), so this is a safe passthrough.
- * Kept to prevent fatal errors from orphaned style_loader_tag hook registrations
- * that may exist on the production server.
- *
- * @since  3.0.0
- * @param  string $html   The link tag HTML.
- * @param  string $handle The stylesheet handle.
- * @param  string $href   The stylesheet URL.
- * @param  string $media  The stylesheet media attribute.
- * @return string Modified or original link tag.
- */
-function skyyrose_add_font_display_swap( $html, $handle, $href, $media ) {
-	// Only modify external Google Fonts links (no longer used since v3.2.1).
-	if ( strpos( $href, 'fonts.googleapis.com' ) !== false && strpos( $href, 'display=' ) === false ) {
-		$href_swap = add_query_arg( 'display', 'swap', $href );
-		$html      = str_replace( $href, esc_url( $href_swap ), $html );
-	}
-	return $html;
 }
 
 /**
@@ -1205,9 +1145,6 @@ add_action( 'wp_head', 'skyyrose_preload_fonts', 3 );
 // Self-hosted fonts (priority 5 so they load before template styles).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_local_fonts', 5 );
 
-// Google Fonts CDN — brand typography for Elite Web Builder design (priority 6).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_google_fonts', 6 );
-
 // Global styles (priority 10 - default).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_global_styles', 10 );
 
@@ -1235,10 +1172,7 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_luxury_cursor', 12 );
 // Dequeue conflicting WooCommerce default styles.
 add_filter( 'woocommerce_enqueue_styles', 'skyyrose_dequeue_woocommerce_styles' );
 
-// Font-display:swap for any remaining Google Fonts links (legacy, safe passthrough).
-add_filter( 'style_loader_tag', 'skyyrose_add_font_display_swap', 10, 4 );
-
-// Defer non-critical scripts.
+/// Defer non-critical scripts.
 add_filter( 'script_loader_tag', 'skyyrose_defer_scripts', 10, 2 );
 
 // Model Viewer — 3D brand avatar on immersive/collection/preorder pages.

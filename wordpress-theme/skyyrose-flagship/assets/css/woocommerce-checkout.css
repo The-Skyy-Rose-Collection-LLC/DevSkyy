@@ -589,7 +589,7 @@
 
 @media (max-width: 480px) {
 	.skyy-checkout__progress-label {
-		font-size: 0.6rem;
+		font-size: 0.6875rem;
 	}
 
 	.skyy-checkout__panel {
