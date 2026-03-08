@@ -362,68 +362,11 @@ add_action( 'wp_ajax_nopriv_skyyrose_immersive_add_to_cart', 'skyyrose_ajax_imme
 
 /*--------------------------------------------------------------
  * Localize Immersive Data
+ *
+ * NOTE: skyyRoseImmersive localization is handled by enqueue.php
+ * (skyyrose_enqueue_template_scripts at priority 20) which includes
+ * the wcActive flag. Do not duplicate it here.
  *--------------------------------------------------------------*/
-
-/**
- * Localize the skyyRoseImmersive JS object on immersive template pages.
- *
- * Provides the AJAX URL, nonce, and cart URL to the client-side
- * WooCommerce bridge script.
- *
- * @since 3.12.0
- * @return void
- */
-function skyyrose_localize_immersive_data() {
-
-	// Only run on immersive template pages.
-	$template = get_page_template_slug();
-
-	if ( empty( $template ) ) {
-		return;
-	}
-
-	$immersive_templates = array(
-		'template-immersive-black-rose.php',
-		'template-immersive-love-hurts.php',
-		'template-immersive-signature.php',
-	);
-
-	if ( ! in_array( $template, $immersive_templates, true ) ) {
-		return;
-	}
-
-	// Determine the best script handle to attach the data to.
-	$handle = 'skyyrose-immersive-wc-bridge';
-
-	// Enqueue the WC bridge script on immersive pages.
-	$bridge_path = SKYYROSE_DIR . '/assets/js/immersive-wc-bridge.js';
-	if ( file_exists( $bridge_path ) ) {
-		wp_enqueue_script(
-			$handle,
-			SKYYROSE_ASSETS_URI . '/js/immersive-wc-bridge.js',
-			array( 'skyyrose-template-immersive' ),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
-
-	// Build the cart URL safely (WooCommerce may not be active).
-	$cart_url = '';
-	if ( function_exists( 'wc_get_cart_url' ) ) {
-		$cart_url = wc_get_cart_url();
-	}
-
-	wp_localize_script(
-		$handle,
-		'skyyRoseImmersive',
-		array(
-			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-			'nonce'   => wp_create_nonce( 'skyyrose-immersive-nonce' ),
-			'cartUrl' => esc_url( $cart_url ),
-		)
-	);
-}
-add_action( 'wp_enqueue_scripts', 'skyyrose_localize_immersive_data', 25 );
 
 /*--------------------------------------------------------------
  * Helper Functions
