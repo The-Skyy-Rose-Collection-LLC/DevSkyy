@@ -86,11 +86,9 @@ jobs:
 
       - name: Check black formatting
         run: black --check --diff .
-        continue-on-error: true
 
       - name: Check isort imports
         run: isort --check-only --diff .
-        continue-on-error: true
 
       - name: Cache mypy
         uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306  # v5.0.3
@@ -102,7 +100,6 @@ jobs:
 
       - name: Run mypy type checking
         run: mypy . --ignore-missing-imports --no-error-summary
-        continue-on-error: true
 
   # ===========================================================================
   # Stage 2: Python Backend Tests
@@ -211,9 +208,8 @@ jobs:
       - name: Run pip-audit (dependency vulnerabilities)
         id: pip_audit
         run: |
-          pip-audit --format=json --output=pip-audit-results.json || true
-          pip-audit --strict 2>&1 | tee pip-audit.txt || echo "::warning::pip-audit found issues"
-        continue-on-error: true
+          pip-audit --format=json --output=pip-audit-results.json
+          pip-audit --strict 2>&1 | tee pip-audit.txt
 
       - name: Run bandit (code security)
         id: bandit
@@ -221,22 +217,19 @@ jobs:
           bandit -r . \
             -x ./tests,./venv,./.venv,./node_modules \
             -f json -o bandit-results.json \
-            -ll || true
+            -ll
           bandit -r . \
             -x ./tests,./venv,./.venv,./node_modules \
-            -ll 2>&1 | tee bandit.txt || echo "::warning::bandit found issues"
-        continue-on-error: true
+            -ll 2>&1 | tee bandit.txt
 
       - name: Run safety check
         run: |
-          safety check --full-report 2>&1 | tee safety.txt || echo "::warning::safety found issues"
-        continue-on-error: true
+          safety check --full-report 2>&1 | tee safety.txt
 
       - name: Run semgrep (SAST)
         run: |
-          semgrep scan --config=auto --json --output=semgrep-results.json . || true
-          semgrep scan --config=auto . 2>&1 | tee semgrep.txt || echo "::warning::semgrep found issues"
-        continue-on-error: true
+          semgrep scan --config=auto --json --output=semgrep-results.json .
+          semgrep scan --config=auto . 2>&1 | tee semgrep.txt
         env:
           SEMGREP_RULES: "p/python"
 
@@ -247,7 +240,6 @@ jobs:
           else
             echo "No custom security audit script found"
           fi
-        continue-on-error: true
 
       - name: Generate security summary
         if: always()
@@ -324,11 +316,9 @@ jobs:
 
       - name: Run ESLint
         run: npm run lint
-        continue-on-error: true
 
       - name: Run TypeScript type check
         run: npm run type-check
-        continue-on-error: true
 
       - name: Build application
         run: npm run build
@@ -365,7 +355,6 @@ jobs:
 
       - name: Run Three.js collection tests
         run: npm run test:collections
-        continue-on-error: true
 
       - name: Upload test results
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
@@ -675,9 +664,11 @@ jobs:
           fi
 
       - name: Create deployment tag
+        if: success()
         run: |
-          git tag -a "deploy-$(date +%Y%m%d-%H%M%S)" -m "Production deployment"
-        continue-on-error: true
+          TAG="deploy-$(date +%Y%m%d-%H%M%S)-${GITHUB_SHA::7}"
+          git tag -a "$TAG" -m "Production deployment ${GITHUB_SHA::7}"
+          git push origin "$TAG" || echo "::warning::Could not push tag $TAG"
 
       - name: Notify deployment success
         run: |
