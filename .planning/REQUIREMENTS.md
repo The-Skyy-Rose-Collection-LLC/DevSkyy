@@ -1,7 +1,7 @@
 # Requirements: Production Armor & WordPress Build Autonomy
 
 **Defined:** 2026-03-08
-**Core Value:** No agent-written code can reach production without passing automated quality gates at every layer — local, CI, PR, and post-deploy.
+**Core Value:** No agent-written code can reach production without passing automated quality gates at every layer -- local, CI, PR, and post-deploy.
 
 ## v1 Requirements
 
@@ -22,7 +22,7 @@
 - [ ] **CI-02**: Underlying lint/type/format failures fixed so CI passes without soft failures
 - [ ] **CI-03**: PHP syntax validation step added to CI pipeline for WordPress theme files
 - [ ] **CI-04**: CI runs WordPress theme build (npm run build) and validates output
-- [ ] **CI-05**: CI detects minification drift — fails if .min files don't match freshly built output
+- [ ] **CI-05**: CI detects minification drift -- fails if .min files don't match freshly built output
 
 ### PR Protection
 
@@ -42,9 +42,9 @@
 - [ ] **DEPLOY-02**: Deploy script enables WP-CLI maintenance mode before file transfer
 - [ ] **DEPLOY-03**: Deploy script disables maintenance mode and flushes cache after transfer
 - [ ] **DEPLOY-04**: Post-deploy deep health check verifies page content (not just HTTP 200)
-- [ ] **DEPLOY-05**: Single command runs the full deploy pipeline (build → transfer → verify)
+- [ ] **DEPLOY-05**: Single command runs the full deploy pipeline (build -> transfer -> verify)
 - [ ] **DEPLOY-06**: Deploy dry-run mode validates without actually shipping to production
-- [ ] **DEPLOY-07**: Deploy script has try/finally safety — maintenance mode always gets disabled even on failure
+- [ ] **DEPLOY-07**: Deploy script has try/finally safety -- maintenance mode always gets disabled even on failure
 
 ## v2 Requirements
 
@@ -66,50 +66,50 @@
 
 | Feature | Reason |
 |---------|--------|
-| Human code review requirement | Agents operate autonomously — CI is the reviewer |
+| Human code review requirement | Agents operate autonomously -- CI is the reviewer |
 | Coverage threshold gates | Adds complexity without clear value for agent workflows |
-| Staging environment | Deploy directly to production with verification — simpler for family business |
+| Staging environment | Deploy directly to production with verification -- simpler for family business |
 | PHPCS/WordPress coding standards | Would generate hundreds of warnings on existing theme code |
-| Docker-based CI | Unnecessary complexity — native runners sufficient |
-| Mobile app CI | Future milestone — no native app exists yet |
-| pre-commit (Python tool) | Wrong ecosystem — Husky is npm-native for this monorepo |
+| Docker-based CI | Unnecessary complexity -- native runners sufficient |
+| Mobile app CI | Future milestone -- no native app exists yet |
+| pre-commit (Python tool) | Wrong ecosystem -- Husky is npm-native for this monorepo |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HOOK-01 | — | Pending |
-| HOOK-02 | — | Pending |
-| HOOK-03 | — | Pending |
-| HOOK-04 | — | Pending |
-| HOOK-05 | — | Pending |
-| HOOK-06 | — | Pending |
-| HOOK-07 | — | Pending |
-| HOOK-08 | — | Pending |
-| CI-01 | — | Pending |
-| CI-02 | — | Pending |
-| CI-03 | — | Pending |
-| CI-04 | — | Pending |
-| CI-05 | — | Pending |
-| PR-01 | — | Pending |
-| PR-02 | — | Pending |
-| BUILD-01 | — | Pending |
-| BUILD-02 | — | Pending |
-| BUILD-03 | — | Pending |
-| BUILD-04 | — | Pending |
-| DEPLOY-01 | — | Pending |
-| DEPLOY-02 | — | Pending |
-| DEPLOY-03 | — | Pending |
-| DEPLOY-04 | — | Pending |
-| DEPLOY-05 | — | Pending |
-| DEPLOY-06 | — | Pending |
-| DEPLOY-07 | — | Pending |
+| HOOK-01 | Phase 3 | Pending |
+| HOOK-02 | Phase 3 | Pending |
+| HOOK-03 | Phase 3 | Pending |
+| HOOK-04 | Phase 3 | Pending |
+| HOOK-05 | Phase 3 | Pending |
+| HOOK-06 | Phase 3 | Pending |
+| HOOK-07 | Phase 2 | Pending |
+| HOOK-08 | Phase 3 | Pending |
+| CI-01 | Phase 1 | Pending |
+| CI-02 | Phase 1 | Pending |
+| CI-03 | Phase 6 | Pending |
+| CI-04 | Phase 6 | Pending |
+| CI-05 | Phase 6 | Pending |
+| PR-01 | Phase 4 | Pending |
+| PR-02 | Phase 4 | Pending |
+| BUILD-01 | Phase 5 | Pending |
+| BUILD-02 | Phase 5 | Pending |
+| BUILD-03 | Phase 5 | Pending |
+| BUILD-04 | Phase 5 | Pending |
+| DEPLOY-01 | Phase 7 | Pending |
+| DEPLOY-02 | Phase 7 | Pending |
+| DEPLOY-03 | Phase 7 | Pending |
+| DEPLOY-04 | Phase 8 | Pending |
+| DEPLOY-05 | Phase 8 | Pending |
+| DEPLOY-06 | Phase 8 | Pending |
+| DEPLOY-07 | Phase 7 | Pending |
 
 **Coverage:**
 - v1 requirements: 26 total
-- Mapped to phases: 0
-- Unmapped: 26 (pending roadmap creation)
+- Mapped to phases: 26
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-08*
-*Last updated: 2026-03-08 after initial definition*
+*Last updated: 2026-03-08 after roadmap creation*
