@@ -337,54 +337,43 @@ get_header();
 			</div>
 		</div>
 
-		<div class="col-grid">
-			<?php
-			$card_delay = 0;
-			foreach ( $all_products as $product ) :
-				$delay_class = $card_delay < 5 ? ' col-rv-d' . ( $card_delay + 1 ) : '';
-				$card_delay++;
-				?>
-				<div class="col-card col-rv<?php echo esc_attr( $delay_class ); ?>"
-				     data-product-id="<?php echo esc_attr( $product['sku'] ); ?>"
-				     role="button"
-				     tabindex="0"
-				     aria-label="<?php echo esc_attr( sprintf( __( 'View %s', 'skyyrose-flagship' ), $product['name'] ) ); ?>">
-					<div class="col-card__img">
-						<?php if ( ! empty( $product['image'] ) ) : ?>
-							<img src="<?php echo esc_url( $product['image'] ); ?>"
-							     alt="<?php echo esc_attr( $product['name'] ); ?>"
-							     width="400" height="533" loading="lazy">
-						<?php else : ?>
-							<span class="col-card__letter"><?php echo esc_html( mb_substr( $product['name'], 0, 1 ) ); ?></span>
-						<?php endif; ?>
-						<span class="col-card__badge"><?php echo esc_html( strtoupper( $col['name'] ) ); ?></span>
-						<?php if ( $product['is_preorder'] ) : ?>
-							<span class="col-card__pre"><?php esc_html_e( 'Pre-Order', 'skyyrose-flagship' ); ?></span>
-						<?php endif; ?>
-						<button class="col-card__heart" data-wishlist-id="<?php echo esc_attr( $product['sku'] ); ?>"
-					        aria-label="<?php echo esc_attr( sprintf( __( 'Add %s to wishlist', 'skyyrose-flagship' ), $product['name'] ) ); ?>"
-					        aria-pressed="false">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-							<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-						</svg>
-					</button>
-					<div class="col-card__hover"><span><?php esc_html_e( 'VIEW PIECE', 'skyyrose-flagship' ); ?></span></div>
-					</div>
-					<div class="col-card__body">
-						<h3 class="col-card__name"><?php echo esc_html( $product['name'] ); ?></h3>
-						<p class="col-card__desc"><?php echo esc_html( $product['desc'] ); ?></p>
-						<div class="col-card__foot">
-							<span class="col-card__price"><?php echo wp_kses_post( $product['price_display'] ); ?></span>
-							<a href="<?php echo esc_url( $product['url'] ); ?>"
-							   class="col-card__view-btn"
-							   aria-label="<?php echo esc_attr( sprintf( __( 'View %s details', 'skyyrose-flagship' ), $product['name'] ) ); ?>">
-								<?php esc_html_e( 'Details', 'skyyrose-flagship' ); ?>
-							</a>
+		<?php
+		if ( function_exists( 'skyyrose_render_interactive_grid' ) ) {
+			skyyrose_render_interactive_grid( $all_products, $col );
+		} else {
+			// Fallback: render legacy col-card grid if interactive-grid.php is not loaded.
+			?>
+			<div class="col-grid">
+				<?php foreach ( $all_products as $product ) : ?>
+					<div class="col-card"
+					     data-product-id="<?php echo esc_attr( $product['sku'] ); ?>"
+					     role="button"
+					     tabindex="0"
+					     aria-label="<?php echo esc_attr( sprintf( __( 'View %s', 'skyyrose-flagship' ), $product['name'] ) ); ?>">
+						<div class="col-card__img">
+							<?php if ( ! empty( $product['image'] ) ) : ?>
+								<img src="<?php echo esc_url( $product['image'] ); ?>"
+								     alt="<?php echo esc_attr( $product['name'] ); ?>"
+								     width="400" height="533" loading="lazy">
+							<?php else : ?>
+								<span class="col-card__letter"><?php echo esc_html( mb_substr( $product['name'], 0, 1 ) ); ?></span>
+							<?php endif; ?>
+						</div>
+						<div class="col-card__body">
+							<h3 class="col-card__name"><?php echo esc_html( $product['name'] ); ?></h3>
+							<div class="col-card__foot">
+								<span class="col-card__price"><?php echo wp_kses_post( $product['price_display'] ); ?></span>
+								<a href="<?php echo esc_url( $product['url'] ); ?>" class="col-card__view-btn">
+									<?php esc_html_e( 'Details', 'skyyrose-flagship' ); ?>
+								</a>
+							</div>
 						</div>
 					</div>
-				</div>
-			<?php endforeach; ?>
-		</div>
+				<?php endforeach; ?>
+			</div>
+			<?php
+		}
+		?>
 
 		<div style="text-align:center; padding:1rem 0 0;">
 			<button class="size-guide-trigger" data-open-size-guide
@@ -483,5 +472,18 @@ wp_localize_script(
 	'skyyRoseCollectionProducts',
 	$all_products
 );
+
+/* Also pass product data to the interactive cards script. */
+if ( wp_script_is( 'skyyrose-interactive-cards', 'enqueued' ) ) {
+	wp_localize_script(
+		'skyyrose-interactive-cards',
+		'skyyRoseInteractiveProducts',
+		array(
+			'products' => $all_products,
+			'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
+			'nonce'    => wp_create_nonce( 'skyyrose-immersive-nonce' ),
+		)
+	);
+}
 
 get_footer();
