@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { X, Send, ShoppingBag, Sparkles, ArrowRight } from 'lucide-react';
 
@@ -213,20 +214,20 @@ export default function MascotBubble() {
 
           {/* Quick Actions */}
           <div className="px-4 pb-2 flex gap-2">
-            <a
+            <Link
               href="/collections"
               className="flex items-center gap-1.5 text-xs bg-gray-800 hover:bg-gray-700 text-[#B76E79] rounded-full px-3 py-1.5 transition-colors border border-[#B76E79]/30"
             >
               <ShoppingBag className="h-3 w-3" />
               Collections
-            </a>
-            <a
+            </Link>
+            <Link
               href="/pre-order"
               className="flex items-center gap-1.5 text-xs bg-[#B76E79]/10 hover:bg-[#B76E79]/20 text-[#B76E79] rounded-full px-3 py-1.5 transition-colors border border-[#B76E79]/30"
             >
               <ArrowRight className="h-3 w-3" />
               Pre-Order
-            </a>
+            </Link>
           </div>
 
           {/* Input */}
