@@ -67,8 +67,8 @@ def _get_wp_client() -> WordPressClient:
 
     Required env vars:
         WORDPRESS_SITE_URL       — WordPress site base URL
-        WC_CONSUMER_KEY          — WooCommerce consumer key
-        WC_CONSUMER_SECRET       — WooCommerce consumer secret
+        WOOCOMMERCE_KEY          — WooCommerce consumer key (fallback: WC_CONSUMER_KEY)
+        WOOCOMMERCE_SECRET       — WooCommerce consumer secret (fallback: WC_CONSUMER_SECRET)
 
     Optional env vars:
         WORDPRESS_USERNAME       — WordPress username (for Application Password auth)
@@ -79,12 +79,14 @@ def _get_wp_client() -> WordPressClient:
         return _wp_client
 
     site_url = os.environ.get("WORDPRESS_SITE_URL", "")
-    consumer_key = os.environ.get("WC_CONSUMER_KEY", "")
-    consumer_secret = os.environ.get("WC_CONSUMER_SECRET", "")
+    consumer_key = os.environ.get("WOOCOMMERCE_KEY") or os.environ.get("WC_CONSUMER_KEY", "")
+    consumer_secret = os.environ.get("WOOCOMMERCE_SECRET") or os.environ.get(
+        "WC_CONSUMER_SECRET", ""
+    )
 
     if not all([site_url, consumer_key, consumer_secret]):
         raise ValueError(
-            "Missing required env vars: WORDPRESS_SITE_URL, WC_CONSUMER_KEY, WC_CONSUMER_SECRET"
+            "Missing required env vars: WORDPRESS_SITE_URL, WOOCOMMERCE_KEY, WOOCOMMERCE_SECRET"
         )
 
     _wp_client = WordPressClient(
@@ -104,8 +106,8 @@ async def _get_product_sync() -> WordPressProductSync:
     Required env vars:
         WORDPRESS_SITE_URL       — WordPress site base URL
         WORDPRESS_API_TOKEN      — WordPress.com OAuth2 access token
-        WC_CONSUMER_KEY          — WooCommerce consumer key
-        WC_CONSUMER_SECRET       — WooCommerce consumer secret
+        WOOCOMMERCE_KEY          — WooCommerce consumer key (fallback: WC_CONSUMER_KEY)
+        WOOCOMMERCE_SECRET       — WooCommerce consumer secret (fallback: WC_CONSUMER_SECRET)
     """
     global _product_sync  # noqa: PLW0603
     if _product_sync is not None:
@@ -113,13 +115,15 @@ async def _get_product_sync() -> WordPressProductSync:
 
     site_url = os.environ.get("WORDPRESS_SITE_URL", "")
     api_token = os.environ.get("WORDPRESS_API_TOKEN", "")
-    consumer_key = os.environ.get("WC_CONSUMER_KEY", "")
-    consumer_secret = os.environ.get("WC_CONSUMER_SECRET", "")
+    consumer_key = os.environ.get("WOOCOMMERCE_KEY") or os.environ.get("WC_CONSUMER_KEY", "")
+    consumer_secret = os.environ.get("WOOCOMMERCE_SECRET") or os.environ.get(
+        "WC_CONSUMER_SECRET", ""
+    )
 
     if not all([site_url, api_token, consumer_key, consumer_secret]):
         raise ValueError(
             "Missing required env vars: WORDPRESS_SITE_URL, WORDPRESS_API_TOKEN, "
-            "WC_CONSUMER_KEY, WC_CONSUMER_SECRET"
+            "WOOCOMMERCE_KEY, WOOCOMMERCE_SECRET"
         )
 
     wp_com_client = await create_wordpress_client(
