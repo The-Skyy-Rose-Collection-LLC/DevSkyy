@@ -20,8 +20,6 @@ Auto-processes via: python3 build/ecommerce-process.py {product_id}
 Then composites:   python3 build/composite-with-bgs.py {product_id}
 """
 
-import hashlib
-import json
 import subprocess
 import sys
 import time
@@ -41,19 +39,20 @@ except ImportError:
     print("❌ Pillow not installed. Run: pip3 install Pillow")
     sys.exit(1)
 
-ROOT     = Path(__file__).parent.parent
-SRC_DIR  = ROOT / "assets/images/source-products"
+ROOT = Path(__file__).parent.parent
+SRC_DIR = ROOT / "assets/images/source-products"
 LOG_FILE = ROOT / "build/pipeline.log"
-DRY_RUN  = "--dry" in sys.argv
+DRY_RUN = "--dry" in sys.argv
 
 SUPPORTED_EXTS = {".jpg", ".jpeg", ".png", ".webp"}
 MIN_RESOLUTION = (800, 800)
-MIN_FILE_BYTES = 50_000       # 50 KB
-MAX_FILE_BYTES = 50_000_000   # 50 MB
-MIN_BRIGHTNESS = 20           # 0-255 — too dark
-MAX_BRIGHTNESS = 245          # 0-255 — overexposed
+MIN_FILE_BYTES = 50_000  # 50 KB
+MAX_FILE_BYTES = 50_000_000  # 50 MB
+MIN_BRIGHTNESS = 20  # 0-255 — too dark
+MAX_BRIGHTNESS = 245  # 0-255 — overexposed
 
 COLLECTIONS = ["black-rose", "love-hurts", "signature"]
+
 
 # ── Product ID lookup by collection folder ────────────────────────────────────
 # Maps a source filename back to its product ID by scanning ecommerce-process.py
@@ -93,9 +92,11 @@ def quality_check(path: Path) -> tuple[bool, list[str], list[str]]:
     # File size check
     size = path.stat().st_size
     if size < MIN_FILE_BYTES:
-        errors.append(f"File too small: {size//1024}KB (min 50KB — likely corrupt or placeholder)")
+        errors.append(
+            f"File too small: {size // 1024}KB (min 50KB — likely corrupt or placeholder)"
+        )
     elif size > MAX_FILE_BYTES:
-        warnings.append(f"Large file: {size//1_000_000}MB — will process but may be slow")
+        warnings.append(f"Large file: {size // 1_000_000}MB — will process but may be slow")
 
     # Image checks
     try:
@@ -104,7 +105,9 @@ def quality_check(path: Path) -> tuple[bool, list[str], list[str]]:
 
         # Resolution
         if w < MIN_RESOLUTION[0] or h < MIN_RESOLUTION[1]:
-            errors.append(f"Too low resolution: {w}×{h}px (minimum {MIN_RESOLUTION[0]}×{MIN_RESOLUTION[1]})")
+            errors.append(
+                f"Too low resolution: {w}×{h}px (minimum {MIN_RESOLUTION[0]}×{MIN_RESOLUTION[1]})"
+            )
         elif w < 1500 or h < 1500:
             warnings.append(f"Low resolution: {w}×{h}px — output quality may be reduced")
 
@@ -119,9 +122,13 @@ def quality_check(path: Path) -> tuple[bool, list[str], list[str]]:
         brightness = sum(stat.mean[:3]) / 3
 
         if brightness < MIN_BRIGHTNESS:
-            errors.append(f"Image too dark: brightness {brightness:.0f}/255 — check lighting or exposure")
+            errors.append(
+                f"Image too dark: brightness {brightness:.0f}/255 — check lighting or exposure"
+            )
         elif brightness < 40:
-            warnings.append(f"Very dark image: brightness {brightness:.0f}/255 — may need manual review")
+            warnings.append(
+                f"Very dark image: brightness {brightness:.0f}/255 — may need manual review"
+            )
         elif brightness > MAX_BRIGHTNESS:
             errors.append(f"Image overexposed: brightness {brightness:.0f}/255 — blown highlights")
         elif brightness > 220:
@@ -151,9 +158,9 @@ def log(msg: str):
 # ── Pipeline Runner ───────────────────────────────────────────────────────────
 def run_pipeline(path: Path, collection: str):
     filename = path.name
-    log(f"\n{'='*56}")
+    log(f"\n{'=' * 56}")
     log(f"  NEW IMAGE DETECTED: {collection}/{filename}")
-    log(f"{'='*56}")
+    log(f"{'=' * 56}")
 
     # Quality check
     log("  Running quality checks…")
@@ -171,7 +178,7 @@ def run_pipeline(path: Path, collection: str):
     if warnings:
         log(f"  ✅ Quality check passed with {len(warnings)} warning(s)")
     else:
-        log(f"  ✅ Quality check passed")
+        log("  ✅ Quality check passed")
 
     if DRY_RUN:
         log("  [DRY RUN] Skipping pipeline — pass without --dry to process")
@@ -180,29 +187,33 @@ def run_pipeline(path: Path, collection: str):
     # Find product ID
     product_id = get_product_id_for_file(filename, collection)
     if not product_id:
-        log(f"  ⚠️  File not mapped to any product in ecommerce-process.py")
+        log("  ⚠️  File not mapped to any product in ecommerce-process.py")
         log(f"  👉 Add '{filename}' to the correct product in build/ecommerce-process.py")
-        log(f"     Then run: python3 build/ecommerce-process.py <product-id>")
+        log("     Then run: python3 build/ecommerce-process.py <product-id>")
         return
 
     log(f"  📦 Mapped to product: {product_id}")
-    log(f"  🔄 Running e-commerce pipeline…")
+    log("  🔄 Running e-commerce pipeline…")
 
     result = subprocess.run(
         ["python3", "build/ecommerce-process.py", product_id],
-        cwd=ROOT, capture_output=True, text=True
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
     )
     for line in result.stdout.strip().split("\n"):
         if line.strip():
             log(f"  {line}")
     if result.returncode != 0:
-        log(f"  ❌ Pipeline failed")
+        log("  ❌ Pipeline failed")
         return
 
-    log(f"  🎨 Running background compositing…")
+    log("  🎨 Running background compositing…")
     result2 = subprocess.run(
         ["python3", "build/composite-with-bgs.py", product_id],
-        cwd=ROOT, capture_output=True, text=True
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
     )
     for line in result2.stdout.strip().split("\n"):
         if line.strip():

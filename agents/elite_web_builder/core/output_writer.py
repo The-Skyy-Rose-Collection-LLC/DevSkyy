@@ -115,9 +115,7 @@ class WriteResult:
 
 # Pattern 1: ```lang:path/to/file.ext
 _FENCE_WITH_PATH = re.compile(
-    r"```(\w+):([a-zA-Z0-9_\-./]+\.\w+)\s*\n"
-    r"(.*?)"
-    r"\n```",
+    r"```(\w+):([a-zA-Z0-9_\-./]+\.\w+)\s*\n" r"(.*?)" r"\n```",
     re.DOTALL,
 )
 
@@ -136,19 +134,13 @@ _FENCE_WITH_COMMENT = re.compile(
 
 # Pattern 3: ### File: path/to/file.ext\n```lang\n...\n```
 _HEADING_THEN_FENCE = re.compile(
-    r"#{1,4}\s*[Ff]ile:\s*([a-zA-Z0-9_\-./]+\.\w+)\s*\n+"
-    r"```(\w*)\s*\n"
-    r"(.*?)"
-    r"\n```",
+    r"#{1,4}\s*[Ff]ile:\s*([a-zA-Z0-9_\-./]+\.\w+)\s*\n+" r"```(\w*)\s*\n" r"(.*?)" r"\n```",
     re.DOTALL,
 )
 
 # Pattern 4: **`path/to/file.ext`**\n```lang\n...\n```
 _BOLD_PATH_THEN_FENCE = re.compile(
-    r"\*\*`([a-zA-Z0-9_\-./]+\.\w+)`\*\*\s*\n+"
-    r"```(\w*)\s*\n"
-    r"(.*?)"
-    r"\n```",
+    r"\*\*`([a-zA-Z0-9_\-./]+\.\w+)`\*\*\s*\n+" r"```(\w*)\s*\n" r"(.*?)" r"\n```",
     re.DOTALL,
 )
 

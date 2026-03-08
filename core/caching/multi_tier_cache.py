@@ -292,10 +292,8 @@ def cached(ttl: int = 300, key_prefix: str = "") -> Callable:
 
         # Expose cache instance for testing/invalidation
         wrapper.cache = func_cache  # type: ignore[attr-defined]
-        wrapper.cache_invalidate = (
-            lambda *a, **k: func_cache.invalidate(  # type: ignore[attr-defined]
-                f"{prefix}:{hashlib.sha256(json.dumps({'args': [str(x) for x in a], 'kwargs': {kk: str(vv) for kk, vv in sorted(k.items())}}, sort_keys=True).encode()).hexdigest()[:32]}"
-            )
+        wrapper.cache_invalidate = lambda *a, **k: func_cache.invalidate(  # type: ignore[attr-defined]
+            f"{prefix}:{hashlib.sha256(json.dumps({'args': [str(x) for x in a], 'kwargs': {kk: str(vv) for kk, vv in sorted(k.items())}}, sort_keys=True).encode()).hexdigest()[:32]}"
         )
 
         return wrapper

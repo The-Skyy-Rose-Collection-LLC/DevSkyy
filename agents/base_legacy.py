@@ -17,6 +17,7 @@ Components:
 Author: DevSkyy Platform Team
 Version: 1.0.0
 """
+
 # DEPRECATED: Import from agents.core.base instead. This file will be removed in a future version.
 
 from __future__ import annotations

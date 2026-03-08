@@ -68,9 +68,9 @@ class TestSubAgentSystemPrompts:
     def test_system_prompt_mentions_skyyrose(self, module_path, class_name):
         cls = _import_agent(module_path, class_name)
         prompt = cls.system_prompt.lower()
-        assert "skyyrose" in prompt or "skyy" in prompt, (
-            f"{class_name}.system_prompt should mention SkyyRose brand"
-        )
+        assert (
+            "skyyrose" in prompt or "skyy" in prompt
+        ), f"{class_name}.system_prompt should mention SkyyRose brand"
 
 
 class TestSubAgentExecute:

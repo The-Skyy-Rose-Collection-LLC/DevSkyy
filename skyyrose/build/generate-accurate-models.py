@@ -26,15 +26,16 @@ from google.genai import types
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
-    print("✗ GEMINI_API_KEY missing"); sys.exit(1)
+    print("✗ GEMINI_API_KEY missing")
+    sys.exit(1)
 
 client = genai.Client(api_key=GEMINI_API_KEY)
 
 VISION_MODEL = "gemini-2.5-flash"
-IMAGE_MODEL  = "gemini-2.5-flash-image"
+IMAGE_MODEL = "gemini-2.5-flash-image"
 
 PRODUCTS_DIR = Path(__file__).parent.parent / "assets/images/products"
-SOURCE_DIR   = Path(__file__).parent.parent / "assets/images/source-products"
+SOURCE_DIR = Path(__file__).parent.parent / "assets/images/source-products"
 
 # ── Product catalog with best flat-lay reference photo ────────────────────────
 PRODUCTS = [
@@ -225,8 +226,8 @@ Extract a COMPLETE, VERBATIM description of every visual element for use in fash
 
 Be exhaustive. Every design detail must be captured so a model can be photographed wearing this EXACT garment and it will be 100% recognizable as this specific product.
 
-Product: {product['name']} — {product['collection']} Collection
-Type: {product['type']}"""
+Product: {product["name"]} — {product["collection"]} Collection
+Type: {product["type"]}"""
 
     try:
         response = client.models.generate_content(
@@ -244,20 +245,22 @@ Type: {product['type']}"""
         return f"{product['type']} with embroidered rose design"
 
 
-def generate_model_photo(product: dict, ref_b64: str, ref_mime: str, visual_desc: str) -> bytes | None:
+def generate_model_photo(
+    product: dict, ref_b64: str, ref_mime: str, visual_desc: str
+) -> bytes | None:
     """Step 2: Generate model photo wearing exact product."""
     print(f"   🎨 Generating: {product['name']}...")
 
-    generation_prompt = f"""Create an ultra-realistic editorial fashion photograph for {product['collection']} Collection by SkyyRose.
+    generation_prompt = f"""Create an ultra-realistic editorial fashion photograph for {product["collection"]} Collection by SkyyRose.
 
 THE MODEL:
-{product['model']}
+{product["model"]}
 
 THE GARMENT — reproduce with 100% accuracy, every detail exactly as shown in the reference image:
 {visual_desc}
 
 PHOTOGRAPHY DIRECTION:
-- Setting: {product['style']}
+- Setting: {product["style"]}
 - Quality: Vogue / Harper's Bazaar editorial standard, 8K ultra-high resolution
 - Lighting: Professional fashion photography, dramatic and atmospheric
 - The garment design, text, graphics, colors, and branding must be PERFECTLY ACCURATE to the reference image
@@ -292,15 +295,15 @@ CRITICAL: Every piece of text, graphic, embroidery, color, and design element on
 
 def run(product_ids: list[str] | None = None):
     targets = [p for p in PRODUCTS if (product_ids is None or p["id"] in product_ids)]
-    print(f"\n🌹 SkyyRose — Accurate Fashion Model Generation")
-    print(f"🔬 Pipeline: Visual Learning → Embedded Description → Image Generation")
+    print("\n🌹 SkyyRose — Accurate Fashion Model Generation")
+    print("🔬 Pipeline: Visual Learning → Embedded Description → Image Generation")
     print(f"🤖 Vision: {VISION_MODEL}  |  Image Gen: {IMAGE_MODEL}")
     print("=" * 70)
     print(f"📋 Generating {len(targets)} products\n")
 
     results = []
     for i, product in enumerate(targets):
-        print(f"[{i+1}/{len(targets)}] {product['name']} ({product['collection']})")
+        print(f"[{i + 1}/{len(targets)}] {product['name']} ({product['collection']})")
         print("─" * 70)
 
         # Load reference image

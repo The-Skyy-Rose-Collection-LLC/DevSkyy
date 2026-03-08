@@ -29,7 +29,12 @@ _API_BASE = "https://generativelanguage.googleapis.com/v1beta"
 
 def _get_key() -> str:
     """Get the active Gemini API key."""
-    return os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or ""
+    return (
+        os.getenv("GEMINI_API_KEY")
+        or os.getenv("GOOGLE_API_KEY")
+        or os.getenv("GOOGLE_AI_API_KEY")
+        or ""
+    )
 
 
 def _endpoint(model: str, method: str = "generateContent") -> str:

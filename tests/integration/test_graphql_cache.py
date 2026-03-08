@@ -122,9 +122,9 @@ class TestGraphQLCacheIntegration:
             assert len(result2.data["products"]) == 2
 
             # DB must be called exactly once despite two GraphQL executions
-            assert mock_session.execute.call_count == 1, (
-                "Expected DB to be called once — second query should hit L1 cache"
-            )
+            assert (
+                mock_session.execute.call_count == 1
+            ), "Expected DB to be called once — second query should hit L1 cache"
             # Cache stats confirm L1 hit on the second call
             assert get_products_from_db.cache.stats["l1_hits"] >= 1  # type: ignore[attr-defined]
 
@@ -174,9 +174,9 @@ class TestGraphQLCacheIntegration:
                 '{ products(collection: "black-rose") { sku collection } }'
             )
             assert br_cached.errors is None
-            assert db_call_count == 2, (
-                "Third query (repeated collection) should be served from cache, not DB"
-            )
+            assert (
+                db_call_count == 2
+            ), "Third query (repeated collection) should be served from cache, not DB"
 
     async def test_offset_pagination_creates_distinct_cache_entries(self) -> None:
         """
@@ -254,9 +254,9 @@ class TestGraphQLCacheIntegration:
             assert r1.errors is None
             assert r2.errors is None
             # Both produce get_products_from_db(limit=100) — same cache key
-            assert mock_session.execute.call_count == 1, (
-                "products(limit: 999) and products(limit: 100) should share a cache entry"
-            )
+            assert (
+                mock_session.execute.call_count == 1
+            ), "products(limit: 999) and products(limit: 100) should share a cache entry"
 
     async def test_cache_invalidate_uses_matching_key_length(self) -> None:
         """
@@ -345,9 +345,9 @@ class TestDataLoaderBatching:
         assert result.data["a"]["sku"] == "br-001"
         assert result.data["b"]["sku"] == "br-002"
         # DataLoader must have batched both SKUs into ONE call
-        assert len(batch_calls) == 1, (
-            f"Expected 1 batch call, got {len(batch_calls)}. DataLoader N+1 prevention is broken."
-        )
+        assert (
+            len(batch_calls) == 1
+        ), f"Expected 1 batch call, got {len(batch_calls)}. DataLoader N+1 prevention is broken."
         assert set(batch_calls[0]) == {"br-001", "br-002"}
 
     async def test_duplicate_sku_in_query_deduplicated_by_dataloader(self) -> None:
@@ -382,9 +382,9 @@ class TestDataLoaderBatching:
         assert result.data["second"]["sku"] == "br-001"
         # One batch call, with "br-001" appearing only once (DataLoader dedup)
         assert len(batch_calls) == 1
-        assert batch_calls[0].count("br-001") == 1, (
-            "DataLoader should deduplicate identical keys within one request"
-        )
+        assert (
+            batch_calls[0].count("br-001") == 1
+        ), "DataLoader should deduplicate identical keys within one request"
 
     async def test_missing_product_sku_returns_null_not_error(self) -> None:
         """

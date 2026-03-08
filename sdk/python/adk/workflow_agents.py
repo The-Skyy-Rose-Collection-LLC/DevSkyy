@@ -934,12 +934,14 @@ class WorkflowPipelineAgent(BaseDevSkyyAgent):
                 metadata={
                     "pipeline_type": self._pipeline_type.value if self._pipeline_type else None,
                     "orchestration_tokens": 0,
-                    "savings": {
-                        "orchestration_tokens_saved": savings.orchestration_tokens_saved,
-                        "savings_pct": round(savings.savings_pct, 1),
-                    }
-                    if savings
-                    else None,
+                    "savings": (
+                        {
+                            "orchestration_tokens_saved": savings.orchestration_tokens_saved,
+                            "savings_pct": round(savings.savings_pct, 1),
+                        }
+                        if savings
+                        else None
+                    ),
                 },
             )
 
