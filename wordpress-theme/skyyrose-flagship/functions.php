@@ -44,6 +44,7 @@ $skyyrose_core_includes = array(
 	'/inc/ai-providers.php',
 	'/inc/theme-setup.php',
 	'/inc/product-catalog.php',
+	'/inc/interactive-grid.php',
 	'/inc/enqueue.php',
 	'/inc/enqueue-engines.php',
 	'/inc/customizer.php',

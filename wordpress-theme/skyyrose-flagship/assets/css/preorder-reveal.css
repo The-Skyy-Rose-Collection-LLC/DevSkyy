@@ -1,0 +1,411 @@
+/**
+ * Pre-Order Reveal Cards
+ *
+ * Dramatic reveal animation for pre-order product cards.
+ * Cards start blurred/locked with countdown timer overlay,
+ * then unfold with particle burst on reveal.
+ *
+ * @package SkyyRose_Flagship
+ * @since   4.1.0
+ */
+
+/* -----------------------------------------------
+   Pre-Order Reveal Card
+   ----------------------------------------------- */
+
+.prc {
+	position: relative;
+	border-radius: 16px;
+	overflow: hidden;
+	background: var(--color-card-bg, #111);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	transition: filter 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+		transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+		opacity 0.6s ease;
+	opacity: 0;
+	transform: translateY(40px);
+}
+
+.prc--visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* Locked state — blurred and non-interactive */
+.prc--locked {
+	filter: blur(8px) brightness(0.7);
+	pointer-events: none;
+	user-select: none;
+}
+
+.prc--locked .prc__image {
+	transform: scale(0.92);
+}
+
+/* Revealed state — clear and interactive */
+.prc--revealed {
+	filter: blur(0) brightness(1);
+	pointer-events: auto;
+	user-select: auto;
+}
+
+.prc--revealed .prc__image {
+	transform: scale(1);
+}
+
+/* -----------------------------------------------
+   Card Image
+   ----------------------------------------------- */
+
+.prc__image-container {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 3 / 4;
+	overflow: hidden;
+	border-radius: 16px 16px 0 0;
+}
+
+.prc__image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* -----------------------------------------------
+   Countdown Timer Overlay
+   ----------------------------------------------- */
+
+.prc__countdown {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	z-index: 20;
+	background: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(4px);
+	transition: opacity 0.4s ease;
+}
+
+.prc--revealed .prc__countdown {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.prc__countdown-label {
+	font-size: 0.75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.2em;
+	color: var(--color-rose-gold, #B76E79);
+	margin-bottom: 12px;
+}
+
+.prc__countdown-timer {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.prc__countdown-segment {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+}
+
+.prc__countdown-value {
+	font-family: 'Space Mono', 'Courier New', monospace;
+	font-size: clamp(1.5rem, 4vw, 2.25rem);
+	font-weight: 700;
+	color: var(--color-text-primary, #fff);
+	line-height: 1;
+	min-width: 2.5ch;
+	text-align: center;
+}
+
+.prc__countdown-unit {
+	font-size: 0.5625rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.15em;
+	color: var(--color-text-muted, #999);
+}
+
+.prc__countdown-sep {
+	font-family: 'Space Mono', 'Courier New', monospace;
+	font-size: 1.5rem;
+	color: var(--color-text-muted, #999);
+	margin-bottom: 18px;
+}
+
+/* -----------------------------------------------
+   Particle Burst
+   ----------------------------------------------- */
+
+.prc__particles {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	z-index: 25;
+	overflow: hidden;
+}
+
+.prc__particles span {
+	position: absolute;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	top: 50%;
+	left: 50%;
+	opacity: 0;
+}
+
+/* Particle colors alternate rose-gold and gold */
+.prc__particles span:nth-child(odd) {
+	background: var(--color-rose-gold, #B76E79);
+}
+
+.prc__particles span:nth-child(even) {
+	background: var(--color-gold, #D4AF37);
+}
+
+/* Particle trajectories — each span has a unique direction */
+.prc__particles--active span {
+	animation: prc-burst 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.prc__particles--active span:nth-child(1)  { --tx: -80px; --ty: -120px; animation-delay: 0ms; }
+.prc__particles--active span:nth-child(2)  { --tx: 60px;  --ty: -100px; animation-delay: 30ms; }
+.prc__particles--active span:nth-child(3)  { --tx: -120px; --ty: -40px; animation-delay: 60ms; }
+.prc__particles--active span:nth-child(4)  { --tx: 100px; --ty: -60px;  animation-delay: 20ms; }
+.prc__particles--active span:nth-child(5)  { --tx: -40px; --ty: -140px; animation-delay: 80ms; }
+.prc__particles--active span:nth-child(6)  { --tx: 130px; --ty: -30px;  animation-delay: 50ms; }
+.prc__particles--active span:nth-child(7)  { --tx: -100px; --ty: 40px;  animation-delay: 40ms; }
+.prc__particles--active span:nth-child(8)  { --tx: 80px;  --ty: 60px;   animation-delay: 70ms; }
+.prc__particles--active span:nth-child(9)  { --tx: -60px; --ty: 100px;  animation-delay: 90ms; }
+.prc__particles--active span:nth-child(10) { --tx: 40px;  --ty: 80px;   animation-delay: 10ms; }
+.prc__particles--active span:nth-child(11) { --tx: -140px; --ty: 20px;  animation-delay: 60ms; }
+.prc__particles--active span:nth-child(12) { --tx: 110px; --ty: -80px;  animation-delay: 45ms; }
+
+@keyframes prc-burst {
+	0% {
+		opacity: 1;
+		transform: translate(0, 0) scale(1);
+	}
+	100% {
+		opacity: 0;
+		transform: translate(var(--tx, 0), var(--ty, 0)) scale(0.3);
+	}
+}
+
+/* -----------------------------------------------
+   Conversion Layer (extends .ipc__conversion pattern)
+   ----------------------------------------------- */
+
+.prc__conversion {
+	padding: 12px 16px 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.prc__scarcity {
+	font-size: var(--text-sm, 0.875rem);
+	color: var(--color-text-secondary, #ccc);
+	letter-spacing: var(--tracking-wide, 0.05em);
+	text-transform: uppercase;
+}
+
+.prc__stock-count {
+	font-weight: 700;
+	color: var(--color-text-primary, #fff);
+}
+
+/* Size Pills */
+.prc__sizes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.prc__size-pill {
+	padding: 4px 12px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--color-text-secondary, #ccc);
+	background: transparent;
+	border: 1px solid var(--color-border, #2a2a2a);
+	border-radius: 20px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	font-family: inherit;
+	line-height: 1.4;
+}
+
+.prc__size-pill:hover {
+	border-color: var(--color-rose-gold, #B76E79);
+	color: var(--color-text-primary, #fff);
+}
+
+.prc__size-pill--selected {
+	background: var(--color-rose-gold, #B76E79);
+	border-color: var(--color-rose-gold, #B76E79);
+	color: #000;
+}
+
+.prc__size-pill:focus-visible {
+	outline: none;
+	box-shadow: var(--focus-ring, 0 0 0 2px #B76E79);
+}
+
+.prc__size-label {
+	font-size: var(--text-sm, 0.875rem);
+	color: var(--color-text-muted, #999);
+}
+
+/* Pre-Order CTA — Pulsing Glow */
+.prc__buy-btn {
+	width: 100%;
+	padding: 14px 20px;
+	font-size: 0.9375rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	color: #000;
+	background: linear-gradient(135deg, var(--color-rose-gold, #B76E79), var(--color-gold, #D4AF37));
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-family: inherit;
+	line-height: 1.4;
+	position: relative;
+	overflow: hidden;
+	animation: prc-pulse 2s ease-in-out infinite;
+}
+
+.prc__buy-btn:hover {
+	filter: brightness(1.15);
+	transform: translateY(-2px);
+}
+
+.prc__buy-btn:active {
+	transform: scale(0.97);
+}
+
+.prc__buy-btn:focus-visible {
+	outline: none;
+	box-shadow: var(--focus-ring, 0 0 0 2px #B76E79);
+}
+
+.prc__buy-btn--loading {
+	pointer-events: none;
+	opacity: 0.7;
+	animation: none;
+}
+
+.prc__buy-btn--success {
+	background: #22c55e;
+	color: #fff;
+	animation: none;
+}
+
+@keyframes prc-pulse {
+	0%, 100% {
+		box-shadow: 0 0 15px rgba(183, 110, 121, 0.3);
+	}
+	50% {
+		box-shadow: 0 0 30px rgba(183, 110, 121, 0.6), 0 0 60px rgba(212, 175, 55, 0.2);
+	}
+}
+
+/* -----------------------------------------------
+   Product Info
+   ----------------------------------------------- */
+
+.prc__info {
+	padding: 0 16px 12px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 8px;
+}
+
+.prc__title {
+	font-size: var(--text-base, 1rem);
+	font-weight: 600;
+	color: var(--color-text-primary, #fff);
+	margin: 0;
+	line-height: var(--leading-snug, 1.3);
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.prc__collection-badge {
+	font-size: 0.625rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.15em;
+	color: var(--color-rose-gold, #B76E79);
+	white-space: nowrap;
+	padding: 3px 8px;
+	border: 1px solid rgba(183, 110, 121, 0.3);
+	border-radius: 4px;
+}
+
+/* Badge overlay */
+.prc__badge {
+	position: absolute;
+	top: 12px;
+	left: 12px;
+	padding: 4px 10px;
+	font-size: 0.625rem;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.15em;
+	color: #000;
+	background: var(--color-rose-gold, #B76E79);
+	border-radius: 4px;
+	z-index: 30;
+}
+
+/* -----------------------------------------------
+   Accessibility: Reduced Motion
+   ----------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.prc {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+
+	.prc--locked {
+		filter: brightness(0.7);
+	}
+
+	.prc--revealed {
+		filter: none;
+	}
+
+	.prc__image {
+		transition: none;
+		transform: none;
+	}
+
+	.prc__buy-btn {
+		animation: none;
+	}
+
+	.prc__particles--active span {
+		animation: none;
+	}
+}

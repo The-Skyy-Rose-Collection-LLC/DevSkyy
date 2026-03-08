@@ -1144,6 +1144,8 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-brand-ambassador',
 		'skyyrose-template-landing-engine',
 		'skyyrose-template-collection-v4',
+		'skyyrose-interactive-cards',
+		'skyyrose-preorder-reveal',
 		'skyyrose-progressive-images',
 		'skyyrose-smart-prefetch',
 		'skyyrose-scroll-enhancements',
