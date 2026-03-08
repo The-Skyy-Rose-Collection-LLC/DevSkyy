@@ -18,7 +18,7 @@
 
 ### CI Enforcement
 
-- [ ] **CI-01**: All 17 `continue-on-error: true` directives removed from ci.yml, security-gate.yml, dast-scan.yml
+- [x] **CI-01**: All 17 `continue-on-error: true` directives removed from ci.yml, security-gate.yml, dast-scan.yml
 - [x] **CI-02**: Underlying lint/type/format failures fixed so CI passes without soft failures
 - [ ] **CI-03**: PHP syntax validation step added to CI pipeline for WordPress theme files
 - [ ] **CI-04**: CI runs WordPress theme build (npm run build) and validates output
@@ -86,7 +86,7 @@
 | HOOK-06 | Phase 3 | Pending |
 | HOOK-07 | Phase 2 | Pending |
 | HOOK-08 | Phase 3 | Pending |
-| CI-01 | Phase 1 | Pending |
+| CI-01 | Phase 1 | Complete |
 | CI-02 | Phase 1 | Complete |
 | CI-03 | Phase 6 | Pending |
 | CI-04 | Phase 6 | Pending |
