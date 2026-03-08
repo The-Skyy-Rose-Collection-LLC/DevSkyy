@@ -1,0 +1,328 @@
+{
+  "total": 29,
+  "success": 24,
+  "failed": 5,
+  "results": [
+    {
+      "sku": "br-001",
+      "name": "BLACK Rose Crewneck",
+      "status": "failed"
+    },
+    {
+      "sku": "br-002",
+      "name": "BLACK Rose Joggers",
+      "status": "success",
+      "provider": "kontext",
+      "tier": 3,
+      "size_kb": 237.0,
+      "qa_score": 82,
+      "qa_pass": true,
+      "qa_issues": []
+    },
+    {
+      "sku": "br-003",
+      "name": "BLACK is Beautiful Jersey",
+      "status": "success",
+      "provider": "fal-fill",
+      "tier": 6,
+      "size_kb": 677.7,
+      "qa_score": 73,
+      "qa_pass": true,
+      "qa_issues": [
+        "The 'alternating numbers' aspect is subtly present but not strongly pronounced, as the numerical forms are predominantly stylized '2's with minor variations, rather than clearly distinct alternating numbers.",
+        "The graphic gives a slight impression of a distinct panel applied rather than a fully seamless, integrated sublimation print that completely blends with the jersey's fabric texture."
+      ]
+    },
+    {
+      "sku": "br-004",
+      "name": "BLACK Rose Hoodie",
+      "status": "failed"
+    },
+    {
+      "sku": "br-005",
+      "name": "BLACK Rose Hoodie \u2014 Signature Edition",
+      "status": "success",
+      "provider": "fal-fill",
+      "tier": 6,
+      "size_kb": 467.6,
+      "qa_score": 75,
+      "qa_pass": true,
+      "qa_issues": [
+        "The branding does not appear embossed or pressed into the fabric with subtle dimensional depth; it looks like a flat white print instead."
+      ]
+    },
+    {
+      "sku": "br-006",
+      "name": "BLACK Rose Sherpa Jacket",
+      "status": "success",
+      "provider": "reve",
+      "tier": 2,
+      "size_kb": 348.9,
+      "qa_score": 80,
+      "qa_pass": true,
+      "qa_issues": [
+        "The logos are rendered as embroidered patches on the black outer shell fabric of the jacket, rather than on sherpa fleece texture as specified in the prompt. While the jacket is a \"Sherpa Jacket\" (implying lining), the instruction specifically requested the logo application \"on sherpa fleece texture.\"",
+        "No text or numbers are present within the logo for legibility assessment."
+      ]
+    },
+    {
+      "sku": "br-007",
+      "name": "BLACK Rose \u00d7 Love Hurts Basketball Shorts",
+      "status": "success",
+      "provider": "gpt",
+      "tier": 1,
+      "size_kb": 482.7,
+      "qa_score": 95,
+      "qa_pass": true,
+      "qa_issues": []
+    },
+    {
+      "sku": "br-008",
+      "name": "Women's BLACK Rose Hooded Dress",
+      "status": "failed"
+    },
+    {
+      "sku": "lh-002",
+      "name": "Love Hurts Joggers",
+      "status": "success",
+      "provider": "kontext",
+      "tier": 3,
+      "size_kb": 180.3,
+      "qa_score": 75,
+      "qa_pass": true,
+      "qa_issues": [
+        "Material accuracy: The embroidery texture, especially for the 'thorns' part of the logo, appears somewhat flat and lacks the realistic depth and slight variations typical of actual stitched embroidery on athletic fabric. It looks a bit more like a clean patch or print in some areas rather than fully embedded stitching."
+      ]
+    },
+    {
+      "sku": "lh-003",
+      "name": "Love Hurts Basketball Shorts",
+      "status": "success",
+      "provider": "ideogram",
+      "tier": 4,
+      "size_kb": 593.2,
+      "qa_score": 98,
+      "qa_pass": true,
+      "qa_issues": []
+    },
+    {
+      "sku": "lh-004",
+      "name": "Love Hurts Varsity Jacket",
+      "status": "success",
+      "provider": "replicate",
+      "tier": 5,
+      "size_kb": 394.5,
+      "qa_score": 83,
+      "qa_pass": true,
+      "qa_issues": [
+        "Jacket material mismatch: The prompt specified 'wool/leather varsity jacket,' but the composite image displays a satin varsity jacket. While the logo's material (chenille/embroidery) is well-represented, the base garment's material type does not match the request."
+      ]
+    },
+    {
+      "sku": "lh-005",
+      "name": "Love Hurts Windbreaker",
+      "status": "success",
+      "provider": "kontext",
+      "tier": 3,
+      "size_kb": 216.7,
+      "qa_score": 83,
+      "qa_pass": true,
+      "qa_issues": [
+        "The logo appears to be a small woven label or patch attached to the windbreaker, rather than direct embroidery stitched onto the nylon fabric.",
+        "Any text or symbols within the small logo tag are not legible due to their size."
+      ]
+    },
+    {
+      "sku": "po-001",
+      "name": "Red #80 Football Jersey",
+      "status": "success",
+      "provider": "gpt",
+      "tier": 1,
+      "size_kb": 260.0,
+      "qa_score": 96,
+      "qa_pass": true,
+      "qa_issues": []
+    },
+    {
+      "sku": "po-002",
+      "name": "\"THE BAY\" Basketball Tank",
+      "status": "success",
+      "provider": "ideogram",
+      "tier": 4,
+      "size_kb": 310.4,
+      "qa_score": 98,
+      "qa_pass": true,
+      "qa_issues": []
+    },
+    {
+      "sku": "po-003",
+      "name": "White #32 Football Jersey",
+      "status": "success",
+      "provider": "ideogram",
+      "tier": 4,
+      "size_kb": 330.5,
+      "qa_score": 95,
+      "qa_pass": true,
+      "qa_issues": []
+    },
+    {
+      "sku": "po-004",
+      "name": "Black & Teal Hockey Jersey",
+      "status": "success",
+      "provider": "gpt",
+      "tier": 1,
+      "size_kb": 161.6,
+      "qa_score": 95,
+      "qa_pass": true,
+      "qa_issues": [
+        "While the quality of the new branding and material rendering in Image 2 is excellent, it represents a significant change from Image 1 beyond just 'inpainted branding'. Image 2 features short sleeves and a completely different body design (gradient vs. stripes and circular logo) compared to Image 1's long sleeves and original design. If the intent was to apply branding to Image 1's existing design, Image 2 deviates significantly. However, evaluating Image 2 purely as a composite embodying the specified logo treatment, its quality is very high."
+      ]
+    },
+    {
+      "sku": "po-005",
+      "name": "Purple GG Bridge Mesh Shorts",
+      "status": "success",
+      "provider": "gpt",
+      "tier": 1,
+      "size_kb": 160.9,
+      "qa_score": 95,
+      "qa_pass": true,
+      "qa_issues": []
+    },
+    {
+      "sku": "po-006",
+      "name": "Black Rose Crewneck & Joggers",
+      "status": "success",
+      "provider": "reve",
+      "tier": 2,
+      "size_kb": 203.3,
+      "qa_score": 95,
+      "qa_pass": true,
+      "qa_issues": []
+    },
+    {
+      "sku": "sg-001",
+      "name": "The Bay Set",
+      "status": "failed"
+    },
+    {
+      "sku": "sg-002",
+      "name": "Stay Golden Set",
+      "status": "success",
+      "provider": "kontext",
+      "tier": 3,
+      "size_kb": 301.0,
+      "qa_score": 78,
+      "qa_pass": true,
+      "qa_issues": [
+        "The logo is placed on a colorful, patterned synthetic fabric (shorts) instead of the specified 'black cotton' background.",
+        "While the logo is golden, its appearance is highly metallic and reflective, which deviates from a typical 'screen-printed' texture. It looks more like a metallic foil transfer or a metallic embroidered patch."
+      ]
+    },
+    {
+      "sku": "sg-003",
+      "name": "The Signature Tee",
+      "status": "success",
+      "provider": "gpt",
+      "tier": 1,
+      "size_kb": 261.7,
+      "qa_score": 92,
+      "qa_pass": true,
+      "qa_issues": []
+    },
+    {
+      "sku": "sg-004",
+      "name": "The Signature Hoodie",
+      "status": "success",
+      "provider": "reve",
+      "tier": 2,
+      "size_kb": 564.7,
+      "qa_score": 90,
+      "qa_pass": true,
+      "qa_issues": [
+        "The prompt specifies 'heavyweight cotton hoodie' for material accuracy, but the image depicts shorts. However, the material appears to be heavyweight cotton and the logo treatment (embroidered) is accurately depicted for the item shown."
+      ]
+    },
+    {
+      "sku": "sg-005",
+      "name": "Stay Golden Tee",
+      "status": "failed"
+    },
+    {
+      "sku": "sg-006",
+      "name": "Mint & Lavender Hoodie",
+      "status": "success",
+      "provider": "reve",
+      "tier": 2,
+      "size_kb": 427.3,
+      "qa_score": 73,
+      "qa_pass": true,
+      "qa_issues": [
+        "The logo does not appear embroidered; it looks like a flat patch or print.",
+        "The logo is not colorful; it uses two shades of brown/tan, rather than a range of distinct colors."
+      ]
+    },
+    {
+      "sku": "sg-008",
+      "name": "Signature Crop Hoodie",
+      "status": "success",
+      "provider": "kontext",
+      "tier": 3,
+      "size_kb": 346.9,
+      "qa_score": 78,
+      "qa_pass": true,
+      "qa_issues": [
+        "The small 'Skyy Rose' logo on the right chest appears to be a printed label or patch, rather than an embroidered logo as specified.",
+        "The large 'Skyy' text on the right sleeve appears to be screen-printed or transferred, rather than an embroidered logo as specified.",
+        "While the main left chest logo is plausible as embroidery, its texture and definition could be enhanced to more clearly convey an embroidered look."
+      ]
+    },
+    {
+      "sku": "sg-009",
+      "name": "The Sherpa Jacket",
+      "status": "success",
+      "provider": "reve",
+      "tier": 2,
+      "size_kb": 476.5,
+      "qa_score": 95,
+      "qa_pass": true,
+      "qa_issues": []
+    },
+    {
+      "sku": "sg-010",
+      "name": "The Bridge Series Shorts",
+      "status": "success",
+      "provider": "kontext",
+      "tier": 3,
+      "size_kb": 301.0,
+      "qa_score": 93,
+      "qa_pass": true,
+      "qa_issues": [
+        "The print does not visually represent the texture or characteristic appearance typically associated with traditional screen-printing (e.g., slightly raised ink layers, less photographic detail), appearing more like a dye-sublimated or direct-to-garment print.",
+        "The outer fabric of the shorts does not visibly display a distinct 'mesh' texture, although the material appears consistent with typical board short or swim trunk fabrics."
+      ]
+    },
+    {
+      "sku": "sg-011",
+      "name": "Original Label Tee (White)",
+      "status": "success",
+      "provider": "kontext",
+      "tier": 3,
+      "size_kb": 324.9,
+      "qa_score": 95,
+      "qa_pass": true,
+      "qa_issues": []
+    },
+    {
+      "sku": "sg-012",
+      "name": "Original Label Tee (Orchid)",
+      "status": "success",
+      "provider": "gpt",
+      "tier": 1,
+      "size_kb": 178.2,
+      "qa_score": 92,
+      "qa_pass": true,
+      "qa_issues": []
+    }
+  ]
+}

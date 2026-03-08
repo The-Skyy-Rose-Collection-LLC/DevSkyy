@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from adk.base import (
@@ -67,7 +67,7 @@ except ImportError:
 # ============================================================================
 
 
-class PipelineType(str, Enum):
+class PipelineType(StrEnum):
     """Pre-built pipeline types for SkyyRose operations."""
 
     PRODUCT_LAUNCH = "product_launch"

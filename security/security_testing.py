@@ -13,7 +13,7 @@ Comprehensive security testing for DevSkyy Platform:
 import logging
 import re
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -21,7 +21,7 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger(__name__)
 
 
-class TestResult(str, Enum):
+class TestResult(StrEnum):
     """Security test result"""
 
     PASSED = "passed"

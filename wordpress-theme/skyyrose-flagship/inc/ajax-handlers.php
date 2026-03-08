@@ -413,7 +413,7 @@ add_action( 'wp_ajax_nopriv_skyyrose_signin', 'skyyrose_ajax_signin' );
 add_action(
 	'wp_ajax_skyyrose_signin',
 	function () {
-		check_ajax_referer( 'skyyrose_signin_nonce', 'nonce' );
+		check_ajax_referer( 'skyyrose_signin', 'skyyrose_signin_nonce' );
 		wp_send_json_success(
 			array(
 				'message'      => esc_html__( 'You are already signed in.', 'skyyrose-flagship' ),

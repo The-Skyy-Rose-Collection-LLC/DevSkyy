@@ -442,7 +442,7 @@
 }
 
 .skyy-single-product__accordion-panel:not([hidden]) {
-	max-height: 600px;
+	max-height: 2000px;
 	visibility: visible;
 }
 

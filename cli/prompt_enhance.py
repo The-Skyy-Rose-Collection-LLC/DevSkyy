@@ -18,7 +18,7 @@ from __future__ import annotations
 import sys
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -90,7 +90,7 @@ def get_config() -> dict[str, Any]:
 # =============================================================================
 
 
-class TaskMode(str, Enum):
+class TaskMode(StrEnum):
     """Detected or specified task mode."""
 
     CODE = "code"
@@ -102,7 +102,7 @@ class TaskMode(str, Enum):
     AUTO = "auto"
 
 
-class OutputFormat(str, Enum):
+class OutputFormat(StrEnum):
     """Output format for enhanced prompts."""
 
     PLAIN = "plain"
@@ -110,7 +110,7 @@ class OutputFormat(str, Enum):
     JSON = "json"
 
 
-class PromptTechnique(str, Enum):
+class PromptTechnique(StrEnum):
     """Prompt engineering techniques."""
 
     CHAIN_OF_THOUGHT = "chain-of-thought"

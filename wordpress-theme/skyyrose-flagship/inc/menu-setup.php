@@ -116,7 +116,7 @@ function skyyrose_get_menu_definitions() {
 				),
 				array(
 					'title'    => __( 'Experiences', 'skyyrose-flagship' ),
-					'url'      => '#',
+					'url'      => '/experiences/',
 					'children' => array(
 						array(
 							'title' => __( 'The Garden', 'skyyrose-flagship' ),
@@ -134,7 +134,7 @@ function skyyrose_get_menu_definitions() {
 				),
 				array(
 					'title' => __( 'Pre-Order', 'skyyrose-flagship' ),
-					'url'   => '/preorder/',
+					'url'   => '/pre-order/',
 				),
 				array(
 					'title' => __( 'About', 'skyyrose-flagship' ),
@@ -159,11 +159,7 @@ function skyyrose_get_menu_definitions() {
 				),
 				array(
 					'title' => __( 'FAQ', 'skyyrose-flagship' ),
-					'url'   => '/faq/',
-				),
-				array(
-					'title' => __( 'Shipping & Returns', 'skyyrose-flagship' ),
-					'url'   => '/shipping-returns/',
+					'url'   => '/contact/#faq',
 				),
 				array(
 					'title' => __( 'Privacy Policy', 'skyyrose-flagship' ),
@@ -192,7 +188,7 @@ function skyyrose_get_menu_definitions() {
 				),
 				array(
 					'title' => __( 'Pre-Order', 'skyyrose-flagship' ),
-					'url'   => '/preorder/',
+					'url'   => '/pre-order/',
 				),
 			),
 		),
@@ -201,15 +197,15 @@ function skyyrose_get_menu_definitions() {
 			'items' => array(
 				array(
 					'title' => __( 'FAQ', 'skyyrose-flagship' ),
-					'url'   => '/faq/',
+					'url'   => '/contact/#faq',
 				),
 				array(
-					'title' => __( 'Shipping & Returns', 'skyyrose-flagship' ),
-					'url'   => '/shipping-returns/',
-				),
-				array(
-					'title' => __( 'Contact', 'skyyrose-flagship' ),
+					'title' => __( 'Contact Us', 'skyyrose-flagship' ),
 					'url'   => '/contact/',
+				),
+				array(
+					'title' => __( 'Pre-Order', 'skyyrose-flagship' ),
+					'url'   => '/pre-order/',
 				),
 			),
 		),
@@ -234,24 +230,48 @@ function skyyrose_get_menu_definitions() {
 					'url'   => '/',
 				),
 				array(
-					'title' => __( 'Collections', 'skyyrose-flagship' ),
-					'url'   => '/collections/',
+					'title'    => __( 'Collections', 'skyyrose-flagship' ),
+					'url'      => '/collections/',
+					'children' => array(
+						array(
+							'title' => __( 'Black Rose', 'skyyrose-flagship' ),
+							'url'   => '/collection-black-rose/',
+						),
+						array(
+							'title' => __( 'Love Hurts', 'skyyrose-flagship' ),
+							'url'   => '/collection-love-hurts/',
+						),
+						array(
+							'title' => __( 'Signature', 'skyyrose-flagship' ),
+							'url'   => '/collection-signature/',
+						),
+						array(
+							'title' => __( 'Kids Capsule', 'skyyrose-flagship' ),
+							'url'   => '/collection-kids-capsule/',
+						),
+					),
 				),
 				array(
-					'title' => __( 'Black Rose', 'skyyrose-flagship' ),
-					'url'   => '/collection-black-rose/',
-				),
-				array(
-					'title' => __( 'Love Hurts', 'skyyrose-flagship' ),
-					'url'   => '/collection-love-hurts/',
-				),
-				array(
-					'title' => __( 'Signature', 'skyyrose-flagship' ),
-					'url'   => '/collection-signature/',
+					'title'    => __( 'Experiences', 'skyyrose-flagship' ),
+					'url'      => '/experiences/',
+					'children' => array(
+						array(
+							'title' => __( 'The Garden', 'skyyrose-flagship' ),
+							'url'   => '/experience-black-rose/',
+						),
+						array(
+							'title' => __( 'The Ballroom', 'skyyrose-flagship' ),
+							'url'   => '/experience-love-hurts/',
+						),
+						array(
+							'title' => __( 'The Runway', 'skyyrose-flagship' ),
+							'url'   => '/experience-signature/',
+						),
+					),
 				),
 				array(
 					'title' => __( 'Pre-Order', 'skyyrose-flagship' ),
-					'url'   => '/preorder/',
+					'url'   => '/pre-order/',
 				),
 				array(
 					'title' => __( 'About', 'skyyrose-flagship' ),
@@ -309,13 +329,14 @@ add_action( 'after_switch_theme', 'skyyrose_setup_menus' );
 
 // Also run on `init` with a one-time flag so menus are created
 // even if theme was already active before this file was deployed.
+// Bump version to v400 to re-run with corrected URLs.
 add_action(
 	'init',
 	function () {
-		if ( get_option( 'skyyrose_menus_setup_v320' ) ) {
+		if ( get_option( 'skyyrose_menus_setup_v430' ) ) {
 			return;
 		}
 		skyyrose_setup_menus();
-		update_option( 'skyyrose_menus_setup_v320', true );
+		update_option( 'skyyrose_menus_setup_v430', true );
 	}
 );

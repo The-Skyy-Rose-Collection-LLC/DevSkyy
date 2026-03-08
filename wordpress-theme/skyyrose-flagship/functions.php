@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*--------------------------------------------------------------
  * Theme Constants
  *--------------------------------------------------------------*/
-define( 'SKYYROSE_VERSION', '3.2.2' );
+define( 'SKYYROSE_VERSION', '4.0.0' );
 define( 'SKYYROSE_DIR', get_template_directory() );
 define( 'SKYYROSE_URI', get_template_directory_uri() );
 
@@ -41,6 +41,7 @@ $GLOBALS['concatenate_scripts'] = false;
  * Core Includes (always loaded)
  *--------------------------------------------------------------*/
 $skyyrose_core_includes = array(
+	'/inc/ai-providers.php',
 	'/inc/theme-setup.php',
 	'/inc/product-catalog.php',
 	'/inc/enqueue.php',
@@ -55,6 +56,7 @@ $skyyrose_core_includes = array(
 	'/inc/branded-content.php',
 	'/inc/facebook-sdk.php',
 	'/inc/menu-setup.php',
+	'/inc/theme-activation-setup.php',
 );
 
 foreach ( $skyyrose_core_includes as $skyyrose_file ) {
@@ -70,6 +72,7 @@ foreach ( $skyyrose_core_includes as $skyyrose_file ) {
 if ( class_exists( 'WooCommerce' ) ) {
 	$skyyrose_woo_includes = array(
 		'/inc/woocommerce.php',
+		'/inc/wc-product-functions.php',
 		'/inc/immersive-ajax.php',
 		'/inc/wishlist-functions.php',
 		'/inc/class-wishlist-widget.php',

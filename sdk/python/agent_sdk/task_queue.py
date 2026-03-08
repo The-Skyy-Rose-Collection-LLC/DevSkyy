@@ -36,7 +36,7 @@ import json
 import logging
 import os
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import Enum, StrEnum
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ TASK_TIMEOUT = 300  # 5 minutes default
 RESULT_CHANNEL = "devskyy:results:channel"
 
 
-class TaskStatus(str, Enum):
+class TaskStatus(StrEnum):
     """Task processing status."""
 
     PENDING = "pending"

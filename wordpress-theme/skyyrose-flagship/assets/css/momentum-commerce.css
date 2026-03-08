@@ -227,7 +227,7 @@ body:has(.mc-ticker--visible) {
 }
 
 .mc-ticker__time {
-	color: rgba(255, 255, 255, 0.3);
+	color: rgba(255, 255, 255, 0.5);
 	font-size: 0.9em;
 }
 
@@ -240,7 +240,7 @@ body:has(.mc-ticker--visible) {
 	height: 20px;
 	border: none;
 	background: rgba(255, 255, 255, 0.05);
-	color: rgba(255, 255, 255, 0.3);
+	color: rgba(255, 255, 255, 0.5);
 	border-radius: 50%;
 	font-size: 0.8rem;
 	cursor: pointer;

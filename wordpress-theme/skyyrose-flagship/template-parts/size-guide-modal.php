@@ -52,15 +52,16 @@ defined( 'ABSPATH' ) || exit;
 		<!-- ====== Unit Toggle ====== -->
 		<div class="size-guide-unit-toggle" role="radiogroup"
 		     aria-label="<?php esc_attr_e( 'Measurement unit', 'skyyrose-flagship' ); ?>">
-			<button class="size-guide-unit active" role="radio" aria-checked="true" data-unit="in">IN</button>
-			<button class="size-guide-unit" role="radio" aria-checked="false" data-unit="cm">CM</button>
+			<button class="size-guide-unit active" role="radio" aria-checked="true" tabindex="0" data-unit="in">IN</button>
+			<button class="size-guide-unit" role="radio" aria-checked="false" tabindex="-1" data-unit="cm">CM</button>
 		</div>
 
 		<!-- ====== Tops Panel ====== -->
 		<div class="size-guide-panel active" id="sg-panel-tops"
-		     role="tabpanel" aria-labelledby="sg-tab-tops">
+		     role="tabpanel" aria-labelledby="sg-tab-tops" tabindex="0">
 			<div class="size-guide-chart">
 				<table>
+					<caption class="screen-reader-text"><?php esc_html_e( 'Tops Size Chart', 'skyyrose-flagship' ); ?></caption>
 					<thead>
 						<tr>
 							<th><?php esc_html_e( 'Size', 'skyyrose-flagship' ); ?></th>
@@ -86,6 +87,7 @@ defined( 'ABSPATH' ) || exit;
 		     role="tabpanel" aria-labelledby="sg-tab-bottoms" hidden>
 			<div class="size-guide-chart">
 				<table>
+					<caption class="screen-reader-text"><?php esc_html_e( 'Bottoms Size Chart', 'skyyrose-flagship' ); ?></caption>
 					<thead>
 						<tr>
 							<th><?php esc_html_e( 'Size', 'skyyrose-flagship' ); ?></th>
@@ -111,6 +113,7 @@ defined( 'ABSPATH' ) || exit;
 		     role="tabpanel" aria-labelledby="sg-tab-outerwear" hidden>
 			<div class="size-guide-chart">
 				<table>
+					<caption class="screen-reader-text"><?php esc_html_e( 'Outerwear Size Chart', 'skyyrose-flagship' ); ?></caption>
 					<thead>
 						<tr>
 							<th><?php esc_html_e( 'Size', 'skyyrose-flagship' ); ?></th>

@@ -19,8 +19,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from PIL import Image
-
-from errors.production_errors import DevSkyErrorCode, DevSkyErrorSeverity
 from services.ml.enhancement.authenticity_validator import (
     AuthenticityReport,
     AuthenticityValidationError,
@@ -59,6 +57,8 @@ from services.ml.replicate_client import (
     ReplicatePrediction,
     ReplicatePredictionStatus,
 )
+
+from errors.production_errors import DevSkyErrorCode, DevSkyErrorSeverity
 
 # =============================================================================
 # Module Imports

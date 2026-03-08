@@ -1,7 +1,7 @@
 # DevSkyy Contributor Guide
 
-**Version**: 3.3.0
-**Last Updated**: 2026-02-24
+**Version**: 3.4.0
+**Last Updated**: 2026-03-03
 **Status**: Complete
 **Source of Truth**: `package.json`, `frontend/package.json`, `.env.example`
 
@@ -1132,7 +1132,7 @@ See [ENV_VARS_REFERENCE.md](ENV_VARS_REFERENCE.md) for complete documentation.
 
 **Document Owner**: DevSkyy Platform Team
 **Next Review**: When workflow or tools change
-**Last Updated**: 2026-02-24
+**Last Updated**: 2026-03-03
 
 ---
 
@@ -1141,8 +1141,10 @@ See [ENV_VARS_REFERENCE.md](ENV_VARS_REFERENCE.md) for complete documentation.
 - **RUNBOOK.md** - Production deployment and operations
 - **ENV_VARS_REFERENCE.md** - Complete environment variable reference
 - **SCRIPTS_REFERENCE.md** - NPM scripts documentation
+- **codemaps/** - Architecture, backend, frontend, and data model codemaps
 - **CLAUDE.md** - Project-specific Claude Code instructions
 - **.claude/rules/** - Coding standards, testing, git workflow, etc.
 - **WordPress Theme** - wordpress-theme/skyyrose-flagship/ (see style.css, functions.php)
+- **AI CLI** - `python scripts/ai.py --help` (spaces, train, dataset, model subcommands)
 
 Welcome to the team! Happy coding! 🚀

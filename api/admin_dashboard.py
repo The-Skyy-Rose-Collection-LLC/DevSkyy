@@ -18,7 +18,7 @@ Version: 1.0.0
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -39,7 +39,7 @@ require_admin = RoleChecker([UserRole.ADMIN])
 # =============================================================================
 
 
-class AssetType(str, Enum):
+class AssetType(StrEnum):
     """Types of assets managed by the platform."""
 
     MODEL_3D = "3d_model"
@@ -48,7 +48,7 @@ class AssetType(str, Enum):
     TEXTURE = "texture"
 
 
-class AssetStatus(str, Enum):
+class AssetStatus(StrEnum):
     """Status of an asset in the pipeline."""
 
     PENDING = "pending"
@@ -58,7 +58,7 @@ class AssetStatus(str, Enum):
     ARCHIVED = "archived"
 
 
-class PipelineType(str, Enum):
+class PipelineType(StrEnum):
     """Types of processing pipelines."""
 
     MODEL_GENERATION = "model_generation"
@@ -67,7 +67,7 @@ class PipelineType(str, Enum):
     SYNC = "sync"
 
 
-class PipelineStatus(str, Enum):
+class PipelineStatus(StrEnum):
     """Status of a pipeline run."""
 
     QUEUED = "queued"
@@ -77,7 +77,7 @@ class PipelineStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class SyncChannel(str, Enum):
+class SyncChannel(StrEnum):
     """E-commerce sync channels."""
 
     WORDPRESS = "wordpress"
@@ -85,7 +85,7 @@ class SyncChannel(str, Enum):
     SHOPIFY = "shopify"
 
 
-class SyncStatus(str, Enum):
+class SyncStatus(StrEnum):
     """Status of a sync operation."""
 
     PENDING = "pending"
@@ -647,6 +647,65 @@ class SyncJobListResponse(BaseModel):
 
     jobs: list[SyncJobSummary] = Field(default_factory=list)
     total: int = 0
+
+
+# =============================================================================
+# WordPress AI SDK Bridge — Provider Status
+# =============================================================================
+
+
+class AIProviderStatus(BaseModel):
+    """Status of a single AI provider."""
+
+    provider: str
+    configured: bool = False
+    round_table_name: str = ""
+    capabilities: list[str] = Field(default_factory=list)
+
+
+class AIBridgeStatus(BaseModel):
+    """WordPress AI SDK bridge status for the dashboard."""
+
+    healthy: bool
+    circuit_breaker: str
+    providers: list[AIProviderStatus]
+    round_table_mapping: dict[str, str]
+
+
+@admin_dashboard_router.get("/ai-providers", response_model=AIBridgeStatus)
+async def get_ai_provider_status(
+    _user: TokenPayload = Depends(require_admin),
+) -> AIBridgeStatus:
+    """Get WordPress AI SDK provider status for the admin dashboard."""
+    from agents.core.shared.wp_ai_bridge import (
+        ROUND_TABLE_TO_WP_SDK,
+        WP_SDK_TO_ROUND_TABLE,
+        WordPressAIBridge,
+    )
+
+    bridge = WordPressAIBridge()
+    health = bridge.health_check()
+    card = bridge.to_dashboard_card()
+
+    providers = []
+    for wp_id, _info in card.get("providers", {}).items():
+        providers.append(
+            AIProviderStatus(
+                provider=wp_id,
+                configured=True,  # Will be updated with live status
+                round_table_name=WP_SDK_TO_ROUND_TABLE.get(wp_id, ""),
+                capabilities=["text_generation"]
+                + (["image_generation"] if wp_id != "anthropic" else [])
+                + ["function_calling"],
+            )
+        )
+
+    return AIBridgeStatus(
+        healthy=health.healthy,
+        circuit_breaker=health.circuit_breaker,
+        providers=providers,
+        round_table_mapping=dict(ROUND_TABLE_TO_WP_SDK),
+    )
 
 
 # Note: AdminDataStore is defined above as a separate class from AdminAssetStore

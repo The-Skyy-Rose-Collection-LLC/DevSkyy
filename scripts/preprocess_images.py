@@ -25,7 +25,7 @@ import argparse
 import subprocess
 import sys
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, NamedTuple
 
@@ -47,7 +47,7 @@ if TYPE_CHECKING:
     pass
 
 
-class QualityPreset(str, Enum):
+class QualityPreset(StrEnum):
     """Quality presets for image preprocessing."""
 
     DRAFT = "draft"  # Fast, basic processing

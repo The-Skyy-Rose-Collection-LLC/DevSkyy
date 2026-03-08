@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -24,7 +24,7 @@ from PIL import Image
 logger = logging.getLogger(__name__)
 
 
-class ControlNetMode(str, Enum):
+class ControlNetMode(StrEnum):
     """ControlNet conditioning modes."""
 
     CANNY = "canny"
@@ -32,7 +32,7 @@ class ControlNetMode(str, Enum):
     NONE = "none"
 
 
-class GenerationQuality(str, Enum):
+class GenerationQuality(StrEnum):
     """Generation quality presets."""
 
     DRAFT = "draft"  # Fast, lower quality

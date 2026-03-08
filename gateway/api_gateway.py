@@ -411,7 +411,7 @@ class APIGateway:
         # After normalization we must verify the path still starts with the
         # route prefix — traversal like /products/../../admin resolves to
         # /admin, which escapes the intended route scope.
-        raw_for_check = path  # keep the original for the prefix check
+        _raw_for_check = path  # keep the original for the prefix check
         normalized = posixpath.normpath(target_path or "/")
         if not normalized.startswith("/"):
             normalized = "/" + normalized

@@ -17,6 +17,7 @@ Components:
 Author: DevSkyy Platform Team
 Version: 1.0.0
 """
+# DEPRECATED: Import from agents.core.base instead. This file will be removed in a future version.
 
 from __future__ import annotations
 
@@ -24,7 +25,7 @@ import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from core.runtime.tool_registry import (
@@ -39,7 +40,7 @@ from core.runtime.tool_registry import (
 # =============================================================================
 
 
-class AgentCapability(str, Enum):
+class AgentCapability(StrEnum):
     """
     Agent capabilities define what an agent can do.
 
@@ -97,7 +98,7 @@ class AgentCapability(str, Enum):
     DATA_SYNC = "data_sync"
 
 
-class LLMCategory(str, Enum):
+class LLMCategory(StrEnum):
     """
     LLM routing categories for 2-LLM agreement architecture.
 
@@ -112,7 +113,7 @@ class LLMCategory(str, Enum):
     CATEGORY_C = "category_c"  # Speed-focused (Claude Haiku, GPT-3.5, Groq)
 
 
-class AgentStatus(str, Enum):
+class AgentStatus(StrEnum):
     """Agent execution status."""
 
     IDLE = "idle"

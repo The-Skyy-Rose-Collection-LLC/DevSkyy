@@ -28,7 +28,7 @@ import json
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -54,7 +54,7 @@ SUPPORTED_FORMATS = {".jpg", ".jpeg", ".png", ".webp"}
 # ============================================================================
 
 
-class ReferenceType(str, Enum):
+class ReferenceType(StrEnum):
     """Types of reference images for generation guidance."""
 
     SUBJECT = "subject"  # Character/object consistency

@@ -13,41 +13,50 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$insta_img_dir = get_theme_file_uri( 'assets/images/instagram' );
+$insta_img_path = get_theme_file_path( 'assets/images/instagram' );
+
 $insta_posts = array(
 	array(
 		'alt'      => __( 'Black Rose collection photoshoot', 'skyyrose-flagship' ),
 		'likes'    => '2.4K',
 		'comments' => '186',
+		'image'    => 'insta-1-black-rose-shoot.jpg',
 		'gradient' => 'linear-gradient(135deg, #1a0000, #3d0000)',
 	),
 	array(
 		'alt'      => __( 'Love Hurts varsity jacket detail', 'skyyrose-flagship' ),
 		'likes'    => '1.8K',
 		'comments' => '142',
+		'image'    => 'insta-2-love-hurts-detail.jpg',
 		'gradient' => 'linear-gradient(135deg, #2d1a1d, #4a2a30)',
 	),
 	array(
 		'alt'      => __( 'Oakland skyline with SkyyRose gear', 'skyyrose-flagship' ),
 		'likes'    => '3.1K',
 		'comments' => '234',
+		'image'    => 'insta-3-oakland-skyline.jpg',
 		'gradient' => 'linear-gradient(135deg, #0a0a14, #1a1a2e)',
 	),
 	array(
 		'alt'      => __( 'Signature collection behind the scenes', 'skyyrose-flagship' ),
 		'likes'    => '2.7K',
 		'comments' => '198',
+		'image'    => 'insta-4-signature-bts.jpg',
 		'gradient' => 'linear-gradient(135deg, #1a1810, #2d2820)',
 	),
 	array(
 		'alt'      => __( 'Customer wearing BLACK Rose Hoodie', 'skyyrose-flagship' ),
 		'likes'    => '4.2K',
 		'comments' => '312',
+		'image'    => 'insta-5-customer-lifestyle.jpg',
 		'gradient' => 'linear-gradient(135deg, #1a0808, #2a0a0a)',
 	),
 	array(
 		'alt'      => __( 'SkyyRose pop-up event in Oakland', 'skyyrose-flagship' ),
 		'likes'    => '5.1K',
 		'comments' => '428',
+		'image'    => 'insta-6-popup-event.jpg',
 		'gradient' => 'linear-gradient(135deg, #140a10, #2a1420)',
 	),
 );
@@ -76,11 +85,25 @@ $insta_posts = array(
 				aria-label="<?php echo esc_attr( sprintf( __( 'View %s on Instagram', 'skyyrose-flagship' ), $post['alt'] ) ); ?>"
 			>
 				<div class="instagram-feed__image" style="background: <?php echo esc_attr( $post['gradient'] ); ?>;" aria-hidden="true">
-					<svg class="instagram-feed__placeholder-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.2" aria-hidden="true" focusable="false">
-						<rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-						<path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-						<line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
-					</svg>
+					<?php
+					$insta_file = ! empty( $post['image'] ) ? $insta_img_path . '/' . $post['image'] : '';
+					if ( $insta_file && file_exists( $insta_file ) ) :
+					?>
+						<img
+							src="<?php echo esc_url( $insta_img_dir . '/' . $post['image'] ); ?>"
+							alt="<?php echo esc_attr( $post['alt'] ); ?>"
+							loading="lazy"
+							width="400"
+							height="400"
+							class="instagram-feed__photo"
+						>
+					<?php else : ?>
+						<svg class="instagram-feed__placeholder-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.2" aria-hidden="true" focusable="false">
+							<rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+							<path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+							<line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+						</svg>
+					<?php endif; ?>
 				</div>
 				<div class="instagram-feed__overlay" aria-hidden="true">
 					<span class="instagram-feed__stat">

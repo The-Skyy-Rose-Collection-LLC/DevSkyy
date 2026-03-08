@@ -24,7 +24,7 @@ import base64
 import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from io import BytesIO
 from typing import Any
 
@@ -131,7 +131,7 @@ class ChatSessionExpiredError(GeminiNativeError):
 # =============================================================================
 
 
-class AspectRatio(str, Enum):
+class AspectRatio(StrEnum):
     """Supported aspect ratios for image generation."""
 
     SQUARE = "1:1"  # 1024x1024
@@ -146,7 +146,7 @@ class AspectRatio(str, Enum):
     ULTRAWIDE = "21:9"  # 1536x672
 
 
-class ImageSize(str, Enum):
+class ImageSize(StrEnum):
     """Supported image sizes (Gemini 3 Pro only)."""
 
     SIZE_1K = "1K"  # 1120 tokens

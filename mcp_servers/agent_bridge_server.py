@@ -52,7 +52,7 @@ import json
 import logging
 import os
 import sys
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -167,14 +167,14 @@ mcp = FastMCP(
 # =============================================================================
 
 
-class ResponseFormat(str, Enum):
+class ResponseFormat(StrEnum):
     """Output format for tool responses."""
 
     MARKDOWN = "markdown"
     JSON = "json"
 
 
-class AgentType(str, Enum):
+class AgentType(StrEnum):
     """Available agent types."""
 
     COMMERCE = "commerce"

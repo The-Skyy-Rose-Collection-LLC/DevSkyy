@@ -133,7 +133,7 @@ def _wp_page(name: str, slug: str, options: dict[str, Any]) -> tuple[ScaffoldFil
 
 def _wp_archive(name: str, slug: str, options: dict[str, Any]) -> tuple[ScaffoldFile, ...]:
     """Generate WordPress FSE archive template."""
-    title = options.get("title", name)
+    _title = options.get("title", name)
     html_content = (
         '<!-- wp:template-part {"slug":"header","area":"header"} /-->\n'
         "\n"
@@ -178,7 +178,7 @@ def _wp_single(name: str, slug: str, options: dict[str, Any]) -> tuple[ScaffoldF
 
 def _wp_template_part(name: str, slug: str, options: dict[str, Any]) -> tuple[ScaffoldFile, ...]:
     """Generate WordPress FSE template part."""
-    area = options.get("area", "uncategorized")
+    _area = options.get("area", "uncategorized")
     html_content = (
         f'<!-- wp:group {{"layout":{{"type":"constrained"}}}} -->\n'
         f'<div class="wp-block-group">\n'

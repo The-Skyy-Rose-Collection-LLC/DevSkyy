@@ -26,14 +26,14 @@ import logging
 import os
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
 import httpx
 from pydantic import BaseModel, Field
 
-from agents.base_legacy import (
+from agents.core.base import (
     AgentCapability,
     AgentConfig,
     ExecutionResult,
@@ -60,7 +60,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class MeshyTaskStatus(str, Enum):
+class MeshyTaskStatus(StrEnum):
     """Meshy API task statuses."""
 
     PENDING = "PENDING"
@@ -70,7 +70,7 @@ class MeshyTaskStatus(str, Enum):
     EXPIRED = "EXPIRED"
 
 
-class MeshyArtStyle(str, Enum):
+class MeshyArtStyle(StrEnum):
     """Meshy generation art styles."""
 
     REALISTIC = "realistic"
@@ -78,21 +78,21 @@ class MeshyArtStyle(str, Enum):
     PBR = "pbr"
 
 
-class MeshyTopology(str, Enum):
+class MeshyTopology(StrEnum):
     """Mesh topology types."""
 
     QUAD = "quad"
     TRIANGLE = "triangle"
 
 
-class MeshyMode(str, Enum):
+class MeshyMode(StrEnum):
     """Meshy generation modes."""
 
     PREVIEW = "preview"
     REFINE = "refine"
 
 
-class OutputFormat(str, Enum):
+class OutputFormat(StrEnum):
     """3D model output formats."""
 
     GLB = "glb"

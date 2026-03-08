@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pre-Order Gateway — Preview</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0a;
+    color: #fff;
+    font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    min-height: 100vh;
+  }
+  .header {
+    text-align: center;
+    padding: 2.5rem 1rem 1rem;
+    border-bottom: 1px solid rgba(183,110,121,0.2);
+  }
+  .header h1 {
+    font-size: 2rem;
+    letter-spacing: 0.3em;
+    font-weight: 300;
+    color: #B76E79;
+  }
+  .header p {
+    color: #888;
+    font-size: 0.85rem;
+    margin-top: 0.4rem;
+    font-style: italic;
+  }
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.2rem 1rem;
+  }
+  .tab {
+    padding: 0.5rem 1.2rem;
+    border: 1px solid #333;
+    border-radius: 2rem;
+    background: transparent;
+    color: #888;
+    font-size: 0.8rem;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+  }
+  .tab.active {
+    background: #B76E79;
+    color: #fff;
+    border-color: #B76E79;
+  }
+  .section-title {
+    text-align: center;
+    padding: 1rem 1rem 0.5rem;
+  }
+  .section-title h2 {
+    font-size: 1.3rem;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+  }
+  .section-title p {
+    color: #666;
+    font-size: 0.75rem;
+    margin-top: 0.3rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
+    padding: 1.5rem 2rem 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .card {
+    background: #111;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #1a1a1a;
+    transition: border-color 0.3s;
+  }
+  .card:hover { border-color: #B76E79; }
+  .card-img {
+    position: relative;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    background: #e8e8e8;
+  }
+  .card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .badge {
+    position: absolute;
+    top: 0.6rem;
+    left: 0.6rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 2rem;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .badge-black-rose { background: #B76E79; color: #fff; }
+  .badge-new { background: #d4af37; color: #0a0a0a; }
+  .card-details {
+    padding: 0.8rem 1rem 1rem;
+  }
+  .card-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.3;
+    margin-bottom: 0.3rem;
+  }
+  .card-price {
+    color: #B76E79;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  .card-collection {
+    color: #555;
+    font-size: 0.7rem;
+    margin-top: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .card-edition {
+    color: #444;
+    font-size: 0.65rem;
+    margin-top: 0.2rem;
+  }
+  .card-btn {
+    display: block;
+    width: calc(100% - 2rem);
+    margin: 0 1rem 1rem;
+    padding: 0.6rem;
+    background: transparent;
+    border: 1px solid #333;
+    color: #ccc;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: all 0.3s;
+  }
+  .card-btn:hover {
+    border-color: #B76E79;
+    color: #B76E79;
+  }
+  .new-badge-ribbon {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    background: rgba(212,175,55,0.9);
+    color: #0a0a0a;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+  .divider {
+    text-align: center;
+    padding: 0.5rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .divider span {
+    display: inline-block;
+    color: #333;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    position: relative;
+    padding: 0 1rem;
+  }
+  .divider span::before, .divider span::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 80px;
+    height: 1px;
+    background: #222;
+  }
+  .divider span::before { right: 100%; }
+  .divider span::after { left: 100%; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>S K Y Y R O S E</h1>
+  <p>Luxury Grows from Concrete.</p>
+</div>
+
+<div class="tabs">
+  <div class="tab active">All</div>
+  <div class="tab" style="border-color:#B76E79;color:#B76E79;">Black Rose</div>
+  <div class="tab">Love Hurts</div>
+  <div class="tab">Signature</div>
+</div>
+
+<div class="section-title">
+  <h2>Pre-Order Collections</h2>
+  <p>Limited numbered pieces — each item individually numbered</p>
+</div>
+
+<!-- NEW DESIGNS ROW -->
+<div class="divider"><span>New Black Rose Designs</span></div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-img">
+      <img src="http://localhost:8888/wordpress-theme/skyyrose-flagship/assets/images/products/br-d01-render-front.webp" alt="Hockey Jersey">
+      <span class="badge badge-black-rose">Black Rose</span>
+      <span class="new-badge-ribbon">NEW</span>
+    </div>
+    <div class="card-details">
+      <div class="card-name">BLACK is Beautiful Hockey Jersey (Teal)</div>
+      <div class="card-price">$55</div>
+      <div class="card-collection">Black Rose Collection</div>
+      <div class="card-edition">Limited to 250 pieces</div>
+    </div>
+    <button class="card-btn">View Details</button>
+  </div>
+
+  <div class="card">
+    <div class="card-img">
+      <img src="http://localhost:8888/wordpress-theme/skyyrose-flagship/assets/images/products/br-d02-render-front.webp" alt="Football Jersey Red">
+      <span class="badge badge-black-rose">Black Rose</span>
+      <span class="new-badge-ribbon">NEW</span>
+    </div>
+    <div class="card-details">
+      <div class="card-name">BLACK is Beautiful Football Jersey (Red #80)</div>
+      <div class="card-price">$55</div>
+      <div class="card-collection">Black Rose Collection</div>
+      <div class="card-edition">Limited to 250 pieces</div>
+    </div>
+    <button class="card-btn">View Details</button>
+  </div>
+
+  <div class="card">
+    <div class="card-img">
+      <img src="http://localhost:8888/wordpress-theme/skyyrose-flagship/assets/images/products/br-d03-render-front.webp" alt="Football Jersey White">
+      <span class="badge badge-black-rose">Black Rose</span>
+      <span class="new-badge-ribbon">NEW</span>
+    </div>
+    <div class="card-details">
+      <div class="card-name">BLACK is Beautiful Football Jersey (White #32)</div>
+      <div class="card-price">$55</div>
+      <div class="card-collection">Black Rose Collection</div>
+      <div class="card-edition">Limited to 250 pieces</div>
+    </div>
+    <button class="card-btn">View Details</button>
+  </div>
+
+  <div class="card">
+    <div class="card-img">
+      <img src="http://localhost:8888/wordpress-theme/skyyrose-flagship/assets/images/products/br-d04-render-front.webp" alt="Basketball Jersey">
+      <span class="badge badge-black-rose">Black Rose</span>
+      <span class="new-badge-ribbon">NEW</span>
+    </div>
+    <div class="card-details">
+      <div class="card-name">BLACK is Beautiful Basketball Jersey</div>
+      <div class="card-price">$45</div>
+      <div class="card-collection">Black Rose Collection</div>
+      <div class="card-edition">Limited to 250 pieces</div>
+    </div>
+    <button class="card-btn">View Details</button>
+  </div>
+</div>
+
+<!-- EXISTING BR PRODUCTS -->
+<div class="divider"><span>Existing Black Rose Pre-Orders</span></div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-img">
+      <img src="http://localhost:8888/wordpress-theme/skyyrose-flagship/assets/images/products/br-002-render-front.webp" alt="BR Joggers">
+      <span class="badge badge-black-rose">Black Rose</span>
+    </div>
+    <div class="card-details">
+      <div class="card-name">BLACK Rose Joggers</div>
+      <div class="card-price">$50</div>
+      <div class="card-collection">Black Rose Collection</div>
+      <div class="card-edition">Limited to 250 pieces</div>
+    </div>
+    <button class="card-btn">View Details</button>
+  </div>
+
+  <div class="card">
+    <div class="card-img">
+      <img src="http://localhost:8888/wordpress-theme/skyyrose-flagship/assets/images/products/br-004-render-front.webp" alt="BR Hoodie">
+      <span class="badge badge-black-rose">Black Rose</span>
+    </div>
+    <div class="card-details">
+      <div class="card-name">BLACK Rose Hoodie</div>
+      <div class="card-price">$40</div>
+      <div class="card-collection">Black Rose Collection</div>
+      <div class="card-edition">Limited to 250 pieces</div>
+    </div>
+    <button class="card-btn">View Details</button>
+  </div>
+
+  <div class="card">
+    <div class="card-img">
+      <img src="http://localhost:8888/wordpress-theme/skyyrose-flagship/assets/images/products/br-005-render-front.webp" alt="BR Hoodie Signature">
+      <span class="badge badge-black-rose">Black Rose</span>
+    </div>
+    <div class="card-details">
+      <div class="card-name">BLACK Rose Hoodie — Signature Edition</div>
+      <div class="card-price">$65</div>
+      <div class="card-collection">Black Rose Collection</div>
+      <div class="card-edition">Limited to 250 pieces</div>
+    </div>
+    <button class="card-btn">View Details</button>
+  </div>
+
+  <div class="card">
+    <div class="card-img">
+      <img src="http://localhost:8888/wordpress-theme/skyyrose-flagship/assets/images/products/br-006-front-model.webp" alt="BR Sherpa">
+      <span class="badge badge-black-rose">Black Rose</span>
+    </div>
+    <div class="card-details">
+      <div class="card-name">BLACK Rose Sherpa Jacket</div>
+      <div class="card-price">$95</div>
+      <div class="card-collection">Black Rose Collection</div>
+      <div class="card-edition">Limited to 250 pieces</div>
+    </div>
+    <button class="card-btn">View Details</button>
+  </div>
+</div>
+
+</body>
+</html>

@@ -27,7 +27,7 @@ import uuid
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ BRAND_ORIGIN = "Oakland, CA"
 BRAND_SITE = "skyyrose.co"
 
 
-class Platform(str, Enum):
+class Platform(StrEnum):
     """Supported social media platforms."""
 
     INSTAGRAM = "instagram"
@@ -57,7 +57,7 @@ class Platform(str, Enum):
     FACEBOOK = "facebook"
 
 
-class ContentType(str, Enum):
+class ContentType(StrEnum):
     """Social media content types."""
 
     PRODUCT_LAUNCH = "product_launch"
@@ -67,7 +67,7 @@ class ContentType(str, Enum):
     ENGAGEMENT = "engagement"
 
 
-class PostStatus(str, Enum):
+class PostStatus(StrEnum):
     """Post lifecycle status."""
 
     DRAFT = "draft"

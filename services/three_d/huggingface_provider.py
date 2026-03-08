@@ -23,7 +23,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class HuggingFaceModel(str, Enum):
+class HuggingFaceModel(StrEnum):
     """Supported HuggingFace 3D models."""
 
     TRELLIS = "trellis"
@@ -515,7 +515,7 @@ class HuggingFaceProvider:
         try:
             # Check if gradio_client is available
             try:
-                from gradio_client import Client
+                from gradio_client import Client  # noqa: F401
 
                 GRADIO_AVAILABLE = True
             except ImportError:

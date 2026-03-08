@@ -90,6 +90,8 @@
 				// WCAG 2.4.3: Move focus into mobile menu when it opens + enable focus trap.
 				if (!expanded && mobileClose) {
 					mobileClose.focus();
+					// Guard: remove first to prevent duplicate listeners on rapid toggle.
+					mobilePanel.removeEventListener('keydown', handleMobileMenuKeydown);
 					mobilePanel.addEventListener('keydown', handleMobileMenuKeydown);
 				}
 			}
@@ -108,21 +110,51 @@
 	}
 
 	/* --------------------------------------------------
-	   Dropdown Keyboard Navigation
+	   Dropdown Navigation (Keyboard + Mobile Touch)
+	   Parent items with children: tap/Enter toggles submenu.
+	   Child items (leaves): tap/click navigates immediately.
+	   Desktop hover behaviour is CSS-only and unaffected.
 	   -------------------------------------------------- */
 
 	var dropdownToggles = document.querySelectorAll('.navbar__menu .menu-item-has-children > a, .main-navigation .menu-item-has-children > a');
+	var isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
 	dropdownToggles.forEach(function (link) {
+		// Keyboard: Enter/Space toggles submenu
 		link.addEventListener('keydown', function (e) {
 			if (e.key === 'Enter' || e.key === ' ') {
 				var parent = link.parentElement;
 				if (parent) {
 					e.preventDefault();
-					parent.classList.toggle('focus');
+					var isOpen = parent.classList.toggle('focus');
+					link.setAttribute('aria-expanded', String(isOpen));
 				}
 			}
 		});
+
+		// Touch: first tap opens submenu, does NOT navigate
+		if (isTouchDevice) {
+			link.addEventListener('click', function (e) {
+				var parent = link.parentElement;
+				if (!parent) return;
+				// If submenu is already open, allow navigation
+				if (parent.classList.contains('focus')) return;
+				// First tap — open submenu, block navigation
+				e.preventDefault();
+				// Close any other open dropdowns
+				dropdownToggles.forEach(function (other) {
+					if (other !== link && other.parentElement) {
+						other.parentElement.classList.remove('focus');
+						other.setAttribute('aria-expanded', 'false');
+					}
+				});
+				parent.classList.add('focus');
+				link.setAttribute('aria-expanded', 'true');
+			});
+		}
+
+		// Set initial aria-expanded
+		link.setAttribute('aria-expanded', 'false');
 	});
 
 	// Close dropdowns on outside click.

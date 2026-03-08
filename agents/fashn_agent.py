@@ -30,7 +30,7 @@ import os
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -39,7 +39,7 @@ import aiohttp
 from pydantic import BaseModel, Field
 from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from agents.base_legacy import (
+from agents.core.base import (
     AgentCapability,
     AgentConfig,
     ExecutionResult,
@@ -66,7 +66,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class GarmentCategory(str, Enum):
+class GarmentCategory(StrEnum):
     """Garment categories for try-on."""
 
     TOPS = "tops"
@@ -76,7 +76,7 @@ class GarmentCategory(str, Enum):
     FULL_BODY = "full_body"
 
 
-class TryOnMode(str, Enum):
+class TryOnMode(StrEnum):
     """Try-on mode."""
 
     QUALITY = "quality"  # Higher quality, slower
@@ -84,7 +84,7 @@ class TryOnMode(str, Enum):
     FAST = "fast"  # Faster, lower quality
 
 
-class FashnTaskStatus(str, Enum):
+class FashnTaskStatus(StrEnum):
     """Task status."""
 
     STARTING = "starting"

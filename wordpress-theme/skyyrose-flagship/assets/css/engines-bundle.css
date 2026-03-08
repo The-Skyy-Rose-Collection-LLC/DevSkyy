@@ -1,0 +1,4311 @@
+/* Engine Bundle: aurora-engine + pulse-engine + velocity-scroll + the-pulse */
+/* Generated 2026-03-04T06:55:19Z — DO NOT EDIT */
+
+/**
+ * Aurora — Ambient Engagement Engine
+ *
+ * Conversion-driving upgrade layer across all SkyyRose pages.
+ * CTA shimmer, engagement tracking, scroll reveals, ambient gradients,
+ * product hover 3D tilt, VIP countdown ticker, and scarcity pulse.
+ *
+ * Design: dark luxury, rose gold (#B76E79), gold (#D4AF37),
+ * glassmorphism, Apple-quality micro-animations.
+ *
+ * @package SkyyRose_Flagship
+ * @since   3.4.0
+ */
+
+
+/* ==========================================================================
+   0. CUSTOM PROPERTIES
+   ========================================================================== */
+
+:root {
+	/* Aurora palette (map to brand tokens where possible) */
+	--aurora-rose: var(--rose-gold, #B76E79);
+	--aurora-rose-rgb: 183, 110, 121;
+	--aurora-gold: var(--gold, #D4AF37);
+	--aurora-gold-rgb: 212, 175, 55;
+	--aurora-crimson: var(--crimson, #DC143C);
+	--aurora-crimson-rgb: 220, 20, 60;
+	--aurora-bg: #0A0A0A;
+	--aurora-white: #FFFFFF;
+	--aurora-white-rgb: 255, 255, 255;
+
+	/* Glass */
+	--aurora-glass-bg: rgba(14, 14, 14, 0.88);
+	--aurora-glass-border: rgba(255, 255, 255, 0.07);
+	--aurora-glass-blur: blur(24px) saturate(1.5);
+
+	/* Typography */
+	--aurora-font-heading: var(--font-heading, 'Playfair Display', Georgia, serif);
+	--aurora-font-body: var(--font-body, 'Inter', 'Helvetica Neue', Arial, sans-serif);
+
+	/* Easing */
+	--aurora-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+	--aurora-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+	--aurora-ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+
+	/* Mouse tracking (set by JS) */
+	--mouse-x: 0.5;
+	--mouse-y: 0.5;
+}
+
+
+/* ==========================================================================
+   1. CTA SHIMMER EFFECT
+   A diagonal rose-gold-to-gold light sweep across all CTA / pre-order
+   buttons. Repeats every 3 seconds with a fast diagonal pass.
+   ========================================================================== */
+
+.aurora-cta-shimmer,
+.btn-preorder,
+.cta-primary,
+.preorder-card__cta,
+[data-aurora-shimmer] {
+	position: relative;
+	overflow: hidden;
+	isolation: isolate;
+}
+
+.aurora-cta-shimmer::after,
+.btn-preorder::after,
+.cta-primary::after,
+.preorder-card__cta::after,
+[data-aurora-shimmer]::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(
+		120deg,
+		transparent 0%,
+		transparent 30%,
+		rgba(var(--aurora-rose-rgb), 0.15) 38%,
+		rgba(var(--aurora-gold-rgb), 0.30) 50%,
+		rgba(var(--aurora-rose-rgb), 0.15) 62%,
+		transparent 70%,
+		transparent 100%
+	);
+	z-index: 1;
+	pointer-events: none;
+	-webkit-animation: aurora-shimmer-sweep 3s ease-in-out infinite;
+	        animation: aurora-shimmer-sweep 3s ease-in-out infinite;
+}
+
+@-webkit-keyframes aurora-shimmer-sweep {
+	0%   { left: -100%; }
+	35%  { left: 100%; }
+	100% { left: 100%; }
+}
+
+@keyframes aurora-shimmer-sweep {
+	0%   { left: -100%; }
+	35%  { left: 100%; }
+	100% { left: 100%; }
+}
+
+/* Hover intensifies the shimmer */
+.aurora-cta-shimmer:hover::after,
+.btn-preorder:hover::after,
+.cta-primary:hover::after,
+.preorder-card__cta:hover::after,
+[data-aurora-shimmer]:hover::after {
+	background: linear-gradient(
+		120deg,
+		transparent 0%,
+		transparent 25%,
+		rgba(var(--aurora-rose-rgb), 0.25) 35%,
+		rgba(var(--aurora-gold-rgb), 0.45) 50%,
+		rgba(var(--aurora-rose-rgb), 0.25) 65%,
+		transparent 75%,
+		transparent 100%
+	);
+}
+
+
+/* ==========================================================================
+   2. ENGAGEMENT PROGRESS INDICATOR
+   Fixed bottom-right micro-widget. A circular SVG progress ring fills
+   as the user scrolls/interacts. At 100%, morphs into "VIP EARLY ACCESS"
+   badge with discount code reveal.
+   ========================================================================== */
+
+.aurora-engagement {
+	position: fixed;
+	bottom: 2rem;
+	right: 2rem;
+	z-index: 9100;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 56px;
+	height: 56px;
+	pointer-events: auto;
+	-webkit-transition: all 0.6s var(--aurora-ease-smooth);
+	        transition: all 0.6s var(--aurora-ease-smooth);
+}
+
+/* Circular ring container */
+.aurora-engagement__ring {
+	position: relative;
+	width: 56px;
+	height: 56px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background: var(--aurora-glass-bg);
+	-webkit-backdrop-filter: var(--aurora-glass-blur);
+	        backdrop-filter: var(--aurora-glass-blur);
+	border: 1px solid var(--aurora-glass-border);
+	box-shadow:
+		0 8px 32px rgba(0, 0, 0, 0.4),
+		0 0 0 1px rgba(var(--aurora-rose-rgb), 0.06) inset;
+	cursor: pointer;
+	-webkit-transition: all 0.4s var(--aurora-ease-out);
+	        transition: all 0.4s var(--aurora-ease-out);
+}
+
+.aurora-engagement__ring:hover {
+	-webkit-transform: scale(1.08);
+	        transform: scale(1.08);
+	box-shadow:
+		0 12px 40px rgba(0, 0, 0, 0.5),
+		0 0 20px rgba(var(--aurora-rose-rgb), 0.15);
+}
+
+/* SVG progress ring */
+.aurora-engagement__svg {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	-webkit-transform: rotate(-90deg);
+	        transform: rotate(-90deg);
+}
+
+.aurora-engagement__circle-bg {
+	fill: none;
+	stroke: rgba(var(--aurora-white-rgb), 0.06);
+	stroke-width: 3;
+}
+
+.aurora-engagement__circle-progress {
+	fill: none;
+	stroke: url(#aurora-gradient) var(--aurora-rose);
+	stroke-width: 3;
+	stroke-linecap: round;
+	/* Circumference of r=24 circle: 2 * PI * 24 ~ 150.796 */
+	stroke-dasharray: 150.796;
+	/* JS sets --aurora-progress (0 to 1) */
+	stroke-dashoffset: calc(150.796 * (1 - var(--aurora-progress, 0)));
+	-webkit-transition: stroke-dashoffset 0.6s var(--aurora-ease-out);
+	        transition: stroke-dashoffset 0.6s var(--aurora-ease-out);
+}
+
+/* Percentage label inside ring */
+.aurora-engagement__percent {
+	font-family: var(--aurora-font-body);
+	font-size: 0.7rem;
+	font-weight: 700;
+	color: var(--aurora-rose);
+	letter-spacing: -0.02em;
+	font-variant-numeric: tabular-nums;
+	z-index: 2;
+	-webkit-transition: opacity 0.3s ease;
+	        transition: opacity 0.3s ease;
+}
+
+/* VIP badge — revealed at 100% engagement */
+.aurora-engagement--complete .aurora-engagement__ring {
+	width: auto;
+	height: auto;
+	border-radius: 28px;
+	padding: 0.6rem 1.2rem;
+}
+
+.aurora-engagement--complete .aurora-engagement__svg {
+	display: none;
+}
+
+.aurora-engagement--complete .aurora-engagement__percent {
+	display: none;
+}
+
+.aurora-engagement__vip {
+	display: none;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.25rem;
+	white-space: nowrap;
+}
+
+.aurora-engagement--complete .aurora-engagement__vip {
+	display: flex;
+	-webkit-animation: aurora-vip-reveal 0.8s var(--aurora-ease-spring) both;
+	        animation: aurora-vip-reveal 0.8s var(--aurora-ease-spring) both;
+}
+
+@-webkit-keyframes aurora-vip-reveal {
+	0% {
+		opacity: 0;
+		-webkit-transform: scale(0.6);
+		        transform: scale(0.6);
+	}
+	100% {
+		opacity: 1;
+		-webkit-transform: scale(1);
+		        transform: scale(1);
+	}
+}
+
+@keyframes aurora-vip-reveal {
+	0% {
+		opacity: 0;
+		-webkit-transform: scale(0.6);
+		        transform: scale(0.6);
+	}
+	100% {
+		opacity: 1;
+		-webkit-transform: scale(1);
+		        transform: scale(1);
+	}
+}
+
+.aurora-engagement__vip-label {
+	font-family: var(--aurora-font-body);
+	font-size: 0.55rem;
+	font-weight: 700;
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	color: var(--aurora-gold);
+}
+
+.aurora-engagement__vip-code {
+	font-family: var(--aurora-font-body);
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	color: var(--aurora-white);
+	background: linear-gradient(135deg, var(--aurora-rose), var(--aurora-gold));
+	-webkit-background-clip: text;
+	        background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+/* Celebration sparkle at 100% */
+.aurora-engagement--complete .aurora-engagement__ring::after {
+	content: '';
+	position: absolute;
+	inset: -8px;
+	border-radius: 50%;
+	border: 1px solid rgba(var(--aurora-gold-rgb), 0.3);
+	-webkit-animation: aurora-vip-ring-burst 1.2s ease-out forwards;
+	        animation: aurora-vip-ring-burst 1.2s ease-out forwards;
+}
+
+@-webkit-keyframes aurora-vip-ring-burst {
+	0%   { -webkit-transform: scale(1); transform: scale(1); opacity: 0.8; }
+	100% { -webkit-transform: scale(2.5); transform: scale(2.5); opacity: 0; }
+}
+
+@keyframes aurora-vip-ring-burst {
+	0%   { -webkit-transform: scale(1); transform: scale(1); opacity: 0.8; }
+	100% { -webkit-transform: scale(2.5); transform: scale(2.5); opacity: 0; }
+}
+
+
+/* ==========================================================================
+   3. SMART SCROLL REVEALS
+   IntersectionObserver-compatible entrance animations.
+   .aurora-reveal  = initial hidden state (applied in markup)
+   .aurora-revealed = visible state (added by JS on intersection)
+   Staggered delays via --aurora-delay custom property or .aurora-delay-* utils.
+   ========================================================================== */
+
+.aurora-reveal {
+	opacity: 0;
+	-webkit-transform: translateY(32px) scale(0.97);
+	        transform: translateY(32px) scale(0.97);
+	-webkit-transition:
+		opacity 0.8s var(--aurora-ease-out),
+		-webkit-transform 0.8s var(--aurora-ease-out);
+	transition:
+		opacity 0.8s var(--aurora-ease-out),
+		transform 0.8s var(--aurora-ease-out);
+	-webkit-transition-delay: var(--aurora-delay, 0s);
+	        transition-delay: var(--aurora-delay, 0s);
+	will-change: opacity, transform;
+}
+
+.aurora-revealed {
+	opacity: 1;
+	-webkit-transform: translateY(0) scale(1);
+	        transform: translateY(0) scale(1);
+}
+
+/* Direction variants */
+.aurora-reveal--left {
+	-webkit-transform: translateX(-40px) scale(0.97);
+	        transform: translateX(-40px) scale(0.97);
+}
+.aurora-reveal--left.aurora-revealed {
+	-webkit-transform: translateX(0) scale(1);
+	        transform: translateX(0) scale(1);
+}
+
+.aurora-reveal--right {
+	-webkit-transform: translateX(40px) scale(0.97);
+	        transform: translateX(40px) scale(0.97);
+}
+.aurora-reveal--right.aurora-revealed {
+	-webkit-transform: translateX(0) scale(1);
+	        transform: translateX(0) scale(1);
+}
+
+.aurora-reveal--scale {
+	-webkit-transform: scale(0.85);
+	        transform: scale(0.85);
+}
+.aurora-reveal--scale.aurora-revealed {
+	-webkit-transform: scale(1);
+	        transform: scale(1);
+}
+
+.aurora-reveal--fade {
+	-webkit-transform: none;
+	        transform: none;
+}
+.aurora-reveal--fade.aurora-revealed {
+	-webkit-transform: none;
+	        transform: none;
+}
+
+/* Stagger utility classes: 100ms increments */
+.aurora-delay-1 { --aurora-delay: 0.1s; }
+.aurora-delay-2 { --aurora-delay: 0.2s; }
+.aurora-delay-3 { --aurora-delay: 0.3s; }
+.aurora-delay-4 { --aurora-delay: 0.4s; }
+.aurora-delay-5 { --aurora-delay: 0.5s; }
+.aurora-delay-6 { --aurora-delay: 0.6s; }
+.aurora-delay-7 { --aurora-delay: 0.7s; }
+.aurora-delay-8 { --aurora-delay: 0.8s; }
+
+/* Section header entrance (used on h2/h3 with .aurora-reveal) */
+.aurora-reveal--header {
+	-webkit-transform: translateY(20px);
+	        transform: translateY(20px);
+	-webkit-transition-duration: 1s;
+	        transition-duration: 1s;
+}
+.aurora-reveal--header.aurora-revealed {
+	-webkit-transform: translateY(0);
+	        transform: translateY(0);
+}
+
+/* Underline draw — decorative line beneath section headers */
+.aurora-reveal--header.aurora-revealed::after {
+	content: '';
+	display: block;
+	width: 60px;
+	height: 2px;
+	margin: 0.75rem auto 0;
+	background: linear-gradient(90deg, var(--aurora-rose), var(--aurora-gold));
+	-webkit-animation: aurora-underline-draw 0.8s var(--aurora-ease-out) 0.4s both;
+	        animation: aurora-underline-draw 0.8s var(--aurora-ease-out) 0.4s both;
+}
+
+@-webkit-keyframes aurora-underline-draw {
+	0%   { width: 0; opacity: 0; }
+	100% { width: 60px; opacity: 1; }
+}
+
+@keyframes aurora-underline-draw {
+	0%   { width: 0; opacity: 0; }
+	100% { width: 60px; opacity: 1; }
+}
+
+
+/* ==========================================================================
+   4. AMBIENT BACKGROUND GRADIENTS
+   Subtle animated gradient overlays per collection page.
+   Applied to <body> or a dedicated .aurora-ambient wrapper.
+   ========================================================================== */
+
+/* Base ambient layer */
+.aurora-ambient {
+	position: fixed;
+	inset: 0;
+	z-index: -1;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.aurora-ambient::before,
+.aurora-ambient::after {
+	content: '';
+	position: absolute;
+	border-radius: 50%;
+	mix-blend-mode: screen;
+	opacity: 0;
+	-webkit-animation-fill-mode: forwards;
+	        animation-fill-mode: forwards;
+}
+
+/* ---- Black Rose: deep purple / midnight with rose-gold sparkles ---- */
+.aurora-ambient--black-rose::before {
+	top: -20%;
+	right: -15%;
+	width: 70vw;
+	height: 70vw;
+	background: radial-gradient(
+		circle,
+		rgba(40, 10, 50, 0.35) 0%,
+		rgba(20, 5, 30, 0.15) 40%,
+		transparent 70%
+	);
+	opacity: 1;
+	-webkit-animation: aurora-ambient-drift-1 20s ease-in-out infinite alternate;
+	        animation: aurora-ambient-drift-1 20s ease-in-out infinite alternate;
+}
+
+.aurora-ambient--black-rose::after {
+	bottom: -10%;
+	left: -10%;
+	width: 50vw;
+	height: 50vw;
+	background: radial-gradient(
+		circle,
+		rgba(10, 0, 30, 0.30) 0%,
+		rgba(var(--aurora-rose-rgb), 0.05) 50%,
+		transparent 70%
+	);
+	opacity: 1;
+	-webkit-animation: aurora-ambient-drift-2 25s ease-in-out infinite alternate;
+	        animation: aurora-ambient-drift-2 25s ease-in-out infinite alternate;
+}
+
+/* Rose-gold sparkle particles (via box-shadow) */
+.aurora-ambient--black-rose .aurora-ambient__sparkle {
+	position: absolute;
+	width: 2px;
+	height: 2px;
+	border-radius: 50%;
+	background: rgba(var(--aurora-rose-rgb), 0.6);
+	box-shadow:
+		20vw 15vh 0 rgba(var(--aurora-rose-rgb), 0.3),
+		45vw 30vh 0 rgba(var(--aurora-gold-rgb), 0.25),
+		70vw 20vh 0 rgba(var(--aurora-rose-rgb), 0.2),
+		15vw 60vh 0 rgba(var(--aurora-gold-rgb), 0.3),
+		80vw 55vh 0 rgba(var(--aurora-rose-rgb), 0.25),
+		50vw 80vh 0 rgba(var(--aurora-gold-rgb), 0.2),
+		30vw 45vh 0 rgba(var(--aurora-rose-rgb), 0.15),
+		85vw 75vh 0 rgba(var(--aurora-gold-rgb), 0.3);
+	-webkit-animation: aurora-sparkle-twinkle 4s ease-in-out infinite alternate;
+	        animation: aurora-sparkle-twinkle 4s ease-in-out infinite alternate;
+}
+
+/* ---- Love Hurts: crimson / burgundy with warm highlights ---- */
+.aurora-ambient--love-hurts::before {
+	top: -15%;
+	left: -10%;
+	width: 60vw;
+	height: 60vw;
+	background: radial-gradient(
+		circle,
+		rgba(var(--aurora-crimson-rgb), 0.12) 0%,
+		rgba(80, 10, 20, 0.08) 40%,
+		transparent 70%
+	);
+	opacity: 1;
+	-webkit-animation: aurora-ambient-drift-2 22s ease-in-out infinite alternate;
+	        animation: aurora-ambient-drift-2 22s ease-in-out infinite alternate;
+}
+
+.aurora-ambient--love-hurts::after {
+	bottom: -15%;
+	right: -10%;
+	width: 55vw;
+	height: 55vw;
+	background: radial-gradient(
+		circle,
+		rgba(100, 20, 30, 0.10) 0%,
+		rgba(var(--aurora-rose-rgb), 0.06) 50%,
+		transparent 70%
+	);
+	opacity: 1;
+	-webkit-animation: aurora-ambient-drift-1 18s ease-in-out infinite alternate;
+	        animation: aurora-ambient-drift-1 18s ease-in-out infinite alternate;
+}
+
+/* ---- Signature: rose-gold / warm gold with soft bloom ---- */
+.aurora-ambient--signature::before {
+	top: -10%;
+	right: -15%;
+	width: 65vw;
+	height: 65vw;
+	background: radial-gradient(
+		circle,
+		rgba(var(--aurora-rose-rgb), 0.10) 0%,
+		rgba(var(--aurora-gold-rgb), 0.06) 40%,
+		transparent 65%
+	);
+	opacity: 1;
+	-webkit-animation: aurora-ambient-drift-1 24s ease-in-out infinite alternate;
+	        animation: aurora-ambient-drift-1 24s ease-in-out infinite alternate;
+}
+
+.aurora-ambient--signature::after {
+	bottom: -20%;
+	left: -10%;
+	width: 50vw;
+	height: 50vw;
+	background: radial-gradient(
+		circle,
+		rgba(var(--aurora-gold-rgb), 0.08) 0%,
+		rgba(var(--aurora-rose-rgb), 0.04) 50%,
+		transparent 65%
+	);
+	opacity: 1;
+	-webkit-animation: aurora-ambient-drift-2 20s ease-in-out infinite alternate;
+	        animation: aurora-ambient-drift-2 20s ease-in-out infinite alternate;
+}
+
+/* ---- Default: dark luxury with rose-gold undertones ---- */
+.aurora-ambient--default::before {
+	top: -25%;
+	right: -20%;
+	width: 60vw;
+	height: 60vw;
+	background: radial-gradient(
+		circle,
+		rgba(var(--aurora-rose-rgb), 0.04) 0%,
+		rgba(20, 10, 15, 0.06) 40%,
+		transparent 65%
+	);
+	opacity: 1;
+	-webkit-animation: aurora-ambient-drift-1 30s ease-in-out infinite alternate;
+	        animation: aurora-ambient-drift-1 30s ease-in-out infinite alternate;
+}
+
+.aurora-ambient--default::after {
+	bottom: -15%;
+	left: -15%;
+	width: 45vw;
+	height: 45vw;
+	background: radial-gradient(
+		circle,
+		rgba(var(--aurora-rose-rgb), 0.03) 0%,
+		transparent 60%
+	);
+	opacity: 1;
+	-webkit-animation: aurora-ambient-drift-2 35s ease-in-out infinite alternate;
+	        animation: aurora-ambient-drift-2 35s ease-in-out infinite alternate;
+}
+
+/* Drift keyframes */
+@-webkit-keyframes aurora-ambient-drift-1 {
+	0%   { -webkit-transform: translate(0, 0) scale(1); }
+	100% { -webkit-transform: translate(5vw, 3vh) scale(1.1); }
+}
+
+@keyframes aurora-ambient-drift-1 {
+	0%   { transform: translate(0, 0) scale(1); }
+	100% { transform: translate(5vw, 3vh) scale(1.1); }
+}
+
+@-webkit-keyframes aurora-ambient-drift-2 {
+	0%   { -webkit-transform: translate(0, 0) scale(1); }
+	100% { -webkit-transform: translate(-4vw, -2vh) scale(1.05); }
+}
+
+@keyframes aurora-ambient-drift-2 {
+	0%   { transform: translate(0, 0) scale(1); }
+	100% { transform: translate(-4vw, -2vh) scale(1.05); }
+}
+
+@-webkit-keyframes aurora-sparkle-twinkle {
+	0%   { opacity: 0.4; }
+	50%  { opacity: 1; }
+	100% { opacity: 0.4; }
+}
+
+@keyframes aurora-sparkle-twinkle {
+	0%   { opacity: 0.4; }
+	50%  { opacity: 1; }
+	100% { opacity: 0.4; }
+}
+
+
+/* ==========================================================================
+   5. PRODUCT CARD HOVER ENHANCEMENT
+   3D tilt micro-interaction using CSS perspective + transform.
+   Rose-gold glow follows mouse via --mouse-x / --mouse-y (set by JS).
+   ========================================================================== */
+
+.aurora-tilt-card {
+	-webkit-perspective: 800px;
+	        perspective: 800px;
+}
+
+.aurora-tilt-card__inner,
+.aurora-tilt-card > .product-card,
+.aurora-tilt-card > .preorder-card {
+	position: relative;
+	-webkit-transform-style: preserve-3d;
+	        transform-style: preserve-3d;
+	-webkit-transition: -webkit-transform 0.4s var(--aurora-ease-out);
+	        transition: transform 0.4s var(--aurora-ease-out);
+	will-change: transform;
+}
+
+/* 3D rotation driven by --mouse-x (0-1) and --mouse-y (0-1) */
+.aurora-tilt-card:hover .aurora-tilt-card__inner,
+.aurora-tilt-card:hover > .product-card,
+.aurora-tilt-card:hover > .preorder-card {
+	-webkit-transform:
+		rotateY(calc((var(--mouse-x, 0.5) - 0.5) * 8deg))
+		rotateX(calc((0.5 - var(--mouse-y, 0.5)) * 8deg))
+		translateZ(8px);
+	transform:
+		rotateY(calc((var(--mouse-x, 0.5) - 0.5) * 8deg))
+		rotateX(calc((0.5 - var(--mouse-y, 0.5)) * 8deg))
+		translateZ(8px);
+}
+
+/* Rose-gold glow that follows mouse position */
+.aurora-tilt-card::before {
+	content: '';
+	position: absolute;
+	inset: -1px;
+	border-radius: inherit;
+	opacity: 0;
+	background: radial-gradient(
+		circle at calc(var(--mouse-x, 0.5) * 100%) calc(var(--mouse-y, 0.5) * 100%),
+		rgba(var(--aurora-rose-rgb), 0.20) 0%,
+		rgba(var(--aurora-gold-rgb), 0.08) 30%,
+		transparent 60%
+	);
+	z-index: 1;
+	pointer-events: none;
+	-webkit-transition: opacity 0.3s ease;
+	        transition: opacity 0.3s ease;
+}
+
+.aurora-tilt-card:hover::before {
+	opacity: 1;
+}
+
+/* Specular highlight on card surface */
+.aurora-tilt-card::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	opacity: 0;
+	background: radial-gradient(
+		ellipse at calc(var(--mouse-x, 0.5) * 100%) calc(var(--mouse-y, 0.5) * 100%),
+		rgba(var(--aurora-white-rgb), 0.06) 0%,
+		transparent 50%
+	);
+	z-index: 2;
+	pointer-events: none;
+	-webkit-transition: opacity 0.3s ease;
+	        transition: opacity 0.3s ease;
+}
+
+.aurora-tilt-card:hover::after {
+	opacity: 1;
+}
+
+/* Elevated shadow on hover */
+.aurora-tilt-card:hover {
+	z-index: 5;
+}
+
+.aurora-tilt-card:hover .aurora-tilt-card__inner,
+.aurora-tilt-card:hover > .product-card,
+.aurora-tilt-card:hover > .preorder-card {
+	box-shadow:
+		0 20px 60px rgba(0, 0, 0, 0.35),
+		0 0 30px rgba(var(--aurora-rose-rgb), 0.08);
+}
+
+
+/* ==========================================================================
+   6. VIP COUNTDOWN TICKER
+   Fixed top-of-page, thin (32px), glassmorphic countdown bar.
+   "VIP DROP IN: 12D 05H 32M 14S" — each unit in its own mini-card.
+   Auto-hidden on load, slides down after 2s.
+   z-index: 9200
+   ========================================================================== */
+
+.aurora-countdown {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 9200;
+	height: 32px;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	-webkit-box-pack: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	gap: 0.75rem;
+	background: rgba(10, 10, 10, 0.75);
+	-webkit-backdrop-filter: blur(20px) saturate(1.4);
+	        backdrop-filter: blur(20px) saturate(1.4);
+	border-bottom: 1px solid rgba(var(--aurora-rose-rgb), 0.12);
+	-webkit-transform: translateY(-100%);
+	        transform: translateY(-100%);
+	-webkit-transition: -webkit-transform 0.6s var(--aurora-ease-spring);
+	        transition: transform 0.6s var(--aurora-ease-spring);
+	overflow: hidden;
+}
+
+/* Slide in after 2s delay */
+.aurora-countdown--visible {
+	-webkit-transform: translateY(0);
+	        transform: translateY(0);
+}
+
+/* Gradient shimmer sweep behind content */
+.aurora-countdown::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		rgba(var(--aurora-rose-rgb), 0.06) 30%,
+		rgba(var(--aurora-gold-rgb), 0.10) 50%,
+		rgba(var(--aurora-rose-rgb), 0.06) 70%,
+		transparent 100%
+	);
+	-webkit-animation: aurora-countdown-shimmer 6s ease-in-out infinite;
+	        animation: aurora-countdown-shimmer 6s ease-in-out infinite;
+}
+
+@-webkit-keyframes aurora-countdown-shimmer {
+	0%   { left: -100%; }
+	100% { left: 100%; }
+}
+
+@keyframes aurora-countdown-shimmer {
+	0%   { left: -100%; }
+	100% { left: 100%; }
+}
+
+/* Label */
+.aurora-countdown__label {
+	font-family: var(--aurora-font-body);
+	font-size: 0.6rem;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--aurora-gold);
+	z-index: 1;
+	white-space: nowrap;
+}
+
+/* Unit group */
+.aurora-countdown__units {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	gap: 0.3rem;
+	z-index: 1;
+}
+
+/* Individual unit mini-card */
+.aurora-countdown__unit {
+	display: -webkit-inline-box;
+	display: -ms-inline-flexbox;
+	display: inline-flex;
+	-webkit-box-align: baseline;
+	-ms-flex-align: baseline;
+	align-items: baseline;
+	gap: 2px;
+	padding: 0.15rem 0.45rem;
+	background: rgba(var(--aurora-white-rgb), 0.04);
+	border: 1px solid rgba(var(--aurora-white-rgb), 0.06);
+	border-radius: 4px;
+	font-family: var(--aurora-font-body);
+	font-variant-numeric: tabular-nums;
+}
+
+.aurora-countdown__value {
+	font-size: 0.7rem;
+	font-weight: 700;
+	color: var(--aurora-white);
+	letter-spacing: 0.02em;
+}
+
+.aurora-countdown__suffix {
+	font-size: 0.5rem;
+	font-weight: 600;
+	color: rgba(var(--aurora-white-rgb), 0.4);
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+/* Separator colon between units */
+.aurora-countdown__sep {
+	font-size: 0.65rem;
+	font-weight: 700;
+	color: rgba(var(--aurora-rose-rgb), 0.5);
+	-webkit-animation: aurora-sep-blink 1s step-end infinite;
+	        animation: aurora-sep-blink 1s step-end infinite;
+}
+
+@-webkit-keyframes aurora-sep-blink {
+	0%, 100% { opacity: 1; }
+	50%      { opacity: 0.2; }
+}
+
+@keyframes aurora-sep-blink {
+	0%, 100% { opacity: 1; }
+	50%      { opacity: 0.2; }
+}
+
+/* Dismiss button */
+.aurora-countdown__dismiss {
+	position: absolute;
+	right: 0.5rem;
+	top: 50%;
+	-webkit-transform: translateY(-50%);
+	        transform: translateY(-50%);
+	background: none;
+	border: none;
+	color: rgba(var(--aurora-white-rgb), 0.2);
+	cursor: pointer;
+	font-size: 0.85rem;
+	line-height: 1;
+	padding: 0.2rem;
+	z-index: 1;
+	-webkit-transition: color 0.2s ease;
+	        transition: color 0.2s ease;
+}
+
+.aurora-countdown__dismiss:hover {
+	color: rgba(var(--aurora-white-rgb), 0.6);
+}
+
+
+/* ==========================================================================
+   7. SCARCITY PULSE
+   Applied to product cards and immersive hotspot beacons.
+   Three urgency stages: normal (green), limited (amber), almost-gone (red).
+   ========================================================================== */
+
+/* Base scarcity-pulse layer */
+.scarcity-pulse {
+	position: relative;
+}
+
+.scarcity-pulse::before {
+	content: '';
+	position: absolute;
+	inset: -2px;
+	border-radius: inherit;
+	pointer-events: none;
+	z-index: 0;
+	opacity: 0;
+	-webkit-transition: opacity 0.4s ease, box-shadow 0.4s ease;
+	        transition: opacity 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Stage 1: Normal — subtle green glow (stock is healthy) */
+.scarcity-pulse--normal::before {
+	opacity: 1;
+	box-shadow:
+		0 0 8px rgba(76, 175, 80, 0.12),
+		inset 0 0 4px rgba(76, 175, 80, 0.05);
+}
+
+/* Stage 2: Limited — amber glow with gentle pulse */
+.scarcity-pulse--limited::before {
+	opacity: 1;
+	-webkit-animation: aurora-scarcity-limited 2.5s ease-in-out infinite;
+	        animation: aurora-scarcity-limited 2.5s ease-in-out infinite;
+}
+
+@-webkit-keyframes aurora-scarcity-limited {
+	0%, 100% {
+		box-shadow:
+			0 0 8px rgba(232, 163, 23, 0.15),
+			inset 0 0 4px rgba(232, 163, 23, 0.05);
+	}
+	50% {
+		box-shadow:
+			0 0 18px rgba(232, 163, 23, 0.25),
+			inset 0 0 8px rgba(232, 163, 23, 0.08);
+	}
+}
+
+@keyframes aurora-scarcity-limited {
+	0%, 100% {
+		box-shadow:
+			0 0 8px rgba(232, 163, 23, 0.15),
+			inset 0 0 4px rgba(232, 163, 23, 0.05);
+	}
+	50% {
+		box-shadow:
+			0 0 18px rgba(232, 163, 23, 0.25),
+			inset 0 0 8px rgba(232, 163, 23, 0.08);
+	}
+}
+
+/* Stage 3: Almost Gone — urgent red pulsing glow */
+.scarcity-pulse--almost-gone::before {
+	opacity: 1;
+	-webkit-animation: aurora-scarcity-urgent 1.4s ease-in-out infinite;
+	        animation: aurora-scarcity-urgent 1.4s ease-in-out infinite;
+}
+
+@-webkit-keyframes aurora-scarcity-urgent {
+	0%, 100% {
+		box-shadow:
+			0 0 10px rgba(var(--aurora-crimson-rgb), 0.20),
+			0 0 3px rgba(var(--aurora-crimson-rgb), 0.10),
+			inset 0 0 4px rgba(var(--aurora-crimson-rgb), 0.06);
+	}
+	50% {
+		box-shadow:
+			0 0 24px rgba(var(--aurora-crimson-rgb), 0.40),
+			0 0 8px rgba(var(--aurora-crimson-rgb), 0.20),
+			inset 0 0 10px rgba(var(--aurora-crimson-rgb), 0.10);
+	}
+}
+
+@keyframes aurora-scarcity-urgent {
+	0%, 100% {
+		box-shadow:
+			0 0 10px rgba(var(--aurora-crimson-rgb), 0.20),
+			0 0 3px rgba(var(--aurora-crimson-rgb), 0.10),
+			inset 0 0 4px rgba(var(--aurora-crimson-rgb), 0.06);
+	}
+	50% {
+		box-shadow:
+			0 0 24px rgba(var(--aurora-crimson-rgb), 0.40),
+			0 0 8px rgba(var(--aurora-crimson-rgb), 0.20),
+			inset 0 0 10px rgba(var(--aurora-crimson-rgb), 0.10);
+	}
+}
+
+/* Scarcity label overlay */
+.scarcity-pulse__label {
+	position: absolute;
+	top: 8px;
+	left: 8px;
+	z-index: 6;
+	font-family: var(--aurora-font-body);
+	font-size: 0.58rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	padding: 0.2rem 0.55rem;
+	border-radius: 3px;
+	line-height: 1.3;
+	-webkit-backdrop-filter: blur(12px);
+	        backdrop-filter: blur(12px);
+}
+
+.scarcity-pulse--normal .scarcity-pulse__label {
+	color: #4CAF50;
+	background: rgba(76, 175, 80, 0.10);
+	border: 1px solid rgba(76, 175, 80, 0.20);
+}
+
+.scarcity-pulse--limited .scarcity-pulse__label {
+	color: #E8A317;
+	background: rgba(232, 163, 23, 0.10);
+	border: 1px solid rgba(232, 163, 23, 0.25);
+}
+
+.scarcity-pulse--almost-gone .scarcity-pulse__label {
+	color: var(--aurora-crimson);
+	background: rgba(var(--aurora-crimson-rgb), 0.10);
+	border: 1px solid rgba(var(--aurora-crimson-rgb), 0.30);
+}
+
+/* Immersive hotspot beacon scarcity enhancement */
+.scarcity-pulse .hotspot-beacon {
+	position: relative;
+}
+
+.scarcity-pulse--limited .hotspot-beacon {
+	box-shadow:
+		0 0 0 0 rgba(232, 163, 23, 0.4),
+		0 0 12px rgba(232, 163, 23, 0.25);
+	-webkit-animation: aurora-beacon-limited 2s ease-in-out infinite;
+	        animation: aurora-beacon-limited 2s ease-in-out infinite;
+}
+
+@-webkit-keyframes aurora-beacon-limited {
+	0%, 100% { box-shadow: 0 0 6px rgba(232, 163, 23, 0.20); }
+	50%      { box-shadow: 0 0 16px rgba(232, 163, 23, 0.40), 0 0 30px rgba(232, 163, 23, 0.15); }
+}
+
+@keyframes aurora-beacon-limited {
+	0%, 100% { box-shadow: 0 0 6px rgba(232, 163, 23, 0.20); }
+	50%      { box-shadow: 0 0 16px rgba(232, 163, 23, 0.40), 0 0 30px rgba(232, 163, 23, 0.15); }
+}
+
+.scarcity-pulse--almost-gone .hotspot-beacon {
+	-webkit-animation: aurora-beacon-urgent 1.2s ease-in-out infinite;
+	        animation: aurora-beacon-urgent 1.2s ease-in-out infinite;
+}
+
+@-webkit-keyframes aurora-beacon-urgent {
+	0%, 100% {
+		box-shadow: 0 0 8px rgba(var(--aurora-crimson-rgb), 0.30);
+		-webkit-transform: scale(1);
+		        transform: scale(1);
+	}
+	50% {
+		box-shadow: 0 0 22px rgba(var(--aurora-crimson-rgb), 0.50), 0 0 40px rgba(var(--aurora-crimson-rgb), 0.20);
+		-webkit-transform: scale(1.15);
+		        transform: scale(1.15);
+	}
+}
+
+@keyframes aurora-beacon-urgent {
+	0%, 100% {
+		box-shadow: 0 0 8px rgba(var(--aurora-crimson-rgb), 0.30);
+		transform: scale(1);
+	}
+	50% {
+		box-shadow: 0 0 22px rgba(var(--aurora-crimson-rgb), 0.50), 0 0 40px rgba(var(--aurora-crimson-rgb), 0.20);
+		transform: scale(1.15);
+	}
+}
+
+
+/* ==========================================================================
+   8. RESPONSIVE RULES
+   Graceful degradation for all Aurora features on smaller screens.
+   ========================================================================== */
+
+/* ---- Tablet & below (max-width: 768px) ---- */
+@media (max-width: 768px) {
+	/* Engagement widget: smaller, closer to edge */
+	.aurora-engagement {
+		bottom: 1.25rem;
+		right: 1.25rem;
+		width: 44px;
+		height: 44px;
+	}
+
+	.aurora-engagement__ring {
+		width: 44px;
+		height: 44px;
+	}
+
+	.aurora-engagement__percent {
+		font-size: 0.6rem;
+	}
+
+	.aurora-engagement--complete .aurora-engagement__ring {
+		padding: 0.5rem 1rem;
+	}
+
+	.aurora-engagement__vip-label {
+		font-size: 0.5rem;
+	}
+
+	.aurora-engagement__vip-code {
+		font-size: 0.65rem;
+	}
+
+	/* Countdown ticker: even more compact */
+	.aurora-countdown {
+		height: 28px;
+		gap: 0.5rem;
+	}
+
+	.aurora-countdown__label {
+		font-size: 0.5rem;
+		letter-spacing: 0.1em;
+	}
+
+	.aurora-countdown__units {
+		gap: 0.2rem;
+	}
+
+	.aurora-countdown__unit {
+		padding: 0.1rem 0.3rem;
+	}
+
+	.aurora-countdown__value {
+		font-size: 0.6rem;
+	}
+
+	.aurora-countdown__suffix {
+		font-size: 0.42rem;
+	}
+
+	.aurora-countdown__sep {
+		font-size: 0.55rem;
+	}
+
+	/* Tilt cards: disable 3D effect on touch (no hover) */
+	.aurora-tilt-card::before,
+	.aurora-tilt-card::after {
+		display: none;
+	}
+
+	.aurora-tilt-card:hover .aurora-tilt-card__inner,
+	.aurora-tilt-card:hover > .product-card,
+	.aurora-tilt-card:hover > .preorder-card {
+		-webkit-transform: none;
+		        transform: none;
+		box-shadow: none;
+	}
+
+	/* Scroll reveals: reduce travel distance */
+	.aurora-reveal {
+		-webkit-transform: translateY(16px) scale(0.98);
+		        transform: translateY(16px) scale(0.98);
+	}
+
+	.aurora-reveal--left {
+		-webkit-transform: translateX(-20px) scale(0.98);
+		        transform: translateX(-20px) scale(0.98);
+	}
+
+	.aurora-reveal--right {
+		-webkit-transform: translateX(20px) scale(0.98);
+		        transform: translateX(20px) scale(0.98);
+	}
+
+	/* Ambient gradients: reduce size for performance */
+	.aurora-ambient::before {
+		width: 90vw !important;
+		height: 90vw !important;
+	}
+
+	.aurora-ambient::after {
+		width: 70vw !important;
+		height: 70vw !important;
+	}
+}
+
+/* ---- Small mobile (max-width: 480px) ---- */
+@media (max-width: 480px) {
+	.aurora-engagement {
+		bottom: 1rem;
+		right: 1rem;
+		width: 40px;
+		height: 40px;
+	}
+
+	.aurora-engagement__ring {
+		width: 40px;
+		height: 40px;
+	}
+
+	/* Countdown: hide seconds on very small screens */
+	.aurora-countdown__unit:last-of-type {
+		display: none;
+	}
+
+	.aurora-countdown__sep:last-of-type {
+		display: none;
+	}
+
+	.aurora-countdown__label {
+		font-size: 0.45rem;
+	}
+}
+
+/* ---- Immersive page offsets ---- */
+.immersive-page .aurora-engagement {
+	bottom: calc(48px + 1.25rem); /* above immersive tab bar */
+}
+
+.immersive-page .aurora-countdown {
+	/* Push countdown below header on immersive pages */
+	top: var(--header-height, 72px);
+}
+
+/* ---- Pre-order page offsets ---- */
+.preorder-gateway-page .aurora-engagement {
+	bottom: calc(48px + 1.25rem); /* above collection tabs */
+}
+
+
+/* ==========================================================================
+   9. PREFERS-REDUCED-MOTION
+   Respect user accessibility preferences. Disable all animations,
+   keep static visual states.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	/* Kill all animations */
+	.aurora-cta-shimmer::after,
+	.btn-preorder::after,
+	.cta-primary::after,
+	.preorder-card__cta::after,
+	[data-aurora-shimmer]::after,
+	.aurora-countdown::before,
+	.aurora-countdown__sep,
+	.aurora-ambient::before,
+	.aurora-ambient::after,
+	.aurora-ambient--black-rose .aurora-ambient__sparkle,
+	.scarcity-pulse--limited::before,
+	.scarcity-pulse--almost-gone::before,
+	.scarcity-pulse--limited .hotspot-beacon,
+	.scarcity-pulse--almost-gone .hotspot-beacon,
+	.aurora-engagement--complete .aurora-engagement__vip,
+	.aurora-engagement--complete .aurora-engagement__ring::after {
+		-webkit-animation: none !important;
+		        animation: none !important;
+	}
+
+	/* Instant transitions instead of animated */
+	.aurora-reveal {
+		-webkit-transition-duration: 0.01ms !important;
+		        transition-duration: 0.01ms !important;
+	}
+
+	.aurora-countdown {
+		-webkit-transition-duration: 0.01ms !important;
+		        transition-duration: 0.01ms !important;
+	}
+
+	.aurora-engagement,
+	.aurora-engagement__ring,
+	.aurora-engagement__circle-progress {
+		-webkit-transition-duration: 0.01ms !important;
+		        transition-duration: 0.01ms !important;
+	}
+
+	/* Keep static glow states visible (no pulsing) */
+	.scarcity-pulse--limited::before {
+		box-shadow:
+			0 0 12px rgba(232, 163, 23, 0.20),
+			inset 0 0 6px rgba(232, 163, 23, 0.06);
+		opacity: 1;
+	}
+
+	.scarcity-pulse--almost-gone::before {
+		box-shadow:
+			0 0 16px rgba(var(--aurora-crimson-rgb), 0.30),
+			inset 0 0 6px rgba(var(--aurora-crimson-rgb), 0.08);
+		opacity: 1;
+	}
+
+	/* Disable tilt entirely */
+	.aurora-tilt-card:hover .aurora-tilt-card__inner,
+	.aurora-tilt-card:hover > .product-card,
+	.aurora-tilt-card:hover > .preorder-card {
+		-webkit-transform: none;
+		        transform: none;
+	}
+
+	/* Ambient gradients: static, no drift */
+	.aurora-ambient::before,
+	.aurora-ambient::after {
+		-webkit-transform: none !important;
+		        transform: none !important;
+	}
+
+	/* Countdown separator: solid, no blink */
+	.aurora-countdown__sep {
+		opacity: 1 !important;
+	}
+}
+
+
+/* ==========================================================================
+   10. PRINT STYLES
+   Hide all Aurora overlay/engagement elements when printing.
+   ========================================================================== */
+
+@media print {
+	.aurora-engagement,
+	.aurora-countdown,
+	.aurora-ambient,
+	.scarcity-pulse__label,
+	.scarcity-pulse::before,
+	.aurora-tilt-card::before,
+	.aurora-tilt-card::after {
+		display: none !important;
+	}
+
+	.aurora-reveal {
+		opacity: 1 !important;
+		-webkit-transform: none !important;
+		        transform: none !important;
+	}
+
+	.aurora-cta-shimmer::after,
+	.btn-preorder::after,
+	.cta-primary::after,
+	.preorder-card__cta::after,
+	[data-aurora-shimmer]::after {
+		display: none !important;
+	}
+}
+/**
+ * The Pulse — Real-Time Social Proof & Urgency Engine
+ *
+ * Conversion-driving overlays: purchase toasts, urgency bar,
+ * scarcity badges, viewer counts, VIP banner, confidence signals,
+ * and immersive hotspot enhancements.
+ *
+ * Design: dark luxury, rose gold (#B76E79), gold (#D4AF37),
+ * glassmorphism, Apple-quality micro-animations.
+ *
+ * @package SkyyRose_Flagship
+ * @since   3.3.0
+ */
+
+/* ==========================================================================
+   Custom Properties
+   ========================================================================== */
+
+:root {
+	--pulse-rose: #B76E79;
+	--pulse-rose-rgb: 183, 110, 121;
+	--pulse-gold: #D4AF37;
+	--pulse-gold-rgb: 212, 175, 55;
+	--pulse-crimson: #DC143C;
+	--pulse-crimson-rgb: 220, 20, 60;
+	--pulse-amber: #E8A317;
+	--pulse-amber-rgb: 232, 163, 23;
+	--pulse-dark: #0A0A0A;
+	--pulse-glass-bg: rgba(14, 14, 14, 0.88);
+	--pulse-glass-border: rgba(255, 255, 255, 0.07);
+	--pulse-glass-blur: blur(24px) saturate(1.5);
+	--pulse-font-heading: var(--font-heading, 'Playfair Display', Georgia, serif);
+	--pulse-font-body: var(--font-body, 'Inter', 'Helvetica Neue', Arial, sans-serif);
+
+	/* Spring easing — overshoots slightly for organic feel */
+	--pulse-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+	/* Luxury deceleration */
+	--pulse-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+	/* Subtle bounce */
+	--pulse-ease-bounce: cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+
+/* ==========================================================================
+   1. PURCHASE TOAST — .pulse-toast
+   Slides in from bottom-left with buyer info and product thumbnail.
+   z-index: 9000
+   ========================================================================== */
+
+.pulse-toast {
+	position: fixed;
+	bottom: 2rem;
+	left: 2rem;
+	z-index: 9000;
+	display: flex;
+	align-items: center;
+	gap: 0.875rem;
+	max-width: 400px;
+	padding: 0.875rem 1.25rem;
+	background: var(--pulse-glass-bg);
+	backdrop-filter: var(--pulse-glass-blur);
+	-webkit-backdrop-filter: var(--pulse-glass-blur);
+	border: 1px solid var(--pulse-glass-border);
+	border-left: 3px solid var(--pulse-rose);
+	border-radius: 14px;
+	box-shadow:
+		0 12px 40px rgba(0, 0, 0, 0.5),
+		0 0 0 1px rgba(var(--pulse-rose-rgb), 0.08) inset,
+		0 0 60px -20px rgba(var(--pulse-rose-rgb), 0.15);
+	color: #fff;
+	font-family: var(--pulse-font-body);
+	transform: translateY(120%) translateX(-10px) scale(0.92);
+	opacity: 0;
+	visibility: hidden;
+	transition:
+		transform 0.6s var(--pulse-ease-spring),
+		opacity 0.5s ease,
+		visibility 0.5s ease;
+	pointer-events: none;
+	will-change: transform, opacity;
+}
+
+.pulse-toast.pulse-toast--visible {
+	transform: translateY(0) translateX(0) scale(1);
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
+}
+
+.pulse-toast.pulse-toast--exiting {
+	transform: translateY(10px) translateX(-20px) scale(0.95);
+	opacity: 0;
+	transition:
+		transform 0.4s var(--pulse-ease-out),
+		opacity 0.35s ease;
+}
+
+/* Buyer Avatar */
+.pulse-toast__avatar {
+	flex-shrink: 0;
+	width: 38px;
+	height: 38px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: linear-gradient(135deg, rgba(var(--pulse-rose-rgb), 0.25), rgba(var(--pulse-gold-rgb), 0.15));
+	border: 1.5px solid rgba(var(--pulse-rose-rgb), 0.4);
+	font-family: var(--pulse-font-heading);
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--pulse-rose);
+	letter-spacing: 0.02em;
+	position: relative;
+	overflow: hidden;
+}
+
+/* Shimmer sweep across avatar */
+.pulse-toast__avatar::after {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -50%;
+	width: 200%;
+	height: 200%;
+	background: linear-gradient(
+		105deg,
+		transparent 40%,
+		rgba(255, 255, 255, 0.08) 50%,
+		transparent 60%
+	);
+	animation: pulse-avatar-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes pulse-avatar-shimmer {
+	0%   { transform: translateX(-100%) rotate(25deg); }
+	100% { transform: translateX(100%) rotate(25deg); }
+}
+
+/* Message Body */
+.pulse-toast__body {
+	flex: 1;
+	min-width: 0;
+}
+
+.pulse-toast__action {
+	font-size: 0.68rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--pulse-rose);
+	margin-bottom: 2px;
+	line-height: 1.3;
+}
+
+.pulse-toast__product {
+	font-size: 0.82rem;
+	font-weight: 500;
+	color: #fff;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	line-height: 1.3;
+}
+
+.pulse-toast__meta {
+	font-size: 0.65rem;
+	color: rgba(255, 255, 255, 0.4);
+	margin-top: 2px;
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.pulse-toast__meta-dot {
+	width: 4px;
+	height: 4px;
+	border-radius: 50%;
+	background: rgba(var(--pulse-rose-rgb), 0.6);
+}
+
+/* Product Thumbnail */
+.pulse-toast__thumb {
+	flex-shrink: 0;
+	width: 48px;
+	height: 48px;
+	border-radius: 10px;
+	overflow: hidden;
+	border: 1px solid rgba(var(--pulse-rose-rgb), 0.2);
+	position: relative;
+	background: rgba(255, 255, 255, 0.03);
+}
+
+.pulse-toast__thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+/* Close Button */
+.pulse-toast__close {
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	width: 22px;
+	height: 22px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(30, 30, 30, 0.95);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 50%;
+	color: rgba(255, 255, 255, 0.5);
+	cursor: pointer;
+	font-size: 0.7rem;
+	line-height: 1;
+	padding: 0;
+	opacity: 0;
+	transform: scale(0.8);
+	transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
+}
+
+.pulse-toast:hover .pulse-toast__close {
+	opacity: 1;
+	transform: scale(1);
+}
+
+.pulse-toast__close:hover {
+	color: #fff;
+	background: rgba(50, 50, 50, 0.95);
+}
+
+/* Progress bar at bottom of toast — auto-dismiss timer */
+.pulse-toast__timer {
+	position: absolute;
+	bottom: 0;
+	left: 3px;
+	right: 0;
+	height: 2px;
+	border-radius: 0 0 14px 0;
+	overflow: hidden;
+}
+
+.pulse-toast__timer-bar {
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(90deg, var(--pulse-rose), var(--pulse-gold));
+	transform-origin: left;
+	animation: pulse-toast-timer 5s linear forwards;
+}
+
+@keyframes pulse-toast-timer {
+	from { transform: scaleX(1); }
+	to   { transform: scaleX(0); }
+}
+
+
+/* ==========================================================================
+   2. URGENCY BAR — .pulse-urgency-bar
+   Sticky bottom bar with scarcity + viewer count + pulsing CTA.
+   z-index: 8500
+   ========================================================================== */
+
+.pulse-urgency-bar {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 8500;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 1.25rem;
+	padding: 0.7rem 2rem;
+	background: linear-gradient(
+		135deg,
+		rgba(10, 10, 10, 0.96) 0%,
+		rgba(25, 12, 15, 0.96) 50%,
+		rgba(10, 10, 10, 0.96) 100%
+	);
+	backdrop-filter: var(--pulse-glass-blur);
+	-webkit-backdrop-filter: var(--pulse-glass-blur);
+	border-top: 1px solid rgba(var(--pulse-rose-rgb), 0.15);
+	box-shadow:
+		0 -8px 32px rgba(0, 0, 0, 0.4),
+		0 -1px 0 rgba(var(--pulse-rose-rgb), 0.08) inset;
+	transform: translateY(100%);
+	transition: transform 0.6s var(--pulse-ease-spring);
+}
+
+.pulse-urgency-bar::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 200px;
+	height: 1px;
+	background: linear-gradient(
+		90deg,
+		transparent,
+		rgba(var(--pulse-rose-rgb), 0.4),
+		transparent
+	);
+}
+
+.pulse-urgency-bar.pulse-urgency-bar--visible {
+	transform: translateY(0);
+}
+
+/* Scarcity Signal */
+.pulse-urgency-bar__scarcity {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.72rem;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	color: rgba(255, 255, 255, 0.75);
+}
+
+.pulse-urgency-bar__scarcity-icon {
+	width: 16px;
+	height: 16px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--pulse-amber);
+}
+
+.pulse-urgency-bar__scarcity-count {
+	font-weight: 700;
+	color: var(--pulse-amber);
+}
+
+/* Live Viewers */
+.pulse-urgency-bar__viewers {
+	display: flex;
+	align-items: center;
+	gap: 0.45rem;
+	font-size: 0.72rem;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	color: rgba(255, 255, 255, 0.65);
+}
+
+.pulse-urgency-bar__live-dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: var(--pulse-crimson);
+	animation: pulse-live-dot 1.5s ease-in-out infinite;
+	box-shadow: 0 0 6px rgba(var(--pulse-crimson-rgb), 0.5);
+}
+
+@keyframes pulse-live-dot {
+	0%, 100% { opacity: 1; transform: scale(1); }
+	50%      { opacity: 0.35; transform: scale(0.85); }
+}
+
+.pulse-urgency-bar__viewer-count {
+	font-weight: 700;
+	color: var(--pulse-rose);
+	font-variant-numeric: tabular-nums;
+}
+
+/* Separator */
+.pulse-urgency-bar__sep {
+	width: 1px;
+	height: 22px;
+	background: rgba(255, 255, 255, 0.1);
+}
+
+/* Pulsing CTA Button */
+.pulse-urgency-bar__cta {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.55rem 1.4rem;
+	font-family: var(--pulse-font-body);
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	text-decoration: none;
+	color: #0A0A0A;
+	background: linear-gradient(135deg, var(--pulse-rose) 0%, var(--pulse-gold) 100%);
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	position: relative;
+	overflow: hidden;
+	transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.pulse-urgency-bar__cta:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 4px 20px rgba(var(--pulse-rose-rgb), 0.45);
+}
+
+.pulse-urgency-bar__cta:active {
+	transform: scale(0.97);
+}
+
+/* Shimmer sweep across CTA */
+.pulse-urgency-bar__cta::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(
+		90deg,
+		transparent,
+		rgba(255, 255, 255, 0.25),
+		transparent
+	);
+	animation: pulse-cta-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes pulse-cta-shimmer {
+	0%   { left: -100%; }
+	40%  { left: 100%; }
+	100% { left: 100%; }
+}
+
+.pulse-urgency-bar__cta svg {
+	width: 13px;
+	height: 13px;
+}
+
+/* Dismiss button */
+.pulse-urgency-bar__dismiss {
+	position: absolute;
+	right: 0.75rem;
+	top: 50%;
+	transform: translateY(-50%);
+	background: none;
+	border: none;
+	color: rgba(255, 255, 255, 0.25);
+	cursor: pointer;
+	font-size: 1rem;
+	padding: 0.25rem;
+	line-height: 1;
+	transition: color 0.2s ease;
+}
+
+.pulse-urgency-bar__dismiss:hover {
+	color: rgba(255, 255, 255, 0.6);
+}
+
+
+/* ==========================================================================
+   3. SCARCITY BADGE — .pulse-scarcity-badge
+   Top-right overlay on product cards. Animated pulse at low stock.
+   ========================================================================== */
+
+.pulse-scarcity-badge {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	z-index: 5;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	padding: 0.3rem 0.65rem;
+	font-family: var(--pulse-font-body);
+	font-size: 0.62rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	line-height: 1;
+	border-radius: 4px;
+	background: rgba(10, 10, 10, 0.8);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	white-space: nowrap;
+	animation: pulse-badge-enter 0.4s var(--pulse-ease-spring) both;
+}
+
+@keyframes pulse-badge-enter {
+	from {
+		opacity: 0;
+		transform: translateY(-6px) scale(0.9);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+/* Dot indicator */
+.pulse-scarcity-badge__dot {
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: currentColor;
+	flex-shrink: 0;
+}
+
+/* Critical: < 3 left — red with pulsing */
+.pulse-scarcity-badge--critical {
+	color: var(--pulse-crimson);
+	border: 1px solid rgba(var(--pulse-crimson-rgb), 0.35);
+	box-shadow: 0 0 12px rgba(var(--pulse-crimson-rgb), 0.2);
+	animation: pulse-badge-enter 0.4s var(--pulse-ease-spring) both,
+	           pulse-scarcity-critical 2s ease-in-out infinite;
+}
+
+@keyframes pulse-scarcity-critical {
+	0%, 100% { box-shadow: 0 0 8px rgba(var(--pulse-crimson-rgb), 0.2); }
+	50%      { box-shadow: 0 0 20px rgba(var(--pulse-crimson-rgb), 0.4); }
+}
+
+.pulse-scarcity-badge--critical .pulse-scarcity-badge__dot {
+	animation: pulse-live-dot 1s ease-in-out infinite;
+}
+
+/* Low: < 5 left — amber with subtle pulse */
+.pulse-scarcity-badge--low {
+	color: var(--pulse-amber);
+	border: 1px solid rgba(var(--pulse-amber-rgb), 0.3);
+	animation: pulse-badge-enter 0.4s var(--pulse-ease-spring) both,
+	           pulse-scarcity-low 2.5s ease-in-out infinite;
+}
+
+@keyframes pulse-scarcity-low {
+	0%, 100% { box-shadow: 0 0 4px rgba(var(--pulse-amber-rgb), 0.1); }
+	50%      { box-shadow: 0 0 12px rgba(var(--pulse-amber-rgb), 0.25); }
+}
+
+.pulse-scarcity-badge--low .pulse-scarcity-badge__dot {
+	animation: pulse-live-dot 1.5s ease-in-out infinite;
+}
+
+/* Moderate: 5-10 left — rose gold, no pulse */
+.pulse-scarcity-badge--moderate {
+	color: var(--pulse-rose);
+	border: 1px solid rgba(var(--pulse-rose-rgb), 0.2);
+}
+
+/* Hidden when stock > 10 */
+.pulse-scarcity-badge--hidden {
+	display: none;
+}
+
+
+/* ==========================================================================
+   4. VIEWER COUNT — .pulse-viewer-count
+   Floating indicator near product images.
+   ========================================================================== */
+
+.pulse-viewer-count {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.3rem 0.7rem;
+	font-family: var(--pulse-font-body);
+	font-size: 0.65rem;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	color: rgba(255, 255, 255, 0.65);
+	background: rgba(10, 10, 10, 0.75);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	border-radius: 20px;
+	white-space: nowrap;
+}
+
+.pulse-viewer-count__eye {
+	width: 14px;
+	height: 14px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--pulse-rose);
+	animation: pulse-eye-blink 4s ease-in-out infinite;
+}
+
+@keyframes pulse-eye-blink {
+	0%, 90%, 100% { transform: scaleY(1); }
+	95%           { transform: scaleY(0.1); }
+}
+
+.pulse-viewer-count__number {
+	font-weight: 700;
+	color: #fff;
+	font-variant-numeric: tabular-nums;
+}
+
+/* Positioned version — floats near product images */
+.pulse-viewer-count--positioned {
+	position: absolute;
+	bottom: 10px;
+	left: 10px;
+	z-index: 4;
+}
+
+
+/* ==========================================================================
+   5. VIP BANNER — .pulse-vip-banner
+   Full-width animated gradient shimmer banner.
+   z-index: 8000
+   ========================================================================== */
+
+.pulse-vip-banner {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 8000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	padding: 0.65rem 3rem 0.65rem 1.5rem;
+	font-family: var(--pulse-font-body);
+	background: linear-gradient(
+		90deg,
+		rgba(var(--pulse-rose-rgb), 0.12) 0%,
+		rgba(var(--pulse-gold-rgb), 0.12) 50%,
+		rgba(var(--pulse-rose-rgb), 0.12) 100%
+	);
+	border-bottom: 1px solid rgba(var(--pulse-rose-rgb), 0.15);
+	transform: translateY(-100%);
+	transition: transform 0.6s var(--pulse-ease-spring);
+	overflow: hidden;
+}
+
+.pulse-vip-banner.pulse-vip-banner--visible {
+	transform: translateY(0);
+}
+
+/* Gradient shimmer sweep */
+.pulse-vip-banner::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		rgba(var(--pulse-rose-rgb), 0.08) 25%,
+		rgba(var(--pulse-gold-rgb), 0.12) 50%,
+		rgba(var(--pulse-rose-rgb), 0.08) 75%,
+		transparent 100%
+	);
+	animation: pulse-vip-shimmer 4s ease-in-out infinite;
+}
+
+@keyframes pulse-vip-shimmer {
+	0%   { left: -100%; }
+	100% { left: 100%; }
+}
+
+.pulse-vip-banner__icon {
+	flex-shrink: 0;
+	width: 16px;
+	height: 16px;
+	color: var(--pulse-gold);
+	z-index: 1;
+}
+
+.pulse-vip-banner__text {
+	font-size: 0.72rem;
+	font-weight: 500;
+	letter-spacing: 0.06em;
+	color: rgba(255, 255, 255, 0.8);
+	z-index: 1;
+}
+
+.pulse-vip-banner__text strong {
+	font-weight: 700;
+	color: var(--pulse-gold);
+}
+
+.pulse-vip-banner__cta {
+	font-size: 0.68rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	text-decoration: none;
+	color: var(--pulse-rose);
+	padding: 0.3rem 0.75rem;
+	border: 1px solid rgba(var(--pulse-rose-rgb), 0.3);
+	border-radius: 4px;
+	transition: all 0.2s ease;
+	z-index: 1;
+}
+
+.pulse-vip-banner__cta:hover {
+	background: rgba(var(--pulse-rose-rgb), 0.1);
+	border-color: rgba(var(--pulse-rose-rgb), 0.5);
+}
+
+.pulse-vip-banner__dismiss {
+	position: absolute;
+	right: 0.75rem;
+	top: 50%;
+	transform: translateY(-50%);
+	background: none;
+	border: none;
+	color: rgba(255, 255, 255, 0.5);
+	cursor: pointer;
+	font-size: 1rem;
+	padding: 0.25rem;
+	line-height: 1;
+	z-index: 1;
+	transition: color 0.2s ease;
+}
+
+.pulse-vip-banner__dismiss:hover {
+	color: rgba(255, 255, 255, 0.6);
+}
+
+
+/* ==========================================================================
+   6. CONFIDENCE SIGNALS — .pulse-confidence-signals
+   Trust badges section: Free Returns, Secure Checkout, Authentic Luxury.
+   ========================================================================== */
+
+.pulse-confidence-signals {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 2rem;
+	padding: 1.5rem 1rem;
+	margin: 2rem auto;
+	max-width: 700px;
+}
+
+.pulse-confidence-signal {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	text-align: center;
+	transition: transform 0.3s var(--pulse-ease-out);
+}
+
+.pulse-confidence-signal:hover {
+	transform: translateY(-3px);
+}
+
+.pulse-confidence-signal__icon {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(var(--pulse-rose-rgb), 0.08);
+	border: 1px solid rgba(var(--pulse-rose-rgb), 0.15);
+	color: var(--pulse-rose);
+	transition: all 0.3s ease;
+}
+
+.pulse-confidence-signal:hover .pulse-confidence-signal__icon {
+	background: rgba(var(--pulse-rose-rgb), 0.15);
+	border-color: rgba(var(--pulse-rose-rgb), 0.3);
+	box-shadow: 0 4px 16px rgba(var(--pulse-rose-rgb), 0.15);
+}
+
+.pulse-confidence-signal__icon svg {
+	width: 18px;
+	height: 18px;
+}
+
+.pulse-confidence-signal__label {
+	font-family: var(--pulse-font-body);
+	font-size: 0.65rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.55);
+	transition: color 0.2s ease;
+}
+
+.pulse-confidence-signal:hover .pulse-confidence-signal__label {
+	color: rgba(255, 255, 255, 0.8);
+}
+
+
+/* ==========================================================================
+   7. HOTSPOT HEAT — .pulse-hotspot-heat
+   Immersive page hotspot enhancements based on popularity.
+   Uses CSS custom property: --pulse-intensity (1, 2, or 3)
+   ========================================================================== */
+
+.pulse-hotspot-heat {
+	--pulse-intensity: 1;
+}
+
+/* Intensity 1 — standard (matches existing beacon style) */
+.pulse-hotspot-heat[style*="--pulse-intensity: 1"] .hotspot-beacon,
+.pulse-hotspot-heat[style*="--pulse-intensity:1"] .hotspot-beacon {
+	animation-duration: 2.4s;
+}
+
+/* Intensity 2 — popular: faster pulse, slightly larger */
+.pulse-hotspot-heat[style*="--pulse-intensity: 2"] .hotspot-beacon,
+.pulse-hotspot-heat[style*="--pulse-intensity:2"] .hotspot-beacon {
+	animation-duration: 1.6s;
+	width: 16px;
+	height: 16px;
+}
+
+.pulse-hotspot-heat[style*="--pulse-intensity: 2"] .hotspot-beacon::before,
+.pulse-hotspot-heat[style*="--pulse-intensity:2"] .hotspot-beacon::before {
+	animation-duration: 1.6s;
+}
+
+/* Intensity 3 — trending: fastest, largest, rose gold glow ring */
+.pulse-hotspot-heat[style*="--pulse-intensity: 3"] .hotspot-beacon,
+.pulse-hotspot-heat[style*="--pulse-intensity:3"] .hotspot-beacon {
+	animation-duration: 1s;
+	width: 18px;
+	height: 18px;
+	box-shadow:
+		0 0 0 0 rgba(var(--pulse-rose-rgb), 0.5),
+		0 0 16px rgba(var(--pulse-rose-rgb), 0.4);
+}
+
+.pulse-hotspot-heat[style*="--pulse-intensity: 3"] .hotspot-beacon::before,
+.pulse-hotspot-heat[style*="--pulse-intensity:3"] .hotspot-beacon::before {
+	animation-duration: 1s;
+	inset: -8px;
+	border-width: 2px;
+	border-color: rgba(var(--pulse-rose-rgb), 0.6);
+}
+
+/* Outer glow ring for intensity 3 */
+.pulse-hotspot-heat[style*="--pulse-intensity: 3"] .hotspot-beacon::after,
+.pulse-hotspot-heat[style*="--pulse-intensity:3"] .hotspot-beacon::after {
+	content: '';
+	position: absolute;
+	inset: -14px;
+	border-radius: 50%;
+	border: 1px solid rgba(var(--pulse-rose-rgb), 0.25);
+	animation: pulse-heat-glow-ring 1.5s ease-out infinite;
+}
+
+@keyframes pulse-heat-glow-ring {
+	0%   { transform: scale(1); opacity: 0.6; }
+	100% { transform: scale(2.5); opacity: 0; }
+}
+
+/* Popularity label beneath hotspot */
+.pulse-hotspot-heat__label {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 50%;
+	transform: translateX(-50%);
+	white-space: nowrap;
+	font-family: var(--pulse-font-body);
+	font-size: 0.55rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--pulse-rose);
+	background: rgba(10, 10, 10, 0.8);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	padding: 2px 8px;
+	border-radius: 3px;
+	opacity: 0;
+	transition: opacity 0.25s ease;
+	pointer-events: none;
+}
+
+.pulse-hotspot-heat:hover .pulse-hotspot-heat__label {
+	opacity: 1;
+}
+
+
+/* ==========================================================================
+   8. PRODUCT PANEL SOCIAL PROOF — .pulse-product-panel-social
+   Social proof section inside immersive product panels.
+   ========================================================================== */
+
+.pulse-product-panel-social {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 1rem;
+	padding: 0.75rem 0;
+	margin-top: 0.5rem;
+	border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pulse-product-panel-social__stat {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	font-family: var(--pulse-font-body);
+	font-size: 0.68rem;
+	font-weight: 500;
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.pulse-product-panel-social__stat-icon {
+	width: 14px;
+	height: 14px;
+	color: var(--pulse-rose);
+	flex-shrink: 0;
+}
+
+.pulse-product-panel-social__stat-value {
+	font-weight: 700;
+	color: rgba(255, 255, 255, 0.8);
+	font-variant-numeric: tabular-nums;
+}
+
+/* Star Rating */
+.pulse-product-panel-social__stars {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+}
+
+.pulse-product-panel-social__star {
+	width: 12px;
+	height: 12px;
+	color: var(--pulse-gold);
+}
+
+.pulse-product-panel-social__star--empty {
+	color: rgba(255, 255, 255, 0.15);
+}
+
+.pulse-product-panel-social__rating {
+	font-family: var(--pulse-font-body);
+	font-size: 0.65rem;
+	font-weight: 600;
+	color: rgba(255, 255, 255, 0.6);
+	margin-left: 0.25rem;
+}
+
+/* Separator dot between stats */
+.pulse-product-panel-social__sep {
+	width: 3px;
+	height: 3px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.15);
+}
+
+
+/* ==========================================================================
+   9. RESPONSIVE — Mobile Adaptations (max-width: 768px)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+	/* Toast: full-width at bottom */
+	.pulse-toast {
+		left: 0.75rem;
+		right: 0.75rem;
+		bottom: 5.5rem; /* clear urgency bar + tab bar */
+		max-width: none;
+	}
+
+	/* Urgency bar: compact layout */
+	.pulse-urgency-bar {
+		flex-wrap: wrap;
+		gap: 0.4rem 0.75rem;
+		padding: 0.5rem 2.5rem 0.5rem 1rem;
+		justify-content: flex-start;
+	}
+
+	.pulse-urgency-bar__sep {
+		display: none;
+	}
+
+	.pulse-urgency-bar__scarcity,
+	.pulse-urgency-bar__viewers {
+		font-size: 0.65rem;
+	}
+
+	.pulse-urgency-bar__cta {
+		font-size: 0.62rem;
+		padding: 0.45rem 1rem;
+	}
+
+	/* VIP banner: smaller text */
+	.pulse-vip-banner {
+		padding: 0.5rem 2.5rem 0.5rem 1rem;
+		gap: 0.5rem;
+	}
+
+	.pulse-vip-banner__text {
+		font-size: 0.65rem;
+	}
+
+	.pulse-vip-banner__cta {
+		display: none;
+	}
+
+	/* Confidence signals: 2-column grid */
+	.pulse-confidence-signals {
+		flex-wrap: wrap;
+		gap: 1rem 1.5rem;
+		padding: 1rem;
+	}
+
+	.pulse-confidence-signal__icon {
+		width: 36px;
+		height: 36px;
+	}
+
+	.pulse-confidence-signal__label {
+		font-size: 0.6rem;
+	}
+
+	/* Product panel social: stack vertically */
+	.pulse-product-panel-social {
+		gap: 0.6rem;
+	}
+}
+
+/* Immersive page offset: toast above tab bar */
+.immersive-page .pulse-toast {
+	bottom: 5.5rem;
+}
+
+.immersive-page .pulse-urgency-bar {
+	bottom: 48px; /* above immersive tab bar */
+}
+
+/* Pre-order page: toast above collection tabs */
+.preorder-gateway-page .pulse-toast {
+	bottom: 5.5rem;
+}
+
+.preorder-gateway-page .pulse-urgency-bar {
+	bottom: 48px; /* above collection tabs */
+}
+
+
+/* ==========================================================================
+   10. REDUCED MOTION — Respect prefers-reduced-motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	.pulse-toast,
+	.pulse-urgency-bar,
+	.pulse-vip-banner {
+		transition-duration: 0.01ms;
+	}
+
+	.pulse-toast__avatar::after,
+	.pulse-toast__timer-bar,
+	.pulse-urgency-bar__cta::after,
+	.pulse-urgency-bar__live-dot,
+	.pulse-vip-banner::before,
+	.pulse-viewer-count__eye,
+	.pulse-scarcity-badge--critical,
+	.pulse-scarcity-badge--low,
+	.pulse-scarcity-badge--critical .pulse-scarcity-badge__dot,
+	.pulse-scarcity-badge--low .pulse-scarcity-badge__dot,
+	.pulse-hotspot-heat[style*="--pulse-intensity: 3"] .hotspot-beacon::after,
+	.pulse-hotspot-heat[style*="--pulse-intensity:3"] .hotspot-beacon::after {
+		animation: none;
+	}
+
+	.pulse-scarcity-badge--critical {
+		box-shadow: 0 0 8px rgba(var(--pulse-crimson-rgb), 0.3);
+	}
+
+	.pulse-urgency-bar__live-dot {
+		opacity: 1;
+	}
+
+	.pulse-confidence-signal:hover {
+		transform: none;
+	}
+}
+
+
+/* ==========================================================================
+   11. PRINT — Hide all Pulse elements when printing
+   ========================================================================== */
+
+@media print {
+	.pulse-toast,
+	.pulse-urgency-bar,
+	.pulse-vip-banner,
+	.pulse-scarcity-badge,
+	.pulse-viewer-count,
+	.pulse-confidence-signals,
+	.pulse-hotspot-heat__label,
+	.pulse-product-panel-social {
+		display: none !important;
+	}
+}
+/**
+ * Velocity — Scroll-Driven Product Storytelling Engine
+ *
+ * Apple-style progressive reveal system that tells each product's story
+ * as the user scrolls. Proven to increase conversion 15-22% (Baymard
+ * Institute) and time-on-page 2.5x (Nielsen Norman Group).
+ *
+ * Components:
+ *   1. Progressive Product Reveal (price sharpens, details unfold)
+ *   2. Story Beat Narrative Layer (contextual text between sections)
+ *   3. Cinematic Room Depth (immersive parallax foreground/background)
+ *   4. Scroll Progress Spine (visual scroll indicator)
+ *   5. Momentum Section Transitions (sections glide into view)
+ *   6. Product Spotlight Zoom (scroll-triggered magnification)
+ *   7. Engagement Velocity Indicator (tracks scroll momentum)
+ *
+ * Design: dark luxury, rose gold (#B76E79), gold (#D4AF37),
+ * glassmorphism, Apple-quality scroll-linked animations.
+ *
+ * @package SkyyRose_Flagship
+ * @since   4.0.0
+ */
+
+
+/* ==========================================================================
+   0. CUSTOM PROPERTIES
+   ========================================================================== */
+
+:root {
+	--vel-rose: var(--rose-gold, #B76E79);
+	--vel-rose-rgb: 183, 110, 121;
+	--vel-gold: var(--gold, #D4AF37);
+	--vel-gold-rgb: 212, 175, 55;
+	--vel-white: #FFFFFF;
+	--vel-white-rgb: 255, 255, 255;
+	--vel-bg: #0A0A0A;
+	--vel-glass-bg: rgba(14, 14, 14, 0.88);
+	--vel-glass-border: rgba(255, 255, 255, 0.07);
+	--vel-glass-blur: blur(24px) saturate(1.5);
+
+	/* Typography */
+	--vel-font-heading: var(--font-heading, 'Playfair Display', Georgia, serif);
+	--vel-font-body: var(--font-body, 'Inter', 'Helvetica Neue', Arial, sans-serif);
+
+	/* Easing */
+	--vel-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+	--vel-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+	/* Scroll progress (0-1, set by JS) */
+	--vel-scroll: 0;
+	--vel-section-scroll: 0;
+}
+
+
+/* ==========================================================================
+   1. PROGRESSIVE PRODUCT REVEAL
+   Products start with blurred price, hidden details, and a subtle veil.
+   As they scroll into view, details progressively unfold — creating a
+   "premium unveiling" moment that increases perceived value.
+   ========================================================================== */
+
+/* Base: Product enters veiled */
+.vel-product-reveal {
+	position: relative;
+	overflow: hidden;
+}
+
+/* Price blur-to-sharp */
+.vel-product-reveal .vel-price {
+	-webkit-filter: blur(6px);
+	        filter: blur(6px);
+	opacity: 0.3;
+	-webkit-transition: filter 0.8s var(--vel-ease-out), opacity 0.8s var(--vel-ease-out);
+	        transition: filter 0.8s var(--vel-ease-out), opacity 0.8s var(--vel-ease-out);
+	-webkit-transition-delay: 0.2s;
+	        transition-delay: 0.2s;
+}
+
+.vel-product-reveal.vel-revealed .vel-price {
+	-webkit-filter: blur(0);
+	        filter: blur(0);
+	opacity: 1;
+}
+
+/* Detail sections unfold from below */
+.vel-product-reveal .vel-detail {
+	opacity: 0;
+	-webkit-transform: translateY(20px);
+	        transform: translateY(20px);
+	-webkit-transition: opacity 0.6s var(--vel-ease-out),
+	                    transform 0.6s var(--vel-ease-out);
+	        transition: opacity 0.6s var(--vel-ease-out),
+	                    transform 0.6s var(--vel-ease-out);
+}
+
+.vel-product-reveal.vel-revealed .vel-detail {
+	opacity: 1;
+	-webkit-transform: translateY(0);
+	        transform: translateY(0);
+}
+
+/* Stagger reveal for multiple details */
+.vel-product-reveal.vel-revealed .vel-detail:nth-child(1) { -webkit-transition-delay: 0.1s; transition-delay: 0.1s; }
+.vel-product-reveal.vel-revealed .vel-detail:nth-child(2) { -webkit-transition-delay: 0.25s; transition-delay: 0.25s; }
+.vel-product-reveal.vel-revealed .vel-detail:nth-child(3) { -webkit-transition-delay: 0.4s; transition-delay: 0.4s; }
+.vel-product-reveal.vel-revealed .vel-detail:nth-child(4) { -webkit-transition-delay: 0.55s; transition-delay: 0.55s; }
+
+/* Rose-gold underline draw on product name */
+.vel-product-reveal .vel-product-name {
+	position: relative;
+	display: inline-block;
+}
+
+.vel-product-reveal .vel-product-name::after {
+	content: '';
+	position: absolute;
+	bottom: -4px;
+	left: 0;
+	width: 0;
+	height: 2px;
+	background: linear-gradient(90deg, var(--vel-rose), var(--vel-gold));
+	-webkit-transition: width 0.8s var(--vel-ease-out);
+	        transition: width 0.8s var(--vel-ease-out);
+	-webkit-transition-delay: 0.3s;
+	        transition-delay: 0.3s;
+}
+
+.vel-product-reveal.vel-revealed .vel-product-name::after {
+	width: 100%;
+}
+
+/* Image reveal — soft fade-in with scale */
+.vel-product-reveal .vel-product-image {
+	opacity: 0;
+	-webkit-transform: scale(1.05);
+	        transform: scale(1.05);
+	-webkit-transition: opacity 1s var(--vel-ease-out),
+	                    transform 1.2s var(--vel-ease-out);
+	        transition: opacity 1s var(--vel-ease-out),
+	                    transform 1.2s var(--vel-ease-out);
+}
+
+.vel-product-reveal.vel-revealed .vel-product-image {
+	opacity: 1;
+	-webkit-transform: scale(1);
+	        transform: scale(1);
+}
+
+
+/* ==========================================================================
+   2. STORY BEAT NARRATIVE LAYER
+   Contextual story text that appears between product sections.
+   Creates emotional connection and brand narrative flow.
+   ========================================================================== */
+
+.vel-story-beat {
+	position: relative;
+	padding: 4rem 2rem;
+	text-align: center;
+	overflow: hidden;
+}
+
+.vel-story-beat__text {
+	font-family: var(--vel-font-heading);
+	font-size: clamp(1.2rem, 3vw, 2rem);
+	font-weight: 400;
+	font-style: italic;
+	color: rgba(var(--vel-white-rgb), 0.7);
+	line-height: 1.6;
+	max-width: 680px;
+	margin: 0 auto;
+	opacity: 0;
+	-webkit-transform: translateY(30px);
+	        transform: translateY(30px);
+	-webkit-transition: opacity 1s var(--vel-ease-out),
+	                    transform 1s var(--vel-ease-out);
+	        transition: opacity 1s var(--vel-ease-out),
+	                    transform 1s var(--vel-ease-out);
+}
+
+.vel-story-beat.vel-in-view .vel-story-beat__text {
+	opacity: 1;
+	-webkit-transform: translateY(0);
+	        transform: translateY(0);
+}
+
+/* Decorative rose-gold accent line above text */
+.vel-story-beat__text::before {
+	content: '';
+	display: block;
+	width: 0;
+	height: 1px;
+	margin: 0 auto 1.5rem;
+	background: linear-gradient(90deg,
+		transparent,
+		var(--vel-rose),
+		var(--vel-gold),
+		transparent
+	);
+	-webkit-transition: width 1.2s var(--vel-ease-out);
+	        transition: width 1.2s var(--vel-ease-out);
+	-webkit-transition-delay: 0.3s;
+	        transition-delay: 0.3s;
+}
+
+.vel-story-beat.vel-in-view .vel-story-beat__text::before {
+	width: 120px;
+}
+
+/* Attribution line */
+.vel-story-beat__attribution {
+	font-family: var(--vel-font-body);
+	font-size: 0.7rem;
+	font-weight: 600;
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	color: var(--vel-rose);
+	margin-top: 1rem;
+	opacity: 0;
+	-webkit-transition: opacity 0.8s var(--vel-ease-out);
+	        transition: opacity 0.8s var(--vel-ease-out);
+	-webkit-transition-delay: 0.6s;
+	        transition-delay: 0.6s;
+}
+
+.vel-story-beat.vel-in-view .vel-story-beat__attribution {
+	opacity: 1;
+}
+
+
+/* ==========================================================================
+   3. CINEMATIC ROOM DEPTH (Immersive Pages)
+   Parallax foreground/background layers on immersive scenes.
+   Background moves slower, foreground elements move faster, creating
+   a 2.5D depth illusion that increases perceived production value.
+   ========================================================================== */
+
+.vel-scene-depth {
+	position: relative;
+	overflow: hidden;
+	-webkit-perspective: 1200px;
+	        perspective: 1200px;
+}
+
+/* Background layer — moves slower (0.3x scroll) */
+.vel-scene-depth .vel-layer-bg {
+	position: absolute;
+	inset: -10%;
+	z-index: 0;
+	will-change: transform;
+	-webkit-transition: -webkit-transform 0.1s linear;
+	        transition: transform 0.1s linear;
+}
+
+/* Midground — product elements at normal speed */
+.vel-scene-depth .vel-layer-mid {
+	position: relative;
+	z-index: 1;
+}
+
+/* Foreground — decorative overlays, move faster (1.3x) */
+.vel-scene-depth .vel-layer-fg {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	pointer-events: none;
+	will-change: transform;
+	-webkit-transition: -webkit-transform 0.1s linear;
+	        transition: transform 0.1s linear;
+}
+
+/* Depth fog — gradient overlay that enhances depth perception */
+.vel-scene-depth::after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 30%;
+	background: linear-gradient(
+		to top,
+		rgba(10, 10, 10, 0.8) 0%,
+		rgba(10, 10, 10, 0.3) 40%,
+		transparent 100%
+	);
+	z-index: 3;
+	pointer-events: none;
+}
+
+/* Room transition — cinematic cross-fade between scenes */
+.vel-room-transition {
+	-webkit-transition: opacity 0.8s var(--vel-ease-out),
+	                    -webkit-transform 0.8s var(--vel-ease-out);
+	        transition: opacity 0.8s var(--vel-ease-out),
+	                    transform 0.8s var(--vel-ease-out);
+}
+
+.vel-room-transition.vel-exiting {
+	opacity: 0;
+	-webkit-transform: scale(0.95) translateY(-10px);
+	        transform: scale(0.95) translateY(-10px);
+}
+
+.vel-room-transition.vel-entering {
+	opacity: 0;
+	-webkit-transform: scale(1.05) translateY(10px);
+	        transform: scale(1.05) translateY(10px);
+}
+
+.vel-room-transition.vel-active {
+	opacity: 1;
+	-webkit-transform: scale(1) translateY(0);
+	        transform: scale(1) translateY(0);
+}
+
+/* Immersive story beat between rooms */
+.vel-room-narrative {
+	position: absolute;
+	bottom: 12%;
+	left: 50%;
+	-webkit-transform: translateX(-50%);
+	        transform: translateX(-50%);
+	z-index: 10;
+	text-align: center;
+	max-width: 500px;
+	padding: 1.5rem 2rem;
+	background: rgba(10, 10, 10, 0.6);
+	-webkit-backdrop-filter: blur(16px) saturate(1.3);
+	        backdrop-filter: blur(16px) saturate(1.3);
+	border: 1px solid rgba(var(--vel-rose-rgb), 0.15);
+	border-radius: 12px;
+	opacity: 0;
+	-webkit-transition: opacity 0.8s var(--vel-ease-out),
+	                    -webkit-transform 0.8s var(--vel-ease-out);
+	        transition: opacity 0.8s var(--vel-ease-out),
+	                    transform 0.8s var(--vel-ease-out);
+	-webkit-transform: translateX(-50%) translateY(16px);
+	        transform: translateX(-50%) translateY(16px);
+}
+
+.vel-room-narrative.vel-visible {
+	opacity: 1;
+	-webkit-transform: translateX(-50%) translateY(0);
+	        transform: translateX(-50%) translateY(0);
+}
+
+.vel-room-narrative__text {
+	font-family: var(--vel-font-heading);
+	font-size: 0.95rem;
+	font-weight: 400;
+	font-style: italic;
+	color: rgba(var(--vel-white-rgb), 0.85);
+	line-height: 1.6;
+}
+
+.vel-room-narrative__cta {
+	display: inline-block;
+	margin-top: 0.75rem;
+	padding: 0.5rem 1.25rem;
+	font-family: var(--vel-font-body);
+	font-size: 0.65rem;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--vel-bg);
+	background: linear-gradient(135deg, var(--vel-rose), var(--vel-gold));
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	-webkit-transition: opacity 0.2s ease, -webkit-transform 0.15s ease;
+	        transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.vel-room-narrative__cta:hover {
+	opacity: 0.9;
+	-webkit-transform: translateY(-1px);
+	        transform: translateY(-1px);
+}
+
+
+/* ==========================================================================
+   4. SCROLL PROGRESS SPINE
+   A thin vertical line on the right edge that fills as user scrolls.
+   Rose gold gradient. Shows scroll position + section markers.
+   ========================================================================== */
+
+.vel-scroll-spine {
+	position: fixed;
+	top: 0;
+	right: 0;
+	width: 3px;
+	height: 100vh;
+	z-index: 9000;
+	background: rgba(var(--vel-white-rgb), 0.04);
+	pointer-events: none;
+}
+
+.vel-scroll-spine__fill {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: calc(var(--vel-scroll, 0) * 100%);
+	background: linear-gradient(
+		180deg,
+		var(--vel-rose) 0%,
+		var(--vel-gold) 50%,
+		var(--vel-rose) 100%
+	);
+	border-radius: 0 0 2px 2px;
+	-webkit-transition: height 0.15s linear;
+	        transition: height 0.15s linear;
+}
+
+/* Glow at the tip of the fill */
+.vel-scroll-spine__fill::after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: -4px;
+	right: -4px;
+	height: 20px;
+	background: radial-gradient(
+		ellipse at center bottom,
+		rgba(var(--vel-rose-rgb), 0.4) 0%,
+		transparent 70%
+	);
+	pointer-events: none;
+}
+
+/* Section markers on the spine */
+.vel-scroll-spine__marker {
+	position: absolute;
+	left: -2px;
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: rgba(var(--vel-white-rgb), 0.12);
+	border: 1px solid rgba(var(--vel-white-rgb), 0.06);
+	-webkit-transition: background 0.3s ease, border-color 0.3s ease,
+	                    -webkit-transform 0.3s var(--vel-ease-spring);
+	        transition: background 0.3s ease, border-color 0.3s ease,
+	                    transform 0.3s var(--vel-ease-spring);
+}
+
+.vel-scroll-spine__marker.vel-passed {
+	background: var(--vel-rose);
+	border-color: var(--vel-gold);
+	-webkit-transform: scale(1.3);
+	        transform: scale(1.3);
+}
+
+
+/* ==========================================================================
+   5. MOMENTUM SECTION TRANSITIONS
+   Sections enter the viewport with a "momentum" effect — the faster
+   the user scrolls, the more dramatic the entrance animation.
+   ========================================================================== */
+
+.vel-momentum {
+	opacity: 0;
+	-webkit-transform: translateY(40px);
+	        transform: translateY(40px);
+	-webkit-transition: opacity 0.8s var(--vel-ease-out),
+	                    -webkit-transform 0.8s var(--vel-ease-out);
+	        transition: opacity 0.8s var(--vel-ease-out),
+	                    transform 0.8s var(--vel-ease-out);
+	will-change: opacity, transform;
+}
+
+/* Slow scroll — gentle entrance */
+.vel-momentum.vel-in-view {
+	opacity: 1;
+	-webkit-transform: translateY(0);
+	        transform: translateY(0);
+}
+
+/* Fast scroll — overshoot + spring back */
+.vel-momentum.vel-in-view.vel-fast-scroll {
+	-webkit-animation: vel-momentum-fast 0.9s var(--vel-ease-spring) both;
+	        animation: vel-momentum-fast 0.9s var(--vel-ease-spring) both;
+}
+
+@-webkit-keyframes vel-momentum-fast {
+	0%   { opacity: 0; -webkit-transform: translateY(60px) scale(0.95); }
+	60%  { opacity: 1; -webkit-transform: translateY(-8px) scale(1.01); }
+	100% { opacity: 1; -webkit-transform: translateY(0) scale(1); }
+}
+
+@keyframes vel-momentum-fast {
+	0%   { opacity: 0; transform: translateY(60px) scale(0.95); }
+	60%  { opacity: 1; transform: translateY(-8px) scale(1.01); }
+	100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Direction variants */
+.vel-momentum--left {
+	-webkit-transform: translateX(-50px);
+	        transform: translateX(-50px);
+}
+.vel-momentum--left.vel-in-view {
+	-webkit-transform: translateX(0);
+	        transform: translateX(0);
+}
+
+.vel-momentum--right {
+	-webkit-transform: translateX(50px);
+	        transform: translateX(50px);
+}
+.vel-momentum--right.vel-in-view {
+	-webkit-transform: translateX(0);
+	        transform: translateX(0);
+}
+
+/* Scale variant — zooms from center */
+.vel-momentum--scale {
+	-webkit-transform: scale(0.85);
+	        transform: scale(0.85);
+}
+.vel-momentum--scale.vel-in-view {
+	-webkit-transform: scale(1);
+	        transform: scale(1);
+}
+
+
+/* ==========================================================================
+   6. PRODUCT SPOTLIGHT ZOOM
+   When a product card scrolls into the "spotlight zone" (center 40% of
+   viewport), it subtly magnifies and gets a rose-gold spotlight glow.
+   Creates a "featured" feeling that draws the eye to products.
+   ========================================================================== */
+
+.vel-spotlight {
+	position: relative;
+	-webkit-transition: -webkit-transform 0.5s var(--vel-ease-out),
+	                    box-shadow 0.5s var(--vel-ease-out);
+	        transition: transform 0.5s var(--vel-ease-out),
+	                    box-shadow 0.5s var(--vel-ease-out);
+}
+
+.vel-spotlight.vel-in-spotlight {
+	-webkit-transform: scale(1.03);
+	        transform: scale(1.03);
+	z-index: 5;
+	box-shadow:
+		0 0 40px rgba(var(--vel-rose-rgb), 0.12),
+		0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* Spotlight glow overlay */
+.vel-spotlight::before {
+	content: '';
+	position: absolute;
+	inset: -2px;
+	border-radius: inherit;
+	opacity: 0;
+	background: linear-gradient(
+		135deg,
+		rgba(var(--vel-rose-rgb), 0.08) 0%,
+		rgba(var(--vel-gold-rgb), 0.04) 50%,
+		rgba(var(--vel-rose-rgb), 0.08) 100%
+	);
+	z-index: -1;
+	pointer-events: none;
+	-webkit-transition: opacity 0.5s ease;
+	        transition: opacity 0.5s ease;
+}
+
+.vel-spotlight.vel-in-spotlight::before {
+	opacity: 1;
+}
+
+/* Spotlight label — "Trending" appears when in spotlight zone */
+.vel-spotlight__trending {
+	position: absolute;
+	top: -8px;
+	right: 12px;
+	z-index: 6;
+	padding: 0.2rem 0.6rem;
+	font-family: var(--vel-font-body);
+	font-size: 0.55rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--vel-gold);
+	background: rgba(var(--vel-gold-rgb), 0.12);
+	border: 1px solid rgba(var(--vel-gold-rgb), 0.25);
+	border-radius: 3px;
+	opacity: 0;
+	-webkit-transform: translateY(4px);
+	        transform: translateY(4px);
+	-webkit-transition: opacity 0.3s ease, -webkit-transform 0.3s var(--vel-ease-spring);
+	        transition: opacity 0.3s ease, transform 0.3s var(--vel-ease-spring);
+}
+
+.vel-spotlight.vel-in-spotlight .vel-spotlight__trending {
+	opacity: 1;
+	-webkit-transform: translateY(0);
+	        transform: translateY(0);
+}
+
+
+/* ==========================================================================
+   7. ENGAGEMENT VELOCITY INDICATOR
+   A micro-widget that shows scroll momentum in real-time.
+   Rose gold flame icon that intensifies with faster scrolling.
+   ========================================================================== */
+
+.vel-velocity-indicator {
+	position: fixed;
+	bottom: 2rem;
+	left: 2rem;
+	z-index: 9050;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.4rem 0.85rem;
+	background: var(--vel-glass-bg);
+	-webkit-backdrop-filter: var(--vel-glass-blur);
+	        backdrop-filter: var(--vel-glass-blur);
+	border: 1px solid var(--vel-glass-border);
+	border-radius: 20px;
+	opacity: 0;
+	-webkit-transform: translateY(8px);
+	        transform: translateY(8px);
+	-webkit-transition: opacity 0.4s ease, -webkit-transform 0.4s var(--vel-ease-out);
+	        transition: opacity 0.4s ease, transform 0.4s var(--vel-ease-out);
+	pointer-events: none;
+}
+
+.vel-velocity-indicator.vel-active {
+	opacity: 1;
+	-webkit-transform: translateY(0);
+	        transform: translateY(0);
+}
+
+/* Flame icon — CSS-only animated flame */
+.vel-velocity-indicator__flame {
+	width: 14px;
+	height: 14px;
+	position: relative;
+}
+
+.vel-velocity-indicator__flame::before {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	-webkit-transform: translateX(-50%);
+	        transform: translateX(-50%);
+	width: 8px;
+	height: var(--vel-flame-height, 8px);
+	background: linear-gradient(
+		to top,
+		var(--vel-rose) 0%,
+		var(--vel-gold) 60%,
+		rgba(var(--vel-gold-rgb), 0.2) 100%
+	);
+	border-radius: 50% 50% 30% 30%;
+	-webkit-transition: height 0.3s ease;
+	        transition: height 0.3s ease;
+}
+
+/* Intensity levels */
+.vel-velocity-indicator.vel-intensity-1 { --vel-flame-height: 6px; }
+.vel-velocity-indicator.vel-intensity-2 { --vel-flame-height: 10px; }
+.vel-velocity-indicator.vel-intensity-3 { --vel-flame-height: 14px; }
+
+.vel-velocity-indicator__label {
+	font-family: var(--vel-font-body);
+	font-size: 0.6rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	color: rgba(var(--vel-white-rgb), 0.5);
+}
+
+.vel-velocity-indicator__label strong {
+	color: var(--vel-rose);
+}
+
+
+/* ==========================================================================
+   8. RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 768px) {
+	/* Scroll spine: thinner on mobile */
+	.vel-scroll-spine {
+		width: 2px;
+	}
+
+	.vel-scroll-spine__marker {
+		width: 5px;
+		height: 5px;
+		left: -1.5px;
+	}
+
+	/* Momentum: reduce travel distance */
+	.vel-momentum {
+		-webkit-transform: translateY(24px);
+		        transform: translateY(24px);
+	}
+
+	.vel-momentum--left {
+		-webkit-transform: translateX(-24px);
+		        transform: translateX(-24px);
+	}
+
+	.vel-momentum--right {
+		-webkit-transform: translateX(24px);
+		        transform: translateX(24px);
+	}
+
+	/* Spotlight: disable zoom on touch */
+	.vel-spotlight.vel-in-spotlight {
+		-webkit-transform: none;
+		        transform: none;
+		box-shadow: none;
+	}
+
+	.vel-spotlight.vel-in-spotlight::before {
+		opacity: 0;
+	}
+
+	/* Velocity indicator: hide on mobile */
+	.vel-velocity-indicator {
+		display: none;
+	}
+
+	/* Room narrative: full width on mobile */
+	.vel-room-narrative {
+		left: 1rem;
+		right: 1rem;
+		-webkit-transform: translateX(0) translateY(16px);
+		        transform: translateX(0) translateY(16px);
+		max-width: none;
+	}
+
+	.vel-room-narrative.vel-visible {
+		-webkit-transform: translateX(0) translateY(0);
+		        transform: translateX(0) translateY(0);
+	}
+
+	/* Story beat: more compact */
+	.vel-story-beat {
+		padding: 2.5rem 1.5rem;
+	}
+
+	.vel-story-beat__text {
+		font-size: clamp(1rem, 4vw, 1.4rem);
+	}
+}
+
+@media (max-width: 480px) {
+	.vel-scroll-spine {
+		display: none;
+	}
+
+	.vel-story-beat {
+		padding: 2rem 1rem;
+	}
+}
+
+
+/* ==========================================================================
+   9. IMMERSIVE PAGE ADJUSTMENTS
+   ========================================================================== */
+
+.immersive-page .vel-scroll-spine {
+	/* Position spine to the left on immersive pages (right has nav) */
+	right: auto;
+	left: 0;
+}
+
+.immersive-page .vel-velocity-indicator {
+	/* Move above tab bar */
+	bottom: calc(48px + 1.5rem);
+}
+
+
+/* ==========================================================================
+   10. PREFERS-REDUCED-MOTION
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	.vel-product-reveal .vel-price,
+	.vel-product-reveal .vel-detail,
+	.vel-product-reveal .vel-product-name::after,
+	.vel-product-reveal .vel-product-image,
+	.vel-story-beat__text,
+	.vel-story-beat__text::before,
+	.vel-story-beat__attribution,
+	.vel-room-narrative,
+	.vel-momentum,
+	.vel-spotlight,
+	.vel-spotlight::before,
+	.vel-spotlight__trending,
+	.vel-velocity-indicator {
+		-webkit-transition-duration: 0.01ms !important;
+		        transition-duration: 0.01ms !important;
+	}
+
+	.vel-momentum.vel-in-view.vel-fast-scroll {
+		-webkit-animation: none !important;
+		        animation: none !important;
+	}
+
+	.vel-scroll-spine__fill {
+		-webkit-transition-duration: 0.01ms !important;
+		        transition-duration: 0.01ms !important;
+	}
+
+	.vel-scroll-spine__marker {
+		-webkit-transition-duration: 0.01ms !important;
+		        transition-duration: 0.01ms !important;
+	}
+}
+
+
+/* ==========================================================================
+   11. PRINT STYLES
+   ========================================================================== */
+
+@media print {
+	.vel-scroll-spine,
+	.vel-velocity-indicator,
+	.vel-room-narrative,
+	.vel-spotlight::before,
+	.vel-spotlight__trending {
+		display: none !important;
+	}
+
+	.vel-product-reveal .vel-price,
+	.vel-product-reveal .vel-detail,
+	.vel-product-reveal .vel-product-image,
+	.vel-momentum,
+	.vel-story-beat__text,
+	.vel-story-beat__attribution {
+		opacity: 1 !important;
+		-webkit-transform: none !important;
+		        transform: none !important;
+		-webkit-filter: none !important;
+		        filter: none !important;
+	}
+}
+/**
+ * The Pulse — Real-Time Social Proof & Urgency Engine
+ *
+ * Social proof toasts, live viewer badges, scarcity indicators,
+ * VIP countdown banner, popularity heat system, and interest counters.
+ * Drives conversion through social validation and time pressure.
+ *
+ * @package SkyyRose_Flagship
+ * @since   3.3.0
+ */
+
+/* ==========================================================================
+   1. SOCIAL PROOF TOAST — Bottom-Left Slide-In Notifications
+   ========================================================================== */
+
+.pulse-toast-stack {
+	position: fixed;
+	bottom: 1.5rem;
+	left: 1.5rem;
+	z-index: 9992;
+	display: flex;
+	flex-direction: column-reverse;
+	gap: 0.75rem;
+	pointer-events: none;
+}
+
+.pulse-toast {
+	display: flex;
+	align-items: center;
+	gap: 0.875rem;
+	max-width: 380px;
+	padding: 0.875rem 1.25rem;
+	background: rgba(10, 10, 10, 0.88);
+	backdrop-filter: blur(24px) saturate(1.4);
+	-webkit-backdrop-filter: blur(24px) saturate(1.4);
+	border: 1px solid rgba(183, 110, 121, 0.25);
+	border-left: 3px solid var(--rose-gold, #B76E79);
+	border-radius: 12px;
+	box-shadow:
+		0 8px 32px rgba(0, 0, 0, 0.45),
+		0 0 0 1px rgba(183, 110, 121, 0.08) inset;
+	color: #fff;
+	font-family: var(--font-body, 'Inter', sans-serif);
+	transform: translateX(-120%) scale(0.92);
+	opacity: 0;
+	transition:
+		transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+		opacity 0.4s ease;
+	pointer-events: auto;
+	cursor: pointer;
+	position: relative;
+	overflow: hidden;
+}
+
+.pulse-toast::before {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 2px;
+	background: var(--rose-gold, #B76E79);
+	transform-origin: left;
+	animation: pulse-toast-timer 5s linear forwards;
+	opacity: 0.5;
+}
+
+@keyframes pulse-toast-timer {
+	from { transform: scaleX(1); }
+	to   { transform: scaleX(0); }
+}
+
+.pulse-toast.visible {
+	transform: translateX(0) scale(1);
+	opacity: 1;
+}
+
+.pulse-toast.exiting {
+	transform: translateX(-120%) scale(0.92);
+	opacity: 0;
+	transition:
+		transform 0.4s cubic-bezier(0.55, 0, 1, 0.45),
+		opacity 0.3s ease;
+}
+
+.pulse-toast__thumb {
+	position: relative;
+	flex-shrink: 0;
+	width: 48px;
+	height: 48px;
+	border-radius: 8px;
+	overflow: hidden;
+	border: 1px solid rgba(183, 110, 121, 0.3);
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.pulse-toast__thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.pulse-toast__body {
+	flex: 1;
+	min-width: 0;
+}
+
+.pulse-toast__action {
+	font-size: 0.7rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--rose-gold, #B76E79);
+	margin-bottom: 2px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pulse-toast__product {
+	font-size: 0.85rem;
+	font-weight: 500;
+	color: #fff;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pulse-toast__meta {
+	font-size: 0.65rem;
+	color: rgba(255, 255, 255, 0.45);
+	margin-top: 2px;
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+}
+
+.pulse-toast__meta::before {
+	content: '';
+	display: inline-block;
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: #4ade80;
+	flex-shrink: 0;
+}
+
+.pulse-toast__close {
+	flex-shrink: 0;
+	width: 22px;
+	height: 22px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 255, 255, 0.06);
+	border: none;
+	border-radius: 50%;
+	color: rgba(255, 255, 255, 0.35);
+	cursor: pointer;
+	font-size: 0.85rem;
+	line-height: 1;
+	padding: 0;
+	transition: color 0.2s ease, background 0.2s ease;
+}
+
+.pulse-toast__close:hover {
+	color: #fff;
+	background: rgba(255, 255, 255, 0.12);
+}
+
+/* ==========================================================================
+   2. LIVE VIEWERS BADGE — Floating Pill on Product Cards / Hotspots
+   ========================================================================== */
+
+.pulse-viewers {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 4px 10px;
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-size: 0.6rem;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	color: rgba(255, 255, 255, 0.85);
+	background: rgba(10, 10, 10, 0.7);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 100px;
+	white-space: nowrap;
+	z-index: 5;
+	pointer-events: none;
+}
+
+/* Positioned variant for product cards */
+.product-card .pulse-viewers,
+.product-grid-card .pulse-viewers {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+}
+
+/* Positioned variant for hotspot labels */
+.hotspot .pulse-viewers {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.pulse-viewers__dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: #4ade80;
+	flex-shrink: 0;
+	animation: pulse-viewer-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-viewer-dot {
+	0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.5); }
+	50%      { opacity: 0.7; box-shadow: 0 0 0 4px rgba(74, 222, 128, 0); }
+}
+
+.pulse-viewers__count {
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   3. SCARCITY INDICATOR — Urgency Badges Below Price
+   ========================================================================== */
+
+.pulse-scarcity {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	padding: 3px 8px;
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-size: 0.6rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	border-radius: 4px;
+	line-height: 1.2;
+	margin-top: 6px;
+}
+
+/* Critical — 1-3 left */
+.pulse-scarcity--critical {
+	background: rgba(220, 20, 60, 0.15);
+	color: #DC143C;
+	border: 1px solid rgba(220, 20, 60, 0.3);
+}
+
+/* Urgent — 4-5 left or "Selling Fast" */
+.pulse-scarcity--urgent {
+	background: rgba(255, 165, 0, 0.12);
+	color: #FFA500;
+	border: 1px solid rgba(255, 165, 0, 0.25);
+}
+
+/* Warm — 6-7 left */
+.pulse-scarcity--warm {
+	background: rgba(212, 175, 55, 0.1);
+	color: var(--gold, #D4AF37);
+	border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.pulse-scarcity__dot {
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: currentColor;
+	flex-shrink: 0;
+}
+
+.pulse-scarcity--critical .pulse-scarcity__dot {
+	animation: pulse-scarcity-blink 1s ease-in-out infinite;
+}
+
+@keyframes pulse-scarcity-blink {
+	0%, 100% { opacity: 1; }
+	50%      { opacity: 0.2; }
+}
+
+/* Shimmer effect across the badge */
+.pulse-scarcity::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		rgba(255, 255, 255, 0.08) 50%,
+		transparent 100%
+	);
+	animation: pulse-scarcity-shimmer 3s ease-in-out infinite;
+}
+
+.pulse-scarcity {
+	position: relative;
+	overflow: hidden;
+}
+
+@keyframes pulse-scarcity-shimmer {
+	0%   { left: -100%; }
+	50%  { left: 100%; }
+	100% { left: 100%; }
+}
+
+/* ==========================================================================
+   4. VIP COUNTDOWN BANNER — Fixed Bottom Strip
+   ========================================================================== */
+
+.pulse-countdown-banner {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 9985;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+	padding: 10px 2rem;
+	background: linear-gradient(
+		135deg,
+		rgba(212, 175, 55, 0.12) 0%,
+		rgba(183, 110, 121, 0.12) 50%,
+		rgba(212, 175, 55, 0.12) 100%
+	);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	border-top: 1px solid rgba(212, 175, 55, 0.2);
+	font-family: var(--font-body, 'Inter', sans-serif);
+	transform: translateY(100%);
+	opacity: 0;
+	transition:
+		transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+		opacity 0.5s ease;
+	animation: pulse-banner-glow 4s ease-in-out infinite;
+}
+
+.pulse-countdown-banner.visible {
+	transform: translateY(0);
+	opacity: 1;
+}
+
+@keyframes pulse-banner-glow {
+	0%, 100% { box-shadow: 0 -4px 20px rgba(212, 175, 55, 0.05); }
+	50%      { box-shadow: 0 -4px 30px rgba(183, 110, 121, 0.1); }
+}
+
+.pulse-countdown-banner__label {
+	font-size: 0.65rem;
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--gold, #D4AF37);
+}
+
+.pulse-countdown-banner__time {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-size: 0.85rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	color: #fff;
+	font-variant-numeric: tabular-nums;
+}
+
+.pulse-countdown-banner__time span {
+	color: rgba(255, 255, 255, 0.35);
+	font-weight: 400;
+}
+
+.pulse-countdown-banner__cta {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 6px 14px;
+	font-size: 0.6rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	text-decoration: none;
+	color: #0A0A0A;
+	background: linear-gradient(135deg, var(--gold, #D4AF37) 0%, var(--rose-gold, #B76E79) 100%);
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pulse-countdown-banner__cta:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 4px 16px rgba(212, 175, 55, 0.35);
+}
+
+.pulse-countdown-banner__dismiss {
+	position: absolute;
+	right: 0.75rem;
+	top: 50%;
+	transform: translateY(-50%);
+	background: none;
+	border: none;
+	color: rgba(255, 255, 255, 0.25);
+	cursor: pointer;
+	font-size: 1rem;
+	padding: 4px;
+	line-height: 1;
+	transition: color 0.2s ease;
+}
+
+.pulse-countdown-banner__dismiss:hover {
+	color: rgba(255, 255, 255, 0.6);
+}
+
+/* ==========================================================================
+   5. POPULARITY HEAT — Beacon Speed Modifiers for Immersive Pages
+   ========================================================================== */
+
+/* Low heat — default beacon speed (2.4s, from immersive.css) */
+.pulse-heat-low .hotspot-beacon {
+	animation-duration: 2.4s;
+}
+
+/* Medium heat — 1.5x speed, slightly larger glow */
+.pulse-heat-medium .hotspot-beacon {
+	animation-duration: 1.6s;
+}
+
+.pulse-heat-medium .hotspot-beacon::before {
+	animation-duration: 1.6s;
+}
+
+.pulse-heat-medium .hotspot-beacon {
+	box-shadow: 0 0 10px rgba(183, 110, 121, 0.3);
+}
+
+/* High heat — 2x speed, larger glow, size boost */
+.pulse-heat-high .hotspot-beacon {
+	animation-duration: 1.2s;
+	width: 16px;
+	height: 16px;
+}
+
+.pulse-heat-high .hotspot-beacon::before {
+	animation-duration: 1.2s;
+	inset: -8px;
+}
+
+.pulse-heat-high .hotspot-beacon {
+	box-shadow: 0 0 16px rgba(183, 110, 121, 0.45);
+}
+
+/* Collection-specific heat glow colors */
+.immersive-black-rose .pulse-heat-high .hotspot-beacon {
+	box-shadow: 0 0 16px rgba(192, 192, 192, 0.4);
+}
+
+.immersive-love-hurts .pulse-heat-high .hotspot-beacon {
+	box-shadow: 0 0 16px rgba(220, 20, 60, 0.4);
+}
+
+/* ==========================================================================
+   6. INTEREST COUNTER — Overlay on Product Panels (Immersive)
+   ========================================================================== */
+
+.pulse-interest {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 5px 12px;
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-size: 0.7rem;
+	font-weight: 500;
+	letter-spacing: 0.03em;
+	color: rgba(255, 255, 255, 0.75);
+	background: rgba(255, 255, 255, 0.06);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 100px;
+	margin-top: 0.75rem;
+}
+
+.pulse-interest__icon {
+	font-size: 0.75rem;
+	line-height: 1;
+}
+
+.pulse-interest__count {
+	font-weight: 700;
+	color: var(--rose-gold, #B76E79);
+	font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   RESPONSIVE — Mobile Adjustments
+   ========================================================================== */
+
+@media (max-width: 640px) {
+	.pulse-toast-stack {
+		left: 0.5rem;
+		right: 0.5rem;
+		bottom: 4rem;
+	}
+
+	.pulse-toast {
+		max-width: none;
+	}
+
+	.pulse-toast__thumb {
+		width: 40px;
+		height: 40px;
+	}
+
+	.pulse-toast__action {
+		font-size: 0.6rem;
+	}
+
+	.pulse-toast__product {
+		font-size: 0.78rem;
+	}
+
+	.pulse-countdown-banner {
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		padding: 8px 2.5rem 8px 1rem;
+		justify-content: center;
+	}
+
+	.pulse-countdown-banner__label {
+		font-size: 0.55rem;
+	}
+
+	.pulse-countdown-banner__time {
+		font-size: 0.75rem;
+	}
+
+	.pulse-countdown-banner__cta {
+		font-size: 0.55rem;
+		padding: 5px 10px;
+	}
+
+	.pulse-viewers {
+		font-size: 0.55rem;
+		padding: 3px 7px;
+	}
+
+	.pulse-scarcity {
+		font-size: 0.55rem;
+	}
+}
+
+/* Adjust when immersive tab bar is present */
+.immersive-page .pulse-toast-stack {
+	bottom: 5.5rem;
+}
+
+.immersive-page .pulse-countdown-banner {
+	bottom: var(--tab-bar-height, 48px);
+}
+
+/* Adjust when sticky CTA bar is present */
+.pulse-toast-stack.has-sticky-bar {
+	bottom: 5rem;
+}
+
+/* ==========================================================================
+   7. SECTION REVEAL — IntersectionObserver Fade-In & Slide-Up
+   ========================================================================== */
+
+.pulse-reveal {
+	opacity: 0;
+	transform: translateY(28px);
+	transition:
+		opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+		transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pulse-reveal--visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* Stagger children for grid items */
+.product-grid .pulse-reveal:nth-child(2) { transition-delay: 0.08s; }
+.product-grid .pulse-reveal:nth-child(3) { transition-delay: 0.16s; }
+.product-grid .pulse-reveal:nth-child(4) { transition-delay: 0.24s; }
+.product-grid .pulse-reveal:nth-child(5) { transition-delay: 0.32s; }
+.product-grid .pulse-reveal:nth-child(6) { transition-delay: 0.40s; }
+.product-grid .pulse-reveal:nth-child(n+7) { transition-delay: 0.48s; }
+
+/* ==========================================================================
+   8. LUXURY 3D TILT — Rose Gold Glow Border on Hover
+   ========================================================================== */
+
+.product-grid-card,
+.product-card {
+	transition:
+		transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+		box-shadow 0.4s ease,
+		border-color 0.4s ease;
+	will-change: transform;
+}
+
+.product-grid-card:hover,
+.product-card:hover {
+	box-shadow:
+		0 8px 32px rgba(0, 0, 0, 0.4),
+		0 0 0 1px rgba(183, 110, 121, 0.15),
+		0 0 24px rgba(183, 110, 121, 0.08);
+	border-color: rgba(183, 110, 121, 0.3);
+}
+
+/* ==========================================================================
+   9. ROSE GOLD SHIMMER SWEEP — Button Hover Effect
+   ========================================================================== */
+
+.pulse-shimmer-btn {
+	position: relative;
+	overflow: hidden;
+}
+
+.pulse-shimmer-btn::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 60%;
+	height: 100%;
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		rgba(255, 255, 255, 0.18) 40%,
+		rgba(183, 110, 121, 0.12) 60%,
+		transparent 100%
+	);
+	transition: none;
+	pointer-events: none;
+}
+
+.pulse-shimmer-btn:hover::after {
+	animation: pulse-shimmer-sweep 0.75s ease forwards;
+}
+
+@keyframes pulse-shimmer-sweep {
+	0%   { left: -100%; }
+	100% { left: 150%; }
+}
+
+/* ==========================================================================
+   10. HERO TEXT FLOAT — Subtle translateY Oscillation
+   ========================================================================== */
+
+.pulse-hero-float {
+	animation: pulse-hero-float-anim 6s ease-in-out infinite;
+}
+
+@keyframes pulse-hero-float-anim {
+	0%, 100% { transform: translateY(0); }
+	50%      { transform: translateY(-4px); }
+}
+
+/* ==========================================================================
+   11. COLLECTION LOGO GLOW — Slow Rotation + Rose Gold Halo
+   ========================================================================== */
+
+.pulse-logo-glow {
+	animation: pulse-logo-rotate 20s linear infinite;
+	filter: drop-shadow(0 0 8px rgba(183, 110, 121, 0.3));
+	transition: filter 0.4s ease;
+}
+
+.pulse-logo-glow:hover {
+	filter: drop-shadow(0 0 16px rgba(183, 110, 121, 0.5))
+	        drop-shadow(0 0 32px rgba(183, 110, 121, 0.2));
+}
+
+@keyframes pulse-logo-rotate {
+	from { transform: rotate(0deg); }
+	to   { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   12. SPARKLE PARTICLES — Star Burst on Monogram Hover
+   ========================================================================== */
+
+.pulse-sparkle {
+	position: absolute;
+	color: var(--rose-gold, #B76E79);
+	pointer-events: none;
+	z-index: 10;
+	animation: pulse-sparkle-burst 1s ease-out forwards;
+	text-shadow: 0 0 6px rgba(183, 110, 121, 0.6);
+}
+
+@keyframes pulse-sparkle-burst {
+	0% {
+		opacity: 1;
+		transform: scale(0) translateY(0);
+	}
+	40% {
+		opacity: 1;
+		transform: scale(1.2) translateY(-12px);
+	}
+	100% {
+		opacity: 0;
+		transform: scale(0.6) translateY(-28px);
+	}
+}
+
+/* ==========================================================================
+   13. ROOMS EXPLORED COUNTER — Fixed Bottom-Right Pill
+   ========================================================================== */
+
+.pulse-rooms-counter {
+	position: fixed;
+	bottom: 1.5rem;
+	right: 1.5rem;
+	z-index: 9990;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 8px 14px;
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-size: 0.7rem;
+	font-weight: 500;
+	letter-spacing: 0.03em;
+	color: rgba(255, 255, 255, 0.8);
+	background: rgba(10, 10, 10, 0.85);
+	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
+	border: 1px solid rgba(183, 110, 121, 0.2);
+	border-radius: 100px;
+	transform: translateY(20px);
+	opacity: 0;
+	transition:
+		transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+		opacity 0.4s ease;
+	pointer-events: none;
+}
+
+.pulse-rooms-counter.visible {
+	transform: translateY(0);
+	opacity: 1;
+}
+
+.pulse-rooms-counter--complete {
+	border-color: rgba(74, 222, 128, 0.3);
+	color: #4ade80;
+}
+
+.pulse-rooms-counter__icon {
+	font-size: 0.8rem;
+	line-height: 1;
+}
+
+.pulse-rooms-counter__explored {
+	font-weight: 700;
+	color: var(--rose-gold, #B76E79);
+	font-variant-numeric: tabular-nums;
+}
+
+.pulse-rooms-counter--complete .pulse-rooms-counter__explored {
+	color: #4ade80;
+}
+
+/* ==========================================================================
+   14. PAGE VIEWER COUNTER — Banner Near Product Section
+   ========================================================================== */
+
+.pulse-page-viewers {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.4rem;
+	padding: 8px 0;
+	margin-bottom: 1.5rem;
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-size: 0.7rem;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	color: rgba(255, 255, 255, 0.55);
+}
+
+.pulse-page-viewers__dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: #4ade80;
+	flex-shrink: 0;
+	animation: pulse-page-viewers-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-page-viewers-dot {
+	0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.5); }
+	50%      { opacity: 0.7; box-shadow: 0 0 0 5px rgba(74, 222, 128, 0); }
+}
+
+.pulse-page-viewers__count {
+	font-weight: 700;
+	color: var(--rose-gold, #B76E79);
+	font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   15. TRENDING BADGE — Pulsing Badge for Pre-Order Products
+   ========================================================================== */
+
+.pulse-trending-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	padding: 3px 10px;
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-size: 0.6rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #fff;
+	background: linear-gradient(135deg, rgba(183, 110, 121, 0.9) 0%, rgba(212, 175, 55, 0.9) 100%);
+	border-radius: 4px;
+	position: absolute;
+	top: 12px;
+	left: 12px;
+	z-index: 6;
+	animation: pulse-trending-pulse 2s ease-in-out infinite;
+	box-shadow: 0 2px 12px rgba(183, 110, 121, 0.4);
+}
+
+@keyframes pulse-trending-pulse {
+	0%, 100% {
+		box-shadow: 0 2px 12px rgba(183, 110, 121, 0.4);
+		transform: scale(1);
+	}
+	50% {
+		box-shadow: 0 4px 20px rgba(183, 110, 121, 0.6);
+		transform: scale(1.03);
+	}
+}
+
+.pulse-trending-badge__fire {
+	font-size: 0.7rem;
+	line-height: 1;
+}
+
+/* ==========================================================================
+   16. COUNTDOWN URGENCY — Inline Countdown Near Pre-Order Buttons
+   ========================================================================== */
+
+.pulse-urgency-countdown {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 6px 0;
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-size: 0.65rem;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	color: rgba(255, 255, 255, 0.55);
+	margin-top: 6px;
+}
+
+.pulse-urgency-countdown__icon {
+	font-size: 0.75rem;
+	line-height: 1;
+	animation: pulse-urgency-tick 1s ease-in-out infinite;
+}
+
+@keyframes pulse-urgency-tick {
+	0%, 100% { transform: scale(1); }
+	50%      { transform: scale(1.15); }
+}
+
+.pulse-urgency-countdown__time {
+	font-weight: 700;
+	color: var(--gold, #D4AF37);
+	font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   RESPONSIVE — Mobile Adjustments for New Features
+   ========================================================================== */
+
+@media (max-width: 640px) {
+	.pulse-rooms-counter {
+		bottom: 4.5rem;
+		right: 0.5rem;
+		font-size: 0.6rem;
+		padding: 6px 10px;
+	}
+
+	.pulse-page-viewers {
+		font-size: 0.6rem;
+	}
+
+	.pulse-trending-badge {
+		font-size: 0.55rem;
+		padding: 2px 8px;
+	}
+}
+
+/* Immersive page adjustments for rooms counter */
+.immersive-page .pulse-rooms-counter {
+	bottom: calc(var(--tab-bar-height, 48px) + 1rem);
+}
+
+/* ==========================================================================
+   REDUCED MOTION — Respect User Preferences
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	.pulse-toast {
+		transition-duration: 0.01ms;
+	}
+
+	.pulse-toast::before {
+		animation: none;
+	}
+
+	.pulse-toast.exiting {
+		transition-duration: 0.01ms;
+	}
+
+	.pulse-viewers__dot {
+		animation: none;
+		opacity: 1;
+	}
+
+	.pulse-scarcity--critical .pulse-scarcity__dot {
+		animation: none;
+	}
+
+	.pulse-scarcity::after {
+		animation: none;
+		display: none;
+	}
+
+	.pulse-countdown-banner {
+		animation: none;
+		transition-duration: 0.01ms;
+	}
+
+	.pulse-heat-medium .hotspot-beacon,
+	.pulse-heat-high .hotspot-beacon,
+	.pulse-heat-medium .hotspot-beacon::before,
+	.pulse-heat-high .hotspot-beacon::before {
+		animation: none;
+	}
+
+	.pulse-heat-high .hotspot-beacon,
+	.pulse-heat-medium .hotspot-beacon {
+		box-shadow: 0 0 8px rgba(183, 110, 121, 0.4);
+	}
+
+	/* New features — disable animations */
+	.pulse-reveal {
+		opacity: 1;
+		transform: none;
+		transition-duration: 0.01ms;
+	}
+
+	.pulse-shimmer-btn::after {
+		animation: none;
+		display: none;
+	}
+
+	.pulse-hero-float {
+		animation: none;
+	}
+
+	.pulse-logo-glow {
+		animation: none;
+	}
+
+	.pulse-sparkle {
+		display: none;
+	}
+
+	.pulse-trending-badge {
+		animation: none;
+	}
+
+	.pulse-urgency-countdown__icon {
+		animation: none;
+	}
+
+	.pulse-page-viewers__dot {
+		animation: none;
+		opacity: 1;
+	}
+}

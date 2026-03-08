@@ -22,7 +22,7 @@ import hashlib
 import json
 import logging
 import time
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -39,7 +39,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class ClassificationType(str, Enum):
+class ClassificationType(StrEnum):
     """Supported classification types."""
 
     INTENT = "intent"
@@ -49,7 +49,7 @@ class ClassificationType(str, Enum):
     CUSTOM = "custom"
 
 
-class SentimentLabel(str, Enum):
+class SentimentLabel(StrEnum):
     """Standard sentiment labels."""
 
     POSITIVE = "positive"

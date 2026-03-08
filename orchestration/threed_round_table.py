@@ -39,7 +39,7 @@ import random
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, TypeVar
 from uuid import uuid4
@@ -65,7 +65,7 @@ T = TypeVar("T")
 # =============================================================================
 
 
-class CircuitState(str, Enum):
+class CircuitState(StrEnum):
     """Circuit breaker states."""
 
     CLOSED = "closed"  # Normal operation
@@ -245,7 +245,7 @@ class ProviderHealth:
 # =============================================================================
 
 
-class ThreeDProvider(str, Enum):
+class ThreeDProvider(StrEnum):
     """3D generation providers participating in Round Table."""
 
     # HuggingFace Models
@@ -263,7 +263,7 @@ class ThreeDProvider(str, Enum):
     CUSTOM = "custom"
 
 
-class CompetitionStatus(str, Enum):
+class CompetitionStatus(StrEnum):
     """Status of a 3D Round Table competition."""
 
     PENDING = "pending"
@@ -276,7 +276,7 @@ class CompetitionStatus(str, Enum):
     PARTIAL = "partial"
 
 
-class GenerationType(str, Enum):
+class GenerationType(StrEnum):
     """Type of 3D generation task."""
 
     TEXT_TO_3D = "text_to_3d"

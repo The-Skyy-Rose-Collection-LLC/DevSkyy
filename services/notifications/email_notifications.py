@@ -21,7 +21,7 @@ import smtplib
 from dataclasses import dataclass, field
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -76,7 +76,7 @@ class EmailConfig:
 # =============================================================================
 
 
-class EmailTemplate(str, Enum):
+class EmailTemplate(StrEnum):
     """Email template types."""
 
     APPROVAL_PENDING = "approval_pending"

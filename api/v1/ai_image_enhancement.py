@@ -8,11 +8,8 @@ Provides REST endpoints for luxury image processing
 @version 1.0.0
 """
 
-import asyncio
-import base64
 import os
 from pathlib import Path
-from typing import Optional
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, Field
@@ -37,11 +34,11 @@ class EnhanceImageResponse(BaseModel):
     """Response model for image enhancement"""
 
     success: bool = Field(..., description="Enhancement success status")
-    enhanced_path: Optional[str] = Field(None, description="Path to enhanced image")
-    blurhash: Optional[str] = Field(None, description="Blurhash placeholder")
-    nobg_path: Optional[str] = Field(None, description="Path to background-removed image")
-    upscaled_url: Optional[str] = Field(None, description="URL of upscaled image")
-    error: Optional[str] = Field(None, description="Error message if failed")
+    enhanced_path: str | None = Field(None, description="Path to enhanced image")
+    blurhash: str | None = Field(None, description="Blurhash placeholder")
+    nobg_path: str | None = Field(None, description="Path to background-removed image")
+    upscaled_url: str | None = Field(None, description="URL of upscaled image")
+    error: str | None = Field(None, description="Error message if failed")
 
 
 class BlurhashRequest(BaseModel):
@@ -62,7 +59,7 @@ class RemoveBackgroundRequest(BaseModel):
     """Request model for background removal"""
 
     image_path: str = Field(..., description="Path to input image")
-    output_path: Optional[str] = Field(None, description="Path for output image")
+    output_path: str | None = Field(None, description="Path for output image")
 
 
 class RemoveBackgroundResponse(BaseModel):
@@ -77,7 +74,7 @@ class UpscaleImageRequest(BaseModel):
 
     image_path: str = Field(..., description="Path to input image")
     scale: int = Field(4, ge=2, le=4, description="Upscale factor (2 or 4)")
-    prompt: Optional[str] = Field(None, description="Optional prompt for AI guidance")
+    prompt: str | None = Field(None, description="Optional prompt for AI guidance")
 
 
 class UpscaleImageResponse(BaseModel):
@@ -170,9 +167,7 @@ async def enhance_image(
         return result
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Image enhancement failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Image enhancement failed: {str(e)}")
 
 
 @router.post("/blurhash", response_model=BlurhashResponse)
@@ -200,16 +195,12 @@ async def generate_blurhash(
 
         # Placeholder blurhash implementation
         # Actual implementation would use blurhash library
-        blurhash_str = f"LKN]Rv%2Tw=w]~RBVZRi};RPxuwH"
+        blurhash_str = "LKN]Rv%2Tw=w]~RBVZRi};RPxuwH"
 
-        return BlurhashResponse(
-            blurhash=blurhash_str, width=width, height=height
-        )
+        return BlurhashResponse(blurhash=blurhash_str, width=width, height=height)
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Blurhash generation failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Blurhash generation failed: {str(e)}")
 
 
 @router.post("/remove-background", response_model=RemoveBackgroundResponse)
@@ -239,14 +230,10 @@ async def remove_background(
         # Remove background
         await enhancer.remove_background(request.image_path, str(output_path))
 
-        return RemoveBackgroundResponse(
-            success=True, output_path=str(output_path)
-        )
+        return RemoveBackgroundResponse(success=True, output_path=str(output_path))
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Background removal failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Background removal failed: {str(e)}")
 
 
 @router.post("/upscale", response_model=UpscaleImageResponse)
@@ -275,9 +262,7 @@ async def upscale_image(
         return UpscaleImageResponse(success=True, upscaled_url=upscaled_url)
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Image upscaling failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Image upscaling failed: {str(e)}")
 
 
 @router.get("/health")

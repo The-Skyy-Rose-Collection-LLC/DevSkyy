@@ -5,6 +5,9 @@ from services.analytics.alert_engine import (
     AlertConfigNotFoundError,
     AlertEngineError,
     AlertEvaluationEngine,
+)
+from services.analytics.alert_engine import AlertSeverity as EngineAlertSeverity
+from services.analytics.alert_engine import (
     AlertStatus,
     AlertTrigger,
     ConditionOperator,
@@ -13,12 +16,14 @@ from services.analytics.alert_engine import (
     MetricValue,
     get_alert_engine,
 )
-from services.analytics.alert_engine import AlertSeverity as EngineAlertSeverity
 from services.analytics.alert_notifier import (
     AlertNotification,
     AlertNotifier,
     AlertNotifierConfig,
     AlertNotifierError,
+)
+from services.analytics.alert_notifier import AlertSeverity as NotifierAlertSeverity
+from services.analytics.alert_notifier import (
     InAppNotification,
     NotificationChannel,
     NotificationPreferences,
@@ -27,7 +32,6 @@ from services.analytics.alert_notifier import (
     get_alert_notifier,
     severity_meets_threshold,
 )
-from services.analytics.alert_notifier import AlertSeverity as NotifierAlertSeverity
 from services.analytics.event_collector import (
     AnalyticsEvent,
     AnalyticsEventCollector,

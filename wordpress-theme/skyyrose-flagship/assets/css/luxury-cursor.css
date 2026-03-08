@@ -6,18 +6,20 @@
  * @since   3.1.0
  */
 
-/* Hide default cursor on desktop */
+/* Hide default cursor on desktop — ONLY when JS custom cursor is active.
+   The .luxury-cursor-active class is added by luxury-cursor.js after init.
+   Without JS, users keep their native cursor (progressive enhancement). */
 @media (hover: hover) {
-	body:not(.immersive-page) {
+	body.luxury-cursor-active:not(.immersive-page) {
 		cursor: none;
 	}
 
-	body:not(.immersive-page) a,
-	body:not(.immersive-page) button,
-	body:not(.immersive-page) [role="button"],
-	body:not(.immersive-page) input,
-	body:not(.immersive-page) select,
-	body:not(.immersive-page) textarea {
+	body.luxury-cursor-active:not(.immersive-page) a,
+	body.luxury-cursor-active:not(.immersive-page) button,
+	body.luxury-cursor-active:not(.immersive-page) [role="button"],
+	body.luxury-cursor-active:not(.immersive-page) input,
+	body.luxury-cursor-active:not(.immersive-page) select,
+	body.luxury-cursor-active:not(.immersive-page) textarea {
 		cursor: none;
 	}
 }
@@ -32,12 +34,12 @@
 	left: 0;
 	width: 36px;
 	height: 36px;
-	border: 1.5px solid rgba(183, 110, 121, 0.5);
+	border: 1.5px solid rgba(183, 110, 121, 0.7);
 	border-radius: 50%;
 	pointer-events: none;
 	z-index: 99999;
 	transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease;
-	mix-blend-mode: difference;
+	filter: drop-shadow(0 0 3px rgba(183, 110, 121, 0.4));
 }
 
 .luxury-cursor-ring.hovering {

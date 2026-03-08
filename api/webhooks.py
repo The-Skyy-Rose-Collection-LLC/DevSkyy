@@ -31,7 +31,7 @@ import time
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import httpx
@@ -73,7 +73,7 @@ class WebhookConfig:
     dead_letter_retention_days: int = 7
 
 
-class WebhookEventType(str, Enum):
+class WebhookEventType(StrEnum):
     """Standard webhook event types"""
 
     # Order events
@@ -112,7 +112,7 @@ class WebhookEventType(str, Enum):
     ALL = "*"
 
 
-class DeliveryStatus(str, Enum):
+class DeliveryStatus(StrEnum):
     """Webhook delivery status"""
 
     PENDING = "pending"

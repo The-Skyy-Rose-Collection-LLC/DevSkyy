@@ -42,20 +42,20 @@ get_header();
         <!-- Instructions -->
         <div class="scene-instructions">
             <p>
-                <span class="instruction-icon">🖱️</span> Click and drag to explore
+                <span class="instruction-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 3l3.057-3 11.943 12-11.943 12-3.057-3 9-9z" fill="currentColor"/></svg></span> Click and drag to explore
             </p>
             <p>
-                <span class="instruction-icon">✨</span> Click glowing products to view
+                <span class="instruction-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="#D4AF37" aria-hidden="true"><path d="M12 2l2.4 7.2H22l-6 4.8 2.4 7.2L12 16.4l-6.4 4.8 2.4-7.2-6-4.8h7.6z"/></svg></span> Click glowing products to view
             </p>
             <p>
-                <span class="instruction-icon">🌹</span> Discover Beauty & Beast Easter eggs
+                <span class="instruction-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="#B76E79" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span> Discover Beauty &amp; Beast Easter eggs
             </p>
         </div>
 
         <!-- Audio Controls -->
         <div class="audio-controls">
             <button id="toggle-audio" class="audio-btn" aria-label="Toggle Music">
-                <span class="audio-icon">🔊</span>
+                <span class="audio-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></span>
             </button>
         </div>
 
@@ -66,12 +66,12 @@ get_header();
                 <span id="eggs-found">0</span> / <span id="total-eggs">6</span>
             </div>
             <ul class="egg-list">
-                <li data-egg="lumiere">🕯️ Lumière</li>
-                <li data-egg="cogsworth">🕐 Cogsworth</li>
-                <li data-egg="potts">🫖 Mrs. Potts & Chip</li>
-                <li data-egg="mirror">🪞 Magic Mirror</li>
-                <li data-egg="wardrobe">🚪 Wardrobe</li>
-                <li data-egg="book">📖 Enchanted Book</li>
+                <li data-egg="lumiere"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v4M12 18v4M8 6l-2-2M16 6l2-2M12 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"/><path d="M10 18h4l-1 4h-2l-1-4Z"/></svg> Lumi&egrave;re</li>
+                <li data-egg="cogsworth"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Cogsworth</li>
+                <li data-egg="potts"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 8h1a4 4 0 0 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg> Mrs. Potts &amp; Chip</li>
+                <li data-egg="mirror"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="10" r="7"/><path d="M8 21h8M12 17v4"/></svg> Magic Mirror</li>
+                <li data-egg="wardrobe"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="2" width="18" height="20" rx="2"/><path d="M12 2v20M9 12h.01M15 12h.01"/></svg> Wardrobe</li>
+                <li data-egg="book"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Enchanted Book</li>
             </ul>
         </div>
     </div>
@@ -104,7 +104,7 @@ get_header();
 
                             <div class="product-actions">
                                 <button id="add-to-cart-btn" class="btn-enchanted btn-add-cart">
-                                    <span class="btn-icon">🌹</span>
+                                    <span class="btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="#B76E79" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span>
                                     Add to Cart
                                 </button>
                                 <button class="btn-enchanted btn-view-details">
@@ -611,8 +611,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Audio toggle
     document.getElementById('toggle-audio').addEventListener('click', function() {
-        this.querySelector('.audio-icon').textContent =
-            this.querySelector('.audio-icon').textContent === '🔊' ? '🔇' : '🔊';
+        var icon = this.querySelector('.audio-icon');
+        var isMuted = icon.getAttribute('data-muted') === 'true';
+        icon.setAttribute('data-muted', isMuted ? 'false' : 'true');
+        icon.innerHTML = isMuted
+            ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>'
+            : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>';
     });
 });
 </script>

@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
 \u2705 Configuration:
    API URL: {API_BASE_URL}
-   API Key: {"Set \u2713" if API_KEY else "Not Set \u26a0\ufe0f"}
+   API Key: {"Set ✓" if API_KEY else "Not Set ⚠️"}
 
 \ud83d\udd27 Tools Available:
    \u2022 devskyy_scan_code - Code analysis and quality checking

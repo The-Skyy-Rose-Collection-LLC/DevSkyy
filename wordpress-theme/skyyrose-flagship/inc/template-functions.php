@@ -365,6 +365,11 @@ function skyyrose_custom_body_classes( $classes ) {
 		$classes[] = 'has-header-image';
 	}
 
+	// Homepage V2 body class for CSS scoping.
+	if ( is_front_page() ) {
+		$classes[] = 'homepage-v2';
+	}
+
 	return $classes;
 }
 add_filter( 'body_class', 'skyyrose_custom_body_classes' );
@@ -691,8 +696,13 @@ function skyyrose_flagship_nav_fallback() {
 
 	$items = array(
 		array(
+			'title'    => __( 'Home', 'skyyrose-flagship' ),
+			'url'      => home_url( '/' ),
+			'children' => array(),
+		),
+		array(
 			'title'    => __( 'Collections', 'skyyrose-flagship' ),
-			'url'      => '#',
+			'url'      => home_url( '/collections/' ),
 			'children' => array(
 				array(
 					'title' => __( 'Black Rose', 'skyyrose-flagship' ),
@@ -731,6 +741,11 @@ function skyyrose_flagship_nav_fallback() {
 			),
 		),
 		array(
+			'title'    => __( 'Pre-Order', 'skyyrose-flagship' ),
+			'url'      => home_url( '/pre-order/' ),
+			'children' => array(),
+		),
+		array(
 			'title'    => __( 'About', 'skyyrose-flagship' ),
 			'url'      => home_url( '/about/' ),
 			'children' => array(),
@@ -738,11 +753,6 @@ function skyyrose_flagship_nav_fallback() {
 		array(
 			'title'    => __( 'Contact', 'skyyrose-flagship' ),
 			'url'      => home_url( '/contact/' ),
-			'children' => array(),
-		),
-		array(
-			'title'    => __( 'Shop', 'skyyrose-flagship' ),
-			'url'      => home_url( '/shop/' ),
 			'children' => array(),
 		),
 	);

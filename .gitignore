@@ -58,6 +58,7 @@ coverage/
 
 # Secrets & Environment
 .env
+.env.hf
 .env.local
 .env.*.local
 .env.save
@@ -69,6 +70,7 @@ coverage/
 .env.skyyrose-experiences
 .env.staging
 .env.production
+.env.wordpress
 !.env.example
 secrets/
 credentials/
@@ -228,3 +230,15 @@ generated_3d_models_color_accurate/
 
 # Large training data files
 skyyrose_training_data.zip
+
+# Ralph auto-managed state (changes every iteration)
+.ralph/ralph-loop.state.json
+
+# Runtime artifacts
+scripts/nano-banana-results.json
+
+# Dev screenshots at repo root
+skyyrose-*.png
+
+# Reference/dev images (not for production)
+wordpress-theme/skyyrose-flagship/assets/images/products/_reference-*

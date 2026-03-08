@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, Literal
 
@@ -20,7 +20,7 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger(__name__)
 
 
-class GateStatus(str, Enum):
+class GateStatus(StrEnum):
     """Status of quality gate check."""
 
     PASSED = "passed"

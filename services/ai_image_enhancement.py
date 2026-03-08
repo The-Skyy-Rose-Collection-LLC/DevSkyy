@@ -302,7 +302,7 @@ class LuxuryImageEnhancer:
 
                 # Upscale
                 if upscale:
-                    upscaled_url = await self.upscale_image(current_path)
+                    _upscaled_url = await self.upscale_image(current_path)
                     # Download upscaled image
                     # (implementation depends on your download utility)
                     pass
@@ -343,13 +343,13 @@ async def main():
     )
 
     # Remove background
-    img = await enhancer.remove_background("product.jpg", "product_nobg.png")
+    _img = await enhancer.remove_background("product.jpg", "product_nobg.png")
 
     # Upscale image
-    upscaled_url = await enhancer.upscale_image("product.jpg", scale=4)
+    _upscaled_url = await enhancer.upscale_image("product.jpg", scale=4)
 
     # Generate new product image
-    generated_url = await enhancer.generate_product_image(
+    _generated_url = await enhancer.generate_product_image(
         "black rose leather jacket with metallic details",
         model="flux",
     )

@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -37,7 +37,7 @@ except ImportError:
     Image = None  # type: ignore
 
 
-class LightingPreset(str, Enum):
+class LightingPreset(StrEnum):
     """Predefined lighting setups for product photography."""
 
     STUDIO = "studio"  # Classic 3-point lighting
@@ -49,7 +49,7 @@ class LightingPreset(str, Enum):
     LUXURY = "luxury"  # Premium luxury feel
 
 
-class BackgroundPreset(str, Enum):
+class BackgroundPreset(StrEnum):
     """Background options for product shots."""
 
     WHITE = "white"  # Pure white (e-commerce standard)
@@ -61,7 +61,7 @@ class BackgroundPreset(str, Enum):
     SKYYROSE_PINK = "skyyrose_pink"  # Brand pink (#B76E79)
 
 
-class CameraAngle(str, Enum):
+class CameraAngle(StrEnum):
     """Camera angle presets."""
 
     FRONT = "front"

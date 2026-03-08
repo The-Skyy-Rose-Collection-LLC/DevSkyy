@@ -12,7 +12,6 @@ import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
 from services.ml.visual_feature_extractor import (
     ColorInfo,
     ColorPalette,

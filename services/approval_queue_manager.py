@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class ApprovalStatus(str, Enum):
+class ApprovalStatus(StrEnum):
     """Status of approval item."""
 
     PENDING = "pending"
@@ -42,7 +42,7 @@ class ApprovalStatus(str, Enum):
     EXPIRED = "expired"
 
 
-class ApprovalAction(str, Enum):
+class ApprovalAction(StrEnum):
     """Action to take on an approval item."""
 
     APPROVE = "approve"
@@ -51,7 +51,7 @@ class ApprovalAction(str, Enum):
     SKIP = "skip"
 
 
-class RevisionPriority(str, Enum):
+class RevisionPriority(StrEnum):
     """Priority level for revision requests."""
 
     LOW = "low"

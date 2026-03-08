@@ -1,7 +1,7 @@
 # NPM Scripts Reference
 
 **Total Scripts**: 46 (28 root + 18 frontend)
-**Last Updated**: 2026-02-24
+**Last Updated**: 2026-03-03
 **Source**: `package.json` (v3.0.0), `frontend/package.json` (v1.0.0)
 
 This document provides comprehensive reference for all npm scripts available in the DevSkyy platform.

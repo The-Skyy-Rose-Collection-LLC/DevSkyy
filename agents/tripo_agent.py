@@ -24,7 +24,7 @@ import logging
 import os
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -39,7 +39,7 @@ except ImportError:
     TRIPO_SDK_AVAILABLE = False
     TaskStatus = None
 
-from agents.base_legacy import (
+from agents.core.base import (
     AgentCapability,
     AgentConfig,
     ExecutionResult,
@@ -66,7 +66,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class TripoTaskStatus(str, Enum):
+class TripoTaskStatus(StrEnum):
     """Tripo task status."""
 
     QUEUED = "queued"
@@ -76,7 +76,7 @@ class TripoTaskStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class ModelFormat(str, Enum):
+class ModelFormat(StrEnum):
     """3D model output formats."""
 
     GLB = "glb"  # Binary glTF - recommended for web
@@ -87,7 +87,7 @@ class ModelFormat(str, Enum):
     STL = "stl"  # 3D printing
 
 
-class ModelStyle(str, Enum):
+class ModelStyle(StrEnum):
     """Generation style presets."""
 
     REALISTIC = "realistic"

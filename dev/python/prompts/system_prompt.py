@@ -6,10 +6,10 @@ Specialized in TypeScript and Python development.
 """
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 
-class PromptTechnique(str, Enum):
+class PromptTechnique(StrEnum):
     """17 verified prompt engineering techniques."""
 
     ROLE_BASED = "role_based"

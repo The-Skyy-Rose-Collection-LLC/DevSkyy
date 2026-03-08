@@ -23,7 +23,7 @@ import os
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, BinaryIO
 
@@ -115,7 +115,7 @@ class R2NotFoundError(R2Error):
 # =============================================================================
 
 
-class AssetCategory(str, Enum):
+class AssetCategory(StrEnum):
     """Asset storage categories for organized bucket structure."""
 
     ORIGINAL = "original"  # Original uploaded images

@@ -32,7 +32,16 @@
 	   Product Data Cache
 	   -------------------------------------------------- */
 
+	var CACHE_MAX = 50;
 	var productCache = new Map();
+
+	function setCacheEntry(sku, data) {
+		if (productCache.size >= CACHE_MAX) {
+			var firstKey = productCache.keys().next().value;
+			productCache.delete(firstKey);
+		}
+		productCache.set(sku, data);
+	}
 
 	/* --------------------------------------------------
 	   AJAX Helper
@@ -115,7 +124,7 @@
 			'skyyrose_get_product_by_sku',
 			{ sku: sku },
 			function (data) {
-				productCache.set(sku, data);
+				setCacheEntry(sku, data);
 				if (onSuccess) onSuccess(data);
 			},
 			onError

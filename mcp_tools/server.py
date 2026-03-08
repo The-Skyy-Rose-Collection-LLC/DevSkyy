@@ -8,7 +8,6 @@ except ImportError:
     settings = None  # Fallback for standalone mode
 
 from mcp.server.fastmcp import FastMCP
-
 from utils.logging_utils import configure_logging, get_logger
 
 # ===========================

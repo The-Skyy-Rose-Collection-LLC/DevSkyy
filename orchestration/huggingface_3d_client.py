@@ -46,7 +46,7 @@ import ssl
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -72,7 +72,7 @@ HF_SPACE_INSTANTMESH = "TencentARC/InstantMesh"
 HF_SPACE_HUNYUAN3D = "tencent/Hunyuan3D-2"
 
 
-class HF3DModel(str, Enum):
+class HF3DModel(StrEnum):
     """Available HuggingFace 3D models - 2025 Edition."""
 
     # Tencent Models (State-of-the-art)
@@ -98,7 +98,7 @@ class HF3DModel(str, Enum):
     CUSTOM = "custom"  # For user-specified models
 
 
-class HF3DFormat(str, Enum):
+class HF3DFormat(StrEnum):
     """Output formats for HuggingFace 3D generation."""
 
     PLY = "ply"  # Point cloud / mesh format
@@ -110,7 +110,7 @@ class HF3DFormat(str, Enum):
     NPZ = "npz"  # NumPy compressed (for processing)
 
 
-class HF3DQuality(str, Enum):
+class HF3DQuality(StrEnum):
     """Quality presets for 3D generation."""
 
     DRAFT = "draft"  # Fast, low quality

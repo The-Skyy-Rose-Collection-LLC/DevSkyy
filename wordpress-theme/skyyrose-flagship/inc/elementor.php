@@ -2,6 +2,9 @@
 /**
  * Elementor Integration
  *
+ * Registers custom SkyyRose widgets, editor styles, frontend scripts,
+ * and brand-correct default schemes for the Elementor page builder.
+ *
  * @package SkyyRose_Flagship
  * @since 1.0.0
  */
@@ -29,10 +32,7 @@ add_action( 'elementor/theme/register_locations', 'skyyrose_register_elementor_l
  * @since 1.0.0
  */
 function skyyrose_add_elementor_support() {
-	// Add theme support for Elementor.
 	add_theme_support( 'elementor' );
-
-	// Add Elementor Pro features.
 	add_theme_support( 'elementor-pro' );
 }
 add_action( 'after_setup_theme', 'skyyrose_add_elementor_support' );
@@ -40,19 +40,38 @@ add_action( 'after_setup_theme', 'skyyrose_add_elementor_support' );
 /**
  * Register custom Elementor widgets.
  *
+ * Uses the modern Elementor 3.5+ `register` hook and method.
+ *
  * @since 1.0.0
+ * @since 3.3.0 Migrated from deprecated widgets_registered / register_widget_type.
+ *
+ * @param \Elementor\Widgets_Manager $widgets_manager Elementor widgets manager.
  */
-function skyyrose_register_elementor_widgets() {
-	// Include widget files.
-	$widget_files = glob( SKYYROSE_THEME_DIR . '/elementor/widgets/*.php' );
+function skyyrose_register_elementor_widgets( $widgets_manager ) {
+	$widget_dir = SKYYROSE_THEME_DIR . '/elementor/widgets';
 
-	if ( $widget_files ) {
-		foreach ( $widget_files as $widget_file ) {
-			require_once $widget_file;
+	$widget_map = array(
+		'three-viewer.php'     => 'SkyyRose_Three_Viewer_Widget',
+		'product-card.php'     => 'SkyyRose_Product_Card_Widget',
+		'collection-hero.php'  => 'SkyyRose_Collection_Hero_Widget',
+		'featured-product.php' => 'SkyyRose_Featured_Product_Widget',
+		'lookbook.php'         => 'SkyyRose_Lookbook_Widget',
+		'newsletter.php'       => 'SkyyRose_Newsletter_Widget',
+		'testimonials.php'     => 'SkyyRose_Testimonials_Widget',
+		'preorder-cta.php'     => 'SkyyRose_Preorder_CTA_Widget',
+	);
+
+	foreach ( $widget_map as $file => $class ) {
+		$path = $widget_dir . '/' . $file;
+		if ( file_exists( $path ) ) {
+			require_once $path;
+			if ( class_exists( $class ) ) {
+				$widgets_manager->register( new $class() );
+			}
 		}
 	}
 }
-add_action( 'elementor/widgets/widgets_registered', 'skyyrose_register_elementor_widgets' );
+add_action( 'elementor/widgets/register', 'skyyrose_register_elementor_widgets' );
 
 /**
  * Add custom Elementor widget categories.
@@ -108,6 +127,20 @@ function skyyrose_elementor_frontend_scripts() {
 		SKYYROSE_VERSION,
 		true
 	);
+
+	wp_enqueue_style(
+		'skyyrose-collection-v4',
+		SKYYROSE_ASSETS_URI . '/css/collection-v4.css',
+		array(),
+		SKYYROSE_VERSION
+	);
+
+	wp_enqueue_style(
+		'skyyrose-design-tokens',
+		SKYYROSE_ASSETS_URI . '/css/design-tokens.css',
+		array(),
+		SKYYROSE_VERSION
+	);
 }
 add_action( 'elementor/frontend/after_enqueue_scripts', 'skyyrose_elementor_frontend_scripts' );
 
@@ -156,41 +189,40 @@ function skyyrose_elementor_canvas_content_close() {
 add_action( 'elementor/page_templates/canvas/after_content', 'skyyrose_elementor_canvas_content_close' );
 
 /**
- * Add default Elementor schemes.
+ * Set brand-correct Elementor default schemes.
  *
  * @since 1.0.0
+ * @since 3.3.0 Updated to SkyyRose brand colors and typography.
  */
 function skyyrose_set_elementor_default_schemes() {
-	// Set default color scheme.
 	update_option(
 		'elementor_scheme_color',
 		array(
-			'1' => '#000000', // Primary.
-			'2' => '#666666', // Secondary.
-			'3' => '#333333', // Text.
-			'4' => '#ffffff', // Accent.
+			'1' => '#0A0A0A', // Primary — dark base.
+			'2' => '#B76E79', // Secondary — rose gold.
+			'3' => '#FFFFFF', // Text — white on dark.
+			'4' => '#D4AF37', // Accent — gold.
 		)
 	);
 
-	// Set default typography scheme.
 	update_option(
 		'elementor_scheme_typography',
 		array(
 			'1' => array( // Primary Headline.
-				'font_family' => 'Roboto',
-				'font_weight' => '700',
+				'font_family' => 'Cinzel',
+				'font_weight' => '900',
 			),
 			'2' => array( // Secondary Headline.
-				'font_family' => 'Roboto',
-				'font_weight' => '600',
+				'font_family' => 'Cinzel',
+				'font_weight' => '700',
 			),
 			'3' => array( // Body Text.
-				'font_family' => 'Roboto',
+				'font_family' => 'Inter',
 				'font_weight' => '400',
 			),
-			'4' => array( // Accent Text.
-				'font_family' => 'Roboto',
-				'font_weight' => '500',
+			'4' => array( // Accent / Labels.
+				'font_family' => 'Bebas Neue',
+				'font_weight' => '400',
 			),
 		)
 	);

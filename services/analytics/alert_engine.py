@@ -25,7 +25,7 @@ import logging
 import uuid
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Protocol
 
 from pydantic import BaseModel, Field
@@ -56,7 +56,7 @@ DEFAULT_COOLDOWN_SECONDS = 300
 # =============================================================================
 
 
-class ConditionType(str, Enum):
+class ConditionType(StrEnum):
     """Types of alert conditions."""
 
     THRESHOLD = "threshold"
@@ -64,7 +64,7 @@ class ConditionType(str, Enum):
     RATE = "rate"
 
 
-class ConditionOperator(str, Enum):
+class ConditionOperator(StrEnum):
     """Operators for condition evaluation."""
 
     GT = "gt"
@@ -75,7 +75,7 @@ class ConditionOperator(str, Enum):
     NEQ = "neq"
 
 
-class AlertSeverity(str, Enum):
+class AlertSeverity(StrEnum):
     """Alert severity levels."""
 
     INFO = "info"
@@ -83,7 +83,7 @@ class AlertSeverity(str, Enum):
     CRITICAL = "critical"
 
 
-class AlertStatus(str, Enum):
+class AlertStatus(StrEnum):
     """Alert status values."""
 
     TRIGGERED = "triggered"

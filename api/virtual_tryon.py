@@ -28,7 +28,7 @@ import socket
 import threading
 import uuid
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -171,7 +171,7 @@ def validate_file_extension(filename: str | None) -> str:
 # =============================================================================
 
 
-class TryOnProvider(str, Enum):
+class TryOnProvider(StrEnum):
     """Virtual try-on provider."""
 
     FASHN = "fashn"  # Commercial API (production-ready)
@@ -179,7 +179,7 @@ class TryOnProvider(str, Enum):
     ROUND_TABLE = "round_table"  # Both compete, A/B test winner
 
 
-class GarmentCategory(str, Enum):
+class GarmentCategory(StrEnum):
     """Garment category for try-on."""
 
     TOPS = "tops"
@@ -189,7 +189,7 @@ class GarmentCategory(str, Enum):
     FULL_BODY = "full_body"
 
 
-class TryOnMode(str, Enum):
+class TryOnMode(StrEnum):
     """Try-on quality mode."""
 
     QUALITY = "quality"  # Higher quality, slower (~20s)
@@ -197,7 +197,7 @@ class TryOnMode(str, Enum):
     FAST = "fast"  # Faster, lower quality (~6s)
 
 
-class JobStatus(str, Enum):
+class JobStatus(StrEnum):
     """Generation job status."""
 
     QUEUED = "queued"
@@ -206,7 +206,7 @@ class JobStatus(str, Enum):
     FAILED = "failed"
 
 
-class ModelGender(str, Enum):
+class ModelGender(StrEnum):
     """AI model gender for generation."""
 
     FEMALE = "female"

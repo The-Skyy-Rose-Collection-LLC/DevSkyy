@@ -16,7 +16,7 @@ Covers missing endpoints:
 import logging
 import secrets
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class AgentCategory(str, Enum):
+class AgentCategory(StrEnum):
     """Agent categories"""
 
     SOCIAL_MEDIA = "social_media"
@@ -50,7 +50,7 @@ class AgentCategory(str, Enum):
     THREE_D_GENERATION = "three_d_generation"
 
 
-class TaskStatus(str, Enum):
+class TaskStatus(StrEnum):
     """Task execution status"""
 
     QUEUED = "queued"
@@ -60,7 +60,7 @@ class TaskStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class Priority(str, Enum):
+class Priority(StrEnum):
     """Task priority"""
 
     LOW = "low"
@@ -112,7 +112,7 @@ class AgentInfo(BaseModel):
 # =============================================================================
 
 
-class ModelFormat(str, Enum):
+class ModelFormat(StrEnum):
     """3D model output formats"""
 
     GLB = "glb"
@@ -159,7 +159,7 @@ class ThreeDGenerationResult(BaseModel):
 # =============================================================================
 
 
-class SocialPlatform(str, Enum):
+class SocialPlatform(StrEnum):
     INSTAGRAM = "instagram"
     TIKTOK = "tiktok"
     TWITTER = "twitter"
@@ -226,7 +226,7 @@ class CampaignRequest(BaseModel):
 # =============================================================================
 
 
-class TicketPriority(str, Enum):
+class TicketPriority(StrEnum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -256,7 +256,7 @@ class ChatbotRequest(BaseModel):
 # =============================================================================
 
 
-class ContentType(str, Enum):
+class ContentType(StrEnum):
     BLOG_POST = "blog_post"
     PRODUCT_DESCRIPTION = "product_description"
     AD_COPY = "ad_copy"

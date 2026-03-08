@@ -195,7 +195,7 @@ class LearningJournal:
             groups.setdefault(key, []).append(entry)
 
         instincts: list[Instinct] = []
-        for key, entries in groups.items():
+        for _key, entries in groups.items():
             if len(entries) < min_occurrences:
                 continue
 

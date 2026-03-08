@@ -160,10 +160,10 @@
 					<h4 class="footer-grid__heading"><?php esc_html_e( 'Help', 'skyyrose-flagship' ); ?></h4>
 					<ul class="footer-grid__list">
 						<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Contact Us', 'skyyrose-flagship' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/faq/' ) ); ?>"><?php esc_html_e( 'FAQ', 'skyyrose-flagship' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/shipping/' ) ); ?>"><?php esc_html_e( 'Shipping & Returns', 'skyyrose-flagship' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/size-guide/' ) ); ?>"><?php esc_html_e( 'Size Guide', 'skyyrose-flagship' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/care-instructions/' ) ); ?>"><?php esc_html_e( 'Care Instructions', 'skyyrose-flagship' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/contact/#faq' ) ); ?>"><?php esc_html_e( 'FAQ', 'skyyrose-flagship' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Shipping & Returns', 'skyyrose-flagship' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Size Guide', 'skyyrose-flagship' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/contact/#faq' ) ); ?>"><?php esc_html_e( 'Care Instructions', 'skyyrose-flagship' ); ?></a></li>
 					</ul>
 				</div>
 
@@ -231,10 +231,19 @@
 <!-- Toast Notification Container -->
 <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-<!-- Luxury Cursor (desktop only, hidden from assistive tech) -->
-<div class="luxury-cursor-ring" aria-hidden="true"></div>
-<div class="luxury-cursor-dot" aria-hidden="true"></div>
-<div class="luxury-cursor-trail" aria-hidden="true"></div>
+<!-- Luxury Cursor elements created dynamically by luxury-cursor.js -->
+
+<!-- Scroll Progress Indicator -->
+<div class="sr-scroll-progress" aria-hidden="true">
+	<div class="sr-scroll-progress__bar"></div>
+</div>
+
+<!-- Back to Top -->
+<button class="sr-back-to-top" aria-label="<?php esc_attr_e( 'Back to top', 'skyyrose-flagship' ); ?>" type="button">
+	<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+		<polyline points="18 15 12 9 6 15"/>
+	</svg>
+</button>
 
 <?php wp_footer(); ?>
 

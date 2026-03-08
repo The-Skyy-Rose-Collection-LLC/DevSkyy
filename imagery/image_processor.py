@@ -13,7 +13,7 @@ from __future__ import annotations
 import io
 import logging
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -41,7 +41,7 @@ from errors.production_errors import ImageProcessingError
 logger = logging.getLogger(__name__)
 
 
-class ImageFormat(str, Enum):
+class ImageFormat(StrEnum):
     """Supported image formats."""
 
     PNG = "PNG"

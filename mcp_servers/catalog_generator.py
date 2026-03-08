@@ -23,7 +23,7 @@ import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class ExportFormat(str, Enum):
+class ExportFormat(StrEnum):
     """Supported export formats."""
 
     OPENAI = "openai"
@@ -47,7 +47,7 @@ class ExportFormat(str, Enum):
     JSON = "json"
 
 
-class ToolCategory(str, Enum):
+class ToolCategory(StrEnum):
     """Tool categories for organization."""
 
     CONTENT = "content"
@@ -62,7 +62,7 @@ class ToolCategory(str, Enum):
     SECURITY = "security"
 
 
-class ToolSeverity(str, Enum):
+class ToolSeverity(StrEnum):
     """Tool severity levels for permission management."""
 
     READ_ONLY = "read_only"

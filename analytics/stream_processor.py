@@ -145,7 +145,7 @@ class StreamProcessor:
         If confluent_kafka is unavailable, logs a warning and returns.
         """
         try:
-            from confluent_kafka import Consumer, KafkaError, KafkaException
+            from confluent_kafka import Consumer, KafkaError, KafkaException  # noqa: F401
         except ImportError:
             logger.warning(
                 "confluent_kafka not installed. Install with: pip install confluent-kafka"

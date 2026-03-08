@@ -120,7 +120,7 @@
 
 		// Populate sizes
 		if (panelSizes) {
-			panelSizes.innerHTML = '';
+			while (panelSizes.firstChild) { panelSizes.removeChild(panelSizes.firstChild); }
 			var sizes = (data.sizes || '').split(',').filter(Boolean);
 			sizes.forEach(function (size) {
 				var btn = document.createElement('button');
@@ -374,9 +374,20 @@
 
 	function initKeyboard() {
 		document.addEventListener('keydown', function (e) {
-			// Close panel on Escape.
 			if (e.key === 'Escape') {
-				closePanel();
+				// Priority: close product panel first.
+				if (panel && panel.classList.contains('open')) {
+					closePanel();
+					return;
+				}
+				// Then exit cinematic mode if active.
+				if (scene && scene.classList.contains('cinematic-active')) {
+					scene.classList.remove('cinematic-active');
+					document.body.classList.remove('cinematic-mode');
+					var cToggle = document.querySelector('.cinematic-toggle');
+					if (cToggle) cToggle.setAttribute('aria-pressed', 'false');
+					try { sessionStorage.removeItem('skyyrose_cinematic_mode'); } catch (err) { /* quota */ }
+				}
 				return;
 			}
 
@@ -436,6 +447,10 @@
 
 	function initEnhancedTransitions() {
 		if (totalRooms <= 1) return;
+
+		// Respect prefers-reduced-motion — skip GPU compositor promotion.
+		var motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+		if (motionQuery.matches) return;
 
 		// Ensure all layers have GPU-accelerated transitions.
 		layers.forEach(function (layer) {
@@ -556,18 +571,8 @@
 			}, 0);
 		});
 
-		// Also listen for Escape to exit cinematic mode.
-		document.addEventListener('keydown', function (e) {
-			if (e.key === 'Escape' && scene.classList.contains('cinematic-active')) {
-				// Yield to the product-panel Escape handler when panel is open.
-				if (panel && panel.classList.contains('open')) return;
-				scene.classList.remove('cinematic-active');
-				// Sync body state too.
-				document.body.classList.remove('cinematic-mode');
-				cinematicToggle.setAttribute('aria-pressed', 'false');
-				try { sessionStorage.removeItem('skyyrose_cinematic_mode'); } catch (err) { /* quota */ }
-			}
-		});
+		// Escape handling for cinematic mode is merged into initKeyboard()
+		// to prevent duplicate document-level keydown listeners.
 	}
 
 	/* --------------------------------------------------

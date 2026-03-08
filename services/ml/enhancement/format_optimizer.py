@@ -17,19 +17,19 @@ from __future__ import annotations
 
 import io
 import logging
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import httpx
 from PIL import Image
 from pydantic import BaseModel
+from services.storage.r2_client import R2Client, R2Config
 
 from errors.production_errors import (
     DevSkyError,
     DevSkyErrorCode,
     DevSkyErrorSeverity,
 )
-from services.storage.r2_client import R2Client, R2Config
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +62,7 @@ SOCIAL_VARIANTS = {
 # =============================================================================
 
 
-class OutputFormat(str, Enum):
+class OutputFormat(StrEnum):
     """Supported output formats."""
 
     WEBP = "webp"

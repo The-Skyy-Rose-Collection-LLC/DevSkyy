@@ -106,23 +106,64 @@
 .navbar__menu > li > a {
 	display: flex;
 	align-items: center;
-	gap: 0.25rem;
-	padding: 0.5rem 1rem;
-	font-family: var(--font-body, 'Inter', -apple-system, sans-serif);
-	font-size: 0.8125rem;
-	font-weight: 500;
-	letter-spacing: 0.08em;
+	gap: 0.35rem;
+	padding: 0.5rem 1.15rem;
+	font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.14em;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.7);
+	color: rgba(255, 255, 255, 0.65);
 	text-decoration: none;
-	transition: color 0.25s ease;
+	transition: color 0.3s ease;
 	white-space: nowrap;
+	position: relative;
+}
+
+.navbar__menu > li > a::after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 1.15rem;
+	right: 1.15rem;
+	height: 1px;
+	background: #B76E79;
+	transform: scaleX(0);
+	transform-origin: right;
+	transition: transform 0.3s ease;
+}
+
+.navbar__menu > li > a:hover::after,
+.navbar__menu > li.current-menu-item > a::after,
+.navbar__menu > li.current_page_item > a::after {
+	transform: scaleX(1);
+	transform-origin: left;
 }
 
 .navbar__menu > li > a:hover,
 .navbar__menu > li.current-menu-item > a,
 .navbar__menu > li.current_page_item > a {
-	color: #B76E79;
+	color: #fff;
+}
+
+/* Dropdown chevron (pure CSS — works for both wp_nav_menu and fallback) */
+.navbar__menu > li.menu-item-has-children > a::before {
+	content: '';
+	order: 99;
+	width: 6px;
+	height: 6px;
+	border-right: 1.5px solid currentColor;
+	border-bottom: 1.5px solid currentColor;
+	transform: rotate(45deg) translateY(-2px);
+	opacity: 0.5;
+	transition: transform 0.25s ease, opacity 0.25s ease;
+	margin-left: 0.2rem;
+}
+
+.navbar__menu > li.menu-item-has-children:hover > a::before,
+.navbar__menu > li.menu-item-has-children:focus-within > a::before {
+	transform: rotate(-135deg) translateY(-2px);
+	opacity: 0.8;
 }
 
 /* Dropdown sub-menus */
@@ -157,18 +198,18 @@
 .navbar__menu .sub-menu li a {
 	display: block;
 	padding: 0.625rem 1.25rem;
-	font-family: var(--font-body, 'Inter', -apple-system, sans-serif);
-	font-size: 0.8125rem;
-	font-weight: 400;
-	color: rgba(255, 255, 255, 0.65);
+	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-size: 0.9rem;
+	font-weight: 500;
+	color: rgba(255, 255, 255, 0.6);
 	text-decoration: none;
-	letter-spacing: 0.04em;
+	letter-spacing: 0.03em;
 	transition: color 0.2s ease, background 0.2s ease, padding-left 0.2s ease;
 }
 
 .navbar__menu .sub-menu li a:hover {
 	color: #B76E79;
-	background: rgba(183, 110, 121, 0.08);
+	background: rgba(183, 110, 121, 0.06);
 	padding-left: 1.5rem;
 }
 
@@ -310,9 +351,10 @@
 	flex: 1;
 	background: transparent;
 	border: none;
-	font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+	font-family: 'Cormorant Garamond', Georgia, serif;
 	font-size: clamp(1.25rem, 3vw, 2rem);
 	font-weight: 400;
+	font-style: italic;
 	color: #fff;
 	padding: 0.5rem 0;
 }
@@ -457,14 +499,20 @@
 .mobile-menu__nav > ul > li > a {
 	display: block;
 	padding: 0.875rem 1.5rem;
-	font-family: var(--font-body, 'Inter', -apple-system, sans-serif);
-	font-size: 0.9375rem;
-	font-weight: 500;
-	letter-spacing: 0.05em;
+	font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	letter-spacing: 0.12em;
 	text-transform: uppercase;
 	color: rgba(255, 255, 255, 0.8);
 	text-decoration: none;
-	transition: color 0.2s ease, padding-left 0.2s ease;
+	transition: color 0.3s ease, padding-left 0.25s ease;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.mobile-menu__list > li:last-child > a,
+.mobile-menu__nav > ul > li:last-child > a {
+	border-bottom: none;
 }
 
 .mobile-menu__list > li > a:hover,
@@ -484,12 +532,13 @@
 .mobile-menu__list .sub-menu a,
 .mobile-menu__nav ul .sub-menu a {
 	display: block;
-	padding: 0.625rem 1.5rem 0.625rem 2.5rem;
-	font-size: 0.8125rem;
-	font-weight: 400;
+	padding: 0.6rem 1.5rem 0.6rem 2.5rem;
+	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-size: 0.9rem;
+	font-weight: 500;
 	color: rgba(255, 255, 255, 0.5);
 	text-decoration: none;
-	letter-spacing: 0.04em;
+	letter-spacing: 0.02em;
 	transition: color 0.2s ease;
 }
 
