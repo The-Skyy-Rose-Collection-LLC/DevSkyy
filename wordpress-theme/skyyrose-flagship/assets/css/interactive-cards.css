@@ -631,6 +631,16 @@
 .ipc-grid .ipc:nth-child(4) { transition-delay: 0.3s; }
 .ipc-grid .ipc:nth-child(5) { transition-delay: 0.4s; }
 .ipc-grid .ipc:nth-child(6) { transition-delay: 0.5s; }
+.ipc-grid .ipc:nth-child(7) { transition-delay: 0.6s; }
+.ipc-grid .ipc:nth-child(8) { transition-delay: 0.7s; }
+.ipc-grid .ipc:nth-child(9) { transition-delay: 0.8s; }
+.ipc-grid .ipc:nth-child(n+10) { transition-delay: 0.9s; }
+
+.no-js .ipc,
+.no-js .prc {
+	opacity: 1;
+	transform: none;
+}
 
 /* ==========================================================================
    14. Accessibility

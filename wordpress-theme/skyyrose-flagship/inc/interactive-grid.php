@@ -36,6 +36,29 @@ function skyyrose_get_product_render_images( $sku ) {
 }
 
 /**
+ * Normalize catalog product fields for template consumption.
+ *
+ * @since  4.2.0
+ * @param  array $product Raw product data from catalog.
+ * @return array Normalized product with desc, url, price_display.
+ */
+function skyyrose_normalize_product_for_template( $product ) {
+	$normalized = $product;
+	$sku = isset( $normalized['sku'] ) ? $normalized['sku'] : '';
+
+	if ( ! isset( $normalized['desc'] ) && isset( $normalized['description'] ) ) {
+		$normalized['desc'] = $normalized['description'];
+	}
+	if ( empty( $normalized['url'] ) && function_exists( 'skyyrose_product_url' ) ) {
+		$normalized['url'] = skyyrose_product_url( $sku );
+	}
+	if ( empty( $normalized['price_display'] ) && function_exists( 'skyyrose_format_price' ) ) {
+		$normalized['price_display'] = skyyrose_format_price( $product );
+	}
+	return $normalized;
+}
+
+/**
  * Render an interactive product grid.
  *
  * @since 4.1.0
@@ -58,20 +81,9 @@ function skyyrose_render_interactive_grid( $products, $collection_config ) {
 	echo '<div class="ipc-grid" data-collection="' . esc_attr( $col['slug'] ) . '">';
 
 	foreach ( $products as $product ) {
-		$sku    = isset( $product['sku'] ) ? $product['sku'] : '';
-		$images = skyyrose_get_product_render_images( $sku );
-
-		// Normalize catalog fields → template fields.
-		$normalized = $product;
-		if ( ! isset( $normalized['desc'] ) && isset( $normalized['description'] ) ) {
-			$normalized['desc'] = $normalized['description'];
-		}
-		if ( empty( $normalized['url'] ) && function_exists( 'skyyrose_product_url' ) ) {
-			$normalized['url'] = skyyrose_product_url( $sku );
-		}
-		if ( empty( $normalized['price_display'] ) && function_exists( 'skyyrose_format_price' ) ) {
-			$normalized['price_display'] = skyyrose_format_price( $product );
-		}
+		$sku        = isset( $product['sku'] ) ? $product['sku'] : '';
+		$images     = skyyrose_get_product_render_images( $sku );
+		$normalized = skyyrose_normalize_product_for_template( $product );
 
 		get_template_part( 'template-parts/interactive-product-card', null, array(
 			'product'    => $normalized,
@@ -127,17 +139,7 @@ function skyyrose_render_preorder_grid( $products, $collection_config, $reveal_a
 	echo '<div class="ipc-grid ipc-grid--preorder" data-collection="' . esc_attr( $col['slug'] ) . '">';
 
 	foreach ( $preorder_products as $product ) {
-		// Normalize catalog fields → template fields.
-		$normalized = $product;
-		if ( ! isset( $normalized['desc'] ) && isset( $normalized['description'] ) ) {
-			$normalized['desc'] = $normalized['description'];
-		}
-		if ( empty( $normalized['url'] ) && function_exists( 'skyyrose_product_url' ) ) {
-			$normalized['url'] = skyyrose_product_url( isset( $product['sku'] ) ? $product['sku'] : '' );
-		}
-		if ( empty( $normalized['price_display'] ) && function_exists( 'skyyrose_format_price' ) ) {
-			$normalized['price_display'] = skyyrose_format_price( $product );
-		}
+		$normalized = skyyrose_normalize_product_for_template( $product );
 
 		get_template_part( 'template-parts/preorder-reveal-card', null, array(
 			'product'    => $normalized,
