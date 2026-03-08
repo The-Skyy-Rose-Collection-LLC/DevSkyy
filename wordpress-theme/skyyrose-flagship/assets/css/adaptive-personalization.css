@@ -308,7 +308,7 @@
 	align-self: flex-start;
 	padding: 3px 10px;
 	font-family: var(--ape-font-body);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
@@ -448,7 +448,7 @@
 	min-width: 18px;
 	height: 18px;
 	padding: 0 5px;
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 700;
 	letter-spacing: 0;
 	color: var(--ape-rose);
@@ -830,7 +830,7 @@ body.mood-golden .immersive-scene::after {
 .ape-recently-viewed__label {
 	flex-shrink: 0;
 	font-family: var(--ape-font-body);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
@@ -947,7 +947,7 @@ body.ape-debug .ape-intent-badge {
 	.ape-intent-badge {
 		top: 8px;
 		right: 8px;
-		font-size: 0.6rem;
+		font-size: 0.6875rem;
 		padding: 4px 8px;
 	}
 }
@@ -969,7 +969,7 @@ body.ape-debug .ape-intent-badge {
 	.ape-fab__count {
 		min-width: 16px;
 		height: 16px;
-		font-size: 0.55rem;
+		font-size: 0.6875rem;
 	}
 
 	/* Bundle toast: full width minus gutters */

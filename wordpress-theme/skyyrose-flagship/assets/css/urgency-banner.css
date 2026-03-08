@@ -114,7 +114,7 @@
 	}
 
 	.sr-urgency-msg {
-		font-size: 9px;
+		font-size: 11px;
 		letter-spacing: 1px;
 	}
 
@@ -124,7 +124,7 @@
 	}
 
 	.sr-urgency-cta {
-		font-size: 9px;
+		font-size: 11px;
 		padding: 4px 12px;
 	}
 }

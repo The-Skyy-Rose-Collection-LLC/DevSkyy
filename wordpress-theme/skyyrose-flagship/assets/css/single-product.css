@@ -40,7 +40,7 @@
     align-items: center;
     gap: 8px;
     font-family: 'Space Mono', monospace;
-    font-size: 8px;
+    font-size: 11px;
     letter-spacing: 3px;
     text-transform: uppercase;
 }
@@ -125,7 +125,7 @@
     right: 16px;
     z-index: 10;
     font-family: 'Space Mono', monospace;
-    font-size: 7px;
+    font-size: 10px;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--sr-accent);
@@ -141,7 +141,7 @@
     left: 16px;
     z-index: 10;
     font-family: 'Space Mono', monospace;
-    font-size: 7px;
+    font-size: 10px;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: rgba(var(--sr-accent-rgb), .5);
@@ -191,7 +191,7 @@
 
 .sr-info-collection {
     font-family: 'Space Mono', monospace;
-    font-size: 8px;
+    font-size: 11px;
     letter-spacing: 6px;
     text-transform: uppercase;
     color: var(--sr-accent);
@@ -250,7 +250,7 @@
     display: flex;
     gap: 12px;
     font-family: 'Space Mono', monospace;
-    font-size: 9px;
+    font-size: 11px;
     letter-spacing: 2px;
 }
 
@@ -286,7 +286,7 @@
 
 .sr-atc-wrap .variations .label label {
     font-family: 'Space Mono', monospace;
-    font-size: 8px;
+    font-size: 11px;
     letter-spacing: 4px;
     text-transform: uppercase;
     color: var(--sr-accent);
@@ -393,7 +393,7 @@
 /* Reset link */
 .sr-atc-wrap .reset_variations {
     font-family: 'Space Mono', monospace;
-    font-size: 8px;
+    font-size: 11px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: rgba(var(--sr-accent-rgb), .3);
@@ -420,7 +420,7 @@
 /* Stock status */
 .sr-stock {
     font-family: 'Space Mono', monospace;
-    font-size: 8px;
+    font-size: 11px;
     letter-spacing: 3px;
     text-transform: uppercase;
     display: flex;
@@ -464,7 +464,7 @@
     align-items: center;
     gap: 10px;
     font-family: 'Space Mono', monospace;
-    font-size: 8px;
+    font-size: 11px;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: rgba(var(--sr-accent-rgb), .25);
@@ -583,7 +583,7 @@
 
 .sr-related-link {
     font-family: 'Space Mono', monospace;
-    font-size: 8px;
+    font-size: 11px;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--sr-accent);
@@ -647,7 +647,7 @@
     top: 12px;
     left: 12px;
     font-family: 'Space Mono', monospace;
-    font-size: 7px;
+    font-size: 10px;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--sr-accent);
@@ -717,7 +717,7 @@
 
 .sr-cta-eye {
     font-family: 'Space Mono', monospace;
-    font-size: 8px;
+    font-size: 11px;
     letter-spacing: 6px;
     text-transform: uppercase;
     color: var(--sr-accent);
@@ -1055,7 +1055,7 @@
     top: 8px;
     left: 8px;
     padding: 3px 10px;
-    font-size: 9px;
+    font-size: 11px;
     font-family: var(--fd, 'Cinzel', serif);
     text-transform: uppercase;
     letter-spacing: 2px;

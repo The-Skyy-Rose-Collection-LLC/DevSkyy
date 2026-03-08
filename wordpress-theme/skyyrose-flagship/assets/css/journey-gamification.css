@@ -293,7 +293,7 @@
 	background: rgba(255, 255, 255, 0.08);
 	color: rgba(255, 255, 255, 0.5);
 	font-family: var(--jge-font-body);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -416,7 +416,7 @@
 /* Link back to immersive */
 .jge-achievement-bar__link {
 	font-family: var(--jge-font-body);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
@@ -452,7 +452,7 @@
 
 .jge-crosssell__heading {
 	font-family: var(--jge-font-body);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.22em;
 	text-transform: uppercase;
@@ -613,7 +613,7 @@
 	background: transparent;
 
 	font-family: var(--jge-font-body);
-	font-size: 0.56rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
@@ -666,7 +666,7 @@
 		top: 12px;
 		right: 12px;
 		padding: 5px 10px;
-		font-size: 0.6rem;
+		font-size: 0.6875rem;
 	}
 
 	.jge-progress-pill__bar {
@@ -713,7 +713,7 @@
 	}
 
 	.jge-achievement-bar__link {
-		font-size: 0.55rem;
+		font-size: 0.6875rem;
 	}
 
 	/* Cross-Sell Strip */
@@ -728,7 +728,7 @@
 	}
 
 	.jge-crosssell__name {
-		font-size: 0.6rem;
+		font-size: 0.6875rem;
 	}
 
 	.jge-crosssell__price {
@@ -736,7 +736,7 @@
 	}
 
 	.jge-crosssell__add {
-		font-size: 0.52rem;
+		font-size: 0.6875rem;
 		padding: 4px 6px;
 	}
 }

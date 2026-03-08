@@ -59,7 +59,7 @@ function skyyrose_inline_critical_css() {
 			--gold: #D4AF37;
 			--silver: #C0C0C0;
 			--font-heading: "Playfair Display", Georgia, serif;
-			--font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+			--font-body: "Cormorant Garamond", Georgia, serif;
 		}
 	';
 

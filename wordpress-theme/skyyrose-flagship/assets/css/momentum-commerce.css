@@ -495,7 +495,7 @@ body:has(.mc-ticker--visible) {
 
 	.mc-ticker__item {
 		padding: 0 20px;
-		font-size: 0.62rem;
+		font-size: 0.6875rem;
 	}
 
 	.mc-price-anchor {

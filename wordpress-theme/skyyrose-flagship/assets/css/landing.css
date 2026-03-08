@@ -284,7 +284,7 @@
 
 .lp-countdown__label {
 	font-family: var(--fm, 'Space Mono', monospace);
-	font-size: 9px;
+	font-size: 11px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	color: var(--lp-text-dim);
@@ -496,7 +496,7 @@
 	top: 12px;
 	right: 12px;
 	font-family: var(--fm, 'Space Mono', monospace);
-	font-size: 9px;
+	font-size: 11px;
 	letter-spacing: 2px;
 	padding: 4px 10px;
 	text-transform: uppercase;
@@ -568,7 +568,7 @@
 
 .lp-afterpay-note {
 	font-family: var(--fm, 'Space Mono', monospace);
-	font-size: 9px;
+	font-size: 11px;
 	letter-spacing: 2px;
 	color: var(--lp-text-dim);
 	display: block;
@@ -971,7 +971,7 @@
 
 .lp-toast__time {
 	font-family: var(--fm, 'Space Mono', monospace);
-	font-size: 9px;
+	font-size: 11px;
 	letter-spacing: 1px;
 	color: var(--lp-text-dim);
 	margin-top: 2px;

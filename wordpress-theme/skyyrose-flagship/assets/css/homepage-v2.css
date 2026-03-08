@@ -97,7 +97,7 @@
 }
 .ld-tag {
 	font-family: var(--ff-mono);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 8px;
 	text-transform: uppercase;
 	color: var(--rose);
@@ -158,7 +158,7 @@
 .nav.scrolled .nav-name { letter-spacing: 6px; }
 .nav-sub {
 	font-family: var(--ff-mono);
-	font-size: 6px;
+	font-size: 10px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
 	color: var(--rose);
@@ -174,7 +174,7 @@
 }
 .nav-link {
 	font-family: var(--ff-mono);
-	font-size: 9px;
+	font-size: 11px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	color: var(--haze);
@@ -213,7 +213,7 @@
 	background: var(--rose);
 	color: #fff;
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	width: 16px;
 	height: 16px;
 	border-radius: 50%;
@@ -470,7 +470,7 @@
 }
 .hero-scroll span {
 	font-family: var(--ff-mono);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 5px;
 	text-transform: uppercase;
 	color: var(--fog);
@@ -502,7 +502,7 @@
 }
 .press-label {
 	font-family: var(--ff-mono);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--rose);
@@ -598,7 +598,7 @@
 }
 .story-eyebrow {
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--rose);
@@ -649,7 +649,7 @@
 }
 .stat-label {
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
 	color: var(--haze);
@@ -686,7 +686,7 @@
 }
 .story-float .sf-lbl {
 	font-family: var(--ff-mono);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
 	color: var(--rose);
@@ -743,7 +743,7 @@
 	position: relative;
 	z-index: 2;
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--fog);
@@ -765,7 +765,7 @@
 }
 .col-header-eyebrow {
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 8px;
 	text-transform: uppercase;
 	color: var(--rose);
@@ -822,7 +822,7 @@
 }
 .col-card-num {
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 5px;
 	text-transform: uppercase;
 	margin-bottom: 8px;
@@ -847,7 +847,7 @@
 	display: flex;
 	gap: 20px;
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	margin-bottom: 20px;
@@ -956,7 +956,7 @@
 	left: 16px;
 	z-index: 2;
 	font-family: var(--ff-mono);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
 	opacity: 0;
@@ -1045,7 +1045,7 @@
 }
 .nl-eyebrow {
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--rose);
@@ -1104,7 +1104,7 @@
 .nl-submit:hover { opacity: .9; }
 .nl-note {
 	font-family: var(--ff-mono);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	color: var(--fog);
@@ -1147,14 +1147,14 @@
 }
 .ft-award {
 	font-family: var(--ff-mono);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	color: var(--fog);
 }
 .ft-col-title {
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 5px;
 	text-transform: uppercase;
 	color: var(--rose);
@@ -1187,7 +1187,7 @@
 }
 .ft-copy {
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	color: var(--fog);
@@ -1198,7 +1198,7 @@
 }
 .ft-social a {
 	font-family: var(--ff-mono);
-	font-size: 9px;
+	font-size: 11px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	color: var(--haze);
@@ -1207,7 +1207,7 @@
 .ft-social a:hover { color: var(--rose); }
 .ft-oakland {
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
 	color: var(--fog);

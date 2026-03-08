@@ -278,7 +278,7 @@
 
 .aurora-engagement__vip-label {
 	font-family: var(--aurora-font-body);
-	font-size: 0.55rem;
+	font-size: 0.6875rem;
 	font-weight: 700;
 	letter-spacing: 0.15em;
 	text-transform: uppercase;
@@ -811,7 +811,7 @@
 /* Label */
 .aurora-countdown__label {
 	font-family: var(--aurora-font-body);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 700;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
@@ -857,7 +857,7 @@
 }
 
 .aurora-countdown__suffix {
-	font-size: 0.5rem;
+	font-size: 0.625rem;
 	font-weight: 600;
 	color: rgba(var(--aurora-white-rgb), 0.4);
 	letter-spacing: 0.04em;
@@ -1015,7 +1015,7 @@
 	left: 8px;
 	z-index: 6;
 	font-family: var(--aurora-font-body);
-	font-size: 0.58rem;
+	font-size: 0.6875rem;
 	font-weight: 700;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -1118,7 +1118,7 @@
 	}
 
 	.aurora-engagement__percent {
-		font-size: 0.6rem;
+		font-size: 0.6875rem;
 	}
 
 	.aurora-engagement--complete .aurora-engagement__ring {
@@ -1126,7 +1126,7 @@
 	}
 
 	.aurora-engagement__vip-label {
-		font-size: 0.5rem;
+		font-size: 0.625rem;
 	}
 
 	.aurora-engagement__vip-code {
@@ -1140,7 +1140,7 @@
 	}
 
 	.aurora-countdown__label {
-		font-size: 0.5rem;
+		font-size: 0.625rem;
 		letter-spacing: 0.1em;
 	}
 
@@ -1153,15 +1153,15 @@
 	}
 
 	.aurora-countdown__value {
-		font-size: 0.6rem;
+		font-size: 0.6875rem;
 	}
 
 	.aurora-countdown__suffix {
-		font-size: 0.42rem;
+		font-size: 0.625rem;
 	}
 
 	.aurora-countdown__sep {
-		font-size: 0.55rem;
+		font-size: 0.6875rem;
 	}
 
 	/* Tilt cards: disable 3D effect on touch (no hover) */
@@ -1230,7 +1230,7 @@
 	}
 
 	.aurora-countdown__label {
-		font-size: 0.45rem;
+		font-size: 0.625rem;
 	}
 }
 
@@ -1832,7 +1832,7 @@
 	gap: 0.3rem;
 	padding: 0.3rem 0.65rem;
 	font-family: var(--pulse-font-body);
-	font-size: 0.62rem;
+	font-size: 0.6875rem;
 	font-weight: 700;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -2223,7 +2223,7 @@
 	transform: translateX(-50%);
 	white-space: nowrap;
 	font-family: var(--pulse-font-body);
-	font-size: 0.55rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
@@ -2346,7 +2346,7 @@
 	}
 
 	.pulse-urgency-bar__cta {
-		font-size: 0.62rem;
+		font-size: 0.6875rem;
 		padding: 0.45rem 1rem;
 	}
 
@@ -2377,7 +2377,7 @@
 	}
 
 	.pulse-confidence-signal__label {
-		font-size: 0.6rem;
+		font-size: 0.6875rem;
 	}
 
 	/* Product panel social: stack vertically */
@@ -3041,7 +3041,7 @@
 	z-index: 6;
 	padding: 0.2rem 0.6rem;
 	font-family: var(--vel-font-body);
-	font-size: 0.55rem;
+	font-size: 0.6875rem;
 	font-weight: 700;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
@@ -3135,7 +3135,7 @@
 
 .vel-velocity-indicator__label {
 	font-family: var(--vel-font-body);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.06em;
 	color: rgba(var(--vel-white-rgb), 0.5);
@@ -3491,7 +3491,7 @@
 	gap: 0.35rem;
 	padding: 4px 10px;
 	font-family: var(--font-body, 'Inter', sans-serif);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 500;
 	letter-spacing: 0.04em;
 	color: rgba(255, 255, 255, 0.85);
@@ -3550,7 +3550,7 @@
 	gap: 0.3rem;
 	padding: 3px 8px;
 	font-family: var(--font-body, 'Inter', sans-serif);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 700;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
@@ -3697,7 +3697,7 @@
 	align-items: center;
 	gap: 0.4rem;
 	padding: 6px 14px;
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 700;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
@@ -3833,7 +3833,7 @@
 	}
 
 	.pulse-toast__action {
-		font-size: 0.6rem;
+		font-size: 0.6875rem;
 	}
 
 	.pulse-toast__product {
@@ -3848,7 +3848,7 @@
 	}
 
 	.pulse-countdown-banner__label {
-		font-size: 0.55rem;
+		font-size: 0.6875rem;
 	}
 
 	.pulse-countdown-banner__time {
@@ -3856,17 +3856,17 @@
 	}
 
 	.pulse-countdown-banner__cta {
-		font-size: 0.55rem;
+		font-size: 0.6875rem;
 		padding: 5px 10px;
 	}
 
 	.pulse-viewers {
-		font-size: 0.55rem;
+		font-size: 0.6875rem;
 		padding: 3px 7px;
 	}
 
 	.pulse-scarcity {
-		font-size: 0.55rem;
+		font-size: 0.6875rem;
 	}
 }
 
@@ -4132,7 +4132,7 @@
 	gap: 0.3rem;
 	padding: 3px 10px;
 	font-family: var(--font-body, 'Inter', sans-serif);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 700;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -4205,16 +4205,16 @@
 	.pulse-rooms-counter {
 		bottom: 4.5rem;
 		right: 0.5rem;
-		font-size: 0.6rem;
+		font-size: 0.6875rem;
 		padding: 6px 10px;
 	}
 
 	.pulse-page-viewers {
-		font-size: 0.6rem;
+		font-size: 0.6875rem;
 	}
 
 	.pulse-trending-badge {
-		font-size: 0.55rem;
+		font-size: 0.6875rem;
 		padding: 2px 8px;
 	}
 }

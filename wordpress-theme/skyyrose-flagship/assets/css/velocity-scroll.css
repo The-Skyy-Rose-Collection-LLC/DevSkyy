@@ -578,7 +578,7 @@
 	z-index: 6;
 	padding: 0.2rem 0.6rem;
 	font-family: var(--vel-font-body);
-	font-size: 0.55rem;
+	font-size: 0.6875rem;
 	font-weight: 700;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
@@ -672,7 +672,7 @@
 
 .vel-velocity-indicator__label {
 	font-family: var(--vel-font-body);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.06em;
 	color: rgba(var(--vel-white-rgb), 0.5);
