@@ -469,6 +469,8 @@ function skyyrose_get_current_template_slug() {
 			'template-landing-black-rose.php'      => 'landing',
 			'template-landing-love-hurts.php'      => 'landing',
 			'template-landing-signature.php'       => 'landing',
+			'template-experiences.php'             => 'experiences',
+			'template-collections.php'             => 'collection',
 		);
 
 		if ( isset( $template_map[ $page_template ] ) ) {
@@ -514,7 +516,8 @@ function skyyrose_enqueue_template_styles() {
 		'front-page'      => 'homepage-v2.css',
 		'collection'      => 'collections.css',
 		'collection-v4'   => 'collection-v4.css',
-		'immersive'       => 'immersive.css',
+				'immersive'       => 'immersive.css',
+		'experiences'     => 'immersive.css',
 		'single-product'  => 'single-product.css',
 		'cart'            => 'woocommerce.css',
 		'checkout'        => 'woocommerce.css',

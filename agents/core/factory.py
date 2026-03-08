@@ -12,6 +12,10 @@ from __future__ import annotations
 
 import importlib
 import logging
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from agents.core.orchestrator import Orchestrator
 
 logger = logging.getLogger(__name__)
 
