@@ -8,6 +8,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from PIL import Image
+
 from services.ml.enhancement.format_optimizer import (
     JPEG_QUALITY,
     PRINT_DPI,

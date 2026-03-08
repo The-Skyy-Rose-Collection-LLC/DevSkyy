@@ -11,16 +11,16 @@ Enterprise API components:
 - Request validation
 """
 
-from .agents import AgentCategory  # Enums; Service; Router
 from .agents import (
+    AgentCategory,  # Enums; Service; Router
     AgentService,
     Priority,
     TaskStatus,
     agent_service,
     agents_router,
 )
-from .gdpr import DataCategory  # Enums; Service; Router
 from .gdpr import (
+    DataCategory,  # Enums; Service; Router
     GDPRService,
     LegalBasis,
     RequestStatus,
@@ -30,8 +30,6 @@ from .gdpr import (
 )
 from .versioning import (
     APIVersion,  # Config; Models; Classes; Dependencies; Decorators; Router; Setup
-)
-from .versioning import (
     APIVersionFactory,
     RequireVersion,
     VersionConfig,
@@ -45,8 +43,8 @@ from .versioning import (
     version_router,
     versioned,
 )
-from .virtual_tryon import BatchJobResponse  # Enums; Models; Store; Router
 from .virtual_tryon import (
+    BatchJobResponse,  # Enums; Models; Store; Router
     BatchTryOnRequest,
     GarmentCategory,
     GenerateModelRequest,
@@ -62,8 +60,8 @@ from .virtual_tryon import (
     TryOnRequest,
     virtual_tryon_router,
 )
-from .webhooks import DeliveryStatus  # Config; Models; Classes; Instances; Router
 from .webhooks import (
+    DeliveryStatus,  # Config; Models; Classes; Instances; Router
     WebhookConfig,
     WebhookDelivery,
     WebhookEndpoint,

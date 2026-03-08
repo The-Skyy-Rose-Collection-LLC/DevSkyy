@@ -221,28 +221,30 @@ class VerificationLoop:
 
             if checker is None:
                 # No checker provided — auto-skip
-                results.append(GateResult(
-                    gate=gate,
-                    status=GateStatus.SKIPPED,
-                    message=f"No checker for {gate.name}",
-                ))
+                results.append(
+                    GateResult(
+                        gate=gate,
+                        status=GateStatus.SKIPPED,
+                        message=f"No checker for {gate.name}",
+                    )
+                )
                 continue
 
             result = await self.run_gate(gate, checker)
             results.append(result)
 
             if self._config.fail_fast and not result.passed:
-                logger.warning(
-                    "Fail-fast: stopping at gate %s", gate.name
-                )
+                logger.warning("Fail-fast: stopping at gate %s", gate.name)
                 # Skip remaining gates
                 remaining = [g for g in Gate if g not in {r.gate for r in results}]
                 for g in remaining:
-                    results.append(GateResult(
-                        gate=g,
-                        status=GateStatus.SKIPPED,
-                        message=f"Skipped (fail-fast after {gate.name})",
-                    ))
+                    results.append(
+                        GateResult(
+                            gate=g,
+                            status=GateStatus.SKIPPED,
+                            message=f"Skipped (fail-fast after {gate.name})",
+                        )
+                    )
                 break
 
         return VerificationReport(results=results)

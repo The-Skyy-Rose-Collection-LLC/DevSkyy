@@ -76,45 +76,118 @@ BRAND_GUIDELINES = {
     "collections": {
         "black-rose": {
             "voice": "Gothic luxury. Dark romance. Poetic and ethereal with an edge of defiance.",
-            "vocabulary": ["twilight", "shadows", "embroidered", "ethereal", "thorns",
-                           "bloom", "darkness", "gothic", "enigmatic", "mystic",
-                           "enchanting", "opulent", "defiant", "moonlight", "aura"],
+            "vocabulary": [
+                "twilight",
+                "shadows",
+                "embroidered",
+                "ethereal",
+                "thorns",
+                "bloom",
+                "darkness",
+                "gothic",
+                "enigmatic",
+                "mystic",
+                "enchanting",
+                "opulent",
+                "defiant",
+                "moonlight",
+                "aura",
+            ],
             "hashtags": [
-                "#SkyyRose", "#BlackRoseCollection", "#GothicLuxury", "#DarkRomance",
-                "#StreetwearFashion", "#BayAreaFashion", "#EmbroideredRose",
-                "#LuxuryStreetwear", "#FashionStatement", "#MysteryStyle",
-                "#DarkAesthetic", "#WearableArt",
+                "#SkyyRose",
+                "#BlackRoseCollection",
+                "#GothicLuxury",
+                "#DarkRomance",
+                "#StreetwearFashion",
+                "#BayAreaFashion",
+                "#EmbroideredRose",
+                "#LuxuryStreetwear",
+                "#FashionStatement",
+                "#MysteryStyle",
+                "#DarkAesthetic",
+                "#WearableArt",
             ],
             "tone": "Poetic, evocative, slightly melancholic but empowering.",
         },
         "love-hurts": {
             "voice": "Raw street intensity. Gritty authenticity rooted in Oakland.",
-            "vocabulary": ["streets", "grit", "fire", "passion", "Oakland", "concrete",
-                           "raw", "hustle", "grind", "authentic", "real", "blood",
-                           "sweat", "resilience", "bay"],
+            "vocabulary": [
+                "streets",
+                "grit",
+                "fire",
+                "passion",
+                "Oakland",
+                "concrete",
+                "raw",
+                "hustle",
+                "grind",
+                "authentic",
+                "real",
+                "blood",
+                "sweat",
+                "resilience",
+                "bay",
+            ],
             "hashtags": [
-                "#SkyyRose", "#LoveHurts", "#OaklandFashion", "#BayAreaStyle",
-                "#StreetwearFashion", "#GritAndGrace", "#RealStyle", "#UrbanLuxury",
-                "#Authentic", "#BayArea", "#OaklandProud",
+                "#SkyyRose",
+                "#LoveHurts",
+                "#OaklandFashion",
+                "#BayAreaStyle",
+                "#StreetwearFashion",
+                "#GritAndGrace",
+                "#RealStyle",
+                "#UrbanLuxury",
+                "#Authentic",
+                "#BayArea",
+                "#OaklandProud",
             ],
             "tone": "Direct, intense, emotionally honest. Pride in origin, unapologetic.",
         },
         "signature": {
             "voice": "Elevated editorial. Couture-level prestige for the discerning.",
-            "vocabulary": ["opulent", "couture", "prestige", "commanding", "refined",
-                           "bespoke", "distinguished", "luxurious", "tailored",
-                           "exclusive", "premier", "exceptional", "artisanal"],
+            "vocabulary": [
+                "opulent",
+                "couture",
+                "prestige",
+                "commanding",
+                "refined",
+                "bespoke",
+                "distinguished",
+                "luxurious",
+                "tailored",
+                "exclusive",
+                "premier",
+                "exceptional",
+                "artisanal",
+            ],
             "hashtags": [
-                "#SkyyRose", "#SignatureCollection", "#LuxuryFashion", "#Couture",
-                "#ElevatedStyle", "#BayAreaLuxury", "#FashionForward",
-                "#SignatureStyle", "#ExclusiveFashion", "#Prestige",
+                "#SkyyRose",
+                "#SignatureCollection",
+                "#LuxuryFashion",
+                "#Couture",
+                "#ElevatedStyle",
+                "#BayAreaLuxury",
+                "#FashionForward",
+                "#SignatureStyle",
+                "#ExclusiveFashion",
+                "#Prestige",
             ],
             "tone": "Authoritative, refined, aspirational. Confident without being boastful.",
         },
     },
     "forbidden_words": [
-        "cheap", "affordable", "budget", "sale", "discount", "basic",
-        "simple", "ordinary", "average", "normal", "regular", "plain",
+        "cheap",
+        "affordable",
+        "budget",
+        "sale",
+        "discount",
+        "basic",
+        "simple",
+        "ordinary",
+        "average",
+        "normal",
+        "regular",
+        "plain",
     ],
     "field_guidelines": {
         "description": (
@@ -182,9 +255,7 @@ def get_collection_products(collection: str) -> dict:
             }
         data = json.loads(PRODUCT_JSON_PATH.read_text(encoding="utf-8"))
         filtered = {
-            sku: product
-            for sku, product in data.items()
-            if product.get("collection") == normalized
+            sku: product for sku, product in data.items() if product.get("collection") == normalized
         }
         return {
             "status": "ok",
@@ -576,9 +647,7 @@ def main() -> None:
     )
 
     # generate-social
-    p_social = subparsers.add_parser(
-        "generate-social", help="Generate social copy for one product"
-    )
+    p_social = subparsers.add_parser("generate-social", help="Generate social copy for one product")
     p_social.add_argument("sku", help="Product SKU")
     p_social.add_argument("platform", help="Platform (instagram | tiktok)")
 

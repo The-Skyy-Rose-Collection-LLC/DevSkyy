@@ -6,6 +6,7 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+
 from services.ml.enhancement.upscaling import (
     DEFAULT_UPSCALE_MODEL,
     FALLBACK_MODELS,

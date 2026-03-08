@@ -1,7 +1,6 @@
 """Tests for AI training providers."""
-from unittest.mock import MagicMock, patch
 
-import pytest
+from unittest.mock import MagicMock, patch
 
 from scripts.ai_config import AIConfig
 
@@ -9,6 +8,7 @@ from scripts.ai_config import AIConfig
 def test_provider_registry_has_both_providers():
     """PROVIDERS dict contains 'replicate' and 'hf'."""
     from scripts.ai_providers import PROVIDERS
+
     assert "replicate" in PROVIDERS
     assert "hf" in PROVIDERS
 
@@ -16,6 +16,7 @@ def test_provider_registry_has_both_providers():
 def test_replicate_provider_start_training():
     """ReplicateProvider.start_training calls replicate.trainings.create."""
     from scripts.ai_providers import ReplicateProvider
+
     provider = ReplicateProvider()
     config = AIConfig()
 
@@ -34,6 +35,7 @@ def test_replicate_provider_start_training():
 def test_replicate_provider_get_status():
     """ReplicateProvider.get_status returns dict with status/logs."""
     from scripts.ai_providers import ReplicateProvider
+
     provider = ReplicateProvider()
 
     mock_training = MagicMock()
@@ -52,6 +54,7 @@ def test_replicate_provider_get_status():
 def test_hf_provider_start_training():
     """HuggingFaceProvider.start_training deploys Space and triggers training."""
     from scripts.ai_providers import HuggingFaceProvider
+
     provider = HuggingFaceProvider()
     config = AIConfig()
 
@@ -71,6 +74,7 @@ def test_hf_provider_start_training():
 def test_hf_provider_get_status():
     """HuggingFaceProvider.get_status checks Space runtime."""
     from scripts.ai_providers import HuggingFaceProvider
+
     provider = HuggingFaceProvider()
     mock_runtime = MagicMock()
     mock_runtime.stage = "RUNNING"

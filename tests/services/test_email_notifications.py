@@ -11,6 +11,7 @@ import smtplib
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from services.notifications.email_notifications import (
     TEMPLATES,
     EmailConfig,

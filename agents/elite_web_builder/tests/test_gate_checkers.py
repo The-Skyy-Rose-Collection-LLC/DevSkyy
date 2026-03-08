@@ -214,9 +214,7 @@ class TestCheckA11y:
 
     @pytest.mark.asyncio
     async def test_img_without_alt(self, tmp_path: Path) -> None:
-        (tmp_path / "page.html").write_text(
-            '<html lang="en"><body><img src="x.jpg"></body></html>'
-        )
+        (tmp_path / "page.html").write_text('<html lang="en"><body><img src="x.jpg"></body></html>')
         result = await check_a11y(["page.html"], tmp_path)
         assert result.status == GateStatus.FAILED
         assert "alt" in result.details[0].lower()
@@ -229,9 +227,7 @@ class TestCheckA11y:
 
     @pytest.mark.asyncio
     async def test_php_templates_checked(self, tmp_path: Path) -> None:
-        (tmp_path / "page.php").write_text(
-            '<?php get_header(); ?><img src="x.jpg">'
-        )
+        (tmp_path / "page.php").write_text('<?php get_header(); ?><img src="x.jpg">')
         result = await check_a11y(["page.php"], tmp_path)
         assert result.status == GateStatus.FAILED
 

@@ -350,7 +350,7 @@ class GeminiClient:
 
     def _build_url(self, model: str, action: str = "generateContent") -> str:
         """Build API URL."""
-        return f"{self.config.base_url}/models/{model}:{action}" f"?key={self.config.api_key}"
+        return f"{self.config.base_url}/models/{model}:{action}?key={self.config.api_key}"
 
     async def _request(
         self,

@@ -21,6 +21,7 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+
 from services.analytics.alert_notifier import (
     AlertNotification,
     AlertNotifier,

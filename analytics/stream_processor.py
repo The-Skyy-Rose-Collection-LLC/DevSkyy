@@ -148,8 +148,7 @@ class StreamProcessor:
             from confluent_kafka import Consumer, KafkaError, KafkaException
         except ImportError:
             logger.warning(
-                "confluent_kafka not installed. "
-                "Install with: pip install confluent-kafka"
+                "confluent_kafka not installed. Install with: pip install confluent-kafka"
             )
             return
 
@@ -283,7 +282,7 @@ class StreamProcessor:
     # Limits cap memory usage from attacker-controlled dict keys
     _MAX_PAGES = 10_000
     _MAX_PRODUCTS = 50_000
-    _MAX_HOUR_BUCKETS = 8_760   # 1 year of hourly buckets
+    _MAX_HOUR_BUCKETS = 8_760  # 1 year of hourly buckets
     _MAX_QUERIES = 50_000
     _MAX_QUERY_LEN = 500
 
@@ -331,8 +330,10 @@ class StreamProcessor:
         timestamp = str(event.get("timestamp", ""))
         hour_bucket = timestamp[:13] if len(timestamp) >= 13 else "unknown"
 
-        if hour_bucket not in self._state.revenue_by_hour and \
-                len(self._state.revenue_by_hour) >= self._MAX_HOUR_BUCKETS:
+        if (
+            hour_bucket not in self._state.revenue_by_hour
+            and len(self._state.revenue_by_hour) >= self._MAX_HOUR_BUCKETS
+        ):
             return
         self._state.revenue_by_hour[hour_bucket] = (
             self._state.revenue_by_hour.get(hour_bucket, 0.0) + amount
@@ -343,12 +344,12 @@ class StreamProcessor:
         query = str(event.get("query", "")).lower().strip()
         if not query or len(query) > self._MAX_QUERY_LEN:
             return
-        if query not in self._state.search_queries and \
-                len(self._state.search_queries) >= self._MAX_QUERIES:
+        if (
+            query not in self._state.search_queries
+            and len(self._state.search_queries) >= self._MAX_QUERIES
+        ):
             return
-        self._state.search_queries[query] = (
-            self._state.search_queries.get(query, 0) + 1
-        )
+        self._state.search_queries[query] = self._state.search_queries.get(query, 0) + 1
 
     # ---------------------------------------------------------------------------
     # Aggregation Access
@@ -372,9 +373,7 @@ class StreamProcessor:
 
     def get_top_pages(self, n: int = 10) -> list[dict[str, Any]]:
         """Return top N most-viewed pages."""
-        sorted_pages = sorted(
-            self._state.page_views.items(), key=lambda x: x[1], reverse=True
-        )
+        sorted_pages = sorted(self._state.page_views.items(), key=lambda x: x[1], reverse=True)
         return [{"page": page, "views": views} for page, views in sorted_pages[:n]]
 
     def reset_stats(self) -> None:
@@ -394,6 +393,7 @@ class StreamProcessor:
 
         try:
             import redis as redis_lib
+
             r = redis_lib.from_url(redis_url, decode_responses=True)
 
             # Flush page views

@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from llm.base import CompletionResponse, Message, ModelProvider
+from llm.base import Message, ModelProvider
 from llm.providers.litellm_provider import _PROVIDER_MODEL_MAP, LiteLLMClient
 
 
@@ -16,9 +16,7 @@ class TestModelStringMapping:
         """All non-LITELLM providers should have a model mapping."""
         for provider in ModelProvider:
             if provider != ModelProvider.LITELLM:
-                assert provider in _PROVIDER_MODEL_MAP, (
-                    f"Missing mapping for {provider}"
-                )
+                assert provider in _PROVIDER_MODEL_MAP, f"Missing mapping for {provider}"
 
     def test_get_model_string_with_provider(self):
         """Should return mapped model string for known providers."""
@@ -32,9 +30,7 @@ class TestModelStringMapping:
 
     def test_get_model_string_with_full_model(self):
         """Should pass through model strings that already have provider prefix."""
-        result = LiteLLMClient.get_model_string(
-            ModelProvider.OPENAI, "openai/gpt-4o"
-        )
+        result = LiteLLMClient.get_model_string(ModelProvider.OPENAI, "openai/gpt-4o")
         assert result == "openai/gpt-4o"
 
 
@@ -96,9 +92,7 @@ class TestLiteLLMClient:
 
         client = LiteLLMClient()
         mock_litellm = MagicMock()
-        mock_litellm.acompletion = AsyncMock(
-            side_effect=Exception("401 authentication failed")
-        )
+        mock_litellm.acompletion = AsyncMock(side_effect=Exception("401 authentication failed"))
         mock_litellm.suppress_debug_info = False
         mock_litellm.set_verbose = False
         client._litellm = mock_litellm
@@ -113,9 +107,7 @@ class TestLiteLLMClient:
 
         client = LiteLLMClient()
         mock_litellm = MagicMock()
-        mock_litellm.acompletion = AsyncMock(
-            side_effect=Exception("429 rate limit exceeded")
-        )
+        mock_litellm.acompletion = AsyncMock(side_effect=Exception("429 rate limit exceeded"))
         mock_litellm.suppress_debug_info = False
         mock_litellm.set_verbose = False
         client._litellm = mock_litellm
@@ -130,9 +122,7 @@ class TestLiteLLMClient:
 
         client = LiteLLMClient()
         mock_litellm = MagicMock()
-        mock_litellm.acompletion = AsyncMock(
-            side_effect=Exception("503 service unavailable")
-        )
+        mock_litellm.acompletion = AsyncMock(side_effect=Exception("503 service unavailable"))
         mock_litellm.suppress_debug_info = False
         mock_litellm.set_verbose = False
         client._litellm = mock_litellm
@@ -147,9 +137,7 @@ class TestLiteLLMClient:
 
         client = LiteLLMClient()
         mock_litellm = MagicMock()
-        mock_litellm.acompletion = AsyncMock(
-            side_effect=Exception("something unknown went wrong")
-        )
+        mock_litellm.acompletion = AsyncMock(side_effect=Exception("something unknown went wrong"))
         mock_litellm.suppress_debug_info = False
         mock_litellm.set_verbose = False
         client._litellm = mock_litellm
@@ -206,9 +194,7 @@ class TestLiteLLMClient:
 
         mock_litellm = MagicMock()
         mock_litellm.acompletion = AsyncMock(return_value=mock_response)
-        mock_litellm.completion_cost = MagicMock(
-            side_effect=Exception("cost tracking failed")
-        )
+        mock_litellm.completion_cost = MagicMock(side_effect=Exception("cost tracking failed"))
         client._litellm = mock_litellm
 
         response = await client.complete([Message.user("test")])

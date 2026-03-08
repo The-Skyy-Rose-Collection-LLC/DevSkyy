@@ -90,9 +90,7 @@ class ProductEventHandler:
 
     async def _on_product_name_changed(self, event: Event) -> None:
         """Update product name in read model."""
-        await self._update_product_field(
-            event.aggregate_id, "name", event.data.get("name", "")
-        )
+        await self._update_product_field(event.aggregate_id, "name", event.data.get("name", ""))
 
     def subscribe(self) -> None:
         """Register this handler with the global event bus."""
@@ -103,7 +101,12 @@ class ProductEventHandler:
     # ---------------------------------------------------------------------------
 
     _ALLOWED_FIELDS: set[str] = {
-        "name", "description", "price", "collection", "category", "sku",
+        "name",
+        "description",
+        "price",
+        "collection",
+        "category",
+        "sku",
     }
 
     async def _invalidate_cache(self) -> None:
@@ -192,18 +195,14 @@ class ProductEventHandler:
         logger.debug(f"Set is_active={is_active} for {aggregate_id}")
         await self._invalidate_cache()
 
-    async def _update_product_field(
-        self, aggregate_id: str, field: str, value: Any
-    ) -> None:
+    async def _update_product_field(self, aggregate_id: str, field: str, value: Any) -> None:
         """
         Update a single field in the read model.
 
         CRITICAL: Only whitelisted fields are allowed to prevent injection.
         """
         if field not in self._ALLOWED_FIELDS:
-            logger.warning(
-                f"Rejected update for disallowed field {field!r} on {aggregate_id}"
-            )
+            logger.warning(f"Rejected update for disallowed field {field!r} on {aggregate_id}")
             return
 
         from database.db import DatabaseManager, Product

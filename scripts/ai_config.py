@@ -1,4 +1,5 @@
 """AI CLI configuration and constants."""
+
 from __future__ import annotations
 
 import os
@@ -39,10 +40,7 @@ class AIConfig:
         """Retrieve HuggingFace token from environment."""
         token = os.environ.get(self.hf_token_env)
         if not token:
-            raise ValueError(
-                f"{self.hf_token_env} not set. "
-                "Run: export HF_TOKEN=hf_..."
-            )
+            raise ValueError(f"{self.hf_token_env} not set. Run: export HF_TOKEN=hf_...")
         return token
 
     def get_replicate_token(self) -> str:
@@ -50,7 +48,6 @@ class AIConfig:
         token = os.environ.get(self.replicate_token_env)
         if not token:
             raise ValueError(
-                f"{self.replicate_token_env} not set. "
-                "Run: export REPLICATE_API_TOKEN=r8_..."
+                f"{self.replicate_token_env} not set. Run: export REPLICATE_API_TOKEN=r8_..."
             )
         return token

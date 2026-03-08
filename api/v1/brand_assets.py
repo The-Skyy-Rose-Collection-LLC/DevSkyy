@@ -23,13 +23,13 @@ from uuid import uuid4
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
+
+from security.jwt_oauth2_auth import TokenPayload, get_current_user
 from services.ml.visual_feature_extractor import (
     VisualFeatureExtractor,
     get_visual_feature_extractor,
 )
 from services.storage.r2_client import R2Client, R2Config, R2Error
-
-from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 logger = logging.getLogger(__name__)
 

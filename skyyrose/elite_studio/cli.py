@@ -73,8 +73,8 @@ def cmd_status(args: argparse.Namespace) -> None:
         else:
             missing.append(sku)
 
-    print(f"\nElite Studio Status")
-    print(f"{'='*40}")
+    print("\nElite Studio Status")
+    print(f"{'=' * 40}")
     print(f"Total products: {len(all_skus)}")
     print(f"Generated:      {len(generated)}")
     print(f"Remaining:      {len(missing)}")
@@ -101,25 +101,19 @@ def main(argv: list[str] | None = None) -> None:
     # produce
     p_produce = sub.add_parser("produce", help="Produce single product")
     p_produce.add_argument("sku", help="Product SKU (e.g., br-001)")
-    p_produce.add_argument(
-        "--view", default="front", choices=["front", "back"], help="View angle"
-    )
+    p_produce.add_argument("--view", default="front", choices=["front", "back"], help="View angle")
 
     # produce-batch
     p_batch = sub.add_parser("produce-batch", help="Produce batch of products")
     p_batch.add_argument("sku", nargs="?", help="SKU prefix filter (optional)")
-    p_batch.add_argument(
-        "--all", action="store_true", help="Process all products"
-    )
+    p_batch.add_argument("--all", action="store_true", help="Process all products")
     p_batch.add_argument(
         "--remaining",
         action="store_true",
         default=True,
         help="Skip already-generated products (default: True)",
     )
-    p_batch.add_argument(
-        "--view", default="front", choices=["front", "back"], help="View angle"
-    )
+    p_batch.add_argument("--view", default="front", choices=["front", "back"], help="View angle")
 
     # status
     sub.add_parser("status", help="Show generation status")

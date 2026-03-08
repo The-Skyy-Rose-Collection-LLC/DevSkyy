@@ -100,9 +100,7 @@ class TestVerificationConfig:
         assert default_config.max_retries == 3
 
     def test_custom_thresholds(self) -> None:
-        config = VerificationConfig(
-            thresholds={"test_coverage": 90.0, "lighthouse_score": 80.0}
-        )
+        config = VerificationConfig(thresholds={"test_coverage": 90.0, "lighthouse_score": 80.0})
         assert config.thresholds["test_coverage"] == 90.0
 
 
@@ -114,22 +112,26 @@ class TestVerificationConfig:
 class TestRunGate:
     @pytest.mark.asyncio
     async def test_run_single_gate_pass(self, loop: VerificationLoop) -> None:
-        checker = AsyncMock(return_value=GateResult(
-            gate=Gate.BUILD,
-            status=GateStatus.PASSED,
-            message="ok",
-        ))
+        checker = AsyncMock(
+            return_value=GateResult(
+                gate=Gate.BUILD,
+                status=GateStatus.PASSED,
+                message="ok",
+            )
+        )
         result = await loop.run_gate(Gate.BUILD, checker)
         assert result.passed is True
         checker.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_run_single_gate_fail(self, loop: VerificationLoop) -> None:
-        checker = AsyncMock(return_value=GateResult(
-            gate=Gate.TESTS,
-            status=GateStatus.FAILED,
-            message="2 tests failed",
-        ))
+        checker = AsyncMock(
+            return_value=GateResult(
+                gate=Gate.TESTS,
+                status=GateStatus.FAILED,
+                message="2 tests failed",
+            )
+        )
         result = await loop.run_gate(Gate.TESTS, checker)
         assert result.passed is False
 
@@ -161,11 +163,13 @@ class TestFullRun:
         """Mock all 8 checkers to pass."""
         checkers = {}
         for gate in Gate:
-            checkers[gate] = AsyncMock(return_value=GateResult(
-                gate=gate,
-                status=GateStatus.PASSED,
-                message=f"{gate.name} ok",
-            ))
+            checkers[gate] = AsyncMock(
+                return_value=GateResult(
+                    gate=gate,
+                    status=GateStatus.PASSED,
+                    message=f"{gate.name} ok",
+                )
+            )
 
         report = await loop.run_all(checkers)
         assert report.all_green is True
@@ -178,17 +182,21 @@ class TestFullRun:
         checkers = {}
         for gate in Gate:
             if gate == Gate.LINT:
-                checkers[gate] = AsyncMock(return_value=GateResult(
-                    gate=gate,
-                    status=GateStatus.FAILED,
-                    message="lint errors",
-                ))
+                checkers[gate] = AsyncMock(
+                    return_value=GateResult(
+                        gate=gate,
+                        status=GateStatus.FAILED,
+                        message="lint errors",
+                    )
+                )
             else:
-                checkers[gate] = AsyncMock(return_value=GateResult(
-                    gate=gate,
-                    status=GateStatus.PASSED,
-                    message="ok",
-                ))
+                checkers[gate] = AsyncMock(
+                    return_value=GateResult(
+                        gate=gate,
+                        status=GateStatus.PASSED,
+                        message="ok",
+                    )
+                )
 
         report = await loop.run_all(checkers)
         assert report.all_green is False
@@ -200,11 +208,13 @@ class TestFullRun:
         """Gates without a checker are skipped, not failed."""
         # Only provide BUILD checker
         checkers = {
-            Gate.BUILD: AsyncMock(return_value=GateResult(
-                gate=Gate.BUILD,
-                status=GateStatus.PASSED,
-                message="ok",
-            ))
+            Gate.BUILD: AsyncMock(
+                return_value=GateResult(
+                    gate=Gate.BUILD,
+                    status=GateStatus.PASSED,
+                    message="ok",
+                )
+            )
         }
         report = await loop.run_all(checkers)
         # BUILD passed, rest skipped → all green (skipped = pass)
@@ -237,10 +247,7 @@ class TestVerificationReport:
         assert report.failed_gates == {Gate.LINT}
 
     def test_all_green_report(self) -> None:
-        results = [
-            GateResult(gate=g, status=GateStatus.PASSED, message="ok")
-            for g in Gate
-        ]
+        results = [GateResult(gate=g, status=GateStatus.PASSED, message="ok") for g in Gate]
         report = VerificationReport(results=results)
         assert report.all_green is True
 

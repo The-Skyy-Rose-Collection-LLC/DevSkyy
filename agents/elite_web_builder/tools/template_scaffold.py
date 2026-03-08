@@ -79,9 +79,15 @@ def _slugify(name: str) -> str:
 # WordPress constants
 # ---------------------------------------------------------------------------
 
-_WP_TEMPLATE_TYPES = frozenset({
-    "page", "archive", "single", "template-part", "block-pattern",
-})
+_WP_TEMPLATE_TYPES = frozenset(
+    {
+        "page",
+        "archive",
+        "single",
+        "template-part",
+        "block-pattern",
+    }
+)
 
 
 # ---------------------------------------------------------------------------
@@ -133,10 +139,10 @@ def _wp_archive(name: str, slug: str, options: dict[str, Any]) -> tuple[Scaffold
         "\n"
         '<!-- wp:group {"tagName":"main","layout":{"type":"constrained"}} -->\n'
         '<main class="wp-block-group">\n'
-        "  <!-- wp:query-title {\"type\":\"archive\"} /-->\n"
+        '  <!-- wp:query-title {"type":"archive"} /-->\n'
         "  <!-- wp:query -->\n"
         "    <!-- wp:post-template -->\n"
-        "      <!-- wp:post-title {\"isLink\":true} /-->\n"
+        '      <!-- wp:post-title {"isLink":true} /-->\n'
         "      <!-- wp:post-excerpt /-->\n"
         "      <!-- wp:post-date /-->\n"
         "    <!-- /wp:post-template -->\n"
@@ -160,8 +166,8 @@ def _wp_single(name: str, slug: str, options: dict[str, Any]) -> tuple[ScaffoldF
         "  <!-- wp:post-title /-->\n"
         "  <!-- wp:post-featured-image /-->\n"
         "  <!-- wp:post-content /-->\n"
-        "  <!-- wp:post-terms {\"term\":\"category\"} /-->\n"
-        "  <!-- wp:post-terms {\"term\":\"post_tag\"} /-->\n"
+        '  <!-- wp:post-terms {"term":"category"} /-->\n'
+        '  <!-- wp:post-terms {"term":"post_tag"} /-->\n'
         "</main>\n"
         "<!-- /wp:group -->\n"
         "\n"
@@ -233,9 +239,15 @@ _WP_GENERATORS = {
 # Shopify constants
 # ---------------------------------------------------------------------------
 
-_SHOPIFY_TEMPLATE_TYPES = frozenset({
-    "page", "collection", "product", "section", "snippet",
-})
+_SHOPIFY_TEMPLATE_TYPES = frozenset(
+    {
+        "page",
+        "collection",
+        "product",
+        "section",
+        "snippet",
+    }
+)
 
 
 # ---------------------------------------------------------------------------
@@ -303,7 +315,7 @@ def _shopify_section(name: str, slug: str, options: dict[str, Any]) -> tuple[Sca
     )
     liquid = (
         f'<section class="section-{slug}">\n'
-        f"  <div class=\"container\">\n"
+        f'  <div class="container">\n'
         f"    <h2>{{{{ section.settings.heading }}}}</h2>\n"
         f"    <!-- Section content for {title} -->\n"
         f"  </div>\n"
@@ -320,10 +332,10 @@ def _shopify_snippet(name: str, slug: str, options: dict[str, Any]) -> tuple[Sca
     """Generate Shopify snippet Liquid file."""
     title = options.get("title", name)
     liquid = (
-        f'{{% comment %}}\n'
+        f"{{% comment %}}\n"
         f"  Snippet: {title}\n"
         f"  Usage: {{% render '{slug}' %}}\n"
-        f'{{% endcomment %}}\n'
+        f"{{% endcomment %}}\n"
         f"\n"
         f'<div class="snippet-{slug}">\n'
         f"  <!-- {title} content -->\n"
@@ -379,11 +391,7 @@ def _component_react(name: str, slug: str, options: dict[str, Any]) -> tuple[Sca
         f"  }});\n"
         f"}});\n"
     )
-    css = (
-        f".root {{\n"
-        f"  /* {name} styles */\n"
-        f"}}\n"
-    )
+    css = f".root {{\n  /* {name} styles */\n}}\n"
     return (
         ScaffoldFile(path=f"{name}/{name}.tsx", content=component),
         ScaffoldFile(path=f"{name}/{name}.test.tsx", content=test),
@@ -400,7 +408,7 @@ def _component_vue(name: str, slug: str, options: dict[str, Any]) -> tuple[Scaff
         f"  </div>\n"
         f"</template>\n"
         f"\n"
-        f"<script setup lang=\"ts\">\n"
+        f'<script setup lang="ts">\n'
         f"defineProps<{{\n"
         f"  className?: string;\n"
         f"}}>();\n"
@@ -423,11 +431,7 @@ def _component_vue(name: str, slug: str, options: dict[str, Any]) -> tuple[Scaff
         f"  }});\n"
         f"}});\n"
     )
-    css = (
-        f".root {{\n"
-        f"  /* {name} styles */\n"
-        f"}}\n"
-    )
+    css = f".root {{\n  /* {name} styles */\n}}\n"
     return (
         ScaffoldFile(path=f"{name}/{name}.vue", content=vue),
         ScaffoldFile(path=f"{name}/{name}.test.ts", content=test),
@@ -462,11 +466,7 @@ def _component_vanilla(name: str, slug: str, options: dict[str, Any]) -> tuple[S
         f"  }});\n"
         f"}});\n"
     )
-    css = (
-        f".{slug} {{\n"
-        f"  /* {name} styles */\n"
-        f"}}\n"
-    )
+    css = f".{slug} {{\n  /* {name} styles */\n}}\n"
     return (
         ScaffoldFile(path=f"{name}/{name}.{ext}", content=component),
         ScaffoldFile(path=f"{name}/{name}.test.{ext}", content=test),
@@ -511,8 +511,7 @@ def scaffold_wordpress_template(
 
     if template_type not in _WP_TEMPLATE_TYPES:
         raise ScaffoldError(
-            f"Invalid template_type '{template_type}'. "
-            f"Supported: {sorted(_WP_TEMPLATE_TYPES)}"
+            f"Invalid template_type '{template_type}'. Supported: {sorted(_WP_TEMPLATE_TYPES)}"
         )
 
     slug = _slugify(clean_name)
@@ -557,8 +556,7 @@ def scaffold_shopify_template(
 
     if template_type not in _SHOPIFY_TEMPLATE_TYPES:
         raise ScaffoldError(
-            f"Invalid template_type '{template_type}'. "
-            f"Supported: {sorted(_SHOPIFY_TEMPLATE_TYPES)}"
+            f"Invalid template_type '{template_type}'. Supported: {sorted(_SHOPIFY_TEMPLATE_TYPES)}"
         )
 
     slug = _slugify(clean_name)
@@ -602,8 +600,7 @@ def scaffold_component(
 
     if framework not in _COMPONENT_FRAMEWORKS:
         raise ScaffoldError(
-            f"Invalid framework '{framework}'. "
-            f"Supported: {sorted(_COMPONENT_FRAMEWORKS)}"
+            f"Invalid framework '{framework}'. Supported: {sorted(_COMPONENT_FRAMEWORKS)}"
         )
 
     slug = _slugify(clean_name)
@@ -634,7 +631,10 @@ def list_templates() -> dict[str, list[dict[str, str]]]:
             {"type": "page", "description": "FSE page template with block pattern JSON"},
             {"type": "archive", "description": "FSE archive template with query loop"},
             {"type": "single", "description": "FSE single post/CPT template"},
-            {"type": "template-part", "description": "Reusable template part (header, footer, sidebar)"},
+            {
+                "type": "template-part",
+                "description": "Reusable template part (header, footer, sidebar)",
+            },
             {"type": "block-pattern", "description": "Block pattern with PHP registration"},
         ],
         "shopify": [

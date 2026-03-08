@@ -4,6 +4,7 @@ VTON generation for sg-006 and sg-011 using FASHN VTON v1.5 on HuggingFace.
 Falls back to IDM-VTON (yisol/IDM-VTON) if FASHN fails.
 Outputs saved as WebP to existing product image paths.
 """
+
 import os
 import shutil
 import sys
@@ -42,11 +43,11 @@ def try_fashn(avatar_path, garment_path, sku):
     print(f"\n[{sku}] Connecting to fashn-ai/fashn-vton-1.5...")
     try:
         client = Client("fashn-ai/fashn-vton-1.5")
-        print(f"  Connected. Viewing API...")
+        print("  Connected. Viewing API...")
         client.view_api(print_info=True)
 
         # Try the standard predict call
-        print(f"  Submitting VTON job...")
+        print("  Submitting VTON job...")
         result = client.predict(
             handle_file(str(avatar_path)),
             handle_file(str(garment_path)),
@@ -56,7 +57,11 @@ def try_fashn(avatar_path, garment_path, sku):
 
         if isinstance(result, (list, tuple)):
             for item in result:
-                p = str(item) if not isinstance(item, dict) else item.get("path", item.get("url", ""))
+                p = (
+                    str(item)
+                    if not isinstance(item, dict)
+                    else item.get("path", item.get("url", ""))
+                )
                 if p and os.path.exists(p):
                     print(f"  Found result file: {p}")
                     return p
@@ -72,7 +77,7 @@ def try_fashn(avatar_path, garment_path, sku):
             if p and os.path.exists(str(p)):
                 return str(p)
 
-        print(f"  Could not extract output file from result")
+        print("  Could not extract output file from result")
         return None
 
     except Exception as e:
@@ -89,7 +94,7 @@ def try_idm_vton(avatar_path, garment_path, sku):
     print(f"\n[{sku}] Connecting to yisol/IDM-VTON...")
     try:
         client = Client("yisol/IDM-VTON")
-        print(f"  Connected. Viewing API...")
+        print("  Connected. Viewing API...")
         client.view_api(print_info=True)
 
         # IDM-VTON expects: model_image (dict with background/layers/composite), garment, description, booleans, steps, seed
@@ -101,23 +106,27 @@ def try_idm_vton(avatar_path, garment_path, sku):
             ),
             handle_file(str(garment_path)),
             "A fashion model wearing the garment",
-            True,   # is_checked (auto-crop)
-            True,   # is_checked_crop (auto-mask)
-            30,     # denoise_steps
-            42,     # seed
+            True,  # is_checked (auto-crop)
+            True,  # is_checked_crop (auto-mask)
+            30,  # denoise_steps
+            42,  # seed
             api_name="/tryon",
         )
         print(f"  Raw result: {result}")
 
         if isinstance(result, (list, tuple)):
             for item in result:
-                p = str(item) if not isinstance(item, dict) else item.get("path", item.get("url", ""))
+                p = (
+                    str(item)
+                    if not isinstance(item, dict)
+                    else item.get("path", item.get("url", ""))
+                )
                 if p and os.path.exists(p):
                     return p
         elif isinstance(result, str) and os.path.exists(result):
             return result
 
-        print(f"  Could not extract output file from result")
+        print("  Could not extract output file from result")
         return None
 
     except Exception as e:
@@ -143,9 +152,9 @@ def main():
             results[sku] = "MISSING_GARMENT"
             continue
 
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"Processing {sku}: {garment.name}")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
 
         backup = output.with_suffix(".webp.bak")
         if output.exists():
@@ -180,9 +189,9 @@ def main():
                 shutil.copy2(backup, output)
                 backup.unlink()
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("SUMMARY")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     for sku, status in results.items():
         print(f"  {sku}: {status}")
 

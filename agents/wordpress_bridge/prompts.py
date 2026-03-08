@@ -73,13 +73,11 @@ PUBLISH_ROUND_TABLE_PROMPT = (
 )
 
 ATTACH_3D_MODEL_PROMPT = (
-    "Attach 3D model GLB file to product. "
-    "Product ID: {product_id}, GLB URL: {glb_url}"
+    "Attach 3D model GLB file to product. Product ID: {product_id}, GLB URL: {glb_url}"
 )
 
 UPLOAD_IMAGERY_PROMPT = (
-    "Upload generated image to product gallery. "
-    "Product ID: {product_id}, Image URL: {image_url}"
+    "Upload generated image to product gallery. Product ID: {product_id}, Image URL: {image_url}"
 )
 
 PUBLISH_SOCIAL_PROMPT = (
@@ -93,6 +91,5 @@ PROCESS_ORDER_PROMPT = (
 )
 
 HEALTH_CHECK_PROMPT = (
-    "Check WordPress and WooCommerce connectivity. "
-    "Report site status, API version, and any issues."
+    "Check WordPress and WooCommerce connectivity. Report site status, API version, and any issues."
 )

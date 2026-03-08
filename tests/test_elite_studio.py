@@ -207,9 +207,7 @@ class TestQualityParsing:
         from skyyrose.skyyrose_elite_studio import QualityPipeline, QualityStatus
 
         pipeline = QualityPipeline()
-        raw = json.dumps(
-            {"test": {"status": "unknown_status", "notes": "test"}}
-        )
+        raw = json.dumps({"test": {"status": "unknown_status", "notes": "test"}})
         checks = pipeline._parse_quality_json(raw)
         assert len(checks) == 1
         assert checks[0].status == QualityStatus.WARN  # Falls back to WARN
@@ -249,9 +247,7 @@ class TestRetryLogic:
                 raise ConnectionError("transient")
             return "recovered"
 
-        result = asyncio.run(
-            retry_async(fail_then_succeed, attempts=3, base_delay=0.01)
-        )
+        result = asyncio.run(retry_async(fail_then_succeed, attempts=3, base_delay=0.01))
         assert result == "recovered"
         assert call_count == 3
 

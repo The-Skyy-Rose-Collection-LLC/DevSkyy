@@ -1,16 +1,16 @@
 """Unit tests for RedisFlagManager."""
+
 import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
-import pytest
-
-from core.feature_flags.flag_manager import FeatureFlag, FlagManager
+from core.feature_flags.flag_manager import FeatureFlag
 
 
 class TestRedisFlagManager:
     def test_fallback_to_memory_when_no_redis(self):
         """Should work as regular FlagManager when Redis is unavailable."""
         from core.feature_flags.flag_manager import RedisFlagManager
+
         mgr = RedisFlagManager(redis_url="")
         flag = FeatureFlag(name="test", enabled=True)
         mgr.set_flag(flag)
@@ -19,6 +19,7 @@ class TestRedisFlagManager:
     def test_set_flag_persists_to_redis(self):
         """set_flag should write to Redis when available."""
         from core.feature_flags.flag_manager import RedisFlagManager
+
         mgr = RedisFlagManager(redis_url="redis://localhost:6379")
         mock_redis = MagicMock()
         mgr._redis = mock_redis
@@ -34,16 +35,19 @@ class TestRedisFlagManager:
     def test_is_enabled_loads_from_redis(self):
         """is_enabled should load flag from Redis if not in memory."""
         from core.feature_flags.flag_manager import RedisFlagManager
+
         mgr = RedisFlagManager(redis_url="redis://localhost:6379")
         mock_redis = MagicMock()
-        mock_redis.hget.return_value = json.dumps({
-            "name": "cached_flag",
-            "enabled": True,
-            "rollout_percentage": 100,
-            "enabled_for_users": [],
-            "disabled_for_users": [],
-            "kill_switch": False,
-        })
+        mock_redis.hget.return_value = json.dumps(
+            {
+                "name": "cached_flag",
+                "enabled": True,
+                "rollout_percentage": 100,
+                "enabled_for_users": [],
+                "disabled_for_users": [],
+                "kill_switch": False,
+            }
+        )
         mgr._redis = mock_redis
 
         result = mgr.is_enabled("cached_flag")
@@ -53,6 +57,7 @@ class TestRedisFlagManager:
     def test_delete_flag_removes_from_redis(self):
         """delete_flag should remove from both memory and Redis."""
         from core.feature_flags.flag_manager import RedisFlagManager
+
         mgr = RedisFlagManager(redis_url="redis://localhost:6379")
         mock_redis = MagicMock()
         mgr._redis = mock_redis

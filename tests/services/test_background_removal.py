@@ -6,6 +6,7 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+
 from services.ml.enhancement.background_removal import (
     DEFAULT_BACKGROUND_REMOVAL_MODEL,
     FALLBACK_MODELS,

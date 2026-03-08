@@ -27,7 +27,6 @@ import logging
 import re
 import subprocess
 from pathlib import Path
-from typing import Any
 
 from core.verification_loop import Gate, GateChecker, GateResult, GateStatus
 
@@ -89,6 +88,7 @@ async def check_build(files: list[str], output_dir: Path) -> GateResult:
 
         elif suffix == ".json":
             import json
+
             try:
                 json.loads(content)
             except json.JSONDecodeError as exc:
@@ -168,7 +168,11 @@ def _try_php_lint(file_path: Path) -> str | None:
 _LINT_PATTERNS: list[tuple[str, re.Pattern[str], str]] = [
     (".php", re.compile(r"\bvar_dump\s*\("), "var_dump() left in code"),
     (".php", re.compile(r"\bprint_r\s*\("), "print_r() left in code"),
-    (".php", re.compile(r"\berror_reporting\s*\(\s*0\s*\)"), "error_reporting(0) suppresses errors"),
+    (
+        ".php",
+        re.compile(r"\berror_reporting\s*\(\s*0\s*\)"),
+        "error_reporting(0) suppresses errors",
+    ),
     (".php", re.compile(r"mysql_(?:query|connect|fetch)"), "deprecated mysql_* functions"),
     (".php", re.compile(r"\$_(?:GET|POST|REQUEST)\s*\["), "raw superglobal without sanitization"),
     (".js", re.compile(r"\bconsole\.\w+\s*\("), "console.log left in code"),
@@ -205,9 +209,7 @@ async def check_lint(files: list[str], output_dir: Path) -> GateResult:
             if suffix == ext:
                 matches = pattern.findall(content)
                 if matches:
-                    warnings.append(
-                        f"{file_path}: {message} ({len(matches)}x)"
-                    )
+                    warnings.append(f"{file_path}: {message} ({len(matches)}x)")
 
     if warnings:
         return GateResult(
@@ -232,9 +234,17 @@ _SECRET_PATTERNS: list[tuple[re.Pattern[str], str]] = [
     (re.compile(r"sk-[a-zA-Z0-9]{20,}"), "potential OpenAI/Anthropic API key"),
     (re.compile(r"AIza[a-zA-Z0-9_-]{35}"), "potential Google API key"),
     (re.compile(r"ghp_[a-zA-Z0-9]{36}"), "potential GitHub token"),
-    (re.compile(r"(?:password|passwd|pwd)\s*[:=]\s*['\"][^'\"]{4,}['\"]", re.IGNORECASE), "hardcoded password"),
+    (
+        re.compile(r"(?:password|passwd|pwd)\s*[:=]\s*['\"][^'\"]{4,}['\"]", re.IGNORECASE),
+        "hardcoded password",
+    ),
     (re.compile(r"-----BEGIN (?:RSA |EC |DSA )?PRIVATE KEY-----"), "private key"),
-    (re.compile(r"(?:access_token|api_key|secret_key)\s*[:=]\s*['\"][^'\"]{8,}['\"]", re.IGNORECASE), "hardcoded credential"),
+    (
+        re.compile(
+            r"(?:access_token|api_key|secret_key)\s*[:=]\s*['\"][^'\"]{8,}['\"]", re.IGNORECASE
+        ),
+        "hardcoded credential",
+    ),
 ]
 
 _XSS_PATTERNS: list[tuple[re.Pattern[str], str]] = [
@@ -320,17 +330,24 @@ async def check_diff(
     - No suspicious file names
     """
     if expected_extensions is None:
-        expected_extensions = frozenset({
-            ".php", ".css", ".js", ".json", ".html", ".svg", ".txt", ".md",
-        })
+        expected_extensions = frozenset(
+            {
+                ".php",
+                ".css",
+                ".js",
+                ".json",
+                ".html",
+                ".svg",
+                ".txt",
+                ".md",
+            }
+        )
 
     errors: list[str] = []
 
     # File count check
     if len(files_written) > max_files:
-        errors.append(
-            f"Too many files: {len(files_written)} (max {max_files})"
-        )
+        errors.append(f"Too many files: {len(files_written)} (max {max_files})")
 
     # Extension check
     for fp in files_written:
@@ -365,20 +382,33 @@ async def check_diff(
 
 _A11Y_CHECKS: list[tuple[re.Pattern[str], str, str]] = [
     # Images without alt
-    (re.compile(r"<img\b(?![^>]*\balt\s*=)[^>]*>", re.IGNORECASE),
-     "img without alt attribute", "CRITICAL"),
+    (
+        re.compile(r"<img\b(?![^>]*\balt\s*=)[^>]*>", re.IGNORECASE),
+        "img without alt attribute",
+        "CRITICAL",
+    ),
     # Missing lang attribute on html
-    (re.compile(r"<html\b(?![^>]*\blang\s*=)[^>]*>", re.IGNORECASE),
-     "html element missing lang attribute", "SERIOUS"),
+    (
+        re.compile(r"<html\b(?![^>]*\blang\s*=)[^>]*>", re.IGNORECASE),
+        "html element missing lang attribute",
+        "SERIOUS",
+    ),
     # Empty links
-    (re.compile(r"<a\b[^>]*>\s*</a>", re.IGNORECASE),
-     "empty link (no text content)", "SERIOUS"),
+    (re.compile(r"<a\b[^>]*>\s*</a>", re.IGNORECASE), "empty link (no text content)", "SERIOUS"),
     # Missing form labels
-    (re.compile(r"<input\b(?![^>]*\b(?:aria-label|aria-labelledby|id)\s*=)[^>]*>", re.IGNORECASE),
-     "input without label association", "SERIOUS"),
+    (
+        re.compile(
+            r"<input\b(?![^>]*\b(?:aria-label|aria-labelledby|id)\s*=)[^>]*>", re.IGNORECASE
+        ),
+        "input without label association",
+        "SERIOUS",
+    ),
     # onclick without keyboard equivalent
-    (re.compile(r'\bonclick\s*=\s*["\'](?![^"\']*\bkeydown|\bkeypress)', re.IGNORECASE),
-     "onclick without keyboard handler", "MODERATE"),
+    (
+        re.compile(r'\bonclick\s*=\s*["\'](?![^"\']*\bkeydown|\bkeypress)', re.IGNORECASE),
+        "onclick without keyboard handler",
+        "MODERATE",
+    ),
 ]
 
 
@@ -443,11 +473,11 @@ async def check_a11y(files: list[str], output_dir: Path) -> GateResult:
 
 # Max sizes per file type (bytes)
 _SIZE_BUDGETS: dict[str, int] = {
-    ".css": 150 * 1024,     # 150 KB per CSS file
-    ".js": 250 * 1024,      # 250 KB per JS file
-    ".php": 100 * 1024,     # 100 KB per PHP file
-    ".json": 500 * 1024,    # 500 KB (theme.json can be large)
-    ".html": 200 * 1024,    # 200 KB per HTML file
+    ".css": 150 * 1024,  # 150 KB per CSS file
+    ".js": 250 * 1024,  # 250 KB per JS file
+    ".php": 100 * 1024,  # 100 KB per PHP file
+    ".json": 500 * 1024,  # 500 KB (theme.json can be large)
+    ".html": 200 * 1024,  # 200 KB per HTML file
 }
 
 
@@ -516,6 +546,7 @@ def build_gate_checkers(
     Returns:
         Dict of Gate → async checker function
     """
+
     async def _build() -> GateResult:
         return await check_build(files_written, output_dir)
 

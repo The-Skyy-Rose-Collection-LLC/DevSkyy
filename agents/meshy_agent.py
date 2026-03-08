@@ -105,9 +105,7 @@ class OutputFormat(str, Enum):
 class MeshyConfig:
     """Meshy API configuration."""
 
-    api_key: str = field(
-        default_factory=lambda: os.getenv("MESHY_API_KEY", "")
-    )
+    api_key: str = field(default_factory=lambda: os.getenv("MESHY_API_KEY", ""))
     base_url: str = "https://api.meshy.ai"
     timeout: float = 300.0  # 5 minutes max wait for generation
     poll_interval: float = 5.0  # Seconds between status checks
@@ -401,14 +399,10 @@ class MeshyAgent(SuperAgent):
                 "Check that your MESHY_API_KEY is valid and not expired."
             )
         if response.status_code == 429:
-            raise ConnectionError(
-                "Meshy API rate limit exceeded. Wait and try again."
-            )
+            raise ConnectionError("Meshy API rate limit exceeded. Wait and try again.")
         if response.status_code >= 400:
             error_detail = response.text[:200] if response.text else "Unknown error"
-            raise ConnectionError(
-                f"Meshy API error ({response.status_code}): {error_detail}"
-            )
+            raise ConnectionError(f"Meshy API error ({response.status_code}): {error_detail}")
 
         return response.json()
 
@@ -454,9 +448,7 @@ class MeshyAgent(SuperAgent):
 
         task_id = result.get("result") or result.get("id", "")
         if not task_id:
-            raise ValueError(
-                "Meshy API returned no task ID. Response may be malformed."
-            )
+            raise ValueError("Meshy API returned no task ID. Response may be malformed.")
 
         # Track the job
         self._active_jobs[task_id] = MeshyTask(
@@ -486,9 +478,7 @@ class MeshyAgent(SuperAgent):
 
         task_id = result.get("result") or result.get("id", "")
         if not task_id:
-            raise ValueError(
-                "Meshy API returned no task ID. Response may be malformed."
-            )
+            raise ValueError("Meshy API returned no task ID. Response may be malformed.")
 
         self._active_jobs[task_id] = MeshyTask(
             task_id=task_id,
@@ -563,7 +553,9 @@ class MeshyAgent(SuperAgent):
             if task.status == MeshyTaskStatus.SUCCEEDED:
                 logger.info(
                     "Meshy task %s completed (attempt %d/%d)",
-                    task_id, attempt + 1, self.meshy_config.max_poll_attempts,
+                    task_id,
+                    attempt + 1,
+                    self.meshy_config.max_poll_attempts,
                 )
                 return task
 
@@ -575,14 +567,15 @@ class MeshyAgent(SuperAgent):
                 )
 
             if task.status == MeshyTaskStatus.EXPIRED:
-                raise RuntimeError(
-                    f"Meshy task {task_id} expired. Recreate the task."
-                )
+                raise RuntimeError(f"Meshy task {task_id} expired. Recreate the task.")
 
             logger.debug(
                 "Meshy task %s: %s (%d%%) - poll %d/%d",
-                task_id, task.status.value, task.progress,
-                attempt + 1, self.meshy_config.max_poll_attempts,
+                task_id,
+                task.status.value,
+                task.progress,
+                attempt + 1,
+                self.meshy_config.max_poll_attempts,
             )
             await asyncio.sleep(self.meshy_config.poll_interval)
 
@@ -666,7 +659,9 @@ class MeshyAgent(SuperAgent):
             response.raise_for_status()
             file_path.write_bytes(response.content)
 
-        logger.info("Downloaded model to: %s (%.1f MB)", file_path, file_path.stat().st_size / (1024 * 1024))
+        logger.info(
+            "Downloaded model to: %s (%.1f MB)", file_path, file_path.stat().st_size / (1024 * 1024)
+        )
         return str(file_path)
 
     # -------------------------------------------------------------------------
@@ -728,7 +723,9 @@ class MeshyAgent(SuperAgent):
             )
             return steps  # No validation step for status checks
         else:
-            raise ValueError(f"Unknown action: {action}. Use text_to_3d, image_to_3d, or get_status.")
+            raise ValueError(
+                f"Unknown action: {action}. Use text_to_3d, image_to_3d, or get_status."
+            )
 
         # Add validation step for generation actions
         steps.append(
@@ -895,12 +892,17 @@ class MeshyAgent(SuperAgent):
 
         # Build collection-aware prompt
         prompt, negative_prompt = self._build_prompt(
-            product_name, collection, garment_type, additional_details,
+            product_name,
+            collection,
+            garment_type,
+            additional_details,
         )
 
         logger.info(
             "Meshy text-to-3D: product=%s, collection=%s, mode=%s",
-            product_name, collection, mode,
+            product_name,
+            collection,
+            mode,
         )
 
         # Submit generation task
@@ -922,15 +924,15 @@ class MeshyAgent(SuperAgent):
         download_url = model_urls.get(output_format) or model_urls.get("glb")
 
         if download_url:
-            output_dir = str(
-                Path(self.meshy_config.output_dir) / collection.lower()
-            )
+            output_dir = str(Path(self.meshy_config.output_dir) / collection.lower())
             safe_name = product_name.lower().replace(" ", "_")[:40]
             filename = f"{safe_name}_{task_id[:8]}.{output_format}"
 
             try:
                 local_path = await self._download_model(
-                    download_url, output_dir, filename,
+                    download_url,
+                    output_dir,
+                    filename,
                 )
             except Exception as e:
                 logger.warning("Failed to download model: %s", e)
@@ -1006,7 +1008,9 @@ class MeshyAgent(SuperAgent):
 
             try:
                 local_path = await self._download_model(
-                    download_url, output_dir, filename,
+                    download_url,
+                    output_dir,
+                    filename,
                 )
             except Exception as e:
                 logger.warning("Failed to download model: %s", e)
@@ -1080,9 +1084,7 @@ class MeshyAgent(SuperAgent):
 
         # If local_path is a template placeholder or empty, skip validation
         if not local_path or local_path.startswith("{"):
-            validation.warnings.append(
-                "No local file to validate (model available via URL only)"
-            )
+            validation.warnings.append("No local file to validate (model available via URL only)")
             return validation.model_dump()
 
         path = Path(local_path)
@@ -1101,9 +1103,7 @@ class MeshyAgent(SuperAgent):
 
         if size_mb > max_file_size_mb:
             validation.is_valid = False
-            validation.errors.append(
-                f"File too large: {size_mb:.1f}MB (max: {max_file_size_mb}MB)"
-            )
+            validation.errors.append(f"File too large: {size_mb:.1f}MB (max: {max_file_size_mb}MB)")
         elif size_mb > max_file_size_mb * 0.7:
             validation.warnings.append(
                 f"Large file: {size_mb:.1f}MB. Consider optimization for web."
@@ -1111,9 +1111,7 @@ class MeshyAgent(SuperAgent):
 
         if size_kb < min_file_size_kb:
             validation.is_valid = False
-            validation.errors.append(
-                f"File too small: {size_kb:.1f}KB. Model may be incomplete."
-            )
+            validation.errors.append(f"File too small: {size_kb:.1f}KB. Model may be incomplete.")
 
         # Format check
         supported = {".glb", ".gltf", ".obj", ".fbx", ".usdz", ".stl"}
@@ -1129,9 +1127,7 @@ class MeshyAgent(SuperAgent):
                     magic = f.read(4)
                     if magic != b"glTF":
                         validation.is_valid = False
-                        validation.errors.append(
-                            "Invalid GLB file: missing glTF magic number"
-                        )
+                        validation.errors.append("Invalid GLB file: missing glTF magic number")
             except Exception as e:
                 validation.errors.append(f"Failed to read GLB header: {e}")
 
@@ -1162,7 +1158,9 @@ class MeshyAgent(SuperAgent):
         if validation.is_valid and not validation.warnings:
             logger.info("Asset validation passed: %s", local_path)
         elif validation.is_valid:
-            logger.warning("Asset validated with warnings: %s -- %s", local_path, validation.warnings)
+            logger.warning(
+                "Asset validated with warnings: %s -- %s", local_path, validation.warnings
+            )
         else:
             logger.error("Asset validation failed: %s -- %s", local_path, validation.errors)
 

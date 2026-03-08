@@ -29,19 +29,10 @@ log = logging.getLogger("nano-banana-vton")
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 PRODUCTS_DIR = (
-    PROJECT_ROOT
-    / "wordpress-theme"
-    / "skyyrose-flagship"
-    / "assets"
-    / "images"
-    / "products"
+    PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
 )
 CANONICAL_MAP = (
-    PROJECT_ROOT
-    / "wordpress-theme"
-    / "skyyrose-flagship"
-    / "data"
-    / "canonical-images.json"
+    PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "canonical-images.json"
 )
 
 MODEL_ID = "gemini-2.5-flash-preview-image-generation"
@@ -86,16 +77,12 @@ ACCESSORY_SKUS = {"lh-001", "sg-007"}
 def find_source_image(sku: str) -> Path | None:
     """Find the best available source image for a SKU."""
     # Try canonical names first (from canonical-images.json)
-    candidates = list(PRODUCTS_DIR.glob(f"{sku}*.webp")) + list(
-        PRODUCTS_DIR.glob(f"{sku}*.jpg")
-    )
+    candidates = list(PRODUCTS_DIR.glob(f"{sku}*.webp")) + list(PRODUCTS_DIR.glob(f"{sku}*.jpg"))
     # Filter out model shots and back images — we want flat-lay/product only
     source_candidates = [
         p
         for p in candidates
-        if "-front-model" not in p.stem
-        and "-back-model" not in p.stem
-        and "-back" not in p.stem
+        if "-front-model" not in p.stem and "-back-model" not in p.stem and "-back" not in p.stem
     ]
     if not source_candidates:
         return None
@@ -236,9 +223,7 @@ def quality_gate(image_bytes: bytes, sku: str, view: str) -> bool:
     return True
 
 
-def process_product(
-    client, product: dict, views: list[str]
-) -> dict:
+def process_product(client, product: dict, views: list[str]) -> dict:
     """Generate model shots for a single product. Returns results dict."""
     sku = product["sku"]
     name = product["name"]
@@ -296,7 +281,8 @@ def process_product(
     results["status"] = (
         "success"
         if all(v == "success" or v == "skipped_accessory" for v in results["views"].values())
-        else "partial" if any(v == "success" for v in results["views"].values())
+        else "partial"
+        if any(v == "success" for v in results["views"].values())
         else "failed"
     )
     return results

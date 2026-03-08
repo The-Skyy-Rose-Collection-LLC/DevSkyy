@@ -28,6 +28,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
 import pytest
+
 from services.ml.gemini_client import (
     AspectRatio,
     GeminiClient,

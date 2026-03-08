@@ -337,8 +337,7 @@ class ModelRouter:
 
         # All exhausted
         raise RuntimeError(
-            f"All providers exhausted for agent '{agent_name}'. "
-            f"Last error: {last_error}"
+            f"All providers exhausted for agent '{agent_name}'. Last error: {last_error}"
         ) from last_error
 
     # -- Bulk operations --

@@ -10,6 +10,7 @@ import json
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+
 from services.ml.image_description_pipeline import (
     ImageDescriptionPipeline,
     VisionModelClient,

@@ -6,8 +6,8 @@ Uses ClaudeSDKClient with adaptive thinking for intelligent operation routing.
 
 from __future__ import annotations
 
-import json
-from typing import Any, AsyncIterator
+from collections.abc import AsyncIterator
+from typing import Any
 
 from claude_agent_sdk import (
     AssistantMessage,

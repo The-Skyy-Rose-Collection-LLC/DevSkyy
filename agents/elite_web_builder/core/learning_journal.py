@@ -143,10 +143,7 @@ class LearningJournal:
             results = [e for e in results if e.agent == agent]
 
         if tag is not None:
-            results = [
-                e for e in results
-                if e.tags is not None and tag in e.tags
-            ]
+            results = [e for e in results if e.tags is not None and tag in e.tags]
 
         return results
 
@@ -216,13 +213,15 @@ class LearningJournal:
             agent_counts = Counter(e.agent for e in entries)
             primary_agent = agent_counts.most_common(1)[0][0]
 
-            instincts.append(Instinct(
-                rule=f"NEVER: {latest.mistake} → ALWAYS: {latest.correct}",
-                confidence=confidence,
-                source_count=len(entries),
-                agent=primary_agent,
-                tags=tuple(sorted(all_tags)),
-            ))
+            instincts.append(
+                Instinct(
+                    rule=f"NEVER: {latest.mistake} → ALWAYS: {latest.correct}",
+                    confidence=confidence,
+                    source_count=len(entries),
+                    agent=primary_agent,
+                    tags=tuple(sorted(all_tags)),
+                )
+            )
 
         # Sort by confidence descending
         instincts.sort(key=lambda i: i.confidence, reverse=True)

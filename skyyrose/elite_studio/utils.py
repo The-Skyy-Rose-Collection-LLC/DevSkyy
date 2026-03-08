@@ -8,8 +8,6 @@ from __future__ import annotations
 
 import base64
 import json
-from pathlib import Path
-from typing import Any
 
 from .config import OVERRIDES_DIR, SOURCE_DIR
 from .models import ProductData
@@ -26,7 +24,7 @@ def load_product_data(sku: str) -> ProductData:
     if not override_path.exists():
         return ProductData(sku=sku, collection="unknown")
 
-    with open(override_path, "r") as f:
+    with open(override_path) as f:
         data = json.load(f)
 
     return ProductData.from_override(sku, data)
@@ -68,8 +66,7 @@ def get_reference_image_path(sku: str, view: str) -> str:
             all_matches = [
                 p
                 for p in all_matches
-                if p.suffix.lower() in image_exts
-                and "back" not in p.stem.lower()
+                if p.suffix.lower() in image_exts and "back" not in p.stem.lower()
             ]
             if all_matches:
                 return str(all_matches[0])
@@ -105,9 +102,7 @@ def resize_for_claude(image_path: str, max_size: int = 1568) -> str:
         background = Image.new("RGB", img.size, (255, 255, 255))
         if img.mode == "P":
             img = img.convert("RGBA")
-        background.paste(
-            img, mask=img.split()[-1] if img.mode in ("RGBA", "LA") else None
-        )
+        background.paste(img, mask=img.split()[-1] if img.mode in ("RGBA", "LA") else None)
         img = background
 
     # Resize if too large

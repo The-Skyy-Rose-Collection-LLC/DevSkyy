@@ -191,9 +191,7 @@ class TestGraphQLCacheIntegration:
             nonlocal db_call_count
             db_call_count += 1
             result = MagicMock()
-            result.scalars.return_value.all.return_value = (
-                page1 if db_call_count == 1 else page2
-            )
+            result.scalars.return_value.all.return_value = page1 if db_call_count == 1 else page2
             return result
 
         mock_session = AsyncMock()
@@ -348,8 +346,7 @@ class TestDataLoaderBatching:
         assert result.data["b"]["sku"] == "br-002"
         # DataLoader must have batched both SKUs into ONE call
         assert len(batch_calls) == 1, (
-            f"Expected 1 batch call, got {len(batch_calls)}. "
-            "DataLoader N+1 prevention is broken."
+            f"Expected 1 batch call, got {len(batch_calls)}. DataLoader N+1 prevention is broken."
         )
         assert set(batch_calls[0]) == {"br-001", "br-002"}
 

@@ -13,7 +13,9 @@ def mock_coordinator():
     """Return a mock coordinator with sensible defaults."""
     coord = MagicMock()
     coord.produce.return_value = ProductionResult(
-        sku="br-001", view="front", status="success",
+        sku="br-001",
+        view="front",
+        status="success",
         output_path="/tmp/br-001-model-front-gemini.jpg",
     )
     coord.produce_batch.return_value = [
@@ -45,7 +47,9 @@ class TestMainProduce:
     def test_produce_shows_error(self, mock_build, capsys):
         coord = MagicMock()
         coord.produce.return_value = ProductionResult(
-            sku="br-001", view="front", status="error",
+            sku="br-001",
+            view="front",
+            status="error",
             error="Vision failed",
         )
         mock_build.return_value = coord
@@ -91,11 +95,13 @@ class TestMainStatus:
             return "br-001" in str(sku_path)
 
         mock_path = MagicMock()
-        mock_path.__truediv__ = MagicMock(side_effect=lambda x: MagicMock(
-            __truediv__=MagicMock(return_value=MagicMock(
-                exists=MagicMock(return_value="br-001" in str(x))
-            ))
-        ))
+        mock_path.__truediv__ = MagicMock(
+            side_effect=lambda x: MagicMock(
+                __truediv__=MagicMock(
+                    return_value=MagicMock(exists=MagicMock(return_value="br-001" in str(x)))
+                )
+            )
+        )
         mock_output_dir.__truediv__ = mock_path.__truediv__
 
         cli.main(["status"])

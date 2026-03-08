@@ -2,13 +2,12 @@
 
 import time
 
-from utils.rate_limiting import get_rate_limit_stats
-from utils.request_deduplication import get_deduplication_stats
-
 from mcp_tools.api_client import _format_response, _make_api_request
 from mcp_tools.security import secure_tool
 from mcp_tools.server import API_BASE_URL, MCP_BACKEND, REQUEST_TIMEOUT, mcp
 from mcp_tools.types import ResponseFormat
+from utils.rate_limiting import get_rate_limit_stats
+from utils.request_deduplication import get_deduplication_stats
 
 
 @mcp.tool(

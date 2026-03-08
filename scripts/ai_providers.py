@@ -1,9 +1,11 @@
 """Training providers for AI CLI — HuggingFace and Replicate."""
+
 from __future__ import annotations
 
 import os
 from abc import ABC, abstractmethod
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 from scripts.ai_config import AIConfig
 

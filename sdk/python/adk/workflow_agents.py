@@ -93,9 +93,7 @@ class TokenSavings:
         """Recalculate savings percentage."""
         total_with_llm = self.estimated_llm_routing_tokens + self.actual_leaf_tokens
         if total_with_llm > 0:
-            self.savings_pct = (
-                self.estimated_llm_routing_tokens / total_with_llm
-            ) * 100
+            self.savings_pct = (self.estimated_llm_routing_tokens / total_with_llm) * 100
         self.orchestration_tokens_saved = self.estimated_llm_routing_tokens
 
 
@@ -132,8 +130,8 @@ def _create_commerce_leaf(*, output_key: str = "commerce_result") -> Any:
         name="commerce_worker",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "You are the Commerce Worker for SkyyRose luxury streetwear.\n"
+            _BRAND_ACCURACY_PREAMBLE
+            + "You are the Commerce Worker for SkyyRose luxury streetwear.\n"
             "Handle product catalog, orders, inventory, pricing, and fulfillment.\n"
             "Platform: WooCommerce on WordPress.\n"
             "Input context (if available): {input_context}\n"
@@ -152,8 +150,8 @@ def _create_creative_leaf(*, output_key: str = "creative_result") -> Any:
         name="creative_worker",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "You are the Creative Worker for SkyyRose luxury streetwear.\n"
+            _BRAND_ACCURACY_PREAMBLE
+            + "You are the Creative Worker for SkyyRose luxury streetwear.\n"
             "Handle 3D asset generation (Tripo3D), virtual try-on (FASHN),\n"
             "image generation, product photography, and video creation.\n"
             "3D models: GLB format, web-optimized.\n"
@@ -173,8 +171,8 @@ def _create_marketing_leaf(*, output_key: str = "marketing_result") -> Any:
         name="marketing_worker",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "You are the Marketing Worker for SkyyRose luxury streetwear.\n"
+            _BRAND_ACCURACY_PREAMBLE
+            + "You are the Marketing Worker for SkyyRose luxury streetwear.\n"
             "Handle content creation, social media, SEO, email campaigns,\n"
             "and influencer outreach.\n"
             "Target: ages 25-45, fashion-forward, quality-conscious.\n"
@@ -194,8 +192,8 @@ def _create_support_leaf(*, output_key: str = "support_result") -> Any:
         name="support_worker",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "You are the Support Worker for SkyyRose luxury streetwear.\n"
+            _BRAND_ACCURACY_PREAMBLE
+            + "You are the Support Worker for SkyyRose luxury streetwear.\n"
             "Handle customer inquiries, tickets, FAQs, returns/refunds.\n"
             "Tone: warm, professional, solution-oriented.\n"
             "Policies: 30-day returns (unworn w/ tags), free exchanges,\n"
@@ -217,8 +215,7 @@ def _create_operations_leaf(*, output_key: str = "operations_result") -> Any:
         name="operations_worker",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "You are the Operations Worker for SkyyRose platform.\n"
+            _BRAND_ACCURACY_PREAMBLE + "You are the Operations Worker for SkyyRose platform.\n"
             "Handle WordPress management, Elementor templates, server monitoring,\n"
             "deployment automation, backups, and performance optimization.\n"
             "Stack: WordPress 6.x + WooCommerce, Shoptimizer 2.9.0,\n"
@@ -240,8 +237,8 @@ def _create_analytics_leaf(*, output_key: str = "analytics_result") -> Any:
         name="analytics_worker",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "You are the Analytics Worker for SkyyRose luxury streetwear.\n"
+            _BRAND_ACCURACY_PREAMBLE
+            + "You are the Analytics Worker for SkyyRose luxury streetwear.\n"
             "Handle sales reporting, customer analytics, trend analysis,\n"
             "demand forecasting, A/B testing, and ROI tracking.\n"
             "Key metrics: revenue, AOV, CLV, conversion rate, cart abandonment,\n"
@@ -263,8 +260,7 @@ def _create_quality_reviewer_leaf(*, output_key: str = "quality_review") -> Any:
         name="quality_reviewer",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "You are the Quality Reviewer for SkyyRose.\n"
+            _BRAND_ACCURACY_PREAMBLE + "You are the Quality Reviewer for SkyyRose.\n"
             "Review the current draft: {current_draft}\n"
             "Check for:\n"
             "1. Brand consistency (rose gold aesthetic, luxury voice) — REJECT if off-brand\n"
@@ -286,8 +282,7 @@ def _create_refiner_leaf(*, output_key: str = "current_draft") -> Any:
         name="content_refiner",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "You are the Content Refiner for SkyyRose.\n"
+            _BRAND_ACCURACY_PREAMBLE + "You are the Content Refiner for SkyyRose.\n"
             "Improve the current draft using the quality review feedback.\n"
             "Current draft: {current_draft}\n"
             "Critique: {quality_review}\n"
@@ -298,9 +293,7 @@ def _create_refiner_leaf(*, output_key: str = "current_draft") -> Any:
     )
 
 
-def _create_synthesizer_leaf(
-    *, keys: list[str], output_key: str = "final_report"
-) -> Any:
+def _create_synthesizer_leaf(*, keys: list[str], output_key: str = "final_report") -> Any:
     """Create an LlmAgent that synthesizes results from multiple parallel agents."""
     if not ADK_WORKFLOW_AVAILABLE:
         return None
@@ -309,8 +302,7 @@ def _create_synthesizer_leaf(
         name="result_synthesizer",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "You are the Report Synthesizer for SkyyRose.\n"
+            _BRAND_ACCURACY_PREAMBLE + "You are the Report Synthesizer for SkyyRose.\n"
             f"Consolidate the following parallel results into a unified report:\n"
             f"{key_refs}\n"
             "Structure: Executive Summary → Key Findings → Action Items → Metrics.\n"
@@ -347,8 +339,7 @@ def create_product_launch_pipeline() -> Any | None:
         name="asset_3d_generator",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "Generate 3D asset specifications for the new product.\n"
+            _BRAND_ACCURACY_PREAMBLE + "Generate 3D asset specifications for the new product.\n"
             "Input: {input_context}\n"
             "Output: GLB model spec, texture maps, polygon count, web optimization notes."
         ),
@@ -359,8 +350,7 @@ def create_product_launch_pipeline() -> Any | None:
         name="asset_image_generator",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "Create product photography direction for the new product.\n"
+            _BRAND_ACCURACY_PREAMBLE + "Create product photography direction for the new product.\n"
             "Input: {input_context}\n"
             "Output: shot list, lighting setup, background, post-processing notes."
         ),
@@ -371,8 +361,7 @@ def create_product_launch_pipeline() -> Any | None:
         name="asset_video_planner",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "Plan product video content for the new product.\n"
+            _BRAND_ACCURACY_PREAMBLE + "Plan product video content for the new product.\n"
             "Input: {input_context}\n"
             "Output: storyboard outline, duration, music mood, platform specs."
         ),
@@ -443,8 +432,7 @@ def create_content_creation_pipeline(*, max_refinements: int = 3) -> Any | None:
         name="content_drafter",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "You are the Content Drafter for SkyyRose.\n"
+            _BRAND_ACCURACY_PREAMBLE + "You are the Content Drafter for SkyyRose.\n"
             "Create an initial draft based on the request.\n"
             "Input: {input_context}\n"
             "Output a complete first draft that embodies the SkyyRose brand."
@@ -469,8 +457,7 @@ def create_content_creation_pipeline(*, max_refinements: int = 3) -> Any | None:
         name="content_publisher",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "You are the Content Publisher for SkyyRose.\n"
+            _BRAND_ACCURACY_PREAMBLE + "You are the Content Publisher for SkyyRose.\n"
             "Finalize the refined content for deployment.\n"
             "Final content: {current_draft}\n"
             "Output: deployment checklist, platform-specific formatting, "
@@ -483,9 +470,7 @@ def create_content_creation_pipeline(*, max_refinements: int = 3) -> Any | None:
     return SequentialAgent(
         name="content_creation_pipeline",
         sub_agents=[drafter, refinement_loop, publisher],
-        description=(
-            "Content pipeline: draft → iterative review/refine → publish plan."
-        ),
+        description=("Content pipeline: draft → iterative review/refine → publish plan."),
     )
 
 
@@ -507,8 +492,7 @@ def create_customer_journey_pipeline() -> Any | None:
         name="support_intake",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "You are Customer Support Intake for SkyyRose.\n"
+            _BRAND_ACCURACY_PREAMBLE + "You are Customer Support Intake for SkyyRose.\n"
             "Classify the customer issue and extract key details.\n"
             "Customer message: {input_context}\n"
             "Output: issue_type, order_id (if any), urgency, key_details."
@@ -521,8 +505,7 @@ def create_customer_journey_pipeline() -> Any | None:
         name="commerce_lookup",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "You are Commerce Data Lookup for SkyyRose.\n"
+            _BRAND_ACCURACY_PREAMBLE + "You are Commerce Data Lookup for SkyyRose.\n"
             "Based on intake: {intake_result}\n"
             "Look up relevant order, product, or inventory data.\n"
             "Output: order_status, product_details, relevant_history."
@@ -535,8 +518,7 @@ def create_customer_journey_pipeline() -> Any | None:
         name="support_resolution",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "You are Customer Support Resolution for SkyyRose.\n"
+            _BRAND_ACCURACY_PREAMBLE + "You are Customer Support Resolution for SkyyRose.\n"
             "Resolve the customer's issue using the gathered data.\n"
             "Intake: {intake_result}\n"
             "Lookup: {lookup_result}\n"
@@ -572,8 +554,7 @@ def create_quality_assurance_pipeline() -> Any | None:
         name="creative_auditor",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "READ-ONLY AUDIT — do NOT call update_product_field().\n"
+            _BRAND_ACCURACY_PREAMBLE + "READ-ONLY AUDIT — do NOT call update_product_field().\n"
             "Audit creative assets for SkyyRose.\n"
             "Context: {input_context}\n"
             "Check: brand consistency (100% accuracy required), image quality,\n"
@@ -588,8 +569,7 @@ def create_quality_assurance_pipeline() -> Any | None:
         name="commerce_auditor",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "READ-ONLY AUDIT — do NOT call update_product_field().\n"
+            _BRAND_ACCURACY_PREAMBLE + "READ-ONLY AUDIT — do NOT call update_product_field().\n"
             "Audit commerce data for SkyyRose.\n"
             "Context: {input_context}\n"
             "Check: product descriptions, pricing accuracy, inventory levels,\n"
@@ -604,8 +584,7 @@ def create_quality_assurance_pipeline() -> Any | None:
         name="operations_auditor",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "READ-ONLY AUDIT — do NOT call update_product_field().\n"
+            _BRAND_ACCURACY_PREAMBLE + "READ-ONLY AUDIT — do NOT call update_product_field().\n"
             "Audit operational infrastructure for SkyyRose.\n"
             "Context: {input_context}\n"
             "Check: page load speed, uptime, plugin versions, security headers,\n"
@@ -658,8 +637,7 @@ def create_campaign_blitz_pipeline(*, max_iterations: int = 2) -> Any | None:
         name="market_researcher",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "Research market conditions for the campaign.\n"
+            _BRAND_ACCURACY_PREAMBLE + "Research market conditions for the campaign.\n"
             "Context: {input_context}\n"
             "Output: target segments, competitor activity, trending topics, timing."
         ),
@@ -670,8 +648,7 @@ def create_campaign_blitz_pipeline(*, max_iterations: int = 2) -> Any | None:
         name="mood_board_creator",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "Create visual mood board direction for the campaign.\n"
+            _BRAND_ACCURACY_PREAMBLE + "Create visual mood board direction for the campaign.\n"
             "Context: {input_context}\n"
             "Output: color palette (must include #B76E79 rose gold), typography, "
             "imagery style, reference links."
@@ -683,8 +660,7 @@ def create_campaign_blitz_pipeline(*, max_iterations: int = 2) -> Any | None:
         name="product_data_gatherer",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "Gather product data needed for the campaign.\n"
+            _BRAND_ACCURACY_PREAMBLE + "Gather product data needed for the campaign.\n"
             "Context: {input_context}\n"
             "Output: featured products, pricing, stock status, hero images."
         ),
@@ -703,8 +679,7 @@ def create_campaign_blitz_pipeline(*, max_iterations: int = 2) -> Any | None:
         name="campaign_drafter",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "Draft the campaign using research results.\n"
+            _BRAND_ACCURACY_PREAMBLE + "Draft the campaign using research results.\n"
             "Market research: {market_research}\n"
             "Mood board: {mood_board}\n"
             "Product data: {product_data}\n"
@@ -731,8 +706,7 @@ def create_campaign_blitz_pipeline(*, max_iterations: int = 2) -> Any | None:
         name="campaign_deploy_planner",
         model=_DEFAULT_MODEL,
         instruction=(
-            _BRAND_ACCURACY_PREAMBLE +
-            "Create deployment plan for the finalized campaign.\n"
+            _BRAND_ACCURACY_PREAMBLE + "Create deployment plan for the finalized campaign.\n"
             "Campaign content: {current_draft}\n"
             "Output: scheduling, platform-specific formatting, budget allocation, "
             "A/B test variants, tracking UTMs."
@@ -749,9 +723,7 @@ def create_campaign_blitz_pipeline(*, max_iterations: int = 2) -> Any | None:
             campaign_refinement,
             deploy_planner,
         ],
-        description=(
-            "Campaign blitz: parallel research → draft → refine loop → deploy plan."
-        ),
+        description=("Campaign blitz: parallel research → draft → refine loop → deploy plan."),
     )
 
 
@@ -798,11 +770,11 @@ def estimate_pipeline_savings(pipeline_type: PipelineType) -> TokenSavings:
     # Count routing hops each pipeline would need with an LLM supervisor
     hop_counts: dict[PipelineType, tuple[int, int]] = {
         #                         (routing_hops, leaf_agents)
-        PipelineType.PRODUCT_LAUNCH: (6, 7),   # route to 3 parallel + 3 seq + synth
+        PipelineType.PRODUCT_LAUNCH: (6, 7),  # route to 3 parallel + 3 seq + synth
         PipelineType.CONTENT_CREATION: (5, 4),  # draft + 2×(review+refine) + publish
         PipelineType.CUSTOMER_JOURNEY: (3, 3),  # intake → lookup → resolution
-        PipelineType.QUALITY_ASSURANCE: (4, 4), # route to 3 parallel + synth
-        PipelineType.CAMPAIGN_BLITZ: (7, 8),    # 3 parallel + draft + 2×loop + deploy
+        PipelineType.QUALITY_ASSURANCE: (4, 4),  # route to 3 parallel + synth
+        PipelineType.CAMPAIGN_BLITZ: (7, 8),  # 3 parallel + draft + 2×loop + deploy
     }
 
     hops, leaves = hop_counts.get(pipeline_type, (3, 3))
@@ -965,7 +937,9 @@ class WorkflowPipelineAgent(BaseDevSkyyAgent):
                     "savings": {
                         "orchestration_tokens_saved": savings.orchestration_tokens_saved,
                         "savings_pct": round(savings.savings_pct, 1),
-                    } if savings else None,
+                    }
+                    if savings
+                    else None,
                 },
             )
 

@@ -18,6 +18,7 @@ from decimal import Decimal
 from typing import Any
 
 import pytest
+
 from services.analytics.rollup_scheduler import (
     RollupDimension,
     RollupGranularity,

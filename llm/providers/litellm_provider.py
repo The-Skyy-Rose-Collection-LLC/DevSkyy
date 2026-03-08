@@ -157,9 +157,7 @@ class LiteLLMClient(BaseLLMClient):
             # Extract usage
             usage = getattr(response, "usage", None)
             input_tokens = getattr(usage, "prompt_tokens", 0) if usage else 0
-            output_tokens = (
-                getattr(usage, "completion_tokens", 0) if usage else 0
-            )
+            output_tokens = getattr(usage, "completion_tokens", 0) if usage else 0
 
             # Extract content
             content = ""
@@ -182,9 +180,7 @@ class LiteLLMClient(BaseLLMClient):
                 output_tokens=output_tokens,
                 total_tokens=input_tokens + output_tokens,
                 finish_reason=(
-                    getattr(response.choices[0], "finish_reason", "")
-                    if response.choices
-                    else ""
+                    getattr(response.choices[0], "finish_reason", "") if response.choices else ""
                 ),
                 latency_ms=self._calculate_latency(start),
                 cost_usd=cost,
@@ -192,11 +188,7 @@ class LiteLLMClient(BaseLLMClient):
 
         except Exception as e:
             error_str = str(e).lower()
-            if (
-                "authentication" in error_str
-                or "api key" in error_str
-                or "401" in error_str
-            ):
+            if "authentication" in error_str or "api key" in error_str or "401" in error_str:
                 raise AuthenticationError(
                     f"LiteLLM auth failed for {model}: {e}",
                     provider=self.provider,
@@ -206,11 +198,7 @@ class LiteLLMClient(BaseLLMClient):
                     f"LiteLLM rate limited for {model}: {e}",
                     provider=self.provider,
                 )
-            elif (
-                "500" in error_str
-                or "503" in error_str
-                or "unavailable" in error_str
-            ):
+            elif "500" in error_str or "503" in error_str or "unavailable" in error_str:
                 raise ServiceUnavailableError(
                     f"LiteLLM service error for {model}: {e}",
                     provider=self.provider,

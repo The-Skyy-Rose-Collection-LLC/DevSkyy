@@ -111,8 +111,8 @@ def analyze_with_gpt4_vision(sku: str, view: str = "front") -> dict[str, Any]:
 
         prompt = f"""You are a luxury fashion technical designer analyzing a garment photo for AI model generation.
 
-PRODUCT: {override.get('name', sku)}
-COLLECTION: {override.get('collection', 'unknown')}
+PRODUCT: {override.get("name", sku)}
+COLLECTION: {override.get("collection", "unknown")}
 
 Analyze this product photo and provide EXACT specifications for an AI model generation:
 
@@ -155,21 +155,23 @@ Return ONLY the analysis in clear, detailed paragraphs. Be extremely specific ab
 
         response = openai_client.chat.completions.create(
             model="gpt-4o",
-            messages=[{
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt},
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/jpeg;base64,{image_data}",
-                            "detail": "high"
-                        }
-                    }
-                ]
-            }],
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{image_data}",
+                                "detail": "high",
+                            },
+                        },
+                    ],
+                }
+            ],
             max_tokens=1500,
-            temperature=0.3
+            temperature=0.3,
         )
 
         analysis = response.choices[0].message.content
@@ -180,16 +182,14 @@ Return ONLY the analysis in clear, detailed paragraphs. Be extremely specific ab
             "view": view,
             "analysis": analysis,
             "char_count": len(analysis),
-            "image_file": image_file
+            "image_file": image_file,
         }
     except Exception as exc:
         return {"status": "error", "error": str(exc)}
 
 
 def generate_model_image_with_gemini(
-    sku: str,
-    gpt4_analysis: str,
-    view: str = "front"
+    sku: str, gpt4_analysis: str, view: str = "front"
 ) -> dict[str, Any]:
     """Generate fashion model image using Gemini 3 Pro Image with GPT-4 analysis."""
     try:
@@ -219,7 +219,7 @@ def generate_model_image_with_gemini(
             "black-rose": "Gothic romance, mysterious elegance, dark florals. Rose gold #B76E79 accents.",
             "love-hurts": "Dramatic passion, bold intensity. Deep crimson #8B0000 with black leather.",
             "signature": "High fashion prestige, editorial excellence. Champagne gold #D4AF37 luxury.",
-            "kids-capsule": "Joyful luxury, elevated kids editorial. Vibrant, SPECIAL, premium quality."
+            "kids-capsule": "Joyful luxury, elevated kids editorial. Vibrant, SPECIAL, premium quality.",
         }
 
         collection = override.get("collection", "signature")
@@ -227,8 +227,8 @@ def generate_model_image_with_gemini(
 
         view_instructions = (
             "Model is facing AWAY from camera, showing the BACK of the garment. Back of head and shoulders visible. Full back view from head to below waist."
-            if view == "back" else
-            "Model is facing FORWARD toward camera, showing the FRONT of the garment. Face visible, confident expression. Full front view from head to below waist."
+            if view == "back"
+            else "Model is facing FORWARD toward camera, showing the FRONT of the garment. Face visible, confident expression. Full front view from head to below waist."
         )
 
         prompt = f"""Create a professional editorial fashion photograph for a luxury streetwear brand.
@@ -272,19 +272,13 @@ Generate the image now."""
             contents=[
                 prompt,
                 genai_types.Part(
-                    inline_data=genai_types.Blob(
-                        mime_type="image/jpeg",
-                        data=ref_image_data
-                    )
-                )
+                    inline_data=genai_types.Blob(mime_type="image/jpeg", data=ref_image_data)
+                ),
             ],
             config=genai_types.GenerateContentConfig(
                 response_modalities=["TEXT", "IMAGE"],
-                image_config=genai_types.ImageConfig(
-                    aspect_ratio="3:4",
-                    image_size="4K"
-                )
-            )
+                image_config=genai_types.ImageConfig(aspect_ratio="3:4", image_size="4K"),
+            ),
         )
 
         # Extract generated image
@@ -310,7 +304,7 @@ Generate the image now."""
                     "view": view,
                     "output_path": str(output_path),
                     "resolution": "4K",
-                    "analysis_path": str(analysis_path)
+                    "analysis_path": str(analysis_path),
                 }
 
         return {"status": "error", "error": "No image data found in response"}
@@ -344,7 +338,7 @@ def verify_generated_image(sku: str, view: str = "front") -> dict[str, Any]:
 Analyze this AI-generated model photo and verify it meets accuracy requirements for product SKU: {sku}
 
 REQUIRED SPECIFICATIONS FROM LOGO FINGERPRINT:
-{json.dumps(logo_fingerprint.get('logos', []), indent=2) if logo_fingerprint else "No fingerprint data available"}
+{json.dumps(logo_fingerprint.get("logos", []), indent=2) if logo_fingerprint else "No fingerprint data available"}
 
 VERIFICATION CHECKLIST:
 1. Logo Placement - Are all logos in the correct locations?
@@ -374,12 +368,9 @@ Return a JSON object with:
             contents=[
                 verification_prompt,
                 genai_types.Part(
-                    inline_data=genai_types.Blob(
-                        mime_type="image/jpeg",
-                        data=image_data
-                    )
-                )
-            ]
+                    inline_data=genai_types.Blob(mime_type="image/jpeg", data=image_data)
+                ),
+            ],
         )
 
         verification_text = response.text
@@ -405,7 +396,7 @@ Return a JSON object with:
             "sku": sku,
             "view": view,
             "verification": verification_result,
-            "image_path": str(image_path)
+            "image_path": str(image_path),
         }
     except Exception as exc:
         return {"status": "error", "error": str(exc)}
@@ -414,9 +405,7 @@ Return a JSON object with:
 def list_all_products() -> dict[str, Any]:
     """List all products that have overrides."""
     try:
-        products = sorted([
-            f.stem for f in OVERRIDES_DIR.glob("*.json")
-        ])
+        products = sorted([f.stem for f in OVERRIDES_DIR.glob("*.json")])
         return {"status": "ok", "products": products, "count": len(products)}
     except Exception as exc:
         return {"status": "error", "error": str(exc)}

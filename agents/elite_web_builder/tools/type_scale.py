@@ -28,13 +28,13 @@ def generate_type_scale(
         Dict with element names → font sizes in px
     """
     return {
-        "caption": round(base_size / (ratio ** 2), 1),
+        "caption": round(base_size / (ratio**2), 1),
         "small": round(base_size / ratio, 1),
         "body": base_size,
         "h6": round(base_size * ratio, 1),
-        "h5": round(base_size * ratio ** 2, 1),
-        "h4": round(base_size * ratio ** 3, 1),
-        "h3": round(base_size * ratio ** 4, 1),
-        "h2": round(base_size * ratio ** 5, 1),
-        "h1": round(base_size * ratio ** 6, 1),
+        "h5": round(base_size * ratio**2, 1),
+        "h4": round(base_size * ratio**3, 1),
+        "h3": round(base_size * ratio**4, 1),
+        "h2": round(base_size * ratio**5, 1),
+        "h1": round(base_size * ratio**6, 1),
     }

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import pytest
 from PIL import Image
+
 from services.ml.watermark_service import (
     MIN_IMAGE_SIZE,
     WATERMARK_MAGIC,

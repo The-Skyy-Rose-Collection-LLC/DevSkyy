@@ -250,8 +250,7 @@ class R2Client:
         if self._client is None:
             if boto3 is None:
                 raise R2Error(
-                    "boto3 is required for R2 storage. "
-                    "Install with: pip install boto3",
+                    "boto3 is required for R2 storage. Install with: pip install boto3",
                     retryable=False,
                 )
             self.config.validate()

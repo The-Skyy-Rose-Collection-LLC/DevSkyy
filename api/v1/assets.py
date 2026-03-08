@@ -20,6 +20,8 @@ from uuid import uuid4
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
 from pydantic import BaseModel, Field
+
+from security.jwt_oauth2_auth import TokenPayload, get_current_user
 from services.storage import (
     AssetInfo,
     AssetNotFoundError,
@@ -31,8 +33,6 @@ from services.storage import (
     VersionListResponse,
     VersionNotFoundError,
 )
-
-from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 logger = logging.getLogger(__name__)
 

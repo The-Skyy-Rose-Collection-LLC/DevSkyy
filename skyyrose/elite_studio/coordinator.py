@@ -13,14 +13,13 @@ from __future__ import annotations
 
 import json
 import time
-from collections.abc import Callable
 from typing import Any, Protocol
 
 from .agents.generator_agent import GeneratorAgent
 from .agents.quality_agent import QualityAgent
 from .agents.vision_agent import VisionAgent
 from .config import BATCH_DELAY_SECONDS, OUTPUT_DIR
-from .models import ProductionResult, SynthesizedVision
+from .models import ProductionResult
 from .utils import discover_all_skus
 
 # ---------------------------------------------------------------------------
@@ -278,19 +277,11 @@ class Coordinator:
         success = sum(1 for r in results if r.status == "success")
         failed = len(results) - success
         self.log.separator()
-        self.log.info(
-            f"BATCH COMPLETE: {success}/{len(results)} succeeded, {failed} failed"
-        )
+        self.log.info(f"BATCH COMPLETE: {success}/{len(results)} succeeded, {failed} failed")
 
-        qc_pass = sum(
-            1 for r in results if r.quality and r.quality.overall_status == "pass"
-        )
-        qc_warn = sum(
-            1 for r in results if r.quality and r.quality.overall_status == "warn"
-        )
-        qc_fail = sum(
-            1 for r in results if r.quality and r.quality.overall_status == "fail"
-        )
+        qc_pass = sum(1 for r in results if r.quality and r.quality.overall_status == "pass")
+        qc_warn = sum(1 for r in results if r.quality and r.quality.overall_status == "warn")
+        qc_fail = sum(1 for r in results if r.quality and r.quality.overall_status == "fail")
         if qc_pass or qc_warn or qc_fail:
             self.log.info(f"QC: {qc_pass} pass, {qc_warn} warn, {qc_fail} fail")
 
