@@ -83,9 +83,13 @@ function skyyrose_render_interactive_grid( $products, $collection_config ) {
 	echo '</div>';
 
 	if ( wp_script_is( 'skyyrose-interactive-cards', 'enqueued' ) ) {
+		$safe_fields = array( 'sku', 'name', 'price', 'price_display', 'url', 'image', 'sizes', 'is_preorder' );
+		$safe_products = array_map( function ( $p ) use ( $safe_fields ) {
+			return array_intersect_key( $p, array_flip( $safe_fields ) );
+		}, $products );
 		wp_add_inline_script(
 			'skyyrose-interactive-cards',
-			'window.skyyRoseCollectionProducts = ' . wp_json_encode( $products, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ';',
+			'window.skyyRoseCollectionProducts = ' . wp_json_encode( array_values( $safe_products ), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ';',
 			'before'
 		);
 	}

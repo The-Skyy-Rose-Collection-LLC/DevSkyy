@@ -413,12 +413,22 @@
 						card.classList.add('ipc--added');
 						setTimeout(function () { card.classList.remove('ipc--added'); }, ADD_GLOW_MS);
 
-						// Update WC fragments if returned.
-						if (json.data && json.data.fragments) {
-							Object.keys(json.data.fragments).forEach(function (sel) {
-								const el = document.querySelector(sel);
-								if (el) el.outerHTML = json.data.fragments[sel];
-							});
+						// Update cart UI elements from response data.
+						if (json.data) {
+							var countEl = document.querySelector('.cart-count');
+							if (countEl && json.data.cart_count !== undefined) {
+								countEl.textContent = json.data.cart_count;
+								countEl.classList.toggle('has-items', json.data.cart_count > 0);
+							}
+							var subtotalEl = document.querySelector('.cart-subtotal');
+							if (subtotalEl && json.data.fragments && json.data.fragments['.cart-subtotal']) {
+								var parser = new DOMParser();
+								var doc = parser.parseFromString(json.data.fragments['.cart-subtotal'], 'text/html');
+								var safe = doc.body.firstChild;
+								if (safe && subtotalEl.parentNode) {
+									subtotalEl.parentNode.replaceChild(safe, subtotalEl);
+								}
+							}
 						}
 					} else {
 						btn.classList.add('ipc__buy-btn--error');
@@ -451,6 +461,38 @@
 						btn.disabled = false;
 					}, BUY_RESET_MS);
 				});
+		});
+	}
+
+	/* -----------------------------------------------
+	   6b. Share Button
+	   ----------------------------------------------- */
+
+	function initShare() {
+		var grid = document.querySelector('.ipc-grid');
+		if (!grid) return;
+
+		grid.addEventListener('click', function (e) {
+			var btn = e.target.closest('.ipc__share');
+			if (!btn) return;
+			e.preventDefault();
+			e.stopPropagation();
+
+			var card = btn.closest('.ipc');
+			var url = card ? card.getAttribute('data-product-url') : '';
+			var nameEl = card ? card.querySelector('.ipc__title a') : null;
+			var title = nameEl ? nameEl.textContent.trim() : '';
+
+			if (navigator.share) {
+				navigator.share({ title: title, url: url }).catch(function () {});
+			} else if (url && navigator.clipboard) {
+				navigator.clipboard.writeText(url).then(function () {
+					btn.setAttribute('aria-label', 'Link copied!');
+					setTimeout(function () {
+						btn.setAttribute('aria-label', 'Share ' + title);
+					}, 2000);
+				}).catch(function () {});
+			}
 		});
 	}
 
@@ -763,6 +805,7 @@
 		initWishlist();
 		initSizePills();
 		initQuickBuy();
+		initShare();
 		initGestures();
 		initModelViewer();
 		initScarcityCounters();

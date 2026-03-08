@@ -230,6 +230,19 @@ function skyyrose_ajax_immersive_add_to_cart() {
 		return;
 	}
 
+	// Rate-limit: max 30 add-to-cart per IP per minute.
+	$rate_key  = 'skyyrose_atc_' . md5( isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : '' );
+	$rate_hits = (int) get_transient( $rate_key );
+	if ( $rate_hits >= 30 ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Too many requests. Please wait a moment.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
+	set_transient( $rate_key, $rate_hits + 1, MINUTE_IN_SECONDS );
+
 	// Sanitize inputs — accept either numeric product_id or SKU string.
 	$product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
 	$sku        = isset( $_POST['sku'] ) ? sanitize_text_field( wp_unslash( $_POST['sku'] ) ) : '';
@@ -273,6 +286,15 @@ function skyyrose_ajax_immersive_add_to_cart() {
 		return;
 	}
 
+	if ( ! $product->is_in_stock() ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'This item is currently out of stock.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
+
 	// Build variation data if size is provided and product is variable.
 	$variation_id = 0;
 	$variation    = array();
@@ -285,9 +307,12 @@ function skyyrose_ajax_immersive_add_to_cart() {
 		$variation_id = $data_store->find_matching_product_variation( $product, $variation );
 
 		if ( ! $variation_id ) {
-			// Size not found as a variation; add simple product without variation.
-			$variation_id = 0;
-			$variation    = array();
+			wp_send_json_error(
+				array(
+					'message' => esc_html__( 'Selected size is not available for this product.', 'skyyrose-flagship' ),
+				)
+			);
+			return;
 		}
 	}
 
