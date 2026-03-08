@@ -33,8 +33,14 @@ class WordPressSettings(BaseModel):
     api_token: str = Field(default_factory=lambda: os.getenv("WORDPRESS_API_TOKEN", ""))
     wp_auth_user: str = Field(default_factory=lambda: os.getenv("WP_AUTH_USER", ""))
     wp_auth_pass: str = Field(default_factory=lambda: os.getenv("WP_AUTH_PASS", ""))
-    consumer_key: str = Field(default_factory=lambda: os.getenv("WC_CONSUMER_KEY", ""))
-    consumer_secret: str = Field(default_factory=lambda: os.getenv("WC_CONSUMER_SECRET", ""))
+    consumer_key: str = Field(
+        default_factory=lambda: os.getenv("WOOCOMMERCE_KEY") or os.getenv("WC_CONSUMER_KEY", "")
+    )
+    consumer_secret: str = Field(
+        default_factory=lambda: (
+            os.getenv("WOOCOMMERCE_SECRET") or os.getenv("WC_CONSUMER_SECRET", "")
+        )
+    )
     webhook_secret: str = Field(default_factory=lambda: os.getenv("WC_WEBHOOK_SECRET", ""))
 
     @property

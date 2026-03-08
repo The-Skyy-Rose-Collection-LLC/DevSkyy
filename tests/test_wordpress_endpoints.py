@@ -21,8 +21,8 @@ class TestWordPressSettings:
             {
                 "WORDPRESS_SITE_URL": "https://test.example.com",
                 "WORDPRESS_API_TOKEN": "test-token",
-                "WC_CONSUMER_KEY": "ck_test",
-                "WC_CONSUMER_SECRET": "cs_test",
+                "WOOCOMMERCE_KEY": "ck_test",
+                "WOOCOMMERCE_SECRET": "cs_test",
             },
         ):
             from api.v1.wordpress_integration import WordPressSettings

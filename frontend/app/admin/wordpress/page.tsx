@@ -10,6 +10,25 @@ import { Textarea } from '@/components/ui/textarea'
 import { getWordPressOperationsManager } from '@/lib/wordpress/operations-manager'
 import { getWordPressMenuManager } from '@/lib/wordpress/menu-manager'
 import { useWordPressAgent } from '@/lib/wordpress/agent-client'
+import type {
+  WPPostResponse,
+  WPPageResponse,
+  WPCategoryResponse,
+  WPTagResponse,
+  WPMediaResponse,
+  WPUserResponse,
+  WPMenuResponse,
+  WPConnectionStatus,
+} from '@/lib/wordpress/types'
+import { WPErrorBoundary } from '@/components/admin/wp-error-boundary'
+import {
+  PostsSkeleton,
+  PagesSkeleton,
+  MediaSkeleton,
+  CategoriesSkeleton,
+  TagsSkeleton,
+  UsersSkeleton,
+} from '@/components/admin/wp-skeleton'
 import {
   Globe,
   FileText,
@@ -52,19 +71,19 @@ interface CreateFormState {
 export default function WordPressAdminPage() {
   const [wpManager, setWpManager] = useState<WPManager | null>(null)
   const [menuManager, setMenuManager] = useState<MenuManager | null>(null)
-  const [connectionStatus, setConnectionStatus] = useState<any>(null)
+  const [connectionStatus, setConnectionStatus] = useState<WPConnectionStatus | null>(null)
   const [loading, setLoading] = useState(false)
   const [opLoading, setOpLoading] = useState<string | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
   // Data state
-  const [posts, setPosts] = useState<any[]>([])
-  const [pages, setPages] = useState<any[]>([])
-  const [categories, setCategories] = useState<any[]>([])
-  const [tags, setTags] = useState<any[]>([])
-  const [media, setMedia] = useState<any[]>([])
-  const [users, setUsers] = useState<any[]>([])
-  const [menus, setMenus] = useState<any[]>([])
+  const [posts, setPosts] = useState<WPPostResponse[]>([])
+  const [pages, setPages] = useState<WPPageResponse[]>([])
+  const [categories, setCategories] = useState<WPCategoryResponse[]>([])
+  const [tags, setTags] = useState<WPTagResponse[]>([])
+  const [media, setMedia] = useState<WPMediaResponse[]>([])
+  const [users, setUsers] = useState<WPUserResponse[]>([])
+  const [menus, setMenus] = useState<WPMenuResponse[]>([])
   const [selectedCollection, setSelectedCollection] = useState('black-rose')
 
   // Create form
@@ -145,17 +164,20 @@ export default function WordPressAdminPage() {
     if (!wpManager || !createForm.type || !createForm.title.trim()) return
     setOpLoading('create')
     try {
-      const payload: any = { title: createForm.title, status: 'draft' as const }
-      if (createForm.content) payload.content = createForm.content
-      if (createForm.slug) payload.slug = createForm.slug
+      const base = {
+        title: createForm.title,
+        content: createForm.content || '',
+        status: 'draft' as const,
+        ...(createForm.slug ? { slug: createForm.slug } : {}),
+      }
 
       switch (createForm.type) {
         case 'post':
-          await wpManager.createPost(payload)
+          await wpManager.createPost(base)
           setPosts(await wpManager.listPosts({ per_page: 20 }))
           break
         case 'page':
-          await wpManager.createPage(payload)
+          await wpManager.createPage(base)
           setPages(await wpManager.listPages({ per_page: 20 }))
           break
         case 'category':
@@ -216,10 +238,10 @@ export default function WordPressAdminPage() {
     setOpLoading(`status-${type}-${id}`)
     try {
       if (type === 'post') {
-        await wpManager.updatePost(id, { status: newStatus as any })
+        await wpManager.updatePost(id, { status: newStatus as 'draft' | 'publish' })
         setPosts(await wpManager.listPosts({ per_page: 20 }))
       } else {
-        await wpManager.updatePage(id, { status: newStatus as any })
+        await wpManager.updatePage(id, { status: newStatus as 'draft' | 'publish' })
         setPages(await wpManager.listPages({ per_page: 20 }))
       }
       showToast(`Status changed to ${newStatus}`)
@@ -307,6 +329,7 @@ export default function WordPressAdminPage() {
   // -------------------------------------------------------------------------
 
   return (
+    <WPErrorBoundary fallbackTitle="WordPress panel error">
     <div className="container mx-auto py-8 space-y-8">
       {/* Toast */}
       {toast && (
@@ -398,7 +421,9 @@ export default function WordPressAdminPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {posts.length === 0 ? (
+              {loading && posts.length === 0 ? (
+                <PostsSkeleton />
+              ) : posts.length === 0 ? (
                 <p className="text-gray-500">No posts found</p>
               ) : (
                 <div className="space-y-3">
@@ -468,7 +493,9 @@ export default function WordPressAdminPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {pages.length === 0 ? (
+              {loading && pages.length === 0 ? (
+                <PagesSkeleton />
+              ) : pages.length === 0 ? (
                 <p className="text-gray-500">No pages found</p>
               ) : (
                 <div className="space-y-3">
@@ -545,7 +572,9 @@ export default function WordPressAdminPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {media.length === 0 ? (
+              {loading && media.length === 0 ? (
+                <MediaSkeleton />
+              ) : media.length === 0 ? (
                 <p className="text-gray-500">No media files found</p>
               ) : (
                 <div className="grid grid-cols-4 gap-4">
@@ -600,7 +629,9 @@ export default function WordPressAdminPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {categories.length === 0 ? (
+              {loading && categories.length === 0 ? (
+                <CategoriesSkeleton />
+              ) : categories.length === 0 ? (
                 <p className="text-gray-500">No categories found</p>
               ) : (
                 <div className="space-y-2">
@@ -646,7 +677,9 @@ export default function WordPressAdminPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {tags.length === 0 ? (
+              {loading && tags.length === 0 ? (
+                <TagsSkeleton />
+              ) : tags.length === 0 ? (
                 <p className="text-gray-500">No tags found</p>
               ) : (
                 <div className="flex flex-wrap gap-2">
@@ -710,8 +743,8 @@ export default function WordPressAdminPage() {
                         )}
                         <div>
                           <span className="font-medium">{user.name}</span>
-                          {user.roles?.length > 0 && (
-                            <Badge variant="outline" className="ml-2 text-xs">{user.roles[0]}</Badge>
+                          {(user.roles?.length ?? 0) > 0 && (
+                            <Badge variant="outline" className="ml-2 text-xs">{user.roles![0]}</Badge>
                           )}
                         </div>
                       </div>
@@ -751,7 +784,7 @@ export default function WordPressAdminPage() {
                           <p className="font-semibold">{menu.name}</p>
                           <p className="text-sm text-gray-400">
                             {menu.count} items{' '}
-                            {menu.locations?.length > 0 && <>· Locations: {menu.locations.join(', ')}</>}
+                            {(menu.locations?.length ?? 0) > 0 && <>· Locations: {menu.locations!.join(', ')}</>}
                           </p>
                         </div>
                       </div>
@@ -886,5 +919,6 @@ export default function WordPressAdminPage() {
         </TabsContent>
       </Tabs>
     </div>
+    </WPErrorBoundary>
   )
 }
