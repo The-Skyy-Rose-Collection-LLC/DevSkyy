@@ -281,9 +281,9 @@ async def test_http_stubs():
         # Should return content with stub message
         assert "content" in result, "Should return content"
         content_text = result["content"][0]["text"]
-        assert "STUB" in content_text or "not yet implemented" in content_text.lower(), (
-            "Should indicate stub status"
-        )
+        assert (
+            "STUB" in content_text or "not yet implemented" in content_text.lower()
+        ), "Should indicate stub status"
 
         print_success("HTTP stubs return appropriate placeholder messages")
 

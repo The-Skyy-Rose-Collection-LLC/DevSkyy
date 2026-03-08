@@ -88,19 +88,25 @@ class GeminiClient:
 
             return {
                 "text": response.text,
-                "candidates": [c.to_dict() for c in response.candidates]
-                if hasattr(response, "candidates")
-                else [],
-                "prompt_feedback": response.prompt_feedback.to_dict()
-                if hasattr(response, "prompt_feedback")
-                else None,
-                "usage_metadata": {
-                    "prompt_token_count": response.usage_metadata.prompt_token_count,
-                    "candidates_token_count": response.usage_metadata.candidates_token_count,
-                    "total_token_count": response.usage_metadata.total_token_count,
-                }
-                if hasattr(response, "usage_metadata")
-                else None,
+                "candidates": (
+                    [c.to_dict() for c in response.candidates]
+                    if hasattr(response, "candidates")
+                    else []
+                ),
+                "prompt_feedback": (
+                    response.prompt_feedback.to_dict()
+                    if hasattr(response, "prompt_feedback")
+                    else None
+                ),
+                "usage_metadata": (
+                    {
+                        "prompt_token_count": response.usage_metadata.prompt_token_count,
+                        "candidates_token_count": response.usage_metadata.candidates_token_count,
+                        "total_token_count": response.usage_metadata.total_token_count,
+                    }
+                    if hasattr(response, "usage_metadata")
+                    else None
+                ),
             }
         except Exception as e:
             return self._handle_error(e)
@@ -197,12 +203,16 @@ class GeminiClient:
 
             return {
                 "text": response.text,
-                "candidates": [c.to_dict() for c in response.candidates]
-                if hasattr(response, "candidates")
-                else [],
-                "usage_metadata": {"total_token_count": response.usage_metadata.total_token_count}
-                if hasattr(response, "usage_metadata")
-                else None,
+                "candidates": (
+                    [c.to_dict() for c in response.candidates]
+                    if hasattr(response, "candidates")
+                    else []
+                ),
+                "usage_metadata": (
+                    {"total_token_count": response.usage_metadata.total_token_count}
+                    if hasattr(response, "usage_metadata")
+                    else None
+                ),
             }
         except Exception as e:
             return self._handle_error(e)

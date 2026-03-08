@@ -893,9 +893,11 @@ def cmd_generate(args):
         "fal": f"fal.ai Trellis-2 ({FAL_TRELLIS_MODEL})",
         "replicate": f"Replicate Trellis ({REPLICATE_TRELLIS_MODEL})",
         "meshy": "Meshy AI (highest texture quality)",
-        "auto": "Auto (fal.ai → Replicate fallback)"
-        if fal
-        else f"Replicate ({REPLICATE_TRELLIS_MODEL})",
+        "auto": (
+            "Auto (fal.ai → Replicate fallback)"
+            if fal
+            else f"Replicate ({REPLICATE_TRELLIS_MODEL})"
+        ),
     }[provider]
 
     log.info("Starting 3D generation: %d products, provider=%s", len(products), provider_label)

@@ -3,12 +3,13 @@
 Quick enhancement pipeline for all source product photos
 Reads actual files from source-products/, applies ecommerce enhancements
 """
+
 import sys
-from glob import glob
 from pathlib import Path
 
 try:
     from rembg import new_session, remove
+
     REMBG_OK = True
 except ImportError:
     REMBG_OK = False
@@ -22,6 +23,7 @@ except ImportError:
 
 ROOT = Path(__file__).parent.parent
 SRC_DIR = ROOT / "assets/images/source-products"
+
 
 # Enhancement functions (same as ecommerce-process.py)
 def enhance_image(img):
@@ -46,6 +48,7 @@ def enhance_image(img):
 
     return img
 
+
 def process_image(path):
     """Process a single image: load → enhance → save"""
     try:
@@ -62,6 +65,7 @@ def process_image(path):
     except Exception as e:
         print(f"  ❌ {path.name}: {e}")
         return False
+
 
 # Find all product photos
 collections = ["black-rose", "love-hurts", "signature", "kids-capsule"]
@@ -82,8 +86,11 @@ for collection in collections:
         images.extend(col_dir.glob(ext))
 
     # Filter out AI concepts, PhotoRoom extras, tinywow
-    images = [img for img in images
-              if not any(x in img.name.lower() for x in ["skyyrosedad", "photoroom_0", "tinywow"])]
+    images = [
+        img
+        for img in images
+        if not any(x in img.name.lower() for x in ["skyyrosedad", "photoroom_0", "tinywow"])
+    ]
 
     if not images:
         continue

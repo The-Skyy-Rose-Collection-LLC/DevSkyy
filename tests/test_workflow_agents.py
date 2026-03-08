@@ -174,9 +174,9 @@ class TestPipelineSavingsEstimation:
 
         for pipeline_type in PipelineType:
             savings = estimate_pipeline_savings(pipeline_type)
-            assert savings.orchestration_tokens_saved > 0, (
-                f"{pipeline_type.value} should save tokens"
-            )
+            assert (
+                savings.orchestration_tokens_saved > 0
+            ), f"{pipeline_type.value} should save tokens"
             assert savings.savings_pct > 0, f"{pipeline_type.value} should have positive savings %"
 
 

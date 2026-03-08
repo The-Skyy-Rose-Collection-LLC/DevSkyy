@@ -340,7 +340,7 @@ select = [
     "E",      # pycodestyle errors
     "W",      # pycodestyle warnings
     "F",      # Pyflakes
-    "I",      # isort
+    # "I",    # isort -- disabled: standalone isort handles import sorting (avoids config drift between ruff-isort and isort)
     "B",      # flake8-bugbear
     "C4",     # flake8-comprehensions
     "UP",     # pyupgrade
@@ -413,79 +413,10 @@ known_first_party = ["core", "api", "security", "database", "wordpress", "agents
 skip = ["legacy/", ".venv/"]
 
 # =============================================================================
-# MyPy Configuration
+# MyPy Configuration — canonical config lives in mypy.ini (not here)
 # =============================================================================
-
-[tool.mypy]
-python_version = "3.11"
-strict = true
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-follow_imports = "silent"
-ignore_missing_imports = true
-exclude = [
-    "hf-spaces/.*",
-    "legacy/.*",
-    ".venv/.*",
-    "build/.*",
-    "dist/.*",
-]
-
-# Third-party libraries without type stubs
-[[tool.mypy.overrides]]
-module = [
-    "celery.*",
-    "redis.*",
-    "woocommerce.*",
-    "mcp.*",
-    "chromadb.*",
-    "sentence_transformers.*",
-    "diffusers.*",
-    "transformers.*",
-    "cv2.*",
-    "PIL.*",
-    "scipy.*",
-    "sklearn.*",
-    "prophet.*",
-    "tiktoken.*",
-    "structlog.*",
-    "tenacity.*",
-]
-ignore_missing_imports = true
-
-# First-party code - enforce strict typing
-[[tool.mypy.overrides]]
-module = [
-    "core.*",
-    "api.*",
-    "security.*",
-    "database.*",
-    "wordpress.*",
-    "agents.*",
-    "orchestration.*",
-    "runtime.*",
-    "llm.*",
-    "mcp_servers.*",
-    "pipelines.*",
-]
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-warn_return_any = true
-
-# Tests - allow some flexibility
-[[tool.mypy.overrides]]
-module = ["tests.*"]
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
+# mypy.ini takes precedence when both exist. To avoid config drift and
+# unexpected strict-mode activation, all mypy settings are in mypy.ini.
 
 # =============================================================================
 # Pytest Configuration

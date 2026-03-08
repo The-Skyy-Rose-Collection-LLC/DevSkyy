@@ -69,7 +69,7 @@ MAX_RETRIES = 2
 # Compositor configuration
 # ---------------------------------------------------------------------------
 
-COMPOSITOR_OPUS_MODEL = "claude-opus-4"
+COMPOSITOR_OPUS_MODEL = "claude-opus-4-6"
 COMPOSITOR_QA_MODEL = "gemini-3-pro-image-preview"  # visual QA (deep analysis)
 COMPOSITOR_STAGE_DELAY = 2
 SCENES_DIR = _BASE_DIR / "assets" / "scenes"

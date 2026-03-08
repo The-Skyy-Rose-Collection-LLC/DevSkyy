@@ -1470,11 +1470,7 @@ def process_product(
     engine_label = (
         "GPT-Image-1.5"
         if use_gpt_image
-        else "Imagen Ultra"
-        if use_imagen
-        else "FLUX.2"
-        if use_flux
-        else "Gemini"
+        else "Imagen Ultra" if use_imagen else "FLUX.2" if use_flux else "Gemini"
     )
 
     # Build analysis-enhanced prompt detail if available

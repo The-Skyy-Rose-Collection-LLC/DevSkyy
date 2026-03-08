@@ -151,7 +151,7 @@ mcp_agent_usage = Counter(
 mcp_llm_tokens = Counter(
     "mcp_llm_tokens_total",
     "LLM token usage",
-    ["provider", "model", "type"],  # type: input, output
+    ["provider", "model", "type"],  # values: input, output
 )
 
 # 3D generation requests (high-cost operation)

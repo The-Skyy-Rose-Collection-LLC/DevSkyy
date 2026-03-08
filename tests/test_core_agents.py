@@ -999,7 +999,6 @@ class TestWordPressAIBridge:
 
     @pytest.mark.asyncio
     async def test_call_wp_api_success(self):
-
         bridge = self._make_bridge()
         mock_resp = MagicMock()
         mock_resp.status_code = 200
