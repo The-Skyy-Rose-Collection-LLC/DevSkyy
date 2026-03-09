@@ -30,7 +30,7 @@ aiofiles==25.1.0
 orjson==3.11.5
 
 # Environment management
-python-dotenv==1.2.1
+python-dotenv==1.2.2
 
 # Logging and monitoring
 structlog==25.5.0
