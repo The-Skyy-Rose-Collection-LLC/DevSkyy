@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-03-09T15:27:26.515Z"
-last_activity: 2026-03-09 -- Completed Plan 01 (WordPress build pipeline)
+status: in-progress
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-03-09T18:35:34Z"
+last_activity: 2026-03-09 -- Completed Plan 01 (WordPress CI integration)
 progress:
   total_phases: 8
-  completed_phases: 5
-  total_plans: 7
-  completed_plans: 7
-  percent: 100
+  completed_phases: 6
+  total_plans: 8
+  completed_plans: 8
+  percent: 75
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** No agent-written code can reach production without passing automated quality gates at every layer -- local, CI, PR, and post-deploy.
-**Current focus:** Phase 5: WordPress Build Pipeline -- COMPLETE (1/1 plans)
+**Current focus:** Phase 6: WordPress CI Integration -- COMPLETE (1/1 plans)
 
 ## Current Position
 
-Phase: 5 of 8 (WordPress Build Pipeline) -- COMPLETE
+Phase: 6 of 8 (WordPress CI Integration) -- COMPLETE
 Plan: 1 of 1 in current phase -- COMPLETE
-Status: Phase 05 complete, ready for Phase 06
-Last activity: 2026-03-09 -- Completed Plan 01 (WordPress build pipeline)
+Status: Phase 06 complete, ready for Phase 07
+Last activity: 2026-03-09 -- Completed Plan 01 (WordPress CI integration)
 
-Progress: [██████████] 100% (Phase 5)
+Progress: [███████░░░] 75% (Phase 6)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 13min
-- Total execution time: 1.5 hours
+- Total plans completed: 8
+- Average duration: 12min
+- Total execution time: 1.6 hours
 
 **By Phase:**
 
@@ -48,9 +48,10 @@ Progress: [██████████] 100% (Phase 5)
 | 03-pre-commit-hook-checks | 2/2 | 13min | 6.5min |
 | 04-pr-branch-protection | 1/1 | 2min | 2min |
 | 05-wordpress-build-pipeline | 1/1 | 3min | 3min |
+| 06-wordpress-ci-integration | 1/1 | 3min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 7min, 2min, 11min, 2min, 3min
+- Last 5 plans: 2min, 11min, 2min, 3min, 3min
 - Trend: stable (fast)
 
 *Updated after each plan completion*
@@ -89,6 +90,9 @@ Recent decisions affecting current work:
 - [05-01]: Programmatic clean-css API over CLI for recursive file discovery and source map control
 - [05-01]: WordPress theme header preserved via extract-and-prepend (style.css uses /* not /*!*)
 - [05-01]: IIFE output wrapping for browser-safe global scripts (window.SkyyRose patterns)
+- [06-01]: Emoji CI job name for consistency; temp-file JSON payload handles encoding
+- [06-01]: npm install (not npm ci) in CI because theme package-lock.json is gitignored
+- [06-01]: No job-level working-directory (PHP lint needs repo root, build needs theme dir)
 
 ### Pending Todos
 
@@ -100,6 +104,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T15:23:50.702Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-03-09T18:35:34Z
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
