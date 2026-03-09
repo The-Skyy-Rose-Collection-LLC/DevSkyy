@@ -28,10 +28,65 @@
   - **ORPHAN FILES:** sg-001 has 9 files but sg-001 is NOT a current SKU
   - **NOTE:** sg-008 has misnamed crop-hoodie files (sg-008-crop-hoodie.webp, sg-008-crop-hoodie-back.webp) — sg-008 is Beanie, not crop hoodie
   - **NON-PRODUCT FILES:** patches (3), references (2), pre-order designs (br-d02–d04, sg-d01–d04), po-* pre-order renders, techflats, source jpgs
-- [ ] Audit existing scenes in `assets/scenes/{collection}/`
-  - Black Rose: 21 files, Love Hurts: 26 files, Signature: 16 files
-  - Note which scenes already have composited lookbooks (v2)
-  - Note which scenes need regeneration to match world key notes
+- [x] Audit existing scenes in `assets/scenes/{collection}/`
+  - **TOTALS: Black Rose: 21 files, Love Hurts: 26 files (+ 1 dome jpg), Signature: 16 files = 63 total**
+
+  ### BLACK ROSE — 21 files (5 base scenes)
+  - **HERO: `black-rose-rooftop-garden-v2`** (.png + .webp) — ✅ PRODUCTION READY
+    - Bay Bridge lit up ✓, night ✓, concrete floor ✓, black rose planters ✓, fog ✓, pendant lights ✓
+    - Has: depth map, pipeline-v1, 4 v2-composites, 4 lookbooks
+  - `black-rose-moonlit-courtyard` (.jpg + .png + .webp) — Gothic courtyard, statues, fountains, black rose topiary. NO Bay Bridge.
+  - `black-rose-iron-gazebo-garden` (.png + .webp) — Iron gazebo in rose garden, aerial view. NO Bay Bridge.
+  - `black-rose-marble-rotunda` (.png + .webp) — Indoor marble rotunda, black tree, crimson accents. NO Bay Bridge.
+  - `black-rose-white-rose-grotto` (.png + .webp) — Underground grotto, white roses, marble pedestal. NO Bay Bridge.
+  - **v2 Composites (4/8 products done):** br-001 ✓, br-002 ✓, br-004 ✓, br-006 ✓
+  - **MISSING composites:** br-003 (Jerseys), br-005 (Set), br-007 (Shorts), br-008 (Dress)
+  - **Depth maps:** hero only — need 4 more for other scenes
+  - **VERDICT:** Hero matches key notes perfectly. Other 4 scenes map to world plan stages (courtyard→gazebo→rotunda→grotto) but lack Oakland-specific anchors. Acceptable as progression into "hidden gardens." Need composites for 4 products + depth maps for 4 scenes.
+
+  ### LOVE HURTS — 26 files (7 base scenes — MOST COMPLETE)
+  - **HERO: `love-hurts-cathedral-rose-chamber-v2`** (.png + .webp) — ✅ PRODUCTION READY
+    - Gothic cathedral ✓, enchanted rose under glass dome ✓, stained glass crimson ✓, candelabras ✓, petals ✓, products placed ✓
+    - Has: depth map, pipeline-v1, 3 v2-composites, 3 lookbooks
+  - `love-hurts-gothic-ballroom` — Dark ballroom, enchanted rose dome, shattered items, blue moonlight. "Beast danced alone" ✓
+  - `love-hurts-crimson-throne-room` — Beast figure in cape (back turned), ornate throne, petal-covered floor. Beast's POV ✓
+  - `love-hurts-enchanted-rose-shrine` — Beast in crimson cape gazing at rose in golden frame. Private grief ✓
+  - `love-hurts-giant-rose-staircase` — Massive rose growing from baroque staircase, thorny vines. Ascension ✓
+  - `love-hurts-reflective-ballroom` — Mirror floor, rose reflected, stained glass dome. Self-reflection ✓
+  - `love-hurts-enchanted-rose-dome.jpg` (57KB) + 3 dome reference jpgs (49-66KB each) — TOO SMALL for production
+  - **ALL 7 world scenes match the scroll plan exactly:**
+    - 0.0–0.15: cathedral-rose-chamber ✓ | 0.15–0.30: gothic-ballroom ✓ | 0.30–0.45: crimson-throne-room ✓
+    - 0.45–0.55: enchanted-rose-shrine ✓ | 0.55–0.70: giant-rose-staircase ✓ | 0.70–0.85: reflective-ballroom ✓
+    - 0.85–1.0: enchanted-rose-dome (exists but LOW-RES — needs high-quality regeneration)
+  - **v2 Composites (3/5 products done):** lh-001 ✓, lh-003 ✓, lh-005 ✓
+  - **MISSING composites:** lh-002 (Joggers), lh-004 (Varsity Jacket)
+  - **Depth maps:** hero only — need 6 more for other scenes
+  - **CRITICAL:** Scenes 4+5 show Beast silhouette — matches "from BEAST's perspective" perfectly ✓
+  - **VERDICT:** Best-covered collection. All 7 stages exist. Need composites for 2 products + 6 depth maps + high-res dome scene.
+
+  ### SIGNATURE — 16 files (2 base scenes — LEAST COMPLETE)
+  - **HERO: `signature-golden-gate-showroom-v2`** (.png + .webp) — ✅ PRODUCTION READY
+    - Golden Gate Bridge (red/orange) visible through windows ✓, golden hour ✓, marble showroom ✓, fog ✓
+    - Has: depth map, pipeline-v1, 4 v2-composites, 4 lookbooks
+  - `signature-waterfront-runway` (.png + .webp) — Waterfront runway platform, golden light, products on pedestals.
+    - **KEY NOTES ISSUE:** Bridge in background appears to be Bay Bridge, NOT Golden Gate. May need regeneration.
+  - **v2 Composites (4/11 products done):** sg-005 ✓, sg-007 ✓, sg-011 ✓, sg-012 ✓
+  - **MISSING composites:** sg-002, sg-003, sg-004, sg-006, sg-008, sg-009, sg-010 (7 products!)
+  - **Depth maps:** hero only — need 1+ more
+  - **World plan needs 5 scenes** (showroom→runway→bridge walkway→fog pier→sunset deck) — **MISSING 3 scene backgrounds**
+  - **VERDICT:** Least complete. Only 2/5 stages exist. Need 3 new scene backgrounds + 7 composites + depth maps.
+
+  ### SUMMARY — What Needs Work Before Phase 1
+  | Collection | Base Scenes | Match Key Notes? | Composites Done | Composites Needed | Depth Maps |
+  |-----------|------------|-----------------|----------------|------------------|-----------|
+  | Black Rose | 5/5 | Hero ✓, others partial | 4/8 | 4 more | 1/5 |
+  | Love Hurts | 7/7 (dome low-res) | ALL match ✓ | 3/5 | 2 more | 1/7 |
+  | Signature | 2/5 | Hero ✓, runway questionable | 4/11 | 7 more | 1/2 |
+
+  **Phase 1 Decision:** Hero scenes (v2) are strong for all 3. But:
+  - Phase 1 task says "Generate 1 hero scene per collection" — heroes ALREADY EXIST and pass visual QA
+  - The real gaps are: depth maps, missing product composites, and Signature's missing 3 scenes
+  - Love Hurts dome scene needs high-res regeneration for the climax stage
 - [ ] Fill render gaps for any current products missing render variants
   - Read `HANDOFF.md` for rendering-critical details (rose fill patterns, text placement, patches)
   - Use `gemini-2.5-flash-image` as primary, `FLUX.2-pro` for editorial quality
