@@ -77,7 +77,7 @@ $collections = array(
 				<div class="collections-card__image-wrap">
 					<img src="<?php echo esc_url( $col['image'] ); ?>"
 					     alt="<?php echo esc_attr( $col['name'] ); ?>"
-					     loading="<?php echo $i < 2 ? 'eager' : 'lazy'; ?>"
+					     loading="<?php echo esc_attr( $i < 2 ? 'eager' : 'lazy' ); ?>"
 					     decoding="async"
 					     width="600" height="800">
 				</div>
