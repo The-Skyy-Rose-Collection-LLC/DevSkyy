@@ -5,7 +5,7 @@
   "scripts": {
     "build": "npm run build:js && npm run build:css",
     "build:js": "webpack --mode production",
-    "build:css": "cleancss -o style.min.css style.css && cleancss -o assets/css/woocommerce.min.css assets/css/woocommerce.css && cleancss -o assets/css/accessibility.min.css assets/css/accessibility.css",
+    "build:css": "node scripts/build-css.js",
     "test": "npm run test:js && npm run test:e2e",
     "test:js": "jest",
     "test:js:watch": "jest --watch",
