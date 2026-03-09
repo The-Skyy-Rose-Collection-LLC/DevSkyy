@@ -86,7 +86,7 @@ ICLIGHT_WEIGHTS_PATH = _BASE_DIR / "assets" / "models" / "ic-light" / "iclight_s
 ICLIGHT_BASE_MODEL = "stablediffusionapi/realistic-vision-v51"
 ICLIGHT_STEPS = 25
 ICLIGHT_CFG = 2.0
-ICLIGHT_RESOLUTION = 512
+ICLIGHT_RESOLUTION = 384
 
 # ---------------------------------------------------------------------------
 # Lazy provider clients (cached singletons — no mutable globals)

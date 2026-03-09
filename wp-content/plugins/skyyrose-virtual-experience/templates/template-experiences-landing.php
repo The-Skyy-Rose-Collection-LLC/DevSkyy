@@ -1,7 +1,7 @@
 <?php
 /**
  * Template Name: SkyyRose Experiences Landing
- * 
+ *
  * Landing page for all SkyyRose virtual experiences.
  * Parent page at /experience/
  */
@@ -275,10 +275,10 @@ get_header();
     <header class="landing-hero">
         <h1 class="landing-title">Virtual Experiences</h1>
         <p class="landing-subtitle">
-            Step into the world of SkyyRose luxury fashion. Explore our immersive 3D experiences 
+            Step into the world of SkyyRose luxury fashion. Explore our immersive 3D experiences
             and discover pieces that define a generation of discerning taste.
         </p>
-        <p class="landing-tagline">Where Love Meets Luxury</p>
+        <p class="landing-tagline">Luxury Grows from Concrete.</p>
     </header>
 
     <main class="experiences-grid">
@@ -292,7 +292,7 @@ get_header();
                     <span>◆</span> Signature Collection
                 </h2>
                 <p class="experience-card-tagline">
-                    Our most celebrated pieces that define a generation of discerning taste. 
+                    Our most celebrated pieces that define a generation of discerning taste.
                     Gold accents meet premium luxury fabrics in this flagship collection.
                 </p>
                 <div class="experience-card-stats">
@@ -326,7 +326,7 @@ get_header();
                     <span>✦</span> Black Rose Collection
                 </h2>
                 <p class="experience-card-tagline">
-                    A gothic journey through midnight gardens where shadow dances with silver. 
+                    A gothic journey through midnight gardens where shadow dances with silver.
                     Noir elegance meets sterling sophistication.
                 </p>
                 <div class="experience-card-stats">
@@ -360,7 +360,7 @@ get_header();
                     <span>♥</span> Love Hurts Collection
                 </h2>
                 <p class="experience-card-tagline">
-                    Where passion meets fragility in a castle of whispered confessions. 
+                    Where passion meets fragility in a castle of whispered confessions.
                     Rose gold threading and tender vulnerability define this romantic collection.
                 </p>
                 <div class="experience-card-stats">

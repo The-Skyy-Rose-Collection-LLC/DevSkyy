@@ -9,6 +9,9 @@
 import type { CartState, CustomerInfo, Order } from '../types/product';
 import type { Stripe, PaymentIntentResult } from './stripeIntegration';
 import { initializeStripe, handlePaymentResult } from './stripeIntegration';
+import { createLogger } from '../utils/Logger';
+
+const log = createLogger('Checkout');
 
 /**
  * Checkout configuration
@@ -116,7 +119,7 @@ export class CheckoutManager {
         sessionId: data.sessionId,
       };
     } catch (error) {
-      console.error('Error creating checkout session:', error);
+      log.error('Error creating checkout session', error);
       return {
         error: 'Network error. Please check your connection and try again.',
       };
@@ -144,7 +147,7 @@ export class CheckoutManager {
         throw new Error(result.error.message);
       }
     } catch (error) {
-      console.error('Error redirecting to checkout:', error);
+      log.error('Error redirecting to checkout', error);
       throw error;
     }
   }
@@ -233,7 +236,7 @@ export class CheckoutManager {
         orderId: order.orderId,
       };
     } catch (error) {
-      console.error('Payment processing error:', error);
+      log.error('Payment processing error', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Payment failed',
@@ -310,7 +313,7 @@ export class CheckoutManager {
       const data = await response.json();
       return data.id;
     } catch (error) {
-      console.error('Error creating WooCommerce order:', error);
+      log.error('Error creating WooCommerce order', error);
       throw error;
     }
   }
@@ -346,7 +349,7 @@ export class CheckoutManager {
       const order = await response.json();
       return order;
     } catch (error) {
-      console.error('Error creating order:', error);
+      log.error('Error creating order', error);
       throw error;
     }
   }
@@ -364,7 +367,7 @@ export class CheckoutManager {
 
       sessionStorage.setItem('threejs_state', JSON.stringify(state));
     } catch (error) {
-      console.error('Error saving Three.js state:', error);
+      log.error('Error saving Three.js state', error);
     }
   }
 
@@ -395,7 +398,7 @@ export class CheckoutManager {
       window.dispatchEvent(restoreEvent);
 
       // Log restoration for debugging
-      console.debug('Three.js state restored:', {
+      log.debug('Three.js state restored', {
         savedAt: new Date(savedState.timestamp).toISOString(),
         hasCamera: !!savedState.cameraPosition,
         hasProduct: !!savedState.selectedProduct,
@@ -404,7 +407,7 @@ export class CheckoutManager {
       // Clear saved state after restoration
       sessionStorage.removeItem('threejs_state');
     } catch (error) {
-      console.error('Error restoring Three.js state:', error);
+      log.error('Error restoring Three.js state', error);
     }
   }
 
@@ -443,7 +446,7 @@ export class CheckoutManager {
         paymentStatus: data.payment_status,
       };
     } catch (error) {
-      console.error('Error getting session status:', error);
+      log.error('Error getting session status', error);
       return {
         status: 'error',
         error: error instanceof Error ? error.message : 'Unknown error',

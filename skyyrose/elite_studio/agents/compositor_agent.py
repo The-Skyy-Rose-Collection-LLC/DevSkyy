@@ -197,13 +197,24 @@ class CompositorAgent:
             self.log.step(4, 6, "FLUX Compositing")
             t0 = time.time()
 
-            # Upload assets to fal CDN
-            scene_url = upload_to_fal(Path(scene_image_path).read_bytes(), f"{sku}-scene.png")
-            subject_url = upload_to_fal(Path(relit_path).read_bytes(), f"{sku}-relit.png")
-            mask_url = upload_to_fal(
-                self._create_scene_mask(alpha_path, scene_image_path),
-                f"{sku}-mask.png",
-            )
+            # Upload assets to CDN (try fal, fall back to data URIs for Replicate)
+            try:
+                scene_url = upload_to_fal(Path(scene_image_path).read_bytes(), f"{sku}-scene.png")
+                subject_url = upload_to_fal(Path(relit_path).read_bytes(), f"{sku}-relit.png")
+                mask_url = upload_to_fal(
+                    self._create_scene_mask(alpha_path, scene_image_path),
+                    f"{sku}-mask.png",
+                )
+            except Exception as exc:
+                import base64 as b64
+
+                def _to_data_uri(data: bytes) -> str:
+                    return "data:image/png;base64," + b64.b64encode(data).decode()
+
+                log.info("fal CDN unavailable, using data URIs: %s", exc)
+                scene_url = _to_data_uri(Path(scene_image_path).read_bytes())
+                subject_url = _to_data_uri(Path(relit_path).read_bytes())
+                mask_url = _to_data_uri(self._create_scene_mask(alpha_path, scene_image_path))
 
             composite_bytes, provider = self._composite_with_flux(
                 scene_url, subject_url, mask_url, flux_prompt
@@ -403,16 +414,45 @@ class CompositorAgent:
         Falls back to using the alpha-matted image directly if IC-Light
         is unavailable or fails.
         """
-        try:
-            relit_bytes = self._run_iclight(alpha_path, scene_path, prompt)
+        # Try cloud IC-Light (Replicate) first, then local, then fallback
+        for method_name, method in [
+            ("replicate", self._run_iclight_replicate),
+            ("local", self._run_iclight),
+        ]:
+            try:
+                relit_bytes = method(alpha_path, scene_path, prompt)
+                relit_path = str(Path(work_dir) / f"{sku}-relit.png")
+                Path(relit_path).write_bytes(relit_bytes)
+                return relit_path
+            except Exception as exc:
+                log.warning("IC-Light %s failed: %s", method_name, exc)
 
-            relit_path = str(Path(work_dir) / f"{sku}-relit.png")
-            Path(relit_path).write_bytes(relit_bytes)
-            return relit_path
+        log.warning("All IC-Light methods failed — using alpha directly")
+        return alpha_path
 
-        except Exception as exc:
-            log.warning("IC-Light failed, using alpha directly: %s", exc)
-            return alpha_path
+    def _run_iclight_replicate(self, alpha_path: str, scene_path: str, prompt: str) -> bytes:
+        """IC-Light via Replicate cloud API (A100 GPU)."""
+        import replicate
+
+        fg_data = Path(alpha_path).read_bytes()
+        bg_data = Path(scene_path).read_bytes()
+
+        output = replicate.run(
+            "zsxkib/ic-light",
+            input={
+                "prompt": prompt,
+                "light_source": "None",
+                "foreground_image": fg_data,
+                "background_image": bg_data,
+                "num_inference_steps": 25,
+                "guidance_scale": 2.0,
+            },
+        )
+        # output is a URL or list of URLs
+        url = output[0] if isinstance(output, list) else output
+        resp = httpx.get(str(url), timeout=60)
+        resp.raise_for_status()
+        return resp.content
 
     def _run_iclight(self, alpha_path: str, scene_path: str, prompt: str) -> bytes:
         """Run IC-Light FBC pipeline (lllyasviel/IC-Light).
