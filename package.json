@@ -185,7 +185,7 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx}\" \"*.{json,md}\"",
     "type-check": "tsc --project config/typescript/tsconfig.json --noEmit",
     "clean": "rm -rf dist coverage",
-    "prepare": "npm run build",
+    "prepare": "husky && npm run build",
     "precommit": "npm run lint && npm run type-check && npm run test:ci",
     "security:audit": "npm audit",
     "security:fix": "npm audit fix",
