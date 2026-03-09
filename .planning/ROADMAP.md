@@ -115,11 +115,10 @@ Plans:
   2. The live site enters WP-CLI maintenance mode before file transfer begins
   3. Maintenance mode is disabled and cache is flushed after transfer completes
   4. If the deploy script fails mid-transfer, maintenance mode is still disabled (try/finally safety)
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 07-01: TBD
-- [ ] 07-02: TBD
+- [ ] 07-01-PLAN.md -- Create deploy-theme.sh with rsync/lftp transfer, WP-CLI maintenance mode, cache flush, and trap safety
 
 ### Phase 8: Deploy Verification & Orchestration
 **Goal**: Deploys are verified against the live site and can be triggered with a single command (including dry-run)
@@ -148,5 +147,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 4. PR Branch Protection | 1/1 | Complete | 2026-03-09 |
 | 5. WordPress Build Pipeline | 1/1 | Complete | 2026-03-09 |
 | 6. WordPress CI Integration | 1/1 | Complete | 2026-03-09 |
-| 7. Deploy Core | 0/2 | Not started | - |
+| 7. Deploy Core | 0/1 | Not started | - |
 | 8. Deploy Verification & Orchestration | 0/2 | Not started | - |
