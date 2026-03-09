@@ -1,6 +1,6 @@
 {
   "name": "skyyrose-flagship-theme",
-  "version": "1.0.0",
+  "version": "4.0.0",
   "description": "SkyyRose flagship WordPress theme with WooCommerce and 3D capabilities",
   "scripts": {
     "build": "npm run build:js && npm run build:css",
@@ -120,7 +120,7 @@
     },
     "rules": {
       "no-unused-vars": "warn",
-      "no-console": "off"
+      "no-console": "warn"
     }
   },
   "prettier": {

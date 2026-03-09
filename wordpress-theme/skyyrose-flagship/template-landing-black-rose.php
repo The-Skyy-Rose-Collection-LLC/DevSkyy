@@ -74,7 +74,7 @@ get_header();
 			     alt="" width="520" height="240" loading="eager">
 		</h1>
 
-		<div class="lp-countdown"<?php echo $countdown_attr; ?>>
+		<div class="lp-countdown"<?php echo esc_attr( $countdown_attr ); ?>>
 			<div class="lp-countdown__unit">
 				<div class="lp-countdown__number cd-d" aria-label="Days">03</div>
 				<div class="lp-countdown__label">Days</div>
@@ -174,13 +174,13 @@ get_header();
 				<?php endif; ?>
 
 				<div class="lp-product-card__image">
-					<img src="<?php echo $image_url; ?>"
-					     alt="<?php echo $name; ?> — <?php echo esc_attr( $collection_name ); ?> Collection"
+					<img src="<?php echo esc_url( $image_url ); ?>"
+					     alt="<?php echo esc_attr( $name ); ?> — <?php echo esc_attr( $collection_name ); ?> Collection"
 					     loading="lazy" width="420" height="560">
 				</div>
 
 				<div class="lp-product-card__info">
-					<div class="lp-product-card__name"><?php echo $name; ?></div>
+					<div class="lp-product-card__name"><?php echo esc_html( $name ); ?></div>
 					<div class="lp-product-card__price">$<?php echo esc_html( number_format( $price, 0 ) ); ?></div>
 
 					<div class="lp-cost-per-wear">
@@ -196,7 +196,7 @@ get_header();
 					<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"
 					   class="lp-btn--add-to-bag"
 					   aria-label="<?php echo esc_attr( 'Pre-order ' . $product['name'] ); ?>">
-						<?php echo $is_preorder ? 'Pre-Order Now' : 'Add to Bag'; ?>
+						<?php echo esc_html( $is_preorder ? 'Pre-Order Now' : 'Add to Bag' ); ?>
 					</a>
 				</div>
 			</div>

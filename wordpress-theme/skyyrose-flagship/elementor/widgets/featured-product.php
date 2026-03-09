@@ -132,7 +132,7 @@ class SkyyRose_Featured_Product_Widget extends \Elementor\Widget_Base {
 		?>
 		<section class="col-featured col-rv"
 			style="--col-accent:<?php echo esc_attr( $accent ); ?>;--col-accent-rgb:<?php echo esc_attr( "$r,$g,$b" ); ?>">
-			<div class="col-feat__inner" style="<?php echo $is_right ? 'direction:rtl;' : ''; ?>">
+			<div class="col-feat__inner" style="<?php echo esc_attr( $is_right ? 'direction:rtl;' : '' ); ?>">
 
 				<div class="col-feat__vis" style="direction:ltr;">
 					<?php if ( $product['badge'] ) : ?>

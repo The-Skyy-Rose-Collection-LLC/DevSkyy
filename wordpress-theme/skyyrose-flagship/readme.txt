@@ -1,9 +1,9 @@
 === SkyyRose Flagship ===
 Contributors: skyyrose
-Requires at least: 6.0
+Requires at least: 6.4
 Tested up to: 6.7
-Requires PHP: 7.4
-Stable tag: 3.2.0
+Requires PHP: 8.0
+Stable tag: 4.0.0
 License: GPL-2.0-or-later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: e-commerce, woocommerce, dark-theme, luxury, fashion, streetwear, glassmorphism, custom-colors, custom-menu, featured-images, threaded-comments, accessibility-ready
@@ -25,7 +25,7 @@ SkyyRose Flagship is a premium dark luxury WordPress theme designed for SkyyRose
 * **Cinematic Mode Toggle** — Immersive viewing mode for product and scene pages
 * **Glassmorphism Navigation** — Frosted-glass header with scroll-triggered effects
 * **Film Grain SVG Overlay** — Subtle texture applied to all pages
-* **Inter + Playfair Display Typography** — Loaded via Google Fonts for a luxury editorial feel
+* **Self-Hosted Typography** — Cinzel, Playfair Display, Cormorant Garamond, Bebas Neue, and more — GDPR-compliant, no external requests
 * **Responsive Design** — Breakpoints at 1200px, 768px, and 480px
 * **WCAG 2.2 AA Accessibility** — Full prefers-reduced-motion support for animations and transitions
 * **Security Hardened** — Content Security Policy, HSTS headers, XML-RPC disabled, nonce protection on all forms
@@ -37,9 +37,9 @@ SkyyRose Flagship is a premium dark luxury WordPress theme designed for SkyyRose
 
 = Requirements =
 
-* WordPress 6.0 or higher
+* WordPress 6.4 or higher
 * WooCommerce (required for e-commerce functionality)
-* PHP 7.4 or higher (8.0+ recommended)
+* PHP 8.0 or higher
 * Modern browser with CSS backdrop-filter support for glassmorphism effects
 
 = Browser Support =
@@ -121,6 +121,17 @@ Each page template only loads the CSS and JavaScript it needs. Collection pages 
 
 == Changelog ==
 
+= 4.0.0 =
+* Marketplace-ready release with comprehensive security hardening
+* Self-hosted typography — removed all Google Fonts external requests (GDPR)
+* Replaced heavyweight wc_get_products queries with lightweight $wpdb and wp_count_posts
+* Fixed 19+ unescaped output statements across landing and homepage templates
+* Immersive 3D scene experiences with Three.js product hotspots
+* Conditional asset loading per template for optimal page weight
+* Design token system with CSS custom properties cascade
+* WooCommerce HPOS compatibility declared
+* Full escaping audit on all template output
+
 = 3.2.0 =
 * Complete theme rebuild from PRD
 * Full dark luxury design system (#0A0A0A backgrounds, glassmorphism, film grain)
@@ -138,8 +149,13 @@ Complete rebuild. Back up your site before upgrading. This version replaces the 
 
 == Credits ==
 
-* Inter typeface — https://rsms.me/inter/ (SIL Open Font License)
+* Cinzel typeface — https://github.com/nicholasgross/Cinzel (SIL Open Font License)
 * Playfair Display typeface — https://github.com/clauseggers/Playfair-Display (SIL Open Font License)
+* Cormorant Garamond typeface — https://github.com/CatharsisFonts/Cormorant (SIL Open Font License)
+* Bebas Neue typeface — https://github.com/dharmatype/Bebas-Neue (SIL Open Font License)
+* Space Mono typeface — https://github.com/googlefonts/spacemono (SIL Open Font License)
+* Instrument Serif typeface — Google Fonts (SIL Open Font License)
+* Three.js — https://threejs.org/ (MIT License)
 * WooCommerce — https://woocommerce.com/ (GPL)
 
 == Privacy Policy ==
@@ -149,7 +165,7 @@ SkyyRose Flagship does not collect personal data from website visitors beyond wh
 The theme includes:
 * Local storage for user preferences (client-side only)
 * No tracking cookies
-* No external API calls beyond Google Fonts and WooCommerce payment gateways
+* No external API calls beyond WooCommerce payment gateways (fonts are self-hosted)
 
 == Theme URI ==
 
