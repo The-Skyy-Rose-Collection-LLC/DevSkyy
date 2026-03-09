@@ -94,7 +94,7 @@ pillow==12.1.1
 soundfile==0.12.1
 
 # Development utilities
-rich==13.9.4  # Better console output
+rich==14.3.3  # Better console output
 click==8.1.7  # CLI interface
 
 # Testing
