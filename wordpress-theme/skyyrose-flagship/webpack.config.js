@@ -1,41 +1,42 @@
 /**
  * Webpack configuration for SkyyRose Flagship Theme
- * Minifies JavaScript assets for production deployment
+ * Auto-discovers and minifies all JS source files with source maps
  */
 
 const path = require('path');
+const glob = require('glob');
 const TerserPlugin = require('terser-webpack-plugin');
+
+// Auto-discover all .js files, exclude .min.js
+const entries = {};
+glob.sync('./assets/js/*.js', { ignore: './assets/js/*.min.js' }).forEach(file => {
+  const name = path.basename(file, '.js');
+  entries[name] = file;
+});
 
 module.exports = {
   mode: 'production',
-  entry: {
-    'main': './assets/js/main.js',
-    'navigation': './assets/js/navigation.js',
-    'woocommerce': './assets/js/woocommerce.js',
-    'wishlist': './assets/js/wishlist.js',
-    'three-init': './assets/js/three-init.js',
-    'accessibility': './assets/js/accessibility.js',
-  },
+  entry: entries,
   output: {
     path: path.resolve(__dirname, 'assets/js'),
     filename: '[name].min.js',
-    clean: false, // Don't delete source files
+    clean: false, // Don't delete source files -- output dir IS source dir
+    iife: true, // Wrap in IIFE -- these are vanilla browser scripts, not ES modules
   },
+  devtool: 'source-map', // BUILD-03: generate external .map files
   optimization: {
     minimize: true,
     minimizer: [
       new TerserPlugin({
         terserOptions: {
           compress: {
-            drop_console: false, // Keep console for debugging
+            drop_console: false,
             drop_debugger: true,
             pure_funcs: ['console.debug'],
           },
-          format: {
-            comments: false, // Remove comments
-          },
+          format: { comments: false },
         },
-        extractComments: false, // Don't create separate license files
+        extractComments: false,
       }),
     ],
   },
