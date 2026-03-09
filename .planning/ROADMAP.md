@@ -16,8 +16,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Husky Foundation** - Replace broken Husky v4 config with working v9 setup at monorepo root
 - [x] **Phase 3: Pre-commit Hook Checks** - Wire up lint, type-check, PHP syntax, and fast tests on staged files
 - [x] **Phase 4: PR Branch Protection** - Block merges to main unless all CI checks pass
-- [ ] **Phase 5: WordPress Build Pipeline** - Full minification of all JS and CSS theme files via single build command
-- [ ] **Phase 6: WordPress CI Integration** - CI validates PHP syntax, build output, and minification drift for theme files
+- [x] **Phase 5: WordPress Build Pipeline** - Full minification of all JS and CSS theme files via single build command
+- [x] **Phase 6: WordPress CI Integration** - CI validates PHP syntax, build output, and minification drift for theme files
 - [ ] **Phase 7: Deploy Core** - Transfer built theme to production via rsync/SSH with maintenance mode safety
 - [ ] **Phase 8: Deploy Verification & Orchestration** - Health checks, single-command pipeline, and dry-run mode
 
@@ -91,7 +91,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 05-01-PLAN.md -- Rewrite webpack config with dynamic JS entry discovery, create CSS build script, and build verification
+- [x] 05-01-PLAN.md -- Rewrite webpack config with dynamic JS entry discovery, create CSS build script, and build verification
 
 ### Phase 6: WordPress CI Integration
 **Goal**: CI catches PHP errors and stale minified files in the WordPress theme before they can be merged
@@ -104,7 +104,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 06-01-PLAN.md -- Add wordpress-theme CI job (PHP lint, build + verify, drift detection) and update branch protection to 5 checks
+- [x] 06-01-PLAN.md -- Add wordpress-theme CI job (PHP lint, build + verify, drift detection) and update branch protection to 5 checks
 
 ### Phase 7: Deploy Core
 **Goal**: Built theme files can be transferred to the production WordPress server safely
@@ -146,7 +146,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 2. Husky Foundation | 1/1 | Complete | 2026-03-09 |
 | 3. Pre-commit Hook Checks | 2/2 | Complete | 2026-03-09 |
 | 4. PR Branch Protection | 1/1 | Complete | 2026-03-09 |
-| 5. WordPress Build Pipeline | 0/1 | Not started | - |
-| 6. WordPress CI Integration | 0/1 | Not started | - |
+| 5. WordPress Build Pipeline | 1/1 | Complete | 2026-03-09 |
+| 6. WordPress CI Integration | 1/1 | Complete | 2026-03-09 |
 | 7. Deploy Core | 0/2 | Not started | - |
 | 8. Deploy Verification & Orchestration | 0/2 | Not started | - |

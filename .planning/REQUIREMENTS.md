@@ -20,9 +20,9 @@
 
 - [x] **CI-01**: All 17 `continue-on-error: true` directives removed from ci.yml, security-gate.yml, dast-scan.yml
 - [x] **CI-02**: Underlying lint/type/format failures fixed so CI passes without soft failures
-- [ ] **CI-03**: PHP syntax validation step added to CI pipeline for WordPress theme files
-- [ ] **CI-04**: CI runs WordPress theme build (npm run build) and validates output
-- [ ] **CI-05**: CI detects minification drift -- fails if .min files don't match freshly built output
+- [x] **CI-03**: PHP syntax validation step added to CI pipeline for WordPress theme files
+- [x] **CI-04**: CI runs WordPress theme build (npm run build) and validates output
+- [x] **CI-05**: CI detects minification drift -- fails if .min files don't match freshly built output
 
 ### PR Protection
 
@@ -88,9 +88,9 @@
 | HOOK-08 | Phase 3 | Complete |
 | CI-01 | Phase 1 | Complete |
 | CI-02 | Phase 1 | Complete |
-| CI-03 | Phase 6 | Pending |
-| CI-04 | Phase 6 | Pending |
-| CI-05 | Phase 6 | Pending |
+| CI-03 | Phase 6 | Complete |
+| CI-04 | Phase 6 | Complete |
+| CI-05 | Phase 6 | Complete |
 | PR-01 | Phase 4 | Complete |
 | PR-02 | Phase 4 | Complete |
 | BUILD-01 | Phase 5 | Complete |
