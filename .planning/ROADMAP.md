@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Husky Foundation** - Replace broken Husky v4 config with working v9 setup at monorepo root
 - [x] **Phase 3: Pre-commit Hook Checks** - Wire up lint, type-check, PHP syntax, and fast tests on staged files
 - [x] **Phase 4: PR Branch Protection** - Block merges to main unless all CI checks pass
-- [ ] **Phase 5: WordPress Build Pipeline** - Full minification of all 24 JS and 31 CSS theme files via single build command
+- [ ] **Phase 5: WordPress Build Pipeline** - Full minification of all JS and CSS theme files via single build command
 - [ ] **Phase 6: WordPress CI Integration** - CI validates PHP syntax, build output, and minification drift for theme files
 - [ ] **Phase 7: Deploy Core** - Transfer built theme to production via rsync/SSH with maintenance mode safety
 - [ ] **Phase 8: Deploy Verification & Orchestration** - Health checks, single-command pipeline, and dry-run mode
@@ -84,15 +84,14 @@ Plans:
 **Depends on**: Nothing (independent of armor chain, but placed here for logical ordering)
 **Requirements**: BUILD-01, BUILD-02, BUILD-03, BUILD-04
 **Success Criteria** (what must be TRUE):
-  1. Running `npm run build` in the WordPress theme directory produces .min.js files for all 24 JS source files
-  2. Running `npm run build` produces .min.css files for all 31 CSS source files
+  1. Running `npm run build` in the WordPress theme directory produces .min.js files for all 43 JS source files
+  2. Running `npm run build` produces .min.css files for all 55+ CSS source files (including subdirectories)
   3. Source maps (.map files) are generated alongside minified output for debugging
   4. A single `npm run build` command produces all minified output -- no manual steps required
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
+- [ ] 05-01-PLAN.md -- Rewrite webpack config with dynamic JS entry discovery, create CSS build script, and build verification
 
 ### Phase 6: WordPress CI Integration
 **Goal**: CI catches PHP errors and stale minified files in the WordPress theme before they can be merged
@@ -147,7 +146,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 2. Husky Foundation | 1/1 | Complete | 2026-03-09 |
 | 3. Pre-commit Hook Checks | 2/2 | Complete | 2026-03-09 |
 | 4. PR Branch Protection | 1/1 | Complete | 2026-03-09 |
-| 5. WordPress Build Pipeline | 0/2 | Not started | - |
+| 5. WordPress Build Pipeline | 0/1 | Not started | - |
 | 6. WordPress CI Integration | 0/1 | Not started | - |
 | 7. Deploy Core | 0/2 | Not started | - |
 | 8. Deploy Verification & Orchestration | 0/2 | Not started | - |
