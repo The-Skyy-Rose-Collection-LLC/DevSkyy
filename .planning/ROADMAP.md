@@ -60,11 +60,11 @@ Plans:
   3. Committing a staged PHP file with a syntax error (`php -l`) blocks the commit
   4. Committing a staged TypeScript file with a type error blocks the commit (tsc or mypy for Python)
   5. All pre-commit checks complete in under 30 seconds on a typical commit touching 5 files
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [ ] 03-01-PLAN.md -- Create lint-staged config, PHP lint wrapper, and wire pre-commit hook with real checks
+- [ ] 03-02-PLAN.md -- Create verification scripts and validate all HOOK requirements end-to-end
 
 ### Phase 4: PR Branch Protection
 **Goal**: No code reaches the main branch without passing all CI checks via a pull request
