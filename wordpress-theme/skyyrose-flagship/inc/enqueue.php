@@ -636,6 +636,20 @@ function skyyrose_enqueue_template_scripts() {
 			);
 		}
 
+		// Enqueue Three.js immersive world engine (progressive enhancement over 2D).
+		if ( 'immersive' === $slug ) {
+			$world_path = $base_js_dir . '/immersive-world.js';
+			if ( file_exists( $world_path ) ) {
+				wp_enqueue_script(
+					'skyyrose-immersive-world',
+					$base_js_uri . '/immersive-world.js',
+					array( $handle ),
+					SKYYROSE_VERSION,
+					true
+				);
+			}
+		}
+
 		// Enqueue immersive WooCommerce bridge + localize skyyRoseImmersive data.
 		if ( 'immersive' === $slug ) {
 			$bridge_path = $base_js_dir . '/immersive-wc-bridge.js';

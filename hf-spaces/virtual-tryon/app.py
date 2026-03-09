@@ -80,9 +80,7 @@ async def fashn_api_request(
 
     timeout = aiohttp.ClientTimeout(total=TIMEOUT)
 
-    async with aiohttp.ClientSession(
-        headers=request_headers, timeout=timeout
-    ) as session:  # noqa: SIM117
+    async with aiohttp.ClientSession(headers=request_headers, timeout=timeout) as session:  # noqa: SIM117
         async with session.request(method, url, json=data) as response:
             result = await response.json()
 
