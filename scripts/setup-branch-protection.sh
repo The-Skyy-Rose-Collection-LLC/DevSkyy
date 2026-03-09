@@ -52,7 +52,8 @@ apply_protection() {
       {"context": "🔍 Lint & Static Analysis", "app_id": -1},
       {"context": "🐍 Python Tests", "app_id": -1},
       {"context": "🔐 Security Scan", "app_id": -1},
-      {"context": "⚛️ Frontend Tests", "app_id": -1}
+      {"context": "⚛️ Frontend Tests", "app_id": -1},
+      {"context": "🏗️ WordPress Theme", "app_id": -1}
     ]
   },
   "enforce_admins": true,
@@ -82,14 +83,14 @@ verify() {
 
   FAILURES=0
 
-  # Check 1: Required status checks count equals 4
+  # Check 1: Required status checks count equals 5
   local check_count
   check_count=$(gh api "repos/$OWNER/$REPO/branches/$BRANCH/protection" \
     --jq '.required_status_checks.checks | length' 2>/dev/null || echo "0")
-  if [ "$check_count" = "4" ]; then
-    pass "Required status checks: $check_count/4 configured"
+  if [ "$check_count" = "5" ]; then
+    pass "Required status checks: $check_count/5 configured"
   else
-    fail "Required status checks: $check_count/4 configured (expected 4)"
+    fail "Required status checks: $check_count/5 configured (expected 5)"
   fi
 
   # Check 2: Strict mode (branch must be up-to-date)
