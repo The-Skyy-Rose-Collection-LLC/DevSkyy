@@ -74,10 +74,10 @@ Plans:
   1. A PR with a failing CI check cannot be merged (merge button is disabled or gh merge fails)
   2. A PR whose branch is behind main cannot be merged until it is updated
   3. Agents (Ralph, Claude Code) can still create PRs and merge them when CI passes -- no human review required
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 04-01: TBD
+- [ ] 04-01-PLAN.md -- Configure GitHub branch protection, required status checks, and auto-merge via idempotent shell script
 
 ### Phase 5: WordPress Build Pipeline
 **Goal**: All WordPress theme assets are minified from source via a single build command
