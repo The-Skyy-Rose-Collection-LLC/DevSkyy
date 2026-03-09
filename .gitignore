@@ -56,22 +56,11 @@ coverage.xml
 .hypothesis/
 coverage/
 
-# Secrets & Environment
+# Secrets & Environment (catch-all, whitelist .env.example only)
 .env
-.env.hf
-.env.local
-.env.*.local
-.env.save
-.env.backup
-.env.bak
-.env.secrets
-.env.secrets.backup
-.env.critical-fuchsia-ape
-.env.skyyrose-experiences
-.env.staging
-.env.production
-.env.wordpress
+.env.*
 !.env.example
+!.env.wordpress.example
 secrets/
 credentials/
 *.pem
@@ -141,20 +130,11 @@ docs/_build/
 # Redis
 dump.rdb
 
-# Code quality reports
-htmlcov/
-.coverage
-coverage.xml
-bandit-report.json
-.pytest_cache/
-.tox/
-
 # Vector databases (runtime-generated)
 data/vectordb/
 data/*.sqlite3
 data/*.db
 .vercel
-.env*.local
 
 # Build artifacts
 *.tsbuildinfo
@@ -228,6 +208,12 @@ generated_3d_models/
 datasets/
 generated_3d_models_color_accurate/
 
+# Pipeline images (use HuggingFace for storage)
+skyyrose/assets/images/
+
+# AI-generated outputs (regenerate, don't track)
+assets/visual-generated/
+
 # Large training data files
 skyyrose_training_data.zip
 
@@ -239,6 +225,48 @@ scripts/nano-banana-results.json
 
 # Dev screenshots at repo root
 skyyrose-*.png
+devskyy-*.png
+product-gallery-*.png
+theme-upload-*.png
+upload-form-*.png
+woocommerce-*.png
+wp-admin-*.png
 
 # Reference/dev images (not for production)
 wordpress-theme/skyyrose-flagship/assets/images/products/_reference-*
+
+# Editorial staging (temp workspace, not for version control)
+editorial-staging/
+
+# Training data & photo scans (use HuggingFace datasets instead)
+skyyrose-photo-scan/
+data/lora_dataset/
+
+# Zip archives (never commit large binaries)
+*.zip
+!frontend/**/*.zip
+
+# Root artifacts (runtime-generated, not source code)
+deployment_summary.json
+wordpress-health-check-results.json
+skyyrose_clothing_barcodes.txt
+
+# Broken tooling artifacts
+--version/
+
+# Dead symlinks & empty clone dirs
+adk
+Hunyuan3D-*/
+
+# Bun lockfile (use npm for Vercel compat)
+bun.lock
+bun.lockb
+
+# Marker files (build artifacts)
+.plugin-fix-complete
+
+# Virtual environments (all)
+.venv-*/
+
+# Serena config (local)
+.serena/

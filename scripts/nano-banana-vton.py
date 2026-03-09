@@ -159,9 +159,9 @@ PRODUCT_CATALOG = {
         "source_override": "sg-007-beanie-source.jpg",
     },
     "sg-008": {
-        "name": "Signature Crop Hoodie",
+        "name": "Signature Beanie (Forest Green)",
         "collection": "signature",
-        "source_override": "sg-008-crop-hoodie.webp",
+        "source_override": "sg-008-beanie-green.jpg",
     },
     "sg-009": {
         "name": "The Sherpa Jacket",
@@ -249,7 +249,8 @@ PRODUCT_CATALOG = {
 # SKUs that are accessories (not wearable on a model's body)
 ACCESSORY_SKUS = {
     "lh-001",  # The Fannie (fanny pack)
-    "sg-007",  # The Signature Beanie
+    "sg-007",  # The Signature Beanie (Black)
+    "sg-008",  # The Signature Beanie (Forest Green)
     "po-007",  # Black Rose Beanie
     "po-009",  # SR Monogram Slides
     "po-010",  # Love Hurts Slides
@@ -282,14 +283,14 @@ TECH_FLAT_SKUS = {
 # Used by --step composite to tell Gemini what the REAL logo looks like.
 # Products not listed get a generic "match the reference" prompt.
 LOGO_TREATMENTS = {
-    "br-001": "embossed — pressed into the fabric creating a raised, dimensional rose texture with subtle shadow",
-    "br-002": "silicone rubber cut-out — raised 3D rubber logo with clean-cut edges standing proud of the fabric",
-    "br-004": "embossed — pressed into the hoodie fabric creating a dimensional rose with visible depth",
-    "br-005": "embossed — pressed into the hoodie fabric creating a dimensional rose with visible depth",
-    "br-006": "embroidered — stitched thread forming the rose logo with visible thread texture on sherpa fabric",
-    "sg-003": "screen-printed — flat ink application with clean edges on cotton tee",
-    "sg-004": "embroidered — stitched logo on hoodie with raised thread texture",
-    "sg-005": "screen-printed — flat ink on cotton tee",
+    "br-001": "raised rose with shadow depth — fabric pressed inward along the logo outline creating a 3D relief effect, light catches the elevated edges while recessed areas sit in soft shadow",
+    "br-002": "thick rubber logo standing ~2mm above the fabric surface — glossy smooth finish with sharply cut edges, catches specular highlights, casts a small shadow onto the matte fabric beneath",
+    "br-004": "raised rose with shadow depth — hoodie fabric pressed inward along the logo outline, creating dimensional relief where light grazes the elevated petals and thorns",
+    "br-005": "raised rose with shadow depth — hoodie fabric pressed inward along the logo outline, creating dimensional relief where light grazes the elevated petals and thorns",
+    "br-006": "visible thread texture forming the rose — individual stitch lines catch light at different angles creating a satin sheen, slightly raised above the sherpa pile with thread density creating the logo shape",
+    "sg-003": "flat matte ink sitting on the cotton surface — crisp sharp edges with no texture change, the print is flush with the fabric showing zero dimensionality, colors are solid and opaque",
+    "sg-004": "visible thread texture forming the logo — individual stitch lines catch light creating slight sheen, raised ~1mm above the hoodie knit with visible thread direction changes at curves",
+    "sg-005": "flat matte ink sitting on the cotton surface — crisp sharp edges with no texture change, the print is flush with the fabric showing zero dimensionality",
 }
 
 IMAGEN_PRODUCT_DESCRIPTIONS = {
@@ -673,9 +674,11 @@ def composite_prompt(name: str, sku: str, view: str = "front") -> str:
         f"and material treatment.{treatment_note} "
         f"YOUR TASK: Generate a new image that keeps the EXACT same model, pose, body position, "
         f"lighting, and background from Image 1 — but corrects the garment's logo and branding "
-        f"details to match Image 2 exactly. The logo must look like the REAL material "
-        f"(embossed, silicone rubber, embroidered, screen-printed, etc.) — NOT a flat printed graphic. "
-        f"Pay close attention to: logo placement, size, dimensionality, material texture, and color. "
+        f"details to match Image 2 exactly. Study the logo in Image 2 closely: how does light "
+        f"hit it? Does it cast shadows? Is it raised or flat? Does it have a glossy or matte finish? "
+        f"Does the fabric change texture around the logo? Reproduce these VISUAL properties exactly. "
+        f"Pay close attention to: logo placement, size, how light interacts with the logo surface, "
+        f"shadow depth, edge sharpness, surface finish (matte/glossy/textured), and color accuracy. "
         f"Everything about the model and background stays IDENTICAL. Only the garment branding changes."
     )
 
@@ -870,8 +873,7 @@ def generate_image(
             config=types.GenerateContentConfig(
                 response_modalities=["IMAGE"],
                 image_config=types.ImageConfig(
-                    aspect_ratio="3:4",
-                    image_size="2K",
+                    aspectRatio="3:4",
                 ),
             ),
         )
@@ -1470,11 +1472,7 @@ def process_product(
     engine_label = (
         "GPT-Image-1.5"
         if use_gpt_image
-        else "Imagen Ultra"
-        if use_imagen
-        else "FLUX.2"
-        if use_flux
-        else "Gemini"
+        else "Imagen Ultra" if use_imagen else "FLUX.2" if use_flux else "Gemini"
     )
 
     # Build analysis-enhanced prompt detail if available
