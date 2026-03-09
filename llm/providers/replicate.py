@@ -191,9 +191,7 @@ class ReplicateClient:
         client = self._get_client()
 
         input_params = {
-            "image": (
-                open(image_path, "rb") if not image_path.startswith("http") else image_path
-            ),  # noqa: SIM115
+            "image": (open(image_path, "rb") if not image_path.startswith("http") else image_path),  # noqa: SIM115
             "scale": scale,
             "face_enhance": face_enhance,
         }
@@ -214,9 +212,7 @@ class ReplicateClient:
         client = self._get_client()
 
         input_params = {
-            "image": (
-                open(image_path, "rb") if not image_path.startswith("http") else image_path
-            ),  # noqa: SIM115
+            "image": (open(image_path, "rb") if not image_path.startswith("http") else image_path),  # noqa: SIM115
         }
 
         output = client.run(self.MODELS["rembg"], input=input_params)
@@ -237,9 +233,7 @@ class ReplicateClient:
         client = self._get_client()
 
         input_params = {
-            "image": (
-                open(image_path, "rb") if not image_path.startswith("http") else image_path
-            ),  # noqa: SIM115
+            "image": (open(image_path, "rb") if not image_path.startswith("http") else image_path),  # noqa: SIM115
             "task": "image_captioning",
         }
 

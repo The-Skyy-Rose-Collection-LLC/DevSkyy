@@ -434,9 +434,7 @@ class CompositorAgent:
         log.warning("All relighting methods failed — using alpha directly")
         return alpha_path
 
-    def _harmonize_libcom(
-        self, alpha_path: str, scene_path: str, sku: str, work_dir: str
-    ) -> str:
+    def _harmonize_libcom(self, alpha_path: str, scene_path: str, sku: str, work_dir: str) -> str:
         """libcom image harmonization — adjusts foreground lighting/color to match scene.
 
         Single CNN forward pass (~3s on GPU) vs IC-Light's 25 diffusion steps (~45s).
