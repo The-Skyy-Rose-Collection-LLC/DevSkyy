@@ -26,8 +26,8 @@
 
 ### PR Protection
 
-- [ ] **PR-01**: All CI status checks required to pass before PR can merge to main
-- [ ] **PR-02**: PR branch must be up-to-date with main before merge is allowed
+- [x] **PR-01**: All CI status checks required to pass before PR can merge to main
+- [x] **PR-02**: PR branch must be up-to-date with main before merge is allowed
 
 ### WordPress Build Pipeline
 
@@ -91,8 +91,8 @@
 | CI-03 | Phase 6 | Pending |
 | CI-04 | Phase 6 | Pending |
 | CI-05 | Phase 6 | Pending |
-| PR-01 | Phase 4 | Pending |
-| PR-02 | Phase 4 | Pending |
+| PR-01 | Phase 4 | Complete |
+| PR-02 | Phase 4 | Complete |
 | BUILD-01 | Phase 5 | Pending |
 | BUILD-02 | Phase 5 | Pending |
 | BUILD-03 | Phase 5 | Pending |

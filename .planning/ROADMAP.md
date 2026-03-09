@@ -13,9 +13,9 @@ This roadmap delivers a 4-layer defense system (hooks, CI, PR gates, deploy veri
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: CI Failure Triage & Fix** - Remove 17 continue-on-error directives and fix the underlying failures they mask
-- [ ] **Phase 2: Husky Foundation** - Replace broken Husky v4 config with working v9 setup at monorepo root
-- [ ] **Phase 3: Pre-commit Hook Checks** - Wire up lint, type-check, PHP syntax, and fast tests on staged files
-- [ ] **Phase 4: PR Branch Protection** - Block merges to main unless all CI checks pass
+- [x] **Phase 2: Husky Foundation** - Replace broken Husky v4 config with working v9 setup at monorepo root
+- [x] **Phase 3: Pre-commit Hook Checks** - Wire up lint, type-check, PHP syntax, and fast tests on staged files
+- [x] **Phase 4: PR Branch Protection** - Block merges to main unless all CI checks pass
 - [ ] **Phase 5: WordPress Build Pipeline** - Full minification of all 24 JS and 31 CSS theme files via single build command
 - [ ] **Phase 6: WordPress CI Integration** - CI validates PHP syntax, build output, and minification drift for theme files
 - [ ] **Phase 7: Deploy Core** - Transfer built theme to production via rsync/SSH with maintenance mode safety
@@ -48,7 +48,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 02-01-PLAN.md -- Initialize Husky v9, create hooks and verification script, clean up WordPress theme
+- [x] 02-01-PLAN.md -- Initialize Husky v9, create hooks and verification script, clean up WordPress theme
 
 ### Phase 3: Pre-commit Hook Checks
 **Goal**: Every commit is checked for lint, type, syntax, and test errors on staged files before it reaches the remote
@@ -63,8 +63,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 03-01-PLAN.md -- Create lint-staged config, PHP lint wrapper, and wire pre-commit hook with real checks
-- [ ] 03-02-PLAN.md -- Create verification scripts and validate all HOOK requirements end-to-end
+- [x] 03-01-PLAN.md -- Create lint-staged config, PHP lint wrapper, and wire pre-commit hook with real checks
+- [x] 03-02-PLAN.md -- Create verification scripts and validate all HOOK requirements end-to-end
 
 ### Phase 4: PR Branch Protection
 **Goal**: No code reaches the main branch without passing all CI checks via a pull request
@@ -77,7 +77,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 04-01-PLAN.md -- Configure GitHub branch protection, required status checks, and auto-merge via idempotent shell script
+- [x] 04-01-PLAN.md -- Configure GitHub branch protection, required status checks, and auto-merge via idempotent shell script
 
 ### Phase 5: WordPress Build Pipeline
 **Goal**: All WordPress theme assets are minified from source via a single build command
@@ -145,8 +145,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 |-------|----------------|--------|-----------|
 | 1. CI Failure Triage & Fix | 2/2 | Complete | 2026-03-08 |
 | 2. Husky Foundation | 1/1 | Complete | 2026-03-09 |
-| 3. Pre-commit Hook Checks | 1/2 | In Progress | - |
-| 4. PR Branch Protection | 0/1 | Not started | - |
+| 3. Pre-commit Hook Checks | 2/2 | Complete | 2026-03-09 |
+| 4. PR Branch Protection | 1/1 | Complete | 2026-03-09 |
 | 5. WordPress Build Pipeline | 0/2 | Not started | - |
 | 6. WordPress CI Integration | 0/1 | Not started | - |
 | 7. Deploy Core | 0/2 | Not started | - |
