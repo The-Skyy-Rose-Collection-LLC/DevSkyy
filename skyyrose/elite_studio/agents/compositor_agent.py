@@ -409,26 +409,79 @@ class CompositorAgent:
         sku: str,
         work_dir: str,
     ) -> str:
-        """IC-Light background-conditioned relighting.
+        """Relight subject to match scene lighting.
 
-        Falls back to using the alpha-matted image directly if IC-Light
-        is unavailable or fails.
+        Uses libcom image harmonization (fast CNN, ~3s) as primary method.
+        Falls back to IC-Light (Replicate cloud) if libcom unavailable,
+        then raw alpha if everything fails.
         """
-        # Try cloud IC-Light (Replicate) first, then local, then fallback
-        for method_name, method in [
-            ("replicate", self._run_iclight_replicate),
-            ("local", self._run_iclight),
-        ]:
-            try:
-                relit_bytes = method(alpha_path, scene_path, prompt)
-                relit_path = str(Path(work_dir) / f"{sku}-relit.png")
-                Path(relit_path).write_bytes(relit_bytes)
-                return relit_path
-            except Exception as exc:
-                log.warning("IC-Light %s failed: %s", method_name, exc)
+        # 1. libcom harmonization — fast CNN, no diffusion
+        try:
+            relit_path = self._harmonize_libcom(alpha_path, scene_path, sku, work_dir)
+            return relit_path
+        except Exception as exc:
+            log.warning("libcom harmonization failed: %s", exc)
 
-        log.warning("All IC-Light methods failed — using alpha directly")
+        # 2. IC-Light via Replicate — slow but high quality
+        try:
+            relit_bytes = self._run_iclight_replicate(alpha_path, scene_path, prompt)
+            relit_path = str(Path(work_dir) / f"{sku}-relit.png")
+            Path(relit_path).write_bytes(relit_bytes)
+            return relit_path
+        except Exception as exc:
+            log.warning("IC-Light replicate failed: %s", exc)
+
+        log.warning("All relighting methods failed — using alpha directly")
         return alpha_path
+
+    def _harmonize_libcom(
+        self, alpha_path: str, scene_path: str, sku: str, work_dir: str
+    ) -> str:
+        """libcom image harmonization — adjusts foreground lighting/color to match scene.
+
+        Single CNN forward pass (~3s on GPU) vs IC-Light's 25 diffusion steps (~45s).
+        """
+        import cv2
+        import numpy as np
+        from libcom.image_harmonization import ImageHarmonizationModel
+        from PIL import Image
+
+        # Load subject (alpha-matted) and scene
+        subject = Image.open(alpha_path).convert("RGBA")
+        scene = Image.open(scene_path).convert("RGB")
+
+        # Create composite: paste subject onto scene at center-bottom
+        composite = scene.copy()
+        scale = min(scene.width * 0.4 / subject.width, scene.height * 0.8 / subject.height)
+        new_w = int(subject.width * scale)
+        new_h = int(subject.height * scale)
+        subject_resized = subject.resize((new_w, new_h), Image.Resampling.LANCZOS)
+
+        x = (scene.width - new_w) // 2
+        y = scene.height - new_h - int(scene.height * 0.05)
+        composite.paste(subject_resized, (x, y), mask=subject_resized.split()[-1])
+
+        # Create mask for the foreground region
+        mask = np.zeros((scene.height, scene.width), dtype=np.uint8)
+        alpha_np = np.array(subject_resized.split()[-1])
+        paste_h = min(new_h, scene.height - y)
+        paste_w = min(new_w, scene.width - x)
+        mask[y : y + paste_h, x : x + paste_w] = alpha_np[:paste_h, :paste_w]
+        mask = (mask > 128).astype(np.uint8) * 255
+
+        # Save temps for libcom
+        comp_path = str(Path(work_dir) / f"{sku}-harm-comp.png")
+        mask_path = str(Path(work_dir) / f"{sku}-harm-mask.png")
+        composite.save(comp_path)
+        cv2.imwrite(mask_path, mask)
+
+        # Run harmonization
+        model = ImageHarmonizationModel(device=0)
+        result = model(comp_path, mask_path)
+
+        relit_path = str(Path(work_dir) / f"{sku}-relit.png")
+        cv2.imwrite(relit_path, result)
+        return relit_path
 
     def _run_iclight_replicate(self, alpha_path: str, scene_path: str, prompt: str) -> bytes:
         """IC-Light via Replicate cloud API (A100 GPU)."""
