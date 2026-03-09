@@ -1,1 +1,20 @@
-echo "pre-commit hook active"
+# Pre-commit: lint, type-check, syntax, and test gates
+# Delegates file-level checks to lint-staged, runs whole-project tools conditionally.
+
+# File-level checks via lint-staged (ruff, black, isort, eslint, tsc, php -l)
+npx lint-staged
+
+# Whole-project tools that can't run per-file via lint-staged
+# (JS object keys must be unique -- can't have multiple '*.py' entries)
+
+# mypy: whole-project type check when Python files are staged
+if git diff --cached --name-only --diff-filter=ACMR | grep -q '\.py$'; then
+  echo "Running mypy type check..."
+  mypy . --ignore-missing-imports
+fi
+
+# Fast unit tests when Python files are staged
+if git diff --cached --name-only --diff-filter=ACMR | grep -q '\.py$'; then
+  echo "Running fast unit tests..."
+  python -m pytest tests/unit/ -x -q
+fi
