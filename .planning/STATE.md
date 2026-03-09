@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-03-09T18:40:51.478Z"
-last_activity: 2026-03-09 -- Completed Plan 01 (WordPress CI integration)
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-03-09T23:56:46.948Z"
+last_activity: 2026-03-09 -- Completed Plan 01 (Deploy Core)
 progress:
   total_phases: 8
-  completed_phases: 6
-  total_plans: 8
-  completed_plans: 8
-  percent: 75
+  completed_phases: 7
+  total_plans: 9
+  completed_plans: 9
+  percent: 88
 ---
 
 # Project State
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** No agent-written code can reach production without passing automated quality gates at every layer -- local, CI, PR, and post-deploy.
-**Current focus:** Phase 6: WordPress CI Integration -- COMPLETE (1/1 plans)
+**Current focus:** Phase 7: Deploy Core -- COMPLETE (1/1 plans)
 
 ## Current Position
 
-Phase: 6 of 8 (WordPress CI Integration) -- COMPLETE
+Phase: 7 of 8 (Deploy Core) -- COMPLETE
 Plan: 1 of 1 in current phase -- COMPLETE
-Status: Phase 06 complete, ready for Phase 07
-Last activity: 2026-03-09 -- Completed Plan 01 (WordPress CI integration)
+Status: Phase 07 complete, ready for Phase 08
+Last activity: 2026-03-09 -- Completed Plan 01 (Deploy Core)
 
-Progress: [███████░░░] 75% (Phase 6)
+Progress: [█████████░] 88% (Phase 7)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
+- Total plans completed: 9
 - Average duration: 12min
-- Total execution time: 1.6 hours
+- Total execution time: 1.7 hours
 
 **By Phase:**
 
@@ -49,9 +49,10 @@ Progress: [███████░░░] 75% (Phase 6)
 | 04-pr-branch-protection | 1/1 | 2min | 2min |
 | 05-wordpress-build-pipeline | 1/1 | 3min | 3min |
 | 06-wordpress-ci-integration | 1/1 | 3min | 3min |
+| 07-deploy-core | 1/1 | 8min | 8min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 11min, 2min, 3min, 3min
+- Last 5 plans: 11min, 2min, 3min, 3min, 8min
 - Trend: stable (fast)
 
 *Updated after each plan completion*
@@ -93,6 +94,8 @@ Recent decisions affecting current work:
 - [06-01]: Emoji CI job name for consistency; temp-file JSON payload handles encoding
 - [06-01]: npm install (not npm ci) in CI because theme package-lock.json is gitignored
 - [06-01]: No job-level working-directory (PHP lint needs repo root, build needs theme dir)
+- [Phase 07]: 27 rsync exclude patterns prevent dev artifacts from reaching production
+- [Phase 07]: trap cleanup EXIT INT TERM with MAINTENANCE_ACTIVE flag guarantees maintenance mode deactivation on failure
 
 ### Pending Todos
 
@@ -104,6 +107,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T18:35:34Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-03-09T23:56:46.946Z
+Stopped at: Completed 07-01-PLAN.md
 Resume file: None
