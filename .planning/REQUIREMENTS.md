@@ -14,7 +14,7 @@
 - [x] **HOOK-05**: Pre-commit runs php -l syntax check on staged PHP files and blocks commit on errors
 - [x] **HOOK-06**: Pre-commit runs fast unit tests on changed files and blocks commit on failures
 - [x] **HOOK-07**: Husky v9 replaces broken v4 config in WordPress theme package.json
-- [ ] **HOOK-08**: All hooks complete in under 30 seconds on a typical commit
+- [x] **HOOK-08**: All hooks complete in under 30 seconds on a typical commit
 
 ### CI Enforcement
 
@@ -85,7 +85,7 @@
 | HOOK-05 | Phase 3 | Complete |
 | HOOK-06 | Phase 3 | Complete |
 | HOOK-07 | Phase 2 | Complete |
-| HOOK-08 | Phase 3 | Pending |
+| HOOK-08 | Phase 3 | Complete |
 | CI-01 | Phase 1 | Complete |
 | CI-02 | Phase 1 | Complete |
 | CI-03 | Phase 6 | Pending |
