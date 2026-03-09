@@ -110,6 +110,9 @@ $assets_uri = SKYYROSE_ASSETS_URI;
 <!-- Scroll progress indicator -->
 <div class="scroll-progress" aria-hidden="true"></div>
 
+<!-- No-JS: hide loader so content is accessible without JavaScript -->
+<noscript><style>#loader{display:none!important}</style></noscript>
+
 <!-- ═══ LOADER ═══ -->
 <div id="loader" role="status" aria-label="<?php esc_attr_e( 'Loading', 'skyyrose-flagship' ); ?>">
 	<span class="ld-brand"><?php echo esc_html( 'SkyyRose' ); ?></span>
@@ -119,7 +122,7 @@ $assets_uri = SKYYROSE_ASSETS_URI;
 
 <!-- ═══ MOBILE MENU ═══ -->
 <div class="mob-menu" id="mobMenu" role="dialog" aria-label="<?php esc_attr_e( 'Mobile Navigation', 'skyyrose-flagship' ); ?>">
-	<span class="mob-close" role="button" aria-label="<?php esc_attr_e( 'Close menu', 'skyyrose-flagship' ); ?>" tabindex="0">&times;</span>
+	<button class="mob-close" type="button" aria-label="<?php esc_attr_e( 'Close menu', 'skyyrose-flagship' ); ?>">&times;</button>
 	<a href="#story"><?php esc_html_e( 'Our Story', 'skyyrose-flagship' ); ?></a>
 	<a href="#collections"><?php esc_html_e( 'Collections', 'skyyrose-flagship' ); ?></a>
 	<a href="#lookbook"><?php esc_html_e( 'Lookbook', 'skyyrose-flagship' ); ?></a>
@@ -148,9 +151,9 @@ $assets_uri = SKYYROSE_ASSETS_URI;
 			<?php esc_html_e( 'Bag', 'skyyrose-flagship' ); ?>
 			<span class="bag-ct" id="bagCt">0</span>
 		</button>
-		<div class="nav-ham" role="button" aria-label="<?php esc_attr_e( 'Open menu', 'skyyrose-flagship' ); ?>" tabindex="0">
+		<button class="nav-ham" type="button" aria-label="<?php esc_attr_e( 'Open menu', 'skyyrose-flagship' ); ?>">
 			<span></span><span></span><span></span>
-		</div>
+		</button>
 	</div>
 </nav>
 
