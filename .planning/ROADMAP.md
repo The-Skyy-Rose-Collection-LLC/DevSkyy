@@ -101,10 +101,10 @@ Plans:
   1. A PHP syntax error in any theme file causes CI to fail
   2. CI runs `npm run build` for the WordPress theme and the build step passes
   3. If a developer edits a source CSS/JS file without rebuilding, CI fails with a minification drift error
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 06-01: TBD
+- [ ] 06-01-PLAN.md -- Add wordpress-theme CI job (PHP lint, build + verify, drift detection) and update branch protection to 5 checks
 
 ### Phase 7: Deploy Core
 **Goal**: Built theme files can be transferred to the production WordPress server safely
