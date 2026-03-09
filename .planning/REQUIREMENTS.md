@@ -38,13 +38,13 @@
 
 ### Deploy Automation
 
-- [ ] **DEPLOY-01**: Deploy script transfers built theme files to production server via rsync over SSH
-- [ ] **DEPLOY-02**: Deploy script enables WP-CLI maintenance mode before file transfer
-- [ ] **DEPLOY-03**: Deploy script disables maintenance mode and flushes cache after transfer
+- [x] **DEPLOY-01**: Deploy script transfers built theme files to production server via rsync over SSH
+- [x] **DEPLOY-02**: Deploy script enables WP-CLI maintenance mode before file transfer
+- [x] **DEPLOY-03**: Deploy script disables maintenance mode and flushes cache after transfer
 - [ ] **DEPLOY-04**: Post-deploy deep health check verifies page content (not just HTTP 200)
 - [ ] **DEPLOY-05**: Single command runs the full deploy pipeline (build -> transfer -> verify)
 - [ ] **DEPLOY-06**: Deploy dry-run mode validates without actually shipping to production
-- [ ] **DEPLOY-07**: Deploy script has try/finally safety -- maintenance mode always gets disabled even on failure
+- [x] **DEPLOY-07**: Deploy script has try/finally safety -- maintenance mode always gets disabled even on failure
 
 ## v2 Requirements
 
@@ -97,13 +97,13 @@
 | BUILD-02 | Phase 5 | Complete |
 | BUILD-03 | Phase 5 | Complete |
 | BUILD-04 | Phase 5 | Complete |
-| DEPLOY-01 | Phase 7 | Pending |
-| DEPLOY-02 | Phase 7 | Pending |
-| DEPLOY-03 | Phase 7 | Pending |
+| DEPLOY-01 | Phase 7 | Complete |
+| DEPLOY-02 | Phase 7 | Complete |
+| DEPLOY-03 | Phase 7 | Complete |
 | DEPLOY-04 | Phase 8 | Pending |
 | DEPLOY-05 | Phase 8 | Pending |
 | DEPLOY-06 | Phase 8 | Pending |
-| DEPLOY-07 | Phase 7 | Pending |
+| DEPLOY-07 | Phase 7 | Complete |
 
 **Coverage:**
 - v1 requirements: 26 total

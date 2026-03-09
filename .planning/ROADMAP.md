@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: PR Branch Protection** - Block merges to main unless all CI checks pass
 - [x] **Phase 5: WordPress Build Pipeline** - Full minification of all JS and CSS theme files via single build command
 - [x] **Phase 6: WordPress CI Integration** - CI validates PHP syntax, build output, and minification drift for theme files
-- [ ] **Phase 7: Deploy Core** - Transfer built theme to production via rsync/SSH with maintenance mode safety
+- [x] **Phase 7: Deploy Core** - Transfer built theme to production via rsync/SSH with maintenance mode safety (completed 2026-03-09)
 - [ ] **Phase 8: Deploy Verification & Orchestration** - Health checks, single-command pipeline, and dry-run mode
 
 ## Phase Details
@@ -115,7 +115,7 @@ Plans:
   2. The live site enters WP-CLI maintenance mode before file transfer begins
   3. Maintenance mode is disabled and cache is flushed after transfer completes
   4. If the deploy script fails mid-transfer, maintenance mode is still disabled (try/finally safety)
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 07-01-PLAN.md -- Create deploy-theme.sh with rsync/lftp transfer, WP-CLI maintenance mode, cache flush, and trap safety
@@ -147,5 +147,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 4. PR Branch Protection | 1/1 | Complete | 2026-03-09 |
 | 5. WordPress Build Pipeline | 1/1 | Complete | 2026-03-09 |
 | 6. WordPress CI Integration | 1/1 | Complete | 2026-03-09 |
-| 7. Deploy Core | 0/1 | Not started | - |
+| 7. Deploy Core | 1/1 | Complete   | 2026-03-09 |
 | 8. Deploy Verification & Orchestration | 0/2 | Not started | - |
