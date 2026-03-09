@@ -16,5 +16,5 @@ fi
 # Fast unit tests when Python files are staged
 if git diff --cached --name-only --diff-filter=ACMR | grep -q '\.py$'; then
   echo "Running fast unit tests..."
-  python -m pytest tests/unit/ -x -q
+  python3 -m pytest tests/unit/ -x -q
 fi
