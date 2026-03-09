@@ -365,6 +365,63 @@ jobs:
           retention-days: 7
 
   # ===========================================================================
+  # Stage 2: WordPress Theme Validation (Parallel)
+  # ===========================================================================
+  wordpress-theme:
+    name: "🏗️ WordPress Theme"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238  # v6.2.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: PHP syntax check (CI-03)
+        run: |
+          error_count=0
+          while IFS= read -r file; do
+            if ! php -l "$file" 2>&1 | grep -q "No syntax errors"; then
+              echo "::error file=$file::PHP syntax error"
+              error_count=$((error_count + 1))
+            fi
+          done < <(find wordpress-theme/skyyrose-flagship \
+            -name "*.php" \
+            -not -path "*/node_modules/*" \
+            -not -path "*/vendor/*")
+          if [ "$error_count" -gt 0 ]; then
+            echo "$error_count PHP file(s) have syntax errors"
+            exit 1
+          fi
+          echo "All PHP files passed syntax check"
+
+      - name: Install theme dependencies
+        working-directory: wordpress-theme/skyyrose-flagship
+        run: npm install
+
+      - name: Build theme assets (CI-04)
+        working-directory: wordpress-theme/skyyrose-flagship
+        run: npm run build
+
+      - name: Verify build output (CI-04)
+        working-directory: wordpress-theme/skyyrose-flagship
+        run: bash scripts/verify-build.sh
+
+      - name: Check for minification drift (CI-05)
+        run: |
+          if ! git diff --exit-code -- 'wordpress-theme/skyyrose-flagship/**/*.min.js' 'wordpress-theme/skyyrose-flagship/**/*.min.css'; then
+            echo ""
+            echo "::error::Minification drift detected! Committed .min files do not match build output."
+            echo "Fix: cd wordpress-theme/skyyrose-flagship && npm run build && git add -A && git commit"
+            exit 1
+          fi
+          echo "No minification drift -- committed .min files match build output"
+
+  # ===========================================================================
   # Stage 3: E2E Tests with Playwright
   # ===========================================================================
   e2e-tests:
@@ -686,7 +743,7 @@ jobs:
   summary:
     name: 📊 Pipeline Summary
     runs-on: ubuntu-latest
-    needs: [lint, python-tests, security, frontend-tests, threejs-tests]
+    needs: [lint, python-tests, security, frontend-tests, threejs-tests, wordpress-theme]
     if: always()
 
     steps:
@@ -701,3 +758,4 @@ jobs:
           echo "| 🔐 Security | ${{ needs.security.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| ⚛️ Frontend | ${{ needs.frontend-tests.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 🎮 Three.js | ${{ needs.threejs-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🏗️ WordPress Theme | ${{ needs.wordpress-theme.result }} |" >> $GITHUB_STEP_SUMMARY
