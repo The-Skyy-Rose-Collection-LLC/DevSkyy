@@ -31,10 +31,10 @@
 
 ### WordPress Build Pipeline
 
-- [ ] **BUILD-01**: All 24 JS files in WordPress theme pass through webpack minification
-- [ ] **BUILD-02**: All 31 CSS files in WordPress theme pass through clean-css minification
-- [ ] **BUILD-03**: Source maps generated for development debugging
-- [ ] **BUILD-04**: Single `npm run build` command produces all .min files from source
+- [x] **BUILD-01**: All 24 JS files in WordPress theme pass through webpack minification
+- [x] **BUILD-02**: All 31 CSS files in WordPress theme pass through clean-css minification
+- [x] **BUILD-03**: Source maps generated for development debugging
+- [x] **BUILD-04**: Single `npm run build` command produces all .min files from source
 
 ### Deploy Automation
 
@@ -93,10 +93,10 @@
 | CI-05 | Phase 6 | Pending |
 | PR-01 | Phase 4 | Complete |
 | PR-02 | Phase 4 | Complete |
-| BUILD-01 | Phase 5 | Pending |
-| BUILD-02 | Phase 5 | Pending |
-| BUILD-03 | Phase 5 | Pending |
-| BUILD-04 | Phase 5 | Pending |
+| BUILD-01 | Phase 5 | Complete |
+| BUILD-02 | Phase 5 | Complete |
+| BUILD-03 | Phase 5 | Complete |
+| BUILD-04 | Phase 5 | Complete |
 | DEPLOY-01 | Phase 7 | Pending |
 | DEPLOY-02 | Phase 7 | Pending |
 | DEPLOY-03 | Phase 7 | Pending |
