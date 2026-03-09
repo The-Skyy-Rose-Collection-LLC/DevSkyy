@@ -45,10 +45,10 @@ Plans:
   1. Running `git commit` on a staged file triggers a pre-commit hook (observable via hook output in terminal)
   2. The broken Husky v4 `husky.hooks` block is removed from package.json
   3. A `.husky/pre-commit` file exists and is executable
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md -- Initialize Husky v9, create hooks and verification script, clean up WordPress theme
 
 ### Phase 3: Pre-commit Hook Checks
 **Goal**: Every commit is checked for lint, type, syntax, and test errors on staged files before it reaches the remote
