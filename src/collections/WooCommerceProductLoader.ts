@@ -6,6 +6,9 @@
  */
 
 import type { ARProduct } from './ARTryOnViewer';
+import { createLogger } from '../utils/Logger';
+
+const log = createLogger('WooCommerceLoader');
 
 export interface WooCommerceProduct {
   id: number;
@@ -143,7 +146,7 @@ export class WooCommerceProductLoader {
       const response = await fetch(this.buildApiUrl(`products/${productId}`));
 
       if (!response.ok) {
-        console.error(`[WooCommerceLoader] Failed to fetch product ${productId}:`, response.status);
+        log.error(`[WooCommerceLoader] Failed to fetch product ${productId}:`, response.status);
         return null;
       }
 
@@ -156,7 +159,7 @@ export class WooCommerceProductLoader {
 
       return product;
     } catch (error) {
-      console.error(`[WooCommerceLoader] Error fetching product ${productId}:`, error);
+      log.error(`[WooCommerceLoader] Error fetching product ${productId}:`, error);
       return null;
     }
   }
@@ -175,7 +178,7 @@ export class WooCommerceProductLoader {
       );
 
       if (!response.ok) {
-        console.error(`[WooCommerceLoader] Failed to fetch product by slug ${slug}:`, response.status);
+        log.error(`[WooCommerceLoader] Failed to fetch product by slug ${slug}:`, response.status);
         return null;
       }
 
@@ -193,7 +196,7 @@ export class WooCommerceProductLoader {
 
       return product;
     } catch (error) {
-      console.error(`[WooCommerceLoader] Error fetching product by slug ${slug}:`, error);
+      log.error(`[WooCommerceLoader] Error fetching product by slug ${slug}:`, error);
       return null;
     }
   }
@@ -219,7 +222,7 @@ export class WooCommerceProductLoader {
       );
 
       if (!categoriesResponse.ok) {
-        console.error(`[WooCommerceLoader] Failed to fetch category ${collectionSlug}`);
+        log.error(`[WooCommerceLoader] Failed to fetch category ${collectionSlug}`);
         return [];
       }
 
@@ -242,7 +245,7 @@ export class WooCommerceProductLoader {
       );
 
       if (!productsResponse.ok) {
-        console.error(`[WooCommerceLoader] Failed to fetch products for category ${categoryId}`);
+        log.error(`[WooCommerceLoader] Failed to fetch products for category ${categoryId}`);
         return [];
       }
 
@@ -255,7 +258,7 @@ export class WooCommerceProductLoader {
 
       return products;
     } catch (error) {
-      console.error(`[WooCommerceLoader] Error fetching collection ${collectionSlug}:`, error);
+      log.error(`[WooCommerceLoader] Error fetching collection ${collectionSlug}:`, error);
       return [];
     }
   }
@@ -298,7 +301,7 @@ export class WooCommerceProductLoader {
 
       return productsResponse.json();
     } catch (error) {
-      console.error(`[WooCommerceLoader] Error fetching by tag ${tagSlug}:`, error);
+      log.error(`[WooCommerceLoader] Error fetching by tag ${tagSlug}:`, error);
       return [];
     }
   }
@@ -318,7 +321,7 @@ export class WooCommerceProductLoader {
       );
 
       if (!response.ok) {
-        console.error(`[WooCommerceLoader] Failed to fetch variations for ${productId}`);
+        log.error(`[WooCommerceLoader] Failed to fetch variations for ${productId}`);
         return [];
       }
 
@@ -331,7 +334,7 @@ export class WooCommerceProductLoader {
 
       return variations;
     } catch (error) {
-      console.error(`[WooCommerceLoader] Error fetching variations:`, error);
+      log.error(`[WooCommerceLoader] Error fetching variations:`, error);
       return [];
     }
   }

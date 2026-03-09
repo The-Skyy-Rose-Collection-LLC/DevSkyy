@@ -7,6 +7,9 @@
  */
 
 import type { CartState } from '../types/product';
+import { createLogger } from '../utils/Logger';
+
+const log = createLogger('Stripe');
 
 /**
  * Stripe instance type (loaded from Stripe.js)
@@ -139,13 +142,13 @@ export const SKYYROSE_STRIPE_THEME: NonNullable<StripeElementsOptions['appearanc
  */
 export function initializeStripe(publicKey: string): Stripe | null {
   if (typeof window === 'undefined') {
-    console.warn('Stripe can only be initialized in browser environment');
+    log.warn('Stripe can only be initialized in browser environment');
     return null;
   }
 
   // Check if Stripe.js is loaded
   if (!(window as any).Stripe) {
-    console.error('Stripe.js not loaded. Add <script src="https://js.stripe.com/v3/"></script> to your HTML');
+    log.error('Stripe.js not loaded — ensure Stripe script tag is present');
     return null;
   }
 
@@ -153,7 +156,7 @@ export function initializeStripe(publicKey: string): Stripe | null {
     const stripe = (window as any).Stripe(publicKey);
     return stripe;
   } catch (error) {
-    console.error('Failed to initialize Stripe:', error);
+    log.error('Failed to initialize Stripe', error);
     return null;
   }
 }
@@ -261,7 +264,7 @@ export async function createPaymentIntent(cart: CartState): Promise<{
       clientSecret: data.clientSecret,
     };
   } catch (error) {
-    console.error('Error creating payment intent:', error);
+    log.error('Error creating payment intent', error);
     return {
       error: 'Network error. Please check your connection and try again.',
     };
