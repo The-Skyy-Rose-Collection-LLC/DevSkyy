@@ -7,12 +7,12 @@
 
 ### Git Hooks
 
-- [ ] **HOOK-01**: Pre-commit runs ESLint on staged JS/TS files and blocks commit on errors
-- [ ] **HOOK-02**: Pre-commit runs Ruff + Black + isort on staged Python files and blocks commit on errors
-- [ ] **HOOK-03**: Pre-commit runs tsc (TypeScript) type checking on staged frontend files and blocks commit on errors
-- [ ] **HOOK-04**: Pre-commit runs mypy type checking on staged Python files and blocks commit on errors
-- [ ] **HOOK-05**: Pre-commit runs php -l syntax check on staged PHP files and blocks commit on errors
-- [ ] **HOOK-06**: Pre-commit runs fast unit tests on changed files and blocks commit on failures
+- [x] **HOOK-01**: Pre-commit runs ESLint on staged JS/TS files and blocks commit on errors
+- [x] **HOOK-02**: Pre-commit runs Ruff + Black + isort on staged Python files and blocks commit on errors
+- [x] **HOOK-03**: Pre-commit runs tsc (TypeScript) type checking on staged frontend files and blocks commit on errors
+- [x] **HOOK-04**: Pre-commit runs mypy type checking on staged Python files and blocks commit on errors
+- [x] **HOOK-05**: Pre-commit runs php -l syntax check on staged PHP files and blocks commit on errors
+- [x] **HOOK-06**: Pre-commit runs fast unit tests on changed files and blocks commit on failures
 - [x] **HOOK-07**: Husky v9 replaces broken v4 config in WordPress theme package.json
 - [ ] **HOOK-08**: All hooks complete in under 30 seconds on a typical commit
 
@@ -78,12 +78,12 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HOOK-01 | Phase 3 | Pending |
-| HOOK-02 | Phase 3 | Pending |
-| HOOK-03 | Phase 3 | Pending |
-| HOOK-04 | Phase 3 | Pending |
-| HOOK-05 | Phase 3 | Pending |
-| HOOK-06 | Phase 3 | Pending |
+| HOOK-01 | Phase 3 | Complete |
+| HOOK-02 | Phase 3 | Complete |
+| HOOK-03 | Phase 3 | Complete |
+| HOOK-04 | Phase 3 | Complete |
+| HOOK-05 | Phase 3 | Complete |
+| HOOK-06 | Phase 3 | Complete |
 | HOOK-07 | Phase 2 | Complete |
 | HOOK-08 | Phase 3 | Pending |
 | CI-01 | Phase 1 | Complete |
