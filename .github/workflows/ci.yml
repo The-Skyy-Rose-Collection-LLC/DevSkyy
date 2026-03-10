@@ -208,28 +208,38 @@ jobs:
       - name: Run pip-audit (dependency vulnerabilities)
         id: pip_audit
         run: |
-          pip-audit --format=json --output=pip-audit-results.json
-          pip-audit --strict 2>&1 | tee pip-audit.txt
+          pip_audit_status=0
+          pip-audit --format=json --output=pip-audit-results.json || pip_audit_status=$?
+          pip-audit --strict 2>&1 | tee pip-audit.txt || pip_audit_status=$?
+          echo "pip_audit_exit=$pip_audit_status" >> "$GITHUB_OUTPUT"
 
       - name: Run bandit (code security)
         id: bandit
         run: |
+          bandit_status=0
           bandit -r . \
             -x ./tests,./venv,./.venv,./node_modules \
             -f json -o bandit-results.json \
-            -ll
+            -ll || bandit_status=$?
           bandit -r . \
             -x ./tests,./venv,./.venv,./node_modules \
-            -ll 2>&1 | tee bandit.txt
+            -ll 2>&1 | tee bandit.txt || bandit_status=$?
+          echo "bandit_exit=$bandit_status" >> "$GITHUB_OUTPUT"
 
       - name: Run safety check
+        id: safety
         run: |
-          safety check --full-report 2>&1 | tee safety.txt
+          safety_status=0
+          safety check --full-report 2>&1 | tee safety.txt || safety_status=$?
+          echo "safety_exit=$safety_status" >> "$GITHUB_OUTPUT"
 
       - name: Run semgrep (SAST)
+        id: semgrep
         run: |
-          semgrep scan --config=auto --json --output=semgrep-results.json .
-          semgrep scan --config=auto . 2>&1 | tee semgrep.txt
+          semgrep_status=0
+          semgrep scan --config=auto --error --json --output=semgrep-results.json . || semgrep_status=$?
+          semgrep scan --config=auto --error . 2>&1 | tee semgrep.txt || semgrep_status=$?
+          echo "semgrep_exit=$semgrep_status" >> "$GITHUB_OUTPUT"
         env:
           SEMGREP_RULES: "p/python"
 
@@ -276,17 +286,36 @@ jobs:
             security-report.*
           retention-days: 30
 
-      - name: Fail on critical vulnerabilities
-        if: github.ref == 'refs/heads/main'
+      - name: Fail on security findings
+        if: always()
         run: |
-          # Check for critical issues that should block deployment
+          failed=0
+          # Check tool exit codes (all tools ran regardless of failures)
+          if [ "${{ steps.pip_audit.outputs.pip_audit_exit }}" != "0" ]; then
+            echo "::error::pip-audit found vulnerabilities"
+            failed=1
+          fi
+          if [ "${{ steps.bandit.outputs.bandit_exit }}" != "0" ]; then
+            echo "::error::bandit found security issues"
+            failed=1
+          fi
+          if [ "${{ steps.semgrep.outputs.semgrep_exit }}" != "0" ]; then
+            echo "::error::semgrep found SAST issues"
+            failed=1
+          fi
+          # Critical bandit issues always block
           if [ -f bandit-results.json ]; then
             CRITICAL=$(jq '[.results[] | select(.issue_severity == "HIGH" and .issue_confidence == "HIGH")] | length' bandit-results.json 2>/dev/null || echo "0")
             if [ "$CRITICAL" -gt 0 ]; then
-              echo "::error::Found $CRITICAL critical security issues. Blocking deployment."
-              exit 1
+              echo "::error::Found $CRITICAL critical security issues (HIGH severity + HIGH confidence)"
+              failed=1
             fi
           fi
+          if [ "$failed" -ne 0 ]; then
+            echo "Security scan failures detected — review reports above"
+            exit 1
+          fi
+          echo "All security scans passed"
 
   # ===========================================================================
   # Stage 2: Frontend Tests (Parallel)
@@ -385,8 +414,8 @@ jobs:
         run: |
           error_count=0
           while IFS= read -r file; do
-            if ! php -l "$file" 2>&1 | grep -q "No syntax errors"; then
-              echo "::error file=$file::PHP syntax error"
+            if ! output=$(php -l "$file" 2>&1); then
+              echo "::error file=$file::PHP syntax error: $output"
               error_count=$((error_count + 1))
             fi
           done < <(find wordpress-theme/skyyrose-flagship \
@@ -413,13 +442,14 @@ jobs:
 
       - name: Check for minification drift (CI-05)
         run: |
-          if ! git diff --exit-code -- 'wordpress-theme/skyyrose-flagship/**/*.min.js' 'wordpress-theme/skyyrose-flagship/**/*.min.css'; then
+          if git status --porcelain --untracked-files=all -- wordpress-theme/skyyrose-flagship \
+            | grep -Eq '\.min\.(js|css)$'; then
             echo ""
-            echo "::error::Minification drift detected! Committed .min files do not match build output."
+            echo "::error::Minification drift detected! Build output differs from committed .min files."
             echo "Fix: cd wordpress-theme/skyyrose-flagship && npm run build && git add -A && git commit"
             exit 1
           fi
-          echo "No minification drift -- committed .min files match build output"
+          echo "No minification drift -- build output is clean"
 
   # ===========================================================================
   # Stage 3: E2E Tests with Playwright
@@ -724,6 +754,8 @@ jobs:
         if: success()
         run: |
           TAG="deploy-$(date +%Y%m%d-%H%M%S)-${GITHUB_SHA::7}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag -a "$TAG" -m "Production deployment ${GITHUB_SHA::7}"
           git push origin "$TAG" || echo "::warning::Could not push tag $TAG"
 

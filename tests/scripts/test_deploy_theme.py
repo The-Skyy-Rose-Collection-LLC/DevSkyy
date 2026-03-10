@@ -182,10 +182,17 @@ class TestCommandOrdering:
         output = result.stdout.lower()
         activate_pos = output.find("maintenance-mode activate")
         # Look for transfer indicators
-        transfer_pos = max(
-            output.find("rsync"),
-            output.find("transfer"),
-            output.find("lftp"),
+        transfer_pos = min(
+            (
+                p
+                for p in (
+                    output.find("rsync"),
+                    output.find("transfer"),
+                    output.find("lftp"),
+                )
+                if p != -1
+            ),
+            default=-1,
         )
         assert activate_pos != -1, "activate not found in output"
         assert transfer_pos != -1, "transfer not found in output"
@@ -201,10 +208,17 @@ class TestCommandOrdering:
             },
         )
         output = result.stdout.lower()
-        transfer_pos = max(
-            output.find("rsync"),
-            output.find("transfer"),
-            output.find("lftp"),
+        transfer_pos = min(
+            (
+                p
+                for p in (
+                    output.find("rsync"),
+                    output.find("transfer"),
+                    output.find("lftp"),
+                )
+                if p != -1
+            ),
+            default=-1,
         )
         deactivate_pos = output.find("maintenance-mode deactivate")
         assert transfer_pos != -1, "transfer not found"
@@ -261,10 +275,17 @@ class TestCacheFlush:
             },
         )
         output = result.stdout.lower()
-        transfer_pos = max(
-            output.find("rsync"),
-            output.find("transfer"),
-            output.find("lftp"),
+        transfer_pos = min(
+            (
+                p
+                for p in (
+                    output.find("rsync"),
+                    output.find("transfer"),
+                    output.find("lftp"),
+                )
+                if p != -1
+            ),
+            default=-1,
         )
         cache_pos = output.find("cache flush")
         assert transfer_pos < cache_pos

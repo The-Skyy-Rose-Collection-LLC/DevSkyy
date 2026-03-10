@@ -74,7 +74,7 @@ get_header();
 			     alt="" width="520" height="240" loading="eager">
 		</h1>
 
-		<div class="lp-countdown"<?php echo esc_attr( $countdown_attr ); ?>>
+		<div class="lp-countdown"<?php echo $countdown_attr; // Already escaped at construction ?>>
 			<div class="lp-countdown__unit">
 				<div class="lp-countdown__number cd-d" aria-label="Days">03</div>
 				<div class="lp-countdown__label">Days</div>
