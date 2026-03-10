@@ -139,6 +139,9 @@ data/*.db
 # Build artifacts
 *.tsbuildinfo
 dist/
+*.min.js
+*.min.css
+!wordpress-theme/skyyrose-flagship/assets/css/system/*.min.css
 
 # Empty directories (should not be committed)
 keys/
@@ -165,6 +168,10 @@ assets/_other/*.zip
 assets/3d-models-generated/
 assets/3d-models/*/
 
+# Generated images and model test outputs
+generated_images/
+models/skyyrose-lora-v3-tests/
+
 # External SDKs (install via pip instead)
 tripo-python-sdk/
 
@@ -177,19 +184,10 @@ huggingface-spaces/
 # Local tool configs
 .playwright-mcp/
 
-# Large product image assets (uploaded to WordPress)
-assets/enhanced_products/all/*.jpg
-assets/enhanced_products/all/*.jpeg
-assets/enhanced_products/all/*.png
-assets/enhanced_products/all/*.JPG
-assets/enhanced_products/all/*.JPEG
-assets/enhanced_products/all/*.PNG
-assets/2d-25d-assets/*.jpg
-assets/2d-25d-assets/*.jpeg
-assets/2d-25d-assets/*.png
-assets/2d-25d-assets/*.JPG
-assets/2d-25d-assets/*.JPEG
-assets/2d-25d-assets/*.PNG
+# Product & enhanced images (backed up locally, uploaded to WordPress/HuggingFace)
+assets/enhanced_products/
+assets/enhanced-images/
+assets/2d-25d-assets/
 
 # WordPress large files and binaries
 wp-cli.phar
@@ -232,8 +230,10 @@ upload-form-*.png
 woocommerce-*.png
 wp-admin-*.png
 
-# Reference/dev images (not for production)
-wordpress-theme/skyyrose-flagship/assets/images/products/_reference-*
+# WordPress theme binary assets (deployed via SFTP, not git)
+wordpress-theme/skyyrose-flagship/assets/images/
+wordpress-theme/skyyrose-flagship/assets/scenes/
+wordpress-theme/skyyrose-flagship/assets/3d/
 
 # Editorial staging (temp workspace, not for version control)
 editorial-staging/
@@ -270,3 +270,12 @@ bun.lockb
 
 # Serena config (local)
 .serena/
+
+# LoRA model weights (stored on HuggingFace: damBruh/skyyrose-assets)
+skyyrose-brand-voice-lora/
+
+# HuggingFace caches (regenerable)
+hf_enhancement_cache/
+
+# Local asset backups (created by cleanup scripts)
+DevSkyy-assets-backup/
