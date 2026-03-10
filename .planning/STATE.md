@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: WordPress Quality & Accessibility
-status: planning
-stopped_at: "Checkpoint: 09-02 Task 2 human-verify (deploy theme and verify hero banners)"
-last_updated: "2026-03-10T23:11:11.524Z"
-last_activity: 2026-03-10 -- Roadmap created for v1.1 milestone
+status: executing
+stopped_at: "Completed 09-01-PLAN.md"
+last_updated: "2026-03-10T23:13:46Z"
+last_activity: 2026-03-10 -- Completed 09-01 (pre-order filtering + CSV sync)
 progress:
   total_phases: 13
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 13
-  completed_plans: 12
+  completed_plans: 13
   percent: 0
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 ## Current Position
 
 Phase: 9 of 13 (Collection & Product Data) -- first phase of v1.1
-Plan: Not started (phase needs planning)
-Status: Ready to plan
-Last activity: 2026-03-10 -- Roadmap created for v1.1 milestone
+Plan: 1 of 2 complete
+Status: Executing
+Last activity: 2026-03-10 -- Completed 09-01 (pre-order filtering + CSV sync)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████░░░░░] 50% (1/2 plans in Phase 9)
 
 ## Performance Metrics
 
@@ -46,6 +46,10 @@ Progress: [░░░░░░░░░░] 0%
 | 1-8 (v1.0) | 11 | ~8.3h | ~45min |
 
 *v1.1 metrics will be tracked from Phase 9 onward*
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 09 P01 | 5min | 2 tasks | 2 files |
 | Phase 09 P02 | 2min | 1 tasks | 0 files |
 
 ## Accumulated Context
@@ -54,6 +58,8 @@ Progress: [░░░░░░░░░░] 0%
 
 Decisions are logged in PROJECT.md Key Decisions table.
 v1.0 decisions carried forward -- see PROJECT.md.
+- [Phase 09 P01]: CSV has 32 products (PHP catalog is authoritative, not plan's 31 estimate)
+- [Phase 09 P01]: Featured product section intentionally still uses all_products for pre-order featured items
 - [Phase 09]: Black Rose hero banner code is correct in git; live site issue is stale deploy
 
 ### Pending Todos
@@ -68,6 +74,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-10T23:11:01.347Z
-Stopped at: Checkpoint: 09-02 Task 2 human-verify (deploy theme and verify hero banners)
+Last session: 2026-03-10T23:13:46Z
+Stopped at: Completed 09-01-PLAN.md
 Resume file: None
