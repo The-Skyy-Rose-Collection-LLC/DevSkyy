@@ -1,12 +1,24 @@
-# Production Armor & WordPress Build Autonomy
+# SkyyRose WordPress — Quality & Accessibility
 
 ## What This Is
 
-A multi-layered defense system that prevents autonomous AI agents from breaking the live SkyyRose ecommerce site. Four layers of protection (git hooks, CI, PR gates, deploy verification) catch bad code at every stage, while a WordPress build pipeline automates minification, PHP testing, and WP-CLI deployments — enabling zero-touch, agent-driven releases.
+The SkyyRose luxury streetwear ecommerce site (skyyrose.co) built on WordPress/WooCommerce with a custom flagship theme. Three collections (Black Rose, Love Hurts, Signature) with immersive 3D experiences, pre-order gateways, and a luxury shopping experience. Protected by a 4-layer production armor chain (git hooks → CI → PR gates → deploy verification) with automated build and deploy pipelines.
 
 ## Core Value
 
-No agent-written code can reach production without passing automated quality gates at every layer — local, CI, PR, and post-deploy.
+skyyrose.co works flawlessly on every device, passes WCAG AA accessibility, and shows the right products in the right collections — a professional luxury shopping experience with zero embarrassing bugs.
+
+## Current Milestone: v1.1 WordPress Quality & Accessibility
+
+**Goal:** Fix all accessibility errors, optimize responsive design, fix product placement, and polish the luxury cursor — making the live site flawless.
+
+**Target features:**
+- Zero Ally plugin errors (currently 100+ per page)
+- WCAG AA compliant color contrast and ARIA
+- Responsive typography and layout across all devices
+- Luxury cursor working correctly on popups/modals
+- Correct hero banners and product-to-collection assignments
+- Pre-order products properly separated from live collections
 
 ## Requirements
 
@@ -30,7 +42,7 @@ No agent-written code can reach production without passing automated quality gat
 
 ### Active
 
-(None — next milestone requirements defined via `/gsd:new-milestone`)
+(Defined in `.planning/REQUIREMENTS.md` for v1.1)
 
 ### Out of Scope
 
@@ -39,6 +51,8 @@ No agent-written code can reach production without passing automated quality gat
 - Rollback automation — manual rollback acceptable for v1
 - Staging environment — deploy directly to production with verification
 - Mobile app CI — deferred until native app exists
+- WCAG AAA compliance — targeting AA level
+- New feature development — this milestone is polish and fixes only
 
 ## Context
 
@@ -50,6 +64,9 @@ No agent-written code can reach production without passing automated quality gat
 - **Agent context**: Ralph Wiggum loop and Claude Code agents autonomously write and commit code
 - **Known tech debt**: 20+ mypy error codes disabled (2094 pre-existing type errors), VALIDATION.md frontmatter not updated
 - **Deploy targets**: Vercel (frontend), WordPress host via SSH/WP-CLI (theme)
+- **Ally plugin**: Installed on live site, finds 100+ errors per page (HTML validation, ARIA, contrast)
+- **Accessibility fix plugin**: `skyyrose-accessibility-fix.php` exists as bandaid — fixes should be in theme code directly
+- **Theme audit findings**: Duplicate stylesheet handles, cursor z-index conflicts with modals, small text contrast issues, hero image missing loading="eager"
 
 ## Constraints
 
