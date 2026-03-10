@@ -41,7 +41,7 @@
 - [x] **DEPLOY-01**: Deploy script transfers built theme files to production server via rsync over SSH
 - [x] **DEPLOY-02**: Deploy script enables WP-CLI maintenance mode before file transfer
 - [x] **DEPLOY-03**: Deploy script disables maintenance mode and flushes cache after transfer
-- [ ] **DEPLOY-04**: Post-deploy deep health check verifies page content (not just HTTP 200)
+- [x] **DEPLOY-04**: Post-deploy deep health check verifies page content (not just HTTP 200)
 - [ ] **DEPLOY-05**: Single command runs the full deploy pipeline (build -> transfer -> verify)
 - [ ] **DEPLOY-06**: Deploy dry-run mode validates without actually shipping to production
 - [x] **DEPLOY-07**: Deploy script has try/finally safety -- maintenance mode always gets disabled even on failure
@@ -100,7 +100,7 @@
 | DEPLOY-01 | Phase 7 | Complete |
 | DEPLOY-02 | Phase 7 | Complete |
 | DEPLOY-03 | Phase 7 | Complete |
-| DEPLOY-04 | Phase 8 | Pending |
+| DEPLOY-04 | Phase 8 | Complete |
 | DEPLOY-05 | Phase 8 | Pending |
 | DEPLOY-06 | Phase 8 | Pending |
 | DEPLOY-07 | Phase 7 | Complete |
