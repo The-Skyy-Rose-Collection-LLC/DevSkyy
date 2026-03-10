@@ -128,6 +128,36 @@ if ( empty( $all_products ) ) {
 	$product_count = count( $all_products );
 }
 
+/*
+ * Separate pre-order products from the catalog grid.
+ * Pre-orders are shown on the pre-order gateway page, not here.
+ */
+$catalog_products_display = array();
+$preorder_products_list   = array();
+
+foreach ( $all_products as $p ) {
+	if ( ! empty( $p['is_preorder'] ) ) {
+		$preorder_products_list[] = $p;
+	} else {
+		$catalog_products_display[] = $p;
+	}
+}
+
+/* Recalculate counts and price range from catalog-display products only. */
+$product_count = count( $catalog_products_display );
+$min_price     = PHP_INT_MAX;
+$max_price     = 0;
+
+foreach ( $catalog_products_display as $p ) {
+	$price = (float) $p['price'];
+	if ( $price < $min_price ) {
+		$min_price = $price;
+	}
+	if ( $price > $max_price ) {
+		$max_price = $price;
+	}
+}
+
 /* Dynamic meta. */
 if ( $product_count > 0 && $min_price < PHP_INT_MAX ) {
 	$col['meta_pieces']      = $product_count . ' ' . _n( 'Piece', 'Pieces', $product_count, 'skyyrose-flagship' );
@@ -339,12 +369,12 @@ get_header();
 
 		<?php
 		if ( function_exists( 'skyyrose_render_interactive_grid' ) ) {
-			skyyrose_render_interactive_grid( $all_products, $col );
+			skyyrose_render_interactive_grid( $catalog_products_display, $col );
 		} else {
 			// Fallback: render legacy col-card grid if interactive-grid.php is not loaded.
 			?>
 			<div class="col-grid">
-				<?php foreach ( $all_products as $product ) : ?>
+				<?php foreach ( $catalog_products_display as $product ) : ?>
 					<div class="col-card"
 					     data-product-id="<?php echo esc_attr( $product['sku'] ); ?>"
 					     role="button"
@@ -470,7 +500,7 @@ get_header();
 wp_localize_script(
 	'skyyrose-template-collection-v4',
 	'skyyRoseCollectionProducts',
-	$all_products
+	$catalog_products_display
 );
 
 /* Also pass product data to the interactive cards script. */
@@ -479,7 +509,7 @@ if ( wp_script_is( 'skyyrose-interactive-cards', 'enqueued' ) ) {
 		'skyyrose-interactive-cards',
 		'skyyRoseInteractiveProducts',
 		array(
-			'products' => $all_products,
+			'products' => $catalog_products_display,
 			'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
 			'nonce'    => wp_create_nonce( 'skyyrose-immersive-nonce' ),
 		)
