@@ -124,7 +124,13 @@ class TestFailureCollection:
     def test_exits_nonzero_on_failure(self):
         """Script exits with non-zero when FAILURES > 0."""
         source = SCRIPT_PATH.read_text()
-        assert "FAILURES -eq 0" in source or "FAILURES -gt 0" in source
+        # Accept both quoted and unquoted forms
+        assert (
+            "FAILURES -eq 0" in source
+            or "FAILURES -gt 0" in source
+            or '"$FAILURES" -eq 0' in source
+            or '"$FAILURES" -gt 0' in source
+        )
 
 
 class TestEnvironmentVariable:
