@@ -59,9 +59,9 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Feature | Reason |
 |---------|--------|
-| WCAG AAA compliance | Targeting AA level — AAA deferred to v2 |
+| WCAG AAA compliance | Targeting AA level -- AAA deferred to v2 |
 | New feature development | This milestone is polish and fixes only |
-| Automated a11y CI testing | Would require pa11y/axe integration — defer to v2 |
+| Automated a11y CI testing | Would require pa11y/axe integration -- defer to v2 |
 | Redesign of any page templates | Fixing existing layouts, not creating new ones |
 | Mobile app | Web-first, mobile later |
 
@@ -71,35 +71,35 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| A11Y-01 | Pending | Pending |
-| A11Y-02 | Pending | Pending |
-| A11Y-03 | Pending | Pending |
-| A11Y-04 | Pending | Pending |
-| A11Y-05 | Pending | Pending |
-| A11Y-06 | Pending | Pending |
-| A11Y-07 | Pending | Pending |
-| A11Y-08 | Pending | Pending |
-| A11Y-09 | Pending | Pending |
-| CNTR-01 | Pending | Pending |
-| CNTR-02 | Pending | Pending |
-| CNTR-03 | Pending | Pending |
-| CNTR-04 | Pending | Pending |
-| RESP-01 | Pending | Pending |
-| RESP-02 | Pending | Pending |
-| RESP-03 | Pending | Pending |
-| RESP-04 | Pending | Pending |
-| CURS-01 | Pending | Pending |
-| CURS-02 | Pending | Pending |
-| CURS-03 | Pending | Pending |
-| DATA-01 | Pending | Pending |
-| DATA-02 | Pending | Pending |
-| DATA-03 | Pending | Pending |
+| A11Y-01 | Phase 10 | Pending |
+| A11Y-02 | Phase 10 | Pending |
+| A11Y-03 | Phase 10 | Pending |
+| A11Y-04 | Phase 10 | Pending |
+| A11Y-05 | Phase 10 | Pending |
+| A11Y-06 | Phase 10 | Pending |
+| A11Y-07 | Phase 10 | Pending |
+| A11Y-08 | Phase 10 | Pending |
+| A11Y-09 | Phase 10 | Pending |
+| CNTR-01 | Phase 11 | Pending |
+| CNTR-02 | Phase 11 | Pending |
+| CNTR-03 | Phase 11 | Pending |
+| CNTR-04 | Phase 11 | Pending |
+| RESP-01 | Phase 12 | Pending |
+| RESP-02 | Phase 12 | Pending |
+| RESP-03 | Phase 12 | Pending |
+| RESP-04 | Phase 12 | Pending |
+| CURS-01 | Phase 13 | Pending |
+| CURS-02 | Phase 13 | Pending |
+| CURS-03 | Phase 13 | Pending |
+| DATA-01 | Phase 9 | Pending |
+| DATA-02 | Phase 9 | Pending |
+| DATA-03 | Phase 9 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 18 total
-- Mapped to phases: 0
-- Unmapped: 18 ⚠️
+- Mapped to phases: 18
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-10*
-*Last updated: 2026-03-10 after initial definition*
+*Last updated: 2026-03-10 after roadmap creation*
