@@ -497,10 +497,21 @@ class SkyyRosePromptBuilder:
         Returns:
             Optimized prompt string
         """
+        # C-2 FIX (sdxl_pipeline): Unknown collection raises instead of silently
+        # producing an empty string, which strips collection aesthetics from the
+        # prompt without any warning.
+        collection_style = cls.COLLECTION_STYLES.get(collection)
+        if collection_style is None:
+            valid = list(cls.COLLECTION_STYLES)
+            raise ValueError(
+                f"Unknown collection {collection!r} in SDXLPipeline.build_prompt(). "
+                f"Valid collections: {valid}"
+            )
+
         parts = [
             f"Professional product photography of {product_name}",
             cls.GARMENT_DETAILS.get(garment_type, garment_type),
-            cls.COLLECTION_STYLES.get(collection, ""),
+            collection_style,
             cls.BRAND_DNA["style"],
             "studio lighting, white background, high resolution",
             "8k, commercial photography, fashion catalog",

@@ -397,8 +397,8 @@ class AI3DModelGenerator:
             texture_path=None,  # TripoSR doesn't generate separate textures
             thumbnail_path=thumbnail_path,
             fidelity_score=0.0,
-            vertex_count=result.polycount or 50000,
-            face_count=(result.polycount or 50000) // 3,
+            vertex_count=result.polycount or 0,  # 0 = not yet measured; caller checks
+            face_count=(result.polycount // 3) if result.polycount else 0,
             file_size_mb=file_size_mb,
             source_images_used=len(source_images),
             generation_time_seconds=result.generation_time_ms / 1000,
@@ -462,10 +462,11 @@ class AI3DModelGenerator:
 
         # Calculate metrics
         file_size_mb = model_path.stat().st_size / (1024 * 1024)
-        vertex_count = (
-            len(optimized_mesh.vertices) if hasattr(optimized_mesh, "vertices") else 50000
-        )
-        face_count = len(optimized_mesh.faces) if hasattr(optimized_mesh, "faces") else 16666
+        # H-6 FIX: Fallback of 50000 fabricates a polycount metric when trimesh
+        # is unavailable. Use 0 to signal "not measured" so callers (quality gate,
+        # WooCommerce meta) don't log or display an invented number.
+        vertex_count = len(optimized_mesh.vertices) if hasattr(optimized_mesh, "vertices") else 0
+        face_count = len(optimized_mesh.faces) if hasattr(optimized_mesh, "faces") else 0
 
         return GeneratedModel(
             product_sku=product_sku,
@@ -773,11 +774,20 @@ class AI3DModelGenerator:
             result.passed_fidelity = report.passed
             result.validation_report = report.to_dict()
 
-        except ImportError:
-            # Simple fallback validation
-            result.fidelity_score = 0.85  # Assume reasonable quality
-            result.passed_fidelity = True
-            result.validation_report = {"method": "fallback", "assumed_score": 0.85}
+        except ImportError as exc:
+            # C-9 FIX: A missing validator must never silently pass fidelity.
+            # Fabricating 0.85 / passed_fidelity=True allows placeholder cube
+            # meshes to reach WordPress as "validated" product assets.
+            raise ModelGenerationError(
+                message=(
+                    "Fidelity validator unavailable: 'imagery.model_fidelity' "
+                    "could not be imported. Install the imagery package or supply "
+                    "a custom ModelFidelityValidator before running this pipeline "
+                    "with validate_fidelity=True."
+                ),
+                stage="fidelity_validation",
+                details={"import_error": str(exc)},
+            ) from exc
 
         except Exception as e:
             logger.warning(f"Fidelity validation failed: {e}")
