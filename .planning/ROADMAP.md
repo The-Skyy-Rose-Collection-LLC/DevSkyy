@@ -158,11 +158,11 @@ Plans:
   1. The Black Rose collection page displays the Black Rose hero banner (not Love Hurts)
   2. Pre-order products (br-004, br-005, br-006, br-d01-d04, lh-001, sg-001, sg-d01) do not appear on live collection catalog grids
   3. Every product in the catalog grid belongs to the collection it appears under (no cross-collection leaks)
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 09-01: TBD
-- [ ] 09-02: TBD
+- [ ] 09-01-PLAN.md -- Filter pre-orders from catalog grids and sync product data (DATA-02, DATA-03)
+- [ ] 09-02-PLAN.md -- Diagnose and fix Black Rose hero banner (DATA-01)
 
 ### Phase 10: Accessibility HTML & ARIA
 **Goal**: The theme's rendered HTML passes validation with zero ARIA errors and correct semantic structure
@@ -236,7 +236,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13
 | 6. WordPress CI Integration | v1.0 | 1/1 | Complete | 2026-03-09 |
 | 7. Deploy Core | v1.0 | 1/1 | Complete | 2026-03-09 |
 | 8. Deploy Verification & Orchestration | v1.0 | 2/2 | Complete | 2026-03-10 |
-| 9. Collection & Product Data | v1.1 | 0/? | Not started | - |
+| 9. Collection & Product Data | v1.1 | 0/2 | Planned | - |
 | 10. Accessibility HTML & ARIA | v1.1 | 0/? | Not started | - |
 | 11. Color Contrast | v1.1 | 0/? | Not started | - |
 | 12. Responsive & Typography | v1.1 | 0/? | Not started | - |
