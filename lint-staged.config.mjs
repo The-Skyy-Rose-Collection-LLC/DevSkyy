@@ -13,8 +13,9 @@ export default {
   // Must run from frontend/ dir -- root node_modules/eslint has ajv crash (ESLint v9 + @eslint/eslintrc)
   // lint-staged uses execa (no shell) so we use bash -c to enable cd && chain
   'frontend/**/*.{ts,tsx,js,jsx,mjs}': (files) => {
-    const relPaths = files.map((f) => f.replace(/^.*\/frontend\//, ''));
-    return `bash -c 'cd frontend && npx eslint ${relPaths.join(' ')}'`;
+    const relPaths = files.map((f) => f.replace(/^.*\/frontend\//, '').replace(/'/g, "'\\''"));
+    const quoted = relPaths.map((p) => `'${p}'`).join(' ');
+    return `bash -c 'cd frontend && npx eslint ${quoted}'`;
   },
 
   // Frontend TypeScript type check: whole-project (function prevents file arg appending)
