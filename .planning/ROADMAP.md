@@ -118,7 +118,7 @@ Plans:
 **Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 07-01-PLAN.md -- Create deploy-theme.sh with rsync/lftp transfer, WP-CLI maintenance mode, cache flush, and trap safety
+- [x] 07-01-PLAN.md -- Create deploy-theme.sh with rsync/lftp transfer, WP-CLI maintenance mode, cache flush, and trap safety
 
 ### Phase 8: Deploy Verification & Orchestration
 **Goal**: Deploys are verified against the live site and can be triggered with a single command (including dry-run)
@@ -128,11 +128,11 @@ Plans:
   1. After deploy, the script hits health endpoints (/health, /health/ready, /health/live) and verifies page content -- not just HTTP 200
   2. A single command runs the full pipeline: build, transfer, verify -- no manual intermediate steps
   3. Running the deploy in dry-run mode shows what would be transferred without actually deploying to production
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 08-01: TBD
-- [ ] 08-02: TBD
+- [ ] 08-01-PLAN.md -- Create verify-deploy.sh with deep content verification (curl + content grep for 6 key pages)
+- [ ] 08-02-PLAN.md -- Create deploy-pipeline.sh orchestrating build -> deploy -> verify with --dry-run support
 
 ## Progress
 
