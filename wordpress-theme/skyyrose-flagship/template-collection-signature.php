@@ -33,7 +33,7 @@ $collection_config = array(
 		. '<p>' . esc_html__( 'Signature is the foundation — Italian wool-blends, premium cotton, rose-gold hardware. Grand ballroom energy in everyday wear. Timeless pieces built for the long game.', 'skyyrose-flagship' ) . '</p>',
 	'manifesto_scene'   => SKYYROSE_ASSETS_URI . '/scenes/signature/signature-waterfront-runway.webp',
 
-	'featured_sku'      => 'sg-d01',
+	'featured_sku'      => 'sg-001',
 
 	'nl_title'          => __( 'Start Here. Build Everything.', 'skyyrose-flagship' ),
 	'nl_desc'           => __( 'First access to new pieces. Curated Oakland style. No noise.', 'skyyrose-flagship' ),

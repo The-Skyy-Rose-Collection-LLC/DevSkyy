@@ -129,6 +129,23 @@ get_header();
 
 <main id="primary" class="site-main immersive-page" role="main" tabindex="-1">
 
+	<!-- Avatar Easter Egg Config (read by immersive-world.js) -->
+	<script type="application/json" id="world-config">
+	<?php echo wp_json_encode( array(
+		'collection'  => 'signature',
+		'bgColor'     => '0x1a1008',
+		'accentColor' => '#B76E79',
+		'avatar'      => array(
+			'x'          => 87.9,
+			'y'          => 69.9,
+			'w'          => 5.0,
+			'h'          => 9.0,
+			'sprite'     => get_template_directory_uri() . '/assets/images/mascot/skyyrose-mascot-signature.png',
+			'introImage' => get_template_directory_uri() . '/assets/images/mascot/skyyrose-mascot-reference.png',
+		),
+	), JSON_UNESCAPED_SLASHES ); ?>
+	</script>
+
 	<div class="immersive-scene immersive-signature" role="region" aria-labelledby="scene-title">
 
 		<!-- Loading Screen -->

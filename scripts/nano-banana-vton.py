@@ -54,207 +54,242 @@ RETRY_DELAY_SEC = 5
 
 PRODUCT_CATALOG = {
     # ── Black Rose Collection ──────────────────────────────────────────────
-    # Every SKU has explicit source_override to prevent auto-glob picking up
+    # Every entry has explicit source_override to prevent auto-glob picking up
     # AI-generated outputs (*-model-*.webp) as source images (feedback loop).
+    # output_slug determines the filename prefix for generated images.
     "br-001": {
         "name": "BLACK Rose Crewneck",
         "collection": "black-rose",
-        "source_override": "br-001-techflat-v4.jpg",
+        "output_slug": "black-rose-crewneck",
+        "source_override": "black-rose-crewneck-techflat-v4.jpg",
     },
     "br-002": {
         "name": "BLACK Rose Joggers",
         "collection": "black-rose",
-        "source_override": "br-002-joggers-source.jpg",
+        "output_slug": "black-rose-joggers",
+        "source_override": "black-rose-joggers-source.jpg",
     },
     "br-003": {
         "name": "BLACK is Beautiful Jersey",
         "collection": "black-rose",
-        "source_override": "br-003-jersey-front-techflat.jpg",
+        "output_slug": "black-is-beautiful-jersey",
+        "source_override": "black-is-beautiful-jersey-techflat-black.jpeg",
+    },
+    "br-003-oakland": {
+        "name": "BLACK is Beautiful Jersey (Oakland)",
+        "collection": "black-rose",
+        "output_slug": "black-is-beautiful-jersey-oakland",
+        "source_override": "black-is-beautiful-jersey-techflat-oakland.jpeg",
+        "variant_of": "br-003",
+    },
+    "br-003-giants": {
+        "name": "BLACK is Beautiful Jersey (Giants)",
+        "collection": "black-rose",
+        "output_slug": "black-is-beautiful-jersey-giants",
+        "source_override": "black-is-beautiful-jersey-techflat-giants.jpeg",
+        "variant_of": "br-003",
+    },
+    "br-003-white": {
+        "name": "BLACK is Beautiful Jersey (White)",
+        "collection": "black-rose",
+        "output_slug": "black-is-beautiful-jersey-white",
+        "source_override": "black-is-beautiful-jersey-techflat-white.jpeg",
+        "variant_of": "br-003",
     },
     "br-004": {
         "name": "BLACK Rose Hoodie",
         "collection": "black-rose",
-        "source_override": "br-004-hoodie-product.jpg",
+        "output_slug": "black-rose-hoodie",
+        "source_override": "black-rose-hoodie-product.jpg",
+        "is_preorder": True,
     },
     "br-005": {
         "name": "BLACK Rose Hoodie — Signature Edition",
         "collection": "black-rose",
-        "source_override": "br-005-hoodie-ltd-source.jpg",
+        "output_slug": "black-rose-hoodie-signature-edition",
+        "source_override": "black-rose-hoodie-signature-edition-hoodie-ltd-source.jpg",
+        "is_preorder": True,
     },
     "br-006": {
         "name": "BLACK Rose Sherpa Jacket",
         "collection": "black-rose",
-        "source_override": "br-006-sherpa-product.jpg",
+        "output_slug": "black-rose-sherpa-jacket",
+        "source_override": "black-rose-sherpa-jacket-sherpa-product.jpg",
+        "is_preorder": True,
     },
     "br-007": {
         "name": "BLACK Rose × Love Hurts Basketball Shorts",
         "collection": "black-rose",
-        "source_override": "br-007-shorts-front-source.jpg",
+        "output_slug": "black-rose-love-hurts-basketball-shorts",
+        "source_override": "black-rose-love-hurts-basketball-shorts-front-source.jpg",
     },
     "br-008": {
         "name": "Women's BLACK Rose Hooded Dress",
         "collection": "black-rose",
-        "source_override": "br-008-hooded-dress.webp",
+        "output_slug": "womens-black-rose-hooded-dress",
+        # No source photo — existing model renders are the only reference.
+    },
+    # ── Black Rose Pre-Order Jerseys ───────────────────────────────────────
+    "br-d01": {
+        "name": "Black & Teal Hockey Jersey",
+        "collection": "black-rose",
+        "output_slug": "black-is-beautiful-hockey-jersey",
+        "source_override": "black-is-beautiful-hockey-jersey-design.jpg",
+        "is_preorder": True,
+    },
+    "br-d02": {
+        "name": "Red #80 Football Jersey",
+        "collection": "black-rose",
+        "output_slug": "black-is-beautiful-football-jersey-red",
+        "source_override": "black-is-beautiful-football-jersey-red-design.jpg",
+        "is_preorder": True,
+    },
+    "br-d03": {
+        "name": "White #32 Football Jersey",
+        "collection": "black-rose",
+        "output_slug": "black-is-beautiful-football-jersey-white",
+        "source_override": "black-is-beautiful-football-jersey-white-design.jpg",
+        "is_preorder": True,
+    },
+    "br-d04": {
+        "name": '"THE BAY" Basketball Tank',
+        "collection": "black-rose",
+        "output_slug": "black-is-beautiful-basketball-jersey",
+        "source_override": "black-is-beautiful-basketball-jersey-design.jpg",
+        "is_preorder": True,
     },
     # ── Love Hurts Collection ──────────────────────────────────────────────
     "lh-001": {
         "name": "The Fannie",
         "collection": "love-hurts",
-        "source_override": "lh-001-fannie-pack-photo.jpg",
+        "output_slug": "the-fannie-pack",
+        "source_override": "the-fannie-pack-photo.jpg",
+        "is_preorder": True,
     },
     "lh-002": {
         "name": "Love Hurts Joggers",
         "collection": "love-hurts",
-        "source_override": "lh-002-joggers-variants.jpg",
+        "output_slug": "love-hurts-joggers",
+        "source_override": "love-hurts-joggers-techflat.jpeg",
     },
     "lh-003": {
         "name": "Love Hurts Basketball Shorts",
         "collection": "love-hurts",
-        "source_override": "lh-003-shorts-front-closeup.jpg",
+        "output_slug": "love-hurts-basketball-shorts",
+        "source_override": "love-hurts-basketball-shorts-source.jpg",
     },
     "lh-004": {
         "name": "Love Hurts Varsity Jacket",
         "collection": "love-hurts",
-        "source_override": "lh-004-varsity-source.jpg",
-    },
-    "lh-005": {
-        "name": "Love Hurts Windbreaker",
-        "collection": "love-hurts",
-        "source_override": "lh-005-bomber.webp",
+        "output_slug": "love-hurts-varsity-jacket",
+        "source_override": "love-hurts-varsity-jacket-varsity-source.jpg",
     },
     # ── Signature Collection ───────────────────────────────────────────────
     "sg-001": {
         "name": "The Bay Set",
         "collection": "signature",
-        "source_override": "sg-001-bay-set.webp",
+        "output_slug": "the-bay-set",
+        "source_override": "the-bay-set-source.jpeg",
+        "is_preorder": True,
     },
     "sg-002": {
-        "name": "Stay Golden Set",
+        "name": "Stay Golden Tee",
         "collection": "signature",
-        "source_override": "sg-002-techflat-v4.jpg",
+        "output_slug": "stay-golden-tee",
+        "source_override": "stay-golden-tee-techflat-v4.jpg",
     },
     "sg-003": {
-        "name": "The Signature Tee",
+        "name": "Signature Tee (Orchid)",
         "collection": "signature",
-        "source_override": "sg-003.webp",
+        "output_slug": "signature-tee-orchid",
+        # No source photo — existing model renders are the only reference.
     },
     "sg-004": {
         "name": "The Signature Hoodie",
         "collection": "signature",
-        "source_override": "sg-004-signature-hoodie.webp",
+        "output_slug": "the-signature-hoodie",
+        "source_override": "the-signature-hoodie-techflat.jpeg",
     },
     "sg-005": {
-        "name": "Stay Golden Tee",
+        "name": "Stay Golden Tee (Classic)",
         "collection": "signature",
-        "source_override": "sg-005-stay-golden-tee.webp",
+        "output_slug": "stay-golden-tee-classic",
+        "source_override": "stay-golden-tee-classic-techflat.jpeg",
     },
     "sg-006": {
         "name": "Mint & Lavender Hoodie",
         "collection": "signature",
-        "source_override": "sg-006-hoodie-source.jpg",
-    },
-    "sg-007": {
-        "name": "The Signature Beanie",
-        "collection": "signature",
-        "source_override": "sg-007-beanie-source.jpg",
-    },
-    "sg-008": {
-        "name": "Signature Beanie (Forest Green)",
-        "collection": "signature",
-        "source_override": "sg-008-beanie-green.jpg",
+        "output_slug": "mint-lavender-hoodie",
+        "source_override": "mint-lavender-hoodie-source.jpg",
     },
     "sg-009": {
         "name": "The Sherpa Jacket",
         "collection": "signature",
-        "source_override": "sg-009-sherpa-jacket.webp",
+        "output_slug": "the-sherpa-jacket",
+        # No source photo — existing model renders are the only reference.
     },
     "sg-010": {
         "name": "The Bridge Series Shorts",
         "collection": "signature",
-        "source_override": "sg-010-bridge-shorts-variants.jpg",
+        "output_slug": "bridge-series-shorts",
+        "source_override": "bridge-series-shorts-bridge-shorts-variants.jpg",
     },
     "sg-011": {
         "name": "Original Label Tee (White)",
         "collection": "signature",
-        "source_override": "sg-011-label-tee-white.webp",
+        "output_slug": "original-label-tee-white",
+        # No source photo — existing model renders are the only reference.
     },
     "sg-012": {
         "name": "Original Label Tee (Orchid)",
         "collection": "signature",
-        "source_override": "sg-012-label-tee-orchid.webp",
+        "output_slug": "original-label-tee-orchid",
+        # No source photo — existing model renders are the only reference.
     },
-    # ── Pre-Order Products ─────────────────────────────────────────────────
-    "po-001": {
-        "name": "Red #80 Football Jersey",
-        "collection": "black-rose",
-        "source_override": "br-design-football-jersey-red.jpg",
-        "is_preorder": True,
-    },
-    "po-002": {
-        "name": '"THE BAY" Basketball Tank',
-        "collection": "black-rose",
-        "source_override": "br-design-basketball-jersey.jpg",
-        "is_preorder": True,
-    },
-    "po-003": {
-        "name": "White #32 Football Jersey",
-        "collection": "black-rose",
-        "source_override": "br-design-football-jersey-white.jpg",
-        "is_preorder": True,
-    },
-    "po-004": {
-        "name": "Black & Teal Hockey Jersey",
-        "collection": "black-rose",
-        "source_override": "br-design-hockey-jersey.jpg",
-        "is_preorder": True,
-    },
-    "po-005": {
-        "name": "Purple GG Bridge Mesh Shorts",
+    # ── Signature Pre-Orders / New ─────────────────────────────────────────
+    "sg-d01": {
+        "name": "Multi-Colored Windbreaker Set",
         "collection": "signature",
-        "source_override": "po-005-bridge-shorts-source.jpg",
+        "output_slug": "multi-colored-windbreaker-set",
+        "source_override": "multi-colored-windbreaker-set-techflat.jpg",
         "is_preorder": True,
     },
-    "po-006": {
-        "name": "Black Rose Crewneck & Joggers",
-        "collection": "black-rose",
-        "source_override": "po-006-techflat.jpg",
-        "is_preorder": True,
+    "sg-d02": {
+        "name": "Collection Shorts",
+        "collection": "signature",
+        "output_slug": "skyyrose-collection-shorts",
+        "source_override": "skyyrose-collection-shorts-1.jpg",
     },
-    "po-007": {
-        "name": "Black Rose Beanie",
-        "collection": "black-rose",
-        "source_override": "po-007-beanie-source.jpg",
-        "is_preorder": True,
+    "sg-d03": {
+        "name": "Mint Rose Crewneck + Jogger Set",
+        "collection": "signature",
+        "output_slug": "mint-rose-crewneck-jogger-set",
+        "source_override": "mint-rose-crewneck-jogger-set-source.jpg",
     },
-    "po-009": {
-        "name": "SR Monogram Slides",
-        "collection": "black-rose",
-        "source_override": "po-009-slides-source.jpg",
-        "is_preorder": True,
+    "sg-d04": {
+        "name": "Mint Rose Hooded Dress",
+        "collection": "signature",
+        "output_slug": "mint-rose-hooded-dress",
+        "source_override": "mint-rose-hooded-dress-source.jpg",
     },
-    "po-010": {
-        "name": "Love Hurts Slides",
-        "collection": "love-hurts",
-        "source_override": "po-010-slides-source.jpg",
-        "is_preorder": True,
+    # ── Kids Capsule ──────────────────────────────────────────────────────
+    "kids-001": {
+        "name": "Kids Red Set",
+        "collection": "kids-capsule",
+        "output_slug": "kids-red-set",
+        "source_override": "colorblock-red-set-real.jpg",
     },
-    "po-011": {
-        "name": "Black Rose Slides",
-        "collection": "black-rose",
-        "source_override": "po-011-slides-source.jpg",
-        "is_preorder": True,
+    "kids-002": {
+        "name": "Kids Purple Set",
+        "collection": "kids-capsule",
+        "output_slug": "kids-purple-set",
+        "source_override": "colorblock-purple-set-real.jpg",
     },
 }
 
 # SKUs that are accessories (not wearable on a model's body)
 ACCESSORY_SKUS = {
     "lh-001",  # The Fannie (fanny pack)
-    "sg-007",  # The Signature Beanie (Black)
-    "sg-008",  # The Signature Beanie (Forest Green)
-    "po-007",  # Black Rose Beanie
-    "po-009",  # SR Monogram Slides
-    "po-010",  # Love Hurts Slides
-    "po-011",  # Black Rose Slides
 }
 
 # SKUs with known bad source images — skipped by default.
@@ -266,7 +301,16 @@ BAD_SOURCE_SKUS = set()  # All sources verified clean as of 2026-03-05
 # drops or garbles. Imagen renders text accurately from text prompts.
 # Descriptions sourced from products.csv — the canonical product database.
 
-TEXT_HEAVY_SKUS = {"br-003", "po-001", "po-002", "po-003", "po-004"}
+TEXT_HEAVY_SKUS = {
+    "br-003",
+    "br-003-oakland",
+    "br-003-giants",
+    "br-003-white",
+    "br-d01",
+    "br-d02",
+    "br-d03",
+    "br-d04",
+}
 
 # -- FLUX.2 via Together AI: tech flat → photorealistic conversion -----------
 # Products that only have vector/design mockup tech flats (not real photos).
@@ -274,9 +318,13 @@ TEXT_HEAVY_SKUS = {"br-003", "po-001", "po-002", "po-003", "po-004"}
 # (2) accurate text rendering, (3) exact hex color matching.
 # In "auto" mode, these get routed to FLUX instead of Gemini.
 TECH_FLAT_SKUS = {
-    "br-001",  # Tech flat only (br-001-techflat-v4.jpg)
-    "sg-002",  # Tech flat only (sg-002-techflat-v4.jpg)
-    "po-006",  # Tech flat only (po-006-techflat.jpg)
+    "br-001",  # Tech flat only (black-rose-crewneck-techflat-v4.jpg)
+    "sg-002",  # Tech flat only (stay-golden-tee-techflat-v4.jpg)
+    "sg-004",  # Tech flat only (the-signature-hoodie-techflat.jpeg)
+    "sg-005",  # Tech flat only (stay-golden-tee-classic-techflat.jpeg)
+    "sg-d01",  # Tech flat only (multi-colored-windbreaker-set-techflat.jpg)
+    "sg-d03",  # Source photo (mint-rose-crewneck-jogger-set-source.jpg)
+    "sg-d04",  # Source photo (mint-rose-hooded-dress-source.jpg)
 }
 
 # -- Logo treatment metadata (real product material) -------------------------
@@ -295,21 +343,73 @@ LOGO_TREATMENTS = {
 
 IMAGEN_PRODUCT_DESCRIPTIONS = {
     "br-003": {
-        "garment": "jersey",
+        "garment": "baseball jersey",
         "details": (
-            "A luxury streetwear jersey. Black body with orange collar trim. "
+            "A luxury streetwear baseball jersey. Black body with orange collar trim. "
             "Large white rose graphic (rose growing from clouds) on the back. "
             "SR monogram on the upper back. Oakland-rooted gothic luxury. "
             "SkyyRose BLACK ROSE Collection branding."
         ),
         "back_details": (
-            "Back of a black jersey with orange collar trim. "
+            "Back of a black baseball jersey with orange collar trim. "
             "Large white rose graphic — a rose growing from thorns and clouds — "
             "centered on the back. SR monogram above the graphic. "
             "Black body color throughout."
         ),
     },
-    "po-001": {
+    "br-003-oakland": {
+        "garment": "baseball jersey",
+        "details": (
+            "A luxury streetwear baseball jersey in Oakland A's green and gold colorway. "
+            "Green body with gold/yellow accents and trim. Rose graphic on the front. "
+            "Oakland-inspired, luxury streetwear. SkyyRose BLACK ROSE Collection."
+        ),
+        "back_details": (
+            "Back of a green and gold baseball jersey. Oakland A's inspired colorway. "
+            "Large rose graphic centered on the back. Green body throughout "
+            "with gold/yellow accents."
+        ),
+    },
+    "br-003-giants": {
+        "garment": "baseball jersey",
+        "details": (
+            "A luxury streetwear baseball jersey in SF Giants orange and black colorway. "
+            "Orange body with black accents and trim. Rose graphic on the front. "
+            "San Francisco inspired, luxury streetwear. SkyyRose BLACK ROSE Collection."
+        ),
+        "back_details": (
+            "Back of an orange and black baseball jersey. SF Giants inspired colorway. "
+            "Large rose graphic centered on the back. Orange body throughout "
+            "with black accents."
+        ),
+    },
+    "br-003-white": {
+        "garment": "baseball jersey",
+        "details": (
+            "A luxury streetwear baseball jersey. Clean white body with contrasting trim. "
+            "Rose graphic on the front. Premium white fabric, luxury streetwear. "
+            "SkyyRose BLACK ROSE Collection branding."
+        ),
+        "back_details": (
+            "Back of a white baseball jersey with contrasting trim. "
+            "Large rose graphic centered on the back. White body color throughout."
+        ),
+    },
+    "br-d01": {
+        "garment": "hooded hockey jersey",
+        "details": (
+            "Black hooded hockey jersey with cyan/teal accents. Large circular "
+            "rose crest on the front. Hood attached. Gradient stripe hem and "
+            "cuffs in cyan/teal. SkyyRose BLACK ROSE Collection."
+        ),
+        "back_details": (
+            "Back of a black hooded hockey jersey. Black body throughout. "
+            "Cyan 'BLACK IS BEAUTIFUL' text across the upper back. "
+            "Rose-filled #0 numeral below the text. Gradient stripe hem "
+            "and cuffs in cyan/teal. Black body color."
+        ),
+    },
+    "br-d02": {
         "garment": "American football jersey",
         "details": (
             "Red V-neck football jersey with #80 in large block numerals on the "
@@ -324,22 +424,7 @@ IMAGEN_PRODUCT_DESCRIPTIONS = {
             "graphic. SR monogram. Stripe trim on sleeves. Red body."
         ),
     },
-    "po-002": {
-        "garment": "sleeveless basketball tank",
-        "details": (
-            "White sleeveless basketball jersey / tank top. 'THE BAY' in bold "
-            "gold text across the chest. Rose circle graphic below the text. "
-            "Grey/silver rose fade on the lower half of the jersey. "
-            "Wide shoulder straps. SkyyRose branding."
-        ),
-        "back_details": (
-            "Back of a white sleeveless basketball tank. White body throughout. "
-            "'BLACK IS BEAUTIFUL' text across the upper back. "
-            "Grey/silver rose fade on lower half. Wide shoulder straps. "
-            "White body color."
-        ),
-    },
-    "po-003": {
+    "br-d03": {
         "garment": "American football jersey",
         "details": (
             "White V-neck football jersey with bold black #32 on the front "
@@ -356,18 +441,19 @@ IMAGEN_PRODUCT_DESCRIPTIONS = {
             "Shoulder numbers. White body color."
         ),
     },
-    "po-004": {
-        "garment": "hooded hockey jersey",
+    "br-d04": {
+        "garment": "sleeveless basketball tank",
         "details": (
-            "Black hooded hockey jersey with cyan/teal accents. Large circular "
-            "rose crest on the front. Hood attached. Gradient stripe hem and "
-            "cuffs in cyan/teal. SkyyRose BLACK ROSE Collection."
+            "White sleeveless basketball jersey / tank top. 'THE BAY' in bold "
+            "gold text across the chest. Rose circle graphic below the text. "
+            "Grey/silver rose fade on the lower half of the jersey. "
+            "Wide shoulder straps. SkyyRose branding."
         ),
         "back_details": (
-            "Back of a black hooded hockey jersey. Black body throughout. "
-            "Cyan 'BLACK IS BEAUTIFUL' text across the upper back. "
-            "Rose-filled #0 numeral below the text. Gradient stripe hem "
-            "and cuffs in cyan/teal. Black body color."
+            "Back of a white sleeveless basketball tank. White body throughout. "
+            "'BLACK IS BEAUTIFUL' text across the upper back. "
+            "Grey/silver rose fade on lower half. Wide shoulder straps. "
+            "White body color."
         ),
     },
 }
@@ -413,32 +499,53 @@ def imagen_render_prompt(sku: str, view: str) -> str:
 
 
 def find_source_image(sku: str) -> Path | None:
-    """Find the best available source image for a SKU."""
-    # Check for explicit source override in catalog
+    """Find the best available source image for a SKU.
+
+    Checks source_override first, then falls back to globbing by output_slug.
+    For products with no source (only existing model renders), tries to use
+    the existing front-model render as a reference for regeneration.
+    """
     info = PRODUCT_CATALOG.get(sku, {})
+
+    # Check for explicit source override in catalog
     if "source_override" in info:
         override_path = PRODUCTS_DIR / info["source_override"]
         if override_path.exists():
             return override_path
         log.warning("source_override %s not found for %s", info["source_override"], sku)
-        return None
 
-    candidates = list(PRODUCTS_DIR.glob(f"{sku}*.webp")) + list(PRODUCTS_DIR.glob(f"{sku}*.jpg"))
-    # Filter out generated shots — we want flat-lay/product source only
+    # Fall back to globbing by output_slug (product-name-based filenames)
+    slug = info.get("output_slug", sku)
+    extensions = (".webp", ".jpg", ".jpeg", ".png")
+    candidates = []
+    for ext in extensions:
+        candidates.extend(PRODUCTS_DIR.glob(f"{slug}*{ext}"))
+
+    # Filter out generated model shots — we want flat-lay/product source only
     source_candidates = [
         p
         for p in candidates
         if "-front-model" not in p.stem
         and "-back-model" not in p.stem
         and "-branding" not in p.stem
-        and "-back" not in p.stem
-        and "-render" not in p.stem
     ]
-    if not source_candidates:
-        return None
-    # Prefer .webp over .jpg, then shorter filenames
-    source_candidates.sort(key=lambda p: (p.suffix != ".webp", len(p.name)))
-    return source_candidates[0]
+    if source_candidates:
+        # Prefer source/techflat/product files, then shorter filenames
+        source_candidates.sort(
+            key=lambda p: (
+                "source" not in p.stem and "techflat" not in p.stem and "product" not in p.stem,
+                len(p.name),
+            )
+        )
+        return source_candidates[0]
+
+    # Last resort: use existing front-model render as reference
+    front_model = PRODUCTS_DIR / f"{slug}-front-model.webp"
+    if front_model.exists():
+        log.info("Using existing front-model render as source for %s", sku)
+        return front_model
+
+    return None
 
 
 def load_products(sku_filter: str | None = None, include_bad: bool = False) -> list[dict]:
@@ -468,9 +575,11 @@ def load_products(sku_filter: str | None = None, include_bad: bool = False) -> l
                 "sku": sku,
                 "name": info["name"],
                 "collection": info["collection"],
+                "output_slug": info.get("output_slug", sku),
                 "source_image": src,
                 "is_accessory": sku in ACCESSORY_SKUS,
                 "is_preorder": info.get("is_preorder", False),
+                "is_variant": "variant_of" in info,
             }
         )
 
@@ -617,6 +726,14 @@ BRANDING_TEMPLATES = {
         "tones, California luxury vibes. Golden (#D4AF37) accent lighting. "
         "Cinematic composition, 3/4 body shot."
     ),
+    "kids-capsule": (
+        "The reference image shows a {name}. Generate a CHILD model (age 8-12) "
+        "wearing this EXACT {name}, front-facing, playful yet premium editorial "
+        "photography, bright studio lighting, clean background. The {name} must "
+        "be 100% identical to the reference — same colors, same cut, same logos. "
+        "Do NOT change the garment type. Vibrant, youthful energy with luxury "
+        "quality. Cinematic composition, 3/4 body shot."
+    ),
 }
 
 ACCESSORY_BRANDING_TEMPLATES = {
@@ -640,14 +757,18 @@ ACCESSORY_BRANDING_TEMPLATES = {
 # Appended to EVERY prompt to prevent AI from inventing details.
 
 ANTI_HALLUCINATION = (
-    " STRICT RULES: "
+    " STRICT RULES — 100% REPLICA: "
+    "The output MUST be a pixel-accurate replica of the reference garment. "
     "Do NOT add any text, words, logos, or branding that is NOT visible "
     "in the reference image. "
     "Do NOT invent labels, patches, tags, or decorative elements. "
     "Do NOT change the garment type to a different product. "
     "Do NOT add sponsor logos, team names, or league branding. "
+    "Do NOT alter colors, fabric textures, or design proportions. "
+    "Do NOT change stitching, seam placement, or construction details. "
     "If you cannot see a detail in the reference, do NOT guess — leave it out. "
-    "Only reproduce what is actually in the reference image."
+    "Only reproduce what is actually in the reference image. "
+    "This is a luxury fashion brand — absolute accuracy is non-negotiable."
 )
 
 ENHANCED_PROMPT_SUFFIX = (
@@ -1411,11 +1532,14 @@ def get_prompt(product: dict, view: str) -> str:
 
 
 def get_output_filename(sku: str, view: str) -> str:
-    """Map view to output filename."""
+    """Map view to output filename using product-name-based slugs."""
+    info = PRODUCT_CATALOG.get(sku, {})
+    slug = info.get("output_slug", sku)
+
     if view.startswith("render3d_"):
         suffix = view.replace("render3d_", "")
-        return f"{sku}-render-{suffix}.webp"
-    return f"{sku}-{view}-model.webp" if view != "branding" else f"{sku}-branding.webp"
+        return f"{slug}-{suffix}-model.webp"
+    return f"{slug}-{view}-model.webp" if view != "branding" else f"{slug}-branding.webp"
 
 
 def process_product(

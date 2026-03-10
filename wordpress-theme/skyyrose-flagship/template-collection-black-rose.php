@@ -33,7 +33,7 @@ $collection_config = array(
 		. '<p>' . esc_html__( 'This is not fashion for the faint of heart. It is armor for the bold, the defiant, the eternally romantic. Limited drops. Once they are gone, they are gone.', 'skyyrose-flagship' ) . '</p>',
 	'manifesto_scene'   => SKYYROSE_ASSETS_URI . '/scenes/black-rose/black-rose-moonlit-courtyard.webp',
 
-	'featured_sku'      => 'br-d02',
+	'featured_sku'      => 'br-006',
 
 	'nl_title'          => __( 'Available Until It\'s Not', 'skyyrose-flagship' ),
 	'nl_desc'           => __( 'First access to drops. Limited pieces. No second chances.', 'skyyrose-flagship' ),
