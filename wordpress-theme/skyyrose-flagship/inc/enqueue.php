@@ -648,6 +648,17 @@ function skyyrose_enqueue_template_scripts() {
 					true
 				);
 			}
+
+			// World-specific styles (narrative panels, canvas, scroll spacer).
+			$world_css = $base_css_dir . '/immersive-world.css';
+			if ( file_exists( $world_css ) ) {
+				wp_enqueue_style(
+					'skyyrose-immersive-world',
+					$base_css_uri . '/immersive-world.css',
+					array( 'skyyrose-template-immersive' ),
+					SKYYROSE_VERSION
+				);
+			}
 		}
 
 		// Enqueue immersive WooCommerce bridge + localize skyyRoseImmersive data.
