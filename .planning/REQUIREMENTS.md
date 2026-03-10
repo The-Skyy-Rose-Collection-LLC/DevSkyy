@@ -42,8 +42,8 @@ Requirements for WordPress quality and accessibility release. Each maps to roadm
 ### Collection & Product Data
 
 - [ ] **DATA-01**: Black Rose collection shows correct hero banner image
-- [ ] **DATA-02**: Pre-order products are not displayed in live collection catalog pages
-- [ ] **DATA-03**: Product-to-collection assignments match authoritative product list
+- [x] **DATA-02**: Pre-order products are not displayed in live collection catalog pages
+- [x] **DATA-03**: Product-to-collection assignments match authoritative product list
 
 ## v2 Requirements
 
@@ -92,8 +92,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CURS-02 | Phase 13 | Pending |
 | CURS-03 | Phase 13 | Pending |
 | DATA-01 | Phase 9 | Pending |
-| DATA-02 | Phase 9 | Pending |
-| DATA-03 | Phase 9 | Pending |
+| DATA-02 | Phase 9 | Complete |
+| DATA-03 | Phase 9 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 18 total
