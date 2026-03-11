@@ -85,7 +85,8 @@
     .card-body { padding: 14px 16px 12px; }
     .card-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
     .badge { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; }
-    .badge-id { color: var(--muted); background: #141414; }
+    .badge-id { color: var(--dim); background: #141414; font-size: 0.54rem; letter-spacing: 0.04em; }
+    .badge-id .sep { color: var(--muted); margin: 0 3px; }
     .badge-col { }
     .card-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 400; line-height: 1.3; margin-bottom: 5px; }
     .card-desc { font-size: 0.7rem; line-height: 1.5; color: var(--dim); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 12px; }
@@ -170,26 +171,33 @@
 /* ─── PRODUCT DATA ─────────────────────────────────── */
 
 const PRODUCTS = [
-  { id:'br-001', name:'BLACK Rose Crewneck', col:'black-rose', desc:'Gothic luxury. Embroidered with defiant elegance, a dark romance woven in every thread.' },
-  { id:'br-002', name:'BLACK Rose Joggers', col:'black-rose', desc:'Twilight comfort meets gothic romance. Embroidered black roses bloom on soft fabric.' },
-  { id:'br-003', name:'BLACK is Beautiful Jersey', col:'black-rose', desc:'A BLACK ROSE Collection declaration. Gothic luxury stitches a powerful message into streetwise elegance.' },
-  { id:'br-004', name:'BLACK Rose Hoodie', col:'black-rose', desc:'Gothic luxury in twilight shadows. Intricate embroidery captures the bloom of darkness.' },
+  // ── Black Rose (8 products) ───────────────────────────────────
+  { id:'br-001', name:'BLACK Rose Crewneck', col:'black-rose', desc:'Gothic luxury. Embossed rose on deep black, a dark romance woven in every thread.' },
+  { id:'br-002', name:'BLACK Rose Joggers', col:'black-rose', desc:'Twilight comfort meets gothic romance. Silicone rubber rose logo on soft fabric.' },
+  { id:'br-003', name:'BLACK is Beautiful Jersey', col:'black-rose', desc:'3 colorways: black, Giants, Oakland A\'s. BLACK ROSE Collection streetwise elegance.' },
+  { id:'br-004', name:'BLACK Rose Hoodie', col:'black-rose', desc:'Gothic luxury in twilight shadows. Embossed rose detail, cascade sleeve design.' },
   { id:'br-005', name:'BLACK Rose Hoodie \u2014 Signature Edition', col:'black-rose', desc:'Exquisite rose embroidery on deep charcoal. Sleeve cascade of roses and thorns.' },
-  { id:'br-006', name:'BLACK Rose Sherpa Jacket', col:'black-rose', desc:'Lustrous black satin with plush Sherpa lining, crowned by an exquisite embroidered rose.' },
+  { id:'br-006', name:'BLACK Rose Sherpa Jacket', col:'black-rose', desc:'Lustrous black satin with plush Sherpa lining, crowned by an embroidered rose.' },
   { id:'br-007', name:'BLACK Rose \u00d7 Love Hurts Basketball Shorts', col:'black-rose', desc:'Embroidered roses bloom on black mesh, a gothic love letter to Oakland.' },
   { id:'br-008', name:"Women's BLACK Rose Hooded Dress", col:'black-rose', desc:'Intricate black rose embroidery and a silhouette of gothic mystery.' },
-  { id:'lh-001', name:'The Fannie', col:'love-hurts', desc:'Luxury fanny pack embodying Oakland grit, passion, and the defiant bloom of a street rose.' },
+  // ── Love Hurts (5 products) ───────────────────────────────────
+  { id:'lh-001', name:'The Fannie', col:'love-hurts', desc:'Luxury fanny pack. Black pebbled leather, "FANNIE" in white script, red rose embroidery.' },
   { id:'lh-002', name:'Love Hurts Joggers', col:'love-hurts', desc:'Where Oakland grit meets luxury. Embroidered rose, passion forged in the streets.' },
   { id:'lh-003', name:'Love Hurts Basketball Shorts', col:'love-hurts', desc:'Defiant rose design on breathable mesh. Oakland-inspired luxury streetwear.' },
   { id:'lh-004', name:'Love Hurts Varsity Jacket', col:'love-hurts', desc:'Black satin, fire-red script, secret rose garden inside the hood.' },
-  { id:'sg-001', name:'The Bay Set', col:'signature', desc:'Embody West Coast luxury. Iconic blue rose and vibrant Bay Area skyline.' },
-  { id:'sg-002', name:'Stay Golden Set', col:'signature', desc:'Luxurious Bay Area streetwear. Signature rose and cityscape.' },
-  { id:'sg-003', name:'The Signature Tee', col:'signature', desc:'Premium staple in Orchid. Couture-level everyday luxury.' },
-  { id:'sg-005', name:'Stay Golden Tee', col:'signature', desc:'West Coast ambition. Opulent rose design symbolizing resilience.' },
-  { id:'sg-006', name:'Mint & Lavender Hoodie', col:'signature', desc:'Refreshing mint base meets opulent lavender artistry.' },
-  { id:'sg-007', name:'The Signature Beanie', col:'signature', desc:'Luxurious knit, bespoke comfort. Red, Purple, and Black.' },
-  { id:'sg-009', name:'The Sherpa Jacket', col:'signature', desc:'Opulent West Coast outerwear featuring signature rose embroidery.' },
-  { id:'sg-010', name:'The Bridge Series Shorts', col:'signature', desc:'Bay Area iconic spirit in premium streetwear. Bridge panoramas on mesh.' },
+  { id:'lh-005', name:'Love Hurts Windbreaker', col:'love-hurts', desc:'Premium bomber silhouette with Love Hurts branding. Passionate streetwear.' },
+  // ── Signature (11 products — NO sg-001) ───────────────────────
+  { id:'sg-002', name:'Stay Golden Set', col:'signature', desc:'Luxurious Bay Area streetwear. Signature rose and cityscape on mint.' },
+  { id:'sg-003', name:'The Signature Tee', col:'signature', desc:'Premium staple. Signature Collection original label, screen-printed logo.' },
+  { id:'sg-004', name:'The Signature Hoodie', col:'signature', desc:'Full hoodie with embroidered signature logo. Raised thread texture detail.' },
+  { id:'sg-005', name:'Stay Golden Tee', col:'signature', desc:'West Coast ambition. Opulent rose design symbolizing resilience and growth.' },
+  { id:'sg-006', name:'Mint & Lavender Hoodie', col:'signature', desc:'Refreshing mint base meets opulent lavender artistry. Unique colorway.' },
+  { id:'sg-007', name:'The Signature Beanie', col:'signature', desc:'Luxurious knit beanie in black. Signature rose embroidery, bespoke comfort.' },
+  { id:'sg-008', name:'Signature Beanie (Forest Green)', col:'signature', desc:'Forest green knit beanie. Signature rose embroidery, Bay Area earth tones.' },
+  { id:'sg-009', name:'The Sherpa Jacket', col:'signature', desc:'Opulent West Coast outerwear featuring signature rose embroidery on sherpa.' },
+  { id:'sg-010', name:'The Bridge Series Shorts', col:'signature', desc:'Bay Area iconic spirit. Bridge panoramas on mesh shorts, matching tees available.' },
+  { id:'sg-011', name:'Original Label Tee (White)', col:'signature', desc:'Clean white premium tee. Signature Collection original label, couture everyday luxury.' },
+  { id:'sg-012', name:'Original Label Tee (Orchid)', col:'signature', desc:'Orchid premium tee. Signature Collection original label, bold color statement.' },
 ];
 
 const COL = {
@@ -201,123 +209,156 @@ const COL = {
 /* ─── IMAGE MAP ────────────────────────────────────── */
 /* Priority: REAL product photos first, CDN second, AI/avatar LAST */
 
-const E = 'datasets/skyyrose_lora_v1/images';   // enhanced photos
-const L = 'datasets/skyyrose_lora_v1';           // love hurts studio
-const T = 'assets/2d-25d-assets';                // 2d/2.5d detail variants
+// Single source: wordpress-theme/skyyrose-flagship/assets/images/products/{sku}/
+// Order: Techflat → Flatlay/Product Photo → Render (Model)
+const P = 'wordpress-theme/skyyrose-flagship/assets/images/products';
 
-function p(dir, file, label) {
-  // Build URL - encode only the filename, not slashes
-  return { src: '/' + dir + '/' + file.split('/').map(s => encodeURIComponent(s)).join('/'), label };
-}
-function cdn(url, label) {
-  return { src: url, label };
+function img(sku, file, label) {
+  return { src: '/' + P + '/' + sku + '/' + encodeURIComponent(file), label };
 }
 
 const IMAGES = {
   'br-001': [
-    // No real product photo available for this item
+    img('br-001', 'br-001-techflat-v4.jpg', 'Techflat'),
+    img('br-001', 'br-001-front-model.webp', 'Render Front'),
+    img('br-001', 'br-001-back-model.webp', 'Render Back'),
   ],
   'br-002': [
-    // No real product photo available
+    img('br-002', 'br-002-joggers-source.jpg', 'Flatlay'),
+    img('br-002', 'br-002-front-model.webp', 'Render Front'),
+    img('br-002', 'br-002-back-model.webp', 'Render Back'),
   ],
   'br-003': [
-    // No real product photo available
+    img('br-003', 'br-003-techflat-black.jpeg', 'Techflat — Black'),
+    img('br-003', 'br-003-techflat-giants.jpeg', 'Techflat — Giants'),
+    img('br-003', 'br-003-techflat-oakland.jpeg', "Techflat — Oakland A's"),
+    img('br-003', 'br-003-jersey-front-techflat.jpg', 'Techflat Front'),
+    img('br-003', 'br-003-jersey-back-techflat.jpg', 'Techflat Back'),
+    img('br-003', 'br-003-front-model.webp', 'Render Front'),
+    img('br-003', 'br-003-back-model.webp', 'Render Back'),
   ],
   'br-004': [
-    // No real product photo available
+    img('br-004', 'br-004-hoodie-product.jpg', 'Flatlay'),
+    img('br-004', 'br-004-hoodie-alt-source.jpg', 'Flatlay Alt'),
+    img('br-004', 'br-hoodie-cloud-sleeve-photo.jpg', 'Flatlay — Sleeve'),
+    img('br-004', 'br-004-front-model.webp', 'Render Front'),
+    img('br-004', 'br-004-back-model.webp', 'Render Back'),
   ],
   'br-005': [
-    // No real product photo available
+    img('br-005', 'br-005-hoodie-ltd-source.jpg', 'Flatlay'),
+    img('br-005', 'br-005-front-model.webp', 'Render Front'),
+    img('br-005', 'br-005-back-model.webp', 'Render Back'),
   ],
   'br-006': [
-    p(E, '0035_enhanced_The BLACK Rose Sherpa Back.jpg', 'Product Photo'),
-    p(T, 'The BLACK Rose Sherpa Back_detail.jpg', 'Detail View'),
-    p(T, 'The BLACK Rose Sherpa Back_shadow.jpg', 'Shadow View'),
-    p(T, 'The BLACK Rose Sherpa Back_depth.jpg', 'Depth Map'),
-    cdn('https://skyyrose.co/wp-content/uploads/2026/01/The-BLACK-Rose-Sherpa-Back_detail-2.jpg', 'CDN Detail'),
+    img('br-006', 'br-006-sherpa-product.jpg', 'Flatlay'),
+    img('br-006', 'br-006-sherpa-rose-detail.jpg', 'Flatlay — Rose'),
+    img('br-006', 'br-006-sherpa-interior.jpg', 'Flatlay — Interior'),
+    img('br-006', 'br-006-sherpa-lining-detail.jpg', 'Flatlay — Lining'),
+    img('br-006', 'br-006-front-model.webp', 'Render Front'),
+    img('br-006', 'br-006-back-model.webp', 'Render Back'),
   ],
   'br-007': [
-    // No real product photo available
+    img('br-007', 'br-007-techflat.jpeg', 'Techflat'),
+    img('br-007', 'br-007-shorts.jpg', 'Flatlay'),
+    img('br-007', 'br-007-shorts-front-source.jpg', 'Flatlay Front'),
+    img('br-007', 'br-007-shorts-back-source.jpg', 'Flatlay Back'),
+    img('br-007', 'br-007-front-model.webp', 'Render Front'),
+    img('br-007', 'br-007-back-model.webp', 'Render Back'),
   ],
   'br-008': [
-    // No real product photo - the "Mint n Lavender Women Hooded Dress" is a different product
+    img('br-008', 'br-008-front-model.webp', 'Render Front'),
+    img('br-008', 'br-008-back-model.webp', 'Render Back'),
   ],
 
   'lh-001': [
-    p(L, 'love_hurts_PhotoRoom_000_20221210_093149.jpg', 'Studio Shot'),
-    p(L, 'love_hurts_IMG_0114.jpg', 'Photo 1'),
-    p(L, 'love_hurts_IMG_0115.jpg', 'Photo 2'),
-    p(L, 'love_hurts_IMG_0117.jpg', 'Photo 3'),
+    img('lh-001', 'lh-001-fannie-pack-photo.jpg', 'Flatlay'),
+    img('lh-001', 'lh-001-fannie-pack-mockup.jpg', 'Flatlay — Mockup'),
+    img('lh-001', 'lh-001-front-model.webp', 'Render'),
   ],
   'lh-002': [
-    p(L, 'love_hurts_joggers.jpg', 'Product Photo'),
-    p(L, 'love_hurts_IMG_2102.jpg', 'Studio 1'),
-    p(L, 'love_hurts_IMG_2103.jpg', 'Studio 2'),
-    p(L, 'love_hurts_IMG_2105.jpg', 'Studio 3'),
+    img('lh-002', 'lh-002-techflat.jpeg', 'Techflat'),
+    img('lh-002', 'lh-002-techflat-set.jpeg', 'Techflat — Set'),
+    img('lh-002', 'lh-002-joggers-variants.jpg', 'Flatlay — Variants'),
+    img('lh-002', 'lh-002-front-model.webp', 'Render Front'),
+    img('lh-002', 'lh-002-back-model.webp', 'Render Back'),
   ],
   'lh-003': [
-    p(L, 'love_hurts_mens Windbreaker shorts.jpg', 'Product Photo'),
-    p(L, 'love_hurts_IMG_1733.jpg', 'Studio Shot'),
-    p(L, 'love_hurts_IMG_3267.jpg', 'Studio Shot 2'),
+    img('lh-003', 'lh-003-techflat-v4.jpg', 'Techflat'),
+    img('lh-003', 'lh-003-shorts-front-source.jpg', 'Flatlay Front'),
+    img('lh-003', 'lh-003-shorts-back-source.jpg', 'Flatlay Back'),
+    img('lh-003', 'lh-003-shorts-front-closeup.jpg', 'Flatlay — Closeup Front'),
+    img('lh-003', 'lh-003-shorts-back-closeup.jpg', 'Flatlay — Closeup Back'),
+    img('lh-003', 'lh-003-front-model.webp', 'Render Front'),
+    img('lh-003', 'lh-003-back-model.webp', 'Render Back'),
   ],
   'lh-004': [
-    p(L, 'love_hurts_Men windbreaker jacket (1).jpg', 'Product Photo'),
-    p(L, 'love_hurts_Womens windbreaker jackets.jpg', "Women's Version"),
-    p(L, 'love_hurts_PhotoRoom_000_20231221_072338.jpg', 'Studio 1'),
-    p(L, 'love_hurts_PhotoRoom_001_20231221_072338.jpg', 'Studio 2'),
-    p(L, 'love_hurts_PhotoRoom_002_20231221_072338.jpg', 'Studio 3'),
+    img('lh-004', 'lh-004-techflat-photo.jpeg', 'Techflat'),
+    img('lh-004', 'lh-004-varsity-source.jpg', 'Flatlay'),
+    img('lh-004', 'lh-004-front-model.webp', 'Render Front'),
+    img('lh-004', 'lh-004-back-model.webp', 'Render Back'),
+  ],
+  'lh-005': [
+    img('lh-005', 'lh-005-techflat-purple.jpeg', 'Techflat — Purple'),
+    img('lh-005', 'lh-005-techflat-hoodie-set.jpeg', 'Techflat — Set'),
+    img('lh-005', 'lh-windbreaker-set-flatlay-photo.jpg', 'Flatlay'),
+    img('lh-005', 'lh-005-bomber.webp', 'Flatlay — Bomber'),
+    img('lh-005', 'lh-005-front-model.webp', 'Render Front'),
+    img('lh-005', 'lh-005-back-model.webp', 'Render Back'),
   ],
 
-  'sg-001': [
-    p(E, '0038_enhanced_The Yay Bridge Set.jpg', 'Product Photo'),
-    p(T, 'The Yay Bridge Set_detail.jpg', 'Detail View'),
-    p(T, 'The Yay Bridge Set_shadow.jpg', 'Shadow View'),
-    cdn('https://skyyrose.co/wp-content/uploads/2026/01/The-Yay-Bridge-Set_detail-3.jpg', 'CDN Detail'),
-  ],
   'sg-002': [
-    p(E, '0014_enhanced_Stay Golden Tee.jpg', 'Product Photo'),
-    p(T, 'Stay Golden Tee_detail.jpg', 'Detail View'),
-    p(T, 'Stay Golden Tee_shadow.jpg', 'Shadow View'),
-    cdn('https://skyyrose.co/wp-content/uploads/2026/01/Stay-Golden-Tee_detail-2.jpg', 'CDN Detail'),
+    img('sg-002', 'sg-002-techflat-v4.jpg', 'Techflat'),
+    img('sg-002', 'sg-002-front-model.webp', 'Render Front'),
+    img('sg-002', 'sg-002-back-model.webp', 'Render Back'),
   ],
   'sg-003': [
-    p(E, '0024_enhanced__Signature Collection_ Original Label Tee (Orchid).jpg', 'Product Photo'),
-    p(T, '_Signature Collection_ Original Label Tee (Orchid)_detail.jpg', 'Detail View'),
-    p(T, '_Signature Collection_ Original Label Tee (Orchid)_shadow.jpg', 'Shadow View'),
-    cdn('https://skyyrose.co/wp-content/uploads/2026/01/Signature-Collection_-Original-Label-Tee-Orchid_detail-2.jpg', 'CDN Detail'),
+    img('sg-003', 'sg-003-front-model.webp', 'Render Front'),
+    img('sg-003', 'sg-003-back-model.webp', 'Render Back'),
+  ],
+  'sg-004': [
+    img('sg-004', 'sg-004-techflat.jpeg', 'Techflat'),
+    img('sg-004', 'sg-004-front-model.webp', 'Render Front'),
+    img('sg-004', 'sg-004-back-model.webp', 'Render Back'),
   ],
   'sg-005': [
-    p(E, '0014_enhanced_Stay Golden Tee.jpg', 'Product Photo'),
-    p(T, 'Stay Golden Tee_detail.jpg', 'Detail View'),
-    cdn('https://skyyrose.co/wp-content/uploads/2026/01/Stay-Golden-Tee_detail-2.jpg', 'CDN Detail'),
+    img('sg-005', 'sg-005-techflat.jpeg', 'Techflat'),
+    img('sg-005', 'sg-005-front-model.webp', 'Render Front'),
+    img('sg-005', 'sg-005-back-model.webp', 'Render Back'),
   ],
   'sg-006': [
-    p(E, '0022_enhanced__Signature Collection_ Hoodie.jpg', 'Product Photo'),
-    p(T, '_Signature Collection_ Hoodie_detail.jpg', 'Detail View'),
-    p(T, '_Signature Collection_ Hoodie_shadow.jpg', 'Shadow View'),
-    cdn('https://skyyrose.co/wp-content/uploads/2026/01/Signature-Collection_-Hoodie_detail-2.jpg', 'CDN Detail'),
+    img('sg-006', 'sg-006-techflat.jpeg', 'Techflat'),
+    img('sg-006', 'sg-006-hoodie-source.jpg', 'Flatlay'),
+    img('sg-006', 'sg-006-front-model.webp', 'Render Front'),
+    img('sg-006', 'sg-006-back-model.webp', 'Render Back'),
   ],
   'sg-007': [
-    p(E, '0013_enhanced_Signature Collection Red Rose Beanie.jpg', 'Red Beanie'),
-    p(E, '0023_enhanced__Signature Collection_ Lavender Rose Beanie.jpg', 'Lavender Beanie'),
-    p(T, 'Signature Collection Red Rose Beanie_detail.jpg', 'Detail \u2014 Red'),
-    p(T, '_Signature Collection_ Lavender Rose Beanie_detail.jpg', 'Detail \u2014 Lavender'),
-    cdn('https://skyyrose.co/wp-content/uploads/2026/01/Signature-Collection-Red-Rose-Beanie_detail-2.jpg', 'CDN Red'),
-    cdn('https://skyyrose.co/wp-content/uploads/2026/01/Signature-Collection_-Lavender-Rose-Beanie_detail-3.jpg', 'CDN Lavender'),
+    img('sg-007', 'sg-007-techflat-v4.jpg', 'Techflat'),
+    img('sg-007', 'sg-007-008-techflat-beanies.jpeg', 'Techflat — Both Beanies'),
+    img('sg-007', 'sg-007-beanie-black.jpg', 'Flatlay'),
+    img('sg-007', 'sg-007-beanie-source.jpg', 'Flatlay — Source'),
+    img('sg-007', 'sg-007-front-model.webp', 'Render'),
+  ],
+  'sg-008': [
+    img('sg-008', 'sg-008-beanie-green.jpg', 'Flatlay'),
+    img('sg-008', 'sg-008-front-model.webp', 'Render Front'),
+    img('sg-008', 'sg-008-back-model.webp', 'Render Back'),
   ],
   'sg-009': [
-    p(E, '0027_enhanced__The Signature Collection_ The Sherpa 2.jpg', 'Product Photo 1'),
-    p(E, '0028_enhanced__The Signature Collection_ The Sherpa 3.jpg', 'Product Photo 2'),
-    p(T, '_The Signature Collection_ The Sherpa 2_detail.jpg', 'Detail 1'),
-    p(T, '_The Signature Collection_ The Sherpa 3_detail.jpg', 'Detail 2'),
-    cdn('https://skyyrose.co/wp-content/uploads/2026/01/The-Signature-Collection_-The-Sherpa-2_detail-2.jpg', 'CDN View 1'),
+    img('sg-009', 'sg-009-front-model.webp', 'Render Front'),
+    img('sg-009', 'sg-009-back-model.webp', 'Render Back'),
   ],
   'sg-010': [
-    p(E, '0017_enhanced_The Signature Shorts.jpg', 'Product Photo'),
-    p(E, '0026_enhanced__Signature Collection_ Signature Shorts.jpg', 'Product Photo Alt'),
-    p(T, 'The Signature Shorts_detail.jpg', 'Detail View'),
-    p(T, '_Signature Collection_ Signature Shorts_detail.jpg', 'Detail Alt'),
-    cdn('https://skyyrose.co/wp-content/uploads/2026/01/The-Signature-Shorts_detail-2.jpg', 'CDN Detail'),
+    img('sg-010', 'sg-010-bridge-shorts-variants.jpg', 'Flatlay — Variants'),
+    img('sg-010', 'sg-010-front-model.webp', 'Render Front'),
+    img('sg-010', 'sg-010-back-model.webp', 'Render Back'),
+  ],
+  'sg-011': [
+    img('sg-011', 'sg-011-front-model.webp', 'Render Front'),
+    img('sg-011', 'sg-011-back-model.webp', 'Render Back'),
+  ],
+  'sg-012': [
+    img('sg-012', 'sg-012-front-model.webp', 'Render Front'),
+    img('sg-012', 'sg-012-back-model.webp', 'Render Back'),
   ],
 };
 
@@ -419,8 +460,7 @@ function cardHTML(pr) {
       <div class="card-img">${imgArea}</div>
       <div class="card-body">
         <div class="card-meta">
-          <span class="badge badge-id">${pr.id}</span>
-          <span class="badge badge-col" style="background:${m.accent}22;color:${m.accent}">${m.name}</span>
+          <span class="badge badge-id">${m.name}<span class="sep">/</span>${pr.name}<span class="sep">/</span>${pr.id.split('-')[1]}</span>
         </div>
         <h3 class="card-name">${pr.name}</h3>
         <p class="card-desc">${pr.desc}</p>
