@@ -35,7 +35,7 @@ $love_hurts_rooms = array(
 				'prop'       => 'glass-dome',
 				'prop_label' => __( 'Draped beside enchanted rose dome', 'skyyrose-flagship' ),
 			) ),
-			skyyrose_immersive_product( 'lh-001', array(
+			skyyrose_immersive_product( 'lh-006', array(
 				'left'       => '68',
 				'top'        => '38',
 				'prop'       => 'candelabra',
@@ -97,7 +97,7 @@ $products_uri = $assets_uri . '/images/products';
 
 // Build product data for 3D world (ALL 5 LH products — ignores publish status).
 $lh_world_products = array();
-$lh_world_skus     = array( 'lh-001', 'lh-002', 'lh-003', 'lh-004', 'lh-005' );
+$lh_world_skus     = array( 'lh-002', 'lh-003', 'lh-004', 'lh-005', 'lh-006' );
 
 foreach ( $lh_world_skus as $sku ) {
 	$p = function_exists( 'skyyrose_get_product' ) ? skyyrose_get_product( $sku ) : null;
@@ -196,7 +196,7 @@ $world_config = array(
 	 * position: [x, y, z] in world units.
 	 */
 	'productPlacements' => array(
-		array( 'sku' => 'lh-001', 'position' => array( 3.0, 2.0, -1.0 ) ),
+		array( 'sku' => 'lh-006', 'position' => array( 3.0, 2.0, -1.0 ) ),
 		array( 'sku' => 'lh-003', 'position' => array( -2.5, 1.5, -3.0 ) ),
 		array( 'sku' => 'lh-005', 'position' => array( 1.0, 2.5, -6.0 ) ),
 		array( 'sku' => 'lh-002', 'position' => array( -3.0, 1.8, -9.0 ) ),
@@ -348,10 +348,7 @@ get_header();
 	<div class="immersive-scene immersive-love-hurts" role="region" aria-labelledby="scene-title">
 
 		<!-- Loading Screen -->
-		<div class="scene-loading" aria-hidden="true">
-			<div class="scene-loading-monogram"><?php echo esc_html__( 'SR', 'skyyrose-flagship' ); ?></div>
-			<div class="scene-loading-text"><?php echo esc_html__( 'Entering The Beast\'s Cathedral', 'skyyrose-flagship' ); ?></div>
-		</div>
+		<?php get_template_part( 'template-parts/immersive-loader', null, array( 'world_name' => __( "The Beast's Cathedral", 'skyyrose-flagship' ) ) ); ?>
 
 		<!-- Scene Viewport — Multi-Room Layers -->
 		<div class="scene-viewport">
@@ -481,19 +478,28 @@ get_header();
 		</div>
 	</div>
 
-	<!-- Collection Tab Bar -->
-	<nav class="immersive-tab-bar" aria-label="<?php esc_attr_e( 'Collection navigation', 'skyyrose-flagship' ); ?>">
-		<a href="<?php echo esc_url( home_url( '/experience-black-rose/' ) ); ?>" class="immersive-tab" style="--tab-accent: #C0C0C0;">
-			<?php echo esc_html__( 'Black Rose', 'skyyrose-flagship' ); ?>
-		</a>
-		<a href="<?php echo esc_url( home_url( '/experience-love-hurts/' ) ); ?>" class="immersive-tab active" aria-current="page" style="--tab-accent: #DC143C;">
-			<?php echo esc_html__( 'Love Hurts', 'skyyrose-flagship' ); ?>
-		</a>
-		<a href="<?php echo esc_url( home_url( '/experience-signature/' ) ); ?>" class="immersive-tab" style="--tab-accent: #B76E79;">
-			<?php echo esc_html__( 'Signature', 'skyyrose-flagship' ); ?>
-		</a>
-		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="immersive-tab" style="--tab-accent: #D4AF37;">
-			<?php echo esc_html__( 'Pre-Order', 'skyyrose-flagship' ); ?>
+	<!-- Cross-World Navigation Doors -->
+	<nav class="world-nav" aria-label="<?php esc_attr_e( 'Enter another world', 'skyyrose-flagship' ); ?>">
+		<div class="world-nav__doors">
+			<a href="<?php echo esc_url( home_url( '/experience-black-rose/' ) ); ?>" class="world-nav__door">
+				<img
+					class="world-nav__door-image"
+					src="<?php echo esc_url( get_template_directory_uri() . '/assets/scenes/black-rose/black-rose-rooftop-garden-lookbook.webp' ); ?>"
+					alt="" loading="lazy" width="320" height="180"
+				>
+				<span class="world-nav__door-label"><?php echo esc_html__( 'Enter The Garden', 'skyyrose-flagship' ); ?></span>
+			</a>
+			<a href="<?php echo esc_url( home_url( '/experience-signature/' ) ); ?>" class="world-nav__door">
+				<img
+					class="world-nav__door-image"
+					src="<?php echo esc_url( get_template_directory_uri() . '/assets/scenes/signature/signature-golden-gate-showroom-lookbook.webp' ); ?>"
+					alt="" loading="lazy" width="320" height="180"
+				>
+				<span class="world-nav__door-label"><?php echo esc_html__( 'Enter The Runway', 'skyyrose-flagship' ); ?></span>
+			</a>
+		</div>
+		<a href="<?php echo esc_url( home_url( '/spatial/' ) ); ?>" class="world-nav__back">
+			<?php echo esc_html__( 'Return to Front Door', 'skyyrose-flagship' ); ?>
 		</a>
 	</nav>
 
