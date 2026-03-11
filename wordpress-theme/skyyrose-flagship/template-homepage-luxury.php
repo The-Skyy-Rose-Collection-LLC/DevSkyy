@@ -72,7 +72,7 @@ get_header();
 <section class="lux-hero" aria-label="<?php esc_attr_e( 'SkyyRose Luxury Streetwear', 'skyyrose-flagship' ); ?>">
 	<div class="lux-hero__bg">
 		<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/scenes/black-rose/black-rose-moonlit-courtyard.webp' ); ?>"
-		     alt="" width="1920" height="1080" fetchpriority="high">
+		     alt="" width="1920" height="1080" loading="eager" fetchpriority="high" decoding="async">
 	</div>
 	<div class="lux-hero__overlay"></div>
 	<div class="lux-hero__content">

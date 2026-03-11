@@ -192,7 +192,7 @@ get_header();
 		<div class="col-hero__img">
 			<img src="<?php echo esc_url( $col['hero_image'] ); ?>"
 			     alt="<?php echo esc_attr( sprintf( __( '%s collection hero image', 'skyyrose-flagship' ), $col['name'] ) ); ?>"
-			     width="1920" height="1080" fetchpriority="high">
+			     width="1920" height="1080" loading="eager" fetchpriority="high" decoding="async">
 		</div>
 		<div class="col-hero__overlay"></div>
 		<div class="col-hero__content">
