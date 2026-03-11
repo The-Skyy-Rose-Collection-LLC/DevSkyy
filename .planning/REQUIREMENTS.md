@@ -24,7 +24,7 @@ Requirements for WordPress quality and accessibility release. Each maps to roadm
 - [x] **CNTR-01**: All text meets WCAG AA contrast ratio (4.5:1 normal text, 3:1 large text)
 - [x] **CNTR-02**: Narrative subtext opacity increased to meet 4.5:1 against background
 - [x] **CNTR-03**: Interactive-cards small text (10-12px) meets minimum contrast
-- [ ] **CNTR-04**: Love Hurts $0 pricing replaced with "Pre-Order" display
+- [x] **CNTR-04**: Love Hurts $0 pricing replaced with "Pre-Order" display
 
 ### Responsive & Typography
 
@@ -83,7 +83,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CNTR-01 | Phase 11 | Complete |
 | CNTR-02 | Phase 11 | Complete |
 | CNTR-03 | Phase 11 | Complete |
-| CNTR-04 | Phase 11 | Pending |
+| CNTR-04 | Phase 11 | Complete |
 | RESP-01 | Phase 12 | Pending |
 | RESP-02 | Phase 12 | Pending |
 | RESP-03 | Phase 12 | Pending |
