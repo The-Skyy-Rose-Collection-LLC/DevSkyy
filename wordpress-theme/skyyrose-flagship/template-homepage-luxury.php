@@ -64,7 +64,7 @@ $collections = array(
 get_header();
 ?>
 
-<main id="primary" class="site-main lux-page" role="main">
+<main id="primary" class="site-main lux-page" role="main" tabindex="-1">
 
 <!-- ════════════════════════════════════════════════
      HERO — Full-Bleed Cinematic

@@ -478,7 +478,7 @@ get_header();
 			<span class="col-modal__letter"></span>
 		</div>
 		<div class="col-modal__body">
-			<h3 class="col-modal__name"></h3>
+			<h3 class="col-modal__name" aria-hidden="true"></h3>
 			<p class="col-modal__price"></p>
 			<p class="col-modal__desc"></p>
 			<div class="col-modal__sizes"></div>
