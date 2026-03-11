@@ -29,8 +29,8 @@ Requirements for WordPress quality and accessibility release. Each maps to roadm
 ### Responsive & Typography
 
 - [ ] **RESP-01**: Font sizes scale appropriately across mobile/tablet/desktop breakpoints
-- [ ] **RESP-02**: No horizontal overflow or layout breaking on mobile devices (320px+)
-- [ ] **RESP-03**: Touch targets meet minimum 44x44px on mobile
+- [x] **RESP-02**: No horizontal overflow or layout breaking on mobile devices (320px+)
+- [x] **RESP-03**: Touch targets meet minimum 44x44px on mobile
 - [ ] **RESP-04**: Typography hierarchy is consistent across all page templates
 
 ### Luxury Cursor
@@ -85,8 +85,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CNTR-03 | Phase 11 | Complete |
 | CNTR-04 | Phase 11 | Complete |
 | RESP-01 | Phase 12 | Pending |
-| RESP-02 | Phase 12 | Pending |
-| RESP-03 | Phase 12 | Pending |
+| RESP-02 | Phase 12 | Complete |
+| RESP-03 | Phase 12 | Complete |
 | RESP-04 | Phase 12 | Pending |
 | CURS-01 | Phase 13 | Pending |
 | CURS-02 | Phase 13 | Pending |
