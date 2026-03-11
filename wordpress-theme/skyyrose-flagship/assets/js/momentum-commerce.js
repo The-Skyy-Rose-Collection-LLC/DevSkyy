@@ -57,8 +57,8 @@
 		spotlightDuration: 3000,      // ms the spotlight beam is visible
 		spotlightCooldown: 20000,     // ms before re-triggering in same room
 		spotlightProducts: [          // SKUs ranked by popularity
-			'br-004', 'br-006', 'br-005', 'lh-001', 'lh-002',
-			'lh-003', 'sg-001-tee', 'sg-009', 'sg-006', 'sg-005',
+			'br-004', 'br-006', 'br-005', 'lh-006', 'lh-002',
+			'lh-003', 'sg-001', 'sg-009', 'sg-006', 'sg-005',
 		],
 
 		// Static page product glow (best sellers)
