@@ -1,0 +1,451 @@
+/**
+ * Immersive World — Three.js 3D Experience Styles
+ *
+ * Styles for the scroll-driven Three.js world canvas, narrative panels,
+ * product hotspot overlays, loading screen, and scroll spacer.
+ * Works alongside immersive.css (2D fallback styles remain separate).
+ *
+ * @package SkyyRose_Flagship
+ * @since   4.3.0
+ */
+
+/* ─────────────────────────────────────────────────
+   World Canvas — Full-Viewport Three.js Container
+   ───────────────────────────────────────────────── */
+
+#world-canvas {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 1;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 0.8s ease;
+}
+
+#world-canvas.active {
+	pointer-events: auto;
+	opacity: 1;
+}
+
+#world-canvas canvas {
+	display: block;
+	width: 100% !important;
+	height: 100% !important;
+}
+
+/* ─────────────────────────────────────────────────
+   Scroll Spacer — Provides Scroll Distance
+   ───────────────────────────────────────────────── */
+
+.world-scroll-spacer {
+	height: 500vh; /* 5x viewport = comfortable scroll distance */
+	pointer-events: none;
+}
+
+/* When 3D is active, position the spacer to create scroll room */
+.immersive-world-page .world-scroll-spacer {
+	position: relative;
+	z-index: 0;
+}
+
+/* ─────────────────────────────────────────────────
+   Narrative Overlay Container
+   ───────────────────────────────────────────────── */
+
+#world-narrative {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 5;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+/* ─────────────────────────────────────────────────
+   Narrative Panels — Beast's Inner Monologue
+   ───────────────────────────────────────────────── */
+
+.narrative-panel {
+	position: absolute;
+	max-width: 480px;
+	padding: 28px 36px;
+	border-radius: 6px;
+	opacity: 0;
+	transform: translateY(20px);
+	transition: opacity 0.6s ease, transform 0.6s ease;
+	pointer-events: none;
+
+	/* Glassmorphism */
+	background: rgba(10, 10, 10, 0.65);
+	backdrop-filter: blur(16px) saturate(1.4);
+	-webkit-backdrop-filter: blur(16px) saturate(1.4);
+	border: 1px solid rgba(220, 20, 60, 0.15);
+}
+
+/* ── Position Variants ── */
+
+.narrative-left {
+	left: 5%;
+	top: 50%;
+	transform: translateY(calc(-50% + 20px));
+}
+
+.narrative-right {
+	right: 5%;
+	top: 50%;
+	transform: translateY(calc(-50% + 20px));
+}
+
+.narrative-center {
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, calc(-50% + 20px));
+}
+
+/* ── Style Variants ── */
+
+.narrative-whisper {
+	font-style: italic;
+	border-left: 3px solid rgba(220, 20, 60, 0.4);
+}
+
+.narrative-prose {
+	border-left: 3px solid rgba(183, 110, 121, 0.6);
+}
+
+.narrative-quote {
+	text-align: center;
+	border-left: none;
+	border-top: 1px solid rgba(220, 20, 60, 0.3);
+	border-bottom: 1px solid rgba(220, 20, 60, 0.3);
+}
+
+/* ── Text Styles ── */
+
+.narrative-text {
+	font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+	font-size: 1.35rem;
+	line-height: 1.7;
+	color: rgba(255, 255, 255, 0.92);
+	margin: 0;
+	letter-spacing: 0.01em;
+}
+
+.narrative-subtext {
+	font-family: 'Inter', 'Barlow', sans-serif;
+	font-size: 0.8rem;
+	line-height: 1.6;
+	color: rgba(183, 110, 121, 0.8);
+	margin: 10px 0 0;
+	text-transform: uppercase;
+	letter-spacing: 0.15em;
+}
+
+.narrative-quote .narrative-text {
+	font-size: 1.5rem;
+	font-weight: 300;
+}
+
+.narrative-whisper .narrative-text {
+	font-size: 1.2rem;
+	color: rgba(255, 255, 255, 0.75);
+}
+
+/* ─────────────────────────────────────────────────
+   Loading Screen Override (3D world variant)
+   ───────────────────────────────────────────────── */
+
+.immersive-world-page .scene-loading {
+	background: #0a0508;
+}
+
+.immersive-world-page .scene-loading-text {
+	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-style: italic;
+	color: rgba(220, 20, 60, 0.8);
+}
+
+/* ─────────────────────────────────────────────────
+   Collection Tab Bar — Fixed Above World
+   ───────────────────────────────────────────────── */
+
+.immersive-world-page .immersive-tab-bar {
+	z-index: 10;
+}
+
+/* ─────────────────────────────────────────────────
+   Product Panel — Elevated Above World
+   ───────────────────────────────────────────────── */
+
+.immersive-world-page .product-panel,
+.immersive-world-page .product-panel-overlay {
+	z-index: 20;
+}
+
+/* ─────────────────────────────────────────────────
+   Scroll Progress Indicator (optional — subtle)
+   ───────────────────────────────────────────────── */
+
+.immersive-world-page::after {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 2px;
+	width: 0;
+	background: linear-gradient(90deg, #DC143C, #B76E79);
+	z-index: 15;
+	transition: width 0.1s ease-out;
+}
+
+/* ─────────────────────────────────────────────────
+   Mobile Responsive
+   ───────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+	.narrative-panel {
+		max-width: 90vw;
+		padding: 20px 24px;
+	}
+
+	.narrative-left,
+	.narrative-right {
+		left: 5%;
+		right: 5%;
+	}
+
+	.narrative-text {
+		font-size: 1.1rem;
+	}
+
+	.narrative-quote .narrative-text {
+		font-size: 1.25rem;
+	}
+
+	.world-scroll-spacer {
+		height: 400vh; /* Shorter scroll on mobile */
+	}
+}
+
+@media (max-width: 480px) {
+	.narrative-panel {
+		padding: 16px 20px;
+		border-radius: 4px;
+	}
+
+	.narrative-text {
+		font-size: 1rem;
+		line-height: 1.6;
+	}
+
+	.narrative-subtext {
+		font-size: 0.7rem;
+	}
+
+	.world-scroll-spacer {
+		height: 350vh;
+	}
+}
+
+/* ─────────────────────────────────────────────────
+   SkyyRose Avatar Easter Egg
+   ───────────────────────────────────────────────── */
+
+/* Hidden avatar hotspot — subtle idle bob, barely visible */
+.avatar-hotspot {
+	position: absolute;
+	background: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	z-index: 6;
+	pointer-events: auto;
+	opacity: 0.45;
+	transition: opacity 0.3s ease, transform 0.3s ease;
+	animation: avatar-idle 3s ease-in-out infinite;
+}
+
+.avatar-hotspot img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	filter: brightness(0.7) saturate(0.8);
+	pointer-events: none;
+}
+
+.avatar-hotspot:hover {
+	opacity: 0.7;
+	transform: scale(1.05);
+}
+
+.avatar-hotspot:hover img {
+	filter: brightness(0.85) saturate(1);
+}
+
+/* Found animation — spin + scale up + glow */
+.avatar-hotspot.avatar-found {
+	opacity: 1;
+	animation: avatar-reveal 1.8s ease forwards;
+	pointer-events: none;
+}
+
+.avatar-hotspot.avatar-found img {
+	filter: brightness(1) saturate(1.2) drop-shadow(0 0 12px rgba(183, 110, 121, 0.8));
+}
+
+@keyframes avatar-idle {
+	0%, 100% { transform: translateY(0); }
+	50% { transform: translateY(-3px); }
+}
+
+@keyframes avatar-reveal {
+	0% { transform: scale(1) rotate(0deg); opacity: 1; }
+	30% { transform: scale(1.6) rotate(360deg); opacity: 1; }
+	60% { transform: scale(1.4) rotate(720deg); opacity: 0.9; }
+	100% { transform: scale(2) rotate(1080deg); opacity: 0; }
+}
+
+/* Toast notification */
+.avatar-toast {
+	position: fixed;
+	bottom: 80px;
+	left: 50%;
+	transform: translateX(-50%) translateY(20px);
+	background: rgba(10, 10, 10, 0.85);
+	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
+	border: 1px solid rgba(183, 110, 121, 0.5);
+	border-radius: 40px;
+	padding: 14px 28px;
+	color: #fff;
+	font-family: 'Inter', 'Barlow', sans-serif;
+	font-size: 0.95rem;
+	letter-spacing: 0.05em;
+	z-index: 100;
+	opacity: 0;
+	transition: opacity 0.4s ease, transform 0.4s ease;
+	pointer-events: none;
+}
+
+.avatar-toast-visible {
+	opacity: 1;
+	transform: translateX(-50%) translateY(0);
+}
+
+.avatar-toast-icon {
+	margin-right: 8px;
+}
+
+/* Fullscreen intro overlay */
+.avatar-intro-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 200;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(10, 5, 8, 0.92);
+	backdrop-filter: blur(24px);
+	-webkit-backdrop-filter: blur(24px);
+	opacity: 0;
+	transition: opacity 0.6s ease;
+}
+
+.avatar-intro-visible {
+	opacity: 1;
+}
+
+.avatar-intro-content {
+	text-align: center;
+	max-width: 420px;
+	padding: 40px;
+}
+
+.avatar-intro-mascot {
+	width: 180px;
+	height: 180px;
+	object-fit: contain;
+	border-radius: 50%;
+	border: 3px solid rgba(183, 110, 121, 0.6);
+	margin-bottom: 24px;
+	animation: avatar-intro-bounce 1.2s ease-in-out infinite alternate;
+}
+
+.avatar-intro-title {
+	font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+	font-size: 2.2rem;
+	color: #fff;
+	margin: 0 0 12px;
+}
+
+.avatar-intro-text {
+	font-family: 'Inter', 'Barlow', sans-serif;
+	font-size: 1rem;
+	color: rgba(255, 255, 255, 0.8);
+	margin: 0 0 8px;
+}
+
+.avatar-intro-tagline {
+	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-size: 1.1rem;
+	font-style: italic;
+	color: #B76E79;
+	margin: 0 0 28px;
+}
+
+.avatar-intro-close {
+	background: linear-gradient(135deg, #B76E79, #DC143C);
+	color: #fff;
+	border: none;
+	padding: 14px 36px;
+	font-family: 'Inter', 'Barlow', sans-serif;
+	font-size: 0.9rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: opacity 0.3s ease;
+}
+
+.avatar-intro-close:hover {
+	opacity: 0.85;
+}
+
+@keyframes avatar-intro-bounce {
+	from { transform: translateY(0); }
+	to { transform: translateY(-10px); }
+}
+
+/* ─────────────────────────────────────────────────
+   Reduced Motion — Respect User Preference
+   ───────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+	#world-canvas {
+		transition: none;
+	}
+
+	.narrative-panel {
+		transition: opacity 0.2s ease;
+		transform: none !important;
+	}
+
+	.avatar-hotspot {
+		animation: none;
+	}
+
+	.avatar-hotspot.avatar-found {
+		animation: none;
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
+
+	.avatar-intro-mascot {
+		animation: none;
+	}
+}

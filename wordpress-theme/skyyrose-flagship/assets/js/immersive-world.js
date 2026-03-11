@@ -12,6 +12,24 @@
   'use strict';
 
   /* ──────────────────────────────────────────────
+     Config (parsed early — avatar system is DOM-only)
+     ────────────────────────────────────────────── */
+
+  var configEl = document.getElementById('world-config');
+  if (!configEl) return;
+
+  var config;
+  try {
+    config = JSON.parse(configEl.textContent);
+  } catch (e) {
+    console.error('[SkyyRose World] Invalid config JSON');
+    return;
+  }
+
+  // Avatar easter egg runs regardless of WebGL support
+  buildAvatarHotspot();
+
+  /* ──────────────────────────────────────────────
      Feature Detection
      ────────────────────────────────────────────── */
 
@@ -31,21 +49,6 @@
   }
 
   /* ──────────────────────────────────────────────
-     Config
-     ────────────────────────────────────────────── */
-
-  var configEl = document.getElementById('world-config');
-  if (!configEl) return;
-
-  var config;
-  try {
-    config = JSON.parse(configEl.textContent);
-  } catch (e) {
-    console.error('[SkyyRose World] Invalid config JSON');
-    return;
-  }
-
-  /* ──────────────────────────────────────────────
      Three.js Loader
      ────────────────────────────────────────────── */
 
@@ -60,6 +63,8 @@
   var narrativePanels = [];
   var isInitialized = false;
   var rafId = null;
+
+  var avatarHotspot = null;
 
   // Hide the 2D fallback when 3D takes over
   var fallbackScene = document.querySelector('.immersive-scene');
@@ -564,6 +569,141 @@
 
   function lerp(a, b, t) { return a + (b - a) * t; }
   function smoothstep(t) { return t * t * (3 - 2 * t); }
+
+  /* ──────────────────────────────────────────────
+     SkyyRose Avatar Easter Egg
+     ────────────────────────────────────────────── */
+
+  var AVATAR_STORAGE_KEY = 'skyyrose-found-worlds';
+
+  function getFoundWorlds() {
+    try {
+      var data = JSON.parse(localStorage.getItem(AVATAR_STORAGE_KEY) || '{}');
+      return data;
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveFoundWorld(collection) {
+    var found = getFoundWorlds();
+    found[collection] = true;
+    localStorage.setItem(AVATAR_STORAGE_KEY, JSON.stringify(found));
+    return found;
+  }
+
+  function buildAvatarHotspot() {
+    if (!config.avatar) return;
+    var av = config.avatar;
+    var collection = config.collection;
+
+    // Check if already found
+    var found = getFoundWorlds();
+    if (found[collection]) return;
+
+    // Create clickable overlay positioned by percentage
+    var el = document.createElement('button');
+    el.className = 'avatar-hotspot';
+    el.type = 'button';
+    el.setAttribute('aria-label', 'Hidden SkyyRose mascot');
+    el.style.left = av.x + '%';
+    el.style.top = av.y + '%';
+    el.style.width = av.w + '%';
+    el.style.height = av.h + '%';
+
+    // Sprite image (idle animation handled by CSS)
+    var img = document.createElement('img');
+    img.src = av.sprite;
+    img.alt = '';
+    img.draggable = false;
+    el.appendChild(img);
+
+    el.addEventListener('click', function (e) {
+      e.stopPropagation();
+      onAvatarFound(el, collection);
+    });
+
+    // Attach to a container that covers the viewport
+    // Prefer world-narrative (3D mode) but fall back to immersive-scene (2D mode)
+    var overlay = document.getElementById('world-narrative')
+      || document.querySelector('.immersive-scene');
+    if (overlay) {
+      overlay.appendChild(el);
+    }
+
+    avatarHotspot = el;
+  }
+
+  function onAvatarFound(el, collection) {
+    // Animate the avatar
+    el.classList.add('avatar-found');
+
+    // Show toast
+    showAvatarToast();
+
+    // Save to localStorage
+    var found = saveFoundWorld(collection);
+    var totalFound = Object.keys(found).length;
+
+    // Remove hotspot after animation
+    setTimeout(function () {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 2000);
+
+    // Check if all 3 found
+    if (totalFound >= 3) {
+      setTimeout(showAvatarIntro, 2500);
+    }
+  }
+
+  function showAvatarToast() {
+    var toast = document.createElement('div');
+    toast.className = 'avatar-toast';
+    toast.innerHTML = '<span class="avatar-toast-icon">&#10024;</span> You found SkyyRose!';
+    document.body.appendChild(toast);
+
+    // Force reflow then animate in
+    toast.offsetHeight; // eslint-disable-line no-unused-expressions
+    toast.classList.add('avatar-toast-visible');
+
+    setTimeout(function () {
+      toast.classList.remove('avatar-toast-visible');
+      setTimeout(function () {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 500);
+    }, 3000);
+  }
+
+  function showAvatarIntro() {
+    var overlay = document.createElement('div');
+    overlay.className = 'avatar-intro-overlay';
+
+    var mascotUrl = config.avatar && config.avatar.introImage
+      ? config.avatar.introImage
+      : (config.avatar ? config.avatar.sprite : '');
+
+    overlay.innerHTML =
+      '<div class="avatar-intro-content">' +
+        '<img class="avatar-intro-mascot" src="' + mascotUrl + '" alt="SkyyRose mascot">' +
+        '<h2 class="avatar-intro-title">Hi! I\'m SkyyRose!</h2>' +
+        '<p class="avatar-intro-text">You found me in all three worlds!</p>' +
+        '<p class="avatar-intro-tagline">Luxury Grows from Concrete.</p>' +
+        '<button class="avatar-intro-close" type="button">Continue Exploring</button>' +
+      '</div>';
+
+    document.body.appendChild(overlay);
+
+    // Force reflow
+    overlay.offsetHeight; // eslint-disable-line no-unused-expressions
+    overlay.classList.add('avatar-intro-visible');
+
+    overlay.querySelector('.avatar-intro-close').addEventListener('click', function () {
+      overlay.classList.remove('avatar-intro-visible');
+      setTimeout(function () {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      }, 600);
+    });
+  }
 
   /* ──────────────────────────────────────────────
      Cleanup
