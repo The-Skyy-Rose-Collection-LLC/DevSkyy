@@ -145,7 +145,7 @@ Plans:
 - [ ] **Phase 9: Collection & Product Data** - Fix hero banners, product-to-collection assignments, and pre-order separation
 - [x] **Phase 10: Accessibility HTML & ARIA** - Fix all HTML validation and ARIA errors in theme templates and enqueue (completed 2026-03-11)
 - [x] **Phase 11: Color Contrast** - Bring all text to WCAG AA contrast ratios and fix price display (completed 2026-03-11)
-- [ ] **Phase 12: Responsive & Typography** - Fix font scaling, layout overflow, touch targets, and type hierarchy across devices
+- [x] **Phase 12: Responsive & Typography** - Fix font scaling, layout overflow, touch targets, and type hierarchy across devices (completed 2026-03-11)
 - [ ] **Phase 13: Luxury Cursor** - Fix z-index conflicts with modals and conditional loading
 
 ## Phase Details
@@ -204,7 +204,7 @@ Plans:
   2. All clickable/tappable elements on mobile are at least 44x44px touch targets
   3. Heading sizes and body text scale smoothly from mobile (320px) through tablet (768px) to desktop (1440px+)
   4. Typography hierarchy (h1 > h2 > h3 > body > small) is visually consistent across all page templates
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 12-01-PLAN.md -- Fix horizontal overflow at 320px and touch targets to 44x44px minimum (RESP-02, RESP-03)
@@ -241,5 +241,5 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13
 | 9. Collection & Product Data | v1.1 | 0/2 | Planned | - |
 | 10. Accessibility HTML & ARIA | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 11. Color Contrast | v1.1 | 2/2 | Complete | 2026-03-11 |
-| 12. Responsive & Typography | 1/2 | In Progress|  | - |
+| 12. Responsive & Typography | 2/2 | Complete   | 2026-03-11 | - |
 | 13. Luxury Cursor | v1.1 | 0/? | Not started | - |
