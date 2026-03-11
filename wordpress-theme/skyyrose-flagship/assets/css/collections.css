@@ -47,7 +47,7 @@
 
 .collection-hero__desc {
 	font-size: 1rem;
-	color: rgba(255, 255, 255, 0.5);
+	color: rgba(255, 255, 255, 0.65);
 	max-width: 600px;
 	margin: 0 auto 1.5rem;
 	line-height: 1.7;
@@ -58,7 +58,7 @@
 	font-weight: 500;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.35);
+	color: rgba(255, 255, 255, 0.60);
 }
 
 /* ==================================================
@@ -209,7 +209,7 @@
 	font-weight: 500;
 	letter-spacing: 0.15em;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.5);
+	color: rgba(255, 255, 255, 0.65);
 	margin: 0 0 0.35rem;
 }
 
@@ -224,7 +224,7 @@
 
 .product-card__desc {
 	font-size: 0.78rem;
-	color: rgba(255, 255, 255, 0.4);
+	color: rgba(255, 255, 255, 0.65);
 	line-height: 1.5;
 	margin: 0 0 0.5rem;
 	display: -webkit-box;
@@ -253,7 +253,7 @@
 
 .collection-story__text {
 	font-size: 1rem;
-	color: rgba(255, 255, 255, 0.5);
+	color: rgba(255, 255, 255, 0.65);
 	line-height: 1.8;
 }
 
@@ -269,7 +269,7 @@
 
 .immersive-cta__text {
 	font-size: 0.85rem;
-	color: rgba(255, 255, 255, 0.45);
+	color: rgba(255, 255, 255, 0.65);
 	margin: 0 0 1.25rem;
 }
 
@@ -324,7 +324,7 @@
 
 .cross-collection-card__count {
 	font-size: 0.7rem;
-	color: rgba(255, 255, 255, 0.35);
+	color: rgba(255, 255, 255, 0.60);
 	letter-spacing: 0.08em;
 }
 
@@ -496,7 +496,7 @@
 
 .collections-card__tagline {
 	font-size: 0.8rem;
-	color: rgba(255, 255, 255, 0.4);
+	color: rgba(255, 255, 255, 0.65);
 	margin: 0 0 0.5rem;
 	line-height: 1.5;
 }
@@ -507,7 +507,7 @@
 	font-weight: 500;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.35);
+	color: rgba(255, 255, 255, 0.60);
 	margin: 0 0 0.75rem;
 }
 

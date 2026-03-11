@@ -127,7 +127,7 @@
 	font-style: italic;
 	font-size: clamp(16px, 2.2vw, 26px);
 	font-weight: 300;
-	color: rgba(255, 255, 255, .45);
+	color: rgba(255, 255, 255, .65);
 	margin-top: 20px;
 	max-width: 500px;
 	line-height: 1.7;
@@ -336,7 +336,7 @@
 	font-size: 10px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
-	color: #666;
+	color: #8A8A8A;
 }
 
 .col-feat__col {
@@ -441,7 +441,7 @@
 	font-size: 11px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
-	color: #555;
+	color: #8A8A8A;
 	margin-right: 8px;
 }
 
@@ -482,7 +482,7 @@
 .col-toolbar__currency {
 	font-family: 'Space Mono', monospace;
 	font-size: 10px;
-	color: #555;
+	color: #8A8A8A;
 }
 
 .col-toolbar__input {
@@ -504,10 +504,10 @@
 	outline: none;
 }
 
-.col-toolbar__input::placeholder { color: #444; }
+.col-toolbar__input::placeholder { color: #767676; }
 
 .col-toolbar__dash {
-	color: #444;
+	color: #767676;
 	font-size: 11px;
 }
 
@@ -522,7 +522,7 @@
 	font-family: 'Space Mono', monospace;
 	font-size: 11px;
 	letter-spacing: 2px;
-	color: #666;
+	color: #8A8A8A;
 	transition: color .3s;
 }
 
@@ -697,7 +697,7 @@
 	font-size: 10px;
 	letter-spacing: 2px;
 	text-transform: uppercase;
-	color: #555;
+	color: #8A8A8A;
 	padding: 4px 10px;
 	background: rgba(var(--col-accent-rgb, 192, 192, 192), .03);
 	border: 1px solid rgba(var(--col-accent-rgb, 192, 192, 192), .04);
@@ -828,7 +828,6 @@
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--col-accent, #C0C0C0);
-	opacity: .4;
 	margin-bottom: 24px;
 }
 
