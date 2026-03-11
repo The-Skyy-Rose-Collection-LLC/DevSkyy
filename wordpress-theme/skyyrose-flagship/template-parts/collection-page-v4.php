@@ -64,11 +64,16 @@ if ( function_exists( 'wc_get_products' ) ) {
 	if ( ! empty( $wc_results ) ) {
 		foreach ( $wc_results as $wc_p ) {
 			$price = (float) $wc_p->get_price();
-			if ( $price < $min_price ) {
-				$min_price = $price;
-			}
-			if ( $price > $max_price ) {
-				$max_price = $price;
+			$is_wc_preorder = '1' === get_post_meta( $wc_p->get_id(), '_is_preorder', true );
+
+			// Skip $0 pre-order prices from range calculation.
+			if ( ! $is_wc_preorder || $price > 0 ) {
+				if ( $price < $min_price ) {
+					$min_price = $price;
+				}
+				if ( $price > $max_price ) {
+					$max_price = $price;
+				}
 			}
 
 			$sizes_attr = $wc_p->get_attribute( 'pa_size' );
