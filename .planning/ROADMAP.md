@@ -189,10 +189,11 @@ Plans:
   2. Small text (10-12px) on interactive cards meets 4.5:1 minimum contrast ratio
   3. Love Hurts pre-order products display "Pre-Order" instead of "$0.00" pricing
   4. Running a contrast checker tool on any page produces zero AA failures for text elements
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 11-01: TBD
+- [ ] 11-01-PLAN.md -- Fix WCAG AA contrast in collection-v4, interactive-cards, and collections CSS (CNTR-01, CNTR-02, CNTR-03)
+- [ ] 11-02-PLAN.md -- Replace $0 pricing with Pre-Order label for pre-order products (CNTR-04)
 
 ### Phase 12: Responsive & Typography
 **Goal**: The site looks and works correctly across all screen sizes from 320px mobile to desktop
@@ -238,6 +239,6 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13
 | 8. Deploy Verification & Orchestration | v1.0 | 2/2 | Complete | 2026-03-10 |
 | 9. Collection & Product Data | v1.1 | 0/2 | Planned | - |
 | 10. Accessibility HTML & ARIA | 2/2 | Complete    | 2026-03-11 | - |
-| 11. Color Contrast | v1.1 | 0/? | Not started | - |
+| 11. Color Contrast | v1.1 | 0/2 | Planned | - |
 | 12. Responsive & Typography | v1.1 | 0/? | Not started | - |
 | 13. Luxury Cursor | v1.1 | 0/? | Not started | - |
