@@ -144,28 +144,31 @@ verify_page() {
         full_url="${url}?_verify=${TIMESTAMP}"
     fi
 
-    # Fetch page with retry support
-    local response http_code body
-    response=$(curl -sSL -w "\n%{http_code}" \
+    # Fetch page with retry support (use temp file to avoid echo/pipe size issues)
+    local tmpfile http_code
+    tmpfile=$(mktemp)
+    http_code=$(curl -sSL -o "$tmpfile" -w "%{http_code}" \
         --connect-timeout 10 --max-time 30 \
         --retry 2 --retry-delay 3 \
-        "$full_url" 2>/dev/null || echo -e "\n000")
-    http_code=$(echo "$response" | tail -n1)
-    body=$(echo "$response" | sed '$d')
+        "$full_url" 2>/dev/null || echo "000")
 
     # Check HTTP status
     if [[ "$http_code" -ne 200 ]]; then
         log_error "$name: HTTP $http_code (expected 200) -- $full_url"
+        rm -f "$tmpfile"
         FAILURES=$((FAILURES + 1))
         return 1
     fi
 
-    # Check content marker (case-insensitive)
-    if ! echo "$body" | grep -qi "$marker"; then
+    # Check content marker (case-insensitive) directly on file
+    if ! grep -qi "$marker" "$tmpfile"; then
         log_error "$name: Content marker '$marker' not found -- $full_url"
+        rm -f "$tmpfile"
         FAILURES=$((FAILURES + 1))
         return 1
     fi
+
+    rm -f "$tmpfile"
 
     log_success "$name: HTTP 200 + content verified"
     return 0
