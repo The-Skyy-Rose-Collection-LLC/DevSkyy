@@ -225,7 +225,7 @@
 .sr-info-price ins { text-decoration: none; }
 
 .sr-info-desc {
-    font-size: 17px;
+    font-size: var(--text-base);
     font-weight: 300;
     font-style: italic;
     color: var(--sr-dim);
@@ -527,7 +527,7 @@
     overflow: hidden;
     transition: max-height .5s cubic-bezier(.16, 1, .3, 1), padding .5s;
     padding: 0 0;
-    font-size: 15px;
+    font-size: var(--text-sm);
     font-weight: 300;
     font-style: italic;
     color: var(--sr-dim);
@@ -686,14 +686,14 @@
 
 .sr-related-name {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 16px;
+    font-size: var(--text-base);
     letter-spacing: 3px;
     margin-bottom: 8px;
 }
 
 .sr-related-price {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
+    font-size: var(--text-xl);
     letter-spacing: 3px;
     color: var(--sr-accent);
 }
@@ -735,7 +735,7 @@
 }
 
 .sr-cta-tagline {
-    font-size: 17px;
+    font-size: var(--text-base);
     font-style: italic;
     font-weight: 300;
     color: var(--sr-dim);
@@ -792,13 +792,13 @@
 
 .sr-sticky-name {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 16px;
+    font-size: var(--text-base);
     letter-spacing: 4px;
 }
 
 .sr-sticky-price {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
+    font-size: var(--text-lg);
     letter-spacing: 3px;
     color: var(--sr-accent);
     margin-left: 16px;
@@ -1082,7 +1082,7 @@
 
 .sr-rv-price {
     font-family: var(--fm, 'Space Mono', monospace);
-    font-size: 15px;
+    font-size: var(--text-sm);
     color: var(--sr-accent, #B76E79);
 }
 
