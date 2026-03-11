@@ -170,7 +170,7 @@
 .ipc__actions {
 	position: absolute;
 	top: 52px;
-	right: 14px;
+	right: 10px;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
@@ -185,8 +185,8 @@
 
 .ipc__wishlist,
 .ipc__share {
-	width: 36px;
-	height: 36px;
+	width: 44px;
+	height: 44px;
 	border-radius: 50%;
 	background: rgba(0, 0, 0, 0.5);
 	-webkit-backdrop-filter: blur(8px);
@@ -252,8 +252,8 @@
 }
 
 .ipc__size-pill {
-	min-width: 36px;
-	height: 32px;
+	min-width: 44px;
+	min-height: 44px;
 	border: 1px solid rgba(255, 255, 255, 0.15);
 	border-radius: 6px;
 	background: transparent;
@@ -263,6 +263,9 @@
 	cursor: pointer;
 	padding: 0 10px;
 	transition: all 0.2s;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .ipc__size-pill:hover {
