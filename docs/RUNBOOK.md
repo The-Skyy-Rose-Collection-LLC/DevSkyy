@@ -101,6 +101,12 @@ Entry point: `main_enterprise.py` — `uvicorn main_enterprise:app --host 0.0.0.
 **Symptom**: SFTP deploy hangs or fails authentication.
 **Fix**: Ensure `sshpass` is installed (`brew install hudochenkov/sshpass/sshpass`).
 
+### Product Routing Goes to Pre-Order for Everything
+
+**Symptom**: All product links go to `/pre-order/` instead of collection pages.
+**Cause**: `skyyrose_product_url()` fallback routes to pre-order when WooCommerce doesn't have the product.
+**Fix**: Verify `is_preorder` flags in `inc/product-catalog.php`. Non-preorder products should have `'is_preorder' => false`. The function checks this flag before routing.
+
 ## Rollback Procedures
 
 ### Vercel

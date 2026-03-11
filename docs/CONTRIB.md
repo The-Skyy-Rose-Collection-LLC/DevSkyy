@@ -54,21 +54,31 @@ npm run type-check            # TypeScript OK
 | Command | Description |
 |---------|-------------|
 | `npm run build` | TypeScript compilation |
+| `npm run build:watch` | TypeScript compilation (watch mode) |
 | `npm run dev` | Dev server with nodemon |
 | `npm run start` | Production server |
 | `npm run test` | Jest test suite |
+| `npm run test:watch` | Jest in watch mode |
 | `npm run test:coverage` | Jest with coverage |
 | `npm run test:ci` | CI mode (no watch, coverage) |
 | `npm run lint` | ESLint |
 | `npm run lint:fix` | ESLint with auto-fix |
-| `npm run format` | Prettier |
+| `npm run format` | Prettier (write) |
+| `npm run format:check` | Prettier (check only) |
 | `npm run type-check` | TypeScript type checking |
 | `npm run clean` | Remove dist/ and coverage/ |
+| `npm run prepare` | Husky setup + build (runs on `npm install`) |
+| `npm run precommit` | lint + type-check + test:ci |
 | `npm run security:audit` | `npm audit` |
+| `npm run security:fix` | `npm audit fix` |
 | `npm run deps:check` | `npm outdated` |
+| `npm run deps:update` | `npm update` |
+| `npm run demo:collections` | List all available 3D demos |
 | `npm run demo:black-rose` | Launch Black Rose 3D demo |
 | `npm run demo:signature` | Launch Signature 3D demo |
 | `npm run demo:love-hurts` | Launch Love Hurts 3D demo |
+| `npm run demo:showroom` | Launch Showroom 3D experience |
+| `npm run demo:runway` | Launch Runway 3D experience |
 | `npm run test:collections` | Test collection experiences |
 
 ## Environment Variables
@@ -84,11 +94,27 @@ Copy `.env.example` and fill in values. Required variables by category:
 | `ANTHROPIC_API_KEY` | Optional | Anthropic API access |
 | `GOOGLE_AI_API_KEY` | Optional | Google AI API access |
 | `STRIPE_API_KEY` | Optional | Stripe payments |
+| `STRIPE_WEBHOOK_SECRET` | Optional | Stripe webhook verification |
 | `HF_TOKEN` | Optional | HuggingFace inference/datasets |
+| `TRIPO_API_KEY` | Optional | Tripo3D 3D asset generation |
+| `FASHN_API_KEY` | Optional | FASHN virtual try-on |
 | `WORDPRESS_URL` | Optional | WordPress site URL |
-| `WOOCOMMERCE_KEY` | Optional | WooCommerce REST API |
+| `WOOCOMMERCE_KEY` | Optional | WooCommerce REST API consumer key |
+| `WOOCOMMERCE_SECRET` | Optional | WooCommerce REST API consumer secret |
+| `KLAVIYO_PRIVATE_KEY` | Optional | Klaviyo email marketing |
 | `REDIS_URL` | Optional | Redis caching |
 | `SENTRY_DSN` | Optional | Error monitoring |
+| `RATE_LIMIT_REQUESTS` | Optional | Requests per window (default: 100) |
+| `RATE_LIMIT_WINDOW_SECONDS` | Optional | Rate limit window (default: 60s) |
+
+**Frontend** (in `frontend/.env.local`, copy from `frontend/.env.example`):
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `NEXT_PUBLIC_API_URL` | Yes | Backend API URL |
+| `NEXT_PUBLIC_WS_URL` | Yes | WebSocket URL |
+| `NEXTAUTH_SECRET` | Yes | NextAuth session secret |
+| `NEXT_PUBLIC_WORDPRESS_URL` | Optional | WordPress for WooCommerce integration |
 
 Generate secrets:
 ```bash
