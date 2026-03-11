@@ -442,6 +442,7 @@ function skyyrose_get_current_template_slug() {
 			'template-landing-love-hurts.php'      => 'landing',
 			'template-landing-signature.php'       => 'landing',
 			'template-experiences.php'             => 'experiences',
+			'template-spatial-home.php'            => 'spatial-home',
 			'template-collections.php'             => 'collection',
 		);
 
@@ -488,8 +489,9 @@ function skyyrose_enqueue_template_styles() {
 		'front-page'      => 'homepage-v2.css',
 		'collection'      => 'collections.css',
 		'collection-v4'   => 'collection-v4.css',
-				'immersive'       => 'immersive.css',
+		'immersive'       => 'immersive.css',
 		'experiences'     => 'immersive.css',
+		'spatial-home'    => 'spatial-home.css',
 		'single-product'  => 'single-product.css',
 		'cart'            => 'woocommerce.css',
 		'checkout'        => 'woocommerce.css',
