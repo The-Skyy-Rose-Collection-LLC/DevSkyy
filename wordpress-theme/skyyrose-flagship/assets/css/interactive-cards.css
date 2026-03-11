@@ -333,7 +333,7 @@
 
 .ipc__title {
 	font-family: 'Cormorant Garamond', serif;
-	font-size: 16px;
+	font-size: var(--text-base);
 	font-weight: 500;
 	color: #e0e0e0;
 	margin: 0 0 4px;
@@ -471,7 +471,7 @@
 
 .prc__tease {
 	font-family: 'Cormorant Garamond', serif;
-	font-size: 14px;
+	font-size: var(--text-sm);
 	color: rgba(255, 255, 255, 0.75);
 	font-style: italic;
 	margin: 8px 0 0;
@@ -516,7 +516,7 @@
 
 .prc__title {
 	font-family: 'Cormorant Garamond', serif;
-	font-size: 18px;
+	font-size: var(--text-lg);
 	font-weight: 500;
 	color: #e0e0e0;
 	margin: 0 0 6px;
@@ -537,7 +537,7 @@
 
 .prc__desc {
 	font-family: 'Cormorant Garamond', serif;
-	font-size: 13px;
+	font-size: var(--text-xs);
 	color: #888;
 	line-height: 1.5;
 	margin: 0 0 12px;

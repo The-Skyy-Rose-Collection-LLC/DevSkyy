@@ -46,7 +46,7 @@
 }
 
 .collection-hero__desc {
-	font-size: 1rem;
+	font-size: var(--text-base);
 	color: rgba(255, 255, 255, 0.65);
 	max-width: 600px;
 	margin: 0 auto 1.5rem;
@@ -215,7 +215,7 @@
 
 .product-card__name {
 	font-family: var(--font-heading, 'Playfair Display', serif);
-	font-size: 1rem;
+	font-size: var(--text-base);
 	font-weight: 600;
 	color: #fff;
 	margin: 0 0 0.25rem;
@@ -223,7 +223,7 @@
 }
 
 .product-card__desc {
-	font-size: 0.78rem;
+	font-size: var(--text-xs);
 	color: rgba(255, 255, 255, 0.65);
 	line-height: 1.5;
 	margin: 0 0 0.5rem;
@@ -234,7 +234,7 @@
 }
 
 .product-card__price {
-	font-size: 0.95rem;
+	font-size: var(--text-sm);
 	font-weight: 600;
 	color: var(--collection-accent, var(--color-rose-gold, #B76E79));
 	margin: 0;
@@ -252,7 +252,7 @@
 }
 
 .collection-story__text {
-	font-size: 1rem;
+	font-size: var(--text-base);
 	color: rgba(255, 255, 255, 0.65);
 	line-height: 1.8;
 }
@@ -268,7 +268,7 @@
 }
 
 .immersive-cta__text {
-	font-size: 0.85rem;
+	font-size: var(--text-xs);
 	color: rgba(255, 255, 255, 0.65);
 	margin: 0 0 1.25rem;
 }
@@ -284,7 +284,7 @@
 .cross-collection-nav__title {
 	text-align: center;
 	font-family: var(--font-heading, 'Playfair Display', serif);
-	font-size: 1.5rem;
+	font-size: var(--text-xl);
 	color: #fff;
 	margin: 0 0 2rem;
 }
@@ -317,7 +317,7 @@
 
 .cross-collection-card__name {
 	font-family: var(--font-heading, 'Playfair Display', serif);
-	font-size: 1rem;
+	font-size: var(--text-base);
 	color: #fff;
 	margin: 0 0 0.25rem;
 }
@@ -488,14 +488,14 @@
 
 .collections-card__name {
 	font-family: var(--font-heading, 'Playfair Display', serif);
-	font-size: 1.1rem;
+	font-size: var(--text-lg);
 	font-weight: 600;
 	color: #fff;
 	margin: 0 0 0.35rem;
 }
 
 .collections-card__tagline {
-	font-size: 0.8rem;
+	font-size: var(--text-xs);
 	color: rgba(255, 255, 255, 0.65);
 	margin: 0 0 0.5rem;
 	line-height: 1.5;

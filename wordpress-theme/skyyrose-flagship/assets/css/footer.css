@@ -32,7 +32,7 @@
 }
 
 .footer-newsletter__text {
-	font-size: 0.875rem;
+	font-size: var(--text-sm);
 	color: rgba(255, 255, 255, 0.5);
 	margin: 0;
 }
@@ -58,7 +58,7 @@
 	border: none;
 	outline: none;
 	font-family: var(--font-body, 'Inter', sans-serif);
-	font-size: 0.875rem;
+	font-size: var(--text-sm);
 	color: #fff;
 }
 
@@ -118,7 +118,7 @@
 .footer-grid__list li { margin-bottom: 0.625rem; }
 
 .footer-grid__list a {
-	font-size: 0.875rem;
+	font-size: var(--text-sm);
 	color: rgba(255, 255, 255, 0.4);
 	text-decoration: none;
 	transition: color 0.2s ease;
@@ -158,7 +158,7 @@
 }
 
 .footer-brand__description {
-	font-size: 0.8125rem;
+	font-size: var(--text-xs);
 	color: rgba(255, 255, 255, 0.35);
 	line-height: 1.6;
 	margin: 0 0 1.25rem;
@@ -200,7 +200,7 @@
 }
 
 .footer-copyright__text {
-	font-size: 0.8125rem;
+	font-size: var(--text-xs);
 	color: rgba(255, 255, 255, 0.5);
 	margin: 0;
 }
