@@ -1240,6 +1240,20 @@
 	.ft-bottom { flex-direction: column; text-align: center; }
 	.nl-form { flex-direction: column; }
 	.nl-input { border-right: 1px solid var(--glass); border-bottom: none; margin-bottom: -1px; }
+	.homepage-v2 .col-header { padding: 0 16px; }
+	.homepage-v2 .lookbook-header { padding: 0 16px; }
+}
+
+@media (max-width: 480px) {
+	.homepage-v2 .nav { padding: 16px 16px; }
+	.homepage-v2 .nav.scrolled { padding: 12px 16px; }
+	.homepage-v2 .story { padding: 60px 16px; }
+	.homepage-v2 .quote-section { padding: 60px 16px; }
+	.homepage-v2 .craft { padding: 60px 16px; }
+	.homepage-v2 .newsletter { padding: 60px 16px; }
+	.homepage-v2 .ft { padding: 48px 16px 24px; }
+	.homepage-v2 .press { padding: 24px 16px; }
+	.homepage-v2 .back-to-top { width: 44px; height: 44px; }
 }
 
 /* ─── BONUS: Scroll Progress Indicator ─── */
