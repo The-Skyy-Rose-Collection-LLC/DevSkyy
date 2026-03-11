@@ -46,6 +46,8 @@ $skyyrose_core_includes = array(
 	'/inc/product-catalog.php',
 	'/inc/interactive-grid.php',
 	'/inc/enqueue.php',
+	'/inc/enqueue-features.php',
+	'/inc/enqueue-performance.php',
 	'/inc/enqueue-engines.php',
 	'/inc/customizer.php',
 	'/inc/template-functions.php',
