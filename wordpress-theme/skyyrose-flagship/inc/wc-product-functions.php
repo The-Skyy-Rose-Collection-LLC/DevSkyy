@@ -234,7 +234,9 @@ function skyyrose_save_product_meta_fields( $post_id ) {
 
 	foreach ( $fields as $field ) {
 		if ( isset( $_POST[ $field ] ) ) {
-			update_post_meta( $post_id, $field, sanitize_text_field( wp_unslash( $_POST[ $field ] ) ) );
+			// Care instructions is a textarea — preserve line breaks.
+			$sanitizer = ( '_skyyrose_care' === $field ) ? 'sanitize_textarea_field' : 'sanitize_text_field';
+			update_post_meta( $post_id, $field, $sanitizer( wp_unslash( $_POST[ $field ] ) ) );
 		}
 	}
 }

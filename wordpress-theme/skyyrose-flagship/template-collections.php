@@ -21,7 +21,7 @@ $collections = array(
 		'accent'  => '#C0C0C0',
 		'image'   => SKYYROSE_ASSETS_URI . '/scenes/black-rose/black-rose-rooftop-garden-v2.webp',
 		'class'   => 'collection--black-rose',
-		'skus'    => array( 'br-001', 'br-002', 'br-003', 'br-004', 'br-005', 'br-006', 'br-007', 'br-008' ),
+		'skus'    => array( 'br-001', 'br-002', 'br-003', 'br-004', 'br-005', 'br-006', 'br-007', 'br-008', 'br-009', 'br-010', 'br-011' ),
 	),
 	array(
 		'slug'    => 'collection-love-hurts',
@@ -30,7 +30,7 @@ $collections = array(
 		'accent'  => '#DC143C',
 		'image'   => SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-cathedral-rose-chamber-v2.webp',
 		'class'   => 'collection--love-hurts',
-		'skus'    => array( 'lh-001', 'lh-002', 'lh-003', 'lh-004', 'lh-005' ),
+		'skus'    => array( 'lh-002', 'lh-003', 'lh-004', 'lh-005', 'lh-006' ),
 	),
 	array(
 		'slug'    => 'collection-signature',
@@ -39,7 +39,7 @@ $collections = array(
 		'accent'  => '#B76E79',
 		'image'   => SKYYROSE_ASSETS_URI . '/scenes/signature/signature-golden-gate-showroom-v2.webp',
 		'class'   => 'collection--signature',
-		'skus'    => array( 'sg-001', 'sg-002', 'sg-003', 'sg-004', 'sg-005', 'sg-006', 'sg-007', 'sg-008', 'sg-009', 'sg-010', 'sg-011', 'sg-012' ),
+		'skus'    => array( 'sg-001', 'sg-002', 'sg-003', 'sg-004', 'sg-005', 'sg-006', 'sg-007', 'sg-009', 'sg-010', 'sg-011', 'sg-012', 'sg-013', 'sg-014' ),
 	),
 	array(
 		'slug'    => 'collection-kids-capsule',
@@ -48,7 +48,7 @@ $collections = array(
 		'accent'  => '#FFB6C1',
 		'image'   => get_template_directory_uri() . '/assets/branding/kids-capsule-preview.webp',
 		'class'   => 'collection--kids-capsule',
-		'skus'    => array(),
+		'skus'    => array( 'kids-001', 'kids-002' ),
 	),
 );
 ?>
