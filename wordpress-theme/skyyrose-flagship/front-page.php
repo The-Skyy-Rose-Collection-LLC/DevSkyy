@@ -322,7 +322,7 @@ $organization_schema = array(
 <script type="application/ld+json"><?php echo wp_json_encode( $organization_schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT ); ?></script>
 
 <!-- Back-to-top button -->
-<button class="back-to-top" aria-label="<?php esc_attr_e( 'Back to top', 'skyyrose-flagship' ); ?>">
+<button type="button" class="back-to-top" aria-label="<?php esc_attr_e( 'Back to top', 'skyyrose-flagship' ); ?>">
 	<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-8 8h5v8h6v-8h5z"/></svg>
 </button>
 

@@ -143,7 +143,7 @@ while ( have_posts() ) :
 					<?php if ( ! empty( $gallery_ids ) ) : ?>
 						<div class="sr-gallery-thumbs">
 							<?php if ( $main_image ) : ?>
-								<button class="sr-thumb sr-thumb-active" data-img="<?php echo esc_url( $main_image ); ?>"
+								<button type="button" class="sr-thumb sr-thumb-active" data-img="<?php echo esc_url( $main_image ); ?>"
 								        aria-label="<?php esc_attr_e( 'Main product image', 'skyyrose-flagship' ); ?>">
 									<img src="<?php echo esc_url( $main_image ); ?>" alt="<?php echo esc_attr( $product->get_name() . ' — main view' ); ?>" loading="lazy">
 								</button>
@@ -157,7 +157,7 @@ while ( have_posts() ) :
 								}
 								$sr_galt = wp_get_attachment_caption( $gid ) ?: ( $product->get_name() . ' — view ' . $sr_thumb_idx );
 							?>
-								<button class="sr-thumb" data-img="<?php echo esc_url( $gurl ); ?>"
+								<button type="button" class="sr-thumb" data-img="<?php echo esc_url( $gurl ); ?>"
 								        aria-label="<?php printf( esc_attr__( 'View image %d', 'skyyrose-flagship' ), $sr_thumb_idx ); ?>">
 									<img src="<?php echo esc_url( $gurl ); ?>" alt="<?php echo esc_attr( $sr_galt ); ?>" loading="lazy">
 								</button>
@@ -296,7 +296,7 @@ while ( have_posts() ) :
 					<!-- Full Description -->
 					<?php if ( $product->get_description() ) : ?>
 						<div class="sr-accordion" data-accordion>
-							<button class="sr-accordion-trigger" aria-expanded="true">
+							<button type="button" class="sr-accordion-trigger" aria-expanded="true">
 								<span><?php esc_html_e( 'Description', 'skyyrose-flagship' ); ?></span>
 								<span class="sr-accordion-icon">&minus;</span>
 							</button>
@@ -309,7 +309,7 @@ while ( have_posts() ) :
 					<!-- Materials & Care -->
 					<?php if ( $meta['material'] || $meta['care'] || $meta['made_in'] ) : ?>
 						<div class="sr-accordion" data-accordion>
-							<button class="sr-accordion-trigger" aria-expanded="false">
+							<button type="button" class="sr-accordion-trigger" aria-expanded="false">
 								<span><?php esc_html_e( 'Materials & Care', 'skyyrose-flagship' ); ?></span>
 								<span class="sr-accordion-icon">+</span>
 							</button>
@@ -329,7 +329,7 @@ while ( have_posts() ) :
 
 					<!-- Size Guide -->
 					<div class="sr-accordion" data-accordion>
-						<button class="sr-accordion-trigger" aria-expanded="false">
+						<button type="button" class="sr-accordion-trigger" aria-expanded="false">
 							<span><?php esc_html_e( 'Size Guide', 'skyyrose-flagship' ); ?></span>
 							<span class="sr-accordion-icon">+</span>
 						</button>
@@ -347,7 +347,7 @@ while ( have_posts() ) :
 
 					<!-- Shipping & Returns -->
 					<div class="sr-accordion" data-accordion>
-						<button class="sr-accordion-trigger" aria-expanded="false">
+						<button type="button" class="sr-accordion-trigger" aria-expanded="false">
 							<span><?php esc_html_e( 'Shipping & Returns', 'skyyrose-flagship' ); ?></span>
 							<span class="sr-accordion-icon">+</span>
 						</button>

@@ -21,7 +21,7 @@ $skyyrose_ambassador_avatar = esc_url( SKYYROSE_ASSETS_URI . '/images/avatar/sky
 <div class="sr-ambassador" id="sr-ambassador" aria-label="<?php esc_attr_e( 'Chat with Skyy Rose', 'skyyrose-flagship' ); ?>">
 
 	<!-- Floating Avatar Button -->
-	<button class="sr-ambassador__fab" id="sr-ambassador-fab"
+	<button type="button" class="sr-ambassador__fab" id="sr-ambassador-fab"
 	        aria-expanded="false"
 	        aria-controls="sr-ambassador-panel"
 	        aria-label="<?php esc_attr_e( 'Open chat with Skyy Rose, our brand ambassador', 'skyyrose-flagship' ); ?>">
@@ -35,7 +35,7 @@ $skyyrose_ambassador_avatar = esc_url( SKYYROSE_ASSETS_URI . '/images/avatar/sky
 	<!-- Greeting Bubble (auto-shows after delay) -->
 	<div class="sr-ambassador__greeting" id="sr-ambassador-greeting" role="status" aria-live="polite">
 		<?php esc_html_e( 'Hey! Need help finding your style?', 'skyyrose-flagship' ); ?>
-		<button class="sr-ambassador__greeting-close" aria-label="<?php esc_attr_e( 'Dismiss', 'skyyrose-flagship' ); ?>">&times;</button>
+		<button type="button" class="sr-ambassador__greeting-close" aria-label="<?php esc_attr_e( 'Dismiss', 'skyyrose-flagship' ); ?>">&times;</button>
 	</div>
 
 	<!-- Chat Panel -->
@@ -53,7 +53,7 @@ $skyyrose_ambassador_avatar = esc_url( SKYYROSE_ASSETS_URI . '/images/avatar/sky
 				<strong><?php esc_html_e( 'Skyy Rose', 'skyyrose-flagship' ); ?></strong>
 				<span class="sr-ambassador__header-status"><?php esc_html_e( 'Brand Ambassador', 'skyyrose-flagship' ); ?></span>
 			</div>
-			<button class="sr-ambassador__close" id="sr-ambassador-close"
+			<button type="button" class="sr-ambassador__close" id="sr-ambassador-close"
 			        aria-label="<?php esc_attr_e( 'Close chat', 'skyyrose-flagship' ); ?>">&times;</button>
 		</div>
 

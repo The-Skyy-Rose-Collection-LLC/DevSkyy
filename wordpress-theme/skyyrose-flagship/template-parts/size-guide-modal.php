@@ -35,15 +35,15 @@ defined( 'ABSPATH' ) || exit;
 
 		<!-- ====== Category Tabs ====== -->
 		<div class="size-guide-tabs" role="tablist" aria-label="<?php esc_attr_e( 'Size chart categories', 'skyyrose-flagship' ); ?>">
-			<button class="size-guide-tab active" role="tab"
+			<button type="button" class="size-guide-tab active" role="tab"
 			        aria-selected="true" aria-controls="sg-panel-tops" id="sg-tab-tops">
 				<?php esc_html_e( 'Tops', 'skyyrose-flagship' ); ?>
 			</button>
-			<button class="size-guide-tab" role="tab"
+			<button type="button" class="size-guide-tab" role="tab"
 			        aria-selected="false" aria-controls="sg-panel-bottoms" id="sg-tab-bottoms" tabindex="-1">
 				<?php esc_html_e( 'Bottoms', 'skyyrose-flagship' ); ?>
 			</button>
-			<button class="size-guide-tab" role="tab"
+			<button type="button" class="size-guide-tab" role="tab"
 			        aria-selected="false" aria-controls="sg-panel-outerwear" id="sg-tab-outerwear" tabindex="-1">
 				<?php esc_html_e( 'Outerwear', 'skyyrose-flagship' ); ?>
 			</button>
@@ -52,8 +52,8 @@ defined( 'ABSPATH' ) || exit;
 		<!-- ====== Unit Toggle ====== -->
 		<div class="size-guide-unit-toggle" role="radiogroup"
 		     aria-label="<?php esc_attr_e( 'Measurement unit', 'skyyrose-flagship' ); ?>">
-			<button class="size-guide-unit active" role="radio" aria-checked="true" tabindex="0" data-unit="in">IN</button>
-			<button class="size-guide-unit" role="radio" aria-checked="false" tabindex="-1" data-unit="cm">CM</button>
+			<button type="button" class="size-guide-unit active" role="radio" aria-checked="true" tabindex="0" data-unit="in">IN</button>
+			<button type="button" class="size-guide-unit" role="radio" aria-checked="false" tabindex="-1" data-unit="cm">CM</button>
 		</div>
 
 		<!-- ====== Tops Panel ====== -->

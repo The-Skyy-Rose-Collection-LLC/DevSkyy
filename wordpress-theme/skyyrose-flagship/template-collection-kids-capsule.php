@@ -264,7 +264,7 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 			<?php endforeach; ?>
 		</div>
 		<div style="text-align:center; padding:1rem 0 0;">
-			<button class="size-guide-trigger" data-open-size-guide aria-label="<?php esc_attr_e( 'Open size guide', 'skyyrose-flagship' ); ?>">
+			<button type="button" class="size-guide-trigger" data-open-size-guide aria-label="<?php esc_attr_e( 'Open size guide', 'skyyrose-flagship' ); ?>">
 				<svg class="size-guide-trigger__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2v20M18 2v20M6 12h12M6 7h12M6 17h12"/></svg>
 				<?php esc_html_e( 'Size Guide', 'skyyrose-flagship' ); ?>
 			</button>
