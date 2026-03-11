@@ -114,7 +114,7 @@ if ( is_admin() ) {
 }
 
 /*--------------------------------------------------------------
- * Legacy: brand styles enqueue (backward compat, safe to remove later)
+ * Brand Styles: variables, luxury theme, collection colors (priority 5)
  *--------------------------------------------------------------*/
 $skyyrose_brand_styles_path = SKYYROSE_DIR . '/inc/enqueue-brand-styles.php';
 if ( file_exists( $skyyrose_brand_styles_path ) ) {
