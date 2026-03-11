@@ -204,10 +204,11 @@ Plans:
   2. All clickable/tappable elements on mobile are at least 44x44px touch targets
   3. Heading sizes and body text scale smoothly from mobile (320px) through tablet (768px) to desktop (1440px+)
   4. Typography hierarchy (h1 > h2 > h3 > body > small) is visually consistent across all page templates
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 12-01: TBD
+- [ ] 12-01-PLAN.md -- Fix horizontal overflow at 320px and touch targets to 44x44px minimum (RESP-02, RESP-03)
+- [ ] 12-02-PLAN.md -- Replace hardcoded font sizes with clamp()/design tokens and enforce typography hierarchy (RESP-01, RESP-04)
 
 ### Phase 13: Luxury Cursor
 **Goal**: The custom luxury cursor works correctly everywhere including above modals and only loads where needed
@@ -238,7 +239,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13
 | 7. Deploy Core | v1.0 | 1/1 | Complete | 2026-03-09 |
 | 8. Deploy Verification & Orchestration | v1.0 | 2/2 | Complete | 2026-03-10 |
 | 9. Collection & Product Data | v1.1 | 0/2 | Planned | - |
-| 10. Accessibility HTML & ARIA | 2/2 | Complete    | 2026-03-11 | - |
-| 11. Color Contrast | 2/2 | Complete    | 2026-03-11 | - |
-| 12. Responsive & Typography | v1.1 | 0/? | Not started | - |
+| 10. Accessibility HTML & ARIA | v1.1 | 2/2 | Complete | 2026-03-11 |
+| 11. Color Contrast | v1.1 | 2/2 | Complete | 2026-03-11 |
+| 12. Responsive & Typography | v1.1 | 0/2 | Planned | - |
 | 13. Luxury Cursor | v1.1 | 0/? | Not started | - |
