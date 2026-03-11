@@ -53,7 +53,7 @@ RETRY_DELAY_SEC = 5
 # Do NOT add products here that are not in products.csv.
 
 PRODUCT_CATALOG = {
-    # ── Black Rose Collection ──────────────────────────────────────────────
+    # ── Black Rose Collection (11 products) ────────────────────────────────
     # Every entry has explicit source_override to prevent auto-glob picking up
     # AI-generated outputs (*-model-*.webp) as source images (feedback loop).
     # output_slug determines the filename prefix for generated images.
@@ -68,6 +68,7 @@ PRODUCT_CATALOG = {
         "collection": "black-rose",
         "output_slug": "black-rose-joggers",
         "source_override": "black-rose-joggers-source.jpg",
+        "is_preorder": True,
     },
     "br-003": {
         "name": "BLACK is Beautiful Jersey",
@@ -118,65 +119,51 @@ PRODUCT_CATALOG = {
         "is_preorder": True,
     },
     "br-007": {
-        "name": "BLACK Rose × Love Hurts Basketball Shorts",
+        "name": "BLACK Rose x Love Hurts Basketball Shorts",
         "collection": "black-rose",
         "output_slug": "black-rose-love-hurts-basketball-shorts",
         "source_override": "black-rose-love-hurts-basketball-shorts-front-source.jpg",
+        "is_preorder": True,
     },
+    # ── BLACK is Beautiful Jersey Series (exclusive, 80 pcs each) ──────────
     "br-008": {
-        "name": "Women's BLACK Rose Hooded Dress",
+        "name": "BLACK is Beautiful Jersey Series: 1. SF inspired",
         "collection": "black-rose",
-        "output_slug": "womens-black-rose-hooded-dress",
-        # No source photo — existing model renders are the only reference.
-    },
-    # ── Black Rose Pre-Order Jerseys ───────────────────────────────────────
-    "br-d01": {
-        "name": "Black & Teal Hockey Jersey",
-        "collection": "black-rose",
-        "output_slug": "black-is-beautiful-hockey-jersey",
-        "source_override": "black-is-beautiful-hockey-jersey-design.jpg",
+        "output_slug": "bib-jersey-sf-inspired",
         "is_preorder": True,
     },
-    "br-d02": {
-        "name": "Red #80 Football Jersey",
+    "br-009": {
+        "name": "BLACK is Beautiful Jersey Series: 2. LAST OAKLAND",
         "collection": "black-rose",
-        "output_slug": "black-is-beautiful-football-jersey-red",
-        "source_override": "black-is-beautiful-football-jersey-red-design.jpg",
+        "output_slug": "bib-jersey-last-oakland",
         "is_preorder": True,
     },
-    "br-d03": {
-        "name": "White #32 Football Jersey",
+    "br-010": {
+        "name": "BLACK is Beautiful Jersey Series: 3. THE BAY",
         "collection": "black-rose",
-        "output_slug": "black-is-beautiful-football-jersey-white",
-        "source_override": "black-is-beautiful-football-jersey-white-design.jpg",
+        "output_slug": "bib-jersey-the-bay",
         "is_preorder": True,
     },
-    "br-d04": {
-        "name": '"THE BAY" Basketball Tank',
+    "br-011": {
+        "name": "BLACK is Beautiful Jersey Series: 4. THE ROSE (SHARKS EDITION)",
         "collection": "black-rose",
-        "output_slug": "black-is-beautiful-basketball-jersey",
-        "source_override": "black-is-beautiful-basketball-jersey-design.jpg",
+        "output_slug": "bib-jersey-the-rose-sharks",
         "is_preorder": True,
     },
-    # ── Love Hurts Collection ──────────────────────────────────────────────
-    "lh-001": {
-        "name": "The Fannie",
-        "collection": "love-hurts",
-        "output_slug": "the-fannie-pack",
-        "source_override": "the-fannie-pack-photo.jpg",
-        "is_preorder": True,
-    },
+    # ── Love Hurts Collection (5 products) ─────────────────────────────────
     "lh-002": {
         "name": "Love Hurts Joggers",
         "collection": "love-hurts",
         "output_slug": "love-hurts-joggers",
         "source_override": "love-hurts-joggers-techflat.jpeg",
+        "is_preorder": True,
     },
     "lh-003": {
         "name": "Love Hurts Basketball Shorts",
         "collection": "love-hurts",
         "output_slug": "love-hurts-basketball-shorts",
         "source_override": "love-hurts-basketball-shorts-source.jpg",
+        "is_preorder": True,
     },
     "lh-004": {
         "name": "Love Hurts Varsity Jacket",
@@ -184,25 +171,39 @@ PRODUCT_CATALOG = {
         "output_slug": "love-hurts-varsity-jacket",
         "source_override": "love-hurts-varsity-jacket-varsity-source.jpg",
     },
-    # ── Signature Collection ───────────────────────────────────────────────
+    "lh-005": {
+        "name": "Love Hurts Windbreaker",
+        "collection": "love-hurts",
+        "output_slug": "love-hurts-windbreaker",
+        # No source photo yet.
+    },
+    "lh-006": {
+        "name": "The Fannie",
+        "collection": "love-hurts",
+        "output_slug": "the-fannie",
+        "source_override": "the-fannie-pack-photo.jpg",
+        "is_preorder": True,
+    },
+    # ── Signature Collection (13 products) ─────────────────────────────────
     "sg-001": {
-        "name": "The Bay Set",
+        "name": "The Bridge Series 'The Bay Bridge' Shorts",
         "collection": "signature",
         "output_slug": "the-bay-set",
         "source_override": "the-bay-set-source.jpeg",
         "is_preorder": True,
     },
     "sg-002": {
-        "name": "Stay Golden Tee",
+        "name": "The Bridge Series 'Stay Golden' Shirt",
         "collection": "signature",
         "output_slug": "stay-golden-tee",
         "source_override": "stay-golden-tee-techflat-v4.jpg",
+        "is_preorder": True,
     },
     "sg-003": {
-        "name": "Signature Tee (Orchid)",
+        "name": "The Bridge Series 'Stay Golden' Shorts",
         "collection": "signature",
-        "output_slug": "signature-tee-orchid",
-        # No source photo — existing model renders are the only reference.
+        "output_slug": "stay-golden-shorts",
+        "is_preorder": True,
     },
     "sg-004": {
         "name": "The Signature Hoodie",
@@ -211,68 +212,62 @@ PRODUCT_CATALOG = {
         "source_override": "the-signature-hoodie-techflat.jpeg",
     },
     "sg-005": {
-        "name": "Stay Golden Tee (Classic)",
+        "name": "The Bridge Series 'The Bay Bridge' Shirt",
         "collection": "signature",
-        "output_slug": "stay-golden-tee-classic",
-        "source_override": "stay-golden-tee-classic-techflat.jpeg",
+        "output_slug": "bay-bridge-shirt",
+        "is_preorder": True,
     },
     "sg-006": {
         "name": "Mint & Lavender Hoodie",
         "collection": "signature",
         "output_slug": "mint-lavender-hoodie",
         "source_override": "mint-lavender-hoodie-source.jpg",
+        "is_preorder": True,
+    },
+    "sg-007": {
+        "name": "The Signature Beanie",
+        "collection": "signature",
+        "output_slug": "signature-beanie",
+        "is_preorder": True,
     },
     "sg-009": {
         "name": "The Sherpa Jacket",
         "collection": "signature",
         "output_slug": "the-sherpa-jacket",
-        # No source photo — existing model renders are the only reference.
+        "is_preorder": True,
     },
     "sg-010": {
         "name": "The Bridge Series Shorts",
         "collection": "signature",
         "output_slug": "bridge-series-shorts",
         "source_override": "bridge-series-shorts-bridge-shorts-variants.jpg",
+        "is_preorder": True,
     },
     "sg-011": {
         "name": "Original Label Tee (White)",
         "collection": "signature",
         "output_slug": "original-label-tee-white",
-        # No source photo — existing model renders are the only reference.
+        "is_preorder": True,
     },
     "sg-012": {
         "name": "Original Label Tee (Orchid)",
         "collection": "signature",
         "output_slug": "original-label-tee-orchid",
-        # No source photo — existing model renders are the only reference.
-    },
-    # ── Signature Pre-Orders / New ─────────────────────────────────────────
-    "sg-d01": {
-        "name": "Multi-Colored Windbreaker Set",
-        "collection": "signature",
-        "output_slug": "multi-colored-windbreaker-set",
-        "source_override": "multi-colored-windbreaker-set-techflat.jpg",
         "is_preorder": True,
     },
-    "sg-d02": {
-        "name": "Collection Shorts",
+    "sg-013": {
+        "name": "Mint & Lavender Crewneck",
         "collection": "signature",
-        "output_slug": "skyyrose-collection-shorts",
-        "source_override": "skyyrose-collection-shorts-1.jpg",
+        "output_slug": "mint-lavender-crewneck",
+        "is_preorder": True,
     },
-    "sg-d03": {
-        "name": "Mint Rose Crewneck + Jogger Set",
+    "sg-014": {
+        "name": "Mint & Lavender Sweatpants",
         "collection": "signature",
-        "output_slug": "mint-rose-crewneck-jogger-set",
-        "source_override": "mint-rose-crewneck-jogger-set-source.jpg",
+        "output_slug": "mint-lavender-sweatpants",
+        "is_preorder": True,
     },
-    "sg-d04": {
-        "name": "Mint Rose Hooded Dress",
-        "collection": "signature",
-        "output_slug": "mint-rose-hooded-dress",
-        "source_override": "mint-rose-hooded-dress-source.jpg",
-    },
-    # ── Kids Capsule ──────────────────────────────────────────────────────
+    # ── Kids Capsule (2 products) ──────────────────────────────────────────
     "kids-001": {
         "name": "Kids Red Set",
         "collection": "kids-capsule",
@@ -289,7 +284,8 @@ PRODUCT_CATALOG = {
 
 # SKUs that are accessories (not wearable on a model's body)
 ACCESSORY_SKUS = {
-    "lh-001",  # The Fannie (fanny pack)
+    "lh-006",  # The Fannie (fanny pack)
+    "sg-007",  # The Signature Beanie (headwear)
 }
 
 # SKUs with known bad source images — skipped by default.
@@ -306,10 +302,10 @@ TEXT_HEAVY_SKUS = {
     "br-003-oakland",
     "br-003-giants",
     "br-003-white",
-    "br-d01",
-    "br-d02",
-    "br-d03",
-    "br-d04",
+    "br-008",
+    "br-009",
+    "br-010",
+    "br-011",
 }
 
 # -- FLUX.2 via Together AI: tech flat → photorealistic conversion -----------
@@ -321,10 +317,6 @@ TECH_FLAT_SKUS = {
     "br-001",  # Tech flat only (black-rose-crewneck-techflat-v4.jpg)
     "sg-002",  # Tech flat only (stay-golden-tee-techflat-v4.jpg)
     "sg-004",  # Tech flat only (the-signature-hoodie-techflat.jpeg)
-    "sg-005",  # Tech flat only (stay-golden-tee-classic-techflat.jpeg)
-    "sg-d01",  # Tech flat only (multi-colored-windbreaker-set-techflat.jpg)
-    "sg-d03",  # Source photo (mint-rose-crewneck-jogger-set-source.jpg)
-    "sg-d04",  # Source photo (mint-rose-hooded-dress-source.jpg)
 }
 
 # -- Logo treatment metadata (real product material) -------------------------
@@ -336,9 +328,7 @@ LOGO_TREATMENTS = {
     "br-004": "raised rose with shadow depth — hoodie fabric pressed inward along the logo outline, creating dimensional relief where light grazes the elevated petals and thorns",
     "br-005": "raised rose with shadow depth — hoodie fabric pressed inward along the logo outline, creating dimensional relief where light grazes the elevated petals and thorns",
     "br-006": "visible thread texture forming the rose — individual stitch lines catch light at different angles creating a satin sheen, slightly raised above the sherpa pile with thread density creating the logo shape",
-    "sg-003": "flat matte ink sitting on the cotton surface — crisp sharp edges with no texture change, the print is flush with the fabric showing zero dimensionality, colors are solid and opaque",
     "sg-004": "visible thread texture forming the logo — individual stitch lines catch light creating slight sheen, raised ~1mm above the hoodie knit with visible thread direction changes at curves",
-    "sg-005": "flat matte ink sitting on the cotton surface — crisp sharp edges with no texture change, the print is flush with the fabric showing zero dimensionality",
 }
 
 IMAGEN_PRODUCT_DESCRIPTIONS = {
@@ -393,67 +383,6 @@ IMAGEN_PRODUCT_DESCRIPTIONS = {
         "back_details": (
             "Back of a white baseball jersey with contrasting trim. "
             "Large rose graphic centered on the back. White body color throughout."
-        ),
-    },
-    "br-d01": {
-        "garment": "hooded hockey jersey",
-        "details": (
-            "Black hooded hockey jersey with cyan/teal accents. Large circular "
-            "rose crest on the front. Hood attached. Gradient stripe hem and "
-            "cuffs in cyan/teal. SkyyRose BLACK ROSE Collection."
-        ),
-        "back_details": (
-            "Back of a black hooded hockey jersey. Black body throughout. "
-            "Cyan 'BLACK IS BEAUTIFUL' text across the upper back. "
-            "Rose-filled #0 numeral below the text. Gradient stripe hem "
-            "and cuffs in cyan/teal. Black body color."
-        ),
-    },
-    "br-d02": {
-        "garment": "American football jersey",
-        "details": (
-            "Red V-neck football jersey with #80 in large block numerals on the "
-            "front. The numbers are filled with a grey/silver rose, thorns & "
-            "clouds graphic. V-neck athletic cut with stripe trim on the sleeves. "
-            "Bold red body. SR monogram. SkyyRose BLACK ROSE Collection."
-        ),
-        "back_details": (
-            "Back of a red V-neck football jersey. The body color is bold red "
-            "throughout. 'BLACK IS BEAUTIFUL' text across the upper back. "
-            "Large #80 numerals — filled with grey/silver rose, thorns & clouds "
-            "graphic. SR monogram. Stripe trim on sleeves. Red body."
-        ),
-    },
-    "br-d03": {
-        "garment": "American football jersey",
-        "details": (
-            "White V-neck football jersey with bold black #32 on the front "
-            "in large block numerals. The '3' digit is filled with a black "
-            "rose graphic, the '2' digit is plain black. Black stripe trim "
-            "on sleeves. V-neck athletic cut. SR monogram. "
-            "SkyyRose BLACK ROSE Collection."
-        ),
-        "back_details": (
-            "Back of a white V-neck football jersey. White body throughout. "
-            "'BLACK IS BEAUTIFUL' text across the upper back. Large black #32 "
-            "numerals — the '2' digit is filled with a black rose graphic, "
-            "the '3' digit is plain black. Black stripe trim. "
-            "Shoulder numbers. White body color."
-        ),
-    },
-    "br-d04": {
-        "garment": "sleeveless basketball tank",
-        "details": (
-            "White sleeveless basketball jersey / tank top. 'THE BAY' in bold "
-            "gold text across the chest. Rose circle graphic below the text. "
-            "Grey/silver rose fade on the lower half of the jersey. "
-            "Wide shoulder straps. SkyyRose branding."
-        ),
-        "back_details": (
-            "Back of a white sleeveless basketball tank. White body throughout. "
-            "'BLACK IS BEAUTIFUL' text across the upper back. "
-            "Grey/silver rose fade on lower half. Wide shoulder straps. "
-            "White body color."
         ),
     },
 }
