@@ -295,7 +295,7 @@ get_header();
 				<p class="col-feat__desc col-rv col-rv-d2"><?php echo esc_html( $featured['desc'] ); ?></p>
 				<div class="col-feat__sizes col-rv col-rv-d3">
 					<?php foreach ( $featured['sizes'] as $size ) : ?>
-						<button data-size="<?php echo esc_attr( $size ); ?>"><?php echo esc_html( $size ); ?></button>
+						<button type="button" data-size="<?php echo esc_attr( $size ); ?>"><?php echo esc_html( $size ); ?></button>
 					<?php endforeach; ?>
 				</div>
 				<a href="<?php echo esc_url( $featured['url'] ); ?>" class="col-feat__add col-rv col-rv-d3">
@@ -406,7 +406,7 @@ get_header();
 		?>
 
 		<div style="text-align:center; padding:1rem 0 0;">
-			<button class="size-guide-trigger" data-open-size-guide
+			<button type="button" class="size-guide-trigger" data-open-size-guide
 			        aria-label="<?php esc_attr_e( 'Open size guide', 'skyyrose-flagship' ); ?>">
 				<svg class="size-guide-trigger__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
 					<path d="M6 2v20M18 2v20M6 12h12M6 7h12M6 17h12"/>
@@ -441,7 +441,7 @@ get_header();
 			<input type="email" class="col-nl__input"
 			       placeholder="<?php esc_attr_e( 'Your email address', 'skyyrose-flagship' ); ?>"
 			       aria-label="<?php esc_attr_e( 'Email address', 'skyyrose-flagship' ); ?>">
-			<button class="col-nl__btn"><?php esc_html_e( 'Join', 'skyyrose-flagship' ); ?></button>
+			<button type="button" class="col-nl__btn"><?php esc_html_e( 'Join', 'skyyrose-flagship' ); ?></button>
 			<?php wp_nonce_field( 'skyyrose_newsletter', '_wpnonce', false ); ?>
 		</div>
 	</section>
@@ -473,7 +473,7 @@ get_header();
      style="--col-accent: <?php echo esc_attr( $col['accent'] ); ?>; --col-accent-rgb: <?php echo esc_attr( $col['accent_rgb'] ); ?>;">
 	<div class="col-modal__bk"></div>
 	<div class="col-modal__card">
-		<button class="col-modal__close" aria-label="<?php esc_attr_e( 'Close', 'skyyrose-flagship' ); ?>">&times;</button>
+		<button type="button" class="col-modal__close" aria-label="<?php esc_attr_e( 'Close', 'skyyrose-flagship' ); ?>">&times;</button>
 		<div class="col-modal__img">
 			<span class="col-modal__letter"></span>
 		</div>
@@ -483,8 +483,8 @@ get_header();
 			<p class="col-modal__desc"></p>
 			<div class="col-modal__sizes"></div>
 			<div class="col-modal__actions">
-				<button class="col-modal__add"><?php esc_html_e( 'View Product', 'skyyrose-flagship' ); ?></button>
-				<button class="col-modal__back"><?php esc_html_e( 'Back', 'skyyrose-flagship' ); ?></button>
+				<button type="button" class="col-modal__add"><?php esc_html_e( 'View Product', 'skyyrose-flagship' ); ?></button>
+				<button type="button" class="col-modal__back"><?php esc_html_e( 'Back', 'skyyrose-flagship' ); ?></button>
 			</div>
 			<p class="col-modal__sku"></p>
 		</div>

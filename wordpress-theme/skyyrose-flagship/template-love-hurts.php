@@ -32,10 +32,10 @@ get_header();
         <nav class="ballroom-navigation">
             <h1 class="collection-title">Love Hurts Collection</h1>
             <ul class="scene-nav-menu">
-                <li><button class="nav-btn" data-section="ballroom">Grand Ballroom</button></li>
-                <li><button class="nav-btn" data-section="rose">Enchanted Rose</button></li>
-                <li><button class="nav-btn" data-section="mirror">Magic Mirror</button></li>
-                <li><button class="nav-btn" data-section="windows">Stained Glass</button></li>
+                <li><button type="button" class="nav-btn" data-section="ballroom">Grand Ballroom</button></li>
+                <li><button type="button" class="nav-btn" data-section="rose">Enchanted Rose</button></li>
+                <li><button type="button" class="nav-btn" data-section="mirror">Magic Mirror</button></li>
+                <li><button type="button" class="nav-btn" data-section="windows">Stained Glass</button></li>
             </ul>
         </nav>
 
@@ -54,7 +54,7 @@ get_header();
 
         <!-- Audio Controls -->
         <div class="audio-controls">
-            <button id="toggle-audio" class="audio-btn" aria-label="Toggle Music">
+            <button type="button" id="toggle-audio" class="audio-btn" aria-label="Toggle Music">
                 <span class="audio-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></span>
             </button>
         </div>
@@ -80,7 +80,7 @@ get_header();
     <div id="product-modal" class="enchanted-modal" style="display: none;">
         <div class="modal-overlay"></div>
         <div class="modal-content">
-            <button class="modal-close" aria-label="Close">&times;</button>
+            <button type="button" class="modal-close" aria-label="Close">&times;</button>
 
             <div class="modal-inner">
                 <!-- Magic Mirror Frame -->
@@ -103,11 +103,11 @@ get_header();
                             </div>
 
                             <div class="product-actions">
-                                <button id="add-to-cart-btn" class="btn-enchanted btn-add-cart">
+                                <button type="button" id="add-to-cart-btn" class="btn-enchanted btn-add-cart">
                                     <span class="btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="#B76E79" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span>
                                     Add to Cart
                                 </button>
-                                <button class="btn-enchanted btn-view-details">
+                                <button type="button" class="btn-enchanted btn-view-details">
                                     View Full Details
                                 </button>
                             </div>

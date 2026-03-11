@@ -318,7 +318,7 @@ function skyyrose_woocommerce_3d_model_button() {
 	}
 
 	printf(
-		'<div class="product-3d-viewer"><button class="button view-3d-model" data-model="%s">%s</button></div>',
+		'<div class="product-3d-viewer"><button type="button" class="button view-3d-model" data-model="%s">%s</button></div>',
 		esc_url( $model_file ),
 		esc_html__( 'View in 3D', 'skyyrose-flagship' )
 	);
