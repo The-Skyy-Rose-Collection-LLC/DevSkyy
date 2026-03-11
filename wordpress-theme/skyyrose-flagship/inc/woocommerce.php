@@ -678,3 +678,47 @@ function skyyrose_preorder_button_text( $text, $product ) {
 }
 add_filter( 'woocommerce_product_single_add_to_cart_text', 'skyyrose_preorder_button_text', 10, 2 );
 add_filter( 'woocommerce_product_add_to_cart_text', 'skyyrose_preorder_button_text', 10, 2 );
+
+/**
+ * Replace $0.00 price display with "Pre-Order" label for pre-order products.
+ *
+ * When a WooCommerce product is marked as pre-order but has a $0 regular price,
+ * the default price_html shows "$0.00" which confuses customers. This filter
+ * replaces it with either "Pre-Order -- $XX" (if a pre-order price is set)
+ * or just "Pre-Order".
+ *
+ * @since 4.3.0
+ *
+ * @param string     $price_html Default price HTML from WooCommerce.
+ * @param WC_Product $product    Product object.
+ * @return string Modified price HTML.
+ */
+function skyyrose_preorder_price_html( $price_html, $product ) {
+	if ( ! skyyrose_is_preorder( $product->get_id() ) ) {
+		return $price_html;
+	}
+
+	$regular_price = (float) $product->get_price();
+
+	// If the product has a real price (> 0), keep WC's formatted output.
+	if ( $regular_price > 0 ) {
+		return $price_html;
+	}
+
+	// Check for a custom pre-order price in meta.
+	$preorder_price = get_post_meta( $product->get_id(), '_preorder_price', true );
+
+	if ( ! empty( $preorder_price ) && is_numeric( $preorder_price ) && (float) $preorder_price > 0 ) {
+		return '<span class="woocommerce-Price-amount amount">'
+			. esc_html__( 'Pre-Order', 'skyyrose-flagship' )
+			. ' &mdash; '
+			. esc_html( get_woocommerce_currency_symbol() )
+			. esc_html( number_format( (float) $preorder_price, 0 ) )
+			. '</span>';
+	}
+
+	return '<span class="woocommerce-Price-amount amount">'
+		. esc_html__( 'Pre-Order', 'skyyrose-flagship' )
+		. '</span>';
+}
+add_filter( 'woocommerce_get_price_html', 'skyyrose_preorder_price_html', 10, 2 );

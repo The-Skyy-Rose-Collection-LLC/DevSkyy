@@ -682,9 +682,16 @@ function skyyrose_format_price( $product ) {
 		return esc_html__( 'Coming Soon', 'skyyrose-flagship' );
 	}
 
+	$price = (float) $product['price'];
+
+	// Pre-order products with zero price show "Pre-Order" instead of "$0".
+	if ( ! empty( $product['is_preorder'] ) && $price <= 0 ) {
+		return esc_html__( 'Pre-Order', 'skyyrose-flagship' );
+	}
+
 	// Use zero decimal places — all prices are whole-dollar and $95 reads
 	// cleaner than $95.00 for a luxury fashion brand.
-	return '$' . number_format( $product['price'], 0 );
+	return '$' . number_format( $price, 0 );
 }
 
 /**
