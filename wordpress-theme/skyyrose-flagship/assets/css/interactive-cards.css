@@ -351,7 +351,6 @@
 	letter-spacing: 4px;
 	text-transform: uppercase;
 	color: var(--collection-accent, #B76E79);
-	opacity: 0.7;
 }
 
 /* ==========================================================================
@@ -470,7 +469,7 @@
 .prc__tease {
 	font-family: 'Cormorant Garamond', serif;
 	font-size: 14px;
-	color: rgba(255, 255, 255, 0.6);
+	color: rgba(255, 255, 255, 0.75);
 	font-style: italic;
 	margin: 8px 0 0;
 }
@@ -508,7 +507,6 @@
 	letter-spacing: 4px;
 	text-transform: uppercase;
 	color: var(--collection-accent, #B76E79);
-	opacity: 0.7;
 	display: block;
 	margin-bottom: 6px;
 }
