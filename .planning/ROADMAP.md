@@ -218,10 +218,10 @@ Plans:
   1. When a modal or popup is open, the luxury cursor renders above it (not hidden behind)
   2. The cursor pauses its animation or adapts its behavior while a modal is active
   3. On immersive pages where the cursor is CSS-hidden, the luxury-cursor JS file is not loaded at all (no wasted bandwidth)
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 13-01: TBD
+- [ ] 13-01-PLAN.md -- Fix z-index supremacy, add modal-aware pause/resume, verify conditional loading (CURS-01, CURS-02, CURS-03)
 
 ## Progress
 
@@ -241,5 +241,5 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13
 | 9. Collection & Product Data | v1.1 | 0/2 | Planned | - |
 | 10. Accessibility HTML & ARIA | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 11. Color Contrast | v1.1 | 2/2 | Complete | 2026-03-11 |
-| 12. Responsive & Typography | 2/2 | Complete    | 2026-03-11 | - |
-| 13. Luxury Cursor | v1.1 | 0/? | Not started | - |
+| 12. Responsive & Typography | v1.1 | 2/2 | Complete | 2026-03-11 |
+| 13. Luxury Cursor | v1.1 | 0/1 | Not started | - |
