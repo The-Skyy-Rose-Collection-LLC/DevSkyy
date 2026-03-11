@@ -11,13 +11,13 @@ Requirements for WordPress quality and accessibility release. Each maps to roadm
 
 - [x] **A11Y-01**: All buttons have explicit `type="button"` attribute
 - [x] **A11Y-02**: No duplicate element IDs in rendered HTML (stylesheet handles, nonce fields)
-- [ ] **A11Y-03**: Empty headings have content or `aria-hidden="true"`
-- [ ] **A11Y-04**: Empty links have descriptive `aria-label` attributes
-- [ ] **A11Y-05**: Focusable elements with `aria-hidden="true"` have `tabindex="-1"`
-- [ ] **A11Y-06**: All form inputs (radio, text) have associated labels or `aria-label`
-- [ ] **A11Y-07**: Skip navigation link is wired and functional
+- [x] **A11Y-03**: Empty headings have content or `aria-hidden="true"`
+- [x] **A11Y-04**: Empty links have descriptive `aria-label` attributes
+- [x] **A11Y-05**: Focusable elements with `aria-hidden="true"` have `tabindex="-1"`
+- [x] **A11Y-06**: All form inputs (radio, text) have associated labels or `aria-label`
+- [x] **A11Y-07**: Skip navigation link is wired and functional
 - [x] **A11Y-08**: Stylesheet and script handles are unique (no `skyyrose-accessibility` collision)
-- [ ] **A11Y-09**: Below-fold images have `loading="lazy"`, hero images have `loading="eager"`
+- [x] **A11Y-09**: Below-fold images have `loading="lazy"`, hero images have `loading="eager"`
 
 ### Color Contrast
 
@@ -73,13 +73,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | A11Y-01 | Phase 10 | Complete |
 | A11Y-02 | Phase 10 | Complete |
-| A11Y-03 | Phase 10 | Pending |
-| A11Y-04 | Phase 10 | Pending |
-| A11Y-05 | Phase 10 | Pending |
-| A11Y-06 | Phase 10 | Pending |
-| A11Y-07 | Phase 10 | Pending |
+| A11Y-03 | Phase 10 | Complete |
+| A11Y-04 | Phase 10 | Complete |
+| A11Y-05 | Phase 10 | Complete |
+| A11Y-06 | Phase 10 | Complete |
+| A11Y-07 | Phase 10 | Complete |
 | A11Y-08 | Phase 10 | Complete |
-| A11Y-09 | Phase 10 | Pending |
+| A11Y-09 | Phase 10 | Complete |
 | CNTR-01 | Phase 11 | Pending |
 | CNTR-02 | Phase 11 | Pending |
 | CNTR-03 | Phase 11 | Pending |

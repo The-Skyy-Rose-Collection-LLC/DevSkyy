@@ -143,7 +143,7 @@ Plans:
 **Milestone Goal:** Fix all accessibility errors, optimize responsive design, fix product placement, and polish the luxury cursor -- making the live site flawless.
 
 - [ ] **Phase 9: Collection & Product Data** - Fix hero banners, product-to-collection assignments, and pre-order separation
-- [ ] **Phase 10: Accessibility HTML & ARIA** - Fix all HTML validation and ARIA errors in theme templates and enqueue
+- [x] **Phase 10: Accessibility HTML & ARIA** - Fix all HTML validation and ARIA errors in theme templates and enqueue (completed 2026-03-11)
 - [ ] **Phase 11: Color Contrast** - Bring all text to WCAG AA contrast ratios and fix price display
 - [ ] **Phase 12: Responsive & Typography** - Fix font scaling, layout overflow, touch targets, and type hierarchy across devices
 - [ ] **Phase 13: Luxury Cursor** - Fix z-index conflicts with modals and conditional loading
@@ -174,7 +174,7 @@ Plans:
   3. Skip navigation link at the top of each page scrolls to the main content area when activated
   4. All form inputs (radio buttons, text fields, search) have associated labels or aria-label attributes
   5. Hero images load immediately (loading="eager") and below-fold images defer (loading="lazy")
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 10-01-PLAN.md -- Fix button type attributes, enqueue handle collision, and duplicate IDs (A11Y-01, A11Y-02, A11Y-08)
@@ -237,7 +237,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13
 | 7. Deploy Core | v1.0 | 1/1 | Complete | 2026-03-09 |
 | 8. Deploy Verification & Orchestration | v1.0 | 2/2 | Complete | 2026-03-10 |
 | 9. Collection & Product Data | v1.1 | 0/2 | Planned | - |
-| 10. Accessibility HTML & ARIA | 1/2 | In Progress|  | - |
+| 10. Accessibility HTML & ARIA | 2/2 | Complete   | 2026-03-11 | - |
 | 11. Color Contrast | v1.1 | 0/? | Not started | - |
 | 12. Responsive & Typography | v1.1 | 0/? | Not started | - |
 | 13. Luxury Cursor | v1.1 | 0/? | Not started | - |
