@@ -845,7 +845,7 @@
 	font-size: 16px;
 	font-style: italic;
 	font-weight: 300;
-	color: rgba(255, 255, 255, .55);
+	color: rgba(255, 255, 255, .70);
 	line-height: 1.8;
 	margin-bottom: 40px;
 	max-width: 500px;
@@ -874,7 +874,7 @@
 	transition: border-color .4s;
 }
 
-.col-nl__input::placeholder { color: rgba(255, 255, 255, .15); }
+.col-nl__input::placeholder { color: rgba(255, 255, 255, .45); }
 .col-nl__input:focus { border-color: var(--col-accent, #C0C0C0); }
 
 .col-nl__btn {
