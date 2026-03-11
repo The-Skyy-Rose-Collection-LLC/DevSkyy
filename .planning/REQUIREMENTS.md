@@ -35,9 +35,9 @@ Requirements for WordPress quality and accessibility release. Each maps to roadm
 
 ### Luxury Cursor
 
-- [ ] **CURS-01**: Cursor renders above modals/popups (z-index management)
-- [ ] **CURS-02**: Cursor pauses or adapts when modal/popup is open
-- [ ] **CURS-03**: Cursor JS does not load on pages where it's CSS-hidden (immersive)
+- [x] **CURS-01**: Cursor renders above modals/popups (z-index management)
+- [x] **CURS-02**: Cursor pauses or adapts when modal/popup is open
+- [x] **CURS-03**: Cursor JS does not load on pages where it's CSS-hidden (immersive)
 
 ### Collection & Product Data
 
@@ -88,9 +88,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RESP-02 | Phase 12 | Complete |
 | RESP-03 | Phase 12 | Complete |
 | RESP-04 | Phase 12 | Complete |
-| CURS-01 | Phase 13 | Pending |
-| CURS-02 | Phase 13 | Pending |
-| CURS-03 | Phase 13 | Pending |
+| CURS-01 | Phase 13 | Complete |
+| CURS-02 | Phase 13 | Complete |
+| CURS-03 | Phase 13 | Complete |
 | DATA-01 | Phase 9 | Pending |
 | DATA-02 | Phase 9 | Complete |
 | DATA-03 | Phase 9 | Complete |

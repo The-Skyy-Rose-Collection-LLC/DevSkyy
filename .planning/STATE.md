@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: WordPress Quality & Accessibility
 status: completed
-stopped_at: Completed 12-02-PLAN.md
-last_updated: "2026-03-11T21:14:50.140Z"
-last_activity: 2026-03-11 -- Completed 12-02 (font size token conversion)
+stopped_at: Completed 13-01-PLAN.md -- Milestone v1.1 complete
+last_updated: "2026-03-11T23:28:13.835Z"
+last_activity: 2026-03-11 -- Completed 13-01 (luxury cursor modal awareness)
 progress:
   total_phases: 13
-  completed_phases: 12
-  total_plans: 19
-  completed_plans: 19
+  completed_phases: 13
+  total_plans: 20
+  completed_plans: 20
   percent: 100
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-10)
 
 **Core value:** skyyrose.co works flawlessly on every device, passes WCAG AA accessibility, and shows the right products in the right collections.
-**Current focus:** Phase 12 - Responsive Typography (In Progress)
+**Current focus:** Milestone v1.1 Complete
 
 ## Current Position
 
-Phase: 12 of 13 (Responsive Typography)
-Plan: 2 of 2 complete
-Status: Phase Complete
-Last activity: 2026-03-11 -- Completed 12-02 (font size token conversion)
+Phase: 13 of 13 (Luxury Cursor)
+Plan: 1 of 1 complete
+Status: Milestone Complete
+Last activity: 2026-03-11 -- Completed 13-01 (luxury cursor modal awareness)
 
-Progress: [██████████] 100% (19/19 plans complete)
+Progress: [██████████] 100% (20/20 plans complete)
 
 ## Performance Metrics
 
@@ -57,6 +57,7 @@ Progress: [██████████] 100% (19/19 plans complete)
 | Phase 11 P01 | 2min | 2 tasks | 3 files |
 | Phase 12 P01 | 8min | 2 tasks | 7 files |
 | Phase 12 P02 | 10min | 2 tasks | 11 files |
+| Phase 13 P01 | 3min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,9 @@ v1.0 decisions carried forward -- see PROJECT.md.
 - [Phase 12 P02]: Preserved intentionally small text (10-12px labels) as luxury aesthetic, not scaling candidates
 - [Phase 12 P02]: Removed 480px breakpoint overrides that defeated parent clamp() values
 - [Phase 12 P02]: Used --text-lg for lead text and --text-xl for subheadings to maintain hierarchy
+- [Phase 13 P01]: Minified assets gitignored -- rebuilt on deploy, only source committed
+- [Phase 13 P01]: enqueue-features.php exclusion already correct for CURS-03 -- no PHP changes needed
+- [Phase 13 P01]: Removed dead :not(.immersive-page) CSS selectors -- PHP prevents loading on those pages
 
 ### Pending Todos
 
@@ -94,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T21:08:42Z
-Stopped at: Completed 12-02-PLAN.md
+Last session: 2026-03-11T23:28:13.833Z
+Stopped at: Completed 13-01-PLAN.md -- Milestone v1.1 complete
 Resume file: None

@@ -146,7 +146,7 @@ Plans:
 - [x] **Phase 10: Accessibility HTML & ARIA** - Fix all HTML validation and ARIA errors in theme templates and enqueue (completed 2026-03-11)
 - [x] **Phase 11: Color Contrast** - Bring all text to WCAG AA contrast ratios and fix price display (completed 2026-03-11)
 - [x] **Phase 12: Responsive & Typography** - Fix font scaling, layout overflow, touch targets, and type hierarchy across devices (completed 2026-03-11)
-- [ ] **Phase 13: Luxury Cursor** - Fix z-index conflicts with modals and conditional loading
+- [x] **Phase 13: Luxury Cursor** - Fix z-index conflicts with modals and conditional loading (completed 2026-03-11)
 
 ## Phase Details
 
@@ -218,7 +218,7 @@ Plans:
   1. When a modal or popup is open, the luxury cursor renders above it (not hidden behind)
   2. The cursor pauses its animation or adapts its behavior while a modal is active
   3. On immersive pages where the cursor is CSS-hidden, the luxury-cursor JS file is not loaded at all (no wasted bandwidth)
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 13-01-PLAN.md -- Fix z-index supremacy, add modal-aware pause/resume, verify conditional loading (CURS-01, CURS-02, CURS-03)
@@ -242,4 +242,4 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13
 | 10. Accessibility HTML & ARIA | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 11. Color Contrast | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 12. Responsive & Typography | v1.1 | 2/2 | Complete | 2026-03-11 |
-| 13. Luxury Cursor | v1.1 | 0/1 | Not started | - |
+| 13. Luxury Cursor | 1/1 | Complete   | 2026-03-11 | - |
