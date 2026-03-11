@@ -174,11 +174,11 @@ Plans:
   3. Skip navigation link at the top of each page scrolls to the main content area when activated
   4. All form inputs (radio buttons, text fields, search) have associated labels or aria-label attributes
   5. Hero images load immediately (loading="eager") and below-fold images defer (loading="lazy")
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 10-01: TBD
-- [ ] 10-02: TBD
+- [ ] 10-01-PLAN.md -- Fix button type attributes, enqueue handle collision, and duplicate IDs (A11Y-01, A11Y-02, A11Y-08)
+- [ ] 10-02-PLAN.md -- Fix empty headings, empty links, ARIA attributes, form labels, skip nav, and image loading (A11Y-03, A11Y-04, A11Y-05, A11Y-06, A11Y-07, A11Y-09)
 
 ### Phase 11: Color Contrast
 **Goal**: All text on the site meets WCAG AA contrast ratios and pricing displays correctly
@@ -237,7 +237,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13
 | 7. Deploy Core | v1.0 | 1/1 | Complete | 2026-03-09 |
 | 8. Deploy Verification & Orchestration | v1.0 | 2/2 | Complete | 2026-03-10 |
 | 9. Collection & Product Data | v1.1 | 0/2 | Planned | - |
-| 10. Accessibility HTML & ARIA | v1.1 | 0/? | Not started | - |
+| 10. Accessibility HTML & ARIA | v1.1 | 0/2 | Planned | - |
 | 11. Color Contrast | v1.1 | 0/? | Not started | - |
 | 12. Responsive & Typography | v1.1 | 0/? | Not started | - |
 | 13. Luxury Cursor | v1.1 | 0/? | Not started | - |
