@@ -53,7 +53,7 @@ $collections = array(
 );
 ?>
 
-<main id="primary" class="site-main collections-page">
+<main id="primary" class="site-main collections-page" role="main" tabindex="-1">
 
 	<!-- Hero -->
 	<section class="collection-hero">

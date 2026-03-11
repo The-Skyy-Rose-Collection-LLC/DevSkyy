@@ -93,7 +93,7 @@ get_header();
                         </div>
 
                         <div class="product-info">
-                            <h2 id="product-title" class="product-title"></h2>
+                            <h2 id="product-title" class="product-title" aria-hidden="true"></h2>
                             <div id="product-price" class="product-price"></div>
                             <div id="product-description" class="product-description"></div>
 
@@ -584,7 +584,9 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(res => res.json())
             .then(data => {
                 // Safely set text content
-                document.getElementById('product-title').textContent = data.title || productName;
+                var titleEl = document.getElementById('product-title');
+                titleEl.textContent = data.title || productName;
+                titleEl.removeAttribute('aria-hidden');
                 document.getElementById('product-price').textContent = data.price || '';
                 document.getElementById('product-description').textContent = data.description || '';
 
@@ -607,6 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function closeProductModal() {
         modal.style.display = 'none';
+        document.getElementById('product-title').setAttribute('aria-hidden', 'true');
     }
 
     // Audio toggle
