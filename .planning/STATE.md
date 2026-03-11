@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: WordPress Quality & Accessibility
 status: completed
-stopped_at: Completed 10-02-PLAN.md
-last_updated: "2026-03-11T15:47:17.246Z"
-last_activity: 2026-03-11 -- Completed 10-02 (empty headings, skip nav, image loading)
+stopped_at: Completed 11-01-PLAN.md
+last_updated: "2026-03-11T16:54:29.334Z"
+last_activity: 2026-03-11 -- Completed 11-02 (pre-order price display fix)
 progress:
   total_phases: 13
-  completed_phases: 10
-  total_plans: 15
-  completed_plans: 15
+  completed_phases: 11
+  total_plans: 17
+  completed_plans: 17
   percent: 100
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-10)
 
 **Core value:** skyyrose.co works flawlessly on every device, passes WCAG AA accessibility, and shows the right products in the right collections.
-**Current focus:** Phase 10 - Accessibility: HTML & ARIA (Complete)
+**Current focus:** Phase 11 - Color Contrast (Complete)
 
 ## Current Position
 
-Phase: 10 of 13 (Accessibility: HTML & ARIA) -- COMPLETE
+Phase: 11 of 13 (Color Contrast) -- COMPLETE
 Plan: 2 of 2 complete
 Status: Phase Complete
-Last activity: 2026-03-11 -- Completed 10-02 (empty headings, skip nav, image loading)
+Last activity: 2026-03-11 -- Completed 11-02 (pre-order price display fix)
 
-Progress: [██████████] 100% (15/15 plans complete)
+Progress: [██████████] 100% (17/17 plans complete)
 
 ## Performance Metrics
 
@@ -53,6 +53,8 @@ Progress: [██████████] 100% (15/15 plans complete)
 | Phase 09 P02 | 2min | 1 tasks | 0 files |
 | Phase 10 P01 | 42min | 2 tasks | 12 files |
 | Phase 10 P02 | 4min | 2 tasks | 8 files |
+| Phase 11 P02 | 2min | 2 tasks | 3 files |
+| Phase 11 P01 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -67,6 +69,10 @@ v1.0 decisions carried forward -- see PROJECT.md.
 - [Phase 10 P01]: Duplicate ID audit found no issues -- template parts use dynamic IDs or appear on separate page views
 - [Phase 10 P02]: aria-hidden on empty modal headings as defense-in-depth, JS manages lifecycle
 - [Phase 10 P02]: All icon-only links, form inputs, and skip-link CSS already correct -- no changes needed
+- [Phase 11 P02]: Pre-order price handled at both WC filter and catalog fallback for defense-in-depth
+- [Phase 11 P02]: CSS rebuild skipped -- plan 11-02 only modifies PHP files, minified assets from 11-01 are current
+- [Phase 11]: Removed opacity entirely from accent-colored text instead of partial bump -- full opacity already meets AA contrast
+- [Phase 11]: Bumped placeholder text opacity .15->.45 for usability even though not WCAG-required
 
 ### Pending Todos
 
@@ -80,6 +86,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-11T15:38:04Z
-Stopped at: Completed 10-02-PLAN.md
+Last session: 2026-03-11T16:53:09Z
+Stopped at: Completed 11-02-PLAN.md
 Resume file: None
