@@ -466,31 +466,31 @@ def imagen_render_prompt(sku: str, view: str) -> str:
 
     if view in ("render3d_front", "front"):
         return (
-            f"Professional e-commerce product photography of a {garment} on an "
-            f"invisible mannequin / ghost mannequin, FRONT VIEW. "
+            f"Photorealistic 3D product render of a {garment}, FRONT VIEW. "
+            "NO model, NO person, NO mannequin — just the garment floating "
+            "naturally showing its 3D shape and drape. "
             f"{desc['details']} "
             "Light gray (#E8E8E8) studio background with subtle floor reflection. "
             "Professional product photography lighting — soft key light from "
             "upper-left, fill light from right, slight rim light. "
-            "Photorealistic, showing natural 3D shape and drape of the fabric. "
             "All text must be perfectly legible and spelled correctly. "
             "Luxury streetwear brand, premium quality."
         )
     elif view in ("render3d_back", "back"):
         return (
-            f"Professional e-commerce product photography of a {garment} on an "
-            f"invisible mannequin / ghost mannequin, BACK VIEW. "
+            f"Photorealistic 3D product render of a {garment}, BACK VIEW. "
+            "NO model, NO person, NO mannequin — just the garment floating "
+            "naturally showing its 3D shape and drape. "
             f"{desc['back_details']} "
             "Light gray (#E8E8E8) studio background with subtle floor reflection. "
             "Professional product photography lighting. "
-            "Photorealistic, showing natural 3D shape and drape of the fabric. "
             "All text must be perfectly legible and spelled correctly. "
             "Luxury streetwear brand, premium quality."
         )
     else:  # branding
         return (
-            f"Cinematic luxury editorial product shot of a {garment} on an "
-            f"invisible mannequin. {desc['details']} "
+            f"Cinematic 3D product render of a {garment}. NO model, NO person. "
+            f"Just the garment floating naturally. {desc['details']} "
             "Dark moody studio background — black marble surface, dramatic "
             "shadows, rose gold (#B76E79) accent lighting. Gothic luxury "
             "aesthetic. All text on the garment must be perfectly legible. "
@@ -666,35 +666,41 @@ def get_api_key() -> str:
 
 def front_prompt(name: str) -> str:
     return (
-        f"The reference image shows a {name}. Generate a professional fashion "
-        f"model wearing this EXACT {name}, front-facing, full body shot, "
-        "luxury streetwear editorial photography, studio lighting, clean white "
-        "background. The garment must be 100% identical to the reference "
-        "image — same colors, same cut, same details, same logo placement, "
-        "same fabric texture. Do NOT change the garment type. "
-        "The model should have a confident, editorial pose." + ANTI_HALLUCINATION
+        f"The reference image shows a {name}. Generate a photorealistic 3D "
+        f"product render of this EXACT {name}, FRONT VIEW. NO model, NO person, "
+        "NO mannequin — just the garment itself floating naturally as if on an "
+        "invisible form, showing its natural 3D shape and drape. "
+        "Clean white/light gray studio background with subtle floor reflection. "
+        "Professional e-commerce product photography lighting — soft key light "
+        "from upper-left, fill from right, slight rim light for edge definition. "
+        "The garment must be a PIXEL-PERFECT replica of the reference image — "
+        "same exact colors, same exact graphics, same exact logo placement, "
+        "same fabric texture, same stitching details. Change NOTHING." + ANTI_HALLUCINATION
     )
 
 
 def back_prompt(name: str) -> str:
     return (
-        f"The reference image shows a {name}. Generate a professional fashion "
-        f"model wearing this EXACT {name}, BACK-FACING (showing the back of "
-        "the garment), full body shot, luxury streetwear editorial photography, "
-        "studio lighting, clean white background. The garment must be 100% "
-        "identical to the reference — same colors, same cut, same back details, "
-        "same logo placement. Do NOT change the garment type. "
-        "The model is turned away from camera showing the back of the outfit." + ANTI_HALLUCINATION
+        f"The reference image shows a {name}. Generate a photorealistic 3D "
+        f"product render of this EXACT {name}, BACK VIEW. NO model, NO person, "
+        "NO mannequin — just the garment itself floating naturally as if on an "
+        "invisible form, showing the back of the garment with its natural 3D "
+        "shape and drape. Clean white/light gray studio background with subtle "
+        "floor reflection. Professional e-commerce product photography lighting. "
+        "The garment must be a PIXEL-PERFECT replica of the reference image — "
+        "same exact colors, same exact back graphics, same exact logo placement. "
+        "Change NOTHING." + ANTI_HALLUCINATION
     )
 
 
 def accessory_prompt(name: str) -> str:
     return (
-        f"The reference image shows a {name}. Generate a professional fashion "
-        f"model wearing/holding this EXACT {name}, front-facing, luxury "
-        "streetwear editorial photography, studio lighting, clean white "
-        "background. The accessory must be 100% identical to the reference "
-        "image. Do NOT change the item type." + ANTI_HALLUCINATION
+        f"The reference image shows a {name}. Generate a photorealistic 3D "
+        f"product render of this EXACT {name}, FRONT VIEW. NO model, NO person. "
+        "Just the accessory itself on a clean white/light gray studio background "
+        "with subtle reflection. Professional product photography lighting. "
+        "The item must be a PIXEL-PERFECT replica of the reference image — "
+        "same exact colors, same exact details. Change NOTHING." + ANTI_HALLUCINATION
     )
 
 
@@ -866,35 +872,35 @@ def generate_composite(
 def render3d_front_prompt(name: str) -> str:
     """Prompt for photorealistic 3D product render — front view."""
     return (
-        f"The reference image is a flat design mockup of a {name}. "
-        f"Convert this EXACT design into a photorealistic 3D product render "
-        f"of the {name}, FRONT VIEW. The garment should appear as a "
-        "professional e-commerce product shot on an invisible mannequin / "
-        "ghost mannequin, showing the natural 3D shape and drape of the "
-        "fabric. Light gray (#E8E8E8) studio background with subtle floor "
-        "reflection. Professional product photography lighting — soft key "
-        "light from upper-left, fill light from right, slight rim light. "
-        "Every detail from the design mockup MUST be preserved exactly: "
-        "same colors, same logos, same numbers, same text, same stripes, "
-        "same patches, same patterns. Do NOT change ANY design element. "
-        "The output should look like a real photograph of this garment "
-        "on a mannequin form, ready for an e-commerce product page." + ANTI_HALLUCINATION
+        f"The reference image shows a {name}. Create a photorealistic 3D "
+        f"product render of this EXACT {name}, FRONT VIEW. "
+        "NO model, NO person, NO mannequin visible — just the garment "
+        "itself displayed naturally showing its 3D shape, volume, and fabric "
+        "drape as if floating on an invisible form. "
+        "Light gray (#E8E8E8) studio background with subtle floor reflection. "
+        "Professional product photography lighting — soft key light from "
+        "upper-left, fill light from right, slight rim light for edge definition. "
+        "The garment must be a PIXEL-PERFECT replica of the reference — "
+        "same exact colors, same exact graphics, same exact logos, same exact "
+        "text, same exact patterns, same exact stitching. "
+        "Change absolutely NOTHING about the design." + ANTI_HALLUCINATION
     )
 
 
 def render3d_back_prompt(name: str) -> str:
     """Prompt for photorealistic 3D product render — back view."""
     return (
-        f"The reference image shows both front and back views of a {name}. "
-        f"Convert the BACK VIEW of this EXACT design into a photorealistic "
-        f"3D product render of the {name}, BACK VIEW. The garment should "
-        "appear as a professional e-commerce product shot on an invisible "
-        "mannequin / ghost mannequin, showing the natural 3D shape and "
-        "drape of the fabric. Light gray (#E8E8E8) studio background with "
-        "subtle floor reflection. Professional product photography lighting. "
-        "Every detail from the back of the design MUST be preserved exactly: "
-        "same colors, same logos, same numbers, same text, same stripes. "
-        "Do NOT change ANY design element. Show the BACK of the garment." + ANTI_HALLUCINATION
+        f"The reference image shows a {name}. Create a photorealistic 3D "
+        f"product render of this EXACT {name}, BACK VIEW. "
+        "NO model, NO person, NO mannequin visible — just the garment "
+        "itself displayed naturally showing its 3D shape, volume, and fabric "
+        "drape as if floating on an invisible form. Show the BACK side. "
+        "Light gray (#E8E8E8) studio background with subtle floor reflection. "
+        "Professional product photography lighting. "
+        "The garment must be a PIXEL-PERFECT replica of the reference — "
+        "same exact colors, same exact back graphics, same exact logos, "
+        "same exact text, same exact patterns. "
+        "Change absolutely NOTHING about the design." + ANTI_HALLUCINATION
     )
 
 
