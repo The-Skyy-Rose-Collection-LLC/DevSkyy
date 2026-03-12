@@ -422,6 +422,130 @@
 }
 
 /* ─────────────────────────────────────────────────
+   Cross-World Navigation Doors
+   ───────────────────────────────────────────────── */
+
+.world-nav {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 8;
+	display: flex;
+	align-items: stretch;
+	justify-content: center;
+	gap: 0;
+	background: linear-gradient(
+		to top,
+		rgba(10, 10, 10, 0.95) 0%,
+		rgba(10, 10, 10, 0.6) 70%,
+		transparent 100%
+	);
+	padding: 16px 24px calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
+.world-nav__doors {
+	display: flex;
+	gap: 12px;
+	flex: 1;
+	max-width: 480px;
+}
+
+.world-nav__door {
+	flex: 1;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-decoration: none;
+	border-radius: 6px;
+	overflow: hidden;
+	border: 1px solid rgba(183, 110, 121, 0.2);
+	transition: border-color 0.3s ease, transform 0.3s ease;
+	background: rgba(10, 10, 10, 0.8);
+}
+
+.world-nav__door:hover {
+	border-color: rgba(183, 110, 121, 0.5);
+	transform: translateY(-2px);
+}
+
+.world-nav__door:focus-visible {
+	outline: 2px solid #B76E79;
+	outline-offset: 2px;
+}
+
+.world-nav__door-image {
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+	filter: brightness(0.6) saturate(0.8);
+	transition: filter 0.3s ease;
+}
+
+.world-nav__door:hover .world-nav__door-image {
+	filter: brightness(0.75) saturate(1);
+}
+
+.world-nav__door-label {
+	padding: 8px 10px;
+	font-family: 'Inter', 'Barlow', sans-serif;
+	font-size: 0.65rem;
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	color: rgba(255, 255, 255, 0.7);
+	text-align: center;
+	white-space: nowrap;
+}
+
+.world-nav__back {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 16px;
+	font-family: 'Inter', 'Barlow', sans-serif;
+	font-size: 0.65rem;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: rgba(255, 255, 255, 0.35);
+	text-decoration: none;
+	transition: color 0.3s ease;
+	white-space: nowrap;
+}
+
+.world-nav__back:hover {
+	color: rgba(255, 255, 255, 0.6);
+}
+
+/* ── World Nav Mobile ── */
+
+@media (max-width: 768px) {
+	.world-nav {
+		padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+	}
+
+	.world-nav__doors {
+		gap: 8px;
+	}
+
+	.world-nav__door-label {
+		font-size: 0.6rem;
+		padding: 6px 8px;
+	}
+}
+
+@media (max-width: 480px) {
+	.world-nav__door-image {
+		aspect-ratio: 3 / 2;
+	}
+
+	.world-nav__back {
+		font-size: 0.6rem;
+		padding: 6px 12px;
+	}
+}
+
+/* ─────────────────────────────────────────────────
    Reduced Motion — Respect User Preference
    ───────────────────────────────────────────────── */
 
@@ -447,5 +571,13 @@
 
 	.avatar-intro-mascot {
 		animation: none;
+	}
+
+	.world-nav__door {
+		transition: none;
+	}
+
+	.world-nav__door-image {
+		transition: none;
 	}
 }
