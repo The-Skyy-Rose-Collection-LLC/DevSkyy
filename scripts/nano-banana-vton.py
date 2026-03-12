@@ -175,12 +175,6 @@ PRODUCT_CATALOG = {
         "output_slug": "love-hurts-varsity-jacket",
         "source_override": "love-hurts-varsity-jacket-varsity-source.jpg",
     },
-    "lh-005": {
-        "name": "Love Hurts Windbreaker",
-        "collection": "love-hurts",
-        "output_slug": "love-hurts-windbreaker",
-        "source_override": "love-hurts-windbreaker-techflat.jpeg",
-    },
     "lh-006": {
         "name": "The Fannie",
         "collection": "love-hurts",
@@ -210,12 +204,6 @@ PRODUCT_CATALOG = {
         "source_override": "stay-golden-shorts-source.jpeg",
         "is_preorder": True,
     },
-    "sg-004": {
-        "name": "The Signature Hoodie",
-        "collection": "signature",
-        "output_slug": "the-signature-hoodie",
-        "source_override": "the-signature-hoodie-techflat.jpeg",
-    },
     "sg-005": {
         "name": "The Bridge Series 'The Bay Bridge' Shirt",
         "collection": "signature",
@@ -241,13 +229,6 @@ PRODUCT_CATALOG = {
         "name": "The Sherpa Jacket",
         "collection": "signature",
         "output_slug": "the-sherpa-jacket",
-        "is_preorder": True,
-    },
-    "sg-010": {
-        "name": "The Bridge Series Shorts",
-        "collection": "signature",
-        "output_slug": "bridge-series-shorts",
-        "source_override": "bridge-series-shorts-bridge-shorts-variants.jpg",
         "is_preorder": True,
     },
     "sg-011": {
@@ -325,19 +306,39 @@ TEXT_HEAVY_SKUS = {
 TECH_FLAT_SKUS = {
     "br-001",  # Tech flat only (black-rose-crewneck-techflat-v4.jpg)
     "sg-002",  # Tech flat only (stay-golden-tee-techflat-v4.jpg)
-    "sg-004",  # Tech flat only (the-signature-hoodie-techflat.jpeg)
 }
 
 # -- Logo treatment metadata (real product material) -------------------------
 # Used by --step composite to tell Gemini what the REAL logo looks like.
 # Products not listed get a generic "match the reference" prompt.
 LOGO_TREATMENTS = {
-    "br-001": "raised rose with shadow depth — fabric pressed inward along the logo outline creating a 3D relief effect, light catches the elevated edges while recessed areas sit in soft shadow",
-    "br-002": "thick rubber logo standing ~2mm above the fabric surface — glossy smooth finish with sharply cut edges, catches specular highlights, casts a small shadow onto the matte fabric beneath",
-    "br-004": "raised rose with shadow depth — hoodie fabric pressed inward along the logo outline, creating dimensional relief where light grazes the elevated petals and thorns",
-    "br-005": "raised rose with shadow depth — hoodie fabric pressed inward along the logo outline, creating dimensional relief where light grazes the elevated petals and thorns",
-    "br-006": "visible thread texture forming the rose — individual stitch lines catch light at different angles creating a satin sheen, slightly raised above the sherpa pile with thread density creating the logo shape",
-    "sg-004": "visible thread texture forming the logo — individual stitch lines catch light creating slight sheen, raised ~1mm above the hoodie knit with visible thread direction changes at curves",
+    "br-001": "embossed rose logo on front chest, approximately 10 inches, pressed into fabric creating dimensional relief",
+    "br-002": "silicone patch logo on left thigh area — glossy smooth finish with sharply cut edges, catches specular highlights",
+    "br-003": "front: 'BLACK IS BEAUTIFUL' text across chest + custom baseball patch at hem; back: large embroidered rose logo centered",
+    "br-003-oakland": "front: 'BLACK IS BEAUTIFUL' text (the A in BLACK is black lettering, rest is gold) + custom baseball patch; back: embroidered rose logo",
+    "br-003-giants": "front: 'BLACK IS BEAUTIFUL' text across chest + custom baseball patch; back: embroidered rose logo centered",
+    "br-003-white": "front: 'BLACK IS BEAUTIFUL' text across chest + custom baseball patch; back: embroidered rose logo centered",
+    "br-004": "embroidered rose logo centered on chest — raised thread texture with shadow depth",
+    "br-005": "silicone cut-out rose logo on right chest + embroidered rose logo on side body of hoodie (not on arm)",
+    "br-006": "embroidered rose logo on left chest + large embroidered rose on back — satin bomber with black sherpa lining and hood",
+    "br-007": "tackle twill cut-out letters 'Oakland' stitched on front; sublimated rose logo throughout; large sublimated 'Love Hurts' logo on left side; additional 'Love Hurts' and rose logos stitched on mesh side panels",
+    "br-008": "jersey-style stitched #80 — front: '8' has rose fill, '0' is plain white; back: reversed ('8' plain, '0' has rose fill). Custom football patch bottom left corner",
+    "br-009": "jersey-style stitched #32 — front: '3' has rose fill, '2' is plain white; back: reversed ('3' plain, '2' has rose fill). Custom football patch bottom left corner",
+    "lh-002": "love hurts heart-and-rose logo on left thigh — two colorways: white joggers with black stripe, black joggers with white stripe",
+    "lh-003": "sublimated rose logo throughout shorts; large sublimated 'Love Hurts' logo on left side; additional 'Love Hurts' and rose logos stitched on mesh side panels",
+    "lh-004": "'Love Hurts' logo lettering across front chest; inside hood: sublimated rose logo; back: 'Love Hurts' heart-and-rose logo centered",
+    "lh-006": "high-end leather fanny pack with heart-and-rose logo where the dot of the 'i' would go in 'Fannie'",
+    "sg-001": "sublimated Bay Bridge image covering entire shorts; blue embroidered rose on bottom left",
+    "sg-002": "embroidered rose with Golden Gate Bridge imagery from the shorts stitched within the rose petals",
+    "sg-003": "sublimated Golden Gate image covering entire shorts; purple embroidered rose on bottom left",
+    "sg-005": "embroidered rose with Bay Bridge imagery from the shorts stitched within the rose petals",
+    "sg-006": "lavender rose logo centered on front of hoodie",
+    "sg-007": "small silicone patch logo slightly off to left side on brim fold — comes in red rose, grey/black rose, and purple rose variants",
+    "sg-009": "red embroidered rose logo on front; lined with white sherpa",
+    "sg-013": "lavender rose embroidered logo centered on front; small SR logo embroidered on back neck",
+    "sg-014": "embroidered rose logo on left thigh",
+    "kids-001": "black rose embroidered logo on left chest and left thigh; right arm: circular patch logo (white with black lettering and black rose, 'Skyy Rose' top, 'Collection' bottom)",
+    "kids-002": "black rose embroidered logo on left chest and left thigh; right arm: circular patch logo (white with black lettering and black rose, 'Skyy Rose' top, 'Collection' bottom)",
 }
 
 IMAGEN_PRODUCT_DESCRIPTIONS = {
