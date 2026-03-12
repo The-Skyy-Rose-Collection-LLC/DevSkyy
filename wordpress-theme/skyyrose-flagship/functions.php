@@ -139,6 +139,15 @@ add_filter( 'template_include', function ( $template ) {
 			return $canvas;
 		}
 	}
+
+	// Experiences landing page → template-experiences.php
+	if ( is_page( 'experience' ) ) {
+		$experiences = SKYYROSE_DIR . '/template-experiences.php';
+		if ( file_exists( $experiences ) ) {
+			return $experiences;
+		}
+	}
+
 	return $template;
 }, 99 );
 
