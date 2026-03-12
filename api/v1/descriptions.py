@@ -30,6 +30,7 @@ from services.ml.schemas.description import (
 )
 
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
+from security.ssrf_protection import ssrf_protection
 
 logger = logging.getLogger(__name__)
 
@@ -367,16 +368,13 @@ async def _send_webhook(url: str, data: dict[str, Any]) -> None:
         data: Data to send
     """
     try:
-        import httpx
-
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                url,
-                json=data,
-                headers={"Content-Type": "application/json"},
-                timeout=30.0,
-            )
-            response.raise_for_status()
-            logger.info(f"Webhook sent to {url}: {response.status_code}")
+        response = await ssrf_protection.safe_request(
+            "POST",
+            url,
+            json=data,
+            headers={"Content-Type": "application/json"},
+        )
+        response.raise_for_status()
+        logger.info(f"Webhook sent to {url}: {response.status_code}")
     except Exception as e:
         logger.error(f"Webhook failed: {e}")

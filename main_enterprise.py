@@ -84,12 +84,16 @@ async def lifespan(app: FastAPI):
 # App
 # =============================================================================
 
+_environment = os.getenv("ENVIRONMENT", "development")
+_docs_url = None if _environment == "production" else "/docs"
+_redoc_url = None if _environment == "production" else "/redoc"
+
 app = FastAPI(
     title="DevSkyy Enterprise Platform",
     description="AI-Driven Multi-Agent Orchestration for SkyyRose",
     version="3.2.0",
-    docs_url="/docs",
-    redoc_url="/redoc",
+    docs_url=_docs_url,
+    redoc_url=_redoc_url,
     lifespan=lifespan,
 )
 
@@ -148,6 +152,16 @@ async def security_headers_middleware(request: Request, call_next):
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     return response
+
+
+# Rate limiting
+from security.rate_limiting import rate_limiter  # noqa: E402
+
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    await rate_limiter.enforce_rate_limit(request)
+    return await call_next(request)
 
 
 # =============================================================================
