@@ -259,14 +259,14 @@
     "wp-pot-cli": "^1.5.0"
   },
   "overrides": {
-    "hono": ">=4.12.4",
+    "hono": ">=4.12.7",
     "nanotar": ">=0.2.1",
-    "devalue": ">=5.6.3",
+    "devalue": ">=5.6.4",
     "prismjs": ">=1.30.0",
     "diff": ">=8.0.3",
     "lodash": "^4.17.23",
     "lodash-es": "^4.17.23",
-    "tar": ">=7.5.10",
+    "tar": ">=7.5.11",
     "undici": ">=6.23.0",
     "@modelcontextprotocol/sdk": "$@modelcontextprotocol/sdk",
     "@apollo/server": "$@apollo/server",
