@@ -174,7 +174,8 @@ class JobWebhookPayload(BaseModel):
 # In-Memory Storage (Replace with database in production)
 # =============================================================================
 
-# Mock storage for jobs
+# Mock storage for jobs (capped to prevent unbounded memory growth)
+_MAX_JOBS = 1000
 _jobs: dict[str, dict[str, Any]] = {}
 
 
@@ -264,6 +265,11 @@ async def ingest_image(
     # TODO: Store original image to R2
     # For now, mock the original URL
     original_url = f"https://r2.skyyrose.com/originals/{job_id}/{file.filename}"
+
+    # Evict oldest jobs if at capacity
+    while len(_jobs) >= _MAX_JOBS:
+        oldest = next(iter(_jobs))
+        del _jobs[oldest]
 
     # Create job record
     created_at = datetime.now(UTC).isoformat()
@@ -1015,7 +1021,8 @@ class AssetUploadResponse(AssetResponse):
     pass
 
 
-# In-memory storage for demo (replace with database in production)
+# In-memory storage for demo (capped; replace with database in production)
+_MAX_ASSETS = 5000
 _assets: dict[str, dict[str, Any]] = {}
 _collection_stats: dict[str, int] = {
     "black_rose": 0,
@@ -1150,14 +1157,31 @@ async def upload_asset(
     import json
     from uuid import uuid4
 
-    # Validate file type
+    # Validate file type by content-type header
     if file.content_type not in ALLOWED_IMAGE_FORMATS and not file.content_type.startswith(
         "model/"
     ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid file type: {file.content_type}",
+            detail="Invalid file type",
         )
+
+    # Validate image files by magic bytes (not just content-type header)
+    if file.content_type in ALLOWED_IMAGE_FORMATS:
+        header = await file.read(16)
+        await file.seek(0)  # Reset for downstream consumers
+        image_signatures = {
+            b"\xff\xd8\xff": "image/jpeg",
+            b"\x89PNG\r\n\x1a\n": "image/png",
+            b"RIFF": "image/webp",  # RIFF....WEBP
+            b"II\x2a\x00": "image/tiff",  # Little-endian TIFF
+            b"MM\x00\x2a": "image/tiff",  # Big-endian TIFF
+        }
+        if not any(header.startswith(sig) for sig in image_signatures):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="File content does not match declared image type",
+            )
 
     # Create asset
     asset_id = f"asset-{uuid4().hex[:8]}"
