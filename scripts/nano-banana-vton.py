@@ -129,25 +129,29 @@ PRODUCT_CATALOG = {
     "br-008": {
         "name": "BLACK is Beautiful Jersey Series: 1. SF inspired",
         "collection": "black-rose",
-        "output_slug": "bib-jersey-sf-inspired",
+        "output_slug": "black-is-beautiful-football-jersey-red",
+        "source_override": "black-is-beautiful-football-jersey-red-design.jpg",
         "is_preorder": True,
     },
     "br-009": {
         "name": "BLACK is Beautiful Jersey Series: 2. LAST OAKLAND",
         "collection": "black-rose",
-        "output_slug": "bib-jersey-last-oakland",
+        "output_slug": "black-is-beautiful-football-jersey-white",
+        "source_override": "black-is-beautiful-football-jersey-white-design.jpg",
         "is_preorder": True,
     },
     "br-010": {
         "name": "BLACK is Beautiful Jersey Series: 3. THE BAY",
         "collection": "black-rose",
-        "output_slug": "bib-jersey-the-bay",
+        "output_slug": "black-is-beautiful-basketball-jersey",
+        "source_override": "black-is-beautiful-basketball-jersey-design.jpg",
         "is_preorder": True,
     },
     "br-011": {
         "name": "BLACK is Beautiful Jersey Series: 4. THE ROSE (SHARKS EDITION)",
         "collection": "black-rose",
-        "output_slug": "bib-jersey-the-rose-sharks",
+        "output_slug": "black-is-beautiful-hockey-jersey",
+        "source_override": "black-is-beautiful-hockey-jersey-design.jpg",
         "is_preorder": True,
     },
     # ── Love Hurts Collection (5 products) ─────────────────────────────────
