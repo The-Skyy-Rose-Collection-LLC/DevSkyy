@@ -39,7 +39,7 @@
       "status": "placeholder_only"
     },
     "br-005": {
-      "name": "BLACK Rose Hoodie \u2014 Signature Edition",
+      "name": "BLACK Rose Hoodie — Signature Edition",
       "collection": "black-rose",
       "local_webp": null,
       "local_jpg": "br-005-hoodie-sig.jpg",
@@ -77,16 +77,6 @@
       "local_jpg": "br-008-hooded-dress.jpg",
       "wp_source": "BR_WOMENS_BLACK_ROSE_HOODED_DRESS_main.webp",
       "wp_id": 8711,
-      "status": "webp_downloaded"
-    },
-    "lh-001": {
-      "name": "The Fannie Pack",
-      "collection": "love-hurts",
-      "local_webp": "lh-001-fannie.webp",
-      "local_jpg": "lh-001-fannie.jpg",
-      "wp_source": "LH_THE_FANNIE_PACK_main.webp",
-      "wp_source_alt": "LH_FANNIE_PACK_FRONT_2_main.webp",
-      "wp_id": 8863,
       "status": "webp_downloaded"
     },
     "lh-002": {
@@ -203,18 +193,6 @@
       "status": "webp_downloaded",
       "_note": "RECONCILED: Red Rose Beanie image (WP ID 8693) correctly assigned. Old cotton candy shorts image retained as legacy."
     },
-    "sg-008": {
-      "name": "Signature Crop Hoodie",
-      "collection": "signature",
-      "local_webp": "sg-008-crop-hoodie.webp",
-      "local_webp_back": "sg-008-crop-hoodie-back.webp",
-      "local_jpg": "sg-008-crop-hoodie.jpg",
-      "wp_source_front": "SIG_CROP_HOODIE_FRONT_main-1.webp",
-      "wp_source_back": "SIG_CROP_HOODIE_BACK_main-1.webp",
-      "wp_id_front": 8896,
-      "wp_id_back": 8882,
-      "status": "webp_downloaded_front_and_back"
-    },
     "sg-009": {
       "name": "The Sherpa Jacket",
       "collection": "signature",
@@ -267,7 +245,15 @@
     "placeholder_only": 6,
     "front_and_back": 2,
     "mismatches_reconciled": 5,
-    "products_missing_webp": ["br-002", "br-004", "br-005", "br-007", "lh-003", "lh-004", "sg-003"],
+    "products_missing_webp": [
+      "br-002",
+      "br-004",
+      "br-005",
+      "br-007",
+      "lh-003",
+      "lh-004",
+      "sg-003"
+    ],
     "_note": "sg-002 still placeholder_only (WP has JPG at 8809 but WebP found at 8705 for stay-golden tee variant). sg-006 has JPG only (no WebP in WP)."
   }
 }
