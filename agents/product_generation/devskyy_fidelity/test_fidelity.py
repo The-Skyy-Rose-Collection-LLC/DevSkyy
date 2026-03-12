@@ -133,8 +133,8 @@ class TestConfig:
             get_fidelity_threshold,
         )
 
-        # lh-001 is RELAXED → collection threshold - 5
-        threshold = get_fidelity_threshold("lh-001", Collection.LOVE_HURTS)
+        # lh-006 is RELAXED → collection threshold - 5
+        threshold = get_fidelity_threshold("lh-006", Collection.LOVE_HURTS)
         assert threshold == 77.0
 
     def test_product_palettes_exist_for_all_skus(self) -> None:
@@ -176,7 +176,7 @@ class TestConfig:
         from agents.product_generation.devskyy_fidelity.config import get_garment_type
 
         assert get_garment_type("br-004") == "hoodie"
-        assert get_garment_type("lh-001") == "fanny pack"
+        assert get_garment_type("lh-006") == "fanny pack"
         assert get_garment_type("sg-002") == "t-shirt"
         assert get_garment_type("nonexistent") is None
 
@@ -581,6 +581,6 @@ class TestProductCatalogCoverage:
             PRODUCT_GARMENT_TYPES,
         )
 
-        # 12 BR + 3 BR variants + 4 BR pre-order + 4 LH + 12 SG + 2 Kids = 37
-        # Actually: let's just check we have a reasonable number
-        assert len(PRODUCT_GARMENT_TYPES) >= 35
+        # 11 BR + 3 BR variants + 4 BR jerseys + 4 LH + 13 SG + 2 Kids = 37 total
+        # After removing 9 deleted SKUs (br-d01–d04, lh-001, sg-d01–d04): 33
+        assert len(PRODUCT_GARMENT_TYPES) >= 33

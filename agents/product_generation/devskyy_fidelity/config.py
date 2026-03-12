@@ -124,14 +124,33 @@ PRODUCT_COLOR_PALETTES: dict[str, tuple[str, ...]] = {
     "br-005": ("#303331", "#FFFFFF", "#CCAACC"),  # Hoodie Sig: charcoal/white/mauve-pink
     "br-006": ("#000000", "#1A1A1F", "#F5F5DC"),  # Sherpa: black satin/dark/sherpa lining
     "br-007": ("#000000", "#FFFFFF", "#4169E1"),  # Shorts: black mesh/white panels/blue clouds
-    "br-008": ("#000000", "#303331", "#FFFFFF"),  # Hooded Dress: black/charcoal/white
+    "br-008": (
+        "#DC001C",
+        "#FFFFFF",
+        "#000000",
+        "#B76E79",
+    ),  # SF Football Jersey: red/white/black/rose gold
     # ── Black Rose Pre-Order Jerseys ───────────────────────────────────────
-    "br-d01": ("#000000", "#00CED1", "#008B8B"),  # Hockey: black/cyan-teal/dark teal
-    "br-d02": ("#CC0000", "#C0C0C0", "#FFFFFF"),  # Football red: red/#80/silver rose/white
-    "br-d03": ("#FFFFFF", "#000000", "#1A1A1A"),  # Football white: white/#32/black
-    "br-d04": ("#FFFFFF", "#D4AF37", "#C0C0C0"),  # Basketball: white/gold text/silver fade
+    "br-009": (
+        "#FFFFFF",
+        "#000000",
+        "#C0C0C0",
+        "#B76E79",
+    ),  # LAST OAKLAND: white/black/silver/rose gold
+    "br-010": (
+        "#FFFFFF",
+        "#000000",
+        "#D4AF37",
+        "#B76E79",
+    ),  # THE BAY basketball tank: white/black/gold/rose gold
+    "br-011": (
+        "#0A0A0A",
+        "#00B1BF",
+        "#FFFFFF",
+        "#008189",
+    ),  # THE ROSE hockey jersey: black/cyan/white/teal
     # ── Love Hurts ─────────────────────────────────────────────────────────
-    "lh-001": ("#000000", "#B76E79", "#DC143C"),  # Fannie: black/rose gold/crimson
+    "lh-006": ("#1A1A1A", "#F8F8F8", "#800000"),  # The Fannie: dark/cream/burgundy
     "lh-002": ("#000000", "#FFFFFF", "#DC143C"),  # Joggers: black/white stripes/crimson
     "lh-003": ("#FFFFFF", "#FF4500", "#000000", "#DC143C"),  # Shorts: white mesh/orange/black/red
     "lh-004": (
@@ -151,11 +170,15 @@ PRODUCT_COLOR_PALETTES: dict[str, tuple[str, ...]] = {
     "sg-010": ("#000000", "#D4AF37", "#FFFFFF"),  # Bridge Shorts: black/gold/white
     "sg-011": ("#FFFFFF", "#000000", "#B76E79"),  # Label Tee White: white/black/rose gold
     "sg-012": ("#DA70D6", "#000000", "#B76E79"),  # Label Tee Orchid: orchid/black/rose gold
-    # ── Signature Pre-Orders / New ─────────────────────────────────────────
-    "sg-d01": ("#FFFFFF", "#98FB98", "#E6E6FA", "#FFB6C1"),  # Windbreaker: white/mint/lav/pink
-    "sg-d02": ("#000000", "#D4AF37", "#B76E79"),  # Collection Shorts: black/gold/rose gold
-    "sg-d03": ("#98FB98", "#000000", "#B76E79"),  # Mint Rose Set: mint/black/rose gold
-    "sg-d04": ("#98FB98", "#000000", "#FFFFFF"),  # Mint Rose Dress: mint/black/white
+    # ── Signature Accessories / New ────────────────────────────────────────
+    "sg-007": (
+        "#212C26",
+        "#343434",
+        "#CC2F2F",
+        "#E0E0E0",
+    ),  # Signature Beanie: dark green/charcoal/red/silver
+    "sg-013": ("#8ADCD0", "#C9B6E1", "#5F5F5F"),  # Mint & Lavender Crewneck: mint/lavender/grey
+    "sg-014": ("#A7DED5", "#B9A1E0", "#9A8AD9"),  # Mint & Lavender Sweatpants: mint/lavender/purple
     # ── Kids Capsule ───────────────────────────────────────────────────────
     "kids-001": ("#CC0000", "#000000", "#FFFFFF"),  # Kids Red Set: red/black/white
     "kids-002": ("#800080", "#000000", "#FFFFFF"),  # Kids Purple Set: purple/black/white
@@ -175,12 +198,11 @@ PRODUCT_GARMENT_TYPES: dict[str, str] = {
     "br-005": "hoodie",
     "br-006": "sherpa jacket",
     "br-007": "basketball shorts",
-    "br-008": "hooded dress",
-    "br-d01": "hockey jersey",
-    "br-d02": "football jersey",
-    "br-d03": "football jersey",
-    "br-d04": "basketball tank",
-    "lh-001": "fanny pack",
+    "br-008": "football jersey",
+    "br-009": "football jersey",
+    "br-010": "basketball tank",
+    "br-011": "hockey jersey",
+    "lh-006": "fanny pack",
     "lh-002": "joggers",
     "lh-003": "basketball shorts",
     "lh-004": "varsity jacket",
@@ -194,10 +216,9 @@ PRODUCT_GARMENT_TYPES: dict[str, str] = {
     "sg-010": "shorts",
     "sg-011": "t-shirt",
     "sg-012": "t-shirt",
-    "sg-d01": "windbreaker set",
-    "sg-d02": "shorts",
-    "sg-d03": "matching set",
-    "sg-d04": "hooded dress",
+    "sg-007": "beanie",
+    "sg-013": "crewneck",
+    "sg-014": "sweatpants",
     "kids-001": "kids matching set",
     "kids-002": "kids matching set",
 }
@@ -213,7 +234,8 @@ PRODUCT_FIDELITY_LEVELS: dict[str, FidelityLevel] = {
     "lh-004": FidelityLevel.STRICT,  # Varsity Jacket — hero
     "sg-009": FidelityLevel.STRICT,  # Sherpa Jacket — hero
     # Accessories — more tolerance for shape
-    "lh-001": FidelityLevel.RELAXED,  # Fanny pack — accessory, not wearable
+    "lh-006": FidelityLevel.RELAXED,  # The Fannie fanny pack — accessory, not wearable
+    "sg-007": FidelityLevel.RELAXED,  # Signature Beanie — accessory, not wearable
     # Everything else is STANDARD (default)
 }
 
