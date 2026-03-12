@@ -8,17 +8,11 @@ The SkyyRose luxury streetwear ecommerce site (skyyrose.co) built on WordPress/W
 
 skyyrose.co works flawlessly on every device, passes WCAG AA accessibility, and shows the right products in the right collections — a professional luxury shopping experience with zero embarrassing bugs.
 
-## Current Milestone: v1.1 WordPress Quality & Accessibility
+## Shipped: v1.1 WordPress Quality & Accessibility (2026-03-11)
 
-**Goal:** Fix all accessibility errors, optimize responsive design, fix product placement, and polish the luxury cursor — making the live site flawless.
+**5 phases, 9 plans, 47 commits, 53 files changed**
 
-**Target features:**
-- Zero Ally plugin errors (currently 100+ per page)
-- WCAG AA compliant color contrast and ARIA
-- Responsive typography and layout across all devices
-- Luxury cursor working correctly on popups/modals
-- Correct hero banners and product-to-collection assignments
-- Pre-order products properly separated from live collections
+Theme now passes WCAG AA accessibility, renders correctly on all devices from 320px mobile, shows correct products per collection, and the luxury cursor works above all modals.
 
 ## Requirements
 
@@ -39,10 +33,15 @@ skyyrose.co works flawlessly on every device, passes WCAG AA accessibility, and 
 - ✓ PHP linting and testing for WordPress theme files — v1.0
 - ✓ WP-CLI automated deployment via SSH with maintenance mode safety — v1.0
 - ✓ Single command deploys theme from commit to live site — v1.0
+- ✓ All buttons have explicit type attributes, no duplicate IDs, correct ARIA on all interactive elements — v1.1
+- ✓ All text meets WCAG AA 4.5:1 contrast ratio; pre-order pricing shows "Pre-Order" not "$0.00" — v1.1
+- ✓ No horizontal overflow at 320px viewport; all touch targets ≥44x44px; fluid typography via design tokens — v1.1
+- ✓ Pre-order products excluded from catalog grids; product assignments correct across all collections — v1.1
+- ✓ Luxury cursor renders above all modals (z-index max), pauses on modal open, excluded from immersive pages — v1.1
 
 ### Active
 
-(Defined in `.planning/REQUIREMENTS.md` for v1.1)
+(Define in next milestone cycle — run `/gsd:new-milestone`)
 
 ### Out of Scope
 
@@ -62,11 +61,11 @@ skyyrose.co works flawlessly on every device, passes WCAG AA accessibility, and 
 - **WordPress build**: webpack (43 JS) + clean-css (56 CSS) + source maps (99 .map files)
 - **Deploy pipeline**: `deploy-pipeline.sh` → npm build → rsync/lftp with maintenance mode → 6-page content verification
 - **Agent context**: Ralph Wiggum loop and Claude Code agents autonomously write and commit code
-- **Known tech debt**: 20+ mypy error codes disabled (2094 pre-existing type errors), VALIDATION.md frontmatter not updated
+- **Known tech debt**: 20+ mypy error codes disabled (2094 pre-existing type errors)
 - **Deploy targets**: Vercel (frontend), WordPress host via SSH/WP-CLI (theme)
-- **Ally plugin**: Installed on live site, finds 100+ errors per page (HTML validation, ARIA, contrast)
-- **Accessibility fix plugin**: `skyyrose-accessibility-fix.php` exists as bandaid — fixes should be in theme code directly
-- **Theme audit findings**: Duplicate stylesheet handles, cursor z-index conflicts with modals, small text contrast issues, hero image missing loading="eager"
+- **Theme status (v1.1)**: WCAG AA compliant, responsive from 320px, 32 products in correct collections, luxury cursor modal-aware
+- **Pending live site**: DATA-01 hero banner requires CDN cache purge after deploy; code is correct in git
+- **Design tokens**: `brand-variables.css` defines `--text-xs` through `--text-5xl` clamp() tokens — adopt in all future CSS
 
 ## Constraints
 
@@ -88,6 +87,12 @@ skyyrose.co works flawlessly on every device, passes WCAG AA accessibility, and 
 | Separate verify script from deploy | Independently testable, reusable outside pipeline | ✓ Good — 6-page deep content verification |
 | Build runs even in dry-run | Catches build errors before live deploy (local-only) | ✓ Good — no false-positive dry-runs |
 | 20+ mypy error codes disabled | 2094 pre-existing type errors, Phase 1 scope was CI fix not debt | ⚠️ Revisit — incrementally re-enable |
+| PHP catalog authoritative over CSV | CSV had 12 wrong pre-order flags; verbal override > file override | ✓ Good — single source of truth |
+| Pre-order price fix at 3 layers | WC filter + catalog fallback + template guard for defense-in-depth | ✓ Good — handles both WC and fallback paths |
+| Cursor z-index = 2147483647 (max int) | Ends z-index arms race permanently above all overlays | ✓ Good — no future conflicts |
+| MutationObserver for modal detection | Watches attribute changes across DOM subtree; works with any modal pattern | ✓ Good — no coupling to specific modal IDs |
+| Design tokens for all font sizes | `--text-xs` through `--text-5xl` in brand-variables.css, adopted across 11 CSS files | ✓ Good — single source of truth for scaling |
+| min(300px, 100%) in grid minmax | Prevents overflow at narrow viewports without breaking tablet/desktop grid | ✓ Good — future-proof pattern |
 
 ---
-*Last updated: 2026-03-10 after v1.0 milestone*
+*Last updated: 2026-03-11 after v1.1 milestone*
