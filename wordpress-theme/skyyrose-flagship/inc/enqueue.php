@@ -687,6 +687,29 @@ function skyyrose_enqueue_template_scripts() {
 				);
 			}
 		}
+
+		// Holo product cards — loaded on collection pages that use the card.
+		if ( in_array( $slug, array( 'collection', 'collection-v4', 'collections-shop', 'front-page' ), true ) ) {
+			$holo_css = $base_css_dir . '/product-card-holo.css';
+			if ( file_exists( $holo_css ) ) {
+				wp_enqueue_style(
+					'skyyrose-product-card-holo',
+					$base_css_uri . '/product-card-holo.css',
+					array( 'skyyrose-design-tokens' ),
+					SKYYROSE_VERSION
+				);
+			}
+			$holo_js = $base_js_dir . '/product-card-holo.js';
+			if ( file_exists( $holo_js ) ) {
+				wp_enqueue_script(
+					'skyyrose-product-card-holo',
+					$base_js_uri . '/product-card-holo.js',
+					array(),
+					SKYYROSE_VERSION,
+					true
+				);
+			}
+		}
 	}
 }
 

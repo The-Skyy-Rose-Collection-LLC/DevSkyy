@@ -36,9 +36,10 @@ function skyyrose_get_product_collection( $product_id = null ) {
 	}
 
 	$collection_map = array(
-		'black-rose' => array( 'black-rose', 'black_rose', 'blackrose' ),
-		'love-hurts' => array( 'love-hurts', 'love_hurts', 'lovehurts' ),
-		'signature'  => array( 'signature', 'sig', 'foundation' ),
+		'black-rose'   => array( 'black-rose', 'black_rose', 'blackrose' ),
+		'love-hurts'   => array( 'love-hurts', 'love_hurts', 'lovehurts' ),
+		'signature'    => array( 'signature', 'sig', 'foundation' ),
+		'kids-capsule' => array( 'kids-capsule', 'kids_capsule', 'kidscapsule', 'kids' ),
 	);
 
 	foreach ( $terms as $term ) {
@@ -124,6 +125,22 @@ function skyyrose_collection_config( $collection ) {
 			'gradient'   => 'linear-gradient(135deg, #8B7020, #D4AF37, #F5E6D3)',
 			'cta_color'  => '#0A0804',
 		),
+	);
+
+	$configs['kids-capsule'] = array(
+		'accent'     => '#FFB6C1',
+		'accent_rgb' => '255,182,193',
+		'bg'         => '#0A0A0A',
+		'bg_alt'     => '#0E0810',
+		'text'       => '#FFFFFF',
+		'dim'        => 'rgba(255,182,193,.35)',
+		'label'      => 'KIDS CAPSULE',
+		'tagline'    => 'Little legends, big style.',
+		'badge_text' => 'Kids',
+		'nav_font'   => "'Playfair Display', serif",
+		'body_class' => 'collection-kids-capsule',
+		'gradient'   => 'linear-gradient(135deg, #FFB6C1, #E6E6FA)',
+		'cta_color'  => '#333333',
 	);
 
 	return isset( $configs[ $collection ] ) ? $configs[ $collection ] : $configs['black-rose'];

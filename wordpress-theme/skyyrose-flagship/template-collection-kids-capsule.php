@@ -209,59 +209,24 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 			</p>
 		</div>
 
-		<div class="collection-products__grid">
+		<div class="holo-grid holo-grid--2">
 			<?php
-			$skyyrose_delay = 0;
+			$skyyrose_idx = 0;
 			foreach ( $skyyrose_kc_products as $skyyrose_product ) :
-				$skyyrose_delay_class = 'delay-' . ( ( $skyyrose_delay % 4 ) + 1 );
-				$skyyrose_delay++;
-
-				$skyyrose_p_url   = isset( $skyyrose_product['url'] ) ? $skyyrose_product['url'] : '#';
-				$skyyrose_p_image = ! empty( $skyyrose_product['image'] ) ? $skyyrose_product['image'] : $skyyrose_kc_placeholder;
-				?>
-				<a href="<?php echo esc_url( $skyyrose_p_url ); ?>"
-				   class="product-card fade-in-up <?php echo esc_attr( $skyyrose_delay_class ); ?>">
-
-					<div class="product-card__image-wrap">
-						<img src="<?php echo esc_url( $skyyrose_p_image ); ?>"
-						     alt="<?php echo esc_attr( $skyyrose_product['name'] ); ?>"
-						     loading="lazy"
-						     width="400"
-						     height="480"
-						     data-fallback="<?php echo esc_url( $skyyrose_kc_placeholder ); ?>" />
-
-						<div class="product-card__overlay" aria-hidden="true">
-							<span class="product-card__quick-view">
-								<?php echo esc_html__( 'Quick View', 'skyyrose-flagship' ); ?>
-							</span>
-						</div>
-
-						<span class="product-card__sku">
-							<?php echo esc_html( strtoupper( $skyyrose_product['sku'] ) ); ?>
-						</span>
-
-						<?php if ( ! empty( $skyyrose_product['badge'] ) ) : ?>
-							<span class="product-card__badge">
-								<?php echo esc_html( $skyyrose_product['badge'] ); ?>
-							</span>
-						<?php endif; ?>
-					</div>
-
-					<div class="product-card__info">
-						<h3 class="product-card__name">
-							<?php echo esc_html( $skyyrose_product['name'] ); ?>
-						</h3>
-						<p class="product-card__price">
-							<?php echo wp_kses_post( $skyyrose_product['price'] ); ?>
-						</p>
-						<?php if ( ! empty( $skyyrose_product['desc'] ) ) : ?>
-							<p class="product-card__desc">
-								<?php echo esc_html( $skyyrose_product['desc'] ); ?>
-							</p>
-						<?php endif; ?>
-					</div>
-				</a>
-			<?php endforeach; ?>
+				get_template_part( 'template-parts/product-card-holo', null, array(
+					'title'      => $skyyrose_product['name'],
+					'price'      => $skyyrose_product['price'],
+					'image_url'  => ! empty( $skyyrose_product['image'] ) ? $skyyrose_product['image'] : $skyyrose_kc_placeholder,
+					'permalink'  => isset( $skyyrose_product['url'] ) ? $skyyrose_product['url'] : '#',
+					'collection' => 'kids-capsule',
+					'badge_text' => ! empty( $skyyrose_product['badge'] ) ? $skyyrose_product['badge'] : '',
+					'desc'       => isset( $skyyrose_product['desc'] ) ? $skyyrose_product['desc'] : '',
+					'sku'        => $skyyrose_product['sku'],
+					'index'      => $skyyrose_idx,
+				) );
+				$skyyrose_idx++;
+			endforeach;
+			?>
 		</div>
 		<div style="text-align:center; padding:1rem 0 0;">
 			<button type="button" class="size-guide-trigger" data-open-size-guide aria-label="<?php esc_attr_e( 'Open size guide', 'skyyrose-flagship' ); ?>">
