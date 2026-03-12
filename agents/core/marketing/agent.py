@@ -60,6 +60,18 @@ class MarketingCoreAgent(CoreAgent):
         except ImportError:
             logger.debug("[%s] CampaignOpsSubAgent unavailable", self.name)
 
+        # SDK-powered agents (web research + data analysis)
+        try:
+            from agents.claude_sdk.domain_agents.marketing import (
+                SDKCampaignAnalystAgent,
+                SDKCompetitiveIntelAgent,
+            )
+
+            self.register_sub_agent("sdk_campaign_analyst", SDKCampaignAnalystAgent())
+            self.register_sub_agent("sdk_competitive_intel", SDKCompetitiveIntelAgent())
+        except ImportError:
+            logger.debug("[%s] SDK marketing agents unavailable", self.name)
+
     def _get_legacy_agent(self) -> Any:
         if self._legacy_agent is None:
             try:

@@ -227,6 +227,32 @@ except ImportError as _e:
     _logger.debug("VisualGeneration unavailable: %s", _e)
 
 try:
+    from .claude_sdk import (
+        ClaudeSDKBaseAgent,
+        DevSkyyHookSystem,
+        EmailAutomationAgent,
+        ExcelHandlerAgent,
+        ResearchAgent,
+        SDKCapabilityMixin,
+        SDKExecutionResult,
+        SDKSubAgent,
+        SessionManager,
+        ToolProfile,
+    )
+except ImportError as _e:
+    _logger.debug("Claude SDK agents unavailable: %s", _e)
+    ClaudeSDKBaseAgent = None  # type: ignore[assignment,misc]
+    ResearchAgent = None  # type: ignore[assignment,misc]
+    EmailAutomationAgent = None  # type: ignore[assignment,misc]
+    ExcelHandlerAgent = None  # type: ignore[assignment,misc]
+    SessionManager = None  # type: ignore[assignment,misc]
+    SDKCapabilityMixin = None  # type: ignore[assignment,misc]
+    SDKExecutionResult = None  # type: ignore[assignment,misc]
+    SDKSubAgent = None  # type: ignore[assignment,misc]
+    DevSkyyHookSystem = None  # type: ignore[assignment,misc]
+    ToolProfile = None  # type: ignore[assignment,misc]
+
+try:
     from .wordpress_asset_agent import (
         GalleryResult,
         MediaUploadResult,
@@ -343,6 +369,18 @@ __all__ = [
     "ContentStatus",
     "GeneratedContent",
     "BrandDNA",
+    # Claude Agent SDK — Standalone agents
+    "ClaudeSDKBaseAgent",
+    "ResearchAgent",
+    "EmailAutomationAgent",
+    "ExcelHandlerAgent",
+    "SessionManager",
+    # Claude Agent SDK — Deep integration
+    "SDKCapabilityMixin",
+    "SDKExecutionResult",
+    "SDKSubAgent",
+    "DevSkyyHookSystem",
+    "ToolProfile",
     # WordPress Asset Agent
     "WordPressAssetAgent",
     "WordPressAssetConfig",

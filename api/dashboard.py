@@ -1132,6 +1132,226 @@ async def get_huggingface_datasets():
 
 
 # =============================================================================
+# Claude Agent SDK Dashboard Endpoints
+# =============================================================================
+
+
+class ClaudeSDKAgentStatus(BaseModel):
+    """Status of a single Claude SDK agent."""
+
+    name: str
+    description: str
+    status: str = "available"
+    capabilities: list[str] = []
+    endpoint: str = ""
+
+
+class ClaudeSDKDashboardOverview(BaseModel):
+    """Claude Agent SDK dashboard overview."""
+
+    sdk_installed: bool = False
+    total_agents: int = 4
+    agents: list[ClaudeSDKAgentStatus] = []
+    recent_sessions: list[dict[str, Any]] = []
+    total_research_reports: int = 0
+    total_spreadsheets: int = 0
+
+
+@dashboard_router.get("/claude-sdk/overview", response_model=ClaudeSDKDashboardOverview)
+async def get_claude_sdk_overview():
+    """
+    Get Claude Agent SDK overview for dashboard.
+
+    Shows SDK agent status, recent sessions, and output artifacts.
+    """
+    from pathlib import Path
+
+    # Check if SDK is installed
+    sdk_installed = False
+    try:
+        import claude_agent_sdk  # noqa: F401
+
+        sdk_installed = True
+    except ImportError:
+        pass
+
+    agents = [
+        ClaudeSDKAgentStatus(
+            name="Research Agent",
+            description="Multi-agent research pipeline: researchers + data analyst + report writer",
+            status="available" if sdk_installed else "sdk_not_installed",
+            capabilities=["web_search", "data_analysis", "chart_generation", "pdf_reports"],
+            endpoint="/api/v1/claude-sdk/research",
+        ),
+        ClaudeSDKAgentStatus(
+            name="Email Automation Agent",
+            description="IMAP email triage with AI classification and response drafting",
+            status="available" if sdk_installed else "sdk_not_installed",
+            capabilities=[
+                "email_fetch",
+                "classification",
+                "action_extraction",
+                "response_drafting",
+            ],
+            endpoint="/api/v1/claude-sdk/email",
+        ),
+        ClaudeSDKAgentStatus(
+            name="Excel Handler Agent",
+            description="Spreadsheet creation and analysis with openpyxl and pandas",
+            status="available" if sdk_installed else "sdk_not_installed",
+            capabilities=[
+                "spreadsheet_creation",
+                "data_analysis",
+                "formula_recalc",
+                "visualization",
+            ],
+            endpoint="/api/v1/claude-sdk/excel",
+        ),
+        ClaudeSDKAgentStatus(
+            name="Session Manager",
+            description="V2 stateful multi-turn conversations with session persistence",
+            status="available" if sdk_installed else "sdk_not_installed",
+            capabilities=["session_create", "session_resume", "one_shot_prompt"],
+            endpoint="/api/v1/claude-sdk/session",
+        ),
+    ]
+
+    # Count output artifacts
+    research_dir = Path("data/research")
+    spreadsheets_dir = Path("data/spreadsheets")
+    report_count = len(list(research_dir.glob("**/reports/*.pdf"))) if research_dir.exists() else 0
+    sheet_count = len(list(spreadsheets_dir.glob("*.xlsx"))) if spreadsheets_dir.exists() else 0
+
+    return ClaudeSDKDashboardOverview(
+        sdk_installed=sdk_installed,
+        total_agents=len(agents),
+        agents=agents,
+        total_research_reports=report_count,
+        total_spreadsheets=sheet_count,
+    )
+
+
+@dashboard_router.get("/claude-sdk/agents")
+async def get_claude_sdk_agents():
+    """List Claude SDK agents with their tools and capabilities."""
+    overview = await get_claude_sdk_overview()
+    return {"agents": [a.model_dump() for a in overview.agents]}
+
+
+@dashboard_router.post("/claude-sdk/execute")
+async def execute_claude_sdk_agent(
+    agent: str,
+    task: str,
+    parameters: dict[str, Any] | None = None,
+):
+    """Execute a Claude SDK agent task from the dashboard.
+
+    Args:
+        agent: Agent name (research, email, excel, session).
+        task: Task description or prompt.
+        parameters: Additional parameters.
+    """
+    import time
+
+    if parameters is None:
+        parameters = {}
+
+    start = time.time()
+
+    try:
+        if agent == "research":
+            from agents.claude_sdk.research import ResearchAgent, ResearchRequest
+
+            sdk_agent = ResearchAgent()
+            request = ResearchRequest(
+                topic=task,
+                subtopics=parameters.get("subtopics"),
+                model=parameters.get("model", "haiku"),
+            )
+            result = await sdk_agent.research(request)
+            return {
+                "status": "completed",
+                "agent": agent,
+                "result": result.model_dump(),
+                "latency_ms": (time.time() - start) * 1000,
+            }
+
+        elif agent == "email":
+            from agents.claude_sdk.email_automation import EmailAutomationAgent, EmailTriageRequest
+
+            sdk_agent = EmailAutomationAgent()
+            request = EmailTriageRequest(
+                mailbox=parameters.get("mailbox", "INBOX"),
+                limit=parameters.get("limit", 10),
+                unread_only=parameters.get("unread_only", True),
+            )
+            result = await sdk_agent.triage(request)
+            return {
+                "status": "completed",
+                "agent": agent,
+                "result": result.model_dump(),
+                "latency_ms": (time.time() - start) * 1000,
+            }
+
+        elif agent == "excel":
+            from agents.claude_sdk.excel_handler import (
+                ExcelHandlerAgent,
+                ExcelOperation,
+                ExcelRequest,
+            )
+
+            sdk_agent = ExcelHandlerAgent()
+            request = ExcelRequest(
+                operation=ExcelOperation(parameters.get("operation", "create")),
+                description=task,
+                input_file=parameters.get("input_file"),
+                output_filename=parameters.get("output_filename"),
+            )
+            result = await sdk_agent.handle(request)
+            return {
+                "status": "completed",
+                "agent": agent,
+                "result": result.model_dump(),
+                "latency_ms": (time.time() - start) * 1000,
+            }
+
+        elif agent == "session":
+            from agents.claude_sdk.session import OneShotRequest, SessionManager
+
+            mgr = SessionManager()
+            result = await mgr.one_shot(
+                OneShotRequest(
+                    prompt=task,
+                    model=parameters.get("model", "sonnet"),
+                )
+            )
+            return {
+                "status": "completed",
+                "agent": agent,
+                "result": result.model_dump(),
+                "latency_ms": (time.time() - start) * 1000,
+            }
+
+        else:
+            from fastapi import HTTPException
+
+            raise HTTPException(
+                400, f"Unknown SDK agent: {agent}. Use: research, email, excel, session"
+            )
+
+    except ImportError:
+        return {"status": "error", "agent": agent, "error": "Claude Agent SDK not installed"}
+    except Exception as e:
+        logger.exception(f"SDK agent execution failed: {agent}")
+        return {
+            "status": "failed",
+            "agent": agent,
+            "error": str(e),
+            "latency_ms": (time.time() - start) * 1000,
+        }
+
+
+# =============================================================================
 # Export
 # =============================================================================
 
@@ -1144,4 +1364,5 @@ __all__ = [
     "ARDashboardOverview",
     "WordPressDashboardOverview",
     "HuggingFaceDashboardOverview",
+    "ClaudeSDKDashboardOverview",
 ]

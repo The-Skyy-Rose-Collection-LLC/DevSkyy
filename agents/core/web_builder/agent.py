@@ -63,6 +63,18 @@ class WebBuilderCoreAgent(CoreAgent):
         except ImportError:
             logger.debug("[%s] WebDevSubAgent unavailable", self.name)
 
+        # SDK-powered agents (file editing + build verification)
+        try:
+            from agents.claude_sdk.domain_agents.web_builder import (
+                SDKTemplateBuilderAgent,
+                SDKThemeDevAgent,
+            )
+
+            self.register_sub_agent("sdk_theme_dev", SDKThemeDevAgent())
+            self.register_sub_agent("sdk_template_builder", SDKTemplateBuilderAgent())
+        except ImportError:
+            logger.debug("[%s] SDK web builder agents unavailable", self.name)
+
     def _get_director(self) -> Any:
         """Lazy-load the Elite Web Builder Director."""
         if self._director is None:
