@@ -115,7 +115,7 @@ You are an expert marketing strategist and content creator with expertise in:
 ## BRAND VOICE
 **Tone:** Sophisticated yet accessible, bold and confident, emotionally resonant
 **Style:** Luxury without pretension, authentic street culture roots
-**Tagline:** "Where Love Meets Luxury"
+**Tagline:** "Luxury Grows from Concrete."
 **Philosophy:** Elevating streetwear to luxury status while honoring its origins
 
 ## TARGET AUDIENCE
@@ -646,7 +646,7 @@ Query: {prompt[:200]}...
 Brand Voice Applied:
 - Sophisticated yet accessible
 - Luxury streetwear positioning
-- "Where Love Meets Luxury"
+- "Luxury Grows from Concrete."
 
 For full marketing capabilities, ensure backend is configured."""
 

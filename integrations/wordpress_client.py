@@ -79,7 +79,7 @@ COLLECTION_CONFIG = {
 # Brand metadata for all products
 BRAND_META = {
     "_skyyrose_brand": "SkyyRose",
-    "_skyyrose_tagline": "Where Love Meets Luxury",
+    "_skyyrose_tagline": "Luxury Grows from Concrete.",
     "_skyyrose_origin": "Oakland, CA",
 }
 

@@ -799,8 +799,9 @@ async def generate_from_image_url(
             temp_path.write_bytes(resp.content)
 
     except Exception as e:
+        logger.warning(f"Failed to download image for job {job.job_id}: {e}")
         job_store.fail(job.job_id, f"Failed to download image: {e}")
-        raise HTTPException(status_code=400, detail=f"Failed to download image: {e}")
+        raise HTTPException(status_code=400, detail="Failed to download image")
 
     # Schedule background task based on provider
     huggingface_image_providers = [
@@ -879,8 +880,9 @@ async def generate_from_upload(
         content = await file.read()
         upload_path.write_bytes(content)
     except Exception as e:
+        logger.error(f"Failed to save upload for job {job.job_id}: {e}", exc_info=True)
         job_store.fail(job.job_id, f"Failed to save upload: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to save upload: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
     # Schedule background task based on provider
     huggingface_image_providers = [

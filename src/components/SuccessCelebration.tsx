@@ -387,7 +387,7 @@ export const SuccessCelebration: React.FC<SuccessCelebrationProps> = ({
             fontFamily: 'Georgia, serif',
           }}
         >
-          Where Love Meets Luxury
+          Luxury Grows from Concrete.
         </p>
       </div>
 

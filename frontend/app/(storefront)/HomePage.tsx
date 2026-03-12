@@ -120,7 +120,7 @@ export default function HomePage() {
                   transition={{ delay: 1, duration: 0.8 }}
                   className="text-white/40 text-lg md:text-xl tracking-[0.15em] mb-2 font-body"
                 >
-                  Where Love Meets Luxury
+                  Luxury Grows from Concrete.
                 </motion.p>
 
                 {/* Decorative line */}
@@ -481,7 +481,7 @@ export default function HomePage() {
                 SKYYROSE
               </h3>
               <p className="text-white/30 text-sm leading-relaxed max-w-sm">
-                Where Love Meets Luxury. Three immersive worlds of fashion,
+                Luxury Grows from Concrete.. Three immersive worlds of fashion,
                 crafted with AI precision and human artistry.
               </p>
             </div>
@@ -528,7 +528,7 @@ export default function HomePage() {
               &copy; 2026 SkyyRose LLC. All rights reserved.
             </p>
             <p className="text-white/10 text-xs tracking-[0.2em] uppercase">
-              Where Love Meets Luxury
+              Luxury Grows from Concrete.
             </p>
           </div>
         </div>
