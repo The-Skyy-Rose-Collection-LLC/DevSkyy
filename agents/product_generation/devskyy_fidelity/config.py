@@ -59,7 +59,7 @@ BLACK_ROSE_CONFIG = CollectionFidelityConfig(
         "#800080",  # purple/pink branding
         "#CCAACC",  # mauve-pink SR monogram
         "#B76E79",  # rose gold (brand)
-        "#00CED1",  # cyan/teal (hockey jersey)
+        "#00B1BF",  # bright cyan/aqua (hockey jersey — br-011 garment analysis)
         "#DC143C",  # crimson (brand)
     ),
 )
