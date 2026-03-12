@@ -26,6 +26,7 @@ from api.v1.analytics.dashboard import router as analytics_dashboard_router
 from api.v1.approval import router as approval_router
 from api.v1.assets import router as assets_router
 from api.v1.brand_assets import router as brand_assets_router
+from api.v1.claude_sdk import router as claude_sdk_router
 from api.v1.code import router as code_router
 from api.v1.commerce import router as commerce_router
 from api.v1.competitors import router as competitors_router
@@ -63,4 +64,5 @@ __all__ = [
     "wordpress_theme_router",
     "training_router",
     "sync_router",
+    "claude_sdk_router",
 ]

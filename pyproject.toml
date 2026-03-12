@@ -77,6 +77,7 @@ dependencies = [
     # AI/ML & MCP Server
     "openai>=1.6",
     "mcp>=1.23.0",  # Fixed: CVE-2025-53365, CVE-2025-53366, CVE-2025-66416
+    "claude-agent-sdk>=0.1.0",  # Claude Agent SDK for multi-agent orchestration
 
     # LLM Provider SDKs
     "anthropic>=0.75.0",
@@ -99,6 +100,7 @@ dependencies = [
     # "python-jose[cryptography]>=3.3",  # Removed: depends on ecdsa (CVE-2024-23342). Using PyJWT instead.
     "sentry-sdk>=2.49.0",
     "toml>=0.10.2",
+    "openpyxl>=3.1.0",  # Excel spreadsheet creation/analysis
 
     # 3D & Visual Generation
     "Pillow>=10.0",

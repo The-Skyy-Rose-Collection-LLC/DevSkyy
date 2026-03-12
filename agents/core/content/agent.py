@@ -60,6 +60,18 @@ class ContentCoreAgent(CoreAgent):
         except ImportError:
             logger.debug("[%s] SeoCopywriterSubAgent unavailable", self.name)
 
+        # SDK-powered agents (file + web access)
+        try:
+            from agents.claude_sdk.domain_agents.content import (
+                SDKCollectionPublisherAgent,
+                SDKSeoWriterAgent,
+            )
+
+            self.register_sub_agent("sdk_seo_writer", SDKSeoWriterAgent())
+            self.register_sub_agent("sdk_collection_publisher", SDKCollectionPublisherAgent())
+        except ImportError:
+            logger.debug("[%s] SDK content agents unavailable", self.name)
+
     def _get_legacy_agent(self) -> Any:
         if self._legacy_agent is None:
             try:
@@ -74,16 +86,25 @@ class ContentCoreAgent(CoreAgent):
 
     async def execute(self, task: str, **kwargs: Any) -> dict[str, Any]:
         task_lower = task.lower()
+        needs_action = any(
+            kw in task_lower for kw in ["generate", "create", "write", "publish", "optimize"]
+        )
 
         if any(kw in task_lower for kw in ["collection", "section", "hero"]):
+            if needs_action and "sdk_collection_publisher" in self._sub_agents:
+                return await self.delegate("sdk_collection_publisher", task, **kwargs)
             if "collection_content" in self._sub_agents:
                 return await self.delegate("collection_content", task, **kwargs)
 
         if any(kw in task_lower for kw in ["seo", "meta", "keyword", "ranking"]):
+            if needs_action and "sdk_seo_writer" in self._sub_agents:
+                return await self.delegate("sdk_seo_writer", task, **kwargs)
             if "seo_content" in self._sub_agents:
                 return await self.delegate("seo_content", task, **kwargs)
 
-        if any(kw in task_lower for kw in ["copy", "blog", "post", "write"]):
+        if any(kw in task_lower for kw in ["copy", "blog", "post"]):
+            if needs_action and "sdk_collection_publisher" in self._sub_agents:
+                return await self.delegate("sdk_collection_publisher", task, **kwargs)
             if "copywriter" in self._sub_agents:
                 return await self.delegate("copywriter", task, **kwargs)
 
