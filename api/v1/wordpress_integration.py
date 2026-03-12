@@ -7,8 +7,11 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import logging
 import os
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from pydantic import BaseModel, Field
@@ -341,7 +344,8 @@ async def wordpress_health(
                 "test_query": f"Found {len(products)} products",
             }
         except Exception as e:
+            logger.error(f"WordPress integration health check failed: {e}", exc_info=True)
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail=f"WordPress integration unhealthy: {e}",
+                detail="WordPress integration unhealthy",
             )

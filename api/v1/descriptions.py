@@ -119,8 +119,8 @@ async def generate_description(
         return result
 
     except Exception as e:
-        logger.error(f"Description generation failed: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Description generation failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.post("/generate/quick", response_model=DescriptionOutput)
@@ -183,8 +183,8 @@ async def generate_batch_descriptions(
         )
 
     except Exception as e:
-        logger.error(f"Batch description failed: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Batch description failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.post("/extract-features", response_model=ExtractedFeatures)
@@ -209,8 +209,8 @@ async def extract_features(
         return result
 
     except Exception as e:
-        logger.error(f"Feature extraction failed: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Feature extraction failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("/models", response_model=list[dict[str, Any]])
@@ -291,7 +291,7 @@ async def list_styles(
             "id": DescriptionStyle.LUXURY.value,
             "name": "Luxury",
             "description": "Sophisticated, evocative language for high-end fashion",
-            "brand_voice": "SkyyRose - Where Love Meets Luxury",
+            "brand_voice": "SkyyRose - Luxury Grows from Concrete.",
             "example_tone": "Crafted with precision, this piece embodies effortless elegance...",
         },
         {

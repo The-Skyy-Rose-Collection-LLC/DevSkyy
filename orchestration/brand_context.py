@@ -43,7 +43,7 @@ class Collection(StrEnum):
 SKYYROSE_BRAND: dict[str, Any] = {
     "name": "The Skyy Rose Collection",
     "tagline": "Luxury Streetwear with Soul",
-    "philosophy": "Where Love Meets Luxury",
+    "philosophy": "Luxury Grows from Concrete.",
     "location": "Oakland, California",
     "tone": {
         "primary": "Elegant, empowering, romantic, bold",

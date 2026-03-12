@@ -150,7 +150,7 @@ class CreativeAgent(EnhancedSuperAgent):
         "aesthetic": "luxury streetwear",
         "style": "bold, sophisticated, emotionally resonant",
         "quality": "premium, high-resolution, editorial",
-        "tagline": "Where Love Meets Luxury",
+        "tagline": "Luxury Grows from Concrete.",
         "collections": {
             "BLACK ROSE": "dark elegance, limited edition, mysterious allure",
             "LOVE HURTS": "emotional expression, bold statements, vulnerable strength",
@@ -805,7 +805,7 @@ For full visual generation, ensure visual APIs are configured."""
         task_prompt = f"""Generate an image using {provider.value}:
 
 Prompt: {enhanced_prompt}
-Brand: SkyyRose - "Where Love Meets Luxury"
+Brand: SkyyRose - "Luxury Grows from Concrete."
 Style: Luxury streetwear, editorial quality
 Colors: Rose gold accents, black foundation, white contrast
 
@@ -946,7 +946,7 @@ Parameters: {kwargs}"""
     def _enhance_visual_prompt(self, prompt: str) -> str:
         """Enhance prompt with brand DNA"""
         brand_context = f"""
-Brand: SkyyRose - "Where Love Meets Luxury"
+Brand: SkyyRose - "Luxury Grows from Concrete."
 Aesthetic: {self.SKYYROSE_BRAND_DNA["aesthetic"]}
 Style: {self.SKYYROSE_BRAND_DNA["style"]}
 Quality: {self.SKYYROSE_BRAND_DNA["quality"]}

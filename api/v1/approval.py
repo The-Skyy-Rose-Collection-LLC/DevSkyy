@@ -209,9 +209,10 @@ async def process_approval_action(
             detail=f"Approval item not found: {item_id}",
         )
     except InvalidApprovalActionError as e:
+        logger.warning(f"Invalid approval action: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="Invalid approval action",
         )
 
 
@@ -286,9 +287,10 @@ async def complete_revision(
             new_enhanced_url=request.new_enhanced_url,
         )
     except Exception as e:
+        logger.warning(f"Failed to complete revision: {e}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
+            detail="Failed to complete revision",
         )
 
 

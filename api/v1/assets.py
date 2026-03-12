@@ -661,10 +661,10 @@ async def list_asset_versions(
         )
         return response
 
-    except AssetNotFoundError as e:
+    except AssetNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Asset not found",
         )
     except Exception as e:
         logger.error(
@@ -711,15 +711,15 @@ async def get_asset_version(
         )
         return version
 
-    except VersionNotFoundError as e:
+    except VersionNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Version not found",
         )
-    except AssetNotFoundError as e:
+    except AssetNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Asset not found",
         )
     except Exception as e:
         logger.error(
@@ -789,15 +789,15 @@ async def revert_asset_version(
 
         return version
 
-    except VersionNotFoundError as e:
+    except VersionNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Version not found",
         )
-    except AssetNotFoundError as e:
+    except AssetNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Asset not found",
         )
     except Exception as e:
         logger.error(
@@ -880,10 +880,10 @@ async def update_asset_retention(
 
         return asset_info
 
-    except AssetNotFoundError as e:
+    except AssetNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Asset not found",
         )
     except Exception as e:
         logger.error(
@@ -945,15 +945,15 @@ async def delete_asset_version(
             extra={"correlation_id": correlation_id},
         )
 
-    except VersionNotFoundError as e:
+    except VersionNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Version not found",
         )
-    except AssetNotFoundError as e:
+    except AssetNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Asset not found",
         )
     except Exception as e:
         logger.error(

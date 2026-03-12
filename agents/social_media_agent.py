@@ -8,7 +8,7 @@ Uses LLM routing to generate brand-voice captions, hashtag strategies, and campa
 Features:
 - Platform-specific formatting (character limits, hashtag strategies, media recommendations)
 - Campaign generation (multi-product, multi-platform)
-- Brand voice enforcement (SkyyRose luxury fashion, "Where Love Meets Luxury", rose gold #B76E79)
+- Brand voice enforcement (SkyyRose luxury fashion, "Luxury Grows from Concrete.", rose gold #B76E79)
 - Content types: product_launch, collection_drop, behind_scenes, lifestyle, engagement
 - Scheduling recommendations based on platform best practices
 - 3 collections: Black Rose (gothic luxury), Love Hurts (street passion), Signature (West Coast luxury)
@@ -42,7 +42,7 @@ _MAX_QUEUE_SIZE = 5000
 _MAX_PUBLISHED_SIZE = 10000
 
 BRAND_NAME = "SkyyRose"
-BRAND_TAGLINE = "Where Love Meets Luxury"
+BRAND_TAGLINE = "Luxury Grows from Concrete."
 BRAND_PRIMARY_COLOR = "#B76E79"  # Rose gold
 BRAND_ORIGIN = "Oakland, CA"
 BRAND_SITE = "skyyrose.co"

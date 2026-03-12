@@ -7,6 +7,7 @@ import json
 import logging
 import os
 import secrets
+from datetime import UTC, datetime
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -133,7 +134,9 @@ class SecurityHardening:
                 results.append("✅ All required environment variables present")
 
             if weak_vars:
-                results.append(f"⚠️ Weak environment variables (< 32 chars): {', '.join(weak_vars)}")
+                results.append(
+                    f"⚠️ Weak environment variables (< 32 chars): {', '.join(weak_vars)}"
+                )
             else:
                 results.append("✅ All environment variables meet minimum length requirements")
 
@@ -299,7 +302,7 @@ class SecurityHardening:
         audit_results["summary"] = [
             f"Security Audit Complete: {passed_checks}/{total_checks} checks passed",
             f"Environment: {self.environment}",
-            f"Timestamp: {os.popen('date').read().strip()}",
+            f"Timestamp: {datetime.now(UTC).isoformat()}",
         ]
 
         logger.info(f"Security audit completed: {passed_checks}/{total_checks} checks passed")
