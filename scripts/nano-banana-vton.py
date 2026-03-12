@@ -1522,11 +1522,17 @@ def process_product(
 
         # For back view, use back-specific source if available
         view_src = src
+        has_back_ref = False  # True only when we have a dedicated back reference image
         if view == "back":
             back_src = get_back_source(sku, PRODUCT_CATALOG.get(sku, {}))
             if back_src:
                 view_src = back_src
+                has_back_ref = True
                 log.info("Using back source for %s: %s", sku, back_src.name)
+            else:
+                log.debug(
+                    "%s has no back_source_override — back vision compare skipped (plain back)", sku
+                )
 
         success = False
         vision_feedback = ""  # Corrective feedback from vision compare — injected on retry
@@ -1567,7 +1573,10 @@ def process_product(
                 # ── Vision compare: generated render vs source tech flat ──────
                 # Compare the render against the source design. On failure, inject
                 # specific issues as corrective feedback and retry generation.
-                if view_src:
+                # Skip for back views without a dedicated back reference — the front
+                # techflat is not a valid comparison target for a plain back.
+                run_vision = view_src and (view != "back" or has_back_ref)
+                if run_vision:
                     logo_spec = LOGO_TREATMENTS.get(sku, "")
                     vision = gemini_vision_compare(client, view_src, image_bytes, name, logo_spec)
                     v_score = vision.get("score", 100)
