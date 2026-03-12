@@ -32,7 +32,7 @@ from services.storage import (
     VersionNotFoundError,
 )
 
-from security.jwt_oauth2_auth import TokenPayload, get_current_user
+from security.jwt_oauth2_auth import TokenPayload, UserRole, get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -826,12 +826,11 @@ async def update_asset_retention(
     """
     correlation_id = str(uuid4())
 
-    # TODO: Check for admin role
-    # if "admin" not in user.roles:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_403_FORBIDDEN,
-    #         detail="Admin privileges required to update retention policy",
-    #     )
+    if not user.has_any_role({UserRole.ADMIN, UserRole.SUPER_ADMIN}):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required to update retention policy",
+        )
 
     logger.info(
         f"Updating retention for asset {asset_id}",

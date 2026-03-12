@@ -41,7 +41,7 @@ from services.approval_queue_manager import (
     get_approval_manager,
 )
 
-from security.jwt_oauth2_auth import TokenPayload, get_current_user
+from security.jwt_oauth2_auth import TokenPayload, UserRole, get_current_user
 from sync.wordpress_media_approval_sync import (
     BatchSyncResult,
     WordPressMediaApprovalSync,
@@ -407,7 +407,11 @@ async def expire_old_items(
 
     Admin-only operation. Returns count of expired items.
     """
-    # TODO: Add role check for admin
+    if not current_user.has_any_role({UserRole.ADMIN, UserRole.SUPER_ADMIN}):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required to expire approval items",
+        )
 
     count = await manager.expire_old_items()
     return {"expired_count": count}
