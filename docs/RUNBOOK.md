@@ -1,6 +1,6 @@
 # DevSkyy Production Runbook
 
-**Last Updated**: 2026-03-09
+**Last Updated**: 2026-03-12
 **Production URL**: devskyy.app (Vercel)
 **WordPress**: SkyyRose Flagship theme
 
@@ -25,12 +25,25 @@ git push origin main   # Triggers Vercel auto-deploy
 
 ### WordPress Theme
 
+Single-command pipeline (build → rsync → maintenance mode → verify):
+
 ```bash
-cd wordpress-theme/skyyrose-flagship
-bash scripts/wp-deploy-theme.sh   # SFTP sync + WP-CLI config
+bash scripts/deploy-pipeline.sh        # Full deploy + verify
+bash scripts/deploy-pipeline.sh --dry-run  # Preview without deploying
 ```
 
-Or manual SFTP upload of `wordpress-theme/skyyrose-flagship/` to `/wp-content/themes/skyyrose-flagship/`.
+Individual steps:
+```bash
+bash scripts/deploy-theme.sh           # Transfer theme files only
+bash scripts/verify-deploy.sh          # Verify 11 pages post-deploy
+WORDPRESS_URL=https://staging.skyyrose.co bash scripts/verify-deploy.sh  # Staging
+```
+
+Pages verified (11 total): Homepage, REST API, Collections ×3, About, Immersive ×3, Pre-Order Gateway, Experiences Hub.
+
+Credentials required in `.env.wordpress`: `SSH_HOST`, `SSH_USER`, `SSH_PASS`, `WP_THEME_PATH`, `SFTP_HOST`, `SFTP_USER`, `SFTP_PASS`.
+
+Note: Binary assets in `assets/images/` are gitignored — rsync uploads them from local disk each deploy.
 
 ### Backend (Docker)
 
