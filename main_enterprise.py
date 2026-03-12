@@ -109,7 +109,7 @@ cors_origins = [o.strip() for o in cors_origins if o.strip()] or [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
-    allow_origin_regex=r"https://.*\.(vercel\.app|devskyy\.app)",
+    allow_origin_regex=r"https://[a-zA-Z0-9-]+\.(vercel\.app|devskyy\.app)",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "X-Request-ID", "X-Correlation-ID"],
