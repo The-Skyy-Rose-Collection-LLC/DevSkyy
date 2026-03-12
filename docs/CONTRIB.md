@@ -1,6 +1,6 @@
 # DevSkyy Contributor Guide
 
-**Last Updated**: 2026-03-09
+**Last Updated**: 2026-03-12
 **Source of Truth**: `package.json`, `Makefile`, `.env.example`
 
 ---
@@ -187,8 +187,7 @@ DevSkyy/
 ├── orchestration/              # RAG, LangGraph workflows
 ├── services/                   # ML, 3D, Analytics
 ├── security/                   # JWT, OAuth2, AES-256-GCM
-├── scripts/                    # ~78 active utilities
-│   └── archive/                # Archived/obsolete scripts
+├── scripts/                    # Active utilities (deploy, verify, php-lint)
 ├── tests/                      # pytest + jest
 └── docs/                       # Documentation
     └── archive/                # Historical docs
