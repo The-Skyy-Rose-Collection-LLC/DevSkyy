@@ -179,7 +179,7 @@ PRODUCT_CATALOG = {
         "name": "Love Hurts Windbreaker",
         "collection": "love-hurts",
         "output_slug": "love-hurts-windbreaker",
-        # No source photo yet.
+        "source_override": "love-hurts-windbreaker-techflat.jpeg",
     },
     "lh-006": {
         "name": "The Fannie",
@@ -207,6 +207,7 @@ PRODUCT_CATALOG = {
         "name": "The Bridge Series 'Stay Golden' Shorts",
         "collection": "signature",
         "output_slug": "stay-golden-shorts",
+        "source_override": "stay-golden-shorts-source.jpeg",
         "is_preorder": True,
     },
     "sg-004": {
@@ -219,6 +220,7 @@ PRODUCT_CATALOG = {
         "name": "The Bridge Series 'The Bay Bridge' Shirt",
         "collection": "signature",
         "output_slug": "bay-bridge-shirt",
+        "source_override": "bay-bridge-shirt-source.jpeg",
         "is_preorder": True,
     },
     "sg-006": {
@@ -232,6 +234,7 @@ PRODUCT_CATALOG = {
         "name": "The Signature Beanie",
         "collection": "signature",
         "output_slug": "signature-beanie",
+        "source_override": "signature-beanie-green.jpeg",
         "is_preorder": True,
     },
     "sg-009": {
@@ -263,12 +266,14 @@ PRODUCT_CATALOG = {
         "name": "Mint & Lavender Crewneck",
         "collection": "signature",
         "output_slug": "mint-lavender-crewneck",
+        "source_override": "mint-lavender-crewneck-techflat.jpeg",
         "is_preorder": True,
     },
     "sg-014": {
         "name": "Mint & Lavender Sweatpants",
         "collection": "signature",
         "output_slug": "mint-lavender-sweatpants",
+        "source_override": "mint-lavender-sweatpants-techflat.jpeg",
         "is_preorder": True,
     },
     # ── Kids Capsule (2 products) ──────────────────────────────────────────
