@@ -19,7 +19,7 @@ from typing import Any
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from services.storage import (
     AssetInfo,
     AssetNotFoundError,
@@ -33,6 +33,7 @@ from services.storage import (
 )
 
 from security.jwt_oauth2_auth import TokenPayload, UserRole, get_current_user
+from security.ssrf_protection import ssrf_protection
 
 logger = logging.getLogger(__name__)
 
@@ -93,6 +94,14 @@ class IngestRequest(BaseModel):
         default=None,
         description="Webhook URL to call on completion",
     )
+
+    @field_validator("callback_url")
+    @classmethod
+    def validate_callback_url(cls, v: str | None) -> str | None:
+        if v is not None:
+            ssrf_protection.validate_url(v)
+        return v
+
     metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional metadata to store with the asset",

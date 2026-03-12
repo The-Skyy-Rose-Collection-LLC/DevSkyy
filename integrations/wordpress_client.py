@@ -19,6 +19,8 @@ from typing import Any, Literal
 import httpx
 from pydantic import BaseModel, Field
 
+from security.ssrf_protection import ssrf_protection
+
 logger = logging.getLogger(__name__)
 
 
@@ -486,7 +488,8 @@ class WordPressClient:
         caption: str | None = None,
     ) -> MediaUploadResult:
         """Upload media from a URL."""
-        # Download image
+        # Download image — validate against SSRF before fetching
+        ssrf_protection.validate_url(image_url)
         async with httpx.AsyncClient() as download_client:
             response = await download_client.get(image_url)
             response.raise_for_status()
