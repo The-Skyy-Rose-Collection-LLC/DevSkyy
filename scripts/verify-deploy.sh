@@ -63,7 +63,8 @@ usage() {
     echo ""
     echo "Pages verified:"
     echo "  Homepage, REST API, Collection: Black Rose, Collection: Love Hurts,"
-    echo "  Collection: Signature, About"
+    echo "  Collection: Signature, About, Immersive: Black Rose, Immersive: Love Hurts,"
+    echo "  Immersive: Signature, Pre-Order Gateway, Experiences Hub"
 }
 
 # ---------------------------------------------------------------------------
@@ -76,6 +77,11 @@ HEALTH_CHECKS=(
     "Collection: Love Hurts|/collection-love-hurts/|Love Hurts"
     "Collection: Signature|/collection-signature/|Signature"
     "About|/about/|SkyyRose"
+    "Immersive: Black Rose|/experience-black-rose/|immersive-black-rose"
+    "Immersive: Love Hurts|/experience-love-hurts/|immersive-love-hurts"
+    "Immersive: Signature|/experience-signature/|immersive-signature"
+    "Pre-Order Gateway|/pre-order/|pre-order"
+    "Experiences Hub|/experience/|Immersive Experiences"
 )
 
 # ---------------------------------------------------------------------------
