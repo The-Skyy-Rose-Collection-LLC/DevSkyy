@@ -250,7 +250,13 @@ class Orchestrator(SelfHealingMixin):
             except Exception:
                 continue
 
-        # All agents failed — human required
+        # All regular agents failed — try SDK escalation before human
+        sdk_result = await self._sdk_escalation(task, **kwargs)
+        if sdk_result and sdk_result.get("success"):
+            logger.info("[orchestrator] SDK escalation resolved the task")
+            return sdk_result
+
+        # SDK also failed — human required
         self._record_failure()
         return {
             "success": False,
@@ -259,6 +265,77 @@ class Orchestrator(SelfHealingMixin):
             "original_failure": original_result,
             "agents_tried": [a.name for a in self._core_agents.values()],
         }
+
+    # -------------------------------------------------------------------------
+    # SDK Availability
+    # -------------------------------------------------------------------------
+
+    @staticmethod
+    def _sdk_available() -> bool:
+        """Check if Claude Agent SDK is importable."""
+        try:
+            from agents.claude_sdk.mixin import SDKCapabilityMixin  # noqa: F401
+
+            return True
+        except ImportError:
+            return False
+
+    # -------------------------------------------------------------------------
+    # SDK Escalation
+    # -------------------------------------------------------------------------
+
+    async def _sdk_escalation(self, task: str, **kwargs: Any) -> dict[str, Any] | None:
+        """Last-resort escalation via Claude Agent SDK.
+
+        When all core agents fail, spawn an SDK agent with full tool
+        access to attempt the task autonomously. This sits between
+        agent failure and human escalation in the chain.
+
+        Returns None if SDK is not available.
+        """
+        try:
+            from agents.claude_sdk.mixin import SDKCapabilityMixin
+            from agents.claude_sdk.tool_bridge import ToolProfile
+        except ImportError:
+            logger.debug("[orchestrator] SDK not available for escalation")
+            return None
+
+        # Create a temporary SDK-capable executor
+        class _EscalationAgent(SDKCapabilityMixin):
+            sdk_tools = ToolProfile.FULL
+            sdk_model = "sonnet"
+            sdk_output_base = __import__("pathlib").Path("data/sdk_sessions/escalation")
+
+            def _sdk_default_prompt(self):
+                return (
+                    "You are a DevSkyy escalation agent with full "
+                    "system access. A task has failed through normal "
+                    "agent channels and you are the last automated "
+                    "resort before human intervention. Analyze the "
+                    "task, use all available tools, and attempt to "
+                    "complete it. If you cannot complete it, explain "
+                    "exactly what blocked you and what a human needs "
+                    "to do."
+                )
+
+        agent = _EscalationAgent()
+        try:
+            result = await agent._sdk_execute(task, label="escalation")
+            if result.success:
+                return {
+                    "success": True,
+                    "result": result.response,
+                    "resolved_by": "sdk_escalation",
+                    "metrics": result.metrics,
+                    "session_dir": result.session_dir,
+                }
+        except Exception as exc:
+            logger.warning(
+                "[orchestrator] SDK escalation failed: %s",
+                str(exc)[:200],
+            )
+
+        return None
 
     # -------------------------------------------------------------------------
     # System Health
@@ -295,6 +372,7 @@ class Orchestrator(SelfHealingMixin):
                 "system_healthy": total_healthy == total_agents,
                 "budget_spent": self._budget_spent_usd,
                 "budget_limit": self._budget_limit_usd,
+                "sdk_escalation_available": self._sdk_available(),
             },
         }
 

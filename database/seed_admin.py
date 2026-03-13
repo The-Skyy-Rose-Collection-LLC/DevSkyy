@@ -19,7 +19,12 @@ async def seed_admin():
 
     admin_email = os.getenv("ADMIN_EMAIL", "admin@skyyrose.co")
     admin_username = os.getenv("ADMIN_USERNAME", "admin")
-    admin_password = os.getenv("ADMIN_PASSWORD", "SkyyRose!2026Admin")
+    admin_password = os.environ.get("ADMIN_PASSWORD")
+    if not admin_password:
+        raise SystemExit(
+            "ADMIN_PASSWORD environment variable is required. "
+            "Refusing to seed with a default password."
+        )
 
     async with db_manager.session() as db:
         from database.db import UserRepository

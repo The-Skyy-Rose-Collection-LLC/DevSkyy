@@ -53,7 +53,7 @@
 	-webkit-font-smoothing: antialiased;
 	overflow-x: hidden;
 	line-height: 1.65;
-	font-size: 17px;
+	font-size: var(--text-base);
 }
 
 .homepage-v2 img { max-width: 100%; display: block; }
@@ -97,7 +97,7 @@
 }
 .ld-tag {
 	font-family: var(--ff-mono);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 8px;
 	text-transform: uppercase;
 	color: var(--rose);
@@ -158,7 +158,7 @@
 .nav.scrolled .nav-name { letter-spacing: 6px; }
 .nav-sub {
 	font-family: var(--ff-mono);
-	font-size: 6px;
+	font-size: 10px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
 	color: var(--rose);
@@ -174,7 +174,7 @@
 }
 .nav-link {
 	font-family: var(--ff-mono);
-	font-size: 9px;
+	font-size: 11px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	color: var(--haze);
@@ -213,7 +213,7 @@
 	background: var(--rose);
 	color: #fff;
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	width: 16px;
 	height: 16px;
 	border-radius: 50%;
@@ -470,7 +470,7 @@
 }
 .hero-scroll span {
 	font-family: var(--ff-mono);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 5px;
 	text-transform: uppercase;
 	color: var(--fog);
@@ -502,7 +502,7 @@
 }
 .press-label {
 	font-family: var(--ff-mono);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--rose);
@@ -598,7 +598,7 @@
 }
 .story-eyebrow {
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--rose);
@@ -626,7 +626,7 @@
 	margin-top: 8px;
 }
 .story-body {
-	font-size: 17px;
+	font-size: var(--text-base);
 	font-weight: 300;
 	font-style: italic;
 	color: var(--cloud);
@@ -649,7 +649,7 @@
 }
 .stat-label {
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
 	color: var(--haze);
@@ -686,7 +686,7 @@
 }
 .story-float .sf-lbl {
 	font-family: var(--ff-mono);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
 	color: var(--rose);
@@ -743,7 +743,7 @@
 	position: relative;
 	z-index: 2;
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--fog);
@@ -765,7 +765,7 @@
 }
 .col-header-eyebrow {
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 8px;
 	text-transform: uppercase;
 	color: var(--rose);
@@ -822,7 +822,7 @@
 }
 .col-card-num {
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 5px;
 	text-transform: uppercase;
 	margin-bottom: 8px;
@@ -847,7 +847,7 @@
 	display: flex;
 	gap: 20px;
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	margin-bottom: 20px;
@@ -915,7 +915,7 @@
 .lookbook-header p {
 	font-family: var(--ff-editorial);
 	font-style: italic;
-	font-size: 15px;
+	font-size: var(--text-sm);
 	color: var(--haze);
 	margin-top: 8px;
 }
@@ -956,7 +956,7 @@
 	left: 16px;
 	z-index: 2;
 	font-family: var(--ff-mono);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
 	opacity: 0;
@@ -987,7 +987,7 @@
 .craft-header p {
 	font-family: var(--ff-editorial);
 	font-style: italic;
-	font-size: 16px;
+	font-size: var(--text-base);
 	color: var(--haze);
 }
 .craft-grid {
@@ -1014,7 +1014,7 @@
 	margin-bottom: 8px;
 }
 .craft-desc {
-	font-size: 14px;
+	font-size: var(--text-sm);
 	font-style: italic;
 	color: var(--haze);
 	line-height: 1.8;
@@ -1045,7 +1045,7 @@
 }
 .nl-eyebrow {
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
 	color: var(--rose);
@@ -1061,7 +1061,7 @@
 	margin-bottom: 14px;
 }
 .nl-desc {
-	font-size: 16px;
+	font-size: var(--text-base);
 	font-style: italic;
 	font-weight: 300;
 	color: var(--cloud);
@@ -1082,7 +1082,7 @@
 	border-right: none;
 	color: #fff;
 	font-family: var(--ff-body);
-	font-size: 15px;
+	font-size: var(--text-sm);
 	font-style: italic;
 	outline: none;
 	transition: border-color .4s;
@@ -1104,7 +1104,7 @@
 .nl-submit:hover { opacity: .9; }
 .nl-note {
 	font-family: var(--ff-mono);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	color: var(--fog);
@@ -1134,7 +1134,7 @@
 	margin-bottom: 16px;
 }
 .ft-desc {
-	font-size: 14px;
+	font-size: var(--text-sm);
 	font-style: italic;
 	color: var(--haze);
 	line-height: 1.9;
@@ -1147,14 +1147,14 @@
 }
 .ft-award {
 	font-family: var(--ff-mono);
-	font-size: 7px;
+	font-size: 10px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	color: var(--fog);
 }
 .ft-col-title {
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 5px;
 	text-transform: uppercase;
 	color: var(--rose);
@@ -1168,7 +1168,7 @@
 	gap: 10px;
 }
 .ft-links a {
-	font-size: 14px;
+	font-size: var(--text-sm);
 	font-style: italic;
 	color: var(--haze);
 	transition: color .3s;
@@ -1187,7 +1187,7 @@
 }
 .ft-copy {
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	color: var(--fog);
@@ -1198,7 +1198,7 @@
 }
 .ft-social a {
 	font-family: var(--ff-mono);
-	font-size: 9px;
+	font-size: 11px;
 	letter-spacing: 3px;
 	text-transform: uppercase;
 	color: var(--haze);
@@ -1207,7 +1207,7 @@
 .ft-social a:hover { color: var(--rose); }
 .ft-oakland {
 	font-family: var(--ff-mono);
-	font-size: 8px;
+	font-size: 11px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
 	color: var(--fog);
@@ -1240,6 +1240,20 @@
 	.ft-bottom { flex-direction: column; text-align: center; }
 	.nl-form { flex-direction: column; }
 	.nl-input { border-right: 1px solid var(--glass); border-bottom: none; margin-bottom: -1px; }
+	.homepage-v2 .col-header { padding: 0 16px; }
+	.homepage-v2 .lookbook-header { padding: 0 16px; }
+}
+
+@media (max-width: 480px) {
+	.homepage-v2 .nav { padding: 16px 16px; }
+	.homepage-v2 .nav.scrolled { padding: 12px 16px; }
+	.homepage-v2 .story { padding: 60px 16px; }
+	.homepage-v2 .quote-section { padding: 60px 16px; }
+	.homepage-v2 .craft { padding: 60px 16px; }
+	.homepage-v2 .newsletter { padding: 60px 16px; }
+	.homepage-v2 .ft { padding: 48px 16px 24px; }
+	.homepage-v2 .press { padding: 24px 16px; }
+	.homepage-v2 .back-to-top { width: 44px; height: 44px; }
 }
 
 /* ─── BONUS: Scroll Progress Indicator ─── */
@@ -1292,5 +1306,5 @@
 }
 
 @media (max-width: 768px) {
-	.back-to-top { bottom: 20px; right: 20px; width: 40px; height: 40px; }
+	.back-to-top { bottom: 20px; right: 20px; width: 44px; height: 44px; }
 }

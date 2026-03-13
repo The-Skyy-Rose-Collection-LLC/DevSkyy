@@ -33,7 +33,7 @@ $collection_config = array(
 		. '<p>' . esc_html__( 'Gothic castle halls, crimson fire, rose petals on stone floors. Every thread channels the beauty in pain, the strength in vulnerability. Some things you don\'t hide. You wear them.', 'skyyrose-flagship' ) . '</p>',
 	'manifesto_scene'   => SKYYROSE_ASSETS_URI . '/scenes/love-hurts/love-hurts-gothic-ballroom.webp',
 
-	'featured_sku'      => 'lh-001',
+	'featured_sku'      => 'lh-006',
 
 	'nl_title'          => __( 'Wear Your Heart', 'skyyrose-flagship' ),
 	'nl_desc'           => __( 'Early access to drops. Behind-the-scenes from Oakland. Stories that matter.', 'skyyrose-flagship' ),

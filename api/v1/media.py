@@ -14,9 +14,10 @@ from typing import Literal
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
+from security.ssrf_protection import ssrf_protection
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -74,6 +75,14 @@ class ThreeDGenerationFromImageRequest(BaseModel):
         description="URL or base64-encoded image for 3D generation",
         max_length=10000,
     )
+
+    @field_validator("image_url")
+    @classmethod
+    def validate_image_url(cls, v: str) -> str:
+        if v.startswith(("http://", "https://")):
+            ssrf_protection.validate_url(v)
+        return v
+
     output_format: Literal["glb", "gltf", "fbx", "obj", "usdz", "stl"] = Field(
         default="glb",
         description="Output 3D model format. GLB recommended for web.",

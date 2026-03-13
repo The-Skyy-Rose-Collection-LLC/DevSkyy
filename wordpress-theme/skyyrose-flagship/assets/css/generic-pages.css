@@ -48,7 +48,7 @@
 }
 
 .skr-page__content.entry-content {
-	font-size: 1.05rem;
+	font-size: var(--text-base);
 	line-height: 1.75;
 	color: var(--color-text-secondary, #CCC);
 }
@@ -166,7 +166,7 @@
 /* --- Post content --- */
 
 .skr-single__content.entry-content {
-	font-size: 1.05rem;
+	font-size: var(--text-base);
 	line-height: 1.8;
 	color: var(--color-text-secondary, #CCC);
 }
@@ -279,7 +279,7 @@
 
 .skr-blog__desc {
 	font-family: var(--ff-body, 'Cormorant Garamond', serif);
-	font-size: 1.1rem;
+	font-size: var(--text-lg);
 	color: var(--color-text-muted, #999);
 	font-style: italic;
 }
@@ -342,7 +342,7 @@
 
 .skr-blog-card__title {
 	font-family: var(--font-heading, 'Playfair Display', serif);
-	font-size: 1.2rem;
+	font-size: var(--text-lg);
 	line-height: 1.3;
 	margin: 0;
 }
@@ -358,7 +358,7 @@
 }
 
 .skr-blog-card__excerpt {
-	font-size: 0.9rem;
+	font-size: var(--text-sm);
 	line-height: 1.6;
 	color: var(--color-text-muted, #999);
 }

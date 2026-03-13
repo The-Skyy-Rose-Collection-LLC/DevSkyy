@@ -19,7 +19,7 @@ from typing import Any
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from services.storage import (
     AssetInfo,
     AssetNotFoundError,
@@ -32,7 +32,8 @@ from services.storage import (
     VersionNotFoundError,
 )
 
-from security.jwt_oauth2_auth import TokenPayload, get_current_user
+from security.jwt_oauth2_auth import TokenPayload, UserRole, get_current_user
+from security.ssrf_protection import ssrf_protection
 
 logger = logging.getLogger(__name__)
 
@@ -93,6 +94,14 @@ class IngestRequest(BaseModel):
         default=None,
         description="Webhook URL to call on completion",
     )
+
+    @field_validator("callback_url")
+    @classmethod
+    def validate_callback_url(cls, v: str | None) -> str | None:
+        if v is not None:
+            ssrf_protection.validate_url(v)
+        return v
+
     metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional metadata to store with the asset",
@@ -165,7 +174,8 @@ class JobWebhookPayload(BaseModel):
 # In-Memory Storage (Replace with database in production)
 # =============================================================================
 
-# Mock storage for jobs
+# Mock storage for jobs (capped to prevent unbounded memory growth)
+_MAX_JOBS = 1000
 _jobs: dict[str, dict[str, Any]] = {}
 
 
@@ -255,6 +265,11 @@ async def ingest_image(
     # TODO: Store original image to R2
     # For now, mock the original URL
     original_url = f"https://r2.skyyrose.com/originals/{job_id}/{file.filename}"
+
+    # Evict oldest jobs if at capacity
+    while len(_jobs) >= _MAX_JOBS:
+        oldest = next(iter(_jobs))
+        del _jobs[oldest]
 
     # Create job record
     created_at = datetime.now(UTC).isoformat()
@@ -652,10 +667,10 @@ async def list_asset_versions(
         )
         return response
 
-    except AssetNotFoundError as e:
+    except AssetNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Asset not found",
         )
     except Exception as e:
         logger.error(
@@ -702,15 +717,15 @@ async def get_asset_version(
         )
         return version
 
-    except VersionNotFoundError as e:
+    except VersionNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Version not found",
         )
-    except AssetNotFoundError as e:
+    except AssetNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Asset not found",
         )
     except Exception as e:
         logger.error(
@@ -780,15 +795,15 @@ async def revert_asset_version(
 
         return version
 
-    except VersionNotFoundError as e:
+    except VersionNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Version not found",
         )
-    except AssetNotFoundError as e:
+    except AssetNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Asset not found",
         )
     except Exception as e:
         logger.error(
@@ -826,12 +841,11 @@ async def update_asset_retention(
     """
     correlation_id = str(uuid4())
 
-    # TODO: Check for admin role
-    # if "admin" not in user.roles:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_403_FORBIDDEN,
-    #         detail="Admin privileges required to update retention policy",
-    #     )
+    if not user.has_any_role({UserRole.ADMIN, UserRole.SUPER_ADMIN}):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required to update retention policy",
+        )
 
     logger.info(
         f"Updating retention for asset {asset_id}",
@@ -872,10 +886,10 @@ async def update_asset_retention(
 
         return asset_info
 
-    except AssetNotFoundError as e:
+    except AssetNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Asset not found",
         )
     except Exception as e:
         logger.error(
@@ -937,15 +951,15 @@ async def delete_asset_version(
             extra={"correlation_id": correlation_id},
         )
 
-    except VersionNotFoundError as e:
+    except VersionNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Version not found",
         )
-    except AssetNotFoundError as e:
+    except AssetNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Asset not found",
         )
     except Exception as e:
         logger.error(
@@ -1007,7 +1021,8 @@ class AssetUploadResponse(AssetResponse):
     pass
 
 
-# In-memory storage for demo (replace with database in production)
+# In-memory storage for demo (capped; replace with database in production)
+_MAX_ASSETS = 5000
 _assets: dict[str, dict[str, Any]] = {}
 _collection_stats: dict[str, int] = {
     "black_rose": 0,
@@ -1142,14 +1157,31 @@ async def upload_asset(
     import json
     from uuid import uuid4
 
-    # Validate file type
+    # Validate file type by content-type header
     if file.content_type not in ALLOWED_IMAGE_FORMATS and not file.content_type.startswith(
         "model/"
     ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid file type: {file.content_type}",
+            detail="Invalid file type",
         )
+
+    # Validate image files by magic bytes (not just content-type header)
+    if file.content_type in ALLOWED_IMAGE_FORMATS:
+        header = await file.read(16)
+        await file.seek(0)  # Reset for downstream consumers
+        image_signatures = {
+            b"\xff\xd8\xff": "image/jpeg",
+            b"\x89PNG\r\n\x1a\n": "image/png",
+            b"RIFF": "image/webp",  # RIFF....WEBP
+            b"II\x2a\x00": "image/tiff",  # Little-endian TIFF
+            b"MM\x00\x2a": "image/tiff",  # Big-endian TIFF
+        }
+        if not any(header.startswith(sig) for sig in image_signatures):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="File content does not match declared image type",
+            )
 
     # Create asset
     asset_id = f"asset-{uuid4().hex[:8]}"

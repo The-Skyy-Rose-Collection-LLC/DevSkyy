@@ -27,6 +27,7 @@ Usage:
 
 import argparse
 import base64
+import csv as _csv
 import io
 import json
 import logging
@@ -60,191 +61,29 @@ POLL_INTERVAL_SEC = 5
 POLL_TIMEOUT_SEC = 300  # 5 min max per generation
 
 
-# -- Product catalog (shared with nano-banana-vton.py) -----------------------
-# Source of truth: products.csv → PRODUCT_CATALOG in nano-banana-vton.py
-# This is a lightweight mirror — SKU → source_override only.
+# -- Product catalog ----------------------------------------------------------
+# Loaded from data/product-catalog.csv — single source of truth.
 
-PRODUCT_CATALOG = {
-    # Black Rose Collection
-    "br-001": {
-        "name": "BLACK Rose Crewneck",
-        "collection": "black-rose",
-        "source_override": "br-001-techflat-v4.jpg",
-    },
-    "br-002": {
-        "name": "BLACK Rose Joggers",
-        "collection": "black-rose",
-        "source_override": "br-002-joggers-source.jpg",
-    },
-    "br-003": {
-        "name": "BLACK is Beautiful Jersey",
-        "collection": "black-rose",
-        "source_override": "br-003-jersey-front-techflat.jpg",
-    },
-    "br-004": {
-        "name": "BLACK Rose Hoodie",
-        "collection": "black-rose",
-        "source_override": "br-004-hoodie-product.jpg",
-    },
-    "br-005": {
-        "name": "BLACK Rose Hoodie — Signature Edition",
-        "collection": "black-rose",
-        "source_override": "br-005-hoodie-ltd-source.jpg",
-    },
-    "br-006": {
-        "name": "BLACK Rose Sherpa Jacket",
-        "collection": "black-rose",
-        "source_override": "br-006-sherpa-product.jpg",
-    },
-    "br-007": {
-        "name": "BLACK Rose × Love Hurts Basketball Shorts",
-        "collection": "black-rose",
-        "source_override": "br-007-shorts-front-source.jpg",
-    },
-    "br-008": {
-        "name": "Women's BLACK Rose Hooded Dress",
-        "collection": "black-rose",
-        "source_override": "br-008-hooded-dress.webp",
-    },
-    # Love Hurts Collection
-    "lh-001": {
-        "name": "The Fannie",
-        "collection": "love-hurts",
-        "source_override": "lh-001-fannie-pack-photo.jpg",
-    },
-    "lh-002": {
-        "name": "Love Hurts Joggers",
-        "collection": "love-hurts",
-        "source_override": "lh-002-joggers-variants.jpg",
-    },
-    "lh-003": {
-        "name": "Love Hurts Basketball Shorts",
-        "collection": "love-hurts",
-        "source_override": "lh-003-shorts-front-closeup.jpg",
-    },
-    "lh-004": {
-        "name": "Love Hurts Varsity Jacket",
-        "collection": "love-hurts",
-        "source_override": "lh-004-varsity-source.jpg",
-    },
-    "lh-005": {
-        "name": "Love Hurts Windbreaker",
-        "collection": "love-hurts",
-        "source_override": "lh-005-bomber.webp",
-    },
-    # Signature Collection
-    "sg-001": {
-        "name": "The Bay Set",
-        "collection": "signature",
-        "source_override": "sg-001-bay-set.webp",
-    },
-    "sg-002": {
-        "name": "Stay Golden Set",
-        "collection": "signature",
-        "source_override": "sg-002-techflat-v4.jpg",
-    },
-    "sg-003": {
-        "name": "The Signature Tee",
-        "collection": "signature",
-        "source_override": "sg-003.webp",
-    },
-    "sg-004": {
-        "name": "The Signature Hoodie",
-        "collection": "signature",
-        "source_override": "sg-004-signature-hoodie.webp",
-    },
-    "sg-005": {
-        "name": "Stay Golden Tee",
-        "collection": "signature",
-        "source_override": "sg-005-stay-golden-tee.webp",
-    },
-    "sg-006": {
-        "name": "Mint & Lavender Hoodie",
-        "collection": "signature",
-        "source_override": "sg-006-hoodie-source.jpg",
-    },
-    "sg-007": {
-        "name": "The Signature Beanie",
-        "collection": "signature",
-        "source_override": "sg-007-beanie-source.jpg",
-    },
-    "sg-008": {
-        "name": "Signature Crop Hoodie",
-        "collection": "signature",
-        "source_override": "sg-008-crop-hoodie.webp",
-    },
-    "sg-009": {
-        "name": "The Sherpa Jacket",
-        "collection": "signature",
-        "source_override": "sg-009-sherpa-jacket.webp",
-    },
-    "sg-010": {
-        "name": "The Bridge Series Shorts",
-        "collection": "signature",
-        "source_override": "sg-010-bridge-shorts-variants.jpg",
-    },
-    "sg-011": {
-        "name": "Original Label Tee (White)",
-        "collection": "signature",
-        "source_override": "sg-011-label-tee-white.webp",
-    },
-    "sg-012": {
-        "name": "Original Label Tee (Orchid)",
-        "collection": "signature",
-        "source_override": "sg-012-label-tee-orchid.webp",
-    },
-    # Pre-Order Products
-    "po-001": {
-        "name": "Red #80 Football Jersey",
-        "collection": "black-rose",
-        "source_override": "br-design-football-jersey-red.jpg",
-    },
-    "po-002": {
-        "name": '"THE BAY" Basketball Tank',
-        "collection": "black-rose",
-        "source_override": "br-design-basketball-jersey.jpg",
-    },
-    "po-003": {
-        "name": "White #32 Football Jersey",
-        "collection": "black-rose",
-        "source_override": "br-design-football-jersey-white.jpg",
-    },
-    "po-004": {
-        "name": "Black & Teal Hockey Jersey",
-        "collection": "black-rose",
-        "source_override": "br-design-hockey-jersey.jpg",
-    },
-    "po-005": {
-        "name": "Purple GG Bridge Mesh Shorts",
-        "collection": "signature",
-        "source_override": "po-005-bridge-shorts-source.jpg",
-    },
-    "po-006": {
-        "name": "Black Rose Crewneck & Joggers",
-        "collection": "black-rose",
-        "source_override": "po-006-techflat.jpg",
-    },
-    "po-007": {
-        "name": "Black Rose Beanie",
-        "collection": "black-rose",
-        "source_override": "po-007-beanie-source.jpg",
-    },
-    "po-009": {
-        "name": "SR Monogram Slides",
-        "collection": "black-rose",
-        "source_override": "po-009-slides-source.jpg",
-    },
-    "po-010": {
-        "name": "Love Hurts Slides",
-        "collection": "love-hurts",
-        "source_override": "po-010-slides-source.jpg",
-    },
-    "po-011": {
-        "name": "Black Rose Slides",
-        "collection": "black-rose",
-        "source_override": "po-011-slides-source.jpg",
-    },
-}
+
+def _load_catalog() -> dict:
+    catalog: dict = {}
+    csv_path = PROJECT_ROOT / "data" / "product-catalog.csv"
+    with csv_path.open(newline="", encoding="utf-8") as f:
+        for row in _csv.DictReader(f):
+            sku = row["sku"].strip()
+            if not sku:
+                continue
+            entry: dict = {
+                "name": row["name"].strip(),
+                "collection": row["collection_slug"].strip(),
+            }
+            if row["render_source_override"].strip():
+                entry["source_override"] = row["render_source_override"].strip()
+            catalog[sku] = entry
+    return catalog
+
+
+PRODUCT_CATALOG = _load_catalog()
 
 
 # -- API key loading ----------------------------------------------------------
@@ -893,9 +732,11 @@ def cmd_generate(args):
         "fal": f"fal.ai Trellis-2 ({FAL_TRELLIS_MODEL})",
         "replicate": f"Replicate Trellis ({REPLICATE_TRELLIS_MODEL})",
         "meshy": "Meshy AI (highest texture quality)",
-        "auto": "Auto (fal.ai → Replicate fallback)"
-        if fal
-        else f"Replicate ({REPLICATE_TRELLIS_MODEL})",
+        "auto": (
+            "Auto (fal.ai → Replicate fallback)"
+            if fal
+            else f"Replicate ({REPLICATE_TRELLIS_MODEL})"
+        ),
     }[provider]
 
     log.info("Starting 3D generation: %d products, provider=%s", len(products), provider_label)

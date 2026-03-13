@@ -121,6 +121,6 @@ pytest --cov
 
 ---
 
-**Last Updated**: December 2025
+**Last Updated**: March 2026
 **Version**: 3.0.0
-**License**: MIT
+**License**: ISC

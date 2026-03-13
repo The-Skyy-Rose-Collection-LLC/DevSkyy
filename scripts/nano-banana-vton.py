@@ -19,6 +19,7 @@ Usage:
 """
 
 import argparse
+import concurrent.futures
 import io
 import json
 import logging
@@ -39,7 +40,6 @@ PRODUCTS_DIR = (
 )
 
 MODEL_ID = "gemini-2.5-flash-image"
-IMAGEN_MODEL_ID = "imagen-4.0-ultra-generate-001"
 FLUX_MODEL_ID = "black-forest-labs/FLUX.2-pro"
 FLUX_MODEL_FREE = "black-forest-labs/FLUX.1-schnell-Free"
 GPT_IMAGE_MODEL = "gpt-image-1.5"
@@ -48,396 +48,359 @@ MIN_FILE_SIZE_KB = 50
 MAX_RETRIES = 3
 RETRY_DELAY_SEC = 5
 
-# -- Product catalog (SOURCE OF TRUTH: products.csv) -------------------------
-# Every SKU, name, and collection comes directly from the canonical CSV.
-# Do NOT add products here that are not in products.csv.
+# -- Product catalog — loaded from data/product-catalog.csv at startup -------
+# Catalog fields (name, collection, price, is_preorder, output_slug,
+# source_override) come from the CSV.  Logo treatments and quality flags
+# (BAD_SOURCE_SKUS) live below as image-pipeline-only augmentation.
 
-PRODUCT_CATALOG = {
-    # ── Black Rose Collection ──────────────────────────────────────────────
-    # Every SKU has explicit source_override to prevent auto-glob picking up
-    # AI-generated outputs (*-model-*.webp) as source images (feedback loop).
-    "br-001": {
-        "name": "BLACK Rose Crewneck",
-        "collection": "black-rose",
-        "source_override": "br-001-techflat-v4.jpg",
-    },
-    "br-002": {
-        "name": "BLACK Rose Joggers",
-        "collection": "black-rose",
-        "source_override": "br-002-joggers-source.jpg",
-    },
-    "br-003": {
-        "name": "BLACK is Beautiful Jersey",
-        "collection": "black-rose",
-        "source_override": "br-003-jersey-front-techflat.jpg",
-    },
-    "br-004": {
-        "name": "BLACK Rose Hoodie",
-        "collection": "black-rose",
-        "source_override": "br-004-hoodie-product.jpg",
-    },
-    "br-005": {
-        "name": "BLACK Rose Hoodie — Signature Edition",
-        "collection": "black-rose",
-        "source_override": "br-005-hoodie-ltd-source.jpg",
-    },
-    "br-006": {
-        "name": "BLACK Rose Sherpa Jacket",
-        "collection": "black-rose",
-        "source_override": "br-006-sherpa-product.jpg",
-    },
-    "br-007": {
-        "name": "BLACK Rose × Love Hurts Basketball Shorts",
-        "collection": "black-rose",
-        "source_override": "br-007-shorts-front-source.jpg",
-    },
-    "br-008": {
-        "name": "Women's BLACK Rose Hooded Dress",
-        "collection": "black-rose",
-        "source_override": "br-008-hooded-dress.webp",
-    },
-    # ── Love Hurts Collection ──────────────────────────────────────────────
-    "lh-001": {
-        "name": "The Fannie",
-        "collection": "love-hurts",
-        "source_override": "lh-001-fannie-pack-photo.jpg",
-    },
-    "lh-002": {
-        "name": "Love Hurts Joggers",
-        "collection": "love-hurts",
-        "source_override": "lh-002-joggers-variants.jpg",
-    },
-    "lh-003": {
-        "name": "Love Hurts Basketball Shorts",
-        "collection": "love-hurts",
-        "source_override": "lh-003-shorts-front-closeup.jpg",
-    },
-    "lh-004": {
-        "name": "Love Hurts Varsity Jacket",
-        "collection": "love-hurts",
-        "source_override": "lh-004-varsity-source.jpg",
-    },
-    "lh-005": {
-        "name": "Love Hurts Windbreaker",
-        "collection": "love-hurts",
-        "source_override": "lh-005-bomber.webp",
-    },
-    # ── Signature Collection ───────────────────────────────────────────────
-    "sg-001": {
-        "name": "The Bay Set",
-        "collection": "signature",
-        "source_override": "sg-001-bay-set.webp",
-    },
-    "sg-002": {
-        "name": "Stay Golden Set",
-        "collection": "signature",
-        "source_override": "sg-002-techflat-v4.jpg",
-    },
-    "sg-003": {
-        "name": "The Signature Tee",
-        "collection": "signature",
-        "source_override": "sg-003.webp",
-    },
-    "sg-004": {
-        "name": "The Signature Hoodie",
-        "collection": "signature",
-        "source_override": "sg-004-signature-hoodie.webp",
-    },
-    "sg-005": {
-        "name": "Stay Golden Tee",
-        "collection": "signature",
-        "source_override": "sg-005-stay-golden-tee.webp",
-    },
-    "sg-006": {
-        "name": "Mint & Lavender Hoodie",
-        "collection": "signature",
-        "source_override": "sg-006-hoodie-source.jpg",
-    },
-    "sg-007": {
-        "name": "The Signature Beanie",
-        "collection": "signature",
-        "source_override": "sg-007-beanie-source.jpg",
-    },
-    "sg-008": {
-        "name": "Signature Crop Hoodie",
-        "collection": "signature",
-        "source_override": "sg-008-crop-hoodie.webp",
-    },
-    "sg-009": {
-        "name": "The Sherpa Jacket",
-        "collection": "signature",
-        "source_override": "sg-009-sherpa-jacket.webp",
-    },
-    "sg-010": {
-        "name": "The Bridge Series Shorts",
-        "collection": "signature",
-        "source_override": "sg-010-bridge-shorts-variants.jpg",
-    },
-    "sg-011": {
-        "name": "Original Label Tee (White)",
-        "collection": "signature",
-        "source_override": "sg-011-label-tee-white.webp",
-    },
-    "sg-012": {
-        "name": "Original Label Tee (Orchid)",
-        "collection": "signature",
-        "source_override": "sg-012-label-tee-orchid.webp",
-    },
-    # ── Pre-Order Products ─────────────────────────────────────────────────
-    "po-001": {
-        "name": "Red #80 Football Jersey",
-        "collection": "black-rose",
-        "source_override": "br-design-football-jersey-red.jpg",
-        "is_preorder": True,
-    },
-    "po-002": {
-        "name": '"THE BAY" Basketball Tank',
-        "collection": "black-rose",
-        "source_override": "br-design-basketball-jersey.jpg",
-        "is_preorder": True,
-    },
-    "po-003": {
-        "name": "White #32 Football Jersey",
-        "collection": "black-rose",
-        "source_override": "br-design-football-jersey-white.jpg",
-        "is_preorder": True,
-    },
-    "po-004": {
-        "name": "Black & Teal Hockey Jersey",
-        "collection": "black-rose",
-        "source_override": "br-design-hockey-jersey.jpg",
-        "is_preorder": True,
-    },
-    "po-005": {
-        "name": "Purple GG Bridge Mesh Shorts",
-        "collection": "signature",
-        "source_override": "po-005-bridge-shorts-source.jpg",
-        "is_preorder": True,
-    },
-    "po-006": {
-        "name": "Black Rose Crewneck & Joggers",
-        "collection": "black-rose",
-        "source_override": "po-006-techflat.jpg",
-        "is_preorder": True,
-    },
-    "po-007": {
-        "name": "Black Rose Beanie",
-        "collection": "black-rose",
-        "source_override": "po-007-beanie-source.jpg",
-        "is_preorder": True,
-    },
-    "po-009": {
-        "name": "SR Monogram Slides",
-        "collection": "black-rose",
-        "source_override": "po-009-slides-source.jpg",
-        "is_preorder": True,
-    },
-    "po-010": {
-        "name": "Love Hurts Slides",
-        "collection": "love-hurts",
-        "source_override": "po-010-slides-source.jpg",
-        "is_preorder": True,
-    },
-    "po-011": {
-        "name": "Black Rose Slides",
-        "collection": "black-rose",
-        "source_override": "po-011-slides-source.jpg",
-        "is_preorder": True,
-    },
-}
 
-# SKUs that are accessories (not wearable on a model's body)
-ACCESSORY_SKUS = {
-    "lh-001",  # The Fannie (fanny pack)
-    "sg-007",  # The Signature Beanie
-    "po-007",  # Black Rose Beanie
-    "po-009",  # SR Monogram Slides
-    "po-010",  # Love Hurts Slides
-    "po-011",  # Black Rose Slides
-}
+def _load_catalog() -> dict:
+    """Load product catalog from data/product-catalog.csv.
+
+    Returns a dict keyed by SKU that preserves the same structure previously
+    hardcoded here, so all downstream code (find_source_image, load_products,
+    get_back_source) works without modification.
+    """
+    import csv as _csv
+
+    catalog: dict = {}
+    csv_path = PROJECT_ROOT / "data" / "product-catalog.csv"
+    with csv_path.open(newline="", encoding="utf-8") as f:
+        for row in _csv.DictReader(f):
+            sku = row["sku"].strip()
+            if not sku:
+                continue
+            entry: dict = {
+                "name": row["name"].strip(),
+                "collection": row["collection_slug"].strip(),
+                "is_preorder": row["is_preorder"].strip() == "1",
+                "output_slug": row["render_output_slug"].strip() or sku,
+                "is_tech_flat": row["render_is_tech_flat"].strip() == "1",
+                "is_accessory": row["render_is_accessory"].strip() == "1",
+            }
+            if row["render_source_override"].strip():
+                entry["source_override"] = row["render_source_override"].strip()
+            if row["render_back_source_override"].strip():
+                entry["back_source_override"] = row["render_back_source_override"].strip()
+            if row["render_variant_of"].strip():
+                entry["variant_of"] = row["render_variant_of"].strip()
+            catalog[sku] = entry
+    return catalog
+
+
+PRODUCT_CATALOG = _load_catalog()
+
+# Derived sets — no manual maintenance required; driven by CSV columns.
+ACCESSORY_SKUS = {sku for sku, p in PRODUCT_CATALOG.items() if p["is_accessory"]}
+TECH_FLAT_SKUS = {sku for sku, p in PRODUCT_CATALOG.items() if p["is_tech_flat"]}
 
 # SKUs with known bad source images — skipped by default.
 # Audited 2026-03-05 by visual inspection of every source file.
 BAD_SOURCE_SKUS = set()  # All sources verified clean as of 2026-03-05
 
-# -- Imagen 4 Ultra: text-heavy product descriptions -------------------------
-# Products with prominent text ("BLACK IS BEAUTIFUL", "THE BAY") that Gemini
-# drops or garbles. Imagen renders text accurately from text prompts.
-# Descriptions sourced from products.csv — the canonical product database.
-
-TEXT_HEAVY_SKUS = {"br-003", "po-001", "po-002", "po-003", "po-004"}
-
-# -- FLUX.2 via Together AI: tech flat → photorealistic conversion -----------
-# Products that only have vector/design mockup tech flats (not real photos).
-# FLUX excels at: (1) converting flat designs → realistic product shots,
-# (2) accurate text rendering, (3) exact hex color matching.
-# In "auto" mode, these get routed to FLUX instead of Gemini.
-TECH_FLAT_SKUS = {
-    "br-001",  # Tech flat only (br-001-techflat-v4.jpg)
-    "sg-002",  # Tech flat only (sg-002-techflat-v4.jpg)
-    "po-006",  # Tech flat only (po-006-techflat.jpg)
-}
-
 # -- Logo treatment metadata (real product material) -------------------------
 # Used by --step composite to tell Gemini what the REAL logo looks like.
 # Products not listed get a generic "match the reference" prompt.
+# Logo visual reference (from brand assets — describe EXACTLY so the model renders them correctly):
+#
+#  ROSE-ONLY:  3D dimensional rose, layered spiral petals opening outward, curved stem with two
+#              broad leaves at base; brushed rose-gold (#B76E79) metallic with specular highlights.
+#              Appears as embroidery (raised thread, shadow depth) or silicone patch (smooth gloss).
+#
+#  SR MONOGRAM + ROSE:  Intertwined serif S and R with flowing calligraphic curves; 3D rose bloom
+#              attached lower-right with short stem and leaf; rose-gold metallic finish.
+#
+#  SR MONOGRAM (GOLD):  Same S-R interlock, no rose — gold/champagne metallic, used as smaller
+#              back-neck or secondary marks.
+#
+#  LOVE HURTS WORDMARK:  Bold red graffiti/bubble-script 'Love Hurts', heavy black outline and
+#              shadow; thorned cracked red heart floating above the text with blood-splash drips
+#              — street-art tattoo style, very high contrast.
+#
+#  LOVE HURTS HEART GRAPHIC:  Cracked red heart tightly wrapped in thick dark thorny branches;
+#              three full red roses with green stems growing upward from the heart; blood splatter
+#              dripping from bottom — cartoon tattoo art style, black outlines, vivid reds/greens.
+#
+#  SKYROSE COLLECTION SCRIPT:  Gold foil wordmark: 'THE' in small serifed caps; 'Skyy Rose' in
+#              ornate italic cursive script; 'Collection' in spaced gold small-caps below; the 'o'
+#              in 'Rose' is replaced by a small rose bloom in rose-gold.
+#
+#  ROSES FROM CONCRETE:  Three large roses growing upward from a broken concrete/cloud base;
+#              thorny green stems, large fully-opened blooms; grey/charcoal colorway (Black Rose)
+#              or red colorway — illustrative style.
+
 LOGO_TREATMENTS = {
-    "br-001": "embossed — pressed into the fabric creating a raised, dimensional rose texture with subtle shadow",
-    "br-002": "silicone rubber cut-out — raised 3D rubber logo with clean-cut edges standing proud of the fabric",
-    "br-004": "embossed — pressed into the hoodie fabric creating a dimensional rose with visible depth",
-    "br-005": "embossed — pressed into the hoodie fabric creating a dimensional rose with visible depth",
-    "br-006": "embroidered — stitched thread forming the rose logo with visible thread texture on sherpa fabric",
-    "sg-003": "screen-printed — flat ink application with clean edges on cotton tee",
-    "sg-004": "embroidered — stitched logo on hoodie with raised thread texture",
-    "sg-005": "screen-printed — flat ink on cotton tee",
+    # ── Black Rose Collection ────────────────────────────────────────────────
+    "br-001": (
+        "front chest center (~10 in): the ROSE-ONLY logo — 3D dimensional rose, layered spiral "
+        "petals, curved stem with two broad leaves, brushed rose-gold metallic; embossed into "
+        "fabric creating dimensional raised relief with subtle drop shadow at base"
+    ),
+    "br-002": (
+        "left thigh: the ROSE-ONLY logo as a silicone patch — same 3D rose shape, glossy smooth "
+        "finish, sharply die-cut edges, rose-gold metallic color, catches strong specular highlights"
+    ),
+    "br-003": (
+        "front: 'BLACK IS BEAUTIFUL' bold block text across chest in white/gold; custom baseball "
+        "patch at lower-hem (circular, team-style); "
+        "back: large ROSE-ONLY embroidered logo centered — raised thread texture, rose-gold tone"
+    ),
+    "br-003-oakland": (
+        "front: 'BLACK IS BEAUTIFUL' text — the letter A in 'BLACK' is black, remaining letters "
+        "are gold; custom baseball patch at lower-hem; "
+        "back: large ROSE-ONLY embroidered logo centered, rose-gold thread"
+    ),
+    "br-003-giants": (
+        "front: 'BLACK IS BEAUTIFUL' block text in orange/black Giants colorway across chest; "
+        "custom baseball circular patch at hem; "
+        "back: large ROSE-ONLY embroidered logo centered, rose-gold thread"
+    ),
+    "br-003-white": (
+        "front: 'BLACK IS BEAUTIFUL' block text in black on white jersey; custom baseball patch "
+        "at hem; "
+        "back: large ROSE-ONLY embroidered logo centered, rose-gold thread"
+    ),
+    "br-004": (
+        "front chest center: the ROSE-ONLY logo — 3D layered spiral rose, embroidered in rose-gold "
+        "thread, raised texture with visible shadow depth between petal layers"
+    ),
+    "br-005": (
+        "right chest: ROSE-ONLY logo as a silicone cut-out patch — glossy rose-gold, dimensionally "
+        "raised, precise cut edges; "
+        "left side body panel (not on arm/sleeve): second ROSE-ONLY logo embroidered in thread"
+    ),
+    "br-006": (
+        "left chest: ROSE-ONLY embroidered logo, rose-gold thread (~5 in); "
+        "back panel center: large ROSE-ONLY embroidered logo (~12 in), rose-gold thread with "
+        "dark shadow depth — black satin outer shell, black sherpa lining visible at cuffs and hood"
+    ),
+    "br-007": (
+        "front waistband: tackle-twill cut-out letters 'OAKLAND' stitched in block font; "
+        "throughout fabric: sublimated ROSE-ONLY graphic repeating; "
+        "left exterior panel: large sublimated LOVE HURTS WORDMARK (red graffiti 'Love Hurts' "
+        "with thorned heart above); mesh side panels: embroidered 'Love Hurts' text and rose marks"
+    ),
+    "br-008": (
+        "football jersey #80 — jersey-style stitched numbers, ~8 in tall; "
+        "FRONT: digit '8' has rose-gold rose fill inside the numeral, digit '0' is plain white; "
+        "BACK: reversed — digit '8' is plain white, digit '0' has rose-gold rose fill; "
+        "bottom-left corner: custom circular football patch"
+    ),
+    "br-009": (
+        "football jersey #32 — jersey-style stitched numbers, ~8 in tall, white with black border; "
+        "FRONT: digit '3' has rose-gold rose fill, digit '2' is plain white; "
+        "BACK: reversed — digit '3' is plain white, digit '2' has rose-gold rose fill; "
+        "bottom-left corner: custom circular football patch"
+    ),
+    "br-010": (
+        "sleeveless basketball tank; front chest: 'THE BAY' in bold gold block text; "
+        "below text: circular ROSE-ONLY graphic in rose-gold; "
+        "lower half of jersey: grey/silver gradient rose fade sublimation; "
+        "SkyyRose SR monogram (gold) at back neck; wide shoulder straps"
+    ),
+    "br-011": (
+        "hooded hockey jersey, black-and-teal colorway; "
+        "front chest: large circular rose crest (ROSE-ONLY logo in teal/cyan ring); "
+        "back upper: 'BLACK IS BEAUTIFUL' in cyan/teal block text; "
+        "back number: rose-filled #0 numeral in teal; "
+        "hem and cuffs: gradient stripe panels in teal/cyan"
+    ),
+    # ── Love Hurts Collection ────────────────────────────────────────────────
+    "lh-002": (
+        "left thigh: LOVE HURTS HEART GRAPHIC — cracked red heart tightly wrapped in thick dark "
+        "thorny branches, three full red roses with green stems growing upward from the heart, "
+        "blood-splash drips at bottom, cartoon tattoo art style with heavy black outlines; "
+        "comes in two colorways: white joggers with black side stripe, or black joggers with "
+        "white side stripe"
+    ),
+    "lh-003": (
+        "throughout shorts fabric: sublimated LOVE HURTS HEART GRAPHIC repeating; "
+        "left exterior panel: large sublimated LOVE HURTS WORDMARK (red graffiti bubble-script "
+        "'Love Hurts', heavy black outline, thorned heart above, blood-splash); "
+        "mesh side panels: embroidered love-hurts text marks and rose details"
+    ),
+    "lh-004": (
+        "front chest: LOVE HURTS WORDMARK — bold red graffiti bubble-script 'Love Hurts', "
+        "heavy black outline and shadow, thorned cracked heart floating above the text; "
+        "inside hood lining: sublimated LOVE HURTS HEART GRAPHIC; "
+        "back center: large LOVE HURTS HEART GRAPHIC — cracked red heart wrapped in thorny "
+        "branches, three red roses growing upward, blood-splash drips — dominant back print"
+    ),
+    "lh-005": (
+        "front chest left: LOVE HURTS WORDMARK — red graffiti bubble-script 'Love Hurts' with "
+        "black outline and thorned heart, sized ~8 in, contrast against blush pink fabric; "
+        "back: 'Love Hurts' text in embroidered script; rose detailing at cuffs/hem"
+    ),
+    "lh-006": (
+        "front face of fanny pack: LOVE HURTS HEART GRAPHIC — cracked red heart tightly wrapped "
+        "in dark thorny branches, three red roses with green stems growing upward from top, "
+        "blood-splash drips at bottom; positioned prominently on the front leather panel, "
+        "printed/embossed; the heart graphic occupies most of the front face"
+    ),
+    # ── Signature Collection ─────────────────────────────────────────────────
+    "sg-001": (
+        "entire shorts fabric: sublimated Bay Bridge panorama photo covering front and back panels; "
+        "bottom-left hem: ROSE-ONLY embroidered logo in blue thread (~3 in), matching bay water tones"
+    ),
+    "sg-002": (
+        "front chest: ROSE-ONLY embroidered logo (~6 in) in gold thread; within the rose petals: "
+        "miniature Golden Gate Bridge imagery stitched into the petal faces — bridge cables and "
+        "towers visible inside the bloom"
+    ),
+    "sg-003": (
+        "entire shorts fabric: sublimated Golden Gate Bridge panorama; "
+        "bottom-left hem: ROSE-ONLY embroidered logo in purple thread (~3 in)"
+    ),
+    "sg-004": (
+        "front chest center: SR MONOGRAM + ROSE — intertwined serif S-R with rose bloom on right, "
+        "rose-gold metallic embroidered (~5 in); "
+        "back neck: small SR MONOGRAM (gold) embroidered label, ~1.5 in"
+    ),
+    "sg-005": (
+        "front chest: ROSE-ONLY embroidered logo (~6 in) in navy/gold thread; within rose petals: "
+        "miniature Bay Bridge imagery stitched into petal faces — bridge span and cables visible"
+    ),
+    "sg-006": (
+        "front chest center: ROSE-ONLY logo in lavender thread (~6 in) — same 3D layered spiral "
+        "rose shape, embroidered, lavender-to-purple gradient thread on mint/lavender colorblock fabric"
+    ),
+    "sg-007": (
+        "brim fold, slightly left of center: ROSE-ONLY logo as a small silicone patch (~2 in) — "
+        "die-cut rose shape, smooth glossy finish; "
+        "comes in three colorways: rose-gold/red rose, grey-black rose, or purple rose"
+    ),
+    "sg-009": (
+        "front chest left: ROSE-ONLY embroidered logo (~5 in) in red thread — "
+        "raised thread texture against cream sherpa; "
+        "lining: white sherpa fleece visible at cuffs, collar, and hem"
+    ),
+    "sg-011": (
+        "front chest: THE SKYROSE COLLECTION SCRIPT — gold foil wordmark: 'THE' in small serifed "
+        "caps, 'Skyy Rose' in ornate italic cursive, 'Collection' in spaced caps; the 'o' in Rose "
+        "is a small rose bloom; printed small (~4 in wide) on clean white fabric"
+    ),
+    "sg-012": (
+        "front chest: THE SKYROSE COLLECTION SCRIPT — same gold foil wordmark as sg-011; "
+        "printed small (~4 in wide) on rich orchid fabric — gold contrasts strongly against purple"
+    ),
+    "sg-013": (
+        "front chest center: ROSE-ONLY embroidered logo in lavender thread (~6 in), same spiral "
+        "rose shape, raised thread depth; "
+        "back neck exterior: small SR MONOGRAM (gold) embroidered, ~1.5 in"
+    ),
+    "sg-014": (
+        "left thigh panel: ROSE-ONLY embroidered logo (~4 in) in lavender thread — "
+        "positioned mid-thigh on the mint/lavender colorblock sweatpants"
+    ),
+    # ── Kids Capsule ─────────────────────────────────────────────────────────
+    "kids-001": (
+        "left chest: ROSE-ONLY embroidered logo (~3 in) in black thread on red fabric; "
+        "left thigh of jogger: matching ROSE-ONLY embroidered logo (~3 in); "
+        "right sleeve: circular woven patch (~2.5 in) — white background, black outline border, "
+        "black rose center, 'Skyy Rose' arched text on top half, 'Collection' on bottom half"
+    ),
+    "kids-002": (
+        "left chest: ROSE-ONLY embroidered logo (~3 in) in black thread on purple fabric; "
+        "left thigh of jogger: matching ROSE-ONLY embroidered logo (~3 in); "
+        "right sleeve: circular woven patch (~2.5 in) — white background, black outline border, "
+        "black rose center, 'Skyy Rose' arched text on top half, 'Collection' on bottom half"
+    ),
 }
 
-IMAGEN_PRODUCT_DESCRIPTIONS = {
-    "br-003": {
-        "garment": "jersey",
-        "details": (
-            "A luxury streetwear jersey. Black body with orange collar trim. "
-            "Large white rose graphic (rose growing from clouds) on the back. "
-            "SR monogram on the upper back. Oakland-rooted gothic luxury. "
-            "SkyyRose BLACK ROSE Collection branding."
-        ),
-        "back_details": (
-            "Back of a black jersey with orange collar trim. "
-            "Large white rose graphic — a rose growing from thorns and clouds — "
-            "centered on the back. SR monogram above the graphic. "
-            "Black body color throughout."
-        ),
-    },
-    "po-001": {
-        "garment": "American football jersey",
-        "details": (
-            "Red V-neck football jersey with #80 in large block numerals on the "
-            "front. The numbers are filled with a grey/silver rose, thorns & "
-            "clouds graphic. V-neck athletic cut with stripe trim on the sleeves. "
-            "Bold red body. SR monogram. SkyyRose BLACK ROSE Collection."
-        ),
-        "back_details": (
-            "Back of a red V-neck football jersey. The body color is bold red "
-            "throughout. 'BLACK IS BEAUTIFUL' text across the upper back. "
-            "Large #80 numerals — filled with grey/silver rose, thorns & clouds "
-            "graphic. SR monogram. Stripe trim on sleeves. Red body."
-        ),
-    },
-    "po-002": {
-        "garment": "sleeveless basketball tank",
-        "details": (
-            "White sleeveless basketball jersey / tank top. 'THE BAY' in bold "
-            "gold text across the chest. Rose circle graphic below the text. "
-            "Grey/silver rose fade on the lower half of the jersey. "
-            "Wide shoulder straps. SkyyRose branding."
-        ),
-        "back_details": (
-            "Back of a white sleeveless basketball tank. White body throughout. "
-            "'BLACK IS BEAUTIFUL' text across the upper back. "
-            "Grey/silver rose fade on lower half. Wide shoulder straps. "
-            "White body color."
-        ),
-    },
-    "po-003": {
-        "garment": "American football jersey",
-        "details": (
-            "White V-neck football jersey with bold black #32 on the front "
-            "in large block numerals. The '3' digit is filled with a black "
-            "rose graphic, the '2' digit is plain black. Black stripe trim "
-            "on sleeves. V-neck athletic cut. SR monogram. "
-            "SkyyRose BLACK ROSE Collection."
-        ),
-        "back_details": (
-            "Back of a white V-neck football jersey. White body throughout. "
-            "'BLACK IS BEAUTIFUL' text across the upper back. Large black #32 "
-            "numerals — the '2' digit is filled with a black rose graphic, "
-            "the '3' digit is plain black. Black stripe trim. "
-            "Shoulder numbers. White body color."
-        ),
-    },
-    "po-004": {
-        "garment": "hooded hockey jersey",
-        "details": (
-            "Black hooded hockey jersey with cyan/teal accents. Large circular "
-            "rose crest on the front. Hood attached. Gradient stripe hem and "
-            "cuffs in cyan/teal. SkyyRose BLACK ROSE Collection."
-        ),
-        "back_details": (
-            "Back of a black hooded hockey jersey. Black body throughout. "
-            "Cyan 'BLACK IS BEAUTIFUL' text across the upper back. "
-            "Rose-filled #0 numeral below the text. Gradient stripe hem "
-            "and cuffs in cyan/teal. Black body color."
-        ),
-    },
-}
 
+def get_back_source(sku: str, product: dict) -> Path | None:
+    """Return a back-specific source image path for a SKU, if available.
 
-def imagen_render_prompt(sku: str, view: str) -> str:
-    """Build a detailed Imagen prompt for text-heavy products."""
-    desc = IMAGEN_PRODUCT_DESCRIPTIONS[sku]
-    garment = desc["garment"]
+    Checks product catalog for a back_source_override filename. If the file is
+    a 2-panel techflat (width > height * 1.5), crops the RIGHT half using PIL
+    and returns the path to a temp file. Otherwise returns the path as-is.
 
-    if view in ("render3d_front", "front"):
-        return (
-            f"Professional e-commerce product photography of a {garment} on an "
-            f"invisible mannequin / ghost mannequin, FRONT VIEW. "
-            f"{desc['details']} "
-            "Light gray (#E8E8E8) studio background with subtle floor reflection. "
-            "Professional product photography lighting — soft key light from "
-            "upper-left, fill light from right, slight rim light. "
-            "Photorealistic, showing natural 3D shape and drape of the fabric. "
-            "All text must be perfectly legible and spelled correctly. "
-            "Luxury streetwear brand, premium quality."
-        )
-    elif view in ("render3d_back", "back"):
-        return (
-            f"Professional e-commerce product photography of a {garment} on an "
-            f"invisible mannequin / ghost mannequin, BACK VIEW. "
-            f"{desc['back_details']} "
-            "Light gray (#E8E8E8) studio background with subtle floor reflection. "
-            "Professional product photography lighting. "
-            "Photorealistic, showing natural 3D shape and drape of the fabric. "
-            "All text must be perfectly legible and spelled correctly. "
-            "Luxury streetwear brand, premium quality."
-        )
-    else:  # branding
-        return (
-            f"Cinematic luxury editorial product shot of a {garment} on an "
-            f"invisible mannequin. {desc['details']} "
-            "Dark moody studio background — black marble surface, dramatic "
-            "shadows, rose gold (#B76E79) accent lighting. Gothic luxury "
-            "aesthetic. All text on the garment must be perfectly legible. "
-            "Cinematic composition, slight floor reflection."
-        )
+    Returns None if no back source is configured or the file doesn't exist.
+    """
+    import tempfile
+
+    info = PRODUCT_CATALOG.get(sku, {})
+    back_override = info.get("back_source_override")
+    if not back_override:
+        return None
+
+    # Check PRODUCTS_DIR first, then source-products tree
+    _source_dir = PROJECT_ROOT / "skyyrose" / "assets" / "images" / "source-products"
+    back_path = PRODUCTS_DIR / back_override
+    if not back_path.exists():
+        back_path = _source_dir / back_override
+    if not back_path.exists():
+        log.warning("back_source_override %s not found for %s", back_override, sku)
+        return None
+
+    # Check if this is a 2-panel techflat (side-by-side front+back layout)
+    try:
+        from PIL import Image
+
+        img = Image.open(back_path)
+        w, h = img.size
+        if w > h * 1.1:
+            # Wide image — crop right half (the back panel)
+            right_half = img.crop((w // 2, 0, w, h))
+            tmp = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
+            right_half.save(tmp.name, format="JPEG", quality=95)
+            tmp.close()
+            log.debug("Cropped right half of 2-panel techflat %s -> %s", back_override, tmp.name)
+            return Path(tmp.name)
+    except Exception as exc:
+        log.warning("Could not inspect/crop back source %s: %s", back_override, exc)
+
+    return back_path
 
 
 def find_source_image(sku: str) -> Path | None:
-    """Find the best available source image for a SKU."""
-    # Check for explicit source override in catalog
+    """Find the best available source image for a SKU.
+
+    Checks source_override first, then falls back to globbing by output_slug.
+    For products with no source (only existing model renders), tries to use
+    the existing front-model render as a reference for regeneration.
+    """
     info = PRODUCT_CATALOG.get(sku, {})
+
+    # Check for explicit source override in catalog
     if "source_override" in info:
         override_path = PRODUCTS_DIR / info["source_override"]
         if override_path.exists():
             return override_path
         log.warning("source_override %s not found for %s", info["source_override"], sku)
-        return None
 
-    candidates = list(PRODUCTS_DIR.glob(f"{sku}*.webp")) + list(PRODUCTS_DIR.glob(f"{sku}*.jpg"))
-    # Filter out generated shots — we want flat-lay/product source only
+    # Fall back to globbing by output_slug (product-name-based filenames)
+    slug = info.get("output_slug", sku)
+    extensions = (".webp", ".jpg", ".jpeg", ".png")
+    candidates = []
+    for ext in extensions:
+        candidates.extend(PRODUCTS_DIR.glob(f"{slug}*{ext}"))
+
+    # Filter out generated model shots — we want flat-lay/product source only
     source_candidates = [
         p
         for p in candidates
         if "-front-model" not in p.stem
         and "-back-model" not in p.stem
         and "-branding" not in p.stem
-        and "-back" not in p.stem
-        and "-render" not in p.stem
     ]
-    if not source_candidates:
-        return None
-    # Prefer .webp over .jpg, then shorter filenames
-    source_candidates.sort(key=lambda p: (p.suffix != ".webp", len(p.name)))
-    return source_candidates[0]
+    if source_candidates:
+        # Prefer source/techflat/product files, then shorter filenames
+        source_candidates.sort(
+            key=lambda p: (
+                "source" not in p.stem and "techflat" not in p.stem and "product" not in p.stem,
+                len(p.name),
+            )
+        )
+        return source_candidates[0]
+
+    # Last resort: use existing front-model render as reference
+    front_model = PRODUCTS_DIR / f"{slug}-front-model.webp"
+    if front_model.exists():
+        log.info("Using existing front-model render as source for %s", sku)
+        return front_model
+
+    return None
 
 
 def load_products(sku_filter: str | None = None, include_bad: bool = False) -> list[dict]:
@@ -467,9 +430,11 @@ def load_products(sku_filter: str | None = None, include_bad: bool = False) -> l
                 "sku": sku,
                 "name": info["name"],
                 "collection": info["collection"],
+                "output_slug": info.get("output_slug", sku),
                 "source_image": src,
                 "is_accessory": sku in ACCESSORY_SKUS,
                 "is_preorder": info.get("is_preorder", False),
+                "is_variant": "variant_of" in info,
             }
         )
 
@@ -556,35 +521,48 @@ def get_api_key() -> str:
 
 def front_prompt(name: str) -> str:
     return (
-        f"The reference image shows a {name}. Generate a professional fashion "
-        f"model wearing this EXACT {name}, front-facing, full body shot, "
-        "luxury streetwear editorial photography, studio lighting, clean white "
-        "background. The garment must be 100% identical to the reference "
-        "image — same colors, same cut, same details, same logo placement, "
-        "same fabric texture. Do NOT change the garment type. "
-        "The model should have a confident, editorial pose." + ANTI_HALLUCINATION
+        f"Generate a photorealistic e-commerce product render of this {name} — FRONT VIEW ONLY.\n"
+        "The provided image is the source tech flat. Reproduce every detail exactly.\n\n"
+        "VIEW RULE: Show ONLY the front panel. "
+        "Do NOT render the back of the garment. "
+        "Do NOT show through to the reverse side. "
+        "One side visible — the front.\n\n"
+        "PRESENTATION: No model, no person, no mannequin. "
+        "Garment floating naturally on an invisible form, full 3D shape and drape. "
+        "Clean white/light gray studio background, subtle floor shadow. "
+        "Professional e-commerce lighting — soft key light upper-left, fill right, "
+        "rim light for edge definition.\n\n"
+        "FIDELITY: Match the reference exactly — same colors, same text, same numbers, "
+        "same logo placement, same panels, same stripes. Change NOTHING." + ANTI_HALLUCINATION
     )
 
 
 def back_prompt(name: str) -> str:
     return (
-        f"The reference image shows a {name}. Generate a professional fashion "
-        f"model wearing this EXACT {name}, BACK-FACING (showing the back of "
-        "the garment), full body shot, luxury streetwear editorial photography, "
-        "studio lighting, clean white background. The garment must be 100% "
-        "identical to the reference — same colors, same cut, same back details, "
-        "same logo placement. Do NOT change the garment type. "
-        "The model is turned away from camera showing the back of the outfit." + ANTI_HALLUCINATION
+        f"Generate a photorealistic e-commerce product render of this {name} — BACK VIEW ONLY.\n"
+        "The provided image is the back-panel tech flat. Reproduce every detail exactly.\n\n"
+        "VIEW RULE: Show ONLY the back panel. "
+        "Do NOT render the front of the garment. "
+        "Do NOT show through to the front side. "
+        "One side visible — the back. Garment facing away from camera.\n\n"
+        "PRESENTATION: No model, no person, no mannequin. "
+        "Garment floating naturally on an invisible form, back-facing, full 3D drape. "
+        "Clean white/light gray studio background, subtle floor shadow. "
+        "Professional e-commerce lighting.\n\n"
+        "FIDELITY: Match the back reference exactly — same colors, same text, same numbers, "
+        "same logo placement, same back graphics. Change NOTHING." + ANTI_HALLUCINATION
     )
 
 
 def accessory_prompt(name: str) -> str:
     return (
-        f"The reference image shows a {name}. Generate a professional fashion "
-        f"model wearing/holding this EXACT {name}, front-facing, luxury "
-        "streetwear editorial photography, studio lighting, clean white "
-        "background. The accessory must be 100% identical to the reference "
-        "image. Do NOT change the item type." + ANTI_HALLUCINATION
+        f"Generate a photorealistic e-commerce product render of this {name} — FRONT VIEW.\n"
+        "The provided image is the source reference. Reproduce every detail exactly.\n\n"
+        "PRESENTATION: No model, no person. "
+        "Item displayed cleanly on white/light gray studio background with subtle shadow. "
+        "Professional product photography lighting.\n\n"
+        "FIDELITY: Match the reference exactly — same colors, same details. Change NOTHING."
+        + ANTI_HALLUCINATION
     )
 
 
@@ -616,6 +594,14 @@ BRANDING_TEMPLATES = {
         "tones, California luxury vibes. Golden (#D4AF37) accent lighting. "
         "Cinematic composition, 3/4 body shot."
     ),
+    "kids-capsule": (
+        "The reference image shows a {name}. Generate a CHILD model (age 8-12) "
+        "wearing this EXACT {name}, front-facing, playful yet premium editorial "
+        "photography, bright studio lighting, clean background. The {name} must "
+        "be 100% identical to the reference — same colors, same cut, same logos. "
+        "Do NOT change the garment type. Vibrant, youthful energy with luxury "
+        "quality. Cinematic composition, 3/4 body shot."
+    ),
 }
 
 ACCESSORY_BRANDING_TEMPLATES = {
@@ -639,14 +625,16 @@ ACCESSORY_BRANDING_TEMPLATES = {
 # Appended to EVERY prompt to prevent AI from inventing details.
 
 ANTI_HALLUCINATION = (
-    " STRICT RULES: "
-    "Do NOT add any text, words, logos, or branding that is NOT visible "
-    "in the reference image. "
-    "Do NOT invent labels, patches, tags, or decorative elements. "
-    "Do NOT change the garment type to a different product. "
-    "Do NOT add sponsor logos, team names, or league branding. "
-    "If you cannot see a detail in the reference, do NOT guess — leave it out. "
-    "Only reproduce what is actually in the reference image."
+    "\n\nSTRICT RULES — NON-NEGOTIABLE:\n"
+    "• Render ONLY the side specified (front or back). Never show both sides simultaneously.\n"
+    "• Do NOT add text, logos, patches, or branding absent from the reference image.\n"
+    "• Do NOT invent pockets, panels, zippers, or design details not in the reference.\n"
+    "• Do NOT change the garment type, silhouette, or cut.\n"
+    "• Do NOT add sponsor logos, team names, league marks, or athlete names.\n"
+    "• Do NOT alter colors — match hex values from the reference exactly.\n"
+    "• Do NOT change stitching, seam placement, or construction.\n"
+    "• If a detail is unclear in the reference, leave it out — never guess.\n"
+    "• This is a luxury fashion brand. Accuracy is the only standard."
 )
 
 ENHANCED_PROMPT_SUFFIX = (
@@ -673,9 +661,11 @@ def composite_prompt(name: str, sku: str, view: str = "front") -> str:
         f"and material treatment.{treatment_note} "
         f"YOUR TASK: Generate a new image that keeps the EXACT same model, pose, body position, "
         f"lighting, and background from Image 1 — but corrects the garment's logo and branding "
-        f"details to match Image 2 exactly. The logo must look like the REAL material "
-        f"(embossed, silicone rubber, embroidered, screen-printed, etc.) — NOT a flat printed graphic. "
-        f"Pay close attention to: logo placement, size, dimensionality, material texture, and color. "
+        f"details to match Image 2 exactly. Study the logo in Image 2 closely: how does light "
+        f"hit it? Does it cast shadows? Is it raised or flat? Does it have a glossy or matte finish? "
+        f"Does the fabric change texture around the logo? Reproduce these VISUAL properties exactly. "
+        f"Pay close attention to: logo placement, size, how light interacts with the logo surface, "
+        f"shadow depth, edge sharpness, surface finish (matte/glossy/textured), and color accuracy. "
         f"Everything about the model and background stays IDENTICAL. Only the garment branding changes."
     )
 
@@ -701,7 +691,8 @@ def generate_composite(
     src_img = enhance_source_image(source_image_path)
 
     try:
-        response = client.models.generate_content(
+        response = _call_with_deadline(
+            client.models.generate_content,
             model=MODEL_ID,
             contents=[
                 "IMAGE 1 — the AI-generated lifestyle photo (keep this composition):",
@@ -714,6 +705,9 @@ def generate_composite(
                 response_modalities=["IMAGE"],
             ),
         )
+    except concurrent.futures.TimeoutError:
+        log.warning("Composite generation timed out after %ds (socket hang)", _GENAI_CALL_TIMEOUT)
+        return None
     except Exception as exc:
         log.error("Composite API call failed: %s", exc)
         return None
@@ -742,35 +736,35 @@ def generate_composite(
 def render3d_front_prompt(name: str) -> str:
     """Prompt for photorealistic 3D product render — front view."""
     return (
-        f"The reference image is a flat design mockup of a {name}. "
-        f"Convert this EXACT design into a photorealistic 3D product render "
-        f"of the {name}, FRONT VIEW. The garment should appear as a "
-        "professional e-commerce product shot on an invisible mannequin / "
-        "ghost mannequin, showing the natural 3D shape and drape of the "
-        "fabric. Light gray (#E8E8E8) studio background with subtle floor "
-        "reflection. Professional product photography lighting — soft key "
-        "light from upper-left, fill light from right, slight rim light. "
-        "Every detail from the design mockup MUST be preserved exactly: "
-        "same colors, same logos, same numbers, same text, same stripes, "
-        "same patches, same patterns. Do NOT change ANY design element. "
-        "The output should look like a real photograph of this garment "
-        "on a mannequin form, ready for an e-commerce product page." + ANTI_HALLUCINATION
+        f"The reference image shows a {name}. Create a photorealistic 3D "
+        f"product render of this EXACT {name}, FRONT VIEW. "
+        "NO model, NO person, NO mannequin visible — just the garment "
+        "itself displayed naturally showing its 3D shape, volume, and fabric "
+        "drape as if floating on an invisible form. "
+        "Light gray (#E8E8E8) studio background with subtle floor reflection. "
+        "Professional product photography lighting — soft key light from "
+        "upper-left, fill light from right, slight rim light for edge definition. "
+        "The garment must be a PIXEL-PERFECT replica of the reference — "
+        "same exact colors, same exact graphics, same exact logos, same exact "
+        "text, same exact patterns, same exact stitching. "
+        "Change absolutely NOTHING about the design." + ANTI_HALLUCINATION
     )
 
 
 def render3d_back_prompt(name: str) -> str:
     """Prompt for photorealistic 3D product render — back view."""
     return (
-        f"The reference image shows both front and back views of a {name}. "
-        f"Convert the BACK VIEW of this EXACT design into a photorealistic "
-        f"3D product render of the {name}, BACK VIEW. The garment should "
-        "appear as a professional e-commerce product shot on an invisible "
-        "mannequin / ghost mannequin, showing the natural 3D shape and "
-        "drape of the fabric. Light gray (#E8E8E8) studio background with "
-        "subtle floor reflection. Professional product photography lighting. "
-        "Every detail from the back of the design MUST be preserved exactly: "
-        "same colors, same logos, same numbers, same text, same stripes. "
-        "Do NOT change ANY design element. Show the BACK of the garment." + ANTI_HALLUCINATION
+        f"The reference image shows a {name}. Create a photorealistic 3D "
+        f"product render of this EXACT {name}, BACK VIEW. "
+        "NO model, NO person, NO mannequin visible — just the garment "
+        "itself displayed naturally showing its 3D shape, volume, and fabric "
+        "drape as if floating on an invisible form. Show the BACK side. "
+        "Light gray (#E8E8E8) studio background with subtle floor reflection. "
+        "Professional product photography lighting. "
+        "The garment must be a PIXEL-PERFECT replica of the reference — "
+        "same exact colors, same exact back graphics, same exact logos, "
+        "same exact text, same exact patterns. "
+        "Change absolutely NOTHING about the design." + ANTI_HALLUCINATION
     )
 
 
@@ -838,6 +832,47 @@ def enhance_source_image(image_path: Path):
     return img
 
 
+# -- Socket-hang guard -------------------------------------------------------
+# Issue #1893: gemini-2.5-flash can stall at socket level indefinitely.
+# http_options timeout does NOT catch this — the socket stays open with no data.
+# ThreadPoolExecutor.result(timeout=N) enforces a wall-clock deadline regardless.
+_GENAI_CALL_TIMEOUT = 90  # seconds wall-clock per attempt
+_GENAI_MAX_RETRIES = 2  # retry socket hangs with backoff before giving up
+_GENAI_BACKOFF_BASE = 10  # seconds; backoff = base * 2^attempt
+
+
+def _call_with_deadline(fn, *args, timeout: int = _GENAI_CALL_TIMEOUT, **kwargs):
+    """Run fn(*args, **kwargs) with a wall-clock deadline and exponential backoff.
+
+    Retries up to _GENAI_MAX_RETRIES times on socket hang (TimeoutError).
+    Raises the last TimeoutError if all retries exhausted.
+    """
+    last_exc = None
+    for attempt in range(_GENAI_MAX_RETRIES + 1):
+        if attempt > 0:
+            backoff = _GENAI_BACKOFF_BASE * (2 ** (attempt - 1))
+            log.warning(
+                "Socket hang retry %d/%d — waiting %ds before retry",
+                attempt,
+                _GENAI_MAX_RETRIES,
+                backoff,
+            )
+            time.sleep(backoff)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            future = pool.submit(fn, *args, **kwargs)
+            try:
+                return future.result(timeout=timeout)
+            except concurrent.futures.TimeoutError as exc:
+                last_exc = exc
+                log.warning(
+                    "API call timed out after %ds (attempt %d/%d)",
+                    timeout,
+                    attempt + 1,
+                    _GENAI_MAX_RETRIES + 1,
+                )
+    raise last_exc
+
+
 # -- Image generation --------------------------------------------------------
 
 
@@ -860,7 +895,8 @@ def generate_image(
         full_prompt += ENHANCED_PROMPT_SUFFIX
 
     try:
-        response = client.models.generate_content(
+        response = _call_with_deadline(
+            client.models.generate_content,
             model=MODEL_ID,
             contents=[
                 "REFERENCE PHOTO of the exact product (study every detail):",
@@ -870,11 +906,15 @@ def generate_image(
             config=types.GenerateContentConfig(
                 response_modalities=["IMAGE"],
                 image_config=types.ImageConfig(
-                    aspect_ratio="3:4",
-                    image_size="2K",
+                    aspectRatio="3:4",
                 ),
             ),
         )
+    except concurrent.futures.TimeoutError:
+        log.warning(
+            "generate_image timed out after %ds (socket hang — skipping)", _GENAI_CALL_TIMEOUT
+        )
+        return None
     except Exception as exc:
         log.error("API call failed (attempt %d): %s", attempt, exc)
         return None
@@ -896,63 +936,6 @@ def generate_image(
             return data
 
     log.warning("No image in response parts (attempt %d)", attempt)
-    return None
-
-
-def generate_image_imagen(
-    client,
-    sku: str,
-    view: str,
-    attempt: int = 1,
-) -> bytes | None:
-    """Generate a single image using Imagen 4 Ultra (text-to-image, no reference).
-
-    Best for products with prominent text that Gemini struggles with.
-    Returns WebP image bytes on success, None on failure.
-    """
-    from google.genai import types
-
-    prompt = imagen_render_prompt(sku, view)
-
-    if attempt > 1:
-        prompt += (
-            " CRITICAL: All text on the garment must be spelled exactly as "
-            "described. Do not omit, abbreviate, or alter any words."
-        )
-
-    try:
-        response = client.models.generate_images(
-            model=IMAGEN_MODEL_ID,
-            prompt=prompt,
-            config=types.GenerateImagesConfig(
-                number_of_images=1,
-                aspect_ratio="3:4",
-                person_generation="allow_adult",
-            ),
-        )
-    except Exception as exc:
-        log.error("Imagen API call failed (attempt %d): %s", attempt, exc)
-        return None
-
-    if not response or not response.generated_images:
-        log.warning("Empty Imagen response (attempt %d)", attempt)
-        return None
-
-    img = response.generated_images[0]
-    if hasattr(img, "image") and hasattr(img.image, "image_bytes"):
-        raw_bytes = img.image.image_bytes
-        # Imagen returns PNG — convert to WebP for consistency
-        try:
-            from PIL import Image
-
-            pil_img = Image.open(io.BytesIO(raw_bytes))
-            buf = io.BytesIO()
-            pil_img.save(buf, format="WEBP", quality=92)
-            return buf.getvalue()
-        except Exception:
-            return raw_bytes  # fallback: save as-is
-
-    log.warning("No image data in Imagen response (attempt %d)", attempt)
     return None
 
 
@@ -1364,6 +1347,120 @@ def qa_check_image(
         return {"pass": False, "issues": ["Could not parse QA response"], "notes": text[:300]}
 
 
+def gemini_vision_compare(
+    client,
+    source_path: Path,
+    generated_bytes: bytes,
+    product_name: str,
+    garment_spec: str = "",
+    view: str = "front",
+) -> dict:
+    """Compare generated render against source tech flat using Gemini Flash vision.
+
+    Called inline within the generation retry loop. On failure, issues are injected
+    as corrective feedback into the next attempt's prompt, triggering regeneration.
+
+    Returns dict with pass/fail, score (0-100), and specific issues for prompt feedback.
+    """
+    from google.genai import types as genai_types
+
+    src_bytes = source_path.read_bytes()
+    src_mime = "image/jpeg" if source_path.suffix.lower() in (".jpg", ".jpeg") else "image/webp"
+    spec_context = f"\nProduct spec: {garment_spec}" if garment_spec else ""
+
+    view_label = view.upper()
+    view_rule = (
+        "IMAGE 2 shows the FRONT of the garment only. "
+        "Do NOT flag missing back-panel content — the back is intentionally not shown."
+        if view == "front"
+        else "IMAGE 2 shows the BACK of the garment only. "
+        "Do NOT flag missing front-panel content — the front is intentionally not shown."
+    )
+
+    prompt = (
+        f"You are a strict QA inspector comparing a SOURCE tech flat vs an AI-generated "
+        f"{view_label} VIEW render of '{product_name}'.{spec_context}\n\n"
+        "IMAGE 1 = SOURCE tech flat (ground truth — what the product MUST look like)\n"
+        f"IMAGE 2 = GENERATED {view_label} VIEW render (evaluate against IMAGE 1)\n\n"
+        f"IMPORTANT: {view_rule}\n\n"
+        "Evaluate ONLY these criteria:\n"
+        "  1. BASE COLORS — garment color(s) must match source exactly\n"
+        "  2. TEXT — all visible text must be correct (content, color, placement)\n"
+        "  3. NUMBERS — jersey numbers must be exact\n"
+        "  4. LOGOS — presence, placement, and color must match (not 3D material texture)\n"
+        "  5. GARMENT TYPE — must be the correct garment (jersey, hoodie, shorts, etc.)\n"
+        "  6. DESIGN ELEMENTS — panels, stripes, patterns must match\n\n"
+        "DO NOT penalize for: logo embossing/3D depth, fabric drape, lighting/shadows, "
+        "material gloss level, or content from the opposite side of the garment.\n\n"
+        "Return ONLY this JSON (no markdown):\n"
+        "{\n"
+        '  "pass": true/false,\n'
+        '  "score": 0-100,\n'
+        '  "color_match": true/false,\n'
+        '  "text_match": true/false,\n'
+        '  "garment_match": true/false,\n'
+        "score=100 means all 6 criteria match. Be strict on colors, text, numbers."
+    )
+
+    # Native JSON schema output — guaranteed valid, no markdown stripping needed.
+    _vision_schema = {
+        "type": "OBJECT",
+        "properties": {
+            "pass": {"type": "BOOLEAN"},
+            "score": {"type": "INTEGER"},
+            "color_match": {"type": "BOOLEAN"},
+            "text_match": {"type": "BOOLEAN"},
+            "garment_match": {"type": "BOOLEAN"},
+            "logo_match": {"type": "BOOLEAN"},
+            "issues": {"type": "ARRAY", "items": {"type": "STRING"}},
+            "notes": {"type": "STRING"},
+        },
+        "required": [
+            "pass",
+            "score",
+            "color_match",
+            "text_match",
+            "garment_match",
+            "logo_match",
+            "issues",
+            "notes",
+        ],
+    }
+
+    try:
+        response = _call_with_deadline(
+            client.models.generate_content,
+            model="gemini-2.5-flash",
+            contents=[
+                prompt,
+                genai_types.Part(inline_data=genai_types.Blob(mime_type=src_mime, data=src_bytes)),
+                genai_types.Part(
+                    inline_data=genai_types.Blob(mime_type="image/webp", data=generated_bytes)
+                ),
+            ],
+            config=genai_types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=_vision_schema,
+            ),
+        )
+    except concurrent.futures.TimeoutError:
+        log.warning(
+            "Vision compare timed out after %ds (socket hang) — treating as pass to avoid infinite retry",
+            _GENAI_CALL_TIMEOUT,
+        )
+        return {
+            "pass": True,
+            "score": -1,
+            "issues": [],
+            "notes": "Vision timeout — socket hang (Issue #1893)",
+        }
+    except Exception as exc:
+        log.error("Vision compare failed: %s", exc)
+        return {"pass": True, "score": 0, "issues": [], "notes": f"Vision API error: {exc}"}
+
+    return json.loads(response.text)
+
+
 def quality_gate(image_bytes: bytes, sku: str, view: str) -> bool:
     """Check if generated image passes quality requirements."""
     size_kb = len(image_bytes) / 1024
@@ -1409,11 +1506,14 @@ def get_prompt(product: dict, view: str) -> str:
 
 
 def get_output_filename(sku: str, view: str) -> str:
-    """Map view to output filename."""
+    """Map view to output filename using product-name-based slugs."""
+    info = PRODUCT_CATALOG.get(sku, {})
+    slug = info.get("output_slug", sku)
+
     if view.startswith("render3d_"):
         suffix = view.replace("render3d_", "")
-        return f"{sku}-render-{suffix}.webp"
-    return f"{sku}-{view}-model.webp" if view != "branding" else f"{sku}-branding.webp"
+        return f"{slug}-{suffix}-model.webp"
+    return f"{slug}-{view}-model.webp" if view != "branding" else f"{slug}-branding.webp"
 
 
 def process_product(
@@ -1427,9 +1527,8 @@ def process_product(
 ) -> dict:
     """Generate images for a single product. Returns results dict.
 
-    engine: "gemini" | "imagen" | "flux" | "gpt-image" | "auto"
+    engine: "gemini" | "flux" | "gpt-image" | "auto"
     In auto mode:
-      - Imagen Ultra for TEXT_HEAVY_SKUS (text rendering from description)
       - FLUX.2 for TECH_FLAT_SKUS (tech flat → photorealistic)
       - Gemini for everything else (reference-based ghost mannequin)
     """
@@ -1439,8 +1538,7 @@ def process_product(
     results = {"sku": sku, "name": name, "views": {}}
 
     # Determine which engine to use for this product
-    use_imagen = engine == "imagen" or (engine == "auto" and sku in TEXT_HEAVY_SKUS)
-    use_flux = engine == "flux" or (engine == "auto" and sku in TECH_FLAT_SKUS and not use_imagen)
+    use_flux = engine == "flux" or (engine == "auto" and sku in TECH_FLAT_SKUS)
     use_gpt_image = engine == "gpt-image"
 
     # Validate engine requirements
@@ -1451,37 +1549,34 @@ def process_product(
         log.warning("SKIP %s: FLUX requested but no Together client (missing API key?)", sku)
         use_flux = False
 
-    if not use_imagen and not use_flux and not use_gpt_image and not src:
+    if not use_flux and not use_gpt_image and not src:
         log.warning("SKIP %s (%s): no source image found", sku, name)
         results["status"] = "no_source"
         return results
 
-    if use_imagen and sku not in IMAGEN_PRODUCT_DESCRIPTIONS:
-        log.warning("SKIP %s: no Imagen description defined, falling back to Gemini", sku)
-        use_imagen = False
-        if not src:
-            log.warning("SKIP %s (%s): no source image and no Imagen desc", sku, name)
-            results["status"] = "no_source"
-            return results
-
     if use_flux and not src:
         log.info("FLUX text-to-image mode for %s (no source image)", sku)
 
-    engine_label = (
-        "GPT-Image-1.5"
-        if use_gpt_image
-        else "Imagen Ultra"
-        if use_imagen
-        else "FLUX.2"
-        if use_flux
-        else "Gemini"
-    )
+    engine_label = "GPT-Image-1.5" if use_gpt_image else "FLUX.2" if use_flux else "Gemini"
 
-    # Build analysis-enhanced prompt detail if available
+    # Build analysis-enhanced prompt detail.
+    # Priority: passed-in analysis dict > garment-analysis.json cache > nothing.
     analysis_detail = ""
     if analysis:
         analysis_detail = analysis_to_prompt_detail(analysis)
-        log.info("Vision analysis available for %s — enhancing prompts", sku)
+        log.info("Vision analysis (passed-in) available for %s — enhancing prompts", sku)
+    else:
+        # Auto-load from garment-analysis.json (written by vision_batch.py)
+        ga_path = PROJECT_ROOT / "skyyrose" / "assets" / "data" / "garment-analysis.json"
+        if ga_path.exists():
+            try:
+                ga_data = json.loads(ga_path.read_text(encoding="utf-8"))
+                ga_entry = ga_data.get("products", {}).get(sku)
+                if ga_entry and ga_entry.get("garmentAnalysis"):
+                    analysis_detail = f"PRE-VISION SPEC: {ga_entry['garmentAnalysis'][:600]}"
+                    log.info("Loaded garment-analysis.json spec for %s", sku)
+            except Exception as exc:
+                log.debug("Could not load garment-analysis.json for %s: %s", sku, exc)
     log.info("Engine: %s for %s", engine_label, sku)
 
     for view in views:
@@ -1494,35 +1589,92 @@ def process_product(
         out_path = PRODUCTS_DIR / get_output_filename(sku, view)
         log.info("Generating %s %s (%s) [%s]...", sku, view, name, engine_label)
 
+        # For back view, use back-specific source if available
+        view_src = src
+        has_back_ref = False  # True only when we have a dedicated back reference image
+        if view == "back":
+            back_src = get_back_source(sku, PRODUCT_CATALOG.get(sku, {}))
+            if back_src:
+                view_src = back_src
+                has_back_ref = True
+                log.info("Using back source for %s: %s", sku, back_src.name)
+            else:
+                log.debug(
+                    "%s has no back_source_override — back vision compare skipped (plain back)", sku
+                )
+
         success = False
+        vision_feedback = ""  # Corrective feedback from vision compare — injected on retry
+        best_image_bytes: bytes | None = None  # Best result by vision score across all attempts
+        best_vision_score: int = -1
         for attempt in range(1, MAX_RETRIES + 1):
-            if use_imagen:
-                image_bytes = generate_image_imagen(client, sku, view, attempt)
-            elif use_gpt_image:
+            if use_gpt_image:
                 prompt = get_prompt(product, view)
                 if analysis_detail:
                     prompt += f" VERIFIED DETAILS: {analysis_detail}"
+                if vision_feedback:
+                    prompt += f" {vision_feedback}"
                 image_bytes = generate_image_gpt(
                     openai_client,
                     prompt,
-                    src,
+                    view_src,
                     attempt,
                 )
             elif use_flux:
                 prompt = flux_render_prompt(name, view, source_desc=analysis_detail)
+                if vision_feedback:
+                    prompt += f" {vision_feedback}"
                 image_bytes = generate_image_flux(
                     together_client,
                     prompt,
-                    src,
+                    view_src,
                     attempt,
                 )
             else:
                 prompt = get_prompt(product, view)
                 if analysis_detail:
                     prompt += f" VERIFIED DETAILS: {analysis_detail}"
-                image_bytes = generate_image(client, src, prompt, attempt)
+                if vision_feedback:
+                    prompt += f" {vision_feedback}"
+                image_bytes = generate_image(client, view_src, prompt, attempt)
 
             if image_bytes and quality_gate(image_bytes, sku, view):
+                # ── Vision compare: generated render vs source tech flat ──────
+                # Compare the render against the source design. On failure, inject
+                # specific issues as corrective feedback and retry generation.
+                # Skip for back views without a dedicated back reference — the front
+                # techflat is not a valid comparison target for a plain back.
+                run_vision = view_src and (view != "back" or has_back_ref)
+                if run_vision:
+                    logo_spec = LOGO_TREATMENTS.get(sku, "")
+                    vision = gemini_vision_compare(
+                        client, view_src, image_bytes, name, logo_spec, view
+                    )
+                    v_score = vision.get("score", 100)
+                    v_pass = vision.get("pass", True)
+                    v_issues = vision.get("issues", [])
+                    log.info(
+                        "VISION %s %s: %s score=%d%s",
+                        sku,
+                        view,
+                        "PASS" if v_pass else "FAIL",
+                        v_score,
+                        f" | {'; '.join(v_issues[:2])}" if v_issues else "",
+                    )
+                    if not v_pass and attempt < MAX_RETRIES:
+                        vision_feedback = (
+                            "CRITICAL CORRECTIONS — fix ALL of the following before anything else: "
+                            + " | ".join(v_issues)
+                            + " Match the source image exactly. Do not change anything not listed."
+                        )
+                        log.info(
+                            "Vision FAIL — retry %d/%d with corrective feedback",
+                            attempt + 1,
+                            MAX_RETRIES,
+                        )
+                        time.sleep(RETRY_DELAY_SEC)
+                        continue  # Regenerate with feedback injected
+                # ── Vision passed (or no-source) — save ──────────────────────
                 out_path.write_bytes(image_bytes)
                 log.info(
                     "SAVED %s (%.1fKB) [%s]", out_path.name, len(image_bytes) / 1024, engine_label
@@ -1671,7 +1823,7 @@ def cmd_composite(args):
     from google import genai
 
     api_key = get_api_key()
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(api_key=api_key, http_options={"timeout": 300000})  # 5 min in ms
     products = load_products(args.sku, include_bad=args.include_bad)
 
     # Determine which views to composite
@@ -1807,7 +1959,7 @@ def cmd_generate(args):
     from google import genai
 
     api_key = get_api_key()
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(api_key=api_key, http_options={"timeout": 300000})  # 5 min in ms
     products = load_products(args.sku, include_bad=args.include_bad)
     views = resolve_views(args.step)
     engine = args.engine
@@ -1832,12 +1984,10 @@ def cmd_generate(args):
 
     engine_label = {
         "gemini": f"Gemini ({MODEL_ID})",
-        "imagen": f"Imagen Ultra ({IMAGEN_MODEL_ID})",
         "flux": f"FLUX.2 ({FLUX_MODEL_ID})",
         "gpt-image": f"GPT-Image ({GPT_IMAGE_MODEL})",
         "auto": (
-            f"Auto (Gemini + Imagen for {len(TEXT_HEAVY_SKUS)} text-heavy"
-            f" + FLUX for {len(TECH_FLAT_SKUS)} tech-flat SKUs)"
+            f"Auto (FLUX for {len(TECH_FLAT_SKUS)} tech-flat SKUs, Gemini for everything else)"
         ),
     }[engine]
 
@@ -1885,13 +2035,9 @@ def cmd_generate(args):
     all_results = []
     for i, product in enumerate(products, 1):
         sku = product["sku"]
-        use_imagen = engine == "imagen" or (engine == "auto" and sku in TEXT_HEAVY_SKUS)
-        use_flux = engine == "flux" or (
-            engine == "auto" and sku in TECH_FLAT_SKUS and not use_imagen
-        )
+        use_flux = engine == "flux" or (engine == "auto" and sku in TECH_FLAT_SKUS)
         use_gpt_image = engine == "gpt-image"
-        needs_source = not use_imagen
-        if not needs_source or product["source_image"] or use_flux or use_gpt_image:
+        if product["source_image"] or use_flux or use_gpt_image:
             pass  # OK to proceed
         elif not product["source_image"]:
             log.warning(
@@ -2053,14 +2199,13 @@ def main():
     parser.add_argument(
         "--engine",
         type=str,
-        choices=["gemini", "imagen", "flux", "gpt-image", "auto"],
+        choices=["gemini", "flux", "gpt-image", "auto"],
         default="auto",
         help=(
             "Image generation engine: gemini (reference-based), "
-            "imagen (Imagen 4 Ultra, text-to-image for text-heavy), "
-            "flux (FLUX.2 via Together AI, tech flat conversion + text), "
+            "flux (FLUX.2 via Together AI, tech flat conversion), "
             "gpt-image (GPT-Image-1.5, reference editing + text), "
-            "auto (routes each SKU to best engine — default)"
+            "auto (FLUX for tech-flat SKUs, Gemini for everything else — default)"
         ),
     )
     parser.add_argument(

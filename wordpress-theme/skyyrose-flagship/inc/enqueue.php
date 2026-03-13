@@ -15,12 +15,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Enqueue self-hosted fonts (Inter + Playfair Display).
+ * Enqueue self-hosted fonts (all brand typography).
  *
- * GDPR-compliant: no external requests to Google Fonts.
- * Font files are served from assets/fonts/ as woff2 variable fonts.
+ * GDPR-compliant: zero external requests to Google Fonts.
+ * All 9 font families served locally from assets/fonts/ as woff2.
+ * Fonts: Inter, Playfair Display, Cinzel, Cormorant Garamond,
+ *        Oswald, Barlow, Bebas Neue, Space Mono, Instrument Serif.
  *
  * @since 3.2.1
+ * @updated 4.1.0 — self-hosted all Google Fonts families
  * @return void
  */
 function skyyrose_enqueue_local_fonts() {
@@ -29,37 +32,6 @@ function skyyrose_enqueue_local_fonts() {
 		SKYYROSE_ASSETS_URI . '/css/fonts.css',
 		array(),
 		SKYYROSE_VERSION
-	);
-}
-
-/**
- * Enqueue Google Fonts CDN for Elite Web Builder brand typography.
- *
- * Loads Cinzel, Cormorant Garamond, Space Mono, and Bebas Neue.
- * Playfair Display is already self-hosted; Inter is the system body font.
- * These fonts power the landing pages, collection pages, and single product pages.
- *
- * @since 4.0.0
- * @return void
- */
-function skyyrose_enqueue_google_fonts() {
-	// Playfair Display removed — already self-hosted in assets/css/fonts.css.
-	$font_families = implode( '&', array(
-		'family=Cinzel:wght@400;500;600;700;800;900',
-		'family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600',
-		'family=Oswald:wght@400;500;600;700',
-		'family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400',
-		'family=Bebas+Neue',
-		'family=Space+Mono:wght@400;700',
-		'family=Instrument+Serif:ital@0;1',
-		'display=swap',
-	) );
-
-	wp_enqueue_style(
-		'skyyrose-google-fonts',
-		'https://fonts.googleapis.com/css2?' . $font_families,
-		array(),
-		null
 	);
 }
 
@@ -89,7 +61,7 @@ function skyyrose_enqueue_global_styles() {
 		wp_enqueue_style(
 			'skyyrose-main',
 			$base_uri . '/' . $main_file,
-			array( 'skyyrose-style', 'skyyrose-google-fonts' ),
+			array( 'skyyrose-style', 'skyyrose-fonts' ),
 			SKYYROSE_VERSION
 		);
 	}
@@ -470,6 +442,7 @@ function skyyrose_get_current_template_slug() {
 			'template-landing-love-hurts.php'      => 'landing',
 			'template-landing-signature.php'       => 'landing',
 			'template-experiences.php'             => 'experiences',
+			'template-spatial-home.php'            => 'spatial-home',
 			'template-collections.php'             => 'collection',
 		);
 
@@ -516,8 +489,9 @@ function skyyrose_enqueue_template_styles() {
 		'front-page'      => 'homepage-v2.css',
 		'collection'      => 'collections.css',
 		'collection-v4'   => 'collection-v4.css',
-				'immersive'       => 'immersive.css',
+		'immersive'       => 'immersive.css',
 		'experiences'     => 'immersive.css',
+		'spatial-home'    => 'spatial-home.css',
 		'single-product'  => 'single-product.css',
 		'cart'            => 'woocommerce.css',
 		'checkout'        => 'woocommerce.css',
@@ -664,6 +638,31 @@ function skyyrose_enqueue_template_scripts() {
 			);
 		}
 
+		// Enqueue Three.js immersive world engine (progressive enhancement over 2D).
+		if ( 'immersive' === $slug ) {
+			$world_path = $base_js_dir . '/immersive-world.js';
+			if ( file_exists( $world_path ) ) {
+				wp_enqueue_script(
+					'skyyrose-immersive-world',
+					$base_js_uri . '/immersive-world.js',
+					array( $handle ),
+					SKYYROSE_VERSION,
+					true
+				);
+			}
+
+			// World-specific styles (narrative panels, canvas, scroll spacer).
+			$world_css = $base_css_dir . '/immersive-world.css';
+			if ( file_exists( $world_css ) ) {
+				wp_enqueue_style(
+					'skyyrose-immersive-world',
+					$base_css_uri . '/immersive-world.css',
+					array( 'skyyrose-template-immersive' ),
+					SKYYROSE_VERSION
+				);
+			}
+		}
+
 		// Enqueue immersive WooCommerce bridge + localize skyyRoseImmersive data.
 		if ( 'immersive' === $slug ) {
 			$bridge_path = $base_js_dir . '/immersive-wc-bridge.js';
@@ -688,480 +687,34 @@ function skyyrose_enqueue_template_scripts() {
 				);
 			}
 		}
+
+		// Holo product cards — loaded on collection pages, shop archives, and WC loop.
+		if ( in_array( $slug, array( 'collection', 'collection-v4', 'collections-shop', 'front-page', 'shop-archive' ), true ) ) {
+			$holo_css_file = $use_min && file_exists( $base_css_dir . '/product-card-holo.min.css' )
+				? 'product-card-holo.min.css' : 'product-card-holo.css';
+			if ( file_exists( $base_css_dir . '/' . $holo_css_file ) ) {
+				wp_enqueue_style(
+					'skyyrose-product-card-holo',
+					$base_css_uri . '/' . $holo_css_file,
+					array( 'skyyrose-design-tokens' ),
+					SKYYROSE_VERSION
+				);
+			}
+			$holo_js_file = $use_min && file_exists( $base_js_dir . '/product-card-holo.min.js' )
+				? 'product-card-holo.min.js' : 'product-card-holo.js';
+			if ( file_exists( $base_js_dir . '/' . $holo_js_file ) ) {
+				wp_enqueue_script(
+					'skyyrose-product-card-holo',
+					$base_js_uri . '/' . $holo_js_file,
+					array(),
+					SKYYROSE_VERSION,
+					true
+				);
+			}
+		}
 	}
 }
 
-/**
- * Enqueue the luxury cursor assets on all static (non-immersive) pages.
- *
- * Loads a custom animated cursor with a rose gold ring, gold center dot,
- * and sparkle trail on desktop devices. Skips immersive and preorder-gateway
- * templates where the cursor would conflict with full-screen experiences.
- *
- * @since 3.1.0
- * @return void
- */
-function skyyrose_enqueue_luxury_cursor() {
-
-	$slug = skyyrose_get_current_template_slug();
-
-	// Skip templates where a custom cursor would conflict with the experience.
-	$excluded_templates = array( 'immersive', 'preorder-gateway' );
-
-	if ( in_array( $slug, $excluded_templates, true ) ) {
-		return;
-	}
-
-	// Luxury cursor CSS.
-	$use_min         = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
-	$cursor_css_file = $use_min && file_exists( SKYYROSE_DIR . '/assets/css/luxury-cursor.min.css' )
-		? 'luxury-cursor.min.css' : 'luxury-cursor.css';
-	if ( file_exists( SKYYROSE_DIR . '/assets/css/' . $cursor_css_file ) ) {
-		wp_enqueue_style(
-			'skyyrose-luxury-cursor',
-			SKYYROSE_ASSETS_URI . '/css/' . $cursor_css_file,
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-
-	// Luxury cursor JS (loaded in footer, deferred via skyyrose_defer_scripts).
-	$cursor_js_file = $use_min && file_exists( SKYYROSE_DIR . '/assets/js/luxury-cursor.min.js' )
-		? 'luxury-cursor.min.js' : 'luxury-cursor.js';
-	if ( file_exists( SKYYROSE_DIR . '/assets/js/' . $cursor_js_file ) ) {
-		wp_enqueue_script(
-			'skyyrose-luxury-cursor',
-			SKYYROSE_ASSETS_URI . '/js/' . $cursor_js_file,
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
-}
-
-/**
- * Conditionally enqueue collection logo 3D rotation styles.
- *
- * Loads collection-logos.css only on collection template pages so the
- * rotating 3D logo animations and collection-specific card styles are available.
- *
- * @since 3.0.0
- * @return void
- */
-function skyyrose_enqueue_collection_logos() {
-
-	$slug = skyyrose_get_current_template_slug();
-
-	if ( 'collection' !== $slug ) {
-		return;
-	}
-
-	$use_min  = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
-	$logos_css = $use_min && file_exists( SKYYROSE_DIR . '/assets/css/collection-logos.min.css' )
-		? 'collection-logos.min.css' : 'collection-logos.css';
-	if ( file_exists( SKYYROSE_DIR . '/assets/css/' . $logos_css ) ) {
-		wp_enqueue_style(
-			'skyyrose-collection-logos',
-			SKYYROSE_ASSETS_URI . '/css/' . $logos_css,
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-
-	// Collection color schemes (per-collection CSS custom properties).
-	$colors_css = $use_min && file_exists( SKYYROSE_DIR . '/assets/css/collection-colors.min.css' )
-		? 'collection-colors.min.css' : 'collection-colors.css';
-	if ( file_exists( SKYYROSE_DIR . '/assets/css/' . $colors_css ) ) {
-		wp_enqueue_style(
-			'skyyrose-collection-colors',
-			SKYYROSE_ASSETS_URI . '/css/' . $colors_css,
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-}
-
-/**
- * Conditionally enqueue Cinematic Mode assets.
- *
- * Loads cinematic-mode.css and cinematic-mode.js only on interactive pages:
- * immersive scenes, pre-order gateway, and WooCommerce single product.
- *
- * @since 3.1.0
- * @return void
- */
-function skyyrose_enqueue_cinematic_mode() {
-
-	$slug            = skyyrose_get_current_template_slug();
-	$cinematic_slugs = array( 'immersive', 'preorder-gateway', 'single-product' );
-
-	if ( ! in_array( $slug, $cinematic_slugs, true ) ) {
-		return;
-	}
-
-	$use_min      = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
-	$cine_css     = $use_min && file_exists( SKYYROSE_DIR . '/assets/css/cinematic-mode.min.css' )
-		? 'cinematic-mode.min.css' : 'cinematic-mode.css';
-	if ( file_exists( SKYYROSE_DIR . '/assets/css/' . $cine_css ) ) {
-		wp_enqueue_style(
-			'skyyrose-cinematic-mode',
-			SKYYROSE_ASSETS_URI . '/css/' . $cine_css,
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-
-	$cine_js = $use_min && file_exists( SKYYROSE_DIR . '/assets/js/cinematic-mode.min.js' )
-		? 'cinematic-mode.min.js' : 'cinematic-mode.js';
-	if ( file_exists( SKYYROSE_DIR . '/assets/js/' . $cine_js ) ) {
-		wp_enqueue_script(
-			'skyyrose-cinematic-mode',
-			SKYYROSE_ASSETS_URI . '/js/' . $cine_js,
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
-}
-
-/**
- * Enqueue Cross-Sell Engine — "Complete the Look".
- *
- * Injects a glassmorphism cross-sell section into the immersive product
- * panel when a hotspot is opened. Shows 2-3 sibling products from the same
- * collection with Quick Add buttons and rose-gold particle celebrations.
- * Loaded only on immersive template pages to keep the payload minimal.
- *
- * @since 3.7.0
- * @return void
- */
-function skyyrose_enqueue_cross_sell_engine() {
-
-	$slug = skyyrose_get_current_template_slug();
-
-	// Only active on immersive scene pages.
-	if ( 'immersive' !== $slug ) {
-		return;
-	}
-
-	$use_min  = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
-	$xs_css   = $use_min && file_exists( SKYYROSE_DIR . '/assets/css/cross-sell-engine.min.css' )
-		? 'cross-sell-engine.min.css' : 'cross-sell-engine.css';
-	if ( file_exists( SKYYROSE_DIR . '/assets/css/' . $xs_css ) ) {
-		wp_enqueue_style(
-			'skyyrose-cross-sell-engine',
-			SKYYROSE_ASSETS_URI . '/css/' . $xs_css,
-			array( 'skyyrose-design-tokens', 'skyyrose-template-immersive' ),
-			SKYYROSE_VERSION
-		);
-	}
-
-	$xs_js = $use_min && file_exists( SKYYROSE_DIR . '/assets/js/cross-sell-engine.min.js' )
-		? 'cross-sell-engine.min.js' : 'cross-sell-engine.js';
-	if ( file_exists( SKYYROSE_DIR . '/assets/js/' . $xs_js ) ) {
-		wp_enqueue_script(
-			'skyyrose-cross-sell-engine',
-			SKYYROSE_ASSETS_URI . '/js/' . $xs_js,
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
-}
-
-/**
- * Enqueue Model Viewer — 3D Brand Avatar.
- *
- * Loads Google model-viewer web component and the brand-avatar stylesheet
- * on pages that include the brand-avatar template part (immersive scenes,
- * collection pages, and the pre-order gateway).
- *
- * @since 3.2.0
- * @return void
- */
-function skyyrose_enqueue_model_viewer() {
-
-	$slug              = skyyrose_get_current_template_slug();
-	$model_viewer_slugs = array( 'immersive', 'collection', 'preorder-gateway', 'front-page' );
-
-	if ( ! in_array( $slug, $model_viewer_slugs, true ) ) {
-		return;
-	}
-
-	// Google model-viewer web component (type="module").
-	wp_enqueue_script(
-		'google-model-viewer',
-		'https://cdn.jsdelivr.net/npm/@google/model-viewer@4.0.0/dist/model-viewer.min.js',
-		array(),
-		null,
-		true
-	);
-
-	// Brand avatar styles.
-	$use_min  = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
-	$mv_css   = $use_min && file_exists( SKYYROSE_DIR . '/assets/css/model-viewer.min.css' )
-		? 'model-viewer.min.css' : 'model-viewer.css';
-	if ( file_exists( SKYYROSE_DIR . '/assets/css/' . $mv_css ) ) {
-		wp_enqueue_style(
-			'skyyrose-model-viewer',
-			SKYYROSE_ASSETS_URI . '/css/' . $mv_css,
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-}
-
-/**
- * Add type="module" to model-viewer script tag.
- *
- * model-viewer requires ES module loading via type="module".
- *
- * @since  3.2.0
- * @param  string $tag    Full script tag HTML.
- * @param  string $handle Script handle.
- * @return string Modified tag.
- */
-function skyyrose_model_viewer_module_type( $tag, $handle ) {
-	if ( 'google-model-viewer' === $handle ) {
-		// Remove existing type attribute before adding type="module" to avoid duplication.
-		$tag = preg_replace( '/(<script)\s+type=[\'"]text\/javascript[\'"]/', '$1', $tag );
-		$tag = str_replace( '<script ', '<script type="module" crossorigin="anonymous" ', $tag );
-		return $tag;
-	}
-	return $tag;
-}
-
-/**
- * Enqueue Analytics Beacon — Unified Event Relay.
- *
- * Collects conversion events from all SkyyRose engines (CIE, Aurora,
- * Pulse, Magnetic Obsidian, Cross-Sell, Journey Gamification, APE)
- * and batches them to the devskyy.app Conversion Analytics API.
- * Uses navigator.sendBeacon for reliable page-unload delivery.
- *
- * @since 3.9.0
- * @return void
- */
-function skyyrose_enqueue_analytics_beacon() {
-
-	// Skip admin context.
-	if ( is_admin() ) {
-		return;
-	}
-
-	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
-	$ab_js   = $use_min && file_exists( SKYYROSE_DIR . '/assets/js/analytics-beacon.min.js' )
-		? 'analytics-beacon.min.js' : 'analytics-beacon.js';
-	if ( file_exists( SKYYROSE_DIR . '/assets/js/' . $ab_js ) ) {
-		wp_enqueue_script(
-			'skyyrose-analytics-beacon',
-			SKYYROSE_ASSETS_URI . '/js/' . $ab_js,
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-
-		wp_localize_script( 'skyyrose-analytics-beacon', 'skyyBeaconConfig', array(
-			'endpoint'      => 'https://devskyy.app/api/conversion',
-			'flushInterval' => 5000,
-		) );
-	}
-}
-
-/**
- * Enqueue Size & Fit Guide — Interactive Size Chart Modal.
- *
- * Loads the size guide CSS and JS on collection and pre-order pages.
- * The modal HTML is included via get_template_part() in the templates.
- *
- * @since 3.10.0
- * @return void
- */
-function skyyrose_enqueue_size_guide() {
-
-	$slug            = skyyrose_get_current_template_slug();
-	$size_guide_slugs = array( 'collection', 'preorder-gateway', 'single-product' );
-
-	if ( ! in_array( $slug, $size_guide_slugs, true ) ) {
-		return;
-	}
-
-	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
-	$sg_css  = $use_min && file_exists( SKYYROSE_DIR . '/assets/css/size-guide.min.css' )
-		? 'size-guide.min.css' : 'size-guide.css';
-	if ( file_exists( SKYYROSE_DIR . '/assets/css/' . $sg_css ) ) {
-		wp_enqueue_style(
-			'skyyrose-size-guide',
-			SKYYROSE_ASSETS_URI . '/css/' . $sg_css,
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-
-	$sg_js = $use_min && file_exists( SKYYROSE_DIR . '/assets/js/size-guide.min.js' )
-		? 'size-guide.min.js' : 'size-guide.js';
-	if ( file_exists( SKYYROSE_DIR . '/assets/js/' . $sg_js ) ) {
-		wp_enqueue_script(
-			'skyyrose-size-guide',
-			SKYYROSE_ASSETS_URI . '/js/' . $sg_js,
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
-}
-
-/**
- * Dequeue WooCommerce default styles that conflict with theme design.
- *
- * WooCommerce loads 3 default stylesheets. We remove the general and
- * smallscreen styles to prevent layout conflicts with our design-token system,
- * but keep the layout stylesheet for grid compatibility.
- *
- * @since  3.0.0
- * @param  array $enqueue_styles WooCommerce styles to load.
- * @return array Filtered styles.
- */
-function skyyrose_dequeue_woocommerce_styles( $enqueue_styles ) {
-
-	// Remove the general WooCommerce stylesheet (buttons, forms, etc.).
-	unset( $enqueue_styles['woocommerce-general'] );
-
-	// Remove the small-screen / mobile stylesheet.
-	unset( $enqueue_styles['woocommerce-smallscreen'] );
-
-	// Keep woocommerce-layout for grid structure.
-	return $enqueue_styles;
-}
-
-/**
- * Add font preload hints for critical above-fold fonts.
- *
- * Preloads latin subsets (used by all page content) for fastest
- * first-paint. Latin-ext subsets load on demand via unicode-range.
- *
- * @since  3.2.1
- * @return void
- */
-function skyyrose_preload_fonts() {
-	$fonts_dir = SKYYROSE_ASSETS_URI . '/fonts';
-	?>
-	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/inter-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
-	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/playfair-display-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
-	<?php
-}
-
-/**
- * Resource hints for external services.
- *
- * Google Fonts preconnects removed in 3.2.1 (fonts self-hosted for GDPR).
- * Kept as filter hook point for future external service preconnects.
- *
- * @since  3.2.1
- * @param  array  $urls          URLs to print for resource hint.
- * @param  string $relation_type The resource hint relation (dns-prefetch, preconnect, etc.).
- * @return array Modified URLs.
- */
-function skyyrose_resource_hints( $urls, $relation_type ) {
-	// Preconnect to model-viewer CDN (used on avatar pages).
-	if ( 'preconnect' === $relation_type ) {
-		$urls[] = array(
-			'href'        => 'https://cdn.jsdelivr.net',
-			'crossorigin' => 'anonymous',
-		);
-		// Google Fonts preconnect (v4.0.0 — brand typography for Elite Web Builder).
-		$urls[] = array(
-			'href'        => 'https://fonts.googleapis.com',
-			'crossorigin' => '',
-		);
-		$urls[] = array(
-			'href'        => 'https://fonts.gstatic.com',
-			'crossorigin' => 'anonymous',
-		);
-	}
-	return $urls;
-}
-
-/**
- * Add font-display:swap to Google Fonts stylesheet link tags.
- *
- * Legacy callback — originally used when fonts were loaded from Google Fonts CDN.
- * Fonts are now self-hosted (v3.2.1 GDPR), so this is a safe passthrough.
- * Kept to prevent fatal errors from orphaned style_loader_tag hook registrations
- * that may exist on the production server.
- *
- * @since  3.0.0
- * @param  string $html   The link tag HTML.
- * @param  string $handle The stylesheet handle.
- * @param  string $href   The stylesheet URL.
- * @param  string $media  The stylesheet media attribute.
- * @return string Modified or original link tag.
- */
-function skyyrose_add_font_display_swap( $html, $handle, $href, $media ) {
-	// Only modify external Google Fonts links (no longer used since v3.2.1).
-	if ( strpos( $href, 'fonts.googleapis.com' ) !== false && strpos( $href, 'display=' ) === false ) {
-		$href_swap = add_query_arg( 'display', 'swap', $href );
-		$html      = str_replace( $href, esc_url( $href_swap ), $html );
-	}
-	return $html;
-}
-
-/**
- * Defer non-critical scripts for better page load performance.
- *
- * @since  3.0.0
- * @param  string $tag    Full script tag HTML.
- * @param  string $handle Script handle.
- * @return string Modified tag.
- */
-function skyyrose_defer_scripts( $tag, $handle ) {
-
-	$defer_handles = array(
-		'skyyrose-navigation',
-		'skyyrose-template-homepage',
-		'skyyrose-template-homepage-v2',
-		'skyyrose-template-collections',
-		'skyyrose-template-immersive',
-		'skyyrose-template-woocommerce',
-		'skyyrose-template-contact',
-		'skyyrose-template-preorder-gateway',
-		'skyyrose-cinematic-mode',
-		'skyyrose-luxury-cursor',
-		'skyyrose-social-proof',
-		'skyyrose-the-pulse',
-		'skyyrose-aurora-engine',
-		'skyyrose-magnetic-obsidian',
-		'skyyrose-conversion-engine',
-		'skyyrose-cross-sell-engine',
-		'skyyrose-adaptive-personalization',
-		'skyyrose-journey-gamification',
-		'skyyrose-momentum-commerce',
-		'skyyrose-velocity-scroll',
-		'skyyrose-analytics-beacon',
-		'skyyrose-immersive-wc-bridge',
-		'skyyrose-size-guide',
-		'skyyrose-template-style-quiz',
-		'skyyrose-brand-ambassador',
-		'skyyrose-template-landing-engine',
-		'skyyrose-template-collection-v4',
-		'skyyrose-interactive-cards',
-		'skyyrose-progressive-images',
-		'skyyrose-smart-prefetch',
-		'skyyrose-scroll-enhancements',
-		'skyyrose-exit-intent',
-		'skyyrose-urgency-banner',
-		'skyyrose-template-single-product',
-		'skyyrose-template-about',
-		'skyyrose-web-vitals',
-		'skyyrose-schema-validator',
-	);
-
-	if ( in_array( $handle, $defer_handles, true ) && strpos( $tag, ' defer' ) === false ) {
-		return preg_replace( '/(<script\b[^>]*)\ssrc=/i', '$1 defer src=', $tag, 1 );
-	}
-
-	return $tag;
-}
 
 /**
  * Enqueue admin styles and scripts.
@@ -1194,19 +747,13 @@ function skyyrose_admin_scripts() {
 
 /*--------------------------------------------------------------
  * Hook Registration
+ *
+ * Feature hooks → inc/enqueue-features.php
+ * Performance hooks → inc/enqueue-performance.php
  *--------------------------------------------------------------*/
-
-// Resource hints for external services (model-viewer CDN, etc.).
-add_filter( 'wp_resource_hints', 'skyyrose_resource_hints', 10, 2 );
-
-// Preload critical font files in <head>.
-add_action( 'wp_head', 'skyyrose_preload_fonts', 3 );
 
 // Self-hosted fonts (priority 5 so they load before template styles).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_local_fonts', 5 );
-
-// Google Fonts CDN — brand typography for Elite Web Builder design (priority 6).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_google_fonts', 6 );
 
 // Global styles (priority 10 - default).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_global_styles', 10 );
@@ -1222,39 +769,6 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_template_styles', 20 );
 
 // Template-specific scripts (priority 20).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_template_scripts', 20 );
-
-// Collection logo 3D rotation styles (priority 22, after template styles).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_collection_logos', 22 );
-
-// Cinematic Mode assets on interactive pages (priority 25, after template assets).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_cinematic_mode', 25 );
-
-// Luxury cursor on static pages (priority 12, after global styles so design-tokens dep is met).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_luxury_cursor', 12 );
-
-// Dequeue conflicting WooCommerce default styles.
-add_filter( 'woocommerce_enqueue_styles', 'skyyrose_dequeue_woocommerce_styles' );
-
-// Font-display:swap for any remaining Google Fonts links (legacy, safe passthrough).
-add_filter( 'style_loader_tag', 'skyyrose_add_font_display_swap', 10, 4 );
-
-// Defer non-critical scripts.
-add_filter( 'script_loader_tag', 'skyyrose_defer_scripts', 10, 2 );
-
-// Model Viewer — 3D brand avatar on immersive/collection/preorder pages.
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_model_viewer', 28 );
-
-// Model Viewer — type="module" attribute for ES module loading.
-add_filter( 'script_loader_tag', 'skyyrose_model_viewer_module_type', 10, 2 );
-
-// Size Guide modal on collection + preorder + single product pages.
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_size_guide', 30 );
-
-// Cross-Sell Engine — only on immersive pages (lightweight, high ROI).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_cross_sell_engine', 40 );
-
-// Analytics Beacon — small footprint, essential for tracking.
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_analytics_beacon', 50 );
 
 // Admin scripts.
 add_action( 'admin_enqueue_scripts', 'skyyrose_admin_scripts' );

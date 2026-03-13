@@ -12,7 +12,10 @@ Usage:
 
 from __future__ import annotations
 
+import os
+
 import strawberry
+from strawberry.extensions import DisableIntrospection
 from strawberry.types import Info
 
 from api.graphql.dataloaders.product_loader import ProductDataLoader
@@ -61,8 +64,13 @@ class Query:
         return [ProductType.from_db(p) for p in db_products]
 
 
-# Compile the schema
+# Compile the schema — disable introspection in production
+_extensions = []
+if os.getenv("ENVIRONMENT", "development") == "production":
+    _extensions.append(DisableIntrospection())
+
 schema = strawberry.Schema(
     query=Query,
     config=strawberry.schema.config.StrawberryConfig(auto_camel_case=True),
+    extensions=_extensions,
 )

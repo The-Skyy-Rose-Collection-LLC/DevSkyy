@@ -263,7 +263,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
             fontFamily: 'Georgia, serif',
           }}
         >
-          Where Love Meets Luxury
+          Luxury Grows from Concrete.
         </p>
       </div>
     </div>

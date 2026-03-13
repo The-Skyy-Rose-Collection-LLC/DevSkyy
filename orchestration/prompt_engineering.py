@@ -753,7 +753,7 @@ You are {role}.
         """Get SkyyRose brand expert role"""
         role = "a luxury streetwear brand strategist and fashion expert for SkyyRose"
         background = """
-SkyyRose is an Oakland-based luxury streetwear brand with the philosophy "Where Love Meets Luxury."
+SkyyRose is an Oakland-based luxury streetwear brand with the philosophy "Luxury Grows from Concrete."
 The brand features three collections:
 - BLACK ROSE: Limited edition dark elegance
 - LOVE HURTS: Emotional expression pieces
@@ -806,7 +806,7 @@ Collection: {collection}
 Features: {features}
 
 Write a compelling product description that:
-- Evokes the brand philosophy "Where Love Meets Luxury"
+- Evokes the brand philosophy "Luxury Grows from Concrete."
 - Highlights craftsmanship and exclusivity
 - Appeals to discerning fashion enthusiasts
 - Is 2-3 paragraphs

@@ -46,6 +46,8 @@ $skyyrose_core_includes = array(
 	'/inc/product-catalog.php',
 	'/inc/interactive-grid.php',
 	'/inc/enqueue.php',
+	'/inc/enqueue-features.php',
+	'/inc/enqueue-performance.php',
 	'/inc/enqueue-engines.php',
 	'/inc/customizer.php',
 	'/inc/template-functions.php',
@@ -58,6 +60,7 @@ $skyyrose_core_includes = array(
 	'/inc/facebook-sdk.php',
 	'/inc/menu-setup.php',
 	'/inc/theme-activation-setup.php',
+	'/inc/klaviyo-integration.php',
 );
 
 foreach ( $skyyrose_core_includes as $skyyrose_file ) {
@@ -114,7 +117,7 @@ if ( is_admin() ) {
 }
 
 /*--------------------------------------------------------------
- * Legacy: brand styles enqueue (backward compat, safe to remove later)
+ * Brand Styles: variables, luxury theme, collection colors (priority 5)
  *--------------------------------------------------------------*/
 $skyyrose_brand_styles_path = SKYYROSE_DIR . '/inc/enqueue-brand-styles.php';
 if ( file_exists( $skyyrose_brand_styles_path ) ) {
@@ -137,6 +140,15 @@ add_filter( 'template_include', function ( $template ) {
 			return $canvas;
 		}
 	}
+
+	// Experiences landing page → template-experiences.php
+	if ( is_page( 'experience' ) ) {
+		$experiences = SKYYROSE_DIR . '/template-experiences.php';
+		if ( file_exists( $experiences ) ) {
+			return $experiences;
+		}
+	}
+
 	return $template;
 }, 99 );
 

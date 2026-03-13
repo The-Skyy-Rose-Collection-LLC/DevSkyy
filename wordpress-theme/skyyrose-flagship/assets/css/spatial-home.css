@@ -1,0 +1,395 @@
+/**
+ * Spatial Home — Drake-style Front Door
+ *
+ * Full-viewport dark entry with 3 door cards linking to immersive worlds.
+ * CSS-only particles and transitions — no JS dependencies.
+ *
+ * @package SkyyRose_Flagship
+ * @since   4.4.0
+ */
+
+/* ==================================================
+   Hide Site Header — Drake-style clean entry
+   ================================================== */
+
+.page-template-template-spatial-home .site-header {
+	display: none;
+}
+
+/* ==================================================
+   Container
+   ================================================== */
+
+.spatial-home {
+	position: relative;
+	min-height: 100vh;
+	background: #0A0A0A;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 60px 24px 40px;
+	overflow: hidden;
+}
+
+/* ==================================================
+   Animated Particles (CSS-only rose gold + gold)
+   ================================================== */
+
+.spatial-home__particles {
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.spatial-home__particles::before,
+.spatial-home__particles::after {
+	content: '';
+	position: absolute;
+	width: 2px;
+	height: 2px;
+	border-radius: 50%;
+	animation: spatial-float 20s linear infinite;
+}
+
+.spatial-home__particles::before {
+	background: rgba(183, 110, 121, 0.4);
+	box-shadow:
+		80vw 10vh 0 rgba(183, 110, 121, 0.3),
+		20vw 30vh 0 rgba(183, 110, 121, 0.2),
+		60vw 50vh 0 rgba(212, 175, 55, 0.3),
+		35vw 70vh 0 rgba(183, 110, 121, 0.25),
+		90vw 25vh 0 rgba(212, 175, 55, 0.2),
+		10vw 80vh 0 rgba(183, 110, 121, 0.35),
+		70vw 90vh 0 rgba(212, 175, 55, 0.25),
+		45vw 15vh 0 rgba(183, 110, 121, 0.3),
+		15vw 55vh 0 rgba(212, 175, 55, 0.2),
+		85vw 65vh 0 rgba(183, 110, 121, 0.3);
+	animation-duration: 25s;
+}
+
+.spatial-home__particles::after {
+	background: rgba(212, 175, 55, 0.3);
+	box-shadow:
+		25vw 20vh 0 rgba(212, 175, 55, 0.3),
+		75vw 40vh 0 rgba(183, 110, 121, 0.25),
+		50vw 60vh 0 rgba(212, 175, 55, 0.2),
+		15vw 85vh 0 rgba(183, 110, 121, 0.3),
+		65vw 75vh 0 rgba(212, 175, 55, 0.35),
+		40vw 35vh 0 rgba(183, 110, 121, 0.2),
+		95vw 45vh 0 rgba(212, 175, 55, 0.25),
+		5vw 5vh 0 rgba(183, 110, 121, 0.3),
+		55vw 95vh 0 rgba(212, 175, 55, 0.2),
+		30vw 50vh 0 rgba(183, 110, 121, 0.25);
+	animation-duration: 30s;
+	animation-delay: -10s;
+}
+
+@keyframes spatial-float {
+	0%   { transform: translateY(0) translateX(0); opacity: 0; }
+	10%  { opacity: 1; }
+	90%  { opacity: 1; }
+	100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
+}
+
+/* ==================================================
+   Brand Hero
+   ================================================== */
+
+.spatial-home__hero {
+	position: relative;
+	z-index: 1;
+	text-align: center;
+	margin-bottom: 48px;
+}
+
+.spatial-home__monogram {
+	font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+	font-size: 4.5rem;
+	font-weight: 700;
+	letter-spacing: 0.3em;
+	background: linear-gradient(135deg, #B76E79 0%, #D4AF37 50%, #B76E79 100%);
+	background-size: 200% 200%;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	color: transparent; /* Fallback for browsers without background-clip */
+	animation: spatial-shimmer 6s ease infinite;
+	margin-bottom: 16px;
+}
+
+@keyframes spatial-shimmer {
+	0%, 100% { background-position: 0% 50%; }
+	50%      { background-position: 100% 50%; }
+}
+
+.spatial-home__tagline {
+	font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+	font-size: 1.15rem;
+	font-style: italic;
+	color: rgba(183, 110, 121, 0.8);
+	letter-spacing: 0.08em;
+	margin: 0;
+}
+
+/* ==================================================
+   Door Cards
+   ================================================== */
+
+.spatial-home__doors {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	gap: 24px;
+	max-width: 1200px;
+	width: 100%;
+	margin-bottom: 48px;
+}
+
+.spatial-home__door {
+	flex: 1;
+	position: relative;
+	aspect-ratio: 3 / 4;
+	border-radius: 8px;
+	overflow: hidden;
+	text-decoration: none;
+	border: 1px solid rgba(183, 110, 121, 0.15);
+	transition: border-color 0.4s ease, transform 0.4s ease;
+	cursor: pointer;
+	display: block;
+}
+
+.spatial-home__door:hover {
+	border-color: var(--door-accent, #B76E79);
+	transform: translateY(-4px);
+}
+
+.spatial-home__door:focus-visible {
+	outline: 2px solid var(--door-accent, #B76E79);
+	outline-offset: 4px;
+}
+
+/* ── Door Image ── */
+
+.spatial-home__door-image-wrap {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+}
+
+.spatial-home__door-image-wrap img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform 0.6s ease, filter 0.6s ease;
+	filter: brightness(0.45) saturate(0.8);
+}
+
+.spatial-home__door:hover .spatial-home__door-image-wrap img {
+	transform: scale(1.05);
+	filter: brightness(0.6) saturate(1);
+}
+
+/* Door vignette overlay */
+.spatial-home__door-image-wrap::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		to top,
+		rgba(10, 10, 10, 0.9) 0%,
+		rgba(10, 10, 10, 0.3) 40%,
+		rgba(10, 10, 10, 0.1) 60%,
+		rgba(10, 10, 10, 0.4) 100%
+	);
+	pointer-events: none;
+}
+
+/* ── Door Content ── */
+
+.spatial-home__door-content {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 32px 24px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	z-index: 1;
+}
+
+.spatial-home__door-enter {
+	font-family: 'Inter', 'Barlow', sans-serif;
+	font-size: 0.7rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.25em;
+	color: var(--door-accent, #B76E79);
+	margin-bottom: 8px;
+	opacity: 0.8;
+	transition: opacity 0.3s ease;
+}
+
+.spatial-home__door:hover .spatial-home__door-enter {
+	opacity: 1;
+}
+
+.spatial-home__door-name {
+	font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+	font-size: 1.8rem;
+	font-weight: 600;
+	color: #fff;
+	line-height: 1.2;
+	margin-bottom: 6px;
+}
+
+.spatial-home__door-collection {
+	font-family: 'Inter', 'Barlow', sans-serif;
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.15em;
+	color: rgba(255, 255, 255, 0.5);
+}
+
+/* ── Door Hover Glow ── */
+
+.spatial-home__door::before {
+	content: '';
+	position: absolute;
+	inset: -1px;
+	border-radius: 8px;
+	background: linear-gradient(
+		135deg,
+		var(--door-accent, #B76E79),
+		transparent 40%,
+		transparent 60%,
+		var(--door-accent, #B76E79)
+	);
+	opacity: 0;
+	z-index: -1;
+	transition: opacity 0.4s ease;
+}
+
+.spatial-home__door:hover::before {
+	opacity: 0.5;
+}
+
+/* ==================================================
+   Shop All Link
+   ================================================== */
+
+.spatial-home__footer {
+	position: relative;
+	z-index: 1;
+}
+
+.spatial-home__shop-all {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-family: 'Inter', 'Barlow', sans-serif;
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	letter-spacing: 0.15em;
+	color: rgba(255, 255, 255, 0.4);
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+.spatial-home__shop-all:hover {
+	color: rgba(255, 255, 255, 0.7);
+}
+
+.spatial-home__shop-all svg {
+	transition: transform 0.3s ease;
+}
+
+.spatial-home__shop-all:hover svg {
+	transform: translateX(4px);
+}
+
+/* ==================================================
+   Mobile Responsive
+   ================================================== */
+
+@media (max-width: 768px) {
+	.spatial-home {
+		padding: 15vh 16px 32px;
+		justify-content: flex-start;
+	}
+
+	.spatial-home__monogram {
+		font-size: 3rem;
+	}
+
+	.spatial-home__tagline {
+		font-size: 1rem;
+	}
+
+	.spatial-home__hero {
+		margin-bottom: 32px;
+	}
+
+	.spatial-home__doors {
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.spatial-home__door {
+		aspect-ratio: 16 / 9;
+	}
+
+	.spatial-home__door-name {
+		font-size: 1.4rem;
+	}
+
+	.spatial-home__door-content {
+		padding: 20px 16px;
+	}
+}
+
+@media (max-width: 480px) {
+	.spatial-home {
+		padding-top: 10vh;
+	}
+
+	.spatial-home__monogram {
+		font-size: 2.5rem;
+	}
+
+	.spatial-home__door {
+		aspect-ratio: 16 / 10;
+	}
+
+	.spatial-home__door-name {
+		font-size: 1.2rem;
+	}
+}
+
+/* ==================================================
+   Reduced Motion — Respect User Preference
+   ================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	.spatial-home__monogram {
+		animation: none;
+	}
+
+	.spatial-home__particles::before,
+	.spatial-home__particles::after {
+		animation: none;
+		opacity: 0.3;
+	}
+
+	.spatial-home__door-image-wrap img {
+		transition: none;
+	}
+
+	.spatial-home__door {
+		transition: none;
+	}
+}

@@ -19,12 +19,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  * (inc/product-catalog.php) to guarantee price/name consistency.
  * Used when WooCommerce has no featured products or is not active.
  */
-$featured_skus = array( 'br-006', 'lh-001', 'sg-001', 'sg-008' );
+$featured_skus = array( 'br-006', 'lh-006', 'sg-001', 'sg-009' );
 $badge_map     = array(
 	'br-006' => array( __( 'Pre-Order', 'skyyrose-flagship' ), 'product-card__badge--limited' ),
-	'lh-001' => array( __( 'Pre-Order', 'skyyrose-flagship' ), 'product-card__badge--limited' ),
+	'lh-006' => array( __( 'Pre-Order', 'skyyrose-flagship' ), 'product-card__badge--limited' ),
 	'sg-001' => array( __( 'Pre-Order', 'skyyrose-flagship' ), 'product-card__badge--limited' ),
-	'sg-008' => array( __( 'Pre-Order', 'skyyrose-flagship' ), 'product-card__badge--limited' ),
+	'sg-009' => array( __( 'Pre-Order', 'skyyrose-flagship' ), 'product-card__badge--limited' ),
 );
 $collection_labels = array(
 	'black-rose' => __( 'Black Rose', 'skyyrose-flagship' ),

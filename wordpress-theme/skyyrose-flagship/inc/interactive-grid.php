@@ -22,14 +22,22 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array Associative array of available views => URLs.
  */
 function skyyrose_get_product_render_images( $sku ) {
-	$views  = array( 'front', 'back', 'branding' );
-	$images = array();
-	$base   = '/assets/images/products/';
+	$images  = array();
+	$product = skyyrose_get_product( $sku );
 
-	foreach ( $views as $view ) {
-		$filename = $sku . '-render-' . $view . '.webp';
-		if ( file_exists( SKYYROSE_DIR . $base . $filename ) ) {
-			$images[ $view ] = SKYYROSE_ASSETS_URI . '/images/products/' . $filename;
+	if ( ! $product ) {
+		return $images;
+	}
+
+	$field_map = array(
+		'front'    => 'front_model_image',
+		'back'     => 'back_model_image',
+		'branding' => 'back_image',
+	);
+
+	foreach ( $field_map as $view => $field ) {
+		if ( ! empty( $product[ $field ] ) ) {
+			$images[ $view ] = get_theme_file_uri( $product[ $field ] );
 		}
 	}
 	return $images;

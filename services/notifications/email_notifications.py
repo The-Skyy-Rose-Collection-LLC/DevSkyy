@@ -133,7 +133,7 @@ TEMPLATES = {
             <a href="{dashboard_url}/approval/{item_id}" class="btn">Review Now</a>
         </div>
         <div class="footer">
-            <p>SkyyRose - Where Love Meets Luxury</p>
+            <p>SkyyRose - Luxury Grows from Concrete.</p>
             <p>This is an automated notification from your asset pipeline.</p>
         </div>
     </div>
@@ -154,7 +154,7 @@ Enhanced: {enhanced_url}
 Please review at: {dashboard_url}/approval/{item_id}
 
 ---
-SkyyRose - Where Love Meets Luxury
+SkyyRose - Luxury Grows from Concrete.
 """,
     },
     EmailTemplate.APPROVAL_BATCH: {
@@ -199,7 +199,7 @@ SkyyRose - Where Love Meets Luxury
             </p>
         </div>
         <div class="footer">
-            <p>SkyyRose - Where Love Meets Luxury</p>
+            <p>SkyyRose - Luxury Grows from Concrete.</p>
         </div>
     </div>
 </body>
@@ -214,7 +214,7 @@ Affected products: {products}
 Review at: {dashboard_url}/approval
 
 ---
-SkyyRose - Where Love Meets Luxury
+SkyyRose - Luxury Grows from Concrete.
 """,
     },
     EmailTemplate.REVISION_REQUESTED: {
@@ -258,7 +258,7 @@ SkyyRose - Where Love Meets Luxury
             <a href="{dashboard_url}/revisions/{revision_id}" class="btn">View Details</a>
         </div>
         <div class="footer">
-            <p>SkyyRose - Where Love Meets Luxury</p>
+            <p>SkyyRose - Luxury Grows from Concrete.</p>
         </div>
     </div>
 </body>
@@ -277,7 +277,7 @@ Feedback:
 View details: {dashboard_url}/revisions/{revision_id}
 
 ---
-SkyyRose - Where Love Meets Luxury
+SkyyRose - Luxury Grows from Concrete.
 """,
     },
     EmailTemplate.SYNC_COMPLETE: {
@@ -317,7 +317,7 @@ SkyyRose - Where Love Meets Luxury
             </div>
         </div>
         <div class="footer">
-            <p>SkyyRose - Where Love Meets Luxury</p>
+            <p>SkyyRose - Luxury Grows from Concrete.</p>
         </div>
     </div>
 </body>
@@ -330,7 +330,7 @@ SkyyRose: WordPress Sync Complete
 {products} products updated.
 
 ---
-SkyyRose - Where Love Meets Luxury
+SkyyRose - Luxury Grows from Concrete.
 """,
     },
 }

@@ -116,7 +116,7 @@
 
 .contact-hero__subtitle {
 	color: var(--contact-text-muted);
-	font-size: 1.05rem;
+	font-size: var(--text-base);
 	line-height: 1.8;
 	max-width: 600px;
 	margin: 0 auto;
@@ -198,14 +198,14 @@
 
 .contact-card__description {
 	color: var(--contact-text-secondary);
-	font-size: 0.85rem;
+	font-size: var(--text-xs);
 	line-height: 1.6;
 	margin-bottom: 0.5rem;
 }
 
 .contact-card__text {
 	color: var(--contact-text-muted);
-	font-size: 0.9rem;
+	font-size: var(--text-sm);
 	line-height: 1.6;
 }
 
@@ -233,7 +233,7 @@
 
 .contact-social__description {
 	color: var(--contact-text-secondary);
-	font-size: 0.85rem;
+	font-size: var(--text-xs);
 	line-height: 1.6;
 	margin-bottom: 1.25rem;
 }
@@ -599,7 +599,7 @@
 
 .response-promise__text {
 	color: var(--contact-text-muted);
-	font-size: 1rem;
+	font-size: var(--text-base);
 	line-height: 1.7;
 	margin-bottom: 2rem;
 }
@@ -671,7 +671,7 @@
 .faq-section__subheading {
 	text-align: center;
 	color: var(--contact-text-muted);
-	font-size: 0.95rem;
+	font-size: var(--text-sm);
 	line-height: 1.7;
 	margin-bottom: 3rem;
 	max-width: 500px;
@@ -775,7 +775,7 @@
 
 .faq-item__answer {
 	color: var(--contact-text-muted);
-	font-size: 0.95rem;
+	font-size: var(--text-sm);
 	line-height: 1.8;
 	padding-right: 3rem;
 }
@@ -897,14 +897,14 @@
 
 .contact-map__address {
 	color: var(--contact-text-muted);
-	font-size: 0.95rem;
+	font-size: var(--text-sm);
 	line-height: 1.7;
 	margin-bottom: 0.75rem;
 }
 
 .contact-map__hours {
 	color: var(--contact-text-muted);
-	font-size: 0.85rem;
+	font-size: var(--text-xs);
 	line-height: 1.6;
 	margin-bottom: 1.5rem;
 }

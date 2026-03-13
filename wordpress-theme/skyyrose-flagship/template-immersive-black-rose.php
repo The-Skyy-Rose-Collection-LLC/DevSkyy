@@ -101,13 +101,27 @@ get_header();
 
 <main id="primary" class="site-main immersive-page" role="main" tabindex="-1">
 
+	<!-- Avatar Easter Egg Config (read by immersive-world.js) -->
+	<script type="application/json" id="world-config">
+	<?php echo wp_json_encode( array(
+		'collection'  => 'black-rose',
+		'bgColor'     => '0x0a0a0a',
+		'accentColor' => '#C0C0C0',
+		'avatar'      => array(
+			'x'          => 12.0,
+			'y'          => 68.0,
+			'w'          => 5.0,
+			'h'          => 9.0,
+			'sprite'     => get_template_directory_uri() . '/assets/images/mascot/skyyrose-mascot-black-rose.png',
+			'introImage' => get_template_directory_uri() . '/assets/images/mascot/skyyrose-mascot-reference.png',
+		),
+	), JSON_UNESCAPED_SLASHES ); ?>
+	</script>
+
 	<div class="immersive-scene immersive-black-rose" role="region" aria-labelledby="scene-title">
 
 		<!-- Loading Screen -->
-		<div class="scene-loading" aria-hidden="true">
-			<div class="scene-loading-monogram"><?php echo esc_html__( 'SR', 'skyyrose-flagship' ); ?></div>
-			<div class="scene-loading-text"><?php echo esc_html__( 'Entering The Garden', 'skyyrose-flagship' ); ?></div>
-		</div>
+		<?php get_template_part( 'template-parts/immersive-loader', null, array( 'world_name' => __( 'The Garden', 'skyyrose-flagship' ) ) ); ?>
 
 		<!-- Scene Viewport — Multi-Room Layers -->
 		<div class="scene-viewport">
@@ -237,19 +251,28 @@ get_header();
 		</div>
 	</div>
 
-	<!-- Collection Tab Bar -->
-	<nav class="immersive-tab-bar" aria-label="<?php esc_attr_e( 'Collection navigation', 'skyyrose-flagship' ); ?>">
-		<a href="<?php echo esc_url( home_url( '/experience-black-rose/' ) ); ?>" class="immersive-tab active" aria-current="page" style="--tab-accent: #C0C0C0;">
-			<?php echo esc_html__( 'Black Rose', 'skyyrose-flagship' ); ?>
-		</a>
-		<a href="<?php echo esc_url( home_url( '/experience-love-hurts/' ) ); ?>" class="immersive-tab" style="--tab-accent: #DC143C;">
-			<?php echo esc_html__( 'Love Hurts', 'skyyrose-flagship' ); ?>
-		</a>
-		<a href="<?php echo esc_url( home_url( '/experience-signature/' ) ); ?>" class="immersive-tab" style="--tab-accent: #B76E79;">
-			<?php echo esc_html__( 'Signature', 'skyyrose-flagship' ); ?>
-		</a>
-		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="immersive-tab" style="--tab-accent: #D4AF37;">
-			<?php echo esc_html__( 'Pre-Order', 'skyyrose-flagship' ); ?>
+	<!-- Cross-World Navigation Doors -->
+	<nav class="world-nav" aria-label="<?php esc_attr_e( 'Enter another world', 'skyyrose-flagship' ); ?>">
+		<div class="world-nav__doors">
+			<a href="<?php echo esc_url( home_url( '/experience-love-hurts/' ) ); ?>" class="world-nav__door">
+				<img
+					class="world-nav__door-image"
+					src="<?php echo esc_url( get_template_directory_uri() . '/assets/scenes/love-hurts/love-hurts-cathedral-rose-chamber-lookbook.webp' ); ?>"
+					alt="" loading="lazy" width="320" height="180"
+				>
+				<span class="world-nav__door-label"><?php echo esc_html__( 'Enter The Cathedral', 'skyyrose-flagship' ); ?></span>
+			</a>
+			<a href="<?php echo esc_url( home_url( '/experience-signature/' ) ); ?>" class="world-nav__door">
+				<img
+					class="world-nav__door-image"
+					src="<?php echo esc_url( get_template_directory_uri() . '/assets/scenes/signature/signature-golden-gate-showroom-lookbook.webp' ); ?>"
+					alt="" loading="lazy" width="320" height="180"
+				>
+				<span class="world-nav__door-label"><?php echo esc_html__( 'Enter The Runway', 'skyyrose-flagship' ); ?></span>
+			</a>
+		</div>
+		<a href="<?php echo esc_url( home_url( '/spatial/' ) ); ?>" class="world-nav__back">
+			<?php echo esc_html__( 'Return to Front Door', 'skyyrose-flagship' ); ?>
 		</a>
 	</nav>
 

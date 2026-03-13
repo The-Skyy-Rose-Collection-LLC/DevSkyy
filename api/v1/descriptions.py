@@ -30,6 +30,7 @@ from services.ml.schemas.description import (
 )
 
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
+from security.ssrf_protection import ssrf_protection
 
 logger = logging.getLogger(__name__)
 
@@ -118,8 +119,8 @@ async def generate_description(
         return result
 
     except Exception as e:
-        logger.error(f"Description generation failed: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Description generation failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.post("/generate/quick", response_model=DescriptionOutput)
@@ -182,8 +183,8 @@ async def generate_batch_descriptions(
         )
 
     except Exception as e:
-        logger.error(f"Batch description failed: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Batch description failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.post("/extract-features", response_model=ExtractedFeatures)
@@ -208,8 +209,8 @@ async def extract_features(
         return result
 
     except Exception as e:
-        logger.error(f"Feature extraction failed: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Feature extraction failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("/models", response_model=list[dict[str, Any]])
@@ -290,7 +291,7 @@ async def list_styles(
             "id": DescriptionStyle.LUXURY.value,
             "name": "Luxury",
             "description": "Sophisticated, evocative language for high-end fashion",
-            "brand_voice": "SkyyRose - Where Love Meets Luxury",
+            "brand_voice": "SkyyRose - Luxury Grows from Concrete.",
             "example_tone": "Crafted with precision, this piece embodies effortless elegance...",
         },
         {
@@ -367,16 +368,13 @@ async def _send_webhook(url: str, data: dict[str, Any]) -> None:
         data: Data to send
     """
     try:
-        import httpx
-
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                url,
-                json=data,
-                headers={"Content-Type": "application/json"},
-                timeout=30.0,
-            )
-            response.raise_for_status()
-            logger.info(f"Webhook sent to {url}: {response.status_code}")
+        response = await ssrf_protection.safe_request(
+            "POST",
+            url,
+            json=data,
+            headers={"Content-Type": "application/json"},
+        )
+        response.raise_for_status()
+        logger.info(f"Webhook sent to {url}: {response.status_code}")
     except Exception as e:
         logger.error(f"Webhook failed: {e}")
