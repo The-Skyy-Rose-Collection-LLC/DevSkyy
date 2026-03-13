@@ -19,6 +19,7 @@ Usage:
 """
 
 import argparse
+import concurrent.futures
 import io
 import json
 import logging
@@ -47,293 +48,263 @@ MIN_FILE_SIZE_KB = 50
 MAX_RETRIES = 3
 RETRY_DELAY_SEC = 5
 
-# -- Product catalog (SOURCE OF TRUTH: products.csv) -------------------------
-# Every SKU, name, and collection comes directly from the canonical CSV.
-# Do NOT add products here that are not in products.csv.
+# -- Product catalog — loaded from data/product-catalog.csv at startup -------
+# Catalog fields (name, collection, price, is_preorder, output_slug,
+# source_override) come from the CSV.  Logo treatments and quality flags
+# (BAD_SOURCE_SKUS) live below as image-pipeline-only augmentation.
 
-PRODUCT_CATALOG = {
-    # ── Black Rose Collection (11 products) ────────────────────────────────
-    # Every entry has explicit source_override to prevent auto-glob picking up
-    # AI-generated outputs (*-model-*.webp) as source images (feedback loop).
-    # output_slug determines the filename prefix for generated images.
-    "br-001": {
-        "name": "BLACK Rose Crewneck",
-        "collection": "black-rose",
-        "output_slug": "black-rose-crewneck",
-        "source_override": "black-rose-crewneck-techflat-v4.jpg",
-    },
-    "br-002": {
-        "name": "BLACK Rose Joggers",
-        "collection": "black-rose",
-        "output_slug": "black-rose-joggers",
-        "source_override": "black-rose-joggers-source.jpg",
-        "is_preorder": True,
-    },
-    "br-003": {
-        "name": "BLACK is Beautiful Jersey",
-        "collection": "black-rose",
-        "output_slug": "black-is-beautiful-jersey",
-        "source_override": "black-is-beautiful-jersey-techflat-black.jpeg",
-        "back_source_override": "black-is-beautiful-jersey-back-techflat.jpg",
-    },
-    "br-003-oakland": {
-        "name": "BLACK is Beautiful Jersey (Oakland)",
-        "collection": "black-rose",
-        "output_slug": "black-is-beautiful-jersey-oakland",
-        "source_override": "black-is-beautiful-jersey-techflat-oakland.jpeg",
-        "back_source_override": "black-is-beautiful-jersey-back-techflat.jpg",
-        "variant_of": "br-003",
-    },
-    "br-003-giants": {
-        "name": "BLACK is Beautiful Jersey (Giants)",
-        "collection": "black-rose",
-        "output_slug": "black-is-beautiful-jersey-giants",
-        "source_override": "black-is-beautiful-jersey-techflat-giants.jpeg",
-        "back_source_override": "black-is-beautiful-jersey-back-techflat.jpg",
-        "variant_of": "br-003",
-    },
-    "br-003-white": {
-        "name": "BLACK is Beautiful Jersey (White)",
-        "collection": "black-rose",
-        "output_slug": "black-is-beautiful-jersey-white",
-        "source_override": "black-is-beautiful-jersey-techflat-white.jpeg",
-        "back_source_override": "black-is-beautiful-jersey-back-techflat.jpg",
-        "variant_of": "br-003",
-    },
-    "br-004": {
-        "name": "BLACK Rose Hoodie",
-        "collection": "black-rose",
-        "output_slug": "black-rose-hoodie",
-        "source_override": "black-rose-hoodie-product.jpg",
-        "is_preorder": True,
-    },
-    "br-005": {
-        "name": "BLACK Rose Hoodie — Signature Edition",
-        "collection": "black-rose",
-        "output_slug": "black-rose-hoodie-signature-edition",
-        "source_override": "black-rose-hoodie-signature-edition-hoodie-ltd-source.jpg",
-        "is_preorder": True,
-    },
-    "br-006": {
-        "name": "BLACK Rose Sherpa Jacket",
-        "collection": "black-rose",
-        "output_slug": "black-rose-sherpa-jacket",
-        "source_override": "black-rose-sherpa-jacket-sherpa-product.jpg",
-        "is_preorder": True,
-    },
-    "br-007": {
-        "name": "BLACK Rose x Love Hurts Basketball Shorts",
-        "collection": "black-rose",
-        "output_slug": "black-rose-love-hurts-basketball-shorts",
-        "source_override": "black-rose-love-hurts-basketball-shorts-front-source.jpg",
-        "is_preorder": True,
-    },
-    # ── BLACK is Beautiful Jersey Series (exclusive, 80 pcs each) ──────────
-    "br-008": {
-        "name": "BLACK is Beautiful Jersey Series: 1. SF inspired",
-        "collection": "black-rose",
-        "output_slug": "black-is-beautiful-football-jersey-red",
-        "source_override": "black-is-beautiful-football-jersey-red-design.jpg",
-        "back_source_override": "black-is-beautiful-football-jersey-red-techflat.jpeg",
-        "is_preorder": True,
-    },
-    "br-009": {
-        "name": "BLACK is Beautiful Jersey Series: 2. LAST OAKLAND",
-        "collection": "black-rose",
-        "output_slug": "black-is-beautiful-football-jersey-white",
-        "source_override": "black-is-beautiful-football-jersey-white-design.jpg",
-        "back_source_override": "black-is-beautiful-football-jersey-white-techflat.jpeg",
-        "is_preorder": True,
-    },
-    "br-010": {
-        "name": "BLACK is Beautiful Jersey Series: 3. THE BAY",
-        "collection": "black-rose",
-        "output_slug": "black-is-beautiful-basketball-jersey",
-        "source_override": "black-is-beautiful-basketball-jersey-design.jpg",
-        "back_source_override": "black-is-beautiful-basketball-jersey-techflat.jpeg",
-        "is_preorder": True,
-    },
-    "br-011": {
-        "name": "BLACK is Beautiful Jersey Series: 4. THE ROSE (SHARKS EDITION)",
-        "collection": "black-rose",
-        "output_slug": "black-is-beautiful-hockey-jersey",
-        "source_override": "black-is-beautiful-hockey-jersey-design.jpg",
-        "back_source_override": "pre-order/br-d01-hockey-jersey-teal-techflat.jpeg",
-        "is_preorder": True,
-    },
-    # ── Love Hurts Collection (5 products) ─────────────────────────────────
-    "lh-002": {
-        "name": "Love Hurts Joggers",
-        "collection": "love-hurts",
-        "output_slug": "love-hurts-joggers",
-        "source_override": "love-hurts-joggers-techflat.jpeg",
-        "is_preorder": True,
-    },
-    "lh-003": {
-        "name": "Love Hurts Basketball Shorts",
-        "collection": "love-hurts",
-        "output_slug": "love-hurts-basketball-shorts",
-        "source_override": "love-hurts-basketball-shorts-source.jpg",
-        "is_preorder": True,
-    },
-    "lh-004": {
-        "name": "Love Hurts Varsity Jacket",
-        "collection": "love-hurts",
-        "output_slug": "love-hurts-varsity-jacket",
-        "source_override": "love-hurts-varsity-jacket-varsity-source.jpg",
-    },
-    "lh-006": {
-        "name": "The Fannie",
-        "collection": "love-hurts",
-        "output_slug": "the-fannie",
-        "source_override": "the-fannie-pack-photo.jpg",
-        "is_preorder": True,
-    },
-    # ── Signature Collection (13 products) ─────────────────────────────────
-    "sg-001": {
-        "name": "The Bridge Series 'The Bay Bridge' Shorts",
-        "collection": "signature",
-        "output_slug": "the-bay-set",
-        "source_override": "the-bay-set-source.jpeg",
-        "is_preorder": True,
-    },
-    "sg-002": {
-        "name": "The Bridge Series 'Stay Golden' Shirt",
-        "collection": "signature",
-        "output_slug": "stay-golden-tee",
-        "source_override": "stay-golden-tee-techflat-v4.jpg",
-        "is_preorder": True,
-    },
-    "sg-003": {
-        "name": "The Bridge Series 'Stay Golden' Shorts",
-        "collection": "signature",
-        "output_slug": "stay-golden-shorts",
-        "source_override": "stay-golden-shorts-source.jpeg",
-        "is_preorder": True,
-    },
-    "sg-005": {
-        "name": "The Bridge Series 'The Bay Bridge' Shirt",
-        "collection": "signature",
-        "output_slug": "bay-bridge-shirt",
-        "source_override": "bay-bridge-shirt-source.jpeg",
-        "is_preorder": True,
-    },
-    "sg-006": {
-        "name": "Mint & Lavender Hoodie",
-        "collection": "signature",
-        "output_slug": "mint-lavender-hoodie",
-        "source_override": "mint-lavender-hoodie-source.jpg",
-        "is_preorder": True,
-    },
-    "sg-007": {
-        "name": "The Signature Beanie",
-        "collection": "signature",
-        "output_slug": "signature-beanie",
-        "source_override": "signature-beanie-green.jpeg",
-        "is_preorder": True,
-    },
-    "sg-009": {
-        "name": "The Sherpa Jacket",
-        "collection": "signature",
-        "output_slug": "the-sherpa-jacket",
-        "is_preorder": True,
-    },
-    "sg-011": {
-        "name": "Original Label Tee (White)",
-        "collection": "signature",
-        "output_slug": "original-label-tee-white",
-        "is_preorder": True,
-    },
-    "sg-012": {
-        "name": "Original Label Tee (Orchid)",
-        "collection": "signature",
-        "output_slug": "original-label-tee-orchid",
-        "is_preorder": True,
-    },
-    "sg-013": {
-        "name": "Mint & Lavender Crewneck",
-        "collection": "signature",
-        "output_slug": "mint-lavender-crewneck",
-        "source_override": "mint-lavender-crewneck-techflat.jpeg",
-        "is_preorder": True,
-    },
-    "sg-014": {
-        "name": "Mint & Lavender Sweatpants",
-        "collection": "signature",
-        "output_slug": "mint-lavender-sweatpants",
-        "source_override": "mint-lavender-sweatpants-techflat.jpeg",
-        "is_preorder": True,
-    },
-    # ── Kids Capsule (2 products) ──────────────────────────────────────────
-    "kids-001": {
-        "name": "Kids Red Set",
-        "collection": "kids-capsule",
-        "output_slug": "kids-red-set",
-        "source_override": "colorblock-red-set-real.jpg",
-    },
-    "kids-002": {
-        "name": "Kids Purple Set",
-        "collection": "kids-capsule",
-        "output_slug": "kids-purple-set",
-        "source_override": "colorblock-purple-set-real.jpg",
-    },
-}
 
-# SKUs that are accessories (not wearable on a model's body)
-ACCESSORY_SKUS = {
-    "lh-006",  # The Fannie (fanny pack)
-    "sg-007",  # The Signature Beanie (headwear)
-}
+def _load_catalog() -> dict:
+    """Load product catalog from data/product-catalog.csv.
+
+    Returns a dict keyed by SKU that preserves the same structure previously
+    hardcoded here, so all downstream code (find_source_image, load_products,
+    get_back_source) works without modification.
+    """
+    import csv as _csv
+
+    catalog: dict = {}
+    csv_path = PROJECT_ROOT / "data" / "product-catalog.csv"
+    with csv_path.open(newline="", encoding="utf-8") as f:
+        for row in _csv.DictReader(f):
+            sku = row["sku"].strip()
+            if not sku:
+                continue
+            entry: dict = {
+                "name": row["name"].strip(),
+                "collection": row["collection_slug"].strip(),
+                "is_preorder": row["is_preorder"].strip() == "1",
+                "output_slug": row["render_output_slug"].strip() or sku,
+                "is_tech_flat": row["render_is_tech_flat"].strip() == "1",
+                "is_accessory": row["render_is_accessory"].strip() == "1",
+            }
+            if row["render_source_override"].strip():
+                entry["source_override"] = row["render_source_override"].strip()
+            if row["render_back_source_override"].strip():
+                entry["back_source_override"] = row["render_back_source_override"].strip()
+            if row["render_variant_of"].strip():
+                entry["variant_of"] = row["render_variant_of"].strip()
+            catalog[sku] = entry
+    return catalog
+
+
+PRODUCT_CATALOG = _load_catalog()
+
+# Derived sets — no manual maintenance required; driven by CSV columns.
+ACCESSORY_SKUS = {sku for sku, p in PRODUCT_CATALOG.items() if p["is_accessory"]}
+TECH_FLAT_SKUS = {sku for sku, p in PRODUCT_CATALOG.items() if p["is_tech_flat"]}
 
 # SKUs with known bad source images — skipped by default.
 # Audited 2026-03-05 by visual inspection of every source file.
 BAD_SOURCE_SKUS = set()  # All sources verified clean as of 2026-03-05
 
-# -- FLUX.2 via Together AI: tech flat → photorealistic conversion -----------
-# Products that only have vector/design mockup tech flats (not real photos).
-# FLUX excels at: (1) converting flat designs → realistic product shots,
-# (2) accurate text rendering, (3) exact hex color matching.
-# In "auto" mode, these get routed to FLUX instead of Gemini.
-TECH_FLAT_SKUS = {
-    "br-001",  # Tech flat only (black-rose-crewneck-techflat-v4.jpg)
-    "sg-002",  # Tech flat only (stay-golden-tee-techflat-v4.jpg)
-}
-
 # -- Logo treatment metadata (real product material) -------------------------
 # Used by --step composite to tell Gemini what the REAL logo looks like.
 # Products not listed get a generic "match the reference" prompt.
+# Logo visual reference (from brand assets — describe EXACTLY so the model renders them correctly):
+#
+#  ROSE-ONLY:  3D dimensional rose, layered spiral petals opening outward, curved stem with two
+#              broad leaves at base; brushed rose-gold (#B76E79) metallic with specular highlights.
+#              Appears as embroidery (raised thread, shadow depth) or silicone patch (smooth gloss).
+#
+#  SR MONOGRAM + ROSE:  Intertwined serif S and R with flowing calligraphic curves; 3D rose bloom
+#              attached lower-right with short stem and leaf; rose-gold metallic finish.
+#
+#  SR MONOGRAM (GOLD):  Same S-R interlock, no rose — gold/champagne metallic, used as smaller
+#              back-neck or secondary marks.
+#
+#  LOVE HURTS WORDMARK:  Bold red graffiti/bubble-script 'Love Hurts', heavy black outline and
+#              shadow; thorned cracked red heart floating above the text with blood-splash drips
+#              — street-art tattoo style, very high contrast.
+#
+#  LOVE HURTS HEART GRAPHIC:  Cracked red heart tightly wrapped in thick dark thorny branches;
+#              three full red roses with green stems growing upward from the heart; blood splatter
+#              dripping from bottom — cartoon tattoo art style, black outlines, vivid reds/greens.
+#
+#  SKYROSE COLLECTION SCRIPT:  Gold foil wordmark: 'THE' in small serifed caps; 'Skyy Rose' in
+#              ornate italic cursive script; 'Collection' in spaced gold small-caps below; the 'o'
+#              in 'Rose' is replaced by a small rose bloom in rose-gold.
+#
+#  ROSES FROM CONCRETE:  Three large roses growing upward from a broken concrete/cloud base;
+#              thorny green stems, large fully-opened blooms; grey/charcoal colorway (Black Rose)
+#              or red colorway — illustrative style.
+
 LOGO_TREATMENTS = {
-    "br-001": "embossed rose logo on front chest, approximately 10 inches, pressed into fabric creating dimensional relief",
-    "br-002": "silicone patch logo on left thigh area — glossy smooth finish with sharply cut edges, catches specular highlights",
-    "br-003": "front: 'BLACK IS BEAUTIFUL' text across chest + custom baseball patch at hem; back: large embroidered rose logo centered",
-    "br-003-oakland": "front: 'BLACK IS BEAUTIFUL' text (the A in BLACK is black lettering, rest is gold) + custom baseball patch; back: embroidered rose logo",
-    "br-003-giants": "front: 'BLACK IS BEAUTIFUL' text across chest + custom baseball patch; back: embroidered rose logo centered",
-    "br-003-white": "front: 'BLACK IS BEAUTIFUL' text across chest + custom baseball patch; back: embroidered rose logo centered",
-    "br-004": "embroidered rose logo centered on chest — raised thread texture with shadow depth",
-    "br-005": "silicone cut-out rose logo on right chest + embroidered rose logo on side body of hoodie (not on arm)",
-    "br-006": "embroidered rose logo on left chest + large embroidered rose on back — satin bomber with black sherpa lining and hood",
-    "br-007": "tackle twill cut-out letters 'Oakland' stitched on front; sublimated rose logo throughout; large sublimated 'Love Hurts' logo on left side; additional 'Love Hurts' and rose logos stitched on mesh side panels",
-    "br-008": "jersey-style stitched #80 — front: '8' has rose fill, '0' is plain white; back: reversed ('8' plain, '0' has rose fill). Custom football patch bottom left corner",
-    "br-009": "jersey-style stitched #32 — front: '3' has rose fill, '2' is plain white; back: reversed ('3' plain, '2' has rose fill). Custom football patch bottom left corner",
-    "br-010": "sleeveless basketball tank — 'THE BAY' in bold gold text across chest, rose circle graphic below, grey/silver rose fade on lower half, wide shoulder straps, SkyyRose branding",
-    "br-011": "hooded hockey jersey — large circular rose crest on front, cyan 'BLACK IS BEAUTIFUL' text on upper back, rose-filled #0 numeral, gradient stripe hem and cuffs in cyan/teal",
-    "lh-002": "love hurts heart-and-rose logo on left thigh — two colorways: white joggers with black stripe, black joggers with white stripe",
-    "lh-003": "sublimated rose logo throughout shorts; large sublimated 'Love Hurts' logo on left side; additional 'Love Hurts' and rose logos stitched on mesh side panels",
-    "lh-004": "'Love Hurts' logo lettering across front chest; inside hood: sublimated rose logo; back: 'Love Hurts' heart-and-rose logo centered",
-    "lh-006": "high-end leather fanny pack with heart-and-rose logo where the dot of the 'i' would go in 'Fannie'",
-    "sg-001": "sublimated Bay Bridge image covering entire shorts; blue embroidered rose on bottom left",
-    "sg-002": "embroidered rose with Golden Gate Bridge imagery from the shorts stitched within the rose petals",
-    "sg-003": "sublimated Golden Gate image covering entire shorts; purple embroidered rose on bottom left",
-    "sg-005": "embroidered rose with Bay Bridge imagery from the shorts stitched within the rose petals",
-    "sg-006": "lavender rose logo centered on front of hoodie",
-    "sg-007": "small silicone patch logo slightly off to left side on brim fold — comes in red rose, grey/black rose, and purple rose variants",
-    "sg-009": "red embroidered rose logo on front; lined with white sherpa",
-    "sg-011": "minimal SkyyRose label branding — small printed logo on chest, clean white cotton tee",
-    "sg-012": "minimal SkyyRose label branding — small printed logo on chest, rich orchid cotton tee",
-    "sg-013": "lavender rose embroidered logo centered on front; small SR logo embroidered on back neck",
-    "sg-014": "embroidered rose logo on left thigh",
-    "kids-001": "black rose embroidered logo on left chest and left thigh; right arm: circular patch logo (white with black lettering and black rose, 'Skyy Rose' top, 'Collection' bottom)",
-    "kids-002": "black rose embroidered logo on left chest and left thigh; right arm: circular patch logo (white with black lettering and black rose, 'Skyy Rose' top, 'Collection' bottom)",
+    # ── Black Rose Collection ────────────────────────────────────────────────
+    "br-001": (
+        "front chest center (~10 in): the ROSE-ONLY logo — 3D dimensional rose, layered spiral "
+        "petals, curved stem with two broad leaves, brushed rose-gold metallic; embossed into "
+        "fabric creating dimensional raised relief with subtle drop shadow at base"
+    ),
+    "br-002": (
+        "left thigh: the ROSE-ONLY logo as a silicone patch — same 3D rose shape, glossy smooth "
+        "finish, sharply die-cut edges, rose-gold metallic color, catches strong specular highlights"
+    ),
+    "br-003": (
+        "front: 'BLACK IS BEAUTIFUL' bold block text across chest in white/gold; custom baseball "
+        "patch at lower-hem (circular, team-style); "
+        "back: large ROSE-ONLY embroidered logo centered — raised thread texture, rose-gold tone"
+    ),
+    "br-003-oakland": (
+        "front: 'BLACK IS BEAUTIFUL' text — the letter A in 'BLACK' is black, remaining letters "
+        "are gold; custom baseball patch at lower-hem; "
+        "back: large ROSE-ONLY embroidered logo centered, rose-gold thread"
+    ),
+    "br-003-giants": (
+        "front: 'BLACK IS BEAUTIFUL' block text in orange/black Giants colorway across chest; "
+        "custom baseball circular patch at hem; "
+        "back: large ROSE-ONLY embroidered logo centered, rose-gold thread"
+    ),
+    "br-003-white": (
+        "front: 'BLACK IS BEAUTIFUL' block text in black on white jersey; custom baseball patch "
+        "at hem; "
+        "back: large ROSE-ONLY embroidered logo centered, rose-gold thread"
+    ),
+    "br-004": (
+        "front chest center: the ROSE-ONLY logo — 3D layered spiral rose, embroidered in rose-gold "
+        "thread, raised texture with visible shadow depth between petal layers"
+    ),
+    "br-005": (
+        "right chest: ROSE-ONLY logo as a silicone cut-out patch — glossy rose-gold, dimensionally "
+        "raised, precise cut edges; "
+        "left side body panel (not on arm/sleeve): second ROSE-ONLY logo embroidered in thread"
+    ),
+    "br-006": (
+        "left chest: ROSE-ONLY embroidered logo, rose-gold thread (~5 in); "
+        "back panel center: large ROSE-ONLY embroidered logo (~12 in), rose-gold thread with "
+        "dark shadow depth — black satin outer shell, black sherpa lining visible at cuffs and hood"
+    ),
+    "br-007": (
+        "front waistband: tackle-twill cut-out letters 'OAKLAND' stitched in block font; "
+        "throughout fabric: sublimated ROSE-ONLY graphic repeating; "
+        "left exterior panel: large sublimated LOVE HURTS WORDMARK (red graffiti 'Love Hurts' "
+        "with thorned heart above); mesh side panels: embroidered 'Love Hurts' text and rose marks"
+    ),
+    "br-008": (
+        "football jersey #80 — jersey-style stitched numbers, ~8 in tall; "
+        "FRONT: digit '8' has rose-gold rose fill inside the numeral, digit '0' is plain white; "
+        "BACK: reversed — digit '8' is plain white, digit '0' has rose-gold rose fill; "
+        "bottom-left corner: custom circular football patch"
+    ),
+    "br-009": (
+        "football jersey #32 — jersey-style stitched numbers, ~8 in tall, white with black border; "
+        "FRONT: digit '3' has rose-gold rose fill, digit '2' is plain white; "
+        "BACK: reversed — digit '3' is plain white, digit '2' has rose-gold rose fill; "
+        "bottom-left corner: custom circular football patch"
+    ),
+    "br-010": (
+        "sleeveless basketball tank; front chest: 'THE BAY' in bold gold block text; "
+        "below text: circular ROSE-ONLY graphic in rose-gold; "
+        "lower half of jersey: grey/silver gradient rose fade sublimation; "
+        "SkyyRose SR monogram (gold) at back neck; wide shoulder straps"
+    ),
+    "br-011": (
+        "hooded hockey jersey, black-and-teal colorway; "
+        "front chest: large circular rose crest (ROSE-ONLY logo in teal/cyan ring); "
+        "back upper: 'BLACK IS BEAUTIFUL' in cyan/teal block text; "
+        "back number: rose-filled #0 numeral in teal; "
+        "hem and cuffs: gradient stripe panels in teal/cyan"
+    ),
+    # ── Love Hurts Collection ────────────────────────────────────────────────
+    "lh-002": (
+        "left thigh: LOVE HURTS HEART GRAPHIC — cracked red heart tightly wrapped in thick dark "
+        "thorny branches, three full red roses with green stems growing upward from the heart, "
+        "blood-splash drips at bottom, cartoon tattoo art style with heavy black outlines; "
+        "comes in two colorways: white joggers with black side stripe, or black joggers with "
+        "white side stripe"
+    ),
+    "lh-003": (
+        "throughout shorts fabric: sublimated LOVE HURTS HEART GRAPHIC repeating; "
+        "left exterior panel: large sublimated LOVE HURTS WORDMARK (red graffiti bubble-script "
+        "'Love Hurts', heavy black outline, thorned heart above, blood-splash); "
+        "mesh side panels: embroidered love-hurts text marks and rose details"
+    ),
+    "lh-004": (
+        "front chest: LOVE HURTS WORDMARK — bold red graffiti bubble-script 'Love Hurts', "
+        "heavy black outline and shadow, thorned cracked heart floating above the text; "
+        "inside hood lining: sublimated LOVE HURTS HEART GRAPHIC; "
+        "back center: large LOVE HURTS HEART GRAPHIC — cracked red heart wrapped in thorny "
+        "branches, three red roses growing upward, blood-splash drips — dominant back print"
+    ),
+    "lh-005": (
+        "front chest left: LOVE HURTS WORDMARK — red graffiti bubble-script 'Love Hurts' with "
+        "black outline and thorned heart, sized ~8 in, contrast against blush pink fabric; "
+        "back: 'Love Hurts' text in embroidered script; rose detailing at cuffs/hem"
+    ),
+    "lh-006": (
+        "front face of fanny pack: LOVE HURTS HEART GRAPHIC — cracked red heart tightly wrapped "
+        "in dark thorny branches, three red roses with green stems growing upward from top, "
+        "blood-splash drips at bottom; positioned prominently on the front leather panel, "
+        "printed/embossed; the heart graphic occupies most of the front face"
+    ),
+    # ── Signature Collection ─────────────────────────────────────────────────
+    "sg-001": (
+        "entire shorts fabric: sublimated Bay Bridge panorama photo covering front and back panels; "
+        "bottom-left hem: ROSE-ONLY embroidered logo in blue thread (~3 in), matching bay water tones"
+    ),
+    "sg-002": (
+        "front chest: ROSE-ONLY embroidered logo (~6 in) in gold thread; within the rose petals: "
+        "miniature Golden Gate Bridge imagery stitched into the petal faces — bridge cables and "
+        "towers visible inside the bloom"
+    ),
+    "sg-003": (
+        "entire shorts fabric: sublimated Golden Gate Bridge panorama; "
+        "bottom-left hem: ROSE-ONLY embroidered logo in purple thread (~3 in)"
+    ),
+    "sg-004": (
+        "front chest center: SR MONOGRAM + ROSE — intertwined serif S-R with rose bloom on right, "
+        "rose-gold metallic embroidered (~5 in); "
+        "back neck: small SR MONOGRAM (gold) embroidered label, ~1.5 in"
+    ),
+    "sg-005": (
+        "front chest: ROSE-ONLY embroidered logo (~6 in) in navy/gold thread; within rose petals: "
+        "miniature Bay Bridge imagery stitched into petal faces — bridge span and cables visible"
+    ),
+    "sg-006": (
+        "front chest center: ROSE-ONLY logo in lavender thread (~6 in) — same 3D layered spiral "
+        "rose shape, embroidered, lavender-to-purple gradient thread on mint/lavender colorblock fabric"
+    ),
+    "sg-007": (
+        "brim fold, slightly left of center: ROSE-ONLY logo as a small silicone patch (~2 in) — "
+        "die-cut rose shape, smooth glossy finish; "
+        "comes in three colorways: rose-gold/red rose, grey-black rose, or purple rose"
+    ),
+    "sg-009": (
+        "front chest left: ROSE-ONLY embroidered logo (~5 in) in red thread — "
+        "raised thread texture against cream sherpa; "
+        "lining: white sherpa fleece visible at cuffs, collar, and hem"
+    ),
+    "sg-011": (
+        "front chest: THE SKYROSE COLLECTION SCRIPT — gold foil wordmark: 'THE' in small serifed "
+        "caps, 'Skyy Rose' in ornate italic cursive, 'Collection' in spaced caps; the 'o' in Rose "
+        "is a small rose bloom; printed small (~4 in wide) on clean white fabric"
+    ),
+    "sg-012": (
+        "front chest: THE SKYROSE COLLECTION SCRIPT — same gold foil wordmark as sg-011; "
+        "printed small (~4 in wide) on rich orchid fabric — gold contrasts strongly against purple"
+    ),
+    "sg-013": (
+        "front chest center: ROSE-ONLY embroidered logo in lavender thread (~6 in), same spiral "
+        "rose shape, raised thread depth; "
+        "back neck exterior: small SR MONOGRAM (gold) embroidered, ~1.5 in"
+    ),
+    "sg-014": (
+        "left thigh panel: ROSE-ONLY embroidered logo (~4 in) in lavender thread — "
+        "positioned mid-thigh on the mint/lavender colorblock sweatpants"
+    ),
+    # ── Kids Capsule ─────────────────────────────────────────────────────────
+    "kids-001": (
+        "left chest: ROSE-ONLY embroidered logo (~3 in) in black thread on red fabric; "
+        "left thigh of jogger: matching ROSE-ONLY embroidered logo (~3 in); "
+        "right sleeve: circular woven patch (~2.5 in) — white background, black outline border, "
+        "black rose center, 'Skyy Rose' arched text on top half, 'Collection' on bottom half"
+    ),
+    "kids-002": (
+        "left chest: ROSE-ONLY embroidered logo (~3 in) in black thread on purple fabric; "
+        "left thigh of jogger: matching ROSE-ONLY embroidered logo (~3 in); "
+        "right sleeve: circular woven patch (~2.5 in) — white background, black outline border, "
+        "black rose center, 'Skyy Rose' arched text on top half, 'Collection' on bottom half"
+    ),
 }
 
 
@@ -550,44 +521,48 @@ def get_api_key() -> str:
 
 def front_prompt(name: str) -> str:
     return (
-        f"The reference image shows a {name}. Generate a photorealistic 3D "
-        f"product render of this EXACT {name}, FRONT VIEW. NO model, NO person, "
-        "NO mannequin — just the garment itself floating naturally as if on an "
-        "invisible form, showing its natural 3D shape and drape. "
-        "Clean white/light gray studio background with subtle floor reflection. "
-        "Professional e-commerce product photography lighting — soft key light "
-        "from upper-left, fill from right, slight rim light for edge definition. "
-        "The garment must be a PIXEL-PERFECT replica of the reference image — "
-        "same exact colors, same exact graphics, same exact logo placement, "
-        "same fabric texture, same stitching details. Change NOTHING." + ANTI_HALLUCINATION
+        f"Generate a photorealistic e-commerce product render of this {name} — FRONT VIEW ONLY.\n"
+        "The provided image is the source tech flat. Reproduce every detail exactly.\n\n"
+        "VIEW RULE: Show ONLY the front panel. "
+        "Do NOT render the back of the garment. "
+        "Do NOT show through to the reverse side. "
+        "One side visible — the front.\n\n"
+        "PRESENTATION: No model, no person, no mannequin. "
+        "Garment floating naturally on an invisible form, full 3D shape and drape. "
+        "Clean white/light gray studio background, subtle floor shadow. "
+        "Professional e-commerce lighting — soft key light upper-left, fill right, "
+        "rim light for edge definition.\n\n"
+        "FIDELITY: Match the reference exactly — same colors, same text, same numbers, "
+        "same logo placement, same panels, same stripes. Change NOTHING." + ANTI_HALLUCINATION
     )
 
 
 def back_prompt(name: str) -> str:
     return (
-        f"This image shows the BACK of the garment. "
-        f"The reference image shows the back of a {name}. Generate a photorealistic 3D "
-        f"product render showing THE BACK of this {name}. "
-        "CRITICAL: Show the BACK side — not the front. Render the rear panel, "
-        "the back neckline, and all back graphics exactly as shown in the reference. "
-        "NO model, NO person, NO mannequin — just the garment floating naturally, "
-        "back-facing, showing its 3D shape and drape from behind. "
-        "Clean white/light gray studio background with subtle floor reflection. "
-        "Professional e-commerce product photography lighting. "
-        "The garment must be a PIXEL-PERFECT replica of the reference image — "
-        "same exact colors, same exact back graphics, same exact logo placement. "
-        "BACK VIEW ONLY. Change NOTHING." + ANTI_HALLUCINATION
+        f"Generate a photorealistic e-commerce product render of this {name} — BACK VIEW ONLY.\n"
+        "The provided image is the back-panel tech flat. Reproduce every detail exactly.\n\n"
+        "VIEW RULE: Show ONLY the back panel. "
+        "Do NOT render the front of the garment. "
+        "Do NOT show through to the front side. "
+        "One side visible — the back. Garment facing away from camera.\n\n"
+        "PRESENTATION: No model, no person, no mannequin. "
+        "Garment floating naturally on an invisible form, back-facing, full 3D drape. "
+        "Clean white/light gray studio background, subtle floor shadow. "
+        "Professional e-commerce lighting.\n\n"
+        "FIDELITY: Match the back reference exactly — same colors, same text, same numbers, "
+        "same logo placement, same back graphics. Change NOTHING." + ANTI_HALLUCINATION
     )
 
 
 def accessory_prompt(name: str) -> str:
     return (
-        f"The reference image shows a {name}. Generate a photorealistic 3D "
-        f"product render of this EXACT {name}, FRONT VIEW. NO model, NO person. "
-        "Just the accessory itself on a clean white/light gray studio background "
-        "with subtle reflection. Professional product photography lighting. "
-        "The item must be a PIXEL-PERFECT replica of the reference image — "
-        "same exact colors, same exact details. Change NOTHING." + ANTI_HALLUCINATION
+        f"Generate a photorealistic e-commerce product render of this {name} — FRONT VIEW.\n"
+        "The provided image is the source reference. Reproduce every detail exactly.\n\n"
+        "PRESENTATION: No model, no person. "
+        "Item displayed cleanly on white/light gray studio background with subtle shadow. "
+        "Professional product photography lighting.\n\n"
+        "FIDELITY: Match the reference exactly — same colors, same details. Change NOTHING."
+        + ANTI_HALLUCINATION
     )
 
 
@@ -650,18 +625,16 @@ ACCESSORY_BRANDING_TEMPLATES = {
 # Appended to EVERY prompt to prevent AI from inventing details.
 
 ANTI_HALLUCINATION = (
-    " STRICT RULES — 100% REPLICA: "
-    "The output MUST be a pixel-accurate replica of the reference garment. "
-    "Do NOT add any text, words, logos, or branding that is NOT visible "
-    "in the reference image. "
-    "Do NOT invent labels, patches, tags, or decorative elements. "
-    "Do NOT change the garment type to a different product. "
-    "Do NOT add sponsor logos, team names, or league branding. "
-    "Do NOT alter colors, fabric textures, or design proportions. "
-    "Do NOT change stitching, seam placement, or construction details. "
-    "If you cannot see a detail in the reference, do NOT guess — leave it out. "
-    "Only reproduce what is actually in the reference image. "
-    "This is a luxury fashion brand — absolute accuracy is non-negotiable."
+    "\n\nSTRICT RULES — NON-NEGOTIABLE:\n"
+    "• Render ONLY the side specified (front or back). Never show both sides simultaneously.\n"
+    "• Do NOT add text, logos, patches, or branding absent from the reference image.\n"
+    "• Do NOT invent pockets, panels, zippers, or design details not in the reference.\n"
+    "• Do NOT change the garment type, silhouette, or cut.\n"
+    "• Do NOT add sponsor logos, team names, league marks, or athlete names.\n"
+    "• Do NOT alter colors — match hex values from the reference exactly.\n"
+    "• Do NOT change stitching, seam placement, or construction.\n"
+    "• If a detail is unclear in the reference, leave it out — never guess.\n"
+    "• This is a luxury fashion brand. Accuracy is the only standard."
 )
 
 ENHANCED_PROMPT_SUFFIX = (
@@ -718,7 +691,8 @@ def generate_composite(
     src_img = enhance_source_image(source_image_path)
 
     try:
-        response = client.models.generate_content(
+        response = _call_with_deadline(
+            client.models.generate_content,
             model=MODEL_ID,
             contents=[
                 "IMAGE 1 — the AI-generated lifestyle photo (keep this composition):",
@@ -731,6 +705,9 @@ def generate_composite(
                 response_modalities=["IMAGE"],
             ),
         )
+    except concurrent.futures.TimeoutError:
+        log.warning("Composite generation timed out after %ds (socket hang)", _GENAI_CALL_TIMEOUT)
+        return None
     except Exception as exc:
         log.error("Composite API call failed: %s", exc)
         return None
@@ -855,6 +832,47 @@ def enhance_source_image(image_path: Path):
     return img
 
 
+# -- Socket-hang guard -------------------------------------------------------
+# Issue #1893: gemini-2.5-flash can stall at socket level indefinitely.
+# http_options timeout does NOT catch this — the socket stays open with no data.
+# ThreadPoolExecutor.result(timeout=N) enforces a wall-clock deadline regardless.
+_GENAI_CALL_TIMEOUT = 90  # seconds wall-clock per attempt
+_GENAI_MAX_RETRIES = 2  # retry socket hangs with backoff before giving up
+_GENAI_BACKOFF_BASE = 10  # seconds; backoff = base * 2^attempt
+
+
+def _call_with_deadline(fn, *args, timeout: int = _GENAI_CALL_TIMEOUT, **kwargs):
+    """Run fn(*args, **kwargs) with a wall-clock deadline and exponential backoff.
+
+    Retries up to _GENAI_MAX_RETRIES times on socket hang (TimeoutError).
+    Raises the last TimeoutError if all retries exhausted.
+    """
+    last_exc = None
+    for attempt in range(_GENAI_MAX_RETRIES + 1):
+        if attempt > 0:
+            backoff = _GENAI_BACKOFF_BASE * (2 ** (attempt - 1))
+            log.warning(
+                "Socket hang retry %d/%d — waiting %ds before retry",
+                attempt,
+                _GENAI_MAX_RETRIES,
+                backoff,
+            )
+            time.sleep(backoff)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            future = pool.submit(fn, *args, **kwargs)
+            try:
+                return future.result(timeout=timeout)
+            except concurrent.futures.TimeoutError as exc:
+                last_exc = exc
+                log.warning(
+                    "API call timed out after %ds (attempt %d/%d)",
+                    timeout,
+                    attempt + 1,
+                    _GENAI_MAX_RETRIES + 1,
+                )
+    raise last_exc
+
+
 # -- Image generation --------------------------------------------------------
 
 
@@ -877,7 +895,8 @@ def generate_image(
         full_prompt += ENHANCED_PROMPT_SUFFIX
 
     try:
-        response = client.models.generate_content(
+        response = _call_with_deadline(
+            client.models.generate_content,
             model=MODEL_ID,
             contents=[
                 "REFERENCE PHOTO of the exact product (study every detail):",
@@ -891,6 +910,11 @@ def generate_image(
                 ),
             ),
         )
+    except concurrent.futures.TimeoutError:
+        log.warning(
+            "generate_image timed out after %ds (socket hang — skipping)", _GENAI_CALL_TIMEOUT
+        )
+        return None
     except Exception as exc:
         log.error("API call failed (attempt %d): %s", attempt, exc)
         return None
@@ -1329,6 +1353,7 @@ def gemini_vision_compare(
     generated_bytes: bytes,
     product_name: str,
     garment_spec: str = "",
+    view: str = "front",
 ) -> dict:
     """Compare generated render against source tech flat using Gemini Flash vision.
 
@@ -1343,28 +1368,68 @@ def gemini_vision_compare(
     src_mime = "image/jpeg" if source_path.suffix.lower() in (".jpg", ".jpeg") else "image/webp"
     spec_context = f"\nProduct spec: {garment_spec}" if garment_spec else ""
 
+    view_label = view.upper()
+    view_rule = (
+        "IMAGE 2 shows the FRONT of the garment only. "
+        "Do NOT flag missing back-panel content — the back is intentionally not shown."
+        if view == "front"
+        else "IMAGE 2 shows the BACK of the garment only. "
+        "Do NOT flag missing front-panel content — the front is intentionally not shown."
+    )
+
     prompt = (
         f"You are a strict QA inspector comparing a SOURCE tech flat vs an AI-generated "
-        f"render of '{product_name}'.{spec_context}\n\n"
+        f"{view_label} VIEW render of '{product_name}'.{spec_context}\n\n"
         "IMAGE 1 = SOURCE tech flat (ground truth — what the product MUST look like)\n"
-        "IMAGE 2 = GENERATED render (evaluate against IMAGE 1)\n\n"
-        "Compare every visual detail and return ONLY this JSON (no markdown):\n"
+        f"IMAGE 2 = GENERATED {view_label} VIEW render (evaluate against IMAGE 1)\n\n"
+        f"IMPORTANT: {view_rule}\n\n"
+        "Evaluate ONLY these criteria:\n"
+        "  1. BASE COLORS — garment color(s) must match source exactly\n"
+        "  2. TEXT — all visible text must be correct (content, color, placement)\n"
+        "  3. NUMBERS — jersey numbers must be exact\n"
+        "  4. LOGOS — presence, placement, and color must match (not 3D material texture)\n"
+        "  5. GARMENT TYPE — must be the correct garment (jersey, hoodie, shorts, etc.)\n"
+        "  6. DESIGN ELEMENTS — panels, stripes, patterns must match\n\n"
+        "DO NOT penalize for: logo embossing/3D depth, fabric drape, lighting/shadows, "
+        "material gloss level, or content from the opposite side of the garment.\n\n"
+        "Return ONLY this JSON (no markdown):\n"
         "{\n"
         '  "pass": true/false,\n'
         '  "score": 0-100,\n'
         '  "color_match": true/false,\n'
         '  "text_match": true/false,\n'
         '  "garment_match": true/false,\n'
-        '  "logo_match": true/false,\n'
-        '  "issues": ["specific problems to fix — be precise, e.g. wrong number, missing stripe"],\n'
-        '  "notes": "one sentence summary"\n'
-        "}\n\n"
-        "Be EXTREMELY strict. Wrong jersey number, wrong color, missing logo, hallucinated "
-        "text, wrong garment type — all are FAIL. score=100 means pixel-perfect."
+        "score=100 means all 6 criteria match. Be strict on colors, text, numbers."
     )
 
+    # Native JSON schema output — guaranteed valid, no markdown stripping needed.
+    _vision_schema = {
+        "type": "OBJECT",
+        "properties": {
+            "pass": {"type": "BOOLEAN"},
+            "score": {"type": "INTEGER"},
+            "color_match": {"type": "BOOLEAN"},
+            "text_match": {"type": "BOOLEAN"},
+            "garment_match": {"type": "BOOLEAN"},
+            "logo_match": {"type": "BOOLEAN"},
+            "issues": {"type": "ARRAY", "items": {"type": "STRING"}},
+            "notes": {"type": "STRING"},
+        },
+        "required": [
+            "pass",
+            "score",
+            "color_match",
+            "text_match",
+            "garment_match",
+            "logo_match",
+            "issues",
+            "notes",
+        ],
+    }
+
     try:
-        response = client.models.generate_content(
+        response = _call_with_deadline(
+            client.models.generate_content,
             model="gemini-2.5-flash",
             contents=[
                 prompt,
@@ -1373,23 +1438,27 @@ def gemini_vision_compare(
                     inline_data=genai_types.Blob(mime_type="image/webp", data=generated_bytes)
                 ),
             ],
+            config=genai_types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=_vision_schema,
+            ),
         )
+    except concurrent.futures.TimeoutError:
+        log.warning(
+            "Vision compare timed out after %ds (socket hang) — treating as pass to avoid infinite retry",
+            _GENAI_CALL_TIMEOUT,
+        )
+        return {
+            "pass": True,
+            "score": -1,
+            "issues": [],
+            "notes": "Vision timeout — socket hang (Issue #1893)",
+        }
     except Exception as exc:
         log.error("Vision compare failed: %s", exc)
-        # On API error: pass through so generation isn't blocked
         return {"pass": True, "score": 0, "issues": [], "notes": f"Vision API error: {exc}"}
 
-    text = response.text.strip()
-    if text.startswith("```"):
-        lines = text.split("\n")
-        text = "\n".join(lines[1:-1] if lines and lines[-1].strip() == "```" else lines[1:])
-    text = text.strip()
-
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        log.warning("Could not parse vision compare response: %.200s", text)
-        return {"pass": True, "score": 0, "issues": [], "notes": "Parse error — passing"}
+    return json.loads(response.text)
 
 
 def quality_gate(image_bytes: bytes, sku: str, view: str) -> bool:
@@ -1578,7 +1647,9 @@ def process_product(
                 run_vision = view_src and (view != "back" or has_back_ref)
                 if run_vision:
                     logo_spec = LOGO_TREATMENTS.get(sku, "")
-                    vision = gemini_vision_compare(client, view_src, image_bytes, name, logo_spec)
+                    vision = gemini_vision_compare(
+                        client, view_src, image_bytes, name, logo_spec, view
+                    )
                     v_score = vision.get("score", 100)
                     v_pass = vision.get("pass", True)
                     v_issues = vision.get("issues", [])
@@ -1752,7 +1823,7 @@ def cmd_composite(args):
     from google import genai
 
     api_key = get_api_key()
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(api_key=api_key, http_options={"timeout": 300000})  # 5 min in ms
     products = load_products(args.sku, include_bad=args.include_bad)
 
     # Determine which views to composite
@@ -1888,7 +1959,7 @@ def cmd_generate(args):
     from google import genai
 
     api_key = get_api_key()
-    client = genai.Client(api_key=api_key)
+    client = genai.Client(api_key=api_key, http_options={"timeout": 300000})  # 5 min in ms
     products = load_products(args.sku, include_bad=args.include_bad)
     views = resolve_views(args.step)
     engine = args.engine
