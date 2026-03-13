@@ -91,6 +91,36 @@ try:
 except ImportError as _e:
     _logger.debug("SDK immersive agents unavailable: %s", _e)
 
+try:
+    from .customer_intelligence import SDKCustomerIntelAgent
+except ImportError as _e:
+    _logger.debug("SDK customer intelligence agent unavailable: %s", _e)
+
+try:
+    from .influencer import SDKInfluencerAgent
+except ImportError as _e:
+    _logger.debug("SDK influencer agent unavailable: %s", _e)
+
+try:
+    from .supply_chain import SDKSupplyChainAgent
+except ImportError as _e:
+    _logger.debug("SDK supply chain agent unavailable: %s", _e)
+
+try:
+    from .brand_guardian import SDKBrandGuardianAgent
+except ImportError as _e:
+    _logger.debug("SDK brand guardian agent unavailable: %s", _e)
+
+try:
+    from .community import SDKCommunityLoyaltyAgent
+except ImportError as _e:
+    _logger.debug("SDK community/loyalty agent unavailable: %s", _e)
+
+try:
+    from .seo_discovery import SDKSEODiscoveryAgent
+except ImportError as _e:
+    _logger.debug("SDK SEO discovery agent unavailable: %s", _e)
+
 __all__ = [
     # Operations
     "SDKDeployRunnerAgent",
@@ -99,18 +129,23 @@ __all__ = [
     # Content
     "SDKSeoWriterAgent",
     "SDKCollectionPublisherAgent",
+    "SDKSEODiscoveryAgent",
     # Analytics
     "SDKDataAnalystAgent",
     "SDKReportGeneratorAgent",
+    "SDKCustomerIntelAgent",
     # Web Builder
     "SDKThemeDevAgent",
     "SDKTemplateBuilderAgent",
     # Marketing
     "SDKCampaignAnalystAgent",
     "SDKCompetitiveIntelAgent",
+    "SDKInfluencerAgent",
+    "SDKCommunityLoyaltyAgent",
     # Commerce
     "SDKCatalogManagerAgent",
     "SDKPriceOptimizerAgent",
+    "SDKSupplyChainAgent",
     # Imagery
     "SDKVirtualTryOnAgent",
     "SDKCompositorAgent",
@@ -118,6 +153,7 @@ __all__ = [
     # Creative
     "SDKBrandAssetAgent",
     "SDKDesignSystemAgent",
+    "SDKBrandGuardianAgent",
     # Immersive 3D/AR
     "SDKGarment3DAgent",
     "SDKSceneBuilderAgent",

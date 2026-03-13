@@ -255,7 +255,9 @@ class DashboardActionInput(BaseAgentInput):
     domain: str = Field(
         ...,
         description="Target domain: operations, commerce, content, "
-        "analytics, imagery, creative, marketing, web_builder",
+        "analytics, imagery, creative, marketing, web_builder, "
+        "immersive, customer_intelligence, influencer, supply_chain, "
+        "brand_guardian, community, seo_discovery",
     )
     action: str = Field(
         ...,
@@ -283,11 +285,13 @@ class DashboardActionInput(BaseAgentInput):
 async def dashboard_action(params: DashboardActionInput) -> str:
     """Execute a dashboard action via SDK domain agents.
 
-    Invokes one of 18 SDK agents across 8 domains to perform
+    Invokes one of 27 SDK agents across 15 domains to perform
     real operations: deploy, render, analyze, audit, scan, etc.
 
     Domains: operations, commerce, content, analytics, imagery,
-    creative, marketing, web_builder.
+    creative, marketing, web_builder, immersive,
+    customer_intelligence, influencer, supply_chain,
+    brand_guardian, community, seo_discovery.
 
     Args:
         params (DashboardActionInput): Action config containing:
@@ -339,7 +343,7 @@ class DashboardHealthInput(BaseAgentInput):
 async def dashboard_health(params: DashboardHealthInput) -> str:
     """Check health and availability of all SDK dashboard agents.
 
-    Returns 18 agents across 8 domains with their capabilities,
+    Returns 27 agents across 15 domains with their capabilities,
     availability status, and last-used timestamps.
 
     Args:

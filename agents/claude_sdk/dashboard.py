@@ -40,7 +40,9 @@ class DashboardAction(BaseModel):
     domain: str = Field(
         ...,
         description="Target domain: operations, commerce, content, "
-        "analytics, imagery, creative, marketing, web_builder",
+        "analytics, imagery, creative, marketing, web_builder, "
+        "immersive, customer_intelligence, influencer, supply_chain, "
+        "brand_guardian, community, seo_discovery",
     )
     action: str = Field(
         ...,
@@ -267,6 +269,86 @@ class DashboardAgentRegistry:
                 "immersive",
                 "agents.claude_sdk.domain_agents.immersive.SDKAvatarStylistAgent",
                 ["outfit_change", "pose_render", "sprite_generate", "lookbook_generate"],
+            ),
+            # --- New agents: customer intelligence, influencer, supply chain,
+            #     brand guardian, community/loyalty, SEO/discovery ---
+            (
+                "sdk_customer_intel",
+                "customer_intelligence",
+                "agents.claude_sdk.domain_agents.customer_intelligence.SDKCustomerIntelAgent",
+                [
+                    "customer_segment",
+                    "clv_score",
+                    "churn_predict",
+                    "cohort_analysis",
+                    "persona_build",
+                    "purchase_pattern",
+                ],
+            ),
+            (
+                "sdk_influencer",
+                "influencer",
+                "agents.claude_sdk.domain_agents.influencer.SDKInfluencerAgent",
+                [
+                    "creator_discover",
+                    "brand_fit_score",
+                    "outreach_draft",
+                    "campaign_roi",
+                    "audience_overlap",
+                    "collab_brief",
+                ],
+            ),
+            (
+                "sdk_supply_chain",
+                "supply_chain",
+                "agents.claude_sdk.domain_agents.supply_chain.SDKSupplyChainAgent",
+                [
+                    "inventory_track",
+                    "demand_forecast",
+                    "supplier_manage",
+                    "fulfillment_optimize",
+                    "lead_time_estimate",
+                    "reorder_alert",
+                ],
+            ),
+            (
+                "sdk_brand_guardian",
+                "brand_guardian",
+                "agents.claude_sdk.domain_agents.brand_guardian.SDKBrandGuardianAgent",
+                [
+                    "brand_audit",
+                    "tagline_enforce",
+                    "tone_monitor",
+                    "color_compliance",
+                    "copy_review",
+                    "brand_drift_detect",
+                ],
+            ),
+            (
+                "sdk_community_loyalty",
+                "community",
+                "agents.claude_sdk.domain_agents.community.SDKCommunityLoyaltyAgent",
+                [
+                    "engagement_track",
+                    "loyalty_tier",
+                    "referral_program",
+                    "community_health",
+                    "retention_strategy",
+                    "ambassador_manage",
+                ],
+            ),
+            (
+                "sdk_seo_discovery",
+                "seo_discovery",
+                "agents.claude_sdk.domain_agents.seo_discovery.SDKSEODiscoveryAgent",
+                [
+                    "serp_analyze",
+                    "content_gap",
+                    "backlink_profile",
+                    "keyword_cluster",
+                    "visual_search_optimize",
+                    "discovery_strategy",
+                ],
             ),
         ]
 

@@ -251,9 +251,10 @@ async def execute_dashboard_actions(
 ):
     """Execute actions across SDK domain agents.
 
-    The dashboard orchestrator coordinates 18 SDK agents across
-    8 domains (operations, commerce, content, analytics, imagery,
-    creative, marketing, web_builder).
+    The dashboard orchestrator coordinates 27 SDK agents across
+    15 domains (operations, commerce, content, analytics, imagery,
+    creative, marketing, web_builder, immersive, customer_intelligence,
+    influencer, supply_chain, brand_guardian, community, seo_discovery).
 
     Each action targets a domain + capability. Independent actions
     can run in parallel for faster dashboard updates.
@@ -292,7 +293,7 @@ async def execute_dashboard_actions(
 async def get_dashboard_health():
     """Get health status of all registered SDK dashboard agents.
 
-    Returns the list of all 18 SDK agents across 8 domains with
+    Returns the list of all 27 SDK agents across 15 domains with
     their availability, capabilities, and last-used timestamps.
     """
     try:
@@ -319,7 +320,9 @@ async def list_dashboard_agents(
 
     Args:
         domain: Optional domain filter (operations, commerce, content,
-                analytics, imagery, creative, marketing, web_builder).
+                analytics, imagery, creative, marketing, web_builder,
+                immersive, customer_intelligence, influencer,
+                supply_chain, brand_guardian, community, seo_discovery).
 
     Returns:
         Agent list with capabilities and domain information.

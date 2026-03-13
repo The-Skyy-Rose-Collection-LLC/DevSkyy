@@ -100,7 +100,7 @@ class SDKCollectionPublisherAgent(SDKSubAgent):
             "Brand voice: confident, poetic, never generic. "
             "Reference Oakland, the Bay, concrete, roses.\n\n"
             "Read product files before writing content. Cross-reference "
-            "with scripts/nano-banana-vton.py PRODUCT_CATALOG for "
+            "with data/product-catalog.csv for "
             "accurate SKUs and descriptions."
         )
 
