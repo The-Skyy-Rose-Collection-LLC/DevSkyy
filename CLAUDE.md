@@ -110,53 +110,21 @@ Persisted to: `.devskyy/handoffs/<session_id>.json`
 
 ---
 
-## Build & Run Commands
+## Commands
 
 ```bash
-# Python backend
-uvicorn main_enterprise:app --host 0.0.0.0 --port 8000 --reload
-python devskyy_mcp.py                    # MCP server
+# Run
+uvicorn main_enterprise:app --host 0.0.0.0 --port 8000 --reload  # API
+npm run dev                              # Frontend dev
+make install / make dev / pip install -e ".[all]"  # Install
 
-# Frontend (Next.js 16)
-npm run dev                              # Dev server
-npm run build && npm start               # Production
+# Test
+make test / make test-fast / make test-cov / make test-all
+pytest tests/ -k "name" -v / pytest tests/ -m integration
 
-# Install
-make install                             # Python production deps
-make dev                                 # Python + TypeScript dev deps
-pip install -e ".[all]"                  # All optional deps
-```
-
-## Test Commands
-
-```bash
-make test                                # Python: pytest tests/ -v --tb=short
-make test-fast                           # Python: pytest -x -q (stop on first failure)
-make test-cov                            # Python: pytest with coverage report
-pytest tests/unit/test_foo.py -v         # Single test file
-pytest tests/ -k "test_name" -v          # Single test by name
-pytest tests/ -m integration             # By marker: unit, integration, security, smoke, slow
-make ts-test                             # TypeScript: jest
-make test-all                            # Both Python + TypeScript
-```
-
-## Lint & Format
-
-```bash
-make format                              # Python: isort . && ruff check --fix && black .
-make lint                                # Python: ruff check . && mypy
-make format-all                          # Python + TypeScript
-make lint-all                            # Python + TypeScript
-make ci                                  # Full local CI (lint-all + test-all)
-npm run type-check                       # TypeScript type checking
-npm run lint                             # ESLint
-```
-
-## Verify After Changes
-
-```bash
-pytest tests/ -v && mypy . --ignore-missing-imports && ruff check .
-npm run type-check && npm run lint
+# Lint & Verify
+make format / make lint / make ci        # Python
+npm run type-check && npm run lint       # TypeScript
 ```
 
 ## Architecture
@@ -184,20 +152,10 @@ Core (auth, cache, events, registry — zero external deps)
 - `agents/base_super_agent.py` — EnhancedSuperAgent base class (17 prompt techniques)
 
 ### Key Directories
-- `core/` — Foundation layer (registry, caching, events, feature flags, CQRS) — no external deps
-- `agents/` — 54 agents (wordpress_bridge, elite_web_builder, visual_generation)
-- `api/v1/` — REST routes; `api/graphql/` — schema + dataloaders
-- `orchestration/` — RAG pipeline, LangGraph workflows, asset pipeline
-- `services/ml/` — Stable Diffusion, ControlNet, DreamBooth; `services/three_d/` — Tripo3D, Meshy
-- `integrations/` — WordPress client, Cloudflare R2, product sync
-- `mcp_tools/` — MCP tool implementations
-- `scripts/` — 171 utility scripts
+`core/` (foundation) · `agents/` (54) · `api/v1/` + `api/graphql/` · `orchestration/` · `services/ml/` + `services/three_d/` · `integrations/` · `mcp_tools/` · `scripts/`
 
 ### Virtual Environments
-- `.venv` — main (diffusers, torch)
-- `.venv-imagery` — image processing (rembg, BRIA)
-- `.venv-lora` — LoRA training
-- `.venv-agents` — ADK (conflicts with numpy, must be separate)
+`.venv` (main) · `.venv-imagery` (rembg, BRIA) · `.venv-lora` · `.venv-agents` (ADK, separate due to numpy conflicts)
 
 ## Development Protocol
 

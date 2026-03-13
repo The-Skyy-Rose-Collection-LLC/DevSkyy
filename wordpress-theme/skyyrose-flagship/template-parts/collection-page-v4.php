@@ -134,32 +134,25 @@ if ( empty( $all_products ) ) {
 }
 
 /*
- * Separate pre-order products from the catalog grid.
- * Pre-orders are shown on the pre-order gateway page, not here.
+ * Display all products (including pre-orders) in the holo grid.
+ * The holo card handles pre-order state natively (badge, CTA, ship note).
  */
-$catalog_products_display = array();
-$preorder_products_list   = array();
+$catalog_products_display = $all_products;
 
-foreach ( $all_products as $p ) {
-	if ( ! empty( $p['is_preorder'] ) ) {
-		$preorder_products_list[] = $p;
-	} else {
-		$catalog_products_display[] = $p;
-	}
-}
-
-/* Recalculate counts and price range from catalog-display products only. */
+/* Recalculate counts and price range from all products. */
 $product_count = count( $catalog_products_display );
 $min_price     = PHP_INT_MAX;
 $max_price     = 0;
 
 foreach ( $catalog_products_display as $p ) {
 	$price = (float) $p['price'];
-	if ( $price < $min_price ) {
-		$min_price = $price;
-	}
-	if ( $price > $max_price ) {
-		$max_price = $price;
+	if ( $price > 0 ) {
+		if ( $price < $min_price ) {
+			$min_price = $price;
+		}
+		if ( $price > $max_price ) {
+			$max_price = $price;
+		}
 	}
 }
 
@@ -372,43 +365,25 @@ get_header();
 			</div>
 		</div>
 
-		<?php
-		if ( function_exists( 'skyyrose_render_interactive_grid' ) ) {
-			skyyrose_render_interactive_grid( $catalog_products_display, $col );
-		} else {
-			// Fallback: render legacy col-card grid if interactive-grid.php is not loaded.
-			?>
-			<div class="col-grid">
-				<?php foreach ( $catalog_products_display as $product ) : ?>
-					<div class="col-card"
-					     data-product-id="<?php echo esc_attr( $product['sku'] ); ?>"
-					     role="button"
-					     tabindex="0"
-					     aria-label="<?php echo esc_attr( sprintf( __( 'View %s', 'skyyrose-flagship' ), $product['name'] ) ); ?>">
-						<div class="col-card__img">
-							<?php if ( ! empty( $product['image'] ) ) : ?>
-								<img src="<?php echo esc_url( $product['image'] ); ?>"
-								     alt="<?php echo esc_attr( $product['name'] ); ?>"
-								     width="400" height="533" loading="lazy">
-							<?php else : ?>
-								<span class="col-card__letter"><?php echo esc_html( mb_substr( $product['name'], 0, 1 ) ); ?></span>
-							<?php endif; ?>
-						</div>
-						<div class="col-card__body">
-							<h3 class="col-card__name"><?php echo esc_html( $product['name'] ); ?></h3>
-							<div class="col-card__foot">
-								<span class="col-card__price"><?php echo wp_kses_post( $product['price_display'] ); ?></span>
-								<a href="<?php echo esc_url( $product['url'] ); ?>" class="col-card__view-btn">
-									<?php esc_html_e( 'Details', 'skyyrose-flagship' ); ?>
-								</a>
-							</div>
-						</div>
-					</div>
-				<?php endforeach; ?>
-			</div>
+		<div class="holo-grid">
 			<?php
-		}
-		?>
+			$holo_idx = 0;
+			foreach ( $catalog_products_display as $cat_product ) :
+				get_template_part( 'template-parts/product-card-holo', null, array(
+					'title'      => $cat_product['name'],
+					'price'      => $cat_product['price_display'],
+					'image_url'  => ! empty( $cat_product['image'] ) ? $cat_product['image'] : '',
+					'permalink'  => ! empty( $cat_product['url'] ) ? $cat_product['url'] : '#',
+					'collection' => $col['slug'],
+					'badge_text' => ! empty( $cat_product['badge'] ) ? $cat_product['badge'] : '',
+					'desc'       => ! empty( $cat_product['desc'] ) ? $cat_product['desc'] : '',
+					'sku'        => $cat_product['sku'],
+					'index'      => $holo_idx,
+				) );
+				$holo_idx++;
+			endforeach;
+			?>
+		</div>
 
 		<div style="text-align:center; padding:1rem 0 0;">
 			<button type="button" class="size-guide-trigger" data-open-size-guide
