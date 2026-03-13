@@ -133,7 +133,7 @@ jobs:
             --allow-only="MIT;BSD-2-Clause;BSD-3-Clause;Apache-2.0;ISC;PSF-2.0;Python-2.0;MPL-2.0;Unlicense;LGPL-2.1-only;LGPL-3.0-only;Public Domain"
 
       - name: Upload license report
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f  # v7.0.0
         with:
           name: license-report
           path: licenses.md
@@ -159,7 +159,7 @@ jobs:
         run: syft . -o spdx-json=sbom-python.spdx.json
 
       - name: Upload SBOM
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f  # v7.0.0
         with:
           name: sbom
           path: sbom-*.spdx.json
