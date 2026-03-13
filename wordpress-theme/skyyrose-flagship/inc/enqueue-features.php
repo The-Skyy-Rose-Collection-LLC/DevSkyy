@@ -363,3 +363,57 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_cross_sell_engine', 40 );
 
 // Analytics Beacon — small footprint, essential for tracking.
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_analytics_beacon', 50 );
+
+/*--------------------------------------------------------------
+ * Social Proof + Momentum Commerce — Conversion Activation
+ *--------------------------------------------------------------*/
+
+/**
+ * Enqueue Social Proof toasts and sticky CTA bar on product-facing pages.
+ *
+ * @since 5.0.0
+ * @return void
+ */
+function skyyrose_enqueue_social_proof() {
+	if ( is_admin() ) {
+		return;
+	}
+	$slug         = skyyrose_get_current_template_slug();
+	$active_slugs = array( 'front-page', 'collection', 'collection-v4', 'single-product', 'preorder-gateway', 'landing', 'immersive', 'collections-shop' );
+	if ( ! in_array( $slug, $active_slugs, true ) ) {
+		return;
+	}
+	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+	$sp_css  = $use_min && file_exists( SKYYROSE_DIR . '/assets/css/social-proof.min.css' ) ? 'social-proof.min.css' : 'social-proof.css';
+	if ( file_exists( SKYYROSE_DIR . '/assets/css/' . $sp_css ) ) {
+		wp_enqueue_style( 'skyyrose-social-proof', SKYYROSE_ASSETS_URI . '/css/' . $sp_css, array( 'skyyrose-design-tokens' ), SKYYROSE_VERSION );
+	}
+	$sp_js = $use_min && file_exists( SKYYROSE_DIR . '/assets/js/social-proof.min.js' ) ? 'social-proof.min.js' : 'social-proof.js';
+	if ( file_exists( SKYYROSE_DIR . '/assets/js/' . $sp_js ) ) {
+		wp_enqueue_script( 'skyyrose-social-proof', SKYYROSE_ASSETS_URI . '/js/' . $sp_js, array(), SKYYROSE_VERSION, true );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_social_proof', 55 );
+
+/**
+ * Enqueue Momentum Commerce (price anchoring + live ticker + spotlight) on product pages.
+ *
+ * @since 5.0.0
+ * @return void
+ */
+function skyyrose_enqueue_momentum_commerce() {
+	if ( is_admin() ) {
+		return;
+	}
+	$slug         = skyyrose_get_current_template_slug();
+	$active_slugs = array( 'front-page', 'collection', 'collection-v4', 'single-product', 'preorder-gateway', 'landing', 'immersive' );
+	if ( ! in_array( $slug, $active_slugs, true ) ) {
+		return;
+	}
+	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+	$mc_js   = $use_min && file_exists( SKYYROSE_DIR . '/assets/js/momentum-commerce.min.js' ) ? 'momentum-commerce.min.js' : 'momentum-commerce.js';
+	if ( file_exists( SKYYROSE_DIR . '/assets/js/' . $mc_js ) ) {
+		wp_enqueue_script( 'skyyrose-momentum-commerce', SKYYROSE_ASSETS_URI . '/js/' . $mc_js, array(), SKYYROSE_VERSION, true );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_momentum_commerce', 57 );

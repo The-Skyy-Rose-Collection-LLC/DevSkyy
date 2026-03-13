@@ -65,6 +65,32 @@ try:
 except ImportError as _e:
     _logger.debug("SDK commerce agents unavailable: %s", _e)
 
+try:
+    from .imagery import (
+        SDKCompositorAgent,
+        SDKImageGenAgent,
+        SDKVirtualTryOnAgent,
+    )
+except ImportError as _e:
+    _logger.debug("SDK imagery agents unavailable: %s", _e)
+
+try:
+    from .creative import (
+        SDKBrandAssetAgent,
+        SDKDesignSystemAgent,
+    )
+except ImportError as _e:
+    _logger.debug("SDK creative agents unavailable: %s", _e)
+
+try:
+    from .immersive import (
+        SDKAvatarStylistAgent,
+        SDKGarment3DAgent,
+        SDKSceneBuilderAgent,
+    )
+except ImportError as _e:
+    _logger.debug("SDK immersive agents unavailable: %s", _e)
+
 __all__ = [
     # Operations
     "SDKDeployRunnerAgent",
@@ -85,4 +111,15 @@ __all__ = [
     # Commerce
     "SDKCatalogManagerAgent",
     "SDKPriceOptimizerAgent",
+    # Imagery
+    "SDKVirtualTryOnAgent",
+    "SDKCompositorAgent",
+    "SDKImageGenAgent",
+    # Creative
+    "SDKBrandAssetAgent",
+    "SDKDesignSystemAgent",
+    # Immersive 3D/AR
+    "SDKGarment3DAgent",
+    "SDKSceneBuilderAgent",
+    "SDKAvatarStylistAgent",
 ]

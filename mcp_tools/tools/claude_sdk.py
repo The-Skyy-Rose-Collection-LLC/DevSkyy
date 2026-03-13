@@ -1,4 +1,4 @@
-"""Claude Agent SDK MCP tools: research, email triage, spreadsheet ops."""
+"""Claude Agent SDK MCP tools: research, email triage, spreadsheet ops, dashboard."""
 
 from pydantic import Field
 
@@ -241,4 +241,115 @@ async def analyze_spreadsheet(params: AnalyzeSpreadsheetInput) -> str:
             "input_file": params.input_file,
         },
     )
+    return _format_response(response)
+
+
+# ------------------------------------------------------------------
+# Dashboard orchestrator tools
+# ------------------------------------------------------------------
+
+
+class DashboardActionInput(BaseAgentInput):
+    """Input for dashboard action execution."""
+
+    domain: str = Field(
+        ...,
+        description="Target domain: operations, commerce, content, "
+        "analytics, imagery, creative, marketing, web_builder",
+    )
+    action: str = Field(
+        ...,
+        description="Action/capability to execute (e.g., deploy_run, "
+        "vton_render, brand_compliance, data_query)",
+    )
+    task: str = Field(
+        default="",
+        description="Task description for the agent",
+    )
+
+
+@mcp.tool(
+    name="devskyy_dashboard_action",
+    annotations={
+        "title": "DevSkyy Dashboard Action",
+        "readOnlyHint": False,
+        "destructiveHint": False,
+        "idempotentHint": False,
+        "openWorldHint": True,
+        "defer_loading": True,
+    },
+)
+@secure_tool("dashboard_action")
+async def dashboard_action(params: DashboardActionInput) -> str:
+    """Execute a dashboard action via SDK domain agents.
+
+    Invokes one of 18 SDK agents across 8 domains to perform
+    real operations: deploy, render, analyze, audit, scan, etc.
+
+    Domains: operations, commerce, content, analytics, imagery,
+    creative, marketing, web_builder.
+
+    Args:
+        params (DashboardActionInput): Action config containing:
+            - domain: Target domain
+            - action: Capability to invoke
+            - task: Task description
+
+    Returns:
+        str: Action result with metrics
+    """
+    response = await _make_api_request(
+        "POST",
+        "/api/v1/claude-sdk/dashboard",
+        json={
+            "actions": [
+                {
+                    "domain": params.domain,
+                    "action": params.action,
+                    "params": {"task": params.task},
+                }
+            ],
+            "parallel": False,
+        },
+    )
+    return _format_response(response)
+
+
+class DashboardHealthInput(BaseAgentInput):
+    """Input for dashboard health check."""
+
+    domain: str | None = Field(
+        default=None,
+        description="Optional domain filter",
+    )
+
+
+@mcp.tool(
+    name="devskyy_dashboard_health",
+    annotations={
+        "title": "DevSkyy Dashboard Health",
+        "readOnlyHint": True,
+        "destructiveHint": False,
+        "idempotentHint": True,
+        "openWorldHint": False,
+        "defer_loading": True,
+    },
+)
+@secure_tool("dashboard_health")
+async def dashboard_health(params: DashboardHealthInput) -> str:
+    """Check health and availability of all SDK dashboard agents.
+
+    Returns 18 agents across 8 domains with their capabilities,
+    availability status, and last-used timestamps.
+
+    Args:
+        params (DashboardHealthInput): Optional domain filter.
+
+    Returns:
+        str: Agent health status across all domains
+    """
+    endpoint = "/api/v1/claude-sdk/dashboard/health"
+    if params.domain:
+        endpoint = f"/api/v1/claude-sdk/dashboard/agents?domain={params.domain}"
+    response = await _make_api_request("GET", endpoint)
     return _format_response(response)
