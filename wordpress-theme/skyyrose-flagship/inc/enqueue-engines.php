@@ -169,26 +169,7 @@ function skyyrose_enqueue_journey_gamification() {
 	skyyrose_enqueue_engine( 'skyyrose-journey-gamification', 'journey-gamification' );
 }
 
-/**
- * Enqueue Momentum Commerce Engine — "The Closer".
- *
- * Smart Price Anchoring, Live Activity Ticker, Spotlight Moments,
- * Best Seller Glow, and Momentum Score engagement rewards.
- *
- * @since 3.8.0
- * @return void
- */
-function skyyrose_enqueue_momentum_commerce() {
-	if ( is_admin() ) {
-		return;
-	}
-	skyyrose_enqueue_engine(
-		'skyyrose-momentum-commerce',
-		'momentum-commerce',
-		array( 'skyyrose-design-tokens' ),
-		array( 'skyyrose-conversion-engine' )
-	);
-}
+// skyyrose_enqueue_momentum_commerce() lives in enqueue-features.php (conditional loading by template).
 
 /**
  * Enqueue Velocity — Scroll-Driven Product Storytelling Engine.
