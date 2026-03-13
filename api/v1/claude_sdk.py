@@ -3,10 +3,14 @@ Claude Agent SDK API Router
 ============================
 
 REST endpoints for Claude Agent SDK integrations:
-- POST /claude-sdk/research   — Trigger multi-agent research pipeline
-- POST /claude-sdk/email      — Process/triage email via IMAP + AI
-- POST /claude-sdk/excel      — Generate or analyze spreadsheets
-- POST /claude-sdk/session    — Create/resume V2 stateful sessions
+- POST /claude-sdk/research    — Trigger multi-agent research pipeline
+- POST /claude-sdk/email       — Process/triage email via IMAP + AI
+- POST /claude-sdk/excel       — Generate or analyze spreadsheets
+- POST /claude-sdk/session     — Create/resume V2 stateful sessions
+- POST /claude-sdk/dashboard   — Execute dashboard actions across domains
+- GET  /claude-sdk/dashboard/health — Dashboard agent health status
+- GET  /claude-sdk/dashboard/agents — List all registered agents
+- POST /claude-sdk/dashboard/find   — Find agents by capability
 """
 
 from __future__ import annotations
@@ -232,4 +236,151 @@ async def manage_session(
         raise
     except Exception as e:
         logger.exception("session_operation_failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ------------------------------------------------------------------
+# Dashboard orchestrator endpoints
+# ------------------------------------------------------------------
+
+
+@router.post("/dashboard")
+async def execute_dashboard_actions(
+    actions: list[dict],
+    parallel: bool = True,
+):
+    """Execute actions across SDK domain agents.
+
+    The dashboard orchestrator coordinates 18 SDK agents across
+    8 domains (operations, commerce, content, analytics, imagery,
+    creative, marketing, web_builder).
+
+    Each action targets a domain + capability. Independent actions
+    can run in parallel for faster dashboard updates.
+
+    Args:
+        actions: List of action dicts with domain, action, params.
+        parallel: Execute independent actions in parallel.
+
+    Returns:
+        Aggregated results from all actions.
+    """
+    try:
+        from agents.claude_sdk.dashboard import (
+            DashboardAction,
+            DashboardOrchestrator,
+            DashboardRequest,
+        )
+
+        orchestrator = DashboardOrchestrator()
+        parsed_actions = [DashboardAction(**a) for a in actions]
+        request = DashboardRequest(actions=parsed_actions, parallel=parallel)
+        result = await orchestrator.execute(request)
+        return result.model_dump()
+
+    except ImportError:
+        raise HTTPException(
+            status_code=503,
+            detail="Claude Agent SDK not installed. Run: pip install claude-agent-sdk",
+        )
+    except Exception as e:
+        logger.exception("dashboard_action_failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/dashboard/health")
+async def get_dashboard_health():
+    """Get health status of all registered SDK dashboard agents.
+
+    Returns the list of all 18 SDK agents across 8 domains with
+    their availability, capabilities, and last-used timestamps.
+    """
+    try:
+        from agents.claude_sdk.dashboard import DashboardOrchestrator
+
+        orchestrator = DashboardOrchestrator()
+        return orchestrator.get_health().model_dump()
+
+    except ImportError:
+        raise HTTPException(
+            status_code=503,
+            detail="Claude Agent SDK not installed.",
+        )
+    except Exception as e:
+        logger.exception("dashboard_health_failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/dashboard/agents")
+async def list_dashboard_agents(
+    domain: str | None = None,
+):
+    """List all registered SDK dashboard agents, optionally filtered by domain.
+
+    Args:
+        domain: Optional domain filter (operations, commerce, content,
+                analytics, imagery, creative, marketing, web_builder).
+
+    Returns:
+        Agent list with capabilities and domain information.
+    """
+    try:
+        from agents.claude_sdk.dashboard import DashboardOrchestrator
+
+        orchestrator = DashboardOrchestrator()
+        health = orchestrator.get_health()
+
+        if domain:
+            agents = [a for a in health.agents if a.domain == domain]
+        else:
+            agents = health.agents
+
+        return {
+            "total": len(agents),
+            "domain_filter": domain,
+            "agents": [a.model_dump() for a in agents],
+            "available_domains": health.domains,
+        }
+
+    except ImportError:
+        raise HTTPException(
+            status_code=503,
+            detail="Claude Agent SDK not installed.",
+        )
+    except Exception as e:
+        logger.exception("dashboard_agents_list_failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/dashboard/find")
+async def find_agents_by_capability(
+    capability: str,
+):
+    """Find SDK agents that have a specific capability.
+
+    Args:
+        capability: Capability to search for (e.g., 'deploy_run',
+                   'vton_render', 'brand_compliance').
+
+    Returns:
+        List of agent names with the requested capability.
+    """
+    try:
+        from agents.claude_sdk.dashboard import DashboardOrchestrator
+
+        orchestrator = DashboardOrchestrator()
+        agents = orchestrator.find_agent(capability)
+        return {
+            "capability": capability,
+            "agents": agents,
+            "count": len(agents),
+        }
+
+    except ImportError:
+        raise HTTPException(
+            status_code=503,
+            detail="Claude Agent SDK not installed.",
+        )
+    except Exception as e:
+        logger.exception("dashboard_find_failed")
         raise HTTPException(status_code=500, detail=str(e))

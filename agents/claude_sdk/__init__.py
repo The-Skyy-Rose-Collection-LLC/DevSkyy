@@ -88,6 +88,17 @@ except ImportError as _e:
     _logger.debug("ToolProfile unavailable: %s", _e)
     ToolProfile = None  # type: ignore[assignment,misc]
 
+try:
+    from .dashboard import (
+        DashboardHealthResponse,
+        DashboardOrchestrator,
+        DashboardRequest,
+        DashboardResult,
+    )
+except ImportError as _e:
+    _logger.debug("DashboardOrchestrator unavailable: %s", _e)
+    DashboardOrchestrator = None  # type: ignore[assignment,misc]
+
 __all__ = [
     # Original standalone agents
     "ClaudeSDKBaseAgent",
@@ -115,4 +126,9 @@ __all__ = [
     "build_writer_agent",
     "build_code_agent",
     "build_domain_agents",
+    # Dashboard orchestrator
+    "DashboardOrchestrator",
+    "DashboardRequest",
+    "DashboardResult",
+    "DashboardHealthResponse",
 ]
