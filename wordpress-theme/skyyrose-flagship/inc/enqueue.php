@@ -187,6 +187,9 @@ function skyyrose_enqueue_global_scripts() {
 			array(
 				'context'   => $mascot_context,
 				'assetsUri' => SKYYROSE_ASSETS_URI . '/images/mascot/',
+				'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
+				'nonce'     => wp_create_nonce( 'skyyrose-nonce' ),
+				'homeUrl'   => home_url( '/' ),
 			)
 		);
 	}

@@ -1,14 +1,12 @@
 /**
  * Brand Mascot Styles
  *
- * Styling for the SkyyRose brand mascot across all placements:
- * - Kids Capsule collection page (primary)
- * - 404 error page (fun error state)
- * - Homepage (greeting element)
- * - Pre-order page (CTA)
+ * Two distinct mascot systems:
+ * 1. Static in-page mascot sections (Kids Capsule, 404)
+ * 2. Skyy — living mascot widget (cinematic walk-on, speech bubbles, choice chips)
  *
  * @package SkyyRose_Flagship
- * @since   3.2.0
+ * @since   4.0.0
  */
 
 /* ===================================================================
@@ -188,7 +186,7 @@
 }
 
 /* ===================================================================
-   Responsive
+   Responsive — Kids Capsule + 404
    =================================================================== */
 
 @media (max-width: 768px) {
@@ -221,313 +219,308 @@
 }
 
 /* ===================================================================
-   Reduced Motion
+   SKYY — Living Mascot Widget
+   Cinematic walk-on · speech bubbles · choice chips
    =================================================================== */
 
-/* ===================================================================
-   INTERACTIVE WALKING MASCOT WIDGET
-   =================================================================== */
+/* --- Keyframes --- */
+
+@keyframes skyy-walk-on {
+	0%   { transform: translateX(120%) scale(0.35) translateY(40px); opacity: 0; }
+	40%  { opacity: 1; }
+	70%  { transform: translateX(8%) scale(1.04) translateY(-4px); }
+	100% { transform: translateX(0) scale(1) translateY(0); }
+}
+
+@keyframes skyy-walk-off {
+	0%   { transform: translateX(0) scale(1); opacity: 1; }
+	100% { transform: translateX(140%) scale(0.45); opacity: 0; }
+}
+
+@keyframes skyy-breathe {
+	0%, 100% {
+		transform: translateY(0);
+		filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.35));
+	}
+	50% {
+		transform: translateY(-6px);
+		filter: drop-shadow(0 20px 44px rgba(0, 0, 0, 0.5));
+	}
+}
+
+@keyframes skyy-speak-pulse {
+	0%, 100% { transform: scale(1.0); }
+	50%       { transform: scale(1.025); }
+}
+
+@keyframes skyy-excited {
+	0%   { transform: translateY(0) rotate(0deg); }
+	25%  { transform: translateY(-10px) rotate(-4deg); }
+	50%  { transform: translateY(-14px) rotate(3deg); }
+	75%  { transform: translateY(-8px) rotate(-2deg); }
+	100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* --- Widget Container --- */
 
 .skyyrose-mascot {
 	position: fixed;
 	bottom: 20px;
-	right: -200px;
+	right: 20px;
 	z-index: 9990;
 	display: flex;
-	flex-direction: column;
+	flex-direction: row-reverse;
 	align-items: flex-end;
-	transition: right 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+	gap: 12px;
 	pointer-events: none;
+	transform: translateX(140%);
+	opacity: 0;
 }
 
-.skyyrose-mascot--entering,
+.skyyrose-mascot--entering {
+	animation: skyy-walk-on 1.4s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+	pointer-events: auto;
+}
+
 .skyyrose-mascot--idle {
-	right: 20px;
+	transform: translateX(0) scale(1);
+	opacity: 1;
 	pointer-events: auto;
 }
 
 .skyyrose-mascot--exiting {
-	right: -200px;
+	animation: skyy-walk-off 0.6s ease-in forwards;
 	pointer-events: none;
 }
 
 .skyyrose-mascot--hidden {
-	display: none;
+	display: none !important;
 }
 
-/* Character button */
+/* --- Character Button --- */
+
 .skyyrose-mascot__character {
 	background: none;
 	border: none;
 	cursor: pointer;
-	position: relative;
 	padding: 0;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-.skyyrose-mascot__image {
-	width: 100px;
-	height: auto;
-	border-radius: 1rem;
-	filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.4));
-	transition: transform 0.3s ease;
-}
-
-/* Idle breathing animation */
-.skyyrose-mascot--idle .skyyrose-mascot__image {
-	animation: mascot-breathe 3s ease-in-out infinite;
-}
-
-@keyframes mascot-breathe {
-	0%, 100% { transform: translateY(0) scale(1); }
-	50% { transform: translateY(-4px) scale(1.02); }
-}
-
-/* Wave on hover */
-.skyyrose-mascot--waving .skyyrose-mascot__image {
-	animation: mascot-wave 0.5s ease-in-out;
-}
-
-@keyframes mascot-wave {
-	0%, 100% { transform: rotate(0deg); }
-	20% { transform: rotate(-8deg); }
-	40% { transform: rotate(8deg); }
-	60% { transform: rotate(-4deg); }
-	80% { transform: rotate(4deg); }
-}
-
-/* Walk-on entrance animation */
-.skyyrose-mascot--entering .skyyrose-mascot__image {
-	animation: mascot-walk-in 0.8s ease-out;
-}
-
-@keyframes mascot-walk-in {
-	0% { transform: translateX(100px) rotate(5deg); }
-	50% { transform: translateX(-10px) rotate(-2deg); }
-	100% { transform: translateX(0) rotate(0); }
-}
-
-/* Greeting speech bubble */
-.skyyrose-mascot__greeting {
-	position: absolute;
-	bottom: 100%;
-	right: 0;
-	margin-bottom: 12px;
-	padding: 0.625rem 1rem;
-	background: rgba(20, 20, 20, 0.95);
-	color: #fff;
-	font-size: 0.8rem;
-	font-weight: 500;
-	border-radius: 0.75rem;
-	white-space: nowrap;
-	border: 1px solid rgba(183, 110, 121, 0.3);
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-	opacity: 0;
-	transform: translateY(8px);
-	transition: opacity 0.3s ease, transform 0.3s ease;
-	pointer-events: none;
-}
-
-.skyyrose-mascot__greeting--visible {
-	opacity: 1;
-	transform: translateY(0);
-}
-
-.skyyrose-mascot__greeting::after {
-	content: '';
-	position: absolute;
-	bottom: -6px;
-	right: 20px;
-	width: 12px;
-	height: 12px;
-	background: rgba(20, 20, 20, 0.95);
-	border-right: 1px solid rgba(183, 110, 121, 0.3);
-	border-bottom: 1px solid rgba(183, 110, 121, 0.3);
-	transform: rotate(45deg);
-}
-
-/* Interaction Panel */
-.skyyrose-mascot__panel {
-	position: absolute;
-	bottom: calc(100% + 16px);
-	right: 0;
-	width: 280px;
-	background: rgba(18, 18, 18, 0.98);
-	border: 1px solid rgba(183, 110, 121, 0.25);
-	border-radius: 1rem;
-	box-shadow:
-		0 20px 50px rgba(0, 0, 0, 0.5),
-		0 0 40px rgba(183, 110, 121, 0.1);
-	overflow: hidden;
-	opacity: 0;
-	transform: translateY(16px) scale(0.95);
-	transition: opacity 0.3s ease, transform 0.3s ease;
-	pointer-events: none;
-}
-
-.skyyrose-mascot--panel-open .skyyrose-mascot__panel {
-	opacity: 1;
-	transform: translateY(0) scale(1);
-	pointer-events: auto;
-}
-
-.skyyrose-mascot__panel-header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 0.875rem 1rem;
-	background: linear-gradient(135deg, rgba(183, 110, 121, 0.15), rgba(183, 110, 121, 0.05));
-	border-bottom: 1px solid rgba(183, 110, 121, 0.15);
-}
-
-.skyyrose-mascot__panel-title {
-	font-size: 0.85rem;
-	font-weight: 700;
-	color: #B76E79;
-	letter-spacing: 0.05em;
-}
-
-.skyyrose-mascot__panel-close {
-	background: none;
-	border: none;
-	color: rgba(255, 255, 255, 0.5);
-	font-size: 1.2rem;
-	cursor: pointer;
-	padding: 4px 8px;
-	border-radius: 6px;
-	transition: color 0.2s, background 0.2s;
-}
-
-.skyyrose-mascot__panel-close:hover {
-	color: #fff;
-	background: rgba(255, 255, 255, 0.1);
-}
-
-.skyyrose-mascot__panel-body {
-	padding: 0.75rem;
-}
-
-/* Action Links */
-.skyyrose-mascot__actions {
-	display: flex;
-	flex-direction: column;
-	gap: 0.375rem;
-}
-
-.skyyrose-mascot__action {
-	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-	padding: 0.75rem;
-	color: rgba(255, 255, 255, 0.8);
-	text-decoration: none;
-	font-size: 0.85rem;
-	font-weight: 500;
-	border-radius: 0.5rem;
-	transition: background 0.2s, color 0.2s;
-}
-
-.skyyrose-mascot__action:hover {
-	background: rgba(255, 255, 255, 0.06);
-	color: #fff;
-}
-
-.skyyrose-mascot__action--highlight {
-	background: rgba(183, 110, 121, 0.1);
-	color: #B76E79;
-	font-weight: 600;
-}
-
-.skyyrose-mascot__action--highlight:hover {
-	background: rgba(183, 110, 121, 0.2);
-	color: #d4919c;
-}
-
-.skyyrose-mascot__action-icon {
-	font-size: 1.1rem;
-	width: 28px;
-	text-align: center;
+	position: relative;
 	flex-shrink: 0;
 }
 
-/* Minimize Button */
+/* --- Character Image — full body, never cropped --- */
+
+.skyyrose-mascot__image {
+	width: 220px;
+	height: auto;
+	object-fit: contain;
+	display: block;
+	filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.35));
+}
+
+.skyyrose-mascot--idle .skyyrose-mascot__image {
+	animation: skyy-breathe 3.5s ease-in-out infinite;
+}
+
+.skyy--speaking .skyyrose-mascot__image {
+	animation: skyy-speak-pulse 0.8s ease-in-out infinite;
+}
+
+.skyy--excited .skyyrose-mascot__image {
+	animation: skyy-excited 0.65s ease-out;
+}
+
+.skyy--glancing .skyyrose-mascot__image {
+	filter: drop-shadow(0 12px 32px rgba(183, 110, 121, 0.55));
+}
+
+/* --- Speech Bubble (left of character via flex row-reverse) --- */
+
+.skyy-bubble {
+	position: relative;
+	background: rgba(14, 14, 14, 0.97);
+	border: 1.5px solid rgba(183, 110, 121, 0.5);
+	border-radius: 1rem;
+	padding: 0.875rem 1rem 0.75rem;
+	max-width: 240px;
+	min-width: 160px;
+	box-shadow:
+		0 8px 32px rgba(0, 0, 0, 0.5),
+		0 0 24px rgba(183, 110, 121, 0.08);
+	opacity: 0;
+	transform: translateX(12px) scale(0.95);
+	transition: opacity 0.25s ease, transform 0.25s ease;
+	pointer-events: none;
+	align-self: flex-end;
+	margin-bottom: 48px;
+}
+
+.skyy-bubble--visible {
+	opacity: 1;
+	transform: translateX(0) scale(1);
+	pointer-events: auto;
+}
+
+/* Right-pointing tail */
+.skyy-bubble::after {
+	content: '';
+	position: absolute;
+	right: -8px;
+	bottom: 24px;
+	width: 14px;
+	height: 14px;
+	background: rgba(14, 14, 14, 0.97);
+	border-top: 1.5px solid rgba(183, 110, 121, 0.5);
+	border-right: 1.5px solid rgba(183, 110, 121, 0.5);
+	transform: rotate(45deg);
+	border-radius: 0 2px 0 0;
+}
+
+.skyy-bubble__text {
+	font-size: 0.85rem;
+	line-height: 1.55;
+	color: rgba(255, 255, 255, 0.92);
+	margin: 0;
+	font-family: inherit;
+}
+
+/* --- Choice Chips --- */
+
+.skyy-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.375rem;
+	margin-top: 0.625rem;
+}
+
+.skyy-chip {
+	background: rgba(183, 110, 121, 0.12);
+	border: 1px solid rgba(183, 110, 121, 0.35);
+	color: #c08090;
+	font-size: 0.78rem;
+	font-weight: 600;
+	padding: 0.35rem 0.75rem;
+	border-radius: 999px;
+	cursor: pointer;
+	transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+	white-space: nowrap;
+	font-family: inherit;
+	line-height: 1.4;
+}
+
+.skyy-chip:hover,
+.skyy-chip:focus-visible {
+	background: rgba(183, 110, 121, 0.28);
+	border-color: #B76E79;
+	color: #fff;
+	outline: none;
+}
+
+/* --- Minimize Button (× at top-right of character) --- */
+
 .skyyrose-mascot__minimize {
 	position: absolute;
-	top: -8px;
+	top: 0;
 	right: -8px;
-	width: 24px;
-	height: 24px;
+	width: 22px;
+	height: 22px;
 	border-radius: 50%;
-	background: rgba(40, 40, 40, 0.9);
+	background: rgba(30, 30, 30, 0.92);
 	border: 1px solid rgba(255, 255, 255, 0.15);
-	color: rgba(255, 255, 255, 0.6);
+	color: rgba(255, 255, 255, 0.55);
+	font-size: 14px;
+	line-height: 1;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	opacity: 0;
-	transition: opacity 0.2s;
+	transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease;
 	z-index: 2;
 }
 
 .skyyrose-mascot--idle .skyyrose-mascot__minimize,
-.skyyrose-mascot--panel-open .skyyrose-mascot__minimize {
+.skyy--speaking .skyyrose-mascot__minimize {
 	opacity: 1;
 }
 
 .skyyrose-mascot__minimize:hover {
-	background: rgba(220, 50, 50, 0.8);
+	background: rgba(200, 40, 40, 0.85);
 	color: #fff;
 }
 
-/* Recall Button */
+/* --- Recall Pill (bottom-right when minimized) --- */
+
 .skyyrose-mascot__recall {
 	position: fixed;
 	bottom: 20px;
 	right: 20px;
-	width: 48px;
-	height: 48px;
-	border-radius: 50%;
-	background: linear-gradient(135deg, #B76E79, #d4919c);
-	border: none;
-	color: #fff;
-	cursor: pointer;
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	box-shadow: 0 4px 20px rgba(183, 110, 121, 0.4);
+	gap: 8px;
+	padding: 7px 14px 7px 7px;
+	background: linear-gradient(135deg, rgba(20, 20, 20, 0.97), rgba(32, 32, 32, 0.97));
+	border: 1px solid rgba(183, 110, 121, 0.4);
+	border-radius: 999px;
+	color: rgba(255, 255, 255, 0.85);
+	font-size: 0.8rem;
+	font-weight: 600;
+	cursor: pointer;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 	z-index: 9990;
-	transition: transform 0.2s, box-shadow 0.2s;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	font-family: inherit;
+}
+
+.skyyrose-mascot__recall img {
+	border-radius: 50%;
+	width: 32px;
+	height: 32px;
+	object-fit: cover;
 }
 
 .skyyrose-mascot__recall:hover {
-	transform: scale(1.1);
-	box-shadow: 0 6px 30px rgba(183, 110, 121, 0.6);
+	transform: scale(1.05);
+	box-shadow: 0 6px 28px rgba(183, 110, 121, 0.4);
 }
 
 /* ===================================================================
-   Responsive — Interactive Widget
+   Responsive — Skyy Widget
    =================================================================== */
 
 @media (max-width: 768px) {
+	.skyyrose-mascot {
+		bottom: 16px;
+		right: 16px;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 8px;
+	}
+
 	.skyyrose-mascot__image {
-		width: 70px;
+		width: 140px;
 	}
 
-	.skyyrose-mascot__panel {
-		width: 240px;
-		right: -10px;
+	.skyy-bubble {
+		max-width: 210px;
+		margin-bottom: 0;
+		align-self: flex-end;
 	}
 
-	.skyyrose-mascot__greeting {
-		font-size: 0.75rem;
+	/* On mobile, tail points downward (bubble is above character) */
+	.skyy-bubble::after {
+		right: 24px;
+		bottom: -8px;
+		top: auto;
+		transform: rotate(135deg);
 	}
 
-	.skyyrose-mascot__recall {
-		width: 40px;
-		height: 40px;
+	.skyy-chips {
+		flex-direction: column;
+	}
+
+	.skyy-chip {
+		text-align: center;
 	}
 }
 
@@ -538,8 +531,7 @@
 @media (prefers-reduced-motion: reduce) {
 	.collection-mascot__image,
 	.error-404-mascot__image,
-	.error-404-mascot__placeholder,
-	.skyyrose-mascot__image {
+	.error-404-mascot__placeholder {
 		animation: none !important;
 	}
 
@@ -552,16 +544,30 @@
 		transition: none;
 	}
 
+	/* Skyy widget — skip all animations, appear instantly */
 	.skyyrose-mascot {
-		transition: none;
+		transition: none !important;
 	}
 
 	.skyyrose-mascot--entering {
-		right: 20px;
+		animation: none !important;
+		transform: translateX(0) scale(1) !important;
+		opacity: 1 !important;
 	}
 
-	.skyyrose-mascot__panel,
-	.skyyrose-mascot__greeting {
-		transition: none;
+	.skyyrose-mascot--exiting {
+		animation: none !important;
+	}
+
+	.skyyrose-mascot__image,
+	.skyy--speaking .skyyrose-mascot__image,
+	.skyy--excited .skyyrose-mascot__image,
+	.skyyrose-mascot--idle .skyyrose-mascot__image {
+		animation: none !important;
+		filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.35));
+	}
+
+	.skyy-bubble {
+		transition: none !important;
 	}
 }
