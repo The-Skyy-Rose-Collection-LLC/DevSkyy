@@ -118,7 +118,7 @@ Entry point: `main_enterprise.py` — `uvicorn main_enterprise:app --host 0.0.0.
 
 **Symptom**: All product links go to `/pre-order/` instead of collection pages.
 **Cause**: `skyyrose_product_url()` fallback routes to pre-order when WooCommerce doesn't have the product.
-**Fix**: Verify `is_preorder` flags in `inc/product-catalog.php`. Non-preorder products should have `'is_preorder' => false`. The function checks this flag before routing.
+**Fix**: Verify `is_preorder` flags in `data/product-catalog.csv` (canonical source). The PHP theme reads this at runtime; `inc/product-catalog.php` is now a CSV reader, not a hardcoded array. Non-preorder products must have `is_preorder=0` in the CSV.
 
 ## Rollback Procedures
 

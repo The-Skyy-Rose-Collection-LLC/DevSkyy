@@ -187,6 +187,8 @@ DevSkyy/
 ├── orchestration/              # RAG, LangGraph workflows
 ├── services/                   # ML, 3D, Analytics
 ├── security/                   # JWT, OAuth2, AES-256-GCM
+├── data/
+│   └── product-catalog.csv     # CANONICAL product catalog (all 31 products)
 ├── scripts/                    # Active utilities (deploy, verify, php-lint)
 ├── tests/                      # pytest + jest
 └── docs/                       # Documentation
