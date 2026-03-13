@@ -64,7 +64,7 @@ slowapi==0.1.9
 fastapi-cors==0.0.6
 
 # Middleware
-starlette-context==0.4.0
+starlette-context==0.5.1
 
 # Docker-specific utilities
 docker==7.1.0
