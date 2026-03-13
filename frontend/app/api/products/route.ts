@@ -64,7 +64,6 @@ const PRICES: Record<string, { price: number; editionSize: number }> = {
   'lh-002': { price: 95, editionSize: 250 },
   'lh-003': { price: 75, editionSize: 250 },
   'lh-004': { price: 265, editionSize: 250 },
-  'lh-005': { price: 145, editionSize: 250 },
   'lh-006': { price: 45, editionSize: 250 },
   // Signature
   'sg-001': { price: 195, editionSize: 250 },
@@ -214,15 +213,6 @@ const PRODUCT_CATALOG: Record<string, RawProduct> = {
     description: 'Oakland street couture. Satin shell with bold fire-red Love Hurts script and hidden rose garden in hood. The statement piece.',
     short_description: 'Oakland street couture. Fire-red script, hidden rose garden.',
     seo_meta: 'SkyyRose Love Hurts Varsity Jacket — Oakland street couture.',
-    instagram: '',
-    tiktok: '',
-  },
-  'lh-005': {
-    name: 'Love Hurts Windbreaker',
-    collection: 'love-hurts',
-    description: 'Oakland fire meets the elements. Blush pink windbreaker with Love Hurts text and rose detailing. Lightweight and luxurious.',
-    short_description: 'Oakland fire meets the elements. Blush windbreaker.',
-    seo_meta: 'SkyyRose Love Hurts Windbreaker — blush luxury outerwear.',
     instagram: '',
     tiktok: '',
   },

@@ -149,13 +149,6 @@ export const COLLECTIONS: Record<CollectionSlug, CollectionConfig> = {
             image: '/images/scenes/love-hurts-product-4.jpg',
             sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
           },
-          {
-            id: 'lh-005',
-            name: 'Love Hurts Windbreaker',
-            price: 145,
-            image: '/images/scenes/love-hurts-product-5.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
         ],
       },
     ],
