@@ -48,7 +48,7 @@
     "@opentelemetry/auto-instrumentations-node": "^0.70.0",
     "@opentelemetry/exporter-metrics-otlp-http": "^0.212.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.212.0",
-    "@opentelemetry/sdk-node": "^0.212.0",
+    "@opentelemetry/sdk-node": "^0.213.0",
     "@pinecone-database/pinecone": "^7.1.0",
     "@pixiv/three-vrm": "^3.4.5",
     "@prisma/client": "^7.3.0",
