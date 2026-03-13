@@ -26,6 +26,8 @@ class AnalyticsCoreAgent(CoreAgent):
     - data_analyst: Reports, anomaly detection, data quality checks
     - trend_predictor: Forecasting, model drift detection, seasonal patterns
     - conversion_tracker: Funnel analysis, tracking validation, optimization
+    - algorithm: Product scoring, pricing, A/B testing, recommendation engine
+    - brand_intel: Competitive intelligence, SWOT, threat assessment, market gaps
     """
 
     core_type = CoreAgentType.ANALYTICS
@@ -50,6 +52,32 @@ class AnalyticsCoreAgent(CoreAgent):
                 self.register_sub_agent(alias, agent)
         except ImportError:
             logger.debug("[%s] AnalyticsOpsSubAgent unavailable", self.name)
+
+        # Algorithm agent (product scoring, pricing, A/B testing)
+        try:
+            from agents.core.analytics.sub_agents.algorithm_agent import (
+                AlgorithmSubAgent,
+            )
+
+            algo = AlgorithmSubAgent()
+            self.register_sub_agent("algorithm", algo)
+            for alias in AlgorithmSubAgent.ALIASES:
+                self.register_sub_agent(alias, algo)
+        except ImportError:
+            logger.debug("[%s] AlgorithmSubAgent unavailable", self.name)
+
+        # Brand intelligence agent (competitive intel, SWOT, threats)
+        try:
+            from agents.core.analytics.sub_agents.brand_intel_agent import (
+                BrandIntelAgent,
+            )
+
+            intel = BrandIntelAgent()
+            self.register_sub_agent("brand_intel", intel)
+            for alias in BrandIntelAgent.ALIASES:
+                self.register_sub_agent(alias, intel)
+        except ImportError:
+            logger.debug("[%s] BrandIntelAgent unavailable", self.name)
 
         # SDK-powered agents (data analysis + multi-agent reports)
         try:
@@ -96,6 +124,19 @@ class AnalyticsCoreAgent(CoreAgent):
         if any(kw in task_lower for kw in ["full report", "executive", "comprehensive"]):
             if "sdk_report_generator" in self._sub_agents:
                 return await self.delegate("sdk_report_generator", task, **kwargs)
+
+        if any(
+            kw in task_lower
+            for kw in ["competitor", "threat", "swot", "intel", "gap", "briefing", "whitespace"]
+        ):
+            if "brand_intel" in self._sub_agents:
+                return await self.delegate("brand_intel", task, **kwargs)
+
+        if any(
+            kw in task_lower for kw in ["score", "rank", "algorithm", "a/b", "pricing", "affinity"]
+        ):
+            if "algorithm" in self._sub_agents:
+                return await self.delegate("algorithm", task, **kwargs)
 
         if any(kw in task_lower for kw in ["conversion", "funnel", "tracking", "pixel"]):
             if "conversion_tracker" in self._sub_agents:
