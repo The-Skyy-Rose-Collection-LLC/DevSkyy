@@ -644,7 +644,7 @@ class AlgorithmSubAgent(SubAgent):
         return 0.5 * (1 + math.erf(x / math.sqrt(2)))
 
     @staticmethod
-    def _required_sample_size(rate_a: float, rate_b: float, power: float = 0.8) -> float:
+    def _required_sample_size(rate_a: float, rate_b: float, _power: float = 0.8) -> float:
         """Estimate required sample size per variant for given power."""
         if rate_a <= 0 or rate_b <= 0:
             return 1000.0  # Fallback
