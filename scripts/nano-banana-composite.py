@@ -33,6 +33,7 @@ Requires in .env.hf:
 
 import argparse
 import base64
+import csv as _csv
 import io
 import json
 import logging
@@ -103,158 +104,73 @@ DEFAULT_ORDER = ["gpt", "reve", "kontext", "ideogram", "replicate", "fal-fill"]
 
 
 # ── Product catalog ──────────────────────────────────────────────────────────
+# Composite-pipeline treatment descriptions — provider routing depends on these.
+# Name + source image are loaded from data/product-catalog.csv; treatment is
+# pipeline-specific and stays here as augmentation.
 
-PRODUCT_CATALOG = {
-    # Black Rose Collection
-    "br-001": {
-        "name": "BLACK Rose Crewneck",
-        "source": "br-001-techflat-v4.jpg",
-        "treatment": "embossed — pressed into fabric creating a raised, dimensional rose texture with subtle shadow depth",
-    },
-    "br-002": {
-        "name": "BLACK Rose Joggers",
-        "source": "br-002-joggers-source.jpg",
-        "treatment": "silicone rubber cut-out — raised 3D rubber logo with clean-cut edges standing proud of the black fabric",
-    },
-    "br-003": {
-        "name": "BLACK is Beautiful Jersey",
-        "source": "br-003-jersey-front-techflat.jpg",
-        "treatment": "sublimation print with rose-filled alternating numbers",
-    },
-    "br-004": {
-        "name": "BLACK Rose Hoodie",
-        "source": "br-004-hoodie-product.jpg",
-        "treatment": "embossed — pressed into hoodie fabric with dimensional depth and shadow",
-    },
-    "br-005": {
-        "name": "BLACK Rose Hoodie — Signature Edition",
-        "source": "br-005-hoodie-ltd-source.jpg",
-        "treatment": "embossed — pressed into fabric with subtle dimensional depth",
-    },
-    "br-006": {
-        "name": "BLACK Rose Sherpa Jacket",
-        "source": "br-006-sherpa-product.jpg",
-        "treatment": "embroidered patch on sherpa fleece texture",
-    },
-    "br-007": {
-        "name": "BLACK Rose × Love Hurts Basketball Shorts",
-        "source": "br-007-shorts-front-source.jpg",
-        "treatment": "screen-printed logo on mesh athletic fabric",
-    },
-    "br-008": {
-        "name": "Women's BLACK Rose Hooded Dress",
-        "source": "br-008-hooded-dress.webp",
-        "treatment": "embossed — pressed into dress fabric",
-    },
-    # Love Hurts Collection
-    "lh-002": {
-        "name": "Love Hurts Joggers",
-        "source": "lh-002-joggers-variants.jpg",
-        "treatment": "embroidered heart-and-thorns logo on athletic fabric",
-    },
-    "lh-003": {
-        "name": "Love Hurts Basketball Shorts",
-        "source": "lh-003-shorts-front-closeup.jpg",
-        "treatment": "sublimation print with heart motif on mesh fabric",
-    },
-    "lh-004": {
-        "name": "Love Hurts Varsity Jacket",
-        "source": "lh-004-varsity-source.jpg",
-        "treatment": "chenille patch letters and embroidered logo on wool/leather varsity jacket",
-    },
-    "lh-005": {
-        "name": "Love Hurts Windbreaker",
-        "source": "lh-005-bomber.webp",
-        "treatment": "embroidered logo on windbreaker nylon",
-    },
-    # Signature Collection
-    "sg-001": {
-        "name": "The Bay Set",
-        "source": "sg-001-bay-set.webp",
-        "treatment": "screen-printed logo on cotton hoodie and shorts",
-    },
-    "sg-002": {
-        "name": "Stay Golden Set",
-        "source": "sg-002-techflat-v4.jpg",
-        "treatment": "screen-printed golden logo on black cotton",
-    },
-    "sg-003": {
-        "name": "The Signature Tee",
-        "source": "sg-003.webp",
-        "treatment": "screen-printed SkyyRose script logo on cotton tee",
-    },
-    "sg-004": {
-        "name": "The Signature Hoodie",
-        "source": "sg-004-signature-hoodie.webp",
-        "treatment": "embroidered SkyyRose logo on heavyweight cotton hoodie",
-    },
-    "sg-005": {
-        "name": "Stay Golden Tee",
-        "source": "sg-005-stay-golden-tee.webp",
-        "treatment": "screen-printed gold logo on black cotton tee",
-    },
-    "sg-006": {
-        "name": "Mint & Lavender Hoodie",
-        "source": "sg-006-hoodie-source.jpg",
-        "treatment": "embroidered colorful logo on pastel hoodie",
-    },
-    "sg-008": {
-        "name": "Signature Crop Hoodie",
-        "source": "sg-008-crop-hoodie.webp",
-        "treatment": "embroidered logo on cropped hoodie",
-    },
-    "sg-009": {
-        "name": "The Sherpa Jacket",
-        "source": "sg-009-sherpa-jacket.webp",
-        "treatment": "embroidered patch on sherpa fleece",
-    },
-    "sg-010": {
-        "name": "The Bridge Series Shorts",
-        "source": "sg-010-bridge-shorts-variants.jpg",
-        "treatment": "screen-printed bridge graphic on mesh shorts",
-    },
-    "sg-011": {
-        "name": "Original Label Tee (White)",
-        "source": "sg-011-label-tee-white.webp",
-        "treatment": "woven label tag on cotton tee",
-    },
-    "sg-012": {
-        "name": "Original Label Tee (Orchid)",
-        "source": "sg-012-label-tee-orchid.webp",
-        "treatment": "woven label tag on orchid cotton tee",
-    },
-    # Pre-Order Products
-    "po-001": {
-        "name": "Red #80 Football Jersey",
-        "source": "br-design-football-jersey-red.jpg",
-        "treatment": "sublimation print with rose-filled numbers on athletic mesh",
-    },
-    "po-002": {
-        "name": '"THE BAY" Basketball Tank',
-        "source": "br-design-basketball-jersey.jpg",
-        "treatment": "sublimation print with Bay Area graphics on mesh jersey",
-    },
-    "po-003": {
-        "name": "White #32 Football Jersey",
-        "source": "br-design-football-jersey-white.jpg",
-        "treatment": "sublimation print with rose-filled numbers on white mesh",
-    },
-    "po-004": {
-        "name": "Black & Teal Hockey Jersey",
-        "source": "br-design-hockey-jersey.jpg",
-        "treatment": "sublimation print with teal accents on hockey mesh",
-    },
-    "po-005": {
-        "name": "Purple GG Bridge Mesh Shorts",
-        "source": "po-005-bridge-shorts-source.jpg",
-        "treatment": "screen-printed bridge graphic on purple mesh",
-    },
-    "po-006": {
-        "name": "Black Rose Crewneck & Joggers",
-        "source": "po-006-techflat.jpg",
-        "treatment": "embossed rose on crewneck + silicone rubber cut-out on joggers",
-    },
+_TREATMENTS: dict[str, str] = {
+    # Black Rose
+    "br-001": "embossed — pressed into fabric creating a raised, dimensional rose texture with subtle shadow depth",
+    "br-002": "silicone rubber cut-out — raised 3D rubber logo with clean-cut edges standing proud of the black fabric",
+    "br-003": "sublimation print with rose-filled alternating numbers",
+    "br-003-oakland": "sublimation print with rose-filled alternating numbers — Oakland colorway",
+    "br-003-giants": "sublimation print with rose-filled alternating numbers — Giants black/orange colorway",
+    "br-003-white": "sublimation print with rose-filled alternating numbers — white colorway",
+    "br-004": "embossed — pressed into hoodie fabric with dimensional depth and shadow",
+    "br-005": "embossed — pressed into fabric with subtle dimensional depth",
+    "br-006": "embroidered patch on sherpa fleece texture",
+    "br-007": "screen-printed logo on mesh athletic fabric",
+    "br-008": "sublimation print with rose-filled numbers on red athletic mesh — SF 49ers inspired, 80-piece exclusive",
+    "br-009": "sublimation print with rose-filled numbers on white mesh — LAST OAKLAND edition",
+    "br-010": "sublimation print with Bay Area graphics on mesh basketball jersey — THE BAY gold text",
+    "br-011": "sublimation print with teal rose crest on hooded hockey jersey — San Jose Sharks inspired",
+    # Love Hurts
+    "lh-002": "embroidered heart-and-thorns logo on athletic fabric",
+    "lh-003": "sublimation print with heart motif on mesh fabric",
+    "lh-004": "chenille patch letters and embroidered logo on wool/leather varsity jacket",
+    "lh-005": "embroidered logo on blush windbreaker nylon",
+    "lh-006": "embroidered logo on fanny pack nylon",
+    # Signature
+    "sg-001": "screen-printed logo on cotton — Bay Bridge shorts",
+    "sg-002": "screen-printed golden logo on black cotton shirt",
+    "sg-003": "screen-printed SkyyRose script logo on cotton shorts — Stay Golden",
+    "sg-004": "embroidered SkyyRose logo on heavyweight cotton hoodie",
+    "sg-005": "screen-printed gold logo on navy cotton shirt — Bay Bridge",
+    "sg-006": "embroidered colorful logo on mint/lavender pastel hoodie",
+    "sg-007": "embroidered signature rose on knit beanie",
+    "sg-009": "embroidered patch on cream sherpa fleece jacket",
+    "sg-011": "woven label tag on white cotton tee",
+    "sg-012": "woven label tag on orchid cotton tee",
+    "sg-013": "embroidered logo on mint/lavender crewneck",
+    "sg-014": "embroidered logo on mint/lavender sweatpants",
+    # Kids Capsule
+    "kids-001": "screen-printed V-chevron colorblock design on red/black hoodie and jogger set",
+    "kids-002": "screen-printed V-chevron colorblock design on purple/black hoodie and jogger set",
 }
+
+
+def _build_catalog() -> dict:
+    """Load product catalog from data/product-catalog.csv, overlay composite treatments."""
+    catalog: dict = {}
+    csv_path = PROJECT_ROOT / "data" / "product-catalog.csv"
+    with csv_path.open(newline="", encoding="utf-8") as f:
+        for row in _csv.DictReader(f):
+            sku = row["sku"].strip()
+            if not sku:
+                continue
+            source = row["render_source_override"].strip()
+            if not source:
+                slug = row["render_output_slug"].strip() or sku
+                source = f"{slug}.jpg"
+            catalog[sku] = {
+                "name": row["name"].strip(),
+                "source": source,
+                "treatment": _TREATMENTS.get(sku, "screen-printed logo"),
+            }
+    return catalog
+
+
+PRODUCT_CATALOG = _build_catalog()
 
 
 # ── Environment setup ────────────────────────────────────────────────────────

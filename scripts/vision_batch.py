@@ -17,6 +17,7 @@ Usage:
 """
 
 import argparse
+import csv as _csv
 import json
 import os
 import sys
@@ -32,16 +33,37 @@ for env_file in _ENV_FILES:
     if env_file.exists():
         load_dotenv(env_file, override=True)
 
-# Import product catalog from nano-banana (hyphenated filename needs importlib)
-import importlib.util
+# Load product catalog from the canonical CSV
 
-_nb_spec = importlib.util.spec_from_file_location(
-    "nano_banana_vton", _ROOT / "scripts" / "nano-banana-vton.py"
-)
-_nb_mod = importlib.util.module_from_spec(_nb_spec)
-_nb_spec.loader.exec_module(_nb_mod)
-PRODUCT_CATALOG = _nb_mod.PRODUCT_CATALOG
-ACCESSORY_SKUS = _nb_mod.ACCESSORY_SKUS
+
+def _load_catalog() -> dict:
+    catalog: dict = {}
+    csv_path = _ROOT / "data" / "product-catalog.csv"
+    with csv_path.open(newline="", encoding="utf-8") as f:
+        for row in _csv.DictReader(f):
+            sku = row["sku"].strip()
+            if not sku:
+                continue
+            entry: dict = {
+                "name": row["name"].strip(),
+                "collection": row["collection_slug"].strip(),
+                "is_preorder": row["is_preorder"].strip() == "1",
+                "output_slug": row["render_output_slug"].strip() or sku,
+                "is_tech_flat": row["render_is_tech_flat"].strip() == "1",
+                "is_accessory": row["render_is_accessory"].strip() == "1",
+            }
+            if row["render_source_override"].strip():
+                entry["source_override"] = row["render_source_override"].strip()
+            if row["render_back_source_override"].strip():
+                entry["back_source_override"] = row["render_back_source_override"].strip()
+            if row["render_variant_of"].strip():
+                entry["variant_of"] = row["render_variant_of"].strip()
+            catalog[sku] = entry
+    return catalog
+
+
+PRODUCT_CATALOG = _load_catalog()
+ACCESSORY_SKUS = {sku for sku, p in PRODUCT_CATALOG.items() if p["is_accessory"]}
 
 # Paths
 PRODUCTS_DIR = _ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
