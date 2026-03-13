@@ -561,9 +561,9 @@ class TestProductCatalogCoverage:
         )
 
         for sku in PRODUCT_FIDELITY_LEVELS:
-            assert (
-                sku in PRODUCT_GARMENT_TYPES
-            ), f"Fidelity level override for {sku} but SKU not in catalog"
+            assert sku in PRODUCT_GARMENT_TYPES, (
+                f"Fidelity level override for {sku} but SKU not in catalog"
+            )
 
     def test_palette_has_at_least_two_colors(self) -> None:
         from agents.product_generation.devskyy_fidelity.config import (
@@ -571,9 +571,9 @@ class TestProductCatalogCoverage:
         )
 
         for sku, palette in PRODUCT_COLOR_PALETTES.items():
-            assert (
-                len(palette) >= 2
-            ), f"SKU {sku} has only {len(palette)} color(s) — need at least 2"
+            assert len(palette) >= 2, (
+                f"SKU {sku} has only {len(palette)} color(s) — need at least 2"
+            )
 
     def test_known_sku_count(self) -> None:
         """Verify we have all 35 products (31 core + 4 variants)."""

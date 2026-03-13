@@ -159,15 +159,24 @@ PRODUCT_COLOR_PALETTES: dict[str, tuple[str, ...]] = {
         "#DC143C",
         "#B76E79",
     ),  # Varsity: black/white/crimson/rose gold
+    "lh-005": (
+        "#000000",
+        "#DC143C",
+        "#FFFFFF",
+    ),  # Windbreaker: black/crimson/white (brand palette — no garment analysis yet)
     # ── Signature ──────────────────────────────────────────────────────────
     "sg-001": ("#000000", "#D4AF37", "#B76E79"),  # Bay Set: black/gold/rose gold
     "sg-002": ("#000000", "#D4AF37", "#FFFFFF"),  # Stay Golden: black/gold/white
-    "sg-003": ("#DA70D6", "#FFFFFF", "#B76E79"),  # Orchid Tee: orchid/white/rose gold
+    "sg-003": (
+        "#4B247C",
+        "#D1A03F",
+        "#FFFFFF",
+    ),  # Stay Golden Shorts: deep indigo/golden yellow/white (sublimation)
     "sg-004": ("#303331", "#D4AF37", "#B76E79"),  # Sig Hoodie: charcoal/gold/rose gold
     "sg-005": ("#FFFFFF", "#D4AF37", "#000000"),  # Stay Golden Classic: white/gold/black
     "sg-006": ("#98FB98", "#E6E6FA", "#FFFFFF"),  # Mint & Lavender: mint/lavender/white
     "sg-009": ("#000000", "#B76E79", "#C0C0C0"),  # Sherpa: black/rose gold/silver
-    "sg-010": ("#000000", "#D4AF37", "#FFFFFF"),  # Bridge Shorts: black/gold/white
+    # sg-010 DELETED (purged Mar 11) — do not add back
     "sg-011": ("#FFFFFF", "#000000", "#B76E79"),  # Label Tee White: white/black/rose gold
     "sg-012": ("#DA70D6", "#000000", "#B76E79"),  # Label Tee Orchid: orchid/black/rose gold
     # ── Signature Accessories / New ────────────────────────────────────────
@@ -206,14 +215,14 @@ PRODUCT_GARMENT_TYPES: dict[str, str] = {
     "lh-002": "joggers",
     "lh-003": "basketball shorts",
     "lh-004": "varsity jacket",
+    "lh-005": "windbreaker",
     "sg-001": "matching set",
     "sg-002": "t-shirt",
-    "sg-003": "t-shirt",
+    "sg-003": "athletic shorts",
     "sg-004": "hoodie",
     "sg-005": "t-shirt",
     "sg-006": "hoodie",
     "sg-009": "sherpa jacket",
-    "sg-010": "shorts",
     "sg-011": "t-shirt",
     "sg-012": "t-shirt",
     "sg-007": "beanie",

@@ -46,7 +46,7 @@ class SDKCatalogManagerAgent(SDKSubAgent):
         return (
             "You are the DevSkyy Catalog Manager for SkyyRose.\n\n"
             "Product data sources (READ THESE — never invent SKUs):\n"
-            "- scripts/nano-banana-vton.py → PRODUCT_CATALOG dict\n"
+            "- data/product-catalog.csv → canonical product catalog\n"
             "- skyyrose/assets/data/garment-analysis.json → colors\n\n"
             "Collections:\n"
             "- Black Rose: br-001 through br-011 (11 products)\n"
