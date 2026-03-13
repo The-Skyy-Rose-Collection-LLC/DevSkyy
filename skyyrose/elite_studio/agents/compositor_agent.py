@@ -61,7 +61,6 @@ SCENE_LOOKBOOK: dict[str, dict[str, str]] = {
     "love-hurts-cathedral-rose-chamber": {
         "lh-001": "lh-001-model-m.webp",
         "lh-003": "lookbook",
-        "lh-005": "lh-005-composite-front.webp",
     },
     "signature-golden-gate-showroom": {
         "sg-005": "lookbook",

@@ -39,7 +39,6 @@ $cross_sell_map = array(
 	'lh-004' => array( 'lh-003', 'lh-002' ),  // Varsity → Shorts, Joggers
 	'lh-002' => array( 'lh-003', 'lh-006' ),  // Joggers → Shorts, Fannie
 	'lh-003' => array( 'lh-002', 'lh-004' ),  // Shorts → Joggers, Varsity
-	'lh-005' => array( 'lh-002', 'lh-003' ),  // Windbreaker → Joggers, Shorts
 	'lh-006' => array( 'lh-002', 'lh-003' ),  // Fannie → Joggers, Shorts
 	// Signature
 	'sg-006' => array( 'sg-014', 'sg-013' ),  // Mint & Lavender Hoodie → Sweatpants, Crewneck

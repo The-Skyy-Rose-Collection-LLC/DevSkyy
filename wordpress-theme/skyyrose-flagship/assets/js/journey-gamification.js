@@ -89,7 +89,6 @@
 			{ sku: 'lh-002', name: 'Love Hurts Joggers',               price: '$95',  image: '', url: '/pre-order/#lh-002' },
 			{ sku: 'lh-003', name: 'Love Hurts Basketball Shorts',     price: '$75',  image: '', url: '/pre-order/#lh-003' },
 			{ sku: 'lh-004', name: 'Love Hurts Varsity Jacket',        price: '$265', image: '', url: '/pre-order/#lh-004' },
-			{ sku: 'lh-005', name: 'Love Hurts Windbreaker',           price: '$145', image: '', url: '/pre-order/#lh-005' },
 			{ sku: 'lh-006', name: 'The Fannie',                       price: '$45',  image: '', url: '/pre-order/#lh-006' },
 		],
 		'signature': [

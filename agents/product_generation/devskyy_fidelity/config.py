@@ -159,11 +159,6 @@ PRODUCT_COLOR_PALETTES: dict[str, tuple[str, ...]] = {
         "#DC143C",
         "#B76E79",
     ),  # Varsity: black/white/crimson/rose gold
-    "lh-005": (
-        "#000000",
-        "#DC143C",
-        "#FFFFFF",
-    ),  # Windbreaker: black/crimson/white (brand palette — no garment analysis yet)
     # ── Signature ──────────────────────────────────────────────────────────
     "sg-001": ("#000000", "#D4AF37", "#B76E79"),  # Bay Set: black/gold/rose gold
     "sg-002": ("#000000", "#D4AF37", "#FFFFFF"),  # Stay Golden: black/gold/white
@@ -215,7 +210,6 @@ PRODUCT_GARMENT_TYPES: dict[str, str] = {
     "lh-002": "joggers",
     "lh-003": "basketball shorts",
     "lh-004": "varsity jacket",
-    "lh-005": "windbreaker",
     "sg-001": "matching set",
     "sg-002": "t-shirt",
     "sg-003": "athletic shorts",

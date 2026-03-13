@@ -97,7 +97,7 @@ $products_uri = $assets_uri . '/images/products';
 
 // Build product data for 3D world (ALL 5 LH products — ignores publish status).
 $lh_world_products = array();
-$lh_world_skus     = array( 'lh-002', 'lh-003', 'lh-004', 'lh-005', 'lh-006' );
+$lh_world_skus     = array( 'lh-002', 'lh-003', 'lh-004', 'lh-006' );
 
 foreach ( $lh_world_skus as $sku ) {
 	$p = function_exists( 'skyyrose_get_product' ) ? skyyrose_get_product( $sku ) : null;
@@ -198,7 +198,6 @@ $world_config = array(
 	'productPlacements' => array(
 		array( 'sku' => 'lh-006', 'position' => array( 3.0, 2.0, -1.0 ) ),
 		array( 'sku' => 'lh-003', 'position' => array( -2.5, 1.5, -3.0 ) ),
-		array( 'sku' => 'lh-005', 'position' => array( 1.0, 2.5, -6.0 ) ),
 		array( 'sku' => 'lh-002', 'position' => array( -3.0, 1.8, -9.0 ) ),
 		array( 'sku' => 'lh-004', 'position' => array( 2.0, 2.2, -13.0 ) ),
 	),

@@ -279,14 +279,14 @@ nonce verification on forms, esc_html/esc_attr on all output
 - Logo placement map: header=SR Monogram, footer=SR Monogram + text, favicon=SR Monogram, \
 collection hero=collection-specific logo centered above heading, product cards=NO logo
 
-## Products (28 total, 4 collections)
+## Products (27 total, 4 collections)
 ### BLACK ROSE (8): br-001 BLACK Rose Crewneck, br-002 BLACK Rose Joggers, \
 br-003 BLACK is Beautiful Jersey, br-004 BLACK Rose Hoodie, \
 br-005 BLACK Rose Hoodie — Signature Edition, br-006 BLACK Rose Sherpa Jacket, \
 br-007 BLACK Rose × Love Hurts Basketball Shorts, br-008 Women's BLACK Rose Hooded Dress
-### LOVE HURTS (5): lh-001 The Fannie, lh-002 Love Hurts Joggers, \
+### LOVE HURTS (4): lh-002 Love Hurts Joggers, \
 lh-003 Love Hurts Basketball Shorts, lh-004 Love Hurts Varsity Jacket, \
-lh-005 Love Hurts Bomber Jacket
+lh-006 The Fannie
 ### SIGNATURE (14): sg-001 The Bay Set, sg-002 Stay Golden Set, \
 sg-003 The Signature Tee, sg-004 The Signature Tee — White, sg-005 Stay Golden Tee, \
 sg-006 Mint & Lavender Hoodie, sg-007 The Signature Beanie, sg-008 The Signature Beanie, \

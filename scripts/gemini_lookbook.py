@@ -165,7 +165,7 @@ COLLECTIONS = {
             },
             {
                 "sku": "sg-009",
-                "ref": "lh-005-bomber.webp",
+                "ref": "sg-009-sherpa.webp",
                 "desc": "Sherpa jacket with SkyyRose branding",
                 "placement": "draped over designer chair, far left",
             },

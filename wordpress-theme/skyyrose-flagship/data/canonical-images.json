@@ -107,16 +107,6 @@
       "wp_id": null,
       "status": "placeholder_only"
     },
-    "lh-005": {
-      "name": "Love Hurts Windbreaker",
-      "collection": "love-hurts",
-      "local_webp": "lh-005-bomber.webp",
-      "local_jpg": "lh-005-bomber.jpg",
-      "wp_source": "LH_MEN_WINDBREAKER_JACKET_1_main-1.webp",
-      "wp_source_womens": "LH_WOMENS_WINDBREAKER_JACKETS_main-1.webp",
-      "wp_id": 8888,
-      "status": "webp_downloaded"
-    },
     "sg-001": {
       "name": "The Bay Set",
       "collection": "signature",

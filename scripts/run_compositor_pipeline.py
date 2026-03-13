@@ -159,14 +159,6 @@ COLLECTIONS = {
         "output_file": "love-hurts-cathedral-rose-chamber-lookbook.webp",
         "products": [
             {
-                "sku": "lh-005",
-                "ref_image": "lh-005-back-model.webp",
-                "x_pct": 0.35,
-                "y_pct": 0.05,
-                "scale": 0.28,
-                "placement": "back of Love Hurts bomber jacket displayed open on gothic stone wall, centered prominently, showing full back design and branding",
-            },
-            {
                 "sku": "lh-003",
                 "ref_image": "lh-003-shorts-front-source.jpg",
                 "x_pct": 0.70,
