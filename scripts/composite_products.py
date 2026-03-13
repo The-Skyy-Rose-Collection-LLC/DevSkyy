@@ -79,10 +79,6 @@ SCENES = {
         "background": "love-hurts-cathedral-rose-chamber-v2.png",
         "products": [
             {
-                "sku": "lh-005",
-                "placement": "draped beside enchanted rose glass dome, center-left of scene",
-            },
-            {
                 "sku": "lh-001",
                 "placement": "hung from gothic candelabra stand, right side of scene",
             },

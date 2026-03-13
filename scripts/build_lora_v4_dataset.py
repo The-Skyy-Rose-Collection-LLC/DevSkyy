@@ -238,29 +238,6 @@ PRODUCTS = {
         "techflat": "lh-004-techflat-photo.jpeg",
         "model_shots": [],
     },
-    "lh-005-hoodie-set": {
-        "trigger": "skyyrose_lh005_hoodie",
-        "name": "Love Hurts Windbreaker Hoodie Set",
-        "caption": (
-            "skyyrose_lh005_hoodie Love Hurts windbreaker hoodie set, "
-            "zip-up windbreaker jacket with hood and matching pants, "
-            "Love Hurts branding, multi-panel colorblock design, "
-            "Love Hurts Collection by SkyyRose, luxury streetwear windbreaker set"
-        ),
-        "techflat": "lh-005-techflat-hoodie-set.jpeg",
-        "model_shots": [],  # Model shot is pink/green, not red/black/white
-    },
-    "lh-005-purple": {
-        "trigger": "skyyrose_lh005_purple",
-        "name": "Love Hurts Windbreaker (Purple Colorway)",
-        "caption": (
-            "skyyrose_lh005_purple Love Hurts windbreaker in purple colorway, "
-            "zip-up jacket with bold purple panels and Love Hurts branding, "
-            "Love Hurts Collection by SkyyRose, luxury streetwear windbreaker"
-        ),
-        "techflat": "lh-005-techflat-purple.jpeg",
-        "model_shots": [],
-    },
     # ═══ SIGNATURE COLLECTION ═══
     "sg-002": {
         "trigger": "skyyrose_sg002",

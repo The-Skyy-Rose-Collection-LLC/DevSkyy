@@ -128,7 +128,6 @@ _TREATMENTS: dict[str, str] = {
     "lh-002": "embroidered heart-and-thorns logo on athletic fabric",
     "lh-003": "sublimation print with heart motif on mesh fabric",
     "lh-004": "chenille patch letters and embroidered logo on wool/leather varsity jacket",
-    "lh-005": "embroidered logo on blush windbreaker nylon",
     "lh-006": "embroidered logo on fanny pack nylon",
     # Signature
     "sg-001": "screen-printed logo on cotton — Bay Bridge shorts",

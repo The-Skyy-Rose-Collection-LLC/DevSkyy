@@ -226,11 +226,6 @@ LOGO_TREATMENTS = {
         "back center: large LOVE HURTS HEART GRAPHIC — cracked red heart wrapped in thorny "
         "branches, three red roses growing upward, blood-splash drips — dominant back print"
     ),
-    "lh-005": (
-        "front chest left: LOVE HURTS WORDMARK — red graffiti bubble-script 'Love Hurts' with "
-        "black outline and thorned heart, sized ~8 in, contrast against blush pink fabric; "
-        "back: 'Love Hurts' text in embroidered script; rose detailing at cuffs/hem"
-    ),
     "lh-006": (
         "front face of fanny pack: LOVE HURTS HEART GRAPHIC — cracked red heart tightly wrapped "
         "in dark thorny branches, three red roses with green stems growing upward from top, "

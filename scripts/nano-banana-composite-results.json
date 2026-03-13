@@ -1,6 +1,6 @@
 {
-  "total": 29,
-  "success": 24,
+  "total": 28,
+  "success": 23,
   "failed": 5,
   "results": [
     {
@@ -116,20 +116,6 @@
       "qa_pass": true,
       "qa_issues": [
         "Jacket material mismatch: The prompt specified 'wool/leather varsity jacket,' but the composite image displays a satin varsity jacket. While the logo's material (chenille/embroidery) is well-represented, the base garment's material type does not match the request."
-      ]
-    },
-    {
-      "sku": "lh-005",
-      "name": "Love Hurts Windbreaker",
-      "status": "success",
-      "provider": "kontext",
-      "tier": 3,
-      "size_kb": 216.7,
-      "qa_score": 83,
-      "qa_pass": true,
-      "qa_issues": [
-        "The logo appears to be a small woven label or patch attached to the windbreaker, rather than direct embroidery stitched onto the nylon fabric.",
-        "Any text or symbols within the small logo tag are not legible due to their size."
       ]
     },
     {
