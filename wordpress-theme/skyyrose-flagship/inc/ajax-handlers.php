@@ -498,3 +498,41 @@ function skyyrose_ajax_track_referral() {
 }
 add_action( 'wp_ajax_skyyrose_track_referral', 'skyyrose_ajax_track_referral' );
 add_action( 'wp_ajax_nopriv_skyyrose_track_referral', 'skyyrose_ajax_track_referral' );
+
+/*--------------------------------------------------------------
+ * Mascot Chat (Scripted — future AI upgrade hook)
+ *--------------------------------------------------------------*/
+
+/**
+ * Handle mascot chip interaction AJAX call.
+ *
+ * Rate-limited to 20 requests/minute per IP. Currently returns scripted
+ * responses (JS handles conversation trees client-side). Reserved for
+ * future Claude API integration.
+ *
+ * @since 4.0.0
+ * @return void
+ */
+function skyyrose_ajax_mascot_chat() {
+	// Verify nonce.
+	if ( ! isset( $_POST['nonce'] ) ||
+		! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'skyyrose-nonce' ) ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Security check failed.', 'skyyrose-flagship' ) ) );
+		return;
+	}
+
+	// Rate limit: 20 requests per minute per IP.
+	$ip_key = 'skyy_chat_' . md5( isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '' );
+	$count  = (int) get_transient( $ip_key );
+	if ( $count >= 20 ) {
+		wp_send_json_error( array( 'message' => esc_html__( 'Too many requests. Slow down!', 'skyyrose-flagship' ) ) );
+		return;
+	}
+	set_transient( $ip_key, $count + 1, MINUTE_IN_SECONDS );
+
+	// JS handles all scripted responses client-side.
+	// This endpoint is reserved for future AI integration.
+	wp_send_json_success( array( 'ok' => true ) );
+}
+add_action( 'wp_ajax_skyyrose_mascot_chat', 'skyyrose_ajax_mascot_chat' );
+add_action( 'wp_ajax_nopriv_skyyrose_mascot_chat', 'skyyrose_ajax_mascot_chat' );

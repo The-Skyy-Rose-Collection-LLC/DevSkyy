@@ -1,16 +1,16 @@
 <?php
 /**
- * Template Part: Interactive Brand Mascot Widget
+ * Template Part: Interactive Brand Mascot — Skyy
  *
- * The SkyyRose brand mascot walks onto the screen from the right side,
- * stands in the bottom-right corner, and acts as an interactive brand
- * ambassador. She wears collection-specific outfits based on the current page.
+ * Skyy walks cinematically onto the screen from the bottom-right, speaks
+ * through contextual speech bubbles with choice chips, and guides visitors
+ * through contextual paths. No panel, no chatbox — just Skyy talking.
  *
  * Usage: get_template_part( 'template-parts/mascot' );
  * Loaded automatically via functions.php wp_footer hook.
  *
  * @package SkyyRose_Flagship
- * @since   3.2.0
+ * @since   4.0.0
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -35,118 +35,99 @@ if ( is_front_page() ) {
 	$skyyrose_mascot_context = '404';
 }
 
-// Mascot image paths — prefer collection-specific PNG, fallback to SVG.
-$skyyrose_mascot_dir = SKYYROSE_DIR . '/assets/images/mascot/';
-$skyyrose_mascot_uri = SKYYROSE_ASSETS_URI . '/images/mascot/';
-$skyyrose_mascot_img = $skyyrose_mascot_uri . 'mascot-fallback.svg';
+// Image selection:
+// - Collection pages get outfit-specific PNGs (black-rose, love-hurts, signature, kids-capsule).
+// - All other contexts use the canonical pointing/red-tee pose.
+// - Fallback chain: pointing.png → reference.png → mascot-fallback.svg
+$skyyrose_mascot_dir         = SKYYROSE_DIR . '/assets/images/mascot/';
+$skyyrose_mascot_uri         = SKYYROSE_ASSETS_URI . '/images/mascot/';
+$skyyrose_mascot_img         = $skyyrose_mascot_uri . 'mascot-fallback.svg';
+$skyyrose_collection_ctxs    = array( 'black-rose', 'love-hurts', 'signature', 'kids-capsule' );
 
-// Try context-specific PNG first, then reference PNG, then idle PNG, then SVG fallback.
-$skyyrose_context_file = 'skyyrose-mascot-' . $skyyrose_mascot_context . '.png';
-if ( file_exists( $skyyrose_mascot_dir . $skyyrose_context_file ) ) {
-	$skyyrose_mascot_img = $skyyrose_mascot_uri . $skyyrose_context_file;
-} elseif ( file_exists( $skyyrose_mascot_dir . 'skyyrose-mascot-reference.png' ) ) {
-	$skyyrose_mascot_img = $skyyrose_mascot_uri . 'skyyrose-mascot-reference.png';
-} elseif ( file_exists( $skyyrose_mascot_dir . 'skyy-idle.png' ) ) {
-	$skyyrose_mascot_img = $skyyrose_mascot_uri . 'skyy-idle.png';
+if ( in_array( $skyyrose_mascot_context, $skyyrose_collection_ctxs, true ) ) {
+	// Try collection-specific PNG first.
+	$skyyrose_context_file = 'skyyrose-mascot-' . $skyyrose_mascot_context . '.png';
+	if ( file_exists( $skyyrose_mascot_dir . $skyyrose_context_file ) ) {
+		$skyyrose_mascot_img = $skyyrose_mascot_uri . $skyyrose_context_file;
+	} elseif ( file_exists( $skyyrose_mascot_dir . 'skyyrose-mascot-pointing.png' ) ) {
+		$skyyrose_mascot_img = $skyyrose_mascot_uri . 'skyyrose-mascot-pointing.png';
+	} elseif ( file_exists( $skyyrose_mascot_dir . 'skyyrose-mascot-reference.png' ) ) {
+		$skyyrose_mascot_img = $skyyrose_mascot_uri . 'skyyrose-mascot-reference.png';
+	}
+} else {
+	// Default: canonical pointing pose.
+	if ( file_exists( $skyyrose_mascot_dir . 'skyyrose-mascot-pointing.png' ) ) {
+		$skyyrose_mascot_img = $skyyrose_mascot_uri . 'skyyrose-mascot-pointing.png';
+	} elseif ( file_exists( $skyyrose_mascot_dir . 'skyyrose-mascot-reference.png' ) ) {
+		$skyyrose_mascot_img = $skyyrose_mascot_uri . 'skyyrose-mascot-reference.png';
+	}
 }
 ?>
 
-<!-- Brand Mascot Widget -->
+<!-- Skyy — Living Brand Mascot -->
 <div
 	id="skyyrose-mascot"
 	class="skyyrose-mascot"
 	role="complementary"
-	aria-label="<?php esc_attr_e( 'SkyyRose Brand Ambassador', 'skyyrose-flagship' ); ?>"
+	aria-label="<?php esc_attr_e( 'Skyy \xe2\x80\x94 SkyyRose Brand Ambassador', 'skyyrose-flagship' ); ?>"
 	data-context="<?php echo esc_attr( $skyyrose_mascot_context ); ?>"
 	aria-hidden="true"
 >
-	<!-- Mascot Character -->
+	<!-- Speech Bubble (rendered left of character via flex row-reverse) -->
+	<div class="skyy-bubble" id="skyy-bubble" aria-live="polite" role="status" hidden>
+		<p class="skyy-bubble__text" id="skyy-bubble-text"></p>
+		<div
+			class="skyy-chips"
+			id="skyy-chips"
+			role="group"
+			aria-label="<?php esc_attr_e( 'Reply options', 'skyyrose-flagship' ); ?>"
+		></div>
+	</div>
+
+	<!-- Character — clicking replays greeting or dismisses bubble -->
 	<button
 		type="button"
 		class="skyyrose-mascot__character"
 		id="skyyrose-mascot-trigger"
-		aria-label="<?php esc_attr_e( 'Talk to our brand ambassador', 'skyyrose-flagship' ); ?>"
+		aria-label="<?php esc_attr_e( 'Talk to Skyy', 'skyyrose-flagship' ); ?>"
 		aria-expanded="false"
-		aria-controls="skyyrose-mascot-panel"
 	>
 		<img
 			src="<?php echo esc_url( $skyyrose_mascot_img ); ?>"
-			alt="<?php esc_attr_e( 'SkyyRose brand mascot', 'skyyrose-flagship' ); ?>"
+			alt="<?php esc_attr_e( 'Skyy, SkyyRose brand ambassador', 'skyyrose-flagship' ); ?>"
 			class="skyyrose-mascot__image"
-			width="120"
-			height="160"
-			loading="lazy"
+			width="220"
+			height="auto"
+			loading="eager"
 			decoding="async"
 		/>
-		<span class="skyyrose-mascot__greeting" aria-live="polite">
-			<?php esc_html_e( 'Hey! Need help?', 'skyyrose-flagship' ); ?>
-		</span>
 	</button>
 
-	<!-- Interaction Panel -->
-	<div
-		class="skyyrose-mascot__panel"
-		id="skyyrose-mascot-panel"
-		role="dialog"
-		aria-modal="true"
-		aria-label="<?php esc_attr_e( 'Brand Ambassador Panel', 'skyyrose-flagship' ); ?>"
-		aria-hidden="true"
-	>
-		<div class="skyyrose-mascot__panel-header">
-			<span class="skyyrose-mascot__panel-title">
-				<?php esc_html_e( 'SkyyRose Guide', 'skyyrose-flagship' ); ?>
-			</span>
-			<button
-				type="button"
-				class="skyyrose-mascot__panel-close"
-				aria-label="<?php esc_attr_e( 'Close panel', 'skyyrose-flagship' ); ?>"
-			>
-				&times;
-			</button>
-		</div>
-
-		<div class="skyyrose-mascot__panel-body">
-			<!-- Dynamic content based on page context -->
-			<div class="skyyrose-mascot__actions">
-				<a href="<?php echo esc_url( home_url( '/shop/' ) ); ?>" class="skyyrose-mascot__action">
-					<span class="skyyrose-mascot__action-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
-					<span><?php esc_html_e( 'Shop Collections', 'skyyrose-flagship' ); ?></span>
-				</a>
-				<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="skyyrose-mascot__action skyyrose-mascot__action--highlight">
-					<span class="skyyrose-mascot__action-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-					<span><?php esc_html_e( 'Pre-Order Now', 'skyyrose-flagship' ); ?></span>
-				</a>
-				<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="skyyrose-mascot__action">
-					<span class="skyyrose-mascot__action-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-					<span><?php esc_html_e( 'Get Help', 'skyyrose-flagship' ); ?></span>
-				</a>
-				<a href="<?php echo esc_url( home_url( '/about/' ) ); ?>" class="skyyrose-mascot__action">
-					<span class="skyyrose-mascot__action-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
-					<span><?php esc_html_e( 'Our Story', 'skyyrose-flagship' ); ?></span>
-				</a>
-			</div>
-		</div>
-	</div>
-
-	<!-- Recall Button (when minimized) -->
-	<button
-		type="button"
-		class="skyyrose-mascot__recall"
-		id="skyyrose-mascot-recall"
-		aria-label="<?php esc_attr_e( 'Bring back brand ambassador', 'skyyrose-flagship' ); ?>"
-		aria-hidden="true"
-		style="display: none;"
-	>
-		<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
-	</button>
-
-	<!-- Minimize Button -->
+	<!-- Minimize — tiny × in top-right corner of character -->
 	<button
 		type="button"
 		class="skyyrose-mascot__minimize"
 		id="skyyrose-mascot-minimize"
-		aria-label="<?php esc_attr_e( 'Dismiss brand ambassador', 'skyyrose-flagship' ); ?>"
-	>
-		<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-	</button>
+		aria-label="<?php esc_attr_e( 'Dismiss Skyy', 'skyyrose-flagship' ); ?>"
+	>&times;</button>
 </div>
+
+<!-- Recall Pill — shown at bottom-right when Skyy is minimized -->
+<button
+	type="button"
+	class="skyyrose-mascot__recall"
+	id="skyyrose-mascot-recall"
+	aria-label="<?php esc_attr_e( 'Bring back Skyy', 'skyyrose-flagship' ); ?>"
+	style="display:none"
+>
+	<img
+		src="<?php echo esc_url( $skyyrose_mascot_img ); ?>"
+		width="32"
+		height="32"
+		alt=""
+		aria-hidden="true"
+		loading="lazy"
+		decoding="async"
+	/>
+	<span><?php esc_html_e( 'Skyy', 'skyyrose-flagship' ); ?></span>
+</button>
