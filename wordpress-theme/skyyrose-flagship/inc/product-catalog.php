@@ -5,8 +5,10 @@
  * Single source of truth for all product data across the SkyyRose theme.
  * All templates reference this file instead of maintaining duplicate arrays.
  *
- * Data sourced from products.csv (prices, descriptions, attributes)
- * and WordPress media library (image paths).
+ * Product data is maintained here directly. The canonical CSV
+ * (data/product-catalog.csv) drives Python render scripts; this PHP file
+ * is the WordPress-tier source of truth, adding image paths and publish
+ * flags that the CSV does not carry.
  *
  * @package SkyyRose_Flagship
  * @since   3.2.1
