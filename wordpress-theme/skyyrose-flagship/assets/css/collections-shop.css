@@ -73,13 +73,13 @@ transition:border-color .4s,transform .4s var(--ease-expo);position:relative}
 display:flex;align-items:center;justify-content:center;overflow:hidden}
 .shop-product-img svg{width:30%;opacity:.06}
 .shop-product-img .badge{position:absolute;top:12px;right:12px;font-family:var(--font-body);
-font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:5px 12px;border-radius:2px}
+font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:5px 12px;border-radius:2px}
 .badge-new{background:var(--rose);color:var(--white)}
 .badge-ltd{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--bone)}
 .badge-core{background:var(--gold);color:var(--void)}
 
 .shop-product-body{padding:clamp(16px,2vw,24px)}
-.shop-product-col{font-family:var(--font-body);font-size:9px;letter-spacing:3px;
+.shop-product-col{font-family:var(--font-body);font-size:11px;letter-spacing:3px;
 text-transform:uppercase;color:var(--mist);margin-bottom:6px}
 .shop-product-name{font-family:var(--font-heading);font-size:clamp(16px,1.8vw,20px);
 color:var(--bone);margin-bottom:12px;line-height:1.3}
@@ -98,7 +98,7 @@ background:transparent;color:var(--mist);border-radius:2px;cursor:pointer;transi
 .shop-banner{padding:clamp(32px,5vw,56px) clamp(20px,4vw,48px);text-align:center;
 border-top:1px solid var(--graphite);border-bottom:1px solid var(--graphite);
 margin:clamp(24px,4vw,48px) 0}
-.shop-banner-label{font-family:var(--font-body);font-size:9px;letter-spacing:5px;
+.shop-banner-label{font-family:var(--font-body);font-size:11px;letter-spacing:5px;
 text-transform:uppercase;color:var(--mist);margin-bottom:8px}
 .shop-banner h2{font-family:var(--font-display);font-size:clamp(28px,5vw,48px);
 letter-spacing:clamp(3px,.8vw,8px);color:var(--white);margin:0 0 8px;line-height:1}

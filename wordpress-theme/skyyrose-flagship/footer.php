@@ -161,9 +161,9 @@
 					<ul class="footer-grid__list">
 						<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Contact Us', 'skyyrose-flagship' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/contact/#faq' ) ); ?>"><?php esc_html_e( 'FAQ', 'skyyrose-flagship' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Shipping & Returns', 'skyyrose-flagship' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Size Guide', 'skyyrose-flagship' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/contact/#faq' ) ); ?>"><?php esc_html_e( 'Care Instructions', 'skyyrose-flagship' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/contact/#shipping-returns' ) ); ?>"><?php esc_html_e( 'Shipping & Returns', 'skyyrose-flagship' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/contact/#size-guide' ) ); ?>"><?php esc_html_e( 'Size Guide', 'skyyrose-flagship' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/contact/#care-instructions' ) ); ?>"><?php esc_html_e( 'Care Instructions', 'skyyrose-flagship' ); ?></a></li>
 					</ul>
 				</div>
 

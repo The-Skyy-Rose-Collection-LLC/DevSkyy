@@ -346,7 +346,10 @@ class TokenBlacklist:
     Token blacklist for revocation.
 
     In production, use Redis or database for persistence.
+    Capped at 10,000 entries to prevent unbounded memory growth.
     """
+
+    MAX_ENTRIES = 10_000
 
     def __init__(self) -> None:
         self._blacklist: dict[str, datetime] = {}  # jti -> expiry
@@ -356,6 +359,10 @@ class TokenBlacklist:
         """Add token to blacklist."""
         self._blacklist[jti] = expires_at
         self._cleanup()
+        # LRU eviction if over capacity
+        while len(self._blacklist) > self.MAX_ENTRIES:
+            oldest_jti = min(self._blacklist, key=self._blacklist.get)  # type: ignore[arg-type]
+            del self._blacklist[oldest_jti]
 
     def revoke_family(self, family_id: str) -> None:
         """Revoke all tokens in a family (e.g., on security breach)."""
@@ -475,6 +482,8 @@ class RateLimiter:
     In production, use Redis for distributed rate limiting.
     """
 
+    MAX_KEYS = 10_000
+
     def __init__(
         self,
         max_attempts: int = 5,
@@ -483,6 +492,12 @@ class RateLimiter:
         self.max_attempts = max_attempts
         self.window_seconds = window_seconds
         self._attempts: dict[str, list[datetime]] = defaultdict(list)
+
+    def _evict_if_needed(self) -> None:
+        """Evict oldest keys if over capacity."""
+        while len(self._attempts) > self.MAX_KEYS:
+            oldest_key = next(iter(self._attempts))
+            del self._attempts[oldest_key]
 
     def is_allowed(self, key: str) -> bool:
         """Check if action is allowed."""
@@ -493,6 +508,7 @@ class RateLimiter:
         """Record an attempt."""
         self._cleanup(key)
         self._attempts[key].append(datetime.now(UTC))
+        self._evict_if_needed()
 
     def get_remaining_attempts(self, key: str) -> int:
         """Get remaining attempts."""

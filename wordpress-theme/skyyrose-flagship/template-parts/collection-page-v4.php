@@ -64,11 +64,16 @@ if ( function_exists( 'wc_get_products' ) ) {
 	if ( ! empty( $wc_results ) ) {
 		foreach ( $wc_results as $wc_p ) {
 			$price = (float) $wc_p->get_price();
-			if ( $price < $min_price ) {
-				$min_price = $price;
-			}
-			if ( $price > $max_price ) {
-				$max_price = $price;
+			$is_wc_preorder = '1' === get_post_meta( $wc_p->get_id(), '_is_preorder', true );
+
+			// Skip $0 pre-order prices from range calculation.
+			if ( ! $is_wc_preorder || $price > 0 ) {
+				if ( $price < $min_price ) {
+					$min_price = $price;
+				}
+				if ( $price > $max_price ) {
+					$max_price = $price;
+				}
 			}
 
 			$sizes_attr = $wc_p->get_attribute( 'pa_size' );
@@ -128,6 +133,29 @@ if ( empty( $all_products ) ) {
 	$product_count = count( $all_products );
 }
 
+/*
+ * Display all products (including pre-orders) in the holo grid.
+ * The holo card handles pre-order state natively (badge, CTA, ship note).
+ */
+$catalog_products_display = $all_products;
+
+/* Recalculate counts and price range from all products. */
+$product_count = count( $catalog_products_display );
+$min_price     = PHP_INT_MAX;
+$max_price     = 0;
+
+foreach ( $catalog_products_display as $p ) {
+	$price = (float) $p['price'];
+	if ( $price > 0 ) {
+		if ( $price < $min_price ) {
+			$min_price = $price;
+		}
+		if ( $price > $max_price ) {
+			$max_price = $price;
+		}
+	}
+}
+
 /* Dynamic meta. */
 if ( $product_count > 0 && $min_price < PHP_INT_MAX ) {
 	$col['meta_pieces']      = $product_count . ' ' . _n( 'Piece', 'Pieces', $product_count, 'skyyrose-flagship' );
@@ -162,7 +190,7 @@ get_header();
 		<div class="col-hero__img">
 			<img src="<?php echo esc_url( $col['hero_image'] ); ?>"
 			     alt="<?php echo esc_attr( sprintf( __( '%s collection hero image', 'skyyrose-flagship' ), $col['name'] ) ); ?>"
-			     width="1920" height="1080" fetchpriority="high">
+			     width="1920" height="1080" loading="eager" fetchpriority="high" decoding="async">
 		</div>
 		<div class="col-hero__overlay"></div>
 		<div class="col-hero__content">
@@ -265,7 +293,7 @@ get_header();
 				<p class="col-feat__desc col-rv col-rv-d2"><?php echo esc_html( $featured['desc'] ); ?></p>
 				<div class="col-feat__sizes col-rv col-rv-d3">
 					<?php foreach ( $featured['sizes'] as $size ) : ?>
-						<button data-size="<?php echo esc_attr( $size ); ?>"><?php echo esc_html( $size ); ?></button>
+						<button type="button" data-size="<?php echo esc_attr( $size ); ?>"><?php echo esc_html( $size ); ?></button>
 					<?php endforeach; ?>
 				</div>
 				<a href="<?php echo esc_url( $featured['url'] ); ?>" class="col-feat__add col-rv col-rv-d3">
@@ -337,46 +365,28 @@ get_header();
 			</div>
 		</div>
 
-		<?php
-		if ( function_exists( 'skyyrose_render_interactive_grid' ) ) {
-			skyyrose_render_interactive_grid( $all_products, $col );
-		} else {
-			// Fallback: render legacy col-card grid if interactive-grid.php is not loaded.
-			?>
-			<div class="col-grid">
-				<?php foreach ( $all_products as $product ) : ?>
-					<div class="col-card"
-					     data-product-id="<?php echo esc_attr( $product['sku'] ); ?>"
-					     role="button"
-					     tabindex="0"
-					     aria-label="<?php echo esc_attr( sprintf( __( 'View %s', 'skyyrose-flagship' ), $product['name'] ) ); ?>">
-						<div class="col-card__img">
-							<?php if ( ! empty( $product['image'] ) ) : ?>
-								<img src="<?php echo esc_url( $product['image'] ); ?>"
-								     alt="<?php echo esc_attr( $product['name'] ); ?>"
-								     width="400" height="533" loading="lazy">
-							<?php else : ?>
-								<span class="col-card__letter"><?php echo esc_html( mb_substr( $product['name'], 0, 1 ) ); ?></span>
-							<?php endif; ?>
-						</div>
-						<div class="col-card__body">
-							<h3 class="col-card__name"><?php echo esc_html( $product['name'] ); ?></h3>
-							<div class="col-card__foot">
-								<span class="col-card__price"><?php echo wp_kses_post( $product['price_display'] ); ?></span>
-								<a href="<?php echo esc_url( $product['url'] ); ?>" class="col-card__view-btn">
-									<?php esc_html_e( 'Details', 'skyyrose-flagship' ); ?>
-								</a>
-							</div>
-						</div>
-					</div>
-				<?php endforeach; ?>
-			</div>
+		<div class="holo-grid">
 			<?php
-		}
-		?>
+			$holo_idx = 0;
+			foreach ( $catalog_products_display as $cat_product ) :
+				get_template_part( 'template-parts/product-card-holo', null, array(
+					'title'      => $cat_product['name'],
+					'price'      => $cat_product['price_display'],
+					'image_url'  => ! empty( $cat_product['image'] ) ? $cat_product['image'] : '',
+					'permalink'  => ! empty( $cat_product['url'] ) ? $cat_product['url'] : '#',
+					'collection' => $col['slug'],
+					'badge_text' => ! empty( $cat_product['badge'] ) ? $cat_product['badge'] : '',
+					'desc'       => ! empty( $cat_product['desc'] ) ? $cat_product['desc'] : '',
+					'sku'        => $cat_product['sku'],
+					'index'      => $holo_idx,
+				) );
+				$holo_idx++;
+			endforeach;
+			?>
+		</div>
 
 		<div style="text-align:center; padding:1rem 0 0;">
-			<button class="size-guide-trigger" data-open-size-guide
+			<button type="button" class="size-guide-trigger" data-open-size-guide
 			        aria-label="<?php esc_attr_e( 'Open size guide', 'skyyrose-flagship' ); ?>">
 				<svg class="size-guide-trigger__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
 					<path d="M6 2v20M18 2v20M6 12h12M6 7h12M6 17h12"/>
@@ -411,7 +421,7 @@ get_header();
 			<input type="email" class="col-nl__input"
 			       placeholder="<?php esc_attr_e( 'Your email address', 'skyyrose-flagship' ); ?>"
 			       aria-label="<?php esc_attr_e( 'Email address', 'skyyrose-flagship' ); ?>">
-			<button class="col-nl__btn"><?php esc_html_e( 'Join', 'skyyrose-flagship' ); ?></button>
+			<button type="button" class="col-nl__btn"><?php esc_html_e( 'Join', 'skyyrose-flagship' ); ?></button>
 			<?php wp_nonce_field( 'skyyrose_newsletter', '_wpnonce', false ); ?>
 		</div>
 	</section>
@@ -443,18 +453,18 @@ get_header();
      style="--col-accent: <?php echo esc_attr( $col['accent'] ); ?>; --col-accent-rgb: <?php echo esc_attr( $col['accent_rgb'] ); ?>;">
 	<div class="col-modal__bk"></div>
 	<div class="col-modal__card">
-		<button class="col-modal__close" aria-label="<?php esc_attr_e( 'Close', 'skyyrose-flagship' ); ?>">&times;</button>
+		<button type="button" class="col-modal__close" aria-label="<?php esc_attr_e( 'Close', 'skyyrose-flagship' ); ?>">&times;</button>
 		<div class="col-modal__img">
 			<span class="col-modal__letter"></span>
 		</div>
 		<div class="col-modal__body">
-			<h3 class="col-modal__name"></h3>
+			<h3 class="col-modal__name" aria-hidden="true"></h3>
 			<p class="col-modal__price"></p>
 			<p class="col-modal__desc"></p>
 			<div class="col-modal__sizes"></div>
 			<div class="col-modal__actions">
-				<button class="col-modal__add"><?php esc_html_e( 'View Product', 'skyyrose-flagship' ); ?></button>
-				<button class="col-modal__back"><?php esc_html_e( 'Back', 'skyyrose-flagship' ); ?></button>
+				<button type="button" class="col-modal__add"><?php esc_html_e( 'View Product', 'skyyrose-flagship' ); ?></button>
+				<button type="button" class="col-modal__back"><?php esc_html_e( 'Back', 'skyyrose-flagship' ); ?></button>
 			</div>
 			<p class="col-modal__sku"></p>
 		</div>
@@ -470,7 +480,7 @@ get_header();
 wp_localize_script(
 	'skyyrose-template-collection-v4',
 	'skyyRoseCollectionProducts',
-	$all_products
+	$catalog_products_display
 );
 
 /* Also pass product data to the interactive cards script. */
@@ -479,7 +489,7 @@ if ( wp_script_is( 'skyyrose-interactive-cards', 'enqueued' ) ) {
 		'skyyrose-interactive-cards',
 		'skyyRoseInteractiveProducts',
 		array(
-			'products' => $all_products,
+			'products' => $catalog_products_display,
 			'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
 			'nonce'    => wp_create_nonce( 'skyyrose-immersive-nonce' ),
 		)

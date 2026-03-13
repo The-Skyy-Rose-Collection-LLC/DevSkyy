@@ -8,7 +8,7 @@ Uses LLM routing to generate brand-voice captions, hashtag strategies, and campa
 Features:
 - Platform-specific formatting (character limits, hashtag strategies, media recommendations)
 - Campaign generation (multi-product, multi-platform)
-- Brand voice enforcement (SkyyRose luxury fashion, "Where Love Meets Luxury", rose gold #B76E79)
+- Brand voice enforcement (SkyyRose luxury fashion, "Luxury Grows from Concrete.", rose gold #B76E79)
 - Content types: product_launch, collection_drop, behind_scenes, lifestyle, engagement
 - Scheduling recommendations based on platform best practices
 - 3 collections: Black Rose (gothic luxury), Love Hurts (street passion), Signature (West Coast luxury)
@@ -19,6 +19,7 @@ Version: 2.0.0
 
 from __future__ import annotations
 
+import csv
 import hashlib
 import json
 import logging
@@ -28,6 +29,7 @@ from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
+from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -42,7 +44,7 @@ _MAX_QUEUE_SIZE = 5000
 _MAX_PUBLISHED_SIZE = 10000
 
 BRAND_NAME = "SkyyRose"
-BRAND_TAGLINE = "Where Love Meets Luxury"
+BRAND_TAGLINE = "Luxury Grows from Concrete."
 BRAND_PRIMARY_COLOR = "#B76E79"  # Rose gold
 BRAND_ORIGIN = "Oakland, CA"
 BRAND_SITE = "skyyrose.co"
@@ -280,29 +282,23 @@ COLLECTIONS: dict[str, dict[str, Any]] = {
 }
 
 
-# Product catalog (mirrors frontend PRODUCT_SKUS)
-PRODUCT_CATALOG: dict[str, dict[str, str]] = {
-    "br-001": {"name": "BLACK Rose Crewneck", "collection": "black-rose"},
-    "br-002": {"name": "BLACK Rose Joggers", "collection": "black-rose"},
-    "br-003": {"name": "BLACK is Beautiful Jersey", "collection": "black-rose"},
-    "br-004": {"name": "BLACK Rose Hoodie", "collection": "black-rose"},
-    "br-005": {"name": "BLACK Rose Hoodie - Signature Ed.", "collection": "black-rose"},
-    "br-006": {"name": "BLACK Rose Sherpa Jacket", "collection": "black-rose"},
-    "br-007": {"name": "BLACK Rose x Love Hurts Shorts", "collection": "black-rose"},
-    "br-008": {"name": "Women's BLACK Rose Hooded Dress", "collection": "black-rose"},
-    "lh-001": {"name": "The Fannie", "collection": "love-hurts"},
-    "lh-002": {"name": "Love Hurts Joggers", "collection": "love-hurts"},
-    "lh-003": {"name": "Love Hurts Basketball Shorts", "collection": "love-hurts"},
-    "lh-004": {"name": "Love Hurts Varsity Jacket", "collection": "love-hurts"},
-    "sg-001": {"name": "The Bay Set", "collection": "signature"},
-    "sg-002": {"name": "Stay Golden Set", "collection": "signature"},
-    "sg-003": {"name": "The Signature Tee", "collection": "signature"},
-    "sg-005": {"name": "Stay Golden Tee", "collection": "signature"},
-    "sg-006": {"name": "Mint & Lavender Hoodie", "collection": "signature"},
-    "sg-007": {"name": "The Signature Beanie", "collection": "signature"},
-    "sg-009": {"name": "The Sherpa Jacket", "collection": "signature"},
-    "sg-010": {"name": "The Bridge Series Shorts", "collection": "signature"},
-}
+# Product catalog — loaded from data/product-catalog.csv (single source of truth)
+def _load_catalog() -> dict[str, dict[str, str]]:
+    catalog: dict[str, dict[str, str]] = {}
+    csv_path = Path(__file__).resolve().parent.parent / "data" / "product-catalog.csv"
+    with csv_path.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            sku = row["sku"].strip()
+            if not sku or row["render_variant_of"].strip():
+                continue
+            catalog[sku] = {
+                "name": row["name"].strip(),
+                "collection": row["collection_slug"].strip(),
+            }
+    return catalog
+
+
+PRODUCT_CATALOG: dict[str, dict[str, str]] = _load_catalog()
 
 
 # Content type templates

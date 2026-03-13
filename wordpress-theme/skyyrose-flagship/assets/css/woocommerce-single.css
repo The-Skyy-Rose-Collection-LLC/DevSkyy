@@ -155,7 +155,7 @@
 }
 
 .skyy-single-product__price {
-	font-size: 1.5rem;
+	font-size: var(--text-xl);
 	font-weight: 700;
 	color: var(--skyy-woo-accent);
 	margin-bottom: 20px;
@@ -172,7 +172,7 @@
 }
 
 .skyy-single-product__description {
-	font-size: 0.95rem;
+	font-size: var(--text-sm);
 	line-height: 1.7;
 	color: var(--skyy-woo-text-muted);
 	margin-bottom: 32px;
@@ -448,7 +448,7 @@
 
 .skyy-single-product__accordion-content {
 	padding: 0 0 24px;
-	font-size: 0.9rem;
+	font-size: var(--text-sm);
 	line-height: 1.7;
 	color: var(--skyy-woo-text-muted);
 }

@@ -4,11 +4,11 @@ import SiteNav from '@/components/navigation/SiteNav';
 import IncentivePopup from '@/components/marketing/IncentivePopup';
 
 export const metadata: Metadata = {
-  title: 'SkyyRose | Where Love Meets Luxury',
+  title: 'SkyyRose | Luxury Grows from Concrete.',
   description:
     'Discover luxury fashion reimagined. Three immersive collections: Black Rose, Love Hurts, and Signature. AI-crafted designs, 3D experiences, exclusive pre-orders.',
   openGraph: {
-    title: 'SkyyRose | Where Love Meets Luxury',
+    title: 'SkyyRose | Luxury Grows from Concrete.',
     description:
       'Luxury fashion reimagined through AI and immersive 3D experiences.',
     images: [{ url: '/images/og-homepage.jpg', width: 1200, height: 630 }],

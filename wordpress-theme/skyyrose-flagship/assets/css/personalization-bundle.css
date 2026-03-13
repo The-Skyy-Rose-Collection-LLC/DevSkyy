@@ -311,7 +311,7 @@
 	align-self: flex-start;
 	padding: 3px 10px;
 	font-family: var(--ape-font-body);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
@@ -451,7 +451,7 @@
 	min-width: 18px;
 	height: 18px;
 	padding: 0 5px;
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 700;
 	letter-spacing: 0;
 	color: var(--ape-rose);
@@ -833,7 +833,7 @@ body.mood-golden .immersive-scene::after {
 .ape-recently-viewed__label {
 	flex-shrink: 0;
 	font-family: var(--ape-font-body);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
@@ -950,7 +950,7 @@ body.ape-debug .ape-intent-badge {
 	.ape-intent-badge {
 		top: 8px;
 		right: 8px;
-		font-size: 0.6rem;
+		font-size: 0.6875rem;
 		padding: 4px 8px;
 	}
 }
@@ -972,7 +972,7 @@ body.ape-debug .ape-intent-badge {
 	.ape-fab__count {
 		min-width: 16px;
 		height: 16px;
-		font-size: 0.55rem;
+		font-size: 0.6875rem;
 	}
 
 	/* Bundle toast: full width minus gutters */
@@ -1364,7 +1364,7 @@ body.ape-debug .ape-intent-badge {
 	background: rgba(255, 255, 255, 0.08);
 	color: rgba(255, 255, 255, 0.5);
 	font-family: var(--jge-font-body);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -1487,7 +1487,7 @@ body.ape-debug .ape-intent-badge {
 /* Link back to immersive */
 .jge-achievement-bar__link {
 	font-family: var(--jge-font-body);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
@@ -1523,7 +1523,7 @@ body.ape-debug .ape-intent-badge {
 
 .jge-crosssell__heading {
 	font-family: var(--jge-font-body);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.22em;
 	text-transform: uppercase;
@@ -1684,7 +1684,7 @@ body.ape-debug .ape-intent-badge {
 	background: transparent;
 
 	font-family: var(--jge-font-body);
-	font-size: 0.56rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
@@ -1737,7 +1737,7 @@ body.ape-debug .ape-intent-badge {
 		top: 12px;
 		right: 12px;
 		padding: 5px 10px;
-		font-size: 0.6rem;
+		font-size: 0.6875rem;
 	}
 
 	.jge-progress-pill__bar {
@@ -1784,7 +1784,7 @@ body.ape-debug .ape-intent-badge {
 	}
 
 	.jge-achievement-bar__link {
-		font-size: 0.55rem;
+		font-size: 0.6875rem;
 	}
 
 	/* Cross-Sell Strip */
@@ -1799,7 +1799,7 @@ body.ape-debug .ape-intent-badge {
 	}
 
 	.jge-crosssell__name {
-		font-size: 0.6rem;
+		font-size: 0.6875rem;
 	}
 
 	.jge-crosssell__price {
@@ -1807,7 +1807,7 @@ body.ape-debug .ape-intent-badge {
 	}
 
 	.jge-crosssell__add {
-		font-size: 0.52rem;
+		font-size: 0.6875rem;
 		padding: 4px 6px;
 	}
 }

@@ -46,8 +46,8 @@
 }
 
 .collection-hero__desc {
-	font-size: 1rem;
-	color: rgba(255, 255, 255, 0.5);
+	font-size: var(--text-base);
+	color: rgba(255, 255, 255, 0.65);
 	max-width: 600px;
 	margin: 0 auto 1.5rem;
 	line-height: 1.7;
@@ -58,7 +58,7 @@
 	font-weight: 500;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.35);
+	color: rgba(255, 255, 255, 0.60);
 }
 
 /* ==================================================
@@ -152,7 +152,7 @@
 	top: 12px;
 	left: 12px;
 	padding: 4px 10px;
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
@@ -209,13 +209,13 @@
 	font-weight: 500;
 	letter-spacing: 0.15em;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.5);
+	color: rgba(255, 255, 255, 0.65);
 	margin: 0 0 0.35rem;
 }
 
 .product-card__name {
 	font-family: var(--font-heading, 'Playfair Display', serif);
-	font-size: 1rem;
+	font-size: var(--text-base);
 	font-weight: 600;
 	color: #fff;
 	margin: 0 0 0.25rem;
@@ -223,8 +223,8 @@
 }
 
 .product-card__desc {
-	font-size: 0.78rem;
-	color: rgba(255, 255, 255, 0.4);
+	font-size: var(--text-xs);
+	color: rgba(255, 255, 255, 0.65);
 	line-height: 1.5;
 	margin: 0 0 0.5rem;
 	display: -webkit-box;
@@ -234,7 +234,7 @@
 }
 
 .product-card__price {
-	font-size: 0.95rem;
+	font-size: var(--text-sm);
 	font-weight: 600;
 	color: var(--collection-accent, var(--color-rose-gold, #B76E79));
 	margin: 0;
@@ -252,8 +252,8 @@
 }
 
 .collection-story__text {
-	font-size: 1rem;
-	color: rgba(255, 255, 255, 0.5);
+	font-size: var(--text-base);
+	color: rgba(255, 255, 255, 0.65);
 	line-height: 1.8;
 }
 
@@ -268,8 +268,8 @@
 }
 
 .immersive-cta__text {
-	font-size: 0.85rem;
-	color: rgba(255, 255, 255, 0.45);
+	font-size: var(--text-xs);
+	color: rgba(255, 255, 255, 0.65);
 	margin: 0 0 1.25rem;
 }
 
@@ -284,7 +284,7 @@
 .cross-collection-nav__title {
 	text-align: center;
 	font-family: var(--font-heading, 'Playfair Display', serif);
-	font-size: 1.5rem;
+	font-size: var(--text-xl);
 	color: #fff;
 	margin: 0 0 2rem;
 }
@@ -317,14 +317,14 @@
 
 .cross-collection-card__name {
 	font-family: var(--font-heading, 'Playfair Display', serif);
-	font-size: 1rem;
+	font-size: var(--text-base);
 	color: #fff;
 	margin: 0 0 0.25rem;
 }
 
 .cross-collection-card__count {
 	font-size: 0.7rem;
-	color: rgba(255, 255, 255, 0.35);
+	color: rgba(255, 255, 255, 0.60);
 	letter-spacing: 0.08em;
 }
 
@@ -488,15 +488,15 @@
 
 .collections-card__name {
 	font-family: var(--font-heading, 'Playfair Display', serif);
-	font-size: 1.1rem;
+	font-size: var(--text-lg);
 	font-weight: 600;
 	color: #fff;
 	margin: 0 0 0.35rem;
 }
 
 .collections-card__tagline {
-	font-size: 0.8rem;
-	color: rgba(255, 255, 255, 0.4);
+	font-size: var(--text-xs);
+	color: rgba(255, 255, 255, 0.65);
 	margin: 0 0 0.5rem;
 	line-height: 1.5;
 }
@@ -507,7 +507,7 @@
 	font-weight: 500;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.35);
+	color: rgba(255, 255, 255, 0.60);
 	margin: 0 0 0.75rem;
 }
 

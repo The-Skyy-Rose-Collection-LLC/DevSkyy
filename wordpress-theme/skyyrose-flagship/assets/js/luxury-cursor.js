@@ -53,6 +53,9 @@
 	   Animation Loop — Smooth Follow
 	   -------------------------------------------------- */
 
+	var paused = false;
+	var rafId  = 0;
+
 	function animate() {
 		// Ring follows with lag.
 		ringX += (mouseX - ringX) * 0.12;
@@ -65,10 +68,10 @@
 		dotY += (mouseY - dotY) * 0.25;
 		dot.style.transform = 'translate(' + dotX + 'px, ' + dotY + 'px) translate(-50%, -50%)';
 
-		requestAnimationFrame(animate);
+		rafId = requestAnimationFrame(animate);
 	}
 
-	requestAnimationFrame(animate);
+	rafId = requestAnimationFrame(animate);
 
 	/* --------------------------------------------------
 	   Hover State — Expand ring on interactive elements
@@ -129,5 +132,62 @@
 	document.addEventListener('mouseenter', function () {
 		ring.style.opacity = '1';
 		dot.style.opacity = '1';
+	});
+
+	/* --------------------------------------------------
+	   Modal Awareness — Pause/Resume on Dialog Open/Close
+	   -------------------------------------------------- */
+
+	var modalSelector = [
+		'[role="dialog"]:not([aria-hidden="true"]):not([inert])',
+		'.search-overlay.open',
+		'.mobile-menu__panel.open',
+		'.col-modal-ov.active',
+		'.size-guide-modal.active',
+		'.sr-exit-overlay.active',
+		'.sr-exit-overlay.visible'
+	].join(', ');
+
+	function pauseCursor() {
+		paused = true;
+		cancelAnimationFrame(rafId);
+		document.body.classList.add('luxury-cursor-paused');
+	}
+
+	function resumeCursor() {
+		paused = false;
+		document.body.classList.remove('luxury-cursor-paused');
+		rafId = requestAnimationFrame(animate);
+	}
+
+	function checkModals() {
+		var hasOpenModal = !!document.querySelector(modalSelector);
+		if (hasOpenModal && !paused) {
+			pauseCursor();
+		} else if (!hasOpenModal && paused) {
+			resumeCursor();
+		}
+	}
+
+	// Observe attribute and child-list changes for modal open/close detection.
+	var observer = new MutationObserver(function () {
+		checkModals();
+	});
+
+	observer.observe(document.body, {
+		attributes: true,
+		childList: true,
+		subtree: true,
+		attributeFilter: ['class', 'aria-hidden', 'inert', 'open', 'aria-modal']
+	});
+
+	// Check on init in case a modal is already open.
+	checkModals();
+
+	// Fast-path: Escape key closes most modals synchronously.
+	document.addEventListener('keydown', function (e) {
+		if (e.key === 'Escape' && paused) {
+			requestAnimationFrame(checkModals);
+		}
 	});
 })();

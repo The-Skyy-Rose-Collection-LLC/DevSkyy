@@ -20,29 +20,46 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 2.0.0
  */
 function skyyrose_enqueue_brand_styles() {
-	// 1. Brand Variables (loaded first, no dependencies)
-	wp_enqueue_style(
-		'skyyrose-brand-variables',
-		get_template_directory_uri() . '/assets/css/brand-variables.css',
-		array(),
-		SKYYROSE_VERSION
-	);
 
-	// 2. Luxury Theme (depends on brand-variables)
-	wp_enqueue_style(
-		'skyyrose-luxury-theme',
-		get_template_directory_uri() . '/assets/css/luxury-theme.css',
-		array( 'skyyrose-brand-variables' ),
-		SKYYROSE_VERSION
-	);
+	$css_dir = SKYYROSE_DIR . '/assets/css';
+	$css_uri = SKYYROSE_ASSETS_URI . '/css';
+	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
-	// 3. Collection Colors (depends on brand-variables)
-	wp_enqueue_style(
-		'skyyrose-collection-colors',
-		get_template_directory_uri() . '/assets/css/collection-colors.css',
-		array( 'skyyrose-brand-variables' ),
-		SKYYROSE_VERSION
-	);
+	// 1. Brand Variables (loaded first, no dependencies).
+	$bv_file = $use_min && file_exists( $css_dir . '/brand-variables.min.css' )
+		? 'brand-variables.min.css' : 'brand-variables.css';
+	if ( file_exists( $css_dir . '/' . $bv_file ) ) {
+		wp_enqueue_style(
+			'skyyrose-brand-variables',
+			$css_uri . '/' . $bv_file,
+			array(),
+			SKYYROSE_VERSION
+		);
+	}
+
+	// 2. Luxury Theme (depends on brand-variables).
+	$lt_file = $use_min && file_exists( $css_dir . '/luxury-theme.min.css' )
+		? 'luxury-theme.min.css' : 'luxury-theme.css';
+	if ( file_exists( $css_dir . '/' . $lt_file ) ) {
+		wp_enqueue_style(
+			'skyyrose-luxury-theme',
+			$css_uri . '/' . $lt_file,
+			array( 'skyyrose-brand-variables' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	// 3. Collection Colors (depends on brand-variables).
+	$cc_file = $use_min && file_exists( $css_dir . '/collection-colors.min.css' )
+		? 'collection-colors.min.css' : 'collection-colors.css';
+	if ( file_exists( $css_dir . '/' . $cc_file ) ) {
+		wp_enqueue_style(
+			'skyyrose-collection-colors',
+			$css_uri . '/' . $cc_file,
+			array( 'skyyrose-brand-variables' ),
+			SKYYROSE_VERSION
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_brand_styles', 5 );
 
@@ -59,7 +76,7 @@ function skyyrose_inline_critical_css() {
 			--gold: #D4AF37;
 			--silver: #C0C0C0;
 			--font-heading: "Playfair Display", Georgia, serif;
-			--font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+			--font-body: "Cormorant Garamond", Georgia, serif;
 		}
 	';
 

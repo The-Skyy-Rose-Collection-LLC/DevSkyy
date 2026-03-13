@@ -56,6 +56,22 @@ SCENES = {
                 "sku": "br-004",
                 "placement": "hanging from matte black clothing rack, right side of scene",
             },
+            {
+                "sku": "br-003",
+                "placement": "displayed on iron display ledge near railing, far right of scene",
+            },
+            {
+                "sku": "br-005",
+                "placement": "folded and stacked on concrete bench near rose planter, far left",
+            },
+            {
+                "sku": "br-007",
+                "placement": "laid flat on low coffee table between seating, center of scene",
+            },
+            {
+                "sku": "br-008",
+                "placement": "hanging from iron display hook near pendant light, right-center",
+            },
         ],
     },
     "love-hurts-cathedral-rose-chamber": {
@@ -74,6 +90,14 @@ SCENES = {
                 "sku": "lh-003",
                 "placement": "displayed on stone ledge in stained glass alcove, center of scene",
             },
+            {
+                "sku": "lh-002",
+                "placement": "draped over gothic stone pew arm, far right near candles",
+            },
+            {
+                "sku": "lh-004",
+                "placement": "displayed on carved wooden stand near stained glass window, left",
+            },
         ],
     },
     "signature-golden-gate-showroom": {
@@ -84,11 +108,22 @@ SCENES = {
             {"sku": "sg-005", "placement": "featured on center marble display table"},
             {"sku": "sg-007", "placement": "on marble pedestal, left-center"},
             {"sku": "sg-011", "placement": "hanging on wall-mounted clothing rack, right side"},
+            {
+                "sku": "sg-002",
+                "placement": "displayed on acrylic mannequin bust near window, center",
+            },
+            {"sku": "sg-003", "placement": "hanging from gold clothing rail, left alcove"},
+            {"sku": "sg-004", "placement": "draped over marble display cube, center-right"},
+            {"sku": "sg-006", "placement": "folded on marble shelf display, right wall niche"},
+            {"sku": "sg-008", "placement": "on marble pedestal display, right-center near window"},
+            {"sku": "sg-009", "placement": "draped over designer chair, far left of showroom"},
+            {"sku": "sg-010", "placement": "laid flat on marble counter display, far right"},
         ],
     },
 }
 
 COST_PER_IMAGE = 0.04
+MIN_FILE_SIZE_KB = 50
 
 
 def encode_image_base64(path: Path) -> str:
@@ -215,6 +250,11 @@ def process_scene(scene_key: str, dry_run: bool = False):
 
         out_name = f"{scene['background'].replace('.png', '')}-{sku}.webp"
         out_path = out_dir / out_name
+
+        if out_path.exists() and out_path.stat().st_size > MIN_FILE_SIZE_KB * 1024:
+            size_kb = out_path.stat().st_size // 1024
+            print(f"\n  SKIP {sku}: {out_name} already exists ({size_kb}KB)")
+            continue
 
         print(f"\n  Processing {sku}...")
         print(f"    Product: {product_path.name} ({product_path.stat().st_size // 1024}KB)")

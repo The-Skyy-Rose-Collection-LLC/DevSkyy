@@ -40,16 +40,14 @@ jobs:
           sudo mv gitleaks /usr/local/bin/
 
       - name: Run Gitleaks
-        run: gitleaks detect --source . --verbose --redact || true
-        continue-on-error: true
+        run: gitleaks detect --source . --verbose --redact
 
       - name: Install TruffleHog
         run: |
           curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sudo sh -s -- -b /usr/local/bin
 
       - name: Run TruffleHog
-        run: trufflehog git file://. --only-verified || true
-        continue-on-error: true
+        run: trufflehog git file://. --only-verified
 
   # ===========================================================================
   # Dependency Review
@@ -131,8 +129,8 @@ jobs:
       - name: Check Python licenses
         run: |
           pip-licenses --format=markdown --with-urls > licenses.md
-          pip-licenses --fail-on="GPL;AGPL" || echo "::warning::Found copyleft licenses"
-        continue-on-error: true
+          pip-licenses --fail-on="GPL-3.0-only;AGPL-3.0-only;GPL-3.0-or-later;AGPL-3.0-or-later" \
+            --allow-only="MIT;BSD-2-Clause;BSD-3-Clause;Apache-2.0;ISC;PSF-2.0;Python-2.0;MPL-2.0;Unlicense;LGPL-2.1-only;LGPL-3.0-only;Public Domain"
 
       - name: Upload license report
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0

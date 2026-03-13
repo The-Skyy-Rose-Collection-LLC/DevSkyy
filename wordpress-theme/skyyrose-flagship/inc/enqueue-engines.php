@@ -16,6 +16,59 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Helper: Enqueue a CSS + JS engine pair with min/non-min switching.
+ *
+ * Centralises the $use_min logic so every engine benefits automatically.
+ * Files must follow the naming convention: {slug}.css / {slug}.min.css
+ * and {slug}.js / {slug}.min.js in the respective asset directories.
+ *
+ * @since 4.1.0
+ *
+ * @param string   $handle   Script/style handle (prefixed with 'skyyrose-').
+ * @param string   $slug     Base filename without extension (e.g. 'social-proof').
+ * @param string[] $css_deps CSS dependency handles. Default: array( 'skyyrose-design-tokens' ).
+ * @param string[] $js_deps  JS dependency handles. Default: array().
+ * @return void
+ */
+function skyyrose_enqueue_engine( $handle, $slug, $css_deps = array( 'skyyrose-design-tokens' ), $js_deps = array() ) {
+
+	$css_dir = SKYYROSE_DIR . '/assets/css';
+	$css_uri = SKYYROSE_ASSETS_URI . '/css';
+	$js_dir  = SKYYROSE_DIR . '/assets/js';
+	$js_uri  = SKYYROSE_ASSETS_URI . '/js';
+	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+
+	// CSS.
+	$css_min  = $slug . '.min.css';
+	$css_full = $slug . '.css';
+	$css_file = $use_min && file_exists( $css_dir . '/' . $css_min ) ? $css_min : $css_full;
+
+	if ( file_exists( $css_dir . '/' . $css_file ) ) {
+		wp_enqueue_style(
+			$handle,
+			$css_uri . '/' . $css_file,
+			$css_deps,
+			SKYYROSE_VERSION
+		);
+	}
+
+	// JS.
+	$js_min  = $slug . '.min.js';
+	$js_full = $slug . '.js';
+	$js_file = $use_min && file_exists( $js_dir . '/' . $js_min ) ? $js_min : $js_full;
+
+	if ( file_exists( $js_dir . '/' . $js_file ) ) {
+		wp_enqueue_script(
+			$handle,
+			$js_uri . '/' . $js_file,
+			$js_deps,
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+}
+
+/**
  * Enqueue the Social Proof + Urgency Engine on customer-facing pages.
  *
  * Loads purchase notification toasts, live viewer count, scarcity badges,
@@ -25,32 +78,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return void
  */
 function skyyrose_enqueue_social_proof() {
-
-	// Skip admin context.
 	if ( is_admin() ) {
 		return;
 	}
-
-	$css_path = SKYYROSE_DIR . '/assets/css/social-proof.css';
-	if ( file_exists( $css_path ) ) {
-		wp_enqueue_style(
-			'skyyrose-social-proof',
-			SKYYROSE_ASSETS_URI . '/css/social-proof.css',
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-
-	$js_path = SKYYROSE_DIR . '/assets/js/social-proof.js';
-	if ( file_exists( $js_path ) ) {
-		wp_enqueue_script(
-			'skyyrose-social-proof',
-			SKYYROSE_ASSETS_URI . '/js/social-proof.js',
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
+	skyyrose_enqueue_engine( 'skyyrose-social-proof', 'social-proof' );
 }
 
 /**
@@ -63,32 +94,10 @@ function skyyrose_enqueue_social_proof() {
  * @return void
  */
 function skyyrose_enqueue_the_pulse() {
-
-	// Skip admin context.
 	if ( is_admin() ) {
 		return;
 	}
-
-	$css_path = SKYYROSE_DIR . '/assets/css/the-pulse.css';
-	if ( file_exists( $css_path ) ) {
-		wp_enqueue_style(
-			'skyyrose-the-pulse',
-			SKYYROSE_ASSETS_URI . '/css/the-pulse.css',
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-
-	$js_path = SKYYROSE_DIR . '/assets/js/the-pulse.js';
-	if ( file_exists( $js_path ) ) {
-		wp_enqueue_script(
-			'skyyrose-the-pulse',
-			SKYYROSE_ASSETS_URI . '/js/the-pulse.js',
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
+	skyyrose_enqueue_engine( 'skyyrose-the-pulse', 'the-pulse' );
 }
 
 /**
@@ -102,32 +111,10 @@ function skyyrose_enqueue_the_pulse() {
  * @return void
  */
 function skyyrose_enqueue_aurora_engine() {
-
-	// Skip admin context.
 	if ( is_admin() ) {
 		return;
 	}
-
-	$css_path = SKYYROSE_DIR . '/assets/css/aurora-engine.css';
-	if ( file_exists( $css_path ) ) {
-		wp_enqueue_style(
-			'skyyrose-aurora-engine',
-			SKYYROSE_ASSETS_URI . '/css/aurora-engine.css',
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-
-	$js_path = SKYYROSE_DIR . '/assets/js/aurora-engine.js';
-	if ( file_exists( $js_path ) ) {
-		wp_enqueue_script(
-			'skyyrose-aurora-engine',
-			SKYYROSE_ASSETS_URI . '/js/aurora-engine.js',
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
+	skyyrose_enqueue_engine( 'skyyrose-aurora-engine', 'aurora-engine' );
 }
 
 /**
@@ -141,32 +128,10 @@ function skyyrose_enqueue_aurora_engine() {
  * @return void
  */
 function skyyrose_enqueue_magnetic_obsidian() {
-
-	// Skip admin context.
 	if ( is_admin() ) {
 		return;
 	}
-
-	$css_path = SKYYROSE_DIR . '/assets/css/magnetic-obsidian.css';
-	if ( file_exists( $css_path ) ) {
-		wp_enqueue_style(
-			'skyyrose-magnetic-obsidian',
-			SKYYROSE_ASSETS_URI . '/css/magnetic-obsidian.css',
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-
-	$js_path = SKYYROSE_DIR . '/assets/js/magnetic-obsidian.js';
-	if ( file_exists( $js_path ) ) {
-		wp_enqueue_script(
-			'skyyrose-magnetic-obsidian',
-			SKYYROSE_ASSETS_URI . '/js/magnetic-obsidian.js',
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
+	skyyrose_enqueue_engine( 'skyyrose-magnetic-obsidian', 'magnetic-obsidian' );
 }
 
 /**
@@ -174,38 +139,16 @@ function skyyrose_enqueue_magnetic_obsidian() {
  *
  * Real-time social proof toasts, urgency countdown timers, stock scarcity
  * indicators, floating pre-order CTA, exit-intent capture, and conversion
- * tracking. Proven to increase conversion 15-34% (Spiegel Research Center).
+ * tracking.
  *
  * @since 3.6.0
  * @return void
  */
 function skyyrose_enqueue_conversion_engine() {
-
-	// Skip admin context.
 	if ( is_admin() ) {
 		return;
 	}
-
-	$css_path = SKYYROSE_DIR . '/assets/css/conversion-engine.css';
-	if ( file_exists( $css_path ) ) {
-		wp_enqueue_style(
-			'skyyrose-conversion-engine',
-			SKYYROSE_ASSETS_URI . '/css/conversion-engine.css',
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-
-	$js_path = SKYYROSE_DIR . '/assets/js/conversion-engine.js';
-	if ( file_exists( $js_path ) ) {
-		wp_enqueue_script(
-			'skyyrose-conversion-engine',
-			SKYYROSE_ASSETS_URI . '/js/conversion-engine.js',
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
+	skyyrose_enqueue_engine( 'skyyrose-conversion-engine', 'conversion-engine' );
 }
 
 /**
@@ -213,39 +156,16 @@ function skyyrose_enqueue_conversion_engine() {
  *
  * Behavioral scoring, personalized "Your Picks" recommendations drawer,
  * ambient mood transitions on immersive pages, smart bundle suggestions,
- * and recently-viewed product strip. Research shows personalized
- * recommendations increase AOV by 10-30% (McKinsey, 2023).
+ * and recently-viewed product strip.
  *
  * @since 3.8.0
  * @return void
  */
 function skyyrose_enqueue_adaptive_personalization() {
-
-	// Skip admin context.
 	if ( is_admin() ) {
 		return;
 	}
-
-	$css_path = SKYYROSE_DIR . '/assets/css/adaptive-personalization.css';
-	if ( file_exists( $css_path ) ) {
-		wp_enqueue_style(
-			'skyyrose-adaptive-personalization',
-			SKYYROSE_ASSETS_URI . '/css/adaptive-personalization.css',
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-
-	$js_path = SKYYROSE_DIR . '/assets/js/adaptive-personalization.js';
-	if ( file_exists( $js_path ) ) {
-		wp_enqueue_script(
-			'skyyrose-adaptive-personalization',
-			SKYYROSE_ASSETS_URI . '/js/adaptive-personalization.js',
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
+	skyyrose_enqueue_engine( 'skyyrose-adaptive-personalization', 'adaptive-personalization' );
 }
 
 /**
@@ -253,80 +173,37 @@ function skyyrose_enqueue_adaptive_personalization() {
  *
  * Room exploration tracking with progress pill, reward reveal upon full
  * collection discovery, achievement badges on static pages, and cross-sell
- * recommendation strip. Gamification increases engagement 48% and conversion
- * 15-30% (Badgeville / Gigya research).
+ * recommendation strip.
  *
  * @since 3.9.0
  * @return void
  */
 function skyyrose_enqueue_journey_gamification() {
-
-	// Skip admin context.
 	if ( is_admin() ) {
 		return;
 	}
-
-	$css_path = SKYYROSE_DIR . '/assets/css/journey-gamification.css';
-	if ( file_exists( $css_path ) ) {
-		wp_enqueue_style(
-			'skyyrose-journey-gamification',
-			SKYYROSE_ASSETS_URI . '/css/journey-gamification.css',
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-
-	$js_path = SKYYROSE_DIR . '/assets/js/journey-gamification.js';
-	if ( file_exists( $js_path ) ) {
-		wp_enqueue_script(
-			'skyyrose-journey-gamification',
-			SKYYROSE_ASSETS_URI . '/js/journey-gamification.js',
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
+	skyyrose_enqueue_engine( 'skyyrose-journey-gamification', 'journey-gamification' );
 }
 
 /**
  * Enqueue Momentum Commerce Engine — "The Closer".
  *
- * Three research-backed conversion techniques:
- *   1. Smart Price Anchoring (Kahneman & Tversky anchoring bias — 20-50% lift)
- *   2. Live Activity Ticker (Spiegel Research — 15-34% social proof lift)
- *   3. Spotlight Moments + Best Seller Glow (Thaler & Sunstein nudge theory)
- *   4. Momentum Score — engagement rewards that drive repeat interaction
+ * Smart Price Anchoring, Live Activity Ticker, Spotlight Moments,
+ * Best Seller Glow, and Momentum Score engagement rewards.
  *
  * @since 3.8.0
  * @return void
  */
 function skyyrose_enqueue_momentum_commerce() {
-
-	// Skip admin context.
 	if ( is_admin() ) {
 		return;
 	}
-
-	$css_path = SKYYROSE_DIR . '/assets/css/momentum-commerce.css';
-	if ( file_exists( $css_path ) ) {
-		wp_enqueue_style(
-			'skyyrose-momentum-commerce',
-			SKYYROSE_ASSETS_URI . '/css/momentum-commerce.css',
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-
-	$js_path = SKYYROSE_DIR . '/assets/js/momentum-commerce.js';
-	if ( file_exists( $js_path ) ) {
-		wp_enqueue_script(
-			'skyyrose-momentum-commerce',
-			SKYYROSE_ASSETS_URI . '/js/momentum-commerce.js',
-			array( 'skyyrose-conversion-engine' ),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
+	skyyrose_enqueue_engine(
+		'skyyrose-momentum-commerce',
+		'momentum-commerce',
+		array( 'skyyrose-design-tokens' ),
+		array( 'skyyrose-conversion-engine' )
+	);
 }
 
 /**
@@ -339,32 +216,10 @@ function skyyrose_enqueue_momentum_commerce() {
  * @return void
  */
 function skyyrose_enqueue_velocity_scroll() {
-
-	// Skip admin context.
 	if ( is_admin() ) {
 		return;
 	}
-
-	$css_path = SKYYROSE_DIR . '/assets/css/velocity-scroll.css';
-	if ( file_exists( $css_path ) ) {
-		wp_enqueue_style(
-			'skyyrose-velocity-scroll',
-			SKYYROSE_ASSETS_URI . '/css/velocity-scroll.css',
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-
-	$js_path = SKYYROSE_DIR . '/assets/js/velocity-scroll.js';
-	if ( file_exists( $js_path ) ) {
-		wp_enqueue_script(
-			'skyyrose-velocity-scroll',
-			SKYYROSE_ASSETS_URI . '/js/velocity-scroll.js',
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
+	skyyrose_enqueue_engine( 'skyyrose-velocity-scroll', 'velocity-scroll' );
 }
 
 /**
@@ -374,32 +229,10 @@ function skyyrose_enqueue_velocity_scroll() {
  * @return void
  */
 function skyyrose_enqueue_pulse_engine() {
-
-	// Skip admin context.
 	if ( is_admin() ) {
 		return;
 	}
-
-	$css_path = SKYYROSE_DIR . '/assets/css/pulse-engine.css';
-	if ( file_exists( $css_path ) ) {
-		wp_enqueue_style(
-			'skyyrose-pulse-engine',
-			SKYYROSE_ASSETS_URI . '/css/pulse-engine.css',
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
-
-	$js_path = SKYYROSE_DIR . '/assets/js/pulse-engine.js';
-	if ( file_exists( $js_path ) ) {
-		wp_enqueue_script(
-			'skyyrose-pulse-engine',
-			SKYYROSE_ASSETS_URI . '/js/pulse-engine.js',
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
+	skyyrose_enqueue_engine( 'skyyrose-pulse-engine', 'pulse-engine' );
 }
 
 /*--------------------------------------------------------------

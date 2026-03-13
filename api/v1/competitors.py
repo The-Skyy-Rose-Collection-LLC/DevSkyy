@@ -160,10 +160,11 @@ async def upload_competitor_asset(
             extract_features=extract_features,
         )
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.warning(f"Invalid competitor asset upload: {e}")
+        raise HTTPException(status_code=400, detail="Invalid request")
     except Exception as e:
-        logger.error(f"Failed to upload competitor asset: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Failed to upload competitor asset: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("/assets", response_model=CompetitorAssetListResponse)
@@ -269,8 +270,8 @@ async def create_competitor(
             created_by=current_user.sub,
         )
     except Exception as e:
-        logger.error(f"Failed to create competitor: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Failed to create competitor: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("", response_model=CompetitorListResponse)

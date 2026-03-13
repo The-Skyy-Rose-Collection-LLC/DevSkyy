@@ -318,7 +318,7 @@ function skyyrose_woocommerce_3d_model_button() {
 	}
 
 	printf(
-		'<div class="product-3d-viewer"><button class="button view-3d-model" data-model="%s">%s</button></div>',
+		'<div class="product-3d-viewer"><button type="button" class="button view-3d-model" data-model="%s">%s</button></div>',
 		esc_url( $model_file ),
 		esc_html__( 'View in 3D', 'skyyrose-flagship' )
 	);
@@ -678,3 +678,181 @@ function skyyrose_preorder_button_text( $text, $product ) {
 }
 add_filter( 'woocommerce_product_single_add_to_cart_text', 'skyyrose_preorder_button_text', 10, 2 );
 add_filter( 'woocommerce_product_add_to_cart_text', 'skyyrose_preorder_button_text', 10, 2 );
+
+/**
+ * Replace $0.00 price display with "Pre-Order" label for pre-order products.
+ *
+ * When a WooCommerce product is marked as pre-order but has a $0 regular price,
+ * the default price_html shows "$0.00" which confuses customers. This filter
+ * replaces it with either "Pre-Order -- $XX" (if a pre-order price is set)
+ * or just "Pre-Order".
+ *
+ * @since 4.3.0
+ *
+ * @param string     $price_html Default price HTML from WooCommerce.
+ * @param WC_Product $product    Product object.
+ * @return string Modified price HTML.
+ */
+function skyyrose_preorder_price_html( $price_html, $product ) {
+	if ( ! skyyrose_is_preorder( $product->get_id() ) ) {
+		return $price_html;
+	}
+
+	$regular_price = (float) $product->get_price();
+
+	// If the product has a real price (> 0), keep WC's formatted output.
+	if ( $regular_price > 0 ) {
+		return $price_html;
+	}
+
+	// Check for a custom pre-order price in meta.
+	$preorder_price = get_post_meta( $product->get_id(), '_preorder_price', true );
+
+	if ( ! empty( $preorder_price ) && is_numeric( $preorder_price ) && (float) $preorder_price > 0 ) {
+		return '<span class="woocommerce-Price-amount amount">'
+			. esc_html__( 'Pre-Order', 'skyyrose-flagship' )
+			. ' &mdash; '
+			. esc_html( get_woocommerce_currency_symbol() )
+			. esc_html( number_format( (float) $preorder_price, 0 ) )
+			. '</span>';
+	}
+
+	return '<span class="woocommerce-Price-amount amount">'
+		. esc_html__( 'Pre-Order', 'skyyrose-flagship' )
+		. '</span>';
+}
+add_filter( 'woocommerce_get_price_html', 'skyyrose_preorder_price_html', 10, 2 );
+
+/*--------------------------------------------------------------
+ * Complete the Look — single product cross-sell
+ *--------------------------------------------------------------*/
+
+/**
+ * Render the "Complete the Look" cross-sell section on single product pages.
+ *
+ * Delegates all logic and markup to template-parts/complete-the-look.php,
+ * which resolves curated SKU pairs and outputs quick-add cards.
+ *
+ * @since 5.0.0
+ * @return void
+ */
+function skyyrose_complete_the_look() {
+	get_template_part( 'template-parts/complete-the-look' );
+}
+add_action( 'woocommerce_single_product_summary', 'skyyrose_complete_the_look', 50 );
+
+/*--------------------------------------------------------------
+ * Referral Dashboard — post-purchase thank-you panel
+ *--------------------------------------------------------------*/
+
+/**
+ * Render the referral dashboard on the order confirmation page.
+ *
+ * Generates or retrieves the customer's unique referral code, creates
+ * the matching WooCommerce coupon if needed, and renders the share UI.
+ *
+ * @since 5.0.0
+ *
+ * @param int $order_id WooCommerce order ID (passed by woocommerce_thankyou).
+ * @return void
+ */
+function skyyrose_referral_dashboard( $order_id ) {
+	get_template_part( 'template-parts/referral-dashboard', null, array( 'order_id' => absint( $order_id ) ) );
+}
+add_action( 'woocommerce_thankyou', 'skyyrose_referral_dashboard', 20 );
+
+/*--------------------------------------------------------------
+ * Referral Credit — award $10 on completed order
+ *--------------------------------------------------------------*/
+
+/**
+ * Credit the referrer when a completed order uses their referral coupon.
+ *
+ * Checks each coupon code on the order against the SKYY prefix pattern,
+ * looks up the coupon owner, prevents self-referral, increments
+ * _skyyrose_referral_count and _skyyrose_referral_earned on the referrer's
+ * user meta, and awards the Founding Ambassador badge to the first 100
+ * successful referrers. Idempotent: no-ops if already credited.
+ *
+ * @since 5.0.0
+ *
+ * @param int $order_id WooCommerce order ID.
+ * @return void
+ */
+function skyyrose_woo_credit_referrer( $order_id ) {
+
+	$order = wc_get_order( absint( $order_id ) );
+	if ( ! $order ) {
+		return;
+	}
+
+	// Idempotency guard — do not double-credit.
+	if ( get_post_meta( $order_id, '_skyyrose_referral_credited', true ) ) {
+		return;
+	}
+
+	foreach ( $order->get_coupon_codes() as $coupon_code ) {
+
+		// Only process SKYY-prefixed referral coupons.
+		if ( 0 !== stripos( $coupon_code, 'SKYY' ) ) {
+			continue;
+		}
+
+		$coupon = new WC_Coupon( $coupon_code );
+		if ( ! $coupon->get_id() ) {
+			continue;
+		}
+
+		$owner_email = get_post_meta( $coupon->get_id(), '_skyyrose_referral_owner_email', true );
+		if ( ! is_email( $owner_email ) ) {
+			continue;
+		}
+
+		// Prevent self-referral.
+		if ( strtolower( $owner_email ) === strtolower( $order->get_billing_email() ) ) {
+			continue;
+		}
+
+		$referrer = get_user_by( 'email', $owner_email );
+		if ( ! $referrer ) {
+			continue;
+		}
+
+		// Increment referral stats.
+		$count  = (int) get_user_meta( $referrer->ID, '_skyyrose_referral_count', true );
+		$earned = (float) get_user_meta( $referrer->ID, '_skyyrose_referral_earned', true );
+
+		update_user_meta( $referrer->ID, '_skyyrose_referral_count', $count + 1 );
+		update_user_meta( $referrer->ID, '_skyyrose_referral_earned', round( $earned + 10.0, 2 ) );
+
+		// Founding Ambassador badge — first 100 referrers with a confirmed conversion.
+		if ( ! get_user_meta( $referrer->ID, '_skyyrose_founding_ambassador', true ) ) {
+			$total_founders = (int) get_option( 'skyyrose_founding_ambassador_count', 0 );
+			if ( $total_founders < 100 ) {
+				update_user_meta( $referrer->ID, '_skyyrose_founding_ambassador', 1 );
+				update_option( 'skyyrose_founding_ambassador_count', $total_founders + 1 );
+			}
+		}
+
+		// Mark order as credited to prevent duplicate processing.
+		update_post_meta( $order_id, '_skyyrose_referral_credited', '1' );
+		update_post_meta( $order_id, '_skyyrose_referral_code_used', sanitize_text_field( $coupon_code ) );
+
+		/**
+		 * Fires after a referral is successfully credited.
+		 *
+		 * Integrations can hook here to send notification emails or
+		 * add store credit via third-party reward plugins.
+		 *
+		 * @since 5.0.0
+		 *
+		 * @param int   $referrer_id WP user ID of the referrer.
+		 * @param int   $order_id    WooCommerce order ID that triggered the credit.
+		 * @param float $credit      Credit amount in USD (10.00).
+		 */
+		do_action( 'skyyrose_referral_credited', $referrer->ID, $order_id, 10.0 );
+
+		break; // One referral credit per order maximum.
+	}
+}
+add_action( 'woocommerce_order_status_completed', 'skyyrose_woo_credit_referrer' );

@@ -51,6 +51,18 @@ class AnalyticsCoreAgent(CoreAgent):
         except ImportError:
             logger.debug("[%s] AnalyticsOpsSubAgent unavailable", self.name)
 
+        # SDK-powered agents (data analysis + multi-agent reports)
+        try:
+            from agents.claude_sdk.domain_agents.analytics import (
+                SDKDataAnalystAgent,
+                SDKReportGeneratorAgent,
+            )
+
+            self.register_sub_agent("sdk_data_analyst", SDKDataAnalystAgent())
+            self.register_sub_agent("sdk_report_generator", SDKReportGeneratorAgent())
+        except ImportError:
+            logger.debug("[%s] SDK analytics agents unavailable", self.name)
+
     def _get_legacy_agent(self) -> Any:
         if self._legacy_agent is None:
             try:
@@ -65,14 +77,25 @@ class AnalyticsCoreAgent(CoreAgent):
 
     async def execute(self, task: str, **kwargs: Any) -> dict[str, Any]:
         task_lower = task.lower()
+        needs_action = any(
+            kw in task_lower for kw in ["run", "generate", "analyze", "create", "build"]
+        )
 
         if any(kw in task_lower for kw in ["report", "data", "query", "anomaly"]):
+            if needs_action and "sdk_data_analyst" in self._sub_agents:
+                return await self.delegate("sdk_data_analyst", task, **kwargs)
             if "data_analyst" in self._sub_agents:
                 return await self.delegate("data_analyst", task, **kwargs)
 
         if any(kw in task_lower for kw in ["trend", "forecast", "predict", "season"]):
+            if needs_action and "sdk_data_analyst" in self._sub_agents:
+                return await self.delegate("sdk_data_analyst", task, **kwargs)
             if "trend_predictor" in self._sub_agents:
                 return await self.delegate("trend_predictor", task, **kwargs)
+
+        if any(kw in task_lower for kw in ["full report", "executive", "comprehensive"]):
+            if "sdk_report_generator" in self._sub_agents:
+                return await self.delegate("sdk_report_generator", task, **kwargs)
 
         if any(kw in task_lower for kw in ["conversion", "funnel", "tracking", "pixel"]):
             if "conversion_tracker" in self._sub_agents:

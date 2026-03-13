@@ -170,7 +170,7 @@
 .ipc__actions {
 	position: absolute;
 	top: 52px;
-	right: 14px;
+	right: 10px;
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
@@ -185,8 +185,8 @@
 
 .ipc__wishlist,
 .ipc__share {
-	width: 36px;
-	height: 36px;
+	width: 44px;
+	height: 44px;
 	border-radius: 50%;
 	background: rgba(0, 0, 0, 0.5);
 	-webkit-backdrop-filter: blur(8px);
@@ -252,8 +252,8 @@
 }
 
 .ipc__size-pill {
-	min-width: 36px;
-	height: 32px;
+	min-width: 44px;
+	min-height: 44px;
 	border: 1px solid rgba(255, 255, 255, 0.15);
 	border-radius: 6px;
 	background: transparent;
@@ -263,6 +263,9 @@
 	cursor: pointer;
 	padding: 0 10px;
 	transition: all 0.2s;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .ipc__size-pill:hover {
@@ -330,7 +333,7 @@
 
 .ipc__title {
 	font-family: 'Cormorant Garamond', serif;
-	font-size: 16px;
+	font-size: var(--text-base);
 	font-weight: 500;
 	color: #e0e0e0;
 	margin: 0 0 4px;
@@ -351,7 +354,6 @@
 	letter-spacing: 4px;
 	text-transform: uppercase;
 	color: var(--collection-accent, #B76E79);
-	opacity: 0.7;
 }
 
 /* ==========================================================================
@@ -469,8 +471,8 @@
 
 .prc__tease {
 	font-family: 'Cormorant Garamond', serif;
-	font-size: 14px;
-	color: rgba(255, 255, 255, 0.6);
+	font-size: var(--text-sm);
+	color: rgba(255, 255, 255, 0.75);
 	font-style: italic;
 	margin: 8px 0 0;
 }
@@ -508,14 +510,13 @@
 	letter-spacing: 4px;
 	text-transform: uppercase;
 	color: var(--collection-accent, #B76E79);
-	opacity: 0.7;
 	display: block;
 	margin-bottom: 6px;
 }
 
 .prc__title {
 	font-family: 'Cormorant Garamond', serif;
-	font-size: 18px;
+	font-size: var(--text-lg);
 	font-weight: 500;
 	color: #e0e0e0;
 	margin: 0 0 6px;
@@ -536,7 +537,7 @@
 
 .prc__desc {
 	font-family: 'Cormorant Garamond', serif;
-	font-size: 13px;
+	font-size: var(--text-xs);
 	color: #888;
 	line-height: 1.5;
 	margin: 0 0 12px;

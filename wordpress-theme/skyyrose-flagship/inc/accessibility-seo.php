@@ -35,7 +35,7 @@ function skyyrose_accessibility_styles() {
 	}
 
 	wp_enqueue_style(
-		'skyyrose-accessibility',
+		'skyyrose-a11y-css',
 		SKYYROSE_ASSETS_URI . '/css/accessibility.css',
 		array( 'skyyrose-style' ),
 		SKYYROSE_VERSION
@@ -94,7 +94,7 @@ function skyyrose_accessibility_scripts() {
 	$a11y_js_path = SKYYROSE_DIR . '/assets/js/accessibility.js';
 	if ( file_exists( $a11y_js_path ) ) {
 		wp_enqueue_script(
-			'skyyrose-accessibility',
+			'skyyrose-a11y-js',
 			SKYYROSE_ASSETS_URI . '/js/accessibility.js',
 			array(),
 			SKYYROSE_VERSION,

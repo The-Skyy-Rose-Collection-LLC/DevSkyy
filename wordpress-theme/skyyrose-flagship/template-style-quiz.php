@@ -48,7 +48,7 @@ if ( function_exists( 'skyyrose_get_collection_products' ) ) {
 			<p class="quiz-intro__desc">
 				<?php esc_html_e( 'Seven questions. Three collections. One unique profile. Discover which SkyyRose collections match your personality and get personalized product recommendations.', 'skyyrose-flagship' ); ?>
 			</p>
-			<button class="quiz-start-btn" id="quiz-start">
+			<button type="button" class="quiz-start-btn" id="quiz-start">
 				<?php esc_html_e( 'Begin the Quiz', 'skyyrose-flagship' ); ?>
 			</button>
 			<p class="quiz-intro__time"><?php esc_html_e( '2 minutes \u2022 No sign-up required', 'skyyrose-flagship' ); ?></p>
@@ -94,17 +94,17 @@ if ( function_exists( 'skyyrose_get_collection_products' ) ) {
 			<canvas id="quiz-share-canvas" width="600" height="400" style="display:none;"></canvas>
 			<img class="quiz-share-preview" id="quiz-share-preview" alt="<?php esc_attr_e( 'Your SkyyRose Style DNA card', 'skyyrose-flagship' ); ?>" />
 			<div class="quiz-share-actions">
-				<button class="quiz-share-btn" id="quiz-share-btn">
+				<button type="button" class="quiz-share-btn" id="quiz-share-btn">
 					<?php esc_html_e( 'Share My DNA', 'skyyrose-flagship' ); ?>
 				</button>
-				<button class="quiz-share-btn quiz-share-btn--secondary" id="quiz-download-btn">
+				<button type="button" class="quiz-share-btn quiz-share-btn--secondary" id="quiz-download-btn">
 					<?php esc_html_e( 'Save Image', 'skyyrose-flagship' ); ?>
 				</button>
 			</div>
 		</div>
 
 		<!-- Retake -->
-		<button class="quiz-retake" id="quiz-retake">
+		<button type="button" class="quiz-retake" id="quiz-retake">
 			<?php esc_html_e( 'Retake Quiz', 'skyyrose-flagship' ); ?>
 		</button>
 

@@ -342,8 +342,16 @@ class SkyyRoseMasterOrchestrator:
         return {"base": base, "upscaled": upscaled}
 
     async def _generate_with_sdxl(self, product_concept: dict, angle: str) -> dict:
-        """Generate with SDXL Space (fallback)."""
-        # SDXL space has different API
+        """Generate with SDXL Space (fallback).
+
+        H-5 FIX: SDXL produces a single standard-resolution image — there is no
+        separate upscaled version. Returning the same image for both ``base`` and
+        ``upscaled`` caused _stage_3_upload_cdn to label standard-res assets as
+        ``_2k.png``, a false quality claim stored in WooCommerce metadata.
+
+        ``upscaled`` is now ``None`` when SDXL is used as a fallback. The CDN
+        upload stage checks for ``None`` and skips the 2K upload slot.
+        """
         image = self.sdxl_space.predict(
             garment_type=product_concept["garment_type"],
             collection=product_concept["collection"],
@@ -355,7 +363,8 @@ class SkyyRoseMasterOrchestrator:
             guidance=7.5,
             api_name="/generate_product_image",
         )
-        return {"base": image, "upscaled": image}
+        # base = actual output; upscaled = None (no upscaler ran)
+        return {"base": image, "upscaled": None}
 
     async def _stage_2_generate_content(
         self, photo_results: dict, product_concept: dict, launch_report: dict
@@ -498,10 +507,13 @@ to where Oakland street authenticity meets luxury craftsmanship.
         for slug, image_data in photo_results.items():
             print(f"  -> Uploading: {slug}")
 
-            # Upload upscaled version
-            upscaled_url = await self._upload_to_cdn(
-                image_data["upscaled"], f"products/{sku}/{slug}_2k.png"
-            )
+            # Upload upscaled version (may be None when SDXL fallback was used)
+            if image_data["upscaled"] is not None:
+                upscaled_url = await self._upload_to_cdn(
+                    image_data["upscaled"], f"products/{sku}/{slug}_2k.png"
+                )
+            else:
+                upscaled_url = None  # H-5: no phantom 2K URL for non-upscaled images
 
             # Upload base version
             base_url = await self._upload_to_cdn(
@@ -510,7 +522,7 @@ to where Oakland street authenticity meets luxury craftsmanship.
 
             cdn_urls[slug] = {"upscaled": upscaled_url, "base": base_url}
 
-            print(f"    [OK] {upscaled_url}")
+            print(f"    [OK] {upscaled_url or base_url}")
 
         stage_duration = (datetime.now() - stage_start).total_seconds()
 
@@ -525,24 +537,29 @@ to where Oakland street authenticity meets luxury craftsmanship.
         return cdn_urls
 
     async def _upload_to_cdn(self, image_path: str, object_key: str) -> str:
-        """Upload image to CDN (Cloudflare R2 or fallback)."""
-        if self.r2_account_id and self.r2_access_key:
-            # Use R2
-            try:
-                import boto3
+        """Upload image to CDN (Cloudflare R2).
 
-                s3 = boto3.client(
-                    "s3",
-                    endpoint_url=f"https://{self.r2_account_id}.r2.cloudflarestorage.com",
-                    aws_access_key_id=self.r2_access_key,
-                    aws_secret_access_key=self.r2_secret_key,
-                )
-                s3.upload_file(image_path, self.r2_bucket, object_key)
-                return f"https://cdn.skyyrose.co/{object_key}"
-            except Exception:
-                pass
+        C-8 FIX: Raises ``RuntimeError`` on any failure rather than silently
+        returning a phantom URL that looks valid but 404s on every request.
+        Callers must handle the exception and decide whether to skip CDN or abort.
+        """
+        if not (self.r2_account_id and self.r2_access_key):
+            raise RuntimeError(
+                f"CDN upload skipped: no R2 credentials configured "
+                f"(object_key={object_key!r}). "
+                "Supply r2_account_id, r2_access_key, and r2_secret_key in config "
+                "to enable CDN delivery."
+            )
 
-        # Fallback: return local path or placeholder
+        import boto3
+
+        s3 = boto3.client(
+            "s3",
+            endpoint_url=f"https://{self.r2_account_id}.r2.cloudflarestorage.com",
+            aws_access_key_id=self.r2_access_key,
+            aws_secret_access_key=self.r2_secret_key,
+        )
+        s3.upload_file(image_path, self.r2_bucket, object_key)
         return f"https://cdn.skyyrose.co/{object_key}"
 
     async def _stage_4_deploy_wordpress(
@@ -602,15 +619,22 @@ to where Oakland street authenticity meets luxury craftsmanship.
         if self.wp_username and self.wp_password:
             product_response = await self._create_woo_product(product_data)
             product_id = product_response.get("id", 0)
-            product_url = product_response.get(
-                "permalink", f"{self.wp_url}/product/{product_concept.get('sku_base', 'new')}"
-            )
+            # M-4 FIX: If the WP API response lacks a 'permalink' key, do not
+            # fabricate one from the SKU — return None so callers surface a real error.
+            product_url = product_response.get("permalink")
+            if product_url is None:
+                raise RuntimeError(
+                    f"WooCommerce API returned a product (id={product_id}) "
+                    "without a 'permalink'. Check WooCommerce configuration."
+                )
             product_slug = product_response.get("slug", "")
         else:
-            # Dry run
+            # Dry run — no WP credentials; product_url is None, not a fabricated path.
+            # M-4 FIX: Returning a fake URL from the SKU silently propagates as a
+            # "real" permalink through SEO and social stages.
             product_id = 0
-            product_url = f"{self.wp_url}/product/{product_concept.get('sku_base', 'new')}"
-            product_slug = product_concept.get("sku_base", "new")
+            product_url = None
+            product_slug = product_concept.get("sku_base", "")
 
         print(f"    [OK] Product created: {product_url}")
 

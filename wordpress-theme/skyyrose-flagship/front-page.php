@@ -56,32 +56,29 @@ foreach ( $skyyrose_collections as $slug => &$col_data ) {
 	$col_data['price_range']   = '';
 
 	if ( function_exists( 'wc_get_products' ) ) {
-		$results = wc_get_products( array(
-			'category' => array( $slug ),
-			'status'   => 'publish',
-			'limit'    => -1,
-			'return'   => 'ids',
-			'paginate' => true,
-		) );
+		// Use taxonomy term count instead of wc_get_products — O(1) vs O(n).
+		global $wpdb;
+		$term = get_term_by( 'slug', $slug, 'product_cat' );
+		if ( $term ) {
+			$col_data['product_count'] = (int) $term->count;
 
-		if ( is_object( $results ) && isset( $results->total ) ) {
-			$col_data['product_count'] = $results->total;
-		}
+			$price_row = $wpdb->get_row( $wpdb->prepare(
+				"SELECT MIN( CAST( pm.meta_value AS DECIMAL(10,2) ) ) AS min_price,
+				        MAX( CAST( pm.meta_value AS DECIMAL(10,2) ) ) AS max_price
+				 FROM {$wpdb->postmeta} pm
+				 INNER JOIN {$wpdb->term_relationships} tr ON pm.post_id = tr.object_id
+				 INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+				 INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID
+				 WHERE tt.term_id = %d
+				   AND tt.taxonomy = 'product_cat'
+				   AND pm.meta_key = '_price'
+				   AND pm.meta_value > 0
+				   AND p.post_status = 'publish'",
+				$term->term_id
+			) );
 
-		// Get price range.
-		$products_for_price = wc_get_products( array(
-			'category' => array( $slug ),
-			'status'   => 'publish',
-			'limit'    => -1,
-		) );
-
-		if ( ! empty( $products_for_price ) ) {
-			$prices = array_filter( array_map( function ( $p ) {
-				return (float) $p->get_price();
-			}, $products_for_price ) );
-
-			if ( ! empty( $prices ) ) {
-				$col_data['price_range'] = '$' . number_format( min( $prices ) ) . ' &mdash; $' . number_format( max( $prices ) );
+			if ( $price_row && $price_row->min_price > 0 ) {
+				$col_data['price_range'] = '$' . number_format( (float) $price_row->min_price ) . ' &mdash; $' . number_format( (float) $price_row->max_price );
 			}
 		}
 	}
@@ -94,18 +91,11 @@ foreach ( $skyyrose_collections as $slug => &$col_data ) {
 }
 unset( $col_data ); // Break reference.
 
-// Total product count for story stats.
+// Total product count for story stats — wp_count_posts is cached, no post objects loaded.
 $skyyrose_total_products = 0;
-if ( function_exists( 'wc_get_products' ) ) {
-	$all_results = wc_get_products( array(
-		'status'   => 'publish',
-		'limit'    => -1,
-		'return'   => 'ids',
-		'paginate' => true,
-	) );
-	if ( is_object( $all_results ) && isset( $all_results->total ) ) {
-		$skyyrose_total_products = $all_results->total;
-	}
+if ( post_type_exists( 'product' ) ) {
+	$product_counts          = wp_count_posts( 'product' );
+	$skyyrose_total_products = isset( $product_counts->publish ) ? (int) $product_counts->publish : 0;
 }
 if ( 0 === $skyyrose_total_products ) {
 	$skyyrose_total_products = 13;
@@ -120,6 +110,9 @@ $assets_uri = SKYYROSE_ASSETS_URI;
 <!-- Scroll progress indicator -->
 <div class="scroll-progress" aria-hidden="true"></div>
 
+<!-- No-JS: hide loader so content is accessible without JavaScript -->
+<noscript><style>#loader{display:none!important}</style></noscript>
+
 <!-- ═══ LOADER ═══ -->
 <div id="loader" role="status" aria-label="<?php esc_attr_e( 'Loading', 'skyyrose-flagship' ); ?>">
 	<span class="ld-brand"><?php echo esc_html( 'SkyyRose' ); ?></span>
@@ -129,7 +122,7 @@ $assets_uri = SKYYROSE_ASSETS_URI;
 
 <!-- ═══ MOBILE MENU ═══ -->
 <div class="mob-menu" id="mobMenu" role="dialog" aria-label="<?php esc_attr_e( 'Mobile Navigation', 'skyyrose-flagship' ); ?>">
-	<span class="mob-close" role="button" aria-label="<?php esc_attr_e( 'Close menu', 'skyyrose-flagship' ); ?>" tabindex="0">&times;</span>
+	<button class="mob-close" type="button" aria-label="<?php esc_attr_e( 'Close menu', 'skyyrose-flagship' ); ?>">&times;</button>
 	<a href="#story"><?php esc_html_e( 'Our Story', 'skyyrose-flagship' ); ?></a>
 	<a href="#collections"><?php esc_html_e( 'Collections', 'skyyrose-flagship' ); ?></a>
 	<a href="#lookbook"><?php esc_html_e( 'Lookbook', 'skyyrose-flagship' ); ?></a>
@@ -158,9 +151,9 @@ $assets_uri = SKYYROSE_ASSETS_URI;
 			<?php esc_html_e( 'Bag', 'skyyrose-flagship' ); ?>
 			<span class="bag-ct" id="bagCt">0</span>
 		</button>
-		<div class="nav-ham" role="button" aria-label="<?php esc_attr_e( 'Open menu', 'skyyrose-flagship' ); ?>" tabindex="0">
+		<button class="nav-ham" type="button" aria-label="<?php esc_attr_e( 'Open menu', 'skyyrose-flagship' ); ?>">
 			<span></span><span></span><span></span>
-		</div>
+		</button>
 	</div>
 </nav>
 
@@ -329,7 +322,7 @@ $organization_schema = array(
 <script type="application/ld+json"><?php echo wp_json_encode( $organization_schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT ); ?></script>
 
 <!-- Back-to-top button -->
-<button class="back-to-top" aria-label="<?php esc_attr_e( 'Back to top', 'skyyrose-flagship' ); ?>">
+<button type="button" class="back-to-top" aria-label="<?php esc_attr_e( 'Back to top', 'skyyrose-flagship' ); ?>">
 	<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-8 8h5v8h6v-8h5z"/></svg>
 </button>
 

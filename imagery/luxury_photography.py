@@ -189,17 +189,42 @@ class LuxuryProductPhotography:
         shot_type: ShotType = ShotType.HERO,
         lighting: LightingPreset = LightingPreset.STUDIO_DRAMATIC,
     ) -> str:
-        """Build optimized prompt for luxury positioning."""
+        """Build optimized prompt for luxury positioning.
+
+        C-1 FIX: Empty ``specs.materials`` raises ``ValueError`` — no "premium fabric"
+        fallback injected into the prompt.
+
+        C-2 FIX: Unknown collection raises ``ValueError`` — no fabricated aesthetic
+        fallback.
+
+        H-1 FIX: Aspirational camera brand claims (Phase One, Hasselblad, Vogue
+        standard) removed. They constitute hallucination risk and add no measurable
+        value to diffusion model output quality.
+
+        For pipeline-level callers that use :class:`~core.product_spec.ProductSpec`,
+        prefer :class:`~imagery.prompt_guard.GroundedPromptBuilder` which enforces
+        the two-zone prompt format and the full spec-validation stack.
+        """
+        # C-2: Resolve collection — raises ValueError for unknown keys
         collection_key = specs.collection.upper().replace("-", "_")
         collection_aesthetic = self.COLLECTION_AESTHETICS.get(
-            collection_key,
-            self.COLLECTION_AESTHETICS.get(specs.collection, "luxury streetwear"),
-        )
+            collection_key
+        ) or self.COLLECTION_AESTHETICS.get(specs.collection)
+        if collection_aesthetic is None:
+            valid = [k for k in self.COLLECTION_AESTHETICS if "_" in k]
+            raise ValueError(f"Unknown collection {specs.collection!r}. Valid collections: {valid}")
 
         lighting_desc = self.LIGHTING_PROMPTS.get(lighting, "")
         angle_desc = self.ANGLE_PROMPTS.get(shot_type, "")
 
-        materials = ", ".join(specs.materials) if specs.materials else "premium fabric"
+        # C-1: Raise on missing materials instead of silently injecting a placeholder
+        if not specs.materials:
+            raise ValueError(
+                f"GarmentSpecs.materials is empty for {specs.name!r}. "
+                "Fabric must be explicitly supplied — no default allowed."
+            )
+        materials = ", ".join(specs.materials)
+
         colors = ", ".join(specs.colors) if specs.colors else ""
 
         prompt_parts = [
@@ -211,13 +236,11 @@ class LuxuryProductPhotography:
             f"materials: {materials}",
             f"colors: {colors}" if colors else "",
             specs.details,
+            # H-1: Photography quality descriptors without camera brand claims
             "luxury streetwear, high-fashion photography",
             "Oakland street culture meets high fashion",
-            "professional studio lighting, Phase One camera quality",
-            "Hasselblad medium format aesthetic",
-            "8K resolution, ultra detailed fabric texture",
-            "premium materials visible, impeccable craftsmanship",
-            "editorial fashion magazine quality, Vogue standard",
+            "8K resolution, ultra-detailed fabric texture",
+            "editorial fashion photography, professional studio",
             "neutral background with subtle gradients",
             "gender-neutral presentation, inclusive fashion",
             "SkyyRose signature aesthetic",

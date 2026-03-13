@@ -23,8 +23,9 @@ from strawberry.fastapi import GraphQLRouter
 from api.graphql.dataloaders.product_loader import ProductDataLoader
 from api.graphql.schema import schema
 
-# Enable GraphiQL playground in development, disable in production
-_graphiql_enabled = os.getenv("ENVIRONMENT", "development") != "production"
+# Enable GraphiQL playground and introspection in development, disable in production
+_is_production = os.getenv("ENVIRONMENT", "development") == "production"
+_graphiql_enabled = not _is_production
 
 
 async def _get_context(request: Request) -> dict[str, Any]:
@@ -47,5 +48,6 @@ async def _get_context(request: Request) -> dict[str, Any]:
 graphql_router = GraphQLRouter(
     schema,
     graphql_ide="graphiql" if _graphiql_enabled else None,
+    allow_queries_via_get=not _is_production,
     context_getter=_get_context,
 )

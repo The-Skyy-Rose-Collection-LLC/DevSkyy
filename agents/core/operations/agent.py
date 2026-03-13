@@ -70,6 +70,20 @@ class OperationsCoreAgent(CoreAgent):
         except ImportError:
             logger.debug("[%s] CodingDoctorSubAgent unavailable", self.name)
 
+        # SDK-powered agents (tool-use enabled)
+        try:
+            from agents.claude_sdk.domain_agents.operations import (
+                SDKCodeDoctorAgent,
+                SDKDeployRunnerAgent,
+                SDKSecurityScannerAgent,
+            )
+
+            self.register_sub_agent("sdk_deploy_runner", SDKDeployRunnerAgent())
+            self.register_sub_agent("sdk_code_doctor", SDKCodeDoctorAgent())
+            self.register_sub_agent("sdk_security_scanner", SDKSecurityScannerAgent())
+        except ImportError:
+            logger.debug("[%s] SDK operations agents unavailable", self.name)
+
     def _get_legacy_agent(self) -> Any:
         if self._legacy_agent is None:
             try:
@@ -84,20 +98,33 @@ class OperationsCoreAgent(CoreAgent):
 
     async def execute(self, task: str, **kwargs: Any) -> dict[str, Any]:
         task_lower = task.lower()
+        # Prefer SDK agents (tool-use) when "run", "execute", "fix",
+        # "scan", or "check" indicate action is needed, not just advice.
+        needs_action = any(
+            kw in task_lower for kw in ["run", "execute", "fix", "scan", "check", "patch"]
+        )
 
         if any(kw in task_lower for kw in ["deploy", "rollback", "release", "ci", "cd"]):
+            if needs_action and "sdk_deploy_runner" in self._sub_agents:
+                return await self.delegate("sdk_deploy_runner", task, **kwargs)
             if "deployment_manager" in self._sub_agents:
                 return await self.delegate("deployment_manager", task, **kwargs)
 
         if any(kw in task_lower for kw in ["security", "vulnerability", "cve", "audit"]):
+            if needs_action and "sdk_security_scanner" in self._sub_agents:
+                return await self.delegate("sdk_security_scanner", task, **kwargs)
             if "security_monitor" in self._sub_agents:
                 return await self.delegate("security_monitor", task, **kwargs)
 
         if any(kw in task_lower for kw in ["health", "uptime", "monitor", "status"]):
+            if needs_action and "sdk_deploy_runner" in self._sub_agents:
+                return await self.delegate("sdk_deploy_runner", task, **kwargs)
             if "health_checker" in self._sub_agents:
                 return await self.delegate("health_checker", task, **kwargs)
 
         if any(kw in task_lower for kw in ["lint", "type", "code", "quality", "fix"]):
+            if needs_action and "sdk_code_doctor" in self._sub_agents:
+                return await self.delegate("sdk_code_doctor", task, **kwargs)
             if "coding_doctor" in self._sub_agents:
                 return await self.delegate("coding_doctor", task, **kwargs)
 

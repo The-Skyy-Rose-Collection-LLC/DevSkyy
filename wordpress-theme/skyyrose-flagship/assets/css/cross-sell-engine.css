@@ -51,7 +51,7 @@
 
 .cs-heading {
 	font-family: var(--font-body, 'Inter', sans-serif);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.22em;
 	text-transform: uppercase;
@@ -244,7 +244,7 @@
 	background: transparent;
 
 	font-family: var(--font-body, 'Inter', sans-serif);
-	font-size: 0.58rem;
+	font-size: 0.6875rem;
 	font-weight: 600;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
@@ -350,7 +350,7 @@
 	}
 
 	.cs-name {
-		font-size: 0.6rem;
+		font-size: 0.6875rem;
 	}
 
 	.cs-price {
@@ -358,7 +358,7 @@
 	}
 
 	.cs-quick-add {
-		font-size: 0.54rem;
+		font-size: 0.6875rem;
 		padding: 5px 6px;
 	}
 }

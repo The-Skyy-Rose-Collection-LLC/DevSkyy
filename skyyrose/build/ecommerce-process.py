@@ -18,14 +18,13 @@ Usage:
   python3 build/ecommerce-process.py --no-rembg  # skip bg removal
 """
 
-import os
-import re
 import sys
 import time
 from pathlib import Path
 
 try:
     from rembg import new_session, remove
+
     REMBG_OK = True
 except ImportError:
     REMBG_OK = False
@@ -33,6 +32,7 @@ except ImportError:
 
 try:
     from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageOps
+
     PIL_OK = True
 except ImportError:
     PIL_OK = False
@@ -40,144 +40,214 @@ except ImportError:
     sys.exit(1)
 
 import io
-import json
-import subprocess
 
 # ── Paths ─────────────────────────────────────────────────────────────────
-ROOT      = Path(__file__).parent.parent
-SRC_DIR   = ROOT / "assets/images/source-products"
-OUT_DIR   = ROOT / "assets/images/products-ecom"
+ROOT = Path(__file__).parent.parent
+SRC_DIR = ROOT / "assets/images/source-products"
+OUT_DIR = ROOT / "assets/images/products-ecom"
 
 # ── Canvas standard (Amazon/Shopify: 2400×2400, white, product fills ~85%) ──
-CANVAS_SIZE    = 2400
-PRODUCT_FILL   = 0.85   # product occupies 85% of canvas
-SHADOW_OPACITY = 60     # 0-255
-SHADOW_BLUR    = 30
-SHADOW_OFFSET  = (0, 40)
+CANVAS_SIZE = 2400
+PRODUCT_FILL = 0.85  # product occupies 85% of canvas
+SHADOW_OPACITY = 60  # 0-255
+SHADOW_BLUR = 30
+SHADOW_OFFSET = (0, 40)
 
 # ── Product map (id → source files, per-product bg removal flag) ─────────
 PRODUCTS = [
     # BLACK ROSE
-    dict(id="br-001", name="BLACK Rose Crewneck", col="black-rose",
-         files=["PhotoRoom_004_20230616_170635.PNG"],  # black colorway flat lay
-         rembg=True),
-
-    dict(id="br-002", name="BLACK Rose Joggers", col="black-rose",
-         files=["PhotoRoom_010_20231221_160237.jpeg"],
-         rembg=True),
-
-    dict(id="br-003", name="BLACK is Beautiful Jersey", col="black-rose",
-         files=[
-             # Last Oakland (green/gold) — Pre-Order
-             "5A8946B1-B51F-4144-BCBB-F028462077A0.jpg",    # last oakland front
-             "266AD7B0-88A6-4489-AA58-AB72A575BD33 3.JPG",  # last oakland back
-             # Black (black/white trim)
-             "The BLACK Jersey (BLACK Rose Collection).jpg",  # black front
-             # Giants (black/orange)
-             "BLACK is Beautiful Giants Front.jpg",           # giants front
-             "PhotoRoom_003_20230616_170635 (1).png",         # giants back
-             # White (black trim)
-             "PhotoRoom_011_20230616_170635.png",             # white front
-             "PhotoRoom_000_20230616_170635.png",             # white back
-         ],
-         rembg=False),  # all PhotoRoom/clean shots already have no bg
-
-    dict(id="br-004", name="BLACK Rose Hoodie", col="black-rose",
-         files=["PhotoRoom_001_20230523_204834.PNG"],
-         rembg=False),
-
-    dict(id="br-005", name="BLACK Rose Hoodie — Signature Edition", col="black-rose",
-         files=["PhotoRoom_008_20221210_093149.PNG"],
-         rembg=False),
-
-    dict(id="br-006", name="BLACK Rose Sherpa Jacket", col="black-rose",
-         files=["The BLACK Rose Sherpa Front.jpg",
-                "The BLACK Rose Sherpa Back.jpg"],
-         rembg=True),
-
-    dict(id="br-007", name="BLACK Rose × Love Hurts Basketball Shorts", col="black-rose",
-         files=["PhotoRoom_20221110_201933.PNG",
-                "PhotoRoom_20221110_202133.PNG"],
-         rembg=False),
-
-    dict(id="br-008", name="Women's BLACK Rose Hooded Dress", col="black-rose",
-         files=["Womens Black Rose Hooded Dress.jpeg"],
-         rembg=True),
-
+    dict(
+        id="br-001",
+        name="BLACK Rose Crewneck",
+        col="black-rose",
+        files=["PhotoRoom_004_20230616_170635.PNG"],  # black colorway flat lay
+        rembg=True,
+    ),
+    dict(
+        id="br-002",
+        name="BLACK Rose Joggers",
+        col="black-rose",
+        files=["PhotoRoom_010_20231221_160237.jpeg"],
+        rembg=True,
+    ),
+    dict(
+        id="br-003",
+        name="BLACK is Beautiful Jersey",
+        col="black-rose",
+        files=[
+            # Last Oakland (green/gold) — Pre-Order
+            "5A8946B1-B51F-4144-BCBB-F028462077A0.jpg",  # last oakland front
+            "266AD7B0-88A6-4489-AA58-AB72A575BD33 3.JPG",  # last oakland back
+            # Black (black/white trim)
+            "The BLACK Jersey (BLACK Rose Collection).jpg",  # black front
+            # Giants (black/orange)
+            "BLACK is Beautiful Giants Front.jpg",  # giants front
+            "PhotoRoom_003_20230616_170635 (1).png",  # giants back
+            # White (black trim)
+            "PhotoRoom_011_20230616_170635.png",  # white front
+            "PhotoRoom_000_20230616_170635.png",  # white back
+        ],
+        rembg=False,
+    ),  # all PhotoRoom/clean shots already have no bg
+    dict(
+        id="br-004",
+        name="BLACK Rose Hoodie",
+        col="black-rose",
+        files=["PhotoRoom_001_20230523_204834.PNG"],
+        rembg=False,
+    ),
+    dict(
+        id="br-005",
+        name="BLACK Rose Hoodie — Signature Edition",
+        col="black-rose",
+        files=["PhotoRoom_008_20221210_093149.PNG"],
+        rembg=False,
+    ),
+    dict(
+        id="br-006",
+        name="BLACK Rose Sherpa Jacket",
+        col="black-rose",
+        files=["The BLACK Rose Sherpa Front.jpg", "The BLACK Rose Sherpa Back.jpg"],
+        rembg=True,
+    ),
+    dict(
+        id="br-007",
+        name="BLACK Rose × Love Hurts Basketball Shorts",
+        col="black-rose",
+        files=["PhotoRoom_20221110_201933.PNG", "PhotoRoom_20221110_202133.PNG"],
+        rembg=False,
+    ),
+    dict(
+        id="br-008",
+        name="Women's BLACK Rose Hooded Dress",
+        col="black-rose",
+        files=["Womens Black Rose Hooded Dress.jpeg"],
+        rembg=True,
+    ),
     # LOVE HURTS
-    dict(id="lh-001", name="The Fannie", col="love-hurts",
-         files=["IMG_0117.jpeg",
-                "4074E988-4DAF-4221-8446-4B93422AF437.jpg"],
-         rembg=True),
-
-    dict(id="lh-002", name="Love Hurts Joggers", col="love-hurts",
-         files=["IMG_2102.png"],                           # Black colorway
-         rembg=False),
-
-    dict(id="lh-002b", name="Love Hurts Joggers", col="love-hurts",
-         files=["IMG_2103.png", "IMG_2105.png"],           # White colorway
-         rembg=False),
-
-    dict(id="lh-003", name="Love Hurts Basketball Shorts", col="love-hurts",
-         files=["PhotoRoom_004_20221110_200039.png",
-                "PhotoRoom_003_20221110_200039.png",
-                "PhotoRoom_018_20231221_160237.jpeg"],
-         rembg=False),
-
-    dict(id="lh-004", name="Love Hurts Varsity Jacket", col="love-hurts",
-         files=["Love-Hurts-Varsity-Jacket.jpg"],
-         rembg=True),
-
+    dict(
+        id="lh-001",
+        name="The Fannie",
+        col="love-hurts",
+        files=["IMG_0117.jpeg", "4074E988-4DAF-4221-8446-4B93422AF437.jpg"],
+        rembg=True,
+    ),
+    dict(
+        id="lh-002",
+        name="Love Hurts Joggers",
+        col="love-hurts",
+        files=["IMG_2102.png"],  # Black colorway
+        rembg=False,
+    ),
+    dict(
+        id="lh-002b",
+        name="Love Hurts Joggers",
+        col="love-hurts",
+        files=["IMG_2103.png", "IMG_2105.png"],  # White colorway
+        rembg=False,
+    ),
+    dict(
+        id="lh-003",
+        name="Love Hurts Basketball Shorts",
+        col="love-hurts",
+        files=[
+            "PhotoRoom_004_20221110_200039.png",
+            "PhotoRoom_003_20221110_200039.png",
+            "PhotoRoom_018_20231221_160237.jpeg",
+        ],
+        rembg=False,
+    ),
+    dict(
+        id="lh-004",
+        name="Love Hurts Varsity Jacket",
+        col="love-hurts",
+        files=["Love-Hurts-Varsity-Jacket.jpg"],
+        rembg=True,
+    ),
     # SIGNATURE
-    dict(id="sg-001", name="The Bay Set", col="signature",
-         files=["0F85F48C-364B-43CB-8297-E90BB7B8BB51 2.jpg",
-                "24661692-0F81-43F4-AA69-7E026552914A.jpg"],
-         rembg=True),
-
-    dict(id="sg-002", name="Stay Golden Set", col="signature",
-         files=["562143CF-4A77-42B8-A58C-C77ED21E9B5E.jpg"],
-         rembg=True),
-
-    dict(id="sg-003", name="The Signature Tee", col="signature",
-         files=["IMG_0553.JPG",
-                "Signature T \u201cOrchard\u201d.jpeg"],   # Orchid colorway
-         rembg=True),
-
-    dict(id="sg-004", name="The Signature Tee", col="signature",
-         files=["IMG_0554.JPG",
-                "Signature T \u201cWhite\u201d.jpeg"],     # White colorway
-         rembg=True),
-
-    dict(id="sg-005", name="Stay Golden Tee", col="signature",
-         files=["Photo Dec 18 2023, 6 09 21 PM.jpg"],
-         rembg=True),
-
-    dict(id="sg-006", name="Mint & Lavender Hoodie", col="signature",
-         files=["PhotoRoom_004_20231221_160237.jpeg",
-                "Mint & Lavender Set (Sold Separately) .jpeg",
-                "MINT & Lavender Set 2 .jpeg"],
-         rembg=False),
-
-    dict(id="sg-007", name="The Signature Beanie", col="signature",
-         files=["Signature-Beanie-Red.jpg",      # Red colorway
-                "Signature-Beanie-Purple.jpg",   # Purple colorway
-                "Signature-Beanie-Black.jpg"],   # Black colorway
-         rembg=False),
-
-    dict(id="sg-009", name="The Sherpa Jacket", col="signature",
-         files=["PhotoRoom_002_20231221_072338.jpg",
-                "PhotoRoom_003_20231221_072338.jpg"],
-         rembg=True),
-
-    dict(id="sg-010", name="The Bridge Series Shorts", col="signature",
-         files=["Bridge-Series-Bay-Bridge.jpg",     # Bay Bridge colorway
-                "Bridge-Series-Golden-Gate.jpg"],   # Golden Gate colorway
-         rembg=False),
+    dict(
+        id="sg-001",
+        name="The Bay Set",
+        col="signature",
+        files=[
+            "0F85F48C-364B-43CB-8297-E90BB7B8BB51 2.jpg",
+            "24661692-0F81-43F4-AA69-7E026552914A.jpg",
+        ],
+        rembg=True,
+    ),
+    dict(
+        id="sg-002",
+        name="Stay Golden Set",
+        col="signature",
+        files=["562143CF-4A77-42B8-A58C-C77ED21E9B5E.jpg"],
+        rembg=True,
+    ),
+    dict(
+        id="sg-003",
+        name="The Signature Tee",
+        col="signature",
+        files=["IMG_0553.JPG", "Signature T \u201cOrchard\u201d.jpeg"],  # Orchid colorway
+        rembg=True,
+    ),
+    dict(
+        id="sg-004",
+        name="The Signature Tee",
+        col="signature",
+        files=["IMG_0554.JPG", "Signature T \u201cWhite\u201d.jpeg"],  # White colorway
+        rembg=True,
+    ),
+    dict(
+        id="sg-005",
+        name="Stay Golden Tee",
+        col="signature",
+        files=["Photo Dec 18 2023, 6 09 21 PM.jpg"],
+        rembg=True,
+    ),
+    dict(
+        id="sg-006",
+        name="Mint & Lavender Hoodie",
+        col="signature",
+        files=[
+            "PhotoRoom_004_20231221_160237.jpeg",
+            "Mint & Lavender Set (Sold Separately) .jpeg",
+            "MINT & Lavender Set 2 .jpeg",
+        ],
+        rembg=False,
+    ),
+    dict(
+        id="sg-007",
+        name="The Signature Beanie",
+        col="signature",
+        files=[
+            "Signature-Beanie-Red.jpg",  # Red colorway
+            "Signature-Beanie-Purple.jpg",  # Purple colorway
+            "Signature-Beanie-Black.jpg",
+        ],  # Black colorway
+        rembg=False,
+    ),
+    dict(
+        id="sg-009",
+        name="The Sherpa Jacket",
+        col="signature",
+        files=["PhotoRoom_002_20231221_072338.jpg", "PhotoRoom_003_20231221_072338.jpg"],
+        rembg=True,
+    ),
+    dict(
+        id="sg-010",
+        name="The Bridge Series Shorts",
+        col="signature",
+        files=[
+            "Bridge-Series-Bay-Bridge.jpg",  # Bay Bridge colorway
+            "Bridge-Series-Golden-Gate.jpg",
+        ],  # Golden Gate colorway
+        rembg=False,
+    ),
 ]
 
 
 # ── rembg session (load once) ─────────────────────────────────────────────
 rembg_session = None
+
 
 def get_rembg_session():
     global rembg_session
@@ -189,6 +259,7 @@ def get_rembg_session():
 
 
 # ── Core processing ───────────────────────────────────────────────────────
+
 
 def load_image(path: Path) -> Image.Image:
     """Load image, convert to RGBA."""
@@ -243,11 +314,11 @@ def has_existing_white_bg(img: Image.Image) -> bool:
     w, h = rgb.size
     corners = [
         rgb.getpixel((10, 10)),
-        rgb.getpixel((w-10, 10)),
-        rgb.getpixel((10, h-10)),
-        rgb.getpixel((w-10, h-10)),
+        rgb.getpixel((w - 10, 10)),
+        rgb.getpixel((10, h - 10)),
+        rgb.getpixel((w - 10, h - 10)),
     ]
-    whites = sum(1 for r,g,b in corners if r > 240 and g > 240 and b > 240)
+    whites = sum(1 for r, g, b in corners if r > 240 and g > 240 and b > 240)
     return whites >= 3
 
 
@@ -277,7 +348,7 @@ def add_shadow(canvas: Image.Image, subject: Image.Image, position: tuple) -> Im
     """Add a realistic soft shadow beneath the product."""
     # Create shadow from subject alpha
     shadow_color = (20, 20, 20, SHADOW_OPACITY)
-    shadow_layer = Image.new("RGBA", canvas.size, (0,0,0,0))
+    shadow_layer = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
 
     # Place shadow offset downward
     sx = position[0] + SHADOW_OFFSET[0]
@@ -325,15 +396,18 @@ def place_on_canvas(subject: Image.Image, canvas_size: int, fill_ratio: float) -
     return canvas
 
 
-def process_image(src_path: Path, out_stem: str, out_dir: Path,
-                  do_rembg: bool = True, is_flatlay: bool = True) -> dict:
+def process_image(
+    src_path: Path, out_stem: str, out_dir: Path, do_rembg: bool = True, is_flatlay: bool = True
+) -> dict:
     """Full e-commerce processing pipeline for one image."""
     out_dir.mkdir(parents=True, exist_ok=True)
 
     img = load_image(src_path)
 
     # Detect if bg already removed (PhotoRoom etc.)
-    already_clean = src_path.suffix.lower() == ".png" and has_existing_white_bg(img.convert("RGB")) is False
+    already_clean = (
+        src_path.suffix.lower() == ".png" and has_existing_white_bg(img.convert("RGB")) is False
+    )
 
     # ── Step 1: Background removal ────────────────────────────────────────
     if do_rembg and REMBG_OK and not already_clean:
@@ -373,14 +447,15 @@ def process_image(src_path: Path, out_stem: str, out_dir: Path,
     final_rgb.save(webp_path, "WEBP", quality=88, method=6)
 
     sizes = {
-        "png_kb":  png_path.stat().st_size // 1024,
-        "jpg_kb":  jpg_path.stat().st_size // 1024,
+        "png_kb": png_path.stat().st_size // 1024,
+        "jpg_kb": jpg_path.stat().st_size // 1024,
         "webp_kb": webp_path.stat().st_size // 1024,
     }
     return sizes
 
 
 # ── Promo / Logo processing (no bg removal, just quality enhance) ─────────
+
 
 def process_promo(src_path: Path, out_dir: Path) -> dict:
     """Enhance promo/ad photos: color, sharpness, quality output only."""
@@ -406,16 +481,17 @@ def process_promo(src_path: Path, out_dir: Path) -> dict:
 
 # ── Main ──────────────────────────────────────────────────────────────────
 
+
 def main():
     no_rembg = "--no-rembg" in sys.argv
-    target   = next((a for a in sys.argv[1:] if not a.startswith("--")), None)
+    target = next((a for a in sys.argv[1:] if not a.startswith("--")), None)
 
     print("\n SkyyRose — E-Commerce Image Processing Pipeline")
     print("=" * 60)
     if no_rembg:
         print("  Mode: no background removal")
-    print(f"  Canvas: {CANVAS_SIZE}×{CANVAS_SIZE}px | Fill: {int(PRODUCT_FILL*100)}%")
-    print(f"  Outputs: master PNG + web JPEG (94%) + WebP (88%)")
+    print(f"  Canvas: {CANVAS_SIZE}×{CANVAS_SIZE}px | Fill: {int(PRODUCT_FILL * 100)}%")
+    print("  Outputs: master PNG + web JPEG (94%) + WebP (88%)")
     print()
 
     # Pre-load model once
@@ -427,7 +503,11 @@ def main():
     total_fail = 0
 
     for prod in products_to_run:
-        col_label = {"black-rose": "BLACK ROSE", "love-hurts": "LOVE HURTS", "signature": "SIGNATURE"}.get(prod["col"], prod["col"])
+        col_label = {
+            "black-rose": "BLACK ROSE",
+            "love-hurts": "LOVE HURTS",
+            "signature": "SIGNATURE",
+        }.get(prod["col"], prod["col"])
         print(f"\n  [{col_label}] {prod['id']} — {prod['name']}")
 
         out_dir = OUT_DIR / prod["id"]
@@ -437,18 +517,19 @@ def main():
                 print(f"    ⚠️  Not found: {fname}")
                 continue
 
-            suffix = "product" if i == 0 else f"product-{i+1}"
+            suffix = "product" if i == 0 else f"product-{i + 1}"
             out_stem = f"{prod['id']}-{suffix}"
             do_rembg = prod["rembg"] and not no_rembg
 
             try:
                 t0 = time.time()
-                sizes = process_image(src, out_stem, out_dir,
-                                      do_rembg=do_rembg, is_flatlay=True)
+                sizes = process_image(src, out_stem, out_dir, do_rembg=do_rembg, is_flatlay=True)
                 elapsed = time.time() - t0
                 rembg_tag = " [bg removed]" if do_rembg else ""
                 print(f"    ✅ {fname[:55]}{rembg_tag}")
-                print(f"       PNG:{sizes['png_kb']}KB  JPG:{sizes['jpg_kb']}KB  WebP:{sizes['webp_kb']}KB  ({elapsed:.1f}s)")
+                print(
+                    f"       PNG:{sizes['png_kb']}KB  JPG:{sizes['jpg_kb']}KB  WebP:{sizes['webp_kb']}KB  ({elapsed:.1f}s)"
+                )
                 total_ok += 1
             except Exception as e:
                 print(f"    ❌ {fname} — {e}")
@@ -465,7 +546,9 @@ def main():
                     continue
                 try:
                     sizes = process_promo(f, promo_out)
-                    print(f"    ✅ {f.name[:55]}  JPG:{sizes['jpg_kb']}KB  WebP:{sizes['webp_kb']}KB")
+                    print(
+                        f"    ✅ {f.name[:55]}  JPG:{sizes['jpg_kb']}KB  WebP:{sizes['webp_kb']}KB"
+                    )
                     total_ok += 1
                 except Exception as e:
                     print(f"    ❌ {f.name} — {e}")
@@ -480,7 +563,9 @@ def main():
                     continue
                 try:
                     sizes = process_promo(f, logo_out)
-                    print(f"    ✅ {f.name[:55]}  JPG:{sizes['jpg_kb']}KB  WebP:{sizes['webp_kb']}KB")
+                    print(
+                        f"    ✅ {f.name[:55]}  JPG:{sizes['jpg_kb']}KB  WebP:{sizes['webp_kb']}KB"
+                    )
                     total_ok += 1
                 except Exception as e:
                     print(f"    ❌ {f.name} — {e}")

@@ -64,7 +64,7 @@ $collections = array(
 get_header();
 ?>
 
-<main id="primary" class="site-main lux-page" role="main">
+<main id="primary" class="site-main lux-page" role="main" tabindex="-1">
 
 <!-- ════════════════════════════════════════════════
      HERO — Full-Bleed Cinematic
@@ -72,7 +72,7 @@ get_header();
 <section class="lux-hero" aria-label="<?php esc_attr_e( 'SkyyRose Luxury Streetwear', 'skyyrose-flagship' ); ?>">
 	<div class="lux-hero__bg">
 		<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/scenes/black-rose/black-rose-moonlit-courtyard.webp' ); ?>"
-		     alt="" width="1920" height="1080" fetchpriority="high">
+		     alt="" width="1920" height="1080" loading="eager" fetchpriority="high" decoding="async">
 	</div>
 	<div class="lux-hero__overlay"></div>
 	<div class="lux-hero__content">
@@ -254,15 +254,15 @@ get_header();
 			$price      = skyyrose_format_price( $product );
 			$delay      = $di > 0 ? ' rv-d' . $di : '';
 		?>
-		<div class="lux-drop-card rv<?php echo esc_attr( $delay ); ?>" data-sku="<?php echo $sku; ?>">
+		<div class="lux-drop-card rv<?php echo esc_attr( $delay ); ?>" data-sku="<?php echo esc_attr( $sku ); ?>">
 			<div class="lux-drop-card__img">
-				<img src="<?php echo $image_url; ?>"
-				     alt="<?php echo $name; ?>"
+				<img src="<?php echo esc_url( $image_url ); ?>"
+				     alt="<?php echo esc_attr( $name ); ?>"
 				     width="420" height="560" loading="lazy">
 				<span class="lux-drop-card__badge"><?php esc_html_e( 'Pre-Order', 'skyyrose-flagship' ); ?></span>
 			</div>
 			<div class="lux-drop-card__info">
-				<h3 class="lux-drop-card__name"><?php echo $name; ?></h3>
+				<h3 class="lux-drop-card__name"><?php echo esc_html( $name ); ?></h3>
 				<span class="lux-drop-card__price"><?php echo wp_kses_post( $price ); ?></span>
 				<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="lux-drop-card__cta">
 					<?php esc_html_e( 'Pre-Order Now', 'skyyrose-flagship' ); ?>

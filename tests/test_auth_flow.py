@@ -353,7 +353,6 @@ class TestTokenRoundTrip:
         assert refresh_payload.sub == "user-rt"
 
     def test_blacklisted_token_fails(self):
-
         config = JWTConfig()
         mgr = JWTManager(config)
         bl = TokenBlacklist()

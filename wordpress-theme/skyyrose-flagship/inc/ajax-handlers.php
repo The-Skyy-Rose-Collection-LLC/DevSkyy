@@ -422,3 +422,79 @@ add_action(
 		);
 	}
 );
+
+/*--------------------------------------------------------------
+ * Referral Link Tracking
+ *--------------------------------------------------------------*/
+
+/**
+ * Handle referral link attribution when a visitor lands via a ?ref= URL.
+ *
+ * Front-end JS sends the referral code via AJAX when it detects a `ref`
+ * query parameter. This handler validates the code against existing
+ * WooCommerce coupons and sets a 30-day cookie so the conversion
+ * can be attributed on order completion by skyyrose_woo_credit_referrer().
+ *
+ * Posted fields:
+ *   nonce    — skyyrose-nonce (from skyyRoseData.nonce)
+ *   ref_code — referral code (e.g. SKYYA1B2C3)
+ *
+ * @since 5.0.0
+ * @return void
+ */
+function skyyrose_ajax_track_referral() {
+
+	// Verify nonce.
+	if ( ! isset( $_POST['nonce'] ) ||
+		! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'skyyrose-nonce' ) ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Security check failed.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
+
+	$ref_code = strtoupper( sanitize_text_field( wp_unslash( $_POST['ref_code'] ?? '' ) ) );
+
+	// Validate format: SKYY followed by 4-8 uppercase alphanumeric chars.
+	if ( ! preg_match( '/^SKYY[A-Z0-9]{4,8}$/', $ref_code ) ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Invalid referral code.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
+
+	// Confirm the coupon exists in WooCommerce before attributing.
+	if ( class_exists( 'WC_Coupon' ) ) {
+		$coupon = new WC_Coupon( strtolower( $ref_code ) );
+		if ( ! $coupon->get_id() ) {
+			wp_send_json_error(
+				array(
+					'message' => esc_html__( 'Referral code not found.', 'skyyrose-flagship' ),
+				)
+			);
+			return;
+		}
+	}
+
+	// Set a 30-day cookie for checkout attribution.
+	// setcookie() is safe here: admin-ajax.php emits no content bytes before the handler fires.
+	if ( ! headers_sent() ) {
+		setcookie(
+			'sr_ref',
+			$ref_code,
+			time() + ( 30 * DAY_IN_SECONDS ),
+			COOKIEPATH,
+			COOKIE_DOMAIN,
+			is_ssl(),
+			true  // httponly — not accessible to JS.
+		);
+	}
+
+	wp_send_json_success( array( 'code' => $ref_code ) );
+}
+add_action( 'wp_ajax_skyyrose_track_referral', 'skyyrose_ajax_track_referral' );
+add_action( 'wp_ajax_nopriv_skyyrose_track_referral', 'skyyrose_ajax_track_referral' );

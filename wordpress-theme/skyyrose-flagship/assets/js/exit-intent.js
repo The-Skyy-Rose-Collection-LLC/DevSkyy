@@ -117,7 +117,7 @@
 			var ajaxUrl = data.ajaxUrl || '/index.php?rest_route=/';
 
 			var formData = new FormData();
-			formData.append( 'action', 'skyyrose_newsletter_subscribe' );
+			formData.append( 'action', 'skyyrose_klaviyo_subscribe' );
 			formData.append( 'email', email );
 			if ( data.nonce ) {
 				formData.append( 'nonce', data.nonce );

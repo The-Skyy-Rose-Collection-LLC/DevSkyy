@@ -53,7 +53,7 @@ class DesignSpecs:
     collection: str  # BLACK_ROSE, LOVE_HURTS, SIGNATURE
     price: float
     garment_type: str
-    material: str = "premium fabric"
+    material: str  # C-5 FIX: no default — caller must supply actual fabric name
     colors: list[str] = field(default_factory=list)
     sizes: list[str] = field(default_factory=lambda: ["XS", "S", "M", "L", "XL", "2XL"])
     require_approval: bool = False
@@ -127,6 +127,22 @@ class SkyyRoseLuxuryPipeline:
             "the foundation of elevated everyday wear."
         ),
     }
+
+    def _get_collection_intro(self, collection: str) -> str:
+        """Return the short-description intro line for *collection*.
+
+        H-4 FIX: Raises ``ValueError`` for unknown collections instead of
+        silently falling back to a fabricated ``"Premium SkyyRose fashion"``
+        string that ships to WooCommerce without review.
+        """
+        intro = self.COLLECTION_INTROS.get(collection)
+        if intro is None:
+            valid = list(self.COLLECTION_INTROS)
+            raise ValueError(
+                f"No intro copy registered for collection {collection!r}. "
+                f"Valid collections: {valid}"
+            )
+        return intro
 
     QUALITY_THRESHOLD = 0.90  # 90% minimum
 
@@ -298,41 +314,56 @@ class SkyyRoseLuxuryPipeline:
         specs: DesignSpecs,
         output_dir: Path,
     ) -> dict[str, Path]:
-        """Stage 1: Generate luxury product photography."""
-        from imagery.luxury_photography import GarmentSpecs
+        """Stage 1: Generate photography via SkyyRoseMasterOrchestrator (2D pipeline).
 
-        garment_specs = GarmentSpecs(
-            name=specs.name,
-            garment_type=specs.garment_type,
-            collection=specs.collection,
-            colors=specs.colors,
-            materials=[specs.material],
-        )
+        COMPOSITION REFACTOR: Previously called LuxuryProductPhotography directly,
+        duplicating prompt-building logic and bypassing hallucination guards.
 
+        Now delegates to SkyyRoseMasterOrchestrator._stage_1_generate_photography(),
+        which uses GroundedPromptBuilder and the canonical collection registry.
+        This ensures C-1, C-2, H-1, H-2 fixes are applied consistently regardless
+        of which pipeline entry point is used.
+        """
+        import shutil as _shutil
+
+        from core.product_spec import from_design_specs
+        from pipelines.skyyrose_master_orchestrator import SkyyRoseMasterOrchestrator
+
+        # Convert DesignSpecs → validated ProductSpec (raises if fabric is placeholder)
+        product_spec = from_design_specs(specs)
+
+        config: dict = {
+            "wordpress_url": self.wordpress_url or "https://skyyrose.co",
+            # No WP/R2 credentials — we only need Stage 1 (photography)
+        }
+        orchestrator = SkyyRoseMasterOrchestrator(config)
+
+        # Run Stage 1 only — reuse the orchestrator's backend-routing logic
+        # (FLUX → SDXL fallback, health tracking, rate limiting)
+        concept = product_spec.model_dump(mode="python")
+        concept["sku_base"] = product_spec.sku  # orchestrator expects sku_base key
+        launch_report: dict = {}
+        photo_results = await orchestrator._stage_1_generate_photography(concept, launch_report)
+
+        # Normalise to {shot_slug: Path} dict expected by the rest of the luxury pipeline
         photo_dir = output_dir / "photos"
-        suite = await self.photo_gen.generate_complete_product_suite(
-            specs=garment_specs,
-            output_dir=photo_dir,
-        )
+        photo_dir.mkdir(parents=True, exist_ok=True)
 
-        # Return paths to generated images
-        photos = {}
-        for shot_type in [
-            "hero",
-            "front",
-            "back",
-            "side_left",
-            "side_right",
-            "detail_fabric",
-            "lifestyle_urban",
-            "lifestyle_luxury",
-        ]:
-            img = getattr(suite, shot_type, None)
-            if img:
-                path = photo_dir / f"{shot_type}.jpg"
-                if not path.exists():
-                    img.save(path, quality=95)
-                photos[shot_type] = path
+        photos: dict[str, Path] = {}
+        for slug, image_data in photo_results.items():
+            if not isinstance(image_data, dict):
+                continue
+            # Prefer upscaled; fall back to base
+            src_str = image_data.get("upscaled") or image_data.get("base")
+            if not src_str:
+                continue
+            src = Path(src_str)
+            if not src.exists():
+                logger.warning(f"Generated image path does not exist: {src}")
+                continue
+            dest = photo_dir / f"{slug}.png"
+            _shutil.copy2(src, dest)
+            photos[slug] = dest
 
         return photos
 
@@ -374,25 +405,72 @@ class SkyyRoseLuxuryPipeline:
         output_dir: Path,
         specs: DesignSpecs,
     ) -> Path | None:
-        """Render turntable animation video."""
+        """Render a turntable animation video via Blender.
+
+        M-3 FIX: The previous implementation saved a JSON *config* file and
+        returned that path, causing ``result.turntable_video_enabled = True``
+        even though no video was ever rendered.
+
+        Now:
+        - Returns ``None`` immediately when Blender is not installed.
+        - Only returns a non-None path when a real ``.mp4`` has been written.
+        - Callers must treat ``None`` as "feature unavailable" and set
+          ``result.turntable_video_enabled = False`` accordingly.
+        """
+        import shutil
+
+        blender_bin = shutil.which("blender")
+        if blender_bin is None:
+            logger.info(
+                "Blender not found on PATH — turntable video skipped. "
+                "Install Blender and add it to PATH to enable this feature."
+            )
+            return None
+
+        video_path = output_dir / f"{specs.sku}_turntable.mp4"
+
         try:
-            # This would integrate with Blender for actual rendering
-            # For now, create placeholder configuration
-            video_config = {
-                "model": str(model_path),
-                "duration": 10,
-                "fps": 60,
-                "resolution": "4K",
-                "rotation": 360,
-                "lighting": "studio_luxury",
-            }
+            import subprocess
 
-            config_path = output_dir / "turntable_config.json"
-            with open(config_path, "w") as f:
-                json.dump(video_config, f, indent=2)
+            render_script = output_dir / "_turntable_render.py"
+            render_script.write_text(f"""
+import bpy, math
+bpy.ops.wm.read_factory_settings(use_empty=True)
+bpy.ops.import_scene.gltf(filepath={str(model_path)!r})
+scene = bpy.context.scene
+scene.render.filepath = {str(video_path)!r}
+scene.render.resolution_x = 1920
+scene.render.resolution_y = 1920
+scene.render.fps = 30
+scene.frame_start, scene.frame_end = 1, 90
+# Rotate camera 360° over 90 frames
+cam = bpy.data.objects.get('Camera') or bpy.data.objects.new('Camera', bpy.data.cameras.new('Camera'))
+bpy.context.scene.camera = cam
+for f in range(1, 91):
+    cam.location = (
+        2.5 * math.sin(2 * math.pi * f / 90),
+        -2.5 * math.cos(2 * math.pi * f / 90),
+        1.5,
+    )
+    cam.keyframe_insert('location', frame=f)
+bpy.ops.render.render(animation=True)
+""")
 
-            logger.info("Turntable video configuration saved")
-            return config_path
+            result = subprocess.run(
+                [blender_bin, "--background", "--python", str(render_script)],
+                capture_output=True,
+                text=True,
+                timeout=300,
+            )
+
+            if result.returncode != 0 or not video_path.exists():
+                logger.warning(
+                    f"Blender render failed (rc={result.returncode}): {result.stderr[-500:]}"
+                )
+                return None
+
+            logger.info(f"Turntable video rendered: {video_path}")
+            return video_path
 
         except Exception as e:
             logger.warning(f"Turntable rendering failed: {e}")
@@ -667,9 +745,7 @@ document.addEventListener('DOMContentLoaded', () => {{
                 "status": "publish",
                 "regular_price": str(specs.price),
                 "description": description,
-                "short_description": self.COLLECTION_INTROS.get(
-                    specs.collection, "Premium SkyyRose fashion"
-                ),
+                "short_description": self._get_collection_intro(specs.collection),
                 "sku": specs.sku,
                 "categories": [{"name": specs.collection}],
                 "images": [{"src": url} for url in gallery_urls],
@@ -751,9 +827,7 @@ document.addEventListener('DOMContentLoaded', () => {{
 
     def _generate_luxury_description(self, specs: DesignSpecs) -> str:
         """Generate brand-aligned product description."""
-        intro = self.COLLECTION_INTROS.get(
-            specs.collection, "From the SkyyRose collection: where love meets luxury."
-        )
+        intro = self._get_collection_intro(specs.collection)
 
         return f"""
 {intro}

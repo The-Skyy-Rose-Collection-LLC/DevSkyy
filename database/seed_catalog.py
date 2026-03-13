@@ -1,6 +1,6 @@
 """Seed the DevSkyy database with SkyyRose product catalog.
 
-Mirrors the 28 products from wordpress-theme/skyyrose-flagship/inc/product-catalog.php.
+Loads from the canonical CSV at data/product-catalog.csv.
 
 Usage:
     python -m database.seed_catalog
@@ -9,410 +9,71 @@ Usage:
 from __future__ import annotations
 
 import asyncio
+import csv
 import json
 import uuid
+from pathlib import Path
 
-PRODUCTS = [
-    # ─── BLACK ROSE COLLECTION ───────────────────────────────────────
-    {
-        "sku": "br-001",
-        "name": "BLACK Rose Crewneck",
-        "price": 35.00,
-        "collection": "black-rose",
-        "category": "Crewnecks",
-        "description": "Gothic luxury blooms in twilight. Embroidered with defiant elegance, a dark romance woven in every thread.",
-        "quantity": 250,
-        "is_active": False,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Black",
-    },
-    {
-        "sku": "br-002",
-        "name": "BLACK Rose Joggers",
-        "price": 50.00,
-        "collection": "black-rose",
-        "category": "Joggers",
-        "description": "Twilight comfort meets gothic romance. Embroidered black roses bloom on soft fabric.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Black",
-    },
-    {
-        "sku": "br-003",
-        "name": "BLACK is Beautiful Jersey",
-        "price": 45.00,
-        "collection": "black-rose",
-        "category": "Jerseys",
-        "description": "A bold statement in luxury athletic wear. Black is beautiful, and this jersey proves it.",
-        "quantity": 250,
-        "is_active": False,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Black",
-    },
-    {
-        "sku": "br-004",
-        "name": "BLACK Rose Hoodie",
-        "price": 40.00,
-        "collection": "black-rose",
-        "category": "Hoodies",
-        "description": "Gothic luxury in twilight shadows. Intricate embroidery captures the bloom of darkness.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Black",
-    },
-    {
-        "sku": "br-005",
-        "name": "BLACK Rose Hoodie — Signature Edition",
-        "price": 65.00,
-        "collection": "black-rose",
-        "category": "Hoodies",
-        "description": "The definitive Black Rose hoodie. Signature edition with premium detailing and numbered tag.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Black",
-    },
-    {
-        "sku": "br-006",
-        "name": "BLACK Rose Sherpa Jacket",
-        "price": 95.00,
-        "collection": "black-rose",
-        "category": "Jackets",
-        "description": "Lustrous black satin with plush Sherpa lining, crowned by an exquisite embroidered rose.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Black",
-    },
-    {
-        "sku": "br-007",
-        "name": "BLACK Rose x Love Hurts Basketball Shorts",
-        "price": 65.00,
-        "collection": "black-rose",
-        "category": "Shorts",
-        "description": "Two worlds collide. A cross-collection collaboration merging Black Rose darkness with Love Hurts fire.",
-        "quantity": 250,
-        "is_active": False,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Black",
-    },
-    {
-        "sku": "br-008",
-        "name": "Women's BLACK Rose Hooded Dress",
-        "price": 120.00,
-        "collection": "black-rose",
-        "category": "Dresses",
-        "description": "Intricate black rose embroidery and a silhouette of gothic mystery. Designed for the fearless.",
-        "quantity": 250,
-        "is_active": False,
-        "sizes": ["XS", "S", "M", "L", "XL", "2XL"],
-        "color": "Black",
-    },
-    {
-        "sku": "br-d01",
-        "name": "BLACK is Beautiful Hockey Jersey (Teal)",
-        "price": 55.00,
-        "collection": "black-rose",
-        "category": "Jerseys",
-        "description": "Hooded hockey jersey in bold black and teal. Streetwear meets the rink.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Black/Teal",
-    },
-    {
-        "sku": "br-d02",
-        "name": "BLACK is Beautiful Football Jersey (Red #80)",
-        "price": 55.00,
-        "collection": "black-rose",
-        "category": "Jerseys",
-        "description": "Red football jersey with #80 numbering. Game-day luxury meets street culture.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Red",
-    },
-    {
-        "sku": "br-d03",
-        "name": "BLACK is Beautiful Football Jersey (White #32)",
-        "price": 55.00,
-        "collection": "black-rose",
-        "category": "Jerseys",
-        "description": "White football jersey with #32. Clean luxury on the gridiron.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "White",
-    },
-    {
-        "sku": "br-d04",
-        "name": "BLACK is Beautiful Basketball Jersey",
-        "price": 45.00,
-        "collection": "black-rose",
-        "category": "Jerseys",
-        "description": 'Basketball jersey with "The Bay" branding. Court-ready luxury streetwear.',
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Black/Red",
-    },
-    # ─── LOVE HURTS COLLECTION ───────────────────────────────────────
-    {
-        "sku": "lh-001",
-        "name": "The Fannie Pack",
-        "price": 65.00,
-        "collection": "love-hurts",
-        "category": "Accessories",
-        "description": "Luxury fanny pack embodying Oakland grit, passion, and the defiant bloom of a street rose.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["One Size"],
-        "color": "Black",
-    },
-    {
-        "sku": "lh-002",
-        "name": "Love Hurts Joggers",
-        "price": 95.00,
-        "collection": "love-hurts",
-        "category": "Joggers",
-        "description": "Oakland grit meets luxury. Feel the fire with the embroidered rose, a symbol of passion.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Black",
-    },
-    {
-        "sku": "lh-003",
-        "name": "Love Hurts Basketball Shorts",
-        "price": 75.00,
-        "collection": "love-hurts",
-        "category": "Shorts",
-        "description": "Oakland-inspired luxury streetwear. Defiant rose design on breathable mesh.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Black",
-    },
-    {
-        "sku": "lh-004",
-        "name": "Love Hurts Varsity Jacket",
-        "price": 265.00,
-        "collection": "love-hurts",
-        "category": "Jackets",
-        "description": "Oakland street couture. Satin, bold fire-red script, hidden rose garden in hood.",
-        "quantity": 250,
-        "is_active": False,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Black",
-    },
-    {
-        "sku": "lh-005",
-        "name": "Love Hurts Windbreaker",
-        "price": 145.00,
-        "collection": "love-hurts",
-        "category": "Jackets",
-        "description": "Oakland fire meets the elements. Blush pink windbreaker with Love Hurts text and rose detailing.",
-        "quantity": 250,
-        "is_active": False,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Blush",
-    },
-    # ─── SIGNATURE COLLECTION ────────────────────────────────────────
-    {
-        "sku": "sg-001",
-        "name": "The Bay Set",
-        "price": 195.00,
-        "collection": "signature",
-        "category": "Sets",
-        "description": "Embody West Coast luxury with this exclusive ensemble. Iconic blue rose and vibrant Bay Area skyline.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Blue",
-    },
-    {
-        "sku": "sg-002",
-        "name": "Stay Golden Set",
-        "price": 65.00,
-        "collection": "signature",
-        "category": "Sets",
-        "description": "Embrace West Coast prestige. Luxurious statement of Bay Area style featuring signature rose.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["XS", "S", "M", "L", "XL", "2XL"],
-        "color": "Gold",
-    },
-    {
-        "sku": "sg-003",
-        "name": "The Signature Tee (Orchid)",
-        "price": 15.00,
-        "collection": "signature",
-        "category": "Tees",
-        "description": "The essential SkyyRose tee in a rich orchid colorway. Soft cotton with embroidered rose.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Orchid",
-    },
-    {
-        "sku": "sg-004",
-        "name": "Signature Tee (White)",
-        "price": 15.00,
-        "collection": "signature",
-        "category": "Tees",
-        "description": "The essential SkyyRose tee in clean white. Minimal design with signature branding.",
-        "quantity": 250,
-        "is_active": False,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "White",
-    },
-    {
-        "sku": "sg-005",
-        "name": "Stay Golden Tee",
-        "price": 40.00,
-        "collection": "signature",
-        "category": "Tees",
-        "description": "The classic Stay Golden silhouette. Timeless Bay Area luxury in every stitch.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["XS", "S", "M", "L", "XL", "2XL"],
-        "color": "Gold",
-    },
-    {
-        "sku": "sg-006",
-        "name": "Mint & Lavender Hoodie",
-        "price": 45.00,
-        "collection": "signature",
-        "category": "Hoodies",
-        "description": "Sweet pastel vibes meet streetwear luxury. Mint and lavender colorblock with signature rose detail.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Mint/Lavender",
-    },
-    {
-        "sku": "sg-007",
-        "name": "The Signature Beanie (Black)",
-        "price": 25.00,
-        "collection": "signature",
-        "category": "Accessories",
-        "description": "Classic cuffed beanie in black with woven SkyyRose rose patch.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["One Size"],
-        "color": "Black",
-    },
-    {
-        "sku": "sg-008",
-        "name": "The Signature Beanie (Forest Green)",
-        "price": 25.00,
-        "collection": "signature",
-        "category": "Accessories",
-        "description": "Classic cuffed beanie in forest green with woven SkyyRose rose patch in teal accent.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["One Size"],
-        "color": "Forest Green",
-    },
-    {
-        "sku": "sg-009",
-        "name": "The Sherpa Jacket",
-        "price": 80.00,
-        "collection": "signature",
-        "category": "Jackets",
-        "description": "Plush sherpa warmth in the SkyyRose signature colorway. Luxury outerwear for the West Coast.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Cream",
-    },
-    {
-        "sku": "sg-010",
-        "name": "The Bridge Series Shorts",
-        "price": 25.00,
-        "collection": "signature",
-        "category": "Shorts",
-        "description": "From the Bridge Series. Athletic shorts celebrating the iconic Bay Area bridges.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL"],
-        "color": "Navy",
-    },
-    {
-        "sku": "sg-011",
-        "name": "Original Label Tee (White)",
-        "price": 30.00,
-        "collection": "signature",
-        "category": "Tees",
-        "description": "The original SkyyRose label tee in clean white. Minimal design with signature branding.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "White",
-    },
-    {
-        "sku": "sg-012",
-        "name": "Original Label Tee (Orchid)",
-        "price": 30.00,
-        "collection": "signature",
-        "category": "Tees",
-        "description": "The original SkyyRose label tee in rich orchid. Minimal design with signature branding.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Orchid",
-    },
-    {
-        "sku": "sg-d01",
-        "name": "The Multi-Colored Windbreaker Set",
-        "price": 75.00,
-        "collection": "signature",
-        "category": "Sets",
-        "description": "Pastel V-chevron windbreaker set — hooded zip jacket and matching jogger pants.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "White/Pastel Multi",
-    },
-    {
-        "sku": "sg-d02",
-        "name": "The SkyyRose Collection Shorts",
-        "price": 45.00,
-        "collection": "signature",
-        "category": "Shorts",
-        "description": 'Black athletic shorts with gold accents and "The SkyyRose Collection" script branding.',
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Black/Gold",
-    },
-    {
-        "sku": "sg-d03",
-        "name": "Mint Rose Crewneck + Jogger Set",
-        "price": 75.00,
-        "collection": "signature",
-        "category": "Sets",
-        "description": "Mint green crewneck and matching joggers with purple rose-growing-from-concrete graphic.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["S", "M", "L", "XL", "2XL", "3XL"],
-        "color": "Mint Green/Purple",
-    },
-    {
-        "sku": "sg-d04",
-        "name": "Mint Rose Hooded Dress",
-        "price": 65.00,
-        "collection": "signature",
-        "category": "Dresses",
-        "description": "Mint green hooded dress with large purple rose-growing-from-concrete graphic. Kangaroo pocket, relaxed fit.",
-        "quantity": 250,
-        "is_active": True,
-        "sizes": ["XS", "S", "M", "L", "XL", "2XL"],
-        "color": "Mint Green/Purple",
-    },
-]
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+_CATALOG_CSV = _PROJECT_ROOT / "data" / "product-catalog.csv"
+
+
+def _infer_category(name: str) -> str:
+    n = name.lower()
+    if "jogger" in n:
+        return "Joggers"
+    if "sweatpant" in n:
+        return "Pants"
+    if "windbreaker" in n or "jacket" in n:
+        return "Jackets"
+    if "hoodie" in n:
+        return "Hoodies"
+    if "crewneck" in n:
+        return "Crewnecks"
+    if "shorts" in n:
+        return "Shorts"
+    if "jersey" in n:
+        return "Jerseys"
+    if "tee" in n or "shirt" in n:
+        return "Tees"
+    if "beanie" in n or "fannie" in n:
+        return "Accessories"
+    if "set" in n:
+        return "Sets"
+    return "Apparel"
+
+
+def _load_products() -> list[dict]:
+    """Load canonical product list from data/product-catalog.csv.
+
+    Skips render-only variants (rows where render_variant_of is set),
+    which are not standalone WooCommerce products.
+    """
+    products = []
+    with _CATALOG_CSV.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            sku = row["sku"].strip()
+            if not sku or row["render_variant_of"].strip():
+                continue
+            sizes = [s.strip() for s in row["sizes"].split("|") if s.strip()]
+            products.append(
+                {
+                    "sku": sku,
+                    "name": row["name"].strip(),
+                    "price": float(row["price"]) if row["price"].strip() else 0.0,
+                    "collection": row["collection_slug"].strip(),
+                    "category": _infer_category(row["name"]),
+                    "description": row["description"].strip(),
+                    "quantity": int(row["edition_size"]) if row["edition_size"].strip() else 250,
+                    "is_active": row["is_preorder"].strip() == "1",
+                    "sizes": sizes,
+                    "color": row["color"].strip(),
+                }
+            )
+    return products
+
+
+PRODUCTS = _load_products()
 
 
 async def seed():

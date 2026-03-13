@@ -28,8 +28,6 @@ test-results/
 *.map
 *.min.js
 *.min.css
-!assets/css/*.min.css
-!assets/js/*.min.js
 dist/
 build/
 

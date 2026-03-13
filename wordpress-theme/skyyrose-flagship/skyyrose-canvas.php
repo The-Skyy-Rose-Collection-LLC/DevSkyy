@@ -32,10 +32,10 @@ get_header();
 
 	<!-- Collection Filter Tabs -->
 	<div class="shop-tabs" role="tablist" aria-label="<?php esc_attr_e( 'Filter by collection', 'skyyrose-flagship' ); ?>">
-		<button class="shop-tab active" data-collection="all" role="tab" aria-selected="true"><?php echo esc_html__( 'All Collections', 'skyyrose-flagship' ); ?></button>
-		<button class="shop-tab" data-collection="black-rose" role="tab" aria-selected="false"><?php echo esc_html__( 'Black Rose', 'skyyrose-flagship' ); ?></button>
-		<button class="shop-tab" data-collection="love-hurts" role="tab" aria-selected="false"><?php echo esc_html__( 'Love Hurts', 'skyyrose-flagship' ); ?></button>
-		<button class="shop-tab" data-collection="signature" role="tab" aria-selected="false"><?php echo esc_html__( 'Signature', 'skyyrose-flagship' ); ?></button>
+		<button type="button" class="shop-tab active" data-collection="all" role="tab" aria-selected="true"><?php echo esc_html__( 'All Collections', 'skyyrose-flagship' ); ?></button>
+		<button type="button" class="shop-tab" data-collection="black-rose" role="tab" aria-selected="false"><?php echo esc_html__( 'Black Rose', 'skyyrose-flagship' ); ?></button>
+		<button type="button" class="shop-tab" data-collection="love-hurts" role="tab" aria-selected="false"><?php echo esc_html__( 'Love Hurts', 'skyyrose-flagship' ); ?></button>
+		<button type="button" class="shop-tab" data-collection="signature" role="tab" aria-selected="false"><?php echo esc_html__( 'Signature', 'skyyrose-flagship' ); ?></button>
 	</div>
 
 	<?php

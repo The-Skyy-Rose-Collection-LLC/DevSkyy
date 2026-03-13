@@ -1,0 +1,752 @@
+/**
+ * Holo Product Card — SkyyRose Flagship v5.0.0
+ *
+ * Physics-based magnetic tilt, holographic cursor refraction,
+ * front/back crossfade, ambient collection glow, quick-add drawer.
+ *
+ * Collection-aware via CSS custom properties:
+ *   --holo-accent       Collection accent color
+ *   --holo-accent-rgb   RGB triplet for alpha compositing
+ *   --holo-radius       Border radius (2px adult, 16px kids)
+ *
+ * JS-driven properties (set by product-card-holo.js):
+ *   --tilt-x, --tilt-y  Rotation angles
+ *   --holo-x, --holo-y  Cursor position (0-100%)
+ *   --holo-angle         Cursor angle for conic gradient
+ *
+ * @package SkyyRose_Flagship
+ * @since   5.0.0
+ */
+
+/* ==========================================================================
+   1. CARD WRAPPER — Positions glow beneath card body
+   ========================================================================== */
+
+.holo {
+	position: relative;
+	contain: layout style;
+	opacity: 0;
+	transform: translateY(32px);
+	transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+	            transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+	transition-delay: var(--holo-delay, 0ms);
+}
+
+.holo--visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* ==========================================================================
+   2. AMBIENT GLOW — Collection-colored light beneath the card
+   ========================================================================== */
+
+.holo__glow {
+	position: absolute;
+	inset: 20% 10% -15% 10%;
+	background: radial-gradient(
+		ellipse at center,
+		rgba(var(--holo-accent-rgb), 0.12) 0%,
+		transparent 70%
+	);
+	filter: blur(40px);
+	opacity: 0;
+	transition: opacity 0.8s ease;
+	pointer-events: none;
+	z-index: 0;
+}
+
+.holo:hover .holo__glow,
+.holo:focus-within .holo__glow {
+	opacity: 1;
+}
+
+/* ==========================================================================
+   3. CARD BODY — Tiltable container with 3D perspective
+   ========================================================================== */
+
+.holo__body {
+	position: relative;
+	z-index: 1;
+	background: #0a0a0a;
+	border: 1px solid rgba(var(--holo-accent-rgb), 0.06);
+	border-radius: var(--holo-radius, 8px);
+	overflow: hidden;
+	transform-style: preserve-3d;
+	transform: perspective(800px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+	transition: transform 0.6s cubic-bezier(0.03, 0.98, 0.52, 0.99),
+	            border-color 0.5s ease,
+	            box-shadow 0.5s ease;
+	will-change: transform;
+}
+
+.holo:hover .holo__body {
+	border-color: rgba(var(--holo-accent-rgb), 0.15);
+	box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5),
+	            0 0 0 1px rgba(var(--holo-accent-rgb), 0.08);
+}
+
+/* ==========================================================================
+   4. HOLOGRAPHIC SHIMMER — Cursor-tracked conic gradient overlay
+   ========================================================================== */
+
+.holo__shimmer {
+	position: absolute;
+	inset: 0;
+	z-index: 10;
+	pointer-events: none;
+	background: conic-gradient(
+		from var(--holo-angle, 0deg) at var(--holo-x, 50%) var(--holo-y, 50%),
+		transparent 0%,
+		rgba(255, 120, 120, 0.03) 8%,
+		rgba(255, 220, 120, 0.05) 16%,
+		rgba(120, 255, 160, 0.03) 24%,
+		rgba(120, 200, 255, 0.05) 32%,
+		rgba(200, 120, 255, 0.03) 40%,
+		rgba(255, 120, 200, 0.04) 48%,
+		transparent 56%
+	);
+	mix-blend-mode: screen;
+	opacity: 0;
+	transition: opacity 0.5s ease;
+	border-radius: inherit;
+}
+
+.holo:hover .holo__shimmer {
+	opacity: 1;
+}
+
+/* Kids capsule: warmer, more visible shimmer */
+.holo--kids-capsule .holo__shimmer {
+	background: conic-gradient(
+		from var(--holo-angle, 0deg) at var(--holo-x, 50%) var(--holo-y, 50%),
+		transparent 0%,
+		rgba(255, 182, 193, 0.06) 10%,
+		rgba(230, 230, 250, 0.08) 25%,
+		rgba(255, 218, 185, 0.06) 40%,
+		rgba(255, 182, 193, 0.08) 55%,
+		transparent 65%
+	);
+}
+
+/* ==========================================================================
+   5. GALLERY — Image area with front/back crossfade
+   ========================================================================== */
+
+.holo__gallery {
+	position: relative;
+	aspect-ratio: 3 / 4;
+	overflow: hidden;
+	background: linear-gradient(160deg, rgba(var(--holo-accent-rgb), 0.02), #0a0a0a 50%);
+}
+
+.holo__img-link {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+.holo__img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+	            transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.holo__img--front {
+	opacity: 1;
+	z-index: 1;
+}
+
+.holo__img--back {
+	opacity: 0;
+	z-index: 2;
+}
+
+/* Crossfade on hover (only when back image exists) */
+.holo[data-has-back="1"]:hover .holo__img--front {
+	opacity: 0;
+	transform: scale(1.02);
+}
+
+.holo[data-has-back="1"]:hover .holo__img--back {
+	opacity: 1;
+}
+
+/* Subtle zoom when no back image */
+.holo[data-has-back="0"]:hover .holo__img--front {
+	transform: scale(1.05);
+}
+
+/* ==========================================================================
+   6. BADGES
+   ========================================================================== */
+
+.holo__badge {
+	position: absolute;
+	top: 14px;
+	left: 14px;
+	z-index: 5;
+	font-family: 'Bebas Neue', sans-serif;
+	font-size: 10px;
+	letter-spacing: 3px;
+	text-transform: uppercase;
+	padding: 5px 12px;
+	border-radius: 3px;
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	pointer-events: none;
+}
+
+.holo__badge--preorder {
+	color: var(--holo-accent);
+	background: rgba(0, 0, 0, 0.65);
+	border: 1px solid rgba(var(--holo-accent-rgb), 0.2);
+}
+
+.holo__badge--sale {
+	color: #fff;
+	background: rgba(var(--holo-accent-rgb), 0.85);
+}
+
+.holo__badge--soldout {
+	color: rgba(255, 100, 100, 0.9);
+	background: rgba(0, 0, 0, 0.7);
+	border: 1px solid rgba(255, 100, 100, 0.2);
+}
+
+.holo__badge--default {
+	color: var(--holo-accent);
+	background: rgba(0, 0, 0, 0.65);
+	border: 1px solid rgba(var(--holo-accent-rgb), 0.15);
+}
+
+.holo__edition {
+	position: absolute;
+	top: 14px;
+	right: 14px;
+	z-index: 5;
+	font-family: 'Space Mono', monospace;
+	font-size: 9px;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+	color: rgba(var(--holo-accent-rgb), 0.5);
+	background: rgba(0, 0, 0, 0.5);
+	padding: 4px 10px;
+	border-radius: 3px;
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	pointer-events: none;
+}
+
+/* ==========================================================================
+   7. WISHLIST BUTTON
+   ========================================================================== */
+
+.holo__wishlist {
+	position: absolute;
+	top: 14px;
+	right: 14px;
+	z-index: 6;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	background: rgba(0, 0, 0, 0.45);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	color: rgba(255, 255, 255, 0.5);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	padding: 0;
+	opacity: 0;
+	transform: translateY(-4px);
+	transition: opacity 0.3s ease, transform 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Move wishlist when edition badge is present */
+.holo--limited .holo__wishlist {
+	top: 44px;
+}
+
+.holo:hover .holo__wishlist,
+.holo:focus-within .holo__wishlist {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.holo__wishlist:hover {
+	color: #fff;
+	border-color: rgba(255, 255, 255, 0.2);
+}
+
+.holo__wishlist[aria-pressed="true"] svg {
+	color: #DC143C;
+	fill: #DC143C;
+}
+
+@keyframes holo-heart-burst {
+	0%   { transform: scale(1); }
+	25%  { transform: scale(1.4); }
+	50%  { transform: scale(0.9); }
+	100% { transform: scale(1); }
+}
+
+.holo__wishlist--burst svg {
+	animation: holo-heart-burst 0.4s ease-out;
+}
+
+/* ==========================================================================
+   8. VIEW INDICATOR (front/back dots)
+   ========================================================================== */
+
+.holo__view-indicator {
+	position: absolute;
+	bottom: 12px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 5;
+	display: flex;
+	gap: 6px;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+
+.holo:hover .holo__view-indicator {
+	opacity: 1;
+}
+
+.holo__view-dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.3);
+	transition: background 0.3s, transform 0.3s;
+}
+
+.holo__view-dot--active {
+	background: var(--holo-accent);
+	transform: scale(1.3);
+}
+
+/* Swap active dot on hover (crossfade shows back) */
+.holo[data-has-back="1"]:hover .holo__view-dot--active {
+	background: rgba(255, 255, 255, 0.3);
+	transform: scale(1);
+}
+
+.holo[data-has-back="1"]:hover .holo__view-dot:not(.holo__view-dot--active) {
+	background: var(--holo-accent);
+	transform: scale(1.3);
+}
+
+/* ==========================================================================
+   9. INFO SECTION
+   ========================================================================== */
+
+.holo__info {
+	padding: 16px 20px 18px;
+	transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.holo__collection {
+	display: block;
+	font-family: 'Bebas Neue', sans-serif;
+	font-size: 10px;
+	letter-spacing: 4px;
+	text-transform: uppercase;
+	color: var(--holo-accent);
+	margin-bottom: 4px;
+}
+
+.holo__name {
+	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-size: var(--text-base, 1rem);
+	font-weight: 500;
+	color: #e0e0e0;
+	margin: 0 0 6px;
+	line-height: 1.3;
+}
+
+.holo__name a {
+	color: inherit;
+	text-decoration: none;
+	transition: color 0.3s;
+}
+
+.holo__name a:hover {
+	color: var(--holo-accent);
+}
+
+.holo__price-row {
+	display: flex;
+	align-items: baseline;
+	gap: 10px;
+}
+
+.holo__price {
+	font-family: 'Bebas Neue', sans-serif;
+	font-size: 18px;
+	letter-spacing: 2px;
+	color: var(--holo-accent);
+}
+
+.holo__price del {
+	opacity: 0.35;
+}
+
+.holo__price ins {
+	text-decoration: none;
+}
+
+.holo__ship-note {
+	font-family: 'Space Mono', monospace;
+	font-size: 9px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: rgba(var(--holo-accent-rgb), 0.4);
+}
+
+/* ==========================================================================
+   10. QUICK-ADD DRAWER
+   ========================================================================== */
+
+.holo__drawer {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 8;
+	padding: 16px 20px 20px;
+	background: linear-gradient(to top, rgba(10, 10, 10, 0.97) 60%, rgba(10, 10, 10, 0.85));
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	transform: translateY(100%);
+	transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+	border-top: 1px solid rgba(var(--holo-accent-rgb), 0.06);
+}
+
+.holo:hover .holo__drawer,
+.holo:focus-within .holo__drawer {
+	transform: translateY(0);
+}
+
+/* Slide info up when drawer opens */
+.holo:hover .holo__info,
+.holo:focus-within .holo__info {
+	transform: translateY(-100%);
+	opacity: 0;
+	pointer-events: none;
+	position: relative;
+}
+
+.holo__sizes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-bottom: 10px;
+}
+
+.holo__size-pill {
+	min-width: 40px;
+	height: 36px;
+	padding: 0 10px;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	border-radius: 4px;
+	background: transparent;
+	color: rgba(255, 255, 255, 0.5);
+	font-family: 'Inter', 'Space Mono', monospace;
+	font-size: 11px;
+	letter-spacing: 1px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.holo__size-pill:hover {
+	border-color: rgba(255, 255, 255, 0.3);
+	color: #ccc;
+}
+
+.holo__size-pill--active {
+	border-color: var(--holo-accent);
+	color: #fff;
+	background: rgba(var(--holo-accent-rgb), 0.12);
+}
+
+.holo__buy {
+	display: block;
+	width: 100%;
+	height: 44px;
+	background: var(--holo-accent);
+	color: #0a0a0a;
+	font-family: 'Bebas Neue', sans-serif;
+	font-size: 13px;
+	letter-spacing: 4px;
+	text-transform: uppercase;
+	text-align: center;
+	text-decoration: none;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: filter 0.2s, transform 0.2s, opacity 0.2s;
+	line-height: 44px;
+}
+
+.holo__buy:hover:not(:disabled) {
+	filter: brightness(1.1);
+	transform: translateY(-1px);
+}
+
+.holo__buy:disabled {
+	opacity: 0.35;
+	cursor: not-allowed;
+}
+
+.holo__buy--added {
+	background: #1a1a1a;
+	color: var(--holo-accent);
+	border: 1px solid var(--holo-accent);
+}
+
+.holo__buy--loading {
+	opacity: 0.6;
+	pointer-events: none;
+}
+
+/* ==========================================================================
+   11. COLLECTION-SPECIFIC OVERRIDES
+   ========================================================================== */
+
+/* Black Rose — silver monochrome, sharp edges, Cinzel type */
+.holo--black-rose .holo__name {
+	font-family: 'Cinzel', serif;
+}
+
+.holo--black-rose .holo__collection {
+	letter-spacing: 6px;
+}
+
+/* Love Hurts — crimson passion, Oswald type */
+.holo--love-hurts .holo__name {
+	font-family: 'Oswald', sans-serif;
+	font-weight: 400;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+/* Signature — gold opulence, Cormorant Garamond (default) */
+.holo--signature .holo__name {
+	font-style: italic;
+}
+
+/* Kids Capsule — soft, rounded, bubbly */
+.holo--kids-capsule .holo__body {
+	border-color: rgba(var(--holo-accent-rgb), 0.1);
+}
+
+.holo--kids-capsule .holo__name {
+	font-family: 'Playfair Display', serif;
+	font-weight: 600;
+}
+
+.holo--kids-capsule .holo__badge {
+	border-radius: 12px;
+}
+
+.holo--kids-capsule .holo__size-pill {
+	border-radius: 8px;
+}
+
+.holo--kids-capsule .holo__buy {
+	border-radius: 10px;
+}
+
+/* ==========================================================================
+   12. SOLD OUT STATE
+   ========================================================================== */
+
+.holo--sold-out .holo__gallery::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.35);
+	z-index: 4;
+	pointer-events: none;
+}
+
+.holo--sold-out .holo__img {
+	filter: saturate(0.4);
+}
+
+/* ==========================================================================
+   13. GRID LAYOUT
+   ========================================================================== */
+
+.holo-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 32px;
+	padding: 0 24px;
+}
+
+.holo-grid--2 {
+	grid-template-columns: repeat(2, 1fr);
+	max-width: 720px;
+	margin: 0 auto;
+	gap: 40px;
+}
+
+.holo-grid--3 {
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.holo-grid--4 {
+	grid-template-columns: repeat(4, 1fr);
+}
+
+/* ==========================================================================
+   14. RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+	.holo-grid--4 {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+@media (max-width: 768px) {
+	.holo-grid,
+	.holo-grid--3,
+	.holo-grid--4 {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 16px;
+		padding: 0 16px;
+	}
+
+	.holo-grid--2 {
+		gap: 24px;
+	}
+
+	/* Drawer always visible on touch (no hover) */
+	.holo__drawer {
+		position: relative;
+		transform: none;
+		background: rgba(10, 10, 10, 0.6);
+		border-top: 1px solid rgba(var(--holo-accent-rgb), 0.04);
+		padding: 12px 16px 16px;
+	}
+
+	.holo__info {
+		padding: 12px 16px 10px;
+	}
+
+	.holo:hover .holo__info,
+	.holo:focus-within .holo__info {
+		transform: none;
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	/* Wishlist always visible */
+	.holo__wishlist {
+		opacity: 1;
+		transform: none;
+	}
+
+	.holo__name { font-size: 14px; }
+	.holo__price { font-size: 16px; }
+}
+
+@media (max-width: 480px) {
+	.holo-grid,
+	.holo-grid--2 {
+		grid-template-columns: 1fr 1fr;
+		gap: 12px;
+		padding: 0 12px;
+	}
+
+	.holo__info { padding: 10px 12px 8px; }
+	.holo__drawer { padding: 10px 12px 14px; }
+	.holo__name { font-size: 13px; }
+	.holo__collection { font-size: 9px; }
+	.holo__buy { height: 40px; line-height: 40px; font-size: 11px; }
+	.holo__size-pill { min-width: 36px; height: 32px; font-size: 10px; }
+}
+
+/* ==========================================================================
+   15. ACCESSIBILITY & REDUCED MOTION
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	.holo,
+	.holo__body,
+	.holo__img,
+	.holo__drawer,
+	.holo__info,
+	.holo__glow,
+	.holo__shimmer,
+	.holo__wishlist,
+	.holo__view-indicator {
+		transition: none !important;
+	}
+
+	.holo {
+		opacity: 1;
+		transform: none;
+	}
+
+	/* Disable tilt for reduced motion */
+	.holo__body {
+		transform: none !important;
+	}
+}
+
+.holo:focus-visible {
+	outline: 2px solid var(--holo-accent);
+	outline-offset: 4px;
+}
+
+.holo__wishlist:focus-visible,
+.holo__size-pill:focus-visible,
+.holo__buy:focus-visible {
+	outline: 2px solid var(--holo-accent);
+	outline-offset: 2px;
+}
+
+/* ==========================================================================
+   16. TOUCH DEVICES
+   ========================================================================== */
+
+@media (hover: none), (pointer: coarse) {
+	.holo__wishlist {
+		opacity: 1;
+		transform: none;
+	}
+
+	.holo__view-indicator {
+		opacity: 1;
+	}
+}
+
+/* No-JS fallback */
+.no-js .holo {
+	opacity: 1;
+	transform: none;
+}
+
+.no-js .holo__body {
+	transform: none;
+}
+
+.no-js .holo__drawer {
+	position: relative;
+	transform: none;
+}

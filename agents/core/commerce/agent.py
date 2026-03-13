@@ -72,6 +72,18 @@ class CommerceCoreAgent(CoreAgent):
         except ImportError:
             logger.debug("[%s] WordPressBridgeSubAgent unavailable", self.name)
 
+        # SDK-powered agents (catalog file access + pricing research)
+        try:
+            from agents.claude_sdk.domain_agents.commerce import (
+                SDKCatalogManagerAgent,
+                SDKPriceOptimizerAgent,
+            )
+
+            self.register_sub_agent("sdk_catalog_manager", SDKCatalogManagerAgent())
+            self.register_sub_agent("sdk_price_optimizer", SDKPriceOptimizerAgent())
+        except ImportError:
+            logger.debug("[%s] SDK commerce agents unavailable", self.name)
+
     def _get_legacy_agent(self) -> Any:
         """Lazy-load the existing CommerceAgent."""
         if self._legacy_agent is None:

@@ -275,7 +275,7 @@
 
 .aurora-engagement__vip-label {
 	font-family: var(--aurora-font-body);
-	font-size: 0.55rem;
+	font-size: 0.6875rem;
 	font-weight: 700;
 	letter-spacing: 0.15em;
 	text-transform: uppercase;
@@ -808,7 +808,7 @@
 /* Label */
 .aurora-countdown__label {
 	font-family: var(--aurora-font-body);
-	font-size: 0.6rem;
+	font-size: 0.6875rem;
 	font-weight: 700;
 	letter-spacing: 0.14em;
 	text-transform: uppercase;
@@ -854,7 +854,7 @@
 }
 
 .aurora-countdown__suffix {
-	font-size: 0.5rem;
+	font-size: 0.625rem;
 	font-weight: 600;
 	color: rgba(var(--aurora-white-rgb), 0.4);
 	letter-spacing: 0.04em;
@@ -1012,7 +1012,7 @@
 	left: 8px;
 	z-index: 6;
 	font-family: var(--aurora-font-body);
-	font-size: 0.58rem;
+	font-size: 0.6875rem;
 	font-weight: 700;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -1115,7 +1115,7 @@
 	}
 
 	.aurora-engagement__percent {
-		font-size: 0.6rem;
+		font-size: 0.6875rem;
 	}
 
 	.aurora-engagement--complete .aurora-engagement__ring {
@@ -1123,7 +1123,7 @@
 	}
 
 	.aurora-engagement__vip-label {
-		font-size: 0.5rem;
+		font-size: 0.625rem;
 	}
 
 	.aurora-engagement__vip-code {
@@ -1137,7 +1137,7 @@
 	}
 
 	.aurora-countdown__label {
-		font-size: 0.5rem;
+		font-size: 0.625rem;
 		letter-spacing: 0.1em;
 	}
 
@@ -1150,15 +1150,15 @@
 	}
 
 	.aurora-countdown__value {
-		font-size: 0.6rem;
+		font-size: 0.6875rem;
 	}
 
 	.aurora-countdown__suffix {
-		font-size: 0.42rem;
+		font-size: 0.625rem;
 	}
 
 	.aurora-countdown__sep {
-		font-size: 0.55rem;
+		font-size: 0.6875rem;
 	}
 
 	/* Tilt cards: disable 3D effect on touch (no hover) */
@@ -1227,7 +1227,7 @@
 	}
 
 	.aurora-countdown__label {
-		font-size: 0.45rem;
+		font-size: 0.625rem;
 	}
 }
 

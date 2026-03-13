@@ -82,12 +82,10 @@ _HEX_8 = re.compile(r"^#[0-9a-fA-F]{8}$")
 
 # Capture groups for semantic validation
 _RGB_CAPTURE = re.compile(
-    r"^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*"
-    r"(?:,\s*([\d.]+)\s*)?\)$"
+    r"^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*" r"(?:,\s*([\d.]+)\s*)?\)$"
 )
 _HSL_CAPTURE = re.compile(
-    r"^hsla?\(\s*(\d{1,3})\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*"
-    r"(?:,\s*([\d.]+)\s*)?\)$"
+    r"^hsla?\(\s*(\d{1,3})\s*,\s*(\d{1,3})%\s*,\s*(\d{1,3})%\s*" r"(?:,\s*([\d.]+)\s*)?\)$"
 )
 
 

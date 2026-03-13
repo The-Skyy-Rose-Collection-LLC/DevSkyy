@@ -1,0 +1,22 @@
+{
+  "name": "@devskyy/llm-roundtable",
+  "version": "1.0.0",
+  "description": "LLM competition arena — multi-model battles, Elo ratings, technique A/B testing",
+  "type": "module",
+  "scripts": {
+    "battle": "tsx engine.ts",
+    "agent": "tsx agent.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.1.72",
+    "@anthropic-ai/sdk": "^0.52.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "@types/node": "^22.0.0"
+  }
+}

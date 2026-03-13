@@ -10,16 +10,16 @@
    The .luxury-cursor-active class is added by luxury-cursor.js after init.
    Without JS, users keep their native cursor (progressive enhancement). */
 @media (hover: hover) {
-	body.luxury-cursor-active:not(.immersive-page) {
+	body.luxury-cursor-active {
 		cursor: none;
 	}
 
-	body.luxury-cursor-active:not(.immersive-page) a,
-	body.luxury-cursor-active:not(.immersive-page) button,
-	body.luxury-cursor-active:not(.immersive-page) [role="button"],
-	body.luxury-cursor-active:not(.immersive-page) input,
-	body.luxury-cursor-active:not(.immersive-page) select,
-	body.luxury-cursor-active:not(.immersive-page) textarea {
+	body.luxury-cursor-active a,
+	body.luxury-cursor-active button,
+	body.luxury-cursor-active [role="button"],
+	body.luxury-cursor-active input,
+	body.luxury-cursor-active select,
+	body.luxury-cursor-active textarea {
 		cursor: none;
 	}
 }
@@ -37,7 +37,7 @@
 	border: 1.5px solid rgba(183, 110, 121, 0.7);
 	border-radius: 50%;
 	pointer-events: none;
-	z-index: 99999;
+	z-index: 2147483647;
 	transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease;
 	filter: drop-shadow(0 0 3px rgba(183, 110, 121, 0.4));
 }
@@ -61,7 +61,7 @@
 	background: var(--color-gold, #D4AF37);
 	border-radius: 50%;
 	pointer-events: none;
-	z-index: 99999;
+	z-index: 2147483647;
 	transition: width 0.2s ease, height 0.2s ease, background 0.2s ease;
 }
 
@@ -79,7 +79,7 @@
 	position: fixed;
 	inset: 0;
 	pointer-events: none;
-	z-index: 99998;
+	z-index: 2147483646;
 	overflow: hidden;
 }
 
@@ -97,6 +97,20 @@
 @keyframes cursorSparkle {
 	0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 	100% { opacity: 0; transform: translate(-50%, -50%) scale(0.2) translateY(-12px); }
+}
+
+/* ==================================================
+   MODAL-ACTIVE HIDE STATE
+   JS toggles .luxury-cursor-paused on body when
+   any modal/dialog/overlay is open.
+   ================================================== */
+
+body.luxury-cursor-paused .luxury-cursor-ring,
+body.luxury-cursor-paused .luxury-cursor-dot,
+body.luxury-cursor-paused .luxury-cursor-trail {
+	opacity: 0 !important;
+	visibility: hidden !important;
+	transition: none !important;
 }
 
 /* ==================================================

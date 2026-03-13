@@ -62,6 +62,7 @@ if ( file_exists( $skyyrose_mascot_dir . $skyyrose_context_file ) ) {
 >
 	<!-- Mascot Character -->
 	<button
+		type="button"
 		class="skyyrose-mascot__character"
 		id="skyyrose-mascot-trigger"
 		aria-label="<?php esc_attr_e( 'Talk to our brand ambassador', 'skyyrose-flagship' ); ?>"
@@ -96,6 +97,7 @@ if ( file_exists( $skyyrose_mascot_dir . $skyyrose_context_file ) ) {
 				<?php esc_html_e( 'SkyyRose Guide', 'skyyrose-flagship' ); ?>
 			</span>
 			<button
+				type="button"
 				class="skyyrose-mascot__panel-close"
 				aria-label="<?php esc_attr_e( 'Close panel', 'skyyrose-flagship' ); ?>"
 			>
@@ -128,6 +130,7 @@ if ( file_exists( $skyyrose_mascot_dir . $skyyrose_context_file ) ) {
 
 	<!-- Recall Button (when minimized) -->
 	<button
+		type="button"
 		class="skyyrose-mascot__recall"
 		id="skyyrose-mascot-recall"
 		aria-label="<?php esc_attr_e( 'Bring back brand ambassador', 'skyyrose-flagship' ); ?>"
@@ -139,6 +142,7 @@ if ( file_exists( $skyyrose_mascot_dir . $skyyrose_context_file ) ) {
 
 	<!-- Minimize Button -->
 	<button
+		type="button"
 		class="skyyrose-mascot__minimize"
 		id="skyyrose-mascot-minimize"
 		aria-label="<?php esc_attr_e( 'Dismiss brand ambassador', 'skyyrose-flagship' ); ?>"

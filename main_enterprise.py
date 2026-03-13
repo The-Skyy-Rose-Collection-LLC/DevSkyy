@@ -84,12 +84,16 @@ async def lifespan(app: FastAPI):
 # App
 # =============================================================================
 
+_environment = os.getenv("ENVIRONMENT", "development")
+_docs_url = None if _environment == "production" else "/docs"
+_redoc_url = None if _environment == "production" else "/redoc"
+
 app = FastAPI(
     title="DevSkyy Enterprise Platform",
     description="AI-Driven Multi-Agent Orchestration for SkyyRose",
     version="3.2.0",
-    docs_url="/docs",
-    redoc_url="/redoc",
+    docs_url=_docs_url,
+    redoc_url=_redoc_url,
     lifespan=lifespan,
 )
 
@@ -109,7 +113,7 @@ cors_origins = [o.strip() for o in cors_origins if o.strip()] or [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
-    allow_origin_regex=r"https://.*\.(vercel\.app|devskyy\.app)",
+    allow_origin_regex=r"https://[a-zA-Z0-9-]+\.(vercel\.app|devskyy\.app)",
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "X-Request-ID", "X-Correlation-ID"],
@@ -147,7 +151,28 @@ async def security_headers_middleware(request: Request, call_next):
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: https:; "
+        "font-src 'self'; "
+        "connect-src 'self' https://*.devskyy.app https://*.vercel.app; "
+        "frame-ancestors 'none'"
+    )
     return response
+
+
+# Rate limiting
+from security.rate_limiting import rate_limiter  # noqa: E402
+
+
+@app.middleware("http")
+async def rate_limit_middleware(request: Request, call_next):
+    await rate_limiter.enforce_rate_limit(request)
+    return await call_next(request)
 
 
 # =============================================================================
@@ -218,6 +243,11 @@ app.include_router(sync_router, prefix="/api/v1")
 app.include_router(training_router, prefix="/api/v1")
 app.include_router(wordpress_agent_router, prefix="/api/v1")
 app.include_router(wordpress_theme_router, prefix="/api/v1")
+
+# Claude Agent SDK
+from api.v1.claude_sdk import router as claude_sdk_router
+
+app.include_router(claude_sdk_router, prefix="/api/v1")
 
 # WordPress integration
 from api.v1.wordpress_integration import router as wordpress_router

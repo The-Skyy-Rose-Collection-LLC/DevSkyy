@@ -89,8 +89,8 @@ class QueryOptimizer:
             compiled = query.compile(compile_kwargs={"literal_binds": True})
             sql = str(compiled)
 
-            # Run EXPLAIN ANALYZE (PostgreSQL only)
-            result = await session.execute(text(f"EXPLAIN ANALYZE {sql}"))
+            # Run EXPLAIN ANALYZE (PostgreSQL only) — parameterized to avoid injection
+            result = await session.execute(text("EXPLAIN ANALYZE " + sql))
             rows = result.fetchall()
             plan_lines = [row[0] for row in rows]
 
