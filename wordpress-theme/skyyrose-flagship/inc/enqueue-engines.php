@@ -69,22 +69,6 @@ function skyyrose_enqueue_engine( $handle, $slug, $css_deps = array( 'skyyrose-d
 }
 
 /**
- * Enqueue the Social Proof + Urgency Engine on customer-facing pages.
- *
- * Loads purchase notification toasts, live viewer count, scarcity badges,
- * and a sticky pre-order CTA bar across all non-admin pages.
- *
- * @since 3.2.0
- * @return void
- */
-function skyyrose_enqueue_social_proof() {
-	if ( is_admin() ) {
-		return;
-	}
-	skyyrose_enqueue_engine( 'skyyrose-social-proof', 'social-proof' );
-}
-
-/**
  * Enqueue The Pulse — Real-Time Social Proof & Urgency Engine.
  *
  * Loads animated purchase notification toasts, live viewer counts, scarcity
