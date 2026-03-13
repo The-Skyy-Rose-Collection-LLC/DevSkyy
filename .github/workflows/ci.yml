@@ -173,7 +173,7 @@ jobs:
             -F python || true
 
       - name: Upload test results
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f  # v7.0.0
         if: always()
         with:
           name: python-test-results
@@ -271,7 +271,7 @@ jobs:
           fi
 
       - name: Upload security reports
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f  # v7.0.0
         if: always()
         with:
           name: security-reports
@@ -355,7 +355,7 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f  # v7.0.0
         with:
           name: frontend-build
           path: frontend/.next/
@@ -386,7 +386,7 @@ jobs:
         run: npm run test:collections
 
       - name: Upload test results
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f  # v7.0.0
         if: always()
         with:
           name: threejs-test-results
@@ -526,7 +526,7 @@ jobs:
           API_BASE_URL: http://localhost:8000
 
       - name: Upload Playwright report
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f  # v7.0.0
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
@@ -534,7 +534,7 @@ jobs:
           retention-days: 30
 
       - name: Upload Playwright traces
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f  # v7.0.0
         if: failure()
         with:
           name: playwright-traces
@@ -586,7 +586,7 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}
 
       - name: Upload API test results
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f  # v7.0.0
         if: always()
         with:
           name: api-test-results
