@@ -1,0 +1,95 @@
+# 配色变量库
+# 包含2种风格的配色方案
+
+温馨可爱:
+  珊瑚粉色系:
+    base_hue: 355  # 粉红色
+    saturation_range: [60, 70]
+    lightness_range: [75, 85]
+    variants:
+      - {hex: "#FF9AA2", name: "蜜桃粉", hsl: "355, 65%, 80%"}
+      - {hex: "#FFB7B2", name: "浅珊瑚", hsl: "355, 68%, 82%"}
+      - {hex: "#FFDAC1", name: "桃子白", hsl: "355, 62%, 85%"}
+      - {hex: "#FFB6C1", name: "浅粉红", hsl: "355, 66%, 83%"}
+      - {hex: "#FFCCCB", name: "玫瑰粉", hsl: "355, 64%, 81%"}
+
+  天空蓝色系:
+    base_hue: 195  # 天蓝色
+    saturation_range: [55, 70]
+    lightness_range: [80, 88]
+    variants:
+      - {hex: "#B5EAD7", name: "天空蓝", hsl: "195, 60%, 83%"}
+      - {hex: "#C7CEEA", name: "淡紫蓝", hsl: "195, 55%, 85%"}
+      - {hex: "#B5EAD7", name: "薄荷蓝", hsl: "195, 62%, 84%"}
+      - {hex: "#A0E8AF", name: "清新绿", hsl: "195, 58%, 82%"}
+      - {hex: "#98DDCA", name: "淡薄荷", hsl: "195, 65%, 86%"}
+
+  薄荷绿色系:
+    base_hue: 150  # 薄荷绿
+    saturation_range: [55, 68]
+    lightness_range: [78, 86]
+    variants:
+      - {hex: "#C7CEEA", name: "薄荷绿", hsl: "150, 60%, 82%"}
+      - {hex: "#98FF98", name: "嫩草绿", hsl: "150, 65%, 84%"}
+      - {hex: "#B5EAD7", name: "淡薄荷", hsl: "150, 58%, 83%"}
+      - {hex: "#A0E8AF", name: "春绿色", hsl: "150, 62%, 80%"}
+      - {hex: "#B0F2C2", name: "清新绿", hsl: "150, 68%, 85%"}
+
+  奶油色系:
+    base_hue: 40  # 奶油色
+    saturation_range: [20, 35]
+    lightness_range: [88, 94]
+    variants:
+      - {hex: "#FFFEF9", name: "奶油白", hsl: "40, 25%, 94%"}
+      - {hex: "#FFF8E7", name: "香草白", hsl: "40, 30%, 92%"}
+      - {hex: "#FFEDD8", name: "桃子白", hsl: "40, 28%, 90%"}
+      - {hex: "#FFFBEB", name: "柠檬白", hsl: "40, 32%, 93%"}
+      - {hex: "#FFF5EE", name: "杏子白", hsl: "40, 26%, 91%"}
+
+  文字色系:
+    variants:
+      - {hex: "#2C2C2C", name: "暖炭灰", contrast: "AAA"}
+      - {hex: "#1F2937", name: "深炭灰", contrast: "AAA"}
+      - {hex: "#374151", name: "中炭灰", contrast: "AAA"}
+
+现代简约:
+  深蓝色系:
+    base_hue: 220  # 深蓝
+    saturation_range: [70, 90]
+    lightness_range: [20, 40]
+    variants:
+      - {hex: "#1F2937", name: "深炭蓝", hsl: "220, 80%, 28%"}
+      - {hex: "#374151", name: "岩石蓝", hsl: "220, 75%, 32%"}
+      - {hex: "#4B5563", name: "中蓝灰", hsl: "220, 70%, 36%"}
+
+  靛蓝色系:
+    base_hue: 240  # 靛蓝
+    saturation_range: [75, 90]
+    lightness_range: [40, 55]
+    variants:
+      - {hex: "#6366F1", name: "靛蓝", hsl: "240, 78%, 48%"}
+      - {hex: "#8B5CF6", name: "紫色", hsl: "240, 85%, 52%"}
+      - {hex: "#A78BFA", name: "淡紫", hsl: "240, 80%, 56%"}
+
+  深绿色系:
+    base_hue: 160  # 深绿
+    saturation_range: [70, 85]
+    lightness_range: [35, 50]
+    variants:
+      - {hex: "#059669", name: "深绿", hsl: "160, 78%, 42%"}
+      - {hex: "#10B981", name: "翠绿", hsl: "160, 82%, 48%"}
+      - {hex: "#34D399", name: "薄荷", hsl: "160, 75%, 54%"}
+
+  中性灰系:
+    base_hue: 210  # 中性灰
+    saturation_range: [5, 15]
+    lightness_range: [20, 50]
+    variants:
+      - {hex: "#1F2937", name: "深灰", hsl: "210, 10%, 28%"}
+      - {hex: "#374151", name: "中灰", hsl: "210, 12%, 32%"}
+      - {hex: "#6B7280", name: "浅灰", hsl: "210, 8%, 48%"}
+
+  背景色系:
+    variants:
+      - {hex: "#FFFFFF", name: "纯白"}
+      - {hex: "#F9FAFB", name: "极浅灰"}
