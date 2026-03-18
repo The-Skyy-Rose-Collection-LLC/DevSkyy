@@ -19,7 +19,7 @@
 	var CONFIG = {
 		toastInterval:    18000,  // 18s between toasts
 		toastDuration:     6000,  // 6s visible
-		stickyDelay:       4000,  // 4s before sticky bar appears
+		stickyDelay:       2000,  // 2s before sticky bar appears (ticker at 0.8s, bar at 2s, toast at 8s)
 		viewerRefresh:    30000,  // 30s between viewer count updates
 		minViewers:          12,
 		maxViewers:          47,
@@ -35,9 +35,9 @@
 		{ name: 'BLACK Rose Joggers',              price: '$50',  collection: 'Black Rose',  image: 'br-002-front-model.webp' },
 		{ name: 'Love Hurts Joggers',              price: '$95',  collection: 'Love Hurts',  image: 'lh-002-front-model.webp' },
 		{ name: 'Love Hurts Basketball Shorts',    price: '$75',  collection: 'Love Hurts',  image: 'lh-003-front-model.webp' },
-		{ name: 'The Bay Set',                     price: '$195', collection: 'Signature',   image: 'sg-001-front-model.webp' },
+		{ name: 'Bay Bridge Shorts',               price: '$195', collection: 'Signature',   image: 'sg-001-front-model.webp' },
 		{ name: 'Mint & Lavender Hoodie',          price: '$45',  collection: 'Signature',   image: 'sg-006-front-model.webp' },
-		{ name: 'Signature Crop Hoodie',           price: '$50',  collection: 'Signature',   image: 'sg-008-front-model.webp' },
+		{ name: 'Signature Sherpa Jacket',         price: '$80',  collection: 'Signature',   image: 'sg-009-front-model.webp' },
 		{ name: 'Stay Golden Tee',                 price: '$65',  collection: 'Signature',   image: 'sg-002-front-model.webp' },
 	];
 

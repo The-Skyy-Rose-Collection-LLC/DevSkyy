@@ -43,13 +43,13 @@
 			{ city: 'New York',     product: 'The Bay Set',                 time: '7 min ago',  type: 'order' },
 			{ city: 'Houston',      product: 'BLACK Rose Sherpa Jacket',    time: '9 min ago',  type: 'order' },
 			{ city: 'Chicago',      product: 'Signature Hoodie',            time: '12 min ago', type: 'order' },
-			{ city: 'Miami',        product: 'Love Hurts Bomber Jacket',    time: '15 min ago', type: 'order' },
-			{ city: 'San Francisco',product: 'Waterfront Crewneck',         time: '18 min ago', type: 'order' },
+			{ city: 'Miami',        product: 'Love Hurts Varsity Jacket',   time: '15 min ago', type: 'order' },
+			{ city: 'San Francisco',product: 'Mint & Lavender Crewneck',    time: '18 min ago', type: 'order' },
 			{ city: 'Oakland',      product: 'BLACK Rose Joggers',          time: '21 min ago', type: 'order' },
-			{ city: 'Dallas',       product: "Women's Hooded Dress",        time: '24 min ago', type: 'order' },
+			{ city: 'Dallas',       product: 'Original Label Tee',          time: '24 min ago', type: 'order' },
 			{ city: 'Seattle',      product: 'Love Hurts Basketball Shorts',time: '28 min ago', type: 'order' },
-			{ city: 'Denver',       product: 'Kids Colorblock Set',         time: '31 min ago', type: 'order' },
-			{ city: 'Portland',     product: 'The Fannie Pack',             time: '35 min ago', type: 'order' },
+			{ city: 'Denver',       product: 'Kids Red Set',                time: '31 min ago', type: 'order' },
+			{ city: 'Portland',     product: 'The Fannie',                  time: '35 min ago', type: 'order' },
 		],
 
 		// Spotlight Moments
@@ -272,10 +272,10 @@
 		// Insert at very top of page
 		document.body.insertBefore(tickerBar, document.body.firstChild);
 
-		// Push page content down
-		requestAnimationFrame(function () {
+		// Push page content down — delay lets the page paint settle first
+		setTimeout(function () {
 			tickerBar.classList.add('mc-ticker--visible');
-		});
+		}, 800);
 
 		// Start animation
 		startTickerAnimation(track, inner);

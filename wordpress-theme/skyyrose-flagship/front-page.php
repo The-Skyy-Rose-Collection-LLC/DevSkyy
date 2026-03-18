@@ -91,15 +91,22 @@ foreach ( $skyyrose_collections as $slug => &$col_data ) {
 }
 unset( $col_data ); // Break reference.
 
-// Total product count for story stats — wp_count_posts is cached, no post objects loaded.
-$skyyrose_total_products = 0;
-if ( post_type_exists( 'product' ) ) {
-	$product_counts          = wp_count_posts( 'product' );
-	$skyyrose_total_products = isset( $product_counts->publish ) ? (int) $product_counts->publish : 0;
+// Canonical piece counts — authoritative override of live WooCommerce term counts.
+// Update this array when products are added or removed from a collection.
+$canonical_counts = array(
+	'black-rose' => 11,
+	'love-hurts' => 4,
+	'signature'  => 13,
+);
+foreach ( $skyyrose_collections as $slug => &$col_data ) {
+	if ( isset( $canonical_counts[ $slug ] ) ) {
+		$col_data['product_count'] = $canonical_counts[ $slug ];
+	}
 }
-if ( 0 === $skyyrose_total_products ) {
-	$skyyrose_total_products = 13;
-}
+unset( $col_data ); // Break reference.
+
+// Canonical total across all 4 collections (BR: 11, LH: 4, SG: 13, Kids: 2).
+$skyyrose_total_products = 30;
 
 $assets_uri = SKYYROSE_ASSETS_URI;
 ?>
@@ -249,7 +256,7 @@ get_template_part( 'template-parts/front-page/section', 'newsletter-v2' );
 	<div class="ft-inner">
 		<div>
 			<div class="ft-brand-name rv"><?php echo esc_html( 'SkyyRose' ); ?></div>
-			<p class="ft-desc rv rv-d1"><?php echo esc_html( 'Where Bay Area authenticity meets high-fashion aesthetics. Gender-neutral, sustainably crafted, limited edition designs. Built by a father, named after a daughter.' ); ?></p>
+			<p class="ft-desc rv rv-d1"><?php echo esc_html( 'Born in Oakland. Three collections for those who refuse to be ordinary. Gender-neutral, limited edition. Built by a father, named after a daughter.' ); ?></p>
 			<div class="ft-awards rv rv-d2">
 				<span class="ft-award"><?php echo wp_kses_post( 'Maxim&rsquo;s 14 Game-Changing Entrepreneurs 2023' ); ?></span>
 				<span class="ft-award"><?php echo esc_html( 'Best Bay Area Clothing Line 2024' ); ?></span>

@@ -22,6 +22,17 @@
 	body.luxury-cursor-active textarea {
 		cursor: none;
 	}
+
+	/* Popup overlays use explicit cursor:pointer in their own stylesheets.
+	   Override here to keep the custom cursor consistent on all overlays. */
+	body.luxury-cursor-active .social-proof-toast,
+	body.luxury-cursor-active .social-proof-toast *,
+	body.luxury-cursor-active .sticky-cta-bar,
+	body.luxury-cursor-active .sticky-cta-bar *,
+	body.luxury-cursor-active .mc-ticker,
+	body.luxury-cursor-active .mc-ticker * {
+		cursor: none !important;
+	}
 }
 
 /* ==================================================

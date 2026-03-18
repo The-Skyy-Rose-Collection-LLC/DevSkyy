@@ -75,7 +75,7 @@
 						<?php esc_html_e( 'Luxury Grows from Concrete.', 'skyyrose-flagship' ); ?>
 					</p>
 					<p class="footer-brand__description">
-						<?php esc_html_e( 'Premium fashion collections crafted with passion, designed for those who dare to express their truth.', 'skyyrose-flagship' ); ?>
+						<?php esc_html_e( 'Oakland luxury streetwear. Gender-neutral, limited edition pieces — built by a father, named after a daughter.', 'skyyrose-flagship' ); ?>
 					</p>
 					<nav class="footer-brand__social" aria-label="<?php esc_attr_e( 'Social Media Links', 'skyyrose-flagship' ); ?>">
 						<?php
