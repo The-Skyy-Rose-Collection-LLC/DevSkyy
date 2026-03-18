@@ -55,7 +55,7 @@ hyperopt==0.2.7
 
 # Audio processing
 librosa==0.10.2.post1
-soundfile==0.12.1
+soundfile==0.13.1
 
 # Time series
 statsmodels==0.14.6

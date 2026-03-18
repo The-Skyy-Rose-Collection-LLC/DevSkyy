@@ -91,7 +91,7 @@ python-pptx>=1.0.2
 pillow==12.1.1
 
 # Audio processing (for audio models)
-soundfile==0.12.1
+soundfile==0.13.1
 
 # Development utilities
 rich==13.9.4  # Better console output
