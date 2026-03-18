@@ -55,7 +55,7 @@ aiosqlite==0.22.1
 redis==7.1.0
 
 # Configuration management
-pyyaml==6.0.2
+pyyaml==6.0.3
 toml==0.10.2
 
 # Type checking support
