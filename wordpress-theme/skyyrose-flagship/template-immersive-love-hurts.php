@@ -263,6 +263,7 @@ $world_config = array(
 		'y'          => 71.9,
 		'w'          => 5.5,
 		'h'          => 9.9,
+		'walkSide'   => 'right',
 		'sprite'     => $assets_uri . '/images/mascot/skyyrose-mascot-love-hurts.png',
 		'introImage' => $assets_uri . '/images/mascot/skyyrose-mascot-reference.png',
 	),
