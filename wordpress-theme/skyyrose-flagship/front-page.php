@@ -94,9 +94,9 @@ unset( $col_data ); // Break reference.
 // Canonical piece counts — authoritative override of live WooCommerce term counts.
 // Update this array when products are added or removed from a collection.
 $canonical_counts = array(
-	'black-rose' => 11,
+	'black-rose' => 12,
 	'love-hurts' => 4,
-	'signature'  => 13,
+	'signature'  => 14,
 );
 foreach ( $skyyrose_collections as $slug => &$col_data ) {
 	if ( isset( $canonical_counts[ $slug ] ) ) {
@@ -105,8 +105,8 @@ foreach ( $skyyrose_collections as $slug => &$col_data ) {
 }
 unset( $col_data ); // Break reference.
 
-// Canonical total across all 4 collections (BR: 11, LH: 4, SG: 13, Kids: 2).
-$skyyrose_total_products = 30;
+// Canonical total across all 4 collections (BR: 12, LH: 4, SG: 14, Kids: 2).
+$skyyrose_total_products = 32;
 
 $assets_uri = SKYYROSE_ASSETS_URI;
 ?>
