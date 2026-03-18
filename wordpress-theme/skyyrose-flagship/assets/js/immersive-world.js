@@ -597,41 +597,78 @@
     var av = config.avatar;
     var collection = config.collection;
 
-    // Check if already found
+    // Already permanently found — don't show again
     var found = getFoundWorlds();
     if (found[collection]) return;
 
-    // Create clickable overlay positioned by percentage
-    var el = document.createElement('button');
-    el.className = 'avatar-hotspot';
-    el.type = 'button';
-    el.setAttribute('aria-label', 'Hidden SkyyRose mascot');
-    el.style.left = av.x + '%';
-    el.style.top = av.y + '%';
-    el.style.width = av.w + '%';
-    el.style.height = av.h + '%';
-
-    // Sprite image (idle animation handled by CSS)
-    var img = document.createElement('img');
-    img.src = av.sprite;
-    img.alt = '';
-    img.draggable = false;
-    el.appendChild(img);
-
-    el.addEventListener('click', function (e) {
-      e.stopPropagation();
-      onAvatarFound(el, collection);
-    });
-
-    // Attach to a container that covers the viewport
-    // Prefer world-narrative (3D mode) but fall back to immersive-scene (2D mode)
+    // Container (3D narrative overlay or 2D scene)
     var overlay = document.getElementById('world-narrative')
       || document.querySelector('.immersive-scene');
-    if (overlay) {
+    if (!overlay) return;
+
+    // Session key — walk-on plays once per session per world
+    var sessionKey = 'skyyrose-walked-' + collection;
+    var alreadyWalked = !!sessionStorage.getItem(sessionKey);
+
+    function spawnAvatar() {
+      var el = document.createElement('button');
+      el.className = 'avatar-hotspot';
+      el.type = 'button';
+      el.setAttribute('aria-label', 'SkyyRose is here — click to find her!');
+      el.setAttribute('data-message', 'Find me in all 3 worlds! \u2728');
+      el.style.left = av.x + '%';
+      el.style.top = av.y + '%';
+      el.style.width = av.w + '%';
+      el.style.height = av.h + '%';
+
+      var img = document.createElement('img');
+      img.src = av.sprite;
+      img.alt = '';
+      img.draggable = false;
+      el.appendChild(img);
+
+      el.addEventListener('click', function (e) {
+        e.stopPropagation();
+        onAvatarFound(el, collection);
+      });
+
       overlay.appendChild(el);
+      avatarHotspot = el;
+
+      if (alreadyWalked) {
+        // Already walked on this session — go straight to idle
+        el.classList.add('avatar-idle');
+      } else {
+        // Walk in from the configured side (default: left)
+        var side = av.walkSide === 'right' ? 'right' : 'left';
+        el.classList.add('avatar-walking-in', 'avatar-from-' + side);
+        sessionStorage.setItem(sessionKey, '1');
+
+        // After walk-in completes, transition to idle
+        setTimeout(function () {
+          if (!el.parentNode) return; // removed if found mid-walk
+          el.classList.remove('avatar-walking-in', 'avatar-from-left', 'avatar-from-right');
+          el.classList.add('avatar-idle');
+        }, 3100); // slightly longer than CSS animation (2900ms) to ensure completion
+      }
     }
 
-    avatarHotspot = el;
+    // Scroll trigger — fire once at 30% page depth
+    var triggered = false;
+    function checkScrollTrigger() {
+      if (triggered) return;
+      var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      var progress = docHeight > 0 ? window.scrollY / docHeight : 0;
+      if (progress >= 0.30) {
+        triggered = true;
+        window.removeEventListener('scroll', checkScrollTrigger);
+        spawnAvatar();
+      }
+    }
+
+    window.addEventListener('scroll', checkScrollTrigger, { passive: true });
+    // Check immediately in case page already scrolled (e.g. anchor link or reload)
+    checkScrollTrigger();
   }
 
   function onAvatarFound(el, collection) {
