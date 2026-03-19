@@ -204,7 +204,6 @@ get_header();
 		<button class="product-modal-close" type="button" aria-label="<?php esc_attr_e( 'Close product details', 'skyyrose-flagship' ); ?>">&times;</button>
 		<div class="modal-360-area">
 			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Product preview', 'skyyrose-flagship' ); ?>" width="400" height="400" loading="lazy">
-			<span class="modal-360-badge"><?php echo esc_html__( '360 Preview', 'skyyrose-flagship' ); ?></span>
 		</div>
 		<div class="modal-details">
 			<h2 class="modal-product-name" id="modal-product-name"><?php esc_html_e( 'Product Details', 'skyyrose-flagship' ); ?></h2>
