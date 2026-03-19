@@ -279,3 +279,8 @@ hf_enhancement_cache/
 
 # Local asset backups (created by cleanup scripts)
 DevSkyy-assets-backup/
+
+# Runtime-generated agent artifacts
+data/sdk_sessions/
+audit_reports/
+scraped_docs/
