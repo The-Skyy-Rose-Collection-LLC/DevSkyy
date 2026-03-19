@@ -167,6 +167,7 @@ $assets_uri = SKYYROSE_ASSETS_URI;
 <!-- ═══ HERO ═══ -->
 <section class="hero" id="hero" aria-label="<?php esc_attr_e( 'SkyyRose Hero', 'skyyrose-flagship' ); ?>">
 	<div class="hero-bg" style="background-image: url('<?php echo esc_url( $assets_uri . '/images/homepage-hero-bg.webp' ); ?>');" aria-hidden="true"></div>
+	<div class="hero-bg hero-bg--alt" style="background-image: url('<?php echo esc_url( $assets_uri . '/images/homepage-hero-bg-alt.webp' ); ?>');" aria-hidden="true"></div>
 	<div class="hero-ov" aria-hidden="true"></div>
 	<div class="hero-particles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
 	<div class="hero-frame" aria-hidden="true"></div>

@@ -265,3 +265,35 @@
 	}
 	.footer-copyright__menu { justify-content: center; }
 }
+
+/* ==================================================
+   UI/UX ELEVATION — Accessibility & Interaction
+   ================================================== */
+
+/* ── Contrast lift (WCAG AA 4.5:1 on #0A0A0A) ── */
+.footer-grid__list a { color: rgba(255, 255, 255, 0.57); }
+.footer-brand__description { color: rgba(255, 255, 255, 0.57); }
+
+/* ── Focus-visible rings for keyboard navigation ── */
+.footer-grid__list a:focus-visible,
+.footer-copyright__menu a:focus-visible {
+	outline: 2px solid #B76E79;
+	outline-offset: 3px;
+	border-radius: 2px;
+}
+
+.footer-brand__social-link:focus-visible {
+	outline: 2px solid #B76E79;
+	outline-offset: 3px;
+}
+
+.footer-brand__logo-link:focus-visible {
+	outline: 2px solid #B76E79;
+	outline-offset: 3px;
+	border-radius: 4px;
+}
+
+.footer-newsletter__submit:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 2px;
+}

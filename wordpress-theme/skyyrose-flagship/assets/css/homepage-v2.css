@@ -290,9 +290,20 @@
 	transform: scale(1.06);
 	animation: heroZoom 25s ease-in-out infinite alternate;
 }
+/* Alt hero image — crossfades with primary for a rich layered look */
+.hero-bg--alt {
+	opacity: 0;
+	animation: heroZoom 25s ease-in-out infinite alternate,
+	           heroCrossfade 16s ease-in-out infinite;
+}
 @keyframes heroZoom {
 	0% { transform: scale(1.06); }
 	100% { transform: scale(1.12) translateY(-1%); }
+}
+@keyframes heroCrossfade {
+	0%, 40%  { opacity: 0; }
+	50%, 65% { opacity: 0.35; }
+	75%, 100% { opacity: 0; }
 }
 .hero-ov {
 	position: absolute;

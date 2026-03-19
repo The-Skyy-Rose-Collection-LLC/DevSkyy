@@ -743,3 +743,25 @@
 		transition: none;
 	}
 }
+
+/* ==================================================
+   UI/UX ELEVATION — Accessibility & Interaction
+   ================================================== */
+
+/* ── Contrast lift ── */
+.world-nav__back { color: rgba(255, 255, 255, 0.57); }
+
+/* ── Touch target (44px min) ── */
+.world-nav__back { min-height: 44px; display: inline-flex; align-items: center; }
+
+/* ── Focus-visible rings ── */
+.avatar-intro-close:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 3px;
+}
+
+.world-nav__back:focus-visible {
+	outline: 2px solid #B76E79;
+	outline-offset: 3px;
+	border-radius: 2px;
+}
