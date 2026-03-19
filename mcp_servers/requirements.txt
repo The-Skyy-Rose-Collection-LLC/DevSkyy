@@ -27,10 +27,10 @@ asyncio==3.4.3
 aiofiles==25.1.0
 
 # JSON handling
-orjson==3.11.5
+orjson==3.11.7
 
 # Environment management
-python-dotenv==1.2.1
+python-dotenv==1.2.2
 
 # Logging and monitoring
 structlog==25.5.0
@@ -45,7 +45,7 @@ ratelimit==2.2.1
 
 # Security
 cryptography==46.0.5
-pyjwt==2.10.1
+pyjwt==2.12.1
 
 # Database (lightweight for MCP)
 sqlalchemy==2.0.45
@@ -55,7 +55,7 @@ aiosqlite==0.22.1
 redis==7.1.0
 
 # Configuration management
-pyyaml==6.0.2
+pyyaml==6.0.3
 toml==0.10.2
 
 # Type checking support
@@ -91,10 +91,10 @@ python-pptx>=1.0.2
 pillow==12.1.1
 
 # Audio processing (for audio models)
-soundfile==0.12.1
+soundfile==0.13.1
 
 # Development utilities
-rich==13.9.4  # Better console output
+rich==14.3.3  # Better console output
 click==8.1.7  # CLI interface
 
 # Testing
