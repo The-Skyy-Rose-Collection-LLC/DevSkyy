@@ -134,7 +134,7 @@ npm run type-check && npm run lint       # TypeScript
 ```
 API (FastAPI REST + GraphQL)  →  Security (JWT, OAuth2, AES-256-GCM)
          ↓
-Agents (54 specialized)  →  Orchestration (RAG, LangGraph, CrewAI)
+Agents (specialized, see agents/)  →  Orchestration (RAG, LangGraph, CrewAI)
          ↓
 Services (ML, 3D, Analytics)  →  LLM Providers (6: OpenAI, Anthropic, Google, Mistral, Cohere, Groq)
          ↓
@@ -149,10 +149,10 @@ Core (auth, cache, events, registry — zero external deps)
 - `frontend/` — Next.js 16 + React 19 + Three.js (5 immersive 3D collection experiences)
 - `skyyrose/elite_studio/` — Multi-agent coordinator: VisionAgent (Gemini+OpenAI) → GeneratorAgent (Gemini) → QualityAgent (Claude)
 - `pipelines/` — FLUX orchestrator, master pipeline, luxury pipeline
-- `agents/base_super_agent.py` — EnhancedSuperAgent base class (17 prompt techniques)
+- `agents/base_super_agent/agent.py` — EnhancedSuperAgent base class (17 prompt techniques)
 
 ### Key Directories
-`core/` (foundation) · `agents/` (54) · `api/v1/` + `api/graphql/` · `orchestration/` · `services/ml/` + `services/three_d/` · `integrations/` · `mcp_tools/` · `scripts/`
+`core/` (foundation) · `agents/` · `api/v1/` + `api/graphql/` · `orchestration/` · `services/ml/` + `services/three_d/` · `integrations/` · `mcp_tools/` · `scripts/`
 
 ### Virtual Environments
 `.venv` (main) · `.venv-imagery` (rembg, BRIA) · `.venv-lora` · `.venv-agents` (ADK, separate due to numpy conflicts)

@@ -11,9 +11,18 @@ const RotatingLogoFallback = lazy(
   () => import('@/components/3d/RotatingLogoFallback')
 );
 
+interface Particle {
+  x: string;
+  y: string;
+  animY: [string, string, string];
+  duration: number;
+  delay: number;
+}
+
 export default function HomePage() {
   const collections = getAllCollections();
   const [heroLoaded, setHeroLoaded] = useState(false);
+  const [particles, setParticles] = useState<Particle[]>([]);
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -28,6 +37,23 @@ export default function HomePage() {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    // Generate particle values client-side only to avoid prerender Math.random() error
+    setParticles(
+      Array.from({ length: 30 }).map(() => ({
+        x: `${Math.random() * 100}%`,
+        y: `${Math.random() * 100}%`,
+        animY: [
+          `${Math.random() * 100}%`,
+          `${Math.random() * 100}%`,
+          `${Math.random() * 100}%`,
+        ] as [string, string, string],
+        duration: 8 + Math.random() * 12,
+        delay: Math.random() * 5,
+      }))
+    );
+  }, []);
+
   return (
     <>
       {/* ======== HERO SECTION ======== */}
@@ -39,30 +65,15 @@ export default function HomePage() {
           {/* Animated gradient background */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#0A0A0A] via-[#1A0A0F] to-[#0D0D0D]" />
 
-          {/* Animated particles */}
+          {/* Animated particles — values generated client-side only */}
           <div className="absolute inset-0 overflow-hidden">
-            {Array.from({ length: 30 }).map((_, i) => (
+            {particles.map((p, i) => (
               <motion.div
                 key={i}
                 className="absolute w-1 h-1 rounded-full bg-[#B76E79]/30"
-                initial={{
-                  x: `${Math.random() * 100}%`,
-                  y: `${Math.random() * 100}%`,
-                  opacity: 0,
-                }}
-                animate={{
-                  y: [
-                    `${Math.random() * 100}%`,
-                    `${Math.random() * 100}%`,
-                    `${Math.random() * 100}%`,
-                  ],
-                  opacity: [0, 0.6, 0],
-                }}
-                transition={{
-                  duration: 8 + Math.random() * 12,
-                  repeat: Infinity,
-                  delay: Math.random() * 5,
-                }}
+                initial={{ x: p.x, y: p.y, opacity: 0 }}
+                animate={{ y: p.animY, opacity: [0, 0.6, 0] }}
+                transition={{ duration: p.duration, repeat: Infinity, delay: p.delay }}
               />
             ))}
           </div>
