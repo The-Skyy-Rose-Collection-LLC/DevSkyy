@@ -86,7 +86,7 @@ class SDKCapabilityMixin:
     # Override in subclass for domain-specific defaults
     sdk_tools: list[str] = ["Read", "Write", "Bash"]
     sdk_model: str = "sonnet"
-    sdk_max_turns: int = 30
+    sdk_max_turns: int = 15  # 30 caused runaway agents; 15 covers 95% of sub-tasks
     sdk_permission: str = "bypassPermissions"
     sdk_output_base: Path = Path("data/sdk_sessions")
 
@@ -132,6 +132,7 @@ class SDKCapabilityMixin:
             agents=agents or {},
             hooks=hook_sys.build_hook_config(),
             model=model or self.sdk_model,
+            max_turns=self.sdk_max_turns,
         )
         return options, hook_sys
 
@@ -139,9 +140,21 @@ class SDKCapabilityMixin:
         """Default system prompt. Override for domain-specific prompts."""
         name = self._sdk_agent_name()
         return (
-            f"You are {name}, a DevSkyy AI agent. "
-            "Execute tasks precisely and return structured results. "
-            "Use available tools to gather data and take actions."
+            f"You are {name}, a DevSkyy sub-agent.\n\n"
+            "EXECUTION RULES (non-negotiable):\n"
+            "- Read before writing. Never modify a file you haven't read this session.\n"
+            "- Do exactly what the task says. No extras, no 'improvements' beyond scope.\n"
+            "- Stop when the task is done. Don't ask clarifying questions — infer from context.\n"
+            "- Return a single structured result. No conversational filler.\n"
+            "- If something is ambiguous, pick the most conservative interpretation and proceed.\n\n"
+            "PROJECT CONTEXT:\n"
+            "- Platform: DevSkyy (AI-driven luxury fashion e-commerce, SkyyRose brand)\n"
+            "- Brand: Black Rose, Love Hurts, Signature collections\n"
+            "- Stack: FastAPI + Next.js 16 + WordPress theme (skyyrose-flagship)\n"
+            "- Colors: #B76E79 rose gold · #0A0A0A dark · #D4AF37 gold · #DC143C crimson\n"
+            "- Tagline: 'Luxury Grows from Concrete.' (ONLY tagline — never use alternatives)\n\n"
+            "OUTPUT FORMAT:\n"
+            "Return a JSON-serialisable summary: {status, result, files_changed, notes}"
         )
 
     # ------------------------------------------------------------------

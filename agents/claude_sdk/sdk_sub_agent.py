@@ -97,9 +97,11 @@ class SDKSubAgent(SubAgent, SDKCapabilityMixin):
         # Build context-enriched prompt
         prompt = self._build_task_prompt(task, **kwargs)
 
-        # Try SDK execution first
+        # Try SDK execution first — always pass system_prompt explicitly
+        # so domain-specific _sdk_default_prompt() overrides are honoured.
         sdk_result = await self._sdk_execute(
             prompt,
+            system_prompt=self._sdk_default_prompt(),
             tools=self.sdk_tools,
             agents=self.sdk_agents or {},
             label=self.name,
