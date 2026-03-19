@@ -26,7 +26,7 @@ $hero_img = get_theme_file_uri('assets/images/homepage-story-founder.webp');
 				Luxury Grows<br>from Concrete.
 			</h1>
 			<p class="abt-hero__sub rv-blur">
-				Oakland-born luxury streetwear. Built by a father. Named after a daughter. Three collections, one bloodline — this is the birth of the rebrand.
+				Oakland-born luxury streetwear. Built by a father. Named after a daughter. Four collections, one bloodline — this is the birth of the rebrand.
 			</p>
 		</div>
 	</section>
@@ -40,7 +40,7 @@ $hero_img = get_theme_file_uri('assets/images/homepage-story-founder.webp');
 			</div>
 			<div class="abt-origin__prose rv-blur">
 				<p>SkyyRose was never just a clothing brand. It was a promise — born in Oakland, forged by a single father who refused to let his circumstances write his daughter's story. <strong>Corey Foster</strong> named the brand after his reason for everything: his daughter, <strong>Skyy Rose</strong>.</p>
-				<p>The rebrand is the full realization of that promise. Three collections, each with its own world, its own story, its own identity — unified under one crown. This is Oakland-born luxury streetwear that doesn't apologize for where it came from. It <strong>celebrates</strong> it.</p>
+				<p>The rebrand is the full realization of that promise. Four collections, each with its own world, its own story, its own identity — unified under one crown. This is Oakland-born luxury streetwear that doesn't apologize for where it came from. It <strong>celebrates</strong> it.</p>
 				<p>Fashion was always self-expression for Corey. Growing up in Oakland's toughest neighborhoods, what you wore said everything — who you were, where you were going, what you refused to accept. SkyyRose carries that energy into every thread, every stitch, every rose.</p>
 				<p>This isn't a business strategy. It's a <strong>bloodline</strong>. The Hurts family name runs through every collection. A grandmother's legacy. A father's drive. A daughter's future. That's the foundation no competitor can replicate.</p>
 			</div>

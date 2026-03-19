@@ -62,7 +62,7 @@ $faq_categories = array(
 		'items' => array(
 			array(
 				'q' => __( 'How do your pieces fit?', 'skyyrose' ),
-				'a' => __( 'Most pieces run true to size with a relaxed, gender-neutral fit. Each product page includes a detailed size chart with measurements. When in doubt, check our Size Guide or contact us — we\'re happy to help you find the right fit.', 'skyyrose' ),
+				'a' => __( 'Most pieces run true to size with a relaxed, gender-neutral fit. Each product page includes a detailed size chart with measurements. When in doubt, check our Size Guide or reach out — we\'ll point you right.', 'skyyrose' ),
 			),
 			array(
 				'q' => __( 'Are your products unisex?', 'skyyrose' ),
@@ -160,8 +160,8 @@ get_header();
 		<!-- Contact CTA -->
 		<section class="info-page__cta rv-blur">
 			<h2><?php esc_html_e( 'Still have questions?', 'skyyrose' ); ?></h2>
-			<p><?php esc_html_e( 'Our team is here to help. Reach out anytime.', 'skyyrose' ); ?></p>
-			<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="info-page__cta-btn btn-sweep btn-press"><?php esc_html_e( 'Contact Us', 'skyyrose' ); ?></a>
+			<p><?php esc_html_e( 'Questions live here. For everything else — reach out.', 'skyyrose' ); ?></p>
+			<a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>" class="info-page__cta-btn btn-sweep btn-press"><?php esc_html_e( 'Reach Out', 'skyyrose' ); ?></a>
 		</section>
 
 	</div>

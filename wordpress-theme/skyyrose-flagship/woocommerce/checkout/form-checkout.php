@@ -385,7 +385,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 									else :
 										?>
 										<li class="skyy-checkout__payment-method--none">
-											<p><?php echo wp_kses_post( apply_filters( 'woocommerce_no_available_payment_methods_message', __( 'Sorry, it seems that there are no available payment methods. Please contact us for assistance.', 'skyyrose' ) ) ); ?></p>
+											<p><?php echo wp_kses_post( apply_filters( 'woocommerce_no_available_payment_methods_message', __( 'Payment options unavailable right now. Reach us at support@skyyrose.co and we will sort it.', 'skyyrose' ) ) ); ?></p>
 										</li>
 									<?php endif; ?>
 								</ul>

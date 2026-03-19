@@ -27,7 +27,7 @@ $allowed_inline = $args['allowed_inline'] ?? array();
 			<?php echo wp_kses( __( 'Luxury Grows<br>from Concrete.', 'skyyrose' ), $allowed_inline ); ?>
 		</h2>
 		<p class="abt-mission__sub">
-			<?php esc_html_e( 'Luxury grows from concrete. Oakland roots, family-driven, fashion as self-expression. Three collections, one bloodline, one crown. This is SkyyRose.', 'skyyrose' ); ?>
+			<?php esc_html_e( 'Oakland roots, family-driven, fashion as self-expression. Four collections, one bloodline, one crown. This is SkyyRose.', 'skyyrose' ); ?>
 		</p>
 		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="abt-mission__cta">
 			<?php esc_html_e( 'Shop the Collection', 'skyyrose' ); ?>

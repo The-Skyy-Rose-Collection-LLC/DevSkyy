@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 --------------------------------------------------------------
  * Theme Constants
  *--------------------------------------------------------------*/
-define( 'SKYYROSE_VERSION', '1.1.2' );
+define( 'SKYYROSE_VERSION', '1.3.0' );
 define( 'SKYYROSE_DIR', get_template_directory() );
 define( 'SKYYROSE_URI', get_template_directory_uri() );
 
@@ -94,6 +94,7 @@ if ( class_exists( 'WooCommerce' ) ) {
 	$skyyrose_woo_includes = array(
 		'/inc/woocommerce.php',
 		'/inc/woocommerce-preorder.php',
+		'/inc/skyyrose-product-meta.php',
 		'/inc/wc-product-functions.php',
 		'/inc/immersive-ajax.php',
 		'/inc/wishlist-functions.php',

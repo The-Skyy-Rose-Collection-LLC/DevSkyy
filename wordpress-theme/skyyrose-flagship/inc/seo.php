@@ -714,7 +714,7 @@ function skyyrose_meta_description() {
 				'template-collection-signature.php'  => 'Browse the full Signature Collection. Everyday luxury — windbreakers, shorts, beanies, and essentials from SkyyRose.',
 				'template-about.php'                 => 'The SkyyRose story — Luxury Grows from Concrete. Founded in Oakland, building premium streetwear for the culture.',
 				'template-preorder-gateway.php'      => 'Secure your SkyyRose pieces before they drop. Pre-order limited edition streetwear and luxury fashion.',
-				'template-contact.php'               => 'Get in touch with SkyyRose. Questions about orders, sizing, collaborations, or press inquiries? We are here to help.',
+				'template-contact.php'               => 'Reach SkyyRose directly. Oakland-made, founder-led. Questions about orders, sizing, collaborations, or press — we read every message.',
 				'template-faq.php'                   => 'Frequently asked questions about SkyyRose orders, shipping, returns, sizing, and pre-orders. Everything you need to know.',
 				'template-shipping-returns.php'      => 'SkyyRose shipping rates, delivery times, 30-day return policy, free exchanges, and pre-order cancellation details.',
 			);
@@ -781,7 +781,7 @@ function skyyrose_pre_document_title( $title ) {
 			'template-collection-signature.php'  => 'Shop Signature — Everyday Luxury Essentials | ' . $brand,
 			'template-about.php'                 => 'Our Story — Luxury Grows from Concrete | ' . $brand,
 			'template-preorder-gateway.php'      => 'Pre-Order — Secure Your Pieces | ' . $brand,
-			'template-contact.php'               => 'Contact Us | ' . $brand,
+			'template-contact.php'               => 'Reach Out | ' . $brand,
 			'page-wishlist.php'                  => 'Your Wishlist | ' . $brand,
 			'template-faq.php'                   => 'FAQ — Orders, Shipping, Returns & Sizing | ' . $brand,
 			'template-shipping-returns.php'      => 'Shipping & Returns Policy | ' . $brand,

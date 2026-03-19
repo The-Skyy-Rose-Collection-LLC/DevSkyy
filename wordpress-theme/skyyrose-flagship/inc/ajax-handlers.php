@@ -223,7 +223,7 @@ function skyyrose_ajax_newsletter_subscribe() {
 
 	wp_send_json_success(
 		array(
-			'message' => esc_html__( 'Welcome to the SkyyRose family! Check your inbox for your 15% discount code.', 'skyyrose' ),
+			'message' => esc_html__( 'You\'re in. Your 15% code is on the way.', 'skyyrose' ),
 		)
 	);
 	return;

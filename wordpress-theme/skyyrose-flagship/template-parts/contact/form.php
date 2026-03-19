@@ -231,7 +231,7 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 
 		<div class="contact-form__group">
 			<label for="contact-referral" class="contact-form__label">
-				<?php esc_html_e( 'How Did You Hear About Us? (Optional)', 'skyyrose' ); ?>
+				<?php esc_html_e( 'Where did you find us?', 'skyyrose' ); ?>
 			</label>
 			<select
 				id="contact-referral"

@@ -179,7 +179,7 @@ defined( 'ABSPATH' ) || exit;
 				<div class="footer-grid__col footer-grid__col--help">
 					<h4 class="footer-grid__heading"><?php esc_html_e( 'Help', 'skyyrose' ); ?></h4>
 					<ul class="footer-grid__list">
-						<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Contact Us', 'skyyrose' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Reach Out', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/faq/' ) ); ?>"><?php esc_html_e( 'FAQ', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/shipping-returns/' ) ); ?>"><?php esc_html_e( 'Shipping & Returns', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/contact/#size-guide' ) ); ?>"><?php esc_html_e( 'Size Guide', 'skyyrose' ); ?></a></li>

@@ -219,7 +219,7 @@ get_header();
 		<p class="hero-eyebrow rv-blur-down"><?php esc_html_e( 'Oakland · Est. 2020 · Gender Neutral', 'skyyrose' ); ?></p>
 		<h1 class="hero-title rv-split-char" aria-label="<?php esc_attr_e( 'SkyyRose', 'skyyrose' ); ?>">SkyyRose</h1>
 		<div class="hero-rule" aria-hidden="true"></div>
-		<p class="hero-subtitle rv-blur"><?php esc_html_e( 'Luxury Grows from Concrete. Three collections, one vision — built by a father, named after a daughter.', 'skyyrose' ); ?></p>
+		<p class="hero-subtitle rv-blur"><?php esc_html_e( 'Luxury Grows from Concrete. Four collections, one bloodline — built by a father, named after a daughter.', 'skyyrose' ); ?></p>
 		<div class="hero-ctas">
 			<a href="#collections" class="hero-cta hero-cta-primary btn-sweep btn-press"><?php esc_html_e( 'Explore Collections', 'skyyrose' ); ?></a>
 			<a href="#story" class="hero-cta btn-border-draw btn-press"><?php esc_html_e( 'Our Story', 'skyyrose' ); ?></a>
