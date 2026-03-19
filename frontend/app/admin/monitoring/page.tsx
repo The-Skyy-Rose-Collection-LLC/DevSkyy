@@ -43,83 +43,31 @@ interface ActivityLog {
 }
 
 export default function MonitoringPage() {
-  const [services, setServices] = useState<ServiceHealth[]>([
-    {
-      name: 'WordPress API',
-      status: 'healthy',
-      uptime: 99.98,
-      lastCheck: new Date(),
-      responseTime: 145,
-    },
-    {
-      name: 'Vercel API',
-      status: 'healthy',
-      uptime: 100,
-      lastCheck: new Date(),
-      responseTime: 89,
-    },
-    {
-      name: 'Round Table',
-      status: 'healthy',
-      uptime: 99.95,
-      lastCheck: new Date(),
-      responseTime: 234,
-    },
-    {
-      name: 'Database',
-      status: 'healthy',
-      uptime: 100,
-      lastCheck: new Date(),
-      responseTime: 12,
-    },
-  ]);
-
-  const [circuitBreakers, setCircuitBreakers] = useState<CircuitBreakerStatus[]>([
-    {
-      service: 'WordPress Sync',
-      state: 'closed',
-      failures: 0,
-      lastFailure: null,
-    },
-    {
-      service: 'Vercel Deployment',
-      state: 'closed',
-      failures: 0,
-      lastFailure: null,
-    },
-    {
-      service: 'Round Table Competition',
-      state: 'closed',
-      failures: 0,
-      lastFailure: null,
-    },
-  ]);
-
-  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([
-    {
-      id: '1',
-      timestamp: new Date(Date.now() - 120000),
-      type: 'success',
-      service: 'WordPress',
-      message: 'Post published successfully (ID: 1234)',
-    },
-    {
-      id: '2',
-      timestamp: new Date(Date.now() - 300000),
-      type: 'success',
-      service: 'Vercel',
-      message: 'Deployment completed: https://devskyy.vercel.app',
-    },
-    {
-      id: '3',
-      timestamp: new Date(Date.now() - 480000),
-      type: 'success',
-      service: 'Round Table',
-      message: 'Competition completed - Winner: Anthropic Claude',
-    },
-  ]);
-
+  // Initialize with empty arrays — populated client-side to avoid new Date() during prerender
+  const [services, setServices] = useState<ServiceHealth[]>([]);
+  const [circuitBreakers, setCircuitBreakers] = useState<CircuitBreakerStatus[]>([]);
+  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  useEffect(() => {
+    const now = new Date();
+    setServices([
+      { name: 'WordPress API', status: 'healthy', uptime: 99.98, lastCheck: now, responseTime: 145 },
+      { name: 'Vercel API', status: 'healthy', uptime: 100, lastCheck: now, responseTime: 89 },
+      { name: 'Round Table', status: 'healthy', uptime: 99.95, lastCheck: now, responseTime: 234 },
+      { name: 'Database', status: 'healthy', uptime: 100, lastCheck: now, responseTime: 12 },
+    ]);
+    setCircuitBreakers([
+      { service: 'WordPress Sync', state: 'closed', failures: 0, lastFailure: null },
+      { service: 'Vercel Deployment', state: 'closed', failures: 0, lastFailure: null },
+      { service: 'Round Table Competition', state: 'closed', failures: 0, lastFailure: null },
+    ]);
+    setActivityLogs([
+      { id: '1', timestamp: new Date(Date.now() - 120000), type: 'success', service: 'WordPress', message: 'Post published successfully (ID: 1234)' },
+      { id: '2', timestamp: new Date(Date.now() - 300000), type: 'success', service: 'Vercel', message: 'Deployment completed: https://devskyy.vercel.app' },
+      { id: '3', timestamp: new Date(Date.now() - 480000), type: 'success', service: 'Round Table', message: 'Competition completed - Winner: Anthropic Claude' },
+    ]);
+  }, []);
 
   const refreshMetrics = async () => {
     setIsRefreshing(true);
