@@ -39,7 +39,7 @@ PRODUCTS_DIR = (
     PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
 )
 
-MODEL_ID = "gemini-2.5-flash-image"
+MODEL_ID = "gemini-3.1-flash-image-preview"
 FLUX_MODEL_ID = "black-forest-labs/FLUX.2-pro"
 FLUX_MODEL_FREE = "black-forest-labs/FLUX.1-schnell-Free"
 GPT_IMAGE_MODEL = "gpt-image-1.5"
