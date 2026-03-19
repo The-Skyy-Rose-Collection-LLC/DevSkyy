@@ -1230,3 +1230,51 @@
 		transform: none !important;
 	}
 }
+
+/* ==================================================
+   UI/UX ELEVATION — Focus, Cursor, Contrast
+   ================================================== */
+
+/* Cursor pointer on clickable card elements */
+.collections__card,
+.featured-product {
+	cursor: pointer;
+}
+
+/* Focus-visible rings on interactive cards */
+.collections__card:focus-visible,
+.featured-product:focus-visible,
+.why-skyyrose__card:focus-visible {
+	outline: 2px solid var(--color-rose-gold, #B76E79);
+	outline-offset: 3px;
+}
+
+/* Focus-visible on hero CTA buttons */
+.btn--primary:focus-visible,
+.btn--outline:focus-visible {
+	outline: 2px solid var(--color-rose-gold, #B76E79);
+	outline-offset: 3px;
+}
+
+/* Newsletter button focus ring */
+.newsletter-form button:focus-visible {
+	outline: 2px solid var(--color-rose-gold, #B76E79);
+	outline-offset: 3px;
+}
+
+/* Contrast lift — WCAG AA compliance for small muted labels */
+/* rgba(255,255,255,0.4) on #0A0A0A ≈ 4.4:1 — bumped to 0.57 ≈ 6.3:1 */
+.social-proof__label,
+.brand-story__stat-label,
+.hero__rotating-label {
+	color: rgba(255, 255, 255, 0.57);
+}
+
+/* Press logo hover — also improve base contrast */
+.press__logo {
+	color: rgba(255, 255, 255, 0.32);
+}
+
+.press__logo:hover {
+	color: rgba(255, 255, 255, 0.65);
+}
