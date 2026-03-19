@@ -297,10 +297,10 @@
 
 .product-grid-wishlist {
 	position: absolute;
-	top: 12px;
-	right: 12px;
-	width: 36px;
-	height: 36px;
+	top: 8px;
+	right: 8px;
+	width: 44px;
+	height: 44px;
 	border-radius: 50%;
 	border: none;
 	background: rgba(10, 10, 10, 0.5);
@@ -402,10 +402,10 @@
 
 .product-modal-close {
 	position: absolute;
-	top: 12px;
-	right: 12px;
-	width: 36px;
-	height: 36px;
+	top: 8px;
+	right: 8px;
+	width: 44px;
+	height: 44px;
 	border: none;
 	background: rgba(255, 255, 255, 0.08);
 	color: #fff;
@@ -1136,10 +1136,10 @@
 
 .incentive-popup-close {
 	position: absolute;
-	top: 12px;
-	right: 16px;
-	width: 32px;
-	height: 32px;
+	top: 8px;
+	right: 10px;
+	width: 44px;
+	height: 44px;
 	border: none;
 	background: rgba(255, 255, 255, 0.06);
 	color: rgba(255, 255, 255, 0.5);
@@ -1269,6 +1269,20 @@
 .signin-close:focus-visible,
 .product-modal-close:focus-visible,
 .incentive-popup-close:focus-visible {
+	outline: 2px solid var(--rose-gold, #B76E79);
+	outline-offset: 2px;
+}
+
+/* Focus-visible on primary CTA buttons */
+.modal-add-to-cart:focus-visible,
+.cart-checkout-btn:focus-visible,
+.signin-submit:focus-visible,
+.incentive-popup-submit:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 3px;
+}
+
+.modal-wishlist-btn:focus-visible {
 	outline: 2px solid var(--rose-gold, #B76E79);
 	outline-offset: 2px;
 }

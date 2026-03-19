@@ -141,7 +141,7 @@
 	font-size: 11px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
-	color: #8A8A8A;
+	color: #9E9E9E; /* WCAG AA: ~4.5:1 on #000 */
 }
 
 .col-hero__ctas {
@@ -237,7 +237,7 @@
 	font-size: var(--text-base);
 	font-weight: 300;
 	font-style: italic;
-	color: #8A8A8A;
+	color: #9E9E9E; /* WCAG AA: ~4.5:1 on #000 */
 	line-height: 2;
 }
 
@@ -1309,4 +1309,37 @@
 	.col-modal-ov { transition: none; }
 	.col-feat__vis-letter { transition: none; }
 	.col-feat__add { transition: none; }
+}
+
+/* ==================================================
+   UI/UX ELEVATION — Focus States + Reduced Motion
+   ================================================== */
+
+.col-btn:focus-visible,
+.col-feat__vis:focus-visible {
+	outline: 2px solid var(--col-accent, #C0C0C0);
+	outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.col-rv,
+	.col-rv-l {
+		transition: none;
+		opacity: 1;
+		transform: none;
+	}
+
+	.col-hero__img img {
+		animation: none;
+	}
+
+	.col-hero__logo {
+		animation: none;
+		opacity: 1;
+		transform: none;
+	}
+
+	.col-mf__scene img {
+		transition: none;
+	}
 }
