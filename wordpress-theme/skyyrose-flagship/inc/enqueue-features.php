@@ -411,9 +411,109 @@ function skyyrose_enqueue_momentum_commerce() {
 		return;
 	}
 	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
-	$mc_js   = $use_min && file_exists( SKYYROSE_DIR . '/assets/js/momentum-commerce.min.js' ) ? 'momentum-commerce.min.js' : 'momentum-commerce.js';
+
+	// CSS — ticker, price anchoring, spotlight bar styles.
+	$mc_css = $use_min && file_exists( SKYYROSE_DIR . '/assets/css/momentum-commerce.min.css' )
+		? 'momentum-commerce.min.css' : 'momentum-commerce.css';
+	if ( file_exists( SKYYROSE_DIR . '/assets/css/' . $mc_css ) ) {
+		wp_enqueue_style( 'skyyrose-momentum-commerce', SKYYROSE_ASSETS_URI . '/css/' . $mc_css, array( 'skyyrose-design-tokens' ), SKYYROSE_VERSION );
+	}
+
+	// JS — ticker animation, price anchoring logic, spotlight engine.
+	$mc_js = $use_min && file_exists( SKYYROSE_DIR . '/assets/js/momentum-commerce.min.js' )
+		? 'momentum-commerce.min.js' : 'momentum-commerce.js';
 	if ( file_exists( SKYYROSE_DIR . '/assets/js/' . $mc_js ) ) {
 		wp_enqueue_script( 'skyyrose-momentum-commerce', SKYYROSE_ASSETS_URI . '/js/' . $mc_js, array(), SKYYROSE_VERSION, true );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_momentum_commerce', 57 );
+
+/**
+ * Enqueue Splite Scene assets on pages that include the splite-scene template part.
+ *
+ * Loads CSS/JS for the 3D Spline split-screen component adapted from 21st.dev.
+ * The Spline viewer web component itself is lazy-loaded via JS when the section
+ * scrolls into view (no upfront <script> needed).
+ *
+ * @since 4.1.0
+ * @return void
+ */
+function skyyrose_enqueue_splite_scene() {
+	if ( is_admin() ) {
+		return;
+	}
+
+	$slug         = skyyrose_get_current_template_slug();
+	$active_slugs = array( 'front-page', 'immersive', 'collection', 'collection-v4', 'collections-shop', 'landing' );
+
+	if ( ! in_array( $slug, $active_slugs, true ) ) {
+		return;
+	}
+
+	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+
+	$css_file = $use_min && file_exists( SKYYROSE_DIR . '/assets/css/splite-scene.min.css' )
+		? 'splite-scene.min.css' : 'splite-scene.css';
+	if ( file_exists( SKYYROSE_DIR . '/assets/css/' . $css_file ) ) {
+		wp_enqueue_style(
+			'skyyrose-splite-scene',
+			SKYYROSE_ASSETS_URI . '/css/' . $css_file,
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	$js_file = $use_min && file_exists( SKYYROSE_DIR . '/assets/js/splite-scene.min.js' )
+		? 'splite-scene.min.js' : 'splite-scene.js';
+	if ( file_exists( SKYYROSE_DIR . '/assets/js/' . $js_file ) ) {
+		wp_enqueue_script(
+			'skyyrose-splite-scene',
+			SKYYROSE_ASSETS_URI . '/js/' . $js_file,
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+}
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_splite_scene', 58 );
+
+/**
+ * Enqueue 21st Effects Engine on all public-facing pages.
+ *
+ * Auto-applies mesh gradients, text reveals, glassmorphism, pulsing borders,
+ * card tilt, and staggered entrances to existing DOM elements via JS class injection.
+ *
+ * @since 4.1.0
+ * @return void
+ */
+function skyyrose_enqueue_21st_effects() {
+	if ( is_admin() ) {
+		return;
+	}
+
+	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+
+	$css_file = $use_min && file_exists( SKYYROSE_DIR . '/assets/css/21st-effects.min.css' )
+		? '21st-effects.min.css' : '21st-effects.css';
+	if ( file_exists( SKYYROSE_DIR . '/assets/css/' . $css_file ) ) {
+		wp_enqueue_style(
+			'skyyrose-21st-effects',
+			SKYYROSE_ASSETS_URI . '/css/' . $css_file,
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	$js_file = $use_min && file_exists( SKYYROSE_DIR . '/assets/js/21st-effects.min.js' )
+		? '21st-effects.min.js' : '21st-effects.js';
+	if ( file_exists( SKYYROSE_DIR . '/assets/js/' . $js_file ) ) {
+		wp_enqueue_script(
+			'skyyrose-21st-effects',
+			SKYYROSE_ASSETS_URI . '/js/' . $js_file,
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+}
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_21st_effects', 60 );

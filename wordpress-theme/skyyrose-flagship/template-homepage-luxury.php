@@ -184,6 +184,20 @@ get_header();
 </section>
 
 <!-- ════════════════════════════════════════════════
+     SPLITE — Immersive 3D Experience Teaser (21st.dev)
+     ════════════════════════════════════════════════ -->
+<?php
+get_template_part( 'template-parts/splite-scene', null, array(
+	'scene'    => 'https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode',
+	'eyebrow'  => __( 'Immersive Experience', 'skyyrose-flagship' ),
+	'heading'  => __( 'Step Inside SkyyRose', 'skyyrose-flagship' ),
+	'text'     => __( 'Explore our collections in interactive 3D worlds. Each piece lives in its own universe — from Oakland\'s grit to the Golden Gate\'s glow.', 'skyyrose-flagship' ),
+	'cta_text' => __( 'Enter the Experience', 'skyyrose-flagship' ),
+	'cta_url'  => home_url( '/experience-black-rose/' ),
+) );
+?>
+
+<!-- ════════════════════════════════════════════════
      CRAFT — What Makes Us Different
      ════════════════════════════════════════════════ -->
 <section class="lux-craft" id="craft" aria-label="<?php esc_attr_e( 'Our Craft', 'skyyrose-flagship' ); ?>">

@@ -260,6 +260,26 @@
 	font-weight: 600;
 }
 
+/* ==================================================
+   UI/UX ELEVATION — Accessibility & Interaction
+   ================================================== */
+
+/* ── Cursor pointer on interactive cards ── */
+.skyy-product-card__inner { cursor: pointer; }
+
+/* ── Focus-visible rings ── */
+.skyy-product-card__inner:focus-visible,
+.skyy-product-card__content-link:focus-visible {
+	outline: 2px solid var(--skyy-woo-accent, #B76E79);
+	outline-offset: 3px;
+}
+
+.skyy-product-card__actions .button:focus-visible,
+.skyy-product-card__actions .add_to_cart_button:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 2px;
+}
+
 /* Reduced motion — WooCommerce elements only (scoped to avoid overriding
    per-component reduced-motion rules in other stylesheets) */
 @media (prefers-reduced-motion: reduce) {

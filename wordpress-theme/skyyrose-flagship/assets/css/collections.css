@@ -529,3 +529,26 @@
 	.collections-grid { grid-template-columns: 1fr; }
 	.collections-grid-wrap { padding: 0 1rem 4rem; }
 }
+
+/* ==================================================
+   UI/UX ELEVATION — Accessibility & Interaction
+   ================================================== */
+
+/* ── Cursor pointer on interactive cards ── */
+.product-card,
+.cross-collection-card,
+.collections-card { cursor: pointer; }
+
+/* ── Focus-visible rings for keyboard navigation ── */
+.product-card:focus-visible,
+.collections-card:focus-visible,
+.cross-collection-card:focus-visible {
+	outline: 2px solid #B76E79;
+	outline-offset: 3px;
+}
+
+.collections-card__cta:focus-visible {
+	outline: 2px solid #B76E79;
+	outline-offset: 2px;
+	border-radius: 2px;
+}
