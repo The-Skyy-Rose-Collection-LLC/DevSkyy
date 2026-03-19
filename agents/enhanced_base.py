@@ -389,9 +389,13 @@ def with_telemetry(
 # =============================================================================
 
 
-class EnhancedSuperAgent(SuperAgent):
+class LegacyEnhancedSuperAgent(SuperAgent):
     """
-    Enhanced SuperAgent with improved error handling and common patterns.
+    Legacy enhanced SuperAgent with error handling and common patterns.
+
+    NOTE: This is the LEGACY version. Production agents use
+    agents.base_super_agent.EnhancedSuperAgent (which extends BaseDevSkyyAgent).
+    This class is retained for backward compatibility only.
 
     Improvements over base SuperAgent:
     - Standardized error handling with AgentError hierarchy
@@ -400,8 +404,6 @@ class EnhancedSuperAgent(SuperAgent):
     - Reduced boilerplate in subclasses
     - Better type safety
     - Telemetry/metrics support
-
-    Backward compatible with existing SuperAgent interface.
     """
 
     def __init__(
@@ -676,7 +678,7 @@ __all__ = [
     "EnhancedExecutionResult",
     "EnhancedValidationResult",
     # Base Classes
-    "EnhancedSuperAgent",
+    "LegacyEnhancedSuperAgent",
     "ToolExecutionMixin",
     # Decorators
     "with_error_handling",
