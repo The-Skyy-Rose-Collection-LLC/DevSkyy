@@ -1,0 +1,28 @@
+/**
+ * Performance Guardian — CLS containment & lazy loading styles.
+ *
+ * @package SkyyRose_Experience_Engine
+ * @since   1.0.0
+ */
+
+/* ── Lazy-loaded modules: hidden until IntersectionObserver triggers ── */
+[data-see-lazy-module]:not(.see-lazy-loaded) {
+	opacity: 0;
+	transform: translateY(20px);
+	transition: opacity var(--see-duration-med, 500ms) var(--see-ease-out, ease),
+	            transform var(--see-duration-med, 500ms) var(--see-ease-out, ease);
+}
+
+[data-see-lazy-module].see-lazy-loaded {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* ── Reduced motion: instant reveal ── */
+@media (prefers-reduced-motion: reduce) {
+	[data-see-lazy-module]:not(.see-lazy-loaded) {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+}

@@ -1,0 +1,120 @@
+/**
+ * Micro-Interactions — Toast, cart fly, wishlist, hover feedback.
+ *
+ * @package SkyyRose_Experience_Engine
+ * @since   1.0.0
+ */
+
+/* ── Toast Container ── */
+.see-toast-container {
+	position: fixed;
+	bottom: 24px;
+	right: 24px;
+	z-index: var(--see-z-toast, 1100);
+	display: flex;
+	flex-direction: column-reverse;
+	gap: 8px;
+	max-width: 360px;
+	pointer-events: none;
+}
+
+.see-toast {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 16px;
+	border-radius: var(--see-radius-md, 8px);
+	font-size: 13px;
+	color: var(--see-white, #FFFFFF);
+	pointer-events: auto;
+	opacity: 0;
+	transform: translateX(100%);
+	transition:
+		opacity var(--see-duration-short, 300ms) var(--see-ease-out),
+		transform var(--see-duration-short, 300ms) var(--see-ease-out);
+	box-shadow: var(--see-shadow-lg);
+}
+
+.see-toast--visible {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+.see-toast--exit {
+	opacity: 0;
+	transform: translateX(100%);
+}
+
+/* Toast types */
+.see-toast--info     { background: var(--see-dark, #0A0A0A); border: 1px solid rgba(183, 110, 121, 0.3); }
+.see-toast--success  { background: #0a3d1a; border: 1px solid rgba(0, 163, 42, 0.3); }
+.see-toast--error    { background: #3d0a0a; border: 1px solid rgba(220, 20, 60, 0.3); }
+.see-toast--warning  { background: #3d2e0a; border: 1px solid rgba(212, 175, 55, 0.3); }
+
+.see-toast-close {
+	background: none;
+	border: none;
+	color: rgba(255, 255, 255, 0.5);
+	font-size: 18px;
+	cursor: pointer;
+	padding: 0 0 0 12px;
+	line-height: 1;
+}
+
+.see-toast-close:hover {
+	color: rgba(255, 255, 255, 0.9);
+}
+
+/* ── Button Pulse Animation ── */
+.see-btn-pulse {
+	animation: see-pulse 600ms var(--see-ease-out);
+}
+
+@keyframes see-pulse {
+	0%   { box-shadow: 0 0 0 0 rgba(183, 110, 121, 0.5); }
+	70%  { box-shadow: 0 0 0 12px rgba(183, 110, 121, 0); }
+	100% { box-shadow: 0 0 0 0 rgba(183, 110, 121, 0); }
+}
+
+/* ── Cart Bounce ── */
+.see-cart-bounce {
+	animation: see-bounce 400ms var(--see-ease-out);
+}
+
+@keyframes see-bounce {
+	0%   { transform: scale(1); }
+	40%  { transform: scale(1.3); }
+	70%  { transform: scale(0.9); }
+	100% { transform: scale(1); }
+}
+
+/* ── Hover Feedback on Interactive Elements ── */
+.see-product-wrapper a,
+.see-product-wrapper button,
+[data-see-track] {
+	transition: transform var(--see-duration-micro, 150ms) var(--see-ease-out);
+}
+
+/* ── Mobile Toast Position ── */
+@media (max-width: 768px) {
+	.see-toast-container {
+		bottom: 16px;
+		right: 16px;
+		left: 16px;
+		max-width: none;
+	}
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+	.see-toast {
+		transition: none;
+		opacity: 1;
+		transform: none;
+	}
+
+	.see-btn-pulse,
+	.see-cart-bounce {
+		animation: none;
+	}
+}

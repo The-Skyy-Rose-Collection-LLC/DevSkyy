@@ -1,0 +1,112 @@
+/**
+ * Personalization Engine — Curated For You section styles.
+ *
+ * @package SkyyRose_Experience_Engine
+ * @since   1.0.0
+ */
+
+/* ── Curated Section ── */
+.see-curated-section {
+	margin: var(--see-space-xl, 4rem) 0;
+	padding: 0 var(--see-space-md, 1rem);
+}
+
+.see-curated-inner {
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.see-curated-heading {
+	font-family: var(--see-font-headline, 'Cinzel', serif);
+	font-size: 24px;
+	color: var(--see-white, #FFFFFF);
+	margin: 0 0 8px;
+	text-align: center;
+}
+
+.see-curated-badge {
+	display: block;
+	text-align: center;
+	font-size: 10px;
+	color: var(--see-rose-gold, #B76E79);
+	text-transform: uppercase;
+	letter-spacing: 2px;
+	margin-bottom: var(--see-space-lg, 2rem);
+}
+
+/* ── Product Grid ── */
+.see-curated-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: var(--see-space-md, 1rem);
+}
+
+.see-curated-item {
+	display: flex;
+	flex-direction: column;
+	background: rgba(255, 255, 255, 0.03);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	border-radius: var(--see-radius-md, 8px);
+	overflow: hidden;
+	text-decoration: none;
+	color: inherit;
+	transition:
+		transform var(--see-duration-short, 300ms) var(--see-ease-out),
+		border-color var(--see-duration-short, 300ms);
+}
+
+.see-curated-item:hover {
+	transform: translateY(-4px);
+	border-color: var(--see-rose-gold, #B76E79);
+}
+
+.see-curated-item img {
+	width: 100%;
+	aspect-ratio: 3 / 4;
+	object-fit: cover;
+}
+
+.see-curated-name {
+	padding: 10px 12px 4px;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--see-white, #FFFFFF);
+}
+
+.see-curated-price {
+	padding: 0 12px 12px;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--see-rose-gold, #B76E79);
+}
+
+/* ── Loading State ── */
+.see-curated-section .see-skeleton {
+	border-radius: var(--see-radius-md, 8px);
+}
+
+.see-curated-loaded .see-skeleton {
+	display: none;
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+	.see-curated-grid {
+		grid-template-columns: repeat(2, 1fr);
+		gap: var(--see-space-sm, 0.5rem);
+	}
+
+	.see-curated-heading {
+		font-size: 20px;
+	}
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+	.see-curated-item {
+		transition: none;
+	}
+	.see-curated-item:hover {
+		transform: none;
+	}
+}

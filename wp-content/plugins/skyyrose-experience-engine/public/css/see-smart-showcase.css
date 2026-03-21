@@ -1,0 +1,210 @@
+/**
+ * Smart Showcase — 3D tilt cards, quick view, hover zoom.
+ *
+ * @package SkyyRose_Experience_Engine
+ * @since   1.0.0
+ */
+
+/* ── Product Card Enhancements ── */
+.see-product-wrapper {
+	position: relative;
+	will-change: transform;
+}
+
+.see-product-wrapper img {
+	transition: transform var(--see-duration-short, 300ms) var(--see-ease-out, ease);
+}
+
+/* ── Quick View Trigger ── */
+.see-qv-trigger {
+	position: absolute;
+	bottom: 12px;
+	left: 50%;
+	transform: translateX(-50%) translateY(8px);
+	opacity: 0;
+	padding: 8px 20px;
+	background: var(--see-dark, #0A0A0A);
+	color: var(--see-white, #FFFFFF);
+	border: 1px solid rgba(183, 110, 121, 0.4);
+	border-radius: var(--see-radius-full, 9999px);
+	font-size: 12px;
+	font-family: var(--see-font-accent, 'Bebas Neue', sans-serif);
+	letter-spacing: 1.5px;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition:
+		opacity var(--see-duration-short, 300ms),
+		transform var(--see-duration-short, 300ms),
+		background var(--see-duration-micro, 150ms);
+	z-index: var(--see-z-base, 1);
+	pointer-events: auto;
+}
+
+.see-product-wrapper:hover .see-qv-trigger,
+.see-product-card:hover .see-qv-trigger {
+	opacity: 1;
+	transform: translateX(-50%) translateY(0);
+}
+
+.see-qv-trigger:hover {
+	background: var(--see-rose-gold, #B76E79);
+	border-color: var(--see-rose-gold, #B76E79);
+}
+
+.see-qv-trigger:focus-visible {
+	outline: 2px solid var(--see-rose-gold, #B76E79);
+	outline-offset: 2px;
+}
+
+/* ── Quick View Dialog ── */
+.see-quick-view-dialog {
+	border: none;
+	border-radius: var(--see-radius-lg, 16px);
+	padding: 0;
+	max-width: 800px;
+	width: 90vw;
+	background: var(--see-dark, #0A0A0A);
+	color: var(--see-white, #FFFFFF);
+	box-shadow: var(--see-shadow-lg);
+	overflow: hidden;
+}
+
+.see-quick-view-dialog::backdrop {
+	background: rgba(0, 0, 0, 0.7);
+	backdrop-filter: blur(4px);
+}
+
+.see-qv-content {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	min-height: 400px;
+}
+
+.see-qv-close {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	background: rgba(255, 255, 255, 0.1);
+	border: none;
+	color: var(--see-white, #FFFFFF);
+	font-size: 24px;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	cursor: pointer;
+	z-index: 2;
+	transition: background var(--see-duration-micro, 150ms);
+}
+
+.see-qv-close:hover {
+	background: rgba(255, 255, 255, 0.2);
+}
+
+.see-qv-image {
+	background: #111;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+}
+
+.see-qv-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.see-qv-details {
+	padding: 32px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.see-qv-title {
+	font-family: var(--see-font-headline, 'Cinzel', serif);
+	font-size: 22px;
+	margin: 0 0 8px;
+}
+
+.see-qv-price {
+	font-size: 20px;
+	color: var(--see-rose-gold, #B76E79);
+	margin: 0 0 16px;
+	font-weight: 600;
+}
+
+.see-qv-description {
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--see-silver, #C0C0C0);
+	margin: 0 0 24px;
+}
+
+.see-qv-link {
+	display: inline-block;
+	padding: 12px 28px;
+	background: var(--see-rose-gold, #B76E79);
+	color: var(--see-white, #FFFFFF);
+	text-decoration: none;
+	border-radius: var(--see-radius-full, 9999px);
+	font-family: var(--see-font-accent, 'Bebas Neue', sans-serif);
+	letter-spacing: 1.5px;
+	text-transform: uppercase;
+	font-size: 13px;
+	text-align: center;
+	transition: background var(--see-duration-micro, 150ms);
+}
+
+.see-qv-link:hover {
+	background: #9e5a63;
+}
+
+/* ── Collection Accent Overrides ── */
+[data-see-collection="black-rose"] .see-qv-price,
+.see-collection-black-rose .see-qv-trigger:hover {
+	color: var(--see-black-rose-primary, #C0C0C0);
+}
+
+[data-see-collection="love-hurts"] .see-qv-price,
+.see-collection-love-hurts .see-qv-trigger:hover {
+	color: var(--see-love-hurts-primary, #DC143C);
+}
+
+[data-see-collection="signature"] .see-qv-price,
+.see-collection-signature .see-qv-trigger:hover {
+	color: var(--see-signature-primary, #D4AF37);
+}
+
+[data-see-collection="kids-capsule"] .see-qv-price,
+.see-collection-kids-capsule .see-qv-trigger:hover {
+	color: var(--see-kids-primary, #FFB6C1);
+}
+
+/* ── Mobile: Full-width dialog ── */
+@media (max-width: 768px) {
+	.see-qv-content {
+		grid-template-columns: 1fr;
+	}
+
+	.see-qv-image {
+		max-height: 50vh;
+	}
+
+	.see-qv-details {
+		padding: 24px;
+	}
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+	.see-qv-trigger {
+		opacity: 1;
+		transform: translateX(-50%);
+		transition: none;
+	}
+
+	.see-product-wrapper img {
+		transition: none;
+	}
+}
