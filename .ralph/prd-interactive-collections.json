@@ -93,7 +93,7 @@
         "All features from previous stories work",
         "Verify in browser"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "COLL-007",

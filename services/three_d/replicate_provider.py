@@ -18,7 +18,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import httpx
-
 from services.ml.replicate_client import (
     ReplicateClient,
     ReplicateConfig,

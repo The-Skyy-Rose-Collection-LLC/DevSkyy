@@ -22,7 +22,7 @@ import logging
 import os
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -108,7 +108,7 @@ def _sanitize_text(text: str, max_length: int = MAX_SUMMARY_LENGTH) -> str:
 # =============================================================================
 
 
-class SyncDirection(str, Enum):
+class SyncDirection(StrEnum):
     """Synchronization direction."""
 
     RT_TO_HF = "round_table_to_huggingface"
@@ -117,7 +117,7 @@ class SyncDirection(str, Enum):
     FULL = "full"
 
 
-class SyncStatus(str, Enum):
+class SyncStatus(StrEnum):
     """Sync operation status."""
 
     PENDING = "pending"

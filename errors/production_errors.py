@@ -18,7 +18,7 @@ import traceback
 import uuid
 from collections.abc import Callable
 from datetime import UTC, datetime
-from enum import Enum, IntEnum
+from enum import IntEnum, StrEnum
 from functools import wraps
 from typing import Any, TypeVar
 
@@ -38,7 +38,7 @@ class DevSkyErrorSeverity(IntEnum):
     CRITICAL = 50  # System failure, immediate action required
 
 
-class DevSkyErrorCode(str, Enum):
+class DevSkyErrorCode(StrEnum):
     """Standardized error codes for API responses."""
 
     # General (1xxx)

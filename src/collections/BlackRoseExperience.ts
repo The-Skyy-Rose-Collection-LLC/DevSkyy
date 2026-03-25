@@ -117,6 +117,9 @@ export class BlackRoseExperience {
   private nightSky: THREE.Mesh | null = null;
   private clouds: THREE.Sprite[] = [];
 
+  // Props — natural habitats for products (cathedral garden theme)
+  private props: THREE.Group[] = [];
+
   // State
   private animationId: number | null = null;
   private clock: THREE.Clock;
@@ -156,6 +159,7 @@ export class BlackRoseExperience {
 
     this.setupEnvironment();
     this.setupLighting();
+    this.createSceneProps();
 
     // Initialize hotspot system
     this.initializeHotspots();
@@ -406,6 +410,136 @@ export class BlackRoseExperience {
       this.scene.add(cloud);
       this.clouds.push(cloud);
     }
+  }
+
+  /**
+   * Create contextual props — natural habitats for products.
+   * Stone benches, iron gates, rose arbors, vintage mirrors, glass bell jars.
+   */
+  private createSceneProps(): void {
+    const ironMaterial = new THREE.MeshStandardMaterial({
+      color: 0x2a2a2a,
+      roughness: 0.3,
+      metalness: 0.9,
+    });
+
+    const stoneMaterial = new THREE.MeshStandardMaterial({
+      color: 0x3a3a3a,
+      roughness: 0.8,
+      metalness: 0.1,
+    });
+
+    // Wrought-iron garden bench (left side of path)
+    const bench = new THREE.Group();
+    const seatGeo = new THREE.BoxGeometry(2.5, 0.12, 0.8);
+    const seat = new THREE.Mesh(seatGeo, ironMaterial);
+    seat.position.set(0, 0.7, 0);
+    seat.receiveShadow = true;
+    bench.add(seat);
+    // Bench legs
+    const legGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.7, 8);
+    [[-1, 0, -0.3], [-1, 0, 0.3], [1, 0, -0.3], [1, 0, 0.3]].forEach(([x, _y, z]) => {
+      const leg = new THREE.Mesh(legGeo, ironMaterial);
+      leg.position.set(x!, 0.35, z!);
+      bench.add(leg);
+    });
+    // Bench backrest (scrollwork)
+    const backGeo = new THREE.BoxGeometry(2.5, 0.8, 0.06);
+    const back = new THREE.Mesh(backGeo, ironMaterial);
+    back.position.set(0, 1.2, -0.35);
+    bench.add(back);
+    bench.position.set(-4, 0, 3);
+    bench.rotation.y = Math.PI / 6;
+    bench.castShadow = true;
+    this.scene.add(bench);
+    this.props.push(bench);
+
+    // Stone pedestal (cathedral steps)
+    const pedestal = new THREE.Group();
+    const baseGeo = new THREE.CylinderGeometry(0.5, 0.6, 0.3, 16);
+    const pedestalBase = new THREE.Mesh(baseGeo, stoneMaterial);
+    pedestalBase.position.y = 0.15;
+    pedestal.add(pedestalBase);
+    const columnGeo = new THREE.CylinderGeometry(0.3, 0.35, 1.2, 16);
+    const column = new THREE.Mesh(columnGeo, stoneMaterial);
+    column.position.y = 0.9;
+    pedestal.add(column);
+    const topGeo = new THREE.CylinderGeometry(0.45, 0.3, 0.15, 16);
+    const top = new THREE.Mesh(topGeo, stoneMaterial);
+    top.position.y = 1.58;
+    pedestal.add(top);
+    pedestal.position.set(4, 0, -2);
+    pedestal.castShadow = true;
+    pedestal.receiveShadow = true;
+    this.scene.add(pedestal);
+    this.props.push(pedestal);
+
+    // Glass bell jar (for earrings/small jewelry)
+    const bellJar = new THREE.Group();
+    const domeGeo = new THREE.SphereGeometry(0.4, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.55);
+    const glassMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.12,
+      roughness: 0,
+      metalness: 0.1,
+      side: THREE.DoubleSide,
+    });
+    const dome = new THREE.Mesh(domeGeo, glassMat);
+    dome.position.y = 1.75;
+    bellJar.add(dome);
+    // Bell jar base plate
+    const plateGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.05, 24);
+    const plateMat = new THREE.MeshStandardMaterial({
+      color: 0x2a2a2a,
+      roughness: 0.2,
+      metalness: 0.8,
+    });
+    const plate = new THREE.Mesh(plateGeo, plateMat);
+    plate.position.y = 1.52;
+    bellJar.add(plate);
+    // Small stand underneath
+    const standGeo = new THREE.CylinderGeometry(0.25, 0.3, 1.5, 12);
+    const stand = new THREE.Mesh(standGeo, stoneMaterial);
+    stand.position.y = 0.75;
+    bellJar.add(stand);
+    bellJar.position.set(-2, 0, -5);
+    bellJar.castShadow = true;
+    this.scene.add(bellJar);
+    this.props.push(bellJar);
+
+    // Antique vanity mirror (against backdrop)
+    const mirror = new THREE.Group();
+    const frameGeo = new THREE.TorusGeometry(0.8, 0.08, 8, 32);
+    const mirrorFrame = new THREE.Mesh(frameGeo, ironMaterial);
+    mirrorFrame.position.y = 2.5;
+    mirror.add(mirrorFrame);
+    const surfaceGeo = new THREE.CircleGeometry(0.75, 32);
+    const surfaceMat = new THREE.MeshStandardMaterial({
+      color: 0x1a1a2e,
+      roughness: 0.05,
+      metalness: 1.0,
+    });
+    const surface = new THREE.Mesh(surfaceGeo, surfaceMat);
+    surface.position.set(0, 2.5, -0.02);
+    mirror.add(surface);
+    // Mirror stand
+    const mirrorStandGeo = new THREE.CylinderGeometry(0.04, 0.06, 2.5, 8);
+    const mirrorStand = new THREE.Mesh(mirrorStandGeo, ironMaterial);
+    mirrorStand.position.y = 1.25;
+    mirror.add(mirrorStand);
+    // Mirror base
+    const mirrorBaseGeo = new THREE.CylinderGeometry(0.4, 0.5, 0.1, 16);
+    const mirrorBase = new THREE.Mesh(mirrorBaseGeo, ironMaterial);
+    mirrorBase.position.y = 0.05;
+    mirror.add(mirrorBase);
+    mirror.position.set(5, 0, 5);
+    mirror.rotation.y = -Math.PI / 4;
+    mirror.castShadow = true;
+    this.scene.add(mirror);
+    this.props.push(mirror);
+
+    this.logger.info(`Created ${this.props.length} scene props (cathedral garden)`);
   }
 
   private async initializeHotspots(): Promise<void> {
@@ -754,6 +888,13 @@ export class BlackRoseExperience {
       this.scene.remove(arbor);
     });
     this.arbors = [];
+
+    // Dispose props
+    this.props.forEach((prop) => {
+      prop.traverse(disposeMesh);
+      this.scene.remove(prop);
+    });
+    this.props = [];
 
     // Dispose night sky
     if (this.nightSky) {

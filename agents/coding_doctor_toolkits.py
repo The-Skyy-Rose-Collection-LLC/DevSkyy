@@ -14,7 +14,7 @@ from __future__ import annotations
 import logging
 import re
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class SeverityLevel(str, Enum):
+class SeverityLevel(StrEnum):
     CRITICAL = "critical"
     HIGH = "high"
     MEDIUM = "medium"
@@ -34,7 +34,7 @@ class SeverityLevel(str, Enum):
     INFO = "info"
 
 
-class IssueCategory(str, Enum):
+class IssueCategory(StrEnum):
     THREEJS = "threejs"
     WEBGL = "webgl"
     WEBXR = "webxr"

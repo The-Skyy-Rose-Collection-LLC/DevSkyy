@@ -19,7 +19,7 @@ from __future__ import annotations
 import io
 import logging
 import math
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import httpx
@@ -55,7 +55,7 @@ HASH_SIZE = 16
 # =============================================================================
 
 
-class ValidationStatus(str, Enum):
+class ValidationStatus(StrEnum):
     """Validation result status."""
 
     PASSED = "passed"

@@ -18,7 +18,7 @@ import logging
 import os
 import uuid
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -39,7 +39,7 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 # =============================================================================
 
 
-class VisualProvider(str, Enum):
+class VisualProvider(StrEnum):
     """Visual generation provider."""
 
     GOOGLE_IMAGEN = "google_imagen"
@@ -47,7 +47,7 @@ class VisualProvider(str, Enum):
     AUTO = "auto"  # Best available
 
 
-class ImageStyle(str, Enum):
+class ImageStyle(StrEnum):
     """Product photography styles."""
 
     PRODUCT_STUDIO = "product_studio"  # Clean white background
@@ -57,7 +57,7 @@ class ImageStyle(str, Enum):
     DETAIL = "detail"  # Close-up detail shot
 
 
-class JobStatus(str, Enum):
+class JobStatus(StrEnum):
     QUEUED = "queued"
     PROCESSING = "processing"
     COMPLETED = "completed"
@@ -412,7 +412,7 @@ async def generate_batch_photos(
 # =============================================================================
 
 
-class EnhancementType(str, Enum):
+class EnhancementType(StrEnum):
     """Type of image enhancement."""
 
     UPSCALE = "upscale"  # 2x-4x resolution increase
@@ -618,8 +618,9 @@ async def enhance_from_url(
             temp_path.write_bytes(resp.content)
 
     except Exception as e:
+        logger.warning(f"Failed to download image for job {job.job_id}: {e}")
         visual_job_store.fail(job.job_id, f"Failed to download image: {e}")
-        raise HTTPException(status_code=400, detail=f"Failed to download image: {e}")
+        raise HTTPException(status_code=400, detail="Failed to download image")
 
     background_tasks.add_task(
         run_image_enhancement,
@@ -672,8 +673,9 @@ async def enhance_from_upload(
         content = await file.read()
         upload_path.write_bytes(content)
     except Exception as e:
+        logger.error(f"Failed to save upload for job {job.job_id}: {e}", exc_info=True)
         visual_job_store.fail(job.job_id, f"Failed to save upload: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to save upload: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
     background_tasks.add_task(
         run_image_enhancement,

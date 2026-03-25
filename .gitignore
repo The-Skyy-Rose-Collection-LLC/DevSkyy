@@ -1,5 +1,9 @@
 # DevSkyy Platform - .gitignore
 
+# Ralph context file (persists across iterations, never commit deletions)
+.ralph/ralph-context.md
+.ralph/.ralph-context.bak
+
 # Python
 __pycache__/
 *.py[cod]
@@ -27,6 +31,7 @@ venv/
 ENV/
 env/
 .venv/
+.venv-agents/
 
 # IDE
 .idea/
@@ -51,19 +56,11 @@ coverage.xml
 .hypothesis/
 coverage/
 
-# Secrets & Environment
+# Secrets & Environment (catch-all, whitelist .env.example only)
 .env
-.env.local
-.env.*.local
-.env.save
-.env.backup
-.env.bak
-.env.secrets
-.env.secrets.backup
-.env.critical-fuchsia-ape
-.env.skyyrose-experiences
-.env.staging
+.env.*
 !.env.example
+!.env.wordpress.example
 secrets/
 credentials/
 *.pem
@@ -71,13 +68,8 @@ credentials/
 *.crt
 .secrets/
 
-# Claude Code Plugin Secrets
-.claude/*.local.md
-.claude/claude-intelligence-core.local.md
-.claude/plugins/*/data/
-.claude/chroma_data/
-*.duckdb
-*.duckdb.wal
+# Claude Code (local settings — contains keys/prefs, never commit)
+.claude/
 
 # Database
 *.db
@@ -103,7 +95,10 @@ node_modules/
 npm-debug.log
 yarn-error.log
 package-lock.json
+!frontend/package-lock.json
 yarn.lock
+pnpm-lock.yaml
+**/pnpm-lock.yaml
 
 # Docker
 .docker/
@@ -135,33 +130,27 @@ docs/_build/
 # Redis
 dump.rdb
 
-# Code quality reports
-htmlcov/
-.coverage
-coverage.xml
-bandit-report.json
-.pytest_cache/
-.tox/
-
 # Vector databases (runtime-generated)
 data/vectordb/
 data/*.sqlite3
 data/*.db
 .vercel
-.env*.local
 
 # Build artifacts
 *.tsbuildinfo
-dist/
 
-# Empty directories (should not be committed)
+# Minified files (build artifacts — theme loads source via SCRIPT_DEBUG fallback)
+*.min.js
+*.min.css
+
+# Empty directories
 keys/
-secrets/
 
 # Staging/deployment logs
 staging/
 backups/
 legacy/
+
 # Large archive files
 assets/_other/*.zip
 
@@ -174,10 +163,13 @@ assets/_other/*.zip
 **/*.secret
 **/*.secrets
 
-
 # Generated 3D assets (large binary files)
 assets/3d-models-generated/
 assets/3d-models/*/
+
+# Generated images and model test outputs
+generated_images/
+models/skyyrose-lora-v3-tests/
 
 # External SDKs (install via pip instead)
 tripo-python-sdk/
@@ -191,19 +183,10 @@ huggingface-spaces/
 # Local tool configs
 .playwright-mcp/
 
-# Large product image assets (uploaded to WordPress)
-assets/enhanced_products/all/*.jpg
-assets/enhanced_products/all/*.jpeg
-assets/enhanced_products/all/*.png
-assets/enhanced_products/all/*.JPG
-assets/enhanced_products/all/*.JPEG
-assets/enhanced_products/all/*.PNG
-assets/2d-25d-assets/*.jpg
-assets/2d-25d-assets/*.jpeg
-assets/2d-25d-assets/*.png
-assets/2d-25d-assets/*.JPG
-assets/2d-25d-assets/*.JPEG
-assets/2d-25d-assets/*.PNG
+# Product & enhanced images (backed up locally, uploaded to WordPress/HuggingFace)
+assets/enhanced_products/
+assets/enhanced-images/
+assets/2d-25d-assets/
 
 # WordPress large files and binaries
 wp-cli.phar
@@ -212,16 +195,99 @@ wordpress/skyyrose-immersive/
 wordpress/skyyrose-immersive.zip
 wordpress/shoptimizer-child-theme/
 wordpress/plugins/
+
 # 3D Models (large binary files)
 generated_3d_models/
 
 # Large files moved to HuggingFace Hub
 # https://huggingface.co/datasets/damBruh/skyyrose-assets
-# https://huggingface.co/datasets/damBruh/skyyrose-lora-dataset-v1
-# https://huggingface.co/datasets/damBruh/skyyrose-lora-dataset-v2
-assets/
+/assets/
 datasets/
 generated_3d_models_color_accurate/
 
+# Pipeline images (use HuggingFace for storage)
+skyyrose/assets/images/
+
+# AI-generated outputs (regenerate, don't track)
+assets/visual-generated/
+
 # Large training data files
 skyyrose_training_data.zip
+
+# Ralph auto-managed state (changes every iteration)
+.ralph/ralph-loop.state.json
+
+# Runtime artifacts
+scripts/nano-banana-results.json
+
+# Dev screenshots at repo root
+skyyrose-*.png
+devskyy-*.png
+product-gallery-*.png
+theme-upload-*.png
+upload-form-*.png
+woocommerce-*.png
+wp-admin-*.png
+
+# WordPress theme binary assets
+# Track homepage/brand images; ignore generated product renders and 3D assets.
+wordpress-theme/skyyrose-flagship/assets/images/products/
+wordpress-theme/skyyrose-flagship/assets/images/avatar/
+wordpress-theme/skyyrose-flagship/assets/scenes/
+wordpress-theme/skyyrose-flagship/assets/3d/
+
+# Editorial staging (temp workspace, not for version control)
+editorial-staging/
+
+# Training data & photo scans (use HuggingFace datasets instead)
+skyyrose-photo-scan/
+data/lora_dataset/
+
+# Zip archives (never commit large binaries)
+*.zip
+!frontend/**/*.zip
+
+# Root artifacts (runtime-generated, not source code)
+deployment_summary.json
+wordpress-health-check-results.json
+skyyrose_clothing_barcodes.txt
+
+# Broken tooling artifacts
+--version/
+
+# Dead symlinks & empty clone dirs
+adk
+Hunyuan3D-*/
+
+# Bun lockfile (use npm for Vercel compat)
+bun.lock
+bun.lockb
+
+# Marker files (build artifacts)
+.plugin-fix-complete
+
+# Virtual environments (all)
+.venv-*/
+
+# Serena config (local)
+.serena/
+
+# LoRA model weights (stored on HuggingFace: damBruh/skyyrose-assets)
+skyyrose-brand-voice-lora/
+
+# HuggingFace caches (regenerable)
+hf_enhancement_cache/
+
+# Local asset backups (created by cleanup scripts)
+DevSkyy-assets-backup/
+
+# Runtime-generated agent artifacts
+data/sdk_sessions/
+audit_reports/
+scraped_docs/
+
+# Dev screenshots (diagnostic captures, not source)
+screenshots/
+
+# Design system docs (generated by UI/UX Pro Max skill)
+design-system/

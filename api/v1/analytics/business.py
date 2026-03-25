@@ -12,7 +12,7 @@ Version: 1.0.0
 
 import logging
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -35,7 +35,7 @@ router = APIRouter(prefix="/analytics/business", tags=["Business Analytics"])
 # =============================================================================
 
 
-class TimeGranularity(str, Enum):
+class TimeGranularity(StrEnum):
     """Time granularity for timeseries data."""
 
     HOURLY = "hourly"
@@ -44,7 +44,7 @@ class TimeGranularity(str, Enum):
     MONTHLY = "monthly"
 
 
-class ComparisonPeriod(str, Enum):
+class ComparisonPeriod(StrEnum):
     """Period for comparison metrics."""
 
     PREVIOUS = "previous"  # vs previous period

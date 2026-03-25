@@ -22,7 +22,7 @@ import os
 import random
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -43,7 +43,7 @@ from errors.production_errors import (
 logger = logging.getLogger(__name__)
 
 
-class MeshyTaskStatus(str, Enum):
+class MeshyTaskStatus(StrEnum):
     """Meshy task status values."""
 
     PENDING = "PENDING"
@@ -53,14 +53,14 @@ class MeshyTaskStatus(str, Enum):
     EXPIRED = "EXPIRED"
 
 
-class MeshyArtStyle(str, Enum):
+class MeshyArtStyle(StrEnum):
     """Art style for 3D generation."""
 
     REALISTIC = "realistic"
     CARTOON = "cartoon"
 
 
-class MeshyTopology(str, Enum):
+class MeshyTopology(StrEnum):
     """Mesh topology type."""
 
     QUAD = "quad"

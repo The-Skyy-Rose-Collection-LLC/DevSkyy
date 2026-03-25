@@ -27,7 +27,7 @@ import base64
 import logging
 import os
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -45,7 +45,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-class MultimodalProvider(str, Enum):
+class MultimodalProvider(StrEnum):
     """Supported multimodal providers"""
 
     ANTHROPIC = "anthropic"  # Claude with vision (default)
@@ -53,7 +53,7 @@ class MultimodalProvider(str, Enum):
     HUGGINGFACE = "huggingface"  # OSS models
 
 
-class AnalysisType(str, Enum):
+class AnalysisType(StrEnum):
     """Types of visual analysis"""
 
     PRODUCT_DESCRIPTION = "product_description"  # Generate product descriptions from images

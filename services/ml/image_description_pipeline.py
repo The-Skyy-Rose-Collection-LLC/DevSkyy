@@ -124,13 +124,9 @@ class VisionModelClient:
         """
         # Route to appropriate provider
         if model.is_gemini():
-            return await self._generate_gemini(
-                model, image_url, prompt, max_tokens, temperature
-            )
+            return await self._generate_gemini(model, image_url, prompt, max_tokens, temperature)
         else:
-            return await self._generate_replicate(
-                model, image_url, prompt, max_tokens, temperature
-            )
+            return await self._generate_replicate(model, image_url, prompt, max_tokens, temperature)
 
     async def _generate_gemini(
         self,
@@ -147,9 +143,7 @@ class VisionModelClient:
 
         # Map VisionModel to GeminiModel
         gemini_model = (
-            GeminiModel.GEMINI_PRO
-            if model == VisionModel.GEMINI_PRO
-            else GeminiModel.FLASH_2_5
+            GeminiModel.GEMINI_PRO if model == VisionModel.GEMINI_PRO else GeminiModel.FLASH_2_5
         )
 
         try:
@@ -391,18 +385,17 @@ class ImageDescriptionPipeline:
                     output.results.append(result)
                     output.completed += 1
                 except Exception as e:
-                    output.errors.append({
-                        "index": index,
-                        "image_url": req.image_url,
-                        "error": str(e),
-                    })
+                    output.errors.append(
+                        {
+                            "index": index,
+                            "image_url": req.image_url,
+                            "error": str(e),
+                        }
+                    )
                     output.failed += 1
 
         # Run all tasks
-        tasks = [
-            process_one(req, i)
-            for i, req in enumerate(request.requests)
-        ]
+        tasks = [process_one(req, i) for i, req in enumerate(request.requests)]
         await asyncio.gather(*tasks)
 
         return output
@@ -558,9 +551,7 @@ Be concise and impactful."""
         Returns:
             List of bullet points
         """
-        response = await self._generate_with_fallback(
-            image_url, BULLET_POINTS_PROMPT, model
-        )
+        response = await self._generate_with_fallback(image_url, BULLET_POINTS_PROMPT, model)
 
         bullet_points = []
         for line in response.strip().split("\n"):
@@ -588,9 +579,7 @@ Be concise and impactful."""
                 }
                 normalized_category = category_map.get(category, "feature")
 
-                bullet_points.append(
-                    BulletPoint(text=text, category=normalized_category)
-                )
+                bullet_points.append(BulletPoint(text=text, category=normalized_category))
             else:
                 # No category prefix
                 bullet_points.append(BulletPoint(text=line, category="feature"))
@@ -616,7 +605,9 @@ Be concise and impactful."""
             SEO content
         """
         prompt = SEO_PROMPT.format(
-            product_type=product_type.value if hasattr(product_type, "value") else str(product_type),
+            product_type=(
+                product_type.value if hasattr(product_type, "value") else str(product_type)
+            ),
             brand_context=f"Brand context: {brand_context}" if brand_context else "",
         )
 
@@ -656,10 +647,6 @@ Be concise and impactful."""
         response = await self._generate_with_fallback(image_url, TAGS_PROMPT, model)
 
         # Parse comma-separated tags
-        tags = [
-            tag.strip().lower()
-            for tag in response.split(",")
-            if tag.strip()
-        ]
+        tags = [tag.strip().lower() for tag in response.split(",") if tag.strip()]
 
         return tags[:15]  # Max 15 tags

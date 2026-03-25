@@ -27,7 +27,7 @@ import os
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class VisualProvider(str, Enum):
+class VisualProvider(StrEnum):
     """Visual generation providers"""
 
     GOOGLE_IMAGEN = "google_imagen"
@@ -53,7 +53,7 @@ class VisualProvider(str, Enum):
     FASHN = "fashn"
 
 
-class GenerationType(str, Enum):
+class GenerationType(StrEnum):
     """Type of visual generation"""
 
     IMAGE_FROM_TEXT = "image_from_text"
@@ -65,7 +65,7 @@ class GenerationType(str, Enum):
     EXACT_PRODUCT = "exact_product"  # LoRA-based exact product generation
 
 
-class AspectRatio(str, Enum):
+class AspectRatio(StrEnum):
     """Supported aspect ratios"""
 
     SQUARE = "1:1"
@@ -75,7 +75,7 @@ class AspectRatio(str, Enum):
     STANDARD = "4:3"
 
 
-class ImageQuality(str, Enum):
+class ImageQuality(StrEnum):
     """Image quality levels"""
 
     DRAFT = "draft"
@@ -143,7 +143,7 @@ class GenerationResult:
 
 SKYYROSE_BRAND_DNA = {
     "name": "SkyyRose",
-    "tagline": "Where Love Meets Luxury",
+    "tagline": "Luxury Grows from Concrete.",
     "location": "Oakland, California",
     "aesthetic": "luxury streetwear",
     "colors": {
@@ -296,7 +296,7 @@ class GoogleImagenClient:
         Style: luxury streetwear, premium quality, editorial photography
         Colors: rose gold accents (#B76E79), black foundation (#1A1A1A), white highlights
         Aesthetic: sophisticated, bold, elegant, high-fashion
-        Brand: SkyyRose - "Where Love Meets Luxury"
+        Brand: SkyyRose - "Luxury Grows from Concrete."
         """
         return f"{prompt}. {brand_context}"
 
@@ -1000,7 +1000,7 @@ class VisualGenerationRouter:
         SkyyRose luxury streetwear campaign video
         Concept: {concept}
         Collection: {collection} - {collection_style}
-        Brand: "Where Love Meets Luxury"
+        Brand: "Luxury Grows from Concrete."
         Style: Cinematic, editorial, high-fashion
         Colors: Rose gold, black, dramatic lighting
         Movement: Smooth, professional camera work

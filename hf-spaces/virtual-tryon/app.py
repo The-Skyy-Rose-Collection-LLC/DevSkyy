@@ -218,16 +218,14 @@ def create_app() -> gr.Blocks:
             secondary_hue="stone",
         ),
     ) as app:
-        gr.Markdown(
-            """
+        gr.Markdown("""
             # 🌹 SkyyRose Virtual Try-On
 
             **Where Love Meets Luxury**
 
             Try on SkyyRose merchandise using AI-powered virtual try-on.
             Upload your photo and select a product to see how it looks on you!
-            """
-        )
+            """)
 
         with gr.Row():
             with gr.Column(scale=1):
@@ -265,19 +263,16 @@ def create_app() -> gr.Blocks:
             with gr.Column(scale=1):
                 output = gr.Image(label="Result", type="pil")
 
-                gr.Markdown(
-                    """
+                gr.Markdown("""
                     ### Tips for Best Results
                     - Use a **clear, well-lit** photo
                     - Face the camera directly
                     - Wear **fitted clothing** (easier for AI to replace)
                     - Stand with arms slightly away from body
                     - Use **high-resolution** images
-                    """
-                )
+                    """)
 
-        gr.Markdown(
-            """
+        gr.Markdown("""
             ## SkyyRose Collections
 
             ### 🖤 BLACK ROSE
@@ -306,8 +301,7 @@ def create_app() -> gr.Blocks:
 
             *Powered by [FASHN AI](https://fashn.ai) | Visit [SkyyRose.co](https://skyyrose.co) |
             Follow [@skyyrose_co](https://instagram.com/skyyrose_co)*
-            """
-        )
+            """)
 
         submit_btn.click(
             fn=virtual_tryon,

@@ -53,7 +53,7 @@ import shutil
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -400,7 +400,7 @@ Maintain exact proportions, colors, and design details from the original asset."
 # =============================================================================
 
 
-class EnhancementStrategy(str, Enum):
+class EnhancementStrategy(StrEnum):
     """Strategy for 3D model enhancement."""
 
     HUGGINGFACE_ONLY = "huggingface_only"  # Use only HuggingFace models
@@ -408,7 +408,7 @@ class EnhancementStrategy(str, Enum):
     ENSEMBLE = "ensemble"  # Blend multiple model outputs
 
 
-class TextureQuality(str, Enum):
+class TextureQuality(StrEnum):
     """Texture quality presets."""
 
     LOW = "low"  # 512x512
@@ -417,7 +417,7 @@ class TextureQuality(str, Enum):
     ULTRA = "ultra"  # 4096x4096
 
 
-class PreprocessingMode(str, Enum):
+class PreprocessingMode(StrEnum):
     """Image preprocessing modes."""
 
     NONE = "none"

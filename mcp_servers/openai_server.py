@@ -28,7 +28,7 @@ Python: 3.11+
 Framework: FastMCP
 
 Installation:
-    pip install fastmcp httpx pydantic openai python-jose[cryptography]
+    pip install fastmcp httpx pydantic openai pyjwt[cryptography]
 
 Usage:
     # Run the server
@@ -52,7 +52,7 @@ Usage:
 
 import json
 import os
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Literal
 
 try:
@@ -61,7 +61,7 @@ try:
     from pydantic import BaseModel, ConfigDict, Field
 except ImportError as e:
     print(f"❌ Missing required package: {e}")
-    print("Install with: pip install fastmcp httpx pydantic openai python-jose[cryptography]")
+    print("Install with: pip install fastmcp httpx pydantic openai pyjwt[cryptography]")
     exit(1)
 
 # =============================================================================
@@ -114,14 +114,14 @@ mcp = FastMCP(
 # =============================================================================
 
 
-class ResponseFormat(str, Enum):
+class ResponseFormat(StrEnum):
     """Output format for tool responses."""
 
     MARKDOWN = "markdown"
     JSON = "json"
 
 
-class OpenAIModel(str, Enum):
+class OpenAIModel(StrEnum):
     """Supported OpenAI models."""
 
     GPT4O = "gpt-4o"
@@ -129,7 +129,7 @@ class OpenAIModel(str, Enum):
     O1_PREVIEW = "o1-preview"
 
 
-class TaskType(str, Enum):
+class TaskType(StrEnum):
     """Task categories for optimal model selection."""
 
     CODE_GENERATION = "code_generation"
@@ -782,8 +782,7 @@ if __name__ == "__main__":
         print("⚠️  Warning: DEVSKYY_API_KEY not set (DevSkyy integration disabled).")
         print("   Set it with: export DEVSKYY_API_KEY='your-key-here'")
 
-    print(
-        f"""
+    print(f"""
 ╔══════════════════════════════════════════════════════════════╗
 ║                                                              ║
 ║   DevSkyy OpenAI MCP Server v1.0.0                          ║
@@ -817,8 +816,7 @@ if __name__ == "__main__":
 📖 OpenAI Docs: https://platform.openai.com/docs
 
 Starting OpenAI MCP server on stdio...
-"""
-    )
+""")
 
     # Run the server
     mcp.run()

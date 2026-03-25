@@ -17,7 +17,7 @@ import logging
 import secrets
 import time
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -27,7 +27,7 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger(__name__)
 
 
-class KeyType(str, Enum):
+class KeyType(StrEnum):
     """Types of cryptographic keys"""
 
     MASTER = "master"
@@ -38,7 +38,7 @@ class KeyType(str, Enum):
     RECOVERY = "recovery"
 
 
-class KeyStatus(str, Enum):
+class KeyStatus(StrEnum):
     """Key lifecycle status"""
 
     ACTIVE = "active"

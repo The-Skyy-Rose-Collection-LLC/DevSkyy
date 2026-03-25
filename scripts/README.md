@@ -196,6 +196,51 @@ python scripts/generate_secrets.py --env-file /path/to/.env
 
 **See also:** [Production Environment Setup Guide](../docs/PRODUCTION_ENVIRONMENT_SETUP.md) for complete deployment workflow.
 
+---
+
+### Security & Maintenance
+
+#### `fix_dependencies.sh` - Security Vulnerability Fix Script (NEW)
+
+Automated script to resolve all GitHub Dependabot security vulnerabilities by fixing dependency conflicts and updating to secure versions.
+
+**Usage:**
+
+```bash
+# Make executable (first time only)
+chmod +x scripts/fix_dependencies.sh
+
+# Run automated fix
+./scripts/fix_dependencies.sh
+```
+
+**What it does:**
+1. Uninstalls conflicting Python packages
+2. Installs compatible versions with correct constraints
+3. Reinstalls DevSkyy with all extras
+4. Updates JavaScript dependencies via pnpm
+5. Verifies all package versions
+
+**Resolves:**
+- HIGH SEVERITY: tar, next, python-multipart, bentoml, protobuf
+- MEDIUM SEVERITY: hono, pypdf, lodash, lodash-es, and transitive dependencies
+
+**Time:** 5-10 minutes
+
+**Requirements:**
+- Python 3.11+
+- Node 18+
+- pnpm installed (`npm install -g pnpm`)
+- Virtual environment activated
+
+**Documentation:**
+- Complete technical details: `SECURITY_FIXES.md`
+- Quick start guide: `EXECUTE_SECURITY_FIXES.md`
+- Execution checklist: `SECURITY_FIX_CHECKLIST.md`
+- Executive summary: `SECURITY_FIX_SUMMARY.md`
+
+---
+
 ## Environment Variables
 
 See `.env.example` for complete list of available environment variables.

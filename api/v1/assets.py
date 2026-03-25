@@ -14,14 +14,12 @@ Version: 1.0.0
 import io
 import logging
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
-from pydantic import BaseModel, Field
-
-from security.jwt_oauth2_auth import TokenPayload, get_current_user
+from pydantic import BaseModel, Field, field_validator
 from services.storage import (
     AssetInfo,
     AssetNotFoundError,
@@ -33,6 +31,9 @@ from services.storage import (
     VersionListResponse,
     VersionNotFoundError,
 )
+
+from security.jwt_oauth2_auth import TokenPayload, UserRole, get_current_user
+from security.ssrf_protection import ssrf_protection
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +54,7 @@ MIN_IMAGE_DIMENSION = 100
 # =============================================================================
 
 
-class JobStatus(str, Enum):
+class JobStatus(StrEnum):
     """Status of a processing job."""
 
     PENDING = "pending"
@@ -63,7 +64,7 @@ class JobStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class ProcessingProfile(str, Enum):
+class ProcessingProfile(StrEnum):
     """Available processing profiles."""
 
     FULL = "full"
@@ -72,7 +73,7 @@ class ProcessingProfile(str, Enum):
     REFORMAT = "reformat"
 
 
-class ImageSource(str, Enum):
+class ImageSource(StrEnum):
     """Source of the image."""
 
     API = "api"
@@ -93,6 +94,14 @@ class IngestRequest(BaseModel):
         default=None,
         description="Webhook URL to call on completion",
     )
+
+    @field_validator("callback_url")
+    @classmethod
+    def validate_callback_url(cls, v: str | None) -> str | None:
+        if v is not None:
+            ssrf_protection.validate_url(v)
+        return v
+
     metadata: dict[str, Any] = Field(
         default_factory=dict,
         description="Additional metadata to store with the asset",
@@ -165,7 +174,8 @@ class JobWebhookPayload(BaseModel):
 # In-Memory Storage (Replace with database in production)
 # =============================================================================
 
-# Mock storage for jobs
+# Mock storage for jobs (capped to prevent unbounded memory growth)
+_MAX_JOBS = 1000
 _jobs: dict[str, dict[str, Any]] = {}
 
 
@@ -255,6 +265,11 @@ async def ingest_image(
     # TODO: Store original image to R2
     # For now, mock the original URL
     original_url = f"https://r2.skyyrose.com/originals/{job_id}/{file.filename}"
+
+    # Evict oldest jobs if at capacity
+    while len(_jobs) >= _MAX_JOBS:
+        oldest = next(iter(_jobs))
+        del _jobs[oldest]
 
     # Create job record
     created_at = datetime.now(UTC).isoformat()
@@ -652,10 +667,10 @@ async def list_asset_versions(
         )
         return response
 
-    except AssetNotFoundError as e:
+    except AssetNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Asset not found",
         )
     except Exception as e:
         logger.error(
@@ -702,15 +717,15 @@ async def get_asset_version(
         )
         return version
 
-    except VersionNotFoundError as e:
+    except VersionNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Version not found",
         )
-    except AssetNotFoundError as e:
+    except AssetNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Asset not found",
         )
     except Exception as e:
         logger.error(
@@ -780,15 +795,15 @@ async def revert_asset_version(
 
         return version
 
-    except VersionNotFoundError as e:
+    except VersionNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Version not found",
         )
-    except AssetNotFoundError as e:
+    except AssetNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Asset not found",
         )
     except Exception as e:
         logger.error(
@@ -826,12 +841,11 @@ async def update_asset_retention(
     """
     correlation_id = str(uuid4())
 
-    # TODO: Check for admin role
-    # if "admin" not in user.roles:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_403_FORBIDDEN,
-    #         detail="Admin privileges required to update retention policy",
-    #     )
+    if not user.has_any_role({UserRole.ADMIN, UserRole.SUPER_ADMIN}):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required to update retention policy",
+        )
 
     logger.info(
         f"Updating retention for asset {asset_id}",
@@ -872,10 +886,10 @@ async def update_asset_retention(
 
         return asset_info
 
-    except AssetNotFoundError as e:
+    except AssetNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Asset not found",
         )
     except Exception as e:
         logger.error(
@@ -937,15 +951,15 @@ async def delete_asset_version(
             extra={"correlation_id": correlation_id},
         )
 
-    except VersionNotFoundError as e:
+    except VersionNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Version not found",
         )
-    except AssetNotFoundError as e:
+    except AssetNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e),
+            detail="Asset not found",
         )
     except Exception as e:
         logger.error(
@@ -960,3 +974,242 @@ async def delete_asset_version(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to delete version",
         )
+
+
+# =============================================================================
+# Asset Management CRUD Operations (for Dashboard UI)
+# =============================================================================
+
+
+class AssetMetadata(BaseModel):
+    """Asset metadata for CRUD operations."""
+
+    collection: str | None = None
+    sku: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    type: str | None = None
+
+
+class AssetResponse(BaseModel):
+    """Response model for asset CRUD."""
+
+    id: str
+    name: str
+    url: str
+    collection: str | None = None
+    sku: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    type: str
+    size: int | None = None
+    dimensions: dict[str, int] | None = None
+    uploaded_at: str
+
+
+class AssetListResponse(BaseModel):
+    """Response for asset list."""
+
+    assets: list[AssetResponse]
+    total: int
+    page: int
+    page_size: int
+    has_more: bool
+
+
+class AssetUploadResponse(AssetResponse):
+    """Response for asset upload."""
+
+    pass
+
+
+# In-memory storage for demo (capped; replace with database in production)
+_MAX_ASSETS = 5000
+_assets: dict[str, dict[str, Any]] = {}
+_collection_stats: dict[str, int] = {
+    "black_rose": 0,
+    "signature": 0,
+    "love_hurts": 0,
+    "showroom": 0,
+    "runway": 0,
+}
+
+
+@router.get("", response_model=AssetListResponse, summary="List assets")
+async def list_assets(
+    collection: str | None = Query(None),
+    type: str | None = Query(None),
+    search: str | None = Query(None),
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100),
+    current_user: TokenPayload = Depends(get_current_user),
+):
+    """List all assets with filtering and pagination."""
+    assets = list(_assets.values())
+
+    # Apply filters
+    if collection:
+        assets = [a for a in assets if a.get("collection") == collection]
+    if type:
+        assets = [a for a in assets if a.get("type") == type]
+    if search:
+        search_lower = search.lower()
+        assets = [
+            a
+            for a in assets
+            if search_lower in a.get("name", "").lower() or search_lower in a.get("sku", "").lower()
+        ]
+
+    total = len(assets)
+    start = (page - 1) * limit
+    end = start + limit
+    paginated = assets[start:end]
+
+    return AssetListResponse(
+        assets=[AssetResponse(**a) for a in paginated],
+        total=total,
+        page=page,
+        page_size=limit,
+        has_more=end < total,
+    )
+
+
+@router.get("/{asset_id}", response_model=AssetResponse, summary="Get asset by ID")
+async def get_asset(
+    asset_id: str,
+    current_user: TokenPayload = Depends(get_current_user),
+):
+    """Get a single asset by ID."""
+    if asset_id not in _assets:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Asset {asset_id} not found",
+        )
+    return AssetResponse(**_assets[asset_id])
+
+
+@router.patch("/{asset_id}", response_model=AssetResponse, summary="Update asset")
+async def update_asset(
+    asset_id: str,
+    metadata: AssetMetadata,
+    current_user: TokenPayload = Depends(get_current_user),
+):
+    """Update asset metadata."""
+    if asset_id not in _assets:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Asset {asset_id} not found",
+        )
+
+    asset = _assets[asset_id]
+    if metadata.collection is not None:
+        # Update collection stats
+        old_collection = asset.get("collection")
+        if old_collection and old_collection in _collection_stats:
+            _collection_stats[old_collection] -= 1
+        if metadata.collection in _collection_stats:
+            _collection_stats[metadata.collection] += 1
+        asset["collection"] = metadata.collection
+
+    if metadata.sku is not None:
+        asset["sku"] = metadata.sku
+    if metadata.tags:
+        asset["tags"] = metadata.tags
+    if metadata.type is not None:
+        asset["type"] = metadata.type
+
+    return AssetResponse(**asset)
+
+
+@router.delete("/{asset_id}", status_code=status.HTTP_200_OK, summary="Delete asset")
+async def delete_asset(
+    asset_id: str,
+    current_user: TokenPayload = Depends(get_current_user),
+):
+    """Delete an asset."""
+    if asset_id not in _assets:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Asset {asset_id} not found",
+        )
+
+    asset = _assets[asset_id]
+    collection = asset.get("collection")
+    if collection and collection in _collection_stats:
+        _collection_stats[collection] -= 1
+
+    del _assets[asset_id]
+    return {"status": "deleted", "asset_id": asset_id}
+
+
+@router.post(
+    "/upload",
+    response_model=AssetUploadResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Upload asset",
+)
+async def upload_asset(
+    file: UploadFile = File(...),
+    collection: str = Form(...),
+    sku: str | None = Form(None),
+    tags: str | None = Form(None),  # JSON string
+    current_user: TokenPayload = Depends(get_current_user),
+):
+    """Upload a new asset file."""
+    import json
+    from uuid import uuid4
+
+    # Validate file type by content-type header
+    if file.content_type not in ALLOWED_IMAGE_FORMATS and not file.content_type.startswith(
+        "model/"
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid file type",
+        )
+
+    # Validate image files by magic bytes (not just content-type header)
+    if file.content_type in ALLOWED_IMAGE_FORMATS:
+        header = await file.read(16)
+        await file.seek(0)  # Reset for downstream consumers
+        image_signatures = {
+            b"\xff\xd8\xff": "image/jpeg",
+            b"\x89PNG\r\n\x1a\n": "image/png",
+            b"RIFF": "image/webp",  # RIFF....WEBP
+            b"II\x2a\x00": "image/tiff",  # Little-endian TIFF
+            b"MM\x00\x2a": "image/tiff",  # Big-endian TIFF
+        }
+        if not any(header.startswith(sig) for sig in image_signatures):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="File content does not match declared image type",
+            )
+
+    # Create asset
+    asset_id = f"asset-{uuid4().hex[:8]}"
+    asset = {
+        "id": asset_id,
+        "name": file.filename,
+        "url": f"https://storage.example.com/assets/{asset_id}/{file.filename}",
+        "collection": collection,
+        "sku": sku,
+        "tags": json.loads(tags) if tags else [],
+        "type": "3d_model" if file.content_type.startswith("model/") else "image",
+        "size": file.size if hasattr(file, "size") else None,
+        "dimensions": None,
+        "uploaded_at": datetime.now(UTC).isoformat(),
+    }
+
+    _assets[asset_id] = asset
+
+    # Update collection stats
+    if collection in _collection_stats:
+        _collection_stats[collection] += 1
+
+    return AssetUploadResponse(**asset)
+
+
+@router.get("/stats/collections", summary="Get collection statistics")
+async def get_collection_stats(
+    current_user: TokenPayload = Depends(get_current_user),
+):
+    """Get asset counts per collection."""
+    return _collection_stats

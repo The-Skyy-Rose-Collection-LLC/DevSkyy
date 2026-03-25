@@ -20,7 +20,7 @@ const API_URL = (() => {
     new URL(url);
     return url;
   } catch {
-    console.error('Invalid API_URL configuration');
+    // Invalid URL — fall back to default
     return 'http://localhost:8000';
   }
 })();
@@ -223,7 +223,6 @@ export default function LoginPage() {
       const parseResult = LoginResponseSchema.safeParse(rawData);
 
       if (!parseResult.success) {
-        console.error('Invalid login response:', parseResult.error);
         throw new Error('Invalid response from server');
       }
 

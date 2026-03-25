@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -24,7 +24,7 @@ from PIL import Image
 logger = logging.getLogger(__name__)
 
 
-class ControlNetMode(str, Enum):
+class ControlNetMode(StrEnum):
     """ControlNet conditioning modes."""
 
     CANNY = "canny"
@@ -32,7 +32,7 @@ class ControlNetMode(str, Enum):
     NONE = "none"
 
 
-class GenerationQuality(str, Enum):
+class GenerationQuality(StrEnum):
     """Generation quality presets."""
 
     DRAFT = "draft"  # Fast, lower quality
@@ -497,10 +497,21 @@ class SkyyRosePromptBuilder:
         Returns:
             Optimized prompt string
         """
+        # C-2 FIX (sdxl_pipeline): Unknown collection raises instead of silently
+        # producing an empty string, which strips collection aesthetics from the
+        # prompt without any warning.
+        collection_style = cls.COLLECTION_STYLES.get(collection)
+        if collection_style is None:
+            valid = list(cls.COLLECTION_STYLES)
+            raise ValueError(
+                f"Unknown collection {collection!r} in SDXLPipeline.build_prompt(). "
+                f"Valid collections: {valid}"
+            )
+
         parts = [
             f"Professional product photography of {product_name}",
             cls.GARMENT_DETAILS.get(garment_type, garment_type),
-            cls.COLLECTION_STYLES.get(collection, ""),
+            collection_style,
             cls.BRAND_DNA["style"],
             "studio lighting, white background, high resolution",
             "8k, commercial photography, fashion catalog",

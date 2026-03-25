@@ -35,3 +35,16 @@ learned_count=$(find "$LEARNED_DIR" -name "*.md" 2>/dev/null | wc -l | tr -d ' '
 if [ "$learned_count" -gt 0 ]; then
   echo "[SessionStart] $learned_count learned skill(s) available in $LEARNED_DIR" >&2
 fi
+
+# Check for CLAUDE.md staleness carry-over from previous session
+STALENESS_LOG="$(git rev-parse --show-toplevel 2>/dev/null || echo "$HOME/DevSkyy")/.claude/claude-md-staleness.log"
+if [ -f "$STALENESS_LOG" ]; then
+  # Delete if older than 3 days
+  if find "$STALENESS_LOG" -mtime +3 -print -quit 2>/dev/null | grep -q .; then
+    rm -f "$STALENESS_LOG"
+  else
+    echo "[SessionStart] CLAUDE.md staleness detected in previous session:" >&2
+    grep -v '^#' "$STALENESS_LOG" | head -10 >&2
+    echo "[SessionStart] Run /revise-claude-md to update stale files" >&2
+  fi
+fi

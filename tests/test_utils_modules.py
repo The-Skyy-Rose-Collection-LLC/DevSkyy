@@ -15,7 +15,6 @@ import asyncio
 import time
 from datetime import datetime
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -138,7 +137,6 @@ class TestLoggingUtils:
 
     def test_log_context_manager(self):
         """LogContext should bind and unbind context."""
-        import structlog
         from utils.logging_utils import LogContext
 
         with LogContext(test_key="test_value", another="value"):

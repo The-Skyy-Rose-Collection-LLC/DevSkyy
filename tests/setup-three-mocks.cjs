@@ -5,8 +5,18 @@
 
 const threeMock = require('./__mocks__/three.cjs');
 
-// Mock the main three module
-jest.mock('three', () => threeMock);
+// Verify critical exports exist before mocking
+if (!threeMock.CanvasTexture) {
+  throw new Error('three.cjs mock is missing CanvasTexture export');
+}
+
+// Mock the main three module — spread ensures all named exports are visible to `import * as THREE`
+jest.mock('three', () => ({
+  ...threeMock,
+}));
+
+// Expose THREE as a global for WordPress theme tests that use CDN-style THREE.* references
+global.THREE = threeMock;
 
 // Mock ModelAssetLoader with explicit implementation to avoid three.js ESM issues
 jest.mock('../src/lib/ModelAssetLoader.js', () => {

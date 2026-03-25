@@ -22,7 +22,7 @@ from __future__ import annotations
 import logging
 import re
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from llm import LLMRouter, Message, ModelProvider
@@ -30,7 +30,7 @@ from llm import LLMRouter, Message, ModelProvider
 logger = logging.getLogger(__name__)
 
 
-class TaskDomain(str, Enum):
+class TaskDomain(StrEnum):
     """Task domains for LLM routing."""
 
     CODE_GENERATION = "code_generation"

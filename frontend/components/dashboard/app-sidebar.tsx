@@ -14,6 +14,17 @@ import {
   FolderOpen,
   Workflow,
   CheckCircle2,
+  Megaphone,
+  Globe,
+  Triangle,
+  Brain,
+  TrendingUp,
+  ListTodo,
+  Bot,
+  Briefcase,
+  Image,
+  Compass,
+  UserCircle2,
 } from 'lucide-react';
 
 import {
@@ -57,14 +68,67 @@ const mainNavItems = [
     icon: FolderOpen,
   },
   {
+    title: 'Imagery',
+    url: '/admin/imagery',
+    icon: Image,
+  },
+  {
     title: 'Generation Queue',
     url: '/admin/pipeline',
     icon: Workflow,
   },
   {
+    title: 'Social Media',
+    url: '/admin/social-media',
+    icon: Megaphone,
+  },
+  {
+    title: 'Conversion Intel',
+    url: '/admin/conversion',
+    icon: TrendingUp,
+  },
+  {
     title: 'Fidelity QA',
     url: '/admin/qa',
     icon: CheckCircle2,
+  },
+  {
+    title: 'Tasks',
+    url: '/admin/tasks',
+    icon: ListTodo,
+  },
+  {
+    title: 'Jobs',
+    url: '/admin/jobs',
+    icon: Briefcase,
+  },
+  {
+    title: 'Journey Analytics',
+    url: '/admin/journey-analytics',
+    icon: Compass,
+  },
+  {
+    title: 'Brand Mascot',
+    url: '/admin/mascot',
+    icon: UserCircle2,
+  },
+];
+
+const deployNavItems = [
+  {
+    title: 'WordPress',
+    url: '/admin/wordpress',
+    icon: Globe,
+  },
+  {
+    title: 'Vercel',
+    url: '/admin/vercel',
+    icon: Triangle,
+  },
+  {
+    title: 'HuggingFace',
+    url: '/admin/huggingface',
+    icon: Brain,
   },
 ];
 
@@ -73,6 +137,11 @@ const systemNavItems = [
     title: 'Monitoring',
     url: '/admin/monitoring',
     icon: Activity,
+  },
+  {
+    title: 'Autonomous',
+    url: '/admin/autonomous',
+    icon: Bot,
   },
   {
     title: 'Settings',
@@ -113,6 +182,38 @@ export function AppSidebar() {
               {mainNavItems.map((item) => {
                 const isActive = pathname === item.url ||
                   (item.url !== '/admin' && pathname.startsWith(item.url));
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      tooltip={item.title}
+                      className={isActive
+                        ? 'bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 hover:text-rose-300'
+                        : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                      }
+                    >
+                      <Link href={item.url}>
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator className="bg-gray-800" />
+
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-gray-500">Deployments</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {deployNavItems.map((item) => {
+                const isActive = pathname === item.url ||
+                  (pathname.startsWith(item.url));
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton

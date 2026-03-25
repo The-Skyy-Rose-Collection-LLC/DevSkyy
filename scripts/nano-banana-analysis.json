@@ -1,0 +1,33 @@
+{
+  "br-003": {
+    "garment_type": "jersey",
+    "colors": [
+      "#000000",
+      "#FFFFFF"
+    ],
+    "color_names": [
+      "black",
+      "white"
+    ],
+    "text_on_garment": [
+      "SR"
+    ],
+    "numbers_on_garment": [],
+    "logos_branding": [
+      "SR monogram"
+    ],
+    "material": "unknown",
+    "construction": [
+      "short sleeve",
+      "collared",
+      "button-up style collar"
+    ],
+    "patches": [],
+    "design_elements": [
+      "white rose illustration on the back",
+      "cloud illustration beneath roses",
+      "white piping on collar and sleeve cuffs"
+    ],
+    "overall_description": "This is a black short sleeve collared jersey featuring a large white rose illustration with cloud detail on the back, accented by white piping and an SR monogram at the upper back."
+  }
+}

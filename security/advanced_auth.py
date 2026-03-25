@@ -17,7 +17,7 @@ import hashlib
 import logging
 import secrets
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 
 from fastapi import Request
 from pydantic import BaseModel, Field
@@ -42,7 +42,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-class MFAMethod(str, Enum):
+class MFAMethod(StrEnum):
     """Multi-factor authentication methods"""
 
     TOTP = "totp"  # Time-based One-Time Password
@@ -51,7 +51,7 @@ class MFAMethod(str, Enum):
     BACKUP_CODES = "backup_codes"  # Backup recovery codes
 
 
-class SecurityEvent(str, Enum):
+class SecurityEvent(StrEnum):
     """Security event types for monitoring"""
 
     LOGIN_SUCCESS = "login_success"

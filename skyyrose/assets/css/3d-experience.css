@@ -1,0 +1,718 @@
+/**
+ * SkyyRose - 3D Immersive Experience Styles
+ * Production-quality drakerelated.com-level polish
+ */
+
+/* ========================================
+   LOADING SCREEN - INSTANT PERCEIVED LOAD
+   ======================================== */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--void);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: opacity 0.8s var(--ease-expo);
+  pointer-events: all;
+}
+
+body:not(.loading) .loading-screen {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-content {
+  text-align: center;
+  max-width: 400px;
+  padding: 0 var(--space-md);
+}
+
+.loading-logo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xl);
+  animation: fadeInUp 1s var(--ease-expo);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loading-text {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: var(--weight-black);
+  letter-spacing: 0.2em;
+  color: var(--white);
+}
+
+.loading-collection {
+  font-family: var(--font-editorial);
+  font-size: var(--text-large);
+  color: var(--rose);
+  font-style: italic;
+}
+
+.loading-progress {
+  animation: fadeIn 1.5s var(--ease-standard) 0.5s backwards;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 2px;
+  background: var(--smoke);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--space-sm);
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--gradient-rose);
+  border-radius: var(--radius-full);
+  transition: width 0.3s var(--ease-standard);
+}
+
+.progress-text {
+  font-size: var(--text-small);
+  color: var(--silver);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+/* ========================================
+   IMMERSIVE NAVIGATION
+   ======================================== */
+.immersive-nav {
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(30px);
+  border-bottom: 1px solid rgba(183, 110, 121, 0.15);
+}
+
+.nav-experience-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.experience-mode {
+  font-size: var(--text-tiny);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--mist);
+}
+
+.collection-name {
+  font-family: var(--font-editorial);
+  font-size: var(--text-small);
+  color: var(--rose);
+  font-weight: var(--weight-semibold);
+}
+
+.exit-experience-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: 1px solid var(--rose);
+  border-radius: var(--radius-sm);
+  color: var(--rose);
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.exit-experience-btn:hover {
+  background: var(--rose);
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ========================================
+   SCENE CONTAINER - FULL-SCREEN IMMERSIVE
+   ======================================== */
+.scene-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--void);
+}
+
+/* Progressive Image Loading (blur-up technique) */
+.scene-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.scene-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px);
+  transform: scale(1.1);
+  opacity: 1;
+  transition: opacity 0.8s var(--ease-expo);
+  will-change: opacity;
+}
+
+.scene-main {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transition: opacity 0.8s var(--ease-expo);
+  will-change: opacity;
+}
+
+/* When main image loads, hide placeholder */
+.scene-main.loaded {
+  opacity: 1;
+}
+
+.scene-main.loaded ~ .scene-placeholder {
+  opacity: 0;
+}
+
+/* ========================================
+   PRODUCT HOTSPOTS - INTERACTIVE
+   ======================================== */
+.hotspots-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.hotspot {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: rgba(183, 110, 121, 0.15);
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--rose);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: all;
+  transform: translate(-50%, -50%);
+  transition: all var(--transition-base);
+  animation: hotspotAppear 0.6s var(--ease-bounce) backwards;
+  will-change: transform;
+}
+
+@keyframes hotspotAppear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Stagger hotspot animations */
+.hotspot:nth-child(1) { animation-delay: 0.2s; }
+.hotspot:nth-child(2) { animation-delay: 0.3s; }
+.hotspot:nth-child(3) { animation-delay: 0.4s; }
+.hotspot:nth-child(4) { animation-delay: 0.5s; }
+.hotspot:nth-child(5) { animation-delay: 0.6s; }
+.hotspot:nth-child(6) { animation-delay: 0.7s; }
+
+.hotspot:hover {
+  background: rgba(183, 110, 121, 0.3);
+  transform: translate(-50%, -50%) scale(1.15);
+  box-shadow: 0 0 30px rgba(183, 110, 121, 0.5);
+}
+
+.hotspot:focus-visible {
+  outline: 3px solid var(--rose);
+  outline-offset: 4px;
+}
+
+/* Hotspot Pulse Animation */
+.hotspot-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--rose);
+  border-radius: var(--radius-full);
+  transform: translate(-50%, -50%);
+  animation: pulse 2s var(--ease-standard) infinite;
+  opacity: 0.8;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.4);
+    opacity: 0;
+  }
+}
+
+.hotspot-number {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: var(--weight-bold);
+  color: var(--white);
+  z-index: 1;
+}
+
+.hotspot-label {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--rose);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  font-weight: var(--weight-medium);
+  color: var(--white);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all var(--transition-base);
+}
+
+.hotspot:hover .hotspot-label,
+.hotspot:focus-visible .hotspot-label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+/* ========================================
+   SCENE NAVIGATION - BOTTOM BAR
+   ======================================== */
+.scene-nav {
+  position: fixed;
+  bottom: var(--space-lg);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(183, 110, 121, 0.2);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  z-index: 100;
+  animation: slideUp 0.8s var(--ease-expo) 1s backwards;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.scene-nav-prev,
+.scene-nav-next {
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-full);
+  color: var(--silver);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+}
+
+.scene-nav-prev:hover,
+.scene-nav-next:hover {
+  background: var(--smoke);
+  color: var(--rose);
+  transform: scale(1.1);
+}
+
+.scene-nav-dots {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.nav-dot {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  background: var(--mist);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: block;
+}
+
+.nav-dot::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-full);
+  transition: border-color var(--transition-base);
+}
+
+.nav-dot:hover {
+  background: var(--rose);
+  transform: scale(1.2);
+}
+
+.nav-dot.active {
+  background: var(--rose);
+  width: 40px;
+  border-radius: var(--radius-full);
+}
+
+.nav-dot.active::before {
+  border-color: var(--rose);
+}
+
+.dot-label {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--rose);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--text-tiny);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--white);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all var(--transition-base);
+}
+
+.nav-dot:hover .dot-label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+/* ========================================
+   VIEW GRID CTA - FIXED BUTTON
+   ======================================== */
+.view-grid-cta {
+  position: fixed;
+  top: 50%;
+  right: var(--space-lg);
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-md) var(--space-sm);
+  background: rgba(183, 110, 121, 0.15);
+  backdrop-filter: blur(20px);
+  border: 2px solid var(--rose);
+  border-radius: var(--radius-lg);
+  color: var(--rose);
+  font-family: var(--font-body);
+  font-size: var(--text-tiny);
+  font-weight: var(--weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  z-index: 100;
+  animation: fadeInRight 0.8s var(--ease-expo) 1.2s backwards;
+  writing-mode: vertical-rl;
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+.view-grid-cta:hover {
+  background: var(--rose);
+  color: var(--white);
+  box-shadow: var(--shadow-glow-rose);
+  transform: translateY(-50%) translateX(-8px);
+}
+
+.view-grid-cta svg {
+  width: 24px;
+  height: 24px;
+  transform: rotate(90deg);
+}
+
+/* ========================================
+   PRODUCT MODAL - FULL-SCREEN OVERLAY
+   ======================================== */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-slow);
+}
+
+.modal:not([hidden]) {
+  display: flex;
+}
+
+.modal.show {
+  opacity: 1;
+}
+
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(30px);
+}
+
+.modal-container {
+  position: relative;
+  max-width: 1200px;
+  max-height: 90vh;
+  margin: 0 var(--space-md);
+  overflow-y: auto;
+  transform: scale(0.9) translateY(30px);
+  transition: transform var(--transition-slow);
+  will-change: transform;
+}
+
+.modal.show .modal-container {
+  transform: scale(1) translateY(0);
+}
+
+.modal-content {
+  position: relative;
+  background: var(--charcoal);
+  border: 1px solid var(--rose);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+  box-shadow: var(--shadow-xl), var(--shadow-glow-rose);
+}
+
+.modal-close {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  width: 48px;
+  height: 48px;
+  background: transparent;
+  border: 2px solid var(--rose);
+  border-radius: var(--radius-full);
+  color: var(--rose);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+  z-index: 1;
+}
+
+.modal-close:hover {
+  background: var(--rose);
+  color: var(--white);
+  transform: rotate(90deg);
+}
+
+/* ========================================
+   SKIP LINKS - ACCESSIBILITY
+   ======================================== */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--rose);
+  color: var(--white);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  z-index: 10001;
+  transition: top var(--transition-base);
+}
+
+.skip-link:focus {
+  top: var(--space-md);
+}
+
+/* ========================================
+   RESPONSIVE - MOBILE OPTIMIZATION
+   ======================================== */
+@media (max-width: 768px) {
+  .hotspot {
+    width: 50px;
+    height: 50px;
+  }
+
+  .hotspot-number {
+    font-size: 1rem;
+  }
+
+  .hotspot-label {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+  }
+
+  .scene-nav {
+    bottom: var(--space-md);
+    padding: var(--space-xs) var(--space-sm);
+  }
+
+  .nav-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .nav-dot.active {
+    width: 30px;
+  }
+
+  .view-grid-cta {
+    right: var(--space-sm);
+    padding: var(--space-sm);
+    font-size: 0.625rem;
+  }
+
+  .view-grid-cta svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .exit-experience-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+  }
+
+  .exit-experience-btn span {
+    display: none;
+  }
+
+  .modal-content {
+    padding: var(--space-lg);
+  }
+
+  .loading-text {
+    font-size: var(--text-heading);
+  }
+}
+
+/* ========================================
+   PERFORMANCE OPTIMIZATIONS
+   ======================================== */
+
+/* Use GPU acceleration for smooth animations */
+.hotspot,
+.scene-main,
+.scene-placeholder,
+.modal-container,
+.progress-fill {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .hotspot-pulse {
+    animation: none;
+  }
+
+  .loading-screen {
+    transition: none;
+  }
+}
+
+/* Dark mode support (already dark, but future-proof) */
+@media (prefers-color-scheme: light) {
+  /* Maintain dark theme even in light mode */
+  body {
+    background: var(--void);
+    color: var(--bone);
+  }
+}

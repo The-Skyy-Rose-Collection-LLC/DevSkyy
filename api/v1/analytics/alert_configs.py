@@ -16,7 +16,7 @@ import logging
 import uuid
 from datetime import UTC, datetime
 from decimal import Decimal
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -39,7 +39,7 @@ router = APIRouter(prefix="/analytics/alert-configs", tags=["Alert Configuration
 # =============================================================================
 
 
-class ConditionType(str, Enum):
+class ConditionType(StrEnum):
     """Alert condition types."""
 
     THRESHOLD = "threshold"
@@ -47,7 +47,7 @@ class ConditionType(str, Enum):
     RATE = "rate"
 
 
-class ConditionOperator(str, Enum):
+class ConditionOperator(StrEnum):
     """Condition comparison operators."""
 
     GT = "gt"
@@ -58,7 +58,7 @@ class ConditionOperator(str, Enum):
     NEQ = "neq"
 
 
-class SeverityLevel(str, Enum):
+class SeverityLevel(StrEnum):
     """Alert severity levels."""
 
     INFO = "info"
@@ -66,7 +66,7 @@ class SeverityLevel(str, Enum):
     CRITICAL = "critical"
 
 
-class NotificationChannel(str, Enum):
+class NotificationChannel(StrEnum):
     """Notification channel types."""
 
     EMAIL = "email"

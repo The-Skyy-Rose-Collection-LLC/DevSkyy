@@ -20,14 +20,14 @@ import json
 import logging
 import subprocess
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class FabricType(str, Enum):
+class FabricType(StrEnum):
     """Detected fabric types for material generation."""
 
     COTTON = "cotton"
@@ -42,7 +42,7 @@ class FabricType(str, Enum):
     KNIT = "knit"
 
 
-class TextureMap(str, Enum):
+class TextureMap(StrEnum):
     """PBR texture map types."""
 
     ALBEDO = "albedo"

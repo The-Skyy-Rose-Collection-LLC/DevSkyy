@@ -27,7 +27,7 @@ from collections import OrderedDict
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -51,7 +51,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class LLMProvider(str, Enum):
+class LLMProvider(StrEnum):
     """LLM providers participating in Round Table."""
 
     CLAUDE = "claude"
@@ -62,7 +62,7 @@ class LLMProvider(str, Enum):
     COHERE = "cohere"
 
 
-class CompetitionStatus(str, Enum):
+class CompetitionStatus(StrEnum):
     """Status of a Round Table competition."""
 
     PENDING = "pending"
@@ -402,8 +402,7 @@ class RoundTableDatabase:
 
         try:
             async with self._pool.acquire() as conn:
-                rows = await conn.fetch(
-                    """
+                rows = await conn.fetch("""
                     SELECT
                         winner_provider,
                         COUNT(*) as wins,
@@ -413,8 +412,7 @@ class RoundTableDatabase:
                     FROM round_table_results
                     WHERE status = 'completed'
                     GROUP BY winner_provider
-                    ORDER BY wins DESC."""
-                )
+                    ORDER BY wins DESC.""")
 
                 return {
                     row["winner_provider"]: {
@@ -1582,13 +1580,12 @@ async def _auto_register_providers(rt: LLMRoundTable) -> None:
     import os
 
     # Provider configurations: (env_var, provider_enum, model_name)
+    # Updated 2026-02-19: Latest model IDs for all 4 integrated providers
     provider_configs = [
-        ("ANTHROPIC_API_KEY", LLMProvider.CLAUDE, "claude-sonnet-4-20250514"),
+        ("ANTHROPIC_API_KEY", LLMProvider.CLAUDE, "claude-sonnet-4-6"),
         ("OPENAI_API_KEY", LLMProvider.GPT4, "gpt-4o"),
-        ("GOOGLE_API_KEY", LLMProvider.GEMINI, "gemini-2.0-flash"),
-        ("GROQ_API_KEY", LLMProvider.LLAMA, "llama-3.3-70b-versatile"),
-        ("MISTRAL_API_KEY", LLMProvider.MISTRAL, "mistral-small-latest"),
-        ("COHERE_API_KEY", LLMProvider.COHERE, "command-a-03-2025"),
+        ("GEMINI_API_KEY", LLMProvider.GEMINI, "gemini-3-flash-preview"),
+        ("XAI_API_KEY", LLMProvider.LLAMA, "grok-3-mini"),  # Using LLAMA enum for Grok
     ]
 
     for env_var, provider, model in provider_configs:
@@ -1602,9 +1599,7 @@ async def _auto_register_providers(rt: LLMRoundTable) -> None:
                 logger.warning(f"Failed to register {provider.value}: {e}")
 
 
-def _create_provider_generator(
-    provider: LLMProvider, model: str, api_key: str
-) -> Callable:
+def _create_provider_generator(provider: LLMProvider, model: str, api_key: str) -> Callable:
     """Create a generator function for a provider."""
 
     async def generator(prompt: str, context: dict | None = None) -> LLMResponse:
@@ -1636,7 +1631,11 @@ def _create_provider_generator(
                     messages=[{"role": "user", "content": prompt}],
                 )
                 content = response.choices[0].message.content or ""
-                tokens = (response.usage.prompt_tokens + response.usage.completion_tokens) if response.usage else 0
+                tokens = (
+                    (response.usage.prompt_tokens + response.usage.completion_tokens)
+                    if response.usage
+                    else 0
+                )
 
             elif provider == LLMProvider.GEMINI:
                 from google import genai
@@ -1650,16 +1649,21 @@ def _create_provider_generator(
                 tokens = response.usage_metadata.total_token_count if response.usage_metadata else 0
 
             elif provider == LLMProvider.LLAMA:
-                import groq
+                # Using LLAMA enum for Grok (XAI) - OpenAI-compatible API
+                import openai
 
-                client = groq.AsyncGroq(api_key=api_key)
+                client = openai.AsyncOpenAI(api_key=api_key, base_url="https://api.x.ai/v1")
                 response = await client.chat.completions.create(
                     model=model,
                     max_tokens=2048,
                     messages=[{"role": "user", "content": prompt}],
                 )
                 content = response.choices[0].message.content or ""
-                tokens = (response.usage.prompt_tokens + response.usage.completion_tokens) if response.usage else 0
+                tokens = (
+                    (response.usage.prompt_tokens + response.usage.completion_tokens)
+                    if response.usage
+                    else 0
+                )
 
             elif provider == LLMProvider.MISTRAL:
                 from mistralai import Mistral
@@ -1670,7 +1674,11 @@ def _create_provider_generator(
                     messages=[{"role": "user", "content": prompt}],
                 )
                 content = response.choices[0].message.content or ""
-                tokens = (response.usage.prompt_tokens + response.usage.completion_tokens) if response.usage else 0
+                tokens = (
+                    (response.usage.prompt_tokens + response.usage.completion_tokens)
+                    if response.usage
+                    else 0
+                )
 
             elif provider == LLMProvider.COHERE:
                 import cohere
@@ -1681,7 +1689,11 @@ def _create_provider_generator(
                     messages=[{"role": "user", "content": prompt}],
                 )
                 content = response.message.content[0].text if response.message.content else ""
-                tokens = (response.usage.tokens.input_tokens + response.usage.tokens.output_tokens) if response.usage else 0
+                tokens = (
+                    (response.usage.tokens.input_tokens + response.usage.tokens.output_tokens)
+                    if response.usage
+                    else 0
+                )
 
             else:
                 raise ValueError(f"Unknown provider: {provider}")
@@ -1706,15 +1718,13 @@ def _create_provider_generator(
 
 
 def _estimate_cost(provider: LLMProvider, tokens: int) -> float:
-    """Estimate cost based on provider and tokens."""
+    """Estimate cost based on provider and tokens (updated 2026-02-19)."""
     # Approximate costs per 1K tokens (blended input/output)
     costs_per_1k = {
-        LLMProvider.CLAUDE: 0.006,
-        LLMProvider.GPT4: 0.01,
-        LLMProvider.GEMINI: 0.0005,
-        LLMProvider.LLAMA: 0.0008,
-        LLMProvider.MISTRAL: 0.002,
-        LLMProvider.COHERE: 0.003,
+        LLMProvider.CLAUDE: 0.009,  # claude-sonnet-4-6: $3/$15 per 1M tokens
+        LLMProvider.GPT4: 0.01,  # gpt-4o: $2.50/$10 per 1M tokens
+        LLMProvider.GEMINI: 0.0001,  # gemini-3-flash-preview: free tier / very low cost
+        LLMProvider.LLAMA: 0.002,  # grok-3-mini: ~$2 per 1M tokens
     }
     return (tokens / 1000) * costs_per_1k.get(provider, 0.005)
 

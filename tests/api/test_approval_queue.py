@@ -12,8 +12,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-
-from api.v1.approval import router
 from services.approval_queue_manager import (
     ApprovalItem,
     ApprovalQueueManager,
@@ -24,6 +22,8 @@ from services.approval_queue_manager import (
     RevisionPriority,
     RevisionQueueResponse,
 )
+
+from api.v1.approval import router
 
 # =============================================================================
 # Fixtures
@@ -202,9 +202,7 @@ class TestGetItem:
         from services.approval_queue_manager import ApprovalItemNotFoundError
 
         manager = MagicMock(spec=ApprovalQueueManager)
-        manager.get_item = AsyncMock(
-            side_effect=ApprovalItemNotFoundError("Not found")
-        )
+        manager.get_item = AsyncMock(side_effect=ApprovalItemNotFoundError("Not found"))
         mock_get_manager.return_value = manager
 
         response = client.get("/approval/queue/nonexistent")
@@ -311,9 +309,7 @@ class TestActionProcessing:
         from services.approval_queue_manager import InvalidApprovalActionError
 
         manager = MagicMock(spec=ApprovalQueueManager)
-        manager.process_action = AsyncMock(
-            side_effect=InvalidApprovalActionError("Cannot process")
-        )
+        manager.process_action = AsyncMock(side_effect=InvalidApprovalActionError("Cannot process"))
         mock_get_manager.return_value = manager
 
         response = client.post(

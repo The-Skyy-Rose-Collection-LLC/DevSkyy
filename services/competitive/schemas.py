@@ -10,7 +10,7 @@ Version: 1.0.0
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -21,7 +21,7 @@ from pydantic import BaseModel, Field, HttpUrl
 # =============================================================================
 
 
-class CompetitorCategory(str, Enum):
+class CompetitorCategory(StrEnum):
     """Category of competitor."""
 
     DIRECT = "direct"  # Direct competitors in same market
@@ -30,7 +30,7 @@ class CompetitorCategory(str, Enum):
     EMERGING = "emerging"  # Up-and-coming competitors
 
 
-class PricePositioning(str, Enum):
+class PricePositioning(StrEnum):
     """Price positioning relative to our brand."""
 
     BUDGET = "budget"
@@ -40,7 +40,7 @@ class PricePositioning(str, Enum):
     ULTRA_LUXURY = "ultra_luxury"
 
 
-class CompositionType(str, Enum):
+class CompositionType(StrEnum):
     """Type of image composition."""
 
     FLAT_LAY = "flat_lay"
@@ -52,7 +52,7 @@ class CompositionType(str, Enum):
     OTHER = "other"
 
 
-class StyleCategory(str, Enum):
+class StyleCategory(StrEnum):
     """Style category of the product."""
 
     MINIMALIST = "minimalist"

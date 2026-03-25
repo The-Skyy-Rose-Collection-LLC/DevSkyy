@@ -15,7 +15,7 @@ import logging
 from collections import defaultdict
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -23,7 +23,7 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger(__name__)
 
 
-class SecurityEventType(str, Enum):
+class SecurityEventType(StrEnum):
     """Types of security events"""
 
     # Authentication events
@@ -62,7 +62,7 @@ class SecurityEventType(str, Enum):
     SYSTEM_ERROR = "system_error"
 
 
-class AlertSeverity(str, Enum):
+class AlertSeverity(StrEnum):
     """Alert severity levels"""
 
     CRITICAL = "critical"

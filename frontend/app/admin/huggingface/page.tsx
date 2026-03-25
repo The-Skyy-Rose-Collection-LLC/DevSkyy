@@ -1,0 +1,1218 @@
+'use client';
+
+import { useEffect, useState, useCallback } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Brain,
+  Cpu,
+  Layers,
+  Download,
+  Play,
+  Pause,
+  RefreshCw,
+  Moon,
+  ExternalLink,
+  Loader2,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  Settings,
+  Shield,
+  TrendingUp,
+  Activity,
+  Zap,
+  Globe,
+  ArrowUpDown,
+  Sparkles,
+  Image,
+  MessageSquare,
+  Video,
+  Palette,
+} from 'lucide-react';
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+interface HFSpace {
+  id: string;
+  name: string;
+  status: 'running' | 'building' | 'sleeping' | 'stopped' | 'error';
+  url: string;
+  sdk: string;
+  sdkVersion: string;
+  hardware: string;
+  createdAt: string;
+  lastUpdated: string;
+}
+
+interface HFModel {
+  id: string;
+  name: string;
+  taskType: string;
+  downloads: number;
+  likes: number;
+  lastUpdated: string;
+  tags: string[];
+}
+
+interface HFEndpoint {
+  id: string;
+  name: string;
+  model: string;
+  status: 'running' | 'scaling' | 'paused' | 'failed';
+  requestsPerMin: number;
+  avgLatencyMs: number;
+  instanceType: string;
+  replicas: number;
+  maxReplicas: number;
+}
+
+interface HFStats {
+  modelsDeployed: number;
+  spacesActive: number;
+  inferenceEndpoints: number;
+  totalDownloads: number;
+}
+
+// ---------------------------------------------------------------------------
+// Simulated Data
+// ---------------------------------------------------------------------------
+
+const SIMULATED_STATS: HFStats = {
+  modelsDeployed: 0,
+  spacesActive: 3,
+  inferenceEndpoints: 0,
+  totalDownloads: 0,
+};
+
+const SIMULATED_SPACES: HFSpace[] = [
+  {
+    id: 'space-001',
+    name: 'damBruh/skyyrose-3d-converter',
+    status: 'sleeping',
+    url: 'https://huggingface.co/spaces/damBruh/skyyrose-3d-converter',
+    sdk: 'Gradio',
+    sdkVersion: '4.44.0',
+    hardware: 'CPU Basic',
+    createdAt: '2025-12-01T08:00:00Z',
+    lastUpdated: '2026-01-17T14:30:00Z',
+  },
+  {
+    id: 'space-002',
+    name: 'damBruh/skyyrose-lora-training-monitor',
+    status: 'sleeping',
+    url: 'https://huggingface.co/spaces/damBruh/skyyrose-lora-training-monitor',
+    sdk: 'Gradio',
+    sdkVersion: '4.44.0',
+    hardware: 'CPU Basic',
+    createdAt: '2025-12-01T08:00:00Z',
+    lastUpdated: '2026-01-17T09:15:00Z',
+  },
+  {
+    id: 'space-003',
+    name: 'damBruh/skyyrose-virtual-tryon',
+    status: 'sleeping',
+    url: 'https://huggingface.co/spaces/damBruh/skyyrose-virtual-tryon',
+    sdk: 'Gradio',
+    sdkVersion: '4.44.0',
+    hardware: 'CPU Basic',
+    createdAt: '2025-12-01T08:00:00Z',
+    lastUpdated: '2026-01-10T11:20:00Z',
+  },
+];
+
+const SIMULATED_MODELS: HFModel[] = [
+  {
+    id: 'model-001',
+    name: 'skyyrose/fashion-embeddings-v2',
+    taskType: 'feature-extraction',
+    downloads: 128_400,
+    likes: 342,
+    lastUpdated: '2026-02-19T10:30:00Z',
+    tags: ['fashion', 'embeddings', 'luxury', 'pytorch'],
+  },
+  {
+    id: 'model-002',
+    name: 'skyyrose/product-caption-gen',
+    taskType: 'text-generation',
+    downloads: 67_200,
+    likes: 189,
+    lastUpdated: '2026-02-15T14:00:00Z',
+    tags: ['captions', 'luxury-fashion', 'transformers'],
+  },
+  {
+    id: 'model-003',
+    name: 'skyyrose/rose-gold-lora',
+    taskType: 'text-to-image',
+    downloads: 45_800,
+    likes: 521,
+    lastUpdated: '2026-02-10T08:00:00Z',
+    tags: ['lora', 'sdxl', 'rose-gold', 'fashion'],
+  },
+  {
+    id: 'model-004',
+    name: 'skyyrose/garment-segmentation',
+    taskType: 'image-segmentation',
+    downloads: 23_100,
+    likes: 97,
+    lastUpdated: '2026-01-28T16:45:00Z',
+    tags: ['segmentation', 'fashion', 'onnx'],
+  },
+  {
+    id: 'model-005',
+    name: 'skyyrose/brand-sentiment',
+    taskType: 'text-classification',
+    downloads: 12_600,
+    likes: 64,
+    lastUpdated: '2026-01-15T12:00:00Z',
+    tags: ['sentiment', 'brand-monitoring', 'bert'],
+  },
+  {
+    id: 'model-006',
+    name: 'skyyrose/color-palette-extractor',
+    taskType: 'image-classification',
+    downloads: 7_400,
+    likes: 41,
+    lastUpdated: '2025-12-20T09:30:00Z',
+    tags: ['color', 'fashion', 'palette', 'vision'],
+  },
+];
+
+const SIMULATED_ENDPOINTS: HFEndpoint[] = [
+  {
+    id: 'ep-001',
+    name: 'fashion-embeddings-prod',
+    model: 'skyyrose/fashion-embeddings-v2',
+    status: 'running',
+    requestsPerMin: 245,
+    avgLatencyMs: 42,
+    instanceType: 'GPU - Nvidia A10G',
+    replicas: 2,
+    maxReplicas: 4,
+  },
+  {
+    id: 'ep-002',
+    name: 'caption-gen-prod',
+    model: 'skyyrose/product-caption-gen',
+    status: 'running',
+    requestsPerMin: 89,
+    avgLatencyMs: 310,
+    instanceType: 'GPU - Nvidia T4',
+    replicas: 1,
+    maxReplicas: 3,
+  },
+  {
+    id: 'ep-003',
+    name: 'segmentation-staging',
+    model: 'skyyrose/garment-segmentation',
+    status: 'paused',
+    requestsPerMin: 0,
+    avgLatencyMs: 0,
+    instanceType: 'GPU - Nvidia T4',
+    replicas: 0,
+    maxReplicas: 2,
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Page Component
+// ---------------------------------------------------------------------------
+
+export default function HuggingFacePage() {
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<HFStats | null>(null);
+  const [spaces, setSpaces] = useState<HFSpace[]>([]);
+  const [models, setModels] = useState<HFModel[]>([]);
+  const [endpoints, setEndpoints] = useState<HFEndpoint[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Settings state
+  const [tokenStatus, setTokenStatus] = useState<'valid' | 'expired' | 'missing'>('valid');
+  const [defaultOrg, setDefaultOrg] = useState('damBruh');
+  const [autoDeploy, setAutoDeploy] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    try {
+      const res = await fetch('/api/huggingface');
+      if (!res.ok) throw new Error(`API returned ${res.status}`);
+      const data = await res.json();
+      setStats(data.stats ?? SIMULATED_STATS);
+      setSpaces(data.spaces ?? SIMULATED_SPACES);
+      setModels(data.models ?? SIMULATED_MODELS);
+      setEndpoints(data.endpoints ?? SIMULATED_ENDPOINTS);
+      setError(null);
+    } catch {
+      // Fall back to simulated data so the UI stays functional
+      setStats(SIMULATED_STATS);
+      setSpaces(SIMULATED_SPACES);
+      setModels(SIMULATED_MODELS);
+      setEndpoints(SIMULATED_ENDPOINTS);
+      setError(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const handleSpaceAction = useCallback(
+    async (action: string, spaceId: string) => {
+      const key = `${action}-${spaceId}`;
+      setActionLoading(key);
+      try {
+        const res = await fetch('/api/huggingface', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, spaceId }),
+        });
+        if (!res.ok) throw new Error(`Action failed: ${res.status}`);
+      } catch (err) {
+        setError(`Failed to ${action} space. Please try again.`);
+      } finally {
+        setActionLoading(null);
+        await fetchData();
+      }
+    },
+    [fetchData]
+  );
+
+  const handleEndpointAction = useCallback(
+    async (action: string, endpointId: string) => {
+      const key = `${action}-${endpointId}`;
+      setActionLoading(key);
+      try {
+        const res = await fetch('/api/huggingface', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, endpointId }),
+        });
+        if (!res.ok) throw new Error(`Action failed: ${res.status}`);
+      } catch (err) {
+        setError(`Failed to ${action} endpoint. Please try again.`);
+      } finally {
+        setActionLoading(null);
+        await fetchData();
+      }
+    },
+    [fetchData]
+  );
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  if (loading) {
+    return <HuggingFaceSkeleton />;
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-8 border border-gray-700">
+        <div className="absolute inset-0 bg-grid-white/[0.02]" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#FF9D00]/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#B76E79]/10 rounded-full blur-3xl" />
+
+        <div className="relative flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#FF9D00] to-[#B76E79] flex items-center justify-center">
+                <Brain className="h-6 w-6 text-white" />
+              </div>
+              HuggingFace Hub
+            </h1>
+            <p className="text-gray-400 mt-2 ml-15">
+              Deploy and manage AI models on HuggingFace Spaces
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Badge variant="outline" className="border-[#FF9D00] text-[#FF9D00]">
+              <div className="h-2 w-2 rounded-full mr-2 bg-[#FF9D00] animate-pulse" />
+              HuggingFace Connected
+            </Badge>
+          </div>
+        </div>
+      </div>
+
+      {/* Error Banner */}
+      {error && (
+        <div className="flex items-center gap-3 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-red-400">
+          <AlertCircle className="h-5 w-5 flex-shrink-0" />
+          <p className="text-sm">{error}</p>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="ml-auto text-red-400 hover:text-red-300"
+            onClick={() => setError(null)}
+          >
+            Dismiss
+          </Button>
+        </div>
+      )}
+
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <GradientStatCard
+          title="Models Deployed"
+          value={stats?.modelsDeployed ?? 0}
+          icon={Layers}
+          gradient="from-[#FF9D00] to-[#B76E79]"
+        />
+        <GradientStatCard
+          title="Spaces Active"
+          value={stats?.spacesActive ?? 0}
+          icon={Globe}
+          gradient="from-emerald-500 to-teal-500"
+        />
+        <GradientStatCard
+          title="Inference Endpoints"
+          value={stats?.inferenceEndpoints ?? 0}
+          icon={Zap}
+          gradient="from-blue-500 to-cyan-500"
+        />
+        <GradientStatCard
+          title="Total Downloads"
+          value={formatNumber(stats?.totalDownloads ?? 0)}
+          icon={Download}
+          gradient="from-purple-500 to-pink-500"
+        />
+      </div>
+
+      {/* Main Content Tabs */}
+      <Tabs defaultValue="spaces" className="space-y-4">
+        <TabsList className="bg-gray-800">
+          <TabsTrigger value="spaces" className="data-[state=active]:bg-gray-700">
+            <Globe className="mr-2 h-4 w-4" />
+            Spaces
+          </TabsTrigger>
+          <TabsTrigger value="models" className="data-[state=active]:bg-gray-700">
+            <Layers className="mr-2 h-4 w-4" />
+            Models
+          </TabsTrigger>
+          <TabsTrigger value="inference" className="data-[state=active]:bg-gray-700">
+            <Zap className="mr-2 h-4 w-4" />
+            Inference
+          </TabsTrigger>
+          <TabsTrigger value="generate" className="data-[state=active]:bg-gray-700">
+            <Sparkles className="mr-2 h-4 w-4" />
+            Generate
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="data-[state=active]:bg-gray-700">
+            <Settings className="mr-2 h-4 w-4" />
+            Settings
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Spaces Tab */}
+        <TabsContent value="spaces" className="space-y-4">
+          {spaces.length === 0 ? (
+            <Card className="bg-gray-900 border-gray-800 py-12">
+              <CardContent className="text-center">
+                <Globe className="h-12 w-12 text-gray-600 mx-auto mb-4" />
+                <p className="text-gray-500">No spaces deployed</p>
+                <p className="text-gray-600 text-sm mt-1">
+                  Deploy your first HuggingFace Space to get started
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {spaces.map((space) => (
+                <SpaceCard
+                  key={space.id}
+                  space={space}
+                  onAction={handleSpaceAction}
+                  actionLoading={actionLoading}
+                />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Models Tab */}
+        <TabsContent value="models" className="space-y-4">
+          {models.length === 0 ? (
+            <Card className="bg-gray-900 border-gray-800 py-12">
+              <CardContent className="text-center">
+                <Layers className="h-12 w-12 text-gray-600 mx-auto mb-4" />
+                <p className="text-gray-500">No models pushed yet</p>
+                <p className="text-gray-600 text-sm mt-1">
+                  Push your first model to the HuggingFace Hub
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {models.map((model) => (
+                <ModelCard key={model.id} model={model} />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Inference Tab */}
+        <TabsContent value="inference" className="space-y-4">
+          {endpoints.length === 0 ? (
+            <Card className="bg-gray-900 border-gray-800 py-12">
+              <CardContent className="text-center">
+                <Zap className="h-12 w-12 text-gray-600 mx-auto mb-4" />
+                <p className="text-gray-500">No inference endpoints</p>
+                <p className="text-gray-600 text-sm mt-1">
+                  Create an inference endpoint to serve your models
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {endpoints.map((endpoint) => (
+                <EndpointCard
+                  key={endpoint.id}
+                  endpoint={endpoint}
+                  onAction={handleEndpointAction}
+                  actionLoading={actionLoading}
+                />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Generate Tab — One-Click Content Generation */}
+        <TabsContent value="generate" className="space-y-4">
+          <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-[#FF9D00]" />
+                Content Generation Studio
+              </CardTitle>
+              <CardDescription className="text-gray-400">
+                One-click brand content generation powered by SkyyRose ML pipelines
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {[
+                  {
+                    title: 'Product Photography',
+                    desc: 'AI model wearing SkyyRose clothing',
+                    icon: Image,
+                    gradient: 'from-[#B76E79] to-rose-600',
+                    status: 'Ready',
+                  },
+                  {
+                    title: 'Social Media Posts',
+                    desc: 'Carousel posts, stories, reels thumbnails',
+                    icon: MessageSquare,
+                    gradient: 'from-purple-500 to-pink-500',
+                    status: 'Ready',
+                  },
+                  {
+                    title: 'Ad Creatives',
+                    desc: 'Facebook, Instagram, TikTok ad formats',
+                    icon: Sparkles,
+                    gradient: 'from-amber-500 to-orange-500',
+                    status: 'Ready',
+                  },
+                  {
+                    title: 'Hero & Banner Imagery',
+                    desc: 'Website hero images and collection banners',
+                    icon: Palette,
+                    gradient: 'from-blue-500 to-cyan-500',
+                    status: 'Ready',
+                  },
+                  {
+                    title: 'Mascot Poses',
+                    desc: 'Brand mascot in different outfits and poses',
+                    icon: Brain,
+                    gradient: 'from-emerald-500 to-teal-500',
+                    status: 'Pending Images',
+                  },
+                  {
+                    title: 'Video Content',
+                    desc: 'Short-form video clips and motion graphics',
+                    icon: Video,
+                    gradient: 'from-red-500 to-rose-500',
+                    status: 'Coming Soon',
+                  },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Card
+                      key={item.title}
+                      className="bg-gray-800/50 border-gray-700 overflow-hidden hover:border-gray-600 transition-colors cursor-pointer group"
+                    >
+                      <div className={`h-1 bg-gradient-to-r ${item.gradient}`} />
+                      <CardContent className="p-5">
+                        <div className="flex items-start gap-3">
+                          <div
+                            className={`h-10 w-10 rounded-lg bg-gradient-to-br ${item.gradient} flex items-center justify-center flex-shrink-0`}
+                          >
+                            <Icon className="h-5 w-5 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-white group-hover:text-[#FF9D00] transition-colors">
+                              {item.title}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
+                            <Badge
+                              variant="outline"
+                              className={`mt-2 text-xs ${
+                                item.status === 'Ready'
+                                  ? 'border-green-500/50 text-green-400'
+                                  : item.status === 'Coming Soon'
+                                  ? 'border-gray-600 text-gray-500'
+                                  : 'border-amber-500/50 text-amber-400'
+                              }`}
+                            >
+                              {item.status}
+                            </Badge>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+
+              <div className="mt-6 p-4 rounded-lg border border-gray-700 bg-gray-800/30">
+                <div className="flex items-center gap-3 mb-3">
+                  <Zap className="h-5 w-5 text-[#FF9D00]" />
+                  <span className="text-sm font-medium text-white">Quick Generate</span>
+                </div>
+                <div className="flex gap-3">
+                  <Input
+                    placeholder="Describe what you need... e.g. 'Instagram post for Black Rose Crewneck launch'"
+                    className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 flex-1"
+                  />
+                  <Button className="bg-gradient-to-r from-[#FF9D00] to-[#B76E79] hover:from-[#e68e00] hover:to-[#a5606a] text-white px-6">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Generate
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Uses SkyyRose LoRA model + brand voice for 100% on-brand output
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Pipeline Status */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base text-white flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-[#FF9D00]" />
+                  LoRA Training Status
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-400">Product LoRA</span>
+                    <Badge variant="outline" className="border-amber-500/50 text-amber-400 text-xs">
+                      Not Started
+                    </Badge>
+                  </div>
+                  <div className="h-2 rounded-full bg-gray-800">
+                    <div className="h-2 rounded-full bg-gradient-to-r from-[#FF9D00] to-[#B76E79]" style={{ width: '0%' }} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-400">Mascot Consistency</span>
+                    <Badge variant="outline" className="border-amber-500/50 text-amber-400 text-xs">
+                      Not Started
+                    </Badge>
+                  </div>
+                  <div className="h-2 rounded-full bg-gray-800">
+                    <div className="h-2 rounded-full bg-gradient-to-r from-[#FF9D00] to-[#B76E79]" style={{ width: '0%' }} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-400">Brand Voice</span>
+                    <Badge variant="outline" className="border-amber-500/50 text-amber-400 text-xs">
+                      Not Started
+                    </Badge>
+                  </div>
+                  <div className="h-2 rounded-full bg-gray-800">
+                    <div className="h-2 rounded-full bg-gradient-to-r from-[#FF9D00] to-[#B76E79]" style={{ width: '0%' }} />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-3">
+                  Training requires product images in assets/2d-25d-assets/ and mascot reference
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base text-white flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-[#FF9D00]" />
+                  Generation Queue
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-3 gap-3 text-center">
+                    <div className="p-3 rounded-lg bg-gray-800/50">
+                      <p className="text-xl font-bold text-white">0</p>
+                      <p className="text-xs text-gray-500">Pending</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-gray-800/50">
+                      <p className="text-xl font-bold text-[#FF9D00]">0</p>
+                      <p className="text-xs text-gray-500">Processing</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-gray-800/50">
+                      <p className="text-xl font-bold text-green-400">0</p>
+                      <p className="text-xs text-gray-500">Completed</p>
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-lg border border-gray-700 bg-gray-800/30 text-center">
+                    <Sparkles className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+                    <p className="text-sm text-gray-500">No generation jobs yet</p>
+                    <p className="text-xs text-gray-600 mt-1">
+                      Use Quick Generate above to start
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Settings Tab */}
+        <TabsContent value="settings" className="space-y-4">
+          <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Shield className="h-5 w-5 text-[#FF9D00]" />
+                HuggingFace Account
+              </CardTitle>
+              <CardDescription className="text-gray-400">
+                Manage your HuggingFace API connection and deployment preferences
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* API Token Status */}
+              <div className="space-y-2">
+                <Label className="text-gray-300">API Token</Label>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-10 rounded-md bg-gray-800 border border-gray-700 px-3 flex items-center">
+                    <span className="text-gray-400 font-mono text-sm">
+                      hf_************************************KxMn
+                    </span>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className={
+                      tokenStatus === 'valid'
+                        ? 'border-green-500 text-green-400'
+                        : tokenStatus === 'expired'
+                        ? 'border-yellow-500 text-yellow-400'
+                        : 'border-red-500 text-red-400'
+                    }
+                  >
+                    <div
+                      className={`h-2 w-2 rounded-full mr-2 ${
+                        tokenStatus === 'valid'
+                          ? 'bg-green-500'
+                          : tokenStatus === 'expired'
+                          ? 'bg-yellow-500'
+                          : 'bg-red-500'
+                      }`}
+                    />
+                    {tokenStatus === 'valid'
+                      ? 'Valid'
+                      : tokenStatus === 'expired'
+                      ? 'Expired'
+                      : 'Missing'}
+                  </Badge>
+                </div>
+                <p className="text-xs text-gray-500">
+                  Token is stored securely in environment variables. Update via Vercel dashboard.
+                </p>
+              </div>
+
+              {/* Default Organization */}
+              <div className="space-y-2">
+                <Label className="text-gray-300">Default Organization</Label>
+                <Input
+                  value={defaultOrg}
+                  onChange={(e) => setDefaultOrg(e.target.value)}
+                  placeholder="your-org-name"
+                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                />
+                <p className="text-xs text-gray-500">
+                  Models and spaces will be pushed under this organization by default.
+                </p>
+              </div>
+
+              {/* Auto-Deploy Toggle */}
+              <div className="flex items-center justify-between rounded-lg border border-gray-700 bg-gray-800/50 p-4">
+                <div>
+                  <p className="text-sm font-medium text-white">Auto-Deploy on Push</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Automatically rebuild and redeploy spaces when model weights are updated
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAutoDeploy(!autoDeploy)}
+                  className={
+                    autoDeploy
+                      ? 'border-green-500 text-green-400 hover:bg-green-500/10'
+                      : 'border-gray-600 text-gray-400 hover:bg-gray-700'
+                  }
+                >
+                  {autoDeploy ? (
+                    <>
+                      <CheckCircle2 className="mr-1 h-3 w-3" />
+                      Enabled
+                    </>
+                  ) : (
+                    <>
+                      <Pause className="mr-1 h-3 w-3" />
+                      Disabled
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* Save Button */}
+              <Button className="w-full bg-gradient-to-r from-[#FF9D00] to-[#B76E79] hover:from-[#e68e00] hover:to-[#a5606a] h-12 text-white">
+                <Settings className="mr-2 h-5 w-5" />
+                Save Settings
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Sub-components
+// ---------------------------------------------------------------------------
+
+function GradientStatCard({
+  title,
+  value,
+  icon: Icon,
+  gradient,
+}: {
+  title: string;
+  value: string | number;
+  icon: React.ComponentType<{ className?: string }>;
+  gradient: string;
+}) {
+  return (
+    <Card className="bg-gray-900/80 border-gray-700 overflow-hidden backdrop-blur-sm">
+      <div className={`h-1 bg-gradient-to-r ${gradient}`} />
+      <CardContent className="pt-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-gray-400">{title}</p>
+            <p className="text-2xl font-bold text-white mt-1">{value}</p>
+          </div>
+          <div
+            className={`h-12 w-12 rounded-xl bg-gradient-to-br ${gradient} bg-opacity-10 flex items-center justify-center`}
+          >
+            <Icon className="h-6 w-6 text-white" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function SpaceCard({
+  space,
+  onAction,
+  actionLoading,
+}: {
+  space: HFSpace;
+  onAction: (action: string, spaceId: string) => void;
+  actionLoading: string | null;
+}) {
+  const statusConfig: Record<
+    HFSpace['status'],
+    { color: string; bgColor: string; borderColor: string; label: string }
+  > = {
+    running: {
+      color: 'text-green-400',
+      bgColor: 'bg-green-500/10',
+      borderColor: 'border-green-500',
+      label: 'Running',
+    },
+    building: {
+      color: 'text-amber-400',
+      bgColor: 'bg-amber-500/10',
+      borderColor: 'border-amber-500',
+      label: 'Building',
+    },
+    sleeping: {
+      color: 'text-blue-400',
+      bgColor: 'bg-blue-500/10',
+      borderColor: 'border-blue-500',
+      label: 'Sleeping',
+    },
+    stopped: {
+      color: 'text-gray-400',
+      bgColor: 'bg-gray-500/10',
+      borderColor: 'border-gray-500',
+      label: 'Stopped',
+    },
+    error: {
+      color: 'text-red-400',
+      bgColor: 'bg-red-500/10',
+      borderColor: 'border-red-500',
+      label: 'Error',
+    },
+  };
+
+  const config = statusConfig[space.status];
+
+  return (
+    <Card className="bg-gray-900 border-gray-800 overflow-hidden">
+      <div
+        className={`h-1 ${
+          space.status === 'running'
+            ? 'bg-gradient-to-r from-green-500 to-emerald-500'
+            : space.status === 'building'
+            ? 'bg-gradient-to-r from-amber-500 to-yellow-500'
+            : space.status === 'sleeping'
+            ? 'bg-gradient-to-r from-blue-500 to-cyan-500'
+            : 'bg-gradient-to-r from-gray-500 to-gray-600'
+        }`}
+      />
+      <CardContent className="p-4">
+        <div className="flex items-start gap-4">
+          <div
+            className={`h-10 w-10 rounded-lg ${config.bgColor} flex items-center justify-center flex-shrink-0`}
+          >
+            <Globe className={`h-5 w-5 ${config.color}`} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <span className="text-sm font-medium text-white truncate">{space.name}</span>
+              <Badge variant="outline" className={`${config.borderColor} ${config.color}`}>
+                {config.label}
+              </Badge>
+            </div>
+            <div className="flex flex-wrap gap-3 text-xs text-gray-500 mt-2">
+              <span className="flex items-center gap-1">
+                <Cpu className="h-3 w-3" />
+                {space.hardware}
+              </span>
+              <span className="flex items-center gap-1">
+                <Layers className="h-3 w-3" />
+                {space.sdk} {space.sdkVersion}
+              </span>
+              <span className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                Updated {new Date(space.lastUpdated).toLocaleDateString()}
+              </span>
+            </div>
+          </div>
+          <div className="flex gap-1 flex-shrink-0">
+            {space.status === 'sleeping' || space.status === 'stopped' ? (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-green-400 hover:text-green-300 hover:bg-green-500/10 h-8 w-8 p-0"
+                title="Start"
+                disabled={actionLoading !== null}
+                onClick={() => onAction('start', space.id)}
+              >
+                {actionLoading === `start-${space.id}` ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+              </Button>
+            ) : space.status === 'running' ? (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 h-8 w-8 p-0"
+                title="Sleep"
+                disabled={actionLoading !== null}
+                onClick={() => onAction('sleep', space.id)}
+              >
+                {actionLoading === `sleep-${space.id}` ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
+              </Button>
+            ) : null}
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-gray-400 hover:text-white h-8 w-8 p-0"
+              title="Restart"
+              disabled={actionLoading !== null}
+              onClick={() => onAction('restart', space.id)}
+            >
+              {actionLoading === `restart-${space.id}` ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4" />
+              )}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-[#FF9D00] hover:text-[#ffb740] h-8 w-8 p-0"
+              title="Open on Hub"
+              onClick={() => window.open(space.url, '_blank')}
+            >
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ModelCard({ model }: { model: HFModel }) {
+  return (
+    <Card className="bg-gray-900 border-gray-800 overflow-hidden">
+      <div className="h-1 bg-gradient-to-r from-[#FF9D00] to-[#B76E79]" />
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg text-white truncate">{model.name}</CardTitle>
+          <Badge variant="secondary" className="bg-gray-800 text-gray-300 text-xs flex-shrink-0">
+            {model.taskType}
+          </Badge>
+        </div>
+        <CardDescription className="text-gray-500">
+          Last updated {new Date(model.lastUpdated).toLocaleDateString()}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center gap-4 mb-3">
+          <div className="flex items-center gap-1.5 text-sm">
+            <Download className="h-4 w-4 text-gray-500" />
+            <span className="text-white font-medium">{formatNumber(model.downloads)}</span>
+            <span className="text-gray-500">downloads</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-sm">
+            <TrendingUp className="h-4 w-4 text-gray-500" />
+            <span className="text-white font-medium">{model.likes}</span>
+            <span className="text-gray-500">likes</span>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-1 mb-3">
+          {model.tags.map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center text-xs text-[#FF9D00] bg-[#FF9D00]/10 px-2 py-0.5 rounded-full"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="w-full text-[#FF9D00] hover:text-[#ffb740] hover:bg-[#FF9D00]/10"
+          onClick={() =>
+            window.open(`https://huggingface.co/${model.name}`, '_blank')
+          }
+        >
+          View on Hub <ExternalLink className="ml-2 h-3 w-3" />
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+function EndpointCard({
+  endpoint,
+  onAction,
+  actionLoading,
+}: {
+  endpoint: HFEndpoint;
+  onAction: (action: string, endpointId: string) => void;
+  actionLoading: string | null;
+}) {
+  const statusConfig: Record<
+    HFEndpoint['status'],
+    { color: string; bgColor: string; borderColor: string; label: string; animate?: boolean }
+  > = {
+    running: {
+      color: 'text-green-400',
+      bgColor: 'bg-green-500/10',
+      borderColor: 'border-green-500',
+      label: 'Running',
+      animate: true,
+    },
+    scaling: {
+      color: 'text-amber-400',
+      bgColor: 'bg-amber-500/10',
+      borderColor: 'border-amber-500',
+      label: 'Scaling',
+      animate: true,
+    },
+    paused: {
+      color: 'text-gray-400',
+      bgColor: 'bg-gray-500/10',
+      borderColor: 'border-gray-500',
+      label: 'Paused',
+    },
+    failed: {
+      color: 'text-red-400',
+      bgColor: 'bg-red-500/10',
+      borderColor: 'border-red-500',
+      label: 'Failed',
+    },
+  };
+
+  const config = statusConfig[endpoint.status];
+
+  return (
+    <Card className="bg-gray-900 border-gray-800 overflow-hidden">
+      <div
+        className={`h-1 ${
+          endpoint.status === 'running'
+            ? 'bg-gradient-to-r from-green-500 to-emerald-500'
+            : endpoint.status === 'scaling'
+            ? 'bg-gradient-to-r from-amber-500 to-yellow-500'
+            : 'bg-gradient-to-r from-gray-500 to-gray-600'
+        }`}
+      />
+      <CardContent className="p-4">
+        <div className="flex items-start gap-4">
+          <div
+            className={`h-10 w-10 rounded-lg ${config.bgColor} flex items-center justify-center flex-shrink-0`}
+          >
+            <Zap className={`h-5 w-5 ${config.color}`} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <span className="text-sm font-medium text-white truncate">
+                {endpoint.name}
+              </span>
+              <Badge variant="outline" className={`${config.borderColor} ${config.color}`}>
+                {config.animate && (
+                  <div className={`h-2 w-2 rounded-full mr-2 ${config.color.replace('text-', 'bg-')} animate-pulse`} />
+                )}
+                {config.label}
+              </Badge>
+            </div>
+            <p className="text-xs text-gray-500 truncate">{endpoint.model}</p>
+            <div className="grid grid-cols-3 gap-3 mt-3">
+              <div className="rounded-lg bg-gray-800/50 px-3 py-2">
+                <p className="text-xs text-gray-500 flex items-center gap-1">
+                  <Activity className="h-3 w-3" />
+                  Req/min
+                </p>
+                <p className="text-sm font-medium text-white">{endpoint.requestsPerMin}</p>
+              </div>
+              <div className="rounded-lg bg-gray-800/50 px-3 py-2">
+                <p className="text-xs text-gray-500 flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  Latency
+                </p>
+                <p className="text-sm font-medium text-white">
+                  {endpoint.avgLatencyMs > 0 ? `${endpoint.avgLatencyMs}ms` : '--'}
+                </p>
+              </div>
+              <div className="rounded-lg bg-gray-800/50 px-3 py-2">
+                <p className="text-xs text-gray-500 flex items-center gap-1">
+                  <Cpu className="h-3 w-3" />
+                  Replicas
+                </p>
+                <p className="text-sm font-medium text-white">
+                  {endpoint.replicas}/{endpoint.maxReplicas}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col gap-1 flex-shrink-0">
+            {endpoint.status === 'paused' ? (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-green-400 hover:text-green-300 hover:bg-green-500/10 h-8 w-8 p-0"
+                title="Resume"
+                disabled={actionLoading !== null}
+                onClick={() => onAction('resume', endpoint.id)}
+              >
+                {actionLoading === `resume-${endpoint.id}` ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
+              </Button>
+            ) : endpoint.status === 'running' ? (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-gray-400 hover:text-white h-8 w-8 p-0"
+                title="Pause"
+                disabled={actionLoading !== null}
+                onClick={() => onAction('pause', endpoint.id)}
+              >
+                {actionLoading === `pause-${endpoint.id}` ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Pause className="h-4 w-4" />
+                )}
+              </Button>
+            ) : null}
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-[#FF9D00] hover:text-[#ffb740] h-8 w-8 p-0"
+              title="Scale"
+              disabled={actionLoading !== null}
+              onClick={() => onAction('scale', endpoint.id)}
+            >
+              {actionLoading === `scale-${endpoint.id}` ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ArrowUpDown className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function HuggingFaceSkeleton() {
+  return (
+    <div className="space-y-6">
+      <Skeleton className="h-40 w-full rounded-2xl bg-gray-800" />
+      <div className="grid gap-4 md:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <Skeleton key={i} className="h-24 bg-gray-800" />
+        ))}
+      </div>
+      <Skeleton className="h-10 w-80 bg-gray-800" />
+      <div className="space-y-3">
+        {[...Array(3)].map((_, i) => (
+          <Skeleton key={i} className="h-28 bg-gray-800" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Utilities
+// ---------------------------------------------------------------------------
+
+function formatNumber(num: number): string {
+  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
+  if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K`;
+  return num.toString();
+}

@@ -110,6 +110,9 @@ export class SignatureExperience {
   private brandLogo: THREE.Group | null = null;
   private roses: THREE.Object3D[] = [];
 
+  // Props — natural habitats for products (runway/showroom theme)
+  private props: THREE.Group[] = [];
+
   // State
   private animationId: number | null = null;
   private clock: THREE.Clock;
@@ -149,6 +152,7 @@ export class SignatureExperience {
     this.setupLighting();
     this.createFountain();
     this.createBrandLogo();
+    this.createShowroomProps();
 
     // Initialize hotspot system
     this.initializeHotspots();
@@ -436,6 +440,128 @@ export class SignatureExperience {
     this.scene.add(this.brandLogo);
   }
 
+  /**
+   * Create showroom/runway props — natural habitats for products.
+   * Industrial garment racks, glass display cases, concrete pedestals,
+   * mannequin forms, velvet display tables.
+   */
+  private createShowroomProps(): void {
+    const metalMaterial = new THREE.MeshStandardMaterial({
+      color: 0x4a4a4a,
+      roughness: 0.3,
+      metalness: 0.8,
+    });
+
+    const glassMaterial = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.1,
+      roughness: 0,
+      metalness: 0.2,
+    });
+
+    // Industrial garment rack (left side of runway)
+    const rack = new THREE.Group();
+    // Horizontal bar
+    const barGeo = new THREE.CylinderGeometry(0.025, 0.025, 3, 8);
+    const bar = new THREE.Mesh(barGeo, metalMaterial);
+    bar.rotation.z = Math.PI / 2;
+    bar.position.y = 2;
+    rack.add(bar);
+    // Vertical supports
+    const supportGeo = new THREE.CylinderGeometry(0.03, 0.03, 2, 8);
+    [[-1.5, 1, 0], [1.5, 1, 0]].forEach(([x, y, z]) => {
+      const support = new THREE.Mesh(supportGeo, metalMaterial);
+      support.position.set(x!, y!, z!);
+      rack.add(support);
+    });
+    // Base feet
+    const footGeo = new THREE.BoxGeometry(0.8, 0.04, 0.4);
+    [[-1.5, 0.02, 0], [1.5, 0.02, 0]].forEach(([x, y, z]) => {
+      const foot = new THREE.Mesh(footGeo, metalMaterial);
+      foot.position.set(x!, y!, z!);
+      rack.add(foot);
+    });
+    rack.position.set(-6, 0, 3);
+    rack.castShadow = true;
+    this.scene.add(rack);
+    this.props.push(rack);
+
+    // Glass display case (showroom)
+    const displayCase = new THREE.Group();
+    // Glass box
+    const caseGeo = new THREE.BoxGeometry(1.2, 0.8, 0.8);
+    const caseBox = new THREE.Mesh(caseGeo, glassMaterial);
+    caseBox.position.y = 1.5;
+    displayCase.add(caseBox);
+    // Metal base
+    const caseBaseGeo = new THREE.BoxGeometry(1.3, 0.06, 0.9);
+    const caseBase = new THREE.Mesh(caseBaseGeo, metalMaterial);
+    caseBase.position.y = 1.1;
+    displayCase.add(caseBase);
+    // Stand
+    const caseStandGeo = new THREE.CylinderGeometry(0.15, 0.2, 1.1, 12);
+    const caseStand = new THREE.Mesh(caseStandGeo, metalMaterial);
+    caseStand.position.y = 0.55;
+    displayCase.add(caseStand);
+    displayCase.position.set(6, 0, -3);
+    displayCase.castShadow = true;
+    this.scene.add(displayCase);
+    this.props.push(displayCase);
+
+    // Concrete pedestal pair (flanking runway)
+    const concreteMat = new THREE.MeshStandardMaterial({
+      color: 0x808080,
+      roughness: 0.9,
+      metalness: 0.05,
+    });
+    [[-3, 0, -5], [3, 0, -5]].forEach(([x, y, z]) => {
+      const ped = new THREE.Group();
+      const pedGeo = new THREE.BoxGeometry(0.8, 1.2, 0.8);
+      const pedMesh = new THREE.Mesh(pedGeo, concreteMat);
+      pedMesh.position.y = 0.6;
+      pedMesh.castShadow = true;
+      pedMesh.receiveShadow = true;
+      ped.add(pedMesh);
+      ped.position.set(x!, y!, z!);
+      this.scene.add(ped);
+      this.props.push(ped);
+    });
+
+    // Mannequin form (fitting room area)
+    const mannequin = new THREE.Group();
+    const torsoGeo = new THREE.CylinderGeometry(0.25, 0.2, 1.2, 12);
+    const torsoMat = new THREE.MeshStandardMaterial({
+      color: BRAND_COLORS.ivory,
+      roughness: 0.6,
+    });
+    const torso = new THREE.Mesh(torsoGeo, torsoMat);
+    torso.position.y = 1.8;
+    mannequin.add(torso);
+    // Shoulders
+    const shoulderGeo = new THREE.SphereGeometry(0.3, 12, 8);
+    const shoulder = new THREE.Mesh(shoulderGeo, torsoMat);
+    shoulder.position.y = 2.4;
+    shoulder.scale.set(1.2, 0.4, 0.8);
+    mannequin.add(shoulder);
+    // Stand pole
+    const poleGeo = new THREE.CylinderGeometry(0.03, 0.03, 1.2, 8);
+    const pole = new THREE.Mesh(poleGeo, metalMaterial);
+    pole.position.y = 0.6;
+    mannequin.add(pole);
+    // Base
+    const mannBaseGeo = new THREE.CylinderGeometry(0.3, 0.35, 0.08, 16);
+    const mannBase = new THREE.Mesh(mannBaseGeo, metalMaterial);
+    mannBase.position.y = 0.04;
+    mannequin.add(mannBase);
+    mannequin.position.set(0, 0, 8);
+    mannequin.castShadow = true;
+    this.scene.add(mannequin);
+    this.props.push(mannequin);
+
+    this.logger.info(`Created ${this.props.length} showroom props`);
+  }
+
   private async initializeHotspots(): Promise<void> {
     try {
       // Create hotspot manager
@@ -660,6 +786,13 @@ export class SignatureExperience {
       this.scene.remove(r);
     });
     this.roses = [];
+
+    // Dispose props
+    this.props.forEach((prop) => {
+      prop.traverse(disposeMesh);
+      this.scene.remove(prop);
+    });
+    this.props = [];
 
     // Dispose fountain
     if (this.fountain) {

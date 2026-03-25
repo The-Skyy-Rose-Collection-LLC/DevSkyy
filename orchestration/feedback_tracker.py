@@ -108,8 +108,7 @@ class FeedbackTracker:
     def _init_db(self) -> None:
         """Initialize SQLite database."""
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute(
-                """
+            conn.execute("""
                 CREATE TABLE IF NOT EXISTS response_metrics (
                     response_id TEXT PRIMARY KEY,
                     provider TEXT NOT NULL,
@@ -124,22 +123,17 @@ class FeedbackTracker:
                     created_at TEXT,
                     metadata TEXT
                 )
-            """
-            )
+            """)
 
-            conn.execute(
-                """
+            conn.execute("""
                 CREATE INDEX IF NOT EXISTS idx_provider
                 ON response_metrics(provider)
-            """
-            )
+            """)
 
-            conn.execute(
-                """
+            conn.execute("""
                 CREATE INDEX IF NOT EXISTS idx_task_type
                 ON response_metrics(task_type)
-            """
-            )
+            """)
 
             conn.commit()
 

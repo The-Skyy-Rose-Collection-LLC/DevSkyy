@@ -17,7 +17,7 @@ import hashlib
 import logging
 import secrets
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class DataCategory(str, Enum):
+class DataCategory(StrEnum):
     """Categories of personal data"""
 
     IDENTITY = "identity"  # Name, email, phone
@@ -46,7 +46,7 @@ class DataCategory(str, Enum):
     COMMUNICATIONS = "communications"  # Messages, support tickets
 
 
-class LegalBasis(str, Enum):
+class LegalBasis(StrEnum):
     """Legal basis for data processing (GDPR Article 6)"""
 
     CONSENT = "consent"
@@ -57,7 +57,7 @@ class LegalBasis(str, Enum):
     LEGITIMATE_INTERESTS = "legitimate_interests"
 
 
-class RequestType(str, Enum):
+class RequestType(StrEnum):
     """GDPR request types"""
 
     EXPORT = "export"  # Article 15
@@ -68,7 +68,7 @@ class RequestType(str, Enum):
     OBJECT = "object"  # Article 21
 
 
-class RequestStatus(str, Enum):
+class RequestStatus(StrEnum):
     """GDPR request status"""
 
     PENDING = "pending"
@@ -78,7 +78,7 @@ class RequestStatus(str, Enum):
     EXPIRED = "expired"
 
 
-class ExportFormat(str, Enum):
+class ExportFormat(StrEnum):
     """Data export formats"""
 
     JSON = "json"

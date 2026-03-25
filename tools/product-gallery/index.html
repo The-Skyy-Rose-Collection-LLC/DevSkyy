@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyyRose — Product Classifier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #060606; --surface: #0e0e0e; --border: #1e1e1e;
+      --text: #ece5dd; --dim: #9a8f83; --muted: #5c554c;
+      --rose: #B76E79; --red: #8B0000; --gold: #D4AF37; --green: #3a9e5c; --exclude: #5a2a2a;
+      --font-display: 'Cormorant Garamond', serif;
+      --font-ui: 'Syne', sans-serif;
+    }
+    html { font-size: 15px; -webkit-font-smoothing: antialiased; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-ui); min-height: 100vh; }
+
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(6,6,6,0.9); backdrop-filter: blur(16px);
+      border-bottom: 1px solid #161616;
+      padding: 14px 28px; display: flex; align-items: center; gap: 20px;
+    }
+    .logo { font-family: var(--font-display); font-size: 1.5rem; font-weight: 300; color: var(--rose); letter-spacing: 0.06em; white-space: nowrap; }
+    .logo em { font-style: italic; color: var(--dim); font-size: 0.8em; margin-left: 8px; }
+    .progress-wrap { flex: 1; display: flex; align-items: center; gap: 10px; }
+    .progress-bar { flex: 1; height: 3px; background: #1a1a1a; border-radius: 2px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--rose), var(--gold)); transition: width 0.5s ease; }
+    .progress-label { font-size: 0.7rem; color: var(--muted); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+    .hdr-btn { background: none; border: 1px solid #1e1e1e; color: var(--dim); font-family: var(--font-ui); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 7px 14px; border-radius: 5px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .hdr-btn:hover { border-color: var(--rose); color: var(--rose); }
+
+    nav {
+      position: sticky; top: 52px; z-index: 90;
+      background: rgba(6,6,6,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid #161616;
+      padding: 0 28px; display: flex; align-items: center; gap: 2px; overflow-x: auto;
+    }
+    .tab { background: none; border: none; font-family: var(--font-ui); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 12px 14px; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; }
+    .tab:hover { color: var(--dim); }
+    .tab.active { color: var(--text); border-bottom-color: var(--rose); }
+    .spacer { flex: 1; }
+    .pills { display: flex; gap: 3px; padding: 4px 0; }
+    .pill { background: #0e0e0e; border: 1px solid #161616; color: var(--muted); font-family: var(--font-ui); font-size: 0.6rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 4px 9px; border-radius: 16px; cursor: pointer; transition: all 0.2s; }
+    .pill:hover { border-color: #2a2a2a; color: var(--dim); }
+    .pill.active { background: rgba(183,110,121,0.12); border-color: var(--rose); color: var(--rose); }
+
+    main { padding: 24px 28px 100px; }
+    .section { margin-bottom: 40px; }
+    .section-hdr { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #161616; }
+    .section-name { font-family: var(--font-display); font-size: 1.6rem; font-weight: 300; letter-spacing: 0.05em; }
+    .section-count { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+    .section-bar { width: 24px; height: 2px; border-radius: 1px; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+
+    .card {
+      background: var(--surface); border: 1px solid #161616; border-radius: 8px; overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s, transform 0.25s, opacity 0.3s;
+    }
+    .card:hover { border-color: #2a2a2a; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+    .card.st-preorder { border-color: rgba(212,175,55,0.3); box-shadow: 0 0 24px rgba(212,175,55,0.08); }
+    .card.st-ready { border-color: rgba(58,158,92,0.3); box-shadow: 0 0 24px rgba(58,158,92,0.08); }
+    .card.st-exclude { border-color: rgba(90,42,42,0.25); opacity: 0.5; }
+
+    .card-img { position: relative; width: 100%; aspect-ratio: 4/5; background: #090909; overflow: hidden; }
+    .card-img img { width: 100%; height: 100%; object-fit: contain; }
+    .card-img .placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+
+    .img-label { position: absolute; top: 8px; left: 8px; font-size: 0.56rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.55); background: rgba(0,0,0,0.5); padding: 3px 7px; border-radius: 3px; }
+    .img-count { position: absolute; top: 8px; right: 8px; font-size: 0.58rem; font-weight: 600; color: rgba(255,255,255,0.35); }
+    .img-dots { position: absolute; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 5px; padding: 10px; background: linear-gradient(transparent, rgba(0,0,0,0.6)); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; transition: all 0.2s; padding: 0; }
+    .dot.on { background: var(--rose); transform: scale(1.25); }
+    .arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.5); font-size: 0.9rem; transition: all 0.2s; opacity: 0; }
+    .card:hover .arrow { opacity: 1; }
+    .arrow:hover { background: rgba(0,0,0,0.6); color: white; }
+    .arrow.l { left: 6px; }
+    .arrow.r { right: 6px; }
+
+    .card-body { padding: 14px 16px 12px; }
+    .card-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 5px; }
+    .badge { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; }
+    .badge-id { color: var(--dim); background: #141414; font-size: 0.54rem; letter-spacing: 0.04em; }
+    .badge-id .sep { color: var(--muted); margin: 0 3px; }
+    .badge-col { }
+    .card-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 400; line-height: 1.3; margin-bottom: 5px; }
+    .card-desc { font-size: 0.7rem; line-height: 1.5; color: var(--dim); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 12px; }
+
+    .actions { display: flex; gap: 5px; }
+    .act { flex: 1; padding: 8px 4px; font-family: var(--font-ui); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 5px; cursor: pointer; transition: all 0.2s; border: 1px solid #1e1e1e; background: var(--surface); color: var(--muted); }
+    .act:hover { transform: translateY(-1px); }
+    .act.preorder:hover, .act.preorder.on { background: rgba(212,175,55,0.1); border-color: var(--gold); color: var(--gold); }
+    .act.ready:hover, .act.ready.on { background: rgba(58,158,92,0.1); border-color: var(--green); color: var(--green); }
+    .act.exclude:hover, .act.exclude.on { background: rgba(90,42,42,0.1); border-color: var(--exclude); color: #9a5555; }
+
+    .footer {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 80;
+      background: rgba(6,6,6,0.92); backdrop-filter: blur(12px);
+      border-top: 1px solid #161616;
+      padding: 10px 28px; display: flex; align-items: center; gap: 20px;
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .st { display: flex; align-items: center; gap: 5px; }
+    .st-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+    .overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; }
+    .overlay.open { display: flex; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; width: 540px; max-width: 90vw; max-height: 80vh; overflow-y: auto; padding: 24px; }
+    .modal h2 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 400; margin-bottom: 4px; }
+    .modal p { font-size: 0.72rem; color: var(--dim); margin-bottom: 14px; }
+    .modal pre { background: var(--bg); border: 1px solid #161616; border-radius: 5px; padding: 14px; font-size: 0.68rem; line-height: 1.5; color: var(--dim); overflow-x: auto; max-height: 360px; }
+    .modal-btns { display: flex; gap: 6px; margin-top: 14px; justify-content: flex-end; }
+    .mbtn { padding: 8px 16px; border-radius: 5px; font-family: var(--font-ui); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; }
+    .mbtn.primary { background: var(--rose); border: none; color: white; }
+    .mbtn.ghost { background: none; border: 1px solid #1e1e1e; color: var(--dim); }
+
+    @media (max-width: 768px) {
+      header, nav, main { padding-left: 14px; padding-right: 14px; }
+      .grid { grid-template-columns: 1fr; }
+      .logo em { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">SkyyRose<em>Product Classifier</em></div>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+    <div class="progress-label" id="pLabel">0/0</div>
+  </div>
+  <button class="hdr-btn" id="exportBtn">Export</button>
+</header>
+
+<nav>
+  <button class="tab active" data-f="all">All</button>
+  <button class="tab" data-f="black-rose">Black Rose</button>
+  <button class="tab" data-f="love-hurts">Love Hurts</button>
+  <button class="tab" data-f="signature">Signature</button>
+  <div class="spacer"></div>
+  <div class="pills">
+    <button class="pill active" data-s="all">All</button>
+    <button class="pill" data-s="unset">Unset</button>
+    <button class="pill" data-s="preorder">Pre-Order</button>
+    <button class="pill" data-s="ready">Ready</button>
+    <button class="pill" data-s="exclude">Exclude</button>
+  </div>
+</nav>
+
+<main id="gallery"></main>
+<div class="footer" id="footer"></div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2>Export Classifications</h2>
+    <p>Copy this JSON for WooCommerce product setup.</p>
+    <pre id="exportOut"></pre>
+    <div class="modal-btns">
+      <button class="mbtn ghost" onclick="document.getElementById('overlay').classList.remove('open')">Close</button>
+      <button class="mbtn primary" id="copyBtn">Copy</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─── PRODUCT DATA ─────────────────────────────────── */
+
+const PRODUCTS = [
+  // ── Black Rose (8 products) ───────────────────────────────────
+  { id:'br-001', name:'BLACK Rose Crewneck', col:'black-rose', desc:'Gothic luxury. Embossed rose on deep black, a dark romance woven in every thread.' },
+  { id:'br-002', name:'BLACK Rose Joggers', col:'black-rose', desc:'Twilight comfort meets gothic romance. Silicone rubber rose logo on soft fabric.' },
+  { id:'br-003', name:'BLACK is Beautiful Jersey', col:'black-rose', desc:'3 colorways: black, Giants, Oakland A\'s. BLACK ROSE Collection streetwise elegance.' },
+  { id:'br-004', name:'BLACK Rose Hoodie', col:'black-rose', desc:'Gothic luxury in twilight shadows. Embossed rose detail, cascade sleeve design.' },
+  { id:'br-005', name:'BLACK Rose Hoodie \u2014 Signature Edition', col:'black-rose', desc:'Exquisite rose embroidery on deep charcoal. Sleeve cascade of roses and thorns.' },
+  { id:'br-006', name:'BLACK Rose Sherpa Jacket', col:'black-rose', desc:'Lustrous black satin with plush Sherpa lining, crowned by an embroidered rose.' },
+  { id:'br-007', name:'BLACK Rose \u00d7 Love Hurts Basketball Shorts', col:'black-rose', desc:'Embroidered roses bloom on black mesh, a gothic love letter to Oakland.' },
+  { id:'br-008', name:"Women's BLACK Rose Hooded Dress", col:'black-rose', desc:'Intricate black rose embroidery and a silhouette of gothic mystery.' },
+  // ── Love Hurts (5 products) ───────────────────────────────────
+  { id:'lh-001', name:'The Fannie', col:'love-hurts', desc:'Luxury fanny pack. Black pebbled leather, "FANNIE" in white script, red rose embroidery.' },
+  { id:'lh-002', name:'Love Hurts Joggers', col:'love-hurts', desc:'Where Oakland grit meets luxury. Embroidered rose, passion forged in the streets.' },
+  { id:'lh-003', name:'Love Hurts Basketball Shorts', col:'love-hurts', desc:'Defiant rose design on breathable mesh. Oakland-inspired luxury streetwear.' },
+  { id:'lh-004', name:'Love Hurts Varsity Jacket', col:'love-hurts', desc:'Black satin, fire-red script, secret rose garden inside the hood.' },
+  // ── Signature (11 products — NO sg-001) ───────────────────────
+  { id:'sg-002', name:'Stay Golden Set', col:'signature', desc:'Luxurious Bay Area streetwear. Signature rose and cityscape on mint.' },
+  { id:'sg-003', name:'The Signature Tee', col:'signature', desc:'Premium staple. Signature Collection original label, screen-printed logo.' },
+  { id:'sg-004', name:'The Signature Hoodie', col:'signature', desc:'Full hoodie with embroidered signature logo. Raised thread texture detail.' },
+  { id:'sg-005', name:'Stay Golden Tee', col:'signature', desc:'West Coast ambition. Opulent rose design symbolizing resilience and growth.' },
+  { id:'sg-006', name:'Mint & Lavender Hoodie', col:'signature', desc:'Refreshing mint base meets opulent lavender artistry. Unique colorway.' },
+  { id:'sg-007', name:'The Signature Beanie', col:'signature', desc:'Luxurious knit beanie in black. Signature rose embroidery, bespoke comfort.' },
+  { id:'sg-008', name:'Signature Beanie (Forest Green)', col:'signature', desc:'Forest green knit beanie. Signature rose embroidery, Bay Area earth tones.' },
+  { id:'sg-009', name:'The Sherpa Jacket', col:'signature', desc:'Opulent West Coast outerwear featuring signature rose embroidery on sherpa.' },
+  { id:'sg-010', name:'The Bridge Series Shorts', col:'signature', desc:'Bay Area iconic spirit. Bridge panoramas on mesh shorts, matching tees available.' },
+  { id:'sg-011', name:'Original Label Tee (White)', col:'signature', desc:'Clean white premium tee. Signature Collection original label, couture everyday luxury.' },
+  { id:'sg-012', name:'Original Label Tee (Orchid)', col:'signature', desc:'Orchid premium tee. Signature Collection original label, bold color statement.' },
+];
+
+const COL = {
+  'black-rose': { name:'BLACK ROSE', accent:'#B76E79' },
+  'love-hurts': { name:'LOVE HURTS', accent:'#8B0000' },
+  'signature':  { name:'SIGNATURE',  accent:'#D4AF37' },
+};
+
+/* ─── IMAGE MAP ────────────────────────────────────── */
+/* Priority: REAL product photos first, CDN second, AI/avatar LAST */
+
+// Single source: wordpress-theme/skyyrose-flagship/assets/images/products/{sku}/
+// Order: Techflat → Flatlay/Product Photo → Render (Model)
+const P = 'wordpress-theme/skyyrose-flagship/assets/images/products';
+
+function img(sku, file, label) {
+  return { src: '/' + P + '/' + sku + '/' + encodeURIComponent(file), label };
+}
+
+const IMAGES = {
+  'br-001': [
+    img('br-001', 'br-001-techflat-v4.jpg', 'Techflat'),
+    img('br-001', 'br-001-front-model.webp', 'Render Front'),
+    img('br-001', 'br-001-back-model.webp', 'Render Back'),
+  ],
+  'br-002': [
+    img('br-002', 'br-002-joggers-source.jpg', 'Flatlay'),
+    img('br-002', 'br-002-front-model.webp', 'Render Front'),
+    img('br-002', 'br-002-back-model.webp', 'Render Back'),
+  ],
+  'br-003': [
+    img('br-003', 'br-003-techflat-black.jpeg', 'Techflat — Black'),
+    img('br-003', 'br-003-techflat-giants.jpeg', 'Techflat — Giants'),
+    img('br-003', 'br-003-techflat-oakland.jpeg', "Techflat — Oakland A's"),
+    img('br-003', 'br-003-jersey-front-techflat.jpg', 'Techflat Front'),
+    img('br-003', 'br-003-jersey-back-techflat.jpg', 'Techflat Back'),
+    img('br-003', 'br-003-front-model.webp', 'Render Front'),
+    img('br-003', 'br-003-back-model.webp', 'Render Back'),
+  ],
+  'br-004': [
+    img('br-004', 'br-004-hoodie-product.jpg', 'Flatlay'),
+    img('br-004', 'br-004-hoodie-alt-source.jpg', 'Flatlay Alt'),
+    img('br-004', 'br-hoodie-cloud-sleeve-photo.jpg', 'Flatlay — Sleeve'),
+    img('br-004', 'br-004-front-model.webp', 'Render Front'),
+    img('br-004', 'br-004-back-model.webp', 'Render Back'),
+  ],
+  'br-005': [
+    img('br-005', 'br-005-hoodie-ltd-source.jpg', 'Flatlay'),
+    img('br-005', 'br-005-front-model.webp', 'Render Front'),
+    img('br-005', 'br-005-back-model.webp', 'Render Back'),
+  ],
+  'br-006': [
+    img('br-006', 'br-006-sherpa-product.jpg', 'Flatlay'),
+    img('br-006', 'br-006-sherpa-rose-detail.jpg', 'Flatlay — Rose'),
+    img('br-006', 'br-006-sherpa-interior.jpg', 'Flatlay — Interior'),
+    img('br-006', 'br-006-sherpa-lining-detail.jpg', 'Flatlay — Lining'),
+    img('br-006', 'br-006-front-model.webp', 'Render Front'),
+    img('br-006', 'br-006-back-model.webp', 'Render Back'),
+  ],
+  'br-007': [
+    img('br-007', 'br-007-techflat.jpeg', 'Techflat'),
+    img('br-007', 'br-007-shorts.jpg', 'Flatlay'),
+    img('br-007', 'br-007-shorts-front-source.jpg', 'Flatlay Front'),
+    img('br-007', 'br-007-shorts-back-source.jpg', 'Flatlay Back'),
+    img('br-007', 'br-007-front-model.webp', 'Render Front'),
+    img('br-007', 'br-007-back-model.webp', 'Render Back'),
+  ],
+  'br-008': [
+    img('br-008', 'br-008-front-model.webp', 'Render Front'),
+    img('br-008', 'br-008-back-model.webp', 'Render Back'),
+  ],
+
+  'lh-001': [
+    img('lh-001', 'lh-001-fannie-pack-photo.jpg', 'Flatlay'),
+    img('lh-001', 'lh-001-fannie-pack-mockup.jpg', 'Flatlay — Mockup'),
+    img('lh-001', 'lh-001-front-model.webp', 'Render'),
+  ],
+  'lh-002': [
+    img('lh-002', 'lh-002-techflat.jpeg', 'Techflat'),
+    img('lh-002', 'lh-002-techflat-set.jpeg', 'Techflat — Set'),
+    img('lh-002', 'lh-002-joggers-variants.jpg', 'Flatlay — Variants'),
+    img('lh-002', 'lh-002-front-model.webp', 'Render Front'),
+    img('lh-002', 'lh-002-back-model.webp', 'Render Back'),
+  ],
+  'lh-003': [
+    img('lh-003', 'lh-003-techflat-v4.jpg', 'Techflat'),
+    img('lh-003', 'lh-003-shorts-front-source.jpg', 'Flatlay Front'),
+    img('lh-003', 'lh-003-shorts-back-source.jpg', 'Flatlay Back'),
+    img('lh-003', 'lh-003-shorts-front-closeup.jpg', 'Flatlay — Closeup Front'),
+    img('lh-003', 'lh-003-shorts-back-closeup.jpg', 'Flatlay — Closeup Back'),
+    img('lh-003', 'lh-003-front-model.webp', 'Render Front'),
+    img('lh-003', 'lh-003-back-model.webp', 'Render Back'),
+  ],
+  'lh-004': [
+    img('lh-004', 'lh-004-techflat-photo.jpeg', 'Techflat'),
+    img('lh-004', 'lh-004-varsity-source.jpg', 'Flatlay'),
+    img('lh-004', 'lh-004-front-model.webp', 'Render Front'),
+    img('lh-004', 'lh-004-back-model.webp', 'Render Back'),
+  ],
+  'sg-002': [
+    img('sg-002', 'sg-002-techflat-v4.jpg', 'Techflat'),
+    img('sg-002', 'sg-002-front-model.webp', 'Render Front'),
+    img('sg-002', 'sg-002-back-model.webp', 'Render Back'),
+  ],
+  'sg-003': [
+    img('sg-003', 'sg-003-front-model.webp', 'Render Front'),
+    img('sg-003', 'sg-003-back-model.webp', 'Render Back'),
+  ],
+  'sg-004': [
+    img('sg-004', 'sg-004-techflat.jpeg', 'Techflat'),
+    img('sg-004', 'sg-004-front-model.webp', 'Render Front'),
+    img('sg-004', 'sg-004-back-model.webp', 'Render Back'),
+  ],
+  'sg-005': [
+    img('sg-005', 'sg-005-techflat.jpeg', 'Techflat'),
+    img('sg-005', 'sg-005-front-model.webp', 'Render Front'),
+    img('sg-005', 'sg-005-back-model.webp', 'Render Back'),
+  ],
+  'sg-006': [
+    img('sg-006', 'sg-006-techflat.jpeg', 'Techflat'),
+    img('sg-006', 'sg-006-hoodie-source.jpg', 'Flatlay'),
+    img('sg-006', 'sg-006-front-model.webp', 'Render Front'),
+    img('sg-006', 'sg-006-back-model.webp', 'Render Back'),
+  ],
+  'sg-007': [
+    img('sg-007', 'sg-007-techflat-v4.jpg', 'Techflat'),
+    img('sg-007', 'sg-007-008-techflat-beanies.jpeg', 'Techflat — Both Beanies'),
+    img('sg-007', 'sg-007-beanie-black.jpg', 'Flatlay'),
+    img('sg-007', 'sg-007-beanie-source.jpg', 'Flatlay — Source'),
+    img('sg-007', 'sg-007-front-model.webp', 'Render'),
+  ],
+  'sg-008': [
+    img('sg-008', 'sg-008-beanie-green.jpg', 'Flatlay'),
+    img('sg-008', 'sg-008-front-model.webp', 'Render Front'),
+    img('sg-008', 'sg-008-back-model.webp', 'Render Back'),
+  ],
+  'sg-009': [
+    img('sg-009', 'sg-009-front-model.webp', 'Render Front'),
+    img('sg-009', 'sg-009-back-model.webp', 'Render Back'),
+  ],
+  'sg-010': [
+    img('sg-010', 'sg-010-bridge-shorts-variants.jpg', 'Flatlay — Variants'),
+    img('sg-010', 'sg-010-front-model.webp', 'Render Front'),
+    img('sg-010', 'sg-010-back-model.webp', 'Render Back'),
+  ],
+  'sg-011': [
+    img('sg-011', 'sg-011-front-model.webp', 'Render Front'),
+    img('sg-011', 'sg-011-back-model.webp', 'Render Back'),
+  ],
+  'sg-012': [
+    img('sg-012', 'sg-012-front-model.webp', 'Render Front'),
+    img('sg-012', 'sg-012-back-model.webp', 'Render Back'),
+  ],
+};
+
+/* ─── STATE ────────────────────────────────────────── */
+
+const KEY = 'skyyrose-classifications';
+let cls = {};
+let idx = {};   // image index per product
+let colFilter = 'all';
+let stFilter = 'all';
+
+function load() { try { cls = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e) { cls = {}; } }
+function save() { localStorage.setItem(KEY, JSON.stringify(cls)); }
+
+function classify(id, status) {
+  cls[id] = cls[id] === status ? undefined : status;
+  if (!cls[id]) delete cls[id];
+  save();
+  const card = document.querySelector(`[data-id="${id}"]`);
+  if (card) syncCard(card, id);
+  syncProgress();
+}
+
+/* ─── RENDER ───────────────────────────────────────── */
+
+function render() {
+  const main = document.getElementById('gallery');
+  main.innerHTML = '';
+  const cols = ['black-rose','love-hurts','signature'];
+  const shown = cols.filter(c => colFilter === 'all' || c === colFilter);
+
+  shown.forEach(col => {
+    const prods = PRODUCTS.filter(pr => {
+      if (pr.col !== col) return false;
+      if (stFilter === 'unset') return !cls[pr.id];
+      if (stFilter !== 'all') return cls[pr.id] === stFilter;
+      return true;
+    });
+    if (!prods.length) return;
+    const m = COL[col];
+    const sec = document.createElement('div');
+    sec.className = 'section';
+    sec.innerHTML = `
+      <div class="section-hdr">
+        <div class="section-bar" style="background:${m.accent}"></div>
+        <h2 class="section-name" style="color:${m.accent}">${m.name}</h2>
+        <span class="section-count">${prods.length} product${prods.length>1?'s':''}</span>
+      </div>
+      <div class="grid">${prods.map(pr => cardHTML(pr)).join('')}</div>
+    `;
+    main.appendChild(sec);
+  });
+
+  // Wire events
+  main.querySelectorAll('.card').forEach(card => {
+    const id = card.dataset.id;
+    card.querySelectorAll('.act').forEach(b => b.onclick = () => classify(id, b.dataset.st));
+    const arrowL = card.querySelector('.arrow.l');
+    const arrowR = card.querySelector('.arrow.r');
+    if (arrowL) arrowL.onclick = e => { e.stopPropagation(); navImg(id, -1); };
+    if (arrowR) arrowR.onclick = e => { e.stopPropagation(); navImg(id, 1); };
+    card.querySelectorAll('.dot').forEach((d,i) => d.onclick = e => { e.stopPropagation(); setImg(id, i); });
+  });
+
+  syncProgress();
+}
+
+function cardHTML(pr) {
+  const imgs = IMAGES[pr.id] || [];
+  const i = idx[pr.id] || 0;
+  const cur = imgs[i];
+  const st = cls[pr.id];
+  const m = COL[pr.col];
+
+  let cc = 'card';
+  if (st === 'preorder') cc += ' st-preorder';
+  if (st === 'ready') cc += ' st-ready';
+  if (st === 'exclude') cc += ' st-exclude';
+
+  // Image area - graceful fallback, never destroy carousel
+  let imgArea;
+  if (!imgs.length) {
+    imgArea = '<div class="placeholder">No product photo</div>';
+  } else {
+    // Use a wrapper so onerror only hides the img, not the nav
+    imgArea = `
+      <img src="${cur.src}" alt="${pr.name}" id="img-${pr.id}"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="placeholder" style="display:none; position:absolute; inset:0;">Image failed to load</div>
+      <div class="img-label">${cur.label}</div>
+      <div class="img-count">${i+1}/${imgs.length}</div>
+      ${imgs.length > 1 ? `<button class="arrow l">\u2039</button><button class="arrow r">\u203a</button>` : ''}
+      ${imgs.length > 1 ? `<div class="img-dots">${imgs.map((_,j) => `<button class="dot${j===i?' on':''}" data-i="${j}"></button>`).join('')}</div>` : ''}
+    `;
+  }
+
+  return `
+    <div class="${cc}" data-id="${pr.id}">
+      <div class="card-img">${imgArea}</div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="badge badge-id">${m.name}<span class="sep">/</span>${pr.name}<span class="sep">/</span>${pr.id.split('-')[1]}</span>
+        </div>
+        <h3 class="card-name">${pr.name}</h3>
+        <p class="card-desc">${pr.desc}</p>
+        <div class="actions">
+          <button class="act preorder${st==='preorder'?' on':''}" data-st="preorder">Pre-Order</button>
+          <button class="act ready${st==='ready'?' on':''}" data-st="ready">Ready to Sell</button>
+          <button class="act exclude${st==='exclude'?' on':''}" data-st="exclude">Exclude</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function syncCard(card, id) {
+  const st = cls[id];
+  card.className = 'card' + (st === 'preorder' ? ' st-preorder' : st === 'ready' ? ' st-ready' : st === 'exclude' ? ' st-exclude' : '');
+  card.querySelectorAll('.act').forEach(b => b.classList.toggle('on', b.dataset.st === st));
+}
+
+function navImg(id, dir) {
+  const imgs = IMAGES[id] || [];
+  if (imgs.length < 2) return;
+  const cur = idx[id] || 0;
+  setImg(id, (cur + dir + imgs.length) % imgs.length);
+}
+
+function setImg(id, i) {
+  const imgs = IMAGES[id] || [];
+  if (i < 0 || i >= imgs.length) return;
+  idx[id] = i;
+  const card = document.querySelector(`[data-id="${id}"]`);
+  if (!card) return;
+  const img = card.querySelector('.card-img img');
+  const lbl = card.querySelector('.img-label');
+  const cnt = card.querySelector('.img-count');
+  const ph = card.querySelector('.card-img .placeholder');
+  if (img) { img.style.display = ''; img.src = imgs[i].src; }
+  if (ph) ph.style.display = 'none';
+  if (lbl) lbl.textContent = imgs[i].label;
+  if (cnt) cnt.textContent = `${i+1}/${imgs.length}`;
+  card.querySelectorAll('.dot').forEach((d,j) => d.classList.toggle('on', j === i));
+}
+
+function syncProgress() {
+  const total = PRODUCTS.length;
+  const done = Object.keys(cls).filter(k => PRODUCTS.some(pr => pr.id === k)).length;
+  document.getElementById('pFill').style.width = (total ? done/total*100 : 0) + '%';
+  document.getElementById('pLabel').textContent = `${done}/${total}`;
+
+  const counts = { preorder:0, ready:0, exclude:0, unset:0 };
+  PRODUCTS.forEach(pr => { const s = cls[pr.id]; if (s) counts[s]++; else counts.unset++; });
+  document.getElementById('footer').innerHTML = `
+    <div class="st"><div class="st-dot" style="background:var(--gold)"></div><span style="color:var(--text)">${counts.preorder}</span><span style="color:var(--muted)">Pre-Order</span></div>
+    <div class="st"><div class="st-dot" style="background:var(--green)"></div><span style="color:var(--text)">${counts.ready}</span><span style="color:var(--muted)">Ready</span></div>
+    <div class="st"><div class="st-dot" style="background:var(--exclude)"></div><span style="color:var(--text)">${counts.exclude}</span><span style="color:var(--muted)">Exclude</span></div>
+    <div class="st"><div class="st-dot" style="background:var(--muted)"></div><span style="color:var(--text)">${counts.unset}</span><span style="color:var(--muted)">Unset</span></div>
+  `;
+}
+
+/* ─── EVENTS ───────────────────────────────────────── */
+
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  colFilter = t.dataset.f;
+  render();
+});
+document.querySelectorAll('.pill').forEach(p => p.onclick = () => {
+  document.querySelectorAll('.pill').forEach(x => x.classList.remove('active'));
+  p.classList.add('active');
+  stFilter = p.dataset.s;
+  render();
+});
+
+document.getElementById('exportBtn').onclick = () => {
+  const out = { pre_order: [], ready_to_sell: [], exclude: [], unset: [] };
+  PRODUCTS.forEach(pr => {
+    const s = cls[pr.id];
+    const e = { id: pr.id, name: pr.name };
+    if (s === 'preorder') out.pre_order.push(e);
+    else if (s === 'ready') out.ready_to_sell.push(e);
+    else if (s === 'exclude') out.exclude.push(e);
+    else out.unset.push(e);
+  });
+  document.getElementById('exportOut').textContent = JSON.stringify(out, null, 2);
+  document.getElementById('overlay').classList.add('open');
+};
+
+document.getElementById('overlay').onclick = e => { if (e.target.id === 'overlay') e.target.classList.remove('open'); };
+document.getElementById('copyBtn').onclick = () => {
+  navigator.clipboard.writeText(document.getElementById('exportOut').textContent).then(() => {
+    const b = document.getElementById('copyBtn');
+    b.textContent = 'Copied!'; setTimeout(() => b.textContent = 'Copy', 1500);
+  });
+};
+document.onkeydown = e => { if (e.key === 'Escape') document.getElementById('overlay').classList.remove('open'); };
+
+/* ─── INIT ─────────────────────────────────────────── */
+
+load();
+render();
+
+</script>
+</body>
+</html>

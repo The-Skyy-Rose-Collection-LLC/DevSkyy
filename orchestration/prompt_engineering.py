@@ -35,7 +35,7 @@ import json
 import logging
 import re
 from collections.abc import Callable
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel
@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class PromptTechnique(str, Enum):
+class PromptTechnique(StrEnum):
     """Prompting techniques"""
 
     ROLE_BASED = "role_based"
@@ -70,7 +70,7 @@ class PromptTechnique(str, Enum):
     ENSEMBLE = "ensemble"
 
 
-class OutputFormat(str, Enum):
+class OutputFormat(StrEnum):
     """Output format types"""
 
     TEXT = "text"
@@ -753,7 +753,7 @@ You are {role}.
         """Get SkyyRose brand expert role"""
         role = "a luxury streetwear brand strategist and fashion expert for SkyyRose"
         background = """
-SkyyRose is an Oakland-based luxury streetwear brand with the philosophy "Where Love Meets Luxury."
+SkyyRose is an Oakland-based luxury streetwear brand with the philosophy "Luxury Grows from Concrete."
 The brand features three collections:
 - BLACK ROSE: Limited edition dark elegance
 - LOVE HURTS: Emotional expression pieces
@@ -806,7 +806,7 @@ Collection: {collection}
 Features: {features}
 
 Write a compelling product description that:
-- Evokes the brand philosophy "Where Love Meets Luxury"
+- Evokes the brand philosophy "Luxury Grows from Concrete."
 - Highlights craftsmanship and exclusivity
 - Appeals to discerning fashion enthusiasts
 - Is 2-3 paragraphs

@@ -1,0 +1,88 @@
+{
+  "_templateId": "ad-creative",
+  "_version": "1.0.0",
+  "_description": "Ad creative / social media template. New pipeline. Collection-scoped.",
+
+  "header": "LUXURY FASHION AD CREATIVE — SKYYROSE",
+
+  "platforms": {
+    "instagram": {
+      "ratio": "1:1",
+      "style": "Square editorial post — product hero with brand identity",
+      "textOverlay": "Minimal — brand name only or no text",
+      "composition": "Product centered, strong negative space, luxury feel"
+    },
+    "stories": {
+      "ratio": "9:16",
+      "style": "Full-bleed vertical — immersive, swipe-worthy",
+      "textOverlay": "Product name top, CTA bottom (brief)",
+      "composition": "Full-frame product or model, vertical flow"
+    },
+    "tiktok-cover": {
+      "ratio": "9:16",
+      "style": "Bold, high-energy vertical thumbnail",
+      "textOverlay": "Punchy headline possible",
+      "composition": "Dynamic angle, color-forward, visual hook"
+    },
+    "launch-banner": {
+      "ratio": "16:9",
+      "style": "Wide cinematic banner — editorial brand moment",
+      "textOverlay": "Collection name + tagline",
+      "composition": "Panoramic, cinematic, product in context"
+    }
+  },
+
+  "collectionVoice": {
+    "black-rose": {
+      "tone": "Mysterious, editorial, gothic luxury",
+      "copyStyle": "Poetic, dark romantic, aspirational shadow",
+      "colorEmphasis": "#B76E79 rose gold highlights against deep blacks",
+      "visualStyle": "Dark, moody, cinematic — Vogue dark editorial",
+      "taglines": ["Where darkness blooms", "Wear the shadows", "Bloom in the night"]
+    },
+    "love-hurts": {
+      "tone": "Bold, passionate, street-heat",
+      "copyStyle": "Raw, direct, emotionally charged",
+      "colorEmphasis": "#8B0000 crimson against leather black",
+      "visualStyle": "Dramatic, high-contrast, raw energy",
+      "taglines": ["Love in every stitch", "Wear your pain beautifully", "Bold as the heart that breaks"]
+    },
+    "signature": {
+      "tone": "High fashion, prestige, Bay Area pride",
+      "copyStyle": "Elevated, confident, West Coast luxury",
+      "colorEmphasis": "#D4AF37 champagne gold against white marble",
+      "visualStyle": "Clean, elevated, editorial — Vogue minimalist",
+      "taglines": ["Stay Golden", "Sign your legacy", "Bay-born luxury"]
+    },
+    "kids-capsule": {
+      "tone": "Joyful luxury, aspirational, SPECIAL",
+      "copyStyle": "Warm, celebratory, inclusive premium",
+      "colorEmphasis": "Vibrant colorblock palette",
+      "visualStyle": "Bright, energetic, premium — elevated kids editorial",
+      "taglines": ["Little royalty", "Tiny luxury, big style", "The next generation blooms"],
+      "specialInstruction": "Make these look SPECIAL — this is the introduction to the kids collection. Not generic. Premium and joyful."
+    }
+  },
+
+  "productPlacement": {
+    "primary": "Product flat lay or on-model hero shot",
+    "skyyOverlay": "Optional: Skyy character pose image as brand mascot overlay",
+    "logoFingerprint": "Use logoFingerprint data to ensure logo accuracy in composites",
+    "brandingBlock": "Brand name and tagline — minimum presence, maximum impact"
+  },
+
+  "technical": {
+    "quality": "Commercial advertising quality — print + digital ready",
+    "colorGrading": "Rich, saturated, luxury color grade matching collection palette",
+    "sharpness": "Crystal clear product visibility — no artistic blur on product",
+    "brandConsistency": "Every ad must be unmistakably SkyyRose — consistent visual language"
+  },
+
+  "criticalRules": [
+    "Product must be clearly identifiable in every ad",
+    "Brand identity must be immediately clear — this is SkyyRose",
+    "Logo accuracy: use logoFingerprint spec if available",
+    "Collection visual identity must be consistent — no cross-collection mixing",
+    "Avoid generic stock-photo energy — every image should feel custom and luxury"
+  ]
+}

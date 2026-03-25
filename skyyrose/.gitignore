@@ -1,0 +1,28 @@
+# Environment — NEVER commit secrets
+.env
+.env.local
+.env.staging
+.env.production
+
+# Dependencies
+node_modules/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Large image assets — host on Cloudflare R2 / CDN (not in git)
+assets/images/scenes/
+assets/images/products/
+assets/images/products-ecom/
+assets/images/collection-bgs/
+assets/images/source-products/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+build/pipeline.log
+
+# Logs
+*.log

@@ -1,0 +1,179 @@
+/**
+ * SkyyRose - SIGNATURE Collection Styles
+ * Cream/gold luxury theme with editorial sophistication
+ */
+
+/* ========================================
+   COLLECTION THEME VARIABLES
+   ======================================== */
+:root[data-collection="signature"],
+.collection-signature {
+  --collection-primary: var(--gold);
+  --collection-secondary: var(--gold-dark);
+  --collection-accent: var(--gold-light);
+  --collection-gradient: var(--gradient-gold);
+  --collection-glow: var(--shadow-glow-gold);
+}
+
+/* ========================================
+   HERO OVERRIDES — SIGNATURE
+   ======================================== */
+.collection-signature .hero-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 8, 0.5),
+    rgba(10, 10, 8, 0.75),
+    rgba(10, 10, 10, 0.95)
+  );
+}
+
+.collection-signature .title-main {
+  color: var(--gold-light);
+  text-shadow: 0 4px 30px rgba(212, 175, 55, 0.5);
+}
+
+.collection-signature .title-tagline {
+  color: var(--gold);
+  text-shadow: 0 0 30px var(--gold-glow);
+}
+
+.collection-signature .collection-description strong {
+  color: var(--gold-light);
+}
+
+/* ========================================
+   STORY SECTION — SIGNATURE
+   ======================================== */
+.collection-signature .collection-story {
+  border-top-color: rgba(212, 175, 55, 0.1);
+  border-bottom-color: rgba(212, 175, 55, 0.1);
+}
+
+.collection-signature .story-subtitle {
+  color: var(--gold);
+}
+
+.collection-signature .story-image {
+  box-shadow: var(--shadow-xl), var(--shadow-glow-gold);
+}
+
+/* ========================================
+   PRODUCT CARDS — SIGNATURE
+   ======================================== */
+.collection-signature .product-card:hover {
+  box-shadow: var(--shadow-xl), var(--shadow-glow-gold);
+}
+
+.collection-signature .product-price {
+  color: var(--gold-light);
+}
+
+.collection-signature .product-badge.bestseller {
+  background: rgba(212, 175, 55, 0.9);
+  color: var(--void);
+}
+
+.collection-signature .product-badge.signature {
+  background: rgba(255, 215, 0, 0.9);
+  color: var(--void);
+}
+
+.collection-signature .wishlist-btn:hover,
+.collection-signature .wishlist-btn.active {
+  background: var(--gold);
+}
+
+.collection-signature .btn-quick-view {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.collection-signature .btn-quick-view:hover {
+  background: var(--gold);
+  color: var(--void);
+  box-shadow: 0 0 20px var(--gold-glow);
+}
+
+/* ========================================
+   BUTTONS — SIGNATURE
+   ======================================== */
+.collection-signature .btn-primary {
+  background: var(--gold);
+  color: var(--void);
+}
+
+.collection-signature .btn-primary:hover {
+  background: var(--gold-dark);
+  box-shadow: var(--shadow-md), var(--shadow-glow-gold);
+  color: var(--void);
+}
+
+/* ========================================
+   SCROLL INDICATOR — SIGNATURE
+   ======================================== */
+.collection-signature .scroll-mouse {
+  border-color: var(--gold);
+}
+
+.collection-signature .scroll-wheel {
+  background: var(--gold);
+}
+
+.collection-signature .scroll-text {
+  color: var(--gold);
+}
+
+/* ========================================
+   CROSS-COLLECTION LINKS
+   ======================================== */
+.collection-signature .other-collections {
+  border-top-color: rgba(212, 175, 55, 0.1);
+}
+
+/* ========================================
+   PRODUCT MODAL — SIGNATURE
+   ======================================== */
+.collection-signature .modal-tag {
+  color: var(--gold);
+}
+
+.collection-signature .modal-price {
+  color: var(--gold-light);
+}
+
+.collection-signature .modal-detail {
+  color: rgba(212, 175, 55, 0.6);
+}
+
+.collection-signature .size-btn.selected {
+  border-color: var(--gold);
+  color: var(--gold-light);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.collection-signature .cart-btn.ready,
+.collection-signature .modal-cta {
+  background: var(--gold);
+  color: var(--void);
+}
+
+.collection-signature .modal-cta:hover {
+  background: var(--gold-dark);
+  box-shadow: 0 0 20px var(--gold-glow);
+}
+
+/* ========================================
+   FOCUS STATES — SIGNATURE
+   ======================================== */
+.collection-signature *:focus-visible {
+  outline-color: var(--gold);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+  .collection-signature .title-main {
+    text-shadow: 0 2px 20px rgba(212, 175, 55, 0.4);
+  }
+}

@@ -27,13 +27,13 @@ import json
 import logging
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class AuditEventType(str, Enum):
+class AuditEventType(StrEnum):
     """Audit event types."""
 
     # Authentication events
@@ -74,7 +74,7 @@ class AuditEventType(str, Enum):
     SECRET_ROTATED = "secret_rotated"
 
 
-class AuditSeverity(str, Enum):
+class AuditSeverity(StrEnum):
     """Audit event severity levels."""
 
     INFO = "info"

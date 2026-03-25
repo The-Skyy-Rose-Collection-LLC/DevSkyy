@@ -14,7 +14,7 @@ import hashlib
 import logging
 import os
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import httpx
@@ -25,7 +25,7 @@ from security.security_monitoring import AlertSeverity, SecurityAlert
 logger = logging.getLogger(__name__)
 
 
-class AlertChannel(str, Enum):
+class AlertChannel(StrEnum):
     """Alert notification channels"""
 
     SLACK = "slack"

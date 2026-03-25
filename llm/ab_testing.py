@@ -22,7 +22,7 @@ import math
 import os
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class ExperimentStatus(str, Enum):
+class ExperimentStatus(StrEnum):
     """Status of an A/B test experiment."""
 
     DRAFT = "draft"
@@ -44,7 +44,7 @@ class ExperimentStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class MetricType(str, Enum):
+class MetricType(StrEnum):
     """Type of metric being tracked."""
 
     CONVERSION = "conversion"  # Binary outcome (0 or 1)
@@ -54,7 +54,7 @@ class MetricType(str, Enum):
     SCORE = "score"  # Rating/score metric
 
 
-class WinnerStatus(str, Enum):
+class WinnerStatus(StrEnum):
     """Winner determination status."""
 
     NO_DATA = "no_data"

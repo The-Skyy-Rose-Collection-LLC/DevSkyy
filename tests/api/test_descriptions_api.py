@@ -12,12 +12,12 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-
-from api.v1.descriptions import get_pipeline, get_vision_client, router
 from services.ml.schemas.description import (
     DescriptionOutput,
     ExtractedFeatures,
 )
+
+from api.v1.descriptions import get_pipeline, get_vision_client, router
 
 # =============================================================================
 # Fixtures

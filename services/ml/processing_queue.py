@@ -24,7 +24,7 @@ from collections import deque
 from collections.abc import Callable, Coroutine
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel
@@ -51,7 +51,7 @@ DEFAULT_RETRY_DELAY_SECONDS = 5
 # =============================================================================
 
 
-class JobStatus(str, Enum):
+class JobStatus(StrEnum):
     """Status of a processing job."""
 
     PENDING = "pending"
@@ -62,7 +62,7 @@ class JobStatus(str, Enum):
     DEAD_LETTER = "dead_letter"
 
 
-class TaskType(str, Enum):
+class TaskType(StrEnum):
     """Types of ML processing tasks."""
 
     BACKGROUND_REMOVAL = "background_removal"

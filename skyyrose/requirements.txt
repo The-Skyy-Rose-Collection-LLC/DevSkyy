@@ -1,0 +1,31 @@
+# SkyyRose — Python Pipeline Dependencies
+# Install: pip3 install -r requirements.txt
+#
+# ⚠️  NUMPY COMPATIBILITY NOTE
+# rembg → pymatting → numba → hard requires numpy ≤ 2.3
+# Do NOT upgrade numpy until numba ships 0.64+ with numpy 2.4 support.
+# Track: https://github.com/numba/numba/issues (watch for 2.4 support)
+#
+# When numba adds numpy 2.4 support, remove the numpy pin and test with:
+#   pip3 install --upgrade numpy pymatting numba rembg
+#   python3 -c "import rembg; print('ok')"
+
+# ── Core background removal ────────────────────────────────────────────────
+rembg==2.0.72
+pymatting==1.1.15
+numba==0.63.1
+llvmlite==0.46.0
+
+# ── Image processing ───────────────────────────────────────────────────────
+Pillow==12.1.1
+scipy==1.17.0
+scikit-image==0.26.0
+
+# ── AI model inference ─────────────────────────────────────────────────────
+onnxruntime==1.24.1
+
+# ── File system watcher ────────────────────────────────────────────────────
+watchdog==6.0.0
+
+# ── PINNED — do not upgrade until numba 0.64+ releases ────────────────────
+numpy==2.3.5

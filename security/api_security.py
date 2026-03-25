@@ -22,7 +22,7 @@ import secrets
 import time
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from fastapi import HTTPException, Request, Response, status
@@ -45,7 +45,7 @@ def _get_cors_origins() -> list[str]:
     return [origin.strip() for origin in origins.split(",") if origin.strip()]
 
 
-class APISecurityLevel(str, Enum):
+class APISecurityLevel(StrEnum):
     """API security levels"""
 
     PUBLIC = "public"  # No authentication required

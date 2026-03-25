@@ -27,19 +27,19 @@ import os
 from abc import ABC, abstractmethod
 from collections.abc import AsyncIterator
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import cohere
 from google import genai
+from groq import AsyncGroq
+from mistralai import Mistral
+from pydantic import BaseModel
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 # Official SDK imports
 from anthropic import AsyncAnthropic
-from groq import AsyncGroq
-from mistralai import Mistral
 from openai import AsyncOpenAI
-from pydantic import BaseModel
-from tenacity import retry, stop_after_attempt, wait_exponential
 
 # Import config for API keys (loads .env.hf)
 try:
@@ -68,7 +68,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class MessageRole(str, Enum):
+class MessageRole(StrEnum):
     """Message roles"""
 
     SYSTEM = "system"

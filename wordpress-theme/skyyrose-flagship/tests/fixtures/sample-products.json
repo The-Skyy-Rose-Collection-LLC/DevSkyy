@@ -1,0 +1,227 @@
+{
+  "products": [
+    {
+      "name": "Luxury Diamond Ring",
+      "sku": "SKR-DR-001",
+      "type": "simple",
+      "regular_price": "2499.99",
+      "sale_price": "1999.99",
+      "description": "Exquisite 18k white gold diamond ring featuring a 1.5 carat center stone.",
+      "short_description": "18k white gold diamond ring with 1.5ct center stone",
+      "categories": ["Rings", "Diamond Jewelry"],
+      "tags": ["luxury", "diamond", "engagement", "wedding"],
+      "images": [
+        "diamond-ring-01.jpg",
+        "diamond-ring-02.jpg",
+        "diamond-ring-03.jpg"
+      ],
+      "3d_model": "diamond-ring.glb",
+      "attributes": {
+        "metal": "18k White Gold",
+        "stone": "Diamond",
+        "carat": "1.5ct"
+      },
+      "stock_quantity": 5,
+      "weight": "4.5",
+      "dimensions": {
+        "length": "2",
+        "width": "2",
+        "height": "1"
+      }
+    },
+    {
+      "name": "Emerald Necklace",
+      "sku": "SKR-EN-002",
+      "type": "simple",
+      "regular_price": "3499.99",
+      "description": "Stunning emerald and diamond necklace in 14k yellow gold.",
+      "short_description": "Emerald and diamond necklace in 14k gold",
+      "categories": ["Necklaces", "Emerald Jewelry"],
+      "tags": ["luxury", "emerald", "necklace", "formal"],
+      "images": [
+        "emerald-necklace-01.jpg",
+        "emerald-necklace-02.jpg"
+      ],
+      "3d_model": "emerald-necklace.glb",
+      "attributes": {
+        "metal": "14k Yellow Gold",
+        "stone": "Emerald",
+        "length": "18 inches"
+      },
+      "stock_quantity": 3,
+      "weight": "12.3"
+    },
+    {
+      "name": "Rose Gold Watch",
+      "sku": "SKR-RGW-003",
+      "type": "variable",
+      "regular_price": "1299.99",
+      "description": "Swiss-made automatic watch with rose gold case and leather strap.",
+      "short_description": "Swiss automatic watch in rose gold",
+      "categories": ["Watches", "Luxury Timepieces"],
+      "tags": ["watch", "luxury", "swiss", "automatic"],
+      "images": [
+        "rose-gold-watch-01.jpg",
+        "rose-gold-watch-02.jpg",
+        "rose-gold-watch-03.jpg"
+      ],
+      "3d_model": "rose-gold-watch.glb",
+      "attributes": {
+        "case_material": "Rose Gold",
+        "movement": "Automatic",
+        "water_resistance": "50m"
+      },
+      "variations": [
+        {
+          "strap": "Black Leather",
+          "sku": "SKR-RGW-003-BLK",
+          "price": "1299.99",
+          "stock": 10
+        },
+        {
+          "strap": "Brown Leather",
+          "sku": "SKR-RGW-003-BRN",
+          "price": "1299.99",
+          "stock": 8
+        },
+        {
+          "strap": "Rose Gold Bracelet",
+          "sku": "SKR-RGW-003-RGB",
+          "price": "1599.99",
+          "stock": 5
+        }
+      ]
+    },
+    {
+      "name": "Sapphire Earrings",
+      "sku": "SKR-SE-004",
+      "type": "simple",
+      "regular_price": "899.99",
+      "sale_price": "749.99",
+      "description": "Classic sapphire stud earrings in platinum setting.",
+      "short_description": "Platinum sapphire stud earrings",
+      "categories": ["Earrings", "Sapphire Jewelry"],
+      "tags": ["sapphire", "earrings", "platinum", "classic"],
+      "images": [
+        "sapphire-earrings-01.jpg",
+        "sapphire-earrings-02.jpg"
+      ],
+      "3d_model": "sapphire-earrings.glb",
+      "attributes": {
+        "metal": "Platinum",
+        "stone": "Sapphire",
+        "total_carat": "2.0ct"
+      },
+      "stock_quantity": 15,
+      "weight": "3.2"
+    },
+    {
+      "name": "Pearl Bracelet",
+      "sku": "SKR-PB-005",
+      "type": "simple",
+      "regular_price": "599.99",
+      "description": "Elegant freshwater pearl bracelet with sterling silver clasp.",
+      "short_description": "Freshwater pearl bracelet with silver clasp",
+      "categories": ["Bracelets", "Pearl Jewelry"],
+      "tags": ["pearl", "bracelet", "elegant", "classic"],
+      "images": [
+        "pearl-bracelet-01.jpg",
+        "pearl-bracelet-02.jpg"
+      ],
+      "3d_model": "pearl-bracelet.glb",
+      "attributes": {
+        "pearl_type": "Freshwater",
+        "clasp": "Sterling Silver",
+        "length": "7.5 inches"
+      },
+      "stock_quantity": 20,
+      "weight": "8.0"
+    }
+  ],
+  "test_users": [
+    {
+      "username": "testcustomer1",
+      "email": "customer1@example.com",
+      "password": "TestPass123!",
+      "first_name": "John",
+      "last_name": "Doe",
+      "role": "customer",
+      "billing": {
+        "first_name": "John",
+        "last_name": "Doe",
+        "address_1": "123 Main Street",
+        "city": "Beverly Hills",
+        "state": "CA",
+        "postcode": "90210",
+        "country": "US",
+        "email": "customer1@example.com",
+        "phone": "310-555-0100"
+      }
+    },
+    {
+      "username": "testcustomer2",
+      "email": "customer2@example.com",
+      "password": "TestPass123!",
+      "first_name": "Jane",
+      "last_name": "Smith",
+      "role": "customer",
+      "billing": {
+        "first_name": "Jane",
+        "last_name": "Smith",
+        "address_1": "456 Park Avenue",
+        "city": "New York",
+        "state": "NY",
+        "postcode": "10022",
+        "country": "US",
+        "email": "customer2@example.com",
+        "phone": "212-555-0200"
+      }
+    }
+  ],
+  "coupons": [
+    {
+      "code": "WELCOME10",
+      "discount_type": "percent",
+      "amount": "10",
+      "description": "10% off your first order",
+      "usage_limit": 1000,
+      "usage_limit_per_user": 1
+    },
+    {
+      "code": "LUXURY50",
+      "discount_type": "fixed_cart",
+      "amount": "50",
+      "description": "$50 off orders over $500",
+      "minimum_amount": "500",
+      "usage_limit": 500
+    },
+    {
+      "code": "FREESHIP",
+      "discount_type": "percent",
+      "amount": "0",
+      "description": "Free shipping",
+      "free_shipping": true,
+      "usage_limit": 1000
+    }
+  ],
+  "collections": [
+    {
+      "name": "Bridal Collection",
+      "slug": "bridal-collection",
+      "description": "Our finest engagement rings and wedding jewelry",
+      "products": ["SKR-DR-001"]
+    },
+    {
+      "name": "Evening Elegance",
+      "slug": "evening-elegance",
+      "description": "Statement pieces for special occasions",
+      "products": ["SKR-EN-002", "SKR-SE-004"]
+    },
+    {
+      "name": "Timeless Classics",
+      "slug": "timeless-classics",
+      "description": "Classic pieces that never go out of style",
+      "products": ["SKR-PB-005", "SKR-RGW-003"]
+    }
+  ]
+}

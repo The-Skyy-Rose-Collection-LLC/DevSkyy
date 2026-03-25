@@ -22,7 +22,7 @@ import shutil
 import time
 import uuid
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -51,7 +51,7 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 # =============================================================================
 
 
-class ModelProvider(str, Enum):
+class ModelProvider(StrEnum):
     """3D generation provider."""
 
     # Direct providers
@@ -70,7 +70,7 @@ class ModelProvider(str, Enum):
     ROUND_TABLE = "round_table"  # All compete, A/B test winner
 
 
-class JobStatus(str, Enum):
+class JobStatus(StrEnum):
     """Generation job status."""
 
     QUEUED = "queued"
@@ -799,8 +799,9 @@ async def generate_from_image_url(
             temp_path.write_bytes(resp.content)
 
     except Exception as e:
+        logger.warning(f"Failed to download image for job {job.job_id}: {e}")
         job_store.fail(job.job_id, f"Failed to download image: {e}")
-        raise HTTPException(status_code=400, detail=f"Failed to download image: {e}")
+        raise HTTPException(status_code=400, detail="Failed to download image")
 
     # Schedule background task based on provider
     huggingface_image_providers = [
@@ -879,8 +880,9 @@ async def generate_from_upload(
         content = await file.read()
         upload_path.write_bytes(content)
     except Exception as e:
+        logger.error(f"Failed to save upload for job {job.job_id}: {e}", exc_info=True)
         job_store.fail(job.job_id, f"Failed to save upload: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to save upload: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
     # Schedule background task based on provider
     huggingface_image_providers = [

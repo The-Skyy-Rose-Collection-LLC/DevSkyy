@@ -27,6 +27,27 @@ class Vector3 {
   }
 }
 
+// Mock Vector2
+class Vector2 {
+  constructor(x = 0, y = 0) {
+    this.x = x;
+    this.y = y;
+  }
+  set(x, y) {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
+  clone() {
+    return new Vector2(this.x, this.y);
+  }
+  copy(v) {
+    this.x = v.x;
+    this.y = v.y;
+    return this;
+  }
+}
+
 // Mock Euler
 class Euler {
   constructor(x = 0, y = 0, z = 0) {
@@ -446,6 +467,7 @@ const PCFSoftShadowMap = 2;
 const ACESFilmicToneMapping = 4;
 
 module.exports = {
+  Vector2,
   Vector3,
   Euler,
   Color,

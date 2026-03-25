@@ -1,0 +1,124 @@
+{
+  "models": [
+    {
+      "id": "gpt-4o",
+      "name": "GPT-4o",
+      "type": "multimodal",
+      "description": "Most capable GPT-4o model — text, vision, audio, code, reasoning",
+      "contextWindow": 128000,
+      "maxOutputTokens": 16384,
+      "inputPricing": { "per1MTokens": 2.50 },
+      "outputPricing": { "per1MTokens": 10.00 },
+      "capabilities": [
+        "text-generation", "chat", "code-generation", "reasoning",
+        "function-calling", "streaming", "vision", "structured-output"
+      ],
+      "recommended": true
+    },
+    {
+      "id": "gpt-4o-mini",
+      "name": "GPT-4o Mini",
+      "type": "multimodal",
+      "description": "Fast, affordable GPT-4o variant for lightweight tasks",
+      "contextWindow": 128000,
+      "maxOutputTokens": 16384,
+      "inputPricing": { "per1MTokens": 0.15 },
+      "outputPricing": { "per1MTokens": 0.60 },
+      "capabilities": [
+        "text-generation", "chat", "code-generation",
+        "function-calling", "streaming", "vision"
+      ],
+      "recommended": true
+    },
+    {
+      "id": "o3",
+      "name": "o3",
+      "type": "reasoning",
+      "description": "Most powerful reasoning model — complex math, science, code",
+      "contextWindow": 200000,
+      "maxOutputTokens": 100000,
+      "inputPricing": { "per1MTokens": 10.00 },
+      "outputPricing": { "per1MTokens": 40.00 },
+      "capabilities": [
+        "text-generation", "advanced-reasoning", "code-generation",
+        "math", "function-calling"
+      ]
+    },
+    {
+      "id": "o4-mini",
+      "name": "o4-mini",
+      "type": "reasoning",
+      "description": "Fast reasoning model — balanced speed and intelligence",
+      "contextWindow": 200000,
+      "maxOutputTokens": 100000,
+      "inputPricing": { "per1MTokens": 1.10 },
+      "outputPricing": { "per1MTokens": 4.40 },
+      "capabilities": [
+        "text-generation", "reasoning", "code-generation",
+        "function-calling", "streaming"
+      ],
+      "recommended": true
+    },
+    {
+      "id": "gpt-image-1",
+      "name": "GPT Image 1",
+      "type": "image-generation",
+      "description": "Latest OpenAI image generation model",
+      "contextWindow": 32000,
+      "maxOutputTokens": 0,
+      "inputPricing": { "per1MTokens": 5.00 },
+      "outputPricing": { "perImage": 0.04 },
+      "capabilities": [
+        "image-generation", "image-editing", "multimodal"
+      ]
+    },
+    {
+      "id": "text-embedding-3-large",
+      "name": "Text Embedding 3 Large",
+      "type": "embedding",
+      "description": "Best embedding model — 3072 dimensions",
+      "contextWindow": 8191,
+      "dimensions": 3072,
+      "inputPricing": { "per1MTokens": 0.13 },
+      "capabilities": ["embeddings", "semantic-search", "clustering"]
+    },
+    {
+      "id": "text-embedding-3-small",
+      "name": "Text Embedding 3 Small",
+      "type": "embedding",
+      "description": "Fast, affordable embedding model — 1536 dimensions",
+      "contextWindow": 8191,
+      "dimensions": 1536,
+      "inputPricing": { "per1MTokens": 0.02 },
+      "capabilities": ["embeddings", "semantic-search"],
+      "recommended": true
+    },
+    {
+      "id": "whisper-1",
+      "name": "Whisper",
+      "type": "audio",
+      "description": "Speech-to-text transcription and translation",
+      "inputPricing": { "perMinute": 0.006 },
+      "capabilities": ["transcription", "translation", "audio"]
+    },
+    {
+      "id": "tts-1-hd",
+      "name": "TTS HD",
+      "type": "audio",
+      "description": "High-quality text-to-speech",
+      "inputPricing": { "per1MChars": 30.00 },
+      "capabilities": ["text-to-speech", "audio"]
+    }
+  ],
+  "modelSelection": {
+    "fastTasks": "gpt-4o-mini",
+    "complexReasoning": "o3",
+    "visionTasks": "gpt-4o",
+    "longContext": "gpt-4o",
+    "production": "gpt-4o",
+    "imageGeneration": "gpt-image-1",
+    "embeddings": "text-embedding-3-small",
+    "transcription": "whisper-1",
+    "tts": "tts-1-hd"
+  }
+}

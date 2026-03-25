@@ -21,11 +21,6 @@ import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from errors.production_errors import (
-    DevSkyError,
-    DevSkyErrorCode,
-    DevSkyErrorSeverity,
-)
 from services.storage.r2_client import R2Client
 from services.storage.schemas import (
     AssetInfo,
@@ -37,6 +32,12 @@ from services.storage.schemas import (
     VersionInfo,
     VersionListResponse,
     VersionStatus,
+)
+
+from errors.production_errors import (
+    DevSkyError,
+    DevSkyErrorCode,
+    DevSkyErrorSeverity,
 )
 
 logger = logging.getLogger(__name__)
@@ -271,7 +272,8 @@ class AssetVersionManager:
         # Filter out deleted versions unless requested
         if not include_deleted:
             versions = [
-                v for v in versions
+                v
+                for v in versions
                 if v.status not in (VersionStatus.DELETED, VersionStatus.PENDING_DELETE)
             ]
 

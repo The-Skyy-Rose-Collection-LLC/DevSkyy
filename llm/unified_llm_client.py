@@ -23,7 +23,7 @@ from __future__ import annotations
 import logging
 import time
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -74,7 +74,7 @@ ROUND_TABLE_TO_MODEL_PROVIDER: dict[RoundTableProvider, ModelProvider] = {
 # =============================================================================
 
 
-class ExecutionMode(str, Enum):
+class ExecutionMode(StrEnum):
     """Execution mode for LLM requests."""
 
     FAST = "fast"  # Single provider, fastest response

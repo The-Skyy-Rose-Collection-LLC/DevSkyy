@@ -13,7 +13,7 @@ Static code analysis and security linting for DevSkyy Platform:
 import logging
 import re
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -22,7 +22,7 @@ from pydantic import BaseModel
 logger = logging.getLogger(__name__)
 
 
-class SecuritySeverity(str, Enum):
+class SecuritySeverity(StrEnum):
     """Security issue severity levels"""
 
     CRITICAL = "critical"
@@ -32,7 +32,7 @@ class SecuritySeverity(str, Enum):
     INFO = "info"
 
 
-class SecurityCategory(str, Enum):
+class SecurityCategory(StrEnum):
     """Security issue categories"""
 
     INJECTION = "injection"

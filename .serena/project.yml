@@ -17,6 +17,10 @@ languages:
 - python
 - typescript
 - java
+- php
+
+# the encoding used by text files in the project
+# For a list of possible encodings, see https://docs.python.org/3.11/library/codecs.html#standard-encodings
 encoding: "utf-8"
 
 # whether to use the project's gitignore file to ignore files
@@ -78,16 +82,57 @@ excluded_tools: []
 # initial prompt for the project. It will always be given to the LLM upon activating the project
 # (contrary to the memories, which are loaded on demand).
 initial_prompt: |
-  DevSkyy is an enterprise AI platform for SkyyRose fashion brand.
-  Key areas: Super Agents, LLM orchestration, 3D asset generation (Tripo3D),
-  WordPress/Elementor integration, and security modules.
-  Always check memories for deployment status and critical directives.
-
+  DevSkyy is an enterprise AI platform for the SkyyRose luxury fashion brand.
+  Architecture: 6 SuperAgents + 21 MCP tools (replaced 54+ legacy agents).
+  Key areas: Google ADK agent orchestration, LLM Round Table, multi-tier caching (L1+L2),
+  event sourcing/CQRS, 3D asset generation, WordPress theme (skyyrose-flagship only),
+  Next.js 16 frontend (26 routes on Vercel at devskyy.app), and security modules.
+  Brand: "Luxury Grows from Concrete." | Primary color: #B76E79 (rose gold).
+  3 Collections: Black Rose (gothic), Love Hurts (passionate), Signature (Bay Area).
+  Check memories for current architecture details before making changes.
+# the name by which the project can be referenced within Serena
 project_name: "DevSkyy"
+
+# list of tools to include that would otherwise be disabled (particularly optional tools that are disabled by default)
 included_optional_tools:
 - delete_lines
 - insert_at_line
 - replace_lines
 - restart_language_server
 - summarize_changes
+
+# fixed set of tools to use as the base tool set (if non-empty), replacing Serena's default set of tools.
+# This cannot be combined with non-empty excluded_tools or included_optional_tools.
 fixed_tools: []
+
+# list of mode names to that are always to be included in the set of active modes
+# The full set of modes to be activated is base_modes + default_modes.
+# If the setting is undefined, the base_modes from the global configuration (serena_config.yml) apply.
+# Otherwise, this setting overrides the global configuration.
+# Set this to [] to disable base modes for this project.
+# Set this to a list of mode names to always include the respective modes for this project.
+base_modes:
+
+# list of mode names that are to be activated by default.
+# The full set of modes to be activated is base_modes + default_modes.
+# If the setting is undefined, the default_modes from the global configuration (serena_config.yml) apply.
+# Otherwise, this overrides the setting from the global configuration (serena_config.yml).
+# This setting can, in turn, be overridden by CLI parameters (--mode).
+default_modes:
+
+# time budget (seconds) per tool call for the retrieval of additional symbol information
+# such as docstrings or parameter information.
+# This overrides the corresponding setting in the global configuration; see the documentation there.
+# If null or missing, use the setting from the global configuration.
+symbol_info_budget:
+
+# The language backend to use for this project.
+# If not set, the global setting from serena_config.yml is used.
+# Valid values: LSP, JetBrains
+# Note: the backend is fixed at startup. If a project with a different backend
+# is activated post-init, an error will be returned.
+language_backend:
+
+# list of regex patterns which, when matched, mark a memory entry as read‑only.
+# Extends the list from the global configuration, merging the two lists.
+read_only_memory_patterns: []

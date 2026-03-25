@@ -1,7 +1,6 @@
 # tests/services/three_d/test_provider_interface.py
 """Tests for 3D provider interface and models."""
 
-
 from services.three_d.provider_interface import (
     OutputFormat,
     ProviderHealth,

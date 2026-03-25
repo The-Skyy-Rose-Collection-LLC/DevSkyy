@@ -1,0 +1,39 @@
+{
+  "model": "devskyy/skyyrose-lora-v4",
+  "version": "devskyy/skyyrose-lora-v4:8bf4de484c4d21064ce79f43d0ffc7942f444c5b2e2e1c112aa1463743fb232a",
+  "training_id": "8ve9hnj44srmw0cwqqsb7z3gdc",
+  "status": "succeeded",
+  "weights_url": {
+    "version": "devskyy/skyyrose-lora-v4:8bf4de484c4d21064ce79f43d0ffc7942f444c5b2e2e1c112aa1463743fb232a",
+    "weights": "https://replicate.delivery/xezq/srDtWvO9lQbbOhMJ0nLoB7Nx9ZLuEBta1K1LllozJnMyrcjF/trained_model.tar"
+  },
+  "trigger_word": "skyyrose",
+  "per_sku_triggers": true,
+  "training_config": {
+    "base_model": "ostris/flux-dev-lora-trainer",
+    "steps": 1500,
+    "lora_rank": 32,
+    "optimizer": "adamw8bit",
+    "batch_size": 1,
+    "resolution": "512,768,1024",
+    "learning_rate": 0.0004,
+    "autocaption": false
+  },
+  "dataset": {
+    "source": "damBruh/skyyrose-lora-dataset-v4",
+    "images": 73,
+    "tech_flats": 24,
+    "model_shots": 49,
+    "unique_triggers": 23,
+    "strategy": "per-SKU trigger words with detailed captions from tech flats"
+  },
+  "improvements_over_v3": [
+    "Per-SKU trigger words instead of single 'skyyrose' trigger",
+    "Tech flat images as ground truth training data",
+    "Detailed per-image captions (not auto-captioned)",
+    "Higher LoRA rank (32 vs 16) for more detail capacity",
+    "More training steps (1500 vs 1000)",
+    "Curated dataset (73 high-quality vs 390 noisy images)"
+  ],
+  "created_at": "2026-03-05T13:14:28Z"
+}

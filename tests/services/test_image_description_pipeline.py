@@ -10,7 +10,6 @@ import json
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-
 from services.ml.image_description_pipeline import (
     ImageDescriptionPipeline,
     VisionModelClient,
@@ -59,33 +58,37 @@ def sample_request() -> DescriptionRequest:
 @pytest.fixture
 def mock_features_response() -> str:
     """Mock features JSON response."""
-    return json.dumps({
-        "colors": [
-            {"name": "charcoal black", "category": "neutral", "prominence": 0.8},
-            {"name": "rose gold", "category": "warm", "prominence": 0.2},
-        ],
-        "materials": [
-            {"name": "silk", "texture": "smooth", "quality_indicator": "luxury"},
-        ],
-        "style": {
-            "aesthetic": "minimalist",
-            "mood": "sophisticated",
-            "occasion": ["evening", "formal"],
-            "season": ["fall", "winter"],
-        },
-        "detected_elements": ["zipper", "v-neck", "midi length"],
-    })
+    return json.dumps(
+        {
+            "colors": [
+                {"name": "charcoal black", "category": "neutral", "prominence": 0.8},
+                {"name": "rose gold", "category": "warm", "prominence": 0.2},
+            ],
+            "materials": [
+                {"name": "silk", "texture": "smooth", "quality_indicator": "luxury"},
+            ],
+            "style": {
+                "aesthetic": "minimalist",
+                "mood": "sophisticated",
+                "occasion": ["evening", "formal"],
+                "season": ["fall", "winter"],
+            },
+            "detected_elements": ["zipper", "v-neck", "midi length"],
+        }
+    )
 
 
 @pytest.fixture
 def mock_seo_response() -> str:
     """Mock SEO JSON response."""
-    return json.dumps({
-        "title": "Black Rose Midi Dress | SkyyRose Luxury",
-        "meta_description": "Discover the Black Rose Midi Dress. Shop now at SkyyRose.",
-        "focus_keyword": "black midi dress",
-        "secondary_keywords": ["evening dress", "luxury fashion", "silk dress"],
-    })
+    return json.dumps(
+        {
+            "title": "Black Rose Midi Dress | SkyyRose Luxury",
+            "meta_description": "Discover the Black Rose Midi Dress. Shop now at SkyyRose.",
+            "focus_keyword": "black midi dress",
+            "secondary_keywords": ["evening dress", "luxury fashion", "silk dress"],
+        }
+    )
 
 
 # =============================================================================
@@ -302,9 +305,12 @@ class TestGenerateBatch:
         )
 
         mock_vision_client.generate.side_effect = [
-            "Desc 1.", "Short 1.",
-            "Desc 2.", "Short 2.",
-            "Desc 3.", "Short 3.",
+            "Desc 1.",
+            "Short 1.",
+            "Desc 2.",
+            "Short 2.",
+            "Desc 3.",
+            "Short 3.",
         ]
 
         result = await pipeline.generate_batch(request)
@@ -335,7 +341,8 @@ class TestGenerateBatch:
 
         # First succeeds, second fails
         mock_vision_client.generate.side_effect = [
-            "Desc 1.", "Short 1.",
+            "Desc 1.",
+            "Short 1.",
             Exception("Network error"),
         ]
 
@@ -434,9 +441,7 @@ STYLE: Perfect for evening events"""
         mock_vision_client: MagicMock,
     ) -> None:
         """Should limit to 7 bullet points."""
-        bullets_response = "\n".join([
-            f"FEATURE: Point {i}" for i in range(10)
-        ])
+        bullets_response = "\n".join([f"FEATURE: Point {i}" for i in range(10)])
 
         mock_vision_client.generate.return_value = bullets_response
 
@@ -480,12 +485,14 @@ class TestSEOGeneration:
         mock_vision_client: MagicMock,
     ) -> None:
         """Should truncate overly long SEO fields."""
-        long_response = json.dumps({
-            "title": "A" * 100,  # Too long
-            "meta_description": "B" * 200,  # Too long
-            "focus_keyword": "test",
-            "secondary_keywords": [],
-        })
+        long_response = json.dumps(
+            {
+                "title": "A" * 100,  # Too long
+                "meta_description": "B" * 200,  # Too long
+                "focus_keyword": "test",
+                "secondary_keywords": [],
+            }
+        )
 
         mock_vision_client.generate.return_value = long_response
 
@@ -530,9 +537,7 @@ class TestTagGeneration:
         mock_vision_client: MagicMock,
     ) -> None:
         """Should limit to 15 tags."""
-        mock_vision_client.generate.return_value = ", ".join([
-            f"tag{i}" for i in range(20)
-        ])
+        mock_vision_client.generate.return_value = ", ".join([f"tag{i}" for i in range(20)])
 
         result = await pipeline._generate_tags(
             "https://example.com/img.jpg",

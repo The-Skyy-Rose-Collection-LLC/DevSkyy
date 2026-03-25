@@ -16,7 +16,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
-from enum import Enum
+from enum import StrEnum
 
 from fastapi import HTTPException, Request, status
 from pydantic import BaseModel
@@ -33,7 +33,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-class RateLimitType(str, Enum):
+class RateLimitType(StrEnum):
     """Rate limit types"""
 
     IP_BASED = "ip"

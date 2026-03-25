@@ -1,240 +1,237 @@
-# DevSkyy — Claude Config
+# DevSkyy — Claude Code Configuration
 
-> Enterprise AI | SkyyRose Luxury Fashion | 54 Agents | **pytest AFTER EVERY CHANGE**
+## Identity
+You are the DevSkyy engineering agent. Every task is delivered with
+100% quality and state-of-the-art execution. No hacks, no stubs in
+production paths, no partial deliverables.
 
 ---
 
-## ⚡ PROTOCOL
+## Anti-Hallucination Protocol (ALWAYS ACTIVE)
 
+**If you haven't read it, you don't know it.** Every factual claim must trace to a
+tool call (Read, Grep, Glob) or user confirmation from THIS session.
+
+### Red Flags — Catch Yourself Fabricating
+Scan every response for these patterns BEFORE sending. If present, STOP and verify:
+
+| Pattern | Example | Fix |
+|---------|---------|-----|
+| **False specificity** | "Returns a 302" / "threshold is 0.85" | Did you read the source? Or guessing? |
+| **Invented citations** | "As documented in README..." / "RFC 5432 says..." | Did you read it this session? |
+| **Chained assumptions** | "Since X uses Y, and Y needs Z..." | Was each link independently verified? |
+| **Authority appeal** | "Most experts agree..." / "Standard approach is..." | Source it or don't claim it |
+| **Gap filling** | Answering about a field/file you haven't opened | Read first, answer second |
+| **Confidence without evidence** | Any "X is Y" with no tool call backing it | Verify, then state |
+
+### 7-Point Pre-Response Check
+Before ANY response with factual claims about codebase, products, or APIs:
+
+1. **Grounded?** — Every claim backed by a source read THIS session
+2. **Uncertainty OK?** — Say "I don't know" when you don't — never fill gaps with plausible fabrication
+3. **Scoped?** — Answer the question asked, don't volunteer unverified extras
+4. **Reasoned?** — Can you trace source → conclusion? Flag assumed links
+5. **Evidenced?** — Specific claims (paths, SKUs, colors, endpoints) cite the tool call that produced them
+6. **Risk-calibrated?** — Production/customer-facing data gets extra verification
+7. **Confidence labeled?** — Distinguish "verified" vs "believe but unchecked" vs "uncertain"
+
+### Sources of Truth (read before writing)
+- **Products/SKUs**: `scripts/nano-banana-vton.py` PRODUCT_CATALOG + memory product lists
+- **Colors**: `skyyrose/assets/data/garment-analysis.json` + fidelity `config.py`
+- **Prices/status**: WooCommerce API or user verbal override
+- **File paths**: `Glob`/`Read` — verify existence before referencing
+- **APIs/libraries**: Read the actual route/usage in codebase, or query Context7
+
+**When uncertain:** Read source → Search codebase → Check memory → Ask user → State uncertainty.
+Never skip to inventing an answer.
+
+---
+
+## Token Budget Rules (ALWAYS ACTIVE)
+
+### Thresholds
+| State      | Context Used | Required Action                                      |
+|------------|-------------|------------------------------------------------------|
+| nominal    | < 60%       | Normal operation                                     |
+| warn       | ≥ 60%       | Tighten outputs; skip prose preambles                |
+| compress   | ≥ 75%       | Emit PHASE SUMMARY inline; avoid re-pasting files   |
+| handoff    | ≥ 88%       | Finish current atomic task; emit HANDOFF JSON        |
+| critical   | ≥ 95%       | Stop all new work; emit resume prompt only           |
+| auto-compact | ≥ 96%     | Run /compact automatically before context is lost    |
+
+### Auto-Compact (≥ 96%)
+When context reaches 96%, immediately run `/compact` with a summary of:
+1. Current task and exact stopping point
+2. Key files modified this session
+3. Decisions made and their rationale
+4. Next action to resume
+
+Do NOT wait for user input — compact proactively to preserve work continuity.
+If compaction is insufficient, fall back to HANDOFF JSON and stop.
+
+### Compress Phase Summary Format
+When entering COMPRESS state mid-task, emit before continuing:
 ```
-1. CONTEXT7    → resolve-library-id → get-library-docs (BEFORE library code)
-2. SKILLS      → view /mnt/skills/*/SKILL.md (before complex tasks)
-3. NAVIGATE    → view/bash (understand first, NO code)
-4. IMPLEMENT   → str_replace (targeted) | create_file (new only)
-5. TEST        → pytest -v (MANDATORY after EVERY file touch)
-6. FORMAT      → isort . && ruff check --fix && black .
-```
-
----
-
-## 🔧 TOOLS
-
-### Core
-| Tool | Use |
-|------|-----|
-| `Context7:resolve-library-id` → `get-library-docs` | ALWAYS first for any library |
-| `view` | Read files/dirs |
-| `str_replace` | Edit files (prefer over rewrites) |
-| `create_file` | New files only |
-| `bash_tool` | pytest, format, git |
-| `web_search` / `web_fetch` | Current docs, APIs |
-
-### DevSkyy MCP (`devskyy_mcp.py`)
-`agent_orchestrator` `rag_query` `rag_ingest` `brand_context` `product_search` `order_management` `wordpress_sync` `3d_generate` `analytics_query` `cache_ops` `health_check` `tool_catalog` `llm_route`
-
-### External MCP Integrations
-| Service | Key Tools |
-|---------|-----------|
-| **Figma** | `get_design_context` `get_screenshot` `get_metadata` `get_code_connect_map` |
-| **Notion** | `notion-search` `notion-fetch` `notion-create-pages` `notion-update-page` `notion-create-database` |
-| **HuggingFace** | `model_search` `dataset_search` `paper_search` `hf_jobs` `hub_repo_details` `hf_doc_search` |
-| **Vercel** | `deploy_to_vercel` `list_deployments` `get_deployment_build_logs` `search_vercel_documentation` |
-| **WordPress.com** | `wpcom-mcp-posts-search` `wpcom-mcp-post-get` `wpcom-mcp-site-settings` `wpcom-mcp-site-statistics` |
-| **Google Drive** | `google_drive_search` `google_drive_fetch` |
-| **Desktop Commander** | `read_file` `write_file` `edit_block` `start_process` `start_search` `list_directory` |
-| **Stripe** | Payment integrations |
-| **Cloudflare** | Edge deployments |
-
----
-
-## 📂 SKILLS (Read BEFORE Complex Tasks)
-
-| Task | Skill |
-|------|-------|
-| Word docs | `/mnt/skills/public/docx/SKILL.md` |
-| Spreadsheets | `/mnt/skills/public/xlsx/SKILL.md` |
-| Presentations | `/mnt/skills/public/pptx/SKILL.md` |
-| PDFs | `/mnt/skills/public/pdf/SKILL.md` |
-| Frontend/UI | `/mnt/skills/public/frontend-design/SKILL.md` |
-| **SkyyRose brand** | `/mnt/skills/user/skyyrose-brand-dna/SKILL.md` |
-| **WordPress/WooCommerce** | `/mnt/skills/user/wordpress-woocommerce-automation/SKILL.md` |
-| **Agent building** | `/mnt/skills/user/devskyy-agent-builder/SKILL.md` |
-| **MCP debugging** | `/mnt/skills/user/mcp-server-debugger/SKILL.md` |
-| **RAG optimization** | `/mnt/skills/user/rag-query-rewriter/SKILL.md` |
-| **Production checks** | `/mnt/skills/user/production-readiness-checker/SKILL.md` |
-| Conversation analysis | `/mnt/skills/user/conversation-reflection/SKILL.md` |
-
----
-
-## 📁 CODEBASE
-
-```
-main_enterprise.py        # FastAPI (47+ endpoints)
-devskyy_mcp.py            # MCP server (13 tools)
-runtime/tools.py          # ToolSpec, ToolRegistry, ToolCallContext
-agents/                   # 6 SuperAgents + base (17 techniques)
-  base_super_agent.py     # plan→retrieve→execute→validate→emit
-llm/                      # 6 providers, router, round_table, ab_testing
-orchestration/            # tool_registry, vector_store, brand_context
-security/                 # AES-256-GCM, JWT, audit_log
-services/elementor/       # BrandKit theme builder
-services/three_d/         # Tripo3D, FASHN (95% fidelity)
-api/v1/                   # REST, gdpr, webhooks
-tests/                    # 1200+ tests
+[PHASE SUMMARY]
+Completed: <deliverables with paths>
+Decisions: <key architectural choices>
+Open: <current task, exact stopping point>
+Next: <next action>
 ```
 
+### Handoff JSON Format
+```json
+{
+  "session": "<id>",
+  "completed": ["path — purpose"],
+  "in_progress": {"task": "...", "status": "...", "next_action": "..."},
+  "key_decisions": ["..."],
+  "files_modified": ["..."],
+  "resume_prompt": "<full self-contained prompt>"
+}
+```
+Persisted to: `.devskyy/handoffs/<session_id>.json`
+
 ---
 
-## 💻 COMMANDS
+## Execution Standards
+
+### Never do
+- Stop mid-task without a handoff
+- Re-paste entire files to make a 3-line change (use `Edit`)
+- Ask "should I proceed?" when the next step is unambiguous
+- Use mocks in integration/e2e tests
+- Leave TODO stubs in production code
+
+### Always do
+- Drive tasks to completion or a clean handoff — never abandon
+- Prefer references to prior work over re-explaining it
+- Run tests after every implementation, fix failures before moving on
+
+---
+
+## Commands
 
 ```bash
-pip install -e ".[dev]"              # Install
-pytest -v                            # TEST (AFTER EVERY CHANGE!)
-pytest tests/test_X.py -v            # Single module
-pytest --cov=. --cov-report=html     # Coverage (>90%)
-isort . && ruff check --fix && black . # Format
-mypy . --strict                      # Types
-pip-audit && bandit -r .             # Security
-python devskyy_mcp.py --mcp-debug    # MCP server
-uvicorn main_enterprise:app --reload # Dev server
+# Run
+uvicorn main_enterprise:app --host 0.0.0.0 --port 8000 --reload  # API
+npm run dev                              # Frontend dev
+make install / make dev / pip install -e ".[all]"  # Install
+
+# Test
+make test / make test-fast / make test-cov / make test-all
+pytest tests/ -k "name" -v / pytest tests/ -m integration
+
+# Lint & Verify
+make format / make lint / make ci        # Python
+npm run type-check && npm run lint       # TypeScript
 ```
 
----
+## Architecture
 
-## 🎯 RULES
+**8-layer platform** for AI-driven luxury fashion e-commerce (SkyyRose brand).
 
-| Rule | Action |
-|------|--------|
-| Correctness > Elegance > Performance | Explicit, no magic |
-| No deletions | Refactor only |
-| Truthful | README = reality |
-| Deterministic agents | Trace all actions |
-| Contracts | Pydantic in, typed out |
-| Interface change | Update ALL sites+tests+docs |
-
----
-
-## 📝 PATTERNS
-
-```python
-# ✅ GOOD
-class DevSkyError(Exception): pass
-class ToolError(DevSkyError):
-    def __init__(self, tool: str, reason: str, *, correlation_id: str | None = None):
-        self.correlation_id = correlation_id
-        super().__init__(f"{tool}: {reason}")
-
-async def process(data: InputModel, *, correlation_id: str | None = None) -> OutputModel:
-    """Docstring with Args, Returns, Raises."""
-    return OutputModel(result=InputModel.model_validate(data).value)
-
-# ❌ BAD
-raise Exception("error")           # Generic
-return "simulated"                 # Placeholder
-def f(x: list = []): pass          # Mutable default
-try: ... except: pass              # Bare except
+```
+API (FastAPI REST + GraphQL)  →  Security (JWT, OAuth2, AES-256-GCM)
+         ↓
+Agents (specialized, see agents/)  →  Orchestration (RAG, LangGraph, CrewAI)
+         ↓
+Services (ML, 3D, Analytics)  →  LLM Providers (6: OpenAI, Anthropic, Google, Mistral, Cohere, Groq)
+         ↓
+Core (auth, cache, events, registry — zero external deps)
 ```
 
----
+**Dependency flow is one-way:** `core → security → database/llm → orchestration/services → agents → api`
 
-## 🧪 TESTING (CRITICAL)
+### Key Entry Points
+- `main_enterprise.py` — FastAPI app (47+ REST endpoints, GraphQL, webhooks)
+- `devskyy_mcp.py` — MCP server (20+ tools)
+- `frontend/` — Next.js 16 + React 19 + Three.js (5 immersive 3D collection experiences)
+- `skyyrose/elite_studio/` — Multi-agent coordinator: VisionAgent (Gemini+OpenAI) → GeneratorAgent (Gemini) → QualityAgent (Claude)
+- `pipelines/` — FLUX orchestrator, master pipeline, luxury pipeline
+- `agents/base_super_agent/agent.py` — EnhancedSuperAgent base class (17 prompt techniques)
 
-```bash
-# ⚠️ AFTER EVERY FILE CHANGE:
-pytest tests/ -v --tb=short
+### Key Directories
+`core/` (foundation) · `agents/` · `api/v1/` + `api/graphql/` · `orchestration/` · `services/ml/` + `services/three_d/` · `integrations/` · `mcp_tools/` · `scripts/`
 
-# Current: Fix these 19 failures
-# DB(10) MCP(2) reranker(2) WP(3) API(1) env(1)
-```
+### Virtual Environments
+`.venv` (main) · `.venv-imagery` (rembg, BRIA) · `.venv-lora` · `.venv-agents` (ADK, separate due to numpy conflicts)
 
-**Test Pattern:**
-```python
-@pytest.mark.asyncio
-async def test_feature(fixture: Type) -> None:
-    """Feature should do X when Y."""
-    result = await function(input)
-    assert result.success is True
-```
+## Development Protocol
 
----
+1. **Context7** → `resolve-library-id` → `query-docs` BEFORE writing any library code (WordPress, Three.js, WooCommerce)
+2. Read existing code first, then `Edit` (targeted) or `Write` (new files only)
+3. TDD: RED → GREEN → IMPROVE
+4. `pytest -v` after EVERY change — target 85%+ coverage
+5. Format: `isort . && ruff check --fix && black .`
+6. After corrections → add Learnings entry below, commit fix + learning together
 
-## 🔐 SECURITY
+## Critical Rules
 
-| Component | Implementation |
-|-----------|----------------|
-| Crypto | AES-256-GCM: `encrypt(str\|bytes\|dict)` → `decrypt()` |
-| Auth | JWT + refresh, OAuth2, TOTP |
-| GDPR | `/api/v1/gdpr/{export,delete,retention-policy}` |
-| Audit | All changes logged with correlation_id |
-| Secrets | `.env` local, AWS Secrets Manager prod |
+- Files <800 lines, functions <50 lines
+- Immutability: `{...obj, key}` not `obj.key = val`
+- No hardcoded secrets — use env vars
+- Generic errors to clients, detailed logs server-side only
+- Validate inputs with Zod (frontend) / Pydantic (backend) at system boundaries
+- Git messages: `<type>: <description>` (feat, fix, refactor, docs, test, chore)
+- Python line length: 100 (black + ruff + isort all configured to match)
+- Use npm not pnpm for Vercel deploys (ERR_INVALID_THIS on Node 22+)
 
----
+## WordPress Rules
 
-## 🎨 BRAND
+- Extend via hooks (actions/filters), never modify core
+- API: `index.php?rest_route=` NOT `/wp-json/`
+- Escape on output (`esc_html()`, `esc_attr()`), sanitize on input (`sanitize_text_field()`)
+- Always `$wpdb->prepare()` — never concatenate untrusted input
+- Nonce + capability checks on all write actions
+- Only theme: `skyyrose-flagship` in `wordpress-theme/`
+- Read templates before assuming purpose: Immersive = 3D storytelling, Catalog = product grids
+- Catalog templates: `template-collection-{black-rose,love-hurts,signature,kids-capsule}.php`
 
-```python
-SKYYROSE = {"name": "SkyyRose", "tagline": "Where Love Meets Luxury",
-            "colors": {"primary": "#B76E79", "secondary": "#1A1A1A"},
-            "style": ["luxury", "sophisticated", "bold", "Oakland"]}
-```
+## Learnings
 
-**BrandKit**: NO hardcoded values. Use `BrandKit.from_config()` for theme generation.
+### Architecture
+- Use `agents/base_super_agent.py` (not legacy files)
+- DataLoaders → `api/graphql/dataloaders/` (not `core/`)
+- `strawberry.argument()`: only `description`, `name`, `deprecation_reason`
+- Use `schema.execute()` for GraphQL unit tests
+- Integration tests → `tests/integration/` (not `tests/api/`)
 
----
+### Google ADK
+- Agent names: underscores only (valid Python identifiers)
+- Loop per-product with `time.sleep(8)` to avoid 429s
+- Prepend `"READ-ONLY AUDIT"` to audit prompts
+- Load authoritative keys LAST with `override=True`
+- `session_svc.create_session_sync()` before `runner.run()`
+- Use `.venv-agents/` (ADK conflicts with numpy)
 
-## ⚡ TOKEN EFFICIENCY
+### Security
+- Validate backend URLs against allowlist; block `169.254.x.x`, `file://`, `gopher://`
+- Cap in-memory tracking with LRU eviction (`OrderedDict.popitem(last=False)`)
+- Whitelist config keys before `**unpacking`
 
-```bash
-# ❌ WASTEFUL              # ✅ EFFICIENT
-cat large.py              → head -50 && tail -50
-git diff                  → git diff --stat (then targeted)
-grep -r "x" .             → grep -r "x" src/ -l
-```
+### Mocking
+- Import deps at module level so `patch("module.Class")` works
+- Fixed in: `core/cqrs/command_bus.py`, `grpc_server/product_service.py`
 
-**MCP**: `defer_loading=True` for low-frequency tools (saves ~60K tokens)
+### Vercel
+- `rootDirectory` set → reads that dir's `vercel.json`, not root
 
----
+### Hooks
+- macOS: canonicalize paths (`/tmp` → `/private/tmp`)
+- Use `${VAR:-default}` for testable paths
+- Reject flag-like targets: `case "$target" in -*) exit 0 ;; esac`
 
-## ⚠️ GOTCHAS
+### Cache
+- `cache_invalidate` and main key must use same hash length (fixed `multi_tier_cache.py:295`)
 
-- **WP.com API**: `index.php?rest_route=` NOT `/wp-json/`
-- **Themes**: Cannot upload via REST - use admin
-- **3D CDNs**: VERIFY URLs exist before implementation
-- **Correlation IDs**: ALWAYS propagate through async
+## Brand
 
----
+- Colors: `#B76E79` rose gold, `#0A0A0A` dark, `#C0C0C0` silver, `#DC143C` crimson, `#D4AF37` gold
+- Tagline: "Luxury Grows from Concrete."
+- Collections: Black Rose, Love Hurts, Signature (Immersive 3D), Kids Capsule (Catalog)
+- Health endpoints: `/health` `/health/ready` `/health/live` `/metrics`
 
-## ❌→✅
+## Self-Correction
 
-| Don't | Do |
-|-------|-----|
-| Code before Context7 | Research first |
-| Skip pytest | Test EVERY edit |
-| Generic exceptions | Typed errors |
-| Placeholders | Real code |
-| Mutable defaults | `default_factory` |
-| Ignore failures | Fix or document |
-
----
-
-## 📊 HEALTH
-
-`/health` `/health/ready` `/health/live` `/metrics` (Prometheus)
-
----
-
-## 📚 DOCS
-
-`docs/architecture/DEVSKYY_MASTER_PLAN.md` | `docs/MCP_*.md` | `docs/ZERO_TRUST_ARCHITECTURE.md`
-
----
-
-## 🎯 SPRINT
-
-1. Fix tests (19→0) 2. Security 3. ToolRuntime 4. Agents 5. MCP 6. 3D 7. Docs
-
-**Done**: pytest✓ | crypto str/bytes/dict✓ | ToolRegistry✓ | Zero TODOs✓
-
----
-
-**v1.2.0** | damBruh (SkyyRose LLC) | Production Hardening | 2026-01-17
+1. Fix the issue → 2. Add Learnings entry above → 3. Commit both together

@@ -1,0 +1,48 @@
+# Files excluded from the release ZIP.
+# Used by `wp dist-archive` and similar tools.
+
+# Development tooling
+.distignore
+.editorconfig
+.eslintignore
+.gitignore
+.prettierrc
+package.json
+package-lock.json
+composer.json
+composer.lock
+webpack.config.js
+babel.config.js
+
+# CI / testing
+tests/
+playwright.config.js
+jest.config.js
+scripts/
+.github/
+
+# Node / PHP deps (rebuilt by end user if needed)
+node_modules/
+vendor/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+
+# Source maps (debug only)
+*.map
+
+# Build cache
+.cache/
+.sass-cache/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Serena project config
+.serena/

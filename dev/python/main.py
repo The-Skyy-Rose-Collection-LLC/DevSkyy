@@ -227,20 +227,17 @@ Target: {target}"""
 
 def print_banner():
     """Print the agent banner."""
-    print(
-        """
+    print("""
 ╔══════════════════════════════════════════════════════════════════╗
 ║           DevSkyy Coding Architect Agent (Python)                ║
 ║   Expert in TypeScript & Python with 17 Prompt Techniques        ║
 ╚══════════════════════════════════════════════════════════════════╝
-"""
-    )
+""")
 
 
 def print_usage():
     """Print usage information."""
-    print(
-        """
+    print("""
 Usage:
   python main.py "<your prompt>"
 
@@ -251,8 +248,7 @@ Examples:
 
 Environment:
   ANTHROPIC_API_KEY  - Your Anthropic API key (required)
-"""
-    )
+""")
 
 
 async def main():

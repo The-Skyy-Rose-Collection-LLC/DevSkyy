@@ -1,52 +1,7 @@
-# DevSkyy Backend - Full ML/3D Features
-# ========================================
-# Includes all optional dependencies for:
-# - RAG with embeddings
-# - Image generation (SDXL/LoRA)
-# - 3D rendering
-# - Advanced ML features
+# DevSkyy - Full ML/3D Dependencies
+# ==================================
+# DEPRECATED: Use pip install -e ".[ml]"
 #
-# Build time: ~20-30 minutes
-# Install: pip install -r requirements-full.txt
+# This installs all ML, 3D, and advanced features.
 
-# Start with core requirements
--r requirements.txt
-
-# RAG / Embeddings
-sentence-transformers>=3.3.1
-chromadb>=0.5.23
-scipy>=1.14.1
-
-# Transformers
-transformers>=4.36.0
-accelerate>=0.25.0
-safetensors>=0.4.0
-
-# Image Generation - SDXL/LoRA
-Pillow>=10.0
-diffusers>=0.25.0
-peft>=0.7.0
-datasets>=2.16.0
-xformers>=0.0.23
-bitsandbytes>=0.42.0
-
-# Image Processing
-scikit-image>=0.22.0
-imagehash>=4.3.1
-opencv-python-headless>=4.8
-gradio-client>=0.8
-
-# 3D Rendering (headless)
-trimesh>=4.0
-pyrender>=0.1.45
-pyglet>=2.0
-
-# PyTorch (commented - install separately for your platform)
-# torch>=2.1.0
-# torchvision>=0.16.0
-
-# Monitoring (optional)
-flower>=2.0.0
-
-# LlamaIndex HuggingFace (requires torch)
-llama-index-multi-modal-llms-huggingface>=0.1.0
+-e .[ml,mcp]

@@ -18,7 +18,7 @@ from __future__ import annotations
 import sys
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -90,7 +90,7 @@ def get_config() -> dict[str, Any]:
 # =============================================================================
 
 
-class TaskMode(str, Enum):
+class TaskMode(StrEnum):
     """Detected or specified task mode."""
 
     CODE = "code"
@@ -102,7 +102,7 @@ class TaskMode(str, Enum):
     AUTO = "auto"
 
 
-class OutputFormat(str, Enum):
+class OutputFormat(StrEnum):
     """Output format for enhanced prompts."""
 
     PLAIN = "plain"
@@ -110,7 +110,7 @@ class OutputFormat(str, Enum):
     JSON = "json"
 
 
-class PromptTechnique(str, Enum):
+class PromptTechnique(StrEnum):
     """Prompt engineering techniques."""
 
     CHAIN_OF_THOUGHT = "chain-of-thought"
@@ -846,7 +846,7 @@ class PromptEnhancer:
 ## Analysis
 - Task Type: {analysis.task_type.value}
 - Clarity Score: {analysis.clarity_score}/100
-- Missing Elements: {', '.join(analysis.missing_elements) or 'None'}
+- Missing Elements: {", ".join(analysis.missing_elements) or "None"}
 
 ## Techniques to Apply
 {technique_instructions}
@@ -1116,7 +1116,7 @@ def _show_stats() -> None:
     click.echo(f"\nTotal enhancements: {total}")
     click.echo("\nBy task type:")
     for mode, count in sorted(modes.items(), key=lambda x: -x[1]):
-        click.echo(f"  {mode}: {count} ({count*100//total}%)")
+        click.echo(f"  {mode}: {count} ({count * 100 // total}%)")
 
     click.echo("\nTechniques used:")
     for tech, count in sorted(techniques.items(), key=lambda x: -x[1]):

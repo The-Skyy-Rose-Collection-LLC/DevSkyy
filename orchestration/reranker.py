@@ -20,7 +20,7 @@ import logging
 import os
 from collections import OrderedDict
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -153,7 +153,7 @@ def get_reranking_cache() -> RerankingCache:
 # =============================================================================
 
 
-class RerankerProvider(str, Enum):
+class RerankerProvider(StrEnum):
     """Supported reranker providers."""
 
     COHERE = "cohere"

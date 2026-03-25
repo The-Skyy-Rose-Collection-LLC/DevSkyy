@@ -18,7 +18,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -26,12 +26,38 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger(__name__)
 
 
+def _get_tracer():
+    """Lazy-load tracer to avoid circular import (adk ← core → adk)."""
+    try:
+        from core.telemetry.tracer import get_tracer
+
+        return get_tracer("adk.agent")
+    except ImportError:
+        return None
+
+
+class _NullSpanCtx:
+    """No-op context manager when tracing is unavailable."""
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        pass
+
+    def set_attribute(self, key, value):
+        pass
+
+    def record_exception(self, exc):
+        pass
+
+
 # =============================================================================
 # Enums
 # =============================================================================
 
 
-class ADKProvider(str, Enum):
+class ADKProvider(StrEnum):
     """Supported ADK frameworks"""
 
     GOOGLE = "google_adk"  # Google Agent Development Kit
@@ -42,7 +68,7 @@ class ADKProvider(str, Enum):
     LANGGRAPH = "langgraph"  # LangGraph
 
 
-class AgentCapability(str, Enum):
+class AgentCapability(StrEnum):
     """Agent capabilities"""
 
     # Core capabilities
@@ -72,7 +98,7 @@ class AgentCapability(str, Enum):
     VIRTUAL_TRYON = "virtual_tryon"
 
 
-class AgentStatus(str, Enum):
+class AgentStatus(StrEnum):
     """Agent execution status"""
 
     IDLE = "idle"
@@ -82,7 +108,7 @@ class AgentStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class ModelTier(str, Enum):
+class ModelTier(StrEnum):
     """Model performance tier"""
 
     FLAGSHIP = "flagship"  # GPT-4o, Claude Opus, Gemini Ultra
@@ -266,56 +292,76 @@ class BaseDevSkyyAgent(ABC):
             AgentResult with execution details
         """
         start_time = datetime.now(UTC)
+        tracer = _get_tracer()
 
-        try:
-            # Initialize if needed
-            if not self._initialized:
-                await self.initialize()
-                self._initialized = True
+        span_ctx = (
+            tracer.start_as_current_span(f"agent.run.{self.name}") if tracer else _NullSpanCtx()
+        )
 
-            self._status = AgentStatus.RUNNING
+        with span_ctx as span:
+            if tracer:
+                span.set_attribute("agent.name", self.name)
+                span.set_attribute("agent.provider", self.provider)
 
-            # Execute
-            result = await asyncio.wait_for(
-                self.execute(prompt, **kwargs),
-                timeout=self.config.timeout,
-            )
+            try:
+                # Initialize if needed
+                if not self._initialized:
+                    await self.initialize()
+                    self._initialized = True
 
-            self._status = AgentStatus.COMPLETED
-            result.completed_at = datetime.now(UTC)
-            result.latency_ms = (result.completed_at - start_time).total_seconds() * 1000
+                self._status = AgentStatus.RUNNING
 
-            # Update memory
-            if self.config.enable_memory:
-                self._update_memory(prompt, result.content)
+                # Execute
+                result = await asyncio.wait_for(
+                    self.execute(prompt, **kwargs),
+                    timeout=self.config.timeout,
+                )
 
-            return result
+                self._status = AgentStatus.COMPLETED
+                result.completed_at = datetime.now(UTC)
+                result.latency_ms = (result.completed_at - start_time).total_seconds() * 1000
 
-        except TimeoutError:
-            self._status = AgentStatus.FAILED
-            return AgentResult(
-                agent_name=self.name,
-                agent_provider=self.provider,
-                content="",
-                status=AgentStatus.FAILED,
-                error=f"Execution timed out after {self.config.timeout}s",
-                error_type="TimeoutError",
-                started_at=start_time,
-                completed_at=datetime.now(UTC),
-            )
-        except Exception as e:
-            self._status = AgentStatus.FAILED
-            logger.error(f"Agent {self.name} failed: {e}", exc_info=True)
-            return AgentResult(
-                agent_name=self.name,
-                agent_provider=self.provider,
-                content="",
-                status=AgentStatus.FAILED,
-                error=str(e),
-                error_type=type(e).__name__,
-                started_at=start_time,
-                completed_at=datetime.now(UTC),
-            )
+                # Update memory
+                if self.config.enable_memory:
+                    self._update_memory(prompt, result.content)
+
+                if tracer:
+                    span.set_attribute("agent.status", result.status.value)
+                    span.set_attribute("agent.latency_ms", result.latency_ms)
+                return result
+
+            except TimeoutError:
+                self._status = AgentStatus.FAILED
+                if tracer:
+                    span.set_attribute("agent.status", "failed")
+                    span.set_attribute("agent.error_type", "TimeoutError")
+                return AgentResult(
+                    agent_name=self.name,
+                    agent_provider=self.provider,
+                    content="",
+                    status=AgentStatus.FAILED,
+                    error=f"Execution timed out after {self.config.timeout}s",
+                    error_type="TimeoutError",
+                    started_at=start_time,
+                    completed_at=datetime.now(UTC),
+                )
+            except Exception as e:
+                self._status = AgentStatus.FAILED
+                if tracer:
+                    span.record_exception(e)
+                    span.set_attribute("agent.status", "failed")
+                    span.set_attribute("agent.error_type", type(e).__name__)
+                logger.error(f"Agent {self.name} failed: {e}", exc_info=True)
+                return AgentResult(
+                    agent_name=self.name,
+                    agent_provider=self.provider,
+                    content="",
+                    status=AgentStatus.FAILED,
+                    error=str(e),
+                    error_type=type(e).__name__,
+                    started_at=start_time,
+                    completed_at=datetime.now(UTC),
+                )
 
     def _update_memory(self, prompt: str, response: str) -> None:
         """Update conversation memory"""

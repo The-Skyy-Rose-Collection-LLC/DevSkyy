@@ -17,7 +17,7 @@ Pattern: Supervisor Pattern with LangGraph orchestration
 
 import logging
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from adk.base import (
@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class SuperAgentType(str, Enum):
+class SuperAgentType(StrEnum):
     """Types of super agents"""
 
     COMMERCE = "commerce"

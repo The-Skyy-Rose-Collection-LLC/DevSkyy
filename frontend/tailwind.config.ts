@@ -9,7 +9,19 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+  		fontFamily: {
+  			display: ['var(--font-playfair)', 'Georgia', 'serif'],
+  			body: ['var(--font-cormorant)', 'Georgia', 'serif'],
+  			mono: ['var(--font-space-mono)', 'Courier New', 'monospace'],
+  		},
   		colors: {
+  			luxury: {
+  				'rose-gold': '#B76E79',
+  				'rose-dark': '#8B5465',
+  				'rose-light': '#D4A5B0',
+  				charcoal: '#1A1A1A',
+  				graphite: '#2D2D2D',
+  			},
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
@@ -71,6 +83,11 @@ const config: Config = {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
+  		},
+  		spacing: {
+  			'phi': '1.618rem', // Golden ratio
+  			'phi-2': '2.618rem',
+  			'phi-3': '4.236rem',
   		}
   	}
   },

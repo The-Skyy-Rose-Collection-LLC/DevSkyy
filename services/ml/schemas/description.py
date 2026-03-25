@@ -10,7 +10,7 @@ Version: 1.0.0
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -21,7 +21,7 @@ from pydantic import BaseModel, Field, HttpUrl
 # =============================================================================
 
 
-class DescriptionStyle(str, Enum):
+class DescriptionStyle(StrEnum):
     """Writing style for descriptions."""
 
     LUXURY = "luxury"
@@ -31,7 +31,7 @@ class DescriptionStyle(str, Enum):
     STORYTELLING = "storytelling"
 
 
-class ProductType(str, Enum):
+class ProductType(StrEnum):
     """Type of product being described."""
 
     APPAREL = "apparel"
@@ -43,7 +43,7 @@ class ProductType(str, Enum):
     OTHER = "other"
 
 
-class VisionModel(str, Enum):
+class VisionModel(StrEnum):
     """Vision model to use for analysis."""
 
     # Replicate models

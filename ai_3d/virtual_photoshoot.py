@@ -20,7 +20,7 @@ from __future__ import annotations
 import io
 import os
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     pass
 
 
-class ScenePreset(str, Enum):
+class ScenePreset(StrEnum):
     """Available scene presets for virtual photoshoot."""
 
     STUDIO_WHITE = "studio_white"

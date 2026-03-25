@@ -23,7 +23,7 @@ from abc import ABC, abstractmethod
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -156,14 +156,14 @@ CHROMA_BATCH_SIZE = 1000
 # =============================================================================
 
 
-class VectorDBType(str, Enum):
+class VectorDBType(StrEnum):
     """Supported vector database types."""
 
     CHROMADB = "chromadb"
     PINECONE = "pinecone"
 
 
-class DocumentStatus(str, Enum):
+class DocumentStatus(StrEnum):
     """Document indexing status."""
 
     PENDING = "pending"

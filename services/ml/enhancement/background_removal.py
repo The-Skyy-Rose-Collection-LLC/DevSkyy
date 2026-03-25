@@ -17,18 +17,18 @@ from __future__ import annotations
 
 import hashlib
 import logging
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import httpx
 from pydantic import BaseModel
+from services.ml.replicate_client import ReplicateClient, ReplicateConfig
 
 from errors.production_errors import (
     DevSkyError,
     DevSkyErrorCode,
     DevSkyErrorSeverity,
 )
-from services.ml.replicate_client import ReplicateClient, ReplicateConfig
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ FALLBACK_MODELS = [
 # =============================================================================
 
 
-class BackgroundType(str, Enum):
+class BackgroundType(StrEnum):
     """Background replacement type."""
 
     TRANSPARENT = "transparent"

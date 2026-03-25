@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import httpx
@@ -26,7 +26,7 @@ from errors.production_errors import MCPServerError
 logger = logging.getLogger(__name__)
 
 
-class MCPServerStatus(str, Enum):
+class MCPServerStatus(StrEnum):
     """MCP server connection status."""
 
     DISCONNECTED = "disconnected"

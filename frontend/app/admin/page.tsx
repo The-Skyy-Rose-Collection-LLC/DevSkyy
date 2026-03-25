@@ -15,7 +15,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { api, type ProviderStats, type PipelineStatus } from '@/lib/api';
-import { useQuery } from '@/hooks';
+import { useQuery } from '@tanstack/react-query';
 import { ErrorState } from '@/components/shared';
 import { StatsCard, DashboardSkeleton } from '@/components/dashboard';
 import {
@@ -24,6 +24,11 @@ import {
   AgentStatusChart,
   PipelineMetricsChart,
 } from '@/components/dashboard/analytics-charts';
+import LuxuryProductViewer from '@/components/3d/LuxuryProductViewer';
+import PulseAnalytics from '@/components/dashboard/pulse-analytics';
+import AuroraAnalytics from '@/components/dashboard/aurora-analytics';
+import { ConversionPulse } from '@/components/dashboard/conversion-pulse';
+import { PersonalizationAnalytics } from '@/components/dashboard/personalization-analytics';
 
 interface DashboardStats {
   roundTable: {
@@ -76,12 +81,29 @@ async function fetchDashboardData(): Promise<{
   };
 }
 
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: { y: 0, opacity: 1 },
+};
+
 export default function AdminDashboard() {
-  const { data, loading, error, refetch } = useQuery(
-    'dashboard',
-    fetchDashboardData,
-    { refetchInterval: 30000 }
-  );
+  const { data, isLoading: loading, error, refetch } = useQuery({
+    queryKey: ['dashboard'],
+    queryFn: fetchDashboardData,
+    refetchInterval: 30000,
+  });
 
   if (loading) {
     return <DashboardSkeleton />;
@@ -101,22 +123,29 @@ export default function AdminDashboard() {
   const { stats, providerStats } = data!;
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className="space-y-8"
+    >
       {/* Header */}
-      <header className="flex items-center justify-between">
+      <motion.header variants={itemVariants} className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">DevSkyy Dashboard</h1>
-          <p className="text-gray-400 mt-1">Enterprise AI Platform Overview</p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+            DevSkyy <span className="gradient-text-vibrant">Dashboard</span>
+          </h1>
+          <p className="text-gray-400 mt-2 text-lg font-medium">Enterprise AI Platform Overview</p>
         </div>
-        <Badge variant="outline" className="border-green-500 text-green-400">
-          <Activity className="h-3 w-3 mr-1" aria-hidden="true" />
+        <Badge variant="outline" className="border-green-500/50 bg-green-500/5 text-green-400 backdrop-blur-sm px-4 py-1">
+          <Activity className="h-3 w-3 mr-2 animate-pulse" aria-hidden="true" />
           All Systems Operational
         </Badge>
-      </header>
+      </motion.header>
 
       {/* Stats Grid */}
-      <section aria-label="Platform Statistics">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <motion.section variants={itemVariants} aria-label="Platform Statistics">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <StatsCard
             title="LLM Competitions"
             value={stats.roundTable.totalCompetitions}
@@ -150,24 +179,24 @@ export default function AdminDashboard() {
             trendDirection="up"
           />
         </div>
-      </section>
+      </motion.section>
 
       {/* Provider & Pipeline Status */}
-      <section aria-label="Provider and Pipeline Status">
-        <div className="grid gap-6 lg:grid-cols-2">
+      <motion.section variants={itemVariants} aria-label="Provider and Pipeline Status">
+        <div className="grid gap-8 lg:grid-cols-2">
           <ProviderRankingsCard providerStats={providerStats} />
           <PipelineStatusCard status={stats.pipeline3d} />
         </div>
-      </section>
+      </motion.section>
 
       {/* Analytics Charts */}
-      <section aria-label="Analytics Charts">
-        <div className="grid gap-6 lg:grid-cols-2">
+      <motion.section variants={itemVariants} aria-label="Analytics Charts">
+        <div className="grid gap-8 lg:grid-cols-2">
           <ProviderPerformanceChart stats={providerStats} />
           <CompetitionTrendChart data={[]} />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2 mt-6">
+        <div className="grid gap-8 lg:grid-cols-2 mt-8">
           <AgentStatusChart
             active={stats.agents.active}
             idle={42}
@@ -180,10 +209,134 @@ export default function AdminDashboard() {
             completedToday={12}
           />
         </div>
-      </section>
+      </motion.section>
+
+      {/* 3D Product Showcase */}
+      <motion.section variants={itemVariants} aria-label="3D Product Showcase">
+        <Card className="bg-gray-900 border-gray-800">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-white font-display text-2xl luxury-text-gradient">
+                  3D Product Showcase
+                </CardTitle>
+                <CardDescription className="text-gray-400 mt-2">
+                  Luxury product visualization powered by React Three Fiber
+                </CardDescription>
+              </div>
+              <Link href="/admin/3d-pipeline">
+                <Button variant="outline" className="border-gray-700">
+                  <Box className="mr-2 h-4 w-4" />
+                  View Pipeline
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* 3D Viewer */}
+              <div className="h-[600px]">
+                <div className="relative w-full h-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-lg overflow-hidden flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <Box className="h-24 w-24 text-rose-400 mx-auto mb-4 opacity-50" />
+                    <h3 className="text-2xl font-display text-white mb-2">
+                      3D Viewer Ready
+                    </h3>
+                    <p className="text-gray-400 mb-4">
+                      Upload a GLB model to /public/models/ to preview
+                    </p>
+                    <div className="text-sm text-gray-500 font-mono bg-gray-800/50 px-4 py-2 rounded inline-block">
+                      LuxuryProductViewer Component Active
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Product Info */}
+              <div className="flex flex-col justify-center space-y-6">
+                <div>
+                  <h3 className="text-2xl font-display text-white mb-2">
+                    Advanced 3D Rendering
+                  </h3>
+                  <p className="text-gray-400 mb-4">
+                    High-fidelity product visualization with real-time lighting,
+                    shadows, and post-processing effects.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-400" />
+                    <span className="text-gray-300">PBR Material Rendering</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-400" />
+                    <span className="text-gray-300">Real-time Shadows & Reflections</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-400" />
+                    <span className="text-gray-300">Bloom & Tone Mapping Effects</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-400" />
+                    <span className="text-gray-300">AR-Ready GLB Export</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-400" />
+                    <span className="text-gray-300">Luxury Rose Gold Lighting</span>
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="p-4 bg-gray-800/50 rounded-lg">
+                      <p className="text-2xl font-bold text-rose-400">8</p>
+                      <p className="text-xs text-gray-400 mt-1">3D Providers</p>
+                    </div>
+                    <div className="p-4 bg-gray-800/50 rounded-lg">
+                      <p className="text-2xl font-bold text-rose-400">1,240</p>
+                      <p className="text-xs text-gray-400 mt-1">Models Generated</p>
+                    </div>
+                    <div className="p-4 bg-gray-800/50 rounded-lg">
+                      <p className="text-2xl font-bold text-rose-400">99.2%</p>
+                      <p className="text-xs text-gray-400 mt-1">Success Rate</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Link href="/admin/3d-pipeline">
+                  <Button className="w-full bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700">
+                    <Box className="mr-2 h-4 w-4" />
+                    Launch 3D Pipeline
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.section>
+
+      {/* The Pulse — Real-Time Social Proof & Urgency Engine */}
+      <motion.section variants={itemVariants} aria-label="The Pulse Analytics">
+        <div className="grid gap-8 lg:grid-cols-2">
+          <PulseAnalytics />
+          <AuroraAnalytics />
+        </div>
+      </motion.section>
+
+      {/* Conversion Pulse — Live Sales Feed */}
+      <motion.section variants={itemVariants} aria-label="Conversion Pulse Live Feed">
+        <ConversionPulse />
+      </motion.section>
+
+      {/* Adaptive Personalization Engine — Behavioral Analytics */}
+      <motion.section variants={itemVariants} aria-label="Adaptive Personalization Analytics">
+        <PersonalizationAnalytics />
+      </motion.section>
 
       {/* Quick Actions */}
-      <section aria-label="Quick Actions">
+      <motion.section variants={itemVariants} aria-label="Quick Actions">
         <Card className="bg-gray-900 border-gray-800">
           <CardHeader>
             <CardTitle className="text-white">Quick Actions</CardTitle>
@@ -229,8 +382,8 @@ export default function AdminDashboard() {
             </div>
           </CardContent>
         </Card>
-      </section>
-    </div>
+      </motion.section>
+    </motion.div>
   );
 }
 

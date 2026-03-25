@@ -12,7 +12,7 @@ from __future__ import annotations
 import logging
 import os
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -74,7 +74,7 @@ except ImportError:
     logger.warning("pyrender not available. 3D rendering disabled.")
 
 
-class LightingPreset(str, Enum):
+class LightingPreset(StrEnum):
     """Lighting configurations for rendering."""
 
     STUDIO = "studio"
@@ -83,7 +83,7 @@ class LightingPreset(str, Enum):
     DRAMATIC = "dramatic"
 
 
-class CameraAngle(str, Enum):
+class CameraAngle(StrEnum):
     """Standard camera angles for product photography."""
 
     FRONT = "front"

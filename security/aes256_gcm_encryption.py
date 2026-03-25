@@ -36,7 +36,7 @@ import re
 import secrets
 from collections.abc import Callable
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any, cast
 
 from cryptography.exceptions import InvalidTag
@@ -107,7 +107,7 @@ class EncryptionConfig:
     default_aad: bytes = b"devskyy-platform-v3"
 
 
-class KeyVersion(str, Enum):
+class KeyVersion(StrEnum):
     """Key versions for rotation tracking."""
 
     V1 = "v1"

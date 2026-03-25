@@ -17,8 +17,10 @@ import asyncio
 import logging
 import time
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
+
+from core.telemetry.tracer import get_tracer
 
 from .base import BaseLLMClient, CompletionResponse, Message, ModelProvider
 from .exceptions import LLMError
@@ -33,6 +35,7 @@ from .providers import (
 from .providers.deepseek import DeepSeekClient
 
 logger = logging.getLogger(__name__)
+_tracer = get_tracer("llm.router")
 
 
 # =============================================================================
@@ -115,8 +118,23 @@ PROVIDER_CONFIGS: dict[ModelProvider, ProviderConfig] = {
     ),
 }
 
+# Add LiteLLM as universal fallback if available
+try:
+    from .providers.litellm_provider import LiteLLMClient
 
-class RoutingStrategy(str, Enum):
+    PROVIDER_CONFIGS[ModelProvider.LITELLM] = ProviderConfig(
+        provider=ModelProvider.LITELLM,
+        client_class=LiteLLMClient,
+        default_model="anthropic/claude-sonnet-4-20250514",
+        priority=99,  # Lowest priority — universal fallback only
+        input_price=0.003,
+        output_price=0.015,
+    )
+except ImportError:
+    pass
+
+
+class RoutingStrategy(StrEnum):
     """Routing strategy for provider selection."""
 
     PRIORITY = "priority"  # Use priority order
@@ -382,15 +400,23 @@ class LLMRouter:
         config = self.configs[provider]
         model = model or config.default_model
 
-        try:
-            response = await client.complete(messages, model=model, **kwargs)
-            # Record success
-            self.circuit_breaker.record_success(provider)
-            return response
-        except Exception:
-            # Record failure
-            self.circuit_breaker.record_failure(provider)
-            raise
+        with _tracer.start_as_current_span("llm.complete") as span:
+            span.set_attribute("llm.provider", provider.value)
+            span.set_attribute("llm.model", model)
+            span.set_attribute("llm.message_count", len(messages))
+            try:
+                response = await client.complete(messages, model=model, **kwargs)
+                # Record success
+                self.circuit_breaker.record_success(provider)
+                span.set_attribute("llm.input_tokens", response.input_tokens)
+                span.set_attribute("llm.output_tokens", response.output_tokens)
+                span.set_attribute("llm.latency_ms", response.latency_ms)
+                return response
+            except Exception as e:
+                # Record failure
+                self.circuit_breaker.record_failure(provider)
+                span.record_exception(e)
+                raise
 
     async def complete_with_fallback(
         self,
@@ -418,6 +444,14 @@ class LLMRouter:
 
         # Filter out providers with open circuits
         available_providers = [p for p in providers if self.circuit_breaker.is_available(p)]
+
+        # Add LiteLLM as universal last-resort fallback
+        if (
+            ModelProvider.LITELLM in self.configs
+            and ModelProvider.LITELLM not in available_providers
+            and self.circuit_breaker.is_available(ModelProvider.LITELLM)
+        ):
+            available_providers.append(ModelProvider.LITELLM)
 
         if not available_providers:
             raise LLMError(

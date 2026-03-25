@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from llm import Message
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class Collection(str, Enum):
+class Collection(StrEnum):
     """SkyyRose collections."""
 
     BLACK_ROSE = "BLACK_ROSE"
@@ -43,7 +43,7 @@ class Collection(str, Enum):
 SKYYROSE_BRAND: dict[str, Any] = {
     "name": "The Skyy Rose Collection",
     "tagline": "Luxury Streetwear with Soul",
-    "philosophy": "Where Love Meets Luxury",
+    "philosophy": "Luxury Grows from Concrete.",
     "location": "Oakland, California",
     "tone": {
         "primary": "Elegant, empowering, romantic, bold",

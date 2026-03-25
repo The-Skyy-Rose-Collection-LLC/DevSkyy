@@ -1,0 +1,776 @@
+<?php
+/**
+ * Wishlist Functions
+ *
+ * @package SkyyRose_Flagship
+ * @since 1.0.0
+ */
+
+// Prevent direct access.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Initialize wishlist session for non-logged-in users.
+ *
+ * @since 1.0.0
+ */
+function skyyrose_init_wishlist_session() {
+	if ( ! function_exists( 'WC' ) || ! WC()->session ) {
+		return;
+	}
+
+	if ( ! is_user_logged_in() && ! WC()->session->has_session() ) {
+		WC()->session->set_customer_session_cookie( true );
+	}
+}
+add_action( 'woocommerce_init', 'skyyrose_init_wishlist_session' );
+
+/**
+ * Get the wishlist key for the current user or session.
+ *
+ * @since 1.0.0
+ * @return string Wishlist key.
+ */
+function skyyrose_get_wishlist_key() {
+	if ( is_user_logged_in() ) {
+		return 'wishlist_user_' . get_current_user_id();
+	}
+
+	// Use session for non-logged-in users.
+	if ( function_exists( 'WC' ) && WC()->session ) {
+		$session_key = WC()->session->get_customer_id();
+		return 'wishlist_session_' . $session_key;
+	}
+
+	return 'wishlist_session_guest';
+}
+
+/**
+ * Add product to wishlist.
+ *
+ * @since 1.0.0
+ * @param int $product_id Product ID to add.
+ * @return bool True on success, false on failure.
+ */
+function skyyrose_add_to_wishlist( $product_id ) {
+	$product_id = absint( $product_id );
+
+	if ( ! $product_id || ! function_exists( 'wc_get_product' ) || ! wc_get_product( $product_id ) ) {
+		return false;
+	}
+
+	$wishlist_key = skyyrose_get_wishlist_key();
+
+	// Guests use transients (auto-expire, no wp_options bloat); logged-in use options.
+	if ( is_user_logged_in() ) {
+		$wishlist = get_option( $wishlist_key, array() );
+	} else {
+		$wishlist = get_transient( $wishlist_key );
+		$wishlist = is_array( $wishlist ) ? $wishlist : array();
+	}
+
+	// Cap wishlist at 50 items to prevent unbounded growth (CLAUDE.md: no unbounded data structures).
+	if ( count( $wishlist ) >= 50 ) {
+		return false;
+	}
+
+	if ( ! in_array( $product_id, $wishlist, true ) ) {
+		$wishlist[] = $product_id;
+
+		if ( is_user_logged_in() ) {
+			update_option( $wishlist_key, $wishlist, false );
+		} else {
+			set_transient( $wishlist_key, $wishlist, 30 * DAY_IN_SECONDS );
+		}
+
+		// Trigger action for extensions.
+		do_action( 'skyyrose_added_to_wishlist', $product_id );
+
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Remove product from wishlist.
+ *
+ * @since 1.0.0
+ * @param int $product_id Product ID to remove.
+ * @return bool True on success, false on failure.
+ */
+function skyyrose_remove_from_wishlist( $product_id ) {
+	$product_id = absint( $product_id );
+
+	if ( ! $product_id ) {
+		return false;
+	}
+
+	$wishlist_key = skyyrose_get_wishlist_key();
+
+	if ( is_user_logged_in() ) {
+		$wishlist = get_option( $wishlist_key, array() );
+	} else {
+		$wishlist = get_transient( $wishlist_key );
+		$wishlist = is_array( $wishlist ) ? $wishlist : array();
+	}
+
+	$key = array_search( $product_id, $wishlist, true );
+	if ( false !== $key ) {
+		unset( $wishlist[ $key ] );
+		$wishlist = array_values( $wishlist ); // Re-index array.
+
+		if ( is_user_logged_in() ) {
+			update_option( $wishlist_key, $wishlist, false );
+		} else {
+			set_transient( $wishlist_key, $wishlist, 30 * DAY_IN_SECONDS );
+		}
+
+		// Trigger action for extensions.
+		do_action( 'skyyrose_removed_from_wishlist', $product_id );
+
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Get wishlist items.
+ *
+ * @since 1.0.0
+ * @return array Array of product IDs in wishlist.
+ */
+function skyyrose_get_wishlist_items() {
+	$wishlist_key = skyyrose_get_wishlist_key();
+
+	if ( is_user_logged_in() ) {
+		$wishlist = get_option( $wishlist_key, array() );
+	} else {
+		$wishlist = get_transient( $wishlist_key );
+		$wishlist = is_array( $wishlist ) ? $wishlist : array();
+	}
+
+	// Filter out invalid products (guard against WooCommerce deactivation mid-request).
+	if ( function_exists( 'wc_get_product' ) ) {
+		$wishlist = array_filter(
+			$wishlist,
+			function( $product_id ) {
+				return wc_get_product( $product_id ) !== false;
+			}
+		);
+	}
+
+	return array_values( $wishlist );
+}
+
+/**
+ * Check if product is in wishlist.
+ *
+ * @since 1.0.0
+ * @param int $product_id Product ID to check.
+ * @return bool True if in wishlist, false otherwise.
+ */
+function skyyrose_is_in_wishlist( $product_id ) {
+	$product_id = absint( $product_id );
+	$wishlist   = skyyrose_get_wishlist_items();
+
+	return in_array( $product_id, $wishlist, true );
+}
+
+/**
+ * Move product from wishlist to cart.
+ *
+ * @since 1.0.0
+ * @param int $product_id Product ID to move.
+ * @return bool True on success, false on failure.
+ */
+function skyyrose_move_to_cart( $product_id ) {
+	$product_id = absint( $product_id );
+
+	if ( ! function_exists( 'wc_get_product' ) ) {
+		return false;
+	}
+
+	$product = wc_get_product( $product_id );
+
+	if ( ! $product ) {
+		return false;
+	}
+
+	// Add to cart.
+	if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+		return false;
+	}
+
+	$cart_item_key = WC()->cart->add_to_cart( $product_id );
+
+	if ( $cart_item_key ) {
+		// Remove from wishlist.
+		skyyrose_remove_from_wishlist( $product_id );
+
+		// Trigger action for extensions.
+		do_action( 'skyyrose_moved_to_cart', $product_id );
+
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Clear all items from wishlist.
+ *
+ * @since 1.0.0
+ * @return bool True on success, false on failure.
+ */
+function skyyrose_clear_wishlist() {
+	$wishlist_key = skyyrose_get_wishlist_key();
+
+	if ( is_user_logged_in() ) {
+		delete_option( $wishlist_key );
+	} else {
+		delete_transient( $wishlist_key );
+	}
+
+	// Always fire action — the wishlist is empty regardless of whether the key existed.
+	do_action( 'skyyrose_wishlist_cleared' );
+
+	return true;
+}
+
+/**
+ * Get wishlist item count.
+ *
+ * @since 1.0.0
+ * @return int Number of items in wishlist.
+ */
+function skyyrose_get_wishlist_count() {
+	return count( skyyrose_get_wishlist_items() );
+}
+
+/**
+ * Move all wishlist items to cart.
+ *
+ * @since 1.0.0
+ * @return array Array with 'success' and 'failed' counts.
+ */
+function skyyrose_move_all_to_cart() {
+	$wishlist = skyyrose_get_wishlist_items();
+	$success  = 0;
+	$failed   = 0;
+
+	foreach ( $wishlist as $product_id ) {
+		if ( skyyrose_move_to_cart( $product_id ) ) {
+			$success++;
+		} else {
+			$failed++;
+		}
+	}
+
+	return array(
+		'success' => $success,
+		'failed'  => $failed,
+	);
+}
+
+/**
+ * AJAX handler: Add to wishlist.
+ *
+ * @since 1.0.0
+ */
+function skyyrose_ajax_add_to_wishlist() {
+	check_ajax_referer( 'skyyrose-wishlist-nonce', 'nonce' );
+
+	$product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+
+	if ( ! $product_id ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Invalid product ID.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
+
+	$result = skyyrose_add_to_wishlist( $product_id );
+
+	if ( $result ) {
+		wp_send_json_success(
+			array(
+				'message' => esc_html__( 'Product added to wishlist.', 'skyyrose-flagship' ),
+				'count'   => skyyrose_get_wishlist_count(),
+			)
+		);
+	} else {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Product already in wishlist.', 'skyyrose-flagship' ),
+			)
+		);
+	}
+}
+add_action( 'wp_ajax_skyyrose_add_to_wishlist', 'skyyrose_ajax_add_to_wishlist' );
+add_action( 'wp_ajax_nopriv_skyyrose_add_to_wishlist', 'skyyrose_ajax_add_to_wishlist' );
+
+/**
+ * AJAX handler: Remove from wishlist.
+ *
+ * @since 1.0.0
+ */
+function skyyrose_ajax_remove_from_wishlist() {
+	check_ajax_referer( 'skyyrose-wishlist-nonce', 'nonce' );
+
+	$product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+
+	if ( ! $product_id ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Invalid product ID.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
+
+	$result = skyyrose_remove_from_wishlist( $product_id );
+
+	if ( $result ) {
+		wp_send_json_success(
+			array(
+				'message' => esc_html__( 'Product removed from wishlist.', 'skyyrose-flagship' ),
+				'count'   => skyyrose_get_wishlist_count(),
+			)
+		);
+	} else {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Product not in wishlist.', 'skyyrose-flagship' ),
+			)
+		);
+	}
+}
+add_action( 'wp_ajax_skyyrose_remove_from_wishlist', 'skyyrose_ajax_remove_from_wishlist' );
+add_action( 'wp_ajax_nopriv_skyyrose_remove_from_wishlist', 'skyyrose_ajax_remove_from_wishlist' );
+
+/**
+ * AJAX handler: Move to cart.
+ *
+ * @since 1.0.0
+ */
+function skyyrose_ajax_move_to_cart() {
+	check_ajax_referer( 'skyyrose-wishlist-nonce', 'nonce' );
+
+	$product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+
+	if ( ! $product_id ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Invalid product ID.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
+
+	$result = skyyrose_move_to_cart( $product_id );
+
+	if ( $result ) {
+		wp_send_json_success(
+			array(
+				'message'    => esc_html__( 'Product moved to cart.', 'skyyrose-flagship' ),
+				'count'      => skyyrose_get_wishlist_count(),
+				'cart_count' => ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0,
+			)
+		);
+	} else {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Failed to add product to cart.', 'skyyrose-flagship' ),
+			)
+		);
+	}
+}
+add_action( 'wp_ajax_skyyrose_move_to_cart', 'skyyrose_ajax_move_to_cart' );
+// Guest move-to-cart: verify nonce first, then return auth-required error so JS can redirect to login.
+add_action( 'wp_ajax_nopriv_skyyrose_move_to_cart', function() {
+	check_ajax_referer( 'skyyrose-wishlist-nonce', 'nonce' );
+	wp_send_json_error(
+		array(
+			'message'       => esc_html__( 'Please sign in to move items to cart.', 'skyyrose-flagship' ),
+			'require_login' => true,
+		)
+	);
+} );
+
+/**
+ * AJAX handler: Clear wishlist.
+ *
+ * @since 1.0.0
+ */
+function skyyrose_ajax_clear_wishlist() {
+	check_ajax_referer( 'skyyrose-wishlist-nonce', 'nonce' );
+
+	$result = skyyrose_clear_wishlist();
+
+	if ( $result ) {
+		wp_send_json_success(
+			array(
+				'message' => esc_html__( 'Wishlist cleared.', 'skyyrose-flagship' ),
+				'count'   => 0,
+			)
+		);
+	} else {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Failed to clear wishlist.', 'skyyrose-flagship' ),
+			)
+		);
+	}
+}
+add_action( 'wp_ajax_skyyrose_clear_wishlist', 'skyyrose_ajax_clear_wishlist' );
+// Guest wishlists exist via transients — guests must be able to clear their own wishlist.
+add_action( 'wp_ajax_nopriv_skyyrose_clear_wishlist', 'skyyrose_ajax_clear_wishlist' );
+
+/**
+ * AJAX handler: Move all to cart.
+ *
+ * @since 1.0.0
+ */
+function skyyrose_ajax_move_all_to_cart() {
+	check_ajax_referer( 'skyyrose-wishlist-nonce', 'nonce' );
+
+	// Rate limit: max 3 "move all" operations per user per minute.
+	$user_id  = get_current_user_id();
+	$rate_key = 'skyyrose_move_all_' . $user_id;
+	$attempts = (int) get_transient( $rate_key );
+	if ( $attempts >= 3 ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Too many requests. Please try again shortly.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
+	}
+	set_transient( $rate_key, $attempts + 1, MINUTE_IN_SECONDS );
+
+	$result = skyyrose_move_all_to_cart();
+
+	if ( $result['success'] > 0 ) {
+		wp_send_json_success(
+			array(
+				'message'    => sprintf(
+					/* translators: %d: Number of products moved */
+					esc_html__( '%d products moved to cart.', 'skyyrose-flagship' ),
+					$result['success']
+				),
+				'count'      => skyyrose_get_wishlist_count(),
+				'cart_count' => ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0,
+			)
+		);
+	} else {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Failed to move products to cart.', 'skyyrose-flagship' ),
+			)
+		);
+	}
+}
+add_action( 'wp_ajax_skyyrose_move_all_to_cart', 'skyyrose_ajax_move_all_to_cart' );
+// nopriv removed: cart mutations require authentication (guest sessions can't persist wishlists).
+
+/**
+ * Register REST API endpoints for wishlist.
+ *
+ * @since 1.0.0
+ */
+function skyyrose_register_wishlist_rest_routes() {
+	// Permission callback — all wishlist REST operations require authentication.
+	// WordPress core already verifies X-WP-Nonce via rest_cookie_check_errors().
+	// Manual nonce check removed: it blocked Application Passwords, OAuth tokens,
+	// and any non-cookie auth method that doesn't send X-WP-Nonce.
+	$permission_callback = function( WP_REST_Request $request ) {
+		if ( ! is_user_logged_in() ) {
+			return new WP_Error(
+				'rest_forbidden',
+				esc_html__( 'Wishlist requires authentication.', 'skyyrose-flagship' ),
+				array( 'status' => 401 )
+			);
+		}
+		return true;
+	};
+
+	// Get wishlist items.
+	register_rest_route(
+		'skyyrose/v1',
+		'/wishlist',
+		array(
+			'methods'             => 'GET',
+			'callback'            => 'skyyrose_rest_get_wishlist',
+			'permission_callback' => $permission_callback,
+		)
+	);
+
+	// Add item to wishlist.
+	register_rest_route(
+		'skyyrose/v1',
+		'/wishlist/add',
+		array(
+			'methods'             => 'POST',
+			'callback'            => 'skyyrose_rest_add_to_wishlist',
+			'permission_callback' => $permission_callback,
+			'args'                => array(
+				'product_id' => array(
+					'required'          => true,
+					'validate_callback' => function( $param ) {
+						return is_numeric( $param );
+					},
+					'sanitize_callback' => 'absint',
+				),
+			),
+		)
+	);
+
+	// Remove item from wishlist.
+	register_rest_route(
+		'skyyrose/v1',
+		'/wishlist/remove',
+		array(
+			'methods'             => 'POST',
+			'callback'            => 'skyyrose_rest_remove_from_wishlist',
+			'permission_callback' => $permission_callback,
+			'args'                => array(
+				'product_id' => array(
+					'required'          => true,
+					'validate_callback' => function( $param ) {
+						return is_numeric( $param );
+					},
+					'sanitize_callback' => 'absint',
+				),
+			),
+		)
+	);
+
+	// Clear all wishlist items.
+	register_rest_route(
+		'skyyrose/v1',
+		'/wishlist/clear',
+		array(
+			'methods'             => 'POST',
+			'callback'            => 'skyyrose_rest_clear_wishlist',
+			'permission_callback' => $permission_callback,
+		)
+	);
+}
+add_action( 'rest_api_init', 'skyyrose_register_wishlist_rest_routes' );
+
+/**
+ * REST API: Get wishlist.
+ *
+ * @since 1.0.0
+ * @param WP_REST_Request $request Request object.
+ * @return WP_REST_Response Response object.
+ */
+function skyyrose_rest_get_wishlist( $request ) {
+	$wishlist = skyyrose_get_wishlist_items();
+	$products = array();
+
+	if ( ! function_exists( 'wc_get_product' ) ) {
+		return new WP_REST_Response( array( 'items' => array(), 'count' => 0 ), 200 );
+	}
+
+	foreach ( $wishlist as $product_id ) {
+		$product = wc_get_product( $product_id );
+		if ( $product ) {
+			$products[] = array(
+				'id'    => $product_id,
+				'name'  => $product->get_name(),
+				'price' => $product->get_price_html(),
+				'image' => wp_get_attachment_image_url( $product->get_image_id(), 'thumbnail' ),
+				'url'   => $product->get_permalink(),
+			);
+		}
+	}
+
+	return new WP_REST_Response(
+		array(
+			'items' => $products,
+			'count' => count( $products ),
+		),
+		200
+	);
+}
+
+/**
+ * REST API: Add to wishlist.
+ *
+ * @since 1.0.0
+ * @param WP_REST_Request $request Request object.
+ * @return WP_REST_Response Response object.
+ */
+function skyyrose_rest_add_to_wishlist( $request ) {
+	$product_id = absint( $request->get_param( 'product_id' ) );
+	$result     = skyyrose_add_to_wishlist( $product_id );
+
+	if ( $result ) {
+		return new WP_REST_Response(
+			array(
+				'success' => true,
+				'message' => esc_html__( 'Product added to wishlist.', 'skyyrose-flagship' ),
+				'count'   => skyyrose_get_wishlist_count(),
+			),
+			200
+		);
+	}
+
+	return new WP_REST_Response(
+		array(
+			'success' => false,
+			'message' => esc_html__( 'Product already in wishlist.', 'skyyrose-flagship' ),
+		),
+		400
+	);
+}
+
+/**
+ * REST API: Remove from wishlist.
+ *
+ * @since 1.0.0
+ * @param WP_REST_Request $request Request object.
+ * @return WP_REST_Response Response object.
+ */
+function skyyrose_rest_remove_from_wishlist( $request ) {
+	$product_id = absint( $request->get_param( 'product_id' ) );
+	$result     = skyyrose_remove_from_wishlist( $product_id );
+
+	if ( $result ) {
+		return new WP_REST_Response(
+			array(
+				'success' => true,
+				'message' => esc_html__( 'Product removed from wishlist.', 'skyyrose-flagship' ),
+				'count'   => skyyrose_get_wishlist_count(),
+			),
+			200
+		);
+	}
+
+	return new WP_REST_Response(
+		array(
+			'success' => false,
+			'message' => esc_html__( 'Product not in wishlist.', 'skyyrose-flagship' ),
+		),
+		400
+	);
+}
+
+/**
+ * REST API: Clear wishlist.
+ *
+ * @since 1.0.0
+ * @param WP_REST_Request $request Request object.
+ * @return WP_REST_Response Response object.
+ */
+function skyyrose_rest_clear_wishlist( $request ) {
+	$result = skyyrose_clear_wishlist();
+
+	if ( $result ) {
+		return new WP_REST_Response(
+			array(
+				'success' => true,
+				'message' => esc_html__( 'Wishlist cleared.', 'skyyrose-flagship' ),
+				'count'   => 0,
+			),
+			200
+		);
+	}
+
+	return new WP_REST_Response(
+		array(
+			'success' => false,
+			'message' => esc_html__( 'Failed to clear wishlist.', 'skyyrose-flagship' ),
+		),
+		400
+	);
+}
+
+/**
+ * Enqueue wishlist scripts and styles.
+ *
+ * @since 1.0.0
+ */
+function skyyrose_enqueue_wishlist_assets() {
+	// Enqueue wishlist CSS (with file_exists guard to prevent 404s on partial deploys).
+	$css_path = SKYYROSE_DIR . '/assets/css/wishlist.css';
+	if ( file_exists( $css_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-wishlist',
+			SKYYROSE_ASSETS_URI . '/css/wishlist.css',
+			array(),
+			SKYYROSE_VERSION
+		);
+	}
+
+	// Enqueue wishlist JS.
+	$js_path = SKYYROSE_DIR . '/assets/js/wishlist.js';
+	if ( ! file_exists( $js_path ) ) {
+		return;
+	}
+	wp_enqueue_script(
+		'skyyrose-wishlist',
+		SKYYROSE_ASSETS_URI . '/js/wishlist.js',
+		array( 'jquery' ),
+		SKYYROSE_VERSION,
+		true
+	);
+
+	// Localize script.
+	wp_localize_script(
+		'skyyrose-wishlist',
+		'skyyRoseWishlist',
+		array(
+			'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
+			'nonce'       => wp_create_nonce( 'skyyrose-wishlist-nonce' ),
+			'count'       => skyyrose_get_wishlist_count(),
+			'wishlistUrl' => ( $wl_page = get_page_by_path( 'wishlist' ) ) ? get_permalink( $wl_page ) : home_url( '/' ),
+			'i18n'        => array(
+				'addedToWishlist'     => esc_html__( 'Added to wishlist', 'skyyrose-flagship' ),
+				'removedFromWishlist' => esc_html__( 'Removed from wishlist', 'skyyrose-flagship' ),
+				'movedToCart'         => esc_html__( 'Moved to cart', 'skyyrose-flagship' ),
+				'error'               => esc_html__( 'An error occurred', 'skyyrose-flagship' ),
+			),
+		)
+	);
+}
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_wishlist_assets' );
+
+/**
+ * Add wishlist button to product loop.
+ *
+ * @since 1.0.0
+ */
+function skyyrose_add_wishlist_button_to_loop() {
+	get_template_part( 'template-parts/wishlist-button' );
+}
+add_action( 'woocommerce_after_shop_loop_item', 'skyyrose_add_wishlist_button_to_loop', 15 );
+
+/**
+ * Add wishlist button to single product page.
+ *
+ * @since 1.0.0
+ */
+function skyyrose_add_wishlist_button_to_single() {
+	get_template_part( 'template-parts/wishlist-button' );
+}
+add_action( 'woocommerce_single_product_summary', 'skyyrose_add_wishlist_button_to_single', 35 );
+
+/**
+ * Clean up wishlist option when a user account is deleted.
+ *
+ * Prevents unbounded wp_options bloat from orphaned wishlist rows.
+ *
+ * @since 3.2.1
+ * @param int $user_id The ID of the user being deleted.
+ */
+add_action( 'delete_user', function( $user_id ) {
+	delete_option( 'wishlist_user_' . absint( $user_id ) );
+} );

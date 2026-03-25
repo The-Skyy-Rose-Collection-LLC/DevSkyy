@@ -10,7 +10,7 @@ Version: 1.0.0
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Protocol, runtime_checkable
 
 from pydantic import BaseModel, Field
@@ -87,7 +87,7 @@ class ThreeDTimeoutError(ThreeDProviderError):
 # =============================================================================
 
 
-class ProviderStatus(str, Enum):
+class ProviderStatus(StrEnum):
     """Provider availability status."""
 
     AVAILABLE = "available"
@@ -96,7 +96,7 @@ class ProviderStatus(str, Enum):
     RATE_LIMITED = "rate_limited"
 
 
-class ThreeDCapability(str, Enum):
+class ThreeDCapability(StrEnum):
     """3D generation capabilities."""
 
     TEXT_TO_3D = "text_to_3d"
@@ -105,7 +105,7 @@ class ThreeDCapability(str, Enum):
     TEXTURE_GENERATION = "texture_generation"
 
 
-class OutputFormat(str, Enum):
+class OutputFormat(StrEnum):
     """3D output formats."""
 
     GLB = "glb"
@@ -116,7 +116,7 @@ class OutputFormat(str, Enum):
     STL = "stl"
 
 
-class QualityLevel(str, Enum):
+class QualityLevel(StrEnum):
     """Generation quality levels."""
 
     DRAFT = "draft"  # Fast, lower quality

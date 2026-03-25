@@ -23,7 +23,7 @@ import uuid
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any, TypeVar
 
 from pydantic import BaseModel, Field
@@ -39,7 +39,7 @@ S = TypeVar("S", bound="WorkflowState")
 # =============================================================================
 
 
-class NodeType(str, Enum):
+class NodeType(StrEnum):
     """Node types in workflow"""
 
     AGENT = "agent"
@@ -50,7 +50,7 @@ class NodeType(str, Enum):
     END = "end"
 
 
-class EdgeType(str, Enum):
+class EdgeType(StrEnum):
     """Edge types"""
 
     SEQUENTIAL = "sequential"
@@ -58,7 +58,7 @@ class EdgeType(str, Enum):
     PARALLEL = "parallel"
 
 
-class WorkflowStatus(str, Enum):
+class WorkflowStatus(StrEnum):
     """Workflow execution status"""
 
     PENDING = "pending"

@@ -13,7 +13,7 @@ Version: 1.0.0
 import json
 import logging
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -36,7 +36,7 @@ router = APIRouter(prefix="/analytics/alerts", tags=["Alert Management"])
 # =============================================================================
 
 
-class AlertStatus(str, Enum):
+class AlertStatus(StrEnum):
     """Alert status enum."""
 
     TRIGGERED = "triggered"
@@ -44,7 +44,7 @@ class AlertStatus(str, Enum):
     RESOLVED = "resolved"
 
 
-class AlertSeverity(str, Enum):
+class AlertSeverity(StrEnum):
     """Alert severity enum."""
 
     INFO = "info"

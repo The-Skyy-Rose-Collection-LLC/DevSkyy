@@ -16,20 +16,20 @@ from __future__ import annotations
 
 import io
 import logging
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import httpx
 import numpy as np
 from PIL import Image
 from pydantic import BaseModel
+from services.ml.replicate_client import ReplicateClient, ReplicateConfig
 
 from errors.production_errors import (
     DevSkyError,
     DevSkyErrorCode,
     DevSkyErrorSeverity,
 )
-from services.ml.replicate_client import ReplicateClient, ReplicateConfig
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +57,7 @@ MAX_COLOR_DELTA_E = 2.0
 # =============================================================================
 
 
-class LightingIntensity(str, Enum):
+class LightingIntensity(StrEnum):
     """Intensity levels for lighting normalization."""
 
     SUBTLE = "subtle"

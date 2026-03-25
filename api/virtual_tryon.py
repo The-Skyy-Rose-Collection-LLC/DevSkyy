@@ -28,7 +28,7 @@ import socket
 import threading
 import uuid
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -171,7 +171,7 @@ def validate_file_extension(filename: str | None) -> str:
 # =============================================================================
 
 
-class TryOnProvider(str, Enum):
+class TryOnProvider(StrEnum):
     """Virtual try-on provider."""
 
     FASHN = "fashn"  # Commercial API (production-ready)
@@ -179,7 +179,7 @@ class TryOnProvider(str, Enum):
     ROUND_TABLE = "round_table"  # Both compete, A/B test winner
 
 
-class GarmentCategory(str, Enum):
+class GarmentCategory(StrEnum):
     """Garment category for try-on."""
 
     TOPS = "tops"
@@ -189,7 +189,7 @@ class GarmentCategory(str, Enum):
     FULL_BODY = "full_body"
 
 
-class TryOnMode(str, Enum):
+class TryOnMode(StrEnum):
     """Try-on quality mode."""
 
     QUALITY = "quality"  # Higher quality, slower (~20s)
@@ -197,7 +197,7 @@ class TryOnMode(str, Enum):
     FAST = "fast"  # Faster, lower quality (~6s)
 
 
-class JobStatus(str, Enum):
+class JobStatus(StrEnum):
     """Generation job status."""
 
     QUEUED = "queued"
@@ -206,7 +206,7 @@ class JobStatus(str, Enum):
     FAILED = "failed"
 
 
-class ModelGender(str, Enum):
+class ModelGender(StrEnum):
     """AI model gender for generation."""
 
     FEMALE = "female"
@@ -1361,7 +1361,8 @@ async def generate_tryon_upload(
         model_ext = validate_file_extension(model_image.filename)
         garment_ext = validate_file_extension(garment_image.filename)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.warning(f"Invalid file extension in try-on request: {e}")
+        raise HTTPException(status_code=400, detail="Invalid file type")
 
     # Validate provider
     if provider == TryOnProvider.FASHN and not os.getenv("FASHN_API_KEY"):
@@ -1402,11 +1403,13 @@ async def generate_tryon_upload(
         model_path.write_bytes(model_content)
         garment_path.write_bytes(garment_content)
     except ValueError as e:
+        logger.warning(f"Invalid upload for try-on job {job.job_id}: {e}")
         job_store.fail_tryon_job(job.job_id, str(e))
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail="Invalid request")
     except Exception as e:
+        logger.error(f"Failed to save uploads for try-on job {job.job_id}: {e}", exc_info=True)
         job_store.fail_tryon_job(job.job_id, f"Failed to save uploads: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to save uploads: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
     # Schedule background task
     if provider == TryOnProvider.FASHN:

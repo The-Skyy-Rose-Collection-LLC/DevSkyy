@@ -31,7 +31,7 @@ from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from functools import wraps
 from typing import Any, TypeVar
 
@@ -111,7 +111,7 @@ class JWTConfig:
 # =============================================================================
 
 
-class UserRole(str, Enum):
+class UserRole(StrEnum):
     """RBAC Roles - ordered by privilege level."""
 
     SUPER_ADMIN = "super_admin"  # Full system access
@@ -133,7 +133,7 @@ ROLE_HIERARCHY: dict[UserRole, int] = {
 }
 
 
-class TokenType(str, Enum):
+class TokenType(StrEnum):
     """Token types for different purposes."""
 
     ACCESS = "access"
@@ -346,7 +346,10 @@ class TokenBlacklist:
     Token blacklist for revocation.
 
     In production, use Redis or database for persistence.
+    Capped at 10,000 entries to prevent unbounded memory growth.
     """
+
+    MAX_ENTRIES = 10_000
 
     def __init__(self) -> None:
         self._blacklist: dict[str, datetime] = {}  # jti -> expiry
@@ -356,6 +359,10 @@ class TokenBlacklist:
         """Add token to blacklist."""
         self._blacklist[jti] = expires_at
         self._cleanup()
+        # LRU eviction if over capacity
+        while len(self._blacklist) > self.MAX_ENTRIES:
+            oldest_jti = min(self._blacklist, key=self._blacklist.get)  # type: ignore[arg-type]
+            del self._blacklist[oldest_jti]
 
     def revoke_family(self, family_id: str) -> None:
         """Revoke all tokens in a family (e.g., on security breach)."""
@@ -475,6 +482,8 @@ class RateLimiter:
     In production, use Redis for distributed rate limiting.
     """
 
+    MAX_KEYS = 10_000
+
     def __init__(
         self,
         max_attempts: int = 5,
@@ -483,6 +492,12 @@ class RateLimiter:
         self.max_attempts = max_attempts
         self.window_seconds = window_seconds
         self._attempts: dict[str, list[datetime]] = defaultdict(list)
+
+    def _evict_if_needed(self) -> None:
+        """Evict oldest keys if over capacity."""
+        while len(self._attempts) > self.MAX_KEYS:
+            oldest_key = next(iter(self._attempts))
+            del self._attempts[oldest_key]
 
     def is_allowed(self, key: str) -> bool:
         """Check if action is allowed."""
@@ -493,6 +508,7 @@ class RateLimiter:
         """Record an attempt."""
         self._cleanup(key)
         self._attempts[key].append(datetime.now(UTC))
+        self._evict_if_needed()
 
     def get_remaining_attempts(self, key: str) -> int:
         """Get remaining attempts."""
@@ -972,7 +988,18 @@ RoleChecker = _create_role_checker_class()
 # Default instances for convenience
 jwt_manager = JWTManager()
 password_manager = PasswordManager()
-token_blacklist = TokenBlacklist()
+
+# Module-level singleton — uses Redis if REDIS_URL is set
+_redis_url = os.getenv("REDIS_URL", "")
+if _redis_url and redis is not None:
+    try:
+        _redis_client = redis.from_url(_redis_url, decode_responses=True)
+        token_blacklist = RedisTokenBlacklist(redis_client=_redis_client)
+    except Exception as _e:
+        logger.warning(f"Failed to initialize Redis token blacklist: {_e}")
+        token_blacklist = TokenBlacklist()
+else:
+    token_blacklist = TokenBlacklist()
 
 
 # =============================================================================
@@ -1002,7 +1029,7 @@ def _create_auth_router():
             Tuple of (user_id, roles) if valid, None if invalid
         """
         try:
-            from database import UserRepository, get_db
+            from database.db import UserRepository, get_db
 
             # Get database session
             async for db in get_db():
@@ -1177,6 +1204,79 @@ def _create_auth_router():
             "issued_at": user.iat.isoformat() if user.iat else None,
             "expires_at": user.exp.isoformat() if user.exp else None,
         }
+
+    @router.post("/register", status_code=status.HTTP_201_CREATED)
+    async def register_user(user_data: UserCreate):
+        """
+        Register a new user account.
+
+        - Validates password strength (OWASP rules)
+        - Hashes password with Argon2id
+        - Creates user in database
+        - Returns access + refresh tokens
+        """
+        import uuid
+
+        try:
+            from database.db import UserRepository, get_db
+
+            async for db in get_db():
+                repo = UserRepository(db)
+
+                # Check if username or email already exists
+                existing = await repo.get_by_username(user_data.username)
+                if existing:
+                    raise HTTPException(
+                        status_code=status.HTTP_409_CONFLICT,
+                        detail="Username already registered",
+                    )
+                existing = await repo.get_by_email(user_data.email)
+                if existing:
+                    raise HTTPException(
+                        status_code=status.HTTP_409_CONFLICT,
+                        detail="Email already registered",
+                    )
+
+                # Hash password and create user
+                hashed = password_manager.hash_password(user_data.password)
+                user_id = str(uuid.uuid4())
+                role = user_data.roles[0].value if user_data.roles else UserRole.API_USER.value
+
+                from database.db import User as UserModel
+
+                new_user = UserModel(
+                    id=user_id,
+                    email=user_data.email,
+                    username=user_data.username,
+                    hashed_password=hashed,
+                    role=role,
+                    is_active=True,
+                    is_verified=False,
+                )
+                db.add(new_user)
+                await db.commit()
+
+                # Generate tokens
+                tokens = jwt_manager.create_token_pair(
+                    user_id=user_id,
+                    roles=[role],
+                )
+
+                logger.info(f"New user registered: {user_data.username}")
+                return {
+                    "message": "User registered successfully",
+                    "user_id": user_id,
+                    **tokens.model_dump(),
+                }
+
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Registration error: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Registration failed",
+            )
 
     return router
 

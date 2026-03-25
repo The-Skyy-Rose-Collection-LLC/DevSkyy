@@ -1,7 +1,11 @@
+import path from 'path'
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  turbopack: {
+    root: path.resolve(__dirname, '..'),
+  },
   images: {
     remotePatterns: [
       {
@@ -14,6 +18,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  cacheComponents: true,
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',

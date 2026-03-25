@@ -16,7 +16,7 @@ Covers missing endpoints:
 import logging
 import secrets
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class AgentCategory(str, Enum):
+class AgentCategory(StrEnum):
     """Agent categories"""
 
     SOCIAL_MEDIA = "social_media"
@@ -50,7 +50,7 @@ class AgentCategory(str, Enum):
     THREE_D_GENERATION = "three_d_generation"
 
 
-class TaskStatus(str, Enum):
+class TaskStatus(StrEnum):
     """Task execution status"""
 
     QUEUED = "queued"
@@ -60,7 +60,7 @@ class TaskStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class Priority(str, Enum):
+class Priority(StrEnum):
     """Task priority"""
 
     LOW = "low"
@@ -112,7 +112,7 @@ class AgentInfo(BaseModel):
 # =============================================================================
 
 
-class ModelFormat(str, Enum):
+class ModelFormat(StrEnum):
     """3D model output formats"""
 
     GLB = "glb"
@@ -159,7 +159,7 @@ class ThreeDGenerationResult(BaseModel):
 # =============================================================================
 
 
-class SocialPlatform(str, Enum):
+class SocialPlatform(StrEnum):
     INSTAGRAM = "instagram"
     TIKTOK = "tiktok"
     TWITTER = "twitter"
@@ -226,7 +226,7 @@ class CampaignRequest(BaseModel):
 # =============================================================================
 
 
-class TicketPriority(str, Enum):
+class TicketPriority(StrEnum):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -256,7 +256,7 @@ class ChatbotRequest(BaseModel):
 # =============================================================================
 
 
-class ContentType(str, Enum):
+class ContentType(StrEnum):
     BLOG_POST = "blog_post"
     PRODUCT_DESCRIPTION = "product_description"
     AD_COPY = "ad_copy"
@@ -445,6 +445,35 @@ class AgentService:
                 description="Data synchronization across systems",
                 actions=["sync", "schedule", "validate"],
             ),
+            # Claude Agent SDK Agents
+            "research_agent": AgentInfo(
+                name="research_agent",
+                category=AgentCategory.CONTENT,
+                description="Multi-agent research pipeline with PDF report generation",
+                actions=["research"],
+                model="claude-haiku",
+            ),
+            "email_triage_agent": AgentInfo(
+                name="email_triage_agent",
+                category=AgentCategory.EMAIL_SMS,
+                description="AI-powered IMAP email triage, classification, and response drafting",
+                actions=["triage"],
+                model="claude-haiku",
+            ),
+            "excel_handler_agent": AgentInfo(
+                name="excel_handler_agent",
+                category=AgentCategory.CONTENT,
+                description="Spreadsheet creation and analysis with openpyxl and pandas",
+                actions=["create", "analyze"],
+                model="claude-haiku",
+            ),
+            "session_manager_agent": AgentInfo(
+                name="session_manager_agent",
+                category=AgentCategory.INTEGRATION,
+                description="V2 stateful multi-turn Claude sessions with resume",
+                actions=["create", "resume", "one_shot"],
+                model="claude-sonnet",
+            ),
         }
 
     def list_agents(self, category: AgentCategory | None = None) -> list[AgentInfo]:
@@ -477,7 +506,9 @@ class AgentService:
         if action not in agent.actions:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Invalid action '{action}' for agent {agent_name}. Available: {agent.actions}",
+                detail=(
+                    f"Invalid action '{action}' for agent {agent_name}. Available: {agent.actions}"
+                ),
             )
 
         task_id = f"task_{secrets.token_urlsafe(16)}"
@@ -525,8 +556,80 @@ class AgentService:
     async def _execute_agent_action(
         self, agent: AgentInfo, action: str, parameters: dict[str, Any]
     ) -> dict[str, Any]:
-        """Execute agent action (simulated)"""
-        # In production, this would call the actual agent implementation
+        """Execute agent action. Routes SDK agents to real implementations."""
+        # Claude Agent SDK agents — real execution
+        if agent.name == "research_agent" and action == "research":
+            try:
+                from agents.claude_sdk.research import ResearchAgent, ResearchRequest
+
+                sdk = ResearchAgent()
+                result = await sdk.research(
+                    ResearchRequest(
+                        topic=parameters.get("topic", ""),
+                        subtopics=parameters.get("subtopics"),
+                        model=parameters.get("model", "haiku"),
+                    )
+                )
+                return result.model_dump()
+            except ImportError:
+                return {"error": "claude-agent-sdk not installed"}
+
+        if agent.name == "email_triage_agent" and action == "triage":
+            try:
+                from agents.claude_sdk.email_automation import (
+                    EmailAutomationAgent,
+                    EmailTriageRequest,
+                )
+
+                sdk = EmailAutomationAgent()
+                result = await sdk.triage(
+                    EmailTriageRequest(
+                        mailbox=parameters.get("mailbox", "INBOX"),
+                        limit=parameters.get("limit", 10),
+                        unread_only=parameters.get("unread_only", True),
+                    )
+                )
+                return result.model_dump()
+            except ImportError:
+                return {"error": "claude-agent-sdk not installed"}
+
+        if agent.name == "excel_handler_agent" and action in ("create", "analyze"):
+            try:
+                from agents.claude_sdk.excel_handler import (
+                    ExcelHandlerAgent,
+                    ExcelOperation,
+                    ExcelRequest,
+                )
+
+                sdk = ExcelHandlerAgent()
+                result = await sdk.handle(
+                    ExcelRequest(
+                        operation=ExcelOperation(action),
+                        description=parameters.get("description", ""),
+                        input_file=parameters.get("input_file"),
+                        output_filename=parameters.get("output_filename"),
+                    )
+                )
+                return result.model_dump()
+            except ImportError:
+                return {"error": "claude-agent-sdk not installed"}
+
+        if agent.name == "session_manager_agent" and action == "one_shot":
+            try:
+                from agents.claude_sdk.session import OneShotRequest, SessionManager
+
+                mgr = SessionManager()
+                result = await mgr.one_shot(
+                    OneShotRequest(
+                        prompt=parameters.get("prompt", ""),
+                        model=parameters.get("model", "sonnet"),
+                    )
+                )
+                return result.model_dump()
+            except ImportError:
+                return {"error": "claude-agent-sdk not installed"}
+
+        # Default: simulated execution for other agents
         return {
             "agent": agent.name,
             "action": action,

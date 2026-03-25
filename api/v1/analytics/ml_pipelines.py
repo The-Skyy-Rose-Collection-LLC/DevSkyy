@@ -17,7 +17,7 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
-from enum import Enum
+from enum import StrEnum
 from typing import TYPE_CHECKING, Any
 
 from fastapi import APIRouter, Depends, Query
@@ -38,7 +38,7 @@ router = APIRouter(prefix="/analytics/ml", tags=["ML Analytics"])
 # =============================================================================
 
 
-class TimeRange(str, Enum):
+class TimeRange(StrEnum):
     """Time range options for analytics queries."""
 
     HOUR_1 = "1h"
@@ -48,7 +48,7 @@ class TimeRange(str, Enum):
     DAYS_90 = "90d"
 
 
-class MLProvider(str, Enum):
+class MLProvider(StrEnum):
     """ML service providers."""
 
     REPLICATE = "replicate"
@@ -58,7 +58,7 @@ class MLProvider(str, Enum):
     OPENAI = "openai"
 
 
-class PipelineType(str, Enum):
+class PipelineType(StrEnum):
     """Types of ML pipelines."""
 
     THREE_D_GENERATION = "3d_generation"
@@ -68,7 +68,7 @@ class PipelineType(str, Enum):
     RERANKING = "reranking"
 
 
-class JobStatus(str, Enum):
+class JobStatus(StrEnum):
     """ML job statuses."""
 
     PENDING = "pending"

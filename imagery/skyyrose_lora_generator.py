@@ -18,7 +18,7 @@ import os
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -28,7 +28,7 @@ import httpx
 logger = logging.getLogger(__name__)
 
 
-class SkyyRoseCollection(str, Enum):
+class SkyyRoseCollection(StrEnum):
     """SkyyRose collection types."""
 
     SIGNATURE = "SIGNATURE"
@@ -36,7 +36,7 @@ class SkyyRoseCollection(str, Enum):
     LOVE_HURTS = "LOVE_HURTS"
 
 
-class GarmentType(str, Enum):
+class GarmentType(StrEnum):
     """Supported garment types."""
 
     HOODIE = "hoodie"
@@ -178,9 +178,13 @@ class SkyyRoseLoRAGenerator:
         parts = [self.TRIGGER_WORD]
 
         # Add collection style
-        collection_data = COLLECTION_STYLES.get(
-            collection, COLLECTION_STYLES[SkyyRoseCollection.SIGNATURE]
-        )
+        # C-3 FIX: Unknown collection raises instead of silently defaulting to SIGNATURE.
+        # A silent fallback causes all unrecognised collections to generate with SIGNATURE
+        # aesthetics (lavender, rose gold, pastels) — wrong for BLACK_ROSE or LOVE_HURTS.
+        collection_data = COLLECTION_STYLES.get(collection)
+        if collection_data is None:
+            valid = [c.value for c in SkyyRoseCollection]
+            raise ValueError(f"Unknown collection {collection!r}. Valid collections: {valid}")
         parts.append(collection_data["style"])
 
         # Add garment description if specified

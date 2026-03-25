@@ -1,0 +1,176 @@
+/**
+ * SkyyRose - LOVE HURTS Collection Styles
+ * Deep red/black passion theme with Oakland street energy
+ */
+
+/* ========================================
+   COLLECTION THEME VARIABLES
+   ======================================== */
+:root[data-collection="love-hurts"],
+.collection-love-hurts {
+  --collection-primary: var(--blood);
+  --collection-secondary: var(--blood-dark);
+  --collection-accent: var(--blood-light);
+  --collection-gradient: var(--gradient-blood);
+  --collection-glow: var(--shadow-glow-blood);
+}
+
+/* ========================================
+   HERO OVERRIDES — LOVE HURTS
+   ======================================== */
+.collection-love-hurts .hero-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 5, 5, 0.6),
+    rgba(20, 0, 0, 0.8),
+    rgba(10, 10, 10, 0.95)
+  );
+}
+
+.collection-love-hurts .title-main {
+  color: var(--blood-light);
+  text-shadow: 0 4px 30px rgba(196, 30, 58, 0.5);
+}
+
+.collection-love-hurts .title-tagline {
+  color: var(--blood);
+  text-shadow: 0 0 30px var(--blood-glow);
+}
+
+.collection-love-hurts .collection-description strong {
+  color: var(--blood-light);
+}
+
+/* ========================================
+   STORY SECTION — LOVE HURTS
+   ======================================== */
+.collection-love-hurts .collection-story {
+  border-top-color: rgba(139, 0, 0, 0.15);
+  border-bottom-color: rgba(139, 0, 0, 0.15);
+}
+
+.collection-love-hurts .story-subtitle {
+  color: var(--blood);
+}
+
+.collection-love-hurts .story-image {
+  box-shadow: var(--shadow-xl), var(--shadow-glow-blood);
+}
+
+/* ========================================
+   PRODUCT CARDS — LOVE HURTS
+   ======================================== */
+.collection-love-hurts .product-card:hover {
+  box-shadow: var(--shadow-xl), var(--shadow-glow-blood);
+}
+
+.collection-love-hurts .product-price {
+  color: var(--blood-light);
+}
+
+.collection-love-hurts .product-badge.bestseller {
+  background: rgba(139, 0, 0, 0.9);
+}
+
+.collection-love-hurts .product-badge.signature {
+  background: rgba(196, 30, 58, 0.9);
+  color: var(--white);
+}
+
+.collection-love-hurts .wishlist-btn:hover,
+.collection-love-hurts .wishlist-btn.active {
+  background: var(--blood);
+}
+
+.collection-love-hurts .btn-quick-view {
+  border-color: var(--blood);
+  color: var(--blood);
+}
+
+.collection-love-hurts .btn-quick-view:hover {
+  background: var(--blood);
+  color: var(--white);
+  box-shadow: 0 0 20px var(--blood-glow);
+}
+
+/* ========================================
+   BUTTONS — LOVE HURTS
+   ======================================== */
+.collection-love-hurts .btn-primary {
+  background: var(--blood);
+}
+
+.collection-love-hurts .btn-primary:hover {
+  background: var(--blood-dark);
+  box-shadow: var(--shadow-md), var(--shadow-glow-blood);
+}
+
+/* ========================================
+   SCROLL INDICATOR — LOVE HURTS
+   ======================================== */
+.collection-love-hurts .scroll-mouse {
+  border-color: var(--blood);
+}
+
+.collection-love-hurts .scroll-wheel {
+  background: var(--blood);
+}
+
+.collection-love-hurts .scroll-text {
+  color: var(--blood);
+}
+
+/* ========================================
+   CROSS-COLLECTION LINKS
+   ======================================== */
+.collection-love-hurts .other-collections {
+  border-top-color: rgba(139, 0, 0, 0.1);
+}
+
+/* ========================================
+   PRODUCT MODAL — LOVE HURTS
+   ======================================== */
+.collection-love-hurts .modal-tag {
+  color: var(--blood);
+}
+
+.collection-love-hurts .modal-price {
+  color: var(--blood-light);
+}
+
+.collection-love-hurts .modal-detail {
+  color: rgba(196, 30, 58, 0.6);
+}
+
+.collection-love-hurts .size-btn.selected {
+  border-color: var(--blood);
+  color: var(--blood-light);
+  background: rgba(139, 0, 0, 0.08);
+}
+
+.collection-love-hurts .cart-btn.ready,
+.collection-love-hurts .modal-cta {
+  background: var(--blood);
+  color: var(--white);
+}
+
+.collection-love-hurts .modal-cta:hover {
+  background: var(--blood-dark);
+  box-shadow: 0 0 20px var(--blood-glow);
+}
+
+/* ========================================
+   FOCUS STATES — LOVE HURTS
+   ======================================== */
+.collection-love-hurts *:focus-visible {
+  outline-color: var(--blood);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+  .collection-love-hurts .title-main {
+    text-shadow: 0 2px 20px rgba(196, 30, 58, 0.4);
+  }
+}
