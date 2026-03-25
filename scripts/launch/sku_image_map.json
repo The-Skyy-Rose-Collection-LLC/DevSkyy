@@ -1,0 +1,290 @@
+{
+  "br-001": {
+    "image_id": 8862,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_000_20230616_170635_main.jpg",
+    "webp_id": 8640,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_000_20230616_170635_main.webp",
+    "match_key": "BR_000_20230616_170635_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "br-002": {
+    "image_id": 8719,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_003_20230616_170635_main.jpg",
+    "webp_id": 8718,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_003_20230616_170635_main.webp",
+    "match_key": "BR_003_20230616_170635_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "br-003": {
+    "image_id": 8947,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_266AD7B0_88A6_4489_AA58_AB72A5_main-3.jpg",
+    "webp_id": 254,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_266AD7B0_88A6_4489_AA58_AB72A5_main.webp",
+    "match_key": "BR_266AD7B0_88A6_4489_AA58_AB72A5_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "br-003-oakland": {
+    "image_id": 8939,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_5A8946B1_B51F_4144_BCBB_F02846_main-2.jpg",
+    "webp_id": 256,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_5A8946B1_B51F_4144_BCBB_F02846_main.webp",
+    "match_key": "BR_5A8946B1_B51F_4144_BCBB_F02846_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "br-003-giants": {
+    "image_id": 8733,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_DEC_18_2023_6_09_21_PM_2_main.jpg",
+    "webp_id": 8691,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_DEC_18_2023_6_09_21_PM_2_main.webp",
+    "match_key": "BR_DEC_18_2023_6_09_21_PM_2_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "br-003-white": {
+    "image_id": 8737,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_WOMENS_BLACK_ROSE_HOODED_DRESS_main.jpg",
+    "webp_id": 8711,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_WOMENS_BLACK_ROSE_HOODED_DRESS_main.webp",
+    "match_key": "BR_WOMENS_BLACK_ROSE_HOODED_DRESS_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "br-004": {
+    "image_id": 8727,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_007_20230616_170635_1_main.jpg",
+    "webp_id": 8631,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_007_20230616_170635_1_main.webp",
+    "match_key": "BR_007_20230616_170635_1_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "br-005": {
+    "image_id": 8736,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_THE_BLACK_ROSE_SHERPA_main.jpg",
+    "webp_id": 8878,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_THE_BLACK_ROSE_SHERPA_main.webp",
+    "match_key": "BR_THE_BLACK_ROSE_SHERPA_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "br-006": {
+    "image_id": 8731,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_BLACK_ROSE_SHERPA_main.jpg",
+    "webp_id": 8626,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_BLACK_ROSE_SHERPA_main.webp",
+    "match_key": "BR_BLACK_ROSE_SHERPA_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "br-007": {
+    "image_id": 8745,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_003_20221110_200039_main.jpg",
+    "webp_id": 8627,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_003_20221110_200039_main.webp",
+    "match_key": "LH_003_20221110_200039_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "br-008": {
+    "image_id": 8770,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_PROD_0D142A63_main.jpg",
+    "webp_id": 8814,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_PROD_0D142A63_main.webp",
+    "match_key": "LH_PROD_0D142A63_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "br-009": {
+    "image_id": 8820,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_PROD_309E1DFA_main-2.jpg",
+    "webp_id": 8819,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_PROD_309E1DFA_main.webp",
+    "match_key": "LH_PROD_309E1DFA_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "br-010": {
+    "image_id": 8780,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_PROD_DE5753FB_main.jpg",
+    "webp_id": 8616,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_PROD_DE5753FB_main.webp",
+    "match_key": "LH_PROD_DE5753FB_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "br-011": {
+    "image_id": 8710,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_PROD_8E0B9D57_main.jpg",
+    "webp_id": 8957,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_PROD_8E0B9D57_main.webp",
+    "match_key": "LH_PROD_8E0B9D57_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "lh-002": {
+    "image_id": 8782,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_SINCERELY_HEARTED_JOGGERS_BLAC_main.jpg",
+    "webp_id": 8628,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_SINCERELY_HEARTED_JOGGERS_BLAC_main.webp",
+    "match_key": "LH_SINCERELY_HEARTED_JOGGERS_BLAC_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "lh-003": {
+    "image_id": 8772,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_PROD_2B35D56E_main.jpg",
+    "webp_id": 8647,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_PROD_2B35D56E_main.webp",
+    "match_key": "LH_PROD_2B35D56E_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "lh-004": {
+    "image_id": 8768,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_MEN_WINDBREAKER_JACKET_1_main.jpg",
+    "webp_id": 8661,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_MEN_WINDBREAKER_JACKET_1_main.webp",
+    "match_key": "LH_MEN_WINDBREAKER_JACKET_1_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "lh-006": {
+    "image_id": 8765,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_FANNIE_PACK_FRONT_2_main.jpg",
+    "webp_id": 8836,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_FANNIE_PACK_FRONT_2_main.webp",
+    "match_key": "LH_FANNIE_PACK_FRONT_2_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "sg-001": {
+    "image_id": 8813,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_THE_SIGNATURE_SHORTS_main.jpg",
+    "webp_id": 8826,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_THE_SIGNATURE_SHORTS_main.webp",
+    "match_key": "SIG_THE_SIGNATURE_SHORTS_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "sg-002": {
+    "image_id": 8809,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_STAY_GOLDEN_TEE_main.jpg",
+    "webp_id": 8705,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_STAY_GOLDEN_TEE_main.webp",
+    "match_key": "SIG_STAY_GOLDEN_TEE_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "sg-003": {
+    "image_id": 8669,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_SIGNATURE_SHORTS1_main.jpg",
+    "webp_id": 8900,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_SIGNATURE_SHORTS1_main.webp",
+    "match_key": "SIG_SIGNATURE_SHORTS1_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "sg-004": {
+    "image_id": 8724,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_HOODIE_main.jpg",
+    "webp_id": 8723,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_HOODIE_main.webp",
+    "match_key": "SIG_HOODIE_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "sg-005": {
+    "image_id": 8786,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_000_20231221_222005_main.jpg",
+    "webp_id": 8918,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_000_20231221_222005_main.webp",
+    "match_key": "SIG_000_20231221_222005_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "sg-006": {
+    "image_id": 8784,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_THE_MINT_AND_LAVENDER_HOODIE_main.jpg",
+    "webp_id": 8677,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/LH_THE_MINT_AND_LAVENDER_HOODIE_main.webp",
+    "match_key": "LH_THE_MINT_AND_LAVENDER_HOODIE_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "sg-007": {
+    "image_id": 8799,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_LAVENDER_ROSE_BEANIE_main.jpg",
+    "webp_id": 8681,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_LAVENDER_ROSE_BEANIE_main.webp",
+    "match_key": "SIG_LAVENDER_ROSE_BEANIE_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "sg-009": {
+    "image_id": 8812,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_THE_SHERPA_3_main.jpg",
+    "webp_id": 8662,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_THE_SHERPA_3_main.webp",
+    "match_key": "SIG_THE_SHERPA_3_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "sg-011": {
+    "image_id": 8801,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_ORIGINAL_LABEL_TEE_WHITE_main.jpg",
+    "webp_id": 8613,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_ORIGINAL_LABEL_TEE_WHITE_main.webp",
+    "match_key": "SIG_ORIGINAL_LABEL_TEE_WHITE_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "sg-012": {
+    "image_id": 8800,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_ORIGINAL_LABEL_TEE_ORCHID_main.jpg",
+    "webp_id": 8707,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_ORIGINAL_LABEL_TEE_ORCHID_main.webp",
+    "match_key": "SIG_ORIGINAL_LABEL_TEE_ORCHID_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "sg-013": {
+    "image_id": 8697,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_THE_PINK_SMOKE_CREWNECK_main.jpg",
+    "webp_id": 8940,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_THE_PINK_SMOKE_CREWNECK_main.webp",
+    "match_key": "SIG_THE_PINK_SMOKE_CREWNECK_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "sg-014": {
+    "image_id": 8810,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_THE_MINT_N_LAVENDER_WOMEN_HOOD_main.jpg",
+    "webp_id": 8966,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_THE_MINT_N_LAVENDER_WOMEN_HOOD_main.webp",
+    "match_key": "SIG_THE_MINT_N_LAVENDER_WOMEN_HOOD_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "kids-001": {
+    "image_id": 8807,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_SIGNATURE_COLLECTION_RED_ROSE__main.jpg",
+    "webp_id": 8693,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_SIGNATURE_COLLECTION_RED_ROSE__main.webp",
+    "match_key": "SIG_SIGNATURE_COLLECTION_RED_ROSE__main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  },
+  "kids-002": {
+    "image_id": 249,
+    "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_PROD_FCCB8B16_main.jpg",
+    "webp_id": 8680,
+    "webp_url": "https://skyyrose.co/wp-content/uploads/2026/01/SIG_PROD_FCCB8B16_main.webp",
+    "match_key": "SIG_PROD_FCCB8B16_main",
+    "confidence": 1.0,
+    "method": "manual_override"
+  }
+}

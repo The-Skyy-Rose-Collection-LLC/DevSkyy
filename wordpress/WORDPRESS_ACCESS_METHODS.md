@@ -94,15 +94,15 @@ python scripts/wordpress_com_cleanup.py --dry-run
 
 ```bash
 # Already in .env:
-WOOCOMMERCE_KEY=ck_f2c49886126f8ec0626a2ec6082ef44d7105ae7c
-WOOCOMMERCE_SECRET=cs_58bbf671bdbdd7fdab8a70c3460290dd63dff839
+WOOCOMMERCE_KEY=(see .env — WOOCOMMERCE_KEY)
+WOOCOMMERCE_SECRET=(see .env — WOOCOMMERCE_SECRET)
 ```
 
 ### API Methods
 
 ```bash
-WC_KEY="ck_f2c49886126f8ec0626a2ec6082ef44d7105ae7c"
-WC_SECRET="cs_58bbf671bdbdd7fdab8a70c3460290dd63dff839"
+WC_KEY="(see .env — WOOCOMMERCE_KEY)"
+WC_SECRET="(see .env — WOOCOMMERCE_SECRET)"
 SITE="https://skyyrose.co"
 
 # List products
@@ -181,8 +181,8 @@ response = requests.post(
 import requests
 from requests.auth import HTTPBasicAuth
 
-KEY = "ck_f2c49886126f8ec0626a2ec6082ef44d7105ae7c"
-SECRET = "cs_58bbf671bdbdd7fdab8a70c3460290dd63dff839"
+KEY = "(see .env — WOOCOMMERCE_KEY)"
+SECRET = "(see .env — WOOCOMMERCE_SECRET)"
 SITE = "https://skyyrose.co"
 
 auth = HTTPBasicAuth(KEY, SECRET)
@@ -419,12 +419,12 @@ Add to `.env`:
 # WordPress.com Login
 WORDPRESS_URL=https://skyyrose.co
 WORDPRESS_USERNAME=skyyroseco
-WORDPRESS_PASSWORD=IQb3KFqFA76vhMJmsyT1tCTC
-WORDPRESS_APP_PASSWORD=IQb3KFqFA76vhMJmsyT1tCTC
+WORDPRESS_PASSWORD=(see .env — WORDPRESS_APP_PASSWORD)
+WORDPRESS_APP_PASSWORD=(see .env — WORDPRESS_APP_PASSWORD)
 
 # WooCommerce (for product management)
-WOOCOMMERCE_KEY=ck_f2c49886126f8ec0626a2ec6082ef44d7105ae7c
-WOOCOMMERCE_SECRET=cs_58bbf671bdbdd7fdab8a70c3460290dd63dff839
+WOOCOMMERCE_KEY=(see .env — WOOCOMMERCE_KEY)
+WOOCOMMERCE_SECRET=(see .env — WOOCOMMERCE_SECRET)
 
 # WordPress.com OAuth (for REST API automation)
 WORDPRESS_COM_CLIENT_ID=YOUR_CLIENT_ID
