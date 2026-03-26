@@ -81,58 +81,89 @@ function skyyrose_resource_hints( $urls, $relation_type ) {
 /**
  * Defer non-critical scripts for better page load performance.
  *
+ * Uses a prefix-based approach instead of a hardcoded list, so newly
+ * added scripts with the skyyrose- prefix automatically get deferred.
+ *
  * @since  3.0.0
+ * @since  4.1.0 Switched from hardcoded list to prefix matching.
  * @param  string $tag    Full script tag HTML.
  * @param  string $handle Script handle.
  * @return string Modified tag.
  */
 function skyyrose_defer_scripts( $tag, $handle ) {
 
-	$defer_handles = array(
-		'skyyrose-navigation',
-		'skyyrose-template-homepage',
-		'skyyrose-template-homepage-v2',
-		'skyyrose-template-collections',
-		'skyyrose-template-immersive',
-		'skyyrose-template-woocommerce',
-		'skyyrose-template-contact',
-		'skyyrose-template-preorder-gateway',
-		'skyyrose-cinematic-mode',
-		'skyyrose-luxury-cursor',
-		'skyyrose-social-proof',
-		'skyyrose-the-pulse',
-		'skyyrose-aurora-engine',
-		'skyyrose-magnetic-obsidian',
-		'skyyrose-conversion-engine',
-		'skyyrose-cross-sell-engine',
-		'skyyrose-adaptive-personalization',
-		'skyyrose-journey-gamification',
-		'skyyrose-momentum-commerce',
-		'skyyrose-velocity-scroll',
-		'skyyrose-analytics-beacon',
-		'skyyrose-immersive-wc-bridge',
-		'skyyrose-size-guide',
-		'skyyrose-template-style-quiz',
-		'skyyrose-brand-ambassador',
-		'skyyrose-template-landing-engine',
-		'skyyrose-template-collection-v4',
-		'skyyrose-interactive-cards',
-		'skyyrose-progressive-images',
-		'skyyrose-smart-prefetch',
-		'skyyrose-scroll-enhancements',
-		'skyyrose-exit-intent',
-		'skyyrose-urgency-banner',
-		'skyyrose-template-single-product',
-		'skyyrose-template-about',
-		'skyyrose-web-vitals',
-		'skyyrose-schema-validator',
+	// All theme scripts should be deferred except critical inline.
+	// Skip scripts that already have defer or async attributes.
+	if ( strpos( $tag, ' defer' ) !== false || strpos( $tag, ' async' ) !== false ) {
+		return $tag;
+	}
+
+	// Defer all skyyrose-prefixed scripts and WC variation scripts loaded in footer.
+	$should_defer = (
+		0 === strpos( $handle, 'skyyrose-' ) ||
+		'wc-add-to-cart-variation' === $handle
 	);
 
-	if ( in_array( $handle, $defer_handles, true ) && strpos( $tag, ' defer' ) === false ) {
+	// Never defer jQuery or WordPress core scripts that other scripts depend on synchronously.
+	$never_defer = array( 'jquery', 'jquery-core', 'jquery-migrate', 'wp-polyfill' );
+	if ( in_array( $handle, $never_defer, true ) ) {
+		$should_defer = false;
+	}
+
+	if ( $should_defer ) {
 		return preg_replace( '/(<script\b[^>]*)\ssrc=/i', '$1 defer src=', $tag, 1 );
 	}
 
 	return $tag;
+}
+
+/**
+ * Add fetchpriority="high" to critical above-fold stylesheets.
+ *
+ * Tells the browser to prioritize design tokens and main styles that
+ * affect First Contentful Paint (FCP) and Largest Contentful Paint (LCP).
+ *
+ * @since  4.1.0
+ * @param  string $html   Link tag HTML.
+ * @param  string $handle Style handle.
+ * @return string Modified tag.
+ */
+function skyyrose_critical_style_priority( $html, $handle ) {
+	$critical_handles = array(
+		'skyyrose-design-tokens',
+		'skyyrose-main',
+		'skyyrose-fonts',
+		'skyyrose-style',
+		'skyyrose-brand-variables',
+	);
+
+	if ( in_array( $handle, $critical_handles, true ) ) {
+		// Add media="all" fetchpriority hint via data attribute for resource prioritization.
+		$html = str_replace( "media='all'", "media='all' fetchpriority='high'", $html );
+	}
+
+	return $html;
+}
+
+/**
+ * Preload the hero image on the front page for faster LCP.
+ *
+ * @since 4.1.0
+ * @return void
+ */
+function skyyrose_preload_hero_image() {
+	if ( ! is_front_page() ) {
+		return;
+	}
+
+	// Preload hero background — this is typically the LCP element.
+	$hero_image = get_theme_mod( 'skyyrose_hero_image', '' );
+	if ( $hero_image ) {
+		printf(
+			'<link rel="preload" href="%s" as="image" fetchpriority="high">' . "\n",
+			esc_url( $hero_image )
+		);
+	}
 }
 
 /*--------------------------------------------------------------
@@ -150,3 +181,9 @@ add_filter( 'woocommerce_enqueue_styles', 'skyyrose_dequeue_woocommerce_styles' 
 
 // Defer non-critical scripts.
 add_filter( 'script_loader_tag', 'skyyrose_defer_scripts', 10, 2 );
+
+// Prioritize critical stylesheets for faster FCP/LCP.
+add_filter( 'style_loader_tag', 'skyyrose_critical_style_priority', 10, 2 );
+
+// Preload hero image on front page for better LCP.
+add_action( 'wp_head', 'skyyrose_preload_hero_image', 4 );

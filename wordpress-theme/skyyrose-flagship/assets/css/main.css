@@ -18,22 +18,35 @@
 }
 
 html {
+	font-size: 100%; /* Ensure 1rem = 16px baseline for accessibility */
 	scroll-behavior: smooth;
+	color-scheme: dark; /* Inform browser of dark theme for native controls */
+	text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
+	hanging-punctuation: first last;
 }
 
 body {
 	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
 	overflow-x: hidden;
 	font-family: var(--font-body, 'Cormorant Garamond', Georgia, serif);
 	font-size: var(--text-base, 1rem);
 	line-height: 1.6;
 	background: #000;
 	color: #fff;
+	min-height: 100dvh;
+}
+
+img, picture, video, canvas, svg {
+	max-width: 100%;
+	display: block;
 }
 
 img {
-	max-width: 100%;
-	display: block;
+	height: auto; /* Prevent aspect ratio distortion */
+	content-visibility: auto; /* Performance: skip offscreen image layout */
 }
 
 a {
@@ -47,6 +60,30 @@ button {
 	border: none;
 	background: none;
 	color: inherit;
+}
+
+/* Improve text readability */
+p, li, dd, blockquote {
+	max-width: 75ch; /* Optimal line length for readability */
+	text-wrap: pretty;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	text-wrap: balance;
+}
+
+/* Target selector for native dark UI elements */
+input, textarea, select {
+	color-scheme: dark;
+}
+
+/* Content visibility for below-fold sections — major paint performance win */
+section:not(:first-child),
+.site-footer,
+.footer-newsletter,
+.footer-grid {
+	content-visibility: auto;
+	contain-intrinsic-size: auto 500px;
 }
 
 /* Custom scrollbar */
@@ -201,8 +238,8 @@ img.sr-progressive--loaded {
 
 @media (max-width: 480px) {
 	.sr-back-to-top {
-		bottom: 20px;
-		right: 20px;
+		bottom: calc(20px + var(--safe-bottom, 0px));
+		right: calc(20px + var(--safe-right, 0px));
 		width: 44px;
 		height: 44px;
 	}

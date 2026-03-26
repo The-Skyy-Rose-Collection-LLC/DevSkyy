@@ -107,6 +107,16 @@
 		});
 	} catch (e) { /* unsupported */ }
 
+	// --- Time to First Byte (TTFB) — server responsiveness ---
+	try {
+		var navEntries = performance.getEntriesByType('navigation');
+		if (navEntries.length > 0) {
+			var ttfb = navEntries[0].responseStart - navEntries[0].requestStart;
+			var rateTTFB = function(ms) { return ms <= 800 ? 'good' : ms <= 1800 ? 'needs-improvement' : 'poor'; };
+			reportMetric('TTFB', ttfb, rateTTFB(ttfb));
+		}
+	} catch (e) { /* unsupported */ }
+
 	// --- Cumulative Layout Shift (CLS) ---
 	try {
 		var clsValue = 0;

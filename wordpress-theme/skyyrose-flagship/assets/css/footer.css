@@ -297,3 +297,27 @@
 	outline: 2px solid #fff;
 	outline-offset: 2px;
 }
+
+/* ── Safe area bottom padding for notch devices ── */
+.footer-copyright {
+	padding-bottom: calc(1.5rem + var(--safe-bottom, 0px));
+}
+
+/* ── Print: clean footer ── */
+@media print {
+	.footer-newsletter,
+	.footer-brand__social,
+	.toast-container {
+		display: none !important;
+	}
+
+	.footer-grid__list a {
+		color: #333;
+	}
+
+	.footer-grid__list a::after {
+		content: " (" attr(href) ")";
+		font-size: 0.7em;
+		color: #666;
+	}
+}

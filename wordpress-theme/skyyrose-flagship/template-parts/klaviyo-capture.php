@@ -69,7 +69,7 @@ $form_id    = 'sr-klav-form-' . $list_slug . '-' . wp_rand( 1000, 9999 );
 $nonce_val  = wp_create_nonce( 'skyyrose-nonce' );
 
 if ( 'popup' === $mode ) : ?>
-<div id="<?php echo esc_attr( $popup_id ); ?>" class="sr-klav-popup<?php echo $collection ? ' ' . $collection : ''; ?>" role="dialog" aria-modal="true" aria-label="<?php echo $headline; ?>" hidden>
+<div id="<?php echo esc_attr( $popup_id ); ?>" class="sr-klav-popup<?php echo $collection ? ' ' . esc_attr( $collection ) : ''; ?>" role="dialog" aria-modal="true" aria-label="<?php echo esc_attr( $args['headline'] ); ?>" hidden>
 	<div class="sr-klav-popup__backdrop" data-klav-close></div>
 	<div class="sr-klav-popup__card" style="--sr-klav-accent: <?php echo esc_attr( $accent ); ?>;">
 		<button class="sr-klav-popup__close" type="button" data-klav-close aria-label="<?php esc_attr_e( 'Close', 'skyyrose-flagship' ); ?>">&times;</button>
@@ -82,7 +82,7 @@ if ( 'popup' === $mode ) : ?>
 
 <?php else : ?>
 
-<div class="sr-klav-capture<?php echo $collection ? ' sr-klav-capture--' . $collection : ''; ?>"
+<div class="sr-klav-capture<?php echo $collection ? ' sr-klav-capture--' . esc_attr( $collection ) : ''; ?>"
 	style="--sr-klav-accent: <?php echo esc_attr( $accent ); ?>;">
 
 	<form id="<?php echo esc_attr( $form_id ); ?>"

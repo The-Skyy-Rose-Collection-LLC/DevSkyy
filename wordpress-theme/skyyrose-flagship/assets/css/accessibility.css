@@ -218,3 +218,72 @@ label {
 [role="alert"] {
 	/* These regions announce updates to screen readers */
 }
+
+/* ==================================================
+   TOUCH TARGET ENFORCEMENT (WCAG 2.2 — 2.5.8 Target Size)
+   Minimum 44x44px for all interactive elements.
+   ================================================== */
+
+a,
+button,
+[role="button"],
+input[type="checkbox"],
+input[type="radio"],
+select,
+summary {
+	min-height: 44px;
+	min-width: 44px;
+}
+
+/* Inline links exempt from size requirement but need adequate padding */
+p a,
+li a,
+td a,
+.breadcrumbs a {
+	min-height: auto;
+	min-width: auto;
+	padding-block: 2px;
+}
+
+/* ==================================================
+   PREFERS CONTRAST — Enhanced contrast mode
+   ================================================== */
+
+@media (prefers-contrast: more) {
+	:root {
+		--color-text-secondary: #E0E0E0;
+		--color-text-muted: #BBBBBB;
+		--color-text-dim: #AAAAAA;
+		--color-border: #444444;
+		--color-border-hover: rgba(183, 110, 121, 0.6);
+	}
+
+	.badge,
+	.pill,
+	.toast {
+		border-width: 2px;
+	}
+}
+
+/* ==================================================
+   PREFERS TRANSPARENCY — Reduce glassmorphism
+   ================================================== */
+
+@media (prefers-reduced-transparency: reduce) {
+	.navbar,
+	.search-overlay,
+	.mobile-menu__panel,
+	.toast,
+	.sr-back-to-top {
+		backdrop-filter: none;
+		-webkit-backdrop-filter: none;
+	}
+
+	.navbar {
+		background: #0A0A0A;
+	}
+
+	.sr-back-to-top {
+		background: #0A0A0A;
+	}
+}

@@ -32,6 +32,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function skyyrose_enqueue_engine( $handle, $slug, $css_deps = array( 'skyyrose-design-tokens' ), $js_deps = array() ) {
 
+	// Validate inputs to prevent path traversal.
+	$slug = sanitize_file_name( $slug );
+
 	$css_dir = SKYYROSE_DIR . '/assets/css';
 	$css_uri = SKYYROSE_ASSETS_URI . '/css';
 	$js_dir  = SKYYROSE_DIR . '/assets/js';

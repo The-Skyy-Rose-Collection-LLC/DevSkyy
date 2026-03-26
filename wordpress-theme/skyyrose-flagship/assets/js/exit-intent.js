@@ -105,10 +105,14 @@
 		// Submit handler (reuse newsletter AJAX if available).
 		submitBtn.addEventListener( 'click', function () {
 			var email = input.value.trim();
-			if ( ! email || email.indexOf( '@' ) === -1 ) {
+			// RFC-compliant basic email validation.
+			var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			if ( ! email || ! emailPattern.test( email ) ) {
 				input.style.borderColor = '#DC143C';
+				input.setAttribute( 'aria-invalid', 'true' );
 				return;
 			}
+			input.removeAttribute( 'aria-invalid' );
 
 			submitBtn.textContent = 'Joining\u2026';
 			submitBtn.disabled = true;

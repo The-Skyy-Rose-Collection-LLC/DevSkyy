@@ -139,9 +139,11 @@ data/*.db
 # Build artifacts
 *.tsbuildinfo
 
-# Minified files (build artifacts — theme loads source via SCRIPT_DEBUG fallback)
+# Minified files (build artifacts — excluded globally EXCEPT theme)
 *.min.js
 *.min.css
+!wordpress-theme/skyyrose-flagship/assets/**/*.min.js
+!wordpress-theme/skyyrose-flagship/assets/**/*.min.css
 
 # Empty directories
 keys/

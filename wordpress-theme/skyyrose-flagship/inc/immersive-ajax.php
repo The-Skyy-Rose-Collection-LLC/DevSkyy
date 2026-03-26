@@ -335,7 +335,7 @@ function skyyrose_ajax_immersive_add_to_cart() {
 	ob_start();
 	$count = $cart_count;
 	?>
-	<span class="cart-count<?php echo $count > 0 ? ' has-items' : ''; ?>"><?php echo esc_html( absint( $count ) ); ?></span>
+	<span class="cart-count<?php echo esc_attr( $count > 0 ? ' has-items' : '' ); ?>"><?php echo esc_html( absint( $count ) ); ?></span>
 	<?php
 	$cart_count_fragment = ob_get_clean();
 

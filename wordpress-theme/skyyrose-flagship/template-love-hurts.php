@@ -3,8 +3,13 @@
  * Template Name: Love Hurts Collection - Enchanted Ballroom
  * Description: Beauty and the Beast inspired 3D shopping experience
  *
- * @package SkyyroseTheme
+ * @package SkyyRose_Flagship
  */
+
+// Prevent direct access.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 get_header();
 ?>
@@ -539,7 +544,7 @@ get_header();
 </style>
 
 <script type="module">
-import LoveHurtsScene from '<?php echo get_template_directory_uri(); ?>/assets/js/three/love-hurts-scene.js';
+import LoveHurtsScene from '<?php echo esc_url( get_template_directory_uri() ); ?>/assets/js/three/love-hurts-scene.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('love-hurts-scene-container');
@@ -580,7 +585,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function openProductModal(productId, productName) {
         // Fetch product data via AJAX
-        fetch(`<?php echo admin_url('admin-ajax.php'); ?>?action=get_product_data&product_id=${productId}`)
+        fetch(`<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>?action=get_product_data&product_id=${productId}`)
             .then(res => res.json())
             .then(data => {
                 // Safely set text content

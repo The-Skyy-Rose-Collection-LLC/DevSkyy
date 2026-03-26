@@ -655,7 +655,8 @@
 @media (max-width: 480px) {
 	.navbar__container {
 		height: 60px;
-		padding: 0 1rem;
+		padding: 0 max(1rem, var(--safe-left, 0px));
+		padding-right: max(1rem, var(--safe-right, 0px));
 	}
 
 	.navbar__monogram {
@@ -665,5 +666,19 @@
 
 	.navbar__site-title {
 		font-size: 0.8rem;
+	}
+}
+
+/* ==================================================
+   PRINT STYLES — Clean print output
+   ================================================== */
+
+@media print {
+	.site-header,
+	.search-overlay,
+	.mobile-menu,
+	.navbar__actions,
+	.navbar__hamburger {
+		display: none !important;
 	}
 }

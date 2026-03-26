@@ -251,3 +251,143 @@
 		transition: none;
 	}
 }
+
+/* ==================================================
+   MODAL BASE — Reusable dialog/modal pattern
+   ================================================== */
+
+.sr-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 1050;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.3s ease, visibility 0.3s;
+}
+
+.sr-modal[open],
+.sr-modal.sr-modal--visible {
+	opacity: 1;
+	visibility: visible;
+}
+
+.sr-modal__backdrop {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.75);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+}
+
+.sr-modal__content {
+	position: relative;
+	z-index: 1;
+	max-width: 640px;
+	width: 90%;
+	max-height: 85vh;
+	overflow-y: auto;
+	background: var(--glass-bg, rgba(17, 17, 17, 0.92));
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 12px;
+	padding: 2rem;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.sr-modal__close {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	width: 44px;
+	height: 44px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: transparent;
+	color: rgba(255, 255, 255, 0.6);
+	cursor: pointer;
+	transition: color 0.2s ease, background 0.2s ease;
+}
+
+.sr-modal__close:hover {
+	color: #fff;
+	background: rgba(255, 255, 255, 0.06);
+}
+
+/* ==================================================
+   BUTTON SYSTEM — CTA, ghost, and text variants
+   ================================================== */
+
+.sr-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	min-height: 48px;
+	padding: 0.75rem 1.5rem;
+	font-family: var(--font-body, 'Cormorant Garamond', Georgia, serif);
+	font-size: 0.875rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	text-decoration: none;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: all 0.25s ease;
+	white-space: nowrap;
+}
+
+.sr-btn--primary {
+	background: var(--color-rose-gold, #B76E79);
+	color: #fff;
+	border: none;
+}
+
+.sr-btn--primary:hover {
+	background: var(--color-gold, #D4AF37);
+	color: #000;
+	transform: var(--hover-lift, translateY(-2px));
+}
+
+.sr-btn--ghost {
+	background: transparent;
+	color: var(--color-rose-gold, #B76E79);
+	border: 1px solid var(--color-rose-gold, #B76E79);
+}
+
+.sr-btn--ghost:hover {
+	background: rgba(183, 110, 121, 0.1);
+	color: #fff;
+}
+
+.sr-btn:disabled,
+.sr-btn[aria-disabled="true"] {
+	opacity: 0.4;
+	cursor: not-allowed;
+	transform: none;
+}
+
+/* ==================================================
+   PRINT RESET — Hide decorative components
+   ================================================== */
+
+@media print {
+	.skyyrose-film-grain,
+	.film-grain__inner,
+	.toast,
+	.toast-container,
+	.sr-modal__backdrop,
+	.badge--rose-gold,
+	.badge--gold,
+	.spinner {
+		display: none !important;
+	}
+
+	.divider {
+		background: #ccc;
+	}
+}

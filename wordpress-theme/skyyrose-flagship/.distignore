@@ -1,4 +1,5 @@
-# Files excluded from the release ZIP.
+# SkyyRose Flagship — Distribution Ignore
+# Files excluded from production deployment archives.
 # Used by `wp dist-archive` and similar tools.
 
 # Development tooling
@@ -13,6 +14,8 @@ composer.json
 composer.lock
 webpack.config.js
 babel.config.js
+build.sh
+generate_models.js
 
 # CI / testing
 tests/
@@ -20,6 +23,10 @@ playwright.config.js
 jest.config.js
 scripts/
 .github/
+
+# Documentation (not shipped to production)
+*.md
+IMMERSIVE-WORLDS-PLAN.md
 
 # Node / PHP deps (rebuilt by end user if needed)
 node_modules/

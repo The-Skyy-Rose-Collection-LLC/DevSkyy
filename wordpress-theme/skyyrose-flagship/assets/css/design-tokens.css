@@ -112,4 +112,37 @@
 	--z-tooltip: 600;
 	--z-modal: 800;
 	--z-cursor: 9999;
+
+	/* -----------------------------------------------
+	   Motion — Reduced motion defaults
+	   ----------------------------------------------- */
+	--motion-duration: 0.3s;
+	--motion-spring: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+
+	/* -----------------------------------------------
+	   Content Visibility — Performance tokens
+	   ----------------------------------------------- */
+	--cv-auto: auto;
+	--contain-paint: paint;
+	--contain-layout: layout;
+
+	/* -----------------------------------------------
+	   Safe Area Insets — Mobile viewport
+	   ----------------------------------------------- */
+	--safe-top: env(safe-area-inset-top, 0px);
+	--safe-bottom: env(safe-area-inset-bottom, 0px);
+	--safe-left: env(safe-area-inset-left, 0px);
+	--safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* -----------------------------------------------
+   Reduced Motion — Override duration tokens
+   ----------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--motion-duration: 0.01ms;
+		--motion-spring: 0.01ms linear;
+		--transition-smooth: all 0.01ms linear;
+		--transition-spring: all 0.01ms linear;
+	}
 }

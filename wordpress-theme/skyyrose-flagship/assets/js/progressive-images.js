@@ -44,6 +44,11 @@
 					img.removeAttribute( 'data-src' );
 					img.classList.add( 'sr-progressive--loaded' );
 				};
+				preloader.onerror = function () {
+					// Graceful degradation: remove blur even if high-res fails.
+					img.classList.add( 'sr-progressive--loaded' );
+					img.removeAttribute( 'data-src' );
+				};
 				preloader.src = fullSrc;
 
 				observer.unobserve( img );

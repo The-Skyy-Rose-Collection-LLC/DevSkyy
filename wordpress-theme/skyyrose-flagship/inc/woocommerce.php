@@ -173,7 +173,7 @@ function skyyrose_woocommerce_cart_fragments( $fragments ) {
 
 	ob_start();
 	?>
-	<span class="cart-count<?php echo $count > 0 ? ' has-items' : ''; ?>"><?php echo wp_kses_data( $count ); ?></span>
+	<span class="cart-count<?php echo esc_attr( $count > 0 ? ' has-items' : '' ); ?>"><?php echo wp_kses_data( $count ); ?></span>
 	<?php
 	$fragments['.cart-count'] = ob_get_clean();
 

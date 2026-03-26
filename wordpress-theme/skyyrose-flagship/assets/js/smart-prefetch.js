@@ -32,6 +32,11 @@
 		}
 	}
 
+	// Respect reduced motion as a proxy for "save resources" preference.
+	if ( window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ) {
+		return;
+	}
+
 	var prefetched = {};
 	var prefetchCount = 0;
 	var MAX_PREFETCH = 10;

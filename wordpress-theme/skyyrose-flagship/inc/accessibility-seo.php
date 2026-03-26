@@ -29,14 +29,20 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 function skyyrose_accessibility_styles() {
-	$css_path = get_template_directory() . '/assets/css/accessibility.css';
-	if ( ! file_exists( $css_path ) ) {
+	$css_dir  = SKYYROSE_DIR . '/assets/css';
+	$css_uri  = SKYYROSE_ASSETS_URI . '/css';
+	$use_min  = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+
+	$a11y_file = $use_min && file_exists( $css_dir . '/accessibility.min.css' )
+		? 'accessibility.min.css' : 'accessibility.css';
+
+	if ( ! file_exists( $css_dir . '/' . $a11y_file ) ) {
 		return;
 	}
 
 	wp_enqueue_style(
 		'skyyrose-a11y-css',
-		SKYYROSE_ASSETS_URI . '/css/accessibility.css',
+		$css_uri . '/' . $a11y_file,
 		array( 'skyyrose-style' ),
 		SKYYROSE_VERSION
 	);

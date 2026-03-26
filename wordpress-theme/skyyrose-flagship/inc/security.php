@@ -82,7 +82,11 @@ function skyyrose_send_security_headers() {
 	header( 'Referrer-Policy: strict-origin-when-cross-origin' );
 
 	// Permissions policy (restrict sensor APIs not needed by a fashion site).
-	header( 'Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(self)' );
+	header( 'Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(self), interest-cohort=(), browsing-topics=(), autoplay=(self), accelerometer=(), gyroscope=(), magnetometer=(), usb=()' );
+
+	// Cross-Origin policies for asset isolation.
+	header( 'Cross-Origin-Opener-Policy: same-origin' );
+	header( 'Cross-Origin-Resource-Policy: same-site' );
 }
 add_action( 'send_headers', 'skyyrose_send_security_headers' );
 

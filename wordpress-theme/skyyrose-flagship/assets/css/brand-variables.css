@@ -129,7 +129,7 @@
 /* Site is always dark theme — no OS-preference switching */
 
 /**
- * Print Styles
+ * Print Styles — Optimized for ink-saving and readability.
  */
 @media print {
 	:root {
@@ -138,5 +138,26 @@
 		--shadow-lg: none;
 		--shadow-xl: none;
 		--shadow-elegant: none;
+		--shadow-rose-glow: none;
+		--shadow-gold-glow: none;
+		--gradient-rose-gold: none;
+		--gradient-signature: none;
+		--gradient-love-hurts: none;
+		--gradient-black-rose: none;
+		--gradient-overlay: none;
+		--blur-sm: none;
+		--blur-md: none;
+		--blur-lg: none;
+	}
+}
+
+/**
+ * High Contrast Mode — Forced colors override
+ */
+@media (forced-colors: active) {
+	:root {
+		--rose-gold: LinkText;
+		--gold: LinkText;
+		--crimson: Mark;
 	}
 }

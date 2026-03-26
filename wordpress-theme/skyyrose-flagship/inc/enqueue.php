@@ -726,21 +726,29 @@ function skyyrose_enqueue_template_scripts() {
  * @return void
  */
 function skyyrose_admin_scripts() {
-	$admin_css = SKYYROSE_DIR . '/assets/css/admin.css';
-	if ( file_exists( $admin_css ) ) {
+	$css_dir = SKYYROSE_DIR . '/assets/css';
+	$css_uri = SKYYROSE_ASSETS_URI . '/css';
+	$js_dir  = SKYYROSE_DIR . '/assets/js';
+	$js_uri  = SKYYROSE_ASSETS_URI . '/js';
+	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+
+	$admin_css_file = $use_min && file_exists( $css_dir . '/admin.min.css' )
+		? 'admin.min.css' : 'admin.css';
+	if ( file_exists( $css_dir . '/' . $admin_css_file ) ) {
 		wp_enqueue_style(
 			'skyyrose-admin',
-			SKYYROSE_ASSETS_URI . '/css/admin.css',
+			$css_uri . '/' . $admin_css_file,
 			array(),
 			SKYYROSE_VERSION
 		);
 	}
 
-	$admin_js = SKYYROSE_DIR . '/assets/js/admin.js';
-	if ( file_exists( $admin_js ) ) {
+	$admin_js_file = $use_min && file_exists( $js_dir . '/admin.min.js' )
+		? 'admin.min.js' : 'admin.js';
+	if ( file_exists( $js_dir . '/' . $admin_js_file ) ) {
 		wp_enqueue_script(
 			'skyyrose-admin',
-			SKYYROSE_ASSETS_URI . '/js/admin.js',
+			$js_uri . '/' . $admin_js_file,
 			array( 'jquery' ),
 			SKYYROSE_VERSION,
 			true
