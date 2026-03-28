@@ -44,7 +44,7 @@
   }
 
   if (!supportsWebGL()) {
-    console.log('[SkyyRose World] WebGL not supported — using 2D fallback');
+    /* WebGL not supported — immersive.js handles 2D fallback */
     return; // Let immersive.js handle it
   }
 
@@ -513,9 +513,13 @@
     if (name) name.textContent = product.name || '';
     if (price) price.textContent = product.price ? '$' + product.price : '';
     if (sizes && product.sizes) {
-      sizes.innerHTML = product.sizes.map(function (s) {
-        return '<span class="size-chip">' + s + '</span>';
-      }).join('');
+      sizes.textContent = '';
+      product.sizes.forEach(function (s) {
+        var chip = document.createElement('span');
+        chip.className = 'size-chip';
+        chip.textContent = s;
+        sizes.appendChild(chip);
+      });
     }
     if (btn && product.sku) {
       btn.href = '/?post_type=product&p=0&sku=' + product.sku;
@@ -706,7 +710,11 @@
   function showAvatarToast() {
     var toast = document.createElement('div');
     toast.className = 'avatar-toast';
-    toast.innerHTML = '<span class="avatar-toast-icon">&#10024;</span> You found SkyyRose!';
+    var icon = document.createElement('span');
+    icon.className = 'avatar-toast-icon';
+    icon.textContent = '\u2728';
+    toast.appendChild(icon);
+    toast.appendChild(document.createTextNode(' You found SkyyRose!'));
     document.body.appendChild(toast);
 
     // Force reflow then animate in
@@ -729,14 +737,37 @@
       ? config.avatar.introImage
       : (config.avatar ? config.avatar.sprite : '');
 
-    overlay.innerHTML =
-      '<div class="avatar-intro-content">' +
-        '<img class="avatar-intro-mascot" src="' + mascotUrl + '" alt="SkyyRose mascot">' +
-        '<h2 class="avatar-intro-title">Hi! I\'m SkyyRose!</h2>' +
-        '<p class="avatar-intro-text">You found me in all three worlds!</p>' +
-        '<p class="avatar-intro-tagline">Luxury Grows from Concrete.</p>' +
-        '<button class="avatar-intro-close" type="button">Continue Exploring</button>' +
-      '</div>';
+    var content = document.createElement('div');
+    content.className = 'avatar-intro-content';
+
+    var img = document.createElement('img');
+    img.className = 'avatar-intro-mascot';
+    img.src = mascotUrl;
+    img.alt = 'SkyyRose mascot';
+    content.appendChild(img);
+
+    var h2 = document.createElement('h2');
+    h2.className = 'avatar-intro-title';
+    h2.textContent = "Hi! I'm SkyyRose!";
+    content.appendChild(h2);
+
+    var p1 = document.createElement('p');
+    p1.className = 'avatar-intro-text';
+    p1.textContent = 'You found me in all three worlds!';
+    content.appendChild(p1);
+
+    var p2 = document.createElement('p');
+    p2.className = 'avatar-intro-tagline';
+    p2.textContent = 'Luxury Grows from Concrete.';
+    content.appendChild(p2);
+
+    var btn = document.createElement('button');
+    btn.className = 'avatar-intro-close';
+    btn.type = 'button';
+    btn.textContent = 'Continue Exploring';
+    content.appendChild(btn);
+
+    overlay.appendChild(content);
 
     document.body.appendChild(overlay);
 
