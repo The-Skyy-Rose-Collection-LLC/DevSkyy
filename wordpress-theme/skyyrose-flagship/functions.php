@@ -41,22 +41,17 @@ $GLOBALS['concatenate_scripts'] = false;
  * Core Includes (always loaded)
  *--------------------------------------------------------------*/
 $skyyrose_core_includes = array(
-	'/inc/ai-providers.php',
 	'/inc/theme-setup.php',
-	'/inc/product-catalog.php',
-	'/inc/interactive-grid.php',
 	'/inc/enqueue.php',
-	'/inc/enqueue-features.php',
 	'/inc/enqueue-performance.php',
-	'/inc/enqueue-engines.php',
 	'/inc/customizer.php',
 	'/inc/template-functions.php',
 	'/inc/security.php',
 	'/inc/accessibility-seo.php',
 	'/inc/seo.php',
 	'/inc/ajax-handlers.php',
+	'/inc/product-catalog.php',
 	'/inc/product-taxonomy.php',
-	'/inc/branded-content.php',
 	'/inc/facebook-sdk.php',
 	'/inc/menu-setup.php',
 	'/inc/theme-activation-setup.php',
@@ -100,68 +95,6 @@ add_action( 'elementor/loaded', function () {
 	}
 } );
 
-/*--------------------------------------------------------------
- * Admin Includes (loaded only in wp-admin context)
- *--------------------------------------------------------------*/
-if ( is_admin() ) {
-	$skyyrose_admin_includes = array(
-		'/inc/deployment-checklist.php',
-	);
+/* Admin includes and brand styles removed in v5.2.0 — dead code cleanup. */
 
-	foreach ( $skyyrose_admin_includes as $skyyrose_file ) {
-		$skyyrose_filepath = SKYYROSE_DIR . $skyyrose_file;
-		if ( file_exists( $skyyrose_filepath ) ) {
-			require_once $skyyrose_filepath;
-		}
-	}
-}
-
-/*--------------------------------------------------------------
- * Brand Styles: variables, luxury theme, collection colors (priority 5)
- *--------------------------------------------------------------*/
-$skyyrose_brand_styles_path = SKYYROSE_DIR . '/inc/enqueue-brand-styles.php';
-if ( file_exists( $skyyrose_brand_styles_path ) ) {
-	require_once $skyyrose_brand_styles_path;
-}
-
-/*--------------------------------------------------------------
- * Force Page Templates
- *
- * WordPress.com's block theme layer can override classic template
- * resolution. This filter ensures our custom page templates load
- * correctly for specific pages.
- *--------------------------------------------------------------*/
-add_filter( 'template_include', function ( $template ) {
-	// Collections "Shop All" page → skyyrose-canvas.php
-	// Uses slug matching instead of hardcoded page ID (IDs differ between environments).
-	if ( is_page( 'collections' ) ) {
-		$canvas = SKYYROSE_DIR . '/skyyrose-canvas.php';
-		if ( file_exists( $canvas ) ) {
-			return $canvas;
-		}
-	}
-
-	// Experiences landing page → template-experiences.php
-	if ( is_page( 'experience' ) ) {
-		$experiences = SKYYROSE_DIR . '/template-experiences.php';
-		if ( file_exists( $experiences ) ) {
-			return $experiences;
-		}
-	}
-
-	return $template;
-}, 99 );
-
-/*--------------------------------------------------------------
- * Brand Mascot Widget
- *
- * Loads the interactive mascot template part in the footer of
- * all front-end pages. Skips admin and REST API contexts.
- *--------------------------------------------------------------*/
-add_action( 'wp_footer', function () {
-	if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
-		return;
-	}
-	get_template_part( 'template-parts/mascot' );
-	get_template_part( 'template-parts/brand-ambassador' );
-} );
+/* Mascot + brand-ambassador removed in v5.2.0. */

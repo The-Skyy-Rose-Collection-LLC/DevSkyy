@@ -3,7 +3,7 @@
  * Elementor Featured Product Widget
  *
  * Full-width product spotlight with large image + info panel.
- * Reuses .col-feat CSS from collection-v4.css.
+ * Reuses .col-feat CSS from product-card-holo.css.
  *
  * @package SkyyRose_Flagship
  * @since   3.3.0

@@ -564,9 +564,6 @@ function skyyrose_meta_description() {
 		if ( is_page() ) {
 			$template     = get_page_template_slug();
 			$descriptions = array(
-				'template-landing-black-rose.php'   => 'Shop the Black Rose Collection — gothic luxury streetwear. Limited edition pieces crafted in Oakland. Free shipping over $150.',
-				'template-landing-love-hurts.php'    => 'Discover Love Hurts — named after a bloodline, designed for survivors. Crimson luxury fashion from SkyyRose. Pre-order now.',
-				'template-landing-signature.php'     => 'The Signature Collection — everyday luxury essentials. Foundation wardrobe pieces built to last. Shop SkyyRose.',
 				'template-collection-black-rose.php' => 'Browse the full Black Rose Collection. Limited edition gothic streetwear — hockey jerseys, basketball jerseys, and more.',
 				'template-collection-love-hurts.php' => 'Browse the full Love Hurts Collection. Crimson luxury fashion — fanny packs, apparel, and accessories from SkyyRose.',
 				'template-collection-signature.php'  => 'Browse the full Signature Collection. Everyday luxury — windbreakers, shorts, beanies, and essentials from SkyyRose.',
@@ -632,9 +629,6 @@ function skyyrose_pre_document_title( $title ) {
 	if ( is_page() ) {
 		$template = get_page_template_slug();
 		$titles   = array(
-			'template-landing-black-rose.php'      => 'Black Rose Collection — Gothic Luxury Streetwear | ' . $brand,
-			'template-landing-love-hurts.php'       => 'Love Hurts Collection — Named After a Bloodline | ' . $brand,
-			'template-landing-signature.php'        => 'The Signature Collection — Foundation Wardrobe | ' . $brand,
 			'template-collection-black-rose.php'    => 'Shop Black Rose — Limited Edition Streetwear | ' . $brand,
 			'template-collection-love-hurts.php'    => 'Shop Love Hurts — Crimson Luxury Fashion | ' . $brand,
 			'template-collection-signature.php'     => 'Shop Signature — Everyday Luxury Essentials | ' . $brand,
@@ -642,7 +636,6 @@ function skyyrose_pre_document_title( $title ) {
 			'template-preorder-gateway.php'         => 'Pre-Order — Secure Your Pieces | ' . $brand,
 			'template-contact.php'                  => 'Contact Us | ' . $brand,
 			'page-wishlist.php'                     => 'Your Wishlist | ' . $brand,
-			'template-style-quiz.php'               => 'Style Quiz — Find Your Collection | ' . $brand,
 		);
 
 		if ( $template && isset( $titles[ $template ] ) ) {

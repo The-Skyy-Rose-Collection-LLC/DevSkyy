@@ -4,7 +4,7 @@
  *
  * 3D rotating product card with drag-to-rotate cube, conversion layer
  * (size pills, scarcity counter, quick-buy), and wishlist/share actions.
- * Progressively enhanced by interactive-cards.js.
+ * Progressively enhanced by product-card-holo.js.
  *
  * Usage:
  *   get_template_part( 'template-parts/interactive-product-card', null, $args );

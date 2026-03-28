@@ -4,7 +4,7 @@
  *
  * Displays a single product from the centralized catalog with
  * collection-aware accent colors, hover overlay, and CTA button.
- * Reuses .col-card CSS from collection-v4.css.
+ * Reuses card CSS from product-card-holo.css.
  *
  * @package SkyyRose_Flagship
  * @since   3.3.0

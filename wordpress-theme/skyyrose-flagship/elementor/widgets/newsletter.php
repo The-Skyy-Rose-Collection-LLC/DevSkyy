@@ -4,7 +4,7 @@
  *
  * Email capture form with AJAX submission, nonce-protected,
  * reusing the existing skyyrose_newsletter AJAX handler.
- * Reuses .col-nl CSS from collection-v4.css.
+ * Reuses collection CSS from product-card-holo.css.
  *
  * @package SkyyRose_Flagship
  * @since   3.3.0

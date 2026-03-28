@@ -72,7 +72,7 @@
 
 	/* -----------------------------------------------
 	   Typography — Font Scale
-	   CANONICAL source: brand-variables.css (--text-xs…--text-5xl).
+	   CANONICAL source: design-tokens.css (--text-xs…--text-5xl).
 	   Do NOT redefine here — the cascade will silently override.
 	   ----------------------------------------------- */
 

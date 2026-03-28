@@ -86,23 +86,6 @@ function skyyrose_get_required_pages() {
 			'content'  => '',
 		),
 
-		// --- Landing pages (conversion engines) ---
-		'landing-black-rose'      => array(
-			'title'    => __( 'Black Rose — Limited Drop', 'skyyrose-flagship' ),
-			'template' => 'template-landing-black-rose.php',
-			'content'  => '',
-		),
-		'landing-love-hurts'      => array(
-			'title'    => __( 'Love Hurts — The Collection', 'skyyrose-flagship' ),
-			'template' => 'template-landing-love-hurts.php',
-			'content'  => '',
-		),
-		'landing-signature'       => array(
-			'title'    => __( 'Signature — Foundation Wardrobe', 'skyyrose-flagship' ),
-			'template' => 'template-landing-signature.php',
-			'content'  => '',
-		),
-
 		// --- Immersive experience pages (3D storytelling) ---
 		'experience-black-rose'   => array(
 			'title'    => __( 'Black Rose Experience', 'skyyrose-flagship' ),
@@ -124,11 +107,6 @@ function skyyrose_get_required_pages() {
 		'wishlist'                => array(
 			'title'    => __( 'Wishlist', 'skyyrose-flagship' ),
 			'template' => 'page-wishlist.php',
-			'content'  => '',
-		),
-		'style-quiz'              => array(
-			'title'    => __( 'Style Quiz', 'skyyrose-flagship' ),
-			'template' => 'template-style-quiz.php',
 			'content'  => '',
 		),
 	);

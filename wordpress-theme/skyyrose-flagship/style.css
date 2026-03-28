@@ -506,14 +506,10 @@ label {
 /* Full-bleed hero pages handle their own offset — reset the header padding */
 .homepage-v2 .site-content,
 .page-template-template-homepage-luxury .site-content,
-.page-template-template-landing-black-rose .site-content,
-.page-template-template-landing-love-hurts .site-content,
-.page-template-template-landing-signature .site-content,
 .page-template-template-love-hurts .site-content,
 .page-template-template-immersive-black-rose .site-content,
 .page-template-template-immersive-love-hurts .site-content,
 .page-template-template-immersive-signature .site-content,
-.page-template-skyyrose-canvas .site-content {
 	padding-top: 0;
 }
 

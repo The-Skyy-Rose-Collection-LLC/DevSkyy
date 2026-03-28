@@ -114,6 +114,16 @@ $skyyrose_kc_collections = array(
 get_header();
 ?>
 
+<style>
+/* Inline override — CDN caches external CSS aggressively */
+.kc-fade-up { animation: kcUp 1s ease-out .3s forwards !important; }
+.kc-fade-left { animation: kcLeft 1s ease-out .5s forwards !important; }
+.kc-fade-right { animation: kcRight 1s ease-out .7s forwards !important; }
+@keyframes kcUp { to { opacity:1; transform:translateY(0); } }
+@keyframes kcLeft { to { opacity:1; transform:translateX(0); } }
+@keyframes kcRight { to { opacity:1; transform:translateX(0); } }
+</style>
+
 <main id="primary" class="site-main kc-page" role="main" tabindex="-1">
 
 	<!-- ============================================================

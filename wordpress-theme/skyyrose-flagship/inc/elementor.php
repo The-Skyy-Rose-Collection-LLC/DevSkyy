@@ -120,17 +120,9 @@ add_action( 'elementor/editor/after_enqueue_styles', 'skyyrose_elementor_editor_
  * @since 1.0.0
  */
 function skyyrose_elementor_frontend_scripts() {
-	wp_enqueue_script(
-		'skyyrose-elementor',
-		SKYYROSE_ASSETS_URI . '/js/elementor-frontend.js',
-		array( 'jquery', 'elementor-frontend' ),
-		SKYYROSE_VERSION,
-		true
-	);
-
 	wp_enqueue_style(
-		'skyyrose-collection-v4',
-		SKYYROSE_ASSETS_URI . '/css/collection-v4.css',
+		'skyyrose-product-card-holo',
+		SKYYROSE_ASSETS_URI . '/css/product-card-holo.css',
 		array(),
 		SKYYROSE_VERSION
 	);

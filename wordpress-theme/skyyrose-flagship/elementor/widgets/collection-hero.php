@@ -3,7 +3,7 @@
  * Elementor Collection Hero Widget
  *
  * Full-bleed hero section with parallax image, collection number,
- * name, tagline, and CTA buttons. Reuses .col-hero CSS from collection-v4.css.
+ * name, tagline, and CTA buttons. Reuses .col-hero CSS from product-card-holo.css.
  *
  * @package SkyyRose_Flagship
  * @since   3.3.0

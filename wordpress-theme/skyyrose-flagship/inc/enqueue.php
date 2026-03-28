@@ -151,129 +151,6 @@ function skyyrose_enqueue_global_scripts() {
 		wp_enqueue_script( 'comment-reply' );
 	}
 
-	// Progressive image loading — blur-up effect for product images (v4.0.0 bonus).
-	$prog_js_file = $use_min && file_exists( $js_dir . '/progressive-images.min.js' ) ? 'progressive-images.min.js' : 'progressive-images.js';
-	if ( file_exists( $js_dir . '/' . $prog_js_file ) && ! is_admin() ) {
-		wp_enqueue_script(
-			'skyyrose-progressive-images',
-			$js_uri . '/' . $prog_js_file,
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
-
-	// Smart link prefetching — preloads pages on hover for instant navigation (v4.0.0 bonus).
-	$prefetch_js_file = $use_min && file_exists( $js_dir . '/smart-prefetch.min.js' ) ? 'smart-prefetch.min.js' : 'smart-prefetch.js';
-	if ( file_exists( $js_dir . '/' . $prefetch_js_file ) && ! is_admin() ) {
-		wp_enqueue_script(
-			'skyyrose-smart-prefetch',
-			$js_uri . '/' . $prefetch_js_file,
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
-
-	// Scroll enhancements — progress indicator + back-to-top button (v4.0.0 S6 bonus).
-	$scroll_js_file = $use_min && file_exists( $js_dir . '/scroll-enhancements.min.js' ) ? 'scroll-enhancements.min.js' : 'scroll-enhancements.js';
-	if ( file_exists( $js_dir . '/' . $scroll_js_file ) && ! is_admin() ) {
-		wp_enqueue_script(
-			'skyyrose-scroll-enhancements',
-			$js_uri . '/' . $scroll_js_file,
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
-
-	// Web Vitals Monitor — tracks LCP, FID/INP, CLS for SEO (v4.0.0 S7 bonus).
-	$vitals_js_file = $use_min && file_exists( $js_dir . '/web-vitals-monitor.min.js' ) ? 'web-vitals-monitor.min.js' : 'web-vitals-monitor.js';
-	if ( file_exists( $js_dir . '/' . $vitals_js_file ) && ! is_admin() ) {
-		wp_enqueue_script(
-			'skyyrose-web-vitals',
-			$js_uri . '/' . $vitals_js_file,
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
-
-	// Schema Validator — dev-mode JSON-LD checker (v4.0.0 S7 bonus).
-	$schema_js_file = $use_min && file_exists( $js_dir . '/schema-validator.min.js' ) ? 'schema-validator.min.js' : 'schema-validator.js';
-	if ( file_exists( $js_dir . '/' . $schema_js_file ) && ! is_admin() && ( defined( 'WP_DEBUG' ) && WP_DEBUG ) ) {
-		wp_enqueue_script(
-			'skyyrose-schema-validator',
-			$js_uri . '/' . $schema_js_file,
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
-
-	// Exit-intent overlay — only on product-facing pages (v4.0.0 S2 bonus).
-	$exit_slugs = array( 'front-page', 'collection', 'collection-v4', 'single-product', 'preorder-gateway', 'landing' );
-	if ( ! is_admin() && in_array( skyyrose_get_current_template_slug(), $exit_slugs, true ) ) {
-		$exit_css_file = $use_min && file_exists( $css_dir . '/exit-intent.min.css' ) ? 'exit-intent.min.css' : 'exit-intent.css';
-		if ( file_exists( $css_dir . '/' . $exit_css_file ) ) {
-			wp_enqueue_style(
-				'skyyrose-exit-intent',
-				$css_uri . '/' . $exit_css_file,
-				array(),
-				SKYYROSE_VERSION
-			);
-		}
-
-		$exit_js_file = $use_min && file_exists( $js_dir . '/exit-intent.min.js' ) ? 'exit-intent.min.js' : 'exit-intent.js';
-		if ( file_exists( $js_dir . '/' . $exit_js_file ) ) {
-			wp_enqueue_script(
-				'skyyrose-exit-intent',
-				$js_uri . '/' . $exit_js_file,
-				array(),
-				SKYYROSE_VERSION,
-				true
-			);
-		}
-	}
-
-	// Urgency countdown banner — only on product-facing pages (v4.0.0 S2 bonus).
-	$urgency_slugs = array( 'front-page', 'collection', 'collection-v4', 'single-product', 'preorder-gateway', 'landing' );
-	if ( ! is_admin() && in_array( skyyrose_get_current_template_slug(), $urgency_slugs, true ) ) {
-		$urg_css_file = $use_min && file_exists( $css_dir . '/urgency-banner.min.css' ) ? 'urgency-banner.min.css' : 'urgency-banner.css';
-		if ( file_exists( $css_dir . '/' . $urg_css_file ) ) {
-			wp_enqueue_style(
-				'skyyrose-urgency-banner',
-				$css_uri . '/' . $urg_css_file,
-				array(),
-				SKYYROSE_VERSION
-			);
-		}
-
-		$urg_js_file = $use_min && file_exists( $js_dir . '/urgency-banner.min.js' ) ? 'urgency-banner.min.js' : 'urgency-banner.js';
-		if ( file_exists( $js_dir . '/' . $urg_js_file ) ) {
-			wp_enqueue_script(
-				'skyyrose-urgency-banner',
-				$js_uri . '/' . $urg_js_file,
-				array(),
-				SKYYROSE_VERSION,
-				true
-			);
-
-			// Pass deadline from WordPress option (set via admin or wp-cli).
-			$preorder_deadline = get_option( 'skyyrose_preorder_deadline', '' );
-			if ( ! $preorder_deadline ) {
-				// Fallback: 30 days from now if no deadline is set.
-				$preorder_deadline = gmdate( 'c', strtotime( '+30 days' ) );
-			}
-
-			wp_localize_script( 'skyyrose-urgency-banner', 'skyyRoseUrgency', array(
-				'deadline' => $preorder_deadline,
-				'message'  => __( 'Pre-Order closes in', 'skyyrose-flagship' ),
-				'ctaUrl'   => home_url( '/pre-order/' ),
-				'ctaText'  => __( 'Shop Now', 'skyyrose-flagship' ),
-			) );
-		}
-	}
 }
 
 /**
@@ -361,15 +238,6 @@ function skyyrose_get_current_template_slug() {
 			'template-about.php'                   => 'about',
 			'template-contact.php'                 => 'contact',
 			'template-preorder-gateway.php'        => 'preorder-gateway',
-			'template-homepage-luxury.php'         => 'front-page',
-			'template-style-quiz.php'              => 'style-quiz',
-			'skyyrose-canvas.php'                  => 'collections-shop',
-			'template-landing-black-rose.php'      => 'landing',
-			'template-landing-love-hurts.php'      => 'landing',
-			'template-landing-signature.php'       => 'landing',
-			'template-experiences.php'             => 'experiences',
-			'template-spatial-home.php'            => 'spatial-home',
-			'template-collections.php'             => 'collection',
 		);
 
 		if ( isset( $template_map[ $page_template ] ) ) {
@@ -413,11 +281,7 @@ function skyyrose_enqueue_template_styles() {
 
 	$template_styles = array(
 		'front-page'      => 'homepage-portal.css',
-		'collection'      => 'collections.css',
-		'collection-v4'   => 'collection-v4.css',
 		'immersive'       => 'immersive.css',
-		'experiences'     => 'immersive.css',
-		'spatial-home'    => 'spatial-home.css',
 		'single-product'  => 'single-product.css',
 		'cart'            => 'woocommerce.css',
 		'checkout'        => 'woocommerce.css',
@@ -425,9 +289,6 @@ function skyyrose_enqueue_template_styles() {
 		'about'           => 'about.css',
 		'contact'         => 'contact.css',
 		'preorder-gateway'  => 'preorder-gateway.css',
-		'style-quiz'       => 'style-quiz.css',
-		'collections-shop' => 'collections-shop.css',
-		'landing'          => 'landing.css',
 		'404'              => '404.css',
 		'single'           => 'generic-pages.css',
 		'blog'             => 'generic-pages.css',
@@ -530,17 +391,12 @@ function skyyrose_enqueue_template_scripts() {
 
 	$template_scripts = array(
 		/* front-page JS is inline Three.js module in the template */
-		'collection'       => 'collections.js',
-		'collection-v4'    => 'collection-v4.js',
 		'immersive'        => 'immersive.js',
 		'single-product'   => 'single-product.js',
 		'cart'             => 'woocommerce.js',
 		'checkout'         => 'woocommerce.js',
 		'contact'          => 'contact.js',
 		'preorder-gateway'  => 'preorder-gateway.js',
-		'style-quiz'       => 'style-quiz.js',
-		'collections-shop' => 'collections-shop.js',
-		'landing'          => 'landing-engine.js',
 		'about'            => 'about.js',
 	);
 
@@ -705,7 +561,7 @@ function skyyrose_admin_scripts() {
 /*--------------------------------------------------------------
  * Hook Registration
  *
- * Feature hooks → inc/enqueue-features.php
+ * Feature hooks removed in v5.2.0
  * Performance hooks → inc/enqueue-performance.php
  *--------------------------------------------------------------*/
 

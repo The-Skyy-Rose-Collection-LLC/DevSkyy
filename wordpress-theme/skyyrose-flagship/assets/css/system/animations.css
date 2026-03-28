@@ -3,7 +3,7 @@
  *
  * Single source of truth for the .rv scroll-reveal system.
  * Replaces duplicate definitions across homepage.css, homepage-v2.css,
- * landing.css. About page retains scoped override (.abt-page .rv).
+ * about.css. About page retains scoped override (.abt-page .rv).
  *
  * Trigger classes: .vis (primary) and .visible (alias for backward compat)
  * Variants: .rv-left, .rv-right, .rv-scale

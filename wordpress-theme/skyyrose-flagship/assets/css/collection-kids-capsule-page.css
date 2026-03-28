@@ -328,10 +328,25 @@
 	margin: 0;
 }
 
-/* GSAP Animation States */
-.kc-fade-up { opacity: 0; transform: translateY(30px); }
-.kc-fade-left { opacity: 0; transform: translateX(-40px); }
-.kc-fade-right { opacity: 0; transform: translateX(40px); }
+/* CSS-only entrance animations — GSAP enhances if loaded */
+.kc-fade-up {
+	opacity: 0; transform: translateY(30px);
+	animation: kcFadeUp 1s ease-out 0.3s forwards;
+}
+.kc-fade-left {
+	opacity: 0; transform: translateX(-40px);
+	animation: kcFadeLeft 1s ease-out 0.5s forwards;
+}
+.kc-fade-right {
+	opacity: 0; transform: translateX(40px);
+	animation: kcFadeRight 1s ease-out 0.7s forwards;
+}
+@keyframes kcFadeUp { to { opacity: 1; transform: translateY(0); } }
+@keyframes kcFadeLeft { to { opacity: 1; transform: translateX(0); } }
+@keyframes kcFadeRight { to { opacity: 1; transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) {
+	.kc-fade-up, .kc-fade-left, .kc-fade-right { opacity: 1; transform: none; animation: none; }
+}
 
 /* -----------------------------------------------
    Toast Notification

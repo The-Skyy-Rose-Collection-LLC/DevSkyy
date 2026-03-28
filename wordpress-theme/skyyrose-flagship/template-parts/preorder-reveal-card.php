@@ -7,7 +7,7 @@
  * When timer completes, blur removes with scale animation and
  * particle burst, revealing the product with a pulsing CTA.
  *
- * Enhanced by interactive-cards.js (initPreOrderReveal).
+ * Enhanced by product-card-holo.js.
  *
  * Usage:
  *   get_template_part( 'template-parts/preorder-reveal-card', null, $args );

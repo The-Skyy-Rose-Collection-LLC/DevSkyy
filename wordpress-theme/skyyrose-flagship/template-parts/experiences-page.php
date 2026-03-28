@@ -5,7 +5,7 @@
  * Renders the full immersive experiences landing page — hero section plus
  * a three-card grid linking to each collection experience.
  *
- * Expected: $experiences_config (array) — set by template-experiences.php.
+ * Expected: $experiences_config (array) — set by immersive template.
  *
  * @package SkyyRose_Flagship
  * @since   4.1.0
