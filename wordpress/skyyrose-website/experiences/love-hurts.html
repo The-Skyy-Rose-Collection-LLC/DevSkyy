@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOVE HURTS Collection | SkyyRose Virtual Castle</title>
-    <meta name="description" content="Enter the LOVE HURTS virtual castle - an immersive 3D throne room experience featuring SkyyRose's emotional expression collection">
-    
-    <!-- Import Maps for Three.js ES Modules -->
+    <title>LOVE HURTS | SkyyRose Immersive Experience</title>
+    <meta name="description" content="Enter the Beast's bedroom. An immersive 3D experience for the SkyyRose LOVE HURTS collection — the enchanted rose, the balcony, the transformation.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/love-hurts-experience.css">
     <script type="importmap">
     {
         "imports": {
@@ -15,1093 +17,743 @@
         }
     }
     </script>
-
-    <style>
-        /* SkyyRose LOVE HURTS Collection Theme */
-        :root {
-            --sr-deep-rose: #C41E3A;
-            --sr-burgundy: #722F37;
-            --sr-blush: #DE5D83;
-            --sr-wine: #4A0E1E;
-            --sr-gold: #D4AF37;
-            --sr-cream: #FFFDD0;
-            --sr-charcoal: #1A1A1A;
-            --font-display: 'Playfair Display', Georgia, serif;
-            --font-body: 'Inter', -apple-system, sans-serif;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
-
-        body {
-            font-family: var(--font-body);
-            background: var(--sr-wine);
-            color: #fff;
-            overflow: hidden;
-            width: 100vw;
-            height: 100vh;
-        }
-
-        /* Loading Screen */
-        #loading-screen {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(135deg, var(--sr-wine) 0%, #2a0a12 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
-        }
-
-        #loading-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .loading-logo {
-            font-family: var(--font-display);
-            font-size: 3rem;
-            font-weight: 600;
-            letter-spacing: 0.3em;
-            margin-bottom: 2rem;
-            background: linear-gradient(135deg, var(--sr-deep-rose), var(--sr-blush));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: heartbeat 1.5s ease-in-out infinite;
-        }
-
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(1); }
-            14% { transform: scale(1.05); }
-            28% { transform: scale(1); }
-            42% { transform: scale(1.05); }
-            70% { transform: scale(1); }
-        }
-
-        .loading-subtitle {
-            font-size: 0.9rem;
-            letter-spacing: 0.5em;
-            text-transform: uppercase;
-            color: var(--sr-blush);
-            margin-bottom: 3rem;
-        }
-
-        .loading-progress {
-            width: 200px;
-            height: 2px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .loading-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--sr-burgundy), var(--sr-deep-rose), var(--sr-blush));
-            transition: width 0.3s ease;
-        }
-
-        /* Canvas Container */
-        #canvas-container {
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-        }
-
-        canvas { display: block; }
-
-        /* Collection Title Overlay */
-        .collection-header {
-            position: fixed;
-            top: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-            z-index: 100;
-            pointer-events: none;
-        }
-
-        .collection-name {
-            font-family: var(--font-display);
-            font-size: 2.5rem;
-            font-weight: 600;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            background: linear-gradient(180deg, #fff 0%, var(--sr-blush) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 40px rgba(196, 30, 58, 0.6);
-        }
-
-        .collection-tagline {
-            font-size: 0.85rem;
-            letter-spacing: 0.4em;
-            text-transform: uppercase;
-            color: var(--sr-blush);
-            margin-top: 0.5rem;
-        }
-
-        /* Heart-shaped Hotspots */
-        .hotspot {
-            position: absolute;
-            width: 44px;
-            height: 44px;
-            cursor: pointer;
-            pointer-events: auto;
-            transform: translate(-50%, -50%);
-            z-index: 50;
-        }
-
-        .hotspot-inner {
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, var(--sr-deep-rose) 0%, transparent 70%);
-            border: 2px solid var(--sr-blush);
-            animation: heart-pulse 1.5s ease-in-out infinite;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(4px);
-            clip-path: path('M22 8.5c0-6-5-9-10-4C7 0 2 3 2 8.5C2 15.5 12 22 12 22s10-6.5 10-13.5');
-            transform: scale(1.8);
-        }
-
-        .hotspot-inner::before {
-            content: '♡';
-            font-size: 1rem;
-            color: #fff;
-        }
-
-        @keyframes heart-pulse {
-            0%, 100% { 
-                transform: scale(1.8); 
-                filter: drop-shadow(0 0 5px rgba(196, 30, 58, 0.5));
-            }
-            50% { 
-                transform: scale(2); 
-                filter: drop-shadow(0 0 15px rgba(196, 30, 58, 0.8));
-            }
-        }
-
-        /* Product Card */
-        .product-card {
-            position: fixed;
-            right: -400px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 350px;
-            background: linear-gradient(135deg, rgba(74,14,30,0.95) 0%, rgba(42,10,18,0.95) 100%);
-            border-left: 1px solid var(--sr-deep-rose);
-            padding: 2rem;
-            z-index: 200;
-            transition: right 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(20px);
-        }
-
-        .product-card.visible {
-            right: 0;
-        }
-
-        .product-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            width: 32px;
-            height: 32px;
-            border: 1px solid var(--sr-blush);
-            background: transparent;
-            color: var(--sr-blush);
-            font-size: 1.2rem;
-            cursor: pointer;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-
-        .product-close:hover {
-            border-color: var(--sr-deep-rose);
-            color: #fff;
-            background: var(--sr-deep-rose);
-        }
-
-        .product-badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            background: linear-gradient(135deg, var(--sr-deep-rose), var(--sr-burgundy));
-            color: #fff;
-            font-size: 0.7rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            margin-bottom: 1rem;
-        }
-
-        .product-image {
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(45deg, var(--sr-wine), #2a0a12);
-            border: 1px solid rgba(196, 30, 58, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-            font-size: 4rem;
-        }
-
-        .product-title {
-            font-family: var(--font-display);
-            font-size: 1.5rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .product-price {
-            font-size: 1.25rem;
-            color: var(--sr-blush);
-            margin-bottom: 1rem;
-        }
-
-        .product-description {
-            font-size: 0.9rem;
-            color: rgba(255,255,255,0.8);
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-        }
-
-        .product-cta {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, var(--sr-deep-rose), var(--sr-burgundy));
-            border: none;
-            color: #fff;
-            font-family: var(--font-body);
-            font-size: 0.85rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .product-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(196, 30, 58, 0.5);
-        }
-
-        /* Navigation Controls */
-        .nav-controls {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 1rem;
-            z-index: 100;
-        }
-
-        .nav-btn {
-            padding: 0.8rem 1.5rem;
-            background: rgba(74, 14, 30, 0.8);
-            border: 1px solid var(--sr-blush);
-            color: var(--sr-blush);
-            font-family: var(--font-body);
-            font-size: 0.75rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        .nav-btn:hover, .nav-btn.active {
-            background: var(--sr-deep-rose);
-            border-color: var(--sr-deep-rose);
-            color: #fff;
-        }
-
-        /* Family Tribute */
-        .family-tribute {
-            position: fixed;
-            top: 50%;
-            left: 2rem;
-            transform: translateY(-50%);
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            font-family: var(--font-display);
-            font-size: 0.75rem;
-            letter-spacing: 0.3em;
-            color: var(--sr-blush);
-            opacity: 0.6;
-            z-index: 100;
-        }
-
-        /* Brand Logo */
-        .brand-logo {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            font-family: var(--font-display);
-            font-size: 1rem;
-            letter-spacing: 0.3em;
-            color: var(--sr-blush);
-            opacity: 0.6;
-            z-index: 100;
-        }
-
-        /* AR Button */
-        .ar-btn {
-            position: fixed;
-            bottom: 2rem;
-            left: 2rem;
-            padding: 0.8rem 1.2rem;
-            background: rgba(74, 14, 30, 0.9);
-            border: 1px solid var(--sr-gold);
-            color: var(--sr-gold);
-            font-family: var(--font-body);
-            font-size: 0.75rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            z-index: 100;
-        }
-
-        .ar-btn:hover {
-            background: var(--sr-gold);
-            color: var(--sr-wine);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .collection-name { font-size: 1.5rem; }
-            .product-card { width: 100%; right: -100%; }
-            .product-card.visible { right: 0; }
-            .nav-controls { flex-wrap: wrap; justify-content: center; }
-            .family-tribute { display: none; }
-        }
-    </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loading-screen">
-        <div class="loading-logo">SKYYROSE</div>
-        <div class="loading-subtitle">Love Hurts Collection</div>
-        <div class="loading-progress">
-            <div class="loading-bar" id="loading-bar"></div>
+
+<!-- Loading Screen -->
+<div id="loading-screen">
+    <div class="loading-logo">LOVE HURTS</div>
+    <div class="loading-subtitle">A SkyyRose Immersive Experience</div>
+    <div class="loading-progress">
+        <div class="loading-bar" id="loading-bar"></div>
+    </div>
+    <div class="loading-status" id="loading-status">Entering the Beast's chamber...</div>
+</div>
+
+<!-- 3D Canvas -->
+<div id="canvas-container"></div>
+
+<!-- UI Overlay -->
+<div id="ui-overlay">
+    <div class="brand-header">
+        <div class="brand-name">SKYYROSE</div>
+        <div class="collection-label">Love Hurts Collection</div>
+    </div>
+
+    <div class="room-indicator">
+        <div class="room-label" id="room-label">Room 1 of 3 — The Bedroom</div>
+        <div class="room-dots">
+            <div class="room-dot active" data-room="0"></div>
+            <div class="room-dot" data-room="1"></div>
+            <div class="room-dot" data-room="2"></div>
         </div>
     </div>
 
-    <!-- 3D Canvas Container -->
-    <div id="canvas-container"></div>
-
-    <!-- Collection Header -->
-    <div class="collection-header">
-        <h1 class="collection-name">Love Hurts</h1>
-        <p class="collection-tagline">Honoring the Hurt Family Legacy</p>
+    <div class="narrative" id="narrative">
+        <p class="narrative-text" id="narrative-text"></p>
     </div>
 
-    <!-- Product Hotspots (positioned by JS) -->
-    <div id="hotspots-container"></div>
+    <div class="nav-arrows" id="nav-arrows"></div>
 
-    <!-- Product Card -->
-    <div class="product-card" id="product-card">
-        <button class="product-close" onclick="closeProductCard()">×</button>
-        <span class="product-badge" id="product-badge">Emotional Expression</span>
-        <div class="product-image" id="product-image">💔</div>
-        <h2 class="product-title" id="product-title">Heartbreak Hoodie</h2>
-        <p class="product-price" id="product-price">$165</p>
-        <p class="product-description" id="product-description">
-            A tribute piece featuring hand-stitched broken heart motif. 
-            Part of our LOVE HURTS collection honoring the Hurt family name.
-        </p>
-        <button class="product-cta" onclick="addToCart()">Add to Cart</button>
+    <div id="hotspots-layer"></div>
+
+    <div class="shop-cta" id="shop-cta">
+        <a href="/collections/love-hurts">Shop the Collection</a>
     </div>
 
-    <!-- Navigation -->
-    <div class="nav-controls">
-        <button class="nav-btn active" data-view="throne">Throne View</button>
-        <button class="nav-btn" data-view="altar">Heart Altar</button>
-        <button class="nav-btn" data-view="gallery">Gallery</button>
+    <div class="back-link">
+        <a href="/experiences">Back to Experiences</a>
     </div>
+</div>
 
-    <!-- Family Tribute -->
-    <div class="family-tribute">THE HURT FAMILY LEGACY</div>
+<!-- Product Detail Panel -->
+<div class="product-panel" id="product-panel">
+    <button class="panel-close" id="panel-close">&times;</button>
+    <div class="panel-image" id="panel-image"></div>
+    <h2 class="panel-title" id="panel-title"></h2>
+    <p class="panel-price" id="panel-price"></p>
+    <p class="panel-desc" id="panel-desc"></p>
+    <button class="panel-cta" id="panel-cta">Add to Cart</button>
+</div>
 
-    <!-- AR Button -->
-    <button class="ar-btn" onclick="activateAR()">
-        <span>💝</span> View in AR
-    </button>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
-    <!-- Brand Logo -->
-    <div class="brand-logo">SKYYROSE</div>
+// WebGL support check
+function hasWebGL() {
+    try {
+        var canvas = document.createElement('canvas');
+        return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+    } catch (e) { return false; }
+}
 
-    <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-        import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+if (!hasWebGL()) {
+    var loading = document.getElementById('loading-screen');
+    if (loading) {
+        loading.innerHTML = '<div style="text-align:center;padding:2rem;"><h2 style="font-family:Playfair Display,serif;color:#DC143C;margin-bottom:1rem;">Experience Unavailable</h2><p style="color:rgba(255,255,255,0.6);margin-bottom:2rem;">Your browser does not support WebGL. Please use a modern browser for the full experience.</p><a href="../collections/love-hurts.html" style="color:#DC143C;text-decoration:underline;">View the Collection</a></div>';
+    }
+    throw new Error('WebGL not supported');
+}
 
-        // ============================================
-        // SKYYROSE LOVE HURTS COLLECTION
-        // Virtual Castle Throne Room Experience
-        // ============================================
+// LOVE HURTS — The Beast's Sanctuary
+const ROOMS = [
+    {
+        name: 'The Bedroom',
+        label: 'Room 1 of 3 \u2014 The Bedroom',
+        narrative: '\u201CThey gave me this name\u2026 Hurts. My grandmother\u2019s bloodline. Every generation carries it \u2014 the weight, the beauty, the pain.\u201D',
+        nav: [{ text: 'Step onto the Balcony \u2192', target: 1 }],
+        camera: { pos: [0, 2.5, 6], target: [0, 1.5, 0] },
+        fog: 0x0A0510,
+        products: [
+            { id: 'enchanted-rose-hoodie', title: 'Enchanted Rose Hoodie', price: '$195', desc: 'Heavyweight French terry hoodie with embroidered enchanted rose on back. Thorned vine detailing on sleeves. A tribute to what endures.', screenPos: [25, 55] },
+            { id: 'beast-mode-tee', title: 'Beast Mode Tee', price: '$85', desc: 'Oversized cotton tee with distressed Beast silhouette. Water-based inks, vintage wash. Isolation made beautiful.', screenPos: [68, 48] }
+        ]
+    },
+    {
+        name: 'The Balcony',
+        label: 'Room 2 of 3 \u2014 The Balcony',
+        narrative: '\u201CLove hurts. That\u2019s not just words \u2014 it\u2019s my last name. And this rose\u2026 it\u2019s all I have left of her.\u201D',
+        nav: [{ text: '\u2190 Back to Bedroom', target: 0 }, { text: 'Witness the Transformation \u2192', target: 2 }],
+        camera: { pos: [0, 2.8, 5], target: [0, 2, -1] },
+        fog: 0x050210,
+        products: [
+            { id: 'thorned-heart-jacket', title: 'Thorned Heart Jacket', price: '$345', desc: 'Structured bomber with thorn-embossed leather panels. Crimson satin lining. Every boundary is a lesson.', screenPos: [18, 42] },
+            { id: 'bloodline-crewneck', title: 'Bloodline Crewneck', price: '$145', desc: 'Midweight crewneck with HURTS gothic-letter chest print. Rose gold thread detailing. Heritage in every stitch.', screenPos: [72, 58] }
+        ]
+    },
+    {
+        name: 'The Transformation',
+        label: 'Room 3 of 3 \u2014 The Transformation',
+        narrative: '\u201CFrom grit to grace. Every petal that falls is a lesson. Every thorn, a boundary. This bloodline doesn\u2019t break \u2014 it transforms.\u201D',
+        nav: [{ text: '\u2190 Back to Balcony', target: 1 }],
+        camera: { pos: [0, 3, 7], target: [0, 2, 0] },
+        fog: 0x0A0505,
+        products: [
+            { id: 'glass-dome-varsity', title: 'Glass Dome Varsity', price: '$295', desc: 'Wool-blend varsity jacket with crystal dome emblem. Gold chenille lettering. The crown jewel of the collection.', screenPos: [30, 50] },
+            { id: 'last-petal-joggers', title: 'Last Petal Joggers', price: '$135', desc: 'Tapered joggers with falling-petal print down the leg. French terry, brushed interior. Comfort through the storm.', screenPos: [65, 52] }
+        ]
+    }
+];
 
-        let scene, camera, renderer, controls, composer;
-        let hearts = [], candles = [], throne;
-        let clock = new THREE.Clock();
-        let hotspots3D = [];
+let scene, camera, renderer, controls, composer, bloomPass;
+let clock = new THREE.Clock();
+let currentRoom = 0;
+let isTransitioning = false;
 
-        // Product Data - Honoring the Hurt Family
-        const products = {
-            'heartbreak-hoodie': {
-                title: 'Heartbreak Hoodie',
-                price: '$165',
-                description: 'A tribute piece featuring hand-stitched broken heart motif. Premium French terry with vintage wash.',
-                badge: 'Family Tribute',
-                emoji: '💔',
-                position: new THREE.Vector3(-3, 1.5, 1)
-            },
-            'love-letter-jacket': {
-                title: 'Love Letter Jacket',
-                price: '$245',
-                description: 'Satin bomber with embroidered love letters from the Hurt family archives. Each piece tells a story.',
-                badge: 'Heritage Piece',
-                emoji: '💌',
-                position: new THREE.Vector3(3, 2, 0)
-            },
-            'bleeding-heart-tee': {
-                title: 'Bleeding Heart Tee',
-                price: '$85',
-                description: 'Oversized cotton tee with anatomical heart graphic. Water-based inks for a soft, worn feel.',
-                badge: 'Best Seller',
-                emoji: '❤️‍🩹',
-                position: new THREE.Vector3(0, 1.5, 3)
-            },
-            'thorns-of-love-pants': {
-                title: 'Thorns of Love Pants',
-                price: '$145',
-                description: 'Cargo pants with thorn embroidery down the seams. Heavy cotton twill with adjustable cuffs.',
-                badge: 'New Drop',
-                emoji: '🥀',
-                position: new THREE.Vector3(-2, 1, -2)
+// Room-specific objects
+let roomGroups = [new THREE.Group(), new THREE.Group(), new THREE.Group()];
+let roomLights = [[], [], []];
+let enchantedRose, petalParticles, dustParticles;
+let transformationParticles;
+
+// DOM refs
+const loadingBar = document.getElementById('loading-bar');
+const loadingStatus = document.getElementById('loading-status');
+const loadingScreen = document.getElementById('loading-screen');
+const narrativeEl = document.getElementById('narrative');
+const narrativeText = document.getElementById('narrative-text');
+const navArrows = document.getElementById('nav-arrows');
+const roomLabel = document.getElementById('room-label');
+const hotspotsLayer = document.getElementById('hotspots-layer');
+const productPanel = document.getElementById('product-panel');
+const shopCta = document.getElementById('shop-cta');
+
+function setProgress(pct, text) {
+    loadingBar.style.width = pct + '%';
+    loadingStatus.textContent = text;
+}
+
+async function init() {
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(ROOMS[0].fog);
+    scene.fog = new THREE.FogExp2(ROOMS[0].fog, 0.06);
+
+    camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(...ROOMS[0].camera.pos);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.8;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.target.set(...ROOMS[0].camera.target);
+    controls.minDistance = 3;
+    controls.maxDistance = 12;
+    controls.maxPolarAngle = Math.PI / 1.7;
+    controls.enablePan = false;
+
+    setupPostProcessing();
+    setProgress(15, 'Building the chamber...');
+
+    buildRoom1();
+    setProgress(35, 'Opening the balcony doors...');
+
+    buildRoom2();
+    setProgress(55, 'Preparing the transformation...');
+
+    buildRoom3();
+    setProgress(75, 'Lighting the candles...');
+
+    createDustParticles();
+    setProgress(90, 'Almost there...');
+
+    // Add all room groups; hide rooms 2 and 3
+    roomGroups.forEach((g, i) => {
+        g.visible = i === 0;
+        scene.add(g);
+    });
+
+    setupUI();
+    showRoom(0, true);
+
+    setProgress(100, 'Welcome.');
+    setTimeout(() => loadingScreen.classList.add('hidden'), 800);
+
+    window.addEventListener('resize', onResize);
+    animate();
+}
+
+function setupPostProcessing() {
+    composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+    bloomPass = new UnrealBloomPass(
+        new THREE.Vector2(window.innerWidth, window.innerHeight),
+        0.9, 0.4, 0.35
+    );
+    composer.addPass(bloomPass);
+    composer.addPass(new OutputPass());
+}
+
+// ROOM 1 — THE BEAST'S BEDROOM
+function buildRoom1() {
+    const g = roomGroups[0];
+
+    // Floor
+    const floor = new THREE.Mesh(
+        new THREE.PlaneGeometry(18, 18),
+        new THREE.MeshStandardMaterial({ color: 0x12080C, roughness: 0.9, metalness: 0.05 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    g.add(floor);
+
+    // Walls
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x0E0610, roughness: 0.95, metalness: 0.02 });
+    const backWall = new THREE.Mesh(new THREE.PlaneGeometry(18, 10), wallMat);
+    backWall.position.set(0, 5, -6); g.add(backWall);
+    const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(12, 10), wallMat);
+    leftWall.position.set(-7, 5, 0); leftWall.rotation.y = Math.PI / 2; g.add(leftWall);
+    const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(12, 10), wallMat);
+    rightWall.position.set(7, 5, 0); rightWall.rotation.y = -Math.PI / 2; g.add(rightWall);
+
+    // Bed
+    const bedBase = new THREE.Mesh(
+        new THREE.BoxGeometry(3.5, 0.6, 4),
+        new THREE.MeshStandardMaterial({ color: 0x1A0A12, roughness: 0.85, metalness: 0.05 })
+    );
+    bedBase.position.set(2, 0.3, -3);
+    bedBase.castShadow = true; g.add(bedBase);
+    const bedding = new THREE.Mesh(new THREE.BoxGeometry(3.3, 0.25, 3.8), new THREE.MeshStandardMaterial({ color: 0x3A1520, roughness: 0.95 }));
+    bedding.position.set(2, 0.72, -3); g.add(bedding);
+    const headboard = new THREE.Mesh(new THREE.BoxGeometry(3.5, 2.5, 0.2), new THREE.MeshStandardMaterial({ color: 0x200E15, roughness: 0.7, metalness: 0.15 }));
+    headboard.position.set(2, 1.85, -4.95); g.add(headboard);
+
+    // Chair with product placement
+    const chairMat = new THREE.MeshStandardMaterial({ color: 0x2A1018, roughness: 0.8 });
+    const chairSeat = new THREE.Mesh(new THREE.BoxGeometry(1, 0.15, 1), chairMat);
+    chairSeat.position.set(-3, 1, -2); g.add(chairSeat);
+    const chairBack = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 0.12), chairMat);
+    chairBack.position.set(-3, 1.75, -2.5); g.add(chairBack);
+
+    const legMat = new THREE.MeshStandardMaterial({ color: 0x1A0A10, roughness: 0.6, metalness: 0.3 });
+    const legGeo = new THREE.CylinderGeometry(0.04, 0.04, 1, 8);
+    [[-0.4, -0.4], [0.4, -0.4], [-0.4, 0.4], [0.4, 0.4]].forEach(function(offsets) {
+        const leg = new THREE.Mesh(legGeo, legMat);
+        leg.position.set(-3 + offsets[0], 0.5, -2 + offsets[1]);
+        g.add(leg);
+    });
+
+    // Lighting
+    const ambient = new THREE.AmbientLight(0x150810, 0.5);
+    g.add(ambient); roomLights[0].push(ambient);
+    const mainLight = new THREE.PointLight(0x8B2252, 2.5, 14);
+    mainLight.position.set(0, 6, 0); mainLight.castShadow = true;
+    g.add(mainLight); roomLights[0].push(mainLight);
+    const bedLight = new THREE.PointLight(0xDC143C, 0.8, 6);
+    bedLight.position.set(2, 3, -3); g.add(bedLight); roomLights[0].push(bedLight);
+    const chairLight = new THREE.PointLight(0x722F37, 0.6, 5);
+    chairLight.position.set(-3, 3, -1); g.add(chairLight); roomLights[0].push(chairLight);
+
+    // Nightstand with candle
+    const nightstand = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.8), new THREE.MeshStandardMaterial({ color: 0x1A0A10, roughness: 0.7, metalness: 0.2 }));
+    nightstand.position.set(4.2, 0.4, -3); g.add(nightstand);
+    const candle = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.5, 12), new THREE.MeshStandardMaterial({ color: 0xFFF8DC, roughness: 0.9 }));
+    candle.position.set(4.2, 1.05, -3); g.add(candle);
+    const flameGlow = new THREE.PointLight(0xFFAA44, 0.6, 3);
+    flameGlow.position.set(4.2, 1.4, -3); g.add(flameGlow); roomLights[0].push(flameGlow);
+}
+
+// ROOM 2 — THE BALCONY (Enchanted Rose)
+function buildRoom2() {
+    const g = roomGroups[1];
+
+    // Floor
+    const floor = new THREE.Mesh(
+        new THREE.PlaneGeometry(14, 10),
+        new THREE.MeshStandardMaterial({ color: 0x0E0A0C, roughness: 0.92, metalness: 0.05 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    g.add(floor);
+
+    // Balcony railing
+    const railMat = new THREE.MeshStandardMaterial({ color: 0x1A1015, roughness: 0.5, metalness: 0.4 });
+    const leftRail = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.2, 8), railMat);
+    leftRail.position.set(-5, 0.6, -1); g.add(leftRail);
+    const rightRail = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.2, 8), railMat);
+    rightRail.position.set(5, 0.6, -1); g.add(rightRail);
+    const frontRail = new THREE.Mesh(new THREE.BoxGeometry(10, 1.2, 0.1), railMat);
+    frontRail.position.set(0, 0.6, -5); g.add(frontRail);
+
+    // Balusters
+    const balusterGeo = new THREE.CylinderGeometry(0.03, 0.03, 1.2, 8);
+    for (let i = -4; i <= 4; i += 0.8) {
+        const b = new THREE.Mesh(balusterGeo, railMat);
+        b.position.set(i, 0.6, -5);
+        g.add(b);
+    }
+
+    // Table for the rose
+    const tableMat = new THREE.MeshStandardMaterial({ color: 0x1A0E12, roughness: 0.6, metalness: 0.3 });
+    const tableTop = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.08, 24), new THREE.MeshStandardMaterial({ color: 0x200E14, roughness: 0.5, metalness: 0.3 }));
+    tableTop.position.set(0, 1.8, -2); g.add(tableTop);
+    const tableLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 1.8, 12), tableMat);
+    tableLeg.position.set(0, 0.9, -2); g.add(tableLeg);
+
+    // ---- ENCHANTED ROSE ----
+    enchantedRose = new THREE.Group();
+    enchantedRose.position.set(0, 2.2, -2);
+
+    // Glass dome
+    const domeGeo = new THREE.SphereGeometry(0.55, 32, 32, 0, Math.PI * 2, 0, Math.PI / 1.3);
+    const domeMat = new THREE.MeshPhysicalMaterial({
+        color: 0xffffff,
+        roughness: 0.05,
+        metalness: 0.0,
+        transmission: 0.92,
+        thickness: 0.3,
+        transparent: true,
+        opacity: 0.3
+    });
+    enchantedRose.add(new THREE.Mesh(domeGeo, domeMat));
+
+    // Rose bloom
+    const bloomMat = new THREE.MeshStandardMaterial({
+        color: 0xDC143C,
+        emissive: 0xDC143C,
+        emissiveIntensity: 0.8,
+        roughness: 0.4,
+        metalness: 0.1
+    });
+    enchantedRose.add(new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 16), bloomMat));
+
+    // Petals around center
+    for (let i = 0; i < 5; i++) {
+        const angle = (i / 5) * Math.PI * 2;
+        const petal = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), bloomMat);
+        petal.position.set(Math.cos(angle) * 0.1, 0.02, Math.sin(angle) * 0.1);
+        petal.scale.set(1.2, 0.6, 1.2);
+        enchantedRose.add(petal);
+    }
+
+    // Stem
+    const stem = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.015, 0.02, 0.5, 8),
+        new THREE.MeshStandardMaterial({ color: 0x1A3A1A, roughness: 0.7 })
+    );
+    stem.position.y = -0.3;
+    enchantedRose.add(stem);
+
+    // Rose crimson glow
+    const roseLight = new THREE.PointLight(0xDC143C, 3, 6);
+    enchantedRose.add(roseLight); roomLights[1].push(roseLight);
+    g.add(enchantedRose);
+
+    // Falling petal particles
+    const petalCount = 60;
+    const petalPositions = new Float32Array(petalCount * 3);
+    const petalColors = new Float32Array(petalCount * 3);
+    for (let i = 0; i < petalCount; i++) {
+        petalPositions[i * 3] = (Math.random() - 0.5) * 1.2;
+        petalPositions[i * 3 + 1] = Math.random() * 2;
+        petalPositions[i * 3 + 2] = (Math.random() - 0.5) * 1.2 - 2;
+        petalColors[i * 3] = 0.86 + Math.random() * 0.14;
+        petalColors[i * 3 + 1] = 0.05 + Math.random() * 0.1;
+        petalColors[i * 3 + 2] = 0.15 + Math.random() * 0.1;
+    }
+    const petalGeo = new THREE.BufferGeometry();
+    petalGeo.setAttribute('position', new THREE.BufferAttribute(petalPositions, 3));
+    petalGeo.setAttribute('color', new THREE.BufferAttribute(petalColors, 3));
+    petalParticles = new THREE.Points(petalGeo, new THREE.PointsMaterial({
+        size: 0.04, vertexColors: true, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending
+    }));
+    g.add(petalParticles);
+
+    // Moonlight and ambient
+    const moonLight = new THREE.DirectionalLight(0x6677AA, 0.6);
+    moonLight.position.set(2, 8, -10); g.add(moonLight); roomLights[1].push(moonLight);
+    const ambientBalcony = new THREE.AmbientLight(0x0A0515, 0.4);
+    g.add(ambientBalcony); roomLights[1].push(ambientBalcony);
+    const railAccent = new THREE.PointLight(0x2D0A1F, 1, 8);
+    railAccent.position.set(-4, 2, -3); g.add(railAccent); roomLights[1].push(railAccent);
+}
+
+// ROOM 3 — THE TRANSFORMATION
+function buildRoom3() {
+    const g = roomGroups[2];
+
+    // Polished floor
+    const floor = new THREE.Mesh(
+        new THREE.PlaneGeometry(16, 16),
+        new THREE.MeshStandardMaterial({ color: 0x100808, roughness: 0.3, metalness: 0.4 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    g.add(floor);
+
+    // Display stands
+    const standMat = new THREE.MeshStandardMaterial({ color: 0x1A0E10, roughness: 0.4, metalness: 0.5 });
+    const standGold = new THREE.MeshStandardMaterial({ color: 0xD4AF37, roughness: 0.2, metalness: 0.8 });
+
+    [[-2.5, 0], [2.5, 0]].forEach(function(coords) {
+        var x = coords[0], z = coords[1];
+        var pedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.6, 2.5, 16), standMat);
+        pedestal.position.set(x, 1.25, z);
+        pedestal.castShadow = true;
+        g.add(pedestal);
+
+        var cap = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.5, 0.1, 16), standGold);
+        cap.position.set(x, 2.55, z);
+        g.add(cap);
+
+        var spot = new THREE.SpotLight(0xD4AF37, 2, 8, Math.PI / 8, 0.5);
+        spot.position.set(x, 6, z + 2);
+        spot.target.position.set(x, 2.5, z);
+        spot.castShadow = true;
+        g.add(spot);
+        g.add(spot.target);
+        roomLights[2].push(spot);
+    });
+
+    // Central light — crimson to gold transition
+    const centralLight = new THREE.PointLight(0xDC143C, 0.5, 12);
+    centralLight.position.set(0, 5, 0); centralLight.name = 'transformCentralLight';
+    g.add(centralLight); roomLights[2].push(centralLight);
+    const upLight1 = new THREE.PointLight(0x722F37, 1.5, 10);
+    upLight1.position.set(-3, 0.5, -3); upLight1.name = 'transformUp1';
+    g.add(upLight1); roomLights[2].push(upLight1);
+    const upLight2 = new THREE.PointLight(0x722F37, 1.5, 10);
+    upLight2.position.set(3, 0.5, -3); upLight2.name = 'transformUp2';
+    g.add(upLight2); roomLights[2].push(upLight2);
+    const ambientTrans = new THREE.AmbientLight(0x0A0505, 0.3);
+    g.add(ambientTrans); roomLights[2].push(ambientTrans);
+
+    // Transformation particle burst
+    const tpCount = 300;
+    const tpPos = new Float32Array(tpCount * 3);
+    const tpCol = new Float32Array(tpCount * 3);
+    for (let i = 0; i < tpCount; i++) {
+        tpPos[i * 3] = (Math.random() - 0.5) * 10;
+        tpPos[i * 3 + 1] = Math.random() * 8;
+        tpPos[i * 3 + 2] = (Math.random() - 0.5) * 10;
+        const isCrimson = Math.random() > 0.5;
+        tpCol[i * 3] = isCrimson ? 0.86 : 0.83;
+        tpCol[i * 3 + 1] = isCrimson ? 0.08 : 0.69;
+        tpCol[i * 3 + 2] = isCrimson ? 0.24 : 0.22;
+    }
+    const tpGeo = new THREE.BufferGeometry();
+    tpGeo.setAttribute('position', new THREE.BufferAttribute(tpPos, 3));
+    tpGeo.setAttribute('color', new THREE.BufferAttribute(tpCol, 3));
+    transformationParticles = new THREE.Points(tpGeo, new THREE.PointsMaterial({
+        size: 0.06, vertexColors: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending
+    }));
+    g.add(transformationParticles);
+}
+
+// AMBIENT DUST
+function createDustParticles() {
+    const count = 400;
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 16;
+        positions[i * 3 + 1] = Math.random() * 8;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 16;
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    dustParticles = new THREE.Points(geo, new THREE.PointsMaterial({
+        size: 0.025, color: 0xB76E79, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending
+    }));
+    scene.add(dustParticles);
+}
+
+// UI MANAGEMENT
+function setupUI() {
+    document.querySelectorAll('.room-dot').forEach(function(dot) {
+        dot.addEventListener('click', function() {
+            const target = parseInt(dot.dataset.room);
+            if (target !== currentRoom && !isTransitioning) showRoom(target);
+        });
+    });
+
+    document.getElementById('panel-close').addEventListener('click', closePanel);
+    document.getElementById('panel-cta').addEventListener('click', function() {
+        const title = document.getElementById('panel-title').textContent;
+        alert('Added "' + title + '" to cart!');
+    });
+}
+
+function showRoom(index, instant) {
+    if (isTransitioning && !instant) return;
+    isTransitioning = true;
+    const room = ROOMS[index];
+    currentRoom = index;
+
+    // Update room label
+    roomLabel.textContent = room.label;
+
+    // Update dots
+    document.querySelectorAll('.room-dot').forEach(function(d, i) {
+        d.classList.toggle('active', i === index);
+    });
+
+    // Hide narrative and CTA
+    narrativeEl.classList.remove('visible');
+    shopCta.classList.remove('visible');
+    closePanel();
+
+    // Camera transition
+    const duration = instant ? 0 : 1200;
+    const startPos = { x: camera.position.x, y: camera.position.y, z: camera.position.z };
+    const startTarget = { x: controls.target.x, y: controls.target.y, z: controls.target.z };
+    const endPos = { x: room.camera.pos[0], y: room.camera.pos[1], z: room.camera.pos[2] };
+    const endTarget = { x: room.camera.target[0], y: room.camera.target[1], z: room.camera.target[2] };
+    const startTime = performance.now();
+
+    function step(now) {
+        const elapsed = now - startTime;
+        const t = duration === 0 ? 1 : Math.min(elapsed / duration, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+
+        camera.position.x = startPos.x + (endPos.x - startPos.x) * ease;
+        camera.position.y = startPos.y + (endPos.y - startPos.y) * ease;
+        camera.position.z = startPos.z + (endPos.z - startPos.z) * ease;
+        controls.target.x = startTarget.x + (endTarget.x - startTarget.x) * ease;
+        controls.target.y = startTarget.y + (endTarget.y - startTarget.y) * ease;
+        controls.target.z = startTarget.z + (endTarget.z - startTarget.z) * ease;
+
+        if (t < 1) {
+            requestAnimationFrame(step);
+        } else {
+            isTransitioning = false;
+        }
+    }
+
+    if (duration > 0) {
+        requestAnimationFrame(step);
+    } else {
+        camera.position.set(...room.camera.pos);
+        controls.target.set(...room.camera.target);
+        isTransitioning = false;
+    }
+
+    // Swap rooms
+    roomGroups.forEach(function(g, i) { g.visible = i === index; });
+
+    // Update fog
+    scene.background.set(room.fog);
+    scene.fog.color.set(room.fog);
+
+    // Room 3 transformation effect
+    if (index === 2) triggerTransformation();
+
+    // Narrative fade-in after transition
+    setTimeout(function() {
+        narrativeText.textContent = room.narrative;
+        narrativeEl.classList.add('visible');
+        if (index === 2) shopCta.classList.add('visible');
+    }, instant ? 100 : 800);
+
+    // Build nav arrows
+    buildNavArrows(room.nav);
+
+    // Build hotspots
+    buildHotspots(room.products);
+}
+
+function buildNavArrows(navItems) {
+    while (navArrows.firstChild) navArrows.removeChild(navArrows.firstChild);
+    navItems.forEach(function(item) {
+        const btn = document.createElement('button');
+        btn.className = 'nav-arrow';
+        btn.textContent = item.text;
+        btn.addEventListener('click', function() { showRoom(item.target); });
+        navArrows.appendChild(btn);
+    });
+}
+
+function buildHotspots(products) {
+    while (hotspotsLayer.firstChild) hotspotsLayer.removeChild(hotspotsLayer.firstChild);
+    products.forEach(function(p) {
+        const spot = document.createElement('div');
+        spot.className = 'hotspot';
+        spot.style.left = p.screenPos[0] + '%';
+        spot.style.top = p.screenPos[1] + '%';
+
+        const ring = document.createElement('div');
+        ring.className = 'hotspot-ring';
+        spot.appendChild(ring);
+
+        const label = document.createElement('div');
+        label.className = 'hotspot-label';
+        label.textContent = p.title + ' \u2014 ' + p.price;
+        spot.appendChild(label);
+
+        spot.addEventListener('click', function() { openPanel(p); });
+        hotspotsLayer.appendChild(spot);
+    });
+}
+
+function openPanel(product) {
+    document.getElementById('panel-title').textContent = product.title;
+    document.getElementById('panel-price').textContent = product.price;
+    document.getElementById('panel-desc').textContent = product.desc;
+    document.getElementById('panel-image').textContent = '';
+    productPanel.classList.add('visible');
+}
+
+function closePanel() {
+    productPanel.classList.remove('visible');
+}
+
+// TRANSFORMATION LIGHTING SHIFT
+function triggerTransformation() {
+    const g = roomGroups[2];
+    const central = g.getObjectByName('transformCentralLight');
+    const up1 = g.getObjectByName('transformUp1');
+    const up2 = g.getObjectByName('transformUp2');
+    if (!central) return;
+
+    const startColor = new THREE.Color(0xDC143C);
+    const endColor = new THREE.Color(0xD4AF37);
+    const startUp = new THREE.Color(0x722F37);
+    const endUp = new THREE.Color(0xB76E79);
+    const duration = 2500;
+    const startTime = performance.now();
+
+    function step(now) {
+        const t = Math.min((now - startTime) / duration, 1);
+        const ease = t * t * (3 - 2 * t);
+        central.color.copy(startColor).lerp(endColor, ease);
+        central.intensity = 0.5 + ease * 3;
+        if (up1) up1.color.copy(startUp).lerp(endUp, ease);
+        if (up2) up2.color.copy(startUp).lerp(endUp, ease);
+        if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+}
+
+// ANIMATION LOOP
+function animate() {
+    requestAnimationFrame(animate);
+    const time = clock.getElapsedTime();
+
+    controls.update();
+
+    // Dust drift
+    if (dustParticles) {
+        const dp = dustParticles.geometry.attributes.position.array;
+        for (let i = 0; i < dp.length; i += 3) {
+            dp[i + 1] += Math.sin(time * 0.4 + i * 0.3) * 0.002;
+            if (dp[i + 1] > 8) dp[i + 1] = 0;
+        }
+        dustParticles.geometry.attributes.position.needsUpdate = true;
+        dustParticles.rotation.y += 0.0002;
+    }
+
+    if (currentRoom === 0) animateBedroom(time);
+    if (currentRoom === 1) animateBalcony(time);
+    if (currentRoom === 2) animateTransformation(time);
+
+    composer.render();
+}
+
+function animateBedroom(time) {
+    const flameLight = roomLights[0][3];
+    if (flameLight) {
+        flameLight.intensity = 0.5 + Math.sin(time * 12) * 0.15 + Math.sin(time * 7.3) * 0.1;
+    }
+}
+
+function animateBalcony(time) {
+    if (enchantedRose) {
+        enchantedRose.rotation.y = Math.sin(time * 0.3) * 0.1;
+        const roseLight = roomLights[1][0];
+        if (roseLight) {
+            roseLight.intensity = 2.5 + Math.sin(time * 1.5) * 0.8;
+        }
+    }
+
+    if (petalParticles) {
+        const pp = petalParticles.geometry.attributes.position.array;
+        for (let i = 0; i < pp.length; i += 3) {
+            pp[i + 1] -= 0.004 + Math.sin(i + time) * 0.001;
+            pp[i] += Math.sin(time * 0.8 + i * 0.5) * 0.002;
+            if (pp[i + 1] < -0.5) {
+                pp[i + 1] = 2 + Math.random();
+                pp[i] = (Math.random() - 0.5) * 1.2;
+                pp[i + 2] = (Math.random() - 0.5) * 1.2 - 2;
             }
-        };
-
-        // Camera Views
-        const cameraViews = {
-            throne: { position: new THREE.Vector3(0, 3, 8), target: new THREE.Vector3(0, 2, 0) },
-            altar: { position: new THREE.Vector3(5, 2, 0), target: new THREE.Vector3(0, 2, 0) },
-            gallery: { position: new THREE.Vector3(-5, 4, 5), target: new THREE.Vector3(0, 1, 0) }
-        };
-
-        // Initialize
-        init();
-        animate();
-
-        function init() {
-            // Scene
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x1a0a10);
-            scene.fog = new THREE.FogExp2(0x1a0a10, 0.04);
-
-            // Camera
-            camera = new THREE.PerspectiveCamera(
-                55,
-                window.innerWidth / window.innerHeight,
-                0.1,
-                100
-            );
-            camera.position.copy(cameraViews.throne.position);
-
-            // Renderer
-            renderer = new THREE.WebGLRenderer({ 
-                antialias: true,
-                powerPreference: 'high-performance'
-            });
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 0.9;
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            document.getElementById('canvas-container').appendChild(renderer.domElement);
-
-            // Controls
-            controls = new OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
-            controls.target.copy(cameraViews.throne.target);
-            controls.minDistance = 3;
-            controls.maxDistance = 15;
-            controls.maxPolarAngle = Math.PI / 1.8;
-            controls.autoRotate = true;
-            controls.autoRotateSpeed = 0.2;
-
-            // Lighting
-            setupLighting();
-
-            // Create Scene Elements
-            createFloor();
-            createWalls();
-            createThrone();
-            createHeartAltar();
-            createFloatingHearts();
-            createCandles();
-            createHotspots();
-
-            // Post-processing with Bloom
-            setupPostProcessing();
-
-            // Events
-            window.addEventListener('resize', onWindowResize);
-            setupNavigation();
-
-            // Loading complete
-            simulateLoading();
         }
+        petalParticles.geometry.attributes.position.needsUpdate = true;
+    }
+}
 
-        function setupLighting() {
-            // Ambient - warm undertone
-            const ambient = new THREE.AmbientLight(0x2a1015, 0.4);
-            scene.add(ambient);
-
-            // Main spotlight on throne
-            const throneLight = new THREE.SpotLight(0xC41E3A, 3, 20, Math.PI / 6, 0.5);
-            throneLight.position.set(0, 10, 5);
-            throneLight.target.position.set(0, 2, -2);
-            throneLight.castShadow = true;
-            throneLight.shadow.mapSize.width = 1024;
-            throneLight.shadow.mapSize.height = 1024;
-            scene.add(throneLight);
-            scene.add(throneLight.target);
-
-            // Rose-colored accent lights
-            const accent1 = new THREE.PointLight(0xDE5D83, 1.5, 12);
-            accent1.position.set(-6, 4, -4);
-            scene.add(accent1);
-
-            const accent2 = new THREE.PointLight(0xDE5D83, 1.5, 12);
-            accent2.position.set(6, 4, -4);
-            scene.add(accent2);
-
-            // Gold rim light
-            const rimLight = new THREE.PointLight(0xD4AF37, 1, 15);
-            rimLight.position.set(0, 6, -8);
-            scene.add(rimLight);
-
-            // Hemisphere for subtle fill
-            const hemi = new THREE.HemisphereLight(0x2a1520, 0x0a0508, 0.3);
-            scene.add(hemi);
+function animateTransformation(time) {
+    if (transformationParticles) {
+        const tp = transformationParticles.geometry.attributes.position.array;
+        for (let i = 0; i < tp.length; i += 3) {
+            tp[i + 1] += Math.sin(time * 1.2 + i * 0.2) * 0.006;
+            tp[i] += Math.cos(time * 0.5 + i * 0.3) * 0.003;
+            if (tp[i + 1] > 8) tp[i + 1] = 0;
+            if (tp[i + 1] < 0) tp[i + 1] = 8;
         }
-
-        function createFloor() {
-            // Castle stone floor
-            const floorGeo = new THREE.PlaneGeometry(30, 30, 20, 20);
-            const floorMat = new THREE.MeshStandardMaterial({
-                color: 0x2a1a1a,
-                roughness: 0.9,
-                metalness: 0.1
-            });
-            const floor = new THREE.Mesh(floorGeo, floorMat);
-            floor.rotation.x = -Math.PI / 2;
-            floor.receiveShadow = true;
-            scene.add(floor);
-
-            // Carpet runner
-            const carpetGeo = new THREE.PlaneGeometry(3, 12);
-            const carpetMat = new THREE.MeshStandardMaterial({
-                color: 0x722F37,
-                roughness: 0.8
-            });
-            const carpet = new THREE.Mesh(carpetGeo, carpetMat);
-            carpet.rotation.x = -Math.PI / 2;
-            carpet.position.set(0, 0.01, 2);
-            scene.add(carpet);
-        }
-
-        function createWalls() {
-            const wallMat = new THREE.MeshStandardMaterial({
-                color: 0x1a0a10,
-                roughness: 0.95,
-                metalness: 0.05
-            });
-
-            // Back wall
-            const backWall = new THREE.Mesh(
-                new THREE.PlaneGeometry(30, 15),
-                wallMat
-            );
-            backWall.position.set(0, 7.5, -10);
-            scene.add(backWall);
-
-            // Side walls
-            const leftWall = new THREE.Mesh(
-                new THREE.PlaneGeometry(20, 15),
-                wallMat
-            );
-            leftWall.position.set(-10, 7.5, 0);
-            leftWall.rotation.y = Math.PI / 2;
-            scene.add(leftWall);
-
-            const rightWall = new THREE.Mesh(
-                new THREE.PlaneGeometry(20, 15),
-                wallMat
-            );
-            rightWall.position.set(10, 7.5, 0);
-            rightWall.rotation.y = -Math.PI / 2;
-            scene.add(rightWall);
-
-            // Gothic arches
-            createGothicArches();
-        }
-
-        function createGothicArches() {
-            const archPositions = [-6, -3, 3, 6];
-            
-            archPositions.forEach(x => {
-                // Arch columns
-                const columnGeo = new THREE.CylinderGeometry(0.3, 0.35, 8, 16);
-                const columnMat = new THREE.MeshStandardMaterial({
-                    color: 0x2a1a1a,
-                    roughness: 0.7,
-                    metalness: 0.2
-                });
-
-                const leftCol = new THREE.Mesh(columnGeo, columnMat);
-                leftCol.position.set(x - 1, 4, -9);
-                scene.add(leftCol);
-
-                const rightCol = new THREE.Mesh(columnGeo, columnMat);
-                rightCol.position.set(x + 1, 4, -9);
-                scene.add(rightCol);
-
-                // Arch top
-                const archGeo = new THREE.TorusGeometry(1, 0.15, 8, 16, Math.PI);
-                const arch = new THREE.Mesh(archGeo, columnMat);
-                arch.position.set(x, 8, -9);
-                arch.rotation.x = Math.PI / 2;
-                scene.add(arch);
-            });
-        }
-
-        function createThrone() {
-            throne = new THREE.Group();
-
-            // Throne seat
-            const seatGeo = new THREE.BoxGeometry(2, 0.3, 2);
-            const throneMat = new THREE.MeshStandardMaterial({
-                color: 0x722F37,
-                roughness: 0.4,
-                metalness: 0.3
-            });
-            const seat = new THREE.Mesh(seatGeo, throneMat);
-            seat.position.y = 1;
-            throne.add(seat);
-
-            // Throne back
-            const backGeo = new THREE.BoxGeometry(2.2, 4, 0.3);
-            const back = new THREE.Mesh(backGeo, throneMat);
-            back.position.set(0, 3, -0.85);
-            throne.add(back);
-
-            // Throne top ornament (heart shape made from spheres)
-            const heartTop = createHeartShape(0.5, 0xD4AF37);
-            heartTop.position.set(0, 5.2, -0.85);
-            throne.add(heartTop);
-
-            // Armrests
-            const armGeo = new THREE.BoxGeometry(0.3, 0.8, 1.8);
-            const leftArm = new THREE.Mesh(armGeo, throneMat);
-            leftArm.position.set(-1.1, 1.5, 0);
-            throne.add(leftArm);
-
-            const rightArm = new THREE.Mesh(armGeo, throneMat);
-            rightArm.position.set(1.1, 1.5, 0);
-            throne.add(rightArm);
-
-            // Gold trim
-            const trimMat = new THREE.MeshStandardMaterial({
-                color: 0xD4AF37,
-                roughness: 0.2,
-                metalness: 0.8
-            });
-
-            const trimGeo = new THREE.TorusGeometry(0.08, 0.02, 8, 32);
-            for (let i = 0; i < 6; i++) {
-                const trim = new THREE.Mesh(trimGeo, trimMat);
-                trim.position.set(0, 1.5 + i * 0.6, -0.7);
-                trim.rotation.y = Math.PI / 2;
-                throne.add(trim);
-            }
-
-            throne.position.set(0, 0, -4);
-            throne.castShadow = true;
-            scene.add(throne);
-        }
-
-        function createHeartShape(size, color) {
-            const heartGroup = new THREE.Group();
-            const mat = new THREE.MeshStandardMaterial({
-                color: color,
-                roughness: 0.3,
-                metalness: 0.6
-            });
-
-            // Heart made from spheres and cone
-            const leftLobe = new THREE.Mesh(
-                new THREE.SphereGeometry(size * 0.6, 16, 16),
-                mat
-            );
-            leftLobe.position.set(-size * 0.35, size * 0.3, 0);
-            heartGroup.add(leftLobe);
-
-            const rightLobe = new THREE.Mesh(
-                new THREE.SphereGeometry(size * 0.6, 16, 16),
-                mat
-            );
-            rightLobe.position.set(size * 0.35, size * 0.3, 0);
-            heartGroup.add(rightLobe);
-
-            const bottom = new THREE.Mesh(
-                new THREE.ConeGeometry(size * 0.7, size, 16),
-                mat
-            );
-            bottom.position.set(0, -size * 0.3, 0);
-            bottom.rotation.z = Math.PI;
-            heartGroup.add(bottom);
-
-            return heartGroup;
-        }
-
-        function createHeartAltar() {
-            // Central altar with glowing heart
-            const altarBase = new THREE.Mesh(
-                new THREE.CylinderGeometry(1, 1.2, 0.5, 32),
-                new THREE.MeshStandardMaterial({
-                    color: 0x2a1a1a,
-                    roughness: 0.6,
-                    metalness: 0.3
-                })
-            );
-            altarBase.position.set(0, 0.25, 0);
-            scene.add(altarBase);
-
-            // Glowing heart on altar
-            const glowingHeart = createHeartShape(0.8, 0xC41E3A);
-            glowingHeart.position.set(0, 1.5, 0);
-            scene.add(glowingHeart);
-
-            // Heart glow
-            const glowGeo = new THREE.SphereGeometry(1.2, 32, 32);
-            const glowMat = new THREE.MeshBasicMaterial({
-                color: 0xC41E3A,
-                transparent: true,
-                opacity: 0.15
-            });
-            const glow = new THREE.Mesh(glowGeo, glowMat);
-            glow.position.set(0, 1.5, 0);
-            scene.add(glow);
-
-            // Point light from heart
-            const heartLight = new THREE.PointLight(0xC41E3A, 2, 8);
-            heartLight.position.set(0, 1.5, 0);
-            scene.add(heartLight);
-        }
-
-        function createFloatingHearts() {
-            const heartCount = 50;
-
-            for (let i = 0; i < heartCount; i++) {
-                const size = Math.random() * 0.2 + 0.1;
-                const colors = [0xC41E3A, 0xDE5D83, 0x722F37, 0xD4AF37];
-                const color = colors[Math.floor(Math.random() * colors.length)];
-
-                const heart = createHeartShape(size, color);
-
-                // Random position in room
-                heart.position.set(
-                    (Math.random() - 0.5) * 16,
-                    Math.random() * 8 + 2,
-                    (Math.random() - 0.5) * 16
-                );
-
-                heart.userData.baseY = heart.position.y;
-                heart.userData.phase = Math.random() * Math.PI * 2;
-                heart.userData.speed = Math.random() * 0.5 + 0.5;
-                heart.userData.rotSpeed = (Math.random() - 0.5) * 0.02;
-
-                hearts.push(heart);
-                scene.add(heart);
-            }
-        }
-
-        function createCandles() {
-            const candlePositions = [
-                { x: -4, z: -3 },
-                { x: 4, z: -3 },
-                { x: -2, z: 2 },
-                { x: 2, z: 2 },
-                { x: -6, z: 0 },
-                { x: 6, z: 0 }
-            ];
-
-            candlePositions.forEach((pos, i) => {
-                const candleGroup = new THREE.Group();
-
-                // Candle stick
-                const stickGeo = new THREE.CylinderGeometry(0.15, 0.2, 1.5, 16);
-                const stickMat = new THREE.MeshStandardMaterial({
-                    color: 0xD4AF37,
-                    roughness: 0.3,
-                    metalness: 0.7
-                });
-                const stick = new THREE.Mesh(stickGeo, stickMat);
-                stick.position.y = 0.75;
-                candleGroup.add(stick);
-
-                // Candle
-                const candleGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.8, 16);
-                const candleMat = new THREE.MeshStandardMaterial({
-                    color: 0xFFF8DC,
-                    roughness: 0.9
-                });
-                const candle = new THREE.Mesh(candleGeo, candleMat);
-                candle.position.y = 1.9;
-                candleGroup.add(candle);
-
-                // Flame (emissive sphere)
-                const flameGeo = new THREE.SphereGeometry(0.06, 16, 16);
-                const flameMat = new THREE.MeshBasicMaterial({
-                    color: 0xFFAA00
-                });
-                const flame = new THREE.Mesh(flameGeo, flameMat);
-                flame.position.y = 2.4;
-                flame.userData.baseY = 2.4;
-                flame.userData.phase = i * 0.5;
-                candleGroup.add(flame);
-
-                // Candle light
-                const candleLight = new THREE.PointLight(0xFFAA00, 0.5, 4);
-                candleLight.position.y = 2.4;
-                candleGroup.add(candleLight);
-
-                candleGroup.position.set(pos.x, 0, pos.z);
-                candles.push({ group: candleGroup, flame, light: candleLight });
-                scene.add(candleGroup);
-            });
-        }
-
-        function createHotspots() {
-            Object.entries(products).forEach(([id, product]) => {
-                // 3D marker (heart-shaped glow)
-                const markerGeo = new THREE.SphereGeometry(0.15, 16, 16);
-                const markerMat = new THREE.MeshBasicMaterial({
-                    color: 0xDE5D83,
-                    transparent: true,
-                    opacity: 0.9
-                });
-                const marker = new THREE.Mesh(markerGeo, markerMat);
-                marker.position.copy(product.position);
-                marker.userData.productId = id;
-                scene.add(marker);
-                hotspots3D.push(marker);
-
-                // Pulsing ring
-                const ringGeo = new THREE.RingGeometry(0.2, 0.28, 32);
-                const ringMat = new THREE.MeshBasicMaterial({
-                    color: 0xD4AF37,
-                    transparent: true,
-                    opacity: 0.5,
-                    side: THREE.DoubleSide
-                });
-                const ring = new THREE.Mesh(ringGeo, ringMat);
-                ring.position.copy(product.position);
-                ring.lookAt(camera.position);
-                scene.add(ring);
-            });
-        }
-
-        function setupPostProcessing() {
-            composer = new EffectComposer(renderer);
-
-            const renderPass = new RenderPass(scene, camera);
-            composer.addPass(renderPass);
-
-            const bloomPass = new UnrealBloomPass(
-                new THREE.Vector2(window.innerWidth, window.innerHeight),
-                1.0,   // strength - higher for romantic glow
-                0.5,   // radius
-                0.3    // threshold
-            );
-            composer.addPass(bloomPass);
-
-            const outputPass = new OutputPass();
-            composer.addPass(outputPass);
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-
-            const time = clock.getElapsedTime();
-
-            // Update controls
-            controls.update();
-
-            // Animate floating hearts
-            hearts.forEach(heart => {
-                heart.position.y = heart.userData.baseY + 
-                    Math.sin(time * heart.userData.speed + heart.userData.phase) * 0.3;
-                heart.rotation.y += heart.userData.rotSpeed;
-                heart.rotation.z = Math.sin(time + heart.userData.phase) * 0.1;
-            });
-
-            // Animate candle flames
-            candles.forEach((candle, i) => {
-                const flicker = Math.sin(time * 10 + candle.flame.userData.phase) * 0.02;
-                candle.flame.position.y = candle.flame.userData.baseY + flicker;
-                candle.flame.scale.setScalar(1 + Math.sin(time * 15 + i) * 0.1);
-                candle.light.intensity = 0.4 + Math.sin(time * 8 + i) * 0.15;
-            });
-
-            // Animate hotspots
-            hotspots3D.forEach((marker, i) => {
-                marker.scale.setScalar(1 + Math.sin(time * 2 + i) * 0.15);
-            });
-
-            // Gentle throne sway
-            if (throne) {
-                throne.rotation.y = Math.sin(time * 0.5) * 0.02;
-            }
-
-            // Render with post-processing
-            composer.render();
-
-            // Update 2D hotspot positions
-            updateHotspotPositions();
-        }
-
-        function updateHotspotPositions() {
-            const container = document.getElementById('hotspots-container');
-            container.innerHTML = '';
-
-            hotspots3D.forEach(marker => {
-                const screenPos = marker.position.clone().project(camera);
-                
-                if (screenPos.z < 1) {
-                    const x = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
-                    const y = (-screenPos.y * 0.5 + 0.5) * window.innerHeight;
-
-                    const hotspot = document.createElement('div');
-                    hotspot.className = 'hotspot';
-                    hotspot.style.left = `${x}px`;
-                    hotspot.style.top = `${y}px`;
-                    hotspot.innerHTML = '<div class="hotspot-inner"></div>';
-                    hotspot.onclick = () => showProduct(marker.userData.productId);
-                    container.appendChild(hotspot);
-                }
-            });
-        }
-
-        function showProduct(productId) {
-            const product = products[productId];
-            if (!product) return;
-
-            document.getElementById('product-badge').textContent = product.badge;
-            document.getElementById('product-image').textContent = product.emoji;
-            document.getElementById('product-title').textContent = product.title;
-            document.getElementById('product-price').textContent = product.price;
-            document.getElementById('product-description').textContent = product.description;
-
-            document.getElementById('product-card').classList.add('visible');
-
-            // Animate camera to product
-            animateCameraTo(
-                product.position.clone().add(new THREE.Vector3(2, 1, 2)),
-                product.position
-            );
-        }
-
-        window.closeProductCard = function() {
-            document.getElementById('product-card').classList.remove('visible');
-        };
-
-        window.addToCart = function() {
-            alert('Added to cart! (Demo mode)');
-        };
-
-        window.activateAR = function() {
-            alert('AR feature requires a compatible device. Try on mobile!');
-        };
-
-        function animateCameraTo(position, target) {
-            const startPos = camera.position.clone();
-            const startTarget = controls.target.clone();
-            const duration = 1200;
-            const startTime = Date.now();
-
-            function updateCamera() {
-                const elapsed = Date.now() - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 3);
-
-                camera.position.lerpVectors(startPos, position, eased);
-                controls.target.lerpVectors(startTarget, target, eased);
-
-                if (progress < 1) {
-                    requestAnimationFrame(updateCamera);
-                }
-            }
-
-            controls.autoRotate = false;
-            updateCamera();
-        }
-
-        function setupNavigation() {
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const view = btn.dataset.view;
-                    const viewData = cameraViews[view];
-                    if (viewData) {
-                        animateCameraTo(viewData.position, viewData.target);
-                        
-                        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                    }
-                });
-            });
-        }
-
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            composer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        function simulateLoading() {
-            const loadingBar = document.getElementById('loading-bar');
-            let progress = 0;
-            
-            const interval = setInterval(() => {
-                progress += Math.random() * 12;
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        document.getElementById('loading-screen').classList.add('hidden');
-                    }, 500);
-                }
-                loadingBar.style.width = `${progress}%`;
-            }, 100);
-        }
-    </script>
+        transformationParticles.geometry.attributes.position.needsUpdate = true;
+        transformationParticles.rotation.y += 0.001;
+    }
+}
+
+function onResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    composer.setSize(window.innerWidth, window.innerHeight);
+}
+
+init();
+
+</script>
 </body>
 </html>

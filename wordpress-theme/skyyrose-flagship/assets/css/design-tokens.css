@@ -48,6 +48,11 @@
 	--glass-blur: blur(24px) saturate(1.4);
 
 	/* -----------------------------------------------
+	   Typography — Font Stacks
+	   ----------------------------------------------- */
+	--font-headline: 'Cinzel', 'Playfair Display', Georgia, serif;
+
+	/* -----------------------------------------------
 	   Typography — Line Heights
 	   ----------------------------------------------- */
 	--leading-tight: 1.15;

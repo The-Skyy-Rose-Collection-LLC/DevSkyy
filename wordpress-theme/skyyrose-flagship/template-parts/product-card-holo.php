@@ -130,7 +130,7 @@ $palettes = array(
 	'black-rose'   => array( '#C0C0C0', '192,192,192', '2px' ),
 	'love-hurts'   => array( '#DC143C', '220,20,60', '2px' ),
 	'signature'    => array( '#D4AF37', '212,175,55', '2px' ),
-	'kids-capsule' => array( '#FFB6C1', '255,182,193', '16px' ),
+	'kids-capsule' => array( '#B76E79', '183,110,121', '16px' ),
 	'default'      => array( '#B76E79', '183,110,121', '8px' ),
 );
 $pal = isset( $palettes[ $collection ] ) ? $palettes[ $collection ] : $palettes['default'];

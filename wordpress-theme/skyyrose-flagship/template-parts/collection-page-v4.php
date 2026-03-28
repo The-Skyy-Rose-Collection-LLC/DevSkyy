@@ -264,6 +264,39 @@ get_header();
 		</div>
 	</section>
 
+	<!-- ============================================================
+	     EDITORIAL STORY — Collection-specific narrative section
+	     ============================================================ -->
+	<?php if ( ! empty( $col['story_sections'] ) && is_array( $col['story_sections'] ) ) : ?>
+	<section class="col-editorial" aria-label="<?php echo esc_attr( sprintf( __( '%s story', 'skyyrose-flagship' ), $col['name'] ) ); ?>">
+		<?php foreach ( $col['story_sections'] as $story_idx => $story ) : ?>
+		<div class="col-editorial__block col-rv <?php echo esc_attr( $story_idx % 2 === 0 ? '' : 'col-editorial__block--reverse' ); ?>">
+			<?php if ( ! empty( $story['image'] ) ) : ?>
+			<div class="col-editorial__image">
+				<img src="<?php echo esc_url( $story['image'] ); ?>"
+				     alt="<?php echo esc_attr( $story['heading'] ?? '' ); ?>"
+				     width="800" height="600" loading="lazy">
+			</div>
+			<?php endif; ?>
+			<div class="col-editorial__content">
+				<?php if ( ! empty( $story['label'] ) ) : ?>
+					<span class="col-editorial__label"><?php echo esc_html( $story['label'] ); ?></span>
+				<?php endif; ?>
+				<?php if ( ! empty( $story['heading'] ) ) : ?>
+					<h2 class="col-editorial__heading"><?php echo wp_kses_post( $story['heading'] ); ?></h2>
+				<?php endif; ?>
+				<?php if ( ! empty( $story['body'] ) ) : ?>
+					<div class="col-editorial__body"><?php echo wp_kses_post( $story['body'] ); ?></div>
+				<?php endif; ?>
+				<?php if ( ! empty( $story['quote'] ) ) : ?>
+					<blockquote class="col-editorial__quote"><?php echo esc_html( $story['quote'] ); ?></blockquote>
+				<?php endif; ?>
+			</div>
+		</div>
+		<?php endforeach; ?>
+	</section>
+	<?php endif; ?>
+
 	<?php if ( $featured ) : ?>
 	<!-- ============================================================
 	     FEATURED PRODUCT

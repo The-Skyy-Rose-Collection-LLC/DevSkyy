@@ -2,363 +2,398 @@
 /**
  * Template Name: Pre-Order Gateway
  *
- * Ultra-dark luxury gateway with loading screen, SR monogram breathe animation,
- * collection tabs, product grid, product modal, cart sidebar, and sign-in panel.
- * Designed to match the drakerelated.com interaction pattern.
+ * Showcase-style pre-order page with hero, interactive collection selector grid,
+ * tabbed product grids using holo cards, sticky cart summary bar, and GSAP
+ * entrance/collection-switching animations. Dark luxury aesthetic.
  *
  * @package SkyyRose_Flagship
- * @since 2.0.0
+ * @since   2.0.0
+ * @updated 6.0.0 — complete rewrite from static pre-order.html
  */
 
-// Prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
-/**
- * Product catalog data for the pre-order gateway.
- *
- * Sourced from the centralized catalog (inc/product-catalog.php).
- * Only includes products with active pre-orders.
+/*
+ * ─── Collection Configuration ───────────────────────────────────────────────
  */
-$collection_labels = array(
-	'black-rose' => esc_html__( 'Black Rose', 'skyyrose-flagship' ),
-	'love-hurts' => esc_html__( 'Love Hurts', 'skyyrose-flagship' ),
-	'signature'  => esc_html__( 'Signature', 'skyyrose-flagship' ),
+$collections = array(
+	'black-rose' => array(
+		'label'    => esc_html__( 'Black Rose', 'skyyrose-flagship' ),
+		'tagline'  => esc_html__( 'The Beauty of Black', 'skyyrose-flagship' ),
+		'number'   => esc_html__( 'Collection 01', 'skyyrose-flagship' ),
+		'subtitle' => esc_html__( 'Dark Elegance', 'skyyrose-flagship' ),
+	),
+	'love-hurts' => array(
+		'label'    => esc_html__( 'Love Hurts', 'skyyrose-flagship' ),
+		'tagline'  => esc_html__( 'The Hurts Bloodline', 'skyyrose-flagship' ),
+		'number'   => esc_html__( 'Collection 02', 'skyyrose-flagship' ),
+		'subtitle' => esc_html__( 'The Hurts Bloodline', 'skyyrose-flagship' ),
+	),
+	'signature'  => array(
+		'label'    => esc_html__( 'Signature', 'skyyrose-flagship' ),
+		'tagline'  => esc_html__( 'The Origin. The Crown.', 'skyyrose-flagship' ),
+		'number'   => esc_html__( 'Collection 03', 'skyyrose-flagship' ),
+		'subtitle' => esc_html__( 'The Origin. The Crown.', 'skyyrose-flagship' ),
+	),
 );
 
-$gateway_products = array();
-$preorder_groups  = skyyrose_get_preorder_products();
+/*
+ * ─── Static fallback products (used when WooCommerce is unavailable) ────────
+ */
+$fallback_products = array(
+	'black-rose' => array(
+		array( 'name' => 'Black Rose Classic Hoodie', 'price' => 65, 'sku' => 'br-hoodie' ),
+		array( 'name' => 'Obsidian Tee',              'price' => 40, 'sku' => 'br-tee' ),
+		array( 'name' => 'Dark Bloom Jacket',          'price' => 95, 'sku' => 'br-jacket' ),
+		array( 'name' => 'Midnight Crewneck',           'price' => 55, 'sku' => 'br-crew' ),
+	),
+	'love-hurts' => array(
+		array( 'name' => 'Enchanted Rose Hoodie', 'price' => 65, 'sku' => 'lh-hoodie' ),
+		array( 'name' => 'Beast Mode Tee',         'price' => 40, 'sku' => 'lh-tee' ),
+		array( 'name' => 'Thorned Heart Jacket',   'price' => 95, 'sku' => 'lh-jacket' ),
+		array( 'name' => 'Bloodline Crewneck',      'price' => 55, 'sku' => 'lh-crew' ),
+	),
+	'signature'  => array(
+		array( 'name' => 'Signature Rose Hoodie', 'price' => 65, 'sku' => 'sg-hoodie' ),
+		array( 'name' => 'Script Logo Tee',        'price' => 40, 'sku' => 'sg-tee' ),
+		array( 'name' => 'Gold Standard Jacket',   'price' => 95, 'sku' => 'sg-jacket' ),
+		array( 'name' => 'Heritage Crewneck',       'price' => 55, 'sku' => 'sg-crew' ),
+	),
+);
 
-foreach ( $preorder_groups as $collection_slug => $products ) {
-	foreach ( $products as $p ) {
-		$gateway_products[] = array(
-			'id'               => $p['sku'],
-			'name'             => $p['name'],
-			'price'            => ( function_exists( 'get_woocommerce_currency_symbol' ) ? html_entity_decode( get_woocommerce_currency_symbol(), ENT_QUOTES, 'UTF-8' ) : '$' ) . number_format( $p['price'], 0 ),
-			'collection'       => $p['collection'],
-			'collection_label' => isset( $collection_labels[ $p['collection'] ] )
-				? $collection_labels[ $p['collection'] ]
-				: esc_html( ucwords( str_replace( '-', ' ', $p['collection'] ) ) ),
-			'sizes'            => str_replace( '|', ',', $p['sizes'] ),
-			'desc'             => $p['description'],
-			'image'            => skyyrose_product_image_uri( ! empty( $p['front_model_image'] ) ? $p['front_model_image'] : $p['image'] ),
-			'edition'          => (string) $p['edition_size'],
-		);
+/*
+ * ─── Query WooCommerce Products (with static fallback) ──────────────────────
+ */
+$products_by_collection = array();
+
+if ( function_exists( 'wc_get_products' ) ) {
+	foreach ( array_keys( $collections ) as $slug ) {
+		$wc_products = wc_get_products( array(
+			'status'   => 'publish',
+			'limit'    => 12,
+			'category' => array( $slug ),
+			'orderby'  => 'menu_order',
+			'order'    => 'ASC',
+		) );
+		$products_by_collection[ $slug ] = ! empty( $wc_products ) ? $wc_products : array();
 	}
 }
+
+// If WooCommerce returned nothing or is unavailable, use static fallback.
+foreach ( array_keys( $collections ) as $slug ) {
+	if ( empty( $products_by_collection[ $slug ] ) && isset( $fallback_products[ $slug ] ) ) {
+		$products_by_collection[ $slug ] = $fallback_products[ $slug ];
+	}
+}
+
+$currency_symbol = function_exists( 'get_woocommerce_currency_symbol' )
+	? html_entity_decode( get_woocommerce_currency_symbol(), ENT_QUOTES, 'UTF-8' )
+	: '$';
+
+$checkout_url = function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : '#';
 
 get_header();
 ?>
 
-<main id="primary" class="site-main" role="main" tabindex="-1">
+<main id="primary" class="site-main preorder-gateway" role="main" tabindex="-1">
 
-	<!-- Loading Screen -->
-	<div class="preorder-loading" aria-hidden="true">
-		<div class="loading-monogram"><?php echo esc_html__( 'SR', 'skyyrose-flagship' ); ?></div>
-		<div class="loading-progress-track">
-			<div class="loading-progress-bar"></div>
+	<!-- ==================== HERO ==================== -->
+	<section class="hero" id="hero">
+		<span class="hero__badge"><?php esc_html_e( 'Exclusive Access', 'skyyrose-flagship' ); ?></span>
+		<h1 class="hero__title"><?php esc_html_e( 'Pre-Order', 'skyyrose-flagship' ); ?></h1>
+		<p class="hero__tagline"><?php esc_html_e( 'Secure Your Pieces Before They Drop', 'skyyrose-flagship' ); ?></p>
+		<p class="hero__subtitle"><?php esc_html_e( 'Luxury Grows from Concrete', 'skyyrose-flagship' ); ?></p>
+	</section>
+
+	<!-- ==================== SHOWCASE GRID ==================== -->
+	<section class="showcase" id="showcase"
+	         aria-label="<?php esc_attr_e( 'Browse collections', 'skyyrose-flagship' ); ?>">
+		<div class="showcase__grid">
+			<?php foreach ( $collections as $slug => $col ) : ?>
+				<div class="showcase__card showcase__card--<?php echo esc_attr( $slug ); ?>"
+				     data-collection="<?php echo esc_attr( $slug ); ?>"
+				     role="button"
+				     tabindex="0"
+				     aria-label="<?php echo esc_attr( sprintf(
+						/* translators: %s: collection name */
+						__( 'Explore %s collection', 'skyyrose-flagship' ),
+						$col['label']
+					) ); ?>">
+					<span class="showcase__card-number"><?php echo esc_html( $col['number'] ); ?></span>
+					<h2 class="showcase__card-title"><?php echo esc_html( $col['label'] ); ?></h2>
+					<p class="showcase__card-tagline"><?php echo esc_html( $col['tagline'] ); ?></p>
+					<span class="showcase__card-cta"><?php
+						echo wp_kses(
+							__( 'Explore Collection &rarr;', 'skyyrose-flagship' ),
+							array()
+						);
+					?></span>
+				</div>
+			<?php endforeach; ?>
 		</div>
-		<div class="loading-text"><?php echo esc_html__( 'Curating Your Experience', 'skyyrose-flagship' ); ?></div>
-	</div>
+	</section>
 
-	<div class="preorder-gateway-page">
-
-		<!-- Exclusive Member Banner -->
-		<div class="member-banner">
-			<span class="member-banner-text">
-				<?php echo wp_kses(
-					__( '<strong>Exclusive:</strong> Members get early access and 25% off pre-orders', 'skyyrose-flagship' ),
-					array( 'strong' => array() )
-				); ?>
-			</span>
-			<button type="button" class="member-banner-cta" data-action="open-signin">
-				<?php echo esc_html__( 'Sign In for Access', 'skyyrose-flagship' ); ?>
+	<!-- ==================== COLLECTION TAB BAR ==================== -->
+	<div class="tab-bar" id="tab-bar" role="tablist"
+	     aria-label="<?php esc_attr_e( 'Filter by collection', 'skyyrose-flagship' ); ?>">
+		<?php foreach ( $collections as $slug => $col ) : ?>
+			<button class="tab-bar__btn" type="button"
+			        role="tab"
+			        aria-selected="false"
+			        aria-controls="grid-<?php echo esc_attr( $slug ); ?>"
+			        data-tab="<?php echo esc_attr( $slug ); ?>"
+			        id="tab-<?php echo esc_attr( $slug ); ?>"
+			        tabindex="-1">
+				<?php echo esc_html( $col['label'] ); ?>
 			</button>
-		</div>
-
-		<!-- Countdown Timer -->
-		<div class="preorder-countdown" aria-label="<?php esc_attr_e( 'Pre-order countdown', 'skyyrose-flagship' ); ?>">
-			<span class="countdown-label"><?php echo esc_html__( 'Pre-Order Window Closes In', 'skyyrose-flagship' ); ?></span>
-			<div class="countdown-timer" role="timer" data-launch-date="<?php echo esc_attr( get_option( 'skyyrose_preorder_deadline', '2026-04-01T00:00:00' ) ); ?>">
-				<div class="countdown-unit">
-					<span class="countdown-value" data-unit="days">00</span>
-					<span class="countdown-unit-label"><?php echo esc_html__( 'Days', 'skyyrose-flagship' ); ?></span>
-				</div>
-				<span class="countdown-separator">:</span>
-				<div class="countdown-unit">
-					<span class="countdown-value" data-unit="hours">00</span>
-					<span class="countdown-unit-label"><?php echo esc_html__( 'Hours', 'skyyrose-flagship' ); ?></span>
-				</div>
-				<span class="countdown-separator">:</span>
-				<div class="countdown-unit">
-					<span class="countdown-value" data-unit="minutes">00</span>
-					<span class="countdown-unit-label"><?php echo esc_html__( 'Min', 'skyyrose-flagship' ); ?></span>
-				</div>
-				<span class="countdown-separator">:</span>
-				<div class="countdown-unit">
-					<span class="countdown-value" data-unit="seconds">00</span>
-					<span class="countdown-unit-label"><?php echo esc_html__( 'Sec', 'skyyrose-flagship' ); ?></span>
-				</div>
-			</div>
-			<span class="countdown-pieces"><?php echo esc_html__( 'Limited numbered pieces — each item individually numbered', 'skyyrose-flagship' ); ?></span>
-		</div>
-
-		<!-- Conversion Intelligence: Viewers + Progress -->
-		<div style="display:flex; justify-content:center; padding:0.5rem 0;">
-			<div data-cie-viewers="42"></div>
-		</div>
-		<div data-cie-preorder-progress style="max-width:480px; margin:0 auto; padding:0 2rem 1rem;"></div>
-
-		<!-- Gateway Header -->
-		<div class="gateway-header" role="region" aria-label="<?php esc_attr_e( 'Pre-Order Controls', 'skyyrose-flagship' ); ?>">
-			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="gateway-logo">
-				<?php echo esc_html__( 'SKyyRose', 'skyyrose-flagship' ); ?>
-			</a>
-			<div class="gateway-actions">
-				<button class="gateway-action-btn" type="button" data-action="open-signin" aria-label="<?php esc_attr_e( 'Sign in', 'skyyrose-flagship' ); ?>">
-					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-				</button>
-				<button class="gateway-action-btn" type="button" data-action="open-cart" aria-label="<?php esc_attr_e( 'Open cart', 'skyyrose-flagship' ); ?>">
-					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-					<span class="cart-count-badge">0</span>
-				</button>
-			</div>
-		</div><!-- .gateway-header -->
-
-		<!-- Product Section -->
-		<section class="gateway-product-section" aria-labelledby="gateway-section-title">
-			<div class="gateway-section-header">
-				<h2 id="gateway-section-title"><?php echo esc_html__( 'Pre-Order Collections', 'skyyrose-flagship' ); ?></h2>
-				<p><?php echo esc_html__( 'Luxury Grows from Concrete.', 'skyyrose-flagship' ); ?></p>
-			</div>
-
-			<!-- Status region for filter announcements (screen readers only) -->
-			<div class="product-grid-status screen-reader-text" role="status" aria-live="polite" aria-atomic="true"></div>
-			<!-- Product Grid -->
-			<div class="product-grid" id="product-grid-panel" aria-label="<?php esc_attr_e( 'Product grid', 'skyyrose-flagship' ); ?>">
-				<?php foreach ( $gateway_products as $product ) :
-					$badge_class = 'badge-' . $product['collection'];
-				?>
-					<article
-						class="product-grid-card"
-						id="product-<?php echo esc_attr( $product['id'] ); ?>"
-						aria-labelledby="product-name-<?php echo esc_attr( $product['id'] ); ?>"
-						data-collection="<?php echo esc_attr( $product['collection'] ); ?>"
-						data-product-id="<?php echo esc_attr( $product['id'] ); ?>"
-						data-product-name="<?php echo esc_attr( $product['name'] ); ?>"
-						data-product-price="<?php echo esc_attr( $product['price'] ); ?>"
-						data-product-image="<?php echo esc_url( $product['image'] ); ?>"
-						data-product-collection-label="<?php echo esc_attr( $product['collection_label'] ); ?>"
-						data-product-desc="<?php echo esc_attr( $product['desc'] ); ?>"
-						data-product-sizes="<?php echo esc_attr( $product['sizes'] ); ?>"
-					>
-						<div class="product-grid-image">
-							<img
-								src="<?php echo esc_url( $product['image'] ); ?>"
-								alt="<?php echo esc_attr( $product['name'] ); ?>"
-								loading="lazy"
-								width="400" height="500"
-								data-fallback="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>"
-							>
-							<span class="product-grid-badge <?php echo esc_attr( $badge_class ); ?>">
-								<?php echo esc_html( $product['collection_label'] ); ?>
-							</span>
-							<button
-								class="product-grid-wishlist"
-								type="button"
-								data-product-id="<?php echo esc_attr( $product['id'] ); ?>"
-								aria-label="<?php echo esc_attr( sprintf( __( 'Add %s to wishlist', 'skyyrose-flagship' ), $product['name'] ) ); ?>"
-							>
-								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-							</button>
-						</div>
-						<div class="product-grid-details">
-							<h3 class="product-grid-name" id="product-name-<?php echo esc_attr( $product['id'] ); ?>"><?php echo esc_html( $product['name'] ); ?></h3>
-							<p class="product-grid-price"><?php echo esc_html( $product['price'] ); ?></p>
-							<p class="product-grid-collection-label" data-label="<?php echo esc_attr( $product['collection'] ); ?>">
-								<?php echo esc_html( $product['collection_label'] ); ?>
-							</p>
-							<?php if ( ! empty( $product['edition'] ) ) : ?>
-								<p class="product-grid-edition">
-									<?php
-									/* translators: %s: number of limited pieces */
-									echo esc_html( sprintf( __( 'Limited to %s pieces', 'skyyrose-flagship' ), $product['edition'] ) );
-									?>
-								</p>
-							<?php endif; ?>
-						</div>
-						<button class="product-grid-view-btn" type="button" aria-haspopup="dialog" aria-label="<?php echo esc_attr( sprintf( __( 'View %s details', 'skyyrose-flagship' ), $product['name'] ) ); ?>">
-							<?php esc_html_e( 'View Details', 'skyyrose-flagship' ); ?>
-						</button>
-					</article>
-				<?php endforeach; ?>
-			</div>
-		</section>
-
-	</div><!-- .preorder-gateway-page -->
-
-	<!-- Product Modal -->
-	<div class="product-modal-overlay" aria-hidden="true"></div>
-	<div class="product-modal" id="product-modal-dialog" role="dialog" aria-modal="true" aria-hidden="true" inert aria-labelledby="modal-product-name" tabindex="-1">
-		<button class="product-modal-close" type="button" aria-label="<?php esc_attr_e( 'Close product details', 'skyyrose-flagship' ); ?>">&times;</button>
-		<div class="modal-360-area">
-			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Product preview', 'skyyrose-flagship' ); ?>" width="400" height="400" loading="lazy">
-		</div>
-		<div class="modal-details">
-			<h2 class="modal-product-name" id="modal-product-name"><?php esc_html_e( 'Product Details', 'skyyrose-flagship' ); ?></h2>
-			<p class="modal-product-collection"></p>
-			<p class="modal-product-price"></p>
-			<p class="modal-product-desc"></p>
-			<p class="modal-sizes-label" id="modal-sizes-label"><?php echo esc_html__( 'Select Size', 'skyyrose-flagship' ); ?></p>
-			<div class="modal-sizes" role="group" aria-labelledby="modal-sizes-label"></div>
-			<div class="modal-actions">
-				<button class="modal-add-to-cart" type="button" aria-describedby="modal-product-name"><?php echo esc_html__( 'Add to Cart', 'skyyrose-flagship' ); ?></button>
-				<button class="modal-wishlist-btn" type="button" aria-label="<?php esc_attr_e( 'Add to wishlist', 'skyyrose-flagship' ); ?>">
-					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-				</button>
-			</div>
-		</div>
+		<?php endforeach; ?>
 	</div>
 
-	<!-- Cart Sidebar -->
-	<div class="cart-sidebar-overlay" aria-hidden="true"></div>
-	<div class="cart-sidebar" id="cart-sidebar-dialog" role="dialog" aria-modal="true" aria-hidden="true" inert aria-labelledby="cart-sidebar-title" tabindex="-1">
-		<div class="cart-sidebar-header">
-			<h3 class="cart-sidebar-title" id="cart-sidebar-title"><?php echo esc_html__( 'Your Cart', 'skyyrose-flagship' ); ?></h3>
-			<button class="cart-sidebar-close" type="button" aria-label="<?php esc_attr_e( 'Close cart', 'skyyrose-flagship' ); ?>">&times;</button>
-		</div>
-		<div class="cart-items-list">
-			<div class="cart-empty-msg">
-				<p><?php echo esc_html__( 'Your cart is empty', 'skyyrose-flagship' ); ?></p>
-				<p><?php echo esc_html__( 'Browse our collections and add your favorites.', 'skyyrose-flagship' ); ?></p>
-			</div>
-		</div>
-		<div class="cart-sidebar-footer">
-			<div class="cart-total-row">
-				<span class="cart-total-label"><?php echo esc_html__( 'Total', 'skyyrose-flagship' ); ?></span>
-				<span class="cart-total-amount">$0.00</span>
-			</div>
-			<button class="cart-checkout-btn" type="button" disabled aria-disabled="true"><?php echo esc_html__( 'Proceed to Checkout', 'skyyrose-flagship' ); ?></button>
-		</div>
-	</div>
+	<!-- ==================== PRODUCT GRIDS ==================== -->
+	<section class="products-section" id="products-section"
+	         aria-label="<?php esc_attr_e( 'Pre-order products', 'skyyrose-flagship' ); ?>">
+		<?php foreach ( $collections as $slug => $col ) :
+			$items = isset( $products_by_collection[ $slug ] ) ? $products_by_collection[ $slug ] : array();
+		?>
+			<div class="product-grid"
+			     data-collection="<?php echo esc_attr( $slug ); ?>"
+			     id="grid-<?php echo esc_attr( $slug ); ?>"
+			     role="tabpanel"
+			     aria-labelledby="tab-<?php echo esc_attr( $slug ); ?>"
+			     style="display:none;">
 
-	<!-- Sign-In Panel -->
-	<div class="signin-overlay" aria-hidden="true"></div>
-	<div class="signin-panel" id="signin-panel-dialog" role="dialog" aria-modal="true" aria-hidden="true" inert aria-label="<?php esc_attr_e( 'Sign in', 'skyyrose-flagship' ); ?>" tabindex="-1">
-		<div class="signin-header">
-			<h3 class="signin-title"><?php echo esc_html__( 'Welcome Back', 'skyyrose-flagship' ); ?></h3>
-			<button class="signin-close" type="button" aria-label="<?php esc_attr_e( 'Close sign-in', 'skyyrose-flagship' ); ?>">&times;</button>
-		</div>
-		<div class="signin-body">
-			<form class="signin-form" method="post" action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>">
-				<input type="hidden" name="action" value="skyyrose_signin">
-				<?php wp_nonce_field( 'skyyrose_signin', 'skyyrose_signin_nonce' ); ?>
-
-				<div class="signin-form-group">
-					<label class="signin-label" for="signin-email"><?php echo esc_html__( 'Email', 'skyyrose-flagship' ); ?></label>
-					<input
-						id="signin-email"
-						class="signin-input"
-						type="email"
-						name="email"
-						placeholder="<?php esc_attr_e( 'you@example.com', 'skyyrose-flagship' ); ?>"
-						required
-						autocomplete="email"
-					>
+				<div class="product-grid__header">
+					<h2 class="product-grid__title"><?php echo esc_html( $col['label'] ); ?></h2>
+					<p class="product-grid__subtitle">
+						<?php echo esc_html( $col['subtitle'] ); ?>
+						&bull;
+						<?php esc_html_e( 'Limited Edition', 'skyyrose-flagship' ); ?>
+					</p>
 				</div>
 
-				<div class="signin-form-group">
-					<label class="signin-label" for="signin-password"><?php echo esc_html__( 'Password', 'skyyrose-flagship' ); ?></label>
-					<input
-						id="signin-password"
-						class="signin-input"
-						type="password"
-						name="password"
-						placeholder="<?php esc_attr_e( 'Your password', 'skyyrose-flagship' ); ?>"
-						required
-						autocomplete="current-password"
-					>
-				</div>
-
-				<div class="signin-feedback" role="alert" aria-live="polite" aria-atomic="true"></div>
-			<button class="signin-submit" type="submit"><?php echo esc_html__( 'Sign In', 'skyyrose-flagship' ); ?></button>
-			</form>
-
-			<div class="signin-divider"><?php echo esc_html__( 'or', 'skyyrose-flagship' ); ?></div>
-
-			<div class="member-perks">
-				<h4 class="member-perks-title"><?php echo esc_html__( 'Member Perks', 'skyyrose-flagship' ); ?></h4>
-				<ul class="member-perks-list">
-					<li><?php echo esc_html__( '48-hour early access to all launches', 'skyyrose-flagship' ); ?></li>
-					<li><?php echo esc_html__( 'Up to 25% off pre-order pricing', 'skyyrose-flagship' ); ?></li>
-					<li><?php echo esc_html__( 'Exclusive behind-the-scenes content', 'skyyrose-flagship' ); ?></li>
-					<li><?php echo esc_html__( 'Priority customer service', 'skyyrose-flagship' ); ?></li>
-					<li><?php echo esc_html__( 'Wishlist sync across devices', 'skyyrose-flagship' ); ?></li>
-					<li><?php echo esc_html__( 'Invitation to private events', 'skyyrose-flagship' ); ?></li>
-				</ul>
+				<?php if ( ! empty( $items ) ) :
+					$index = 0;
+					foreach ( $items as $item ) :
+						if ( $item instanceof WC_Product ) {
+							$card_args = array(
+								'product'    => $item,
+								'collection' => $slug,
+								'badge_text' => __( 'Pre-Order', 'skyyrose-flagship' ),
+								'index'      => $index,
+							);
+						} else {
+							$card_args = array(
+								'title'      => isset( $item['name'] ) ? $item['name'] : '',
+								'price'      => $currency_symbol . number_format( isset( $item['price'] ) ? (float) $item['price'] : 0, 0 ),
+								'image_url'  => '',
+								'permalink'  => '#',
+								'collection' => $slug,
+								'badge_text' => __( 'Pre-Order', 'skyyrose-flagship' ),
+								'desc'       => isset( $item['description'] ) ? $item['description'] : '',
+								'sku'        => isset( $item['sku'] ) ? $item['sku'] : '',
+								'index'      => $index,
+							);
+						}
+						get_template_part( 'template-parts/product-card-holo', null, $card_args );
+						$index++;
+					endforeach;
+				else : ?>
+					<p class="product-grid__empty">
+						<?php esc_html_e( 'Products coming soon.', 'skyyrose-flagship' ); ?>
+					</p>
+				<?php endif; ?>
 			</div>
-		</div>
-	</div>
+		<?php endforeach; ?>
+	</section>
 
-	<!-- Collection Tabs (Fixed Bottom) -->
-	<div class="collection-tabs" role="tablist" aria-label="<?php esc_attr_e( 'Filter by collection', 'skyyrose-flagship' ); ?>">
-		<button class="collection-tab active" type="button" role="tab" aria-selected="true" aria-controls="product-grid-panel" tabindex="0" data-collection="all" id="tab-all">
-			<?php echo esc_html__( 'All', 'skyyrose-flagship' ); ?>
-		</button>
-		<button class="collection-tab" type="button" role="tab" aria-selected="false" aria-controls="product-grid-panel" tabindex="-1" data-collection="black-rose" id="tab-black-rose">
-			<?php echo esc_html__( 'Black Rose', 'skyyrose-flagship' ); ?>
-		</button>
-		<button class="collection-tab" type="button" role="tab" aria-selected="false" aria-controls="product-grid-panel" tabindex="-1" data-collection="love-hurts" id="tab-love-hurts">
-			<?php echo esc_html__( 'Love Hurts', 'skyyrose-flagship' ); ?>
-		</button>
-		<button class="collection-tab" type="button" role="tab" aria-selected="false" aria-controls="product-grid-panel" tabindex="-1" data-collection="signature" id="tab-signature">
-			<?php echo esc_html__( 'Signature', 'skyyrose-flagship' ); ?>
-		</button>
-	</div>
-
-	<!-- Exclusive Incentive Popup — triggers after 15s or on exit intent -->
-	<div class="incentive-popup-overlay" aria-hidden="true"></div>
-	<div class="incentive-popup" id="incentive-popup-dialog" role="dialog" aria-modal="true" aria-hidden="true" inert aria-label="<?php esc_attr_e( 'Exclusive early access offer', 'skyyrose-flagship' ); ?>" tabindex="-1">
-			<button class="incentive-popup-close" type="button" aria-label="<?php esc_attr_e( 'Close early access offer', 'skyyrose-flagship' ); ?>">&times;</button>
-			<div class="incentive-popup-content">
-				<div class="incentive-popup-monogram"><?php echo esc_html__( 'SR', 'skyyrose-flagship' ); ?></div>
-				<h3 class="incentive-popup-title"><?php echo esc_html__( 'Unlock Early Access', 'skyyrose-flagship' ); ?></h3>
-				<p class="incentive-popup-subtitle"><?php echo esc_html__( 'Get 25% off your first pre-order + 48hr early access to every collection drop.', 'skyyrose-flagship' ); ?></p>
-				<form class="incentive-popup-form" method="post" action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>">
-					<input type="hidden" name="action" value="skyyrose_incentive_signup">
-					<?php wp_nonce_field( 'skyyrose_incentive', 'skyyrose_incentive_nonce' ); ?>
-					<label for="incentive-email" class="screen-reader-text"><?php esc_html_e( 'Email address', 'skyyrose-flagship' ); ?></label>
-					<input
-						id="incentive-email"
-						class="incentive-popup-input"
-						type="email"
-						name="email"
-						placeholder="<?php esc_attr_e( 'Your email address', 'skyyrose-flagship' ); ?>"
-						required
-						autocomplete="email"
-					>
-					<label for="incentive-phone" class="screen-reader-text"><?php esc_html_e( 'Phone number (optional)', 'skyyrose-flagship' ); ?></label>
-					<input
-						id="incentive-phone"
-						class="incentive-popup-input"
-						type="tel"
-						name="phone"
-						placeholder="<?php esc_attr_e( 'Phone for SMS alerts (optional)', 'skyyrose-flagship' ); ?>"
-						autocomplete="tel"
-					>
-					<button class="incentive-popup-submit" type="submit"><?php echo esc_html__( 'Get Early Access', 'skyyrose-flagship' ); ?></button>
-				</form>
-				<p class="incentive-popup-fine"><?php echo esc_html__( 'No spam. Unsubscribe anytime. Numbered pieces sell out fast.', 'skyyrose-flagship' ); ?></p>
+	<!-- ==================== CART SUMMARY BAR ==================== -->
+	<div class="cart-summary" id="cart-summary"
+	     aria-label="<?php esc_attr_e( 'Cart summary', 'skyyrose-flagship' ); ?>">
+		<div class="cart-summary__info">
+			<span class="cart-summary__count" id="cart-summary-count">
+				<?php esc_html_e( '0 items', 'skyyrose-flagship' ); ?>
+			</span>
+			<span class="cart-summary__total" id="cart-summary-total">
+				<?php echo esc_html( $currency_symbol . '0' ); ?>
+			</span>
 		</div>
+		<a class="cart-summary__checkout"
+		   href="<?php echo esc_url( $checkout_url ); ?>">
+			<?php esc_html_e( 'Proceed to Checkout', 'skyyrose-flagship' ); ?>
+		</a>
 	</div>
 
 </main><!-- #primary -->
 
 <?php
-// skyyRoseGateway is localized in inc/enqueue.php during wp_enqueue_scripts (before wp_head).
-// wp_localize_script() called after wp_head is a no-op — data is silently dropped.
+/*
+ * ─── Inline GSAP Animations ─────────────────────────────────────────────────
+ * Entrance animations and collection-switching logic.
+ * GSAP + ScrollToPlugin loaded by the theme enqueue system.
+ */
+?>
+<script>
+(function() {
+	'use strict';
 
-get_template_part( 'template-parts/cinematic-toggle' );
+	/* ── DOM References ── */
+	var body            = document.body;
+	var showcaseCards   = document.querySelectorAll('.showcase__card');
+	var tabButtons      = document.querySelectorAll('.tab-bar__btn');
+	var productSection  = document.getElementById('products-section');
+	var cartSummary     = document.getElementById('cart-summary');
+	var cartCountEl     = document.getElementById('cart-summary-count');
+	var cartTotalEl     = document.getElementById('cart-summary-total');
+	var activeCollection = null;
 
-get_footer();
+	/* Collection grid map */
+	var grids = {};
+	['black-rose', 'love-hurts', 'signature'].forEach(function(slug) {
+		grids[slug] = document.getElementById('grid-' + slug);
+	});
+
+	/* ── Entrance Animations ── */
+	function initEntranceAnimations() {
+		if (typeof gsap === 'undefined') { return; }
+
+		gsap.from('.hero__badge', {
+			opacity: 0, y: 20, duration: 0.8, delay: 0.2, ease: 'power3.out'
+		});
+		gsap.from('.hero__title', {
+			opacity: 0, y: 30, duration: 1, delay: 0.4, ease: 'power3.out'
+		});
+		gsap.from('.hero__tagline', {
+			opacity: 0, y: 20, duration: 0.8, delay: 0.7, ease: 'power3.out'
+		});
+		gsap.from('.hero__subtitle', {
+			opacity: 0, y: 15, duration: 0.8, delay: 0.9, ease: 'power3.out'
+		});
+		gsap.from('.showcase__card', {
+			opacity: 0, y: 50, duration: 0.9, stagger: 0.15, delay: 1.1,
+			ease: 'power3.out'
+		});
+	}
+
+	/* ── Collection Activation ── */
+	function activateCollection(slug) {
+		if (activeCollection === slug) { return; }
+		activeCollection = slug;
+
+		body.setAttribute('data-active-collection', slug);
+
+		/* Update tab bar */
+		tabButtons.forEach(function(btn) {
+			var isActive = btn.getAttribute('data-tab') === slug;
+			btn.classList.toggle('tab-bar__btn--active', isActive);
+			btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+			btn.setAttribute('tabindex', isActive ? '0' : '-1');
+		});
+
+		/* Show/hide grids */
+		Object.keys(grids).forEach(function(key) {
+			var grid = grids[key];
+			if (!grid) { return; }
+			if (key === slug) {
+				grid.style.display = '';
+				grid.removeAttribute('hidden');
+				animateGridIn(grid);
+			} else {
+				grid.style.display = 'none';
+				grid.setAttribute('hidden', '');
+			}
+		});
+
+		/* Scroll to product section */
+		if (productSection && typeof gsap !== 'undefined' && gsap.plugins && gsap.plugins.scrollTo) {
+			gsap.to(window, {
+				scrollTo: { y: productSection, offsetY: 120 },
+				duration: 0.8,
+				ease: 'power3.inOut'
+			});
+		} else if (productSection) {
+			productSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		}
+	}
+
+	function animateGridIn(grid) {
+		var cards = grid.querySelectorAll('.holo');
+		if (typeof gsap === 'undefined') {
+			cards.forEach(function(c) { c.classList.add('holo--visible'); });
+			return;
+		}
+
+		cards.forEach(function(card) {
+			card.classList.remove('holo--visible');
+			card.style.opacity = '0';
+			card.style.transform = 'translateY(32px)';
+		});
+
+		gsap.to(cards, {
+			opacity: 1,
+			y: 0,
+			duration: 0.7,
+			stagger: 0.1,
+			ease: 'power3.out',
+			delay: 0.15,
+			onComplete: function() {
+				cards.forEach(function(card) {
+					card.classList.add('holo--visible');
+					card.style.transform = '';
+					card.style.opacity = '';
+				});
+			}
+		});
+	}
+
+	/* ── Event Listeners ── */
+	showcaseCards.forEach(function(card) {
+		card.addEventListener('click', function() {
+			var slug = card.getAttribute('data-collection');
+			if (slug) { activateCollection(slug); }
+		});
+		card.addEventListener('keydown', function(e) {
+			if (e.key === 'Enter' || e.key === ' ') {
+				e.preventDefault();
+				var slug = card.getAttribute('data-collection');
+				if (slug) { activateCollection(slug); }
+			}
+		});
+	});
+
+	tabButtons.forEach(function(btn) {
+		btn.addEventListener('click', function() {
+			var slug = btn.getAttribute('data-tab');
+			if (slug) { activateCollection(slug); }
+		});
+	});
+
+	/* ── Cart Summary UI (mirrors WooCommerce mini-cart state) ── */
+	function updateCartSummary() {
+		if (!cartSummary) { return; }
+		var countEl = document.querySelector('.nav-cart-count, .cart-contents .count');
+		var count   = countEl ? parseInt(countEl.textContent, 10) || 0 : 0;
+
+		if (count > 0) {
+			cartSummary.classList.add('cart-summary--visible');
+			if (cartCountEl) {
+				cartCountEl.textContent = count + (count === 1
+					? ' <?php echo esc_js( __( 'item', 'skyyrose-flagship' ) ); ?>'
+					: ' <?php echo esc_js( __( 'items', 'skyyrose-flagship' ) ); ?>');
+			}
+		} else {
+			cartSummary.classList.remove('cart-summary--visible');
+		}
+	}
+
+	/* Listen for WooCommerce fragment updates */
+	if (typeof jQuery !== 'undefined') {
+		jQuery(document.body).on('added_to_cart removed_from_cart wc_fragments_refreshed', updateCartSummary);
+	}
+
+	/* ── Init ── */
+	initEntranceAnimations();
+	updateCartSummary();
+})();
+</script>
+
+<?php get_footer(); ?>

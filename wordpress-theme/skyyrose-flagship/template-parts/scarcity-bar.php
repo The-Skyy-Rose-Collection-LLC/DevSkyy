@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 $args         = $args ?? array();
 $sku          = sanitize_text_field( $args['sku'] ?? '' );
 $edition_size = absint( $args['edition_size'] ?? 80 );
-$label        = esc_html( $args['label'] ?? '' );
+$label        = $args['label'] ?? '';
 
 if ( empty( $sku ) ) { return; }
 
@@ -47,7 +47,7 @@ $rest_url     = esc_url( rest_url( 'skyyrose/v1/stock/' . $sku ) );
 ?>
 <div id="<?php echo esc_attr( $bar_id ); ?>" class="<?php echo esc_attr( $bar_class ); ?>" aria-label="<?php esc_attr_e( 'Availability', 'skyyrose-flagship' ); ?>">
 	<?php if ( $label ) : ?>
-	<span class="sr-scarcity-bar__label"><?php echo $label; ?></span>
+	<span class="sr-scarcity-bar__label"><?php echo esc_html( $label ); ?></span>
 	<?php endif; ?>
 
 	<div class="sr-scarcity-bar__counter">

@@ -166,7 +166,7 @@ get_header();
 				$stock_seed    = crc32( $sku );
 				$remaining     = ( $stock_seed % 40 ) + 12; // 12-51 remaining
 			?>
-			<div class="lp-product-card <?php echo esc_attr( $delay_class ); ?>" data-sku="<?php echo $sku; ?>">
+			<div class="lp-product-card <?php echo esc_attr( $delay_class ); ?>" data-sku="<?php echo esc_attr( $sku ); ?>">
 				<?php if ( $is_preorder ) : ?>
 					<span class="lp-badge lp-badge--limited">Pre-Order</span>
 				<?php else : ?>

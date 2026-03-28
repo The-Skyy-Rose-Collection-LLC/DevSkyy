@@ -373,8 +373,18 @@
       var el = document.createElement('div');
       el.className = 'narrative-panel narrative-' + panel.position + ' narrative-' + panel.style;
       el.dataset.trigger = panel.trigger;
-      el.innerHTML = '<p class="narrative-text">' + panel.text + '</p>' +
-        (panel.subtext ? '<p class="narrative-subtext">' + panel.subtext + '</p>' : '');
+      var pText = document.createElement('p');
+      pText.className = 'narrative-text';
+      pText.textContent = panel.text;
+      el.appendChild(pText);
+
+      if (panel.subtext) {
+        var pSub = document.createElement('p');
+        pSub.className = 'narrative-subtext';
+        pSub.textContent = panel.subtext;
+        el.appendChild(pSub);
+      }
+
       overlay.appendChild(el);
       narrativePanels.push(el);
     });

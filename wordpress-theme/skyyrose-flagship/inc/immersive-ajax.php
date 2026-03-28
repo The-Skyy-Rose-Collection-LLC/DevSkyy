@@ -231,7 +231,7 @@ function skyyrose_ajax_immersive_add_to_cart() {
 	}
 
 	// Rate-limit: max 30 add-to-cart per IP per minute.
-	$rate_key  = 'skyyrose_atc_' . md5( isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : '' );
+	$rate_key  = 'skyyrose_atc_' . md5( isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '' );
 	$rate_hits = (int) get_transient( $rate_key );
 	if ( $rate_hits >= 30 ) {
 		wp_send_json_error(

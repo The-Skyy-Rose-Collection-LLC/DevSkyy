@@ -128,8 +128,11 @@ wp_remote() {
         log_info "[DRY RUN] wp $cmd"
         return 0
     fi
-    sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=accept-new \
-        -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "wp $cmd" 2>/dev/null
+    local ssh_opts=(-o StrictHostKeyChecking=yes -p "${SSH_PORT:-22}")
+    if [[ -f "${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}" ]]; then
+        ssh_opts+=(-i "${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}")
+    fi
+    ssh "${ssh_opts[@]}" "${SSH_USER}@${SSH_HOST}" "wp $cmd" 2>/dev/null
 }
 
 # ---------------------------------------------------------------------------
@@ -148,12 +151,15 @@ preflight() {
     done
     log_success "All credentials present"
 
-    # Verify sshpass
-    if ! command -v sshpass &>/dev/null; then
-        log_error "sshpass not installed. Run: brew install hudochenkov/sshpass/sshpass"
+    # Verify SSH auth method (key preferred, sshpass fallback)
+    if [[ -f "${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}" ]]; then
+        log_success "SSH key found: ${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}"
+    elif command -v sshpass &>/dev/null; then
+        log_success "sshpass available (password auth)"
+    else
+        log_error "No SSH key at ~/.ssh/skyyrose-deploy and sshpass not installed"
         exit 1
     fi
-    log_success "sshpass available"
 
     # Verify theme directory
     if [[ ! -d "$THEME_DIR" ]]; then
@@ -179,8 +185,11 @@ preflight() {
 
     # Test SSH connectivity (skip in dry-run)
     if [[ "$DRY_RUN" == "false" ]]; then
-        if ! sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=accept-new \
-            -p "${SSH_PORT:-22}" "${SSH_USER}@${SSH_HOST}" "echo ok" 2>/dev/null; then
+        local ssh_test_opts=(-o StrictHostKeyChecking=yes -o ConnectTimeout=15 -p "${SSH_PORT:-22}")
+        if [[ -f "${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}" ]]; then
+            ssh_test_opts+=(-i "${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}")
+        fi
+        if ! ssh "${ssh_test_opts[@]}" "${SSH_USER}@${SSH_HOST}" "echo ok" 2>/dev/null; then
             log_error "SSH connectivity test failed -- check credentials and network"
             exit 1
         fi
@@ -251,15 +260,63 @@ transfer_files() {
 
 try_rsync() {
     if [[ "$DRY_RUN" == "true" ]]; then
-        log_info "[DRY RUN] rsync -avz --delete --timeout=300 ${RSYNC_EXCLUDES[*]} $THEME_DIR/ -> ${SSH_USER}@${SSH_HOST}:${WP_THEME_PATH}/"
+        log_info "[DRY RUN] sftp upload $THEME_DIR/ -> ${SSH_USER}@${SSH_HOST}:${WP_THEME_PATH}/"
         return 0
     fi
 
-    rsync -avz --delete --timeout=300 \
-        "${RSYNC_EXCLUDES[@]}" \
-        -e "sshpass -p '$SSH_PASS' ssh -o StrictHostKeyChecking=accept-new -p ${SSH_PORT:-22}" \
-        "$THEME_DIR/" \
-        "${SSH_USER}@${SSH_HOST}:${WP_THEME_PATH}/"
+    local key_path="${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}"
+    local ssh_opts="-o StrictHostKeyChecking=yes -p ${SSH_PORT:-22}"
+    if [[ -f "$key_path" ]]; then
+        ssh_opts="$ssh_opts -i $key_path"
+    fi
+
+    # WordPress.com doesn't support rsync protocol — use sftp batch upload
+    log_info "Creating upload archive..."
+    local tmpzip="/tmp/skyyrose-flagship-deploy.tar.gz"
+    tar -czf "$tmpzip" \
+        --exclude='.git' \
+        --exclude='node_modules' \
+        --exclude='vendor' \
+        --exclude='tests' \
+        --exclude='test-results' \
+        --exclude='_archive' \
+        --exclude='.env*' \
+        --exclude='*.map' \
+        --exclude='*.log' \
+        --exclude='.DS_Store' \
+        --exclude='deploy.sh' \
+        --exclude='CLAUDE.md' \
+        --exclude='IMMERSIVE-WORLDS-PLAN.md' \
+        --exclude='.deploy-archives' \
+        --exclude='.gitignore' \
+        --exclude='.phpcs.xml' \
+        --exclude='.eslintrc*' \
+        --exclude='.prettierrc*' \
+        --exclude='.editorconfig' \
+        --exclude='phpunit.xml' \
+        --exclude='playwright-report' \
+        --exclude='screenshots' \
+        --exclude='.serena' \
+        -C "$(dirname "$THEME_DIR")" "$(basename "$THEME_DIR")"
+
+    local archive_size
+    archive_size="$(du -h "$tmpzip" | cut -f1)"
+    log_info "Archive: $tmpzip ($archive_size)"
+
+    # Upload via scp then extract remotely
+    local key_flag=""
+    if [[ -f "$key_path" ]]; then
+        key_flag="-i $key_path"
+    fi
+
+    log_info "Uploading via scp..."
+    scp -P "${SSH_PORT:-22}" $key_flag -o StrictHostKeyChecking=yes "$tmpzip" "${SSH_USER}@${SSH_HOST}:/tmp/skyyrose-deploy.tar.gz"
+
+    log_info "Extracting on remote..."
+    ssh -p "${SSH_PORT:-22}" $key_flag -o StrictHostKeyChecking=yes "${SSH_USER}@${SSH_HOST}" "cd /tmp && tar -xzf skyyrose-deploy.tar.gz && rm -rf ${WP_THEME_PATH} && mv skyyrose-flagship ${WP_THEME_PATH} && rm skyyrose-deploy.tar.gz"
+
+    rm -f "$tmpzip"
+    log_success "Theme uploaded and extracted"
 }
 
 try_lftp() {
@@ -281,12 +338,14 @@ try_lftp() {
         return 0
     fi
 
+    local key_path="${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}"
     # shellcheck disable=SC2086
     lftp -c "
 set sftp:auto-confirm yes
+set sftp:connect-program 'ssh -i $key_path -o StrictHostKeyChecking=yes'
 set net:max-retries 3
 set net:reconnect-interval-base 5
-open -u $SFTP_USER,$SFTP_PASS sftp://$SFTP_HOST:${SFTP_PORT:-22}
+open -u $SFTP_USER, sftp://$SFTP_HOST:${SFTP_PORT:-22}
 mirror --reverse --verbose --only-newer --delete $lftp_excludes \
   $THEME_DIR/ \
   $WP_THEME_PATH/

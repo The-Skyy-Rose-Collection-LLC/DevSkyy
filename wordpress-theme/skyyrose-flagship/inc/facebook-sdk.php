@@ -22,7 +22,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * SDK version is safe to keep as a constant.
  */
 if ( ! defined( 'SKYYROSE_FB_APP_ID' ) ) {
-	define( 'SKYYROSE_FB_APP_ID', get_option( 'skyyrose_fb_app_id', '860288763161770' ) );
+	$fb_app_id = get_option( 'skyyrose_fb_app_id', '' );
+	define( 'SKYYROSE_FB_APP_ID', $fb_app_id );
 }
 if ( ! defined( 'SKYYROSE_FB_SDK_VERSION' ) ) {
 	define( 'SKYYROSE_FB_SDK_VERSION', 'v18.0' );
@@ -35,7 +36,7 @@ if ( ! defined( 'SKYYROSE_FB_SDK_VERSION' ) ) {
  * fires as early as possible for accurate page-view tracking.
  */
 function skyyrose_facebook_pixel_head() {
-	if ( is_admin() ) {
+	if ( is_admin() || empty( SKYYROSE_FB_APP_ID ) ) {
 		return;
 	}
 	?>

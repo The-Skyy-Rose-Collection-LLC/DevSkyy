@@ -1,0 +1,393 @@
+/**
+ * Collection — Kids Capsule
+ *
+ * Standalone page styles for the Kids Capsule catalog template.
+ * Palette: rose-gold #B76E79 on warm charcoal #1A1A1A.
+ * NOT pink, NOT playful — same dark luxury DNA as every SkyyRose collection.
+ *
+ * @package SkyyRose_Flagship
+ * @since   5.0.0
+ */
+
+/* -----------------------------------------------
+   CSS Custom Properties
+   ----------------------------------------------- */
+.kc-page {
+	--kc-rose: #B76E79;
+	--kc-rose-rgb: 183, 110, 121;
+	--kc-charcoal: #1A1A1A;
+	--kc-dark: #0A0A0A;
+	--kc-gold: #D4AF37;
+	--kc-silver: #C0C0C0;
+	--kc-crimson: #DC143C;
+	--kc-font-display: 'Playfair Display', serif;
+	--kc-font-body: 'Inter', sans-serif;
+}
+
+/* -----------------------------------------------
+   Page Container & Texture
+   ----------------------------------------------- */
+.kc-page {
+	background: var(--kc-dark);
+	color: #fff;
+	font-family: var(--kc-font-body);
+	position: relative;
+}
+
+.kc-page::before {
+	content: '';
+	position: fixed;
+	inset: 0;
+	background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+	opacity: 0.03;
+	pointer-events: none;
+	z-index: 0;
+}
+
+.kc-page::after {
+	content: '';
+	position: fixed;
+	inset: 0;
+	background: radial-gradient(ellipse at 50% 0%, rgba(var(--kc-rose-rgb), 0.12) 0%, transparent 60%);
+	pointer-events: none;
+	z-index: -1;
+}
+
+/* -----------------------------------------------
+   Hero
+   ----------------------------------------------- */
+.kc-hero {
+	min-height: 75vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	padding-top: 100px;
+	overflow: hidden;
+}
+
+.kc-hero__bg {
+	position: absolute;
+	inset: 0;
+	background:
+		radial-gradient(ellipse at 30% 20%, rgba(var(--kc-rose-rgb), 0.15) 0%, transparent 50%),
+		radial-gradient(ellipse at 70% 80%, rgba(26, 26, 26, 0.8) 0%, transparent 60%);
+}
+
+.kc-hero__content {
+	text-align: center;
+	z-index: 10;
+	max-width: 800px;
+	padding: 0 2rem;
+	position: relative;
+}
+
+.kc-hero__badge {
+	display: inline-block;
+	padding: 0.5rem 1.5rem;
+	background: var(--kc-rose);
+	font-size: 0.75rem;
+	letter-spacing: 3px;
+	text-transform: uppercase;
+	margin-bottom: 2rem;
+	color: var(--kc-dark);
+	font-weight: 600;
+}
+
+.kc-hero__title {
+	font-family: var(--kc-font-display);
+	font-size: clamp(3rem, 8vw, 5.5rem);
+	font-weight: 400;
+	margin: 0 0 1.5rem;
+	line-height: 1.05;
+}
+
+.kc-hero__title span {
+	display: block;
+	background: linear-gradient(135deg, #fff 0%, var(--kc-rose) 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.kc-hero__subtitle {
+	font-size: 1.15rem;
+	color: rgba(255, 255, 255, 0.65);
+	max-width: 520px;
+	margin: 0 auto;
+	line-height: 1.8;
+	letter-spacing: 0.02em;
+}
+
+.kc-hero__cta {
+	display: inline-block;
+	margin-top: 2.5rem;
+	padding: 1rem 2.5rem;
+	border: 1px solid rgba(var(--kc-rose-rgb), 0.4);
+	color: #fff;
+	text-decoration: none;
+	font-size: 0.8rem;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+	transition: all 0.4s ease;
+	background: transparent;
+}
+
+.kc-hero__cta:hover,
+.kc-hero__cta:focus {
+	background: var(--kc-rose);
+	border-color: var(--kc-rose);
+	color: var(--kc-dark);
+	outline: none;
+}
+
+/* -----------------------------------------------
+   Brand Story
+   ----------------------------------------------- */
+.kc-story {
+	padding: 8rem 4rem;
+	background: linear-gradient(180deg, var(--kc-charcoal) 0%, var(--kc-dark) 100%);
+	overflow: hidden;
+}
+
+.kc-story__inner {
+	max-width: 1000px;
+	margin: 0 auto;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 6rem;
+	align-items: center;
+}
+
+.kc-story__text h2 {
+	font-family: var(--kc-font-display);
+	font-size: 2.5rem;
+	margin: 0 0 1.5rem;
+	line-height: 1.2;
+}
+
+.kc-story__text h2 span {
+	background: linear-gradient(135deg, var(--kc-rose), var(--kc-gold));
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.kc-story__text p {
+	color: rgba(255, 255, 255, 0.65);
+	line-height: 2;
+	margin: 0 0 1rem;
+	font-size: 0.95rem;
+}
+
+/* KC monogram visual block */
+.kc-story__visual {
+	height: 400px;
+	background: linear-gradient(135deg, rgba(var(--kc-rose-rgb), 0.2), rgba(26, 26, 26, 0.6));
+	position: relative;
+	border: 1px solid rgba(var(--kc-rose-rgb), 0.1);
+}
+
+.kc-story__visual::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background:
+		radial-gradient(circle at 30% 40%, rgba(var(--kc-rose-rgb), 0.15) 0%, transparent 50%),
+		radial-gradient(circle at 70% 60%, rgba(212, 175, 55, 0.08) 0%, transparent 40%);
+}
+
+.kc-story__visual::after {
+	content: 'KC';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-family: var(--kc-font-display);
+	font-size: 6rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	background: linear-gradient(135deg, rgba(var(--kc-rose-rgb), 0.3), rgba(212, 175, 55, 0.2));
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+/* -----------------------------------------------
+   Products Section
+   ----------------------------------------------- */
+.kc-products {
+	padding: 2rem 0 4rem;
+	position: relative;
+	z-index: 1;
+}
+
+.kc-products__header {
+	text-align: center;
+	padding: 4rem 2rem 0;
+}
+
+.kc-products__header h2 {
+	font-family: var(--kc-font-display);
+	font-size: 2rem;
+	font-weight: 400;
+	letter-spacing: 0.1em;
+	margin: 0 0 0.75rem;
+}
+
+.kc-products__header p {
+	color: rgba(255, 255, 255, 0.4);
+	font-size: 0.85rem;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	margin: 0;
+}
+
+/* -----------------------------------------------
+   Cross-Collection Navigation
+   ----------------------------------------------- */
+.kc-cross {
+	padding: 6rem 4rem;
+	background: var(--kc-charcoal);
+	text-align: center;
+}
+
+.kc-cross__heading {
+	font-family: var(--kc-font-display);
+	font-size: 2rem;
+	font-weight: 400;
+	letter-spacing: 0.08em;
+	margin: 0 0 3rem;
+}
+
+.kc-cross__grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 2rem;
+	max-width: 1000px;
+	margin: 0 auto;
+}
+
+.kc-cross__link {
+	position: relative;
+	padding: 3rem 2rem;
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	background: rgba(255, 255, 255, 0.02);
+	text-decoration: none;
+	color: #fff;
+	transition: all 0.4s ease;
+	overflow: hidden;
+}
+
+.kc-cross__link::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	transition: opacity 0.4s ease;
+}
+
+.kc-cross__link--signature::before {
+	background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+}
+
+.kc-cross__link--black-rose::before {
+	background: radial-gradient(ellipse at center, rgba(192, 192, 192, 0.1) 0%, transparent 70%);
+}
+
+.kc-cross__link--love-hurts::before {
+	background: radial-gradient(ellipse at center, rgba(220, 20, 60, 0.1) 0%, transparent 70%);
+}
+
+.kc-cross__link:hover::before,
+.kc-cross__link:focus::before {
+	opacity: 1;
+}
+
+.kc-cross__link:hover,
+.kc-cross__link:focus {
+	border-color: rgba(255, 255, 255, 0.15);
+	transform: translateY(-4px);
+	outline: none;
+}
+
+.kc-cross__link h3 {
+	font-family: var(--kc-font-display);
+	font-size: 1.4rem;
+	font-weight: 400;
+	margin: 0 0 0.5rem;
+	position: relative;
+}
+
+.kc-cross__link p {
+	font-size: 0.8rem;
+	color: rgba(255, 255, 255, 0.4);
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	position: relative;
+	margin: 0;
+}
+
+/* GSAP Animation States */
+.kc-fade-up { opacity: 0; transform: translateY(30px); }
+.kc-fade-left { opacity: 0; transform: translateX(-40px); }
+.kc-fade-right { opacity: 0; transform: translateX(40px); }
+
+/* -----------------------------------------------
+   Toast Notification
+   ----------------------------------------------- */
+.kc-toast {
+	position: fixed;
+	bottom: 2rem;
+	right: 2rem;
+	background: var(--kc-rose);
+	color: var(--kc-dark);
+	font-weight: 600;
+	padding: 1rem 2rem;
+	font-size: 0.85rem;
+	letter-spacing: 0.5px;
+	transform: translateX(150%);
+	transition: transform 0.4s ease;
+	z-index: 2000;
+}
+
+.kc-toast.show {
+	transform: translateX(0);
+}
+
+/* -----------------------------------------------
+   Responsive
+   ----------------------------------------------- */
+@media (max-width: 1024px) {
+	.kc-story__inner {
+		grid-template-columns: 1fr;
+		gap: 3rem;
+	}
+
+	.kc-cross__grid {
+		grid-template-columns: 1fr;
+		max-width: 400px;
+	}
+
+	.kc-cross {
+		padding: 4rem 2rem;
+	}
+}
+
+@media (max-width: 768px) {
+	.kc-hero {
+		min-height: 60vh;
+	}
+
+	.kc-story {
+		padding: 4rem 2rem;
+	}
+
+	.kc-story__visual {
+		height: 280px;
+	}
+
+	.kc-story__visual::after {
+		font-size: 4rem;
+	}
+}

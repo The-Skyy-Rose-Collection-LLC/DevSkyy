@@ -101,12 +101,12 @@ $accent         = esc_attr( $config['accent'] ?? '#B76E79' );
 		?>
 		<div class="sr-cl-card" data-product-id="<?php echo esc_attr( $rel_id ); ?>">
 			<a href="<?php echo esc_url( $rel_url ); ?>" class="sr-cl-card__image-link" tabindex="-1" aria-hidden="true">
-				<?php echo $rel_img; ?>
+				<?php echo wp_kses_post( $rel_img ); ?>
 			</a>
 			<a href="<?php echo esc_url( $rel_url ); ?>" class="sr-cl-card__name">
 				<?php echo esc_html( $rel_name ); ?>
 			</a>
-			<div class="sr-cl-card__price"><?php echo $rel_price; ?></div>
+			<div class="sr-cl-card__price"><?php echo wp_kses_post( $rel_price ); ?></div>
 			<button
 				type="button"
 				class="sr-cl-card__add"

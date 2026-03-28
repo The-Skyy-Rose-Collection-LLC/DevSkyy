@@ -4,855 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkyyRose | Where Love Meets Luxury</title>
-    <meta name="description" content="SkyyRose - Where Love Meets Luxury. Oakland-born streetwear featuring three distinct collections: Black Rose, Love Hurts, and Signature.">
+    <meta name="description" content="SkyyRose - Where Love Meets Luxury. Oakland-born streetwear featuring four distinct collections: Black Rose, Love Hurts, Signature, and Kids Capsule.">
 
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Fonts: Cinzel for headlines, Playfair for accents, Inter for body -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <!-- GSAP for luxury animations -->
+    <!-- GSAP for luxury scroll animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
-    <!-- Luxury Design System -->
+    <!-- Three.js via importmap -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <!-- Design System + Portal Styles -->
     <link rel="stylesheet" href="assets/css/luxury-design.css">
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --black-rose: #8B0000;
-            --black-rose-dark: #5C0000;
-            --love-hurts: #B76E79;
-            --love-hurts-light: #D4A5AD;
-            --signature-gold: #D4AF37;
-            --signature-cream: #F5F0E6;
-            --text-primary: #1A1A1A;
-            --text-secondary: #666;
-            --bg-dark: #0A0A0A;
-            --bg-light: #FAFAFA;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-dark);
-            color: #fff;
-            overflow-x: hidden;
-        }
-
-        /* Film Grain Overlay */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
-            opacity: 0.03;
-            pointer-events: none;
-            z-index: 9999;
-        }
-
-        /* Navigation */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            padding: 1.5rem 4rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.4s ease;
-            background: transparent;
-        }
-
-        .navbar.scrolled {
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 1rem 4rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            background: linear-gradient(135deg, var(--love-hurts), var(--signature-gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 3rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            position: relative;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 0;
-            height: 1px;
-            background: var(--signature-gold);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .nav-actions {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .nav-icon {
-            color: #fff;
-            font-size: 1.2rem;
-            cursor: pointer;
-            position: relative;
-            transition: color 0.3s ease;
-        }
-
-        .nav-icon:hover {
-            color: var(--signature-gold);
-        }
-
-        .cart-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--black-rose);
-            color: #fff;
-            font-size: 0.65rem;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-        }
-
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-bg {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse at center, rgba(139, 0, 0, 0.15) 0%, transparent 70%),
-                        radial-gradient(ellipse at 20% 80%, rgba(183, 110, 121, 0.1) 0%, transparent 50%),
-                        radial-gradient(ellipse at 80% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 50%);
-        }
-
-        /* Animated Orbs */
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            animation: float 20s ease-in-out infinite;
-        }
-
-        .orb-1 {
-            width: 500px;
-            height: 500px;
-            background: rgba(139, 0, 0, 0.3);
-            top: 10%;
-            left: 10%;
-            animation-delay: 0s;
-        }
-
-        .orb-2 {
-            width: 400px;
-            height: 400px;
-            background: rgba(183, 110, 121, 0.25);
-            bottom: 20%;
-            right: 15%;
-            animation-delay: -7s;
-        }
-
-        .orb-3 {
-            width: 300px;
-            height: 300px;
-            background: rgba(212, 175, 55, 0.2);
-            top: 50%;
-            right: 30%;
-            animation-delay: -14s;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(50px, -30px) scale(1.05); }
-            50% { transform: translate(-30px, 50px) scale(0.95); }
-            75% { transform: translate(-50px, -20px) scale(1.02); }
-        }
-
-        .hero-content {
-            text-align: center;
-            z-index: 10;
-            max-width: 900px;
-            padding: 0 2rem;
-        }
-
-        .hero-badge {
-            display: inline-block;
-            padding: 0.5rem 1.5rem;
-            border: 1px solid rgba(212, 175, 55, 0.5);
-            border-radius: 30px;
-            font-size: 0.75rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--signature-gold);
-            margin-bottom: 2rem;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .hero-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(3rem, 8vw, 6rem);
-            font-weight: 400;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-        }
-
-        .hero-title span {
-            display: block;
-            background: linear-gradient(135deg, #fff 0%, var(--love-hurts) 50%, var(--signature-gold) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .hero-subtitle {
-            font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.7);
-            max-width: 600px;
-            margin: 0 auto 3rem;
-            line-height: 1.8;
-            font-weight: 300;
-        }
-
-        .hero-cta {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 1rem 2.5rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-decoration: none;
-            border-radius: 0;
-            transition: all 0.4s ease;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--black-rose), var(--love-hurts));
-            color: #fff;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(139, 0, 0, 0.4);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-outline:hover {
-            background: #fff;
-            color: var(--bg-dark);
-            border-color: #fff;
-        }
-
-        /* Scroll Indicator */
-        .scroll-indicator {
-            position: absolute;
-            bottom: 3rem;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.75rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .scroll-indicator::after {
-            content: '';
-            width: 1px;
-            height: 60px;
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), transparent);
-            animation: scrollPulse 2s ease-in-out infinite;
-        }
-
-        @keyframes scrollPulse {
-            0%, 100% { opacity: 1; transform: scaleY(1); }
-            50% { opacity: 0.5; transform: scaleY(0.8); }
-        }
-
-        /* Collections Section */
-        .collections {
-            padding: 8rem 4rem;
-            background: linear-gradient(180deg, var(--bg-dark) 0%, #111 100%);
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 5rem;
-        }
-
-        .section-label {
-            font-size: 0.75rem;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: var(--signature-gold);
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-        .section-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2rem, 4vw, 3rem);
-            font-weight: 400;
-            margin-bottom: 1rem;
-        }
-
-        .section-subtitle {
-            color: rgba(255, 255, 255, 0.6);
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.8;
-        }
-
-        .collections-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .collection-card {
-            position: relative;
-            height: 600px;
-            overflow: hidden;
-            cursor: pointer;
-            group: collection;
-        }
-
-        .collection-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.9) 100%);
-            z-index: 1;
-            transition: opacity 0.4s ease;
-        }
-
-        .collection-card:hover::before {
-            opacity: 0.7;
-        }
-
-        .collection-bg {
-            position: absolute;
-            inset: 0;
-            background-size: cover;
-            background-position: center;
-            transition: transform 0.8s ease;
-        }
-
-        .collection-card:hover .collection-bg {
-            transform: scale(1.08);
-        }
-
-        .collection-card.black-rose .collection-bg {
-            background: linear-gradient(135deg, #1a0000 0%, #3d0000 50%, #1a0000 100%);
-        }
-
-        .collection-card.love-hurts .collection-bg {
-            background: linear-gradient(135deg, #2d1a1d 0%, #4a2a30 50%, #2d1a1d 100%);
-        }
-
-        .collection-card.signature .collection-bg {
-            background: linear-gradient(135deg, #1a1810 0%, #2d2820 50%, #1a1810 100%);
-        }
-
-        .collection-content {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 3rem;
-            z-index: 2;
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.5s ease;
-        }
-
-        .collection-card:hover .collection-content {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .collection-name {
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .collection-tagline {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .collection-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--signature-gold);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .collection-link svg {
-            transition: transform 0.3s ease;
-        }
-
-        .collection-link:hover svg {
-            transform: translateX(5px);
-        }
-
-        /* Featured Products */
-        .featured {
-            padding: 8rem 4rem;
-            background: #111;
-        }
-
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 2rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .product-card {
-            position: relative;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            overflow: hidden;
-            transition: all 0.4s ease;
-        }
-
-        .product-card:hover {
-            border-color: rgba(212, 175, 55, 0.3);
-            transform: translateY(-5px);
-        }
-
-        .product-badge {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            padding: 0.4rem 0.8rem;
-            font-size: 0.65rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            z-index: 10;
-        }
-
-        .product-badge.new {
-            background: var(--signature-gold);
-            color: var(--bg-dark);
-        }
-
-        .product-badge.limited {
-            background: var(--black-rose);
-            color: #fff;
-        }
-
-        .product-image {
-            position: relative;
-            height: 350px;
-            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .product-image img {
-            max-width: 80%;
-            max-height: 80%;
-            object-fit: contain;
-            transition: transform 0.5s ease;
-        }
-
-        .product-card:hover .product-image img {
-            transform: scale(1.05);
-        }
-
-        .product-actions {
-            position: absolute;
-            bottom: -60px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 1rem;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
-            transition: bottom 0.4s ease;
-        }
-
-        .product-card:hover .product-actions {
-            bottom: 0;
-        }
-
-        .product-action-btn {
-            width: 40px;
-            height: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.5);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .product-action-btn:hover {
-            background: var(--signature-gold);
-            border-color: var(--signature-gold);
-            color: var(--bg-dark);
-        }
-
-        .product-info {
-            padding: 1.5rem;
-        }
-
-        .product-collection {
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--love-hurts);
-            margin-bottom: 0.5rem;
-        }
-
-        .product-name {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.1rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .product-price {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--signature-gold);
-        }
-
-        /* Brand Story */
-        .brand-story {
-            padding: 10rem 4rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .brand-story-bg {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse at 30% 50%, rgba(183, 110, 121, 0.1) 0%, transparent 60%);
-        }
-
-        .brand-story-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6rem;
-            align-items: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .brand-story-text h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            font-weight: 400;
-            margin-bottom: 2rem;
-            line-height: 1.2;
-        }
-
-        .brand-story-text p {
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 2;
-            margin-bottom: 1.5rem;
-        }
-
-        .brand-story-visual {
-            position: relative;
-            height: 500px;
-        }
-
-        .brand-story-visual::before {
-            content: '';
-            position: absolute;
-            inset: 40px;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-        }
-
-        .brand-story-visual::after {
-            content: '"Where Love Meets Luxury"';
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            font-style: italic;
-            color: var(--signature-gold);
-            opacity: 0.5;
-        }
-
-        /* Newsletter */
-        .newsletter {
-            padding: 6rem 4rem;
-            background: linear-gradient(135deg, var(--black-rose-dark) 0%, var(--bg-dark) 100%);
-            text-align: center;
-        }
-
-        .newsletter-content {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .newsletter h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .newsletter p {
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 2rem;
-        }
-
-        .newsletter-form {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-
-        .newsletter-form input {
-            flex: 1;
-            max-width: 350px;
-            padding: 1rem 1.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-            font-size: 0.9rem;
-        }
-
-        .newsletter-form input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .newsletter-form input:focus {
-            outline: none;
-            border-color: var(--signature-gold);
-        }
-
-        /* Footer */
-        .footer {
-            padding: 5rem 4rem 2rem;
-            background: var(--bg-dark);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr repeat(4, 1fr);
-            gap: 4rem;
-            max-width: 1400px;
-            margin: 0 auto 4rem;
-        }
-
-        .footer-brand p {
-            color: rgba(255, 255, 255, 0.6);
-            line-height: 1.8;
-            margin-top: 1.5rem;
-            max-width: 300px;
-        }
-
-        .footer-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 1.5rem;
-        }
-
-        .footer-links {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 0.75rem;
-        }
-
-        .footer-links a {
-            color: rgba(255, 255, 255, 0.6);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
-        }
-
-        .footer-links a:hover {
-            color: var(--signature-gold);
-        }
-
-        .footer-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .footer-bottom p {
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 0.85rem;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1.5rem;
-        }
-
-        .social-links a {
-            color: rgba(255, 255, 255, 0.6);
-            transition: color 0.3s ease;
-        }
-
-        .social-links a:hover {
-            color: var(--signature-gold);
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .navbar {
-                padding: 1rem 2rem;
-            }
-
-            .nav-links {
-                display: none;
-            }
-
-            .collections-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .collection-card {
-                height: 400px;
-            }
-
-            .products-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .brand-story-content {
-                grid-template-columns: 1fr;
-                gap: 3rem;
-            }
-
-            .footer-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .hero-title {
-                font-size: 2.5rem;
-            }
-
-            .products-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .newsletter-form {
-                flex-direction: column;
-            }
-
-            .newsletter-form input {
-                max-width: 100%;
-            }
-
-            .footer-grid {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-
-            .footer-bottom {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/homepage-portal.css">
 </head>
 <body class="luxury-film-grain">
+
     <!-- Navigation -->
     <nav class="navbar" id="navbar">
         <a href="homepage.html" class="logo">SKYYROSE</a>
@@ -864,190 +40,105 @@
             <li><a href="blog.html">Journal</a></li>
         </ul>
         <div class="nav-actions">
-            <span class="nav-icon">🔍</span>
-            <a href="wishlist.html" class="nav-icon">♡</a>
-            <a href="cart.html" class="nav-icon" style="position: relative;">
-                🛒
+            <span class="nav-icon">&#128269;</span>
+            <a href="wishlist.html" class="nav-icon">&#9825;</a>
+            <a href="cart.html" class="nav-icon" style="position:relative;">
+                &#128722;
                 <span class="cart-count" id="cartCount">0</span>
             </a>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero parallax-container">
-        <div class="hero-bg">
-            <div class="orb orb-1" data-speed="0.3"></div>
-            <div class="orb orb-2" data-speed="0.5"></div>
-            <div class="orb orb-3" data-speed="0.7"></div>
-        </div>
-        <div class="hero-content">
-            <span class="hero-badge glow-pulse">Oakland Luxury Streetwear</span>
-            <h1 class="hero-title">
-                <span class="gradient-text-animated">Where Love</span>
-                <span class="gradient-text-animated">Meets Luxury</span>
-            </h1>
-            <p class="hero-subtitle">
-                Three distinct collections, one unified vision. Born in Oakland, crafted with passion, 
-                designed for those who wear their heart on their sleeve.
-            </p>
-            <div class="hero-cta">
-                <a href="pre-order.html" class="btn btn-primary">Pre-Order Now</a>
-                <a href="#collections" class="btn btn-outline">Explore Collections</a>
-            </div>
+    <!-- Hero — Three.js Portal Scene -->
+    <section class="hero" id="hero">
+        <canvas id="hero-canvas"></canvas>
+        <div class="hero-fallback" id="hero-fallback">
+            <div class="fallback-title">SKYYROSE</div>
         </div>
         <div class="scroll-indicator">
-            <span>Scroll</span>
+            <span>Scroll to Explore</span>
         </div>
     </section>
 
-    <!-- Collections Section -->
+    <!-- Portal label tooltip (positioned by JS) -->
+    <div id="portal-label"></div>
+
+    <!-- Collections Showcase -->
     <section class="collections" id="collections">
         <div class="section-header reveal">
             <span class="section-label luxury-label">The Collections</span>
-            <h2 class="section-title gradient-text">Three Stories, One Vision</h2>
+            <h2 class="section-title gradient-text">Four Stories, One Vision</h2>
             <p class="section-subtitle luxury-body">
-                Each collection represents a chapter in our story—from dark elegance to emotional depth to timeless luxury.
+                Each collection represents a chapter in our story — from dark elegance
+                to emotional depth to timeless luxury to the next generation.
             </p>
         </div>
         <div class="collections-grid">
-            <div class="collection-card black-rose glass-card luxury-card-3d">
-                <div class="collection-bg"></div>
-                <div class="collection-content">
-                    <h3 class="collection-name gradient-text-blackrose">BLACK ROSE</h3>
-                    <p class="collection-tagline">Dark elegance for the bold</p>
-                    <a href="experiences/black-rose.html" class="collection-link">
-                        Explore Experience
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-            <div class="collection-card love-hurts glass-card luxury-card-3d">
-                <div class="collection-bg"></div>
-                <div class="collection-content">
-                    <h3 class="collection-name gradient-text-lovehurts">LOVE HURTS</h3>
-                    <p class="collection-tagline">Where emotion meets fashion</p>
-                    <a href="experiences/love-hurts.html" class="collection-link">
-                        Explore Experience
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
-                    </a>
-                </div>
-            </div>
+            <!-- Signature -->
             <div class="collection-card signature glass-card luxury-card-3d">
                 <div class="collection-bg"></div>
                 <div class="collection-content">
-                    <h3 class="collection-name gradient-text-signature">SIGNATURE</h3>
-                    <p class="collection-tagline">Timeless luxury essentials</p>
-                    <a href="experiences/signature.html" class="collection-link">
-                        Explore Experience
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
+                    <h3 class="collection-name">SIGNATURE</h3>
+                    <p class="collection-tagline">The Origin. The Crown.</p>
+                    <a href="collections/signature.html" class="collection-link">
+                        Explore Collection
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </a>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Featured Products -->
-    <section class="featured">
-        <div class="section-header reveal">
-            <span class="section-label luxury-label">Featured</span>
-            <h2 class="section-title gradient-text">New Arrivals</h2>
-            <p class="section-subtitle luxury-body">
-                The latest additions to our collections, each piece crafted with intention.
-            </p>
-        </div>
-        <div class="products-grid">
-            <div class="product-card luxury-card">
-                <span class="product-badge luxury-badge-new">New</span>
-                <div class="product-image">
-                    <div style="width: 200px; height: 250px; background: linear-gradient(135deg, #2a0a0a, #1a0505); border-radius: 8px;"></div>
-                </div>
-                <div class="product-actions">
-                    <button class="product-action-btn" title="Quick View">👁️</button>
-                    <button class="product-action-btn" title="Add to Wishlist">♡</button>
-                    <button class="product-action-btn" title="Add to Cart">🛒</button>
-                </div>
-                <div class="product-info">
-                    <p class="product-collection">Black Rose</p>
-                    <h3 class="product-name">Thorn Hoodie</h3>
-                    <p class="product-price">$185</p>
+            <!-- Black Rose -->
+            <div class="collection-card black-rose glass-card luxury-card-3d">
+                <div class="collection-bg"></div>
+                <div class="collection-content">
+                    <h3 class="collection-name">BLACK ROSE</h3>
+                    <p class="collection-tagline">Every Man Would Wear a Black Rose.</p>
+                    <a href="collections/black-rose.html" class="collection-link">
+                        Explore Collection
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
                 </div>
             </div>
-            <div class="product-card luxury-card">
-                <span class="product-badge luxury-badge-limited">Limited</span>
-                <div class="product-image">
-                    <div style="width: 200px; height: 250px; background: linear-gradient(135deg, #3d1a20, #2a1015); border-radius: 8px;"></div>
-                </div>
-                <div class="product-actions">
-                    <button class="product-action-btn" title="Quick View">👁️</button>
-                    <button class="product-action-btn" title="Add to Wishlist">♡</button>
-                    <button class="product-action-btn" title="Add to Cart">🛒</button>
-                </div>
-                <div class="product-info">
-                    <p class="product-collection">Love Hurts</p>
-                    <h3 class="product-name">Heartbreak Hoodie</h3>
-                    <p class="product-price">$195</p>
+            <!-- Love Hurts -->
+            <div class="collection-card love-hurts glass-card luxury-card-3d">
+                <div class="collection-bg"></div>
+                <div class="collection-content">
+                    <h3 class="collection-name">LOVE HURTS</h3>
+                    <p class="collection-tagline">The Hurts Bloodline. Love Through Pain.</p>
+                    <a href="collections/love-hurts.html" class="collection-link">
+                        Explore Collection
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
                 </div>
             </div>
-            <div class="product-card luxury-card">
-                <div class="product-image">
-                    <div style="width: 200px; height: 250px; background: linear-gradient(135deg, #2d2820, #1a1810); border-radius: 8px;"></div>
-                </div>
-                <div class="product-actions">
-                    <button class="product-action-btn" title="Quick View">👁️</button>
-                    <button class="product-action-btn" title="Add to Wishlist">♡</button>
-                    <button class="product-action-btn" title="Add to Cart">🛒</button>
-                </div>
-                <div class="product-info">
-                    <p class="product-collection">Signature</p>
-                    <h3 class="product-name">Foundation Blazer</h3>
-                    <p class="product-price">$425</p>
-                </div>
-            </div>
-            <div class="product-card luxury-card">
-                <span class="product-badge luxury-badge-new">New</span>
-                <div class="product-image">
-                    <div style="width: 200px; height: 250px; background: linear-gradient(135deg, #1a0808, #0a0303); border-radius: 8px;"></div>
-                </div>
-                <div class="product-actions">
-                    <button class="product-action-btn" title="Quick View">👁️</button>
-                    <button class="product-action-btn" title="Add to Wishlist">♡</button>
-                    <button class="product-action-btn" title="Add to Cart">🛒</button>
-                </div>
-                <div class="product-info">
-                    <p class="product-collection">Black Rose</p>
-                    <h3 class="product-name">Midnight Jacket</h3>
-                    <p class="product-price">$295</p>
+            <!-- Kids Capsule -->
+            <div class="collection-card kids-capsule glass-card luxury-card-3d">
+                <div class="collection-bg"></div>
+                <div class="collection-content">
+                    <h3 class="collection-name">KIDS CAPSULE</h3>
+                    <p class="collection-tagline">Luxury Runs In The Family.</p>
+                    <a href="collections/kids-capsule.html" class="collection-link">
+                        Explore Collection
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Brand Story -->
-    <section class="brand-story">
-        <div class="brand-story-bg"></div>
-        <div class="brand-story-content">
-            <div class="brand-story-text reveal-left">
-                <span class="section-label luxury-label">Our Story</span>
-                <h2 class="gradient-text">Born in Oakland,<br>Crafted with Love</h2>
-                <p>
-                    SkyyRose emerged from the vibrant streets of Oakland, where authenticity isn't just valued—it's essential. 
-                    Founded with a vision to bridge the gap between street culture and luxury fashion, we create pieces that 
-                    tell stories.
-                </p>
-                <p>
-                    The name "Love Hurts" carries deep meaning—it's our founder's family name, Hurts, woven into the 
-                    fabric of every piece. This personal connection infuses each collection with genuine emotion and 
-                    uncompromising quality.
-                </p>
-                <a href="about.html" class="btn btn-outline btn-magnetic">Learn More</a>
-            </div>
-            <div class="brand-story-visual reveal-right"></div>
+    <section class="collections" style="background: #111;">
+        <div class="section-header reveal">
+            <span class="section-label luxury-label">Our Story</span>
+            <h2 class="section-title gradient-text">Born in Oakland, Crafted with Love</h2>
+            <p class="section-subtitle luxury-body">
+                SkyyRose emerged from the vibrant streets of Oakland, where authenticity
+                isn't just valued — it's essential. The name "Love Hurts" carries deep
+                meaning — it's our founder's family name, Hurts, woven into the fabric
+                of every piece.
+            </p>
+        </div>
+        <div style="text-align:center;">
+            <a href="about.html" class="btn btn-outline">Learn Our Story</a>
         </div>
     </section>
 
@@ -1057,9 +148,9 @@
             <span class="section-label luxury-label">Stay Connected</span>
             <h2 class="gradient-text">Join the SkyyRose Family</h2>
             <p class="luxury-body">Be the first to know about new drops, exclusive offers, and behind-the-scenes content.</p>
-            <form class="newsletter-form">
+            <form class="newsletter-form" id="newsletter-form">
                 <input type="email" placeholder="Enter your email" required class="luxury-input">
-                <button type="submit" class="btn btn-primary btn-luxury btn-luxury-primary">Subscribe</button>
+                <button type="submit" class="btn btn-primary">Subscribe</button>
             </form>
         </div>
     </section>
@@ -1077,6 +168,7 @@
                     <li><a href="collections/black-rose.html">Black Rose</a></li>
                     <li><a href="collections/love-hurts.html">Love Hurts</a></li>
                     <li><a href="collections/signature.html">Signature</a></li>
+                    <li><a href="collections/kids-capsule.html">Kids Capsule</a></li>
                     <li><a href="pre-order.html">Pre-Order</a></li>
                 </ul>
             </div>
@@ -1086,13 +178,12 @@
                     <li><a href="about.html">About Us</a></li>
                     <li><a href="blog.html">Journal</a></li>
                     <li><a href="contact.html">Contact</a></li>
-                    <li><a href="#">Careers</a></li>
                 </ul>
             </div>
             <div class="footer-column">
                 <h4 class="footer-title">Support</h4>
                 <ul class="footer-links">
-                    <li><a href="#">Shipping & Returns</a></li>
+                    <li><a href="#">Shipping &amp; Returns</a></li>
                     <li><a href="#">Size Guide</a></li>
                     <li><a href="#">FAQ</a></li>
                     <li><a href="#">Track Order</a></li>
@@ -1117,10 +208,242 @@
         </div>
     </footer>
 
+    <!-- ═══════════════════════════════════════════
+         Three.js Portal Scene
+         ═══════════════════════════════════════════ -->
+    <script type="module">
+    import * as THREE from 'three';
+
+    const PORTALS = [
+        { name: 'SIGNATURE',  color: 0xD4AF37, glow: 0xD4AF37, url: 'collections/signature.html',  pos: [0, 0.6, 0] },
+        { name: 'BLACK ROSE', color: 0xC0C0C0, glow: 0xDC143C, url: 'collections/black-rose.html', pos: [-1.8, -0.8, 0] },
+        { name: 'LOVE HURTS', color: 0xDC143C, glow: 0x2D0A1F, url: 'collections/love-hurts.html', pos: [1.8, -0.8, 0] }
+    ];
+
+    const canvas = document.getElementById('hero-canvas');
+    const fallback = document.getElementById('hero-fallback');
+    const label = document.getElementById('portal-label');
+
+    // WebGL check
+    function hasWebGL() {
+        try {
+            const c = document.createElement('canvas');
+            return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
+        } catch (e) { return false; }
+    }
+
+    if (!hasWebGL()) {
+        canvas.style.display = 'none';
+        fallback.classList.add('active');
+    } else {
+        initScene();
+    }
+
+    function initScene() {
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0x0A0A0A);
+
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x0A0A0A, 0.25);
+
+        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 0, 5);
+
+        // Lighting
+        const ambient = new THREE.AmbientLight(0x111111, 1.0);
+        scene.add(ambient);
+
+        PORTALS.forEach(p => {
+            const pt = new THREE.PointLight(p.color, 0.6, 8);
+            pt.position.set(p.pos[0], p.pos[1], 1.5);
+            scene.add(pt);
+        });
+
+        // Rose-gold particle field
+        const particleCount = 2000;
+        const pGeo = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const velocities = new Float32Array(particleCount * 3);
+        for (let i = 0; i < particleCount; i++) {
+            const i3 = i * 3;
+            positions[i3]     = (Math.random() - 0.5) * 10;
+            positions[i3 + 1] = (Math.random() - 0.5) * 8;
+            positions[i3 + 2] = (Math.random() - 0.5) * 6;
+            velocities[i3]     = (Math.random() - 0.5) * 0.002;
+            velocities[i3 + 1] = (Math.random() - 0.5) * 0.002;
+            velocities[i3 + 2] = (Math.random() - 0.5) * 0.001;
+        }
+        pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        const pMat = new THREE.PointsMaterial({
+            color: 0xB76E79,
+            size: 0.025,
+            transparent: true,
+            opacity: 0.7,
+            sizeAttenuation: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+        const particles = new THREE.Points(pGeo, pMat);
+        scene.add(particles);
+
+        // Brand text plane (simple approach: a glowing plane with SKYYROSE)
+        const textCanvas = document.createElement('canvas');
+        textCanvas.width = 1024; textCanvas.height = 256;
+        const ctx = textCanvas.getContext('2d');
+        ctx.fillStyle = 'transparent'; ctx.fillRect(0, 0, 1024, 256);
+        ctx.font = '700 120px Cinzel, serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        const grad = ctx.createLinearGradient(200, 0, 824, 256);
+        grad.addColorStop(0, '#FFFFFF');
+        grad.addColorStop(0.5, '#B76E79');
+        grad.addColorStop(1, '#D4AF37');
+        ctx.fillStyle = grad;
+        ctx.fillText('SKYYROSE', 512, 128);
+        const textTex = new THREE.CanvasTexture(textCanvas);
+        const textMat = new THREE.MeshBasicMaterial({ map: textTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
+        const textMesh = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 1.1), textMat);
+        textMesh.position.set(0, 2.2, -1);
+        scene.add(textMesh);
+
+        // Portal rings
+        const portalMeshes = [];
+        PORTALS.forEach(p => {
+            const group = new THREE.Group();
+            // Outer ring
+            const ringGeo = new THREE.TorusGeometry(0.55, 0.04, 24, 64);
+            const ringMat = new THREE.MeshStandardMaterial({
+                color: p.color, emissive: p.color, emissiveIntensity: 0.6,
+                metalness: 0.8, roughness: 0.2, transparent: true, opacity: 0.9
+            });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            group.add(ring);
+
+            // Inner glow disc
+            const discGeo = new THREE.CircleGeometry(0.45, 48);
+            const discMat = new THREE.MeshBasicMaterial({
+                color: p.glow, transparent: true, opacity: 0.12,
+                blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false
+            });
+            const disc = new THREE.Mesh(discGeo, discMat);
+            group.add(disc);
+
+            // Second ring for depth
+            const ring2Geo = new THREE.TorusGeometry(0.48, 0.02, 16, 48);
+            const ring2Mat = new THREE.MeshStandardMaterial({
+                color: p.glow, emissive: p.glow, emissiveIntensity: 0.4,
+                transparent: true, opacity: 0.5
+            });
+            const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
+            ring2.rotation.x = 0.3;
+            group.add(ring2);
+
+            group.position.set(p.pos[0], p.pos[1], p.pos[2]);
+            group.userData = { name: p.name, url: p.url, baseScale: 1.0 };
+            scene.add(group);
+            portalMeshes.push(group);
+        });
+
+        // Raycaster
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let hoveredPortal = null;
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            label.style.left = (e.clientX + 16) + 'px';
+            label.style.top  = (e.clientY - 16) + 'px';
+        });
+
+        canvas.addEventListener('click', () => {
+            if (hoveredPortal) {
+                window.location.href = hoveredPortal.userData.url;
+            }
+        });
+
+        canvas.style.cursor = 'default';
+
+        // Resize
+        function onResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        window.addEventListener('resize', onResize);
+
+        // Animation loop
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const t = clock.getElapsedTime();
+
+            // Float particles
+            const pos = particles.geometry.attributes.position.array;
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                pos[i3]     += velocities[i3];
+                pos[i3 + 1] += velocities[i3 + 1];
+                pos[i3 + 2] += velocities[i3 + 2];
+                if (Math.abs(pos[i3]) > 5) velocities[i3] *= -1;
+                if (Math.abs(pos[i3 + 1]) > 4) velocities[i3 + 1] *= -1;
+                if (Math.abs(pos[i3 + 2]) > 3) velocities[i3 + 2] *= -1;
+            }
+            particles.geometry.attributes.position.needsUpdate = true;
+
+            // Animate portals: gentle bob + pulse
+            portalMeshes.forEach((g, i) => {
+                const offset = i * 2.1;
+                g.rotation.z = Math.sin(t * 0.5 + offset) * 0.1;
+                g.position.y = PORTALS[i].pos[1] + Math.sin(t * 0.7 + offset) * 0.08;
+                const pulse = 1.0 + Math.sin(t * 1.5 + offset) * 0.04;
+                const targetScale = (hoveredPortal === g) ? 1.18 : 1.0;
+                g.userData.baseScale += (targetScale - g.userData.baseScale) * 0.08;
+                const s = g.userData.baseScale * pulse;
+                g.scale.set(s, s, s);
+                // Pulse inner disc opacity
+                g.children[1].material.opacity = 0.10 + Math.sin(t * 2 + offset) * 0.06;
+            });
+
+            // Text subtle breathe
+            textMesh.material.opacity = 0.85 + Math.sin(t * 0.8) * 0.15;
+
+            // Raycast
+            raycaster.setFromCamera(mouse, camera);
+            const allChildren = portalMeshes.flatMap(g => g.children.map(c => ({ mesh: c, group: g })));
+            const intersects = raycaster.intersectObjects(allChildren.map(o => o.mesh));
+            if (intersects.length > 0) {
+                const hit = allChildren.find(o => o.mesh === intersects[0].object);
+                if (hit) {
+                    hoveredPortal = hit.group;
+                    canvas.style.cursor = 'pointer';
+                    label.textContent = hoveredPortal.userData.name;
+                    label.classList.add('visible');
+                } else {
+                    hoveredPortal = null;
+                    canvas.style.cursor = 'default';
+                    label.classList.remove('visible');
+                }
+            } else {
+                hoveredPortal = null;
+                canvas.style.cursor = 'default';
+                label.classList.remove('visible');
+            }
+
+            renderer.render(scene, camera);
+        }
+        animate();
+    }
+    </script>
+
+    <!-- Page Logic -->
     <script>
         // Navbar scroll effect
-        window.addEventListener('scroll', () => {
-            const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', function() {
+            var navbar = document.getElementById('navbar');
             if (window.scrollY > 50) {
                 navbar.classList.add('scrolled');
             } else {
@@ -1128,37 +451,33 @@
             }
         });
 
-        // Cart functionality
-        let cart = JSON.parse(localStorage.getItem('skyyrose_cart')) || [];
-        
-        function updateCartCount() {
-            document.getElementById('cartCount').textContent = cart.length;
-        }
-        
-        updateCartCount();
+        // Cart
+        var cart = JSON.parse(localStorage.getItem('skyyrose_cart')) || [];
+        document.getElementById('cartCount').textContent = cart.length;
 
         // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
+        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+            anchor.addEventListener('click', function(e) {
                 e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+                var target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
             });
         });
 
-        // Collection cards hover animation already handled by CSS
-        
-        // Newsletter form
-        document.querySelector('.newsletter-form').addEventListener('submit', (e) => {
+        // Newsletter
+        document.getElementById('newsletter-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            const email = e.target.querySelector('input').value;
-            alert(`Thank you for subscribing with ${email}! Welcome to the SkyyRose family.`);
+            var email = e.target.querySelector('input').value;
+            var toast = document.createElement('div');
+            toast.textContent = 'Welcome to the SkyyRose family.';
+            toast.style.cssText = 'position:fixed;bottom:2rem;right:2rem;background:rgba(183,110,121,0.95);color:#fff;padding:1rem 2rem;border-radius:4px;font-size:0.85rem;z-index:9999;animation:fadeIn 0.3s ease';
+            document.body.appendChild(toast);
+            setTimeout(function() { toast.remove(); }, 3000);
             e.target.reset();
         });
     </script>
 
-    <!-- Luxury Animations -->
+    <!-- GSAP Scroll Animations -->
     <script src="assets/js/luxury-animations.js"></script>
 </body>
 </html>

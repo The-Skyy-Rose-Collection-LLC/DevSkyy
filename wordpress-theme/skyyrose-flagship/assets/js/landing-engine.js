@@ -182,23 +182,40 @@
 		var notifications = toastData[collection] || [];
 
 		if (notifications.length > 0) {
-			// Create toast element
+			// Create toast element using safe DOM construction
 			var toast = document.createElement('div');
 			toast.className = 'lp-toast';
 			toast.setAttribute('role', 'status');
 			toast.setAttribute('aria-live', 'polite');
-			toast.innerHTML =
-				'<span class="lp-toast__icon">\u2714</span>' +
-				'<div class="lp-toast__body">' +
-				'<div class="lp-toast__text"></div>' +
-				'<div class="lp-toast__time"></div>' +
-				'</div>' +
-				'<button class="lp-toast__close" aria-label="Dismiss notification">\u00D7</button>';
+
+			var toastIcon = document.createElement('span');
+			toastIcon.className = 'lp-toast__icon';
+			toastIcon.textContent = '\u2714';
+			toast.appendChild(toastIcon);
+
+			var toastBody = document.createElement('div');
+			toastBody.className = 'lp-toast__body';
+
+			var toastTextEl = document.createElement('div');
+			toastTextEl.className = 'lp-toast__text';
+			toastBody.appendChild(toastTextEl);
+
+			var toastTimeEl = document.createElement('div');
+			toastTimeEl.className = 'lp-toast__time';
+			toastBody.appendChild(toastTimeEl);
+
+			toast.appendChild(toastBody);
+
+			var closeBtn = document.createElement('button');
+			closeBtn.className = 'lp-toast__close';
+			closeBtn.setAttribute('aria-label', 'Dismiss notification');
+			closeBtn.textContent = '\u00D7';
+			toast.appendChild(closeBtn);
+
 			document.body.appendChild(toast);
 
-			var toastText = toast.querySelector('.lp-toast__text');
-			var toastTime = toast.querySelector('.lp-toast__time');
-			var closeBtn = toast.querySelector('.lp-toast__close');
+			var toastText = toastTextEl;
+			var toastTime = toastTimeEl;
 			var toastIndex = 0;
 			var toastTimer = null;
 			var hideTimer = null;
@@ -206,9 +223,14 @@
 			function showToast() {
 				var item = notifications[toastIndex % notifications.length];
 				var minutes = Math.floor(Math.random() * 18) + 2; // 2-20 minutes ago
-				toastText.innerHTML =
-					'<strong>' + item.name + '</strong> from ' + item.city +
-					' just ordered the <strong>' + item.product + '</strong>';
+				toastText.textContent = ''; // Clear safely.
+				var nameStrong = document.createElement('strong');
+				nameStrong.textContent = item.name;
+				var productStrong = document.createElement('strong');
+				productStrong.textContent = item.product;
+				toastText.appendChild(nameStrong);
+				toastText.appendChild(document.createTextNode(' from ' + item.city + ' just ordered the '));
+				toastText.appendChild(productStrong);
 				toastTime.textContent = minutes + ' min ago';
 				toast.classList.add('visible');
 
@@ -247,11 +269,18 @@
 		stickyBar.className = 'lp-sticky-cta';
 		stickyBar.setAttribute('role', 'complementary');
 		stickyBar.setAttribute('aria-label', 'Quick shop');
-		stickyBar.innerHTML =
-			'<span class="lp-sticky-cta__label">' +
-			(collectionNames[collection] || 'SKYYROSE') +
-			'</span>' +
-			'<a href="#products" class="lp-sticky-cta__btn">Shop Now</a>';
+
+		var stickyLabel = document.createElement('span');
+		stickyLabel.className = 'lp-sticky-cta__label';
+		stickyLabel.textContent = collectionNames[collection] || 'SKYYROSE';
+		stickyBar.appendChild(stickyLabel);
+
+		var stickyBtn = document.createElement('a');
+		stickyBtn.href = '#products';
+		stickyBtn.className = 'lp-sticky-cta__btn';
+		stickyBtn.textContent = 'Shop Now';
+		stickyBar.appendChild(stickyBtn);
+
 		document.body.appendChild(stickyBar);
 
 		var hero = document.querySelector('.lp-hero');
@@ -268,7 +297,7 @@
 		}
 
 		// Smooth scroll to products section
-		stickyBar.querySelector('.lp-sticky-cta__btn').addEventListener('click', function (e) {
+		stickyBtn.addEventListener('click', function (e) {
 			var target = document.querySelector('#products');
 			if (target) {
 				e.preventDefault();

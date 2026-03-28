@@ -234,22 +234,50 @@
             var others = items.filter(function(p) { return p.id !== currentId; });
 
             if (others.length > 0) {
-                var html = '';
+                rvGrid.textContent = ''; // Clear existing content safely.
                 others.slice(0, 6).forEach(function(p) {
-                    html += '<a href="' + p.url + '" class="sr-rv-card">' +
-                        '<div class="sr-rv-img">' +
-                            (p.image ?
-                                '<img src="' + p.image + '" alt="' + p.name + '" loading="lazy">' :
-                                '<span class="sr-rv-letter">' + p.name.charAt(0) + '</span>') +
-                            '<span class="sr-rv-badge">' + p.badge + '</span>' +
-                        '</div>' +
-                        '<div class="sr-rv-body">' +
-                            '<h3 class="sr-rv-name">' + p.name + '</h3>' +
-                            '<span class="sr-rv-price">' + p.price + '</span>' +
-                        '</div>' +
-                    '</a>';
+                    var card = document.createElement('a');
+                    card.href = p.url;
+                    card.className = 'sr-rv-card';
+
+                    var imgWrap = document.createElement('div');
+                    imgWrap.className = 'sr-rv-img';
+
+                    if (p.image) {
+                        var img = document.createElement('img');
+                        img.src = p.image;
+                        img.alt = p.name;
+                        img.loading = 'lazy';
+                        imgWrap.appendChild(img);
+                    } else {
+                        var letter = document.createElement('span');
+                        letter.className = 'sr-rv-letter';
+                        letter.textContent = p.name.charAt(0);
+                        imgWrap.appendChild(letter);
+                    }
+
+                    var badge = document.createElement('span');
+                    badge.className = 'sr-rv-badge';
+                    badge.textContent = p.badge;
+                    imgWrap.appendChild(badge);
+
+                    var body = document.createElement('div');
+                    body.className = 'sr-rv-body';
+
+                    var name = document.createElement('h3');
+                    name.className = 'sr-rv-name';
+                    name.textContent = p.name;
+                    body.appendChild(name);
+
+                    var price = document.createElement('span');
+                    price.className = 'sr-rv-price';
+                    price.textContent = p.price;
+                    body.appendChild(price);
+
+                    card.appendChild(imgWrap);
+                    card.appendChild(body);
+                    rvGrid.appendChild(card);
                 });
-                rvGrid.innerHTML = html;
                 rvSection.style.display = '';
             }
         } catch (e) { /* parse error — section stays hidden */ }

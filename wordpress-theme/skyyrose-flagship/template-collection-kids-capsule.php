@@ -2,325 +2,265 @@
 /**
  * Template Name: Collection - Kids Capsule
  *
- * KIDS CAPSULE collection page — Playful energy with floating stars/bubbles,
- * pink (#FFB6C1) and lavender (#E6E6FA) palette, rounded cards.
+ * Standalone catalog page for the KIDS CAPSULE collection.
+ * Rose-gold (#B76E79) on warm charcoal (#1A1A1A) — dark luxury, not playful.
  *
  * @package SkyyRose_Flagship
- * @since   3.0.0
+ * @since   5.0.0
  */
 
 defined( 'ABSPATH' ) || exit;
 
-get_header();
+/* ------------------------------------------------------------------
+   Product catalog — WooCommerce first, static fallback
+   ------------------------------------------------------------------ */
+$skyyrose_kc_products = array();
 
-/**
- * Build the KIDS CAPSULE product catalog.
- *
- * Attempts a WooCommerce query first; falls back to the static catalog
- * defined in the PRD so the page is never empty.
- *
- * @return array<int, array{sku:string, name:string, price:string, desc:string, badge:string, url:string, image:string}>
- */
-if ( ! function_exists( 'skyyrose_get_kids_capsule_products' ) ) :
-function skyyrose_get_kids_capsule_products() {
+if ( function_exists( 'wc_get_products' ) ) {
+	$skyyrose_kc_wc = wc_get_products( array(
+		'limit'    => 10,
+		'category' => array( 'kids-capsule' ),
+		'status'   => 'publish',
+		'orderby'  => 'menu_order',
+		'order'    => 'ASC',
+	) );
 
-	$static_products = array(
-		array(
-			'sku'   => 'kids-001',
-			'name'  => __( 'Kids Colorblock Hoodie Set — Purple/Pink', 'skyyrose-flagship' ),
-			'price' => '$65',
-			'desc'  => __( 'Cozy colorblock hoodie and jogger set in playful purple and pink', 'skyyrose-flagship' ),
-			'badge' => __( 'New', 'skyyrose-flagship' ),
-			'url'   => home_url( '/pre-order/' ),
-			'image' => SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg',
-		),
-		array(
-			'sku'   => 'kids-002',
-			'name'  => __( 'Kids Colorblock Hoodie Set — Black/Red/White', 'skyyrose-flagship' ),
-			'price' => '$65',
-			'desc'  => __( 'Bold colorblock hoodie and jogger set in classic black, red, and white', 'skyyrose-flagship' ),
-			'badge' => __( 'New', 'skyyrose-flagship' ),
-			'url'   => home_url( '/pre-order/' ),
-			'image' => SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg',
-		),
-	);
-
-	if ( ! function_exists( 'wc_get_products' ) ) {
-		return $static_products;
-	}
-
-	$wc_products = wc_get_products(
-		array(
-			'limit'    => 10,
-			'category' => array( 'kids-capsule' ),
-			'status'   => 'publish',
-			'orderby'  => 'menu_order',
-			'order'    => 'ASC',
-		)
-	);
-
-	if ( empty( $wc_products ) ) {
-		return $static_products;
-	}
-
-	$products = array();
-	foreach ( $wc_products as $wc_product ) {
-		$products[] = array(
-			'sku'   => $wc_product->get_sku(),
-			'name'  => $wc_product->get_name(),
-			'price' => $wc_product->get_price_html(),
-			'desc'  => wp_strip_all_tags( $wc_product->get_short_description() ),
-			'badge' => $wc_product->get_meta( '_collection_badge' ),
-			'url'   => get_permalink( $wc_product->get_id() ),
-			'image' => wp_get_attachment_url( $wc_product->get_image_id() ),
+	foreach ( $skyyrose_kc_wc as $skyyrose_wc_item ) {
+		$skyyrose_kc_products[] = array(
+			'product'   => $skyyrose_wc_item,
+			'sku'       => $skyyrose_wc_item->get_sku(),
+			'name'      => $skyyrose_wc_item->get_name(),
+			'price'     => $skyyrose_wc_item->get_price_html(),
+			'desc'      => wp_strip_all_tags( $skyyrose_wc_item->get_short_description() ),
+			'badge'     => $skyyrose_wc_item->get_meta( '_collection_badge' ),
+			'url'       => get_permalink( $skyyrose_wc_item->get_id() ),
+			'image_url' => wp_get_attachment_image_url( $skyyrose_wc_item->get_image_id(), 'large' ),
 		);
 	}
-
-	return $products;
 }
-endif;
 
-$skyyrose_kc_products   = skyyrose_get_kids_capsule_products();
-$skyyrose_kc_shop_url   = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : '/shop';
-$skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg' );
+/* Static fallback when WooCommerce is absent or category is empty */
+if ( empty( $skyyrose_kc_products ) ) {
+	$skyyrose_kc_preorder = home_url( '/pre-order/' );
+	$skyyrose_kc_products = array(
+		array(
+			'product'   => null,
+			'sku'       => 'kids-001',
+			'name'      => __( 'Kids Colorblock Hoodie Set — Purple/Pink', 'skyyrose-flagship' ),
+			'price'     => '$55',
+			'desc'      => __( 'Luxury colorblock hoodie and jogger set in deep purple and rose-gold', 'skyyrose-flagship' ),
+			'badge'     => __( 'New', 'skyyrose-flagship' ),
+			'url'       => $skyyrose_kc_preorder,
+			'image_url' => '',
+		),
+		array(
+			'product'   => null,
+			'sku'       => 'kids-002',
+			'name'      => __( 'Kids Colorblock Hoodie Set — Black/Red/White', 'skyyrose-flagship' ),
+			'price'     => '$55',
+			'desc'      => __( 'Bold colorblock hoodie and jogger set in classic black, red, and white', 'skyyrose-flagship' ),
+			'badge'     => __( 'New', 'skyyrose-flagship' ),
+			'url'       => $skyyrose_kc_preorder,
+			'image_url' => '',
+		),
+		array(
+			'product'   => null,
+			'sku'       => 'kids-003',
+			'name'      => __( 'Mini Rose Classic Tee', 'skyyrose-flagship' ),
+			'price'     => '$35',
+			'desc'      => __( 'Premium classic tee with Mini Rose branding', 'skyyrose-flagship' ),
+			'badge'     => '',
+			'url'       => $skyyrose_kc_preorder,
+			'image_url' => '',
+		),
+		array(
+			'product'   => null,
+			'sku'       => 'kids-004',
+			'name'      => __( 'Little Legend Joggers', 'skyyrose-flagship' ),
+			'price'     => '$45',
+			'desc'      => __( 'Dark-luxury joggers built for the next generation', 'skyyrose-flagship' ),
+			'badge'     => '',
+			'url'       => $skyyrose_kc_preorder,
+			'image_url' => '',
+		),
+	);
+}
+
+$skyyrose_kc_count = count( $skyyrose_kc_products );
+$skyyrose_kc_cart  = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' );
+
+/* Cross-collection navigation */
+$skyyrose_kc_collections = array(
+	array(
+		'slug'  => 'collection-signature',
+		'name'  => __( 'Signature', 'skyyrose-flagship' ),
+		'desc'  => __( 'The Foundation', 'skyyrose-flagship' ),
+		'class' => 'kc-cross__link--signature',
+	),
+	array(
+		'slug'  => 'collection-black-rose',
+		'name'  => __( 'Black Rose', 'skyyrose-flagship' ),
+		'desc'  => __( 'Dark Elegance', 'skyyrose-flagship' ),
+		'class' => 'kc-cross__link--black-rose',
+	),
+	array(
+		'slug'  => 'collection-love-hurts',
+		'name'  => __( 'Love Hurts', 'skyyrose-flagship' ),
+		'desc'  => __( 'Crimson Rebellion', 'skyyrose-flagship' ),
+		'class' => 'kc-cross__link--love-hurts',
+	),
+);
+
+get_header();
 ?>
 
-<main id="primary" class="site-main" role="main" tabindex="-1">
-<div class="collection--kids-capsule" data-collection="kids-capsule">
+<main id="primary" class="site-main kc-page" role="main" tabindex="-1">
 
 	<!-- ============================================================
-	     HERO SECTION
+	     HERO — Rose-gold radial gradient
 	     ============================================================ -->
-	<section class="collection-hero" aria-label="<?php esc_attr_e( 'Kids Capsule Hero', 'skyyrose-flagship' ); ?>">
-		<div class="collection-hero__overlay" aria-hidden="true"></div>
-
-		<div class="collection-hero__content fade-in-up">
-			<span class="collection-hero__badge">
-				<?php echo esc_html__( 'SKyyRose Flagship', 'skyyrose-flagship' ); ?>
+	<section class="kc-hero" aria-label="<?php esc_attr_e( 'Kids Capsule Hero', 'skyyrose-flagship' ); ?>">
+		<div class="kc-hero__bg" aria-hidden="true"></div>
+		<div class="kc-hero__content kc-fade-up" id="kc-hero-content">
+			<span class="kc-hero__badge">
+				<?php esc_html_e( 'New Collection', 'skyyrose-flagship' ); ?>
 			</span>
-
-			<h1 class="collection-hero__title">
-				<?php echo esc_html__( 'KIDS CAPSULE', 'skyyrose-flagship' ); ?>
+			<h1 class="kc-hero__title">
+				<span><?php esc_html_e( 'KIDS CAPSULE', 'skyyrose-flagship' ); ?></span>
 			</h1>
-
-			<p class="collection-hero__subtitle">
-				<?php echo esc_html__( 'Little Legends, Big Style', 'skyyrose-flagship' ); ?>
+			<p class="kc-hero__subtitle">
+				<?php esc_html_e( 'Luxury runs in the family. Premium streetwear for the next generation — powerful, elevated, and born into legacy.', 'skyyrose-flagship' ); ?>
 			</p>
-
-			<p class="collection-hero__tagline">
-				<?php echo esc_html__( 'Playful Luxury for Growing Stars', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<a href="#kids-capsule-products" class="collection-hero__cta">
-				<?php echo esc_html__( 'Shop for Kids', 'skyyrose-flagship' ); ?>
+			<a href="#kc-products" class="kc-hero__cta">
+				<?php esc_html_e( 'Shop the Collection', 'skyyrose-flagship' ); ?>
 			</a>
 		</div>
-
-		<!-- Floating stars and bubbles injected by collections.js -->
 	</section>
 
 	<!-- ============================================================
-	     BRAND MASCOT — PRIMARY MASCOT PLACEMENT
+	     BRAND STORY — "Born Into Luxury" + KC monogram
 	     ============================================================ -->
-	<section class="collection-mascot" id="kids-capsule-mascot" aria-label="<?php esc_attr_e( 'Meet Our SkyyRose Mascot', 'skyyrose-flagship' ); ?>">
-		<div class="collection-mascot__inner fade-in-up">
-			<div class="collection-mascot__image-wrap">
-				<?php
-				$mascot_path = SKYYROSE_DIR . '/assets/images/mascot/';
-				$mascot_url  = SKYYROSE_ASSETS_URI . '/images/mascot/';
-				$mascot_ref  = $mascot_url . 'skyyrose-mascot-kids-capsule.png';
-				$mascot_fallback = $mascot_url . 'skyyrose-mascot-reference.png';
-				$mascot_src  = file_exists( $mascot_path . 'skyyrose-mascot-kids-capsule.png' )
-					? $mascot_ref
-					: ( file_exists( $mascot_path . 'skyyrose-mascot-reference.png' ) ? $mascot_fallback : '' );
-				if ( $mascot_src ) : ?>
-					<img
-						src="<?php echo esc_url( $mascot_src ); ?>"
-						alt="<?php esc_attr_e( 'SkyyRose brand mascot wearing Kids Capsule collection', 'skyyrose-flagship' ); ?>"
-						class="collection-mascot__image"
-						width="400"
-						height="500"
-						loading="lazy"
-						decoding="async"
-					/>
-				<?php else : ?>
-					<div class="collection-mascot__placeholder" aria-hidden="true">
-						<svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#FFB6C1" stroke-width="1" stroke-linecap="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
-					</div>
-				<?php endif; ?>
-			</div>
-			<div class="collection-mascot__content">
-				<h2 class="collection-mascot__heading">
-					<?php echo esc_html__( 'Meet Your Style Guide!', 'skyyrose-flagship' ); ?>
+	<section class="kc-story" aria-labelledby="kc-story-heading">
+		<div class="kc-story__inner">
+			<div class="kc-story__text kc-fade-left" id="kc-story-text">
+				<h2 id="kc-story-heading">
+					<?php esc_html_e( 'The Next Generation of', 'skyyrose-flagship' ); ?>
+					<span><?php esc_html_e( 'SkyyRose', 'skyyrose-flagship' ); ?></span>
 				</h2>
-				<p class="collection-mascot__text">
-					<?php echo esc_html__( 'Our SkyyRose mascot is here to help you explore the Kids Capsule collection. She wears every piece with confidence and style — just like your little one will!', 'skyyrose-flagship' ); ?>
+				<p>
+					<?php esc_html_e( 'Born into luxury, built for the bold. Kids Capsule carries the same uncompromising vision that defines every SkyyRose collection — distilled for the youngest members of the family.', 'skyyrose-flagship' ); ?>
 				</p>
-				<a href="#kids-capsule-products" class="collection-mascot__cta">
-					<?php echo esc_html__( 'Explore Her Favorites', 'skyyrose-flagship' ); ?> &rarr;
-				</a>
+				<p>
+					<?php esc_html_e( 'No pastels. No cartoons. This is real streetwear scaled down, not dumbed down. Every piece is crafted with the same premium materials and dark elegance that the brand was built on.', 'skyyrose-flagship' ); ?>
+				</p>
+				<p>
+					<?php esc_html_e( 'Because legacy is not inherited. It is worn.', 'skyyrose-flagship' ); ?>
+				</p>
 			</div>
+			<div class="kc-story__visual kc-fade-right" id="kc-story-visual" aria-hidden="true"></div>
 		</div>
 	</section>
 
 	<!-- ============================================================
-	     COLLECTION STORY
+	     PRODUCT GRID — Holo cards with data-collection
 	     ============================================================ -->
-	<section class="collection-story" id="kids-capsule-story" aria-labelledby="kids-capsule-story-heading">
-		<div class="collection-story__inner fade-in-up">
-			<span class="collection-story__label">
-				<?php echo esc_html__( 'The Story', 'skyyrose-flagship' ); ?>
-			</span>
-
-			<h2 id="kids-capsule-story-heading" class="collection-story__heading">
-				<?php echo esc_html__( 'Where Fun Meets Fashion', 'skyyrose-flagship' ); ?>
-			</h2>
-
-			<p class="collection-story__text">
-				<?php echo esc_html__( 'The KIDS CAPSULE brings the SKyyRose spirit to the youngest members of the family. We believe great style starts early — and comfort should never be compromised. These pieces are designed to keep up with the energy, imagination, and joy of growing up.', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<p class="collection-story__text">
-				<?php echo esc_html__( 'Soft fabrics, vibrant colors, and playful designs that make getting dressed the best part of the day. Because every kid deserves to feel like a star.', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<div class="collection-story__divider" aria-hidden="true"></div>
-		</div>
-	</section>
-
-	<!-- ============================================================
-	     PRODUCT GRID
-	     ============================================================ -->
-	<section id="kids-capsule-products" class="collection-products" aria-labelledby="kids-products-heading">
-		<div class="collection-products__header fade-in-up">
-			<span class="collection-products__label">
+	<section class="kc-products" id="kc-products" aria-labelledby="kc-products-heading">
+		<div class="kc-products__header">
+			<h2 id="kc-products-heading">
 				<?php esc_html_e( 'The Collection', 'skyyrose-flagship' ); ?>
-			</span>
-
-			<h2 id="kids-products-heading" class="collection-products__title">
-				<?php esc_html_e( 'KIDS CAPSULE Pieces', 'skyyrose-flagship' ); ?>
 			</h2>
-
-			<p class="collection-products__count">
+			<p>
 				<?php
-				/* translators: %d: number of products in the collection */
-				printf( esc_html__( '%d Pieces', 'skyyrose-flagship' ), count( $skyyrose_kc_products ) );
+				printf(
+					/* translators: %d: number of products */
+					esc_html( _n( '%d Piece', '%d Pieces', $skyyrose_kc_count, 'skyyrose-flagship' ) ),
+					$skyyrose_kc_count
+				);
+				echo ' &middot; ';
+				esc_html_e( 'Limited Run', 'skyyrose-flagship' );
 				?>
 			</p>
 		</div>
 
-		<div class="holo-grid holo-grid--2">
+		<div class="product-grid" data-collection="kids-capsule">
 			<?php
-			$skyyrose_idx = 0;
-			foreach ( $skyyrose_kc_products as $skyyrose_product ) :
+			$skyyrose_kc_idx = 0;
+			foreach ( $skyyrose_kc_products as $skyyrose_kc_item ) :
 				get_template_part( 'template-parts/product-card-holo', null, array(
-					'title'      => $skyyrose_product['name'],
-					'price'      => $skyyrose_product['price'],
-					'image_url'  => ! empty( $skyyrose_product['image'] ) ? $skyyrose_product['image'] : $skyyrose_kc_placeholder,
-					'permalink'  => isset( $skyyrose_product['url'] ) ? $skyyrose_product['url'] : '#',
+					'product'    => $skyyrose_kc_item['product'] ?? null,
+					'title'      => $skyyrose_kc_item['name'],
+					'price'      => $skyyrose_kc_item['price'],
+					'image_url'  => $skyyrose_kc_item['image_url'],
+					'permalink'  => $skyyrose_kc_item['url'],
 					'collection' => 'kids-capsule',
-					'badge_text' => ! empty( $skyyrose_product['badge'] ) ? $skyyrose_product['badge'] : '',
-					'desc'       => isset( $skyyrose_product['desc'] ) ? $skyyrose_product['desc'] : '',
-					'sku'        => $skyyrose_product['sku'],
-					'index'      => $skyyrose_idx,
+					'badge_text' => $skyyrose_kc_item['badge'],
+					'desc'       => $skyyrose_kc_item['desc'],
+					'sku'        => $skyyrose_kc_item['sku'],
+					'index'      => $skyyrose_kc_idx,
 				) );
-				$skyyrose_idx++;
+				$skyyrose_kc_idx++;
 			endforeach;
 			?>
 		</div>
-		<div style="text-align:center; padding:1rem 0 0;">
-			<button type="button" class="size-guide-trigger" data-open-size-guide aria-label="<?php esc_attr_e( 'Open size guide', 'skyyrose-flagship' ); ?>">
-				<svg class="size-guide-trigger__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2v20M18 2v20M6 12h12M6 7h12M6 17h12"/></svg>
-				<?php esc_html_e( 'Size Guide', 'skyyrose-flagship' ); ?>
-			</button>
-		</div>
 	</section>
 
 	<!-- ============================================================
-	     PRE-ORDER CTA
+	     CROSS-COLLECTION NAVIGATION
 	     ============================================================ -->
-	<!-- Conversion Intelligence -->
-	<div data-cie-viewers="18" style="text-align:center; padding:1rem 0;"></div>
-	<div data-cie-confidence></div>
-	<div data-cie-preorder-progress style="max-width:480px; margin:0 auto; padding:1rem 2rem;"></div>
-
-	<section class="collection-preorder-cta" aria-label="<?php esc_attr_e( 'Pre-order call to action', 'skyyrose-flagship' ); ?>">
-		<div data-cie-countdown="auto" data-cie-countdown-label="<?php esc_attr_e( 'Pre-Order Window', 'skyyrose-flagship' ); ?>" style="display:flex; justify-content:center; margin-bottom:1.5rem;"></div>
-		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"
-		   class="collection-preorder-cta__btn">
-			<?php echo esc_html__( 'Pre-Order Now', 'skyyrose-flagship' ); ?>
-		</a>
-	</section>
-
-	<!-- ============================================================
-	     CTA BANNER
-	     ============================================================ -->
-	<section class="collection-cta" aria-labelledby="kc-cta-heading">
-		<div class="collection-cta__inner fade-in-up">
-			<h2 id="kc-cta-heading" class="collection-cta__heading">
-				<?php echo esc_html__( 'Dress Them Like Stars', 'skyyrose-flagship' ); ?>
-			</h2>
-
-			<p class="collection-cta__text">
-				<?php echo esc_html__( 'Our Kids Capsule is just getting started. More colorways and styles are on the way. Sign up to be the first to know when new pieces drop.', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<a href="<?php echo esc_url( $skyyrose_kc_shop_url ); ?>"
-			   class="collection-cta__button">
-				<?php echo esc_html__( 'Shop KIDS CAPSULE', 'skyyrose-flagship' ); ?>
-			</a>
-		</div>
-	</section>
-
-	<!-- ============================================================
-	     EXPLORE OTHER COLLECTIONS
-	     ============================================================ -->
-	<section class="collection-explore fade-in-up" aria-labelledby="kids-capsule-explore-heading">
-		<h2 id="kids-capsule-explore-heading" class="collection-explore__heading">
-			<?php echo esc_html__( 'Explore Other Collections', 'skyyrose-flagship' ); ?>
+	<section class="kc-cross" aria-labelledby="kc-cross-heading">
+		<h2 id="kc-cross-heading" class="kc-cross__heading">
+			<?php esc_html_e( 'Explore More Collections', 'skyyrose-flagship' ); ?>
 		</h2>
-
-		<div class="collection-explore__grid">
-			<?php
-			$skyyrose_other_collections = array(
-				array(
-					'slug' => 'collection-black-rose',
-					'name' => __( 'BLACK ROSE', 'skyyrose-flagship' ),
-					'desc' => __( 'Gothic Garden', 'skyyrose-flagship' ),
-				),
-				array(
-					'slug' => 'collection-love-hurts',
-					'name' => __( 'Love Hurts', 'skyyrose-flagship' ),
-					'desc' => __( 'Passionate Drama', 'skyyrose-flagship' ),
-				),
-				array(
-					'slug' => 'collection-signature',
-					'name' => __( 'Signature', 'skyyrose-flagship' ),
-					'desc' => __( 'Elevated Luxury', 'skyyrose-flagship' ),
-				),
-			);
-
-			foreach ( $skyyrose_other_collections as $skyyrose_col ) :
-				$skyyrose_link = home_url( '/' . $skyyrose_col['slug'] . '/' );
-				?>
-				<a href="<?php echo esc_url( $skyyrose_link ); ?>"
-				   class="collection-explore__link"
-				   aria-label="<?php echo esc_attr( sprintf( __( 'Explore the %s collection', 'skyyrose-flagship' ), $skyyrose_col['name'] ) ); ?>">
-					<span class="collection-explore__link-name">
-						<?php echo esc_html( $skyyrose_col['name'] ); ?>
-					</span>
-					<span class="collection-explore__link-desc">
-						<?php echo esc_html( $skyyrose_col['desc'] ); ?>
-					</span>
+		<div class="kc-cross__grid">
+			<?php foreach ( $skyyrose_kc_collections as $skyyrose_kc_col ) : ?>
+				<a href="<?php echo esc_url( home_url( '/' . $skyyrose_kc_col['slug'] . '/' ) ); ?>"
+				   class="kc-cross__link <?php echo esc_attr( $skyyrose_kc_col['class'] ); ?>"
+				   aria-label="<?php echo esc_attr( sprintf(
+					   /* translators: %s: collection name */
+					   __( 'Explore the %s collection', 'skyyrose-flagship' ),
+					   $skyyrose_kc_col['name']
+				   ) ); ?>">
+					<h3><?php echo esc_html( $skyyrose_kc_col['name'] ); ?></h3>
+					<p><?php echo esc_html( $skyyrose_kc_col['desc'] ); ?></p>
 				</a>
 			<?php endforeach; ?>
 		</div>
 	</section>
 
-</div><!-- .collection--kids-capsule -->
-
-<?php get_template_part( 'template-parts/size-guide-modal' ); ?>
-
 </main><!-- #primary -->
+
+<!-- Toast notification for add-to-cart feedback -->
+<div class="kc-toast" id="kc-toast" aria-live="polite"></div>
+
+<script>
+(function () {
+	/* GSAP scroll animations (progressive — no-op if GSAP missing) */
+	if ( typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined' ) { return; }
+	gsap.registerPlugin( ScrollTrigger );
+
+	/* Hero fade-up */
+	gsap.to( '#kc-hero-content', {
+		opacity: 1, y: 0, duration: 1.2, ease: 'power3.out', delay: 0.3
+	} );
+
+	/* Story section */
+	gsap.to( '#kc-story-text', {
+		scrollTrigger: { trigger: '.kc-story', start: 'top 75%', toggleActions: 'play none none none' },
+		opacity: 1, x: 0, duration: 1, ease: 'power3.out'
+	} );
+	gsap.to( '#kc-story-visual', {
+		scrollTrigger: { trigger: '.kc-story', start: 'top 75%', toggleActions: 'play none none none' },
+		opacity: 1, x: 0, duration: 1, ease: 'power3.out', delay: 0.2
+	} );
+
+	/* Cross-collection links stagger */
+	gsap.utils.toArray( '.kc-cross__link' ).forEach( function ( link, i ) {
+		gsap.from( link, {
+			scrollTrigger: { trigger: link, start: 'top 85%', toggleActions: 'play none none none' },
+			opacity: 0, y: 30, duration: 0.8, delay: i * 0.15, ease: 'power3.out'
+		} );
+	} );
+})();
+</script>
 
 <?php get_footer(); ?>

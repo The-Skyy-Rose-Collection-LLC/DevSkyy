@@ -32,8 +32,10 @@
 	transition-delay: var(--holo-delay, 0ms);
 }
 
-.holo--visible {
-	opacity: 1;
+.holo--visible,
+.fx-stagger > .holo--visible,
+.fx-stagger.fx-visible > .holo--visible {
+	opacity: 1 !important;
 	transform: translateY(0);
 }
 
@@ -590,11 +592,23 @@
    13. GRID LAYOUT
    ========================================================================== */
 
-.holo-grid {
+/* Card grid containers — ONLY elements whose direct children are .holo cards */
+.holo-grid,
+.product-grid,
+.product-grid__items,
+.br-product-grid__items {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 	gap: 32px;
 	padding: 0 24px;
+}
+
+/* Non-card children inside .product-grid must span the full row.
+   .product-grid__items is both a grid item (of .product-grid) AND a grid
+   container (for holo cards), so it needs full-width spanning too. */
+.product-grid__header,
+.product-grid__items {
+	grid-column: 1 / -1;
 }
 
 .holo-grid--2 {
@@ -625,9 +639,12 @@
 @media (max-width: 768px) {
 	.holo-grid,
 	.holo-grid--3,
-	.holo-grid--4 {
+	.holo-grid--4,
+	.product-grid,
+	.product-grid__items,
+	.br-product-grid__items {
 		grid-template-columns: repeat(2, 1fr);
-		gap: 16px;
+		gap: 20px;
 		padding: 0 16px;
 	}
 
@@ -667,9 +684,12 @@
 
 @media (max-width: 480px) {
 	.holo-grid,
-	.holo-grid--2 {
+	.holo-grid--2,
+	.product-grid,
+	.product-grid__items,
+	.br-product-grid__items {
 		grid-template-columns: 1fr 1fr;
-		gap: 12px;
+		gap: 14px;
 		padding: 0 12px;
 	}
 

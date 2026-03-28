@@ -2,60 +2,39 @@
 
 ## Immutability (CRITICAL)
 
-ALWAYS create new objects, NEVER mutate:
+ALWAYS create new objects, NEVER mutate existing ones:
 
-```javascript
-// WRONG: Mutation
-function updateUser(user, name) {
-  user.name = name  // MUTATION!
-  return user
-}
-
-// CORRECT: Immutability
-function updateUser(user, name) {
-  return {
-    ...user,
-    name
-  }
-}
 ```
+// Pseudocode
+WRONG:  modify(original, field, value) → changes original in-place
+CORRECT: update(original, field, value) → returns new copy with change
+```
+
+Rationale: Immutable data prevents hidden side effects, makes debugging easier, and enables safe concurrency.
 
 ## File Organization
 
 MANY SMALL FILES > FEW LARGE FILES:
 - High cohesion, low coupling
 - 200-400 lines typical, 800 max
-- Extract utilities from large components
+- Extract utilities from large modules
 - Organize by feature/domain, not by type
 
 ## Error Handling
 
 ALWAYS handle errors comprehensively:
-
-```typescript
-try {
-  const result = await riskyOperation()
-  return result
-} catch (error) {
-  console.error('Operation failed:', error)
-  throw new Error('Detailed user-friendly message')
-}
-```
+- Handle errors explicitly at every level
+- Provide user-friendly error messages in UI-facing code
+- Log detailed error context on the server side
+- Never silently swallow errors
 
 ## Input Validation
 
-ALWAYS validate user input:
-
-```typescript
-import { z } from 'zod'
-
-const schema = z.object({
-  email: z.string().email(),
-  age: z.number().int().min(0).max(150)
-})
-
-const validated = schema.parse(input)
-```
+ALWAYS validate at system boundaries:
+- Validate all user input before processing
+- Use schema-based validation where available
+- Fail fast with clear error messages
+- Never trust external data (API responses, user input, file content)
 
 ## Code Quality Checklist
 
@@ -65,6 +44,5 @@ Before marking work complete:
 - [ ] Files are focused (<800 lines)
 - [ ] No deep nesting (>4 levels)
 - [ ] Proper error handling
-- [ ] No console.log statements
-- [ ] No hardcoded values
+- [ ] No hardcoded values (use constants or config)
 - [ ] No mutation (immutable patterns used)

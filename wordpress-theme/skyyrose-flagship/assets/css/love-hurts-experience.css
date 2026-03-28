@@ -1,0 +1,135 @@
+/* ============================================
+   SKYYROSE — LOVE HURTS IMMERSIVE EXPERIENCE
+   The Beast's Bedroom / Balcony / Transformation
+   ============================================ */
+
+:root {
+    --lh-crimson: #DC143C;
+    --lh-deep-purple: #2D0A1F;
+    --lh-burgundy: #722F37;
+    --lh-rose-gold: #B76E79;
+    --lh-bg-dark: #0A0505;
+    --lh-gold: #D4AF37;
+    --lh-font-display: 'Playfair Display', Georgia, serif;
+    --lh-font-body: 'Inter', -apple-system, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body.love-hurts-immersive {
+    font-family: var(--lh-font-body);
+    background: var(--lh-bg-dark);
+    color: #fff;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* --- Loading Screen --- */
+#loading-screen {
+    position: fixed; inset: 0;
+    background: linear-gradient(135deg, var(--lh-bg-dark) 0%, #1a0510 50%, var(--lh-deep-purple) 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 1000;
+    transition: opacity 1s ease, visibility 1s ease;
+}
+#loading-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+.loading-logo {
+    font-family: var(--lh-font-display); font-size: 3.5rem; font-weight: 600;
+    letter-spacing: 0.3em; margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--lh-crimson), var(--lh-rose-gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+.loading-subtitle {
+    font-size: 0.8rem; letter-spacing: 0.5em; text-transform: uppercase;
+    color: var(--lh-rose-gold); margin-bottom: 2.5rem; opacity: 0.8;
+}
+.loading-progress { width: 220px; height: 2px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+.loading-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--lh-burgundy), var(--lh-crimson), var(--lh-rose-gold)); transition: width 0.3s ease; }
+.loading-status { margin-top: 1rem; font-size: 0.7rem; letter-spacing: 0.2em; color: rgba(220,20,60,0.6); text-transform: uppercase; }
+
+@keyframes pulse-glow { 0%,100% { opacity: 0.8; } 50% { opacity: 1; } }
+
+/* --- Canvas --- */
+#canvas-container { position: fixed; inset: 0; z-index: 1; }
+canvas { display: block; }
+
+/* --- UI Overlay --- */
+#ui-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 100; }
+
+.brand-header { position: absolute; top: 2rem; left: 2rem; }
+.brand-header .brand-name { font-family: var(--lh-font-display); font-size: 1.1rem; font-weight: 500; letter-spacing: 0.4em; color: var(--lh-crimson); }
+.brand-header .collection-label { font-size: 0.65rem; letter-spacing: 0.3em; color: var(--lh-rose-gold); opacity: 0.7; margin-top: 0.2rem; text-transform: uppercase; }
+
+.room-indicator { position: absolute; top: 2rem; right: 2rem; text-align: right; }
+.room-indicator .room-label { font-size: 0.7rem; letter-spacing: 0.25em; color: var(--lh-rose-gold); text-transform: uppercase; opacity: 0.8; }
+.room-indicator .room-dots { display: flex; gap: 0.4rem; justify-content: flex-end; margin-top: 0.5rem; }
+.room-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(183,110,121,0.3); border: 1px solid rgba(183,110,121,0.5); transition: all 0.4s ease; pointer-events: auto; cursor: pointer; }
+.room-dot.active { background: var(--lh-crimson); border-color: var(--lh-crimson); box-shadow: 0 0 10px rgba(220,20,60,0.6); }
+
+/* --- Narrative Text --- */
+.narrative { position: absolute; bottom: 6rem; left: 2rem; max-width: 480px; opacity: 0; transition: opacity 0.8s ease; }
+.narrative.visible { opacity: 1; }
+.narrative-text { font-family: var(--lh-font-display); font-size: 1.3rem; font-weight: 400; line-height: 1.7; color: rgba(255,255,255,0.85); font-style: italic; }
+
+/* --- Navigation Arrows --- */
+.nav-arrows { position: absolute; bottom: 2rem; right: 2rem; display: flex; gap: 0.8rem; }
+.nav-arrow { pointer-events: auto; padding: 0.7rem 1.4rem; background: rgba(45,10,31,0.7); border: 1px solid rgba(220,20,60,0.4); color: var(--lh-rose-gold); font-family: var(--lh-font-body); font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; backdrop-filter: blur(8px); transition: all 0.3s ease; }
+.nav-arrow:hover { background: rgba(220,20,60,0.25); border-color: var(--lh-crimson); color: #fff; }
+.nav-arrow:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+
+/* --- Product Hotspots --- */
+.hotspot { position: absolute; width: 40px; height: 40px; transform: translate(-50%,-50%); pointer-events: auto; cursor: pointer; z-index: 110; }
+.hotspot-ring { width: 100%; height: 100%; border-radius: 50%; border: 2px solid var(--lh-crimson); background: radial-gradient(circle, rgba(220,20,60,0.3) 0%, transparent 70%); animation: hotspot-pulse 2s ease-in-out infinite; transition: all 0.3s ease; }
+.hotspot:hover .hotspot-ring { transform: scale(1.3); border-color: var(--lh-rose-gold); }
+.hotspot-label { position: absolute; top: 50px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 0.65rem; letter-spacing: 0.1em; color: var(--lh-rose-gold); opacity: 0; transition: opacity 0.3s ease; text-align: center; text-transform: uppercase; }
+.hotspot:hover .hotspot-label { opacity: 1; }
+
+@keyframes hotspot-pulse {
+    0%,100% { box-shadow: 0 0 6px rgba(220,20,60,0.4); }
+    50% { box-shadow: 0 0 18px rgba(220,20,60,0.7); }
+}
+
+/* --- Product Detail Panel --- */
+.product-panel { position: fixed; right: -400px; top: 0; width: 380px; height: 100%; background: linear-gradient(180deg, rgba(10,5,5,0.97) 0%, rgba(45,10,31,0.97) 100%); border-left: 1px solid rgba(220,20,60,0.3); padding: 3rem 2rem 2rem; z-index: 200; transition: right 0.5s cubic-bezier(0.4,0,0.2,1); backdrop-filter: blur(20px); overflow-y: auto; }
+.product-panel.visible { right: 0; }
+.product-panel .panel-close { position: absolute; top: 1rem; right: 1rem; width: 32px; height: 32px; border: 1px solid rgba(183,110,121,0.5); background: transparent; color: var(--lh-rose-gold); font-size: 1.2rem; cursor: pointer; border-radius: 50%; transition: all 0.3s ease; }
+.product-panel .panel-close:hover { background: var(--lh-crimson); border-color: var(--lh-crimson); color: #fff; }
+.product-panel .panel-image { width: 100%; aspect-ratio: 1; background: linear-gradient(135deg, var(--lh-deep-purple), var(--lh-bg-dark)); border: 1px solid rgba(220,20,60,0.2); margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.product-panel .panel-image img { width: 100%; height: 100%; object-fit: cover; }
+.product-panel .panel-title { font-family: var(--lh-font-display); font-size: 1.4rem; font-weight: 500; margin-bottom: 0.4rem; }
+.product-panel .panel-price { font-size: 1.1rem; color: var(--lh-rose-gold); margin-bottom: 1rem; }
+.product-panel .panel-desc { font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.7; margin-bottom: 1.5rem; }
+.product-panel .panel-cta { display: block; width: 100%; padding: 1rem; background: linear-gradient(135deg, var(--lh-crimson), var(--lh-burgundy)); border: none; color: #fff; font-family: var(--lh-font-body); font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease; text-align: center; text-decoration: none; }
+.product-panel .panel-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(220,20,60,0.4); }
+
+/* --- Shop CTA (Room 3) --- */
+.shop-cta { position: absolute; bottom: 6rem; left: 50%; transform: translateX(-50%); pointer-events: auto; opacity: 0; transition: opacity 0.6s ease; }
+.shop-cta.visible { opacity: 1; }
+.shop-cta a { display: inline-block; padding: 1rem 3rem; background: linear-gradient(135deg, var(--lh-crimson), var(--lh-gold)); color: #fff; text-decoration: none; font-size: 0.85rem; letter-spacing: 0.25em; text-transform: uppercase; transition: all 0.3s ease; }
+.shop-cta a:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(220,20,60,0.5); }
+
+/* --- Back Link --- */
+.back-link { position: absolute; bottom: 2rem; left: 2rem; pointer-events: auto; }
+.back-link a { color: var(--lh-rose-gold); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.6; transition: opacity 0.3s ease; }
+.back-link a:hover { opacity: 1; }
+
+/* --- WebGL Fallback --- */
+.webgl-fallback { text-align: center; padding: 4rem 2rem; }
+.webgl-fallback h2 { font-family: var(--lh-font-display); color: var(--lh-crimson); margin-bottom: 1rem; }
+.webgl-fallback p { color: rgba(255,255,255,0.6); margin-bottom: 2rem; }
+.webgl-fallback a { color: var(--lh-crimson); text-decoration: underline; }
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .loading-logo { font-size: 2.2rem; }
+    .narrative { left: 1rem; right: 1rem; bottom: 7rem; max-width: none; }
+    .narrative-text { font-size: 1rem; }
+    .product-panel { width: 100%; right: -100%; }
+    .product-panel.visible { right: 0; }
+    .nav-arrows { right: 1rem; bottom: 1rem; }
+    .brand-header { top: 1rem; left: 1rem; }
+    .room-indicator { top: 1rem; right: 1rem; }
+}

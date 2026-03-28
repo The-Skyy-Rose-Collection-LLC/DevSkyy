@@ -1,0 +1,172 @@
+/**
+ * Pre-Order Showcase — SkyyRose
+ * Collection selector, tab bar, cart summary. Dark luxury aesthetic.
+ * @package SkyyRose
+ * @since   4.2.0
+ */
+
+/* 0. PALETTE VARIABLES */
+:root {
+    --br-crimson: #DC143C; --br-dark: #0A0505; --br-silver: #C0C0C0;
+    --lh-rose: #E91E63; --lh-burgundy: #880E4F; --lh-blush: #F8BBD9;
+    --sg-gold: #D4AF37; --sg-rose-gold: #B76E79; --sg-black: #0A0A0A;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-heading: 'Cinzel', 'Playfair Display', Georgia, serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --accent: var(--sg-gold); --accent-rgb: 212, 175, 55;
+}
+body[data-active-collection="black-rose"]  { --accent: var(--br-silver); --accent-rgb: 192, 192, 192; }
+body[data-active-collection="love-hurts"]  { --accent: var(--lh-rose);   --accent-rgb: 233, 30, 99;   }
+body[data-active-collection="signature"]   { --accent: var(--sg-gold);   --accent-rgb: 212, 175, 55;  }
+
+/* 1. HERO */
+.hero {
+    min-height: 50vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    padding: 10rem 2rem 4rem; position: relative;
+}
+.hero__badge {
+    display: inline-block; padding: 0.4rem 1.2rem;
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    font-size: 0.65rem; letter-spacing: 0.35em; text-transform: uppercase;
+    color: var(--sg-gold); margin-bottom: 1.5rem;
+}
+.hero__title {
+    font-family: var(--font-heading); font-size: 5rem; font-weight: 400;
+    letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 1rem;
+    background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.65) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero__tagline {
+    font-size: 1rem; letter-spacing: 0.4em; text-transform: uppercase;
+    color: rgba(255,255,255,0.5); margin-bottom: 0.5rem;
+}
+.hero__subtitle {
+    font-size: 0.8rem; letter-spacing: 0.2em; color: rgba(255,255,255,0.35);
+}
+
+/* 2. SHOWCASE GRID */
+.showcase { padding: 2rem 5% 6rem; max-width: 1400px; margin: 0 auto; }
+.showcase__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+
+.showcase__card {
+    position: relative; padding: 3rem 2rem 2.5rem; min-height: 340px;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.02); backdrop-filter: blur(12px);
+    overflow: hidden; cursor: pointer;
+    transition: transform 0.5s cubic-bezier(0.16,1,0.3,1), border-color 0.5s ease, box-shadow 0.5s ease;
+}
+.showcase__card::before {
+    content: ''; position: absolute; inset: 0; border-radius: inherit;
+    opacity: 0; transition: opacity 0.5s ease; pointer-events: none;
+}
+.showcase__card:hover { transform: translateY(-8px); }
+.showcase__card:hover::before { opacity: 1; }
+
+.showcase__card--black-rose::before  { background: radial-gradient(ellipse at 30% 80%, rgba(220,20,60,0.12) 0%, transparent 60%); }
+.showcase__card--love-hurts::before  { background: radial-gradient(ellipse at 50% 80%, rgba(136,14,79,0.15) 0%, transparent 60%); }
+.showcase__card--signature::before   { background: radial-gradient(ellipse at 70% 80%, rgba(212,175,55,0.1) 0%, transparent 60%); }
+
+.showcase__card--black-rose:hover { border-color: rgba(220,20,60,0.3); box-shadow: 0 20px 60px rgba(220,20,60,0.1), 0 0 0 1px rgba(192,192,192,0.08); }
+.showcase__card--love-hurts:hover { border-color: rgba(233,30,99,0.3); box-shadow: 0 20px 60px rgba(136,14,79,0.15), 0 0 0 1px rgba(233,30,99,0.08); }
+.showcase__card--signature:hover  { border-color: rgba(212,175,55,0.3); box-shadow: 0 20px 60px rgba(212,175,55,0.1), 0 0 0 1px rgba(212,175,55,0.08); }
+
+.showcase__card-number {
+    font-size: 0.6rem; letter-spacing: 0.4em; text-transform: uppercase;
+    color: rgba(255,255,255,0.25); margin-bottom: 0.75rem;
+}
+.showcase__card-title {
+    font-family: var(--font-heading); font-size: 1.8rem; font-weight: 400;
+    letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem;
+}
+.showcase__card--black-rose .showcase__card-title {
+    background: linear-gradient(135deg, var(--br-crimson), var(--br-silver));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.showcase__card--love-hurts .showcase__card-title {
+    background: linear-gradient(135deg, var(--lh-rose), var(--lh-blush));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.showcase__card--signature .showcase__card-title {
+    background: linear-gradient(135deg, var(--sg-gold), var(--sg-rose-gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.showcase__card-tagline {
+    font-size: 0.75rem; letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.4); margin-bottom: 1.5rem;
+}
+.showcase__card-cta {
+    display: inline-block; font-size: 0.7rem; font-weight: 600;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: rgba(255,255,255,0.6); transition: color 0.3s ease;
+}
+.showcase__card:hover .showcase__card-cta { color: #fff; }
+
+/* 3. COLLECTION TAB BAR */
+.tab-bar {
+    display: none; justify-content: center; gap: 0.5rem; padding: 1.5rem 5%;
+    position: sticky; top: 76px; z-index: 100;
+    background: rgba(10,10,10,0.92); backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+body[data-active-collection] .tab-bar { display: flex; }
+
+.tab-bar__btn {
+    background: transparent; border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.45); padding: 0.55rem 1.6rem;
+    font-family: var(--font-body); font-size: 0.7rem; font-weight: 500;
+    letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer;
+    transition: all 0.3s ease;
+}
+.tab-bar__btn:hover { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); }
+.tab-bar__btn--active[data-tab="black-rose"] { border-color: var(--br-crimson); color: #fff; background: rgba(220,20,60,0.1); }
+.tab-bar__btn--active[data-tab="love-hurts"] { border-color: var(--lh-rose); color: #fff; background: rgba(233,30,99,0.1); }
+.tab-bar__btn--active[data-tab="signature"]  { border-color: var(--sg-gold); color: #fff; background: rgba(212,175,55,0.1); }
+
+/* 4. PRODUCT GRID SECTION */
+.products-section { display: none; padding: 3rem 0 4rem; }
+body[data-active-collection] .products-section { display: block; }
+
+/* 5. CART SUMMARY BAR */
+.cart-summary {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 500;
+    padding: 1rem 5%; background: rgba(10,10,10,0.96); backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: space-between;
+    transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.cart-summary--visible { transform: translateY(0); }
+.cart-summary__info { display: flex; align-items: center; gap: 2rem; }
+.cart-summary__count { font-size: 0.8rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.6); }
+.cart-summary__total { font-family: var(--font-display); font-size: 1.2rem; color: var(--sg-gold); }
+.cart-summary__checkout {
+    padding: 0.8rem 2.5rem; background: linear-gradient(135deg, var(--sg-gold), var(--sg-rose-gold));
+    border: none; color: #000; font-family: var(--font-body); font-size: 0.75rem;
+    font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.3s ease;
+}
+.cart-summary__checkout:hover {
+    filter: brightness(1.15); transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(212,175,55,0.3);
+}
+
+/* 6. RESPONSIVE */
+@media (max-width: 768px) {
+    .hero__title { font-size: 3rem; letter-spacing: 0.15em; }
+    .showcase__grid { grid-template-columns: 1fr; gap: 1.25rem; }
+    .showcase__card { min-height: 200px; padding: 2rem 1.5rem; }
+    .tab-bar { gap: 0.25rem; top: 64px; }
+    .tab-bar__btn { padding: 0.45rem 1rem; font-size: 0.6rem; }
+    .cart-summary { flex-direction: column; gap: 0.75rem; padding: 1rem 4%; }
+}
+@media (max-width: 480px) {
+    .hero { padding: 8rem 1.5rem 3rem; }
+    .hero__title { font-size: 2.2rem; letter-spacing: 0.1em; }
+}
+
+/* 7. REDUCED MOTION */
+@media (prefers-reduced-motion: reduce) {
+    .showcase__card { transition: border-color 0.3s ease, box-shadow 0.3s ease; }
+    .cart-summary { transition: none; }
+}

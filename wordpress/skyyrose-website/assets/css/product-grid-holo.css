@@ -1,0 +1,410 @@
+/**
+ * Holo Product Grid — SkyyRose Static Pages
+ *
+ * Ported from wordpress-theme/skyyrose-flagship/assets/css/product-card-holo.css
+ * Collection-aware via [data-collection] on grid container.
+ *
+ * @package SkyyRose
+ * @since   4.1.0
+ */
+
+/* ==========================================================================
+   0. COLLECTION PALETTES — set by [data-collection] on .product-grid
+   ========================================================================== */
+
+.product-grid[data-collection="signature"] {
+    --holo-accent: #D4AF37;
+    --holo-accent-rgb: 212, 175, 55;
+    --holo-radius: 8px;
+}
+
+.product-grid[data-collection="black-rose"] {
+    --holo-accent: #C0C0C0;
+    --holo-accent-rgb: 192, 192, 192;
+    --holo-radius: 8px;
+}
+
+.product-grid[data-collection="love-hurts"] {
+    --holo-accent: #DC143C;
+    --holo-accent-rgb: 220, 20, 60;
+    --holo-radius: 8px;
+}
+
+.product-grid[data-collection="kids-capsule"] {
+    --holo-accent: #B76E79;
+    --holo-accent-rgb: 183, 110, 121;
+    --holo-radius: 12px;
+}
+
+/* ==========================================================================
+   1. GRID LAYOUT — Masonry-style responsive grid
+   ========================================================================== */
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    padding: 4rem 6%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.product-grid__header {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.product-grid__title {
+    font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+    font-size: 2.4rem;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--holo-accent), #fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.product-grid__subtitle {
+    font-size: 0.85rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Filter bar */
+.product-grid__filters {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.filter-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    padding: 0.5rem 1.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    border-color: var(--holo-accent);
+    color: #fff;
+    background: rgba(var(--holo-accent-rgb), 0.08);
+}
+
+/* ==========================================================================
+   2. HOLO CARD — Wrapper with entrance animation
+   ========================================================================== */
+
+.holo {
+    position: relative;
+    contain: layout style;
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: var(--holo-delay, 0ms);
+}
+
+.holo--visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ==========================================================================
+   3. AMBIENT GLOW — Collection-colored light beneath card
+   ========================================================================== */
+
+.holo__glow {
+    position: absolute;
+    inset: 20% 10% -15% 10%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(var(--holo-accent-rgb), 0.12) 0%,
+        transparent 70%
+    );
+    filter: blur(40px);
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.holo:hover .holo__glow {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   4. CARD BODY — 3D tiltable container
+   ========================================================================== */
+
+.holo__body {
+    position: relative;
+    z-index: 1;
+    background: #0a0a0a;
+    border: 1px solid rgba(var(--holo-accent-rgb), 0.06);
+    border-radius: var(--holo-radius, 8px);
+    overflow: hidden;
+    transform-style: preserve-3d;
+    transform: perspective(800px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+    transition: transform 0.6s cubic-bezier(0.03, 0.98, 0.52, 0.99),
+                border-color 0.5s ease,
+                box-shadow 0.5s ease;
+    will-change: transform;
+}
+
+.holo:hover .holo__body {
+    border-color: rgba(var(--holo-accent-rgb), 0.15);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(var(--holo-accent-rgb), 0.08);
+}
+
+/* ==========================================================================
+   5. HOLOGRAPHIC SHIMMER — Cursor-tracked conic gradient
+   ========================================================================== */
+
+.holo__shimmer {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;
+    background: conic-gradient(
+        from var(--holo-angle, 0deg) at var(--holo-x, 50%) var(--holo-y, 50%),
+        transparent 0%,
+        rgba(255, 120, 120, 0.03) 8%,
+        rgba(255, 220, 120, 0.05) 16%,
+        rgba(120, 255, 160, 0.03) 24%,
+        rgba(120, 200, 255, 0.05) 32%,
+        rgba(200, 120, 255, 0.03) 40%,
+        rgba(255, 120, 200, 0.04) 48%,
+        transparent 56%
+    );
+    mix-blend-mode: screen;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    border-radius: inherit;
+}
+
+.holo:hover .holo__shimmer {
+    opacity: 1;
+}
+
+/* ==========================================================================
+   6. CARD CONTENT — Image, info, actions
+   ========================================================================== */
+
+.holo__image-wrap {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: #111;
+}
+
+.holo__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.holo:hover .holo__image {
+    transform: scale(1.05);
+}
+
+.holo__badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: rgba(var(--holo-accent-rgb), 0.9);
+    color: #0a0a0a;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.75rem;
+    border-radius: 2px;
+}
+
+.holo__wishlist {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.holo__wishlist:hover,
+.holo__wishlist[aria-pressed="true"] {
+    background: rgba(var(--holo-accent-rgb), 0.2);
+    border-color: var(--holo-accent);
+    color: var(--holo-accent);
+}
+
+.holo__info {
+    padding: 1.25rem 1rem;
+}
+
+.holo__collection-tag {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--holo-accent);
+    margin-bottom: 0.4rem;
+}
+
+.holo__name {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.holo__price {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.holo__price--sale {
+    color: var(--holo-accent);
+}
+
+.holo__price--original {
+    text-decoration: line-through;
+    color: rgba(255, 255, 255, 0.3);
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+}
+
+/* ==========================================================================
+   7. QUICK-ADD DRAWER — Slides up on hover
+   ========================================================================== */
+
+.holo__drawer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.95));
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 5;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.holo:hover .holo__drawer {
+    transform: translateY(0);
+}
+
+.holo__btn {
+    flex: 1;
+    padding: 0.7rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.holo__btn--primary {
+    background: var(--holo-accent);
+    color: #0a0a0a;
+}
+
+.holo__btn--primary:hover {
+    filter: brightness(1.15);
+}
+
+.holo__btn--secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.holo__btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* ==========================================================================
+   8. RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        padding: 2rem 4%;
+    }
+
+    .product-grid__title {
+        font-size: 1.6rem;
+    }
+
+    .holo__drawer {
+        transform: translateY(0);
+        position: relative;
+        background: transparent;
+        padding: 0 1rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+/* ==========================================================================
+   9. REDUCED MOTION
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .holo {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    .holo__body {
+        transform: none;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .holo__shimmer {
+        display: none;
+    }
+
+    .holo__image {
+        transition: none;
+    }
+}

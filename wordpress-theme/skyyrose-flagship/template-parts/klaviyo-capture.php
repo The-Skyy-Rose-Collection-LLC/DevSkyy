@@ -49,9 +49,9 @@ $args = wp_parse_args(
 $mode       = in_array( $args['mode'], array( 'inline', 'popup' ), true ) ? $args['mode'] : 'inline';
 $list_slug  = sanitize_key( $args['list_slug'] );
 $popup_id   = sanitize_html_class( $args['popup_id'] );
-$headline   = esc_html( $args['headline'] );
-$subhead    = esc_html( $args['subheadline'] );
-$cta        = esc_html( $args['cta'] );
+$headline   = $args['headline'];
+$subhead    = $args['subheadline'];
+$cta        = $args['cta'];
 $show_phone = (bool) $args['show_phone'];
 $collection = sanitize_html_class( $args['collection'] );
 
@@ -74,8 +74,8 @@ if ( 'popup' === $mode ) : ?>
 	<div class="sr-klav-popup__card" style="--sr-klav-accent: <?php echo esc_attr( $accent ); ?>;">
 		<button class="sr-klav-popup__close" type="button" data-klav-close aria-label="<?php esc_attr_e( 'Close', 'skyyrose-flagship' ); ?>">&times;</button>
 		<p class="sr-klav-popup__eyebrow"><?php esc_html_e( 'Exclusive Access', 'skyyrose-flagship' ); ?></p>
-		<h2 class="sr-klav-popup__headline"><?php echo $headline; ?></h2>
-		<p class="sr-klav-popup__sub"><?php echo $subhead; ?></p>
+		<h2 class="sr-klav-popup__headline"><?php echo esc_html( $headline ); ?></h2>
+		<p class="sr-klav-popup__sub"><?php echo esc_html( $subhead ); ?></p>
 		<?php include __FILE__; // Re-render as inline inside popup — handled below. ?>
 	</div>
 </div>
@@ -123,7 +123,7 @@ if ( 'popup' === $mode ) : ?>
 			<?php endif; ?>
 
 			<button type="submit" class="sr-klav-form__submit">
-				<?php echo $cta; ?>
+				<?php echo wp_kses_post( $cta ); ?>
 			</button>
 		</div>
 

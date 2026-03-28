@@ -178,7 +178,7 @@ while ( have_posts() ) :
 						<h1 class="sr-info-name"><?php the_title(); ?></h1>
 
 						<!-- Price -->
-						<div class="sr-info-price"><?php echo $price_html; // phpcs:ignore WordPress.Security.EscapeOutput ?></div>
+						<div class="sr-info-price"><?php echo wp_kses_post( $price_html ); ?></div>
 
 						<!-- Short description -->
 						<?php if ( $product->get_short_description() ) : ?>
@@ -397,7 +397,7 @@ while ( have_posts() ) :
 								</div>
 								<div class="sr-related-body">
 									<h3 class="sr-related-name"><?php echo esc_html( $rel_product->get_name() ); ?></h3>
-									<span class="sr-related-price"><?php echo $rel_product->get_price_html(); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+									<span class="sr-related-price"><?php echo wp_kses_post( $rel_product->get_price_html() ); ?></span>
 								</div>
 							</a>
 						<?php endforeach; ?>
@@ -451,7 +451,7 @@ while ( have_posts() ) :
 			<div class="sr-container sr-sticky-inner">
 				<div class="sr-sticky-info">
 					<span class="sr-sticky-name"><?php the_title(); ?></span>
-					<span class="sr-sticky-price"><?php echo $price_html; // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+					<span class="sr-sticky-price"><?php echo wp_kses_post( $price_html ); ?></span>
 				</div>
 				<a href="#sr-atc-anchor" class="sr-sticky-btn"><?php esc_html_e( 'Add to Bag', 'skyyrose-flagship' ); ?></a>
 			</div>

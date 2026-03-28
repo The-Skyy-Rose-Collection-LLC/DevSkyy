@@ -27,24 +27,30 @@
 	   ────────────────────────────────────────────── */
 
 	function initEntrance() {
-		var cards = document.querySelectorAll('.holo:not(.holo--visible)');
-		if (!cards.length) return;
+		/* Delay slightly to ensure layout is calculated after deferred script load */
+		setTimeout(function () {
+			var cards = document.querySelectorAll('.holo:not(.holo--visible)');
+			if (!cards.length) return;
 
-		if (!('IntersectionObserver' in window)) {
-			cards.forEach(function (c) { c.classList.add('holo--visible'); });
-			return;
-		}
+			if (!('IntersectionObserver' in window)) {
+				cards.forEach(function (c) { c.classList.add('holo--visible'); });
+				return;
+			}
 
-		var observer = new IntersectionObserver(function (entries) {
-			entries.forEach(function (entry) {
-				if (entry.isIntersecting) {
-					entry.target.classList.add('holo--visible');
-					observer.unobserve(entry.target);
-				}
-			});
-		}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+			var staggerIdx = 0;
+			var observer = new IntersectionObserver(function (entries) {
+				entries.forEach(function (entry) {
+					if (entry.isIntersecting) {
+						entry.target.style.setProperty('--holo-delay', (staggerIdx * 80) + 'ms');
+						entry.target.classList.add('holo--visible');
+						staggerIdx++;
+						observer.unobserve(entry.target);
+					}
+				});
+			}, { threshold: 0.05, rootMargin: '0px 0px 50px 0px' });
 
-		cards.forEach(function (card) { observer.observe(card); });
+			cards.forEach(function (card) { observer.observe(card); });
+		}, 100);
 	}
 
 	/* ──────────────────────────────────────────────

@@ -98,11 +98,11 @@ get_header();
 	);
 
 	foreach ( $collections as $collection ) :
-		$col_slug = esc_attr( $collection['slug'] );
+		$col_slug = $collection['slug'];
 	?>
 
 	<!-- <?php echo esc_html( strtoupper( $collection['name'] ) ); ?> SECTION -->
-	<div class="shop-banner" data-section="<?php echo $col_slug; ?>" id="<?php echo esc_attr( str_replace( '-', '', $collection['slug'] ) ); ?>">
+	<div class="shop-banner" data-section="<?php echo esc_attr( $col_slug ); ?>" id="<?php echo esc_attr( str_replace( '-', '', $collection['slug'] ) ); ?>">
 		<div class="shop-banner-label"><?php echo esc_html( sprintf( __( 'Collection %s', 'skyyrose-flagship' ), $collection['number'] ) ); ?></div>
 		<h2><?php echo esc_html( $collection['name'] ); ?></h2>
 		<p class="shop-banner-desc"><?php echo esc_html( $collection['desc'] ); ?></p>
@@ -113,7 +113,7 @@ get_header();
 		<div class="shop-grid" role="list" aria-label="<?php echo esc_attr( $collection['name'] . ' products' ); ?>">
 
 			<?php foreach ( $collection['products'] as $product ) : ?>
-			<div class="shop-product" data-collection="<?php echo $col_slug; ?>" data-type="<?php echo esc_attr( $product['type'] ); ?>" role="listitem">
+			<div class="shop-product" data-collection="<?php echo esc_attr( $col_slug ); ?>" data-type="<?php echo esc_attr( $product['type'] ); ?>" role="listitem">
 				<div class="shop-product-img"<?php echo ! empty( $collection['bg'] ) ? ' style="' . esc_attr( $collection['bg'] ) . '"' : ''; ?>>
 					<?php if ( ! empty( $product['badge'] ) ) : ?>
 						<div class="badge badge-<?php echo esc_attr( $product['badge'] ); ?>">

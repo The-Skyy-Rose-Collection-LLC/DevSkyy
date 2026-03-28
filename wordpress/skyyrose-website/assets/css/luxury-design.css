@@ -1,0 +1,53 @@
+/**
+ * SkyyRose Luxury Design System — Shared Foundation
+ * Imported by all collection and page templates.
+ * @package SkyyRose
+ * @since   4.1.0
+ */
+
+:root {
+    --bg-dark: #0A0A0A;
+    --text-primary: #fff;
+    --text-secondary: rgba(255, 255, 255, 0.6);
+    --rose-gold: #B76E79;
+    --signature-gold: #D4AF37;
+    --black-rose-crimson: #DC143C;
+    --love-hurts-crimson: #DC143C;
+    --font-display: 'Cinzel', 'Playfair Display', Georgia, serif;
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+}
+
+/* Smooth scroll globally */
+html { scroll-behavior: smooth; }
+
+/* Selection color */
+::selection {
+    background: rgba(183, 110, 121, 0.3);
+    color: #fff;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0A0A0A; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+/* Focus visible for accessibility */
+:focus-visible {
+    outline: 2px solid var(--rose-gold);
+    outline-offset: 2px;
+}
+
+/* Skip link */
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    z-index: 9999;
+    padding: 0.5rem 1rem;
+    background: var(--rose-gold);
+    color: #0A0A0A;
+    font-weight: 600;
+}
+.skip-link:focus { top: 1rem; }
