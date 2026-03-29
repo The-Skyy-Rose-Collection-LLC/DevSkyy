@@ -280,7 +280,7 @@ function skyyrose_enqueue_template_styles() {
 	$use_min      = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
 	$template_styles = array(
-		'front-page'      => 'homepage-portal.css',
+		'front-page'      => 'homepage-v2.css',
 		'immersive'       => 'immersive.css',
 		'single-product'  => 'single-product.css',
 		'cart'            => 'woocommerce.css',
@@ -383,14 +383,14 @@ function skyyrose_enqueue_template_scripts() {
 	$base_css_dir = SKYYROSE_DIR . '/assets/css';
 
 	// GSAP — loaded on pages that use scroll animations.
-	$gsap_slugs = array( 'front-page', 'collection-standalone', 'collection-v4', 'preorder-gateway', 'about', 'landing', 'immersive' );
+	$gsap_slugs = array( 'collection-standalone', 'preorder-gateway', 'about', 'immersive' );
 	if ( in_array( $slug, $gsap_slugs, true ) ) {
 		wp_enqueue_script( 'skyyrose-gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js', array(), '3.12.2', true );
 		wp_enqueue_script( 'skyyrose-gsap-st', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js', array( 'skyyrose-gsap' ), '3.12.2', true );
 	}
 
 	$template_scripts = array(
-		/* front-page JS is inline Three.js module in the template */
+		'front-page'       => 'homepage-v2.js',
 		'immersive'        => 'immersive.js',
 		'single-product'   => 'single-product.js',
 		'cart'             => 'woocommerce.js',
