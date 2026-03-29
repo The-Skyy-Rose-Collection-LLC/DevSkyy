@@ -60,6 +60,11 @@
 .homepage-v2 a { color: inherit; text-decoration: none; }
 .homepage-v2 button { font-family: inherit; cursor: pointer; border: none; background: none; }
 
+/* Hide the theme site-header — homepage has its own nav */
+.site-header { display: none !important; }
+/* Also hide theme footer — homepage has its own */
+.site-footer { display: none !important; }
+
 /* Grain + vignette — now in main.css (global) */
 .vignette {
 	position: fixed;
