@@ -105,17 +105,37 @@
 }
 .showcase-card:hover .showcase-card-bg { transform: scale(1.08); }
 
-/* Collection gradient backgrounds */
-.showcase-card--signature .showcase-card-bg   { background: linear-gradient(135deg, #1a1810, #2d2820, #1a1810); }
-.showcase-card--black-rose .showcase-card-bg  { background: linear-gradient(135deg, #1a0000, #3d0000, #1a0000); }
-.showcase-card--love-hurts .showcase-card-bg  { background: linear-gradient(135deg, #2d1a1d, #4a2a30, #2d1a1d); }
-.showcase-card--kids-capsule .showcase-card-bg { background: linear-gradient(135deg, #0a0a14, #1a1a2e, #0a0a14); }
+/* Collection atmospheric backgrounds — layered radial glows over dark base */
+.showcase-card--signature .showcase-card-bg {
+    background:
+        radial-gradient(ellipse at 30% 60%, rgba(212,175,55,0.25) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 30%, rgba(205,127,50,0.15) 0%, transparent 50%),
+        linear-gradient(180deg, #1a1810 0%, #0d0b06 100%);
+}
+.showcase-card--black-rose .showcase-card-bg {
+    background:
+        radial-gradient(ellipse at 40% 50%, rgba(192,192,192,0.18) 0%, transparent 55%),
+        radial-gradient(ellipse at 70% 70%, rgba(220,20,60,0.12) 0%, transparent 45%),
+        linear-gradient(180deg, #0a0505 0%, #050505 100%);
+}
+.showcase-card--love-hurts .showcase-card-bg {
+    background:
+        radial-gradient(ellipse at 50% 40%, rgba(220,20,60,0.3) 0%, transparent 55%),
+        radial-gradient(ellipse at 30% 80%, rgba(45,10,31,0.6) 0%, transparent 50%),
+        linear-gradient(180deg, #2d0a1f 0%, #0a0505 100%);
+}
+.showcase-card--kids-capsule .showcase-card-bg {
+    background:
+        radial-gradient(ellipse at 50% 50%, rgba(183,110,121,0.2) 0%, transparent 55%),
+        radial-gradient(ellipse at 70% 30%, rgba(212,175,55,0.08) 0%, transparent 40%),
+        linear-gradient(180deg, #1a1014 0%, #0a0a0a 100%);
+}
 
 .showcase-card-content {
     position: absolute; bottom: 0; left: 0; right: 0; padding: 2.5rem; z-index: 2;
-    transform: translateY(20px); opacity: 0; transition: all 0.5s ease;
+    transform: translateY(0); opacity: 1;
 }
-.showcase-card:hover .showcase-card-content { transform: translateY(0); opacity: 1; }
+.showcase-card:hover .showcase-card-content { transform: translateY(-8px); }
 .showcase-card-name { font-family: 'Cinzel', serif; font-size: 1.6rem; margin-bottom: 0.5rem; color: #fff; }
 .showcase-card-tagline { color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 1.5rem; font-style: italic; }
 .showcase-card-link {
@@ -125,27 +145,6 @@
 }
 .showcase-card-link svg { transition: transform 0.3s ease; }
 .showcase-card-link:hover svg { transform: translateX(5px); }
-
-/* ── Collection Narrative Cards ── */
-.collection-narratives {
-    padding: 6rem 4rem;
-    background: linear-gradient(180deg, #111 0%, var(--portal-bg-dark) 100%);
-}
-.narratives-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 3rem; max-width: 1200px; margin: 0 auto;
-}
-.narrative-card {
-    text-align: center; padding: 3rem 2rem;
-    border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02);
-    transition: border-color 0.4s ease, background 0.4s ease;
-}
-.narrative-card:hover { border-color: rgba(212,175,55,0.2); background: rgba(255,255,255,0.04); }
-.narrative-card-name {
-    font-family: 'Cinzel', serif; font-size: 1.1rem; letter-spacing: 3px;
-    text-transform: uppercase; color: var(--portal-signature-gold); margin-bottom: 1rem;
-}
-.narrative-card-tagline { color: rgba(255,255,255,0.65); font-size: 0.95rem; line-height: 1.7; font-style: italic; }
 
 /* ── Brand Story Section ── */
 .brand-story-section { padding: 8rem 4rem; background: #111; }
@@ -187,15 +186,12 @@
     .collections-showcase { padding: 6rem 2rem; }
     .collections-showcase-grid { grid-template-columns: repeat(2, 1fr); }
     .showcase-card { height: 380px; }
-    .collection-narratives { padding: 4rem 2rem; }
     .brand-story-section { padding: 6rem 2rem; }
     .portal-newsletter { padding: 4rem 2rem; }
 }
 @media (max-width: 768px) {
     .collections-showcase-grid { grid-template-columns: 1fr; }
     .portal-hero { height: 80vh; }
-    .collection-narratives { padding: 3rem 1.5rem; }
-    .narratives-grid { grid-template-columns: 1fr; gap: 2rem; }
     .portal-newsletter-form { flex-direction: column; }
     .portal-newsletter-input { max-width: 100%; }
     .brand-story-section { padding: 4rem 1.5rem; }

@@ -205,6 +205,9 @@ wordpress-theme/skyyrose-flagship/
 - `enqueue.php` template slug map must match actual template filenames exactly
 - Collection page CSS loads via `$standalone_css_map` — don't duplicate with inline enqueues
 - Holo card grid: only `.product-grid`, `.product-grid__items`, `.br-product-grid__items` should be `display: grid`
+- Don't duplicate content sections — if showcase cards show collections, don't add separate narrative cards with same data
+- Showcase card content should be visible by default (`opacity: 1`), not hidden until hover — mobile has no hover
+- When removing a PHP section, also remove its CSS rules AND responsive breakpoint overrides
 
 ### Hooks (macOS)
 - Canonicalize paths (`/tmp` → `/private/tmp`)

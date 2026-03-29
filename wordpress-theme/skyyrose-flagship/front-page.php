@@ -138,20 +138,6 @@ $skyyrose_cart_url = function_exists( 'wc_get_cart_url' )
 	</section>
 
 	<!-- ══════════════════════════════════════════
-	     Collection Narrative Cards
-	     ══════════════════════════════════════════ -->
-	<section class="collection-narratives" aria-label="<?php esc_attr_e( 'Collection narratives', 'skyyrose-flagship' ); ?>">
-		<div class="narratives-grid">
-			<?php foreach ( $skyyrose_collections as $col ) : ?>
-				<div class="narrative-card">
-					<h3 class="narrative-card-name"><?php echo esc_html( strtoupper( $col['name'] ) ); ?></h3>
-					<p class="narrative-card-tagline"><?php echo esc_html( $col['tagline'] ); ?></p>
-				</div>
-			<?php endforeach; ?>
-		</div>
-	</section>
-
-	<!-- ══════════════════════════════════════════
 	     Brand Story
 	     ══════════════════════════════════════════ -->
 	<section class="brand-story-section" aria-label="<?php esc_attr_e( 'Brand story', 'skyyrose-flagship' ); ?>">
