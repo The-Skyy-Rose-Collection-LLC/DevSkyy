@@ -1,0 +1,16 @@
+{
+  "name": "skyyrose-flagship-theme",
+  "version": "5.2.0",
+  "private": true,
+  "description": "SkyyRose Flagship WordPress theme — local dev tooling",
+  "scripts": {
+    "deploy": "bash ../scripts/deploy-theme.sh",
+    "deploy:dry": "bash ../scripts/deploy-theme.sh --dry-run",
+    "lint:php": "find skyyrose-flagship -name '*.php' -exec php -l {} \\;",
+    "lint:css": "npx stylelint 'skyyrose-flagship/assets/css/**/*.css'",
+    "watch": "npx chokidar 'skyyrose-flagship/**/*.{php,css,js}' -c 'echo Changed: {path}'",
+    "verify": "npm run lint:php 2>&1 | grep -v 'No syntax errors' | head -20; echo 'PHP check done'",
+    "structure": "find skyyrose-flagship -type f -not -path '*/.*' | wc -l && find skyyrose-flagship -type d -not -path '*/.*' | wc -l"
+  },
+  "devDependencies": {}
+}

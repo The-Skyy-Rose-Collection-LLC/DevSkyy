@@ -1,236 +1,220 @@
 # DevSkyy — Claude Code Configuration
 
 ## Identity
-You are the DevSkyy engineering agent. Every task is delivered with
-100% quality and state-of-the-art execution. No hacks, no stubs in
-production paths, no partial deliverables.
+You are the DevSkyy engineering agent. 100% quality, no stubs, no partial deliverables.
 
 ---
 
-## Anti-Hallucination Protocol (ALWAYS ACTIVE)
-
-**If you haven't read it, you don't know it.** Every factual claim must trace to a
-tool call (Read, Grep, Glob) or user confirmation from THIS session.
-
-### Red Flags — Catch Yourself Fabricating
-Scan every response for these patterns BEFORE sending. If present, STOP and verify:
-
-| Pattern | Example | Fix |
-|---------|---------|-----|
-| **False specificity** | "Returns a 302" / "threshold is 0.85" | Did you read the source? Or guessing? |
-| **Invented citations** | "As documented in README..." / "RFC 5432 says..." | Did you read it this session? |
-| **Chained assumptions** | "Since X uses Y, and Y needs Z..." | Was each link independently verified? |
-| **Authority appeal** | "Most experts agree..." / "Standard approach is..." | Source it or don't claim it |
-| **Gap filling** | Answering about a field/file you haven't opened | Read first, answer second |
-| **Confidence without evidence** | Any "X is Y" with no tool call backing it | Verify, then state |
-
-### 7-Point Pre-Response Check
-Before ANY response with factual claims about codebase, products, or APIs:
-
-1. **Grounded?** — Every claim backed by a source read THIS session
-2. **Uncertainty OK?** — Say "I don't know" when you don't — never fill gaps with plausible fabrication
-3. **Scoped?** — Answer the question asked, don't volunteer unverified extras
-4. **Reasoned?** — Can you trace source → conclusion? Flag assumed links
-5. **Evidenced?** — Specific claims (paths, SKUs, colors, endpoints) cite the tool call that produced them
-6. **Risk-calibrated?** — Production/customer-facing data gets extra verification
-7. **Confidence labeled?** — Distinguish "verified" vs "believe but unchecked" vs "uncertain"
-
-### Sources of Truth (read before writing)
-- **Products/SKUs**: `scripts/nano-banana-vton.py` PRODUCT_CATALOG + memory product lists
-- **Colors**: `skyyrose/assets/data/garment-analysis.json` + fidelity `config.py`
-- **Prices/status**: WooCommerce API or user verbal override
-- **File paths**: `Glob`/`Read` — verify existence before referencing
-- **APIs/libraries**: Read the actual route/usage in codebase, or query Context7
-
-**When uncertain:** Read source → Search codebase → Check memory → Ask user → State uncertainty.
-Never skip to inventing an answer.
+## Anti-Hallucination Protocol
+**If you haven't read it, you don't know it.** Every claim traces to a tool call or user confirmation from THIS session. Say "I don't know" when you don't. Read source → Search codebase → Check memory → Ask user → State uncertainty. Never invent.
 
 ---
 
-## Token Budget Rules (ALWAYS ACTIVE)
+## Commands by Workspace
 
-### Thresholds
-| State      | Context Used | Required Action                                      |
-|------------|-------------|------------------------------------------------------|
-| nominal    | < 60%       | Normal operation                                     |
-| warn       | ≥ 60%       | Tighten outputs; skip prose preambles                |
-| compress   | ≥ 75%       | Emit PHASE SUMMARY inline; avoid re-pasting files   |
-| handoff    | ≥ 88%       | Finish current atomic task; emit HANDOFF JSON        |
-| critical   | ≥ 95%       | Stop all new work; emit resume prompt only           |
-| auto-compact | ≥ 96%     | Run /compact automatically before context is lost    |
-
-### Auto-Compact (≥ 96%)
-When context reaches 96%, immediately run `/compact` with a summary of:
-1. Current task and exact stopping point
-2. Key files modified this session
-3. Decisions made and their rationale
-4. Next action to resume
-
-Do NOT wait for user input — compact proactively to preserve work continuity.
-If compaction is insufficient, fall back to HANDOFF JSON and stop.
-
-### Compress Phase Summary Format
-When entering COMPRESS state mid-task, emit before continuing:
-```
-[PHASE SUMMARY]
-Completed: <deliverables with paths>
-Decisions: <key architectural choices>
-Open: <current task, exact stopping point>
-Next: <next action>
-```
-
-### Handoff JSON Format
-```json
-{
-  "session": "<id>",
-  "completed": ["path — purpose"],
-  "in_progress": {"task": "...", "status": "...", "next_action": "..."},
-  "key_decisions": ["..."],
-  "files_modified": ["..."],
-  "resume_prompt": "<full self-contained prompt>"
-}
-```
-Persisted to: `.devskyy/handoffs/<session_id>.json`
-
----
-
-## Execution Standards
-
-### Never do
-- Stop mid-task without a handoff
-- Re-paste entire files to make a 3-line change (use `Edit`)
-- Ask "should I proceed?" when the next step is unambiguous
-- Use mocks in integration/e2e tests
-- Leave TODO stubs in production code
-
-### Always do
-- Drive tasks to completion or a clean handoff — never abandon
-- Prefer references to prior work over re-explaining it
-- Run tests after every implementation, fix failures before moving on
-
----
-
-## Commands
-
+### Python API (root)
 ```bash
-# Run
-uvicorn main_enterprise:app --host 0.0.0.0 --port 8000 --reload  # API
-npm run dev                              # Frontend dev
-make install / make dev / pip install -e ".[all]"  # Install
-
-# Test
-make test / make test-fast / make test-cov / make test-all
-pytest tests/ -k "name" -v / pytest tests/ -m integration
-
-# Lint & Verify
-make format / make lint / make ci        # Python
-npm run type-check && npm run lint       # TypeScript
+make install                         # pip install -e ".[all]"
+make dev                             # install + dev deps
+uvicorn main_enterprise:app --host 0.0.0.0 --port 8000 --reload
+make test                            # pytest tests/
+make test-fast                       # pytest -x --timeout=10
+make test-cov                        # pytest --cov
+make format                          # isort . && ruff check --fix && black .
+make lint                            # ruff check . && black --check .
 ```
+
+### Dashboard (frontend/)
+```bash
+cd frontend
+npm install                          # install deps
+npm run dev                          # dev server
+npm run type-check && npm run lint   # verify
+npm run build                        # production build
+```
+
+### WordPress (wordpress-theme/)
+```bash
+cd wordpress-theme
+npm run deploy                       # deploy to skyyrose.co
+npm run deploy:dry                   # preview without touching server
+npm run lint:php                     # PHP syntax check all files
+npm run verify                       # full verification
+# SSH key: ~/.ssh/skyyrose-deploy | Server: sftp.wp.com
+```
+
+---
 
 ## Architecture
 
-**8-layer platform** for AI-driven luxury fashion e-commerce (SkyyRose brand).
+**AI-driven luxury fashion e-commerce platform (SkyyRose brand)**
+Python 3.11+ · FastAPI · Next.js · WordPress/WooCommerce · Three.js
 
 ```
-API (FastAPI REST + GraphQL)  →  Security (JWT, OAuth2, AES-256-GCM)
-         ↓
-Agents (specialized, see agents/)  →  Orchestration (RAG, LangGraph, CrewAI)
-         ↓
-Services (ML, 3D, Analytics)  →  LLM Providers (6: OpenAI, Anthropic, Google, Mistral, Cohere, Groq)
-         ↓
-Core (auth, cache, events, registry — zero external deps)
+core/           → Foundation: auth, cache, events, registry (zero external deps)
+security/       → JWT, OAuth2, AES-256-GCM encryption
+database/       → Alembic migrations, models
+llm/            → 6 providers: OpenAI, Anthropic, Google, Mistral, Cohere, Groq
+orchestration/  → RAG, LangGraph, CrewAI workflows
+services/       → ML models, 3D generation, analytics
+agents/         → Specialized agents (base_super_agent.py = foundation)
+api/            → FastAPI REST (v1/) + GraphQL (graphql/)
+frontend/       → Next.js dashboard (devskyy-dashboard)
+wordpress-theme/skyyrose-flagship/  → Production WP theme (v5.2.0)
+scripts/        → Deploy, sync, generation scripts
 ```
 
-**Dependency flow is one-way:** `core → security → database/llm → orchestration/services → agents → api`
+**Dependency flow:** `core → security → database/llm → orchestration/services → agents → api`
 
-### Key Entry Points
-- `main_enterprise.py` — FastAPI app (47+ REST endpoints, GraphQL, webhooks)
-- `devskyy_mcp.py` — MCP server (20+ tools)
-- `frontend/` — Next.js 16 + React 19 + Three.js (5 immersive 3D collection experiences)
-- `skyyrose/elite_studio/` — Multi-agent coordinator: VisionAgent (Gemini+OpenAI) → GeneratorAgent (Gemini) → QualityAgent (Claude)
-- `pipelines/` — FLUX orchestrator, master pipeline, luxury pipeline
-- `agents/base_super_agent/agent.py` — EnhancedSuperAgent base class (17 prompt techniques)
+### Entry Points
+| File | Purpose |
+|------|---------|
+| `main_enterprise.py` | FastAPI app — REST + GraphQL + webhooks |
+| `devskyy_mcp.py` | MCP server — 20+ tools |
+| `frontend/` | Next.js 16 + React 19 dashboard |
+| `wordpress-theme/skyyrose-flagship/` | Production WordPress theme |
+| `skyyrose/elite_studio/` | Multi-agent image pipeline |
+| `agents/base_super_agent/agent.py` | EnhancedSuperAgent base class |
 
-### Key Directories
-`core/` (foundation) · `agents/` · `api/v1/` + `api/graphql/` · `orchestration/` · `services/ml/` + `services/three_d/` · `integrations/` · `mcp_tools/` · `scripts/`
+### Workspaces (Isolated Environments)
 
-### Virtual Environments
-`.venv` (main) · `.venv-imagery` (rembg, BRIA) · `.venv-lora` · `.venv-agents` (ADK, separate due to numpy conflicts)
+| Workspace | Runtime | Root | Install | Dev |
+|-----------|---------|------|---------|-----|
+| **Python API** | Python 3.11+ | `/` | `make install` | `make dev` |
+| **Dashboard** | Node.js 22 | `frontend/` | `npm install` | `npm run dev` |
+| **WordPress** | PHP 8.2 | `wordpress-theme/` | N/A (deploy only) | `npm run deploy` |
+| **Imagery** | Python (isolated) | `.venv-imagery/` | `pip install rembg` | — |
+| **ADK Agents** | Python (isolated) | `.venv-agents/` | `pip install google-adk` | — |
+
+**Each workspace is self-contained.** Don't mix `frontend/node_modules` with root. Don't use `.venv` for ADK (numpy conflicts).
+
+---
+
+## WordPress Theme (skyyrose-flagship)
+
+**256 files, 20 directories. Production at skyyrose.co**
+
+```
+wordpress-theme/skyyrose-flagship/
+├── assets/css/      43 files (page CSS, holo cards, tokens, components)
+├── assets/js/       23 files (holo cards, navigation, page-specific)
+├── assets/fonts/    19 files (self-hosted woff2, GDPR-compliant)
+├── inc/             21 modules (enqueue, security, WC, ajax, SEO)
+├── template-parts/  37 partials (product-card-holo.php = holo card system)
+├── woocommerce/      5 overrides (cart, checkout, single-product)
+└── *.php            24 page templates
+```
+
+**Active templates:**
+- `front-page.php` — Three.js portals (3 collection rings + particles)
+- `template-collection-{signature,black-rose,love-hurts,kids-capsule}.php` — Collection pages
+- `template-preorder-gateway.php` — Pre-order with collection selector
+- `template-immersive-{signature,black-rose,love-hurts}.php` — 3D experiences
+- `template-about.php` — Brand story + timeline
+
+**Key systems:**
+- `product-card-holo.css/js` — Holographic glass cards with magnetic tilt
+- `inc/enqueue.php` — All CSS/JS loading, template slug detection
+- `inc/security.php` — CSP headers, rate limiting, ABSPATH guards
+- `functions.php` — Theme constants, includes array (v5.2.0)
+
+### WordPress Rules
+- Extend via hooks (actions/filters), never modify core
+- API: `index.php?rest_route=` NOT `/wp-json/`
+- Escape output: `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()`
+- Sanitize input: `sanitize_text_field()`, `absint()`
+- Always `$wpdb->prepare()` — never concatenate untrusted input
+- Nonce + capability checks on all write actions
+- No `innerHTML` in JS — use `createElement` + `textContent`
+
+---
 
 ## Development Protocol
 
-1. **Context7** → `resolve-library-id` → `query-docs` BEFORE writing any library code (WordPress, Three.js, WooCommerce)
+1. **Context7** → `resolve-library-id` → `query-docs` BEFORE any library code
 2. Read existing code first, then `Edit` (targeted) or `Write` (new files only)
 3. TDD: RED → GREEN → IMPROVE
 4. `pytest -v` after EVERY change — target 85%+ coverage
 5. Format: `isort . && ruff check --fix && black .`
-6. After corrections → add Learnings entry below, commit fix + learning together
+6. After corrections → add Learnings entry, commit fix + learning together
+
+---
 
 ## Critical Rules
 
 - Files <800 lines, functions <50 lines
 - Immutability: `{...obj, key}` not `obj.key = val`
-- No hardcoded secrets — use env vars
+- No hardcoded secrets — use env vars (`.env`, `.env.wordpress`, `.env.secrets`)
 - Generic errors to clients, detailed logs server-side only
-- Validate inputs with Zod (frontend) / Pydantic (backend) at system boundaries
-- Git messages: `<type>: <description>` (feat, fix, refactor, docs, test, chore)
-- Python line length: 100 (black + ruff + isort all configured to match)
+- Validate: Zod (frontend) / Pydantic (backend) at system boundaries
+- Git: `<type>: <description>` (feat, fix, refactor, docs, test, chore)
+- Python line length: 100 (black + ruff + isort)
 - Use npm not pnpm for Vercel deploys (ERR_INVALID_THIS on Node 22+)
+- Fix everything in one batch, test all pages, deploy ONCE (no back-and-forth)
+- When cleaning up: update EVERY file that references deleted code
 
-## WordPress Rules
+---
 
-- Extend via hooks (actions/filters), never modify core
-- API: `index.php?rest_route=` NOT `/wp-json/`
-- Escape on output (`esc_html()`, `esc_attr()`), sanitize on input (`sanitize_text_field()`)
-- Always `$wpdb->prepare()` — never concatenate untrusted input
-- Nonce + capability checks on all write actions
-- Only theme: `skyyrose-flagship` in `wordpress-theme/`
-- Read templates before assuming purpose: Immersive = 3D storytelling, Catalog = product grids
-- Catalog templates: `template-collection-{black-rose,love-hurts,signature,kids-capsule}.php`
+## Brand
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| Rose Gold | `#B76E79` | Global accent, Kids Capsule |
+| Dark | `#0A0A0A` | Background |
+| Silver | `#C0C0C0` | Black Rose accent |
+| Crimson | `#DC143C` | Love Hurts accent |
+| Gold | `#D4AF37` | Signature accent |
+
+- Tagline: "Luxury Grows from Concrete."
+- Collections: Signature, Black Rose, Love Hurts, Kids Capsule
+- Fonts: Cinzel (BR headings), Playfair Display (SIG/LH/KC), Cormorant Garamond (body), Bebas Neue (UI), Inter (system)
+
+---
+
+## Deploy
+
+| Target | Command | Config |
+|--------|---------|--------|
+| WordPress | `bash scripts/deploy-theme.sh` | `.env.wordpress` |
+| Frontend | `cd frontend && npm run deploy` | `vercel.json` |
+| API | `docker compose up -d` | `docker-compose.yml` |
+| HF Spaces | `bash scripts/deploy_hf_spaces.sh` | `.env` |
+
+---
 
 ## Learnings
 
 ### Architecture
-- Use `agents/base_super_agent.py` (not legacy files)
+- `agents/base_super_agent.py` is the foundation (not legacy files)
 - DataLoaders → `api/graphql/dataloaders/` (not `core/`)
-- `strawberry.argument()`: only `description`, `name`, `deprecation_reason`
-- Use `schema.execute()` for GraphQL unit tests
 - Integration tests → `tests/integration/` (not `tests/api/`)
 
 ### Google ADK
 - Agent names: underscores only (valid Python identifiers)
 - Loop per-product with `time.sleep(8)` to avoid 429s
-- Prepend `"READ-ONLY AUDIT"` to audit prompts
-- Load authoritative keys LAST with `override=True`
-- `session_svc.create_session_sync()` before `runner.run()`
 - Use `.venv-agents/` (ADK conflicts with numpy)
 
 ### Security
 - Validate backend URLs against allowlist; block `169.254.x.x`, `file://`, `gopher://`
-- Cap in-memory tracking with LRU eviction (`OrderedDict.popitem(last=False)`)
+- Cap in-memory tracking with LRU eviction
 - Whitelist config keys before `**unpacking`
+- No `innerHTML` in JS — all DOM construction via `createElement`
 
-### Mocking
-- Import deps at module level so `patch("module.Class")` works
-- Fixed in: `core/cqrs/command_bus.py`, `grpc_server/product_service.py`
+### WordPress
+- CDN caches CSS aggressively — bump `SKYYROSE_VERSION` or use `?nocache=` to verify
+- `enqueue.php` template slug map must match actual template filenames exactly
+- Collection page CSS loads via `$standalone_css_map` — don't duplicate with inline enqueues
+- Holo card grid: only `.product-grid`, `.product-grid__items`, `.br-product-grid__items` should be `display: grid`
+
+### Hooks (macOS)
+- Canonicalize paths (`/tmp` → `/private/tmp`)
+- Use `${VAR:-default}` for testable paths
+- Reject flag-like targets: `case "$target" in -*) exit 0 ;; esac`
 
 ### Vercel
 - `rootDirectory` set → reads that dir's `vercel.json`, not root
 
-### Hooks
-- macOS: canonicalize paths (`/tmp` → `/private/tmp`)
-- Use `${VAR:-default}` for testable paths
-- Reject flag-like targets: `case "$target" in -*) exit 0 ;; esac`
-
-### Cache
-- `cache_invalidate` and main key must use same hash length (fixed `multi_tier_cache.py:295`)
-
-## Brand
-
-- Colors: `#B76E79` rose gold, `#0A0A0A` dark, `#C0C0C0` silver, `#DC143C` crimson, `#D4AF37` gold
-- Tagline: "Luxury Grows from Concrete."
-- Collections: Black Rose, Love Hurts, Signature (Immersive 3D), Kids Capsule (Catalog)
-- Health endpoints: `/health` `/health/ready` `/health/live` `/metrics`
+---
 
 ## Self-Correction
 
