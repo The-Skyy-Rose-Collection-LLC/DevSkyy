@@ -213,6 +213,7 @@ wordpress-theme/skyyrose-flagship/
 - Premium animation system: `animations-premium.css` + `premium-interactions.js` loaded globally — use `rv-clip-*`, `rv-blur*`, `rv-split-*`, `stagger-grid`, `magnetic`, `btn-sweep`, `btn-border-draw` classes
 - `php-lint.sh` needs explicit Homebrew PHP path (`/opt/homebrew/bin/php`) — lint-staged subshell doesn't inherit brew paths
 - Image cache-bust: append `?v=' . SKYYROSE_VERSION` to branding image URLs in templates
+- Cursor disappearing: caused by Jetpack Instant Search invisible overlay (z-index max, opacity 0, pointer-events auto) — fix with `pointer-events: none !important` in design-tokens.css
 
 ### Hooks (macOS)
 - Canonicalize paths (`/tmp` → `/private/tmp`)
@@ -239,10 +240,10 @@ wordpress-theme/skyyrose-flagship/
 - One task per subagent for focused execution
 
 ### 3. Self-Improvement Loop
-- After ANY correction from the user: update Learnings with the pattern
-- Write rules that prevent the same mistake from recurring
-- Ruthlessly iterate on these learnings until mistake rate drops
-- Review learnings at session start for relevant project
+- After ANY correction from the user: update `tasks/lessons.md` with the pattern
+- Write rules for yourself that prevent the same mistake
+- Ruthlessly iterate on these lessons until mistake rate drops
+- Review lessons at session start for relevant project
 
 ### 4. Verification Before Done
 - Never mark a task complete without proving it works
@@ -263,12 +264,12 @@ wordpress-theme/skyyrose-flagship/
 - Go fix failing CI tests without being told how
 
 ## Task Management
-1. **Plan First**: Write plan with checkable items
+1. **Plan First**: Write plan to `tasks/todo.md` with checkable items
 2. **Verify Plan**: Check in before starting implementation
 3. **Track Progress**: Mark items complete as you go
 4. **Explain Changes**: High-level summary at each step
-5. **Document Results**: Add review section
-6. **Capture Lessons**: Update Learnings after corrections
+5. **Document Results**: Add review section to `tasks/todo.md`
+6. **Capture Lessons**: Update `tasks/lessons.md` after corrections
 
 ## Core Principles
 - **Simplicity First**: Make every change as simple as possible. Impact minimal code.
