@@ -357,10 +357,12 @@ function skyyrose_enqueue_template_styles() {
 
 	// Unified collection page CSS — single stylesheet for all 4 collection templates.
 	if ( 'collection-standalone' === $slug ) {
-		if ( file_exists( $base_css_dir . '/collection-pages.css' ) ) {
+		$col_css = $use_min && file_exists( $base_css_dir . '/collection-pages.min.css' )
+			? 'collection-pages.min.css' : 'collection-pages.css';
+		if ( file_exists( $base_css_dir . '/' . $col_css ) ) {
 			wp_enqueue_style(
 				'skyyrose-collection-pages',
-				$base_css_uri . '/collection-pages.css',
+				$base_css_uri . '/' . $col_css,
 				$global_deps,
 				SKYYROSE_VERSION
 			);

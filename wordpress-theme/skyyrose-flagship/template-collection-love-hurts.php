@@ -28,17 +28,7 @@ if ( $has_wc ) {
 }
 
 if ( empty( $products ) ) {
-	$catalog_products = skyyrose_get_collection_products( 'love-hurts' );
-	foreach ( $catalog_products as $cat_product ) {
-		$products[] = array(
-			'title'      => $cat_product['name'],
-			'price'      => skyyrose_format_price( $cat_product ),
-			'badge_text' => $cat_product['badge'],
-			'sku'        => $cat_product['sku'],
-			'image_url'  => skyyrose_product_image_uri( $cat_product['front_model_image'] ?: $cat_product['image'] ),
-			'image_back' => skyyrose_product_image_uri( $cat_product['back_image'] ),
-		);
-	}
+	$products = skyyrose_map_collection_to_cards( 'love-hurts' );
 }
 
 /* ── Emotion cards (Love Hurts unique section) ────────────────── */

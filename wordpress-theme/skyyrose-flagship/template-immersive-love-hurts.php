@@ -55,6 +55,8 @@ if ( class_exists( 'WooCommerce' ) ) {
 
 		$products_per_room[ $room_idx ][] = array(
 			'id'         => $wc_product->get_slug(),
+			'sku'        => $wc_product->get_sku() ? $wc_product->get_sku() : $wc_product->get_slug(),
+			'wc_id'      => $wc_product->get_id(),
 			'name'       => $wc_product->get_name(),
 			'price'      => wp_strip_all_tags( wc_price( $wc_product->get_price() ) ),
 			'image'      => $wc_product->get_image_id() ? wp_get_attachment_url( $wc_product->get_image_id() ) : '',

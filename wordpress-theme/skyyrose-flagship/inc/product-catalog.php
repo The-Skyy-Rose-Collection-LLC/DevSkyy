@@ -634,8 +634,14 @@ function skyyrose_get_product( $sku ) {
  * @return array  Array of product data arrays for the collection.
  */
 function skyyrose_get_collection_products( $collection ) {
+	static $cache = array();
+
 	$collection = sanitize_key( $collection );
-	$catalog    = skyyrose_get_product_catalog();
+	if ( isset( $cache[ $collection ] ) ) {
+		return $cache[ $collection ];
+	}
+
+	$catalog  = skyyrose_get_product_catalog();
 	$products = array();
 
 	foreach ( $catalog as $product ) {
@@ -644,7 +650,49 @@ function skyyrose_get_collection_products( $collection ) {
 		}
 	}
 
+	$cache[ $collection ] = $products;
 	return $products;
+}
+
+/**
+ * Normalize a SKU to its base product SKU (strip variant suffixes).
+ *
+ * Handles: br-003-giants → br-003, sg-001-tee → sg-001, br-003a → br-003.
+ *
+ * @since  6.3.0
+ * @param  string $sku SKU with optional variant suffix.
+ * @return string Base SKU.
+ */
+function skyyrose_normalize_sku( $sku ) {
+	$sku = preg_replace( '/-(tee|shorts|giants|white|oakland)$/', '', $sku );
+	return preg_replace( '/([a-z]{2,4}-\d{3})[a-z]$/', '$1', $sku );
+}
+
+/**
+ * Map catalog products to the format expected by product-card-holo template.
+ *
+ * Used as fallback when WooCommerce products are unavailable.
+ *
+ * @since  6.3.0
+ * @param  string $collection Collection slug.
+ * @return array  Array of product card args.
+ */
+function skyyrose_map_collection_to_cards( $collection ) {
+	$cards    = array();
+	$products = skyyrose_get_collection_products( $collection );
+
+	foreach ( $products as $product ) {
+		$cards[] = array(
+			'title'      => $product['name'],
+			'price'      => skyyrose_format_price( $product ),
+			'badge_text' => $product['badge'],
+			'sku'        => $product['sku'],
+			'image_url'  => skyyrose_product_image_uri( $product['front_model_image'] ?: $product['image'] ),
+			'image_back' => skyyrose_product_image_uri( $product['back_image'] ),
+		);
+	}
+
+	return $cards;
 }
 
 /**
@@ -729,9 +777,7 @@ function skyyrose_product_image_uri( $image_path ) {
  */
 function skyyrose_product_url( $sku ) {
 	if ( function_exists( 'wc_get_product_id_by_sku' ) ) {
-		// Strip variant suffixes for WC lookup.
-		$lookup_sku = preg_replace( '/-(tee|shorts)$/', '', $sku );
-		$lookup_sku = preg_replace( '/([a-z]{2}-\d{3})[a-z]$/', '$1', $lookup_sku );
+		$lookup_sku = skyyrose_normalize_sku( $sku );
 		$product_id = wc_get_product_id_by_sku( $lookup_sku );
 		if ( $product_id ) {
 			return get_permalink( $product_id );

@@ -37,15 +37,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Extract args with defaults.
-$collection_slug = isset( $args['collection_slug'] ) ? $args['collection_slug'] : '';
+$collection_slug = isset( $args['collection_slug'] ) ? sanitize_key( $args['collection_slug'] ) : '';
 $collection_name = isset( $args['collection_name'] ) ? $args['collection_name'] : '';
 $world_name      = isset( $args['world_name'] ) ? $args['world_name'] : '';
 $tagline         = isset( $args['tagline'] ) ? $args['tagline'] : '';
 $accent_color    = isset( $args['accent_color'] ) ? $args['accent_color'] : '#B76E79';
 $collection_url  = isset( $args['collection_url'] ) ? $args['collection_url'] : '';
-$rooms           = isset( $args['rooms'] ) ? $args['rooms'] : array();
+$rooms           = isset( $args['rooms'] ) && is_array( $args['rooms'] ) ? $args['rooms'] : array();
 $room_count      = count( $rooms );
-$first_room_name = $room_count > 0 ? $rooms[0]['name'] : '';
+$first_room_name = $room_count > 0 && isset( $rooms[0]['name'] ) ? $rooms[0]['name'] : '';
+
+// Validate accent_color is a safe CSS color value (hex only).
+if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
+	$accent_color = '#B76E79';
+}
 ?>
 
 <!-- ═══ Immersive Scene: <?php echo esc_html( $world_name ); ?> ═══ -->
@@ -59,12 +64,15 @@ $first_room_name = $room_count > 0 ? $rooms[0]['name'] : '';
 
 	<!-- Scene Viewport — Composited AI Scene Images -->
 	<div class="scene-viewport">
-		<?php foreach ( $rooms as $index => $room ) : ?>
+		<?php foreach ( $rooms as $index => $room ) :
+			$room_name  = isset( $room['name'] ) ? $room['name'] : '';
+			$room_image = isset( $room['image'] ) ? $room['image'] : '';
+		?>
 			<div class="scene-layer<?php echo 0 === $index ? ' active' : ''; ?>"
-			     data-room-name="<?php echo esc_attr( $room['name'] ); ?>">
-				<?php if ( ! empty( $room['image'] ) ) : ?>
-					<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/immersive/' . $room['image'] ); ?>"
-					     alt="<?php echo esc_attr( $room['name'] ); ?>"
+			     data-room-name="<?php echo esc_attr( $room_name ); ?>">
+				<?php if ( ! empty( $room_image ) ) : ?>
+					<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/immersive/' . $room_image ); ?>"
+					     alt="<?php echo esc_attr( $room_name ); ?>"
 					     <?php echo 0 === $index ? 'fetchpriority="high"' : 'loading="lazy"'; ?>>
 				<?php endif; ?>
 			</div>
@@ -114,12 +122,18 @@ $first_room_name = $room_count > 0 ? $rooms[0]['name'] : '';
 					continue;
 				}
 			?>
+				<?php
+					$p_id  = isset( $product['id'] ) ? $product['id'] : '';
+					$p_sku = isset( $product['sku'] ) ? $product['sku'] : $p_id;
+					$p_wc  = isset( $product['wc_id'] ) ? (int) $product['wc_id'] : 0;
+				?>
 				<a
-					href="<?php echo esc_url( $product['url'] ); ?>"
+					href="<?php echo esc_url( isset( $product['url'] ) ? $product['url'] : '' ); ?>"
 					class="hotspot<?php echo ! empty( $product['prop'] ) ? ' hotspot--prop-' . esc_attr( $product['prop'] ) : ''; ?>"
-					style="left: <?php echo esc_attr( $product['left'] ); ?>%; top: <?php echo esc_attr( $product['top'] ); ?>%;"
-					data-product-id="<?php echo esc_attr( $product['id'] ); ?>"
-					data-product-sku="<?php echo esc_attr( $product['id'] ); ?>"
+					style="left: <?php echo esc_attr( isset( $product['left'] ) ? $product['left'] : '50' ); ?>%; top: <?php echo esc_attr( isset( $product['top'] ) ? $product['top'] : '50' ); ?>%;"
+					data-product-id="<?php echo esc_attr( $p_id ); ?>"
+					data-product-sku="<?php echo esc_attr( $p_sku ); ?>"
+					<?php if ( $p_wc > 0 ) : ?>data-product-wc-id="<?php echo esc_attr( $p_wc ); ?>"<?php endif; ?>
 					data-product-name="<?php echo esc_attr( $product['name'] ); ?>"
 					data-product-price="<?php echo esc_attr( $product['price'] ); ?>"
 					data-product-image="<?php echo esc_url( $product['image'] ); ?>"

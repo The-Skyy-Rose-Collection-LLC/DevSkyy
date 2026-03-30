@@ -17,7 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 </button>
 <script>
 (function(){
-	var btn = document.querySelector('.cinematic-toggle');
+	var s = document.currentScript;
+	var btn = s ? s.previousElementSibling : document.querySelector('.cinematic-toggle');
 	if (!btn) return;
 	try {
 		if (sessionStorage.getItem('skyyrose_cinematic_mode') === '1') {
