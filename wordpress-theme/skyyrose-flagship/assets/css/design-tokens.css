@@ -187,6 +187,16 @@
 }
 
 /* -----------------------------------------------
+   Jetpack Overlay Fix — invisible overlay blocks cursor
+   ----------------------------------------------- */
+.jetpack-instant-search__overlay {
+	pointer-events: none !important;
+}
+.jetpack-instant-search__overlay[aria-hidden="true"] {
+	display: none !important;
+}
+
+/* -----------------------------------------------
    Reduced Motion — Override duration tokens
    ----------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
