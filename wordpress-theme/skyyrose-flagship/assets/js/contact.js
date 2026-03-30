@@ -318,30 +318,75 @@
 			existing.remove();
 		}
 
-		var iconSvg = type === 'success'
-			? '<svg class="contact-toast__icon contact-toast__icon--success" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
-			: '<svg class="contact-toast__icon contact-toast__icon--error" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+		var svgNS = 'http://www.w3.org/2000/svg';
+
+		function createSvgIcon(cls, paths) {
+			var svg = document.createElementNS(svgNS, 'svg');
+			svg.setAttribute('class', cls);
+			svg.setAttribute('width', '24');
+			svg.setAttribute('height', '24');
+			svg.setAttribute('viewBox', '0 0 24 24');
+			svg.setAttribute('fill', 'none');
+			svg.setAttribute('stroke', 'currentColor');
+			svg.setAttribute('stroke-width', '2');
+			svg.setAttribute('stroke-linecap', 'round');
+			svg.setAttribute('stroke-linejoin', 'round');
+			paths.forEach(function (p) {
+				var el = document.createElementNS(svgNS, p.tag);
+				Object.keys(p.attrs).forEach(function (k) { el.setAttribute(k, p.attrs[k]); });
+				svg.appendChild(el);
+			});
+			return svg;
+		}
+
+		var iconEl = type === 'success'
+			? createSvgIcon('contact-toast__icon contact-toast__icon--success', [
+				{ tag: 'path', attrs: { d: 'M22 11.08V12a10 10 0 1 1-5.93-9.14' } },
+				{ tag: 'polyline', attrs: { points: '22 4 12 14.01 9 11.01' } }
+			])
+			: createSvgIcon('contact-toast__icon contact-toast__icon--error', [
+				{ tag: 'circle', attrs: { cx: '12', cy: '12', r: '10' } },
+				{ tag: 'line', attrs: { x1: '15', y1: '9', x2: '9', y2: '15' } },
+				{ tag: 'line', attrs: { x1: '9', y1: '9', x2: '15', y2: '15' } }
+			]);
 
 		var toast = document.createElement('div');
 		toast.className = 'contact-toast contact-toast--' + type;
 		toast.setAttribute('role', 'alert');
 		toast.setAttribute('aria-live', 'assertive');
-		toast.innerHTML =
-			iconSvg +
-			'<span class="contact-toast__message">' + escapeHtml(message) + '</span>' +
-			'<button type="button" class="contact-toast__dismiss" aria-label="Dismiss notification">' +
-			'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>' +
-			'</button>';
+		toast.appendChild(iconEl);
+		var msgSpan = document.createElement('span');
+		msgSpan.className = 'contact-toast__message';
+		msgSpan.textContent = message;
+		toast.appendChild(msgSpan);
+		var dismissBtn = document.createElement('button');
+		dismissBtn.type = 'button';
+		dismissBtn.className = 'contact-toast__dismiss';
+		dismissBtn.setAttribute('aria-label', 'Dismiss notification');
+		var dismissSvg = document.createElementNS(svgNS, 'svg');
+		dismissSvg.setAttribute('width', '16');
+		dismissSvg.setAttribute('height', '16');
+		dismissSvg.setAttribute('viewBox', '0 0 24 24');
+		dismissSvg.setAttribute('fill', 'none');
+		dismissSvg.setAttribute('stroke', 'currentColor');
+		dismissSvg.setAttribute('stroke-width', '2');
+		dismissSvg.setAttribute('stroke-linecap', 'round');
+		dismissSvg.setAttribute('stroke-linejoin', 'round');
+		var p1 = document.createElementNS(svgNS, 'path');
+		p1.setAttribute('d', 'M18 6 6 18');
+		dismissSvg.appendChild(p1);
+		var p2 = document.createElementNS(svgNS, 'path');
+		p2.setAttribute('d', 'm6 6 12 12');
+		dismissSvg.appendChild(p2);
+		dismissBtn.appendChild(dismissSvg);
+		toast.appendChild(dismissBtn);
 
 		document.body.appendChild(toast);
 
-		// Dismiss on click.
-		var dismissBtn = qs('.contact-toast__dismiss', toast);
-		if (dismissBtn) {
-			dismissBtn.addEventListener('click', function () {
-				dismissToast(toast);
-			});
-		}
+		// Dismiss on click (dismissBtn already created above).
+		dismissBtn.addEventListener('click', function () {
+			dismissToast(toast);
+		});
 
 		// Animate in.
 		requestAnimationFrame(function () {
