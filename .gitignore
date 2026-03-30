@@ -232,8 +232,8 @@ woocommerce-*.png
 wp-admin-*.png
 
 # WordPress theme binary assets
-# Track homepage/brand images; ignore generated product renders and 3D assets.
-wordpress-theme/skyyrose-flagship/assets/images/products/
+# Track homepage/brand images and product photos; ignore avatar and 3D assets.
+# wordpress-theme/skyyrose-flagship/assets/images/products/  # now tracked — needed for deploy
 wordpress-theme/skyyrose-flagship/assets/images/avatar/
 wordpress-theme/skyyrose-flagship/assets/scenes/
 wordpress-theme/skyyrose-flagship/assets/3d/
