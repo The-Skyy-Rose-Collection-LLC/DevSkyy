@@ -423,5 +423,16 @@ echo wp_json_encode( array(
 </div><!-- .homepage-v2 -->
 
 <?php
-// Don't call get_footer() — this template has its own footer
+// Load homepage JS inline to bypass page-optimize plugin stripping
+$homepage_js_path = SKYYROSE_DIR . '/assets/js/homepage-v2.js';
+if ( file_exists( $homepage_js_path ) ) :
 ?>
+<script><?php
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+	echo file_get_contents( $homepage_js_path );
+?></script>
+<?php endif; ?>
+
+<?php wp_footer(); ?>
+</body>
+</html>
