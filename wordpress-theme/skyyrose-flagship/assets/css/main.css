@@ -68,8 +68,36 @@ p, li, dd, blockquote {
 	text-wrap: pretty;
 }
 
+/* ── Global Headings ─────────────────────────────────────────── */
 h1, h2, h3, h4, h5, h6 {
+	font-family: var(--fd, 'Cinzel', serif);
+	font-weight: 600;
+	line-height: var(--leading-tight, 1.15);
+	letter-spacing: var(--tracking-tight, -0.025em);
+	color: var(--color-text-primary, #fff);
 	text-wrap: balance;
+}
+
+h1 { font-size: var(--text-5xl); }
+h2 { font-size: var(--text-4xl); }
+h3 { font-size: var(--text-3xl); letter-spacing: var(--tracking-normal, 0); }
+h4 { font-size: var(--text-2xl); }
+h5 { font-size: var(--text-xl); font-weight: 500; }
+h6 { font-size: var(--text-lg); font-weight: 500; }
+
+/* ── Global Body Text Clarity ────────────────────────────────── */
+p {
+	font-size: var(--text-base);
+	line-height: var(--leading-normal, 1.6);
+	color: var(--color-text-secondary, #E0E0E0);
+	max-width: 75ch;
+}
+
+/* Ensure body text on dark bg is readable */
+.site-content p,
+.col-page p,
+.homepage-v2 p {
+	color: rgba(255, 255, 255, 0.92);
 }
 
 /* Target selector for native dark UI elements */

@@ -171,7 +171,7 @@ preflight() {
     # PHP syntax check
     local php_errors=0
     while IFS= read -r -d '' phpfile; do
-        if ! php -l "$phpfile" &>/dev/null; then
+        if ! /opt/homebrew/bin/php -l "$phpfile" &>/dev/null; then
             log_error "PHP syntax error: $phpfile"
             php_errors=$((php_errors + 1))
         fi

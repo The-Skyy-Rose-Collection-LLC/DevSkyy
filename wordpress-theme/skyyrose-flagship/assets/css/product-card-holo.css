@@ -260,7 +260,7 @@
 	backdrop-filter: blur(8px);
 	-webkit-backdrop-filter: blur(8px);
 	border: 1px solid rgba(255, 255, 255, 0.08);
-	color: rgba(255, 255, 255, 0.5);
+	color: rgba(255, 255, 255, 0.72);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -461,7 +461,7 @@
 	border: 1px solid rgba(255, 255, 255, 0.12);
 	border-radius: 4px;
 	background: transparent;
-	color: rgba(255, 255, 255, 0.5);
+	color: rgba(255, 255, 255, 0.72);
 	font-family: 'Inter', 'Space Mono', monospace;
 	font-size: 11px;
 	letter-spacing: 1px;

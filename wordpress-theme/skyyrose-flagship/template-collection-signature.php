@@ -24,14 +24,17 @@ if ( function_exists( 'wc_get_products' ) ) {
 }
 
 if ( empty( $products ) ) {
-	$products = array(
-		array( 'title' => __( 'Signature Rose Hoodie', 'skyyrose-flagship' ), 'price' => '$185', 'badge_text' => __( 'Iconic', 'skyyrose-flagship' ), 'sku' => 'sig-rose-hoodie' ),
-		array( 'title' => __( 'Script Logo Tee', 'skyyrose-flagship' ), 'price' => '$95', 'badge_text' => __( 'Bestseller', 'skyyrose-flagship' ), 'sku' => 'sig-script-tee' ),
-		array( 'title' => __( 'Gold Standard Jacket', 'skyyrose-flagship' ), 'price' => '$425', 'badge_text' => __( 'Limited', 'skyyrose-flagship' ), 'sku' => 'sig-gold-jacket' ),
-		array( 'title' => __( 'Heritage Crewneck', 'skyyrose-flagship' ), 'price' => '$145', 'badge_text' => '', 'sku' => 'sig-heritage-crew' ),
-		array( 'title' => __( 'Foundation Joggers', 'skyyrose-flagship' ), 'price' => '$155', 'badge_text' => __( 'New', 'skyyrose-flagship' ), 'sku' => 'sig-foundation-joggers' ),
-		array( 'title' => __( 'Crown Cap', 'skyyrose-flagship' ), 'price' => '$65', 'badge_text' => '', 'sku' => 'sig-crown-cap' ),
-	);
+	$catalog_products = skyyrose_get_collection_products( 'signature' );
+	foreach ( $catalog_products as $cat_product ) {
+		$products[] = array(
+			'title'      => $cat_product['name'],
+			'price'      => skyyrose_format_price( $cat_product ),
+			'badge_text' => $cat_product['badge'],
+			'sku'        => $cat_product['sku'],
+			'image_url'  => skyyrose_product_image_uri( $cat_product['front_model_image'] ?: $cat_product['image'] ),
+			'image_back' => skyyrose_product_image_uri( $cat_product['back_image'] ),
+		);
+	}
 }
 
 /* ── Feature cards ────────────────────────────────────────────── */

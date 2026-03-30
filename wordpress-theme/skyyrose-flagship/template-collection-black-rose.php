@@ -26,14 +26,17 @@ if ( function_exists( 'wc_get_products' ) ) {
 }
 
 if ( empty( $products ) ) {
-	$products = array(
-		array( 'title' => __( 'Black Rose Classic Hoodie', 'skyyrose-flagship' ), 'price' => '$185', 'badge_text' => __( 'Bestseller', 'skyyrose-flagship' ), 'sku' => 'br-classic-hoodie' ),
-		array( 'title' => __( 'Obsidian Tee', 'skyyrose-flagship' ), 'price' => '$75', 'badge_text' => __( 'New', 'skyyrose-flagship' ), 'sku' => 'br-obsidian-tee' ),
-		array( 'title' => __( 'Dark Bloom Jacket', 'skyyrose-flagship' ), 'price' => '$295', 'badge_text' => __( 'Limited', 'skyyrose-flagship' ), 'sku' => 'br-dark-bloom-jacket' ),
-		array( 'title' => __( 'Thorn Cargo Pants', 'skyyrose-flagship' ), 'price' => '$195', 'badge_text' => '', 'sku' => 'br-thorn-cargo' ),
-		array( 'title' => __( 'Midnight Pullover', 'skyyrose-flagship' ), 'price' => '$165', 'badge_text' => '', 'sku' => 'br-midnight-pullover' ),
-		array( 'title' => __( 'Shadow Knit Tee', 'skyyrose-flagship' ), 'price' => '$85', 'badge_text' => '', 'sku' => 'br-shadow-knit-tee' ),
-	);
+	$catalog_products = skyyrose_get_collection_products( 'black-rose' );
+	foreach ( $catalog_products as $cat_product ) {
+		$products[] = array(
+			'title'      => $cat_product['name'],
+			'price'      => skyyrose_format_price( $cat_product ),
+			'badge_text' => $cat_product['badge'],
+			'sku'        => $cat_product['sku'],
+			'image_url'  => skyyrose_product_image_uri( $cat_product['front_model_image'] ?: $cat_product['image'] ),
+			'image_back' => skyyrose_product_image_uri( $cat_product['back_image'] ),
+		);
+	}
 }
 
 /* ── Feature cards — The Philosophy ───────────────────────────── */

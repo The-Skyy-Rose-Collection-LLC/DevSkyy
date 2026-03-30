@@ -28,14 +28,17 @@ if ( $has_wc ) {
 }
 
 if ( empty( $products ) ) {
-	$products = array(
-		array( 'title' => __( 'Enchanted Rose Hoodie', 'skyyrose-flagship' ), 'price' => '$195', 'badge_text' => __( 'Bestseller', 'skyyrose-flagship' ), 'sku' => 'lh-enchanted-rose-hoodie' ),
-		array( 'title' => __( 'Beast Mode Tee', 'skyyrose-flagship' ), 'price' => '$85', 'badge_text' => __( 'New', 'skyyrose-flagship' ), 'sku' => 'lh-beast-mode-tee' ),
-		array( 'title' => __( 'Thorned Heart Jacket', 'skyyrose-flagship' ), 'price' => '$345', 'badge_text' => __( 'Limited', 'skyyrose-flagship' ), 'sku' => 'lh-thorned-heart-jacket' ),
-		array( 'title' => __( 'Bloodline Crewneck', 'skyyrose-flagship' ), 'price' => '$145', 'badge_text' => '', 'sku' => 'lh-bloodline-crewneck' ),
-		array( 'title' => __( 'Glass Dome Varsity', 'skyyrose-flagship' ), 'price' => '$295', 'badge_text' => __( 'New', 'skyyrose-flagship' ), 'sku' => 'lh-glass-dome-varsity' ),
-		array( 'title' => __( 'Last Petal Joggers', 'skyyrose-flagship' ), 'price' => '$135', 'badge_text' => '', 'sku' => 'lh-last-petal-joggers' ),
-	);
+	$catalog_products = skyyrose_get_collection_products( 'love-hurts' );
+	foreach ( $catalog_products as $cat_product ) {
+		$products[] = array(
+			'title'      => $cat_product['name'],
+			'price'      => skyyrose_format_price( $cat_product ),
+			'badge_text' => $cat_product['badge'],
+			'sku'        => $cat_product['sku'],
+			'image_url'  => skyyrose_product_image_uri( $cat_product['front_model_image'] ?: $cat_product['image'] ),
+			'image_back' => skyyrose_product_image_uri( $cat_product['back_image'] ),
+		);
+	}
 }
 
 /* ── Emotion cards (Love Hurts unique section) ────────────────── */

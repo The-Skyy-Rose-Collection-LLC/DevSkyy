@@ -333,10 +333,10 @@ add_action( 'after_switch_theme', 'skyyrose_setup_menus' );
 add_action(
 	'init',
 	function () {
-		if ( get_option( 'skyyrose_menus_setup_v430' ) ) {
+		if ( get_option( 'skyyrose_menus_setup_v620' ) ) {
 			return;
 		}
 		skyyrose_setup_menus();
-		update_option( 'skyyrose_menus_setup_v430', true );
+		update_option( 'skyyrose_menus_setup_v620', true );
 	}
 );

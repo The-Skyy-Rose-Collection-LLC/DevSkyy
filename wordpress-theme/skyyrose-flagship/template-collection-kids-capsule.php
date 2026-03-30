@@ -27,12 +27,17 @@ if ( function_exists( 'wc_get_products' ) ) {
 }
 
 if ( empty( $products ) ) {
-	$products = array(
-		array( 'title' => __( 'Kids Colorblock Hoodie Set — Purple/Pink', 'skyyrose-flagship' ), 'price' => '$55', 'badge_text' => __( 'New', 'skyyrose-flagship' ), 'sku' => 'kids-001' ),
-		array( 'title' => __( 'Kids Colorblock Hoodie Set — Black/Red/White', 'skyyrose-flagship' ), 'price' => '$55', 'badge_text' => __( 'New', 'skyyrose-flagship' ), 'sku' => 'kids-002' ),
-		array( 'title' => __( 'Mini Rose Classic Tee', 'skyyrose-flagship' ), 'price' => '$35', 'badge_text' => '', 'sku' => 'kids-003' ),
-		array( 'title' => __( 'Little Legend Joggers', 'skyyrose-flagship' ), 'price' => '$45', 'badge_text' => '', 'sku' => 'kids-004' ),
-	);
+	$catalog_products = skyyrose_get_collection_products( 'kids-capsule' );
+	foreach ( $catalog_products as $cat_product ) {
+		$products[] = array(
+			'title'      => $cat_product['name'],
+			'price'      => skyyrose_format_price( $cat_product ),
+			'badge_text' => $cat_product['badge'],
+			'sku'        => $cat_product['sku'],
+			'image_url'  => skyyrose_product_image_uri( $cat_product['front_model_image'] ?: $cat_product['image'] ),
+			'image_back' => skyyrose_product_image_uri( $cat_product['back_image'] ),
+		);
+	}
 }
 
 $product_count = count( $products );
