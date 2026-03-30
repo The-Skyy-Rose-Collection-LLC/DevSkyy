@@ -20,7 +20,7 @@ from enum import StrEnum
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, HttpUrl, field_validator
 
 from api.webhooks import WebhookEventType, webhook_manager
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
@@ -77,11 +77,33 @@ class Priority(StrEnum):
 class AgentTask(BaseModel):
     """Agent task request"""
 
-    agent_name: str
-    action: str
-    parameters: dict[str, Any] = {}
+    agent_name: str = Field(..., min_length=1, max_length=100, pattern=r"^[a-zA-Z0-9_-]+$")
+    action: str = Field(..., min_length=1, max_length=100, pattern=r"^[a-zA-Z0-9_.-]+$")
+    parameters: dict[str, Any] = Field(default_factory=dict)
     priority: Priority = Priority.NORMAL
-    callback_url: str | None = None
+    callback_url: HttpUrl | None = None
+
+    @field_validator("parameters")
+    @classmethod
+    def validate_parameters_size(cls, v: dict[str, Any]) -> dict[str, Any]:
+        """Reject oversized parameter payloads to prevent memory exhaustion."""
+        import json
+
+        raw = json.dumps(v, default=str)
+        if len(raw) > 102_400:  # 100 KB limit
+            raise ValueError("parameters payload exceeds 100 KB limit")
+        return v
+
+    @field_validator("callback_url")
+    @classmethod
+    def validate_callback_url(cls, v: HttpUrl | None) -> HttpUrl | None:
+        """Block SSRF via callback_url — reject private IPs and metadata services."""
+        if v is None:
+            return v
+        from security.ssrf_protection import SSRFProtection
+
+        SSRFProtection().validate_url(str(v))
+        return v
 
 
 class AgentTaskResponse(BaseModel):

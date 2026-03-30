@@ -38,6 +38,8 @@ import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field, HttpUrl, validator
 
+from security.ssrf_protection import SSRFProtection
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -329,6 +331,9 @@ class WebhookManager:
         # HTTP client
         self._client: httpx.AsyncClient | None = None
 
+        # SSRF protection — blocks private IPs, metadata services, dangerous ports
+        self._ssrf = SSRFProtection()
+
     async def get_client(self) -> httpx.AsyncClient:
         """Get or create HTTP client"""
         if self._client is None or self._client.is_closed:
@@ -352,6 +357,9 @@ class WebhookManager:
         metadata: dict = None,
     ) -> WebhookEndpoint:
         """Register a new webhook endpoint"""
+        # Validate URL against SSRF at registration time
+        self._ssrf.validate_url(url)
+
         endpoint = WebhookEndpoint(
             url=url,
             events=events or [WebhookEventType.ALL.value],
@@ -523,6 +531,9 @@ class WebhookManager:
         start_time = time.time()
 
         try:
+            # Validate URL against SSRF before making request
+            self._ssrf.validate_url(str(endpoint.url))
+
             client = await self.get_client()
             response = await client.post(str(endpoint.url), content=payload, headers=headers)
 
