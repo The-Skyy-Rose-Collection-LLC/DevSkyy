@@ -27,7 +27,7 @@ defined( 'ABSPATH' ) || exit;
 		<?php esc_html_e( 'Skip to content', 'skyyrose-flagship' ); ?>
 	</a>
 
-	<header id="masthead" class="site-header" role="banner">
+	<header id="masthead" class="site-header" role="banner"<?php if ( is_front_page() ) echo ' style="display:none"'; ?>>
 		<nav class="navbar" id="navbar" aria-label="<?php esc_attr_e( 'Primary Navigation', 'skyyrose-flagship' ); ?>">
 			<div class="navbar__container">
 

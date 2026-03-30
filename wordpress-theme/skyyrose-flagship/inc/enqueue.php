@@ -441,56 +441,7 @@ function skyyrose_enqueue_template_scripts() {
 			);
 		}
 
-		// Enqueue Three.js immersive world engine (progressive enhancement over 2D).
-		if ( 'immersive' === $slug ) {
-			$world_path = $base_js_dir . '/immersive-world.js';
-			if ( file_exists( $world_path ) ) {
-				wp_enqueue_script(
-					'skyyrose-immersive-world',
-					$base_js_uri . '/immersive-world.js',
-					array( $handle ),
-					SKYYROSE_VERSION,
-					true
-				);
-			}
-
-			// World-specific styles (narrative panels, canvas, scroll spacer).
-			$world_css = $base_css_dir . '/immersive-world.css';
-			if ( file_exists( $world_css ) ) {
-				wp_enqueue_style(
-					'skyyrose-immersive-world',
-					$base_css_uri . '/immersive-world.css',
-					array( 'skyyrose-template-immersive' ),
-					SKYYROSE_VERSION
-				);
-			}
-		}
-
-		// Enqueue immersive WooCommerce bridge + localize skyyRoseImmersive data.
-		if ( 'immersive' === $slug ) {
-			$bridge_path = $base_js_dir . '/immersive-wc-bridge.js';
-			if ( file_exists( $bridge_path ) ) {
-				wp_enqueue_script(
-					'skyyrose-immersive-wc-bridge',
-					$base_js_uri . '/immersive-wc-bridge.js',
-					array( $handle ),
-					SKYYROSE_VERSION,
-					true
-				);
-
-				wp_localize_script(
-					'skyyrose-immersive-wc-bridge',
-					'skyyRoseImmersive',
-					array(
-						'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
-						'nonce'    => wp_create_nonce( 'skyyrose-immersive-nonce' ),
-						'wcActive' => class_exists( 'WooCommerce' ),
-						'cartUrl'  => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
-					)
-				);
-			}
-		}
-
+		/* Immersive world + WC bridge — will be re-added when immersive rooms v6.0 ships */
 	}
 
 	// Holo product cards — loaded on collection pages, shop archives, and WC loop.
