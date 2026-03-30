@@ -186,7 +186,6 @@
 
 .magnetic {
 	transition: transform 0.4s var(--ease-magnetic);
-	will-change: transform;
 }
 .magnetic:hover {
 	transform:
@@ -284,9 +283,7 @@
    JS sets --scroll-progress (0→1) as user scrolls past hero.
    ═══════════════════════════════════════════════════════════════════ */
 
-[data-scroll-fade] {
-	will-change: transform, opacity;
-}
+/* scroll-fade: will-change set dynamically by JS only when scrolling */
 [data-scroll-fade] > * {
 	transform: scale(calc(1 - var(--scroll-progress, 0) * 0.06));
 	opacity: calc(1 - var(--scroll-progress, 0));
@@ -299,15 +296,12 @@
 
 .parallax-slow {
 	transform: translateY(calc(var(--parallax-offset, 0) * var(--parallax-slow, 0.15)));
-	will-change: transform;
 }
 .parallax-medium {
 	transform: translateY(calc(var(--parallax-offset, 0) * var(--parallax-medium, 0.3)));
-	will-change: transform;
 }
 .parallax-fast {
 	transform: translateY(calc(var(--parallax-offset, 0) * var(--parallax-fast, 0.5)));
-	will-change: transform;
 }
 
 /* Hero scene Ken Burns — starts zoomed, shifts on scroll */
@@ -315,7 +309,6 @@
 	transform:
 		scale(calc(1.12 - var(--scroll-progress, 0) * 0.12))
 		translateY(calc(var(--parallax-offset, 0) * 0.2));
-	will-change: transform;
 	transition: none; /* Driven by JS, not CSS transitions */
 }
 

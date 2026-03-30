@@ -15,6 +15,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /*--------------------------------------------------------------
+ * SVG Allowed HTML (wp_kses whitelist for inline SVG icons)
+ *--------------------------------------------------------------*/
+
+/**
+ * Return the wp_kses allowed tags array for inline SVG icons.
+ *
+ * Centralizes the SVG whitelist used across collection templates,
+ * front-page, about, and any template that renders SVG icons.
+ *
+ * @since  6.2.0
+ * @return array Allowed HTML tags for wp_kses.
+ */
+function skyyrose_svg_kses() {
+	return array(
+		'svg'      => array( 'width' => true, 'height' => true, 'viewBox' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true, 'class' => true, 'aria-hidden' => true, 'focusable' => true, 'xmlns' => true ),
+		'path'     => array( 'd' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true ),
+		'circle'   => array( 'cx' => true, 'cy' => true, 'r' => true, 'fill' => true ),
+		'line'     => array( 'x1' => true, 'y1' => true, 'x2' => true, 'y2' => true, 'stroke' => true, 'stroke-width' => true ),
+		'polyline' => array( 'points' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true ),
+		'polygon'  => array( 'points' => true, 'fill' => true ),
+		'rect'     => array( 'x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true, 'ry' => true, 'fill' => true, 'stroke' => true ),
+	);
+}
+
+/*--------------------------------------------------------------
  * Collection Color Mapping
  *--------------------------------------------------------------*/
 

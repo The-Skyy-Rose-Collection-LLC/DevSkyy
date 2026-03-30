@@ -49,7 +49,7 @@ $cross_nav = array(
 );
 
 /* SVG whitelist for wp_kses */
-$svg_kses = array( 'svg' => array( 'viewBox' => true, 'fill' => true, 'stroke' => true, 'class' => true, 'aria-hidden' => true, 'width' => true, 'height' => true, 'xmlns' => true ), 'path' => array( 'd' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true ), 'circle' => array( 'cx' => true, 'cy' => true, 'r' => true, 'fill' => true ) );
+$svg_kses = skyyrose_svg_kses();
 
 get_header();
 ?>
