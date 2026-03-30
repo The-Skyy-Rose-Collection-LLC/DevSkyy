@@ -67,6 +67,25 @@ if ( $is_wc ) {
 } else {
 	$image_url = $args['image_url'];
 }
+
+// Catalog fallback: if WC product has no featured image, check the catalog.
+// Strip variant suffixes (e.g., br-003-giants → br-003) to match catalog SKUs.
+if ( empty( $image_url ) && function_exists( 'skyyrose_get_product' ) && ! empty( $sku ) ) {
+	$cat_product = skyyrose_get_product( $sku );
+	if ( ! $cat_product ) {
+		$base_sku    = preg_replace( '/(-[a-z]+)+$/', '', $sku );
+		$cat_product = skyyrose_get_product( $base_sku );
+	}
+	if ( $cat_product ) {
+		$cat_front = $cat_product['front_model_image'] ?: $cat_product['image'];
+		if ( ! empty( $cat_front ) ) {
+			$image_url = function_exists( 'skyyrose_product_image_uri' )
+				? skyyrose_product_image_uri( $cat_front )
+				: get_theme_file_uri( $cat_front );
+		}
+	}
+}
+
 if ( empty( $image_url ) && defined( 'SKYYROSE_ASSETS_URI' ) ) {
 	$image_url = SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg';
 }
@@ -77,6 +96,16 @@ if ( empty( $image_back ) && $is_wc ) {
 	$gallery = $wc->get_gallery_image_ids();
 	if ( ! empty( $gallery[0] ) ) {
 		$image_back = wp_get_attachment_image_url( $gallery[0], 'large' );
+	}
+}
+
+// Catalog fallback for back image too.
+if ( empty( $image_back ) && function_exists( 'skyyrose_get_product' ) && ! empty( $sku ) ) {
+	$cat_product = isset( $cat_product ) ? $cat_product : skyyrose_get_product( $sku );
+	if ( $cat_product && ! empty( $cat_product['back_image'] ) ) {
+		$image_back = function_exists( 'skyyrose_product_image_uri' )
+			? skyyrose_product_image_uri( $cat_product['back_image'] )
+			: get_theme_file_uri( $cat_product['back_image'] );
 	}
 }
 
