@@ -743,25 +743,9 @@ function skyyrose_enqueue_wishlist_assets() {
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_wishlist_assets' );
 
-/**
- * Add wishlist button to product loop.
- *
- * @since 1.0.0
- */
-function skyyrose_add_wishlist_button_to_loop() {
-	get_template_part( 'template-parts/wishlist-button' );
-}
-add_action( 'woocommerce_after_shop_loop_item', 'skyyrose_add_wishlist_button_to_loop', 15 );
-
-/**
- * Add wishlist button to single product page.
- *
- * @since 1.0.0
- */
-function skyyrose_add_wishlist_button_to_single() {
-	get_template_part( 'template-parts/wishlist-button' );
-}
-add_action( 'woocommerce_single_product_summary', 'skyyrose_add_wishlist_button_to_single', 35 );
+/* Wishlist button hooks removed in v6.2.0 — template-parts/wishlist-button.php
+   was deleted. The holo card system (product-card-holo.php) renders its own
+   wishlist heart button. No separate WC hook needed. */
 
 /**
  * Clean up wishlist option when a user account is deleted.

@@ -756,10 +756,8 @@ add_action( 'woocommerce_single_product_summary', 'skyyrose_complete_the_look', 
  * @param int $order_id WooCommerce order ID (passed by woocommerce_thankyou).
  * @return void
  */
-function skyyrose_referral_dashboard( $order_id ) {
-	get_template_part( 'template-parts/referral-dashboard', null, array( 'order_id' => absint( $order_id ) ) );
-}
-add_action( 'woocommerce_thankyou', 'skyyrose_referral_dashboard', 20 );
+/* Referral dashboard template removed in v6.2.0 — template-parts/referral-dashboard.php
+   was deleted in dead file cleanup. Referral system will be rebuilt in a future release. */
 
 /*--------------------------------------------------------------
  * Referral Credit — award $10 on completed order
