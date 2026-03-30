@@ -238,20 +238,10 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "#!/bin/bash\n# Auto-prompt: review changed code before session ends\nchanged=$(git diff --name-only 2>/dev/null | wc -l | tr -d ' ')\nif [ \"$changed\" -gt 0 ]; then\n  echo '[Auto] '$changed' file(s) changed this session. Run /code-review or /simplify before committing.' >&2\nfi"
+                        "command": "#!/bin/bash\nchanged=$(git diff --name-only 2>/dev/null | wc -l | tr -d ' ')\nif [ \"$changed\" -gt 0 ]; then\n  echo '[Auto] '$changed' file(s) changed — run /code-review or /simplify before committing.' >&2\n  echo '[Auto] Then run /learn to extract reusable patterns.' >&2\nelse\n  echo '[Auto] No changes. Consider /learn for session insights.' >&2\nfi"
                     }
                 ],
-                "description": "Remind to review changed code before session ends"
-            },
-            {
-                "matcher": "*",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "#!/bin/bash\n# Auto-prompt: extract learnings from session\necho '[Auto] Session ending — consider running /learn to extract reusable patterns.' >&2"
-                    }
-                ],
-                "description": "Remind to extract learnings at session end"
+                "description": "Review code and extract learnings at session end"
             }
         ]
     }
