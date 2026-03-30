@@ -150,6 +150,16 @@ function skyyrose_enqueue_global_styles() {
 			SKYYROSE_VERSION
 		);
 	}
+
+	// Cookie consent banner (GDPR).
+	if ( file_exists( $base_dir . '/cookie-consent.css' ) ) {
+		wp_enqueue_style(
+			'skyyrose-cookie-consent',
+			$base_uri . '/cookie-consent.css',
+			array(),
+			SKYYROSE_VERSION
+		);
+	}
 }
 
 /**
@@ -172,6 +182,18 @@ function skyyrose_enqueue_global_scripts() {
 		wp_enqueue_script(
 			'skyyrose-navigation',
 			$js_uri . '/' . $nav_file,
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+
+	// Toast notification utility (global, used by wishlist, add-to-cart, newsletter).
+	$toast_file = $use_min && file_exists( $js_dir . '/toast.min.js' ) ? 'toast.min.js' : 'toast.js';
+	if ( file_exists( $js_dir . '/' . $toast_file ) ) {
+		wp_enqueue_script(
+			'skyyrose-toast',
+			$js_uri . '/' . $toast_file,
 			array(),
 			SKYYROSE_VERSION,
 			true

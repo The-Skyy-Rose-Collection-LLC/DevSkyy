@@ -1,0 +1,116 @@
+/* ==========================================================================
+   Cookie Consent Banner
+   Dark glass bar — fixed to viewport bottom, above mobile nav.
+   ========================================================================== */
+
+.cookie-consent {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 9998;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+	padding: 16px 24px;
+	background: rgba(10, 10, 10, 0.97);
+	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
+	border-top: 1px solid rgba(183, 110, 121, 0.2);
+	transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+				opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cookie-consent--hidden {
+	transform: translateY(100%);
+	opacity: 0;
+	pointer-events: none;
+}
+
+/* ---- Message ---- */
+
+.cookie-consent__message {
+	margin: 0;
+	font-family: Inter, system-ui, sans-serif;
+	font-size: 13px;
+	line-height: 1.5;
+	color: rgba(255, 255, 255, 0.8);
+}
+
+.cookie-consent__link {
+	color: #B76E79;
+	text-decoration: none;
+	transition: text-decoration-color 0.2s ease;
+}
+
+.cookie-consent__link:hover,
+.cookie-consent__link:focus-visible {
+	text-decoration: underline;
+}
+
+/* ---- Buttons ---- */
+
+.cookie-consent__actions {
+	display: flex;
+	gap: 10px;
+	flex-shrink: 0;
+}
+
+.cookie-consent__btn {
+	font-family: Inter, system-ui, sans-serif;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	padding: 8px 20px;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: opacity 0.2s ease;
+	line-height: 1;
+}
+
+.cookie-consent__btn:hover {
+	opacity: 0.85;
+}
+
+.cookie-consent__btn--accept {
+	background: #B76E79;
+	color: #fff;
+	border: none;
+}
+
+.cookie-consent__btn--decline {
+	background: transparent;
+	color: #fff;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 599px) {
+	.cookie-consent {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 12px;
+		padding: 14px 16px;
+		bottom: calc(64px + env(safe-area-inset-bottom));
+	}
+
+	.cookie-consent__actions {
+		justify-content: stretch;
+	}
+
+	.cookie-consent__btn {
+		flex: 1;
+		text-align: center;
+	}
+}
+
+/* ---- Reduced motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+	.cookie-consent {
+		transition: none;
+	}
+}

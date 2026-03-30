@@ -229,6 +229,7 @@ defined( 'ABSPATH' ) || exit;
 	</footer><!-- #colophon -->
 </div><!-- #page -->
 
+<?php get_template_part( 'template-parts/cookie-consent' ); ?>
 <?php get_template_part( 'template-parts/mobile-bottom-nav' ); ?>
 
 <!-- Toast Notification Container -->
