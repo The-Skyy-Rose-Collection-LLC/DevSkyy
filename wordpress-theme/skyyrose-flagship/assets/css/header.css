@@ -8,6 +8,36 @@
  */
 
 /* ==================================================
+   SKIP LINK — Visible on keyboard focus (WCAG 2.4.1)
+   ================================================== */
+
+.skip-link {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(1px, 1px, 1px, 1px);
+}
+
+.skip-link:focus {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 100000;
+	padding: 1rem 2rem;
+	background: #B76E79;
+	color: #fff;
+	font-family: var(--fd, 'Cinzel', serif);
+	font-size: 0.875rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	text-decoration: none;
+	clip: unset;
+	width: auto;
+	height: auto;
+}
+
+/* ==================================================
    NAVBAR — Fixed Dark Glassmorphism
    ================================================== */
 

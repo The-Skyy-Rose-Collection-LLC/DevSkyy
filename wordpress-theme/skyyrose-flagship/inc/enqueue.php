@@ -98,15 +98,24 @@ function skyyrose_enqueue_global_styles() {
 	}
 
 	// Premium animations: clip-path reveals, split-text, stagger, magnetic, parallax.
+	// Conditionally loaded — skip on lightweight pages where the extra CSS is wasted
+	// (cart, checkout, blog, search, 404, generic pages, contact).
+	// Loaded on: front-page, about, immersive, preorder-gateway, collection pages,
+	//            single-product, shop-archive (footer uses stagger-grid + rv-clip-up).
 	$prem_anim = $use_min && file_exists( $base_dir . '/system/animations-premium.min.css' )
 		? 'system/animations-premium.min.css' : 'system/animations-premium.css';
 	if ( file_exists( $base_dir . '/' . $prem_anim ) ) {
-		wp_enqueue_style(
-			'skyyrose-animations-premium',
-			$base_uri . '/' . $prem_anim,
-			array( 'skyyrose-animations' ),
-			SKYYROSE_VERSION
-		);
+		$prem_slug     = skyyrose_get_current_template_slug();
+		$prem_skip     = array( 'cart', 'checkout', 'blog', 'single', 'page', 'contact', '404', 'default' );
+		$skip_premium  = in_array( $prem_slug, $prem_skip, true );
+		if ( ! $skip_premium ) {
+			wp_enqueue_style(
+				'skyyrose-animations-premium',
+				$base_uri . '/' . $prem_anim,
+				array( 'skyyrose-animations' ),
+				SKYYROSE_VERSION
+			);
+		}
 	}
 
 	// Header: navbar, search overlay, mobile menu, dropdowns.

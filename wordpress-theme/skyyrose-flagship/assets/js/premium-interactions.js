@@ -165,7 +165,7 @@
 		});
 	}
 
-	if (parallaxEls.length || scrollFadeEls.length) {
+	if ((parallaxEls.length || scrollFadeEls.length) && !prefersReduced) {
 		window.addEventListener('scroll', onScroll, { passive: true });
 		onScroll();
 	}
@@ -225,6 +225,12 @@
 			var url = new URL(href, window.location.origin);
 			if (url.origin !== window.location.origin) return;
 		} catch (err) { return; }
+
+		/* Reduced-motion: skip exit animation, navigate immediately */
+		if (prefersReduced) {
+			window.location.href = href;
+			return;
+		}
 
 		e.preventDefault();
 		document.body.classList.remove('page-enter');
