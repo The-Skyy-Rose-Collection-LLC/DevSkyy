@@ -814,6 +814,26 @@
 
 /* Signature — Rose Gold beacons (default) */
 
+/* Kids Capsule — Rose Gold beacons */
+.immersive-kids-capsule .hotspot-beacon {
+	background: var(--rose-gold, #B76E79);
+	box-shadow: 0 0 0 0 rgba(183, 110, 121, 0.5);
+}
+
+.immersive-kids-capsule .hotspot-beacon::before {
+	border-color: rgba(183, 110, 121, 0.4);
+}
+
+@keyframes beaconPulseKidsCapsule {
+	0%   { box-shadow: 0 0 0 0 rgba(183, 110, 121, 0.5); }
+	70%  { box-shadow: 0 0 0 14px rgba(183, 110, 121, 0); }
+	100% { box-shadow: 0 0 0 0 rgba(183, 110, 121, 0); }
+}
+
+.immersive-kids-capsule .hotspot-beacon {
+	animation-name: beaconPulseKidsCapsule;
+}
+
 /* ==================================================
    RESPONSIVE — Tablet & Mobile
    ================================================== */
@@ -1056,6 +1076,26 @@
 	100% { transform: translateX(3%) translateY(-1%); opacity: 1; }
 }
 
+/* Rose-gold glow for Kids Capsule scenes */
+.immersive-kids-capsule .scene-viewport::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	pointer-events: none;
+	background: radial-gradient(
+		ellipse 50% 50% at 50% 50%,
+		rgba(183, 110, 121, 0.04) 0%,
+		transparent 70%
+	);
+	animation: kidsGlow 8s ease-in-out infinite alternate;
+}
+
+@keyframes kidsGlow {
+	0%   { opacity: 0.6; }
+	100% { opacity: 1; }
+}
+
 /* ==================================================
    CINEMATIC-ACTIVE — Scene-Level Integration
    ================================================== */
@@ -1157,7 +1197,8 @@
 	/* Disable environmental animations */
 	.immersive-love-hurts .scene-viewport::after,
 	.immersive-signature .scene-viewport::after,
-	.immersive-black-rose .scene-viewport::after {
+	.immersive-black-rose .scene-viewport::after,
+	.immersive-kids-capsule .scene-viewport::after {
 		animation: none;
 		opacity: 0;
 	}

@@ -411,6 +411,7 @@ function skyyrose_enqueue_template_scripts() {
 	$base_js_dir = SKYYROSE_DIR . '/assets/js';
 	$base_css_uri = SKYYROSE_ASSETS_URI . '/css';
 	$base_css_dir = SKYYROSE_DIR . '/assets/css';
+	$use_min     = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
 	// Collection pages JS — IntersectionObserver scroll-reveal (no GSAP dependency).
 	if ( 'collection-standalone' === $slug ) {
@@ -444,8 +445,6 @@ function skyyrose_enqueue_template_scripts() {
 		'preorder-gateway'  => 'preorder-gateway.js',
 		'about'            => 'about.js',
 	);
-
-	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
 	if ( isset( $template_scripts[ $slug ] ) ) {
 		$js_file = $template_scripts[ $slug ];

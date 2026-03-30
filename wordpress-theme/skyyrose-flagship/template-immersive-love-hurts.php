@@ -57,7 +57,7 @@ if ( class_exists( 'WooCommerce' ) ) {
 			'id'         => $wc_product->get_slug(),
 			'name'       => $wc_product->get_name(),
 			'price'      => wp_strip_all_tags( wc_price( $wc_product->get_price() ) ),
-			'image'      => wp_get_attachment_url( $wc_product->get_image_id() ),
+			'image'      => $wc_product->get_image_id() ? wp_get_attachment_url( $wc_product->get_image_id() ) : '',
 			'url'        => $wc_product->get_permalink(),
 			'collection' => __( 'Love Hurts Collection', 'skyyrose-flagship' ),
 			'sizes'      => '',
