@@ -98,15 +98,24 @@ function skyyrose_enqueue_global_styles() {
 	}
 
 	// Premium animations: clip-path reveals, split-text, stagger, magnetic, parallax.
+	// Conditionally loaded — skip on lightweight pages where the extra CSS is wasted
+	// (cart, checkout, blog, search, 404, generic pages, contact).
+	// Loaded on: front-page, about, immersive, preorder-gateway, collection pages,
+	//            single-product, shop-archive (footer uses stagger-grid + rv-clip-up).
 	$prem_anim = $use_min && file_exists( $base_dir . '/system/animations-premium.min.css' )
 		? 'system/animations-premium.min.css' : 'system/animations-premium.css';
 	if ( file_exists( $base_dir . '/' . $prem_anim ) ) {
-		wp_enqueue_style(
-			'skyyrose-animations-premium',
-			$base_uri . '/' . $prem_anim,
-			array( 'skyyrose-animations' ),
-			SKYYROSE_VERSION
-		);
+		$prem_slug     = skyyrose_get_current_template_slug();
+		$prem_skip     = array( 'cart', 'checkout', 'blog', 'single', 'page', 'contact', '404', 'search', 'default' );
+		$skip_premium  = in_array( $prem_slug, $prem_skip, true );
+		if ( ! $skip_premium ) {
+			wp_enqueue_style(
+				'skyyrose-animations-premium',
+				$base_uri . '/' . $prem_anim,
+				array( 'skyyrose-animations' ),
+				SKYYROSE_VERSION
+			);
+		}
 	}
 
 	// Header: navbar, search overlay, mobile menu, dropdowns.
@@ -127,6 +136,27 @@ function skyyrose_enqueue_global_styles() {
 			'skyyrose-footer',
 			$base_uri . '/' . $footer_file,
 			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	// Mobile bottom navigation bar (hidden via CSS on desktop ≥769px).
+	$mobnav_file = $use_min && file_exists( $base_dir . '/mobile-bottom-nav.min.css' ) ? 'mobile-bottom-nav.min.css' : 'mobile-bottom-nav.css';
+	if ( file_exists( $base_dir . '/' . $mobnav_file ) ) {
+		wp_enqueue_style(
+			'skyyrose-mobile-nav',
+			$base_uri . '/' . $mobnav_file,
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	// Cookie consent banner (GDPR).
+	if ( file_exists( $base_dir . '/cookie-consent.css' ) ) {
+		wp_enqueue_style(
+			'skyyrose-cookie-consent',
+			$base_uri . '/cookie-consent.css',
+			array(),
 			SKYYROSE_VERSION
 		);
 	}
@@ -152,6 +182,18 @@ function skyyrose_enqueue_global_scripts() {
 		wp_enqueue_script(
 			'skyyrose-navigation',
 			$js_uri . '/' . $nav_file,
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+
+	// Toast notification utility (global, used by wishlist, add-to-cart, newsletter).
+	$toast_file = $use_min && file_exists( $js_dir . '/toast.min.js' ) ? 'toast.min.js' : 'toast.js';
+	if ( file_exists( $js_dir . '/' . $toast_file ) ) {
+		wp_enqueue_script(
+			'skyyrose-toast',
+			$js_uri . '/' . $toast_file,
 			array(),
 			SKYYROSE_VERSION,
 			true
@@ -276,8 +318,13 @@ function skyyrose_get_current_template_slug() {
 		return 'single';
 	}
 
+	// Search results.
+	if ( is_search() ) {
+		return 'search';
+	}
+
 	// Blog index / archive.
-	if ( is_home() || is_archive() || is_search() ) {
+	if ( is_home() || is_archive() ) {
 		return 'blog';
 	}
 
@@ -316,6 +363,7 @@ function skyyrose_enqueue_template_styles() {
 		'contact'         => 'contact.css',
 		'preorder-gateway'  => 'preorder-gateway.css',
 		'404'              => '404.css',
+		'search'           => 'search-results.css',
 		'single'           => 'generic-pages.css',
 		'blog'             => 'generic-pages.css',
 		'page'             => 'generic-pages.css',
@@ -492,7 +540,7 @@ function skyyrose_enqueue_template_scripts() {
 
 	// Holo product cards — loaded on collection pages, shop archives, and WC loop.
 	// NOTE: This must be OUTSIDE the $template_scripts check above.
-	if ( in_array( $slug, array( 'collection', 'collection-v4', 'collection-standalone', 'collections-shop', 'front-page', 'shop-archive', 'preorder-gateway' ), true ) ) {
+	if ( in_array( $slug, array( 'collection', 'collection-v4', 'collection-standalone', 'collections-shop', 'front-page', 'shop-archive', 'preorder-gateway', 'search' ), true ) ) {
 			$holo_css_file = $use_min && file_exists( $base_css_dir . '/product-card-holo.min.css' )
 				? 'product-card-holo.min.css' : 'product-card-holo.css';
 			if ( file_exists( $base_css_dir . '/' . $holo_css_file ) ) {

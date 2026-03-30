@@ -112,6 +112,20 @@
 	--transition-spring: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 
 	/* -----------------------------------------------
+	   Focus States (WCAG 2.4.7)
+	   ----------------------------------------------- */
+}
+
+:focus-visible {
+	outline: 2px solid var(--color-rose-gold, #B76E79);
+	outline-offset: 3px;
+}
+:focus:not(:focus-visible) {
+	outline: none;
+}
+
+:root {
+	/* -----------------------------------------------
 	   Interactive States
 	   ----------------------------------------------- */
 	--focus-ring: 0 0 0 2px var(--color-rose-gold, #B76E79);

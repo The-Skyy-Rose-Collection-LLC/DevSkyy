@@ -118,9 +118,10 @@
 			var id = btn.getAttribute('data-wishlist-id');
 			if (!id) return;
 
-			// Restore state
+			// Restore state — CSS handles visual via .holo__wishlist--active
 			if (list.indexOf(id) !== -1) {
 				btn.setAttribute('aria-pressed', 'true');
+				btn.classList.add('holo__wishlist--active');
 			}
 
 			btn.addEventListener('click', function (e) {
@@ -134,9 +135,11 @@
 				if (active) {
 					current.splice(idx, 1);
 					btn.setAttribute('aria-pressed', 'false');
+					btn.classList.remove('holo__wishlist--active');
 				} else {
 					current.push(id);
 					btn.setAttribute('aria-pressed', 'true');
+					btn.classList.add('holo__wishlist--active');
 					// Burst animation
 					btn.classList.add('holo__wishlist--burst');
 					btn.addEventListener('animationend', function () {
@@ -145,6 +148,11 @@
 				}
 
 				saveWishlist(current);
+
+				// Toast notification
+				if (window.skyyToast) {
+					window.skyyToast(active ? 'Removed from wishlist' : 'Added to wishlist', 'info');
+				}
 
 				// Dispatch event for other systems (analytics, badge count)
 				document.dispatchEvent(new CustomEvent('skyyrose:wishlist', {
@@ -191,6 +199,10 @@
 				e.preventDefault();
 				if (btn.disabled) return;
 
+				// Prevent double-click
+				btn.disabled = true;
+				btn.setAttribute('aria-busy', 'true');
+
 				var productId = btn.getAttribute('data-product-id');
 				var card = btn.closest('.holo');
 				var selectedSize = card ? card.querySelector('.holo__size-pill--active') : null;
@@ -229,6 +241,8 @@
 						setTimeout(function () {
 							btn.classList.remove('holo__buy--error');
 							btn.textContent = originalText;
+							btn.disabled = false;
+							btn.removeAttribute('aria-busy');
 						}, 2000);
 						return;
 					}
@@ -246,11 +260,15 @@
 					setTimeout(function () {
 						btn.classList.remove('holo__buy--added');
 						btn.textContent = originalText;
+						btn.disabled = false;
+						btn.removeAttribute('aria-busy');
 					}, 2500);
 				})
 				.catch(function () {
 					btn.classList.remove('holo__buy--loading');
 					btn.textContent = originalText;
+					btn.disabled = false;
+					btn.removeAttribute('aria-busy');
 				});
 			});
 		});

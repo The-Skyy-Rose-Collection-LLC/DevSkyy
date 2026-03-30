@@ -294,6 +294,7 @@
 	background-position: center 30%;
 	transform: scale(1.06);
 	animation: heroZoom 25s ease-in-out infinite alternate;
+	aspect-ratio: 1 / 1;
 }
 /* Alt hero image — crossfades with primary for a rich layered look */
 .hero-bg--alt {

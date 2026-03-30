@@ -303,6 +303,25 @@
 	animation: holo-heart-burst 0.4s ease-out;
 }
 
+/* Active state — heart fill (color set by class, animation by CSS) */
+.holo__wishlist--active {
+	color: #B76E79;
+}
+
+.holo__wishlist--active svg {
+	fill: #B76E79;
+	stroke: #B76E79;
+	transform: scale(1.15);
+	transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), fill 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.holo__wishlist--active svg {
+		transform: none;
+		transition: none;
+	}
+}
+
 /* ==========================================================================
    8. VIEW INDICATOR (front/back dots)
    ========================================================================== */
