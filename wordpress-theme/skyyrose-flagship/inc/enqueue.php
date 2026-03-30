@@ -106,7 +106,7 @@ function skyyrose_enqueue_global_styles() {
 		? 'system/animations-premium.min.css' : 'system/animations-premium.css';
 	if ( file_exists( $base_dir . '/' . $prem_anim ) ) {
 		$prem_slug     = skyyrose_get_current_template_slug();
-		$prem_skip     = array( 'cart', 'checkout', 'blog', 'single', 'page', 'contact', '404', 'default' );
+		$prem_skip     = array( 'cart', 'checkout', 'blog', 'single', 'page', 'contact', '404', 'search', 'default' );
 		$skip_premium  = in_array( $prem_slug, $prem_skip, true );
 		if ( ! $skip_premium ) {
 			wp_enqueue_style(
@@ -135,6 +135,17 @@ function skyyrose_enqueue_global_styles() {
 		wp_enqueue_style(
 			'skyyrose-footer',
 			$base_uri . '/' . $footer_file,
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	// Mobile bottom navigation bar (hidden via CSS on desktop ≥769px).
+	$mobnav_file = $use_min && file_exists( $base_dir . '/mobile-bottom-nav.min.css' ) ? 'mobile-bottom-nav.min.css' : 'mobile-bottom-nav.css';
+	if ( file_exists( $base_dir . '/' . $mobnav_file ) ) {
+		wp_enqueue_style(
+			'skyyrose-mobile-nav',
+			$base_uri . '/' . $mobnav_file,
 			array( 'skyyrose-design-tokens' ),
 			SKYYROSE_VERSION
 		);
@@ -285,8 +296,13 @@ function skyyrose_get_current_template_slug() {
 		return 'single';
 	}
 
+	// Search results.
+	if ( is_search() ) {
+		return 'search';
+	}
+
 	// Blog index / archive.
-	if ( is_home() || is_archive() || is_search() ) {
+	if ( is_home() || is_archive() ) {
 		return 'blog';
 	}
 
@@ -325,6 +341,7 @@ function skyyrose_enqueue_template_styles() {
 		'contact'         => 'contact.css',
 		'preorder-gateway'  => 'preorder-gateway.css',
 		'404'              => '404.css',
+		'search'           => 'search-results.css',
 		'single'           => 'generic-pages.css',
 		'blog'             => 'generic-pages.css',
 		'page'             => 'generic-pages.css',
@@ -501,7 +518,7 @@ function skyyrose_enqueue_template_scripts() {
 
 	// Holo product cards — loaded on collection pages, shop archives, and WC loop.
 	// NOTE: This must be OUTSIDE the $template_scripts check above.
-	if ( in_array( $slug, array( 'collection', 'collection-v4', 'collection-standalone', 'collections-shop', 'front-page', 'shop-archive', 'preorder-gateway' ), true ) ) {
+	if ( in_array( $slug, array( 'collection', 'collection-v4', 'collection-standalone', 'collections-shop', 'front-page', 'shop-archive', 'preorder-gateway', 'search' ), true ) ) {
 			$holo_css_file = $use_min && file_exists( $base_css_dir . '/product-card-holo.min.css' )
 				? 'product-card-holo.min.css' : 'product-card-holo.css';
 			if ( file_exists( $base_css_dir . '/' . $holo_css_file ) ) {

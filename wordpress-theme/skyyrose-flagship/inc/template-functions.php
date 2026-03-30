@@ -395,6 +395,9 @@ function skyyrose_custom_body_classes( $classes ) {
 		$classes[] = 'homepage-v2';
 	}
 
+	// Mobile bottom nav body spacer (CSS handles visibility).
+	$classes[] = 'has-mobile-nav';
+
 	return $classes;
 }
 add_filter( 'body_class', 'skyyrose_custom_body_classes' );
