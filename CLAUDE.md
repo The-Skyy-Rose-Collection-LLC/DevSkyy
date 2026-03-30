@@ -210,6 +210,9 @@ wordpress-theme/skyyrose-flagship/
 - Don't duplicate content sections — if showcase cards show collections, don't add separate narrative cards with same data
 - Showcase card content should be visible by default (`opacity: 1`), not hidden until hover — mobile has no hover
 - When removing a PHP section, also remove its CSS rules AND responsive breakpoint overrides
+- Premium animation system: `animations-premium.css` + `premium-interactions.js` loaded globally — use `rv-clip-*`, `rv-blur*`, `rv-split-*`, `stagger-grid`, `magnetic`, `btn-sweep`, `btn-border-draw` classes
+- `php-lint.sh` needs explicit Homebrew PHP path (`/opt/homebrew/bin/php`) — lint-staged subshell doesn't inherit brew paths
+- Image cache-bust: append `?v=' . SKYYROSE_VERSION` to branding image URLs in templates
 
 ### Hooks (macOS)
 - Canonicalize paths (`/tmp` → `/private/tmp`)
