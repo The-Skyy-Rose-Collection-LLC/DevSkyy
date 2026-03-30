@@ -22,8 +22,9 @@ $allowed_inline = array(
 
 /* Hero Section Data. */
 $hero_eyebrow = get_theme_mod( 'about_hero_eyebrow', 'Oakland, California &mdash; Est. 2020' );
-$hero_title   = get_theme_mod( 'about_hero_title', 'Where Love<br>Meets Luxury.' );
-$hero_title_2 = get_theme_mod( 'about_hero_title_2', 'Luxury Grows<br>from Concrete.' );
+/* Hardcoded — Customizer DB may have stale "Where Love Meets Luxury" value */
+$hero_title   = 'Luxury Grows<br>from Concrete.';
+$hero_title_2 = 'Luxury Grows<br>from Concrete.';
 $hero_sub     = get_theme_mod(
 	'about_hero_sub',
 	'Oakland-born luxury streetwear. Built by a father. Named after a daughter. Three collections, one bloodline &mdash; this is the birth of the rebrand.'
@@ -104,7 +105,7 @@ $timeline_milestones = array(
 	array(
 		'year'  => '2025&ndash;26',
 		'event' => __( 'The Rebrand', 'skyyrose-flagship' ),
-		'desc'  => __( 'The full vision realized. Three collection worlds with dedicated immersive experiences. AI-powered operations. Custom luxury platform. SkyyRose evolves from a promise into a legacy &mdash; Oakland-born luxury streetwear, where love meets luxury.', 'skyyrose-flagship' ),
+		'desc'  => __( 'The full vision realized. Three collection worlds with dedicated immersive experiences. AI-powered operations. Custom luxury platform. SkyyRose evolves from a promise into a legacy &mdash; Oakland-born luxury streetwear. Luxury grows from concrete.', 'skyyrose-flagship' ),
 	),
 );
 
@@ -168,8 +169,8 @@ $customer_photos = array(
 <main id="primary" class="site-main abt-page" role="main" tabindex="-1">
 
 	<!-- Hero -->
-	<section class="abt-hero" aria-label="<?php esc_attr_e( 'About SkyyRose', 'skyyrose-flagship' ); ?>">
-		<div class="abt-hero__img" aria-hidden="true">
+	<section class="abt-hero" data-scroll-fade aria-label="<?php esc_attr_e( 'About SkyyRose', 'skyyrose-flagship' ); ?>">
+		<div class="abt-hero__img parallax-ken-burns" aria-hidden="true">
 			<?php
 			$hero_img_custom = get_theme_mod( 'about_hero_image', '' );
 			$hero_candidates = array(
@@ -192,20 +193,20 @@ $customer_photos = array(
 			if ( ! empty( $hero_src ) ) :
 			?>
 				<img src="<?php echo esc_url( $hero_src ); ?>"
-					 alt="<?php esc_attr_e( 'SkyyRose — Oakland-born luxury streetwear, where love meets luxury', 'skyyrose-flagship' ); ?>"
+					 alt="<?php esc_attr_e( 'SkyyRose — Oakland-born luxury streetwear. Luxury grows from concrete.', 'skyyrose-flagship' ); ?>"
 					 loading="eager" fetchpriority="high" decoding="async" width="1920" height="1080">
 			<?php endif; ?>
 		</div>
 		<div class="abt-hero__overlay" aria-hidden="true"></div>
 		<div class="abt-hero__content">
-			<p class="abt-hero__eyebrow rv">
+			<p class="abt-hero__eyebrow rv-blur-down">
 				<?php echo wp_kses( $hero_eyebrow, $allowed_inline ); ?>
 			</p>
-			<h1 class="abt-hero__title rv rv-d1">
+			<h1 class="abt-hero__title rv-clip-up">
 				<span><?php echo wp_kses( $hero_title, $allowed_inline ); ?></span>
 				<?php echo wp_kses( $hero_title_2, $allowed_inline ); ?>
 			</h1>
-			<p class="abt-hero__sub rv rv-d2">
+			<p class="abt-hero__sub rv-blur">
 				<?php echo wp_kses( $hero_sub, $allowed_inline ); ?>
 			</p>
 		</div>
@@ -217,10 +218,10 @@ $customer_photos = array(
 
 	<!-- Chapter I — The Rebrand -->
 	<section class="abt-chapter abt-origin" id="origin" aria-label="<?php esc_attr_e( 'The Rebrand Story', 'skyyrose-flagship' ); ?>">
-		<span class="abt-chapter__num" aria-hidden="true">01</span>
+		<span class="abt-chapter__num rv-split-char" aria-hidden="true">01</span>
 		<div class="abt-chapter__container">
-			<p class="abt-chapter__label rv"><?php esc_html_e( 'Chapter I', 'skyyrose-flagship' ); ?></p>
-			<h2 class="abt-chapter__title rv rv-d1">
+			<p class="abt-chapter__label rv-blur-down"><?php esc_html_e( 'Chapter I', 'skyyrose-flagship' ); ?></p>
+			<h2 class="abt-chapter__title rv-clip-up">
 				<?php echo wp_kses( __( 'The Birth of<br>the Rebrand', 'skyyrose-flagship' ), $allowed_inline ); ?>
 			</h2>
 
@@ -266,10 +267,10 @@ $customer_photos = array(
 
 	<!-- Chapter II — The Collections -->
 	<section class="abt-chapter abt-values" aria-label="<?php esc_attr_e( 'The Collections', 'skyyrose-flagship' ); ?>">
-		<span class="abt-chapter__num" aria-hidden="true">02</span>
+		<span class="abt-chapter__num rv-split-char" aria-hidden="true">02</span>
 		<div class="abt-chapter__container">
-			<p class="abt-chapter__label rv"><?php esc_html_e( 'Chapter II', 'skyyrose-flagship' ); ?></p>
-			<h2 class="abt-chapter__title rv rv-d1">
+			<p class="abt-chapter__label rv-blur-down"><?php esc_html_e( 'Chapter II', 'skyyrose-flagship' ); ?></p>
+			<h2 class="abt-chapter__title rv-clip-up">
 				<?php echo wp_kses( __( 'Three Worlds,<br>One Crown', 'skyyrose-flagship' ), $allowed_inline ); ?>
 			</h2>
 
@@ -303,10 +304,10 @@ $customer_photos = array(
 
 	<!-- Chapter III — Timeline -->
 	<section class="abt-chapter abt-timeline" aria-label="<?php esc_attr_e( 'Our Journey', 'skyyrose-flagship' ); ?>">
-		<span class="abt-chapter__num" aria-hidden="true">03</span>
+		<span class="abt-chapter__num rv-split-char" aria-hidden="true">03</span>
 		<div class="abt-chapter__container">
-			<p class="abt-chapter__label rv"><?php esc_html_e( 'Chapter III', 'skyyrose-flagship' ); ?></p>
-			<h2 class="abt-chapter__title rv rv-d1"><?php esc_html_e( 'The Journey', 'skyyrose-flagship' ); ?></h2>
+			<p class="abt-chapter__label rv-blur-down"><?php esc_html_e( 'Chapter III', 'skyyrose-flagship' ); ?></p>
+			<h2 class="abt-chapter__title rv-clip-up"><?php esc_html_e( 'The Journey', 'skyyrose-flagship' ); ?></h2>
 
 			<div class="abt-tl__track" role="list">
 				<?php foreach ( $timeline_milestones as $ms ) : ?>
@@ -322,10 +323,10 @@ $customer_photos = array(
 
 	<!-- Press Room -->
 	<section class="abt-chapter abt-press" id="press" aria-label="<?php esc_attr_e( 'Press & Media', 'skyyrose-flagship' ); ?>">
-		<span class="abt-chapter__num" aria-hidden="true">04</span>
+		<span class="abt-chapter__num rv-split-char" aria-hidden="true">04</span>
 		<div class="abt-chapter__container">
-			<p class="abt-chapter__label rv"><?php esc_html_e( 'Chapter IV', 'skyyrose-flagship' ); ?></p>
-			<h2 class="abt-chapter__title rv rv-d1"><?php esc_html_e( 'As Seen In', 'skyyrose-flagship' ); ?></h2>
+			<p class="abt-chapter__label rv-blur-down"><?php esc_html_e( 'Chapter IV', 'skyyrose-flagship' ); ?></p>
+			<h2 class="abt-chapter__title rv-clip-up"><?php esc_html_e( 'As Seen In', 'skyyrose-flagship' ); ?></h2>
 			<p class="abt-press__intro rv rv-d2">
 				<?php esc_html_e( 'The SkyyRose story has been recognized by national and regional publications for its authenticity, innovation, and the power of its origin.', 'skyyrose-flagship' ); ?>
 			</p>
@@ -406,7 +407,7 @@ $customer_photos = array(
 				<?php esc_html_e( 'The Mission', 'skyyrose-flagship' ); ?>
 			</p>
 			<h2 class="abt-mission__tagline">
-				<?php echo wp_kses( __( 'Where Love<br>Meets Luxury', 'skyyrose-flagship' ), $allowed_inline ); ?>
+				<?php echo wp_kses( __( 'Luxury Grows<br>from Concrete.', 'skyyrose-flagship' ), $allowed_inline ); ?>
 			</h2>
 			<p class="abt-mission__sub">
 				<?php esc_html_e( 'Luxury grows from concrete. Oakland roots, family-driven, fashion as self-expression. Three collections, one bloodline, one crown. This is SkyyRose.', 'skyyrose-flagship' ); ?>

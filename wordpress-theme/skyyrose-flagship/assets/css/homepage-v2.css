@@ -881,28 +881,40 @@
 }
 .col-card:hover .col-card-cta { opacity: 1; transform: translateY(-4px); }
 
-/* Black Rose skin */
+/* Black Rose skin — Cinzel, silver gradient */
 .col-card.br .col-card-ov { background: linear-gradient(to top, rgba(0, 0, 0, .92) 0%, rgba(0, 0, 0, .3) 50%, rgba(0, 0, 0, .15) 100%); }
 .col-card.br .col-card-num { color: var(--silver); }
-.col-card.br .col-card-name { color: #fff; }
+.col-card.br .col-card-name {
+	font-family: 'Cinzel', serif; letter-spacing: 0.06em;
+	background: linear-gradient(135deg, #fff 0%, var(--silver) 60%, rgba(220, 20, 60, 0.4) 100%);
+	-webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
 .col-card.br .col-card-tag { color: rgba(255, 255, 255, .45); }
 .col-card.br .col-card-meta { color: #888; }
 .col-card.br .col-card-cta { color: var(--silver); border-color: rgba(192, 192, 192, .2); }
 .col-card.br:hover .col-card-cta { border-color: var(--silver); background: rgba(192, 192, 192, .06); }
 
-/* Love Hurts skin */
+/* Love Hurts skin — Playfair Display, crimson gradient */
 .col-card.lh .col-card-ov { background: linear-gradient(to top, rgba(20, 2, 8, .92) 0%, rgba(20, 0, 5, .3) 50%, rgba(0, 0, 0, .1) 100%); }
 .col-card.lh .col-card-num { color: var(--crimson); }
-.col-card.lh .col-card-name { color: #fff; }
+.col-card.lh .col-card-name {
+	font-family: 'Playfair Display', serif; letter-spacing: 0.04em;
+	background: linear-gradient(135deg, #fff 0%, #E8475F 50%, var(--crimson) 100%);
+	-webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
 .col-card.lh .col-card-tag { color: rgba(255, 190, 190, .4); }
 .col-card.lh .col-card-meta { color: #E91E63; }
 .col-card.lh .col-card-cta { color: var(--crimson); border-color: rgba(220, 20, 60, .2); }
 .col-card.lh:hover .col-card-cta { border-color: var(--crimson); background: rgba(220, 20, 60, .05); }
 
-/* Signature skin */
+/* Signature skin — Playfair Display, gold gradient */
 .col-card.sg .col-card-ov { background: linear-gradient(to top, rgba(10, 8, 4, .92) 0%, rgba(10, 6, 0, .3) 50%, rgba(0, 0, 0, .08) 100%); }
 .col-card.sg .col-card-num { color: var(--gold); }
-.col-card.sg .col-card-name { color: #F5E6D3; }
+.col-card.sg .col-card-name {
+	font-family: 'Playfair Display', serif; letter-spacing: 0.04em;
+	background: linear-gradient(135deg, var(--gold) 0%, #F7E7CE 50%, var(--gold) 100%);
+	-webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
 .col-card.sg .col-card-tag { color: rgba(245, 230, 211, .4); }
 .col-card.sg .col-card-meta { color: #C9A84C; }
 .col-card.sg .col-card-cta { color: var(--gold); border-color: rgba(212, 175, 55, .2); }

@@ -2,267 +2,187 @@
 /**
  * Template Name: Collection - Signature
  *
- * SIGNATURE collection — standalone page template.
- * Hero, origin story, craftsmanship, holo product grid,
- * quality promise, CTA banner.
- *
- * Gold (#D4AF37) accents on deep black.
+ * SIGNATURE collection — the origin. Gold (#D4AF37) on deep black.
+ * Uses unified collection layout (col-*) with data-collection="signature".
  *
  * @package SkyyRose_Flagship
- * @since   5.0.0
+ * @since   6.1.0
  */
 
 defined( 'ABSPATH' ) || exit;
 
-
-/* ── Product data ──────────────────────────────────────────────────────────── */
-$signature_products = array();
-
+/* ── Product data ─────────────────────────────────────────────── */
+$products = array();
 if ( function_exists( 'wc_get_products' ) ) {
-	$signature_products = wc_get_products( array(
+	$products = wc_get_products( array(
 		'category' => array( 'signature' ),
 		'limit'    => 20,
 		'status'   => 'publish',
+		'orderby'  => 'menu_order',
+		'order'    => 'ASC',
 	) );
 }
 
-// Static fallback when WooCommerce is unavailable or returns no products.
-if ( empty( $signature_products ) ) {
-	$signature_products = array(
-		array(
-			'title'      => __( 'Signature Rose Hoodie', 'skyyrose-flagship' ),
-			'price'      => '$185',
-			'badge_text' => __( 'Iconic', 'skyyrose-flagship' ),
-			'collection' => 'signature',
-			'permalink'  => '#',
-			'sku'        => 'sig-rose-hoodie',
-			'category'   => 'tops',
-		),
-		array(
-			'title'      => __( 'Script Logo Tee', 'skyyrose-flagship' ),
-			'price'      => '$95',
-			'badge_text' => __( 'Bestseller', 'skyyrose-flagship' ),
-			'collection' => 'signature',
-			'permalink'  => '#',
-			'sku'        => 'sig-script-tee',
-			'category'   => 'tops',
-		),
-		array(
-			'title'      => __( 'Gold Standard Jacket', 'skyyrose-flagship' ),
-			'price'      => '$425',
-			'badge_text' => __( 'Limited', 'skyyrose-flagship' ),
-			'collection' => 'signature',
-			'permalink'  => '#',
-			'sku'        => 'sig-gold-jacket',
-			'category'   => 'outerwear',
-		),
-		array(
-			'title'      => __( 'Heritage Crewneck', 'skyyrose-flagship' ),
-			'price'      => '$145',
-			'badge_text' => '',
-			'collection' => 'signature',
-			'permalink'  => '#',
-			'sku'        => 'sig-heritage-crew',
-			'category'   => 'tops',
-		),
-		array(
-			'title'      => __( 'Foundation Joggers', 'skyyrose-flagship' ),
-			'price'      => '$155',
-			'badge_text' => __( 'New', 'skyyrose-flagship' ),
-			'collection' => 'signature',
-			'permalink'  => '#',
-			'sku'        => 'sig-foundation-joggers',
-			'category'   => 'bottoms',
-		),
-		array(
-			'title'      => __( 'Crown Cap', 'skyyrose-flagship' ),
-			'price'      => '$65',
-			'badge_text' => '',
-			'collection' => 'signature',
-			'permalink'  => '#',
-			'sku'        => 'sig-crown-cap',
-			'category'   => 'accessories',
-		),
+if ( empty( $products ) ) {
+	$products = array(
+		array( 'title' => __( 'Signature Rose Hoodie', 'skyyrose-flagship' ), 'price' => '$185', 'badge_text' => __( 'Iconic', 'skyyrose-flagship' ), 'sku' => 'sig-rose-hoodie' ),
+		array( 'title' => __( 'Script Logo Tee', 'skyyrose-flagship' ), 'price' => '$95', 'badge_text' => __( 'Bestseller', 'skyyrose-flagship' ), 'sku' => 'sig-script-tee' ),
+		array( 'title' => __( 'Gold Standard Jacket', 'skyyrose-flagship' ), 'price' => '$425', 'badge_text' => __( 'Limited', 'skyyrose-flagship' ), 'sku' => 'sig-gold-jacket' ),
+		array( 'title' => __( 'Heritage Crewneck', 'skyyrose-flagship' ), 'price' => '$145', 'badge_text' => '', 'sku' => 'sig-heritage-crew' ),
+		array( 'title' => __( 'Foundation Joggers', 'skyyrose-flagship' ), 'price' => '$155', 'badge_text' => __( 'New', 'skyyrose-flagship' ), 'sku' => 'sig-foundation-joggers' ),
+		array( 'title' => __( 'Crown Cap', 'skyyrose-flagship' ), 'price' => '$65', 'badge_text' => '', 'sku' => 'sig-crown-cap' ),
 	);
 }
 
-/* ── Craftsmanship features ────────────────────────────────────────────────── */
-$craft_features = array(
-	array(
-		'icon'  => '&#x2726;',
-		'title' => __( 'Premium Materials', 'skyyrose-flagship' ),
-		'desc'  => __( 'Italian leathers, Japanese denim, Egyptian cotton', 'skyyrose-flagship' ),
-	),
-	array(
-		'icon'  => '&#x2726;',
-		'title' => __( 'Expert Construction', 'skyyrose-flagship' ),
-		'desc'  => __( 'Hand-finished details by master tailors', 'skyyrose-flagship' ),
-	),
-	array(
-		'icon'  => '&#x2726;',
-		'title' => __( 'Timeless Design', 'skyyrose-flagship' ),
-		'desc'  => __( 'Classic silhouettes that never date', 'skyyrose-flagship' ),
-	),
-	array(
-		'icon'  => '&#x2726;',
-		'title' => __( 'Limited Production', 'skyyrose-flagship' ),
-		'desc'  => __( 'Small batches for exclusivity', 'skyyrose-flagship' ),
-	),
+/* ── Feature cards ────────────────────────────────────────────── */
+$features = array(
+	array( 'icon' => '&#x2726;', 'title' => __( 'Premium Materials', 'skyyrose-flagship' ), 'text' => __( 'Italian leathers, Japanese denim, Egyptian cotton — sourced from the finest mills worldwide.', 'skyyrose-flagship' ) ),
+	array( 'icon' => '&#x2726;', 'title' => __( 'Expert Construction', 'skyyrose-flagship' ), 'text' => __( 'Hand-finished details by master tailors who share our obsession with perfection.', 'skyyrose-flagship' ) ),
+	array( 'icon' => '&#x2726;', 'title' => __( 'Timeless Design', 'skyyrose-flagship' ), 'text' => __( 'Classic silhouettes that never date. Investment pieces, not trend pieces.', 'skyyrose-flagship' ) ),
 );
 
-/* ── Quality promise items ─────────────────────────────────────────────────── */
-$quality_items = array(
-	array(
-		'icon'  => '&#x1F3C6;',
-		'title' => __( 'Lifetime Warranty', 'skyyrose-flagship' ),
-		'desc'  => __( 'Covers manufacturing defects for the life of the garment', 'skyyrose-flagship' ),
-	),
-	array(
-		'icon'  => '&#x1F527;',
-		'title' => __( 'Free Repairs', 'skyyrose-flagship' ),
-		'desc'  => __( 'Complimentary alterations and repairs for the first year', 'skyyrose-flagship' ),
-	),
-	array(
-		'icon'  => '&#x1F4E6;',
-		'title' => __( 'Premium Packaging', 'skyyrose-flagship' ),
-		'desc'  => __( 'Each piece arrives in our signature luxury presentation', 'skyyrose-flagship' ),
-	),
-	array(
-		'icon'  => '&#x1F48E;',
-		'title' => __( 'Authenticity Card', 'skyyrose-flagship' ),
-		'desc'  => __( 'Numbered certificate of authenticity with each purchase', 'skyyrose-flagship' ),
-	),
+/* ── Cross-collection navigation ──────────────────────────────── */
+$cross_nav = array(
+	array( 'slug' => 'collection-black-rose', 'name' => __( 'Black Rose', 'skyyrose-flagship' ), 'desc' => __( 'Dark Elegance', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--black-rose' ),
+	array( 'slug' => 'collection-love-hurts', 'name' => __( 'Love Hurts', 'skyyrose-flagship' ), 'desc' => __( 'Crimson Rebellion', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--love-hurts' ),
+	array( 'slug' => 'collection-kids-capsule', 'name' => __( 'Kids Capsule', 'skyyrose-flagship' ), 'desc' => __( 'Next Generation', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--kids-capsule' ),
 );
+
+/* SVG whitelist for wp_kses */
+$svg_kses = array( 'svg' => array( 'viewBox' => true, 'fill' => true, 'stroke' => true, 'class' => true, 'aria-hidden' => true, 'width' => true, 'height' => true, 'xmlns' => true ), 'path' => array( 'd' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true ), 'circle' => array( 'cx' => true, 'cy' => true, 'r' => true, 'fill' => true ) );
 
 get_header();
 ?>
 
-<div class="sig-art-deco"></div>
+<div class="col-page" data-collection="signature">
+	<div class="col-floating" aria-hidden="true"></div>
 
-<!-- ════ Hero ════════════════════════════════════════════════════════════════ -->
-<section class="sig-hero">
-	<div class="sig-hero__content reveal">
-		<span class="sig-hero__badge"><?php echo esc_html__( 'Where It All Began', 'skyyrose-flagship' ); ?></span>
-		<h1 class="sig-hero__title gradient-text-animated"><?php echo esc_html__( 'SIGNATURE', 'skyyrose-flagship' ); ?></h1>
-		<p class="sig-hero__tagline"><?php echo esc_html__( 'The origin. The main event. The birth of it all.', 'skyyrose-flagship' ); ?></p>
-		<p class="sig-hero__subtitle"><?php echo esc_html__( 'This is what they know us for. The first rose ever pressed. The signature script logo worn around the world. The iconic pieces that built the crown. Every collection since has grown from this foundation.', 'skyyrose-flagship' ); ?></p>
-		<div class="sig-hero__cta-group">
-			<a href="#col-catalog" class="sig-hero__cta sig-hero__cta--primary"><?php echo esc_html__( 'Shop the Collection', 'skyyrose-flagship' ); ?></a>
-			<a href="<?php echo esc_url( home_url( '/experience-signature/' ) ); ?>" class="sig-hero__cta sig-hero__cta--secondary"><?php echo esc_html__( 'View 3D Experience', 'skyyrose-flagship' ); ?></a>
+	<!-- ════ Hero ════ -->
+	<section class="col-hero ambient-glow" data-scroll-fade>
+		<div class="col-hero__bg parallax-ken-burns">
+			<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/sr-collection-signature.webp?v=' . SKYYROSE_VERSION ); ?>"
+			     alt="<?php esc_attr_e( 'Signature Collection — Oakland skyline', 'skyyrose-flagship' ); ?>"
+			     loading="eager" fetchpriority="high" decoding="async" width="1024" height="1024">
 		</div>
-	</div>
-	<div class="sig-hero__scroll">
-		<span><?php echo esc_html__( 'Discover', 'skyyrose-flagship' ); ?></span>
-		<span>&#x2193;</span>
-	</div>
-</section>
-
-<!-- ════ Origin Story ═══════════════════════════════════════════════════════ -->
-<section class="sig-origin reveal">
-	<div class="sig-origin__grid">
-		<div class="sig-origin__content">
-			<span class="sig-origin__label"><?php echo esc_html__( 'Chapter One', 'skyyrose-flagship' ); ?></span>
-			<h2 class="sig-origin__title"><?php echo esc_html__( 'The First Rose', 'skyyrose-flagship' ); ?></h2>
-			<p class="sig-origin__text"><?php echo esc_html__( 'Before the collections, before the collaborations, before the world took notice, there was a single idea: luxury grows from concrete. The Signature collection is that seed. It carries the original rose motif, the hand-drawn script logo, and every foundational silhouette that defined SkyyRose from day one.', 'skyyrose-flagship' ); ?></p>
-			<blockquote class="sig-origin__quote"><?php echo esc_html__( '"This is the crown. Everything we\'ve built starts right here, in these pieces. The first sketches, the first fabrics, the first time someone saw the logo and understood what we were building."', 'skyyrose-flagship' ); ?></blockquote>
-			<p class="sig-origin__text"><?php echo esc_html__( 'These are not trend pieces. They are the architecture of a brand. Each garment carries the DNA that every future collection inherits. When you wear Signature, you wear the origin story.', 'skyyrose-flagship' ); ?></p>
-		</div>
-		<div class="sig-origin__visual">
-			<span class="sig-origin__rose">&#x1F339;</span>
-			<span class="sig-origin__visual-label"><?php echo esc_html__( 'Est. Oakland, CA', 'skyyrose-flagship' ); ?></span>
-		</div>
-	</div>
-</section>
-
-<!-- ════ Divider ═════════════════════════════════════════════════════════════ -->
-<div class="sig-divider"><span>&#x2726;</span></div>
-
-<!-- ════ Craftsmanship ══════════════════════════════════════════════════════ -->
-<section class="sig-craft reveal">
-	<div class="sig-craft__grid">
-		<div class="sig-craft__content">
-			<h2 class="sig-craft__title"><?php echo esc_html__( 'The Art of Craftsmanship', 'skyyrose-flagship' ); ?></h2>
-			<p class="sig-craft__text"><?php echo esc_html__( 'Every SIGNATURE piece represents the pinnacle of luxury streetwear. We source only the finest materials from renowned mills and work with master craftspeople who share our obsession with perfection.', 'skyyrose-flagship' ); ?></p>
-			<p class="sig-craft__text"><?php echo esc_html__( 'From the initial sketch to the final stitch, each garment undergoes rigorous quality checks to ensure it meets our exacting standards. This is clothing built to be cherished for generations.', 'skyyrose-flagship' ); ?></p>
-			<div class="sig-craft__features">
-				<?php foreach ( $craft_features as $feature ) : ?>
-					<div class="sig-craft__feature">
-						<span class="sig-craft__feature-icon"><?php echo wp_kses( $feature['icon'], array( 'svg' => array( 'viewBox' => true, 'fill' => true, 'stroke' => true, 'class' => true, 'aria-hidden' => true, 'width' => true, 'height' => true, 'xmlns' => true ), 'path' => array( 'd' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true ), 'circle' => array( 'cx' => true, 'cy' => true, 'r' => true, 'fill' => true ), 'line' => array( 'x1' => true, 'y1' => true, 'x2' => true, 'y2' => true, 'stroke' => true, 'stroke-width' => true ), 'polyline' => array( 'points' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true ), 'rect' => array( 'x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true, 'ry' => true, 'fill' => true, 'stroke' => true ) ) ); ?></span>
-						<div>
-							<h4><?php echo esc_html( $feature['title'] ); ?></h4>
-							<p><?php echo esc_html( $feature['desc'] ); ?></p>
-						</div>
-					</div>
-				<?php endforeach; ?>
+		<div class="col-hero__content col-reveal">
+			<span class="col-hero__badge rv-blur-down"><?php esc_html_e( 'Where It All Began', 'skyyrose-flagship' ); ?></span>
+			<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/signature-logo-hero-transparent.png?v=' . SKYYROSE_VERSION ); ?>"
+			     alt="<?php esc_attr_e( 'The SkyyRose Signature Collection', 'skyyrose-flagship' ); ?>"
+			     class="col-hero__logo rv-clip-up" width="560" height="280" loading="eager">
+			<p class="col-hero__tagline rv-split-word"><?php esc_html_e( 'The origin. The main event. The birth of it all.', 'skyyrose-flagship' ); ?></p>
+			<p class="col-hero__subtitle rv-blur"><?php esc_html_e( 'This is what they know us for. The first rose ever pressed. The signature script logo worn around the world. Every collection since has grown from this foundation.', 'skyyrose-flagship' ); ?></p>
+			<div class="col-hero__cta-group">
+				<a href="#shop" class="col-hero__cta col-hero__cta--primary btn-sweep btn-press"><?php esc_html_e( 'Shop the Collection', 'skyyrose-flagship' ); ?></a>
+				<a href="<?php echo esc_url( home_url( '/experience-signature/' ) ); ?>" class="col-hero__cta col-hero__cta--secondary btn-border-draw btn-press"><?php esc_html_e( 'View 3D Experience', 'skyyrose-flagship' ); ?></a>
 			</div>
 		</div>
-		<div class="sig-craft__image">&#x25C6;</div>
-	</div>
-</section>
+		<div class="col-hero__scroll" aria-hidden="true"><span><?php esc_html_e( 'Discover', 'skyyrose-flagship' ); ?></span><span>&#x2193;</span></div>
+	</section>
 
-<!-- ════ Holographic Product Grid ═══════════════════════════════════════════ -->
-<section class="sig-products reveal" id="col-catalog">
-	<div class="sig-products__header">
-		<h2><?php echo esc_html__( 'The Collection', 'skyyrose-flagship' ); ?></h2>
-		<p><?php echo esc_html__( 'The iconic pieces. Investment-grade luxury built on the original blueprint.', 'skyyrose-flagship' ); ?></p>
-	</div>
-
-	<div class="product-grid" data-collection="signature">
-		<div class="product-grid__header">
-			<h3 class="product-grid__title"><?php echo esc_html__( 'Signature Essentials', 'skyyrose-flagship' ); ?></h3>
-			<p class="product-grid__subtitle"><?php echo esc_html__( 'The foundation of the SkyyRose wardrobe', 'skyyrose-flagship' ); ?></p>
+	<!-- ════ Marquee ════ -->
+	<div class="col-marquee" aria-hidden="true">
+		<div class="col-marquee__track">
+			<?php for ( $i = 0; $i < 8; $i++ ) : ?>
+				<span><?php esc_html_e( 'The Foundation', 'skyyrose-flagship' ); ?></span>
+				<span>&#x2726;</span>
+				<span><?php esc_html_e( 'Est. Oakland', 'skyyrose-flagship' ); ?></span>
+				<span>&#x2726;</span>
+			<?php endfor; ?>
 		</div>
-
-		<?php
-		$index = 0;
-		foreach ( $signature_products as $product_item ) :
-			// Build args for the holo card template part.
-			if ( $product_item instanceof WC_Product ) {
-				$card_args = array(
-					'product'    => $product_item,
-					'collection' => 'signature',
-					'index'      => $index,
-				);
-			} else {
-				$card_args = array(
-					'product'    => null,
-					'title'      => $product_item['title'] ?? '',
-					'price'      => $product_item['price'] ?? '',
-					'badge_text' => $product_item['badge_text'] ?? '',
-					'collection' => 'signature',
-					'permalink'  => $product_item['permalink'] ?? '#',
-					'sku'        => $product_item['sku'] ?? '',
-					'index'      => $index,
-				);
-			}
-
-			get_template_part( 'template-parts/product-card-holo', null, $card_args );
-			$index++;
-		endforeach;
-		?>
 	</div>
-</section>
 
-<!-- ════ Quality Promise ════════════════════════════════════════════════════ -->
-<section class="sig-quality reveal">
-	<h2 class="sig-quality__title"><?php echo esc_html__( 'Our Quality Promise', 'skyyrose-flagship' ); ?></h2>
-	<p class="sig-quality__desc"><?php echo esc_html__( 'Every SIGNATURE piece is backed by our commitment to excellence. We stand behind every stitch, every seam, every detail.', 'skyyrose-flagship' ); ?></p>
-	<div class="sig-quality__grid">
-		<?php foreach ( $quality_items as $item ) : ?>
-			<div class="sig-quality__item">
-				<div class="sig-quality__icon"><?php echo wp_kses( $item['icon'], array( 'svg' => array( 'viewBox' => true, 'fill' => true, 'stroke' => true, 'class' => true, 'aria-hidden' => true, 'width' => true, 'height' => true, 'xmlns' => true ), 'path' => array( 'd' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true ), 'circle' => array( 'cx' => true, 'cy' => true, 'r' => true, 'fill' => true ), 'line' => array( 'x1' => true, 'y1' => true, 'x2' => true, 'y2' => true, 'stroke' => true, 'stroke-width' => true ), 'polyline' => array( 'points' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true ), 'rect' => array( 'x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true, 'ry' => true, 'fill' => true, 'stroke' => true ) ) ); ?></div>
-				<h3><?php echo esc_html( $item['title'] ); ?></h3>
-				<p><?php echo esc_html( $item['desc'] ); ?></p>
+	<!-- ════ Story ════ -->
+	<section class="col-story rv-clip-up">
+		<div class="col-story__grid">
+			<div class="col-story__content">
+				<span class="col-story__label"><?php esc_html_e( 'Chapter One', 'skyyrose-flagship' ); ?></span>
+				<h2 class="col-story__title"><?php esc_html_e( 'The First Rose', 'skyyrose-flagship' ); ?></h2>
+				<p class="col-story__text"><?php esc_html_e( 'Before the collections, before the collaborations, before the world took notice, there was a single idea: luxury grows from concrete. The Signature collection is that seed. It carries the original rose motif, the hand-drawn script logo, and every foundational silhouette that defined SkyyRose from day one.', 'skyyrose-flagship' ); ?></p>
+				<blockquote class="col-story__quote"><?php esc_html_e( '"This is the crown. Everything we\'ve built starts right here, in these pieces. The first sketches, the first fabrics, the first time someone saw the logo and understood what we were building."', 'skyyrose-flagship' ); ?></blockquote>
+				<p class="col-story__text"><?php esc_html_e( 'These are not trend pieces. They are the architecture of a brand. Each garment carries the DNA that every future collection inherits. When you wear Signature, you wear the origin story.', 'skyyrose-flagship' ); ?></p>
 			</div>
-		<?php endforeach; ?>
-	</div>
-</section>
+			<div class="col-story__visual">
+				<span class="col-story__visual-text"><?php esc_html_e( 'SIGNATURE', 'skyyrose-flagship' ); ?></span>
+				<span class="col-story__visual-label"><?php esc_html_e( 'Est. Oakland, CA', 'skyyrose-flagship' ); ?></span>
+			</div>
+		</div>
+	</section>
 
-<!-- ════ CTA Banner ═════════════════════════════════════════════════════════ -->
-<section class="sig-cta reveal">
-	<h2 class="sig-cta__title"><?php echo esc_html__( 'Invest in Excellence', 'skyyrose-flagship' ); ?></h2>
-	<p class="sig-cta__text"><?php echo esc_html__( 'Join the discerning few who understand that true luxury is an investment in craftsmanship, quality, and timeless style.', 'skyyrose-flagship' ); ?></p>
-	<a href="<?php echo esc_url( function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : '#' ); ?>" class="sig-cta__btn"><?php echo esc_html__( 'Shop Signature', 'skyyrose-flagship' ); ?></a>
-</section>
+	<!-- ════ Divider + Quote ════ -->
+	<div class="col-divider" aria-hidden="true"><span class="col-divider__icon">&#x2726;</span></div>
+	<div class="col-quote-block rv-blur">
+		<blockquote class="col-quote-block__text"><?php esc_html_e( '"The first rose ever pressed became the blueprint for everything. Signature is not a collection — it is the origin of the crown."', 'skyyrose-flagship' ); ?></blockquote>
+		<cite class="col-quote-block__cite">&mdash; <?php esc_html_e( 'Corey Foster, Founder', 'skyyrose-flagship' ); ?></cite>
+	</div>
+
+	<!-- ════ Feature Cards ════ -->
+	<section class="col-features rv-clip-left">
+		<h2 class="col-features__heading"><?php esc_html_e( 'The Art of Craftsmanship', 'skyyrose-flagship' ); ?></h2>
+		<p class="col-features__subheading"><?php esc_html_e( 'Every SIGNATURE piece represents the pinnacle of luxury streetwear — from initial sketch to final stitch.', 'skyyrose-flagship' ); ?></p>
+		<div class="col-features__grid stagger-grid">
+			<?php foreach ( $features as $feat ) : ?>
+				<div class="col-features__card">
+					<div class="col-features__icon" aria-hidden="true"><?php echo wp_kses( $feat['icon'], $svg_kses ); ?></div>
+					<h3><?php echo esc_html( $feat['title'] ); ?></h3>
+					<p><?php echo esc_html( $feat['text'] ); ?></p>
+				</div>
+			<?php endforeach; ?>
+		</div>
+	</section>
+
+	<!-- ════ Product Grid ════ -->
+	<section class="col-products rv-clip-up" id="shop">
+		<div class="col-products__header">
+			<h2><?php esc_html_e( 'The Collection', 'skyyrose-flagship' ); ?></h2>
+			<p><?php esc_html_e( 'Investment-grade luxury built on the original blueprint.', 'skyyrose-flagship' ); ?></p>
+		</div>
+		<div class="product-grid stagger-grid" data-collection="signature">
+			<?php
+			$index = 0;
+			foreach ( $products as $item ) :
+				if ( $item instanceof WC_Product ) {
+					$card_args = array( 'product' => $item, 'collection' => 'signature', 'index' => $index );
+				} else {
+					$card_args = array( 'product' => null, 'title' => $item['title'] ?? '', 'price' => $item['price'] ?? '', 'badge_text' => $item['badge_text'] ?? '', 'collection' => 'signature', 'permalink' => '#', 'sku' => $item['sku'] ?? '', 'index' => $index );
+				}
+				get_template_part( 'template-parts/product-card-holo', null, $card_args );
+				$index++;
+			endforeach;
+			?>
+		</div>
+	</section>
+
+	<!-- ════ CTA ════ -->
+	<section class="col-cta rv-blur">
+		<h2 class="col-cta__title"><?php esc_html_e( 'Invest in Excellence', 'skyyrose-flagship' ); ?></h2>
+		<p class="col-cta__text"><?php esc_html_e( 'Join the discerning few who understand that true luxury is an investment in craftsmanship, quality, and timeless style.', 'skyyrose-flagship' ); ?></p>
+		<a href="<?php echo esc_url( function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/shop/' ) ); ?>" class="col-cta__btn"><?php esc_html_e( 'Shop Signature', 'skyyrose-flagship' ); ?></a>
+	</section>
+
+	<!-- ════ Cross-Collection Nav ════ -->
+	<nav class="col-crossnav rv-clip-up" aria-label="<?php esc_attr_e( 'Other collections', 'skyyrose-flagship' ); ?>">
+		<h3 class="col-crossnav__heading"><?php esc_html_e( 'Explore More Collections', 'skyyrose-flagship' ); ?></h3>
+		<div class="col-crossnav__grid stagger-grid">
+			<?php foreach ( $cross_nav as $nav ) : ?>
+				<a href="<?php echo esc_url( home_url( '/' . $nav['slug'] . '/' ) ); ?>" class="col-crossnav__link <?php echo esc_attr( $nav['class'] ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Explore the %s collection', 'skyyrose-flagship' ), $nav['name'] ) ); ?>">
+					<h3><?php echo esc_html( $nav['name'] ); ?></h3>
+					<p><?php echo esc_html( $nav['desc'] ); ?></p>
+				</a>
+			<?php endforeach; ?>
+		</div>
+	</nav>
+
+	<!-- ════ Newsletter ════ -->
+	<section class="col-newsletter rv-blur">
+		<h2 class="col-newsletter__title"><?php esc_html_e( 'Join the Inner Circle', 'skyyrose-flagship' ); ?></h2>
+		<p class="col-newsletter__text"><?php esc_html_e( 'Early access to new drops, exclusive content, and the stories behind each piece.', 'skyyrose-flagship' ); ?></p>
+		<form class="col-newsletter__form" aria-label="<?php esc_attr_e( 'Newsletter signup', 'skyyrose-flagship' ); ?>">
+			<label class="screen-reader-text" for="sig-email"><?php esc_html_e( 'Email address', 'skyyrose-flagship' ); ?></label>
+			<input type="email" id="sig-email" class="col-newsletter__input" placeholder="<?php esc_attr_e( 'Enter your email', 'skyyrose-flagship' ); ?>" required>
+			<button type="submit" class="col-newsletter__submit"><?php esc_html_e( 'Join', 'skyyrose-flagship' ); ?></button>
+		</form>
+	</section>
+
+</div><!-- .col-page -->
 
 <?php get_footer(); ?>

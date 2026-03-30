@@ -105,7 +105,7 @@ while ( have_posts() ) :
 		</nav>
 
 		<!-- PRODUCT HERO — Split Layout -->
-		<section class="sr-hero">
+		<section class="sr-hero rv-clip-up">
 			<div class="sr-container sr-hero-grid">
 
 				<!-- Gallery Column -->
@@ -244,7 +244,7 @@ while ( have_posts() ) :
 						</div>
 
 						<!-- Trust signals -->
-						<div class="sr-trust">
+						<div class="sr-trust stagger-grid">
 							<div class="sr-trust-item">
 								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
 								<span><?php esc_html_e( 'Secure Checkout', 'skyyrose-flagship' ); ?></span>
@@ -289,7 +289,7 @@ while ( have_posts() ) :
 		</section>
 
 		<!-- PRODUCT DETAILS ACCORDION -->
-		<section class="sr-details">
+		<section class="sr-details rv-clip-up">
 			<div class="sr-container">
 				<div class="sr-details-grid">
 
@@ -378,7 +378,7 @@ while ( have_posts() ) :
 							</a>
 						<?php endif; ?>
 					</div>
-					<div class="sr-related-grid">
+					<div class="sr-related-grid stagger-grid">
 						<?php foreach ( $related as $rel_product ) :
 							$rel_img  = wp_get_attachment_url( $rel_product->get_image_id() );
 							$rel_link = get_permalink( $rel_product->get_id() );

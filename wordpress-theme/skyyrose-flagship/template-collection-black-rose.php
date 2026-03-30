@@ -2,216 +2,190 @@
 /**
  * Template Name: Collection - Black Rose
  *
- * BLACK ROSE collection — standalone page template.
- * Hero with crimson radial gradient, origin story, philosophy,
- * holo product grid from WooCommerce, cross-collection nav.
+ * BLACK ROSE collection — masculine elegance, silver on deep black.
+ * Uses unified collection layout (col-*) with data-collection="black-rose".
  *
- * Palette: Silver #C0C0C0 · Deep #050505 · Crimson #DC143C
+ * Palette: Silver #C0C0C0 / Deep #050505 / Crimson accent #DC143C
  *
  * @package SkyyRose_Flagship
- * @since   5.0.0
+ * @since   6.1.0
  */
 
 defined( 'ABSPATH' ) || exit;
 
-/* ── Pull WooCommerce products (static fallback) ── */
-$br_products = array();
-
+/* ── Product data ─────────────────────────────────────────────── */
+$products = array();
 if ( function_exists( 'wc_get_products' ) ) {
-	$br_products = wc_get_products( array(
+	$products = wc_get_products( array(
 		'category' => array( 'black-rose' ),
 		'limit'    => 20,
 		'status'   => 'publish',
+		'orderby'  => 'menu_order',
+		'order'    => 'ASC',
 	) );
 }
 
-if ( empty( $br_products ) ) {
-	$br_products = array(
-		array(
-			'name'     => 'Black Rose Classic Hoodie',
-			'price'    => '185',
-			'badge'    => 'Bestseller',
-			'category' => 'hoodies',
-			'slug'     => 'br-classic-hoodie',
-		),
-		array(
-			'name'     => 'Obsidian Tee',
-			'price'    => '75',
-			'badge'    => 'New',
-			'category' => 'tees',
-			'slug'     => 'br-obsidian-tee',
-		),
-		array(
-			'name'     => 'Dark Bloom Jacket',
-			'price'    => '295',
-			'badge'    => 'Limited',
-			'category' => 'jackets',
-			'slug'     => 'br-dark-bloom-jacket',
-		),
-		array(
-			'name'     => 'Thorn Cargo Pants',
-			'price'    => '195',
-			'badge'    => '',
-			'category' => 'pants',
-			'slug'     => 'br-thorn-cargo',
-		),
-		array(
-			'name'     => 'Midnight Pullover',
-			'price'    => '165',
-			'badge'    => '',
-			'category' => 'hoodies',
-			'slug'     => 'br-midnight-pullover',
-		),
-		array(
-			'name'     => 'Shadow Knit Tee',
-			'price'    => '85',
-			'badge'    => '',
-			'category' => 'tees',
-			'slug'     => 'br-shadow-knit-tee',
-		),
+if ( empty( $products ) ) {
+	$products = array(
+		array( 'title' => __( 'Black Rose Classic Hoodie', 'skyyrose-flagship' ), 'price' => '$185', 'badge_text' => __( 'Bestseller', 'skyyrose-flagship' ), 'sku' => 'br-classic-hoodie' ),
+		array( 'title' => __( 'Obsidian Tee', 'skyyrose-flagship' ), 'price' => '$75', 'badge_text' => __( 'New', 'skyyrose-flagship' ), 'sku' => 'br-obsidian-tee' ),
+		array( 'title' => __( 'Dark Bloom Jacket', 'skyyrose-flagship' ), 'price' => '$295', 'badge_text' => __( 'Limited', 'skyyrose-flagship' ), 'sku' => 'br-dark-bloom-jacket' ),
+		array( 'title' => __( 'Thorn Cargo Pants', 'skyyrose-flagship' ), 'price' => '$195', 'badge_text' => '', 'sku' => 'br-thorn-cargo' ),
+		array( 'title' => __( 'Midnight Pullover', 'skyyrose-flagship' ), 'price' => '$165', 'badge_text' => '', 'sku' => 'br-midnight-pullover' ),
+		array( 'title' => __( 'Shadow Knit Tee', 'skyyrose-flagship' ), 'price' => '$85', 'badge_text' => '', 'sku' => 'br-shadow-knit-tee' ),
 	);
 }
+
+/* ── Feature cards — The Philosophy ───────────────────────────── */
+$features = array(
+	array( 'icon' => '&#x1F5A4;', 'title' => __( 'Monochrome Mastery', 'skyyrose-flagship' ), 'text' => __( 'The depth of black carries what other colors cannot — layered textures, tonal contrasts, silhouettes that command presence without raising their voice.', 'skyyrose-flagship' ) ),
+	array( 'icon' => '&#x1F339;', 'title' => __( 'The Thorn Motif', 'skyyrose-flagship' ), 'text' => __( 'Resilience encoded in every stitch. The thorn represents protective beauty — guarding what is precious while standing its ground.', 'skyyrose-flagship' ) ),
+	array( 'icon' => '&#x25C6;', 'title' => __( 'Dark-on-Dark Texture', 'skyyrose-flagship' ), 'text' => __( 'This is not loud fashion. This is the quiet authority of someone who knows exactly who they are. Elegance distilled into every fiber.', 'skyyrose-flagship' ) ),
+);
+
+/* ── Cross-collection navigation ──────────────────────────────── */
+$cross_nav = array(
+	array( 'slug' => 'collection-love-hurts', 'name' => __( 'Love Hurts', 'skyyrose-flagship' ), 'desc' => __( 'Crimson Rebellion', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--love-hurts' ),
+	array( 'slug' => 'collection-signature', 'name' => __( 'Signature', 'skyyrose-flagship' ), 'desc' => __( 'The Foundation', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--signature' ),
+	array( 'slug' => 'collection-kids-capsule', 'name' => __( 'Kids Capsule', 'skyyrose-flagship' ), 'desc' => __( 'Next Generation', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--kids-capsule' ),
+);
+
+$svg_kses = array( 'svg' => array( 'viewBox' => true, 'fill' => true, 'stroke' => true, 'class' => true, 'aria-hidden' => true, 'width' => true, 'height' => true, 'xmlns' => true ), 'path' => array( 'd' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true ), 'circle' => array( 'cx' => true, 'cy' => true, 'r' => true, 'fill' => true ) );
 
 get_header();
 ?>
 
-<div class="br-page theme-blackrose">
+<div class="col-page" data-collection="black-rose">
+	<div class="col-floating" aria-hidden="true"></div>
 
-	<!-- Floating particles -->
-	<?php for ( $i = 0; $i < 5; $i++ ) :
-		$positions = array( 10, 30, 50, 70, 90 );
-		$delays    = array( 0, 3, 7, 10, 14 );
-	?>
-		<div class="br-floating-element" style="left: <?php echo esc_attr( $positions[ $i ] ); ?>%; animation-delay: <?php echo esc_attr( $delays[ $i ] ); ?>s;">&#x2022;</div>
-	<?php endfor; ?>
-
-	<!-- ── Hero: Origin Story ── -->
-	<section class="br-hero">
-		<div class="br-hero__bg"></div>
-		<div class="br-hero__content">
-			<span class="br-hero__badge">
-				<?php echo esc_html__( 'The Original Collection', 'skyyrose-flagship' ); ?>
-			</span>
-			<h1 class="br-hero__title">
-				<span><?php echo esc_html__( 'BLACK ROSE', 'skyyrose-flagship' ); ?></span>
-			</h1>
-			<p class="br-hero__subtitle">
-				<?php echo esc_html__( 'The beauty of the color black through the rose and high-end fashion design. Monochrome sophistication. Dark-on-dark texture. Masculine elegance distilled into every fiber.', 'skyyrose-flagship' ); ?>
-			</p>
-			<div class="br-hero__origin">
-				<blockquote><?php echo esc_html__( '"What do you make for men?"', 'skyyrose-flagship' ); ?></blockquote>
-				<blockquote>
-					<?php
-					/* translators: origin story quote */
-					echo esc_html__( 'The answer came without hesitation — "Every man would wear a black rose."', 'skyyrose-flagship' );
-					?>
-				</blockquote>
-				<cite>&mdash; <?php echo esc_html__( 'The moment that sparked the collection', 'skyyrose-flagship' ); ?></cite>
+	<!-- ════ Hero ════ -->
+	<section class="col-hero ambient-glow" data-scroll-fade>
+		<div class="col-hero__bg parallax-ken-burns">
+			<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/sr-collection-black-rose.webp?v=' . SKYYROSE_VERSION ); ?>"
+			     alt="<?php esc_attr_e( 'Black Rose Collection — rose from concrete', 'skyyrose-flagship' ); ?>"
+			     loading="eager" fetchpriority="high" decoding="async" width="1024" height="1024">
+		</div>
+		<div class="col-hero__content col-reveal">
+			<span class="col-hero__badge rv-blur-down"><?php esc_html_e( 'The Original Collection', 'skyyrose-flagship' ); ?></span>
+			<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/black-rose-logo-hero-transparent.png?v=' . SKYYROSE_VERSION ); ?>"
+			     alt="<?php esc_attr_e( 'The Black Rose Collection', 'skyyrose-flagship' ); ?>"
+			     class="col-hero__logo rv-clip-up" width="560" height="280" loading="eager">
+			<p class="col-hero__tagline rv-split-word"><?php esc_html_e( 'The beauty of the color black through the rose and high-end fashion design.', 'skyyrose-flagship' ); ?></p>
+			<p class="col-hero__subtitle rv-blur"><?php esc_html_e( 'Monochrome sophistication. Dark-on-dark texture. Masculine elegance distilled into every fiber. Every man would wear a black rose.', 'skyyrose-flagship' ); ?></p>
+			<div class="col-hero__cta-group">
+				<a href="#shop" class="col-hero__cta col-hero__cta--primary btn-sweep btn-press"><?php esc_html_e( 'Shop the Collection', 'skyyrose-flagship' ); ?></a>
+				<a href="<?php echo esc_url( home_url( '/experience-black-rose/' ) ); ?>" class="col-hero__cta col-hero__cta--secondary btn-border-draw btn-press"><?php esc_html_e( 'View 3D Experience', 'skyyrose-flagship' ); ?></a>
 			</div>
-			<div class="br-hero__cta">
-				<a href="<?php echo esc_url( home_url( '/experience-black-rose/' ) ); ?>" class="br-btn br-btn--outline">
-					<?php echo esc_html__( 'View 3D Experience', 'skyyrose-flagship' ); ?>
-				</a>
-				<a href="#shop" class="br-btn br-btn--solid">
-					<?php echo esc_html__( 'Shop the Collection', 'skyyrose-flagship' ); ?>
-				</a>
+		</div>
+		<div class="col-hero__scroll" aria-hidden="true"><span><?php esc_html_e( 'Discover', 'skyyrose-flagship' ); ?></span><span>&#x2193;</span></div>
+	</section>
+
+	<!-- ════ Marquee ════ -->
+	<div class="col-marquee" aria-hidden="true">
+		<div class="col-marquee__track">
+			<?php for ( $i = 0; $i < 8; $i++ ) : ?>
+				<span><?php esc_html_e( 'Dark Elegance', 'skyyrose-flagship' ); ?></span>
+				<span>&#x25C6;</span>
+				<span><?php esc_html_e( 'Masculine Power', 'skyyrose-flagship' ); ?></span>
+				<span>&#x25C6;</span>
+			<?php endfor; ?>
+		</div>
+	</div>
+
+	<!-- ════ Story ════ -->
+	<section class="col-story rv-clip-up">
+		<div class="col-story__grid">
+			<div class="col-story__content">
+				<span class="col-story__label"><?php esc_html_e( 'The Origin', 'skyyrose-flagship' ); ?></span>
+				<h2 class="col-story__title"><?php esc_html_e( 'Born from a Single Question', 'skyyrose-flagship' ); ?></h2>
+				<p class="col-story__text"><?php esc_html_e( 'It started with a customer asking what SkyyRose made for men. The answer was instant and instinctive: every man would wear a black rose. Not just a flower — a symbol of strength refined through darkness, beauty that does not need to announce itself.', 'skyyrose-flagship' ); ?></p>
+				<blockquote class="col-story__quote"><?php esc_html_e( '"What do you make for men?" The answer came without hesitation — "Every man would wear a black rose."', 'skyyrose-flagship' ); ?></blockquote>
+				<p class="col-story__text"><?php esc_html_e( 'Black Rose is the exploration of that conviction. Each piece channels the philosophy of monochrome sophistication into wearable form — layered textures, tonal contrasts, and silhouettes that command presence without raising their voice.', 'skyyrose-flagship' ); ?></p>
+			</div>
+			<div class="col-story__visual">
+				<span class="col-story__visual-text"><?php esc_html_e( 'BLACK ROSE', 'skyyrose-flagship' ); ?></span>
+				<span class="col-story__visual-label"><?php esc_html_e( 'Dark Elegance', 'skyyrose-flagship' ); ?></span>
 			</div>
 		</div>
 	</section>
 
-	<!-- ── Section Divider ── -->
-	<div class="br-divider" aria-hidden="true"></div>
+	<!-- ════ Divider + Quote ════ -->
+	<div class="col-divider" aria-hidden="true"><span class="col-divider__icon">&#x25C6;</span></div>
+	<div class="col-quote-block rv-blur">
+		<blockquote class="col-quote-block__text"><?php esc_html_e( '"In a world of fleeting trends, Black Rose stands eternal. Each piece is crafted for those who find strength in darkness and elegance in the unconventional."', 'skyyrose-flagship' ); ?></blockquote>
+		<cite class="col-quote-block__cite">&mdash; <?php esc_html_e( 'The Philosophy', 'skyyrose-flagship' ); ?></cite>
+	</div>
 
-	<!-- ── Story: The Origin ── -->
-	<section class="br-story">
-		<div class="br-story__content">
-			<div class="br-story__text">
-				<h2><?php echo esc_html__( 'Born from a Single Question', 'skyyrose-flagship' ); ?></h2>
-				<p><?php echo esc_html__( 'It started with a customer asking what SkyyRose made for men. The answer was instant and instinctive: every man would wear a black rose. Not just a flower — a symbol of strength refined through darkness, beauty that does not need to announce itself.', 'skyyrose-flagship' ); ?></p>
-				<p><?php echo esc_html__( 'Black Rose is the exploration of that conviction. The color black carries a depth that other colors cannot — layered textures, tonal contrasts, and silhouettes that command presence without raising their voice. Each piece channels that philosophy into wearable form.', 'skyyrose-flagship' ); ?></p>
-			</div>
-			<div class="br-story__visual" aria-hidden="true"></div>
+	<!-- ════ Feature Cards ════ -->
+	<section class="col-features rv-clip-left">
+		<h2 class="col-features__heading"><?php esc_html_e( 'The Philosophy', 'skyyrose-flagship' ); ?></h2>
+		<p class="col-features__subheading"><?php esc_html_e( 'Every stitch, every detail is designed to empower you to move through the world on your own terms.', 'skyyrose-flagship' ); ?></p>
+		<div class="col-features__grid stagger-grid">
+			<?php foreach ( $features as $feat ) : ?>
+				<div class="col-features__card">
+					<div class="col-features__icon" aria-hidden="true"><?php echo wp_kses( $feat['icon'], $svg_kses ); ?></div>
+					<h3><?php echo esc_html( $feat['title'] ); ?></h3>
+					<p><?php echo esc_html( $feat['text'] ); ?></p>
+				</div>
+			<?php endforeach; ?>
 		</div>
 	</section>
 
-	<!-- ── Section Divider ── -->
-	<div class="br-divider" aria-hidden="true"></div>
-
-	<!-- ── Philosophy ── -->
-	<section class="br-philosophy">
-		<div class="br-philosophy__inner">
-			<h2><?php echo esc_html__( 'The Philosophy', 'skyyrose-flagship' ); ?></h2>
-			<p><?php echo esc_html__( 'In a world of fleeting trends, Black Rose stands eternal. Each piece is crafted for those who find strength in darkness and elegance in the unconventional. The thorn motif represents resilience — protective beauty guarding what is precious.', 'skyyrose-flagship' ); ?></p>
-			<p><?php echo esc_html__( 'Every stitch, every detail is designed to empower you to move through the world on your own terms. This is not loud fashion. This is the quiet authority of someone who knows exactly who they are.', 'skyyrose-flagship' ); ?></p>
+	<!-- ════ Product Grid ════ -->
+	<section class="col-products rv-clip-up" id="shop">
+		<div class="col-products__header">
+			<h2><?php esc_html_e( 'The Collection', 'skyyrose-flagship' ); ?></h2>
+			<p><?php esc_html_e( 'Dark elegance — holographic preview', 'skyyrose-flagship' ); ?></p>
 		</div>
-	</section>
-
-	<!-- ── Section Divider ── -->
-	<div class="br-divider" aria-hidden="true"></div>
-
-	<!-- ── Holographic Product Grid ── -->
-	<section id="shop" class="br-holo-section">
-		<div class="br-product-grid" data-collection="black-rose">
-			<div class="br-product-grid__header">
-				<h2 class="br-product-grid__title"><?php echo esc_html__( 'The Collection', 'skyyrose-flagship' ); ?></h2>
-				<p class="br-product-grid__subtitle"><?php echo esc_html__( 'Holographic Preview — Dark Elegance', 'skyyrose-flagship' ); ?></p>
-			</div>
-
-			<div class="br-product-grid__items">
+		<div class="product-grid stagger-grid" data-collection="black-rose">
+			<div class="product-grid__items">
 				<?php
-				$br_index = 0;
-				foreach ( $br_products as $product ) :
-					$is_wc = is_a( $product, 'WC_Product' );
-
-					if ( $is_wc ) {
-						$card_args = array(
-							'product'    => $product,
-							'collection' => 'black-rose',
-							'index'      => $br_index,
-						);
+				$index = 0;
+				foreach ( $products as $item ) :
+					if ( $item instanceof WC_Product ) {
+						$card_args = array( 'product' => $item, 'collection' => 'black-rose', 'index' => $index );
 					} else {
-						$card_args = array(
-							'product'    => null,
-							'title'      => $product['name'],
-							'price'      => '$' . $product['price'],
-							'badge_text' => $product['badge'],
-							'collection' => 'black-rose',
-							'permalink'  => '#',
-							'sku'        => $product['slug'],
-							'index'      => $br_index,
-						);
+						$card_args = array( 'product' => null, 'title' => $item['title'] ?? '', 'price' => $item['price'] ?? '', 'badge_text' => $item['badge_text'] ?? '', 'collection' => 'black-rose', 'permalink' => '#', 'sku' => $item['sku'] ?? '', 'index' => $index );
 					}
-
 					get_template_part( 'template-parts/product-card-holo', null, $card_args );
-					$br_index++;
+					$index++;
 				endforeach;
 				?>
 			</div>
 		</div>
 	</section>
 
-	<!-- ── Section Divider ── -->
-	<div class="br-divider" aria-hidden="true"></div>
-
-	<!-- ── Cross-Collection Navigation ── -->
-	<section class="br-cross-nav">
-		<h2 class="br-cross-nav__title"><?php echo esc_html__( 'Explore More Collections', 'skyyrose-flagship' ); ?></h2>
-		<div class="br-cross-nav__links">
-			<a href="<?php echo esc_url( home_url( '/collection-love-hurts/' ) ); ?>" class="br-cross-nav__link br-cross-nav__link--lh">
-				<span class="br-cross-nav__label"><?php echo esc_html__( 'Love Hurts', 'skyyrose-flagship' ); ?></span>
-				<span class="br-cross-nav__arrow">&rarr;</span>
-			</a>
-			<a href="<?php echo esc_url( home_url( '/collection-signature/' ) ); ?>" class="br-cross-nav__link br-cross-nav__link--sg">
-				<span class="br-cross-nav__label"><?php echo esc_html__( 'Signature', 'skyyrose-flagship' ); ?></span>
-				<span class="br-cross-nav__arrow">&rarr;</span>
-			</a>
-			<a href="<?php echo esc_url( home_url( '/collection-kids-capsule/' ) ); ?>" class="br-cross-nav__link br-cross-nav__link--kc">
-				<span class="br-cross-nav__label"><?php echo esc_html__( 'Kids Capsule', 'skyyrose-flagship' ); ?></span>
-				<span class="br-cross-nav__arrow">&rarr;</span>
-			</a>
-		</div>
+	<!-- ════ CTA ════ -->
+	<section class="col-cta rv-blur">
+		<h2 class="col-cta__title"><?php esc_html_e( 'Wear the Darkness', 'skyyrose-flagship' ); ?></h2>
+		<p class="col-cta__text"><?php esc_html_e( 'The thorn motif represents resilience — protective beauty guarding what is precious. This is clothing for those who find strength in darkness.', 'skyyrose-flagship' ); ?></p>
+		<a href="<?php echo esc_url( function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/shop/' ) ); ?>" class="col-cta__btn"><?php esc_html_e( 'Shop Black Rose', 'skyyrose-flagship' ); ?></a>
 	</section>
 
-</div><!-- .br-page -->
+	<!-- ════ Cross-Collection Nav ════ -->
+	<nav class="col-crossnav rv-clip-up" aria-label="<?php esc_attr_e( 'Other collections', 'skyyrose-flagship' ); ?>">
+		<h3 class="col-crossnav__heading"><?php esc_html_e( 'Explore More Collections', 'skyyrose-flagship' ); ?></h3>
+		<div class="col-crossnav__grid stagger-grid">
+			<?php foreach ( $cross_nav as $nav ) : ?>
+				<a href="<?php echo esc_url( home_url( '/' . $nav['slug'] . '/' ) ); ?>" class="col-crossnav__link <?php echo esc_attr( $nav['class'] ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Explore the %s collection', 'skyyrose-flagship' ), $nav['name'] ) ); ?>">
+					<h3><?php echo esc_html( $nav['name'] ); ?></h3>
+					<p><?php echo esc_html( $nav['desc'] ); ?></p>
+				</a>
+			<?php endforeach; ?>
+		</div>
+	</nav>
+
+	<!-- ════ Newsletter ════ -->
+	<section class="col-newsletter rv-blur">
+		<h2 class="col-newsletter__title"><?php esc_html_e( 'Join the Inner Circle', 'skyyrose-flagship' ); ?></h2>
+		<p class="col-newsletter__text"><?php esc_html_e( 'First access to new drops, exclusive content, and the stories behind the darkness.', 'skyyrose-flagship' ); ?></p>
+		<form class="col-newsletter__form" aria-label="<?php esc_attr_e( 'Newsletter signup', 'skyyrose-flagship' ); ?>">
+			<label class="screen-reader-text" for="br-email"><?php esc_html_e( 'Email address', 'skyyrose-flagship' ); ?></label>
+			<input type="email" id="br-email" class="col-newsletter__input" placeholder="<?php esc_attr_e( 'Enter your email', 'skyyrose-flagship' ); ?>" required>
+			<button type="submit" class="col-newsletter__submit"><?php esc_html_e( 'Join', 'skyyrose-flagship' ); ?></button>
+		</form>
+	</section>
+
+</div><!-- .col-page -->
 
 <?php get_footer(); ?>

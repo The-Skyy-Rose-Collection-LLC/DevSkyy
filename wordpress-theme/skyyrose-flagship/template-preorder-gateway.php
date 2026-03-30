@@ -98,19 +98,19 @@ get_header();
 <main id="primary" class="site-main preorder-gateway" role="main" tabindex="-1">
 
 	<!-- ==================== HERO ==================== -->
-	<section class="hero" id="hero">
-		<span class="hero__badge"><?php esc_html_e( 'Exclusive Access', 'skyyrose-flagship' ); ?></span>
-		<h1 class="hero__title"><?php esc_html_e( 'Pre-Order', 'skyyrose-flagship' ); ?></h1>
-		<p class="hero__tagline"><?php esc_html_e( 'Secure Your Pieces Before They Drop', 'skyyrose-flagship' ); ?></p>
-		<p class="hero__subtitle"><?php esc_html_e( 'Luxury Grows from Concrete', 'skyyrose-flagship' ); ?></p>
+	<section class="hero" id="hero" data-scroll-fade>
+		<span class="hero__badge rv-blur-down"><?php esc_html_e( 'Exclusive Access', 'skyyrose-flagship' ); ?></span>
+		<h1 class="hero__title rv-split-char"><?php esc_html_e( 'Pre-Order', 'skyyrose-flagship' ); ?></h1>
+		<p class="hero__tagline rv-split-word"><?php esc_html_e( 'Secure Your Pieces Before They Drop', 'skyyrose-flagship' ); ?></p>
+		<p class="hero__subtitle rv-blur"><?php esc_html_e( 'Luxury Grows from Concrete', 'skyyrose-flagship' ); ?></p>
 	</section>
 
 	<!-- ==================== SHOWCASE GRID ==================== -->
 	<section class="showcase" id="showcase"
 	         aria-label="<?php esc_attr_e( 'Browse collections', 'skyyrose-flagship' ); ?>">
-		<div class="showcase__grid">
+		<div class="showcase__grid stagger-grid">
 			<?php foreach ( $collections as $slug => $col ) : ?>
-				<div class="showcase__card showcase__card--<?php echo esc_attr( $slug ); ?>"
+				<div class="showcase__card showcase__card--<?php echo esc_attr( $slug ); ?> magnetic"
 				     data-collection="<?php echo esc_attr( $slug ); ?>"
 				     role="button"
 				     tabindex="0"

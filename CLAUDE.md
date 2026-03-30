@@ -203,7 +203,9 @@ wordpress-theme/skyyrose-flagship/
 ### WordPress
 - CDN caches CSS aggressively — bump `SKYYROSE_VERSION` or use `?nocache=` to verify
 - `enqueue.php` template slug map must match actual template filenames exactly
-- Collection page CSS loads via `$standalone_css_map` — don't duplicate with inline enqueues
+- Collection pages use unified `collection-pages.css` + `collection-pages.js` (one CSS replaces 4 separate files)
+- Collection pages use `col-*` classes with `data-collection` attribute for palette switching via CSS custom properties
+- Collection pages use IntersectionObserver scroll-reveal (`.col-reveal`), NOT GSAP — GSAP only for preorder/about/immersive
 - Holo card grid: only `.product-grid`, `.product-grid__items`, `.br-product-grid__items` should be `display: grid`
 - Don't duplicate content sections — if showcase cards show collections, don't add separate narrative cards with same data
 - Showcase card content should be visible by default (`opacity: 1`), not hidden until hover — mobile has no hover
@@ -216,6 +218,59 @@ wordpress-theme/skyyrose-flagship/
 
 ### Vercel
 - `rootDirectory` set → reads that dir's `vercel.json`, not root
+
+---
+
+## Workflow Orchestration
+
+### 1. Plan Mode Default
+- Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions)
+- If something goes sideways, STOP and re-plan immediately — don't keep pushing
+- Use plan mode for verification steps, not just building
+- Write detailed specs upfront to reduce ambiguity
+
+### 2. Subagent Strategy
+- Use subagents liberally to keep main context window clean
+- Offload research, exploration, and parallel analysis to subagents
+- For complex problems, throw more compute at it via subagents
+- One task per subagent for focused execution
+
+### 3. Self-Improvement Loop
+- After ANY correction from the user: update Learnings with the pattern
+- Write rules that prevent the same mistake from recurring
+- Ruthlessly iterate on these learnings until mistake rate drops
+- Review learnings at session start for relevant project
+
+### 4. Verification Before Done
+- Never mark a task complete without proving it works
+- Diff behavior between main and your changes when relevant
+- Ask yourself: "Would a staff engineer approve this?"
+- Run tests, check logs, demonstrate correctness
+
+### 5. Demand Elegance (Balanced)
+- For non-trivial changes: pause and ask "is there a more elegant way?"
+- If a fix feels hacky: "Knowing everything I know now, implement the elegant solution"
+- Skip this for simple, obvious fixes — don't over-engineer
+- Challenge your own work before presenting it
+
+### 6. Autonomous Bug Fixing
+- When given a bug report: just fix it. Don't ask for hand-holding
+- Point at logs, errors, failing tests — then resolve them
+- Zero context switching required from the user
+- Go fix failing CI tests without being told how
+
+## Task Management
+1. **Plan First**: Write plan with checkable items
+2. **Verify Plan**: Check in before starting implementation
+3. **Track Progress**: Mark items complete as you go
+4. **Explain Changes**: High-level summary at each step
+5. **Document Results**: Add review section
+6. **Capture Lessons**: Update Learnings after corrections
+
+## Core Principles
+- **Simplicity First**: Make every change as simple as possible. Impact minimal code.
+- **No Laziness**: Find root causes. No temporary fixes. Senior developer standards.
+- **Minimal Impact**: Changes should only touch what's necessary. Avoid introducing bugs.
 
 ---
 

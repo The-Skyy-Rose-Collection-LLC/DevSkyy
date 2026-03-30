@@ -125,6 +125,52 @@
 	--motion-spring: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 
 	/* -----------------------------------------------
+	   Cinematic Easing Library
+	   ----------------------------------------------- */
+	--ease-cinematic: cubic-bezier(0.22, 1, 0.36, 1);    /* hero entrances, page reveals */
+	--ease-magnetic: cubic-bezier(0.03, 0.98, 0.52, 0.99); /* cursor-reactive follow */
+	--ease-whip: cubic-bezier(0.75, 0, 0.25, 1);          /* snappy micro-interactions */
+	--ease-smooth-out: cubic-bezier(0.16, 1, 0.3, 1);     /* exit animations */
+	--ease-dramatic: cubic-bezier(0.65, 0, 0.35, 1);      /* clip-path reveals */
+
+	/* -----------------------------------------------
+	   Parallax Speed Multipliers
+	   ----------------------------------------------- */
+	--parallax-slow: 0.15;
+	--parallax-medium: 0.3;
+	--parallax-fast: 0.5;
+
+	/* -----------------------------------------------
+	   Stagger Timing (cascade delays)
+	   ----------------------------------------------- */
+	--stagger-base: 60ms;
+	--stagger-medium: 100ms;
+	--stagger-long: 150ms;
+
+	/* -----------------------------------------------
+	   Split-Text Timing
+	   ----------------------------------------------- */
+	--split-char-delay: 25ms;
+	--split-word-delay: 70ms;
+	--split-line-delay: 120ms;
+
+	/* -----------------------------------------------
+	   Depth / Elevation System
+	   ----------------------------------------------- */
+	--depth-1: 0 2px 8px rgba(0, 0, 0, 0.4);
+	--depth-2: 0 8px 24px rgba(0, 0, 0, 0.5);
+	--depth-3: 0 16px 48px rgba(0, 0, 0, 0.6);
+	--depth-4: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 120px rgba(0, 0, 0, 0.3);
+
+	/* -----------------------------------------------
+	   Reveal Animation Durations
+	   ----------------------------------------------- */
+	--reveal-fast: 0.5s;
+	--reveal-normal: 0.8s;
+	--reveal-slow: 1.2s;
+	--reveal-cinematic: 1.6s;
+
+	/* -----------------------------------------------
 	   Content Visibility — Performance tokens
 	   ----------------------------------------------- */
 	--cv-auto: auto;

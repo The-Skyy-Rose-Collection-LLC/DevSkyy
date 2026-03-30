@@ -17,10 +17,10 @@ defined( 'ABSPATH' ) || exit;
 	<footer id="colophon" class="site-footer" role="contentinfo">
 
 		<!-- Newsletter Signup Bar -->
-		<div class="footer-newsletter">
+		<div class="footer-newsletter rv-clip-up">
 			<div class="footer-newsletter__container">
 				<div class="footer-newsletter__content">
-					<h3 class="footer-newsletter__title">
+					<h3 class="footer-newsletter__title rv-split-word">
 						<?php esc_html_e( 'Join the Inner Circle', 'skyyrose-flagship' ); ?>
 					</h3>
 					<p class="footer-newsletter__text">
@@ -43,7 +43,7 @@ defined( 'ABSPATH' ) || exit;
 							required
 							autocomplete="email"
 						>
-						<button type="submit" class="footer-newsletter__submit" name="skyyrose_newsletter_submit">
+						<button type="submit" class="footer-newsletter__submit btn-sweep btn-press" name="skyyrose_newsletter_submit">
 							<?php esc_html_e( 'Subscribe', 'skyyrose-flagship' ); ?>
 							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 								<path d="M5 12h14"/>
@@ -56,8 +56,8 @@ defined( 'ABSPATH' ) || exit;
 		</div>
 
 		<!-- 5-Column Footer Grid -->
-		<div class="footer-grid">
-			<div class="footer-grid__container">
+		<div class="footer-grid rv-clip-up">
+			<div class="footer-grid__container stagger-grid">
 
 				<!-- Column 1: Brand (2fr) -->
 				<div class="footer-grid__col footer-grid__col--brand">

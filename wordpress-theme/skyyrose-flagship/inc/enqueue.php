@@ -97,6 +97,18 @@ function skyyrose_enqueue_global_styles() {
 		);
 	}
 
+	// Premium animations: clip-path reveals, split-text, stagger, magnetic, parallax.
+	$prem_anim = $use_min && file_exists( $base_dir . '/system/animations-premium.min.css' )
+		? 'system/animations-premium.min.css' : 'system/animations-premium.css';
+	if ( file_exists( $base_dir . '/' . $prem_anim ) ) {
+		wp_enqueue_style(
+			'skyyrose-animations-premium',
+			$base_uri . '/' . $prem_anim,
+			array( 'skyyrose-animations' ),
+			SKYYROSE_VERSION
+		);
+	}
+
 	// Header: navbar, search overlay, mobile menu, dropdowns.
 	$header_file = $use_min && file_exists( $base_dir . '/header.min.css' ) ? 'header.min.css' : 'header.css';
 	if ( file_exists( $base_dir . '/' . $header_file ) ) {
@@ -140,6 +152,19 @@ function skyyrose_enqueue_global_scripts() {
 		wp_enqueue_script(
 			'skyyrose-navigation',
 			$js_uri . '/' . $nav_file,
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+
+	// Premium interactions: parallax, split-text, magnetic, stagger, scroll-fade.
+	$prem_js = $use_min && file_exists( $js_dir . '/premium-interactions.min.js' )
+		? 'premium-interactions.min.js' : 'premium-interactions.js';
+	if ( file_exists( $js_dir . '/' . $prem_js ) ) {
+		wp_enqueue_script(
+			'skyyrose-premium-interactions',
+			$js_uri . '/' . $prem_js,
 			array(),
 			SKYYROSE_VERSION,
 			true
@@ -235,6 +260,7 @@ function skyyrose_get_current_template_slug() {
 			'template-immersive-black-rose.php'    => 'immersive',
 			'template-immersive-love-hurts.php'    => 'immersive',
 			'template-immersive-signature.php'     => 'immersive',
+			'template-immersive-kids-capsule.php'  => 'immersive',
 			'template-about.php'                   => 'about',
 			'template-contact.php'                 => 'contact',
 			'template-preorder-gateway.php'        => 'preorder-gateway',
@@ -315,25 +341,29 @@ function skyyrose_enqueue_template_styles() {
 		}
 	}
 
-	// Standalone collection page CSS — each template has its own stylesheet.
+	// Immersive scene images — overlays, tab bar, cinematic toggle, particles.
+	if ( 'immersive' === $slug ) {
+		$scenes_file = $use_min && file_exists( $base_css_dir . '/immersive-scenes.min.css' )
+			? 'immersive-scenes.min.css' : 'immersive-scenes.css';
+		if ( file_exists( $base_css_dir . '/' . $scenes_file ) ) {
+			wp_enqueue_style(
+				'skyyrose-immersive-scenes',
+				$base_css_uri . '/' . $scenes_file,
+				array( 'skyyrose-template-immersive' ),
+				SKYYROSE_VERSION
+			);
+		}
+	}
+
+	// Unified collection page CSS — single stylesheet for all 4 collection templates.
 	if ( 'collection-standalone' === $slug ) {
-		$standalone_css_map = array(
-			'template-collection-signature.php'    => 'collection-signature-page.css',
-			'template-collection-black-rose.php'   => 'collection-black-rose-page.css',
-			'template-collection-love-hurts.php'   => 'collection-love-hurts-page.css',
-			'template-collection-kids-capsule.php'  => 'collection-kids-capsule-page.css',
-		);
-		$current_template = get_page_template_slug();
-		if ( isset( $standalone_css_map[ $current_template ] ) ) {
-			$standalone_file = $standalone_css_map[ $current_template ];
-			if ( file_exists( $base_css_dir . '/' . $standalone_file ) ) {
-				wp_enqueue_style(
-					'skyyrose-collection-page',
-					$base_css_uri . '/' . $standalone_file,
-					$global_deps,
-					SKYYROSE_VERSION
-				);
-			}
+		if ( file_exists( $base_css_dir . '/collection-pages.css' ) ) {
+			wp_enqueue_style(
+				'skyyrose-collection-pages',
+				$base_css_uri . '/collection-pages.css',
+				$global_deps,
+				SKYYROSE_VERSION
+			);
 		}
 	}
 
@@ -382,8 +412,23 @@ function skyyrose_enqueue_template_scripts() {
 	$base_css_uri = SKYYROSE_ASSETS_URI . '/css';
 	$base_css_dir = SKYYROSE_DIR . '/assets/css';
 
-	// GSAP — loaded on pages that use scroll animations.
-	$gsap_slugs = array( 'collection-standalone', 'preorder-gateway', 'about', 'immersive' );
+	// Collection pages JS — IntersectionObserver scroll-reveal (no GSAP dependency).
+	if ( 'collection-standalone' === $slug ) {
+		$col_js = $use_min && file_exists( $base_js_dir . '/collection-pages.min.js' )
+			? 'collection-pages.min.js' : 'collection-pages.js';
+		if ( file_exists( $base_js_dir . '/' . $col_js ) ) {
+			wp_enqueue_script(
+				'skyyrose-collection-pages',
+				$base_js_uri . '/' . $col_js,
+				array(),
+				SKYYROSE_VERSION,
+				true
+			);
+		}
+	}
+
+	// GSAP — loaded on pages that use scroll animations (NOT collection pages — they use IntersectionObserver).
+	$gsap_slugs = array( 'preorder-gateway', 'about', 'immersive' );
 	if ( in_array( $slug, $gsap_slugs, true ) ) {
 		wp_enqueue_script( 'skyyrose-gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js', array(), '3.12.2', true );
 		wp_enqueue_script( 'skyyrose-gsap-st', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js', array( 'skyyrose-gsap' ), '3.12.2', true );

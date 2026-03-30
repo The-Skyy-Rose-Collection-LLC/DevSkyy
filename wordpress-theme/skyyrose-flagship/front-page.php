@@ -177,19 +177,19 @@ get_header();
 </nav>
 
 <!-- ═══ HERO ═══ -->
-<section class="hero" id="hero" aria-label="<?php esc_attr_e( 'SkyyRose Hero', 'skyyrose-flagship' ); ?>">
-	<div class="hero-bg" style="background-image: url('<?php echo esc_url( $hero_bg ); ?>');" aria-hidden="true"></div>
+<section class="hero" id="hero" data-scroll-fade aria-label="<?php esc_attr_e( 'SkyyRose Hero', 'skyyrose-flagship' ); ?>">
+	<div class="hero-bg parallax-ken-burns" style="background-image: url('<?php echo esc_url( $hero_bg ); ?>');" aria-hidden="true"></div>
 	<div class="hero-ov" aria-hidden="true"></div>
 	<div class="hero-particles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
 	<div class="hero-frame" aria-hidden="true"></div>
 	<div class="hero-content">
-		<p class="hero-eyebrow"><?php esc_html_e( 'Oakland · Est. 2020 · Gender Neutral', 'skyyrose-flagship' ); ?></p>
-		<h1 class="hero-title" aria-label="<?php esc_attr_e( 'SkyyRose', 'skyyrose-flagship' ); ?>">SkyyRose</h1>
+		<p class="hero-eyebrow rv-blur-down"><?php esc_html_e( 'Oakland · Est. 2020 · Gender Neutral', 'skyyrose-flagship' ); ?></p>
+		<h1 class="hero-title rv-split-char" aria-label="<?php esc_attr_e( 'SkyyRose', 'skyyrose-flagship' ); ?>">SkyyRose</h1>
 		<div class="hero-rule" aria-hidden="true"></div>
-		<p class="hero-subtitle"><?php esc_html_e( 'Luxury Grows from Concrete. Three collections, one vision — built by a father, named after a daughter.', 'skyyrose-flagship' ); ?></p>
+		<p class="hero-subtitle rv-blur"><?php esc_html_e( 'Luxury Grows from Concrete. Three collections, one vision — built by a father, named after a daughter.', 'skyyrose-flagship' ); ?></p>
 		<div class="hero-ctas">
-			<a href="#collections" class="hero-cta hero-cta-primary"><?php esc_html_e( 'Explore Collections', 'skyyrose-flagship' ); ?></a>
-			<a href="#story" class="hero-cta"><?php esc_html_e( 'Our Story', 'skyyrose-flagship' ); ?></a>
+			<a href="#collections" class="hero-cta hero-cta-primary btn-sweep btn-press"><?php esc_html_e( 'Explore Collections', 'skyyrose-flagship' ); ?></a>
+			<a href="#story" class="hero-cta btn-border-draw btn-press"><?php esc_html_e( 'Our Story', 'skyyrose-flagship' ); ?></a>
 		</div>
 	</div>
 	<div class="hero-scroll" aria-hidden="true">
@@ -270,13 +270,13 @@ get_header();
 
 <!-- ═══ COLLECTIONS ═══ -->
 <section class="collections" id="collections" aria-label="<?php esc_attr_e( 'Our Collections', 'skyyrose-flagship' ); ?>">
-	<div class="col-header rv">
+	<div class="col-header rv-clip-up">
 		<p class="col-header-eyebrow"><?php esc_html_e( 'The Collections', 'skyyrose-flagship' ); ?></p>
-		<h2 class="col-header-title"><?php esc_html_e( 'Three Worlds. One Vision.', 'skyyrose-flagship' ); ?></h2>
+		<h2 class="col-header-title rv-split-word"><?php esc_html_e( 'Three Worlds. One Vision.', 'skyyrose-flagship' ); ?></h2>
 	</div>
-	<div class="col-grid">
+	<div class="col-grid stagger-grid">
 		<?php foreach ( $collections as $idx => $col ) : ?>
-			<a href="<?php echo esc_url( $col['link'] ); ?>" class="col-card <?php echo esc_attr( $col['class'] ); ?> rv rv-d<?php echo esc_attr( $idx + 1 ); ?>">
+			<a href="<?php echo esc_url( $col['link'] ); ?>" class="col-card <?php echo esc_attr( $col['class'] ); ?> magnetic">
 				<div class="col-card-img">
 					<img src="<?php echo esc_url( $col['image'] ); ?>"
 					     alt="<?php echo esc_attr( $col['name'] . ' Collection' ); ?>"
@@ -300,11 +300,11 @@ get_header();
 
 <!-- ═══ LOOKBOOK ═══ -->
 <section class="lookbook" id="lookbook" aria-label="<?php esc_attr_e( 'Lookbook', 'skyyrose-flagship' ); ?>">
-	<div class="lookbook-header rv">
+	<div class="lookbook-header rv-clip-up">
 		<h2><?php esc_html_e( 'Lookbook', 'skyyrose-flagship' ); ?></h2>
 		<p><?php esc_html_e( 'Real people. Real style. Oakland made.', 'skyyrose-flagship' ); ?></p>
 	</div>
-	<div class="lookbook-grid">
+	<div class="lookbook-grid stagger-grid">
 		<?php foreach ( $lookbook as $lb ) :
 			$lb_base = SKYYROSE_ASSETS_URI . '/images/lookbook/' . $lb['file'];
 		?>
@@ -323,13 +323,13 @@ get_header();
 <!-- ═══ CRAFT ═══ -->
 <section class="craft" id="craft" aria-label="<?php esc_attr_e( 'Our Craft', 'skyyrose-flagship' ); ?>">
 	<div class="craft-inner">
-		<div class="craft-header rv">
+		<div class="craft-header rv-clip-up">
 			<h2><?php esc_html_e( 'The Craft', 'skyyrose-flagship' ); ?></h2>
 			<p><?php esc_html_e( 'Every stitch, every fabric, every detail — intentional.', 'skyyrose-flagship' ); ?></p>
 		</div>
-		<div class="craft-grid">
+		<div class="craft-grid stagger-grid">
 			<?php foreach ( $craft_cards as $idx => $card ) : ?>
-				<div class="craft-card rv rv-d<?php echo esc_attr( $idx + 1 ); ?>">
+				<div class="craft-card">
 					<div class="craft-icon" aria-hidden="true"><?php echo wp_kses( $card['icon'], $svg_whitelist ); ?></div>
 					<div class="craft-label"><?php echo esc_html( $card['label'] ); ?></div>
 					<p class="craft-desc"><?php echo esc_html( $card['desc'] ); ?></p>
@@ -342,10 +342,10 @@ get_header();
 <!-- ═══ NEWSLETTER ═══ -->
 <section class="newsletter" id="community" aria-label="<?php esc_attr_e( 'Newsletter', 'skyyrose-flagship' ); ?>">
 	<div class="nl-inner">
-		<p class="nl-eyebrow rv"><?php esc_html_e( 'Join the Movement', 'skyyrose-flagship' ); ?></p>
-		<h2 class="nl-title rv rv-d1"><?php esc_html_e( 'For The Real Ones', 'skyyrose-flagship' ); ?></h2>
-		<p class="nl-desc rv rv-d2"><?php esc_html_e( 'Early access to drops. Behind-the-scenes from Oakland. Stories that matter. No spam, just substance.', 'skyyrose-flagship' ); ?></p>
-		<div class="nl-form rv rv-d3">
+		<p class="nl-eyebrow rv-blur-down"><?php esc_html_e( 'Join the Movement', 'skyyrose-flagship' ); ?></p>
+		<h2 class="nl-title rv-split-word"><?php esc_html_e( 'For The Real Ones', 'skyyrose-flagship' ); ?></h2>
+		<p class="nl-desc rv-blur"><?php esc_html_e( 'Early access to drops. Behind-the-scenes from Oakland. Stories that matter. No spam, just substance.', 'skyyrose-flagship' ); ?></p>
+		<div class="nl-form rv-clip-up">
 			<input type="email" class="nl-input" placeholder="<?php esc_attr_e( 'Your email address', 'skyyrose-flagship' ); ?>" id="nlEmail" aria-label="<?php esc_attr_e( 'Email address', 'skyyrose-flagship' ); ?>" required>
 			<button type="button" class="nl-submit"><?php esc_html_e( 'Join', 'skyyrose-flagship' ); ?></button>
 		</div>
