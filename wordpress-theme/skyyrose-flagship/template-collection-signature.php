@@ -90,9 +90,9 @@ get_header();
 			<div class="col-story__content">
 				<span class="col-story__label"><?php esc_html_e( 'Chapter One', 'skyyrose-flagship' ); ?></span>
 				<h2 class="col-story__title"><?php esc_html_e( 'The First Rose', 'skyyrose-flagship' ); ?></h2>
-				<p class="col-story__text"><?php esc_html_e( 'Before the collections, before the collaborations, before the world took notice, there was a single idea: luxury grows from concrete. The Signature collection is that seed. It carries the original rose motif, the hand-drawn script logo, and every foundational silhouette that defined SkyyRose from day one.', 'skyyrose-flagship' ); ?></p>
-				<blockquote class="col-story__quote"><?php esc_html_e( '"This is the crown. Everything we\'ve built starts right here, in these pieces. The first sketches, the first fabrics, the first time someone saw the logo and understood what we were building."', 'skyyrose-flagship' ); ?></blockquote>
-				<p class="col-story__text"><?php esc_html_e( 'These are not trend pieces. They are the architecture of a brand. Each garment carries the DNA that every future collection inherits. When you wear Signature, you wear the origin story.', 'skyyrose-flagship' ); ?></p>
+				<p class="col-story__text"><?php esc_html_e( 'I drew the first rose on a night I couldn\'t afford dinner. Broke, a baby on the way, every manufacturer I\'d worked with had scammed me. But I sat there sketching that script logo until 4 AM because something in me knew — if I could get this right, everything changes. Signature is that night made permanent.', 'skyyrose-flagship' ); ?></p>
+				<blockquote class="col-story__quote"><?php esc_html_e( '"They told me luxury doesn\'t come from Oakland. I said luxury grows from concrete — and I meant that literally. This collection is the concrete. Everything else grew from here."', 'skyyrose-flagship' ); ?></blockquote>
+				<p class="col-story__text"><?php esc_html_e( 'Before Black Rose. Before Love Hurts. Before the press wrote us up or anybody knew the name. There was just a father in Oakland with a daughter\'s name and a refusal to quit. Every piece in Signature carries that original DNA — the gold rose, the hand-drawn script, the silhouettes I sketched when I had nothing but the idea.', 'skyyrose-flagship' ); ?></p>
 			</div>
 			<div class="col-story__visual">
 				<span class="col-story__visual-text"><?php esc_html_e( 'SIGNATURE', 'skyyrose-flagship' ); ?></span>
@@ -104,14 +104,14 @@ get_header();
 	<!-- ════ Divider + Quote ════ -->
 	<div class="col-divider" aria-hidden="true"><span class="col-divider__icon">&#x2726;</span></div>
 	<div class="col-quote-block rv-blur">
-		<blockquote class="col-quote-block__text"><?php esc_html_e( '"The first rose ever pressed became the blueprint for everything. Signature is not a collection — it is the origin of the crown."', 'skyyrose-flagship' ); ?></blockquote>
-		<cite class="col-quote-block__cite">&mdash; <?php esc_html_e( 'Corey Foster, Founder', 'skyyrose-flagship' ); ?></cite>
+		<blockquote class="col-quote-block__text"><?php esc_html_e( '"Four years ago I never would have thought I\'d be here. I had no drive, lost it all, a baby on the way, and was broke. But we knew we had to get it by any means necessary. Signature is the proof that your circumstances don\'t define your destination."', 'skyyrose-flagship' ); ?></blockquote>
+		<cite class="col-quote-block__cite">&mdash; <?php esc_html_e( 'Corey Foster, Oakland', 'skyyrose-flagship' ); ?></cite>
 	</div>
 
 	<!-- ════ Feature Cards ════ -->
 	<section class="col-features rv-clip-left">
-		<h2 class="col-features__heading"><?php esc_html_e( 'The Art of Craftsmanship', 'skyyrose-flagship' ); ?></h2>
-		<p class="col-features__subheading"><?php esc_html_e( 'Every SIGNATURE piece represents the pinnacle of luxury streetwear — from initial sketch to final stitch.', 'skyyrose-flagship' ); ?></p>
+		<h2 class="col-features__heading"><?php esc_html_e( 'Built from Nothing', 'skyyrose-flagship' ); ?></h2>
+		<p class="col-features__subheading"><?php esc_html_e( 'Every Signature piece carries the same stubbornness that built the brand — failed websites, scammer manufacturers, single parenthood with zero support. We refused to cut corners then. We refuse now.', 'skyyrose-flagship' ); ?></p>
 		<div class="col-features__grid stagger-grid">
 			<?php foreach ( $features as $feat ) : ?>
 				<div class="col-features__card">
@@ -127,7 +127,7 @@ get_header();
 	<section class="col-products rv-clip-up" id="shop">
 		<div class="col-products__header">
 			<h2><?php esc_html_e( 'The Collection', 'skyyrose-flagship' ); ?></h2>
-			<p><?php esc_html_e( 'Investment-grade luxury built on the original blueprint.', 'skyyrose-flagship' ); ?></p>
+			<p><?php esc_html_e( 'The original blueprint. Every piece carries the DNA of day one.', 'skyyrose-flagship' ); ?></p>
 		</div>
 		<div class="product-grid stagger-grid" data-collection="signature">
 			<?php
@@ -147,8 +147,8 @@ get_header();
 
 	<!-- ════ CTA ════ -->
 	<section class="col-cta rv-blur">
-		<h2 class="col-cta__title"><?php esc_html_e( 'Invest in Excellence', 'skyyrose-flagship' ); ?></h2>
-		<p class="col-cta__text"><?php esc_html_e( 'Join the discerning few who understand that true luxury is an investment in craftsmanship, quality, and timeless style.', 'skyyrose-flagship' ); ?></p>
+		<h2 class="col-cta__title"><?php esc_html_e( 'Wear the Foundation', 'skyyrose-flagship' ); ?></h2>
+		<p class="col-cta__text"><?php esc_html_e( 'This is where it all started. A father in Oakland with a daughter\'s name and a dream that wouldn\'t die. When you wear Signature, you wear the origin story — and you help write the next chapter.', 'skyyrose-flagship' ); ?></p>
 		<a href="<?php echo esc_url( function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/shop/' ) ); ?>" class="col-cta__btn"><?php esc_html_e( 'Shop Signature', 'skyyrose-flagship' ); ?></a>
 	</section>
 

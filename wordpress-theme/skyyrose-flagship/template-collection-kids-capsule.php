@@ -84,11 +84,11 @@ get_header();
 	<section class="col-story rv-clip-up">
 		<div class="col-story__grid">
 			<div class="col-story__content">
-				<span class="col-story__label"><?php esc_html_e( 'The Legacy', 'skyyrose-flagship' ); ?></span>
-				<h2 class="col-story__title"><?php esc_html_e( 'The Next Generation of SkyyRose', 'skyyrose-flagship' ); ?></h2>
-				<p class="col-story__text"><?php esc_html_e( 'Born into luxury, built for the bold. Kids Capsule carries the same uncompromising vision that defines every SkyyRose collection — distilled for the youngest members of the family.', 'skyyrose-flagship' ); ?></p>
-				<blockquote class="col-story__quote"><?php esc_html_e( '"No pastels. No cartoons. This is real streetwear scaled down, not dumbed down. Every piece is crafted with the same premium materials and dark elegance that the brand was built on."', 'skyyrose-flagship' ); ?></blockquote>
-				<p class="col-story__text"><?php esc_html_e( 'Because legacy is not inherited. It is worn.', 'skyyrose-flagship' ); ?></p>
+				<span class="col-story__label"><?php esc_html_e( 'Her Name', 'skyyrose-flagship' ); ?></span>
+				<h2 class="col-story__title"><?php esc_html_e( 'Named After My Daughter', 'skyyrose-flagship' ); ?></h2>
+				<p class="col-story__text"><?php esc_html_e( 'The whole brand is named after her — Skyy Rose. My daughter. She was on the way when I had nothing. No drive, no money, no support. But that baby coming changed everything. I needed to build something she\'d be proud to carry. Kids Capsule is the promise made real — pieces I designed thinking about my daughter walking into a room and knowing she belongs there.', 'skyyrose-flagship' ); ?></p>
+				<blockquote class="col-story__quote"><?php esc_html_e( '"No pastels. No cartoons. Skyy Rose doesn\'t wear that. She wears what her father built — premium, dark, elegant. Scaled down but never dumbed down."', 'skyyrose-flagship' ); ?></blockquote>
+				<p class="col-story__text"><?php esc_html_e( 'Every kid deserves to feel like they belong at the table. Not the kids\' table — THE table. Kids Capsule is that seat.', 'skyyrose-flagship' ); ?></p>
 			</div>
 			<div class="col-story__visual">
 				<span class="col-story__visual-text"><?php esc_html_e( 'KC', 'skyyrose-flagship' ); ?></span>
@@ -100,8 +100,8 @@ get_header();
 	<!-- ════ Divider + Quote ════ -->
 	<div class="col-divider" aria-hidden="true"><span class="col-divider__icon">&#x2726;</span></div>
 	<div class="col-quote-block rv-blur">
-		<blockquote class="col-quote-block__text"><?php esc_html_e( '"We didn\'t make a kids line. We made the SkyyRose line smaller. Same fabrics, same ethos, same refusal to compromise. Just a different generation wearing it."', 'skyyrose-flagship' ); ?></blockquote>
-		<cite class="col-quote-block__cite">&mdash; <?php esc_html_e( 'Corey Foster, Founder', 'skyyrose-flagship' ); ?></cite>
+		<blockquote class="col-quote-block__text"><?php esc_html_e( '"I built SkyyRose so my daughter would never have to wonder if she was enough. Every piece in Kids Capsule carries that — a father\'s promise that she can be anything, wear anything, own any room she walks into."', 'skyyrose-flagship' ); ?></blockquote>
+		<cite class="col-quote-block__cite">&mdash; <?php esc_html_e( 'Corey Foster, Father & Founder', 'skyyrose-flagship' ); ?></cite>
 	</div>
 
 	<!-- ════ Feature Cards ════ -->
@@ -152,8 +152,8 @@ get_header();
 
 	<!-- ════ CTA ════ -->
 	<section class="col-cta rv-blur">
-		<h2 class="col-cta__title"><?php esc_html_e( 'Legacy Starts Here', 'skyyrose-flagship' ); ?></h2>
-		<p class="col-cta__text"><?php esc_html_e( 'Premium streetwear for the next generation. Because luxury runs in the family — and the next generation deserves the same crown.', 'skyyrose-flagship' ); ?></p>
+		<h2 class="col-cta__title"><?php esc_html_e( 'Their Turn Now', 'skyyrose-flagship' ); ?></h2>
+		<p class="col-cta__text"><?php esc_html_e( 'We built this for Skyy Rose. For every kid who deserves to feel the same luxury their parents wear. Legacy isn\'t inherited — it\'s earned. But we can give them a head start.', 'skyyrose-flagship' ); ?></p>
 		<a href="<?php echo esc_url( function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : $preorder_url ); ?>" class="col-cta__btn"><?php esc_html_e( 'Shop Kids Capsule', 'skyyrose-flagship' ); ?></a>
 	</section>
 

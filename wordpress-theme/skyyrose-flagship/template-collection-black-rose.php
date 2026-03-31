@@ -89,11 +89,11 @@ get_header();
 	<section class="col-story rv-clip-up">
 		<div class="col-story__grid">
 			<div class="col-story__content">
-				<span class="col-story__label"><?php esc_html_e( 'The Origin', 'skyyrose-flagship' ); ?></span>
+				<span class="col-story__label"><?php esc_html_e( 'From the Concrete', 'skyyrose-flagship' ); ?></span>
 				<h2 class="col-story__title"><?php esc_html_e( 'Born from a Single Question', 'skyyrose-flagship' ); ?></h2>
-				<p class="col-story__text"><?php esc_html_e( 'It started with a customer asking what SkyyRose made for men. The answer was instant and instinctive: every man would wear a black rose. Not just a flower — a symbol of strength refined through darkness, beauty that does not need to announce itself.', 'skyyrose-flagship' ); ?></p>
-				<blockquote class="col-story__quote"><?php esc_html_e( '"What do you make for men?" The answer came without hesitation — "Every man would wear a black rose."', 'skyyrose-flagship' ); ?></blockquote>
-				<p class="col-story__text"><?php esc_html_e( 'Black Rose is the exploration of that conviction. Each piece channels the philosophy of monochrome sophistication into wearable form — layered textures, tonal contrasts, and silhouettes that command presence without raising their voice.', 'skyyrose-flagship' ); ?></p>
+				<p class="col-story__text"><?php esc_html_e( 'Someone asked what SkyyRose made for men. The answer came before the question finished: every man would wear a black rose. Not a flower — a conviction. In Oakland, where concrete is the only soil that matters, beauty doesn\'t ask for permission. It forces its way through the cracks.', 'skyyrose-flagship' ); ?></p>
+				<blockquote class="col-story__quote"><?php esc_html_e( '"They said luxury can\'t come from the Town. We said watch. Every piece in Black Rose is the concrete answering back."', 'skyyrose-flagship' ); ?></blockquote>
+				<p class="col-story__text"><?php esc_html_e( 'Black Rose is what happens when you stop apologizing for where you\'re from. Monochrome because silence speaks louder. Dark-on-dark because depth is earned, not given. These aren\'t clothes that announce themselves — they command presence the way Oakland taught us. Quiet. Unshakable.', 'skyyrose-flagship' ); ?></p>
 			</div>
 			<div class="col-story__visual">
 				<span class="col-story__visual-text"><?php esc_html_e( 'BLACK ROSE', 'skyyrose-flagship' ); ?></span>
@@ -105,8 +105,8 @@ get_header();
 	<!-- ════ Divider + Quote ════ -->
 	<div class="col-divider" aria-hidden="true"><span class="col-divider__icon">&#x25C6;</span></div>
 	<div class="col-quote-block rv-blur">
-		<blockquote class="col-quote-block__text"><?php esc_html_e( '"In a world of fleeting trends, Black Rose stands eternal. Each piece is crafted for those who find strength in darkness and elegance in the unconventional."', 'skyyrose-flagship' ); ?></blockquote>
-		<cite class="col-quote-block__cite">&mdash; <?php esc_html_e( 'The Philosophy', 'skyyrose-flagship' ); ?></cite>
+		<blockquote class="col-quote-block__text"><?php esc_html_e( '"Where I\'m from, black isn\'t a color — it\'s armor. Every kid on my block knew that. Black Rose is that truth made into fabric. You don\'t wear it to stand out. You wear it because you already stood up."', 'skyyrose-flagship' ); ?></blockquote>
+		<cite class="col-quote-block__cite">&mdash; <?php esc_html_e( 'Corey Foster, Oakland', 'skyyrose-flagship' ); ?></cite>
 	</div>
 
 	<!-- ════ Feature Cards ════ -->
@@ -151,7 +151,7 @@ get_header();
 	<!-- ════ CTA ════ -->
 	<section class="col-cta rv-blur">
 		<h2 class="col-cta__title"><?php esc_html_e( 'Wear the Darkness', 'skyyrose-flagship' ); ?></h2>
-		<p class="col-cta__text"><?php esc_html_e( 'The thorn motif represents resilience — protective beauty guarding what is precious. This is clothing for those who find strength in darkness.', 'skyyrose-flagship' ); ?></p>
+		<p class="col-cta__text"><?php esc_html_e( 'The thorn protects what the world tries to take. Every piece in Black Rose carries that Oakland lesson: be beautiful, be sharp, never be soft where it counts.', 'skyyrose-flagship' ); ?></p>
 		<a href="<?php echo esc_url( function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/shop/' ) ); ?>" class="col-cta__btn"><?php esc_html_e( 'Shop Black Rose', 'skyyrose-flagship' ); ?></a>
 	</section>
 
