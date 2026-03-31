@@ -160,6 +160,26 @@ function skyyrose_enqueue_global_styles() {
 			SKYYROSE_VERSION
 		);
 	}
+
+	// Size guide modal (global — trigger via [data-open-size-guide] or .js-size-guide-trigger).
+	if ( file_exists( $base_dir . '/size-guide.css' ) ) {
+		wp_enqueue_style(
+			'skyyrose-size-guide',
+			$base_uri . '/size-guide.css',
+			array(),
+			SKYYROSE_VERSION
+		);
+	}
+
+	// Luxury cursor — dot follower (desktop only, CSS hidden on touch/mobile).
+	if ( file_exists( $base_dir . '/luxury-cursor.css' ) ) {
+		wp_enqueue_style(
+			'skyyrose-luxury-cursor',
+			$base_uri . '/luxury-cursor.css',
+			array(),
+			SKYYROSE_VERSION
+		);
+	}
 }
 
 /**
@@ -194,6 +214,18 @@ function skyyrose_enqueue_global_scripts() {
 		wp_enqueue_script(
 			'skyyrose-toast',
 			$js_uri . '/' . $toast_file,
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+
+	// Luxury cursor — dot follower (desktop only, self-disables on touch/mobile).
+	$cursor_file = $use_min && file_exists( $js_dir . '/luxury-cursor.min.js' ) ? 'luxury-cursor.min.js' : 'luxury-cursor.js';
+	if ( file_exists( $js_dir . '/' . $cursor_file ) ) {
+		wp_enqueue_script(
+			'skyyrose-luxury-cursor',
+			$js_uri . '/' . $cursor_file,
 			array(),
 			SKYYROSE_VERSION,
 			true
