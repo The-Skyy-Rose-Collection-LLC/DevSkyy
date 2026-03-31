@@ -218,6 +218,15 @@ wordpress-theme/skyyrose-flagship/
 - Jetpack Instant Search hijacks search results with a white overlay — our custom `search.php` only renders when Instant Search is disabled
 - Any new template part added to `footer.php` must ALSO be added to `front-page.php` before `wp_footer()`
 
+### WordPress Deploy
+- Dirty working tree on main blocks `git merge` — always stash unrelated changes before merging worktree branches
+- `mv: preserving permissions` warnings during deploy are cosmetic (WordPress.com hosting restriction) — files transfer correctly
+- After deploy: verify HTTP status on homepage + search + 404 + cart + shop AND verify new asset URLs return 200
+- Search page uses `'search'` slug in `enqueue.php` — must come BEFORE the `is_home() || is_archive() || is_search()` blog catch-all
+- Size guide modal, cookie consent, mobile nav are all `get_template_part()` calls in `footer.php` — order matters (size guide → cookie consent → mobile nav → toast container)
+- Pre-order functions extracted to `inc/woocommerce-preorder.php` — woocommerce.php no longer has pre-order meta boxes
+- `toast.js` provides global `window.skyyToast(msg, type, duration)` — all components should use this, not custom toast implementations
+
 ### Hooks (macOS)
 - Canonicalize paths (`/tmp` → `/private/tmp`)
 - Use `${VAR:-default}` for testable paths
