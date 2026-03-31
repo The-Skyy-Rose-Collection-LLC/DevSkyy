@@ -423,7 +423,7 @@ echo wp_json_encode( array(
 </div><!-- .homepage-v2 -->
 
 <?php
-// Load homepage JS inline to bypass page-optimize plugin stripping
+// Load homepage JS inline to bypass page-optimize plugin stripping.
 $homepage_js_path = SKYYROSE_DIR . '/assets/js/homepage-v2.js';
 if ( file_exists( $homepage_js_path ) ) :
 ?>
@@ -432,6 +432,19 @@ if ( file_exists( $homepage_js_path ) ) :
 	echo file_get_contents( $homepage_js_path );
 ?></script>
 <?php endif; ?>
+
+<?php
+// Use wp_footer() directly (not get_footer()) because the homepage has its
+// own inline footer markup above (.ft). But include the shared template parts
+// that live in footer.php so mobile nav, cookie consent, size guide, and
+// toast container render on the homepage too.
+get_template_part( 'template-parts/size-guide-modal' );
+get_template_part( 'template-parts/cookie-consent' );
+get_template_part( 'template-parts/mobile-bottom-nav' );
+?>
+
+<!-- Toast Notification Container -->
+<div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
 <?php wp_footer(); ?>
 </body>
