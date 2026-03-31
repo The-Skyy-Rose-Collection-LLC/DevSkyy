@@ -99,9 +99,7 @@ class JWTConfig:
     """
 
     # SECRET KEYS - Must be set via environment variables in production
-    secret_key: str = field(
-        default_factory=lambda: _require_secret("JWT_SECRET_KEY")
-    )
+    secret_key: str = field(default_factory=lambda: _require_secret("JWT_SECRET_KEY"))
     refresh_secret_key: str = field(
         default_factory=lambda: _require_secret("JWT_REFRESH_SECRET_KEY")
     )
