@@ -231,7 +231,7 @@ function skyyrose_ajax_immersive_add_to_cart() {
 	}
 
 	// Rate-limit: max 30 add-to-cart per IP per minute.
-	$rate_key  = 'skyyrose_atc_' . md5( isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '' );
+	$rate_key  = 'skyyrose_atc_' . md5( isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( $_SERVER['REMOTE_ADDR'] ) : '' );
 	$rate_hits = (int) get_transient( $rate_key );
 	if ( $rate_hits >= 30 ) {
 		wp_send_json_error(
@@ -245,7 +245,8 @@ function skyyrose_ajax_immersive_add_to_cart() {
 
 	// Sanitize inputs — accept either numeric product_id or SKU string.
 	$product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
-	$sku        = isset( $_POST['sku'] ) ? sanitize_text_field( wp_unslash( $_POST['sku'] ) ) : '';
+	$raw_sku    = isset( $_POST['sku'] ) ? sanitize_text_field( wp_unslash( $_POST['sku'] ) ) : '';
+	$sku        = ( strlen( $raw_sku ) <= 50 ) ? $raw_sku : '';
 	$quantity   = isset( $_POST['quantity'] ) ? absint( $_POST['quantity'] ) : 1;
 	$size       = isset( $_POST['attribute_pa_size'] ) ? sanitize_text_field( wp_unslash( $_POST['attribute_pa_size'] ) ) : '';
 

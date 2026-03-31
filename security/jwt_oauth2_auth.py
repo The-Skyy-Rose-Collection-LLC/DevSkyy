@@ -61,6 +61,31 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
+def _require_secret(env_var: str) -> str:
+    """Return the env var value, or an ephemeral key with a loud warning.
+
+    In production (ENVIRONMENT=production), missing secrets raise immediately.
+    In development, an ephemeral key is generated with a warning so local
+    workflows aren't blocked.
+    """
+    value = os.getenv(env_var)
+    if value:
+        return value
+    if os.getenv("ENVIRONMENT", "").lower() == "production":
+        raise RuntimeError(
+            f"CRITICAL: {env_var} is not set. "
+            f"Set {env_var} before starting the application in production."
+        )
+    ephemeral = secrets.token_urlsafe(64)
+    logger.warning(
+        "%s not set. Using ephemeral key — tokens will be invalid after restart. "
+        "Set %s for production.",
+        env_var,
+        env_var,
+    )
+    return ephemeral
+
+
 @dataclass
 class JWTConfig:
     """
@@ -75,16 +100,10 @@ class JWTConfig:
 
     # SECRET KEYS - Must be set via environment variables in production
     secret_key: str = field(
-        default_factory=lambda: os.getenv(
-            "JWT_SECRET_KEY",
-            secrets.token_urlsafe(64),  # 512-bit key for HS512
-        )
+        default_factory=lambda: _require_secret("JWT_SECRET_KEY")
     )
     refresh_secret_key: str = field(
-        default_factory=lambda: os.getenv(
-            "JWT_REFRESH_SECRET_KEY",
-            secrets.token_urlsafe(64),
-        )
+        default_factory=lambda: _require_secret("JWT_REFRESH_SECRET_KEY")
     )
 
     # Algorithm - HS512 for HMAC with SHA-512

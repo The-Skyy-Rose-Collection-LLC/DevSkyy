@@ -50,6 +50,10 @@
 	transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
+.site-header--hidden {
+	display: none;
+}
+
 .navbar {
 	background: rgba(10, 10, 10, 0.92);
 	backdrop-filter: blur(20px);
