@@ -12,23 +12,9 @@
 
 defined( 'ABSPATH' ) || exit;
 
-/* ── Product data ─────────────────────────────────────────────── */
-$products     = array();
+/* ── Product data (catalog = source of truth, WC enriches) ───── */
 $preorder_url = home_url( '/pre-order/' );
-
-if ( function_exists( 'wc_get_products' ) ) {
-	$products = wc_get_products( array(
-		'limit'    => 10,
-		'category' => array( 'kids-capsule' ),
-		'status'   => 'publish',
-		'orderby'  => 'menu_order',
-		'order'    => 'ASC',
-	) );
-}
-
-if ( empty( $products ) ) {
-	$products = skyyrose_map_collection_to_cards( 'kids-capsule' );
-}
+$products     = skyyrose_get_collection_display_products( 'kids-capsule' );
 
 $product_count = count( $products );
 

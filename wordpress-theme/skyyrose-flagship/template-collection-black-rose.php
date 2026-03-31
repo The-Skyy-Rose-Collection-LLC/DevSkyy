@@ -13,21 +13,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
-/* ── Product data ─────────────────────────────────────────────── */
-$products = array();
-if ( function_exists( 'wc_get_products' ) ) {
-	$products = wc_get_products( array(
-		'category' => array( 'black-rose' ),
-		'limit'    => 20,
-		'status'   => 'publish',
-		'orderby'  => 'menu_order',
-		'order'    => 'ASC',
-	) );
-}
-
-if ( empty( $products ) ) {
-	$products = skyyrose_map_collection_to_cards( 'black-rose' );
-}
+/* ── Product data (catalog = source of truth, WC enriches) ───── */
+$products = skyyrose_get_collection_display_products( 'black-rose' );
 
 /* ── Feature cards — The Philosophy ───────────────────────────── */
 $features = array(

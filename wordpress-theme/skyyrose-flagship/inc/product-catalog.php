@@ -696,6 +696,60 @@ function skyyrose_map_collection_to_cards( $collection ) {
 }
 
 /**
+ * Get collection products for display — catalog is source of truth.
+ *
+ * Returns an array of items ready to pass to get_template_part('product-card-holo').
+ * Each item is either a WC_Product (matched by SKU from catalog) or a static
+ * card array from the catalog. The PHP catalog controls WHAT shows and in WHAT
+ * ORDER. WooCommerce just provides live pricing, stock, and add-to-cart.
+ *
+ * @since  6.4.0
+ * @param  string $collection Collection slug (e.g., 'black-rose').
+ * @return array  Mixed array — WC_Product objects or static card arrays.
+ */
+function skyyrose_get_collection_display_products( $collection ) {
+	$catalog_products = skyyrose_get_collection_products( $collection );
+	$has_wc           = function_exists( 'wc_get_product_id_by_sku' );
+	$display          = array();
+
+	foreach ( $catalog_products as $cat ) {
+		// Skip unpublished, non-preorder products.
+		if ( empty( $cat['published'] ) && empty( $cat['is_preorder'] ) ) {
+			continue;
+		}
+
+		// Try to match to a WC product by SKU.
+		$wc_product = null;
+		if ( $has_wc ) {
+			$product_id = wc_get_product_id_by_sku( $cat['sku'] );
+			if ( ! $product_id ) {
+				$product_id = wc_get_product_id_by_sku( skyyrose_normalize_sku( $cat['sku'] ) );
+			}
+			if ( $product_id ) {
+				$wc_product = wc_get_product( $product_id );
+			}
+		}
+
+		if ( $wc_product ) {
+			// WC product found — use it (holo card will pull catalog images as fallback).
+			$display[] = $wc_product;
+		} else {
+			// No WC match — use static card from catalog.
+			$display[] = array(
+				'title'      => $cat['name'],
+				'price'      => skyyrose_format_price( $cat ),
+				'badge_text' => $cat['badge'],
+				'sku'        => $cat['sku'],
+				'image_url'  => skyyrose_product_image_uri( $cat['front_model_image'] ?: $cat['image'] ),
+				'image_back' => skyyrose_product_image_uri( $cat['back_image'] ),
+			);
+		}
+	}
+
+	return $display;
+}
+
+/**
  * Get products filtered for the pre-order gateway.
  *
  * Returns only published products with active pre-orders,

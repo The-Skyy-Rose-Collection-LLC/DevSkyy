@@ -13,23 +13,9 @@
 
 defined( 'ABSPATH' ) || exit;
 
-/* ── Product data ─────────────────────────────────────────────── */
-$products = array();
+/* ── Product data (catalog = source of truth, WC enriches) ───── */
+$products = skyyrose_get_collection_display_products( 'love-hurts' );
 $has_wc   = function_exists( 'wc_get_products' );
-
-if ( $has_wc ) {
-	$products = wc_get_products( array(
-		'limit'    => 12,
-		'category' => array( 'love-hurts' ),
-		'status'   => 'publish',
-		'orderby'  => 'menu_order',
-		'order'    => 'ASC',
-	) );
-}
-
-if ( empty( $products ) ) {
-	$products = skyyrose_map_collection_to_cards( 'love-hurts' );
-}
 
 /* ── Emotion cards (Love Hurts unique section) ────────────────── */
 $features = array(
