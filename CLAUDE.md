@@ -214,6 +214,9 @@ wordpress-theme/skyyrose-flagship/
 - `php-lint.sh` needs explicit Homebrew PHP path (`/opt/homebrew/bin/php`) — lint-staged subshell doesn't inherit brew paths
 - Image cache-bust: append `?v=' . SKYYROSE_VERSION` to branding image URLs in templates
 - Cursor disappearing: caused by Jetpack Instant Search invisible overlay (z-index max, opacity 0, pointer-events auto) — fix with `pointer-events: none !important` in design-tokens.css
+- `front-page.php` uses its own inline footer (`.ft` class) + `wp_footer()` instead of `get_footer()` — shared template parts (mobile-nav, cookie-consent, size-guide, toast-container) must be manually included before `wp_footer()`
+- Jetpack Instant Search hijacks search results with a white overlay — our custom `search.php` only renders when Instant Search is disabled
+- Any new template part added to `footer.php` must ALSO be added to `front-page.php` before `wp_footer()`
 
 ### Hooks (macOS)
 - Canonicalize paths (`/tmp` → `/private/tmp`)
