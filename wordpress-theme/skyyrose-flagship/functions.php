@@ -71,6 +71,7 @@ foreach ( $skyyrose_core_includes as $skyyrose_file ) {
 if ( class_exists( 'WooCommerce' ) ) {
 	$skyyrose_woo_includes = array(
 		'/inc/woocommerce.php',
+		'/inc/woocommerce-preorder.php',
 		'/inc/wc-product-functions.php',
 		'/inc/immersive-ajax.php',
 		'/inc/wishlist-functions.php',
