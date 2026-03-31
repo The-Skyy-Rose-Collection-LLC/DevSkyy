@@ -94,7 +94,10 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "create_product_launch_pipeline": ("adk.workflow_agents", "create_product_launch_pipeline"),
     "create_content_creation_pipeline": ("adk.workflow_agents", "create_content_creation_pipeline"),
     "create_customer_journey_pipeline": ("adk.workflow_agents", "create_customer_journey_pipeline"),
-    "create_quality_assurance_pipeline": ("adk.workflow_agents", "create_quality_assurance_pipeline"),
+    "create_quality_assurance_pipeline": (
+        "adk.workflow_agents",
+        "create_quality_assurance_pipeline",
+    ),
     "create_campaign_blitz_pipeline": ("adk.workflow_agents", "create_campaign_blitz_pipeline"),
     "get_pipeline": ("adk.workflow_agents", "get_pipeline"),
     "estimate_pipeline_savings": ("adk.workflow_agents", "estimate_pipeline_savings"),
