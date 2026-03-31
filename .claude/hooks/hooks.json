@@ -1,5 +1,5 @@
 {
-    "$schema": "https://json.schemastore.org/claude-code-settings.json",
+    "$schema": "https://json-schema.store.org/claude-code-settings.json",
     "hooks": {
         "PreToolUse": [
             {
@@ -7,20 +7,10 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "#!/bin/bash\ninput=$(cat)\ncmd=$(echo \"$input\" | jq -r '.tool_input.command // \"\"')\n\n# Block dev servers that aren't run in tmux\necho '[Hook] BLOCKED: Dev server must run in tmux for log access' >&2\necho '[Hook] Use this command instead:' >&2\necho \"[Hook] tmux new-session -d -s dev 'npm run dev'\" >&2\necho '[Hook] Then: tmux attach -t dev' >&2\nexit 1"
+                        "command": "#!/bin/bash\necho '[Hook] BLOCKED: Dev server must run in tmux for log access' >&2\necho '[Hook] Use: tmux new-session -d -s dev \"npm run dev\"' >&2\nexit 1"
                     }
                 ],
-                "description": "Block dev servers outside tmux - ensures you can access logs"
-            },
-            {
-                "matcher": "tool == \"Bash\" && tool_input.command matches \"(npm (install|test)|pnpm (install|test)|yarn (install|test)|bun (install|test)|cargo build|make|docker|pytest|vitest|playwright)\"",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "#!/bin/bash\ninput=$(cat)\nif [ -z \"$TMUX\" ]; then\n  echo '[Hook] Consider running in tmux for session persistence' >&2\n  echo '[Hook] tmux new -s dev  |  tmux attach -t dev' >&2\nfi\necho \"$input\""
-                    }
-                ],
-                "description": "Reminder to use tmux for long-running commands"
+                "description": "Block dev servers outside tmux — ensures log access"
             },
             {
                 "matcher": "tool == \"Bash\" && tool_input.command matches \"git push\"",
@@ -32,16 +22,6 @@
                     }
                 ],
                 "description": "Pause before git push to review changes"
-            },
-            {
-                "matcher": "tool == \"Write\" && tool_input.file_path matches \"\\\\.(md|txt)$\" && !(tool_input.file_path matches \"README\\\\.md|CLAUDE\\\\.md|AGENTS\\\\.md|CONTRIBUTING\\\\.md\")",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "#!/bin/bash\n# Block creation of unnecessary documentation files\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\n\nif [[ \"$file_path\" =~ \\.(md|txt)$ ]] && [[ ! \"$file_path\" =~ (README|CLAUDE|AGENTS|CONTRIBUTING)\\.md$ ]]; then\n  echo \"[Hook] BLOCKED: Unnecessary documentation file creation\" >&2\n  echo \"[Hook] File: $file_path\" >&2\n  echo \"[Hook] Use README.md for documentation instead\" >&2\n  exit 1\nfi\n\necho \"$input\""
-                    }
-                ],
-                "description": "Block creation of random .md files - keeps docs consolidated"
             },
             {
                 "matcher": "tool == \"Edit\" || tool == \"Write\"",
@@ -80,94 +60,64 @@
         ],
         "PostToolUse": [
             {
-                "matcher": "tool == \"Bash\"",
+                "matcher": "(tool == \"Edit\" || tool == \"Write\") && tool_input.file_path matches \"\\\\.py$\"",
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "#!/bin/bash\n# Auto-detect PR creation and log useful info\ninput=$(cat)\ncmd=$(echo \"$input\" | jq -r '.tool_input.command')\n\nif echo \"$cmd\" | grep -qE 'gh pr create'; then\n  output=$(echo \"$input\" | jq -r '.tool_output.output // \"\"')\n  pr_url=$(echo \"$output\" | grep -oE 'https://github.com/[^/]+/[^/]+/pull/[0-9]+')\n  \n  if [ -n \"$pr_url\" ]; then\n    echo \"[Hook] PR created: $pr_url\" >&2\n    echo \"[Hook] Checking GitHub Actions status...\" >&2\n    repo=$(echo \"$pr_url\" | sed -E 's|https://github.com/([^/]+/[^/]+)/pull/[0-9]+|\\1|')\n    pr_num=$(echo \"$pr_url\" | sed -E 's|.*/pull/([0-9]+)|\\1|')\n    echo \"[Hook] To review PR: gh pr review $pr_num --repo $repo\" >&2\n  fi\nfi\n\necho \"$input\""
+                        "command": "#!/bin/bash\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  repo_root=$(git -C \"$(dirname \"$file_path\")\" rev-parse --show-toplevel 2>/dev/null || echo '.')\n  if [ -f \"$repo_root/.venv/bin/ruff\" ]; then\n    \"$repo_root/.venv/bin/ruff\" check --fix --quiet \"$file_path\" 2>&1 | head -5 >&2\n    \"$repo_root/.venv/bin/ruff\" format --quiet \"$file_path\" 2>/dev/null\n  elif command -v ruff >/dev/null 2>&1; then\n    ruff check --fix --quiet \"$file_path\" 2>&1 | head -5 >&2\n    ruff format --quiet \"$file_path\" 2>/dev/null\n  fi\n  # Warn about print() statements\n  prints=$(grep -n '\\bprint(' \"$file_path\" 2>/dev/null | grep -v '# noqa' || true)\n  if [ -n \"$prints\" ]; then\n    echo \"[Hook] WARNING: print() found in $(basename \"$file_path\")\" >&2\n    echo \"$prints\" | head -3 >&2\n  fi\nfi\necho \"$input\""
                     }
                 ],
-                "description": "Log PR URL and provide review command after PR creation"
+                "description": "Auto-format Python files with ruff + warn about print()"
             },
             {
-                "matcher": "tool == \"Edit\" && tool_input.file_path matches \"\\\\.(ts|tsx|js|jsx)$\"",
+                "matcher": "(tool == \"Edit\" || tool == \"Write\") && tool_input.file_path matches \"\\\\.(ts|tsx|js|jsx)$\"",
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "#!/bin/bash\n# Auto-format with Prettier after editing JS/TS files\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\n\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  if command -v prettier >/dev/null 2>&1; then\n    prettier --write \"$file_path\" 2>&1 | head -5 >&2\n  fi\nfi\n\necho \"$input\""
+                        "command": "#!/bin/bash\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  if command -v prettier >/dev/null 2>&1; then\n    prettier --write \"$file_path\" 2>&1 | head -5 >&2\n  fi\n  # Warn about console.log\n  console_logs=$(grep -n 'console\\.log' \"$file_path\" 2>/dev/null || true)\n  if [ -n \"$console_logs\" ]; then\n    echo \"[Hook] WARNING: console.log in $(basename \"$file_path\")\" >&2\n    echo \"$console_logs\" | head -3 >&2\n  fi\nfi\necho \"$input\""
                     }
                 ],
-                "description": "Auto-format JS/TS files with Prettier after edits"
+                "description": "Auto-format JS/TS with Prettier + warn about console.log"
             },
             {
-                "matcher": "tool == \"Edit\" && tool_input.file_path matches \"\\\\.(ts|tsx)$\"",
+                "matcher": "(tool == \"Edit\" || tool == \"Write\") && tool_input.file_path matches \"\\\\.(ts|tsx)$\"",
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "#!/bin/bash\n# Run TypeScript check after editing TS files\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\n\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  dir=$(dirname \"$file_path\")\n  project_root=\"$dir\"\n  while [ \"$project_root\" != \"/\" ] && [ ! -f \"$project_root/package.json\" ]; do\n    project_root=$(dirname \"$project_root\")\n  done\n  \n  if [ -f \"$project_root/tsconfig.json\" ]; then\n    cd \"$project_root\" && npx tsc --noEmit --pretty false 2>&1 | grep \"$file_path\" | head -10 >&2 || true\n  fi\nfi\n\necho \"$input\""
+                        "command": "#!/bin/bash\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  dir=$(dirname \"$file_path\")\n  project_root=\"$dir\"\n  while [ \"$project_root\" != \"/\" ] && [ ! -f \"$project_root/package.json\" ]; do\n    project_root=$(dirname \"$project_root\")\n  done\n  if [ -f \"$project_root/tsconfig.json\" ]; then\n    cd \"$project_root\" && npx tsc --noEmit --pretty false 2>&1 | grep \"$(basename \"$file_path\")\" | head -5 >&2 || true\n  fi\nfi\necho \"$input\""
                     }
                 ],
-                "description": "TypeScript check after editing .ts/.tsx files"
-            },
-            {
-                "matcher": "tool == \"Edit\" && tool_input.file_path matches \"\\\\.(ts|tsx|js|jsx)$\"",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "#!/bin/bash\n# Warn about console.log in edited files\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\n\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  console_logs=$(grep -n \"console\\\\.log\" \"$file_path\" 2>/dev/null || true)\n  \n  if [ -n \"$console_logs\" ]; then\n    echo \"[Hook] WARNING: console.log found in $file_path\" >&2\n    echo \"$console_logs\" | head -5 >&2\n    echo \"[Hook] Remove console.log before committing\" >&2\n  fi\nfi\n\necho \"$input\""
-                    }
-                ],
-                "description": "Warn about console.log statements after edits"
-            },
-            {
-                "matcher": "tool == \"Edit\" && tool_input.file_path matches \"\\\\.py$\"",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "#!/bin/bash\n# Auto-format Python files with ruff after edits\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  repo_root=$(git -C \"$(dirname \"$file_path\")\" rev-parse --show-toplevel 2>/dev/null || echo '.')\n  if command -v ruff >/dev/null 2>&1; then\n    ruff check --fix --quiet \"$file_path\" 2>&1 | head -5 >&2\n    ruff format --quiet \"$file_path\" 2>/dev/null\n  fi\nfi\necho \"$input\""
-                    }
-                ],
-                "description": "Auto-format Python files with ruff after edits"
-            },
-            {
-                "matcher": "tool == \"Edit\" && tool_input.file_path matches \"\\\\.py$\"",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "#!/bin/bash\n# Warn about print() statements in Python files\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  prints=$(grep -n '\\bprint(' \"$file_path\" 2>/dev/null | grep -v '# noqa' || true)\n  if [ -n \"$prints\" ]; then\n    echo \"[Hook] WARNING: print() found in $file_path\" >&2\n    echo \"$prints\" | head -5 >&2\n    echo \"[Hook] Use logging module or remove before committing\" >&2\n  fi\nfi\necho \"$input\""
-                    }
-                ],
-                "description": "Warn about print() statements in Python files after edits"
-            },
-            {
-                "matcher": "tool == \"Write\" || tool == \"Edit\" || tool == \"Bash\"",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/claude-md-tracker/track-changes.sh\""
-                    }
-                ],
-                "description": "Track structural changes for CLAUDE.md staleness detection"
+                "description": "TypeScript type check after editing .ts/.tsx files"
             },
             {
                 "matcher": "(tool == \"Edit\" || tool == \"Write\") && tool_input.file_path matches \"\\\\.php$\"",
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "#!/bin/bash\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  result=$(/opt/homebrew/bin/php -l \"$file_path\" 2>&1)\n  if echo \"$result\" | grep -q 'Parse error\\|Fatal error'; then\n    echo \"[Hook] PHP SYNTAX ERROR in $file_path\" >&2\n    echo \"$result\" | head -5 >&2\n    exit 1\n  fi\nfi\necho \"$input\""
+                        "command": "#!/bin/bash\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  result=$(/opt/homebrew/bin/php -l \"$file_path\" 2>&1)\n  if echo \"$result\" | grep -q 'Parse error\\|Fatal error'; then\n    echo \"[Hook] PHP SYNTAX ERROR in $(basename \"$file_path\")\" >&2\n    echo \"$result\" | head -5 >&2\n    exit 1\n  fi\nfi\necho \"$input\""
                     }
                 ],
                 "description": "PHP syntax check on all PHP file edits/writes"
             },
             {
-                "matcher": "tool == \"Write\" && tool_input.file_path matches \"\\\\.(ts|tsx|js|jsx)$\"",
+                "matcher": "tool == \"Bash\" && tool_input.command matches \"gh pr create\"",
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "#!/bin/bash\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  if command -v prettier >/dev/null 2>&1; then\n    prettier --write \"$file_path\" 2>&1 | head -5 >&2\n  fi\nfi\necho \"$input\""
+                        "command": "#!/bin/bash\ninput=$(cat)\noutput=$(echo \"$input\" | jq -r '.tool_output.output // \"\"')\npr_url=$(echo \"$output\" | grep -oE 'https://github.com/[^/]+/[^/]+/pull/[0-9]+')\nif [ -n \"$pr_url\" ]; then\n  echo \"[Hook] PR created: $pr_url\" >&2\nfi\necho \"$input\""
                     }
                 ],
-                "description": "Auto-format JS/TS files with Prettier after writes"
+                "description": "Log PR URL after creation"
+            },
+            {
+                "matcher": "tool == \"Bash\" && tool_input.command matches \"deploy-theme|deploy-wp|bash scripts/deploy\"",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "#!/bin/bash\ninput=$(cat)\noutput=$(echo \"$input\" | jq -r '.tool_output.stdout // .tool_output.output // \"\"')\nif echo \"$output\" | grep -q 'Deploy complete'; then\n  echo '[Hook] Deploy succeeded — run /verify to check live site.' >&2\nfi\necho \"$input\""
+                    }
+                ],
+                "description": "Auto-prompt verification after WordPress deploy"
             },
             {
                 "matcher": "(tool == \"Write\" || tool == \"Bash\") && (tool_input.file_path matches \"\\\\.(jpg|jpeg|png|webp|gif|svg)$\" || tool_input.command matches \"(cp|mv|curl|wget).*\\\\.(jpg|jpeg|png|webp|gif|svg)\")",
@@ -180,34 +130,14 @@
                 "description": "Auto-optimize images: compress, generate WebP, resize oversized"
             },
             {
-                "matcher": "tool == \"Bash\" && tool_input.command matches \"deploy-theme|deploy-wp|bash scripts/deploy\"",
+                "matcher": "tool == \"Write\" || tool == \"Edit\" || tool == \"Bash\"",
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "#!/bin/bash\ninput=$(cat)\noutput=$(echo \"$input\" | jq -r '.tool_output.stdout // .tool_output.output // \"\"')\nif echo \"$output\" | grep -q 'Deploy complete'; then\n  echo '[Auto] Deploy succeeded — run /verification-before-completion to verify live site.' >&2\n  echo '[Auto] Quick check: curl -sI https://skyyrose.co | grep -E \"HTTP|x-cache\"' >&2\nfi\necho \"$input\""
+                        "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/claude-md-tracker/track-changes.sh\""
                     }
                 ],
-                "description": "Auto-prompt verification after WordPress deploy"
-            },
-            {
-                "matcher": "tool == \"Bash\" && tool_input.command matches \"git commit\"",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "#!/bin/bash\ninput=$(cat)\noutput=$(echo \"$input\" | jq -r '.tool_output.stdout // .tool_output.output // \"\"')\nif echo \"$output\" | grep -qE '\\[main|\\[feat|\\[fix'; then\n  echo '[Auto] Commit created. Run /wp-simplify to review code quality before pushing.' >&2\nfi\necho \"$input\""
-                    }
-                ],
-                "description": "Auto-prompt code quality review after commits"
-            },
-            {
-                "matcher": "tool == \"Write\" && tool_input.file_path matches \"\\\\.py$\"",
-                "hooks": [
-                    {
-                        "type": "command",
-                        "command": "#!/bin/bash\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  if command -v ruff >/dev/null 2>&1; then\n    ruff check --fix --quiet \"$file_path\" 2>&1 | head -5 >&2\n    ruff format --quiet \"$file_path\" 2>/dev/null\n  fi\nfi\necho \"$input\""
-                    }
-                ],
-                "description": "Auto-format Python files with ruff after writes"
+                "description": "Track structural changes for CLAUDE.md staleness detection"
             }
         ],
         "PostCompact": [
@@ -216,7 +146,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "#!/bin/bash\ncat <<'REINJECT'\n[CRITICAL CONTEXT - Re-injected after compaction]\n\n## DevSkyy Build Rules (do NOT forget these):\n- CDN caches CSS aggressively — bump SKYYROSE_VERSION or use ?nocache= to verify\n- enqueue.php template slug map must match actual template filenames exactly\n- Collection page CSS loads via $standalone_css_map — don't duplicate with inline enqueues\n- When removing a PHP section, also remove its CSS rules AND responsive breakpoint overrides\n- Showcase card content should be visible by default (opacity: 1), not hidden until hover\n- Don't duplicate content sections — if showcase cards show collections, don't add separate narrative cards with same data\n- Holo card grid: only .product-grid, .product-grid__items, .br-product-grid__items should be display: grid\n- Fix everything in one batch, test all pages, deploy ONCE — no back-and-forth\n- When cleaning up: update EVERY file that references deleted code\n- Use npm not pnpm for Vercel deploys\n- MUST verify all APIs with Context7 before writing any code\nREINJECT"
+                        "command": "#!/bin/bash\ncat <<'REINJECT'\n[CRITICAL CONTEXT - Re-injected after compaction]\n\n## DevSkyy Build Rules:\n- CDN caches CSS aggressively — bump SKYYROSE_VERSION or use ?nocache= to verify\n- enqueue.php template slug map must match actual template filenames exactly\n- Collection pages use unified collection-pages.css + collection-pages.js\n- When removing a PHP section, also remove its CSS rules AND responsive breakpoint overrides\n- Showcase card content should be visible by default (opacity: 1), not hidden until hover\n- Holo card grid: only .product-grid, .product-grid__items, .br-product-grid__items should be display: grid\n- Fix everything in one batch, test all pages, deploy ONCE — no back-and-forth\n- When cleaning up: update EVERY file that references deleted code\n- Use npm not pnpm for Vercel deploys\n- MUST verify all APIs with Context7 before writing any code\n- No innerHTML in JS — use createElement + textContent\n- Escape output: esc_html(), esc_attr(), esc_url(), wp_kses_post()\nREINJECT"
                     }
                 ],
                 "description": "Re-inject critical DevSkyy build rules after context compaction"
@@ -238,7 +168,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "#!/bin/bash\nchanged=$(git diff --name-only 2>/dev/null | wc -l | tr -d ' ')\nif [ \"$changed\" -gt 0 ]; then\n  echo '[Auto] '$changed' file(s) changed — run /code-review or /simplify before committing.' >&2\n  echo '[Auto] Then run /learn to extract reusable patterns.' >&2\nelse\n  echo '[Auto] No changes. Consider /learn for session insights.' >&2\nfi"
+                        "command": "#!/bin/bash\nchanged=$(git diff --name-only 2>/dev/null | wc -l | tr -d ' ')\nif [ \"$changed\" -gt 0 ]; then\n  echo \"[Hook] $changed file(s) uncommitted — run /code-review before committing.\" >&2\nelse\n  echo '[Hook] Clean working tree. Consider /learn for session insights.' >&2\nfi"
                     }
                 ],
                 "description": "Review code and extract learnings at session end"

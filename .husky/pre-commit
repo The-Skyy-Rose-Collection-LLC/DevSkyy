@@ -21,11 +21,10 @@ if git diff --cached --name-only --diff-filter=ACMR | grep -q '\.py$'; then
   fi
 fi
 
-# Fast unit tests — only run tests for staged files, skip collection errors
+# Fast unit tests on staged Python files
 if git diff --cached --name-only --diff-filter=ACMR | grep -q '\.py$'; then
   if command -v pytest >/dev/null 2>&1 && [ -d "$REPO_ROOT/tests/unit" ]; then
     echo "Running fast unit tests..."
-    # --ignore-glob skips files with import errors; -x stops on first real failure
-    pytest tests/unit/ -x -q --timeout=30 --ignore-glob="**/test_brand_learning.py" 2>&1 || true
+    pytest tests/unit/ -x -q
   fi
 fi

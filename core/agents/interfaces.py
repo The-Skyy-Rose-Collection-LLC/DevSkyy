@@ -17,9 +17,10 @@ Version: 1.0.0 (Phase 4 Refactoring)
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
-from adk.base import AgentResult
+if TYPE_CHECKING:
+    from adk.base import AgentResult
 
 
 class IAgent(Protocol):
