@@ -156,6 +156,54 @@
 }
 
 /* ==================================================
+   FORM SUBMIT FEEDBACK
+   ================================================== */
+
+.btn-loading {
+	position: relative;
+	color: transparent !important;
+	pointer-events: none;
+}
+
+.btn-loading::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 18px;
+	height: 18px;
+	margin: -9px 0 0 -9px;
+	border: 2px solid rgba(255, 255, 255, 0.3);
+	border-top-color: #fff;
+	border-radius: 50%;
+	animation: btnSpin 0.6s linear infinite;
+}
+
+@keyframes btnSpin {
+	to { transform: rotate(360deg); }
+}
+
+.btn-success {
+	background: #2ecc71 !important;
+	border-color: #2ecc71 !important;
+	transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-error {
+	background: #e74c3c !important;
+	border-color: #e74c3c !important;
+	transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.btn-loading::after {
+		animation: none;
+		border-top-color: #fff;
+		opacity: 0.7;
+	}
+}
+
+/* ==================================================
    BREADCRUMBS
    ================================================== */
 
