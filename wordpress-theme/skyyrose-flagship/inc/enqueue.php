@@ -180,6 +180,16 @@ function skyyrose_enqueue_global_styles() {
 			SKYYROSE_VERSION
 		);
 	}
+
+	// Skeleton loading states — shimmer placeholders for images and cards.
+	if ( file_exists( $base_dir . '/skeleton.css' ) ) {
+		wp_enqueue_style(
+			'skyyrose-skeleton',
+			$base_uri . '/skeleton.css',
+			array(),
+			SKYYROSE_VERSION
+		);
+	}
 }
 
 /**
@@ -239,6 +249,19 @@ function skyyrose_enqueue_global_scripts() {
 		wp_enqueue_script(
 			'skyyrose-premium-interactions',
 			$js_uri . '/' . $prem_js,
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+
+	// Page transitions + skeleton screens + scarcity bars.
+	$pt_file = $use_min && file_exists( $js_dir . '/page-transitions.min.js' )
+		? 'page-transitions.min.js' : 'page-transitions.js';
+	if ( file_exists( $js_dir . '/' . $pt_file ) ) {
+		wp_enqueue_script(
+			'skyyrose-page-transitions',
+			$js_uri . '/' . $pt_file,
 			array(),
 			SKYYROSE_VERSION,
 			true
@@ -338,6 +361,8 @@ function skyyrose_get_current_template_slug() {
 			'template-about.php'                   => 'about',
 			'template-contact.php'                 => 'contact',
 			'template-preorder-gateway.php'        => 'preorder-gateway',
+			'template-faq.php'                     => 'faq',
+			'template-shipping-returns.php'        => 'shipping-returns',
 		);
 
 		if ( isset( $template_map[ $page_template ] ) ) {
@@ -396,6 +421,8 @@ function skyyrose_enqueue_template_styles() {
 		'preorder-gateway'  => 'preorder-gateway.css',
 		'404'              => '404.css',
 		'search'           => 'search-results.css',
+		'faq'              => 'info-pages.css',
+		'shipping-returns' => 'info-pages.css',
 		'single'           => 'generic-pages.css',
 		'blog'             => 'generic-pages.css',
 		'page'             => 'generic-pages.css',
