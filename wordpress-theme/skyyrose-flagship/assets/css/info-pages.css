@@ -1,0 +1,383 @@
+/**
+ * Info Pages — shared styles for FAQ, Shipping & Returns
+ *
+ * Dark luxury design with glass cards, smooth accordion transitions,
+ * and responsive tables. Uses design tokens for consistency.
+ *
+ * @package SkyyRose_Flagship
+ * @since   6.4.0
+ */
+
+/* ==========================================================================
+   1. PAGE LAYOUT
+   ========================================================================== */
+
+.info-page {
+	min-height: 100vh;
+	padding: clamp(6rem, 10vw, 10rem) 0 clamp(4rem, 8vw, 8rem);
+	background: var(--color-bg, #0A0A0A);
+	color: var(--color-text, #E8E8E8);
+}
+
+.info-page__container {
+	width: 90%;
+	max-width: 860px;
+	margin: 0 auto;
+}
+
+/* ==========================================================================
+   2. HERO
+   ========================================================================== */
+
+.info-page__hero {
+	text-align: center;
+	margin-bottom: clamp(3rem, 6vw, 5rem);
+}
+
+.info-page__badge {
+	display: inline-block;
+	font-family: var(--font-ui, 'Bebas Neue', sans-serif);
+	font-size: 0.75rem;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: var(--color-rose-gold, #B76E79);
+	border: 1px solid rgba(183, 110, 121, 0.3);
+	padding: 0.35em 1.2em;
+	border-radius: 2px;
+	margin-bottom: 1.5rem;
+}
+
+.info-page__title {
+	font-family: var(--font-display, 'Playfair Display', serif);
+	font-size: clamp(2rem, 5vw, 3.5rem);
+	font-weight: 400;
+	letter-spacing: 0.02em;
+	margin: 0 0 1rem;
+	background: linear-gradient(135deg, #fff 0%, var(--color-rose-gold, #B76E79) 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.info-page__subtitle {
+	font-family: var(--font-body, 'Cormorant Garamond', serif);
+	font-size: clamp(1rem, 2vw, 1.2rem);
+	color: rgba(255, 255, 255, 0.6);
+	max-width: 560px;
+	margin: 0 auto;
+	line-height: 1.7;
+}
+
+/* ==========================================================================
+   3. FAQ ACCORDION
+   ========================================================================== */
+
+.faq-categories {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(2.5rem, 4vw, 4rem);
+}
+
+.faq-category__title {
+	font-family: var(--font-display, 'Playfair Display', serif);
+	font-size: clamp(1.3rem, 3vw, 1.8rem);
+	font-weight: 400;
+	color: #fff;
+	margin: 0 0 1.5rem;
+	padding-bottom: 0.75rem;
+	border-bottom: 1px solid rgba(183, 110, 121, 0.2);
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.faq-category__icon {
+	color: var(--color-rose-gold, #B76E79);
+	font-size: 0.9em;
+}
+
+.faq-category__items {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+}
+
+/* Details/summary accordion */
+.faq-item {
+	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.faq-item__question {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 1.25rem 0;
+	cursor: pointer;
+	list-style: none;
+	user-select: none;
+	transition: color 0.2s ease;
+}
+
+.faq-item__question::-webkit-details-marker {
+	display: none;
+}
+
+.faq-item__question::marker {
+	display: none;
+	content: '';
+}
+
+.faq-item__q-text {
+	font-family: var(--font-body, 'Cormorant Garamond', serif);
+	font-size: clamp(1rem, 1.8vw, 1.15rem);
+	color: rgba(255, 255, 255, 0.85);
+	line-height: 1.5;
+}
+
+.faq-item__toggle {
+	flex-shrink: 0;
+	color: var(--color-rose-gold, #B76E79);
+	transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.faq-item[open] .faq-item__toggle {
+	transform: rotate(180deg);
+}
+
+.faq-item__question:hover .faq-item__q-text,
+.faq-item__question:focus-visible .faq-item__q-text {
+	color: #fff;
+}
+
+.faq-item__answer {
+	overflow: hidden;
+	padding: 0 0 1.25rem;
+}
+
+.faq-item__answer p {
+	font-family: var(--font-body, 'Cormorant Garamond', serif);
+	font-size: clamp(0.95rem, 1.6vw, 1.05rem);
+	line-height: 1.8;
+	color: rgba(255, 255, 255, 0.55);
+	margin: 0;
+}
+
+/* ==========================================================================
+   4. SHIPPING SECTIONS
+   ========================================================================== */
+
+.ship-section {
+	margin-bottom: clamp(3rem, 6vw, 5rem);
+}
+
+.ship-section__title {
+	font-family: var(--font-display, 'Playfair Display', serif);
+	font-size: clamp(1.3rem, 3vw, 1.8rem);
+	font-weight: 400;
+	color: #fff;
+	margin: 0 0 1.5rem;
+	padding-bottom: 0.75rem;
+	border-bottom: 1px solid rgba(183, 110, 121, 0.2);
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.ship-section__icon {
+	color: var(--color-rose-gold, #B76E79);
+	font-size: 0.9em;
+}
+
+.ship-cards {
+	display: grid;
+	gap: 1.5rem;
+}
+
+.ship-card {
+	background: rgba(255, 255, 255, 0.03);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	border-radius: 8px;
+	padding: clamp(1.5rem, 3vw, 2rem);
+	transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.ship-card:hover {
+	border-color: rgba(183, 110, 121, 0.2);
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.ship-card--highlight {
+	border-color: rgba(183, 110, 121, 0.3);
+	background: rgba(183, 110, 121, 0.05);
+}
+
+.ship-card h3 {
+	font-family: var(--font-display, 'Playfair Display', serif);
+	font-size: clamp(1rem, 2vw, 1.2rem);
+	font-weight: 400;
+	color: #fff;
+	margin: 0 0 0.75rem;
+}
+
+.ship-card p {
+	font-family: var(--font-body, 'Cormorant Garamond', serif);
+	font-size: clamp(0.95rem, 1.6vw, 1.05rem);
+	line-height: 1.8;
+	color: rgba(255, 255, 255, 0.55);
+	margin: 0;
+}
+
+/* Shipping rate table */
+.ship-table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 0.5rem;
+}
+
+.ship-table th,
+.ship-table td {
+	text-align: left;
+	padding: 0.75rem 1rem;
+	font-family: var(--font-body, 'Cormorant Garamond', serif);
+	font-size: 0.95rem;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ship-table th {
+	color: var(--color-rose-gold, #B76E79);
+	font-weight: 600;
+	font-size: 0.8rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.ship-table td {
+	color: rgba(255, 255, 255, 0.6);
+}
+
+.ship-table tbody tr:last-child td {
+	border-bottom: none;
+}
+
+/* Steps and lists */
+.ship-steps,
+.ship-list {
+	list-style: none;
+	padding: 0;
+	margin: 0.5rem 0 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.ship-steps li {
+	font-family: var(--font-body, 'Cormorant Garamond', serif);
+	font-size: clamp(0.95rem, 1.6vw, 1.05rem);
+	color: rgba(255, 255, 255, 0.55);
+	line-height: 1.6;
+	padding-left: 2rem;
+	position: relative;
+	counter-increment: step;
+}
+
+.ship-steps li::before {
+	content: counter(step);
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 1.4rem;
+	height: 1.4rem;
+	border-radius: 50%;
+	background: rgba(183, 110, 121, 0.15);
+	color: var(--color-rose-gold, #B76E79);
+	font-size: 0.75rem;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: var(--font-ui, 'Bebas Neue', sans-serif);
+}
+
+.ship-list li {
+	font-family: var(--font-body, 'Cormorant Garamond', serif);
+	font-size: clamp(0.95rem, 1.6vw, 1.05rem);
+	color: rgba(255, 255, 255, 0.55);
+	line-height: 1.6;
+	padding-left: 1.5rem;
+	position: relative;
+}
+
+.ship-list li::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0.6em;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--color-rose-gold, #B76E79);
+	opacity: 0.5;
+}
+
+/* ==========================================================================
+   5. CTA
+   ========================================================================== */
+
+.info-page__cta {
+	text-align: center;
+	padding: clamp(3rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3rem);
+	margin-top: clamp(2rem, 4vw, 4rem);
+	border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.info-page__cta h2 {
+	font-family: var(--font-display, 'Playfair Display', serif);
+	font-size: clamp(1.5rem, 3vw, 2rem);
+	font-weight: 400;
+	color: #fff;
+	margin: 0 0 0.75rem;
+}
+
+.info-page__cta p {
+	font-family: var(--font-body, 'Cormorant Garamond', serif);
+	font-size: 1.05rem;
+	color: rgba(255, 255, 255, 0.5);
+	margin: 0 0 2rem;
+}
+
+.info-page__cta-btn {
+	display: inline-block;
+	font-family: var(--font-ui, 'Bebas Neue', sans-serif);
+	font-size: 0.85rem;
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	color: #fff;
+	background: transparent;
+	border: 1px solid var(--color-rose-gold, #B76E79);
+	padding: 0.9em 2.5em;
+	text-decoration: none;
+	transition: background 0.3s ease, color 0.3s ease;
+}
+
+.info-page__cta-btn:hover,
+.info-page__cta-btn:focus-visible {
+	background: var(--color-rose-gold, #B76E79);
+	color: #0A0A0A;
+}
+
+/* ==========================================================================
+   6. RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 600px) {
+	.ship-table th,
+	.ship-table td {
+		padding: 0.6rem 0.5rem;
+		font-size: 0.85rem;
+	}
+
+	.faq-item__question {
+		padding: 1rem 0;
+	}
+}

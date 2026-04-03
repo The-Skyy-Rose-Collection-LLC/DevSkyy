@@ -138,6 +138,19 @@ if ( $is_wc && $wc->is_type( 'variable' ) ) {
 $edition_size = $product_id ? get_post_meta( $product_id, '_skyyrose_edition_of', true ) : '';
 $is_limited   = $product_id ? get_post_meta( $product_id, '_skyyrose_limited', true ) : '';
 
+// Scarcity data — stock quantity for depletion bar.
+$stock_qty     = $is_wc ? $wc->get_stock_quantity() : null;
+$edition_total = $edition_size ? intval( $edition_size ) : 0;
+$scarcity_pct  = 0;
+$scarcity_low  = false;
+if ( $edition_total > 0 && null !== $stock_qty ) {
+	$sold         = $edition_total - intval( $stock_qty );
+	$scarcity_pct = min( 100, max( 0, round( ( $sold / $edition_total ) * 100 ) ) );
+	$scarcity_low = ( intval( $stock_qty ) <= 5 && intval( $stock_qty ) > 0 );
+} elseif ( null !== $stock_qty && intval( $stock_qty ) > 0 && intval( $stock_qty ) <= 10 ) {
+	$scarcity_low = true;
+}
+
 // ---------------------------------------------------------------------------
 // Collection detection.
 // ---------------------------------------------------------------------------
@@ -262,6 +275,29 @@ if ( $is_limited ) {
 					<span class="holo__ship-note"><?php esc_html_e( 'Ships Spring 2026', 'skyyrose-flagship' ); ?></span>
 				<?php endif; ?>
 			</div>
+
+			<?php if ( $edition_total > 0 && $scarcity_pct > 0 ) : ?>
+				<div class="holo__scarcity<?php echo $scarcity_low ? ' holo__scarcity--low' : ''; ?>">
+					<span class="holo__scarcity-label"><?php
+						printf(
+							esc_html__( '%d%% claimed', 'skyyrose-flagship' ),
+							$scarcity_pct
+						);
+					?></span>
+					<div class="holo__scarcity-bar" aria-hidden="true">
+						<div class="holo__scarcity-fill" data-percent="<?php echo esc_attr( $scarcity_pct ); ?>" style="width:0%"></div>
+					</div>
+				</div>
+			<?php elseif ( $scarcity_low && null !== $stock_qty ) : ?>
+				<div class="holo__scarcity holo__scarcity--low">
+					<span class="holo__scarcity-label"><?php
+						printf(
+							esc_html( _n( 'Only %d left', 'Only %d left', intval( $stock_qty ), 'skyyrose-flagship' ) ),
+							intval( $stock_qty )
+						);
+					?></span>
+				</div>
+			<?php endif; ?>
 		</div>
 
 		<!-- Quick-Add Drawer (slides up on hover) -->
