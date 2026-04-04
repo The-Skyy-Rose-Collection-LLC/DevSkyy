@@ -149,13 +149,15 @@ while ( have_posts() ) :
 								</button>
 							<?php endif; ?>
 							<?php
-							$sr_thumb_idx = 2;
+							$sr_thumb_idx  = 2;
+							$sr_alt_labels = array( 'back view', 'detail view', 'side view', 'close-up', 'styled view', 'alternate angle' );
 							foreach ( $gallery_ids as $gid ) :
 								$gurl = wp_get_attachment_url( $gid );
 								if ( ! $gurl ) {
 									continue;
 								}
-								$sr_galt = wp_get_attachment_caption( $gid ) ?: ( $product->get_name() . ' — view ' . $sr_thumb_idx );
+								$sr_alt_suffix = $sr_alt_labels[ $sr_thumb_idx - 2 ] ?? ( 'view ' . $sr_thumb_idx );
+								$sr_galt       = wp_get_attachment_caption( $gid ) ?: ( $product->get_name() . ' — ' . $sr_alt_suffix );
 							?>
 								<button type="button" class="sr-thumb" data-img="<?php echo esc_url( $gurl ); ?>"
 								        aria-label="<?php printf( esc_attr__( 'View image %d', 'skyyrose-flagship' ), $sr_thumb_idx ); ?>">

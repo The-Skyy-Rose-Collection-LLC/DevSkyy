@@ -194,6 +194,43 @@ function skyyrose_organization_schema() {
 add_action( 'wp_head', 'skyyrose_organization_schema' );
 
 /**
+ * Add WebSite schema with SearchAction (sitelinks search box).
+ *
+ * Enables the search box that appears in Google sitelinks for branded queries.
+ * Only outputs on the front page. Defers to Yoast SEO when active.
+ *
+ * @since 6.4.0
+ */
+function skyyrose_website_schema() {
+	if ( ! is_front_page() ) {
+		return;
+	}
+
+	// Defer to Yoast SEO if active.
+	if ( defined( 'WPSEO_VERSION' ) ) {
+		return;
+	}
+
+	$schema = array(
+		'@context'        => 'https://schema.org',
+		'@type'           => 'WebSite',
+		'name'            => get_bloginfo( 'name' ),
+		'url'             => home_url( '/' ),
+		'potentialAction' => array(
+			'@type'       => 'SearchAction',
+			'target'      => array(
+				'@type'        => 'EntryPoint',
+				'urlTemplate'  => home_url( '/?s={search_term_string}' ),
+			),
+			'query-input' => 'required name=search_term_string',
+		),
+	);
+
+	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+}
+add_action( 'wp_head', 'skyyrose_website_schema' );
+
+/**
  * Add BreadcrumbList schema markup.
  *
  * Skips output when Yoast SEO is active to prevent duplicate breadcrumb schema.
@@ -570,6 +607,8 @@ function skyyrose_meta_description() {
 				'template-about.php'                 => 'The SkyyRose story — Luxury Grows from Concrete. Founded in Oakland, building premium streetwear for the culture.',
 				'template-preorder-gateway.php'      => 'Secure your SkyyRose pieces before they drop. Pre-order limited edition streetwear and luxury fashion.',
 				'template-contact.php'               => 'Get in touch with SkyyRose. Questions about orders, sizing, collaborations, or press inquiries? We are here to help.',
+				'template-faq.php'                   => 'Frequently asked questions about SkyyRose orders, shipping, returns, sizing, and pre-orders. Everything you need to know.',
+				'template-shipping-returns.php'       => 'SkyyRose shipping rates, delivery times, 30-day return policy, free exchanges, and pre-order cancellation details.',
 			);
 			if ( $template && isset( $descriptions[ $template ] ) ) {
 				$description = $descriptions[ $template ];
@@ -636,6 +675,8 @@ function skyyrose_pre_document_title( $title ) {
 			'template-preorder-gateway.php'         => 'Pre-Order — Secure Your Pieces | ' . $brand,
 			'template-contact.php'                  => 'Contact Us | ' . $brand,
 			'page-wishlist.php'                     => 'Your Wishlist | ' . $brand,
+			'template-faq.php'                      => 'FAQ — Orders, Shipping, Returns & Sizing | ' . $brand,
+			'template-shipping-returns.php'         => 'Shipping & Returns Policy | ' . $brand,
 		);
 
 		if ( $template && isset( $titles[ $template ] ) ) {
