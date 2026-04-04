@@ -517,3 +517,98 @@ function skyyrose_enqueue_21st_effects() {
 	}
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_21st_effects', 60 );
+
+/*--------------------------------------------------------------
+ * Collection Experience Scenes — Three.js Per-Collection Worlds
+ *--------------------------------------------------------------*/
+
+/**
+ * Enqueue collection-specific Three.js experience scenes.
+ *
+ * Loads the experience base class and the per-collection scene file
+ * on immersive template pages. Each collection gets its own Three.js
+ * world (Black Rose: gothic moonlit garden, Love Hurts: beast's
+ * cathedral, Signature: golden gate runway).
+ *
+ * Depends on Three.js (CDN) and the base immersive-world.js engine.
+ * Product data is localized by enqueue.php (skyyRoseImmersive).
+ *
+ * @since 5.1.0
+ * @return void
+ */
+function skyyrose_enqueue_collection_experiences() {
+	if ( is_admin() ) {
+		return;
+	}
+
+	// Map template slugs to their experience JS files.
+	$experience_map = array(
+		'template-immersive-black-rose.php'  => 'experiences/blackrose-experience',
+		'template-immersive-love-hurts.php'  => 'experiences/lovehurts-experience',
+		'template-immersive-signature.php'   => 'experiences/signature-experience',
+	);
+
+	$current_template = get_page_template_slug();
+
+	if ( ! $current_template || ! isset( $experience_map[ $current_template ] ) ) {
+		return;
+	}
+
+	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+	$js_dir  = SKYYROSE_DIR . '/assets/js';
+	$js_uri  = SKYYROSE_ASSETS_URI . '/js';
+
+	// Three.js via CDN (shared dependency for all experiences).
+	if ( ! wp_script_is( 'threejs', 'enqueued' ) ) {
+		wp_enqueue_script(
+			'threejs',
+			'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+			array(),
+			'r128',
+			true
+		);
+	}
+
+	// Experience base class (SkyyRoseExperience — shared foundation).
+	$base_file = $use_min && file_exists( $js_dir . '/experiences/experience-base.min.js' )
+		? 'experiences/experience-base.min.js' : 'experiences/experience-base.js';
+	if ( file_exists( $js_dir . '/' . $base_file ) ) {
+		wp_enqueue_script(
+			'skyyrose-experience-base',
+			$js_uri . '/' . $base_file,
+			array( 'threejs' ),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+
+	// Luxury animations (shared animation utilities).
+	$anim_file = $use_min && file_exists( $js_dir . '/experiences/luxury-animations.min.js' )
+		? 'experiences/luxury-animations.min.js' : 'experiences/luxury-animations.js';
+	if ( file_exists( $js_dir . '/' . $anim_file ) ) {
+		wp_enqueue_script(
+			'skyyrose-luxury-animations',
+			$js_uri . '/' . $anim_file,
+			array( 'skyyrose-experience-base' ),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+
+	// Collection-specific experience scene.
+	$scene_slug = $experience_map[ $current_template ];
+	$scene_file = $use_min && file_exists( $js_dir . '/' . $scene_slug . '.min.js' )
+		? $scene_slug . '.min.js' : $scene_slug . '.js';
+	if ( file_exists( $js_dir . '/' . $scene_file ) ) {
+		wp_enqueue_script(
+			'skyyrose-collection-experience',
+			$js_uri . '/' . $scene_file,
+			array( 'skyyrose-experience-base', 'skyyrose-luxury-animations' ),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+}
+
+// Collection experiences on immersive pages (priority 65, after 21st effects).
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_collection_experiences', 65 );
