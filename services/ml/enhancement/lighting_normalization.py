@@ -25,7 +25,7 @@ from PIL import Image
 from pydantic import BaseModel
 from services.ml.replicate_client import ReplicateClient, ReplicateConfig
 
-from errors.production_errors import (
+from core.errors.production_errors import (
     DevSkyError,
     DevSkyErrorCode,
     DevSkyErrorSeverity,

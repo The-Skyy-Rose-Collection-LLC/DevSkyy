@@ -6,7 +6,7 @@ Tests the error hierarchy, error formatting, and exception handling
 for the DevSkyy production error system.
 """
 
-from errors.production_errors import (
+from core.errors.production_errors import (
     MINIMUM_FIDELITY_SCORE,
     AssetNotFoundError,
     AuthenticationError,

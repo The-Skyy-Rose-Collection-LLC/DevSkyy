@@ -36,7 +36,7 @@ except ImportError:
     CV2_AVAILABLE = False
     cv2 = None  # type: ignore
 
-from errors.production_errors import ImageProcessingError
+from core.errors.production_errors import ImageProcessingError
 
 logger = logging.getLogger(__name__)
 

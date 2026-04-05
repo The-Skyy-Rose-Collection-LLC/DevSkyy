@@ -21,7 +21,7 @@ from typing import Any
 import httpx
 from pydantic import BaseModel, Field
 
-from errors.production_errors import MCPServerError
+from core.errors.production_errors import MCPServerError
 
 logger = logging.getLogger(__name__)
 

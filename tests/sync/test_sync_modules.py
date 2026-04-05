@@ -18,7 +18,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import httpx
 import pytest
 
-from errors.production_errors import ConfigurationError, WordPressIntegrationError
+from core.errors.production_errors import ConfigurationError, WordPressIntegrationError
 
 
 def create_mock_response(json_data: dict | list, status_code: int = 200) -> MagicMock:
