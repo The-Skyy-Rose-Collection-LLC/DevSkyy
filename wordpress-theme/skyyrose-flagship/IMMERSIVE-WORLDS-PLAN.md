@@ -1,5 +1,9 @@
 # Immersive Worlds Build Plan
 
+> **STATUS:** Aspirational design plan — NOT current production code.
+> The Three.js 3D worlds, avatar easter egg, and world-specific JS modules described here are not yet built.
+> Current immersive pages use 2D image-based scenes (`template-immersive-*.php` + `immersive-scenes.css`).
+
 ## Goal
 Replace 2D image-map immersive experiences with Three.js-powered 3D worlds that make drakerelated.com look like pre-schoolers.
 

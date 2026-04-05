@@ -23,12 +23,8 @@ $features = array(
 	array( 'icon' => '&#x25C6;', 'title' => __( 'Dark-on-Dark Texture', 'skyyrose-flagship' ), 'text' => __( 'This is not loud fashion. This is the quiet authority of someone who knows exactly who they are. Elegance distilled into every fiber.', 'skyyrose-flagship' ) ),
 );
 
-/* ── Cross-collection navigation ──────────────────────────────── */
-$cross_nav = array(
-	array( 'slug' => 'collection-love-hurts', 'name' => __( 'Love Hurts', 'skyyrose-flagship' ), 'desc' => __( 'Crimson Rebellion', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--love-hurts' ),
-	array( 'slug' => 'collection-signature', 'name' => __( 'Signature', 'skyyrose-flagship' ), 'desc' => __( 'The Foundation', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--signature' ),
-	array( 'slug' => 'collection-kids-capsule', 'name' => __( 'Kids Capsule', 'skyyrose-flagship' ), 'desc' => __( 'Next Generation', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--kids-capsule' ),
-);
+/* Cross-collection navigation — sourced from inc/collections-config.php */
+$cross_nav = skyyrose_get_cross_nav( 'black-rose' );
 
 $svg_kses = skyyrose_svg_kses();
 

@@ -29,6 +29,7 @@ DevSkyy is a production-grade AI orchestration platform designed for luxury fash
 - **3D Asset Pipeline**: Tripo3D integration for 3D model generation with retry logic
 - **Virtual Try-On**: FASHN API integration for fashion visualization
 - **Immersive 3D Experiences**: Five collection-specific Three.js environments
+- **AI Image Pipeline (Nano Banana 2)**: Product imagery via Gemini `gemini-2.5-flash-image` / `gemini-3-pro-image-preview` — see [docs/NANO_BANANA.md](docs/NANO_BANANA.md)
 
 ## 3D Collection Experiences
 
