@@ -69,6 +69,7 @@ def cmd_generate(args):
     from nano_banana.catalog import (
         PRODUCTS_DIR,
         find_back_source,
+        get_material_spec,
         load_catalog,
         load_products,
     )
@@ -126,6 +127,10 @@ def cmd_generate(args):
                     view_src = back
 
             prompt = get_prompt(product, view)
+            # Inject material specs from product-references.json if available.
+            material_spec = get_material_spec(sku)
+            if material_spec:
+                prompt += f"\n\nMATERIAL SPEC: {material_spec}"
             image_bytes = None
 
             for attempt in range(1, MAX_RETRIES + 1):

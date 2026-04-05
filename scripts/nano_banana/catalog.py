@@ -6,6 +6,7 @@ Single source of truth for all product metadata. No hardcoded catalogs.
 from __future__ import annotations
 
 import csv
+import json
 import logging
 from pathlib import Path
 
@@ -17,6 +18,7 @@ PRODUCTS_DIR = (
 )
 SOURCE_DIR = PROJECT_ROOT / "skyyrose" / "assets" / "images" / "source-products"
 CATALOG_CSV = PROJECT_ROOT / "data" / "product-catalog.csv"
+REFERENCES_JSON = PROJECT_ROOT / "data" / "product-references.json"
 
 
 def load_catalog() -> dict[str, dict]:
@@ -139,3 +141,43 @@ def load_products(
         })
 
     return products
+
+
+def load_references() -> dict[str, dict]:
+    """Load product reference manifest (techflats + material specs).
+
+    Returns the 'products' dict keyed by SKU. Each entry has:
+        name, collection, reference_image, reference_back,
+        fabric, texture, material_notes
+
+    Fabric/texture/notes fields may be None until populated by user.
+    Returns empty dict if manifest file doesn't exist.
+    """
+    if not REFERENCES_JSON.exists():
+        return {}
+    data = json.loads(REFERENCES_JSON.read_text())
+    return data.get("products", {})
+
+
+def get_material_spec(sku: str) -> str:
+    """Get fabric + texture description for a SKU to inject into prompts.
+
+    Returns a formatted string like:
+        'Material: satin. Texture: embossed logo with raised relief. Notes: ...'
+
+    Returns empty string if no specs populated for this SKU.
+    """
+    refs = load_references()
+    entry = refs.get(sku, {})
+    if not entry:
+        return ""
+
+    parts = []
+    if entry.get("fabric"):
+        parts.append(f"Material: {entry['fabric']}")
+    if entry.get("texture"):
+        parts.append(f"Texture: {entry['texture']}")
+    if entry.get("material_notes"):
+        parts.append(f"Notes: {entry['material_notes']}")
+
+    return " | ".join(parts) if parts else ""
