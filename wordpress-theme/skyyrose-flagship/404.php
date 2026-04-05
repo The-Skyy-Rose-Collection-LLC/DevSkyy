@@ -118,7 +118,7 @@ if ( class_exists( 'WooCommerce' ) ) {
 // Static fallback when WooCommerce is inactive or no products found.
 // Source from centralized catalog so prices stay in sync.
 if ( empty( $skyyrose_trending_products ) ) {
-	// Only published pre-order products — br-001, br-007, and lh-004 are drafts.
+	// Only published products — br-001, br-007, and lh-004 are drafts.
 	$skyyrose_404_skus = array( 'br-006', 'lh-002', 'sg-001', 'sg-008' );
 	foreach ( $skyyrose_404_skus as $skyyrose_404_sku ) {
 		$skyyrose_404_product = skyyrose_get_product( $skyyrose_404_sku );

@@ -9,7 +9,7 @@ from pathlib import Path
 log = logging.getLogger(__name__)
 
 ENHANCE_TARGET_PX = 1536
-MIN_FILE_SIZE_KB = 50
+MIN_FILE_SIZE_KB = 15
 
 
 def enhance_source_image(image_path: Path):
