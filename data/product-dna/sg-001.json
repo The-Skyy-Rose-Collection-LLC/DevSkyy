@@ -1,75 +1,276 @@
 {
   "sku": "sg-001",
   "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/the-bay-set-source.jpeg",
-  "analyzed_at": "2026-04-05T07:27:28.666153",
+  "analyzed_at": "2026-04-05T09:18:18.110157",
   "models_used": [
     "gpt",
     "claude",
     "gemini"
   ],
   "consensus": {
-    "base_color": "#F5F5F0",
-    "base_color_name": "off-white",
+    "base_color": "#FFFFFF",
+    "base_color_name": "white",
     "construction": [
-      "crewneck neckline",
-      "short sleeves",
-      "elastic drawstring waistband on shorts",
-      "mesh shorts fabric"
+      "elastic waistband"
     ],
     "design_elements": [
-      "blue roses with gray/silver leaves graphic on t-shirt",
-      "blue cloud motif beneath roses on t-shirt",
-      "cityscape bridge scene sublimated on shorts",
-      "blue-to-green gradient color scheme on shorts",
-      "coordinating blue rose motif across both pieces"
+      "graphic print",
+      "urban landscape"
     ],
-    "fabric": "lightweight cotton t-shirt; polyester mesh shorts with all-over sublimation print",
-    "garment_type": "two-piece set: crewneck t-shirt and mesh shorts",
+    "fabric": "lightweight synthetic",
+    "garment_type": "t-shirt and shorts",
     "logos": [
-      {
-        "type": "SR-monogram",
-        "position": "front neckline center",
-        "size_inches": 1.5,
-        "material": "printed"
-      },
       {
         "type": "rose-only",
         "position": "front chest center of t-shirt",
-        "size_inches": 6,
-        "material": "printed"
-      },
-      {
-        "type": "rose-only",
-        "position": "front right leg of shorts",
-        "size_inches": 3,
+        "size_inches": 5,
         "material": "sublimated"
       }
     ],
     "numbers": [],
-    "overall_description": "A SkyyRose two-piece matching set consisting of an off-white crewneck t-shirt featuring a blue rose and cloud graphic, paired with mesh athletic shorts displaying a sublimated cityscape bridge scene in blue and green tones with a coordinating blue rose element.",
+    "overall_description": "The set includes a white t-shirt with a sublimated rose design and a pair of graphic print shorts featuring an urban landscape in blue and green tones.",
     "patches": [],
     "secondary_colors": [
-      "#1E3FA0",
-      "#2A8BC7",
-      "#3B6B3A",
+      "#0000FF",
+      "#006400",
       "#000000"
     ],
-    "stitching_details": "standard seam construction visible on shorts with contrast stitching",
+    "stitching_details": "standard seam construction visible on shorts, contrast stitching visible on shorts in lighter thread",
     "text_content": []
   },
-  "disagreements": [],
+  "disagreements": [
+    {
+      "field": "construction",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "elastic waistband"
+        ],
+        "claude": [
+          "crewneck neckline",
+          "short sleeves",
+          "drawstring waistband on shorts",
+          "mesh shorts fabric"
+        ],
+        "gemini": [
+          "Crewneck",
+          "Short sleeves",
+          "Elastic waistband",
+          "Drawstring closure"
+        ]
+      }
+    },
+    {
+      "field": "design_elements",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "graphic print",
+          "urban landscape"
+        ],
+        "claude": [
+          "blue roses graphic with cloud motif on t-shirt",
+          "cityscape and bridge all-over sublimated print on shorts",
+          "blue rose integrated into shorts cityscape design",
+          "coordinated blue color theme between t-shirt graphic and shorts print"
+        ],
+        "gemini": [
+          "Sublimated graphics",
+          "All-over cityscape print on shorts",
+          "Gradient color from blue to green on shorts",
+          "Rose graphic with thorny stem"
+        ]
+      }
+    },
+    {
+      "field": "fabric",
+      "no_consensus": true,
+      "values": {
+        "gpt": "lightweight synthetic",
+        "claude": "t-shirt: lightweight cotton jersey; shorts: mesh athletic fabric with all-over sublimation print",
+        "gemini": "Performance fabric t-shirt and athletic mesh shorts"
+      }
+    },
+    {
+      "field": "garment_type",
+      "agreed_models": [
+        "gpt",
+        "gemini"
+      ],
+      "disagreeing_models": [
+        "claude"
+      ],
+      "values": {
+        "gpt": "t-shirt and shorts",
+        "claude": "two-piece set: crewneck t-shirt and mesh shorts",
+        "gemini": "T-shirt and shorts set"
+      }
+    },
+    {
+      "field": "logos",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          {
+            "type": "rose-only",
+            "position": "front chest center of t-shirt",
+            "size_inches": 5,
+            "material": "sublimated"
+          }
+        ],
+        "claude": [
+          {
+            "type": "SR-monogram",
+            "position": "front chest center top",
+            "size_inches": 1,
+            "material": "printed"
+          },
+          {
+            "type": "rose-only",
+            "position": "front chest center (t-shirt)",
+            "size_inches": 5,
+            "material": "printed"
+          },
+          {
+            "type": "rose-only",
+            "position": "front right leg area (shorts)",
+            "size_inches": 2,
+            "material": "sublimated"
+          }
+        ],
+        "gemini": [
+          {
+            "type": "rose-only",
+            "position": "front chest center",
+            "size_inches": 7,
+            "material": "printed"
+          },
+          {
+            "type": "SR-monogram",
+            "position": "neckline center, inside tag area",
+            "size_inches": 1,
+            "material": "printed"
+          },
+          {
+            "type": "rose-only",
+            "position": "right leg, near hem",
+            "size_inches": 2.5,
+            "material": "printed"
+          }
+        ]
+      }
+    },
+    {
+      "field": "overall_description",
+      "no_consensus": true,
+      "values": {
+        "gpt": "The set includes a white t-shirt with a sublimated rose design and a pair of graphic print shorts featuring an urban landscape in blue and green tones.",
+        "claude": "A SkyyRose two-piece matching set consisting of a white crewneck t-shirt featuring a blue roses-and-clouds graphic with the SR monogram, paired with mesh athletic shorts displaying a full sublimated cityscape/bridge print in blue and green tones with a coordinating blue rose motif.",
+        "gemini": "A matching set featuring a white t-shirt with a blue rose graphic and athletic shorts with a sublimated blue-to-green cityscape print. The rose motif is present on both the shirt and shorts for a coordinated look."
+      }
+    },
+    {
+      "field": "secondary_colors",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "#0000FF",
+          "#006400",
+          "#000000"
+        ],
+        "claude": [
+          "#1E3FA0",
+          "#2A7BBF",
+          "#3B6B4A",
+          "#000000"
+        ],
+        "gemini": [
+          "#1A5FB4",
+          "#2E8B57",
+          "#000000",
+          "#C0C0C0"
+        ]
+      }
+    },
+    {
+      "field": "stitching_details",
+      "no_consensus": true,
+      "values": {
+        "gpt": "",
+        "claude": "standard seam construction visible on shorts, contrast stitching visible on shorts in lighter thread",
+        "gemini": ""
+      }
+    },
+    {
+      "field": "text_content",
+      "agreed_models": [
+        "gemini",
+        "claude"
+      ],
+      "disagreeing_models": [
+        "gpt"
+      ],
+      "values": {
+        "gpt": [
+          {
+            "text": "SkyyRose",
+            "location": "bottom right on shorts",
+            "color": "#FFFFFF",
+            "style": "script font"
+          }
+        ],
+        "claude": [],
+        "gemini": []
+      }
+    }
+  ],
   "raw_results": {
     "gpt": {
-      "_error": "Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************9MQA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}"
+      "garment_type": "t-shirt and shorts",
+      "base_color": "#FFFFFF",
+      "base_color_name": "white",
+      "secondary_colors": [
+        "#0000FF",
+        "#006400",
+        "#000000"
+      ],
+      "text_content": [
+        {
+          "text": "SkyyRose",
+          "location": "bottom right on shorts",
+          "color": "#FFFFFF",
+          "style": "script font"
+        }
+      ],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "rose-only",
+          "position": "front chest center of t-shirt",
+          "size_inches": 5,
+          "material": "sublimated"
+        }
+      ],
+      "construction": [
+        "elastic waistband"
+      ],
+      "fabric": "lightweight synthetic",
+      "patches": [],
+      "design_elements": [
+        "graphic print",
+        "urban landscape"
+      ],
+      "stitching_details": "",
+      "overall_description": "The set includes a white t-shirt with a sublimated rose design and a pair of graphic print shorts featuring an urban landscape in blue and green tones."
     },
     "claude": {
       "garment_type": "two-piece set: crewneck t-shirt and mesh shorts",
-      "base_color": "#F5F5F0",
-      "base_color_name": "off-white",
+      "base_color": "#FFFFFF",
+      "base_color_name": "white",
       "secondary_colors": [
         "#1E3FA0",
-        "#2A8BC7",
-        "#3B6B3A",
+        "#2A7BBF",
+        "#3B6B4A",
         "#000000"
       ],
       "text_content": [],
@@ -77,43 +278,88 @@
       "logos": [
         {
           "type": "SR-monogram",
-          "position": "front neckline center",
-          "size_inches": 1.5,
+          "position": "front chest center top",
+          "size_inches": 1,
           "material": "printed"
         },
         {
           "type": "rose-only",
-          "position": "front chest center of t-shirt",
-          "size_inches": 6,
+          "position": "front chest center (t-shirt)",
+          "size_inches": 5,
           "material": "printed"
         },
         {
           "type": "rose-only",
-          "position": "front right leg of shorts",
-          "size_inches": 3,
+          "position": "front right leg area (shorts)",
+          "size_inches": 2,
           "material": "sublimated"
         }
       ],
       "construction": [
         "crewneck neckline",
         "short sleeves",
-        "elastic drawstring waistband on shorts",
+        "drawstring waistband on shorts",
         "mesh shorts fabric"
       ],
-      "fabric": "lightweight cotton t-shirt; polyester mesh shorts with all-over sublimation print",
+      "fabric": "t-shirt: lightweight cotton jersey; shorts: mesh athletic fabric with all-over sublimation print",
       "patches": [],
       "design_elements": [
-        "blue roses with gray/silver leaves graphic on t-shirt",
-        "blue cloud motif beneath roses on t-shirt",
-        "cityscape bridge scene sublimated on shorts",
-        "blue-to-green gradient color scheme on shorts",
-        "coordinating blue rose motif across both pieces"
+        "blue roses graphic with cloud motif on t-shirt",
+        "cityscape and bridge all-over sublimated print on shorts",
+        "blue rose integrated into shorts cityscape design",
+        "coordinated blue color theme between t-shirt graphic and shorts print"
       ],
-      "stitching_details": "standard seam construction visible on shorts with contrast stitching",
-      "overall_description": "A SkyyRose two-piece matching set consisting of an off-white crewneck t-shirt featuring a blue rose and cloud graphic, paired with mesh athletic shorts displaying a sublimated cityscape bridge scene in blue and green tones with a coordinating blue rose element."
+      "stitching_details": "standard seam construction visible on shorts, contrast stitching visible on shorts in lighter thread",
+      "overall_description": "A SkyyRose two-piece matching set consisting of a white crewneck t-shirt featuring a blue roses-and-clouds graphic with the SR monogram, paired with mesh athletic shorts displaying a full sublimated cityscape/bridge print in blue and green tones with a coordinating blue rose motif."
     },
     "gemini": {
-      "_error": "the JSON object must be str, bytes or bytearray, not NoneType"
+      "garment_type": "T-shirt and shorts set",
+      "base_color": "#FFFFFF",
+      "base_color_name": "White",
+      "secondary_colors": [
+        "#1A5FB4",
+        "#2E8B57",
+        "#000000",
+        "#C0C0C0"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "rose-only",
+          "position": "front chest center",
+          "size_inches": 7,
+          "material": "printed"
+        },
+        {
+          "type": "SR-monogram",
+          "position": "neckline center, inside tag area",
+          "size_inches": 1,
+          "material": "printed"
+        },
+        {
+          "type": "rose-only",
+          "position": "right leg, near hem",
+          "size_inches": 2.5,
+          "material": "printed"
+        }
+      ],
+      "construction": [
+        "Crewneck",
+        "Short sleeves",
+        "Elastic waistband",
+        "Drawstring closure"
+      ],
+      "fabric": "Performance fabric t-shirt and athletic mesh shorts",
+      "patches": [],
+      "design_elements": [
+        "Sublimated graphics",
+        "All-over cityscape print on shorts",
+        "Gradient color from blue to green on shorts",
+        "Rose graphic with thorny stem"
+      ],
+      "stitching_details": "",
+      "overall_description": "A matching set featuring a white t-shirt with a blue rose graphic and athletic shorts with a sublimated blue-to-green cityscape print. The rose motif is present on both the shirt and shorts for a coordinated look."
     }
   }
 }

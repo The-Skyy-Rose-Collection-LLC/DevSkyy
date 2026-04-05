@@ -1,69 +1,182 @@
 {
   "sku": "sg-006",
   "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/mint-lavender-hoodie-source.jpg",
-  "analyzed_at": "2026-04-05T07:28:02.699151",
+  "analyzed_at": "2026-04-05T09:18:51.871603",
   "models_used": [
     "gpt",
     "claude",
     "gemini"
   ],
   "consensus": {
-    "base_color": "#88D498",
-    "base_color_name": "mint green",
+    "base_color": "#7FB77E",
+    "base_color_name": "pastel green",
     "construction": [
       "attached hood",
-      "drawstring hood",
-      "kangaroo pocket",
       "ribbed cuffs",
-      "ribbed hem"
+      "kangaroo pocket"
     ],
     "design_elements": [
-      "large purple crystal/floral cluster graphic emerging from white and grey clouds on front center"
+      "floral graphic"
     ],
     "fabric": "heavyweight cotton fleece",
-    "garment_type": "pullover hoodie",
+    "garment_type": "hooded sweatshirt",
     "logos": [
       {
-        "type": "floral-crystal-cloud-graphic",
+        "type": "floral-crystal-graphic",
         "position": "front center chest",
-        "size_inches": 7,
+        "size_inches": 6,
         "material": "printed"
       }
     ],
     "numbers": [],
-    "overall_description": "A mint green pullover hoodie featuring a prominent front graphic of purple crystalline flowers or tulips rising from a bed of white and grey clouds, with standard hoodie construction including a kangaroo pocket and drawstring hood.",
+    "overall_description": "A pastel green hooded sweatshirt featuring a floral design on the front with shades of purple, white, and green.",
     "patches": [],
     "secondary_colors": [
-      "#C5A3D1",
-      "#7B6B8A",
+      "#9E7BB5",
+      "#2E5E4E",
       "#FFFFFF",
-      "#5C5C5C"
+      "#000000"
     ],
-    "stitching_details": "",
+    "stitching_details": null,
     "text_content": []
   },
-  "disagreements": [],
+  "disagreements": [
+    {
+      "field": "base_color",
+      "no_consensus": true,
+      "values": {
+        "gpt": "#7FB77E",
+        "claude": "#7EC88B"
+      }
+    },
+    {
+      "field": "base_color_name",
+      "no_consensus": true,
+      "values": {
+        "gpt": "pastel green",
+        "claude": "mint green"
+      }
+    },
+    {
+      "field": "design_elements",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "floral graphic"
+        ],
+        "claude": [
+          "large purple crystal/floral cluster graphic with cloud base on front center"
+        ]
+      }
+    },
+    {
+      "field": "fabric",
+      "no_consensus": true,
+      "values": {
+        "gpt": "",
+        "claude": "heavyweight cotton fleece"
+      }
+    },
+    {
+      "field": "garment_type",
+      "no_consensus": true,
+      "values": {
+        "gpt": "hooded sweatshirt",
+        "claude": "pullover hoodie"
+      }
+    },
+    {
+      "field": "logos",
+      "no_consensus": true,
+      "values": {
+        "gpt": [],
+        "claude": [
+          {
+            "type": "floral-crystal-graphic",
+            "position": "front center chest",
+            "size_inches": 6,
+            "material": "printed"
+          }
+        ]
+      }
+    },
+    {
+      "field": "overall_description",
+      "no_consensus": true,
+      "values": {
+        "gpt": "A pastel green hooded sweatshirt featuring a floral design on the front with shades of purple, white, and green.",
+        "claude": "A mint green pullover hoodie featuring a prominent purple crystal or floral cluster design emerging from stylized clouds on the front center, with a kangaroo pocket, drawstring hood, and ribbed cuffs and hem."
+      }
+    },
+    {
+      "field": "secondary_colors",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "#9E7BB5",
+          "#2E5E4E",
+          "#FFFFFF",
+          "#000000"
+        ],
+        "claude": [
+          "#B08DC4",
+          "#C0C0C0",
+          "#FFFFFF"
+        ]
+      }
+    },
+    {
+      "field": "stitching_details",
+      "no_consensus": true,
+      "values": {
+        "gpt": "",
+        "claude": ""
+      }
+    }
+  ],
   "raw_results": {
     "gpt": {
-      "_error": "Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************9MQA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}"
+      "garment_type": "hooded sweatshirt",
+      "base_color": "#7FB77E",
+      "base_color_name": "pastel green",
+      "secondary_colors": [
+        "#9E7BB5",
+        "#2E5E4E",
+        "#FFFFFF",
+        "#000000"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [],
+      "construction": [
+        "attached hood",
+        "ribbed cuffs",
+        "kangaroo pocket"
+      ],
+      "fabric": "",
+      "patches": [],
+      "design_elements": [
+        "floral graphic"
+      ],
+      "stitching_details": "",
+      "overall_description": "A pastel green hooded sweatshirt featuring a floral design on the front with shades of purple, white, and green."
     },
     "claude": {
       "garment_type": "pullover hoodie",
-      "base_color": "#88D498",
+      "base_color": "#7EC88B",
       "base_color_name": "mint green",
       "secondary_colors": [
-        "#C5A3D1",
-        "#7B6B8A",
-        "#FFFFFF",
-        "#5C5C5C"
+        "#B08DC4",
+        "#C0C0C0",
+        "#FFFFFF"
       ],
       "text_content": [],
       "numbers": [],
       "logos": [
         {
-          "type": "floral-crystal-cloud-graphic",
+          "type": "floral-crystal-graphic",
           "position": "front center chest",
-          "size_inches": 7,
+          "size_inches": 6,
           "material": "printed"
         }
       ],
@@ -77,13 +190,13 @@
       "fabric": "heavyweight cotton fleece",
       "patches": [],
       "design_elements": [
-        "large purple crystal/floral cluster graphic emerging from white and grey clouds on front center"
+        "large purple crystal/floral cluster graphic with cloud base on front center"
       ],
       "stitching_details": "",
-      "overall_description": "A mint green pullover hoodie featuring a prominent front graphic of purple crystalline flowers or tulips rising from a bed of white and grey clouds, with standard hoodie construction including a kangaroo pocket and drawstring hood."
+      "overall_description": "A mint green pullover hoodie featuring a prominent purple crystal or floral cluster design emerging from stylized clouds on the front center, with a kangaroo pocket, drawstring hood, and ribbed cuffs and hem."
     },
     "gemini": {
-      "_error": "Expecting property name enclosed in double quotes: line 14 column 3 (char 246)"
+      "_error": "Unterminated string starting at: line 29 column 5 (char 563)"
     }
   }
 }

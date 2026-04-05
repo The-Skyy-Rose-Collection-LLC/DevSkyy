@@ -1,30 +1,24 @@
 {
   "sku": "lh-004",
   "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-varsity-jacket-varsity-source.jpg",
-  "analyzed_at": "2026-04-05T07:26:54.423662",
+  "analyzed_at": "2026-04-05T09:17:51.520877",
   "models_used": [
     "gpt",
     "claude",
     "gemini"
   ],
   "consensus": {
-    "base_color": "#E8A8A8",
-    "base_color_name": "dusty pink",
+    "base_color": "#F4CECD",
+    "base_color_name": "light pink",
     "construction": [
-      "attached hood",
-      "elasticated cuffs",
-      "raglan or set-in sleeves",
-      "contrast side panels",
-      "pullover or full-zip front"
+      "ribbed cuffs",
+      "attached hood"
     ],
     "design_elements": [
-      "dark green contrast panels on hood sides",
-      "dark green contrast panels on side body",
-      "dark green stripe running down hood center",
-      "red heart graphic wrapped in gold thorns/barbed wire on back"
+      "contrasting panels"
     ],
-    "fabric": "lightweight nylon or polyester shell, windbreaker-style",
-    "garment_type": "hooded windbreaker jacket",
+    "fabric": "Nylon or polyester shell",
+    "garment_type": "Hooded windbreaker jacket",
     "logos": [
       {
         "type": "love-hurts-wordmark",
@@ -40,44 +34,281 @@
       },
       {
         "type": "small-patch",
-        "position": "bottom right cuff area",
+        "position": "right cuff area",
         "size_inches": 1,
         "material": "woven patch"
       }
     ],
     "numbers": [],
-    "overall_description": "A dusty pink hooded windbreaker jacket with dark green contrast panels on the hood and sides, featuring a large 'Love Hurts' cursive script graphic on the back accompanied by a red heart wrapped in gold thorns. Part of the SkyyRose brand's streetwear-inspired collection.",
+    "overall_description": "A light pink hooded jacket with black panels and 'Love Hurts' text on the back in red cursive font.",
     "patches": [
-      "small green/yellow woven label near right cuff"
+      "small green/yellow rectangular patch on lower right cuff"
     ],
     "secondary_colors": [
-      "#2F3F3A",
-      "#E63946",
-      "#C4975A"
+      "#000000",
+      "#FF0000"
     ],
-    "stitching_details": "standard seam construction visible at shoulders and sleeve joins",
+    "stitching_details": "standard seam construction visible at shoulders and side panels",
     "text_content": [
       {
         "text": "Love Hurts",
         "location": "back center",
-        "color": "#E63946",
-        "style": "cursive script with decorative flourishes"
+        "color": "#FF0000",
+        "style": "cursive"
       }
     ]
   },
-  "disagreements": [],
+  "disagreements": [
+    {
+      "field": "base_color",
+      "no_consensus": true,
+      "values": {
+        "gpt": "#F4CECD",
+        "claude": "#E8A8A8",
+        "gemini": "#E3A8A7"
+      }
+    },
+    {
+      "field": "base_color_name",
+      "no_consensus": true,
+      "values": {
+        "gpt": "light pink",
+        "claude": "dusty pink",
+        "gemini": "dusty rose"
+      }
+    },
+    {
+      "field": "construction",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "ribbed cuffs",
+          "attached hood"
+        ],
+        "claude": [
+          "attached hood",
+          "elastic cuffs",
+          "elastic hem",
+          "raglan or set-in sleeves",
+          "contrast side panels"
+        ],
+        "gemini": [
+          "attached hood",
+          "elasticated cuffs",
+          "elasticated waistband",
+          "zip-up front"
+        ]
+      }
+    },
+    {
+      "field": "design_elements",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "contrasting panels"
+        ],
+        "claude": [
+          "dark green contrast panels on sides and hood stripe",
+          "red heart graphic wrapped in gold thorns/barbed wire",
+          "cursive Love Hurts script"
+        ],
+        "gemini": [
+          "Contrasting dark green panels on the hood and outer sleeves."
+        ]
+      }
+    },
+    {
+      "field": "fabric",
+      "agreed_models": [
+        "gemini",
+        "claude"
+      ],
+      "disagreeing_models": [
+        "gpt"
+      ],
+      "values": {
+        "gpt": "",
+        "claude": "lightweight nylon or polyester shell, windbreaker-style material",
+        "gemini": "Nylon or polyester shell"
+      }
+    },
+    {
+      "field": "garment_type",
+      "agreed_models": [
+        "gemini",
+        "claude"
+      ],
+      "disagreeing_models": [
+        "gpt"
+      ],
+      "values": {
+        "gpt": "hooded jacket",
+        "claude": "hooded windbreaker jacket",
+        "gemini": "Hooded windbreaker jacket"
+      }
+    },
+    {
+      "field": "logos",
+      "no_consensus": true,
+      "values": {
+        "gpt": [],
+        "claude": [
+          {
+            "type": "love-hurts-wordmark",
+            "position": "back center",
+            "size_inches": 10,
+            "material": "printed"
+          },
+          {
+            "type": "heart-with-thorns-graphic",
+            "position": "back center above text",
+            "size_inches": 6,
+            "material": "printed"
+          },
+          {
+            "type": "small-patch",
+            "position": "right cuff area",
+            "size_inches": 1,
+            "material": "woven patch"
+          }
+        ],
+        "gemini": [
+          {
+            "type": "love-hurts-graphic",
+            "position": "back center",
+            "size_inches": 10,
+            "material": "embroidered"
+          },
+          {
+            "type": "branded cuff patch",
+            "position": "left sleeve cuff",
+            "size_inches": 1,
+            "material": "woven patch"
+          }
+        ]
+      }
+    },
+    {
+      "field": "overall_description",
+      "no_consensus": true,
+      "values": {
+        "gpt": "A light pink hooded jacket with black panels and 'Love Hurts' text on the back in red cursive font.",
+        "claude": "A dusty pink hooded windbreaker jacket with dark green contrast panels along the sides and hood, featuring a large 'Love Hurts' cursive graphic on the back with a red heart wrapped in gold thorns. The jacket has elastic cuffs and hem with a relaxed fit.",
+        "gemini": "A dusty rose hooded windbreaker jacket with dark green contrast panels on the hood and sleeves. The back features a large embroidered graphic of a red heart wrapped in thorns over the text 'Love Hurts'."
+      }
+    },
+    {
+      "field": "patches",
+      "no_consensus": true,
+      "values": {
+        "gpt": [],
+        "claude": [
+          "small green/yellow rectangular patch on lower right cuff"
+        ],
+        "gemini": [
+          "Small green and gold woven patch on the left sleeve cuff."
+        ]
+      }
+    },
+    {
+      "field": "secondary_colors",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "#000000",
+          "#FF0000"
+        ],
+        "claude": [
+          "#2D3D35",
+          "#E63946",
+          "#C4A84D"
+        ],
+        "gemini": [
+          "#1A2622",
+          "#C92429",
+          "#C9AD79"
+        ]
+      }
+    },
+    {
+      "field": "stitching_details",
+      "no_consensus": true,
+      "values": {
+        "gpt": "",
+        "claude": "standard seam construction visible at shoulders and side panels",
+        "gemini": "The back graphic is heavily embroidered."
+      }
+    },
+    {
+      "field": "text_content",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          {
+            "text": "Love Hurts",
+            "location": "back center",
+            "color": "#FF0000",
+            "style": "cursive"
+          }
+        ],
+        "claude": [
+          {
+            "text": "Love Hurts",
+            "location": "back center",
+            "color": "#E63946",
+            "style": "cursive script with decorative flourishes"
+          }
+        ],
+        "gemini": [
+          {
+            "text": "Love Hurts",
+            "location": "back center",
+            "color": "#C92429",
+            "style": "embroidered script font"
+          }
+        ]
+      }
+    }
+  ],
   "raw_results": {
     "gpt": {
-      "_error": "Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************9MQA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}"
+      "garment_type": "hooded jacket",
+      "base_color": "#F4CECD",
+      "base_color_name": "light pink",
+      "secondary_colors": [
+        "#000000",
+        "#FF0000"
+      ],
+      "text_content": [
+        {
+          "text": "Love Hurts",
+          "location": "back center",
+          "color": "#FF0000",
+          "style": "cursive"
+        }
+      ],
+      "numbers": [],
+      "logos": [],
+      "construction": [
+        "ribbed cuffs",
+        "attached hood"
+      ],
+      "fabric": "",
+      "patches": [],
+      "design_elements": [
+        "contrasting panels"
+      ],
+      "stitching_details": "",
+      "overall_description": "A light pink hooded jacket with black panels and 'Love Hurts' text on the back in red cursive font."
     },
     "claude": {
       "garment_type": "hooded windbreaker jacket",
       "base_color": "#E8A8A8",
       "base_color_name": "dusty pink",
       "secondary_colors": [
-        "#2F3F3A",
+        "#2D3D35",
         "#E63946",
-        "#C4975A"
+        "#C4A84D"
       ],
       "text_content": [
         {
@@ -103,7 +334,58 @@
         },
         {
           "type": "small-patch",
-          "position": "bottom right cuff area",
+          "position": "right cuff area",
+          "size_inches": 1,
+          "material": "woven patch"
+        }
+      ],
+      "construction": [
+        "attached hood",
+        "elastic cuffs",
+        "elastic hem",
+        "raglan or set-in sleeves",
+        "contrast side panels"
+      ],
+      "fabric": "lightweight nylon or polyester shell, windbreaker-style material",
+      "patches": [
+        "small green/yellow rectangular patch on lower right cuff"
+      ],
+      "design_elements": [
+        "dark green contrast panels on sides and hood stripe",
+        "red heart graphic wrapped in gold thorns/barbed wire",
+        "cursive Love Hurts script"
+      ],
+      "stitching_details": "standard seam construction visible at shoulders and side panels",
+      "overall_description": "A dusty pink hooded windbreaker jacket with dark green contrast panels along the sides and hood, featuring a large 'Love Hurts' cursive graphic on the back with a red heart wrapped in gold thorns. The jacket has elastic cuffs and hem with a relaxed fit."
+    },
+    "gemini": {
+      "garment_type": "Hooded windbreaker jacket",
+      "base_color": "#E3A8A7",
+      "base_color_name": "dusty rose",
+      "secondary_colors": [
+        "#1A2622",
+        "#C92429",
+        "#C9AD79"
+      ],
+      "text_content": [
+        {
+          "text": "Love Hurts",
+          "location": "back center",
+          "color": "#C92429",
+          "style": "embroidered script font"
+        }
+      ],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "love-hurts-graphic",
+          "position": "back center",
+          "size_inches": 10,
+          "material": "embroidered"
+        },
+        {
+          "type": "branded cuff patch",
+          "position": "left sleeve cuff",
           "size_inches": 1,
           "material": "woven patch"
         }
@@ -111,25 +393,18 @@
       "construction": [
         "attached hood",
         "elasticated cuffs",
-        "raglan or set-in sleeves",
-        "contrast side panels",
-        "pullover or full-zip front"
+        "elasticated waistband",
+        "zip-up front"
       ],
-      "fabric": "lightweight nylon or polyester shell, windbreaker-style",
+      "fabric": "Nylon or polyester shell",
       "patches": [
-        "small green/yellow woven label near right cuff"
+        "Small green and gold woven patch on the left sleeve cuff."
       ],
       "design_elements": [
-        "dark green contrast panels on hood sides",
-        "dark green contrast panels on side body",
-        "dark green stripe running down hood center",
-        "red heart graphic wrapped in gold thorns/barbed wire on back"
+        "Contrasting dark green panels on the hood and outer sleeves."
       ],
-      "stitching_details": "standard seam construction visible at shoulders and sleeve joins",
-      "overall_description": "A dusty pink hooded windbreaker jacket with dark green contrast panels on the hood and sides, featuring a large 'Love Hurts' cursive script graphic on the back accompanied by a red heart wrapped in gold thorns. Part of the SkyyRose brand's streetwear-inspired collection."
-    },
-    "gemini": {
-      "_error": "Unterminated string starting at: line 39 column 5 (char 899)"
+      "stitching_details": "The back graphic is heavily embroidered.",
+      "overall_description": "A dusty rose hooded windbreaker jacket with dark green contrast panels on the hood and sleeves. The back features a large embroidered graphic of a red heart wrapped in thorns over the text 'Love Hurts'."
     }
   }
 }

@@ -1,7 +1,7 @@
 {
   "sku": "lh-002",
   "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-joggers-techflat.jpeg",
-  "analyzed_at": "2026-04-05T07:26:22.263318",
+  "analyzed_at": "2026-04-05T09:17:20.626279",
   "models_used": [
     "gpt",
     "claude",
@@ -11,35 +11,28 @@
     "base_color": "#FFFFFF",
     "base_color_name": "white",
     "construction": [
-      "elastic waistband",
-      "drawstring closure",
-      "black drawstring cords",
-      "side pockets",
-      "ankle zippers",
-      "tapered leg"
+      "welt pockets"
     ],
     "design_elements": [
-      "black side stripe panels running full length from waist to ankle on both legs"
+      "black side stripes"
     ],
-    "fabric": "smooth polyester or satin-finish tricot track pant fabric",
+    "fabric": "polyester tricot or satin-finish athletic fabric",
     "garment_type": "track pants",
     "logos": [
       {
-        "type": "love-hurts-heart-with-roses",
-        "position": "front left thigh",
+        "type": "rose-only",
+        "position": "right thigh",
         "size_inches": 4,
         "material": "embroidered"
       }
     ],
     "numbers": [],
-    "overall_description": "White track pants with black side stripe panels and black drawstring, featuring an embroidered Sacred Heart with roses logo on the front left thigh. Ankle zippers provide a tailored, modern silhouette.",
+    "overall_description": "White track pants with black side stripes and an embroidered rose design on the right thigh. Features welt pockets and a zippered ankle opening.",
     "patches": [],
     "secondary_colors": [
-      "#1A1A1A",
-      "#C41E2A",
-      "#4A0E0E"
+      "#000000"
     ],
-    "stitching_details": "clean seams along stripe panels, zipper closures at ankle hems",
+    "stitching_details": "clean seam construction along side stripe panels",
     "text_content": []
   },
   "disagreements": [
@@ -47,18 +40,22 @@
       "field": "construction",
       "no_consensus": true,
       "values": {
+        "gpt": [
+          "welt pockets"
+        ],
         "claude": [
           "elastic waistband",
           "drawstring closure",
           "black drawstring cords",
-          "side pockets",
+          "side seam pockets",
           "ankle zippers",
           "tapered leg"
         ],
         "gemini": [
-          "drawstring waist",
-          "slash pockets",
-          "zippered ankle cuffs"
+          "Elastic waistband",
+          "Drawstring closure",
+          "Side pockets",
+          "Zippers at ankles"
         ]
       }
     },
@@ -66,11 +63,15 @@
       "field": "design_elements",
       "no_consensus": true,
       "values": {
+        "gpt": [
+          "black side stripes"
+        ],
         "claude": [
-          "black side stripe panels running full length from waist to ankle on both legs"
+          "black side stripe running full length from waistband to ankle on both legs",
+          "contrast black panel along outer seam"
         ],
         "gemini": [
-          "vertical side stripes"
+          "Contrasting side stripes"
         ]
       }
     },
@@ -78,14 +79,23 @@
       "field": "fabric",
       "no_consensus": true,
       "values": {
-        "claude": "smooth polyester or satin-finish tricot track pant fabric",
-        "gemini": "satin-like fabric"
+        "gpt": "",
+        "claude": "polyester tricot or satin-finish athletic fabric",
+        "gemini": "Satin-like synthetic fabric"
       }
     },
     {
       "field": "logos",
       "no_consensus": true,
       "values": {
+        "gpt": [
+          {
+            "type": "rose-only",
+            "position": "right thigh",
+            "size_inches": 4,
+            "material": "embroidered"
+          }
+        ],
         "claude": [
           {
             "type": "love-hurts-heart-with-roses",
@@ -96,9 +106,9 @@
         ],
         "gemini": [
           {
-            "type": "heart with roses",
+            "type": "love-hurts",
             "position": "front left thigh",
-            "size_inches": 3,
+            "size_inches": 4,
             "material": "embroidered"
           }
         ]
@@ -108,23 +118,27 @@
       "field": "overall_description",
       "no_consensus": true,
       "values": {
-        "claude": "White track pants with black side stripe panels and black drawstring, featuring an embroidered Sacred Heart with roses logo on the front left thigh. Ankle zippers provide a tailored, modern silhouette.",
-        "gemini": "White track pants with a satin-like finish, featuring black vertical stripes down the sides. They have a drawstring waist, zippered ankle cuffs, and an embroidered graphic of a heart and roses on the front left thigh."
+        "gpt": "White track pants with black side stripes and an embroidered rose design on the right thigh. Features welt pockets and a zippered ankle opening.",
+        "claude": "White track pants with black side stripes featuring the SkyyRose 'Love Hurts' sacred heart and roses embroidered logo on the front left thigh, with black drawstring waistband and zippered ankle openings.",
+        "gemini": "White track pants with a satin-like finish, featuring black stripes down the outer legs and zippered ankles. An embroidered graphic of a heart pierced by thorny roses is located on the upper left thigh."
       }
     },
     {
       "field": "secondary_colors",
       "no_consensus": true,
       "values": {
+        "gpt": [
+          "#000000"
+        ],
         "claude": [
           "#1A1A1A",
-          "#C41E2A",
-          "#4A0E0E"
+          "#C0272D",
+          "#5B8C3E"
         ],
         "gemini": [
           "#000000",
-          "#C81D25",
-          "#2E5733"
+          "#D8313A",
+          "#59795F"
         ]
       }
     },
@@ -132,23 +146,49 @@
       "field": "stitching_details",
       "no_consensus": true,
       "values": {
-        "claude": "clean seams along stripe panels, zipper closures at ankle hems",
+        "gpt": "",
+        "claude": "clean seam construction along side stripe panels",
         "gemini": ""
       }
     }
   ],
   "raw_results": {
     "gpt": {
-      "_error": "Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************9MQA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}"
+      "garment_type": "track pants",
+      "base_color": "#FFFFFF",
+      "base_color_name": "white",
+      "secondary_colors": [
+        "#000000"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "rose-only",
+          "position": "right thigh",
+          "size_inches": 4,
+          "material": "embroidered"
+        }
+      ],
+      "construction": [
+        "welt pockets"
+      ],
+      "fabric": "",
+      "patches": [],
+      "design_elements": [
+        "black side stripes"
+      ],
+      "stitching_details": "",
+      "overall_description": "White track pants with black side stripes and an embroidered rose design on the right thigh. Features welt pockets and a zippered ankle opening."
     },
     "claude": {
-      "garment_type": "track pants with ankle zippers",
+      "garment_type": "track pants with side stripe and ankle zippers",
       "base_color": "#FFFFFF",
       "base_color_name": "white",
       "secondary_colors": [
         "#1A1A1A",
-        "#C41E2A",
-        "#4A0E0E"
+        "#C0272D",
+        "#5B8C3E"
       ],
       "text_content": [],
       "numbers": [],
@@ -164,49 +204,51 @@
         "elastic waistband",
         "drawstring closure",
         "black drawstring cords",
-        "side pockets",
+        "side seam pockets",
         "ankle zippers",
         "tapered leg"
       ],
-      "fabric": "smooth polyester or satin-finish tricot track pant fabric",
+      "fabric": "polyester tricot or satin-finish athletic fabric",
       "patches": [],
       "design_elements": [
-        "black side stripe panels running full length from waist to ankle on both legs"
+        "black side stripe running full length from waistband to ankle on both legs",
+        "contrast black panel along outer seam"
       ],
-      "stitching_details": "clean seams along stripe panels, zipper closures at ankle hems",
-      "overall_description": "White track pants with black side stripe panels and black drawstring, featuring an embroidered Sacred Heart with roses logo on the front left thigh. Ankle zippers provide a tailored, modern silhouette."
+      "stitching_details": "clean seam construction along side stripe panels",
+      "overall_description": "White track pants with black side stripes featuring the SkyyRose 'Love Hurts' sacred heart and roses embroidered logo on the front left thigh, with black drawstring waistband and zippered ankle openings."
     },
     "gemini": {
-      "garment_type": "track pants",
+      "garment_type": "Track pants",
       "base_color": "#FFFFFF",
-      "base_color_name": "white",
+      "base_color_name": "White",
       "secondary_colors": [
         "#000000",
-        "#C81D25",
-        "#2E5733"
+        "#D8313A",
+        "#59795F"
       ],
       "text_content": [],
       "numbers": [],
       "logos": [
         {
-          "type": "heart with roses",
+          "type": "love-hurts",
           "position": "front left thigh",
-          "size_inches": 3,
+          "size_inches": 4,
           "material": "embroidered"
         }
       ],
       "construction": [
-        "drawstring waist",
-        "slash pockets",
-        "zippered ankle cuffs"
+        "Elastic waistband",
+        "Drawstring closure",
+        "Side pockets",
+        "Zippers at ankles"
       ],
-      "fabric": "satin-like fabric",
+      "fabric": "Satin-like synthetic fabric",
       "patches": [],
       "design_elements": [
-        "vertical side stripes"
+        "Contrasting side stripes"
       ],
       "stitching_details": "",
-      "overall_description": "White track pants with a satin-like finish, featuring black vertical stripes down the sides. They have a drawstring waist, zippered ankle cuffs, and an embroidered graphic of a heart and roses on the front left thigh."
+      "overall_description": "White track pants with a satin-like finish, featuring black stripes down the outer legs and zippered ankles. An embroidered graphic of a heart pierced by thorny roses is located on the upper left thigh."
     }
   }
 }

@@ -1,14 +1,14 @@
 {
   "sku": "sg-002",
   "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/stay-golden-tee-techflat-v4.jpg",
-  "analyzed_at": "2026-04-05T07:27:44.841032",
+  "analyzed_at": "2026-04-05T09:18:33.778876",
   "models_used": [
     "gpt",
     "claude",
     "gemini"
   ],
   "consensus": {
-    "base_color": "#F0EDE8",
+    "base_color": "#FFFFFF",
     "base_color_name": "white",
     "construction": [
       "crewneck ribbed collar",
@@ -16,13 +16,10 @@
       "standard hem"
     ],
     "design_elements": [
-      "large multicolor rose illustration growing from dark clouds",
-      "stained-glass style rose with deep purple, orange, pink, and grey tones",
-      "grey stem with thorns and leaves emerging from black cloud base",
-      "radiating geometric lines behind flower"
+      "graphic print"
     ],
     "fabric": "lightweight cotton jersey",
-    "garment_type": "crewneck short-sleeve t-shirt",
+    "garment_type": "crewneck t-shirt",
     "logos": [
       {
         "type": "SR-monogram",
@@ -38,25 +35,29 @@
       }
     ],
     "numbers": [],
-    "overall_description": "An off-white crewneck t-shirt featuring a large artistic rose graphic in a stained-glass style with dark purple, orange, pink, and grey tones, growing from a stylized black cloud base. A small SR monogram logo is printed at the upper center neckline.",
-    "patches": [
-      "A large, embroidered patch on the front chest depicting two colorful roses with thorny stems growing from a dark cloud."
-    ],
+    "overall_description": "A white crewneck t-shirt featuring a colorful graphic print of roses and abstract elements on the front.",
+    "patches": [],
     "secondary_colors": [
-      "#1A1A1A",
-      "#3B2D6B",
-      "#C75B2A",
-      "#808080",
-      "#D4456A"
+      "#000000",
+      "#FF5733",
+      "#C70039",
+      "#900C3F"
     ],
-    "stitching_details": "standard seam construction, ribbed neckband appears slightly contrasting in cream/white",
+    "stitching_details": "Standard stitching visible on the collar and sleeve hem.",
     "text_content": []
   },
   "disagreements": [
     {
       "field": "base_color",
-      "no_consensus": true,
+      "agreed_models": [
+        "gpt",
+        "gemini"
+      ],
+      "disagreeing_models": [
+        "claude"
+      ],
       "values": {
+        "gpt": "#FFFFFF",
         "claude": "#F0EDE8",
         "gemini": "#FFFFFF"
       }
@@ -65,14 +66,15 @@
       "field": "construction",
       "no_consensus": true,
       "values": {
+        "gpt": [],
         "claude": [
           "crewneck ribbed collar",
           "short sleeves",
           "standard hem"
         ],
         "gemini": [
-          "crew neck collar",
-          "short set-in sleeves"
+          "crew neck",
+          "short sleeves"
         ]
       }
     },
@@ -80,14 +82,17 @@
       "field": "design_elements",
       "no_consensus": true,
       "values": {
+        "gpt": [
+          "graphic print"
+        ],
         "claude": [
-          "large multicolor rose illustration growing from dark clouds",
-          "stained-glass style rose with deep purple, orange, pink, and grey tones",
-          "grey stem with thorns and leaves emerging from black cloud base",
-          "radiating geometric lines behind flower"
+          "large illustrative rose bouquet graphic emerging from dark clouds",
+          "multicolor stained-glass style fill within roses using deep purple, orange, pink, and gray tones",
+          "gray stems and leaves with line-art detailing",
+          "dark cloud base beneath the floral arrangement"
         ],
         "gemini": [
-          "The rose petals within the central graphic have a multi-colored, abstract pattern."
+          "The rose petals feature a colorful, abstract pattern."
         ]
       }
     },
@@ -95,22 +100,16 @@
       "field": "fabric",
       "no_consensus": true,
       "values": {
+        "gpt": "",
         "claude": "lightweight cotton jersey",
-        "gemini": "lightweight knit fabric"
-      }
-    },
-    {
-      "field": "garment_type",
-      "no_consensus": true,
-      "values": {
-        "claude": "crewneck short-sleeve t-shirt",
-        "gemini": "crewneck t-shirt"
+        "gemini": "cotton-blend jersey"
       }
     },
     {
       "field": "logos",
       "no_consensus": true,
       "values": {
+        "gpt": [],
         "claude": [
           {
             "type": "SR-monogram",
@@ -127,8 +126,8 @@
         ],
         "gemini": [
           {
-            "type": "SR-monogram",
-            "position": "back neck",
+            "type": "monogram",
+            "position": "upper back center",
             "size_inches": 1,
             "material": "printed"
           }
@@ -139,17 +138,25 @@
       "field": "overall_description",
       "no_consensus": true,
       "values": {
-        "claude": "An off-white crewneck t-shirt featuring a large artistic rose graphic in a stained-glass style with dark purple, orange, pink, and grey tones, growing from a stylized black cloud base. A small SR monogram logo is printed at the upper center neckline.",
-        "gemini": "A white crewneck t-shirt featuring a large, colorful embroidered patch of two stylized roses on the chest and a small monogram logo on the back of the neck."
+        "gpt": "A white crewneck t-shirt featuring a colorful graphic print of roses and abstract elements on the front.",
+        "claude": "An off-white crewneck t-shirt featuring a large center-front graphic of stylized roses rising from dark clouds, rendered in a stained-glass-inspired multicolor palette of deep purple, orange, pink, and gray, with the SkyyRose SR monogram printed at the neckline.",
+        "gemini": "A white short-sleeve crewneck t-shirt with a large, intricate embroidered patch on the chest. The patch shows two colorful roses growing out of a cloud, and a small monogram logo is printed on the upper back."
       }
     },
     {
       "field": "patches",
-      "no_consensus": true,
+      "agreed_models": [
+        "gpt",
+        "claude"
+      ],
+      "disagreeing_models": [
+        "gemini"
+      ],
       "values": {
+        "gpt": [],
         "claude": [],
         "gemini": [
-          "A large, embroidered patch on the front chest depicting two colorful roses with thorny stems growing from a dark cloud."
+          "Large embroidered patch on the center chest depicting two multi-colored roses with thorny stems, emerging from a dark cloud."
         ]
       }
     },
@@ -157,19 +164,25 @@
       "field": "secondary_colors",
       "no_consensus": true,
       "values": {
+        "gpt": [
+          "#000000",
+          "#FF5733",
+          "#C70039",
+          "#900C3F"
+        ],
         "claude": [
           "#1A1A1A",
-          "#3B2D6B",
-          "#C75B2A",
+          "#3B2D7A",
+          "#C45C2E",
           "#808080",
-          "#D4456A"
+          "#D4436A"
         ],
         "gemini": [
           "#000000",
-          "#808080",
-          "#5D3FD3",
-          "#4169E1",
-          "#FFD700"
+          "#8A468A",
+          "#F18A3C",
+          "#3C829D",
+          "#C0C0C0"
         ]
       }
     },
@@ -177,25 +190,45 @@
       "field": "stitching_details",
       "no_consensus": true,
       "values": {
-        "claude": "standard seam construction, ribbed neckband appears slightly contrasting in cream/white",
-        "gemini": "Standard t-shirt seam construction."
+        "gpt": "",
+        "claude": "",
+        "gemini": "Standard stitching visible on the collar and sleeve hem."
       }
     }
   ],
   "raw_results": {
     "gpt": {
-      "_error": "Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************9MQA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}"
+      "garment_type": "crewneck t-shirt",
+      "base_color": "#FFFFFF",
+      "base_color_name": "white",
+      "secondary_colors": [
+        "#000000",
+        "#FF5733",
+        "#C70039",
+        "#900C3F"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [],
+      "construction": [],
+      "fabric": "",
+      "patches": [],
+      "design_elements": [
+        "graphic print"
+      ],
+      "stitching_details": "",
+      "overall_description": "A white crewneck t-shirt featuring a colorful graphic print of roses and abstract elements on the front."
     },
     "claude": {
-      "garment_type": "crewneck short-sleeve t-shirt",
+      "garment_type": "crewneck t-shirt",
       "base_color": "#F0EDE8",
       "base_color_name": "off-white / cream",
       "secondary_colors": [
         "#1A1A1A",
-        "#3B2D6B",
-        "#C75B2A",
+        "#3B2D7A",
+        "#C45C2E",
         "#808080",
-        "#D4456A"
+        "#D4436A"
       ],
       "text_content": [],
       "numbers": [],
@@ -221,13 +254,13 @@
       "fabric": "lightweight cotton jersey",
       "patches": [],
       "design_elements": [
-        "large multicolor rose illustration growing from dark clouds",
-        "stained-glass style rose with deep purple, orange, pink, and grey tones",
-        "grey stem with thorns and leaves emerging from black cloud base",
-        "radiating geometric lines behind flower"
+        "large illustrative rose bouquet graphic emerging from dark clouds",
+        "multicolor stained-glass style fill within roses using deep purple, orange, pink, and gray tones",
+        "gray stems and leaves with line-art detailing",
+        "dark cloud base beneath the floral arrangement"
       ],
-      "stitching_details": "standard seam construction, ribbed neckband appears slightly contrasting in cream/white",
-      "overall_description": "An off-white crewneck t-shirt featuring a large artistic rose graphic in a stained-glass style with dark purple, orange, pink, and grey tones, growing from a stylized black cloud base. A small SR monogram logo is printed at the upper center neckline."
+      "stitching_details": "",
+      "overall_description": "An off-white crewneck t-shirt featuring a large center-front graphic of stylized roses rising from dark clouds, rendered in a stained-glass-inspired multicolor palette of deep purple, orange, pink, and gray, with the SkyyRose SR monogram printed at the neckline."
     },
     "gemini": {
       "garment_type": "crewneck t-shirt",
@@ -235,34 +268,34 @@
       "base_color_name": "white",
       "secondary_colors": [
         "#000000",
-        "#808080",
-        "#5D3FD3",
-        "#4169E1",
-        "#FFD700"
+        "#8A468A",
+        "#F18A3C",
+        "#3C829D",
+        "#C0C0C0"
       ],
       "text_content": [],
       "numbers": [],
       "logos": [
         {
-          "type": "SR-monogram",
-          "position": "back neck",
+          "type": "monogram",
+          "position": "upper back center",
           "size_inches": 1,
           "material": "printed"
         }
       ],
       "construction": [
-        "crew neck collar",
-        "short set-in sleeves"
+        "crew neck",
+        "short sleeves"
       ],
-      "fabric": "lightweight knit fabric",
+      "fabric": "cotton-blend jersey",
       "patches": [
-        "A large, embroidered patch on the front chest depicting two colorful roses with thorny stems growing from a dark cloud."
+        "Large embroidered patch on the center chest depicting two multi-colored roses with thorny stems, emerging from a dark cloud."
       ],
       "design_elements": [
-        "The rose petals within the central graphic have a multi-colored, abstract pattern."
+        "The rose petals feature a colorful, abstract pattern."
       ],
-      "stitching_details": "Standard t-shirt seam construction.",
-      "overall_description": "A white crewneck t-shirt featuring a large, colorful embroidered patch of two stylized roses on the chest and a small monogram logo on the back of the neck."
+      "stitching_details": "Standard stitching visible on the collar and sleeve hem.",
+      "overall_description": "A white short-sleeve crewneck t-shirt with a large, intricate embroidered patch on the chest. The patch shows two colorful roses growing out of a cloud, and a small monogram logo is printed on the upper back."
     }
   }
 }

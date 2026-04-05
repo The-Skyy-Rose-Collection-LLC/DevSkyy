@@ -1,46 +1,40 @@
 {
   "sku": "br-004",
   "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-hoodie-signature-edition-hoodie-ltd-source.jpg",
-  "analyzed_at": "2026-04-05T07:23:40.814613",
+  "analyzed_at": "2026-04-05T09:15:02.320166",
   "models_used": [
     "gpt",
     "claude",
     "gemini"
   ],
   "consensus": {
-    "base_color": "#1A2A1A",
-    "base_color_name": "dark forest green",
+    "base_color": "#343434",
+    "base_color_name": "charcoal gray",
     "construction": [
       "attached hood",
-      "drawstrings",
       "ribbed cuffs",
-      "kangaroo pocket",
-      "ribbed hem"
+      "front kangaroo pocket"
     ],
     "design_elements": [
-      "large rose graphic emerging from clouds on front center"
+      "large rose emerging from clouds graphic on front center"
     ],
-    "fabric": "heavyweight fleece cotton blend",
-    "garment_type": "pullover hoodie",
+    "fabric": "heavyweight cotton fleece",
+    "garment_type": "hooded sweatshirt",
     "logos": [
       {
-        "type": "rose-with-clouds",
-        "position": "front center chest",
-        "size_inches": 7,
-        "material": "printed"
+        "type": "rose-only",
+        "position": "front chest center",
+        "size_inches": 8,
+        "material": "embroidered"
       }
     ],
     "numbers": [],
-    "overall_description": "A dark forest green pullover hoodie featuring a large white and black illustrated graphic of a rose blooming from clouds on the front center. The hoodie has a classic silhouette with kangaroo pocket, drawstring hood, and ribbed cuffs and hem.",
-    "patches": [
-      "small woven tag on the left sleeve cuff"
-    ],
+    "overall_description": "A charcoal gray hooded sweatshirt featuring an embroidered rose design on the front. It has ribbed cuffs and a front kangaroo pocket.",
+    "patches": [],
     "secondary_colors": [
-      "#FFFFFF",
-      "#C0C0C0",
-      "#000000"
+      "#FFFFFF"
     ],
-    "stitching_details": "Visible double-needle stitching on the pocket, cuffs, and shoulder seams.",
+    "stitching_details": "standard seam construction visible at shoulders and sleeves",
     "text_content": []
   },
   "disagreements": [
@@ -48,54 +42,80 @@
       "field": "base_color",
       "no_consensus": true,
       "values": {
-        "claude": "#1A2A1A",
-        "gemini": "#333634"
+        "gpt": "#343434",
+        "claude": "#1A2A1A"
       }
     },
     {
       "field": "base_color_name",
       "no_consensus": true,
       "values": {
-        "claude": "dark forest green",
-        "gemini": "dark charcoal gray"
+        "gpt": "charcoal gray",
+        "claude": "dark forest green"
+      }
+    },
+    {
+      "field": "construction",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "attached hood",
+          "ribbed cuffs",
+          "front kangaroo pocket"
+        ],
+        "claude": [
+          "attached hood",
+          "drawstring hood",
+          "kangaroo pocket",
+          "ribbed cuffs",
+          "ribbed hem"
+        ]
       }
     },
     {
       "field": "design_elements",
       "no_consensus": true,
       "values": {
+        "gpt": [],
         "claude": [
-          "large rose graphic emerging from clouds on front center"
-        ],
-        "gemini": []
+          "large rose emerging from clouds graphic on front center"
+        ]
       }
     },
     {
       "field": "fabric",
       "no_consensus": true,
       "values": {
-        "claude": "heavyweight fleece cotton blend",
-        "gemini": "heavyweight cotton fleece"
+        "gpt": "",
+        "claude": "heavyweight cotton fleece"
+      }
+    },
+    {
+      "field": "garment_type",
+      "no_consensus": true,
+      "values": {
+        "gpt": "hooded sweatshirt",
+        "claude": "pullover hoodie"
       }
     },
     {
       "field": "logos",
       "no_consensus": true,
       "values": {
+        "gpt": [
+          {
+            "type": "rose-only",
+            "position": "front chest center",
+            "size_inches": 8,
+            "material": "embroidered"
+          }
+        ],
         "claude": [
           {
             "type": "rose-with-clouds",
             "position": "front center chest",
             "size_inches": 7,
             "material": "printed"
-          }
-        ],
-        "gemini": [
-          {
-            "type": "rose-cloud graphic",
-            "position": "front chest center",
-            "size_inches": 8,
-            "material": "embroidered"
           }
         ]
       }
@@ -104,33 +124,21 @@
       "field": "overall_description",
       "no_consensus": true,
       "values": {
-        "claude": "A dark forest green pullover hoodie featuring a large white and black illustrated graphic of a rose blooming from clouds on the front center. The hoodie has a classic silhouette with kangaroo pocket, drawstring hood, and ribbed cuffs and hem.",
-        "gemini": "A dark charcoal gray pullover hoodie featuring a large, embroidered graphic of two roses emerging from a cloud on the chest. The hoodie has a classic construction with a kangaroo pocket, ribbed cuffs and hem, and an attached hood with drawstrings."
-      }
-    },
-    {
-      "field": "patches",
-      "no_consensus": true,
-      "values": {
-        "claude": [],
-        "gemini": [
-          "small woven tag on the left sleeve cuff"
-        ]
+        "gpt": "A charcoal gray hooded sweatshirt featuring an embroidered rose design on the front. It has ribbed cuffs and a front kangaroo pocket.",
+        "claude": "A dark forest green pullover hoodie featuring a prominent white and black graphic of a rose blooming from clouds on the front center. The hoodie has classic construction with a kangaroo pocket, drawstring hood, and ribbed cuffs and hem."
       }
     },
     {
       "field": "secondary_colors",
       "no_consensus": true,
       "values": {
+        "gpt": [
+          "#FFFFFF"
+        ],
         "claude": [
           "#FFFFFF",
           "#C0C0C0",
           "#000000"
-        ],
-        "gemini": [
-          "#EAEAEA",
-          "#BCC4C8",
-          "#212121"
         ]
       }
     },
@@ -138,14 +146,39 @@
       "field": "stitching_details",
       "no_consensus": true,
       "values": {
-        "claude": "",
-        "gemini": "Visible double-needle stitching on the pocket, cuffs, and shoulder seams."
+        "gpt": "",
+        "claude": "standard seam construction visible at shoulders and sleeves"
       }
     }
   ],
   "raw_results": {
     "gpt": {
-      "_error": "Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************9MQA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}"
+      "garment_type": "hooded sweatshirt",
+      "base_color": "#343434",
+      "base_color_name": "charcoal gray",
+      "secondary_colors": [
+        "#FFFFFF"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "rose-only",
+          "position": "front chest center",
+          "size_inches": 8,
+          "material": "embroidered"
+        }
+      ],
+      "construction": [
+        "attached hood",
+        "ribbed cuffs",
+        "front kangaroo pocket"
+      ],
+      "fabric": "",
+      "patches": [],
+      "design_elements": [],
+      "stitching_details": "",
+      "overall_description": "A charcoal gray hooded sweatshirt featuring an embroidered rose design on the front. It has ribbed cuffs and a front kangaroo pocket."
     },
     "claude": {
       "garment_type": "pullover hoodie",
@@ -173,47 +206,16 @@
         "ribbed cuffs",
         "ribbed hem"
       ],
-      "fabric": "heavyweight fleece cotton blend",
+      "fabric": "heavyweight cotton fleece",
       "patches": [],
       "design_elements": [
-        "large rose graphic emerging from clouds on front center"
+        "large rose emerging from clouds graphic on front center"
       ],
-      "stitching_details": "",
-      "overall_description": "A dark forest green pullover hoodie featuring a large white and black illustrated graphic of a rose blooming from clouds on the front center. The hoodie has a classic silhouette with kangaroo pocket, drawstring hood, and ribbed cuffs and hem."
+      "stitching_details": "standard seam construction visible at shoulders and sleeves",
+      "overall_description": "A dark forest green pullover hoodie featuring a prominent white and black graphic of a rose blooming from clouds on the front center. The hoodie has classic construction with a kangaroo pocket, drawstring hood, and ribbed cuffs and hem."
     },
     "gemini": {
-      "garment_type": "pullover hoodie",
-      "base_color": "#333634",
-      "base_color_name": "dark charcoal gray",
-      "secondary_colors": [
-        "#EAEAEA",
-        "#BCC4C8",
-        "#212121"
-      ],
-      "text_content": [],
-      "numbers": [],
-      "logos": [
-        {
-          "type": "rose-cloud graphic",
-          "position": "front chest center",
-          "size_inches": 8,
-          "material": "embroidered"
-        }
-      ],
-      "construction": [
-        "attached hood",
-        "drawstrings",
-        "ribbed cuffs",
-        "kangaroo pocket",
-        "ribbed hem"
-      ],
-      "fabric": "heavyweight cotton fleece",
-      "patches": [
-        "small woven tag on the left sleeve cuff"
-      ],
-      "design_elements": [],
-      "stitching_details": "Visible double-needle stitching on the pocket, cuffs, and shoulder seams.",
-      "overall_description": "A dark charcoal gray pullover hoodie featuring a large, embroidered graphic of two roses emerging from a cloud on the chest. The hoodie has a classic construction with a kangaroo pocket, ribbed cuffs and hem, and an attached hood with drawstrings."
+      "_error": "Expecting property name enclosed in double quotes: line 14 column 1 (char 243)"
     }
   }
 }
