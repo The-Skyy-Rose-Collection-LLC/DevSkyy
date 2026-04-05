@@ -1,41 +1,40 @@
 {
   "sku": "lh-003",
   "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-basketball-shorts-source.jpg",
-  "analyzed_at": "2026-04-05T09:17:34.432221",
+  "analyzed_at": "2026-04-05T09:27:22.494355",
   "models_used": [
     "gpt",
     "claude",
     "gemini"
   ],
   "consensus": {
-    "base_color": "#E9A9A2",
-    "base_color_name": "light pink",
+    "base_color": "#F4A5A6",
+    "base_color_name": "salmon pink",
     "construction": [
-      "elasticated waistband",
-      "drawstring closure"
+      "drawstring waistband"
     ],
     "design_elements": [
       "black diagonal panel"
     ],
-    "fabric": "nylon shell",
-    "garment_type": "athletic shorts",
+    "fabric": "lightweight nylon shell",
+    "garment_type": "drawstring athletic shorts",
     "logos": [
       {
-        "type": "rose-bouquet",
-        "position": "front lower right leg",
+        "type": "rose-only",
+        "position": "front left leg",
         "size_inches": 3,
-        "material": "embroidered patch"
+        "material": "embroidered"
       }
     ],
     "numbers": [],
-    "overall_description": "These light pink drawstring shorts feature a contrasting black diagonal panel and a rose patch on the left leg. The shorts have a practical drawstring waistband.",
+    "overall_description": "The shorts feature a light pink color with a black diagonal panel, decorated with an embroidered rose design on the front left leg. They include a drawstring waistband for adjustment.",
     "patches": [
-      "rose patch on the left leg"
+      "Embroidered rose bouquet patch with red roses and light blue/white base on lower right leg"
     ],
     "secondary_colors": [
-      "#1A1A1A"
+      "#2E2E2E"
     ],
-    "stitching_details": "visible stitching along panel edges",
+    "stitching_details": "shirred stitching on waistband",
     "text_content": []
   },
   "disagreements": [
@@ -43,42 +42,42 @@
       "field": "base_color",
       "no_consensus": true,
       "values": {
-        "gpt": "#E9A9A2",
+        "gpt": "#F4A5A6",
         "claude": "#F0A0A0",
-        "gemini": "#D5A4A7"
+        "gemini": "#EFA6A6"
       }
     },
     {
       "field": "base_color_name",
-      "no_consensus": true,
-      "values": {
-        "gpt": "light pink",
-        "claude": "salmon pink",
-        "gemini": "dusty rose"
-      }
-    },
-    {
-      "field": "construction",
       "agreed_models": [
-        "gemini",
-        "claude"
+        "claude",
+        "gemini"
       ],
       "disagreeing_models": [
         "gpt"
       ],
       "values": {
+        "gpt": "light pink",
+        "claude": "salmon pink",
+        "gemini": "salmon pink"
+      }
+    },
+    {
+      "field": "construction",
+      "no_consensus": true,
+      "values": {
         "gpt": [
           "drawstring waistband"
         ],
         "claude": [
-          "elasticated waistband",
+          "elastic waistband",
           "drawstring closure",
-          "black drawstring cords",
-          "contrast panel across front"
+          "black drawcord",
+          "contrast color-block panel across front"
         ],
         "gemini": [
-          "elasticated waistband",
-          "drawstring closure"
+          "elastic waistband",
+          "long black drawstrings"
         ]
       }
     },
@@ -90,33 +89,28 @@
           "black diagonal panel"
         ],
         "claude": [
-          "horizontal dark green/black color-block panel across upper thighs spanning both legs"
+          "horizontal dark green/black color-block panel spanning across both legs at mid-thigh level",
+          "two-tone colorblocking"
         ],
         "gemini": [
-          "color-blocked panel"
+          "wide diagonal black color-blocked panel across the front"
         ]
       }
     },
     {
       "field": "fabric",
-      "agreed_models": [
-        "gemini",
-        "claude"
-      ],
-      "disagreeing_models": [
-        "gpt"
-      ],
+      "no_consensus": true,
       "values": {
         "gpt": "",
         "claude": "lightweight nylon shell",
-        "gemini": "nylon shell"
+        "gemini": "nylon or polyester shell"
       }
     },
     {
       "field": "garment_type",
       "agreed_models": [
-        "gemini",
-        "claude"
+        "claude",
+        "gemini"
       ],
       "disagreeing_models": [
         "gpt"
@@ -131,20 +125,27 @@
       "field": "logos",
       "no_consensus": true,
       "values": {
-        "gpt": [],
+        "gpt": [
+          {
+            "type": "rose-only",
+            "position": "front left leg",
+            "size_inches": 3,
+            "material": "embroidered"
+          }
+        ],
         "claude": [
           {
-            "type": "rose-bouquet",
-            "position": "front lower right leg",
+            "type": "rose-only",
+            "position": "front right leg lower",
             "size_inches": 3,
             "material": "embroidered patch"
           }
         ],
         "gemini": [
           {
-            "type": "rose-only",
-            "position": "front lower left leg",
-            "size_inches": 2.5,
+            "type": "rose-with-cloud",
+            "position": "lower right leg",
+            "size_inches": 3,
             "material": "embroidered"
           }
         ]
@@ -154,23 +155,21 @@
       "field": "overall_description",
       "no_consensus": true,
       "values": {
-        "gpt": "These light pink drawstring shorts feature a contrasting black diagonal panel and a rose patch on the left leg. The shorts have a practical drawstring waistband.",
-        "claude": "Salmon pink lightweight nylon athletic shorts featuring a dark green/black horizontal contrast panel across the front and an embroidered rose bouquet patch on the lower right leg, with an elastic waistband and black drawstring closure.",
-        "gemini": "A pair of dusty rose athletic-style shorts featuring a large, black, asymmetrical color-blocked panel across the upper section. The shorts have an elasticated waistband with a black drawstring and an embroidered rose patch on the lower left leg."
+        "gpt": "The shorts feature a light pink color with a black diagonal panel, decorated with an embroidered rose design on the front left leg. They include a drawstring waistband for adjustment.",
+        "claude": "Salmon pink lightweight nylon athletic shorts featuring a dark green/black horizontal panel across the front and an embroidered rose bouquet patch on the lower right leg, with a black drawstring waistband.",
+        "gemini": "Salmon pink athletic shorts featuring a wide diagonal black color-blocked panel. The shorts have an elastic waistband with long black drawstrings and an embroidered rose patch on the lower right leg."
       }
     },
     {
       "field": "patches",
       "no_consensus": true,
       "values": {
-        "gpt": [
-          "rose patch on the left leg"
-        ],
+        "gpt": [],
         "claude": [
-          "Embroidered rose bouquet patch on lower right leg featuring red roses with green leaves and light blue/white base"
+          "Embroidered rose bouquet patch with red roses and light blue/white base on lower right leg"
         ],
         "gemini": [
-          "Embroidered patch on the front lower left leg depicting a red rose with green leaves, on a light blue and white base."
+          "embroidered patch of a red rose with green leaves on a white cloud"
         ]
       }
     },
@@ -179,17 +178,17 @@
       "no_consensus": true,
       "values": {
         "gpt": [
-          "#1A1A1A"
+          "#2E2E2E"
         ],
         "claude": [
-          "#2D3A35",
+          "#2B3B35",
           "#000000"
         ],
         "gemini": [
-          "#1A1A1A",
-          "#C42E31",
-          "#2F563B",
-          "#C3D9E2"
+          "#111111",
+          "#D22B2B",
+          "#2E8B57",
+          "#FFFFFF"
         ]
       }
     },
@@ -197,103 +196,109 @@
       "field": "stitching_details",
       "no_consensus": true,
       "values": {
-        "gpt": "visible stitching along panel edges",
+        "gpt": "",
         "claude": "",
-        "gemini": "Topstitching is visible on the waistband."
+        "gemini": "shirred stitching on waistband"
       }
     }
   ],
   "raw_results": {
     "gpt": {
       "garment_type": "drawstring shorts",
-      "base_color": "#E9A9A2",
+      "base_color": "#F4A5A6",
       "base_color_name": "light pink",
       "secondary_colors": [
-        "#1A1A1A"
-      ],
-      "text_content": [],
-      "numbers": [],
-      "logos": [],
-      "construction": [
-        "drawstring waistband"
-      ],
-      "fabric": "",
-      "patches": [
-        "rose patch on the left leg"
-      ],
-      "design_elements": [
-        "black diagonal panel"
-      ],
-      "stitching_details": "visible stitching along panel edges",
-      "overall_description": "These light pink drawstring shorts feature a contrasting black diagonal panel and a rose patch on the left leg. The shorts have a practical drawstring waistband."
-    },
-    "claude": {
-      "garment_type": "drawstring athletic shorts",
-      "base_color": "#F0A0A0",
-      "base_color_name": "salmon pink",
-      "secondary_colors": [
-        "#2D3A35",
-        "#000000"
-      ],
-      "text_content": [],
-      "numbers": [],
-      "logos": [
-        {
-          "type": "rose-bouquet",
-          "position": "front lower right leg",
-          "size_inches": 3,
-          "material": "embroidered patch"
-        }
-      ],
-      "construction": [
-        "elasticated waistband",
-        "drawstring closure",
-        "black drawstring cords",
-        "contrast panel across front"
-      ],
-      "fabric": "lightweight nylon shell",
-      "patches": [
-        "Embroidered rose bouquet patch on lower right leg featuring red roses with green leaves and light blue/white base"
-      ],
-      "design_elements": [
-        "horizontal dark green/black color-block panel across upper thighs spanning both legs"
-      ],
-      "stitching_details": "",
-      "overall_description": "Salmon pink lightweight nylon athletic shorts featuring a dark green/black horizontal contrast panel across the front and an embroidered rose bouquet patch on the lower right leg, with an elastic waistband and black drawstring closure."
-    },
-    "gemini": {
-      "garment_type": "athletic shorts",
-      "base_color": "#D5A4A7",
-      "base_color_name": "dusty rose",
-      "secondary_colors": [
-        "#1A1A1A",
-        "#C42E31",
-        "#2F563B",
-        "#C3D9E2"
+        "#2E2E2E"
       ],
       "text_content": [],
       "numbers": [],
       "logos": [
         {
           "type": "rose-only",
-          "position": "front lower left leg",
-          "size_inches": 2.5,
+          "position": "front left leg",
+          "size_inches": 3,
           "material": "embroidered"
         }
       ],
       "construction": [
-        "elasticated waistband",
-        "drawstring closure"
+        "drawstring waistband"
       ],
-      "fabric": "nylon shell",
+      "fabric": "",
+      "patches": [],
+      "design_elements": [
+        "black diagonal panel"
+      ],
+      "stitching_details": "",
+      "overall_description": "The shorts feature a light pink color with a black diagonal panel, decorated with an embroidered rose design on the front left leg. They include a drawstring waistband for adjustment."
+    },
+    "claude": {
+      "garment_type": "drawstring athletic shorts",
+      "base_color": "#F0A0A0",
+      "base_color_name": "salmon pink",
+      "secondary_colors": [
+        "#2B3B35",
+        "#000000"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "rose-only",
+          "position": "front right leg lower",
+          "size_inches": 3,
+          "material": "embroidered patch"
+        }
+      ],
+      "construction": [
+        "elastic waistband",
+        "drawstring closure",
+        "black drawcord",
+        "contrast color-block panel across front"
+      ],
+      "fabric": "lightweight nylon shell",
       "patches": [
-        "Embroidered patch on the front lower left leg depicting a red rose with green leaves, on a light blue and white base."
+        "Embroidered rose bouquet patch with red roses and light blue/white base on lower right leg"
       ],
       "design_elements": [
-        "color-blocked panel"
+        "horizontal dark green/black color-block panel spanning across both legs at mid-thigh level",
+        "two-tone colorblocking"
       ],
-      "stitching_details": "Topstitching is visible on the waistband.",
-      "overall_description": "A pair of dusty rose athletic-style shorts featuring a large, black, asymmetrical color-blocked panel across the upper section. The shorts have an elasticated waistband with a black drawstring and an embroidered rose patch on the lower left leg."
+      "stitching_details": "",
+      "overall_description": "Salmon pink lightweight nylon athletic shorts featuring a dark green/black horizontal panel across the front and an embroidered rose bouquet patch on the lower right leg, with a black drawstring waistband."
+    },
+    "gemini": {
+      "garment_type": "athletic shorts",
+      "base_color": "#EFA6A6",
+      "base_color_name": "salmon pink",
+      "secondary_colors": [
+        "#111111",
+        "#D22B2B",
+        "#2E8B57",
+        "#FFFFFF"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "rose-with-cloud",
+          "position": "lower right leg",
+          "size_inches": 3,
+          "material": "embroidered"
+        }
+      ],
+      "construction": [
+        "elastic waistband",
+        "long black drawstrings"
+      ],
+      "fabric": "nylon or polyester shell",
+      "patches": [
+        "embroidered patch of a red rose with green leaves on a white cloud"
+      ],
+      "design_elements": [
+        "wide diagonal black color-blocked panel across the front"
+      ],
+      "stitching_details": "shirred stitching on waistband",
+      "overall_description": "Salmon pink athletic shorts featuring a wide diagonal black color-blocked panel. The shorts have an elastic waistband with long black drawstrings and an embroidered rose patch on the lower right leg."
     }
   }
 }

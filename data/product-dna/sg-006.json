@@ -1,19 +1,18 @@
 {
   "sku": "sg-006",
   "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/mint-lavender-hoodie-source.jpg",
-  "analyzed_at": "2026-04-05T09:18:51.871603",
+  "analyzed_at": "2026-04-05T09:28:09.911289",
   "models_used": [
     "gpt",
     "claude",
     "gemini"
   ],
   "consensus": {
-    "base_color": "#7FB77E",
-    "base_color_name": "pastel green",
+    "base_color": "#58A05E",
+    "base_color_name": "mint green",
     "construction": [
       "attached hood",
-      "ribbed cuffs",
-      "kangaroo pocket"
+      "ribbed cuffs"
     ],
     "design_elements": [
       "floral graphic"
@@ -24,20 +23,19 @@
       {
         "type": "floral-crystal-graphic",
         "position": "front center chest",
-        "size_inches": 6,
+        "size_inches": 7,
         "material": "printed"
       }
     ],
     "numbers": [],
-    "overall_description": "A pastel green hooded sweatshirt featuring a floral design on the front with shades of purple, white, and green.",
+    "overall_description": "A green hooded sweatshirt with a large purple floral graphic on the front. It features ribbed cuffs and an attached hood.",
     "patches": [],
     "secondary_colors": [
-      "#9E7BB5",
-      "#2E5E4E",
+      "#A459A3",
       "#FFFFFF",
-      "#000000"
+      "#444444"
     ],
-    "stitching_details": null,
+    "stitching_details": "standard seam construction, ribbed knit trim at cuffs and hem in slightly lighter mint tone",
     "text_content": []
   },
   "disagreements": [
@@ -45,16 +43,32 @@
       "field": "base_color",
       "no_consensus": true,
       "values": {
-        "gpt": "#7FB77E",
-        "claude": "#7EC88B"
+        "gpt": "#58A05E",
+        "claude": "#88D4A8",
+        "gemini": "#7BCC97"
       }
     },
     {
-      "field": "base_color_name",
+      "field": "construction",
       "no_consensus": true,
       "values": {
-        "gpt": "pastel green",
-        "claude": "mint green"
+        "gpt": [
+          "attached hood",
+          "ribbed cuffs"
+        ],
+        "claude": [
+          "attached hood",
+          "drawstring hood",
+          "kangaroo pocket",
+          "ribbed cuffs",
+          "ribbed hem"
+        ],
+        "gemini": [
+          "attached hood with drawstrings",
+          "ribbed cuffs",
+          "ribbed hem",
+          "front kangaroo pocket"
+        ]
       }
     },
     {
@@ -65,7 +79,11 @@
           "floral graphic"
         ],
         "claude": [
-          "large purple crystal/floral cluster graphic with cloud base on front center"
+          "large purple/lavender crystal or floral cluster graphic with white clouds at the base"
+        ],
+        "gemini": [
+          "white drawstrings",
+          "small woven tag on right wrist cuff"
         ]
       }
     },
@@ -74,15 +92,23 @@
       "no_consensus": true,
       "values": {
         "gpt": "",
-        "claude": "heavyweight cotton fleece"
+        "claude": "heavyweight cotton fleece",
+        "gemini": "cotton blend fleece"
       }
     },
     {
       "field": "garment_type",
-      "no_consensus": true,
+      "agreed_models": [
+        "gemini",
+        "gpt"
+      ],
+      "disagreeing_models": [
+        "claude"
+      ],
       "values": {
         "gpt": "hooded sweatshirt",
-        "claude": "pullover hoodie"
+        "claude": "pullover hoodie",
+        "gemini": "hooded sweatshirt"
       }
     },
     {
@@ -94,8 +120,16 @@
           {
             "type": "floral-crystal-graphic",
             "position": "front center chest",
-            "size_inches": 6,
+            "size_inches": 7,
             "material": "printed"
+          }
+        ],
+        "gemini": [
+          {
+            "type": "purple rose bundle floating on a cloud",
+            "position": "front chest center",
+            "size_inches": 6,
+            "material": "embroidered"
           }
         ]
       }
@@ -104,8 +138,9 @@
       "field": "overall_description",
       "no_consensus": true,
       "values": {
-        "gpt": "A pastel green hooded sweatshirt featuring a floral design on the front with shades of purple, white, and green.",
-        "claude": "A mint green pullover hoodie featuring a prominent purple crystal or floral cluster design emerging from stylized clouds on the front center, with a kangaroo pocket, drawstring hood, and ribbed cuffs and hem."
+        "gpt": "A green hooded sweatshirt with a large purple floral graphic on the front. It features ribbed cuffs and an attached hood.",
+        "claude": "A mint green pullover hoodie featuring a large front graphic of purple/lavender crystalline flowers or rose-shaped crystals emerging from white clouds, with a kangaroo pocket, drawstring hood, and ribbed cuffs and hem.",
+        "gemini": "A mint green hooded sweatshirt featuring a center chest embroidery of purple roses floating above a small cloud."
       }
     },
     {
@@ -113,14 +148,17 @@
       "no_consensus": true,
       "values": {
         "gpt": [
-          "#9E7BB5",
-          "#2E5E4E",
+          "#A459A3",
           "#FFFFFF",
-          "#000000"
+          "#444444"
         ],
         "claude": [
-          "#B08DC4",
-          "#C0C0C0",
+          "#C8A2D4",
+          "#FFFFFF",
+          "#6B6B6B"
+        ],
+        "gemini": [
+          "#9A4FAF",
           "#FFFFFF"
         ]
       }
@@ -130,28 +168,27 @@
       "no_consensus": true,
       "values": {
         "gpt": "",
-        "claude": ""
+        "claude": "standard seam construction, ribbed knit trim at cuffs and hem in slightly lighter mint tone",
+        "gemini": "tonal stitching"
       }
     }
   ],
   "raw_results": {
     "gpt": {
       "garment_type": "hooded sweatshirt",
-      "base_color": "#7FB77E",
-      "base_color_name": "pastel green",
+      "base_color": "#58A05E",
+      "base_color_name": "green",
       "secondary_colors": [
-        "#9E7BB5",
-        "#2E5E4E",
+        "#A459A3",
         "#FFFFFF",
-        "#000000"
+        "#444444"
       ],
       "text_content": [],
       "numbers": [],
       "logos": [],
       "construction": [
         "attached hood",
-        "ribbed cuffs",
-        "kangaroo pocket"
+        "ribbed cuffs"
       ],
       "fabric": "",
       "patches": [],
@@ -159,16 +196,16 @@
         "floral graphic"
       ],
       "stitching_details": "",
-      "overall_description": "A pastel green hooded sweatshirt featuring a floral design on the front with shades of purple, white, and green."
+      "overall_description": "A green hooded sweatshirt with a large purple floral graphic on the front. It features ribbed cuffs and an attached hood."
     },
     "claude": {
       "garment_type": "pullover hoodie",
-      "base_color": "#7EC88B",
+      "base_color": "#88D4A8",
       "base_color_name": "mint green",
       "secondary_colors": [
-        "#B08DC4",
-        "#C0C0C0",
-        "#FFFFFF"
+        "#C8A2D4",
+        "#FFFFFF",
+        "#6B6B6B"
       ],
       "text_content": [],
       "numbers": [],
@@ -176,7 +213,7 @@
         {
           "type": "floral-crystal-graphic",
           "position": "front center chest",
-          "size_inches": 6,
+          "size_inches": 7,
           "material": "printed"
         }
       ],
@@ -190,13 +227,43 @@
       "fabric": "heavyweight cotton fleece",
       "patches": [],
       "design_elements": [
-        "large purple crystal/floral cluster graphic with cloud base on front center"
+        "large purple/lavender crystal or floral cluster graphic with white clouds at the base"
       ],
-      "stitching_details": "",
-      "overall_description": "A mint green pullover hoodie featuring a prominent purple crystal or floral cluster design emerging from stylized clouds on the front center, with a kangaroo pocket, drawstring hood, and ribbed cuffs and hem."
+      "stitching_details": "standard seam construction, ribbed knit trim at cuffs and hem in slightly lighter mint tone",
+      "overall_description": "A mint green pullover hoodie featuring a large front graphic of purple/lavender crystalline flowers or rose-shaped crystals emerging from white clouds, with a kangaroo pocket, drawstring hood, and ribbed cuffs and hem."
     },
     "gemini": {
-      "_error": "Unterminated string starting at: line 29 column 5 (char 563)"
+      "garment_type": "hooded sweatshirt",
+      "base_color": "#7BCC97",
+      "base_color_name": "mint green",
+      "secondary_colors": [
+        "#9A4FAF",
+        "#FFFFFF"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "purple rose bundle floating on a cloud",
+          "position": "front chest center",
+          "size_inches": 6,
+          "material": "embroidered"
+        }
+      ],
+      "construction": [
+        "attached hood with drawstrings",
+        "ribbed cuffs",
+        "ribbed hem",
+        "front kangaroo pocket"
+      ],
+      "fabric": "cotton blend fleece",
+      "patches": [],
+      "design_elements": [
+        "white drawstrings",
+        "small woven tag on right wrist cuff"
+      ],
+      "stitching_details": "tonal stitching",
+      "overall_description": "A mint green hooded sweatshirt featuring a center chest embroidery of purple roses floating above a small cloud."
     }
   }
 }

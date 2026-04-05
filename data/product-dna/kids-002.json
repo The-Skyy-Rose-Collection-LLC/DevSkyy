@@ -1,7 +1,7 @@
 {
   "sku": "kids-002",
   "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/colorblock-purple-set-real.jpg",
-  "analyzed_at": "2026-04-05T09:17:10.516304",
+  "analyzed_at": "2026-04-05T09:26:55.619262",
   "models_used": [
     "gpt",
     "claude",
@@ -11,37 +11,36 @@
     "base_color": "#FFFFFF",
     "base_color_name": "white",
     "construction": [
-      "crewneck neckline",
+      "crewneck collar",
       "short sleeves",
+      "slim fit",
       "straight hem"
     ],
     "design_elements": [],
-    "fabric": "cotton",
+    "fabric": "lightweight cotton jersey",
     "garment_type": "crewneck t-shirt",
     "logos": [
       {
         "type": "rose-only",
         "position": "left sleeve",
         "size_inches": 1,
-        "material": "woven patch"
+        "material": "printed"
       }
     ],
     "numbers": [],
-    "overall_description": "A plain white crewneck t-shirt featuring the SkyyRose logo on the left sleeve and brand text inside the neck label.",
-    "patches": [
-      "small black and gold brand patch on right sleeve near hem"
-    ],
+    "overall_description": "A white crewneck t-shirt with a small rose logo printed on the left sleeve and brand text on an inner neck label.",
+    "patches": [],
     "secondary_colors": [
       "#1A1A1A",
       "#C8A84E"
     ],
-    "stitching_details": "visible seam lines along shoulders and sleeves, standard construction stitching",
+    "stitching_details": "clean topstitching visible on collar, sleeve hems, and shoulder seams",
     "text_content": [
       {
         "text": "SkyyRose",
-        "location": "inside neck label",
+        "location": "inner neck label",
         "color": "#FFD700",
-        "style": "cursive script font"
+        "style": "script font"
       }
     ]
   },
@@ -49,8 +48,8 @@
     {
       "field": "base_color",
       "agreed_models": [
-        "gpt",
-        "gemini"
+        "gemini",
+        "gpt"
       ],
       "disagreeing_models": [
         "claude"
@@ -67,29 +66,41 @@
       "values": {
         "gpt": [],
         "claude": [
-          "crewneck neckline",
+          "crewneck collar",
           "short sleeves",
+          "slim fit",
           "straight hem"
         ],
         "gemini": [
           "ribbed crewneck collar",
-          "set-in short sleeves"
+          "short sleeves"
+        ]
+      }
+    },
+    {
+      "field": "design_elements",
+      "agreed_models": [
+        "claude",
+        "gpt"
+      ],
+      "disagreeing_models": [
+        "gemini"
+      ],
+      "values": {
+        "gpt": [],
+        "claude": [],
+        "gemini": [
+          "small woven label on right sleeve hem"
         ]
       }
     },
     {
       "field": "fabric",
-      "agreed_models": [
-        "gemini",
-        "claude"
-      ],
-      "disagreeing_models": [
-        "gpt"
-      ],
+      "no_consensus": true,
       "values": {
         "gpt": "",
-        "claude": "lightweight to midweight cotton jersey",
-        "gemini": "cotton"
+        "claude": "lightweight cotton jersey",
+        "gemini": "lightweight knit cotton or poly-cotton blend"
       }
     },
     {
@@ -101,13 +112,13 @@
             "type": "rose-only",
             "position": "left sleeve",
             "size_inches": 1,
-            "material": "woven patch"
+            "material": "printed"
           }
         ],
         "claude": [
           {
             "type": "brand label",
-            "position": "interior neck",
+            "position": "inner neck",
             "size_inches": 1.5,
             "material": "woven label"
           },
@@ -120,10 +131,10 @@
         ],
         "gemini": [
           {
-            "type": "monogram logo",
-            "position": "right sleeve",
-            "size_inches": 1,
-            "material": "woven patch"
+            "type": "monogram",
+            "position": "right sleeve cuff",
+            "size_inches": 0.5,
+            "material": "woven label"
           }
         ]
       }
@@ -132,22 +143,26 @@
       "field": "overall_description",
       "no_consensus": true,
       "values": {
-        "gpt": "A plain white crewneck t-shirt featuring the SkyyRose logo on the left sleeve and brand text inside the neck label.",
-        "claude": "A clean white crewneck t-shirt from SkyyRose featuring a black and gold woven neck label with script branding and a small black and gold brand patch on the right sleeve. Size M, front view shown.",
-        "gemini": "A plain white crewneck t-shirt featuring a black and gold branded tag inside the collar and a small, matching logo patch on the right sleeve."
+        "gpt": "A white crewneck t-shirt with a small rose logo printed on the left sleeve and brand text on an inner neck label.",
+        "claude": "A clean white crewneck t-shirt from SkyyRose featuring a black and gold woven neck label with script branding and a small black and gold branded patch on the right sleeve. Size M, shown from the front.",
+        "gemini": "A plain white short-sleeve crewneck t-shirt with a small black and gold woven label on the right sleeve edge and a black neck label inside."
       }
     },
     {
       "field": "patches",
-      "no_consensus": true,
+      "agreed_models": [
+        "gemini",
+        "gpt"
+      ],
+      "disagreeing_models": [
+        "claude"
+      ],
       "values": {
         "gpt": [],
         "claude": [
-          "small black and gold brand patch on right sleeve near hem"
+          "small black and gold branded patch on right sleeve near hem"
         ],
-        "gemini": [
-          "Small black square woven patch with a gold monogram on the right sleeve."
-        ]
+        "gemini": []
       }
     },
     {
@@ -170,8 +185,8 @@
       "no_consensus": true,
       "values": {
         "gpt": "",
-        "claude": "visible seam lines along shoulders and sleeves, standard construction stitching",
-        "gemini": "Visible seam stitching at the collar, sleeve hems, and bottom hem."
+        "claude": "clean topstitching visible on collar, sleeve hems, and shoulder seams",
+        "gemini": "double-needle stitching on hem and cuffs"
       }
     },
     {
@@ -181,25 +196,25 @@
         "gpt": [
           {
             "text": "SkyyRose",
-            "location": "inside neck label",
+            "location": "inner neck label",
             "color": "#FFD700",
-            "style": "cursive script font"
+            "style": "script font"
           }
         ],
         "claude": [
           {
             "text": "Skyy Rose",
-            "location": "interior neck label",
+            "location": "inner neck label",
             "color": "#C8A84E",
-            "style": "script/cursive gold lettering on black label"
+            "style": "cursive/script gold lettering on black label"
           }
         ],
         "gemini": [
           {
             "text": "Skyy Rose",
-            "location": "inner neck tag",
+            "location": "inside neck label",
             "color": "#D4AF37",
-            "style": "cursive script"
+            "style": "cursive font"
           }
         ]
       }
@@ -214,9 +229,9 @@
       "text_content": [
         {
           "text": "SkyyRose",
-          "location": "inside neck label",
+          "location": "inner neck label",
           "color": "#FFD700",
-          "style": "cursive script font"
+          "style": "script font"
         }
       ],
       "numbers": [],
@@ -225,7 +240,7 @@
           "type": "rose-only",
           "position": "left sleeve",
           "size_inches": 1,
-          "material": "woven patch"
+          "material": "printed"
         }
       ],
       "construction": [],
@@ -233,7 +248,7 @@
       "patches": [],
       "design_elements": [],
       "stitching_details": "",
-      "overall_description": "A plain white crewneck t-shirt featuring the SkyyRose logo on the left sleeve and brand text inside the neck label."
+      "overall_description": "A white crewneck t-shirt with a small rose logo printed on the left sleeve and brand text on an inner neck label."
     },
     "claude": {
       "garment_type": "crewneck t-shirt",
@@ -246,16 +261,16 @@
       "text_content": [
         {
           "text": "Skyy Rose",
-          "location": "interior neck label",
+          "location": "inner neck label",
           "color": "#C8A84E",
-          "style": "script/cursive gold lettering on black label"
+          "style": "cursive/script gold lettering on black label"
         }
       ],
       "numbers": [],
       "logos": [
         {
           "type": "brand label",
-          "position": "interior neck",
+          "position": "inner neck",
           "size_inches": 1.5,
           "material": "woven label"
         },
@@ -267,17 +282,18 @@
         }
       ],
       "construction": [
-        "crewneck neckline",
+        "crewneck collar",
         "short sleeves",
+        "slim fit",
         "straight hem"
       ],
-      "fabric": "lightweight to midweight cotton jersey",
+      "fabric": "lightweight cotton jersey",
       "patches": [
-        "small black and gold brand patch on right sleeve near hem"
+        "small black and gold branded patch on right sleeve near hem"
       ],
       "design_elements": [],
-      "stitching_details": "visible seam lines along shoulders and sleeves, standard construction stitching",
-      "overall_description": "A clean white crewneck t-shirt from SkyyRose featuring a black and gold woven neck label with script branding and a small black and gold brand patch on the right sleeve. Size M, front view shown."
+      "stitching_details": "clean topstitching visible on collar, sleeve hems, and shoulder seams",
+      "overall_description": "A clean white crewneck t-shirt from SkyyRose featuring a black and gold woven neck label with script branding and a small black and gold branded patch on the right sleeve. Size M, shown from the front."
     },
     "gemini": {
       "garment_type": "crewneck t-shirt",
@@ -290,31 +306,31 @@
       "text_content": [
         {
           "text": "Skyy Rose",
-          "location": "inner neck tag",
+          "location": "inside neck label",
           "color": "#D4AF37",
-          "style": "cursive script"
+          "style": "cursive font"
         }
       ],
       "numbers": [],
       "logos": [
         {
-          "type": "monogram logo",
-          "position": "right sleeve",
-          "size_inches": 1,
-          "material": "woven patch"
+          "type": "monogram",
+          "position": "right sleeve cuff",
+          "size_inches": 0.5,
+          "material": "woven label"
         }
       ],
       "construction": [
         "ribbed crewneck collar",
-        "set-in short sleeves"
+        "short sleeves"
       ],
-      "fabric": "cotton",
-      "patches": [
-        "Small black square woven patch with a gold monogram on the right sleeve."
+      "fabric": "lightweight knit cotton or poly-cotton blend",
+      "patches": [],
+      "design_elements": [
+        "small woven label on right sleeve hem"
       ],
-      "design_elements": [],
-      "stitching_details": "Visible seam stitching at the collar, sleeve hems, and bottom hem.",
-      "overall_description": "A plain white crewneck t-shirt featuring a black and gold branded tag inside the collar and a small, matching logo patch on the right sleeve."
+      "stitching_details": "double-needle stitching on hem and cuffs",
+      "overall_description": "A plain white short-sleeve crewneck t-shirt with a small black and gold woven label on the right sleeve edge and a black neck label inside."
     }
   }
 }

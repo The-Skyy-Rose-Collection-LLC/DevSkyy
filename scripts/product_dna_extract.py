@@ -43,7 +43,7 @@ DNA_DIR.mkdir(parents=True, exist_ok=True)
 
 GPT_VISION_MODEL = "gpt-4o"                     # OpenAI flagship vision (most reliable)
 CLAUDE_VISION_MODEL = "claude-opus-4-6"          # Anthropic flagship (Opus 4.6)
-GEMINI_VISION_MODEL = "gemini-2.5-pro"           # Google Gemini Pro vision
+GEMINI_VISION_MODEL = "gemini-3-pro-preview"     # Google Gemini 3 Pro (latest flagship)
 
 # ---- Extraction schema ---------------------------------------------------
 

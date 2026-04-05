@@ -1,14 +1,14 @@
 {
   "sku": "lh-006",
   "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/the-fannie-pack-photo.jpg",
-  "analyzed_at": "2026-04-05T09:18:02.137687",
+  "analyzed_at": "2026-04-05T09:27:41.031523",
   "models_used": [
     "gpt",
     "claude",
     "gemini"
   ],
   "consensus": {
-    "base_color": "#0A0A0A",
+    "base_color": "#000000",
     "base_color_name": "black",
     "construction": [
       "top zipper closure",
@@ -17,29 +17,29 @@
     ],
     "design_elements": [],
     "fabric": "faux leather / PU leather shell with nylon webbing strap",
-    "garment_type": "fanny pack",
+    "garment_type": "fanny pack / belt bag",
     "logos": [
       {
         "type": "rose-only",
         "position": "front right",
         "size_inches": 1,
-        "material": "embroidered"
+        "material": "printed"
       }
     ],
     "numbers": [],
-    "overall_description": "A black fanny pack with the text 'FANNIE' in white on the front. It features an embroidered rose design next to the text.",
+    "overall_description": "A black fanny pack with white stylized script text 'FANNIE' on the front and a red rose graphic printed next to it.",
     "patches": [],
     "secondary_colors": [
       "#FFFFFF",
       "#C8102E"
     ],
-    "stitching_details": "Tonal stitching visible around the zipper.",
+    "stitching_details": "visible stitching on the front and top",
     "text_content": [
       {
         "text": "FANNIE",
-        "location": "front center",
+        "location": "front",
         "color": "#FFFFFF",
-        "style": "bold script"
+        "style": "stylized script"
       }
     ]
   },
@@ -48,15 +48,15 @@
       "field": "base_color",
       "agreed_models": [
         "gemini",
-        "claude"
+        "gpt"
       ],
       "disagreeing_models": [
-        "gpt"
+        "claude"
       ],
       "values": {
         "gpt": "#000000",
         "claude": "#0A0A0A",
-        "gemini": "#0A0A0A"
+        "gemini": "#000000"
       }
     },
     {
@@ -70,19 +70,10 @@
           "plastic side-release buckle"
         ],
         "gemini": [
-          "zippered front pocket",
-          "adjustable woven strap",
-          "plastic side-release buckle"
+          "zipper closure",
+          "adjustable strap",
+          "buckle closure"
         ]
-      }
-    },
-    {
-      "field": "fabric",
-      "no_consensus": true,
-      "values": {
-        "gpt": "",
-        "claude": "faux leather / PU leather shell with nylon webbing strap",
-        "gemini": "faux leather body with nylon webbing strap"
       }
     },
     {
@@ -94,7 +85,7 @@
             "type": "rose-only",
             "position": "front right",
             "size_inches": 1,
-            "material": "embroidered"
+            "material": "printed"
           }
         ],
         "claude": [
@@ -108,8 +99,8 @@
         "gemini": [
           {
             "type": "rose-only",
-            "position": "front, right of text",
-            "size_inches": null,
+            "position": "front lower right",
+            "size_inches": 1,
             "material": "embroidered"
           }
         ]
@@ -119,25 +110,9 @@
       "field": "overall_description",
       "no_consensus": true,
       "values": {
-        "gpt": "A black fanny pack with the text 'FANNIE' in white on the front. It features an embroidered rose design next to the text.",
-        "claude": "A black faux leather fanny pack featuring the word 'FANNIE' in white decorative lettering across the front with a small red rose embroidered detail integrated near the text. The bag has a top zipper pocket and an adjustable black nylon strap with a plastic buckle.",
-        "gemini": "A black faux leather fanny pack featuring a zippered front pocket, an adjustable strap, and embroidered white text reading 'FANNIE' next to a small red rose."
-      }
-    },
-    {
-      "field": "secondary_colors",
-      "no_consensus": true,
-      "values": {
-        "gpt": [],
-        "claude": [
-          "#FFFFFF",
-          "#C8102E"
-        ],
-        "gemini": [
-          "#FFFFFF",
-          "#B0233A",
-          "#59705D"
-        ]
+        "gpt": "A black fanny pack with white stylized script text 'FANNIE' on the front and a red rose graphic printed next to it.",
+        "claude": "A black faux leather fanny pack featuring the word 'FANNIE' in white decorative lettering across the front with a small embroidered red rose accent near the text, equipped with a zippered compartment and adjustable black nylon belt strap with a plastic buckle.",
+        "gemini": "A black faux leather fanny pack with the word 'FANNIE' in white stylized cursive text on the front lower center and a red rose logo on the front lower right. It has a zipper closure, adjustable strap, and buckle closure."
       }
     },
     {
@@ -146,7 +121,7 @@
       "values": {
         "gpt": "",
         "claude": "",
-        "gemini": "Tonal stitching visible around the zipper."
+        "gemini": "visible stitching on the front and top"
       }
     },
     {
@@ -156,9 +131,9 @@
         "gpt": [
           {
             "text": "FANNIE",
-            "location": "front center",
+            "location": "front",
             "color": "#FFFFFF",
-            "style": "bold script"
+            "style": "stylized script"
           }
         ],
         "claude": [
@@ -172,9 +147,9 @@
         "gemini": [
           {
             "text": "FANNIE",
-            "location": "front center",
+            "location": "front lower center",
             "color": "#FFFFFF",
-            "style": "cursive script"
+            "style": "stylized cursive"
           }
         ]
       }
@@ -185,13 +160,15 @@
       "garment_type": "fanny pack",
       "base_color": "#000000",
       "base_color_name": "black",
-      "secondary_colors": [],
+      "secondary_colors": [
+        "#FF0000"
+      ],
       "text_content": [
         {
           "text": "FANNIE",
-          "location": "front center",
+          "location": "front",
           "color": "#FFFFFF",
-          "style": "bold script"
+          "style": "stylized script"
         }
       ],
       "numbers": [],
@@ -200,15 +177,15 @@
           "type": "rose-only",
           "position": "front right",
           "size_inches": 1,
-          "material": "embroidered"
+          "material": "printed"
         }
       ],
       "construction": [],
-      "fabric": "",
+      "fabric": "faux leather",
       "patches": [],
       "design_elements": [],
       "stitching_details": "",
-      "overall_description": "A black fanny pack with the text 'FANNIE' in white on the front. It features an embroidered rose design next to the text."
+      "overall_description": "A black fanny pack with white stylized script text 'FANNIE' on the front and a red rose graphic printed next to it."
     },
     "claude": {
       "garment_type": "fanny pack / belt bag",
@@ -244,44 +221,43 @@
       "patches": [],
       "design_elements": [],
       "stitching_details": "",
-      "overall_description": "A black faux leather fanny pack featuring the word 'FANNIE' in white decorative lettering across the front with a small red rose embroidered detail integrated near the text. The bag has a top zipper pocket and an adjustable black nylon strap with a plastic buckle."
+      "overall_description": "A black faux leather fanny pack featuring the word 'FANNIE' in white decorative lettering across the front with a small embroidered red rose accent near the text, equipped with a zippered compartment and adjustable black nylon belt strap with a plastic buckle."
     },
     "gemini": {
       "garment_type": "fanny pack",
-      "base_color": "#0A0A0A",
+      "base_color": "#000000",
       "base_color_name": "black",
       "secondary_colors": [
         "#FFFFFF",
-        "#B0233A",
-        "#59705D"
+        "#FF0000"
       ],
       "text_content": [
         {
           "text": "FANNIE",
-          "location": "front center",
+          "location": "front lower center",
           "color": "#FFFFFF",
-          "style": "cursive script"
+          "style": "stylized cursive"
         }
       ],
       "numbers": [],
       "logos": [
         {
           "type": "rose-only",
-          "position": "front, right of text",
-          "size_inches": null,
+          "position": "front lower right",
+          "size_inches": 1,
           "material": "embroidered"
         }
       ],
       "construction": [
-        "zippered front pocket",
-        "adjustable woven strap",
-        "plastic side-release buckle"
+        "zipper closure",
+        "adjustable strap",
+        "buckle closure"
       ],
-      "fabric": "faux leather body with nylon webbing strap",
+      "fabric": "faux leather",
       "patches": [],
       "design_elements": [],
-      "stitching_details": "Tonal stitching visible around the zipper.",
-      "overall_description": "A black faux leather fanny pack featuring a zippered front pocket, an adjustable strap, and embroidered white text reading 'FANNIE' next to a small red rose."
+      "stitching_details": "visible stitching on the front and top",
+      "overall_description": "A black faux leather fanny pack with the word 'FANNIE' in white stylized cursive text on the front lower center and a red rose logo on the front lower right. It has a zipper closure, adjustable strap, and buckle closure."
     }
   }
 }
