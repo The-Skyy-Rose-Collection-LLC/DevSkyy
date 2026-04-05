@@ -229,6 +229,52 @@ def cmd_composite(args):
             time.sleep(3)
 
 
+def cmd_verify_generate(args):
+    """Run full verified generation pipeline for one SKU+view."""
+    from nano_banana.catalog import load_catalog, find_source_image, find_back_source
+    from nano_banana.verify_pipeline import verify_generate, save_verify_result, promote_winner_to_production
+
+    catalog = load_catalog()
+    if args.sku not in catalog:
+        log.error("SKU %s not in catalog", args.sku)
+        return
+
+    info = catalog[args.sku]
+    if args.view == "back":
+        src = find_back_source(args.sku, catalog) or find_source_image(args.sku, catalog)
+    else:
+        src = find_source_image(args.sku, catalog)
+
+    if not src:
+        log.error("No source image for %s", args.sku)
+        return
+
+    log.info("Starting verified generation: %s %s", args.sku, args.view)
+    result = verify_generate(
+        sku=args.sku,
+        view=args.view,
+        source_path=src,
+        collection=info["collection"],
+        max_cycles=args.cycles,
+        n_candidates=args.candidates,
+        passing_threshold=args.threshold,
+    )
+
+    save_verify_result(result)
+
+    log.info("=" * 60)
+    log.info("RESULT: %s %s", args.sku, args.view)
+    log.info("  Cycles run:       %d", result.cycles_run)
+    log.info("  Total candidates: %d", result.total_candidates)
+    log.info("  Winner score:     %.1f", result.winner_score)
+    log.info("  Passed 98%%:      %s", result.passed_98)
+    log.info("  All scores:       %s", [round(s, 1) for s in result.all_scores])
+    log.info("=" * 60)
+
+    if args.promote and result.winner_path:
+        promote_winner_to_production(result, info["output_slug"])
+
+
 def main():
     logging.basicConfig(
         level=logging.INFO,
@@ -262,6 +308,15 @@ def main():
     comp.add_argument("--step", type=str, default="composite", choices=["composite", "composite_all"])
     comp.add_argument("--pro", action="store_true", help="Use Nano Banana Pro model")
 
+    # -- verify-generate --
+    vg = sub.add_parser("verify-generate", help="Full verified generation pipeline (DNA + tournament + regen)")
+    vg.add_argument("--sku", type=str, required=True, help="Product SKU")
+    vg.add_argument("--view", type=str, default="front", choices=["front", "back", "branding"])
+    vg.add_argument("--cycles", type=int, default=3, help="Max regen cycles (default 3)")
+    vg.add_argument("--candidates", type=int, default=3, help="Candidates per cycle (default 3)")
+    vg.add_argument("--threshold", type=float, default=92.0, help="Passing score threshold (default 92)")
+    vg.add_argument("--promote", action="store_true", help="Copy winner to production directory")
+
     args = parser.parse_args()
 
     if args.command == "dry-run":
@@ -270,6 +325,8 @@ def main():
         cmd_generate(args)
     elif args.command == "composite":
         cmd_composite(args)
+    elif args.command == "verify-generate":
+        cmd_verify_generate(args)
 
 
 if __name__ == "__main__":
