@@ -189,7 +189,7 @@ curl -u "ck_xxx:cs_xxx" "https://skyyrose.co/index.php?rest_route=/wc/v3/product
 **Check logs**: `docker-compose logs -f api` or `fly logs -a devskyy`.
 **Common causes**:
 - Missing environment variables (compare `.env` to `.env.example`)
-- Database connection failed (test with `python -c "from sqlalchemy import create_engine; create_engine(os.environ['DATABASE_URL']).connect()"`)
+- Database connection failed (test with `python -c "import os; from sqlalchemy import create_engine; create_engine(os.environ['DATABASE_URL']).connect()"`)
 - Invalid LLM API keys (check with provider dashboard)
 
 ### CORS Errors on Frontend
