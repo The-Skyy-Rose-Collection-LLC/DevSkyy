@@ -362,7 +362,6 @@ class SignatureExperience extends SkyyRoseExperience {
             product.castShadow = true;
             product.userData.productIndex = index;
             product.userData.onClick = (obj) => {
-                console.log(`Product ${obj.userData.productIndex} clicked`);
                 // Trigger product modal
                 window.dispatchEvent(new CustomEvent('skyyrose:product-click', {
                     detail: { index: obj.userData.productIndex, collection: 'signature' }
@@ -517,12 +516,5 @@ class SignatureExperience extends SkyyRoseExperience {
     }
 }
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('signature-experience');
-    if (container) {
-        window.signatureExperience = new SignatureExperience('signature-experience');
-    }
-});
-
+// Export class — initialization owned by init-3d.js to prevent dual-init.
 window.SignatureExperience = SignatureExperience;

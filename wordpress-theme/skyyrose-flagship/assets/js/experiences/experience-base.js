@@ -1,7 +1,8 @@
 /**
  * SkyyRose Experience Base Class
  * Foundation for all immersive 3D collection experiences
- * Uses Three.js r160 with post-processing and PBR materials
+ * Uses Three.js r160+ with post-processing and PBR materials
+ * CDN: loaded via wp_enqueue_script in enqueue-features.php
  */
 
 // Verify Three.js is loaded before proceeding
@@ -33,11 +34,17 @@ class SkyyRoseExperience {
         // State
         this.isLoading = true;
         this.loadProgress = 0;
+        this.isRunning = true;
+        this.rafId = null;
         this.clock = new THREE.Clock();
         this.mixers = [];
         this.interactiveObjects = [];
         this.raycaster = new THREE.Raycaster();
         this.mouse = new THREE.Vector2();
+
+        // Reduced motion preference
+        this.prefersReducedMotion = window.matchMedia
+            && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         // Initialize
         this.init();
@@ -102,13 +109,17 @@ class SkyyRoseExperience {
             (url) => this.onLoadError(url)
         );
 
-        this.gltfLoader = new THREE.GLTFLoader(this.loadingManager);
+        if (typeof THREE.GLTFLoader !== 'undefined') {
+            this.gltfLoader = new THREE.GLTFLoader(this.loadingManager);
 
-        // DRACO compression support
-        if (typeof THREE.DRACOLoader !== 'undefined') {
-            const dracoLoader = new THREE.DRACOLoader();
-            dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
-            this.gltfLoader.setDRACOLoader(dracoLoader);
+            // DRACO compression support
+            if (typeof THREE.DRACOLoader !== 'undefined') {
+                const dracoLoader = new THREE.DRACOLoader();
+                dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+                this.gltfLoader.setDRACOLoader(dracoLoader);
+            }
+        } else {
+            this.gltfLoader = null;
         }
 
         this.textureLoader = new THREE.TextureLoader(this.loadingManager);
@@ -137,15 +148,18 @@ class SkyyRoseExperience {
     }
 
     setupEventListeners() {
-        window.addEventListener('resize', () => this.onResize());
-
-        this.container.addEventListener('mousemove', (e) => {
+        // Store bound references for proper cleanup in dispose()
+        this._onResize = () => this.onResize();
+        this._onMouseMove = (e) => {
             const rect = this.container.getBoundingClientRect();
             this.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
             this.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-        });
+        };
+        this._onClick = () => this.onClick();
 
-        this.container.addEventListener('click', () => this.onClick());
+        window.addEventListener('resize', this._onResize);
+        this.container.addEventListener('mousemove', this._onMouseMove);
+        this.container.addEventListener('click', this._onClick);
     }
 
     onResize() {
@@ -208,6 +222,10 @@ class SkyyRoseExperience {
 
     // Utility: Load GLB model
     async loadModel(url, options = {}) {
+        if (!this.gltfLoader) {
+            console.warn('GLTFLoader not available — model loading skipped');
+            return Promise.resolve(null);
+        }
         return new Promise((resolve, reject) => {
             this.gltfLoader.load(
                 url,
@@ -384,9 +402,16 @@ class SkyyRoseExperience {
         return group;
     }
 
-    // Animation loop
+    // Animation loop with lifecycle control
     animate() {
-        requestAnimationFrame(() => this.animate());
+        if (!this.isRunning) return;
+        this.rafId = requestAnimationFrame(() => this.animate());
+
+        // Reduced motion: render once, skip animation updates
+        if (this.prefersReducedMotion) {
+            this.renderer.render(this.scene, this.camera);
+            return;
+        }
 
         const delta = this.clock.getDelta();
 
@@ -412,21 +437,46 @@ class SkyyRoseExperience {
     // Override in subclass for custom updates
     update(delta) {}
 
-    // Cleanup
+    // Cleanup — stop loop, remove listeners, free GPU resources
     dispose() {
-        window.removeEventListener('resize', this.onResize);
+        // Stop the animation loop
+        this.isRunning = false;
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+        }
 
+        // Remove event listeners with correct references
+        if (this._onResize) window.removeEventListener('resize', this._onResize);
+        if (this._onMouseMove) this.container.removeEventListener('mousemove', this._onMouseMove);
+        if (this._onClick) this.container.removeEventListener('click', this._onClick);
+
+        // Dispose controls
+        if (this.controls && this.controls.dispose) {
+            this.controls.dispose();
+        }
+
+        // Dispose all scene objects
         this.scene.traverse((object) => {
             if (object.geometry) object.geometry.dispose();
             if (object.material) {
                 if (Array.isArray(object.material)) {
-                    object.material.forEach((mat) => mat.dispose());
+                    object.material.forEach((mat) => {
+                        if (mat.map) mat.map.dispose();
+                        mat.dispose();
+                    });
                 } else {
+                    if (object.material.map) object.material.map.dispose();
                     object.material.dispose();
                 }
             }
         });
 
+        // Remove canvas from DOM and release GPU context
+        if (this.renderer.domElement && this.renderer.domElement.parentNode) {
+            this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
+        }
+        this.renderer.forceContextLoss();
         this.renderer.dispose();
         if (this.composer) this.composer.dispose();
     }

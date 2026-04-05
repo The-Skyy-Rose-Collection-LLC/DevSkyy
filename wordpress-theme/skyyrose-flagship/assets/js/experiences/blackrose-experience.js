@@ -752,12 +752,5 @@ class BlackRoseExperience extends SkyyRoseExperience {
     }
 }
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('blackrose-experience');
-    if (container) {
-        window.blackroseExperience = new BlackRoseExperience('blackrose-experience');
-    }
-});
-
+// Export class — initialization owned by init-3d.js to prevent dual-init.
 window.BlackRoseExperience = BlackRoseExperience;

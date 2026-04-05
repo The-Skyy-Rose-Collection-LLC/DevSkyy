@@ -691,12 +691,5 @@ class LoveHurtsExperience extends SkyyRoseExperience {
     }
 }
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('lovehurts-experience');
-    if (container) {
-        window.lovehurtsExperience = new LoveHurtsExperience('lovehurts-experience');
-    }
-});
-
+// Export class — initialization owned by init-3d.js to prevent dual-init.
 window.LoveHurtsExperience = LoveHurtsExperience;

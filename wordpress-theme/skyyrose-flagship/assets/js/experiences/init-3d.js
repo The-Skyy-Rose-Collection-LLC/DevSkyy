@@ -215,9 +215,10 @@
      * Get product data (placeholder - would be populated from WooCommerce)
      */
     function getProductData(collection, index) {
-        // This would typically be populated via wp_localize_script
-        const products = window.skyyrose3D?.products || {};
-        return products[collection]?.[index] || null;
+        // Product data populated via wp_localize_script (skyyRoseImmersive)
+        var sr = window.skyyrose3D && window.skyyrose3D.products ? window.skyyrose3D.products : {};
+        var collectionData = sr[collection] || null;
+        return collectionData && collectionData[index] ? collectionData[index] : null;
     }
 
     /**
@@ -327,15 +328,20 @@
     /**
      * Main initialization
      */
+    var _initRetries = 0;
+    var _maxInitRetries = 50; // 5 seconds max wait
+
     function init() {
-        // Wait for Three.js to be available
+        // Wait for Three.js to be available (max 5s)
         if (typeof THREE === 'undefined') {
-            console.log('SkyyRose 3D: Waiting for Three.js...');
+            _initRetries++;
+            if (_initRetries > _maxInitRetries) {
+                console.warn('SkyyRose 3D: Three.js failed to load after 5s — falling back to 2D.');
+                return;
+            }
             setTimeout(init, 100);
             return;
         }
-
-        console.log('SkyyRose 3D: Initializing...');
 
         setupProductClickHandler();
         setupVisibilityHandler();
@@ -367,10 +373,8 @@
         init: initializeExperiences,
         initContainer: initializeContainer,
         getExperience: function(containerId) {
-            const container = document.getElementById(containerId);
-            return container?._skyyRoseExperience || null;
-        },
-        // Expose JSON cleaner for use by other scripts
-        cleanJsonResponse: cleanJsonResponse
+            var container = document.getElementById(containerId);
+            return container && container._skyyRoseExperience ? container._skyyRoseExperience : null;
+        }
     };
 })();

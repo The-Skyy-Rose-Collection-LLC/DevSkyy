@@ -558,15 +558,45 @@ function skyyrose_enqueue_collection_experiences() {
 	$js_dir  = SKYYROSE_DIR . '/assets/js';
 	$js_uri  = SKYYROSE_ASSETS_URI . '/js';
 
-	// Three.js via CDN (shared dependency for all experiences).
+	// Three.js r160 via CDN (shared dependency for all experiences).
+	// Experience code uses r160 APIs (outputColorSpace, SRGBColorSpace).
+	// Add-on scripts (OrbitControls, GLTFLoader, etc.) loaded from examples/js/.
+	$threejs_ver = '0.160.0';
+	$threejs_cdn = 'https://cdn.jsdelivr.net/npm/three@' . $threejs_ver;
+
 	if ( ! wp_script_is( 'threejs', 'enqueued' ) ) {
 		wp_enqueue_script(
 			'threejs',
-			'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+			$threejs_cdn . '/build/three.min.js',
 			array(),
-			'r128',
+			$threejs_ver,
 			true
 		);
+	}
+
+	// Three.js add-ons (required by experience-base.js).
+	$addons = array(
+		'threejs-orbit-controls'  => '/examples/js/controls/OrbitControls.js',
+		'threejs-gltf-loader'     => '/examples/js/loaders/GLTFLoader.js',
+		'threejs-draco-loader'    => '/examples/js/loaders/DRACOLoader.js',
+		'threejs-rgbe-loader'     => '/examples/js/loaders/RGBELoader.js',
+		'threejs-effect-composer'  => '/examples/js/postprocessing/EffectComposer.js',
+		'threejs-render-pass'     => '/examples/js/postprocessing/RenderPass.js',
+		'threejs-unreal-bloom'    => '/examples/js/postprocessing/UnrealBloomPass.js',
+		'threejs-shader-pass'     => '/examples/js/postprocessing/ShaderPass.js',
+		'threejs-copy-shader'     => '/examples/js/shaders/CopyShader.js',
+	);
+
+	foreach ( $addons as $handle => $path ) {
+		if ( ! wp_script_is( $handle, 'enqueued' ) ) {
+			wp_enqueue_script(
+				$handle,
+				$threejs_cdn . $path,
+				array( 'threejs' ),
+				$threejs_ver,
+				true
+			);
+		}
 	}
 
 	// Experience base class (SkyyRoseExperience — shared foundation).
@@ -604,6 +634,20 @@ function skyyrose_enqueue_collection_experiences() {
 			'skyyrose-collection-experience',
 			$js_uri . '/' . $scene_file,
 			array( 'skyyrose-experience-base', 'skyyrose-luxury-animations' ),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+
+	// Init-3D orchestrator (lazy loading, visibility pause, cleanup, global API).
+	// Loads AFTER the collection scene so all classes are available.
+	$init_file = $use_min && file_exists( $js_dir . '/experiences/init-3d.min.js' )
+		? 'experiences/init-3d.min.js' : 'experiences/init-3d.js';
+	if ( file_exists( $js_dir . '/' . $init_file ) ) {
+		wp_enqueue_script(
+			'skyyrose-3d-init',
+			$js_uri . '/' . $init_file,
+			array( 'skyyrose-collection-experience' ),
 			SKYYROSE_VERSION,
 			true
 		);
