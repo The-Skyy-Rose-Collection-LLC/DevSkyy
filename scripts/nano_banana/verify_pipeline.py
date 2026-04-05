@@ -151,6 +151,30 @@ def verify_generate(
             feedback_metrics = {"issues": {"list": cycle_winner.top_issues, "fixes": cycle_winner.all_fixes}}
             current_prompt = base_prompt + _format_feedback(cycle_winner)
 
+    # If all cycles failed on text/logos, try composite fallback
+    if best_result and not best_result.passed_98:
+        from nano_banana.composite_fallback import should_use_composite_fallback, hybrid_composite_from_dna
+        if should_use_composite_fallback(best_result) and clients.get("anthropic"):
+            log.info("Triggering hybrid composite fallback (text/logo scores low)")
+            try:
+                composite_path = hybrid_composite_from_dna(
+                    base_image_path=PROJECT_ROOT / best_result.candidate_path,
+                    source_image_path=source_path,
+                    dna=dna,
+                    anthropic_client=clients["anthropic"],
+                )
+                if composite_path:
+                    # Re-judge composite
+                    composite_result = run_tournament(
+                        clients, source_path, composite_path, dna, passing_threshold=98.0
+                    )
+                    log.info("Composite fallback score: %.1f", composite_result.aggregate_score)
+                    if composite_result.aggregate_score > best_result.aggregate_score:
+                        best_result = composite_result
+                        all_tournament_results.append(composite_result)
+            except Exception as exc:
+                log.error("Composite fallback failed: %s", exc)
+
     # Summary
     passed_98 = best_result and best_result.aggregate_score >= 98.0
 
