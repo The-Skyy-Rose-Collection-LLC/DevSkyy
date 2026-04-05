@@ -25,7 +25,7 @@ from typing import Any
 
 import httpx
 
-from errors.production_errors import ConfigurationError, WordPressIntegrationError
+from core.errors.production_errors import ConfigurationError, WordPressIntegrationError
 
 logger = logging.getLogger(__name__)
 

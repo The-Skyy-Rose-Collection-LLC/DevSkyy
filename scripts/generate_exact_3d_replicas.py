@@ -33,7 +33,7 @@ from ai_3d.generation_pipeline import (
     ThreeDGenerationPipeline,
     ThreeDProvider,
 )
-from errors.production_errors import ModelFidelityError
+from core.errors.production_errors import ModelFidelityError
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

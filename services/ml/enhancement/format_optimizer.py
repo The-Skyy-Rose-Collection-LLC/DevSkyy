@@ -25,7 +25,7 @@ from PIL import Image
 from pydantic import BaseModel
 from services.storage.r2_client import R2Client, R2Config
 
-from errors.production_errors import (
+from core.errors.production_errors import (
     DevSkyError,
     DevSkyErrorCode,
     DevSkyErrorSeverity,

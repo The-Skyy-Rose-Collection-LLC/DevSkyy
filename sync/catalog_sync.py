@@ -28,7 +28,7 @@ from typing import TYPE_CHECKING, Any
 import structlog
 from pydantic import BaseModel, Field
 
-from errors.production_errors import SyncError
+from core.errors.production_errors import SyncError
 
 if TYPE_CHECKING:
     pass

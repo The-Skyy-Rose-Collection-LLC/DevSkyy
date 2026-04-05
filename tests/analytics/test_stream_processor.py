@@ -8,7 +8,7 @@ process_event() — no Kafka connection required.
 
 import pytest
 
-from analytics.stream_processor import AnalyticsState, StreamProcessor
+from monitoring.stream_processor import AnalyticsState, StreamProcessor
 
 
 def _make_processor() -> StreamProcessor:

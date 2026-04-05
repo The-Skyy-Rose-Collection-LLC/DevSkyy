@@ -65,7 +65,7 @@ class VerificationReport:
 def check_95_percent_fidelity() -> CheckResult:
     """Verify 95% fidelity threshold is enforced."""
     try:
-        from errors.production_errors import MINIMUM_FIDELITY_SCORE
+        from core.errors.production_errors import MINIMUM_FIDELITY_SCORE
         from imagery.model_fidelity import MINIMUM_FIDELITY_SCORE as IMG_THRESHOLD
 
         if MINIMUM_FIDELITY_SCORE == 95.0 and IMG_THRESHOLD == 95.0:
@@ -91,7 +91,7 @@ def check_95_percent_fidelity() -> CheckResult:
 def check_error_handling() -> CheckResult:
     """Verify production error handling is in place."""
     try:
-        from errors.production_errors import (
+        from core.errors.production_errors import (
             DevSkyError,
         )
 
