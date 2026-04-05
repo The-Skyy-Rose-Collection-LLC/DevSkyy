@@ -126,7 +126,7 @@ $svg_whitelist = array(
 get_header();
 ?>
 
-<div id="primary" class="site-main homepage-v2">
+<main id="primary" class="site-main homepage-v2" role="main" tabindex="-1">
 
 <div class="grain" aria-hidden="true"></div>
 <div class="vignette" aria-hidden="true"></div>
@@ -420,7 +420,7 @@ echo wp_json_encode( array(
 	<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-8 8h5v8h6v-8h5z"/></svg>
 </button>
 
-</div><!-- .homepage-v2 -->
+</main><!-- .homepage-v2 -->
 
 <?php
 // Load homepage JS inline to bypass page-optimize plugin stripping.
