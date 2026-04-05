@@ -1,0 +1,119 @@
+{
+  "sku": "sg-001",
+  "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/the-bay-set-source.jpeg",
+  "analyzed_at": "2026-04-05T07:27:28.666153",
+  "models_used": [
+    "gpt",
+    "claude",
+    "gemini"
+  ],
+  "consensus": {
+    "base_color": "#F5F5F0",
+    "base_color_name": "off-white",
+    "construction": [
+      "crewneck neckline",
+      "short sleeves",
+      "elastic drawstring waistband on shorts",
+      "mesh shorts fabric"
+    ],
+    "design_elements": [
+      "blue roses with gray/silver leaves graphic on t-shirt",
+      "blue cloud motif beneath roses on t-shirt",
+      "cityscape bridge scene sublimated on shorts",
+      "blue-to-green gradient color scheme on shorts",
+      "coordinating blue rose motif across both pieces"
+    ],
+    "fabric": "lightweight cotton t-shirt; polyester mesh shorts with all-over sublimation print",
+    "garment_type": "two-piece set: crewneck t-shirt and mesh shorts",
+    "logos": [
+      {
+        "type": "SR-monogram",
+        "position": "front neckline center",
+        "size_inches": 1.5,
+        "material": "printed"
+      },
+      {
+        "type": "rose-only",
+        "position": "front chest center of t-shirt",
+        "size_inches": 6,
+        "material": "printed"
+      },
+      {
+        "type": "rose-only",
+        "position": "front right leg of shorts",
+        "size_inches": 3,
+        "material": "sublimated"
+      }
+    ],
+    "numbers": [],
+    "overall_description": "A SkyyRose two-piece matching set consisting of an off-white crewneck t-shirt featuring a blue rose and cloud graphic, paired with mesh athletic shorts displaying a sublimated cityscape bridge scene in blue and green tones with a coordinating blue rose element.",
+    "patches": [],
+    "secondary_colors": [
+      "#1E3FA0",
+      "#2A8BC7",
+      "#3B6B3A",
+      "#000000"
+    ],
+    "stitching_details": "standard seam construction visible on shorts with contrast stitching",
+    "text_content": []
+  },
+  "disagreements": [],
+  "raw_results": {
+    "gpt": {
+      "_error": "Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************9MQA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}"
+    },
+    "claude": {
+      "garment_type": "two-piece set: crewneck t-shirt and mesh shorts",
+      "base_color": "#F5F5F0",
+      "base_color_name": "off-white",
+      "secondary_colors": [
+        "#1E3FA0",
+        "#2A8BC7",
+        "#3B6B3A",
+        "#000000"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "SR-monogram",
+          "position": "front neckline center",
+          "size_inches": 1.5,
+          "material": "printed"
+        },
+        {
+          "type": "rose-only",
+          "position": "front chest center of t-shirt",
+          "size_inches": 6,
+          "material": "printed"
+        },
+        {
+          "type": "rose-only",
+          "position": "front right leg of shorts",
+          "size_inches": 3,
+          "material": "sublimated"
+        }
+      ],
+      "construction": [
+        "crewneck neckline",
+        "short sleeves",
+        "elastic drawstring waistband on shorts",
+        "mesh shorts fabric"
+      ],
+      "fabric": "lightweight cotton t-shirt; polyester mesh shorts with all-over sublimation print",
+      "patches": [],
+      "design_elements": [
+        "blue roses with gray/silver leaves graphic on t-shirt",
+        "blue cloud motif beneath roses on t-shirt",
+        "cityscape bridge scene sublimated on shorts",
+        "blue-to-green gradient color scheme on shorts",
+        "coordinating blue rose motif across both pieces"
+      ],
+      "stitching_details": "standard seam construction visible on shorts with contrast stitching",
+      "overall_description": "A SkyyRose two-piece matching set consisting of an off-white crewneck t-shirt featuring a blue rose and cloud graphic, paired with mesh athletic shorts displaying a sublimated cityscape bridge scene in blue and green tones with a coordinating blue rose element."
+    },
+    "gemini": {
+      "_error": "the JSON object must be str, bytes or bytearray, not NoneType"
+    }
+  }
+}

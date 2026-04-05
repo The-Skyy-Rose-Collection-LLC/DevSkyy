@@ -1,0 +1,205 @@
+{
+  "sku": "lh-003",
+  "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-basketball-shorts-source.jpg",
+  "analyzed_at": "2026-04-05T07:26:35.441718",
+  "models_used": [
+    "gpt",
+    "claude",
+    "gemini"
+  ],
+  "consensus": {
+    "base_color": "#F0A0A0",
+    "base_color_name": "salmon pink",
+    "construction": [
+      "elastic waistband",
+      "drawstring closure"
+    ],
+    "design_elements": [
+      "dark green/black horizontal color-block panel across mid-thigh area spanning both legs",
+      "black drawstring cords"
+    ],
+    "fabric": "nylon shell",
+    "garment_type": "shorts",
+    "logos": [
+      {
+        "type": "rose-only",
+        "position": "front right leg lower",
+        "size_inches": 3,
+        "material": "embroidered"
+      }
+    ],
+    "numbers": [],
+    "overall_description": "Salmon pink lightweight nylon athletic shorts featuring a dark green/black horizontal panel across the front, an elastic waistband with black drawstring, and an embroidered red rose bouquet patch on the lower right leg.",
+    "patches": [
+      "embroidered rose bouquet patch on lower right leg, featuring red roses with green leaves and light blue/white base"
+    ],
+    "secondary_colors": [
+      "#2A3A35",
+      "#000000"
+    ],
+    "stitching_details": "Tonal stitching throughout.",
+    "text_content": []
+  },
+  "disagreements": [
+    {
+      "field": "base_color",
+      "no_consensus": true,
+      "values": {
+        "claude": "#F0A0A0",
+        "gemini": "#EEA09A"
+      }
+    },
+    {
+      "field": "design_elements",
+      "no_consensus": true,
+      "values": {
+        "claude": [
+          "dark green/black horizontal color-block panel across mid-thigh area spanning both legs",
+          "black drawstring cords"
+        ],
+        "gemini": [
+          "Asymmetrical color-block panel"
+        ]
+      }
+    },
+    {
+      "field": "logos",
+      "no_consensus": true,
+      "values": {
+        "claude": [
+          {
+            "type": "rose-only",
+            "position": "front right leg lower",
+            "size_inches": 3,
+            "material": "embroidered"
+          }
+        ],
+        "gemini": [
+          {
+            "type": "rose",
+            "position": "front lower left leg",
+            "size_inches": 2,
+            "material": "embroidered"
+          }
+        ]
+      }
+    },
+    {
+      "field": "overall_description",
+      "no_consensus": true,
+      "values": {
+        "claude": "Salmon pink lightweight nylon athletic shorts featuring a dark green/black horizontal panel across the front, an elastic waistband with black drawstring, and an embroidered red rose bouquet patch on the lower right leg.",
+        "gemini": "A pair of salmon pink nylon shorts with a black drawstring, an elastic waistband, and a large, black asymmetrical color-block panel across the front. An embroidered rose patch is featured on the lower left leg."
+      }
+    },
+    {
+      "field": "patches",
+      "no_consensus": true,
+      "values": {
+        "claude": [
+          "embroidered rose bouquet patch on lower right leg, featuring red roses with green leaves and light blue/white base"
+        ],
+        "gemini": [
+          "Embroidered patch of a red rose with green leaves on a small light blue cloud."
+        ]
+      }
+    },
+    {
+      "field": "secondary_colors",
+      "no_consensus": true,
+      "values": {
+        "claude": [
+          "#2A3A35",
+          "#000000"
+        ],
+        "gemini": [
+          "#0A0A0A",
+          "#B52C31",
+          "#3A6731",
+          "#DDE6E8"
+        ]
+      }
+    },
+    {
+      "field": "stitching_details",
+      "no_consensus": true,
+      "values": {
+        "claude": "",
+        "gemini": "Tonal stitching throughout."
+      }
+    }
+  ],
+  "raw_results": {
+    "gpt": {
+      "_error": "Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************9MQA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}"
+    },
+    "claude": {
+      "garment_type": "drawstring athletic shorts",
+      "base_color": "#F0A0A0",
+      "base_color_name": "salmon pink",
+      "secondary_colors": [
+        "#2A3A35",
+        "#000000"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "rose-only",
+          "position": "front right leg lower",
+          "size_inches": 3,
+          "material": "embroidered"
+        }
+      ],
+      "construction": [
+        "elastic waistband",
+        "drawstring closure",
+        "contrast color-block panel across front"
+      ],
+      "fabric": "lightweight nylon shell",
+      "patches": [
+        "embroidered rose bouquet patch on lower right leg, featuring red roses with green leaves and light blue/white base"
+      ],
+      "design_elements": [
+        "dark green/black horizontal color-block panel across mid-thigh area spanning both legs",
+        "black drawstring cords"
+      ],
+      "stitching_details": "",
+      "overall_description": "Salmon pink lightweight nylon athletic shorts featuring a dark green/black horizontal panel across the front, an elastic waistband with black drawstring, and an embroidered red rose bouquet patch on the lower right leg."
+    },
+    "gemini": {
+      "garment_type": "shorts",
+      "base_color": "#EEA09A",
+      "base_color_name": "salmon pink",
+      "secondary_colors": [
+        "#0A0A0A",
+        "#B52C31",
+        "#3A6731",
+        "#DDE6E8"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "rose",
+          "position": "front lower left leg",
+          "size_inches": 2,
+          "material": "embroidered"
+        }
+      ],
+      "construction": [
+        "elastic waistband",
+        "drawstring closure"
+      ],
+      "fabric": "nylon shell",
+      "patches": [
+        "Embroidered patch of a red rose with green leaves on a small light blue cloud."
+      ],
+      "design_elements": [
+        "Asymmetrical color-block panel"
+      ],
+      "stitching_details": "Tonal stitching throughout.",
+      "overall_description": "A pair of salmon pink nylon shorts with a black drawstring, an elastic waistband, and a large, black asymmetrical color-block panel across the front. An embroidered rose patch is featured on the lower left leg."
+    }
+  }
+}

@@ -1,0 +1,250 @@
+{
+  "sku": "kids-001",
+  "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/colorblock-red-set-real.jpg",
+  "analyzed_at": "2026-04-05T07:25:49.534257",
+  "models_used": [
+    "gpt",
+    "claude",
+    "gemini"
+  ],
+  "consensus": {
+    "base_color": "#A8839B",
+    "base_color_name": "mauve",
+    "construction": [
+      "crewneck collar",
+      "short sleeves",
+      "straight hem"
+    ],
+    "design_elements": [],
+    "fabric": "cotton jersey",
+    "garment_type": "crewneck t-shirt",
+    "logos": [
+      {
+        "type": "brand-label",
+        "position": "inner neck center",
+        "size_inches": 1.5,
+        "material": "woven label"
+      },
+      {
+        "type": "small-tag-logo",
+        "position": "right sleeve hem",
+        "size_inches": 0.75,
+        "material": "woven label"
+      }
+    ],
+    "numbers": [],
+    "overall_description": "A plain dusty mauve crewneck t-shirt from SkyyRose in size Medium, featuring a black woven neck label with gold script branding and a small woven tag on the right sleeve. Clean, minimalist design with no front graphics.",
+    "patches": [
+      "Small black square patch with a gold monogram on the right sleeve."
+    ],
+    "secondary_colors": [
+      "#1A1A1A"
+    ],
+    "stitching_details": "clean topstitching visible at sleeve hems and bottom hem, shoulder seams appear standard set-in construction",
+    "text_content": [
+      {
+        "text": "Skyy Rose",
+        "location": "inner neck label",
+        "color": "#C5A55A",
+        "style": "cursive/script gold lettering"
+      }
+    ]
+  },
+  "disagreements": [
+    {
+      "field": "base_color",
+      "no_consensus": true,
+      "values": {
+        "claude": "#A8839B",
+        "gemini": "#B193A7"
+      }
+    },
+    {
+      "field": "construction",
+      "no_consensus": true,
+      "values": {
+        "claude": [
+          "crewneck collar",
+          "short sleeves",
+          "straight hem"
+        ],
+        "gemini": [
+          "ribbed crewneck collar",
+          "set-in sleeves"
+        ]
+      }
+    },
+    {
+      "field": "logos",
+      "no_consensus": true,
+      "values": {
+        "claude": [
+          {
+            "type": "brand-label",
+            "position": "inner neck center",
+            "size_inches": 1.5,
+            "material": "woven label"
+          },
+          {
+            "type": "small-tag-logo",
+            "position": "right sleeve hem",
+            "size_inches": 0.75,
+            "material": "woven label"
+          }
+        ],
+        "gemini": [
+          {
+            "type": "SR-monogram",
+            "position": "right sleeve",
+            "size_inches": null,
+            "material": "patch"
+          }
+        ]
+      }
+    },
+    {
+      "field": "overall_description",
+      "no_consensus": true,
+      "values": {
+        "claude": "A plain dusty mauve crewneck t-shirt from SkyyRose in size Medium, featuring a black woven neck label with gold script branding and a small woven tag on the right sleeve. Clean, minimalist design with no front graphics.",
+        "gemini": "A solid mauve short-sleeve t-shirt with a classic crewneck collar. It features a woven brand label inside the neck and a small black and gold logo patch on the right sleeve."
+      }
+    },
+    {
+      "field": "patches",
+      "no_consensus": true,
+      "values": {
+        "claude": [],
+        "gemini": [
+          "Small black square patch with a gold monogram on the right sleeve."
+        ]
+      }
+    },
+    {
+      "field": "secondary_colors",
+      "no_consensus": true,
+      "values": {
+        "claude": [
+          "#1A1A1A"
+        ],
+        "gemini": [
+          "#000000",
+          "#E0C154"
+        ]
+      }
+    },
+    {
+      "field": "stitching_details",
+      "no_consensus": true,
+      "values": {
+        "claude": "clean topstitching visible at sleeve hems and bottom hem, shoulder seams appear standard set-in construction",
+        "gemini": "Tonal stitching is visible along the collar, sleeve hems, and bottom hem."
+      }
+    },
+    {
+      "field": "text_content",
+      "no_consensus": true,
+      "values": {
+        "claude": [
+          {
+            "text": "Skyy Rose",
+            "location": "inner neck label",
+            "color": "#C5A55A",
+            "style": "cursive/script gold lettering"
+          }
+        ],
+        "gemini": [
+          {
+            "text": "Skyy Rose",
+            "location": "inner neck tag",
+            "color": "#E0C154",
+            "style": "cursive script"
+          }
+        ]
+      }
+    }
+  ],
+  "raw_results": {
+    "gpt": {
+      "_error": "Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************9MQA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}"
+    },
+    "claude": {
+      "garment_type": "crewneck t-shirt",
+      "base_color": "#A8839B",
+      "base_color_name": "dusty mauve",
+      "secondary_colors": [
+        "#1A1A1A"
+      ],
+      "text_content": [
+        {
+          "text": "Skyy Rose",
+          "location": "inner neck label",
+          "color": "#C5A55A",
+          "style": "cursive/script gold lettering"
+        }
+      ],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "brand-label",
+          "position": "inner neck center",
+          "size_inches": 1.5,
+          "material": "woven label"
+        },
+        {
+          "type": "small-tag-logo",
+          "position": "right sleeve hem",
+          "size_inches": 0.75,
+          "material": "woven label"
+        }
+      ],
+      "construction": [
+        "crewneck collar",
+        "short sleeves",
+        "straight hem"
+      ],
+      "fabric": "soft cotton jersey, appears lightweight to midweight",
+      "patches": [],
+      "design_elements": [],
+      "stitching_details": "clean topstitching visible at sleeve hems and bottom hem, shoulder seams appear standard set-in construction",
+      "overall_description": "A plain dusty mauve crewneck t-shirt from SkyyRose in size Medium, featuring a black woven neck label with gold script branding and a small woven tag on the right sleeve. Clean, minimalist design with no front graphics."
+    },
+    "gemini": {
+      "garment_type": "crewneck t-shirt",
+      "base_color": "#B193A7",
+      "base_color_name": "mauve",
+      "secondary_colors": [
+        "#000000",
+        "#E0C154"
+      ],
+      "text_content": [
+        {
+          "text": "Skyy Rose",
+          "location": "inner neck tag",
+          "color": "#E0C154",
+          "style": "cursive script"
+        }
+      ],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "SR-monogram",
+          "position": "right sleeve",
+          "size_inches": null,
+          "material": "patch"
+        }
+      ],
+      "construction": [
+        "ribbed crewneck collar",
+        "set-in sleeves"
+      ],
+      "fabric": "cotton jersey",
+      "patches": [
+        "Small black square patch with a gold monogram on the right sleeve."
+      ],
+      "design_elements": [],
+      "stitching_details": "Tonal stitching is visible along the collar, sleeve hems, and bottom hem.",
+      "overall_description": "A solid mauve short-sleeve t-shirt with a classic crewneck collar. It features a woven brand label inside the neck and a small black and gold logo patch on the right sleeve."
+    }
+  }
+}

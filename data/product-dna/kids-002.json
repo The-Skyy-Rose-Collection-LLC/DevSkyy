@@ -1,0 +1,265 @@
+{
+  "sku": "kids-002",
+  "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/colorblock-purple-set-real.jpg",
+  "analyzed_at": "2026-04-05T07:26:07.864836",
+  "models_used": [
+    "gpt",
+    "claude",
+    "gemini"
+  ],
+  "consensus": {
+    "base_color": "#F0F0F0",
+    "base_color_name": "white",
+    "construction": [
+      "crew neckline",
+      "short sleeves",
+      "slim fit",
+      "black woven neck label",
+      "small black woven sleeve tab"
+    ],
+    "design_elements": [],
+    "fabric": "cotton",
+    "garment_type": "crewneck t-shirt",
+    "logos": [
+      {
+        "type": "brand label",
+        "position": "interior neck",
+        "size_inches": 1.5,
+        "material": "woven label"
+      },
+      {
+        "type": "small woven tab",
+        "position": "right sleeve hem",
+        "size_inches": 0.75,
+        "material": "woven label"
+      }
+    ],
+    "numbers": [],
+    "overall_description": "A plain white crewneck t-shirt from SkyyRose featuring a black and gold woven neck label with script branding and a small black woven tab on the right sleeve. Size M, shown from the front.",
+    "patches": [
+      "small black and gold woven tag on right sleeve"
+    ],
+    "secondary_colors": [
+      "#1A1A1A",
+      "#C8A84E"
+    ],
+    "stitching_details": "standard seam construction visible at shoulders, sleeves, and side seams; clean hemline",
+    "text_content": [
+      {
+        "text": "Skyy Rose",
+        "location": "interior neck label",
+        "color": "#C8A84E",
+        "style": "cursive/script gold lettering on black label"
+      }
+    ]
+  },
+  "disagreements": [
+    {
+      "field": "base_color",
+      "no_consensus": true,
+      "values": {
+        "claude": "#F0F0F0",
+        "gemini": "#FFFFFF"
+      }
+    },
+    {
+      "field": "construction",
+      "no_consensus": true,
+      "values": {
+        "claude": [
+          "crew neckline",
+          "short sleeves",
+          "slim fit",
+          "black woven neck label",
+          "small black woven sleeve tab"
+        ],
+        "gemini": [
+          "crewneck collar",
+          "woven neck label",
+          "set-in sleeves"
+        ]
+      }
+    },
+    {
+      "field": "logos",
+      "no_consensus": true,
+      "values": {
+        "claude": [
+          {
+            "type": "brand label",
+            "position": "interior neck",
+            "size_inches": 1.5,
+            "material": "woven label"
+          },
+          {
+            "type": "small woven tab",
+            "position": "right sleeve hem",
+            "size_inches": 0.75,
+            "material": "woven label"
+          }
+        ],
+        "gemini": [
+          {
+            "type": "SR-monogram",
+            "position": "right sleeve",
+            "size_inches": 1,
+            "material": "woven patch"
+          }
+        ]
+      }
+    },
+    {
+      "field": "overall_description",
+      "no_consensus": true,
+      "values": {
+        "claude": "A plain white crewneck t-shirt from SkyyRose featuring a black and gold woven neck label with script branding and a small black woven tab on the right sleeve. Size M, shown from the front.",
+        "gemini": "A plain white short-sleeve crewneck t-shirt with a black and gold woven label inside the collar and a small, matching black and gold monogram patch on the right sleeve."
+      }
+    },
+    {
+      "field": "patches",
+      "no_consensus": true,
+      "values": {
+        "claude": [
+          "small black and gold woven tag on right sleeve"
+        ],
+        "gemini": [
+          "Small black woven patch with gold monogram on the right sleeve."
+        ]
+      }
+    },
+    {
+      "field": "secondary_colors",
+      "no_consensus": true,
+      "values": {
+        "claude": [
+          "#1A1A1A",
+          "#C8A84E"
+        ],
+        "gemini": [
+          "#000000",
+          "#B38F3A"
+        ]
+      }
+    },
+    {
+      "field": "stitching_details",
+      "no_consensus": true,
+      "values": {
+        "claude": "standard seam construction visible at shoulders, sleeves, and side seams; clean hemline",
+        "gemini": "Tonal white stitching is visible on the collar, sleeve hems, and bottom hem."
+      }
+    },
+    {
+      "field": "text_content",
+      "no_consensus": true,
+      "values": {
+        "claude": [
+          {
+            "text": "Skyy Rose",
+            "location": "interior neck label",
+            "color": "#C8A84E",
+            "style": "cursive/script gold lettering on black label"
+          }
+        ],
+        "gemini": [
+          {
+            "text": "Skyy Rose",
+            "location": "interior neck tag",
+            "color": "#B38F3A",
+            "style": "cursive script"
+          }
+        ]
+      }
+    }
+  ],
+  "raw_results": {
+    "gpt": {
+      "_error": "Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************9MQA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}"
+    },
+    "claude": {
+      "garment_type": "crewneck t-shirt",
+      "base_color": "#F0F0F0",
+      "base_color_name": "white",
+      "secondary_colors": [
+        "#1A1A1A",
+        "#C8A84E"
+      ],
+      "text_content": [
+        {
+          "text": "Skyy Rose",
+          "location": "interior neck label",
+          "color": "#C8A84E",
+          "style": "cursive/script gold lettering on black label"
+        }
+      ],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "brand label",
+          "position": "interior neck",
+          "size_inches": 1.5,
+          "material": "woven label"
+        },
+        {
+          "type": "small woven tab",
+          "position": "right sleeve hem",
+          "size_inches": 0.75,
+          "material": "woven label"
+        }
+      ],
+      "construction": [
+        "crew neckline",
+        "short sleeves",
+        "slim fit",
+        "black woven neck label",
+        "small black woven sleeve tab"
+      ],
+      "fabric": "lightweight cotton jersey",
+      "patches": [
+        "small black and gold woven tag on right sleeve"
+      ],
+      "design_elements": [],
+      "stitching_details": "standard seam construction visible at shoulders, sleeves, and side seams; clean hemline",
+      "overall_description": "A plain white crewneck t-shirt from SkyyRose featuring a black and gold woven neck label with script branding and a small black woven tab on the right sleeve. Size M, shown from the front."
+    },
+    "gemini": {
+      "garment_type": "crewneck t-shirt",
+      "base_color": "#FFFFFF",
+      "base_color_name": "white",
+      "secondary_colors": [
+        "#000000",
+        "#B38F3A"
+      ],
+      "text_content": [
+        {
+          "text": "Skyy Rose",
+          "location": "interior neck tag",
+          "color": "#B38F3A",
+          "style": "cursive script"
+        }
+      ],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "SR-monogram",
+          "position": "right sleeve",
+          "size_inches": 1,
+          "material": "woven patch"
+        }
+      ],
+      "construction": [
+        "crewneck collar",
+        "woven neck label",
+        "set-in sleeves"
+      ],
+      "fabric": "cotton",
+      "patches": [
+        "Small black woven patch with gold monogram on the right sleeve."
+      ],
+      "design_elements": [],
+      "stitching_details": "Tonal white stitching is visible on the collar, sleeve hems, and bottom hem.",
+      "overall_description": "A plain white short-sleeve crewneck t-shirt with a black and gold woven label inside the collar and a small, matching black and gold monogram patch on the right sleeve."
+    }
+  }
+}

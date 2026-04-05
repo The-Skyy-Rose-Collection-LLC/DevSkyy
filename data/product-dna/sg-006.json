@@ -1,0 +1,89 @@
+{
+  "sku": "sg-006",
+  "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/mint-lavender-hoodie-source.jpg",
+  "analyzed_at": "2026-04-05T07:28:02.699151",
+  "models_used": [
+    "gpt",
+    "claude",
+    "gemini"
+  ],
+  "consensus": {
+    "base_color": "#88D498",
+    "base_color_name": "mint green",
+    "construction": [
+      "attached hood",
+      "drawstring hood",
+      "kangaroo pocket",
+      "ribbed cuffs",
+      "ribbed hem"
+    ],
+    "design_elements": [
+      "large purple crystal/floral cluster graphic emerging from white and grey clouds on front center"
+    ],
+    "fabric": "heavyweight cotton fleece",
+    "garment_type": "pullover hoodie",
+    "logos": [
+      {
+        "type": "floral-crystal-cloud-graphic",
+        "position": "front center chest",
+        "size_inches": 7,
+        "material": "printed"
+      }
+    ],
+    "numbers": [],
+    "overall_description": "A mint green pullover hoodie featuring a prominent front graphic of purple crystalline flowers or tulips rising from a bed of white and grey clouds, with standard hoodie construction including a kangaroo pocket and drawstring hood.",
+    "patches": [],
+    "secondary_colors": [
+      "#C5A3D1",
+      "#7B6B8A",
+      "#FFFFFF",
+      "#5C5C5C"
+    ],
+    "stitching_details": "",
+    "text_content": []
+  },
+  "disagreements": [],
+  "raw_results": {
+    "gpt": {
+      "_error": "Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************9MQA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}"
+    },
+    "claude": {
+      "garment_type": "pullover hoodie",
+      "base_color": "#88D498",
+      "base_color_name": "mint green",
+      "secondary_colors": [
+        "#C5A3D1",
+        "#7B6B8A",
+        "#FFFFFF",
+        "#5C5C5C"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "floral-crystal-cloud-graphic",
+          "position": "front center chest",
+          "size_inches": 7,
+          "material": "printed"
+        }
+      ],
+      "construction": [
+        "attached hood",
+        "drawstring hood",
+        "kangaroo pocket",
+        "ribbed cuffs",
+        "ribbed hem"
+      ],
+      "fabric": "heavyweight cotton fleece",
+      "patches": [],
+      "design_elements": [
+        "large purple crystal/floral cluster graphic emerging from white and grey clouds on front center"
+      ],
+      "stitching_details": "",
+      "overall_description": "A mint green pullover hoodie featuring a prominent front graphic of purple crystalline flowers or tulips rising from a bed of white and grey clouds, with standard hoodie construction including a kangaroo pocket and drawstring hood."
+    },
+    "gemini": {
+      "_error": "Expecting property name enclosed in double quotes: line 14 column 3 (char 246)"
+    }
+  }
+}

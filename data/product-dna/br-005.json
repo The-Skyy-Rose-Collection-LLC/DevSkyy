@@ -1,0 +1,207 @@
+{
+  "sku": "br-005",
+  "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-hoodie-signature-edition-hoodie-ltd-source.jpg",
+  "analyzed_at": "2026-04-05T07:23:56.993930",
+  "models_used": [
+    "gpt",
+    "claude",
+    "gemini"
+  ],
+  "consensus": {
+    "base_color": "#1A2A1A",
+    "base_color_name": "dark forest green",
+    "construction": [
+      "attached hood",
+      "drawstrings",
+      "ribbed cuffs",
+      "kangaroo pocket"
+    ],
+    "design_elements": [
+      "large rose emerging from clouds graphic on front center"
+    ],
+    "fabric": "heavyweight fleece cotton blend",
+    "garment_type": "pullover hoodie",
+    "logos": [
+      {
+        "type": "rose-with-clouds",
+        "position": "front center chest",
+        "size_inches": 7,
+        "material": "printed"
+      }
+    ],
+    "numbers": [],
+    "overall_description": "A dark forest green pullover hoodie featuring a prominent white and black graphic of a rose blooming from clouds on the front center. The hoodie has a classic construction with a kangaroo pocket, drawstring hood, and ribbed cuffs and hem.",
+    "patches": [
+      "Small rectangular woven tag on the right sleeve cuff."
+    ],
+    "secondary_colors": [
+      "#FFFFFF",
+      "#C0C0C0",
+      "#000000"
+    ],
+    "stitching_details": "standard seam construction, ribbed knit trim at cuffs and hem",
+    "text_content": []
+  },
+  "disagreements": [
+    {
+      "field": "base_color",
+      "no_consensus": true,
+      "values": {
+        "claude": "#1A2A1A",
+        "gemini": "#3D4140"
+      }
+    },
+    {
+      "field": "base_color_name",
+      "no_consensus": true,
+      "values": {
+        "claude": "dark forest green",
+        "gemini": "charcoal grey"
+      }
+    },
+    {
+      "field": "design_elements",
+      "no_consensus": true,
+      "values": {
+        "claude": [
+          "large rose emerging from clouds graphic on front center"
+        ],
+        "gemini": [
+          "Large embroidered graphic on the center chest depicting two roses with thorny stems emerging from a cloud."
+        ]
+      }
+    },
+    {
+      "field": "fabric",
+      "no_consensus": true,
+      "values": {
+        "claude": "heavyweight fleece cotton blend",
+        "gemini": "heavyweight cotton fleece"
+      }
+    },
+    {
+      "field": "logos",
+      "no_consensus": true,
+      "values": {
+        "claude": [
+          {
+            "type": "rose-with-clouds",
+            "position": "front center chest",
+            "size_inches": 7,
+            "material": "printed"
+          }
+        ],
+        "gemini": []
+      }
+    },
+    {
+      "field": "overall_description",
+      "no_consensus": true,
+      "values": {
+        "claude": "A dark forest green pullover hoodie featuring a prominent white and black graphic of a rose blooming from clouds on the front center. The hoodie has a classic construction with a kangaroo pocket, drawstring hood, and ribbed cuffs and hem.",
+        "gemini": "A charcoal grey pullover hoodie featuring a large, intricately embroidered graphic of two roses emerging from a cloud on the center chest. The garment is constructed with a kangaroo pocket, ribbed cuffs, and a drawstring hood."
+      }
+    },
+    {
+      "field": "patches",
+      "no_consensus": true,
+      "values": {
+        "claude": [],
+        "gemini": [
+          "Small rectangular woven tag on the right sleeve cuff."
+        ]
+      }
+    },
+    {
+      "field": "secondary_colors",
+      "no_consensus": true,
+      "values": {
+        "claude": [
+          "#FFFFFF",
+          "#C0C0C0",
+          "#000000"
+        ],
+        "gemini": [
+          "#EAEAEA",
+          "#A8A8A8",
+          "#1C1C1C"
+        ]
+      }
+    },
+    {
+      "field": "stitching_details",
+      "no_consensus": true,
+      "values": {
+        "claude": "standard seam construction, ribbed knit trim at cuffs and hem",
+        "gemini": "The central chest graphic is rendered in detailed embroidery with white, grey, and black thread."
+      }
+    }
+  ],
+  "raw_results": {
+    "gpt": {
+      "_error": "Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************9MQA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}"
+    },
+    "claude": {
+      "garment_type": "pullover hoodie",
+      "base_color": "#1A2A1A",
+      "base_color_name": "dark forest green",
+      "secondary_colors": [
+        "#FFFFFF",
+        "#C0C0C0",
+        "#000000"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "rose-with-clouds",
+          "position": "front center chest",
+          "size_inches": 7,
+          "material": "printed"
+        }
+      ],
+      "construction": [
+        "attached hood",
+        "drawstring hood",
+        "kangaroo pocket",
+        "ribbed cuffs",
+        "ribbed hem"
+      ],
+      "fabric": "heavyweight fleece cotton blend",
+      "patches": [],
+      "design_elements": [
+        "large rose emerging from clouds graphic on front center"
+      ],
+      "stitching_details": "standard seam construction, ribbed knit trim at cuffs and hem",
+      "overall_description": "A dark forest green pullover hoodie featuring a prominent white and black graphic of a rose blooming from clouds on the front center. The hoodie has a classic construction with a kangaroo pocket, drawstring hood, and ribbed cuffs and hem."
+    },
+    "gemini": {
+      "garment_type": "pullover hoodie",
+      "base_color": "#3D4140",
+      "base_color_name": "charcoal grey",
+      "secondary_colors": [
+        "#EAEAEA",
+        "#A8A8A8",
+        "#1C1C1C"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [],
+      "construction": [
+        "attached hood",
+        "drawstrings",
+        "ribbed cuffs",
+        "kangaroo pocket"
+      ],
+      "fabric": "heavyweight cotton fleece",
+      "patches": [
+        "Small rectangular woven tag on the right sleeve cuff."
+      ],
+      "design_elements": [
+        "Large embroidered graphic on the center chest depicting two roses with thorny stems emerging from a cloud."
+      ],
+      "stitching_details": "The central chest graphic is rendered in detailed embroidery with white, grey, and black thread.",
+      "overall_description": "A charcoal grey pullover hoodie featuring a large, intricately embroidered graphic of two roses emerging from a cloud on the center chest. The garment is constructed with a kangaroo pocket, ribbed cuffs, and a drawstring hood."
+    }
+  }
+}
