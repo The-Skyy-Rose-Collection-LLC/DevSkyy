@@ -60,17 +60,19 @@ class LuxuryHomePageBuilder(ElementorPageBuilder):
             Elementor section configuration dict
         """
         # Register GSAP animations for hero
-        self._animations.extend([
-            self.gsap_builder.build_split_text_animation(
-                ".hero-headline",
-                split_type="chars,words",
-            ),
-            self.gsap_builder.build_scroll_animation(
-                AnimationType.FADE_IN_UP,
-                ".hero-subtitle",
-            ),
-            self.gsap_builder.build_magnetic_button(".hero-cta"),
-        ])
+        self._animations.extend(
+            [
+                self.gsap_builder.build_split_text_animation(
+                    ".hero-headline",
+                    split_type="chars,words",
+                ),
+                self.gsap_builder.build_scroll_animation(
+                    AnimationType.FADE_IN_UP,
+                    ".hero-subtitle",
+                ),
+                self.gsap_builder.build_magnetic_button(".hero-cta"),
+            ]
+        )
 
         return {
             "elType": "section",
@@ -148,7 +150,13 @@ class LuxuryHomePageBuilder(ElementorPageBuilder):
                                 "button_border_color": "rgba(183, 110, 121, 0.6)",
                                 "button_hover_border_color": brand_kit.colors.primary,
                                 "button_border_radius": {"size": 12, "unit": "px"},
-                                "button_padding": {"top": 18, "right": 36, "bottom": 18, "left": 36, "unit": "px"},
+                                "button_padding": {
+                                    "top": 18,
+                                    "right": 36,
+                                    "bottom": 18,
+                                    "left": 36,
+                                    "unit": "px",
+                                },
                                 "_css_classes": "hero-cta glass-button",
                                 "motion_fx_enabled": "yes",
                             },
@@ -227,7 +235,7 @@ class LuxuryHomePageBuilder(ElementorPageBuilder):
                         {
                             "elType": "column",
                             "settings": {"_column_size": 33},
-                            "elements": [self._build_collection_card(coll, idx)]
+                            "elements": [self._build_collection_card(coll, idx)],
                         }
                         for idx, coll in enumerate(collections)
                     ],
@@ -276,7 +284,9 @@ class LuxuryHomePageBuilder(ElementorPageBuilder):
                     "elType": "widget",
                     "widgetType": "image",
                     "settings": {
-                        "image": {"url": f"/wp-content/uploads/collections/{collection_slug}-hero.webp"},
+                        "image": {
+                            "url": f"/wp-content/uploads/collections/{collection_slug}-hero.webp"
+                        },
                         "image_size": "full",
                         "width": {"size": 100, "unit": "%"},
                         "height": {"size": 480, "unit": "px"},
@@ -353,9 +363,7 @@ class LuxuryHomePageBuilder(ElementorPageBuilder):
             Elementor section configuration dict
         """
         # Register parallax animation
-        self._animations.append(
-            self.gsap_builder.build_parallax(".parallax-layer", speed=0.3)
-        )
+        self._animations.append(self.gsap_builder.build_parallax(".parallax-layer", speed=0.3))
 
         return {
             "elType": "section",

@@ -16,7 +16,6 @@ import os
 import sys
 import time
 from pathlib import Path
-from urllib.parse import urlencode
 
 import httpx
 
@@ -98,11 +97,15 @@ def ensure_kids_category() -> int:
             return cat["id"]
 
     # Create it
-    result = wc_request("POST", "products/categories", json_data={
-        "name": "Kids Capsule",
-        "slug": KIDS_CATEGORY_SLUG,
-        "description": "SkyyRose Kids — luxury starts young.",
-    })
+    result = wc_request(
+        "POST",
+        "products/categories",
+        json_data={
+            "name": "Kids Capsule",
+            "slug": KIDS_CATEGORY_SLUG,
+            "description": "SkyyRose Kids — luxury starts young.",
+        },
+    )
     print(f"  Created Kids Capsule category (ID: {result['id']})")
     return result["id"]
 
@@ -141,19 +144,23 @@ def build_product_data(
     if sizes:
         size_list = [s.strip() for s in sizes.split("|") if s.strip()]
         if size_list:
-            data["attributes"].append({
-                "name": "Size",
-                "visible": True,
-                "options": size_list,
-            })
+            data["attributes"].append(
+                {
+                    "name": "Size",
+                    "visible": True,
+                    "options": size_list,
+                }
+            )
 
     # Add color attribute
     if color:
-        data["attributes"].append({
-            "name": "Color",
-            "visible": True,
-            "options": [color],
-        })
+        data["attributes"].append(
+            {
+                "name": "Color",
+                "visible": True,
+                "options": [color],
+            }
+        )
 
     # Add image
     if image_info:
@@ -229,13 +236,17 @@ def sync_all():
                 wc_id = existing[sku]["id"]
                 wc_request("PUT", f"products/{wc_id}", json_data=product_data)
                 img_status = "✓ img" if image_info else "✗ no img"
-                print(f"  UPDATED  {sku:18s} | {name[:40]:40s} | ${product_data['regular_price']:>6s} | {img_status}")
+                print(
+                    f"  UPDATED  {sku:18s} | {name[:40]:40s} | ${product_data['regular_price']:>6s} | {img_status}"
+                )
                 updated += 1
             else:
                 # Create new
                 result = wc_request("POST", "products", json_data=product_data)
                 img_status = "✓ img" if image_info else "✗ no img"
-                print(f"  CREATED  {sku:18s} | {name[:40]:40s} | ${product_data['regular_price']:>6s} | {img_status}")
+                print(
+                    f"  CREATED  {sku:18s} | {name[:40]:40s} | ${product_data['regular_price']:>6s} | {img_status}"
+                )
                 created += 1
 
             # Rate limit: WooCommerce can throttle
@@ -248,11 +259,15 @@ def sync_all():
                     product_data.pop("images", None)
                     if sku in existing:
                         wc_request("PUT", f"products/{existing[sku]['id']}", json_data=product_data)
-                        print(f"  UPDATED  {sku:18s} | {name[:40]:40s} | ${product_data['regular_price']:>6s} | ✗ img invalid, synced without")
+                        print(
+                            f"  UPDATED  {sku:18s} | {name[:40]:40s} | ${product_data['regular_price']:>6s} | ✗ img invalid, synced without"
+                        )
                         updated += 1
                     else:
                         wc_request("POST", "products", json_data=product_data)
-                        print(f"  CREATED  {sku:18s} | {name[:40]:40s} | ${product_data['regular_price']:>6s} | ✗ img invalid, synced without")
+                        print(
+                            f"  CREATED  {sku:18s} | {name[:40]:40s} | ${product_data['regular_price']:>6s} | ✗ img invalid, synced without"
+                        )
                         created += 1
                     time.sleep(0.5)
                     continue
@@ -260,7 +275,9 @@ def sync_all():
                     print(f"  FAILED   {sku:18s} | {name[:40]:40s} | retry failed: {retry_err}")
                     failed += 1
             else:
-                print(f"  FAILED   {sku:18s} | {name[:40]:40s} | {e.response.status_code}: {e.response.text[:100]}")
+                print(
+                    f"  FAILED   {sku:18s} | {name[:40]:40s} | {e.response.status_code}: {e.response.text[:100]}"
+                )
                 failed += 1
         except Exception as e:
             print(f"  FAILED   {sku:18s} | {name[:40]:40s} | {e}")

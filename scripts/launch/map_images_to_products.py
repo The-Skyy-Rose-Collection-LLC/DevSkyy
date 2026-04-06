@@ -180,8 +180,7 @@ def map_images() -> dict[str, dict]:
 
         # Filter images by prefix
         candidates = {
-            k: v for k, v in images.items()
-            if k.startswith(img_prefix) and k not in used_images
+            k: v for k, v in images.items() if k.startswith(img_prefix) and k not in used_images
         }
 
         if not candidates:

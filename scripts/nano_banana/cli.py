@@ -41,11 +41,11 @@ def cmd_dry_run(args):
     products = load_products(catalog, sku_filter=args.sku)
     views = _resolve_views(args.step)
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("Nano Banana 2 — DRY RUN")
     print(f"Products: {len(products)} | Views: {views}")
     print(f"Output dir: {PRODUCTS_DIR}")
-    print(f"{'='*60}\n")
+    print(f"{'=' * 60}\n")
 
     found = 0
     missing = 0
