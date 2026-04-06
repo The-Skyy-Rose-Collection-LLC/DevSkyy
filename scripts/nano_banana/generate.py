@@ -164,13 +164,22 @@ def generate_gpt(
         "quality": "high",
     }
 
-    if source_path and source_path.exists():
-        b64 = base64.b64encode(source_path.read_bytes()).decode("utf-8")
-        mime = "image/jpeg" if source_path.suffix.lower() in (".jpg", ".jpeg") else "image/webp"
-        kwargs["image"] = [{"type": "base64", "media_type": mime, "data": b64}]
+    # GPT Image 1.5 uses images.edit() for reference-based editing,
+    # images.generate() for text-to-image only.
+    use_edit = source_path and source_path.exists()
 
     try:
-        response = openai_client.images.generate(**kwargs)
+        if use_edit:
+            # Use edit endpoint with reference image as input
+            with open(source_path, "rb") as img_file:
+                response = openai_client.images.edit(
+                    model=GPT_IMAGE_MODEL,
+                    image=img_file,
+                    prompt=prompt,
+                    size="1024x1536",
+                )
+        else:
+            response = openai_client.images.generate(**kwargs)
     except Exception as exc:
         log.error("GPT-Image API call failed: %s", exc)
         return None

@@ -250,8 +250,17 @@ def judge_with_gemini(client, source_path: Path, candidate_path: Path, dna: dict
                 max_output_tokens=1000,
             ),
         )
-        data = json.loads(response.text)
-        return _build_judgment_from_json("gemini-3-pro-preview", data, response.text)
+        # Extract text from parts, skipping thought_signature and other non-text parts
+        text_parts = []
+        if response.candidates and response.candidates[0].content.parts:
+            for part in response.candidates[0].content.parts:
+                if hasattr(part, "text") and part.text:
+                    text_parts.append(part.text)
+        raw_text = "\n".join(text_parts) if text_parts else (response.text or "")
+        data = _parse_json(raw_text)
+        if not data:
+            raise ValueError(f"Empty JSON parse from: {raw_text[:200]}")
+        return _build_judgment_from_json("gemini-3-pro-preview", data, raw_text)
     except Exception as exc:
         log.error("Gemini judge failed: %s", exc)
         return JudgmentScore("gemini-3-pro-preview", 0, 0, 0, 0, 0, 0, 0, [f"judge error: {exc}"], [], "")
