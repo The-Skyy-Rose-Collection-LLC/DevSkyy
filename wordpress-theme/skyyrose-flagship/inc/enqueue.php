@@ -611,6 +611,10 @@ function skyyrose_enqueue_template_scripts() {
 					'wcActive'    => class_exists( 'WooCommerce' ),
 					'checkoutUrl' => function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/checkout/' ),
 					'cartUrl'     => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
+					'i18n'        => array(
+						'item'  => __( 'item', 'skyyrose-flagship' ),
+						'items' => __( 'items', 'skyyrose-flagship' ),
+					),
 				)
 			);
 		}

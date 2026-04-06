@@ -958,6 +958,164 @@
 	}
 
 	/* --------------------------------------------------
+	   GSAP Entrance Animations & Collection Switching
+	   (extracted from inline script in template-preorder-gateway.php)
+	   -------------------------------------------------- */
+
+	var showcaseCards  = document.querySelectorAll('.showcase__card');
+	var tabBarButtons  = document.querySelectorAll('.tab-bar__btn');
+	var productSection = document.getElementById('products-section');
+	var cartSummaryBar = document.getElementById('cart-summary');
+	var cartCountEl    = document.getElementById('cart-summary-count');
+	var cartTotalEl    = document.getElementById('cart-summary-total');
+	var activeCollection = null;
+
+	/* Collection grid map */
+	var grids = {};
+	['black-rose', 'love-hurts', 'signature'].forEach(function(slug) {
+		grids[slug] = document.getElementById('grid-' + slug);
+	});
+
+	function initEntranceAnimations() {
+		if (typeof gsap === 'undefined') { return; }
+
+		gsap.from('.hero__badge', {
+			opacity: 0, y: 20, duration: 0.8, delay: 0.2, ease: 'power3.out'
+		});
+		gsap.from('.hero__title', {
+			opacity: 0, y: 30, duration: 1, delay: 0.4, ease: 'power3.out'
+		});
+		gsap.from('.hero__tagline', {
+			opacity: 0, y: 20, duration: 0.8, delay: 0.7, ease: 'power3.out'
+		});
+		gsap.from('.hero__subtitle', {
+			opacity: 0, y: 15, duration: 0.8, delay: 0.9, ease: 'power3.out'
+		});
+		gsap.from('.showcase__card', {
+			opacity: 0, y: 50, duration: 0.9, stagger: 0.15, delay: 1.1,
+			ease: 'power3.out'
+		});
+	}
+
+	function activateCollection(slug) {
+		if (activeCollection === slug) { return; }
+		activeCollection = slug;
+
+		document.body.setAttribute('data-active-collection', slug);
+
+		/* Update tab bar */
+		tabBarButtons.forEach(function(btn) {
+			var isActive = btn.getAttribute('data-tab') === slug;
+			btn.classList.toggle('tab-bar__btn--active', isActive);
+			btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+			btn.setAttribute('tabindex', isActive ? '0' : '-1');
+		});
+
+		/* Show/hide grids */
+		Object.keys(grids).forEach(function(key) {
+			var grid = grids[key];
+			if (!grid) { return; }
+			if (key === slug) {
+				grid.style.display = '';
+				grid.removeAttribute('hidden');
+				animateGridIn(grid);
+			} else {
+				grid.style.display = 'none';
+				grid.setAttribute('hidden', '');
+			}
+		});
+
+		/* Scroll to product section */
+		if (productSection && typeof gsap !== 'undefined' && gsap.plugins && gsap.plugins.scrollTo) {
+			gsap.to(window, {
+				scrollTo: { y: productSection, offsetY: 120 },
+				duration: 0.8,
+				ease: 'power3.inOut'
+			});
+		} else if (productSection) {
+			productSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		}
+	}
+
+	function animateGridIn(grid) {
+		var holoCards = grid.querySelectorAll('.holo');
+		if (typeof gsap === 'undefined') {
+			holoCards.forEach(function(c) { c.classList.add('holo--visible'); });
+			return;
+		}
+
+		holoCards.forEach(function(card) {
+			card.classList.remove('holo--visible');
+			card.style.opacity = '0';
+			card.style.transform = 'translateY(32px)';
+		});
+
+		gsap.to(holoCards, {
+			opacity: 1,
+			y: 0,
+			duration: 0.7,
+			stagger: 0.1,
+			ease: 'power3.out',
+			delay: 0.15,
+			onComplete: function() {
+				holoCards.forEach(function(card) {
+					card.classList.add('holo--visible');
+					card.style.transform = '';
+					card.style.opacity = '';
+				});
+			}
+		});
+	}
+
+	function initShowcaseCards() {
+		showcaseCards.forEach(function(card) {
+			card.addEventListener('click', function() {
+				var slug = card.getAttribute('data-collection');
+				if (slug) { activateCollection(slug); }
+			});
+			card.addEventListener('keydown', function(e) {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault();
+					var slug = card.getAttribute('data-collection');
+					if (slug) { activateCollection(slug); }
+				}
+			});
+		});
+
+		tabBarButtons.forEach(function(btn) {
+			btn.addEventListener('click', function() {
+				var slug = btn.getAttribute('data-tab');
+				if (slug) { activateCollection(slug); }
+			});
+		});
+	}
+
+	function updateCartSummaryBar() {
+		if (!cartSummaryBar) { return; }
+		var countEl = document.querySelector('.nav-cart-count, .cart-contents .count');
+		var count   = countEl ? parseInt(countEl.textContent, 10) || 0 : 0;
+
+		if (count > 0) {
+			cartSummaryBar.classList.add('cart-summary--visible');
+			if (cartCountEl) {
+				var i18n = (typeof skyyRoseGateway !== 'undefined' && skyyRoseGateway.i18n) || {};
+				var itemWord = count === 1 ? (i18n.item || 'item') : (i18n.items || 'items');
+				cartCountEl.textContent = count + ' ' + itemWord;
+			}
+		} else {
+			cartSummaryBar.classList.remove('cart-summary--visible');
+		}
+	}
+
+	function initCartSummaryBar() {
+		/* Listen for WooCommerce fragment updates */
+		if (typeof jQuery !== 'undefined') {
+			jQuery(document.body).on('added_to_cart removed_from_cart wc_fragments_refreshed', updateCartSummaryBar);
+		}
+		updateCartSummaryBar();
+	}
+
+	/* --------------------------------------------------
 	   Init
 	   -------------------------------------------------- */
 
@@ -975,6 +1133,9 @@
 		initTrendingBadges();
 		initUrgencyCountdowns();
 		initScarcityPrice();
+		initEntranceAnimations();
+		initShowcaseCards();
+		initCartSummaryBar();
 	}
 
 	if (document.readyState === 'loading') {

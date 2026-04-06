@@ -216,279 +216,46 @@ $customer_photos = array(
 		</div>
 	</section>
 
-	<!-- Chapter I — The Rebrand -->
-	<section class="abt-chapter abt-origin" id="origin" aria-label="<?php esc_attr_e( 'The Rebrand Story', 'skyyrose-flagship' ); ?>">
-		<span class="abt-chapter__num rv-split-char" aria-hidden="true">01</span>
-		<div class="abt-chapter__container">
-			<p class="abt-chapter__label rv-blur-down"><?php esc_html_e( 'Chapter I', 'skyyrose-flagship' ); ?></p>
-			<h2 class="abt-chapter__title rv-clip-up">
-				<?php echo wp_kses( __( 'The Birth of<br>the Rebrand', 'skyyrose-flagship' ), $allowed_inline ); ?>
-			</h2>
-
-			<div class="abt-origin__grid">
-				<div class="abt-origin__quote rv rv-d2">
-					<blockquote>
-						<?php echo wp_kses( $origin_quote, $allowed_inline ); ?>
-					</blockquote>
-					<cite><?php echo wp_kses( $origin_cite, $allowed_inline ); ?></cite>
-
-					<?php
-					$founder_img = get_theme_file_path( 'assets/images/founder-portrait.jpg' );
-					if ( file_exists( $founder_img ) ) :
-					?>
-						<figure class="abt-origin__portrait rv rv-d3">
-							<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/founder-portrait.jpg' ) ); ?>"
-								 alt="<?php esc_attr_e( 'Corey Foster — Founder & CEO of SkyyRose', 'skyyrose-flagship' ); ?>"
-								 loading="lazy" width="600" height="750">
-							<figcaption><?php esc_html_e( 'Corey Foster, Founder & CEO', 'skyyrose-flagship' ); ?></figcaption>
-						</figure>
-					<?php endif; ?>
-				</div>
-				<div class="abt-origin__text rv rv-d3">
-					<?php foreach ( $origin_paragraphs as $para ) : ?>
-						<p><?php echo wp_kses( $para, $allowed_inline ); ?></p>
-					<?php endforeach; ?>
-				</div>
-			</div>
-		</div>
-	</section>
-
-	<!-- Photo Divider 1 -->
 	<?php
-	$story1_img = get_theme_file_path( 'assets/images/about-story-1.jpg' );
-	if ( file_exists( $story1_img ) ) :
+	/* Chapter I — The Rebrand (Origin Story). */
+	get_template_part( 'template-parts/about/chapter-origin', null, array(
+		'allowed_inline'   => $allowed_inline,
+		'origin_quote'     => $origin_quote,
+		'origin_cite'      => $origin_cite,
+		'origin_paragraphs' => $origin_paragraphs,
+	) );
+
+	/* Chapter II — The Collections Grid. */
+	get_template_part( 'template-parts/about/collections-grid', null, array(
+		'allowed_inline' => $allowed_inline,
+		'collections'    => $collections,
+	) );
+
+	/* Chapter III — Timeline / The Journey. */
+	get_template_part( 'template-parts/about/timeline', null, array(
+		'allowed_inline'      => $allowed_inline,
+		'timeline_milestones' => $timeline_milestones,
+	) );
+
+	/* Chapter IV — Press Room. */
+	get_template_part( 'template-parts/about/press-section', null, array(
+		'allowed_inline'   => $allowed_inline,
+		'youtube_embed_id' => $youtube_embed_id,
+		'press_features'   => $press_features,
+		'arrow_svg'        => $arrow_svg,
+	) );
+
+	/* Mission Banner. */
+	get_template_part( 'template-parts/about/mission', null, array(
+		'allowed_inline' => $allowed_inline,
+	) );
+
+	/* Community — Oakland Roots. */
+	get_template_part( 'template-parts/about/community', null, array(
+		'allowed_inline'  => $allowed_inline,
+		'customer_photos' => $customer_photos,
+	) );
 	?>
-		<div class="abt-divider rv" aria-hidden="true">
-			<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/about-story-1.jpg' ) ); ?>"
-				 alt="" loading="lazy" width="1920" height="600">
-			<div class="abt-divider__overlay"></div>
-		</div>
-	<?php endif; ?>
-
-	<!-- Chapter II — The Collections -->
-	<section class="abt-chapter abt-values" aria-label="<?php esc_attr_e( 'The Collections', 'skyyrose-flagship' ); ?>">
-		<span class="abt-chapter__num rv-split-char" aria-hidden="true">02</span>
-		<div class="abt-chapter__container">
-			<p class="abt-chapter__label rv-blur-down"><?php esc_html_e( 'Chapter II', 'skyyrose-flagship' ); ?></p>
-			<h2 class="abt-chapter__title rv-clip-up">
-				<?php echo wp_kses( __( 'Three Worlds,<br>One Crown', 'skyyrose-flagship' ), $allowed_inline ); ?>
-			</h2>
-
-			<div class="abt-values__grid">
-				<?php foreach ( $collections as $ci => $col ) :
-					$delay = 'rv-d' . ( ( $ci % 3 ) + 1 );
-				?>
-					<div class="abt-val-card rv <?php echo esc_attr( $delay ); ?>">
-						<div class="abt-val-card__icon" aria-hidden="true">
-							<?php echo wp_kses( $col['icon'], array( 'svg' => array( 'viewBox' => true, 'fill' => true, 'stroke' => true, 'class' => true, 'aria-hidden' => true, 'width' => true, 'height' => true, 'xmlns' => true ), 'path' => array( 'd' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true ), 'circle' => array( 'cx' => true, 'cy' => true, 'r' => true, 'fill' => true ), 'line' => array( 'x1' => true, 'y1' => true, 'x2' => true, 'y2' => true, 'stroke' => true, 'stroke-width' => true ), 'polyline' => array( 'points' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true ), 'rect' => array( 'x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true, 'ry' => true, 'fill' => true, 'stroke' => true ) ) ); ?>
-						</div>
-						<h3 class="abt-val-card__title"><?php echo esc_html( $col['title'] ); ?></h3>
-						<p class="abt-val-card__text"><?php echo wp_kses( $col['text'], $allowed_inline ); ?></p>
-					</div>
-				<?php endforeach; ?>
-			</div>
-		</div>
-	</section>
-
-	<!-- Photo Divider 2 -->
-	<?php
-	$story2_img = get_theme_file_path( 'assets/images/about-story-2.jpg' );
-	if ( file_exists( $story2_img ) ) :
-	?>
-		<div class="abt-divider rv" aria-hidden="true">
-			<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/about-story-2.jpg' ) ); ?>"
-				 alt="" loading="lazy" width="1920" height="600">
-			<div class="abt-divider__overlay"></div>
-		</div>
-	<?php endif; ?>
-
-	<!-- Chapter III — Timeline -->
-	<section class="abt-chapter abt-timeline" aria-label="<?php esc_attr_e( 'Our Journey', 'skyyrose-flagship' ); ?>">
-		<span class="abt-chapter__num rv-split-char" aria-hidden="true">03</span>
-		<div class="abt-chapter__container">
-			<p class="abt-chapter__label rv-blur-down"><?php esc_html_e( 'Chapter III', 'skyyrose-flagship' ); ?></p>
-			<h2 class="abt-chapter__title rv-clip-up"><?php esc_html_e( 'The Journey', 'skyyrose-flagship' ); ?></h2>
-
-			<div class="abt-tl__track" role="list">
-				<?php foreach ( $timeline_milestones as $ms ) : ?>
-					<div class="abt-tl__node rv" role="listitem">
-						<div class="abt-tl__year"><?php echo wp_kses( $ms['year'], $allowed_inline ); ?></div>
-						<h3 class="abt-tl__event"><?php echo esc_html( $ms['event'] ); ?></h3>
-						<p class="abt-tl__desc"><?php echo wp_kses( $ms['desc'], $allowed_inline ); ?></p>
-					</div>
-				<?php endforeach; ?>
-			</div>
-		</div>
-	</section>
-
-	<!-- Press Room -->
-	<section class="abt-chapter abt-press" id="press" aria-label="<?php esc_attr_e( 'Press & Media', 'skyyrose-flagship' ); ?>">
-		<span class="abt-chapter__num rv-split-char" aria-hidden="true">04</span>
-		<div class="abt-chapter__container">
-			<p class="abt-chapter__label rv-blur-down"><?php esc_html_e( 'Chapter IV', 'skyyrose-flagship' ); ?></p>
-			<h2 class="abt-chapter__title rv-clip-up"><?php esc_html_e( 'As Seen In', 'skyyrose-flagship' ); ?></h2>
-			<p class="abt-press__intro rv rv-d2">
-				<?php esc_html_e( 'The SkyyRose story has been recognized by national and regional publications for its authenticity, innovation, and the power of its origin.', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<?php
-			$press_img = get_theme_file_path( 'assets/images/press-the-blox-interview.jpg' );
-			if ( file_exists( $press_img ) ) :
-			?>
-				<figure class="abt-press__photo rv rv-d2">
-					<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/press-the-blox-interview.jpg' ) ); ?>"
-						 alt="<?php esc_attr_e( 'Corey Foster interviewed on The Blox', 'skyyrose-flagship' ); ?>"
-						 loading="lazy" width="1200" height="675">
-					<figcaption><?php esc_html_e( 'Corey Foster on The Blox — discussing the SkyyRose story', 'skyyrose-flagship' ); ?></figcaption>
-				</figure>
-			<?php endif; ?>
-
-			<?php if ( ! empty( $youtube_embed_id ) ) : ?>
-				<div class="abt-press__video-wrap rv rv-d3">
-					<div class="abt-press__video-header">
-						<span><?php esc_html_e( 'Featured Video', 'skyyrose-flagship' ); ?></span>
-						<div class="abt-press__video-line" aria-hidden="true"></div>
-					</div>
-					<div class="abt-press__video-embed">
-						<iframe
-							src="<?php echo esc_url( 'https://www.youtube.com/embed/' . $youtube_embed_id . '?rel=0&modestbranding=1&color=white' ); ?>"
-							title="<?php esc_attr_e( 'SkyyRose Collection — Featured Video', 'skyyrose-flagship' ); ?>"
-							frameborder="0"
-							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-							allowfullscreen
-							loading="lazy">
-						</iframe>
-					</div>
-				</div>
-			<?php endif; ?>
-		</div>
-
-		<div class="abt-press__scroll" id="pressScroll">
-			<?php foreach ( $press_features as $pi => $pf ) :
-				$delay = 'rv-d' . min( $pi + 1, 4 );
-			?>
-				<article class="abt-press-card rv <?php echo esc_attr( $delay ); ?>">
-					<div class="abt-press-card__inner">
-						<p class="abt-press-card__src"><?php echo esc_html( $pf['src'] ); ?></p>
-						<p class="abt-press-card__year"><?php echo esc_html( $pf['year'] ); ?></p>
-						<h3 class="abt-press-card__headline">
-							<?php echo wp_kses( $pf['headline'], $allowed_inline ); ?>
-						</h3>
-						<p class="abt-press-card__excerpt">
-							<?php echo wp_kses( $pf['excerpt'], $allowed_inline ); ?>
-						</p>
-						<?php if ( ! empty( $pf['url'] ) ) : ?>
-							<a href="<?php echo esc_url( $pf['url'] ); ?>"
-							   class="abt-press-card__link"
-							   target="_blank"
-							   rel="noopener noreferrer">
-								<?php esc_html_e( 'Read Article', 'skyyrose-flagship' ); ?>
-								<?php echo wp_kses( $arrow_svg, array( 'svg' => array( 'viewBox' => true, 'fill' => true, 'stroke' => true, 'class' => true, 'aria-hidden' => true, 'width' => true, 'height' => true, 'xmlns' => true, 'focusable' => true ), 'path' => array( 'd' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true ), 'circle' => array( 'cx' => true, 'cy' => true, 'r' => true, 'fill' => true ), 'line' => array( 'x1' => true, 'y1' => true, 'x2' => true, 'y2' => true, 'stroke' => true, 'stroke-width' => true ), 'polyline' => array( 'points' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true ), 'rect' => array( 'x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true, 'ry' => true, 'fill' => true, 'stroke' => true ) ) ); ?>
-							</a>
-						<?php endif; ?>
-					</div>
-				</article>
-			<?php endforeach; ?>
-			<div class="abt-press__scroll-spacer" aria-hidden="true"></div>
-		</div>
-
-		<div class="abt-chapter__container">
-			<div class="abt-press__hint rv" aria-hidden="true">
-				<div class="abt-press__hint-line"></div>
-				<span><?php esc_html_e( 'Scroll to explore', 'skyyrose-flagship' ); ?></span>
-			</div>
-		</div>
-	</section>
-
-	<!-- Mission Banner -->
-	<section class="abt-mission" aria-label="<?php esc_attr_e( 'Our Mission', 'skyyrose-flagship' ); ?>">
-		<div class="rv">
-			<p class="abt-chapter__label" style="text-align:center;margin-bottom:24px">
-				<?php esc_html_e( 'The Mission', 'skyyrose-flagship' ); ?>
-			</p>
-			<h2 class="abt-mission__tagline">
-				<?php echo wp_kses( __( 'Luxury Grows<br>from Concrete.', 'skyyrose-flagship' ), $allowed_inline ); ?>
-			</h2>
-			<p class="abt-mission__sub">
-				<?php esc_html_e( 'Luxury grows from concrete. Oakland roots, family-driven, fashion as self-expression. Three collections, one bloodline, one crown. This is SkyyRose.', 'skyyrose-flagship' ); ?>
-			</p>
-			<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="abt-mission__cta">
-				<?php esc_html_e( 'Shop the Collection', 'skyyrose-flagship' ); ?>
-			</a>
-		</div>
-	</section>
-
-	<!-- Community — Oakland Roots -->
-	<section class="abt-community" aria-label="<?php esc_attr_e( 'Our Community', 'skyyrose-flagship' ); ?>">
-		<div class="abt-community__inner">
-			<div class="abt-community__content rv">
-				<h2 class="abt-community__heading">
-					<?php esc_html_e( 'Rooted in Oakland, Built for the World', 'skyyrose-flagship' ); ?>
-				</h2>
-				<p class="abt-community__text">
-					<?php
-					echo wp_kses(
-						__( 'Oakland isn\'t just where SkyyRose was born&mdash;it\'s <em>who</em> we are. The creativity, the resilience, the unapologetic swagger of the Bay Area runs through every thread of our brand. Fashion was always self-expression here. What you wear says who you are, where you\'re going, what you refuse to accept.', 'skyyrose-flagship' ),
-						$allowed_inline
-					);
-					?>
-				</p>
-				<p class="abt-community__text">
-					<?php
-					echo wp_kses(
-						__( 'SkyyRose is family-driven at its core. The Hurts bloodline, a grandmother\'s legacy, a father\'s promise to his daughter&mdash;that\'s the foundation. We give back because it\'s in our DNA. Whether partnering with local Oakland artists, supporting youth programs, or spotlighting the voices that inspire our collections&mdash;SkyyRose exists to lift up the community that lifted us.', 'skyyrose-flagship' ),
-						$allowed_inline
-					);
-					?>
-				</p>
-			</div>
-			<div class="abt-community__pillars rv rv-d2">
-				<div class="abt-community__pillar">
-					<h3><?php esc_html_e( 'Local Artists', 'skyyrose-flagship' ); ?></h3>
-					<p><?php esc_html_e( 'Collaborating with Oakland creatives to bring fresh perspectives to every collection and campaign.', 'skyyrose-flagship' ); ?></p>
-				</div>
-				<div class="abt-community__pillar">
-					<h3><?php esc_html_e( 'Youth Programs', 'skyyrose-flagship' ); ?></h3>
-					<p><?php esc_html_e( 'Supporting the next generation of designers and entrepreneurs through mentorship and creative workshops.', 'skyyrose-flagship' ); ?></p>
-				</div>
-				<div class="abt-community__pillar">
-					<h3><?php esc_html_e( 'Luxury Runs in the Family', 'skyyrose-flagship' ); ?></h3>
-					<p><?php esc_html_e( 'From the Kids Capsule to every mainline collection, SkyyRose proves that quality, vision, and ambition are inherited. The next generation wears the crown too.', 'skyyrose-flagship' ); ?></p>
-				</div>
-			</div>
-		</div>
-
-		<?php
-		$has_photos = false;
-		foreach ( $customer_photos as $photo ) {
-			if ( file_exists( get_theme_file_path( 'assets/images/customers/' . $photo['file'] ) ) ) {
-				$has_photos = true;
-				break;
-			}
-		}
-
-		if ( $has_photos ) :
-		?>
-			<div class="abt-community__gallery rv rv-d3">
-				<p class="abt-community__gallery-label"><?php esc_html_e( 'The SkyyRose Family', 'skyyrose-flagship' ); ?></p>
-				<div class="abt-community__photos">
-					<?php foreach ( $customer_photos as $photo ) :
-						$photo_path = get_theme_file_path( 'assets/images/customers/' . $photo['file'] );
-						if ( file_exists( $photo_path ) ) :
-					?>
-						<figure class="abt-community__photo">
-							<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/customers/' . $photo['file'] ) ); ?>"
-								 alt="<?php echo esc_attr( $photo['alt'] ); ?>"
-								 loading="lazy" width="400" height="500">
-						</figure>
-					<?php
-						endif;
-					endforeach;
-					?>
-				</div>
-			</div>
-		<?php endif; ?>
-	</section>
 
 </main>
 
