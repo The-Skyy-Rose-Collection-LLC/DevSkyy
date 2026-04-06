@@ -9,7 +9,7 @@
 ### Three.js Stack (Production)
 - **Three.js r160** via jsdelivr CDN (9 add-on scripts)
 - Add-ons: OrbitControls, GLTFLoader, DRACOLoader, RGBELoader, EffectComposer, RenderPass, UnrealBloomPass, ShaderPass, CopyShader
-- Enqueued conditionally per-template in `inc/enqueue-features.php` at priority 65
+- Enqueued conditionally per-template in `inc/enqueue.php` at priority 65
 
 ### Load Chain
 ```
@@ -36,9 +36,8 @@ assets/js/
     init-3d.js                    ← Initialization orchestrator
 
 inc/
-  enqueue.php                     ← Global asset loading
+  enqueue.php                     ← Global asset loading + collection experience enqueue (priority 65)
   enqueue-engines.php             ← skyyrose_enqueue_engine() helper
-  enqueue-features.php            ← Collection experience enqueue (priority 65)
   immersive-ajax.php              ← AJAX: get-product-by-sku, get-collection, add-to-cart
 
 template-immersive-black-rose.php ← 2D fallback rooms + world config
