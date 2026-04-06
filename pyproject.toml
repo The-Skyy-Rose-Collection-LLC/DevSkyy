@@ -258,7 +258,7 @@ ml = [
     "omegaconf==2.3.0",
     "tqdm==4.67.3",
     "joblib==1.5.3",
-    "dill==0.4.0",
+    "dill==0.4.1",
     "fastapi>=0.119.0",
     "uvicorn>=0.32.1",
     "pydantic>=2.10.3",
