@@ -29,6 +29,7 @@ ENHANCED_SUFFIX = (
 
 # -- View prompts -------------------------------------------------------------
 
+
 def front_prompt(name: str) -> str:
     return (
         f"Generate a photorealistic e-commerce product render of this {name} — FRONT VIEW ONLY.\n"
@@ -114,6 +115,7 @@ ACCESSORY_BRANDING_TEMPLATES = {
 
 # -- Composite prompts --------------------------------------------------------
 
+
 def composite_prompt(name: str, sku: str, view: str = "front") -> str:
     """Build a prompt for compositing real branding onto an AI lifestyle shot."""
     treatment = LOGO_TREATMENTS.get(sku, "")
@@ -132,10 +134,13 @@ def composite_prompt(name: str, sku: str, view: str = "front") -> str:
 
 # -- FLUX prompts (text-to-image, no reference) -------------------------------
 
+
 def flux_prompt(name: str, view: str, source_desc: str = "") -> str:
     """Build a FLUX prompt for converting tech flats to photorealistic shots."""
     view_label = {
-        "front": "FRONT VIEW", "back": "BACK VIEW", "branding": "cinematic editorial shot",
+        "front": "FRONT VIEW",
+        "back": "BACK VIEW",
+        "branding": "cinematic editorial shot",
     }.get(view, "FRONT VIEW")
 
     base = f"Professional e-commerce product photography of a {name} on an invisible ghost mannequin, {view_label}. "
@@ -159,6 +164,7 @@ def flux_prompt(name: str, view: str, source_desc: str = "") -> str:
 
 # -- Prompt router ------------------------------------------------------------
 
+
 def get_prompt(product: dict, view: str) -> str:
     """Select the right prompt for a product + view combination."""
     name = product["name"]
@@ -167,9 +173,13 @@ def get_prompt(product: dict, view: str) -> str:
 
     if view == "branding":
         if is_accessory:
-            tpl = ACCESSORY_BRANDING_TEMPLATES.get(collection, BRANDING_TEMPLATES.get(collection, BRANDING_TEMPLATES["black-rose"]))
+            tpl = ACCESSORY_BRANDING_TEMPLATES.get(
+                collection, BRANDING_TEMPLATES.get(collection, BRANDING_TEMPLATES["black-rose"])
+            )
             return tpl.format(name=name)
-        return BRANDING_TEMPLATES.get(collection, BRANDING_TEMPLATES["black-rose"]).format(name=name)
+        return BRANDING_TEMPLATES.get(collection, BRANDING_TEMPLATES["black-rose"]).format(
+            name=name
+        )
 
     if is_accessory:
         return accessory_prompt(name)

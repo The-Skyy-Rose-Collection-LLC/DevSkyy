@@ -1,0 +1,269 @@
+{
+  "sku": "lh-002",
+  "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-joggers-techflat.jpeg",
+  "analyzed_at": "2026-04-05T09:27:04.302158",
+  "models_used": [
+    "gpt",
+    "claude",
+    "gemini"
+  ],
+  "consensus": {
+    "base_color": "#FFFFFF",
+    "base_color_name": "white",
+    "construction": [
+      "elastic waistband",
+      "drawstring closure",
+      "black drawstring cords",
+      "side seam pockets",
+      "ankle zippers",
+      "tapered leg"
+    ],
+    "design_elements": [
+      "side stripes"
+    ],
+    "fabric": "smooth polyester or poly-blend tracksuit fabric with slight sheen",
+    "garment_type": "track pants with side stripe and ankle zippers",
+    "logos": [
+      {
+        "type": "rose-only",
+        "position": "front right leg",
+        "size_inches": 5,
+        "material": ""
+      }
+    ],
+    "numbers": [],
+    "overall_description": "White track pants with black side stripes and a rose design on the front right leg, featuring a zipper at the bottom.",
+    "patches": [],
+    "secondary_colors": [
+      "#000000"
+    ],
+    "stitching_details": "clean seam construction along stripe panels; zipper closures visible at ankle hems",
+    "text_content": []
+  },
+  "disagreements": [
+    {
+      "field": "construction",
+      "agreed_models": [
+        "claude",
+        "gemini"
+      ],
+      "disagreeing_models": [
+        "gpt"
+      ],
+      "values": {
+        "gpt": [
+          "welt pockets"
+        ],
+        "claude": [
+          "elastic waistband",
+          "drawstring closure",
+          "black drawstring cords",
+          "side seam pockets",
+          "ankle zippers",
+          "tapered leg"
+        ],
+        "gemini": [
+          "elastic waistband",
+          "drawstring closure",
+          "side pockets",
+          "ankle zippers"
+        ]
+      }
+    },
+    {
+      "field": "design_elements",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "side stripes"
+        ],
+        "claude": [
+          "black side stripe running full length from waist to ankle on both legs",
+          "white main body panels",
+          "zippered ankle openings"
+        ],
+        "gemini": [
+          "black side stripes",
+          "black inner leg panels"
+        ]
+      }
+    },
+    {
+      "field": "fabric",
+      "no_consensus": true,
+      "values": {
+        "gpt": "",
+        "claude": "smooth polyester or poly-blend tracksuit fabric with slight sheen",
+        "gemini": "polyester blend"
+      }
+    },
+    {
+      "field": "logos",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          {
+            "type": "rose-only",
+            "position": "front right leg",
+            "size_inches": 5,
+            "material": ""
+          }
+        ],
+        "claude": [
+          {
+            "type": "love-hurts-heart-and-roses",
+            "position": "front left thigh",
+            "size_inches": 4,
+            "material": "embroidered"
+          }
+        ],
+        "gemini": [
+          {
+            "type": "heart-and-rose graphic",
+            "position": "front left thigh",
+            "size_inches": 4,
+            "material": "embroidered"
+          }
+        ]
+      }
+    },
+    {
+      "field": "overall_description",
+      "no_consensus": true,
+      "values": {
+        "gpt": "White track pants with black side stripes and a rose design on the front right leg, featuring a zipper at the bottom.",
+        "claude": "White track pants featuring bold black side stripes running the full length of each leg, an embroidered sacred heart with roses graphic on the front left thigh, a drawstring elastic waistband, and zippered ankle openings for a sleek tapered silhouette.",
+        "gemini": "White track pants with black side stripes and inner leg panels. Features a heart and rose graphic on the front left thigh and ankle zippers."
+      }
+    },
+    {
+      "field": "secondary_colors",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "#000000"
+        ],
+        "claude": [
+          "#1A1A1A",
+          "#C41E2A",
+          "#4A7A2E"
+        ],
+        "gemini": [
+          "#000000",
+          "#FF0000",
+          "#00FF00"
+        ]
+      }
+    },
+    {
+      "field": "stitching_details",
+      "no_consensus": true,
+      "values": {
+        "gpt": "",
+        "claude": "clean seam construction along stripe panels; zipper closures visible at ankle hems",
+        "gemini": "visible seam stitching on side panels"
+      }
+    }
+  ],
+  "raw_results": {
+    "gpt": {
+      "garment_type": "track pants",
+      "base_color": "#FFFFFF",
+      "base_color_name": "white",
+      "secondary_colors": [
+        "#000000"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "rose-only",
+          "position": "front right leg",
+          "size_inches": 5,
+          "material": ""
+        }
+      ],
+      "construction": [
+        "welt pockets"
+      ],
+      "fabric": "",
+      "patches": [],
+      "design_elements": [
+        "side stripes"
+      ],
+      "stitching_details": "",
+      "overall_description": "White track pants with black side stripes and a rose design on the front right leg, featuring a zipper at the bottom."
+    },
+    "claude": {
+      "garment_type": "track pants with side stripe and ankle zippers",
+      "base_color": "#FFFFFF",
+      "base_color_name": "white",
+      "secondary_colors": [
+        "#1A1A1A",
+        "#C41E2A",
+        "#4A7A2E"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "love-hurts-heart-and-roses",
+          "position": "front left thigh",
+          "size_inches": 4,
+          "material": "embroidered"
+        }
+      ],
+      "construction": [
+        "elastic waistband",
+        "drawstring closure",
+        "black drawstring cords",
+        "side seam pockets",
+        "ankle zippers",
+        "tapered leg"
+      ],
+      "fabric": "smooth polyester or poly-blend tracksuit fabric with slight sheen",
+      "patches": [],
+      "design_elements": [
+        "black side stripe running full length from waist to ankle on both legs",
+        "white main body panels",
+        "zippered ankle openings"
+      ],
+      "stitching_details": "clean seam construction along stripe panels; zipper closures visible at ankle hems",
+      "overall_description": "White track pants featuring bold black side stripes running the full length of each leg, an embroidered sacred heart with roses graphic on the front left thigh, a drawstring elastic waistband, and zippered ankle openings for a sleek tapered silhouette."
+    },
+    "gemini": {
+      "garment_type": "track pants",
+      "base_color": "#FFFFFF",
+      "base_color_name": "white",
+      "secondary_colors": [
+        "#000000",
+        "#FF0000",
+        "#00FF00"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "heart-and-rose graphic",
+          "position": "front left thigh",
+          "size_inches": 4,
+          "material": "embroidered"
+        }
+      ],
+      "construction": [
+        "elastic waistband",
+        "drawstring closure",
+        "side pockets",
+        "ankle zippers"
+      ],
+      "fabric": "polyester blend",
+      "patches": [],
+      "design_elements": [
+        "black side stripes",
+        "black inner leg panels"
+      ],
+      "stitching_details": "visible seam stitching on side panels",
+      "overall_description": "White track pants with black side stripes and inner leg panels. Features a heart and rose graphic on the front left thigh and ankle zippers."
+    }
+  }
+}

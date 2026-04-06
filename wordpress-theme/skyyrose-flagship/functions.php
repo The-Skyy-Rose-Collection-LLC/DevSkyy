@@ -42,11 +42,14 @@ $GLOBALS['concatenate_scripts'] = false;
  *--------------------------------------------------------------*/
 $skyyrose_core_includes = array(
 	'/inc/theme-setup.php',
+	'/inc/brand-colors.php',
+	'/inc/collections-config.php',
 	'/inc/enqueue.php',
 	'/inc/enqueue-performance.php',
 	'/inc/customizer.php',
 	'/inc/template-functions.php',
 	'/inc/security.php',
+	'/inc/accessibility-fix.php',
 	'/inc/accessibility-seo.php',
 	'/inc/seo.php',
 	'/inc/ajax-handlers.php',

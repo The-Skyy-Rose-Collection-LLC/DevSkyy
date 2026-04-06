@@ -1,0 +1,307 @@
+{
+  "_schema": {
+    "version": "1.0",
+    "description": "Product reference images + material specs for Nano Banana 2 image pipeline",
+    "last_updated": "2026-04-05",
+    "fields": {
+      "name": "Product name (from catalog)",
+      "collection": "Collection slug",
+      "reference_image": "Primary front reference (techflat or product photo)",
+      "reference_back": "Back panel reference if distinct file exists",
+      "fabric": "Material type (e.g. 'satin', 'mesh', 'heavyweight cotton 320gsm') \u2014 user-specified",
+      "texture": "Surface treatment (e.g. 'embossed', 'silicone patch', 'embroidered') \u2014 user-specified",
+      "material_notes": "Free-form notes for nuanced rendering guidance"
+    },
+    "usage": "Loaded by nano_banana.catalog.load_references() and injected into generation prompts"
+  },
+  "products": {
+    "br-001": {
+      "name": "BLACK Rose Crewneck",
+      "collection": "black-rose",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-crewneck-techflat-v4.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "br-002": {
+      "name": "BLACK Rose Joggers",
+      "collection": "black-rose",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-joggers-source.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "br-003": {
+      "name": "BLACK is Beautiful Jersey",
+      "collection": "black-rose",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-jersey-techflat-black.jpeg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "br-003-giants": {
+      "name": "BLACK is Beautiful Jersey (Giants)",
+      "collection": "black-rose",
+      "reference_image": null,
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "br-003-oakland": {
+      "name": "BLACK is Beautiful Jersey (Oakland)",
+      "collection": "black-rose",
+      "reference_image": null,
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "br-003-white": {
+      "name": "BLACK is Beautiful Jersey (White)",
+      "collection": "black-rose",
+      "reference_image": null,
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "br-004": {
+      "name": "BLACK Rose Hoodie",
+      "collection": "black-rose",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-hoodie-signature-edition-hoodie-ltd-source.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "br-005": {
+      "name": "BLACK Rose Hoodie \u2014 Signature Edition",
+      "collection": "black-rose",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-hoodie-signature-edition-hoodie-ltd-source.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "br-006": {
+      "name": "BLACK Rose Sherpa Jacket",
+      "collection": "black-rose",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-sherpa-jacket-sherpa-product.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "br-007": {
+      "name": "BLACK Rose x Love Hurts Basketball Shorts",
+      "collection": "black-rose",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-love-hurts-basketball-shorts-shorts.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "br-008": {
+      "name": "BLACK is Beautiful Jersey Series: 1. SF inspired",
+      "collection": "black-rose",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-football-jersey-red-design.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "br-009": {
+      "name": "BLACK is Beautiful Jersey Series: 2. LAST OAKLAND",
+      "collection": "black-rose",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-football-jersey-white-design.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "br-010": {
+      "name": "BLACK is Beautiful Jersey Series: 3. THE BAY",
+      "collection": "black-rose",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-basketball-jersey-design.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "br-011": {
+      "name": "BLACK is Beautiful Jersey Series: 4. THE ROSE (SHARKS EDITION)",
+      "collection": "black-rose",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-hockey-jersey-design.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "kids-001": {
+      "name": "Kids Red Set",
+      "collection": "kids-capsule",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/colorblock-red-set-real.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "kids-002": {
+      "name": "Kids Purple Set",
+      "collection": "kids-capsule",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/colorblock-purple-set-real.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "lh-002": {
+      "name": "Love Hurts Joggers",
+      "collection": "love-hurts",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-joggers-techflat.jpeg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "lh-003": {
+      "name": "Love Hurts Basketball Shorts",
+      "collection": "love-hurts",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-basketball-shorts-source.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "lh-004": {
+      "name": "Love Hurts Varsity Jacket",
+      "collection": "love-hurts",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-varsity-jacket-varsity-source.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "lh-006": {
+      "name": "The Fannie",
+      "collection": "love-hurts",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/the-fannie-pack-photo.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "sg-001": {
+      "name": "The Bridge Series 'The Bay Bridge' Shorts",
+      "collection": "signature",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/the-bay-set-source.jpeg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "sg-002": {
+      "name": "The Bridge Series 'Stay Golden' Shirt",
+      "collection": "signature",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/stay-golden-tee-techflat-v4.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "sg-003": {
+      "name": "The Bridge Series 'Stay Golden' Shorts",
+      "collection": "signature",
+      "reference_image": null,
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "sg-004": {
+      "name": "The Signature Hoodie",
+      "collection": "signature",
+      "reference_image": null,
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "sg-005": {
+      "name": "The Bridge Series 'The Bay Bridge' Shirt",
+      "collection": "signature",
+      "reference_image": null,
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "sg-006": {
+      "name": "Mint & Lavender Hoodie",
+      "collection": "signature",
+      "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/mint-lavender-hoodie-source.jpg",
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "sg-007": {
+      "name": "The Signature Beanie",
+      "collection": "signature",
+      "reference_image": null,
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "sg-009": {
+      "name": "The Sherpa Jacket",
+      "collection": "signature",
+      "reference_image": null,
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "sg-011": {
+      "name": "Original Label Tee (White)",
+      "collection": "signature",
+      "reference_image": null,
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "sg-012": {
+      "name": "Original Label Tee (Orchid)",
+      "collection": "signature",
+      "reference_image": null,
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "sg-013": {
+      "name": "Mint & Lavender Crewneck",
+      "collection": "signature",
+      "reference_image": null,
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    },
+    "sg-014": {
+      "name": "Mint & Lavender Sweatpants",
+      "collection": "signature",
+      "reference_image": null,
+      "reference_back": null,
+      "fabric": null,
+      "texture": null,
+      "material_notes": null
+    }
+  }
+}

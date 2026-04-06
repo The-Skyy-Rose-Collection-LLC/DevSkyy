@@ -46,9 +46,7 @@ def get_genai_client(timeout_ms: int = 300_000):
 
     api_key = _find_google_api_key()
     if not api_key:
-        log.error(
-            "No Google API key found. Set GOOGLE_API_KEY in env or .env.hf"
-        )
+        log.error("No Google API key found. Set GOOGLE_API_KEY in env or .env.hf")
         sys.exit(1)
 
     return genai.Client(
@@ -66,6 +64,7 @@ def get_openai_client():
 
     try:
         import openai
+
         return openai.OpenAI(api_key=key)
     except ImportError:
         log.warning("openai package not installed — GPT Image unavailable")
@@ -81,6 +80,7 @@ def get_together_client():
 
     try:
         import together
+
         return together.Together(api_key=key)
     except ImportError:
         log.warning("together package not installed — FLUX unavailable")

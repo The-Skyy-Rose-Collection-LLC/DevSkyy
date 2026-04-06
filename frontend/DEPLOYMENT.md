@@ -6,16 +6,16 @@
 
 ```bash
 # Deploy to preview
-pnpm deploy
+npm run deploy
 
 # Deploy to production
-pnpm deploy:prod
+npm run deploy:prod
 
 # Automated deployment with pre-checks
-pnpm deploy:auto
+npm run deploy:auto
 
 # Automated production deployment
-pnpm deploy:auto:prod
+npm run deploy:auto:prod
 ```
 
 ---
@@ -169,10 +169,10 @@ The automated deployment script (`scripts/deploy.ts`) includes:
 
 ```bash
 # Preview deployment
-pnpm deploy:auto
+npm run deploy:auto
 
 # Production deployment
-pnpm deploy:auto:prod
+npm run deploy:auto:prod
 
 # With options
 tsx scripts/deploy.ts --prod --force --debug
@@ -214,10 +214,10 @@ vercel rm <deployment-url>
 
 ```bash
 # Pull env vars from Vercel
-pnpm vercel:env:pull
+npm run vercel:env:pull
 
 # Push env vars to Vercel
-pnpm vercel:env:push
+npm run vercel:env:push
 
 # Add env variable
 vercel env add
@@ -478,14 +478,14 @@ sendMetric({
 
 ```bash
 # Check TypeScript errors
-pnpm build
+npm run build
 
 # Check for linting issues
-pnpm lint
+npm run lint
 
 # Clear build cache
 rm -rf .next
-pnpm build
+npm run build
 ```
 
 ### Deployment Failures
@@ -524,14 +524,14 @@ vercel --force
 
 1. **Always build locally first**
    ```bash
-   pnpm build
+   npm run build
    ```
 
 2. **Test in preview before production**
    ```bash
-   pnpm deploy        # Preview
+   npm run deploy        # Preview
    # Test thoroughly
-   pnpm deploy:prod   # Production
+   npm run deploy:prod   # Production
    ```
 
 3. **Use environment-specific variables**

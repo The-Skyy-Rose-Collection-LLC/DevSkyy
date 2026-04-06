@@ -60,7 +60,7 @@ services/       → ML models, 3D generation, analytics
 agents/         → Specialized agents (base_super_agent.py = foundation)
 api/            → FastAPI REST (v1/) + GraphQL (graphql/)
 frontend/       → Next.js dashboard (devskyy-dashboard)
-wordpress-theme/skyyrose-flagship/  → Production WP theme (v5.2.0)
+wordpress-theme/skyyrose-flagship/  → Production WP theme (v6.4.0)
 scripts/        → Deploy, sync, generation scripts
 ```
 
@@ -83,7 +83,7 @@ scripts/        → Deploy, sync, generation scripts
 | **Python API** | Python 3.11+ | `/` | `make install` | `make dev` |
 | **Dashboard** | Node.js 22 | `frontend/` | `npm install` | `npm run dev` |
 | **WordPress** | PHP 8.2 | `wordpress-theme/` | N/A (deploy only) | `npm run deploy` |
-| **Imagery** | Python (isolated) | `.venv-imagery/` | `pip install rembg` | — |
+| **Imagery (Nano Banana 2)** | Python (isolated) | `.venv-imagery/` | `pip install -r requirements-imagery.txt` | `python scripts/nano-banana-run.py generate --sku br-001 --pro` — see `docs/NANO_BANANA.md` |
 | **ADK Agents** | Python (isolated) | `.venv-agents/` | `pip install google-adk` | — |
 
 **Each workspace is self-contained.** Don't mix `frontend/node_modules` with root. Don't use `.venv` for ADK (numpy conflicts).
@@ -116,7 +116,7 @@ wordpress-theme/skyyrose-flagship/
 - `product-card-holo.css/js` — Holographic glass cards with magnetic tilt
 - `inc/enqueue.php` — All CSS/JS loading, template slug detection
 - `inc/security.php` — CSP headers, rate limiting, ABSPATH guards
-- `functions.php` — Theme constants, includes array (v5.2.0)
+- `functions.php` — Theme constants, includes array (v6.4.0)
 
 ### WordPress Rules
 - Extend via hooks (actions/filters), never modify core

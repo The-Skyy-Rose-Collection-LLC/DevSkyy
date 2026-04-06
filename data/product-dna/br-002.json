@@ -1,0 +1,285 @@
+{
+  "sku": "br-002",
+  "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-joggers-source.jpg",
+  "analyzed_at": "2026-04-05T09:25:14.987543",
+  "models_used": [
+    "gpt",
+    "claude",
+    "gemini"
+  ],
+  "consensus": {
+    "base_color": "#0A0A0A",
+    "base_color_name": "black",
+    "construction": [
+      "ribbed cuffs",
+      "attached hood"
+    ],
+    "design_elements": [
+      "contrast between matte hood fabric and glossy satin body"
+    ],
+    "fabric": "satin shell with cotton/fleece hood lining and ribbed knit trim",
+    "garment_type": "hooded satin bomber jacket",
+    "logos": [
+      {
+        "type": "rose-only",
+        "position": "front left chest",
+        "size_inches": 4,
+        "material": "embroidered"
+      }
+    ],
+    "numbers": [],
+    "overall_description": "The jacket is a dark charcoal hooded satin bomber with an embroidered rose logo on the front left chest. It features ribbed cuffs for added style.",
+    "patches": [],
+    "secondary_colors": [
+      "#C0C0C0"
+    ],
+    "stitching_details": "standard seaming on satin panels, ribbed knit banding at cuffs and waistband",
+    "text_content": []
+  },
+  "disagreements": [
+    {
+      "field": "base_color",
+      "agreed_models": [
+        "claude",
+        "gemini"
+      ],
+      "disagreeing_models": [
+        "gpt"
+      ],
+      "values": {
+        "gpt": "#1B1B1B",
+        "claude": "#0A0A0A",
+        "gemini": "#0A0A0A"
+      }
+    },
+    {
+      "field": "base_color_name",
+      "agreed_models": [
+        "claude",
+        "gemini"
+      ],
+      "disagreeing_models": [
+        "gpt"
+      ],
+      "values": {
+        "gpt": "dark charcoal",
+        "claude": "black",
+        "gemini": "true black"
+      }
+    },
+    {
+      "field": "construction",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "ribbed cuffs",
+          "attached hood"
+        ],
+        "claude": [
+          "snap-button front closure",
+          "attached drawstring hood",
+          "ribbed knit cuffs",
+          "ribbed knit hem",
+          "side welt pockets",
+          "quilted/padded body"
+        ],
+        "gemini": [
+          "snap-button front closure",
+          "ribbed cuffs",
+          "ribbed hem",
+          "welt pockets",
+          "attached hood",
+          "hood drawstrings"
+        ]
+      }
+    },
+    {
+      "field": "design_elements",
+      "no_consensus": true,
+      "values": {
+        "gpt": [],
+        "claude": [
+          "contrast between matte hood fabric and glossy satin body"
+        ],
+        "gemini": [
+          "contrast matte hood"
+        ]
+      }
+    },
+    {
+      "field": "logos",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          {
+            "type": "rose-only",
+            "position": "front left chest",
+            "size_inches": 4,
+            "material": "embroidered"
+          }
+        ],
+        "claude": [
+          {
+            "type": "rose-bouquet",
+            "position": "left chest",
+            "size_inches": 3,
+            "material": "embroidered"
+          }
+        ],
+        "gemini": [
+          {
+            "type": "rose motif",
+            "position": "left chest",
+            "size_inches": 3,
+            "material": "embroidered"
+          }
+        ]
+      }
+    },
+    {
+      "field": "overall_description",
+      "no_consensus": true,
+      "values": {
+        "gpt": "The jacket is a dark charcoal hooded satin bomber with an embroidered rose logo on the front left chest. It features ribbed cuffs for added style.",
+        "claude": "A black satin hooded bomber jacket featuring a silver/white embroidered floral bouquet design on the left chest, with snap-button front closure, drawstring hood in matte black fabric, and ribbed knit trim at cuffs and hem.",
+        "gemini": "A true black hooded satin bomber jacket featuring a snap-button front, ribbed trim, and a white embroidered rose motif on the left chest."
+      }
+    },
+    {
+      "field": "patches",
+      "agreed_models": [
+        "gemini",
+        "gpt"
+      ],
+      "disagreeing_models": [
+        "claude"
+      ],
+      "values": {
+        "gpt": [],
+        "claude": [
+          "small brand label/tag visible inside near collar area, appears multicolored"
+        ],
+        "gemini": []
+      }
+    },
+    {
+      "field": "secondary_colors",
+      "no_consensus": true,
+      "values": {
+        "gpt": [],
+        "claude": [
+          "#C0C0C0"
+        ],
+        "gemini": [
+          "#FFFFFF",
+          "#CCCCCC"
+        ]
+      }
+    },
+    {
+      "field": "stitching_details",
+      "no_consensus": true,
+      "values": {
+        "gpt": "",
+        "claude": "standard seaming on satin panels, ribbed knit banding at cuffs and waistband",
+        "gemini": "standard seam construction"
+      }
+    }
+  ],
+  "raw_results": {
+    "gpt": {
+      "garment_type": "hooded satin bomber jacket",
+      "base_color": "#1B1B1B",
+      "base_color_name": "dark charcoal",
+      "secondary_colors": [],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "rose-only",
+          "position": "front left chest",
+          "size_inches": 4,
+          "material": "embroidered"
+        }
+      ],
+      "construction": [
+        "ribbed cuffs",
+        "attached hood"
+      ],
+      "fabric": "satin shell",
+      "patches": [],
+      "design_elements": [],
+      "stitching_details": "",
+      "overall_description": "The jacket is a dark charcoal hooded satin bomber with an embroidered rose logo on the front left chest. It features ribbed cuffs for added style."
+    },
+    "claude": {
+      "garment_type": "hooded satin bomber jacket",
+      "base_color": "#0A0A0A",
+      "base_color_name": "black",
+      "secondary_colors": [
+        "#C0C0C0"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "rose-bouquet",
+          "position": "left chest",
+          "size_inches": 3,
+          "material": "embroidered"
+        }
+      ],
+      "construction": [
+        "snap-button front closure",
+        "attached drawstring hood",
+        "ribbed knit cuffs",
+        "ribbed knit hem",
+        "side welt pockets",
+        "quilted/padded body"
+      ],
+      "fabric": "satin shell with cotton/fleece hood lining and ribbed knit trim",
+      "patches": [
+        "small brand label/tag visible inside near collar area, appears multicolored"
+      ],
+      "design_elements": [
+        "contrast between matte hood fabric and glossy satin body"
+      ],
+      "stitching_details": "standard seaming on satin panels, ribbed knit banding at cuffs and waistband",
+      "overall_description": "A black satin hooded bomber jacket featuring a silver/white embroidered floral bouquet design on the left chest, with snap-button front closure, drawstring hood in matte black fabric, and ribbed knit trim at cuffs and hem."
+    },
+    "gemini": {
+      "garment_type": "hooded satin bomber jacket",
+      "base_color": "#0A0A0A",
+      "base_color_name": "true black",
+      "secondary_colors": [
+        "#FFFFFF",
+        "#CCCCCC"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "rose motif",
+          "position": "left chest",
+          "size_inches": 3,
+          "material": "embroidered"
+        }
+      ],
+      "construction": [
+        "snap-button front closure",
+        "ribbed cuffs",
+        "ribbed hem",
+        "welt pockets",
+        "attached hood",
+        "hood drawstrings"
+      ],
+      "fabric": "satin shell with matte hood and ribbed knit trim",
+      "patches": [],
+      "design_elements": [
+        "contrast matte hood"
+      ],
+      "stitching_details": "standard seam construction",
+      "overall_description": "A true black hooded satin bomber jacket featuring a snap-button front, ribbed trim, and a white embroidered rose motif on the left chest."
+    }
+  }
+}

@@ -25,7 +25,16 @@ _VISION_SCHEMA = {
         "issues": {"type": "ARRAY", "items": {"type": "STRING"}},
         "notes": {"type": "STRING"},
     },
-    "required": ["pass", "score", "color_match", "text_match", "garment_match", "logo_match", "issues", "notes"],
+    "required": [
+        "pass",
+        "score",
+        "color_match",
+        "text_match",
+        "garment_match",
+        "logo_match",
+        "issues",
+        "notes",
+    ],
 }
 
 

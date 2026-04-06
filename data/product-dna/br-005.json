@@ -1,0 +1,264 @@
+{
+  "sku": "br-005",
+  "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-hoodie-signature-edition-hoodie-ltd-source.jpg",
+  "analyzed_at": "2026-04-05T09:25:38.967693",
+  "models_used": [
+    "gpt",
+    "claude",
+    "gemini"
+  ],
+  "consensus": {
+    "base_color": "#393F3F",
+    "base_color_name": "charcoal gray",
+    "construction": [
+      "attached hood",
+      "ribbed cuffs",
+      "front pouch pocket"
+    ],
+    "design_elements": [
+      "embroidered rose design"
+    ],
+    "fabric": "heavyweight cotton fleece",
+    "garment_type": "pullover hoodie",
+    "logos": [
+      {
+        "type": "rose-only",
+        "position": "front center",
+        "size_inches": 10,
+        "material": "sublimated"
+      }
+    ],
+    "numbers": [],
+    "overall_description": "A charcoal gray hooded sweatshirt with a sublimated rose design on the front center, featuring ribbed cuffs and a front pouch pocket.",
+    "patches": [],
+    "secondary_colors": [
+      "#FFFFFF"
+    ],
+    "stitching_details": "tonal stitching",
+    "text_content": []
+  },
+  "disagreements": [
+    {
+      "field": "base_color",
+      "no_consensus": true,
+      "values": {
+        "gpt": "#393F3F",
+        "claude": "#1A2A1A",
+        "gemini": "#222524"
+      }
+    },
+    {
+      "field": "base_color_name",
+      "no_consensus": true,
+      "values": {
+        "gpt": "charcoal gray",
+        "claude": "dark forest green",
+        "gemini": "black"
+      }
+    },
+    {
+      "field": "construction",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "attached hood",
+          "ribbed cuffs",
+          "front pouch pocket"
+        ],
+        "claude": [
+          "attached hood",
+          "drawstring hood",
+          "kangaroo pocket",
+          "ribbed cuffs",
+          "ribbed hem"
+        ],
+        "gemini": [
+          "attached hood with drawstrings",
+          "front kangaroo pocket",
+          "ribbed cuffs",
+          "ribbed hem"
+        ]
+      }
+    },
+    {
+      "field": "design_elements",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "embroidered rose design"
+        ],
+        "claude": [
+          "large rose graphic emerging from clouds, rendered in white/silver and black ink style"
+        ],
+        "gemini": [
+          "large embroidered rose graphic on front chest"
+        ]
+      }
+    },
+    {
+      "field": "garment_type",
+      "agreed_models": [
+        "claude",
+        "gemini"
+      ],
+      "disagreeing_models": [
+        "gpt"
+      ],
+      "values": {
+        "gpt": "hooded sweatshirt",
+        "claude": "pullover hoodie",
+        "gemini": "hoodie"
+      }
+    },
+    {
+      "field": "logos",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          {
+            "type": "rose-only",
+            "position": "front center",
+            "size_inches": 10,
+            "material": "sublimated"
+          }
+        ],
+        "claude": [
+          {
+            "type": "rose-with-clouds",
+            "position": "front center chest",
+            "size_inches": 7,
+            "material": "printed"
+          }
+        ],
+        "gemini": []
+      }
+    },
+    {
+      "field": "overall_description",
+      "no_consensus": true,
+      "values": {
+        "gpt": "A charcoal gray hooded sweatshirt with a sublimated rose design on the front center, featuring ribbed cuffs and a front pouch pocket.",
+        "claude": "A dark forest green pullover hoodie featuring a large front graphic of a detailed rose bloom with leaves rising from stylized clouds, printed in white and black. The hoodie has classic construction with a kangaroo pocket, drawstring hood, and ribbed cuffs and hem.",
+        "gemini": "A black hoodie with a large embroidered graphic of a rose on the front chest."
+      }
+    },
+    {
+      "field": "secondary_colors",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "#FFFFFF"
+        ],
+        "claude": [
+          "#FFFFFF",
+          "#C0C0C0",
+          "#000000"
+        ],
+        "gemini": [
+          "#f1e9e7",
+          "#e2e6e9"
+        ]
+      }
+    },
+    {
+      "field": "stitching_details",
+      "no_consensus": true,
+      "values": {
+        "gpt": "",
+        "claude": "",
+        "gemini": "tonal stitching"
+      }
+    }
+  ],
+  "raw_results": {
+    "gpt": {
+      "garment_type": "hooded sweatshirt",
+      "base_color": "#393F3F",
+      "base_color_name": "charcoal gray",
+      "secondary_colors": [
+        "#FFFFFF"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "rose-only",
+          "position": "front center",
+          "size_inches": 10,
+          "material": "sublimated"
+        }
+      ],
+      "construction": [
+        "attached hood",
+        "ribbed cuffs",
+        "front pouch pocket"
+      ],
+      "fabric": "heavyweight cotton",
+      "patches": [],
+      "design_elements": [
+        "embroidered rose design"
+      ],
+      "stitching_details": "",
+      "overall_description": "A charcoal gray hooded sweatshirt with a sublimated rose design on the front center, featuring ribbed cuffs and a front pouch pocket."
+    },
+    "claude": {
+      "garment_type": "pullover hoodie",
+      "base_color": "#1A2A1A",
+      "base_color_name": "dark forest green",
+      "secondary_colors": [
+        "#FFFFFF",
+        "#C0C0C0",
+        "#000000"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "rose-with-clouds",
+          "position": "front center chest",
+          "size_inches": 7,
+          "material": "printed"
+        }
+      ],
+      "construction": [
+        "attached hood",
+        "drawstring hood",
+        "kangaroo pocket",
+        "ribbed cuffs",
+        "ribbed hem"
+      ],
+      "fabric": "heavyweight cotton fleece",
+      "patches": [],
+      "design_elements": [
+        "large rose graphic emerging from clouds, rendered in white/silver and black ink style"
+      ],
+      "stitching_details": "",
+      "overall_description": "A dark forest green pullover hoodie featuring a large front graphic of a detailed rose bloom with leaves rising from stylized clouds, printed in white and black. The hoodie has classic construction with a kangaroo pocket, drawstring hood, and ribbed cuffs and hem."
+    },
+    "gemini": {
+      "garment_type": "hoodie",
+      "base_color": "#222524",
+      "base_color_name": "black",
+      "secondary_colors": [
+        "#f1e9e7",
+        "#e2e6e9"
+      ],
+      "text_content": [],
+      "numbers": [],
+      "logos": [],
+      "construction": [
+        "attached hood with drawstrings",
+        "front kangaroo pocket",
+        "ribbed cuffs",
+        "ribbed hem"
+      ],
+      "fabric": "heavyweight cotton",
+      "patches": [],
+      "design_elements": [
+        "large embroidered rose graphic on front chest"
+      ],
+      "stitching_details": "tonal stitching",
+      "overall_description": "A black hoodie with a large embroidered graphic of a rose on the front chest."
+    }
+  }
+}

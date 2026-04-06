@@ -24,12 +24,8 @@ $features = array(
 	array( 'icon' => '&#x1F4AB;', 'title' => __( 'The Transformation', 'skyyrose-flagship' ), 'text' => __( "From concrete to runway. From grief to grace. The Hurts bloodline doesn't break — it metamorphoses. The Beast becoming the prince he always was.", 'skyyrose-flagship' ) ),
 );
 
-/* ── Cross-collection navigation ──────────────────────────────── */
-$cross_nav = array(
-	array( 'slug' => 'collection-black-rose', 'name' => __( 'Black Rose', 'skyyrose-flagship' ), 'desc' => __( 'Dark Elegance', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--black-rose' ),
-	array( 'slug' => 'collection-signature', 'name' => __( 'Signature', 'skyyrose-flagship' ), 'desc' => __( 'The Foundation', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--signature' ),
-	array( 'slug' => 'collection-kids-capsule', 'name' => __( 'Kids Capsule', 'skyyrose-flagship' ), 'desc' => __( 'Next Generation', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--kids-capsule' ),
-);
+/* Cross-collection navigation — sourced from inc/collections-config.php */
+$cross_nav = skyyrose_get_cross_nav( 'love-hurts' );
 
 $svg_kses = skyyrose_svg_kses();
 

@@ -55,22 +55,12 @@ function skyyrose_svg_kses() {
  * @return string Hex color code.
  */
 function skyyrose_get_collection_color( $collection ) {
-
-	$colors = array(
-		'black-rose'   => '#1A1A2E',
-		'love-hurts'   => '#8B0000',
-		'signature'    => '#D4AF37',
-		'kids-capsule' => '#FFB6C1',
-		'default'      => '#B76E79',
-	);
-
-	$sanitized_collection = sanitize_key( $collection );
-
-	if ( isset( $colors[ $sanitized_collection ] ) ) {
-		return $colors[ $sanitized_collection ];
+	// Pull primary color from the single source of truth.
+	$palette = skyyrose_get_collection_field( $collection, 'palette' );
+	if ( is_array( $palette ) && isset( $palette['primary'] ) ) {
+		return $palette['primary'];
 	}
-
-	return $colors['default'];
+	return SKYYROSE_COLOR_ROSE_GOLD;
 }
 
 /**
@@ -84,40 +74,15 @@ function skyyrose_get_collection_color( $collection ) {
  * @return array  Associative array with 'primary', 'secondary', 'accent' keys.
  */
 function skyyrose_get_collection_palette( $collection ) {
-
-	$palettes = array(
-		'black-rose' => array(
-			'primary'   => '#1A1A2E',
-			'secondary' => '#16213E',
-			'accent'    => '#0F3460',
-		),
-		'love-hurts' => array(
-			'primary'   => '#8B0000',
-			'secondary' => '#4B0082',
-			'accent'    => '#D4AF37',
-		),
-		'signature'  => array(
-			'primary'   => '#D4AF37',
-			'secondary' => '#0A0A0A',
-			'accent'    => '#B76E79',
-		),
-		'kids-capsule' => array(
-			'primary'   => '#FFB6C1',
-			'secondary' => '#FFF0F5',
-			'accent'    => '#D4AF37',
-		),
-	);
-
-	$sanitized_collection = sanitize_key( $collection );
-
-	if ( isset( $palettes[ $sanitized_collection ] ) ) {
-		return $palettes[ $sanitized_collection ];
+	// Pull palette from the single source of truth.
+	$palette = skyyrose_get_collection_field( $collection, 'palette' );
+	if ( is_array( $palette ) ) {
+		return $palette;
 	}
-
 	return array(
-		'primary'   => '#B76E79',
-		'secondary' => '#0A0A0A',
-		'accent'    => '#D4AF37',
+		'primary'   => SKYYROSE_COLOR_ROSE_GOLD,
+		'secondary' => SKYYROSE_COLOR_DARK,
+		'accent'    => SKYYROSE_COLOR_GOLD,
 	);
 }
 

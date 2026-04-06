@@ -11,9 +11,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import json
 import logging
-import sys
 import time
 from pathlib import Path
 
@@ -37,14 +35,14 @@ def _resolve_views(step: str) -> list[str]:
 
 def cmd_dry_run(args):
     """Show what would be generated without making API calls."""
-    from nano_banana.catalog import PRODUCTS_DIR, find_source_image, load_catalog, load_products
+    from nano_banana.catalog import PRODUCTS_DIR, load_catalog, load_products
 
     catalog = load_catalog()
     products = load_products(catalog, sku_filter=args.sku)
     views = _resolve_views(args.step)
 
     print(f"\n{'='*60}")
-    print(f"Nano Banana 2 — DRY RUN")
+    print("Nano Banana 2 — DRY RUN")
     print(f"Products: {len(products)} | Views: {views}")
     print(f"Output dir: {PRODUCTS_DIR}")
     print(f"{'='*60}\n")
@@ -69,11 +67,18 @@ def cmd_generate(args):
     from nano_banana.catalog import (
         PRODUCTS_DIR,
         find_back_source,
+        get_material_spec,
         load_catalog,
         load_products,
     )
     from nano_banana.client import get_genai_client, get_openai_client, get_together_client
-    from nano_banana.generate import GEMINI_FAST, GEMINI_PRO, generate_flux, generate_gemini, generate_gpt
+    from nano_banana.generate import (
+        GEMINI_FAST,
+        GEMINI_PRO,
+        generate_flux,
+        generate_gemini,
+        generate_gpt,
+    )
     from nano_banana.prompts import flux_prompt, get_prompt
     from nano_banana.qa import vision_compare
     from nano_banana.utils import get_output_filename, quality_gate, save_image
@@ -93,7 +98,10 @@ def cmd_generate(args):
 
     log.info(
         "Starting: %d products, views=%s, model=%s, engine=%s",
-        len(products), views, model, engine,
+        len(products),
+        views,
+        model,
+        engine,
     )
 
     success_count = 0
@@ -126,6 +134,10 @@ def cmd_generate(args):
                     view_src = back
 
             prompt = get_prompt(product, view)
+            # Inject material specs from product-references.json if available.
+            material_spec = get_material_spec(sku)
+            if material_spec:
+                prompt += f"\n\nMATERIAL SPEC: {material_spec}"
             image_bytes = None
 
             for attempt in range(1, MAX_RETRIES + 1):
@@ -136,17 +148,28 @@ def cmd_generate(args):
                     image_bytes = generate_gpt(openai_client, prompt, view_src)
                 else:
                     image_bytes = generate_gemini(
-                        genai_client, view_src, prompt,
-                        model=model, enhanced=(attempt > 1),
+                        genai_client,
+                        view_src,
+                        prompt,
+                        model=model,
+                        enhanced=(attempt > 1),
                     )
 
                 if image_bytes and quality_gate(image_bytes, sku, view):
                     # Optional vision QA
                     if args.qa and view_src and not use_flux:
-                        qa_result = vision_compare(genai_client, view_src, image_bytes, product["name"], view)
+                        qa_result = vision_compare(
+                            genai_client, view_src, image_bytes, product["name"], view
+                        )
                         if not qa_result.get("pass", True) and attempt < MAX_RETRIES:
                             issues = qa_result.get("issues", [])
-                            log.warning("QA FAIL %s %s (score=%s): %s", sku, view, qa_result.get("score"), issues)
+                            log.warning(
+                                "QA FAIL %s %s (score=%s): %s",
+                                sku,
+                                view,
+                                qa_result.get("score"),
+                                issues,
+                            )
                             image_bytes = None
                             time.sleep(RETRY_DELAY)
                             continue
@@ -197,7 +220,11 @@ def cmd_composite(args):
             continue
 
         for view in views:
-            suffix = {"front": "front-model.webp", "back": "back-model.webp", "branding": "branding.webp"}[view]
+            suffix = {
+                "front": "front-model.webp",
+                "back": "back-model.webp",
+                "branding": "branding.webp",
+            }[view]
             ai_render = PRODUCTS_DIR / f"{sku}-{suffix}"
             if not ai_render.exists():
                 log.warning("SKIP %s %s: no AI render at %s", sku, view, ai_render.name)
@@ -224,6 +251,56 @@ def cmd_composite(args):
             time.sleep(3)
 
 
+def cmd_verify_generate(args):
+    """Run full verified generation pipeline for one SKU+view."""
+    from nano_banana.catalog import find_back_source, find_source_image, load_catalog
+    from nano_banana.verify_pipeline import (
+        promote_winner_to_production,
+        save_verify_result,
+        verify_generate,
+    )
+
+    catalog = load_catalog()
+    if args.sku not in catalog:
+        log.error("SKU %s not in catalog", args.sku)
+        return
+
+    info = catalog[args.sku]
+    if args.view == "back":
+        src = find_back_source(args.sku, catalog) or find_source_image(args.sku, catalog)
+    else:
+        src = find_source_image(args.sku, catalog)
+
+    if not src:
+        log.error("No source image for %s", args.sku)
+        return
+
+    log.info("Starting verified generation: %s %s", args.sku, args.view)
+    result = verify_generate(
+        sku=args.sku,
+        view=args.view,
+        source_path=src,
+        collection=info["collection"],
+        max_cycles=args.cycles,
+        n_candidates=args.candidates,
+        passing_threshold=args.threshold,
+    )
+
+    save_verify_result(result)
+
+    log.info("=" * 60)
+    log.info("RESULT: %s %s", args.sku, args.view)
+    log.info("  Cycles run:       %d", result.cycles_run)
+    log.info("  Total candidates: %d", result.total_candidates)
+    log.info("  Winner score:     %.1f", result.winner_score)
+    log.info("  Passed 98%%:      %s", result.passed_98)
+    log.info("  All scores:       %s", [round(s, 1) for s in result.all_scores])
+    log.info("=" * 60)
+
+    if args.promote and result.winner_path:
+        promote_winner_to_production(result, info["output_slug"])
+
+
 def main():
     logging.basicConfig(
         level=logging.INFO,
@@ -239,23 +316,52 @@ def main():
     # -- dry-run --
     dr = sub.add_parser("dry-run", help="Preview what would be generated")
     dr.add_argument("--sku", type=str, default=None, help="Single SKU to process")
-    dr.add_argument("--step", type=str, default="all", choices=["front", "back", "branding", "all", "front_back"])
+    dr.add_argument(
+        "--step",
+        type=str,
+        default="all",
+        choices=["front", "back", "branding", "all", "front_back"],
+    )
 
     # -- generate --
     gen = sub.add_parser("generate", help="Generate product images")
     gen.add_argument("--sku", type=str, default=None, help="Single SKU to process")
-    gen.add_argument("--step", type=str, default="all", choices=["front", "back", "branding", "all", "front_back"])
-    gen.add_argument("--engine", type=str, default="gemini", choices=["gemini", "flux", "gpt-image", "auto"])
+    gen.add_argument(
+        "--step",
+        type=str,
+        default="all",
+        choices=["front", "back", "branding", "all", "front_back"],
+    )
+    gen.add_argument(
+        "--engine", type=str, default="gemini", choices=["gemini", "flux", "gpt-image", "auto"]
+    )
     gen.add_argument("--model", type=str, default=None, help="Override Gemini model ID")
-    gen.add_argument("--pro", action="store_true", help="Use Nano Banana Pro (gemini-3-pro-image-preview)")
+    gen.add_argument(
+        "--pro", action="store_true", help="Use Nano Banana Pro (gemini-3-pro-image-preview)"
+    )
     gen.add_argument("--qa", action="store_true", help="Run Gemini vision QA after generation")
     gen.add_argument("--free", action="store_true", help="Use free FLUX model (lower quality)")
 
     # -- composite --
     comp = sub.add_parser("composite", help="Composite real branding onto AI shots")
     comp.add_argument("--sku", type=str, default=None, help="Single SKU to process")
-    comp.add_argument("--step", type=str, default="composite", choices=["composite", "composite_all"])
+    comp.add_argument(
+        "--step", type=str, default="composite", choices=["composite", "composite_all"]
+    )
     comp.add_argument("--pro", action="store_true", help="Use Nano Banana Pro model")
+
+    # -- verify-generate --
+    vg = sub.add_parser(
+        "verify-generate", help="Full verified generation pipeline (DNA + tournament + regen)"
+    )
+    vg.add_argument("--sku", type=str, required=True, help="Product SKU")
+    vg.add_argument("--view", type=str, default="front", choices=["front", "back", "branding"])
+    vg.add_argument("--cycles", type=int, default=3, help="Max regen cycles (default 3)")
+    vg.add_argument("--candidates", type=int, default=3, help="Candidates per cycle (default 3)")
+    vg.add_argument(
+        "--threshold", type=float, default=92.0, help="Passing score threshold (default 92)"
+    )
+    vg.add_argument("--promote", action="store_true", help="Copy winner to production directory")
 
     args = parser.parse_args()
 
@@ -265,6 +371,8 @@ def main():
         cmd_generate(args)
     elif args.command == "composite":
         cmd_composite(args)
+    elif args.command == "verify-generate":
+        cmd_verify_generate(args)
 
 
 if __name__ == "__main__":

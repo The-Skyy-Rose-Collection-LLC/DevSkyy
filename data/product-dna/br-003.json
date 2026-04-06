@@ -1,0 +1,412 @@
+{
+  "sku": "br-003",
+  "reference_image": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-jersey-techflat-black.jpeg",
+  "analyzed_at": "2026-04-05T09:25:25.644878",
+  "models_used": [
+    "gpt",
+    "claude",
+    "gemini"
+  ],
+  "consensus": {
+    "base_color": "#000000",
+    "base_color_name": "black",
+    "construction": [
+      "button placket"
+    ],
+    "design_elements": [
+      "contrasting white stripes",
+      "patch"
+    ],
+    "fabric": "lightweight mesh or polyester athletic jersey fabric",
+    "garment_type": "button-up jersey shirt",
+    "logos": [],
+    "numbers": [],
+    "overall_description": "A black button-up jersey shirt featuring the text 'BLACK IS BEAUTIFUL' in white arched letters on the front. It has a bottom patch with additional text and contrasting white stripes along the sleeves and button placket.",
+    "patches": [
+      "bottom hem patch with text and design"
+    ],
+    "secondary_colors": [
+      "#FFFFFF"
+    ],
+    "stitching_details": "visible along edges and button placket",
+    "text_content": [
+      {
+        "text": "BLACK IS BEAUTIFUL",
+        "location": "front chest",
+        "color": "#FFFFFF",
+        "style": "arched block letters"
+      },
+      {
+        "text": "BLACK ROSE",
+        "location": "bottom patch",
+        "color": "#000000",
+        "style": "block letters"
+      },
+      {
+        "text": "COLLECTION",
+        "location": "bottom patch",
+        "color": "#DAA520",
+        "style": "bold uppercase"
+      },
+      {
+        "text": "HOS",
+        "location": "bottom patch",
+        "color": "#000000",
+        "style": "block letters"
+      },
+      {
+        "text": "No 2 of a limited edition",
+        "location": "bottom patch",
+        "color": "#000000",
+        "style": "italic"
+      }
+    ]
+  },
+  "disagreements": [
+    {
+      "field": "base_color",
+      "no_consensus": true,
+      "values": {
+        "gpt": "#000000",
+        "claude": "#1A1A1A",
+        "gemini": "#111111"
+      }
+    },
+    {
+      "field": "construction",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "button placket"
+        ],
+        "claude": [
+          "full button-front placket with snap buttons",
+          "V-neck collar",
+          "short sleeves with banded cuffs",
+          "white piping along placket and collar",
+          "white stripe on sleeve cuffs"
+        ],
+        "gemini": [
+          "6-button front placket",
+          "short sleeves"
+        ]
+      }
+    },
+    {
+      "field": "design_elements",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "contrasting white stripes",
+          "patch"
+        ],
+        "claude": [
+          "white piping trim along front placket edges",
+          "white piping along V-neck collar",
+          "white stripe bands on sleeve cuffs",
+          "arched text across chest"
+        ],
+        "gemini": [
+          "white piping extending from back neck down the front placket",
+          "white piping around sleeve ends"
+        ]
+      }
+    },
+    {
+      "field": "fabric",
+      "no_consensus": true,
+      "values": {
+        "gpt": "",
+        "claude": "lightweight mesh or polyester athletic jersey fabric",
+        "gemini": "shiny synthetic mesh"
+      }
+    },
+    {
+      "field": "garment_type",
+      "no_consensus": true,
+      "values": {
+        "gpt": "button-up jersey shirt",
+        "claude": "button-front baseball jersey",
+        "gemini": "button-up baseball jersey"
+      }
+    },
+    {
+      "field": "logos",
+      "agreed_models": [
+        "gemini",
+        "gpt"
+      ],
+      "disagreeing_models": [
+        "claude"
+      ],
+      "values": {
+        "gpt": [],
+        "claude": [
+          {
+            "type": "SkyyRose brand tag",
+            "position": "inner collar/neckline",
+            "size_inches": 1.5,
+            "material": "woven label"
+          },
+          {
+            "type": "Black Rose Collection patch",
+            "position": "lower front right",
+            "size_inches": 2.5,
+            "material": "woven patch"
+          }
+        ],
+        "gemini": []
+      }
+    },
+    {
+      "field": "overall_description",
+      "no_consensus": true,
+      "values": {
+        "gpt": "A black button-up jersey shirt featuring the text 'BLACK IS BEAUTIFUL' in white arched letters on the front. It has a bottom patch with additional text and contrasting white stripes along the sleeves and button placket.",
+        "claude": "A black button-front baseball jersey featuring 'BLACK IS BEAUTIFUL' in white arched collegiate lettering across the chest, accented with white piping along the placket, collar, and sleeve cuffs, with a Black Rose Collection patch on the lower front.",
+        "gemini": "A black short-sleeve baseball jersey with white piping details and 'BLACK IS BEAUTIFUL' text arched across the chest. It features a full button front and a jock tag near the hem."
+      }
+    },
+    {
+      "field": "patches",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          "bottom hem patch with text and design"
+        ],
+        "claude": [
+          "Black Rose Collection rectangular woven patch on lower right front with decorative border"
+        ],
+        "gemini": [
+          "rectangular jock tag on bottom left hem with text 'BLACK ROSE COLLECTION'"
+        ]
+      }
+    },
+    {
+      "field": "stitching_details",
+      "no_consensus": true,
+      "values": {
+        "gpt": "visible along edges and button placket",
+        "claude": "clean stitching along piping and sleeve bands",
+        "gemini": "visible seam running vertically down the back"
+      }
+    },
+    {
+      "field": "text_content",
+      "no_consensus": true,
+      "values": {
+        "gpt": [
+          {
+            "text": "BLACK IS BEAUTIFUL",
+            "location": "front chest",
+            "color": "#FFFFFF",
+            "style": "arched block letters"
+          },
+          {
+            "text": "BLACK ROSE",
+            "location": "bottom patch",
+            "color": "#000000",
+            "style": "block letters"
+          },
+          {
+            "text": "COLLECTION",
+            "location": "bottom patch",
+            "color": "#DAA520",
+            "style": "bold uppercase"
+          },
+          {
+            "text": "HOS",
+            "location": "bottom patch",
+            "color": "#000000",
+            "style": "block letters"
+          },
+          {
+            "text": "No 2 of a limited edition",
+            "location": "bottom patch",
+            "color": "#000000",
+            "style": "italic"
+          }
+        ],
+        "claude": [
+          {
+            "text": "BLACK IS BEAUTIFUL",
+            "location": "front chest, arched across",
+            "color": "#FFFFFF",
+            "style": "bold collegiate/varsity block uppercase serif"
+          },
+          {
+            "text": "BLACK ROSE COLLECTION",
+            "location": "bottom right front patch",
+            "color": "#000000",
+            "style": "small patch text"
+          }
+        ],
+        "gemini": [
+          {
+            "text": "BLACK IS",
+            "location": "front left chest",
+            "color": "#FFFFFF",
+            "style": "arched collegiate block font"
+          },
+          {
+            "text": "BEAUTIFUL",
+            "location": "front right chest",
+            "color": "#FFFFFF",
+            "style": "arched collegiate block font"
+          }
+        ]
+      }
+    }
+  ],
+  "raw_results": {
+    "gpt": {
+      "garment_type": "button-up jersey shirt",
+      "base_color": "#000000",
+      "base_color_name": "black",
+      "secondary_colors": [
+        "#FFFFFF"
+      ],
+      "text_content": [
+        {
+          "text": "BLACK IS BEAUTIFUL",
+          "location": "front chest",
+          "color": "#FFFFFF",
+          "style": "arched block letters"
+        },
+        {
+          "text": "BLACK ROSE",
+          "location": "bottom patch",
+          "color": "#000000",
+          "style": "block letters"
+        },
+        {
+          "text": "COLLECTION",
+          "location": "bottom patch",
+          "color": "#DAA520",
+          "style": "bold uppercase"
+        },
+        {
+          "text": "HOS",
+          "location": "bottom patch",
+          "color": "#000000",
+          "style": "block letters"
+        },
+        {
+          "text": "No 2 of a limited edition",
+          "location": "bottom patch",
+          "color": "#000000",
+          "style": "italic"
+        }
+      ],
+      "numbers": [],
+      "logos": [],
+      "construction": [
+        "button placket"
+      ],
+      "fabric": "",
+      "patches": [
+        "bottom hem patch with text and design"
+      ],
+      "design_elements": [
+        "contrasting white stripes",
+        "patch"
+      ],
+      "stitching_details": "visible along edges and button placket",
+      "overall_description": "A black button-up jersey shirt featuring the text 'BLACK IS BEAUTIFUL' in white arched letters on the front. It has a bottom patch with additional text and contrasting white stripes along the sleeves and button placket."
+    },
+    "claude": {
+      "garment_type": "button-front baseball jersey",
+      "base_color": "#1A1A1A",
+      "base_color_name": "black",
+      "secondary_colors": [
+        "#FFFFFF"
+      ],
+      "text_content": [
+        {
+          "text": "BLACK IS BEAUTIFUL",
+          "location": "front chest, arched across",
+          "color": "#FFFFFF",
+          "style": "bold collegiate/varsity block uppercase serif"
+        },
+        {
+          "text": "BLACK ROSE COLLECTION",
+          "location": "bottom right front patch",
+          "color": "#000000",
+          "style": "small patch text"
+        }
+      ],
+      "numbers": [],
+      "logos": [
+        {
+          "type": "SkyyRose brand tag",
+          "position": "inner collar/neckline",
+          "size_inches": 1.5,
+          "material": "woven label"
+        },
+        {
+          "type": "Black Rose Collection patch",
+          "position": "lower front right",
+          "size_inches": 2.5,
+          "material": "woven patch"
+        }
+      ],
+      "construction": [
+        "full button-front placket with snap buttons",
+        "V-neck collar",
+        "short sleeves with banded cuffs",
+        "white piping along placket and collar",
+        "white stripe on sleeve cuffs"
+      ],
+      "fabric": "lightweight mesh or polyester athletic jersey fabric",
+      "patches": [
+        "Black Rose Collection rectangular woven patch on lower right front with decorative border"
+      ],
+      "design_elements": [
+        "white piping trim along front placket edges",
+        "white piping along V-neck collar",
+        "white stripe bands on sleeve cuffs",
+        "arched text across chest"
+      ],
+      "stitching_details": "clean stitching along piping and sleeve bands",
+      "overall_description": "A black button-front baseball jersey featuring 'BLACK IS BEAUTIFUL' in white arched collegiate lettering across the chest, accented with white piping along the placket, collar, and sleeve cuffs, with a Black Rose Collection patch on the lower front."
+    },
+    "gemini": {
+      "garment_type": "button-up baseball jersey",
+      "base_color": "#111111",
+      "base_color_name": "black",
+      "secondary_colors": [
+        "#FFFFFF"
+      ],
+      "text_content": [
+        {
+          "text": "BLACK IS",
+          "location": "front left chest",
+          "color": "#FFFFFF",
+          "style": "arched collegiate block font"
+        },
+        {
+          "text": "BEAUTIFUL",
+          "location": "front right chest",
+          "color": "#FFFFFF",
+          "style": "arched collegiate block font"
+        }
+      ],
+      "numbers": [],
+      "logos": [],
+      "construction": [
+        "6-button front placket",
+        "short sleeves"
+      ],
+      "fabric": "shiny synthetic mesh",
+      "patches": [
+        "rectangular jock tag on bottom left hem with text 'BLACK ROSE COLLECTION'"
+      ],
+      "design_elements": [
+        "white piping extending from back neck down the front placket",
+        "white piping around sleeve ends"
+      ],
+      "stitching_details": "visible seam running vertically down the back",
+      "overall_description": "A black short-sleeve baseball jersey with white piping details and 'BLACK IS BEAUTIFUL' text arched across the chest. It features a full button front and a jock tag near the hem."
+    }
+  }
+}

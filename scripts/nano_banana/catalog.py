@@ -6,6 +6,7 @@ Single source of truth for all product metadata. No hardcoded catalogs.
 from __future__ import annotations
 
 import csv
+import json
 import logging
 from pathlib import Path
 
@@ -17,6 +18,7 @@ PRODUCTS_DIR = (
 )
 SOURCE_DIR = PROJECT_ROOT / "skyyrose" / "assets" / "images" / "source-products"
 CATALOG_CSV = PROJECT_ROOT / "data" / "product-catalog.csv"
+REFERENCES_JSON = PROJECT_ROOT / "data" / "product-references.json"
 
 
 def load_catalog() -> dict[str, dict]:
@@ -64,7 +66,8 @@ def find_source_image(sku: str, catalog: dict[str, dict]) -> Path | None:
 
     # Filter out generated model shots
     source_candidates = [
-        p for p in candidates
+        p
+        for p in candidates
         if "-front-model" not in p.stem
         and "-back-model" not in p.stem
         and "-branding" not in p.stem
@@ -97,6 +100,7 @@ def find_back_source(sku: str, catalog: dict[str, dict]) -> Path | None:
     # Auto-crop right half of 2-panel techflats
     try:
         from PIL import Image
+
         img = Image.open(back_path)
         w, h = img.size
         if w > h * 1.1:
@@ -128,14 +132,56 @@ def load_products(
             continue
         info = catalog[sku]
         source = find_source_image(sku, catalog)
-        products.append({
-            "sku": sku,
-            "name": info["name"],
-            "collection": info["collection"],
-            "is_accessory": info["is_accessory"],
-            "is_tech_flat": info["is_tech_flat"],
-            "output_slug": info["output_slug"],
-            "source_image": source,
-        })
+        products.append(
+            {
+                "sku": sku,
+                "name": info["name"],
+                "collection": info["collection"],
+                "is_accessory": info["is_accessory"],
+                "is_tech_flat": info["is_tech_flat"],
+                "output_slug": info["output_slug"],
+                "source_image": source,
+            }
+        )
 
     return products
+
+
+def load_references() -> dict[str, dict]:
+    """Load product reference manifest (techflats + material specs).
+
+    Returns the 'products' dict keyed by SKU. Each entry has:
+        name, collection, reference_image, reference_back,
+        fabric, texture, material_notes
+
+    Fabric/texture/notes fields may be None until populated by user.
+    Returns empty dict if manifest file doesn't exist.
+    """
+    if not REFERENCES_JSON.exists():
+        return {}
+    data = json.loads(REFERENCES_JSON.read_text())
+    return data.get("products", {})
+
+
+def get_material_spec(sku: str) -> str:
+    """Get fabric + texture description for a SKU to inject into prompts.
+
+    Returns a formatted string like:
+        'Material: satin. Texture: embossed logo with raised relief. Notes: ...'
+
+    Returns empty string if no specs populated for this SKU.
+    """
+    refs = load_references()
+    entry = refs.get(sku, {})
+    if not entry:
+        return ""
+
+    parts = []
+    if entry.get("fabric"):
+        parts.append(f"Material: {entry['fabric']}")
+    if entry.get("texture"):
+        parts.append(f"Texture: {entry['texture']}")
+    if entry.get("material_notes"):
+        parts.append(f"Notes: {entry['material_notes']}")
+
+    return " | ".join(parts) if parts else ""

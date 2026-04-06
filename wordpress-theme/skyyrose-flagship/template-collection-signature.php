@@ -21,12 +21,8 @@ $features = array(
 	array( 'icon' => '&#x2726;', 'title' => __( 'Timeless Design', 'skyyrose-flagship' ), 'text' => __( 'Classic silhouettes that never date. Investment pieces, not trend pieces.', 'skyyrose-flagship' ) ),
 );
 
-/* ── Cross-collection navigation ──────────────────────────────── */
-$cross_nav = array(
-	array( 'slug' => 'collection-black-rose', 'name' => __( 'Black Rose', 'skyyrose-flagship' ), 'desc' => __( 'Dark Elegance', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--black-rose' ),
-	array( 'slug' => 'collection-love-hurts', 'name' => __( 'Love Hurts', 'skyyrose-flagship' ), 'desc' => __( 'Crimson Rebellion', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--love-hurts' ),
-	array( 'slug' => 'collection-kids-capsule', 'name' => __( 'Kids Capsule', 'skyyrose-flagship' ), 'desc' => __( 'Next Generation', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--kids-capsule' ),
-);
+/* Cross-collection navigation — sourced from inc/collections-config.php */
+$cross_nav = skyyrose_get_cross_nav( 'signature' );
 
 /* SVG whitelist for wp_kses */
 $svg_kses = skyyrose_svg_kses();

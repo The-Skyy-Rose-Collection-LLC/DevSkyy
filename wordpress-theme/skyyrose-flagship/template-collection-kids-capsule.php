@@ -25,12 +25,8 @@ $features = array(
 	array( 'icon' => '&#x2726;', 'title' => __( 'Dark Luxury DNA', 'skyyrose-flagship' ), 'text' => __( 'No pastels. No cartoons. Real streetwear scaled down, not dumbed down. The same aesthetic the brand was built on.', 'skyyrose-flagship' ) ),
 );
 
-/* ── Cross-collection navigation ──────────────────────────────── */
-$cross_nav = array(
-	array( 'slug' => 'collection-signature', 'name' => __( 'Signature', 'skyyrose-flagship' ), 'desc' => __( 'The Foundation', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--signature' ),
-	array( 'slug' => 'collection-black-rose', 'name' => __( 'Black Rose', 'skyyrose-flagship' ), 'desc' => __( 'Dark Elegance', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--black-rose' ),
-	array( 'slug' => 'collection-love-hurts', 'name' => __( 'Love Hurts', 'skyyrose-flagship' ), 'desc' => __( 'Crimson Rebellion', 'skyyrose-flagship' ), 'class' => 'col-crossnav__link--love-hurts' ),
-);
+/* Cross-collection navigation — sourced from inc/collections-config.php */
+$cross_nav = skyyrose_get_cross_nav( 'kids-capsule' );
 
 $svg_kses = skyyrose_svg_kses();
 
