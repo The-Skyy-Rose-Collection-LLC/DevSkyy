@@ -12,12 +12,13 @@
 
 class BlackRoseExperience extends SkyyRoseExperience {
     constructor(containerId, options) {
-        super(containerId, Object.assign({
+        super(containerId, {
             backgroundColor: 0x050508,
             enablePostProcessing: true,
             enableParticles: true,
-            cameraFov: 55
-        }, options || {}));
+            cameraFov: 55,
+            ...(options || {})
+        });
 
         // Collection colors
         this.colors = {

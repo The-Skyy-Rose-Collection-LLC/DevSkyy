@@ -10,6 +10,7 @@
 
     // Global configuration from WordPress
     const config = window.skyyrose3D || {};
+    var isMobileDevice = config.isMobile || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     /**
      * Clean corrupted JSON response by stripping leading junk
@@ -117,7 +118,7 @@
             const finalConfig = {
                 ...config,
                 ...containerConfig,
-                isMobile: config.isMobile || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+                isMobile: isMobileDevice
             };
 
             // Create the experience
@@ -149,7 +150,7 @@
                     try {
                         var collectionConfig = {
                             ...config,
-                            isMobile: config.isMobile || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+                            isMobile: isMobileDevice
                         };
                         new ExperienceClass(collection + '-experience', collectionConfig);
                         container.dataset.initialized = 'true';

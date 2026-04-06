@@ -195,6 +195,10 @@ class SkyyRoseExperience {
     onLoadComplete() {
         this.isLoading = false;
         this.hideLoadingUI();
+        // Reduced-motion users get a single static render after assets load
+        if (this.prefersReducedMotion) {
+            this.renderer.render(this.scene, this.camera);
+        }
     }
 
     onLoadError(url) {

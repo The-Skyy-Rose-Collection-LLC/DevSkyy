@@ -38,9 +38,21 @@ Protected Endpoints (require request signing):
 
 import hashlib
 import hmac
+import json
 import secrets
 import time
 from typing import Any
+
+
+def _body_to_bytes(body: bytes | str | dict | None) -> bytes:
+    """Canonicalize request body to bytes for deterministic signing."""
+    if body is None:
+        return b""
+    if isinstance(body, dict):
+        return json.dumps(body, sort_keys=True, separators=(",", ":")).encode()
+    if isinstance(body, str):
+        return body.encode()
+    return body
 
 
 class RequestSigner:
@@ -99,19 +111,7 @@ class RequestSigner:
         timestamp = timestamp or int(time.time())
         nonce = secrets.token_hex(16)
 
-        # Convert body to bytes
-        if body is None:
-            body_bytes = b""
-        elif isinstance(body, dict):
-            import json
-
-            body_bytes = json.dumps(body, sort_keys=True, separators=(",", ":")).encode()
-        elif isinstance(body, str):
-            body_bytes = body.encode()
-        else:
-            body_bytes = body
-
-        # Create signature payload
+        body_bytes = _body_to_bytes(body)
         body_hash = hashlib.sha256(body_bytes).hexdigest()
         payload = f"{method}:{path}:{timestamp}:{nonce}:{body_hash}"
 
@@ -160,19 +160,7 @@ class RequestSigner:
         timestamp = timestamp or int(time.time())
         nonce = secrets.token_hex(16)
 
-        # Convert body to bytes
-        if body is None:
-            body_bytes = b""
-        elif isinstance(body, dict):
-            import json
-
-            body_bytes = json.dumps(body, sort_keys=True, separators=(",", ":")).encode()
-        elif isinstance(body, str):
-            body_bytes = body.encode()
-        else:
-            body_bytes = body
-
-        # Create signature payload
+        body_bytes = _body_to_bytes(body)
         body_hash = hashlib.sha256(body_bytes).hexdigest()
         payload = f"{method}:{path}:{timestamp}:{nonce}:{body_hash}"
 
