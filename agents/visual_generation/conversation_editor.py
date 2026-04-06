@@ -26,7 +26,7 @@ from typing import Literal
 
 from PIL import Image
 
-from errors.production_errors import DevSkyError, DevSkyErrorCode, DevSkyErrorSeverity
+from core.errors.production_errors import DevSkyError, DevSkyErrorCode, DevSkyErrorSeverity
 
 logger = logging.getLogger(__name__)
 

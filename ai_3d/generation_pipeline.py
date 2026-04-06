@@ -31,7 +31,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from errors.production_errors import (
+from core.errors.production_errors import (
     ModelFidelityError,
 )
 from imagery.image_processor import ImagePreprocessor

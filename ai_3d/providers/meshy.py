@@ -34,7 +34,7 @@ try:
 except ImportError:
     MESHY_API_KEY = os.getenv("MESHY_API_KEY", "")
 
-from errors.production_errors import (
+from core.errors.production_errors import (
     ConfigurationError,
     ExternalServiceError,
     RateLimitError,

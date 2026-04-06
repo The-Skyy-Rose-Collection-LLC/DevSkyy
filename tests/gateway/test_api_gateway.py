@@ -11,7 +11,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from gateway.api_gateway import (
+from api.gateway import (
     APIGateway,
     CircuitBreaker,
     CircuitState,

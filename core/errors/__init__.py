@@ -1,4 +1,4 @@
-# errors/__init__.py
+# core/errors/__init__.py
 """
 DevSkyy Production Error Handling Module.
 
@@ -12,7 +12,7 @@ Design Principles:
 - Context preservation for debugging
 """
 
-from errors.production_errors import (
+from core.errors.production_errors import (
     AgentExecutionError,
     AuthenticationError,
     AuthorizationError,

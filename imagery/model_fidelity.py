@@ -42,7 +42,7 @@ except ImportError:
     PIL_AVAILABLE = False
     Image = None  # type: ignore
 
-from errors.production_errors import (
+from core.errors.production_errors import (
     ModelFidelityError,
     ThreeDGenerationError,
 )

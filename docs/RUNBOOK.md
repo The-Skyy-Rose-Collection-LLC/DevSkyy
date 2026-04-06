@@ -1,8 +1,41 @@
 # DevSkyy Production Runbook
 
-**Last Updated**: 2026-03-12
+**Last Updated**: 2026-04-05
 **Production URL**: devskyy.app (Vercel)
-**WordPress**: SkyyRose Flagship theme
+**WordPress**: SkyyRose Flagship theme at skyyrose.co
+
+---
+
+## Pre-Deployment Checklist
+
+### Generate Security Keys (first-time setup)
+
+```bash
+# JWT secret (64+ chars)
+python -c "import secrets; print('JWT_SECRET_KEY=' + secrets.token_urlsafe(64))"
+
+# Encryption key (32 bytes, base64)
+python -c "import secrets, base64; print('ENCRYPTION_MASTER_KEY=' + base64.b64encode(secrets.token_bytes(32)).decode())"
+```
+
+### Quality Gates
+
+```bash
+make ci                          # Full CI locally
+# Or individual checks:
+ruff check .                     # Lint
+black --check .                  # Format
+mypy . --ignore-missing-imports  # Types (904 source files)
+pytest tests/ -v                 # Tests
+```
+
+### Environment Verification
+- [ ] All secrets in `.env.example` are configured in `.env`
+- [ ] Database is provisioned and accessible (`DATABASE_URL` set)
+- [ ] Redis cache is provisioned (optional but recommended)
+- [ ] At least one LLM provider API key is valid
+- [ ] `.env.wordpress` has fresh SFTP credentials (rotates periodically)
+- [ ] DNS records point to correct endpoints
 
 ---
 
@@ -53,6 +86,43 @@ docker-compose -f docker-compose.staging.yml up -d  # Staging
 ```
 
 Entry point: `main_enterprise.py` — `uvicorn main_enterprise:app --host 0.0.0.0 --port 8000`
+
+### HuggingFace Spaces
+
+```bash
+# First-time auth
+pip install huggingface_hub
+huggingface-cli login
+
+# Deploy all spaces
+cd hf-spaces && bash deploy-all-spaces.sh
+
+# Deploy individual space (example: 3D Converter)
+cd hf-spaces/3d-converter
+huggingface-cli repo create skyyrose/3d-converter --type space -y || true
+git init && git remote add origin https://huggingface.co/spaces/skyyrose/3d-converter
+git add . && git commit -m "Deploy" && git push -f origin main
+```
+
+Set secrets in Space settings (`HF_TOKEN` + space-specific keys).
+Verify: `curl https://huggingface.co/api/spaces/skyyrose/<space-name>`.
+
+## Smoke Tests
+
+```bash
+# Backend + API
+curl https://api.devskyy.app/health
+curl https://api.devskyy.app/metrics
+open https://api.devskyy.app/docs
+
+# Frontend
+curl -s -o /dev/null -w "%{http_code}\n" https://devskyy.app
+
+# WordPress
+curl -s -o /dev/null -w "%{http_code}\n" https://skyyrose.co
+curl "https://skyyrose.co/index.php?rest_route=/wp/v2/posts&per_page=1"
+curl -u "ck_xxx:cs_xxx" "https://skyyrose.co/index.php?rest_route=/wc/v3/products&per_page=1"
+```
 
 ## Health Endpoints
 
@@ -112,7 +182,28 @@ Entry point: `main_enterprise.py` — `uvicorn main_enterprise:app --host 0.0.0.
 ### WordPress Theme Upload Fails
 
 **Symptom**: SFTP deploy hangs or fails authentication.
-**Fix**: Ensure `sshpass` is installed (`brew install hudochenkov/sshpass/sshpass`).
+**Fix**: Ensure `sshpass` is installed (`brew install hudochenkov/sshpass/sshpass`). If auth still fails, the WordPress.com SFTP password has likely rotated — regenerate at WP.com Dashboard → Users → Security → SFTP/SSH credentials and update `.env.wordpress`.
+
+### Backend 500 Internal Server Error
+
+**Check logs**: `docker-compose logs -f api` or `fly logs -a devskyy`.
+**Common causes**:
+- Missing environment variables (compare `.env` to `.env.example`)
+- Database connection failed (test with `python -c "import os; from sqlalchemy import create_engine; create_engine(os.environ['DATABASE_URL']).connect()"`)
+- Invalid LLM API keys (check with provider dashboard)
+
+### CORS Errors on Frontend
+
+**Symptom**: Browser blocks requests from `devskyy.app` to `api.devskyy.app`.
+**Fix**: Verify `CORS_ORIGINS` env var includes all frontend domains:
+```bash
+echo $CORS_ORIGINS
+# Should include: https://devskyy.app,https://skyyrose.co
+```
+
+### HuggingFace Space Not Starting
+
+**Check space logs** in HF dashboard. Verify secrets are set. Free tier spaces sleep after inactivity — upgrade to persistent hardware or add keep-alive pings.
 
 ### Product Routing Goes to Pre-Order for Everything
 
