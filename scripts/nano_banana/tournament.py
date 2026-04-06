@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 # Judge models (same as DNA extractors for consistency)
 GPT_JUDGE_MODEL = "gpt-4o"
 CLAUDE_JUDGE_MODEL = "claude-opus-4-6"
-GEMINI_JUDGE_MODEL = "gemini-3-pro-preview"
+GEMINI_JUDGE_MODEL = "gemini-2.5-flash"
 
 
 JUDGE_PROMPT = """You are a strict QA inspector for a luxury fashion brand.
@@ -120,10 +120,30 @@ def _parse_json(text: str) -> dict:
         text = text.split("\n", 1)[1] if "\n" in text else text[3:]
     if text.endswith("```"):
         text = text[:-3]
+    text = text.strip()
     try:
-        return json.loads(text.strip())
+        return json.loads(text)
     except json.JSONDecodeError:
-        return {}
+        pass
+    # Fallback: try to repair truncated JSON by closing braces/brackets
+    import re
+    for suffix in ["}", "]}", '"]}']:
+        try:
+            # Find last complete key-value pair and close the object
+            repaired = text.rstrip().rstrip(",") + suffix
+            result = json.loads(repaired)
+            if isinstance(result, dict):
+                return result
+        except json.JSONDecodeError:
+            continue
+    # Last resort: extract individual numeric fields with regex
+    fields = {}
+    for key in ("garment_type", "color_accuracy", "text_accuracy",
+                "logo_accuracy", "construction_accuracy", "no_hallucinations", "overall"):
+        m = re.search(rf'"{key}"\s*:\s*(\d+)', text)
+        if m:
+            fields[key] = int(m.group(1))
+    return fields
 
 
 def _dna_to_spec(dna: dict) -> str:
@@ -235,6 +255,28 @@ def judge_with_gemini(client, source_path: Path, candidate_path: Path, dna: dict
     src_mime = _load_image_b64(source_path)[1]
     cand_mime = _load_image_b64(candidate_path)[1]
     spec = _dna_to_spec(dna)
+
+    # Constrained decoding schema — guarantees complete, valid JSON output
+    judge_schema = {
+        "type": "object",
+        "properties": {
+            "garment_type": {"type": "integer"},
+            "color_accuracy": {"type": "integer"},
+            "text_accuracy": {"type": "integer"},
+            "logo_accuracy": {"type": "integer"},
+            "construction_accuracy": {"type": "integer"},
+            "no_hallucinations": {"type": "integer"},
+            "overall": {"type": "integer"},
+            "issues": {"type": "array", "items": {"type": "string"}},
+            "suggested_fixes": {"type": "array", "items": {"type": "string"}},
+        },
+        "required": [
+            "garment_type", "color_accuracy", "text_accuracy",
+            "logo_accuracy", "construction_accuracy", "no_hallucinations",
+            "overall", "issues", "suggested_fixes",
+        ],
+    }
+
     try:
         response = client.models.generate_content(
             model=GEMINI_JUDGE_MODEL,
@@ -247,10 +289,13 @@ def judge_with_gemini(client, source_path: Path, candidate_path: Path, dna: dict
             ],
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
-                max_output_tokens=1000,
+                response_schema=judge_schema,
+                max_output_tokens=4096,
+                temperature=1.0,
+                thinking_config=types.ThinkingConfig(thinking_budget=8192),
             ),
         )
-        # Extract text from parts, skipping thought_signature and other non-text parts
+        # Extract text from parts, skipping thought parts
         text_parts = []
         if response.candidates and response.candidates[0].content.parts:
             for part in response.candidates[0].content.parts:
@@ -260,10 +305,10 @@ def judge_with_gemini(client, source_path: Path, candidate_path: Path, dna: dict
         data = _parse_json(raw_text)
         if not data:
             raise ValueError(f"Empty JSON parse from: {raw_text[:200]}")
-        return _build_judgment_from_json("gemini-3-pro-preview", data, raw_text)
+        return _build_judgment_from_json("gemini-2.5-flash", data, raw_text)
     except Exception as exc:
         log.error("Gemini judge failed: %s", exc)
-        return JudgmentScore("gemini-3-pro-preview", 0, 0, 0, 0, 0, 0, 0, [f"judge error: {exc}"], [], "")
+        return JudgmentScore("gemini-2.5-flash", 0, 0, 0, 0, 0, 0, 0, [f"judge error: {exc}"], [], "")
 
 
 # -- Tournament orchestration -----------------------------------------------
