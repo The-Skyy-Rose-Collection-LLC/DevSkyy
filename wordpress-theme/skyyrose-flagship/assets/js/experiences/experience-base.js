@@ -2,7 +2,7 @@
  * SkyyRose Experience Base Class
  * Foundation for all immersive 3D collection experiences
  * Uses Three.js r160+ with post-processing and PBR materials
- * CDN: loaded via wp_enqueue_script in enqueue-features.php
+ * CDN: loaded via wp_enqueue_script in enqueue.php
  */
 
 // Verify Three.js is loaded before proceeding
@@ -15,8 +15,7 @@ class SkyyRoseExperience {
     constructor(containerId, options = {}) {
         this.container = document.getElementById(containerId);
         if (!this.container) {
-            console.error(`Container #${containerId} not found`);
-            return;
+            throw new Error('SkyyRose 3D: Container #' + containerId + ' not found');
         }
 
         // Configuration
@@ -405,13 +404,14 @@ class SkyyRoseExperience {
     // Animation loop with lifecycle control
     animate() {
         if (!this.isRunning) return;
-        this.rafId = requestAnimationFrame(() => this.animate());
 
-        // Reduced motion: render once, skip animation updates
+        // Reduced motion: render once then stop the loop entirely
         if (this.prefersReducedMotion) {
             this.renderer.render(this.scene, this.camera);
             return;
         }
+
+        this.rafId = requestAnimationFrame(() => this.animate());
 
         const delta = this.clock.getDelta();
 

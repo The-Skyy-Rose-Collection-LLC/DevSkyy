@@ -275,7 +275,9 @@ async def benchmark_parallel_processing(iterations: int = 5) -> list[BenchmarkRe
 
     results = [
         create_result(f"Sequential ({num_tasks} tasks)", sequential_times),
-        create_result(f"Parallel ({num_tasks} tasks)", parallel_times, {"speedup": f"{speedup:.1f}x"}),
+        create_result(
+            f"Parallel ({num_tasks} tasks)", parallel_times, {"speedup": f"{speedup:.1f}x"}
+        ),
     ]
 
     print(f"\nSpeedup: {speedup:.1f}x")
@@ -335,7 +337,9 @@ async def benchmark_semaphore_limiting(iterations: int = 3) -> list[BenchmarkRes
         create_result(f"Semaphore Limited (max={max_concurrent})", limited_times),
     ]
 
-    print(f"\nSequential vs Limited Speedup: {statistics.mean(sequential_times) / statistics.mean(limited_times):.1f}x")
+    print(
+        f"\nSequential vs Limited Speedup: {statistics.mean(sequential_times) / statistics.mean(limited_times):.1f}x"
+    )
     for r in results:
         print(f"\n{r}")
 

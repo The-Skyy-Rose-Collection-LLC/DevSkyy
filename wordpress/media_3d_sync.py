@@ -877,7 +877,7 @@ class WordPress3DPipelineSync:
                 )
 
             # Sync to WordPress
-            result = await self.media_sync.sync_3d_model(
+            await self.media_sync.sync_3d_model(
                 product_id=model.product_id,
                 glb_url=glb_url,
                 usdz_url=usdz_url,
@@ -988,7 +988,6 @@ class WordPress3DPipelineSync:
         """
         from wordpress.hotspot_config_generator import (
             CollectionType,
-            HotspotConfigGenerator,
         )
 
         self._logger.info("regenerate_hotspots_start", collection=collection)
@@ -1005,7 +1004,7 @@ class WordPress3DPipelineSync:
                 self._logger.warning("unknown_collection", collection=collection)
                 return None
 
-            collection_type = collection_map[collection]
+            collection_map[collection]
 
             # Load existing hotspot config
             hotspot_file = self.hotspots_dir / f"{collection}-hotspots.json"
@@ -1094,9 +1093,7 @@ class WordPress3DPipelineSync:
                 batch_data = json.load(f)
 
             # Filter completed results
-            completed = [
-                r for r in batch_data.get("results", []) if r.get("status") == "completed"
-            ]
+            completed = [r for r in batch_data.get("results", []) if r.get("status") == "completed"]
 
             if not completed:
                 self._logger.info("no_completed_results", batch_id=batch_id)

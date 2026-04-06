@@ -42,7 +42,7 @@ class DevSkyy:
     def __init__(self):
         """Initialize DevSkyy with orchestrators."""
         self.orchestrator = AgentOrchestrator()
-        self.round_table = RoundTableOrchestrator()
+        self._round_table_orchestrator = RoundTableOrchestrator()
 
     async def execute(
         self,
@@ -135,7 +135,7 @@ class DevSkyy:
             print(f"Result: {result['result']}")
             ```
         """
-        return await self.round_table.execute_with_winner(task, models)
+        return await self._round_table_orchestrator.execute_with_winner(task, models)
 
 
 # Convenience functions for quick access

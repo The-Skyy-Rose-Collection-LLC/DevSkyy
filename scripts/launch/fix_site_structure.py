@@ -6,10 +6,7 @@ and WooCommerce REST API for category operations.
 
 from __future__ import annotations
 
-import json
 import os
-import sys
-import time
 from pathlib import Path
 
 import httpx
@@ -60,8 +57,13 @@ def verify_products():
 
     products = wc_request("GET", "products", params={"per_page": 100})
     total = len(products)
-    with_images = sum(1 for p in products if p.get("images") and len(p["images"]) > 0
-                      and "placeholder" not in p["images"][0].get("src", ""))
+    with_images = sum(
+        1
+        for p in products
+        if p.get("images")
+        and len(p["images"]) > 0
+        and "placeholder" not in p["images"][0].get("src", "")
+    )
     with_prices = sum(1 for p in products if p.get("price") and float(p.get("price", 0)) > 0)
 
     print(f"  Total products:     {total}")
@@ -72,11 +74,16 @@ def verify_products():
     # Show products missing images or prices
     issues = []
     for p in products:
-        has_image = (p.get("images") and len(p["images"]) > 0
-                     and "placeholder" not in p["images"][0].get("src", ""))
+        has_image = (
+            p.get("images")
+            and len(p["images"]) > 0
+            and "placeholder" not in p["images"][0].get("src", "")
+        )
         has_price = p.get("price") and float(p.get("price", 0)) > 0
         if not has_image or not has_price:
-            issues.append(f"  ⚠ {p.get('sku', '(none)'):18s} | img: {'✓' if has_image else '✗':1s} | price: {'✓' if has_price else '✗':1s} | {p['name'][:40]}")
+            issues.append(
+                f"  ⚠ {p.get('sku', '(none)'):18s} | img: {'✓' if has_image else '✗':1s} | price: {'✓' if has_price else '✗':1s} | {p['name'][:40]}"
+            )
 
     if issues:
         print("  Issues found:")

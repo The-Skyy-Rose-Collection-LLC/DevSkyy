@@ -143,8 +143,9 @@ class WooCommerceConfig:
         default_factory=lambda: os.getenv("WOOCOMMERCE_KEY", "") or os.getenv("WC_CONSUMER_KEY", "")
     )
     consumer_secret: str = field(
-        default_factory=lambda: os.getenv("WOOCOMMERCE_SECRET", "")
-        or os.getenv("WC_CONSUMER_SECRET", "")
+        default_factory=lambda: (
+            os.getenv("WOOCOMMERCE_SECRET", "") or os.getenv("WC_CONSUMER_SECRET", "")
+        )
     )
     api_version: str = "wc/v3"
     timeout: float = 30.0
