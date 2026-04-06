@@ -240,7 +240,7 @@ ml = [
     "seaborn==0.13.2",
     "plotly==5.24.1",
     "feature-engine==1.9.3",
-    "category-encoders==2.6.4",
+    "category-encoders==2.9.0",
     "optuna==4.1.0",
     "hyperopt==0.2.7",
     "librosa==0.10.2.post1",
