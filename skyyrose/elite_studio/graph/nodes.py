@@ -119,8 +119,12 @@ def compositor_node(state: EliteStudioState) -> dict:
 
     gen = state.get("generation_result")
     if not gen or not gen.success:
+        elapsed = time.monotonic() - start
+        timings = dict(state.get("stage_timings", {}))
+        timings["compositing"] = round(elapsed, 2)
         return {
             "compositor_result": None,
+            "stage_timings": timings,
         }
 
     agent = CompositorAgent()

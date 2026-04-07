@@ -22,6 +22,23 @@ from .coordinator import Coordinator
 from .utils import discover_all_skus, discover_scene_images
 
 
+def _run_graph(sku: str, view: str, with_compositor: bool) -> None:
+    """Run the LangGraph engine path and print result."""
+    from .graph import GraphConfig, run_single
+
+    config = GraphConfig(enable_compositor=with_compositor)
+    result = run_single(sku=sku, view=view, config=config)
+    print(f"\nResult: {result.status}")
+    if result.output_path:
+        print(f"Output: {result.output_path}")
+    if result.compositing and result.compositing.success:
+        print(f"Composited: {result.compositing.output_path}")
+    if result.error:
+        print(f"Error: {result.error}")
+    if result.quality:
+        print(f"QC score: {result.quality.score:.2f}  [{result.quality.recommendation}]")
+
+
 def build_team(with_compositor: bool = False) -> Coordinator:
     """Build the default agent team."""
     return Coordinator(
@@ -34,6 +51,9 @@ def build_team(with_compositor: bool = False) -> Coordinator:
 
 def cmd_produce(args: argparse.Namespace) -> None:
     """Produce a single product."""
+    if getattr(args, "graph", False):
+        _run_graph(args.sku, args.view, with_compositor=getattr(args, "composite", False))
+        return
     team = build_team(with_compositor=getattr(args, "composite", False))
     result = team.produce(args.sku, args.view)
     print(f"\nResult: {result.status}")
@@ -192,6 +212,12 @@ def main(argv: list[str] | None = None) -> None:
         "--composite",
         action="store_true",
         help="Run scene compositing after generation",
+    )
+    # Add --graph flag to produce (opts into LangGraph engine)
+    p_produce.add_argument(
+        "--graph",
+        action="store_true",
+        help="Use LangGraph engine instead of legacy Coordinator",
     )
 
     args = parser.parse_args(argv)

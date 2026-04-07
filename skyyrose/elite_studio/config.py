@@ -65,6 +65,10 @@ BATCH_DELAY_SECONDS = 10
 RETRY_DELAY_SECONDS = 5
 MAX_RETRIES = 2
 
+# LangGraph engine
+MAX_QC_RETRIES = int(os.getenv("ELITE_MAX_QC_RETRIES", "2"))
+GRAPH_CHECKPOINT_DIR = Path(os.getenv("ELITE_CHECKPOINT_DIR", str(_BASE_DIR / ".checkpoints")))
+
 # ---------------------------------------------------------------------------
 # Compositor configuration
 # ---------------------------------------------------------------------------
