@@ -192,6 +192,7 @@ mcp = [
     "langchain>=0.3.18",
     "langchain-openai>=0.3.0",
     "langchain-anthropic>=0.3.0",
+    "langgraph>=0.2",
     "chromadb>=0.6.0",
     "faiss-cpu==1.13.1",
     "beautifulsoup4==4.12.3",

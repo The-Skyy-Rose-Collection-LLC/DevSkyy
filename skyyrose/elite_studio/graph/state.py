@@ -1,0 +1,98 @@
+"""
+EliteStudioState — shared state accumulator for the LangGraph pipeline.
+
+Each node reads from and writes to this TypedDict. LangGraph manages
+the state transitions between nodes automatically.
+"""
+
+from __future__ import annotations
+
+import uuid
+from typing import Any, TypedDict
+
+from ..models import (
+    CompositorResult,
+    GenerationResult,
+    QualityVerification,
+    SynthesizedVision,
+)
+
+
+class EliteStudioState(TypedDict, total=False):
+    """Shared state flowing through the Elite Studio graph.
+
+    Required fields are set at graph invocation. Optional fields
+    are populated by individual nodes as the pipeline progresses.
+    """
+
+    # --- Inputs (set at invocation) ---
+    sku: str
+    view: str
+    enable_compositor: bool
+
+    # --- Stage results (set by nodes) ---
+    vision_result: SynthesizedVision | None
+    generation_result: GenerationResult | None
+    quality_result: QualityVerification | None
+    compositor_result: CompositorResult | None
+
+    # --- Control flow ---
+    retry_count: int
+    max_retries: int
+    status: str  # "running", "success", "error"
+    error: str
+    failed_step: str
+
+    # --- Metadata ---
+    workflow_id: str
+    stage_timings: dict[str, float]
+
+
+def create_initial_state(
+    sku: str,
+    view: str = "front",
+    enable_compositor: bool = False,
+    max_retries: int = 2,
+) -> EliteStudioState:
+    """Create the initial state for a graph invocation."""
+    return EliteStudioState(
+        sku=sku,
+        view=view,
+        enable_compositor=enable_compositor,
+        vision_result=None,
+        generation_result=None,
+        quality_result=None,
+        compositor_result=None,
+        retry_count=0,
+        max_retries=max_retries,
+        status="running",
+        error="",
+        failed_step="",
+        workflow_id=str(uuid.uuid4()),
+        stage_timings={},
+    )
+
+
+def extract_production_result(state: EliteStudioState) -> Any:
+    """Extract a ProductionResult from the final graph state.
+
+    Imported here to avoid circular imports at module level.
+    """
+    from ..models import ProductionResult
+
+    return ProductionResult(
+        sku=state["sku"],
+        view=state["view"],
+        status=state.get("status", "error"),
+        output_path=(
+            state["generation_result"].output_path
+            if state.get("generation_result") and state["generation_result"].success
+            else ""
+        ),
+        vision=state.get("vision_result"),
+        generation=state.get("generation_result"),
+        quality=state.get("quality_result"),
+        compositing=state.get("compositor_result"),
+        error=state.get("error", ""),
+        step=state.get("failed_step", ""),
+    )
