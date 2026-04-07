@@ -48,17 +48,29 @@ def load_catalog() -> dict[str, dict]:
 
 
 def find_source_image(sku: str, catalog: dict[str, dict]) -> Path | None:
-    """Find the best available source image for a SKU."""
+    """Find the best available source image for a SKU.
+
+    Priority: source_map (authoritative) → CSV override → glob fallback.
+    """
+    from nano_banana.source_map import get_source_map
+
+    # 1. Authoritative source map — single source of truth
+    smap = get_source_map()
+    if sku in smap:
+        front = smap[sku].get("front")
+        if front and front.exists():
+            return front
+
     info = catalog.get(sku, {})
 
-    # Explicit source override
+    # 2. Explicit CSV source override
     if "source_override" in info:
         path = PRODUCTS_DIR / info["source_override"]
         if path.exists():
             return path
         log.warning("source_override %s not found for %s", info["source_override"], sku)
 
-    # Glob by output_slug
+    # 3. Glob fallback by output_slug
     slug = info.get("output_slug", sku)
     candidates = []
     for ext in (".webp", ".jpg", ".jpeg", ".png"):
@@ -85,6 +97,16 @@ def find_back_source(sku: str, catalog: dict[str, dict]) -> Path | None:
     """Find back-specific source image. Crops 2-panel techflats automatically."""
     import tempfile
 
+    from nano_banana.source_map import get_source_map
+
+    # 1. Authoritative source map
+    smap = get_source_map()
+    if sku in smap:
+        back = smap[sku].get("back")
+        if back and back.exists():
+            return back
+
+    # 2. CSV override fallback
     info = catalog.get(sku, {})
     back_override = info.get("back_source_override")
     if not back_override:

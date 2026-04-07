@@ -454,6 +454,72 @@ class ProductionPipeline:
         return desc
 
 
+def _load_bundle_refs(
+    name: str, sku: str, source_path: Path, view: str
+) -> list[Path]:
+    """Load reference images from the product bundle directory.
+
+    Returns a list of image Paths relevant to the requested view.
+    The pipeline sends these as extra_refs to the generation model
+    so it can see logo close-ups, previous renders, branding, etc.
+    """
+    bundle_dir = PROJECT_ROOT / "data" / "product-bundles" / sku
+    if not bundle_dir.exists():
+        log.warning("No bundle directory for %s at %s", sku, bundle_dir)
+        return []
+
+    # Load manifest to get file paths
+    manifest_path = bundle_dir / "manifest.json"
+    if not manifest_path.exists():
+        # Fall back to globbing image files
+        refs = [
+            p
+            for p in bundle_dir.iterdir()
+            if p.suffix.lower() in (".webp", ".jpg", ".jpeg", ".png")
+            and p != source_path
+        ]
+        return sorted(refs, key=lambda p: p.stat().st_size, reverse=True)[:5]
+
+    try:
+        manifest = json.loads(manifest_path.read_text())
+    except (json.JSONDecodeError, OSError) as exc:
+        log.warning("Bad manifest for %s: %s", sku, exc)
+        return []
+
+    files = manifest.get("files", {})
+    refs: list[Path] = []
+
+    # Always include logo reference if available
+    if "logo-ref" in files:
+        p = Path(files["logo-ref"])
+        if p.exists():
+            refs.append(p)
+
+    # View-specific references
+    if view == "front":
+        for key in ("render-front", "composite-front", "model-front", "real-photo", "product-photo"):
+            if key in files:
+                p = Path(files[key])
+                if p.exists() and p != source_path:
+                    refs.append(p)
+    elif view == "back":
+        for key in ("render-back", "model-back", "real-photo"):
+            if key in files:
+                p = Path(files[key])
+                if p.exists() and p != source_path:
+                    refs.append(p)
+    else:
+        # branding/editorial — include everything useful
+        for key in ("branding", "render-front", "render-back", "model-front", "model-back"):
+            if key in files:
+                p = Path(files[key])
+                if p.exists() and p != source_path:
+                    refs.append(p)
+
+    # Cap at 5 references to stay within model limits
+    return refs[:5]
+
+
 def _source_env_file(path: Path) -> None:
     """Load environment variables from a file."""
     for line in path.read_text().splitlines():
