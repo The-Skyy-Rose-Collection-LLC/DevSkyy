@@ -1,0 +1,17 @@
+{
+  "sku": "br-004",
+  "name": "BLACK Rose Hoodie",
+  "collection": "black-rose",
+  "files": {
+    "model-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-004/model-back.webp",
+    "model-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-004/model-front.webp",
+    "real-photo": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-004/real-photo.jpg",
+    "detail": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-004/detail.jpg",
+    "render-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-004/render-back.webp",
+    "branding": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-004/branding.webp",
+    "render-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-004/render-front.webp",
+    "product-photo": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-004/product-photo.jpg",
+    "logo-ref": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-004/logo-ref.png",
+    "spec": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-004/spec.txt"
+  }
+}

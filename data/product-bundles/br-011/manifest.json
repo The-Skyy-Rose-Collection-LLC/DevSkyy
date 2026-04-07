@@ -1,0 +1,12 @@
+{
+  "sku": "br-011",
+  "name": "BLACK is Beautiful Jersey Series: 4. THE ROSE (SHARKS EDITION)",
+  "collection": "black-rose",
+  "files": {
+    "model-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-011/model-front.webp",
+    "asset-black-is-beautiful-hockey-jersey-design": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-011/asset-black-is-beautiful-hockey-jersey-design.jpg",
+    "model-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-011/model-back.webp",
+    "logo-ref": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-011/logo-ref.png",
+    "spec": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-011/spec.txt"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "sku": "lh-002",
+  "name": "Love Hurts Joggers",
+  "collection": "love-hurts",
+  "files": {
+    "model-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-002/model-back.webp",
+    "composite-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-002/composite-front.webp",
+    "model-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-002/model-front.webp",
+    "techflat-source": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-002/techflat-source.jpeg",
+    "render-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-002/render-front.webp",
+    "branding": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-002/branding.webp",
+    "render-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-002/render-back.webp",
+    "model-female": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-002/model-female.webp",
+    "model-male": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-002/model-male.webp",
+    "asset-lh-002-joggers-variants": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-002/asset-lh-002-joggers-variants.jpg",
+    "asset-lh-002-joggers": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-002/asset-lh-002-joggers.webp",
+    "logo-ref": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-002/logo-ref.png",
+    "spec": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-002/spec.txt"
+  }
+}

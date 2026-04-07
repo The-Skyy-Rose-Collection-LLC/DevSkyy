@@ -1,0 +1,14 @@
+{
+  "sku": "br-002",
+  "name": "BLACK Rose Joggers",
+  "collection": "black-rose",
+  "files": {
+    "model-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-002/model-back.webp",
+    "real-photo": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-002/real-photo.jpg",
+    "model-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-002/model-front.webp",
+    "render-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-002/render-front.webp",
+    "branding": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-002/branding.webp",
+    "logo-ref": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-002/logo-ref.png",
+    "spec": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/br-002/spec.txt"
+  }
+}

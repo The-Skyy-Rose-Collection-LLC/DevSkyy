@@ -1,0 +1,20 @@
+{
+  "sku": "lh-003",
+  "name": "Love Hurts Basketball Shorts",
+  "collection": "love-hurts",
+  "files": {
+    "model-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-003/model-back.webp",
+    "real-photo": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-003/real-photo.jpg",
+    "asset-black-rose-love-hurts-basketball-shorts-shorts": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-003/asset-black-rose-love-hurts-basketball-shorts-shorts.jpg",
+    "model-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-003/model-front.webp",
+    "render-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-003/render-front.webp",
+    "asset-lh-003-shorts-back-closeup": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-003/asset-lh-003-shorts-back-closeup.jpg",
+    "asset-lh-003": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-003/asset-lh-003.webp",
+    "branding": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-003/branding.webp",
+    "asset-lh-003-shorts-front-closeup": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-003/asset-lh-003-shorts-front-closeup.jpg",
+    "techflat-source": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-003/techflat-source.jpg",
+    "render-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-003/render-back.webp",
+    "logo-ref": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-003/logo-ref.png",
+    "spec": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-003/spec.txt"
+  }
+}

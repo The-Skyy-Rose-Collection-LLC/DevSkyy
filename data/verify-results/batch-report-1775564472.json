@@ -1,0 +1,29 @@
+{
+  "summary": {
+    "passed": 0,
+    "needs_review": 1,
+    "skipped": 0,
+    "total_cost": 0.08
+  },
+  "results": [
+    {
+      "sku": "br-001",
+      "view": "front",
+      "output_path": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/wordpress-theme/skyyrose-flagship/assets/images/products/br-001-front-render.webp",
+      "engine_used": "gemini-pro",
+      "route_decision": "Complex fabric (Main body and sleeves are smooth, reflective satin. Hood appears to be a matte cotton blend or fleece. Ribbing is a standard knit.) \u2014 Gemini Pro best at material physics",
+      "qa_score": 54.0,
+      "qa_passed": false,
+      "attempts": 1,
+      "cost_usd": 0.08,
+      "issues": [
+        "Extra large rose design not in original spec",
+        "Slight difference in the positioning or size of logo",
+        "Large pink/rose gold rose graphic added to the front center of the jacket that does not exist in the source reference",
+        "The jacket material appears more like leather or faux leather in the generated image vs the satin/nylon bomber look of the source",
+        "A large rose gold rose logo has been hallucinated and prominently placed on the front of the jacket, which is not present in the source image or product specification."
+      ],
+      "refinement_applied": true
+    }
+  ]
+}
