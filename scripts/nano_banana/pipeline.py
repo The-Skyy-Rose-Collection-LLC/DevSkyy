@@ -162,12 +162,10 @@ class ProductionPipeline:
         vision_desc = self._get_or_cache_vision(product, source_path)
         result.vision_desc = vision_desc
 
-        # ── Step 1b: GATHER REFERENCES (3 per product) ───────────────
-        # Bundles: real flatlay photo + techflat + logo close-up
-        all_refs = get_all_references(sku, collection, source_path)
-        # Extra refs for generation (exclude the primary source which is sent separately)
-        extra_refs = [(label, path) for label, path in all_refs if path != source_path]
-        log.info("REFS: %d reference images bundled", len(all_refs))
+        # ── Step 1b: GATHER BUNDLE REFERENCES ────────────────────────
+        # Load COMPLETE product bundle — every available asset
+        extra_refs = _load_bundle_refs(name, sku, source_path, view)
+        log.info("BUNDLE: %d reference images loaded for %s", len(extra_refs) + 1, name)
 
         # ── Step 2: ROUTE ────────────────────────────────────────────
         decisions = route_product(product, vision_desc, view)

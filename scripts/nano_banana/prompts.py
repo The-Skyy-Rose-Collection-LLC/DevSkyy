@@ -303,41 +303,79 @@ def get_prompt(product: dict, view: str) -> str:
 # Used by front/back prompts AND composite step.
 
 LOGO_TREATMENTS = {
-    # -- Black Rose Collection --
-    "br-001": "front chest center (~10 in): ROSE-ONLY logo — 3D dimensional rose, layered spiral petals, curved stem with two broad leaves, brushed rose-gold metallic; embossed into fabric",
-    "br-002": "left thigh: ROSE-ONLY logo as silicone patch — glossy smooth finish, die-cut edges, rose-gold metallic",
-    "br-003": "front: 'BLACK IS BEAUTIFUL' bold block text in white/gold; back: large ROSE-ONLY embroidered logo",
-    "br-003-oakland": "front: 'BLACK IS BEAUTIFUL' — letter A in 'BLACK' is black, rest gold; back: ROSE-ONLY embroidered",
-    "br-003-giants": "front: 'BLACK IS BEAUTIFUL' in orange/black Giants colorway; back: ROSE-ONLY embroidered",
-    "br-003-white": "front: 'BLACK IS BEAUTIFUL' in black on white; back: ROSE-ONLY embroidered",
-    "br-004": "front chest center: ROSE-ONLY embroidered in rose-gold thread, raised texture",
-    "br-005": "right chest: small ROSE-ONLY silicone cutout patch (~3 in); LEFT SIDE of hoodie body (not sleeve): large ROSE-ONLY embroidered (~8 in); hood lining: all-over sublimated rose pattern",
-    "br-006": "left chest: ROSE-ONLY embroidered (~5 in); back: large ROSE-ONLY embroidered (~12 in), rose-gold thread",
-    "br-007": "front waistband: tackle-twill 'OAKLAND'; throughout: sublimated ROSE-ONLY repeating",
-    "br-008": "football jersey #80 — front digit '8' has rose-gold rose fill, '0' plain white; back reversed",
-    "br-009": "football jersey #32 — front digit '3' has rose-gold rose fill, '2' plain white; back reversed",
-    "br-010": "front chest: 'THE BAY' bold gold text; below: circular ROSE-ONLY in rose-gold; lower half: grey/silver gradient",
-    "br-011": "hooded hockey jersey teal — front: large circular rose crest; back: 'BLACK IS BEAUTIFUL' cyan text + rose-filled #0",
-    "br-012": "button-front baseball jersey, dark green (#1A3C2A) with gold (#D4AF37) piping and trim; front: 'BLACK IS BEAUTIFUL' arched text in gold with 'A' in black; small SkyyRose woven label at lower hem; back: large ROSE-ONLY embroidered in grey/silver with gold clouds at base, SR monogram at upper back in gold",
-    # -- Love Hurts Collection --
-    "lh-002": "left thigh: LOVE HURTS HEART GRAPHIC — cracked red heart in thorny branches, three roses, blood-splash drips",
-    "lh-003": "throughout: sublimated LOVE HURTS HEART GRAPHIC; left panel: large LOVE HURTS WORDMARK",
-    "lh-004": "front chest: LOVE HURTS WORDMARK red graffiti; inside hood: sublimated heart graphic; back: large heart graphic",
-    "lh-006": "front face: LOVE HURTS HEART GRAPHIC — cracked heart, thorny branches, three roses, blood-splash",
-    # -- Signature Collection --
-    "sg-001": "entire shorts: sublimated Bay Bridge panorama; hem: ROSE-ONLY embroidered in blue thread",
-    "sg-002": "front chest: ROSE-ONLY embroidered (~6 in) gold thread; within petals: Golden Gate Bridge imagery",
-    "sg-003": "entire shorts: sublimated Golden Gate Bridge panorama; hem: ROSE-ONLY in purple thread",
-    "sg-004": "front chest: SR MONOGRAM + ROSE embroidered rose-gold (~5 in); back neck: SR MONOGRAM gold",
-    "sg-005": "white crewneck tee; front chest center (~9 in): stylized rose with Bay Bridge imagery visible inside petals, blue/teal coloring, blue clouds at base; back collar: SR monogram in black",
-    "sg-006": "front chest: ROSE-ONLY in lavender thread (~6 in) on mint/lavender colorblock",
-    "sg-007": "brim: ROSE-ONLY silicone patch (~2 in); three colorways: rose-gold, grey-black, purple",
-    "sg-009": "black nylon shell zip-front jacket with white sherpa lining visible when opened; left chest (~3 in): small ROSE-ONLY embroidered in red/green (red petals, green leaves, grey clouds at base); SkyyRose woven label inside collar; NOT a hooded jacket — collar only",
-    "sg-011": "front chest: THE SKYROSE COLLECTION SCRIPT gold foil — 'THE' serifed caps, 'Skyy Rose' cursive, 'Collection' spaced caps",
-    "sg-012": "front chest: THE SKYROSE COLLECTION SCRIPT gold foil on orchid fabric",
-    "sg-013": "front chest: ROSE-ONLY embroidered lavender (~6 in); back neck: SR MONOGRAM gold",
-    "sg-014": "left thigh: ROSE-ONLY embroidered lavender (~4 in) on mint/lavender colorblock",
-    # -- Kids Capsule --
-    "kids-001": "left chest + left thigh: ROSE-ONLY embroidered black on red; right sleeve: circular woven patch",
-    "kids-002": "left chest + left thigh: ROSE-ONLY embroidered black on purple; right sleeve: circular woven patch",
+    # ══ BLACK ROSE COLLECTION ══════════════════════════════════════
+    # Founder-verified specs — April 2026
+
+    "br-001": "EMBOSSED rose logo on front chest, approximately 10 inches. 3D dimensional rose with layered spiral petals, curved stem, two broad leaves. Brushed rose-gold metallic finish embossed into the fabric",
+
+    "br-002": "SILICONE PATCH logo on left thigh area. Glossy smooth finish, die-cut edges, rose-gold metallic. Small (~3-4 inches)",
+
+    "br-003": "FRONT: 'BLACK IS BEAUTIFUL' text + custom baseball patch at bottom left corner. BACK: large embroidered rose logo centered",
+    "br-003-oakland": "FRONT: 'BLACK IS BEAUTIFUL' — the letter A in 'BLACK' is black lettering, the rest is gold. Custom baseball patch bottom left. BACK: embroidered rose logo",
+    "br-003-giants": "FRONT: 'BLACK IS BEAUTIFUL' text + custom baseball patch. BACK: embroidered rose logo",
+    "br-003-white": "FRONT: 'BLACK IS BEAUTIFUL' text + custom baseball patch. BACK: embroidered rose logo. White base jersey",
+
+    "br-004": "EMBROIDERED rose logo centered on front chest. Large detailed rose growing from clouds",
+
+    "br-005": "SILICONE CUTOUT logo on RIGHT chest (small ~3 in). Large EMBROIDERED rose logo on the SIDE of the hoodie body — NOT on the arm/sleeve. Hood lining has all-over sublimated rose pattern visible when hood is down",
+
+    "br-006": "SATIN HOODED BOMBER JACKET lined with BLACK SHERPA inside. Embroidered rose logo on left chest (~5 in). Large embroidered rose logo on back (~12 in), rose-gold thread",
+
+    "br-007": "TACKLE-TWILL cut-out letters stitched on front waistband spelling 'OAKLAND'. SUBLIMATED rose logo repeated throughout entire shorts. Large sublimated 'LOVE HURTS' logo on left side. Additional 'Love Hurts' and rose logos stitched on mesh side panels",
+
+    "br-008": "FOOTBALL JERSEY #80. Jersey-style stitched numbers front and back. FRONT: '8' has rose logo INSIDE the digit, '0' is plain white. Custom football patch bottom left corner. BACK: reversed — '8' is plain white, '0' has rose logo inside",
+
+    "br-009": "FOOTBALL JERSEY #32. Jersey-style stitched numbers front and back. FRONT: '3' has rose logo INSIDE the digit, '2' is plain white. Custom football patch bottom left corner. BACK: reversed — '3' is plain white, '2' has rose logo inside",
+
+    "br-010": "BASKETBALL JERSEY. Vision model did a good job on first render — keep that reference. Front chest: 'THE BAY' bold gold text, circular rose below in rose-gold, lower half grey/silver gradient",
+
+    "br-011": "HOODED HOCKEY JERSEY teal/black. Vision model did a good job on first render — keep that reference. Front: large circular rose crest. Back: 'BLACK IS BEAUTIFUL' cyan text + rose-filled #0",
+
+    "br-012": "BASEBALL JERSEY button-front, dark green (#1A3C2A) with gold (#D4AF37) piping. Front: 'BLACK IS BEAUTIFUL' arched text in gold, letter A in 'BLACK' is black. Custom baseball patch. Back: large embroidered rose in grey/silver with gold clouds, SR monogram upper back in gold",
+
+    # ══ LOVE HURTS COLLECTION ══════════════════════════════════════
+
+    "lh-002": "TWO VARIANTS — (1) White joggers with black stripe, (2) Black joggers with white stripe. Both have: Love Hurts heart-and-rose logo on LEFT thigh. Heart graphic = cracked red heart wrapped in thorny branches with three roses, blood-splash drips",
+
+    "lh-003": "SUBLIMATED rose logo repeated throughout entire shorts. Large sublimated 'Love Hurts' logo on left side. Additional 'Love Hurts' and rose logos stitched on mesh side panels",
+
+    "lh-004": "'LOVE HURTS' logo lettering ACROSS THE FRONT in red graffiti script. Inside hood: sublimated rose logo pattern. BACK: Love Hurts 'heart and rose' logo centered — cracked heart with thorny branches and roses",
+
+    "lh-006": "HIGH-END LEATHER fanny pack. 'Fannie' script on front. The heart-and-rose logo replaces the DOT on the letter I in 'Fannie'",
+
+    # NOTE: lh-005 (Love Hurts Windbreaker) — DELETED per founder
+
+    # ══ SIGNATURE COLLECTION ═══════════════════════════════════════
+
+    "sg-001": "SUBLIMATED Bay Bridge image covering entire shorts. Blue EMBROIDERED rose on bottom left of shorts",
+
+    "sg-002": "EMBROIDERED rose on front chest with Golden Gate Bridge imagery STITCHED INSIDE the rose petals (the bridge scene from the shorts is visible within the rose)",
+
+    "sg-003": "SUBLIMATED Golden Gate Bridge image covering entire shorts. Purple EMBROIDERED rose on bottom left of shorts",
+
+    # NOTE: sg-004 (The Signature Hoodie) — DELETED per founder
+
+    "sg-005": "White crewneck tee. EMBROIDERED rose on front chest center with Bay Bridge imagery STITCHED INSIDE the rose petals (the bridge scene from the shorts is visible within the rose). SR monogram at back collar",
+
+    "sg-006": "Mint green hoodie. LAVENDER rose logo EMBROIDERED centered on front. Large detailed rose with petals and leaves in lavender thread",
+
+    "sg-007": "SILICONE PATCH logo, small (~2 in), slightly off to LEFT side of beanie brim. THREE COLORWAY VARIANTS: red rose, grey-and-black rose, purple rose",
+
+    "sg-009": "Black nylon shell zip-front jacket. White sherpa lining visible at collar and when opened. RED embroidered rose logo on front (~3 in). NOT hooded — collar only",
+
+    # NOTE: sg-010 (Bridge Series Shorts) — DELETED per founder (duplicate)
+
+    "sg-011": "White tee. Front chest: THE SKYROSE COLLECTION SCRIPT in gold foil — 'THE' in serifed caps, 'Skyy Rose' in cursive, 'Collection' in spaced caps",
+
+    "sg-012": "Orchid/purple tee. Front chest: THE SKYROSE COLLECTION SCRIPT in gold foil — same layout as sg-011",
+
+    "sg-013": "Mint green crewneck. LAVENDER rose EMBROIDERED logo centered on front. Small embroidered logo on back of neck",
+
+    "sg-014": "Mint/lavender sweatpants. EMBROIDERED rose logo on left thigh in lavender thread",
+
+    # ══ KIDS CAPSULE ═══════════════════════════════════════════════
+
+    "kids-001": "RED colorblock set. BLACK rose embroidered logo on left chest and left thigh. Right arm: CIRCULAR WOVEN PATCH — white background, black lettering, black rose in center. Text reads 'Skyy Rose' on top, 'Collection' on bottom",
+
+    "kids-002": "PURPLE colorblock set. BLACK rose embroidered logo on left chest and left thigh. Right arm: CIRCULAR WOVEN PATCH — white background, black lettering, black rose in center. Text reads 'Skyy Rose' on top, 'Collection' on bottom",
 }
