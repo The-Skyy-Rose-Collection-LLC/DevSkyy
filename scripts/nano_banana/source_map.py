@@ -174,9 +174,9 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "back":  S / "signature" / "sg-bridge-shorts-golden-back.jpeg",
         },
 
-        # sg-004: The Signature Hoodie — no source yet
+        # sg-004: The Signature Hoodie
         "sg-004": {
-            "front": None,
+            "front": P / "signature-hoodie-techflat.jpeg",
             "back":  None,
         },
 
@@ -207,15 +207,15 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "back":  None,
         },
 
-        # sg-011: Original Label Tee (White) — no source
+        # sg-011: Original Label Tee (White)
         "sg-011": {
-            "front": None,
+            "front": P / "original-label-tee-white-front.webp",
             "back":  None,
         },
 
-        # sg-012: Original Label Tee (Orchid) — no source
+        # sg-012: Original Label Tee (Orchid)
         "sg-012": {
-            "front": None,
+            "front": P / "original-label-tee-orchid-front.webp",
             "back":  None,
         },
 
