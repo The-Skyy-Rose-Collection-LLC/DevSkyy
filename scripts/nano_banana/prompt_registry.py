@@ -334,37 +334,49 @@ WHAT YOU MUST NOT DO:
         category="jersey",
         view="front",
         version=1,
-        template="""SPORT JERSEY RENDER — {name}
-This is a sport-style jersey. TEXT AND NUMBER ACCURACY IS THE #1 PRIORITY.
+        template="""AUTHENTIC SPORT JERSEY RENDER — {name}
+This is a REAL sport jersey made with authentic athletic materials.
+TEXT AND NUMBER ACCURACY IS THE #1 PRIORITY.
 
 ▸ GARMENT: {garment_label}
-▸ FABRIC: {fabric}
 ▸ VIEW: FRONT ONLY
+
+AUTHENTIC SPORT FABRIC — this is NOT a fashion tee, it is a real athletic jersey:
+- FOOTBALL JERSEY: Pro-weight polyester mesh, moisture-wicking, tackle-twill numbers with satin stitch borders, reinforced V-neck with 3-color braid, sleeve stripes with overlock finish, NFL-grade athletic cut
+- BASKETBALL JERSEY: Lightweight dazzle mesh polyester, sublimation print, wide shoulder straps, deep armholes, NBA-grade tank cut
+- HOCKEY JERSEY: Heavy-weight air-knit polyester, fight strap, hooded pullover construction, reinforced elbow patches, NHL-grade loose fit, teal/black horizontal striping
+- BASEBALL JERSEY: Button-front athletic mesh, sublimation print, raglan sleeves, MLB-grade relaxed fit
+
+Use the fabric description that matches this specific jersey type.
 
 EXACT COLORS:
 {color_map}
 
-TEXT & NUMBERS — MUST BE PIXEL-PERFECT:
+TEXT & NUMBERS — PIXEL-PERFECT ACCURACY:
 {graphics_spec}
 {branding_verified}
 
 CONSTRUCTION:
 {construction}
 
-READ THE REFERENCE NUMBERS AND TEXT CAREFULLY:
-- Every digit must be the correct number (not close — EXACT)
-- Every letter must be correctly spelled
-- Font style, weight, and color must match
+CRITICAL — TEXT AND NUMBER RULES:
+- Every digit must be the EXACT correct number from the reference
+- Every letter must be correctly spelled — "BLACK IS BEAUTIFUL" not "BLACK IS BEAUTFUL"
+- Font style, weight, outline, and fill colors must match exactly
+- Rose graphics inside numbers must be reproduced precisely
+- Athletic trim (stripes, braids, piping) must match reference colors and width
 
 STUDIO:
-- Ghost mannequin, no person
+- Ghost mannequin, no person — jersey floating with natural athletic drape
 - {bg}
 - {light}
+- Fabric must show authentic mesh/knit texture — NOT flat matte cotton
 
 FORBIDDEN:
 {negative_constraints}
   - Do NOT change any numbers or text from the reference
-  - Do NOT add team names, athlete names, or league logos
+  - Do NOT add real team names, athlete names, or official league logos (NFL/NBA/MLB/NHL shields)
+  - Do NOT smooth out the mesh texture — athletic fabric has visible weave
   - FRONT ONLY""",
     ),
 
