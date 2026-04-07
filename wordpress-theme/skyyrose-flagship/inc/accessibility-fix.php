@@ -16,6 +16,11 @@
  */
 defined('ABSPATH') || exit;
 
+// Guard: skip if the standalone plugin already loaded this class.
+if ( class_exists( 'SkyyRose_Accessibility_Fix' ) ) {
+    return;
+}
+
 class SkyyRose_Accessibility_Fix {
 
     public function __construct() {

@@ -1,0 +1,20 @@
+{
+  "sku": "sg-012",
+  "name": "Original Label Tee (Orchid)",
+  "collection": "signature",
+  "files": {
+    "composite-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-012/composite-front.webp",
+    "model-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-012/model-back.webp",
+    "model-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-012/model-front.webp",
+    "asset-original-label-tee-orchid-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-012/asset-original-label-tee-orchid-front.webp",
+    "model-male": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-012/model-male.webp",
+    "asset-sg-012-label-tee-orchid": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-012/asset-sg-012-label-tee-orchid.webp",
+    "branding": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-012/branding.webp",
+    "model-female": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-012/model-female.webp",
+    "render-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-012/render-front.webp",
+    "render-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-012/render-back.webp",
+    "logo-ref": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-012/logo-ref.jpeg",
+    "spec": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-012/spec.txt"
+  },
+  "folder_name": "Original Label Tee (Orchid)"
+}

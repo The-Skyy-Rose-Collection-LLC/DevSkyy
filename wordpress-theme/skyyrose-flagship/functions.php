@@ -53,6 +53,7 @@ $skyyrose_core_includes = array(
 	'/inc/accessibility-seo.php',
 	'/inc/seo.php',
 	'/inc/ajax-handlers.php',
+	'/inc/collection-content.php',
 	'/inc/product-catalog.php',
 	'/inc/product-taxonomy.php',
 	'/inc/facebook-sdk.php',
@@ -90,12 +91,17 @@ if ( class_exists( 'WooCommerce' ) ) {
 }
 
 /*--------------------------------------------------------------
- * Elementor Include (loaded only when Elementor is active)
+ * Elementor Includes (loaded only when Elementor is active)
  *--------------------------------------------------------------*/
 add_action( 'elementor/loaded', function () {
 	$elementor_path = SKYYROSE_DIR . '/inc/elementor.php';
 	if ( file_exists( $elementor_path ) ) {
 		require_once $elementor_path;
+	}
+
+	$elementor_compat_path = SKYYROSE_DIR . '/inc/elementor-compat.php';
+	if ( file_exists( $elementor_compat_path ) ) {
+		require_once $elementor_compat_path;
 	}
 } );
 

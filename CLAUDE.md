@@ -108,6 +108,7 @@ wordpress-theme/skyyrose-flagship/
 **Active templates:**
 - `front-page.php` — Three.js portals (3 collection rings + particles)
 - `template-collection-{signature,black-rose,love-hurts,kids-capsule}.php` — Collection pages
+- `template-landing-{black-rose,love-hurts,signature}.php` — Conversion landing pages
 - `template-preorder-gateway.php` — Pre-order with collection selector
 - `template-immersive-{signature,black-rose,love-hurts}.php` — 3D experiences
 - `template-about.php` — Brand story + timeline
@@ -217,6 +218,12 @@ wordpress-theme/skyyrose-flagship/
 - `front-page.php` uses its own inline footer (`.ft` class) + `wp_footer()` instead of `get_footer()` — shared template parts (mobile-nav, cookie-consent, size-guide, toast-container) must be manually included before `wp_footer()`
 - Jetpack Instant Search hijacks search results with a white overlay — our custom `search.php` only renders when Instant Search is disabled
 - Any new template part added to `footer.php` must ALSO be added to `front-page.php` before `wp_footer()`
+- Landing pages use `lp-*` classes with `[data-collection]` palette switching (same pattern as collection pages but `--lp-*` CSS vars)
+- Landing pages use `.lp-rv` scroll-reveal (IntersectionObserver) — NOT `.col-reveal` or GSAP
+- Landing page templates registered as slug `'landing'` in enqueue.php — loads `landing-pages.css` + `landing-pages.js` + holo cards
+- Hero overlays live in `assets/images/hero-overlays/` (deployed with theme) — source PNGs in `assets/techflats/hero-overlays/` (repo root)
+- Landing page template parts in `template-parts/landing/` accept `$args` arrays: hero.php, product-grid.php, faq.php
+- Product grid template part pulls from `product-catalog.php` by SKU array — if SKU not in catalog, card is silently skipped
 
 ### WordPress Deploy
 - Dirty working tree on main blocks `git merge` — always stash unrelated changes before merging worktree branches

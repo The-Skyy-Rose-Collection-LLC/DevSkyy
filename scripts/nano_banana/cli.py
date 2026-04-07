@@ -363,6 +363,14 @@ def main():
     )
     vg.add_argument("--promote", action="store_true", help="Copy winner to production directory")
 
+    # -- produce (v4 production pipeline) --
+    prod = sub.add_parser("produce", help="V4 production pipeline — vision + routing + QA + refine")
+    prod.add_argument("--sku", type=str, default=None, help="Single SKU to process")
+    prod.add_argument("--views", type=str, default="front,back,branding", help="Comma-separated views")
+    prod.add_argument("--fast", action="store_true", help="Use fast preset (lower quality, lower cost)")
+    prod.add_argument("--config", type=str, default=None, help="Path to pipeline-config.json")
+    prod.add_argument("--cost-only", action="store_true", help="Show cost estimate without generating")
+
     args = parser.parse_args()
 
     if args.command == "dry-run":
@@ -373,6 +381,66 @@ def main():
         cmd_composite(args)
     elif args.command == "verify-generate":
         cmd_verify_generate(args)
+    elif args.command == "produce":
+        cmd_produce(args)
+
+
+def cmd_produce(args):
+    """V4 production pipeline — vision-first, intelligent routing, QA, refinement."""
+    from nano_banana.catalog import load_catalog, load_products
+    from nano_banana.config import PipelineConfig
+    from nano_banana.pipeline import ProductionPipeline
+    from nano_banana.router import estimate_batch_cost
+
+    # Load config
+    if args.config:
+        config = PipelineConfig.from_json(Path(args.config))
+    elif args.fast:
+        config = PipelineConfig.fast()
+    else:
+        config = PipelineConfig.production()
+
+    views = [v.strip() for v in args.views.split(",")]
+    catalog = load_catalog()
+    products = load_products(catalog, sku_filter=args.sku)
+
+    if not products:
+        log.error("No products found")
+        return
+
+    # Cost estimate
+    cost = estimate_batch_cost(products, views)
+    log.info("\n--- Cost Estimate ---")
+    log.info("Images: %d", cost["image_count"])
+    log.info("Estimated cost: $%.2f", cost["total_usd"])
+    for engine, amount in cost["per_engine"].items():
+        log.info("  %s: $%.2f", engine, amount)
+
+    if args.cost_only:
+        return
+
+    log.info("\n--- Starting Production Pipeline (v4) ---")
+    log.info("Products: %d | Views: %s | Config: %s",
+             len(products), views, "fast" if args.fast else "production")
+
+    # Initialize pipeline
+    pipeline = ProductionPipeline.from_env()
+    pipeline.config = config
+
+    # Run batch
+    results = pipeline.run_batch(products, views=views)
+
+    # Print summary
+    passed = [r for r in results if r.qa_passed]
+    review = [r for r in results if r.output_path and not r.qa_passed]
+    failed = [r for r in results if not r.output_path]
+
+    log.info("\n--- FINAL SUMMARY ---")
+    for r in results:
+        status = "PASS" if r.qa_passed else "REVIEW" if r.output_path else "FAIL"
+        log.info("  %s %-20s %-8s engine=%-12s score=%.1f $%.3f %s",
+                 status, r.sku, r.view, r.engine_used, r.qa_score, r.cost_usd,
+                 "[refined]" if r.refinement_applied else "")
 
 
 if __name__ == "__main__":

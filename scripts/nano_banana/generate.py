@@ -28,6 +28,7 @@ def generate_gemini(
     model: str = GEMINI_FAST,
     aspect_ratio: str = "3:4",
     enhanced: bool = False,
+    extra_refs: list | None = None,
 ) -> bytes | None:
     """Generate an image using the official Google genai SDK.
 
@@ -38,6 +39,7 @@ def generate_gemini(
         model: Gemini model ID
         aspect_ratio: Output aspect ratio (3:4 for product shots)
         enhanced: Append extra fidelity constraints on retries
+        extra_refs: Additional labeled reference images [(label, path), ...]
 
     Returns:
         WebP image bytes on success, None on failure.
@@ -50,15 +52,25 @@ def generate_gemini(
     if enhanced:
         full_prompt += ENHANCED_SUFFIX
 
-    # Build contents: reference image + prompt, or just prompt
+    # Build contents: reference images + prompt
+    contents = []
+
     if source_path and source_path.exists():
         src_img = enhance_source_image(source_path)
-        contents = [
-            "REFERENCE PHOTO of the exact product (study every detail):",
-            src_img,
-            full_prompt,
-        ]
-    else:
+        contents.append("REFERENCE IMAGE 1 — GARMENT TECH FLAT (study every detail):")
+        contents.append(src_img)
+
+    # Add extra reference images (logo close-ups, patches, etc.)
+    if extra_refs:
+        for label, ref_path in extra_refs:
+            if ref_path and Path(ref_path).exists():
+                ref_img = enhance_source_image(Path(ref_path))
+                contents.append(label + ":")
+                contents.append(ref_img)
+
+    contents.append(full_prompt)
+
+    if not contents:
         contents = [full_prompt]
 
     try:
