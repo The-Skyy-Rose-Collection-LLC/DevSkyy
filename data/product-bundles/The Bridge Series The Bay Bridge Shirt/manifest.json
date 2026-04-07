@@ -1,0 +1,21 @@
+{
+  "sku": "sg-005",
+  "name": "The Bridge Series 'The Bay Bridge' Shirt",
+  "collection": "signature",
+  "files": {
+    "composite-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-005/composite-front.webp",
+    "model-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-005/model-back.webp",
+    "asset-bay-bridge-shirt-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-005/asset-bay-bridge-shirt-front.jpg",
+    "asset-sg-005-stay-golden-tee": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-005/asset-sg-005-stay-golden-tee.webp",
+    "render-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-005/render-back.webp",
+    "branding": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-005/branding.webp",
+    "render-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-005/render-front.webp",
+    "model-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-005/model-front.webp",
+    "model-female": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-005/model-female.webp",
+    "model-male": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-005/model-male.webp",
+    "techflat-source": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-005/techflat-source.jpeg",
+    "logo-ref": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-005/logo-ref.png",
+    "spec": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-005/spec.txt"
+  },
+  "folder_name": "The Bridge Series The Bay Bridge Shirt"
+}
