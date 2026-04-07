@@ -153,12 +153,12 @@ def _mime_type(path: Path) -> str:
 # -- Prompt builders from vision description ----------------------------------
 
 def build_render_prompt(desc: dict, product: dict, view: str = "front") -> str:
-    """Build a generation prompt grounded in the vision model's analysis.
+    """Build a strict specification prompt from vision analysis.
 
-    This is the core innovation: instead of a generic prompt, we use
-    what the vision model actually SAW to construct a precise specification.
+    The prompt is structured as a SPEC SHEET — not a creative brief.
+    The generation model must treat every line as a hard constraint.
     """
-    from nano_banana.prompts import ANTI_HALLUCINATION, COLLECTION_LIGHTING, LOGO_TREATMENTS
+    from nano_banana.prompts import COLLECTION_LIGHTING, LOGO_TREATMENTS
 
     name = product.get("name", "garment")
     collection = product.get("collection", "black-rose")
@@ -166,7 +166,6 @@ def build_render_prompt(desc: dict, product: dict, view: str = "front") -> str:
     lighting = COLLECTION_LIGHTING.get(collection, COLLECTION_LIGHTING["black-rose"])
 
     if not desc:
-        # Fallback to standard prompts if vision failed
         from nano_banana.prompts import get_prompt
         return get_prompt(product, view)
 
@@ -176,94 +175,105 @@ def build_render_prompt(desc: dict, product: dict, view: str = "front") -> str:
     fabric = desc.get("fabric_appearance", "")
     garment_label = f"{silhouette} {subtype or garment}".strip()
 
-    # Build color spec from vision data
-    color_spec = ""
-    colors = desc.get("colors", [])
-    if colors:
-        color_lines = []
-        for c in colors:
-            area = c.get("area", "")
-            color = c.get("color", "")
-            finish = c.get("finish", "")
-            if area and color:
-                color_lines.append(f"  - {area}: {color} ({finish})" if finish else f"  - {area}: {color}")
-        if color_lines:
-            color_spec = "\n\nEXACT COLORS (from source analysis):\n" + "\n".join(color_lines)
+    # ── SPEC SECTIONS ──────────────────────────────────────────────
 
-    # Build graphics spec from vision data
-    graphics_spec = ""
-    graphics = desc.get("graphics", [])
-    if graphics:
-        gfx_lines = []
-        for g in graphics:
-            gtype = g.get("type", "")
-            content = g.get("content", "")
-            location = g.get("location", "")
-            size = g.get("size", "")
-            style = g.get("style", "")
-            line = f"  - {location}: {content}"
-            if gtype:
-                line += f" ({gtype})"
-            if size:
-                line += f", ~{size}"
-            if style:
-                line += f", {style} finish"
-            gfx_lines.append(line)
-        if gfx_lines:
-            graphics_spec = "\n\nGRAPHICS & BRANDING (from source analysis):\n" + "\n".join(gfx_lines)
+    # 1. Exact color map
+    color_lines = []
+    for c in desc.get("colors", []):
+        area = c.get("area", "")
+        color = c.get("color", "")
+        finish = c.get("finish", "")
+        if area and color:
+            color_lines.append(f"  {area}: {color} {finish}")
 
-    # Build construction spec
-    construction_spec = ""
+    # 2. Graphics — CRITICAL section with exact positions and sizes
+    gfx_lines = []
+    gfx_count = 0
+    for g in desc.get("graphics", []):
+        gfx_count += 1
+        location = g.get("location", "unknown")
+        content = g.get("content", "graphic")
+        gtype = g.get("type", "")
+        size = g.get("size", "")
+        style = g.get("style", "")
+        colors = g.get("colors", [])
+
+        line = f"  GRAPHIC #{gfx_count}: \"{content}\""
+        line += f"\n    POSITION: {location} — THIS IS EXACT, do not move it"
+        if size:
+            line += f"\n    SIZE: {size} — THIS IS EXACT, do not resize"
+        if gtype:
+            line += f"\n    TECHNIQUE: {gtype}"
+        if style:
+            line += f"\n    FINISH: {style}"
+        if colors:
+            line += f"\n    COLORS: {', '.join(str(c) for c in colors)}"
+        gfx_lines.append(line)
+
+    # 3. Construction details
     construction = desc.get("construction", {})
-    if construction:
-        c_lines = []
-        for k, v in construction.items():
-            if v:
-                c_lines.append(f"  - {k}: {v}")
-        if c_lines:
-            construction_spec = "\n\nCONSTRUCTION DETAILS:\n" + "\n".join(c_lines)
+    const_lines = []
+    for k, v in construction.items():
+        if v:
+            const_lines.append(f"  {k}: {v}")
 
-    # Add logo treatment from our metadata (enriches vision data)
+    # 4. Verified branding from our metadata
     treatment = LOGO_TREATMENTS.get(sku, "")
-    treatment_spec = ""
-    if treatment:
-        treatment_spec = f"\n\nBRANDING SPEC (verified): {treatment}"
 
-    if view == "front":
-        return (
-            f"Generate a photorealistic luxury e-commerce render of this {name} — FRONT VIEW ONLY.\n\n"
-            f"GARMENT: {garment_label}\n"
-            f"FABRIC: {fabric}\n"
-            f"{color_spec}{graphics_spec}{construction_spec}{treatment_spec}\n\n"
-            f"VIEW: FRONT PANEL ONLY. Do NOT show the back.\n\n"
-            f"PRESENTATION:\n"
-            f"- No model, no mannequin. Garment floating on invisible form, natural 3D drape.\n"
-            f"- {lighting['bg']}.\n"
-            f"- {lighting['light']}.\n"
-            f"- {lighting['mood']}.\n"
-            f"- Photorealistic fabric texture — visible weave, thread weight, material sheen.\n\n"
-            f"FIDELITY: Every color, logo, panel, stripe, and stitch must match the source EXACTLY."
-            + ANTI_HALLUCINATION
-        )
+    # 5. Build NEGATIVE constraints — what NOT to generate
+    negatives = [
+        "Do NOT add any graphics, logos, text, or embroidery not listed above",
+        "Do NOT change the size or position of any graphic",
+        "Do NOT add a second logo or duplicate any element",
+        f"The garment has EXACTLY {gfx_count} graphic element(s) — no more",
+    ]
+    if gfx_count == 1:
+        negatives.append("There is ONE graphic on this garment. Do NOT add a second one anywhere")
+    if gfx_count == 0:
+        negatives.append("This garment has NO graphics or logos. Keep it completely plain")
 
-    elif view == "back":
-        return (
-            f"Generate a photorealistic luxury e-commerce render of this {name} — BACK VIEW ONLY.\n\n"
-            f"GARMENT: {garment_label}\n"
-            f"FABRIC: {fabric}\n"
-            f"{color_spec}{graphics_spec}{construction_spec}{treatment_spec}\n\n"
-            f"VIEW: BACK PANEL ONLY. Garment facing away.\n\n"
-            f"PRESENTATION:\n"
-            f"- No model, no mannequin. Back-facing on invisible form.\n"
-            f"- {lighting['bg']}.\n"
-            f"- {lighting['light']}.\n"
-            f"- Photorealistic fabric texture.\n\n"
-            f"FIDELITY: Match back reference exactly."
-            + ANTI_HALLUCINATION
-        )
+    # ── ASSEMBLE PROMPT ────────────────────────────────────────────
 
-    else:  # branding / editorial
-        return _build_editorial_prompt(desc, product, lighting, treatment_spec)
+    if view == "branding":
+        return _build_editorial_prompt(desc, product, lighting, treatment)
+
+    view_label = "FRONT VIEW ONLY" if view == "front" else "BACK VIEW ONLY"
+    view_dir = "facing camera" if view == "front" else "facing away from camera"
+
+    prompt = f"""PRODUCT SPECIFICATION SHEET — {name}
+Reproduce the reference image as a photorealistic e-commerce render.
+
+═══ GARMENT ═══
+Type: {garment_label}
+Fabric: {fabric}
+Silhouette: {silhouette}
+View: {view_label} — garment {view_dir}
+
+═══ EXACT COLORS ═══
+{chr(10).join(color_lines) if color_lines else '  All black (#000000)'}
+
+═══ GRAPHICS & BRANDING ({gfx_count} element(s) total) ═══
+{chr(10).join(gfx_lines) if gfx_lines else '  NONE — plain garment, no graphics'}
+{f'{chr(10)}  VERIFIED SPEC: {treatment}' if treatment else ''}
+
+═══ CONSTRUCTION ═══
+{chr(10).join(const_lines) if const_lines else '  Standard construction'}
+
+═══ PRESENTATION ═══
+- No model, no person, no mannequin
+- Garment floating on invisible form with natural 3D shape and drape
+- {lighting['bg']}
+- {lighting['light']}
+- Photorealistic fabric — visible weave, thread weight, material sheen
+
+═══ NEGATIVE CONSTRAINTS (CRITICAL) ═══
+{chr(10).join(f'- {n}' for n in negatives)}
+- Do NOT show the {'back' if view == 'front' else 'front'}
+- Do NOT add text, watermarks, or labels not in the spec
+- Do NOT change any colors from the hex values listed above
+- If anything is unclear, LEAVE IT OUT — never guess or invent"""
+
+    return prompt
 
 
 def _build_editorial_prompt(

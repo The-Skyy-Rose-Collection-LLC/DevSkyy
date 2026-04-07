@@ -141,14 +141,16 @@ class ProductionPipeline:
             generate_gemini,
             generate_gpt,
         )
+        from nano_banana.logo_refs import get_all_references
         from nano_banana.prompts import composite_prompt, get_prompt
+        from nano_banana.prompt_registry import PromptRegistry
         from nano_banana.router import route_product
         from nano_banana.tournament import run_tournament
         from nano_banana.utils import quality_gate, save_image
-        from nano_banana.vision_describe import build_render_prompt, describe_product
 
         sku = product.get("sku", "unknown")
         name = product.get("name", "garment")
+        collection = product.get("collection", "black-rose")
         cfg = self.config
         result = PipelineResult(sku=sku, view=view)
 
@@ -159,6 +161,13 @@ class ProductionPipeline:
         # ── Step 1: DESCRIBE ─────────────────────────────────────────
         vision_desc = self._get_or_cache_vision(product, source_path)
         result.vision_desc = vision_desc
+
+        # ── Step 1b: GATHER REFERENCES (3 per product) ───────────────
+        # Bundles: real flatlay photo + techflat + logo close-up
+        all_refs = get_all_references(sku, collection, source_path)
+        # Extra refs for generation (exclude the primary source which is sent separately)
+        extra_refs = [(label, path) for label, path in all_refs if path != source_path]
+        log.info("REFS: %d reference images bundled", len(all_refs))
 
         # ── Step 2: ROUTE ────────────────────────────────────────────
         decisions = route_product(product, vision_desc, view)
@@ -171,11 +180,10 @@ class ProductionPipeline:
         result.route_decision = decisions[0].reason
 
         # ── Step 3: GENERATE ─────────────────────────────────────────
-        # Build prompt from vision description
-        if vision_desc:
-            prompt = build_render_prompt(vision_desc, product, view)
-        else:
-            prompt = get_prompt(product, view)
+        # Build prompt from registry (A/B tested templates)
+        registry = PromptRegistry.load()
+        model_hint = decisions[0].engine if decisions else ""
+        prompt, template_id = registry.get_prompt(vision_desc, product, view, model_hint)
 
         img_bytes = None
         engine_used = ""
@@ -188,7 +196,7 @@ class ProductionPipeline:
             engine = decision.engine
             model_id = decision.model_id
 
-            log.info("  Attempt %d/%d — engine: %s", attempt + 1, cfg.max_attempts, engine)
+            log.info("  Attempt %d/%d — engine: %s, template: %s", attempt + 1, cfg.max_attempts, engine, template_id)
 
             try:
                 if engine in ("gemini-pro", "gemini-flash"):
@@ -200,6 +208,7 @@ class ProductionPipeline:
                         model=actual_model,
                         aspect_ratio=cfg.aspect_ratio,
                         enhanced=(attempt > 0),
+                        extra_refs=extra_refs,
                     )
                 elif engine == "gpt-image" and self.openai:
                     img_bytes = generate_gpt(self.openai, prompt, source_path)
@@ -262,6 +271,10 @@ class ProductionPipeline:
             result.issues = qa_result.top_issues
 
             log.info("QA: %.1f/100 — %s", qa_result.aggregate_score, "PASS" if qa_result.passed_98 else "NEEDS WORK")
+
+            # Feed score back to prompt registry (A/B testing loop)
+            registry.record_score(template_id, qa_result.aggregate_score)
+            registry.save()
 
             # Save QA results
             qa_dir = PROJECT_ROOT / cfg.qa_results_dir
