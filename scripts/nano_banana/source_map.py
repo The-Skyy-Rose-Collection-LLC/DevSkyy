@@ -66,15 +66,17 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "back":  S / "black-rose" / "br-jersey-baseball-white-back.jpeg",
         },
 
-        # br-004: BLACK Rose Hoodie — AWAITING UPLOAD from user
+        # br-004: BLACK Rose Hoodie — centered large rose embroidery, kangaroo pocket
+        # User confirmed: large rose center chest, different from Signature Edition
         "br-004": {
-            "front": P / "black-rose-hoodie-source.jpg",  # placeholder until user uploads
+            "front": P / "black-rose-hoodie-source.jpg",  # waiting for user to save upload to disk
             "back":  None,
         },
 
         # br-005: BLACK Rose Hoodie Signature Edition
+        # Small silicone cutout rose on chest + large embroidered rose on hoodie SIDE + rose-print hood lining
         "br-005": {
-            "front": P / "black-rose-hoodie-signature-edition-hoodie-ltd-source.jpg",
+            "front": P / "black-rose-hoodie-signature-edition-hoodie-ltd-source.jpg",  # waiting for user to save upload to disk
             "back":  None,
         },
 
@@ -114,9 +116,11 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "back":  S / "black-rose" / "br-jersey-hockey-back.jpeg",
         },
 
-        # br-012: Last Oakland Baseball Jersey — no source yet
+        # br-012: Last Oakland Baseball Jersey — green/gold A's-inspired,
+        # "BLACK IS BEAUTIFUL" arched in gold, button-front, rose logo on back, gold piping
+        # User uploaded photo — waiting for file to be saved to disk
         "br-012": {
-            "front": None,
+            "front": P / "last-oakland-baseball-jersey-front.jpeg",
             "back":  None,
         },
 
@@ -176,9 +180,10 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "back":  None,
         },
 
-        # sg-005: The Bay Bridge Shirt — no dedicated source, but golden tee may work
+        # sg-005: The Bay Bridge Shirt — white crewneck tee, blue rose with Bay Bridge
+        # imagery inside petals, blue clouds at base, SR monogram at collar
         "sg-005": {
-            "front": None,
+            "front": P / "bay-bridge-shirt-front.jpg",
             "back":  None,
         },
 
@@ -194,9 +199,11 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "back":  None,
         },
 
-        # sg-009: The Sherpa Jacket — no source
+        # sg-009: Signature Sherpa Jacket — black nylon shell, white sherpa lining,
+        # small red/green rose embroidery on left chest, zip-front
+        # DIFFERENT from br-006 (satin hooded bomber)
         "sg-009": {
-            "front": None,
+            "front": P / "sherpa-jacket-front.jpg",
             "back":  None,
         },
 
