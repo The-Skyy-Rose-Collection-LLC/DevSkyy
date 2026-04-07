@@ -1,0 +1,50 @@
+{
+  "garment_type": "jersey",
+  "garment_subtype": "baseball jersey",
+  "silhouette": "athletic",
+  "construction": {
+    "panels": "Standard baseball jersey construction with set-in short sleeves and a full-button placket.",
+    "seams": "Standard flat seams throughout, no visible contrast stitching.",
+    "closures": "Full-front button closure with seven round, translucent white/grey buttons.",
+    "details": "V-neck collar. Orange piping detail runs vertically along the edge of the placket on both sides, and horizontally around the sleeve cuffs. The hem is a straight cut."
+  },
+  "colors": [
+    {
+      "area": "body",
+      "color": "#000000",
+      "finish": "matte"
+    },
+    {
+      "area": "trim",
+      "color": "#FF6600",
+      "finish": "matte"
+    },
+    {
+      "area": "buttons",
+      "color": "#E0E0E0",
+      "finish": "satin"
+    }
+  ],
+  "graphics": [
+    {
+      "type": "tackle-twill",
+      "content": "BLACK IS BEAUTIFUL",
+      "location": "front chest, arching across the chest",
+      "size": "approximately 12 inches wide x 4 inches tall",
+      "colors": [
+        "#FF6600"
+      ],
+      "style": "flat, slightly raised"
+    }
+  ],
+  "branding": {
+    "primary_logo": "Small, colorful SkyyRose logo (appears to be a moon/rose graphic) on a purple/pink background.",
+    "logo_location": "Interior neck tag, center back.",
+    "logo_technique": "Printed on woven label.",
+    "secondary_marks": "A rectangular woven label on the lower front right side of the jersey. It features a baseball-like graphic with 'BLACK ROSE COLLECTION' text above it, and additional smaller text below, all on an off-white background with black text and graphics."
+  },
+  "fabric_appearance": "Smooth jersey knit, likely a polyester blend, with a subtle sheen characteristic of athletic wear.",
+  "unique_features": "The prominent 'BLACK IS BEAUTIFUL' graphic on the front, the 'BLACK ROSE COLLECTION' woven label, and the specific orange and black colorway reminiscent of Oakland sports teams.",
+  "views_shown": "front only",
+  "collection_aesthetic": "This piece embodies Oakland grit and emotional expression through its bold statement and athletic-inspired design, aligning with SkyyRose's luxury streetwear identity. The color scheme pays homage to local culture while the 'BLACK IS BEAUTIFUL' message adds a layer of social commentary and pride."
+}

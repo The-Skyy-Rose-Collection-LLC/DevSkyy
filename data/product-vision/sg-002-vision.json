@@ -1,0 +1,51 @@
+{
+  "garment_type": "t-shirt",
+  "garment_subtype": null,
+  "silhouette": "relaxed",
+  "construction": {
+    "panels": "Standard set-in sleeve construction with a single front body panel.",
+    "seams": "Standard overlock stitching visible along the shoulder, side, and sleeve seams. No contrast stitching.",
+    "closures": null,
+    "details": "Ribbed crew neck collar. Standard hemmed sleeves and bottom hem."
+  },
+  "colors": [
+    {
+      "area": "body",
+      "color": "#FFFFFF",
+      "finish": "matte"
+    },
+    {
+      "area": "collar",
+      "color": "#FFFFFF",
+      "finish": "matte"
+    }
+  ],
+  "graphics": [
+    {
+      "type": "embroidery",
+      "content": "Stylized rose graphic with two main blooms, thorny stem, and a cloud base. The rose petals feature a vibrant, multi-colored abstract pattern (purple, orange, yellow, green, blue, black outlines). The stem and thorns are a solid grey, and the cloud base is solid black.",
+      "location": "front chest center",
+      "size": "approximately 9\" H x 7\" W",
+      "colors": [
+        "#000000",
+        "#800080",
+        "#FFA500",
+        "#FFFF00",
+        "#008000",
+        "#0000FF",
+        "#A9A9A9"
+      ],
+      "style": "3D dimensional embroidery for the outlines and solid elements (cloud, stem, thorns), with a flatter, dense embroidery fill for the colorful rose petals."
+    }
+  ],
+  "branding": {
+    "primary_logo": "Stylized 'SR' monogram, appearing as a single-line outline.",
+    "logo_location": "Interior back neck, centered below the collar seam.",
+    "logo_technique": "Embroidery",
+    "secondary_marks": null
+  },
+  "fabric_appearance": "Smooth, lightweight jersey knit fabric, likely cotton or a cotton blend.",
+  "unique_features": "The distinctive 'Stay Golden' rose graphic with its vibrant, abstract multi-color fill and contrasting black cloud base.",
+  "views_shown": "front only",
+  "collection_aesthetic": "This piece embodies Oakland luxury streetwear through its clean white base and a bold, intricately embroidered graphic. The 'Stay Golden' rose, with its thorns and vibrant colors emerging from a dark cloud, symbolizes resilience, growth, and beauty amidst adversity, aligning with themes of emotional expression and the 'Oakland grit' ethos of the SkyyRose brand. The 'Bridge Series' suggests connection and overcoming challenges."
+}

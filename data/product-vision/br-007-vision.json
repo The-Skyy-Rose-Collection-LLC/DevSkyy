@@ -1,0 +1,53 @@
+{
+  "garment_type": "shorts",
+  "garment_subtype": "basketball shorts",
+  "silhouette": "athletic / relaxed",
+  "construction": {
+    "panels": "Two-tone color-block design. The main body is a light pink/peach. A large, irregular black panel extends diagonally from the upper left side across the front, tapering towards the right thigh. The black panel is a separate fabric piece sewn onto the main body.",
+    "seams": "Standard stitching, tonal to the fabric color, visible along the panel divisions and hem. No contrast stitching or flatlock seams are apparent.",
+    "closures": "Black drawstring with knotted ends at the center front waist. Elastic waistband.",
+    "details": "Elastic waistband with an internal drawstring for adjustable fit. Side pockets are implied by the typical construction of basketball shorts, though not explicitly detailed in the image. Straight hem on both legs."
+  },
+  "colors": [
+    {
+      "area": "body",
+      "color": "#E8B9A9",
+      "finish": "matte"
+    },
+    {
+      "area": "diagonal panel",
+      "color": "#000000",
+      "finish": "matte"
+    },
+    {
+      "area": "drawstring",
+      "color": "#000000",
+      "finish": "matte"
+    }
+  ],
+  "graphics": [
+    {
+      "type": "embroidery",
+      "content": "Stylized red rose with green leaves, emerging from a light blue and white cloud-like base.",
+      "location": "Lower left thigh, above the hem.",
+      "size": "Approximately 2.5 inches tall by 2 inches wide.",
+      "colors": [
+        "#C00000",
+        "#006400",
+        "#ADD8E6",
+        "#FFFFFF"
+      ],
+      "style": "Raised, multi-layered embroidery with distinct thread textures, creating a dimensional effect."
+    }
+  ],
+  "branding": {
+    "primary_logo": "Embroidered patch featuring a red rose with green leaves emerging from a light blue/white cloud, representing the 'BLACK Rose x Love Hurts' theme.",
+    "logo_location": "Lower left thigh.",
+    "logo_technique": "Embroidery.",
+    "secondary_marks": "None visible."
+  },
+  "fabric_appearance": "Smooth, lightweight woven fabric with a subtle crinkled texture, characteristic of nylon or polyester windbreaker-style material. Appears durable and quick-drying.",
+  "unique_features": "Distinctive diagonal black color-block panel across the front. Custom embroidered 'Black Rose x Love Hurts' patch on the left thigh.",
+  "views_shown": "front only",
+  "collection_aesthetic": "Oakland luxury streetwear blending athletic utility with unique graphic storytelling. The 'Love Hurts' theme is subtly conveyed through the rose and cloud motif, suggesting a blend of delicate beauty and underlying resilience, characteristic of emotional expression within a bold streetwear context."
+}

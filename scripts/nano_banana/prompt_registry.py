@@ -48,7 +48,7 @@ GARMENT_CATEGORIES = {
 def _categorize_garment(vision_desc: dict) -> str:
     """Map vision description to a garment category."""
     garment = vision_desc.get("garment_type", "").lower()
-    subtype = vision_desc.get("garment_subtype", "").lower()
+    subtype = (vision_desc.get("garment_subtype") or "").lower()
     combined = f"{garment} {subtype}"
 
     for category, keywords in GARMENT_CATEGORIES.items():

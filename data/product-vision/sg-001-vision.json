@@ -1,0 +1,74 @@
+{
+  "garment_type": "shorts",
+  "garment_subtype": "athletic shorts",
+  "silhouette": "athletic",
+  "construction": {
+    "panels": "Standard two-panel construction with side seams, featuring a full-garment sublimation print.",
+    "seams": "Standard machine stitching, tonal to the printed graphic, no visible contrast or flatlock stitching.",
+    "closures": "Internal white drawstring with an elastic waistband.",
+    "details": "Elastic waistband, internal drawstring, hemmed leg openings. No visible pockets from the front view."
+  },
+  "colors": [
+    {
+      "area": "body",
+      "color": "multi-color sublimation print",
+      "finish": "matte"
+    },
+    {
+      "area": "sky in print",
+      "color": "#4A70B8",
+      "finish": "matte"
+    },
+    {
+      "area": "water/land in print",
+      "color": "#2F4F4F",
+      "finish": "matte"
+    },
+    {
+      "area": "bridge/city in print",
+      "color": "#696969",
+      "finish": "matte"
+    },
+    {
+      "area": "drawstring",
+      "color": "#FFFFFF",
+      "finish": "matte"
+    }
+  ],
+  "graphics": [
+    {
+      "type": "sublimation",
+      "content": "Panoramic image of the Bay Bridge and Oakland/San Francisco cityscape, featuring the bridge structure prominently over water with a blue sky background.",
+      "location": "Full front and wrapping around the sides of the shorts",
+      "size": "Full coverage of the shorts",
+      "colors": [
+        "#4A70B8",
+        "#2F4F4F",
+        "#696969",
+        "#000000"
+      ],
+      "style": "Flat, photographic print"
+    },
+    {
+      "type": "sublimation",
+      "content": "Stylized blue rose graphic with green leaves/stem.",
+      "location": "Lower right thigh, integrated into the main sublimation print.",
+      "size": "Approximately 2.5 inches in diameter",
+      "colors": [
+        "#0000FF",
+        "#006400"
+      ],
+      "style": "Flat, stylized print"
+    }
+  ],
+  "branding": {
+    "primary_logo": "Stylized blue rose graphic",
+    "logo_location": "Lower right thigh",
+    "logo_technique": "Sublimation print",
+    "secondary_marks": "None visible on the shorts"
+  },
+  "fabric_appearance": "Mesh knit, visible perforations, smooth texture typical of athletic shorts.",
+  "unique_features": "Full-garment sublimation print depicting the iconic Bay Bridge and Oakland cityscape, part of 'The Bridge Series'.",
+  "views_shown": "Front only",
+  "collection_aesthetic": "The Bay Bridge graphic directly references Oakland, aligning with SkyyRose's 'Oakland luxury streetwear' identity. The detailed, full-coverage print elevates the athletic shorts to a statement piece, embodying a blend of local pride and high-quality design."
+}

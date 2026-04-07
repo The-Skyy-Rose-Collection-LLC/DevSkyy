@@ -1,0 +1,57 @@
+{
+  "garment_type": "jacket",
+  "garment_subtype": "varsity bomber",
+  "silhouette": "relaxed",
+  "construction": {
+    "panels": "Color-block construction with main body panels, set-in sleeves featuring a contrasting vertical panel along the outer arm, and a two-panel hood with a contrasting top panel.",
+    "seams": "Standard stitched seams, tonal to the fabric color.",
+    "closures": "Not visible from the back, but typically a full-zip front closure for a bomber jacket. Elasticated cuffs and hem provide closure.",
+    "details": "Two-panel hood with a visible channel for a drawstring (drawstring not visible). Elasticated cuffs and hem, giving a gathered, ribbed appearance. No pockets visible from the back."
+  },
+  "colors": [
+    {
+      "area": "body",
+      "color": "#E4BAB2",
+      "finish": "satin"
+    },
+    {
+      "area": "sleeves",
+      "color": "#E4BAB2",
+      "finish": "satin"
+    },
+    {
+      "area": "hood_top_panel",
+      "color": "#24302C",
+      "finish": "satin"
+    },
+    {
+      "area": "sleeve_side_panels",
+      "color": "#24302C",
+      "finish": "satin"
+    }
+  ],
+  "graphics": [
+    {
+      "type": "embroidery / chenille patch",
+      "content": "Script text 'Love Hurts' with a heart wrapped in thorns above and to the right.",
+      "location": "full back, centered",
+      "size": "approximately 12 inches wide x 10 inches tall",
+      "colors": [
+        "#C4303C",
+        "#FFFFFF",
+        "#C4A45C"
+      ],
+      "style": "The 'Love Hurts' text appears to be thick, raised chenille or dimensional embroidery in deep red with a white outline. The heart is a deep red patch or tackle-twill, outlined with white embroidery. The thorns are embroidered in a metallic gold/tan color, appearing raised."
+    }
+  ],
+  "branding": {
+    "primary_logo": "Small circular patch with a stylized 'S' or rose/leaf design in light green on a dark green background.",
+    "logo_location": "Left cuff, near the elasticated hem.",
+    "logo_technique": "Woven patch or small embroidery.",
+    "secondary_marks": "None visible other than the main 'Love Hurts' graphic which is central to the collection's theme."
+  },
+  "fabric_appearance": "Smooth, lightweight woven fabric with a subtle satin sheen and slight crinkle texture, characteristic of nylon or polyester windbreaker/bomber material.",
+  "unique_features": "The prominent 'Love Hurts' graphic with the thorny heart on the back is the signature feature. The color-blocked hood and sleeve panels add a distinctive design element.",
+  "views_shown": "back only",
+  "collection_aesthetic": "This piece embodies Oakland luxury streetwear through its relaxed fit and premium fabric appearance. The 'Love Hurts' graphic with the thorny heart conveys emotional expression, blending a sense of 'dark luxury' with a bold, statement-making design, characteristic of the SkyyRose brand."
+}

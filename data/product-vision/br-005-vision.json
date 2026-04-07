@@ -1,0 +1,54 @@
+{
+  "garment_type": "hoodie",
+  "garment_subtype": "pullover",
+  "silhouette": "relaxed",
+  "construction": {
+    "panels": "Standard set-in sleeve construction with a single-panel body and a two-panel hood. The kangaroo pocket is integrated into the front panel.",
+    "seams": "Tonal stitching throughout, visible on sleeve seams, hood attachment, and pocket edges, indicating a clean finish.",
+    "closures": "Adjustable drawstring closure for the hood, featuring tonal flat drawstrings with no visible aglets.",
+    "details": "Large kangaroo pocket on the front, ribbed cuffs on sleeves, ribbed hem, and a lined hood. The hood opening is finished with a clean edge."
+  },
+  "colors": [
+    {
+      "area": "body",
+      "color": "#333636",
+      "finish": "matte"
+    },
+    {
+      "area": "sleeves",
+      "color": "#333636",
+      "finish": "matte"
+    },
+    {
+      "area": "trim",
+      "color": "#333636",
+      "finish": "matte"
+    }
+  ],
+  "graphics": [
+    {
+      "type": "embroidery",
+      "content": "Intricate graphic of two stylized roses with thorny stems emerging from a layered cloud formation. The roses feature detailed outlines and shading, with one rose appearing more open and the other slightly more closed. The clouds are depicted with multiple layers and outlines.",
+      "location": "Front chest center",
+      "size": "approximately 9 inches tall by 7 inches wide",
+      "colors": [
+        "#000000",
+        "#ffffff",
+        "#e0e0e0",
+        "#a0a0a0",
+        "#505050"
+      ],
+      "style": "Raised, multi-layered embroidery with dense stitching creating texture and depth."
+    }
+  ],
+  "branding": {
+    "primary_logo": "Small woven tag with a red graphic (possibly a stylized rose or initial) on a white background.",
+    "logo_location": "Exterior of the right sleeve cuff, near the wrist.",
+    "logo_technique": "Woven label/tag.",
+    "secondary_marks": "The main embroidered 'BLACK Rose' graphic serves as a prominent brand identifier for the collection."
+  },
+  "fabric_appearance": "Smooth, soft-looking heavy cotton blend, likely a fleece-back jersey knit, characteristic of premium streetwear hoodies.",
+  "unique_features": "Designated as a 'Signature Edition' (from product context). The highly detailed, multi-tone embroidered black rose and cloud graphic is a distinctive and central design element.",
+  "views_shown": "front only",
+  "collection_aesthetic": "This garment embodies SkyyRose's 'Oakland luxury streetwear' aesthetic through its premium construction, subtle dark color palette, and the intricate, symbolic 'BLACK Rose' graphic, conveying a sense of emotional depth and refined urban style. The 'Signature Edition' status reinforces its exclusivity."
+}

@@ -1,0 +1,62 @@
+{
+  "garment_type": "jacket",
+  "garment_subtype": "varsity bomber",
+  "silhouette": "relaxed",
+  "construction": {
+    "panels": "Standard set-in sleeve construction with a main body and two sleeves. An attached hood is present at the neckline.",
+    "seams": "Standard tonal stitching visible along panel lines, sleeve attachments, and hood seam. No contrast stitching.",
+    "closures": "Full-front snap button closure with seven black plastic snaps.",
+    "details": "Attached hood with a drawstring (drawstring not visible but implied by hood type). Ribbed cuffs at the sleeve openings and a ribbed hem band at the waist. Two front welt pockets are subtly visible near the hem."
+  },
+  "colors": [
+    {
+      "area": "body",
+      "color": "#000000",
+      "finish": "satin"
+    },
+    {
+      "area": "sleeves",
+      "color": "#000000",
+      "finish": "satin"
+    },
+    {
+      "area": "hood",
+      "color": "#000000",
+      "finish": "matte"
+    },
+    {
+      "area": "trim (cuffs, hem)",
+      "color": "#000000",
+      "finish": "matte"
+    },
+    {
+      "area": "snaps",
+      "color": "#000000",
+      "finish": "matte"
+    }
+  ],
+  "graphics": [
+    {
+      "type": "embroidery",
+      "content": "A stylized rose graphic with intricate details, featuring a central rose bloom with surrounding leaves and abstract elements. The design incorporates dark outlines and lighter fill, creating depth.",
+      "location": "Front chest, wearer's right side",
+      "size": "Approximately 4.5 inches (height) x 3.5 inches (width)",
+      "colors": [
+        "#FFFFFF",
+        "#CCCCCC",
+        "#000000"
+      ],
+      "style": "3D dimensional / raised"
+    }
+  ],
+  "branding": {
+    "primary_logo": "Stylized rose graphic, likely representing the SkyyRose brand or collection.",
+    "logo_location": "Front chest, wearer's right side",
+    "logo_technique": "embroidery",
+    "secondary_marks": "A small, rectangular woven label with purple and orange hues is visible inside the neck, likely a brand or size tag."
+  },
+  "fabric_appearance": "The main body and sleeves exhibit a smooth, lustrous satin finish. The hood and ribbed trim (cuffs, hem) appear to be a softer, matte fabric, possibly cotton fleece or a similar knit.",
+  "unique_features": "The combination of a classic satin bomber jacket silhouette with an integrated, matte-finish hood. The detailed, raised rose embroidery adds a distinctive luxury touch.",
+  "views_shown": "front only",
+  "collection_aesthetic": "This piece aligns with the 'Oakland luxury streetwear' aesthetic of SkyyRose, featuring a dark, sophisticated color palette and a prominent, intricate rose graphic that embodies emotional expression and urban grit, fitting the 'black-rose' collection."
+}

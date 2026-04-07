@@ -1,0 +1,55 @@
+{
+  "garment_type": "jersey",
+  "garment_subtype": "baseball jersey",
+  "silhouette": "relaxed",
+  "construction": {
+    "panels": "Standard baseball jersey construction with set-in short sleeves. White piping forms a V-shape across the chest and extends down the full-button placket.",
+    "seams": "Standard flat stitching, tone-on-tone.",
+    "closures": "Full-button front closure with 7 white, round, flat buttons.",
+    "details": "V-neck collar. Short sleeves with double white stripe trim on the cuffs. Straight hem."
+  },
+  "colors": [
+    {
+      "area": "body",
+      "color": "#000000",
+      "finish": "subtle sheen"
+    },
+    {
+      "area": "sleeves",
+      "color": "#000000",
+      "finish": "subtle sheen"
+    },
+    {
+      "area": "piping and sleeve stripes",
+      "color": "#FFFFFF",
+      "finish": "matte"
+    },
+    {
+      "area": "buttons",
+      "color": "#FFFFFF",
+      "finish": "matte"
+    }
+  ],
+  "graphics": [
+    {
+      "type": "tackle-twill appliqu\u00e9",
+      "content": "BLACK IS BEAUTIFUL",
+      "location": "Arched across the front chest, above the button placket.",
+      "size": "Approximately 14 inches wide and 4 inches tall at its highest point.",
+      "colors": [
+        "#FFFFFF"
+      ],
+      "style": "Flat, slightly raised appliqu\u00e9 with a clean edge."
+    }
+  ],
+  "branding": {
+    "primary_logo": "Small woven label at the interior back neck, featuring a purple background with a yellow/gold rose graphic and 'SkyyRose' text (text not fully legible).",
+    "logo_location": "Interior back neck.",
+    "logo_technique": "Woven label.",
+    "secondary_marks": "Rectangular woven patch on the lower front right side (when worn), featuring a brown/tan background with a baseball bat/ball graphic, 'BLACK ROSE COLLECTION' text, and smaller illegible text below. A small white care/size tag is visible directly below this patch."
+  },
+  "fabric_appearance": "Performance jersey knit with a subtle sheen, appearing to have a fine mesh texture.",
+  "unique_features": "Prominent 'BLACK IS BEAUTIFUL' graphic. Custom 'BLACK ROSE COLLECTION' woven patch with baseball motif.",
+  "views_shown": "front only",
+  "collection_aesthetic": "Oakland luxury streetwear, blending athletic wear with a powerful social statement. Reflects emotional expression and a 'dark luxury' vibe through its color palette and collection name."
+}

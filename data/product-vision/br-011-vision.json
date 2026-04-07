@@ -1,0 +1,91 @@
+{
+  "garment_type": "jersey",
+  "garment_subtype": "baseball jersey",
+  "silhouette": "athletic",
+  "construction": {
+    "panels": "Standard baseball jersey construction with set-in sleeves. Features a full-button front placket and a V-neck collar.",
+    "seams": "Standard flat seams throughout. White piping runs along the V-neck collar, down the front placket, and around the sleeve cuffs, creating distinct visual lines.",
+    "closures": "Seven white plastic buttons on the front placket for full closure.",
+    "details": "V-neck collar. Short sleeves with double white stripe cuffs. Straight hemline. No visible pockets."
+  },
+  "colors": [
+    {
+      "area": "body",
+      "color": "#000000",
+      "finish": "satin"
+    },
+    {
+      "area": "sleeves",
+      "color": "#000000",
+      "finish": "satin"
+    },
+    {
+      "area": "trim",
+      "color": "#FFFFFF",
+      "finish": "matte"
+    },
+    {
+      "area": "buttons",
+      "color": "#FFFFFF",
+      "finish": "matte"
+    },
+    {
+      "area": "neck_label",
+      "color": "#800080",
+      "finish": "matte"
+    },
+    {
+      "area": "bottom_woven_label_background",
+      "color": "#8B4513",
+      "finish": "matte"
+    }
+  ],
+  "graphics": [
+    {
+      "type": "tackle-twill",
+      "content": "BLACK IS BEAUTIFUL",
+      "location": "front chest, arched",
+      "size": "approximately 18 inches wide, 4.5 inches tall at center",
+      "colors": [
+        "#FFFFFF"
+      ],
+      "style": "slightly raised, flat"
+    },
+    {
+      "type": "woven label",
+      "content": "SkyyRose logo and text (stylized 'S' or rose)",
+      "location": "interior back neck",
+      "size": "approximately 1.5 inches wide, 1 inch tall",
+      "colors": [
+        "#FFD700",
+        "#FFFFFF",
+        "#800080"
+      ],
+      "style": "flat"
+    },
+    {
+      "type": "woven label",
+      "content": "BLACK ROSE COLLECTION with baseball-style logo (similar to MLB logo)",
+      "location": "lower front right hem",
+      "size": "approximately 2.5 inches wide, 3.5 inches tall",
+      "colors": [
+        "#8B4513",
+        "#FFFFFF",
+        "#000000",
+        "#FF0000",
+        "#0000FF"
+      ],
+      "style": "flat"
+    }
+  ],
+  "branding": {
+    "primary_logo": "Stylized 'S' or rose graphic with 'SkyyRose' text",
+    "logo_location": "interior back neck label",
+    "logo_technique": "woven label",
+    "secondary_marks": "Woven label on lower front right hem featuring 'BLACK ROSE COLLECTION' text and a baseball-style logo."
+  },
+  "fabric_appearance": "Smooth jersey knit with a slight sheen, characteristic of athletic polyester fabric.",
+  "unique_features": "The prominent 'BLACK IS BEAUTIFUL' graphic on the front. Part of the 'BLACK is Beautiful Jersey Series: 4. THE ROSE (SHARKS EDITION)' as indicated by product context and the 'BLACK ROSE COLLECTION' woven label.",
+  "views_shown": "front only",
+  "collection_aesthetic": "This piece embodies Oakland luxury streetwear, blending 'dark luxury' with 'Oakland grit' through its bold statement and athletic silhouette, expressing 'emotional expression' via the 'BLACK IS BEAUTIFUL' message."
+}

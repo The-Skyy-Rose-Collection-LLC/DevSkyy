@@ -1,0 +1,54 @@
+{
+  "garment_type": "shorts",
+  "garment_subtype": "basketball shorts",
+  "silhouette": "athletic",
+  "construction": {
+    "panels": "Color-blocked design featuring a main body in peach/pink and a prominent, angular black panel that originates from the upper left side and extends diagonally across the front of the shorts, creating an asymmetrical visual.",
+    "seams": "Standard tonal stitching throughout the garment, with no visible contrast stitching.",
+    "closures": "A black braided drawstring with knotted ends is present at the center front of the waistband.",
+    "details": "Elastic waistband for a flexible and comfortable fit. Side pockets are implied by the garment type and typical construction of basketball shorts. The leg openings feature a simple, straight hem."
+  },
+  "colors": [
+    {
+      "area": "body",
+      "color": "#F2B2A8",
+      "finish": "matte"
+    },
+    {
+      "area": "color-block panel",
+      "color": "#000000",
+      "finish": "matte"
+    },
+    {
+      "area": "drawstring",
+      "color": "#000000",
+      "finish": "matte"
+    }
+  ],
+  "graphics": [
+    {
+      "type": "embroidery",
+      "content": "A detailed rose graphic featuring multiple red petals and green leaves, intricately stitched and emerging from a light blue and white cloud-like base.",
+      "location": "lower left thigh",
+      "size": "approximately 2.5 inches wide x 3 inches tall",
+      "colors": [
+        "#C70039",
+        "#8B0000",
+        "#006400",
+        "#ADD8E6",
+        "#FFFFFF"
+      ],
+      "style": "3D dimensional, raised"
+    }
+  ],
+  "branding": {
+    "primary_logo": "The embroidered rose patch serves as the primary visual mark, representing the 'Love Hurts' collection and the SkyyRose brand.",
+    "logo_location": "lower left thigh",
+    "logo_technique": "embroidery",
+    "secondary_marks": "None explicitly visible in the provided image."
+  },
+  "fabric_appearance": "Smooth, lightweight woven nylon/polyester fabric with a subtle crinkled texture, characteristic of windbreaker material.",
+  "unique_features": "The distinctive angular black color-block panel and the intricately embroidered 'Love Hurts' rose patch are key unique design elements.",
+  "views_shown": "front only",
+  "collection_aesthetic": "The 'Love Hurts' rose motif directly embodies emotional expression, while the athletic silhouette and premium construction align with SkyyRose's Oakland luxury streetwear and 'Oakland grit' aesthetic."
+}

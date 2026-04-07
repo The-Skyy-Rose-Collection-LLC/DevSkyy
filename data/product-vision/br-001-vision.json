@@ -1,0 +1,56 @@
+{
+  "garment_type": "jacket",
+  "garment_subtype": "varsity bomber",
+  "silhouette": "relaxed",
+  "construction": {
+    "panels": "Standard body panels with set-in sleeves. The hood is attached and appears to be constructed from multiple panels (e.g., a central panel and side panels) to give it shape.",
+    "seams": "Standard flat seams with tonal stitching, not visibly contrasting.",
+    "closures": "Full-front snap button closure with black, possibly plastic or metal, snap buttons.",
+    "details": "Rib-knit cuffs and hem in black. Attached hood made from a contrasting fabric. Side entry pockets are implied by the jacket style but not clearly visible in the image."
+  },
+  "colors": [
+    {
+      "area": "body",
+      "color": "#000000",
+      "finish": "satin"
+    },
+    {
+      "area": "sleeves",
+      "color": "#000000",
+      "finish": "satin"
+    },
+    {
+      "area": "hood",
+      "color": "#000000",
+      "finish": "matte"
+    },
+    {
+      "area": "trim (cuffs, hem)",
+      "color": "#000000",
+      "finish": "matte"
+    }
+  ],
+  "graphics": [
+    {
+      "type": "embroidery",
+      "content": "A stylized black rose graphic, rendered in white and light grey tones, featuring intricate details of petals and possibly thorns, with a somewhat gothic or dark aesthetic.",
+      "location": "front left chest",
+      "size": "approximately 4-5 inches tall",
+      "colors": [
+        "#E0E0E0",
+        "#A0A0A0"
+      ],
+      "style": "flat embroidery with visible texture from the stitching"
+    }
+  ],
+  "branding": {
+    "primary_logo": "The stylized black rose graphic, rendered in white/grey embroidery.",
+    "logo_location": "front left chest",
+    "logo_technique": "embroidery",
+    "secondary_marks": "A small, indistinct purple and orange tag is visible inside the neck, likely a brand or size label."
+  },
+  "fabric_appearance": "The body and sleeves are made of a smooth, lustrous satin fabric, exhibiting a soft sheen and fluid drape. The hood appears to be made from a matte, possibly cotton-blend fleece or jersey fabric, providing a textural contrast to the satin body.",
+  "unique_features": "The distinctive combination of a shiny satin bomber jacket body with an attached hood made from a contrasting matte fabric. The full-front snap button closure adds to the classic bomber aesthetic.",
+  "views_shown": "front only",
+  "collection_aesthetic": "The black color palette, luxurious satin finish, and the stylized rose graphic align with a 'dark luxury' aesthetic. The bomber silhouette and streetwear elements contribute to the 'Oakland grit' and 'emotional expression' aspects of the SkyyRose brand."
+}
