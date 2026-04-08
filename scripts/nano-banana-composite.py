@@ -176,17 +176,19 @@ PRODUCT_CATALOG = _build_catalog()
 
 
 def load_env():
-    """Load API keys from .env.hf."""
+    """Load API keys from .env.hf or environment variables."""
     env_path = PROJECT_ROOT / ".env.hf"
-    if not env_path.exists():
-        log.error("Missing .env.hf — need API keys")
+    if env_path.exists():
+        for line in env_path.read_text().splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, val = line.split("=", 1)
+            os.environ.setdefault(key.strip(), val.strip())
+
+    if not os.environ.get("GOOGLE_API_KEY"):
+        log.error("No GOOGLE_API_KEY — set it in .env.hf or export GOOGLE_API_KEY")
         sys.exit(1)
-    for line in env_path.read_text().splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, val = line.split("=", 1)
-        os.environ.setdefault(key.strip(), val.strip())
 
 
 def upload_to_fal(image_path: Path) -> str:
