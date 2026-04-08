@@ -72,8 +72,8 @@
     "br-006": {
       "name": "BLACK Rose Sherpa Jacket",
       "collection": "black-rose",
-      "branding": "SATIN HOODED BOMBER JACKET lined with BLACK SHERPA inside. Embroidered rose logo on left chest (~5 in). Large embroidered rose logo on back (~12 in), rose-gold thread",
-      "fabric": "satin shell + sherpa lining",
+      "branding": "SATIN BLACK HOODED BOMBER JACKET with BLACK SHERPA LINING inside. Satin shell is black, lining is black sherpa. Embroidered rose logo on left chest (~5 in). Large embroidered rose logo on back (~12 in), rose-gold thread",
+      "fabric": "black satin shell + black sherpa lining",
       "texture": "embroidered rose-gold thread",
       "patch": null
     },
@@ -120,7 +120,7 @@
     "lh-002": {
       "name": "Love Hurts Joggers",
       "collection": "love-hurts",
-      "branding": "TWO VARIANTS — (1) White joggers with black stripe, (2) Black joggers with white stripe. Both have: Love Hurts heart-and-rose logo on LEFT thigh. Heart graphic = cracked red heart wrapped in thorny branches with three roses, blood-splash drips",
+      "branding": "TWO COLORWAY VARIANTS: (1) WHITE joggers with BLACK side stripe, (2) BLACK joggers with WHITE side stripe. Both have: Love Hurts heart-and-rose logo embroidered on LEFT thigh. Heart graphic = cracked red heart wrapped in thorny branches with three roses, blood-splash drips.",
       "fabric": "cotton-poly fleece joggers",
       "texture": "sublimated + embroidered",
       "patch": null
@@ -136,8 +136,8 @@
     "lh-004": {
       "name": "Love Hurts Varsity Jacket",
       "collection": "love-hurts",
-      "branding": "SATIN BOMBER JACKET (NOT wool varsity). 'LOVE HURTS' logo lettering ACROSS THE FRONT in red graffiti script. Inside hood: sublimated rose logo pattern. BACK: Love Hurts 'heart and rose' logo centered — cracked heart with thorny branches and roses",
-      "fabric": "satin shell",
+      "branding": "WHITE SATIN BOMBER JACKET (NOT wool varsity, NOT windbreaker). White satin body, black satin raglan sleeves, hooded. 'LOVE HURTS' logo lettering ACROSS THE FRONT in red graffiti script. Inside hood: sublimated rose logo pattern. BACK: Love Hurts heart-and-rose logo centered — cracked heart with thorny branches and roses. Red/black/white striped ribbed cuffs and hem.",
+      "fabric": "white satin body + black satin sleeves",
       "texture": "embroidered + sublimated",
       "patch": null
     },
@@ -208,9 +208,9 @@
     "sg-009": {
       "name": "The Sherpa Jacket",
       "collection": "signature",
-      "branding": "Black nylon shell zip-front jacket. White sherpa lining visible at collar and when opened. RED embroidered rose logo on front (~3 in). NOT hooded — collar only",
-      "fabric": "nylon shell + sherpa lining",
-      "texture": "embroidered",
+      "branding": "BLACK nylon shell zip-front jacket. WHITE SHERPA LINING visible at collar and when opened. RED embroidered rose logo on front (~3 in). NOT hooded — collar only. Black exterior, white interior, red rose",
+      "fabric": "black nylon shell + white sherpa lining",
+      "texture": "red embroidered rose",
       "patch": null
     },
     "sg-011": {
