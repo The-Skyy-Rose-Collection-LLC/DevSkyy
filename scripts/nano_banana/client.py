@@ -56,19 +56,28 @@ def get_genai_client(timeout_ms: int = 300_000):
 
 
 def get_openai_client():
-    """Create an OpenAI client. Returns None if no API key."""
-    key = os.getenv("OPENAI_API_KEY", "").strip()
-    if not key:
-        log.debug("No OPENAI_API_KEY — GPT Image engine unavailable")
-        return None
+    """Create an OpenAI client. Tries multiple key env vars, validates each."""
+    import openai
 
-    try:
-        import openai
+    for var in ("OPENAI_API_KEY", "OPENAI_AGENT107_KEY", "OPENAI_FEB19", "OPENAI_MCP_KEY"):
+        key = os.getenv(var, "").strip()
+        if not key:
+            continue
+        client = openai.OpenAI(api_key=key)
+        try:
+            client.models.list()
+            log.info("OpenAI: using %s", var)
+            return client
+        except openai.AuthenticationError:
+            log.warning("OpenAI key %s is invalid, trying next", var)
+            continue
+        except Exception:
+            # Network error etc — key might be fine, use it
+            log.info("OpenAI: using %s (could not validate)", var)
+            return client
 
-        return openai.OpenAI(api_key=key)
-    except ImportError:
-        log.warning("openai package not installed — GPT Image unavailable")
-        return None
+    log.debug("No working OpenAI API key found — GPT engine unavailable")
+    return None
 
 
 def get_together_client():

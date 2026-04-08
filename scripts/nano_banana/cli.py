@@ -134,11 +134,28 @@ def cmd_generate(args):
                     view_src = back
 
             prompt = get_prompt(product, view)
-            # Inject material specs from product-references.json if available.
+            # Inject material specs from product-specs.json
             material_spec = get_material_spec(sku)
             if material_spec:
                 prompt += f"\n\nMATERIAL SPEC: {material_spec}"
             image_bytes = None
+
+            # Load bundle reference images (logo, patches, product photos)
+            from nano_banana.pipeline import _find_bundle_dir
+            extra_refs = []
+            bundle_dir = _find_bundle_dir(product["name"], sku)
+            if bundle_dir:
+                for tag, label in [
+                    ("logo-ref", "REFERENCE — EXACT LOGO ART (copy this precisely)"),
+                    ("logo-heart-rose", "REFERENCE — EXACT LOGO ART (copy this precisely)"),
+                    ("patch-ref", "REFERENCE — EXACT PATCH DESIGN (reproduce this patch)"),
+                    ("photo-front", "REFERENCE — REAL PRODUCT PHOTO (match this exactly)"),
+                    ("source-photo", "REFERENCE — REAL PRODUCT PHOTO (match this exactly)"),
+                ]:
+                    for f in bundle_dir.glob(f"{tag}.*"):
+                        if f.exists():
+                            extra_refs.append((label, f))
+                            break
 
             for attempt in range(1, MAX_RETRIES + 1):
                 if use_flux:
@@ -153,6 +170,7 @@ def cmd_generate(args):
                         prompt,
                         model=model,
                         enhanced=(attempt > 1),
+                        extra_refs=extra_refs if extra_refs else None,
                     )
 
                 if image_bytes and quality_gate(image_bytes, sku, view):
@@ -342,6 +360,23 @@ def main():
     gen.add_argument("--qa", action="store_true", help="Run Gemini vision QA after generation")
     gen.add_argument("--free", action="store_true", help="Use free FLUX model (lower quality)")
 
+    # -- generate-async --
+    ga = sub.add_parser("generate-async", help="Async parallel generation (3 concurrent)")
+    ga.add_argument("--sku", type=str, default=None, help="Single SKU to process")
+    ga.add_argument(
+        "--step",
+        type=str,
+        default="all",
+        choices=["front", "back", "branding", "all", "front_back"],
+    )
+    ga.add_argument("--model", type=str, default=None, help="Override Gemini model ID")
+    ga.add_argument(
+        "--pro", action="store_true", help="Use Nano Banana Pro (gemini-3-pro-image-preview)"
+    )
+    ga.add_argument(
+        "--concurrency", type=int, default=3, help="Max concurrent API calls (default 3)"
+    )
+
     # -- composite --
     comp = sub.add_parser("composite", help="Composite real branding onto AI shots")
     comp.add_argument("--sku", type=str, default=None, help="Single SKU to process")
@@ -377,12 +412,140 @@ def main():
         cmd_dry_run(args)
     elif args.command == "generate":
         cmd_generate(args)
+    elif args.command == "generate-async":
+        import asyncio
+        asyncio.run(cmd_generate_async(args))
     elif args.command == "composite":
         cmd_composite(args)
     elif args.command == "verify-generate":
         cmd_verify_generate(args)
     elif args.command == "produce":
         cmd_produce(args)
+
+
+async def cmd_generate_async(args):
+    """Async parallel generation with error boundaries."""
+    import asyncio
+
+    from nano_banana.catalog import (
+        PRODUCTS_DIR,
+        find_back_source,
+        find_source_image,
+        get_material_spec,
+        load_catalog,
+        load_products,
+    )
+    from nano_banana.client import get_genai_client
+    from nano_banana.generate import GEMINI_FAST, GEMINI_PRO, generate_gemini_async
+    from nano_banana.pipeline import _find_bundle_dir
+    from nano_banana.prompts import get_prompt
+    from nano_banana.utils import get_output_filename, quality_gate, save_image
+
+    catalog = load_catalog()
+    products = load_products(catalog, sku_filter=args.sku)
+    views = _resolve_views(args.step)
+    model = GEMINI_PRO if args.pro else args.model or GEMINI_FAST
+    concurrency = args.concurrency
+    client = get_genai_client()
+
+    semaphore = asyncio.Semaphore(concurrency)
+    results: dict[str, str] = {}  # "sku-view" -> "PASS" | "FAIL" | "SKIP"
+
+    async def generate_one(product: dict, view: str) -> None:
+        sku = product["sku"]
+        key = f"{sku}-{view}"
+        src = product["source_image"]
+
+        if product["is_accessory"] and view == "back":
+            results[key] = "SKIP"
+            return
+
+        if not src:
+            log.warning("SKIP %s %s: no source", sku, view)
+            results[key] = "SKIP"
+            return
+
+        view_src = src
+        if view == "back":
+            back = find_back_source(sku, catalog)
+            if back:
+                view_src = back
+
+        prompt = get_prompt(product, view)
+        material_spec = get_material_spec(sku)
+        if material_spec:
+            prompt += f"\n\nMATERIAL SPEC: {material_spec}"
+
+        # Load bundle refs
+        extra_refs = []
+        bundle_dir = _find_bundle_dir(product["name"], sku)
+        if bundle_dir:
+            for tag, label in [
+                ("logo-ref", "REFERENCE — EXACT LOGO ART (copy this precisely)"),
+                ("logo-heart-rose", "REFERENCE — EXACT LOGO ART (copy this precisely)"),
+                ("patch-ref", "REFERENCE — EXACT PATCH DESIGN (reproduce this patch)"),
+                ("photo-front", "REFERENCE — REAL PRODUCT PHOTO (match this exactly)"),
+                ("source-photo", "REFERENCE — REAL PRODUCT PHOTO (match this exactly)"),
+            ]:
+                for f in bundle_dir.glob(f"{tag}.*"):
+                    if f.exists():
+                        extra_refs.append((label, f))
+                        break
+
+        out_path = PRODUCTS_DIR / get_output_filename(sku, view, product["output_slug"])
+
+        async with semaphore:
+            for attempt in range(1, MAX_RETRIES + 1):
+                try:
+                    img_bytes = await generate_gemini_async(
+                        client,
+                        view_src,
+                        prompt,
+                        model=model,
+                        enhanced=(attempt > 1),
+                        extra_refs=extra_refs if extra_refs else None,
+                    )
+                except Exception as exc:
+                    log.error("[%s %s] attempt %d error: %s", sku, view, attempt, exc)
+                    img_bytes = None
+
+                if img_bytes and quality_gate(img_bytes, sku, view):
+                    save_image(img_bytes, out_path)
+                    log.info("PASS %s %s: %.1fKB", sku, view, len(img_bytes) / 1024)
+                    results[key] = "PASS"
+                    return
+
+                if attempt < MAX_RETRIES:
+                    log.info("Retry %d/%d for %s %s", attempt, MAX_RETRIES, sku, view)
+                    await asyncio.sleep(RETRY_DELAY)
+
+            log.error("FAIL %s %s after %d attempts", sku, view, MAX_RETRIES)
+            results[key] = "FAIL"
+
+    # Build task list
+    tasks = []
+    for product in products:
+        for view in views:
+            tasks.append(generate_one(product, view))
+
+    total = len(tasks)
+    log.info(
+        "ASYNC: %d tasks, %d concurrent, model=%s", total, concurrency, model
+    )
+
+    await asyncio.gather(*tasks)
+
+    # Summary
+    passed = sum(1 for v in results.values() if v == "PASS")
+    failed = sum(1 for v in results.values() if v == "FAIL")
+    skipped = sum(1 for v in results.values() if v == "SKIP")
+    log.info("COMPLETE: %d passed / %d failed / %d skipped", passed, failed, skipped)
+
+    if failed:
+        log.info("Failed:")
+        for k, v in results.items():
+            if v == "FAIL":
+                log.info("  %s", k)
 
 
 def cmd_produce(args):

@@ -104,6 +104,74 @@ def generate_gemini(
     return None
 
 
+async def generate_gemini_async(
+    client,
+    source_path: Path | None,
+    prompt: str,
+    *,
+    model: str = GEMINI_FAST,
+    aspect_ratio: str = "3:4",
+    enhanced: bool = False,
+    extra_refs: list | None = None,
+) -> bytes | None:
+    """Async version of generate_gemini using client.aio."""
+    from google.genai import types
+    from nano_banana.prompts import ENHANCED_SUFFIX
+    from nano_banana.utils import enhance_source_image, to_webp
+
+    full_prompt = prompt
+    if enhanced:
+        full_prompt += ENHANCED_SUFFIX
+
+    contents = []
+
+    if source_path and source_path.exists():
+        src_img = enhance_source_image(source_path)
+        contents.append("REFERENCE IMAGE 1 — GARMENT TECH FLAT (study every detail):")
+        contents.append(src_img)
+
+    if extra_refs:
+        for label, ref_path in extra_refs:
+            if ref_path and Path(ref_path).exists():
+                ref_img = enhance_source_image(Path(ref_path))
+                contents.append(label + ":")
+                contents.append(ref_img)
+
+    contents.append(full_prompt)
+
+    if not contents:
+        contents = [full_prompt]
+
+    try:
+        response = await client.aio.models.generate_content(
+            model=model,
+            contents=contents,
+            config=types.GenerateContentConfig(
+                response_modalities=["IMAGE"],
+                image_config=types.ImageConfig(
+                    aspect_ratio=aspect_ratio,
+                ),
+            ),
+        )
+    except Exception as exc:
+        log.error("Gemini async API call failed: %s", exc)
+        return None
+
+    if not response or not response.candidates:
+        log.warning("Empty async response from Gemini")
+        return None
+
+    for part in response.candidates[0].content.parts:
+        if part.inline_data:
+            raw = part.inline_data.data
+            if isinstance(raw, str):
+                raw = base64.b64decode(raw)
+            return to_webp(raw)
+
+    log.warning("No image in async Gemini response parts")
+    return None
+
+
 def generate_flux(
     together_client,
     prompt: str,
@@ -164,34 +232,30 @@ def generate_gpt(
 ) -> bytes | None:
     """Generate an image using GPT-Image-1.5.
 
-    Supports reference-based editing: source photo + instructions.
+    Uses images.edit() with input_fidelity="high" for reference-based editing.
     Returns WebP image bytes on success, None on failure.
     """
     from nano_banana.utils import to_webp
 
-    kwargs = {
-        "model": GPT_IMAGE_MODEL,
-        "prompt": prompt,
-        "size": "1024x1536",
-        "quality": "high",
-    }
-
-    # GPT Image 1.5 uses images.edit() for reference-based editing,
-    # images.generate() for text-to-image only.
     use_edit = source_path and source_path.exists()
 
     try:
         if use_edit:
-            # Use edit endpoint with reference image as input
             with open(source_path, "rb") as img_file:
                 response = openai_client.images.edit(
                     model=GPT_IMAGE_MODEL,
                     image=img_file,
                     prompt=prompt,
                     size="1024x1536",
+                    input_fidelity="high",
                 )
         else:
-            response = openai_client.images.generate(**kwargs)
+            response = openai_client.images.generate(
+                model=GPT_IMAGE_MODEL,
+                prompt=prompt,
+                size="1024x1536",
+                quality="high",
+            )
     except Exception as exc:
         log.error("GPT-Image API call failed: %s", exc)
         return None

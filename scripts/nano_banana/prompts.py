@@ -19,9 +19,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 ANTI_HALLUCINATION = (
     "\n\nSTRICT RULES — NON-NEGOTIABLE:\n"
+    "- COPY the logo/branding art EXACTLY from the reference images provided. Do NOT simplify, reinterpret, or redesign logos.\n"
+    "- If a reference image shows a logo with specific details (clouds, thorns, petals, patches), reproduce EVERY detail.\n"
     "- Render ONLY the side specified (front or back). Never show both sides.\n"
-    "- Do NOT add text, logos, patches, or branding absent from the reference.\n"
-    "- Do NOT invent pockets, panels, zippers, or details not in the reference.\n"
+    "- Do NOT add text, logos, patches, pockets, panels, zippers, or details not in the reference.\n"
+    "- Do NOT invent or add features absent from the reference images.\n"
     "- Do NOT change the garment type, silhouette, or cut.\n"
     "- Do NOT add sponsor logos, team names, league marks, or athlete names.\n"
     "- Do NOT alter colors — match hex values from the reference exactly.\n"

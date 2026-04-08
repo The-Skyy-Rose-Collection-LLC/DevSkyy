@@ -478,41 +478,53 @@ def _find_bundle_dir(name: str, sku: str) -> Path | None:
 
 def _load_bundle_refs(
     name: str, sku: str, source_path: Path, view: str
-) -> list[Path]:
+) -> list[tuple[str, Path]]:
     """Load reference images from the product bundle directory.
 
     Bundles are named by product name (not SKU).
-    Returns a list of image Paths relevant to the requested view.
+    Returns list of (label, Path) tuples for generate_gemini() extra_refs.
     """
     bundle_dir = _find_bundle_dir(name, sku)
     if not bundle_dir:
         log.warning("No bundle directory for %s (%s)", name, sku)
         return []
 
-    refs: list[Path] = []
+    TAG_LABELS = {
+        "logo-ref": "REFERENCE — EXACT LOGO ART (copy this precisely)",
+        "logo-heart-rose": "REFERENCE — EXACT LOGO ART (copy this precisely)",
+        "patch-ref": "REFERENCE — EXACT PATCH DESIGN (reproduce this patch)",
+        "source-photo": "REFERENCE — REAL PRODUCT PHOTO (match this exactly)",
+        "photo-front": "REFERENCE — REAL PRODUCT PHOTO (match this exactly)",
+        "photo-back": "REFERENCE — REAL PRODUCT BACK (match this exactly)",
+        "techflat-front": "REFERENCE — TECHFLAT FRONT",
+        "techflat-back": "REFERENCE — TECHFLAT BACK",
+    }
+
+    refs: list[tuple[str, Path]] = []
 
     # Always include logo + patch references
-    for tag in ("logo-ref", "patch-ref"):
+    for tag in ("logo-ref", "logo-heart-rose", "patch-ref"):
         for f in bundle_dir.glob(f"{tag}.*"):
             if f.exists():
-                refs.append(f)
+                refs.append((TAG_LABELS.get(tag, tag), f))
 
-    # Include source photo if available
-    for f in bundle_dir.glob("source-photo.*"):
-        if f.exists() and f != source_path:
-            refs.append(f)
+    # Include source/product photo
+    for tag in ("source-photo", "photo-front"):
+        for f in bundle_dir.glob(f"{tag}.*"):
+            if f.exists() and f != source_path:
+                refs.append((TAG_LABELS.get(tag, tag), f))
 
     # Include techflat for the requested view
     if view == "front":
         for f in bundle_dir.glob("techflat-front.*"):
             if f.exists() and f != source_path:
-                refs.append(f)
+                refs.append((TAG_LABELS["techflat-front"], f))
     elif view == "back":
         for f in bundle_dir.glob("techflat-back.*"):
             if f.exists() and f != source_path:
-                refs.append(f)
+                refs.append((TAG_LABELS["techflat-back"], f))
 
-    # Cap at 5 references to stay within model limits
+    # Cap at 5 references
     return refs[:5]
 
 
