@@ -1039,7 +1039,7 @@ def run_pipeline(args):
         from google import genai
     except ImportError:
         log.error("google-genai not installed — run: pip install google-genai")
-        return
+        sys.exit(1)
 
     load_env()
     client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
