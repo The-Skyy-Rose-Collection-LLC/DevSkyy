@@ -12,9 +12,8 @@ from collections.abc import Generator
 from pathlib import Path
 from typing import Any
 
-from dotenv import load_dotenv
-
 import openai
+from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).parent.parent.parent / ".env")
 

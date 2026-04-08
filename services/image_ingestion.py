@@ -20,11 +20,10 @@ import logging
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import httpx
-
 from services.image_deduplication import (
     ImageDeduplicator,
     get_deduplicator,
@@ -57,7 +56,7 @@ MAX_DIMENSION = 10000  # Maximum image dimension
 # =============================================================================
 
 
-class IngestionSource(str, Enum):
+class IngestionSource(StrEnum):
     """Source of ingested images."""
 
     WOOCOMMERCE = "woocommerce"
@@ -66,7 +65,7 @@ class IngestionSource(str, Enum):
     BULK_IMPORT = "bulk_import"
 
 
-class IngestionStatus(str, Enum):
+class IngestionStatus(StrEnum):
     """Status of ingestion operation."""
 
     PENDING = "pending"

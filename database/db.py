@@ -19,7 +19,7 @@ import logging
 import os
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
-from typing import Any, Generic, Optional, TypeVar
+from typing import Any, Optional, TypeVar
 
 from pydantic import BaseModel
 from sqlalchemy import (
@@ -410,7 +410,7 @@ class DatabaseManager:
 T = TypeVar("T", bound=Base)
 
 
-class BaseRepository(Generic[T]):
+class BaseRepository[T: Base]:
     """
     Base repository with common CRUD operations
 

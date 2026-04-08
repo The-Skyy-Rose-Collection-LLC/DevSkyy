@@ -11,7 +11,7 @@ Hooks intercept agent events for:
 from __future__ import annotations
 
 import json
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Any
 
 from claude_agent_sdk import HookMatcher
@@ -133,7 +133,7 @@ async def log_file_edit(input_data: dict, tool_use_id: str, context: Any) -> dic
 async def report_progress(input_data: dict, tool_use_id: str, context: Any) -> dict:
     """Print agent activity to console for visibility."""
     tool_name = input_data.get("tool_name", "unknown")
-    agent_id = input_data.get("agent_id", "main")
+    input_data.get("agent_id", "main")
     agent_type = input_data.get("agent_type", "")
 
     # Only report for subagents — main agent output is visible

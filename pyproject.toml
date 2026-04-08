@@ -333,9 +333,20 @@ exclude = ["tests*", "docs*", "legacy*"]
 # =============================================================================
 
 [tool.ruff]
-target-version = "py311"
+target-version = "py313"
 line-length = 100
-exclude = ["legacy/", "*.pyi", "__pycache__"]
+exclude = [
+    "legacy/",
+    "*.pyi",
+    "__pycache__",
+    "archive/",
+    "_archive/",
+    "open-claude-code/",
+    ".claude/",
+    ".agents/",
+    ".aidesigner/",
+    ".venv*/",
+]
 
 [tool.ruff.lint]
 select = [
@@ -387,7 +398,7 @@ known-first-party = ["core", "api", "security", "database", "wordpress", "agents
 
 [tool.black]
 line-length = 100
-target-version = ["py311"]
+target-version = ["py313"]
 include = '\.pyi?$'
 exclude = '''
 /(
@@ -396,6 +407,12 @@ exclude = '''
     | \.mypy_cache
     | \.tox
     | \.venv
+    | \.venv-.*
+    | \.claude
+    | \.agents
+    | \.aidesigner
+    | _archive
+    | open-claude-code
     | _build
     | buck-out
     | build
@@ -412,7 +429,7 @@ exclude = '''
 profile = "black"
 line_length = 100
 known_first_party = ["core", "api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm"]
-skip = ["legacy/", ".venv/"]
+skip = ["legacy/", ".venv/", ".venv-*/", ".claude/", "_archive/", "open-claude-code/", ".agents/", ".aidesigner/"]
 
 # =============================================================================
 # MyPy Configuration — canonical config lives in mypy.ini (not here)

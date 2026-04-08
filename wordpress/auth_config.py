@@ -28,7 +28,7 @@ import secrets
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from urllib.parse import urlencode
 
@@ -49,7 +49,7 @@ except ImportError:
 # ============================================================================
 
 
-class AuthMethod(str, Enum):
+class AuthMethod(StrEnum):
     """Supported authentication methods."""
 
     APP_PASSWORD = "app_password"
@@ -58,7 +58,7 @@ class AuthMethod(str, Enum):
     WC_API_KEY = "wc_api_key"
 
 
-class UserRole(str, Enum):
+class UserRole(StrEnum):
     """WordPress user roles."""
 
     ADMINISTRATOR = "administrator"
@@ -70,7 +70,7 @@ class UserRole(str, Enum):
     CUSTOMER = "customer"
 
 
-class Permission(str, Enum):
+class Permission(StrEnum):
     """Required permissions for DevSkyy operations."""
 
     READ_PAGES = "read_pages"

@@ -12,10 +12,9 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from claude_agent_sdk import tool, create_sdk_mcp_server
+from claude_agent_sdk import create_sdk_mcp_server, tool
 
 from .config import ASSETS_DIR, PRODUCT_DATA_DIR, REPO_DIR, THEME_DIR
-
 
 # ---------------------------------------------------------------------------
 # Product Catalog Tools
@@ -134,9 +133,9 @@ async def get_theme_css_stats(args: dict[str, Any]) -> dict[str, Any]:
                 "lines": content.count("\n") + 1,
                 "size_kb": round(css_file.stat().st_size / 1024, 1),
                 "has_minified": min_file.exists(),
-                "min_size_kb": round(min_file.stat().st_size / 1024, 1)
-                if min_file.exists()
-                else None,
+                "min_size_kb": (
+                    round(min_file.stat().st_size / 1024, 1) if min_file.exists() else None
+                ),
             }
         )
 
@@ -286,8 +285,8 @@ async def generate_product_copy(args: dict[str, Any]) -> dict[str, Any]:
 )
 async def elite_studio_status(args: dict[str, Any]) -> dict[str, Any]:
     """Check which products have generated images."""
-    from ..elite_studio.utils import discover_all_skus
     from ..elite_studio.config import OUTPUT_DIR
+    from ..elite_studio.utils import discover_all_skus
 
     all_skus = discover_all_skus()
     generated = []

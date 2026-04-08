@@ -24,7 +24,7 @@ import json
 import logging
 import uuid
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class WidgetType(str, Enum):
+class WidgetType(StrEnum):
     """Elementor widget types."""
 
     HEADING = "heading"
@@ -93,7 +93,7 @@ class WidgetType(str, Enum):
     TABS = "tabs"  # Tab widget for content organization
 
 
-class SectionLayout(str, Enum):
+class SectionLayout(StrEnum):
     """Section layout types."""
 
     BOXED = "boxed"
@@ -101,7 +101,7 @@ class SectionLayout(str, Enum):
     FULL_SCREEN = "full_screen"
 
 
-class PageType(str, Enum):
+class PageType(StrEnum):
     """Page types for template generation."""
 
     HOME = "home"

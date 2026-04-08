@@ -64,6 +64,7 @@ class TestBatchGeneration:
         """Test batch generation with invalid provider."""
         response = await client.post(
             "/api/v1/pipeline/batch-generate",
+            headers=auth_headers,
             json={
                 "asset_ids": ["asset-1"],
                 "provider": "invalid-provider",

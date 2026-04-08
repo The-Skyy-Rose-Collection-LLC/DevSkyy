@@ -16,8 +16,8 @@ Each subagent has its own tools, system prompt, and permission scope.
 The orchestrator decides what to delegate based on the user's request.
 """
 
-from .orchestrator import run_orchestrator, run_single_agent
 from .agents import AGENT_DEFINITIONS
+from .orchestrator import run_orchestrator, run_single_agent
 from .tools import CUSTOM_TOOLS
 
 __all__ = [
