@@ -140,8 +140,15 @@ def find_back_source(sku: str, catalog: dict[str, dict]) -> Path | None:
 def load_products(
     catalog: dict[str, dict],
     sku_filter: str | None = None,
+    collection_filter: str | None = None,
 ) -> list[dict]:
     """Build product list with resolved source images.
+
+    Args:
+        catalog: Full catalog dict keyed by SKU.
+        sku_filter: Process only this single SKU.
+        collection_filter: Process only SKUs in this collection slug
+            (e.g. "black-rose", "signature", "love-hurts", "kids-capsule").
 
     Returns list of dicts with sku, name, collection, source_image, etc.
     """
@@ -153,6 +160,10 @@ def load_products(
             log.warning("SKU %s not in catalog", sku)
             continue
         info = catalog[sku]
+
+        if collection_filter and info["collection"] != collection_filter:
+            continue
+
         source = find_source_image(sku, catalog)
         products.append(
             {

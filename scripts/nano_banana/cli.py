@@ -38,7 +38,9 @@ def cmd_dry_run(args):
     from nano_banana.catalog import PRODUCTS_DIR, load_catalog, load_products
 
     catalog = load_catalog()
-    products = load_products(catalog, sku_filter=args.sku)
+    products = load_products(
+        catalog, sku_filter=args.sku, collection_filter=getattr(args, "collection", None)
+    )
     views = _resolve_views(args.step)
 
     print(f"\n{'=' * 60}")
@@ -84,7 +86,9 @@ def cmd_generate(args):
     from nano_banana.utils import get_output_filename, quality_gate, save_image
 
     catalog = load_catalog()
-    products = load_products(catalog, sku_filter=args.sku)
+    products = load_products(
+        catalog, sku_filter=args.sku, collection_filter=getattr(args, "collection", None)
+    )
     views = _resolve_views(args.step)
     model = GEMINI_PRO if args.pro else args.model or GEMINI_FAST
     engine = args.engine
@@ -223,7 +227,9 @@ def cmd_composite(args):
     from nano_banana.utils import quality_gate, save_image
 
     catalog = load_catalog()
-    products = load_products(catalog, sku_filter=args.sku)
+    products = load_products(
+        catalog, sku_filter=args.sku, collection_filter=getattr(args, "collection", None)
+    )
     model = GEMINI_PRO if args.pro else GEMINI_FAST
     client = get_genai_client()
 
@@ -336,6 +342,12 @@ def main():
     dr = sub.add_parser("dry-run", help="Preview what would be generated")
     dr.add_argument("--sku", type=str, default=None, help="Single SKU to process")
     dr.add_argument(
+        "--collection",
+        type=str,
+        default=None,
+        help="Filter by collection slug (e.g. black-rose, signature, love-hurts, kids-capsule)",
+    )
+    dr.add_argument(
         "--step",
         type=str,
         default="all",
@@ -345,6 +357,12 @@ def main():
     # -- generate --
     gen = sub.add_parser("generate", help="Generate product images")
     gen.add_argument("--sku", type=str, default=None, help="Single SKU to process")
+    gen.add_argument(
+        "--collection",
+        type=str,
+        default=None,
+        help="Filter by collection slug (e.g. black-rose, signature, love-hurts, kids-capsule)",
+    )
     gen.add_argument(
         "--step",
         type=str,
@@ -365,6 +383,12 @@ def main():
     ga = sub.add_parser("generate-async", help="Async parallel generation (3 concurrent)")
     ga.add_argument("--sku", type=str, default=None, help="Single SKU to process")
     ga.add_argument(
+        "--collection",
+        type=str,
+        default=None,
+        help="Filter by collection slug (e.g. black-rose, signature, love-hurts, kids-capsule)",
+    )
+    ga.add_argument(
         "--step",
         type=str,
         default="all",
@@ -381,6 +405,12 @@ def main():
     # -- composite --
     comp = sub.add_parser("composite", help="Composite real branding onto AI shots")
     comp.add_argument("--sku", type=str, default=None, help="Single SKU to process")
+    comp.add_argument(
+        "--collection",
+        type=str,
+        default=None,
+        help="Filter by collection slug (e.g. black-rose, signature, love-hurts, kids-capsule)",
+    )
     comp.add_argument(
         "--step", type=str, default="composite", choices=["composite", "composite_all"]
     )
@@ -403,6 +433,12 @@ def main():
     prod = sub.add_parser("produce", help="V4 production pipeline — sequential (legacy)")
     prod.add_argument("--sku", type=str, default=None, help="Single SKU to process")
     prod.add_argument(
+        "--collection",
+        type=str,
+        default=None,
+        help="Filter by collection slug (e.g. black-rose, signature, love-hurts, kids-capsule)",
+    )
+    prod.add_argument(
         "--views", type=str, default="front,back,branding", help="Comma-separated views"
     )
     prod.add_argument(
@@ -418,6 +454,12 @@ def main():
         "produce-async", help="Staged async production — vision → generate → QA → refine"
     )
     pa.add_argument("--sku", type=str, default=None, help="Single SKU to process")
+    pa.add_argument(
+        "--collection",
+        type=str,
+        default=None,
+        help="Filter by collection slug (e.g. black-rose, signature, love-hurts, kids-capsule)",
+    )
     pa.add_argument("--views", type=str, default="front,back", help="Comma-separated views")
     pa.add_argument("--concurrency", type=int, default=3, help="Max concurrent API calls per stage")
     pa.add_argument("--model", type=str, default=None, help="Override generation model")
@@ -462,7 +504,9 @@ async def cmd_generate_async(args):
     from nano_banana.utils import get_output_filename, quality_gate, save_image
 
     catalog = load_catalog()
-    products = load_products(catalog, sku_filter=args.sku)
+    products = load_products(
+        catalog, sku_filter=args.sku, collection_filter=getattr(args, "collection", None)
+    )
     views = _resolve_views(args.step)
     model = GEMINI_PRO if args.pro else args.model or GEMINI_FAST
     concurrency = args.concurrency
@@ -574,15 +618,18 @@ async def cmd_produce_async(args):
     from nano_banana.produce_async import run_production
 
     catalog = load_catalog()
-    products = load_products(catalog, sku_filter=args.sku)
+    products = load_products(
+        catalog, sku_filter=args.sku, collection_filter=getattr(args, "collection", None)
+    )
     views = [v.strip() for v in args.views.split(",")]
 
     if not products:
         log.error("No products found")
         return
 
-    # Global batch timeout: 30 min for full catalog, 5 min per SKU
-    batch_timeout = 300 if args.sku else 1800
+    # Global batch timeout: 30 min for full catalog, 10 min per collection, 5 min per SKU
+    collection = getattr(args, "collection", None)
+    batch_timeout = 300 if args.sku else (600 if collection else 1800)
 
     log.info("=== STAGED ASYNC PRODUCTION ===")
     log.info(
@@ -633,7 +680,9 @@ def cmd_produce(args):
 
     views = [v.strip() for v in args.views.split(",")]
     catalog = load_catalog()
-    products = load_products(catalog, sku_filter=args.sku)
+    products = load_products(
+        catalog, sku_filter=args.sku, collection_filter=getattr(args, "collection", None)
+    )
 
     if not products:
         log.error("No products found")
