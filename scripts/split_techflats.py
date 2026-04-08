@@ -13,6 +13,7 @@ Output goes to assets/techflats/split/ with clear naming:
 """
 
 from pathlib import Path
+
 from PIL import Image
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
