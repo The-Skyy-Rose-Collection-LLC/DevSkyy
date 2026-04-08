@@ -142,6 +142,7 @@ def cmd_generate(args):
 
             # Load bundle reference images (logo, patches, product photos)
             from nano_banana.pipeline import _find_bundle_dir
+
             extra_refs = []
             bundle_dir = _find_bundle_dir(product["name"], sku)
             if bundle_dir:
@@ -401,13 +402,21 @@ def main():
     # -- produce (v4 production pipeline — sequential) --
     prod = sub.add_parser("produce", help="V4 production pipeline — sequential (legacy)")
     prod.add_argument("--sku", type=str, default=None, help="Single SKU to process")
-    prod.add_argument("--views", type=str, default="front,back,branding", help="Comma-separated views")
-    prod.add_argument("--fast", action="store_true", help="Use fast preset (lower quality, lower cost)")
+    prod.add_argument(
+        "--views", type=str, default="front,back,branding", help="Comma-separated views"
+    )
+    prod.add_argument(
+        "--fast", action="store_true", help="Use fast preset (lower quality, lower cost)"
+    )
     prod.add_argument("--config", type=str, default=None, help="Path to pipeline-config.json")
-    prod.add_argument("--cost-only", action="store_true", help="Show cost estimate without generating")
+    prod.add_argument(
+        "--cost-only", action="store_true", help="Show cost estimate without generating"
+    )
 
     # -- produce-async (staged production pipeline) --
-    pa = sub.add_parser("produce-async", help="Staged async production — vision → generate → QA → refine")
+    pa = sub.add_parser(
+        "produce-async", help="Staged async production — vision → generate → QA → refine"
+    )
     pa.add_argument("--sku", type=str, default=None, help="Single SKU to process")
     pa.add_argument("--views", type=str, default="front,back", help="Comma-separated views")
     pa.add_argument("--concurrency", type=int, default=3, help="Max concurrent API calls per stage")
@@ -421,6 +430,7 @@ def main():
         cmd_generate(args)
     elif args.command == "generate-async":
         import asyncio
+
         asyncio.run(cmd_generate_async(args))
     elif args.command == "composite":
         cmd_composite(args)
@@ -430,6 +440,7 @@ def main():
         cmd_produce(args)
     elif args.command == "produce-async":
         import asyncio
+
         asyncio.run(cmd_produce_async(args))
 
 
@@ -440,7 +451,6 @@ async def cmd_generate_async(args):
     from nano_banana.catalog import (
         PRODUCTS_DIR,
         find_back_source,
-        find_source_image,
         get_material_spec,
         load_catalog,
         load_products,
@@ -539,9 +549,7 @@ async def cmd_generate_async(args):
             tasks.append(generate_one(product, view))
 
     total = len(tasks)
-    log.info(
-        "ASYNC: %d tasks, %d concurrent, model=%s", total, concurrency, model
-    )
+    log.info("ASYNC: %d tasks, %d concurrent, model=%s", total, concurrency, model)
 
     await asyncio.gather(*tasks)
 
@@ -577,8 +585,13 @@ async def cmd_produce_async(args):
     batch_timeout = 300 if args.sku else 1800
 
     log.info("=== STAGED ASYNC PRODUCTION ===")
-    log.info("Products: %d | Views: %s | Concurrency: %d | Timeout: %ds",
-             len(products), views, args.concurrency, batch_timeout)
+    log.info(
+        "Products: %d | Views: %s | Concurrency: %d | Timeout: %ds",
+        len(products),
+        views,
+        args.concurrency,
+        batch_timeout,
+    )
 
     try:
         jobs = await _asyncio.wait_for(
@@ -591,8 +604,10 @@ async def cmd_produce_async(args):
             ),
             timeout=batch_timeout,
         )
-    except _asyncio.TimeoutError:
-        log.error("BATCH TIMEOUT after %ds — partial results may exist in output dir", batch_timeout)
+    except TimeoutError:
+        log.error(
+            "BATCH TIMEOUT after %ds — partial results may exist in output dir", batch_timeout
+        )
         return
 
     # Final status
@@ -636,8 +651,12 @@ def cmd_produce(args):
         return
 
     log.info("\n--- Starting Production Pipeline (v4) ---")
-    log.info("Products: %d | Views: %s | Config: %s",
-             len(products), views, "fast" if args.fast else "production")
+    log.info(
+        "Products: %d | Views: %s | Config: %s",
+        len(products),
+        views,
+        "fast" if args.fast else "production",
+    )
 
     # Initialize pipeline
     pipeline = ProductionPipeline.from_env()
@@ -654,9 +673,16 @@ def cmd_produce(args):
     log.info("\n--- FINAL SUMMARY ---")
     for r in results:
         status = "PASS" if r.qa_passed else "REVIEW" if r.output_path else "FAIL"
-        log.info("  %s %-20s %-8s engine=%-12s score=%.1f $%.3f %s",
-                 status, r.sku, r.view, r.engine_used, r.qa_score, r.cost_usd,
-                 "[refined]" if r.refinement_applied else "")
+        log.info(
+            "  %s %-20s %-8s engine=%-12s score=%.1f $%.3f %s",
+            status,
+            r.sku,
+            r.view,
+            r.engine_used,
+            r.qa_score,
+            r.cost_usd,
+            "[refined]" if r.refinement_applied else "",
+        )
 
 
 if __name__ == "__main__":

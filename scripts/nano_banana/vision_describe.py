@@ -170,6 +170,7 @@ def _mime_type(path: Path) -> str:
 
 # -- Prompt builders from vision description ----------------------------------
 
+
 def build_render_prompt(desc: dict, product: dict, view: str = "front") -> str:
     """Build a strict specification prompt from vision analysis.
 
@@ -185,6 +186,7 @@ def build_render_prompt(desc: dict, product: dict, view: str = "front") -> str:
 
     if not desc:
         from nano_banana.prompts import get_prompt
+
         return get_prompt(product, view)
 
     garment = desc.get("garment_type", "garment")
@@ -216,7 +218,7 @@ def build_render_prompt(desc: dict, product: dict, view: str = "front") -> str:
         style = g.get("style", "")
         colors = g.get("colors", [])
 
-        line = f"  GRAPHIC #{gfx_count}: \"{content}\""
+        line = f'  GRAPHIC #{gfx_count}: "{content}"'
         line += f"\n    POSITION: {location} — THIS IS EXACT, do not move it"
         if size:
             line += f"\n    SIZE: {size} — THIS IS EXACT, do not resize"
@@ -294,9 +296,7 @@ View: {view_label} — garment {view_dir}
     return prompt
 
 
-def _build_editorial_prompt(
-    desc: dict, product: dict, lighting: dict, treatment_spec: str
-) -> str:
+def _build_editorial_prompt(desc: dict, product: dict, lighting: dict, treatment_spec: str) -> str:
     """Build an editorial/lifestyle prompt grounded in vision analysis."""
     from nano_banana.prompts import ANTI_HALLUCINATION, BRANDING_TEMPLATES
 
@@ -318,9 +318,7 @@ def _build_editorial_prompt(
 
     # Enrich with vision data
     vision_enrichment = (
-        f"\n\nVISION-VERIFIED DETAILS:\n"
-        f"- Garment: {garment_label}\n"
-        f"- Fabric: {fabric}\n"
+        f"\n\nVISION-VERIFIED DETAILS:\n" f"- Garment: {garment_label}\n" f"- Fabric: {fabric}\n"
     )
     if unique:
         vision_enrichment += f"- Unique features: {unique}\n"
@@ -331,6 +329,7 @@ def _build_editorial_prompt(
 
 
 # -- Batch describe -----------------------------------------------------------
+
 
 def describe_all_products(
     client,

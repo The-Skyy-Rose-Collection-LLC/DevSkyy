@@ -70,6 +70,7 @@ COLLECTION_LIGHTING = {
 
 # -- View prompts -------------------------------------------------------------
 
+
 def front_prompt(product: dict) -> str:
     """Build a front-view product shot prompt with collection-specific styling."""
     name = product["name"]
@@ -111,11 +112,10 @@ def back_prompt(product: dict) -> str:
 
     branding_note = ""
     if treatment and "back" in treatment.lower():
-        back_detail = treatment.split("back:")[-1].strip() if "back:" in treatment.lower() else treatment
-        branding_note = (
-            f"\n\nBACK BRANDING: {back_detail}. "
-            "Reproduce the back branding EXACTLY."
+        back_detail = (
+            treatment.split("back:")[-1].strip() if "back:" in treatment.lower() else treatment
         )
+        branding_note = f"\n\nBACK BRANDING: {back_detail}. " "Reproduce the back branding EXACTLY."
 
     return (
         f"Generate a photorealistic luxury e-commerce product render of this {name} — BACK VIEW ONLY.\n"
@@ -233,6 +233,7 @@ ACCESSORY_BRANDING_TEMPLATES = {
 
 # -- Composite prompts --------------------------------------------------------
 
+
 def composite_prompt(name: str, sku: str, view: str = "front") -> str:
     """Build a prompt for compositing real branding onto an AI lifestyle shot."""
     treatment = LOGO_TREATMENTS.get(sku, "")
@@ -251,10 +252,13 @@ def composite_prompt(name: str, sku: str, view: str = "front") -> str:
 
 # -- FLUX prompts (text-to-image, no reference) -------------------------------
 
+
 def flux_prompt(name: str, view: str, source_desc: str = "") -> str:
     """Build a FLUX prompt for converting tech flats to photorealistic shots."""
     view_label = {
-        "front": "FRONT VIEW", "back": "BACK VIEW", "branding": "cinematic editorial shot",
+        "front": "FRONT VIEW",
+        "back": "BACK VIEW",
+        "branding": "cinematic editorial shot",
     }.get(view, "FRONT VIEW")
 
     base = f"Professional luxury product photography of a {name} on invisible ghost mannequin, {view_label}. "
@@ -278,6 +282,7 @@ def flux_prompt(name: str, view: str, source_desc: str = "") -> str:
 
 
 # -- Prompt router ------------------------------------------------------------
+
 
 def get_prompt(product: dict, view: str) -> str:
     """Select the right prompt for a product + view combination."""
@@ -310,6 +315,7 @@ def get_prompt(product: dict, view: str) -> str:
 # Loaded from data/product-specs.json — the SINGLE SOURCE OF TRUTH.
 # Do NOT hardcode branding here. Edit product-specs.json instead.
 
+
 def _load_logo_treatments() -> dict[str, str]:
     """Load branding specs from the canonical product-specs.json."""
     specs_path = PROJECT_ROOT / "data" / "product-specs.json"
@@ -317,6 +323,7 @@ def _load_logo_treatments() -> dict[str, str]:
         log.warning("product-specs.json not found at %s", specs_path)
         return {}
     import json
+
     data = json.loads(specs_path.read_text())
     return {
         sku: entry.get("branding", "")

@@ -6,6 +6,7 @@ including reference-guided editing via Kontext.
 Requires: pip install fal-client
 API key: FAL_KEY environment variable (auto-detected by fal_client)
 """
+
 from __future__ import annotations
 
 import base64
@@ -24,6 +25,7 @@ def _fal_available() -> bool:
     try:
         import fal_client  # noqa: F401
         import os
+
         return bool(os.getenv("FAL_KEY", "").strip())
     except ImportError:
         return False
@@ -83,7 +85,11 @@ def generate_flux_fal(
         img_bytes = source_path.read_bytes()
         b64 = base64.b64encode(img_bytes).decode("utf-8")
         ext = source_path.suffix.lower()
-        mime = "image/jpeg" if ext in (".jpg", ".jpeg") else "image/png" if ext == ".png" else "image/webp"
+        mime = (
+            "image/jpeg"
+            if ext in (".jpg", ".jpeg")
+            else "image/png" if ext == ".png" else "image/webp"
+        )
         arguments["image_url"] = f"data:{mime};base64,{b64}"
 
     try:
@@ -142,7 +148,9 @@ def refine_with_kontext(
     img_bytes = source_path.read_bytes()
     b64 = base64.b64encode(img_bytes).decode("utf-8")
     ext = source_path.suffix.lower()
-    mime = "image/jpeg" if ext in (".jpg", ".jpeg") else "image/png" if ext == ".png" else "image/webp"
+    mime = (
+        "image/jpeg" if ext in (".jpg", ".jpeg") else "image/png" if ext == ".png" else "image/webp"
+    )
 
     try:
         log.info("Refining via FLUX Kontext Pro...")

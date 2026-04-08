@@ -46,7 +46,7 @@ async def safe_thread(fn, *args, timeout: float = 120, label: str = "task"):
             asyncio.to_thread(fn, *args),
             timeout=timeout,
         )
-    except asyncio.TimeoutError:
+    except TimeoutError:
         log.error("TIMEOUT (%ds) on %s — thread orphaned, job skipped", timeout, label)
         return None
     except asyncio.CancelledError:
@@ -125,6 +125,7 @@ async def run_production(
     if anthropic_key:
         try:
             import anthropic
+
             anthropic_client = anthropic.Anthropic(api_key=anthropic_key)
         except Exception as exc:
             log.warning("Anthropic client failed: %s — Claude judge unavailable", exc)
@@ -167,16 +168,18 @@ async def run_production(
                     except Exception as exc:
                         log.warning("find_back_source failed for %s: %s", sku, exc)
 
-                jobs.append(ImageJob(
-                    sku=sku,
-                    name=name,
-                    collection=collection,
-                    view=view,
-                    source_path=Path(str(view_src)),
-                    output_slug=product.get("output_slug", sku),
-                    is_accessory=product.get("is_accessory", False),
-                    product=product,
-                ))
+                jobs.append(
+                    ImageJob(
+                        sku=sku,
+                        name=name,
+                        collection=collection,
+                        view=view,
+                        source_path=Path(str(view_src)),
+                        output_slug=product.get("output_slug", sku),
+                        is_accessory=product.get("is_accessory", False),
+                        product=product,
+                    )
+                )
             except Exception as exc:
                 log.error("Job creation failed for %s %s: %s", sku, view, exc)
 
@@ -184,7 +187,9 @@ async def run_production(
         log.warning("Skipped %d products (no source image or missing SKU)", skipped)
 
     total = len(jobs)
-    log.info("PRODUCTION: %d images to generate (%d products × %s views)", total, len(products), views)
+    log.info(
+        "PRODUCTION: %d images to generate (%d products × %s views)", total, len(products), views
+    )
 
     # ── Stage 1: Vision analysis ─────────────────────────────────────
     log.info("\n=== STAGE 1: VISION ANALYSIS ===")
@@ -212,8 +217,12 @@ async def run_production(
             try:
                 # describe_product is sync — run in thread pool
                 desc = await safe_thread(
-                    describe_product, client, job.source_path, job.product,
-                    timeout=VISION_TIMEOUT, label=f"vision-{job.sku}",
+                    describe_product,
+                    client,
+                    job.source_path,
+                    job.product,
+                    timeout=VISION_TIMEOUT,
+                    label=f"vision-{job.sku}",
                 )
                 if desc:
                     job.vision = desc
@@ -256,7 +265,9 @@ async def run_production(
             else:
                 job.route_engine = "gemini-pro"
         except Exception as exc:
-            log.warning("Route failed for %s %s: %s — defaulting to gemini-pro", job.sku, job.view, exc)
+            log.warning(
+                "Route failed for %s %s: %s — defaulting to gemini-pro", job.sku, job.view, exc
+            )
             job.route_engine = "gemini-pro"
 
         try:
@@ -313,8 +324,14 @@ async def run_production(
                         ),
                         timeout=GENERATE_TIMEOUT,
                     )
-                except asyncio.TimeoutError:
-                    log.error("[%s %s] attempt %d TIMEOUT (%ds)", job.sku, job.view, attempt, GENERATE_TIMEOUT)
+                except TimeoutError:
+                    log.error(
+                        "[%s %s] attempt %d TIMEOUT (%ds)",
+                        job.sku,
+                        job.view,
+                        attempt,
+                        GENERATE_TIMEOUT,
+                    )
                     img_bytes = None
                 except asyncio.CancelledError:
                     log.warning("[%s %s] attempt %d CANCELLED", job.sku, job.view, attempt)
@@ -330,8 +347,14 @@ async def run_production(
                             job.output_path = out_path
                             job.status = "generated"
                             gen_count += 1
-                            log.info("[%d/%d] PASS %s %s (%.1fKB)",
-                                     gen_count, total, job.sku, job.view, len(img_bytes) / 1024)
+                            log.info(
+                                "[%d/%d] PASS %s %s (%.1fKB)",
+                                gen_count,
+                                total,
+                                job.sku,
+                                job.view,
+                                len(img_bytes) / 1024,
+                            )
                             return
                     except Exception as exc:
                         log.error("[%s %s] save/quality_gate error: %s", job.sku, job.view, exc)
@@ -389,16 +412,25 @@ async def run_production(
         async with qa_sem:
             result = await safe_thread(
                 run_tournament,
-                tournament_clients, qa_source, job.output_path, job.vision, 80.0,
-                timeout=QA_TIMEOUT, label=f"qa-{job.sku}-{job.view}",
+                tournament_clients,
+                qa_source,
+                job.output_path,
+                job.vision,
+                80.0,
+                timeout=QA_TIMEOUT,
+                label=f"qa-{job.sku}-{job.view}",
             )
             if result is not None:
                 job.qa_score = result.aggregate_score
                 job.qa_passed = result.passed_98
                 job.qa_issues = result.top_issues
-                log.info("QA %s %s: %.1f — %s",
-                         job.sku, job.view, job.qa_score,
-                         "PASS" if job.qa_passed else "REVIEW")
+                log.info(
+                    "QA %s %s: %.1f — %s",
+                    job.sku,
+                    job.view,
+                    job.qa_score,
+                    "PASS" if job.qa_passed else "REVIEW",
+                )
             else:
                 log.error("QA returned None for %s %s (timeout or thread death)", job.sku, job.view)
                 job.qa_score = 0.0
@@ -413,7 +445,9 @@ async def run_production(
     passed = [j for j in generated if j.qa_passed]
     needs_review = [j for j in generated if not j.qa_passed and j.qa_score >= 50]
     auto_reject = [j for j in generated if not j.qa_passed and j.qa_score < 50]
-    log.info("QA: %d passed, %d review, %d rejected", len(passed), len(needs_review), len(auto_reject))
+    log.info(
+        "QA: %d passed, %d review, %d rejected", len(passed), len(needs_review), len(auto_reject)
+    )
 
     # ── Stage 5: Refine (only jobs scoring 30-79) ────────────────────
     to_refine = [j for j in generated if not j.qa_passed and j.qa_score >= 30]
@@ -433,8 +467,13 @@ async def run_production(
                 try:
                     comp_prompt = composite_prompt(job.name, job.sku, job.view)
                     refined = await safe_thread(
-                        composite_gemini, client, job.output_path, job.source_path, comp_prompt,
-                        timeout=REFINE_TIMEOUT, label=f"refine-{job.sku}-{job.view}",
+                        composite_gemini,
+                        client,
+                        job.output_path,
+                        job.source_path,
+                        comp_prompt,
+                        timeout=REFINE_TIMEOUT,
+                        label=f"refine-{job.sku}-{job.view}",
                     )
                     if refined and quality_gate(refined, job.sku, f"{job.view}-refined"):
                         save_image(refined, job.output_path)
@@ -458,8 +497,12 @@ async def run_production(
 def _save_report(jobs: list[ImageJob], total: int) -> None:
     """Save production report to disk."""
     final_pass = sum(1 for j in jobs if j.qa_passed)
-    final_review = sum(1 for j in jobs if j.status == "qa_done" and not j.qa_passed and j.qa_score >= 50)
-    final_fail = sum(1 for j in jobs if j.status == "failed" or (j.status == "qa_done" and j.qa_score < 50))
+    final_review = sum(
+        1 for j in jobs if j.status == "qa_done" and not j.qa_passed and j.qa_score >= 50
+    )
+    final_fail = sum(
+        1 for j in jobs if j.status == "failed" or (j.status == "qa_done" and j.qa_score < 50)
+    )
     refined_count = sum(1 for j in jobs if j.refined)
 
     log.info("\n" + "=" * 60)

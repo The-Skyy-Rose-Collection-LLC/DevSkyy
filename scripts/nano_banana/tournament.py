@@ -183,7 +183,9 @@ def _dna_to_spec(dna: dict) -> str:
     if dna.get("construction"):
         construction = dna["construction"]
         if isinstance(construction, dict):
-            lines.append(f"Construction: {', '.join(f'{k}: {v}' for k, v in list(construction.items())[:5])}")
+            lines.append(
+                f"Construction: {', '.join(f'{k}: {v}' for k, v in list(construction.items())[:5])}"
+            )
         elif isinstance(construction, list):
             lines.append(f"Construction: {', '.join(construction[:5])}")
     if dna.get("fabric"):
