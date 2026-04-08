@@ -10,6 +10,22 @@ You are the DevSkyy engineering agent. 100% quality, no stubs, no partial delive
 
 ---
 
+## Harness Architecture
+
+Each component owns exactly ONE concern. If a clause appears in two places, one must be deleted.
+
+| Component | Location | Source of Truth For |
+|-----------|----------|---------------------|
+| **CLAUDE.md** | This file | Project identity, architecture, workspaces, brand, deploy, learnings |
+| **Rules** | `.claude/rules/` | Constraints and boundaries (coding, testing, security, git, WordPress, workflow) |
+| **Hooks** | `.claude/hooks/` | Automated lifecycle behaviors (format, lint, deploy verify, memory) |
+| **Agents** | `.claude/agents/` | Specialized roles — WHO does the work |
+| **Commands** | `.claude/commands/` | User-invocable workflows — WHAT verbs to run |
+| **Skills** | `.claude/skills/` | Reusable domain knowledge — expertise modules |
+| **Contexts** | `.claude/contexts/` | Behavioral modes — HOW to operate |
+
+---
+
 ## Commands by Workspace
 
 ### Python API (root)
@@ -118,40 +134,7 @@ wordpress-theme/skyyrose-flagship/
 - `inc/security.php` — CSP headers, rate limiting, ABSPATH guards
 - `functions.php` — Theme constants, includes array (v5.2.0)
 
-### WordPress Rules
-- Extend via hooks (actions/filters), never modify core
-- API: `index.php?rest_route=` NOT `/wp-json/`
-- Escape output: `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses_post()`
-- Sanitize input: `sanitize_text_field()`, `absint()`
-- Always `$wpdb->prepare()` — never concatenate untrusted input
-- Nonce + capability checks on all write actions
-- No `innerHTML` in JS — use `createElement` + `textContent`
-
----
-
-## Development Protocol
-
-1. **Context7** → `resolve-library-id` → `query-docs` BEFORE any library code
-2. Read existing code first, then `Edit` (targeted) or `Write` (new files only)
-3. TDD: RED → GREEN → IMPROVE
-4. `pytest -v` after EVERY change — target 85%+ coverage
-5. Format: `isort . && ruff check --fix && black .`
-6. After corrections → add Learnings entry, commit fix + learning together
-
----
-
-## Critical Rules
-
-- Files <800 lines, functions <50 lines
-- Immutability: `{...obj, key}` not `obj.key = val`
-- No hardcoded secrets — use env vars (`.env`, `.env.wordpress`, `.env.secrets`)
-- Generic errors to clients, detailed logs server-side only
-- Validate: Zod (frontend) / Pydantic (backend) at system boundaries
-- Git: `<type>: <description>` (feat, fix, refactor, docs, test, chore)
-- Python line length: 100 (black + ruff + isort)
-- Use npm not pnpm for Vercel deploys (ERR_INVALID_THIS on Node 22+)
-- Fix everything in one batch, test all pages, deploy ONCE (no back-and-forth)
-- When cleaning up: update EVERY file that references deleted code
+> WordPress coding rules → See `.claude/rules/wordpress.md`
 
 ---
 
@@ -234,59 +217,6 @@ wordpress-theme/skyyrose-flagship/
 
 ### Vercel
 - `rootDirectory` set → reads that dir's `vercel.json`, not root
-
----
-
-## Workflow Orchestration
-
-### 1. Plan Mode Default
-- Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions)
-- If something goes sideways, STOP and re-plan immediately — don't keep pushing
-- Use plan mode for verification steps, not just building
-- Write detailed specs upfront to reduce ambiguity
-
-### 2. Subagent Strategy
-- Use subagents liberally to keep main context window clean
-- Offload research, exploration, and parallel analysis to subagents
-- For complex problems, throw more compute at it via subagents
-- One task per subagent for focused execution
-
-### 3. Self-Improvement Loop
-- After ANY correction from the user: update `tasks/lessons.md` with the pattern
-- Write rules for yourself that prevent the same mistake
-- Ruthlessly iterate on these lessons until mistake rate drops
-- Review lessons at session start for relevant project
-
-### 4. Verification Before Done
-- Never mark a task complete without proving it works
-- Diff behavior between main and your changes when relevant
-- Ask yourself: "Would a staff engineer approve this?"
-- Run tests, check logs, demonstrate correctness
-
-### 5. Demand Elegance (Balanced)
-- For non-trivial changes: pause and ask "is there a more elegant way?"
-- If a fix feels hacky: "Knowing everything I know now, implement the elegant solution"
-- Skip this for simple, obvious fixes — don't over-engineer
-- Challenge your own work before presenting it
-
-### 6. Autonomous Bug Fixing
-- When given a bug report: just fix it. Don't ask for hand-holding
-- Point at logs, errors, failing tests — then resolve them
-- Zero context switching required from the user
-- Go fix failing CI tests without being told how
-
-## Task Management
-1. **Plan First**: Write plan to `tasks/todo.md` with checkable items
-2. **Verify Plan**: Check in before starting implementation
-3. **Track Progress**: Mark items complete as you go
-4. **Explain Changes**: High-level summary at each step
-5. **Document Results**: Add review section to `tasks/todo.md`
-6. **Capture Lessons**: Update `tasks/lessons.md` after corrections
-
-## Core Principles
-- **Simplicity First**: Make every change as simple as possible. Impact minimal code.
-- **No Laziness**: Find root causes. No temporary fixes. Senior developer standards.
-- **Minimal Impact**: Changes should only touch what's necessary. Avoid introducing bugs.
 
 ---
 
