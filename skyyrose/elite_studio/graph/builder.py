@@ -3,6 +3,13 @@ Graph builder — assembles the Elite Studio StateGraph.
 
 Call ``build_graph()`` once to get a compiled, reusable graph. The
 returned object is thread-safe and can be invoked concurrently.
+
+Layer 2 optional stages (all disabled by default unless noted):
+  - prompt_enrichment  (on by default — pure rule-based, no cost)
+  - safety             (on by default — blocks flagged content)
+  - upscaling          (off — costs $ via Replicate)
+  - color_correction   (off)
+  - variants           (off)
 """
 
 from __future__ import annotations
@@ -13,19 +20,30 @@ from langgraph.graph import END, StateGraph
 
 from .edges import (
     COMPOSITOR,
+    COLOR_CORRECTION,
     FINALIZE,
     GENERATOR,
+    PROMPT_ENRICHMENT,
     QUALITY,
+    SAFETY,
+    UPSCALING,
+    VARIANTS,
     after_compositor,
     after_generation,
     after_quality,
+    after_safety,
     after_vision,
 )
 from .nodes import (
+    color_correction_node,
     compositor_node,
     finalize_node,
     generator_node,
+    prompt_enrichment_node,
     quality_node,
+    safety_node,
+    upscaling_node,
+    variant_node,
     vision_node,
 )
 from .state import EliteStudioState
@@ -36,6 +54,11 @@ _GENERATOR = GENERATOR
 _QUALITY = QUALITY
 _COMPOSITOR = COMPOSITOR
 _FINALIZE = FINALIZE
+_PROMPT_ENRICHMENT = PROMPT_ENRICHMENT
+_SAFETY = SAFETY
+_UPSCALING = UPSCALING
+_COLOR_CORRECTION = COLOR_CORRECTION
+_VARIANTS = VARIANTS
 
 
 @dataclass(frozen=True)
@@ -44,11 +67,34 @@ class GraphConfig:
 
     All fields have sensible defaults so callers only need to specify
     what differs from the standard pipeline.
+
+    Layer 2 flags:
+        enable_prompt_enrichment: Insert rule-based enrichment between vision
+            and generator. On by default (free, no external calls).
+        enable_safety: Insert safety check between generator and quality.
+            On by default (blocks inappropriate content before QC cost).
+        enable_upscaling: Insert Real-ESRGAN upscaling after quality gate.
+            Off by default (costs Replicate credits).
+        enable_color_correction: Insert PIL color correction after upscaling.
+            Off by default.
+        enable_variants: Generate alternate angle/colorway variants after QC.
+            Off by default.
+        variant_specs: List of variant names to generate when enable_variants
+            is True (e.g., ['back_view', 'side_view']).
     """
 
     max_retries: int = 2
     enable_compositor: bool = False
-    # Future layers will add: enable_upscaling, enable_safety, etc.
+
+    # Layer 2 optional stages
+    enable_prompt_enrichment: bool = True    # on by default (pure enrichment, no cost)
+    enable_safety: bool = True               # on by default
+    enable_upscaling: bool = False           # off by default (costs $)
+    enable_color_correction: bool = False    # off by default
+    enable_variants: bool = False            # off by default
+    variant_specs: list[str] = field(default_factory=list)
+
+    # Extension hook (reserved for future layers)
     extra_nodes: list[str] = field(default_factory=list)
 
 
@@ -57,6 +103,21 @@ def build_graph(config: GraphConfig | None = None) -> object:
 
     Returns a ``CompiledGraph`` that can be invoked with
     ``graph.invoke(state_dict)``.
+
+    Topology (Layer 1 + Layer 2 optional nodes):
+
+        vision
+          → [prompt_enrichment?]
+          → generator
+          → [safety?]          # routes to END if flagged
+          → quality
+          → [retry?]           → generator
+          → [upscaling?]
+          → [color_correction?]
+          → [variants?]        # parallel branch, joins at finalize
+          → [compositor?]
+          → finalize
+          → END
 
     Args:
         config: Optional graph configuration. Uses defaults if None.
@@ -69,39 +130,118 @@ def build_graph(config: GraphConfig | None = None) -> object:
 
     graph = StateGraph(EliteStudioState)
 
-    # --- Register nodes ---
+    # --- Register core nodes (always present) ---
     graph.add_node(_VISION, vision_node)
     graph.add_node(_GENERATOR, generator_node)
     graph.add_node(_QUALITY, quality_node)
     graph.add_node(_COMPOSITOR, compositor_node)
     graph.add_node(_FINALIZE, finalize_node)
 
+    # --- Register optional Layer 2 nodes ---
+    if config.enable_prompt_enrichment:
+        graph.add_node(_PROMPT_ENRICHMENT, prompt_enrichment_node)
+
+    if config.enable_safety:
+        graph.add_node(_SAFETY, safety_node)
+
+    if config.enable_upscaling:
+        graph.add_node(_UPSCALING, upscaling_node)
+
+    if config.enable_color_correction:
+        graph.add_node(_COLOR_CORRECTION, color_correction_node)
+
+    if config.enable_variants:
+        graph.add_node(_VARIANTS, variant_node)
+
     # --- Entry point ---
     graph.set_entry_point(_VISION)
 
-    # --- Conditional edges ---
-    graph.add_conditional_edges(
-        _VISION,
-        after_vision,
-        {_GENERATOR: _GENERATOR, END: END},
-    )
-    graph.add_conditional_edges(
-        _GENERATOR,
-        after_generation,
-        {_QUALITY: _QUALITY, END: END},
-    )
+    # --- vision → [prompt_enrichment?] → generator ---
+    if config.enable_prompt_enrichment:
+        graph.add_conditional_edges(
+            _VISION,
+            after_vision,
+            {_GENERATOR: _PROMPT_ENRICHMENT, END: END},
+        )
+        graph.add_edge(_PROMPT_ENRICHMENT, _GENERATOR)
+    else:
+        graph.add_conditional_edges(
+            _VISION,
+            after_vision,
+            {_GENERATOR: _GENERATOR, END: END},
+        )
+
+    # --- generator → [safety?] → quality ---
+    if config.enable_safety:
+        graph.add_conditional_edges(
+            _GENERATOR,
+            after_generation,
+            {_QUALITY: _SAFETY, END: END},
+        )
+        graph.add_conditional_edges(
+            _SAFETY,
+            after_safety,
+            {_QUALITY: _QUALITY, "error_end": END},
+        )
+    else:
+        graph.add_conditional_edges(
+            _GENERATOR,
+            after_generation,
+            {_QUALITY: _QUALITY, END: END},
+        )
+
+    # --- quality → [retry?] → generator OR post-processing chain ---
+    # Determine what quality routes to on "proceed"
+    _post_quality = _build_post_quality_target(config)
+
     graph.add_conditional_edges(
         _QUALITY,
         after_quality,
-        {_GENERATOR: _GENERATOR, _COMPOSITOR: _COMPOSITOR, _FINALIZE: _FINALIZE},
+        {_GENERATOR: _GENERATOR, _COMPOSITOR: _post_quality, _FINALIZE: _post_quality},
     )
-    graph.add_conditional_edges(
-        _COMPOSITOR,
-        after_compositor,
-        {_FINALIZE: _FINALIZE},
-    )
+
+    # --- Post-quality chain: upscaling → color_correction → variants → compositor → finalize ---
+    _wire_post_quality_chain(graph, config)
 
     # --- Terminal edge ---
     graph.add_edge(_FINALIZE, END)
 
     return graph.compile()
+
+
+def _build_post_quality_target(config: GraphConfig) -> str:
+    """Return the first node in the post-quality processing chain."""
+    if config.enable_upscaling:
+        return _UPSCALING
+    if config.enable_color_correction:
+        return _COLOR_CORRECTION
+    if config.enable_variants:
+        return _VARIANTS
+    if config.enable_compositor:
+        return _COMPOSITOR
+    return _FINALIZE
+
+
+def _wire_post_quality_chain(graph: StateGraph, config: GraphConfig) -> None:  # type: ignore[type-arg]
+    """Wire the optional post-quality nodes in sequence."""
+    # Build the ordered chain of optional post-quality nodes
+    chain: list[str] = []
+    if config.enable_upscaling:
+        chain.append(_UPSCALING)
+    if config.enable_color_correction:
+        chain.append(_COLOR_CORRECTION)
+    if config.enable_variants:
+        chain.append(_VARIANTS)
+    if config.enable_compositor:
+        chain.append(_COMPOSITOR)
+
+    if not chain:
+        # No optional nodes — quality already routes to FINALIZE directly
+        return
+
+    # Wire sequential edges between optional nodes
+    for i in range(len(chain) - 1):
+        graph.add_edge(chain[i], chain[i + 1])
+
+    # Last optional node → finalize
+    graph.add_edge(chain[-1], _FINALIZE)

@@ -11,10 +11,15 @@ import uuid
 from typing import Any, TypedDict
 
 from ..models import (
+    ColorCorrectionResult,
     CompositorResult,
+    EnrichedPrompt,
     GenerationResult,
     QualityVerification,
+    SafetyResult,
     SynthesizedVision,
+    UpscaleResult,
+    VariantResult,
 )
 
 
@@ -35,6 +40,13 @@ class EliteStudioState(TypedDict, total=False):
     generation_result: GenerationResult | None
     quality_result: QualityVerification | None
     compositor_result: CompositorResult | None
+
+    # --- Layer 2 stage results (optional — only set when enabled) ---
+    enriched_prompt: EnrichedPrompt | None
+    upscale_result: UpscaleResult | None
+    color_result: ColorCorrectionResult | None
+    safety_result: SafetyResult | None
+    variant_results: list[VariantResult] | None
 
     # --- Control flow ---
     retry_count: int

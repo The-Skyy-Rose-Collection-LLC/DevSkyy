@@ -119,3 +119,69 @@ class ProductionResult:
     compositing: CompositorResult | None = None
     error: str = ""
     step: str = ""  # which step failed (vision, generation, quality)
+
+
+# ---------------------------------------------------------------------------
+# Layer 2 models — optional pipeline stages
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class EnrichedPrompt:
+    """Result from rule-based prompt enrichment."""
+
+    success: bool
+    original_spec: str = ""
+    enriched_spec: str = ""
+    additions: tuple[str, ...] = ()
+    error: str = ""
+
+
+@dataclass(frozen=True)
+class UpscaleResult:
+    """Result from image upscaling."""
+
+    success: bool
+    output_path: str = ""
+    original_resolution: tuple[int, int] = (0, 0)
+    final_resolution: tuple[int, int] = (0, 0)
+    provider: str = ""  # "replicate" or "pil_lanczos"
+    error: str = ""
+
+
+@dataclass(frozen=True)
+class ColorCorrectionResult:
+    """Result from PIL-based color correction."""
+
+    success: bool
+    output_path: str = ""
+    adjustments_applied: tuple[str, ...] = ()
+    error: str = ""
+
+
+@dataclass(frozen=True)
+class SafetyResult:
+    """Result from content safety check."""
+
+    success: bool
+    flagged: bool = False
+    categories: tuple[str, ...] = ()
+    error: str = ""
+
+
+@dataclass(frozen=True)
+class VariantSpec:
+    """Specification for a single image variant."""
+
+    name: str
+    prompt_modifier: str
+
+
+@dataclass(frozen=True)
+class VariantResult:
+    """Result for a single generated variant."""
+
+    success: bool
+    variant_name: str = ""
+    output_path: str = ""
+    error: str = ""
