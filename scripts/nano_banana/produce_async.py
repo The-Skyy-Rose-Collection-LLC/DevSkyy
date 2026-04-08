@@ -34,18 +34,27 @@ QA_TIMEOUT = 90
 REFINE_TIMEOUT = 90
 
 
-async def safe_thread(fn, *args, timeout: float = 120, label: str = "task") -> any:
-    """Run sync function in thread with timeout. Returns result or raises."""
+async def safe_thread(fn, *args, timeout: float = 120, label: str = "task"):
+    """Run sync function in thread with timeout and proper error capture.
+
+    - TimeoutError: logs, returns None (thread may still be running but job moves on)
+    - Exception: logs full traceback, returns None
+    - Success: returns the function result
+    """
     try:
         return await asyncio.wait_for(
             asyncio.to_thread(fn, *args),
             timeout=timeout,
         )
     except asyncio.TimeoutError:
-        log.error("TIMEOUT (%ds) on %s", timeout, label)
-        raise
-    except Exception:
-        raise
+        log.error("TIMEOUT (%ds) on %s — thread orphaned, job skipped", timeout, label)
+        return None
+    except asyncio.CancelledError:
+        log.warning("CANCELLED %s", label)
+        return None
+    except Exception as exc:
+        log.error("THREAD DIED on %s: %s", label, exc, exc_info=True)
+        return None
 
 
 @dataclass
@@ -343,24 +352,23 @@ async def run_production(
             log.warning("Bundle lookup for QA source failed %s: %s", job.sku, exc)
 
         async with qa_sem:
-            try:
-                result = await safe_thread(
-                    run_tournament,
-                    tournament_clients, qa_source, job.output_path, job.vision, 80.0,
-                    timeout=QA_TIMEOUT, label=f"qa-{job.sku}-{job.view}",
-                )
+            result = await safe_thread(
+                run_tournament,
+                tournament_clients, qa_source, job.output_path, job.vision, 80.0,
+                timeout=QA_TIMEOUT, label=f"qa-{job.sku}-{job.view}",
+            )
+            if result is not None:
                 job.qa_score = result.aggregate_score
                 job.qa_passed = result.passed_98
                 job.qa_issues = result.top_issues
-                job.status = "qa_done"
                 log.info("QA %s %s: %.1f — %s",
                          job.sku, job.view, job.qa_score,
                          "PASS" if job.qa_passed else "REVIEW")
-            except Exception as exc:
-                log.error("QA failed %s %s: %s", job.sku, job.view, exc)
+            else:
+                log.error("QA returned None for %s %s (timeout or thread death)", job.sku, job.view)
                 job.qa_score = 0.0
-                job.status = "qa_done"
-                job.error = f"QA error: {exc}"
+                job.error = "QA timeout or thread death"
+            job.status = "qa_done"
 
     qa_results = await asyncio.gather(*(qa_one(j) for j in generated), return_exceptions=True)
     for i, r in enumerate(qa_results):
