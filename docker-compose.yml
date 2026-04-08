@@ -122,6 +122,49 @@ services:
       retries: 3
       start_period: 40s
 
+  # Elite Studio render worker — processes async SKU render jobs
+  elite-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: devskyy-elite-worker
+    command: python -m skyyrose.elite_studio worker
+    environment:
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-changeme}@redis:6379/0
+      - DATABASE_URL=postgresql://devskyy:${POSTGRES_PASSWORD:-changeme}@postgres:5432/devskyy
+      - ENVIRONMENT=production
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY}
+      - ELITE_WORKER_CONCURRENCY=${ELITE_WORKER_CONCURRENCY:-1}
+      - ELITE_COST_TRACKING=${ELITE_COST_TRACKING:-true}
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    volumes:
+      - app_data:/app/data
+      - app_logs:/app/logs
+    networks:
+      - devskyy-network
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
   # Celery monitoring (Flower)
   celery-flower:
     build: .
