@@ -20,7 +20,7 @@ from typing import Any
 import httpx
 from pydantic import BaseModel, Field, field_validator
 
-from errors.production_errors import ConfigurationError
+from core.errors.production_errors import ConfigurationError
 
 # Import config for API keys (loads .env.hf)
 try:

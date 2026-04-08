@@ -60,7 +60,7 @@ services/       → ML models, 3D generation, analytics
 agents/         → Specialized agents (base_super_agent.py = foundation)
 api/            → FastAPI REST (v1/) + GraphQL (graphql/)
 frontend/       → Next.js dashboard (devskyy-dashboard)
-wordpress-theme/skyyrose-flagship/  → Production WP theme (v5.2.0)
+wordpress-theme/skyyrose-flagship/  → Production WP theme (v6.4.0)
 scripts/        → Deploy, sync, generation scripts
 ```
 
@@ -83,7 +83,7 @@ scripts/        → Deploy, sync, generation scripts
 | **Python API** | Python 3.11+ | `/` | `make install` | `make dev` |
 | **Dashboard** | Node.js 22 | `frontend/` | `npm install` | `npm run dev` |
 | **WordPress** | PHP 8.2 | `wordpress-theme/` | N/A (deploy only) | `npm run deploy` |
-| **Imagery** | Python (isolated) | `.venv-imagery/` | `pip install rembg` | — |
+| **Imagery (Nano Banana 2)** | Python (isolated) | `.venv-imagery/` | `pip install -r requirements-imagery.txt` | `python scripts/nano-banana-run.py generate --sku br-001 --pro` — see `docs/NANO_BANANA.md` |
 | **ADK Agents** | Python (isolated) | `.venv-agents/` | `pip install google-adk` | — |
 
 **Each workspace is self-contained.** Don't mix `frontend/node_modules` with root. Don't use `.venv` for ADK (numpy conflicts).
@@ -108,6 +108,7 @@ wordpress-theme/skyyrose-flagship/
 **Active templates:**
 - `front-page.php` — Three.js portals (3 collection rings + particles)
 - `template-collection-{signature,black-rose,love-hurts,kids-capsule}.php` — Collection pages
+- `template-landing-{black-rose,love-hurts,signature}.php` — Conversion landing pages
 - `template-preorder-gateway.php` — Pre-order with collection selector
 - `template-immersive-{signature,black-rose,love-hurts}.php` — 3D experiences
 - `template-about.php` — Brand story + timeline
@@ -116,7 +117,7 @@ wordpress-theme/skyyrose-flagship/
 - `product-card-holo.css/js` — Holographic glass cards with magnetic tilt
 - `inc/enqueue.php` — All CSS/JS loading, template slug detection
 - `inc/security.php` — CSP headers, rate limiting, ABSPATH guards
-- `functions.php` — Theme constants, includes array (v5.2.0)
+- `functions.php` — Theme constants, includes array (v6.4.0)
 
 ### WordPress Rules
 - Extend via hooks (actions/filters), never modify core
@@ -217,6 +218,12 @@ wordpress-theme/skyyrose-flagship/
 - `front-page.php` uses its own inline footer (`.ft` class) + `wp_footer()` instead of `get_footer()` — shared template parts (mobile-nav, cookie-consent, size-guide, toast-container) must be manually included before `wp_footer()`
 - Jetpack Instant Search hijacks search results with a white overlay — our custom `search.php` only renders when Instant Search is disabled
 - Any new template part added to `footer.php` must ALSO be added to `front-page.php` before `wp_footer()`
+- Landing pages use `lp-*` classes with `[data-collection]` palette switching (same pattern as collection pages but `--lp-*` CSS vars)
+- Landing pages use `.lp-rv` scroll-reveal (IntersectionObserver) — NOT `.col-reveal` or GSAP
+- Landing page templates registered as slug `'landing'` in enqueue.php — loads `landing-pages.css` + `landing-pages.js` + holo cards
+- Hero overlays live in `assets/images/hero-overlays/` (deployed with theme) — source PNGs in `assets/techflats/hero-overlays/` (repo root)
+- Landing page template parts in `template-parts/landing/` accept `$args` arrays: hero.php, product-grid.php, faq.php
+- Product grid template part pulls from `product-catalog.php` by SKU array — if SKU not in catalog, card is silently skipped
 
 ### WordPress Deploy
 - Dirty working tree on main blocks `git merge` — always stash unrelated changes before merging worktree branches

@@ -1,0 +1,11 @@
+{
+  "sku": "lh-002",
+  "name": "Love Hurts Joggers",
+  "dirname": "Love Hurts Joggers",
+  "collection": "love-hurts",
+  "files": {
+    "techflat-front": "techflat-front.jpeg",
+    "logo-ref": "logo-ref.png",
+    "spec": "spec.txt"
+  }
+}

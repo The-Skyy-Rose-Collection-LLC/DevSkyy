@@ -1,0 +1,12 @@
+{
+  "sku": "br-006",
+  "name": "BLACK Rose Sherpa Jacket",
+  "dirname": "BLACK Rose Sherpa Jacket",
+  "collection": "black-rose",
+  "files": {
+    "techflat-front": "techflat-front.jpg",
+    "source-photo": "source-photo.jpg",
+    "logo-ref": "logo-ref.png",
+    "spec": "spec.txt"
+  }
+}

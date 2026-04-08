@@ -16,13 +16,11 @@ Author: DevSkyy Platform Team
 from __future__ import annotations
 
 import io
-from datetime import UTC, datetime
-from typing import Any
+from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
 import pytest
-
 from services.image_ingestion import (
     ALLOWED_MIME_TYPES,
     MAX_DIMENSION,
@@ -36,7 +34,6 @@ from services.image_ingestion import (
     IngestionStatus,
     get_ingestion_service,
 )
-
 
 # =============================================================================
 # Fixtures
@@ -350,9 +347,7 @@ class TestHTTPClient:
     """Test HTTP client management."""
 
     @pytest.mark.asyncio
-    async def test_get_http_client_creates_client(
-        self, service: ImageIngestionService
-    ) -> None:
+    async def test_get_http_client_creates_client(self, service: ImageIngestionService) -> None:
         """Should create HTTP client on first call."""
         assert service._http_client is None
         client = await service._get_http_client()
@@ -361,9 +356,7 @@ class TestHTTPClient:
         await service.close()
 
     @pytest.mark.asyncio
-    async def test_get_http_client_reuses_client(
-        self, service: ImageIngestionService
-    ) -> None:
+    async def test_get_http_client_reuses_client(self, service: ImageIngestionService) -> None:
         """Should reuse existing HTTP client."""
         client1 = await service._get_http_client()
         client2 = await service._get_http_client()
@@ -371,9 +364,7 @@ class TestHTTPClient:
         await service.close()
 
     @pytest.mark.asyncio
-    async def test_close_closes_client(
-        self, service: ImageIngestionService
-    ) -> None:
+    async def test_close_closes_client(self, service: ImageIngestionService) -> None:
         """Should close HTTP client."""
         await service._get_http_client()
         assert service._http_client is not None

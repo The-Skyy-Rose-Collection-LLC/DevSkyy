@@ -1,0 +1,13 @@
+{
+  "sku": "br-002",
+  "name": "BLACK Rose Joggers",
+  "dirname": "BLACK Rose Joggers",
+  "collection": "black-rose",
+  "files": {
+    "techflat-front": "techflat-front.jpeg",
+    "techflat-back": "techflat-back.jpeg",
+    "source-photo": "source-photo.jpg",
+    "logo-ref": "logo-ref.png",
+    "spec": "spec.txt"
+  }
+}

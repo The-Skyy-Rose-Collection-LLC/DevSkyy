@@ -28,7 +28,7 @@ import json
 import logging
 import os
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 import aiohttp
@@ -55,9 +55,11 @@ class WooCommerceMCPConfig:
 
     # WooCommerce store URL (falls back to WordPress URL)
     store_url: str = field(
-        default_factory=lambda: os.getenv("WOOCOMMERCE_URL", "")
-        or os.getenv("WORDPRESS_URL", "")
-        or os.getenv("WP_SITE_URL", "")
+        default_factory=lambda: (
+            os.getenv("WOOCOMMERCE_URL", "")
+            or os.getenv("WORDPRESS_URL", "")
+            or os.getenv("WP_SITE_URL", "")
+        )
     )
 
     # WC REST API credentials (supports both naming conventions)
@@ -65,8 +67,9 @@ class WooCommerceMCPConfig:
         default_factory=lambda: os.getenv("WOOCOMMERCE_KEY", "") or os.getenv("WC_CONSUMER_KEY", "")
     )
     consumer_secret: str = field(
-        default_factory=lambda: os.getenv("WOOCOMMERCE_SECRET", "")
-        or os.getenv("WC_CONSUMER_SECRET", "")
+        default_factory=lambda: (
+            os.getenv("WOOCOMMERCE_SECRET", "") or os.getenv("WC_CONSUMER_SECRET", "")
+        )
     )
 
     # MCP server settings
@@ -85,7 +88,7 @@ class WooCommerceMCPConfig:
 # =============================================================================
 
 
-class OrderStatus(str, Enum):
+class OrderStatus(StrEnum):
     """WooCommerce order statuses."""
 
     PENDING = "pending"
@@ -97,7 +100,7 @@ class OrderStatus(str, Enum):
     FAILED = "failed"
 
 
-class StockStatus(str, Enum):
+class StockStatus(StrEnum):
     """Product stock statuses."""
 
     IN_STOCK = "instock"
@@ -105,7 +108,7 @@ class StockStatus(str, Enum):
     ON_BACKORDER = "onbackorder"
 
 
-class ProductType(str, Enum):
+class ProductType(StrEnum):
     """WooCommerce product types."""
 
     SIMPLE = "simple"
@@ -1109,8 +1112,7 @@ async def wc_get_store_settings() -> str:
 # =============================================================================
 
 if __name__ == "__main__":
-    print(
-        """
+    print("""
 ╔══════════════════════════════════════════════════════════════════╗
 ║                                                                  ║
 ║   WooCommerce MCP Server v2.0.0                                 ║
@@ -1131,6 +1133,5 @@ if __name__ == "__main__":
    • wc_get_store_settings - Get store config
 
 Starting MCP server on stdio...
-"""
-    )
+""")
     mcp.run()

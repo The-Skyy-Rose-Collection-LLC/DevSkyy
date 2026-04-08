@@ -31,7 +31,7 @@ from typing import TYPE_CHECKING, Any, Protocol
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 
-from errors.production_errors import (
+from core.errors.production_errors import (
     DevSkyError,
     DevSkyErrorCode,
     DevSkyErrorSeverity,

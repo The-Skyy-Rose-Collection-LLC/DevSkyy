@@ -12,41 +12,8 @@
 
 get_header();
 
-// Collection data: slug, label, accent color, glow color, tagline, description.
-$skyyrose_collections = array(
-	array(
-		'slug'        => 'black-rose',
-		'label'       => __( 'Black Rose', 'skyyrose-flagship' ),
-		'accent'      => '#C0C0C0',
-		'glow'        => 'rgba(192, 192, 192, 0.3)',
-		'tagline'     => __( 'Gothic elegance, dark romance', 'skyyrose-flagship' ),
-		'description' => __( 'Monochromatic pieces that channel mystery and silver-toned refinement.', 'skyyrose-flagship' ),
-	),
-	array(
-		'slug'        => 'love-hurts',
-		'label'       => __( 'Love Hurts', 'skyyrose-flagship' ),
-		'accent'      => '#DC143C',
-		'glow'        => 'rgba(220, 20, 60, 0.3)',
-		'tagline'     => __( 'Dramatic, passionate, fearless', 'skyyrose-flagship' ),
-		'description' => __( 'Bold crimson statements for those who wear their heart on their sleeve.', 'skyyrose-flagship' ),
-	),
-	array(
-		'slug'        => 'signature',
-		'label'       => __( 'Signature', 'skyyrose-flagship' ),
-		'accent'      => '#D4AF37',
-		'glow'        => 'rgba(212, 175, 55, 0.3)',
-		'tagline'     => __( 'Elevated, confident, refined', 'skyyrose-flagship' ),
-		'description' => __( 'Gold luxe essentials for building the foundation wardrobe.', 'skyyrose-flagship' ),
-	),
-	array(
-		'slug'        => 'kids-capsule',
-		'label'       => __( 'Kids Capsule', 'skyyrose-flagship' ),
-		'accent'      => '#FFB6C1',
-		'glow'        => 'rgba(255, 182, 193, 0.3)',
-		'tagline'     => __( 'Joyful luxury, playful sophistication', 'skyyrose-flagship' ),
-		'description' => __( 'Mini versions of our signature pieces for the youngest trendsetters.', 'skyyrose-flagship' ),
-	),
-);
+// Collection data sourced from inc/collections-config.php (single source of truth).
+$skyyrose_collections = array_values( skyyrose_get_collections_config() );
 
 // Quick navigation links: label, url path, SVG icon.
 $skyyrose_quick_links = array(
@@ -118,7 +85,7 @@ if ( class_exists( 'WooCommerce' ) ) {
 // Static fallback when WooCommerce is inactive or no products found.
 // Source from centralized catalog so prices stay in sync.
 if ( empty( $skyyrose_trending_products ) ) {
-	// Only published pre-order products — br-001, br-007, and lh-004 are drafts.
+	// Only published products — br-001, br-007, and lh-004 are drafts.
 	$skyyrose_404_skus = array( 'br-006', 'lh-002', 'sg-001', 'sg-008' );
 	foreach ( $skyyrose_404_skus as $skyyrose_404_sku ) {
 		$skyyrose_404_product = skyyrose_get_product( $skyyrose_404_sku );
@@ -238,7 +205,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 				/>
 			<?php else : ?>
 				<div class="error-404-mascot__placeholder" aria-hidden="true">
-					<svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#B76E79" stroke-width="1" stroke-linecap="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+					<svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="<?php echo esc_attr( SKYYROSE_COLOR_ROSE_GOLD ); ?>" stroke-width="1" stroke-linecap="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
 				</div>
 			<?php endif; ?>
 			<p class="error-404-mascot__speech">

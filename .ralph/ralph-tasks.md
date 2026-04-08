@@ -12,8 +12,8 @@
 
 ## EXISTING v2 COMPOSITES (SKIP THESE)
 - Black Rose: br-001, br-002, br-004, br-006 (4 done)
-- Love Hurts: lh-001, lh-003, lh-005 (3 done)
-- Signature: sg-005, sg-007, sg-011, sg-012 (4 done)
+- Love Hurts: lh-003 (1 done) — lh-001 and lh-005 DELETED
+- Signature: sg-005, sg-007, sg-011, sg-012 (4 done) — sg-008 DELETED
 
 ---
 

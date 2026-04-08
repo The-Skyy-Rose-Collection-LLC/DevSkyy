@@ -25,7 +25,7 @@ from agents.visual_generation.conversation_editor import (
     ConversationEditor,
     GeneratedImage,
 )
-from errors.production_errors import DevSkyError
+from core.errors.production_errors import DevSkyError
 
 # =============================================================================
 # Fixtures

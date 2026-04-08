@@ -28,7 +28,7 @@ from typing import Any
 
 import httpx
 
-from errors.production_errors import ConfigurationError, RateLimitError
+from core.errors.production_errors import ConfigurationError, RateLimitError
 
 logger = logging.getLogger(__name__)
 

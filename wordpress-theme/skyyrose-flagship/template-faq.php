@@ -167,4 +167,30 @@ get_header();
 	</div>
 </main>
 
+<?php
+// FAQPage Schema (JSON-LD) — enables rich snippets in Google search results.
+if ( ! defined( 'WPSEO_VERSION' ) ) {
+	$faq_schema = array(
+		'@context'   => 'https://schema.org',
+		'@type'      => 'FAQPage',
+		'mainEntity' => array(),
+	);
+
+	foreach ( $faq_categories as $category ) {
+		foreach ( $category['items'] as $item ) {
+			$faq_schema['mainEntity'][] = array(
+				'@type'          => 'Question',
+				'name'           => $item['q'],
+				'acceptedAnswer' => array(
+					'@type' => 'Answer',
+					'text'  => $item['a'],
+				),
+			);
+		}
+	}
+
+	echo '<script type="application/ld+json">' . wp_json_encode( $faq_schema, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+}
+?>
+
 <?php get_footer(); ?>

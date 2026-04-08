@@ -1,0 +1,12 @@
+{
+  "sku": "sg-001",
+  "name": "The Bridge Series 'The Bay Bridge' Shorts",
+  "dirname": "The Bridge Series The Bay Bridge Shorts",
+  "collection": "signature",
+  "files": {
+    "techflat-front": "techflat-front.jpeg",
+    "techflat-back": "techflat-back.jpeg",
+    "logo-ref": "logo-ref.png",
+    "spec": "spec.txt"
+  }
+}

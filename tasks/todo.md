@@ -9,10 +9,17 @@
 - [ ] Kids Capsule hero — needs scene image + logo wordmark
 - [ ] Love Hurts hero — user wants Beast with back turned (image not in repo)
 
-### File Splits (over 800-line limit)
-- [ ] `about.css` (1,401 lines) → split into `about-layout.css` + `about-effects.css`
-- [ ] `homepage-v2.css` (1,338 lines) → audit for dead rules, split if still over 800
-- [ ] `preorder-gateway.js` (966 lines) → audit/split into logic + animations
+### Files Over 800-Line Limit (9 total — monitor, don't split)
+> Splitting CSS adds HTTP requests. These work fine in production. Revisit if maintainability becomes an issue.
+- `about.css` — 1,401 lines
+- `homepage-v2.css` — 1,339 lines
+- `contact.css` — 1,252 lines
+- `immersive.css` — 1,216 lines
+- `404.css` — 1,207 lines
+- `single-product.css` — 1,133 lines
+- `preorder-gateway.js` — 985 lines
+- `product-catalog.php` — 918 lines
+- `header.css` — 811 lines
 
 ### Immersive Pages (separate terminal)
 - [ ] Being built in parallel — DO NOT TOUCH from this terminal

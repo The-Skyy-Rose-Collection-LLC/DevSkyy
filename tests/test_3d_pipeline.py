@@ -64,7 +64,7 @@ class TestMeshyClient:
     def test_meshy_client_requires_api_key(self):
         """Test MeshyClient raises error without API key."""
         from ai_3d.providers.meshy import MeshyClient
-        from errors.production_errors import ConfigurationError
+        from core.errors.production_errors import ConfigurationError
 
         # Patch both the module constant AND os.getenv to ensure no API key
         with (
@@ -112,7 +112,7 @@ class TestHuggingFaceClient:
         monkeypatch.delenv("HF_TOKEN", raising=False)
 
         from ai_3d.providers.huggingface import HuggingFace3DClient
-        from errors.production_errors import ConfigurationError
+        from core.errors.production_errors import ConfigurationError
 
         with pytest.raises(ConfigurationError) as exc_info:
             HuggingFace3DClient()
@@ -248,7 +248,7 @@ class TestErrorHandling:
 
     def test_rate_limit_error_has_service(self):
         """Test RateLimitError includes service name."""
-        from errors.production_errors import RateLimitError
+        from core.errors.production_errors import RateLimitError
 
         error = RateLimitError(service="Meshy", retry_after=60)
         assert "Meshy" in str(error)
@@ -257,7 +257,7 @@ class TestErrorHandling:
 
     def test_external_service_error_formats(self):
         """Test ExternalServiceError accepts error_message param."""
-        from errors.production_errors import ExternalServiceError
+        from core.errors.production_errors import ExternalServiceError
 
         error = ExternalServiceError(
             service_name="Meshy",
