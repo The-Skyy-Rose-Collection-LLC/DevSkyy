@@ -103,17 +103,35 @@ def describe_product(
         f"Brand: SkyyRose — Oakland luxury streetwear"
     )
 
+    # Build content parts — include real product photos from bundle if available
+    from nano_banana.pipeline import _find_bundle_dir
+
+    content_parts = [f"PRODUCT CONTEXT:\n{context}\n\nSOURCE TECHFLAT:"]
+    content_parts.append(
+        types.Part.from_bytes(
+            data=source_path.read_bytes(),
+            mime_type=_mime_type(source_path),
+        )
+    )
+
+    # Add real product photos so vision describes the ACTUAL product, not just the sketch
+    bundle_dir = _find_bundle_dir(name, sku)
+    if bundle_dir:
+        for tag in ("photo-front", "photo-side", "photo-back", "source-photo"):
+            for f in bundle_dir.glob(f"{tag}.*"):
+                if f.exists() and f != source_path:
+                    content_parts.append(f"REAL PRODUCT PHOTO ({tag}):")
+                    content_parts.append(
+                        types.Part.from_bytes(data=f.read_bytes(), mime_type=_mime_type(f))
+                    )
+                    break
+
+    content_parts.append(ANALYZE_PROMPT)
+
     try:
         response = client.models.generate_content(
             model=model,
-            contents=[
-                f"PRODUCT CONTEXT:\n{context}\n\nSOURCE IMAGE:",
-                types.Part.from_bytes(
-                    data=source_path.read_bytes(),
-                    mime_type=_mime_type(source_path),
-                ),
-                ANALYZE_PROMPT,
-            ],
+            contents=content_parts,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
                 max_output_tokens=4096,

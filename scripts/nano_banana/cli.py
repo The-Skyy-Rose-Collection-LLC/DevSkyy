@@ -398,13 +398,20 @@ def main():
     )
     vg.add_argument("--promote", action="store_true", help="Copy winner to production directory")
 
-    # -- produce (v4 production pipeline) --
-    prod = sub.add_parser("produce", help="V4 production pipeline — vision + routing + QA + refine")
+    # -- produce (v4 production pipeline — sequential) --
+    prod = sub.add_parser("produce", help="V4 production pipeline — sequential (legacy)")
     prod.add_argument("--sku", type=str, default=None, help="Single SKU to process")
     prod.add_argument("--views", type=str, default="front,back,branding", help="Comma-separated views")
     prod.add_argument("--fast", action="store_true", help="Use fast preset (lower quality, lower cost)")
     prod.add_argument("--config", type=str, default=None, help="Path to pipeline-config.json")
     prod.add_argument("--cost-only", action="store_true", help="Show cost estimate without generating")
+
+    # -- produce-async (staged production pipeline) --
+    pa = sub.add_parser("produce-async", help="Staged async production — vision → generate → QA → refine")
+    pa.add_argument("--sku", type=str, default=None, help="Single SKU to process")
+    pa.add_argument("--views", type=str, default="front,back", help="Comma-separated views")
+    pa.add_argument("--concurrency", type=int, default=3, help="Max concurrent API calls per stage")
+    pa.add_argument("--model", type=str, default=None, help="Override generation model")
 
     args = parser.parse_args()
 
@@ -421,6 +428,9 @@ def main():
         cmd_verify_generate(args)
     elif args.command == "produce":
         cmd_produce(args)
+    elif args.command == "produce-async":
+        import asyncio
+        asyncio.run(cmd_produce_async(args))
 
 
 async def cmd_generate_async(args):
@@ -546,6 +556,37 @@ async def cmd_generate_async(args):
         for k, v in results.items():
             if v == "FAIL":
                 log.info("  %s", k)
+
+
+async def cmd_produce_async(args):
+    """Staged async production pipeline — maximum throughput."""
+    from nano_banana.catalog import load_catalog, load_products
+    from nano_banana.produce_async import run_production
+
+    catalog = load_catalog()
+    products = load_products(catalog, sku_filter=args.sku)
+    views = [v.strip() for v in args.views.split(",")]
+
+    if not products:
+        log.error("No products found")
+        return
+
+    log.info("=== STAGED ASYNC PRODUCTION ===")
+    log.info("Products: %d | Views: %s | Concurrency: %d",
+             len(products), views, args.concurrency)
+
+    jobs = await run_production(
+        products=products,
+        views=views,
+        catalog=catalog,
+        concurrency=args.concurrency,
+        model_override=args.model,
+    )
+
+    # Final status
+    passed = sum(1 for j in jobs if j.qa_passed)
+    total = len(jobs)
+    log.info("\nDONE: %d/%d passed QA", passed, total)
 
 
 def cmd_produce(args):

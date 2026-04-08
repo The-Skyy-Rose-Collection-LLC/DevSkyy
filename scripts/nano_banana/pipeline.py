@@ -256,10 +256,22 @@ class ProductionPipeline:
             "gemini": self.genai,
         }
 
+        # Use real product photo for QA when available (not techflat)
+        qa_source = source_path
+        bundle_dir = _find_bundle_dir(name, sku)
+        if bundle_dir:
+            for tag in ("photo-front", "source-photo"):
+                for f in bundle_dir.glob(f"{tag}.*"):
+                    if f.exists():
+                        qa_source = f
+                        break
+                if qa_source != source_path:
+                    break
+
         try:
             qa_result = run_tournament(
                 clients=tournament_clients,
-                source_path=source_path,
+                source_path=qa_source,
                 candidate_path=output_path,
                 dna=vision_desc,
                 passing_threshold=cfg.qa_auto_approve,
