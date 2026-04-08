@@ -560,6 +560,8 @@ async def cmd_generate_async(args):
 
 async def cmd_produce_async(args):
     """Staged async production pipeline — maximum throughput."""
+    import asyncio as _asyncio
+
     from nano_banana.catalog import load_catalog, load_products
     from nano_banana.produce_async import run_production
 
@@ -571,17 +573,27 @@ async def cmd_produce_async(args):
         log.error("No products found")
         return
 
-    log.info("=== STAGED ASYNC PRODUCTION ===")
-    log.info("Products: %d | Views: %s | Concurrency: %d",
-             len(products), views, args.concurrency)
+    # Global batch timeout: 30 min for full catalog, 5 min per SKU
+    batch_timeout = 300 if args.sku else 1800
 
-    jobs = await run_production(
-        products=products,
-        views=views,
-        catalog=catalog,
-        concurrency=args.concurrency,
-        model_override=args.model,
-    )
+    log.info("=== STAGED ASYNC PRODUCTION ===")
+    log.info("Products: %d | Views: %s | Concurrency: %d | Timeout: %ds",
+             len(products), views, args.concurrency, batch_timeout)
+
+    try:
+        jobs = await _asyncio.wait_for(
+            run_production(
+                products=products,
+                views=views,
+                catalog=catalog,
+                concurrency=args.concurrency,
+                model_override=args.model,
+            ),
+            timeout=batch_timeout,
+        )
+    except _asyncio.TimeoutError:
+        log.error("BATCH TIMEOUT after %ds — partial results may exist in output dir", batch_timeout)
+        return
 
     # Final status
     passed = sum(1 for j in jobs if j.qa_passed)

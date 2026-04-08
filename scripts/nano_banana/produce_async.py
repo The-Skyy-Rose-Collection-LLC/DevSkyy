@@ -276,14 +276,23 @@ async def run_production(
         async with gen_sem:
             for attempt in range(1, 4):
                 try:
-                    img_bytes = await generate_gemini_async(
-                        client,
-                        job.source_path,
-                        job.prompt,
-                        model=model,
-                        enhanced=(attempt > 1),
-                        extra_refs=job.extra_refs if job.extra_refs else None,
+                    img_bytes = await asyncio.wait_for(
+                        generate_gemini_async(
+                            client,
+                            job.source_path,
+                            job.prompt,
+                            model=model,
+                            enhanced=(attempt > 1),
+                            extra_refs=job.extra_refs if job.extra_refs else None,
+                        ),
+                        timeout=GENERATE_TIMEOUT,
                     )
+                except asyncio.TimeoutError:
+                    log.error("[%s %s] attempt %d TIMEOUT (%ds)", job.sku, job.view, attempt, GENERATE_TIMEOUT)
+                    img_bytes = None
+                except asyncio.CancelledError:
+                    log.warning("[%s %s] attempt %d CANCELLED", job.sku, job.view, attempt)
+                    img_bytes = None
                 except Exception as exc:
                     log.error("[%s %s] attempt %d: %s", job.sku, job.view, attempt, exc)
                     img_bytes = None
