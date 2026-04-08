@@ -24,14 +24,18 @@ import sys
 import time
 from pathlib import Path
 
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    load_dotenv = None
 
 # Load environment
 _ROOT = Path(__file__).parent.parent
-_ENV_FILES = [_ROOT / ".env", _ROOT / ".env.hf", _ROOT / "gemini" / ".env"]
-for env_file in _ENV_FILES:
-    if env_file.exists():
-        load_dotenv(env_file, override=True)
+if load_dotenv:
+    _ENV_FILES = [_ROOT / ".env", _ROOT / ".env.hf", _ROOT / "gemini" / ".env"]
+    for env_file in _ENV_FILES:
+        if env_file.exists():
+            load_dotenv(env_file, override=True)
 
 # Load product catalog from the canonical CSV
 
