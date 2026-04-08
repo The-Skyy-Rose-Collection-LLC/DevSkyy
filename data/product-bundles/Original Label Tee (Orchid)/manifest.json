@@ -1,0 +1,11 @@
+{
+  "sku": "sg-012",
+  "name": "Original Label Tee (Orchid)",
+  "dirname": "Original Label Tee (Orchid)",
+  "collection": "signature",
+  "files": {
+    "techflat-front": "techflat-front.webp",
+    "logo-ref": "logo-ref.jpeg",
+    "spec": "spec.txt"
+  }
+}

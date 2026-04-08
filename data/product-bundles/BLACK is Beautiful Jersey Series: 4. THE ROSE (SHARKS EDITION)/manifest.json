@@ -1,0 +1,14 @@
+{
+  "sku": "br-011",
+  "name": "BLACK is Beautiful Jersey Series: 4. THE ROSE (SHARKS EDITION)",
+  "dirname": "BLACK is Beautiful Jersey Series: 4. THE ROSE (SHARKS EDITION)",
+  "collection": "black-rose",
+  "files": {
+    "techflat-front": "techflat-front.jpeg",
+    "techflat-back": "techflat-back.jpeg",
+    "source-photo": "source-photo.jpg",
+    "logo-ref": "logo-ref.png",
+    "patch-ref": "patch-ref.jpg",
+    "spec": "spec.txt"
+  }
+}

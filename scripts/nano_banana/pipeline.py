@@ -454,67 +454,63 @@ class ProductionPipeline:
         return desc
 
 
+def _find_bundle_dir(name: str, sku: str) -> Path | None:
+    """Find the bundle directory by product name (primary) or SKU (fallback)."""
+    bundle_root = PROJECT_ROOT / "data" / "product-bundles"
+    # Primary: match by product name (directory name = product name)
+    name_dir = bundle_root / name.replace("—", "-").replace("'", "").replace('"', "").strip()
+    if name_dir.exists():
+        return name_dir
+    # Fallback: search manifests for matching SKU
+    for d in bundle_root.iterdir():
+        if not d.is_dir():
+            continue
+        manifest = d / "manifest.json"
+        if manifest.exists():
+            try:
+                data = json.loads(manifest.read_text())
+                if data.get("sku") == sku:
+                    return d
+            except (json.JSONDecodeError, OSError):
+                continue
+    return None
+
+
 def _load_bundle_refs(
     name: str, sku: str, source_path: Path, view: str
 ) -> list[Path]:
     """Load reference images from the product bundle directory.
 
+    Bundles are named by product name (not SKU).
     Returns a list of image Paths relevant to the requested view.
-    The pipeline sends these as extra_refs to the generation model
-    so it can see logo close-ups, previous renders, branding, etc.
     """
-    bundle_dir = PROJECT_ROOT / "data" / "product-bundles" / sku
-    if not bundle_dir.exists():
-        log.warning("No bundle directory for %s at %s", sku, bundle_dir)
+    bundle_dir = _find_bundle_dir(name, sku)
+    if not bundle_dir:
+        log.warning("No bundle directory for %s (%s)", name, sku)
         return []
 
-    # Load manifest to get file paths
-    manifest_path = bundle_dir / "manifest.json"
-    if not manifest_path.exists():
-        # Fall back to globbing image files
-        refs = [
-            p
-            for p in bundle_dir.iterdir()
-            if p.suffix.lower() in (".webp", ".jpg", ".jpeg", ".png")
-            and p != source_path
-        ]
-        return sorted(refs, key=lambda p: p.stat().st_size, reverse=True)[:5]
-
-    try:
-        manifest = json.loads(manifest_path.read_text())
-    except (json.JSONDecodeError, OSError) as exc:
-        log.warning("Bad manifest for %s: %s", sku, exc)
-        return []
-
-    files = manifest.get("files", {})
     refs: list[Path] = []
 
-    # Always include logo reference if available
-    if "logo-ref" in files:
-        p = Path(files["logo-ref"])
-        if p.exists():
-            refs.append(p)
+    # Always include logo + patch references
+    for tag in ("logo-ref", "patch-ref"):
+        for f in bundle_dir.glob(f"{tag}.*"):
+            if f.exists():
+                refs.append(f)
 
-    # View-specific references
+    # Include source photo if available
+    for f in bundle_dir.glob("source-photo.*"):
+        if f.exists() and f != source_path:
+            refs.append(f)
+
+    # Include techflat for the requested view
     if view == "front":
-        for key in ("render-front", "composite-front", "model-front", "real-photo", "product-photo"):
-            if key in files:
-                p = Path(files[key])
-                if p.exists() and p != source_path:
-                    refs.append(p)
+        for f in bundle_dir.glob("techflat-front.*"):
+            if f.exists() and f != source_path:
+                refs.append(f)
     elif view == "back":
-        for key in ("render-back", "model-back", "real-photo"):
-            if key in files:
-                p = Path(files[key])
-                if p.exists() and p != source_path:
-                    refs.append(p)
-    else:
-        # branding/editorial — include everything useful
-        for key in ("branding", "render-front", "render-back", "model-front", "model-back"):
-            if key in files:
-                p = Path(files[key])
-                if p.exists() and p != source_path:
-                    refs.append(p)
+        for f in bundle_dir.glob("techflat-back.*"):
+            if f.exists() and f != source_path:
+                refs.append(f)
 
     # Cap at 5 references to stay within model limits
     return refs[:5]

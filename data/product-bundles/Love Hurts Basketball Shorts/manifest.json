@@ -1,0 +1,11 @@
+{
+  "sku": "lh-003",
+  "name": "Love Hurts Basketball Shorts",
+  "dirname": "Love Hurts Basketball Shorts",
+  "collection": "love-hurts",
+  "files": {
+    "techflat-front": "techflat-front.jpeg",
+    "logo-ref": "logo-ref.png",
+    "spec": "spec.txt"
+  }
+}

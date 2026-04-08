@@ -1,0 +1,12 @@
+{
+  "sku": "kids-002",
+  "name": "Kids Purple Set",
+  "dirname": "Kids Purple Set",
+  "collection": "kids-capsule",
+  "files": {
+    "techflat-front": "techflat-front.jpeg",
+    "techflat-back": "techflat-back.jpeg",
+    "source-photo": "source-photo.jpg",
+    "spec": "spec.txt"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "sku": "br-003-giants",
+  "name": "BLACK is Beautiful Jersey (Giants)",
+  "dirname": "BLACK is Beautiful Jersey (Giants)",
+  "collection": "black-rose",
+  "files": {
+    "techflat-front": "techflat-front.jpeg",
+    "techflat-back": "techflat-back.jpeg",
+    "logo-ref": "logo-ref.png",
+    "spec": "spec.txt"
+  }
+}
