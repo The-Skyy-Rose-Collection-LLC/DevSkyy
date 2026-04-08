@@ -1033,7 +1033,11 @@ def build_prompt(name: str, treatment: str) -> str:
 
 def run_pipeline(args):
     """Run the full 6-provider composite pipeline."""
-    from google import genai
+    try:
+        from google import genai
+    except ImportError:
+        log.error("google-genai not installed — run: pip install google-genai")
+        return
 
     load_env()
     client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
