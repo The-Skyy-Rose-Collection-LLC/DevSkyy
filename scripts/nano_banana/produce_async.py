@@ -135,39 +135,53 @@ async def run_production(
         "gemini": client,
     }
 
-    # ── Build job list (with error boundaries per product) ───────────
+    # ── Build job list (with null checks + error boundaries) ──────────
     jobs: list[ImageJob] = []
+    skipped = 0
     for product in products:
-        sku = product["sku"]
+        sku = product.get("sku")
+        if not sku:
+            log.warning("Product missing SKU — skipped")
+            skipped += 1
+            continue
+        name = product.get("name", sku)
+        collection = product.get("collection", "")
+        src = product.get("source_image")
+
+        if not src or not Path(str(src)).exists():
+            log.warning("SKIP %s: no source image", sku)
+            skipped += 1
+            continue
+
         for view in views:
             try:
                 if product.get("is_accessory") and view == "back":
                     continue
 
-                src = product.get("source_image")
+                view_src = src
                 if view == "back":
                     try:
                         back = find_back_source(sku, catalog)
-                        if back:
-                            src = back
+                        if back and Path(str(back)).exists():
+                            view_src = back
                     except Exception as exc:
                         log.warning("find_back_source failed for %s: %s", sku, exc)
 
-                if not src:
-                    continue
-
                 jobs.append(ImageJob(
                     sku=sku,
-                    name=product["name"],
-                    collection=product["collection"],
+                    name=name,
+                    collection=collection,
                     view=view,
-                    source_path=src,
+                    source_path=Path(str(view_src)),
                     output_slug=product.get("output_slug", sku),
                     is_accessory=product.get("is_accessory", False),
                     product=product,
                 ))
             except Exception as exc:
                 log.error("Job creation failed for %s %s: %s", sku, view, exc)
+
+    if skipped:
+        log.warning("Skipped %d products (no source image or missing SKU)", skipped)
 
     total = len(jobs)
     log.info("PRODUCTION: %d images to generate (%d products × %s views)", total, len(products), views)
@@ -269,6 +283,18 @@ async def run_production(
 
     async def generate_one(job: ImageJob) -> None:
         nonlocal gen_count
+        if not job.source_path or not job.source_path.exists():
+            job.status = "failed"
+            job.error = "No source image"
+            gen_count += 1
+            log.error("[%d/%d] SKIP %s %s: source missing", gen_count, total, job.sku, job.view)
+            return
+        if not job.prompt:
+            job.status = "failed"
+            job.error = "No prompt generated"
+            gen_count += 1
+            log.error("[%d/%d] SKIP %s %s: empty prompt", gen_count, total, job.sku, job.view)
+            return
         job.status = "generating"
         model = model_override or GEMINI_PRO
         out_path = PRODUCTS_DIR / get_output_filename(job.sku, job.view, job.output_slug)
@@ -397,6 +423,12 @@ async def run_production(
         from nano_banana.prompts import composite_prompt
 
         async def refine_one(job: ImageJob) -> None:
+            if not job.output_path or not job.output_path.exists():
+                log.warning("SKIP refine %s %s: no output to refine", job.sku, job.view)
+                return
+            if not job.source_path or not job.source_path.exists():
+                log.warning("SKIP refine %s %s: no source for composite", job.sku, job.view)
+                return
             async with gen_sem:
                 try:
                     comp_prompt = composite_prompt(job.name, job.sku, job.view)
