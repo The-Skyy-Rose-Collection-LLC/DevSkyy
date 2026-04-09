@@ -16,6 +16,8 @@ defined( 'ABSPATH' ) || exit;
 
 	<footer id="colophon" class="site-footer" role="contentinfo">
 
+		<?php get_template_part( 'template-parts/footer-cro' ); ?>
+
 		<!-- Newsletter Signup Bar -->
 		<div class="footer-newsletter rv-clip-up">
 			<div class="footer-newsletter__container">
