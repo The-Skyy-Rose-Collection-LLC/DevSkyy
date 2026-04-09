@@ -4,6 +4,9 @@ Conditional edge functions for the Elite Studio graph.
 Each function takes the current state and returns the name of the
 next node to execute. LangGraph uses these as routing decisions
 at conditional branch points.
+
+Layer 4 addition: after_quality_v2 replaces after_quality in configs
+that enable human review or visual regression.
 """
 
 from __future__ import annotations
@@ -16,6 +19,7 @@ GENERATOR = "generator"
 QUALITY = "quality"
 COMPOSITOR = "compositor"
 FINALIZE = "finalize"
+HUMAN_REVIEW = "human_review"
 
 
 def after_vision(state: EliteStudioState) -> str:
@@ -54,6 +58,68 @@ def after_quality(state: EliteStudioState) -> str:
         return GENERATOR
 
     # Check if compositor is enabled
+    if state.get("enable_compositor", False):
+        return COMPOSITOR
+
+    return FINALIZE
+
+
+def after_quality_v2(state: EliteStudioState) -> str:
+    """Layer 4 routing after dual-QC quality node.
+
+    Routing priority:
+    1. Low classifier confidence + human review enabled → human_review node.
+    2. QC recommends regenerate + retries remaining → generator.
+    3. Compositor enabled → compositor.
+    4. Otherwise → finalize.
+
+    Args:
+        state: Current graph state.
+
+    Returns:
+        Next node name.
+    """
+    qc = state.get("quality_result")
+    classifier = state.get("classifier_result")
+    retry_count = state.get("retry_count", 0)
+    max_retries = state.get("max_retries", 2)
+
+    enable_human_review: bool = state.get("enable_human_review", False)  # type: ignore[assignment]
+    review_threshold: float = state.get("review_confidence_threshold", 0.6)  # type: ignore[assignment]
+
+    # --- Rule 1: Escalate to human review when classifier is uncertain ---
+    if (
+        enable_human_review
+        and classifier is not None
+        and classifier.confidence < review_threshold
+        and state.get("human_review_result") is None  # not yet reviewed
+    ):
+        return HUMAN_REVIEW
+
+    # --- Rule 2: QC says regenerate and retries remain ---
+    if qc and qc.success and qc.recommendation == "regenerate" and retry_count < max_retries:
+        return GENERATOR
+
+    # --- Rule 3: Compositor enabled ---
+    if state.get("enable_compositor", False):
+        return COMPOSITOR
+
+    return FINALIZE
+
+
+def after_human_review(state: EliteStudioState) -> str:
+    """Route after human review decision.
+
+    - Reject → generator (if retries left), else finalize.
+    - Approve / timeout → compositor or finalize.
+    """
+    decision = state.get("human_review_result")
+    retry_count = state.get("retry_count", 0)
+    max_retries = state.get("max_retries", 2)
+
+    if decision and decision.decision == "reject" and retry_count < max_retries:
+        return GENERATOR
+
     if state.get("enable_compositor", False):
         return COMPOSITOR
 

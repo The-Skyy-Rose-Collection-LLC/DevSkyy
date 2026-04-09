@@ -16,6 +16,9 @@ from ..models import (
     QualityVerification,
     SynthesizedVision,
 )
+from ..quality.ml_classifier import ClassifierResult
+from ..quality.human_review import ReviewDecision
+from ..quality.visual_regression import RegressionResult
 
 
 class EliteStudioState(TypedDict, total=False):
@@ -35,6 +38,11 @@ class EliteStudioState(TypedDict, total=False):
     generation_result: GenerationResult | None
     quality_result: QualityVerification | None
     compositor_result: CompositorResult | None
+
+    # --- Layer 4 quality results (set by quality_node v2 and human_review_node) ---
+    classifier_result: ClassifierResult | None
+    human_review_result: ReviewDecision | None
+    regression_result: RegressionResult | None
 
     # --- Control flow ---
     retry_count: int
@@ -63,6 +71,9 @@ def create_initial_state(
         generation_result=None,
         quality_result=None,
         compositor_result=None,
+        classifier_result=None,
+        human_review_result=None,
+        regression_result=None,
         retry_count=0,
         max_retries=max_retries,
         status="running",
