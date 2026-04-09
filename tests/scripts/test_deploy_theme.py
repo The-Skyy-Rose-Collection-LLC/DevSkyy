@@ -7,6 +7,7 @@ with fake .env.wordpress for controlled testing.
 
 import os
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -171,6 +172,7 @@ class TestCommandOrdering:
     """Test 5: In dry-run output, activate before transfer, deactivate after."""
 
     def test_activate_before_transfer(self, fake_env):
+        """Maintenance mode must be activated before file transfer begins."""
         tmp_path, env_file, theme_dir = fake_env
         result = run_script(
             "--dry-run",
@@ -189,6 +191,8 @@ class TestCommandOrdering:
                     output.find("rsync"),
                     output.find("transfer"),
                     output.find("lftp"),
+                    output.find("sftp"),
+                    output.find("upload"),
                 )
                 if p != -1
             ),
@@ -326,6 +330,10 @@ class TestExcludes:
 class TestShellcheck:
     """Test 8: shellcheck passes on the deploy script."""
 
+    @pytest.mark.skipif(
+        not shutil.which("shellcheck"),
+        reason="shellcheck binary not installed",
+    )
     def test_shellcheck_passes(self):
         result = subprocess.run(
             ["shellcheck", str(SCRIPT_PATH)],
