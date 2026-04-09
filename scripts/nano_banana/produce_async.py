@@ -93,7 +93,7 @@ async def run_production(
     model_override: str | None = None,
 ) -> list[ImageJob]:
     """Run the full staged production pipeline with error boundaries."""
-    from nano_banana.catalog import find_back_source, get_material_spec
+    from nano_banana.catalog import find_back_source
     from nano_banana.client import get_genai_client, get_openai_client
     from nano_banana.generate import GEMINI_PRO, generate_gemini_async
     from nano_banana.pipeline import _find_bundle_dir, _load_bundle_refs

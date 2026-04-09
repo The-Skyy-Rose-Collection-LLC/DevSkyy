@@ -69,7 +69,6 @@ def cmd_generate(args):
     from nano_banana.catalog import (
         PRODUCTS_DIR,
         find_back_source,
-        get_material_spec,
         load_catalog,
         load_products,
     )
@@ -489,7 +488,6 @@ async def cmd_generate_async(args):
     from nano_banana.catalog import (
         PRODUCTS_DIR,
         find_back_source,
-        get_material_spec,
         load_catalog,
         load_products,
     )
