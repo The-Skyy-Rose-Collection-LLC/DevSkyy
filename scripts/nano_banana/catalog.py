@@ -50,33 +50,52 @@ def load_catalog() -> dict[str, dict]:
 def find_source_image(sku: str, catalog: dict[str, dict]) -> Path | None:
     """Find the best available source image for a SKU.
 
-    Priority: source_map (authoritative) → CSV override → glob fallback.
+    Priority: real photos first, never use generated renders as source.
+    1. Bundle product photo (real camera shot)
+    2. Source map techflat split (real scan, .jpeg/.jpg/.png only)
+    3. CSV override (explicit path)
+    4. Glob fallback (non-generated files only)
     """
+    from nano_banana.pipeline import _find_bundle_dir
     from nano_banana.source_map import get_source_map
 
-    # 1. Authoritative source map — single source of truth
+    info = catalog.get(sku, {})
+    name = info.get("name", sku)
+
+    # 1. Bundle product photo — real camera shot, highest trust
+    bundle_dir = _find_bundle_dir(name, sku)
+    if bundle_dir:
+        for tag in ("photo-front", "source-photo"):
+            for f in bundle_dir.glob(f"{tag}.*"):
+                if f.exists() and f.suffix.lower() in (".jpg", ".jpeg", ".png"):
+                    return f
+
+    # 2. Source map techflat — real scan, but only non-webp (avoid generated renders)
     smap = get_source_map()
     if sku in smap:
         front = smap[sku].get("front")
-        if front and front.exists():
+        if front and front.exists() and front.suffix.lower() in (".jpg", ".jpeg", ".png"):
             return front
 
-    info = catalog.get(sku, {})
-
-    # 2. Explicit CSV source override
+    # 3. CSV source override
     if "source_override" in info:
         path = PRODUCTS_DIR / info["source_override"]
         if path.exists():
             return path
         log.warning("source_override %s not found for %s", info["source_override"], sku)
 
-    # 3. Glob fallback by output_slug
+    # 4. Source map webp fallback (may be a real photo saved as webp)
+    if sku in smap:
+        front = smap[sku].get("front")
+        if front and front.exists():
+            return front
+
+    # 5. Glob fallback — exclude generated renders
     slug = info.get("output_slug", sku)
     candidates = []
-    for ext in (".webp", ".jpg", ".jpeg", ".png"):
+    for ext in (".jpg", ".jpeg", ".png", ".webp"):
         candidates.extend(PRODUCTS_DIR.glob(f"{slug}*{ext}"))
 
-    # Filter out generated model shots
     source_candidates = [
         p
         for p in candidates
@@ -87,6 +106,11 @@ def find_source_image(sku: str, catalog: dict[str, dict]) -> Path | None:
     ]
 
     if source_candidates:
+        # Prefer non-webp (real photos) over webp (possibly generated)
+        real = [p for p in source_candidates if p.suffix.lower() != ".webp"]
+        if real:
+            real.sort(key=lambda p: p.stat().st_size, reverse=True)
+            return real[0]
         source_candidates.sort(key=lambda p: p.stat().st_size, reverse=True)
         return source_candidates[0]
 
