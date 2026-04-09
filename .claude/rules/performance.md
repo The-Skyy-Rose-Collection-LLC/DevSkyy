@@ -42,9 +42,9 @@ Control extended thinking via:
 
 For complex tasks requiring deep reasoning:
 1. Ensure extended thinking is enabled (on by default)
-2. Enable **Plan Mode** for structured approach
+2. Use Plan Mode (see `development-workflow.md` for when/how)
 3. Use multiple critique rounds for thorough analysis
-4. Use split role sub-agents for diverse perspectives
+4. Use split role sub-agents for diverse perspectives (see `agents.md`)
 
 ## Build Troubleshooting
 
