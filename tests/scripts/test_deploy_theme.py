@@ -201,9 +201,9 @@ class TestCommandOrdering:
         assert activate_pos != -1, "activate not found in output"
         assert transfer_pos != -1, "transfer not found in output"
         # Deploy script activates maintenance BEFORE transferring files
-        assert activate_pos < transfer_pos, (
-            "maintenance-mode activate must appear before file transfer"
-        )
+        assert (
+            activate_pos < transfer_pos
+        ), "maintenance-mode activate must appear before file transfer"
 
     def test_deactivate_after_transfer(self, fake_env):
         tmp_path, env_file, theme_dir = fake_env
