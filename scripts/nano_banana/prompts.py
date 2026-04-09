@@ -19,22 +19,21 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 ANTI_HALLUCINATION = (
     "\n\nSTRICT RULES — NON-NEGOTIABLE:\n"
-    "- COPY the logo/branding art EXACTLY from the reference images provided. Do NOT simplify, reinterpret, or redesign logos.\n"
-    "- If a reference image shows a logo with specific details (clouds, thorns, petals, patches), reproduce EVERY detail.\n"
-    "- Render ONLY the side specified (front or back). Never show both sides.\n"
-    "- Do NOT add text, logos, patches, pockets, panels, zippers, or details not in the reference.\n"
-    "- Do NOT invent or add features absent from the reference images.\n"
+    "- ONLY reproduce what is VISIBLE in the reference photo. Nothing else.\n"
+    "- Do NOT add ANY text to the garment. No brand names, no collection names, no words of any kind.\n"
+    "- Do NOT add logos, patches, graphics, or designs that are not in the reference photo.\n"
+    "- Do NOT invent features. If you cannot see it in the photo, it does not exist.\n"
     "- Do NOT change the garment type, silhouette, or cut.\n"
-    "- Do NOT add sponsor logos, team names, league marks, or athlete names.\n"
-    "- Do NOT alter colors — match hex values from the reference exactly.\n"
-    "- If a detail is unclear in the reference, leave it out — never guess.\n"
-    "- This is a luxury fashion brand. Accuracy is the only standard."
+    "- Do NOT alter colors — match the reference photo exactly.\n"
+    "- Render ONLY the side specified (front or back). Never show both sides.\n"
+    "- If a detail is unclear, leave it out — never guess or improvise.\n"
+    "- The reference photo is the ONLY truth. Ignore any text in the prompt that contradicts what you see in the photo."
 )
 
 ENHANCED_SUFFIX = (
-    " CRITICAL: The item MUST be pixel-accurate to the reference. "
-    "Do not change any colors, patterns, logos, or design elements. "
-    "This is a luxury fashion brand — accuracy is everything." + ANTI_HALLUCINATION
+    " CRITICAL: Copy the reference photo exactly. "
+    "Do not change any colors, patterns, or design elements. "
+    "Do not add any text or graphics not in the photo." + ANTI_HALLUCINATION
 )
 
 # -- Collection lighting profiles --------------------------------------------
@@ -79,26 +78,18 @@ def front_prompt(product: dict) -> str:
     lighting = COLLECTION_LIGHTING.get(collection, COLLECTION_LIGHTING["black-rose"])
     treatment = LOGO_TREATMENTS.get(sku, "")
 
-    branding_note = ""
-    if treatment:
-        branding_note = (
-            f"\n\nBRANDING DETAIL: The real product has: {treatment}. "
-            "Reproduce this branding EXACTLY as described — correct position, correct material finish, correct colors."
-        )
-
     return (
-        f"Generate a photorealistic luxury e-commerce product render of this {name} — FRONT VIEW ONLY.\n"
-        f"The provided image is the source tech flat. Study every stitch, color, and logo placement.\n\n"
-        f"VIEW: Show ONLY the front panel. Do NOT render the back.\n\n"
+        f"Generate a photorealistic product render of this garment — FRONT VIEW ONLY.\n"
+        f"The provided photo is the ONLY reference. Copy it exactly.\n\n"
+        f"VIEW: Front panel only.\n\n"
         f"PRESENTATION:\n"
-        f"- No model, no person, no mannequin. Garment floating on an invisible form with natural 3D shape and drape.\n"
+        f"- No model, no person, no mannequin. Garment floating on invisible form with natural drape.\n"
         f"- {lighting['bg']}.\n"
         f"- {lighting['light']}.\n"
-        f"- {lighting['mood']}.\n"
         f"- {lighting['shadow']}.\n"
-        f"- Fabric texture must be photorealistic — visible weave, thread weight, material sheen.\n\n"
-        f"FIDELITY: Match the reference EXACTLY — same colors, text, numbers, "
-        f"logo placement, panels, stripes. Change NOTHING.{branding_note}" + ANTI_HALLUCINATION
+        f"- Photorealistic fabric texture.\n\n"
+        f"FIDELITY: Copy the reference photo exactly. Same colors, same graphics, same construction. Add NOTHING."
+        + ANTI_HALLUCINATION
     )
 
 
@@ -110,23 +101,16 @@ def back_prompt(product: dict) -> str:
     lighting = COLLECTION_LIGHTING.get(collection, COLLECTION_LIGHTING["black-rose"])
     treatment = LOGO_TREATMENTS.get(sku, "")
 
-    branding_note = ""
-    if treatment and "back" in treatment.lower():
-        back_detail = (
-            treatment.split("back:")[-1].strip() if "back:" in treatment.lower() else treatment
-        )
-        branding_note = f"\n\nBACK BRANDING: {back_detail}. " "Reproduce the back branding EXACTLY."
-
     return (
-        f"Generate a photorealistic luxury e-commerce product render of this {name} — BACK VIEW ONLY.\n"
-        f"The provided image is the back-panel tech flat. Reproduce every detail exactly.\n\n"
-        f"VIEW: Show ONLY the back panel. Garment facing away from camera.\n\n"
+        f"Generate a photorealistic product render of this garment — BACK VIEW ONLY.\n"
+        f"The provided photo is the ONLY reference. Copy it exactly.\n\n"
+        f"VIEW: Back panel only. Garment facing away from camera.\n\n"
         f"PRESENTATION:\n"
-        f"- No model, no person, no mannequin. Garment floating on invisible form, back-facing, full 3D drape.\n"
+        f"- No model, no person, no mannequin. Garment floating on invisible form, back-facing, natural drape.\n"
         f"- {lighting['bg']}.\n"
         f"- {lighting['light']}.\n"
-        f"- Fabric texture must be photorealistic.\n\n"
-        f"FIDELITY: Match the back reference exactly.{branding_note}" + ANTI_HALLUCINATION
+        f"- Photorealistic fabric texture.\n\n"
+        f"FIDELITY: Copy the reference photo exactly. Add NOTHING." + ANTI_HALLUCINATION
     )
 
 
@@ -138,19 +122,15 @@ def accessory_prompt(product: dict) -> str:
     lighting = COLLECTION_LIGHTING.get(collection, COLLECTION_LIGHTING["signature"])
     treatment = LOGO_TREATMENTS.get(sku, "")
 
-    branding_note = ""
-    if treatment:
-        branding_note = f"\n\nBRANDING: {treatment}. Reproduce exactly."
-
     return (
-        f"Generate a photorealistic luxury product render of this {name} — HERO ANGLE.\n"
-        f"The provided image is the source reference. Reproduce every detail exactly.\n\n"
+        f"Generate a photorealistic product render of this accessory — HERO ANGLE.\n"
+        f"The provided photo is the ONLY reference. Copy it exactly.\n\n"
         f"PRESENTATION:\n"
         f"- No model. Product only, slightly angled for dimension.\n"
         f"- {lighting['bg']}.\n"
         f"- {lighting['light']}.\n"
         f"- Tight framing — the accessory fills the frame.\n\n"
-        f"FIDELITY: Match the reference exactly.{branding_note}" + ANTI_HALLUCINATION
+        f"FIDELITY: Copy the reference photo exactly. Add NOTHING." + ANTI_HALLUCINATION
     )
 
 

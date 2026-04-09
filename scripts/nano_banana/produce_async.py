@@ -272,9 +272,6 @@ async def run_production(
 
         try:
             job.prompt = get_prompt(job.product, job.view)
-            material_spec = get_material_spec(job.sku)
-            if material_spec:
-                job.prompt += f"\n\nMATERIAL SPEC: {material_spec}"
         except Exception as exc:
             log.error("Prompt failed for %s %s: %s", job.sku, job.view, exc)
             job.prompt = f"Generate a photorealistic product render of {job.name}, {job.view} view."

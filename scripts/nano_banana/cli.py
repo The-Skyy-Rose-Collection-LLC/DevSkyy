@@ -138,10 +138,6 @@ def cmd_generate(args):
                     view_src = back
 
             prompt = get_prompt(product, view)
-            # Inject material specs from product-specs.json
-            material_spec = get_material_spec(sku)
-            if material_spec:
-                prompt += f"\n\nMATERIAL SPEC: {material_spec}"
             image_bytes = None
 
             # Load bundle reference images (logo, patches, product photos)
@@ -536,9 +532,6 @@ async def cmd_generate_async(args):
                 view_src = back
 
         prompt = get_prompt(product, view)
-        material_spec = get_material_spec(sku)
-        if material_spec:
-            prompt += f"\n\nMATERIAL SPEC: {material_spec}"
 
         # Load bundle refs
         extra_refs = []
