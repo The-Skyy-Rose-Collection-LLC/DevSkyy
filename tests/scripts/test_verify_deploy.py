@@ -6,8 +6,11 @@ verification for post-deploy health checks.
 """
 
 import os
+import shutil
 import subprocess
 from pathlib import Path
+
+import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT_PATH = PROJECT_ROOT / "scripts" / "verify-deploy.sh"
@@ -149,6 +152,10 @@ class TestEnvironmentVariable:
 class TestShellcheck:
     """Test 8: shellcheck passes on verify-deploy.sh."""
 
+    @pytest.mark.skipif(
+        not shutil.which("shellcheck"),
+        reason="shellcheck binary not installed",
+    )
     def test_shellcheck_passes(self):
         result = subprocess.run(
             ["shellcheck", str(SCRIPT_PATH)],

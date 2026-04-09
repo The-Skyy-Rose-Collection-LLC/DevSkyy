@@ -222,6 +222,8 @@ class TestCommandOrdering:
                     output.find("rsync"),
                     output.find("transfer"),
                     output.find("lftp"),
+                    output.find("sftp"),
+                    output.find("upload"),
                 )
                 if p != -1
             ),
@@ -289,6 +291,8 @@ class TestCacheFlush:
                     output.find("rsync"),
                     output.find("transfer"),
                     output.find("lftp"),
+                    output.find("sftp"),
+                    output.find("upload"),
                 )
                 if p != -1
             ),
