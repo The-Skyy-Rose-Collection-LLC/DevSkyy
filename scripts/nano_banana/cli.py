@@ -145,12 +145,10 @@ def cmd_generate(args):
             extra_refs = []
             bundle_dir = _find_bundle_dir(product["name"], sku)
             if bundle_dir:
+                # Only product photos — no logo/patch refs (they cause hallucinated text)
                 for tag, label in [
-                    ("logo-ref", "REFERENCE — EXACT LOGO ART (copy this precisely)"),
-                    ("logo-heart-rose", "REFERENCE — EXACT LOGO ART (copy this precisely)"),
-                    ("patch-ref", "REFERENCE — EXACT PATCH DESIGN (reproduce this patch)"),
-                    ("photo-front", "REFERENCE — REAL PRODUCT PHOTO (match this exactly)"),
-                    ("source-photo", "REFERENCE — REAL PRODUCT PHOTO (match this exactly)"),
+                    ("photo-front", "REFERENCE — REAL PRODUCT PHOTO"),
+                    ("source-photo", "REFERENCE — REAL PRODUCT PHOTO"),
                 ]:
                     for f in bundle_dir.glob(f"{tag}.*"):
                         if f.exists():
@@ -535,12 +533,10 @@ async def cmd_generate_async(args):
         extra_refs = []
         bundle_dir = _find_bundle_dir(product["name"], sku)
         if bundle_dir:
+            # Only product photos — no logo/patch refs (they cause hallucinated text)
             for tag, label in [
-                ("logo-ref", "REFERENCE — EXACT LOGO ART (copy this precisely)"),
-                ("logo-heart-rose", "REFERENCE — EXACT LOGO ART (copy this precisely)"),
-                ("patch-ref", "REFERENCE — EXACT PATCH DESIGN (reproduce this patch)"),
-                ("photo-front", "REFERENCE — REAL PRODUCT PHOTO (match this exactly)"),
-                ("source-photo", "REFERENCE — REAL PRODUCT PHOTO (match this exactly)"),
+                ("photo-front", "REFERENCE — REAL PRODUCT PHOTO"),
+                ("source-photo", "REFERENCE — REAL PRODUCT PHOTO"),
             ]:
                 for f in bundle_dir.glob(f"{tag}.*"):
                     if f.exists():

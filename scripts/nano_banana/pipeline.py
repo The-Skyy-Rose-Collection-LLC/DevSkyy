@@ -555,25 +555,18 @@ def _load_bundle_refs(name: str, sku: str, source_path: Path, view: str) -> list
         return []
 
     TAG_LABELS = {
-        "logo-ref": "REFERENCE — EXACT LOGO ART (copy this precisely)",
-        "logo-heart-rose": "REFERENCE — EXACT LOGO ART (copy this precisely)",
-        "patch-ref": "REFERENCE — EXACT PATCH DESIGN (reproduce this patch)",
-        "source-photo": "REFERENCE — REAL PRODUCT PHOTO (match this exactly)",
-        "photo-front": "REFERENCE — REAL PRODUCT PHOTO (match this exactly)",
-        "photo-back": "REFERENCE — REAL PRODUCT BACK (match this exactly)",
-        "techflat-front": "REFERENCE — TECHFLAT FRONT",
-        "techflat-back": "REFERENCE — TECHFLAT BACK",
+        # Logo/patch refs EXCLUDED — they cause the model to hallucinate
+        # brand text onto garments. The source photo already shows the branding.
+        "source-photo": "REFERENCE — REAL PRODUCT PHOTO",
+        "photo-front": "REFERENCE — REAL PRODUCT PHOTO",
+        "photo-back": "REFERENCE — REAL PRODUCT PHOTO (back)",
+        "techflat-front": "REFERENCE — PRODUCT FLAT",
+        "techflat-back": "REFERENCE — PRODUCT FLAT (back)",
     }
 
     refs: list[tuple[str, Path]] = []
 
-    # Always include logo + patch references
-    for tag in ("logo-ref", "logo-heart-rose", "patch-ref"):
-        for f in bundle_dir.glob(f"{tag}.*"):
-            if f.exists():
-                refs.append((TAG_LABELS.get(tag, tag), f))
-
-    # Include source/product photo
+    # Include source/product photo ONLY — no logo or patch refs
     for tag in ("source-photo", "photo-front"):
         for f in bundle_dir.glob(f"{tag}.*"):
             if f.exists() and f != source_path:
