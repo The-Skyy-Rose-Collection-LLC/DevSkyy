@@ -29,6 +29,7 @@
  *   // From the homepage (featured cross-collection set)
  *   get_template_part( 'template-parts/product-grid', null, array(
  *       'featured'      => true,
+ *       'limit'         => 8,
  *       'heading'       => __( 'Featured', 'skyyrose-flagship' ),
  *       'subheading'    => __( 'Shop the staples', 'skyyrose-flagship' ),
  *       'section_class' => 'fp-featured',
@@ -45,15 +46,30 @@
  *       'reveal_class'  => 'lp-rv',
  *   ) );
  *
+ *   // From any surface with a pre-resolved product list (custom query)
+ *   get_template_part( 'template-parts/product-grid', null, array(
+ *       'products' => $my_curated_list, // empty array renders nothing (no fallback)
+ *       'heading'  => __( 'Staff Picks', 'skyyrose-flagship' ),
+ *   ) );
+ *
  * @param array $args {
- *     Data source (one of these, in priority order):
- *     @type array    $products       Pre-resolved list (WC_Product | static card).
+ *     Data source — the wrapper checks these in order and uses the first
+ *     non-empty source. `products` is the null-sentinel path: passing it
+ *     explicitly (including as an empty array) always short-circuits the
+ *     cascade so a caller-provided empty list renders an empty grid
+ *     instead of silently falling through to featured/collection/skus.
+ *
+ *     @type array    $products       1. Pre-resolved list (WC_Product | static card).
  *                                    Explicitly passing an empty array is honored
  *                                    (renders nothing — no cascade to other sources).
- *     @type bool     $featured       If true, use skyyrose_get_featured_display_products().
- *     @type string   $collection     Collection slug to resolve via skyyrose_get_collection_display_products().
- *     @type string[] $skus           SKU list to resolve via the catalog.
+ *     @type bool     $featured       2. If true, use skyyrose_get_featured_display_products().
+ *     @type string   $collection     3. Collection slug → skyyrose_get_collection_display_products().
+ *     @type string[] $skus           4. SKU list resolved through the shared catalog resolver.
  *     @type int      $limit          Cap on items rendered. 0 (default) = no cap.
+ *                                    The featured path pre-caps inside its own helper;
+ *                                    collection/skus/products paths rely on the late-stage
+ *                                    slice below. The late-stage slice is a no-op for
+ *                                    already-capped results.
  *
  *     Display:
  *     @type string   $heading        Section heading text. Omit to hide header.
@@ -103,27 +119,58 @@ $args = wp_parse_args( $args ?? array(), $defaults );
 // fall through to featured/collection/skus.
 // ---------------------------------------------------------------------------
 $products = array();
+$debug    = defined( 'WP_DEBUG' ) && WP_DEBUG;
 
 if ( null !== $args['products'] ) {
 	// 1. Pre-resolved products — caller provided explicit data (possibly empty).
 	$products = is_array( $args['products'] ) ? $args['products'] : array();
-} elseif ( ! empty( $args['featured'] ) && function_exists( 'skyyrose_get_featured_display_products' ) ) {
+} elseif ( ! empty( $args['featured'] ) ) {
 	// 2. Featured cross-collection set.
-	$products = skyyrose_get_featured_display_products( (int) $args['limit'] );
-} elseif ( ! empty( $args['collection'] ) && function_exists( 'skyyrose_get_collection_display_products' ) ) {
+	if ( function_exists( 'skyyrose_get_featured_display_products' ) ) {
+		$products = skyyrose_get_featured_display_products( (int) $args['limit'] );
+	} elseif ( $debug ) {
+		trigger_error(
+			'product-grid: skyyrose_get_featured_display_products() missing — inc/product-catalog.php not loaded.',
+			E_USER_WARNING
+		);
+	}
+} elseif ( ! empty( $args['collection'] ) ) {
 	// 3. Full collection by slug.
-	$products = skyyrose_get_collection_display_products( $args['collection'] );
-} elseif ( ! empty( $args['skus'] ) && function_exists( 'skyyrose_get_product' ) && function_exists( '_skyyrose_resolve_display_products' ) ) {
+	if ( function_exists( 'skyyrose_get_collection_display_products' ) ) {
+		$products = skyyrose_get_collection_display_products( $args['collection'] );
+	} elseif ( $debug ) {
+		trigger_error(
+			'product-grid: skyyrose_get_collection_display_products() missing — inc/product-catalog.php not loaded.',
+			E_USER_WARNING
+		);
+	}
+} elseif ( ! empty( $args['skus'] ) ) {
 	// 4. Hand-picked SKU list — resolve through the shared catalog resolver
 	//    so visibility rules and WC-first logic stay centralised.
-	$entries = array();
-	foreach ( (array) $args['skus'] as $sku ) {
-		$cat = skyyrose_get_product( $sku );
-		if ( $cat ) {
-			$entries[] = $cat;
+	if ( function_exists( 'skyyrose_get_product' ) && function_exists( '_skyyrose_resolve_display_products' ) ) {
+		$entries        = array();
+		$requested      = count( (array) $args['skus'] );
+		foreach ( (array) $args['skus'] as $sku ) {
+			$cat = skyyrose_get_product( $sku );
+			if ( $cat ) {
+				$entries[] = $cat;
+			} elseif ( $debug ) {
+				trigger_error(
+					sprintf(
+						'product-grid: SKU %s not in catalog — dropped from grid.',
+						esc_html( (string) $sku )
+					),
+					E_USER_NOTICE
+				);
+			}
 		}
+		$products = _skyyrose_resolve_display_products( $entries );
+	} elseif ( $debug ) {
+		trigger_error(
+			'product-grid: catalog helpers missing — inc/product-catalog.php not loaded.',
+			E_USER_WARNING
+		);
 	}
-	$products = _skyyrose_resolve_display_products( $entries );
 }
 
 // Apply limit (late-stage cap — covers the paths that do not pre-cap).

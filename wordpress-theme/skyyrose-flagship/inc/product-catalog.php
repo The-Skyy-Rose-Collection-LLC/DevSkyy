@@ -719,7 +719,18 @@ function _skyyrose_resolve_display_products( array $catalog_entries ) {
 			// WC product found — use it (holo card pulls catalog images as fallback).
 			$display[] = $wc_product;
 		} else {
-			// No WC match — use static card from catalog.
+			// No WC match — use static card from catalog. Log under WP_DEBUG so a
+			// silent drift from "live WC product" → "stale catalog snapshot" is
+			// diagnosable by shop operators on every request.
+			if ( $has_wc && defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				trigger_error(
+					sprintf(
+						'skyyrose catalog: SKU %s has no WC match — rendering static card fallback.',
+						esc_html( $cat['sku'] )
+					),
+					E_USER_NOTICE
+				);
+			}
 			$display[] = array(
 				'title'      => $cat['name'],
 				'price'      => skyyrose_format_price( $cat ),
@@ -728,6 +739,11 @@ function _skyyrose_resolve_display_products( array $catalog_entries ) {
 				'image_url'  => skyyrose_product_image_uri( $cat['front_model_image'] ?: $cat['image'] ),
 				'image_back' => skyyrose_product_image_uri( $cat['back_image'] ),
 				'collection' => $cat['collection'] ?? '',
+				// Resolve a real URL via skyyrose_product_url() — routes through WC
+				// permalink → preorder anchor → collection anchor fallback. Prevents
+				// the homepage featured grid from rendering dead href="#" CTAs when
+				// a curated SKU has no matching WC product.
+				'permalink'  => function_exists( 'skyyrose_product_url' ) ? skyyrose_product_url( $cat['sku'] ) : '',
 			);
 		}
 	}
@@ -782,7 +798,7 @@ function skyyrose_get_preorder_products() {
 }
 
 /**
- * Get the curated featured cross-collection set for the homepage.
+ * Get the curated featured cross-collection catalog entries for the homepage.
  *
  * Returns an ordered array of catalog entries representing one flagship
  * piece from each collection plus a small rotation of staples. The
@@ -794,11 +810,17 @@ function skyyrose_get_preorder_products() {
  * filter — this lets a child theme or site plugin curate the featured set
  * without modifying core theme files.
  *
+ * NAME COLLISION NOTE: a pre-existing dead function `skyyrose_get_featured_products()`
+ * lives in `inc/template-functions.php` (returns a WP_Query tagged with the
+ * product_visibility 'featured' taxonomy, from theme v3.0.0). That function
+ * has zero callers and is effectively dead, but we cannot redeclare it
+ * without triggering a PHP fatal, so this helper uses a distinct name.
+ *
  * @since  6.5.0
  * @param  int $limit Max number of entries. Pass 0 (or any value <= 0) for no cap.
  * @return array      Ordered array of catalog entries.
  */
-function skyyrose_get_featured_products( $limit = 8 ) {
+function skyyrose_get_featured_catalog_products( $limit = 8 ) {
 	// Curated featured rotation — one or two flagships per collection, in
 	// a natural browsing order (signature → black rose → love hurts → kids).
 	$default_skus = array(
@@ -815,8 +837,9 @@ function skyyrose_get_featured_products( $limit = 8 ) {
 	/**
 	 * Filters the curated featured product SKUs shown on the homepage.
 	 *
-	 * Return an ordered list of SKU strings. Missing SKUs are silently
-	 * skipped when the catalog is resolved downstream.
+	 * Return an ordered list of SKU strings. Unknown SKUs are silently
+	 * skipped when the catalog is resolved downstream (logged under
+	 * WP_DEBUG so child-theme authors can catch typos quickly).
 	 *
 	 * @since 6.5.0
 	 * @param string[] $default_skus Default featured SKU list.
@@ -826,6 +849,7 @@ function skyyrose_get_featured_products( $limit = 8 ) {
 	$catalog  = skyyrose_get_product_catalog();
 	$featured = array();
 	$cap      = max( 0, (int) $limit ); // 0 = no cap
+	$debug    = defined( 'WP_DEBUG' ) && WP_DEBUG;
 
 	foreach ( (array) $featured_skus as $sku ) {
 		if ( $cap > 0 && count( $featured ) >= $cap ) {
@@ -833,6 +857,14 @@ function skyyrose_get_featured_products( $limit = 8 ) {
 		}
 		if ( isset( $catalog[ $sku ] ) ) {
 			$featured[] = $catalog[ $sku ];
+		} elseif ( $debug ) {
+			trigger_error(
+				sprintf(
+					'skyyrose_featured_product_skus: unknown SKU %s — not in catalog, skipped.',
+					esc_html( (string) $sku )
+				),
+				E_USER_WARNING
+			);
 		}
 	}
 
@@ -845,14 +877,26 @@ function skyyrose_get_featured_products( $limit = 8 ) {
  * Thin wrapper around the shared resolver — the catalog-level featured list
  * is fed through the same WC-first / catalog-fallback path the collection
  * grids use, keeping homepage visibility rules consistent with collection
- * and shop surfaces.
+ * and shop surfaces. Memoised per-request so the homepage is not paying
+ * the catalog iteration + WC SKU lookups on every template part render.
  *
  * @since  6.5.0
  * @param  int $limit Max number of entries. Pass 0 (or any value <= 0) for no cap.
  * @return array      Mixed array — WC_Product objects or static card arrays.
  */
 function skyyrose_get_featured_display_products( $limit = 8 ) {
-	return _skyyrose_resolve_display_products( skyyrose_get_featured_products( $limit ) );
+	static $cache = array();
+
+	$key = (int) $limit;
+	if ( isset( $cache[ $key ] ) ) {
+		return $cache[ $key ];
+	}
+
+	$cache[ $key ] = _skyyrose_resolve_display_products(
+		skyyrose_get_featured_catalog_products( $key )
+	);
+
+	return $cache[ $key ];
 }
 
 /**
