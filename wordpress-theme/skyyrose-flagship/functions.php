@@ -55,6 +55,8 @@ $skyyrose_core_includes = array(
 	'/inc/ajax-handlers.php',
 	'/inc/collection-content.php',
 	'/inc/product-catalog.php',
+	'/inc/product-catalog-display.php',
+	'/inc/immersive-product-adapter.php',
 	'/inc/product-taxonomy.php',
 	'/inc/facebook-sdk.php',
 	'/inc/menu-setup.php',
