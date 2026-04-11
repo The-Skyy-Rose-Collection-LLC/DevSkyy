@@ -185,36 +185,7 @@
   }
 
   /* ──────────────────────────────────────────────────────────────────
-     5. Scarcity Bar Animation
-     ────────────────────────────────────────────────────────────────── */
-  function initScarcityBars() {
-    if (!('IntersectionObserver' in window)) return;
-
-    var bars = document.querySelectorAll('.lp-product-card__scarcity-fill');
-    if (!bars.length) return;
-
-    var observer = new IntersectionObserver(
-      function (entries) {
-        for (var i = 0; i < entries.length; i++) {
-          if (entries[i].isIntersecting) {
-            var bar = entries[i].target;
-            var pct = bar.getAttribute('data-pct') || '0';
-            bar.style.width = pct + '%';
-            observer.unobserve(bar);
-          }
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    for (var j = 0; j < bars.length; j++) {
-      bars[j].style.width = '0%';
-      observer.observe(bars[j]);
-    }
-  }
-
-  /* ──────────────────────────────────────────────────────────────────
-     6. Smooth Scroll for Anchor Links
+     5. Smooth Scroll for Anchor Links
      ────────────────────────────────────────────────────────────────── */
   function initSmoothScroll() {
     var anchors = document.querySelectorAll('.lp a[href^="#"]');
@@ -238,7 +209,6 @@
     initParallax();
     initFAQ();
     initScrollReveal();
-    initScarcityBars();
     initSmoothScroll();
   }
 
