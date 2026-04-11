@@ -83,10 +83,10 @@ scripts/        → Deploy, sync, generation scripts
 | **Python API** | Python 3.11+ | `/` | `make install` | `make dev` |
 | **Dashboard** | Node.js 22 | `frontend/` | `npm install` | `npm run dev` |
 | **WordPress** | PHP 8.2 | `wordpress-theme/` | N/A (deploy only) | `npm run deploy` |
-| **Imagery (Nano Banana 2)** | Python (isolated) | `.venv-imagery/` | `pip install -r requirements-imagery.txt` | `python scripts/nano-banana-run.py generate --sku br-001 --pro` — see `docs/NANO_BANANA.md` |
-| **ADK Agents** | Python (isolated) | `.venv-agents/` | `pip install google-adk` | — |
+| **Imagery (Nano Banana 2)** | Python 3.13 | `.venv/` | `pip install -r requirements-imagery.txt` | `source .venv/bin/activate && python scripts/nano-banana-run.py generate --sku br-001 --pro` — see `docs/NANO_BANANA.md` |
+| **ADK Agents** | Python (isolated) | `.venv-agents/` (create as needed) | `pip install google-adk` | — |
 
-**Each workspace is self-contained.** Don't mix `frontend/node_modules` with root. Don't use `.venv` for ADK (numpy conflicts).
+**Each workspace is self-contained.** Don't mix `frontend/node_modules` with root. Don't use `.venv` for ADK (numpy conflicts — create `.venv-agents/` for it). Nano Banana shares the main `.venv/`; `.venv-imagery/` was an earlier design that was never created.
 
 ---
 
