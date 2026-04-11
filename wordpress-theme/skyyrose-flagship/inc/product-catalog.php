@@ -61,7 +61,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Black',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => false,
 		),
 		'br-002' => array(
@@ -78,7 +78,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Black',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'br-003' => array(
@@ -95,7 +95,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Black',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => false,
 		),
 		'br-004' => array(
@@ -112,7 +112,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Black',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'br-005' => array(
@@ -129,7 +129,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Black',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'br-006' => array(
@@ -146,7 +146,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Black',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'br-007' => array(
@@ -163,7 +163,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Black',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 
@@ -272,7 +272,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Black',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'lh-003' => array(
@@ -289,7 +289,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Black',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'lh-004' => array(
@@ -306,7 +306,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Black',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => false,
 		),
 		'lh-006' => array(
@@ -345,7 +345,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Blue',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'sg-002' => array(
@@ -362,7 +362,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'XS|S|M|L|XL|2XL',
 			'color'             => 'Gold',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'sg-003' => array(
@@ -379,7 +379,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Gold',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'sg-004' => array(
@@ -413,7 +413,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL',
 			'color'             => 'Navy',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'sg-006' => array(
@@ -430,7 +430,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Mint/Lavender',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'sg-007' => array(
@@ -447,7 +447,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'One Size',
 			'color'             => 'Black',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'sg-009' => array(
@@ -464,7 +464,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Cream',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'sg-011' => array(
@@ -481,7 +481,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'White',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'sg-012' => array(
@@ -498,7 +498,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Orchid',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'sg-013' => array(
@@ -515,7 +515,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Mint/Lavender',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'sg-014' => array(
@@ -532,7 +532,7 @@ function skyyrose_get_product_catalog() {
 			'sizes'             => 'S|M|L|XL|2XL|3XL',
 			'color'             => 'Mint/Lavender',
 			'edition_size'      => 250,
-			'published'         => false,
+			'published'         => true,
 			'is_preorder'       => true,
 		),
 		'sg-015' => array(
@@ -679,29 +679,31 @@ function skyyrose_map_collection_to_cards( $collection ) {
 }
 
 /**
- * Get collection products for display — catalog is source of truth.
+ * Resolve a list of catalog entries into the mixed display array that the
+ * holo card template consumes. Shared by the collection, featured, and SKU
+ * code paths so the WC-first / catalog-fallback logic lives in exactly one
+ * place. Applies the same visibility filter (skip unpublished non-preorder)
+ * everywhere.
  *
- * Returns an array of items ready to pass to get_template_part('product-card-holo').
- * Each item is either a WC_Product (matched by SKU from catalog) or a static
- * card array from the catalog. The PHP catalog controls WHAT shows and in WHAT
- * ORDER. WooCommerce just provides live pricing, stock, and add-to-cart.
+ * Each returned item is either a WC_Product (when a matching WooCommerce
+ * product exists) or a static card array compatible with product-card-holo.
  *
- * @since  6.4.0
- * @param  string $collection Collection slug (e.g., 'black-rose').
- * @return array  Mixed array — WC_Product objects or static card arrays.
+ * @since  6.5.0
+ * @access private
+ * @param  array $catalog_entries Array of catalog product arrays.
+ * @return array                  Mixed display array (WC_Product | static card).
  */
-function skyyrose_get_collection_display_products( $collection ) {
-	$catalog_products = skyyrose_get_collection_products( $collection );
-	$has_wc           = function_exists( 'wc_get_product_id_by_sku' );
-	$display          = array();
+function _skyyrose_resolve_display_products( array $catalog_entries ) {
+	$has_wc  = function_exists( 'wc_get_product_id_by_sku' );
+	$display = array();
 
-	foreach ( $catalog_products as $cat ) {
-		// Skip unpublished, non-preorder products.
+	foreach ( $catalog_entries as $cat ) {
+		// Skip unpublished, non-preorder products (visibility rule).
 		if ( empty( $cat['published'] ) && empty( $cat['is_preorder'] ) ) {
 			continue;
 		}
 
-		// Try to match to a WC product by SKU.
+		// Try to match to a WC product by SKU (primary, then normalized).
 		$wc_product = null;
 		if ( $has_wc ) {
 			$product_id = wc_get_product_id_by_sku( $cat['sku'] );
@@ -714,7 +716,7 @@ function skyyrose_get_collection_display_products( $collection ) {
 		}
 
 		if ( $wc_product ) {
-			// WC product found — use it (holo card will pull catalog images as fallback).
+			// WC product found — use it (holo card pulls catalog images as fallback).
 			$display[] = $wc_product;
 		} else {
 			// No WC match — use static card from catalog.
@@ -725,11 +727,28 @@ function skyyrose_get_collection_display_products( $collection ) {
 				'sku'        => $cat['sku'],
 				'image_url'  => skyyrose_product_image_uri( $cat['front_model_image'] ?: $cat['image'] ),
 				'image_back' => skyyrose_product_image_uri( $cat['back_image'] ),
+				'collection' => $cat['collection'] ?? '',
 			);
 		}
 	}
 
 	return $display;
+}
+
+/**
+ * Get collection products for display — catalog is source of truth.
+ *
+ * Returns an array of items ready to pass to get_template_part('product-card-holo').
+ * Each item is either a WC_Product (matched by SKU from catalog) or a static
+ * card array from the catalog. The PHP catalog controls WHAT shows and in WHAT
+ * ORDER. WooCommerce just provides live pricing, stock, and add-to-cart.
+ *
+ * @since  6.4.0
+ * @param  string $collection Collection slug (e.g., 'black-rose').
+ * @return array  Mixed array — WC_Product objects or static card arrays.
+ */
+function skyyrose_get_collection_display_products( $collection ) {
+	return _skyyrose_resolve_display_products( skyyrose_get_collection_products( $collection ) );
 }
 
 /**
@@ -760,6 +779,80 @@ function skyyrose_get_preorder_products() {
 	}
 
 	return $collections;
+}
+
+/**
+ * Get the curated featured cross-collection set for the homepage.
+ *
+ * Returns an ordered array of catalog entries representing one flagship
+ * piece from each collection plus a small rotation of staples. The
+ * homepage featured grid consumes this via skyyrose_get_featured_display_products()
+ * which applies the same WC-first / catalog-fallback pattern the collection
+ * grids use.
+ *
+ * The SKU list can be overridden via the `skyyrose_featured_product_skus`
+ * filter — this lets a child theme or site plugin curate the featured set
+ * without modifying core theme files.
+ *
+ * @since  6.5.0
+ * @param  int $limit Max number of entries. Pass 0 (or any value <= 0) for no cap.
+ * @return array      Ordered array of catalog entries.
+ */
+function skyyrose_get_featured_products( $limit = 8 ) {
+	// Curated featured rotation — one or two flagships per collection, in
+	// a natural browsing order (signature → black rose → love hurts → kids).
+	$default_skus = array(
+		'sg-004',  // The Signature Hoodie
+		'br-004',  // BLACK Rose Hoodie
+		'br-008',  // SF Inspired Football Jersey
+		'lh-004',  // Love Hurts Varsity Jacket
+		'sg-006',  // Mint & Lavender Hoodie
+		'br-010',  // The Bay Basketball Jersey
+		'sg-013',  // Mint & Lavender Crewneck
+		'kids-001', // Kids Red Set
+	);
+
+	/**
+	 * Filters the curated featured product SKUs shown on the homepage.
+	 *
+	 * Return an ordered list of SKU strings. Missing SKUs are silently
+	 * skipped when the catalog is resolved downstream.
+	 *
+	 * @since 6.5.0
+	 * @param string[] $default_skus Default featured SKU list.
+	 */
+	$featured_skus = apply_filters( 'skyyrose_featured_product_skus', $default_skus );
+
+	$catalog  = skyyrose_get_product_catalog();
+	$featured = array();
+	$cap      = max( 0, (int) $limit ); // 0 = no cap
+
+	foreach ( (array) $featured_skus as $sku ) {
+		if ( $cap > 0 && count( $featured ) >= $cap ) {
+			break;
+		}
+		if ( isset( $catalog[ $sku ] ) ) {
+			$featured[] = $catalog[ $sku ];
+		}
+	}
+
+	return $featured;
+}
+
+/**
+ * Get featured products shaped for display (WC_Product or static card).
+ *
+ * Thin wrapper around the shared resolver — the catalog-level featured list
+ * is fed through the same WC-first / catalog-fallback path the collection
+ * grids use, keeping homepage visibility rules consistent with collection
+ * and shop surfaces.
+ *
+ * @since  6.5.0
+ * @param  int $limit Max number of entries. Pass 0 (or any value <= 0) for no cap.
+ * @return array      Mixed array — WC_Product objects or static card arrays.
+ */
+function skyyrose_get_featured_display_products( $limit = 8 ) {
+	return _skyyrose_resolve_display_products( skyyrose_get_featured_products( $limit ) );
 }
 
 /**

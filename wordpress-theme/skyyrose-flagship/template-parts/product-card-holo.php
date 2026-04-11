@@ -56,7 +56,17 @@ $product_id = $is_wc ? $wc->get_id() : 0;
 
 $title     = $is_wc ? $wc->get_name()          : $args['title'];
 $price     = $is_wc ? $wc->get_price_html()     : $args['price'];
-$permalink = $is_wc ? $wc->get_permalink()       : $args['permalink'];
+// Honor an explicit permalink override even for WC products (e.g. kids-capsule
+// routes all cards to /pre-order/ regardless of the individual WC permalink).
+// The default '#' sentinel does not override; only a real URL does.
+$explicit_permalink = ( ! empty( $args['permalink'] ) && '#' !== $args['permalink'] ) ? $args['permalink'] : '';
+if ( $explicit_permalink ) {
+	$permalink = $explicit_permalink;
+} elseif ( $is_wc ) {
+	$permalink = $wc->get_permalink();
+} else {
+	$permalink = $args['permalink'];
+}
 $sku       = $is_wc ? $wc->get_sku()             : $args['sku'];
 $desc      = $is_wc ? wp_strip_all_tags( $wc->get_short_description() ) : $args['desc'];
 

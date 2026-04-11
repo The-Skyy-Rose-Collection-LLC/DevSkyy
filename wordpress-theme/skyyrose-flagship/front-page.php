@@ -264,6 +264,23 @@ get_header();
 	</div>
 </section>
 
+<!-- ═══ FEATURED PRODUCTS ═══ -->
+<?php
+get_template_part(
+	'template-parts/product-grid',
+	null,
+	array(
+		'featured'      => true,
+		'limit'         => 8,
+		'heading'       => __( 'Featured', 'skyyrose-flagship' ),
+		'subheading'    => __( 'Shop the staples — limited editions, Oakland-made.', 'skyyrose-flagship' ),
+		'section_id'    => 'featured',
+		'section_class' => 'fp-featured',
+		'reveal_class'  => 'rv-clip-up',
+	)
+);
+?>
+
 <!-- ═══ LOOKBOOK ═══ -->
 <section class="lookbook" id="lookbook" aria-label="<?php esc_attr_e( 'Lookbook', 'skyyrose-flagship' ); ?>">
 	<div class="lookbook-header rv-clip-up">

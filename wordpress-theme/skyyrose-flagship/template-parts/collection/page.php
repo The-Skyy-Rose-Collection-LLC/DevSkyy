@@ -125,51 +125,34 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 	</section>
 
 	<!-- ════ Product Grid ════ -->
-	<section class="col-products rv-clip-up" id="shop">
-		<div class="col-products__header">
-			<h2><?php esc_html_e( 'The Collection', 'skyyrose-flagship' ); ?></h2>
-			<p>
-				<?php if ( $is_kids ) : ?>
-					<?php
-					printf(
-						esc_html( _n( '%d Piece', '%d Pieces', $product_count, 'skyyrose-flagship' ) ),
-						$product_count
-					);
-					echo ' &middot; ';
-					esc_html_e( 'Limited Run', 'skyyrose-flagship' );
-					?>
-				<?php else : ?>
-					<?php echo esc_html( $c['products_subheading'] ); ?>
-				<?php endif; ?>
-			</p>
-		</div>
-		<div class="product-grid stagger-grid" data-collection="<?php echo esc_attr( $slug ); ?>">
-			<div class="product-grid__items">
-				<?php
-				$index = 0;
-				foreach ( $products as $item ) :
-					if ( $item instanceof WC_Product ) {
-						$card_args = array( 'product' => $item, 'collection' => $slug, 'index' => $index );
-					} else {
-						$permalink  = $is_kids ? $preorder_url : '#';
-						$card_args  = array(
-							'product'    => null,
-							'title'      => $item['title'] ?? '',
-							'price'      => $item['price'] ?? '',
-							'badge_text' => $item['badge_text'] ?? '',
-							'collection' => $slug,
-							'permalink'  => $permalink,
-							'sku'        => $item['sku'] ?? '',
-							'index'      => $index,
-						);
-					}
-					get_template_part( 'template-parts/product-card-holo', null, $card_args );
-					$index++;
-				endforeach;
-				?>
-			</div>
-		</div>
-	</section>
+	<?php
+	// Build subheading: kids-capsule uses a dynamic piece count, others
+	// use the static copy from skyyrose_get_collection_content().
+	if ( $is_kids ) {
+		$products_subheading = sprintf(
+			/* translators: %d: product count */
+			_n( '%d Piece', '%d Pieces', $product_count, 'skyyrose-flagship' ),
+			$product_count
+		) . ' · ' . __( 'Limited Run', 'skyyrose-flagship' );
+	} else {
+		$products_subheading = $c['products_subheading'] ?? '';
+	}
+
+	get_template_part(
+		'template-parts/product-grid',
+		null,
+		array(
+			'products'      => $products,
+			'collection'    => $slug,
+			'heading'       => __( 'The Collection', 'skyyrose-flagship' ),
+			'subheading'    => $products_subheading,
+			'section_id'    => 'shop',
+			'section_class' => 'col-products',
+			'reveal_class'  => 'rv-clip-up',
+			'permalink'     => $is_kids ? $preorder_url : '',
+		)
+	);
+	?>
 
 	<!-- ════ CTA ════ -->
 	<section class="col-cta rv-blur">
