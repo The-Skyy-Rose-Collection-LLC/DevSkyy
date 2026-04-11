@@ -249,6 +249,11 @@ from api.v1.claude_sdk import router as claude_sdk_router
 
 app.include_router(claude_sdk_router, prefix="/api/v1")
 
+# Elite Studio — Layer 5 REST API
+from api.v1.elite_studio import router as elite_studio_router
+
+app.include_router(elite_studio_router, prefix="/api/v1")
+
 # WordPress integration
 from api.v1.wordpress_integration import router as wordpress_router
 

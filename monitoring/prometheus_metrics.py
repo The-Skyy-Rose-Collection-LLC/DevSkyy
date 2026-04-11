@@ -441,3 +441,19 @@ def initialize_metrics():
 
 # Initialize on module import
 initialize_metrics()
+
+# Import Elite Studio metrics so they are registered alongside MCP metrics.
+# Guarded with try/except so the MCP server remains importable even if the
+# Elite Studio package is not installed in this environment.
+try:
+    from monitoring.elite_studio_metrics import (  # noqa: F401
+        elite_studio_active_jobs,
+        elite_studio_cost_dollars,
+        elite_studio_jobs_total,
+        elite_studio_qc_score,
+        elite_studio_queue_depth,
+        elite_studio_retry_total,
+        elite_studio_stage_duration_s,
+    )
+except Exception:
+    pass
