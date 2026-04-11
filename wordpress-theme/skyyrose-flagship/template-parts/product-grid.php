@@ -199,7 +199,10 @@ if ( empty( $products ) ) {
 $has_heading  = ! empty( $args['heading'] );
 $has_subhead  = ! empty( $args['subheading'] );
 $has_header   = $has_heading || $has_subhead;
-$section_id   = $args['section_id'] ? sanitize_html_class( $args['section_id'] ) : 'shop';
+// sanitize_title() yields a valid HTML5 id slug (lowercase, hyphen-separated);
+// sanitize_html_class() was semantically for class tokens and would leak
+// uppercase/underscored values into the id attribute.
+$section_id   = $args['section_id'] ? sanitize_title( (string) $args['section_id'] ) : 'shop';
 $heading_id   = $has_heading ? $section_id . '-heading' : '';
 
 // Multi-token class handling — each whitespace-separated token is sanitized
