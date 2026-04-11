@@ -28,6 +28,38 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Build the display-shaped static card from a raw catalog entry.
+ *
+ * Single source of truth for the catalog-fallback card shape consumed by
+ * `template-parts/product-card-holo.php`. Called from both the cold-path
+ * resolver (_skyyrose_resolve_display_products) and the transient cache
+ * rehydration path (skyyrose_get_featured_display_products) so both
+ * paths produce identical shapes — blank fields and dead `#` CTAs
+ * regress the moment the shapes drift.
+ *
+ * @since  6.5.2
+ * @access private
+ * @param  array $cat Raw catalog entry.
+ * @return array      Display-shaped static card.
+ */
+function _skyyrose_catalog_to_static_card( array $cat ) {
+	return array(
+		'title'      => $cat['name'],
+		'price'      => skyyrose_format_price( $cat ),
+		'badge_text' => $cat['badge'],
+		'sku'        => $cat['sku'],
+		'image_url'  => skyyrose_product_image_uri( $cat['front_model_image'] ?: $cat['image'] ),
+		'image_back' => skyyrose_product_image_uri( $cat['back_image'] ),
+		'collection' => $cat['collection'] ?? '',
+		// Resolve a real URL via skyyrose_product_url() — routes through WC
+		// permalink → preorder anchor → collection anchor fallback. Prevents
+		// the homepage featured grid from rendering dead href="#" CTAs when
+		// a curated SKU has no matching WC product.
+		'permalink'  => function_exists( 'skyyrose_product_url' ) ? skyyrose_product_url( $cat['sku'] ) : '',
+	);
+}
+
+/**
  * Resolve a list of catalog entries into the mixed display array that the
  * holo card template consumes. Shared by the collection, featured, and SKU
  * code paths so the WC-first / catalog-fallback logic lives in exactly one
@@ -80,20 +112,7 @@ function _skyyrose_resolve_display_products( array $catalog_entries ) {
 					E_USER_NOTICE
 				);
 			}
-			$display[] = array(
-				'title'      => $cat['name'],
-				'price'      => skyyrose_format_price( $cat ),
-				'badge_text' => $cat['badge'],
-				'sku'        => $cat['sku'],
-				'image_url'  => skyyrose_product_image_uri( $cat['front_model_image'] ?: $cat['image'] ),
-				'image_back' => skyyrose_product_image_uri( $cat['back_image'] ),
-				'collection' => $cat['collection'] ?? '',
-				// Resolve a real URL via skyyrose_product_url() — routes through WC
-				// permalink → preorder anchor → collection anchor fallback. Prevents
-				// the homepage featured grid from rendering dead href="#" CTAs when
-				// a curated SKU has no matching WC product.
-				'permalink'  => function_exists( 'skyyrose_product_url' ) ? skyyrose_product_url( $cat['sku'] ) : '',
-			);
+			$display[] = _skyyrose_catalog_to_static_card( $cat );
 		}
 	}
 
@@ -286,9 +305,12 @@ function skyyrose_get_featured_display_products( $limit = 8 ) {
 				$hydrated[] = $product;
 			}
 		} elseif ( 'catalog' === $desc['type'] && function_exists( 'skyyrose_get_product' ) ) {
-			$product = skyyrose_get_product( (string) $desc['sku'] );
-			if ( $product ) {
-				$hydrated[] = $product;
+			$cat = skyyrose_get_product( (string) $desc['sku'] );
+			// Re-check visibility — an admin who un-publishes a product
+			// during the 5-minute TTL should not have it resurrected from
+			// stale descriptors.
+			if ( $cat && ( ! empty( $cat['published'] ) || ! empty( $cat['is_preorder'] ) ) ) {
+				$hydrated[] = _skyyrose_catalog_to_static_card( $cat );
 			}
 		}
 	}
