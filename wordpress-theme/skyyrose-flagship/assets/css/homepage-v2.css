@@ -1421,10 +1421,3 @@
 		padding: 3rem 1rem;
 	}
 }
-
-/* Respect reduced-motion — strip the radial gradient background pulse. */
-@media (prefers-reduced-motion: reduce) {
-	.fp-featured::before {
-		animation: none;
-	}
-}
