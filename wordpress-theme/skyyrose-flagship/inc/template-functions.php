@@ -150,35 +150,6 @@ function skyyrose_get_products_by_collection( $collection, $limit = 8 ) {
 	return new WP_Query( $args );
 }
 
-/**
- * Get featured products across all collections.
- *
- * @since  3.0.0
- *
- * @param  int $limit Number of products. Default 4.
- * @return WP_Query Query result.
- */
-function skyyrose_get_featured_products( $limit = 4 ) {
-
-	$sanitized_limit = max( 1, min( 50, absint( $limit ) ) );
-
-	$args = array(
-		'post_type'      => 'product',
-		'post_status'    => 'publish',
-		'posts_per_page' => $sanitized_limit,
-		'orderby'        => 'rand',
-		'tax_query'      => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-			array(
-				'taxonomy' => 'product_visibility',
-				'field'    => 'name',
-				'terms'    => 'featured',
-			),
-		),
-	);
-
-	return new WP_Query( $args );
-}
-
 /*--------------------------------------------------------------
  * Breadcrumbs
  *--------------------------------------------------------------*/

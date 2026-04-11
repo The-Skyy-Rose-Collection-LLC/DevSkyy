@@ -810,12 +810,6 @@ function skyyrose_get_preorder_products() {
  * filter — this lets a child theme or site plugin curate the featured set
  * without modifying core theme files.
  *
- * NAME COLLISION NOTE: a pre-existing dead function `skyyrose_get_featured_products()`
- * lives in `inc/template-functions.php` (returns a WP_Query tagged with the
- * product_visibility 'featured' taxonomy, from theme v3.0.0). That function
- * has zero callers and is effectively dead, but we cannot redeclare it
- * without triggering a PHP fatal, so this helper uses a distinct name.
- *
  * @since  6.5.0
  * @param  int $limit Max number of entries. Pass 0 (or any value <= 0) for no cap.
  * @return array      Ordered array of catalog entries.
