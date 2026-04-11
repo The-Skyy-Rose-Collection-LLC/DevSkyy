@@ -83,9 +83,10 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "back": None,
         },
         # br-007: BLACK Rose x Love Hurts Basketball Shorts
+        # Real product photos supplied — black mesh, OAKLAND + Love Hurts silver script, tonal rose
         "br-007": {
-            "front": P / "black-rose-love-hurts-basketball-shorts-shorts.jpg",
-            "back": None,
+            "front": P / "br-007-real-front.jpg",
+            "back": P / "br-007-real-back.jpg",
         },
         # br-008: SF Inspired Football Jersey — use split techflat
         "br-008": {
@@ -123,9 +124,10 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "back": None,  # no back in the composite
         },
         # lh-003: Love Hurts Basketball Shorts
+        # Real product photos supplied — white mesh, orange-red rose clusters, Love Hurts dripping script
         "lh-003": {
-            "front": S / "love-hurts" / "lh-shorts-front.jpeg",
-            "back": None,
+            "front": P / "lh-003-real-front.jpg",
+            "back": P / "lh-003-real-back.jpg",
         },
         # lh-004: Love Hurts Varsity Jacket
         "lh-004": {

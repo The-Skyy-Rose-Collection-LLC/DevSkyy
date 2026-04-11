@@ -19,21 +19,25 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 ANTI_HALLUCINATION = (
     "\n\nSTRICT RULES — NON-NEGOTIABLE:\n"
-    "- ONLY reproduce what is VISIBLE in the reference photo. Nothing else.\n"
-    "- Do NOT add ANY text to the garment. No brand names, no collection names, no words of any kind.\n"
-    "- Do NOT add logos, patches, graphics, or designs that are not in the reference photo.\n"
-    "- Do NOT invent features. If you cannot see it in the photo, it does not exist.\n"
-    "- Do NOT change the garment type, silhouette, or cut.\n"
-    "- Do NOT alter colors — match the reference photo exactly.\n"
-    "- Render ONLY the side specified (front or back). Never show both sides.\n"
-    "- If a detail is unclear, leave it out — never guess or improvise.\n"
-    "- The reference photo is the ONLY truth. Ignore any text in the prompt that contradicts what you see in the photo."
+    "- FIDELITY: Only reproduce what is visible in the reference photo AND listed in the REQUIRED BRANDING section above. Nothing else.\n"
+    "- TEXT MUST BE CHARACTER-PERFECT: Every letter, number, and symbol must be spelled EXACTLY as shown in the reference or REQUIRED BRANDING. "
+    "No missing letters. No extra letters. No garbled glyphs. No substituted characters. No mirrored or flipped text. "
+    "If the reference or spec says 'BLACK IS BEAUTIFUL', the output MUST show 'BLACK IS BEAUTIFUL' — not 'BLACK S BEAUTIFUL', not 'BLACK IS BEADTIFUL', not 'GEDDIFUL'. "
+    "If you cannot render a word legibly and accurately, DO NOT render the image — return blank rather than produce misspelled text.\n"
+    "- DO NOT INVENT TEXT: Do not add any word, brand name, number, or phrase not in the reference or REQUIRED BRANDING. No placeholder lorem ipsum, no made-up taglines.\n"
+    "- DO NOT INVENT GRAPHICS: Do not add logos, patches, roses, embroidery, or designs not in the reference or REQUIRED BRANDING.\n"
+    "- PATCH / BADGE PLACEMENT IS MANDATORY: If REQUIRED BRANDING names a patch, badge, or logo with a specific location (e.g. 'bottom left', 'upper-right chest', 'below waistband'), that element MUST appear in the output, in EXACTLY that position, at the specified size. "
+    "Do NOT move it, mirror it, center it, duplicate it, or omit it. A jersey without its woven patch is a FAIL.\n"
+    "- GARMENT INTEGRITY: Do not change garment type, silhouette, cut, or colors. Match the reference hex values exactly.\n"
+    "- VIEW LOCK: Render ONLY the side specified (front or back). Never show both.\n"
+    "- CONFLICT RESOLUTION: If the reference photo and REQUIRED BRANDING disagree on a detail, trust REQUIRED BRANDING (it is the spec of record). If both are unclear, leave the detail out — never guess.\n"
 )
 
 ENHANCED_SUFFIX = (
     " CRITICAL: Copy the reference photo exactly. "
-    "Do not change any colors, patterns, or design elements. "
-    "Do not add any text or graphics not in the photo." + ANTI_HALLUCINATION
+    "Preserve every pixel of color, pattern, design element, text character, logo, and patch. "
+    "All text must be character-perfect (spelling, case, kerning). "
+    "All patches and badges must appear at the exact location and size specified." + ANTI_HALLUCINATION
 )
 
 # -- Collection lighting profiles --------------------------------------------
@@ -70,6 +74,19 @@ COLLECTION_LIGHTING = {
 # -- View prompts -------------------------------------------------------------
 
 
+def _branding_block(treatment: str) -> str:
+    """Format the REQUIRED BRANDING section injected into view prompts."""
+    if not treatment:
+        return ""
+    return (
+        f"\n\n═══ REQUIRED BRANDING (MANDATORY — must appear exactly as specified) ═══\n"
+        f"{treatment}\n"
+        f"Every element above MUST be rendered in the output. Any patch, badge, text, "
+        f"or logo named here must appear at the specified location, at the specified size, "
+        f"with text spelled character-perfect. This is non-negotiable.\n"
+    )
+
+
 def front_prompt(product: dict) -> str:
     """Build a front-view product shot prompt with collection-specific styling."""
     name = product["name"]
@@ -88,7 +105,8 @@ def front_prompt(product: dict) -> str:
         f"- {lighting['light']}.\n"
         f"- {lighting['shadow']}.\n"
         f"- Photorealistic fabric texture.\n\n"
-        f"FIDELITY: Copy the reference photo exactly. Same colors, same graphics, same construction. Add NOTHING."
+        f"FIDELITY: Copy the reference photo exactly. Same colors, same graphics, same construction."
+        f"{_branding_block(treatment)}"
         + ANTI_HALLUCINATION
     )
 
@@ -110,7 +128,9 @@ def back_prompt(product: dict) -> str:
         f"- {lighting['bg']}.\n"
         f"- {lighting['light']}.\n"
         f"- Photorealistic fabric texture.\n\n"
-        f"FIDELITY: Copy the reference photo exactly. Add NOTHING." + ANTI_HALLUCINATION
+        f"FIDELITY: Copy the reference photo exactly."
+        f"{_branding_block(treatment)}"
+        + ANTI_HALLUCINATION
     )
 
 
@@ -130,7 +150,9 @@ def accessory_prompt(product: dict) -> str:
         f"- {lighting['bg']}.\n"
         f"- {lighting['light']}.\n"
         f"- Tight framing — the accessory fills the frame.\n\n"
-        f"FIDELITY: Copy the reference photo exactly. Add NOTHING." + ANTI_HALLUCINATION
+        f"FIDELITY: Copy the reference photo exactly."
+        f"{_branding_block(treatment)}"
+        + ANTI_HALLUCINATION
     )
 
 
