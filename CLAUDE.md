@@ -60,7 +60,7 @@ services/       → ML models, 3D generation, analytics
 agents/         → Specialized agents (base_super_agent.py = foundation)
 api/            → FastAPI REST (v1/) + GraphQL (graphql/)
 frontend/       → Next.js dashboard (devskyy-dashboard)
-wordpress-theme/skyyrose-flagship/  → Production WP theme (v6.4.0)
+wordpress-theme/skyyrose-flagship/  → Production WP theme (v1.0.0 — commercial)
 scripts/        → Deploy, sync, generation scripts
 ```
 
@@ -90,19 +90,24 @@ scripts/        → Deploy, sync, generation scripts
 
 ---
 
-## WordPress Theme (skyyrose-flagship)
+## WordPress Theme (SkyyRose v1.0.0)
 
-**256 files, 20 directories. Production at skyyrose.co**
+**Commercial marketplace theme. Production at skyyrose.co**
+**Theme Name:** SkyyRose | **Text Domain:** `skyyrose` | **@package:** SkyyRose
 
 ```
 wordpress-theme/skyyrose-flagship/
 ├── assets/css/      43 files (page CSS, holo cards, tokens, components)
 ├── assets/js/       23 files (holo cards, navigation, page-specific)
-├── assets/fonts/    19 files (self-hosted woff2, GDPR-compliant)
+├── assets/fonts/    19 files (self-hosted woff2, zero Google Fonts CDN)
 ├── inc/             21 modules (enqueue, security, WC, ajax, SEO)
+├── inc/builders/    6 files (detection, elementor, divi, beaver, bricks)
 ├── template-parts/  37 partials (product-card-holo.php = holo card system)
-├── woocommerce/      5 overrides (cart, checkout, single-product)
-└── *.php            24 page templates
+├── patterns/        4 collection hero block patterns
+├── woocommerce/     5 overrides (cart, checkout, single-product)
+├── blueprints/      WC Blueprints for one-click demo import
+├── docs/            11 HTML documentation files (ThemeForest submission)
+└── *.php            24 page templates + 3 builder templates
 ```
 
 **Active templates:**
@@ -110,14 +115,24 @@ wordpress-theme/skyyrose-flagship/
 - `template-collection-{signature,black-rose,love-hurts,kids-capsule}.php` — Collection pages
 - `template-landing-{black-rose,love-hurts,signature}.php` — Conversion landing pages
 - `template-preorder-gateway.php` — Pre-order with collection selector
-- `template-immersive-{signature,black-rose,love-hurts}.php` — 3D experiences
+- `template-immersive-{signature,black-rose,love-hurts,kids-capsule}.php` — 3D experiences
 - `template-about.php` — Brand story + timeline
+- `template-elementor-canvas.php` / `template-elementor-fullwidth.php` — Builder templates
 
 **Key systems:**
 - `product-card-holo.css/js` — Holographic glass cards with magnetic tilt
 - `inc/enqueue.php` — All CSS/JS loading, template slug detection
 - `inc/security.php` — CSP headers, rate limiting, ABSPATH guards
-- `functions.php` — Theme constants, includes array (v6.4.0)
+- `inc/builders/detection.php` — `skyyrose_active_builder()` + `skyyrose_builder_owns_template()`
+- `inc/patterns.php` — Block pattern registration for all collections
+- `inc/performance.php` — Google Fonts removal, AVIF support, custom image sizes
+- `functions.php` — Theme constants, includes array (v1.0.0)
+
+**PHPCS compliance:**
+- `.phpcs.xml` in theme root — WordPress standard, `skyyrose` prefix
+- Run: `cd wordpress-theme/skyyrose-flagship && vendor/bin/phpcs --standard=.phpcs.xml -s .`
+- Auto-fix: `vendor/bin/phpcbf --standard=.phpcs.xml .`
+- Composer must be installed first: `~/.local/bin/composer install`
 
 ### WordPress Rules
 - Extend via hooks (actions/filters), never modify core
@@ -169,6 +184,7 @@ wordpress-theme/skyyrose-flagship/
 - Tagline: "Luxury Grows from Concrete."
 - Collections: Signature, Black Rose, Love Hurts, Kids Capsule
 - Fonts: Cinzel (BR headings), Playfair Display (SIG/LH/KC), Cormorant Garamond (body), Bebas Neue (UI), Inter (system)
+- All 9 font families declared in `theme.json` via WordPress Font Library (zero external CDN)
 
 ---
 
@@ -224,6 +240,14 @@ wordpress-theme/skyyrose-flagship/
 - Hero overlays live in `assets/images/hero-overlays/` (deployed with theme) — source PNGs in `assets/techflats/hero-overlays/` (repo root)
 - Landing page template parts in `template-parts/landing/` accept `$args` arrays: hero.php, product-grid.php, faq.php
 - Product grid template part pulls from `product-catalog.php` by SKU array — if SKU not in catalog, card is silently skipped
+- **Theme name is "SkyyRose"** (not "SkyyRose Flagship") — text domain is `skyyrose`, @package is `SkyyRose`, folder stays `skyyrose-flagship/` for deploy compat
+- **Version is 1.0.0** for commercial release — synced across style.css, readme.txt, and `SKYYROSE_VERSION` constant
+- **PHPCS WordPress standard enforced** — `.phpcs.xml` in theme root, run `vendor/bin/phpcs` before commits. Composer installed at `~/.local/bin/composer`
+- Leading-underscore functions (`_skyyrose_*`) renamed to `skyyrose_*` — WPCS requires theme prefix without underscore
+- `skyyrose_nav_fallback()` (was `skyyrose_flagship_nav_fallback()`) — used as fallback_cb in header.php wp_nav_menu calls
+- Builder detection: `skyyrose_active_builder()` returns slug ('elementor'|'divi'|'beaver-builder'|'bricks'|'gutenberg')
+- Block patterns registered in `inc/patterns.php` — pattern files in `patterns/` directory
+- Store API v1 cart in `assets/js/cart.js` — uses `window.skyyrose.storeNonce` passed via wp_add_inline_script
 
 ### WordPress Deploy
 - Dirty working tree on main blocks `git merge` — always stash unrelated changes before merging worktree branches
