@@ -96,7 +96,7 @@
     "amqplib": "^0.10.9",
     "aos": "^2.3.4",
     "autoprefixer": "^10.4.23",
-    "axios": "^1.13.5",
+    "axios": "^1.15.0",
     "blurhash": "^2.0.5",
     "bullmq": "^5.70.1",
     "canvas": "^3.2.1",
