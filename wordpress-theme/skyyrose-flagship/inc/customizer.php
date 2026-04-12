@@ -5,7 +5,7 @@
  * Registers brand color controls, logo upload, social media URLs,
  * and live preview with postMessage transport.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   1.0.0
  */
 
@@ -457,4 +457,26 @@ function skyyrose_get_social_urls() {
 	}
 
 	return $urls;
+}
+
+/**
+ * Sanitize the Kids Capsule mode setting.
+ *
+ * @since 6.5.0
+ *
+ * @param string $value Raw value from the Customizer.
+ * @return string 'launch' or 'live'.
+ */
+function skyyrose_sanitize_kc_mode( $value ) {
+	return in_array( $value, array( 'launch', 'live' ), true ) ? $value : 'launch';
+}
+
+/**
+ * Check whether Kids Capsule is in launch mode.
+ *
+ * @since 6.5.0
+ * @return bool True if launch mode, false if live.
+ */
+function skyyrose_kc_is_launch_mode() {
+	return 'launch' === get_theme_mod( 'skyyrose_kc_mode', 'launch' );
 }

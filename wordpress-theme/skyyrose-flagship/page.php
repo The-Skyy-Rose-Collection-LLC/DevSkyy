@@ -6,7 +6,7 @@
  * and spacing. Falls back to this for any page without a
  * custom page template assigned.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   4.2.0
  */
 

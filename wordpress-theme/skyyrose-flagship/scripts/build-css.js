@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * CSS Build Script for SkyyRose Flagship Theme
+ * CSS Build Script for SkyyRose Theme
  * Discovers and minifies all CSS source files with source maps.
  *
  * Handles:

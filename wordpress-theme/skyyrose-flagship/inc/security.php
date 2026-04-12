@@ -5,7 +5,7 @@
  * CSP headers, HTTP security headers, XML-RPC disabling,
  * WordPress version removal, and nonce helper functions.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   2.0.0
  */
 

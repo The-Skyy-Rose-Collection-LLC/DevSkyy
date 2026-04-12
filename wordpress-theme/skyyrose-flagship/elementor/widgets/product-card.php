@@ -6,7 +6,7 @@
  * collection-aware accent colors, hover overlay, and CTA button.
  * Reuses card CSS from product-card-holo.css.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.3.0
  */
 

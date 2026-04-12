@@ -6,7 +6,7 @@
  * Fires standard events (PageView, ViewContent, AddToCart, InitiateCheckout)
  * and relays custom conversion events from the analytics beacon.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.10.0
  */
 

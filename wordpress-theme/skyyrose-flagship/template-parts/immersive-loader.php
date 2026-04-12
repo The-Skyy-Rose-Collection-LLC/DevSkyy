@@ -2,7 +2,7 @@
 /**
  * Immersive Loader — Loading Screen
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.0.0
  * @param array $args { @type string $world_name Scene title. }
  */

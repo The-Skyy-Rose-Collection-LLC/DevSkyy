@@ -10,7 +10,7 @@
  * Hooked into: woocommerce_single_product_summary (priority 50)
  * Called by:   inc/woocommerce.php → skyyrose_complete_the_look()
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   5.0.0
  */
 

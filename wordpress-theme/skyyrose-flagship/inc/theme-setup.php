@@ -5,7 +5,7 @@
  * Registers theme supports, navigation menus, custom image sizes,
  * content width, widget areas, and WooCommerce HPOS compatibility.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   1.0.0
  */
 

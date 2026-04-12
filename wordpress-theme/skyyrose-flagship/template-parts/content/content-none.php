@@ -2,7 +2,7 @@
 /**
  * Template part for displaying a message that posts cannot be found
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since 1.0.0
  */
 

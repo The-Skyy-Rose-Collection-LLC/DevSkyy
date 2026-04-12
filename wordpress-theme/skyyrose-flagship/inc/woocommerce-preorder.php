@@ -7,7 +7,7 @@
  *
  * Split from inc/woocommerce.php for maintainability.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.3.0
  */
 

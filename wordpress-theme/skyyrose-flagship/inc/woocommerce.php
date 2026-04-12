@@ -5,7 +5,7 @@
  * Hooks, overrides, and customizations for WooCommerce product display,
  * cart fragments, gallery thumbnails, and related products.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   1.0.0
  */
 

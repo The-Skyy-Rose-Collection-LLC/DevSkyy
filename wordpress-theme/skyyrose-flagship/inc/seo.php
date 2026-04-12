@@ -9,7 +9,7 @@
  *
  * Extracted from accessibility-seo.php in iteration 28 to keep files under 800 lines.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   1.0.0
  */
 

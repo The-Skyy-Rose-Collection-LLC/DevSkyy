@@ -8,7 +8,7 @@
  *   'heading'   => string  Section heading ("Frequently Asked")
  *   'questions' => array   Array of ['q' => question, 'a' => answer]
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

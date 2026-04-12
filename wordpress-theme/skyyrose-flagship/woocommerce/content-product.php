@@ -7,7 +7,7 @@
  * passing the WC_Product object for automatic data resolution.
  *
  * @see     https://woocommerce.com/document/template-structure/
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   5.0.0
  * @version 9.4.0
  */

@@ -6,7 +6,7 @@
  * labels, fonts), custom meta fields for the WP admin product editor,
  * and single-product page asset loading with collection-aware theming.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   4.0.0
  */
 

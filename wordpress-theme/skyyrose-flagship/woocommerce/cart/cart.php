@@ -7,7 +7,7 @@
  * sticky order summary sidebar, empty cart state.
  *
  * @see     https://woocommerce.com/document/template-structure/
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   2.0.0
  * @version 10.1.0
  */

@@ -9,7 +9,7 @@
  * Handles kids-capsule differences: no hero bg image, h1 title instead
  * of logo, no 3D experience link, pre-order product URLs, product count.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

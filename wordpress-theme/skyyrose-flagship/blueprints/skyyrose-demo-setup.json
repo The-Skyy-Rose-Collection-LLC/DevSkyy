@@ -35,7 +35,7 @@
 			"step": "installTheme",
 			"themeData": {
 				"resource": "url",
-				"url": "https://skyyrose.co/theme/skyyrose-flagship.zip"
+				"url": "https://skyyrose.co/theme/skyyrose.zip"
 			},
 			"options": {
 				"activate": true

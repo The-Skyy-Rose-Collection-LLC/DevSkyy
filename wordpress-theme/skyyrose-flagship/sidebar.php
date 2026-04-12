@@ -2,7 +2,7 @@
 /**
  * The sidebar containing the main widget area
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since 1.0.0
  */
 

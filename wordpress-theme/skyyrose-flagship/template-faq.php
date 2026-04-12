@@ -5,7 +5,7 @@
  * Frequently Asked Questions — dark luxury accordion.
  * Uses <details>/<summary> for native accessibility + progressive enhancement.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.4.0
  */
 

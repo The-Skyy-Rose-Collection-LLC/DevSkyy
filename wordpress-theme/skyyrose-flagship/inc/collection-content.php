@@ -6,7 +6,7 @@
  * collection page layout. This is the single source of truth for all
  * collection-specific copy.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

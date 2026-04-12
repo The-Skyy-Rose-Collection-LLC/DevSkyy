@@ -4,7 +4,7 @@
  * Lightweight vanilla JS toast notification system.
  * Usage: window.skyyToast('Message', 'success', 4000)
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   5.3.0
  */
 (function () {

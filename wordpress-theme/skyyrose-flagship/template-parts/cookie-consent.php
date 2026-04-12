@@ -5,7 +5,7 @@
  * Minimal dark luxury consent bar fixed to viewport bottom.
  * Checks localStorage — if consent already recorded, nothing renders.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.3.0
  */
 

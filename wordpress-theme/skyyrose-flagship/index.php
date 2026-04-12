@@ -5,7 +5,7 @@
  * Dark luxury blog layout with card-based post grid
  * and brand-consistent typography.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   4.2.0
  */
 

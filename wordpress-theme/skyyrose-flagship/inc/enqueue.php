@@ -5,7 +5,7 @@
  * Handles all CSS and JS enqueue logic with conditional loading per template.
  * Global assets load on every page; template-specific assets load only where needed.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.0.0
  */
 
@@ -351,7 +351,7 @@ function skyyrose_get_current_template_slug() {
 			'template-collection-black-rose.php'   => 'collection-standalone',
 			'template-collection-love-hurts.php'   => 'collection-standalone',
 			'template-collection-signature.php'    => 'collection-standalone',
-			'template-collection-kids-capsule.php' => 'collection-standalone',
+			'template-collection-kids-capsule.php' => ( function_exists( 'skyyrose_kc_is_launch_mode' ) && skyyrose_kc_is_launch_mode() ) ? 'kc-launch' : 'collection-standalone',
 			'template-immersive-black-rose.php'    => 'immersive',
 			'template-immersive-love-hurts.php'    => 'immersive',
 			'template-immersive-signature.php'     => 'immersive',
@@ -432,6 +432,7 @@ function skyyrose_enqueue_template_styles() {
 		'single'              => 'generic-pages.css',
 		'blog'                => 'generic-pages.css',
 		'page'                => 'generic-pages.css',
+		'kc-launch'           => 'kids-capsule.css',
 	);
 
 	if ( isset( $template_styles[ $slug ] ) ) {
@@ -558,7 +559,7 @@ function skyyrose_enqueue_template_scripts() {
 	}
 
 	// GSAP — loaded on pages that use scroll animations (NOT collection pages — they use IntersectionObserver).
-	$gsap_slugs = array( 'preorder-gateway', 'about', 'immersive' );
+	$gsap_slugs = array( 'preorder-gateway', 'about', 'immersive', 'kc-launch' );
 	if ( in_array( $slug, $gsap_slugs, true ) ) {
 		wp_enqueue_script( 'skyyrose-gsap', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js', array(), '3.12.2', true );
 		wp_enqueue_script( 'skyyrose-gsap-st', 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js', array( 'skyyrose-gsap' ), '3.12.2', true );
@@ -573,6 +574,7 @@ function skyyrose_enqueue_template_scripts() {
 		'contact'          => 'contact.js',
 		'preorder-gateway' => 'preorder-gateway.js',
 		'about'            => 'about.js',
+		'kc-launch'        => 'kids-capsule-launch.js',
 	);
 
 	if ( isset( $template_scripts[ $slug ] ) ) {

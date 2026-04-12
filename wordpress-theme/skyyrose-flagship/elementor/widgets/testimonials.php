@@ -5,7 +5,7 @@
  * Carousel of customer testimonials with star rating, avatar,
  * and auto-play fade transitions.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.3.0
  */
 

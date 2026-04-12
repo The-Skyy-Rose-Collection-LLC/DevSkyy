@@ -6,7 +6,7 @@
  * Contains WooCommerce style dequeuing, font preloading, resource hints,
  * and script defer logic.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   4.1.0
  */
 

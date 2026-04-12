@@ -9,7 +9,7 @@
  *     @type array $customer_photos Array of customer photo data (file, alt).
  * }
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

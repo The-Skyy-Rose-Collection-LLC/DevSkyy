@@ -10,7 +10,7 @@
  * Called via get_template_part() from each collection's
  * immersive page template with $args containing room data.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.0.0
  *
  * @param array $args {

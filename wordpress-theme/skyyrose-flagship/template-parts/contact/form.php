@@ -9,7 +9,7 @@
  *   $args['subject_options']  — associative array of subject <option> values.
  *   $args['referral_options'] — associative array of referral <option> values.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

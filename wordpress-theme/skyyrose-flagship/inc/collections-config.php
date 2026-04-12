@@ -8,7 +8,7 @@
  *
  * Depends on inc/brand-colors.php for color constants.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.4.0
  */
 

@@ -5,7 +5,7 @@
  * Dark luxury single post layout with brand typography,
  * featured image hero, post navigation, and author info.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   4.2.0
  */
 

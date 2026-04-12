@@ -6,7 +6,7 @@
  * Signature collection landing page — everyday luxury, foundation wardrobe.
  * Gold accent palette (#D4AF37). Uses shared landing-pages.css/js via enqueue.php.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

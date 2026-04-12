@@ -1,12 +1,12 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 /**
- * The header for the SkyyRose Flagship theme
+ * The header for the SkyyRose theme
  *
  * Displays the fixed dark navbar with SR monogram logo, gradient text branding,
  * navigation with collections dropdown, icon buttons, and mobile hamburger menu.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since 2.0.0
  */
 
@@ -61,7 +61,7 @@ defined( 'ABSPATH' ) || exit;
 							'menu_id'        => 'primary-menu',
 							'menu_class'     => 'navbar__menu',
 							'container'      => false,
-							'fallback_cb'    => 'skyyrose_flagship_nav_fallback',
+							'fallback_cb'    => 'skyyrose_nav_fallback',
 							'depth'          => 2,
 							'items_wrap'     => '<ul id="%1$s" class="%2$s">%3$s</ul>',
 						)
@@ -210,7 +210,7 @@ defined( 'ABSPATH' ) || exit;
 							'menu_id'        => 'mobile-primary-menu',
 							'menu_class'     => 'mobile-menu__list',
 							'container'      => false,
-							'fallback_cb'    => 'skyyrose_flagship_nav_fallback',
+							'fallback_cb'    => 'skyyrose_nav_fallback',
 							'depth'          => 2,
 						)
 					);

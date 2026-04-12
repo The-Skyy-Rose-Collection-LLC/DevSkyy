@@ -5,7 +5,7 @@
  * Helper functions used across theme templates: collection colors,
  * product queries, breadcrumbs, film grain overlay, and post meta.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   1.0.0
  */
 
@@ -788,7 +788,7 @@ function skyyrose_get_social_links() {
  * @since 3.0.0
  * @return void
  */
-function skyyrose_flagship_nav_fallback() {
+function skyyrose_nav_fallback() {
 
 	$items = array(
 		array(

@@ -10,7 +10,7 @@
  * the patterns/ directory (WP 6.0+) using PHP file header comments.
  * This file handles category registration and the content loader utility.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.6.0
  */
 

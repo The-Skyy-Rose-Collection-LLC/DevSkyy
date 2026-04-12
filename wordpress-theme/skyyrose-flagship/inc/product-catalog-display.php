@@ -18,7 +18,7 @@
  * All functions in this file depend on helpers defined in product-catalog.php,
  * so this file MUST be required AFTER product-catalog.php in functions.php.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.1
  */
 

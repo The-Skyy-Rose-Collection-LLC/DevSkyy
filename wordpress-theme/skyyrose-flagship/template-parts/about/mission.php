@@ -8,7 +8,7 @@
  *     @type array $allowed_inline wp_kses whitelist for em/strong/br.
  * }
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

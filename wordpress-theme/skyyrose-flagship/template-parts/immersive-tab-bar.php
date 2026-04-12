@@ -5,7 +5,7 @@
  * Fixed bottom tab bar for navigating between immersive experiences.
  * Shows all 4 collection worlds with active state detection.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.0.0
  *
  * @param array $args {

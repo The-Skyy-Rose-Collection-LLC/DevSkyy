@@ -9,7 +9,7 @@
  * Products loaded dynamically from WooCommerce (love-hurts category).
  * Built on the shared immersive engine (immersive.css + immersive.js).
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.0.0
  * @updated 6.0.0 — Rebuild on shared 2D engine, AI scene images, WC category query, GDPR fix
  */

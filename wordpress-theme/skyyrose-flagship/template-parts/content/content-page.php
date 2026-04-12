@@ -2,7 +2,7 @@
 /**
  * Template part for displaying page content
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since 1.0.0
  */
 

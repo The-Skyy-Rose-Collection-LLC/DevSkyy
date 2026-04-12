@@ -6,7 +6,7 @@
  * reusing the existing skyyrose_newsletter AJAX handler.
  * Reuses collection CSS from product-card-holo.css.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.3.0
  */
 

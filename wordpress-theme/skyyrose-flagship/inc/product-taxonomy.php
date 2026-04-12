@@ -6,7 +6,7 @@
  * when WooCommerce is not active. Ensures the SkyyRose collection
  * hierarchy and product tags exist in the database.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.1.0
  */
 

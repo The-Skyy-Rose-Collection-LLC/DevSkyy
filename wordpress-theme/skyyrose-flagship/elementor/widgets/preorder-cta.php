@@ -5,7 +5,7 @@
  * Full-width urgency banner with live countdown timer,
  * pulsing CTA button, and "limited pieces" messaging.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.3.0
  */
 

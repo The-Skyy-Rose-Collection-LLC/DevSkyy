@@ -5,7 +5,7 @@
  * Shipping rates, processing times, return policy, exchanges.
  * Dark luxury layout with glass cards per section.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.4.0
  */
 

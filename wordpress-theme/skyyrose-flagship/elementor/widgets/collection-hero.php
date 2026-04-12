@@ -5,7 +5,7 @@
  * Full-bleed hero section with parallax image, collection number,
  * name, tagline, and CTA buttons. Reuses .col-hero CSS from product-card-holo.css.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.3.0
  */
 

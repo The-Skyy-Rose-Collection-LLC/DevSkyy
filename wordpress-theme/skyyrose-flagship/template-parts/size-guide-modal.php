@@ -3,7 +3,7 @@
  * Size Guide Modal — dark luxury size guide accessible site-wide.
  * Triggered by [data-open-size-guide] or .js-size-guide-trigger elements.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   5.3.0
  */
 

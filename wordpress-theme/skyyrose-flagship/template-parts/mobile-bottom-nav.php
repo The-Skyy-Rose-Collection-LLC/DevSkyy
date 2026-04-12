@@ -8,7 +8,7 @@
  * Glass panel aesthetic matching SkyyRose dark opulence.
  * Renders on all pages — hidden above 768px via CSS.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.3.0
  */
 

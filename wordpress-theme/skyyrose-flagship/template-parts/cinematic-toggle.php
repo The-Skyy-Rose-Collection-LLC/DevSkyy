@@ -4,7 +4,7 @@
  *
  * Persists cinematic mode state in sessionStorage.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.0.0
  */
 if ( ! defined( 'ABSPATH' ) ) {

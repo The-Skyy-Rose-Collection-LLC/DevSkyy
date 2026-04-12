@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) || exit;
  * 5-column grid footer with brand column, navigation columns,
  * newsletter signup bar, and copyright.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since 2.0.0
  */
 

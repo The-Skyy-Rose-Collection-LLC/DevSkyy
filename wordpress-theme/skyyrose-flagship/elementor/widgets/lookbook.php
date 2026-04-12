@@ -5,7 +5,7 @@
  * Masonry-style image gallery for social proof / lifestyle photos.
  * Uses Elementor's built-in gallery control with hover overlay.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.3.0
  */
 

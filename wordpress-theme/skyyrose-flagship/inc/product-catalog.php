@@ -10,7 +10,7 @@
  * is the WordPress-tier source of truth, adding image paths and publish
  * flags that the CSV does not carry.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.2.1
  */
 

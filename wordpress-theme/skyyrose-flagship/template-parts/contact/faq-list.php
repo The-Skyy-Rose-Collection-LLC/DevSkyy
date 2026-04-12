@@ -7,7 +7,7 @@
  * Expected variables (passed via $args from get_template_part):
  *   $args['faq_items'] — indexed array of arrays with 'question' and 'answer' keys.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

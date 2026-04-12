@@ -7,7 +7,7 @@
  * Requires: product-card-holo.css for visual output.
  * No dependencies — vanilla JS, ~6KB unminified.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   5.0.0
  */
 

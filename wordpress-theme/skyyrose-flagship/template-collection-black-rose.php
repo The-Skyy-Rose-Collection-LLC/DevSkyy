@@ -5,7 +5,7 @@
  * BLACK ROSE collection — masculine elegance, silver on deep black.
  * Delegates to unified collection layout with slug-specific content.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.1.0
  */
 

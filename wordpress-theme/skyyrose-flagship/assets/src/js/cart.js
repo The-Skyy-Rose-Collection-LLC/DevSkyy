@@ -5,7 +5,7 @@
  * admin-ajax.php. Provides add/remove/update with ARIA-live toasts
  * for accessibility.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.6.0
  */
 

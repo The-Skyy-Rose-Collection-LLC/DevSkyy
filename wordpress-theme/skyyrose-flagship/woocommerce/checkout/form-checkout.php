@@ -7,7 +7,7 @@
  * sidebar (420px), dark glass panels, WooCommerce hook integration.
  *
  * @see     https://woocommerce.com/document/template-structure/
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   2.0.0
  * @version 9.4.0
  */

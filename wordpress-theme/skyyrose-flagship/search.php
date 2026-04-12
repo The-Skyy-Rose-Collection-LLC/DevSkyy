@@ -6,7 +6,7 @@
  * re-search form, content list, and branded empty state with collection
  * quick-links and suggestions.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   5.3.0
  */
 

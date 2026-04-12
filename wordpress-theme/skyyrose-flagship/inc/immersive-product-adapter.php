@@ -15,7 +15,7 @@
  * Split out of `inc/product-catalog.php` in v6.5.1 to keep that module
  * under the 800-line cap and to localize immersive-scene concerns.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.1
  */
 

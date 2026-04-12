@@ -17,7 +17,7 @@
  *   skyyrose_klaviyo_list_signature      — Signature drop waitlist
  *   skyyrose_klaviyo_list_jersey_vip     — Jersey Series VIP list
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   5.0.0
  */
 
@@ -137,7 +137,8 @@ function skyyrose_klaviyo_list_id( $slug ) {
 		'black_rose' => 'skyyrose_klaviyo_list_black_rose',
 		'love_hurts' => 'skyyrose_klaviyo_list_love_hurts',
 		'signature'  => 'skyyrose_klaviyo_list_signature',
-		'jersey_vip' => 'skyyrose_klaviyo_list_jersey_vip',
+		'jersey_vip'   => 'skyyrose_klaviyo_list_jersey_vip',
+		'kids_capsule' => 'skyyrose_klaviyo_list_kids_capsule',
 	);
 
 	if ( ! isset( $option_map[ $slug ] ) ) {
@@ -549,7 +550,8 @@ function skyyrose_klaviyo_customizer_settings( $wp_customize ) {
 		'skyyrose_klaviyo_list_black_rose' => esc_html__( 'Black Rose Drop List ID', 'skyyrose' ),
 		'skyyrose_klaviyo_list_love_hurts' => esc_html__( 'Love Hurts Drop List ID', 'skyyrose' ),
 		'skyyrose_klaviyo_list_signature'  => esc_html__( 'Signature Drop List ID', 'skyyrose' ),
-		'skyyrose_klaviyo_list_jersey_vip' => esc_html__( 'Jersey Series VIP List ID', 'skyyrose' ),
+		'skyyrose_klaviyo_list_jersey_vip'   => esc_html__( 'Jersey Series VIP List ID', 'skyyrose' ),
+		'skyyrose_klaviyo_list_kids_capsule' => esc_html__( 'Kids Capsule Waitlist List ID', 'skyyrose' ),
 	);
 
 	foreach ( $lists as $option_name => $label ) {

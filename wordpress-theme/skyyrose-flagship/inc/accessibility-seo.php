@@ -2,13 +2,13 @@
 /**
  * Accessibility Features (WCAG 2.1 AA Compliance)
  *
- * Implements WCAG 2.1 AA compliance for the SkyyRose Flagship Theme:
+ * Implements WCAG 2.1 AA compliance for the SkyyRose Theme:
  * ARIA labels, live regions, image alt enforcement, landmark roles,
  * WooCommerce accessibility enhancements, and admin testing tools.
  *
  * SEO features extracted to inc/seo.php in iteration 28 to keep files under 800 lines.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   1.0.0
  */
 

@@ -6,7 +6,7 @@
  * showroom & business hours, AJAX form submission, expanded FAQ accordion,
  * map placeholder section, and response promise section.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.1.0
  */
 

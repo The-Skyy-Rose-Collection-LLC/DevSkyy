@@ -85,7 +85,7 @@
  *     @type string   $empty_message  Text shown if no products resolve. Empty = render nothing.
  * }
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

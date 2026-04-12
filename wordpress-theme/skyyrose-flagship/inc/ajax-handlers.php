@@ -5,7 +5,7 @@
  * Contact form, newsletter subscription, and sign-in AJAX endpoints
  * with nonce verification and input sanitization.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.0.0
  */
 

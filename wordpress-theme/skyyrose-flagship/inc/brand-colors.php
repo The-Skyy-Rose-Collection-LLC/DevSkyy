@@ -8,7 +8,7 @@
  * The canonical CSS source is assets/css/design-tokens.css (CSS custom
  * properties). This file mirrors those values for PHP consumers.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.4.0
  */
 

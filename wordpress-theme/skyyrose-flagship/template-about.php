@@ -6,7 +6,7 @@
  * Sections: Hero -> Ch I (Rebrand) -> Ch II (Collections) ->
  *           Ch III (Timeline) -> Press -> Mission -> Community.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   4.1.0
  */
 

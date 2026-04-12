@@ -7,7 +7,7 @@
  * "Hurts" is the founder's family name — this collection is deeply personal.
  * Voice: raw, emotional, vulnerability as strength.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

@@ -11,7 +11,7 @@
  * V3: ALL fixes applied via output buffer — no dependency on wp_head,
  * wp_body_open, or any theme hooks. Works on WordPress.com atomic.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.4.0
  */
 defined( 'ABSPATH' ) || exit;

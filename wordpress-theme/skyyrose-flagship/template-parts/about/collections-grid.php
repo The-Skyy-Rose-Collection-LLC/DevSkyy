@@ -9,7 +9,7 @@
  *     @type array $collections    Array of collection card data (icon, title, text).
  * }
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

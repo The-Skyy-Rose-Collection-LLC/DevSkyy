@@ -6,7 +6,7 @@
  * Conversion-focused landing page for the Black Rose collection.
  * Uses shared template-parts/landing/ components (hero, product-grid, faq).
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

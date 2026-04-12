@@ -9,7 +9,7 @@
  * Products loaded dynamically from WooCommerce (kids-capsule category).
  * Built on the shared immersive engine (immersive.css + immersive.js).
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.0.0
  */
 

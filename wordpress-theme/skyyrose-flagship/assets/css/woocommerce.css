@@ -1,5 +1,5 @@
 /**
- * SkyyRose Flagship - WooCommerce Base Styles
+ * SkyyRose - WooCommerce Base Styles
  *
  * CSS custom properties, product card (shop loop), and WC notice overrides.
  * Loaded on ALL WooCommerce pages. Page-specific styles are split into:
@@ -7,7 +7,7 @@
  *   - woocommerce-cart.css     (cart page)
  *   - woocommerce-checkout.css (checkout page)
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   2.0.0
  * @updated 3.2.0  Split into conditional page-specific chunks.
  */

@@ -12,7 +12,7 @@ A premium dark luxury WooCommerce theme for fashion, streetwear, and lifestyle b
 
 == Description ==
 
-SkyyRose Flagship is a premium dark luxury WooCommerce theme built for fashion, streetwear, and lifestyle brands. The theme delivers immersive product experiences with a dark aesthetic, glassmorphism effects, holographic product cards, and configurable collection palettes. Compatible with Elementor, Gutenberg, and all major page builders.
+SkyyRose is a premium dark luxury WooCommerce theme built for fashion, streetwear, and lifestyle brands. The theme delivers immersive product experiences with a dark aesthetic, glassmorphism effects, holographic product cards, and configurable collection palettes. Compatible with Elementor, Gutenberg, and all major page builders.
 
 = Features =
 
@@ -170,7 +170,7 @@ Complete rebuild. Back up your site before upgrading. This version replaces the 
 
 == Privacy Policy ==
 
-SkyyRose Flagship does not collect personal data from website visitors beyond what WordPress and WooCommerce handle natively.
+SkyyRose does not collect personal data from website visitors beyond what WordPress and WooCommerce handle natively.
 
 The theme includes:
 * Local storage for user preferences (client-side only)
@@ -188,8 +188,8 @@ https://skyyrose.co
 
 == Copyright ==
 
-SkyyRose Flagship Theme, Copyright 2026 The Skyy Rose Collection LLC
-SkyyRose Flagship is distributed under the terms of the GNU GPL v2 or later.
+SkyyRose Theme, Copyright 2026 The Skyy Rose Collection LLC
+SkyyRose is distributed under the terms of the GNU GPL v2 or later.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

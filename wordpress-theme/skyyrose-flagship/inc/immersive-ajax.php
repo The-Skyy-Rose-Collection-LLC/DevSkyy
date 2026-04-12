@@ -5,7 +5,7 @@
  * Provides AJAX endpoints for immersive scene pages to fetch
  * live product data from WooCommerce by SKU.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.12.0
  */
 

@@ -9,7 +9,7 @@
  * CSS: assets/css/homepage-v2.css
  * JS: assets/js/homepage-v2.js
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.0.0
  */
 

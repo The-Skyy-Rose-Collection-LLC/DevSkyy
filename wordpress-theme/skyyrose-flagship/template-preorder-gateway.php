@@ -6,7 +6,7 @@
  * tabbed product grids using holo cards, sticky cart summary bar, and GSAP
  * entrance/collection-switching animations. Dark luxury aesthetic.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   2.0.0
  * @updated 6.0.0 — complete rewrite from static pre-order.html
  */

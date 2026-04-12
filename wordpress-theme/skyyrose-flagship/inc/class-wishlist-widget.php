@@ -2,7 +2,7 @@
 /**
  * Wishlist Widget
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since 1.0.0
  */
 

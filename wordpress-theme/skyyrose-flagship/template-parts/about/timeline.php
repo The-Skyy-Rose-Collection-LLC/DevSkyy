@@ -9,7 +9,7 @@
  *     @type array $timeline_milestones Array of milestone data (year, event, desc).
  * }
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

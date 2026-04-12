@@ -10,7 +10,7 @@
  * Runs on `after_switch_theme` (fresh activation) and once on `init`
  * via a versioned option flag (for sites already running the theme).
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   4.0.0
  */
 

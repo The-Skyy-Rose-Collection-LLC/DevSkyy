@@ -11,7 +11,7 @@
  *     @type array  $origin_paragraphs Array of paragraph strings.
  * }
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

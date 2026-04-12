@@ -6,7 +6,7 @@
  * Runs once via `after_switch_theme` and can be re-triggered via
  * `skyyrose_setup_menus()` manually.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.2.0
  */
 

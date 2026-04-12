@@ -8,7 +8,7 @@
  * AI-composited scene images with beacon-style product discovery.
  * Built on the shared immersive engine (immersive.css + immersive.js).
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.0.0
  * @updated 6.0.0 — Rebuild on shared 2D engine, AI scene images
  */

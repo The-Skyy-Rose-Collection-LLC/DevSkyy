@@ -11,7 +11,7 @@
  *   Love Hurts  — crimson / gothic (#DC143C)
  *   Signature   — gold / opulence (#D4AF37)
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   4.0.0
  * @version 4.0.0
  *

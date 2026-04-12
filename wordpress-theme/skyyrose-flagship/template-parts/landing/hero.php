@@ -16,7 +16,7 @@
  *   'cta_secondary' => array  ['text' => 'Story', 'url' => '#story']  (optional)
  *   'bg_image'     => string  Hero background image URL (optional)
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

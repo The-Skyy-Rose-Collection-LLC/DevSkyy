@@ -15,7 +15,7 @@
  *   'wear_count'  => int      Legacy param for cost-per-wear (no longer rendered on the card itself)
  *   'remaining'   => array    Legacy scarcity map (no longer rendered; holo reads WC stock)
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

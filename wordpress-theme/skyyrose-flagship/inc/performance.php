@@ -11,7 +11,7 @@
  * - Image optimization hints
  * - Cache header helpers
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.6.0
  */
 

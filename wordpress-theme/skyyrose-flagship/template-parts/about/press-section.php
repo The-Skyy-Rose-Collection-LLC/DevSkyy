@@ -11,7 +11,7 @@
  *     @type string $arrow_svg        Arrow SVG markup string.
  * }
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

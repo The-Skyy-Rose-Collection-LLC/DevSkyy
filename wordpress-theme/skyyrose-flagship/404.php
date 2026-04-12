@@ -6,7 +6,7 @@
  * sparkle particles, search, collection quick-links, trending products,
  * quick navigation, newsletter CTA, floating orbs, and film grain overlay.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.1.0
  */
 

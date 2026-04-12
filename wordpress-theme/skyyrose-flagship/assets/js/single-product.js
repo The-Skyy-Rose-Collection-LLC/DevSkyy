@@ -4,7 +4,7 @@
  * Gallery zoom, thumbnail switcher, WC variation image swap,
  * accordion, sticky ATC bar, AJAX cart feedback, scroll reveals.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since 4.0.0
  */
 (function($) {
