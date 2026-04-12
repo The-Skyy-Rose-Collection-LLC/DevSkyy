@@ -32,30 +32,42 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Single source of truth for the catalog-fallback card shape consumed by
  * `template-parts/product-card-holo.php`. Called from both the cold-path
- * resolver (_skyyrose_resolve_display_products) and the transient cache
- * rehydration path (skyyrose_get_featured_display_products) so both
- * paths produce identical shapes — blank fields and dead `#` CTAs
- * regress the moment the shapes drift.
+ * resolver and the transient cache rehydration loop, so the two code
+ * paths cannot drift — blank fields and dead `#` CTAs regress the moment
+ * the shapes stop matching.
+ *
+ * All `$cat` accesses are `?? ''` guarded so a thinner array (e.g. a
+ * partial catalog snapshot from a plugin filter) degrades to empty
+ * strings rather than emitting `E_WARNING: Undefined array key` under
+ * PHP 8.x.
  *
  * @since  6.5.2
  * @access private
+ * @see    _skyyrose_resolve_display_products() Cold-path caller.
+ * @see    skyyrose_get_featured_display_products() Rehydration caller.
  * @param  array $cat Raw catalog entry.
  * @return array      Display-shaped static card.
  */
 function _skyyrose_catalog_to_static_card( array $cat ) {
+	$sku          = (string) ( $cat['sku'] ?? '' );
+	// Preserve the original `?:` fall-through semantics (empty string
+	// falls through to `image`), not `??` which only falls through on null.
+	$front_source = ( $cat['front_model_image'] ?? '' ) ?: ( $cat['image'] ?? '' );
 	return array(
-		'title'      => $cat['name'],
+		'title'      => $cat['name'] ?? '',
 		'price'      => skyyrose_format_price( $cat ),
-		'badge_text' => $cat['badge'],
-		'sku'        => $cat['sku'],
-		'image_url'  => skyyrose_product_image_uri( $cat['front_model_image'] ?: $cat['image'] ),
-		'image_back' => skyyrose_product_image_uri( $cat['back_image'] ),
+		'badge_text' => $cat['badge'] ?? '',
+		'sku'        => $sku,
+		'image_url'  => skyyrose_product_image_uri( $front_source ),
+		'image_back' => skyyrose_product_image_uri( $cat['back_image'] ?? '' ),
 		'collection' => $cat['collection'] ?? '',
 		// Resolve a real URL via skyyrose_product_url() — routes through WC
 		// permalink → preorder anchor → collection anchor fallback. Prevents
 		// the homepage featured grid from rendering dead href="#" CTAs when
-		// a curated SKU has no matching WC product.
-		'permalink'  => function_exists( 'skyyrose_product_url' ) ? skyyrose_product_url( $cat['sku'] ) : '',
+		// a curated SKU has no matching WC product. No function_exists guard
+		// here: product-catalog.php is a hard require for this file, matching
+		// the unguarded skyyrose_format_price() call above.
+		'permalink'  => skyyrose_product_url( $sku ),
 	);
 }
 
@@ -305,12 +317,28 @@ function skyyrose_get_featured_display_products( $limit = 8 ) {
 				$hydrated[] = $product;
 			}
 		} elseif ( 'catalog' === $desc['type'] && function_exists( 'skyyrose_get_product' ) ) {
-			$cat = skyyrose_get_product( (string) $desc['sku'] );
-			// Re-check visibility — an admin who un-publishes a product
-			// during the 5-minute TTL should not have it resurrected from
-			// stale descriptors.
+			$sku = (string) $desc['sku'];
+			$cat = skyyrose_get_product( $sku );
+			// Re-check visibility — descriptors are a point-in-time snapshot,
+			// and catalog entries can flip 'published' between cache write and
+			// cache read (plugin filter, code deploy, etc.). WC product edits
+			// are covered by the save_post_product / woocommerce_update_product
+			// flush hooks wired below; this guard covers pure-catalog drift.
 			if ( $cat && ( ! empty( $cat['published'] ) || ! empty( $cat['is_preorder'] ) ) ) {
 				$hydrated[] = _skyyrose_catalog_to_static_card( $cat );
+			} elseif ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				// Symmetric with the cold-path WP_DEBUG trigger_error in
+				// _skyyrose_resolve_display_products() — a shop operator
+				// debugging "why did my homepage card disappear" should see
+				// matching log lines from both the cold and rehydration paths.
+				trigger_error(
+					sprintf(
+						'skyyrose featured cache: catalog descriptor SKU %s dropped on rehydration (%s).',
+						esc_html( $sku ),
+						$cat ? 'not published' : 'missing from catalog'
+					),
+					E_USER_NOTICE
+				);
 			}
 		}
 	}
