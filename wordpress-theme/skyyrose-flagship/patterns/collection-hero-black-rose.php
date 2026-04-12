@@ -6,6 +6,8 @@
  * Description: Full-width hero section for the Black Rose collection with silver accent.
  * Keywords: hero, black rose, collection, gothic
  * Block Types: core/group
+ *
+ * @package SkyyRose
  * Post Types: page
  */
 

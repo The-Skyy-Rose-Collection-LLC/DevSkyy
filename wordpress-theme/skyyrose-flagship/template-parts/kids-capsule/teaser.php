@@ -26,9 +26,11 @@ $assets_uri  = defined( 'SKYYROSE_ASSETS_URI' ) ? SKYYROSE_ASSETS_URI : '';
 <div class="kc-teaser" data-collection="kids-capsule">
 
 	<?php
-	/*--------------------------------------------------------------
+	/*
+	--------------------------------------------------------------
 	 * 1. Hero — KC Night Canvas
-	 *--------------------------------------------------------------*/ ?>
+	 *--------------------------------------------------------------*/
+	?>
 	<section class="kc-teaser__hero" id="kc-hero" aria-label="<?php esc_attr_e( 'Kids Capsule Coming Soon', 'skyyrose' ); ?>">
 		<div class="kc-teaser__hero-bg" aria-hidden="true"></div>
 		<div class="kc-teaser__hero-content">
@@ -45,9 +47,11 @@ $assets_uri  = defined( 'SKYYROSE_ASSETS_URI' ) ? SKYYROSE_ASSETS_URI : '';
 	</section>
 
 	<?php
-	/*--------------------------------------------------------------
+	/*
+	--------------------------------------------------------------
 	 * 2. Reveal Statement
-	 *--------------------------------------------------------------*/ ?>
+	 *--------------------------------------------------------------*/
+	?>
 	<section class="kc-teaser__reveal col-reveal" aria-label="<?php esc_attr_e( 'Collection Story', 'skyyrose' ); ?>">
 		<div class="kc-teaser__reveal-inner">
 			<blockquote class="kc-teaser__quote">
@@ -62,9 +66,11 @@ $assets_uri  = defined( 'SKYYROSE_ASSETS_URI' ) ? SKYYROSE_ASSETS_URI : '';
 	</section>
 
 	<?php
-	/*--------------------------------------------------------------
+	/*
+	--------------------------------------------------------------
 	 * 3. Countdown Timer
-	 *--------------------------------------------------------------*/ ?>
+	 *--------------------------------------------------------------*/
+	?>
 	<?php if ( $launch_date ) : ?>
 	<section class="kc-teaser__countdown col-reveal" id="kc-countdown" aria-label="<?php esc_attr_e( 'Launch Countdown', 'skyyrose' ); ?>">
 		<h2 class="kc-teaser__section-title"><?php esc_html_e( 'Launching In', 'skyyrose' ); ?></h2>
@@ -93,9 +99,11 @@ $assets_uri  = defined( 'SKYYROSE_ASSETS_URI' ) ? SKYYROSE_ASSETS_URI : '';
 	<?php endif; ?>
 
 	<?php
-	/*--------------------------------------------------------------
+	/*
+	--------------------------------------------------------------
 	 * 4. Parent-Child Preview
-	 *--------------------------------------------------------------*/ ?>
+	 *--------------------------------------------------------------*/
+	?>
 	<section class="kc-teaser__preview col-reveal" aria-label="<?php esc_attr_e( 'Collection Preview', 'skyyrose' ); ?>">
 		<div class="kc-teaser__preview-inner">
 			<h2 class="kc-teaser__section-title rv-clip-up"><?php esc_html_e( 'Match With Your Mini', 'skyyrose' ); ?></h2>
@@ -116,9 +124,11 @@ $assets_uri  = defined( 'SKYYROSE_ASSETS_URI' ) ? SKYYROSE_ASSETS_URI : '';
 	</section>
 
 	<?php
-	/*--------------------------------------------------------------
+	/*
+	--------------------------------------------------------------
 	 * 5. Waitlist Form — Klaviyo
-	 *--------------------------------------------------------------*/ ?>
+	 *--------------------------------------------------------------*/
+	?>
 	<section class="kc-teaser__waitlist col-reveal" id="kc-waitlist" aria-label="<?php esc_attr_e( 'Join the Waitlist', 'skyyrose' ); ?>">
 		<div class="kc-teaser__waitlist-inner">
 			<h2 class="kc-teaser__section-title"><?php esc_html_e( 'Be the First to Know', 'skyyrose' ); ?></h2>
@@ -148,9 +158,11 @@ $assets_uri  = defined( 'SKYYROSE_ASSETS_URI' ) ? SKYYROSE_ASSETS_URI : '';
 	</section>
 
 	<?php
-	/*--------------------------------------------------------------
+	/*
+	--------------------------------------------------------------
 	 * 6. Brand Anchor
-	 *--------------------------------------------------------------*/ ?>
+	 *--------------------------------------------------------------*/
+	?>
 	<section class="kc-teaser__anchor col-reveal" aria-label="<?php esc_attr_e( 'Brand Story', 'skyyrose' ); ?>">
 		<div class="kc-teaser__anchor-inner">
 			<blockquote class="kc-teaser__anchor-quote">

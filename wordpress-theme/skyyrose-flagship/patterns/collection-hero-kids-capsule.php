@@ -6,6 +6,8 @@
  * Description: Full-width hero section for the Kids Capsule collection with pink accent.
  * Keywords: hero, kids capsule, collection, playful
  * Block Types: core/group
+ *
+ * @package SkyyRose
  * Post Types: page
  */
 

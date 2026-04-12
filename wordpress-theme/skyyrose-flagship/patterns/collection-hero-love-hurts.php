@@ -6,6 +6,8 @@
  * Description: Full-width hero section for the Love Hurts collection with crimson accent.
  * Keywords: hero, love hurts, collection, crimson
  * Block Types: core/group
+ *
+ * @package SkyyRose
  * Post Types: page
  */
 

@@ -6,6 +6,8 @@
  * Description: Full-width hero section for the Signature collection with gold accent.
  * Keywords: hero, signature, collection, luxury
  * Block Types: core/group
+ *
+ * @package SkyyRose
  * Post Types: page
  */
 

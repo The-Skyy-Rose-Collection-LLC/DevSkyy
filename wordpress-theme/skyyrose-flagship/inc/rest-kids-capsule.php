@@ -67,16 +67,21 @@ function skyyrose_rest_get_matching_set( $request ) {
 	$adult_id = (int) get_post_meta( $kids_id, '_kc_matching_adult_id', true );
 	$adult    = $adult_id ? wc_get_product( $adult_id ) : null;
 
-	$kids_data  = function_exists( 'skyyrose_build_product_data' )
+	$kids_data = function_exists( 'skyyrose_build_product_data' )
 		? skyyrose_build_product_data( $kids )
-		: array( 'id' => $kids_id, 'name' => $kids->get_name() );
+		: array(
+			'id'   => $kids_id,
+			'name' => $kids->get_name(),
+		);
 
 	$adult_data = ( $adult && function_exists( 'skyyrose_build_product_data' ) )
 		? skyyrose_build_product_data( $adult )
 		: null;
 
-	return rest_ensure_response( array(
-		'kids'  => $kids_data,
-		'adult' => $adult_data,
-	) );
+	return rest_ensure_response(
+		array(
+			'kids'  => $kids_data,
+			'adult' => $adult_data,
+		)
+	);
 }

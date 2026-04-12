@@ -133,10 +133,10 @@ function skyyrose_klaviyo_subscribe_to_list( $email, $list_id, $properties = arr
  */
 function skyyrose_klaviyo_list_id( $slug ) {
 	$option_map = array(
-		'general'    => 'skyyrose_klaviyo_list_general',
-		'black_rose' => 'skyyrose_klaviyo_list_black_rose',
-		'love_hurts' => 'skyyrose_klaviyo_list_love_hurts',
-		'signature'  => 'skyyrose_klaviyo_list_signature',
+		'general'      => 'skyyrose_klaviyo_list_general',
+		'black_rose'   => 'skyyrose_klaviyo_list_black_rose',
+		'love_hurts'   => 'skyyrose_klaviyo_list_love_hurts',
+		'signature'    => 'skyyrose_klaviyo_list_signature',
 		'jersey_vip'   => 'skyyrose_klaviyo_list_jersey_vip',
 		'kids_capsule' => 'skyyrose_klaviyo_list_kids_capsule',
 	);
@@ -546,10 +546,10 @@ function skyyrose_klaviyo_customizer_settings( $wp_customize ) {
 
 	// List IDs.
 	$lists = array(
-		'skyyrose_klaviyo_list_general'    => esc_html__( 'General Newsletter List ID', 'skyyrose' ),
-		'skyyrose_klaviyo_list_black_rose' => esc_html__( 'Black Rose Drop List ID', 'skyyrose' ),
-		'skyyrose_klaviyo_list_love_hurts' => esc_html__( 'Love Hurts Drop List ID', 'skyyrose' ),
-		'skyyrose_klaviyo_list_signature'  => esc_html__( 'Signature Drop List ID', 'skyyrose' ),
+		'skyyrose_klaviyo_list_general'      => esc_html__( 'General Newsletter List ID', 'skyyrose' ),
+		'skyyrose_klaviyo_list_black_rose'   => esc_html__( 'Black Rose Drop List ID', 'skyyrose' ),
+		'skyyrose_klaviyo_list_love_hurts'   => esc_html__( 'Love Hurts Drop List ID', 'skyyrose' ),
+		'skyyrose_klaviyo_list_signature'    => esc_html__( 'Signature Drop List ID', 'skyyrose' ),
 		'skyyrose_klaviyo_list_jersey_vip'   => esc_html__( 'Jersey Series VIP List ID', 'skyyrose' ),
 		'skyyrose_klaviyo_list_kids_capsule' => esc_html__( 'Kids Capsule Waitlist List ID', 'skyyrose' ),
 	);

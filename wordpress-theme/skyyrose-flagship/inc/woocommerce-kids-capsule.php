@@ -52,18 +52,18 @@ function skyyrose_kc_meta_box_callback( $post ) {
 
 	wp_nonce_field( 'skyyrose_kc_meta_nonce', 'skyyrose_kc_meta_nonce' );
 
-	$age_range    = get_post_meta( $post->ID, '_kc_age_range', true );
-	$adult_id     = get_post_meta( $post->ID, '_kc_matching_adult_id', true );
-	$drop_number  = get_post_meta( $post->ID, '_kc_drop_number', true );
+	$age_range   = get_post_meta( $post->ID, '_kc_age_range', true );
+	$adult_id    = get_post_meta( $post->ID, '_kc_matching_adult_id', true );
+	$drop_number = get_post_meta( $post->ID, '_kc_drop_number', true );
 
 	$age_options = array(
-		''       => esc_html__( 'Select age range', 'skyyrose' ),
-		'2t-3t'  => '2T - 3T (Toddler)',
-		'4t-5t'  => '4T - 5T (Toddler)',
-		'4-6'    => '4 - 6 (Kids)',
-		'7-10'   => '7 - 10 (Kids)',
-		'11-14'  => '11 - 14 (Youth)',
-		'14-16'  => '14 - 16 (Youth/Junior)',
+		''      => esc_html__( 'Select age range', 'skyyrose' ),
+		'2t-3t' => '2T - 3T (Toddler)',
+		'4t-5t' => '4T - 5T (Toddler)',
+		'4-6'   => '4 - 6 (Kids)',
+		'7-10'  => '7 - 10 (Kids)',
+		'11-14' => '11 - 14 (Youth)',
+		'14-16' => '14 - 16 (Youth/Junior)',
 	);
 	?>
 	<p>
@@ -119,7 +119,7 @@ function skyyrose_save_kc_meta( $post_id ) {
 
 	// Age range — validate against allowed values.
 	if ( isset( $_POST['skyyrose_kc_age_range'] ) ) {
-		$age = sanitize_text_field( wp_unslash( $_POST['skyyrose_kc_age_range'] ) );
+		$age     = sanitize_text_field( wp_unslash( $_POST['skyyrose_kc_age_range'] ) );
 		$allowed = array( '', '2t-3t', '4t-5t', '4-6', '7-10', '11-14', '14-16' );
 		if ( in_array( $age, $allowed, true ) ) {
 			update_post_meta( $post_id, '_kc_age_range', $age );
