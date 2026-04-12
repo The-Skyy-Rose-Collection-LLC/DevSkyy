@@ -1,11 +1,11 @@
 <?php
 /**
- * SkyyRose Flagship Theme Functions
+ * SkyyRose Theme Functions
  *
  * Main bootstrap file. Defines theme constants and loads modular inc/ files.
  * All heavy logic is delegated to individual inc/ modules for maintainability.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   1.0.0
  */
 
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 --------------------------------------------------------------
  * Theme Constants
  *--------------------------------------------------------------*/
-define( 'SKYYROSE_VERSION', '6.5.2' );
+define( 'SKYYROSE_VERSION', '1.0.0' );
 define( 'SKYYROSE_DIR', get_template_directory() );
 define( 'SKYYROSE_URI', get_template_directory_uri() );
 
@@ -88,6 +88,8 @@ if ( class_exists( 'WooCommerce' ) ) {
 		'/inc/immersive-ajax.php',
 		'/inc/wishlist-functions.php',
 		'/inc/class-wishlist-widget.php',
+		'/inc/woocommerce-kids-capsule.php',
+		'/inc/rest-kids-capsule.php',
 	);
 
 	foreach ( $skyyrose_woo_includes as $skyyrose_file ) {

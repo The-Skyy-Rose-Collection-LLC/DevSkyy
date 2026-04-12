@@ -1,12 +1,12 @@
-=== SkyyRose Flagship ===
-Contributors: skyyrose
+=== SkyyRose ===
+Contributors: skyyroseco
+Tags: woocommerce, elementor, full-site-editing, fashion, ecommerce, luxury, accessibility-ready
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.2
-Stable tag: 6.5.2
-License: GPL-2.0-or-later
+Stable tag: 1.0.0
+License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Tags: e-commerce, woocommerce, one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-width-template, threaded-comments, translation-ready, accessibility-ready, block-styles
 
 A premium dark luxury WooCommerce theme for fashion, streetwear, and lifestyle brands. Features glassmorphism navigation, immersive product scenes, holographic product cards, 4 collection palettes, AJAX search, and WCAG 2.2 AA accessibility. Built for Elementor, Gutenberg, and all major page builders.
 
