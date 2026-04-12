@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*--------------------------------------------------------------
  * Theme Constants
  *--------------------------------------------------------------*/
-define( 'SKYYROSE_VERSION', '6.3.0' );
+define( 'SKYYROSE_VERSION', '6.5.2' );
 define( 'SKYYROSE_DIR', get_template_directory() );
 define( 'SKYYROSE_URI', get_template_directory_uri() );
 
@@ -42,15 +42,21 @@ $GLOBALS['concatenate_scripts'] = false;
  *--------------------------------------------------------------*/
 $skyyrose_core_includes = array(
 	'/inc/theme-setup.php',
+	'/inc/brand-colors.php',
+	'/inc/collections-config.php',
 	'/inc/enqueue.php',
 	'/inc/enqueue-performance.php',
 	'/inc/customizer.php',
 	'/inc/template-functions.php',
 	'/inc/security.php',
+	'/inc/accessibility-fix.php',
 	'/inc/accessibility-seo.php',
 	'/inc/seo.php',
 	'/inc/ajax-handlers.php',
+	'/inc/collection-content.php',
 	'/inc/product-catalog.php',
+	'/inc/product-catalog-display.php',
+	'/inc/immersive-product-adapter.php',
 	'/inc/product-taxonomy.php',
 	'/inc/facebook-sdk.php',
 	'/inc/menu-setup.php',
@@ -87,12 +93,17 @@ if ( class_exists( 'WooCommerce' ) ) {
 }
 
 /*--------------------------------------------------------------
- * Elementor Include (loaded only when Elementor is active)
+ * Elementor Includes (loaded only when Elementor is active)
  *--------------------------------------------------------------*/
 add_action( 'elementor/loaded', function () {
 	$elementor_path = SKYYROSE_DIR . '/inc/elementor.php';
 	if ( file_exists( $elementor_path ) ) {
 		require_once $elementor_path;
+	}
+
+	$elementor_compat_path = SKYYROSE_DIR . '/inc/elementor-compat.php';
+	if ( file_exists( $elementor_compat_path ) ) {
+		require_once $elementor_compat_path;
 	}
 } );
 

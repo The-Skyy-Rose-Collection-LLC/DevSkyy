@@ -1,0 +1,12 @@
+{
+  "sku": "sg-003",
+  "name": "The Bridge Series 'Stay Golden' Shorts",
+  "dirname": "The Bridge Series Stay Golden Shorts",
+  "collection": "signature",
+  "files": {
+    "techflat-front": "techflat-front.jpeg",
+    "techflat-back": "techflat-back.jpeg",
+    "logo-ref": "logo-ref.png",
+    "spec": "spec.txt"
+  }
+}

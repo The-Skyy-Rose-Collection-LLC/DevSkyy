@@ -46,12 +46,12 @@ _GEMINI_ENV = Path(__file__).parent.parent / "gemini" / ".env"
 if _GEMINI_ENV.exists():
     load_dotenv(_GEMINI_ENV, override=True)
 
+import anthropic
+import openai
+
 # Provider imports
 from google import genai as google_genai
 from google.genai import types as genai_types
-
-import anthropic
-import openai
 
 # ---------------------------------------------------------------------------
 # Configuration

@@ -1,0 +1,11 @@
+{
+  "sku": "sg-011",
+  "name": "Original Label Tee (White)",
+  "dirname": "Original Label Tee (White)",
+  "collection": "signature",
+  "files": {
+    "techflat-front": "techflat-front.webp",
+    "logo-ref": "logo-ref.jpeg",
+    "spec": "spec.txt"
+  }
+}

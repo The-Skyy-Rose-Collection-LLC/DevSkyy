@@ -110,7 +110,7 @@ def categorize_error(error: Exception) -> ErrorCategory:
     return ErrorCategory.FATAL
 
 
-async def ralph_wiggums_execute(
+async def ralph_wiggums_execute[T](
     operation: Callable[[], T],
     fallbacks: list[Callable[[], T]] | None = None,
     max_attempts: int = 3,
@@ -383,7 +383,7 @@ def with_retry(
     return decorator
 
 
-async def with_fallbacks(
+async def with_fallbacks[T](
     operations: list[Callable[[], T]],
     max_attempts_per_op: int = 2,
     base_delay: float = 1.0,

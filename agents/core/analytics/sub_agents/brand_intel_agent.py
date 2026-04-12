@@ -690,9 +690,9 @@ class BrandIntelAgent(SubAgent):
                     "scores": scores,
                     "overall": round(overall, 1),
                     "grade": self._score_to_grade(overall),
-                    "vs_skyyrose": "above"
-                    if overall > 70
-                    else ("par" if overall > 50 else "below"),
+                    "vs_skyyrose": (
+                        "above" if overall > 70 else ("par" if overall > 50 else "below")
+                    ),
                 }
             )
 

@@ -31,6 +31,7 @@ ENV_FILE="${ENV_FILE:-$PROJECT_ROOT/.env.wordpress}"
 # State tracking
 # ---------------------------------------------------------------------------
 DRY_RUN=false
+WITH_MAINTENANCE=false
 MAINTENANCE_ACTIVE=false
 
 # ---------------------------------------------------------------------------
@@ -56,18 +57,24 @@ usage() {
     echo "Deploy the SkyyRose WordPress theme to production."
     echo ""
     echo "Options:"
-    echo "  --dry-run    Preview what would happen without touching production"
-    echo "  --help       Show this help message"
+    echo "  --dry-run            Preview what would happen without touching production"
+    echo "  --with-maintenance   Enable wp maintenance-mode during deploy (legacy)."
+    echo "                       Default is hot-swap, which avoids the Jetpack Uptime"
+    echo "                       false-positive 503 window. Use --with-maintenance for"
+    echo "                       deploys that include DB migrations or plugin changes."
+    echo "  --help               Show this help message"
     echo ""
     echo "Environment:"
     echo "  ENV_FILE             Path to .env.wordpress (default: \$PROJECT_ROOT/.env.wordpress)"
     echo "  THEME_DIR_OVERRIDE   Override theme source directory"
+    echo "  PUBLIC_URL           Verified URL for post-deploy check (default: https://skyyrose.co/)"
     echo ""
     echo "The script will:"
     echo "  1. Run preflight checks (credentials, tools, PHP syntax)"
-    echo "  2. Enable maintenance mode via WP-CLI over SSH"
-    echo "  3. Transfer theme files via rsync (with lftp SFTP fallback)"
-    echo "  4. Disable maintenance mode and flush all caches"
+    echo "  2. Transfer theme files via tar+scp with atomic hot-swap on remote"
+    echo "     (or, with --with-maintenance, enable maintenance mode first)"
+    echo "  3. Flush object/transient/rewrite caches"
+    echo "  4. Verify the live site returns HTTP 200 with no PHP error markers"
 }
 
 # ---------------------------------------------------------------------------
@@ -78,6 +85,10 @@ parse_args() {
         case "$1" in
             --dry-run)
                 DRY_RUN=true
+                shift
+                ;;
+            --with-maintenance)
+                WITH_MAINTENANCE=true
                 shift
                 ;;
             --help|-h)
@@ -323,8 +334,15 @@ try_rsync() {
     log_info "Uploading via scp..."
     "${SCP_CMD[@]}" "$tmpzip" "${SSH_USER}@${SSH_HOST}:/tmp/skyyrose-deploy.tar.gz"
 
-    log_info "Extracting on remote..."
-    "${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" "cd /tmp && tar -xzf skyyrose-deploy.tar.gz && rm -rf ${WP_THEME_PATH} && mv skyyrose-flagship ${WP_THEME_PATH} && rm skyyrose-deploy.tar.gz"
+    log_info "Extracting on remote (atomic hot-swap)..."
+    # Hot-swap deploy (DEPLOY-08): rename current theme aside, then rename new
+    # theme into place. The live path is unreachable only between two consecutive
+    # rename(2) syscalls — microseconds, not the ~60 seconds the old `rm -rf && mv`
+    # pattern produced with maintenance mode. Jetpack Uptime stops firing
+    # false-positive "site is down" alerts during routine code-only deploys.
+    local swap_id
+    swap_id="$(date +%s)-$$"
+    "${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" "cd /tmp && tar -xzf skyyrose-deploy.tar.gz && (if [ -d '${WP_THEME_PATH}' ]; then mv '${WP_THEME_PATH}' '${WP_THEME_PATH}.old.${swap_id}'; fi) && mv skyyrose-flagship '${WP_THEME_PATH}' && (rm -rf '${WP_THEME_PATH}.old.${swap_id}' 2>/dev/null; rm -f skyyrose-deploy.tar.gz; true)"
 
     rm -f "$tmpzip"
     log_success "Theme uploaded and extracted"
@@ -376,6 +394,64 @@ flush_caches() {
 }
 
 # ---------------------------------------------------------------------------
+# Post-deploy verification (DEPLOY-08)
+#
+# Boris Cherny's #1 tip for Claude Code: "Give Claude a way to verify its
+# work. If Claude has that feedback loop, it will 2-3x the quality of the
+# final result."
+#
+# We curl the live homepage with a cache-buster query string (bypasses
+# Jetpack Boost page cache) and assert: HTTP 200, response size >= 50 KB
+# (an error page or half-rendered fatal is typically much smaller), and
+# no PHP error markers leaking through to the HTML body. Exits non-zero
+# on any failure so the caller knows the deploy didn't really land.
+#
+# Override the verified URL via the PUBLIC_URL env var.
+# ---------------------------------------------------------------------------
+verify_live() {
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log_info "[DRY RUN] Skipping live verification"
+        return 0
+    fi
+
+    local public_url="${PUBLIC_URL:-https://skyyrose.co/}"
+    local bust_url="${public_url}?deploy_verify=$(date +%s)"
+    local tmpfile
+    tmpfile="$(mktemp)"
+    # shellcheck disable=SC2064
+    trap "rm -f '$tmpfile'" RETURN
+
+    log_info "Running post-deploy verification: $bust_url"
+
+    local http_code
+    http_code=$(curl -sS -o "$tmpfile" -w "%{http_code}" \
+        -A "DevSkyy-deploy-verify/1.0" \
+        --max-time 30 \
+        "$bust_url" 2>/dev/null || echo "000")
+
+    if [[ "$http_code" != "200" ]]; then
+        log_error "Verification FAILED: homepage returned HTTP $http_code (expected 200)"
+        return 1
+    fi
+
+    local size
+    size=$(wc -c < "$tmpfile" | tr -d ' ')
+    if [[ "${size:-0}" -lt 50000 ]]; then
+        log_error "Verification FAILED: homepage response too small (${size:-0} bytes, expected >= 50 KB)"
+        return 1
+    fi
+
+    if grep -qE "Fatal error|Parse error|Call to undefined|There has been a critical error" "$tmpfile"; then
+        log_error "Verification FAILED: PHP error markers found in homepage response:"
+        grep -oE "(Fatal error|Parse error|Call to undefined|There has been a critical error)[^<]{0,100}" "$tmpfile" | head -3 >&2
+        return 1
+    fi
+
+    log_success "Post-deploy verification passed (HTTP $http_code, $size bytes)"
+    return 0
+}
+
+# ---------------------------------------------------------------------------
 # Main deploy pipeline
 # ---------------------------------------------------------------------------
 main() {
@@ -395,25 +471,42 @@ main() {
     # 1. Preflight checks
     preflight
 
-    # 2. Enable maintenance mode (DEPLOY-02)
-    log_info "Activating maintenance mode..."
-    wp_remote "maintenance-mode activate"
-    MAINTENANCE_ACTIVE=true
-    log_success "Maintenance mode active"
+    # 2. Maintenance mode — OPT-IN via --with-maintenance (DEPLOY-02)
+    # Hot-swap (the default transfer path) makes maintenance mode unnecessary
+    # for code-only deploys and eliminates the Jetpack Uptime false-positive
+    # alert window. Pass --with-maintenance when deploying DB migrations or
+    # plugin changes that require the site to be locked.
+    if [[ "$WITH_MAINTENANCE" == "true" ]]; then
+        log_info "Activating maintenance mode (--with-maintenance)..."
+        wp_remote "maintenance-mode activate"
+        MAINTENANCE_ACTIVE=true
+        log_success "Maintenance mode active"
+    else
+        log_info "Skipping maintenance mode (hot-swap default) — pass --with-maintenance to opt in"
+    fi
 
     # 3. Transfer files (DEPLOY-01)
     transfer_files
 
-    # 4. Disable maintenance mode (DEPLOY-03)
-    log_info "Deactivating maintenance mode..."
-    wp_remote "maintenance-mode deactivate"
-    MAINTENANCE_ACTIVE=false
-    log_success "Maintenance mode deactivated"
+    # 4. Disable maintenance mode if it was enabled (DEPLOY-03)
+    if [[ "$MAINTENANCE_ACTIVE" == "true" ]]; then
+        log_info "Deactivating maintenance mode..."
+        wp_remote "maintenance-mode deactivate"
+        MAINTENANCE_ACTIVE=false
+        log_success "Maintenance mode deactivated"
+    fi
 
     # 5. Flush caches (DEPLOY-03)
     flush_caches
 
-    log_success "=== Deploy complete ==="
+    # 6. Post-deploy verification gate (DEPLOY-08 — Boris Cherny tip #14)
+    if ! verify_live; then
+        log_error "=== Deploy FAILED post-verification ==="
+        log_error "Site may be in a broken state — investigate before re-deploying"
+        exit 1
+    fi
+
+    log_success "=== Deploy complete (verified live) ==="
 }
 
 main "$@"

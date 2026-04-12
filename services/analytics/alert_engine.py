@@ -356,8 +356,7 @@ class AlertEvaluationEngine:
         configs: list[AlertConfig] = []
 
         async with self._session_factory() as session:
-            result = await session.execute(
-                text("""
+            result = await session.execute(text("""
                     SELECT id, name, description, metric_name, condition_type,
                            condition_operator, threshold_value, threshold_unit,
                            window_duration_seconds, evaluation_interval_seconds,
@@ -366,8 +365,7 @@ class AlertEvaluationEngine:
                            created_by, updated_by, created_at, updated_at
                     FROM alert_configs
                     WHERE is_enabled = true
-                """)
-            )
+                """))
             rows = result.fetchall()
 
             for row in rows:

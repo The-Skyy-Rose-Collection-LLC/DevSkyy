@@ -1,0 +1,14 @@
+# Nano Banana 2 — SkyyRose AI Image Pipeline
+# Install: python3 -m venv .venv-imagery && source .venv-imagery/bin/activate && pip install -r requirements-imagery.txt
+#
+# Required env vars:
+#   GOOGLE_API_KEY          — Gemini image generation (required)
+#   OPENAI_API_KEY          — GPT Image engine + vision QA (optional)
+#   TOGETHER_API_KEY        — FLUX.2 via Together AI (optional)
+#   FAL_KEY                 — fal.ai models (optional)
+
+google-genai>=1.14.0
+Pillow>=10.0
+together>=1.0
+openai>=1.30
+httpx>=0.27

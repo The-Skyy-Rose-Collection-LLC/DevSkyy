@@ -106,7 +106,7 @@ function skyyrose_enqueue_global_styles() {
 		? 'system/animations-premium.min.css' : 'system/animations-premium.css';
 	if ( file_exists( $base_dir . '/' . $prem_anim ) ) {
 		$prem_slug     = skyyrose_get_current_template_slug();
-		$prem_skip     = array( 'cart', 'checkout', 'blog', 'single', 'page', 'contact', '404', 'search', 'default' );
+		$prem_skip     = array( 'cart', 'checkout', 'blog', 'single', 'page', 'contact', '404', 'default' );
 		$skip_premium  = in_array( $prem_slug, $prem_skip, true );
 		if ( ! $skip_premium ) {
 			wp_enqueue_style(
@@ -180,6 +180,16 @@ function skyyrose_enqueue_global_styles() {
 			SKYYROSE_VERSION
 		);
 	}
+
+	// Skeleton loading states — shimmer placeholders for images and cards.
+	if ( file_exists( $base_dir . '/skeleton.css' ) ) {
+		wp_enqueue_style(
+			'skyyrose-skeleton',
+			$base_uri . '/skeleton.css',
+			array(),
+			SKYYROSE_VERSION
+		);
+	}
 }
 
 /**
@@ -239,6 +249,19 @@ function skyyrose_enqueue_global_scripts() {
 		wp_enqueue_script(
 			'skyyrose-premium-interactions',
 			$js_uri . '/' . $prem_js,
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+
+	// Page transitions + skeleton screens + scarcity bars.
+	$pt_file = $use_min && file_exists( $js_dir . '/page-transitions.min.js' )
+		? 'page-transitions.min.js' : 'page-transitions.js';
+	if ( file_exists( $js_dir . '/' . $pt_file ) ) {
+		wp_enqueue_script(
+			'skyyrose-page-transitions',
+			$js_uri . '/' . $pt_file,
 			array(),
 			SKYYROSE_VERSION,
 			true
@@ -338,6 +361,12 @@ function skyyrose_get_current_template_slug() {
 			'template-about.php'                   => 'about',
 			'template-contact.php'                 => 'contact',
 			'template-preorder-gateway.php'        => 'preorder-gateway',
+			'template-faq.php'                     => 'faq',
+			'template-shipping-returns.php'        => 'shipping-returns',
+			'template-landing-black-rose.php'      => 'landing',
+			'template-landing-love-hurts.php'      => 'landing',
+			'template-landing-signature.php'       => 'landing',
+			'template-elementor-editorial.php'     => 'elementor-editorial',
 		);
 
 		if ( isset( $template_map[ $page_template ] ) ) {
@@ -396,6 +425,10 @@ function skyyrose_enqueue_template_styles() {
 		'preorder-gateway'  => 'preorder-gateway.css',
 		'404'              => '404.css',
 		'search'           => 'search-results.css',
+		'faq'              => 'info-pages.css',
+		'shipping-returns' => 'info-pages.css',
+		'landing'              => 'landing-pages.css',
+		'elementor-editorial'  => 'landing-pages.css',
 		'single'           => 'generic-pages.css',
 		'blog'             => 'generic-pages.css',
 		'page'             => 'generic-pages.css',
@@ -495,6 +528,21 @@ function skyyrose_enqueue_template_scripts() {
 	$base_css_dir = SKYYROSE_DIR . '/assets/css';
 	$use_min     = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
+	// Landing pages JS — countdown, parallax, FAQ accordion, scroll reveal.
+	if ( in_array( $slug, array( 'landing', 'elementor-editorial' ), true ) ) {
+		$lp_js = $use_min && file_exists( $base_js_dir . '/landing-pages.min.js' )
+			? 'landing-pages.min.js' : 'landing-pages.js';
+		if ( file_exists( $base_js_dir . '/' . $lp_js ) ) {
+			wp_enqueue_script(
+				'skyyrose-landing-pages',
+				$base_js_uri . '/' . $lp_js,
+				array(),
+				SKYYROSE_VERSION,
+				true
+			);
+		}
+	}
+
 	// Collection pages JS — IntersectionObserver scroll-reveal (no GSAP dependency).
 	if ( 'collection-standalone' === $slug ) {
 		$col_js = $use_min && file_exists( $base_js_dir . '/collection-pages.min.js' )
@@ -563,6 +611,10 @@ function skyyrose_enqueue_template_scripts() {
 					'wcActive'    => class_exists( 'WooCommerce' ),
 					'checkoutUrl' => function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url() : home_url( '/checkout/' ),
 					'cartUrl'     => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
+					'i18n'        => array(
+						'item'  => __( 'item', 'skyyrose-flagship' ),
+						'items' => __( 'items', 'skyyrose-flagship' ),
+					),
 				)
 			);
 		}
@@ -572,7 +624,7 @@ function skyyrose_enqueue_template_scripts() {
 
 	// Holo product cards — loaded on collection pages, shop archives, and WC loop.
 	// NOTE: This must be OUTSIDE the $template_scripts check above.
-	if ( in_array( $slug, array( 'collection', 'collection-v4', 'collection-standalone', 'collections-shop', 'front-page', 'shop-archive', 'preorder-gateway', 'search' ), true ) ) {
+	if ( in_array( $slug, array( 'collection', 'collection-v4', 'collection-standalone', 'collections-shop', 'front-page', 'shop-archive', 'preorder-gateway', 'search', 'landing', 'elementor-editorial' ), true ) ) {
 			$holo_css_file = $use_min && file_exists( $base_css_dir . '/product-card-holo.min.css' )
 				? 'product-card-holo.min.css' : 'product-card-holo.css';
 			if ( file_exists( $base_css_dir . '/' . $holo_css_file ) ) {

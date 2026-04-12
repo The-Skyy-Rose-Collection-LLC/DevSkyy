@@ -120,7 +120,7 @@ async def generate_description(
 
     except Exception as e:
         logger.error(f"Description generation failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/generate/quick", response_model=DescriptionOutput)

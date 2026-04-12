@@ -146,24 +146,79 @@ function skyyrose_critical_style_priority( $html, $handle ) {
 }
 
 /**
- * Preload the hero image on the front page for faster LCP.
+ * Preload the hero/LCP image for the current template.
+ *
+ * Front page: preloads the hero background from Customizer.
+ * Single product: preloads the main product image (above-fold gallery).
+ * Collection/immersive: preloads the featured image (hero banner).
  *
  * @since 4.1.0
+ * @since 6.4.0 Extended to single product, collection, and immersive pages.
  * @return void
  */
 function skyyrose_preload_hero_image() {
-	if ( ! is_front_page() ) {
-		return;
+	$image_url = '';
+
+	if ( is_front_page() ) {
+		$image_url = get_theme_mod( 'skyyrose_hero_image', '' );
+	} elseif ( function_exists( 'is_product' ) && is_product() ) {
+		// Single product: the main gallery image is the LCP element.
+		global $product;
+		if ( ! $product && function_exists( 'wc_get_product' ) ) {
+			$product = wc_get_product( get_the_ID() );
+		}
+		if ( $product && $product->get_image_id() ) {
+			$image_url = wp_get_attachment_url( $product->get_image_id() );
+		}
+	} elseif ( is_page() ) {
+		// Collection and immersive pages: preload featured image if set.
+		$template = get_page_template_slug();
+		$hero_templates = array(
+			'template-collection-black-rose.php',
+			'template-collection-love-hurts.php',
+			'template-collection-signature.php',
+			'template-collection-kids-capsule.php',
+			'template-immersive-black-rose.php',
+			'template-immersive-love-hurts.php',
+			'template-immersive-signature.php',
+			'template-immersive-kids-capsule.php',
+			'template-about.php',
+		);
+		if ( $template && in_array( $template, $hero_templates, true ) && has_post_thumbnail() ) {
+			$image_url = get_the_post_thumbnail_url( get_the_ID(), 'full' );
+		}
 	}
 
-	// Preload hero background — this is typically the LCP element.
-	$hero_image = get_theme_mod( 'skyyrose_hero_image', '' );
-	if ( $hero_image ) {
+	if ( $image_url ) {
 		printf(
 			'<link rel="preload" href="%s" as="image" fetchpriority="high">' . "\n",
-			esc_url( $hero_image )
+			esc_url( $image_url )
 		);
 	}
+}
+
+/**
+ * Add Subresource Integrity (SRI) hashes to CDN-loaded scripts.
+ *
+ * Ensures that CDN-delivered files have not been tampered with.
+ * If the hash doesn't match, the browser refuses to execute the script.
+ *
+ * @since 6.4.0
+ * @param  string $tag    Full script tag HTML.
+ * @param  string $handle Script handle.
+ * @return string Modified tag.
+ */
+function skyyrose_add_sri_hashes( $tag, $handle ) {
+	$sri_map = array(
+		'skyyrose-gsap'    => 'sha512-uLQ2FiOFLOSKlKAOaGEHMA/N2O2qOc5OjA6MGOF1ygQZwfBMCURc12Bj+/YJymGs6PiA1KOsSiyc+PMjBvfg==',
+		'skyyrose-gsap-st' => 'sha512-HhCLnFuMiJVTOwulMQrifGsT0pc69svMZVJxYkFiUB8e2HCMFqBEnKNWlGRMO+y7Y+S5eFZyGQ17IPJMP7fUA==',
+	);
+
+	if ( isset( $sri_map[ $handle ] ) ) {
+		$tag = str_replace( ' src=', ' integrity="' . $sri_map[ $handle ] . '" crossorigin="anonymous" src=', $tag );
+	}
+
+	return $tag;
 }
 
 /*--------------------------------------------------------------
@@ -187,3 +242,6 @@ add_filter( 'style_loader_tag', 'skyyrose_critical_style_priority', 10, 2 );
 
 // Preload hero image on front page for better LCP.
 add_action( 'wp_head', 'skyyrose_preload_hero_image', 4 );
+
+// Add SRI hashes to CDN scripts for defense-in-depth.
+add_filter( 'script_loader_tag', 'skyyrose_add_sri_hashes', 20, 2 );

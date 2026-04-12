@@ -53,8 +53,7 @@ print(f"  ... and {len(products_images) - 5} more\n")
 print("=" * 60)
 print("🔧 NEXT STEPS - Use WordPress MCP Tools")
 print("=" * 60)
-print(
-    """
+print("""
 To complete the gallery update using MCP tools:
 
 1. List WooCommerce products:
@@ -75,8 +74,7 @@ To complete the gallery update using MCP tools:
 
 NOTE: This approach may bypass REST API rate limits since MCP
 tools use internal WordPress APIs rather than the REST API.
-"""
-)
+""")
 
 # Save product groupings for manual reference
 output_file = project_root / "assets" / "2d-25d-assets" / "product_image_mappings.json"

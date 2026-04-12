@@ -21,42 +21,8 @@ $hero_bg     = SKYYROSE_ASSETS_URI . '/images/homepage-hero-bg.webp';
 $founder_img = SKYYROSE_ASSETS_URI . '/images/homepage-story-founder.webp';
 $cart_url    = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' );
 
-/* Collection data — dynamic product counts from WooCommerce */
-$collections = array(
-	array(
-		'slug'    => 'black-rose',
-		'class'   => 'br',
-		'name'    => __( 'Black Rose', 'skyyrose-flagship' ),
-		'title'   => 'Black<br>Rose',
-		'tagline' => __( 'For those who found power in the dark.', 'skyyrose-flagship' ),
-		'label'   => __( 'Limited', 'skyyrose-flagship' ),
-		'num'     => __( 'Collection 01', 'skyyrose-flagship' ),
-		'link'    => home_url( '/collection-black-rose/' ),
-		'image'   => SKYYROSE_ASSETS_URI . '/images/homepage-col-black-rose.webp',
-	),
-	array(
-		'slug'    => 'love-hurts',
-		'class'   => 'lh',
-		'name'    => __( 'Love Hurts', 'skyyrose-flagship' ),
-		'title'   => 'Love<br>Hurts',
-		'tagline' => __( 'Wear your heart. Own your scars.', 'skyyrose-flagship' ),
-		'label'   => __( 'Family Legacy', 'skyyrose-flagship' ),
-		'num'     => __( 'Collection 02', 'skyyrose-flagship' ),
-		'link'    => home_url( '/collection-love-hurts/' ),
-		'image'   => SKYYROSE_ASSETS_URI . '/images/homepage-col-love-hurts.webp',
-	),
-	array(
-		'slug'    => 'signature',
-		'class'   => 'sg',
-		'name'    => __( 'Signature', 'skyyrose-flagship' ),
-		'title'   => 'Signature',
-		'tagline' => __( 'The foundation of any wardrobe worth building.', 'skyyrose-flagship' ),
-		'label'   => __( 'Everyday Luxury', 'skyyrose-flagship' ),
-		'num'     => __( 'Collection 03', 'skyyrose-flagship' ),
-		'link'    => home_url( '/collection-signature/' ),
-		'image'   => SKYYROSE_ASSETS_URI . '/images/homepage-col-signature.webp',
-	),
-);
+/* Collection data sourced from inc/collections-config.php (single source of truth). */
+$collections = skyyrose_get_front_page_collections();
 
 /* Dynamic product counts per collection */
 foreach ( $collections as &$col ) {
@@ -297,6 +263,23 @@ get_header();
 		<?php endforeach; ?>
 	</div>
 </section>
+
+<!-- ═══ FEATURED PRODUCTS ═══ -->
+<?php
+get_template_part(
+	'template-parts/product-grid',
+	null,
+	array(
+		'featured'      => true,
+		'limit'         => 8,
+		'heading'       => __( 'Featured', 'skyyrose-flagship' ),
+		'subheading'    => __( 'Shop the staples — limited editions, Oakland-made.', 'skyyrose-flagship' ),
+		'section_id'    => 'featured',
+		'section_class' => 'fp-featured',
+		'reveal_class'  => 'rv-clip-up',
+	)
+);
+?>
 
 <!-- ═══ LOOKBOOK ═══ -->
 <section class="lookbook" id="lookbook" aria-label="<?php esc_attr_e( 'Lookbook', 'skyyrose-flagship' ); ?>">

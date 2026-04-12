@@ -1,0 +1,11 @@
+{
+  "sku": "sg-005",
+  "name": "The Bridge Series 'The Bay Bridge' Shirt",
+  "dirname": "The Bridge Series The Bay Bridge Shirt",
+  "collection": "signature",
+  "files": {
+    "techflat-front": "techflat-front.jpg",
+    "logo-ref": "logo-ref.png",
+    "spec": "spec.txt"
+  }
+}

@@ -20,8 +20,14 @@ from database.db import db_manager
 
 @pytest.fixture
 async def client():
-    """ASGI test client with fresh in-memory database."""
+    """ASGI test client with fresh in-memory database and reset rate limiter."""
     from main_enterprise import app
+
+    # Reset rate limiter state so tests don't hit 429
+    from security.rate_limiting import rate_limiter
+
+    rate_limiter.sliding_windows.clear()
+    rate_limiter.token_buckets.clear()
 
     # Reset singleton for test isolation
     if db_manager._engine:

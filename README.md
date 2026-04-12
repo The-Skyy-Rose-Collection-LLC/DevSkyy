@@ -37,6 +37,7 @@ cd frontend && npm run dev                          # Dashboard
 # B) Full stack via Docker (API + deps in containers):
 docker-compose up -d
 
+
 # Test
 make test-fast                       # Unit tests
 make ci                              # Full CI (lint + type + test)

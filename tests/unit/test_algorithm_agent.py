@@ -4,13 +4,11 @@ Tests for the Algorithm Sub-Agent.
 
 from __future__ import annotations
 
-
 import pytest
 
 from agents.core.analytics.sub_agents.algorithm_agent import (
     AlgorithmSubAgent,
 )
-
 
 # =============================================================================
 # Fixtures

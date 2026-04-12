@@ -1,36 +1,100 @@
-"""Tests for Assets API endpoints."""
+"""Tests for Assets API endpoints.
+
+Tests the actual ingest/job-status endpoints and the versioning endpoints
+provided by api.v1.assets.  Uses a standalone TestClient with dependency
+overrides so tests are isolated from the global rate limiter.
+"""
 
 import io
-from unittest.mock import patch
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from PIL import Image
+from services.storage import (
+    AssetNotFoundError,
+    AssetVersionManager,
+    VersionInfo,
+    VersionListResponse,
+    VersionNotFoundError,
+    VersionStatus,
+)
 
-pytestmark = pytest.mark.asyncio
+from api.v1.assets import get_version_manager, router
+from security.jwt_oauth2_auth import TokenPayload, TokenType
+
+# ---------------------------------------------------------------------------
+# Fixtures
+# ---------------------------------------------------------------------------
 
 
 @pytest.fixture
-def mock_asset_data():
-    """Sample asset data for testing."""
-    return {
-        "id": "test-asset-123",
-        "name": "test-product.jpg",
-        "url": "https://storage.example.com/test-product.jpg",
-        "collection": "signature",
-        "sku": "SKY-001",
-        "tags": ["rose-gold", "hoodie"],
-        "type": "image",
-        "size": 2048576,
-        "dimensions": {"width": 1920, "height": 1080},
-        "uploaded_at": "2026-01-29T00:00:00Z",
-    }
+def mock_user() -> TokenPayload:
+    """Create mock authenticated user."""
+    return TokenPayload(
+        sub="user_test",
+        jti="jti_test",
+        type=TokenType.ACCESS,
+        roles=["user"],
+        exp=datetime.now(UTC),
+        iat=datetime.now(UTC),
+    )
+
+
+@pytest.fixture
+def mock_version_manager() -> MagicMock:
+    """Create a mock version manager."""
+    manager = MagicMock(spec=AssetVersionManager)
+    manager.list_versions = AsyncMock(
+        return_value=VersionListResponse(
+            asset_id="asset_1",
+            versions=[],
+            total=0,
+            current_version=1,
+        )
+    )
+    manager.get_version = AsyncMock(
+        return_value=VersionInfo(
+            version_id="ver_1",
+            asset_id="asset_1",
+            version_number=1,
+            is_original=True,
+            is_current=True,
+            status=VersionStatus.ACTIVE,
+            r2_key="versioned/asset_1/v1/image.jpg",
+            content_hash="sha256_v1",
+            file_size_bytes=1024,
+            created_at=datetime.now(UTC),
+        )
+    )
+    manager.delete_version = AsyncMock(return_value=None)
+    return manager
+
+
+@pytest.fixture
+def app(mock_user: TokenPayload, mock_version_manager: MagicMock) -> FastAPI:
+    """Create isolated test FastAPI app with mocked dependencies."""
+    from security.jwt_oauth2_auth import get_current_user
+
+    test_app = FastAPI()
+    test_app.include_router(router)
+    test_app.dependency_overrides[get_current_user] = lambda: mock_user
+    test_app.dependency_overrides[get_version_manager] = lambda: mock_version_manager
+    return test_app
+
+
+@pytest.fixture
+def client(app: FastAPI) -> TestClient:
+    """Synchronous test client -- no rate limiter, no global middleware."""
+    return TestClient(app)
 
 
 @pytest.fixture
 def test_image():
-    """Create a test image file."""
-    img = Image.new("RGB", (100, 100), color="red")
+    """Create a test image file (meets minimum 100x100 dimension requirement)."""
+    img = Image.new("RGB", (200, 200), color="red")
     img_bytes = io.BytesIO()
     img.save(img_bytes, format="JPEG")
     img_bytes.seek(0)
@@ -38,250 +102,244 @@ def test_image():
     return img_bytes
 
 
-class TestAssetsList:
-    """Test GET /api/v1/assets endpoint."""
-
-    async def test_list_assets_success(self, client: TestClient, mock_asset_data):
-        """Test listing assets with default parameters."""
-        with patch("api.v1.assets.get_assets") as mock_get:
-            mock_get.return_value = {
-                "assets": [mock_asset_data],
-                "total": 1,
-                "page": 1,
-                "page_size": 20,
-                "has_more": False,
-            }
-
-            response = client.get("/api/v1/assets")
-
-            assert response.status_code == 200
-            data = response.json()
-            assert len(data["assets"]) == 1
-            assert data["assets"][0]["id"] == "test-asset-123"
-            assert data["total"] == 1
-
-    async def test_list_assets_with_collection_filter(self, client: TestClient):
-        """Test filtering assets by collection."""
-        with patch("api.v1.assets.get_assets") as mock_get:
-            mock_get.return_value = {
-                "assets": [],
-                "total": 0,
-                "page": 1,
-                "page_size": 20,
-                "has_more": False,
-            }
-
-            response = client.get("/api/v1/assets?collection=black-rose")
-
-            assert response.status_code == 200
-            mock_get.assert_called_once()
-            assert mock_get.call_args[1]["collection"] == "black-rose"
-
-    async def test_list_assets_with_type_filter(self, client: TestClient):
-        """Test filtering assets by type."""
-        response = client.get("/api/v1/assets?type=3d_model")
-
-        assert response.status_code == 200
-
-    async def test_list_assets_pagination(self, client: TestClient):
-        """Test pagination parameters."""
-        response = client.get("/api/v1/assets?page=2&page_size=10")
-
-        assert response.status_code == 200
+# ---------------------------------------------------------------------------
+# Ingest endpoint tests
+# ---------------------------------------------------------------------------
 
 
-class TestAssetsUpload:
-    """Test POST /api/v1/assets/upload endpoint."""
+class TestAssetIngest:
+    """Test POST /assets/ingest endpoint."""
 
-    async def test_upload_asset_success(self, client: TestClient, test_image, mock_asset_data):
-        """Test successful asset upload."""
-        with patch("api.v1.assets.upload_asset") as mock_upload:
-            mock_upload.return_value = mock_asset_data
+    def test_ingest_success(self, client: TestClient, test_image):
+        """Test successful image ingest returns 202 with job id."""
+        response = client.post(
+            "/assets/ingest",
+            files={"file": ("test.jpg", test_image, "image/jpeg")},
+            data={"source": "api"},
+        )
 
-            response = client.post(
-                "/api/v1/assets/upload",
-                files={"file": ("test.jpg", test_image, "image/jpeg")},
-                data={"collection": "signature"},
-            )
+        assert response.status_code == 202
+        data = response.json()
+        assert "job_id" in data
+        assert data["status"] == "pending"
+        assert data["message"] == "Image accepted for processing"
 
-            assert response.status_code == 200
-            data = response.json()
-            assert data["id"] == "test-asset-123"
-            assert data["collection"] == "signature"
-
-    async def test_upload_asset_invalid_file_type(self, client: TestClient):
-        """Test upload with invalid file type."""
+    def test_ingest_invalid_content_type(self, client: TestClient):
+        """Test upload with invalid file type returns 400."""
         invalid_file = io.BytesIO(b"not an image")
-        invalid_file.name = "test.txt"
 
         response = client.post(
-            "/api/v1/assets/upload",
+            "/assets/ingest",
             files={"file": ("test.txt", invalid_file, "text/plain")},
-            data={"collection": "signature"},
+            data={"source": "api"},
         )
 
         assert response.status_code == 400
 
-    async def test_upload_asset_missing_collection(self, client: TestClient, test_image):
-        """Test upload without collection parameter."""
+    def test_ingest_image_too_small(self, client: TestClient):
+        """Test upload with image below minimum dimensions returns 400."""
+        img = Image.new("RGB", (50, 50), color="blue")
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG")
+        buf.seek(0)
+
         response = client.post(
-            "/api/v1/assets/upload",
-            files={"file": ("test.jpg", test_image, "image/jpeg")},
+            "/assets/ingest",
+            files={"file": ("small.jpg", buf, "image/jpeg")},
+            data={"source": "api"},
         )
 
-        # Should use default collection or return 400
-        assert response.status_code in [200, 400]
+        assert response.status_code == 400
 
-    async def test_upload_asset_with_metadata(self, client: TestClient, test_image):
-        """Test upload with additional metadata."""
-        with patch("api.v1.assets.upload_asset") as mock_upload:
-            mock_upload.return_value = {
-                "id": "test-123",
-                "name": "test.jpg",
-                "collection": "signature",
-                "sku": "SKY-999",
-                "tags": ["custom"],
-            }
+    def test_ingest_with_product_id(self, client: TestClient, test_image):
+        """Test ingest with optional product_id."""
+        response = client.post(
+            "/assets/ingest",
+            files={"file": ("test.jpg", test_image, "image/jpeg")},
+            data={"source": "woocommerce", "product_id": "prod-123"},
+        )
+
+        assert response.status_code == 202
+        data = response.json()
+        assert data["status"] == "pending"
+
+    def test_ingest_with_processing_profile(self, client: TestClient, test_image):
+        """Test ingest with different processing profiles."""
+        response = client.post(
+            "/assets/ingest",
+            files={"file": ("test.jpg", test_image, "image/jpeg")},
+            data={"source": "api", "processing_profile": "quick"},
+        )
+
+        assert response.status_code == 202
+
+    def test_ingest_webp_format(self, client: TestClient):
+        """Test ingest accepts WebP format."""
+        img = Image.new("RGB", (200, 200), color="green")
+        buf = io.BytesIO()
+        img.save(buf, format="WEBP")
+        buf.seek(0)
+
+        response = client.post(
+            "/assets/ingest",
+            files={"file": ("test.webp", buf, "image/webp")},
+            data={"source": "dashboard"},
+        )
+
+        assert response.status_code == 202
+
+    def test_ingest_png_format(self, client: TestClient):
+        """Test ingest accepts PNG format."""
+        img = Image.new("RGB", (200, 200), color="white")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        buf.seek(0)
+
+        response = client.post(
+            "/assets/ingest",
+            files={"file": ("test.png", buf, "image/png")},
+            data={"source": "api"},
+        )
+
+        assert response.status_code == 202
+
+
+# ---------------------------------------------------------------------------
+# Job status endpoint tests
+# ---------------------------------------------------------------------------
+
+
+class TestJobStatus:
+    """Test GET /assets/jobs/{job_id} endpoint."""
+
+    def test_get_job_not_found(self, client: TestClient):
+        """Test getting a non-existent job returns 404."""
+        response = client.get("/assets/jobs/nonexistent-job-id")
+
+        assert response.status_code == 404
+
+    def test_get_job_after_ingest(self, client: TestClient, test_image):
+        """Test getting job status after ingesting an image."""
+        # First ingest an image
+        ingest_resp = client.post(
+            "/assets/ingest",
+            files={"file": ("test.jpg", test_image, "image/jpeg")},
+            data={"source": "api"},
+        )
+        assert ingest_resp.status_code == 202
+        job_id = ingest_resp.json()["job_id"]
+
+        # Then check job status
+        status_resp = client.get(f"/assets/jobs/{job_id}")
+
+        assert status_resp.status_code == 200
+        data = status_resp.json()
+        assert data["job_id"] == job_id
+        assert data["status"] == "pending"
+
+
+# ---------------------------------------------------------------------------
+# Version listing endpoint tests
+# ---------------------------------------------------------------------------
+
+
+class TestVersionListing:
+    """Test GET /assets/{asset_id}/versions endpoint."""
+
+    def test_list_versions_success(self, client: TestClient, mock_version_manager: MagicMock):
+        """Test listing versions returns 200."""
+        response = client.get("/assets/asset_1/versions")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["asset_id"] == "asset_1"
+        mock_version_manager.list_versions.assert_called_once()
+
+    def test_list_versions_not_found(self, client: TestClient, mock_version_manager: MagicMock):
+        """Test listing versions for non-existent asset returns 404."""
+        mock_version_manager.list_versions.side_effect = AssetNotFoundError("missing")
+
+        response = client.get("/assets/missing/versions")
+
+        assert response.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Version get endpoint tests
+# ---------------------------------------------------------------------------
+
+
+class TestVersionGet:
+    """Test GET /assets/{asset_id}/versions/{n} endpoint."""
+
+    def test_get_version_success(self, client: TestClient, mock_version_manager: MagicMock):
+        """Test getting a specific version returns 200."""
+        response = client.get("/assets/asset_1/versions/1")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["version_number"] == 1
+        mock_version_manager.get_version.assert_called_once()
+
+    def test_get_version_not_found(self, client: TestClient, mock_version_manager: MagicMock):
+        """Test getting non-existent version returns 404."""
+        mock_version_manager.get_version.side_effect = VersionNotFoundError("a", 99)
+
+        response = client.get("/assets/asset_1/versions/99")
+
+        assert response.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Version delete endpoint tests
+# ---------------------------------------------------------------------------
+
+
+class TestVersionDelete:
+    """Test DELETE /assets/{asset_id}/versions/{n} endpoint."""
+
+    def test_delete_version_success(self, client: TestClient, mock_version_manager: MagicMock):
+        """Test deleting a non-original version returns 204."""
+        response = client.delete("/assets/asset_1/versions/2")
+
+        assert response.status_code == 204
+        mock_version_manager.delete_version.assert_called_once()
+
+    def test_delete_original_blocked(self, client: TestClient):
+        """Test deleting version 1 (original) is rejected with 400."""
+        response = client.delete("/assets/asset_1/versions/1")
+
+        assert response.status_code == 400
+        assert "original version" in response.json()["detail"].lower()
+
+    def test_delete_version_not_found(self, client: TestClient, mock_version_manager: MagicMock):
+        """Test deleting non-existent version returns 404."""
+        mock_version_manager.delete_version.side_effect = VersionNotFoundError("a", 99)
+
+        response = client.delete("/assets/asset_1/versions/99")
+
+        assert response.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Multiple ingest test
+# ---------------------------------------------------------------------------
+
+
+class TestMultipleIngest:
+    """Test sequential ingest operations."""
+
+    def test_ingest_multiple_images(self, client: TestClient):
+        """Test that multiple images can be ingested sequentially."""
+        for i in range(3):
+            img = Image.new("RGB", (200, 200), color="red")
+            buf = io.BytesIO()
+            img.save(buf, format="JPEG")
+            buf.seek(0)
 
             response = client.post(
-                "/api/v1/assets/upload",
-                files={"file": ("test.jpg", test_image, "image/jpeg")},
-                data={
-                    "collection": "signature",
-                    "sku": "SKY-999",
-                    "tags": '["custom"]',
-                },
+                "/assets/ingest",
+                files={"file": (f"img{i}.jpg", buf, "image/jpeg")},
+                data={"source": "api"},
             )
-
-            assert response.status_code == 200
-
-
-class TestAssetsGet:
-    """Test GET /api/v1/assets/{asset_id} endpoint."""
-
-    async def test_get_asset_success(self, client: TestClient, mock_asset_data):
-        """Test getting a single asset by ID."""
-        with patch("api.v1.assets.get_asset") as mock_get:
-            mock_get.return_value = mock_asset_data
-
-            response = client.get("/api/v1/assets/test-asset-123")
-
-            assert response.status_code == 200
-            data = response.json()
-            assert data["id"] == "test-asset-123"
-
-    async def test_get_asset_not_found(self, client: TestClient):
-        """Test getting non-existent asset."""
-        with patch("api.v1.assets.get_asset") as mock_get:
-            mock_get.return_value = None
-
-            response = client.get("/api/v1/assets/nonexistent")
-
-            assert response.status_code == 404
-
-
-class TestAssetsUpdate:
-    """Test PUT /api/v1/assets/{asset_id} endpoint."""
-
-    async def test_update_asset_metadata(self, client: TestClient, mock_asset_data):
-        """Test updating asset metadata."""
-        updated_data = {**mock_asset_data, "sku": "SKY-002", "tags": ["updated"]}
-
-        with patch("api.v1.assets.update_asset") as mock_update:
-            mock_update.return_value = updated_data
-
-            response = client.put(
-                "/api/v1/assets/test-asset-123",
-                json={"sku": "SKY-002", "tags": ["updated"]},
-            )
-
-            assert response.status_code == 200
-            data = response.json()
-            assert data["sku"] == "SKY-002"
-
-    async def test_update_asset_not_found(self, client: TestClient):
-        """Test updating non-existent asset."""
-        with patch("api.v1.assets.update_asset") as mock_update:
-            mock_update.return_value = None
-
-            response = client.put(
-                "/api/v1/assets/nonexistent",
-                json={"sku": "SKY-999"},
-            )
-
-            assert response.status_code == 404
-
-
-class TestAssetsDelete:
-    """Test DELETE /api/v1/assets/{asset_id} endpoint."""
-
-    async def test_delete_asset_success(self, client: TestClient):
-        """Test deleting an asset."""
-        with patch("api.v1.assets.delete_asset") as mock_delete:
-            mock_delete.return_value = True
-
-            response = client.delete("/api/v1/assets/test-asset-123")
-
-            assert response.status_code == 200
-
-    async def test_delete_asset_not_found(self, client: TestClient):
-        """Test deleting non-existent asset."""
-        with patch("api.v1.assets.delete_asset") as mock_delete:
-            mock_delete.return_value = False
-
-            response = client.delete("/api/v1/assets/nonexistent")
-
-            assert response.status_code == 404
-
-
-class TestBatchOperations:
-    """Test batch operations on assets."""
-
-    async def test_batch_delete(self, client: TestClient):
-        """Test batch deletion of assets."""
-        with patch("api.v1.assets.batch_delete") as mock_batch:
-            mock_batch.return_value = {"deleted": 3, "failed": 0}
-
-            response = client.post(
-                "/api/v1/assets/batch/delete",
-                json={"asset_ids": ["id1", "id2", "id3"]},
-            )
-
-            assert response.status_code == 200
-            data = response.json()
-            assert data["deleted"] == 3
-
-    async def test_batch_update_collection(self, client: TestClient):
-        """Test batch updating collection."""
-        with patch("api.v1.assets.batch_update") as mock_batch:
-            mock_batch.return_value = {"updated": 5, "failed": 0}
-
-            response = client.post(
-                "/api/v1/assets/batch/update",
-                json={
-                    "asset_ids": ["id1", "id2", "id3", "id4", "id5"],
-                    "collection": "love-hurts",
-                },
-            )
-
-            assert response.status_code == 200
-
-
-class TestCollectionStats:
-    """Test collection statistics endpoint."""
-
-    async def test_get_collection_stats(self, client: TestClient):
-        """Test getting collection statistics."""
-        with patch("api.v1.assets.get_collection_stats") as mock_stats:
-            mock_stats.return_value = {
-                "signature": 50,
-                "black-rose": 30,
-                "love-hurts": 20,
-            }
-
-            response = client.get("/api/v1/assets/stats/collections")
-
-            assert response.status_code == 200
-            data = response.json()
-            assert data["signature"] == 50
-            assert data["black-rose"] == 30
+            assert response.status_code == 202

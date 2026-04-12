@@ -1,0 +1,146 @@
+/**
+ * Skeleton Loading States
+ *
+ * Shimmer placeholder for image-heavy pages.
+ * Applied via .skeleton class on containers; removed when content loads.
+ * Respects prefers-reduced-motion.
+ *
+ * @package SkyyRose_Flagship
+ * @since   6.4.0
+ */
+
+/* ==========================================================================
+   1. BASE SKELETON
+   ========================================================================== */
+
+.skeleton {
+	position: relative;
+	overflow: hidden;
+	background: rgba(255, 255, 255, 0.03);
+	border-radius: var(--holo-radius, 4px);
+}
+
+.skeleton::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		rgba(183, 110, 121, 0.06) 40%,
+		rgba(183, 110, 121, 0.08) 50%,
+		rgba(183, 110, 121, 0.06) 60%,
+		transparent 100%
+	);
+	animation: skeleton-shimmer 1.8s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+	0%   { transform: translateX(-100%); }
+	100% { transform: translateX(100%); }
+}
+
+/* ==========================================================================
+   2. SKELETON VARIANTS
+   ========================================================================== */
+
+/* Product card placeholder */
+.skeleton--card {
+	aspect-ratio: 3 / 4;
+	border-radius: var(--holo-radius, 4px);
+}
+
+/* Text line */
+.skeleton--text {
+	height: 1em;
+	border-radius: 3px;
+	width: 80%;
+}
+
+.skeleton--text-short {
+	height: 1em;
+	border-radius: 3px;
+	width: 50%;
+}
+
+/* Circle (avatar, icon) */
+.skeleton--circle {
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+}
+
+/* Hero image placeholder */
+.skeleton--hero {
+	aspect-ratio: 16 / 9;
+	width: 100%;
+}
+
+/* ==========================================================================
+   3. IMAGE SKELETON (auto-applied via JS)
+   ========================================================================== */
+
+.holo__gallery .skeleton--img {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	transition: opacity 0.4s ease;
+}
+
+.holo__gallery .skeleton--img.loaded {
+	opacity: 0;
+	pointer-events: none;
+}
+
+/* ==========================================================================
+   4. SCARCITY INDICATORS
+   ========================================================================== */
+
+/* Edition depletion bar (inside holo card info area) */
+.holo__scarcity {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-top: 0.5rem;
+	font-family: var(--font-ui, 'Bebas Neue', sans-serif);
+	font-size: 0.65rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.holo__scarcity-bar {
+	flex: 1;
+	height: 3px;
+	background: rgba(255, 255, 255, 0.08);
+	border-radius: 2px;
+	overflow: hidden;
+	position: relative;
+}
+
+.holo__scarcity-fill {
+	height: 100%;
+	border-radius: 2px;
+	background: var(--holo-accent, #B76E79);
+	transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Low stock urgency */
+.holo__scarcity--low .holo__scarcity-fill {
+	background: #DC143C;
+}
+
+.holo__scarcity-label {
+	white-space: nowrap;
+}
+
+/* ==========================================================================
+   5. REDUCED MOTION
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	.skeleton::after {
+		animation: none;
+		background: rgba(183, 110, 121, 0.04);
+	}
+}
