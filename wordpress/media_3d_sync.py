@@ -1004,6 +1004,8 @@ class WordPress3DPipelineSync:
                 self._logger.warning("unknown_collection", collection=collection)
                 return None
 
+
+
             # Load existing hotspot config
             hotspot_file = self.hotspots_dir / f"{collection}-hotspots.json"
             if not hotspot_file.exists():

@@ -131,6 +131,27 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 # ---------------------------------------------------------------------------
+# SSH auth helper — key preferred, sshpass -e fallback (avoids ps exposure)
+# ---------------------------------------------------------------------------
+SSH_STRICT="${SSH_STRICT_HOST:-accept-new}"
+
+# Build an SSH command array with auth resolved once.
+# Usage: "${SSH_CMD[@]}" user@host "command"
+build_ssh_cmd() {
+    local key_path="${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}"
+    SSH_CMD=( ssh -o "StrictHostKeyChecking=$SSH_STRICT" -o ConnectTimeout=15 -p "${SSH_PORT:-22}" )
+    SCP_CMD=( scp -o "StrictHostKeyChecking=$SSH_STRICT" -P "${SSH_PORT:-22}" )
+    if [[ -f "$key_path" ]]; then
+        SSH_CMD+=( -i "$key_path" )
+        SCP_CMD+=( -i "$key_path" )
+    elif [[ -n "${SSH_PASS:-}" ]] && command -v sshpass &>/dev/null; then
+        export SSHPASS="$SSH_PASS"
+        SSH_CMD=( sshpass -e "${SSH_CMD[@]}" )
+        SCP_CMD=( sshpass -e "${SCP_CMD[@]}" )
+    fi
+}
+
+# ---------------------------------------------------------------------------
 # WP-CLI over SSH (proven pattern from wp-deploy-theme.sh)
 # ---------------------------------------------------------------------------
 wp_remote() {
@@ -139,11 +160,7 @@ wp_remote() {
         log_info "[DRY RUN] wp $cmd"
         return 0
     fi
-    local ssh_opts=(-o StrictHostKeyChecking=yes -p "${SSH_PORT:-22}")
-    if [[ -f "${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}" ]]; then
-        ssh_opts+=(-i "${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}")
-    fi
-    ssh "${ssh_opts[@]}" "${SSH_USER}@${SSH_HOST}" "wp $cmd" 2>/dev/null
+    "${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" "wp $cmd" 2>/dev/null
 }
 
 # ---------------------------------------------------------------------------
@@ -196,11 +213,8 @@ preflight() {
 
     # Test SSH connectivity (skip in dry-run)
     if [[ "$DRY_RUN" == "false" ]]; then
-        local ssh_test_opts=(-o StrictHostKeyChecking=yes -o ConnectTimeout=15 -p "${SSH_PORT:-22}")
-        if [[ -f "${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}" ]]; then
-            ssh_test_opts+=(-i "${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}")
-        fi
-        if ! ssh "${ssh_test_opts[@]}" "${SSH_USER}@${SSH_HOST}" "echo ok" 2>/dev/null; then
+        build_ssh_cmd
+        if ! "${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" "echo ok" 2>/dev/null; then
             log_error "SSH connectivity test failed -- check credentials and network"
             exit 1
         fi
@@ -314,14 +328,11 @@ try_rsync() {
     archive_size="$(du -h "$tmpzip" | cut -f1)"
     log_info "Archive: $tmpzip ($archive_size)"
 
-    # Upload via scp then extract remotely
-    local key_flag=""
-    if [[ -f "$key_path" ]]; then
-        key_flag="-i $key_path"
-    fi
+    # Upload via scp then extract remotely (uses shared SSH_CMD/SCP_CMD from build_ssh_cmd)
+    build_ssh_cmd
 
     log_info "Uploading via scp..."
-    scp -P "${SSH_PORT:-22}" $key_flag -o StrictHostKeyChecking=yes "$tmpzip" "${SSH_USER}@${SSH_HOST}:/tmp/skyyrose-deploy.tar.gz"
+    "${SCP_CMD[@]}" "$tmpzip" "${SSH_USER}@${SSH_HOST}:/tmp/skyyrose-deploy.tar.gz"
 
     log_info "Extracting on remote (atomic hot-swap)..."
     # Hot-swap deploy (DEPLOY-08): rename current theme aside, then rename new
@@ -331,7 +342,7 @@ try_rsync() {
     # false-positive "site is down" alerts during routine code-only deploys.
     local swap_id
     swap_id="$(date +%s)-$$"
-    ssh -p "${SSH_PORT:-22}" $key_flag -o StrictHostKeyChecking=yes "${SSH_USER}@${SSH_HOST}" "cd /tmp && tar -xzf skyyrose-deploy.tar.gz && (if [ -d '${WP_THEME_PATH}' ]; then mv '${WP_THEME_PATH}' '${WP_THEME_PATH}.old.${swap_id}'; fi) && mv skyyrose-flagship '${WP_THEME_PATH}' && (rm -rf '${WP_THEME_PATH}.old.${swap_id}' 2>/dev/null; rm -f skyyrose-deploy.tar.gz; true)"
+    "${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" "cd /tmp && tar -xzf skyyrose-deploy.tar.gz && (if [ -d '${WP_THEME_PATH}' ]; then mv '${WP_THEME_PATH}' '${WP_THEME_PATH}.old.${swap_id}'; fi) && mv skyyrose-flagship '${WP_THEME_PATH}' && (rm -rf '${WP_THEME_PATH}.old.${swap_id}' 2>/dev/null; rm -f skyyrose-deploy.tar.gz; true)"
 
     rm -f "$tmpzip"
     log_success "Theme uploaded and extracted"

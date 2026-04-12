@@ -776,6 +776,16 @@ function skyyrose_enqueue_collection_experiences() {
 		? 'experiences/init-3d.min.js' : 'experiences/init-3d.js';
 	if ( file_exists( $js_dir . '/' . $init_file ) ) {
 		wp_enqueue_script( 'skyyrose-3d-init', $js_uri . '/' . $init_file, array( 'skyyrose-collection-experience' ), SKYYROSE_VERSION, true );
+
+		// Provide runtime config that init-3d.js reads from window.skyyrose3D.
+		wp_localize_script( 'skyyrose-3d-init', 'skyyrose3D', array(
+			'debug'    => defined( 'WP_DEBUG' ) && WP_DEBUG,
+			'lazyLoad' => true,
+			'isMobile' => wp_is_mobile(),
+			'siteUrl'  => esc_url( home_url() ),
+			'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
+			'nonce'    => wp_create_nonce( 'skyyrose_3d_nonce' ),
+		) );
 	}
 }
 

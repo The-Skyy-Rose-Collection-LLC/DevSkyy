@@ -10,6 +10,7 @@
 
     // Global configuration from WordPress
     const config = window.skyyrose3D || {};
+    var isMobileDevice = config.isMobile || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     /**
      * Clean corrupted JSON response by stripping leading junk
@@ -117,7 +118,7 @@
             const finalConfig = {
                 ...config,
                 ...containerConfig,
-                isMobile: config.isMobile || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+                isMobile: isMobileDevice
             };
 
             // Create the experience
@@ -127,7 +128,7 @@
             container.dataset.initialized = 'true';
             container._skyyRoseExperience = experience;
 
-            console.log(`SkyyRose 3D: Initialized ${collection} experience for`, container.id);
+            if (config.debug) console.log('SkyyRose 3D: Initialized ' + collection + ' experience for ' + container.id);
         } catch (error) {
             console.error('SkyyRose 3D: Error initializing container', error);
         }
@@ -147,9 +148,13 @@
 
                 if (ExperienceClass && typeof THREE !== 'undefined') {
                     try {
-                        new ExperienceClass(`${collection}-experience`);
+                        var collectionConfig = {
+                            ...config,
+                            isMobile: isMobileDevice
+                        };
+                        new ExperienceClass(collection + '-experience', collectionConfig);
                         container.dataset.initialized = 'true';
-                        console.log(`SkyyRose 3D: Auto-initialized ${collection} experience`);
+                        if (config.debug) console.log('SkyyRose 3D: Auto-initialized ' + collection + ' experience');
                     } catch (error) {
                         console.error(`SkyyRose 3D: Failed to initialize ${collection}`, error);
                     }
@@ -196,7 +201,7 @@
         window.addEventListener('skyyrose:product-click', function(event) {
             const { index, collection } = event.detail;
 
-            console.log(`Product clicked: Collection=${collection}, Index=${index}`);
+            if (config.debug) console.log('Product clicked: Collection=' + collection + ', Index=' + index);
 
             // Dispatch to any registered handlers
             if (window.skyyRoseProductModal) {
@@ -358,7 +363,7 @@
             setupPerformanceMonitoring();
         }
 
-        console.log('SkyyRose 3D: Ready');
+        if (config.debug) console.log('SkyyRose 3D: Ready');
     }
 
     // Start when DOM is ready
