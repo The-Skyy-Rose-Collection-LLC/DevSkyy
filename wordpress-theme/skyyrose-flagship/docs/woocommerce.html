@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WooCommerce &mdash; SkyyRose Documentation</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#0A0A0A;color:#F5F5F0;font-family:'Inter',system-ui,sans-serif;line-height:1.7;padding:2rem;max-width:860px;margin:0 auto}
+    h1,h2,h3{font-family:'Playfair Display',serif;color:#B76E79;margin:1.5rem 0 .75rem}
+    h1{font-size:2rem;border-bottom:1px solid #B76E79;padding-bottom:.5rem}
+    a{color:#B76E79;text-decoration:none}a:hover{text-decoration:underline}
+    .doc-nav{display:flex;flex-wrap:wrap;gap:.5rem;padding:1rem 0;border-bottom:1px solid #222}
+    .doc-nav a{padding:.25rem .6rem;border:1px solid #333;border-radius:4px;font-size:.85rem}
+    .doc-nav a:hover{border-color:#B76E79}
+    code,pre{background:#151515;border-radius:4px;font-family:'Space Mono',monospace;font-size:.85rem}
+    code{padding:.15rem .35rem}
+    pre{padding:1rem;overflow-x:auto;margin:1rem 0;border:1px solid #222}
+    table{width:100%;border-collapse:collapse;margin:1rem 0}
+    th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid #222}
+    th{color:#B76E79;font-weight:600}
+    p{margin:.75rem 0}
+    ul,ol{margin:.5rem 0 .5rem 1.5rem}
+    .collection-tag{display:inline-block;padding:.15rem .5rem;border-radius:3px;font-size:.75rem;font-weight:600;margin-right:.25rem}
+  </style>
+</head>
+<body>
+<nav class="doc-nav">
+  <a href="index.html">Overview</a>
+  <a href="installation.html">Installation</a>
+  <a href="getting-started.html">Getting Started</a>
+  <a href="collections.html">Collections</a>
+  <a href="kids-capsule.html">Kids Capsule</a>
+  <a href="elementor.html">Elementor</a>
+  <a href="builders.html">Page Builders</a>
+  <a href="woocommerce.html">WooCommerce</a>
+  <a href="customization.html">Customization</a>
+  <a href="changelog.html">Changelog</a>
+  <a href="credits.html">Credits</a>
+</nav>
+
+<h1>WooCommerce Setup</h1>
+<p>SkyyRose requires <strong>WooCommerce 9.9+</strong> and leverages the Store API v1 for a modern, AJAX-powered shopping experience.</p>
+
+<h2>Requirements</h2>
+<ul>
+  <li>WooCommerce 9.9 or newer</li>
+  <li>WordPress 6.7+</li>
+  <li>PHP 8.2+</li>
+  <li>SSL certificate (required for checkout)</li>
+</ul>
+
+<h2>Creating Products</h2>
+<ol>
+  <li>Navigate to <strong>Products &rarr; Add New</strong>.</li>
+  <li>Enter the product name, description, and pricing in the Product Data panel.</li>
+  <li>Upload a product image at the recommended size of <strong>1200 &times; 1500 px</strong>. AVIF format is supported for smaller file sizes.</li>
+  <li>Add gallery images for the holographic card hover effect (minimum 2 images recommended).</li>
+  <li>Assign the product to a <strong>Collection</strong> category (see below).</li>
+</ol>
+
+<h2>Collection Categories</h2>
+<p>SkyyRose uses product categories as collections. Four are created on theme activation:</p>
+<table>
+  <tr><th>Collection</th><th>Slug</th><th>Accent Color</th></tr>
+  <tr><td>Black Rose</td><td><code>black-rose</code></td><td style="color:#C0C0C0">Silver #C0C0C0</td></tr>
+  <tr><td>Love Hurts</td><td><code>love-hurts</code></td><td style="color:#DC143C">Crimson #DC143C</td></tr>
+  <tr><td>Signature</td><td><code>signature</code></td><td style="color:#D4AF37">Gold #D4AF37</td></tr>
+  <tr><td>Kids Capsule</td><td><code>kids-capsule</code></td><td style="color:#B76E79">Rose Gold #B76E79</td></tr>
+</table>
+<p>Assign products via the <strong>Product Categories</strong> panel in the editor sidebar. A product may belong to multiple collections.</p>
+
+<h2>Store API v1 Cart</h2>
+<p>SkyyRose replaces the traditional WooCommerce AJAX cart with the Store API v1 endpoint for faster, headless-compatible cart operations.</p>
+<pre>// AJAX add-to-cart via Store API v1
+fetch('/wp-json/wc/store/v1/cart/add-item', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Nonce': skyyrose_cart.nonce
+  },
+  body: JSON.stringify({ id: productId, quantity: 1 })
+});</pre>
+<p>The mini-cart drawer updates automatically after each Store API response. No page reload is required.</p>
+
+<h2>Blueprints Demo Import</h2>
+<p>SkyyRose ships with a WooCommerce Blueprints file for one-click demo content import:</p>
+<ol>
+  <li>Go to <strong>WooCommerce &rarr; Home</strong>.</li>
+  <li>Click <strong>Import Blueprint</strong> when prompted, or navigate to <strong>Tools &rarr; Import</strong>.</li>
+  <li>Select the <code>blueprint.json</code> file from the theme's <code>/assets/blueprints/</code> directory.</li>
+  <li>The importer creates sample products, collections, pages, and menus.</li>
+</ol>
+
+<h2>Custom Product Meta Fields</h2>
+<p>Two custom meta fields are added to the Product Data panel:</p>
+<table>
+  <tr><th>Field</th><th>Meta Key</th><th>Description</th></tr>
+  <tr><td>Care Instructions</td><td><code>_skyyrose_care</code></td><td>Washing, drying, and ironing guidelines displayed on the product page.</td></tr>
+  <tr><td>Fabric Content</td><td><code>_skyyrose_fabric</code></td><td>Material composition (e.g., &ldquo;100% Premium Cotton&rdquo;) shown in the product details tab.</td></tr>
+</table>
+<p>These fields appear in a dedicated <strong>SkyyRose</strong> tab within the Product Data metabox.</p>
+
+<h2>Pre-Order Gateway</h2>
+<p>SkyyRose includes a lightweight pre-order payment gateway for upcoming drops:</p>
+<ul>
+  <li>Enable at <strong>WooCommerce &rarr; Settings &rarr; Payments &rarr; SkyyRose Pre-Order</strong>.</li>
+  <li>Mark individual products as pre-order in the Product Data panel.</li>
+  <li>Customers are charged when the product ships (manual capture) or immediately (auto-capture).</li>
+  <li>Pre-order badges display automatically on product cards and the cart.</li>
+</ul>
+
+<h2>Checkout Flow</h2>
+<ol>
+  <li><strong>Cart Drawer</strong> &mdash; Slide-out mini-cart powered by Store API v1. Quantity adjustments happen inline.</li>
+  <li><strong>Checkout Page</strong> &mdash; Uses the WooCommerce Checkout block for a streamlined, single-page checkout.</li>
+  <li><strong>Order Confirmation</strong> &mdash; Branded thank-you page with order summary, social sharing, and next-drop teaser.</li>
+</ol>
+<p>The entire flow uses GSAP micro-animations for transitions, keeping the luxury feel consistent through purchase completion.</p>
+
+</body>
+</html>

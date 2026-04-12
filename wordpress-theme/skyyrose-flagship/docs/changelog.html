@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Changelog &mdash; SkyyRose Documentation</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#0A0A0A;color:#F5F5F0;font-family:'Inter',system-ui,sans-serif;line-height:1.7;padding:2rem;max-width:860px;margin:0 auto}
+    h1,h2,h3{font-family:'Playfair Display',serif;color:#B76E79;margin:1.5rem 0 .75rem}
+    h1{font-size:2rem;border-bottom:1px solid #B76E79;padding-bottom:.5rem}
+    a{color:#B76E79;text-decoration:none}a:hover{text-decoration:underline}
+    .doc-nav{display:flex;flex-wrap:wrap;gap:.5rem;padding:1rem 0;border-bottom:1px solid #222}
+    .doc-nav a{padding:.25rem .6rem;border:1px solid #333;border-radius:4px;font-size:.85rem}
+    .doc-nav a:hover{border-color:#B76E79}
+    code,pre{background:#151515;border-radius:4px;font-family:'Space Mono',monospace;font-size:.85rem}
+    code{padding:.15rem .35rem}
+    pre{padding:1rem;overflow-x:auto;margin:1rem 0;border:1px solid #222}
+    p{margin:.75rem 0}
+    ul{margin:.5rem 0 .5rem 1.5rem}
+    .version{display:flex;align-items:baseline;gap:.75rem;margin-top:2rem}
+    .version h2{margin:0}
+    .version-date{color:#888;font-size:.9rem}
+    .tag{display:inline-block;padding:.1rem .45rem;border-radius:3px;font-size:.7rem;font-weight:600;text-transform:uppercase;margin-right:.35rem}
+    .tag-new{background:#2ECC71;color:#0A0A0A}
+    .tag-feature{background:#B76E79;color:#0A0A0A}
+  </style>
+</head>
+<body>
+<nav class="doc-nav">
+  <a href="index.html">Overview</a>
+  <a href="installation.html">Installation</a>
+  <a href="getting-started.html">Getting Started</a>
+  <a href="collections.html">Collections</a>
+  <a href="kids-capsule.html">Kids Capsule</a>
+  <a href="elementor.html">Elementor</a>
+  <a href="builders.html">Page Builders</a>
+  <a href="woocommerce.html">WooCommerce</a>
+  <a href="customization.html">Customization</a>
+  <a href="changelog.html">Changelog</a>
+  <a href="credits.html">Credits</a>
+</nav>
+
+<h1>Changelog</h1>
+<p>All notable changes to the SkyyRose theme are documented below. This log follows <a href="https://keepachangelog.com" target="_blank" rel="noopener">Keep a Changelog</a> conventions.</p>
+
+<h2>Version Format</h2>
+<p>SkyyRose uses <strong>semantic versioning</strong>: <code>MAJOR.MINOR.PATCH</code></p>
+<ul>
+  <li><strong>MAJOR</strong> &mdash; Breaking changes (template structure, required plugin versions).</li>
+  <li><strong>MINOR</strong> &mdash; New features and enhancements (backward-compatible).</li>
+  <li><strong>PATCH</strong> &mdash; Bug fixes, security patches, performance improvements.</li>
+</ul>
+
+<h2>Upgrade Instructions</h2>
+<p>Before updating, always back up your site and any child theme customizations. After uploading the new version:</p>
+<ol>
+  <li>Navigate to <strong>Appearance &rarr; Themes</strong> and activate the updated theme.</li>
+  <li>Go to <strong>Settings &rarr; Permalinks</strong> and click <strong>Save</strong> to flush rewrite rules.</li>
+  <li>Clear any page or object caches.</li>
+  <li>Review the notes below for any version-specific steps.</li>
+</ol>
+
+<div class="version">
+  <h2>1.0.0</h2>
+  <span class="version-date">&mdash; April 12, 2026</span>
+</div>
+<p><span class="tag tag-new">Initial Release</span></p>
+<ul>
+  <li><span class="tag tag-feature">Feature</span> Four luxury collections: Black Rose, Love Hurts, Signature, and Kids Capsule.</li>
+  <li><span class="tag tag-feature">Feature</span> WooCommerce 9.9+ integration with Store API v1 AJAX cart.</li>
+  <li><span class="tag tag-feature">Feature</span> Elementor Pro native support with custom widgets for collections and holographic product cards.</li>
+  <li><span class="tag tag-feature">Feature</span> Divi 5.x, Beaver Builder 2.x, Bricks 1.x, and Gutenberg (Site Editor) compatibility.</li>
+  <li><span class="tag tag-feature">Feature</span> Block patterns for hero banners, product grids, collection showcases, and testimonial rows.</li>
+  <li><span class="tag tag-feature">Feature</span> WooCommerce Blueprints demo import for one-click sample content setup.</li>
+  <li><span class="tag tag-feature">Feature</span> Self-hosted font system with 9 families (Inter, Playfair Display, Cinzel, Cormorant Garamond, Bebas Neue, DM Sans, Barlow, Oswald, Instrument Serif) via Font Library.</li>
+  <li><span class="tag tag-feature">Feature</span> Three.js holographic product cards and GSAP scroll animations.</li>
+  <li><span class="tag tag-feature">Feature</span> AVIF image support with custom image sizes (hero, product, card, thumbnail).</li>
+  <li><span class="tag tag-feature">Feature</span> theme.json design tokens: 15 colors, 6 gradients, fluid typography with <code>clamp()</code>.</li>
+  <li><span class="tag tag-feature">Feature</span> Pre-order payment gateway for upcoming drops.</li>
+  <li><span class="tag tag-feature">Feature</span> Custom product meta fields for care instructions and fabric content.</li>
+  <li><span class="tag tag-feature">Feature</span> Canvas and Full Width page templates for all supported builders.</li>
+  <li><span class="tag tag-feature">Feature</span> Kids Capsule toggle in the Customizer for site-wide visibility control.</li>
+  <li><span class="tag tag-feature">Feature</span> CSS custom properties (<code>--skyyrose-*</code>) for easy child theme overrides.</li>
+</ul>
+
+</body>
+</html>
