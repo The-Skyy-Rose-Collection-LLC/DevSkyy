@@ -337,7 +337,7 @@ function skyyrose_ajax_signin() {
 
 	// Sanitize input.
 	$email    = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
-	$password = isset( $_POST['password'] ) ? sanitize_text_field( wp_unslash( $_POST['password'] ) ) : '';
+	$password = isset( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- passwords must not be sanitized; raw value required for hash comparison.
 
 	// Cap password length to prevent bcrypt DoS via multi-MB payloads.
 	if ( strlen( $password ) > 4096 ) {
