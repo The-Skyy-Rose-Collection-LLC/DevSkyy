@@ -110,17 +110,7 @@ defined( 'ABSPATH' ) || exit;
 						<a
 							href="<?php echo esc_url( wc_get_cart_url() ); ?>"
 							class="navbar__action-btn navbar__cart-btn"
-							aria-label="
-							<?php
-							echo esc_attr(
-								sprintf(
-								/* translators: %d: number of items in cart */
-									_n( '%d item in cart', '%d items in cart', $cart_count, 'skyyrose' ),
-									$cart_count
-								)
-							);
-							?>
-							"
+							aria-label="<?php echo esc_attr( sprintf( /* translators: %d: number of items in cart */ _n( '%d item in cart', '%d items in cart', $cart_count, 'skyyrose' ), $cart_count ) ); ?>"
 						>
 							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 								<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>

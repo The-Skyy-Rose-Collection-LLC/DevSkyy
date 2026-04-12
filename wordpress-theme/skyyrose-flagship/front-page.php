@@ -493,7 +493,10 @@ if ( file_exists( $homepage_js_path ) ) :
 <script>
 	<?php
 	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents, WordPress.Security.EscapeOutput.OutputNotEscaped -- inlining local JS file for critical-path performance.
-	echo file_get_contents( $homepage_js_path );
+	$homepage_js_content = file_get_contents( $homepage_js_path );
+	if ( $homepage_js_content ) {
+		echo $homepage_js_content;
+	}
 	?>
 </script>
 <?php endif; ?>
