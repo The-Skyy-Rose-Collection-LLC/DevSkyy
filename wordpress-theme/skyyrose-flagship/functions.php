@@ -14,7 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Theme Constants
  *--------------------------------------------------------------*/
 define( 'SKYYROSE_VERSION', '6.5.2' );
@@ -26,18 +27,20 @@ define( 'SKYYROSE_THEME_DIR', SKYYROSE_DIR );
 define( 'SKYYROSE_THEME_URI', SKYYROSE_URI );
 define( 'SKYYROSE_ASSETS_URI', SKYYROSE_URI . '/assets' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Disable WordPress.com CSS/JS Concatenation
  *
  * WordPress.com's concatenation service (_jb_static) can cause
  * MIME type errors and 404s. Disable it to serve files directly.
  *--------------------------------------------------------------*/
 if ( ! defined( 'CONCATENATE_SCRIPTS' ) ) {
-	define( 'CONCATENATE_SCRIPTS', false );
+	define( 'CONCATENATE_SCRIPTS', false ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- WP core constant.
 }
 $GLOBALS['concatenate_scripts'] = false;
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Core Includes (always loaded)
  *--------------------------------------------------------------*/
 $skyyrose_core_includes = array(
@@ -62,6 +65,8 @@ $skyyrose_core_includes = array(
 	'/inc/menu-setup.php',
 	'/inc/theme-activation-setup.php',
 	'/inc/klaviyo-integration.php',
+	'/inc/performance.php',
+	'/inc/patterns.php',
 );
 
 foreach ( $skyyrose_core_includes as $skyyrose_file ) {
@@ -71,7 +76,8 @@ foreach ( $skyyrose_core_includes as $skyyrose_file ) {
 	}
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * WooCommerce Includes (loaded only when WooCommerce is active)
  *--------------------------------------------------------------*/
 if ( class_exists( 'WooCommerce' ) ) {
@@ -92,20 +98,41 @@ if ( class_exists( 'WooCommerce' ) ) {
 	}
 }
 
-/*--------------------------------------------------------------
- * Elementor Includes (loaded only when Elementor is active)
+/*
+--------------------------------------------------------------
+ * Page Builder Includes
  *--------------------------------------------------------------*/
-add_action( 'elementor/loaded', function () {
-	$elementor_path = SKYYROSE_DIR . '/inc/elementor.php';
-	if ( file_exists( $elementor_path ) ) {
-		require_once $elementor_path;
-	}
+require_once SKYYROSE_DIR . '/inc/builders/detection.php';
 
-	$elementor_compat_path = SKYYROSE_DIR . '/inc/elementor-compat.php';
-	if ( file_exists( $elementor_compat_path ) ) {
-		require_once $elementor_compat_path;
+// Elementor — preserve same hook timing as the original loading.
+add_action(
+	'elementor/loaded',
+	function () {
+		$files = array(
+			'/inc/builders/elementor.php',
+			'/inc/builders/elementor-compat.php',
+		);
+		foreach ( $files as $file ) {
+			$path = SKYYROSE_DIR . $file;
+			if ( file_exists( $path ) ) {
+				require_once $path;
+			}
+		}
 	}
-} );
+);
+
+// Divi, Beaver Builder, Bricks — self-guarded stubs.
+$skyyrose_builder_stubs = array(
+	'/inc/builders/divi.php',
+	'/inc/builders/beaver-builder.php',
+	'/inc/builders/bricks.php',
+);
+foreach ( $skyyrose_builder_stubs as $skyyrose_stub ) {
+	$path = SKYYROSE_DIR . $skyyrose_stub;
+	if ( file_exists( $path ) ) {
+		require_once $path;
+	}
+}
 
 /* Admin includes and brand styles removed in v5.2.0 — dead code cleanup. */
 

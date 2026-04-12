@@ -28,100 +28,100 @@ function skyyrose_get_collections_config(): array {
 	$uri = defined( 'SKYYROSE_ASSETS_URI' ) ? SKYYROSE_ASSETS_URI : '';
 
 	return array(
-		'black-rose' => array(
-			'slug'         => 'black-rose',
-			'class_abbr'   => 'br',
-			'label'        => __( 'Black Rose', 'skyyrose-flagship' ),
-			'short_desc'   => __( 'Dark Elegance', 'skyyrose-flagship' ),
-			'accent'       => SKYYROSE_COLOR_SILVER,
-			'glow'         => skyyrose_hex_to_rgba( SKYYROSE_COLOR_SILVER, 0.3 ),
-			'tagline'      => __( 'Gothic elegance, dark romance', 'skyyrose-flagship' ),
-			'description'  => __( 'Monochromatic pieces that channel mystery and silver-toned refinement.', 'skyyrose-flagship' ),
-			'page_url'     => home_url( '/collection-black-rose/' ),
-			'palette'      => array(
+		'black-rose'   => array(
+			'slug'        => 'black-rose',
+			'class_abbr'  => 'br',
+			'label'       => __( 'Black Rose', 'skyyrose' ),
+			'short_desc'  => __( 'Dark Elegance', 'skyyrose' ),
+			'accent'      => SKYYROSE_COLOR_SILVER,
+			'glow'        => skyyrose_hex_to_rgba( SKYYROSE_COLOR_SILVER, 0.3 ),
+			'tagline'     => __( 'Gothic elegance, dark romance', 'skyyrose' ),
+			'description' => __( 'Monochromatic pieces that channel mystery and silver-toned refinement.', 'skyyrose' ),
+			'page_url'    => home_url( '/collection-black-rose/' ),
+			'palette'     => array(
 				'primary'   => SKYYROSE_COLOR_DEEP_BLACK,
 				'secondary' => SKYYROSE_COLOR_NAVY,
 				'accent'    => SKYYROSE_COLOR_DEEP_BLUE,
 			),
-			'front_page'   => array(
-				'title'           => 'Black<br>Rose',
-				'poetic_tagline'  => __( 'For those who found power in the dark.', 'skyyrose-flagship' ),
-				'label'           => __( 'Limited', 'skyyrose-flagship' ),
-				'num'             => __( 'Collection 01', 'skyyrose-flagship' ),
-				'image'           => $uri . '/images/homepage-col-black-rose.webp',
-				'show_on_front'   => true,
+			'front_page'  => array(
+				'title'          => 'Black<br>Rose',
+				'poetic_tagline' => __( 'For those who found power in the dark.', 'skyyrose' ),
+				'label'          => __( 'Limited', 'skyyrose' ),
+				'num'            => __( 'Collection 01', 'skyyrose' ),
+				'image'          => $uri . '/images/homepage-col-black-rose.webp',
+				'show_on_front'  => true,
 			),
 		),
-		'love-hurts' => array(
-			'slug'         => 'love-hurts',
-			'class_abbr'   => 'lh',
-			'label'        => __( 'Love Hurts', 'skyyrose-flagship' ),
-			'short_desc'   => __( 'Crimson Rebellion', 'skyyrose-flagship' ),
-			'accent'       => SKYYROSE_COLOR_CRIMSON,
-			'glow'         => skyyrose_hex_to_rgba( SKYYROSE_COLOR_CRIMSON, 0.3 ),
-			'tagline'      => __( 'Dramatic, passionate, fearless', 'skyyrose-flagship' ),
-			'description'  => __( 'Bold crimson statements for those who wear their heart on their sleeve.', 'skyyrose-flagship' ),
-			'page_url'     => home_url( '/collection-love-hurts/' ),
-			'palette'      => array(
+		'love-hurts'   => array(
+			'slug'        => 'love-hurts',
+			'class_abbr'  => 'lh',
+			'label'       => __( 'Love Hurts', 'skyyrose' ),
+			'short_desc'  => __( 'Crimson Rebellion', 'skyyrose' ),
+			'accent'      => SKYYROSE_COLOR_CRIMSON,
+			'glow'        => skyyrose_hex_to_rgba( SKYYROSE_COLOR_CRIMSON, 0.3 ),
+			'tagline'     => __( 'Dramatic, passionate, fearless', 'skyyrose' ),
+			'description' => __( 'Bold crimson statements for those who wear their heart on their sleeve.', 'skyyrose' ),
+			'page_url'    => home_url( '/collection-love-hurts/' ),
+			'palette'     => array(
 				'primary'   => SKYYROSE_COLOR_DEEP_RED,
 				'secondary' => SKYYROSE_COLOR_PURPLE,
 				'accent'    => SKYYROSE_COLOR_GOLD,
 			),
-			'front_page'   => array(
-				'title'           => 'Love<br>Hurts',
-				'poetic_tagline'  => __( 'Wear your heart. Own your scars.', 'skyyrose-flagship' ),
-				'label'           => __( 'Family Legacy', 'skyyrose-flagship' ),
-				'num'             => __( 'Collection 02', 'skyyrose-flagship' ),
-				'image'           => $uri . '/images/homepage-col-love-hurts.webp',
-				'show_on_front'   => true,
+			'front_page'  => array(
+				'title'          => 'Love<br>Hurts',
+				'poetic_tagline' => __( 'Wear your heart. Own your scars.', 'skyyrose' ),
+				'label'          => __( 'Family Legacy', 'skyyrose' ),
+				'num'            => __( 'Collection 02', 'skyyrose' ),
+				'image'          => $uri . '/images/homepage-col-love-hurts.webp',
+				'show_on_front'  => true,
 			),
 		),
-		'signature' => array(
-			'slug'         => 'signature',
-			'class_abbr'   => 'sg',
-			'label'        => __( 'Signature', 'skyyrose-flagship' ),
-			'short_desc'   => __( 'The Foundation', 'skyyrose-flagship' ),
-			'accent'       => SKYYROSE_COLOR_GOLD,
-			'glow'         => skyyrose_hex_to_rgba( SKYYROSE_COLOR_GOLD, 0.3 ),
-			'tagline'      => __( 'Elevated, confident, refined', 'skyyrose-flagship' ),
-			'description'  => __( 'Gold luxe essentials for building the foundation wardrobe.', 'skyyrose-flagship' ),
-			'page_url'     => home_url( '/collection-signature/' ),
-			'palette'      => array(
+		'signature'    => array(
+			'slug'        => 'signature',
+			'class_abbr'  => 'sg',
+			'label'       => __( 'Signature', 'skyyrose' ),
+			'short_desc'  => __( 'The Foundation', 'skyyrose' ),
+			'accent'      => SKYYROSE_COLOR_GOLD,
+			'glow'        => skyyrose_hex_to_rgba( SKYYROSE_COLOR_GOLD, 0.3 ),
+			'tagline'     => __( 'Elevated, confident, refined', 'skyyrose' ),
+			'description' => __( 'Gold luxe essentials for building the foundation wardrobe.', 'skyyrose' ),
+			'page_url'    => home_url( '/collection-signature/' ),
+			'palette'     => array(
 				'primary'   => SKYYROSE_COLOR_GOLD,
 				'secondary' => SKYYROSE_COLOR_DARK,
 				'accent'    => SKYYROSE_COLOR_ROSE_GOLD,
 			),
-			'front_page'   => array(
-				'title'           => 'Signature',
-				'poetic_tagline'  => __( 'The foundation of any wardrobe worth building.', 'skyyrose-flagship' ),
-				'label'           => __( 'Everyday Luxury', 'skyyrose-flagship' ),
-				'num'             => __( 'Collection 03', 'skyyrose-flagship' ),
-				'image'           => $uri . '/images/homepage-col-signature.webp',
-				'show_on_front'   => true,
+			'front_page'  => array(
+				'title'          => 'Signature',
+				'poetic_tagline' => __( 'The foundation of any wardrobe worth building.', 'skyyrose' ),
+				'label'          => __( 'Everyday Luxury', 'skyyrose' ),
+				'num'            => __( 'Collection 03', 'skyyrose' ),
+				'image'          => $uri . '/images/homepage-col-signature.webp',
+				'show_on_front'  => true,
 			),
 		),
 		'kids-capsule' => array(
-			'slug'         => 'kids-capsule',
-			'class_abbr'   => 'kc',
-			'label'        => __( 'Kids Capsule', 'skyyrose-flagship' ),
-			'short_desc'   => __( 'Next Generation', 'skyyrose-flagship' ),
-			'accent'       => SKYYROSE_COLOR_SOFT_PINK,
-			'glow'         => skyyrose_hex_to_rgba( SKYYROSE_COLOR_SOFT_PINK, 0.3 ),
-			'tagline'      => __( 'Joyful luxury, playful sophistication', 'skyyrose-flagship' ),
-			'description'  => __( 'Mini versions of our signature pieces for the youngest trendsetters.', 'skyyrose-flagship' ),
-			'page_url'     => home_url( '/collection-kids-capsule/' ),
-			'palette'      => array(
+			'slug'        => 'kids-capsule',
+			'class_abbr'  => 'kc',
+			'label'       => __( 'Kids Capsule', 'skyyrose' ),
+			'short_desc'  => __( 'Next Generation', 'skyyrose' ),
+			'accent'      => SKYYROSE_COLOR_SOFT_PINK,
+			'glow'        => skyyrose_hex_to_rgba( SKYYROSE_COLOR_SOFT_PINK, 0.3 ),
+			'tagline'     => __( 'Joyful luxury, playful sophistication', 'skyyrose' ),
+			'description' => __( 'Mini versions of our signature pieces for the youngest trendsetters.', 'skyyrose' ),
+			'page_url'    => home_url( '/collection-kids-capsule/' ),
+			'palette'     => array(
 				'primary'   => SKYYROSE_COLOR_SOFT_PINK,
 				'secondary' => SKYYROSE_COLOR_LAVENDER,
 				'accent'    => SKYYROSE_COLOR_GOLD,
 			),
-			'front_page'   => array(
-				'title'           => 'Kids<br>Capsule',
-				'poetic_tagline'  => __( 'For the next generation of legacy.', 'skyyrose-flagship' ),
-				'label'           => __( 'Kids', 'skyyrose-flagship' ),
-				'num'             => __( 'Collection 04', 'skyyrose-flagship' ),
-				'image'           => $uri . '/images/homepage-col-kids-capsule.webp',
-				'show_on_front'   => false,
+			'front_page'  => array(
+				'title'          => 'Kids<br>Capsule',
+				'poetic_tagline' => __( 'For the next generation of legacy.', 'skyyrose' ),
+				'label'          => __( 'Kids', 'skyyrose' ),
+				'num'            => __( 'Collection 04', 'skyyrose' ),
+				'image'          => $uri . '/images/homepage-col-kids-capsule.webp',
+				'show_on_front'  => false,
 			),
 		),
 	);
@@ -138,7 +138,7 @@ function skyyrose_get_collections_config(): array {
  */
 function skyyrose_get_cross_nav( string $exclude_slug ): array {
 	$configs = skyyrose_get_collections_config();
-	$out = array();
+	$out     = array();
 	foreach ( $configs as $slug => $config ) {
 		if ( $slug === $exclude_slug ) {
 			continue;
@@ -161,12 +161,12 @@ function skyyrose_get_cross_nav( string $exclude_slug ): array {
  */
 function skyyrose_get_front_page_collections(): array {
 	$configs = skyyrose_get_collections_config();
-	$out = array();
+	$out     = array();
 	foreach ( $configs as $slug => $config ) {
 		if ( empty( $config['front_page']['show_on_front'] ) ) {
 			continue;
 		}
-		$fp = $config['front_page'];
+		$fp    = $config['front_page'];
 		$out[] = array(
 			'slug'    => $slug,
 			'class'   => $config['class_abbr'],
@@ -190,7 +190,7 @@ function skyyrose_get_front_page_collections(): array {
  * @return array<string, mixed>|null Config array, or null if slug not found.
  */
 function skyyrose_get_collection( string $slug ): ?array {
-	$configs = skyyrose_get_collections_config();
+	$configs   = skyyrose_get_collections_config();
 	$sanitized = sanitize_key( $slug );
 	return $configs[ $sanitized ] ?? null;
 }

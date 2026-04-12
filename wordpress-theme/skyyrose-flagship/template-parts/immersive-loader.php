@@ -6,7 +6,8 @@
  * @since   6.0.0
  * @param array $args { @type string $world_name Scene title. }
  */
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; }
 $world_name = isset( $args['world_name'] ) ? $args['world_name'] : '';
 ?>
 <div class="scene-loading" aria-live="polite">

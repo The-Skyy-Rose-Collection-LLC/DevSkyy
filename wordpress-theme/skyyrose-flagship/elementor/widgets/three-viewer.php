@@ -33,7 +33,7 @@ class SkyyRose_Three_Viewer_Widget extends \Elementor\Widget_Base {
 	 * @return string Widget title.
 	 */
 	public function get_title() {
-		return esc_html__( '3D Model Viewer', 'skyyrose-flagship' );
+		return esc_html__( '3D Model Viewer', 'skyyrose' );
 	}
 
 	/**
@@ -66,7 +66,7 @@ class SkyyRose_Three_Viewer_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'content_section',
 			array(
-				'label' => esc_html__( 'Content', 'skyyrose-flagship' ),
+				'label' => esc_html__( 'Content', 'skyyrose' ),
 				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
 			)
 		);
@@ -74,18 +74,18 @@ class SkyyRose_Three_Viewer_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'model_url',
 			array(
-				'label'       => esc_html__( 'Model URL', 'skyyrose-flagship' ),
+				'label'       => esc_html__( 'Model URL', 'skyyrose' ),
 				'type'        => \Elementor\Controls_Manager::TEXT,
 				'input_type'  => 'url',
-				'placeholder' => esc_html__( 'https://your-domain.com/model.glb', 'skyyrose-flagship' ),
-				'description' => esc_html__( 'Enter the URL of your GLB or GLTF model file.', 'skyyrose-flagship' ),
+				'placeholder' => esc_html__( 'https://your-domain.com/model.glb', 'skyyrose' ),
+				'description' => esc_html__( 'Enter the URL of your GLB or GLTF model file.', 'skyyrose' ),
 			)
 		);
 
 		$this->add_control(
 			'viewer_height',
 			array(
-				'label'      => esc_html__( 'Viewer Height', 'skyyrose-flagship' ),
+				'label'      => esc_html__( 'Viewer Height', 'skyyrose' ),
 				'type'       => \Elementor\Controls_Manager::SLIDER,
 				'size_units' => array( 'px', 'vh' ),
 				'range'      => array(
@@ -108,10 +108,10 @@ class SkyyRose_Three_Viewer_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'auto_rotate',
 			array(
-				'label'        => esc_html__( 'Auto Rotate', 'skyyrose-flagship' ),
+				'label'        => esc_html__( 'Auto Rotate', 'skyyrose' ),
 				'type'         => \Elementor\Controls_Manager::SWITCHER,
-				'label_on'     => esc_html__( 'Yes', 'skyyrose-flagship' ),
-				'label_off'    => esc_html__( 'No', 'skyyrose-flagship' ),
+				'label_on'     => esc_html__( 'Yes', 'skyyrose' ),
+				'label_off'    => esc_html__( 'No', 'skyyrose' ),
 				'return_value' => 'yes',
 				'default'      => 'yes',
 			)
@@ -122,7 +122,7 @@ class SkyyRose_Three_Viewer_Widget extends \Elementor\Widget_Base {
 		$this->start_controls_section(
 			'style_section',
 			array(
-				'label' => esc_html__( 'Style', 'skyyrose-flagship' ),
+				'label' => esc_html__( 'Style', 'skyyrose' ),
 				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -130,7 +130,7 @@ class SkyyRose_Three_Viewer_Widget extends \Elementor\Widget_Base {
 		$this->add_control(
 			'background_color',
 			array(
-				'label'     => esc_html__( 'Background Color', 'skyyrose-flagship' ),
+				'label'     => esc_html__( 'Background Color', 'skyyrose' ),
 				'type'      => \Elementor\Controls_Manager::COLOR,
 				'default'   => '#f5f5f5',
 				'selectors' => array(
@@ -151,7 +151,7 @@ class SkyyRose_Three_Viewer_Widget extends \Elementor\Widget_Base {
 		$settings = $this->get_settings_for_display();
 
 		if ( empty( $settings['model_url'] ) ) {
-			echo '<p>' . esc_html__( 'Please add a model URL.', 'skyyrose-flagship' ) . '</p>';
+			echo '<p>' . esc_html__( 'Please add a model URL.', 'skyyrose' ) . '</p>';
 			return;
 		}
 

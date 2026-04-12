@@ -21,7 +21,7 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 
 <div class="contact-form-wrapper">
 	<h2 class="contact-form__heading">
-		<?php esc_html_e( 'Send Us a Message', 'skyyrose-flagship' ); ?>
+		<?php esc_html_e( 'Send Us a Message', 'skyyrose' ); ?>
 	</h2>
 
 	<form
@@ -37,7 +37,7 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 		<!-- Honeypot field for bot detection — display:none removes from both visual and accessibility trees -->
 		<div class="contact-form__hp" style="display:none;" aria-hidden="true">
 			<label for="contact-website" aria-hidden="true">
-				<?php esc_html_e( 'Website', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Website', 'skyyrose' ); ?>
 			</label>
 			<input
 				type="text"
@@ -52,7 +52,7 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 		<div class="contact-form__row">
 			<div class="contact-form__group">
 				<label for="contact-first-name" class="contact-form__label">
-					<?php esc_html_e( 'First Name', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'First Name', 'skyyrose' ); ?>
 				</label>
 				<input
 					type="text"
@@ -63,13 +63,13 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 					autocomplete="given-name"
 					aria-required="true"
 					aria-describedby="contact-first-name-error"
-					placeholder="<?php esc_attr_e( 'Your first name', 'skyyrose-flagship' ); ?>"
+					placeholder="<?php esc_attr_e( 'Your first name', 'skyyrose' ); ?>"
 				>
 				<span id="contact-first-name-error" class="contact-form__error" role="alert" aria-live="polite"></span>
 			</div>
 			<div class="contact-form__group">
 				<label for="contact-last-name" class="contact-form__label">
-					<?php esc_html_e( 'Last Name', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Last Name', 'skyyrose' ); ?>
 				</label>
 				<input
 					type="text"
@@ -80,7 +80,7 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 					autocomplete="family-name"
 					aria-required="true"
 					aria-describedby="contact-last-name-error"
-					placeholder="<?php esc_attr_e( 'Your last name', 'skyyrose-flagship' ); ?>"
+					placeholder="<?php esc_attr_e( 'Your last name', 'skyyrose' ); ?>"
 				>
 				<span id="contact-last-name-error" class="contact-form__error" role="alert" aria-live="polite"></span>
 			</div>
@@ -89,7 +89,7 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 		<div class="contact-form__row">
 			<div class="contact-form__group">
 				<label for="contact-email" class="contact-form__label">
-					<?php esc_html_e( 'Email Address', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Email Address', 'skyyrose' ); ?>
 				</label>
 				<input
 					type="email"
@@ -100,13 +100,13 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 					autocomplete="email"
 					aria-required="true"
 					aria-describedby="contact-email-error"
-					placeholder="<?php esc_attr_e( 'you@example.com', 'skyyrose-flagship' ); ?>"
+					placeholder="<?php esc_attr_e( 'you@example.com', 'skyyrose' ); ?>"
 				>
 				<span id="contact-email-error" class="contact-form__error" role="alert" aria-live="polite"></span>
 			</div>
 			<div class="contact-form__group">
 				<label for="contact-phone" class="contact-form__label">
-					<?php esc_html_e( 'Phone (Optional)', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Phone (Optional)', 'skyyrose' ); ?>
 				</label>
 				<input
 					type="tel"
@@ -115,7 +115,7 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 					class="contact-form__input"
 					autocomplete="tel"
 					aria-describedby="contact-phone-error"
-					placeholder="<?php esc_attr_e( '(555) 123-4567', 'skyyrose-flagship' ); ?>"
+					placeholder="<?php esc_attr_e( '(555) 123-4567', 'skyyrose' ); ?>"
 				>
 				<span id="contact-phone-error" class="contact-form__error" role="alert" aria-live="polite"></span>
 			</div>
@@ -124,7 +124,7 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 		<div class="contact-form__row">
 			<div class="contact-form__group">
 				<label for="contact-subject" class="contact-form__label">
-					<?php esc_html_e( 'Subject', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Subject', 'skyyrose' ); ?>
 				</label>
 				<select
 					id="contact-subject"
@@ -136,7 +136,13 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 				>
 					<?php $is_first_opt = true; ?>
 					<?php foreach ( $subject_options as $value => $label ) : ?>
-						<option value="<?php echo esc_attr( $value ); ?>"<?php if ( $is_first_opt && '' === $value ) { echo ' disabled selected'; $is_first_opt = false; } ?>>
+						<option value="<?php echo esc_attr( $value ); ?>"
+						<?php
+						if ( $is_first_opt && '' === $value ) {
+							echo ' disabled selected';
+							$is_first_opt = false; }
+						?>
+						>
 							<?php echo esc_html( $label ); ?>
 						</option>
 					<?php endforeach; ?>
@@ -145,14 +151,14 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 			</div>
 			<div class="contact-form__group contact-form__group--order-number" id="order-number-group">
 				<label for="contact-order-number" class="contact-form__label">
-					<?php esc_html_e( 'Order Number (Optional)', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Order Number (Optional)', 'skyyrose' ); ?>
 				</label>
 				<input
 					type="text"
 					id="contact-order-number"
 					name="order_number"
 					class="contact-form__input"
-					placeholder="<?php esc_attr_e( 'e.g. SR-2025-123456', 'skyyrose-flagship' ); ?>"
+					placeholder="<?php esc_attr_e( 'e.g. SR-2025-123456', 'skyyrose' ); ?>"
 					aria-describedby="contact-order-number-error"
 				>
 				<span id="contact-order-number-error" class="contact-form__error" role="alert" aria-live="polite"></span>
@@ -163,7 +169,7 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 		<div class="contact-form__group">
 			<fieldset class="contact-form__fieldset">
 				<legend class="contact-form__label">
-					<?php esc_html_e( 'Preferred Contact Method', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Preferred Contact Method', 'skyyrose' ); ?>
 				</legend>
 				<div class="contact-form__radio-group">
 					<label class="contact-form__radio-label">
@@ -176,7 +182,7 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 						>
 						<span class="contact-form__radio-indicator" aria-hidden="true"></span>
 						<span class="contact-form__radio-text">
-							<?php esc_html_e( 'Email', 'skyyrose-flagship' ); ?>
+							<?php esc_html_e( 'Email', 'skyyrose' ); ?>
 						</span>
 					</label>
 					<label class="contact-form__radio-label">
@@ -188,7 +194,7 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 						>
 						<span class="contact-form__radio-indicator" aria-hidden="true"></span>
 						<span class="contact-form__radio-text">
-							<?php esc_html_e( 'Phone', 'skyyrose-flagship' ); ?>
+							<?php esc_html_e( 'Phone', 'skyyrose' ); ?>
 						</span>
 					</label>
 					<label class="contact-form__radio-label">
@@ -200,7 +206,7 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 						>
 						<span class="contact-form__radio-indicator" aria-hidden="true"></span>
 						<span class="contact-form__radio-text">
-							<?php esc_html_e( 'Either', 'skyyrose-flagship' ); ?>
+							<?php esc_html_e( 'Either', 'skyyrose' ); ?>
 						</span>
 					</label>
 				</div>
@@ -209,7 +215,7 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 
 		<div class="contact-form__group">
 			<label for="contact-message" class="contact-form__label">
-				<?php esc_html_e( 'Your Message', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Your Message', 'skyyrose' ); ?>
 			</label>
 			<textarea
 				id="contact-message"
@@ -218,14 +224,14 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 				required
 				aria-required="true"
 				aria-describedby="contact-message-error"
-				placeholder="<?php esc_attr_e( "Tell us what's on your mind. We're all ears...", 'skyyrose-flagship' ); ?>"
+				placeholder="<?php esc_attr_e( "Tell us what's on your mind. We're all ears...", 'skyyrose' ); ?>"
 			></textarea>
 			<span id="contact-message-error" class="contact-form__error" role="alert" aria-live="polite"></span>
 		</div>
 
 		<div class="contact-form__group">
 			<label for="contact-referral" class="contact-form__label">
-				<?php esc_html_e( 'How Did You Hear About Us? (Optional)', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'How Did You Hear About Us? (Optional)', 'skyyrose' ); ?>
 			</label>
 			<select
 				id="contact-referral"
@@ -234,7 +240,13 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 			>
 				<?php $is_first_ref = true; ?>
 				<?php foreach ( $referral_options as $value => $label ) : ?>
-					<option value="<?php echo esc_attr( $value ); ?>"<?php if ( $is_first_ref && '' === $value ) { echo ' disabled selected'; $is_first_ref = false; } ?>>
+					<option value="<?php echo esc_attr( $value ); ?>"
+					<?php
+					if ( $is_first_ref && '' === $value ) {
+						echo ' disabled selected';
+						$is_first_ref = false; }
+					?>
+					>
 						<?php echo esc_html( $label ); ?>
 					</option>
 				<?php endforeach; ?>
@@ -243,13 +255,13 @@ $referral_options = isset( $args['referral_options'] ) ? $args['referral_options
 
 		<button type="submit" class="contact-form__submit" id="contact-submit-btn">
 			<span class="contact-form__submit-text">
-				<?php esc_html_e( 'Send Message', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Send Message', 'skyyrose' ); ?>
 			</span>
 			<span class="contact-form__submit-loading" aria-hidden="true">
 				<svg class="contact-form__spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<path d="M21 12a9 9 0 1 1-6.219-8.56"/>
 				</svg>
-				<?php esc_html_e( 'Sending...', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Sending...', 'skyyrose' ); ?>
 			</span>
 		</button>
 	</form>

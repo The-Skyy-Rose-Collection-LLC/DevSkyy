@@ -77,12 +77,14 @@ function skyyrose_product_schema() {
 	}
 
 	// Add reviews.
-	$reviews = get_comments( array(
-		'post_id' => $product->get_id(),
-		'status'  => 'approve',
-		'type'    => 'review',
-		'number'  => 5,
-	) );
+	$reviews = get_comments(
+		array(
+			'post_id' => $product->get_id(),
+			'status'  => 'approve',
+			'type'    => 'review',
+			'number'  => 5,
+		)
+	);
 
 	if ( ! empty( $reviews ) ) {
 		$schema['review'] = array();
@@ -140,14 +142,14 @@ function skyyrose_organization_schema() {
 		'name'        => 'SkyyRose',
 		'legalName'   => 'SkyyRose LLC',
 		'url'         => home_url( '/' ),
-		'description' => __( 'Luxury Grows from Concrete. Premium streetwear and luxury fashion brand.', 'skyyrose-flagship' ),
+		'description' => __( 'Luxury Grows from Concrete. Premium streetwear and luxury fashion brand.', 'skyyrose' ),
 		'logo'        => $logo_url ? array(
 			'@type' => 'ImageObject',
 			'url'   => $logo_url,
 		) : null,
 		'brand'       => array(
-			'@type' => 'Brand',
-			'name'  => 'SkyyRose',
+			'@type'  => 'Brand',
+			'name'   => 'SkyyRose',
 			'slogan' => 'Luxury Grows from Concrete.',
 		),
 		'sameAs'      => array(),
@@ -187,7 +189,12 @@ function skyyrose_organization_schema() {
 	}
 
 	// Remove null fields (e.g., logo when no custom logo is set).
-	$schema = array_filter( $schema, function ( $v ) { return null !== $v; } );
+	$schema = array_filter(
+		$schema,
+		function ( $v ) {
+			return null !== $v;
+		}
+	);
 
 	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-encoded with JSON_HEX_TAG preventing script injection.
 }
@@ -219,8 +226,8 @@ function skyyrose_website_schema() {
 		'potentialAction' => array(
 			'@type'       => 'SearchAction',
 			'target'      => array(
-				'@type'        => 'EntryPoint',
-				'urlTemplate'  => home_url( '/?s={search_term_string}' ),
+				'@type'       => 'EntryPoint',
+				'urlTemplate' => home_url( '/?s={search_term_string}' ),
 			),
 			'query-input' => 'required name=search_term_string',
 		),
@@ -267,7 +274,7 @@ function skyyrose_breadcrumb_schema() {
 			'name'     => $breadcrumb['title'],
 			'item'     => $breadcrumb['url'],
 		);
-		$position++;
+		++$position;
 	}
 
 	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-encoded with JSON_HEX_TAG preventing script injection.
@@ -284,20 +291,20 @@ add_action( 'wp_head', 'skyyrose_breadcrumb_schema' );
 function skyyrose_get_breadcrumb_trail() {
 	$breadcrumbs = array(
 		array(
-			'title' => __( 'Home', 'skyyrose-flagship' ),
+			'title' => __( 'Home', 'skyyrose' ),
 			'url'   => home_url( '/' ),
 		),
 	);
 
 	if ( is_singular( 'product' ) && function_exists( 'wc_get_page_id' ) ) {
 		$breadcrumbs[] = array(
-			'title' => __( 'Shop', 'skyyrose-flagship' ),
+			'title' => __( 'Shop', 'skyyrose' ),
 			'url'   => get_permalink( wc_get_page_id( 'shop' ) ),
 		);
 
 		$terms = get_the_terms( get_the_ID(), 'product_cat' );
 		if ( $terms && ! is_wp_error( $terms ) ) {
-			$term = array_shift( $terms );
+			$term          = array_shift( $terms );
 			$breadcrumbs[] = array(
 				'title' => wp_strip_all_tags( html_entity_decode( $term->name, ENT_QUOTES, 'UTF-8' ) ),
 				'url'   => get_term_link( $term ),
@@ -310,12 +317,12 @@ function skyyrose_get_breadcrumb_trail() {
 		);
 	} elseif ( function_exists( 'wc_get_page_id' ) && ( is_post_type_archive( 'product' ) || is_shop() ) ) {
 		$breadcrumbs[] = array(
-			'title' => __( 'Shop', 'skyyrose-flagship' ),
+			'title' => __( 'Shop', 'skyyrose' ),
 			'url'   => get_permalink( wc_get_page_id( 'shop' ) ),
 		);
 	} elseif ( function_exists( 'wc_get_page_id' ) && is_tax( 'product_cat' ) ) {
 		$breadcrumbs[] = array(
-			'title' => __( 'Shop', 'skyyrose-flagship' ),
+			'title' => __( 'Shop', 'skyyrose' ),
 			'url'   => get_permalink( wc_get_page_id( 'shop' ) ),
 		);
 
@@ -329,7 +336,7 @@ function skyyrose_get_breadcrumb_trail() {
 	} elseif ( is_singular( 'post' ) ) {
 		$categories = get_the_category();
 		if ( $categories ) {
-			$category = array_shift( $categories );
+			$category      = array_shift( $categories );
 			$breadcrumbs[] = array(
 				'title' => wp_strip_all_tags( html_entity_decode( $category->name, ENT_QUOTES, 'UTF-8' ) ),
 				'url'   => get_category_link( $category->term_id ),
@@ -352,7 +359,7 @@ function skyyrose_get_breadcrumb_trail() {
 		);
 	} elseif ( is_search() ) {
 		$breadcrumbs[] = array(
-			'title' => sprintf( __( 'Search Results for: %s', 'skyyrose-flagship' ), esc_html( get_search_query() ) ),
+			'title' => sprintf( __( 'Search Results for: %s', 'skyyrose' ), esc_html( get_search_query() ) ),
 			'url'   => '',
 		);
 	}
@@ -376,10 +383,10 @@ function skyyrose_breadcrumb() {
 		return;
 	}
 
-	echo '<nav class="breadcrumb-navigation" aria-label="' . esc_attr__( 'Breadcrumb', 'skyyrose-flagship' ) . '">';
+	echo '<nav class="breadcrumb-navigation" aria-label="' . esc_attr__( 'Breadcrumb', 'skyyrose' ) . '">';
 	echo '<ol class="breadcrumbs" itemscope itemtype="https://schema.org/BreadcrumbList">';
 
-	$position = 1;
+	$position   = 1;
 	$last_index = count( $breadcrumbs ) - 1;
 
 	foreach ( $breadcrumbs as $index => $breadcrumb ) {
@@ -398,7 +405,7 @@ function skyyrose_breadcrumb() {
 		echo '<meta itemprop="position" content="' . esc_attr( $position ) . '" />';
 		echo '</li>';
 
-		$position++;
+		++$position;
 	}
 
 	echo '</ol>';
@@ -608,7 +615,7 @@ function skyyrose_meta_description() {
 				'template-preorder-gateway.php'      => 'Secure your SkyyRose pieces before they drop. Pre-order limited edition streetwear and luxury fashion.',
 				'template-contact.php'               => 'Get in touch with SkyyRose. Questions about orders, sizing, collaborations, or press inquiries? We are here to help.',
 				'template-faq.php'                   => 'Frequently asked questions about SkyyRose orders, shipping, returns, sizing, and pre-orders. Everything you need to know.',
-				'template-shipping-returns.php'       => 'SkyyRose shipping rates, delivery times, 30-day return policy, free exchanges, and pre-order cancellation details.',
+				'template-shipping-returns.php'      => 'SkyyRose shipping rates, delivery times, 30-day return policy, free exchanges, and pre-order cancellation details.',
 			);
 			if ( $template && isset( $descriptions[ $template ] ) ) {
 				$description = $descriptions[ $template ];
@@ -668,15 +675,15 @@ function skyyrose_pre_document_title( $title ) {
 	if ( is_page() ) {
 		$template = get_page_template_slug();
 		$titles   = array(
-			'template-collection-black-rose.php'    => 'Shop Black Rose — Limited Edition Streetwear | ' . $brand,
-			'template-collection-love-hurts.php'    => 'Shop Love Hurts — Crimson Luxury Fashion | ' . $brand,
-			'template-collection-signature.php'     => 'Shop Signature — Everyday Luxury Essentials | ' . $brand,
-			'template-about.php'                    => 'Our Story — Luxury Grows from Concrete | ' . $brand,
-			'template-preorder-gateway.php'         => 'Pre-Order — Secure Your Pieces | ' . $brand,
-			'template-contact.php'                  => 'Contact Us | ' . $brand,
-			'page-wishlist.php'                     => 'Your Wishlist | ' . $brand,
-			'template-faq.php'                      => 'FAQ — Orders, Shipping, Returns & Sizing | ' . $brand,
-			'template-shipping-returns.php'         => 'Shipping & Returns Policy | ' . $brand,
+			'template-collection-black-rose.php' => 'Shop Black Rose — Limited Edition Streetwear | ' . $brand,
+			'template-collection-love-hurts.php' => 'Shop Love Hurts — Crimson Luxury Fashion | ' . $brand,
+			'template-collection-signature.php'  => 'Shop Signature — Everyday Luxury Essentials | ' . $brand,
+			'template-about.php'                 => 'Our Story — Luxury Grows from Concrete | ' . $brand,
+			'template-preorder-gateway.php'      => 'Pre-Order — Secure Your Pieces | ' . $brand,
+			'template-contact.php'               => 'Contact Us | ' . $brand,
+			'page-wishlist.php'                  => 'Your Wishlist | ' . $brand,
+			'template-faq.php'                   => 'FAQ — Orders, Shipping, Returns & Sizing | ' . $brand,
+			'template-shipping-returns.php'      => 'Shipping & Returns Policy | ' . $brand,
 		);
 
 		if ( $template && isset( $titles[ $template ] ) ) {
@@ -765,7 +772,7 @@ function skyyrose_collection_schema() {
 	$schema = array(
 		'@context'    => 'https://schema.org',
 		'@type'       => 'CollectionPage',
-		'name'        => is_tax( 'product_cat' ) ? $term->name : __( 'Products', 'skyyrose-flagship' ),
+		'name'        => is_tax( 'product_cat' ) ? $term->name : __( 'Products', 'skyyrose' ),
 		'description' => is_tax( 'product_cat' ) ? term_description() : get_bloginfo( 'description' ),
 		'url'         => is_tax( 'product_cat' ) ? get_term_link( $term ) : get_post_type_archive_link( 'product' ),
 	);

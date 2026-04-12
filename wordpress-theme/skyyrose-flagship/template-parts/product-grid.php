@@ -20,7 +20,7 @@
  *   get_template_part( 'template-parts/product-grid', null, array(
  *       'products'      => $products,
  *       'collection'    => $slug,
- *       'heading'       => __( 'The Collection', 'skyyrose-flagship' ),
+ *       'heading'       => __( 'The Collection', 'skyyrose' ),
  *       'subheading'    => $subheading_text,
  *       'section_class' => 'col-products',
  *       'section_id'    => 'shop',
@@ -30,8 +30,8 @@
  *   get_template_part( 'template-parts/product-grid', null, array(
  *       'featured'      => true,
  *       'limit'         => 8,
- *       'heading'       => __( 'Featured', 'skyyrose-flagship' ),
- *       'subheading'    => __( 'Shop the staples', 'skyyrose-flagship' ),
+ *       'heading'       => __( 'Featured', 'skyyrose' ),
+ *       'subheading'    => __( 'Shop the staples', 'skyyrose' ),
  *       'section_class' => 'fp-featured',
  *       'section_id'    => 'featured',
  *   ) );
@@ -49,7 +49,7 @@
  *   // From any surface with a pre-resolved product list (custom query)
  *   get_template_part( 'template-parts/product-grid', null, array(
  *       'products' => $my_curated_list, // empty array renders nothing (no fallback)
- *       'heading'  => __( 'Staff Picks', 'skyyrose-flagship' ),
+ *       'heading'  => __( 'Staff Picks', 'skyyrose' ),
  *   ) );
  *
  * @param array $args {
@@ -108,7 +108,7 @@ $defaults = array(
 	'permalink'     => '',
 	'empty_message' => '',
 );
-$args = wp_parse_args( $args ?? array(), $defaults );
+$args     = wp_parse_args( $args ?? array(), $defaults );
 
 // ---------------------------------------------------------------------------
 // Resolve the product list from whichever data source was provided.
@@ -146,10 +146,10 @@ if ( null !== $args['products'] ) {
 	}
 } elseif ( ! empty( $args['skus'] ) ) {
 	// 4. Hand-picked SKU list — resolve through the shared catalog resolver
-	//    so visibility rules and WC-first logic stay centralised.
-	if ( function_exists( 'skyyrose_get_product' ) && function_exists( '_skyyrose_resolve_display_products' ) ) {
-		$entries        = array();
-		$requested      = count( (array) $args['skus'] );
+	// so visibility rules and WC-first logic stay centralised.
+	if ( function_exists( 'skyyrose_get_product' ) && function_exists( 'skyyrose_resolve_display_products' ) ) {
+		$entries   = array();
+		$requested = count( (array) $args['skus'] );
 		foreach ( (array) $args['skus'] as $sku ) {
 			$cat = skyyrose_get_product( $sku );
 			if ( $cat ) {
@@ -164,7 +164,7 @@ if ( null !== $args['products'] ) {
 				);
 			}
 		}
-		$products = _skyyrose_resolve_display_products( $entries );
+		$products = skyyrose_resolve_display_products( $entries );
 	} elseif ( $debug ) {
 		trigger_error(
 			'product-grid: catalog helpers missing — inc/product-catalog.php not loaded.',
@@ -196,14 +196,14 @@ if ( empty( $products ) ) {
 // section_class may contain space-separated tokens; we split, sanitize
 // each, and rejoin so multi-class values survive sanitize_html_class().
 // ---------------------------------------------------------------------------
-$has_heading  = ! empty( $args['heading'] );
-$has_subhead  = ! empty( $args['subheading'] );
-$has_header   = $has_heading || $has_subhead;
+$has_heading = ! empty( $args['heading'] );
+$has_subhead = ! empty( $args['subheading'] );
+$has_header  = $has_heading || $has_subhead;
 // sanitize_title() yields a valid HTML5 id slug (lowercase, hyphen-separated);
 // sanitize_html_class() was semantically for class tokens and would leak
 // uppercase/underscored values into the id attribute.
-$section_id   = $args['section_id'] ? sanitize_title( (string) $args['section_id'] ) : 'shop';
-$heading_id   = $has_heading ? $section_id . '-heading' : '';
+$section_id = $args['section_id'] ? sanitize_title( (string) $args['section_id'] ) : 'shop';
+$heading_id = $has_heading ? $section_id . '-heading' : '';
 
 // Multi-token class handling — each whitespace-separated token is sanitized
 // independently so spaces are preserved. sanitize_html_class() strips any
@@ -248,7 +248,7 @@ if ( $first_slug ) {
 	<?php if ( $heading_id ) : ?>
 	aria-labelledby="<?php echo esc_attr( $heading_id ); ?>"
 	<?php else : ?>
-	aria-label="<?php esc_attr_e( 'Product grid', 'skyyrose-flagship' ); ?>"
+	aria-label="<?php esc_attr_e( 'Product grid', 'skyyrose' ); ?>"
 	<?php endif; ?>
 >
 	<?php if ( $has_header ) : ?>
@@ -273,7 +273,7 @@ if ( $first_slug ) {
 	>
 		<div class="product-grid__items" role="list">
 			<?php
-			$index            = 0;
+			$index              = 0;
 			$permalink_override = ! empty( $args['permalink'] ) ? (string) $args['permalink'] : '';
 			foreach ( $products as $item ) :
 				// Build card args — this template part delegates rendering to the holo card.
@@ -301,7 +301,7 @@ if ( $first_slug ) {
 					);
 				}
 				get_template_part( 'template-parts/product-card-holo', null, $card_args );
-				$index++;
+				++$index;
 			endforeach;
 			?>
 		</div>

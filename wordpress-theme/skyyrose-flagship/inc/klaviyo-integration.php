@@ -26,7 +26,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Klaviyo API Client
  *--------------------------------------------------------------*/
 
@@ -69,30 +70,32 @@ function skyyrose_klaviyo_subscribe_to_list( $email, $list_id, $properties = arr
 		),
 	);
 
-	$body = wp_json_encode( array(
-		'data' => array(
-			'type'       => 'profile-subscription-bulk-create-job',
-			'attributes' => array(
-				'profiles'          => array(
-					'data' => array(
-						array(
-							'type'       => 'profile',
-							'attributes' => $profile_attrs,
+	$body = wp_json_encode(
+		array(
+			'data' => array(
+				'type'          => 'profile-subscription-bulk-create-job',
+				'attributes'    => array(
+					'profiles'          => array(
+						'data' => array(
+							array(
+								'type'       => 'profile',
+								'attributes' => $profile_attrs,
+							),
+						),
+					),
+					'historical_import' => false,
+				),
+				'relationships' => array(
+					'list' => array(
+						'data' => array(
+							'type' => 'list',
+							'id'   => $list_id,
 						),
 					),
 				),
-				'historical_import' => false,
 			),
-			'relationships' => array(
-				'list' => array(
-					'data' => array(
-						'type' => 'list',
-						'id'   => $list_id,
-					),
-				),
-			),
-		),
-	) );
+		)
+	);
 
 	$response = wp_remote_post(
 		'https://a.klaviyo.com/api/profile-subscription-bulk-create-jobs/',
@@ -144,7 +147,8 @@ function skyyrose_klaviyo_list_id( $slug ) {
 	return get_option( $option_map[ $slug ], '' );
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Hook: Newsletter Signup → Klaviyo General List
  *--------------------------------------------------------------*/
 
@@ -165,7 +169,8 @@ function skyyrose_klaviyo_on_newsletter_signup( $email ) {
 }
 add_action( 'skyyrose_newsletter_signup', 'skyyrose_klaviyo_on_newsletter_signup' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Hook: Incentive Popup Signup → Klaviyo General + VIP Lists
  *--------------------------------------------------------------*/
 
@@ -189,7 +194,8 @@ function skyyrose_klaviyo_on_incentive_signup( $email, $phone = '' ) {
 }
 add_action( 'skyyrose_incentive_signup', 'skyyrose_klaviyo_on_incentive_signup', 10, 2 );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * AJAX: Generic Klaviyo Subscribe Endpoint
  *
  * Accepts email + optional list_slug parameter so the JS engines
@@ -216,13 +222,13 @@ function skyyrose_ajax_klaviyo_subscribe() {
 	// Verify the standard site nonce.
 	if ( ! isset( $_POST['nonce'] ) ||
 		! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'skyyrose-nonce' ) ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'Security check failed.', 'skyyrose-flagship' ) ) );
+		wp_send_json_error( array( 'message' => esc_html__( 'Security check failed.', 'skyyrose' ) ) );
 		return;
 	}
 
 	$email = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
 	if ( ! is_email( $email ) ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'Please enter a valid email address.', 'skyyrose-flagship' ) ) );
+		wp_send_json_error( array( 'message' => esc_html__( 'Please enter a valid email address.', 'skyyrose' ) ) );
 		return;
 	}
 
@@ -230,7 +236,7 @@ function skyyrose_ajax_klaviyo_subscribe() {
 	$rate_key = 'skyyrose_klav_' . md5( strtolower( trim( $email ) ) );
 	$attempts = (int) get_transient( $rate_key );
 	if ( $attempts >= 5 ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'Too many requests. Please try again later.', 'skyyrose-flagship' ) ) );
+		wp_send_json_error( array( 'message' => esc_html__( 'Too many requests. Please try again later.', 'skyyrose' ) ) );
 		return;
 	}
 	set_transient( $rate_key, $attempts + 1, 15 * MINUTE_IN_SECONDS );
@@ -247,7 +253,7 @@ function skyyrose_ajax_klaviyo_subscribe() {
 	}
 
 	// Resolve list ID — default to general.
-	$list_slug   = sanitize_key( wp_unslash( $_POST['list_slug'] ?? 'general' ) );
+	$list_slug     = sanitize_key( wp_unslash( $_POST['list_slug'] ?? 'general' ) );
 	$allowed_slugs = array( 'general', 'black_rose', 'love_hurts', 'signature', 'jersey_vip' );
 	if ( ! in_array( $list_slug, $allowed_slugs, true ) ) {
 		$list_slug = 'general';
@@ -261,14 +267,17 @@ function skyyrose_ajax_klaviyo_subscribe() {
 	do_action( 'skyyrose_newsletter_signup', $email );
 
 	// Always return success to the user — avoid exposing API config state.
-	wp_send_json_success( array(
-		'message' => esc_html__( 'Welcome to the SkyyRose family! Check your inbox for your early access details.', 'skyyrose-flagship' ),
-	) );
+	wp_send_json_success(
+		array(
+			'message' => esc_html__( 'Welcome to the SkyyRose family! Check your inbox for your early access details.', 'skyyrose' ),
+		)
+	);
 }
 add_action( 'wp_ajax_skyyrose_klaviyo_subscribe', 'skyyrose_ajax_klaviyo_subscribe' );
 add_action( 'wp_ajax_nopriv_skyyrose_klaviyo_subscribe', 'skyyrose_ajax_klaviyo_subscribe' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * REST API: Live Stock Counts
  *
  * GET /index.php?rest_route=/skyyrose/v1/stock/<sku>
@@ -337,10 +346,10 @@ function skyyrose_rest_stock_handler( $request ) {
 
 	// Fall back to WooCommerce stock management if pre-order meta is absent.
 	if ( $product->managing_stock() ) {
-		$wc_stock   = (int) $product->get_stock_quantity();
-		$total      = $edition_size > 0 ? $edition_size : 0;
-		$remaining  = $wc_stock;
-		$claimed    = max( 0, $total - $remaining );
+		$wc_stock  = (int) $product->get_stock_quantity();
+		$total     = $edition_size > 0 ? $edition_size : 0;
+		$remaining = $wc_stock;
+		$claimed   = max( 0, $total - $remaining );
 	} else {
 		// Use manual pre-order remaining field.
 		$remaining = '' !== $available ? (int) $available : $edition_size;
@@ -367,7 +376,8 @@ function skyyrose_rest_stock_handler( $request ) {
 	return $response;
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * WooCommerce Order Events → Klaviyo
  *
  * Fire Placed Order and Fulfilled Order events to Klaviyo via
@@ -426,11 +436,11 @@ function skyyrose_klaviyo_on_order_created( $order_id, $order ) {
 			'type'       => 'event',
 			'attributes' => array(
 				'properties' => array(
-					'OrderId'     => $order_id,
-					'Revenue'     => (float) $order->get_total(),
-					'ItemCount'   => $order->get_item_count(),
-					'Items'       => $items,
-					'IsPreOrder'  => true,
+					'OrderId'    => $order_id,
+					'Revenue'    => (float) $order->get_total(),
+					'ItemCount'  => $order->get_item_count(),
+					'Items'      => $items,
+					'IsPreOrder' => true,
 				),
 				'metric'     => array(
 					'data' => array(
@@ -468,7 +478,8 @@ function skyyrose_klaviyo_on_order_created( $order_id, $order ) {
 }
 add_action( 'woocommerce_checkout_order_created', 'skyyrose_klaviyo_on_order_created', 10, 2 );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Inline Customizer: Klaviyo Settings Panel
  *
  * Adds a "Klaviyo Integration" section to the WordPress Customizer
@@ -485,64 +496,86 @@ add_action( 'woocommerce_checkout_order_created', 'skyyrose_klaviyo_on_order_cre
  */
 function skyyrose_klaviyo_customizer_settings( $wp_customize ) {
 
-	$wp_customize->add_section( 'skyyrose_klaviyo', array(
-		'title'    => esc_html__( 'Klaviyo Integration', 'skyyrose-flagship' ),
-		'priority' => 200,
-	) );
-
-	// Private API key.
-	$wp_customize->add_setting( 'skyyrose_klaviyo_private_key', array(
-		'default'           => '',
-		'transport'         => 'refresh',
-		'sanitize_callback' => 'sanitize_text_field',
-		'type'              => 'option',
-	) );
-	$wp_customize->add_control( 'skyyrose_klaviyo_private_key', array(
-		'label'       => esc_html__( 'Private API Key (sk_live_...)', 'skyyrose-flagship' ),
-		'section'     => 'skyyrose_klaviyo',
-		'type'        => 'text',
-		'description' => esc_html__( 'Found in Klaviyo → Account → API Keys', 'skyyrose-flagship' ),
-	) );
-
-	// Public site ID.
-	$wp_customize->add_setting( 'skyyrose_klaviyo_public_key', array(
-		'default'           => '',
-		'transport'         => 'refresh',
-		'sanitize_callback' => 'sanitize_text_field',
-		'type'              => 'option',
-	) );
-	$wp_customize->add_control( 'skyyrose_klaviyo_public_key', array(
-		'label'   => esc_html__( 'Public Site ID (6-char)', 'skyyrose-flagship' ),
-		'section' => 'skyyrose_klaviyo',
-		'type'    => 'text',
-	) );
-
-	// List IDs.
-	$lists = array(
-		'skyyrose_klaviyo_list_general'    => esc_html__( 'General Newsletter List ID', 'skyyrose-flagship' ),
-		'skyyrose_klaviyo_list_black_rose' => esc_html__( 'Black Rose Drop List ID', 'skyyrose-flagship' ),
-		'skyyrose_klaviyo_list_love_hurts' => esc_html__( 'Love Hurts Drop List ID', 'skyyrose-flagship' ),
-		'skyyrose_klaviyo_list_signature'  => esc_html__( 'Signature Drop List ID', 'skyyrose-flagship' ),
-		'skyyrose_klaviyo_list_jersey_vip' => esc_html__( 'Jersey Series VIP List ID', 'skyyrose-flagship' ),
+	$wp_customize->add_section(
+		'skyyrose_klaviyo',
+		array(
+			'title'    => esc_html__( 'Klaviyo Integration', 'skyyrose' ),
+			'priority' => 200,
+		)
 	);
 
-	foreach ( $lists as $option_name => $label ) {
-		$wp_customize->add_setting( $option_name, array(
+	// Private API key.
+	$wp_customize->add_setting(
+		'skyyrose_klaviyo_private_key',
+		array(
 			'default'           => '',
 			'transport'         => 'refresh',
 			'sanitize_callback' => 'sanitize_text_field',
 			'type'              => 'option',
-		) );
-		$wp_customize->add_control( $option_name, array(
-			'label'   => $label,
+		)
+	);
+	$wp_customize->add_control(
+		'skyyrose_klaviyo_private_key',
+		array(
+			'label'       => esc_html__( 'Private API Key (sk_live_...)', 'skyyrose' ),
+			'section'     => 'skyyrose_klaviyo',
+			'type'        => 'text',
+			'description' => esc_html__( 'Found in Klaviyo → Account → API Keys', 'skyyrose' ),
+		)
+	);
+
+	// Public site ID.
+	$wp_customize->add_setting(
+		'skyyrose_klaviyo_public_key',
+		array(
+			'default'           => '',
+			'transport'         => 'refresh',
+			'sanitize_callback' => 'sanitize_text_field',
+			'type'              => 'option',
+		)
+	);
+	$wp_customize->add_control(
+		'skyyrose_klaviyo_public_key',
+		array(
+			'label'   => esc_html__( 'Public Site ID (6-char)', 'skyyrose' ),
 			'section' => 'skyyrose_klaviyo',
 			'type'    => 'text',
-		) );
+		)
+	);
+
+	// List IDs.
+	$lists = array(
+		'skyyrose_klaviyo_list_general'    => esc_html__( 'General Newsletter List ID', 'skyyrose' ),
+		'skyyrose_klaviyo_list_black_rose' => esc_html__( 'Black Rose Drop List ID', 'skyyrose' ),
+		'skyyrose_klaviyo_list_love_hurts' => esc_html__( 'Love Hurts Drop List ID', 'skyyrose' ),
+		'skyyrose_klaviyo_list_signature'  => esc_html__( 'Signature Drop List ID', 'skyyrose' ),
+		'skyyrose_klaviyo_list_jersey_vip' => esc_html__( 'Jersey Series VIP List ID', 'skyyrose' ),
+	);
+
+	foreach ( $lists as $option_name => $label ) {
+		$wp_customize->add_setting(
+			$option_name,
+			array(
+				'default'           => '',
+				'transport'         => 'refresh',
+				'sanitize_callback' => 'sanitize_text_field',
+				'type'              => 'option',
+			)
+		);
+		$wp_customize->add_control(
+			$option_name,
+			array(
+				'label'   => $label,
+				'section' => 'skyyrose_klaviyo',
+				'type'    => 'text',
+			)
+		);
 	}
 }
 add_action( 'customize_register', 'skyyrose_klaviyo_customizer_settings' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Enqueue Klaviyo JS Tracking Snippet (public site ID)
  *--------------------------------------------------------------*/
 
@@ -575,7 +608,8 @@ function skyyrose_klaviyo_enqueue_tracking() {
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_klaviyo_enqueue_tracking', 5 );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Include in functions.php (via theme-setup.php)
  *
  * This file must be require_once'd from functions.php or

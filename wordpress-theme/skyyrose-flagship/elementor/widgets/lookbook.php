@@ -20,7 +20,7 @@ class SkyyRose_Lookbook_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_title() {
-		return esc_html__( 'Lookbook Gallery', 'skyyrose-flagship' );
+		return esc_html__( 'Lookbook Gallery', 'skyyrose' );
 	}
 
 	public function get_icon() {
@@ -37,45 +37,60 @@ class SkyyRose_Lookbook_Widget extends \Elementor\Widget_Base {
 
 	protected function register_controls() {
 
-		$this->start_controls_section( 'section_gallery', array(
-			'label' => esc_html__( 'Gallery', 'skyyrose-flagship' ),
-			'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
-		) );
+		$this->start_controls_section(
+			'section_gallery',
+			array(
+				'label' => esc_html__( 'Gallery', 'skyyrose' ),
+				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
+			)
+		);
 
-		$this->add_control( 'gallery', array(
-			'label'   => esc_html__( 'Images', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::GALLERY,
-			'default' => array(),
-		) );
+		$this->add_control(
+			'gallery',
+			array(
+				'label'   => esc_html__( 'Images', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::GALLERY,
+				'default' => array(),
+			)
+		);
 
-		$this->add_control( 'columns', array(
-			'label'   => esc_html__( 'Columns', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::SELECT,
-			'options' => array(
-				'2' => '2',
-				'3' => '3',
-				'4' => '4',
-			),
-			'default' => '3',
-		) );
+		$this->add_control(
+			'columns',
+			array(
+				'label'   => esc_html__( 'Columns', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::SELECT,
+				'options' => array(
+					'2' => '2',
+					'3' => '3',
+					'4' => '4',
+				),
+				'default' => '3',
+			)
+		);
 
-		$this->add_control( 'aspect_ratio', array(
-			'label'   => esc_html__( 'Aspect Ratio', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::SELECT,
-			'options' => array(
-				'1/1'   => esc_html__( 'Square', 'skyyrose-flagship' ),
-				'3/4'   => esc_html__( '3:4 Portrait', 'skyyrose-flagship' ),
-				'4/3'   => esc_html__( '4:3 Landscape', 'skyyrose-flagship' ),
-				'auto'  => esc_html__( 'Auto', 'skyyrose-flagship' ),
-			),
-			'default' => '3/4',
-		) );
+		$this->add_control(
+			'aspect_ratio',
+			array(
+				'label'   => esc_html__( 'Aspect Ratio', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::SELECT,
+				'options' => array(
+					'1/1'  => esc_html__( 'Square', 'skyyrose' ),
+					'3/4'  => esc_html__( '3:4 Portrait', 'skyyrose' ),
+					'4/3'  => esc_html__( '4:3 Landscape', 'skyyrose' ),
+					'auto' => esc_html__( 'Auto', 'skyyrose' ),
+				),
+				'default' => '3/4',
+			)
+		);
 
-		$this->add_control( 'overlay_text', array(
-			'label'       => esc_html__( 'Overlay Text', 'skyyrose-flagship' ),
-			'type'        => \Elementor\Controls_Manager::TEXT,
-			'placeholder' => esc_html__( 'e.g. @skyyrose', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'overlay_text',
+			array(
+				'label'       => esc_html__( 'Overlay Text', 'skyyrose' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'placeholder' => esc_html__( 'e.g. @skyyrose', 'skyyrose' ),
+			)
+		);
 
 		$this->end_controls_section();
 	}
@@ -88,7 +103,7 @@ class SkyyRose_Lookbook_Widget extends \Elementor\Widget_Base {
 		$overlay  = $settings['overlay_text'];
 
 		if ( empty( $gallery ) ) {
-			echo '<p class="elementor-alert">' . esc_html__( 'Add images to the gallery.', 'skyyrose-flagship' ) . '</p>';
+			echo '<p class="elementor-alert">' . esc_html__( 'Add images to the gallery.', 'skyyrose' ) . '</p>';
 			return;
 		}
 
@@ -96,16 +111,20 @@ class SkyyRose_Lookbook_Widget extends \Elementor\Widget_Base {
 		?>
 		<div class="col-rv" style="display:grid;grid-template-columns:repeat(<?php echo esc_attr( $columns ); ?>,1fr);
 			gap:8px;padding:40px 0;">
-			<?php foreach ( $gallery as $image ) :
+			<?php
+			foreach ( $gallery as $image ) :
 				$url  = ! empty( $image['url'] ) ? $image['url'] : '';
 				$id   = ! empty( $image['id'] ) ? $image['id'] : 0;
 				$alt  = $id ? get_post_meta( $id, '_wp_attachment_image_alt', true ) : '';
 				$srcs = $id ? wp_get_attachment_image_srcset( $id, 'large' ) : '';
-			?>
+				?>
 				<div style="position:relative;overflow:hidden;border-radius:4px;<?php echo esc_attr( $aspect_style ); ?>">
 					<img src="<?php echo esc_url( $url ); ?>"
 						alt="<?php echo esc_attr( $alt ); ?>"
-						<?php if ( $srcs ) : ?>srcset="<?php echo esc_attr( $srcs ); ?>"<?php endif; ?>
+						<?php
+						if ( $srcs ) :
+							?>
+							srcset="<?php echo esc_attr( $srcs ); ?>"<?php endif; ?>
 						sizes="(max-width:768px) 50vw, <?php echo esc_attr( round( 100 / $columns ) ); ?>vw"
 						loading="lazy"
 						style="width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.16,1,.3,1);">

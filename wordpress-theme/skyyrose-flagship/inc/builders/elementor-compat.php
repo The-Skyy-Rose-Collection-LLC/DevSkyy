@@ -8,21 +8,15 @@
  *
  * Loaded conditionally — only when Elementor is active (see functions.php).
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 
 defined( 'ABSPATH' ) || exit;
 
-/*--------------------------------------------------------------
- * 1. Guard — bail if Elementor is not active.
- *--------------------------------------------------------------*/
-if ( ! did_action( 'elementor/loaded' ) && ! class_exists( '\Elementor\Plugin' ) ) {
-	return;
-}
-
-/*--------------------------------------------------------------
- * 2. Register custom Elementor widget category for editorial.
+/*
+--------------------------------------------------------------
+ * 1. Register custom Elementor widget category for editorial.
  *--------------------------------------------------------------*/
 add_action( 'elementor/elements/categories_registered', 'skyyrose_ee_register_categories' );
 
@@ -35,14 +29,15 @@ function skyyrose_ee_register_categories( $elements_manager ) {
 	$elements_manager->add_category(
 		'skyyrose-editorial',
 		array(
-			'title' => esc_html__( 'SkyyRose Editorial', 'skyyrose-flagship' ),
+			'title' => esc_html__( 'SkyyRose Editorial', 'skyyrose' ),
 			'icon'  => 'eicon-document-file',
 		)
 	);
 }
 
-/*--------------------------------------------------------------
- * 3. Expose scroll-reveal CSS classes to Elementor's class list.
+/*
+--------------------------------------------------------------
+ * 2. Expose scroll-reveal CSS classes to Elementor's class list.
  *--------------------------------------------------------------*/
 add_filter( 'elementor/editor/localize_settings', 'skyyrose_ee_expose_classes' );
 
@@ -78,8 +73,9 @@ function skyyrose_ee_expose_classes( $settings ) {
 	return $settings;
 }
 
-/*--------------------------------------------------------------
- * 4. Collection Palette Meta Box
+/*
+--------------------------------------------------------------
+ * 3. Collection Palette Meta Box
  *--------------------------------------------------------------*/
 add_action( 'add_meta_boxes', 'skyyrose_ee_add_collection_meta_box' );
 add_action( 'save_post', 'skyyrose_ee_save_collection_meta', 10, 2 );
@@ -90,7 +86,7 @@ add_action( 'save_post', 'skyyrose_ee_save_collection_meta', 10, 2 );
 function skyyrose_ee_add_collection_meta_box() {
 	add_meta_box(
 		'skyyrose_collection_palette',
-		esc_html__( 'SkyyRose Collection Palette', 'skyyrose-flagship' ),
+		esc_html__( 'SkyyRose Collection Palette', 'skyyrose' ),
 		'skyyrose_ee_render_collection_meta_box',
 		'page',
 		'side',
@@ -112,14 +108,14 @@ function skyyrose_ee_render_collection_meta_box( $post ) {
 	wp_nonce_field( 'skyyrose_collection_nonce_action', 'skyyrose_collection_nonce' );
 
 	$options = array(
-		'signature'  => esc_html__( 'Signature (Gold)', 'skyyrose-flagship' ),
-		'black-rose' => esc_html__( 'Black Rose (Silver)', 'skyyrose-flagship' ),
-		'love-hurts' => esc_html__( 'Love Hurts (Crimson)', 'skyyrose-flagship' ),
+		'signature'  => esc_html__( 'Signature (Gold)', 'skyyrose' ),
+		'black-rose' => esc_html__( 'Black Rose (Silver)', 'skyyrose' ),
+		'love-hurts' => esc_html__( 'Love Hurts (Crimson)', 'skyyrose' ),
 	);
 	?>
 	<p>
 		<label for="skyyrose_collection">
-			<?php echo esc_html__( 'Select the collection palette for this page:', 'skyyrose-flagship' ); ?>
+			<?php echo esc_html__( 'Select the collection palette for this page:', 'skyyrose' ); ?>
 		</label>
 	</p>
 	<select id="skyyrose_collection" name="skyyrose_collection" style="width:100%;">
@@ -130,7 +126,7 @@ function skyyrose_ee_render_collection_meta_box( $post ) {
 		<?php endforeach; ?>
 	</select>
 	<p class="description">
-		<?php echo esc_html__( 'Controls CSS custom properties (accent colors, glow) on the editorial template.', 'skyyrose-flagship' ); ?>
+		<?php echo esc_html__( 'Controls CSS custom properties (accent colors, glow) on the editorial template.', 'skyyrose' ); ?>
 	</p>
 	<?php
 }
@@ -161,7 +157,7 @@ function skyyrose_ee_save_collection_meta( $post_id, $post ) {
 	}
 
 	if ( isset( $_POST['skyyrose_collection'] ) ) {
-		$value = sanitize_text_field( wp_unslash( $_POST['skyyrose_collection'] ) );
+		$value   = sanitize_text_field( wp_unslash( $_POST['skyyrose_collection'] ) );
 		$allowed = array( 'signature', 'black-rose', 'love-hurts' );
 
 		if ( in_array( $value, $allowed, true ) ) {
@@ -170,8 +166,9 @@ function skyyrose_ee_save_collection_meta( $post_id, $post ) {
 	}
 }
 
-/*--------------------------------------------------------------
- * 5. Shortcodes for Elementor
+/*
+--------------------------------------------------------------
+ * 4. Shortcodes for Elementor
  *--------------------------------------------------------------*/
 
 /**
@@ -204,22 +201,22 @@ function skyyrose_ee_countdown_shortcode( $atts ) {
 	<div class="lp-countdown" data-countdown="<?php echo esc_attr( $config ); ?>">
 		<div class="lp-countdown__unit">
 			<span class="lp-countdown__num" data-cd="d">00</span>
-			<span class="lp-countdown__lbl"><?php echo esc_html__( 'Days', 'skyyrose-flagship' ); ?></span>
+			<span class="lp-countdown__lbl"><?php echo esc_html__( 'Days', 'skyyrose' ); ?></span>
 		</div>
 		<span class="lp-countdown__sep" aria-hidden="true">:</span>
 		<div class="lp-countdown__unit">
 			<span class="lp-countdown__num" data-cd="h">00</span>
-			<span class="lp-countdown__lbl"><?php echo esc_html__( 'Hours', 'skyyrose-flagship' ); ?></span>
+			<span class="lp-countdown__lbl"><?php echo esc_html__( 'Hours', 'skyyrose' ); ?></span>
 		</div>
 		<span class="lp-countdown__sep" aria-hidden="true">:</span>
 		<div class="lp-countdown__unit">
 			<span class="lp-countdown__num" data-cd="m">00</span>
-			<span class="lp-countdown__lbl"><?php echo esc_html__( 'Min', 'skyyrose-flagship' ); ?></span>
+			<span class="lp-countdown__lbl"><?php echo esc_html__( 'Min', 'skyyrose' ); ?></span>
 		</div>
 		<span class="lp-countdown__sep" aria-hidden="true">:</span>
 		<div class="lp-countdown__unit">
 			<span class="lp-countdown__num" data-cd="s">00</span>
-			<span class="lp-countdown__lbl"><?php echo esc_html__( 'Sec', 'skyyrose-flagship' ); ?></span>
+			<span class="lp-countdown__lbl"><?php echo esc_html__( 'Sec', 'skyyrose' ); ?></span>
 		</div>
 	</div>
 	<?php
@@ -259,13 +256,13 @@ function skyyrose_ee_scarcity_shortcode( $atts ) {
 		return '';
 	}
 
-	$product       = $catalog[ $sku ];
-	$edition_size  = isset( $product['edition_size'] ) ? absint( $product['edition_size'] ) : 200;
-	$remaining     = isset( $product['remaining'] ) ? absint( $product['remaining'] ) : $edition_size;
-	$sold          = max( 0, $edition_size - $remaining );
-	$sold_pct      = $edition_size > 0 ? min( 100, round( ( $sold / $edition_size ) * 100 ) ) : 0;
-	$is_low        = ( $remaining <= 10 && $remaining > 0 );
-	$product_name  = isset( $product['name'] ) ? $product['name'] : $sku;
+	$product      = $catalog[ $sku ];
+	$edition_size = isset( $product['edition_size'] ) ? absint( $product['edition_size'] ) : 200;
+	$remaining    = isset( $product['remaining'] ) ? absint( $product['remaining'] ) : $edition_size;
+	$sold         = max( 0, $edition_size - $remaining );
+	$sold_pct     = $edition_size > 0 ? min( 100, round( ( $sold / $edition_size ) * 100 ) ) : 0;
+	$is_low       = ( $remaining <= 10 && $remaining > 0 );
+	$product_name = isset( $product['name'] ) ? $product['name'] : $sku;
 
 	ob_start();
 	?>
@@ -276,7 +273,7 @@ function skyyrose_ee_scarcity_shortcode( $atts ) {
 				<?php
 				printf(
 					/* translators: %d: percentage of stock sold */
-					esc_html__( '%d%% sold', 'skyyrose-flagship' ),
+					esc_html__( '%d%% sold', 'skyyrose' ),
 					intval( $sold_pct )
 				);
 				?>
@@ -290,7 +287,7 @@ function skyyrose_ee_scarcity_shortcode( $atts ) {
 				<?php
 				printf(
 					/* translators: %d: number of items remaining */
-					esc_html__( 'Only %d left', 'skyyrose-flagship' ),
+					esc_html__( 'Only %d left', 'skyyrose' ),
 					intval( $remaining )
 				);
 				?>
@@ -323,9 +320,9 @@ function skyyrose_ee_press_bar_shortcode( $atts ) {
 
 	ob_start();
 	?>
-	<div class="lp-press lp-rv" aria-label="<?php echo esc_attr__( 'Featured in', 'skyyrose-flagship' ); ?>">
+	<div class="lp-press lp-rv" aria-label="<?php echo esc_attr__( 'Featured in', 'skyyrose' ); ?>">
 		<div class="lp__container">
-			<span class="lp-press__label"><?php echo esc_html__( 'As Seen In', 'skyyrose-flagship' ); ?></span>
+			<span class="lp-press__label"><?php echo esc_html__( 'As Seen In', 'skyyrose' ); ?></span>
 			<ul class="lp-press__list">
 				<?php foreach ( $mentions as $outlet ) : ?>
 					<li><?php echo esc_html( $outlet ); ?></li>
@@ -398,9 +395,9 @@ function skyyrose_ee_product_card_shortcode( $atts ) {
 		<div class="lp-product-card" data-collection="<?php echo esc_attr( $card_args['collection'] ); ?>">
 			<?php if ( $card_args['image_url'] ) : ?>
 				<img src="<?php echo esc_url( $card_args['image_url'] ); ?>"
-				     alt="<?php echo esc_attr( $card_args['title'] ); ?>"
-				     loading="lazy"
-				     width="400" height="400">
+					alt="<?php echo esc_attr( $card_args['title'] ); ?>"
+					loading="lazy"
+					width="400" height="400">
 			<?php endif; ?>
 			<h3><?php echo esc_html( $card_args['title'] ); ?></h3>
 			<p class="lp-product-card__price"><?php echo esc_html( $card_args['price'] ); ?></p>
@@ -412,8 +409,9 @@ function skyyrose_ee_product_card_shortcode( $atts ) {
 }
 add_shortcode( 'skyyrose_product_card', 'skyyrose_ee_product_card_shortcode' );
 
-/*--------------------------------------------------------------
- * 6. Enqueue landing-pages JS on Elementor editorial pages
+/*
+--------------------------------------------------------------
+ * 5. Enqueue landing-pages JS on Elementor editorial pages
  *    so countdown timers and scroll-reveal work.
  *--------------------------------------------------------------*/
 add_action( 'wp_enqueue_scripts', 'skyyrose_ee_enqueue_editorial_assets', 25 );
@@ -428,8 +426,8 @@ function skyyrose_ee_enqueue_editorial_assets() {
 		return;
 	}
 
-	$js_uri = SKYYROSE_ASSETS_URI . '/js';
-	$js_dir = SKYYROSE_DIR . '/assets/js';
+	$js_uri  = SKYYROSE_ASSETS_URI . '/js';
+	$js_dir  = SKYYROSE_DIR . '/assets/js';
 	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
 	$lp_js = $use_min && file_exists( $js_dir . '/landing-pages.min.js' )

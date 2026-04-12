@@ -21,18 +21,19 @@ $svg_kses       = skyyrose_svg_kses();
 ?>
 
 <!-- Chapter II — The Collections -->
-<section class="abt-chapter abt-values" aria-label="<?php esc_attr_e( 'The Collections', 'skyyrose-flagship' ); ?>">
+<section class="abt-chapter abt-values" aria-label="<?php esc_attr_e( 'The Collections', 'skyyrose' ); ?>">
 	<span class="abt-chapter__num rv-split-char" aria-hidden="true">02</span>
 	<div class="abt-chapter__container">
-		<p class="abt-chapter__label rv-blur-down"><?php esc_html_e( 'Chapter II', 'skyyrose-flagship' ); ?></p>
+		<p class="abt-chapter__label rv-blur-down"><?php esc_html_e( 'Chapter II', 'skyyrose' ); ?></p>
 		<h2 class="abt-chapter__title rv-clip-up">
-			<?php echo wp_kses( __( 'Three Worlds,<br>One Crown', 'skyyrose-flagship' ), $allowed_inline ); ?>
+			<?php echo wp_kses( __( 'Three Worlds,<br>One Crown', 'skyyrose' ), $allowed_inline ); ?>
 		</h2>
 
 		<div class="abt-values__grid">
-			<?php foreach ( $collections as $ci => $col ) :
+			<?php
+			foreach ( $collections as $ci => $col ) :
 				$delay = 'rv-d' . ( ( $ci % 3 ) + 1 );
-			?>
+				?>
 				<div class="abt-val-card rv <?php echo esc_attr( $delay ); ?>">
 					<div class="abt-val-card__icon" aria-hidden="true">
 						<?php echo wp_kses( $col['icon'], $svg_kses ); ?>
@@ -49,10 +50,10 @@ $svg_kses       = skyyrose_svg_kses();
 <?php
 $story2_img = get_theme_file_path( 'assets/images/about-story-2.jpg' );
 if ( file_exists( $story2_img ) ) :
-?>
+	?>
 	<div class="abt-divider rv" aria-hidden="true">
 		<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/about-story-2.jpg' ) ); ?>"
-			 alt="" loading="lazy" width="1920" height="600">
+			alt="" loading="lazy" width="1920" height="600">
 		<div class="abt-divider__overlay"></div>
 	</div>
 <?php endif; ?>

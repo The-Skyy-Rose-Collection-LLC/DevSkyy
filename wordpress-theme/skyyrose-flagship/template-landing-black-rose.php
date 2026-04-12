@@ -18,24 +18,35 @@ get_header();
 <div class="lp" data-collection="black-rose">
 
 	<?php
-	/* ══════════════════════════════════════════════════════════════
+	/*
+	══════════════════════════════════════════════════════════════
 	 * 1. HERO
 	 * ══════════════════════════════════════════════════════════════ */
-	get_template_part( 'template-parts/landing/hero', null, array(
-		'collection'    => 'black-rose',
-		'badge_text'    => 'Limited Edition — 200 Pieces Per Style',
-		'logo_image'    => '/images/hero-overlays/br-brand-script.png',
-		'logo_alt'      => 'The Black Rose Collection',
-		'subtitle'      => "Darkness isn't the absence of light. It's where you find your own.",
-		'countdown'     => '72h',
-		'cta_primary'   => array( 'text' => 'Shop the Drop', 'url' => '#products' ),
-		'cta_secondary' => array( 'text' => 'The Story', 'url' => '#story' ),
-	) );
+	get_template_part(
+		'template-parts/landing/hero',
+		null,
+		array(
+			'collection'    => 'black-rose',
+			'badge_text'    => 'Limited Edition — 200 Pieces Per Style',
+			'logo_image'    => '/images/hero-overlays/br-brand-script.png',
+			'logo_alt'      => 'The Black Rose Collection',
+			'subtitle'      => "Darkness isn't the absence of light. It's where you find your own.",
+			'countdown'     => '72h',
+			'cta_primary'   => array(
+				'text' => 'Shop the Drop',
+				'url'  => '#products',
+			),
+			'cta_secondary' => array(
+				'text' => 'The Story',
+				'url'  => '#story',
+			),
+		)
+	);
 	?>
 
 	<!-- ══════════════════════════════════════════════════════════════
-	     2. PRESS BAR
-	     ══════════════════════════════════════════════════════════════ -->
+		2. PRESS BAR
+		══════════════════════════════════════════════════════════════ -->
 	<div class="lp-press lp-rv" aria-label="Featured in">
 		<div class="lp__container">
 			<span class="lp-press__label"><?php echo esc_html( 'As Seen In' ); ?></span>
@@ -49,8 +60,8 @@ get_header();
 	</div>
 
 	<!-- ══════════════════════════════════════════════════════════════
-	     3. STORY
-	     ══════════════════════════════════════════════════════════════ -->
+		3. STORY
+		══════════════════════════════════════════════════════════════ -->
 	<section class="lp-story" id="story">
 		<div class="lp__container">
 			<div class="lp-story__grid">
@@ -79,8 +90,8 @@ get_header();
 	</section>
 
 	<!-- ══════════════════════════════════════════════════════════════
-	     4. PARALLAX BANNER
-	     ══════════════════════════════════════════════════════════════ -->
+		4. PARALLAX BANNER
+		══════════════════════════════════════════════════════════════ -->
 	<div class="lp-parallax lp-rv">
 		<div class="lp__container">
 			<p class="lp-parallax__text"><?php echo esc_html( '200 Pieces. Numbered. Never Restocked.' ); ?></p>
@@ -88,20 +99,25 @@ get_header();
 	</div>
 
 	<?php
-	/* ══════════════════════════════════════════════════════════════
+	/*
+	══════════════════════════════════════════════════════════════
 	 * 5. PRODUCT GRID
 	 * ══════════════════════════════════════════════════════════════ */
-	get_template_part( 'template-parts/landing/product-grid', null, array(
-		'heading'    => 'The Collection',
-		'subheading' => "Limited edition. Numbered. When they're gone, they're gone.",
-		'skus'       => array( 'br-004', 'br-005', 'br-006', 'br-010' ),
-		'wear_count' => 200,
-	) );
+	get_template_part(
+		'template-parts/landing/product-grid',
+		null,
+		array(
+			'heading'    => 'The Collection',
+			'subheading' => "Limited edition. Numbered. When they're gone, they're gone.",
+			'skus'       => array( 'br-004', 'br-005', 'br-006', 'br-010' ),
+			'wear_count' => 200,
+		)
+	);
 	?>
 
 	<!-- ══════════════════════════════════════════════════════════════
-	     6. EDITORIAL GALLERY
-	     ══════════════════════════════════════════════════════════════ -->
+		6. EDITORIAL GALLERY
+		══════════════════════════════════════════════════════════════ -->
 	<section class="lp-editorial" id="editorial">
 		<div class="lp__container">
 			<div class="lp-editorial__header lp-rv">
@@ -132,8 +148,8 @@ get_header();
 	</section>
 
 	<!-- ══════════════════════════════════════════════════════════════
-	     7. REVIEWS
-	     ══════════════════════════════════════════════════════════════ -->
+		7. REVIEWS
+		══════════════════════════════════════════════════════════════ -->
 	<section class="lp-reviews" id="reviews">
 		<div class="lp__container">
 			<div class="lp-reviews__header lp-rv">
@@ -159,15 +175,15 @@ get_header();
 
 				$delay = 1;
 				foreach ( $reviews as $review ) :
-				?>
+					?>
 					<div class="lp-reviews__card lp-rv" data-delay="<?php echo esc_attr( $delay ); ?>">
 						<blockquote>
 							<p><?php echo esc_html( $review['text'] ); ?></p>
 						</blockquote>
 						<cite><?php echo esc_html( '— ' . $review['author'] ); ?></cite>
 					</div>
-				<?php
-					$delay++;
+					<?php
+					++$delay;
 				endforeach;
 				?>
 			</div>
@@ -175,8 +191,8 @@ get_header();
 	</section>
 
 	<!-- ══════════════════════════════════════════════════════════════
-	     8. CRAFT / VALUE PROPOSITION
-	     ══════════════════════════════════════════════════════════════ -->
+		8. CRAFT / VALUE PROPOSITION
+		══════════════════════════════════════════════════════════════ -->
 	<section class="lp-craft" id="craft">
 		<div class="lp__container">
 			<div class="lp-craft__header lp-rv">
@@ -211,14 +227,14 @@ get_header();
 
 				$delay = 1;
 				foreach ( $craft_cards as $card ) :
-				?>
+					?>
 					<div class="lp-craft__card lp-rv" data-delay="<?php echo esc_attr( $delay ); ?>">
 						<span class="lp-craft__icon" aria-hidden="true"><?php echo esc_html( $card['icon'] ); ?></span>
 						<h3><?php echo esc_html( $card['title'] ); ?></h3>
 						<p><?php echo esc_html( $card['desc'] ); ?></p>
 					</div>
-				<?php
-					$delay++;
+					<?php
+					++$delay;
 				endforeach;
 				?>
 			</div>
@@ -226,39 +242,44 @@ get_header();
 	</section>
 
 	<?php
-	/* ══════════════════════════════════════════════════════════════
+	/*
+	══════════════════════════════════════════════════════════════
 	 * 9. FAQ
 	 * ══════════════════════════════════════════════════════════════ */
-	get_template_part( 'template-parts/landing/faq', null, array(
-		'heading'   => 'Questions We Get Asked',
-		'questions' => array(
-			array(
-				'q' => 'How does the sizing run?',
-				'a' => 'True to size across the board. We offer sizes S through 3XL. Check the size guide on any product page for exact measurements.',
+	get_template_part(
+		'template-parts/landing/faq',
+		null,
+		array(
+			'heading'   => 'Questions We Get Asked',
+			'questions' => array(
+				array(
+					'q' => 'How does the sizing run?',
+					'a' => 'True to size across the board. We offer sizes S through 3XL. Check the size guide on any product page for exact measurements.',
+				),
+				array(
+					'q' => 'Is this really limited edition?',
+					'a' => 'Yes. Every style is produced in a numbered run of 200 pieces. Once they sell out, they are never restocked or reprinted.',
+				),
+				array(
+					'q' => 'What is your return policy?',
+					'a' => 'We offer a 30-day return and exchange policy on all unworn items. Contact us and we will make it right.',
+				),
+				array(
+					'q' => 'What about the quality?',
+					'a' => 'Premium construction throughout. 280gsm+ cotton, double-stitched seams, and heavyweight French Terry on our hoodies and outerwear.',
+				),
+				array(
+					'q' => 'How long does shipping take?',
+					'a' => 'Orders ship within 5-7 business days. You will receive a tracking number via email as soon as your order is on its way.',
+				),
 			),
-			array(
-				'q' => 'Is this really limited edition?',
-				'a' => 'Yes. Every style is produced in a numbered run of 200 pieces. Once they sell out, they are never restocked or reprinted.',
-			),
-			array(
-				'q' => 'What is your return policy?',
-				'a' => 'We offer a 30-day return and exchange policy on all unworn items. Contact us and we will make it right.',
-			),
-			array(
-				'q' => 'What about the quality?',
-				'a' => 'Premium construction throughout. 280gsm+ cotton, double-stitched seams, and heavyweight French Terry on our hoodies and outerwear.',
-			),
-			array(
-				'q' => 'How long does shipping take?',
-				'a' => 'Orders ship within 5-7 business days. You will receive a tracking number via email as soon as your order is on its way.',
-			),
-		),
-	) );
+		)
+	);
 	?>
 
 	<!-- ══════════════════════════════════════════════════════════════
-	     10. EMAIL CTA
-	     ══════════════════════════════════════════════════════════════ -->
+		10. EMAIL CTA
+		══════════════════════════════════════════════════════════════ -->
 	<section class="lp-cta" id="signup">
 		<div class="lp__container">
 			<div class="lp-cta__content lp-rv">
@@ -270,12 +291,12 @@ get_header();
 						<?php echo esc_html( 'Email address' ); ?>
 					</label>
 					<input id="lp-cta-email"
-					       class="lp-cta__input"
-					       type="email"
-					       name="email"
-					       placeholder="<?php echo esc_attr( 'Enter your email' ); ?>"
-					       required
-					       autocomplete="email">
+							class="lp-cta__input"
+							type="email"
+							name="email"
+							placeholder="<?php echo esc_attr( 'Enter your email' ); ?>"
+							required
+							autocomplete="email">
 					<button class="lp-btn lp-btn--primary lp-cta__submit" type="submit">
 						<?php echo esc_html( 'Join' ); ?>
 					</button>

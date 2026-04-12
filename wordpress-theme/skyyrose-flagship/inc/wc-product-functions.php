@@ -176,46 +176,60 @@ function skyyrose_get_product_meta( $product_id = null ) {
  */
 function skyyrose_add_product_meta_fields() {
 	echo '<div class="options_group">';
-	echo '<h4 style="padding-left:12px;color:#B76E79;">' . esc_html__( 'SkyyRose Product Details', 'skyyrose-flagship' ) . '</h4>';
+	echo '<h4 style="padding-left:12px;color:#B76E79;">' . esc_html__( 'SkyyRose Product Details', 'skyyrose' ) . '</h4>';
 
-	woocommerce_wp_text_input( array(
-		'id'          => '_skyyrose_material',
-		'label'       => esc_html__( 'Material', 'skyyrose-flagship' ),
-		'placeholder' => 'e.g. 380gsm Cotton Fleece',
-		'desc_tip'    => true,
-		'description' => esc_html__( 'Primary material composition', 'skyyrose-flagship' ),
-	) );
-	woocommerce_wp_text_input( array(
-		'id'          => '_skyyrose_fit',
-		'label'       => esc_html__( 'Fit', 'skyyrose-flagship' ),
-		'placeholder' => 'e.g. Oversized, Tailored, Relaxed',
-	) );
-	woocommerce_wp_text_input( array(
-		'id'          => '_skyyrose_detail',
-		'label'       => esc_html__( 'Signature Detail', 'skyyrose-flagship' ),
-		'placeholder' => 'e.g. Silver thorn zipper pulls',
-	) );
-	woocommerce_wp_textarea_input( array(
-		'id'          => '_skyyrose_care',
-		'label'       => esc_html__( 'Care Instructions', 'skyyrose-flagship' ),
-		'placeholder' => 'Cold wash, hang dry...',
-	) );
-	woocommerce_wp_text_input( array(
-		'id'          => '_skyyrose_made_in',
-		'label'       => esc_html__( 'Made In', 'skyyrose-flagship' ),
-		'placeholder' => 'USA',
-	) );
-	woocommerce_wp_text_input( array(
-		'id'          => '_skyyrose_limited',
-		'label'       => esc_html__( 'Limited Edition?', 'skyyrose-flagship' ),
-		'placeholder' => 'yes or leave blank',
-	) );
-	woocommerce_wp_text_input( array(
-		'id'          => '_skyyrose_edition_of',
-		'label'       => esc_html__( 'Edition Size', 'skyyrose-flagship' ),
-		'placeholder' => 'e.g. 100',
-		'type'        => 'number',
-	) );
+	woocommerce_wp_text_input(
+		array(
+			'id'          => '_skyyrose_material',
+			'label'       => esc_html__( 'Material', 'skyyrose' ),
+			'placeholder' => 'e.g. 380gsm Cotton Fleece',
+			'desc_tip'    => true,
+			'description' => esc_html__( 'Primary material composition', 'skyyrose' ),
+		)
+	);
+	woocommerce_wp_text_input(
+		array(
+			'id'          => '_skyyrose_fit',
+			'label'       => esc_html__( 'Fit', 'skyyrose' ),
+			'placeholder' => 'e.g. Oversized, Tailored, Relaxed',
+		)
+	);
+	woocommerce_wp_text_input(
+		array(
+			'id'          => '_skyyrose_detail',
+			'label'       => esc_html__( 'Signature Detail', 'skyyrose' ),
+			'placeholder' => 'e.g. Silver thorn zipper pulls',
+		)
+	);
+	woocommerce_wp_textarea_input(
+		array(
+			'id'          => '_skyyrose_care',
+			'label'       => esc_html__( 'Care Instructions', 'skyyrose' ),
+			'placeholder' => 'Cold wash, hang dry...',
+		)
+	);
+	woocommerce_wp_text_input(
+		array(
+			'id'          => '_skyyrose_made_in',
+			'label'       => esc_html__( 'Made In', 'skyyrose' ),
+			'placeholder' => 'USA',
+		)
+	);
+	woocommerce_wp_text_input(
+		array(
+			'id'          => '_skyyrose_limited',
+			'label'       => esc_html__( 'Limited Edition?', 'skyyrose' ),
+			'placeholder' => 'yes or leave blank',
+		)
+	);
+	woocommerce_wp_text_input(
+		array(
+			'id'          => '_skyyrose_edition_of',
+			'label'       => esc_html__( 'Edition Size', 'skyyrose' ),
+			'placeholder' => 'e.g. 100',
+			'type'        => 'number',
+		)
+	);
 
 	wp_nonce_field( 'skyyrose_product_meta', 'skyyrose_product_meta_nonce' );
 	echo '</div>';
@@ -235,7 +249,7 @@ add_action( 'woocommerce_product_options_general_product_data', 'skyyrose_add_pr
  */
 function skyyrose_save_product_meta_fields( $post_id ) {
 	if ( ! isset( $_POST['skyyrose_product_meta_nonce'] ) ||
-	     ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['skyyrose_product_meta_nonce'] ) ), 'skyyrose_product_meta' ) ) {
+		! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['skyyrose_product_meta_nonce'] ) ), 'skyyrose_product_meta' ) ) {
 		return;
 	}
 
@@ -253,7 +267,7 @@ function skyyrose_save_product_meta_fields( $post_id ) {
 		if ( isset( $_POST[ $field ] ) ) {
 			// Care instructions is a textarea — preserve line breaks.
 			$sanitizer = ( '_skyyrose_care' === $field ) ? 'sanitize_textarea_field' : 'sanitize_text_field';
-			update_post_meta( $post_id, $field, $sanitizer( wp_unslash( $_POST[ $field ] ) ) );
+			update_post_meta( $post_id, $field, $sanitizer( wp_unslash( $_POST[ $field ] ) ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized via $sanitizer() call.
 		}
 	}
 }
@@ -330,13 +344,17 @@ function skyyrose_localize_product_data() {
 	$collection = skyyrose_get_product_collection();
 	$config     = skyyrose_collection_config( $collection );
 
-	wp_localize_script( $handle, 'skyyrose', array(
-		'ajax_url'   => admin_url( 'admin-ajax.php' ),
-		'nonce'      => wp_create_nonce( 'skyyrose-nonce' ),
-		'collection' => $collection,
-		'config'     => $config,
-		'cart_url'   => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
-	) );
+	wp_localize_script(
+		$handle,
+		'skyyrose',
+		array(
+			'ajax_url'   => admin_url( 'admin-ajax.php' ),
+			'nonce'      => wp_create_nonce( 'skyyrose-nonce' ),
+			'collection' => $collection,
+			'config'     => $config,
+			'cart_url'   => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
+		)
+	);
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_localize_product_data', 25 );
 

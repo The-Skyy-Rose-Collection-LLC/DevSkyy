@@ -38,14 +38,14 @@ do_action( 'woocommerce_before_cart' );
 					<circle cx="53" cy="58" r="3" stroke="currentColor" stroke-width="2"/>
 				</svg>
 				<h1 class="skyy-cart__empty-title">
-					<?php esc_html_e( 'Your Cart is Empty', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Your Cart is Empty', 'skyyrose' ); ?>
 				</h1>
 				<p class="skyy-cart__empty-text">
-					<?php esc_html_e( 'Explore our collections and find pieces that speak to you.', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Explore our collections and find pieces that speak to you.', 'skyyrose' ); ?>
 				</p>
 				<a href="<?php echo esc_url( apply_filters( 'woocommerce_return_to_shop_redirect', wc_get_page_permalink( 'shop' ) ) ); ?>"
-				   class="skyy-cart__empty-cta">
-					<?php esc_html_e( 'Explore Collections', 'skyyrose-flagship' ); ?>
+					class="skyy-cart__empty-cta">
+					<?php esc_html_e( 'Explore Collections', 'skyyrose' ); ?>
 				</a>
 			</div>
 		</div>
@@ -54,14 +54,14 @@ do_action( 'woocommerce_before_cart' );
 
 		<div class="skyy-cart__header">
 			<h1 class="skyy-cart__title">
-				<?php esc_html_e( 'Shopping Cart', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Shopping Cart', 'skyyrose' ); ?>
 			</h1>
 			<span class="skyy-cart__count">
 				<?php
 				printf(
 					/* translators: %d: number of items */
-					esc_html( _n( '%d item', '%d items', WC()->cart->get_cart_contents_count(), 'skyyrose-flagship' ) ),
-					WC()->cart->get_cart_contents_count()
+					esc_html( _n( '%d item', '%d items', WC()->cart->get_cart_contents_count(), 'skyyrose' ) ),
+					(int) WC()->cart->get_cart_contents_count()
 				);
 				?>
 			</span>
@@ -113,14 +113,14 @@ do_action( 'woocommerce_before_cart' );
 							$variation_data = array();
 							if ( ! empty( $cart_item['variation'] ) ) {
 								foreach ( $cart_item['variation'] as $attr_name => $attr_value ) {
-									$attr_label = wc_attribute_label( str_replace( 'attribute_', '', $attr_name ) );
+									$attr_label                    = wc_attribute_label( str_replace( 'attribute_', '', $attr_name ) );
 									$variation_data[ $attr_label ] = $attr_value;
 								}
 							}
 							?>
 
 							<div class="skyy-cart__item <?php echo esc_attr( apply_filters( 'woocommerce_cart_item_class', 'cart_item', $cart_item, $cart_item_key ) ); ?>"
-								 data-cart-item-key="<?php echo esc_attr( $cart_item_key ); ?>">
+								data-cart-item-key="<?php echo esc_attr( $cart_item_key ); ?>">
 
 								<!-- Product Image (150px) -->
 								<div class="skyy-cart__item-image">
@@ -160,11 +160,11 @@ do_action( 'woocommerce_before_cart' );
 										do_action( 'woocommerce_after_cart_item_name', $cart_item, $cart_item_key );
 
 										// Meta data.
-										echo wc_get_formatted_cart_item_data( $cart_item ); // PHPCS: XSS ok.
+										echo wc_get_formatted_cart_item_data( $cart_item ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WooCommerce core handles escaping.
 
 										// Backorder notification.
 										if ( $_product->backorders_require_notification() && $_product->is_on_backorder( $cart_item['quantity'] ) ) {
-											echo wp_kses_post( apply_filters( 'woocommerce_cart_item_backorder_notification', '<p class="backorder_notification">' . esc_html__( 'Available on backorder', 'skyyrose-flagship' ) . '</p>', $product_id ) );
+											echo wp_kses_post( apply_filters( 'woocommerce_cart_item_backorder_notification', '<p class="backorder_notification">' . esc_html__( 'Available on backorder', 'skyyrose' ) . '</p>', $product_id ) );
 										}
 										?>
 
@@ -215,15 +215,15 @@ do_action( 'woocommerce_before_cart' );
 												</button>
 											</div>',
 											esc_attr( $cart_item_key ),
-											esc_attr__( 'Decrease quantity', 'skyyrose-flagship' ),
+											esc_attr__( 'Decrease quantity', 'skyyrose' ),
 											esc_attr( $cart_item['quantity'] ),
 											esc_attr( $min_quantity ),
 											esc_attr( $max_quantity > 0 ? $max_quantity : 99 ),
-											esc_attr__( 'Item quantity', 'skyyrose-flagship' ),
-											esc_attr__( 'Increase quantity', 'skyyrose-flagship' )
+											esc_attr__( 'Item quantity', 'skyyrose' ),
+											esc_attr__( 'Increase quantity', 'skyyrose' )
 										);
 
-										echo apply_filters( 'woocommerce_cart_item_quantity', $product_quantity, $cart_item_key, $cart_item ); // PHPCS: XSS ok.
+										echo apply_filters( 'woocommerce_cart_item_quantity', $product_quantity, $cart_item_key, $cart_item ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WooCommerce core filter, pre-escaped.
 										?>
 									</div>
 
@@ -235,18 +235,20 @@ do_action( 'woocommerce_before_cart' );
 									<!-- Remove Button -->
 									<div class="skyy-cart__item-remove">
 										<?php
-										echo wp_kses_post( apply_filters(
-											'woocommerce_cart_item_remove_link',
-											sprintf(
-												'<a role="button" href="%s" class="skyy-cart__remove-btn" aria-label="%s" data-product_id="%s" data-product_sku="%s">&times;</a>',
-												esc_url( wc_get_cart_remove_url( $cart_item_key ) ),
-												/* translators: %s: product name */
-												esc_attr( sprintf( __( 'Remove %s from cart', 'skyyrose-flagship' ), wp_strip_all_tags( $product_name ) ) ),
-												esc_attr( $product_id ),
-												esc_attr( $_product->get_sku() )
-											),
-											$cart_item_key
-										) );
+										echo wp_kses_post(
+											apply_filters(
+												'woocommerce_cart_item_remove_link',
+												sprintf(
+													'<a role="button" href="%s" class="skyy-cart__remove-btn" aria-label="%s" data-product_id="%s" data-product_sku="%s">&times;</a>',
+													esc_url( wc_get_cart_remove_url( $cart_item_key ) ),
+													/* translators: %s: product name */
+													esc_attr( sprintf( __( 'Remove %s from cart', 'skyyrose' ), wp_strip_all_tags( $product_name ) ) ),
+													esc_attr( $product_id ),
+													esc_attr( $_product->get_sku() )
+												),
+												$cart_item_key
+											)
+										);
 										?>
 									</div>
 								</div>
@@ -268,19 +270,19 @@ do_action( 'woocommerce_before_cart' );
 						<?php if ( wc_coupons_enabled() ) : ?>
 							<div class="skyy-cart__coupon">
 								<label for="skyy-coupon-code" class="screen-reader-text">
-									<?php esc_html_e( 'Coupon code', 'skyyrose-flagship' ); ?>
+									<?php esc_html_e( 'Coupon code', 'skyyrose' ); ?>
 								</label>
 								<input type="text"
-									   name="coupon_code"
-									   class="skyy-cart__coupon-input"
-									   id="skyy-coupon-code"
-									   value=""
-									   placeholder="<?php esc_attr_e( 'Coupon code', 'skyyrose-flagship' ); ?>" />
+										name="coupon_code"
+										class="skyy-cart__coupon-input"
+										id="skyy-coupon-code"
+										value=""
+										placeholder="<?php esc_attr_e( 'Coupon code', 'skyyrose' ); ?>" />
 								<button type="submit"
 										class="skyy-cart__coupon-btn<?php echo esc_attr( wc_wp_theme_get_element_class_name( 'button' ) ? ' ' . wc_wp_theme_get_element_class_name( 'button' ) : '' ); ?>"
 										name="apply_coupon"
-										value="<?php esc_attr_e( 'Apply', 'skyyrose-flagship' ); ?>">
-									<?php esc_html_e( 'Apply', 'skyyrose-flagship' ); ?>
+										value="<?php esc_attr_e( 'Apply', 'skyyrose' ); ?>">
+									<?php esc_html_e( 'Apply', 'skyyrose' ); ?>
 								</button>
 								<?php do_action( 'woocommerce_cart_coupon' ); ?>
 							</div>
@@ -289,8 +291,8 @@ do_action( 'woocommerce_before_cart' );
 						<button type="submit"
 								class="skyy-cart__update-btn<?php echo esc_attr( wc_wp_theme_get_element_class_name( 'button' ) ? ' ' . wc_wp_theme_get_element_class_name( 'button' ) : '' ); ?>"
 								name="update_cart"
-								value="<?php esc_attr_e( 'Update cart', 'skyyrose-flagship' ); ?>">
-							<?php esc_html_e( 'Update Cart', 'skyyrose-flagship' ); ?>
+								value="<?php esc_attr_e( 'Update cart', 'skyyrose' ); ?>">
+							<?php esc_html_e( 'Update Cart', 'skyyrose' ); ?>
 						</button>
 
 						<?php do_action( 'woocommerce_cart_actions' ); ?>
@@ -309,11 +311,11 @@ do_action( 'woocommerce_before_cart' );
 
 				<div class="skyy-cart__continue">
 					<a href="<?php echo esc_url( apply_filters( 'woocommerce_return_to_shop_redirect', wc_get_page_permalink( 'shop' ) ) ); ?>"
-					   class="skyy-cart__continue-btn">
+						class="skyy-cart__continue-btn">
 						<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
 							<path d="M10 12l-4-4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 						</svg>
-						<?php esc_html_e( 'Continue Shopping', 'skyyrose-flagship' ); ?>
+						<?php esc_html_e( 'Continue Shopping', 'skyyrose' ); ?>
 					</a>
 				</div>
 			</div>
@@ -324,7 +326,7 @@ do_action( 'woocommerce_before_cart' );
 			<aside class="skyy-cart__summary" data-skyy-cart-summary>
 				<div class="skyy-cart__summary-inner">
 					<h2 class="skyy-cart__summary-title">
-						<?php esc_html_e( 'Order Summary', 'skyyrose-flagship' ); ?>
+						<?php esc_html_e( 'Order Summary', 'skyyrose' ); ?>
 					</h2>
 
 					<?php
@@ -339,7 +341,7 @@ do_action( 'woocommerce_before_cart' );
 						<!-- Subtotal -->
 						<div class="skyy-cart__summary-row">
 							<span class="skyy-cart__summary-label">
-								<?php esc_html_e( 'Subtotal', 'skyyrose-flagship' ); ?>
+								<?php esc_html_e( 'Subtotal', 'skyyrose' ); ?>
 							</span>
 							<span class="skyy-cart__summary-value">
 								<?php wc_cart_totals_subtotal_html(); ?>
@@ -352,7 +354,7 @@ do_action( 'woocommerce_before_cart' );
 								<span class="skyy-cart__summary-label">
 									<?php
 									/* translators: %s: coupon code */
-									printf( esc_html__( 'Coupon: %s', 'skyyrose-flagship' ), esc_html( $code ) );
+									printf( esc_html__( 'Coupon: %s', 'skyyrose' ), esc_html( $code ) );
 									?>
 								</span>
 								<span class="skyy-cart__summary-value">
@@ -365,7 +367,7 @@ do_action( 'woocommerce_before_cart' );
 						<?php if ( WC()->cart->needs_shipping() && WC()->cart->show_shipping() ) : ?>
 							<div class="skyy-cart__summary-row">
 								<span class="skyy-cart__summary-label">
-									<?php esc_html_e( 'Shipping', 'skyyrose-flagship' ); ?>
+									<?php esc_html_e( 'Shipping', 'skyyrose' ); ?>
 								</span>
 								<span class="skyy-cart__summary-value">
 									<?php wc_cart_totals_shipping_html(); ?>
@@ -374,10 +376,10 @@ do_action( 'woocommerce_before_cart' );
 						<?php elseif ( WC()->cart->needs_shipping() ) : ?>
 							<div class="skyy-cart__summary-row">
 								<span class="skyy-cart__summary-label">
-									<?php esc_html_e( 'Shipping', 'skyyrose-flagship' ); ?>
+									<?php esc_html_e( 'Shipping', 'skyyrose' ); ?>
 								</span>
 								<span class="skyy-cart__summary-value skyy-cart__summary-value--estimate">
-									<?php esc_html_e( 'Calculated at checkout', 'skyyrose-flagship' ); ?>
+									<?php esc_html_e( 'Calculated at checkout', 'skyyrose' ); ?>
 								</span>
 							</div>
 						<?php endif; ?>
@@ -413,7 +415,7 @@ do_action( 'woocommerce_before_cart' );
 					<!-- Total -->
 					<div class="skyy-cart__summary-total">
 						<span class="skyy-cart__summary-total-label">
-							<?php esc_html_e( 'Total', 'skyyrose-flagship' ); ?>
+							<?php esc_html_e( 'Total', 'skyyrose' ); ?>
 						</span>
 						<span class="skyy-cart__summary-total-value">
 							<?php wc_cart_totals_order_total_html(); ?>
@@ -430,8 +432,8 @@ do_action( 'woocommerce_before_cart' );
 					<!-- Proceed to Checkout -->
 					<div class="skyy-cart__summary-checkout">
 						<a href="<?php echo esc_url( wc_get_checkout_url() ); ?>"
-						   class="skyy-cart__checkout-btn wc-proceed-to-checkout">
-							<?php esc_html_e( 'Proceed to Checkout', 'skyyrose-flagship' ); ?>
+							class="skyy-cart__checkout-btn wc-proceed-to-checkout">
+							<?php esc_html_e( 'Proceed to Checkout', 'skyyrose' ); ?>
 						</a>
 					</div>
 
@@ -441,19 +443,19 @@ do_action( 'woocommerce_before_cart' );
 							<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
 								<path d="M8 1l2 3h3l-2.5 2.5L11.5 10 8 8l-3.5 2 1-3.5L3 4h3l2-3z" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
 							</svg>
-							<span><?php esc_html_e( 'Secure Checkout', 'skyyrose-flagship' ); ?></span>
+							<span><?php esc_html_e( 'Secure Checkout', 'skyyrose' ); ?></span>
 						</div>
 						<div class="skyy-cart__trust-badge">
 							<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
 								<path d="M2 8l4 4 8-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 							</svg>
-							<span><?php esc_html_e( 'Free Shipping 150+', 'skyyrose-flagship' ); ?></span>
+							<span><?php esc_html_e( 'Free Shipping 150+', 'skyyrose' ); ?></span>
 						</div>
 						<div class="skyy-cart__trust-badge">
 							<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
 								<path d="M1 4l7-3 7 3v5c0 3.5-3 5.5-7 7-4-1.5-7-3.5-7-7V4z" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
 							</svg>
-							<span><?php esc_html_e( '30-Day Returns', 'skyyrose-flagship' ); ?></span>
+							<span><?php esc_html_e( '30-Day Returns', 'skyyrose' ); ?></span>
 						</div>
 					</div>
 

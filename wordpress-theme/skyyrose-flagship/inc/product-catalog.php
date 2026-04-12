@@ -43,11 +43,12 @@ function skyyrose_get_product_catalog() {
 
 	$catalog = array(
 
-		/*--------------------------------------------------------------
+		/*
+		--------------------------------------------------------------
 		 * BLACK ROSE COLLECTION (11 products)
 		 *--------------------------------------------------------------*/
 
-		'br-001' => array(
+		'br-001'   => array(
 			'sku'               => 'br-001',
 			'name'              => 'BLACK Rose Crewneck',
 			'price'             => 35.00,
@@ -64,7 +65,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => false,
 		),
-		'br-002' => array(
+		'br-002'   => array(
 			'sku'               => 'br-002',
 			'name'              => 'BLACK Rose Joggers',
 			'price'             => 50.00,
@@ -81,7 +82,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'br-003' => array(
+		'br-003'   => array(
 			'sku'               => 'br-003',
 			'name'              => 'BLACK is Beautiful Jersey',
 			'price'             => 45.00,
@@ -98,7 +99,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => false,
 		),
-		'br-004' => array(
+		'br-004'   => array(
 			'sku'               => 'br-004',
 			'name'              => 'BLACK Rose Hoodie',
 			'price'             => 40.00,
@@ -115,7 +116,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'br-005' => array(
+		'br-005'   => array(
 			'sku'               => 'br-005',
 			'name'              => 'BLACK Rose Hoodie — Signature Edition',
 			'price'             => 65.00,
@@ -132,7 +133,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'br-006' => array(
+		'br-006'   => array(
 			'sku'               => 'br-006',
 			'name'              => 'BLACK Rose Sherpa Jacket',
 			'price'             => 95.00,
@@ -149,7 +150,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'br-007' => array(
+		'br-007'   => array(
 			'sku'               => 'br-007',
 			'name'              => 'BLACK Rose x Love Hurts Basketball Shorts',
 			'price'             => 65.00,
@@ -168,7 +169,7 @@ function skyyrose_get_product_catalog() {
 		),
 
 		// BLACK is Beautiful Jersey Series — Exclusive editions ($115 each, 80 pieces).
-		'br-008' => array(
+		'br-008'   => array(
 			'sku'               => 'br-008',
 			'name'              => 'SF Inspired (Football)',
 			'price'             => 115.00,
@@ -185,7 +186,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'br-009' => array(
+		'br-009'   => array(
 			'sku'               => 'br-009',
 			'name'              => 'Last Oakland (Football)',
 			'price'             => 115.00,
@@ -202,7 +203,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'br-010' => array(
+		'br-010'   => array(
 			'sku'               => 'br-010',
 			'name'              => 'The Bay Jersey (Basketball)',
 			'price'             => 100.00,
@@ -219,7 +220,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'br-011' => array(
+		'br-011'   => array(
 			'sku'               => 'br-011',
 			'name'              => 'The Rose (Hockey)',
 			'price'             => 115.00,
@@ -236,7 +237,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'br-012' => array(
+		'br-012'   => array(
 			'sku'               => 'br-012',
 			'name'              => 'Last Oakland (Baseball)',
 			'price'             => 100.00,
@@ -254,11 +255,12 @@ function skyyrose_get_product_catalog() {
 			'is_preorder'       => true,
 		),
 
-		/*--------------------------------------------------------------
+		/*
+		--------------------------------------------------------------
 		 * LOVE HURTS COLLECTION (5 products)
 		 *--------------------------------------------------------------*/
 
-		'lh-002' => array(
+		'lh-002'   => array(
 			'sku'               => 'lh-002',
 			'name'              => 'Love Hurts Joggers',
 			'price'             => 95.00,
@@ -275,7 +277,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'lh-003' => array(
+		'lh-003'   => array(
 			'sku'               => 'lh-003',
 			'name'              => 'Love Hurts Basketball Shorts',
 			'price'             => 75.00,
@@ -292,7 +294,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'lh-004' => array(
+		'lh-004'   => array(
 			'sku'               => 'lh-004',
 			'name'              => 'Love Hurts Varsity Jacket',
 			'price'             => 265.00,
@@ -309,7 +311,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => false,
 		),
-		'lh-006' => array(
+		'lh-006'   => array(
 			'sku'               => 'lh-006',
 			'name'              => 'The Fannie',
 			'price'             => 55.00,
@@ -327,11 +329,12 @@ function skyyrose_get_product_catalog() {
 			'is_preorder'       => true,
 		),
 
-		/*--------------------------------------------------------------
+		/*
+		--------------------------------------------------------------
 		 * SIGNATURE COLLECTION (13 products)
 		 *--------------------------------------------------------------*/
 
-		'sg-001' => array(
+		'sg-001'   => array(
 			'sku'               => 'sg-001',
 			'name'              => "The Bridge Series 'The Bay Bridge' Shorts",
 			'price'             => 195.00,
@@ -348,7 +351,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'sg-002' => array(
+		'sg-002'   => array(
 			'sku'               => 'sg-002',
 			'name'              => "The Bridge Series 'Stay Golden' Shirt",
 			'price'             => 65.00,
@@ -365,7 +368,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'sg-003' => array(
+		'sg-003'   => array(
 			'sku'               => 'sg-003',
 			'name'              => "The Bridge Series 'Stay Golden' Shorts",
 			'price'             => 65.00,
@@ -382,7 +385,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'sg-004' => array(
+		'sg-004'   => array(
 			'sku'               => 'sg-004',
 			'name'              => 'The Signature Hoodie',
 			'price'             => 55.00,
@@ -399,7 +402,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'sg-005' => array(
+		'sg-005'   => array(
 			'sku'               => 'sg-005',
 			'name'              => "The Bridge Series 'The Bay Bridge' Shirt",
 			'price'             => 25.00,
@@ -416,7 +419,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'sg-006' => array(
+		'sg-006'   => array(
 			'sku'               => 'sg-006',
 			'name'              => 'Mint & Lavender Hoodie',
 			'price'             => 45.00,
@@ -433,7 +436,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'sg-007' => array(
+		'sg-007'   => array(
 			'sku'               => 'sg-007',
 			'name'              => 'The Signature Beanie',
 			'price'             => 25.00,
@@ -450,7 +453,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'sg-009' => array(
+		'sg-009'   => array(
 			'sku'               => 'sg-009',
 			'name'              => 'The Sherpa Jacket',
 			'price'             => 80.00,
@@ -467,7 +470,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'sg-011' => array(
+		'sg-011'   => array(
 			'sku'               => 'sg-011',
 			'name'              => 'Original Label Tee (White)',
 			'price'             => 30.00,
@@ -484,7 +487,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'sg-012' => array(
+		'sg-012'   => array(
 			'sku'               => 'sg-012',
 			'name'              => 'Original Label Tee (Orchid)',
 			'price'             => 30.00,
@@ -501,7 +504,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'sg-013' => array(
+		'sg-013'   => array(
 			'sku'               => 'sg-013',
 			'name'              => 'Mint & Lavender Crewneck',
 			'price'             => 40.00,
@@ -518,7 +521,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'sg-014' => array(
+		'sg-014'   => array(
 			'sku'               => 'sg-014',
 			'name'              => 'Mint & Lavender Sweatpants',
 			'price'             => 45.00,
@@ -535,7 +538,7 @@ function skyyrose_get_product_catalog() {
 			'published'         => true,
 			'is_preorder'       => true,
 		),
-		'sg-015' => array(
+		'sg-015'   => array(
 			'sku'               => 'sg-015',
 			'name'              => 'The Windbreaker Set',
 			'price'             => 85.00,
@@ -553,7 +556,8 @@ function skyyrose_get_product_catalog() {
 			'is_preorder'       => true,
 		),
 
-		/*--------------------------------------------------------------
+		/*
+		--------------------------------------------------------------
 		 * KIDS CAPSULE (2 products)
 		 *--------------------------------------------------------------*/
 
@@ -663,14 +667,14 @@ function skyyrose_normalize_sku( $sku ) {
  */
 function skyyrose_format_price( $product ) {
 	if ( ! $product['published'] && ! $product['is_preorder'] ) {
-		return esc_html__( 'Coming Soon', 'skyyrose-flagship' );
+		return esc_html__( 'Coming Soon', 'skyyrose' );
 	}
 
 	$price = (float) $product['price'];
 
 	// Pre-order products with zero price show "Pre-Order" instead of "$0".
 	if ( ! empty( $product['is_preorder'] ) && $price <= 0 ) {
-		return esc_html__( 'Pre-Order', 'skyyrose-flagship' );
+		return esc_html__( 'Pre-Order', 'skyyrose' );
 	}
 
 	// Use zero decimal places — all prices are whole-dollar and $95 reads
@@ -722,4 +726,3 @@ function skyyrose_product_url( $sku ) {
 
 	return home_url( '/pre-order/#' . sanitize_title( $sku ) );
 }
-

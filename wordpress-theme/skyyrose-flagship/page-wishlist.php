@@ -13,10 +13,10 @@ if ( ! class_exists( 'WooCommerce' ) ) {
 	<main id="primary" class="site-main wishlist-page" role="main" tabindex="-1">
 		<div class="container">
 			<div class="wishlist-empty">
-				<h2 class="wishlist-empty-title"><?php esc_html_e( 'Wishlist Unavailable', 'skyyrose-flagship' ); ?></h2>
-				<p class="wishlist-empty-text"><?php esc_html_e( 'The wishlist feature requires WooCommerce to be active.', 'skyyrose-flagship' ); ?></p>
+				<h2 class="wishlist-empty-title"><?php esc_html_e( 'Wishlist Unavailable', 'skyyrose' ); ?></h2>
+				<p class="wishlist-empty-text"><?php esc_html_e( 'The wishlist feature requires WooCommerce to be active.', 'skyyrose' ); ?></p>
 				<div class="wishlist-empty-actions">
-					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="button alt"><?php esc_html_e( 'Return Home', 'skyyrose-flagship' ); ?></a>
+					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="button alt"><?php esc_html_e( 'Return Home', 'skyyrose' ); ?></a>
 				</div>
 			</div>
 		</div>
@@ -32,7 +32,7 @@ if ( ! class_exists( 'WooCommerce' ) ) {
 	<div class="container">
 
 		<header class="page-header">
-			<h1 class="page-title"><?php esc_html_e( 'My Wishlist', 'skyyrose-flagship' ); ?></h1>
+			<h1 class="page-title"><?php esc_html_e( 'My Wishlist', 'skyyrose' ); ?></h1>
 		</header>
 
 		<?php
@@ -44,16 +44,16 @@ if ( ! class_exists( 'WooCommerce' ) ) {
 			<div class="wishlist-actions">
 				<?php // Nonce for AJAX is in skyyRoseWishlist.nonce (localized). Form field not needed. ?>
 				<button type="button" class="button alt wishlist-move-all" data-action="move-all">
-					<?php esc_html_e( 'Move All to Cart', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Move All to Cart', 'skyyrose' ); ?>
 				</button>
 				<button type="button" class="button wishlist-clear-all" data-action="clear-all">
-					<?php esc_html_e( 'Clear Wishlist', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Clear Wishlist', 'skyyrose' ); ?>
 				</button>
 				<button type="button" class="button wishlist-share" data-action="share">
 					<svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
 						<path d="M13 10.5C12.4 10.5 11.85 10.7 11.4 11.05L5.55 7.55C5.6 7.37 5.625 7.187 5.625 7C5.625 6.813 5.6 6.63 5.55 6.45L11.35 2.975C11.825 3.35 12.388 3.563 13 3.563C14.381 3.563 15.5 2.444 15.5 1.063C15.5 -0.319 14.381 -1.438 13 -1.438C11.619 -1.438 10.5 -0.319 10.5 1.063C10.5 1.25 10.525 1.432 10.575 1.613L4.775 5.088C4.3 4.712 3.738 4.5 3.125 4.5C1.744 4.5 0.625 5.619 0.625 7C0.625 8.381 1.744 9.5 3.125 9.5C3.738 9.5 4.3 9.287 4.775 8.912L10.6 12.425C10.55 12.593 10.525 12.768 10.525 12.95C10.525 14.281 11.606 15.362 12.938 15.362C14.269 15.362 15.35 14.281 15.35 12.95C15.35 11.619 14.269 10.538 12.938 10.538L13 10.5Z" fill="currentColor"/>
 					</svg>
-					<?php esc_html_e( 'Share Wishlist', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Share Wishlist', 'skyyrose' ); ?>
 				</button>
 			</div>
 
@@ -70,10 +70,10 @@ if ( ! class_exists( 'WooCommerce' ) ) {
 
 							<div class="product-image">
 								<a href="<?php echo esc_url( $product->get_permalink() ); ?>"
-								aria-label="<?php echo esc_attr( sprintf( __( 'View %s', 'skyyrose-flagship' ), $product->get_name() ) ); ?>">
+								aria-label="<?php echo esc_attr( sprintf( __( 'View %s', 'skyyrose' ), $product->get_name() ) ); ?>">
 									<?php echo wp_kses_post( $product->get_image( 'woocommerce_thumbnail' ) ); ?>
 								</a>
-								<button type="button" class="wishlist-remove" data-product-id="<?php echo esc_attr( $product_id ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Remove %s from wishlist', 'skyyrose-flagship' ), $product->get_name() ) ); ?>">
+								<button type="button" class="wishlist-remove" data-product-id="<?php echo esc_attr( $product_id ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Remove %s from wishlist', 'skyyrose' ), $product->get_name() ) ); ?>">
 									<svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 										<path d="M12.5 3.5L3.5 12.5M3.5 3.5L12.5 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
 									</svg>
@@ -99,20 +99,20 @@ if ( ! class_exists( 'WooCommerce' ) ) {
 
 								<div class="product-meta">
 									<?php if ( $product->is_in_stock() ) : ?>
-										<span class="stock in-stock"><?php esc_html_e( 'In Stock', 'skyyrose-flagship' ); ?></span>
+										<span class="stock in-stock"><?php esc_html_e( 'In Stock', 'skyyrose' ); ?></span>
 									<?php else : ?>
-										<span class="stock out-of-stock"><?php esc_html_e( 'Out of Stock', 'skyyrose-flagship' ); ?></span>
+										<span class="stock out-of-stock"><?php esc_html_e( 'Out of Stock', 'skyyrose' ); ?></span>
 									<?php endif; ?>
 								</div>
 
 								<div class="product-actions">
 									<?php if ( $product->is_purchasable() && $product->is_in_stock() ) : ?>
 										<button type="button" class="button alt wishlist-move-to-cart" data-product-id="<?php echo esc_attr( $product_id ); ?>">
-											<?php esc_html_e( 'Move to Cart', 'skyyrose-flagship' ); ?>
+											<?php esc_html_e( 'Move to Cart', 'skyyrose' ); ?>
 										</button>
 									<?php else : ?>
 										<a href="<?php echo esc_url( $product->get_permalink() ); ?>" class="button">
-											<?php esc_html_e( 'View Product', 'skyyrose-flagship' ); ?>
+											<?php esc_html_e( 'View Product', 'skyyrose' ); ?>
 										</a>
 									<?php endif; ?>
 								</div>
@@ -133,13 +133,13 @@ if ( ! class_exists( 'WooCommerce' ) ) {
 						<path d="M58.333 20L68 10M22 20L12 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 					</svg>
 				</div>
-				<h2 class="wishlist-empty-title"><?php esc_html_e( 'Your Wishlist is Empty', 'skyyrose-flagship' ); ?></h2>
+				<h2 class="wishlist-empty-title"><?php esc_html_e( 'Your Wishlist is Empty', 'skyyrose' ); ?></h2>
 				<p class="wishlist-empty-text">
-					<?php esc_html_e( 'Save your favorite items here to purchase later or keep track of items you love.', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Save your favorite items here to purchase later or keep track of items you love.', 'skyyrose' ); ?>
 				</p>
 				<div class="wishlist-empty-actions">
 					<a href="<?php echo esc_url( function_exists( 'wc_get_page_id' ) ? get_permalink( wc_get_page_id( 'shop' ) ) : home_url( '/shop/' ) ); ?>" class="button alt">
-						<?php esc_html_e( 'Start Shopping', 'skyyrose-flagship' ); ?>
+						<?php esc_html_e( 'Start Shopping', 'skyyrose' ); ?>
 					</a>
 				</div>
 			</div>

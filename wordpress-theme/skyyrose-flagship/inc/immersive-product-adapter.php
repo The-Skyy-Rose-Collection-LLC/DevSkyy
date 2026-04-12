@@ -68,7 +68,7 @@ function skyyrose_immersive_product( $sku, $scene ) {
 	// Collection display name.
 	$collection_label = '';
 	if ( $product ) {
-		$slugs = array(
+		$slugs            = array(
 			'black-rose'   => 'Black Rose Collection',
 			'love-hurts'   => 'Love Hurts Collection',
 			'signature'    => 'Signature Collection',

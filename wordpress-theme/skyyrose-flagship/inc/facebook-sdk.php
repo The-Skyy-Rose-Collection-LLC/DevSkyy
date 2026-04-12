@@ -77,10 +77,14 @@ function skyyrose_enqueue_facebook_sdk() {
 		true
 	);
 
-	wp_localize_script( 'facebook-sdk', 'skyyroseFB', array(
-		'appId'   => SKYYROSE_FB_APP_ID,
-		'version' => SKYYROSE_FB_SDK_VERSION,
-	) );
+	wp_localize_script(
+		'facebook-sdk',
+		'skyyroseFB',
+		array(
+			'appId'   => SKYYROSE_FB_APP_ID,
+			'version' => SKYYROSE_FB_SDK_VERSION,
+		)
+	);
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_facebook_sdk' );
 
@@ -106,11 +110,11 @@ function skyyrose_facebook_footer_scripts() {
 			$fb_event_data = array(
 				'event' => 'ViewContent',
 				'data'  => array(
-					'content_name'     => $product->get_name(),
-					'content_ids'      => array( $product->get_sku() ?: (string) $product->get_id() ),
-					'content_type'     => 'product',
-					'value'            => (float) $product->get_price(),
-					'currency'         => get_woocommerce_currency(),
+					'content_name' => $product->get_name(),
+					'content_ids'  => array( $product->get_sku() ?: (string) $product->get_id() ),
+					'content_type' => 'product',
+					'value'        => (float) $product->get_price(),
+					'currency'     => get_woocommerce_currency(),
 				),
 			);
 		}

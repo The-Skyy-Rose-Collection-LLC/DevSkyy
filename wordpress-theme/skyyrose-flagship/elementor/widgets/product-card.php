@@ -22,7 +22,7 @@ class SkyyRose_Product_Card_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_title() {
-		return esc_html__( 'Product Card', 'skyyrose-flagship' );
+		return esc_html__( 'Product Card', 'skyyrose' );
 	}
 
 	public function get_icon() {
@@ -41,13 +41,16 @@ class SkyyRose_Product_Card_Widget extends \Elementor\Widget_Base {
 
 		/* ── Content ────────────────────────────── */
 
-		$this->start_controls_section( 'section_product', array(
-			'label' => esc_html__( 'Product', 'skyyrose-flagship' ),
-			'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
-		) );
+		$this->start_controls_section(
+			'section_product',
+			array(
+				'label' => esc_html__( 'Product', 'skyyrose' ),
+				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
+			)
+		);
 
 		// Build SKU options from catalog.
-		$sku_options = array( '' => esc_html__( '— Select Product —', 'skyyrose-flagship' ) );
+		$sku_options = array( '' => esc_html__( '— Select Product —', 'skyyrose' ) );
 		if ( function_exists( 'skyyrose_get_product_catalog' ) ) {
 			foreach ( skyyrose_get_product_catalog() as $sku => $p ) {
 				if ( ! empty( $p['published'] ) ) {
@@ -56,55 +59,76 @@ class SkyyRose_Product_Card_Widget extends \Elementor\Widget_Base {
 			}
 		}
 
-		$this->add_control( 'product_sku', array(
-			'label'   => esc_html__( 'Product SKU', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::SELECT,
-			'options' => $sku_options,
-			'default' => '',
-		) );
+		$this->add_control(
+			'product_sku',
+			array(
+				'label'   => esc_html__( 'Product SKU', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::SELECT,
+				'options' => $sku_options,
+				'default' => '',
+			)
+		);
 
-		$this->add_control( 'show_price', array(
-			'label'        => esc_html__( 'Show Price', 'skyyrose-flagship' ),
-			'type'         => \Elementor\Controls_Manager::SWITCHER,
-			'default'      => 'yes',
-			'return_value' => 'yes',
-		) );
+		$this->add_control(
+			'show_price',
+			array(
+				'label'        => esc_html__( 'Show Price', 'skyyrose' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+			)
+		);
 
-		$this->add_control( 'show_sizes', array(
-			'label'        => esc_html__( 'Show Sizes', 'skyyrose-flagship' ),
-			'type'         => \Elementor\Controls_Manager::SWITCHER,
-			'default'      => '',
-			'return_value' => 'yes',
-		) );
+		$this->add_control(
+			'show_sizes',
+			array(
+				'label'        => esc_html__( 'Show Sizes', 'skyyrose' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'default'      => '',
+				'return_value' => 'yes',
+			)
+		);
 
-		$this->add_control( 'badge_text', array(
-			'label'       => esc_html__( 'Badge Override', 'skyyrose-flagship' ),
-			'type'        => \Elementor\Controls_Manager::TEXT,
-			'placeholder' => esc_html__( 'e.g. NEW, SOLD OUT', 'skyyrose-flagship' ),
-			'description' => esc_html__( 'Leave empty to use catalog badge.', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'badge_text',
+			array(
+				'label'       => esc_html__( 'Badge Override', 'skyyrose' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'placeholder' => esc_html__( 'e.g. NEW, SOLD OUT', 'skyyrose' ),
+				'description' => esc_html__( 'Leave empty to use catalog badge.', 'skyyrose' ),
+			)
+		);
 
-		$this->add_control( 'cta_text', array(
-			'label'   => esc_html__( 'CTA Text', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::TEXT,
-			'default' => esc_html__( 'View Piece', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'cta_text',
+			array(
+				'label'   => esc_html__( 'CTA Text', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::TEXT,
+				'default' => esc_html__( 'View Piece', 'skyyrose' ),
+			)
+		);
 
 		$this->end_controls_section();
 
 		/* ── Style ──────────────────────────────── */
 
-		$this->start_controls_section( 'section_style', array(
-			'label' => esc_html__( 'Card Style', 'skyyrose-flagship' ),
-			'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
-		) );
+		$this->start_controls_section(
+			'section_style',
+			array(
+				'label' => esc_html__( 'Card Style', 'skyyrose' ),
+				'tab'   => \Elementor\Controls_Manager::TAB_STYLE,
+			)
+		);
 
-		$this->add_control( 'accent_color', array(
-			'label'   => esc_html__( 'Accent Color', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::COLOR,
-			'default' => '',
-			'description' => esc_html__( 'Leave empty to auto-detect from collection.', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'accent_color',
+			array(
+				'label'       => esc_html__( 'Accent Color', 'skyyrose' ),
+				'type'        => \Elementor\Controls_Manager::COLOR,
+				'default'     => '',
+				'description' => esc_html__( 'Leave empty to auto-detect from collection.', 'skyyrose' ),
+			)
+		);
 
 		$this->end_controls_section();
 	}
@@ -114,13 +138,13 @@ class SkyyRose_Product_Card_Widget extends \Elementor\Widget_Base {
 		$sku      = sanitize_key( $settings['product_sku'] );
 
 		if ( empty( $sku ) || ! function_exists( 'skyyrose_get_product' ) ) {
-			echo '<p class="elementor-alert">' . esc_html__( 'Select a product SKU.', 'skyyrose-flagship' ) . '</p>';
+			echo '<p class="elementor-alert">' . esc_html__( 'Select a product SKU.', 'skyyrose' ) . '</p>';
 			return;
 		}
 
 		$product = skyyrose_get_product( $sku );
 		if ( ! $product ) {
-			echo '<p class="elementor-alert">' . esc_html__( 'Product not found.', 'skyyrose-flagship' ) . '</p>';
+			echo '<p class="elementor-alert">' . esc_html__( 'Product not found.', 'skyyrose' ) . '</p>';
 			return;
 		}
 
@@ -132,7 +156,7 @@ class SkyyRose_Product_Card_Widget extends \Elementor\Widget_Base {
 				'love-hurts' => '#DC143C',
 				'signature'  => '#D4AF37',
 			);
-			$accent = isset( $collection_accents[ $product['collection'] ] )
+			$accent             = isset( $collection_accents[ $product['collection'] ] )
 				? $collection_accents[ $product['collection'] ]
 				: '#B76E79';
 		}

@@ -34,7 +34,7 @@ if ( $skyyrose_has_wc && ! empty( $skyyrose_search_query ) ) {
 			'posts_per_page' => 12,
 		)
 	);
-	$skyyrose_product_count = $skyyrose_product_results->found_posts;
+	$skyyrose_product_count   = $skyyrose_product_results->found_posts;
 }
 
 // Total count: products + main loop (non-product content).
@@ -48,31 +48,31 @@ if ( have_posts() ) {
 $skyyrose_collections = array(
 	array(
 		'slug'        => 'black-rose',
-		'label'       => __( 'Black Rose', 'skyyrose-flagship' ),
+		'label'       => __( 'Black Rose', 'skyyrose' ),
 		'accent'      => '#C0C0C0',
 		'glow'        => 'rgba(192, 192, 192, 0.3)',
-		'description' => __( 'Gothic elegance, dark romance', 'skyyrose-flagship' ),
+		'description' => __( 'Gothic elegance, dark romance', 'skyyrose' ),
 	),
 	array(
 		'slug'        => 'love-hurts',
-		'label'       => __( 'Love Hurts', 'skyyrose-flagship' ),
+		'label'       => __( 'Love Hurts', 'skyyrose' ),
 		'accent'      => '#DC143C',
 		'glow'        => 'rgba(220, 20, 60, 0.3)',
-		'description' => __( 'Dramatic, passionate, fearless', 'skyyrose-flagship' ),
+		'description' => __( 'Dramatic, passionate, fearless', 'skyyrose' ),
 	),
 	array(
 		'slug'        => 'signature',
-		'label'       => __( 'Signature', 'skyyrose-flagship' ),
+		'label'       => __( 'Signature', 'skyyrose' ),
 		'accent'      => '#D4AF37',
 		'glow'        => 'rgba(212, 175, 55, 0.3)',
-		'description' => __( 'Elevated, confident, refined', 'skyyrose-flagship' ),
+		'description' => __( 'Elevated, confident, refined', 'skyyrose' ),
 	),
 	array(
 		'slug'        => 'kids-capsule',
-		'label'       => __( 'Kids Capsule', 'skyyrose-flagship' ),
+		'label'       => __( 'Kids Capsule', 'skyyrose' ),
 		'accent'      => '#FFB6C1',
 		'glow'        => 'rgba(255, 182, 193, 0.3)',
-		'description' => __( 'Joyful luxury, playful sophistication', 'skyyrose-flagship' ),
+		'description' => __( 'Joyful luxury, playful sophistication', 'skyyrose' ),
 	),
 );
 ?>
@@ -80,15 +80,15 @@ $skyyrose_collections = array(
 <main id="primary" class="search-results" role="main" tabindex="-1">
 
 	<!-- ============================
-	     Header + Re-Search Form
-	     ============================ -->
+		Header + Re-Search Form
+		============================ -->
 	<header class="search-results__header">
 		<h1 class="search-results__title">
 			<?php if ( ! empty( $skyyrose_search_query ) ) : ?>
-				<?php esc_html_e( 'Results for', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Results for', 'skyyrose' ); ?>
 				<span class="search-results__query"><?php echo esc_html( $skyyrose_search_query ); ?></span>
 			<?php else : ?>
-				<?php esc_html_e( 'Search', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Search', 'skyyrose' ); ?>
 			<?php endif; ?>
 		</h1>
 
@@ -98,28 +98,28 @@ $skyyrose_collections = array(
 				$skyyrose_total = $skyyrose_product_count + $skyyrose_content_count;
 				printf(
 					/* translators: %d: total result count */
-					esc_html( _n( '%d result found', '%d results found', $skyyrose_total, 'skyyrose-flagship' ) ),
+					esc_html( _n( '%d result found', '%d results found', $skyyrose_total, 'skyyrose' ) ),
 					absint( $skyyrose_total )
 				);
 				?>
 			</p>
 		<?php endif; ?>
 
-		<div class="search-results__search-form" role="search" aria-label="<?php esc_attr_e( 'Search the site', 'skyyrose-flagship' ); ?>">
+		<div class="search-results__search-form" role="search" aria-label="<?php esc_attr_e( 'Search the site', 'skyyrose' ); ?>">
 			<form action="<?php echo esc_url( home_url( '/' ) ); ?>" method="get" class="search-results__form">
 				<label for="search-results-input" class="screen-reader-text">
-					<?php esc_html_e( 'Search for:', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Search for:', 'skyyrose' ); ?>
 				</label>
 				<input
 					type="search"
 					id="search-results-input"
 					class="search-results__input"
 					name="s"
-					placeholder="<?php esc_attr_e( 'Search products, collections, pages...', 'skyyrose-flagship' ); ?>"
+					placeholder="<?php esc_attr_e( 'Search products, collections, pages...', 'skyyrose' ); ?>"
 					value="<?php echo esc_attr( $skyyrose_search_query ); ?>"
 					autocomplete="off"
 				/>
-				<button type="submit" class="search-results__submit" aria-label="<?php esc_attr_e( 'Search', 'skyyrose-flagship' ); ?>">
+				<button type="submit" class="search-results__submit" aria-label="<?php esc_attr_e( 'Search', 'skyyrose' ); ?>">
 					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 						<circle cx="11" cy="11" r="8"/>
 						<line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -136,13 +136,13 @@ $skyyrose_collections = array(
 		// Product Results (holo card grid) — shown first.
 		// ==================================================================
 		if ( $skyyrose_product_results && $skyyrose_product_results->have_posts() ) :
-		?>
-			<section class="search-results__products" aria-label="<?php esc_attr_e( 'Product Results', 'skyyrose-flagship' ); ?>">
+			?>
+			<section class="search-results__products" aria-label="<?php esc_attr_e( 'Product Results', 'skyyrose' ); ?>">
 				<h2 class="search-results__section-heading">
 					<?php
 					printf(
 						/* translators: %d: product count */
-						esc_html( _n( '%d Product', '%d Products', $skyyrose_product_count, 'skyyrose-flagship' ) ),
+						esc_html( _n( '%d Product', '%d Products', $skyyrose_product_count, 'skyyrose' ) ),
 						absint( $skyyrose_product_count )
 					);
 					?>
@@ -165,7 +165,7 @@ $skyyrose_collections = array(
 										'index'   => $skyyrose_index,
 									)
 								);
-								$skyyrose_index++;
+								++$skyyrose_index;
 							endif;
 						endwhile;
 						wp_reset_postdata();
@@ -180,14 +180,17 @@ $skyyrose_collections = array(
 		// Content Results (posts, pages) — shown below products.
 		// ==================================================================
 		if ( have_posts() ) :
-		?>
-			<section class="search-results__content" aria-label="<?php esc_attr_e( 'Content Results', 'skyyrose-flagship' ); ?>">
+			?>
+			<section class="search-results__content" aria-label="<?php esc_attr_e( 'Content Results', 'skyyrose' ); ?>">
 				<h2 class="search-results__section-heading">
-					<?php esc_html_e( 'Pages & Posts', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Pages & Posts', 'skyyrose' ); ?>
 				</h2>
 
 				<div class="search-results__list">
-					<?php while ( have_posts() ) : the_post(); ?>
+					<?php
+					while ( have_posts() ) :
+						the_post();
+						?>
 						<article class="search-results__item" id="post-<?php the_ID(); ?>">
 							<a href="<?php echo esc_url( get_permalink() ); ?>" class="search-results__item-link">
 								<div class="search-results__item-body">
@@ -212,21 +215,23 @@ $skyyrose_collections = array(
 					<?php endwhile; ?>
 				</div>
 
-				<?php the_posts_navigation(
+				<?php
+				the_posts_navigation(
 					array(
-						'prev_text' => __( 'Older Results', 'skyyrose-flagship' ),
-						'next_text' => __( 'Newer Results', 'skyyrose-flagship' ),
+						'prev_text' => __( 'Older Results', 'skyyrose' ),
+						'next_text' => __( 'Newer Results', 'skyyrose' ),
 						'class'     => 'search-results__pagination',
 					)
-				); ?>
+				);
+				?>
 			</section>
 		<?php endif; ?>
 
 	<?php else : ?>
 
 		<!-- ============================
-		     Empty State — No Results
-		     ============================ -->
+			Empty State — No Results
+			============================ -->
 		<div class="search-results__empty">
 
 			<div class="search-results__empty-icon" aria-hidden="true">
@@ -239,7 +244,7 @@ $skyyrose_collections = array(
 			</div>
 
 			<h2 class="search-results__empty-title">
-				<?php esc_html_e( 'No Results Found', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'No Results Found', 'skyyrose' ); ?>
 			</h2>
 
 			<p class="search-results__empty-subtitle">
@@ -247,11 +252,11 @@ $skyyrose_collections = array(
 				if ( ! empty( $skyyrose_search_query ) ) {
 					printf(
 						/* translators: %s: search query */
-						esc_html__( 'We couldn\'t find anything matching "%s"', 'skyyrose-flagship' ),
+						esc_html__( 'We couldn\'t find anything matching "%s"', 'skyyrose' ),
 						esc_html( $skyyrose_search_query )
 					);
 				} else {
-					esc_html_e( 'Enter a search term to explore our collections', 'skyyrose-flagship' );
+					esc_html_e( 'Enter a search term to explore our collections', 'skyyrose' );
 				}
 				?>
 			</p>
@@ -259,22 +264,22 @@ $skyyrose_collections = array(
 			<!-- Search Suggestions -->
 			<div class="search-results__suggestions">
 				<h3 class="search-results__section-heading">
-					<?php esc_html_e( 'Try Searching For', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Try Searching For', 'skyyrose' ); ?>
 				</h3>
 				<div class="search-results__suggestion-tags">
 					<?php
 					$skyyrose_suggestions = array(
-						__( 'Hoodies', 'skyyrose-flagship' ),
-						__( 'T-Shirts', 'skyyrose-flagship' ),
-						__( 'Black Rose', 'skyyrose-flagship' ),
-						__( 'Love Hurts', 'skyyrose-flagship' ),
-						__( 'Signature', 'skyyrose-flagship' ),
-						__( 'Kids', 'skyyrose-flagship' ),
+						__( 'Hoodies', 'skyyrose' ),
+						__( 'T-Shirts', 'skyyrose' ),
+						__( 'Black Rose', 'skyyrose' ),
+						__( 'Love Hurts', 'skyyrose' ),
+						__( 'Signature', 'skyyrose' ),
+						__( 'Kids', 'skyyrose' ),
 					);
 					foreach ( $skyyrose_suggestions as $skyyrose_suggestion ) :
-					?>
+						?>
 						<a href="<?php echo esc_url( home_url( '/?s=' . rawurlencode( $skyyrose_suggestion ) ) ); ?>"
-						   class="search-results__suggestion-tag">
+							class="search-results__suggestion-tag">
 							<?php echo esc_html( $skyyrose_suggestion ); ?>
 						</a>
 					<?php endforeach; ?>
@@ -282,9 +287,9 @@ $skyyrose_collections = array(
 			</div>
 
 			<!-- Collection Quick Links (matching 404.php pattern) -->
-			<nav class="search-results__collections" aria-label="<?php esc_attr_e( 'Browse Collections', 'skyyrose-flagship' ); ?>">
+			<nav class="search-results__collections" aria-label="<?php esc_attr_e( 'Browse Collections', 'skyyrose' ); ?>">
 				<h3 class="search-results__section-heading">
-					<?php esc_html_e( 'Explore Our Collections', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Explore Our Collections', 'skyyrose' ); ?>
 				</h3>
 
 				<div class="search-results__cards">
@@ -299,7 +304,7 @@ $skyyrose_collections = array(
 								$skyyrose_link  = get_term_link( $skyyrose_term );
 								$skyyrose_count = sprintf(
 									/* translators: %d: number of products */
-									_n( '%d product', '%d products', $skyyrose_term->count, 'skyyrose-flagship' ),
+									_n( '%d product', '%d products', $skyyrose_term->count, 'skyyrose' ),
 									$skyyrose_term->count
 								);
 							}
@@ -307,12 +312,12 @@ $skyyrose_collections = array(
 
 						if ( '#' === $skyyrose_link || is_wp_error( $skyyrose_link ) ) {
 							$skyyrose_link  = home_url( '/collection-' . $skyyrose_collection['slug'] . '/' );
-							$skyyrose_count = __( 'Explore', 'skyyrose-flagship' );
+							$skyyrose_count = __( 'Explore', 'skyyrose' );
 						}
 						?>
 						<a href="<?php echo esc_url( $skyyrose_link ); ?>"
-						   class="search-results__card"
-						   style="--card-accent: <?php echo esc_attr( $skyyrose_collection['accent'] ); ?>; --card-glow: <?php echo esc_attr( $skyyrose_collection['glow'] ); ?>">
+							class="search-results__card"
+							style="--card-accent: <?php echo esc_attr( $skyyrose_collection['accent'] ); ?>; --card-glow: <?php echo esc_attr( $skyyrose_collection['glow'] ); ?>">
 							<span class="search-results__card-border" aria-hidden="true"></span>
 							<span class="search-results__card-label">
 								<?php echo esc_html( $skyyrose_collection['label'] ); ?>
@@ -332,10 +337,10 @@ $skyyrose_collections = array(
 			<!-- CTA Buttons -->
 			<div class="search-results__cta-group">
 				<a href="<?php echo esc_url( home_url( '/shop/' ) ); ?>" class="search-results__cta search-results__cta--primary">
-					<?php esc_html_e( 'Browse All Products', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Browse All Products', 'skyyrose' ); ?>
 				</a>
 				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="search-results__cta search-results__cta--secondary">
-					<?php esc_html_e( 'Return Home', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Return Home', 'skyyrose' ); ?>
 				</a>
 			</div>
 

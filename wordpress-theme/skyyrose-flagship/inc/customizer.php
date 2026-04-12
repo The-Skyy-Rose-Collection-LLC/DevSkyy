@@ -24,7 +24,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function skyyrose_customize_register( $wp_customize ) {
 
-	/*--------------------------------------------------------------
+	/*
+	--------------------------------------------------------------
 	 * Core settings transport
 	 *--------------------------------------------------------------*/
 	$wp_customize->get_setting( 'blogname' )->transport         = 'postMessage';
@@ -48,19 +49,21 @@ function skyyrose_customize_register( $wp_customize ) {
 		);
 	}
 
-	/*--------------------------------------------------------------
+	/*
+	--------------------------------------------------------------
 	 * Section: Brand Identity
 	 *--------------------------------------------------------------*/
 	$wp_customize->add_section(
 		'skyyrose_brand',
 		array(
-			'title'       => esc_html__( 'Brand Identity', 'skyyrose-flagship' ),
-			'description' => esc_html__( 'Customize brand colors, logo, and social media links.', 'skyyrose-flagship' ),
+			'title'       => esc_html__( 'Brand Identity', 'skyyrose' ),
+			'description' => esc_html__( 'Customize brand colors, logo, and social media links.', 'skyyrose' ),
 			'priority'    => 30,
 		)
 	);
 
-	/*--------------------------------------------------------------
+	/*
+	--------------------------------------------------------------
 	 * Setting + Control: Primary Brand Color (Rose Gold)
 	 *--------------------------------------------------------------*/
 	$wp_customize->add_setting(
@@ -77,15 +80,16 @@ function skyyrose_customize_register( $wp_customize ) {
 			$wp_customize,
 			'skyyrose_primary_color',
 			array(
-				'label'       => esc_html__( 'Primary Brand Color', 'skyyrose-flagship' ),
-				'description' => esc_html__( 'Rose gold accent used for headings, links, and highlights.', 'skyyrose-flagship' ),
+				'label'       => esc_html__( 'Primary Brand Color', 'skyyrose' ),
+				'description' => esc_html__( 'Rose gold accent used for headings, links, and highlights.', 'skyyrose' ),
 				'section'     => 'skyyrose_brand',
 				'settings'    => 'skyyrose_primary_color',
 			)
 		)
 	);
 
-	/*--------------------------------------------------------------
+	/*
+	--------------------------------------------------------------
 	 * Setting + Control: Gold Accent Color
 	 *--------------------------------------------------------------*/
 	$wp_customize->add_setting(
@@ -102,15 +106,16 @@ function skyyrose_customize_register( $wp_customize ) {
 			$wp_customize,
 			'skyyrose_gold_accent',
 			array(
-				'label'       => esc_html__( 'Gold Accent Color', 'skyyrose-flagship' ),
-				'description' => esc_html__( 'Used for buttons, CTA accents, and luxury highlights.', 'skyyrose-flagship' ),
+				'label'       => esc_html__( 'Gold Accent Color', 'skyyrose' ),
+				'description' => esc_html__( 'Used for buttons, CTA accents, and luxury highlights.', 'skyyrose' ),
 				'section'     => 'skyyrose_brand',
 				'settings'    => 'skyyrose_gold_accent',
 			)
 		)
 	);
 
-	/*--------------------------------------------------------------
+	/*
+	--------------------------------------------------------------
 	 * Setting + Control: Dark Background Color
 	 *--------------------------------------------------------------*/
 	$wp_customize->add_setting(
@@ -127,15 +132,16 @@ function skyyrose_customize_register( $wp_customize ) {
 			$wp_customize,
 			'skyyrose_dark_bg',
 			array(
-				'label'       => esc_html__( 'Dark Background', 'skyyrose-flagship' ),
-				'description' => esc_html__( 'Primary dark background for header, footer, and immersive sections.', 'skyyrose-flagship' ),
+				'label'       => esc_html__( 'Dark Background', 'skyyrose' ),
+				'description' => esc_html__( 'Primary dark background for header, footer, and immersive sections.', 'skyyrose' ),
 				'section'     => 'skyyrose_brand',
 				'settings'    => 'skyyrose_dark_bg',
 			)
 		)
 	);
 
-	/*--------------------------------------------------------------
+	/*
+	--------------------------------------------------------------
 	 * Setting + Control: Brand Logo Upload
 	 *--------------------------------------------------------------*/
 	$wp_customize->add_setting(
@@ -152,53 +158,54 @@ function skyyrose_customize_register( $wp_customize ) {
 			$wp_customize,
 			'skyyrose_brand_logo',
 			array(
-				'label'       => esc_html__( 'Brand Logo (SVG or PNG)', 'skyyrose-flagship' ),
-				'description' => esc_html__( 'Upload a transparent-background logo for the footer and email templates. Use Custom Logo (above) for the header.', 'skyyrose-flagship' ),
+				'label'       => esc_html__( 'Brand Logo (SVG or PNG)', 'skyyrose' ),
+				'description' => esc_html__( 'Upload a transparent-background logo for the footer and email templates. Use Custom Logo (above) for the header.', 'skyyrose' ),
 				'section'     => 'skyyrose_brand',
 				'settings'    => 'skyyrose_brand_logo',
 			)
 		)
 	);
 
-	/*--------------------------------------------------------------
+	/*
+	--------------------------------------------------------------
 	 * Section: Social Media
 	 *--------------------------------------------------------------*/
 	$wp_customize->add_section(
 		'skyyrose_social',
 		array(
-			'title'       => esc_html__( 'Social Media', 'skyyrose-flagship' ),
-			'description' => esc_html__( 'Add your social media profile URLs for the footer and Open Graph.', 'skyyrose-flagship' ),
+			'title'       => esc_html__( 'Social Media', 'skyyrose' ),
+			'description' => esc_html__( 'Add your social media profile URLs for the footer and Open Graph.', 'skyyrose' ),
 			'priority'    => 35,
 		)
 	);
 
 	$social_networks = array(
 		'instagram' => array(
-			'label'   => esc_html__( 'Instagram URL', 'skyyrose-flagship' ),
+			'label'   => esc_html__( 'Instagram URL', 'skyyrose' ),
 			'default' => '',
 		),
 		'tiktok'    => array(
-			'label'   => esc_html__( 'TikTok URL', 'skyyrose-flagship' ),
+			'label'   => esc_html__( 'TikTok URL', 'skyyrose' ),
 			'default' => '',
 		),
 		'facebook'  => array(
-			'label'   => esc_html__( 'Facebook URL', 'skyyrose-flagship' ),
+			'label'   => esc_html__( 'Facebook URL', 'skyyrose' ),
 			'default' => '',
 		),
 		'twitter'   => array(
-			'label'   => esc_html__( 'X (Twitter) URL', 'skyyrose-flagship' ),
+			'label'   => esc_html__( 'X (Twitter) URL', 'skyyrose' ),
 			'default' => '',
 		),
 		'pinterest' => array(
-			'label'   => esc_html__( 'Pinterest URL', 'skyyrose-flagship' ),
+			'label'   => esc_html__( 'Pinterest URL', 'skyyrose' ),
 			'default' => '',
 		),
 		'youtube'   => array(
-			'label'   => esc_html__( 'YouTube URL', 'skyyrose-flagship' ),
+			'label'   => esc_html__( 'YouTube URL', 'skyyrose' ),
 			'default' => '',
 		),
 		'linkedin'  => array(
-			'label'   => esc_html__( 'LinkedIn URL', 'skyyrose-flagship' ),
+			'label'   => esc_html__( 'LinkedIn URL', 'skyyrose' ),
 			'default' => '',
 		),
 	);
@@ -225,7 +232,8 @@ function skyyrose_customize_register( $wp_customize ) {
 		);
 	}
 
-	/*--------------------------------------------------------------
+	/*
+	--------------------------------------------------------------
 	 * Setting + Control: Twitter Handle (for Twitter Cards meta)
 	 *--------------------------------------------------------------*/
 	$wp_customize->add_setting(
@@ -240,14 +248,15 @@ function skyyrose_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'twitter_handle',
 		array(
-			'label'       => esc_html__( 'Twitter/X Handle', 'skyyrose-flagship' ),
-			'description' => esc_html__( 'Without the @ symbol (e.g., "SkyyRose").', 'skyyrose-flagship' ),
+			'label'       => esc_html__( 'Twitter/X Handle', 'skyyrose' ),
+			'description' => esc_html__( 'Without the @ symbol (e.g., "SkyyRose").', 'skyyrose' ),
 			'section'     => 'skyyrose_social',
 			'type'        => 'text',
 		)
 	);
 
-	/*--------------------------------------------------------------
+	/*
+	--------------------------------------------------------------
 	 * Setting + Control: Contact Email
 	 *--------------------------------------------------------------*/
 	$wp_customize->add_setting(
@@ -262,13 +271,14 @@ function skyyrose_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'contact_email',
 		array(
-			'label'   => esc_html__( 'Contact Email', 'skyyrose-flagship' ),
+			'label'   => esc_html__( 'Contact Email', 'skyyrose' ),
 			'section' => 'skyyrose_social',
 			'type'    => 'email',
 		)
 	);
 
-	/*--------------------------------------------------------------
+	/*
+	--------------------------------------------------------------
 	 * Setting + Control: Contact Phone
 	 *--------------------------------------------------------------*/
 	$wp_customize->add_setting(
@@ -283,9 +293,65 @@ function skyyrose_customize_register( $wp_customize ) {
 	$wp_customize->add_control(
 		'contact_phone',
 		array(
-			'label'   => esc_html__( 'Contact Phone', 'skyyrose-flagship' ),
+			'label'   => esc_html__( 'Contact Phone', 'skyyrose' ),
 			'section' => 'skyyrose_social',
 			'type'    => 'tel',
+		)
+	);
+
+	/*
+	--------------------------------------------------------------
+	 * Section: Kids Capsule Launch Controls
+	 *--------------------------------------------------------------*/
+	$wp_customize->add_section(
+		'skyyrose_kids_capsule',
+		array(
+			'title'       => esc_html__( 'Kids Capsule Launch', 'skyyrose' ),
+			'description' => esc_html__( 'Toggle between launch mode (teaser + waitlist) and live mode (full catalog).', 'skyyrose' ),
+			'priority'    => 60,
+		)
+	);
+
+	// Collection status: launch vs live.
+	$wp_customize->add_setting(
+		'skyyrose_kc_mode',
+		array(
+			'default'           => 'launch',
+			'transport'         => 'refresh',
+			'sanitize_callback' => 'skyyrose_sanitize_kc_mode',
+		)
+	);
+
+	$wp_customize->add_control(
+		'skyyrose_kc_mode',
+		array(
+			'label'   => esc_html__( 'Collection Status', 'skyyrose' ),
+			'section' => 'skyyrose_kids_capsule',
+			'type'    => 'radio',
+			'choices' => array(
+				'launch' => esc_html__( 'Launch Mode — Teaser + Waitlist', 'skyyrose' ),
+				'live'   => esc_html__( 'Live Mode — Full Catalog', 'skyyrose' ),
+			),
+		)
+	);
+
+	// Launch date for countdown timer.
+	$wp_customize->add_setting(
+		'skyyrose_kc_launch_date',
+		array(
+			'default'           => '',
+			'transport'         => 'refresh',
+			'sanitize_callback' => 'sanitize_text_field',
+		)
+	);
+
+	$wp_customize->add_control(
+		'skyyrose_kc_launch_date',
+		array(
+			'label'       => esc_html__( 'Launch Date', 'skyyrose' ),
+			'description' => esc_html__( 'ISO 8601 date for the countdown timer, e.g. 2026-06-01T09:00:00-07:00', 'skyyrose' ),
+			'section'     => 'skyyrose_kids_capsule',
+			'type'        => 'text',
 		)
 	);
 }

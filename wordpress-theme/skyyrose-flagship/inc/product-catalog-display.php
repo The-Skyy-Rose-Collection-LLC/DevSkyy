@@ -43,13 +43,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since  6.5.2
  * @access private
- * @see    _skyyrose_resolve_display_products() Cold-path caller.
+ * @see    skyyrose_resolve_display_products() Cold-path caller.
  * @see    skyyrose_get_featured_display_products() Rehydration caller.
  * @param  array $cat Raw catalog entry.
  * @return array      Display-shaped static card.
  */
-function _skyyrose_catalog_to_static_card( array $cat ) {
-	$sku          = (string) ( $cat['sku'] ?? '' );
+function skyyrose_catalog_to_static_card( array $cat ) {
+	$sku = (string) ( $cat['sku'] ?? '' );
 	// Preserve the original `?:` fall-through semantics (empty string
 	// falls through to `image`), not `??` which only falls through on null.
 	$front_source = ( $cat['front_model_image'] ?? '' ) ?: ( $cat['image'] ?? '' );
@@ -86,7 +86,7 @@ function _skyyrose_catalog_to_static_card( array $cat ) {
  * @param  array $catalog_entries Array of catalog product arrays.
  * @return array                  Mixed display array (WC_Product | static card).
  */
-function _skyyrose_resolve_display_products( array $catalog_entries ) {
+function skyyrose_resolve_display_products( array $catalog_entries ) {
 	$has_wc  = function_exists( 'wc_get_product_id_by_sku' );
 	$display = array();
 
@@ -124,7 +124,7 @@ function _skyyrose_resolve_display_products( array $catalog_entries ) {
 					E_USER_NOTICE
 				);
 			}
-			$display[] = _skyyrose_catalog_to_static_card( $cat );
+			$display[] = skyyrose_catalog_to_static_card( $cat );
 		}
 	}
 
@@ -144,7 +144,7 @@ function _skyyrose_resolve_display_products( array $catalog_entries ) {
  * @return array  Mixed array — WC_Product objects or static card arrays.
  */
 function skyyrose_get_collection_display_products( $collection ) {
-	return _skyyrose_resolve_display_products( skyyrose_get_collection_products( $collection ) );
+	return skyyrose_resolve_display_products( skyyrose_get_collection_products( $collection ) );
 }
 
 /**
@@ -287,7 +287,7 @@ function skyyrose_get_featured_display_products( $limit = 8 ) {
 	$descriptors   = get_transient( $transient_key );
 
 	if ( false === $descriptors || ! is_array( $descriptors ) ) {
-		$resolved    = _skyyrose_resolve_display_products(
+		$resolved    = skyyrose_resolve_display_products(
 			skyyrose_get_featured_catalog_products( $key )
 		);
 		$descriptors = array();
@@ -325,10 +325,10 @@ function skyyrose_get_featured_display_products( $limit = 8 ) {
 			// are covered by the save_post_product / woocommerce_update_product
 			// flush hooks wired below; this guard covers pure-catalog drift.
 			if ( $cat && ( ! empty( $cat['published'] ) || ! empty( $cat['is_preorder'] ) ) ) {
-				$hydrated[] = _skyyrose_catalog_to_static_card( $cat );
+				$hydrated[] = skyyrose_catalog_to_static_card( $cat );
 			} elseif ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 				// Symmetric with the cold-path WP_DEBUG trigger_error in
-				// _skyyrose_resolve_display_products() — a shop operator
+				// skyyrose_resolve_display_products() — a shop operator
 				// debugging "why did my homepage card disappear" should see
 				// matching log lines from both the cold and rehydration paths.
 				trigger_error(

@@ -21,7 +21,7 @@ class SkyyRose_Newsletter_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_title() {
-		return esc_html__( 'Newsletter Signup', 'skyyrose-flagship' );
+		return esc_html__( 'Newsletter Signup', 'skyyrose' );
 	}
 
 	public function get_icon() {
@@ -38,40 +38,58 @@ class SkyyRose_Newsletter_Widget extends \Elementor\Widget_Base {
 
 	protected function register_controls() {
 
-		$this->start_controls_section( 'section_content', array(
-			'label' => esc_html__( 'Content', 'skyyrose-flagship' ),
-			'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
-		) );
+		$this->start_controls_section(
+			'section_content',
+			array(
+				'label' => esc_html__( 'Content', 'skyyrose' ),
+				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
+			)
+		);
 
-		$this->add_control( 'heading', array(
-			'label'   => esc_html__( 'Heading', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::TEXT,
-			'default' => esc_html__( 'Join the Inner Circle', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'heading',
+			array(
+				'label'   => esc_html__( 'Heading', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::TEXT,
+				'default' => esc_html__( 'Join the Inner Circle', 'skyyrose' ),
+			)
+		);
 
-		$this->add_control( 'description', array(
-			'label'   => esc_html__( 'Description', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::TEXTAREA,
-			'default' => esc_html__( 'Early access to drops, exclusive offers, and behind-the-scenes from the studio.', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'description',
+			array(
+				'label'   => esc_html__( 'Description', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::TEXTAREA,
+				'default' => esc_html__( 'Early access to drops, exclusive offers, and behind-the-scenes from the studio.', 'skyyrose' ),
+			)
+		);
 
-		$this->add_control( 'button_text', array(
-			'label'   => esc_html__( 'Button Text', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::TEXT,
-			'default' => esc_html__( 'Subscribe', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'button_text',
+			array(
+				'label'   => esc_html__( 'Button Text', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::TEXT,
+				'default' => esc_html__( 'Subscribe', 'skyyrose' ),
+			)
+		);
 
-		$this->add_control( 'success_message', array(
-			'label'   => esc_html__( 'Success Message', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::TEXT,
-			'default' => esc_html__( 'Welcome to the circle.', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'success_message',
+			array(
+				'label'   => esc_html__( 'Success Message', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::TEXT,
+				'default' => esc_html__( 'Welcome to the circle.', 'skyyrose' ),
+			)
+		);
 
-		$this->add_control( 'collection_accent', array(
-			'label'   => esc_html__( 'Accent Color', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::COLOR,
-			'default' => '#B76E79',
-		) );
+		$this->add_control(
+			'collection_accent',
+			array(
+				'label'   => esc_html__( 'Accent Color', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::COLOR,
+				'default' => '#B76E79',
+			)
+		);
 
 		$this->end_controls_section();
 	}
@@ -79,9 +97,9 @@ class SkyyRose_Newsletter_Widget extends \Elementor\Widget_Base {
 	protected function render() {
 		$settings = $this->get_settings_for_display();
 		$accent   = $settings['collection_accent'];
-		$r = hexdec( substr( $accent, 1, 2 ) );
-		$g = hexdec( substr( $accent, 3, 2 ) );
-		$b = hexdec( substr( $accent, 5, 2 ) );
+		$r        = hexdec( substr( $accent, 1, 2 ) );
+		$g        = hexdec( substr( $accent, 3, 2 ) );
+		$b        = hexdec( substr( $accent, 5, 2 ) );
 
 		$widget_id = 'nl-' . $this->get_id();
 		$nonce     = wp_create_nonce( 'skyyrose_newsletter' );
@@ -100,7 +118,7 @@ class SkyyRose_Newsletter_Widget extends \Elementor\Widget_Base {
 				data-nonce="<?php echo esc_attr( $nonce ); ?>"
 				data-success="<?php echo esc_attr( $settings['success_message'] ); ?>">
 				<input type="email" class="col-nl__input" name="email" required
-					placeholder="<?php echo esc_attr__( 'Your email address', 'skyyrose-flagship' ); ?>"
+					placeholder="<?php echo esc_attr__( 'Your email address', 'skyyrose' ); ?>"
 					autocomplete="email">
 				<button type="submit" class="col-nl__btn">
 					<?php echo esc_html( $settings['button_text'] ); ?>

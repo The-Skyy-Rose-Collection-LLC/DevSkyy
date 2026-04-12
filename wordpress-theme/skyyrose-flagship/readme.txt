@@ -1,18 +1,18 @@
 === SkyyRose Flagship ===
 Contributors: skyyrose
-Requires at least: 6.4
-Tested up to: 6.7
-Requires PHP: 8.0
-Stable tag: 4.0.0
+Requires at least: 6.8
+Tested up to: 6.8
+Requires PHP: 8.2
+Stable tag: 6.5.2
 License: GPL-2.0-or-later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Tags: e-commerce, woocommerce, dark-theme, luxury, fashion, streetwear, glassmorphism, custom-colors, custom-menu, featured-images, threaded-comments, accessibility-ready
+Tags: e-commerce, woocommerce, one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-width-template, threaded-comments, translation-ready, accessibility-ready, block-styles
 
-A premium dark luxury WordPress theme for SkyyRose, an Oakland-based luxury streetwear brand. Features a complete WooCommerce integration, immersive product experiences inspired by drakerelated.com, and a dark aesthetic with glassmorphism, film grain overlays, and rose gold/gold accent colors.
+A premium dark luxury WooCommerce theme for fashion, streetwear, and lifestyle brands. Features glassmorphism navigation, immersive product scenes, holographic product cards, 4 collection palettes, AJAX search, and WCAG 2.2 AA accessibility. Built for Elementor, Gutenberg, and all major page builders.
 
 == Description ==
 
-SkyyRose Flagship is a premium dark luxury WordPress theme designed for SkyyRose, an Oakland-based luxury streetwear brand. The theme delivers immersive product experiences with a dark aesthetic, glassmorphism effects, film grain overlays, and rose gold/gold accent colors throughout.
+SkyyRose Flagship is a premium dark luxury WooCommerce theme built for fashion, streetwear, and lifestyle brands. The theme delivers immersive product experiences with a dark aesthetic, glassmorphism effects, holographic product cards, and configurable collection palettes. Compatible with Elementor, Gutenberg, and all major page builders.
 
 = Features =
 
@@ -37,9 +37,9 @@ SkyyRose Flagship is a premium dark luxury WordPress theme designed for SkyyRose
 
 = Requirements =
 
-* WordPress 6.4 or higher
-* WooCommerce (required for e-commerce functionality)
-* PHP 8.0 or higher
+* WordPress 6.8 or higher
+* WooCommerce 9.9 or higher (required for e-commerce functionality)
+* PHP 8.2 or higher
 * Modern browser with CSS backdrop-filter support for glassmorphism effects
 
 = Browser Support =
@@ -53,7 +53,7 @@ SkyyRose Flagship is a premium dark luxury WordPress theme designed for SkyyRose
 
 == Installation ==
 
-1. Upload the `skyyrose-flagship` folder to `/wp-content/themes/`
+1. Upload the `skyyrose` folder to `/wp-content/themes/`
 2. Activate through Appearance > Themes in the WordPress admin
 3. Install and activate WooCommerce for full e-commerce functionality
 4. Set up navigation menus (Primary, Footer Shop, Footer Help, Footer Legal)
@@ -121,6 +121,13 @@ Each page template only loads the CSS and JavaScript it needs. Collection pages 
 
 == Changelog ==
 
+= 6.5.2 =
+* Commercial metadata update for ThemeForest and WordPress.org submission
+* Bumped minimum requirements to WordPress 6.8, WooCommerce 9.9, PHP 8.2
+* Updated Tags to WordPress.org-valid tag set
+* Updated description to commercial marketplace language
+* Synced all version numbers (style.css, readme.txt, functions.php)
+
 = 4.0.0 =
 * Marketplace-ready release with comprehensive security hardening
 * Self-hosted typography — removed all Google Fonts external requests (GDPR)
@@ -143,6 +150,9 @@ Each page template only loads the CSS and JavaScript it needs. Collection pages 
 * AJAX form handlers for contact, newsletter, and sign-in
 
 == Upgrade Notice ==
+
+= 6.5.2 =
+Metadata update only. No functional changes. Requires WordPress 6.8+ and PHP 8.2+.
 
 = 3.2.0 =
 Complete rebuild. Back up your site before upgrading. This version replaces the previous theme architecture with a new dark luxury design system, WooCommerce checkout flow, and security hardening.

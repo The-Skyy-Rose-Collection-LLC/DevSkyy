@@ -50,7 +50,7 @@ get_template_part(
 	array(
 		'skus'          => $skus,
 		'collection'    => $collection,
-		'heading'       => $args['heading'] ?? __( 'The Collection', 'skyyrose-flagship' ),
+		'heading'       => $args['heading'] ?? __( 'The Collection', 'skyyrose' ),
 		'subheading'    => $args['subheading'] ?? '',
 		'section_id'    => 'products',
 		'section_class' => 'lp-products',

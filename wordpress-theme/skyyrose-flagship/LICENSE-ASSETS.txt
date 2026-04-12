@@ -1,0 +1,28 @@
+# SkyyRose Theme — Third-Party Asset Licenses
+
+## Fonts (all locally served via WordPress Font Library)
+
+| Font             | License    | URL                                          |
+|------------------|------------|----------------------------------------------|
+| Inter            | OFL 1.1    | https://github.com/rsms/inter                |
+| Playfair Display | OFL 1.1    | https://github.com/clauseggers/Playfair      |
+| Bebas Neue       | OFL 1.1    | https://github.com/dharmatype/Bebas-Neue     |
+| DM Sans          | OFL 1.1    | https://github.com/googlefonts/dm-fonts      |
+| Cinzel           | OFL 1.1    | https://github.com/nicholasjdavies           |
+| Cormorant Garamond | OFL 1.1  | https://github.com/CatharsisFonts/Cormorant  |
+| Barlow           | OFL 1.1    | https://github.com/jpt/barlow                |
+| Oswald           | OFL 1.1    | https://github.com/googlefonts/OswaldFont    |
+| Instrument Serif | OFL 1.1    | https://github.com/nicholasjdavies           |
+| Space Mono       | OFL 1.1    | https://github.com/nicholasjdavies           |
+
+## JavaScript Libraries
+
+| Library          | License              | URL                                    |
+|------------------|----------------------|----------------------------------------|
+| Three.js r128    | MIT                  | https://github.com/mrdoob/three.js     |
+| GSAP 3.12.5      | Standard GSAP License| https://gsap.com/community/licensing/  |
+
+## Images
+
+All product images are proprietary to The Skyy Rose Collection LLC.
+Placeholder/demo images are CC0 Public Domain unless otherwise noted.

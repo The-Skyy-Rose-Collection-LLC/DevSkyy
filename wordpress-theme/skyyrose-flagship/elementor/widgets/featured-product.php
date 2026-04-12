@@ -20,7 +20,7 @@ class SkyyRose_Featured_Product_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_title() {
-		return esc_html__( 'Featured Product', 'skyyrose-flagship' );
+		return esc_html__( 'Featured Product', 'skyyrose' );
 	}
 
 	public function get_icon() {
@@ -39,12 +39,15 @@ class SkyyRose_Featured_Product_Widget extends \Elementor\Widget_Base {
 
 		/* ── Content ────────────────────────────── */
 
-		$this->start_controls_section( 'section_product', array(
-			'label' => esc_html__( 'Product', 'skyyrose-flagship' ),
-			'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
-		) );
+		$this->start_controls_section(
+			'section_product',
+			array(
+				'label' => esc_html__( 'Product', 'skyyrose' ),
+				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
+			)
+		);
 
-		$sku_options = array( '' => esc_html__( '— Select Product —', 'skyyrose-flagship' ) );
+		$sku_options = array( '' => esc_html__( '— Select Product —', 'skyyrose' ) );
 		if ( function_exists( 'skyyrose_get_product_catalog' ) ) {
 			foreach ( skyyrose_get_product_catalog() as $sku => $p ) {
 				if ( ! empty( $p['published'] ) ) {
@@ -53,35 +56,47 @@ class SkyyRose_Featured_Product_Widget extends \Elementor\Widget_Base {
 			}
 		}
 
-		$this->add_control( 'product_sku', array(
-			'label'   => esc_html__( 'Product SKU', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::SELECT,
-			'options' => $sku_options,
-			'default' => '',
-		) );
+		$this->add_control(
+			'product_sku',
+			array(
+				'label'   => esc_html__( 'Product SKU', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::SELECT,
+				'options' => $sku_options,
+				'default' => '',
+			)
+		);
 
-		$this->add_control( 'layout', array(
-			'label'   => esc_html__( 'Layout', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::SELECT,
-			'options' => array(
-				'image-left'  => esc_html__( 'Image Left', 'skyyrose-flagship' ),
-				'image-right' => esc_html__( 'Image Right', 'skyyrose-flagship' ),
-			),
-			'default' => 'image-left',
-		) );
+		$this->add_control(
+			'layout',
+			array(
+				'label'   => esc_html__( 'Layout', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::SELECT,
+				'options' => array(
+					'image-left'  => esc_html__( 'Image Left', 'skyyrose' ),
+					'image-right' => esc_html__( 'Image Right', 'skyyrose' ),
+				),
+				'default' => 'image-left',
+			)
+		);
 
-		$this->add_control( 'show_sizes', array(
-			'label'        => esc_html__( 'Show Sizes', 'skyyrose-flagship' ),
-			'type'         => \Elementor\Controls_Manager::SWITCHER,
-			'default'      => 'yes',
-			'return_value' => 'yes',
-		) );
+		$this->add_control(
+			'show_sizes',
+			array(
+				'label'        => esc_html__( 'Show Sizes', 'skyyrose' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'default'      => 'yes',
+				'return_value' => 'yes',
+			)
+		);
 
-		$this->add_control( 'cta_text', array(
-			'label'   => esc_html__( 'CTA Text', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::TEXT,
-			'default' => esc_html__( 'Pre-Order Now', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'cta_text',
+			array(
+				'label'   => esc_html__( 'CTA Text', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::TEXT,
+				'default' => esc_html__( 'Pre-Order Now', 'skyyrose' ),
+			)
+		);
 
 		$this->end_controls_section();
 	}
@@ -91,13 +106,13 @@ class SkyyRose_Featured_Product_Widget extends \Elementor\Widget_Base {
 		$sku      = sanitize_key( $settings['product_sku'] );
 
 		if ( empty( $sku ) || ! function_exists( 'skyyrose_get_product' ) ) {
-			echo '<p class="elementor-alert">' . esc_html__( 'Select a product SKU.', 'skyyrose-flagship' ) . '</p>';
+			echo '<p class="elementor-alert">' . esc_html__( 'Select a product SKU.', 'skyyrose' ) . '</p>';
 			return;
 		}
 
 		$product = skyyrose_get_product( $sku );
 		if ( ! $product ) {
-			echo '<p class="elementor-alert">' . esc_html__( 'Product not found.', 'skyyrose-flagship' ) . '</p>';
+			echo '<p class="elementor-alert">' . esc_html__( 'Product not found.', 'skyyrose' ) . '</p>';
 			return;
 		}
 
@@ -106,7 +121,7 @@ class SkyyRose_Featured_Product_Widget extends \Elementor\Widget_Base {
 			'love-hurts' => '#DC143C',
 			'signature'  => '#D4AF37',
 		);
-		$accent = isset( $collection_accents[ $product['collection'] ] )
+		$accent             = isset( $collection_accents[ $product['collection'] ] )
 			? $collection_accents[ $product['collection'] ]
 			: '#B76E79';
 
@@ -114,11 +129,11 @@ class SkyyRose_Featured_Product_Widget extends \Elementor\Widget_Base {
 		$g = hexdec( substr( $accent, 3, 2 ) );
 		$b = hexdec( substr( $accent, 5, 2 ) );
 
-		$image   = skyyrose_product_image_uri( $product['image'] );
-		$url     = skyyrose_product_url( $sku );
-		$price   = skyyrose_format_price( $product );
-		$cta     = $settings['cta_text'];
-		$sizes   = explode( '|', $product['sizes'] );
+		$image    = skyyrose_product_image_uri( $product['image'] );
+		$url      = skyyrose_product_url( $sku );
+		$price    = skyyrose_format_price( $product );
+		$cta      = $settings['cta_text'];
+		$sizes    = explode( '|', $product['sizes'] );
 		$is_right = 'image-right' === $settings['layout'];
 
 		$collection_labels = array(
@@ -126,7 +141,7 @@ class SkyyRose_Featured_Product_Widget extends \Elementor\Widget_Base {
 			'love-hurts' => 'Love Hurts Collection',
 			'signature'  => 'Signature Collection',
 		);
-		$col_label = isset( $collection_labels[ $product['collection'] ] )
+		$col_label         = isset( $collection_labels[ $product['collection'] ] )
 			? $collection_labels[ $product['collection'] ]
 			: ucfirst( $product['collection'] );
 		?>
@@ -144,7 +159,7 @@ class SkyyRose_Featured_Product_Widget extends \Elementor\Widget_Base {
 				</div>
 
 				<div style="direction:ltr;">
-					<span class="col-feat__tag"><?php echo esc_html__( 'Featured', 'skyyrose-flagship' ); ?></span>
+					<span class="col-feat__tag"><?php echo esc_html__( 'Featured', 'skyyrose' ); ?></span>
 					<span class="col-feat__col"><?php echo esc_html( $col_label ); ?></span>
 					<h2 class="col-feat__name"><?php echo esc_html( $product['name'] ); ?></h2>
 					<span class="col-feat__price"><?php echo esc_html( $price ); ?></span>

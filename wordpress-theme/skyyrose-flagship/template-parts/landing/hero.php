@@ -38,12 +38,12 @@ $assets_uri    = defined( 'SKYYROSE_ASSETS_URI' ) ? SKYYROSE_ASSETS_URI : '';
 	<?php if ( $bg_image ) : ?>
 		<div class="lp-hero__bg">
 			<img src="<?php echo esc_url( $bg_image ); ?>"
-			     alt=""
-			     loading="eager"
-			     fetchpriority="high"
-			     width="1920"
-			     height="1080"
-			     decoding="async">
+				alt=""
+				loading="eager"
+				fetchpriority="high"
+				width="1920"
+				height="1080"
+				decoding="async">
 		</div>
 	<?php endif; ?>
 
@@ -54,13 +54,13 @@ $assets_uri    = defined( 'SKYYROSE_ASSETS_URI' ) ? SKYYROSE_ASSETS_URI : '';
 
 		<?php if ( $logo_image ) : ?>
 			<img class="lp-hero__logo"
-			     src="<?php echo esc_url( $assets_uri . $logo_image ); ?>"
-			     alt="<?php echo esc_attr( $logo_alt ); ?>"
-			     loading="eager"
-			     fetchpriority="high"
-			     decoding="async"
-			     width="600"
-			     height="300">
+				src="<?php echo esc_url( $assets_uri . $logo_image ); ?>"
+				alt="<?php echo esc_attr( $logo_alt ); ?>"
+				loading="eager"
+				fetchpriority="high"
+				decoding="async"
+				width="600"
+				height="300">
 		<?php endif; ?>
 
 		<?php if ( $countdown ) : ?>
@@ -95,13 +95,13 @@ $assets_uri    = defined( 'SKYYROSE_ASSETS_URI' ) ? SKYYROSE_ASSETS_URI : '';
 			<div class="lp-hero__ctas">
 				<?php if ( ! empty( $cta_primary['text'] ) ) : ?>
 					<a href="<?php echo esc_url( $cta_primary['url'] ?? '#products' ); ?>"
-					   class="lp-btn lp-btn--primary">
+						class="lp-btn lp-btn--primary">
 						<?php echo esc_html( $cta_primary['text'] ); ?>
 					</a>
 				<?php endif; ?>
 				<?php if ( ! empty( $cta_secondary['text'] ) ) : ?>
 					<a href="<?php echo esc_url( $cta_secondary['url'] ?? '#story' ); ?>"
-					   class="lp-btn lp-btn--secondary">
+						class="lp-btn lp-btn--secondary">
 						<?php echo esc_html( $cta_secondary['text'] ); ?>
 					</a>
 				<?php endif; ?>

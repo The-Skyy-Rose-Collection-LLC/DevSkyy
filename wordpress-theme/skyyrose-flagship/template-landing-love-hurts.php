@@ -20,16 +20,26 @@ get_header();
 
 	<?php
 	/* ───── 1. Hero ───── */
-	get_template_part( 'template-parts/landing/hero', null, array(
-		'collection'    => 'love-hurts',
-		'badge_text'    => 'Family Legacy — The Hurts Collection',
-		'logo_image'    => '/images/hero-overlays/lh-logo-combined.png',
-		'logo_alt'      => 'Love Hurts Collection',
-		'subtitle'      => 'This isn\'t a theme. It\'s what you\'ve survived.',
-		'countdown'     => '72h',
-		'cta_primary'   => array( 'text' => 'Shop the Drop', 'url' => '#products' ),
-		'cta_secondary' => array( 'text' => 'The Story', 'url' => '#story' ),
-	) );
+	get_template_part(
+		'template-parts/landing/hero',
+		null,
+		array(
+			'collection'    => 'love-hurts',
+			'badge_text'    => 'Family Legacy — The Hurts Collection',
+			'logo_image'    => '/images/hero-overlays/lh-logo-combined.png',
+			'logo_alt'      => 'Love Hurts Collection',
+			'subtitle'      => 'This isn\'t a theme. It\'s what you\'ve survived.',
+			'countdown'     => '72h',
+			'cta_primary'   => array(
+				'text' => 'Shop the Drop',
+				'url'  => '#products',
+			),
+			'cta_secondary' => array(
+				'text' => 'The Story',
+				'url'  => '#story',
+			),
+		)
+	);
 	?>
 
 	<?php /* ───── 2. Press Bar ───── */ ?>
@@ -77,12 +87,16 @@ get_header();
 
 	<?php
 	/* ───── 5. Product Grid ───── */
-	get_template_part( 'template-parts/landing/product-grid', null, array(
-		'heading'    => 'The Collection',
-		'subheading' => 'Wear what you\'ve survived.',
-		'skus'       => array( 'lh-004', 'lh-002', 'lh-003', 'lh-006' ),
-		'wear_count' => 200,
-	) );
+	get_template_part(
+		'template-parts/landing/product-grid',
+		null,
+		array(
+			'heading'    => 'The Collection',
+			'subheading' => 'Wear what you\'ve survived.',
+			'skus'       => array( 'lh-004', 'lh-002', 'lh-003', 'lh-006' ),
+			'wear_count' => 200,
+		)
+	);
 	?>
 
 	<?php /* ───── 6. Editorial Gallery ───── */ ?>
@@ -168,31 +182,35 @@ get_header();
 
 	<?php
 	/* ───── 9. FAQ ───── */
-	get_template_part( 'template-parts/landing/faq', null, array(
-		'heading'   => 'Questions We Get Asked',
-		'questions' => array(
-			array(
-				'q' => 'What does "Love Hurts" mean?',
-				'a' => '<p>"Hurts" is the founder\'s actual family name. This collection is deeply personal — it\'s a tribute to everything the family has been through, transformed into something you can wear with pride.</p>',
+	get_template_part(
+		'template-parts/landing/faq',
+		null,
+		array(
+			'heading'   => 'Questions We Get Asked',
+			'questions' => array(
+				array(
+					'q' => 'What does "Love Hurts" mean?',
+					'a' => '<p>"Hurts" is the founder\'s actual family name. This collection is deeply personal — it\'s a tribute to everything the family has been through, transformed into something you can wear with pride.</p>',
+				),
+				array(
+					'q' => 'How does sizing run?',
+					'a' => '<p>Love Hurts pieces run true to size. The joggers and basketball shorts have an athletic fit with adjustable waistbands. The varsity jacket is cut relaxed for layering. When in doubt, go with your usual size.</p>',
+				),
+				array(
+					'q' => 'How should I care for my pieces?',
+					'a' => '<p>Machine wash cold on a gentle cycle, inside out. Hang dry to preserve the satin finish and embroidery details. Do not bleach or iron directly on printed areas.</p>',
+				),
+				array(
+					'q' => 'What is the return policy?',
+					'a' => '<p>We offer a 30-day return policy on all unworn items with original tags attached. Pre-order items can be cancelled for a full refund before they ship.</p>',
+				),
+				array(
+					'q' => 'How long does shipping take?',
+					'a' => '<p>Standard shipping is 5&ndash;7 business days within the US. Express options are available at checkout. International orders typically arrive within 10&ndash;14 business days.</p>',
+				),
 			),
-			array(
-				'q' => 'How does sizing run?',
-				'a' => '<p>Love Hurts pieces run true to size. The joggers and basketball shorts have an athletic fit with adjustable waistbands. The varsity jacket is cut relaxed for layering. When in doubt, go with your usual size.</p>',
-			),
-			array(
-				'q' => 'How should I care for my pieces?',
-				'a' => '<p>Machine wash cold on a gentle cycle, inside out. Hang dry to preserve the satin finish and embroidery details. Do not bleach or iron directly on printed areas.</p>',
-			),
-			array(
-				'q' => 'What is the return policy?',
-				'a' => '<p>We offer a 30-day return policy on all unworn items with original tags attached. Pre-order items can be cancelled for a full refund before they ship.</p>',
-			),
-			array(
-				'q' => 'How long does shipping take?',
-				'a' => '<p>Standard shipping is 5&ndash;7 business days within the US. Express options are available at checkout. International orders typically arrive within 10&ndash;14 business days.</p>',
-			),
-		),
-	) );
+		)
+	);
 	?>
 
 	<?php /* ───── 10. Email CTA ───── */ ?>
@@ -204,12 +222,12 @@ get_header();
 			</p>
 			<form class="lp-cta__form lp-rv" data-delay="2" action="#" method="post">
 				<input class="lp-cta__input"
-				       type="email"
-				       name="email"
-				       placeholder="Your email"
-				       required
-				       autocomplete="email"
-				       aria-label="Email address">
+						type="email"
+						name="email"
+						placeholder="Your email"
+						required
+						autocomplete="email"
+						aria-label="Email address">
 				<button class="lp-cta__submit" type="submit"><?php echo esc_html( 'Join' ); ?></button>
 			</form>
 			<p class="lp-cta__note lp-rv" data-delay="3"><?php echo esc_html( 'Join 12,400+ members' ); ?></p>

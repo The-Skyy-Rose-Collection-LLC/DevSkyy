@@ -18,7 +18,7 @@ get_header();
 		<?php
 		while ( have_posts() ) :
 			the_post();
-		?>
+			?>
 		<article id="post-<?php the_ID(); ?>" <?php post_class( 'skr-page__article' ); ?>>
 			<header class="skr-page__header">
 				<?php the_title( '<h1 class="skr-page__title">', '</h1>' ); ?>
@@ -28,14 +28,16 @@ get_header();
 				<?php
 				the_content();
 
-				wp_link_pages( array(
-					'before' => '<nav class="skr-page-links" aria-label="' . esc_attr__( 'Page navigation', 'skyyrose-flagship' ) . '">',
-					'after'  => '</nav>',
-				) );
+				wp_link_pages(
+					array(
+						'before' => '<nav class="skr-page-links" aria-label="' . esc_attr__( 'Page navigation', 'skyyrose' ) . '">',
+						'after'  => '</nav>',
+					)
+				);
 				?>
 			</div>
 		</article>
-		<?php
+			<?php
 			if ( comments_open() || get_comments_number() ) :
 				comments_template();
 			endif;

@@ -22,9 +22,9 @@ class SkyyRose_Wishlist_Widget extends WP_Widget {
 	public function __construct() {
 		parent::__construct(
 			'skyyrose_wishlist',
-			esc_html__( 'SkyyRose Wishlist', 'skyyrose-flagship' ),
+			esc_html__( 'SkyyRose Wishlist', 'skyyrose' ),
 			array(
-				'description' => esc_html__( 'Display wishlist items in the sidebar.', 'skyyrose-flagship' ),
+				'description' => esc_html__( 'Display wishlist items in the sidebar.', 'skyyrose' ),
 			)
 		);
 	}
@@ -36,7 +36,7 @@ class SkyyRose_Wishlist_Widget extends WP_Widget {
 	 * @param array $instance Saved values from database.
 	 */
 	public function widget( $args, $instance ) {
-		$title       = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'My Wishlist', 'skyyrose-flagship' );
+		$title       = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'My Wishlist', 'skyyrose' );
 		$limit       = ! empty( $instance['limit'] ) ? absint( $instance['limit'] ) : 5;
 		$show_button = ! empty( $instance['show_button'] ) ? $instance['show_button'] : 'yes';
 
@@ -82,7 +82,7 @@ class SkyyRose_Wishlist_Widget extends WP_Widget {
 			<?php if ( 'yes' === $show_button ) : ?>
 				<div class="wishlist-widget-actions">
 					<a href="<?php echo esc_url( get_permalink( get_page_by_path( 'wishlist' ) ) ); ?>" class="button">
-						<?php esc_html_e( 'View All', 'skyyrose-flagship' ); ?>
+						<?php esc_html_e( 'View All', 'skyyrose' ); ?>
 					</a>
 				</div>
 			<?php endif; ?>
@@ -90,7 +90,7 @@ class SkyyRose_Wishlist_Widget extends WP_Widget {
 		} else {
 			?>
 			<div class="wishlist-widget-empty">
-				<p><?php esc_html_e( 'Your wishlist is empty.', 'skyyrose-flagship' ); ?></p>
+				<p><?php esc_html_e( 'Your wishlist is empty.', 'skyyrose' ); ?></p>
 			</div>
 			<?php
 		}
@@ -104,13 +104,13 @@ class SkyyRose_Wishlist_Widget extends WP_Widget {
 	 * @param array $instance The widget options.
 	 */
 	public function form( $instance ) {
-		$title       = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'My Wishlist', 'skyyrose-flagship' );
+		$title       = ! empty( $instance['title'] ) ? $instance['title'] : esc_html__( 'My Wishlist', 'skyyrose' );
 		$limit       = ! empty( $instance['limit'] ) ? absint( $instance['limit'] ) : 5;
 		$show_button = ! empty( $instance['show_button'] ) ? $instance['show_button'] : 'yes';
 		?>
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>">
-				<?php esc_html_e( 'Title:', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Title:', 'skyyrose' ); ?>
 			</label>
 			<input
 				class="widefat"
@@ -123,7 +123,7 @@ class SkyyRose_Wishlist_Widget extends WP_Widget {
 
 		<p>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'limit' ) ); ?>">
-				<?php esc_html_e( 'Number of items to show:', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Number of items to show:', 'skyyrose' ); ?>
 			</label>
 			<input
 				class="tiny-text"
@@ -147,7 +147,7 @@ class SkyyRose_Wishlist_Widget extends WP_Widget {
 				value="yes"
 			>
 			<label for="<?php echo esc_attr( $this->get_field_id( 'show_button' ) ); ?>">
-				<?php esc_html_e( 'Show "View All" button', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Show "View All" button', 'skyyrose' ); ?>
 			</label>
 		</p>
 		<?php

@@ -17,14 +17,14 @@ $cookie_privacy_url = home_url( '/privacy-policy/' );
 ?>
 
 <div id="skyyrose-cookie-consent"
-	 class="cookie-consent cookie-consent--hidden"
-	 role="dialog"
-	 aria-label="<?php esc_attr_e( 'Cookie consent', 'skyyrose-flagship' ); ?>">
+	class="cookie-consent cookie-consent--hidden"
+	role="dialog"
+	aria-label="<?php esc_attr_e( 'Cookie consent', 'skyyrose' ); ?>">
 	<p class="cookie-consent__message">
 		<?php
 		printf(
 			/* translators: %s: opening and closing link tags */
-			esc_html__( 'We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies. %1$sPrivacy Policy%2$s', 'skyyrose-flagship' ),
+			esc_html__( 'We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies. %1$sPrivacy Policy%2$s', 'skyyrose' ),
 			'<a href="' . esc_url( $cookie_privacy_url ) . '" class="cookie-consent__link">',
 			'</a>'
 		);
@@ -32,10 +32,10 @@ $cookie_privacy_url = home_url( '/privacy-policy/' );
 	</p>
 	<div class="cookie-consent__actions">
 		<button id="skyyrose-cookie-accept" class="cookie-consent__btn cookie-consent__btn--accept" type="button">
-			<?php esc_html_e( 'Accept', 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( 'Accept', 'skyyrose' ); ?>
 		</button>
 		<button id="skyyrose-cookie-decline" class="cookie-consent__btn cookie-consent__btn--decline" type="button">
-			<?php esc_html_e( 'Decline', 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( 'Decline', 'skyyrose' ); ?>
 		</button>
 	</div>
 </div>

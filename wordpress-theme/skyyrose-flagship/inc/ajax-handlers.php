@@ -14,7 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Contact Form Submission
  *--------------------------------------------------------------*/
 
@@ -33,7 +34,7 @@ function skyyrose_ajax_contact_submit() {
 		! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['skyyrose_contact_nonce'] ) ), 'skyyrose_contact_form' ) ) {
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -43,17 +44,17 @@ function skyyrose_ajax_contact_submit() {
 	if ( ! empty( $_POST['website'] ) ) {
 		wp_send_json_success(
 			array(
-				'message' => esc_html__( 'Thank you for your message. We will be in touch soon.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Thank you for your message. We will be in touch soon.', 'skyyrose' ),
 			)
 		);
 		return;
 	}
 
 	// Sanitize input fields (contact form sends first_name + last_name).
-	$first_name = mb_substr( sanitize_text_field( wp_unslash( $_POST['first_name'] ?? '' ) ), 0, 100 );
-	$last_name  = mb_substr( sanitize_text_field( wp_unslash( $_POST['last_name'] ?? '' ) ), 0, 100 );
-	$name       = trim( $first_name . ' ' . $last_name );
-	$email      = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
+	$first_name        = mb_substr( sanitize_text_field( wp_unslash( $_POST['first_name'] ?? '' ) ), 0, 100 );
+	$last_name         = mb_substr( sanitize_text_field( wp_unslash( $_POST['last_name'] ?? '' ) ), 0, 100 );
+	$name              = trim( $first_name . ' ' . $last_name );
+	$email             = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
 	$phone             = str_replace( array( "\r", "\n", "\t" ), '', mb_substr( sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) ), 0, 30 ) );
 	$subject_raw       = mb_substr( sanitize_text_field( wp_unslash( $_POST['subject'] ?? '' ) ), 0, 200 );
 	$message           = mb_substr( sanitize_textarea_field( wp_unslash( $_POST['message'] ?? '' ) ), 0, 5000 );
@@ -78,23 +79,23 @@ function skyyrose_ajax_contact_submit() {
 
 	// Map subject slugs to human-readable labels.
 	$subject_labels = array(
-		'general-inquiry'    => __( 'General Inquiry', 'skyyrose-flagship' ),
-		'order-status'       => __( 'Order Status', 'skyyrose-flagship' ),
-		'returns-exchanges'  => __( 'Returns & Exchanges', 'skyyrose-flagship' ),
-		'wholesale-inquiry'  => __( 'Wholesale Inquiry', 'skyyrose-flagship' ),
-		'press-media'        => __( 'Press & Media', 'skyyrose-flagship' ),
-		'collaboration'      => __( 'Collaboration', 'skyyrose-flagship' ),
-		'custom-orders'      => __( 'Custom Orders', 'skyyrose-flagship' ),
-		'press'              => __( 'Press', 'skyyrose-flagship' ),
-		'other'              => __( 'Other', 'skyyrose-flagship' ),
+		'general-inquiry'   => __( 'General Inquiry', 'skyyrose' ),
+		'order-status'      => __( 'Order Status', 'skyyrose' ),
+		'returns-exchanges' => __( 'Returns & Exchanges', 'skyyrose' ),
+		'wholesale-inquiry' => __( 'Wholesale Inquiry', 'skyyrose' ),
+		'press-media'       => __( 'Press & Media', 'skyyrose' ),
+		'collaboration'     => __( 'Collaboration', 'skyyrose' ),
+		'custom-orders'     => __( 'Custom Orders', 'skyyrose' ),
+		'press'             => __( 'Press', 'skyyrose' ),
+		'other'             => __( 'Other', 'skyyrose' ),
 	);
-	$subject = isset( $subject_labels[ $subject_raw ] ) ? $subject_labels[ $subject_raw ] : $subject_labels['other'];
+	$subject        = isset( $subject_labels[ $subject_raw ] ) ? $subject_labels[ $subject_raw ] : $subject_labels['other'];
 
 	// Validate required fields.
 	if ( empty( $name ) || empty( $email ) || empty( $message ) ) {
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Please fill in all required fields.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Please fill in all required fields.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -103,7 +104,7 @@ function skyyrose_ajax_contact_submit() {
 	if ( ! is_email( $email ) ) {
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Please enter a valid email address.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Please enter a valid email address.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -113,14 +114,14 @@ function skyyrose_ajax_contact_submit() {
 	$to      = get_option( 'admin_email' );
 	$subject = ! empty( $subject )
 		? sprintf( '[SkyyRose Contact] %s', $subject )
-		: __( '[SkyyRose Contact] New Message', 'skyyrose-flagship' );
+		: __( '[SkyyRose Contact] New Message', 'skyyrose' );
 
 	// Strip newlines from $name and $email to prevent email header injection.
 	// Compute safe versions BEFORE using in body or headers.
 	$safe_name  = str_replace( array( "\r", "\n", "\t" ), '', $name );
 	$safe_email = str_replace( array( "\r", "\n", "\t" ), '', $email );
 
-	$body = sprintf(
+	$body    = sprintf(
 		"Name: %s\nEmail: %s\nPhone: %s\nOrder Number: %s\nPreferred Contact: %s\nReferral Source: %s\n\nMessage:\n%s",
 		$safe_name,
 		$safe_email,
@@ -130,7 +131,7 @@ function skyyrose_ajax_contact_submit() {
 		$referral_source ? $referral_source : 'Not specified',
 		$message
 	);
-	$headers    = array(
+	$headers = array(
 		'Content-Type: text/plain; charset=UTF-8',
 		sprintf( 'Reply-To: %s <%s>', $safe_name, $safe_email ),
 	);
@@ -140,14 +141,14 @@ function skyyrose_ajax_contact_submit() {
 	if ( $sent ) {
 		wp_send_json_success(
 			array(
-				'message' => esc_html__( 'Thank you for your message. We will be in touch soon.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Thank you for your message. We will be in touch soon.', 'skyyrose' ),
 			)
 		);
 		return;
 	} else {
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Unable to send your message. Please try again later.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Unable to send your message. Please try again later.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -156,7 +157,8 @@ function skyyrose_ajax_contact_submit() {
 add_action( 'wp_ajax_skyyrose_contact_submit', 'skyyrose_ajax_contact_submit' );
 add_action( 'wp_ajax_nopriv_skyyrose_contact_submit', 'skyyrose_ajax_contact_submit' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Newsletter Subscription
  *--------------------------------------------------------------*/
 
@@ -175,7 +177,7 @@ function skyyrose_ajax_newsletter_subscribe() {
 		! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['skyyrose_newsletter_nonce'] ) ), 'skyyrose_newsletter' ) ) {
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -188,7 +190,7 @@ function skyyrose_ajax_newsletter_subscribe() {
 	if ( ! is_email( $email ) ) {
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Please enter a valid email address.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Please enter a valid email address.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -201,7 +203,7 @@ function skyyrose_ajax_newsletter_subscribe() {
 	if ( $attempts >= 5 ) {
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Too many requests. Please try again later.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Too many requests. Please try again later.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -221,7 +223,7 @@ function skyyrose_ajax_newsletter_subscribe() {
 
 	wp_send_json_success(
 		array(
-			'message' => esc_html__( 'Welcome to the SkyyRose family! Check your inbox for your 15% discount code.', 'skyyrose-flagship' ),
+			'message' => esc_html__( 'Welcome to the SkyyRose family! Check your inbox for your 15% discount code.', 'skyyrose' ),
 		)
 	);
 	return;
@@ -229,7 +231,8 @@ function skyyrose_ajax_newsletter_subscribe() {
 add_action( 'wp_ajax_skyyrose_newsletter_subscribe', 'skyyrose_ajax_newsletter_subscribe' );
 add_action( 'wp_ajax_nopriv_skyyrose_newsletter_subscribe', 'skyyrose_ajax_newsletter_subscribe' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Incentive Popup Signup (Pre-Order Gateway)
  *--------------------------------------------------------------*/
 
@@ -248,7 +251,7 @@ function skyyrose_ajax_incentive_signup() {
 		! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['skyyrose_incentive_nonce'] ) ), 'skyyrose_incentive' ) ) {
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -261,7 +264,7 @@ function skyyrose_ajax_incentive_signup() {
 	if ( ! is_email( $email ) ) {
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Please enter a valid email address.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Please enter a valid email address.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -274,7 +277,7 @@ function skyyrose_ajax_incentive_signup() {
 	if ( $attempts >= 5 ) {
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Too many requests. Please try again later.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Too many requests. Please try again later.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -298,7 +301,7 @@ function skyyrose_ajax_incentive_signup() {
 
 	wp_send_json_success(
 		array(
-			'message' => esc_html__( 'You are in! Check your inbox for your 25% discount code and early access details.', 'skyyrose-flagship' ),
+			'message' => esc_html__( 'You are in! Check your inbox for your 25% discount code and early access details.', 'skyyrose' ),
 		)
 	);
 	return;
@@ -306,7 +309,8 @@ function skyyrose_ajax_incentive_signup() {
 add_action( 'wp_ajax_skyyrose_incentive_signup', 'skyyrose_ajax_incentive_signup' );
 add_action( 'wp_ajax_nopriv_skyyrose_incentive_signup', 'skyyrose_ajax_incentive_signup' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Sign In
  *--------------------------------------------------------------*/
 
@@ -325,7 +329,7 @@ function skyyrose_ajax_signin() {
 		! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['skyyrose_signin_nonce'] ) ), 'skyyrose_signin' ) ) {
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -333,13 +337,13 @@ function skyyrose_ajax_signin() {
 
 	// Sanitize input.
 	$email    = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
-	$password = isset( $_POST['password'] ) ? wp_unslash( $_POST['password'] ) : '';
+	$password = isset( $_POST['password'] ) ? sanitize_text_field( wp_unslash( $_POST['password'] ) ) : '';
 
 	// Cap password length to prevent bcrypt DoS via multi-MB payloads.
 	if ( strlen( $password ) > 4096 ) {
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Invalid email or password. Please try again.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Invalid email or password. Please try again.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -348,7 +352,7 @@ function skyyrose_ajax_signin() {
 	if ( empty( $email ) || empty( $password ) ) {
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Please enter both email and password.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Please enter both email and password.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -357,8 +361,8 @@ function skyyrose_ajax_signin() {
 	// Rate limiting: max 5 attempts per email per 15 minutes.
 	// Uses email (not IP) because REMOTE_ADDR is the proxy IP on WordPress.com.
 	$normalized_email = strtolower( trim( $email ) );
-	$cache_key = 'skyyrose_login_attempts_' . md5( $normalized_email );
-	$attempts  = (int) get_transient( $cache_key );
+	$cache_key        = 'skyyrose_login_attempts_' . md5( $normalized_email );
+	$attempts         = (int) get_transient( $cache_key );
 
 	// Per-IP rate limiting removed: on WordPress.com (and all proxy environments),
 	// REMOTE_ADDR is the proxy IP — shared by ALL users. A per-IP bucket of 20
@@ -368,7 +372,7 @@ function skyyrose_ajax_signin() {
 	if ( $attempts >= 5 ) {
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Too many login attempts. Please try again in 15 minutes.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Too many login attempts. Please try again in 15 minutes.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -381,7 +385,7 @@ function skyyrose_ajax_signin() {
 		set_transient( $cache_key, $attempts + 1, 15 * MINUTE_IN_SECONDS );
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Invalid email or password. Please try again.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Invalid email or password. Please try again.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -401,7 +405,7 @@ function skyyrose_ajax_signin() {
 
 	wp_send_json_success(
 		array(
-			'message'      => esc_html__( 'Sign in successful. Redirecting...', 'skyyrose-flagship' ),
+			'message'      => esc_html__( 'Sign in successful. Redirecting...', 'skyyrose' ),
 			'redirect_url' => home_url( '/' ),
 		)
 	);
@@ -416,14 +420,15 @@ add_action(
 		check_ajax_referer( 'skyyrose_signin', 'skyyrose_signin_nonce' );
 		wp_send_json_success(
 			array(
-				'message'      => esc_html__( 'You are already signed in.', 'skyyrose-flagship' ),
+				'message'      => esc_html__( 'You are already signed in.', 'skyyrose' ),
 				'redirect_url' => home_url( '/' ),
 			)
 		);
 	}
 );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Referral Link Tracking
  *--------------------------------------------------------------*/
 
@@ -449,7 +454,7 @@ function skyyrose_ajax_track_referral() {
 		! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'skyyrose-nonce' ) ) {
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Security check failed.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Security check failed.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -461,7 +466,7 @@ function skyyrose_ajax_track_referral() {
 	if ( ! preg_match( '/^SKYY[A-Z0-9]{4,8}$/', $ref_code ) ) {
 		wp_send_json_error(
 			array(
-				'message' => esc_html__( 'Invalid referral code.', 'skyyrose-flagship' ),
+				'message' => esc_html__( 'Invalid referral code.', 'skyyrose' ),
 			)
 		);
 		return;
@@ -473,7 +478,7 @@ function skyyrose_ajax_track_referral() {
 		if ( ! $coupon->get_id() ) {
 			wp_send_json_error(
 				array(
-					'message' => esc_html__( 'Referral code not found.', 'skyyrose-flagship' ),
+					'message' => esc_html__( 'Referral code not found.', 'skyyrose' ),
 				)
 			);
 			return;
@@ -499,7 +504,8 @@ function skyyrose_ajax_track_referral() {
 add_action( 'wp_ajax_skyyrose_track_referral', 'skyyrose_ajax_track_referral' );
 add_action( 'wp_ajax_nopriv_skyyrose_track_referral', 'skyyrose_ajax_track_referral' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Mascot Chat (Scripted — future AI upgrade hook)
  *--------------------------------------------------------------*/
 
@@ -517,7 +523,7 @@ function skyyrose_ajax_mascot_chat() {
 	// Verify nonce.
 	if ( ! isset( $_POST['nonce'] ) ||
 		! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'skyyrose-nonce' ) ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'Security check failed.', 'skyyrose-flagship' ) ) );
+		wp_send_json_error( array( 'message' => esc_html__( 'Security check failed.', 'skyyrose' ) ) );
 		return;
 	}
 
@@ -525,7 +531,7 @@ function skyyrose_ajax_mascot_chat() {
 	$ip_key = 'skyy_chat_' . md5( isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '' );
 	$count  = (int) get_transient( $ip_key );
 	if ( $count >= 20 ) {
-		wp_send_json_error( array( 'message' => esc_html__( 'Too many requests. Slow down!', 'skyyrose-flagship' ) ) );
+		wp_send_json_error( array( 'message' => esc_html__( 'Too many requests. Slow down!', 'skyyrose' ) ) );
 		return;
 	}
 	set_transient( $ip_key, $count + 1, MINUTE_IN_SECONDS );

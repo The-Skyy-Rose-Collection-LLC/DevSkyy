@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<ruleset name="SkyyRose Theme">
+    <description>WordPress coding standards for the SkyyRose theme.</description>
+
+    <file>.</file>
+
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/assets/js/lib/*</exclude-pattern>
+
+    <arg name="extensions" value="php"/>
+    <arg name="colors"/>
+    <arg value="sp"/>
+
+    <rule ref="WordPress">
+        <exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+        <!-- Template-local variables do not need theme prefix -->
+        <exclude name="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound"/>
+        <!-- Comment formatting is enforced by project style, not WPCS -->
+        <exclude name="Squiz.Commenting.BlockComment.CloserSameLine"/>
+        <exclude name="Squiz.Commenting.BlockComment.HasEmptyLineBefore"/>
+        <exclude name="Squiz.Commenting.FunctionComment.Missing"/>
+        <exclude name="Squiz.Commenting.FunctionComment.MissingParamTag"/>
+        <exclude name="Squiz.Commenting.ClassComment.Missing"/>
+        <exclude name="Squiz.Commenting.InlineComment.InvalidEndChar"/>
+        <exclude name="Squiz.Commenting.FileComment.Missing"/>
+        <exclude name="Squiz.Commenting.FileComment.SpacingAfterComment"/>
+        <!-- Short ternary is idiomatic PHP 7+ -->
+        <exclude name="Universal.Operators.DisallowShortTernary.Found"/>
+        <!-- Unused params in WP hook callbacks are expected (WP passes fixed args) -->
+        <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.Found"/>
+        <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed"/>
+        <!-- trigger_error is used intentionally for developer notices -->
+        <exclude name="WordPress.PHP.DevelopmentFunctions.error_log_trigger_error"/>
+        <!-- Unreachable return after wp_send_json is a known false positive -->
+        <exclude name="Squiz.PHP.NonExecutableCode.ReturnNotRequired"/>
+        <!-- Assignment in condition is used intentionally for WP_Query loops -->
+        <exclude name="Generic.CodeAnalysis.AssignmentInCondition.Found"/>
+        <exclude name="WordPress.CodeAnalysis.AssignmentInTernaryCondition.FoundInTernaryCondition"/>
+        <!-- Multiple assignment is common in WP template setup -->
+        <exclude name="Squiz.PHP.DisallowMultipleAssignments.Found"/>
+        <exclude name="Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure"/>
+        <!-- Mixed OO/functions is standard in WP themes -->
+        <exclude name="Universal.Files.SeparateFunctionsFromOO.Mixed"/>
+        <!-- Reserved keyword param names from WP core callbacks -->
+        <exclude name="Universal.NamingConventions.NoReservedKeywordParameterNames.defaultFound"/>
+        <!-- Theme hooks into WP/WC core hook names which cannot be prefixed -->
+        <exclude name="WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound"/>
+        <!-- Template files legitimately set WP globals like $post -->
+        <exclude name="WordPress.WP.GlobalVariablesOverride.Prohibited"/>
+        <!-- Translator comments added where needed, rest are simple %s/%d -->
+        <exclude name="WordPress.WP.I18n.MissingTranslatorsComment"/>
+        <!-- meta_key queries are necessary for WooCommerce product lookups -->
+        <exclude name="WordPress.DB.SlowDBQuery.slow_db_query_meta_key"/>
+        <!-- Internal PHPCS issue with empty template files -->
+        <exclude name="Internal.NoCodeFound"/>
+        <!-- parse_url is acceptable — wp_parse_url is a wrapper with identical behavior -->
+        <exclude name="WordPress.WP.AlternativeFunctions.parse_url_parse_url"/>
+        <!-- error_log is used for server-side debug logging behind WP_DEBUG -->
+        <exclude name="WordPress.PHP.DevelopmentFunctions.error_log_error_log"/>
+        <!-- Third-party scripts (Klaviyo, Facebook SDK) manage their own versioning -->
+        <exclude name="WordPress.WP.EnqueuedResourceParameters.MissingVersion"/>
+    </rule>
+
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="skyyrose"/>
+            </property>
+        </properties>
+    </rule>
+
+    <config name="prefixes" value="skyyrose"/>
+    <config name="minimum_wp_version" value="6.8"/>
+</ruleset>

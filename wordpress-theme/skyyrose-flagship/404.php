@@ -18,32 +18,32 @@ $skyyrose_collections = array_values( skyyrose_get_collections_config() );
 // Quick navigation links: label, url path, SVG icon.
 $skyyrose_quick_links = array(
 	array(
-		'label' => __( 'Shop All', 'skyyrose-flagship' ),
+		'label' => __( 'Shop All', 'skyyrose' ),
 		'path'  => '/shop/',
 		'icon'  => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>',
 	),
 	array(
-		'label' => __( 'New Arrivals', 'skyyrose-flagship' ),
+		'label' => __( 'New Arrivals', 'skyyrose' ),
 		'path'  => '/shop/?orderby=date',
 		'icon'  => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
 	),
 	array(
-		'label' => __( 'Best Sellers', 'skyyrose-flagship' ),
+		'label' => __( 'Best Sellers', 'skyyrose' ),
 		'path'  => '/shop/?orderby=popularity',
 		'icon'  => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>',
 	),
 	array(
-		'label' => __( 'Contact Us', 'skyyrose-flagship' ),
+		'label' => __( 'Contact Us', 'skyyrose' ),
 		'path'  => '/contact/',
 		'icon'  => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',
 	),
 	array(
-		'label' => __( 'About Us', 'skyyrose-flagship' ),
+		'label' => __( 'About Us', 'skyyrose' ),
 		'path'  => '/about/',
 		'icon'  => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
 	),
 	array(
-		'label' => __( 'FAQ', 'skyyrose-flagship' ),
+		'label' => __( 'FAQ', 'skyyrose' ),
 		'path'  => '/faq/',
 		'icon'  => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
 	),
@@ -90,7 +90,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 	foreach ( $skyyrose_404_skus as $skyyrose_404_sku ) {
 		$skyyrose_404_product = skyyrose_get_product( $skyyrose_404_sku );
 		if ( $skyyrose_404_product ) {
-			$skyyrose_404_image = ! empty( $skyyrose_404_product['front_model_image'] )
+			$skyyrose_404_image           = ! empty( $skyyrose_404_product['front_model_image'] )
 				? get_theme_file_uri( $skyyrose_404_product['front_model_image'] )
 				: ( ! empty( $skyyrose_404_product['image'] )
 					? get_theme_file_uri( $skyyrose_404_product['image'] )
@@ -129,45 +129,45 @@ if ( empty( $skyyrose_trending_products ) ) {
 	<div class="error-404-content">
 
 		<!-- ============================
-		     404 Display Number
-		     ============================ -->
-		<h1 class="error-404-number" aria-label="<?php esc_attr_e( 'Error 404', 'skyyrose-flagship' ); ?>">
+			404 Display Number
+			============================ -->
+		<h1 class="error-404-number" aria-label="<?php esc_attr_e( 'Error 404', 'skyyrose' ); ?>">
 			404
 		</h1>
 
 		<!-- ============================
-		     Enhanced Message
-		     ============================ -->
+			Enhanced Message
+			============================ -->
 		<h2 class="error-404-title">
-			<?php esc_html_e( 'Lost in Style', 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( 'Lost in Style', 'skyyrose' ); ?>
 		</h2>
 
 		<p class="error-404-subtitle">
-			<?php esc_html_e( 'The page you\'re looking for has wandered off the runway', 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( 'The page you\'re looking for has wandered off the runway', 'skyyrose' ); ?>
 		</p>
 
 		<p class="error-404-witty">
-			<?php esc_html_e( 'Even our best pieces go off-grid sometimes', 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( 'Even our best pieces go off-grid sometimes', 'skyyrose' ); ?>
 		</p>
 
 		<!-- ============================
-		     Search Bar
-		     ============================ -->
-		<div class="error-404-search" role="search" aria-label="<?php esc_attr_e( 'Search the site', 'skyyrose-flagship' ); ?>">
+			Search Bar
+			============================ -->
+		<div class="error-404-search" role="search" aria-label="<?php esc_attr_e( 'Search the site', 'skyyrose' ); ?>">
 			<form action="<?php echo esc_url( home_url( '/' ) ); ?>" method="get" class="error-404-search-form">
 				<label for="error-404-search-input" class="screen-reader-text">
-					<?php esc_html_e( 'Search for:', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Search for:', 'skyyrose' ); ?>
 				</label>
 				<input
 					type="search"
 					id="error-404-search-input"
 					class="error-404-search-input"
 					name="s"
-					placeholder="<?php esc_attr_e( 'Search products, collections, pages...', 'skyyrose-flagship' ); ?>"
+					placeholder="<?php esc_attr_e( 'Search products, collections, pages...', 'skyyrose' ); ?>"
 					value=""
 					autocomplete="off"
 				/>
-				<button type="submit" class="error-404-search-btn" aria-label="<?php esc_attr_e( 'Search', 'skyyrose-flagship' ); ?>">
+				<button type="submit" class="error-404-search-btn" aria-label="<?php esc_attr_e( 'Search', 'skyyrose' ); ?>">
 					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 						<circle cx="11" cy="11" r="8"/>
 						<line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -177,8 +177,8 @@ if ( empty( $skyyrose_trending_products ) ) {
 		</div>
 
 		<!-- ============================
-		     Brand Mascot — Fun Error State
-		     ============================ -->
+			Brand Mascot — Fun Error State
+			============================ -->
 		<div class="error-404-mascot">
 			<?php
 			$skyyrose_mascot_404_path = SKYYROSE_DIR . '/assets/images/mascot/skyyrose-mascot-404.png';
@@ -193,10 +193,11 @@ if ( empty( $skyyrose_trending_products ) ) {
 				$skyyrose_mascot_display = $skyyrose_mascot_ref_url;
 			}
 
-			if ( $skyyrose_mascot_display ) : ?>
+			if ( $skyyrose_mascot_display ) :
+				?>
 				<img
 					src="<?php echo esc_url( $skyyrose_mascot_display ); ?>"
-					alt="<?php esc_attr_e( 'SkyyRose mascot looking lost — Oops! This page wandered off.', 'skyyrose-flagship' ); ?>"
+					alt="<?php esc_attr_e( 'SkyyRose mascot looking lost — Oops! This page wandered off.', 'skyyrose' ); ?>"
 					class="error-404-mascot__image"
 					width="200"
 					height="250"
@@ -209,16 +210,16 @@ if ( empty( $skyyrose_trending_products ) ) {
 				</div>
 			<?php endif; ?>
 			<p class="error-404-mascot__speech">
-				<?php esc_html_e( "Oops! Even I can't find this page. Let's explore something amazing instead!", 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( "Oops! Even I can't find this page. Let's explore something amazing instead!", 'skyyrose' ); ?>
 			</p>
 		</div>
 
 		<!-- ============================
-		     Collection Quick Links
-		     ============================ -->
-		<nav class="error-404-collections" aria-label="<?php esc_attr_e( 'Browse Collections', 'skyyrose-flagship' ); ?>">
+			Collection Quick Links
+			============================ -->
+		<nav class="error-404-collections" aria-label="<?php esc_attr_e( 'Browse Collections', 'skyyrose' ); ?>">
 			<h3 class="error-404-section-heading">
-				<?php esc_html_e( 'Explore Our World', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Explore Our World', 'skyyrose' ); ?>
 			</h3>
 
 			<div class="error-404-cards">
@@ -234,7 +235,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 							$skyyrose_link  = get_term_link( $skyyrose_term );
 							$skyyrose_count = sprintf(
 								/* translators: %d: number of products */
-								_n( '%d product', '%d products', $skyyrose_term->count, 'skyyrose-flagship' ),
+								_n( '%d product', '%d products', $skyyrose_term->count, 'skyyrose' ),
 								$skyyrose_term->count
 							);
 						}
@@ -243,12 +244,12 @@ if ( empty( $skyyrose_trending_products ) ) {
 					// Fallback URL and explore text.
 					if ( '#' === $skyyrose_link || is_wp_error( $skyyrose_link ) ) {
 						$skyyrose_link  = home_url( '/collection-' . $skyyrose_collection['slug'] . '/' );
-						$skyyrose_count = __( 'Explore', 'skyyrose-flagship' );
+						$skyyrose_count = __( 'Explore', 'skyyrose' );
 					}
 					?>
 					<a href="<?php echo esc_url( $skyyrose_link ); ?>"
-					   class="error-404-card"
-					   style="--card-accent: <?php echo esc_attr( $skyyrose_collection['accent'] ); ?>; --card-glow: <?php echo esc_attr( $skyyrose_collection['glow'] ); ?>">
+						class="error-404-card"
+						style="--card-accent: <?php echo esc_attr( $skyyrose_collection['accent'] ); ?>; --card-glow: <?php echo esc_attr( $skyyrose_collection['glow'] ); ?>">
 						<span class="error-404-card-border" aria-hidden="true"></span>
 						<span class="error-404-card-label">
 							<?php echo esc_html( $skyyrose_collection['label'] ); ?>
@@ -266,11 +267,11 @@ if ( empty( $skyyrose_trending_products ) ) {
 		</nav>
 
 		<!-- ============================
-		     Trending Products
-		     ============================ -->
-		<section class="error-404-trending" aria-label="<?php esc_attr_e( 'Trending Products', 'skyyrose-flagship' ); ?>">
+			Trending Products
+			============================ -->
+		<section class="error-404-trending" aria-label="<?php esc_attr_e( 'Trending Products', 'skyyrose' ); ?>">
 			<h3 class="error-404-section-heading">
-				<?php esc_html_e( 'Trending Right Now', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Trending Right Now', 'skyyrose' ); ?>
 			</h3>
 
 			<div class="error-404-trending-grid">
@@ -316,11 +317,11 @@ if ( empty( $skyyrose_trending_products ) ) {
 		</section>
 
 		<!-- ============================
-		     Quick Navigation
-		     ============================ -->
-		<nav class="error-404-quick-nav" aria-label="<?php esc_attr_e( 'Quick Navigation', 'skyyrose-flagship' ); ?>">
+			Quick Navigation
+			============================ -->
+		<nav class="error-404-quick-nav" aria-label="<?php esc_attr_e( 'Quick Navigation', 'skyyrose' ); ?>">
 			<h3 class="error-404-section-heading">
-				<?php esc_html_e( 'Quick Links', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Quick Links', 'skyyrose' ); ?>
 			</h3>
 
 			<div class="error-404-nav-grid">
@@ -341,45 +342,45 @@ if ( empty( $skyyrose_trending_products ) ) {
 		</nav>
 
 		<!-- ============================
-		     Newsletter CTA
-		     ============================ -->
-		<section class="error-404-newsletter" aria-label="<?php esc_attr_e( 'Newsletter Signup', 'skyyrose-flagship' ); ?>">
+			Newsletter CTA
+			============================ -->
+		<section class="error-404-newsletter" aria-label="<?php esc_attr_e( 'Newsletter Signup', 'skyyrose' ); ?>">
 			<h3 class="error-404-newsletter-heading">
-				<?php esc_html_e( 'While you\'re here, join the family', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'While you\'re here, join the family', 'skyyrose' ); ?>
 			</h3>
 			<p class="error-404-newsletter-text">
-				<?php esc_html_e( 'Be the first to know about drops, exclusives, and events.', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Be the first to know about drops, exclusives, and events.', 'skyyrose' ); ?>
 			</p>
-			<form class="error-404-newsletter-form" aria-label="<?php esc_attr_e( 'Newsletter signup', 'skyyrose-flagship' ); ?>" action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>" method="post">
+			<form class="error-404-newsletter-form" aria-label="<?php esc_attr_e( 'Newsletter signup', 'skyyrose' ); ?>" action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>" method="post">
 				<?php wp_nonce_field( 'skyyrose_newsletter', 'skyyrose_newsletter_nonce' ); ?>
 				<input type="hidden" name="action" value="skyyrose_newsletter_subscribe">
 				<label for="error-404-newsletter-email" class="screen-reader-text">
-					<?php esc_html_e( 'Email address', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Email address', 'skyyrose' ); ?>
 				</label>
 				<input
 					type="email"
 					id="error-404-newsletter-email"
 					name="email"
 					class="error-404-newsletter-input"
-					placeholder="<?php esc_attr_e( 'Enter your email', 'skyyrose-flagship' ); ?>"
+					placeholder="<?php esc_attr_e( 'Enter your email', 'skyyrose' ); ?>"
 					required
 					autocomplete="email"
 				/>
 				<button type="submit" class="error-404-newsletter-btn">
-					<?php esc_html_e( 'Join', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Join', 'skyyrose' ); ?>
 				</button>
 			</form>
 		</section>
 
 		<!-- ============================
-		     Dual CTA Buttons
-		     ============================ -->
+			Dual CTA Buttons
+			============================ -->
 		<div class="error-404-cta-group">
 			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="error-404-cta error-404-cta--primary">
-				<?php esc_html_e( 'Return Home', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Return Home', 'skyyrose' ); ?>
 			</a>
 			<a href="<?php echo esc_url( home_url( '/shop/' ) ); ?>" class="error-404-cta error-404-cta--secondary">
-				<?php esc_html_e( 'Continue Shopping', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Continue Shopping', 'skyyrose' ); ?>
 			</a>
 		</div>
 
