@@ -6,7 +6,7 @@
  * Runs once via `after_switch_theme` and can be re-triggered via
  * `skyyrose_setup_menus()` manually.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.2.0
  */
 
@@ -86,237 +86,237 @@ function skyyrose_setup_menus() {
 function skyyrose_get_menu_definitions() {
 	return array(
 		'primary'      => array(
-			'name'  => __( 'Primary Menu', 'skyyrose-flagship' ),
+			'name'  => __( 'Primary Menu', 'skyyrose' ),
 			'items' => array(
 				array(
-					'title' => __( 'Home', 'skyyrose-flagship' ),
+					'title' => __( 'Home', 'skyyrose' ),
 					'url'   => '/',
 				),
 				array(
-					'title'    => __( 'Collections', 'skyyrose-flagship' ),
+					'title'    => __( 'Collections', 'skyyrose' ),
 					'url'      => '/collections/',
 					'children' => array(
 						array(
-							'title' => __( 'Black Rose', 'skyyrose-flagship' ),
+							'title' => __( 'Black Rose', 'skyyrose' ),
 							'url'   => '/collection-black-rose/',
 						),
 						array(
-							'title' => __( 'Love Hurts', 'skyyrose-flagship' ),
+							'title' => __( 'Love Hurts', 'skyyrose' ),
 							'url'   => '/collection-love-hurts/',
 						),
 						array(
-							'title' => __( 'Signature', 'skyyrose-flagship' ),
+							'title' => __( 'Signature', 'skyyrose' ),
 							'url'   => '/collection-signature/',
 						),
 						array(
-							'title' => __( 'Kids Capsule', 'skyyrose-flagship' ),
+							'title' => __( 'Kids Capsule', 'skyyrose' ),
 							'url'   => '/collection-kids-capsule/',
 						),
 					),
 				),
 				array(
-					'title'    => __( 'Experiences', 'skyyrose-flagship' ),
+					'title'    => __( 'Experiences', 'skyyrose' ),
 					'url'      => '/experiences/',
 					'children' => array(
 						array(
-							'title' => __( 'The Garden', 'skyyrose-flagship' ),
+							'title' => __( 'The Garden', 'skyyrose' ),
 							'url'   => '/experience-black-rose/',
 						),
 						array(
-							'title' => __( 'The Ballroom', 'skyyrose-flagship' ),
+							'title' => __( 'The Ballroom', 'skyyrose' ),
 							'url'   => '/experience-love-hurts/',
 						),
 						array(
-							'title' => __( 'The Runway', 'skyyrose-flagship' ),
+							'title' => __( 'The Runway', 'skyyrose' ),
 							'url'   => '/experience-signature/',
 						),
 					),
 				),
 				array(
-					'title' => __( 'Pre-Order', 'skyyrose-flagship' ),
+					'title' => __( 'Pre-Order', 'skyyrose' ),
 					'url'   => '/pre-order/',
 				),
 				array(
-					'title' => __( 'About', 'skyyrose-flagship' ),
+					'title' => __( 'About', 'skyyrose' ),
 					'url'   => '/about/',
 				),
 				array(
-					'title' => __( 'Contact', 'skyyrose-flagship' ),
+					'title' => __( 'Contact', 'skyyrose' ),
 					'url'   => '/contact/',
 				),
 			),
 		),
 		'footer'       => array(
-			'name'  => __( 'Footer Menu', 'skyyrose-flagship' ),
+			'name'  => __( 'Footer Menu', 'skyyrose' ),
 			'items' => array(
 				array(
-					'title' => __( 'About', 'skyyrose-flagship' ),
+					'title' => __( 'About', 'skyyrose' ),
 					'url'   => '/about/',
 				),
 				array(
-					'title' => __( 'Contact', 'skyyrose-flagship' ),
+					'title' => __( 'Contact', 'skyyrose' ),
 					'url'   => '/contact/',
 				),
 				array(
-					'title' => __( 'FAQ', 'skyyrose-flagship' ),
+					'title' => __( 'FAQ', 'skyyrose' ),
 					'url'   => '/contact/#faq',
 				),
 				array(
-					'title' => __( 'Privacy Policy', 'skyyrose-flagship' ),
+					'title' => __( 'Privacy Policy', 'skyyrose' ),
 					'url'   => '/privacy-policy/',
 				),
 				array(
-					'title' => __( 'Terms of Service', 'skyyrose-flagship' ),
+					'title' => __( 'Terms of Service', 'skyyrose' ),
 					'url'   => '/terms-of-service/',
 				),
 			),
 		),
 		'footer-shop'  => array(
-			'name'  => __( 'Footer - Shop', 'skyyrose-flagship' ),
+			'name'  => __( 'Footer - Shop', 'skyyrose' ),
 			'items' => array(
 				array(
-					'title' => __( 'Black Rose', 'skyyrose-flagship' ),
+					'title' => __( 'Black Rose', 'skyyrose' ),
 					'url'   => '/collection-black-rose/',
 				),
 				array(
-					'title' => __( 'Love Hurts', 'skyyrose-flagship' ),
+					'title' => __( 'Love Hurts', 'skyyrose' ),
 					'url'   => '/collection-love-hurts/',
 				),
 				array(
-					'title' => __( 'Signature', 'skyyrose-flagship' ),
+					'title' => __( 'Signature', 'skyyrose' ),
 					'url'   => '/collection-signature/',
 				),
 				array(
-					'title' => __( 'Pre-Order', 'skyyrose-flagship' ),
+					'title' => __( 'Pre-Order', 'skyyrose' ),
 					'url'   => '/pre-order/',
 				),
 			),
 		),
 		'footer-help'  => array(
-			'name'  => __( 'Footer - Help', 'skyyrose-flagship' ),
+			'name'  => __( 'Footer - Help', 'skyyrose' ),
 			'items' => array(
 				array(
-					'title' => __( 'FAQ', 'skyyrose-flagship' ),
+					'title' => __( 'FAQ', 'skyyrose' ),
 					'url'   => '/contact/#faq',
 				),
 				array(
-					'title' => __( 'Contact Us', 'skyyrose-flagship' ),
+					'title' => __( 'Contact Us', 'skyyrose' ),
 					'url'   => '/contact/',
 				),
 				array(
-					'title' => __( 'Pre-Order', 'skyyrose-flagship' ),
+					'title' => __( 'Pre-Order', 'skyyrose' ),
 					'url'   => '/pre-order/',
 				),
 			),
 		),
 		'footer-legal' => array(
-			'name'  => __( 'Footer - Legal', 'skyyrose-flagship' ),
+			'name'  => __( 'Footer - Legal', 'skyyrose' ),
 			'items' => array(
 				array(
-					'title' => __( 'Privacy Policy', 'skyyrose-flagship' ),
+					'title' => __( 'Privacy Policy', 'skyyrose' ),
 					'url'   => '/privacy-policy/',
 				),
 				array(
-					'title' => __( 'Terms of Service', 'skyyrose-flagship' ),
+					'title' => __( 'Terms of Service', 'skyyrose' ),
 					'url'   => '/terms-of-service/',
 				),
 			),
 		),
 		'mobile'       => array(
-			'name'  => __( 'Mobile Menu', 'skyyrose-flagship' ),
+			'name'  => __( 'Mobile Menu', 'skyyrose' ),
 			'items' => array(
 				array(
-					'title' => __( 'Home', 'skyyrose-flagship' ),
+					'title' => __( 'Home', 'skyyrose' ),
 					'url'   => '/',
 				),
 				array(
-					'title'    => __( 'Collections', 'skyyrose-flagship' ),
+					'title'    => __( 'Collections', 'skyyrose' ),
 					'url'      => '/collections/',
 					'children' => array(
 						array(
-							'title' => __( 'Black Rose', 'skyyrose-flagship' ),
+							'title' => __( 'Black Rose', 'skyyrose' ),
 							'url'   => '/collection-black-rose/',
 						),
 						array(
-							'title' => __( 'Love Hurts', 'skyyrose-flagship' ),
+							'title' => __( 'Love Hurts', 'skyyrose' ),
 							'url'   => '/collection-love-hurts/',
 						),
 						array(
-							'title' => __( 'Signature', 'skyyrose-flagship' ),
+							'title' => __( 'Signature', 'skyyrose' ),
 							'url'   => '/collection-signature/',
 						),
 						array(
-							'title' => __( 'Kids Capsule', 'skyyrose-flagship' ),
+							'title' => __( 'Kids Capsule', 'skyyrose' ),
 							'url'   => '/collection-kids-capsule/',
 						),
 					),
 				),
 				array(
-					'title'    => __( 'Experiences', 'skyyrose-flagship' ),
+					'title'    => __( 'Experiences', 'skyyrose' ),
 					'url'      => '/experiences/',
 					'children' => array(
 						array(
-							'title' => __( 'The Garden', 'skyyrose-flagship' ),
+							'title' => __( 'The Garden', 'skyyrose' ),
 							'url'   => '/experience-black-rose/',
 						),
 						array(
-							'title' => __( 'The Ballroom', 'skyyrose-flagship' ),
+							'title' => __( 'The Ballroom', 'skyyrose' ),
 							'url'   => '/experience-love-hurts/',
 						),
 						array(
-							'title' => __( 'The Runway', 'skyyrose-flagship' ),
+							'title' => __( 'The Runway', 'skyyrose' ),
 							'url'   => '/experience-signature/',
 						),
 					),
 				),
 				array(
-					'title' => __( 'Pre-Order', 'skyyrose-flagship' ),
+					'title' => __( 'Pre-Order', 'skyyrose' ),
 					'url'   => '/pre-order/',
 				),
 				array(
-					'title' => __( 'About', 'skyyrose-flagship' ),
+					'title' => __( 'About', 'skyyrose' ),
 					'url'   => '/about/',
 				),
 				array(
-					'title' => __( 'Contact', 'skyyrose-flagship' ),
+					'title' => __( 'Contact', 'skyyrose' ),
 					'url'   => '/contact/',
 				),
 			),
 		),
 		'collection'   => array(
-			'name'  => __( 'Collection Navigation', 'skyyrose-flagship' ),
+			'name'  => __( 'Collection Navigation', 'skyyrose' ),
 			'items' => array(
 				array(
-					'title' => __( 'Black Rose', 'skyyrose-flagship' ),
+					'title' => __( 'Black Rose', 'skyyrose' ),
 					'url'   => '/collection-black-rose/',
 				),
 				array(
-					'title' => __( 'Love Hurts', 'skyyrose-flagship' ),
+					'title' => __( 'Love Hurts', 'skyyrose' ),
 					'url'   => '/collection-love-hurts/',
 				),
 				array(
-					'title' => __( 'Signature', 'skyyrose-flagship' ),
+					'title' => __( 'Signature', 'skyyrose' ),
 					'url'   => '/collection-signature/',
 				),
 				array(
-					'title' => __( 'Kids Capsule', 'skyyrose-flagship' ),
+					'title' => __( 'Kids Capsule', 'skyyrose' ),
 					'url'   => '/collection-kids-capsule/',
 				),
 			),
 		),
 		'experiences'  => array(
-			'name'  => __( 'Experiences Navigation', 'skyyrose-flagship' ),
+			'name'  => __( 'Experiences Navigation', 'skyyrose' ),
 			'items' => array(
 				array(
-					'title' => __( 'The Garden', 'skyyrose-flagship' ),
+					'title' => __( 'The Garden', 'skyyrose' ),
 					'url'   => '/experience-black-rose/',
 				),
 				array(
-					'title' => __( 'The Ballroom', 'skyyrose-flagship' ),
+					'title' => __( 'The Ballroom', 'skyyrose' ),
 					'url'   => '/experience-love-hurts/',
 				),
 				array(
-					'title' => __( 'The Runway', 'skyyrose-flagship' ),
+					'title' => __( 'The Runway', 'skyyrose' ),
 					'url'   => '/experience-signature/',
 				),
 			),

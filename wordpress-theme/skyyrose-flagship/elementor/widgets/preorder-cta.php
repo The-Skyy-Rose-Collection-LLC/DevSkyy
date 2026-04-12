@@ -5,7 +5,7 @@
  * Full-width urgency banner with live countdown timer,
  * pulsing CTA button, and "limited pieces" messaging.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.3.0
  */
 
@@ -20,7 +20,7 @@ class SkyyRose_Preorder_CTA_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_title() {
-		return esc_html__( 'Pre-Order CTA', 'skyyrose-flagship' );
+		return esc_html__( 'Pre-Order CTA', 'skyyrose' );
 	}
 
 	public function get_icon() {
@@ -37,46 +37,67 @@ class SkyyRose_Preorder_CTA_Widget extends \Elementor\Widget_Base {
 
 	protected function register_controls() {
 
-		$this->start_controls_section( 'section_content', array(
-			'label' => esc_html__( 'Content', 'skyyrose-flagship' ),
-			'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
-		) );
+		$this->start_controls_section(
+			'section_content',
+			array(
+				'label' => esc_html__( 'Content', 'skyyrose' ),
+				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
+			)
+		);
 
-		$this->add_control( 'headline', array(
-			'label'   => esc_html__( 'Headline', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::TEXT,
-			'default' => esc_html__( 'Limited Edition — Pre-Order Now', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'headline',
+			array(
+				'label'   => esc_html__( 'Headline', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::TEXT,
+				'default' => esc_html__( 'Limited Edition — Pre-Order Now', 'skyyrose' ),
+			)
+		);
 
-		$this->add_control( 'subtext', array(
-			'label'   => esc_html__( 'Subtext', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::TEXTAREA,
-			'default' => esc_html__( 'Only 250 pieces per style. Once they are gone, they are gone.', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'subtext',
+			array(
+				'label'   => esc_html__( 'Subtext', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::TEXTAREA,
+				'default' => esc_html__( 'Only 250 pieces per style. Once they are gone, they are gone.', 'skyyrose' ),
+			)
+		);
 
-		$this->add_control( 'deadline', array(
-			'label'       => esc_html__( 'Countdown Deadline', 'skyyrose-flagship' ),
-			'type'        => \Elementor\Controls_Manager::DATE_TIME,
-			'description' => esc_html__( 'Leave empty to hide countdown.', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'deadline',
+			array(
+				'label'       => esc_html__( 'Countdown Deadline', 'skyyrose' ),
+				'type'        => \Elementor\Controls_Manager::DATE_TIME,
+				'description' => esc_html__( 'Leave empty to hide countdown.', 'skyyrose' ),
+			)
+		);
 
-		$this->add_control( 'cta_text', array(
-			'label'   => esc_html__( 'CTA Text', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::TEXT,
-			'default' => esc_html__( 'Secure Your Piece', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'cta_text',
+			array(
+				'label'   => esc_html__( 'CTA Text', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::TEXT,
+				'default' => esc_html__( 'Secure Your Piece', 'skyyrose' ),
+			)
+		);
 
-		$this->add_control( 'cta_url', array(
-			'label'   => esc_html__( 'CTA URL', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::URL,
-			'default' => array( 'url' => '/pre-order/' ),
-		) );
+		$this->add_control(
+			'cta_url',
+			array(
+				'label'   => esc_html__( 'CTA URL', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::URL,
+				'default' => array( 'url' => '/pre-order/' ),
+			)
+		);
 
-		$this->add_control( 'collection_accent', array(
-			'label'   => esc_html__( 'Accent Color', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::COLOR,
-			'default' => '#B76E79',
-		) );
+		$this->add_control(
+			'collection_accent',
+			array(
+				'label'   => esc_html__( 'Accent Color', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::COLOR,
+				'default' => '#B76E79',
+			)
+		);
 
 		$this->end_controls_section();
 	}
@@ -84,9 +105,9 @@ class SkyyRose_Preorder_CTA_Widget extends \Elementor\Widget_Base {
 	protected function render() {
 		$settings = $this->get_settings_for_display();
 		$accent   = $settings['collection_accent'];
-		$r = hexdec( substr( $accent, 1, 2 ) );
-		$g = hexdec( substr( $accent, 3, 2 ) );
-		$b = hexdec( substr( $accent, 5, 2 ) );
+		$r        = hexdec( substr( $accent, 1, 2 ) );
+		$g        = hexdec( substr( $accent, 3, 2 ) );
+		$b        = hexdec( substr( $accent, 5, 2 ) );
 
 		$cta_url = ! empty( $settings['cta_url']['url'] ) ? $settings['cta_url']['url'] : '/pre-order/';
 		?>
@@ -109,12 +130,13 @@ class SkyyRose_Preorder_CTA_Widget extends \Elementor\Widget_Base {
 					style="display:flex;justify-content:center;gap:32px;margin-bottom:40px;">
 					<?php
 					$units = array(
-						'days'  => esc_html__( 'Days', 'skyyrose-flagship' ),
-						'hours' => esc_html__( 'Hours', 'skyyrose-flagship' ),
-						'mins'  => esc_html__( 'Mins', 'skyyrose-flagship' ),
-						'secs'  => esc_html__( 'Secs', 'skyyrose-flagship' ),
+						'days'  => esc_html__( 'Days', 'skyyrose' ),
+						'hours' => esc_html__( 'Hours', 'skyyrose' ),
+						'mins'  => esc_html__( 'Mins', 'skyyrose' ),
+						'secs'  => esc_html__( 'Secs', 'skyyrose' ),
 					);
-					foreach ( $units as $class => $label ) : ?>
+					foreach ( $units as $class => $label ) :
+						?>
 						<div style="text-align:center;">
 							<span class="cd-<?php echo esc_attr( $class ); ?>"
 								style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,6vw,64px);

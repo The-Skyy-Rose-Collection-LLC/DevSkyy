@@ -1,5 +1,5 @@
 /**
- * Holo Product Card — SkyyRose Flagship v5.0.0
+ * Holo Product Card — SkyyRose v5.0.0
  *
  * Physics-based magnetic tilt, holographic cursor refraction,
  * front/back crossfade, ambient collection glow, quick-add drawer.
@@ -14,7 +14,7 @@
  *   --holo-x, --holo-y  Cursor position (0-100%)
  *   --holo-angle         Cursor angle for conic gradient
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   5.0.0
  */
 

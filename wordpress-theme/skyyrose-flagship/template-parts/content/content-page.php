@@ -2,7 +2,7 @@
 /**
  * Template part for displaying page content
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since 1.0.0
  */
 
@@ -25,7 +25,7 @@
 
 		wp_link_pages(
 			array(
-				'before' => '<div class="page-links">' . esc_html__( 'Pages:', 'skyyrose-flagship' ),
+				'before' => '<div class="page-links">' . esc_html__( 'Pages:', 'skyyrose' ),
 				'after'  => '</div>',
 			)
 		);
@@ -39,7 +39,7 @@
 				sprintf(
 					wp_kses(
 						/* translators: %s: Name of current post. Only visible to screen readers */
-						__( 'Edit <span class="screen-reader-text">%s</span>', 'skyyrose-flagship' ),
+						__( 'Edit <span class="screen-reader-text">%s</span>', 'skyyrose' ),
 						array(
 							'span' => array(
 								'class' => array(),

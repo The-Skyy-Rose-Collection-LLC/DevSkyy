@@ -5,7 +5,7 @@
  * Registers theme supports, navigation menus, custom image sizes,
  * content width, widget areas, and WooCommerce HPOS compatibility.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   1.0.0
  */
 
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function skyyrose_setup() {
 
 	// Make the theme translatable.
-	load_theme_textdomain( 'skyyrose-flagship', SKYYROSE_DIR . '/languages' );
+	load_theme_textdomain( 'skyyrose', SKYYROSE_DIR . '/languages' );
 
 	// Add default posts and comments RSS feed links to head.
 	add_theme_support( 'automatic-feed-links' );
@@ -61,15 +61,15 @@ function skyyrose_setup() {
 	 */
 	register_nav_menus(
 		array(
-			'primary'      => esc_html__( 'Primary Menu', 'skyyrose-flagship' ),
-			'collection'   => esc_html__( 'Collection Navigation', 'skyyrose-flagship' ),
-			'experiences'  => esc_html__( 'Experiences Navigation', 'skyyrose-flagship' ),
-			'footer-shop'  => esc_html__( 'Footer - Shop', 'skyyrose-flagship' ),
-			'footer-help'  => esc_html__( 'Footer - Help', 'skyyrose-flagship' ),
-			'footer-legal' => esc_html__( 'Footer - Legal', 'skyyrose-flagship' ),
-			'footer'       => esc_html__( 'Footer Menu', 'skyyrose-flagship' ),
-			'mobile'       => esc_html__( 'Mobile Menu', 'skyyrose-flagship' ),
-			'top-bar'      => esc_html__( 'Top Bar Menu', 'skyyrose-flagship' ),
+			'primary'      => esc_html__( 'Primary Menu', 'skyyrose' ),
+			'collection'   => esc_html__( 'Collection Navigation', 'skyyrose' ),
+			'experiences'  => esc_html__( 'Experiences Navigation', 'skyyrose' ),
+			'footer-shop'  => esc_html__( 'Footer - Shop', 'skyyrose' ),
+			'footer-help'  => esc_html__( 'Footer - Help', 'skyyrose' ),
+			'footer-legal' => esc_html__( 'Footer - Legal', 'skyyrose' ),
+			'footer'       => esc_html__( 'Footer Menu', 'skyyrose' ),
+			'mobile'       => esc_html__( 'Mobile Menu', 'skyyrose' ),
+			'top-bar'      => esc_html__( 'Top Bar Menu', 'skyyrose' ),
 		)
 	);
 
@@ -175,29 +175,29 @@ function skyyrose_widgets_init() {
 
 	$sidebars = array(
 		array(
-			'name'        => esc_html__( 'Primary Sidebar', 'skyyrose-flagship' ),
+			'name'        => esc_html__( 'Primary Sidebar', 'skyyrose' ),
 			'id'          => 'sidebar-1',
-			'description' => esc_html__( 'Add widgets here to appear in your sidebar.', 'skyyrose-flagship' ),
+			'description' => esc_html__( 'Add widgets here to appear in your sidebar.', 'skyyrose' ),
 		),
 		array(
-			'name'        => esc_html__( 'Footer Area 1', 'skyyrose-flagship' ),
+			'name'        => esc_html__( 'Footer Area 1', 'skyyrose' ),
 			'id'          => 'footer-1',
-			'description' => esc_html__( 'First footer widget area.', 'skyyrose-flagship' ),
+			'description' => esc_html__( 'First footer widget area.', 'skyyrose' ),
 		),
 		array(
-			'name'        => esc_html__( 'Footer Area 2', 'skyyrose-flagship' ),
+			'name'        => esc_html__( 'Footer Area 2', 'skyyrose' ),
 			'id'          => 'footer-2',
-			'description' => esc_html__( 'Second footer widget area.', 'skyyrose-flagship' ),
+			'description' => esc_html__( 'Second footer widget area.', 'skyyrose' ),
 		),
 		array(
-			'name'        => esc_html__( 'Footer Area 3', 'skyyrose-flagship' ),
+			'name'        => esc_html__( 'Footer Area 3', 'skyyrose' ),
 			'id'          => 'footer-3',
-			'description' => esc_html__( 'Third footer widget area.', 'skyyrose-flagship' ),
+			'description' => esc_html__( 'Third footer widget area.', 'skyyrose' ),
 		),
 		array(
-			'name'        => esc_html__( 'Footer Area 4', 'skyyrose-flagship' ),
+			'name'        => esc_html__( 'Footer Area 4', 'skyyrose' ),
 			'id'          => 'footer-4',
-			'description' => esc_html__( 'Fourth footer widget area.', 'skyyrose-flagship' ),
+			'description' => esc_html__( 'Fourth footer widget area.', 'skyyrose' ),
 		),
 	);
 
@@ -211,9 +211,9 @@ function skyyrose_widgets_init() {
 			array_merge(
 				$widget_defaults,
 				array(
-					'name'        => esc_html__( 'Shop Sidebar', 'skyyrose-flagship' ),
+					'name'        => esc_html__( 'Shop Sidebar', 'skyyrose' ),
 					'id'          => 'shop-sidebar',
-					'description' => esc_html__( 'Widgets for WooCommerce shop pages.', 'skyyrose-flagship' ),
+					'description' => esc_html__( 'Widgets for WooCommerce shop pages.', 'skyyrose' ),
 				)
 			)
 		);
@@ -230,8 +230,8 @@ add_action( 'widgets_init', 'skyyrose_widgets_init' );
 function skyyrose_register_wishlist_cpt() {
 	$args = array(
 		'labels'              => array(
-			'name'          => esc_html__( 'Wishlists', 'skyyrose-flagship' ),
-			'singular_name' => esc_html__( 'Wishlist', 'skyyrose-flagship' ),
+			'name'          => esc_html__( 'Wishlists', 'skyyrose' ),
+			'singular_name' => esc_html__( 'Wishlist', 'skyyrose' ),
 		),
 		'public'              => false,
 		'has_archive'         => false,

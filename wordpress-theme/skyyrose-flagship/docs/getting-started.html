@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Getting Started &mdash; SkyyRose Theme</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0A0A0A; color: #F5F5F0; line-height: 1.7; padding: 2rem; max-width: 900px; margin: 0 auto; }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    h2 { color: #B76E79; margin: 2rem 0 1rem; font-size: 1.4rem; }
+    h3 { margin: 1.5rem 0 0.5rem; }
+    p, li { margin-bottom: 0.75rem; }
+    ol, ul { padding-left: 1.5rem; }
+    a { color: #B76E79; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .doc-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 1rem 0; border-bottom: 1px solid #222; margin-bottom: 2rem; }
+    .doc-nav a { padding: 0.35rem 0.75rem; border: 1px solid #333; border-radius: 4px; font-size: 0.85rem; }
+    .doc-nav a.active { background: #B76E79; color: #0A0A0A; border-color: #B76E79; }
+    code { background: #1a1a1a; padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
+    .step { background: #111; border-left: 3px solid #B76E79; padding: 1rem 1.25rem; margin: 1rem 0; border-radius: 0 4px 4px 0; }
+    .step strong { color: #B76E79; }
+    .note { background: #1a1610; border: 1px solid #3a2a10; padding: 0.75rem 1rem; border-radius: 4px; margin: 1rem 0; font-size: 0.95rem; }
+    footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #222; font-size: 0.85rem; color: #888; }
+  </style>
+</head>
+<body>
+  <nav class="doc-nav">
+    <a href="index.html">Overview</a>
+    <a href="installation.html">Installation</a>
+    <a href="getting-started.html" class="active">Getting Started</a>
+    <a href="collections.html">Collections</a>
+    <a href="kids-capsule.html">Kids Capsule</a>
+    <a href="elementor.html">Elementor</a>
+    <a href="builders.html">Page Builders</a>
+    <a href="woocommerce.html">WooCommerce</a>
+    <a href="customization.html">Customization</a>
+    <a href="changelog.html">Changelog</a>
+    <a href="credits.html">Credits</a>
+  </nav>
+
+  <h1>Getting Started</h1>
+  <p>This guide walks you through your first-launch configuration: branding, menus, homepage, and collection pages.</p>
+
+  <h2>1. Customizer Settings</h2>
+  <div class="step">
+    <p>Go to <strong>Appearance &gt; Customize</strong> to access all SkyyRose theme options.</p>
+
+    <h3>Brand Colors</h3>
+    <ul>
+      <li><strong>Accent Color</strong> &mdash; defaults to Rose Gold <code>#B76E79</code>. Used for buttons, links, and highlights.</li>
+      <li><strong>Background Color</strong> &mdash; defaults to <code>#0A0A0A</code>. The dark base of the theme.</li>
+      <li><strong>Text Color</strong> &mdash; defaults to <code>#F5F5F0</code>.</li>
+    </ul>
+
+    <h3>Logo</h3>
+    <ul>
+      <li>Navigate to <strong>Site Identity</strong> in the Customizer.</li>
+      <li>Upload your logo (recommended size: 200x60px, SVG or PNG with transparency).</li>
+      <li>Set the site title and tagline as fallback text.</li>
+    </ul>
+
+    <h3>Social URLs</h3>
+    <ul>
+      <li>Navigate to <strong>SkyyRose Settings &gt; Social Links</strong>.</li>
+      <li>Enter URLs for Instagram, TikTok, X (Twitter), Facebook, and Pinterest.</li>
+      <li>Icons will appear automatically in the header and footer.</li>
+    </ul>
+  </div>
+
+  <h2>2. Setting Up Menus</h2>
+  <div class="step">
+    <p>Go to <strong>Appearance &gt; Menus</strong> (or use the Customizer under <strong>Menus</strong>).</p>
+    <p>SkyyRose registers four menu locations:</p>
+    <ul>
+      <li><strong>Primary</strong> &mdash; Main navigation in the header. Add your collection pages, Shop, About, and Contact.</li>
+      <li><strong>Footer Shop</strong> &mdash; Appears in the footer. Suggested links: Shop All, New Arrivals, Sale, Gift Cards.</li>
+      <li><strong>Footer Help</strong> &mdash; Appears in the footer. Suggested links: FAQ, Shipping &amp; Returns, Size Guide, Contact.</li>
+      <li><strong>Footer Legal</strong> &mdash; Appears in the footer. Suggested links: Privacy Policy, Terms of Service, Cookie Policy.</li>
+    </ul>
+    <p>Create a menu for each location and assign it under <strong>Menu Settings &gt; Display location</strong>.</p>
+  </div>
+
+  <h2>3. Configuring the Homepage</h2>
+  <div class="step">
+    <ol>
+      <li>Go to <strong>Settings &gt; Reading</strong>.</li>
+      <li>Select <strong>A static page</strong> and choose the <strong>Home</strong> page (created during demo import).</li>
+      <li>Set the <strong>Posts page</strong> to your blog page if you plan to use one.</li>
+      <li>The homepage template includes: hero section, featured collections grid, lookbook carousel, and newsletter signup.</li>
+    </ol>
+    <div class="note">If you did not import demo content, create a new page and assign the <strong>Front Page</strong> template under <strong>Page Attributes &gt; Template</strong>.</div>
+  </div>
+
+  <h2>4. Setting Up Collection Pages</h2>
+  <div class="step">
+    <p>Each collection has three page types, created automatically during demo import:</p>
+    <ol>
+      <li><strong>Landing Page</strong> &mdash; The marketing entry point with hero imagery and storytelling. Uses a dedicated page template (e.g., <code>template-landing-black-rose.php</code>).</li>
+      <li><strong>Collection Page</strong> &mdash; The WooCommerce product archive filtered to that collection's category.</li>
+      <li><strong>Immersive Experience</strong> &mdash; A Three.js-powered interactive page. Uses a dedicated template (e.g., <code>template-immersive-black-rose.php</code>).</li>
+    </ol>
+    <p>Link these pages in your Primary menu under each collection's dropdown.</p>
+    <p>For detailed collection setup, see <a href="collections.html">Collections</a>.</p>
+  </div>
+
+  <p>Next: <a href="collections.html">Collections &rarr;</a></p>
+
+  <footer>
+    <p>SkyyRose Theme &copy; 2026. All rights reserved.</p>
+  </footer>
+</body>
+</html>

@@ -6,7 +6,7 @@
  * Contains WooCommerce style dequeuing, font preloading, resource hints,
  * and script defer logic.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   4.1.0
  */
 
@@ -172,7 +172,7 @@ function skyyrose_preload_hero_image() {
 		}
 	} elseif ( is_page() ) {
 		// Collection and immersive pages: preload featured image if set.
-		$template = get_page_template_slug();
+		$template       = get_page_template_slug();
 		$hero_templates = array(
 			'template-collection-black-rose.php',
 			'template-collection-love-hurts.php',
@@ -221,7 +221,8 @@ function skyyrose_add_sri_hashes( $tag, $handle ) {
 	return $tag;
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Hook Registration — Performance Optimizations
  *--------------------------------------------------------------*/
 

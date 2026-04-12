@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Builders &mdash; SkyyRose Documentation</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#0A0A0A;color:#F5F5F0;font-family:'Inter',system-ui,sans-serif;line-height:1.7;padding:2rem;max-width:860px;margin:0 auto}
+    h1,h2,h3{font-family:'Playfair Display',serif;color:#B76E79;margin:1.5rem 0 .75rem}
+    h1{font-size:2rem;border-bottom:1px solid #B76E79;padding-bottom:.5rem}
+    a{color:#B76E79;text-decoration:none}a:hover{text-decoration:underline}
+    .doc-nav{display:flex;flex-wrap:wrap;gap:.5rem;padding:1rem 0;border-bottom:1px solid #222}
+    .doc-nav a{padding:.25rem .6rem;border:1px solid #333;border-radius:4px;font-size:.85rem}
+    .doc-nav a:hover{border-color:#B76E79}
+    code,pre{background:#151515;border-radius:4px;font-family:'Space Mono',monospace;font-size:.85rem}
+    code{padding:.15rem .35rem}
+    pre{padding:1rem;overflow-x:auto;margin:1rem 0;border:1px solid #222}
+    table{width:100%;border-collapse:collapse;margin:1rem 0}
+    th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid #222}
+    th{color:#B76E79;font-weight:600}
+    .badge{display:inline-block;padding:.15rem .5rem;border-radius:3px;font-size:.75rem;font-weight:600;background:#1a1a1a;border:1px solid #333;margin-right:.25rem}
+    .badge.default{border-color:#B76E79;color:#B76E79}
+    p{margin:.75rem 0}
+    ul{margin:.5rem 0 .5rem 1.5rem}
+  </style>
+</head>
+<body>
+<nav class="doc-nav">
+  <a href="index.html">Overview</a>
+  <a href="installation.html">Installation</a>
+  <a href="getting-started.html">Getting Started</a>
+  <a href="collections.html">Collections</a>
+  <a href="kids-capsule.html">Kids Capsule</a>
+  <a href="elementor.html">Elementor</a>
+  <a href="builders.html">Page Builders</a>
+  <a href="woocommerce.html">WooCommerce</a>
+  <a href="customization.html">Customization</a>
+  <a href="changelog.html">Changelog</a>
+  <a href="credits.html">Credits</a>
+</nav>
+
+<h1>Page Builder Compatibility</h1>
+<p>SkyyRose ships with first-class support for multiple page builders. The theme detects the active builder at runtime and loads only the relevant integration layer.</p>
+
+<h2>Builder Detection</h2>
+<p>The helper function <code>skyyrose_active_builder()</code> returns the slug of the currently active builder:</p>
+<pre>$builder = skyyrose_active_builder();
+// Returns: 'gutenberg' | 'elementor' | 'divi' | 'beaver-builder' | 'bricks'</pre>
+<p>This function checks for active builder plugins in priority order and falls back to <code>'gutenberg'</code> (the WordPress default) when no third-party builder is detected.</p>
+
+<h2>Gutenberg (Block Editor)</h2>
+<p><span class="badge default">Default</span> The native WordPress block editor is fully supported out of the box.</p>
+<ul>
+  <li><strong>Block Patterns</strong> &mdash; Pre-built patterns for hero sections, product grids, collection banners, and testimonial rows are registered automatically.</li>
+  <li><strong>Site Editor</strong> &mdash; SkyyRose includes block theme templates editable via Appearance &rarr; Editor. Modify headers, footers, and archive layouts visually.</li>
+  <li><strong>theme.json</strong> &mdash; All design tokens (colors, typography, spacing) are defined in <code>theme.json</code> and surfaced in the editor UI.</li>
+  <li><strong>Custom blocks</strong> &mdash; The <code>skyyrose/holographic-card</code> and <code>skyyrose/collection-hero</code> blocks are registered for Gutenberg only.</li>
+</ul>
+
+<h2>Divi 5.x</h2>
+<p>Divi 5.x is supported with the following considerations:</p>
+<ul>
+  <li>The <code>&lt;model-viewer&gt;</code> web component is allow-listed so 3D product previews render inside Divi modules.</li>
+  <li>SkyyRose CSS custom properties (<code>--skyyrose-*</code>) are available in Divi's custom CSS fields.</li>
+  <li>Use the <strong>Code Module</strong> to embed Three.js holographic cards or GSAP scroll animations.</li>
+</ul>
+
+<h2>Beaver Builder 2.x</h2>
+<ul>
+  <li><strong>Template Directory</strong> &mdash; SkyyRose registers pre-built page templates in Beaver Builder's template directory (Templates &rarr; Saved Templates).</li>
+  <li>Templates include: Landing Page, Collection Archive, Product Showcase, and About Page.</li>
+  <li>Row and module styles inherit theme design tokens automatically.</li>
+</ul>
+
+<h2>Bricks 1.x</h2>
+<ul>
+  <li>Bricks reads <code>theme.json</code> natively, so all SkyyRose design tokens (colors, fonts, spacing) appear in the Bricks editor without extra configuration.</li>
+  <li>Global classes using <code>--skyyrose-*</code> custom properties work in the Bricks style panel.</li>
+  <li>Dynamic data tags for WooCommerce product meta (care instructions, fabric content) are compatible.</li>
+</ul>
+
+<h2>Page Templates</h2>
+<p>Two layout templates are available for every supported builder:</p>
+<table>
+  <tr><th>Template</th><th>Slug</th><th>Description</th></tr>
+  <tr><td>Canvas</td><td><code>template-canvas.php</code></td><td>No header, no footer. Full control for landing pages and custom funnels.</td></tr>
+  <tr><td>Full Width</td><td><code>template-full-width.php</code></td><td>Header and footer included, no sidebar, content spans the full viewport width.</td></tr>
+</table>
+<p>Select the template from the Page Attributes panel (Gutenberg) or the builder's own template selector.</p>
+
+<h2>Best Practices</h2>
+<ul>
+  <li>Only one builder plugin should be active at a time. <code>skyyrose_active_builder()</code> returns the first match.</li>
+  <li>Deactivate unused builders to keep front-end asset loading minimal.</li>
+  <li>When switching builders, re-save permalinks (<strong>Settings &rarr; Permalinks &rarr; Save</strong>) to flush rewrite rules.</li>
+</ul>
+
+</body>
+</html>

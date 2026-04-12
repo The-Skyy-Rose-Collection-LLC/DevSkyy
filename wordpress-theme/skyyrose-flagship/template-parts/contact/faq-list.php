@@ -7,7 +7,7 @@
  * Expected variables (passed via $args from get_template_part):
  *   $args['faq_items'] — indexed array of arrays with 'question' and 'answer' keys.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 
@@ -20,13 +20,13 @@ if ( empty( $faq_items ) ) {
 }
 ?>
 
-<section class="faq-section" aria-label="<?php esc_attr_e( 'Frequently Asked Questions', 'skyyrose-flagship' ); ?>">
+<section class="faq-section" aria-label="<?php esc_attr_e( 'Frequently Asked Questions', 'skyyrose' ); ?>">
 	<div class="faq-section__container">
 		<h2 class="faq-section__heading">
-			<?php esc_html_e( 'Frequently Asked Questions', 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( 'Frequently Asked Questions', 'skyyrose' ); ?>
 		</h2>
 		<p class="faq-section__subheading">
-			<?php esc_html_e( "Can't find what you're looking for? Send us a message above and we'll get back to you.", 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( "Can't find what you're looking for? Send us a message above and we'll get back to you.", 'skyyrose' ); ?>
 		</p>
 
 		<div class="faq-accordion" role="list">

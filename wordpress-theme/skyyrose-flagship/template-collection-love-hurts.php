@@ -5,7 +5,7 @@
  * LOVE HURTS collection — Beauty and the Beast, the Hurts bloodline.
  * Delegates to unified collection layout with slug-specific content.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.1.0
  */
 

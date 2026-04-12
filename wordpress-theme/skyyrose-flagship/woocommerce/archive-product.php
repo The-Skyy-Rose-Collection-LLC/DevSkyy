@@ -11,7 +11,7 @@
  * the readme will list any important changes.
  *
  * @see     https://woocommerce.com/document/template-structure/
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   2.0.0
  * @version 8.6.0
  */

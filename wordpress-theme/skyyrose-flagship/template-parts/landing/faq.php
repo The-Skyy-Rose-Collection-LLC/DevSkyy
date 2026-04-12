@@ -8,7 +8,7 @@
  *   'heading'   => string  Section heading ("Frequently Asked")
  *   'questions' => array   Array of ['q' => question, 'a' => answer]
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 
@@ -32,8 +32,8 @@ if ( empty( $questions ) ) {
 			<?php foreach ( $questions as $i => $item ) : ?>
 				<div class="lp-faq__item lp-rv" data-delay="<?php echo esc_attr( min( $i + 1, 5 ) ); ?>">
 					<button class="lp-faq__question" type="button"
-					        aria-expanded="false"
-					        aria-controls="lp-faq-a-<?php echo esc_attr( $i ); ?>">
+							aria-expanded="false"
+							aria-controls="lp-faq-a-<?php echo esc_attr( $i ); ?>">
 						<span><?php echo esc_html( $item['q'] ); ?></span>
 						<svg class="lp-faq__icon" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" aria-hidden="true">
 							<line x1="12" y1="5" x2="12" y2="19"></line>

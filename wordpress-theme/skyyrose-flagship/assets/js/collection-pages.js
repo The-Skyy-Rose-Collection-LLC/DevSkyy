@@ -4,7 +4,7 @@
  * IntersectionObserver scroll-reveal + floating particle generator.
  * Replaces GSAP ScrollTrigger dependency for collection pages.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.1.0
  */
 (function () {

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyyRose Theme Documentation</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0A0A0A; color: #F5F5F0; line-height: 1.7; padding: 2rem; max-width: 900px; margin: 0 auto; }
+    h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+    h2 { color: #B76E79; margin: 2rem 0 1rem; font-size: 1.4rem; }
+    h3 { margin: 1.5rem 0 0.5rem; }
+    p, li { margin-bottom: 0.75rem; }
+    ul { padding-left: 1.5rem; }
+    a { color: #B76E79; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .doc-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 1rem 0; border-bottom: 1px solid #222; margin-bottom: 2rem; }
+    .doc-nav a { padding: 0.35rem 0.75rem; border: 1px solid #333; border-radius: 4px; font-size: 0.85rem; }
+    .doc-nav a.active { background: #B76E79; color: #0A0A0A; border-color: #B76E79; }
+    .tagline { color: #B76E79; font-style: italic; font-size: 1.1rem; margin-bottom: 2rem; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+    .card { border: 1px solid #222; border-radius: 6px; padding: 1.25rem; }
+    .card h3 { margin-top: 0; color: #B76E79; }
+    code { background: #1a1a1a; padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
+    footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #222; font-size: 0.85rem; color: #888; }
+  </style>
+</head>
+<body>
+  <nav class="doc-nav">
+    <a href="index.html" class="active">Overview</a>
+    <a href="installation.html">Installation</a>
+    <a href="getting-started.html">Getting Started</a>
+    <a href="collections.html">Collections</a>
+    <a href="kids-capsule.html">Kids Capsule</a>
+    <a href="elementor.html">Elementor</a>
+    <a href="builders.html">Page Builders</a>
+    <a href="woocommerce.html">WooCommerce</a>
+    <a href="customization.html">Customization</a>
+    <a href="changelog.html">Changelog</a>
+    <a href="credits.html">Credits</a>
+  </nav>
+
+  <h1>SkyyRose Theme Documentation</h1>
+  <p class="tagline">Luxury Grows from Concrete.</p>
+
+  <p>SkyyRose is a luxury streetwear WooCommerce theme built for bold brands. It ships with four curated collections, immersive Three.js experiences, GSAP-powered animations, and full compatibility with every major WordPress page builder.</p>
+
+  <h2>Feature Highlights</h2>
+  <ul>
+    <li><strong>4 Collections</strong> &mdash; Black Rose, Love Hurts, Signature, and Kids Capsule, each with dedicated landing pages, catalog pages, and 3D immersive experiences.</li>
+    <li><strong>WooCommerce 9.9+</strong> &mdash; Store API cart, product quick-view, and one-click demo import via WC Blueprints.</li>
+    <li><strong>Elementor Pro Native</strong> &mdash; Template Kit with pre-built header, footer, single product, and archive templates.</li>
+    <li><strong>Universal Builder Support</strong> &mdash; Works with Divi, Beaver Builder, Bricks, and the block editor (Gutenberg).</li>
+    <li><strong>Three.js &amp; GSAP</strong> &mdash; Holographic product cards, glassmorphism navigation, and scroll-driven animations.</li>
+    <li><strong>WCAG 2.2 AA Accessible</strong> &mdash; Focus management, skip links, contrast ratios, and reduced-motion support.</li>
+    <li><strong>Self-Hosted Fonts</strong> &mdash; Uses the WordPress Font Library. Zero Google Fonts CDN calls for full GDPR compliance.</li>
+    <li><strong>Kids Capsule Launch Mode</strong> &mdash; Built-in teaser page with countdown timer and email waitlist.</li>
+    <li><strong>Block Patterns</strong> &mdash; Pre-designed patterns for every collection, ready to insert from the block editor.</li>
+  </ul>
+
+  <h2>Quick Links</h2>
+  <div class="card-grid">
+    <div class="card">
+      <h3>Installation</h3>
+      <p>Upload, activate, and import demo content in minutes.</p>
+      <a href="installation.html">Read guide &rarr;</a>
+    </div>
+    <div class="card">
+      <h3>Getting Started</h3>
+      <p>Configure your brand colors, menus, logo, and homepage.</p>
+      <a href="getting-started.html">Read guide &rarr;</a>
+    </div>
+    <div class="card">
+      <h3>Collections</h3>
+      <p>Set up all four collections with their unique color palettes and templates.</p>
+      <a href="collections.html">Read guide &rarr;</a>
+    </div>
+    <div class="card">
+      <h3>Kids Capsule</h3>
+      <p>Launch mode, waitlist, and parent-child matching commerce.</p>
+      <a href="kids-capsule.html">Read guide &rarr;</a>
+    </div>
+    <div class="card">
+      <h3>Elementor Pro</h3>
+      <p>Import the Template Kit and configure theme builder locations.</p>
+      <a href="elementor.html">Read guide &rarr;</a>
+    </div>
+    <div class="card">
+      <h3>Page Builders</h3>
+      <p>Divi, Beaver Builder, Bricks, and Gutenberg compatibility.</p>
+      <a href="builders.html">Read guide &rarr;</a>
+    </div>
+  </div>
+
+  <h2>Requirements</h2>
+  <ul>
+    <li>WordPress 6.8 or higher</li>
+    <li>PHP 8.2 or higher</li>
+    <li>WooCommerce 9.9 or higher</li>
+  </ul>
+
+  <footer>
+    <p>SkyyRose Theme &copy; 2026. All rights reserved.</p>
+  </footer>
+</body>
+</html>

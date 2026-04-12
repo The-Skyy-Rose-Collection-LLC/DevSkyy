@@ -5,7 +5,7 @@
  * Full-bleed hero section with parallax image, collection number,
  * name, tagline, and CTA buttons. Reuses .col-hero CSS from product-card-holo.css.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.3.0
  */
 
@@ -20,7 +20,7 @@ class SkyyRose_Collection_Hero_Widget extends \Elementor\Widget_Base {
 	}
 
 	public function get_title() {
-		return esc_html__( 'Collection Hero', 'skyyrose-flagship' );
+		return esc_html__( 'Collection Hero', 'skyyrose' );
 	}
 
 	public function get_icon() {
@@ -54,7 +54,7 @@ class SkyyRose_Collection_Hero_Widget extends \Elementor\Widget_Base {
 				'accent'  => '#DC143C',
 				'image'   => 'assets/scenes/love-hurts/scene-castle.webp',
 			),
-			'signature' => array(
+			'signature'  => array(
 				'name'    => 'Signature',
 				'tagline' => 'Bay Area luxury in every stitch',
 				'number'  => 'Collection 03',
@@ -68,62 +68,89 @@ class SkyyRose_Collection_Hero_Widget extends \Elementor\Widget_Base {
 
 		/* ── Content ────────────────────────────── */
 
-		$this->start_controls_section( 'section_hero', array(
-			'label' => esc_html__( 'Hero', 'skyyrose-flagship' ),
-			'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
-		) );
+		$this->start_controls_section(
+			'section_hero',
+			array(
+				'label' => esc_html__( 'Hero', 'skyyrose' ),
+				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
+			)
+		);
 
-		$this->add_control( 'collection', array(
-			'label'   => esc_html__( 'Collection', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::SELECT,
-			'options' => array(
-				'black-rose' => esc_html__( 'Black Rose', 'skyyrose-flagship' ),
-				'love-hurts' => esc_html__( 'Love Hurts', 'skyyrose-flagship' ),
-				'signature'  => esc_html__( 'Signature', 'skyyrose-flagship' ),
-			),
-			'default' => 'black-rose',
-		) );
+		$this->add_control(
+			'collection',
+			array(
+				'label'   => esc_html__( 'Collection', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::SELECT,
+				'options' => array(
+					'black-rose' => esc_html__( 'Black Rose', 'skyyrose' ),
+					'love-hurts' => esc_html__( 'Love Hurts', 'skyyrose' ),
+					'signature'  => esc_html__( 'Signature', 'skyyrose' ),
+				),
+				'default' => 'black-rose',
+			)
+		);
 
-		$this->add_control( 'heading_override', array(
-			'label'       => esc_html__( 'Heading Override', 'skyyrose-flagship' ),
-			'type'        => \Elementor\Controls_Manager::TEXT,
-			'placeholder' => esc_html__( 'Auto-loaded from collection', 'skyyrose-flagship' ),
-			'description' => esc_html__( 'Leave empty to use collection name.', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'heading_override',
+			array(
+				'label'       => esc_html__( 'Heading Override', 'skyyrose' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'placeholder' => esc_html__( 'Auto-loaded from collection', 'skyyrose' ),
+				'description' => esc_html__( 'Leave empty to use collection name.', 'skyyrose' ),
+			)
+		);
 
-		$this->add_control( 'tagline_override', array(
-			'label'       => esc_html__( 'Tagline Override', 'skyyrose-flagship' ),
-			'type'        => \Elementor\Controls_Manager::TEXTAREA,
-			'placeholder' => esc_html__( 'Auto-loaded from collection', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'tagline_override',
+			array(
+				'label'       => esc_html__( 'Tagline Override', 'skyyrose' ),
+				'type'        => \Elementor\Controls_Manager::TEXTAREA,
+				'placeholder' => esc_html__( 'Auto-loaded from collection', 'skyyrose' ),
+			)
+		);
 
-		$this->add_control( 'hero_image', array(
-			'label'       => esc_html__( 'Hero Image', 'skyyrose-flagship' ),
-			'type'        => \Elementor\Controls_Manager::MEDIA,
-			'description' => esc_html__( 'Leave empty to use default collection scene.', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'hero_image',
+			array(
+				'label'       => esc_html__( 'Hero Image', 'skyyrose' ),
+				'type'        => \Elementor\Controls_Manager::MEDIA,
+				'description' => esc_html__( 'Leave empty to use default collection scene.', 'skyyrose' ),
+			)
+		);
 
-		$this->add_control( 'cta_primary_text', array(
-			'label'   => esc_html__( 'Primary CTA Text', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::TEXT,
-			'default' => esc_html__( 'Explore Collection', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'cta_primary_text',
+			array(
+				'label'   => esc_html__( 'Primary CTA Text', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::TEXT,
+				'default' => esc_html__( 'Explore Collection', 'skyyrose' ),
+			)
+		);
 
-		$this->add_control( 'cta_primary_url', array(
-			'label' => esc_html__( 'Primary CTA URL', 'skyyrose-flagship' ),
-			'type'  => \Elementor\Controls_Manager::URL,
-		) );
+		$this->add_control(
+			'cta_primary_url',
+			array(
+				'label' => esc_html__( 'Primary CTA URL', 'skyyrose' ),
+				'type'  => \Elementor\Controls_Manager::URL,
+			)
+		);
 
-		$this->add_control( 'cta_secondary_text', array(
-			'label'   => esc_html__( 'Secondary CTA Text', 'skyyrose-flagship' ),
-			'type'    => \Elementor\Controls_Manager::TEXT,
-			'default' => esc_html__( 'Pre-Order', 'skyyrose-flagship' ),
-		) );
+		$this->add_control(
+			'cta_secondary_text',
+			array(
+				'label'   => esc_html__( 'Secondary CTA Text', 'skyyrose' ),
+				'type'    => \Elementor\Controls_Manager::TEXT,
+				'default' => esc_html__( 'Pre-Order', 'skyyrose' ),
+			)
+		);
 
-		$this->add_control( 'cta_secondary_url', array(
-			'label' => esc_html__( 'Secondary CTA URL', 'skyyrose-flagship' ),
-			'type'  => \Elementor\Controls_Manager::URL,
-		) );
+		$this->add_control(
+			'cta_secondary_url',
+			array(
+				'label' => esc_html__( 'Secondary CTA URL', 'skyyrose' ),
+				'type'  => \Elementor\Controls_Manager::URL,
+			)
+		);
 
 		$this->end_controls_section();
 	}
@@ -134,10 +161,10 @@ class SkyyRose_Collection_Hero_Widget extends \Elementor\Widget_Base {
 		$slug        = sanitize_key( $settings['collection'] );
 		$col         = isset( $collections[ $slug ] ) ? $collections[ $slug ] : $collections['black-rose'];
 
-		$accent  = $col['accent'];
-		$r = hexdec( substr( $accent, 1, 2 ) );
-		$g = hexdec( substr( $accent, 3, 2 ) );
-		$b = hexdec( substr( $accent, 5, 2 ) );
+		$accent = $col['accent'];
+		$r      = hexdec( substr( $accent, 1, 2 ) );
+		$g      = hexdec( substr( $accent, 3, 2 ) );
+		$b      = hexdec( substr( $accent, 5, 2 ) );
 
 		$heading = ! empty( $settings['heading_override'] ) ? $settings['heading_override'] : $col['name'];
 		$tagline = ! empty( $settings['tagline_override'] ) ? $settings['tagline_override'] : $col['tagline'];
@@ -149,7 +176,7 @@ class SkyyRose_Collection_Hero_Widget extends \Elementor\Widget_Base {
 			$image_url = get_theme_file_uri( $col['image'] );
 		}
 
-		$primary_url = ! empty( $settings['cta_primary_url']['url'] ) ? $settings['cta_primary_url']['url'] : '#';
+		$primary_url   = ! empty( $settings['cta_primary_url']['url'] ) ? $settings['cta_primary_url']['url'] : '#';
 		$secondary_url = ! empty( $settings['cta_secondary_url']['url'] ) ? $settings['cta_secondary_url']['url'] : '';
 		?>
 		<section class="col-hero"

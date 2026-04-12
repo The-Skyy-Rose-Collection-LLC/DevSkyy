@@ -4,7 +4,7 @@
  * Countdown timer, parallax, FAQ accordion, scroll reveal.
  * Zero GSAP dependency — same pattern as collection-pages.js.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

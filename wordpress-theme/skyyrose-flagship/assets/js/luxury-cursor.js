@@ -4,7 +4,7 @@
  * Subtle custom cursor for desktop: small dot + larger ring outline.
  * Disabled on touch devices, mobile (<768px), and prefers-reduced-motion.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   5.3.0
  */
 (function () {

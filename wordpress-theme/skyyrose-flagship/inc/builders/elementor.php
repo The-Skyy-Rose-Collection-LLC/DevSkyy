@@ -5,8 +5,8 @@
  * Registers custom SkyyRose widgets, editor styles, frontend scripts,
  * and brand-correct default schemes for the Elementor page builder.
  *
- * @package SkyyRose_Flagship
- * @since 1.0.0
+ * @package SkyyRose
+ * @since   1.0.0
  */
 
 // Prevent direct access.
@@ -84,7 +84,7 @@ function skyyrose_add_elementor_widget_categories( $elements_manager ) {
 	$elements_manager->add_category(
 		'skyyrose',
 		array(
-			'title' => esc_html__( 'SkyyRose Widgets', 'skyyrose-flagship' ),
+			'title' => esc_html__( 'SkyyRose Widgets', 'skyyrose' ),
 			'icon'  => 'fa fa-plug',
 		)
 	);
@@ -92,7 +92,7 @@ function skyyrose_add_elementor_widget_categories( $elements_manager ) {
 	$elements_manager->add_category(
 		'skyyrose-3d',
 		array(
-			'title' => esc_html__( 'SkyyRose 3D', 'skyyrose-flagship' ),
+			'title' => esc_html__( 'SkyyRose 3D', 'skyyrose' ),
 			'icon'  => 'fa fa-cube',
 		)
 	);
@@ -236,3 +236,10 @@ function skyyrose_elementor_breakpoints( $breakpoints ) {
 	return $breakpoints;
 }
 add_filter( 'elementor/breakpoints/get_breakpoints', 'skyyrose_elementor_breakpoints' );
+
+/**
+ * Disable Elementor Google Fonts — theme serves fonts locally via Font Library.
+ *
+ * @since 1.0.0
+ */
+add_filter( 'elementor/frontend/print_google_fonts', '__return_false' );

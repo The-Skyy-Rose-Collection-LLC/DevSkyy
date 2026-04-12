@@ -4,7 +4,7 @@
  * Loading screen, collection tab filtering, product modal,
  * cart sidebar, sign-in panel, and wishlist toggling.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   2.0.0
  */
 

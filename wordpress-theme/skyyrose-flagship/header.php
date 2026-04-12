@@ -1,12 +1,12 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 /**
- * The header for the SkyyRose Flagship theme
+ * The header for the SkyyRose theme
  *
  * Displays the fixed dark navbar with SR monogram logo, gradient text branding,
  * navigation with collections dropdown, icon buttons, and mobile hamburger menu.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since 2.0.0
  */
 
@@ -24,19 +24,19 @@ defined( 'ABSPATH' ) || exit;
 
 <div id="page" class="site">
 	<a class="skip-link screen-reader-text" href="#primary">
-		<?php esc_html_e( 'Skip to content', 'skyyrose-flagship' ); ?>
+		<?php esc_html_e( 'Skip to content', 'skyyrose' ); ?>
 	</a>
 
 	<header id="masthead" class="site-header<?php echo is_front_page() ? ' site-header--hidden' : ''; ?>" role="banner">
-		<nav class="navbar" id="navbar" aria-label="<?php esc_attr_e( 'Primary Navigation', 'skyyrose-flagship' ); ?>">
+		<nav class="navbar" id="navbar" aria-label="<?php esc_attr_e( 'Primary Navigation', 'skyyrose' ); ?>">
 			<div class="navbar__container">
 
 				<!-- Logo / Brand -->
 				<div class="navbar__brand">
-					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="navbar__logo-link" rel="home" aria-label="<?php esc_attr_e( 'SkyyRose Home', 'skyyrose-flagship' ); ?>">
+					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="navbar__logo-link" rel="home" aria-label="<?php esc_attr_e( 'SkyyRose Home', 'skyyrose' ); ?>">
 						<img
 							src="<?php echo esc_url( get_template_directory_uri() . '/assets/branding/skyyrose-monogram-nav.webp' ); ?>"
-							alt="<?php esc_attr_e( 'SR Monogram', 'skyyrose-flagship' ); ?>"
+							alt="<?php esc_attr_e( 'SR Monogram', 'skyyrose' ); ?>"
 							class="navbar__monogram"
 							width="50"
 							height="50"
@@ -46,7 +46,7 @@ defined( 'ABSPATH' ) || exit;
 						>
 						<span class="navbar__brand-text">
 							<span class="navbar__site-title">
-								<span class="navbar__gradient-text"><?php esc_html_e( 'SKYY ROSE', 'skyyrose-flagship' ); ?></span>
+								<span class="navbar__gradient-text"><?php esc_html_e( 'SKYY ROSE', 'skyyrose' ); ?></span>
 							</span>
 						</span>
 					</a>
@@ -57,13 +57,13 @@ defined( 'ABSPATH' ) || exit;
 					<?php
 					wp_nav_menu(
 						array(
-							'theme_location'  => 'primary',
-							'menu_id'         => 'primary-menu',
-							'menu_class'      => 'navbar__menu',
-							'container'       => false,
-							'fallback_cb'     => 'skyyrose_flagship_nav_fallback',
-							'depth'           => 2,
-							'items_wrap'      => '<ul id="%1$s" class="%2$s">%3$s</ul>',
+							'theme_location' => 'primary',
+							'menu_id'        => 'primary-menu',
+							'menu_class'     => 'navbar__menu',
+							'container'      => false,
+							'fallback_cb'    => 'skyyrose_nav_fallback',
+							'depth'          => 2,
+							'items_wrap'     => '<ul id="%1$s" class="%2$s">%3$s</ul>',
 						)
 					);
 					?>
@@ -76,7 +76,7 @@ defined( 'ABSPATH' ) || exit;
 					<button
 						class="navbar__action-btn navbar__search-btn"
 						id="search-toggle"
-						aria-label="<?php esc_attr_e( 'Search', 'skyyrose-flagship' ); ?>"
+						aria-label="<?php esc_attr_e( 'Search', 'skyyrose' ); ?>"
 						aria-expanded="false"
 						aria-controls="search-overlay"
 						type="button"
@@ -96,7 +96,7 @@ defined( 'ABSPATH' ) || exit;
 					<a
 						href="<?php echo esc_url( $account_url ); ?>"
 						class="navbar__action-btn navbar__account-btn"
-						aria-label="<?php esc_attr_e( 'My Account', 'skyyrose-flagship' ); ?>"
+						aria-label="<?php esc_attr_e( 'My Account', 'skyyrose' ); ?>"
 					>
 						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 							<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -110,11 +110,7 @@ defined( 'ABSPATH' ) || exit;
 						<a
 							href="<?php echo esc_url( wc_get_cart_url() ); ?>"
 							class="navbar__action-btn navbar__cart-btn"
-							aria-label="<?php echo esc_attr( sprintf(
-								/* translators: %d: number of items in cart */
-								_n( '%d item in cart', '%d items in cart', $cart_count, 'skyyrose-flagship' ),
-								$cart_count
-							) ); ?>"
+							aria-label="<?php echo esc_attr( sprintf( /* translators: %d: number of items in cart */ _n( '%d item in cart', '%d items in cart', $cart_count, 'skyyrose' ), $cart_count ) ); ?>"
 						>
 							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 								<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
@@ -133,7 +129,7 @@ defined( 'ABSPATH' ) || exit;
 						id="mobile-menu-toggle"
 						aria-controls="mobile-menu"
 						aria-expanded="false"
-						aria-label="<?php esc_attr_e( 'Toggle navigation menu', 'skyyrose-flagship' ); ?>"
+						aria-label="<?php esc_attr_e( 'Toggle navigation menu', 'skyyrose' ); ?>"
 						type="button"
 					>
 						<span class="navbar__hamburger-line" aria-hidden="true"></span>
@@ -146,29 +142,29 @@ defined( 'ABSPATH' ) || exit;
 		</nav>
 
 		<!-- Search Overlay -->
-		<div class="search-overlay" id="search-overlay" aria-hidden="true" inert role="dialog" aria-modal="true" tabindex="-1" aria-label="<?php esc_attr_e( 'Search', 'skyyrose-flagship' ); ?>">
+		<div class="search-overlay" id="search-overlay" aria-hidden="true" inert role="dialog" aria-modal="true" tabindex="-1" aria-label="<?php esc_attr_e( 'Search', 'skyyrose' ); ?>">
 			<div class="search-overlay__container">
 				<form role="search" method="get" class="search-overlay__form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
 					<label class="screen-reader-text" for="search-overlay-input">
-						<?php esc_html_e( 'Search for:', 'skyyrose-flagship' ); ?>
+						<?php esc_html_e( 'Search for:', 'skyyrose' ); ?>
 					</label>
 					<input
 						type="search"
 						id="search-overlay-input"
 						class="search-overlay__input"
-						placeholder="<?php esc_attr_e( 'Search the collection...', 'skyyrose-flagship' ); ?>"
+						placeholder="<?php esc_attr_e( 'Search the collection...', 'skyyrose' ); ?>"
 						value="<?php echo esc_attr( get_search_query() ); ?>"
 						name="s"
 						autocomplete="off"
 					>
-					<button type="submit" class="search-overlay__submit" aria-label="<?php esc_attr_e( 'Submit search', 'skyyrose-flagship' ); ?>">
+					<button type="submit" class="search-overlay__submit" aria-label="<?php esc_attr_e( 'Submit search', 'skyyrose' ); ?>">
 						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 							<circle cx="11" cy="11" r="8"/>
 							<path d="m21 21-4.35-4.35"/>
 						</svg>
 					</button>
 				</form>
-				<button class="search-overlay__close" id="search-close" aria-label="<?php esc_attr_e( 'Close Search', 'skyyrose-flagship' ); ?>" type="button">
+				<button class="search-overlay__close" id="search-close" aria-label="<?php esc_attr_e( 'Close Search', 'skyyrose' ); ?>" type="button">
 					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 						<path d="M18 6 6 18"/>
 						<path d="m6 6 12 12"/>
@@ -180,13 +176,13 @@ defined( 'ABSPATH' ) || exit;
 		<!-- Mobile Menu Slide-In -->
 		<div class="mobile-menu" id="mobile-menu" aria-hidden="true" inert>
 			<div class="mobile-menu__overlay" id="mobile-menu-overlay" aria-hidden="true"></div>
-			<div class="mobile-menu__panel" role="dialog" aria-modal="true" tabindex="-1" aria-label="<?php esc_attr_e( 'Mobile Navigation', 'skyyrose-flagship' ); ?>">
+			<div class="mobile-menu__panel" role="dialog" aria-modal="true" tabindex="-1" aria-label="<?php esc_attr_e( 'Mobile Navigation', 'skyyrose' ); ?>">
 				<div class="mobile-menu__header">
-					<span class="mobile-menu__brand navbar__gradient-text"><?php esc_html_e( 'SKYY ROSE', 'skyyrose-flagship' ); ?></span>
+					<span class="mobile-menu__brand navbar__gradient-text"><?php esc_html_e( 'SKYY ROSE', 'skyyrose' ); ?></span>
 					<button
 						class="mobile-menu__close"
 						id="mobile-menu-close"
-						aria-label="<?php esc_attr_e( 'Close Menu', 'skyyrose-flagship' ); ?>"
+						aria-label="<?php esc_attr_e( 'Close Menu', 'skyyrose' ); ?>"
 						type="button"
 					>
 						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
@@ -200,12 +196,12 @@ defined( 'ABSPATH' ) || exit;
 					<?php
 					wp_nav_menu(
 						array(
-							'theme_location'  => 'mobile',
-							'menu_id'         => 'mobile-primary-menu',
-							'menu_class'      => 'mobile-menu__list',
-							'container'       => false,
-							'fallback_cb'     => 'skyyrose_flagship_nav_fallback',
-							'depth'           => 2,
+							'theme_location' => 'mobile',
+							'menu_id'        => 'mobile-primary-menu',
+							'menu_class'     => 'mobile-menu__list',
+							'container'      => false,
+							'fallback_cb'    => 'skyyrose_nav_fallback',
+							'depth'          => 2,
 						)
 					);
 					?>
@@ -218,7 +214,7 @@ defined( 'ABSPATH' ) || exit;
 								<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
 								<circle cx="12" cy="7" r="4"/>
 							</svg>
-							<?php esc_html_e( 'My Account', 'skyyrose-flagship' ); ?>
+							<?php esc_html_e( 'My Account', 'skyyrose' ); ?>
 						</a>
 					<?php endif; ?>
 
@@ -230,7 +226,7 @@ defined( 'ABSPATH' ) || exit;
 							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 								<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
 							</svg>
-							<?php esc_html_e( 'Wishlist', 'skyyrose-flagship' ); ?>
+							<?php esc_html_e( 'Wishlist', 'skyyrose' ); ?>
 						</a>
 					<?php endif; ?>
 
@@ -241,7 +237,7 @@ defined( 'ABSPATH' ) || exit;
 								<path d="M3 6h18"/>
 								<path d="M16 10a4 4 0 0 1-8 0"/>
 							</svg>
-							<?php esc_html_e( 'Cart', 'skyyrose-flagship' ); ?>
+							<?php esc_html_e( 'Cart', 'skyyrose' ); ?>
 							<?php if ( $cart_count > 0 ) : ?>
 								<span class="mobile-menu__badge"><?php echo esc_html( $cart_count ); ?></span>
 							<?php endif; ?>

@@ -7,7 +7,7 @@
  * sidebar (420px), dark glass panels, WooCommerce hook integration.
  *
  * @see     https://woocommerce.com/document/template-structure/
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   2.0.0
  * @version 9.4.0
  */
@@ -34,7 +34,7 @@ do_action( 'woocommerce_before_checkout_form', $checkout );
 
 // If checkout registration is disabled and not logged in, the user cannot checkout.
 if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_required() && ! is_user_logged_in() ) {
-	echo esc_html( apply_filters( 'woocommerce_checkout_must_be_logged_in_message', __( 'You must be logged in to checkout.', 'skyyrose-flagship' ) ) );
+	echo esc_html( apply_filters( 'woocommerce_checkout_must_be_logged_in_message', __( 'You must be logged in to checkout.', 'skyyrose' ) ) );
 	return;
 }
 ?>
@@ -42,23 +42,23 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 <div class="skyy-checkout" data-skyy-checkout>
 
 	<!-- 4-STEP PROGRESS BAR -->
-	<div class="skyy-checkout__progress" role="navigation" aria-label="<?php esc_attr_e( 'Checkout progress', 'skyyrose-flagship' ); ?>">
+	<div class="skyy-checkout__progress" role="navigation" aria-label="<?php esc_attr_e( 'Checkout progress', 'skyyrose' ); ?>">
 		<ol class="skyy-checkout__progress-steps">
 			<li class="skyy-checkout__progress-step is-active is-complete" data-step="0">
 				<span class="skyy-checkout__progress-number">1</span>
-				<span class="skyy-checkout__progress-label"><?php esc_html_e( 'Cart', 'skyyrose-flagship' ); ?></span>
+				<span class="skyy-checkout__progress-label"><?php esc_html_e( 'Cart', 'skyyrose' ); ?></span>
 			</li>
 			<li class="skyy-checkout__progress-step is-active" data-step="1">
 				<span class="skyy-checkout__progress-number">2</span>
-				<span class="skyy-checkout__progress-label"><?php esc_html_e( 'Information', 'skyyrose-flagship' ); ?></span>
+				<span class="skyy-checkout__progress-label"><?php esc_html_e( 'Information', 'skyyrose' ); ?></span>
 			</li>
 			<li class="skyy-checkout__progress-step" data-step="2">
 				<span class="skyy-checkout__progress-number">3</span>
-				<span class="skyy-checkout__progress-label"><?php esc_html_e( 'Payment', 'skyyrose-flagship' ); ?></span>
+				<span class="skyy-checkout__progress-label"><?php esc_html_e( 'Payment', 'skyyrose' ); ?></span>
 			</li>
 			<li class="skyy-checkout__progress-step" data-step="3">
 				<span class="skyy-checkout__progress-number">4</span>
-				<span class="skyy-checkout__progress-label"><?php esc_html_e( 'Confirmation', 'skyyrose-flagship' ); ?></span>
+				<span class="skyy-checkout__progress-label"><?php esc_html_e( 'Confirmation', 'skyyrose' ); ?></span>
 			</li>
 		</ol>
 		<div class="skyy-checkout__progress-bar">
@@ -71,12 +71,12 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 		<!-- MAIN FORM AREA -->
 		<div class="skyy-checkout__main">
 			<form name="checkout"
-				  method="post"
-				  class="checkout woocommerce-checkout skyy-checkout__form"
-				  action="<?php echo esc_url( wc_get_checkout_url() ); ?>"
-				  enctype="multipart/form-data"
-				  aria-label="<?php echo esc_attr__( 'Checkout', 'skyyrose-flagship' ); ?>"
-				  data-skyy-checkout-form>
+					method="post"
+					class="checkout woocommerce-checkout skyy-checkout__form"
+					action="<?php echo esc_url( wc_get_checkout_url() ); ?>"
+					enctype="multipart/form-data"
+					aria-label="<?php echo esc_attr__( 'Checkout', 'skyyrose' ); ?>"
+					data-skyy-checkout-form>
 
 				<?php
 				/**
@@ -89,10 +89,10 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 				<div class="skyy-checkout__step skyy-checkout__step--active" data-skyy-step="1">
 					<div class="skyy-checkout__panel">
 						<h2 class="skyy-checkout__panel-title">
-							<?php esc_html_e( 'Contact Information', 'skyyrose-flagship' ); ?>
+							<?php esc_html_e( 'Contact Information', 'skyyrose' ); ?>
 						</h2>
 						<p class="skyy-checkout__panel-subtitle">
-							<?php esc_html_e( 'We\'ll use this email for order updates and tracking.', 'skyyrose-flagship' ); ?>
+							<?php esc_html_e( 'We\'ll use this email for order updates and tracking.', 'skyyrose' ); ?>
 						</p>
 
 						<div class="skyy-checkout__field-group">
@@ -101,11 +101,11 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 								'billing_email',
 								array(
 									'type'        => 'email',
-									'label'       => esc_html__( 'Email Address', 'skyyrose-flagship' ),
+									'label'       => esc_html__( 'Email Address', 'skyyrose' ),
 									'required'    => true,
 									'class'       => array( 'skyy-checkout__field', 'form-row-wide' ),
 									'input_class' => array( 'skyy-checkout__input' ),
-									'placeholder' => esc_attr__( 'your@email.com', 'skyyrose-flagship' ),
+									'placeholder' => esc_attr__( 'your@email.com', 'skyyrose' ),
 								),
 								$checkout->get_value( 'billing_email' )
 							);
@@ -117,11 +117,11 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 									'billing_phone',
 									array(
 										'type'        => 'tel',
-										'label'       => esc_html__( 'Phone (optional)', 'skyyrose-flagship' ),
+										'label'       => esc_html__( 'Phone (optional)', 'skyyrose' ),
 										'required'    => false,
 										'class'       => array( 'skyy-checkout__field', 'form-row-wide' ),
 										'input_class' => array( 'skyy-checkout__input' ),
-										'placeholder' => esc_attr__( '+1 (555) 000-0000', 'skyyrose-flagship' ),
+										'placeholder' => esc_attr__( '+1 (555) 000-0000', 'skyyrose' ),
 									),
 									$checkout->get_value( 'billing_phone' )
 								);
@@ -134,12 +134,12 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 								<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
 									<path d="M10 12l-4-4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 								</svg>
-								<?php esc_html_e( 'Back to Cart', 'skyyrose-flagship' ); ?>
+								<?php esc_html_e( 'Back to Cart', 'skyyrose' ); ?>
 							</a>
 							<button type="button"
 									class="skyy-checkout__next-btn"
 									data-skyy-next-step="2">
-								<?php esc_html_e( 'Continue to Shipping', 'skyyrose-flagship' ); ?>
+								<?php esc_html_e( 'Continue to Shipping', 'skyyrose' ); ?>
 							</button>
 						</div>
 					</div>
@@ -149,7 +149,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 				<div class="skyy-checkout__step" data-skyy-step="2">
 					<div class="skyy-checkout__panel">
 						<h2 class="skyy-checkout__panel-title">
-							<?php esc_html_e( 'Shipping Address', 'skyyrose-flagship' ); ?>
+							<?php esc_html_e( 'Shipping Address', 'skyyrose' ); ?>
 						</h2>
 
 						<div class="skyy-checkout__field-group">
@@ -159,7 +159,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 									'billing_first_name',
 									array(
 										'type'        => 'text',
-										'label'       => esc_html__( 'First Name', 'skyyrose-flagship' ),
+										'label'       => esc_html__( 'First Name', 'skyyrose' ),
 										'required'    => true,
 										'class'       => array( 'skyy-checkout__field', 'form-row-first' ),
 										'input_class' => array( 'skyy-checkout__input' ),
@@ -172,7 +172,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 									'billing_last_name',
 									array(
 										'type'        => 'text',
-										'label'       => esc_html__( 'Last Name', 'skyyrose-flagship' ),
+										'label'       => esc_html__( 'Last Name', 'skyyrose' ),
 										'required'    => true,
 										'class'       => array( 'skyy-checkout__field', 'form-row-last' ),
 										'input_class' => array( 'skyy-checkout__input' ),
@@ -188,11 +188,11 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 								'billing_address_1',
 								array(
 									'type'        => 'text',
-									'label'       => esc_html__( 'Street Address', 'skyyrose-flagship' ),
+									'label'       => esc_html__( 'Street Address', 'skyyrose' ),
 									'required'    => true,
 									'class'       => array( 'skyy-checkout__field', 'form-row-wide' ),
 									'input_class' => array( 'skyy-checkout__input' ),
-									'placeholder' => esc_attr__( '123 Main Street', 'skyyrose-flagship' ),
+									'placeholder' => esc_attr__( '123 Main Street', 'skyyrose' ),
 								),
 								$checkout->get_value( 'billing_address_1' )
 							);
@@ -201,7 +201,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 								'billing_address_2',
 								array(
 									'type'        => 'text',
-									'label'       => esc_html__( 'Apartment, Suite, etc. (optional)', 'skyyrose-flagship' ),
+									'label'       => esc_html__( 'Apartment, Suite, etc. (optional)', 'skyyrose' ),
 									'required'    => false,
 									'class'       => array( 'skyy-checkout__field', 'form-row-wide' ),
 									'input_class' => array( 'skyy-checkout__input' ),
@@ -217,7 +217,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 									'billing_city',
 									array(
 										'type'        => 'text',
-										'label'       => esc_html__( 'City', 'skyyrose-flagship' ),
+										'label'       => esc_html__( 'City', 'skyyrose' ),
 										'required'    => true,
 										'class'       => array( 'skyy-checkout__field', 'form-row-first' ),
 										'input_class' => array( 'skyy-checkout__input' ),
@@ -230,7 +230,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 									'billing_state',
 									array(
 										'type'        => 'state',
-										'label'       => esc_html__( 'State / Province', 'skyyrose-flagship' ),
+										'label'       => esc_html__( 'State / Province', 'skyyrose' ),
 										'required'    => true,
 										'class'       => array( 'skyy-checkout__field', 'form-row-last' ),
 										'input_class' => array( 'skyy-checkout__input' ),
@@ -246,7 +246,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 									'billing_postcode',
 									array(
 										'type'        => 'text',
-										'label'       => esc_html__( 'ZIP / Postal Code', 'skyyrose-flagship' ),
+										'label'       => esc_html__( 'ZIP / Postal Code', 'skyyrose' ),
 										'required'    => true,
 										'class'       => array( 'skyy-checkout__field', 'form-row-first' ),
 										'input_class' => array( 'skyy-checkout__input' ),
@@ -259,7 +259,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 									'billing_country',
 									array(
 										'type'        => 'country',
-										'label'       => esc_html__( 'Country', 'skyyrose-flagship' ),
+										'label'       => esc_html__( 'Country', 'skyyrose' ),
 										'required'    => true,
 										'class'       => array( 'skyy-checkout__field', 'form-row-last' ),
 										'input_class' => array( 'skyy-checkout__input' ),
@@ -274,11 +274,11 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 								'billing_phone',
 								array(
 									'type'        => 'tel',
-									'label'       => esc_html__( 'Phone', 'skyyrose-flagship' ),
+									'label'       => esc_html__( 'Phone', 'skyyrose' ),
 									'required'    => true,
 									'class'       => array( 'skyy-checkout__field', 'form-row-wide' ),
 									'input_class' => array( 'skyy-checkout__input' ),
-									'placeholder' => esc_attr__( '+1 (555) 000-0000', 'skyyrose-flagship' ),
+									'placeholder' => esc_attr__( '+1 (555) 000-0000', 'skyyrose' ),
 								),
 								$checkout->get_value( 'billing_phone' )
 							);
@@ -298,7 +298,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 						<?php if ( WC()->cart->needs_shipping() && WC()->cart->show_shipping() ) : ?>
 							<div class="skyy-checkout__shipping-methods">
 								<h3 class="skyy-checkout__shipping-methods-title">
-									<?php esc_html_e( 'Shipping Method', 'skyyrose-flagship' ); ?>
+									<?php esc_html_e( 'Shipping Method', 'skyyrose' ); ?>
 								</h3>
 								<?php wc_cart_totals_shipping_html(); ?>
 							</div>
@@ -311,12 +311,12 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 								<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
 									<path d="M10 12l-4-4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 								</svg>
-								<?php esc_html_e( 'Back', 'skyyrose-flagship' ); ?>
+								<?php esc_html_e( 'Back', 'skyyrose' ); ?>
 							</button>
 							<button type="button"
 									class="skyy-checkout__next-btn"
 									data-skyy-next-step="3">
-								<?php esc_html_e( 'Continue to Payment', 'skyyrose-flagship' ); ?>
+								<?php esc_html_e( 'Continue to Payment', 'skyyrose' ); ?>
 							</button>
 						</div>
 					</div>
@@ -333,10 +333,10 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 				<div class="skyy-checkout__step" data-skyy-step="3">
 					<div class="skyy-checkout__panel">
 						<h2 class="skyy-checkout__panel-title">
-							<?php esc_html_e( 'Payment', 'skyyrose-flagship' ); ?>
+							<?php esc_html_e( 'Payment', 'skyyrose' ); ?>
 						</h2>
 						<p class="skyy-checkout__panel-subtitle">
-							<?php esc_html_e( 'All transactions are secure and encrypted.', 'skyyrose-flagship' ); ?>
+							<?php esc_html_e( 'All transactions are secure and encrypted.', 'skyyrose' ); ?>
 						</p>
 
 						<?php if ( WC()->cart->needs_payment() ) : ?>
@@ -356,22 +356,25 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 											?>
 											<li class="skyy-checkout__payment-method wc_payment_method payment_method_<?php echo esc_attr( $gateway->id ); ?>">
 												<input id="payment_method_<?php echo esc_attr( $gateway->id ); ?>"
-													   type="radio"
-													   class="input-radio"
-													   name="payment_method"
-													   value="<?php echo esc_attr( $gateway->id ); ?>"
-													   <?php checked( $first, true ); ?>
-													   data-order_button_text="<?php echo esc_attr( $gateway->order_button_text ); ?>" />
+														type="radio"
+														class="input-radio"
+														name="payment_method"
+														value="<?php echo esc_attr( $gateway->id ); ?>"
+														<?php checked( $first, true ); ?>
+														data-order_button_text="<?php echo esc_attr( $gateway->order_button_text ); ?>" />
 
 												<label for="payment_method_<?php echo esc_attr( $gateway->id ); ?>"
-													   class="skyy-checkout__payment-method-label">
+														class="skyy-checkout__payment-method-label">
 													<?php echo wp_kses_post( $gateway->get_title() ); ?>
 													<?php echo wp_kses_post( $gateway->get_icon() ); ?>
 												</label>
 
 												<?php if ( $gateway->has_fields() || $gateway->get_description() ) : ?>
 													<div class="skyy-checkout__payment-method-fields payment_box payment_method_<?php echo esc_attr( $gateway->id ); ?>"
-														 <?php if ( ! $first ) : ?>style="display:none;"<?php endif; ?>>
+														<?php
+														if ( ! $first ) :
+															?>
+															style="display:none;"<?php endif; ?>>
 														<?php $gateway->payment_fields(); ?>
 													</div>
 												<?php endif; ?>
@@ -382,7 +385,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 									else :
 										?>
 										<li class="skyy-checkout__payment-method--none">
-											<p><?php echo wp_kses_post( apply_filters( 'woocommerce_no_available_payment_methods_message', __( 'Sorry, it seems that there are no available payment methods. Please contact us for assistance.', 'skyyrose-flagship' ) ) ); ?></p>
+											<p><?php echo wp_kses_post( apply_filters( 'woocommerce_no_available_payment_methods_message', __( 'Sorry, it seems that there are no available payment methods. Please contact us for assistance.', 'skyyrose' ) ) ); ?></p>
 										</li>
 									<?php endif; ?>
 								</ul>
@@ -396,12 +399,12 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 								<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
 									<path d="M10 12l-4-4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 								</svg>
-								<?php esc_html_e( 'Back', 'skyyrose-flagship' ); ?>
+								<?php esc_html_e( 'Back', 'skyyrose' ); ?>
 							</button>
 							<button type="button"
 									class="skyy-checkout__next-btn"
 									data-skyy-next-step="4">
-								<?php esc_html_e( 'Review Order', 'skyyrose-flagship' ); ?>
+								<?php esc_html_e( 'Review Order', 'skyyrose' ); ?>
 							</button>
 						</div>
 					</div>
@@ -411,19 +414,19 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 				<div class="skyy-checkout__step" data-skyy-step="4">
 					<div class="skyy-checkout__panel">
 						<h2 class="skyy-checkout__panel-title">
-							<?php esc_html_e( 'Review & Confirm', 'skyyrose-flagship' ); ?>
+							<?php esc_html_e( 'Review & Confirm', 'skyyrose' ); ?>
 						</h2>
 
 						<!-- Review: Contact -->
 						<div class="skyy-checkout__review-section">
 							<div class="skyy-checkout__review-header">
 								<h3 class="skyy-checkout__review-heading">
-									<?php esc_html_e( 'Contact', 'skyyrose-flagship' ); ?>
+									<?php esc_html_e( 'Contact', 'skyyrose' ); ?>
 								</h3>
 								<button type="button"
 										class="skyy-checkout__review-edit"
 										data-skyy-goto-step="1">
-									<?php esc_html_e( 'Edit', 'skyyrose-flagship' ); ?>
+									<?php esc_html_e( 'Edit', 'skyyrose' ); ?>
 								</button>
 							</div>
 							<p class="skyy-checkout__review-value" data-skyy-review-email></p>
@@ -433,12 +436,12 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 						<div class="skyy-checkout__review-section">
 							<div class="skyy-checkout__review-header">
 								<h3 class="skyy-checkout__review-heading">
-									<?php esc_html_e( 'Ship to', 'skyyrose-flagship' ); ?>
+									<?php esc_html_e( 'Ship to', 'skyyrose' ); ?>
 								</h3>
 								<button type="button"
 										class="skyy-checkout__review-edit"
 										data-skyy-goto-step="2">
-									<?php esc_html_e( 'Edit', 'skyyrose-flagship' ); ?>
+									<?php esc_html_e( 'Edit', 'skyyrose' ); ?>
 								</button>
 							</div>
 							<p class="skyy-checkout__review-value" data-skyy-review-address></p>
@@ -448,12 +451,12 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 						<div class="skyy-checkout__review-section">
 							<div class="skyy-checkout__review-header">
 								<h3 class="skyy-checkout__review-heading">
-									<?php esc_html_e( 'Payment', 'skyyrose-flagship' ); ?>
+									<?php esc_html_e( 'Payment', 'skyyrose' ); ?>
 								</h3>
 								<button type="button"
 										class="skyy-checkout__review-edit"
 										data-skyy-goto-step="3">
-									<?php esc_html_e( 'Edit', 'skyyrose-flagship' ); ?>
+									<?php esc_html_e( 'Edit', 'skyyrose' ); ?>
 								</button>
 							</div>
 							<p class="skyy-checkout__review-value" data-skyy-review-payment></p>
@@ -466,10 +469,10 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 								'order_comments',
 								array(
 									'type'        => 'textarea',
-									'label'       => esc_html__( 'Order Notes (optional)', 'skyyrose-flagship' ),
+									'label'       => esc_html__( 'Order Notes (optional)', 'skyyrose' ),
 									'class'       => array( 'skyy-checkout__field', 'form-row-wide' ),
 									'input_class' => array( 'skyy-checkout__input', 'skyy-checkout__textarea' ),
-									'placeholder' => esc_attr__( 'Notes about your order, e.g. special notes for delivery.', 'skyyrose-flagship' ),
+									'placeholder' => esc_attr__( 'Notes about your order, e.g. special notes for delivery.', 'skyyrose' ),
 								),
 								$checkout->get_value( 'order_comments' )
 							);
@@ -493,19 +496,24 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 								<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
 									<path d="M10 12l-4-4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 								</svg>
-								<?php esc_html_e( 'Back', 'skyyrose-flagship' ); ?>
+								<?php esc_html_e( 'Back', 'skyyrose' ); ?>
 							</button>
 
-							<?php echo wp_kses_post( apply_filters( 'woocommerce_order_button_html',
-								'<button type="submit"
+							<?php
+							echo wp_kses_post(
+								apply_filters(
+									'woocommerce_order_button_html',
+									'<button type="submit"
 										 class="skyy-checkout__place-order-btn button alt"
 										 name="woocommerce_checkout_place_order"
 										 id="place_order"
-										 value="' . esc_attr__( 'Place Order', 'skyyrose-flagship' ) . '"
-										 data-value="' . esc_attr__( 'Place Order', 'skyyrose-flagship' ) . '">' .
-									esc_html__( 'Place Order', 'skyyrose-flagship' ) .
-								'</button>'
-							) ); ?>
+										 value="' . esc_attr__( 'Place Order', 'skyyrose' ) . '"
+										 data-value="' . esc_attr__( 'Place Order', 'skyyrose' ) . '">' .
+									esc_html__( 'Place Order', 'skyyrose' ) .
+									'</button>'
+								)
+							);
+							?>
 						</div>
 
 						<?php
@@ -527,7 +535,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 		<aside class="skyy-checkout__sidebar" data-skyy-checkout-sidebar>
 			<div class="skyy-checkout__sidebar-inner">
 				<h2 class="skyy-checkout__sidebar-title">
-					<?php esc_html_e( 'Order Summary', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Order Summary', 'skyyrose' ); ?>
 				</h2>
 
 				<?php
@@ -587,7 +595,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 				<!-- Totals -->
 				<div class="skyy-checkout__sidebar-totals">
 					<div class="skyy-checkout__sidebar-row">
-						<span><?php esc_html_e( 'Subtotal', 'skyyrose-flagship' ); ?></span>
+						<span><?php esc_html_e( 'Subtotal', 'skyyrose' ); ?></span>
 						<span><?php wc_cart_totals_subtotal_html(); ?></span>
 					</div>
 
@@ -596,7 +604,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 							<span>
 								<?php
 								/* translators: %s: coupon code */
-								printf( esc_html__( 'Coupon: %s', 'skyyrose-flagship' ), esc_html( $code ) );
+								printf( esc_html__( 'Coupon: %s', 'skyyrose' ), esc_html( $code ) );
 								?>
 							</span>
 							<span><?php wc_cart_totals_coupon_html( $coupon ); ?></span>
@@ -605,7 +613,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 
 					<?php if ( WC()->cart->needs_shipping() && WC()->cart->show_shipping() ) : ?>
 						<div class="skyy-checkout__sidebar-row">
-							<span><?php esc_html_e( 'Shipping', 'skyyrose-flagship' ); ?></span>
+							<span><?php esc_html_e( 'Shipping', 'skyyrose' ); ?></span>
 							<span><?php wc_cart_totals_shipping_html(); ?></span>
 						</div>
 					<?php endif; ?>
@@ -628,7 +636,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 				</div>
 
 				<div class="skyy-checkout__sidebar-total">
-					<span><?php esc_html_e( 'Total', 'skyyrose-flagship' ); ?></span>
+					<span><?php esc_html_e( 'Total', 'skyyrose' ); ?></span>
 					<span><?php wc_cart_totals_order_total_html(); ?></span>
 				</div>
 

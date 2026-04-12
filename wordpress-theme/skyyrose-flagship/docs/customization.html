@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customization &mdash; SkyyRose Documentation</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#0A0A0A;color:#F5F5F0;font-family:'Inter',system-ui,sans-serif;line-height:1.7;padding:2rem;max-width:860px;margin:0 auto}
+    h1,h2,h3{font-family:'Playfair Display',serif;color:#B76E79;margin:1.5rem 0 .75rem}
+    h1{font-size:2rem;border-bottom:1px solid #B76E79;padding-bottom:.5rem}
+    a{color:#B76E79;text-decoration:none}a:hover{text-decoration:underline}
+    .doc-nav{display:flex;flex-wrap:wrap;gap:.5rem;padding:1rem 0;border-bottom:1px solid #222}
+    .doc-nav a{padding:.25rem .6rem;border:1px solid #333;border-radius:4px;font-size:.85rem}
+    .doc-nav a:hover{border-color:#B76E79}
+    code,pre{background:#151515;border-radius:4px;font-family:'Space Mono',monospace;font-size:.85rem}
+    code{padding:.15rem .35rem}
+    pre{padding:1rem;overflow-x:auto;margin:1rem 0;border:1px solid #222}
+    table{width:100%;border-collapse:collapse;margin:1rem 0}
+    th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid #222}
+    th{color:#B76E79;font-weight:600}
+    p{margin:.75rem 0}
+    ul,ol{margin:.5rem 0 .5rem 1.5rem}
+    .swatch{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:4px;border:1px solid #333}
+  </style>
+</head>
+<body>
+<nav class="doc-nav">
+  <a href="index.html">Overview</a>
+  <a href="installation.html">Installation</a>
+  <a href="getting-started.html">Getting Started</a>
+  <a href="collections.html">Collections</a>
+  <a href="kids-capsule.html">Kids Capsule</a>
+  <a href="elementor.html">Elementor</a>
+  <a href="builders.html">Page Builders</a>
+  <a href="woocommerce.html">WooCommerce</a>
+  <a href="customization.html">Customization</a>
+  <a href="changelog.html">Changelog</a>
+  <a href="credits.html">Credits</a>
+</nav>
+
+<h1>Customization</h1>
+<p>SkyyRose exposes design tokens through <code>theme.json</code>, the WordPress Customizer, CSS custom properties, and the Font Library. Every visual aspect of the theme can be adjusted without editing PHP.</p>
+
+<h2>theme.json Design Tokens</h2>
+
+<h3>Colors (15 Palette Entries)</h3>
+<table>
+  <tr><th>Token</th><th>Value</th><th>Usage</th></tr>
+  <tr><td><span class="swatch" style="background:#0A0A0A"></span><code>base</code></td><td>#0A0A0A</td><td>Page background</td></tr>
+  <tr><td><span class="swatch" style="background:#F5F5F0"></span><code>contrast</code></td><td>#F5F5F0</td><td>Primary text</td></tr>
+  <tr><td><span class="swatch" style="background:#B76E79"></span><code>accent</code></td><td>#B76E79</td><td>Rose gold brand accent</td></tr>
+  <tr><td><span class="swatch" style="background:#C0C0C0"></span><code>black-rose</code></td><td>#C0C0C0</td><td>Black Rose collection silver</td></tr>
+  <tr><td><span class="swatch" style="background:#DC143C"></span><code>love-hurts</code></td><td>#DC143C</td><td>Love Hurts collection crimson</td></tr>
+  <tr><td><span class="swatch" style="background:#D4AF37"></span><code>signature</code></td><td>#D4AF37</td><td>Signature collection gold</td></tr>
+  <tr><td><span class="swatch" style="background:#B76E79"></span><code>kids-capsule</code></td><td>#B76E79</td><td>Kids Capsule rose gold</td></tr>
+  <tr><td><span class="swatch" style="background:#151515"></span><code>surface</code></td><td>#151515</td><td>Card and panel backgrounds</td></tr>
+  <tr><td><span class="swatch" style="background:#1A1A1A"></span><code>surface-alt</code></td><td>#1A1A1A</td><td>Alternate surface</td></tr>
+  <tr><td><span class="swatch" style="background:#222222"></span><code>border</code></td><td>#222222</td><td>Subtle borders</td></tr>
+  <tr><td><span class="swatch" style="background:#333333"></span><code>border-strong</code></td><td>#333333</td><td>Emphasized borders</td></tr>
+  <tr><td><span class="swatch" style="background:#888888"></span><code>muted</code></td><td>#888888</td><td>Secondary text</td></tr>
+  <tr><td><span class="swatch" style="background:#FFFFFF"></span><code>white</code></td><td>#FFFFFF</td><td>Pure white highlights</td></tr>
+  <tr><td><span class="swatch" style="background:#E74C3C"></span><code>error</code></td><td>#E74C3C</td><td>Error states</td></tr>
+  <tr><td><span class="swatch" style="background:#2ECC71"></span><code>success</code></td><td>#2ECC71</td><td>Success states</td></tr>
+</table>
+
+<h3>Gradients (6)</h3>
+<ul>
+  <li><code>rose-gold-fade</code> &mdash; <code>linear-gradient(135deg, #B76E79, #0A0A0A)</code></li>
+  <li><code>black-rose-shimmer</code> &mdash; <code>linear-gradient(135deg, #C0C0C0, #0A0A0A)</code></li>
+  <li><code>love-hurts-glow</code> &mdash; <code>linear-gradient(135deg, #DC143C, #0A0A0A)</code></li>
+  <li><code>signature-lux</code> &mdash; <code>linear-gradient(135deg, #D4AF37, #0A0A0A)</code></li>
+  <li><code>holographic</code> &mdash; <code>linear-gradient(135deg, #B76E79, #D4AF37, #C0C0C0)</code></li>
+  <li><code>dark-surface</code> &mdash; <code>linear-gradient(180deg, #151515, #0A0A0A)</code></li>
+</ul>
+
+<h3>Fluid Typography</h3>
+<p>Font sizes use <code>clamp()</code> for responsive scaling without breakpoints:</p>
+<pre>"fontSize": "clamp(1rem, 0.5rem + 1vw, 1.125rem)"  /* Body */
+"fontSize": "clamp(2rem, 1rem + 3vw, 4rem)"          /* Hero heading */</pre>
+
+<h2>WordPress Customizer</h2>
+<p>Access via <strong>Appearance &rarr; Customize</strong>. SkyyRose adds the following panels:</p>
+<table>
+  <tr><th>Section</th><th>Options</th></tr>
+  <tr><td>Brand Identity</td><td>Primary accent color, secondary accent, logo upload, favicon</td></tr>
+  <tr><td>Social URLs</td><td>Instagram, TikTok, X (Twitter), Facebook, Pinterest, YouTube</td></tr>
+  <tr><td>Kids Capsule</td><td>Toggle collection visibility on/off site-wide</td></tr>
+  <tr><td>Footer</td><td>Copyright text, payment icons toggle, newsletter form shortcode</td></tr>
+</table>
+
+<h2>Font System</h2>
+<p>SkyyRose self-hosts 9 font families via the WordPress Font Library (no Google Fonts CDN calls). All fonts are loaded from <code>/assets/fonts/</code>:</p>
+<table>
+  <tr><th>Family</th><th>Role</th><th>Weights</th></tr>
+  <tr><td>Inter</td><td>Body text, UI</td><td>400, 500, 600, 700</td></tr>
+  <tr><td>Playfair Display</td><td>Headings</td><td>400, 700</td></tr>
+  <tr><td>Cinzel</td><td>Display, luxury accents</td><td>400, 700</td></tr>
+  <tr><td>Cormorant Garamond</td><td>Editorial, quotes</td><td>400, 600</td></tr>
+  <tr><td>Bebas Neue</td><td>Banner headlines</td><td>400</td></tr>
+  <tr><td>DM Sans</td><td>Small text, captions</td><td>400, 500, 700</td></tr>
+  <tr><td>Barlow</td><td>Navigation, buttons</td><td>500, 600</td></tr>
+  <tr><td>Oswald</td><td>Price display, labels</td><td>400, 500</td></tr>
+  <tr><td>Instrument Serif</td><td>Alternate headings</td><td>400</td></tr>
+</table>
+<p><strong>Note:</strong> Space Mono is used in code blocks within the documentation only and is not bundled with the theme.</p>
+
+<h2>Custom Image Sizes</h2>
+<p>SkyyRose registers four image sizes on activation. Upload full-resolution images and WordPress will generate each crop:</p>
+<table>
+  <tr><th>Name</th><th>Dimensions</th><th>Usage</th></tr>
+  <tr><td><code>skyyrose-hero</code></td><td>1920 &times; 1080</td><td>Full-width hero banners</td></tr>
+  <tr><td><code>skyyrose-product</code></td><td>1200 &times; 1500</td><td>Single product page main image</td></tr>
+  <tr><td><code>skyyrose-card</code></td><td>600 &times; 750</td><td>Product grid cards, holographic hover</td></tr>
+  <tr><td><code>skyyrose-thumb</code></td><td>400 &times; 500</td><td>Thumbnails, related products</td></tr>
+</table>
+<p>AVIF format is supported. Upload <code>.avif</code> files directly or use a plugin to auto-convert on upload.</p>
+
+<h2>CSS Custom Properties</h2>
+<p>All theme tokens are exposed as CSS variables on <code>:root</code> for use in custom CSS or child themes:</p>
+<pre>:root {
+  --skyyrose-color-base: #0A0A0A;
+  --skyyrose-color-contrast: #F5F5F0;
+  --skyyrose-color-accent: #B76E79;
+  --skyyrose-color-black-rose: #C0C0C0;
+  --skyyrose-color-love-hurts: #DC143C;
+  --skyyrose-color-signature: #D4AF37;
+  --skyyrose-color-kids-capsule: #B76E79;
+  --skyyrose-font-body: 'Inter', system-ui, sans-serif;
+  --skyyrose-font-heading: 'Playfair Display', serif;
+  --skyyrose-radius-sm: 4px;
+  --skyyrose-radius-md: 8px;
+  --skyyrose-radius-lg: 16px;
+  --skyyrose-shadow-card: 0 4px 24px rgba(0,0,0,0.4);
+}</pre>
+<p>Override any property in a child theme's <code>style.css</code> or via <strong>Appearance &rarr; Customize &rarr; Additional CSS</strong>.</p>
+
+</body>
+</html>

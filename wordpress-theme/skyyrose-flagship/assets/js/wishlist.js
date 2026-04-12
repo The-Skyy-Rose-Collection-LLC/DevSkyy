@@ -4,7 +4,7 @@
  * Handles add/remove/toggle wishlist via AJAX.
  * Depends on localized `skyyRoseWishlist` object from PHP.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since 1.0.0
  */
 (function () {

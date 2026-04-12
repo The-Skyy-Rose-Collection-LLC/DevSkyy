@@ -9,7 +9,7 @@
  * Products loaded dynamically from WooCommerce (kids-capsule category).
  * Built on the shared immersive engine (immersive.css + immersive.js).
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.0.0
  */
 
@@ -18,11 +18,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/* ─────────────────────────────────────────────────────────
-   Product Data — WooCommerce query by category.
-   Distributes products across 2 rooms: first half in room 1,
-   second half in room 2. Falls back to hardcoded if WC inactive.
-   ───────────────────────────────────────────────────────── */
+/*
+─────────────────────────────────────────────────────────
+	Product Data — WooCommerce query by category.
+	Distributes products across 2 rooms: first half in room 1,
+	second half in room 2. Falls back to hardcoded if WC inactive.
+	───────────────────────────────────────────────────────── */
 
 $products_per_room = array( array(), array() );
 
@@ -35,19 +36,21 @@ $hotspot_positions = array(
 );
 
 if ( class_exists( 'WooCommerce' ) ) {
-	$wc_products = wc_get_products( array(
-		'category' => array( 'kids-capsule' ),
-		'status'   => 'publish',
-		'limit'    => 20,
-		'orderby'  => 'menu_order',
-		'order'    => 'ASC',
-	) );
+	$wc_products = wc_get_products(
+		array(
+			'category' => array( 'kids-capsule' ),
+			'status'   => 'publish',
+			'limit'    => 20,
+			'orderby'  => 'menu_order',
+			'order'    => 'ASC',
+		)
+	);
 
 	$half = max( 1, (int) ceil( count( $wc_products ) / 2 ) );
 
 	foreach ( $wc_products as $idx => $wc_product ) {
 		$room_idx = $idx < $half ? 0 : 1;
-		$slot     = $room_idx === 0 ? $idx : $idx - $half;
+		$slot     = 0 === $room_idx ? $idx : $idx - $half;
 		$pos      = isset( $hotspot_positions[ $room_idx ][ $slot ] )
 			? $hotspot_positions[ $room_idx ][ $slot ]
 			: array( 30 + ( $slot * 18 ), 42 + ( $slot * 5 ) );
@@ -60,21 +63,37 @@ if ( class_exists( 'WooCommerce' ) ) {
 			'price'      => wp_strip_all_tags( wc_price( $wc_product->get_price() ) ),
 			'image'      => $wc_product->get_image_id() ? wp_get_attachment_url( $wc_product->get_image_id() ) : '',
 			'url'        => $wc_product->get_permalink(),
-			'collection' => __( 'Kids Capsule Collection', 'skyyrose-flagship' ),
+			'collection' => __( 'Kids Capsule Collection', 'skyyrose' ),
 			'sizes'      => '',
 			'left'       => (string) $pos[0],
 			'top'        => (string) $pos[1],
 			'prop'       => 'playroom-display',
-			'prop_label' => __( 'Playroom display', 'skyyrose-flagship' ),
+			'prop_label' => __( 'Playroom display', 'skyyrose' ),
 		);
 	}
 } else {
 	// Fallback hardcoded products.
 	$fallback = array(
-		array( 'name' => 'Mini Rose Hoodie',      'price' => '$95',  'room' => 0 ),
-		array( 'name' => 'Little Crown Tee',       'price' => '$45',  'room' => 0 ),
-		array( 'name' => 'Petal Joggers Kids',     'price' => '$65',  'room' => 1 ),
-		array( 'name' => 'Baby Rose Onesie',       'price' => '$55',  'room' => 1 ),
+		array(
+			'name'  => 'Mini Rose Hoodie',
+			'price' => '$95',
+			'room'  => 0,
+		),
+		array(
+			'name'  => 'Little Crown Tee',
+			'price' => '$45',
+			'room'  => 0,
+		),
+		array(
+			'name'  => 'Petal Joggers Kids',
+			'price' => '$65',
+			'room'  => 1,
+		),
+		array(
+			'name'  => 'Baby Rose Onesie',
+			'price' => '$55',
+			'room'  => 1,
+		),
 	);
 
 	foreach ( $fallback as $idx => $fb ) {
@@ -90,28 +109,29 @@ if ( class_exists( 'WooCommerce' ) ) {
 			'price'      => $fb['price'],
 			'image'      => '',
 			'url'        => home_url( '/pre-order/' ),
-			'collection' => __( 'Kids Capsule Collection', 'skyyrose-flagship' ),
+			'collection' => __( 'Kids Capsule Collection', 'skyyrose' ),
 			'sizes'      => '',
 			'left'       => (string) $pos[0],
 			'top'        => (string) $pos[1],
 			'prop'       => 'playroom-display',
-			'prop_label' => __( 'Playroom display', 'skyyrose-flagship' ),
+			'prop_label' => __( 'Playroom display', 'skyyrose' ),
 		);
 	}
 }
 
-/* ─────────────────────────────────────────────────────────
-   Room Config — 2 rooms using AI scene images.
-   ───────────────────────────────────────────────────────── */
+/*
+─────────────────────────────────────────────────────────
+	Room Config — 2 rooms using AI scene images.
+	───────────────────────────────────────────────────────── */
 
 $rooms = array(
 	array(
-		'name'     => esc_html__( 'The Playroom', 'skyyrose-flagship' ),
+		'name'     => esc_html__( 'The Playroom', 'skyyrose' ),
 		'image'    => 'scene-kids-capsule-playroom.webp',
 		'products' => $products_per_room[0],
 	),
 	array(
-		'name'     => esc_html__( 'The Runway', 'skyyrose-flagship' ),
+		'name'     => esc_html__( 'The Runway', 'skyyrose' ),
 		'image'    => 'scene-kids-capsule-runway.webp',
 		'products' => $products_per_room[1],
 	),
@@ -122,15 +142,19 @@ get_header();
 
 <main id="primary" class="site-main immersive-page" role="main" tabindex="-1">
 	<?php
-	get_template_part( 'template-parts/immersive-scene', null, array(
-		'collection_slug' => 'kids-capsule',
-		'collection_name' => __( 'Kids Capsule Collection', 'skyyrose-flagship' ),
-		'world_name'      => __( 'The Playroom', 'skyyrose-flagship' ),
-		'tagline'         => __( 'Luxury grows young.', 'skyyrose-flagship' ),
-		'accent_color'    => '#B76E79',
-		'collection_url'  => home_url( '/collection-kids-capsule/' ),
-		'rooms'           => $rooms,
-	) );
+	get_template_part(
+		'template-parts/immersive-scene',
+		null,
+		array(
+			'collection_slug' => 'kids-capsule',
+			'collection_name' => __( 'Kids Capsule Collection', 'skyyrose' ),
+			'world_name'      => __( 'The Playroom', 'skyyrose' ),
+			'tagline'         => __( 'Luxury grows young.', 'skyyrose' ),
+			'accent_color'    => '#B76E79',
+			'collection_url'  => home_url( '/collection-kids-capsule/' ),
+			'rooms'           => $rooms,
+		)
+	);
 	?>
 </main>
 

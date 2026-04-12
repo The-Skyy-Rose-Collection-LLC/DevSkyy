@@ -1,11 +1,11 @@
 /**
- * SkyyRose Flagship - WooCommerce Checkout Styles
+ * SkyyRose - WooCommerce Checkout Styles
  *
  * Styles for the checkout page. Loaded conditionally
  * only on WooCommerce checkout pages.
  * Requires woocommerce.css (base variables + product cards).
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.2.0
  */
 

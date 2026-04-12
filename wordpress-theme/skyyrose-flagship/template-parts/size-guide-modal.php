@@ -3,7 +3,7 @@
  * Size Guide Modal — dark luxury size guide accessible site-wide.
  * Triggered by [data-open-size-guide] or .js-size-guide-trigger elements.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   5.3.0
  */
 
@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit;
 
 $sg_tables = array(
 	'tops'    => array(
-		'label'   => __( 'Tops', 'skyyrose-flagship' ),
+		'label'   => __( 'Tops', 'skyyrose' ),
 		'headers' => array( 'Size', 'Chest', 'Waist', 'Length', 'Sleeve' ),
 		'rows'    => array(
 			array( 'XS', '34', '28', '27', '32' ),
@@ -23,7 +23,7 @@ $sg_tables = array(
 		),
 	),
 	'bottoms' => array(
-		'label'   => __( 'Bottoms', 'skyyrose-flagship' ),
+		'label'   => __( 'Bottoms', 'skyyrose' ),
 		'headers' => array( 'Size', 'Waist', 'Hip', 'Inseam', 'Length' ),
 		'rows'    => array(
 			array( 'XS', '28', '34', '30', '38' ),
@@ -35,7 +35,7 @@ $sg_tables = array(
 		),
 	),
 	'kids'    => array(
-		'label'   => __( 'Kids', 'skyyrose-flagship' ),
+		'label'   => __( 'Kids', 'skyyrose' ),
 		'headers' => array( 'Size', 'Age', 'Chest', 'Waist', 'Height' ),
 		'rows'    => array(
 			array( '2T', '2', '21', '20', '33-36' ),
@@ -49,40 +49,54 @@ $sg_tables = array(
 ?>
 <div id="size-guide-modal" class="sg-overlay" role="dialog" aria-labelledby="sg-heading" aria-modal="true" aria-hidden="true" inert>
 <div class="sg-panel">
-	<button type="button" class="sg-close" aria-label="<?php esc_attr_e( 'Close size guide', 'skyyrose-flagship' ); ?>">
+	<button type="button" class="sg-close" aria-label="<?php esc_attr_e( 'Close size guide', 'skyyrose' ); ?>">
 		<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
 	</button>
-	<h2 id="sg-heading" class="sg-heading"><?php esc_html_e( 'Size Guide', 'skyyrose-flagship' ); ?></h2>
-	<p class="sg-subheading"><?php esc_html_e( 'All measurements in inches', 'skyyrose-flagship' ); ?></p>
+	<h2 id="sg-heading" class="sg-heading"><?php esc_html_e( 'Size Guide', 'skyyrose' ); ?></h2>
+	<p class="sg-subheading"><?php esc_html_e( 'All measurements in inches', 'skyyrose' ); ?></p>
 
-	<div class="sg-tabs" role="tablist" aria-label="<?php esc_attr_e( 'Size categories', 'skyyrose-flagship' ); ?>">
+	<div class="sg-tabs" role="tablist" aria-label="<?php esc_attr_e( 'Size categories', 'skyyrose' ); ?>">
 		<?php $first = true; foreach ( $sg_tables as $key => $t ) : ?>
 			<button type="button" role="tab" id="sg-tab-<?php echo esc_attr( $key ); ?>" class="sg-tab<?php echo $first ? ' sg-tab--active' : ''; ?>" aria-selected="<?php echo $first ? 'true' : 'false'; ?>" aria-controls="sg-panel-<?php echo esc_attr( $key ); ?>" data-sg-tab="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $t['label'] ); ?></button>
-		<?php $first = false; endforeach; ?>
+			<?php
+			$first = false;
+endforeach;
+		?>
 	</div>
 
 	<?php $first = true; foreach ( $sg_tables as $key => $t ) : ?>
 		<div id="sg-panel-<?php echo esc_attr( $key ); ?>" class="sg-tabpanel" role="tabpanel" aria-labelledby="sg-tab-<?php echo esc_attr( $key ); ?>"<?php echo $first ? '' : ' hidden'; ?>>
 			<div class="sg-table-wrap"><table class="sg-table">
-				<thead><tr><?php foreach ( $t['headers'] as $h ) : ?><th><?php echo esc_html( $h ); ?></th><?php endforeach; ?></tr></thead>
+				<thead><tr>
+				<?php
+				foreach ( $t['headers'] as $h ) :
+					?>
+					<th><?php echo esc_html( $h ); ?></th><?php endforeach; ?></tr></thead>
 				<tbody>
 					<?php foreach ( $t['rows'] as $row ) : ?>
-						<tr><?php foreach ( $row as $c ) : ?><td><?php echo esc_html( $c ); ?></td><?php endforeach; ?></tr>
+						<tr>
+						<?php
+						foreach ( $row as $c ) :
+							?>
+							<td><?php echo esc_html( $c ); ?></td><?php endforeach; ?></tr>
 					<?php endforeach; ?>
 				</tbody>
 			</table></div>
 		</div>
-	<?php $first = false; endforeach; ?>
+		<?php
+		$first = false;
+endforeach;
+	?>
 
 	<div class="sg-measure">
-		<h3 class="sg-measure__heading"><?php esc_html_e( 'How to Measure', 'skyyrose-flagship' ); ?></h3>
+		<h3 class="sg-measure__heading"><?php esc_html_e( 'How to Measure', 'skyyrose' ); ?></h3>
 		<div class="sg-measure__content">
 			<svg class="sg-measure__icon" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><ellipse cx="24" cy="10" rx="6" ry="7"/><path d="M14 22c0-2 4-4 10-4s10 2 10 4v2c0 1-2 3-10 3s-10-2-10-3z"/><path d="M18 27v18M30 27v18"/><path d="M18 34h12"/></svg>
 			<ul class="sg-measure__list">
-				<li><?php esc_html_e( 'Chest: Measure around the fullest part, keeping the tape level.', 'skyyrose-flagship' ); ?></li>
-				<li><?php esc_html_e( 'Waist: Measure around your natural waistline, just above the navel.', 'skyyrose-flagship' ); ?></li>
-				<li><?php esc_html_e( 'Hip: Measure around the widest part of your hips.', 'skyyrose-flagship' ); ?></li>
-				<li><?php esc_html_e( 'Inseam: Measure from the crotch seam to the ankle bone.', 'skyyrose-flagship' ); ?></li>
+				<li><?php esc_html_e( 'Chest: Measure around the fullest part, keeping the tape level.', 'skyyrose' ); ?></li>
+				<li><?php esc_html_e( 'Waist: Measure around your natural waistline, just above the navel.', 'skyyrose' ); ?></li>
+				<li><?php esc_html_e( 'Hip: Measure around the widest part of your hips.', 'skyyrose' ); ?></li>
+				<li><?php esc_html_e( 'Inseam: Measure from the crotch seam to the ankle bone.', 'skyyrose' ); ?></li>
 			</ul>
 		</div>
 	</div>

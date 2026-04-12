@@ -9,7 +9,7 @@
  * Respects prefers-reduced-motion.
  * No external dependencies.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   4.0.0
  */
 

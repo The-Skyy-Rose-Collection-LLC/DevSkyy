@@ -7,7 +7,7 @@
  * All event handlers use addEventListener (no inline onclick — CSP compliant).
  * Localized data from WordPress via `skyyrose_homepage` object.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   4.1.0
  */
 

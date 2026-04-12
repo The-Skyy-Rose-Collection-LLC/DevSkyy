@@ -1,6 +1,6 @@
 {
-    "name": "skyyrose/flagship-theme",
-    "description": "SkyyRose flagship WordPress theme with WooCommerce and 3D capabilities",
+    "name": "skyyrose/theme",
+    "description": "SkyyRose WordPress theme with WooCommerce and 3D capabilities",
     "type": "wordpress-theme",
     "license": "GPL-2.0-or-later",
     "authors": [

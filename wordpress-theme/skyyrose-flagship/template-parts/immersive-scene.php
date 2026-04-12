@@ -10,7 +10,7 @@
  * Called via get_template_part() from each collection's
  * immersive page template with $args containing room data.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.0.0
  *
  * @param array $args {
@@ -55,25 +55,26 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 
 <!-- ═══ Immersive Scene: <?php echo esc_html( $world_name ); ?> ═══ -->
 <div class="immersive-scene immersive-<?php echo esc_attr( $collection_slug ); ?>"
-     role="region"
-     aria-labelledby="scene-title"
-     style="--accent-color: <?php echo esc_attr( $accent_color ); ?>;">
+	role="region"
+	aria-labelledby="scene-title"
+	style="--accent-color: <?php echo esc_attr( $accent_color ); ?>;">
 
 	<!-- Loading Screen -->
 	<?php get_template_part( 'template-parts/immersive-loader', null, array( 'world_name' => $world_name ) ); ?>
 
 	<!-- Scene Viewport — Composited AI Scene Images -->
 	<div class="scene-viewport">
-		<?php foreach ( $rooms as $index => $room ) :
+		<?php
+		foreach ( $rooms as $index => $room ) :
 			$room_name  = isset( $room['name'] ) ? $room['name'] : '';
 			$room_image = isset( $room['image'] ) ? $room['image'] : '';
-		?>
+			?>
 			<div class="scene-layer<?php echo 0 === $index ? ' active' : ''; ?>"
-			     data-room-name="<?php echo esc_attr( $room_name ); ?>">
+				data-room-name="<?php echo esc_attr( $room_name ); ?>">
 				<?php if ( ! empty( $room_image ) ) : ?>
 					<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/immersive/' . $room_image ); ?>"
-					     alt="<?php echo esc_attr( $room_name ); ?>"
-					     <?php echo 0 === $index ? 'fetchpriority="high"' : 'loading="lazy"'; ?>>
+						alt="<?php echo esc_attr( $room_name ); ?>"
+						<?php echo 0 === $index ? 'fetchpriority="high"' : 'loading="lazy"'; ?>>
 				<?php endif; ?>
 			</div>
 		<?php endforeach; ?>
@@ -85,30 +86,36 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 
 	<!-- Room Navigation Arrows -->
 	<div class="room-nav room-nav-prev">
-		<button class="room-nav-btn" type="button" aria-label="<?php esc_attr_e( 'Previous room', 'skyyrose-flagship' ); ?>">
+		<button class="room-nav-btn" type="button" aria-label="<?php esc_attr_e( 'Previous room', 'skyyrose' ); ?>">
 			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"></polyline></svg>
 		</button>
 	</div>
 	<div class="room-nav room-nav-next">
-		<button class="room-nav-btn" type="button" aria-label="<?php esc_attr_e( 'Next room', 'skyyrose-flagship' ); ?>">
+		<button class="room-nav-btn" type="button" aria-label="<?php esc_attr_e( 'Next room', 'skyyrose' ); ?>">
 			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"></polyline></svg>
 		</button>
 	</div>
 
 	<!-- Room Indicators -->
-	<div class="room-indicators" role="group" aria-label="<?php esc_attr_e( 'Room selector', 'skyyrose-flagship' ); ?>">
+	<div class="room-indicators" role="group" aria-label="<?php esc_attr_e( 'Room selector', 'skyyrose' ); ?>">
 		<?php foreach ( $rooms as $index => $room ) : ?>
 			<button
 				class="room-dot<?php echo 0 === $index ? ' active' : ''; ?>"
 				type="button"
 				aria-pressed="<?php echo 0 === $index ? 'true' : 'false'; ?>"
-				aria-label="<?php echo esc_attr( sprintf(
+				aria-label="
+				<?php
+				echo esc_attr(
+					sprintf(
 					/* translators: 1: room number, 2: total rooms, 3: room name */
-					__( 'Room %1$d of %2$d: %3$s', 'skyyrose-flagship' ),
-					$index + 1,
-					$room_count,
-					$room['name']
-				) ); ?>"
+						__( 'Room %1$d of %2$d: %3$s', 'skyyrose' ),
+						$index + 1,
+						$room_count,
+						$room['name']
+					)
+				);
+				?>
+				"
 			></button>
 		<?php endforeach; ?>
 	</div>
@@ -117,11 +124,12 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 	<!-- Hotspot Containers — One per room -->
 	<?php foreach ( $rooms as $room_index => $room ) : ?>
 		<div class="hotspot-container"<?php echo 0 !== $room_index ? ' aria-hidden="true" inert style="display:none;"' : ''; ?>>
-			<?php foreach ( $room['products'] as $product ) :
+			<?php
+			foreach ( $room['products'] as $product ) :
 				if ( empty( $product ) ) {
 					continue;
 				}
-			?>
+				?>
 				<?php
 					$p_id  = isset( $product['id'] ) ? $product['id'] : '';
 					$p_sku = isset( $product['sku'] ) ? $product['sku'] : $p_id;
@@ -133,7 +141,10 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 					style="left: <?php echo esc_attr( isset( $product['left'] ) ? $product['left'] : '50' ); ?>%; top: <?php echo esc_attr( isset( $product['top'] ) ? $product['top'] : '50' ); ?>%;"
 					data-product-id="<?php echo esc_attr( $p_id ); ?>"
 					data-product-sku="<?php echo esc_attr( $p_sku ); ?>"
-					<?php if ( $p_wc > 0 ) : ?>data-product-wc-id="<?php echo esc_attr( $p_wc ); ?>"<?php endif; ?>
+					<?php
+					if ( $p_wc > 0 ) :
+						?>
+						data-product-wc-id="<?php echo esc_attr( $p_wc ); ?>"<?php endif; ?>
 					data-product-name="<?php echo esc_attr( $product['name'] ); ?>"
 					data-product-price="<?php echo esc_attr( $product['price'] ); ?>"
 					data-product-image="<?php echo esc_url( $product['image'] ); ?>"
@@ -169,7 +180,7 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 	<?php if ( $collection_url ) : ?>
 		<div class="immersive-cta">
 			<a href="<?php echo esc_url( $collection_url ); ?>" class="immersive-cta__link">
-				<span class="immersive-cta__text"><?php esc_html_e( 'Explore the Full Collection', 'skyyrose-flagship' ); ?></span>
+				<span class="immersive-cta__text"><?php esc_html_e( 'Explore the Full Collection', 'skyyrose' ); ?></span>
 				<svg class="immersive-cta__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 					<path d="M5 12h14"/>
 					<path d="m12 5 7 7-7 7"/>
@@ -183,26 +194,26 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 <!-- Product Detail Panel (Glassmorphism Slide-Up) -->
 <div class="product-panel-overlay" aria-hidden="true"></div>
 <div class="product-panel" role="dialog" aria-modal="true" aria-hidden="true" inert aria-labelledby="product-panel-name" tabindex="-1">
-	<button class="product-panel-close" type="button" aria-label="<?php esc_attr_e( 'Close product details', 'skyyrose-flagship' ); ?>">&times;</button>
+	<button class="product-panel-close" type="button" aria-label="<?php esc_attr_e( 'Close product details', 'skyyrose' ); ?>">&times;</button>
 	<div class="product-panel-inner">
 		<div class="product-panel-thumb">
 			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>"
-			     alt="<?php esc_attr_e( 'Product preview', 'skyyrose-flagship' ); ?>"
-			     data-fallback="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>">
+				alt="<?php esc_attr_e( 'Product preview', 'skyyrose' ); ?>"
+				data-fallback="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>">
 		</div>
 		<div class="product-panel-info">
 			<p class="product-panel-collection"></p>
-			<h3 class="product-panel-name" id="product-panel-name"><?php esc_html_e( 'Product Details', 'skyyrose-flagship' ); ?></h3>
+			<h3 class="product-panel-name" id="product-panel-name"><?php esc_html_e( 'Product Details', 'skyyrose' ); ?></h3>
 			<p class="product-panel-prop"></p>
 			<p class="product-panel-price"></p>
-			<div class="product-panel-sizes" role="group" aria-label="<?php esc_attr_e( 'Available sizes', 'skyyrose-flagship' ); ?>"></div>
+			<div class="product-panel-sizes" role="group" aria-label="<?php esc_attr_e( 'Available sizes', 'skyyrose' ); ?>"></div>
 			<div class="product-panel-actions">
-				<button class="btn-add-to-cart" type="button"><?php esc_html_e( 'Pre-Order Now', 'skyyrose-flagship' ); ?></button>
-				<a class="btn-view-details" href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"><?php esc_html_e( 'View Details', 'skyyrose-flagship' ); ?></a>
+				<button class="btn-add-to-cart" type="button"><?php esc_html_e( 'Pre-Order Now', 'skyyrose' ); ?></button>
+				<a class="btn-view-details" href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"><?php esc_html_e( 'View Details', 'skyyrose' ); ?></a>
 			</div>
 			<?php if ( $collection_url ) : ?>
 				<a class="btn-view-collection" href="<?php echo esc_url( $collection_url ); ?>">
-					<?php esc_html_e( 'View Full Collection', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'View Full Collection', 'skyyrose' ); ?>
 					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 						<path d="M5 12h14"/>
 						<path d="m12 5 7 7-7 7"/>
