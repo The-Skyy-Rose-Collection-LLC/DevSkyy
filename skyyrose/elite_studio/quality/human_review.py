@@ -66,9 +66,7 @@ class HumanReviewGate:
         """
         try:
             manager = self._get_manager()
-            item = asyncio.get_event_loop().run_until_complete(
-                self._submit_async(manager, sku, image_path, job_id)
-            )
+            item = asyncio.run(self._submit_async(manager, sku, image_path, job_id))
             logger.info(
                 "Submitted %s for human review: review_id=%s", sku, item.id
             )
@@ -110,9 +108,7 @@ class HumanReviewGate:
         try:
             manager = self._get_manager()
             while time.monotonic() < deadline:
-                item = asyncio.get_event_loop().run_until_complete(
-                    manager.get_item(review_id)
-                )
+                item = asyncio.run(manager.get_item(review_id))
                 decision = self._map_status(item.status.value)
                 if decision in ("approve", "reject"):
                     return ReviewDecision(

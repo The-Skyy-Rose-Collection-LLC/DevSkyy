@@ -12,7 +12,6 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import TYPE_CHECKING
 
 logger = logging.getLogger(__name__)
 
@@ -157,7 +156,7 @@ class QualityClassifier:
         # Compute weighted quality score across all labels
         score = sum(
             prob * _LABEL_SCORES[label]
-            for prob, label in zip(prob_list, _CANDIDATE_LABELS)
+            for prob, label in zip(prob_list, _CANDIDATE_LABELS, strict=True)
         )
         score = max(0.0, min(1.0, score))
 
