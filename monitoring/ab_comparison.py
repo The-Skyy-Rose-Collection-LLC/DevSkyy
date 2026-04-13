@@ -17,7 +17,7 @@ import logging
 import math
 import os
 from dataclasses import dataclass
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from typing import Any
 
 logger = logging.getLogger(__name__)
