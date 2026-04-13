@@ -12,8 +12,7 @@ import asyncio
 import logging
 import shutil
 import time
-from datetime import datetime, timezone
-from pathlib import Path
+from datetime import datetime, UTC
 
 from ..config import OUTPUT_DIR
 from ..models import TryOnResult
@@ -163,7 +162,7 @@ class TryOnAgent:
             raise ValueError("FASHN returned no image_path")
 
         # Copy to canonical Elite Studio output location
-        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         dest_dir = OUTPUT_DIR / sku / "tryon"
         dest_dir.mkdir(parents=True, exist_ok=True)
         dest_path = dest_dir / f"{sku}-tryon-{timestamp}.jpg"
