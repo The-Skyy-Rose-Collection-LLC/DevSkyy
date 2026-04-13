@@ -26,6 +26,7 @@ from .nodes import (
     finalize_node,
     generator_node,
     quality_node,
+    tryon_node,
     vision_node,
 )
 from .state import EliteStudioState
@@ -36,6 +37,7 @@ _GENERATOR = GENERATOR
 _QUALITY = QUALITY
 _COMPOSITOR = COMPOSITOR
 _FINALIZE = FINALIZE
+_TRYON = "tryon"
 
 
 @dataclass(frozen=True)
@@ -48,7 +50,8 @@ class GraphConfig:
 
     max_retries: int = 2
     enable_compositor: bool = False
-    # Future layers will add: enable_upscaling, enable_safety, etc.
+    enable_tryon: bool = False
+    tryon_category: str = "upper_body"
     extra_nodes: list[str] = field(default_factory=list)
 
 
@@ -57,6 +60,10 @@ def build_graph(config: GraphConfig | None = None) -> object:
 
     Returns a ``CompiledGraph`` that can be invoked with
     ``graph.invoke(state_dict)``.
+
+    When ``enable_tryon=True``, a sequential tryon node is inserted after
+    quality (alongside compositor routing). The tryon node is additive:
+    errors never fail the main job.
 
     Args:
         config: Optional graph configuration. Uses defaults if None.
@@ -69,12 +76,16 @@ def build_graph(config: GraphConfig | None = None) -> object:
 
     graph = StateGraph(EliteStudioState)
 
-    # --- Register nodes ---
+    # --- Register core nodes ---
     graph.add_node(_VISION, vision_node)
     graph.add_node(_GENERATOR, generator_node)
     graph.add_node(_QUALITY, quality_node)
     graph.add_node(_COMPOSITOR, compositor_node)
     graph.add_node(_FINALIZE, finalize_node)
+
+    # --- Register optional tryon node ---
+    if config.enable_tryon:
+        graph.add_node(_TRYON, tryon_node)
 
     # --- Entry point ---
     graph.set_entry_point(_VISION)
@@ -90,16 +101,31 @@ def build_graph(config: GraphConfig | None = None) -> object:
         after_generation,
         {_QUALITY: _QUALITY, END: END},
     )
-    graph.add_conditional_edges(
-        _QUALITY,
-        after_quality,
-        {_GENERATOR: _GENERATOR, _COMPOSITOR: _COMPOSITOR, _FINALIZE: _FINALIZE},
-    )
-    graph.add_conditional_edges(
-        _COMPOSITOR,
-        after_compositor,
-        {_FINALIZE: _FINALIZE},
-    )
+
+    if config.enable_tryon:
+        # quality → tryon → (compositor or finalize)
+        graph.add_conditional_edges(
+            _QUALITY,
+            after_quality,
+            {_GENERATOR: _GENERATOR, _COMPOSITOR: _COMPOSITOR, _FINALIZE: _TRYON},
+        )
+        graph.add_conditional_edges(
+            _COMPOSITOR,
+            after_compositor,
+            {_FINALIZE: _TRYON},
+        )
+        graph.add_edge(_TRYON, _FINALIZE)
+    else:
+        graph.add_conditional_edges(
+            _QUALITY,
+            after_quality,
+            {_GENERATOR: _GENERATOR, _COMPOSITOR: _COMPOSITOR, _FINALIZE: _FINALIZE},
+        )
+        graph.add_conditional_edges(
+            _COMPOSITOR,
+            after_compositor,
+            {_FINALIZE: _FINALIZE},
+        )
 
     # --- Terminal edge ---
     graph.add_edge(_FINALIZE, END)

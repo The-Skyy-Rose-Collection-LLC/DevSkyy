@@ -47,6 +47,8 @@ def run_single(
         sku=sku,
         view=view,
         enable_compositor=config.enable_compositor,
+        enable_tryon=config.enable_tryon,
+        tryon_category=config.tryon_category,
         max_retries=config.max_retries,
     )
 

@@ -22,17 +22,24 @@ from .coordinator import Coordinator
 from .utils import discover_all_skus, discover_scene_images
 
 
-def _run_graph(sku: str, view: str, with_compositor: bool) -> None:
+def _run_graph(
+    sku: str,
+    view: str,
+    with_compositor: bool,
+    with_tryon: bool = False,
+) -> None:
     """Run the LangGraph engine path and print result."""
     from .graph import GraphConfig, run_single
 
-    config = GraphConfig(enable_compositor=with_compositor)
+    config = GraphConfig(enable_compositor=with_compositor, enable_tryon=with_tryon)
     result = run_single(sku=sku, view=view, config=config)
     print(f"\nResult: {result.status}")
     if result.output_path:
         print(f"Output: {result.output_path}")
     if result.compositing and result.compositing.success:
         print(f"Composited: {result.compositing.output_path}")
+    if result.tryon and result.tryon.success:
+        print(f"Try-on:     {result.tryon.output_path}")
     if result.error:
         print(f"Error: {result.error}")
     if result.quality:
@@ -52,7 +59,12 @@ def build_team(with_compositor: bool = False) -> Coordinator:
 def cmd_produce(args: argparse.Namespace) -> None:
     """Produce a single product."""
     if getattr(args, "graph", False):
-        _run_graph(args.sku, args.view, with_compositor=getattr(args, "composite", False))
+        _run_graph(
+            args.sku,
+            args.view,
+            with_compositor=getattr(args, "composite", False),
+            with_tryon=getattr(args, "tryon", False),
+        )
         return
     team = build_team(with_compositor=getattr(args, "composite", False))
     result = team.produce(args.sku, args.view)
@@ -218,6 +230,12 @@ def main(argv: list[str] | None = None) -> None:
         "--graph",
         action="store_true",
         help="Use LangGraph engine instead of legacy Coordinator",
+    )
+    # Add --tryon flag to produce (requires --graph)
+    p_produce.add_argument(
+        "--tryon",
+        action="store_true",
+        help="Run virtual try-on after generation (requires --graph; uses FASHN_API_KEY)",
     )
 
     args = parser.parse_args(argv)
