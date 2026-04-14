@@ -45,16 +45,26 @@ def _make_test_jpeg(path: str | Path, color: tuple[int, int, int] = (128, 64, 32
 class TestRegressionResult:
     def test_frozen(self):
         r = RegressionResult(
-            success=True, sku="br-001", ssim_score=0.9, passed=True,
-            threshold=0.85, has_reference=True, report_path="/tmp/r.html",
+            success=True,
+            sku="br-001",
+            ssim_score=0.9,
+            passed=True,
+            threshold=0.85,
+            has_reference=True,
+            report_path="/tmp/r.html",
         )
         with pytest.raises((AttributeError, TypeError)):
             r.passed = False  # type: ignore[misc]
 
     def test_default_error(self):
         r = RegressionResult(
-            success=True, sku="br-001", ssim_score=0.9, passed=True,
-            threshold=0.85, has_reference=False, report_path="",
+            success=True,
+            sku="br-001",
+            ssim_score=0.9,
+            passed=True,
+            threshold=0.85,
+            has_reference=False,
+            report_path="",
         )
         assert r.error == ""
 
@@ -139,6 +149,7 @@ class TestSSIMAboveThreshold:
         img_path = tmp_path / "img.jpg"
         _make_test_jpeg(img_path, color=(50, 50, 50))
         import shutil
+
         shutil.copy(img_path, golden_dir / "reference.jpg")
 
         tester = VisualRegressionTester(

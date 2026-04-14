@@ -59,8 +59,11 @@ class TestUpscalingAgentPilFallback:
         src = make_test_image(tmp_path, size=(128, 128))
         with patch.dict(os.environ, {}, clear=False):
             # Ensure no Replicate key so PIL path is taken
-            env = {k: v for k, v in os.environ.items()
-                   if k not in ("REPLICATE_API_TOKEN", "REPLICATE_API_KEY")}
+            env = {
+                k: v
+                for k, v in os.environ.items()
+                if k not in ("REPLICATE_API_TOKEN", "REPLICATE_API_KEY")
+            }
             with patch.dict(os.environ, env, clear=True):
                 result = self.agent.upscale(str(src), target_resolution=(512, 512))
 

@@ -60,7 +60,9 @@ class DeadLetterQueue:
             logger.warning("DeadLetterQueue: Redis unavailable: %s", exc)
             return None
 
-    def move_to_dlq(self, job_id: str, error: str, original_data: dict[str, Any] | None = None) -> None:
+    def move_to_dlq(
+        self, job_id: str, error: str, original_data: dict[str, Any] | None = None
+    ) -> None:
         """Push a failed job onto the DLQ.
 
         Args:
@@ -70,7 +72,9 @@ class DeadLetterQueue:
         """
         r = self._get_redis()
         if r is None:
-            logger.warning("DeadLetterQueue.move_to_dlq: Redis unavailable, job %s lost from DLQ", job_id)
+            logger.warning(
+                "DeadLetterQueue.move_to_dlq: Redis unavailable, job %s lost from DLQ", job_id
+            )
             return
 
         entry = {
@@ -218,5 +222,7 @@ class DeadLetterQueue:
                 logger.warning("DeadLetterQueue.purge: error processing entry: %s", exc)
 
         if purged:
-            logger.info("DeadLetterQueue.purge: removed %d entries older than %dh", purged, older_than_hours)
+            logger.info(
+                "DeadLetterQueue.purge: removed %d entries older than %dh", purged, older_than_hours
+            )
         return purged

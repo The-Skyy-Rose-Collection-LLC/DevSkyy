@@ -30,10 +30,15 @@ class TestLoadTestReport:
         import pytest
 
         r = LoadTestReport(
-            total_jobs=1, successful=1, failed=0,
-            throughput_per_min=60.0, p50_latency_s=0.1,
-            p95_latency_s=0.2, p99_latency_s=0.3,
-            bottleneck_stage="generation", cost_per_sku_usd=0.023,
+            total_jobs=1,
+            successful=1,
+            failed=0,
+            throughput_per_min=60.0,
+            p50_latency_s=0.1,
+            p95_latency_s=0.2,
+            p99_latency_s=0.3,
+            bottleneck_stage="generation",
+            cost_per_sku_usd=0.023,
             stage_latencies={"vision": 0.05},
         )
         with pytest.raises((AttributeError, TypeError)):
@@ -41,10 +46,15 @@ class TestLoadTestReport:
 
     def test_all_fields_present(self):
         r = LoadTestReport(
-            total_jobs=5, successful=4, failed=1,
-            throughput_per_min=120.0, p50_latency_s=0.1,
-            p95_latency_s=0.18, p99_latency_s=0.2,
-            bottleneck_stage="vision", cost_per_sku_usd=0.015,
+            total_jobs=5,
+            successful=4,
+            failed=1,
+            throughput_per_min=120.0,
+            p50_latency_s=0.1,
+            p95_latency_s=0.18,
+            p99_latency_s=0.2,
+            bottleneck_stage="vision",
+            cost_per_sku_usd=0.015,
             stage_latencies={"vision": 0.1, "generation": 0.05},
         )
         assert r.total_jobs == 5
@@ -200,7 +210,9 @@ class TestCostCalculation:
 class TestConcurrency:
     def test_high_concurrency_all_succeed(self):
         tester = PipelineLoadTester()
-        report = tester.run(skus=["br-001", "br-002", "sg-001", "lh-002"], concurrency=8, iterations=2)
+        report = tester.run(
+            skus=["br-001", "br-002", "sg-001", "lh-002"], concurrency=8, iterations=2
+        )
         assert report.failed == 0
         assert report.successful == 8
 

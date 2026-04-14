@@ -134,7 +134,9 @@ class TestQualityNodeHighConfidence:
         mock_classifier.predict.return_value = _high_confidence_result(passed=True)
 
         with (
-            patch("skyyrose.elite_studio.graph.nodes.QualityClassifier", return_value=mock_classifier),
+            patch(
+                "skyyrose.elite_studio.graph.nodes.QualityClassifier", return_value=mock_classifier
+            ),
             patch("skyyrose.elite_studio.graph.nodes.QualityAgent") as mock_llm_cls,
         ):
             result = quality_node(state)
@@ -149,7 +151,9 @@ class TestQualityNodeHighConfidence:
         mock_classifier.predict.return_value = _high_confidence_result(passed=True)
 
         with (
-            patch("skyyrose.elite_studio.graph.nodes.QualityClassifier", return_value=mock_classifier),
+            patch(
+                "skyyrose.elite_studio.graph.nodes.QualityClassifier", return_value=mock_classifier
+            ),
             patch("skyyrose.elite_studio.graph.nodes.QualityAgent"),
         ):
             result = quality_node(state)
@@ -165,7 +169,9 @@ class TestQualityNodeHighConfidence:
         mock_classifier.predict.return_value = _high_confidence_result(passed=False)
 
         with (
-            patch("skyyrose.elite_studio.graph.nodes.QualityClassifier", return_value=mock_classifier),
+            patch(
+                "skyyrose.elite_studio.graph.nodes.QualityClassifier", return_value=mock_classifier
+            ),
             patch("skyyrose.elite_studio.graph.nodes.QualityAgent"),
         ):
             result = quality_node(state)
@@ -182,7 +188,9 @@ class TestQualityNodeHighConfidence:
         mock_classifier.predict.return_value = expected_classifier
 
         with (
-            patch("skyyrose.elite_studio.graph.nodes.QualityClassifier", return_value=mock_classifier),
+            patch(
+                "skyyrose.elite_studio.graph.nodes.QualityClassifier", return_value=mock_classifier
+            ),
             patch("skyyrose.elite_studio.graph.nodes.QualityAgent"),
         ):
             result = quality_node(state)
@@ -204,14 +212,19 @@ class TestQualityNodeLowConfidence:
         mock_classifier.predict.return_value = _low_confidence_result()
 
         mock_qc = QualityVerification(
-            success=True, provider="anthropic", model="claude-sonnet-4",
-            overall_status="pass", recommendation="approve",
+            success=True,
+            provider="anthropic",
+            model="claude-sonnet-4",
+            overall_status="pass",
+            recommendation="approve",
         )
         mock_llm = MagicMock()
         mock_llm.verify.return_value = mock_qc
 
         with (
-            patch("skyyrose.elite_studio.graph.nodes.QualityClassifier", return_value=mock_classifier),
+            patch(
+                "skyyrose.elite_studio.graph.nodes.QualityClassifier", return_value=mock_classifier
+            ),
             patch("skyyrose.elite_studio.graph.nodes.QualityAgent", return_value=mock_llm),
         ):
             result = quality_node(state)
@@ -227,12 +240,17 @@ class TestQualityNodeLowConfidence:
 
         mock_llm = MagicMock()
         mock_llm.verify.return_value = QualityVerification(
-            success=True, provider="anthropic", model="claude-sonnet-4",
-            overall_status="pass", recommendation="approve",
+            success=True,
+            provider="anthropic",
+            model="claude-sonnet-4",
+            overall_status="pass",
+            recommendation="approve",
         )
 
         with (
-            patch("skyyrose.elite_studio.graph.nodes.QualityClassifier", return_value=mock_classifier),
+            patch(
+                "skyyrose.elite_studio.graph.nodes.QualityClassifier", return_value=mock_classifier
+            ),
             patch("skyyrose.elite_studio.graph.nodes.QualityAgent", return_value=mock_llm),
         ):
             result = quality_node(state)
@@ -245,7 +263,9 @@ class TestQualityNodeLowConfidence:
         mock_classifier.predict.return_value = _high_confidence_result()
 
         with (
-            patch("skyyrose.elite_studio.graph.nodes.QualityClassifier", return_value=mock_classifier),
+            patch(
+                "skyyrose.elite_studio.graph.nodes.QualityClassifier", return_value=mock_classifier
+            ),
             patch("skyyrose.elite_studio.graph.nodes.QualityAgent"),
         ):
             result = quality_node(state)
@@ -286,8 +306,11 @@ class TestHumanReviewNode:
     def test_reject_overrides_quality_recommendation(self):
         """Reviewer reject should update quality_result.recommendation to 'regenerate'."""
         existing_qc = QualityVerification(
-            success=True, provider="anthropic", model="claude-sonnet-4",
-            overall_status="pass", recommendation="approve",
+            success=True,
+            provider="anthropic",
+            model="claude-sonnet-4",
+            overall_status="pass",
+            recommendation="approve",
         )
         state = _make_state(quality_result=existing_qc)
 
@@ -308,8 +331,11 @@ class TestHumanReviewNode:
 
     def test_reject_notes_propagated(self):
         existing_qc = QualityVerification(
-            success=True, provider="anthropic", model="claude-sonnet-4",
-            overall_status="pass", recommendation="approve",
+            success=True,
+            provider="anthropic",
+            model="claude-sonnet-4",
+            overall_status="pass",
+            recommendation="approve",
         )
         state = _make_state(quality_result=existing_qc)
 
@@ -356,8 +382,11 @@ class TestAfterQualityV2:
         )
         # No human review yet, no QC recommendation to regenerate
         state["quality_result"] = QualityVerification(
-            success=True, provider="clip", model="clip",
-            overall_status="unknown", recommendation="approve",
+            success=True,
+            provider="clip",
+            model="clip",
+            overall_status="unknown",
+            recommendation="approve",
         )
         result = after_quality_v2(state)
         assert result == "human_review"
@@ -373,8 +402,11 @@ class TestAfterQualityV2:
             ),
         )
         state["quality_result"] = QualityVerification(
-            success=True, provider="clip", model="clip",
-            overall_status="pass", recommendation="approve",
+            success=True,
+            provider="clip",
+            model="clip",
+            overall_status="pass",
+            recommendation="approve",
         )
         result = after_quality_v2(state)
         # Should not go to human_review again
@@ -383,8 +415,11 @@ class TestAfterQualityV2:
     def test_regenerate_routes_to_generator(self):
         state = _make_state(retry_count=0, max_retries=2)
         state["quality_result"] = QualityVerification(
-            success=True, provider="anthropic", model="claude-sonnet-4",
-            overall_status="fail", recommendation="regenerate",
+            success=True,
+            provider="anthropic",
+            model="claude-sonnet-4",
+            overall_status="fail",
+            recommendation="regenerate",
         )
         result = after_quality_v2(state)
         assert result == "generator"
@@ -392,8 +427,11 @@ class TestAfterQualityV2:
     def test_regenerate_exhausted_retries_routes_to_finalize(self):
         state = _make_state(retry_count=2, max_retries=2)
         state["quality_result"] = QualityVerification(
-            success=True, provider="anthropic", model="claude-sonnet-4",
-            overall_status="fail", recommendation="regenerate",
+            success=True,
+            provider="anthropic",
+            model="claude-sonnet-4",
+            overall_status="fail",
+            recommendation="regenerate",
         )
         result = after_quality_v2(state)
         assert result == "finalize"
@@ -401,8 +439,11 @@ class TestAfterQualityV2:
     def test_approve_with_compositor_routes_to_compositor(self):
         state = _make_state(enable_compositor=True)
         state["quality_result"] = QualityVerification(
-            success=True, provider="anthropic", model="claude-sonnet-4",
-            overall_status="pass", recommendation="approve",
+            success=True,
+            provider="anthropic",
+            model="claude-sonnet-4",
+            overall_status="pass",
+            recommendation="approve",
         )
         result = after_quality_v2(state)
         assert result == "compositor"
@@ -410,8 +451,11 @@ class TestAfterQualityV2:
     def test_approve_without_compositor_routes_to_finalize(self):
         state = _make_state(enable_compositor=False)
         state["quality_result"] = QualityVerification(
-            success=True, provider="anthropic", model="claude-sonnet-4",
-            overall_status="pass", recommendation="approve",
+            success=True,
+            provider="anthropic",
+            model="claude-sonnet-4",
+            overall_status="pass",
+            recommendation="approve",
         )
         result = after_quality_v2(state)
         assert result == "finalize"
@@ -424,8 +468,11 @@ class TestAfterQualityV2:
             ),
         )
         state["quality_result"] = QualityVerification(
-            success=True, provider="clip", model="clip",
-            overall_status="pass", recommendation="approve",
+            success=True,
+            provider="clip",
+            model="clip",
+            overall_status="pass",
+            recommendation="approve",
         )
         result = after_quality_v2(state)
         assert result == "finalize"
@@ -433,8 +480,11 @@ class TestAfterQualityV2:
     def test_no_classifier_result_no_human_review_routes_normally(self):
         state = _make_state()
         state["quality_result"] = QualityVerification(
-            success=True, provider="anthropic", model="claude-sonnet-4",
-            overall_status="pass", recommendation="approve",
+            success=True,
+            provider="anthropic",
+            model="claude-sonnet-4",
+            overall_status="pass",
+            recommendation="approve",
         )
         result = after_quality_v2(state)
         assert result == "finalize"

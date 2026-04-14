@@ -110,6 +110,7 @@ class TestPromptEnrichmentAgent:
 
     def test_exception_returns_failure(self, monkeypatch):
         """If internal logic raises, agent returns success=False with error."""
+
         def _boom(*args, **kwargs):
             raise RuntimeError("Simulated internal error")
 

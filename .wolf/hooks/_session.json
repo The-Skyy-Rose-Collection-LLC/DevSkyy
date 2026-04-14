@@ -296,6 +296,21 @@
       "count": 1,
       "tokens": 0,
       "first_read": "2026-04-14T04:50:22.303Z"
+    },
+    "/private/tmp/claude-501/-Users-theceo-DevSkyy/aeacd2c0-5eeb-4064-81a5-56c40e30501f/tasks/br7t5dnpv.output": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-14T04:54:59.793Z"
+    },
+    "/private/tmp/claude-501/-Users-theceo-DevSkyy/aeacd2c0-5eeb-4064-81a5-56c40e30501f/tasks/b8ifmwe9e.output": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-14T04:55:00.709Z"
+    },
+    "/private/tmp/claude-501/-Users-theceo-DevSkyy/aeacd2c0-5eeb-4064-81a5-56c40e30501f/tasks/bg728y75j.output": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-14T04:55:01.245Z"
     }
   },
   "files_written": [
@@ -673,8 +688,8 @@
     "skyyrose/elite_studio/graph/builder.py": 1
   },
   "anatomy_hits": 5,
-  "anatomy_misses": 53,
+  "anatomy_misses": 56,
   "repeated_reads_warned": 36,
   "cerebrum_warnings": 0,
-  "stop_count": 8
+  "stop_count": 9
 }

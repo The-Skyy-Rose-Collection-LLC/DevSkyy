@@ -120,15 +120,11 @@ class PipelineLoadTester:
             LoadTestReport with aggregated metrics.
         """
         jobs: list[tuple[str, int]] = [
-            (sku, iteration)
-            for sku in skus
-            for iteration in range(iterations)
+            (sku, iteration) for sku in skus for iteration in range(iterations)
         ]
         total_jobs = len(jobs)
 
-        logger.info(
-            "Load test starting: %d jobs, concurrency=%d", total_jobs, concurrency
-        )
+        logger.info("Load test starting: %d jobs, concurrency=%d", total_jobs, concurrency)
 
         results: list[_JobResult] = []
         wall_start = time.monotonic()
@@ -214,7 +210,9 @@ class PipelineLoadTester:
             times = [r.stage_times.get(stage, 0.0) for r in successful if r.stage_times]
             stage_latencies[stage] = round(statistics.mean(times), 4) if times else 0.0
 
-        bottleneck = max(stage_latencies, key=lambda s: stage_latencies[s]) if stage_latencies else ""
+        bottleneck = (
+            max(stage_latencies, key=lambda s: stage_latencies[s]) if stage_latencies else ""
+        )
 
         cost_per_sku = sum(self._stage_costs.get(s, 0.0) for s in self._stage_durations)
 

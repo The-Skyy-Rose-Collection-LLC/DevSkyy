@@ -88,9 +88,7 @@ class SafetyAgent:
         )
 
         # Run image safety check via GPT-4o vision
-        image_flag, image_categories = self._check_image_vision(
-            client, image_b64, media_type
-        )
+        image_flag, image_categories = self._check_image_vision(client, image_b64, media_type)
 
         all_flagged = text_flag or image_flag
         all_categories = tuple(set(text_categories + image_categories))
@@ -115,7 +113,11 @@ class SafetyAgent:
 
         # Collect flagged category names
         categories = []
-        cat_dict = result.categories.model_dump() if hasattr(result.categories, "model_dump") else vars(result.categories)
+        cat_dict = (
+            result.categories.model_dump()
+            if hasattr(result.categories, "model_dump")
+            else vars(result.categories)
+        )
         for category, is_flagged in cat_dict.items():
             if is_flagged:
                 categories.append(category)

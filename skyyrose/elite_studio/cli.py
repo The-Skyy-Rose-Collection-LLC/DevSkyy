@@ -325,9 +325,13 @@ def main(argv: list[str] | None = None) -> None:
     )
 
     # produce-async
-    p_produce_async = sub.add_parser("produce-async", help="Enqueue a single SKU render job (async)")
+    p_produce_async = sub.add_parser(
+        "produce-async", help="Enqueue a single SKU render job (async)"
+    )
     p_produce_async.add_argument("sku", help="Product SKU (e.g., br-001)")
-    p_produce_async.add_argument("--view", default="front", choices=["front", "back"], help="View angle")
+    p_produce_async.add_argument(
+        "--view", default="front", choices=["front", "back"], help="View angle"
+    )
     p_produce_async.add_argument("--priority", type=int, default=5, help="Job priority 1-10")
     p_produce_async.add_argument(
         "--composite", action="store_true", help="Enable scene compositing"

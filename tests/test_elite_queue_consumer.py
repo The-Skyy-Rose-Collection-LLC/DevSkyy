@@ -189,7 +189,9 @@ def test_process_job_exception_moves_to_dlq(worker, job_data):
         "skyyrose.elite_studio.queue.consumer.run_single",
         side_effect=RuntimeError("pipeline exploded"),
     ):
-        with patch.object(worker._dlq, "move_to_dlq", side_effect=lambda **kw: dlq_entries.append(kw)):
+        with patch.object(
+            worker._dlq, "move_to_dlq", side_effect=lambda **kw: dlq_entries.append(kw)
+        ):
             stored = []
             worker._store_result = lambda r: stored.append(r)
 

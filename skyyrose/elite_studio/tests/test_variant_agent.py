@@ -95,9 +95,7 @@ class TestVariantAgentSuccess:
             "skyyrose.elite_studio.agents.variant_agent.GeneratorAgent",
             return_value=mock_gen,
         ):
-            results = self.agent.generate_variants(
-                "br-001", "/base.jpg", "spec", ["back_view"]
-            )
+            results = self.agent.generate_variants("br-001", "/base.jpg", "spec", ["back_view"])
 
         assert len(results) == 1
         assert results[0].success is True
@@ -130,9 +128,7 @@ class TestVariantAgentSuccess:
             "skyyrose.elite_studio.agents.variant_agent.GeneratorAgent",
             return_value=mock_gen,
         ):
-            results = self.agent.generate_variants(
-                "sg-005", "/base.jpg", "spec", ["lifestyle"]
-            )
+            results = self.agent.generate_variants("sg-005", "/base.jpg", "spec", ["lifestyle"])
 
         assert results[0].variant_name == "lifestyle"
 

@@ -40,9 +40,7 @@ def make_mock_clip_output(probs: list[float]):
 
     mock_squeezed = mock_probs
     mock_logits = MagicMock()
-    mock_logits.softmax.return_value = MagicMock(
-        squeeze=MagicMock(return_value=mock_squeezed)
-    )
+    mock_logits.softmax.return_value = MagicMock(squeeze=MagicMock(return_value=mock_squeezed))
 
     outputs = MagicMock()
     outputs.logits_per_image = mock_logits
@@ -56,7 +54,9 @@ def make_mock_clip_output(probs: list[float]):
 
 class TestClassifierResult:
     def test_frozen(self):
-        result = ClassifierResult(success=True, score=0.9, confidence=0.8, label="high quality fashion photo")
+        result = ClassifierResult(
+            success=True, score=0.9, confidence=0.8, label="high quality fashion photo"
+        )
         with pytest.raises((AttributeError, TypeError)):
             result.score = 0.5  # type: ignore[misc]
 
@@ -186,7 +186,9 @@ class TestCLIPPath:
         ):
             mock_load.return_value = (mocks["model"], mocks["processor"])
 
-            with patch("skyyrose.elite_studio.quality.ml_classifier.QualityClassifier._run_clip") as mock_run:
+            with patch(
+                "skyyrose.elite_studio.quality.ml_classifier.QualityClassifier._run_clip"
+            ) as mock_run:
                 expected_score = sum(
                     p * _LABEL_SCORES[l] for p, l in zip(probs, _CANDIDATE_LABELS, strict=False)
                 )
@@ -246,6 +248,8 @@ class TestLabelScores:
             assert label in _LABEL_SCORES
 
     def test_high_quality_has_highest_score(self):
-        assert _LABEL_SCORES["high quality fashion photo"] > _LABEL_SCORES["low quality blurry photo"]
+        assert (
+            _LABEL_SCORES["high quality fashion photo"] > _LABEL_SCORES["low quality blurry photo"]
+        )
         assert _LABEL_SCORES["high quality fashion photo"] > _LABEL_SCORES["inappropriate content"]
         assert _LABEL_SCORES["inappropriate content"] == 0.0

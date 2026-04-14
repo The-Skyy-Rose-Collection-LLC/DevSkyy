@@ -42,7 +42,13 @@ def dlq(fake_redis):
 
 
 def _make_original_data(sku: str = "br-001") -> dict:
-    return {"sku": sku, "view": "front", "priority": 5, "enable_compositor": False, "max_retries": 2}
+    return {
+        "sku": sku,
+        "view": "front",
+        "priority": 5,
+        "enable_compositor": False,
+        "max_retries": 2,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -145,7 +151,9 @@ def test_retry_removes_entry_from_dlq(dlq, fake_redis):
     assert fake_redis.llen(_DLQ_KEY) == 1
 
     new_job_id_holder = []
-    with patch("skyyrose.elite_studio.queue.producer.enqueue_produce", return_value="elite:br-001:newjob") as mock_enqueue:
+    with patch(
+        "skyyrose.elite_studio.queue.producer.enqueue_produce", return_value="elite:br-001:newjob"
+    ) as mock_enqueue:
         new_id = dlq.retry("elite:br-001:retry1")
         new_job_id_holder.append(new_id)
 
@@ -156,11 +164,16 @@ def test_retry_removes_entry_from_dlq(dlq, fake_redis):
 def test_retry_calls_enqueue_produce_with_correct_sku(dlq):
     dlq.move_to_dlq("elite:sg-005:rtry", "error", _make_original_data("sg-005"))
 
-    with patch("skyyrose.elite_studio.queue.producer.enqueue_produce", return_value="elite:sg-005:new") as mock_enqueue:
+    with patch(
+        "skyyrose.elite_studio.queue.producer.enqueue_produce", return_value="elite:sg-005:new"
+    ) as mock_enqueue:
         dlq.retry("elite:sg-005:rtry")
 
     mock_enqueue.assert_called_once()
-    assert mock_enqueue.call_args.kwargs.get("sku") == "sg-005" or mock_enqueue.call_args.args[0] == "sg-005"
+    assert (
+        mock_enqueue.call_args.kwargs.get("sku") == "sg-005"
+        or mock_enqueue.call_args.args[0] == "sg-005"
+    )
 
 
 def test_retry_raises_key_error_for_unknown_job(dlq):
@@ -179,7 +192,9 @@ def test_retry_preserves_other_entries(dlq):
     dlq.move_to_dlq("elite:br-001:keep", "err", _make_original_data())
     dlq.move_to_dlq("elite:br-002:gone", "err", _make_original_data("br-002"))
 
-    with patch("skyyrose.elite_studio.queue.producer.enqueue_produce", return_value="elite:br-002:new"):
+    with patch(
+        "skyyrose.elite_studio.queue.producer.enqueue_produce", return_value="elite:br-002:new"
+    ):
         dlq.retry("elite:br-002:gone")
 
     remaining = dlq.list_failed()

@@ -70,7 +70,9 @@ class ProviderRateLimiter:
             self._redis.ping()
             return self._redis
         except Exception as exc:
-            logger.warning("ProviderRateLimiter: Redis unavailable, rate limiting disabled: %s", exc)
+            logger.warning(
+                "ProviderRateLimiter: Redis unavailable, rate limiting disabled: %s", exc
+            )
             return None
 
     def acquire(self, provider: str, timeout: float = 30.0) -> bool:
@@ -120,7 +122,10 @@ class ProviderRateLimiter:
                     r.zadd(key, {request_token: now})
                     r.expire(key, self._WINDOW_SECONDS + 5)
                     logger.debug(
-                        "RateLimiter: acquired slot for %s (%d/%d)", provider, current_count + 1, limit
+                        "RateLimiter: acquired slot for %s (%d/%d)",
+                        provider,
+                        current_count + 1,
+                        limit,
                     )
                     return True
 
@@ -130,7 +135,11 @@ class ProviderRateLimiter:
                     break
                 sleep_time = min(0.5, wait_remaining)
                 logger.debug(
-                    "RateLimiter: %s at limit (%d/%d), waiting %.1fs", provider, current_count, limit, sleep_time
+                    "RateLimiter: %s at limit (%d/%d), waiting %.1fs",
+                    provider,
+                    current_count,
+                    limit,
+                    sleep_time,
                 )
                 time.sleep(sleep_time)
 

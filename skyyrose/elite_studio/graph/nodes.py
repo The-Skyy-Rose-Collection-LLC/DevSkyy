@@ -43,10 +43,10 @@ except ImportError:  # pragma: no cover
         pass
 
 # Approximate token estimates per node call (used for cost tracking).
-_VISION_TOKENS_ESTIMATE = 2_000     # dual-provider: Gemini + OpenAI
+_VISION_TOKENS_ESTIMATE = 2_000  # dual-provider: Gemini + OpenAI
 _GENERATION_TOKENS_ESTIMATE = 1_500  # Gemini image generation prompt
-_QC_TOKENS_ESTIMATE = 1_000         # Claude Sonnet QC call
-_COMPOSITOR_TOKENS_ESTIMATE = 800    # Gemini QA gate
+_QC_TOKENS_ESTIMATE = 1_000  # Claude Sonnet QC call
+_COMPOSITOR_TOKENS_ESTIMATE = 800  # Gemini QA gate
 
 # Classifier confidence threshold — below this the LLM QC runs as well
 _CLASSIFIER_CONFIDENCE_THRESHOLD = 0.8

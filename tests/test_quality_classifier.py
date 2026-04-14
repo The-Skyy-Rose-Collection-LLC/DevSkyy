@@ -127,15 +127,21 @@ class TestClassifierWithMockCLIP:
         classifier = QualityClassifier()
 
         with (
-            patch("skyyrose.elite_studio.quality.ml_classifier._load_clip_model",
-                  return_value=(mock_model, mock_processor)),
-            patch("PIL.Image.open", return_value=MagicMock(
-                convert=MagicMock(return_value=MagicMock())
-            )),
-            patch("torch.no_grad", return_value=MagicMock(
-                __enter__=MagicMock(return_value=None),
-                __exit__=MagicMock(return_value=False),
-            )),
+            patch(
+                "skyyrose.elite_studio.quality.ml_classifier._load_clip_model",
+                return_value=(mock_model, mock_processor),
+            ),
+            patch(
+                "PIL.Image.open",
+                return_value=MagicMock(convert=MagicMock(return_value=MagicMock())),
+            ),
+            patch(
+                "torch.no_grad",
+                return_value=MagicMock(
+                    __enter__=MagicMock(return_value=None),
+                    __exit__=MagicMock(return_value=False),
+                ),
+            ),
         ):
             return classifier.predict(image_path)
 

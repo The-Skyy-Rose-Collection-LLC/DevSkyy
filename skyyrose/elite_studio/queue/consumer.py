@@ -30,6 +30,7 @@ def _get_graph_config(enable_compositor: bool, max_retries: int) -> GraphConfig:
     """Construct a GraphConfig — isolated so tests can patch run_single cleanly."""
     return GraphConfig(enable_compositor=enable_compositor, max_retries=max_retries)
 
+
 logger = logging.getLogger(__name__)
 
 # Redis key / channel constants
@@ -141,7 +142,9 @@ class EliteStudioWorker:
         """
         logger.info(
             "EliteStudioWorker: starting job %s (sku=%s, view=%s)",
-            job_id, job_data.sku, job_data.view,
+            job_id,
+            job_data.sku,
+            job_data.view,
         )
         start_ts = time.monotonic()
 
@@ -207,13 +210,17 @@ class EliteStudioWorker:
         self._register_signal_handlers()
 
         logger.info(
-            "EliteStudioWorker: starting (host=%s, concurrency=%d)", self._hostname, self.concurrency
+            "EliteStudioWorker: starting (host=%s, concurrency=%d)",
+            self._hostname,
+            self.concurrency,
         )
 
         while self._running and not self._shutdown_requested:
             r = self._get_redis()
             if r is None:
-                logger.warning("EliteStudioWorker: no Redis, retrying in %ds", int(_ERROR_BACKOFF_SECONDS))
+                logger.warning(
+                    "EliteStudioWorker: no Redis, retrying in %ds", int(_ERROR_BACKOFF_SECONDS)
+                )
                 time.sleep(_ERROR_BACKOFF_SECONDS)
                 continue
 
@@ -278,8 +285,11 @@ class EliteStudioWorker:
 
     def _register_signal_handlers(self) -> None:
         """Register SIGTERM/SIGINT handlers for graceful shutdown."""
+
         def _handle_signal(signum: int, frame: Any) -> None:
-            logger.info("EliteStudioWorker: received signal %d, finishing current job then exiting", signum)
+            logger.info(
+                "EliteStudioWorker: received signal %d, finishing current job then exiting", signum
+            )
             self._shutdown_requested = True
 
         signal.signal(signal.SIGTERM, _handle_signal)

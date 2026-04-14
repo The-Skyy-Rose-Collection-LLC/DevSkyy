@@ -44,7 +44,9 @@ async def _async_enqueue(job_data: EliteStudioJobData) -> str:
             task_data={"job_id": job_id, **job_data.model_dump()},
             priority=job_data.priority,
         )
-        logger.info("Enqueued Elite Studio job: %s (sku=%s, view=%s)", job_id, job_data.sku, job_data.view)
+        logger.info(
+            "Enqueued Elite Studio job: %s (sku=%s, view=%s)", job_id, job_data.sku, job_data.view
+        )
         return job_id
     finally:
         await queue.disconnect()

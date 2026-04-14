@@ -19,10 +19,10 @@ _BRAND_PALETTE: dict[str, str] = {
 }
 
 # Correction parameters tuned for luxury fashion editorial
-_CONTRAST_FACTOR = 1.15       # slight contrast boost for editorial pop
-_SATURATION_FACTOR = 1.08     # subtle saturation push toward rose gold warmth
-_BRIGHTNESS_FACTOR = 1.05     # minor brightness lift for clean studio feel
-_SHARPNESS_FACTOR = 1.10      # light sharpness for detail clarity
+_CONTRAST_FACTOR = 1.15  # slight contrast boost for editorial pop
+_SATURATION_FACTOR = 1.08  # subtle saturation push toward rose gold warmth
+_BRIGHTNESS_FACTOR = 1.05  # minor brightness lift for clean studio feel
+_SHARPNESS_FACTOR = 1.10  # light sharpness for detail clarity
 
 
 class ColorCorrectionAgent:

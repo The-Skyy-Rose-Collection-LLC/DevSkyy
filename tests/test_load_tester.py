@@ -38,9 +38,15 @@ _FAST_COSTS = {
 class TestLoadTestReport:
     def test_frozen(self):
         report = LoadTestReport(
-            total_jobs=1, successful=1, failed=0,
-            throughput_per_min=60.0, p50_latency_s=0.1, p95_latency_s=0.2,
-            p99_latency_s=0.3, bottleneck_stage="generation", cost_per_sku_usd=0.023,
+            total_jobs=1,
+            successful=1,
+            failed=0,
+            throughput_per_min=60.0,
+            p50_latency_s=0.1,
+            p95_latency_s=0.2,
+            p99_latency_s=0.3,
+            bottleneck_stage="generation",
+            cost_per_sku_usd=0.023,
             stage_latencies={},
         )
         with pytest.raises((FrozenInstanceError, AttributeError)):

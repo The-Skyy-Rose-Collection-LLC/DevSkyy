@@ -67,14 +67,10 @@ class HumanReviewGate:
         try:
             manager = self._get_manager()
             item = asyncio.run(self._submit_async(manager, sku, image_path, job_id))
-            logger.info(
-                "Submitted %s for human review: review_id=%s", sku, item.id
-            )
+            logger.info("Submitted %s for human review: review_id=%s", sku, item.id)
             return item.id
         except Exception as exc:
-            logger.warning(
-                "Approval queue unavailable (%s) — auto-approving %s", exc, sku
-            )
+            logger.warning("Approval queue unavailable (%s) — auto-approving %s", exc, sku)
             # Return a sentinel that get_decision() will recognise as auto-approve
             return f"auto-approve:{job_id}"
 
@@ -119,9 +115,7 @@ class HumanReviewGate:
                     )
                 time.sleep(self._poll_interval)
         except Exception as exc:
-            logger.warning(
-                "Error polling approval queue (%s) — defaulting to approve", exc
-            )
+            logger.warning("Error polling approval queue (%s) — defaulting to approve", exc)
             return ReviewDecision(
                 review_id=review_id,
                 decision="approve",

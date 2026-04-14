@@ -51,6 +51,7 @@ def _make_moderation_response(flagged: bool = False, categories: dict | None = N
 def _make_chat_response(safe: bool = True, flagged_categories: list | None = None) -> MagicMock:
     """Build a mock GPT-4o chat response."""
     import json
+
     cats = flagged_categories or []
     content = json.dumps({"safe": safe, "flagged_categories": cats})
 

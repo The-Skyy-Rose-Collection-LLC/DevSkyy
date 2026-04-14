@@ -62,7 +62,9 @@ def _make_state(
 
 
 def _high_confidence_classifier() -> ClassifierResult:
-    return ClassifierResult(success=True, score=0.9, confidence=0.92, label="high quality fashion photo")
+    return ClassifierResult(
+        success=True, score=0.9, confidence=0.92, label="high quality fashion photo"
+    )
 
 
 def _low_confidence_classifier() -> ClassifierResult:
@@ -71,15 +73,21 @@ def _low_confidence_classifier() -> ClassifierResult:
 
 def _passing_qc() -> QualityVerification:
     return QualityVerification(
-        success=True, provider="anthropic", model="claude-sonnet",
-        overall_status="pass", recommendation="approve",
+        success=True,
+        provider="anthropic",
+        model="claude-sonnet",
+        overall_status="pass",
+        recommendation="approve",
     )
 
 
 def _failing_qc() -> QualityVerification:
     return QualityVerification(
-        success=True, provider="anthropic", model="claude-sonnet",
-        overall_status="fail", recommendation="regenerate",
+        success=True,
+        provider="anthropic",
+        model="claude-sonnet",
+        overall_status="fail",
+        recommendation="regenerate",
     )
 
 
@@ -271,9 +279,7 @@ class TestHumanReviewNode:
         state = _make_state(output_path=str(img))
         state["quality_result"] = _passing_qc()
 
-        approve_decision = ReviewDecision(
-            review_id="rev-1", decision="approve", reviewer="alice"
-        )
+        approve_decision = ReviewDecision(review_id="rev-1", decision="approve", reviewer="alice")
 
         with (
             patch(
@@ -289,8 +295,11 @@ class TestHumanReviewNode:
 
         assert result["human_review_result"] is approve_decision
         # approve: quality_result should NOT be overridden to regenerate
-        assert "quality_result" not in result or result.get("quality_result") is None or \
-               result.get("quality_result", _passing_qc()).recommendation != "regenerate"
+        assert (
+            "quality_result" not in result
+            or result.get("quality_result") is None
+            or result.get("quality_result", _passing_qc()).recommendation != "regenerate"
+        )
 
     def test_reject_decision_overrides_qc_to_regenerate(self, tmp_path):
         from skyyrose.elite_studio.graph.nodes import human_review_node
@@ -328,9 +337,7 @@ class TestHumanReviewNode:
         img.write_bytes(b"FAKE")
         state = _make_state(output_path=str(img))
 
-        approve_decision = ReviewDecision(
-            review_id="rev-3", decision="approve", reviewer="carol"
-        )
+        approve_decision = ReviewDecision(review_id="rev-3", decision="approve", reviewer="carol")
 
         with (
             patch(

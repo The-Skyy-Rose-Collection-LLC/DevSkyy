@@ -106,11 +106,11 @@ class GraphConfig:
     enable_compositor: bool = False
 
     # Layer 2 optional stages
-    enable_prompt_enrichment: bool = True    # on by default (pure enrichment, no cost)
-    enable_safety: bool = True               # on by default
-    enable_upscaling: bool = False           # off by default (costs $)
-    enable_color_correction: bool = False    # off by default
-    enable_variants: bool = False            # off by default
+    enable_prompt_enrichment: bool = True  # on by default (pure enrichment, no cost)
+    enable_safety: bool = True  # on by default
+    enable_upscaling: bool = False  # off by default (costs $)
+    enable_color_correction: bool = False  # off by default
+    enable_variants: bool = False  # off by default
     variant_specs: list[str] = field(default_factory=list)
 
     # Layer 4 quality gates

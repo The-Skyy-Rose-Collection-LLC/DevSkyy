@@ -48,16 +48,26 @@ def _make_jpeg(path: Path, color: tuple[int, int, int] = (128, 128, 128)) -> Pat
 class TestRegressionResult:
     def test_frozen(self):
         r = RegressionResult(
-            success=True, sku="br-001", ssim_score=0.9, passed=True,
-            threshold=0.85, has_reference=True, report_path="",
+            success=True,
+            sku="br-001",
+            ssim_score=0.9,
+            passed=True,
+            threshold=0.85,
+            has_reference=True,
+            report_path="",
         )
         with pytest.raises((FrozenInstanceError, AttributeError)):
             r.ssim_score = 0.5  # type: ignore[misc]
 
     def test_default_error_empty(self):
         r = RegressionResult(
-            success=True, sku="br-001", ssim_score=0.9, passed=True,
-            threshold=0.85, has_reference=False, report_path="",
+            success=True,
+            sku="br-001",
+            ssim_score=0.9,
+            passed=True,
+            threshold=0.85,
+            has_reference=False,
+            report_path="",
         )
         assert r.error == ""
 
@@ -69,8 +79,9 @@ class TestRegressionResult:
 
 class TestNoReference:
     def test_returns_passed_true_when_no_golden(self, tmp_path):
-        tester = VisualRegressionTester(golden_base=tmp_path / "golden",
-                                         reports_base=tmp_path / "reports")
+        tester = VisualRegressionTester(
+            golden_base=tmp_path / "golden", reports_base=tmp_path / "reports"
+        )
         gen_img = _make_jpeg(tmp_path / "gen.jpg")
 
         result = tester.compare(str(gen_img), "br-001")
@@ -90,8 +101,7 @@ class TestNoReference:
 class TestSetGolden:
     def test_set_golden_creates_reference_file(self, tmp_path):
         golden_base = tmp_path / "golden"
-        tester = VisualRegressionTester(golden_base=golden_base,
-                                         reports_base=tmp_path / "reports")
+        tester = VisualRegressionTester(golden_base=golden_base, reports_base=tmp_path / "reports")
         src = _make_jpeg(tmp_path / "approved.jpg", color=(200, 100, 50))
 
         tester.set_golden("sg-001", str(src))
@@ -102,8 +112,7 @@ class TestSetGolden:
 
     def test_set_golden_overwrites_existing(self, tmp_path):
         golden_base = tmp_path / "golden"
-        tester = VisualRegressionTester(golden_base=golden_base,
-                                         reports_base=tmp_path / "reports")
+        tester = VisualRegressionTester(golden_base=golden_base, reports_base=tmp_path / "reports")
         src1 = _make_jpeg(tmp_path / "v1.jpg", color=(10, 20, 30))
         src2 = _make_jpeg(tmp_path / "v2.jpg", color=(200, 210, 220))
 
@@ -127,8 +136,7 @@ class TestSSIMComparison:
         """Create golden reference + generated image, mock SSIM to return value."""
         golden_base = tmp_path / "golden"
         reports_base = tmp_path / "reports"
-        tester = VisualRegressionTester(golden_base=golden_base,
-                                         reports_base=reports_base)
+        tester = VisualRegressionTester(golden_base=golden_base, reports_base=reports_base)
 
         # Create golden reference
         ref = golden_base / "br-001"
@@ -185,8 +193,9 @@ class TestSSIMComparison:
     def test_graceful_fallback_when_skimage_missing(self, tmp_path):
         tester, gen_path, _ = self._setup(tmp_path, 0.0)
 
-        with patch.object(tester, "_compute_ssim",
-                          side_effect=ImportError("No module named 'skimage'")):
+        with patch.object(
+            tester, "_compute_ssim", side_effect=ImportError("No module named 'skimage'")
+        ):
             result = tester.compare(gen_path, "br-001")
 
         assert result.success is True
@@ -197,8 +206,7 @@ class TestSSIMComparison:
     def test_returns_error_result_on_unexpected_exception(self, tmp_path):
         tester, gen_path, _ = self._setup(tmp_path, 0.0)
 
-        with patch.object(tester, "_compute_ssim",
-                          side_effect=ValueError("corrupt image")):
+        with patch.object(tester, "_compute_ssim", side_effect=ValueError("corrupt image")):
             result = tester.compare(gen_path, "br-001")
 
         assert result.success is False

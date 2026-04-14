@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 
 # Pricing constants (USD per 1K tokens)
 PRICING_PER_1K: dict[str, float] = {
-    "gemini": 0.000075,   # Gemini Flash
-    "openai": 0.005,      # GPT-4o input
-    "anthropic": 0.003,   # Claude Sonnet input
+    "gemini": 0.000075,  # Gemini Flash
+    "openai": 0.005,  # GPT-4o input
+    "anthropic": 0.003,  # Claude Sonnet input
 }
 
 # Redis key patterns
@@ -97,7 +97,10 @@ class CostTracker:
 
             logger.debug(
                 "CostTracker: job=%s provider=%s tokens=%d cost=$%.6f",
-                job_id, provider, tokens, cost_usd,
+                job_id,
+                provider,
+                tokens,
+                cost_usd,
             )
         except Exception as exc:
             logger.warning("CostTracker.record: failed to write cost data: %s", exc)
