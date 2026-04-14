@@ -195,6 +195,39 @@ def cmd_produce_async(args: argparse.Namespace) -> None:
     print(f"Enqueued: {job_id}")
 
 
+def cmd_create(args: argparse.Namespace) -> None:
+    """Run a creative operation via the Creative Operations Hub."""
+    import json
+    from .creative.runner import run_creative
+
+    params: dict = {}
+    if args.params:
+        try:
+            params = json.loads(args.params)
+        except json.JSONDecodeError as exc:
+            print(f"Error: --params must be valid JSON: {exc}")
+            sys.exit(1)
+
+    result = run_creative(
+        intent=args.intent,
+        params=params,
+        sku=getattr(args, "sku", "") or "",
+    )
+    print(f"Operation: {result.get('operation_id', '')}")
+    print(f"Status:    {result.get('status', 'unknown')}")
+    if result.get("error"):
+        print(f"Error:     {result['error']}")
+    if result.get("render_result"):
+        r = result["render_result"]
+        print(f"Render:    {r.get('output_path', '')} [{r.get('status', '')}]")
+    if result.get("design_result"):
+        d = result["design_result"]
+        print(f"Design:    {d.get('concept_name', '')} ({d.get('concept_id', '')})")
+    if result.get("copy_result"):
+        c = result["copy_result"]
+        print(f"Copy:      {c.get('meta_title', '')}")
+
+
 def cmd_job_status(args: argparse.Namespace) -> None:
     """Print the current status of a queued job."""
     import json
@@ -376,6 +409,24 @@ def main(argv: list[str] | None = None) -> None:
         "--concurrency", type=int, default=1, help="Number of concurrent jobs (default: 1)"
     )
 
+    # create (Creative Operations Hub)
+    p_create = sub.add_parser("create", help="Run a creative operation via the Creative Operations Hub")
+    p_create.add_argument(
+        "--intent",
+        required=True,
+        help=(
+            "Creative intent: product-render, social-pack, product-copy, design-ideation, "
+            "collection-plan, tech-pack, moodboard, colorway-explore, 3d-model, "
+            "character-sheet, scene-composite, virtual-tryon, full-product-launch, mockup"
+        ),
+    )
+    p_create.add_argument("--sku", default="", help="Product SKU (e.g. br-001)")
+    p_create.add_argument(
+        "--params",
+        default="",
+        help="JSON string of additional parameters (e.g. '{\"collection\": \"black-rose\"}')",
+    )
+
     args = parser.parse_args(argv)
 
     if not args.command:
@@ -402,3 +453,5 @@ def main(argv: list[str] | None = None) -> None:
         cmd_dlq_retry(args)
     elif args.command == "worker":
         cmd_worker(args)
+    elif args.command == "create":
+        cmd_create(args)

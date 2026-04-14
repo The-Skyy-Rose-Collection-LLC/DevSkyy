@@ -101,6 +101,34 @@ def enqueue_produce(
     return asyncio.run(_async_enqueue(job_data))
 
 
+def enqueue_creative(
+    intent: str,
+    params: dict,
+    sku: str = "",
+    priority: int = 5,
+) -> str:
+    """Enqueue a creative operation job.
+
+    Args:
+        intent: Creative intent (e.g. "product-render", "social-pack").
+        params: Operation-specific parameters.
+        sku: Product SKU (optional).
+        priority: 1-10 (higher = processed sooner).
+
+    Returns:
+        job_id: Unique job identifier.
+    """
+    job_data = EliteStudioJobData(
+        sku=sku or "creative",
+        view="front",
+        priority=priority,
+        intent=intent,
+        creative_params=params,
+        submitted_at=datetime.now(UTC).isoformat(),
+    )
+    return asyncio.run(_async_enqueue(job_data))
+
+
 def enqueue_batch(
     skus: list[str],
     view: str = "front",

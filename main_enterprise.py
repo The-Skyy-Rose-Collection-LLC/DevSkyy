@@ -254,6 +254,21 @@ from api.v1.elite_studio import router as elite_studio_router
 
 app.include_router(elite_studio_router, prefix="/api/v1")
 
+# Enterprise API v2 — creative ops, characters, assets, webhooks, health
+from api.v2 import (
+    assets_router as v2_assets_router,
+    characters_router as v2_characters_router,
+    creative_router as v2_creative_router,
+    health_router as v2_health_router,
+    webhooks_router as v2_webhooks_router,
+)
+
+app.include_router(v2_creative_router, prefix="/api/v2")
+app.include_router(v2_characters_router, prefix="/api/v2")
+app.include_router(v2_assets_router, prefix="/api/v2")
+app.include_router(v2_webhooks_router, prefix="/api/v2")
+app.include_router(v2_health_router, prefix="/api/v2")
+
 # WordPress integration
 from api.v1.wordpress_integration import router as wordpress_router
 
@@ -288,6 +303,18 @@ app.include_router(pipeline_router, prefix="/api/v1")
 from security.jwt_oauth2_auth import auth_router
 
 app.include_router(auth_router)
+
+# SaaS Infrastructure — tenant resolution + billing entitlements
+from core.middleware.tenant import tenant_middleware  # noqa: E402
+from billing.middleware import billing_middleware  # noqa: E402
+
+app.middleware("http")(tenant_middleware)
+app.middleware("http")(billing_middleware)
+
+# Customer Portal
+from api.v1.portal import portal_router  # noqa: E402
+
+app.include_router(portal_router, prefix="/api/v1")
 
 # GraphQL
 from api.graphql_server import graphql_router

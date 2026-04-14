@@ -22,7 +22,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from pydantic import BaseModel, Field, field_validator
 
 from skyyrose.elite_studio.queue.job_types import EliteStudioJobResult
-from skyyrose.elite_studio.queue.producer import enqueue_batch, enqueue_produce
+from skyyrose.elite_studio.queue.producer import enqueue_batch, enqueue_produce, enqueue_creative
 
 logger = logging.getLogger(__name__)
 
@@ -456,6 +456,87 @@ async def health(
             queue_depth=-1,
             checked_at=checked_at,
         )
+
+
+# ---------------------------------------------------------------------------
+# Creative Operations Hub endpoint
+# ---------------------------------------------------------------------------
+
+
+class CreateRequest(BaseModel):
+    """Request body for the Creative Operations Hub endpoint."""
+
+    model_config = {"str_strip_whitespace": True}
+
+    intent: str
+    sku: str = ""
+    params: dict = Field(default_factory=dict)
+    priority: int = Field(default=5, ge=1, le=10)
+
+    @field_validator("intent")
+    @classmethod
+    def _validate_intent(cls, v: str) -> str:
+        from skyyrose.elite_studio.creative.state import CreativeIntent
+        valid = {e.value for e in CreativeIntent}
+        if v not in valid:
+            raise ValueError(f"intent must be one of {sorted(valid)}, got: {v!r}")
+        return v
+
+    @field_validator("sku")
+    @classmethod
+    def _normalise_sku(cls, v: str) -> str:
+        return v.strip().lower()
+
+
+class CreateResponse(BaseModel):
+    """Response from the Creative Operations Hub endpoint."""
+
+    operation_id: str
+    intent: str
+    sku: str
+    status: str
+    queued_at: str
+
+
+@router.post(
+    "/create",
+    response_model=CreateResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Enqueue a creative operation (render, social pack, copy, etc.)",
+)
+async def create_operation(
+    body: CreateRequest,
+    _auth=Depends(_api_key_dep),
+):
+    """Enqueue a creative operation via the Creative Operations Hub.
+
+    Supports all 14 creative intents: product-render, social-pack,
+    product-copy, design-ideation, collection-plan, tech-pack, moodboard,
+    colorway-explore, 3d-model, character-sheet, scene-composite,
+    virtual-tryon, full-product-launch, mockup.
+    """
+    queued_at = datetime.now(UTC).isoformat()
+    try:
+        job_id = enqueue_creative(
+            intent=body.intent,
+            params=body.params,
+            sku=body.sku,
+            priority=body.priority,
+        )
+    except Exception as exc:
+        logger.error("Failed to enqueue creative operation intent=%s: %s", body.intent, exc)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Queue unavailable: {exc}",
+        ) from exc
+
+    return CreateResponse(
+        operation_id=job_id,
+        intent=body.intent,
+        sku=body.sku,
+        status="queued",
+        queued_at=queued_at,
+    )
 
 
 # ---------------------------------------------------------------------------
