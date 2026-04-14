@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /*--------------------------------------------------------------
  * Theme Constants
  *--------------------------------------------------------------*/
-define( 'SKYYROSE_VERSION', '6.4.0' );
+define( 'SKYYROSE_VERSION', '7.0.1' );
 define( 'SKYYROSE_DIR', get_template_directory() );
 define( 'SKYYROSE_URI', get_template_directory_uri() );
 
@@ -60,6 +60,9 @@ $skyyrose_core_includes = array(
 	'/inc/menu-setup.php',
 	'/inc/theme-activation-setup.php',
 	'/inc/klaviyo-integration.php',
+	'/inc/experience-engine.php',
+	'/inc/fastapi-client.php',
+	'/inc/rest-api-experience.php',
 );
 
 foreach ( $skyyrose_core_includes as $skyyrose_file ) {
@@ -80,6 +83,7 @@ if ( class_exists( 'WooCommerce' ) ) {
 		'/inc/immersive-ajax.php',
 		'/inc/wishlist-functions.php',
 		'/inc/class-wishlist-widget.php',
+		'/inc/experience-analyzer.php',
 	);
 
 	foreach ( $skyyrose_woo_includes as $skyyrose_file ) {

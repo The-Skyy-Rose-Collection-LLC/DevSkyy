@@ -15,6 +15,10 @@ Layer 4 additions to GraphConfig:
 - enable_human_review: pause at quality for human approval on uncertain images
 - review_confidence_threshold: classifier confidence below which human review triggers
 - enable_visual_regression: run SSIM comparison against golden references
+
+Layer 6 additions to GraphConfig:
+- enable_tryon: insert virtual try-on node after compositor/finalize routing
+- tryon_category: garment category passed to FASHN API
 """
 
 from __future__ import annotations
@@ -51,6 +55,7 @@ from .nodes import (
     prompt_enrichment_node,
     quality_node,
     safety_node,
+    tryon_node,
     upscaling_node,
     variant_node,
     vision_node,
@@ -69,6 +74,7 @@ _UPSCALING = UPSCALING
 _COLOR_CORRECTION = COLOR_CORRECTION
 _VARIANTS = VARIANTS
 _HUMAN_REVIEW = HUMAN_REVIEW
+_TRYON = "tryon"
 
 
 @dataclass(frozen=True)
@@ -100,6 +106,13 @@ class GraphConfig:
             is True. Defaults to 0.6.
         enable_visual_regression: When True, generated images are compared
             against golden references using SSIM. Defaults to False.
+
+    Layer 6 fields:
+        enable_tryon: When True, a virtual try-on node is inserted after
+            quality (additive — errors never fail the main job). Defaults
+            to False.
+        tryon_category: Garment category for FASHN API. Defaults to
+            "upper_body".
     """
 
     max_retries: int = 2
@@ -118,6 +131,10 @@ class GraphConfig:
     review_confidence_threshold: float = 0.6
     enable_visual_regression: bool = False
 
+    # Layer 6 optional stages
+    enable_tryon: bool = False
+    tryon_category: str = "upper_body"
+
     # Extension hook (reserved for future layers)
     extra_nodes: list[str] = field(default_factory=list)
 
@@ -128,7 +145,8 @@ def build_graph(config: GraphConfig | None = None) -> object:
     Returns a ``CompiledGraph`` that can be invoked with
     ``graph.invoke(state_dict)``.
 
-    Topology (Layer 1 + Layer 2 optional nodes + Layer 4 quality system):
+    Topology (Layer 1 + Layer 2 optional nodes + Layer 4 quality system
+              + Layer 6 virtual try-on):
 
         vision
           → [prompt_enrichment?]
@@ -141,6 +159,7 @@ def build_graph(config: GraphConfig | None = None) -> object:
           → [color_correction?]
           → [variants?]        # parallel branch, joins at finalize
           → [compositor?]
+          → [tryon?]           # virtual try-on, additive (errors skipped)
           → finalize
           → END
 
@@ -148,6 +167,10 @@ def build_graph(config: GraphConfig | None = None) -> object:
     ``after_quality_v2`` edge function which can route to the
     ``human_review`` node. Otherwise the original ``after_quality`` edge
     is used for backwards compatibility.
+
+    When ``enable_tryon=True``, a sequential tryon node is inserted after
+    quality (alongside compositor routing). The tryon node is additive:
+    errors never fail the main job.
 
     Args:
         config: Optional graph configuration. Uses defaults if None.
@@ -183,6 +206,10 @@ def build_graph(config: GraphConfig | None = None) -> object:
 
     if config.enable_variants:
         graph.add_node(_VARIANTS, variant_node)
+
+    # --- Register optional Layer 6 tryon node ---
+    if config.enable_tryon:
+        graph.add_node(_TRYON, tryon_node)
 
     # --- Entry point ---
     graph.set_entry_point(_VISION)
@@ -265,6 +292,8 @@ def build_graph(config: GraphConfig | None = None) -> object:
 
 def _build_post_quality_target(config: GraphConfig) -> str:
     """Return the first node in the post-quality processing chain."""
+    if config.enable_tryon:
+        return _TRYON
     if config.enable_upscaling:
         return _UPSCALING
     if config.enable_color_correction:
@@ -288,6 +317,8 @@ def _wire_post_quality_chain(graph: StateGraph, config: GraphConfig) -> None:  #
         chain.append(_VARIANTS)
     if config.enable_compositor:
         chain.append(_COMPOSITOR)
+    if config.enable_tryon:
+        chain.append(_TRYON)
 
     if not chain:
         # No optional nodes — quality already routes to FINALIZE directly

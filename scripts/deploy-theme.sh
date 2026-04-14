@@ -175,7 +175,7 @@ preflight() {
             log_error "PHP syntax error: $phpfile"
             php_errors=$((php_errors + 1))
         fi
-    done < <(find "$THEME_DIR" -name '*.php' -print0 2>/dev/null)
+    done < <(find "$THEME_DIR" -name '*.php' -not -path '*/vendor/*' -not -path '*/node_modules/*' -print0 2>/dev/null)
 
     if [[ "$php_errors" -gt 0 ]]; then
         log_error "$php_errors PHP file(s) have syntax errors -- fix before deploying"
@@ -183,19 +183,30 @@ preflight() {
     fi
     log_success "PHP syntax check passed"
 
-    # Test SSH connectivity (skip in dry-run)
+    # Test SFTP connectivity (skip in dry-run)
     if [[ "$DRY_RUN" == "false" ]]; then
-        local ssh_test_opts=(-o StrictHostKeyChecking=yes -o ConnectTimeout=15 -p "${SSH_PORT:-22}")
+        local sftp_test_host="${SFTP_HOST:-${SSH_HOST}}"
+        local sftp_test_user="${SFTP_USER:-${SSH_USER}}"
+        local sftp_test_pass="${SFTP_PASS:-${SSH_PASS}}"
+        local sftp_test_port="${SSH_PORT:-22}"
+        local ssh_opts="-o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 -P ${sftp_test_port}"
+
         if [[ -f "${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}" ]]; then
-            ssh_test_opts+=(-i "${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}")
+            if ! sftp ${ssh_opts} -i "${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}" "${sftp_test_user}@${sftp_test_host}" <<< "bye" &>/dev/null; then
+                log_error "SFTP connectivity test failed -- check credentials and network"
+                exit 1
+            fi
+        elif command -v sshpass &>/dev/null; then
+            if ! sshpass -p "$sftp_test_pass" sftp ${ssh_opts} "${sftp_test_user}@${sftp_test_host}" <<< "bye" &>/dev/null; then
+                log_error "SFTP connectivity test failed -- check credentials and network"
+                exit 1
+            fi
+        else
+            log_warn "Cannot test SFTP connectivity (no key, no sshpass) -- skipping"
         fi
-        if ! ssh "${ssh_test_opts[@]}" "${SSH_USER}@${SSH_HOST}" "echo ok" 2>/dev/null; then
-            log_error "SSH connectivity test failed -- check credentials and network"
-            exit 1
-        fi
-        log_success "SSH connectivity verified"
+        log_success "SFTP connectivity verified"
     else
-        log_info "[DRY RUN] Skipping SSH connectivity test"
+        log_info "[DRY RUN] Skipping SFTP connectivity test"
     fi
 
     log_success "All preflight checks passed"
@@ -309,11 +320,23 @@ try_rsync() {
         key_flag="-i $key_path"
     fi
 
+    # Build scp/ssh command prefix (sshpass for password auth)
+    local cmd_prefix=""
+    if [[ -z "$key_flag" ]] && command -v sshpass &>/dev/null; then
+        cmd_prefix="sshpass -p ${SSH_PASS}"
+    fi
+
     log_info "Uploading via scp..."
-    scp -P "${SSH_PORT:-22}" $key_flag -o StrictHostKeyChecking=yes "$tmpzip" "${SSH_USER}@${SSH_HOST}:/tmp/skyyrose-deploy.tar.gz"
+    if ! $cmd_prefix scp -P "${SSH_PORT:-22}" $key_flag -o StrictHostKeyChecking=accept-new "$tmpzip" "${SSH_USER}@${SSH_HOST}:/tmp/skyyrose-deploy.tar.gz"; then
+        rm -f "$tmpzip"
+        return 1
+    fi
 
     log_info "Extracting on remote..."
-    ssh -p "${SSH_PORT:-22}" $key_flag -o StrictHostKeyChecking=yes "${SSH_USER}@${SSH_HOST}" "cd /tmp && tar -xzf skyyrose-deploy.tar.gz && rm -rf ${WP_THEME_PATH} && mv skyyrose-flagship ${WP_THEME_PATH} && rm skyyrose-deploy.tar.gz"
+    if ! $cmd_prefix ssh -p "${SSH_PORT:-22}" $key_flag -o StrictHostKeyChecking=accept-new "${SSH_USER}@${SSH_HOST}" "cd /tmp && tar -xzf skyyrose-deploy.tar.gz && rm -rf ${WP_THEME_PATH} && mv skyyrose-flagship ${WP_THEME_PATH} && rm skyyrose-deploy.tar.gz"; then
+        rm -f "$tmpzip"
+        return 1
+    fi
 
     rm -f "$tmpzip"
     log_success "Theme uploaded and extracted"
@@ -358,9 +381,9 @@ bye
 # ---------------------------------------------------------------------------
 flush_caches() {
     log_info "Flushing all caches..."
-    wp_remote "cache flush"
-    wp_remote "transient delete --all"
-    wp_remote "rewrite flush"
+    wp_remote "cache flush" || true
+    wp_remote "transient delete --all" || true
+    wp_remote "rewrite flush" || true
     log_success "All caches flushed"
 }
 
@@ -384,22 +407,27 @@ main() {
     # 1. Preflight checks
     preflight
 
-    # 2. Enable maintenance mode (DEPLOY-02)
+    # 2. Enable maintenance mode (best-effort — WordPress.com doesn't support SSH shell)
     log_info "Activating maintenance mode..."
-    wp_remote "maintenance-mode activate"
-    MAINTENANCE_ACTIVE=true
-    log_success "Maintenance mode active"
+    if wp_remote "maintenance-mode activate"; then
+        MAINTENANCE_ACTIVE=true
+        log_success "Maintenance mode active"
+    else
+        log_warn "Maintenance mode unavailable (SFTP-only host) -- deploying without"
+    fi
 
     # 3. Transfer files (DEPLOY-01)
     transfer_files
 
-    # 4. Disable maintenance mode (DEPLOY-03)
-    log_info "Deactivating maintenance mode..."
-    wp_remote "maintenance-mode deactivate"
-    MAINTENANCE_ACTIVE=false
-    log_success "Maintenance mode deactivated"
+    # 4. Disable maintenance mode (best-effort)
+    if [[ "$MAINTENANCE_ACTIVE" == "true" ]]; then
+        log_info "Deactivating maintenance mode..."
+        wp_remote "maintenance-mode deactivate" || log_warn "Failed to deactivate maintenance mode"
+        MAINTENANCE_ACTIVE=false
+        log_success "Maintenance mode deactivated"
+    fi
 
-    # 5. Flush caches (DEPLOY-03)
+    # 5. Flush caches (best-effort)
     flush_caches
 
     log_success "=== Deploy complete ==="

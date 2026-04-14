@@ -26,6 +26,7 @@ from ..agents.generator_agent import GeneratorAgent
 from ..agents.prompt_enrichment_agent import PromptEnrichmentAgent
 from ..agents.quality_agent import QualityAgent
 from ..agents.safety_agent import SafetyAgent
+from ..agents.tryon_agent import TryOnAgent, _find_garment_image
 from ..agents.upscaling_agent import UpscalingAgent
 from ..agents.variant_agent import VariantAgent
 from ..agents.vision_agent import VisionAgent
@@ -344,6 +345,42 @@ def compositor_node(state: EliteStudioState) -> dict:
     }
 
 
+def tryon_node(state: EliteStudioState) -> dict:
+    """Run virtual try-on in parallel with compositor (additive — never fails the job).
+
+    Skips silently when:
+    - generation_result is absent or unsuccessful
+    - no garment image can be found for the SKU
+    """
+    start = time.monotonic()
+    timings = dict(state.get("stage_timings", {}))
+
+    gen = state.get("generation_result")
+    if not gen or not gen.success:
+        logger.debug("tryon_node: skipping — no successful generation result")
+        timings["tryon"] = round(time.monotonic() - start, 2)
+        return {"tryon_result": None, "stage_timings": timings}
+
+    sku = state["sku"]
+    garment_path = _find_garment_image(sku)
+    if not garment_path:
+        logger.debug("tryon_node: skipping — no garment image found for %s", sku)
+        timings["tryon"] = round(time.monotonic() - start, 2)
+        return {"tryon_result": None, "stage_timings": timings}
+
+    category = state.get("tryon_category", "upper_body")
+    agent = TryOnAgent()
+    result = agent.try_on(
+        sku=sku,
+        garment_image_path=garment_path,
+        model_image_path=gen.output_path,
+        category=category,
+    )
+
+    timings["tryon"] = round(time.monotonic() - start, 2)
+    return {"tryon_result": result, "stage_timings": timings}
+
+
 def finalize_node(state: EliteStudioState) -> dict:
     """Set final status based on accumulated results."""
     # If status is already "error", keep it
@@ -535,3 +572,39 @@ def variant_node(state: EliteStudioState) -> dict:
         "variant_results": results,
         "stage_timings": timings,
     }
+
+
+def tryon_node(state: EliteStudioState) -> dict:
+    """Run virtual try-on in parallel with compositor (additive — never fails the job).
+
+    Skips silently when:
+    - generation_result is absent or unsuccessful
+    - no garment image can be found for the SKU
+    """
+    start = time.monotonic()
+    timings = dict(state.get("stage_timings", {}))
+
+    gen = state.get("generation_result")
+    if not gen or not gen.success:
+        logger.debug("tryon_node: skipping — no successful generation result")
+        timings["tryon"] = round(time.monotonic() - start, 2)
+        return {"tryon_result": None, "stage_timings": timings}
+
+    sku = state["sku"]
+    garment_path = _find_garment_image(sku)
+    if not garment_path:
+        logger.debug("tryon_node: skipping — no garment image found for %s", sku)
+        timings["tryon"] = round(time.monotonic() - start, 2)
+        return {"tryon_result": None, "stage_timings": timings}
+
+    category = state.get("tryon_category", "upper_body")
+    agent = TryOnAgent()
+    result = agent.try_on(
+        sku=sku,
+        garment_image_path=garment_path,
+        model_image_path=gen.output_path,
+        category=category,
+    )
+
+    timings["tryon"] = round(time.monotonic() - start, 2)
+    return {"tryon_result": result, "stage_timings": timings}

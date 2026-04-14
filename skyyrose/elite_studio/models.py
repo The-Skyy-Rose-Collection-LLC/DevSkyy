@@ -106,6 +106,19 @@ class CompositorResult:
 
 
 @dataclass(frozen=True)
+class TryOnResult:
+    """Result from virtual try-on via FASHN API."""
+
+    success: bool
+    output_path: str = ""
+    garment_sku: str = ""
+    model_image_path: str = ""
+    provider: str = "fashn"
+    latency_s: float = 0.0
+    error: str = ""
+
+
+@dataclass(frozen=True)
 class ProductionResult:
     """Complete production result for a single product."""
 
@@ -117,6 +130,7 @@ class ProductionResult:
     generation: GenerationResult | None = None
     quality: QualityVerification | None = None
     compositing: CompositorResult | None = None
+    tryon: TryOnResult | None = None
     error: str = ""
     step: str = ""  # which step failed (vision, generation, quality)
 

@@ -18,6 +18,7 @@ from ..models import (
     QualityVerification,
     SafetyResult,
     SynthesizedVision,
+    TryOnResult,
     UpscaleResult,
     VariantResult,
 )
@@ -37,12 +38,15 @@ class EliteStudioState(TypedDict, total=False):
     sku: str
     view: str
     enable_compositor: bool
+    enable_tryon: bool
+    tryon_category: str
 
     # --- Stage results (set by nodes) ---
     vision_result: SynthesizedVision | None
     generation_result: GenerationResult | None
     quality_result: QualityVerification | None
     compositor_result: CompositorResult | None
+    tryon_result: TryOnResult | None
 
     # --- Layer 2 stage results (optional — only set when enabled) ---
     enriched_prompt: EnrichedPrompt | None
@@ -72,6 +76,8 @@ def create_initial_state(
     sku: str,
     view: str = "front",
     enable_compositor: bool = False,
+    enable_tryon: bool = False,
+    tryon_category: str = "upper_body",
     max_retries: int = 2,
 ) -> EliteStudioState:
     """Create the initial state for a graph invocation."""
@@ -79,6 +85,8 @@ def create_initial_state(
         sku=sku,
         view=view,
         enable_compositor=enable_compositor,
+        enable_tryon=enable_tryon,
+        tryon_category=tryon_category,
         vision_result=None,
         generation_result=None,
         quality_result=None,
@@ -86,6 +94,7 @@ def create_initial_state(
         classifier_result=None,
         human_review_result=None,
         regression_result=None,
+        tryon_result=None,
         retry_count=0,
         max_retries=max_retries,
         status="running",
@@ -116,6 +125,7 @@ def extract_production_result(state: EliteStudioState) -> Any:
         generation=state.get("generation_result"),
         quality=state.get("quality_result"),
         compositing=state.get("compositor_result"),
+        tryon=state.get("tryon_result"),
         error=state.get("error", ""),
         step=state.get("failed_step", ""),
     )
