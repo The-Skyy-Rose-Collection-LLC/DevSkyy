@@ -1,19 +1,11 @@
 {
   "sku": "sg-009",
   "name": "The Sherpa Jacket",
+  "dirname": "The Sherpa Jacket",
   "collection": "signature",
   "files": {
-    "composite-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-009/composite-front.webp",
-    "model-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-009/model-back.webp",
-    "model-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-009/model-front.webp",
-    "model-male": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-009/model-male.webp",
-    "branding": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-009/branding.webp",
-    "render-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-009/render-front.webp",
-    "render-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-009/render-back.webp",
-    "asset-sg-009-sherpa-jacket": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-009/asset-sg-009-sherpa-jacket.webp",
-    "model-female": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-009/model-female.webp",
-    "logo-ref": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-009/logo-ref.png",
-    "spec": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-009/spec.txt"
-  },
-  "folder_name": "The Sherpa Jacket"
+    "techflat-front": "techflat-front.jpg",
+    "logo-ref": "logo-ref.png",
+    "spec": "spec.txt"
+  }
 }

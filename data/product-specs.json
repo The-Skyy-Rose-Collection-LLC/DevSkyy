@@ -1,0 +1,265 @@
+{
+  "_meta": {
+    "description": "Single source of truth for all product branding, material, and patch specs",
+    "updated": "2026-04-07",
+    "usage": "Loaded by nano_banana scripts. Do NOT duplicate this data elsewhere."
+  },
+  "products": {
+    "br-001": {
+      "name": "BLACK Rose Crewneck",
+      "collection": "black-rose",
+      "branding": "EMBOSSED rose logo on front chest, approximately 10 inches. 3D dimensional rose with layered spiral petals, curved stem, two broad leaves. Brushed rose-gold metallic finish embossed into the fabric",
+      "fabric": "heavyweight cotton fleece",
+      "texture": "embossed rose-gold metallic",
+      "patch": null
+    },
+    "br-002": {
+      "name": "BLACK Rose Joggers",
+      "collection": "black-rose",
+      "branding": "SILICONE PATCH logo on left thigh area. Glossy smooth finish, die-cut edges, rose-gold metallic. Small (~3-4 inches)",
+      "fabric": "heavyweight cotton fleece",
+      "texture": "silicone patch",
+      "patch": null
+    },
+    "br-003": {
+      "name": "BLACK is Beautiful Jersey",
+      "collection": "black-rose",
+      "branding": "FRONT: 'BLACK IS BEAUTIFUL' arched text across chest. BOTTOM LEFT: rectangular woven patch — 'BLACK ROSE' top, MLB-style baseball logo in center, 'COLLECTION' below, 'HOS' and '1 of x limited edition' at bottom. BACK: large embroidered rose logo centered",
+      "fabric": "polyester mesh jersey",
+      "texture": "sublimated + embroidered",
+      "patch": "baseball"
+    },
+    "br-003-oakland": {
+      "name": "BLACK is Beautiful Jersey (Oakland)",
+      "collection": "black-rose",
+      "branding": "FRONT: 'BLACK IS BEAUTIFUL' — the letter A in 'BLACK' is black lettering, the rest is gold. BOTTOM LEFT: rectangular woven patch — 'BLACK ROSE COLLECTION' with MLB-style baseball logo. BACK: embroidered rose logo",
+      "fabric": "polyester mesh jersey",
+      "texture": "sublimated + embroidered",
+      "patch": "baseball"
+    },
+    "br-003-giants": {
+      "name": "BLACK is Beautiful Jersey (Giants)",
+      "collection": "black-rose",
+      "branding": "FRONT: 'BLACK IS BEAUTIFUL' text. BOTTOM LEFT: rectangular woven patch — 'BLACK ROSE COLLECTION' with MLB-style baseball logo. BACK: embroidered rose logo",
+      "fabric": "polyester mesh jersey",
+      "texture": "sublimated + embroidered",
+      "patch": "baseball"
+    },
+    "br-003-white": {
+      "name": "BLACK is Beautiful Jersey (White)",
+      "collection": "black-rose",
+      "branding": "FRONT: 'BLACK IS BEAUTIFUL' text. BOTTOM LEFT: rectangular woven patch — 'BLACK ROSE COLLECTION' with MLB-style baseball logo. BACK: embroidered rose logo. White base jersey",
+      "fabric": "polyester mesh jersey",
+      "texture": "sublimated + embroidered",
+      "patch": "baseball"
+    },
+    "br-004": {
+      "name": "BLACK Rose Hoodie",
+      "collection": "black-rose",
+      "branding": "EMBROIDERED rose logo centered on front chest. Large detailed rose growing from clouds",
+      "fabric": "heavyweight cotton fleece",
+      "texture": "embroidered",
+      "patch": null
+    },
+    "br-005": {
+      "name": "BLACK Rose Hoodie — Signature Edition",
+      "collection": "black-rose",
+      "branding": "SILICONE CUTOUT logo on RIGHT chest (small ~3 in). Large EMBROIDERED rose logo on the SIDE of the hoodie body — NOT on the arm/sleeve. Hood lining has all-over sublimated rose pattern visible when hood is down",
+      "fabric": "heavyweight cotton fleece",
+      "texture": "silicone cutout + embroidered + sublimated",
+      "patch": null
+    },
+    "br-006": {
+      "name": "BLACK Rose Sherpa Jacket",
+      "collection": "black-rose",
+      "branding": "SATIN HOODED BOMBER JACKET lined with BLACK SHERPA inside. Embroidered rose logo on left chest (~5 in). Large embroidered rose logo on back (~12 in), rose-gold thread",
+      "fabric": "satin shell + sherpa lining",
+      "texture": "embroidered rose-gold thread",
+      "patch": null
+    },
+    "br-007": {
+      "name": "BLACK Rose x Love Hurts Basketball Shorts",
+      "collection": "black-rose",
+      "branding": "Black mesh basketball shorts with ALL-OVER SUBLIMATED grey rose pattern. Cream/white elastic waistband with drawstring. FRONT: TACKLE-TWILL cut-out letters \"OAKLAND\" stitched across waistband. RIGHT SIDE: Large \"Love Hurts\" graffiti script in silver/grey. LEFT THIGH: PENTAGON-SHAPED white patch with \"Love Hurts\" text + heart-and-rose logo inside. RIGHT THIGH: Small embroidered rose logo near pocket. White mesh side panels with black/white striped border trim. BACK: Large rose logo centered, same all-over rose sublimation pattern.",
+      "fabric": "polyester mesh",
+      "texture": "tackle-twill + sublimated",
+      "patch": null
+    },
+    "br-008": {
+      "name": "BLACK is Beautiful Jersey Series: 1. SF inspired",
+      "collection": "black-rose",
+      "branding": "FOOTBALL JERSEY #80. Jersey-style stitched numbers front and back. FRONT: '8' has rose logo INSIDE the digit, '0' is plain white. BOTTOM LEFT: rectangular gold/cream woven patch — 'BLACK ROSE' top in serif, NFL-style shield (football + stars) center, 'AUTHENTIC' banner, 'COLLECTION' bottom in serif, red diamond row, 'Property Of / Black Is Beautiful Series / Skyy Rose Co' + rose logo. Small SkyyRose logo at V-neck collar. BACK: reversed — '8' is plain white, '0' has rose logo inside",
+      "fabric": "polyester mesh football jersey",
+      "texture": "jersey-stitched numbers + sublimated",
+      "patch": "nfl-football"
+    },
+    "br-009": {
+      "name": "BLACK is Beautiful Jersey Series: 2. LAST OAKLAND",
+      "collection": "black-rose",
+      "branding": "FOOTBALL JERSEY #32. Jersey-style stitched numbers front and back. FRONT: '3' has rose logo INSIDE the digit, '2' is plain white. BOTTOM LEFT: same gold/cream NFL-style 'BLACK ROSE AUTHENTIC COLLECTION' patch as br-008. Small SkyyRose logo at V-neck collar. BACK: reversed — '3' is plain white, '2' has rose logo inside",
+      "fabric": "polyester mesh football jersey",
+      "texture": "jersey-stitched numbers + sublimated",
+      "patch": "nfl-football"
+    },
+    "br-010": {
+      "name": "BLACK is Beautiful Jersey Series: 3. THE BAY",
+      "collection": "black-rose",
+      "branding": "BASKETBALL JERSEY. Front chest: 'THE BAY' bold gold text, circular rose below in rose-gold, lower half grey/silver gradient. BOTTOM LEFT: rectangular gold/cream woven patch — 'BLACK ROSE' top in serif, NBA-style logo (dribbling player silhouette in red/blue) center, 'AUTHENTIC' banner, 'COLLECTION' bottom in serif, red diamond row, 'Property Of / Black Is Beautiful Series / Skyy Rose Co' + rose logo",
+      "fabric": "polyester mesh basketball jersey",
+      "texture": "sublimated + embossed",
+      "patch": "nba-basketball"
+    },
+    "br-011": {
+      "name": "BLACK is Beautiful Jersey Series: 4. THE ROSE (SHARKS EDITION)",
+      "collection": "black-rose",
+      "branding": "HOODED HOCKEY JERSEY teal/black. Front: large circular rose crest. BOTTOM LEFT: rectangular silver/grey woven patch — 'BLACK ROSE' top in serif, shield with crossed hockey sticks + puck + 'HOCKEY CHAMPIONSHIP' + 3 stars center, 'COLLECTION' bottom in serif, grey diamond row at base. Back: 'BLACK IS BEAUTIFUL' cyan text + rose-filled #0",
+      "fabric": "polyester mesh hockey jersey",
+      "texture": "sublimated + embroidered",
+      "patch": "hockey"
+    },
+    "lh-002": {
+      "name": "Love Hurts Joggers",
+      "collection": "love-hurts",
+      "branding": "TWO VARIANTS — (1) White joggers with black stripe, (2) Black joggers with white stripe. Both have: Love Hurts heart-and-rose logo on LEFT thigh. Heart graphic = cracked red heart wrapped in thorny branches with three roses, blood-splash drips",
+      "fabric": "cotton-poly fleece joggers",
+      "texture": "sublimated + embroidered",
+      "patch": null
+    },
+    "lh-003": {
+      "name": "Love Hurts Basketball Shorts",
+      "collection": "love-hurts",
+      "branding": "SUBLIMATED rose logo repeated throughout entire shorts. Large sublimated 'Love Hurts' logo on left side. Additional 'Love Hurts' and rose logos stitched on mesh side panels",
+      "fabric": "polyester mesh",
+      "texture": "sublimated + stitched",
+      "patch": null
+    },
+    "lh-004": {
+      "name": "Love Hurts Varsity Jacket",
+      "collection": "love-hurts",
+      "branding": "SATIN BOMBER JACKET (NOT wool varsity). 'LOVE HURTS' logo lettering ACROSS THE FRONT in red graffiti script. Inside hood: sublimated rose logo pattern. BACK: Love Hurts 'heart and rose' logo centered — cracked heart with thorny branches and roses",
+      "fabric": "satin shell",
+      "texture": "embroidered + sublimated",
+      "patch": null
+    },
+    "lh-006": {
+      "name": "The Fannie",
+      "collection": "love-hurts",
+      "branding": "HIGH-END LEATHER fanny pack. 'Fannie' script on front. The heart-and-rose logo replaces the DOT on the letter I in 'Fannie'",
+      "fabric": "premium leather",
+      "texture": "embossed script",
+      "patch": null
+    },
+    "sg-001": {
+      "name": "The Bridge Series 'The Bay Bridge' Shorts",
+      "collection": "signature",
+      "branding": "SUBLIMATED Bay Bridge image covering entire shorts. Blue EMBROIDERED rose on bottom left of shorts",
+      "fabric": "polyester athletic shorts",
+      "texture": "sublimated + embroidered",
+      "patch": null
+    },
+    "sg-002": {
+      "name": "The Bridge Series 'Stay Golden' Shirt",
+      "collection": "signature",
+      "branding": "EMBROIDERED rose on front chest with Golden Gate Bridge imagery STITCHED INSIDE the rose petals (the bridge scene from the shorts is visible within the rose)",
+      "fabric": "cotton tee",
+      "texture": "embroidered",
+      "patch": null
+    },
+    "sg-003": {
+      "name": "The Bridge Series 'Stay Golden' Shorts",
+      "collection": "signature",
+      "branding": "SUBLIMATED Golden Gate Bridge image covering entire shorts. Purple EMBROIDERED rose on bottom left of shorts",
+      "fabric": "polyester athletic shorts",
+      "texture": "sublimated + embroidered",
+      "patch": null
+    },
+    "sg-004": {
+      "name": "The Signature Hoodie",
+      "collection": "signature",
+      "branding": "No treatment specified",
+      "fabric": "heavyweight cotton fleece",
+      "texture": "unspecified",
+      "patch": null
+    },
+    "sg-005": {
+      "name": "The Bridge Series 'The Bay Bridge' Shirt",
+      "collection": "signature",
+      "branding": "White crewneck tee. EMBROIDERED rose on front chest center with Bay Bridge imagery STITCHED INSIDE the rose petals (the bridge scene from the shorts is visible within the rose). SR monogram at back collar",
+      "fabric": "cotton tee",
+      "texture": "embroidered",
+      "patch": null
+    },
+    "sg-006": {
+      "name": "Mint & Lavender Hoodie",
+      "collection": "signature",
+      "branding": "Mint green hoodie. LAVENDER rose logo EMBROIDERED centered on front. Large detailed rose with petals and leaves in lavender thread",
+      "fabric": "heavyweight cotton fleece",
+      "texture": "embroidered lavender thread",
+      "patch": null
+    },
+    "sg-007": {
+      "name": "The Signature Beanie",
+      "collection": "signature",
+      "branding": "SILICONE PATCH logo, small (~2 in), slightly off to LEFT side of beanie brim. THREE COLORWAY VARIANTS: red rose, grey-and-black rose, purple rose",
+      "fabric": "knit acrylic beanie",
+      "texture": "silicone patch",
+      "patch": null
+    },
+    "sg-009": {
+      "name": "The Sherpa Jacket",
+      "collection": "signature",
+      "branding": "Black nylon shell zip-front jacket. White sherpa lining visible at collar and when opened. RED embroidered rose logo on front (~3 in). NOT hooded — collar only",
+      "fabric": "nylon shell + sherpa lining",
+      "texture": "embroidered",
+      "patch": null
+    },
+    "sg-011": {
+      "name": "Original Label Tee (White)",
+      "collection": "signature",
+      "branding": "White tee. Front chest: THE SKYROSE COLLECTION SCRIPT in gold foil — 'THE' in serifed caps, 'Skyy Rose' in cursive, 'Collection' in spaced caps",
+      "fabric": "cotton tee",
+      "texture": "gold foil print",
+      "patch": null
+    },
+    "sg-012": {
+      "name": "Original Label Tee (Orchid)",
+      "collection": "signature",
+      "branding": "Orchid/purple tee. Front chest: THE SKYROSE COLLECTION SCRIPT in gold foil — same layout as sg-011",
+      "fabric": "cotton tee",
+      "texture": "gold foil print",
+      "patch": null
+    },
+    "sg-013": {
+      "name": "Mint & Lavender Crewneck",
+      "collection": "signature",
+      "branding": "Mint green crewneck. LAVENDER rose EMBROIDERED logo centered on front. Small embroidered logo on back of neck",
+      "fabric": "heavyweight cotton fleece",
+      "texture": "embroidered lavender thread",
+      "patch": null
+    },
+    "sg-014": {
+      "name": "Mint & Lavender Sweatpants",
+      "collection": "signature",
+      "branding": "Mint/lavender sweatpants. EMBROIDERED rose logo on left thigh in lavender thread",
+      "fabric": "heavyweight cotton fleece",
+      "texture": "embroidered lavender thread",
+      "patch": null
+    },
+    "kids-001": {
+      "name": "Kids Red Set",
+      "collection": "kids-capsule",
+      "branding": "RED colorblock set. BLACK rose embroidered logo on left chest and left thigh. Right arm: CIRCULAR WOVEN PATCH — white background, black lettering, black rose in center. Text reads 'Skyy Rose' on top, 'Collection' on bottom",
+      "fabric": "cotton-poly colorblock fleece",
+      "texture": "embroidered + woven patch",
+      "patch": null
+    },
+    "kids-002": {
+      "name": "Kids Purple Set",
+      "collection": "kids-capsule",
+      "branding": "PURPLE colorblock set. BLACK rose embroidered logo on left chest and left thigh. Right arm: CIRCULAR WOVEN PATCH — white background, black lettering, black rose in center. Text reads 'Skyy Rose' on top, 'Collection' on bottom",
+      "fabric": "cotton-poly colorblock fleece",
+      "texture": "embroidered + woven patch",
+      "patch": null
+    }
+  }
+}

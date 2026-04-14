@@ -3,8 +3,4 @@ SKU: br-003-giants
 COLLECTION: black-rose
 
 BRANDING SPECIFICATION:
-front: 'BLACK IS BEAUTIFUL' in orange/black Giants colorway; back: ROSE-ONLY embroidered
-
-GARMENT TYPE: N/A
-PRICE: $N/A
-EDITION SIZE: N/A
+FRONT: 'BLACK IS BEAUTIFUL' text. BOTTOM LEFT: rectangular woven patch — 'BLACK ROSE COLLECTION' with MLB-style baseball logo. BACK: embroidered rose logo

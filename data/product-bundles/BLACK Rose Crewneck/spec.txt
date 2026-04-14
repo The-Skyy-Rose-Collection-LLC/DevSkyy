@@ -3,8 +3,4 @@ SKU: br-001
 COLLECTION: black-rose
 
 BRANDING SPECIFICATION:
-front chest center (~10 in): ROSE-ONLY logo — 3D dimensional rose, layered spiral petals, curved stem with two broad leaves, brushed rose-gold metallic; embossed into fabric
-
-GARMENT TYPE: N/A
-PRICE: $N/A
-EDITION SIZE: N/A
+EMBOSSED rose logo on front chest, approximately 10 inches. 3D dimensional rose with layered spiral petals, curved stem, two broad leaves. Brushed rose-gold metallic finish embossed into the fabric

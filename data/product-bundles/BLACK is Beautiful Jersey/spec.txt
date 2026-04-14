@@ -3,8 +3,4 @@ SKU: br-003
 COLLECTION: black-rose
 
 BRANDING SPECIFICATION:
-front: 'BLACK IS BEAUTIFUL' bold block text in white/gold; back: large ROSE-ONLY embroidered logo
-
-GARMENT TYPE: N/A
-PRICE: $N/A
-EDITION SIZE: N/A
+FRONT: 'BLACK IS BEAUTIFUL' arched text across chest. BOTTOM LEFT: rectangular woven patch — 'BLACK ROSE' top, MLB-style baseball logo in center, 'COLLECTION' below, 'HOS' and '1 of x limited edition' at bottom. BACK: large embroidered rose logo centered

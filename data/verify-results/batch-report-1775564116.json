@@ -1,0 +1,29 @@
+{
+  "summary": {
+    "passed": 0,
+    "needs_review": 1,
+    "skipped": 0,
+    "total_cost": 0.08
+  },
+  "results": [
+    {
+      "sku": "br-001",
+      "view": "front",
+      "output_path": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/wordpress-theme/skyyrose-flagship/assets/images/products/br-001-front-render.webp",
+      "engine_used": "gemini-pro",
+      "route_decision": "Complex fabric (Main body and sleeves are smooth, reflective satin. Hood appears to be a matte cotton blend or fleece. Ribbing is a standard knit.) \u2014 Gemini Pro best at material physics",
+      "qa_score": 31.0,
+      "qa_passed": false,
+      "attempts": 1,
+      "cost_usd": 0.08,
+      "issues": [
+        "judge error: Error code: 401 - {'error': {'message': 'Incorrect API key provided: sk-proj-********************************************************************************************************************************************************9MQA. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'code': 'invalid_api_key', 'param': None}, 'status': 401}",
+        "Embroidered logo/graphic is completely wrong - source has a small white/silver tree or floral cluster design, generated has a large pink/rose gold single rose embroidery that doesn't match",
+        "Material appears to be leather or faux leather in generated image rather than the satin/nylon bomber material seen in source",
+        "The logo on the left chest is completely different in design, color, and material from the source reference.",
+        "The garment material in the generated image appears to be a smooth, leather-like texture, which deviates significantly from the satin-like fabric of the source reference."
+      ],
+      "refinement_applied": true
+    }
+  ]
+}

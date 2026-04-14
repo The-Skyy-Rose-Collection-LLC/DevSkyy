@@ -1,0 +1,21 @@
+{
+  "sku": "br-003",
+  "view": "front",
+  "cycles_run": 3,
+  "winner_path": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/candidates/br-003/front/nano_pro_03_20260405_180201_129.webp",
+  "winner_score": 91.33333333333333,
+  "passed_98": false,
+  "all_scores": [
+    56.666666666666664,
+    60.0,
+    57.0,
+    58.0,
+    57.333333333333336,
+    54.666666666666664,
+    91.33333333333333,
+    59.0,
+    60.0
+  ],
+  "total_candidates": 9,
+  "completed_at": "2026-04-05T18:03:36.424044"
+}

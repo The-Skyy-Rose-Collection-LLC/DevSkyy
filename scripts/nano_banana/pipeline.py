@@ -509,6 +509,68 @@ class ProductionPipeline:
         return desc
 
 
+def _find_bundle_dir(name: str, sku: str) -> Path | None:
+    """Find the bundle directory by product name (primary) or SKU (fallback)."""
+    bundle_root = PROJECT_ROOT / "data" / "product-bundles"
+    # Primary: match by product name (directory name = product name)
+    name_dir = bundle_root / name.replace("—", "-").replace("'", "").replace('"', "").strip()
+    if name_dir.exists():
+        return name_dir
+    # Fallback: search manifests for matching SKU
+    for d in bundle_root.iterdir():
+        if not d.is_dir():
+            continue
+        manifest = d / "manifest.json"
+        if manifest.exists():
+            try:
+                data = json.loads(manifest.read_text())
+                if data.get("sku") == sku:
+                    return d
+            except (json.JSONDecodeError, OSError):
+                continue
+    return None
+
+
+def _load_bundle_refs(
+    name: str, sku: str, source_path: Path, view: str
+) -> list[Path]:
+    """Load reference images from the product bundle directory.
+
+    Bundles are named by product name (not SKU).
+    Returns a list of image Paths relevant to the requested view.
+    """
+    bundle_dir = _find_bundle_dir(name, sku)
+    if not bundle_dir:
+        log.warning("No bundle directory for %s (%s)", name, sku)
+        return []
+
+    refs: list[Path] = []
+
+    # Always include logo + patch references
+    for tag in ("logo-ref", "patch-ref"):
+        for f in bundle_dir.glob(f"{tag}.*"):
+            if f.exists():
+                refs.append(f)
+
+    # Include source photo if available
+    for f in bundle_dir.glob("source-photo.*"):
+        if f.exists() and f != source_path:
+            refs.append(f)
+
+    # Include techflat for the requested view
+    if view == "front":
+        for f in bundle_dir.glob("techflat-front.*"):
+            if f.exists() and f != source_path:
+                refs.append(f)
+    elif view == "back":
+        for f in bundle_dir.glob("techflat-back.*"):
+            if f.exists() and f != source_path:
+                refs.append(f)
+
+    # Cap at 5 references to stay within model limits
+    return refs[:5]
+
+
 def _source_env_file(path: Path) -> None:
     """Load environment variables from a file."""
     for line in path.read_text().splitlines():

@@ -18,7 +18,7 @@ PRODUCTS_DIR = (
 )
 SOURCE_DIR = PROJECT_ROOT / "skyyrose" / "assets" / "images" / "source-products"
 CATALOG_CSV = PROJECT_ROOT / "data" / "product-catalog.csv"
-REFERENCES_JSON = PROJECT_ROOT / "data" / "product-references.json"
+SPECS_JSON = PROJECT_ROOT / "data" / "product-specs.json"
 
 
 def load_catalog() -> dict[str, dict]:
@@ -48,17 +48,29 @@ def load_catalog() -> dict[str, dict]:
 
 
 def find_source_image(sku: str, catalog: dict[str, dict]) -> Path | None:
-    """Find the best available source image for a SKU."""
+    """Find the best available source image for a SKU.
+
+    Priority: source_map (authoritative) → CSV override → glob fallback.
+    """
+    from nano_banana.source_map import get_source_map
+
+    # 1. Authoritative source map — single source of truth
+    smap = get_source_map()
+    if sku in smap:
+        front = smap[sku].get("front")
+        if front and front.exists():
+            return front
+
     info = catalog.get(sku, {})
 
-    # Explicit source override
+    # 2. Explicit CSV source override
     if "source_override" in info:
         path = PRODUCTS_DIR / info["source_override"]
         if path.exists():
             return path
         log.warning("source_override %s not found for %s", info["source_override"], sku)
 
-    # Glob by output_slug
+    # 3. Glob fallback by output_slug
     slug = info.get("output_slug", sku)
     candidates = []
     for ext in (".webp", ".jpg", ".jpeg", ".png"):
@@ -85,6 +97,16 @@ def find_back_source(sku: str, catalog: dict[str, dict]) -> Path | None:
     """Find back-specific source image. Crops 2-panel techflats automatically."""
     import tempfile
 
+    from nano_banana.source_map import get_source_map
+
+    # 1. Authoritative source map
+    smap = get_source_map()
+    if sku in smap:
+        back = smap[sku].get("back")
+        if back and back.exists():
+            return back
+
+    # 2. CSV override fallback
     info = catalog.get(sku, {})
     back_override = info.get("back_source_override")
     if not back_override:
@@ -147,32 +169,26 @@ def load_products(
     return products
 
 
-def load_references() -> dict[str, dict]:
-    """Load product reference manifest (techflats + material specs).
+def load_specs() -> dict[str, dict]:
+    """Load product specs from the single source of truth (product-specs.json).
 
     Returns the 'products' dict keyed by SKU. Each entry has:
-        name, collection, reference_image, reference_back,
-        fabric, texture, material_notes
-
-    Fabric/texture/notes fields may be None until populated by user.
-    Returns empty dict if manifest file doesn't exist.
+        name, collection, branding, fabric, texture, patch
     """
-    if not REFERENCES_JSON.exists():
+    if not SPECS_JSON.exists():
         return {}
-    data = json.loads(REFERENCES_JSON.read_text())
+    data = json.loads(SPECS_JSON.read_text())
     return data.get("products", {})
 
 
 def get_material_spec(sku: str) -> str:
     """Get fabric + texture description for a SKU to inject into prompts.
 
-    Returns a formatted string like:
-        'Material: satin. Texture: embossed logo with raised relief. Notes: ...'
-
-    Returns empty string if no specs populated for this SKU.
+    Loads from data/product-specs.json (single source of truth).
+    Returns empty string if no specs for this SKU.
     """
-    refs = load_references()
-    entry = refs.get(sku, {})
+    specs = load_specs()
+    entry = specs.get(sku, {})
     if not entry:
         return ""
 
@@ -181,7 +197,5 @@ def get_material_spec(sku: str) -> str:
         parts.append(f"Material: {entry['fabric']}")
     if entry.get("texture"):
         parts.append(f"Texture: {entry['texture']}")
-    if entry.get("material_notes"):
-        parts.append(f"Notes: {entry['material_notes']}")
 
     return " | ".join(parts) if parts else ""

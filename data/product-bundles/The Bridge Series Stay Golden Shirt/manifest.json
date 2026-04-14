@@ -1,17 +1,13 @@
 {
   "sku": "sg-002",
   "name": "The Bridge Series 'Stay Golden' Shirt",
+  "dirname": "The Bridge Series Stay Golden Shirt",
   "collection": "signature",
   "files": {
-    "model-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-002/model-back.webp",
-    "composite-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-002/composite-front.webp",
-    "techflat-source": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-002/techflat-source.jpg",
-    "model-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-002/model-front.webp",
-    "render-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-002/render-front.webp",
-    "branding": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-002/branding.webp",
-    "render-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-002/render-back.webp",
-    "logo-ref": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-002/logo-ref.png",
-    "spec": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-002/spec.txt"
-  },
-  "folder_name": "The Bridge Series Stay Golden Shirt"
+    "techflat-front": "techflat-front.jpeg",
+    "techflat-back": "techflat-back.jpeg",
+    "source-photo": "source-photo.jpg",
+    "logo-ref": "logo-ref.png",
+    "spec": "spec.txt"
+  }
 }

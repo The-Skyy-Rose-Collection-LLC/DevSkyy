@@ -1,10 +1,12 @@
 {
   "sku": "sg-013",
   "name": "Mint & Lavender Crewneck",
+  "dirname": "Mint & Lavender Crewneck",
   "collection": "signature",
   "files": {
-    "logo-ref": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-013/logo-ref.png",
-    "spec": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-013/spec.txt"
-  },
-  "folder_name": "Mint & Lavender Crewneck"
+    "techflat-front": "techflat-front.jpeg",
+    "techflat-back": "techflat-back.jpeg",
+    "logo-ref": "logo-ref.png",
+    "spec": "spec.txt"
+  }
 }

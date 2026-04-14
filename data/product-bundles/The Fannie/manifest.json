@@ -1,12 +1,12 @@
 {
   "sku": "lh-006",
   "name": "The Fannie",
+  "dirname": "The Fannie",
   "collection": "love-hurts",
   "files": {
-    "photo": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-006/photo.jpg",
-    "model-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-006/model-front.webp",
-    "logo-ref": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-006/logo-ref.png",
-    "spec": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-006/spec.txt"
-  },
-  "folder_name": "The Fannie"
+    "techflat-front": "techflat-front.jpg",
+    "source-photo": "source-photo.jpg",
+    "logo-ref": "logo-ref.png",
+    "spec": "spec.txt"
+  }
 }

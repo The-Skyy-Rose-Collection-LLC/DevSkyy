@@ -1,20 +1,11 @@
 {
   "sku": "sg-007",
   "name": "The Signature Beanie",
+  "dirname": "The Signature Beanie",
   "collection": "signature",
   "files": {
-    "asset-sg-007-signature-beanie": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-007/asset-sg-007-signature-beanie.webp",
-    "model-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-007/model-front.webp",
-    "render-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-007/render-front.webp",
-    "techflat-source": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-007/techflat-source.jpg",
-    "model-male": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-007/model-male.webp",
-    "model-female": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-007/model-female.webp",
-    "branding": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-007/branding.webp",
-    "render-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-007/render-back.webp",
-    "real-photo": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-007/real-photo.jpg",
-    "asset-sg-007-beanie-black": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-007/asset-sg-007-beanie-black.jpg",
-    "logo-ref": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-007/logo-ref.png",
-    "spec": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/sg-007/spec.txt"
-  },
-  "folder_name": "The Signature Beanie"
+    "techflat-front": "techflat-front.jpeg",
+    "logo-ref": "logo-ref.png",
+    "spec": "spec.txt"
+  }
 }

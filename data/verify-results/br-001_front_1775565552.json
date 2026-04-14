@@ -1,0 +1,99 @@
+{
+  "candidate_path": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/wordpress-theme/skyyrose-flagship/assets/images/products/br-001-front-render.webp",
+  "aggregate_score": 80.66666666666667,
+  "passed_98": true,
+  "top_issues": [
+    "The embroidered graphic on the chest is significantly different - source shows a more complex/abstract floral/tree design, generated shows a simplified single rose with stem and leaves",
+    "The generated image adds a large, clearly defined single rose graphic that does not match the source's embroidery design",
+    "The chest graphic in the generated image does not accurately match the design of the graphic in the reference image. The source graphic is more intricate with additional elements surrounding the rose, while the generated image features a simpler, stylized rose.",
+    "The specific details and complexity of the rose emblem are not reproduced faithfully from the source."
+  ],
+  "all_fixes": [
+    "Adjust the jacket's base color to match the source more closely.",
+    "Ensure the hood is constructed with identifiable multiple panels.",
+    "Enhance the prominence of the snap buttons.",
+    "Slightly adjust logo position to match the source.",
+    "Replace the single rose embroidery with the correct multi-element floral/tree graphic matching the source",
+    "Add drawstrings to the hood to match the source design",
+    "Make the hood more voluminous and less structured to match source",
+    "Add the small brand label/tag visible near the collar in the source",
+    "Adjust the overall fit to appear more relaxed/oversized as in the source",
+    "Adjust the satin material rendering to show more natural light variation"
+  ],
+  "judges": [
+    {
+      "judge": "gpt-4o",
+      "overall": 92,
+      "scores": {
+        "garment_type": 100,
+        "color_accuracy": 95,
+        "text_accuracy": 100,
+        "logo_accuracy": 90,
+        "construction_accuracy": 85,
+        "no_hallucinations": 90
+      },
+      "issues": [
+        "Base color is slightly darker than the source.",
+        "Hood construction looks slightly different from the source.",
+        "Snap buttons appear less prominent.",
+        "Logo position slightly different."
+      ],
+      "suggested_fixes": [
+        "Adjust the jacket's base color to match the source more closely.",
+        "Ensure the hood is constructed with identifiable multiple panels.",
+        "Enhance the prominence of the snap buttons.",
+        "Slightly adjust logo position to match the source."
+      ]
+    },
+    {
+      "judge": "claude-opus-4-6",
+      "overall": 65,
+      "scores": {
+        "garment_type": 95,
+        "color_accuracy": 85,
+        "text_accuracy": 100,
+        "logo_accuracy": 40,
+        "construction_accuracy": 78,
+        "no_hallucinations": 45
+      },
+      "issues": [
+        "The embroidered graphic on the chest is significantly different - source shows a more complex/abstract floral/tree design, generated shows a simplified single rose with stem and leaves",
+        "The generated image adds a large, clearly defined single rose graphic that does not match the source's embroidery design",
+        "The hood in the source appears more voluminous and loose with visible drawstrings; the generated hood is more structured and compact without visible drawstrings",
+        "Source has visible elastic/rib-knit waistband; generated shows a cleaner, more minimal hem area",
+        "The source jacket appears more oversized/relaxed in fit; the generated version looks more tailored and fitted",
+        "Source shows a small colorful label/tag near the collar area (left chest) which is missing in the generated image",
+        "The satin sheen and material texture differ - generated looks more uniformly sleek while source has more varied light reflection",
+        "Side pockets appear slightly different in execution between source and generated"
+      ],
+      "suggested_fixes": [
+        "Replace the single rose embroidery with the correct multi-element floral/tree graphic matching the source",
+        "Add drawstrings to the hood to match the source design",
+        "Make the hood more voluminous and less structured to match source",
+        "Add the small brand label/tag visible near the collar in the source",
+        "Adjust the overall fit to appear more relaxed/oversized as in the source",
+        "Adjust the satin material rendering to show more natural light variation"
+      ]
+    },
+    {
+      "judge": "gemini-2.5-flash",
+      "overall": 85,
+      "scores": {
+        "garment_type": 100,
+        "color_accuracy": 95,
+        "text_accuracy": 100,
+        "logo_accuracy": 30,
+        "construction_accuracy": 95,
+        "no_hallucinations": 100
+      },
+      "issues": [
+        "The chest graphic in the generated image does not accurately match the design of the graphic in the reference image. The source graphic is more intricate with additional elements surrounding the rose, while the generated image features a simpler, stylized rose.",
+        "The specific details and complexity of the rose emblem are not reproduced faithfully from the source."
+      ],
+      "suggested_fixes": [
+        "Ensure the chest graphic is an exact replica of the source, including all specific intricate details and surrounding abstract elements.",
+        "Adjust the generated graphic to match the complexity and specific design of the rose and its accompanying features from the reference image."
+      ]
+    }
+  ]
+}

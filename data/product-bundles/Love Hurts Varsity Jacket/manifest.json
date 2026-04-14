@@ -1,21 +1,13 @@
 {
   "sku": "lh-004",
   "name": "Love Hurts Varsity Jacket",
+  "dirname": "Love Hurts Varsity Jacket",
   "collection": "love-hurts",
   "files": {
-    "model-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-004/model-back.webp",
-    "composite-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-004/composite-front.webp",
-    "real-photo": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-004/real-photo.jpg",
-    "model-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-004/model-front.webp",
-    "render-back": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-004/render-back.webp",
-    "branding": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-004/branding.webp",
-    "render-front": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-004/render-front.webp",
-    "asset-lh-004-varsity": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-004/asset-lh-004-varsity.jpg",
-    "model-female": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-004/model-female.webp",
-    "techflat-source": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-004/techflat-source.jpeg",
-    "model-male": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-004/model-male.webp",
-    "logo-ref": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-004/logo-ref.jpeg",
-    "spec": "/Users/coreyfoster/DevSkyy/.claude/worktrees/wp-theme/data/product-bundles/lh-004/spec.txt"
-  },
-  "folder_name": "Love Hurts Varsity Jacket"
+    "techflat-front": "techflat-front.jpeg",
+    "techflat-back": "techflat-back.jpeg",
+    "source-photo": "source-photo.jpg",
+    "logo-ref": "logo-ref.jpeg",
+    "spec": "spec.txt"
+  }
 }
