@@ -97,6 +97,28 @@ ICLIGHT_RESOLUTION = 384
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# Queue / worker configuration
+# ---------------------------------------------------------------------------
+
+REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+
+# Worker concurrency (number of concurrent render jobs per worker process)
+WORKER_CONCURRENCY: int = int(os.getenv("ELITE_WORKER_CONCURRENCY", "1"))
+
+# Cost tracking — set to "false" to disable Redis cost writes
+COST_TRACKING_ENABLED: bool = os.getenv("ELITE_COST_TRACKING", "true").lower() != "false"
+
+# Rate limit constants per provider (requests / minute)
+RATE_LIMIT_GEMINI: int = int(os.getenv("ELITE_RATE_LIMIT_GEMINI", "60"))
+RATE_LIMIT_OPENAI: int = int(os.getenv("ELITE_RATE_LIMIT_OPENAI", "500"))
+RATE_LIMIT_ANTHROPIC: int = int(os.getenv("ELITE_RATE_LIMIT_ANTHROPIC", "50"))
+
+# ---------------------------------------------------------------------------
+# Lazy provider clients (cached singletons — no mutable globals)
+# ---------------------------------------------------------------------------
+
+
 @lru_cache(maxsize=1)
 def get_openai_client():
     """Lazy-init OpenAI client (cached singleton)."""
