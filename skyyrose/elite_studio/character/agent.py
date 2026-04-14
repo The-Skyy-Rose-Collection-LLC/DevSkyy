@@ -4,16 +4,41 @@ Character creation agent for SkyyRose Elite Studio.
 Builds reference sheet prompts for brand characters, with special support
 for the canonical SkyyRose mascot 'Rosie'.
 
+Rosie already exists — reference assets live at:
+  - assets/branding/mascot/skyyrose-mascot-reference.png  (primary)
+  - skyyrose/assets/images/source-products/brand-assets/skyyrose-avatar-reference.jpeg
+
+The frontend mascot system (/api/mascot, MascotBubble.tsx) is the canonical
+generation system. This agent bridges Rosie into the Elite Studio creative pipeline.
+
 "Luxury Grows from Concrete."
 """
 
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 
 from .models import CharacterPose, CharacterSheet, CharacterSpec
 
 logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Existing mascot asset paths (relative to repo root)
+# ---------------------------------------------------------------------------
+
+_MASCOT_REFERENCE_PNG = Path("assets/branding/mascot/skyyrose-mascot-reference.png")
+_AVATAR_REFERENCE_JPEG = Path(
+    "skyyrose/assets/images/source-products/brand-assets/skyyrose-avatar-reference.jpeg"
+)
+
+# Base prompt matching the existing frontend /api/mascot route (route.ts:MASCOT_BASE_PROMPT)
+# Kept in sync so Python pipeline produces consistent results with the dashboard.
+_MASCOT_BASE_PROMPT = (
+    "Pixar/Disney-quality 3D animated young Black girl with voluminous curly/afro dark brown hair, "
+    "big expressive brown eyes, warm brown skin, friendly confident smile. "
+    "Character must be 100% identical to reference image in face, hair, skin tone, art style, and proportions."
+)
 
 # ---------------------------------------------------------------------------
 # Canonical Rosie spec
@@ -51,7 +76,10 @@ _ROSIE_SPEC = CharacterSpec(
         "'Luxury Grows from Concrete.' ethos embodied in confident pose",
         "Oakland pride — subtle Bay Area references in background details",
     ),
-    reference_paths=(),  # avatar reference not available in this environment
+    reference_paths=(
+        str(_AVATAR_REFERENCE_JPEG),
+        str(_MASCOT_REFERENCE_PNG),
+    ),
     embedding_path="",
 )
 
@@ -245,5 +273,67 @@ class CharacterCreationAgent:
             )
 
     def create_skyyrose_rosie(self) -> CharacterSheet:
-        """Create the canonical SkyyRose mascot 'Rosie' character sheet."""
-        return self.create_sheet(_ROSIE_SPEC)
+        """Return the canonical SkyyRose mascot 'Rosie' character sheet.
+
+        Uses existing reference assets — Rosie already exists. Prompts are
+        kept in sync with the frontend /api/mascot route (MASCOT_BASE_PROMPT).
+        """
+        try:
+            base = _MASCOT_BASE_PROMPT
+
+            ref_note = ""
+            if _MASCOT_REFERENCE_PNG.exists():
+                ref_note = f"Reference image: {_MASCOT_REFERENCE_PNG}. "
+            elif _AVATAR_REFERENCE_JPEG.exists():
+                ref_note = f"Reference image: {_AVATAR_REFERENCE_JPEG}. "
+
+            front_view = (
+                f"{base} {ref_note}"
+                "Full body, standing confidently with hands on hips, studio lighting. "
+                "SkyyRose brand energy, 'Luxury Grows from Concrete.' Oakland, CA."
+            )
+            side_view = (
+                f"{base} {ref_note}"
+                "Full body, 90-degree side profile, same outfit and expression. "
+                "Clean white studio background. Character reference sheet quality."
+            )
+            back_view = (
+                f"{base} {ref_note}"
+                "Full body, back view. Afro puffs visible from behind. "
+                "SkyyRose branding on back of outfit. Reference sheet quality."
+            )
+            expression_grid = (
+                f"{base} {ref_note}"
+                "Expression reference sheet: 2x3 grid of 6 expressions. "
+                "Row 1: joyful grin, determined confidence, surprised delight. "
+                "Row 2: thinking (finger on chin), waving hello, proud arms-crossed. "
+                "Same character in all 6 panels. Label each expression clearly."
+            )
+            sprite_description = (
+                "2D flat-design web sprite for Rosie (SkyyRose mascot). "
+                "Simplified art style for CSS animation on dark backgrounds. "
+                f"{ref_note}"
+                "Transparent PNG, vector-like edges, rose gold #B76E79 accents."
+            )
+
+            return CharacterSheet(
+                success=True,
+                spec=_ROSIE_SPEC,
+                front_view_prompt=front_view,
+                side_view_prompt=side_view,
+                back_view_prompt=back_view,
+                expression_grid_prompt=expression_grid,
+                sprite_description=sprite_description,
+            )
+        except Exception as exc:
+            logger.exception("create_skyyrose_rosie failed: %s", exc)
+            return CharacterSheet(
+                success=False,
+                spec=_ROSIE_SPEC,
+                front_view_prompt="",
+                side_view_prompt="",
+                back_view_prompt="",
+                expression_grid_prompt="",
+                sprite_description="",
+                error=str(exc),
+            )
