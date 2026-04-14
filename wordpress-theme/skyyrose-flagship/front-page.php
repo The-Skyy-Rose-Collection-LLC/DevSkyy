@@ -407,6 +407,7 @@ if ( file_exists( $homepage_js_path ) ) :
 get_template_part( 'template-parts/size-guide-modal' );
 get_template_part( 'template-parts/cookie-consent' );
 get_template_part( 'template-parts/mobile-bottom-nav' );
+get_template_part( 'template-parts/skyy-mascot' );
 ?>
 
 <!-- Toast Notification Container -->

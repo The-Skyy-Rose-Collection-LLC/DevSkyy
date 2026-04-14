@@ -190,6 +190,26 @@ function skyyrose_enqueue_global_styles() {
 			SKYYROSE_VERSION
 		);
 	}
+
+	// Skyy living character widget — base styles (speech bubble, chips, recall pill).
+	if ( file_exists( $base_dir . '/mascot.min.css' ) ) {
+		wp_enqueue_style(
+			'skyyrose-mascot',
+			$base_uri . '/mascot.min.css',
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	// Skyy Pixar-like walk cycle enhancements — layered on top of mascot.min.css.
+	if ( file_exists( $base_dir . '/skyy-walk.css' ) ) {
+		wp_enqueue_style(
+			'skyyrose-skyy-walk',
+			$base_uri . '/skyy-walk.css',
+			array( 'skyyrose-mascot' ),
+			SKYYROSE_VERSION
+		);
+	}
 }
 
 /**
@@ -271,6 +291,37 @@ function skyyrose_enqueue_global_scripts() {
 	// Comment reply script (WordPress built-in).
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
+	}
+
+	// Skyy living character widget JS — state machine, walk-on, speech bubbles, chips.
+	if ( file_exists( $js_dir . '/mascot.min.js' ) ) {
+		wp_enqueue_script(
+			'skyyrose-mascot',
+			$js_uri . '/mascot.min.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+
+	// Skyy 3D walking character — Three.js GLB viewer driven by mascot state events.
+	// Only enqueued when the .glb model file is present on disk.
+	$model_file = SKYYROSE_DIR . '/assets/models/skyy.glb';
+	if ( file_exists( $js_dir . '/skyy-3d.js' ) && file_exists( $model_file ) ) {
+		wp_enqueue_script(
+			'skyyrose-skyy-3d',
+			$js_uri . '/skyy-3d.js',
+			array( 'skyyrose-mascot' ),
+			SKYYROSE_VERSION,
+			true
+		);
+		wp_localize_script(
+			'skyyrose-skyy-3d',
+			'SKYY_3D_CONFIG',
+			array(
+				'modelUrl' => SKYYROSE_ASSETS_URI . '/models/skyy.glb',
+			)
+		);
 	}
 
 }

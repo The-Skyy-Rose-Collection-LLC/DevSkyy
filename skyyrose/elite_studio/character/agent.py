@@ -24,59 +24,64 @@ from .models import CharacterPose, CharacterSheet, CharacterSpec
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# Existing mascot asset paths (relative to repo root)
+# Canonical character asset paths (relative to repo root)
 # ---------------------------------------------------------------------------
 
+# Primary canonical reference — the actual Skyy character
+_CANONICAL_REFERENCE = Path("assets/branding/mascot/skyy-canonical-reference.jpeg")
 _MASCOT_REFERENCE_PNG = Path("assets/branding/mascot/skyyrose-mascot-reference.png")
 _AVATAR_REFERENCE_JPEG = Path(
     "skyyrose/assets/images/source-products/brand-assets/skyyrose-avatar-reference.jpeg"
 )
 
-# Base prompt matching the existing frontend /api/mascot route (route.ts:MASCOT_BASE_PROMPT)
-# Kept in sync so Python pipeline produces consistent results with the dashboard.
+# Base prompt — describes the canonical Skyy character precisely as seen in reference image.
+# Must be kept in sync with frontend /api/mascot route (route.ts:MASCOT_BASE_PROMPT).
 _MASCOT_BASE_PROMPT = (
-    "Pixar/Disney-quality 3D animated young Black girl with voluminous curly/afro dark brown hair, "
-    "big expressive brown eyes, warm brown skin, friendly confident smile. "
+    "Pixar/Disney-quality 3D CGI animated young Black girl, approximately 4-6 years old. "
+    "EXACT appearance from reference image: voluminous large natural curly afro hair (very full, dark brown), "
+    "warm medium-brown skin, big expressive dark brown eyes, small button nose, joyful open smile. "
+    "Slightly chibi proportions — larger head relative to body, compact frame. "
     "Character must be 100% identical to reference image in face, hair, skin tone, art style, and proportions."
 )
 
 # ---------------------------------------------------------------------------
-# Canonical Rosie spec
+# Canonical Skyy spec — built from the actual reference image
 # ---------------------------------------------------------------------------
 
 _ROSIE_SPEC = CharacterSpec(
-    name="Rosie",
+    name="Skyy",
     style="pixar-chibi",
     body_description=(
-        "Young Black girl, approximately 6 years old, Pixar-quality 3D render. "
-        "Warm brown skin, bright expressive eyes with long lashes, "
-        "soft chubby cheeks with a joyful smile. "
-        "Compact, slightly chibi proportions — large head, petite frame. "
-        "Confident posture — hands on hips or arms slightly out."
+        "Young Black girl, approximately 4-6 years old, Pixar/Disney-quality 3D CGI render. "
+        "Warm medium-brown skin, big expressive dark brown eyes, small button nose, joyful open smile. "
+        "Voluminous, very full natural curly afro hair — dark brown, large and round. "
+        "Compact slightly chibi proportions — larger head, petite confident frame. "
+        "Presenting gesture: one arm extended outward with open palm, welcoming pose."
     ),
     face_features=(
-        "Round face with warm brown skin. Large bright dark brown eyes, "
-        "long eyelashes, small button nose, full lips with a wide smile. "
-        "Natural hair in two large afro puffs on either side of head, "
-        "secured with rose gold satin ribbons tied in bows. "
-        "Single small rose gold rose pin on left afro puff. "
-        "Expression: joyful, confident, curious."
+        "Round face, warm medium-brown skin. Large expressive dark brown eyes with natural lashes. "
+        "Small button nose, full lips with a wide joyful smile, soft cheeks. "
+        "Voluminous natural curly afro hair — very full, large, dark brown, unrestrained. "
+        "Expression: joyful, friendly, confident, welcoming."
     ),
     outfit_base=(
-        "Mini BLACK Rose Hoodie (child-sized version of br-004): "
-        "near-black (#0A0A0A) french terry hoodie with embroidered silver rose on left chest. "
-        "Matching mini black joggers with rose gold stripe detail. "
-        "Clean white sneakers with rose gold lace tips. "
-        "Small rose gold stud earrings."
+        # Default outfit: Love Hurts varsity set — exactly as seen in canonical reference
+        "Love Hurts varsity jacket: white satin body with black leather sleeves, "
+        "'Love Hurts' red script lettering on chest, rose-embroidered hood lining visible at collar, "
+        "black/white striped cuff bands. "
+        "Matching white satin track pants with black side stripe, red rose embroidery on left leg. "
+        "White/black/red sneakers (Jordan-style) with rose graphic embroidery on sides and tongue. "
+        "No accessories — clean, confident presentation."
     ),
     brand_elements=(
-        "Rose gold (#B76E79) accents throughout — ribbons, rose pin, sneaker tips",
-        "Embroidered SkyyRose silver rose on left chest of mini hoodie",
-        "SkyyRose logo subtly visible on sneaker tongue",
-        "'Luxury Grows from Concrete.' ethos embodied in confident pose",
-        "Oakland pride — subtle Bay Area references in background details",
+        "Love Hurts collection — crimson (#DC143C) roses throughout",
+        "'Love Hurts' script lettering on jacket chest",
+        "Rose embroidery on jacket hood lining, pants leg, and sneakers",
+        "White satin + black leather varsity aesthetic",
+        "'Luxury Grows from Concrete.' — Oakland roots embodied in her confident stance",
     ),
     reference_paths=(
+        str(_CANONICAL_REFERENCE),  # PRIMARY — actual Skyy character image
         str(_AVATAR_REFERENCE_JPEG),
         str(_MASCOT_REFERENCE_PNG),
     ),
@@ -310,7 +315,7 @@ class CharacterCreationAgent:
                 "Same character in all 6 panels. Label each expression clearly."
             )
             sprite_description = (
-                "2D flat-design web sprite for Rosie (SkyyRose mascot). "
+                "2D flat-design web sprite for Skyy (SkyyRose mascot). "
                 "Simplified art style for CSS animation on dark backgrounds. "
                 f"{ref_note}"
                 "Transparent PNG, vector-like edges, rose gold #B76E79 accents."
