@@ -13,6 +13,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from skyyrose.elite_studio import config as elite_config
 from skyyrose.elite_studio.agents.compositor_agent import CompositorAgent
 from skyyrose.elite_studio.coordinator import NullLogger
 from skyyrose.elite_studio.models import CompositorResult
@@ -129,7 +130,7 @@ class TestOpusPromptEngineering:
         assert "fashion model" in prompt.lower() or len(prompt) > 20
         mock_client.messages.create.assert_called_once()
         call_kwargs = mock_client.messages.create.call_args
-        assert call_kwargs.kwargs["model"] == "claude-opus-4"
+        assert call_kwargs.kwargs["model"] == elite_config.COMPOSITOR_OPUS_MODEL
 
     @patch("skyyrose.elite_studio.agents.compositor_agent.get_anthropic_client")
     def test_opus_failure_raises(self, mock_client_fn, compositor):
@@ -153,7 +154,7 @@ class TestOpusPromptEngineering:
 
 
 class TestICLightRelighting:
-    @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._run_iclight")
+    @patch("skyyrose.elite_studio.agents.compositor_agent.CompositorAgent._run_iclight_replicate")
     def test_relight_subject_returns_path(self, mock_iclight, compositor, tmp_path):
         """IC-Light produces a relit image saved to disk."""
         import io
