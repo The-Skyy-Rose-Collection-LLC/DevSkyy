@@ -359,11 +359,11 @@ get_template_part(
 			$lb_base = SKYYROSE_ASSETS_URI . '/images/lookbook/' . $lb['file'];
 			?>
 			<div class="lb-img rv<?php echo $lb['tall'] ? ' tall' : ''; ?>">
-				<img src="<?php echo esc_url( $lb_base . '-480w.webp' ); ?>"
+				<img src="<?php echo esc_url( $lb_base . '-960w.webp' ); ?>"
 					srcset="<?php echo esc_url( $lb_base . '-480w.webp' ); ?> 480w, <?php echo esc_url( $lb_base . '-960w.webp' ); ?> 960w"
-					sizes="(max-width: 768px) 100vw, 480px"
+					sizes="(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 480px"
 					alt="<?php echo esc_attr( $lb['alt'] ); ?>"
-					loading="lazy" decoding="async" width="480" height="640">
+					loading="lazy" decoding="async" width="960" height="1280">
 				<span class="lb-label"><?php echo esc_html( $lb['label'] ); ?></span>
 			</div>
 		<?php endforeach; ?>

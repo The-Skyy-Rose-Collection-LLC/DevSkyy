@@ -53,9 +53,8 @@ function skyyrose_setup() {
 	 * primary      - Main header navigation
 	 * collection   - Collection-specific navigation (per-collection pages)
 	 * experiences  - Immersive experience pages navigation (3D storytelling)
-	 * footer-shop  - Footer column: Shop links
-	 * footer-help  - Footer column: Help / support links
 	 * footer-legal - Footer column: Legal / policy links
+	 * footer       - Footer menu (legal nav in footer.php)
 	 * mobile       - Mobile-specific navigation (legacy)
 	 * top-bar      - Announcement / utility bar (legacy)
 	 */
@@ -64,8 +63,6 @@ function skyyrose_setup() {
 			'primary'      => esc_html__( 'Primary Menu', 'skyyrose' ),
 			'collection'   => esc_html__( 'Collection Navigation', 'skyyrose' ),
 			'experiences'  => esc_html__( 'Experiences Navigation', 'skyyrose' ),
-			'footer-shop'  => esc_html__( 'Footer - Shop', 'skyyrose' ),
-			'footer-help'  => esc_html__( 'Footer - Help', 'skyyrose' ),
 			'footer-legal' => esc_html__( 'Footer - Legal', 'skyyrose' ),
 			'footer'       => esc_html__( 'Footer Menu', 'skyyrose' ),
 			'mobile'       => esc_html__( 'Mobile Menu', 'skyyrose' ),

@@ -25,9 +25,14 @@ defined( 'ABSPATH' ) || exit;
  * @return array<string, array<string, mixed>>
  */
 function skyyrose_get_collections_config(): array {
+	static $cache = null;
+	if ( null !== $cache ) {
+		return $cache;
+	}
+
 	$uri = defined( 'SKYYROSE_ASSETS_URI' ) ? SKYYROSE_ASSETS_URI : '';
 
-	return array(
+	$cache = array(
 		'black-rose'   => array(
 			'slug'        => 'black-rose',
 			'class_abbr'  => 'br',
@@ -125,6 +130,8 @@ function skyyrose_get_collections_config(): array {
 			),
 		),
 	);
+
+	return $cache;
 }
 
 /**

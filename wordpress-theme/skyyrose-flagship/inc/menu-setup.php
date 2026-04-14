@@ -171,44 +171,6 @@ function skyyrose_get_menu_definitions() {
 				),
 			),
 		),
-		'footer-shop'  => array(
-			'name'  => __( 'Footer - Shop', 'skyyrose' ),
-			'items' => array(
-				array(
-					'title' => __( 'Black Rose', 'skyyrose' ),
-					'url'   => '/collection-black-rose/',
-				),
-				array(
-					'title' => __( 'Love Hurts', 'skyyrose' ),
-					'url'   => '/collection-love-hurts/',
-				),
-				array(
-					'title' => __( 'Signature', 'skyyrose' ),
-					'url'   => '/collection-signature/',
-				),
-				array(
-					'title' => __( 'Pre-Order', 'skyyrose' ),
-					'url'   => '/pre-order/',
-				),
-			),
-		),
-		'footer-help'  => array(
-			'name'  => __( 'Footer - Help', 'skyyrose' ),
-			'items' => array(
-				array(
-					'title' => __( 'FAQ', 'skyyrose' ),
-					'url'   => '/contact/#faq',
-				),
-				array(
-					'title' => __( 'Contact Us', 'skyyrose' ),
-					'url'   => '/contact/',
-				),
-				array(
-					'title' => __( 'Pre-Order', 'skyyrose' ),
-					'url'   => '/pre-order/',
-				),
-			),
-		),
 		'footer-legal' => array(
 			'name'  => __( 'Footer - Legal', 'skyyrose' ),
 			'items' => array(

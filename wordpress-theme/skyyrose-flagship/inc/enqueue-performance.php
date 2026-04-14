@@ -221,6 +221,55 @@ function skyyrose_add_sri_hashes( $tag, $handle ) {
 	return $tag;
 }
 
+/**
+ * Remove jQuery Migrate on the frontend.
+ *
+ * Removes the jQuery Migrate compatibility shim for deprecated jQuery APIs.
+ * Modern WooCommerce (9.0+) and WordPress (6.0+) do not require it.
+ * Removing it saves ~12 KB and one blocking request.
+ *
+ * @since 6.6.0
+ * @param \WP_Scripts $scripts Registered scripts.
+ * @return void
+ */
+function skyyrose_remove_jquery_migrate( $scripts ) {
+	if ( is_admin() ) {
+		return;
+	}
+	if ( isset( $scripts->registered['jquery'] ) ) {
+		$scripts->registered['jquery']->deps = array_diff(
+			$scripts->registered['jquery']->deps,
+			array( 'jquery-migrate' )
+		);
+	}
+}
+
+/**
+ * Dequeue Gutenberg block library styles on pages that don't use blocks.
+ *
+ * The wp-block-library stylesheet (~40 KB) is loaded globally. On pages
+ * that don't contain blocks (product pages, collection templates, etc.)
+ * this is wasted bandwidth.
+ *
+ * @since 6.6.0
+ * @return void
+ */
+function skyyrose_dequeue_block_styles() {
+	if ( is_admin() ) {
+		return;
+	}
+
+	// Keep block styles on pages that actually use blocks.
+	if ( function_exists( 'has_blocks' ) && has_blocks() ) {
+		return;
+	}
+
+	wp_dequeue_style( 'wp-block-library' );
+	wp_dequeue_style( 'wp-block-library-theme' );
+	wp_dequeue_style( 'wc-blocks-style' );
+	wp_dequeue_style( 'global-styles' );
+}
+
 /*
 --------------------------------------------------------------
  * Hook Registration — Performance Optimizations
@@ -246,3 +295,9 @@ add_action( 'wp_head', 'skyyrose_preload_hero_image', 4 );
 
 // Add SRI hashes to CDN scripts for defense-in-depth.
 add_filter( 'script_loader_tag', 'skyyrose_add_sri_hashes', 20, 2 );
+
+// Remove jQuery Migrate on frontend (not needed since WC 9.0+ / WP 6.0+).
+add_action( 'wp_default_scripts', 'skyyrose_remove_jquery_migrate' );
+
+// Dequeue Gutenberg block styles on non-block pages.
+add_action( 'wp_enqueue_scripts', 'skyyrose_dequeue_block_styles', 100 );
