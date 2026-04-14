@@ -30,7 +30,36 @@ logger = logging.getLogger(__name__)
 # Constants
 # ---------------------------------------------------------------------------
 
-VALID_EVENTS = frozenset({"job.completed", "job.failed", "job.review_required"})
+VALID_EVENTS = frozenset(
+    {
+        # Legacy job events
+        "job.completed",
+        "job.failed",
+        "job.review_required",
+        # Operation lifecycle
+        "operation.created",
+        "operation.started",
+        "operation.completed",
+        "operation.failed",
+        "operation.review_required",
+        # Character events
+        "character.created",
+        "character.updated",
+        # Asset events
+        "asset.generated",
+        "asset.approved",
+        "asset.rejected",
+        # Billing / subscription
+        "subscription.created",
+        "subscription.updated",
+        "subscription.cancelled",
+        "invoice.paid",
+        "usage.threshold_reached",
+        # Team events
+        "team.member_invited",
+        "team.member_removed",
+    }
+)
 _KEY_PREFIX = "elite_studio:webhooks"
 _DELIVERY_TIMEOUT = 10  # seconds
 

@@ -254,6 +254,21 @@ from api.v1.elite_studio import router as elite_studio_router
 
 app.include_router(elite_studio_router, prefix="/api/v1")
 
+# Enterprise API v2 — creative ops, characters, assets, webhooks, health
+from api.v2 import (
+    assets_router as v2_assets_router,
+    characters_router as v2_characters_router,
+    creative_router as v2_creative_router,
+    health_router as v2_health_router,
+    webhooks_router as v2_webhooks_router,
+)
+
+app.include_router(v2_creative_router, prefix="/api/v2")
+app.include_router(v2_characters_router, prefix="/api/v2")
+app.include_router(v2_assets_router, prefix="/api/v2")
+app.include_router(v2_webhooks_router, prefix="/api/v2")
+app.include_router(v2_health_router, prefix="/api/v2")
+
 # WordPress integration
 from api.v1.wordpress_integration import router as wordpress_router
 
