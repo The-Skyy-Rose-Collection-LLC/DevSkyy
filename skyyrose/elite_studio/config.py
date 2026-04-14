@@ -115,6 +115,25 @@ RATE_LIMIT_OPENAI: int = int(os.getenv("ELITE_RATE_LIMIT_OPENAI", "500"))
 RATE_LIMIT_ANTHROPIC: int = int(os.getenv("ELITE_RATE_LIMIT_ANTHROPIC", "50"))
 
 # ---------------------------------------------------------------------------
+# Stripe / Billing configuration
+# ---------------------------------------------------------------------------
+
+STRIPE_SECRET_KEY: str = os.getenv("STRIPE_SECRET_KEY", "")
+STRIPE_WEBHOOK_SECRET: str = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+
+# Comma-separated list of tier:price_id pairs.
+# Example: "starter:price_abc123,pro:price_def456,enterprise:price_ghi789"
+STRIPE_PRICE_IDS_RAW: str = os.getenv("STRIPE_PRICE_IDS", "")
+
+# Parsed as a dict for convenient lookups.
+STRIPE_PRICE_IDS: dict[str, str] = {
+    _k.strip(): _v.strip()
+    for _entry in STRIPE_PRICE_IDS_RAW.split(",")
+    if ":" in _entry
+    for _k, _v in [_entry.strip().split(":", 1)]
+}
+
+# ---------------------------------------------------------------------------
 # Lazy provider clients (cached singletons — no mutable globals)
 # ---------------------------------------------------------------------------
 

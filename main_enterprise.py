@@ -304,6 +304,18 @@ from security.jwt_oauth2_auth import auth_router
 
 app.include_router(auth_router)
 
+# SaaS Infrastructure — tenant resolution + billing entitlements
+from core.middleware.tenant import tenant_middleware  # noqa: E402
+from billing.middleware import billing_middleware  # noqa: E402
+
+app.middleware("http")(tenant_middleware)
+app.middleware("http")(billing_middleware)
+
+# Customer Portal
+from api.v1.portal import portal_router  # noqa: E402
+
+app.include_router(portal_router, prefix="/api/v1")
+
 # GraphQL
 from api.graphql_server import graphql_router
 
