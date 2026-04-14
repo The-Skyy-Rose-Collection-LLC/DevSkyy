@@ -35,6 +35,13 @@ from .state import EliteStudioState
 
 logger = logging.getLogger(__name__)
 
+# Lazy import guard so nodes remain testable without prometheus_client installed.
+try:
+    from monitoring.elite_studio_metrics import record_stage_duration as _record_stage_duration
+except ImportError:  # pragma: no cover
+    def _record_stage_duration(stage: str, duration_s: float) -> None:  # type: ignore[misc]
+        pass
+
 # Approximate token estimates per node call (used for cost tracking).
 _VISION_TOKENS_ESTIMATE = 2_000     # dual-provider: Gemini + OpenAI
 _GENERATION_TOKENS_ESTIMATE = 1_500  # Gemini image generation prompt
@@ -74,6 +81,7 @@ def vision_node(state: EliteStudioState) -> dict:
 
     timings = dict(state.get("stage_timings", {}))
     timings["vision"] = round(elapsed, 2)
+    _record_stage_duration("vision", elapsed)
 
     if not result.success:
         return {
@@ -115,6 +123,7 @@ def generator_node(state: EliteStudioState) -> dict:
 
     timings = dict(state.get("stage_timings", {}))
     timings["generation"] = round(elapsed, 2)
+    _record_stage_duration("generation", elapsed)
 
     if not result.success:
         return {
@@ -204,6 +213,7 @@ def quality_node(state: EliteStudioState) -> dict:
 
     elapsed = time.monotonic() - start
     timings["quality"] = round(elapsed, 2)
+    _record_stage_duration("quality", elapsed)
 
     return {
         "quality_result": quality_result,
@@ -324,6 +334,7 @@ def compositor_node(state: EliteStudioState) -> dict:
 
     timings = dict(state.get("stage_timings", {}))
     timings["compositing"] = round(elapsed, 2)
+    _record_stage_duration("compositing", elapsed)
 
     return {
         "compositor_result": comp_result,
