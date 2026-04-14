@@ -67,7 +67,7 @@ class PromptCache:
     """
 
     CACHE_PREFIX = "elite_studio:prompt_cache"
-    INDEX_KEY = "elite_studio:prompt_cache:index"
+    INDEX_PREFIX = "elite_studio:prompt_cache:index"
     STATS_KEY = "elite_studio:prompt_cache:stats"
     DEFAULT_TTL = 86400  # 24 hours
 
@@ -100,7 +100,6 @@ class PromptCache:
             return None
 
         try:
-            # Exact match first
             key = f"{self.CACHE_PREFIX}:{_prompt_hash(prompt, intent)}"
             cached_json = self._redis.get(key)
             if cached_json:
@@ -108,8 +107,9 @@ class PromptCache:
                 self._record_stat("hits")
                 return self._deserialize(cached_json)
 
-            # Similarity search via index
-            index_data = self._redis.hgetall(self.INDEX_KEY)
+            # Similarity search — partitioned by intent to avoid O(n) full scan
+            index_key = f"{self.INDEX_PREFIX}:{intent}"
+            index_data = self._redis.hgetall(index_key)
             if not index_data:
                 self._misses += 1
                 self._record_stat("misses")
@@ -119,11 +119,8 @@ class PromptCache:
             best_match: str | None = None
             best_score = 0.0
 
-            for cache_key, meta_json in index_data.items():
-                meta = json.loads(meta_json)
-                if meta.get("intent") != intent:
-                    continue
-                stored_tokens = frozenset(meta.get("tokens", []))
+            for cache_key, tokens_json in index_data.items():
+                stored_tokens = frozenset(json.loads(tokens_json))
                 sim = _jaccard_similarity(query_tokens, stored_tokens)
                 if sim > best_score and sim >= threshold:
                     best_score = sim
@@ -156,13 +153,12 @@ class PromptCache:
             key = f"{self.CACHE_PREFIX}:{_prompt_hash(original, intent)}"
             ttl = ttl or self.DEFAULT_TTL
 
-            # Store the full result
             self._redis.setex(key, ttl, self._serialize(enhanced))
 
-            # Store in similarity index
-            tokens = list(_tokenize(original))
-            index_meta = json.dumps({"intent": intent, "tokens": tokens})
-            self._redis.hset(self.INDEX_KEY, key, index_meta)
+            # Store tokens in intent-partitioned index (only tokens, no redundant intent field)
+            index_key = f"{self.INDEX_PREFIX}:{intent}"
+            tokens = json.dumps(list(_tokenize(original)))
+            self._redis.hset(index_key, key, tokens)
 
             self._record_stat("stores")
         except Exception:
@@ -174,15 +170,17 @@ class PromptCache:
             return 0
 
         try:
-            index_data = self._redis.hgetall(self.INDEX_KEY)
-            removed = 0
-            for cache_key, meta_json in index_data.items():
-                meta = json.loads(meta_json)
-                if meta.get("intent") == intent:
-                    self._redis.delete(cache_key)
-                    self._redis.hdel(self.INDEX_KEY, cache_key)
-                    removed += 1
-            return removed
+            index_key = f"{self.INDEX_PREFIX}:{intent}"
+            index_data = self._redis.hgetall(index_key)
+            if not index_data:
+                return 0
+            # Batch delete data keys + wipe the intent index in one pass
+            pipe = self._redis.pipeline()
+            for cache_key in index_data:
+                pipe.delete(cache_key)
+            pipe.delete(index_key)
+            pipe.execute()
+            return len(index_data)
         except Exception:
             logger.warning("PromptCache: invalidate failed", exc_info=True)
             return 0

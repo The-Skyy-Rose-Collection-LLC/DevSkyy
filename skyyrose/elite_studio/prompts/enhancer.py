@@ -7,11 +7,10 @@ Combines analyzer, cache, chain, and history into one call:
 
 from __future__ import annotations
 
-import hashlib
 from dataclasses import dataclass
 
 from skyyrose.elite_studio.prompts.analyzer import PromptAnalysis, PromptAnalyzer
-from skyyrose.elite_studio.prompts.cache import PromptCache
+from skyyrose.elite_studio.prompts.cache import PromptCache, _prompt_hash
 from skyyrose.elite_studio.prompts.chain import PromptChain
 
 
@@ -27,12 +26,6 @@ class EnhancedPrompt:
     context_added: tuple[str, ...]
     cache_key: str
     template_used: str
-
-
-def _compute_cache_key(prompt: str, intent: str) -> str:
-    """Deterministic cache key from prompt + intent."""
-    raw = f"{intent}:{prompt.strip().lower()}"
-    return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
 
 class PromptEnhancer:
@@ -79,7 +72,7 @@ class PromptEnhancer:
         if resolved_intent == "unknown":
             resolved_intent = "product-render"
 
-        cache_key = _compute_cache_key(prompt, resolved_intent)
+        cache_key = _prompt_hash(prompt, resolved_intent)
 
         # Check cache for semantically similar prompt
         cached = self._cache.check(prompt, resolved_intent)

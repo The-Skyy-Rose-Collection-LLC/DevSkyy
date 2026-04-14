@@ -55,6 +55,18 @@ _PLATFORMS = frozenset({
     "linkedin", "youtube", "threads", "snapchat",
 })
 
+_MOOD_WORDS = frozenset({
+    "edgy", "gothic", "luxury", "elegant", "bold", "minimal", "clean",
+    "dark", "romantic", "raw", "emotional", "refined", "understated",
+    "street", "urban", "dramatic", "moody", "vibrant", "fresh",
+    "pastel", "premium", "exclusive", "fierce", "soft", "cozy",
+})
+
+_REFERENCE_INDICATORS = frozenset({
+    "reference", "like", "similar to", "inspired by", "based on",
+    ".jpg", ".png", ".webp",
+})
+
 _INTENT_KEYWORDS: dict[str, list[str]] = {
     "product-render": ["render", "product image", "product photo", "generate image"],
     "3d-model": ["3d", "three-d", "glb", "gltf", "model", "mesh", "turntable"],
@@ -219,20 +231,13 @@ class PromptAnalyzer:
         return bool(re.search(r"\$\d+", text)) or "price" in text
 
     def _has_mood(self, text: str) -> bool:
-        mood_words = {
-            "edgy", "gothic", "luxury", "elegant", "bold", "minimal", "clean",
-            "dark", "romantic", "raw", "emotional", "refined", "understated",
-            "street", "urban", "dramatic", "moody", "vibrant", "fresh",
-            "pastel", "premium", "exclusive", "fierce", "soft", "cozy",
-        }
-        return any(m in text for m in mood_words)
+        return any(m in text for m in _MOOD_WORDS)
 
     def _has_platform(self, text: str) -> bool:
         return any(p in text for p in _PLATFORMS)
 
     def _has_reference(self, text: str) -> bool:
-        ref_indicators = {"reference", "like", "similar to", "inspired by", "based on", ".jpg", ".png", ".webp"}
-        return any(r in text for r in ref_indicators)
+        return any(r in text for r in _REFERENCE_INDICATORS)
 
     def _has_dimensions(self, text: str) -> bool:
         return bool(re.search(r"\d{3,4}\s*x\s*\d{3,4}", text)) or any(

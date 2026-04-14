@@ -474,11 +474,15 @@ def _build_templates() -> dict[str, PromptTemplate]:
     }
 
 
+# Module-level constant — built once, shared across all registry instances
+_TEMPLATES: dict[str, PromptTemplate] = _build_templates()
+
+
 class PromptTemplateRegistry:
     """Registry of curated prompt templates per creative intent."""
 
     def __init__(self) -> None:
-        self._templates = _build_templates()
+        self._templates = _TEMPLATES
 
     def get_template(self, intent: str) -> PromptTemplate | None:
         """Return the template for a creative intent, or None if not found."""

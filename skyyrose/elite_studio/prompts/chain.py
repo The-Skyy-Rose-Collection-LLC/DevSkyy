@@ -13,7 +13,11 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from skyyrose.elite_studio.prompts.analyzer import PromptAnalyzer, _SKU_PREFIXES
+from skyyrose.elite_studio.prompts.analyzer import (
+    PromptAnalyzer,
+    _COLLECTIONS,
+    _SKU_PREFIXES,
+)
 from skyyrose.elite_studio.prompts.templates import (
     BRAND_COLORS,
     BRAND_NAME,
@@ -118,16 +122,11 @@ def _detect_collection_from_sku(text: str) -> str | None:
 
 
 def _detect_collection_from_name(text: str) -> str | None:
-    """Detect collection from collection name mention."""
+    """Detect collection from collection name mention using canonical _COLLECTIONS dict."""
     lower = text.lower()
-    if "black rose" in lower or "blackrose" in lower:
-        return "black-rose"
-    if "love hurts" in lower or "lovehurts" in lower:
-        return "love-hurts"
-    if "signature" in lower:
-        return "signature"
-    if "kids" in lower or "children" in lower:
-        return "kids-capsule"
+    for name, slug in _COLLECTIONS.items():
+        if name in lower:
+            return slug
     return None
 
 
@@ -151,25 +150,37 @@ class PromptChain:
         """
         context_added: list[str] = []
 
-        # --- Stage 1: Intent Classification ---
+        # Stage 1: Intent Classification — use analysis.missing to drive expansion
         analysis = self._analyzer.analyze(prompt)
         resolved_intent = intent or analysis.intent
         if resolved_intent == "unknown":
             resolved_intent = "product-render"
             context_added.append("defaulted intent to product-render")
 
-        # --- Stage 2: Context Expansion ---
-        expanded = self._expand_context(prompt, resolved_intent, context_added)
+        # Pre-compute shared detections (avoid redundant calls across stages)
+        garment = _detect_garment_type(prompt)
+        collection = (
+            _detect_collection_from_sku(prompt) or _detect_collection_from_name(prompt)
+        )
+        missing_set = frozenset(analysis.missing)
 
-        # --- Stage 3: Domain Injection ---
-        domain_enriched = self._inject_domain(expanded, resolved_intent, context_added)
-
-        # --- Stage 4: Brand Injection ---
-        branded = self._inject_brand(
-            domain_enriched, resolved_intent, fashion_context, brand_context, context_added
+        # Stage 2: Context Expansion
+        expanded = self._expand_context(
+            prompt, resolved_intent, garment, collection, missing_set, context_added
         )
 
-        # --- Stage 5: Agent Optimization ---
+        # Stage 3: Domain Injection
+        domain_enriched = self._inject_domain(
+            expanded, resolved_intent, garment, context_added
+        )
+
+        # Stage 4: Brand Injection
+        branded = self._inject_brand(
+            domain_enriched, resolved_intent, collection,
+            fashion_context, brand_context, context_added,
+        )
+
+        # Stage 5: Agent Optimization
         optimized = self._optimize_for_agent(branded, resolved_intent, context_added)
 
         template = self._registry.get_template(resolved_intent)
@@ -182,18 +193,25 @@ class PromptChain:
             "template_used": template_name,
         }
 
-    def _expand_context(self, prompt: str, intent: str, added: list[str]) -> str:
-        """Fill gaps with smart defaults based on intent and detected context."""
+    def _expand_context(
+        self,
+        prompt: str,
+        intent: str,
+        garment: str,
+        collection: str | None,
+        missing: frozenset[str],
+        added: list[str],
+    ) -> str:
+        """Fill gaps with smart defaults using analysis.missing instead of private methods."""
         parts = [prompt.rstrip(".")]
 
-        # Add season if missing
-        if not self._analyzer._has_season(prompt.lower()):
+        # Add season if missing (check via analysis.missing keys)
+        if any("season" in m for m in missing):
             season = _current_season()
             parts.append(f"Season: {season}")
             added.append(f"added season {season}")
 
-        # Add collection from SKU if detectable
-        collection = _detect_collection_from_sku(prompt) or _detect_collection_from_name(prompt)
+        # Add collection from SKU/name if detectable
         if collection and collection not in prompt.lower().replace("-", " ").replace("_", " "):
             coll_data = COLLECTION_DNA.get(collection, {})
             coll_name = coll_data.get("name", collection)
@@ -201,27 +219,28 @@ class PromptChain:
             added.append(f"detected collection {coll_name}")
 
         # Add garment defaults if garment type detected
-        garment = _detect_garment_type(prompt)
         if garment != "garment" and garment in _GARMENT_DEFAULTS:
             defaults = _GARMENT_DEFAULTS[garment]
-            if not self._analyzer._has_fabric(prompt.lower()):
+            if any("fabric" in m for m in missing):
                 parts.append(f"Fabric: {defaults['fabric']}")
                 added.append(f"added default fabric {defaults['fabric']}")
 
-        # Add resolution default for render intents
+        # Add resolution default for render intents (not tracked in missing — check raw prompt)
         if intent in ("product-render", "mockup", "scene-composite"):
-            if not self._analyzer._has_dimensions(prompt.lower()):
+            lower = prompt.lower()
+            has_dims = any(d in lower for d in ("4k", "2k", "1080", "1024", "2048", "resolution"))
+            if not has_dims:
                 parts.append("Resolution: 4K (2048x2730)")
                 added.append("added 4K resolution default")
 
         return ". ".join(parts) + "."
 
-    def _inject_domain(self, prompt: str, intent: str, added: list[str]) -> str:
+    def _inject_domain(
+        self, prompt: str, intent: str, garment: str, added: list[str]
+    ) -> str:
         """Inject fashion-specific domain knowledge."""
         parts = [prompt.rstrip(".")]
 
-        # Detect garment and inject fabric properties
-        garment = _detect_garment_type(prompt)
         if garment in _GARMENT_DEFAULTS:
             fabric = _GARMENT_DEFAULTS[garment].get("fabric", "")
             if fabric in _FABRIC_PROPERTIES:
@@ -251,18 +270,13 @@ class PromptChain:
         self,
         prompt: str,
         intent: str,
+        collection: str | None,
         fashion_context: dict | None,
         brand_context: dict | None,
         added: list[str],
     ) -> str:
-        """Inject SkyyRose brand DNA."""
+        """Inject SkyyRose brand DNA using pre-computed collection."""
         parts = [prompt.rstrip(".")]
-
-        # Detect collection and inject DNA
-        collection = (
-            _detect_collection_from_sku(prompt)
-            or _detect_collection_from_name(prompt)
-        )
 
         # Use fashion_context if provided
         if fashion_context and "collection_dna" in fashion_context:
