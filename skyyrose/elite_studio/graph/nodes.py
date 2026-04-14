@@ -12,6 +12,7 @@ themselves are synchronous (REST calls with retry).
 
 from __future__ import annotations
 
+import logging
 import time
 
 from ..agents.color_correction_agent import ColorCorrectionAgent
@@ -25,6 +26,32 @@ from ..agents.variant_agent import VariantAgent
 from ..agents.vision_agent import VisionAgent
 from .state import EliteStudioState
 
+logger = logging.getLogger(__name__)
+
+# Approximate token estimates per node call (used for cost tracking).
+# These are conservative estimates; real token counts are not yet surfaced
+# by the agent layer. Replace with actual counts when agents expose usage.
+_VISION_TOKENS_ESTIMATE = 2_000     # dual-provider: Gemini + OpenAI
+_GENERATION_TOKENS_ESTIMATE = 1_500  # Gemini image generation prompt
+_QC_TOKENS_ESTIMATE = 1_000         # Claude Sonnet QC call
+_COMPOSITOR_TOKENS_ESTIMATE = 800    # Gemini QA gate
+
+
+def _record_cost(job_id: str | None, provider: str, tokens: int) -> None:
+    """Record estimated API cost for a node call. No-ops if job_id is None."""
+    if not job_id:
+        return
+    try:
+        from ..queue.cost_tracker import CostTracker, PRICING_PER_1K
+        from ..config import COST_TRACKING_ENABLED
+
+        if not COST_TRACKING_ENABLED:
+            return
+        cost_usd = PRICING_PER_1K.get(provider, 0.0) * tokens / 1000
+        CostTracker().record(job_id=job_id, provider=provider, tokens=tokens, cost_usd=cost_usd)
+    except Exception as exc:
+        logger.debug("Cost tracking skipped: %s", exc)
+
 
 def vision_node(state: EliteStudioState) -> dict:
     """Analyze product images via dual-provider vision (Gemini + OpenAI)."""
@@ -32,6 +59,10 @@ def vision_node(state: EliteStudioState) -> dict:
     agent = VisionAgent()
     result = agent.analyze(state["sku"], state["view"])
     elapsed = time.monotonic() - start
+
+    job_id: str | None = state.get("job_id")  # type: ignore[assignment]
+    _record_cost(job_id, "gemini", _VISION_TOKENS_ESTIMATE // 2)
+    _record_cost(job_id, "openai", _VISION_TOKENS_ESTIMATE // 2)
 
     timings = dict(state.get("stage_timings", {}))
     timings["vision"] = round(elapsed, 2)
@@ -71,6 +102,9 @@ def generator_node(state: EliteStudioState) -> dict:
     )
     elapsed = time.monotonic() - start
 
+    job_id: str | None = state.get("job_id")  # type: ignore[assignment]
+    _record_cost(job_id, "gemini", _GENERATION_TOKENS_ESTIMATE)
+
     timings = dict(state.get("stage_timings", {}))
     timings["generation"] = round(elapsed, 2)
 
@@ -108,6 +142,9 @@ def quality_node(state: EliteStudioState) -> dict:
         expected_spec=vision.unified_spec,
     )
     elapsed = time.monotonic() - start
+
+    job_id: str | None = state.get("job_id")  # type: ignore[assignment]
+    _record_cost(job_id, "anthropic", _QC_TOKENS_ESTIMATE)
 
     timings = dict(state.get("stage_timings", {}))
     timings["quality"] = round(elapsed, 2)
@@ -158,6 +195,10 @@ def compositor_node(state: EliteStudioState) -> dict:
         pass
 
     elapsed = time.monotonic() - start
+
+    if comp_result and comp_result.success:
+        job_id: str | None = state.get("job_id")  # type: ignore[assignment]
+        _record_cost(job_id, "gemini", _COMPOSITOR_TOKENS_ESTIMATE)
 
     timings = dict(state.get("stage_timings", {}))
     timings["compositing"] = round(elapsed, 2)

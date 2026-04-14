@@ -218,6 +218,45 @@ class BackgroundWorker:
             },
         }
 
+    async def process_elite_studio_produce(self, task_data: dict[str, Any]) -> dict[str, Any]:
+        """
+        Process an Elite Studio render job dispatched from the async queue.
+
+        Delegates to EliteStudioWorker.process_job() via a thread executor so
+        the blocking synchronous pipeline does not stall the asyncio event loop.
+
+        Args:
+            task_data: Full EliteStudioJobData dict (includes job_id).
+
+        Returns:
+            Task result dict with status and output_path.
+        """
+        import asyncio
+
+        from skyyrose.elite_studio.queue.consumer import EliteStudioWorker
+        from skyyrose.elite_studio.queue.job_types import EliteStudioJobData
+
+        try:
+            job_data = EliteStudioJobData.model_validate(task_data)
+            job_id: str = task_data.get("job_id", f"elite:{job_data.sku}:inline")
+
+            worker = EliteStudioWorker(redis_url=self.redis_url)
+
+            loop = asyncio.get_running_loop()
+            await loop.run_in_executor(None, worker.process_job, job_id, job_data)
+
+            logger.info("EliteStudio job %s completed via BackgroundWorker", job_id)
+            return {
+                "status": "completed",
+                "job_id": job_id,
+                "sku": job_data.sku,
+                "completed_at": datetime.now(UTC).isoformat(),
+            }
+
+        except Exception as e:
+            logger.error("EliteStudio produce task failed: %s", e, exc_info=True)
+            return {"status": "failed", "error": str(e), "error_type": type(e).__name__}
+
     async def process_task(self, task_id: str, task_data: dict[str, Any]) -> None:
         """
         Route task to appropriate processor.
@@ -236,6 +275,8 @@ class BackgroundWorker:
                 result = await self.process_generate_3d(task_data.get("data", {}))
             elif task_type == "fashn_tryon":
                 result = await self.process_fashn_tryon(task_data.get("data", {}))
+            elif task_type == "elite_studio_produce":
+                result = await self.process_elite_studio_produce(task_data.get("data", task_data))
             else:
                 result = {"status": "failed", "error": f"Unknown task type: {task_type}"}
 

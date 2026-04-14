@@ -170,6 +170,110 @@ def cmd_composite(args: argparse.Namespace) -> None:
         print(f"Error: {result.error}")
 
 
+def cmd_produce_async(args: argparse.Namespace) -> None:
+    """Enqueue a SKU render job and return the job_id."""
+    from .queue.producer import enqueue_produce
+
+    job_id = enqueue_produce(
+        sku=args.sku,
+        view=args.view,
+        priority=args.priority,
+        enable_compositor=getattr(args, "composite", False),
+    )
+    print(f"Enqueued: {job_id}")
+
+
+def cmd_job_status(args: argparse.Namespace) -> None:
+    """Print the current status of a queued job."""
+    import json
+    import os
+
+    import redis as sync_redis
+
+    redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+    try:
+        r = sync_redis.from_url(redis_url, decode_responses=True)
+        raw = r.get(f"elite_studio:result:{args.job_id}")
+        if raw:
+            data = json.loads(raw)
+            print(f"Status:  {data.get('status', 'unknown')}")
+            print(f"SKU:     {data.get('sku', '')}")
+            print(f"Output:  {data.get('output_path', '')}")
+            if data.get("error"):
+                print(f"Error:   {data['error']}")
+        else:
+            print(f"Job {args.job_id!r} not found (may still be queued or expired).")
+    except Exception as exc:
+        print(f"Error connecting to Redis: {exc}")
+        sys.exit(1)
+
+
+def cmd_job_result(args: argparse.Namespace) -> None:
+    """Print the full JSON result for a completed job."""
+    import json
+    import os
+
+    import redis as sync_redis
+
+    redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+    try:
+        r = sync_redis.from_url(redis_url, decode_responses=True)
+        raw = r.get(f"elite_studio:result:{args.job_id}")
+        if raw:
+            print(json.dumps(json.loads(raw), indent=2))
+        else:
+            print(f"No result found for job {args.job_id!r}.")
+    except Exception as exc:
+        print(f"Error connecting to Redis: {exc}")
+        sys.exit(1)
+
+
+def cmd_dlq_list(args: argparse.Namespace) -> None:
+    """List all entries in the Dead Letter Queue."""
+    from .queue.dead_letter import DeadLetterQueue
+
+    dlq = DeadLetterQueue()
+    entries = dlq.list_failed()
+    if not entries:
+        print("DLQ is empty.")
+        return
+    print(f"DLQ entries: {len(entries)}")
+    for entry in entries:
+        print(f"  {entry.get('job_id')}  sku={entry.get('sku')}  failed={entry.get('failed_at')}")
+        print(f"    error: {entry.get('error', '')[:100]}")
+
+
+def cmd_dlq_retry(args: argparse.Namespace) -> None:
+    """Retry a specific failed job from the DLQ."""
+    from .queue.dead_letter import DeadLetterQueue
+
+    dlq = DeadLetterQueue()
+    try:
+        new_job_id = dlq.retry(args.job_id)
+        print(f"Retried: {args.job_id} -> new job {new_job_id}")
+    except KeyError:
+        print(f"Job {args.job_id!r} not found in DLQ.")
+        sys.exit(1)
+    except Exception as exc:
+        print(f"Retry failed: {exc}")
+        sys.exit(1)
+
+
+def cmd_worker(args: argparse.Namespace) -> None:
+    """Start the Elite Studio queue worker."""
+    import logging
+
+    from .queue.consumer import EliteStudioWorker
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(name)s %(levelname)s %(message)s",
+    )
+    concurrency = getattr(args, "concurrency", 1)
+    worker = EliteStudioWorker(concurrency=concurrency)
+    worker.run_forever()
+
+
 def main(argv: list[str] | None = None) -> None:
     """CLI main entry point."""
     parser = argparse.ArgumentParser(
@@ -220,6 +324,36 @@ def main(argv: list[str] | None = None) -> None:
         help="Use LangGraph engine instead of legacy Coordinator",
     )
 
+    # produce-async
+    p_produce_async = sub.add_parser("produce-async", help="Enqueue a single SKU render job (async)")
+    p_produce_async.add_argument("sku", help="Product SKU (e.g., br-001)")
+    p_produce_async.add_argument("--view", default="front", choices=["front", "back"], help="View angle")
+    p_produce_async.add_argument("--priority", type=int, default=5, help="Job priority 1-10")
+    p_produce_async.add_argument(
+        "--composite", action="store_true", help="Enable scene compositing"
+    )
+
+    # job-status
+    p_job_status = sub.add_parser("job-status", help="Check status of a queued job")
+    p_job_status.add_argument("job_id", help="Job ID returned by produce-async")
+
+    # job-result
+    p_job_result = sub.add_parser("job-result", help="Print full JSON result of a completed job")
+    p_job_result.add_argument("job_id", help="Job ID returned by produce-async")
+
+    # dlq-list
+    sub.add_parser("dlq-list", help="List all entries in the Dead Letter Queue")
+
+    # dlq-retry
+    p_dlq_retry = sub.add_parser("dlq-retry", help="Retry a failed job from the DLQ")
+    p_dlq_retry.add_argument("job_id", help="Job ID to retry")
+
+    # worker
+    p_worker = sub.add_parser("worker", help="Start the Elite Studio queue worker")
+    p_worker.add_argument(
+        "--concurrency", type=int, default=1, help="Number of concurrent jobs (default: 1)"
+    )
+
     args = parser.parse_args(argv)
 
     if not args.command:
@@ -234,3 +368,15 @@ def main(argv: list[str] | None = None) -> None:
         cmd_status(args)
     elif args.command == "composite":
         cmd_composite(args)
+    elif args.command == "produce-async":
+        cmd_produce_async(args)
+    elif args.command == "job-status":
+        cmd_job_status(args)
+    elif args.command == "job-result":
+        cmd_job_result(args)
+    elif args.command == "dlq-list":
+        cmd_dlq_list(args)
+    elif args.command == "dlq-retry":
+        cmd_dlq_retry(args)
+    elif args.command == "worker":
+        cmd_worker(args)
