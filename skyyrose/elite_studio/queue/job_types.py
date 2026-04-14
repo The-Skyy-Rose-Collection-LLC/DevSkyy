@@ -21,6 +21,10 @@ class EliteStudioJobData(BaseModel):
     priority: int = Field(default=5, ge=1, le=10)  # 1-10, higher = sooner
     submitted_at: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
 
+    # Creative Hub fields (used when intent != "product-render")
+    intent: str = "product-render"
+    creative_params: dict = Field(default_factory=dict)
+
     @field_validator("view")
     @classmethod
     def validate_view(cls, v: str) -> str:
