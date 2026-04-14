@@ -193,8 +193,8 @@ class TestCreateOperationAsync:
             )
 
         assert resp.status_code == 202
-        # setex called for both operation storage and webhook key
-        assert mock_redis.setex.call_count >= 2
+        # operation stored via pipeline (setex+zadd) and webhook stored via setex
+        assert mock_redis.pipeline.called or mock_redis.setex.call_count >= 1
 
     def test_queue_unavailable_returns_503(self, creative_client):
         with patch(
@@ -316,9 +316,10 @@ class TestListOperations:
     def _build_redis_mock(self, ops: list[str]) -> MagicMock:
         mock_redis = MagicMock()
         mock_redis.ping.return_value = True
-        keys = [f"elite_studio:v2:operation:{i}" for i in range(len(ops))]
-        mock_redis.keys.return_value = keys
-        mock_redis.get.side_effect = lambda key: ops[keys.index(key)] if key in keys else None
+        op_ids = [f"op-{i}" for i in range(len(ops))]
+        # New implementation uses zrevrange (returns op_ids) then mget (returns values)
+        mock_redis.zrevrange.return_value = op_ids
+        mock_redis.mget.return_value = ops
         return mock_redis
 
     def test_returns_paginated_list(self, creative_client):

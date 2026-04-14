@@ -17,7 +17,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +78,7 @@ class CreateCharacterRequest(BaseModel):
     outfit_base: str = ""
     brand_elements: list[str] = Field(default_factory=list)
 
+    @field_validator("style")
     @classmethod
     def _validate_style(cls, v: str) -> str:
         valid = {"pixar-chibi", "realistic", "illustration"}

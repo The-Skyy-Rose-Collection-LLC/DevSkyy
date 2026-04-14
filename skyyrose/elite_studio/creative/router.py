@@ -109,3 +109,15 @@ def build_creative_graph():  # type: ignore[return]
     graph.add_edge(FINALIZE, END)
 
     return graph.compile()
+
+
+# Module-level singleton — compiled once, reused across all requests
+_CREATIVE_GRAPH = None
+
+
+def get_creative_graph():
+    """Return the cached compiled graph, building it on first call."""
+    global _CREATIVE_GRAPH
+    if _CREATIVE_GRAPH is None:
+        _CREATIVE_GRAPH = build_creative_graph()
+    return _CREATIVE_GRAPH

@@ -37,7 +37,34 @@ except ImportError:  # pragma: no cover
 
 _RESULT_KEY_PREFIX = "elite_studio:result:"
 _OP_KEY_PREFIX = "elite_studio:v2:operation:"
+_OP_INDEX_KEY = "elite_studio:v2:operation:_index"  # sorted set: score=created_at_ts, member=op_id
 _QUEUE_NAME = "queue:elite_studio_produce"
+
+# ---------------------------------------------------------------------------
+# Module-level Redis singleton — one connection per process, not per request
+# ---------------------------------------------------------------------------
+
+_redis_client: Any = None
+
+
+def _get_redis() -> Any | None:
+    global _redis_client
+    if _redis_client is not None:
+        try:
+            _redis_client.ping()
+            return _redis_client
+        except Exception:
+            _redis_client = None
+    redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+    try:
+        import redis as redis_lib
+        r = redis_lib.from_url(redis_url, decode_responses=True, socket_timeout=3)
+        r.ping()
+        _redis_client = r
+        return _redis_client
+    except Exception as exc:
+        logger.warning("creative v2: Redis unavailable — %s", exc)
+        return None
 
 
 # ---------------------------------------------------------------------------
@@ -119,19 +146,6 @@ class OperationListResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-def _get_redis() -> Any | None:
-    redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
-    try:
-        import redis as redis_lib
-
-        r = redis_lib.from_url(redis_url, decode_responses=True, socket_timeout=3)
-        r.ping()
-        return r
-    except Exception as exc:
-        logger.warning("creative v2: Redis unavailable — %s", exc)
-        return None
-
-
 def _require_redis() -> Any:
     r = _get_redis()
     if r is None:
@@ -143,10 +157,16 @@ def _require_redis() -> Any:
 
 
 def _store_operation(r: Any, op: OperationResponse, ttl: int = 86_400 * 7) -> None:
-    """Persist an OperationResponse to Redis with a 7-day TTL."""
+    """Persist an OperationResponse and update the sorted-set index."""
+    import time
+
     key = f"{_OP_KEY_PREFIX}{op.operation_id}"
     try:
-        r.setex(key, ttl, op.model_dump_json())
+        pipe = r.pipeline()
+        pipe.setex(key, ttl, op.model_dump_json())
+        # Sorted set: score = unix timestamp for chronological ordering
+        pipe.zadd(_OP_INDEX_KEY, {op.operation_id: time.time()})
+        pipe.execute()
     except Exception as exc:
         logger.warning("Failed to store operation %s: %s", op.operation_id, exc)
 
@@ -330,7 +350,12 @@ async def list_operations(
     """
     r = _require_redis()
     try:
-        keys = r.keys(f"{_OP_KEY_PREFIX}*")
+        # Use sorted-set index for O(log N) range, then mget for batch fetch
+        op_ids = r.zrevrange(_OP_INDEX_KEY, 0, -1)
+        if not op_ids:
+            return OperationListResponse(operations=[], total=0, page=page, page_size=page_size)
+        keys = [f"{_OP_KEY_PREFIX}{op_id}" for op_id in op_ids]
+        raw_values = r.mget(keys)  # single round-trip for all values
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -338,15 +363,13 @@ async def list_operations(
         ) from exc
 
     operations: list[OperationResponse] = []
-    for key in keys:
-        raw = r.get(key)
+    for raw in raw_values:
         if not raw:
             continue
         try:
             op = OperationResponse.model_validate_json(raw)
         except Exception:
             continue
-
         if status_filter and op.status != status_filter:
             continue
         if intent and op.intent != intent:
@@ -355,7 +378,6 @@ async def list_operations(
             continue
         operations.append(op)
 
-    operations.sort(key=lambda o: o.created_at, reverse=True)
     total = len(operations)
     start = (page - 1) * page_size
     paginated = operations[start : start + page_size]

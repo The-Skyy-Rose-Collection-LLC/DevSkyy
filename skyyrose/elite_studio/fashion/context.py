@@ -22,6 +22,8 @@ logger = logging.getLogger(__name__)
 
 _CATALOG_PATH = Path(__file__).parent.parent.parent.parent.parent / "data" / "product-catalog.csv"
 
+_DEFAULT_SEASON = "FW26"
+
 # Cache loaded catalog to avoid repeated CSV reads
 _catalog_cache: dict[str, dict[str, str]] | None = None
 
@@ -172,7 +174,7 @@ class FashionContextBuilder:
         sku: str = "",
         garment_type: str = "",
         collection: str = "",
-        season: str = "FW26",
+        season: str = _DEFAULT_SEASON,
     ) -> FashionContext:
         """Build a FashionContext from explicit parameters.
 
@@ -260,20 +262,15 @@ class FashionContextBuilder:
 
         if not row:
             logger.warning("SKU %s not found in product catalog — using defaults", sku)
-            return self.build(sku=sku, garment_type="garment", collection="", season="FW26")
+            return self.build(sku=sku, garment_type="garment", collection="", season=_DEFAULT_SEASON)
 
         collection_slug = row.get("collection_slug", "").strip()
         product_name = row.get("name", "")
         garment_type = _infer_garment_type(product_name)
 
-        # Determine season from collection and context
-        season = "FW26"
-        if collection_slug in ("signature", "kids-capsule"):
-            season = "FW26"  # both seasonal
-
         return self.build(
             sku=sku_normalized,
             garment_type=garment_type,
             collection=collection_slug,
-            season=season,
+            season=_DEFAULT_SEASON,
         )
