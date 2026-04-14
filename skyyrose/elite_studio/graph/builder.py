@@ -50,9 +50,13 @@ from .nodes import (
     human_review_node,
     prompt_enrichment_node,
     quality_node,
+<<<<<<< HEAD
     safety_node,
     upscaling_node,
     variant_node,
+=======
+    tryon_node,
+>>>>>>> elite/layer-6-virtual-tryon
     vision_node,
 )
 from .state import EliteStudioState
@@ -63,12 +67,16 @@ _GENERATOR = GENERATOR
 _QUALITY = QUALITY
 _COMPOSITOR = COMPOSITOR
 _FINALIZE = FINALIZE
+<<<<<<< HEAD
 _PROMPT_ENRICHMENT = PROMPT_ENRICHMENT
 _SAFETY = SAFETY
 _UPSCALING = UPSCALING
 _COLOR_CORRECTION = COLOR_CORRECTION
 _VARIANTS = VARIANTS
 _HUMAN_REVIEW = HUMAN_REVIEW
+=======
+_TRYON = "tryon"
+>>>>>>> elite/layer-6-virtual-tryon
 
 
 @dataclass(frozen=True)
@@ -104,6 +112,7 @@ class GraphConfig:
 
     max_retries: int = 2
     enable_compositor: bool = False
+<<<<<<< HEAD
 
     # Layer 2 optional stages
     enable_prompt_enrichment: bool = True  # on by default (pure enrichment, no cost)
@@ -119,6 +128,10 @@ class GraphConfig:
     enable_visual_regression: bool = False
 
     # Extension hook (reserved for future layers)
+=======
+    enable_tryon: bool = False
+    tryon_category: str = "upper_body"
+>>>>>>> elite/layer-6-virtual-tryon
     extra_nodes: list[str] = field(default_factory=list)
 
 
@@ -128,6 +141,7 @@ def build_graph(config: GraphConfig | None = None) -> object:
     Returns a ``CompiledGraph`` that can be invoked with
     ``graph.invoke(state_dict)``.
 
+<<<<<<< HEAD
     Topology (Layers 1-4):
 
         vision
@@ -143,6 +157,11 @@ def build_graph(config: GraphConfig | None = None) -> object:
           → [compositor?]
           → finalize
           → END
+=======
+    When ``enable_tryon=True``, a sequential tryon node is inserted after
+    quality (alongside compositor routing). The tryon node is additive:
+    errors never fail the main job.
+>>>>>>> elite/layer-6-virtual-tryon
 
     Args:
         config: Optional graph configuration. Uses defaults if None.
@@ -155,13 +174,18 @@ def build_graph(config: GraphConfig | None = None) -> object:
 
     graph = StateGraph(EliteStudioState)
 
+<<<<<<< HEAD
     # --- Register core nodes (always present) ---
+=======
+    # --- Register core nodes ---
+>>>>>>> elite/layer-6-virtual-tryon
     graph.add_node(_VISION, vision_node)
     graph.add_node(_GENERATOR, generator_node)
     graph.add_node(_QUALITY, quality_node)
     graph.add_node(_COMPOSITOR, compositor_node)
     graph.add_node(_FINALIZE, finalize_node)
 
+<<<<<<< HEAD
     # --- Register Layer 2 optional nodes ---
     if config.enable_prompt_enrichment:
         graph.add_node(_PROMPT_ENRICHMENT, prompt_enrichment_node)
@@ -181,10 +205,16 @@ def build_graph(config: GraphConfig | None = None) -> object:
     # --- Register Layer 4 optional nodes ---
     if config.enable_human_review:
         graph.add_node(_HUMAN_REVIEW, human_review_node)
+=======
+    # --- Register optional tryon node ---
+    if config.enable_tryon:
+        graph.add_node(_TRYON, tryon_node)
+>>>>>>> elite/layer-6-virtual-tryon
 
     # --- Entry point ---
     graph.set_entry_point(_VISION)
 
+<<<<<<< HEAD
     # --- vision → [prompt_enrichment?] → generator ---
     if config.enable_prompt_enrichment:
         graph.add_conditional_edges(
@@ -238,10 +268,38 @@ def build_graph(config: GraphConfig | None = None) -> object:
             after_human_review,
             {_GENERATOR: _GENERATOR, _COMPOSITOR: _post_quality, _FINALIZE: _post_quality},
         )
+=======
+    # --- Conditional edges ---
+    graph.add_conditional_edges(
+        _VISION,
+        after_vision,
+        {_GENERATOR: _GENERATOR, END: END},
+    )
+    graph.add_conditional_edges(
+        _GENERATOR,
+        after_generation,
+        {_QUALITY: _QUALITY, END: END},
+    )
+
+    if config.enable_tryon:
+        # quality → tryon → (compositor or finalize)
+        graph.add_conditional_edges(
+            _QUALITY,
+            after_quality,
+            {_GENERATOR: _GENERATOR, _COMPOSITOR: _COMPOSITOR, _FINALIZE: _TRYON},
+        )
+        graph.add_conditional_edges(
+            _COMPOSITOR,
+            after_compositor,
+            {_FINALIZE: _TRYON},
+        )
+        graph.add_edge(_TRYON, _FINALIZE)
+>>>>>>> elite/layer-6-virtual-tryon
     else:
         graph.add_conditional_edges(
             _QUALITY,
             after_quality,
+<<<<<<< HEAD
             {_GENERATOR: _GENERATOR, _COMPOSITOR: _post_quality, _FINALIZE: _post_quality},
         )
 
@@ -250,6 +308,15 @@ def build_graph(config: GraphConfig | None = None) -> object:
         after_compositor,
         {_FINALIZE: _FINALIZE},
     )
+=======
+            {_GENERATOR: _GENERATOR, _COMPOSITOR: _COMPOSITOR, _FINALIZE: _FINALIZE},
+        )
+        graph.add_conditional_edges(
+            _COMPOSITOR,
+            after_compositor,
+            {_FINALIZE: _FINALIZE},
+        )
+>>>>>>> elite/layer-6-virtual-tryon
 
     # --- Post-quality chain: upscaling → color_correction → variants → compositor → finalize ---
     _wire_post_quality_chain(graph, config)

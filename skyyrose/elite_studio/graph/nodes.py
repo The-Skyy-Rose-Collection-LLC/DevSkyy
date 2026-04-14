@@ -26,6 +26,7 @@ from ..agents.generator_agent import GeneratorAgent
 from ..agents.prompt_enrichment_agent import PromptEnrichmentAgent
 from ..agents.quality_agent import QualityAgent
 from ..agents.safety_agent import SafetyAgent
+from ..agents.tryon_agent import TryOnAgent, _find_garment_image
 from ..agents.upscaling_agent import UpscalingAgent
 from ..agents.variant_agent import VariantAgent
 from ..agents.vision_agent import VisionAgent
@@ -39,8 +40,10 @@ logger = logging.getLogger(__name__)
 try:
     from monitoring.elite_studio_metrics import record_stage_duration as _record_stage_duration
 except ImportError:  # pragma: no cover
+
     def _record_stage_duration(stage: str, duration_s: float) -> None:  # type: ignore[misc]
         pass
+
 
 # Approximate token estimates per node call (used for cost tracking).
 _VISION_TOKENS_ESTIMATE = 2_000  # dual-provider: Gemini + OpenAI
@@ -340,6 +343,42 @@ def compositor_node(state: EliteStudioState) -> dict:
         "compositor_result": comp_result,
         "stage_timings": timings,
     }
+
+
+def tryon_node(state: EliteStudioState) -> dict:
+    """Run virtual try-on in parallel with compositor (additive — never fails the job).
+
+    Skips silently when:
+    - generation_result is absent or unsuccessful
+    - no garment image can be found for the SKU
+    """
+    start = time.monotonic()
+    timings = dict(state.get("stage_timings", {}))
+
+    gen = state.get("generation_result")
+    if not gen or not gen.success:
+        logger.debug("tryon_node: skipping — no successful generation result")
+        timings["tryon"] = round(time.monotonic() - start, 2)
+        return {"tryon_result": None, "stage_timings": timings}
+
+    sku = state["sku"]
+    garment_path = _find_garment_image(sku)
+    if not garment_path:
+        logger.debug("tryon_node: skipping — no garment image found for %s", sku)
+        timings["tryon"] = round(time.monotonic() - start, 2)
+        return {"tryon_result": None, "stage_timings": timings}
+
+    category = state.get("tryon_category", "upper_body")
+    agent = TryOnAgent()
+    result = agent.try_on(
+        sku=sku,
+        garment_image_path=garment_path,
+        model_image_path=gen.output_path,
+        category=category,
+    )
+
+    timings["tryon"] = round(time.monotonic() - start, 2)
+    return {"tryon_result": result, "stage_timings": timings}
 
 
 def finalize_node(state: EliteStudioState) -> dict:

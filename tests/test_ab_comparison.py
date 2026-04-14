@@ -7,7 +7,6 @@ Falls back gracefully when fakeredis is not installed.
 
 from __future__ import annotations
 
-import math
 
 import pytest
 
@@ -18,9 +17,7 @@ try:
 except ImportError:
     FAKEREDIS_AVAILABLE = False
 
-pytestmark = pytest.mark.skipif(
-    not FAKEREDIS_AVAILABLE, reason="fakeredis not installed"
-)
+pytestmark = pytest.mark.skipif(not FAKEREDIS_AVAILABLE, reason="fakeredis not installed")
 
 
 # ---------------------------------------------------------------------------

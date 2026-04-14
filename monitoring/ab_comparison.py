@@ -82,7 +82,9 @@ class ABComparisonTracker:
         try:
             import redis as redis_lib
 
-            self._redis = redis_lib.from_url(self._redis_url, decode_responses=True, socket_timeout=2)
+            self._redis = redis_lib.from_url(
+                self._redis_url, decode_responses=True, socket_timeout=2
+            )
             self._redis.ping()
             return self._redis
         except Exception as exc:
