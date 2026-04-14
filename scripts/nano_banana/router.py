@@ -7,6 +7,7 @@ Routes based on garment features extracted by vision_describe.py:
 - Logo refinement → FLUX Kontext Pro (reference-guided editing)
 - Editorial/branding → Gemini 3 Pro (best scene composition)
 """
+
 from __future__ import annotations
 
 import logging
@@ -15,7 +16,7 @@ from dataclasses import dataclass
 log = logging.getLogger(__name__)
 
 COST_TABLE = {
-    "gemini-pro": 0.04,      # per image
+    "gemini-pro": 0.04,  # per image
     "gemini-flash": 0.01,
     "gpt-image": 0.08,
     "flux-pro": 0.035,
@@ -30,17 +31,41 @@ ENGINE_CAPABILITIES = {
     "flux-kontext": "Reference-guided editing. Fix logos/text on existing renders without regenerating.",
 }
 
-COMPLEX_FABRICS = frozenset({
-    "satin", "sherpa", "velvet", "mesh", "silk", "leather",
-    "quilted", "fleece", "terry", "french terry", "corduroy",
-    "wool", "cashmere", "suede",
-})
+COMPLEX_FABRICS = frozenset(
+    {
+        "satin",
+        "sherpa",
+        "velvet",
+        "mesh",
+        "silk",
+        "leather",
+        "quilted",
+        "fleece",
+        "terry",
+        "french terry",
+        "corduroy",
+        "wool",
+        "cashmere",
+        "suede",
+    }
+)
 
-TEXT_INDICATORS = frozenset({
-    "black is beautiful", "love hurts", "the bay", "oakland",
-    "skyy rose", "skyyrose", "the skyrose collection",
-    "wordmark", "script", "text", "lettering", "foil",
-})
+TEXT_INDICATORS = frozenset(
+    {
+        "black is beautiful",
+        "love hurts",
+        "the bay",
+        "oakland",
+        "skyy rose",
+        "skyyrose",
+        "the skyrose collection",
+        "wordmark",
+        "script",
+        "text",
+        "lettering",
+        "foil",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -65,6 +90,7 @@ def _has_text_graphics(vision_desc: dict, sku: str) -> bool:
 
     # Check LOGO_TREATMENTS metadata
     from nano_banana.prompts import LOGO_TREATMENTS
+
     treatment = LOGO_TREATMENTS.get(sku, "").lower()
     return any(ind in treatment for ind in TEXT_INDICATORS)
 
@@ -92,36 +118,96 @@ def route_product(
     # Editorial/branding views — always Gemini Pro for scene composition
     if view == "branding":
         return [
-            RouteDecision("gemini-pro", "gemini-3-pro-image-preview", "Editorial scene composition — Gemini Pro excels at cinematic environments", COST_TABLE["gemini-pro"], 1),
-            RouteDecision("gpt-image", "gpt-image-1.5", "Fallback for editorial — strong commercial aesthetics", COST_TABLE["gpt-image"], 2),
+            RouteDecision(
+                "gemini-pro",
+                "gemini-3-pro-image-preview",
+                "Editorial scene composition — Gemini Pro excels at cinematic environments",
+                COST_TABLE["gemini-pro"],
+                1,
+            ),
+            RouteDecision(
+                "gpt-image",
+                "gpt-image-1.5",
+                "Fallback for editorial — strong commercial aesthetics",
+                COST_TABLE["gpt-image"],
+                2,
+            ),
         ]
 
     # Text/logo-heavy products — GPT Image for text accuracy
     if has_text:
         return [
-            RouteDecision("gpt-image", "gpt-image-1.5", f"Text/logo product ({sku}) — GPT Image has 96%+ text accuracy", COST_TABLE["gpt-image"], 1),
-            RouteDecision("gemini-pro", "gemini-3-pro-image-preview", "Fallback — good text rendering with superior fabric physics", COST_TABLE["gemini-pro"], 2),
+            RouteDecision(
+                "gpt-image",
+                "gpt-image-1.5",
+                f"Text/logo product ({sku}) — GPT Image has 96%+ text accuracy",
+                COST_TABLE["gpt-image"],
+                1,
+            ),
+            RouteDecision(
+                "gemini-pro",
+                "gemini-3-pro-image-preview",
+                "Fallback — good text rendering with superior fabric physics",
+                COST_TABLE["gemini-pro"],
+                2,
+            ),
         ]
 
     # Complex fabric — Gemini Pro for material physics
     if has_complex:
         fabric = vision_desc.get("fabric_appearance", "complex")
         return [
-            RouteDecision("gemini-pro", "gemini-3-pro-image-preview", f"Complex fabric ({fabric}) — Gemini Pro best at material physics", COST_TABLE["gemini-pro"], 1),
-            RouteDecision("flux-pro", "fal-ai/flux-pro/v1.1", "Fallback — high photorealism at lower cost", COST_TABLE["flux-pro"], 2),
+            RouteDecision(
+                "gemini-pro",
+                "gemini-3-pro-image-preview",
+                f"Complex fabric ({fabric}) — Gemini Pro best at material physics",
+                COST_TABLE["gemini-pro"],
+                1,
+            ),
+            RouteDecision(
+                "flux-pro",
+                "fal-ai/flux-pro/v1.1",
+                "Fallback — high photorealism at lower cost",
+                COST_TABLE["flux-pro"],
+                2,
+            ),
         ]
 
     # Accessories — FLUX for efficiency
     if is_accessory:
         return [
-            RouteDecision("flux-pro", "fal-ai/flux-pro/v1.1", "Accessory — FLUX Pro best value for simple items", COST_TABLE["flux-pro"], 1),
-            RouteDecision("gemini-pro", "gemini-3-pro-image-preview", "Fallback — premium quality", COST_TABLE["gemini-pro"], 2),
+            RouteDecision(
+                "flux-pro",
+                "fal-ai/flux-pro/v1.1",
+                "Accessory — FLUX Pro best value for simple items",
+                COST_TABLE["flux-pro"],
+                1,
+            ),
+            RouteDecision(
+                "gemini-pro",
+                "gemini-3-pro-image-preview",
+                "Fallback — premium quality",
+                COST_TABLE["gemini-pro"],
+                2,
+            ),
         ]
 
     # Default — plain garments, standard cotton/fleece
     return [
-        RouteDecision("flux-pro", "fal-ai/flux-pro/v1.1", "Standard garment — FLUX Pro best value (98% quality, 26% cost)", COST_TABLE["flux-pro"], 1),
-        RouteDecision("gemini-pro", "gemini-3-pro-image-preview", "Fallback — premium quality for retries", COST_TABLE["gemini-pro"], 2),
+        RouteDecision(
+            "flux-pro",
+            "fal-ai/flux-pro/v1.1",
+            "Standard garment — FLUX Pro best value (98% quality, 26% cost)",
+            COST_TABLE["flux-pro"],
+            1,
+        ),
+        RouteDecision(
+            "gemini-pro",
+            "gemini-3-pro-image-preview",
+            "Fallback — premium quality for retries",
+            COST_TABLE["gemini-pro"],
+            2,
+        ),
     ]
 
 

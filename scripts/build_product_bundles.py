@@ -37,7 +37,9 @@ sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 
 BUNDLE_DIR = PROJECT_ROOT / "data" / "product-bundles"
 SPLIT_DIR = PROJECT_ROOT / "assets" / "techflats" / "split"
-PRODUCTS_DIR = PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
+PRODUCTS_DIR = (
+    PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
+)
 DESKTOP_DIR = Path.home() / "Desktop" / "products copy"
 VISION_DIR = PROJECT_ROOT / "data" / "product-vision"
 
@@ -62,7 +64,13 @@ def build_bundle(sku: str, product: dict) -> dict:
     if col_dir:
         for pattern in [f"*{sku}*", f"*{sku.replace('-', '*')}*"]:
             for f in (SPLIT_DIR / col_dir).glob(pattern):
-                tag = "techflat-front" if "front" in f.name else "techflat-back" if "back" in f.name else f"techflat-{f.stem}"
+                tag = (
+                    "techflat-front"
+                    if "front" in f.name
+                    else "techflat-back"
+                    if "back" in f.name
+                    else f"techflat-{f.stem}"
+                )
                 dest = bundle_path / f"{tag}{f.suffix}"
                 shutil.copy2(f, dest)
                 assets["files"][tag] = str(dest)
@@ -97,6 +105,7 @@ def build_bundle(sku: str, product: dict) -> dict:
 
     # 4. Logo reference
     from nano_banana.logo_refs import get_logo_reference
+
     logo = get_logo_reference(sku, collection)
     if logo and logo.exists():
         dest = bundle_path / f"logo-ref{logo.suffix}"
@@ -111,6 +120,7 @@ def build_bundle(sku: str, product: dict) -> dict:
 
     # 6. Product spec (LOGO_TREATMENTS + metadata)
     from nano_banana.prompts import LOGO_TREATMENTS
+
     treatment = LOGO_TREATMENTS.get(sku, "No treatment specified")
     spec_text = f"""PRODUCT: {name}
 SKU: {sku}
@@ -119,9 +129,9 @@ COLLECTION: {collection}
 BRANDING SPECIFICATION:
 {treatment}
 
-GARMENT TYPE: {product.get('garment_type', 'N/A')}
-PRICE: ${product.get('price', 'N/A')}
-EDITION SIZE: {product.get('edition_size', 'N/A')}
+GARMENT TYPE: {product.get("garment_type", "N/A")}
+PRICE: ${product.get("price", "N/A")}
+EDITION SIZE: {product.get("edition_size", "N/A")}
 """
     (bundle_path / "spec.txt").write_text(spec_text)
     assets["files"]["spec"] = str(bundle_path / "spec.txt")
@@ -136,7 +146,13 @@ def _classify_file(filename: str) -> str:
     """Classify a file by its content type from its name."""
     name = filename.lower()
     if "composite" in name:
-        return "composite-front" if "front" in name else "composite-back" if "back" in name else "composite"
+        return (
+            "composite-front"
+            if "front" in name
+            else "composite-back"
+            if "back" in name
+            else "composite"
+        )
     if "model-f" in name:
         return "model-female"
     if "model-m" in name:

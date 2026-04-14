@@ -116,7 +116,9 @@ def _load_image_b64(image_path: Path) -> tuple[str, str]:
     mime = (
         "image/jpeg"
         if ext in (".jpg", ".jpeg")
-        else "image/webp" if ext == ".webp" else "image/png"
+        else "image/webp"
+        if ext == ".webp"
+        else "image/png"
     )
     return base64.b64encode(image_path.read_bytes()).decode("utf-8"), mime
 
@@ -183,7 +185,9 @@ def _dna_to_spec(dna: dict) -> str:
     if dna.get("construction"):
         construction = dna["construction"]
         if isinstance(construction, dict):
-            lines.append(f"Construction: {', '.join(f'{k}: {v}' for k, v in list(construction.items())[:5])}")
+            lines.append(
+                f"Construction: {', '.join(f'{k}: {v}' for k, v in list(construction.items())[:5])}"
+            )
         elif isinstance(construction, list):
             lines.append(f"Construction: {', '.join(construction[:5])}")
     if dna.get("fabric"):

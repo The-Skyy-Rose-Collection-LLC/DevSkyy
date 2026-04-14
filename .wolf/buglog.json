@@ -1,0 +1,277 @@
+{
+  "version": 1,
+  "bugs": [
+    {
+      "id": "bug-001",
+      "timestamp": "2026-04-07T23:54:02.717Z",
+      "error_message": "Significant refactor of ",
+      "file": "wordpress-theme/skyyrose-flagship/assets/css/preorder-gateway.css",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 5→12 lines (2 removed) | Also: .po-rv {; .po-rv--visible {",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "css"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-07T23:54:18.004Z"
+    },
+    {
+      "id": "bug-002",
+      "timestamp": "2026-04-07T23:54:12.176Z",
+      "error_message": "Significant refactor of ",
+      "file": "wordpress-theme/skyyrose-flagship/assets/js/preorder-gateway.js",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 21→26 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-07T23:54:12.176Z"
+    },
+    {
+      "id": "bug-003",
+      "timestamp": "2026-04-08T00:59:15.259Z",
+      "error_message": "Missing error handling in after_compositor",
+      "file": "../elite-layer-2/skyyrose/elite_studio/graph/edges.py",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T00:59:15.259Z"
+    },
+    {
+      "id": "bug-004",
+      "timestamp": "2026-04-08T02:36:57.291Z",
+      "error_message": "Function not marked async",
+      "file": "../elite-layer-3/skyyrose/elite_studio/cli.py",
+      "root_cause": "Function uses await but wasn't declared async",
+      "fix": "Added async modifier",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T02:36:57.291Z"
+    },
+    {
+      "id": "bug-005",
+      "timestamp": "2026-04-08T03:20:12.400Z",
+      "error_message": "Missing await",
+      "file": "../elite-layer-3/agent_sdk/worker.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T03:20:12.400Z"
+    },
+    {
+      "id": "bug-006",
+      "timestamp": "2026-04-08T03:20:31.155Z",
+      "error_message": "Function not marked async",
+      "file": "../elite-layer-3/docker-compose.yml",
+      "root_cause": "Function uses await but wasn't declared async",
+      "fix": "Added async modifier",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "yml"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T03:20:31.155Z"
+    },
+    {
+      "id": "bug-007",
+      "timestamp": "2026-04-08T07:59:16.896Z",
+      "error_message": "Significant refactor of ",
+      "file": "scripts/deploy-theme.sh",
+      "root_cause": "7 lines replaced/restructured",
+      "fix": "Rewrote 14→25 lines (7 removed) | Also: # 2. Enable maintenance mode (DEPLOY-02); wp_remote \"maintenance-mode activate\" | Also: scp -P \"${SSH_PORT:-22}\" $key_flag -o StrictHostKe; ssh -p \"${SSH_PORT:-22}\" $key_flag -o StrictHostKe",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "sh"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-04-08T08:03:52.146Z"
+    },
+    {
+      "id": "bug-008",
+      "timestamp": "2026-04-08T08:01:34.989Z",
+      "error_message": "Incorrect value in code",
+      "file": "scripts/deploy-theme.sh",
+      "root_cause": "Had \"-o StrictHostKeyChecking=accept-new -o ConnectTim",
+      "fix": "Changed to \"-o StrictHostKeyChecking=accept-new -o ConnectTim",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "sh"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T08:01:34.989Z"
+    },
+    {
+      "id": "bug-009",
+      "timestamp": "2026-04-08T08:05:14.697Z",
+      "error_message": "Significant refactor of ",
+      "file": "../elite-layer-3/skyyrose/elite_studio/queue/dead_letter.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 4→4 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T08:05:14.697Z"
+    },
+    {
+      "id": "bug-010",
+      "timestamp": "2026-04-08T08:05:47.186Z",
+      "error_message": "Significant refactor of ",
+      "file": "../elite-layer-3/tests/test_elite_queue_consumer.py",
+      "root_cause": "6 lines replaced/restructured",
+      "fix": "Rewrote 19→12 lines (6 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T08:05:47.186Z"
+    },
+    {
+      "id": "bug-011",
+      "timestamp": "2026-04-08T08:08:05.020Z",
+      "error_message": "Significant refactor of ",
+      "file": "../elite-layer-3/skyyrose/elite_studio/queue/consumer.py",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 42→63 lines (3 removed) | Also: logger.error(\"EliteStudioWorker: job %s failed: %s; self._dlq.move_to_dlq(",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-08T08:08:12.317Z"
+    },
+    {
+      "id": "bug-012",
+      "timestamp": "2026-04-08T08:15:22.843Z",
+      "error_message": "Incorrect value in code",
+      "file": "wordpress-theme/skyyrose-flagship/functions.php",
+      "root_cause": "Had '6.4.0'",
+      "fix": "Changed to '7.0.0'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-08T08:15:22.843Z"
+    },
+    {
+      "id": "bug-013",
+      "timestamp": "2026-04-09T00:48:18.736Z",
+      "error_message": "Incorrect value in code",
+      "file": "wordpress-theme/skyyrose-flagship/inc/enqueue-performance.php",
+      "root_cause": "Had 'sha512-uLQ2FiOFLOSKlKAOaGEHMA/N2O2qOc5OjA6MGOF1yg",
+      "fix": "Changed to 'sha512-16esztaSRplJROstbIIdwX3N97V1+pZvV33ABoG1H2",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-09T00:48:18.736Z"
+    },
+    {
+      "id": "bug-014",
+      "timestamp": "2026-04-09T00:51:24.196Z",
+      "error_message": "Incorrect value in code",
+      "file": "wordpress-theme/skyyrose-flagship/template-preorder-gateway.php",
+      "root_cause": "Had \"po-hero__ctas po-rv\"",
+      "fix": "Changed to \"po-hero__ctas\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-09T00:51:24.196Z"
+    },
+    {
+      "id": "bug-015",
+      "timestamp": "2026-04-09T02:25:16.053Z",
+      "error_message": "Incorrect value in code",
+      "file": "wordpress-theme/skyyrose-flagship/functions.php",
+      "root_cause": "Had '7.0.0'",
+      "fix": "Changed to '7.0.1'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-09T02:25:16.053Z"
+    },
+    {
+      "id": "bug-016",
+      "timestamp": "2026-04-09T06:32:18.321Z",
+      "error_message": "Significant refactor of ",
+      "file": "../elite-layer-4/tests/test_quality_classifier.py",
+      "root_cause": "16 lines replaced/restructured",
+      "fix": "Rewrote 61→78 lines (16 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-09T06:32:18.321Z"
+    },
+    {
+      "id": "bug-017",
+      "timestamp": "2026-04-11T02:24:43.972Z",
+      "error_message": "Incorrect value in code",
+      "file": "../elite-layer-6/skyyrose/elite_studio/tests/test_tryon_agent.py",
+      "root_cause": "Had \"skyyrose.elite_studio.agents.tryon_agent.shutil.c",
+      "fix": "Changed to \"shutil.copy2\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-11T02:24:43.972Z"
+    }
+  ]
+}

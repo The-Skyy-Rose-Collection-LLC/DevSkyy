@@ -6,9 +6,7 @@ Uses fakeredis to simulate Redis sorted set operations.
 
 from __future__ import annotations
 
-import time
 from datetime import UTC, datetime
-from unittest.mock import patch
 
 import fakeredis
 import pytest

@@ -42,10 +42,8 @@ SKU_LOGO_REFS = {
     "br-012": OVERLAYS_DIR / "br-patch-mlb-baseball.png",
     "br-003-giants": OVERLAYS_DIR / "br-patch-mlb-baseball.png",
     "br-003-oakland": OVERLAYS_DIR / "br-patch-mlb-baseball.png",
-
     # Love Hurts — graffiti script logos
     "lh-004": TECHFLATS_DIR / "love-hurts" / "logo-love.jpeg",  # varsity has "Love Hurts" script
-
     # Signature — gold script
     "sg-011": TECHFLATS_DIR / "signature" / "brand-skyy-rose-collection-gold.jpeg",
     "sg-012": TECHFLATS_DIR / "signature" / "brand-skyy-rose-collection-gold.jpeg",
@@ -83,7 +81,9 @@ def find_flatlay_photo(sku: str, catalog: dict | None = None) -> Path | None:
     These are actual photographs of the garment laid flat — they show real fabric,
     real logos, real colors. Most valuable reference for generation accuracy.
     """
-    products_dir = PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
+    products_dir = (
+        PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
+    )
 
     if not products_dir.exists():
         return None
@@ -129,39 +129,51 @@ def get_all_references(
     # Real flatlay photo FIRST (if available) — this is ground truth
     flatlay = find_flatlay_photo(sku, catalog)
     if flatlay:
-        refs.append((
-            f"REFERENCE IMAGE {ref_num} — REAL PRODUCT PHOTO (GROUND TRUTH): "
-            "This is an actual photograph of the real garment. "
-            "The REAL fabric texture, REAL colors, and REAL logo appearance are shown here. "
-            "This image is the ultimate authority — match its colors and material exactly.",
-            flatlay,
-        ))
+        refs.append(
+            (
+                f"REFERENCE IMAGE {ref_num} — REAL PRODUCT PHOTO (GROUND TRUTH): "
+                "This is an actual photograph of the real garment. "
+                "The REAL fabric texture, REAL colors, and REAL logo appearance are shown here. "
+                "This image is the ultimate authority — match its colors and material exactly.",
+                flatlay,
+            )
+        )
         ref_num += 1
 
     # Tech flat (design illustration)
     if source_path and source_path.exists():
-        refs.append((
-            f"REFERENCE IMAGE {ref_num} — GARMENT TECH FLAT: "
-            "Design illustration showing overall shape, panel layout, and graphic placement. "
-            "Use this for silhouette and construction details." +
-            (" Defer to the REAL PHOTO for colors and textures." if flatlay else ""),
-            source_path,
-        ))
+        refs.append(
+            (
+                f"REFERENCE IMAGE {ref_num} — GARMENT TECH FLAT: "
+                "Design illustration showing overall shape, panel layout, and graphic placement. "
+                "Use this for silhouette and construction details."
+                + (" Defer to the REAL PHOTO for colors and textures." if flatlay else ""),
+                source_path,
+            )
+        )
         ref_num += 1
 
     # Logo close-up
     logo = get_logo_reference(sku, collection)
     if logo:
-        refs.append((
-            f"REFERENCE IMAGE {ref_num} — LOGO/BRANDING CLOSE-UP: "
-            "This is the EXACT logo/graphic that appears on the garment. "
-            "Reproduce it at the EXACT position and size shown in the tech flat. "
-            "Do NOT resize, reposition, duplicate, or alter it in any way.",
-            logo,
-        ))
+        refs.append(
+            (
+                f"REFERENCE IMAGE {ref_num} — LOGO/BRANDING CLOSE-UP: "
+                "This is the EXACT logo/graphic that appears on the garment. "
+                "Reproduce it at the EXACT position and size shown in the tech flat. "
+                "Do NOT resize, reposition, duplicate, or alter it in any way.",
+                logo,
+            )
+        )
 
-    log.info("References for %s: %d images (%s)",
-             sku, len(refs),
-             ", ".join("flatlay" if "GROUND TRUTH" in r[0] else "techflat" if "TECH FLAT" in r[0] else "logo" for r in refs))
+    log.info(
+        "References for %s: %d images (%s)",
+        sku,
+        len(refs),
+        ", ".join(
+            "flatlay" if "GROUND TRUTH" in r[0] else "techflat" if "TECH FLAT" in r[0] else "logo"
+            for r in refs
+        ),
+    )
 
     return refs

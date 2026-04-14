@@ -6,7 +6,6 @@ Uses fakeredis to avoid requiring a live Redis instance.
 
 from __future__ import annotations
 
-import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -147,7 +146,7 @@ def test_enqueue_batch_each_sku_prefixed_correctly():
     with patch("skyyrose.elite_studio.queue.producer._get_queue", return_value=mock_queue):
         job_ids = enqueue_batch(skus)
 
-    for job_id, sku in zip(job_ids, skus):
+    for job_id, sku in zip(job_ids, skus, strict=False):
         assert job_id.startswith(f"elite:{sku}:")
 
 

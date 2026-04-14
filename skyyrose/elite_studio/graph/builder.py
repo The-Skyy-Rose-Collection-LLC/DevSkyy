@@ -10,6 +10,11 @@ Layer 2 optional stages (all disabled by default unless noted):
   - upscaling          (off — costs $ via Replicate)
   - color_correction   (off)
   - variants           (off)
+
+Layer 4 additions to GraphConfig:
+  - enable_human_review: pause at quality for human approval on uncertain images
+  - review_confidence_threshold: classifier confidence below which human review triggers
+  - enable_visual_regression: run SSIM comparison against golden references
 """
 
 from __future__ import annotations
@@ -23,6 +28,7 @@ from .edges import (
     COLOR_CORRECTION,
     FINALIZE,
     GENERATOR,
+    HUMAN_REVIEW,
     PROMPT_ENRICHMENT,
     QUALITY,
     SAFETY,
@@ -30,7 +36,9 @@ from .edges import (
     VARIANTS,
     after_compositor,
     after_generation,
+    after_human_review,
     after_quality,
+    after_quality_v2,
     after_safety,
     after_vision,
 )
@@ -39,6 +47,7 @@ from .nodes import (
     compositor_node,
     finalize_node,
     generator_node,
+    human_review_node,
     prompt_enrichment_node,
     quality_node,
     safety_node,
@@ -59,6 +68,7 @@ _SAFETY = SAFETY
 _UPSCALING = UPSCALING
 _COLOR_CORRECTION = COLOR_CORRECTION
 _VARIANTS = VARIANTS
+_HUMAN_REVIEW = HUMAN_REVIEW
 
 
 @dataclass(frozen=True)
@@ -81,6 +91,15 @@ class GraphConfig:
             Off by default.
         variant_specs: List of variant names to generate when enable_variants
             is True (e.g., ['back_view', 'side_view']).
+
+    Layer 4 fields:
+        enable_human_review: When True, uncertain images are paused for
+            human approval before continuing. Defaults to False.
+        review_confidence_threshold: Classifier confidence below which
+            human review is triggered. Only used when enable_human_review
+            is True. Defaults to 0.6.
+        enable_visual_regression: When True, generated images are compared
+            against golden references using SSIM. Defaults to False.
     """
 
     max_retries: int = 2
@@ -94,6 +113,11 @@ class GraphConfig:
     enable_variants: bool = False            # off by default
     variant_specs: list[str] = field(default_factory=list)
 
+    # Layer 4 quality gates
+    enable_human_review: bool = False
+    review_confidence_threshold: float = 0.6
+    enable_visual_regression: bool = False
+
     # Extension hook (reserved for future layers)
     extra_nodes: list[str] = field(default_factory=list)
 
@@ -104,17 +128,18 @@ def build_graph(config: GraphConfig | None = None) -> object:
     Returns a ``CompiledGraph`` that can be invoked with
     ``graph.invoke(state_dict)``.
 
-    Topology (Layer 1 + Layer 2 optional nodes):
+    Topology (Layers 1-4):
 
         vision
           → [prompt_enrichment?]
           → generator
-          → [safety?]          # routes to END if flagged
-          → quality
-          → [retry?]           → generator
+          → [safety?]              # routes to END if flagged
+          → quality                # dual-layer: ML classifier + Claude Sonnet
+          → [human_review?]        # pauses for human approval if confidence low
+          → [retry?]               → generator
           → [upscaling?]
           → [color_correction?]
-          → [variants?]        # parallel branch, joins at finalize
+          → [variants?]
           → [compositor?]
           → finalize
           → END
@@ -137,7 +162,7 @@ def build_graph(config: GraphConfig | None = None) -> object:
     graph.add_node(_COMPOSITOR, compositor_node)
     graph.add_node(_FINALIZE, finalize_node)
 
-    # --- Register optional Layer 2 nodes ---
+    # --- Register Layer 2 optional nodes ---
     if config.enable_prompt_enrichment:
         graph.add_node(_PROMPT_ENRICHMENT, prompt_enrichment_node)
 
@@ -152,6 +177,10 @@ def build_graph(config: GraphConfig | None = None) -> object:
 
     if config.enable_variants:
         graph.add_node(_VARIANTS, variant_node)
+
+    # --- Register Layer 4 optional nodes ---
+    if config.enable_human_review:
+        graph.add_node(_HUMAN_REVIEW, human_review_node)
 
     # --- Entry point ---
     graph.set_entry_point(_VISION)
@@ -190,14 +219,36 @@ def build_graph(config: GraphConfig | None = None) -> object:
             {_QUALITY: _QUALITY, END: END},
         )
 
-    # --- quality → [retry?] → generator OR post-processing chain ---
-    # Determine what quality routes to on "proceed"
+    # --- quality → [human_review?] → post-processing chain ---
     _post_quality = _build_post_quality_target(config)
 
+    if config.enable_human_review:
+        graph.add_conditional_edges(
+            _QUALITY,
+            after_quality_v2,
+            {
+                _GENERATOR: _GENERATOR,
+                _HUMAN_REVIEW: _HUMAN_REVIEW,
+                _COMPOSITOR: _post_quality,
+                _FINALIZE: _post_quality,
+            },
+        )
+        graph.add_conditional_edges(
+            _HUMAN_REVIEW,
+            after_human_review,
+            {_GENERATOR: _GENERATOR, _COMPOSITOR: _post_quality, _FINALIZE: _post_quality},
+        )
+    else:
+        graph.add_conditional_edges(
+            _QUALITY,
+            after_quality,
+            {_GENERATOR: _GENERATOR, _COMPOSITOR: _post_quality, _FINALIZE: _post_quality},
+        )
+
     graph.add_conditional_edges(
-        _QUALITY,
-        after_quality,
-        {_GENERATOR: _GENERATOR, _COMPOSITOR: _post_quality, _FINALIZE: _post_quality},
+        _COMPOSITOR,
+        after_compositor,
+        {_FINALIZE: _FINALIZE},
     )
 
     # --- Post-quality chain: upscaling → color_correction → variants → compositor → finalize ---
@@ -224,7 +275,6 @@ def _build_post_quality_target(config: GraphConfig) -> str:
 
 def _wire_post_quality_chain(graph: StateGraph, config: GraphConfig) -> None:  # type: ignore[type-arg]
     """Wire the optional post-quality nodes in sequence."""
-    # Build the ordered chain of optional post-quality nodes
     chain: list[str] = []
     if config.enable_upscaling:
         chain.append(_UPSCALING)
@@ -239,9 +289,7 @@ def _wire_post_quality_chain(graph: StateGraph, config: GraphConfig) -> None:  #
         # No optional nodes — quality already routes to FINALIZE directly
         return
 
-    # Wire sequential edges between optional nodes
     for i in range(len(chain) - 1):
         graph.add_edge(chain[i], chain[i + 1])
 
-    # Last optional node → finalize
     graph.add_edge(chain[-1], _FINALIZE)

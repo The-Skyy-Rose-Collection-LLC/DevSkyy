@@ -366,10 +366,16 @@ def main():
     # -- produce (v4 production pipeline) --
     prod = sub.add_parser("produce", help="V4 production pipeline — vision + routing + QA + refine")
     prod.add_argument("--sku", type=str, default=None, help="Single SKU to process")
-    prod.add_argument("--views", type=str, default="front,back,branding", help="Comma-separated views")
-    prod.add_argument("--fast", action="store_true", help="Use fast preset (lower quality, lower cost)")
+    prod.add_argument(
+        "--views", type=str, default="front,back,branding", help="Comma-separated views"
+    )
+    prod.add_argument(
+        "--fast", action="store_true", help="Use fast preset (lower quality, lower cost)"
+    )
     prod.add_argument("--config", type=str, default=None, help="Path to pipeline-config.json")
-    prod.add_argument("--cost-only", action="store_true", help="Show cost estimate without generating")
+    prod.add_argument(
+        "--cost-only", action="store_true", help="Show cost estimate without generating"
+    )
 
     args = parser.parse_args()
 
@@ -420,8 +426,12 @@ def cmd_produce(args):
         return
 
     log.info("\n--- Starting Production Pipeline (v4) ---")
-    log.info("Products: %d | Views: %s | Config: %s",
-             len(products), views, "fast" if args.fast else "production")
+    log.info(
+        "Products: %d | Views: %s | Config: %s",
+        len(products),
+        views,
+        "fast" if args.fast else "production",
+    )
 
     # Initialize pipeline
     pipeline = ProductionPipeline.from_env()
@@ -438,9 +448,16 @@ def cmd_produce(args):
     log.info("\n--- FINAL SUMMARY ---")
     for r in results:
         status = "PASS" if r.qa_passed else "REVIEW" if r.output_path else "FAIL"
-        log.info("  %s %-20s %-8s engine=%-12s score=%.1f $%.3f %s",
-                 status, r.sku, r.view, r.engine_used, r.qa_score, r.cost_usd,
-                 "[refined]" if r.refinement_applied else "")
+        log.info(
+            "  %s %-20s %-8s engine=%-12s score=%.1f $%.3f %s",
+            status,
+            r.sku,
+            r.view,
+            r.engine_used,
+            r.qa_score,
+            r.cost_usd,
+            "[refined]" if r.refinement_applied else "",
+        )
 
 
 if __name__ == "__main__":

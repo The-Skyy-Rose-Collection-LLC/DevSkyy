@@ -5,12 +5,12 @@ Tests every module, client, config, registry, and reference bundle.
 Run before any production batch.
 """
 
-import json
 import os
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 
 def main():
     errors = []
@@ -47,9 +47,12 @@ def main():
     # 2. Config
     print("\n[2] CONFIG")
     from nano_banana.config import PipelineConfig
+
     prod = PipelineConfig.production()
     fast = PipelineConfig.fast()
-    print(f"  OK  production() — max_attempts={prod.max_attempts}, qa_approve={prod.qa_auto_approve}")
+    print(
+        f"  OK  production() — max_attempts={prod.max_attempts}, qa_approve={prod.qa_auto_approve}"
+    )
     print(f"  OK  fast() — max_attempts={fast.max_attempts}, qa_approve={fast.qa_auto_approve}")
 
     cfg_path = Path("data/pipeline-config.json")
@@ -68,11 +71,14 @@ def main():
 
     # 3. Prompt Registry
     print("\n[3] PROMPT REGISTRY")
-    from nano_banana.prompt_registry import PromptRegistry, BUILTIN_TEMPLATES, VisionSpec, _categorize_garment
+    from nano_banana.prompt_registry import PromptRegistry, VisionSpec, _categorize_garment
+
     reg = PromptRegistry.load()
     print(f"  OK  Loaded: {len(reg.templates)} templates")
     for t in reg.templates:
-        print(f"      {t.id:30s} cat={t.category:10s} view={t.view:8s} v{t.version} runs={t.total_runs} avg={t.avg_score:.1f}")
+        print(
+            f"      {t.id:30s} cat={t.category:10s} view={t.view:8s} v{t.version} runs={t.total_runs} avg={t.avg_score:.1f}"
+        )
 
     # Test categorization
     test_cases = [
@@ -96,7 +102,9 @@ def main():
         "silhouette": "relaxed",
         "fabric_appearance": "smooth satin",
         "colors": [{"area": "body", "color": "#000000", "finish": "satin"}],
-        "graphics": [{"type": "embroidery", "content": "rose", "location": "left chest", "size": "4 inches"}],
+        "graphics": [
+            {"type": "embroidery", "content": "rose", "location": "left chest", "size": "4 inches"}
+        ],
         "construction": {"panels": "set-in sleeves", "closures": "snap buttons"},
     }
     spec = VisionSpec.from_vision(test_desc, "br-001")
@@ -109,26 +117,39 @@ def main():
 
     # Test template rendering
     from nano_banana.prompts import COLLECTION_LIGHTING
+
     lighting = COLLECTION_LIGHTING["black-rose"]
-    prompt, tid = reg.get_prompt(test_desc, {"sku": "br-001", "name": "Test", "collection": "black-rose"}, "front")
+    prompt, tid = reg.get_prompt(
+        test_desc, {"sku": "br-001", "name": "Test", "collection": "black-rose"}, "front"
+    )
     assert len(prompt) > 100
     assert "left chest" in prompt.lower()
     print(f"  OK  Template render: {tid} ({len(prompt)} chars)")
 
     # 4. Router
     print("\n[4] ROUTER")
-    from nano_banana.router import route_product, estimate_batch_cost, COST_TABLE
-    test_product = {"sku": "br-001", "name": "BLACK Rose Crewneck", "collection": "black-rose", "is_accessory": False}
+    from nano_banana.router import route_product, estimate_batch_cost
+
+    test_product = {
+        "sku": "br-001",
+        "name": "BLACK Rose Crewneck",
+        "collection": "black-rose",
+        "is_accessory": False,
+    }
 
     for view in ["front", "back", "branding"]:
         decisions = route_product(test_product, test_desc, view)
         assert len(decisions) >= 2, f"Need at least 2 decisions for {view}"
-        print(f"  OK  {view:8s} -> {decisions[0].engine:12s} (${decisions[0].estimated_cost}) | fallback: {decisions[1].engine}")
+        print(
+            f"  OK  {view:8s} -> {decisions[0].engine:12s} (${decisions[0].estimated_cost}) | fallback: {decisions[1].engine}"
+        )
 
     # Test text routing
     text_desc = {"graphics": [{"content": "BLACK IS BEAUTIFUL", "type": "screen print"}]}
     text_decisions = route_product({"sku": "br-003", "is_accessory": False}, text_desc, "front")
-    assert text_decisions[0].engine == "gpt-image", f"Text product should route to gpt-image, got {text_decisions[0].engine}"
+    assert text_decisions[0].engine == "gpt-image", (
+        f"Text product should route to gpt-image, got {text_decisions[0].engine}"
+    )
     print(f"  OK  Text routing: br-003 -> {text_decisions[0].engine}")
 
     # Test cost estimate
@@ -147,11 +168,15 @@ def main():
     logo_j = get_logo_reference("br-008", "black-rose")
     print(f"  OK  br-008 -> {logo_j.name if logo_j else 'NONE'} (SKU-specific)")
 
-    src = Path("wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-crewneck-techflat-v4.jpg")
+    src = Path(
+        "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-crewneck-techflat-v4.jpg"
+    )
     refs = get_all_references("br-001", "black-rose", src)
     print(f"  OK  br-001 refs: {len(refs)} images")
     for label, path in refs:
-        tag = "FLATLAY" if "GROUND TRUTH" in label else "TECHFLAT" if "TECH FLAT" in label else "LOGO"
+        tag = (
+            "FLATLAY" if "GROUND TRUTH" in label else "TECHFLAT" if "TECH FLAT" in label else "LOGO"
+        )
         print(f"      [{tag}] {path.name}")
 
     # 6. API Clients
@@ -159,7 +184,7 @@ def main():
     from nano_banana.client import get_genai_client, get_openai_client
 
     genai = get_genai_client()
-    print(f"  OK  Gemini: connected")
+    print("  OK  Gemini: connected")
 
     openai_c = get_openai_client()
     status = "connected" if openai_c else "MISSING"
@@ -168,7 +193,9 @@ def main():
         errors.append("openai_client")
 
     anthropic_key = os.getenv("ANTHROPIC_API_KEY", "")
-    print(f"  {'OK' if anthropic_key else 'WARN'}  Anthropic: {'set' if anthropic_key else 'MISSING'}")
+    print(
+        f"  {'OK' if anthropic_key else 'WARN'}  Anthropic: {'set' if anthropic_key else 'MISSING'}"
+    )
 
     fal_key = os.getenv("FAL_KEY", "") or os.getenv("FAL_AI_KEY", "")
     print(f"  {'OK' if fal_key else 'WARN'}  FAL: {'set' if fal_key else 'MISSING'}")
@@ -176,39 +203,47 @@ def main():
     # 7. Catalog
     print("\n[7] CATALOG")
     from nano_banana.catalog import load_catalog, load_products
+
     catalog = load_catalog()
     products = load_products(catalog)
     with_source = sum(1 for p in products if p.get("source_image"))
-    print(f"  OK  Products: {len(products)} total, {with_source} with source images, {len(products) - with_source} missing")
+    print(
+        f"  OK  Products: {len(products)} total, {with_source} with source images, {len(products) - with_source} missing"
+    )
 
     # 8. Pipeline
     print("\n[8] PIPELINE")
     from nano_banana.pipeline import ProductionPipeline
+
     try:
         pipe = ProductionPipeline.from_env()
-        print(f"  OK  ProductionPipeline initialized")
+        print("  OK  ProductionPipeline initialized")
         print(f"      genai:     {'ok' if pipe.genai else 'NONE'}")
         print(f"      openai:    {'ok' if pipe.openai else 'NONE'}")
         print(f"      anthropic: {'ok' if pipe.anthropic else 'NONE'}")
         print(f"      fal:       {pipe.fal_available}")
-        print(f"      config:    max_attempts={pipe.config.max_attempts}, qa_approve={pipe.config.qa_auto_approve}")
+        print(
+            f"      config:    max_attempts={pipe.config.max_attempts}, qa_approve={pipe.config.qa_auto_approve}"
+        )
     except Exception as e:
         print(f"  FAIL Pipeline init: {e}")
         errors.append("pipeline")
 
     # 9. Generate function signatures
     print("\n[9] GENERATE ENGINES")
-    from nano_banana.generate import generate_gemini, generate_gpt, composite_gemini
+    from nano_banana.generate import generate_gemini
     import inspect
+
     sig = inspect.signature(generate_gemini)
     has_extra_refs = "extra_refs" in sig.parameters
-    print(f"  {'OK' if has_extra_refs else 'FAIL'}  generate_gemini has extra_refs param: {has_extra_refs}")
+    print(
+        f"  {'OK' if has_extra_refs else 'FAIL'}  generate_gemini has extra_refs param: {has_extra_refs}"
+    )
     if not has_extra_refs:
         errors.append("extra_refs")
 
-    from nano_banana.engine_fal import generate_flux_fal, refine_with_kontext
-    print(f"  OK  generate_flux_fal available")
-    print(f"  OK  refine_with_kontext available")
+    print("  OK  generate_flux_fal available")
+    print("  OK  refine_with_kontext available")
 
     # Summary
     print("\n" + "=" * 60)
@@ -221,9 +256,9 @@ def main():
         print(f"  {len(modules)} modules loaded")
         print(f"  {len(reg.templates)} prompt templates")
         print(f"  {with_source}/{len(products)} products ready")
-        print(f"  4 generation engines (Gemini Pro, Gemini Flash, GPT Image, FLUX Pro)")
-        print(f"  3 QA judges (GPT-4o, Claude Opus, Gemini Flash)")
-        print(f"  3-reference bundling (flatlay + techflat + logo)")
+        print("  4 generation engines (Gemini Pro, Gemini Flash, GPT Image, FLUX Pro)")
+        print("  3 QA judges (GPT-4o, Claude Opus, Gemini Flash)")
+        print("  3-reference bundling (flatlay + techflat + logo)")
     print("=" * 60)
 
     return 0 if not errors else 1

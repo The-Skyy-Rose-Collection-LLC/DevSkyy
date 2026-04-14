@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 log = logging.getLogger(__name__)
@@ -35,7 +35,13 @@ REGISTRY_PATH = PROJECT_ROOT / "data" / "prompt-registry.json"
 GARMENT_CATEGORIES = {
     "hoodie": ["hoodie", "hooded", "pullover hoodie"],
     "jacket": ["jacket", "bomber", "varsity", "sherpa", "windbreaker"],
-    "jersey": ["jersey", "football jersey", "basketball jersey", "hockey jersey", "baseball jersey"],
+    "jersey": [
+        "jersey",
+        "football jersey",
+        "basketball jersey",
+        "hockey jersey",
+        "baseball jersey",
+    ],
     "crewneck": ["crewneck", "sweatshirt", "crew neck"],
     "tee": ["tee", "t-shirt", "shirt"],
     "joggers": ["joggers", "sweatpants", "track pants"],
@@ -60,18 +66,19 @@ def _categorize_garment(vision_desc: dict) -> str:
 
 # ── Template slot system ─────────────────────────────────────────────────────
 
+
 @dataclass
 class VisionSpec:
     """Structured spec extracted from vision analysis — the slots for templates."""
 
-    garment_label: str = ""          # "relaxed hooded varsity bomber"
-    fabric: str = ""                 # "smooth reflective satin body, matte fleece hood"
-    color_map: str = ""              # formatted color lines
-    graphics_count: int = 0          # number of graphic elements
-    graphics_spec: str = ""          # detailed graphic specs with positions/sizes
-    construction: str = ""           # panel/seam/closure details
-    branding_verified: str = ""      # from LOGO_TREATMENTS
-    negative_constraints: str = ""   # what NOT to generate
+    garment_label: str = ""  # "relaxed hooded varsity bomber"
+    fabric: str = ""  # "smooth reflective satin body, matte fleece hood"
+    color_map: str = ""  # formatted color lines
+    graphics_count: int = 0  # number of graphic elements
+    graphics_spec: str = ""  # detailed graphic specs with positions/sizes
+    construction: str = ""  # panel/seam/closure details
+    branding_verified: str = ""  # from LOGO_TREATMENTS
+    negative_constraints: str = ""  # what NOT to generate
 
     @classmethod
     def from_vision(cls, desc: dict, sku: str = "") -> VisionSpec:
@@ -90,7 +97,9 @@ class VisionSpec:
             color = c.get("color", "")
             finish = c.get("finish", "")
             if area and color:
-                color_lines.append(f"  {area}: {color} ({finish})" if finish else f"  {area}: {color}")
+                color_lines.append(
+                    f"  {area}: {color} ({finish})" if finish else f"  {area}: {color}"
+                )
         color_map = "\n".join(color_lines) if color_lines else "  Solid black (#000000)"
 
         # Graphics — with strict position/size enforcement
@@ -160,16 +169,17 @@ class VisionSpec:
 
 # ── Prompt Templates ─────────────────────────────────────────────────────────
 
+
 @dataclass
 class PromptTemplate:
     """A versioned prompt template with performance tracking."""
 
-    id: str                          # "jersey_front_v2"
-    category: str                    # garment category
-    view: str                        # "front" | "back" | "branding"
+    id: str  # "jersey_front_v2"
+    category: str  # garment category
+    view: str  # "front" | "back" | "branding"
     version: int = 1
-    model_hint: str = ""             # empty = all models, or "gemini-pro" / "gpt-image"
-    template: str = ""               # the actual prompt template with {slot} placeholders
+    model_hint: str = ""  # empty = all models, or "gemini-pro" / "gpt-image"
+    template: str = ""  # the actual prompt template with {slot} placeholders
     total_runs: int = 0
     total_score: float = 0.0
     best_score: float = 0.0
@@ -212,7 +222,6 @@ class PromptTemplate:
 # ── Built-in templates ───────────────────────────────────────────────────────
 
 BUILTIN_TEMPLATES: list[PromptTemplate] = [
-
     # ── FRONT VIEW v1: Strict Spec Sheet ──
     PromptTemplate(
         id="front_v1_strict",
@@ -248,7 +257,6 @@ WHAT YOU MUST NOT DO:
   - Do NOT add watermarks, price tags, or size labels
   - If ANYTHING is unclear in the reference, LEAVE IT OUT""",
     ),
-
     # ── FRONT VIEW v2: Narrative + Spec (may work better for Gemini) ──
     PromptTemplate(
         id="front_v2_narrative",
@@ -280,7 +288,6 @@ CRITICAL NEGATIVE RULES:
   - FRONT VIEW ONLY — do not show the back
   - Match the reference EXACTLY — this is luxury fashion, accuracy is everything""",
     ),
-
     # ── FRONT VIEW v3: Minimal (for FLUX — shorter prompts work better) ──
     PromptTemplate(
         id="front_v3_minimal",
@@ -295,7 +302,6 @@ CRITICAL NEGATIVE RULES:
 Colors: {color_map}
 No model. No extras. Match reference exactly.""",
     ),
-
     # ── BACK VIEW v1 ──
     PromptTemplate(
         id="back_v1_strict",
@@ -327,7 +333,6 @@ WHAT YOU MUST NOT DO:
   - Do NOT show the front of the garment
   - Match the reference EXACTLY""",
     ),
-
     # ── JERSEY-SPECIFIC v1 (sport jerseys need extra text accuracy) ──
     PromptTemplate(
         id="jersey_front_v1",
@@ -379,7 +384,6 @@ FORBIDDEN:
   - Do NOT smooth out the mesh texture — athletic fabric has visible weave
   - FRONT ONLY""",
     ),
-
     # ── ACCESSORY v1 ──
     PromptTemplate(
         id="accessory_front_v1",
@@ -407,6 +411,7 @@ RULES:
 
 
 # ── Registry ─────────────────────────────────────────────────────────────────
+
 
 class PromptRegistry:
     """Manages prompt templates with A/B testing and scoring feedback."""
@@ -458,17 +463,26 @@ class PromptRegistry:
             return spec.graphics_spec, "fallback"
 
         # Pick winner: category-specific > highest avg score > latest version
-        candidates.sort(key=lambda t: (
-            t.category != "*",           # prefer specific category
-            t.avg_score,                 # then highest score
-            t.version,                   # then latest version
-        ), reverse=True)
+        candidates.sort(
+            key=lambda t: (
+                t.category != "*",  # prefer specific category
+                t.avg_score,  # then highest score
+                t.version,  # then latest version
+            ),
+            reverse=True,
+        )
 
         winner = candidates[0]
         rendered = winner.render(spec, lighting, name)
 
-        log.info("PROMPT: template=%s (cat=%s, v%d, avg=%.1f, runs=%d)",
-                 winner.id, winner.category, winner.version, winner.avg_score, winner.total_runs)
+        log.info(
+            "PROMPT: template=%s (cat=%s, v%d, avg=%.1f, runs=%d)",
+            winner.id,
+            winner.category,
+            winner.version,
+            winner.avg_score,
+            winner.total_runs,
+        )
 
         return rendered, winner.id
 
@@ -480,8 +494,13 @@ class PromptRegistry:
                 tpl.total_score += score
                 if score > tpl.best_score:
                     tpl.best_score = score
-                log.info("SCORE: %s → %.1f (avg=%.1f over %d runs)",
-                         template_id, score, tpl.avg_score, tpl.total_runs)
+                log.info(
+                    "SCORE: %s → %.1f (avg=%.1f over %d runs)",
+                    template_id,
+                    score,
+                    tpl.avg_score,
+                    tpl.total_runs,
+                )
                 return
         log.warning("Template %s not found in registry", template_id)
 
@@ -535,20 +554,25 @@ class PromptRegistry:
         builtin_ids = {t.id for t in BUILTIN_TEMPLATES}
         for s in saved:
             if s["id"] not in builtin_ids:
-                templates.append(PromptTemplate(
-                    id=s["id"],
-                    category=s.get("category", "*"),
-                    view=s.get("view", "front"),
-                    version=s.get("version", 1),
-                    model_hint=s.get("model_hint", ""),
-                    template=s.get("template", ""),
-                    total_runs=s.get("total_runs", 0),
-                    total_score=s.get("total_score", 0.0),
-                    best_score=s.get("best_score", 0.0),
-                ))
+                templates.append(
+                    PromptTemplate(
+                        id=s["id"],
+                        category=s.get("category", "*"),
+                        view=s.get("view", "front"),
+                        version=s.get("version", 1),
+                        model_hint=s.get("model_hint", ""),
+                        template=s.get("template", ""),
+                        total_runs=s.get("total_runs", 0),
+                        total_score=s.get("total_score", 0.0),
+                        best_score=s.get("best_score", 0.0),
+                    )
+                )
 
-        log.info("Registry loaded: %d templates (%d with scores)",
-                 len(templates), sum(1 for t in templates if t.total_runs > 0))
+        log.info(
+            "Registry loaded: %d templates (%d with scores)",
+            len(templates),
+            sum(1 for t in templates if t.total_runs > 0),
+        )
         return cls(templates)
 
     def add_template(self, template: PromptTemplate) -> None:

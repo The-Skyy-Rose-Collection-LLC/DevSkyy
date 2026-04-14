@@ -12,7 +12,6 @@ Output goes to assets/techflats/split/ with clear naming:
   {collection}/{product}-back.jpeg
 """
 
-import sys
 from pathlib import Path
 from PIL import Image
 
@@ -47,10 +46,10 @@ def split_2x2(img, names, collection, out_dir):
     mid_y = h // 2
 
     crops = [
-        (0, 0, mid_x, mid_y),          # top-left
-        (mid_x, 0, w, mid_y),          # top-right
-        (0, mid_y, mid_x, h),          # bottom-left
-        (mid_x, mid_y, w, h),          # bottom-right
+        (0, 0, mid_x, mid_y),  # top-left
+        (mid_x, 0, w, mid_y),  # top-right
+        (0, mid_y, mid_x, h),  # bottom-left
+        (mid_x, mid_y, w, h),  # bottom-right
     ]
 
     col_dir = out_dir / collection
@@ -111,12 +110,17 @@ def main():
     # Crewneck + Joggers (2x2: crewneck front/back top, joggers front/back bottom)
     print("\nblack-rose/crewneck-and-joggers.jpeg")
     img = Image.open(TECHFLATS / "black-rose" / "crewneck-and-joggers.jpeg")
-    split_2x2(img, [
-        "br-crewneck-front",
-        "br-crewneck-back",
-        "br-joggers-front",
-        "br-joggers-back",
-    ], "black-rose", SPLIT_DIR)
+    split_2x2(
+        img,
+        [
+            "br-crewneck-front",
+            "br-crewneck-back",
+            "br-joggers-front",
+            "br-joggers-back",
+        ],
+        "black-rose",
+        SPLIT_DIR,
+    )
     total += 4
 
     # Jerseys (all are front+back side by side)
@@ -148,10 +152,13 @@ def main():
     # Bombers + Joggers (top: bomber front+back, bottom: joggers)
     print("\nlove-hurts/bombers-and-joggers.jpeg")
     img = Image.open(TECHFLATS / "love-hurts" / "bombers-and-joggers.jpeg")
-    split_top_bottom_with_sides(img,
+    split_top_bottom_with_sides(
+        img,
         ["lh-bomber-joggers-front", "lh-bomber-joggers-back"],
         "lh-joggers-front",
-        "love-hurts", SPLIT_DIR)
+        "love-hurts",
+        SPLIT_DIR,
+    )
     total += 3
 
     # Shorts (single image — just copy)
@@ -160,7 +167,7 @@ def main():
     col_dir = SPLIT_DIR / "love-hurts"
     col_dir.mkdir(parents=True, exist_ok=True)
     img.save(col_dir / "lh-shorts-front.jpeg", "JPEG", quality=95)
-    print(f"  -> lh-shorts-front.jpeg (single)")
+    print("  -> lh-shorts-front.jpeg (single)")
     total += 1
 
     # ── SIGNATURE ───────────────────────────────────────────────
@@ -168,12 +175,17 @@ def main():
     # Bridge Series Golden (t-shirt + shorts, 2x2)
     print("\nsignature/bridge-series-golden.jpeg")
     img = Image.open(TECHFLATS / "signature" / "bridge-series-golden.jpeg")
-    split_2x2(img, [
-        "sg-bridge-tee-golden-front",
-        "sg-bridge-tee-golden-back",
-        "sg-bridge-shorts-golden-front",
-        "sg-bridge-shorts-golden-back",
-    ], "signature", SPLIT_DIR)
+    split_2x2(
+        img,
+        [
+            "sg-bridge-tee-golden-front",
+            "sg-bridge-tee-golden-back",
+            "sg-bridge-shorts-golden-front",
+            "sg-bridge-shorts-golden-back",
+        ],
+        "signature",
+        SPLIT_DIR,
+    )
     total += 4
 
     # Bridge Shorts Bay (single front+back)
@@ -181,7 +193,9 @@ def main():
     if path.exists():
         print("\nsignature/bridge-shorts-bay.jpeg")
         img = Image.open(path)
-        split_horizontal(img, "sg-bridge-shorts-bay-front", "sg-bridge-shorts-bay-back", "signature", SPLIT_DIR)
+        split_horizontal(
+            img, "sg-bridge-shorts-bay-front", "sg-bridge-shorts-bay-back", "signature", SPLIT_DIR
+        )
         total += 2
 
     # Bridge Shorts Golden (single front+back)
@@ -189,29 +203,41 @@ def main():
     if path.exists():
         print("\nsignature/bridge-shorts-golden.jpeg")
         img = Image.open(path)
-        split_horizontal(img, "sg-shorts-golden-front", "sg-shorts-golden-back", "signature", SPLIT_DIR)
+        split_horizontal(
+            img, "sg-shorts-golden-front", "sg-shorts-golden-back", "signature", SPLIT_DIR
+        )
         total += 2
 
     # Bridge Shorts Variants (2x2: Bay Bridge top, Golden Gate bottom)
     print("\nsignature/bridge-shorts-variants.jpg")
     img = Image.open(TECHFLATS / "signature" / "bridge-shorts-variants.jpg")
-    split_2x2(img, [
-        "sg-shorts-bay-v2-front",
-        "sg-shorts-bay-v2-back",
-        "sg-shorts-golden-v2-front",
-        "sg-shorts-golden-v2-back",
-    ], "signature", SPLIT_DIR)
+    split_2x2(
+        img,
+        [
+            "sg-shorts-bay-v2-front",
+            "sg-shorts-bay-v2-back",
+            "sg-shorts-golden-v2-front",
+            "sg-shorts-golden-v2-back",
+        ],
+        "signature",
+        SPLIT_DIR,
+    )
     total += 4
 
     # Mint Lavender Crewneck + Sweats (2x2)
     print("\nsignature/mint-lavender-crewneck-sweats.jpeg")
     img = Image.open(TECHFLATS / "signature" / "mint-lavender-crewneck-sweats.jpeg")
-    split_2x2(img, [
-        "sg-mint-lav-crewneck-front",
-        "sg-mint-lav-crewneck-back",
-        "sg-mint-lav-sweats-front",
-        "sg-mint-lav-sweats-back",
-    ], "signature", SPLIT_DIR)
+    split_2x2(
+        img,
+        [
+            "sg-mint-lav-crewneck-front",
+            "sg-mint-lav-crewneck-back",
+            "sg-mint-lav-sweats-front",
+            "sg-mint-lav-sweats-back",
+        ],
+        "signature",
+        SPLIT_DIR,
+    )
     total += 4
 
     # Mint Lavender Hoodie (single — copy or split if front+back)
@@ -222,29 +248,39 @@ def main():
         col_dir = SPLIT_DIR / "signature"
         col_dir.mkdir(parents=True, exist_ok=True)
         img.save(col_dir / "sg-mint-lav-hoodie-front.jpeg", "JPEG", quality=95)
-        print(f"  -> sg-mint-lav-hoodie-front.jpeg (single)")
+        print("  -> sg-mint-lav-hoodie-front.jpeg (single)")
         total += 1
 
     # Windbreaker Set (2x2)
     print("\nsignature/windbreaker-set.jpeg")
     img = Image.open(TECHFLATS / "signature" / "windbreaker-set.jpeg")
-    split_2x2(img, [
-        "sg-windbreaker-front",
-        "sg-windbreaker-back",
-        "sg-windbreaker-joggers-front",
-        "sg-windbreaker-joggers-back",
-    ], "signature", SPLIT_DIR)
+    split_2x2(
+        img,
+        [
+            "sg-windbreaker-front",
+            "sg-windbreaker-back",
+            "sg-windbreaker-joggers-front",
+            "sg-windbreaker-joggers-back",
+        ],
+        "signature",
+        SPLIT_DIR,
+    )
     total += 4
 
     # Beanies (4 vertical)
     print("\nsignature/beanies.jpeg")
     img = Image.open(TECHFLATS / "signature" / "beanies.jpeg")
-    split_vertical(img, [
-        "sg-beanie-purple",
-        "sg-beanie-black-silver",
-        "sg-beanie-red",
-        "sg-beanie-red-large",
-    ], "signature", SPLIT_DIR)
+    split_vertical(
+        img,
+        [
+            "sg-beanie-purple",
+            "sg-beanie-black-silver",
+            "sg-beanie-red",
+            "sg-beanie-red-large",
+        ],
+        "signature",
+        SPLIT_DIR,
+    )
     total += 4
 
     # ── KIDS CAPSULE ────────────────────────────────────────────
@@ -252,23 +288,33 @@ def main():
     # Red Set (2x2: hoodie front/back top, joggers front/back bottom)
     print("\nkids-capsule/colorblock-red.jpeg")
     img = Image.open(TECHFLATS / "kids-capsule" / "colorblock-red.jpeg")
-    split_2x2(img, [
-        "kids-red-hoodie-front",
-        "kids-red-hoodie-back",
-        "kids-red-joggers-front",
-        "kids-red-joggers-back",
-    ], "kids-capsule", SPLIT_DIR)
+    split_2x2(
+        img,
+        [
+            "kids-red-hoodie-front",
+            "kids-red-hoodie-back",
+            "kids-red-joggers-front",
+            "kids-red-joggers-back",
+        ],
+        "kids-capsule",
+        SPLIT_DIR,
+    )
     total += 4
 
     # Purple Set (2x2)
     print("\nkids-capsule/colorblock-purple.jpeg")
     img = Image.open(TECHFLATS / "kids-capsule" / "colorblock-purple.jpeg")
-    split_2x2(img, [
-        "kids-purple-hoodie-front",
-        "kids-purple-hoodie-back",
-        "kids-purple-joggers-front",
-        "kids-purple-joggers-back",
-    ], "kids-capsule", SPLIT_DIR)
+    split_2x2(
+        img,
+        [
+            "kids-purple-hoodie-front",
+            "kids-purple-hoodie-back",
+            "kids-purple-joggers-front",
+            "kids-purple-joggers-back",
+        ],
+        "kids-capsule",
+        SPLIT_DIR,
+    )
     total += 4
 
     print(f"\n{'=' * 50}")

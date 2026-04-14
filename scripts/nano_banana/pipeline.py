@@ -141,8 +141,7 @@ class ProductionPipeline:
             generate_gemini,
             generate_gpt,
         )
-        from nano_banana.logo_refs import get_all_references
-        from nano_banana.prompts import composite_prompt, get_prompt
+        from nano_banana.prompts import composite_prompt
         from nano_banana.prompt_registry import PromptRegistry
         from nano_banana.router import route_product
         from nano_banana.tournament import run_tournament
@@ -174,7 +173,11 @@ class ProductionPipeline:
             result.issues.append("Router returned no engine decisions")
             return result
 
-        log.info("ROUTE: %s (fallback: %s)", decisions[0].reason, decisions[1].engine if len(decisions) > 1 else "none")
+        log.info(
+            "ROUTE: %s (fallback: %s)",
+            decisions[0].reason,
+            decisions[1].engine if len(decisions) > 1 else "none",
+        )
         result.route_decision = decisions[0].reason
 
         # ── Step 3: GENERATE ─────────────────────────────────────────
@@ -194,7 +197,13 @@ class ProductionPipeline:
             engine = decision.engine
             model_id = decision.model_id
 
-            log.info("  Attempt %d/%d — engine: %s, template: %s", attempt + 1, cfg.max_attempts, engine, template_id)
+            log.info(
+                "  Attempt %d/%d — engine: %s, template: %s",
+                attempt + 1,
+                cfg.max_attempts,
+                engine,
+                template_id,
+            )
 
             try:
                 if engine in ("gemini-pro", "gemini-flash"):
@@ -268,7 +277,11 @@ class ProductionPipeline:
             result.qa_passed = qa_result.passed_98  # uses passing_threshold
             result.issues = qa_result.top_issues
 
-            log.info("QA: %.1f/100 — %s", qa_result.aggregate_score, "PASS" if qa_result.passed_98 else "NEEDS WORK")
+            log.info(
+                "QA: %.1f/100 — %s",
+                qa_result.aggregate_score,
+                "PASS" if qa_result.passed_98 else "NEEDS WORK",
+            )
 
             # Feed score back to prompt registry (A/B testing loop)
             registry.record_score(template_id, qa_result.aggregate_score)
@@ -290,11 +303,21 @@ class ProductionPipeline:
             for judge in qa_result.judges:
                 if judge.text_accuracy < cfg.qa_refine_text_threshold:
                     needs_refine = True
-                    log.info("REFINE triggered: %s text_accuracy=%d < %d", judge.judge, judge.text_accuracy, cfg.qa_refine_text_threshold)
+                    log.info(
+                        "REFINE triggered: %s text_accuracy=%d < %d",
+                        judge.judge,
+                        judge.text_accuracy,
+                        cfg.qa_refine_text_threshold,
+                    )
                     break
                 if judge.logo_accuracy < cfg.qa_refine_logo_threshold:
                     needs_refine = True
-                    log.info("REFINE triggered: %s logo_accuracy=%d < %d", judge.judge, judge.logo_accuracy, cfg.qa_refine_logo_threshold)
+                    log.info(
+                        "REFINE triggered: %s logo_accuracy=%d < %d",
+                        judge.judge,
+                        judge.logo_accuracy,
+                        cfg.qa_refine_logo_threshold,
+                    )
                     break
 
         if needs_refine and result.qa_score < cfg.qa_auto_approve:
@@ -313,9 +336,7 @@ class ProductionPipeline:
             # Fallback: Gemini composite
             if not refined_bytes and source_path.exists():
                 comp_prompt = composite_prompt(name, sku, view)
-                refined_bytes = composite_gemini(
-                    self.genai, output_path, source_path, comp_prompt
-                )
+                refined_bytes = composite_gemini(self.genai, output_path, source_path, comp_prompt)
 
             if refined_bytes and quality_gate(refined_bytes, sku, f"{view}-refined"):
                 save_image(refined_bytes, output_path)
@@ -335,17 +356,36 @@ class ProductionPipeline:
                     result.qa_score = qa2.aggregate_score
                     result.qa_passed = qa2.passed_98
                     result.issues = qa2.top_issues
-                    log.info("QA (post-refine): %.1f/100 — %s", qa2.aggregate_score, "PASS" if qa2.passed_98 else "NEEDS WORK")
+                    log.info(
+                        "QA (post-refine): %.1f/100 — %s",
+                        qa2.aggregate_score,
+                        "PASS" if qa2.passed_98 else "NEEDS WORK",
+                    )
                 except Exception as exc:
                     log.error("Post-refine QA failed: %s", exc)
 
         # Auto-reject check
         if result.qa_score < cfg.qa_auto_reject:
-            log.warning("AUTO-REJECT: %s %s scored %.1f (< %.1f threshold)", sku, view, result.qa_score, cfg.qa_auto_reject)
+            log.warning(
+                "AUTO-REJECT: %s %s scored %.1f (< %.1f threshold)",
+                sku,
+                view,
+                result.qa_score,
+                cfg.qa_auto_reject,
+            )
             result.qa_passed = False
 
-        log.info("RESULT: %s %s — engine=%s score=%.1f passed=%s cost=$%.3f attempts=%d refined=%s",
-                 sku, view, engine_used, result.qa_score, result.qa_passed, result.cost_usd, result.attempts, result.refinement_applied)
+        log.info(
+            "RESULT: %s %s — engine=%s score=%.1f passed=%s cost=$%.3f attempts=%d refined=%s",
+            sku,
+            view,
+            engine_used,
+            result.qa_score,
+            result.qa_passed,
+            result.cost_usd,
+            result.attempts,
+            result.refinement_applied,
+        )
 
         return result
 
@@ -373,10 +413,13 @@ class ProductionPipeline:
             if not source or not Path(source).exists():
                 log.warning("SKIP %s — no source image", sku)
                 for view in views:
-                    results.append(PipelineResult(
-                        sku=sku, view=view,
-                        issues=["No source image available"],
-                    ))
+                    results.append(
+                        PipelineResult(
+                            sku=sku,
+                            view=view,
+                            issues=["No source image available"],
+                        )
+                    )
                     idx += 1
                 continue
 
@@ -403,12 +446,24 @@ class ProductionPipeline:
         log.info("=" * 60)
 
         # Save batch report
-        report_path = PROJECT_ROOT / self.config.qa_results_dir / f"batch-report-{int(time.time())}.json"
+        report_path = (
+            PROJECT_ROOT / self.config.qa_results_dir / f"batch-report-{int(time.time())}.json"
+        )
         report_path.parent.mkdir(parents=True, exist_ok=True)
-        report_path.write_text(json.dumps({
-            "summary": {"passed": passed, "needs_review": failed, "skipped": skipped, "total_cost": total_cost},
-            "results": [r.to_dict() for r in results],
-        }, indent=2))
+        report_path.write_text(
+            json.dumps(
+                {
+                    "summary": {
+                        "passed": passed,
+                        "needs_review": failed,
+                        "skipped": skipped,
+                        "total_cost": total_cost,
+                    },
+                    "results": [r.to_dict() for r in results],
+                },
+                indent=2,
+            )
+        )
         log.info("Batch report: %s", report_path)
 
         return results
