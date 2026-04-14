@@ -25,47 +25,165 @@ _COLLECTIONS = {
     "children": "kids-capsule",
 }
 
-_GARMENT_TYPES = frozenset({
-    "hoodie", "crewneck", "joggers", "jacket", "sherpa", "jersey", "shorts",
-    "shirt", "tee", "t-shirt", "beanie", "sweatpants", "varsity", "fanny",
-    "fannie", "set", "tank", "cap", "hat", "dress", "skirt", "pants",
-})
+_GARMENT_TYPES = frozenset(
+    {
+        "hoodie",
+        "crewneck",
+        "joggers",
+        "jacket",
+        "sherpa",
+        "jersey",
+        "shorts",
+        "shirt",
+        "tee",
+        "t-shirt",
+        "beanie",
+        "sweatpants",
+        "varsity",
+        "fanny",
+        "fannie",
+        "set",
+        "tank",
+        "cap",
+        "hat",
+        "dress",
+        "skirt",
+        "pants",
+    }
+)
 
-_FABRICS = frozenset({
-    "sherpa", "french terry", "fleece", "mesh", "satin", "jersey knit",
-    "cotton", "polyester", "denim", "silk", "linen", "wool", "cashmere",
-    "nylon", "velvet", "corduroy", "chambray", "twill", "canvas",
-    "recycled", "organic", "bamboo",
-})
+_FABRICS = frozenset(
+    {
+        "sherpa",
+        "french terry",
+        "fleece",
+        "mesh",
+        "satin",
+        "jersey knit",
+        "cotton",
+        "polyester",
+        "denim",
+        "silk",
+        "linen",
+        "wool",
+        "cashmere",
+        "nylon",
+        "velvet",
+        "corduroy",
+        "chambray",
+        "twill",
+        "canvas",
+        "recycled",
+        "organic",
+        "bamboo",
+    }
+)
 
-_COLORS = frozenset({
-    "black", "white", "red", "gold", "rose gold", "silver", "crimson",
-    "midnight", "navy", "teal", "mint", "lavender", "orchid", "purple",
-    "blue", "green", "orange", "pink", "cream", "charcoal", "burgundy",
-})
+_COLORS = frozenset(
+    {
+        "black",
+        "white",
+        "red",
+        "gold",
+        "rose gold",
+        "silver",
+        "crimson",
+        "midnight",
+        "navy",
+        "teal",
+        "mint",
+        "lavender",
+        "orchid",
+        "purple",
+        "blue",
+        "green",
+        "orange",
+        "pink",
+        "cream",
+        "charcoal",
+        "burgundy",
+    }
+)
 
-_SEASONS = frozenset({
-    "ss", "fw", "spring", "summer", "fall", "autumn", "winter",
-    "resort", "pre-fall", "pre-spring", "holiday", "ss25", "fw25",
-    "ss26", "fw26", "ss27", "fw27",
-})
+_SEASONS = frozenset(
+    {
+        "ss",
+        "fw",
+        "spring",
+        "summer",
+        "fall",
+        "autumn",
+        "winter",
+        "resort",
+        "pre-fall",
+        "pre-spring",
+        "holiday",
+        "ss25",
+        "fw25",
+        "ss26",
+        "fw26",
+        "ss27",
+        "fw27",
+    }
+)
 
-_PLATFORMS = frozenset({
-    "instagram", "tiktok", "twitter", "x", "facebook", "pinterest",
-    "linkedin", "youtube", "threads", "snapchat",
-})
+_PLATFORMS = frozenset(
+    {
+        "instagram",
+        "tiktok",
+        "twitter",
+        "x",
+        "facebook",
+        "pinterest",
+        "linkedin",
+        "youtube",
+        "threads",
+        "snapchat",
+    }
+)
 
-_MOOD_WORDS = frozenset({
-    "edgy", "gothic", "luxury", "elegant", "bold", "minimal", "clean",
-    "dark", "romantic", "raw", "emotional", "refined", "understated",
-    "street", "urban", "dramatic", "moody", "vibrant", "fresh",
-    "pastel", "premium", "exclusive", "fierce", "soft", "cozy",
-})
+_MOOD_WORDS = frozenset(
+    {
+        "edgy",
+        "gothic",
+        "luxury",
+        "elegant",
+        "bold",
+        "minimal",
+        "clean",
+        "dark",
+        "romantic",
+        "raw",
+        "emotional",
+        "refined",
+        "understated",
+        "street",
+        "urban",
+        "dramatic",
+        "moody",
+        "vibrant",
+        "fresh",
+        "pastel",
+        "premium",
+        "exclusive",
+        "fierce",
+        "soft",
+        "cozy",
+    }
+)
 
-_REFERENCE_INDICATORS = frozenset({
-    "reference", "like", "similar to", "inspired by", "based on",
-    ".jpg", ".png", ".webp",
-})
+_REFERENCE_INDICATORS = frozenset(
+    {
+        "reference",
+        "like",
+        "similar to",
+        "inspired by",
+        "based on",
+        ".jpg",
+        ".png",
+        ".webp",
+    }
+)
 
 _INTENT_KEYWORDS: dict[str, list[str]] = {
     "product-render": ["render", "product image", "product photo", "generate image"],

@@ -6,12 +6,10 @@ Covers: analyzer, templates, chain, enhancer, cache, history, and brand DNA pres
 
 from __future__ import annotations
 
-import json
-
 import pytest
 
-from skyyrose.elite_studio.prompts.analyzer import PromptAnalyzer, PromptAnalysis
-from skyyrose.elite_studio.prompts.cache import PromptCache, _tokenize, _jaccard_similarity
+from skyyrose.elite_studio.prompts.analyzer import PromptAnalysis, PromptAnalyzer
+from skyyrose.elite_studio.prompts.cache import PromptCache, _jaccard_similarity, _tokenize
 from skyyrose.elite_studio.prompts.chain import PromptChain
 from skyyrose.elite_studio.prompts.enhancer import EnhancedPrompt, PromptEnhancer
 from skyyrose.elite_studio.prompts.history import PromptHistory
@@ -22,7 +20,6 @@ from skyyrose.elite_studio.prompts.templates import (
     COLLECTION_DNA,
     PromptTemplateRegistry,
 )
-
 
 # ===================================================================
 # Analyzer Tests
@@ -40,9 +37,7 @@ class TestPromptAnalyzer:
         assert result.enhancement_potential > 0.7
 
     def test_medium_quality_partial_prompt(self):
-        result = self.analyzer.analyze(
-            "render the black rose hoodie in dark gothic style"
-        )
+        result = self.analyzer.analyze("render the black rose hoodie in dark gothic style")
         assert result.score >= 2.0
         assert result.intent in ("product-render", "design-ideation")
 
@@ -140,9 +135,18 @@ class TestPromptTemplateRegistry:
 
     def test_all_twelve_intents_have_templates(self):
         expected_intents = {
-            "product-render", "3d-model", "social-pack", "product-copy",
-            "design-ideation", "mockup", "character-sheet", "scene-composite",
-            "collection-plan", "tech-pack", "moodboard", "colorway-explore",
+            "product-render",
+            "3d-model",
+            "social-pack",
+            "product-copy",
+            "design-ideation",
+            "mockup",
+            "character-sheet",
+            "scene-composite",
+            "collection-plan",
+            "tech-pack",
+            "moodboard",
+            "colorway-explore",
         }
         for intent in expected_intents:
             template = self.registry.get_template(intent)
@@ -159,16 +163,24 @@ class TestPromptTemplateRegistry:
     def test_templates_have_skyyrose_brand_references(self):
         """Every example_output should reference SkyyRose products or brand elements."""
         brand_indicators = {
-            "skyyrose", "rose", "oakland", "black rose", "love hurts",
-            "signature", "b76e79", "0a0a0a", "d4af37", "dc143c", "c0c0c0",
+            "skyyrose",
+            "rose",
+            "oakland",
+            "black rose",
+            "love hurts",
+            "signature",
+            "b76e79",
+            "0a0a0a",
+            "d4af37",
+            "dc143c",
+            "c0c0c0",
         }
         for template in self.registry.list_templates():
             lower = template.example_output.lower()
             found = any(ind in lower for ind in brand_indicators)
-            assert found, (
-                f"Template '{template.intent}' example_output missing "
-                f"SkyyRose brand reference"
-            )
+            assert (
+                found
+            ), f"Template '{template.intent}' example_output missing SkyyRose brand reference"
 
     def test_list_intents(self):
         intents = self.registry.list_intents()
@@ -234,9 +246,7 @@ class TestPromptChain:
 
     def test_fashion_context_override(self):
         custom_context = {"collection_dna": "custom brand override context"}
-        result = self.chain.enhance(
-            "design something", fashion_context=custom_context
-        )
+        result = self.chain.enhance("design something", fashion_context=custom_context)
         assert "custom brand override context" in result["enhanced"]
 
     def test_template_name_returned(self):

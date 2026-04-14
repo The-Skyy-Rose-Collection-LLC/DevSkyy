@@ -272,6 +272,230 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-04-11T02:24:43.972Z"
+    },
+    {
+      "id": "bug-018",
+      "timestamp": "2026-04-14T20:16:59.112Z",
+      "error_message": "Significant refactor of ",
+      "file": "skyyrose/elite_studio/character/agent.py",
+      "root_cause": "10 lines replaced/restructured",
+      "fix": "Rewrote 17→20 lines (10 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-14T20:16:59.112Z"
+    },
+    {
+      "id": "bug-019",
+      "timestamp": "2026-04-14T20:17:17.906Z",
+      "error_message": "Incorrect value in code",
+      "file": "skyyrose/elite_studio/character/agent.py",
+      "root_cause": "Had \"2D flat-design web sprite for Rosie (SkyyRose mas",
+      "fix": "Changed to \"2D flat-design web sprite for Skyy (SkyyRose masc",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-14T20:17:17.906Z"
+    },
+    {
+      "id": "bug-020",
+      "timestamp": "2026-04-14T20:27:02.379Z",
+      "error_message": "CSS fix: hover",
+      "file": "frontend/components/mascot/MascotBubble.tsx",
+      "root_cause": "hover: scale-110 hover:shadow-xl hover:shadow-[#B76E79]/40 → scale-105",
+      "fix": "Changed hover: scale-110 hover:shadow-xl hover:shadow-[#B76E79]/40 → scale-105",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-14T20:29:07.704Z"
+    },
+    {
+      "id": "bug-021",
+      "timestamp": "2026-04-14T20:27:23.078Z",
+      "error_message": "Significant refactor of ",
+      "file": "frontend/components/mascot/MascotBubble.tsx",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 11→17 lines (2 removed) | Also: import Image from 'next/image';; // Canonical Skyy character image — the real masco | Also: <div className=\"h-10 w-10 rounded-full bg-white/20; <Image",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "tsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-04-14T20:28:36.960Z"
+    },
+    {
+      "id": "bug-022",
+      "timestamp": "2026-04-14T20:35:09.816Z",
+      "error_message": "Incorrect value in code",
+      "file": "wordpress-theme/skyyrose-flagship/assets/js/mascot.min.js",
+      "root_cause": "Had 'skyy--speaking'",
+      "fix": "Changed to 'speaking'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-14T20:35:21.701Z"
+    },
+    {
+      "id": "bug-023",
+      "timestamp": "2026-04-14T20:36:01.424Z",
+      "error_message": "Wrong operator: || should be &&",
+      "file": "wordpress-theme/skyyrose-flagship/assets/js/skyy-3d.js",
+      "root_cause": "Used \"||\" instead of \"&&\"",
+      "fix": "Changed operator || → &&",
+      "tags": [
+        "auto-detected",
+        "operator-fix",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-14T20:36:01.424Z"
+    },
+    {
+      "id": "bug-024",
+      "timestamp": "2026-04-14T20:36:21.368Z",
+      "error_message": "Wrong condition in logic",
+      "file": "wordpress-theme/skyyrose-flagship/assets/js/skyy-3d.js",
+      "root_cause": "Condition was: if ( gltf.animations && gltf.animations.length )",
+      "fix": "Changed to: if ( staticImg )",
+      "tags": [
+        "auto-detected",
+        "logic-fix",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-14T20:36:21.368Z"
+    },
+    {
+      "id": "bug-025",
+      "timestamp": "2026-04-14T21:23:33.266Z",
+      "error_message": "Significant refactor of ",
+      "file": "tests/test_character_system.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 4→5 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-14T21:23:33.266Z"
+    },
+    {
+      "id": "bug-026",
+      "timestamp": "2026-04-14T22:22:38.391Z",
+      "error_message": "Significant refactor of ",
+      "file": "wordpress-theme/skyyrose-flagship/assets/js/skyy-3d.js",
+      "root_cause": "5 lines replaced/restructured",
+      "fix": "Rewrote 8→3 lines (5 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-14T22:22:38.391Z"
+    },
+    {
+      "id": "bug-027",
+      "timestamp": "2026-04-14T22:24:32.413Z",
+      "error_message": "Null/undefined access in ",
+      "file": "wordpress-theme/skyyrose-flagship/assets/js/skyy-3d.js",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-14T22:24:32.413Z"
+    },
+    {
+      "id": "bug-028",
+      "timestamp": "2026-04-14T22:36:21.226Z",
+      "error_message": "Incorrect value in code",
+      "file": "pyproject.toml",
+      "root_cause": "Had \"devskyy[dev,api,mcp,ml,worker,deploy,sdk]\"",
+      "fix": "Changed to \"devskyy[dev,api,mcp,ml,worker,deploy,sdk,rag]\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "toml"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-14T22:36:21.226Z"
+    },
+    {
+      "id": "bug-029",
+      "timestamp": "2026-04-14T22:45:58.519Z",
+      "error_message": "Incorrect value in code",
+      "file": "../.claude/settings.json",
+      "root_cause": "Had \"fp=$(cat | jq -r '",
+      "fix": "Changed to \"fp=$(jq -r '",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "json"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-14T22:45:58.519Z"
+    },
+    {
+      "id": "bug-030",
+      "timestamp": "2026-04-14T22:48:35.049Z",
+      "error_message": "Wrong reference: true should be false",
+      "file": ".claude/settings.json",
+      "root_cause": "Used \"true\" instead of \"false\"",
+      "fix": "Changed true → false",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "json"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-14T22:48:35.049Z"
+    },
+    {
+      "id": "bug-031",
+      "timestamp": "2026-04-14T23:08:57.192Z",
+      "error_message": "Incorrect value in code",
+      "file": "../.claude/settings.json",
+      "root_cause": "Had \"ENABLE_PROMPT_CACHING_1H=1\"",
+      "fix": "Changed to \"ENABLE_PROMPT_CACHING_1H\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "json"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-14T23:08:57.192Z"
     }
   ]
 }

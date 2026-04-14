@@ -8,8 +8,6 @@ run_creative end-to-end (mocked sub-nodes), enqueue_creative job data.
 from __future__ import annotations
 
 import pytest
-from unittest.mock import MagicMock, patch
-
 
 # ---------------------------------------------------------------------------
 # CreativeIntent enum tests
@@ -19,6 +17,7 @@ from unittest.mock import MagicMock, patch
 class TestCreativeIntent:
     def test_all_14_intents_present(self):
         from skyyrose.elite_studio.creative.state import CreativeIntent
+
         intents = {e.value for e in CreativeIntent}
         expected = {
             "product-render",
@@ -40,6 +39,7 @@ class TestCreativeIntent:
 
     def test_intent_values_are_strings(self):
         from skyyrose.elite_studio.creative.state import CreativeIntent
+
         for intent in CreativeIntent:
             assert isinstance(intent.value, str)
             assert "-" in intent.value or intent.value.isalpha()
@@ -53,6 +53,7 @@ class TestCreativeIntent:
 class TestCreativeOperationState:
     def test_create_initial_state(self):
         from skyyrose.elite_studio.creative.state import create_initial_state
+
         state = create_initial_state(
             intent="product-render",
             params={"view": "front"},
@@ -68,11 +69,20 @@ class TestCreativeOperationState:
 
     def test_initial_state_has_all_result_fields(self):
         from skyyrose.elite_studio.creative.state import create_initial_state
+
         state = create_initial_state("design-ideation", {})
-        for field in ("render_result", "model_3d_result", "social_result",
-                      "copy_result", "character_result", "composite_result",
-                      "tryon_result", "design_result", "tech_pack_result",
-                      "collection_plan_result"):
+        for field in (
+            "render_result",
+            "model_3d_result",
+            "social_result",
+            "copy_result",
+            "character_result",
+            "composite_result",
+            "tryon_result",
+            "design_result",
+            "tech_pack_result",
+            "collection_plan_result",
+        ):
             assert field in state
             assert state[field] is None
 
@@ -85,6 +95,7 @@ class TestCreativeOperationState:
 class TestEntryNode:
     def test_valid_intent_passes(self):
         from skyyrose.elite_studio.creative.nodes import entry_node
+
         state = {
             "intent": "design-ideation",
             "sku": "",
@@ -99,6 +110,7 @@ class TestEntryNode:
 
     def test_invalid_intent_sets_error(self):
         from skyyrose.elite_studio.creative.nodes import entry_node
+
         state = {
             "intent": "not-a-real-intent",
             "sku": "",
@@ -112,6 +124,7 @@ class TestEntryNode:
 
     def test_entry_node_builds_fashion_context_for_sku(self):
         from skyyrose.elite_studio.creative.nodes import entry_node
+
         state = {
             "intent": "product-render",
             "sku": "br-001",
@@ -125,6 +138,7 @@ class TestEntryNode:
 
     def test_entry_node_builds_fashion_context_from_params(self):
         from skyyrose.elite_studio.creative.nodes import entry_node
+
         state = {
             "intent": "design-ideation",
             "sku": "",
@@ -147,55 +161,65 @@ class TestEntryNode:
 
 class TestRouteIntent:
     def test_product_render_routes_to_product_render(self):
-        from skyyrose.elite_studio.creative.edges import route_intent, PRODUCT_RENDER
+        from skyyrose.elite_studio.creative.edges import PRODUCT_RENDER, route_intent
+
         state = {"intent": "product-render", "status": "running"}
         assert route_intent(state) == PRODUCT_RENDER
 
     def test_social_pack_routes_to_social_pack(self):
-        from skyyrose.elite_studio.creative.edges import route_intent, SOCIAL_PACK
+        from skyyrose.elite_studio.creative.edges import SOCIAL_PACK, route_intent
+
         state = {"intent": "social-pack", "status": "running"}
         assert route_intent(state) == SOCIAL_PACK
 
     def test_design_ideation_routes_to_design(self):
-        from skyyrose.elite_studio.creative.edges import route_intent, DESIGN_IDEATION
+        from skyyrose.elite_studio.creative.edges import DESIGN_IDEATION, route_intent
+
         state = {"intent": "design-ideation", "status": "running"}
         assert route_intent(state) == DESIGN_IDEATION
 
     def test_mockup_routes_to_design(self):
-        from skyyrose.elite_studio.creative.edges import route_intent, DESIGN_IDEATION
+        from skyyrose.elite_studio.creative.edges import DESIGN_IDEATION, route_intent
+
         state = {"intent": "mockup", "status": "running"}
         assert route_intent(state) == DESIGN_IDEATION
 
     def test_collection_plan_routes_correctly(self):
-        from skyyrose.elite_studio.creative.edges import route_intent, COLLECTION_PLAN
+        from skyyrose.elite_studio.creative.edges import COLLECTION_PLAN, route_intent
+
         state = {"intent": "collection-plan", "status": "running"}
         assert route_intent(state) == COLLECTION_PLAN
 
     def test_character_sheet_routes_to_character(self):
-        from skyyrose.elite_studio.creative.edges import route_intent, CHARACTER
+        from skyyrose.elite_studio.creative.edges import CHARACTER, route_intent
+
         state = {"intent": "character-sheet", "status": "running"}
         assert route_intent(state) == CHARACTER
 
     def test_error_state_routes_to_finalize(self):
-        from skyyrose.elite_studio.creative.edges import route_intent, FINALIZE
+        from skyyrose.elite_studio.creative.edges import FINALIZE, route_intent
+
         state = {"intent": "product-render", "status": "error"}
         assert route_intent(state) == FINALIZE
 
     def test_all_14_intents_have_routing(self):
-        from skyyrose.elite_studio.creative.edges import route_intent, FINALIZE
+        from skyyrose.elite_studio.creative.edges import route_intent
         from skyyrose.elite_studio.creative.state import CreativeIntent
+
         for intent in CreativeIntent:
             state = {"intent": intent.value, "status": "running"}
             result = route_intent(state)
             assert result != "", f"Intent {intent.value} routed to empty string"
 
     def test_after_render_full_launch_chains_to_social(self):
-        from skyyrose.elite_studio.creative.edges import after_render, SOCIAL_PACK
+        from skyyrose.elite_studio.creative.edges import SOCIAL_PACK, after_render
+
         state = {"intent": "full-product-launch", "status": "running"}
         assert after_render(state) == SOCIAL_PACK
 
     def test_after_render_normal_goes_to_finalize(self):
-        from skyyrose.elite_studio.creative.edges import after_render, FINALIZE
+        from skyyrose.elite_studio.creative.edges import FINALIZE, after_render
+
         state = {"intent": "product-render", "status": "running"}
         assert after_render(state) == FINALIZE
 
@@ -208,6 +232,7 @@ class TestRouteIntent:
 class TestProductCopyNode:
     def test_generates_copy_for_known_sku(self):
         from skyyrose.elite_studio.creative.nodes import product_copy_node
+
         state = {
             "intent": "product-copy",
             "sku": "br-001",
@@ -237,6 +262,7 @@ class TestProductCopyNode:
 
     def test_copy_includes_brand_tagline(self):
         from skyyrose.elite_studio.creative.nodes import product_copy_node
+
         state = {
             "intent": "product-copy",
             "sku": "sg-007",
@@ -252,8 +278,11 @@ class TestProductCopyNode:
         result = product_copy_node(state)
         copy = result.get("copy_result", {})
         assert copy.get("success") is True
-        combined = (copy.get("short_description", "") + copy.get("long_description", "") +
-                    " ".join(copy.get("keywords", [])))
+        combined = (
+            copy.get("short_description", "")
+            + copy.get("long_description", "")
+            + " ".join(copy.get("keywords", []))
+        )
         assert "SkyyRose" in combined or "Luxury" in combined
 
 
@@ -265,6 +294,7 @@ class TestProductCopyNode:
 class TestDesignIdeationNode:
     def test_generates_design_concept(self):
         from skyyrose.elite_studio.creative.nodes import design_ideation_node
+
         state = {
             "intent": "design-ideation",
             "sku": "",
@@ -286,6 +316,7 @@ class TestDesignIdeationNode:
 
     def test_design_contains_collection_dna(self):
         from skyyrose.elite_studio.creative.nodes import design_ideation_node
+
         state = {
             "intent": "design-ideation",
             "sku": "",
@@ -314,6 +345,7 @@ class TestDesignIdeationNode:
 class TestCollectionPlanNode:
     def test_generates_collection_plan(self):
         from skyyrose.elite_studio.creative.nodes import collection_plan_node
+
         state = {
             "intent": "collection-plan",
             "sku": "",
@@ -342,12 +374,14 @@ class TestCollectionPlanNode:
 class TestFinalizeNode:
     def test_sets_success_when_no_error(self):
         from skyyrose.elite_studio.creative.nodes import finalize_node
+
         state = {"status": "running", "error": ""}
         result = finalize_node(state)
         assert result.get("status") == "success"
 
     def test_preserves_error_state(self):
         from skyyrose.elite_studio.creative.nodes import finalize_node
+
         state = {"status": "error", "error": "something went wrong"}
         result = finalize_node(state)
         # Should return empty dict — error state preserved from state
@@ -362,6 +396,7 @@ class TestFinalizeNode:
 class TestRunCreative:
     def test_run_creative_design_ideation(self):
         from skyyrose.elite_studio.creative.runner import run_creative
+
         result = run_creative(
             intent="design-ideation",
             params={
@@ -378,6 +413,7 @@ class TestRunCreative:
 
     def test_run_creative_collection_plan(self):
         from skyyrose.elite_studio.creative.runner import run_creative
+
         result = run_creative(
             intent="collection-plan",
             params={"collection": "signature", "season": "FW26", "theme": "West Coast"},
@@ -386,12 +422,14 @@ class TestRunCreative:
 
     def test_run_creative_invalid_intent(self):
         from skyyrose.elite_studio.creative.runner import run_creative
+
         result = run_creative(intent="not-valid", params={})
         assert result.get("status") == "error"
         assert result.get("error") != ""
 
     def test_run_creative_product_copy(self):
         from skyyrose.elite_studio.creative.runner import run_creative
+
         result = run_creative(
             intent="product-copy",
             params={
@@ -414,6 +452,7 @@ class TestEnqueueCreative:
     def test_enqueue_creative_produces_correct_job_data(self):
         """Verify enqueue_creative builds correct EliteStudioJobData."""
         from skyyrose.elite_studio.queue.job_types import EliteStudioJobData
+
         job = EliteStudioJobData(
             sku="br-001",
             intent="social-pack",
@@ -427,12 +466,15 @@ class TestEnqueueCreative:
 
     def test_job_data_default_intent(self):
         from skyyrose.elite_studio.queue.job_types import EliteStudioJobData
+
         job = EliteStudioJobData(sku="sg-001")
         assert job.intent == "product-render"
         assert job.creative_params == {}
 
     def test_job_data_validates_sku(self):
-        from skyyrose.elite_studio.queue.job_types import EliteStudioJobData
         from pydantic import ValidationError
+
+        from skyyrose.elite_studio.queue.job_types import EliteStudioJobData
+
         with pytest.raises(ValidationError):
             EliteStudioJobData(sku="")

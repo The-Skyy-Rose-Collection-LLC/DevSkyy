@@ -21,6 +21,7 @@ def _get_graph():  # type: ignore[return]
     global _compiled_graph
     if _compiled_graph is None:
         from .router import build_creative_graph
+
         _compiled_graph = build_creative_graph()
     return _compiled_graph
 

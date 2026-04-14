@@ -60,9 +60,19 @@ def build_bundle(sku: str, product: dict, source_map: dict) -> dict:
     back_src = smap_entry.get("back")
 
     if front_src and Path(front_src).exists():
-        _copy(Path(front_src), bundle_path / f"techflat-front{Path(front_src).suffix}", files, "techflat-front")
+        _copy(
+            Path(front_src),
+            bundle_path / f"techflat-front{Path(front_src).suffix}",
+            files,
+            "techflat-front",
+        )
     if back_src and Path(back_src).exists():
-        _copy(Path(back_src), bundle_path / f"techflat-back{Path(back_src).suffix}", files, "techflat-back")
+        _copy(
+            Path(back_src),
+            bundle_path / f"techflat-back{Path(back_src).suffix}",
+            files,
+            "techflat-back",
+        )
 
     # 2. Real product photo (from CSV source_override)
     output_slug = product.get("output_slug", sku)
@@ -75,6 +85,7 @@ def build_bundle(sku: str, product: dict, source_map: dict) -> dict:
     # 3. Logo reference
     try:
         from nano_banana.logo_refs import get_logo_reference
+
         logo = get_logo_reference(sku, collection)
         if logo and logo.exists():
             _copy(logo, bundle_path / f"logo-ref{logo.suffix}", files, "logo-ref")
@@ -148,7 +159,9 @@ def verify_bundles() -> list[str]:
                 issues.append(f"{bundle_dir.name} ({sku}): MISSING {tag} -> {filename}")
 
         # Check no unlisted files (except manifest.json and spec.txt)
-        actual_files = {f.name for f in bundle_dir.iterdir() if f.name not in ("manifest.json", "spec.txt")}
+        actual_files = {
+            f.name for f in bundle_dir.iterdir() if f.name not in ("manifest.json", "spec.txt")
+        }
         listed_files = {v for k, v in files.items() if k != "spec"}
         orphans = actual_files - listed_files
         if orphans:

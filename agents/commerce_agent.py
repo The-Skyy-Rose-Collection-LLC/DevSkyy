@@ -91,7 +91,12 @@ class CommerceAgent(EnhancedSuperAgent):
         "forecast": PromptTechnique.CHAIN_OF_THOUGHT,
     }
 
-    def __init__(self, config: AgentConfig | None = None, wordpress_client: Any = None):
+    def __init__(
+        self,
+        config: AgentConfig | None = None,
+        wordpress_client: Any = None,
+        rag_service: Any | None = None,
+    ):
         if config is None:
             config = AgentConfig(
                 name="commerce_agent",
@@ -111,6 +116,10 @@ class CommerceAgent(EnhancedSuperAgent):
         # WordPress/WooCommerce client
         self._wordpress_client = wordpress_client
         self._wordpress_connected = False
+
+        # RAGAnything — multimodal knowledge-base context
+        self._rag_service = rag_service
+        self._rag_collection = "skyyrose-catalog"
 
     def _build_system_prompt(self) -> str:
         """Build the commerce agent system prompt"""
@@ -325,6 +334,22 @@ When analyzing or recommending, use this structure:
                 parameters={
                     "tracking_number": {"type": "string", "description": "Tracking number"},
                     "carrier": {"type": "string", "description": "Carrier name"},
+                },
+            ),
+            # RAGAnything — product knowledge search
+            ToolDefinition(
+                name="rag_knowledge_search",
+                description=(
+                    "Search the SkyyRose product knowledge graph for detailed catalog, "
+                    "care instructions, sizing, fabric specs, or supplier information."
+                ),
+                parameters={
+                    "question": {"type": "string", "description": "Search question"},
+                    "mode": {
+                        "type": "string",
+                        "description": "Retrieval mode: local, global, hybrid, naive, mix",
+                        "default": "mix",
+                    },
                 },
             ),
         ]
@@ -581,8 +606,27 @@ When analyzing or recommending, use this structure:
                 task_type, self.select_technique(TaskCategory.REASONING)
             )
 
-            # Apply technique to enhance prompt
-            enhanced = self.apply_technique(technique, prompt, **kwargs)
+            # RAGAnything context enrichment — pre-fetch product knowledge
+            rag_context = None
+            if self._rag_service is not None:
+                try:
+                    rag_result = await self._rag_service.query(
+                        collection=self._rag_collection,
+                        question=prompt,
+                        mode="mix",
+                        top_k=5,
+                    )
+                    rag_context = rag_result.get("answer", "") or None
+                except Exception as rag_exc:
+                    logger.warning(f"RAG context fetch failed, continuing without: {rag_exc}")
+
+            # Apply technique to enhance prompt (inject RAG context when available)
+            enhanced = self.apply_technique(
+                technique,
+                prompt,
+                context=rag_context,
+                **{k: v for k, v in kwargs.items() if k != "context"},
+            )
 
             # Execute with backend
             if hasattr(self, "_backend_agent"):

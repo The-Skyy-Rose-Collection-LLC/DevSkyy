@@ -22,7 +22,6 @@ from skyyrose.elite_studio.quality.visual_regression import (
     VisualRegressionTester,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -110,10 +109,7 @@ class TestNoGoldenReference:
 
 class TestSSIMAboveThreshold:
     def test_pass_when_ssim_high(self, tmp_path: Path):
-        try:
-            from PIL import Image
-        except ImportError:
-            pytest.skip("Pillow not installed")
+        pytest.importorskip("PIL")
 
         golden_dir = tmp_path / "golden" / "br-001"
         golden_dir.mkdir(parents=True)
@@ -139,10 +135,7 @@ class TestSSIMAboveThreshold:
         assert result.threshold == 0.85
 
     def test_identical_images_pass(self, tmp_path: Path):
-        try:
-            from PIL import Image
-        except ImportError:
-            pytest.skip("Pillow not installed")
+        pytest.importorskip("PIL")
 
         golden_dir = tmp_path / "golden" / "br-002"
         golden_dir.mkdir(parents=True)
@@ -173,10 +166,7 @@ class TestSSIMAboveThreshold:
 
 class TestSSIMBelowThreshold:
     def test_fail_when_ssim_low(self, tmp_path: Path):
-        try:
-            from PIL import Image
-        except ImportError:
-            pytest.skip("Pillow not installed")
+        pytest.importorskip("PIL")
 
         golden_dir = tmp_path / "golden" / "br-003"
         golden_dir.mkdir(parents=True)
@@ -238,10 +228,7 @@ class TestSciKitImageFallback:
 
 class TestSetGolden:
     def test_set_golden_creates_file(self, tmp_path: Path):
-        try:
-            from PIL import Image
-        except ImportError:
-            pytest.skip("Pillow not installed")
+        pytest.importorskip("PIL")
 
         source_img = tmp_path / "approved.jpg"
         _make_test_jpeg(source_img)
@@ -256,10 +243,7 @@ class TestSetGolden:
         assert expected.exists()
 
     def test_set_golden_idempotent(self, tmp_path: Path):
-        try:
-            from PIL import Image
-        except ImportError:
-            pytest.skip("Pillow not installed")
+        pytest.importorskip("PIL")
 
         source_img = tmp_path / "approved.jpg"
         _make_test_jpeg(source_img)
@@ -282,10 +266,7 @@ class TestSetGolden:
 
 class TestHTMLReport:
     def test_report_generated_on_compare(self, tmp_path: Path):
-        try:
-            from PIL import Image
-        except ImportError:
-            pytest.skip("Pillow not installed")
+        pytest.importorskip("PIL")
 
         golden_dir = tmp_path / "golden" / "br-005"
         golden_dir.mkdir(parents=True)

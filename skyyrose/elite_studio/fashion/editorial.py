@@ -219,8 +219,7 @@ _RULES: dict[tuple[str, str], StylingRule] = {
         ),
         occasion="Daily carry, sport-luxury, festival, Oakland utility",
         collection_context=(
-            "Oakland luxury meets everyday utility. "
-            "Love Hurts embroidery on a functional form."
+            "Oakland luxury meets everyday utility. Love Hurts embroidery on a functional form."
         ),
     ),
     ("set", "kids-capsule"): StylingRule(
@@ -290,8 +289,17 @@ _LOOKBOOK_SEQUENCES: dict[str, list[str]] = {
 
 # Flat-lay preferred garment types
 _FLAT_LAY_PREFERRED = {"beanie", "fanny pack", "shirt"}
-_ON_MODEL_PREFERRED = {"hoodie", "crewneck", "joggers", "sweatpants", "shorts", "jacket",
-                        "varsity jacket", "set", "jersey"}
+_ON_MODEL_PREFERRED = {
+    "hoodie",
+    "crewneck",
+    "joggers",
+    "sweatpants",
+    "shorts",
+    "jacket",
+    "varsity jacket",
+    "set",
+    "jersey",
+}
 
 
 class EditorialDirector:
@@ -316,9 +324,7 @@ class EditorialDirector:
                 return r
         return _DEFAULT_RULE
 
-    def plan_lookbook_sequence(
-        self, products: list[str], collection: str
-    ) -> list[dict]:
+    def plan_lookbook_sequence(self, products: list[str], collection: str) -> list[dict]:
         """Plan a lookbook sequence for a set of product SKUs in a collection.
 
         Returns ordered list of dicts with shot description and product SKU.
@@ -327,20 +333,26 @@ class EditorialDirector:
         result: list[dict] = []
         for i, shot_description in enumerate(sequence_template):
             sku = products[i] if i < len(products) else ""
-            result.append({
-                "shot": i + 1,
-                "description": shot_description,
-                "sku": sku,
-                "collection": collection,
-            })
+            result.append(
+                {
+                    "shot": i + 1,
+                    "description": shot_description,
+                    "sku": sku,
+                    "collection": collection,
+                }
+            )
         # Append any extra products not in template
-        for j, extra_sku in enumerate(products[len(sequence_template):], start=len(sequence_template) + 1):
-            result.append({
-                "shot": j,
-                "description": f"Additional product shot: {extra_sku}",
-                "sku": extra_sku,
-                "collection": collection,
-            })
+        for j, extra_sku in enumerate(
+            products[len(sequence_template) :], start=len(sequence_template) + 1
+        ):
+            result.append(
+                {
+                    "shot": j,
+                    "description": f"Additional product shot: {extra_sku}",
+                    "sku": extra_sku,
+                    "collection": collection,
+                }
+            )
         return result
 
     def recommend_flat_vs_on_model(self, garment_type: str) -> str:
@@ -379,4 +391,6 @@ class EditorialDirector:
                 "Bright, clean, family-forward."
             ),
         }
-        return notes.get(collection.lower(), "SkyyRose brand aesthetic — luxury grows from concrete.")
+        return notes.get(
+            collection.lower(), "SkyyRose brand aesthetic — luxury grows from concrete."
+        )

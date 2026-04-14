@@ -52,12 +52,12 @@ class DesignIdeationAgent:
     """
 
     def __init__(self) -> None:
-        from ..knowledge import FashionKnowledgeBase
         from ..colorway import ColorAdvisor
-        from ..trends import TrendAdvisor
-        from ..materials import MaterialsExpert
         from ..editorial import EditorialDirector
+        from ..knowledge import FashionKnowledgeBase
+        from ..materials import MaterialsExpert
         from ..photography import PhotographyDirector
+        from ..trends import TrendAdvisor
 
         self._kb = FashionKnowledgeBase()
         self._color = ColorAdvisor()
@@ -76,20 +76,25 @@ class DesignIdeationAgent:
 
         # Resolve fabric
         garment = self._kb.get_garment(brief.garment_type)
-        fabric = garment.default_fabric if garment else self._kb.get_default_fabric_for_garment(
-            brief.garment_type
+        fabric = (
+            garment.default_fabric
+            if garment
+            else self._kb.get_default_fabric_for_garment(brief.garment_type)
         )
 
         # Material spec
         mat_spec = self._materials.get_rendering_spec(fabric)
         fabric_spec = (
-            f"{fabric}: {mat_spec.reference_description}" if mat_spec
+            f"{fabric}: {mat_spec.reference_description}"
+            if mat_spec
             else f"{fabric}: standard construction"
         )
 
         # Trend alignment
         trend_notes = self._trends.get_trend_notes_for_garment(brief.garment_type)
-        trend_str = "; ".join(trend_notes[:2]) if trend_notes else "Aligns with sport-luxury crossover"
+        trend_str = (
+            "; ".join(trend_notes[:2]) if trend_notes else "Aligns with sport-luxury crossover"
+        )
 
         # Styling direction
         styling_rule = self._editorial.get_styling(brief.garment_type, brief.collection)
@@ -99,7 +104,8 @@ class DesignIdeationAgent:
         photo_style = self._photography.recommend_style(brief.garment_type, brief.collection)
         photo_std = self._photography.get_standard(photo_style)
         photo_dir = (
-            f"{photo_style.upper()} style: {photo_std.lighting}" if photo_std
+            f"{photo_style.upper()} style: {photo_std.lighting}"
+            if photo_std
             else f"{photo_style.upper()} style photography"
         )
 
@@ -115,8 +121,7 @@ class DesignIdeationAgent:
         concept_name = f"{collection_display} {brief.garment_type.title()} — {brief.season}"
 
         headline = (
-            f"{brief.design_intent} in {collection_display} aesthetic "
-            f"with {fabric} construction."
+            f"{brief.design_intent} in {collection_display} aesthetic with {fabric} construction."
         )
 
         full_description = (

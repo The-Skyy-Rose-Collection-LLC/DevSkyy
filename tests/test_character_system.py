@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # CharacterSpec tests
 # ---------------------------------------------------------------------------
@@ -18,6 +17,7 @@ import pytest
 class TestCharacterSpec:
     def test_create_basic_spec(self):
         from skyyrose.elite_studio.character.models import CharacterSpec
+
         spec = CharacterSpec(
             name="Test Character",
             style="pixar-chibi",
@@ -33,6 +33,7 @@ class TestCharacterSpec:
 
     def test_spec_is_frozen(self):
         from skyyrose.elite_studio.character.models import CharacterSpec
+
         spec = CharacterSpec(
             name="Frozen Test",
             style="realistic",
@@ -47,6 +48,7 @@ class TestCharacterSpec:
 
     def test_spec_default_embedding_path(self):
         from skyyrose.elite_studio.character.models import CharacterSpec
+
         spec = CharacterSpec(
             name="Default",
             style="illustration",
@@ -60,6 +62,7 @@ class TestCharacterSpec:
 
     def test_character_pose_is_frozen(self):
         from skyyrose.elite_studio.character.models import CharacterPose
+
         pose = CharacterPose(
             success=True,
             character_name="Rosie",
@@ -72,6 +75,7 @@ class TestCharacterSpec:
 
     def test_character_sheet_is_frozen(self):
         from skyyrose.elite_studio.character.models import CharacterSheet, CharacterSpec
+
         spec = CharacterSpec(
             name="Sheet Test",
             style="pixar-chibi",
@@ -103,6 +107,7 @@ class TestCharacterCreationAgent:
     def setup_method(self):
         from skyyrose.elite_studio.character.agent import CharacterCreationAgent
         from skyyrose.elite_studio.character.models import CharacterSpec
+
         self.agent = CharacterCreationAgent()
         self.CharacterSpec = CharacterSpec
 
@@ -179,7 +184,9 @@ class TestCharacterCreationAgent:
         pose = self.agent.generate_pose(spec, "wave")
         assert pose.success is True
         assert pose.pose == "wave"
-        assert "wave" in pose.generation_prompt.lower() or "waving" in pose.generation_prompt.lower()
+        assert (
+            "wave" in pose.generation_prompt.lower() or "waving" in pose.generation_prompt.lower()
+        )
 
     def test_generate_pose_with_product_sku(self):
         spec = self.CharacterSpec(
@@ -205,12 +212,13 @@ class TestCharacterCreationAgent:
 class TestRosieMascot:
     def setup_method(self):
         from skyyrose.elite_studio.character.agent import CharacterCreationAgent
+
         self.agent = CharacterCreationAgent()
 
     def test_create_skyyrose_rosie_returns_success(self):
         sheet = self.agent.create_skyyrose_rosie()
         assert sheet.success is True
-        assert sheet.spec.name == "Rosie"
+        assert sheet.spec.name == "Skyy"
 
     def test_rosie_is_pixar_chibi(self):
         sheet = self.agent.create_skyyrose_rosie()
@@ -219,17 +227,24 @@ class TestRosieMascot:
     def test_rosie_has_brand_elements(self):
         sheet = self.agent.create_skyyrose_rosie()
         elements_text = " ".join(sheet.spec.brand_elements)
-        assert "rose gold" in elements_text.lower() or "#B76E79" in elements_text
+        # Skyy wears Love Hurts collection — crimson accents + Oakland tagline
+        assert (
+            "love hurts" in elements_text.lower()
+            or "crimson" in elements_text.lower()
+            or "luxury grows" in elements_text.lower()
+        )
 
-    def test_rosie_wears_black_rose_hoodie(self):
+    def test_rosie_wears_love_hurts_varsity(self):
         sheet = self.agent.create_skyyrose_rosie()
         outfit = sheet.spec.outfit_base.lower()
-        assert "hoodie" in outfit and ("black" in outfit or "br-004" in outfit or "dark" in outfit)
+        # Skyy wears the canonical Love Hurts varsity jacket as seen in the reference image
+        assert "varsity" in outfit or "love hurts" in outfit
 
-    def test_rosie_has_afro_puffs(self):
+    def test_rosie_has_natural_afro(self):
         sheet = self.agent.create_skyyrose_rosie()
         face = sheet.spec.face_features.lower()
-        assert "afro" in face and "puff" in face
+        # Skyy has a full natural afro (not afro puffs — canonical reference shows unrestrained hair)
+        assert "afro" in face
 
     def test_rosie_front_prompt_has_quality_markers(self):
         sheet = self.agent.create_skyyrose_rosie()
@@ -238,20 +253,24 @@ class TestRosieMascot:
 
     def test_rosie_brand_dna_present_in_prompts(self):
         sheet = self.agent.create_skyyrose_rosie()
-        all_prompts = " ".join([
-            sheet.front_view_prompt,
-            sheet.side_view_prompt,
-            sheet.back_view_prompt,
-        ])
+        all_prompts = " ".join(
+            [
+                sheet.front_view_prompt,
+                sheet.side_view_prompt,
+                sheet.back_view_prompt,
+            ]
+        )
         assert "skyyrose" in all_prompts.lower() or "SkyyRose" in all_prompts
 
     def test_rosie_tagline_present(self):
         sheet = self.agent.create_skyyrose_rosie()
-        all_prompts = " ".join([
-            sheet.front_view_prompt,
-            sheet.back_view_prompt,
-            sheet.expression_grid_prompt,
-        ])
+        all_prompts = " ".join(
+            [
+                sheet.front_view_prompt,
+                sheet.back_view_prompt,
+                sheet.expression_grid_prompt,
+            ]
+        )
         assert "Luxury Grows from Concrete" in all_prompts
 
     def test_rosie_is_young_black_girl(self):
@@ -262,10 +281,13 @@ class TestRosieMascot:
     def test_rosie_has_oakland_reference(self):
         sheet = self.agent.create_skyyrose_rosie()
         all_text = (
-            sheet.spec.body_description + sheet.spec.face_features +
-            sheet.front_view_prompt
+            sheet.spec.body_description + sheet.spec.face_features + sheet.front_view_prompt
         ).lower()
-        assert "oakland" in all_text or "bay area" in all_text or "oakland" in " ".join(sheet.spec.brand_elements).lower()
+        assert (
+            "oakland" in all_text
+            or "bay area" in all_text
+            or "oakland" in " ".join(sheet.spec.brand_elements).lower()
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -277,6 +299,7 @@ class TestConsistencyManager:
     def setup_method(self):
         from skyyrose.elite_studio.character.consistency import ConsistencyManager
         from skyyrose.elite_studio.character.models import CharacterSpec
+
         self.manager = ConsistencyManager()
         self.CharacterSpec = CharacterSpec
 
@@ -335,6 +358,7 @@ class TestConsistencyManager:
 
     def test_build_consistency_prompt_function(self):
         from skyyrose.elite_studio.character.consistency import build_consistency_prompt
+
         spec = self._make_spec("Prompt Test")
         prompt = build_consistency_prompt(spec, "standing in Oakland alley")
         assert "CONSISTENCY ANCHOR" in prompt
@@ -350,6 +374,7 @@ class TestConsistencyManager:
 class TestSpriteGenerator:
     def setup_method(self):
         from skyyrose.elite_studio.character.sprite_generator import SpriteGenerator, SpriteSpec
+
         self.generator = SpriteGenerator()
         self.SpriteSpec = SpriteSpec
 
@@ -417,5 +442,6 @@ class TestSpriteGenerator:
     def test_rosie_sprite_prompts_mention_rosie_identity(self):
         result = self.generator.generate_skyyrose_mascot_sprites()
         for pose, prompt in result.sprite_prompts.items():
-            assert "Rosie" in prompt or "rosie" in prompt.lower(), \
-                f"Pose {pose} prompt missing Rosie identity"
+            assert (
+                "Rosie" in prompt or "rosie" in prompt.lower()
+            ), f"Pose {pose} prompt missing Rosie identity"

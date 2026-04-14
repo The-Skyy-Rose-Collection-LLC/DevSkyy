@@ -45,6 +45,8 @@ class TierLimits:
     api_requests_per_minute: int
     storage_gb: int
     allowed_intents: frozenset[str]  # frozenset(["*"]) = all intents allowed
+    rag_queries_per_month: int = 0  # multimodal knowledge-base queries; -1 = unlimited
+    rag_ingest_per_month: int = 0  # documents ingested per month; -1 = unlimited
 
 
 # ---------------------------------------------------------------------------
@@ -61,6 +63,8 @@ _STARTER_INTENTS: frozenset[str] = frozenset(
         "scene-composite",
         "virtual-tryon",
         "moodboard",
+        "rag-query",
+        "rag-ingest",
     }
 )
 
@@ -79,6 +83,8 @@ TIER_LIMITS: dict[str, TierLimits] = {
         api_requests_per_minute=10,
         storage_gb=1,
         allowed_intents=_FREE_INTENTS,
+        rag_queries_per_month=0,
+        rag_ingest_per_month=0,
     ),
     "starter": TierLimits(
         renders_per_month=100,
@@ -88,6 +94,8 @@ TIER_LIMITS: dict[str, TierLimits] = {
         api_requests_per_minute=60,
         storage_gb=10,
         allowed_intents=_STARTER_INTENTS,
+        rag_queries_per_month=200,
+        rag_ingest_per_month=20,
     ),
     "pro": TierLimits(
         renders_per_month=1000,
@@ -97,6 +105,8 @@ TIER_LIMITS: dict[str, TierLimits] = {
         api_requests_per_minute=300,
         storage_gb=100,
         allowed_intents=_ALL_INTENTS,
+        rag_queries_per_month=2000,
+        rag_ingest_per_month=200,
     ),
     "enterprise": TierLimits(
         renders_per_month=-1,
@@ -106,6 +116,8 @@ TIER_LIMITS: dict[str, TierLimits] = {
         api_requests_per_minute=1000,
         storage_gb=1000,
         allowed_intents=_ALL_INTENTS,
+        rag_queries_per_month=-1,
+        rag_ingest_per_month=-1,
     ),
 }
 
@@ -121,6 +133,8 @@ _INTENT_QUOTA_MAP: dict[str, str] = {
     "3d-model": "models_3d_per_month",
     "social-pack": "social_packs_per_month",
     "product-copy": "api_requests_per_minute",  # text-only; track against API requests
+    "rag-query": "rag_queries_per_month",
+    "rag-ingest": "rag_ingest_per_month",
 }
 
 

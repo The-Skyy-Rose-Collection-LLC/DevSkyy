@@ -29,12 +29,16 @@ def entry_node(state: dict) -> dict:
 
     try:
         from .state import CreativeIntent
+
         valid_intents = {e.value for e in CreativeIntent}
         if intent not in valid_intents:
             return {
                 "status": "error",
                 "error": f"Unknown intent: {intent!r}. Valid intents: {sorted(valid_intents)}",
-                "stage_timings": {**state.get("stage_timings", {}), "entry": time.monotonic() - start},
+                "stage_timings": {
+                    **state.get("stage_timings", {}),
+                    "entry": time.monotonic() - start,
+                },
             }
 
         # Build FashionContext if we have enough info
@@ -42,6 +46,7 @@ def entry_node(state: dict) -> dict:
         if sku or params.get("garment_type") or params.get("collection"):
             try:
                 from skyyrose.elite_studio.fashion.context import FashionContextBuilder
+
                 builder = FashionContextBuilder()
                 if sku:
                     ctx = builder.build_from_product_catalog(sku)
@@ -89,8 +94,8 @@ def product_render_node(state: dict) -> dict:
     view = params.get("view", "front")
 
     try:
-        from skyyrose.elite_studio.graph.runner import run_single
         from skyyrose.elite_studio.graph.builder import GraphConfig
+        from skyyrose.elite_studio.graph.runner import run_single
 
         config = GraphConfig(
             enable_compositor=params.get("enable_compositor", False),
@@ -125,6 +130,7 @@ def product_render_node(state: dict) -> dict:
 def three_d_model_node(state: dict) -> dict:
     """Generate a 3D model from the product render via ThreeDGenerationPipeline."""
     import asyncio
+
     start = time.monotonic()
     params = state.get("params", {})
     image_path = params.get("image_path", "")
@@ -133,10 +139,12 @@ def three_d_model_node(state: dict) -> dict:
         from ai_3d.generation_pipeline import ThreeDGenerationPipeline
 
         pipeline = ThreeDGenerationPipeline()
-        result = asyncio.run(pipeline.generate_from_image(
-            image_path=image_path,
-            prompt=params.get("prompt", ""),
-        ))
+        result = asyncio.run(
+            pipeline.generate_from_image(
+                image_path=image_path,
+                prompt=params.get("prompt", ""),
+            )
+        )
         model_result = {
             "success": result.success,
             "model_path": getattr(result, "model_path", ""),
@@ -379,12 +387,13 @@ def design_ideation_node(state: dict) -> dict:
     fashion_context = state.get("fashion_context") or {}
 
     try:
-        from skyyrose.elite_studio.fashion.design.ideation import DesignIdeationAgent, DesignBrief
+        from skyyrose.elite_studio.fashion.design.ideation import DesignBrief, DesignIdeationAgent
 
         agent = DesignIdeationAgent()
         brief = DesignBrief(
             collection=params.get("collection") or _extract_collection(fashion_context),
-            garment_type=params.get("garment_type") or fashion_context.get("garment_type", "hoodie"),
+            garment_type=params.get("garment_type")
+            or fashion_context.get("garment_type", "hoodie"),
             season=params.get("season", "FW26"),
             target_price_usd=float(params.get("target_price_usd", 65.0)),
             design_intent=params.get("design_intent", "Premium SkyyRose luxury streetwear"),
@@ -430,7 +439,9 @@ def collection_plan_node(state: dict) -> dict:
         from skyyrose.elite_studio.fashion.design.collection_planner import CollectionPlanner
 
         planner = CollectionPlanner()
-        collection = params.get("collection") or _extract_collection(fashion_context) or "black-rose"
+        collection = (
+            params.get("collection") or _extract_collection(fashion_context) or "black-rose"
+        )
         plan = planner.plan_collection(
             collection=collection,
             season=params.get("season", "FW26"),

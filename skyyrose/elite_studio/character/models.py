@@ -36,7 +36,7 @@ class CharacterSheet:
     side_view_prompt: str
     back_view_prompt: str
     expression_grid_prompt: str  # 2x3 grid of 6 expressions
-    sprite_description: str      # description for web sprite generation
+    sprite_description: str  # description for web sprite generation
     error: str = ""
 
 

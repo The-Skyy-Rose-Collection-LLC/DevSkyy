@@ -24,19 +24,106 @@ logger = logging.getLogger(__name__)
 # Token-based similarity (no ML dependency required)
 # ---------------------------------------------------------------------------
 
-_STOP_WORDS = frozenset({
-    "a", "an", "the", "is", "are", "was", "were", "be", "been", "being",
-    "have", "has", "had", "do", "does", "did", "will", "would", "could",
-    "should", "may", "might", "shall", "can", "need", "dare", "ought",
-    "to", "of", "in", "for", "on", "with", "at", "by", "from", "as",
-    "into", "through", "during", "before", "after", "above", "below",
-    "between", "out", "off", "over", "under", "again", "further", "then",
-    "once", "and", "but", "or", "nor", "not", "so", "yet", "both",
-    "each", "all", "any", "few", "more", "most", "other", "some", "such",
-    "no", "only", "own", "same", "than", "too", "very", "just", "because",
-    "i", "me", "my", "we", "our", "you", "your", "it", "its", "this", "that",
-    "make", "create", "generate", "give", "want", "something",
-})
+_STOP_WORDS = frozenset(
+    {
+        "a",
+        "an",
+        "the",
+        "is",
+        "are",
+        "was",
+        "were",
+        "be",
+        "been",
+        "being",
+        "have",
+        "has",
+        "had",
+        "do",
+        "does",
+        "did",
+        "will",
+        "would",
+        "could",
+        "should",
+        "may",
+        "might",
+        "shall",
+        "can",
+        "need",
+        "dare",
+        "ought",
+        "to",
+        "of",
+        "in",
+        "for",
+        "on",
+        "with",
+        "at",
+        "by",
+        "from",
+        "as",
+        "into",
+        "through",
+        "during",
+        "before",
+        "after",
+        "above",
+        "below",
+        "between",
+        "out",
+        "off",
+        "over",
+        "under",
+        "again",
+        "further",
+        "then",
+        "once",
+        "and",
+        "but",
+        "or",
+        "nor",
+        "not",
+        "so",
+        "yet",
+        "both",
+        "each",
+        "all",
+        "any",
+        "few",
+        "more",
+        "most",
+        "other",
+        "some",
+        "such",
+        "no",
+        "only",
+        "own",
+        "same",
+        "than",
+        "too",
+        "very",
+        "just",
+        "because",
+        "i",
+        "me",
+        "my",
+        "we",
+        "our",
+        "you",
+        "your",
+        "it",
+        "its",
+        "this",
+        "that",
+        "make",
+        "create",
+        "generate",
+        "give",
+        "want",
+        "something",
+    }
+)
 
 
 def _tokenize(text: str) -> frozenset[str]:
@@ -89,9 +176,7 @@ class PromptCache:
             logger.warning("PromptCache: Redis unavailable — operating in passthrough mode")
             return None
 
-    def check(
-        self, prompt: str, intent: str, threshold: float = 0.75
-    ) -> EnhancedPrompt | None:
+    def check(self, prompt: str, intent: str, threshold: float = 0.75) -> EnhancedPrompt | None:
         """Find a cached enhancement for a similar prompt.
 
         First checks exact hash match, then falls back to similarity search.
@@ -141,9 +226,7 @@ class PromptCache:
             logger.warning("PromptCache: check failed", exc_info=True)
             return None
 
-    def store(
-        self, original: str, enhanced: Any, ttl: int | None = None
-    ) -> None:
+    def store(self, original: str, enhanced: Any, ttl: int | None = None) -> None:
         """Cache an enhanced prompt result."""
         if self._redis is None:
             return
@@ -212,17 +295,19 @@ class PromptCache:
 
     def _serialize(self, enhanced: Any) -> str:
         """Serialize an EnhancedPrompt to JSON."""
-        return json.dumps({
-            "original": enhanced.original,
-            "enhanced": enhanced.enhanced,
-            "intent": enhanced.intent,
-            "score_before": enhanced.score_before,
-            "score_after": enhanced.score_after,
-            "context_added": list(enhanced.context_added),
-            "cache_key": enhanced.cache_key,
-            "template_used": enhanced.template_used,
-            "cached_at": time.time(),
-        })
+        return json.dumps(
+            {
+                "original": enhanced.original,
+                "enhanced": enhanced.enhanced,
+                "intent": enhanced.intent,
+                "score_before": enhanced.score_before,
+                "score_after": enhanced.score_after,
+                "context_added": list(enhanced.context_added),
+                "cache_key": enhanced.cache_key,
+                "template_used": enhanced.template_used,
+                "cached_at": time.time(),
+            }
+        )
 
     def _deserialize(self, json_str: str) -> Any:
         """Deserialize JSON back to EnhancedPrompt."""

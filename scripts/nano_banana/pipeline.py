@@ -141,8 +141,8 @@ class ProductionPipeline:
             generate_gemini,
             generate_gpt,
         )
-        from nano_banana.prompts import composite_prompt
         from nano_banana.prompt_registry import PromptRegistry
+        from nano_banana.prompts import composite_prompt
         from nano_banana.router import route_product
         from nano_banana.tournament import run_tournament
         from nano_banana.utils import quality_gate, save_image
@@ -531,9 +531,7 @@ def _find_bundle_dir(name: str, sku: str) -> Path | None:
     return None
 
 
-def _load_bundle_refs(
-    name: str, sku: str, source_path: Path, view: str
-) -> list[Path]:
+def _load_bundle_refs(name: str, sku: str, source_path: Path, view: str) -> list[Path]:
     """Load reference images from the product bundle directory.
 
     Bundles are named by product name (not SKU).

@@ -243,6 +243,7 @@ volumes:
   nginx_logs:
   prometheus_data:
   grafana_data:
+  raganything_data:
 
 networks:
   devskyy-network:

@@ -42,9 +42,9 @@ class MoodboardComposer:
 
     def __init__(self) -> None:
         from ..colorway import ColorAdvisor
-        from ..trends import TrendAdvisor
         from ..editorial import EditorialDirector
         from ..photography import PhotographyDirector
+        from ..trends import TrendAdvisor
 
         self._color = ColorAdvisor()
         self._trends = TrendAdvisor()
@@ -172,7 +172,9 @@ class MoodboardComposer:
                 "Family on Oakland street — multi-generational, brand passing forward",
             ),
         }
-        visual_references = visual_refs_map.get(collection.lower(), ("Collection visual references TBD",))
+        visual_references = visual_refs_map.get(
+            collection.lower(), ("Collection visual references TBD",)
+        )
 
         # Typography
         typography_map = {

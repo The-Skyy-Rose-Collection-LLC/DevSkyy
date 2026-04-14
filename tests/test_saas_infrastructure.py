@@ -25,7 +25,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-
 # =============================================================================
 # billing.plans
 # =============================================================================
@@ -124,7 +123,13 @@ class TestIntentAllowed:
     def test_pro_allows_all_intents(self):
         from billing.plans import intent_allowed
 
-        for intent in ["product-render", "3d-model", "social-pack", "virtual-tryon", "batch-render"]:
+        for intent in [
+            "product-render",
+            "3d-model",
+            "social-pack",
+            "virtual-tryon",
+            "batch-render",
+        ]:
             assert intent_allowed("pro", intent) is True, f"pro should allow {intent}"
 
     def test_enterprise_allows_all_intents(self):
@@ -221,7 +226,6 @@ class TestUsageMeteringFallback:
         assert remaining == -1
 
     def test_reset_period_clears_counters(self):
-        from datetime import UTC, datetime
 
         period = datetime.now(UTC).strftime("%Y-%m")
         self.metering.record("tenant-8", "product-render", count=5)
@@ -245,6 +249,7 @@ class TestUsageMeteringFakeRedis:
     def setup_method(self):
         try:
             import fakeredis  # type: ignore[import]
+
             from billing.metering import UsageMetering
 
             self.metering = UsageMetering.__new__(UsageMetering)
@@ -515,7 +520,6 @@ def mock_token_payload():
 @pytest.fixture
 def portal_client(mock_token_payload):
     """TestClient with auth dependency overridden."""
-    import importlib
 
     # Import app lazily to avoid side-effects at collection time
     try:
@@ -699,7 +703,6 @@ class TestTenantMiddleware:
         from unittest.mock import AsyncMock
 
         from starlette.requests import Request
-        from starlette.testclient import TestClient
 
         from core.middleware.tenant import tenant_middleware
 

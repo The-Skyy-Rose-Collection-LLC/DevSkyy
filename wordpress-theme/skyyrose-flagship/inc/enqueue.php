@@ -306,7 +306,8 @@ function skyyrose_enqueue_global_scripts() {
 
 	// Skyy 3D walking character — Three.js GLB viewer driven by mascot state events.
 	// Only enqueued when the .glb model file is present on disk.
-	$model_file = SKYYROSE_DIR . '/assets/models/skyy.glb';
+	$model_rel  = '/assets/models/skyy.glb';
+	$model_file = SKYYROSE_DIR . $model_rel;
 	if ( file_exists( $js_dir . '/skyy-3d.js' ) && file_exists( $model_file ) ) {
 		wp_enqueue_script(
 			'skyyrose-skyy-3d',
@@ -319,7 +320,7 @@ function skyyrose_enqueue_global_scripts() {
 			'skyyrose-skyy-3d',
 			'SKYY_3D_CONFIG',
 			array(
-				'modelUrl' => SKYYROSE_ASSETS_URI . '/models/skyy.glb',
+				'modelUrl' => SKYYROSE_ASSETS_URI . $model_rel,
 			)
 		);
 	}

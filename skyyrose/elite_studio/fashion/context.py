@@ -130,42 +130,49 @@ class FashionContextBuilder:
     def _get_kb(self):  # type: ignore[return]
         if self._kb is None:
             from .knowledge import FashionKnowledgeBase
+
             self._kb = FashionKnowledgeBase()
         return self._kb
 
     def _get_trends(self):  # type: ignore[return]
         if self._trends is None:
             from .trends import TrendAdvisor
+
             self._trends = TrendAdvisor()
         return self._trends
 
     def _get_photography(self):  # type: ignore[return]
         if self._photography is None:
             from .photography import PhotographyDirector
+
             self._photography = PhotographyDirector()
         return self._photography
 
     def _get_sizing(self):  # type: ignore[return]
         if self._sizing is None:
             from .sizing import SizingAdvisor
+
             self._sizing = SizingAdvisor()
         return self._sizing
 
     def _get_color(self):  # type: ignore[return]
         if self._color is None:
             from .colorway import ColorAdvisor
+
             self._color = ColorAdvisor()
         return self._color
 
     def _get_editorial(self):  # type: ignore[return]
         if self._editorial is None:
             from .editorial import EditorialDirector
+
             self._editorial = EditorialDirector()
         return self._editorial
 
     def _get_materials(self):  # type: ignore[return]
         if self._materials is None:
             from .materials import MaterialsExpert
+
             self._materials = MaterialsExpert()
         return self._materials
 
@@ -189,7 +196,9 @@ class FashionContextBuilder:
         """
         kb = self._get_kb()
         garment = kb.get_garment(garment_type) if garment_type else None
-        fabric = garment.default_fabric if garment else kb.get_default_fabric_for_garment(garment_type)
+        fabric = (
+            garment.default_fabric if garment else kb.get_default_fabric_for_garment(garment_type)
+        )
 
         # Photography direction
         photo_dir = self._get_photography()
@@ -201,8 +210,10 @@ class FashionContextBuilder:
         color_tuple = (palette.primary, palette.secondary, palette.accent)
 
         # Collection DNA
-        from .knowledge import BRAND_TAGLINE
         from skyyrose.elite_studio.prompts.templates import COLLECTION_DNA
+
+        from .knowledge import BRAND_TAGLINE
+
         dna_data = COLLECTION_DNA.get(collection.lower(), {})
         collection_dna = (
             f"{dna_data.get('name', collection)}: {dna_data.get('aesthetic', '')}. "
@@ -262,7 +273,9 @@ class FashionContextBuilder:
 
         if not row:
             logger.warning("SKU %s not found in product catalog — using defaults", sku)
-            return self.build(sku=sku, garment_type="garment", collection="", season=_DEFAULT_SEASON)
+            return self.build(
+                sku=sku, garment_type="garment", collection="", season=_DEFAULT_SEASON
+            )
 
         collection_slug = row.get("collection_slug", "").strip()
         product_name = row.get("name", "")

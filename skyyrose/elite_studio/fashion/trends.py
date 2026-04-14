@@ -186,11 +186,20 @@ for _trend in _TRENDS:
 
 # Garment relevance scoring — how many rising/peak trends apply
 _GARMENT_TREND_SCORES: dict[str, list[str]] = {
-    "hoodie": ["Oversized Silhouettes", "Sport-Luxury Crossover", "Monochromatic Dressing", "Elevated Embroidery"],
+    "hoodie": [
+        "Oversized Silhouettes",
+        "Sport-Luxury Crossover",
+        "Monochromatic Dressing",
+        "Elevated Embroidery",
+    ],
     "crewneck": ["Oversized Silhouettes", "Monochromatic Dressing", "Elevated Embroidery"],
     "jersey": ["Sport-Luxury Crossover", "Bay Area Cultural Pride", "Elevated Embroidery"],
     "joggers": ["Oversized Silhouettes", "Sport-Luxury Crossover", "Monochromatic Dressing"],
-    "sweatpants": ["Oversized Silhouettes", "Monochromatic Dressing", "Earth Tones & Muted Palettes"],
+    "sweatpants": [
+        "Oversized Silhouettes",
+        "Monochromatic Dressing",
+        "Earth Tones & Muted Palettes",
+    ],
     "shorts": ["Sport-Luxury Crossover", "Monochromatic Dressing"],
     "shirt": ["Oversized Silhouettes", "Sport-Luxury Crossover", "Bay Area Cultural Pride"],
     "jacket": ["Sherpa & Fleece Comeback", "Sport-Luxury Crossover"],
@@ -232,9 +241,7 @@ class TrendAdvisor:
 
         if season:
             season_upper = season.upper()
-            applicable_trends = [
-                t for t in applicable_trends if season_upper in t.season.upper()
-            ]
+            applicable_trends = [t for t in applicable_trends if season_upper in t.season.upper()]
 
         if not applicable_trends:
             return 0.3

@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Knowledge base tests
 # ---------------------------------------------------------------------------
@@ -18,6 +17,7 @@ import pytest
 class TestFashionKnowledgeBase:
     def setup_method(self):
         from skyyrose.elite_studio.fashion.knowledge import FashionKnowledgeBase
+
         self.kb = FashionKnowledgeBase()
 
     def test_get_garment_hoodie(self):
@@ -36,7 +36,9 @@ class TestFashionKnowledgeBase:
     def test_get_fabric_sherpa(self):
         fabric = self.kb.get_fabric("sherpa")
         assert fabric is not None
-        assert "pile" in fabric.rendering_notes.lower() or "texture" in fabric.rendering_notes.lower()
+        assert (
+            "pile" in fabric.rendering_notes.lower() or "texture" in fabric.rendering_notes.lower()
+        )
 
     def test_get_fabric_french_terry(self):
         fabric = self.kb.get_fabric("french terry")
@@ -67,6 +69,7 @@ class TestFashionKnowledgeBase:
 
     def test_brand_tagline_present(self):
         from skyyrose.elite_studio.fashion.knowledge import BRAND_TAGLINE
+
         assert "Luxury Grows from Concrete" in BRAND_TAGLINE
 
 
@@ -78,6 +81,7 @@ class TestFashionKnowledgeBase:
 class TestTrendAdvisor:
     def setup_method(self):
         from skyyrose.elite_studio.fashion.trends import TrendAdvisor
+
         self.advisor = TrendAdvisor()
 
     def test_get_current_trends_all(self):
@@ -140,6 +144,7 @@ class TestTrendAdvisor:
 class TestPhotographyDirector:
     def setup_method(self):
         from skyyrose.elite_studio.fashion.photography import PhotographyDirector
+
         self.director = PhotographyDirector()
 
     def test_get_standard_ecommerce(self):
@@ -192,6 +197,7 @@ class TestPhotographyDirector:
 class TestColorAdvisor:
     def setup_method(self):
         from skyyrose.elite_studio.fashion.colorway import ColorAdvisor
+
         self.advisor = ColorAdvisor()
 
     def test_get_collection_palette_black_rose(self):
@@ -244,6 +250,7 @@ class TestColorAdvisor:
 class TestSizingAdvisor:
     def setup_method(self):
         from skyyrose.elite_studio.fashion.sizing import SizingAdvisor
+
         self.advisor = SizingAdvisor()
 
     def test_get_guideline_hoodie(self):
@@ -286,6 +293,7 @@ class TestSizingAdvisor:
 class TestMaterialsExpert:
     def setup_method(self):
         from skyyrose.elite_studio.fashion.materials import MaterialsExpert
+
         self.expert = MaterialsExpert()
 
     def test_get_rendering_spec_sherpa(self):
@@ -302,17 +310,23 @@ class TestMaterialsExpert:
         assert self.expert.get_rendering_spec("unobtainium") is None
 
     def test_validate_texture_sherpa_pass(self):
-        assert self.expert.validate_texture(
-            "sherpa", "dense pile texture with deep micro-shadows between fibers"
-        ) is True
+        assert (
+            self.expert.validate_texture(
+                "sherpa", "dense pile texture with deep micro-shadows between fibers"
+            )
+            is True
+        )
 
     def test_validate_texture_sherpa_fail_on_flat(self):
         assert self.expert.validate_texture("sherpa", "flat smooth cotton surface") is False
 
     def test_validate_texture_mesh_pass(self):
-        assert self.expert.validate_texture(
-            "mesh", "open-weave grid pattern semi-transparent athletic mesh"
-        ) is True
+        assert (
+            self.expert.validate_texture(
+                "mesh", "open-weave grid pattern semi-transparent athletic mesh"
+            )
+            is True
+        )
 
     def test_validate_texture_mesh_fail_on_solid(self):
         assert self.expert.validate_texture("mesh", "solid opaque fabric surface") is False
@@ -341,6 +355,7 @@ class TestMaterialsExpert:
 class TestFashionQA:
     def setup_method(self):
         from skyyrose.elite_studio.fashion.qa_rules import FashionQA
+
         self.qa = FashionQA()
 
     def test_get_rules_all(self):
@@ -388,6 +403,7 @@ class TestFashionQA:
 class TestFashionContextBuilder:
     def setup_method(self):
         from skyyrose.elite_studio.fashion.context import FashionContextBuilder
+
         self.builder = FashionContextBuilder()
 
     def test_build_basic(self):
@@ -442,7 +458,8 @@ class TestFashionContextBuilder:
 
 class TestDesignIdeation:
     def setup_method(self):
-        from skyyrose.elite_studio.fashion.design.ideation import DesignIdeationAgent, DesignBrief
+        from skyyrose.elite_studio.fashion.design.ideation import DesignBrief, DesignIdeationAgent
+
         self.agent = DesignIdeationAgent()
         self.DesignBrief = DesignBrief
 
@@ -468,7 +485,9 @@ class TestDesignIdeation:
             design_intent="Bay Area pride tee",
         )
         concept = self.agent.generate_concept(brief)
-        assert "Signature" in concept.concept_name or "signature" in concept.generation_prompt.lower()
+        assert (
+            "Signature" in concept.concept_name or "signature" in concept.generation_prompt.lower()
+        )
 
     def test_generate_alternatives_returns_multiple(self):
         brief = self.DesignBrief(
@@ -502,6 +521,7 @@ class TestDesignIdeation:
 class TestCollectionPlanner:
     def setup_method(self):
         from skyyrose.elite_studio.fashion.design.collection_planner import CollectionPlanner
+
         self.planner = CollectionPlanner()
 
     def test_plan_black_rose_collection(self):

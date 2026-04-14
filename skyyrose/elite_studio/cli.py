@@ -198,6 +198,7 @@ def cmd_produce_async(args: argparse.Namespace) -> None:
 def cmd_create(args: argparse.Namespace) -> None:
     """Run a creative operation via the Creative Operations Hub."""
     import json
+
     from .creative.runner import run_creative
 
     params: dict = {}
@@ -410,7 +411,9 @@ def main(argv: list[str] | None = None) -> None:
     )
 
     # create (Creative Operations Hub)
-    p_create = sub.add_parser("create", help="Run a creative operation via the Creative Operations Hub")
+    p_create = sub.add_parser(
+        "create", help="Run a creative operation via the Creative Operations Hub"
+    )
     p_create.add_argument(
         "--intent",
         required=True,
@@ -424,7 +427,7 @@ def main(argv: list[str] | None = None) -> None:
     p_create.add_argument(
         "--params",
         default="",
-        help="JSON string of additional parameters (e.g. '{\"collection\": \"black-rose\"}')",
+        help='JSON string of additional parameters (e.g. \'{"collection": "black-rose"}\')',
     )
 
     args = parser.parse_args(argv)

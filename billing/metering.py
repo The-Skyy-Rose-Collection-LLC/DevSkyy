@@ -225,7 +225,5 @@ class UsageMetering:
             logger.info("UsageMetering connected to Redis: %s", redis_url.split("@")[-1])
             return client
         except Exception as exc:
-            logger.warning(
-                "Redis unavailable (%s) — UsageMetering using in-process fallback.", exc
-            )
+            logger.warning("Redis unavailable (%s) — UsageMetering using in-process fallback.", exc)
             return None

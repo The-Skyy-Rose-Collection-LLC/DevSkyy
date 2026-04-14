@@ -39,10 +39,10 @@ class CollectionPlanner:
     """
 
     def __init__(self) -> None:
-        from ..trends import TrendAdvisor
         from ..colorway import ColorAdvisor
         from ..editorial import EditorialDirector
         from ..photography import PhotographyDirector
+        from ..trends import TrendAdvisor
 
         self._trends = TrendAdvisor()
         self._color = ColorAdvisor()
@@ -68,20 +68,20 @@ class CollectionPlanner:
         # Trend hooks for this collection
         all_trends = self._trends.get_current_trends(season)
         rising_trends = [t for t in all_trends if t.direction in ("rising", "peak")]
-        trend_hooks = tuple(
-            t.name for t in rising_trends[:4]
-        )
+        trend_hooks = tuple(t.name for t in rising_trends[:4])
 
         # Collection-specific product category strategy
         category_map = {
-            "black-rose": (
-                "hoodie", "crewneck", "jersey", "joggers", "shorts", "jacket"
-            ),
-            "love-hurts": (
-                "joggers", "shorts", "varsity jacket", "fanny pack"
-            ),
+            "black-rose": ("hoodie", "crewneck", "jersey", "joggers", "shorts", "jacket"),
+            "love-hurts": ("joggers", "shorts", "varsity jacket", "fanny pack"),
             "signature": (
-                "shirt", "shorts", "hoodie", "crewneck", "sweatpants", "beanie", "jacket"
+                "shirt",
+                "shorts",
+                "hoodie",
+                "crewneck",
+                "sweatpants",
+                "beanie",
+                "jacket",
             ),
             "kids-capsule": ("set",),
         }
@@ -118,7 +118,9 @@ class CollectionPlanner:
             "signature": f"Entry ${25}–${30} (tees/beanie), mid ${40}–${65} (hoodies/shorts), premium ${80}–${195} (jacket/set)",
             "kids-capsule": f"Single price point ${40} per set",
         }
-        pricing_strategy = pricing_map.get(collection.lower(), "Tiered entry, mid, and hero pricing")
+        pricing_strategy = pricing_map.get(
+            collection.lower(), "Tiered entry, mid, and hero pricing"
+        )
 
         # Photography approach
         photo_style = self._photography.recommend_style("hoodie", collection)
@@ -144,11 +146,11 @@ class CollectionPlanner:
                 "3. Bay Area: Stay Golden set (sg-002, sg-003)",
                 "4. Essentials: Tees, Beanie, remaining pieces",
             ),
-            "kids-capsule": (
-                "1. Simultaneous drop: Red Set (kids-001) + Purple Set (kids-002)",
-            ),
+            "kids-capsule": ("1. Simultaneous drop: Red Set (kids-001) + Purple Set (kids-002)",),
         }
-        launch_sequence = launch_sequences.get(collection.lower(), ("1. Hero launch", "2. Full collection drop"))
+        launch_sequence = launch_sequences.get(
+            collection.lower(), ("1. Hero launch", "2. Full collection drop")
+        )
 
         # Colorway strategy
         colorway_strategy = (
@@ -183,6 +185,5 @@ class CollectionPlanner:
             "kids-capsule": "Little ones deserve luxury too. Next-gen SkyyRose.",
         }
         return [
-            self.plan_collection(collection, season, theme)
-            for collection, theme in themes.items()
+            self.plan_collection(collection, season, theme) for collection, theme in themes.items()
         ]

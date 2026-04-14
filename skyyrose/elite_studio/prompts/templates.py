@@ -94,9 +94,17 @@ def _build_templates() -> dict[str, PromptTemplate]:
             ),
             required_fields=("sku", "product_name", "collection", "view"),
             optional_fields=(
-                "garment_type", "color", "fabric", "construction_details",
-                "brand_elements", "lighting", "background", "resolution",
-                "aspect_ratio", "photography_style", "collection_aesthetic",
+                "garment_type",
+                "color",
+                "fabric",
+                "construction_details",
+                "brand_elements",
+                "lighting",
+                "background",
+                "resolution",
+                "aspect_ratio",
+                "photography_style",
+                "collection_aesthetic",
             ),
             example_output=(
                 "Generate an e-commerce product image of the BLACK Rose Hoodie — "
@@ -128,8 +136,14 @@ def _build_templates() -> dict[str, PromptTemplate]:
             ),
             required_fields=("sku", "product_name", "collection"),
             optional_fields=(
-                "garment_type", "color", "fabric", "drape_notes",
-                "output_format", "texture_res", "pbr", "brand_details",
+                "garment_type",
+                "color",
+                "fabric",
+                "drape_notes",
+                "output_format",
+                "texture_res",
+                "pbr",
+                "brand_details",
             ),
             example_output=(
                 "Generate a production-quality 3D model of the BLACK Rose Sherpa "
@@ -159,8 +173,13 @@ def _build_templates() -> dict[str, PromptTemplate]:
             ),
             required_fields=("sku", "product_name", "collection", "platforms"),
             optional_fields=(
-                "content_type", "brand_voice", "selling_points", "price",
-                "collection_mood", "hashtag_notes", "cta",
+                "content_type",
+                "brand_voice",
+                "selling_points",
+                "price",
+                "collection_mood",
+                "hashtag_notes",
+                "cta",
             ),
             example_output=(
                 "Create a social media content pack for the Love Hurts Varsity "
@@ -193,8 +212,13 @@ def _build_templates() -> dict[str, PromptTemplate]:
             ),
             required_fields=("sku", "product_name", "collection", "price"),
             optional_fields=(
-                "garment_type", "color", "fabric", "sizes", "preorder_note",
-                "collection_context", "brand_voice",
+                "garment_type",
+                "color",
+                "fabric",
+                "sizes",
+                "preorder_note",
+                "collection_context",
+                "brand_voice",
             ),
             example_output=(
                 "Write product copy for the BLACK Rose Joggers (br-002) from the "
@@ -224,8 +248,13 @@ def _build_templates() -> dict[str, PromptTemplate]:
             ),
             required_fields=("garment_type", "collection", "season"),
             optional_fields=(
-                "target_price", "aesthetic", "fabric", "colorway",
-                "inspirations", "constraints", "collection_dna",
+                "target_price",
+                "aesthetic",
+                "fabric",
+                "colorway",
+                "inspirations",
+                "constraints",
+                "collection_dna",
             ),
             example_output=(
                 "Design a new sherpa jacket for the Black Rose collection, season "
@@ -254,8 +283,12 @@ def _build_templates() -> dict[str, PromptTemplate]:
             ),
             required_fields=("garment_type", "collection", "description"),
             optional_fields=(
-                "mockup_type", "colorway", "fabric", "brand_elements",
-                "views", "style",
+                "mockup_type",
+                "colorway",
+                "fabric",
+                "brand_elements",
+                "views",
+                "style",
             ),
             example_output=(
                 "Create a technical flat mockup of a hoodie for the Love Hurts "
@@ -286,7 +319,9 @@ def _build_templates() -> dict[str, PromptTemplate]:
             ),
             required_fields=("character_name", "style"),
             optional_fields=(
-                "body_description", "face_features", "outfit",
+                "body_description",
+                "face_features",
+                "outfit",
                 "brand_elements",
             ),
             example_output=(
@@ -318,8 +353,12 @@ def _build_templates() -> dict[str, PromptTemplate]:
             ),
             required_fields=("sku", "product_name", "collection", "scene_description"),
             optional_fields=(
-                "scene_type", "lighting", "time_of_day", "mood",
-                "model_direction", "camera_angle",
+                "scene_type",
+                "lighting",
+                "time_of_day",
+                "mood",
+                "model_direction",
+                "camera_angle",
             ),
             example_output=(
                 "Composite the Stay Golden Shirt (sg-002) into an editorial "
@@ -350,8 +389,14 @@ def _build_templates() -> dict[str, PromptTemplate]:
             ),
             required_fields=("season", "collection"),
             optional_fields=(
-                "piece_count", "price_low", "price_high", "aesthetic",
-                "required_pieces", "fabrics", "color_story", "cadence",
+                "piece_count",
+                "price_low",
+                "price_high",
+                "aesthetic",
+                "required_pieces",
+                "fabrics",
+                "color_story",
+                "cadence",
             ),
             example_output=(
                 "Plan a FW26 collection for Black Rose. "
@@ -383,8 +428,13 @@ def _build_templates() -> dict[str, PromptTemplate]:
             ),
             required_fields=("sku", "product_name", "garment_type"),
             optional_fields=(
-                "fabric", "fabric_weight", "construction", "sizes",
-                "colorway", "branding", "hardware",
+                "fabric",
+                "fabric_weight",
+                "construction",
+                "sizes",
+                "colorway",
+                "branding",
+                "hardware",
             ),
             example_output=(
                 "Generate a tech pack for the BLACK Rose Hoodie — Signature "
@@ -419,8 +469,12 @@ def _build_templates() -> dict[str, PromptTemplate]:
             ),
             required_fields=("subject", "collection"),
             optional_fields=(
-                "season", "mood", "colors", "textures",
-                "references", "typography",
+                "season",
+                "mood",
+                "colors",
+                "textures",
+                "references",
+                "typography",
             ),
             example_output=(
                 "Create a mood board for the FW26 Love Hurts drop. "
@@ -454,8 +508,11 @@ def _build_templates() -> dict[str, PromptTemplate]:
             ),
             required_fields=("sku", "product_name", "collection"),
             optional_fields=(
-                "base_description", "current_colorway", "num_variations",
-                "direction", "constraints",
+                "base_description",
+                "current_colorway",
+                "num_variations",
+                "direction",
+                "constraints",
             ),
             example_output=(
                 "Explore colorway variations for the Mint & Lavender Hoodie "

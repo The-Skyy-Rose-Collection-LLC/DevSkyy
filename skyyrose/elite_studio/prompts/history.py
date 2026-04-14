@@ -38,9 +38,7 @@ class PromptHistory:
             client.ping()
             return client
         except Exception:
-            logger.warning(
-                "PromptHistory: Redis unavailable — history tracking disabled"
-            )
+            logger.warning("PromptHistory: Redis unavailable — history tracking disabled")
             return None
 
     def record(
@@ -67,14 +65,16 @@ class PromptHistory:
 
         try:
             key = f"{self.HISTORY_PREFIX}:{intent}"
-            entry = json.dumps({
-                "prompt": enhanced_prompt[:500],  # truncate for storage efficiency
-                "quality": round(result_quality, 3),
-                "job_id": job_id,
-                "context_added": list(context_added),
-                "template_used": template_used,
-                "recorded_at": time.time(),
-            })
+            entry = json.dumps(
+                {
+                    "prompt": enhanced_prompt[:500],  # truncate for storage efficiency
+                    "quality": round(result_quality, 3),
+                    "job_id": job_id,
+                    "context_added": list(context_added),
+                    "template_used": template_used,
+                    "recorded_at": time.time(),
+                }
+            )
 
             # Store with quality as score (higher = better)
             self._redis.zadd(key, {entry: result_quality})

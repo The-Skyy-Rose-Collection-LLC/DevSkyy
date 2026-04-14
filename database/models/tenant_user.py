@@ -49,11 +49,7 @@ class TenantUser(Base):
         default=lambda: datetime.now(UTC),
     )
 
-    __table_args__ = (
-        UniqueConstraint("tenant_id", "user_id", name="uq_tenant_user"),
-    )
+    __table_args__ = (UniqueConstraint("tenant_id", "user_id", name="uq_tenant_user"),)
 
     def __repr__(self) -> str:
-        return (
-            f"<TenantUser tenant={self.tenant_id!r} user={self.user_id!r} role={self.role!r}>"
-        )
+        return f"<TenantUser tenant={self.tenant_id!r} user={self.user_id!r} role={self.role!r}>"

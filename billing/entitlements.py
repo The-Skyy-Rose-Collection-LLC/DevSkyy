@@ -35,6 +35,8 @@ _UPGRADE_MAP: dict[str, str] = {
     "scene-composite": "starter",
     "virtual-tryon": "starter",
     "moodboard": "starter",
+    "rag-query": "starter",
+    "rag-ingest": "starter",
     "editorial": "pro",
     "batch-render": "pro",
     "custom-training": "enterprise",

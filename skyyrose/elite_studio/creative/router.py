@@ -11,16 +11,16 @@ from __future__ import annotations
 from langgraph.graph import END, StateGraph
 
 from .edges import (
-    ENTRY,
-    PRODUCT_RENDER,
-    THREE_D_MODEL,
-    SOCIAL_PACK,
-    PRODUCT_COPY,
     CHARACTER,
-    SCENE_COMPOSITE,
-    DESIGN_IDEATION,
     COLLECTION_PLAN,
+    DESIGN_IDEATION,
+    ENTRY,
     FINALIZE,
+    PRODUCT_COPY,
+    PRODUCT_RENDER,
+    SCENE_COMPOSITE,
+    SOCIAL_PACK,
+    THREE_D_MODEL,
     after_any,
     after_render,
     route_intent,
@@ -101,8 +101,15 @@ def build_creative_graph():  # type: ignore[return]
     )
 
     # All other nodes go directly to finalize
-    for node in (THREE_D_MODEL, SOCIAL_PACK, PRODUCT_COPY, CHARACTER,
-                 SCENE_COMPOSITE, DESIGN_IDEATION, COLLECTION_PLAN):
+    for node in (
+        THREE_D_MODEL,
+        SOCIAL_PACK,
+        PRODUCT_COPY,
+        CHARACTER,
+        SCENE_COMPOSITE,
+        DESIGN_IDEATION,
+        COLLECTION_PLAN,
+    ):
         graph.add_conditional_edges(node, after_any, {FINALIZE: FINALIZE})
 
     # Terminal edge

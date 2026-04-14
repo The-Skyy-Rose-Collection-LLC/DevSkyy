@@ -37,7 +37,6 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -323,9 +322,7 @@ class TestListOperations:
         return mock_redis
 
     def test_returns_paginated_list(self, creative_client):
-        ops = [
-            _fake_op_json(f"op-{i}", op_status="completed") for i in range(5)
-        ]
+        ops = [_fake_op_json(f"op-{i}", op_status="completed") for i in range(5)]
         mock_redis = self._build_redis_mock(ops)
 
         with patch("api.v2.creative._get_redis", return_value=mock_redis):

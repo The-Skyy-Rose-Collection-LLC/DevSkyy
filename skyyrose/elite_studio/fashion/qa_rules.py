@@ -339,15 +339,35 @@ _RULES: tuple[QARule, ...] = (
 _BY_CATEGORY: dict[str, list[QARule]] = {}
 _BY_GARMENT: dict[str, list[QARule]] = {
     "jersey": ["Jersey Number Placement", "Mesh Grid Pattern", "Embroidery Texture"],
-    "hoodie": ["French Terry Ribbing", "Garment Proportion Accuracy", "Construction Detail Visibility",
-                "SkyyRose Branding Visibility"],
+    "hoodie": [
+        "French Terry Ribbing",
+        "Garment Proportion Accuracy",
+        "Construction Detail Visibility",
+        "SkyyRose Branding Visibility",
+    ],
     "crewneck": ["French Terry Ribbing", "Garment Proportion Accuracy", "Embroidery Texture"],
-    "joggers": ["French Terry Ribbing", "Garment Proportion Accuracy", "Construction Detail Visibility"],
+    "joggers": [
+        "French Terry Ribbing",
+        "Garment Proportion Accuracy",
+        "Construction Detail Visibility",
+    ],
     "sweatpants": ["French Terry Ribbing", "Garment Proportion Accuracy"],
-    "shorts": ["Mesh Grid Pattern", "Garment Proportion Accuracy", "Construction Detail Visibility"],
+    "shorts": [
+        "Mesh Grid Pattern",
+        "Garment Proportion Accuracy",
+        "Construction Detail Visibility",
+    ],
     "shirt": ["No Placeholder or Watermark", "Garment Proportion Accuracy"],
-    "jacket": ["Sherpa Pile Visibility", "Construction Detail Visibility", "Garment Proportion Accuracy"],
-    "varsity jacket": ["Satin Specular Highlight", "Embroidery Texture", "Construction Detail Visibility"],
+    "jacket": [
+        "Sherpa Pile Visibility",
+        "Construction Detail Visibility",
+        "Garment Proportion Accuracy",
+    ],
+    "varsity jacket": [
+        "Satin Specular Highlight",
+        "Embroidery Texture",
+        "Construction Detail Visibility",
+    ],
     "beanie": ["Embroidery Texture", "SkyyRose Branding Visibility"],
     "fanny pack": ["Construction Detail Visibility", "SkyyRose Branding Visibility"],
     "set": ["Kids Capsule Age Appropriateness", "Garment Proportion Accuracy"],
@@ -355,19 +375,28 @@ _BY_GARMENT: dict[str, list[QARule]] = {
 
 _BY_COLLECTION: dict[str, list[str]] = {
     "black-rose": [
-        "Black Rose Dark Tone", "Sherpa Pile Visibility", "Mesh Grid Pattern",
-        "Jersey Number Placement", "Collection DNA Consistency", "Embroidery Texture",
+        "Black Rose Dark Tone",
+        "Sherpa Pile Visibility",
+        "Mesh Grid Pattern",
+        "Jersey Number Placement",
+        "Collection DNA Consistency",
+        "Embroidery Texture",
     ],
     "love-hurts": [
-        "Love Hurts Crimson Accuracy", "Satin Specular Highlight",
-        "Collection DNA Consistency", "Embroidery Texture",
+        "Love Hurts Crimson Accuracy",
+        "Satin Specular Highlight",
+        "Collection DNA Consistency",
+        "Embroidery Texture",
     ],
     "signature": [
-        "Signature Gold Fidelity", "Rose Gold Brand Accent",
-        "Collection DNA Consistency", "Sherpa Pile Visibility",
+        "Signature Gold Fidelity",
+        "Rose Gold Brand Accent",
+        "Collection DNA Consistency",
+        "Sherpa Pile Visibility",
     ],
     "kids-capsule": [
-        "Kids Capsule Age Appropriateness", "Collection DNA Consistency",
+        "Kids Capsule Age Appropriateness",
+        "Collection DNA Consistency",
         "Rose Gold Brand Accent",
     ],
 }

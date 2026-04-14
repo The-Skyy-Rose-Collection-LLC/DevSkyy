@@ -11,7 +11,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-
 # ---------------------------------------------------------------------------
 # Brand constants (canonical — mirrors templates.py)
 # ---------------------------------------------------------------------------
@@ -72,12 +71,10 @@ _GARMENT_CATALOGUE: tuple[GarmentType, ...] = (
         category="tops",
         default_fabric="french terry",
         construction_notes=(
-            "ribbed crew neck, ribbed cuffs and hem, "
-            "double-needle stitching throughout"
+            "ribbed crew neck, ribbed cuffs and hem, double-needle stitching throughout"
         ),
         photography_style=(
-            "front + back flat lay on clean background; "
-            "on-model chest-up for lifestyle"
+            "front + back flat lay on clean background; on-model chest-up for lifestyle"
         ),
         sizing_notes="S-3XL unisex relaxed fit; chest + shoulder measurement key",
     ),
@@ -101,12 +98,10 @@ _GARMENT_CATALOGUE: tuple[GarmentType, ...] = (
         category="bottoms",
         default_fabric="french terry",
         construction_notes=(
-            "elastic waistband with drawstring, tapered leg, "
-            "ribbed ankle cuffs, side pockets"
+            "elastic waistband with drawstring, tapered leg, ribbed ankle cuffs, side pockets"
         ),
         photography_style=(
-            "flat lay front + back; on-model full-length for fit reference; "
-            "waistband detail shot"
+            "flat lay front + back; on-model full-length for fit reference; waistband detail shot"
         ),
         sizing_notes="S-3XL unisex relaxed through thigh, tapered at ankle",
     ),
@@ -119,8 +114,7 @@ _GARMENT_CATALOGUE: tuple[GarmentType, ...] = (
             "ribbed ankle cuffs, side and back pockets"
         ),
         photography_style=(
-            "flat lay front + back; on-model full-length; "
-            "waistband and pocket detail"
+            "flat lay front + back; on-model full-length; waistband and pocket detail"
         ),
         sizing_notes="S-3XL unisex relaxed fit throughout",
     ),
@@ -146,10 +140,7 @@ _GARMENT_CATALOGUE: tuple[GarmentType, ...] = (
             "crew or v-neck, short or long sleeve, "
             "taped seams for premium finish, heat-transfer or screen print graphics"
         ),
-        photography_style=(
-            "front + back flat lay; on-model chest-up; "
-            "graphic detail close-up"
-        ),
+        photography_style=("front + back flat lay; on-model chest-up; graphic detail close-up"),
         sizing_notes="XS-2XL unisex regular fit; chest measurement primary",
     ),
     GarmentType(
@@ -188,12 +179,10 @@ _GARMENT_CATALOGUE: tuple[GarmentType, ...] = (
         category="accessories",
         default_fabric="knit",
         construction_notes=(
-            "double-layer rib knit, folded cuff, "
-            "embroidered patch or woven label branding"
+            "double-layer rib knit, folded cuff, embroidered patch or woven label branding"
         ),
         photography_style=(
-            "on-head 3/4 angle; flat lay showing inner label; "
-            "embroidery detail close-up"
+            "on-head 3/4 angle; flat lay showing inner label; embroidery detail close-up"
         ),
         sizing_notes="One Size; one-size-fits-most ribbed stretch",
     ),

@@ -132,6 +132,7 @@ dump.rdb
 
 # Vector databases (runtime-generated)
 data/vectordb/
+data/raganything/
 data/*.sqlite3
 data/*.db
 .vercel

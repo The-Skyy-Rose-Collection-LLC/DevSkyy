@@ -22,7 +22,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from pydantic import BaseModel, Field, field_validator
 
 from skyyrose.elite_studio.queue.job_types import EliteStudioJobResult
-from skyyrose.elite_studio.queue.producer import enqueue_batch, enqueue_produce, enqueue_creative
+from skyyrose.elite_studio.queue.producer import enqueue_batch, enqueue_creative, enqueue_produce
 
 logger = logging.getLogger(__name__)
 
@@ -477,6 +477,7 @@ class CreateRequest(BaseModel):
     @classmethod
     def _validate_intent(cls, v: str) -> str:
         from skyyrose.elite_studio.creative.state import CreativeIntent
+
         valid = {e.value for e in CreativeIntent}
         if v not in valid:
             raise ValueError(f"intent must be one of {sorted(valid)}, got: {v!r}")

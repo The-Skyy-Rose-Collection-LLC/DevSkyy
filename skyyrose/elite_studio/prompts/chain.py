@@ -14,9 +14,9 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from skyyrose.elite_studio.prompts.analyzer import (
-    PromptAnalyzer,
     _COLLECTIONS,
     _SKU_PREFIXES,
+    PromptAnalyzer,
 )
 from skyyrose.elite_studio.prompts.templates import (
     BRAND_COLORS,
@@ -31,8 +31,18 @@ from skyyrose.elite_studio.prompts.templates import (
 # ---------------------------------------------------------------------------
 
 _MONTH_TO_SEASON = {
-    1: "SS", 2: "SS", 3: "SS", 4: "SS", 5: "SS", 6: "SS",
-    7: "FW", 8: "FW", 9: "FW", 10: "FW", 11: "FW", 12: "FW",
+    1: "SS",
+    2: "SS",
+    3: "SS",
+    4: "SS",
+    5: "SS",
+    6: "SS",
+    7: "FW",
+    8: "FW",
+    9: "FW",
+    10: "FW",
+    11: "FW",
+    12: "FW",
 }
 
 
@@ -159,9 +169,7 @@ class PromptChain:
 
         # Pre-compute shared detections (avoid redundant calls across stages)
         garment = _detect_garment_type(prompt)
-        collection = (
-            _detect_collection_from_sku(prompt) or _detect_collection_from_name(prompt)
-        )
+        collection = _detect_collection_from_sku(prompt) or _detect_collection_from_name(prompt)
         missing_set = frozenset(analysis.missing)
 
         # Stage 2: Context Expansion
@@ -170,14 +178,16 @@ class PromptChain:
         )
 
         # Stage 3: Domain Injection
-        domain_enriched = self._inject_domain(
-            expanded, resolved_intent, garment, context_added
-        )
+        domain_enriched = self._inject_domain(expanded, resolved_intent, garment, context_added)
 
         # Stage 4: Brand Injection
         branded = self._inject_brand(
-            domain_enriched, resolved_intent, collection,
-            fashion_context, brand_context, context_added,
+            domain_enriched,
+            resolved_intent,
+            collection,
+            fashion_context,
+            brand_context,
+            context_added,
         )
 
         # Stage 5: Agent Optimization
@@ -235,9 +245,7 @@ class PromptChain:
 
         return ". ".join(parts) + "."
 
-    def _inject_domain(
-        self, prompt: str, intent: str, garment: str, added: list[str]
-    ) -> str:
+    def _inject_domain(self, prompt: str, intent: str, garment: str, added: list[str]) -> str:
         """Inject fashion-specific domain knowledge."""
         parts = [prompt.rstrip(".")]
 

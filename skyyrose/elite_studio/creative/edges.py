@@ -30,13 +30,13 @@ _INTENT_TO_NODE: dict[str, str] = {
     CreativeIntent.PRODUCT_COPY: PRODUCT_COPY,
     CreativeIntent.CHARACTER_SHEET: CHARACTER,
     CreativeIntent.SCENE_COMPOSITE: SCENE_COMPOSITE,
-    CreativeIntent.VIRTUAL_TRYON: PRODUCT_RENDER,   # tryon uses render pipeline
+    CreativeIntent.VIRTUAL_TRYON: PRODUCT_RENDER,  # tryon uses render pipeline
     CreativeIntent.FULL_PRODUCT_LAUNCH: PRODUCT_RENDER,  # starts with render
     CreativeIntent.DESIGN_IDEATION: DESIGN_IDEATION,
-    CreativeIntent.MOCKUP: DESIGN_IDEATION,          # mockup is a design sub-intent
+    CreativeIntent.MOCKUP: DESIGN_IDEATION,  # mockup is a design sub-intent
     CreativeIntent.COLLECTION_PLAN: COLLECTION_PLAN,
-    CreativeIntent.TECH_PACK: DESIGN_IDEATION,       # tech pack via design agent
-    CreativeIntent.MOODBOARD: DESIGN_IDEATION,       # moodboard via design agent
+    CreativeIntent.TECH_PACK: DESIGN_IDEATION,  # tech pack via design agent
+    CreativeIntent.MOODBOARD: DESIGN_IDEATION,  # moodboard via design agent
     CreativeIntent.COLORWAY_EXPLORE: DESIGN_IDEATION,  # colorway via design agent
 }
 

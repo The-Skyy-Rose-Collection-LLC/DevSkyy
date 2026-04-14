@@ -159,9 +159,7 @@ async def subscribe(
     client_secret = None
     try:
         client_secret = (
-            subscription.get("latest_invoice", {})
-            .get("payment_intent", {})
-            .get("client_secret")
+            subscription.get("latest_invoice", {}).get("payment_intent", {}).get("client_secret")
         )
     except Exception:
         pass
@@ -261,9 +259,7 @@ async def update_subscription(
 
     subscription = None
     if customer_id:
-        subscription = stripe.create_subscription(
-            customer_id=customer_id, price_id=price_id
-        )
+        subscription = stripe.create_subscription(customer_id=customer_id, price_id=price_id)
 
     return SubscribeResponse(
         tenant_id=tenant_id,

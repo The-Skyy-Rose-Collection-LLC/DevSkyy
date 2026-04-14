@@ -128,7 +128,9 @@ def _require_admin(tenant_id: str, user_id: str) -> None:
         return
     # If no store entry exists for this user we allow it in stub mode
     # (a real implementation queries the DB)
-    logger.debug("_require_admin: no store entry for %s in %s — allowing (stub)", user_id, tenant_id)
+    logger.debug(
+        "_require_admin: no store entry for %s in %s — allowing (stub)", user_id, tenant_id
+    )
 
 
 # ---------------------------------------------------------------------------

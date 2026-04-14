@@ -60,12 +60,7 @@
 
 		var base = 'https://cdn.jsdelivr.net/npm/three@0.170.0';
 
-		var scriptThree = document.createElement( 'script' );
-		scriptThree.src  = base + '/build/three.module.js';
-		scriptThree.type = 'module';
-
-		// Use importmap approach — inject a module script that imports THREE
-		// and attaches it to window for non-module callers.
+		// Inject a module script that imports THREE and attaches it to window.
 		var injectScript = document.createElement( 'script' );
 		injectScript.type = 'module';
 		injectScript.textContent = [
@@ -181,6 +176,11 @@
 						actions[ clip.name.toLowerCase() ] = mixer.clipAction( clip );
 					} );
 
+					// Warn if expected clip names weren't found (helps debug GLB exports).
+					if ( ! actions[ CLIP_IDLE ] || ! actions[ CLIP_WALK ] ) {
+						console.warn( 'Skyy 3D: expected clips "idle"/"walk" not found. Available:', Object.keys( actions ) );
+					}
+
 					// Start with idle, transition to walk when event fires
 					playAction( CLIP_IDLE );
 				}
@@ -233,48 +233,51 @@
 	// -------------------------------------------------------------------------
 
 	function bindMascotEvents() {
+		// Track excited-animation timer so it can be cancelled on state change.
+		var excitedTimer = null;
+
+		function clearExcitedTimer() {
+			if ( excitedTimer !== null ) {
+				clearTimeout( excitedTimer );
+				excitedTimer = null;
+			}
+		}
+
 		// The mascot.min.js dispatches CustomEvents that we listen for here
 		document.addEventListener( 'skyy:walking-in', function () {
+			clearExcitedTimer();
 			playAction( CLIP_WALK, { fadeIn: 0.2, fadeOut: 0.2 } );
 		} );
 
 		document.addEventListener( 'skyy:idle', function () {
+			clearExcitedTimer();
 			playAction( CLIP_IDLE, { fadeIn: 0.4, fadeOut: 0.4 } );
 		} );
 
 		document.addEventListener( 'skyy:speaking', function () {
+			clearExcitedTimer();
 			// Play talk clip if available, else stay on idle
 			playAction( actions.talk ? 'talk' : CLIP_IDLE );
 		} );
 
 		document.addEventListener( 'skyy:exiting', function () {
+			clearExcitedTimer();
 			playAction( CLIP_WALK, { fadeIn: 0.2, fadeOut: 0.2 } );
 		} );
 
 		document.addEventListener( 'skyy:excited', function () {
 			var exciteClip = actions.jump || actions.wave || actions[ CLIP_IDLE ];
 			if ( ! exciteClip ) return;
+			clearExcitedTimer();
 			currentAction && currentAction.fadeOut( 0.15 );
 			exciteClip.reset().fadeIn( 0.15 ).play();
 			currentAction = exciteClip;
-			setTimeout( function () {
+			excitedTimer = setTimeout( function () {
+				excitedTimer = null;
 				playAction( CLIP_IDLE, { fadeIn: 0.3, fadeOut: 0.3 } );
 			}, 1000 );
 		} );
 	}
-
-	// -------------------------------------------------------------------------
-	// Responsive resize
-	// -------------------------------------------------------------------------
-
-	function onResize() {
-		if ( ! renderer ) return;
-		renderer.setSize( CHARACTER_W, CHARACTER_H );
-		camera.aspect = CHARACTER_W / CHARACTER_H;
-		camera.updateProjectionMatrix();
-	}
-
-	window.addEventListener( 'resize', onResize );
 
 	// -------------------------------------------------------------------------
 	// Bootstrap

@@ -31,9 +31,7 @@ _ASSET_KEY_PREFIX = "elite_studio:v2:asset:"
 _RESULT_KEY_PREFIX = "elite_studio:result:"
 
 # Valid asset types surfaced by the pipeline
-_VALID_ASSET_TYPES = frozenset(
-    {"render", "3d-model", "social-pack", "copy", "character-sheet"}
-)
+_VALID_ASSET_TYPES = frozenset({"render", "3d-model", "social-pack", "copy", "character-sheet"})
 
 
 # ---------------------------------------------------------------------------

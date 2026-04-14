@@ -38,8 +38,8 @@ class MockupGenerator:
     """
 
     def __init__(self) -> None:
-        from ..knowledge import FashionKnowledgeBase
         from ..colorway import ColorAdvisor
+        from ..knowledge import FashionKnowledgeBase
         from ..materials import MaterialsExpert
         from ..photography import PhotographyDirector
         from ..qa_rules import FashionQA
@@ -71,15 +71,13 @@ class MockupGenerator:
         style = self._photography.recommend_style(garment_type, collection)
         std = self._photography.get_standard(style)
         photo_spec = (
-            f"{style}: {std.camera_angle} | {std.lighting}" if std
-            else f"{style} photography"
+            f"{style}: {std.camera_angle} | {std.lighting}" if std else f"{style} photography"
         )
 
         # Color spec
         palette = self._color.get_collection_palette(collection)
         color_spec = (
-            f"Primary {palette.primary}, secondary {palette.secondary}, "
-            f"accent {palette.accent}"
+            f"Primary {palette.primary}, secondary {palette.secondary}, accent {palette.accent}"
         )
 
         # Brand elements
@@ -130,7 +128,4 @@ class MockupGenerator:
     ) -> list[MockupResult]:
         """Generate mockup specs for all standard views of a product."""
         views = ["front", "back", "detail", "lifestyle"]
-        return [
-            self.generate_mockup_spec(sku, garment_type, collection, view)
-            for view in views
-        ]
+        return [self.generate_mockup_spec(sku, garment_type, collection, view) for view in views]

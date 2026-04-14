@@ -42,11 +42,11 @@ class TechPackGenerator:
     """
 
     def __init__(self) -> None:
-        from ..knowledge import FashionKnowledgeBase
         from ..colorway import ColorAdvisor
-        from ..sizing import SizingAdvisor
+        from ..knowledge import FashionKnowledgeBase
         from ..materials import MaterialsExpert
         from ..qa_rules import FashionQA
+        from ..sizing import SizingAdvisor
 
         self._kb = FashionKnowledgeBase()
         self._color = ColorAdvisor()
@@ -67,7 +67,11 @@ class TechPackGenerator:
 
         # Garment and fabric
         garment = self._kb.get_garment(garment_type)
-        fabric = garment.default_fabric if garment else self._kb.get_default_fabric_for_garment(garment_type)
+        fabric = (
+            garment.default_fabric
+            if garment
+            else self._kb.get_default_fabric_for_garment(garment_type)
+        )
         construction = garment.construction_notes if garment else "Standard construction"
 
         # Fabric spec
@@ -125,10 +129,13 @@ class TechPackGenerator:
                 "Hood interior: hidden rose garden embroidery",
             ),
         }
-        branding = branding_map.get(garment_type.lower(), (
-            "Left chest: SkyyRose rose embroidery (2-3 inch)",
-            "Inner label: woven brand label",
-        ))
+        branding = branding_map.get(
+            garment_type.lower(),
+            (
+                "Left chest: SkyyRose rose embroidery (2-3 inch)",
+                "Inner label: woven brand label",
+            ),
+        )
 
         # Hardware
         hardware_map = {
@@ -161,7 +168,9 @@ class TechPackGenerator:
 
         # QA checklist
         qa_rules = self._qa.get_rules_for_garment(garment_type)
-        qa_checklist = tuple(f"[{r.category.upper()}] {r.name}: {r.pass_criteria[:80]}" for r in qa_rules[:5])
+        qa_checklist = tuple(
+            f"[{r.category.upper()}] {r.name}: {r.pass_criteria[:80]}" for r in qa_rules[:5]
+        )
 
         return TechPack(
             tech_pack_id=tech_pack_id,

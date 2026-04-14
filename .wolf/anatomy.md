@@ -1,7 +1,16 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-04-14T04:51:21.752Z
-> Files: 596 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-04-14T23:08:56.680Z
+> Files: 613 tracked | Anatomy hits: 0 | Misses: 0
+
+## ../.claude/
+
+- `settings.json` (~1500 tok)
+
+## ../.claude/plans/
+
+- `eager-doodling-fog.md` — Skyy — 100% Identical 3D Character Pipeline (~1726 tok)
+- `whimsical-toasting-cook.md` — Plan: RAGAnything Commercial Integration (~1685 tok)
 
 ## ./
 
@@ -42,7 +51,7 @@
 - `pnpm-lock.yaml` — pnpm lock file (~195082 tok)
 - `pre-build-check.sh` — DevSkyy Pre-Build Verification (~2307 tok)
 - `prometheus.yml` — DevSkyy - Prometheus Configuration (~790 tok)
-- `pyproject.toml` — Python project configuration (~3872 tok)
+- `pyproject.toml` — AI-driven multi-agent orchestration platform for enterprise e-commerce automation with WordPress/Woo (~3651 tok)
 - `README.md` — Project documentation (~1429 tok)
 - `requirements-dev.txt` — Development Dependencies (~85 tok)
 - `requirements-full.txt` — DevSkyy - Full ML/3D Dependencies (~46 tok)
@@ -76,7 +85,7 @@
 - `IMMEDIATE_REQUIREMENTS.md` — Immediate Requirements - READ THIS FIRST (~499 tok)
 - `mcp-config.json` (~116 tok)
 - `ralph-loop-iteration-2.md` — Ralph Loop Iteration 2 - MCP Server Loading Fix (~601 tok)
-- `settings.json` (~934 tok)
+- `settings.json` (~989 tok)
 - `settings.local.json` (~450 tok)
 
 ## .claude/agents/
@@ -1637,8 +1646,55 @@
 - `RenderPass.js.cjs` — Mock for three/examples/jsm/postprocessing/RenderPass.js (~80 tok)
 - `UnrealBloomPass.js.cjs` — Mock for three/examples/jsm/postprocessing/UnrealBloomPass.js (~111 tok)
 
+## api/v1/
+
+- `rag_anything.py` — API: 4 endpoints (~1987 tok)
+
+## billing/
+
+- `entitlements.py` — EntitlementResult: check, get_upgrade_message (~1530 tok)
+- `plans.py` — TierLimits: get_limits, intent_allowed, quota_remaining (~1686 tok)
+
+## frontend/components/mascot/
+
+- `MascotBubble.tsx` — COLLECTION_GREETINGS (~3509 tok)
+
+## services/
+
+- `rag_anything_service.py` — class: llm_model_func, initialize, ingest_document, query + 1 more (~4084 tok)
+
+## skyyrose/elite_studio/character/
+
+- `agent.py` — CharacterCreationAgent: create_sheet, generate_pose, create_skyyrose_rosie (~4156 tok)
+
 ## skyyrose/elite_studio/graph/
 
 - `builder.py` — GraphConfig: build_graph (~2673 tok)
 - `nodes.py` — vision_node, generator_node, quality_node, human_review_node (~4968 tok)
 - `state.py` — EliteStudioState: create_initial_state, extract_production_result (~1019 tok)
+
+## tests/
+
+- `test_character_system.py` — TestCharacterSpec: test_create_basic_spec, test_spec_is_frozen, test_spec_default_embedding_path, te (~4718 tok)
+
+## wordpress-theme/skyyrose-flagship/
+
+- `footer.php` — The template for displaying the footer (~3003 tok)
+- `front-page.php` — Front Page — SkyyRose v6.0 Editorial Homepage (~6222 tok)
+
+## wordpress-theme/skyyrose-flagship/assets/css/
+
+- `skyy-walk.css` — Skyy — Pixar-Like Walk Cycle Enhancements (~1816 tok)
+
+## wordpress-theme/skyyrose-flagship/assets/js/
+
+- `mascot.min.js` — SkyyRose Brand Mascot — Skyy Living Character (~4000 tok)
+- `skyy-3d.js` — Skyy — Three.js Walking Character (~2669 tok)
+
+## wordpress-theme/skyyrose-flagship/inc/
+
+- `enqueue.php` — Enqueue Scripts & Styles (~7479 tok)
+
+## wordpress-theme/skyyrose-flagship/template-parts/
+
+- `skyy-mascot.php` — Skyy — Living Character Widget (~1207 tok)

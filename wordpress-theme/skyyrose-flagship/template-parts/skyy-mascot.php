@@ -47,6 +47,7 @@ if ( is_front_page() ) {
 $recall_thumb = $skyy_img_url ?: '';
 ?>
 
+<?php if ( wp_script_is( 'skyyrose-skyy-3d', 'enqueued' ) ) : ?>
 <!-- Skyy 3D canvas — sits behind the speech bubble, driven by skyy-3d.js -->
 <canvas
 	id="skyy-3d-canvas"
@@ -56,6 +57,7 @@ $recall_thumb = $skyy_img_url ?: '';
 	aria-hidden="true"
 	style="position:fixed;bottom:20px;right:20px;z-index:9989;pointer-events:none;display:none;"
 ></canvas>
+<?php endif; ?>
 
 <!-- Skyy — Living Character Widget -->
 <div
@@ -97,15 +99,16 @@ $recall_thumb = $skyy_img_url ?: '';
 			</div>
 		<?php endif; ?>
 
-		<!-- Minimize × button (appears on idle/speaking) -->
-		<button
-			id="skyyrose-mascot-minimize"
-			class="skyyrose-mascot__minimize"
-			type="button"
-			aria-label="<?php esc_attr_e( 'Minimize Skyy', 'skyyrose-flagship' ); ?>"
-			tabindex="-1"
-		>&#215;</button>
 	</button>
+
+	<!-- Minimize × button — must be OUTSIDE the trigger to avoid nested <button> (invalid HTML) -->
+	<button
+		id="skyyrose-mascot-minimize"
+		class="skyyrose-mascot__minimize"
+		type="button"
+		aria-label="<?php esc_attr_e( 'Minimize Skyy', 'skyyrose-flagship' ); ?>"
+		tabindex="-1"
+	>&#215;</button>
 </div><!-- #skyyrose-mascot -->
 
 <!-- Recall pill — shown when minimised -->

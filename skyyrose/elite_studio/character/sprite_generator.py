@@ -36,7 +36,7 @@ class SpriteResult:
     success: bool
     character_name: str
     sprite_prompts: dict[str, str]  # pose -> generation prompt
-    css_animation_hint: str          # suggested CSS animation approach
+    css_animation_hint: str  # suggested CSS animation approach
     error: str = ""
 
 
