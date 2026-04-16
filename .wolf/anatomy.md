@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-04-16T20:42:51.327Z
-> Files: 650 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-04-16T21:11:25.376Z
+> Files: 653 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../.claude/
 
@@ -1693,6 +1693,14 @@
 - `image_ingestion.py` — Image ingestion service for downloading and processing images. (~5342 tok)
 - `rag_anything_service.py` — class: llm_model_func, initialize, ingest_document, query + 1 more (~4084 tok)
 
+## skyyrose/elite_studio/
+
+- `telemetry.py` — name: new_run_id, hash_inputs, emit, set + 1 more (~1277 tok)
+
+## skyyrose/elite_studio/agents/
+
+- `compositor_agent.py` — Logger: info, step, ok, fail + 2 more (~12690 tok)
+
 ## skyyrose/elite_studio/character/
 
 - `agent.py` — CharacterCreationAgent: create_sheet, generate_pose, create_skyyrose_rosie (~4156 tok)
@@ -1707,6 +1715,10 @@
 
 - `consumer.py` — EliteStudioWorker: process_job, run_forever (~3208 tok)
 - `producer.py` — enqueue_produce, enqueue_creative, enqueue_batch (~1323 tok)
+
+## skyyrose/elite_studio/tests/
+
+- `test_telemetry.py` — Tests for skyyrose.elite_studio.telemetry (Phase 1 compositor instrumentation). (~1239 tok)
 
 ## skyyrose/multi_agent/
 

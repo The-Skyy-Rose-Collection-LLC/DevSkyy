@@ -32,6 +32,8 @@ from ..config import (
 )
 from ..gemini_rest import analyze_vision
 from ..models import CompositorResult
+from ..telemetry import emit as _emit
+from ..telemetry import new_run_id as _new_run_id
 from ..utils import image_to_base64, upload_to_fal
 
 try:
@@ -135,6 +137,7 @@ class CompositorAgent:
         work.mkdir(parents=True, exist_ok=True)
 
         stages: dict[str, Any] = {}
+        run_id = _new_run_id()
         alpha_path = checkpoint_alpha
         relit_path = checkpoint_relit
         flux_prompt = checkpoint_prompt
@@ -153,6 +156,19 @@ class CompositorAgent:
                     "path": alpha_path,
                     "duration_s": round(time.time() - t0, 2),
                 }
+                _emit(
+                    {
+                        "run_id": run_id,
+                        "stage": "alpha",
+                        "sku": sku,
+                        "scene_name": scene_name,
+                        "collection": collection,
+                        "duration_ms": int((time.time() - t0) * 1000),
+                        "status": "ok",
+                        "provider": "bria-rmbg-2.0",
+                        "meta": {"path": alpha_path},
+                    }
+                )
                 stages_completed = 1
                 self.log.ok(f"Alpha: {alpha_path}")
                 time.sleep(COMPOSITOR_STAGE_DELAY)
@@ -173,6 +189,20 @@ class CompositorAgent:
                     "prompt_length": len(flux_prompt),
                     "duration_s": round(time.time() - t0, 2),
                 }
+                _emit(
+                    {
+                        "run_id": run_id,
+                        "stage": "prompt",
+                        "sku": sku,
+                        "scene_name": scene_name,
+                        "collection": collection,
+                        "duration_ms": int((time.time() - t0) * 1000),
+                        "status": "ok",
+                        "model": COMPOSITOR_OPUS_MODEL,
+                        "bytes_out": len(flux_prompt),
+                        "meta": {"prompt_length": len(flux_prompt)},
+                    }
+                )
                 stages_completed = 2
                 self.log.ok(f"Prompt: {len(flux_prompt)} chars")
                 time.sleep(COMPOSITOR_STAGE_DELAY)
@@ -188,6 +218,18 @@ class CompositorAgent:
                     "path": relit_path,
                     "duration_s": round(time.time() - t0, 2),
                 }
+                _emit(
+                    {
+                        "run_id": run_id,
+                        "stage": "relight",
+                        "sku": sku,
+                        "scene_name": scene_name,
+                        "collection": collection,
+                        "duration_ms": int((time.time() - t0) * 1000),
+                        "status": "ok",
+                        "meta": {"path": relit_path},
+                    }
+                )
                 stages_completed = 3
                 self.log.ok(f"Relit: {relit_path}")
                 time.sleep(COMPOSITOR_STAGE_DELAY)
@@ -232,6 +274,22 @@ class CompositorAgent:
                 "used_fallback": used_fallback,
                 "duration_s": round(time.time() - t0, 2),
             }
+            _emit(
+                {
+                    "run_id": run_id,
+                    "stage": "flux",
+                    "sku": sku,
+                    "scene_name": scene_name,
+                    "collection": collection,
+                    "duration_ms": int((time.time() - t0) * 1000),
+                    "status": "ok",
+                    "provider": provider,
+                    "meta": {
+                        "used_fallback": used_fallback,
+                        "fallback_provider": fallback_provider,
+                    },
+                }
+            )
             stages_completed = 4
             self.log.ok(f"Composite: {provider}")
             time.sleep(COMPOSITOR_STAGE_DELAY)
@@ -244,6 +302,18 @@ class CompositorAgent:
                 "path": final_path,
                 "duration_s": round(time.time() - t0, 2),
             }
+            _emit(
+                {
+                    "run_id": run_id,
+                    "stage": "shadows",
+                    "sku": sku,
+                    "scene_name": scene_name,
+                    "collection": collection,
+                    "duration_ms": int((time.time() - t0) * 1000),
+                    "status": "ok",
+                    "meta": {"path": final_path},
+                }
+            )
             stages_completed = 5
             self.log.ok(f"Shadows: {final_path}")
             time.sleep(COMPOSITOR_STAGE_DELAY)
@@ -257,6 +327,19 @@ class CompositorAgent:
                 "duration_s": round(time.time() - t0, 2),
                 **qa,
             }
+            _emit(
+                {
+                    "run_id": run_id,
+                    "stage": "qa",
+                    "sku": sku,
+                    "scene_name": scene_name,
+                    "collection": collection,
+                    "duration_ms": int((time.time() - t0) * 1000),
+                    "status": "ok",
+                    "model": "gemini-3-pro-image-preview",
+                    "meta": {"verdict": qa.get("status", "unknown")},
+                }
+            )
             stages_completed = 6
             self.log.ok(f"QA: {qa.get('status', 'unknown')}")
 
