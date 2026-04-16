@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-04-16T00:57:33.228Z
-> Files: 642 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-04-16T01:13:16.594Z
+> Files: 648 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../.claude/
 
@@ -1672,6 +1672,10 @@
 
 - `MascotBubble.tsx` — COLLECTION_GREETINGS (~3509 tok)
 
+## scripts/
+
+- `split_techflats.py` — Split composite techflat images into individual front/back views. (~2954 tok)
+
 ## sdk/python/agent_sdk/
 
 - `custom_tools.py` — generate_3d_model, virtual_tryon, check_task_status, manage_product (~4124 tok)
@@ -1686,6 +1690,7 @@
 
 ## services/
 
+- `image_ingestion.py` — Image ingestion service for downloading and processing images. (~5342 tok)
 - `rag_anything_service.py` — class: llm_model_func, initialize, ingest_document, query + 1 more (~4084 tok)
 
 ## skyyrose/elite_studio/character/
@@ -1702,6 +1707,10 @@
 
 - `consumer.py` — EliteStudioWorker: process_job, run_forever (~3208 tok)
 - `producer.py` — enqueue_produce, enqueue_creative, enqueue_batch (~1323 tok)
+
+## skyyrose/multi_agent/
+
+- `hooks.py` — audit_tool_use, guard_bash, log_file_edit, report_progress (~1457 tok)
 
 ## tasks/
 
@@ -1726,15 +1735,17 @@
 ## wordpress-theme/skyyrose-flagship/assets/css/
 
 - `brand-atmosphere.css` — Brand Atmosphere — Canvas Overlay Styles (~369 tok)
+- `personalization.css` — Personalization — Curated For You Grid (~1188 tok)
 - `skyy-walk.css` — Skyy — Pixar-Like Walk Cycle Enhancements (~1816 tok)
 - `smart-showcase.css` — Smart Showcase — Quick-View Dialog Styles (~2218 tok)
 
 ## wordpress-theme/skyyrose-flagship/assets/js/
 
 - `brand-atmosphere.js` — Brand Atmosphere — Canvas Particle System (~1978 tok)
-- `experience-analyzer.js` — Experience Analyzer — Behavioral Tracking & Event Relay (~1668 tok)
+- `experience-analyzer.js` — Experience Analyzer — Behavioral Tracking & Event Relay (~1857 tok)
 - `mascot.min.js` — SkyyRose Brand Mascot — Skyy Living Character (~4000 tok)
 - `performance-guardian.js` — Performance Guardian — FPS Watchdog & Animation Budget Manager (~951 tok)
+- `personalization.js` — Personalization — Curated For You (~2026 tok)
 - `skyy-3d.js` — Skyy — Three.js Walking Character (~2669 tok)
 - `smart-showcase.js` — Smart Showcase — Quick-View Dialog (~3113 tok)
 
@@ -1742,6 +1753,7 @@
 
 - `enqueue.php` — Enqueue Scripts & Styles (~8824 tok)
 - `performance-guardian.php` — Performance Guardian — Phase 2 (~848 tok)
+- `personalization.php` — Personalization — Curated For You (~834 tok)
 - `woocommerce.php` — WooCommerce Integration (~3982 tok)
 
 ## wordpress-theme/skyyrose-flagship/template-parts/

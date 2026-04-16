@@ -1,159 +1,539 @@
 {
-  "session_id": "session-2026-04-14-1528",
-  "started": "2026-04-14T22:28:25.237Z",
+  "session_id": "session-2026-04-15-1626",
+  "started": "2026-04-15T23:26:14.885Z",
   "files_read": {
-    "/Users/theceo/DevSkyy/billing/plans.py": {
+    "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/inc/enqueue.php": {
+      "count": 6,
+      "tokens": 8866,
+      "first_read": "2026-04-15T23:37:19.793Z"
+    },
+    "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/functions.php": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-15T23:37:43.429Z"
+    },
+    "/Users/theceo/DevSkyy/tasks/todo.md": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-15T23:41:29.580Z"
+    },
+    "/Users/theceo/.claude/get-shit-done/workflows/update.md": {
       "count": 2,
       "tokens": 0,
-      "first_read": "2026-04-14T22:29:38.015Z"
+      "first_read": "2026-04-15T23:41:49.948Z"
     },
-    "/Users/theceo/DevSkyy/billing/entitlements.py": {
+    "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/0246cad8-f2b5-4071-bc18-e46b1f7d27f6/tool-results/bstdj8hyu.txt": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-15T23:51:12.394Z"
+    },
+    "/Users/theceo/.claude/agents/gsd-codebase-mapper.md": {
       "count": 2,
       "tokens": 0,
-      "first_read": "2026-04-14T22:29:38.407Z"
+      "first_read": "2026-04-15T23:52:38.638Z"
     },
-    "/Users/theceo/DevSkyy/pyproject.toml": {
-      "count": 1,
-      "tokens": 3872,
-      "first_read": "2026-04-14T22:29:38.757Z"
+    "/Users/theceo/.claude/agents/gsd-integration-checker.md": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-04-15T23:52:38.948Z"
     },
-    "/Users/theceo/.claude/settings.json": {
-      "count": 1,
-      "tokens": 934,
-      "first_read": "2026-04-14T22:31:51.718Z"
+    "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/template-parts/product-card-holo.php": {
+      "count": 3,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:17:28.031Z"
     },
-    "/Users/theceo/DevSkyy/.claude/settings.json": {
-      "count": 1,
-      "tokens": 934,
-      "first_read": "2026-04-14T22:31:51.892Z"
+    "/Users/theceo/.claude/agents/gsd-nyquist-auditor.md": {
+      "count": 3,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:19:03.268Z"
     },
-    "/Users/theceo/DevSkyy/scripts/ralph-fast.sh": {
+    "/Users/theceo/.claude/agents/gsd-research-synthesizer.md": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:19:03.670Z"
+    },
+    "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/front-page.php": {
+      "count": 3,
+      "tokens": 6222,
+      "first_read": "2026-04-16T00:21:09.381Z"
+    },
+    "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/css/design-tokens.css": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:21:10.554Z"
+    },
+    "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/css/homepage-v2.css": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:21:19.344Z"
+    },
+    "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/js/homepage-v2.js": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:21:19.691Z"
+    },
+    "/Users/theceo/DevSkyy/skyyrose/elite_studio/queue/producer.py": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-04-14T22:43:55.583Z"
+      "first_read": "2026-04-16T00:22:10.326Z"
     },
-    "/Users/theceo/DevSkyy/assets/branding/mascot/skyy-combined-kontext.jpg": {
+    "/Users/theceo/DevSkyy/skyyrose/elite_studio/queue/consumer.py": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-04-14T23:00:10.915Z"
+      "first_read": "2026-04-16T00:22:10.747Z"
     },
-    "/Users/theceo/DevSkyy/assets/branding/mascot/skyy-combined-multi.jpg": {
+    "/Users/theceo/DevSkyy/tests/test_security.py": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-04-14T23:00:11.244Z"
+      "first_read": "2026-04-16T00:22:11.271Z"
+    },
+    "/Users/theceo/DevSkyy/tests/test_hybrid_simple.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:37:06.324Z"
+    },
+    "/Users/theceo/DevSkyy/tests/integration/test_hybrid_integration.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:37:06.690Z"
+    },
+    "/Users/theceo/DevSkyy/tests/test_hybrid_integration.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:37:07.365Z"
+    },
+    "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/inc/woocommerce.php": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:37:20.156Z"
+    },
+    "/Users/theceo/DevSkyy/examples/multi_agent_workflow.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:40:02.989Z"
+    },
+    "/Users/theceo/DevSkyy/examples/basic_query.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:40:03.063Z"
+    },
+    "/Users/theceo/DevSkyy/examples/continuous_conversation.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:40:03.528Z"
+    },
+    "/Users/theceo/DevSkyy/sdk/python/agent_sdk/worker.py": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:45:12.181Z"
+    },
+    "/Users/theceo/DevSkyy/sdk/python/agent_sdk/round_table.py": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:45:12.360Z"
+    },
+    "/Users/theceo/DevSkyy/sdk/python/agent_sdk/custom_tools.py": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:45:13.152Z"
+    },
+    "/Users/theceo/DevSkyy/sdk/python/agent_sdk/orchestrator.py": {
+      "count": 2,
+      "tokens": 2264,
+      "first_read": "2026-04-16T00:45:13.566Z"
+    },
+    "/Users/theceo/DevSkyy/sdk/python/agent_sdk/main.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:45:14.396Z"
+    },
+    "/Users/theceo/DevSkyy/sdk/python/agent_sdk/super_agents/__init__.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-16T00:45:14.950Z"
+    },
+    "/Users/theceo/DevSkyy/scripts/split_techflats.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-16T01:04:38.121Z"
+    },
+    "/Users/theceo/DevSkyy/services/image_ingestion.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-16T01:04:38.796Z"
+    },
+    "/Users/theceo/DevSkyy/skyyrose/multi_agent/hooks.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-04-16T01:04:39.172Z"
+    },
+    "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/inc/rest-api-experience.php": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-04-16T01:06:31.896Z"
+    },
+    "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/inc/experience-analyzer.php": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-04-16T01:06:32.671Z"
+    },
+    "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/js/experience-analyzer.js": {
+      "count": 1,
+      "tokens": 1668,
+      "first_read": "2026-04-16T01:09:53.984Z"
     }
   },
   "files_written": [
     {
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/inc/performance-guardian.php",
+      "action": "create",
+      "tokens": 908,
+      "at": "2026-04-15T23:30:16.457Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/js/performance-guardian.js",
+      "action": "create",
+      "tokens": 951,
+      "at": "2026-04-15T23:34:13.400Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/js/brand-atmosphere.js",
+      "action": "create",
+      "tokens": 1978,
+      "at": "2026-04-15T23:35:54.436Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/css/brand-atmosphere.css",
+      "action": "create",
+      "tokens": 369,
+      "at": "2026-04-15T23:36:09.849Z"
+    },
+    {
       "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/inc/enqueue.php",
       "action": "edit",
-      "tokens": 126,
-      "at": "2026-04-14T22:29:34.273Z"
+      "tokens": 656,
+      "at": "2026-04-15T23:37:07.040Z"
     },
     {
-      "file": "/Users/theceo/DevSkyy/billing/plans.py",
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/inc/enqueue.php",
       "action": "edit",
-      "tokens": 123,
-      "at": "2026-04-14T22:34:22.568Z"
+      "tokens": 44,
+      "at": "2026-04-15T23:37:34.738Z"
     },
     {
-      "file": "/Users/theceo/DevSkyy/billing/plans.py",
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/functions.php",
       "action": "edit",
-      "tokens": 71,
-      "at": "2026-04-14T22:34:48.868Z"
+      "tokens": 19,
+      "at": "2026-04-15T23:39:13.741Z"
     },
     {
-      "file": "/Users/theceo/DevSkyy/billing/plans.py",
+      "file": "/Users/theceo/DevSkyy/tasks/todo.md",
       "action": "edit",
-      "tokens": 366,
-      "at": "2026-04-14T22:35:36.387Z"
+      "tokens": 130,
+      "at": "2026-04-15T23:43:39.950Z"
     },
     {
-      "file": "/Users/theceo/DevSkyy/billing/plans.py",
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/template-parts/product-card-holo.php",
       "action": "edit",
-      "tokens": 50,
-      "at": "2026-04-14T22:35:45.323Z"
+      "tokens": 59,
+      "at": "2026-04-16T00:20:02.998Z"
     },
     {
-      "file": "/Users/theceo/DevSkyy/billing/entitlements.py",
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/template-parts/product-card-holo.php",
       "action": "edit",
-      "tokens": 95,
-      "at": "2026-04-14T22:35:56.106Z"
+      "tokens": 197,
+      "at": "2026-04-16T00:20:45.614Z"
     },
     {
-      "file": "/Users/theceo/DevSkyy/pyproject.toml",
-      "action": "edit",
-      "tokens": 70,
-      "at": "2026-04-14T22:36:09.013Z"
-    },
-    {
-      "file": "/Users/theceo/DevSkyy/pyproject.toml",
-      "action": "edit",
-      "tokens": 18,
-      "at": "2026-04-14T22:36:21.219Z"
-    },
-    {
-      "file": "/Users/theceo/DevSkyy/services/rag_anything_service.py",
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/js/experience-analyzer.js",
       "action": "create",
-      "tokens": 4084,
-      "at": "2026-04-14T22:45:20.713Z"
+      "tokens": 1668,
+      "at": "2026-04-16T00:21:34.514Z"
     },
     {
-      "file": "/Users/theceo/.claude/settings.json",
-      "action": "edit",
-      "tokens": 84,
-      "at": "2026-04-14T22:45:58.512Z"
-    },
-    {
-      "file": "/Users/theceo/.claude/settings.json",
-      "action": "edit",
-      "tokens": 6,
-      "at": "2026-04-14T22:46:35.904Z"
-    },
-    {
-      "file": "/Users/theceo/DevSkyy/.claude/settings.json",
-      "action": "edit",
-      "tokens": 125,
-      "at": "2026-04-14T22:47:36.922Z"
-    },
-    {
-      "file": "/Users/theceo/DevSkyy/.claude/settings.json",
-      "action": "edit",
-      "tokens": 17,
-      "at": "2026-04-14T22:48:35.044Z"
-    },
-    {
-      "file": "/Users/theceo/DevSkyy/api/v1/rag_anything.py",
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/js/smart-showcase.js",
       "action": "create",
-      "tokens": 1987,
-      "at": "2026-04-14T22:49:03.544Z"
+      "tokens": 3113,
+      "at": "2026-04-16T00:24:37.738Z"
     },
     {
-      "file": "/Users/theceo/.claude/settings.json",
+      "file": "/Users/theceo/DevSkyy/skyyrose/elite_studio/queue/producer.py",
       "action": "edit",
       "tokens": 16,
-      "at": "2026-04-14T23:07:57.719Z"
+      "at": "2026-04-16T00:24:43.099Z"
     },
     {
-      "file": "/Users/theceo/.claude/settings.json",
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/js/micro-interactions.js",
+      "action": "create",
+      "tokens": 1862,
+      "at": "2026-04-16T00:25:55.465Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/skyyrose/elite_studio/queue/consumer.py",
+      "action": "edit",
+      "tokens": 16,
+      "at": "2026-04-16T00:25:55.540Z"
+    },
+    {
+      "file": "/Users/theceo/.claude/agents/gsd-codebase-mapper.md",
+      "action": "edit",
+      "tokens": 394,
+      "at": "2026-04-16T00:36:57.366Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/tests/test_security.py",
+      "action": "edit",
+      "tokens": 20,
+      "at": "2026-04-16T00:37:02.916Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/css/smart-showcase.css",
+      "action": "create",
+      "tokens": 2218,
+      "at": "2026-04-16T00:37:10.383Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/tests/test_hybrid_simple.py",
+      "action": "edit",
+      "tokens": 8,
+      "at": "2026-04-16T00:37:48.655Z"
+    },
+    {
+      "file": "/Users/theceo/.claude/agents/gsd-integration-checker.md",
+      "action": "edit",
+      "tokens": 407,
+      "at": "2026-04-16T00:37:50.153Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/tests/integration/test_hybrid_integration.py",
+      "action": "edit",
+      "tokens": 8,
+      "at": "2026-04-16T00:38:01.892Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/inc/woocommerce.php",
+      "action": "edit",
+      "tokens": 319,
+      "at": "2026-04-16T00:38:03.982Z"
+    },
+    {
+      "file": "/Users/theceo/.claude/agents/gsd-nyquist-auditor.md",
+      "action": "edit",
+      "tokens": 412,
+      "at": "2026-04-16T00:38:36.147Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/inc/enqueue.php",
+      "action": "edit",
+      "tokens": 828,
+      "at": "2026-04-16T00:38:48.730Z"
+    },
+    {
+      "file": "/Users/theceo/.claude/agents/gsd-research-synthesizer.md",
+      "action": "edit",
+      "tokens": 386,
+      "at": "2026-04-16T00:38:52.614Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/inc/enqueue.php",
+      "action": "edit",
+      "tokens": 64,
+      "at": "2026-04-16T00:39:50.636Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/examples/multi_agent_workflow.py",
+      "action": "edit",
+      "tokens": 8,
+      "at": "2026-04-16T00:40:11.087Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/examples/basic_query.py",
+      "action": "edit",
+      "tokens": 8,
+      "at": "2026-04-16T00:40:12.532Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/examples/continuous_conversation.py",
+      "action": "edit",
+      "tokens": 8,
+      "at": "2026-04-16T00:40:14.374Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/tasks/todo.md",
+      "action": "edit",
+      "tokens": 216,
+      "at": "2026-04-16T00:41:01.506Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/inc/enqueue.php",
+      "action": "edit",
+      "tokens": 40,
+      "at": "2026-04-16T00:45:44.423Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/sdk/python/agent_sdk/main.py",
+      "action": "edit",
+      "tokens": 26,
+      "at": "2026-04-16T00:45:45.902Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/sdk/python/agent_sdk/super_agents/__init__.py",
+      "action": "edit",
+      "tokens": 74,
+      "at": "2026-04-16T00:45:53.185Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/sdk/python/agent_sdk/orchestrator.py",
+      "action": "edit",
+      "tokens": 14,
+      "at": "2026-04-16T00:45:55.867Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/inc/enqueue.php",
+      "action": "edit",
+      "tokens": 610,
+      "at": "2026-04-16T00:52:28.974Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/front-page.php",
+      "action": "create",
+      "tokens": 5532,
+      "at": "2026-04-16T00:52:30.917Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/sdk/python/agent_sdk/orchestrator.py",
+      "action": "edit",
+      "tokens": 8,
+      "at": "2026-04-16T00:52:34.768Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/sdk/python/agent_sdk/worker.py",
+      "action": "edit",
+      "tokens": 8,
+      "at": "2026-04-16T00:52:38.064Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/sdk/python/agent_sdk/round_table.py",
+      "action": "edit",
+      "tokens": 14,
+      "at": "2026-04-16T00:52:43.246Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/sdk/python/agent_sdk/custom_tools.py",
       "action": "edit",
       "tokens": 15,
-      "at": "2026-04-14T23:08:56.796Z"
+      "at": "2026-04-16T00:52:51.641Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/sdk/python/agent_sdk/main.py",
+      "action": "edit",
+      "tokens": 16,
+      "at": "2026-04-16T00:57:33.244Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/scripts/split_techflats.py",
+      "action": "edit",
+      "tokens": 15,
+      "at": "2026-04-16T01:05:28.853Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/services/image_ingestion.py",
+      "action": "edit",
+      "tokens": 9,
+      "at": "2026-04-16T01:05:29.588Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/skyyrose/multi_agent/hooks.py",
+      "action": "edit",
+      "tokens": 14,
+      "at": "2026-04-16T01:05:30.509Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/services/image_ingestion.py",
+      "action": "edit",
+      "tokens": 9,
+      "at": "2026-04-16T01:05:35.993Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/services/image_ingestion.py",
+      "action": "edit",
+      "tokens": 9,
+      "at": "2026-04-16T01:05:36.803Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/services/image_ingestion.py",
+      "action": "edit",
+      "tokens": 7,
+      "at": "2026-04-16T01:05:47.677Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/js/experience-analyzer.js",
+      "action": "edit",
+      "tokens": 265,
+      "at": "2026-04-16T01:11:06.044Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/inc/personalization.php",
+      "action": "create",
+      "tokens": 894,
+      "at": "2026-04-16T01:11:43.415Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/js/personalization.js",
+      "action": "create",
+      "tokens": 2026,
+      "at": "2026-04-16T01:12:26.100Z"
+    },
+    {
+      "file": "/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship/assets/css/personalization.css",
+      "action": "create",
+      "tokens": 1188,
+      "at": "2026-04-16T01:13:16.758Z"
     }
   ],
   "edit_counts": {
-    "wordpress-theme/skyyrose-flagship/inc/enqueue.php": 1,
-    "billing/plans.py": 4,
-    "billing/entitlements.py": 1,
-    "pyproject.toml": 2,
-    "services/rag_anything_service.py": 1,
-    "../.claude/settings.json": 4,
-    ".claude/settings.json": 2,
-    "api/v1/rag_anything.py": 1
+    "wordpress-theme/skyyrose-flagship/inc/performance-guardian.php": 1,
+    "wordpress-theme/skyyrose-flagship/assets/js/performance-guardian.js": 1,
+    "wordpress-theme/skyyrose-flagship/assets/js/brand-atmosphere.js": 1,
+    "wordpress-theme/skyyrose-flagship/assets/css/brand-atmosphere.css": 1,
+    "wordpress-theme/skyyrose-flagship/inc/enqueue.php": 6,
+    "wordpress-theme/skyyrose-flagship/functions.php": 1,
+    "tasks/todo.md": 2,
+    "wordpress-theme/skyyrose-flagship/template-parts/product-card-holo.php": 2,
+    "wordpress-theme/skyyrose-flagship/assets/js/experience-analyzer.js": 2,
+    "wordpress-theme/skyyrose-flagship/assets/js/smart-showcase.js": 1,
+    "skyyrose/elite_studio/queue/producer.py": 1,
+    "wordpress-theme/skyyrose-flagship/assets/js/micro-interactions.js": 1,
+    "skyyrose/elite_studio/queue/consumer.py": 1,
+    "../.claude/agents/gsd-codebase-mapper.md": 1,
+    "tests/test_security.py": 1,
+    "wordpress-theme/skyyrose-flagship/assets/css/smart-showcase.css": 1,
+    "tests/test_hybrid_simple.py": 1,
+    "../.claude/agents/gsd-integration-checker.md": 1,
+    "tests/integration/test_hybrid_integration.py": 1,
+    "wordpress-theme/skyyrose-flagship/inc/woocommerce.php": 1,
+    "../.claude/agents/gsd-nyquist-auditor.md": 1,
+    "../.claude/agents/gsd-research-synthesizer.md": 1,
+    "examples/multi_agent_workflow.py": 1,
+    "examples/basic_query.py": 1,
+    "examples/continuous_conversation.py": 1,
+    "sdk/python/agent_sdk/main.py": 2,
+    "sdk/python/agent_sdk/super_agents/__init__.py": 1,
+    "sdk/python/agent_sdk/orchestrator.py": 2,
+    "wordpress-theme/skyyrose-flagship/front-page.php": 1,
+    "sdk/python/agent_sdk/worker.py": 1,
+    "sdk/python/agent_sdk/round_table.py": 1,
+    "sdk/python/agent_sdk/custom_tools.py": 1,
+    "scripts/split_techflats.py": 1,
+    "services/image_ingestion.py": 4,
+    "skyyrose/multi_agent/hooks.py": 1,
+    "wordpress-theme/skyyrose-flagship/inc/personalization.php": 1,
+    "wordpress-theme/skyyrose-flagship/assets/js/personalization.js": 1,
+    "wordpress-theme/skyyrose-flagship/assets/css/personalization.css": 1
   },
   "anatomy_hits": 3,
-  "anatomy_misses": 5,
-  "repeated_reads_warned": 2,
+  "anatomy_misses": 33,
+  "repeated_reads_warned": 25,
   "cerebrum_warnings": 0,
-  "stop_count": 9
+  "stop_count": 25
 }
