@@ -59,16 +59,31 @@
   // Flush
   // -------------------------------------------------------------------------
 
+  function getVisitorHash() {
+    // Prefer cookie set server-side by personalization.php.
+    var match = document.cookie.match(/(?:^|;\s*)skyy_visitor=([a-f0-9]{16,64})/);
+    if (match) return match[1];
+    // Fallback: generate and persist in localStorage.
+    var stored = localStorage.getItem('skyy_vh');
+    if (stored && /^[a-f0-9]{16}$/.test(stored)) return stored;
+    var bytes = new Uint8Array(8);
+    crypto.getRandomValues(bytes);
+    var hash = Array.from(bytes)
+      .map(function (b) {
+        return b.toString(16).padStart(2, '0');
+      })
+      .join('');
+    localStorage.setItem('skyy_vh', hash);
+    return hash;
+  }
+
   function getEndpoint() {
-    // Use WP AJAX with a dedicated action registered in rest-api-experience.php.
-    var base = (window.skyyRoseData && window.skyyRoseData.ajaxUrl) || '/wp-admin/admin-ajax.php';
-    return base;
+    return '/?rest_route=/skyyrose/v1/analytics/events';
   }
 
   function buildPayload() {
     return JSON.stringify({
-      action: 'skyyrose_see_batch_events',
-      nonce: (window.skyyRoseData && window.skyyRoseData.nonce) || '',
+      visitorHash: getVisitorHash(),
       events: queue.splice(0, queue.length), // drain the queue
     });
   }
