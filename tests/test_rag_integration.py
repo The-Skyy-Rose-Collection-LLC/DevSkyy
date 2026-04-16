@@ -13,8 +13,17 @@ from pathlib import Path
 
 import pytest
 
-# Skip all tests in this module if chromadb is not installed or incompatible
-pytest.importorskip("chromadb", reason="chromadb not installed or incompatible with Pydantic v2")
+# Skip all tests in this module if chromadb is not installed or incompatible.
+# chromadb <= 0.5.x initializes pydantic.v1 BaseSettings at import time, which
+# raises pydantic.v1.errors.ConfigError on Python 3.14 — not an ImportError, so
+# pytest.importorskip does not catch it. Use a broad except + allow_module_level.
+try:
+    import chromadb  # noqa: F401
+except Exception as e:  # noqa: BLE001 — chromadb's import can raise pydantic/config errors
+    pytest.skip(
+        f"chromadb unavailable or incompatible with Pydantic v2 on this Python: {e}",
+        allow_module_level=True,
+    )
 
 from adk.base import AgentConfig
 from agents.commerce_agent import CommerceAgent
