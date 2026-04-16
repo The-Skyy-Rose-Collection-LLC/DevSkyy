@@ -1,0 +1,365 @@
+/**
+ * Smart Showcase — Quick-View Dialog Styles
+ *
+ * Part of the SkyyRose Experience Engine, Phase 3.
+ * Styles the native <dialog> quick-view overlay with collection-aware accents.
+ *
+ * @package SkyyRose_Flagship
+ * @since   6.4.0
+ */
+
+/* ==========================================================================
+   Quick-view button on holo cards
+   ========================================================================== */
+
+.holo__quickview {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  background: rgba(10, 10, 10, 0.75);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  font-size: 0.68rem;
+  font-family: inherit;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 5;
+  white-space: nowrap;
+}
+
+.product-card-holo:hover .holo__quickview,
+.product-card-holo:focus-within .holo__quickview {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (hover: none) {
+  /* Show on touch devices without hover */
+  .holo__quickview {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    font-size: 0.6rem;
+    padding: 4px 10px;
+  }
+}
+
+/* ==========================================================================
+   Cart bounce keyframe (injected by micro-interactions.js)
+   ========================================================================== */
+
+@keyframes skyy-cart-bounce {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.35);
+  }
+  65% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.skyy-cart-bounce {
+  animation: skyy-cart-bounce 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* ==========================================================================
+   Dialog shell
+   ========================================================================== */
+
+#skyy-quickview-dialog {
+  --qv-accent: #b76e79; /* overridden per-collection via JS */
+  border: none;
+  padding: 0;
+  background: transparent;
+  max-width: 100vw;
+  max-height: 100vh;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+#skyy-quickview-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* ==========================================================================
+   Backdrop (inside dialog for click-to-close)
+   ========================================================================== */
+
+.skyy-qv__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Panel
+   ========================================================================== */
+
+.skyy-qv__panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  background: #121216;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: min(900px, 92vw);
+  max-height: 88vh;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
+}
+
+@media (max-width: 640px) {
+  .skyy-qv__panel {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    width: 96vw;
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+}
+
+/* ==========================================================================
+   Close button
+   ========================================================================== */
+
+.skyy-qv__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: #c0c0c0;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.skyy-qv__close:hover,
+.skyy-qv__close:focus-visible {
+  background: var(--qv-accent);
+  color: #fff;
+  outline: none;
+}
+
+/* ==========================================================================
+   Gallery
+   ========================================================================== */
+
+.skyy-qv__gallery {
+  position: relative;
+  background: #0a0a0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  min-height: 340px;
+}
+
+.skyy-qv__img {
+  display: none;
+  width: 100%;
+  max-height: 440px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.skyy-qv__img--active {
+  display: block;
+}
+
+.skyy-qv__img-toggle {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+}
+
+.skyy-qv__toggle-btn {
+  font-size: 0.68rem;
+  font-family: inherit;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(10, 10, 10, 0.8);
+  color: #888;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.skyy-qv__toggle-btn--active,
+.skyy-qv__toggle-btn:hover {
+  background: var(--qv-accent);
+  color: #fff;
+  border-color: var(--qv-accent);
+}
+
+/* ==========================================================================
+   Info panel
+   ========================================================================== */
+
+.skyy-qv__info {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 36px 28px 28px;
+  overflow-y: auto;
+}
+
+.skyy-qv__collection {
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--qv-accent);
+  font-weight: 600;
+}
+
+.skyy-qv__title {
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.skyy-qv__price {
+  font-size: 1.1rem;
+  color: #c0c0c0;
+  margin: 0;
+}
+
+/* ==========================================================================
+   Sizes
+   ========================================================================== */
+
+.skyy-qv__sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skyy-qv__size-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  color: #c0c0c0;
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.skyy-qv__size-pill:hover,
+.skyy-qv__size-pill--selected,
+.skyy-qv__size-pill[aria-checked='true'] {
+  background: var(--qv-accent);
+  color: #fff;
+  border-color: var(--qv-accent);
+}
+
+/* ==========================================================================
+   Buy button & full-details link
+   ========================================================================== */
+
+.skyy-qv__buy {
+  display: block;
+  width: 100%;
+  padding: 13px 20px;
+  background: var(--qv-accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    opacity 0.15s,
+    transform 0.15s;
+}
+
+.skyy-qv__buy:hover:not(:disabled) {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.skyy-qv__buy:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.skyy-qv__full-link {
+  text-align: center;
+  font-size: 0.78rem;
+  color: #666;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+
+.skyy-qv__full-link:hover {
+  color: var(--qv-accent);
+}
+
+/* ==========================================================================
+   Reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .holo__quickview,
+  .skyy-qv__close,
+  .skyy-qv__toggle-btn,
+  .skyy-qv__size-pill,
+  .skyy-qv__buy {
+    transition: none;
+  }
+
+  .skyy-cart-bounce {
+    animation: none;
+  }
+}

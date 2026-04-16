@@ -63,6 +63,7 @@ $skyyrose_core_includes = array(
 	'/inc/experience-engine.php',
 	'/inc/fastapi-client.php',
 	'/inc/rest-api-experience.php',
+	'/inc/performance-guardian.php',
 );
 
 foreach ( $skyyrose_core_includes as $skyyrose_file ) {

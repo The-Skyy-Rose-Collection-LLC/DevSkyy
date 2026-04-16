@@ -192,6 +192,8 @@ if ( $is_limited ) {
 	class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>"
 	data-product-id="<?php echo esc_attr( $product_id ); ?>"
 	data-sku="<?php echo esc_attr( $sku ); ?>"
+	data-collection="<?php echo esc_attr( $collection ); ?>"
+	data-name="<?php echo esc_attr( $title ); ?>"
 	data-has-back="<?php echo esc_attr( ! empty( $image_back ) ? '1' : '0' ); ?>"
 	style="--holo-accent:<?php echo esc_attr( $pal[0] ); ?>;--holo-accent-rgb:<?php echo esc_attr( $pal[1] ); ?>;--holo-radius:<?php echo esc_attr( $pal[2] ); ?>;--holo-delay:<?php echo esc_attr( $delay ); ?>ms;"
 	tabindex="0"
@@ -248,6 +250,14 @@ if ( $is_limited ) {
 				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 					<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
 				</svg>
+			</button>
+
+			<!-- Quick View trigger (Experience Engine Phase 3) -->
+			<button class="holo__quickview" type="button"
+			        aria-label="<?php echo esc_attr( sprintf( __( 'Quick view %s', 'skyyrose-flagship' ), $title ) ); ?>"
+			        aria-haspopup="dialog">
+				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+				<?php esc_html_e( 'Quick View', 'skyyrose-flagship' ); ?>
 			</button>
 
 			<!-- View indicator (shows on hover with back image) -->

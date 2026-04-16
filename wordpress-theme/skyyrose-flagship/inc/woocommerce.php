@@ -493,3 +493,34 @@ add_action( 'woocommerce_single_product_summary', 'skyyrose_complete_the_look', 
 
 /* Pre-order meta, notices, pricing, and referral credit logic moved to
    inc/woocommerce-preorder.php in v6.3.0 for maintainability. */
+
+/**
+ * Inject product collection data on WooCommerce native loop items.
+ *
+ * Outputs a hidden element with data-product-id, data-collection, and
+ * data-name on shop/archive pages that don't use the holo card template,
+ * so experience-analyzer.js and smart-showcase.js can identify products.
+ *
+ * Part of the Experience Engine, Phase 3.
+ */
+function skyyrose_wc_inject_product_attrs(): void {
+	$product_id = get_the_ID();
+	if ( ! $product_id ) {
+		return;
+	}
+
+	$collection = function_exists( 'skyyrose_get_product_collection' )
+		? skyyrose_get_product_collection( $product_id )
+		: '';
+
+	$product = wc_get_product( $product_id );
+	$name    = $product ? $product->get_name() : '';
+
+	printf(
+		'<div class="skyy-product-meta" hidden data-product-id="%s" data-collection="%s" data-name="%s"></div>',
+		esc_attr( $product_id ),
+		esc_attr( $collection ),
+		esc_attr( $name )
+	);
+}
+add_action( 'woocommerce_before_shop_loop_item_title', 'skyyrose_wc_inject_product_attrs', 5 );
