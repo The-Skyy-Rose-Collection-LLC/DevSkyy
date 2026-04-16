@@ -688,6 +688,22 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-04-16T01:11:06.049Z"
+    },
+    {
+      "id": "bug-044",
+      "timestamp": "2026-04-16T20:42:51.359Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "tests/test_rag_integration.py",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-16T20:42:51.359Z"
     }
   ]
 }

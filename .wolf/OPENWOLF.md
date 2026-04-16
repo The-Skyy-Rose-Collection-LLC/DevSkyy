@@ -19,6 +19,24 @@ You are working in an OpenWolf-managed project. These rules apply every turn.
 1. After every significant action, append a one-line entry to `.wolf/memory.md`:
    `| HH:MM | description | file(s) | outcome | ~tokens |`
 2. After creating, deleting, or renaming files: update `.wolf/anatomy.md`.
+3. When the action relates to a claim captured by claude-mem (see the digest below), append `[cmem #NNN]` to the memory.md row so the two systems cross-reference.
+
+## claude-mem Cross-Reference
+
+A SessionStart hook (`.wolf/hooks/claude-mem-sync.sh`) syncs the last 25 claude-mem observations for this project into `.wolf/claude-mem-digest.md`. Read that file when you need cross-session context that isn't already in `cerebrum.md`/`anatomy.md`/`memory.md`.
+
+**Use the digest to:**
+
+1. **Cite observation IDs** — when logging to `.wolf/memory.md` or adding entries to `.wolf/cerebrum.md`, append `[cmem #NNN]` so the OpenWolf record links to claude-mem's richer narrative.
+2. **Avoid duplicate discovery** — if an answer already exists in the digest (or in full via `get_observations([NNN])` / the `mem-search` skill), do not re-explore the codebase.
+3. **Refresh mid-session** — when you've just landed a significant observation and need the digest updated before the next hop, run `bash .wolf/hooks/claude-mem-sync.sh`.
+
+**Direction of sync:**
+
+- **claude-mem → OpenWolf**: via this hook at SessionStart (and manual refresh).
+- **OpenWolf → claude-mem**: **automatic** — claude-mem ingests session transcripts, so any `.wolf/*` edit you make is already observed. No action required in this direction.
+
+**Data location:** observations live in `~/.claude-mem/claude-mem.db` (SQLite, project-scoped on the `project` column; this project = `DevSkyy`).
 
 ## Cerebrum Learning (MANDATORY — every session)
 

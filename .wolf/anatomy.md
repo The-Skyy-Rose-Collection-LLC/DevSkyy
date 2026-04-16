@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-04-16T01:13:16.594Z
-> Files: 648 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-04-16T20:42:51.327Z
+> Files: 650 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../.claude/
 
@@ -1720,6 +1720,7 @@
 
 - `test_character_system.py` — TestCharacterSpec: test_create_basic_spec, test_spec_is_frozen, test_spec_default_embedding_path, te (~4718 tok)
 - `test_hybrid_simple.py` — main (~1523 tok)
+- `test_rag_integration.py` — rag_manager, ingested_rag_manager, test_rag_context_retrieval, test_agent_with_rag_context (~2267 tok)
 - `test_security.py` — TestAESGCMEncryption: test_encrypt_decrypt_string, test_encrypt_decrypt_bytes, test_encrypt_decrypt_ (~17535 tok)
 
 ## tests/integration/
@@ -1751,7 +1752,8 @@
 
 ## wordpress-theme/skyyrose-flagship/inc/
 
-- `enqueue.php` — Enqueue Scripts & Styles (~8824 tok)
+- `admin-experience-dashboard.php` — Experience Engine — WordPress Admin Dashboard (~4676 tok)
+- `enqueue.php` — Enqueue Scripts & Styles (~9351 tok)
 - `performance-guardian.php` — Performance Guardian — Phase 2 (~848 tok)
 - `personalization.php` — Personalization — Curated For You (~834 tok)
 - `woocommerce.php` — WooCommerce Integration (~3982 tok)
