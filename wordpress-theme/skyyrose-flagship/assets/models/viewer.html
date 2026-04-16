@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Skyy 3D</title>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0a0a0a; overflow:hidden; font-family:sans-serif; }
+  canvas { display:block; }
+  #info { position:fixed; bottom:16px; left:50%; transform:translateX(-50%);
+    color:rgba(183,110,121,0.8); font-size:13px; }
+  #loading { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    color:#B76E79; font-size:16px; letter-spacing:2px; }
+</style>
+</head>
+<body>
+<div id="loading">LOADING SKYY...</div>
+<div id="info">Drag to rotate · Scroll to zoom</div>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+// Renderer
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.2;
+renderer.shadowMap.enabled = true;
+document.body.appendChild(renderer.domElement);
+
+// Scene + environment lighting (no manual lights needed — RoomEnvironment is studio quality)
+const pmrem = new THREE.PMREMGenerator(renderer);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x111111);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+// Camera
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.001, 1000);
+
+// Controls
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.screenSpacePanning = false;
+controls.minDistance = 0.1;
+controls.maxDistance = 100;
+
+// Directional light for shadow/definition
+const dir = new THREE.DirectionalLight(0xffffff, 1.5);
+dir.position.set(2, 4, 3);
+scene.add(dir);
+
+// Ground
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(20, 20),
+  new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 1, metalness: 0 })
+);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// fitCameraToSelection — from Three.js official docs/examples
+function fitCameraToSelection(camera, controls, selection, fitOffset = 1.4) {
+  const box = new THREE.Box3().setFromObject(selection);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const maxSize = Math.max(size.x, size.y, size.z);
+  const fitHeightDistance = maxSize / (2 * Math.atan(Math.PI * camera.fov / 360));
+  const distance = fitOffset * fitHeightDistance;
+  const direction = controls.target.clone()
+    .sub(camera.position).normalize().multiplyScalar(distance);
+  controls.maxDistance = distance * 10;
+  controls.minDistance = distance / 10;
+  controls.target.copy(center);
+  camera.near = distance / 100;
+  camera.far = distance * 100;
+  camera.updateProjectionMatrix();
+  camera.position.copy(controls.target).sub(direction);
+  controls.update();
+}
+
+// Load model
+const loader = new GLTFLoader();
+loader.load('./skyy-v2.glb', gltf => {
+  document.getElementById('loading').remove();
+
+  const model = gltf.scene;
+
+  // Sit on the ground
+  const box = new THREE.Box3().setFromObject(model);
+  model.position.y -= box.min.y;
+
+  scene.add(model);
+
+  // Fit camera using the proper Three.js method
+  fitCameraToSelection(camera, controls, model, 1.4);
+
+  // Slightly raise the camera to face level
+  const modelBox = new THREE.Box3().setFromObject(model);
+  const modelCenter = modelBox.getCenter(new THREE.Vector3());
+  controls.target.set(modelCenter.x, modelCenter.y * 0.75, modelCenter.z);
+  controls.update();
+
+}, xhr => {
+  const pct = Math.round(xhr.loaded / xhr.total * 100);
+  const el = document.getElementById('loading');
+  if (el) el.textContent = `LOADING SKYY... ${pct}%`;
+}, err => {
+  console.error(err);
+  const el = document.getElementById('loading');
+  if (el) el.textContent = 'Error loading model: ' + err.message;
+});
+
+// Render loop
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>

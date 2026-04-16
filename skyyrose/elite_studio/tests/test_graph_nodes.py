@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-
 from skyyrose.elite_studio.graph.nodes import (
     compositor_node,
     finalize_node,

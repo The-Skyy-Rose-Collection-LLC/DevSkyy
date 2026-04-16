@@ -14,7 +14,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-
 # ---------------------------------------------------------------------------
 # Minimal FastAPI app fixture — avoids importing the full main_enterprise app
 # (which requires database, sentry, etc.)

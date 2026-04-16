@@ -12,26 +12,26 @@ from __future__ import annotations
 
 from .colorway import ColorAdvisor, ColorPalette
 from .context import FashionContext, FashionContextBuilder
-from .editorial import EditorialDirector, StylingRule
-from .knowledge import FashionKnowledgeBase, FabricProperties, GarmentType
-from .materials import MaterialsExpert, RenderingSpec
-from .photography import PhotographyDirector, PhotographyStandard
-from .qa_rules import FashionQA, QARule
-from .sizing import SizingAdvisor, SizingGuideline
-from .trends import TrendAdvisor, TrendSignal
 from .design import (
+    CollectionPlan,
+    CollectionPlanner,
     DesignBrief,
     DesignConcept,
     DesignIdeationAgent,
     MockupGenerator,
     MockupResult,
-    CollectionPlanner,
-    CollectionPlan,
-    TechPackGenerator,
-    TechPack,
-    MoodboardComposer,
     Moodboard,
+    MoodboardComposer,
+    TechPack,
+    TechPackGenerator,
 )
+from .editorial import EditorialDirector, StylingRule
+from .knowledge import FabricProperties, FashionKnowledgeBase, GarmentType
+from .materials import MaterialsExpert, RenderingSpec
+from .photography import PhotographyDirector, PhotographyStandard
+from .qa_rules import FashionQA, QARule
+from .sizing import SizingAdvisor, SizingGuideline
+from .trends import TrendAdvisor, TrendSignal
 
 __all__ = [
     # Context (primary entry point)

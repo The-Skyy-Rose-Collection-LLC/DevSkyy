@@ -12,12 +12,11 @@ import fakeredis
 import pytest
 
 from skyyrose.elite_studio.queue.cost_tracker import (
-    PRICING_PER_1K,
-    CostTracker,
     _COST_KEY_PREFIX,
     _TOTAL_COST_SORTED_SET,
+    PRICING_PER_1K,
+    CostTracker,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

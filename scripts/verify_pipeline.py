@@ -128,7 +128,7 @@ def main():
 
     # 4. Router
     print("\n[4] ROUTER")
-    from nano_banana.router import route_product, estimate_batch_cost
+    from nano_banana.router import estimate_batch_cost, route_product
 
     test_product = {
         "sku": "br-001",
@@ -147,9 +147,9 @@ def main():
     # Test text routing
     text_desc = {"graphics": [{"content": "BLACK IS BEAUTIFUL", "type": "screen print"}]}
     text_decisions = route_product({"sku": "br-003", "is_accessory": False}, text_desc, "front")
-    assert text_decisions[0].engine == "gpt-image", (
-        f"Text product should route to gpt-image, got {text_decisions[0].engine}"
-    )
+    assert (
+        text_decisions[0].engine == "gpt-image"
+    ), f"Text product should route to gpt-image, got {text_decisions[0].engine}"
     print(f"  OK  Text routing: br-003 -> {text_decisions[0].engine}")
 
     # Test cost estimate
@@ -231,8 +231,9 @@ def main():
 
     # 9. Generate function signatures
     print("\n[9] GENERATE ENGINES")
-    from nano_banana.generate import generate_gemini
     import inspect
+
+    from nano_banana.generate import generate_gemini
 
     sig = inspect.signature(generate_gemini)
     has_extra_refs = "extra_refs" in sig.parameters

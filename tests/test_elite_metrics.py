@@ -13,7 +13,6 @@ from prometheus_client import Counter as PCounter
 from prometheus_client import Gauge as PGauge
 from prometheus_client import Histogram as PHistogram
 
-
 # ---------------------------------------------------------------------------
 # Fixtures: isolated registry per test
 # ---------------------------------------------------------------------------

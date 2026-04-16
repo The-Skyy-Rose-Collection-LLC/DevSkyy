@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-
 from skyyrose.elite_studio.graph.edges import (
     COMPOSITOR,
     FINALIZE,

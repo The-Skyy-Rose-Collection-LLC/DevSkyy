@@ -189,6 +189,7 @@ def _current_period() -> str:
 def _last_n_periods(n: int) -> list[str]:
     """Return the last *n* YYYY-MM strings in reverse chronological order."""
     from datetime import date
+
     from dateutil.relativedelta import relativedelta  # type: ignore[import]
 
     periods: list[str] = []

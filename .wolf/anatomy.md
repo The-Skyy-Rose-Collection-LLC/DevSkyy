@@ -1,11 +1,18 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-04-14T23:08:56.680Z
-> Files: 613 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-04-16T00:57:33.228Z
+> Files: 642 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../.claude/
 
 - `settings.json` (~1500 tok)
+
+## ../.claude/agents/
+
+- `gsd-codebase-mapper.md` — hooks: (~4622 tok)
+- `gsd-integration-checker.md` — Required Context (provided by milestone auditor) (~3794 tok)
+- `gsd-nyquist-auditor.md` — GAPS FILLED (~1815 tok)
+- `gsd-research-synthesizer.md` — hooks: (~2144 tok)
 
 ## ../.claude/plans/
 
@@ -1655,9 +1662,27 @@
 - `entitlements.py` — EntitlementResult: check, get_upgrade_message (~1530 tok)
 - `plans.py` — TierLimits: get_limits, intent_allowed, quota_remaining (~1686 tok)
 
+## examples/
+
+- `basic_query.py` — basic_example, single_agent_example, main (~620 tok)
+- `continuous_conversation.py` — interactive_conversation, multi_turn_analysis, collaborative_workflow, main (~2249 tok)
+- `multi_agent_workflow.py` — product_launch_workflow, campaign_optimization_workflow, customer_support_workflow, main (~1312 tok)
+
 ## frontend/components/mascot/
 
 - `MascotBubble.tsx` — COLLECTION_GREETINGS (~3509 tok)
+
+## sdk/python/agent_sdk/
+
+- `custom_tools.py` — generate_3d_model, virtual_tryon, check_task_status, manage_product (~4124 tok)
+- `main.py` — DevSkyy: main, execute, query_agent, round_table + 4 more (~1745 tok)
+- `orchestrator.py` — AgentOrchestrator: get_orchestrator_options, execute_workflow, query_single_agent (~2261 tok)
+- `round_table.py` — RoundTableOrchestrator: get_base_options, run_single_participant, run_round_table, execute_with_winn (~2504 tok)
+- `worker.py` — BackgroundWorker: connect, process_generate_3d, process_fashn_tryon, process_task + 1 more (~3888 tok)
+
+## sdk/python/agent_sdk/super_agents/
+
+- `__init__.py` (~213 tok)
 
 ## services/
 
@@ -1673,28 +1698,53 @@
 - `nodes.py` — vision_node, generator_node, quality_node, human_review_node (~4968 tok)
 - `state.py` — EliteStudioState: create_initial_state, extract_production_result (~1019 tok)
 
+## skyyrose/elite_studio/queue/
+
+- `consumer.py` — EliteStudioWorker: process_job, run_forever (~3208 tok)
+- `producer.py` — enqueue_produce, enqueue_creative, enqueue_batch (~1323 tok)
+
+## tasks/
+
+- `todo.md` — Current Tasks (~1455 tok)
+
 ## tests/
 
 - `test_character_system.py` — TestCharacterSpec: test_create_basic_spec, test_spec_is_frozen, test_spec_default_embedding_path, te (~4718 tok)
+- `test_hybrid_simple.py` — main (~1523 tok)
+- `test_security.py` — TestAESGCMEncryption: test_encrypt_decrypt_string, test_encrypt_decrypt_bytes, test_encrypt_decrypt_ (~17535 tok)
+
+## tests/integration/
+
+- `test_hybrid_integration.py` — print_test, print_success, print_error, print_warning (~3579 tok)
 
 ## wordpress-theme/skyyrose-flagship/
 
 - `footer.php` — The template for displaying the footer (~3003 tok)
-- `front-page.php` — Front Page — SkyyRose v6.0 Editorial Homepage (~6222 tok)
+- `front-page.php` — Front Page — SkyyRose v7.0 "Concrete" Commercial Theme (~5164 tok)
+- `functions.php` — SkyyRose Flagship Theme Functions (~991 tok)
 
 ## wordpress-theme/skyyrose-flagship/assets/css/
 
+- `brand-atmosphere.css` — Brand Atmosphere — Canvas Overlay Styles (~369 tok)
 - `skyy-walk.css` — Skyy — Pixar-Like Walk Cycle Enhancements (~1816 tok)
+- `smart-showcase.css` — Smart Showcase — Quick-View Dialog Styles (~2218 tok)
 
 ## wordpress-theme/skyyrose-flagship/assets/js/
 
+- `brand-atmosphere.js` — Brand Atmosphere — Canvas Particle System (~1978 tok)
+- `experience-analyzer.js` — Experience Analyzer — Behavioral Tracking & Event Relay (~1668 tok)
 - `mascot.min.js` — SkyyRose Brand Mascot — Skyy Living Character (~4000 tok)
+- `performance-guardian.js` — Performance Guardian — FPS Watchdog & Animation Budget Manager (~951 tok)
 - `skyy-3d.js` — Skyy — Three.js Walking Character (~2669 tok)
+- `smart-showcase.js` — Smart Showcase — Quick-View Dialog (~3113 tok)
 
 ## wordpress-theme/skyyrose-flagship/inc/
 
-- `enqueue.php` — Enqueue Scripts & Styles (~7479 tok)
+- `enqueue.php` — Enqueue Scripts & Styles (~8824 tok)
+- `performance-guardian.php` — Performance Guardian — Phase 2 (~848 tok)
+- `woocommerce.php` — WooCommerce Integration (~3982 tok)
 
 ## wordpress-theme/skyyrose-flagship/template-parts/
 
+- `product-card-holo.php` — Template Part: Holo Product Card (~3569 tok)
 - `skyy-mascot.php` — Skyy — Living Character Widget (~1207 tok)

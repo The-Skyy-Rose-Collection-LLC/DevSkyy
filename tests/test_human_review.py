@@ -18,7 +18,6 @@ from skyyrose.elite_studio.quality.human_review import (
     ReviewDecision,
 )
 
-
 # ---------------------------------------------------------------------------
 # ReviewDecision dataclass
 # ---------------------------------------------------------------------------

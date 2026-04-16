@@ -23,8 +23,9 @@ FLUX_KONTEXT_MODEL = "fal-ai/flux-pro/kontext"
 def _fal_available() -> bool:
     """Check if fal_client is installed and API key is set."""
     try:
-        import fal_client  # noqa: F401
         import os
+
+        import fal_client  # noqa: F401
 
         return bool(os.getenv("FAL_KEY", "").strip())
     except ImportError:
@@ -88,9 +89,7 @@ def generate_flux_fal(
         mime = (
             "image/jpeg"
             if ext in (".jpg", ".jpeg")
-            else "image/png"
-            if ext == ".png"
-            else "image/webp"
+            else "image/png" if ext == ".png" else "image/webp"
         )
         arguments["image_url"] = f"data:{mime};base64,{b64}"
 

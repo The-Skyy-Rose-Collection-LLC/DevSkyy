@@ -18,7 +18,6 @@ from skyyrose.elite_studio.quality.visual_regression import (
     VisualRegressionTester,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers — create tiny JPEG images for testing
 # ---------------------------------------------------------------------------

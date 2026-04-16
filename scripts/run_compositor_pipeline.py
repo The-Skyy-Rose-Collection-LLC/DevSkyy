@@ -38,11 +38,10 @@ for env_file in [PROJECT_ROOT / ".env.hf", PROJECT_ROOT / ".env"]:
                 k, _, v = line.partition("=")
                 os.environ.setdefault(k.strip(), v.strip())
 
+import anthropic
 import fal_client
 import httpx
 from PIL import Image, ImageFilter
-
-import anthropic
 
 # ---------------------------------------------------------------------------
 # Logging

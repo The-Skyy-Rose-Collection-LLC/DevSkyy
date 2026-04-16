@@ -10,7 +10,6 @@ Both use Claude Agent SDK for autonomous operation.
 
 from __future__ import annotations
 
-
 from claude_agent_sdk import (
     AssistantMessage,
     ClaudeAgentOptions,

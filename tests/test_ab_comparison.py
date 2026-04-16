@@ -7,7 +7,6 @@ Falls back gracefully when fakeredis is not installed.
 
 from __future__ import annotations
 
-
 import pytest
 
 try:
@@ -74,8 +73,9 @@ class TestRecord:
         assert fake_redis.zcard("elite_studio:ab:openai:gpt-image") == 1
 
     def test_record_without_redis_does_not_raise(self):
-        from monitoring.ab_comparison import ABComparisonTracker
         import unittest.mock as mock
+
+        from monitoring.ab_comparison import ABComparisonTracker
 
         t = ABComparisonTracker()
         # Patch _get_redis to simulate unavailable Redis

@@ -8,8 +8,8 @@ Partial success is allowed — each variant is attempted independently.
 
 from __future__ import annotations
 
-from .generator_agent import GeneratorAgent
 from ..models import VariantResult
+from .generator_agent import GeneratorAgent
 
 # Prompt modifiers keyed by variant name
 _VARIANT_PROMPT_MODIFIERS: dict[str, str] = {

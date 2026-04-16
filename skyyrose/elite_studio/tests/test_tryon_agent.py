@@ -17,12 +17,11 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from skyyrose.elite_studio.agents.tryon_agent import (
-    TryOnAgent,
     _CATEGORY_MAP,
+    TryOnAgent,
     _find_garment_image,
 )
 from skyyrose.elite_studio.models import TryOnResult
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

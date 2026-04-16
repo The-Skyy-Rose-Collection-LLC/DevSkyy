@@ -16,14 +16,12 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-
 from skyyrose.elite_studio.graph.edges import after_quality_v2
 from skyyrose.elite_studio.graph.nodes import human_review_node, quality_node
 from skyyrose.elite_studio.graph.state import create_initial_state
 from skyyrose.elite_studio.models import GenerationResult, QualityVerification, SynthesizedVision
 from skyyrose.elite_studio.quality.human_review import ReviewDecision
 from skyyrose.elite_studio.quality.ml_classifier import ClassifierResult
-
 
 # ---------------------------------------------------------------------------
 # Helpers

@@ -13,12 +13,11 @@ Tests cover:
 from __future__ import annotations
 
 from skyyrose.elite_studio.quality.load_tester import (
-    LoadTestReport,
-    PipelineLoadTester,
     _MOCK_STAGE_DURATIONS,
     _STAGE_COST_USD,
+    LoadTestReport,
+    PipelineLoadTester,
 )
-
 
 # ---------------------------------------------------------------------------
 # LoadTestReport data class

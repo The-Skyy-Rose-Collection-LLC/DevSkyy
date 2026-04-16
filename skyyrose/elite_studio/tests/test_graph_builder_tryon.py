@@ -12,8 +12,7 @@ from __future__ import annotations
 
 import pytest
 
-from skyyrose.elite_studio.graph.builder import GraphConfig, _TRYON, build_graph
-
+from skyyrose.elite_studio.graph.builder import _TRYON, GraphConfig, build_graph
 
 # ---------------------------------------------------------------------------
 # GraphConfig
@@ -86,9 +85,9 @@ class TestBuildGraphTryon:
             graph = build_graph(config)
             node_names = self._get_node_names(graph)
             for core_node in ("vision", "generator", "quality", "compositor", "finalize"):
-                assert core_node in node_names, (
-                    f"Core node '{core_node}' missing when enable_tryon={enable}"
-                )
+                assert (
+                    core_node in node_names
+                ), f"Core node '{core_node}' missing when enable_tryon={enable}"
 
     def test_graph_is_compiled_and_invocable(self) -> None:
         """build_graph returns a compiled object with an invoke method."""

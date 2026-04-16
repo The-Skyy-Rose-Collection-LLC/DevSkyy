@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-
 from skyyrose.elite_studio.graph.builder import GraphConfig
 from skyyrose.elite_studio.graph.runner import run_batch, run_single
 from skyyrose.elite_studio.models import ProductionResult

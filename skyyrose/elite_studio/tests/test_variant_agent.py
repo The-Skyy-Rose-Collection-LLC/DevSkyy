@@ -9,7 +9,6 @@ import pytest
 from skyyrose.elite_studio.agents.variant_agent import VariantAgent, _get_prompt_modifier
 from skyyrose.elite_studio.models import GenerationResult, VariantResult, VariantSpec
 
-
 # ---------------------------------------------------------------------------
 # Model tests
 # ---------------------------------------------------------------------------

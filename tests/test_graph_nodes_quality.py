@@ -9,11 +9,9 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-
 from skyyrose.elite_studio.models import GenerationResult, QualityVerification, SynthesizedVision
 from skyyrose.elite_studio.quality.human_review import ReviewDecision
 from skyyrose.elite_studio.quality.ml_classifier import ClassifierResult
-
 
 # ---------------------------------------------------------------------------
 # Helpers

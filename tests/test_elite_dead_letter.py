@@ -14,10 +14,9 @@ import fakeredis
 import pytest
 
 from skyyrose.elite_studio.queue.dead_letter import (
-    DeadLetterQueue,
     _DLQ_KEY,
+    DeadLetterQueue,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

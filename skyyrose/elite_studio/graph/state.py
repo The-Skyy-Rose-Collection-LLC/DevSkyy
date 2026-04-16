@@ -22,8 +22,8 @@ from ..models import (
     UpscaleResult,
     VariantResult,
 )
-from ..quality.ml_classifier import ClassifierResult
 from ..quality.human_review import ReviewDecision
+from ..quality.ml_classifier import ClassifierResult
 from ..quality.visual_regression import RegressionResult
 
 

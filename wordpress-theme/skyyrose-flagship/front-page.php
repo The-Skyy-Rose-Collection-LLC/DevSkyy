@@ -1,101 +1,101 @@
 <?php
 /**
- * Front Page — SkyyRose v6.0 Editorial Homepage
+ * Front Page — SkyyRose v7.0 "Concrete" Commercial Theme
  *
- * Cinematic hero, press strip, marquee, founder story, quote,
- * collection cards with photography, lookbook, craft, newsletter.
+ * Dark luxury editorial homepage. Typographic bleed hero, cursor-trigger
+ * collection split portal, specimen catalogue ticker, narrative scroll.
  *
- * Layout ported from the proven v4.0 homepage design.
- * CSS: assets/css/homepage-v2.css
- * JS: assets/js/homepage-v2.js
+ * Design: AIDesigner "Concrete" concept — dark luxury streetwear commercial theme.
+ * CSS: assets/css/homepage-v2.css (+ v7 appended rules)
+ * JS:  assets/js/homepage-v2.js  (+ v7 appended interactions)
  *
  * @package SkyyRose_Flagship
- * @since   6.0.0
+ * @since   7.0.0
  */
 
 defined( 'ABSPATH' ) || exit;
 
 /* ── Data ──────────────────────────────────────────────────────────────────── */
 
-$hero_bg     = SKYYROSE_ASSETS_URI . '/images/homepage-hero-bg.webp';
 $founder_img = SKYYROSE_ASSETS_URI . '/images/homepage-story-founder.webp';
 $cart_url    = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' );
 
-/* Collection data sourced from inc/collections-config.php (single source of truth). */
+/* Collection data — single source of truth in inc/collections-config.php */
 $collections = skyyrose_get_front_page_collections();
 
 /* Dynamic product counts per collection */
 foreach ( $collections as &$col ) {
 	$col['count'] = 0;
 	if ( function_exists( 'wc_get_products' ) ) {
-		$products = wc_get_products( array( 'category' => array( $col['slug'] ), 'limit' => -1, 'return' => 'ids', 'status' => 'publish' ) );
+		$products    = wc_get_products( array( 'category' => array( $col['slug'] ), 'limit' => -1, 'return' => 'ids', 'status' => 'publish' ) );
 		$col['count'] = count( $products );
 	}
 }
 unset( $col );
 
+/* Map collections by class key for direct access */
+$col_map = array();
+foreach ( $collections as $c ) {
+	$col_map[ $c['class'] ] = $c;
+}
+$col_br = $col_map['br'] ?? null;
+$col_lh = $col_map['lh'] ?? null;
+$col_sg = $col_map['sg'] ?? null;
+
 /* Press features */
 $press = array(
-	__( 'Maxim', 'skyyrose-flagship' ),
-	__( 'CEO Weekly', 'skyyrose-flagship' ),
-	__( 'San Francisco Post', 'skyyrose-flagship' ),
-	__( 'Best of Best Review', 'skyyrose-flagship' ),
-	__( 'The Blox', 'skyyrose-flagship' ),
+	array( 'name' => __( 'Maxim', 'skyyrose-flagship' ),           'font' => 'cinzel' ),
+	array( 'name' => __( 'CEO Weekly', 'skyyrose-flagship' ),       'font' => 'bebas' ),
+	array( 'name' => __( 'San Francisco Post', 'skyyrose-flagship' ),'font' => 'playfair' ),
+	array( 'name' => __( 'Best of Best Review', 'skyyrose-flagship' ),'font' => 'mono' ),
+	array( 'name' => __( 'The Blox', 'skyyrose-flagship' ),         'font' => 'cormorant' ),
 );
 
-/* Marquee items */
-$marquee = array(
-	'Black Rose', 'Love Hurts', 'Signature', 'Oakland Made',
-	'Gender Neutral', 'Limited Edition', 'Luxury Streetwear', 'Built Different',
-);
-
-/* Lookbook images */
-$lookbook = array(
-	array( 'file' => 'lb-love-hurts-varsity', 'alt' => __( 'Love Hurts varsity jacket', 'skyyrose-flagship' ), 'label' => 'Love Hurts', 'tall' => true ),
-	array( 'file' => 'lb-black-rose-hockey',  'alt' => __( 'Black Rose hockey jersey', 'skyyrose-flagship' ),  'label' => 'Black Rose', 'tall' => false ),
-	array( 'file' => 'lb-kid-black-rose',     'alt' => __( 'Kid in Black Rose hoodie', 'skyyrose-flagship' ),  'label' => 'Street Style', 'tall' => false ),
-	array( 'file' => 'lb-rose-hoodie-beanie', 'alt' => __( 'Rose hoodie and beanie', 'skyyrose-flagship' ),    'label' => 'Signature', 'tall' => false ),
-	array( 'file' => 'lb-black-rose-football','alt' => __( 'Black Rose football jersey', 'skyyrose-flagship' ),'label' => 'Limited Edition', 'tall' => false ),
+/* Specimen catalogue items — BR jersey series */
+$specimens = array(
+	'001 / BR_008 SF_INSPIRED — 80 PIECES',
+	'002 / BR_009 LAST_OAKLAND — 80 PIECES',
+	'003 / BR_010 THE_BAY — 80 PIECES',
+	'004 / BR_011 THE_ROSE_(SHARKS) — 80 PIECES',
 );
 
 /* Craft cards */
 $craft_cards = array(
 	array(
-		'icon'  => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
+		'icon'  => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 2L2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
 		'label' => __( 'Premium Materials', 'skyyrose-flagship' ),
-		'desc'  => __( '280-400gsm cotton. Italian wool blends. Full-grain leather. No shortcuts.', 'skyyrose-flagship' ),
+		'desc'  => __( '280–400gsm cotton. Italian wool blends. Full-grain leather. No shortcuts.', 'skyyrose-flagship' ),
 	),
 	array(
-		'icon'  => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
-		'label' => __( 'Oakland Made Mentality', 'skyyrose-flagship' ),
+		'icon'  => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+		'label' => __( 'The Town Mentality', 'skyyrose-flagship' ),
 		'desc'  => __( 'Born from the struggle of East Oakland. Designed for the world. Built to last generations.', 'skyyrose-flagship' ),
 	),
 	array(
-		'icon'  => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+		'icon'  => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
 		'label' => __( 'Gender Neutral', 'skyyrose-flagship' ),
 		'desc'  => __( 'Pioneer in Bay Area gender-neutral fashion. Designed for anyone, regardless of gender or age.', 'skyyrose-flagship' ),
 	),
 	array(
-		'icon'  => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+		'icon'  => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
 		'label' => __( 'Limited Editions', 'skyyrose-flagship' ),
-		'desc'  => __( 'Small batch production. Individually numbered. When it\'s gone, it\'s gone.', 'skyyrose-flagship' ),
+		'desc'  => __( "Small batch production. Individually numbered. When it's gone, it's gone.", 'skyyrose-flagship' ),
 	),
 );
 
 $svg_whitelist = array(
-	'svg'      => array( 'width' => true, 'height' => true, 'viewBox' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true, 'aria-hidden' => true, 'focusable' => true, 'xmlns' => true ),
-	'path'     => array( 'd' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true ),
-	'circle'   => array( 'cx' => true, 'cy' => true, 'r' => true, 'fill' => true ),
-	'polygon'  => array( 'points' => true, 'fill' => true ),
+	'svg'    => array( 'width' => true, 'height' => true, 'viewBox' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true, 'aria-hidden' => true, 'focusable' => true, 'xmlns' => true ),
+	'path'   => array( 'd' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true ),
+	'circle' => array( 'cx' => true, 'cy' => true, 'r' => true, 'fill' => true ),
+	'polygon'=> array( 'points' => true, 'fill' => true ),
 );
 
 get_header();
 ?>
 
-<main id="primary" class="site-main homepage-v2" role="main" tabindex="-1">
+<main id="primary" class="site-main homepage-v2 homepage-v7" role="main" tabindex="-1">
 
-<div class="grain" aria-hidden="true"></div>
-<div class="vignette" aria-hidden="true"></div>
+<canvas id="grainCanvas" class="grain-canvas" aria-hidden="true"></canvas>
 <div class="scroll-progress" aria-hidden="true"></div>
 
 <noscript><style>#loader{display:none!important}</style></noscript>
@@ -108,33 +108,29 @@ get_header();
 </div>
 
 <!-- ═══ MOBILE MENU ═══ -->
-<div class="mob-menu" id="mobMenu" role="dialog" aria-label="<?php esc_attr_e( 'Mobile Navigation', 'skyyrose-flagship' ); ?>">
+<div class="mob-menu" id="mobMenu" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Navigation', 'skyyrose-flagship' ); ?>">
 	<button class="mob-close" type="button" aria-label="<?php esc_attr_e( 'Close menu', 'skyyrose-flagship' ); ?>">&times;</button>
-	<a href="#story"><?php esc_html_e( 'Our Story', 'skyyrose-flagship' ); ?></a>
-	<a href="#collections"><?php esc_html_e( 'Collections', 'skyyrose-flagship' ); ?></a>
-	<a href="#lookbook"><?php esc_html_e( 'Lookbook', 'skyyrose-flagship' ); ?></a>
-	<a href="#craft"><?php esc_html_e( 'Craft', 'skyyrose-flagship' ); ?></a>
-	<a href="#community"><?php esc_html_e( 'Community', 'skyyrose-flagship' ); ?></a>
+	<a href="#collections"><?php esc_html_e( 'Worlds', 'skyyrose-flagship' ); ?></a>
+	<a href="#drops"><?php esc_html_e( 'Drops', 'skyyrose-flagship' ); ?></a>
+	<a href="#issue"><?php esc_html_e( 'Issue', 'skyyrose-flagship' ); ?></a>
+	<a href="#story"><?php esc_html_e( 'The Roster', 'skyyrose-flagship' ); ?></a>
 	<a href="<?php echo esc_url( $cart_url ); ?>"><?php esc_html_e( 'Bag', 'skyyrose-flagship' ); ?></a>
 </div>
 
-<!-- ═══ NAV ═══ -->
-<nav class="nav" id="mainNav" aria-label="<?php esc_attr_e( 'Homepage Navigation', 'skyyrose-flagship' ); ?>">
-	<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="nav-brand">
-		<span class="nav-name"><?php esc_html_e( 'SkyyRose', 'skyyrose-flagship' ); ?></span>
-		<span class="nav-sub"><?php esc_html_e( 'Oakland Luxury', 'skyyrose-flagship' ); ?></span>
-	</a>
-	<div class="nav-center">
-		<a href="#story" class="nav-link"><?php esc_html_e( 'Story', 'skyyrose-flagship' ); ?></a>
-		<a href="#collections" class="nav-link"><?php esc_html_e( 'Collections', 'skyyrose-flagship' ); ?></a>
-		<a href="#lookbook" class="nav-link"><?php esc_html_e( 'Lookbook', 'skyyrose-flagship' ); ?></a>
-		<a href="#craft" class="nav-link"><?php esc_html_e( 'Craft', 'skyyrose-flagship' ); ?></a>
-		<a href="#community" class="nav-link"><?php esc_html_e( 'Community', 'skyyrose-flagship' ); ?></a>
+<!-- ═══ NAV — Brand vocabulary only. No "Shop." ═══ -->
+<nav class="nav nav-v7" id="mainNav" aria-label="<?php esc_attr_e( 'Homepage Navigation', 'skyyrose-flagship' ); ?>">
+	<div class="nav-left">
+		<a href="#collections" class="nav-link"><?php esc_html_e( 'Worlds', 'skyyrose-flagship' ); ?></a>
+		<a href="#drops" class="nav-link"><?php esc_html_e( 'Drops', 'skyyrose-flagship' ); ?></a>
+		<a href="#issue" class="nav-link hidden-sm"><?php esc_html_e( 'Issue', 'skyyrose-flagship' ); ?></a>
+		<a href="#story" class="nav-link hidden-sm"><?php esc_html_e( 'The Roster', 'skyyrose-flagship' ); ?></a>
 	</div>
+	<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="nav-brand-center">
+		<span class="nav-name"><?php esc_html_e( 'SkyyRose', 'skyyrose-flagship' ); ?></span>
+	</a>
 	<div class="nav-right">
 		<button class="nav-bag" type="button" aria-label="<?php esc_attr_e( 'Shopping Bag', 'skyyrose-flagship' ); ?>">
-			<?php esc_html_e( 'Bag', 'skyyrose-flagship' ); ?>
-			<span class="bag-ct" id="bagCt">0</span>
+			<?php esc_html_e( 'Cart', 'skyyrose-flagship' ); ?><span class="bag-ct" id="bagCt">_0</span>
 		</button>
 		<button class="nav-ham" type="button" aria-label="<?php esc_attr_e( 'Open menu', 'skyyrose-flagship' ); ?>">
 			<span></span><span></span><span></span>
@@ -142,149 +138,133 @@ get_header();
 	</div>
 </nav>
 
-<!-- ═══ HERO ═══ -->
-<section class="hero" id="hero" data-scroll-fade aria-label="<?php esc_attr_e( 'SkyyRose Hero', 'skyyrose-flagship' ); ?>">
-	<div class="hero-bg parallax-ken-burns" style="background-image: url('<?php echo esc_url( $hero_bg ); ?>');" aria-hidden="true"></div>
-	<div class="hero-ov" aria-hidden="true"></div>
-	<div class="hero-particles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-	<div class="hero-frame" aria-hidden="true"></div>
-	<div class="hero-content">
-		<p class="hero-eyebrow rv-blur-down"><?php esc_html_e( 'Oakland · Est. 2020 · Gender Neutral', 'skyyrose-flagship' ); ?></p>
-		<h1 class="hero-title rv-split-char" aria-label="<?php esc_attr_e( 'SkyyRose', 'skyyrose-flagship' ); ?>">SkyyRose</h1>
-		<div class="hero-rule" aria-hidden="true"></div>
-		<p class="hero-subtitle rv-blur"><?php esc_html_e( 'Luxury Grows from Concrete. Three collections, one vision — built by a father, named after a daughter.', 'skyyrose-flagship' ); ?></p>
-		<div class="hero-ctas">
-			<a href="#collections" class="hero-cta hero-cta-primary btn-sweep btn-press"><?php esc_html_e( 'Explore Collections', 'skyyrose-flagship' ); ?></a>
-			<a href="#story" class="hero-cta btn-border-draw btn-press"><?php esc_html_e( 'Our Story', 'skyyrose-flagship' ); ?></a>
+<!-- ═══ HERO — Typographic bleed. No photography. ═══ -->
+<section class="hero hero-concrete" id="hero" aria-label="<?php esc_attr_e( 'SkyyRose', 'skyyrose-flagship' ); ?>">
+	<h1 class="hero-concrete-word" aria-label="<?php esc_attr_e( 'Concrete', 'skyyrose-flagship' ); ?>">
+		<span aria-hidden="true">CONCRETE</span>
+	</h1>
+	<div class="hero-concrete-sub">
+		<p class="hero-tagline"><?php esc_html_e( 'Luxury Grows from Concrete.', 'skyyrose-flagship' ); ?></p>
+		<a href="#collections" class="hero-scroll-cta" aria-label="<?php esc_attr_e( 'Explore collections', 'skyyrose-flagship' ); ?>">
+			<span class="hero-scroll-line"></span>
+			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+		</a>
+	</div>
+</section>
+
+<!-- ═══ COLLECTION SPLIT PORTAL — Cursor-trigger 50/50 ═══ -->
+<section class="collection-split" id="collections" aria-label="<?php esc_attr_e( 'Collections', 'skyyrose-flagship' ); ?>">
+
+	<!-- Left: Black Rose -->
+	<?php if ( $col_br ) : ?>
+	<a href="<?php echo esc_url( $col_br['link'] ); ?>"
+	   class="split-panel split-br"
+	   aria-label="<?php esc_attr_e( 'Black Rose Collection', 'skyyrose-flagship' ); ?>">
+		<div class="split-panel-bg split-br-bg" aria-hidden="true"></div>
+		<div class="split-panel-content">
+			<span class="split-num font-mono"><?php esc_html_e( '01', 'skyyrose-flagship' ); ?></span>
+			<h2 class="split-name split-br-name"><?php esc_html_e( 'Black', 'skyyrose-flagship' ); ?><br><?php esc_html_e( 'Rose', 'skyyrose-flagship' ); ?></h2>
+			<p class="split-tag"><?php esc_html_e( 'Dark elegance. The Town.', 'skyyrose-flagship' ); ?></p>
+		</div>
+	</a>
+	<?php endif; ?>
+
+	<!-- Right: Signature -->
+	<?php if ( $col_sg ) : ?>
+	<a href="<?php echo esc_url( $col_sg['link'] ); ?>"
+	   class="split-panel split-sg"
+	   aria-label="<?php esc_attr_e( 'Signature Collection', 'skyyrose-flagship' ); ?>">
+		<div class="split-panel-bg split-sg-bg" aria-hidden="true"></div>
+		<div class="split-panel-content split-panel-content--right">
+			<span class="split-num font-mono"><?php esc_html_e( '03', 'skyyrose-flagship' ); ?></span>
+			<h2 class="split-name split-sg-name"><?php esc_html_e( 'Signature', 'skyyrose-flagship' ); ?></h2>
+			<p class="split-tag"><?php esc_html_e( 'Bay Area confidence. Everyday elevation.', 'skyyrose-flagship' ); ?></p>
+		</div>
+	</a>
+	<?php endif; ?>
+
+	<!-- 1px rose-gold divider -->
+	<div class="split-divider" aria-hidden="true"></div>
+
+	<!-- Center intrusion: Love Hurts — Corey's family name -->
+	<?php if ( $col_lh ) : ?>
+	<a href="<?php echo esc_url( $col_lh['link'] ); ?>"
+	   class="split-lh-strip"
+	   aria-label="<?php esc_attr_e( 'Love Hurts Collection', 'skyyrose-flagship' ); ?>">
+		<span class="split-lh-num font-mono"><?php esc_html_e( '02', 'skyyrose-flagship' ); ?></span>
+		<h2 class="split-lh-name"><?php esc_html_e( 'Love Hurts', 'skyyrose-flagship' ); ?></h2>
+		<span class="split-lh-note font-mono"><?php esc_html_e( "The Founder's Name", 'skyyrose-flagship' ); ?></span>
+	</a>
+	<?php endif; ?>
+
+</section>
+
+<!-- ═══ SPECIMEN CATALOGUE TICKER ═══ -->
+<div class="specimen-ticker" id="drops" aria-label="<?php esc_attr_e( 'Limited Edition Drops', 'skyyrose-flagship' ); ?>">
+	<div class="specimen-ticker-mask" aria-hidden="true">
+		<div class="specimen-track" id="specimenTrack">
+			<?php for ( $i = 0; $i < 3; $i++ ) : ?>
+				<?php foreach ( $specimens as $item ) : ?>
+					<span class="specimen-item"><?php echo esc_html( $item ); ?></span>
+					<span class="specimen-sep" aria-hidden="true">◆</span>
+				<?php endforeach; ?>
+			<?php endfor; ?>
 		</div>
 	</div>
-	<div class="hero-scroll" aria-hidden="true">
-		<span><?php esc_html_e( 'Scroll', 'skyyrose-flagship' ); ?></span>
-		<div class="hero-scroll-line"></div>
+</div>
+
+<!-- ═══ NARRATIVE SCROLL — Story embedded in editorial prose ═══ -->
+<section class="narrative" id="issue" aria-label="<?php esc_attr_e( 'The Story', 'skyyrose-flagship' ); ?>">
+	<p class="narrative-prose rv">
+		<?php esc_html_e( 'The architecture of modern garments must carry the weight of the environments they inherit. Every hem weighed against the gravity of the streets we come from — built not in pristine ateliers, but in The Town, pouring obsession into fabrics that function as armor.', 'skyyrose-flagship' ); ?>
+	</p>
+
+	<figure class="narrative-artifact rv rv-d1">
+		<?php if ( $col_br ) : ?>
+		<div class="narrative-artifact-img">
+			<img src="<?php echo esc_url( $col_br['image'] ); ?>"
+			     alt="<?php esc_attr_e( 'Black Rose collection — heavyweight construction detail', 'skyyrose-flagship' ); ?>"
+			     loading="lazy" decoding="async" width="960" height="640">
+		</div>
+		<?php endif; ?>
+		<figcaption class="narrative-artifact-cap font-mono">
+			<?php esc_html_e( 'Artifact_001 / Black Rose — Limited Edition Archive', 'skyyrose-flagship' ); ?>
+		</figcaption>
+	</figure>
+
+	<p class="narrative-prose rv rv-d2">
+		<?php esc_html_e( 'Named after a daughter. Built by a father. The SkyyRose Collection began as a refusal — to become a statistic, to give up, to let The Town write the ending. Through failed websites, deceitful manufacturers, and single parenthood with no support, Corey Foster built something real. This is what it looks like when love becomes architecture.', 'skyyrose-flagship' ); ?>
+	</p>
+</section>
+
+<!-- ═══ FOUNDER QUOTE ═══ -->
+<section class="quote-section quote-v7" id="story" aria-label="<?php esc_attr_e( 'Founder Quote', 'skyyrose-flagship' ); ?>">
+	<div class="quote-v7-inner">
+		<div class="quote-v7-text rv">
+			<blockquote class="quote-v7-words">
+				<?php echo wp_kses_post( __( '&ldquo;Believe in your vision<br>even when others<br>can&rsquo;t see it.&rdquo;', 'skyyrose-flagship' ) ); ?>
+			</blockquote>
+			<hr class="quote-v7-rule" aria-hidden="true">
+			<p class="quote-v7-attr font-mono"><?php esc_html_e( 'Corey Foster — Founder', 'skyyrose-flagship' ); ?></p>
+		</div>
+		<div class="quote-v7-portrait rv-right">
+			<img src="<?php echo esc_url( $founder_img ); ?>"
+			     alt="<?php esc_attr_e( 'Corey Foster, founder of SkyyRose', 'skyyrose-flagship' ); ?>"
+			     loading="lazy" decoding="async" width="600" height="800">
+			<div class="quote-v7-portrait-shade" aria-hidden="true"></div>
+		</div>
 	</div>
 </section>
 
 <!-- ═══ PRESS STRIP ═══ -->
-<div class="press rv">
-	<p class="press-label"><?php esc_html_e( 'As Featured In', 'skyyrose-flagship' ); ?></p>
-	<div class="press-logos">
-		<?php foreach ( $press as $idx => $name ) : ?>
-			<?php if ( $idx > 0 ) : ?><span class="press-sep" aria-hidden="true"></span><?php endif; ?>
-			<span class="press-item"><?php echo esc_html( $name ); ?></span>
+<div class="press press-v7 rv">
+	<p class="press-label font-mono"><?php esc_html_e( 'Acknowledged By', 'skyyrose-flagship' ); ?></p>
+	<div class="press-logos-v7">
+		<?php foreach ( $press as $p ) : ?>
+			<span class="press-item press-item--<?php echo esc_attr( $p['font'] ); ?>"><?php echo esc_html( $p['name'] ); ?></span>
 		<?php endforeach; ?>
 	</div>
 </div>
-
-<!-- ═══ MARQUEE ═══ -->
-<div class="marquee" aria-hidden="true">
-	<div class="marquee-track">
-		<?php for ( $i = 0; $i < 2; $i++ ) : ?>
-			<?php foreach ( $marquee as $item ) : ?>
-				<span class="mq-item"><?php echo esc_html( $item ); ?><span class="mq-dot"></span></span>
-			<?php endforeach; ?>
-		<?php endfor; ?>
-	</div>
-</div>
-
-<!-- ═══ STORY ═══ -->
-<section class="story" id="story" aria-label="<?php esc_attr_e( 'Our Story', 'skyyrose-flagship' ); ?>">
-	<div class="story-bg" aria-hidden="true"></div>
-	<div class="story-inner">
-		<div>
-			<p class="story-eyebrow rv"><?php esc_html_e( 'The Origin', 'skyyrose-flagship' ); ?></p>
-			<h2 class="story-heading rv rv-d1">
-				<?php
-				/* translators: line break for visual layout */
-				echo wp_kses( __( 'Born In<br>The Town', 'skyyrose-flagship' ), array( 'br' => array() ) );
-				?>
-				<em><?php esc_html_e( "A father's promise. A daughter's name.", 'skyyrose-flagship' ); ?></em>
-			</h2>
-			<div class="story-body rv rv-d2">
-				<p><?php echo wp_kses_post( __( 'In a neighborhood where opportunities are as scarce as support, <strong>Corey Foster</strong> refused to become another statistic. He\'d lost everything — broke, no drive left, a baby on the way.', 'skyyrose-flagship' ) ); ?></p>
-				<p><?php echo wp_kses_post( __( 'Through failed websites, scammer manufacturers, and single parenthood with no support — he built something real. Named after his daughter <strong>Skyy Rose</strong>. Designed for anyone, regardless of gender or age.', 'skyyrose-flagship' ) ); ?></p>
-				<p><?php esc_html_e( "SkyyRose isn't just clothing. It's proof that your circumstances don't define your destination.", 'skyyrose-flagship' ); ?></p>
-			</div>
-			<div class="story-stats rv rv-d3">
-				<div><div class="stat-num">3</div><div class="stat-label"><?php esc_html_e( 'Collections', 'skyyrose-flagship' ); ?></div></div>
-				<div><div class="stat-num"><?php echo esc_html( array_sum( array_column( $collections, 'count' ) ) ?: '29' ); ?></div><div class="stat-label"><?php esc_html_e( 'Pieces', 'skyyrose-flagship' ); ?></div></div>
-				<div><div class="stat-num">2020</div><div class="stat-label"><?php esc_html_e( 'Founded', 'skyyrose-flagship' ); ?></div></div>
-				<div><div class="stat-num">5+</div><div class="stat-label"><?php esc_html_e( 'Press Features', 'skyyrose-flagship' ); ?></div></div>
-			</div>
-		</div>
-		<div class="story-img-wrap rv-right">
-			<div class="story-img">
-				<img src="<?php echo esc_url( $founder_img ); ?>"
-				     alt="<?php esc_attr_e( 'Corey Foster, SkyyRose founder', 'skyyrose-flagship' ); ?>"
-				     loading="lazy" decoding="async" width="600" height="800">
-			</div>
-			<div class="story-float">
-				<div class="sf-lbl"><?php esc_html_e( 'Recognition', 'skyyrose-flagship' ); ?></div>
-				<div class="sf-val"><?php echo wp_kses( __( 'Best Bay Area<br>Clothing Line 2024', 'skyyrose-flagship' ), array( 'br' => array() ) ); ?></div>
-			</div>
-		</div>
-	</div>
-</section>
-
-<!-- ═══ QUOTE ═══ -->
-<section class="quote-section" aria-label="<?php esc_attr_e( 'Founder Quote', 'skyyrose-flagship' ); ?>">
-	<div class="quote-mark rv" aria-hidden="true">&ldquo;</div>
-	<blockquote class="quote-text rv rv-d1">
-		<?php echo wp_kses_post( __( '&ldquo;If you asked me four years ago, I never would have thought I&rsquo;d be here. I had no drive, lost it all, a baby on the way, and was broke. But we knew we had to get it <em>by any means necessary</em>.&rdquo;', 'skyyrose-flagship' ) ); ?>
-	</blockquote>
-	<p class="quote-attr rv rv-d2"><?php echo esc_html( '— ' . __( 'Corey Foster, Founder & CEO', 'skyyrose-flagship' ) ); ?></p>
-</section>
-
-<!-- ═══ COLLECTIONS ═══ -->
-<section class="collections" id="collections" aria-label="<?php esc_attr_e( 'Our Collections', 'skyyrose-flagship' ); ?>">
-	<div class="col-header rv-clip-up">
-		<p class="col-header-eyebrow"><?php esc_html_e( 'The Collections', 'skyyrose-flagship' ); ?></p>
-		<h2 class="col-header-title rv-split-word"><?php esc_html_e( 'Three Worlds. One Vision.', 'skyyrose-flagship' ); ?></h2>
-	</div>
-	<div class="col-grid stagger-grid">
-		<?php foreach ( $collections as $idx => $col ) : ?>
-			<a href="<?php echo esc_url( $col['link'] ); ?>" class="col-card <?php echo esc_attr( $col['class'] ); ?> magnetic">
-				<div class="col-card-img">
-					<img src="<?php echo esc_url( $col['image'] ); ?>"
-					     alt="<?php echo esc_attr( $col['name'] . ' Collection' ); ?>"
-					     loading="lazy" decoding="async" width="480" height="640">
-				</div>
-				<div class="col-card-ov"></div>
-				<div class="col-card-content">
-					<p class="col-card-num"><?php echo esc_html( $col['num'] ); ?></p>
-					<h3 class="col-card-name"><?php echo wp_kses( $col['title'], array( 'br' => array() ) ); ?></h3>
-					<p class="col-card-tag"><?php echo esc_html( $col['tagline'] ); ?></p>
-					<div class="col-card-meta">
-						<span><?php echo esc_html( ( $col['count'] ?: '—' ) . ' ' . __( 'Pieces', 'skyyrose-flagship' ) ); ?></span>
-						<span><?php echo esc_html( $col['label'] ); ?></span>
-					</div>
-					<span class="col-card-cta"><?php esc_html_e( 'Explore Collection', 'skyyrose-flagship' ); ?></span>
-				</div>
-			</a>
-		<?php endforeach; ?>
-	</div>
-</section>
-
-<!-- ═══ LOOKBOOK ═══ -->
-<section class="lookbook" id="lookbook" aria-label="<?php esc_attr_e( 'Lookbook', 'skyyrose-flagship' ); ?>">
-	<div class="lookbook-header rv-clip-up">
-		<h2><?php esc_html_e( 'Lookbook', 'skyyrose-flagship' ); ?></h2>
-		<p><?php esc_html_e( 'Real people. Real style. Oakland made.', 'skyyrose-flagship' ); ?></p>
-	</div>
-	<div class="lookbook-grid stagger-grid">
-		<?php foreach ( $lookbook as $lb ) :
-			$lb_base = SKYYROSE_ASSETS_URI . '/images/lookbook/' . $lb['file'];
-		?>
-			<div class="lb-img rv<?php echo $lb['tall'] ? ' tall' : ''; ?>">
-				<img src="<?php echo esc_url( $lb_base . '-480w.webp' ); ?>"
-				     srcset="<?php echo esc_url( $lb_base . '-480w.webp' ); ?> 480w, <?php echo esc_url( $lb_base . '-960w.webp' ); ?> 960w"
-				     sizes="(max-width: 768px) 100vw, 480px"
-				     alt="<?php echo esc_attr( $lb['alt'] ); ?>"
-				     loading="lazy" decoding="async" width="480" height="640">
-				<span class="lb-label"><?php echo esc_html( $lb['label'] ); ?></span>
-			</div>
-		<?php endforeach; ?>
-	</div>
-</section>
 
 <!-- ═══ CRAFT ═══ -->
 <section class="craft" id="craft" aria-label="<?php esc_attr_e( 'Our Craft', 'skyyrose-flagship' ); ?>">
@@ -294,7 +274,7 @@ get_header();
 			<p><?php esc_html_e( 'Every stitch, every fabric, every detail — intentional.', 'skyyrose-flagship' ); ?></p>
 		</div>
 		<div class="craft-grid stagger-grid">
-			<?php foreach ( $craft_cards as $idx => $card ) : ?>
+			<?php foreach ( $craft_cards as $card ) : ?>
 				<div class="craft-card">
 					<div class="craft-icon" aria-hidden="true"><?php echo wp_kses( $card['icon'], $svg_whitelist ); ?></div>
 					<div class="craft-label"><?php echo esc_html( $card['label'] ); ?></div>
@@ -305,80 +285,59 @@ get_header();
 	</div>
 </section>
 
-<!-- ═══ NEWSLETTER ═══ -->
-<section class="newsletter" id="community" aria-label="<?php esc_attr_e( 'Newsletter', 'skyyrose-flagship' ); ?>">
-	<div class="nl-inner">
-		<p class="nl-eyebrow rv-blur-down"><?php esc_html_e( 'Join the Movement', 'skyyrose-flagship' ); ?></p>
-		<h2 class="nl-title rv-split-word"><?php esc_html_e( 'For The Real Ones', 'skyyrose-flagship' ); ?></h2>
-		<p class="nl-desc rv-blur"><?php esc_html_e( 'Early access to drops. Behind-the-scenes from Oakland. Stories that matter. No spam, just substance.', 'skyyrose-flagship' ); ?></p>
-		<div class="nl-form rv-clip-up">
-			<input type="email" class="nl-input" placeholder="<?php esc_attr_e( 'Your email address', 'skyyrose-flagship' ); ?>" id="nlEmail" aria-label="<?php esc_attr_e( 'Email address', 'skyyrose-flagship' ); ?>" required>
-			<button type="button" class="nl-submit"><?php esc_html_e( 'Join', 'skyyrose-flagship' ); ?></button>
+<!-- ═══ DROP LIST — "Join the Drop List" not "Newsletter" ═══ -->
+<section class="newsletter newsletter-v7" id="community" aria-label="<?php esc_attr_e( 'Drop List', 'skyyrose-flagship' ); ?>">
+	<div class="nl-v7-ghost font-cinzel" aria-hidden="true"><?php esc_html_e( 'SKYYROSE', 'skyyrose-flagship' ); ?></div>
+	<div class="nl-v7-inner">
+		<div class="nl-v7-left rv">
+			<p class="nl-v7-label font-mono"><?php esc_html_e( 'Join the Drop List', 'skyyrose-flagship' ); ?></p>
+			<p class="nl-v7-desc"><?php esc_html_e( 'Exclusive access to drops, pre-orders, and private events. No noise.', 'skyyrose-flagship' ); ?></p>
+			<div class="nl-form nl-v7-form">
+				<input type="email" class="nl-input nl-v7-input" id="nlEmail"
+				       placeholder="<?php esc_attr_e( 'Your email', 'skyyrose-flagship' ); ?>"
+				       aria-label="<?php esc_attr_e( 'Email address', 'skyyrose-flagship' ); ?>" required>
+				<button type="button" class="nl-submit nl-v7-submit" aria-label="<?php esc_attr_e( 'Submit', 'skyyrose-flagship' ); ?>">→</button>
+			</div>
 		</div>
-		<p class="nl-note rv rv-d4"><?php esc_html_e( 'Free to join · Unsubscribe anytime · Oakland love only', 'skyyrose-flagship' ); ?></p>
+		<nav class="nl-v7-nav rv-right" aria-label="<?php esc_attr_e( 'Footer Navigation', 'skyyrose-flagship' ); ?>">
+			<div class="nl-v7-nav-col">
+				<span class="nl-v7-nav-hd font-mono"><?php esc_html_e( 'Worlds', 'skyyrose-flagship' ); ?></span>
+				<?php foreach ( $collections as $c ) : ?>
+					<a href="<?php echo esc_url( $c['link'] ); ?>"><?php echo esc_html( $c['name'] ); ?></a>
+				<?php endforeach; ?>
+			</div>
+			<div class="nl-v7-nav-col">
+				<span class="nl-v7-nav-hd font-mono"><?php esc_html_e( 'Brand', 'skyyrose-flagship' ); ?></span>
+				<a href="<?php echo esc_url( home_url( '/about/' ) ); ?>"><?php esc_html_e( 'About', 'skyyrose-flagship' ); ?></a>
+				<a href="#issue"><?php esc_html_e( 'Issue', 'skyyrose-flagship' ); ?></a>
+				<a href="<?php echo esc_url( home_url( '/about/' ) ); ?>"><?php esc_html_e( 'Manifesto', 'skyyrose-flagship' ); ?></a>
+				<a href="<?php echo esc_url( home_url( '/shipping-returns/' ) ); ?>"><?php esc_html_e( 'Returns', 'skyyrose-flagship' ); ?></a>
+			</div>
+		</nav>
+	</div>
+	<div class="nl-v7-bottom">
+		<span class="font-mono">&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php esc_html_e( 'SkyyRose', 'skyyrose-flagship' ); ?></span>
+		<span class="nl-v7-tagline"><?php esc_html_e( 'Luxury Grows from Concrete.', 'skyyrose-flagship' ); ?></span>
+		<div class="ft-social">
+			<a href="https://instagram.com/skyyroseco" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'IG', 'skyyrose-flagship' ); ?></a>
+			<a href="https://tiktok.com/@skyyroseco" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'TT', 'skyyrose-flagship' ); ?></a>
+			<a href="https://x.com/skyyroseco" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'X', 'skyyrose-flagship' ); ?></a>
+		</div>
 	</div>
 </section>
 
-<!-- ═══ FOOTER ═══ -->
-<footer class="ft" aria-label="<?php esc_attr_e( 'Site Footer', 'skyyrose-flagship' ); ?>">
-	<div class="ft-inner">
-		<div>
-			<div class="ft-brand-name rv"><?php esc_html_e( 'SkyyRose', 'skyyrose-flagship' ); ?></div>
-			<p class="ft-desc rv rv-d1"><?php esc_html_e( 'Where Bay Area authenticity meets high-fashion aesthetics. Gender-neutral, sustainably crafted, limited edition designs. Built by a father, named after a daughter.', 'skyyrose-flagship' ); ?></p>
-			<div class="ft-awards rv rv-d2">
-				<span class="ft-award"><?php esc_html_e( "Maxim's 14 Game-Changing Entrepreneurs 2023", 'skyyrose-flagship' ); ?></span>
-				<span class="ft-award"><?php esc_html_e( 'Best Bay Area Clothing Line 2024', 'skyyrose-flagship' ); ?></span>
-				<span class="ft-award"><?php esc_html_e( 'Featured — San Francisco Post, CEO Weekly', 'skyyrose-flagship' ); ?></span>
-			</div>
-		</div>
-		<div>
-			<div class="ft-col-title rv"><?php esc_html_e( 'Collections', 'skyyrose-flagship' ); ?></div>
-			<ul class="ft-links rv rv-d1">
-				<li><a href="<?php echo esc_url( home_url( '/collection-black-rose/' ) ); ?>"><?php esc_html_e( 'Black Rose', 'skyyrose-flagship' ); ?></a></li>
-				<li><a href="<?php echo esc_url( home_url( '/collection-love-hurts/' ) ); ?>"><?php esc_html_e( 'Love Hurts', 'skyyrose-flagship' ); ?></a></li>
-				<li><a href="<?php echo esc_url( home_url( '/collection-signature/' ) ); ?>"><?php esc_html_e( 'Signature', 'skyyrose-flagship' ); ?></a></li>
-			</ul>
-		</div>
-		<div>
-			<div class="ft-col-title rv"><?php esc_html_e( 'Brand', 'skyyrose-flagship' ); ?></div>
-			<ul class="ft-links rv rv-d1">
-				<li><a href="<?php echo esc_url( home_url( '/about/' ) ); ?>"><?php esc_html_e( 'Our Story', 'skyyrose-flagship' ); ?></a></li>
-				<li><a href="#lookbook"><?php esc_html_e( 'Lookbook', 'skyyrose-flagship' ); ?></a></li>
-				<li><a href="<?php echo esc_url( home_url( '/about/' ) ); ?>"><?php esc_html_e( 'About', 'skyyrose-flagship' ); ?></a></li>
-			</ul>
-		</div>
-		<div>
-			<div class="ft-col-title rv"><?php esc_html_e( 'Support', 'skyyrose-flagship' ); ?></div>
-			<ul class="ft-links rv rv-d1">
-				<li><a href="<?php echo esc_url( home_url( '/shipping-returns/' ) ); ?>"><?php esc_html_e( 'Shipping & Returns', 'skyyrose-flagship' ); ?></a></li>
-				<li><a href="mailto:info@skyyrose.co"><?php esc_html_e( 'Contact', 'skyyrose-flagship' ); ?></a></li>
-				<li><a href="<?php echo esc_url( home_url( '/faq/' ) ); ?>"><?php esc_html_e( 'FAQ', 'skyyrose-flagship' ); ?></a></li>
-			</ul>
-		</div>
-	</div>
-	<div class="ft-bottom">
-		<span class="ft-copy">&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php esc_html_e( 'SkyyRose LLC. All rights reserved.', 'skyyrose-flagship' ); ?></span>
-		<div class="ft-social">
-			<a href="https://instagram.com/skyyroseco" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Instagram', 'skyyrose-flagship' ); ?></a>
-			<a href="https://tiktok.com/@skyyroseco" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'TikTok', 'skyyrose-flagship' ); ?></a>
-			<a href="https://x.com/skyyroseco" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'X', 'skyyrose-flagship' ); ?></a>
-		</div>
-		<span class="ft-oakland"><?php esc_html_e( 'Made in Oakland', 'skyyrose-flagship' ); ?></span>
-	</div>
-</footer>
-
 <script data-jetpack-boost="ignore" type="application/ld+json"><?php
 echo wp_json_encode( array(
-	'@context'      => 'https://schema.org',
-	'@type'         => 'Organization',
-	'name'          => 'SkyyRose',
-	'url'           => home_url( '/' ),
-	'logo'          => SKYYROSE_ASSETS_URI . '/branding/skyyrose-monogram.webp',
-	'description'   => 'Oakland luxury streetwear. Gender-neutral, limited edition designs. Built by a father, named after a daughter.',
-	'foundingDate'  => '2020',
-	'founder'       => array( '@type' => 'Person', 'name' => 'Corey Foster' ),
-	'address'       => array( '@type' => 'PostalAddress', 'addressLocality' => 'Oakland', 'addressRegion' => 'CA', 'addressCountry' => 'US' ),
-	'sameAs'        => array( 'https://instagram.com/skyyroseco' ),
+	'@context'     => 'https://schema.org',
+	'@type'        => 'Organization',
+	'name'         => 'SkyyRose',
+	'url'          => home_url( '/' ),
+	'logo'         => SKYYROSE_ASSETS_URI . '/branding/skyyrose-monogram.webp',
+	'description'  => 'Oakland luxury streetwear. Gender-neutral, limited edition designs. Built by a father, named after a daughter.',
+	'foundingDate' => '2020',
+	'founder'      => array( '@type' => 'Person', 'name' => 'Corey Foster' ),
+	'address'      => array( '@type' => 'PostalAddress', 'addressLocality' => 'Oakland', 'addressRegion' => 'CA', 'addressCountry' => 'US' ),
+	'sameAs'       => array( 'https://instagram.com/skyyroseco' ),
 ), JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT );
 ?></script>
 
@@ -386,10 +345,9 @@ echo wp_json_encode( array(
 	<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-8 8h5v8h6v-8h5z"/></svg>
 </button>
 
-</main><!-- .homepage-v2 -->
+</main>
 
 <?php
-// Load homepage JS inline to bypass page-optimize plugin stripping.
 $homepage_js_path = SKYYROSE_DIR . '/assets/js/homepage-v2.js';
 if ( file_exists( $homepage_js_path ) ) :
 ?>
@@ -400,17 +358,12 @@ if ( file_exists( $homepage_js_path ) ) :
 <?php endif; ?>
 
 <?php
-// Use wp_footer() directly (not get_footer()) because the homepage has its
-// own inline footer markup above (.ft). But include the shared template parts
-// that live in footer.php so mobile nav, cookie consent, size guide, and
-// toast container render on the homepage too.
 get_template_part( 'template-parts/size-guide-modal' );
 get_template_part( 'template-parts/cookie-consent' );
 get_template_part( 'template-parts/mobile-bottom-nav' );
 get_template_part( 'template-parts/skyy-mascot' );
 ?>
 
-<!-- Toast Notification Container -->
 <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
 <?php wp_footer(); ?>

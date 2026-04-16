@@ -20,7 +20,6 @@ from datetime import UTC, datetime
 from typing import Any
 
 import structlog
-
 from base import (
     AgentCapability,
     AgentConfig,
@@ -31,6 +30,7 @@ from base import (
     SuperAgent,
     ValidationResult,
 )
+
 from core.runtime.tool_registry import ToolCallContext, ToolCategory, ToolRegistry, ToolSeverity
 
 logger = structlog.get_logger(__name__)

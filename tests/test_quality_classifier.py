@@ -12,12 +12,11 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from skyyrose.elite_studio.quality.ml_classifier import (
-    ClassifierResult,
-    QualityClassifier,
     _CANDIDATE_LABELS,
     _LABEL_SCORES,
+    ClassifierResult,
+    QualityClassifier,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers

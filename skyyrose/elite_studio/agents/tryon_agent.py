@@ -12,7 +12,7 @@ import asyncio
 import logging
 import shutil
 import time
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 
 from ..config import OUTPUT_DIR
 from ..models import TryOnResult

@@ -496,6 +496,150 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-04-14T23:08:57.192Z"
+    },
+    {
+      "id": "bug-032",
+      "timestamp": "2026-04-16T00:36:57.368Z",
+      "error_message": "Missing error handling in catches",
+      "file": "../.claude/agents/gsd-codebase-mapper.md",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-16T00:36:57.368Z"
+    },
+    {
+      "id": "bug-033",
+      "timestamp": "2026-04-16T00:37:48.657Z",
+      "error_message": "Wrong reference: agent_sdk should be sdk",
+      "file": "tests/test_hybrid_simple.py",
+      "root_cause": "Used \"agent_sdk\" instead of \"sdk\"",
+      "fix": "Changed agent_sdk → sdk",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-16T00:37:48.657Z"
+    },
+    {
+      "id": "bug-034",
+      "timestamp": "2026-04-16T00:37:50.155Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "../.claude/agents/gsd-integration-checker.md",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-16T00:37:50.155Z"
+    },
+    {
+      "id": "bug-035",
+      "timestamp": "2026-04-16T00:38:01.894Z",
+      "error_message": "Wrong reference: agent_sdk should be sdk",
+      "file": "tests/integration/test_hybrid_integration.py",
+      "root_cause": "Used \"agent_sdk\" instead of \"sdk\"",
+      "fix": "Changed agent_sdk → sdk",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-16T00:38:01.894Z"
+    },
+    {
+      "id": "bug-036",
+      "timestamp": "2026-04-16T00:40:11.088Z",
+      "error_message": "Wrong reference: agent_sdk should be sdk",
+      "file": "examples/multi_agent_workflow.py",
+      "root_cause": "Used \"agent_sdk\" instead of \"sdk\"",
+      "fix": "Changed agent_sdk → sdk",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-16T00:40:11.088Z"
+    },
+    {
+      "id": "bug-037",
+      "timestamp": "2026-04-16T00:40:12.534Z",
+      "error_message": "Wrong reference: agent_sdk should be sdk",
+      "file": "examples/basic_query.py",
+      "root_cause": "Used \"agent_sdk\" instead of \"sdk\"",
+      "fix": "Changed agent_sdk → sdk",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-16T00:40:12.534Z"
+    },
+    {
+      "id": "bug-038",
+      "timestamp": "2026-04-16T00:40:14.376Z",
+      "error_message": "Wrong reference: agent_sdk should be sdk",
+      "file": "examples/continuous_conversation.py",
+      "root_cause": "Used \"agent_sdk\" instead of \"sdk\"",
+      "fix": "Changed agent_sdk → sdk",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-16T00:40:14.376Z"
+    },
+    {
+      "id": "bug-039",
+      "timestamp": "2026-04-16T00:41:01.510Z",
+      "error_message": "Significant refactor of ",
+      "file": "tasks/todo.md",
+      "root_cause": "7 lines replaced/restructured",
+      "fix": "Rewrote 7→7 lines (7 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-16T00:41:01.510Z"
+    },
+    {
+      "id": "bug-040",
+      "timestamp": "2026-04-16T00:45:53.187Z",
+      "error_message": "Significant refactor of ",
+      "file": "sdk/python/agent_sdk/super_agents/__init__.py",
+      "root_cause": "6 lines replaced/restructured",
+      "fix": "Rewrote 6→6 lines (6 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-16T00:45:53.187Z"
     }
   ]
 }

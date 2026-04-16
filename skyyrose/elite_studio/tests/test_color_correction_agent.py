@@ -8,14 +8,13 @@ import pytest
 from PIL import Image
 
 from skyyrose.elite_studio.agents.color_correction_agent import (
-    ColorCorrectionAgent,
     _BRIGHTNESS_FACTOR,
     _CONTRAST_FACTOR,
     _SATURATION_FACTOR,
     _SHARPNESS_FACTOR,
+    ColorCorrectionAgent,
 )
 from skyyrose.elite_studio.models import ColorCorrectionResult
-
 
 # ---------------------------------------------------------------------------
 # Helpers

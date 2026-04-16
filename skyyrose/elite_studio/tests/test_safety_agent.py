@@ -11,7 +11,6 @@ from PIL import Image
 from skyyrose.elite_studio.agents.safety_agent import SafetyAgent
 from skyyrose.elite_studio.models import SafetyResult
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

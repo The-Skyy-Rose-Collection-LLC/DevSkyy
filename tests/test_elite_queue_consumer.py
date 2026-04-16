@@ -15,12 +15,11 @@ import fakeredis
 import pytest
 
 from skyyrose.elite_studio.queue.consumer import (
-    EliteStudioWorker,
     _EVENT_CHANNEL,
     _RESULT_KEY_PREFIX,
+    EliteStudioWorker,
 )
 from skyyrose.elite_studio.queue.job_types import EliteStudioJobData, EliteStudioJobResult
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

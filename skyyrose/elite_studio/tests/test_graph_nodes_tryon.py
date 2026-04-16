@@ -13,10 +13,8 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-
 from skyyrose.elite_studio.graph.nodes import tryon_node
 from skyyrose.elite_studio.models import GenerationResult, TryOnResult
-
 
 # ---------------------------------------------------------------------------
 # Helpers

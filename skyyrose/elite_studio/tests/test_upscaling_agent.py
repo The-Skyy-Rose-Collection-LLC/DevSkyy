@@ -12,7 +12,6 @@ from PIL import Image
 from skyyrose.elite_studio.agents.upscaling_agent import UpscalingAgent
 from skyyrose.elite_studio.models import UpscaleResult
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
