@@ -496,6 +496,20 @@ function skyyrose_enqueue_template_styles() {
 		}
 	}
 
+	// Homepage v7 "Concrete" theme — supplemental styles loaded after homepage-v2.
+	if ( 'front-page' === $slug ) {
+		$v7_css = $use_min && file_exists( $base_css_dir . '/homepage-v7.min.css' )
+			? 'homepage-v7.min.css' : 'homepage-v7.css';
+		if ( file_exists( $base_css_dir . '/' . $v7_css ) ) {
+			wp_enqueue_style(
+				'skyyrose-homepage-v7',
+				$base_css_uri . '/' . $v7_css,
+				array( 'skyyrose-template-homepage-v2' ),
+				SKYYROSE_VERSION
+			);
+		}
+	}
+
 	// Unified collection page CSS — single stylesheet for all 4 collection templates.
 	if ( 'collection-standalone' === $slug ) {
 		$col_css = $use_min && file_exists( $base_css_dir . '/collection-pages.min.css' )
@@ -984,6 +998,67 @@ function skyyrose_enqueue_phase3_assets(): void {
 	}
 }
 
+/**
+ * Enqueue Phase 4 Experience Engine assets — Personalization.
+ *
+ * personalization.js + personalization.css load on pages that render product
+ * grids or single products. Runs at priority 42 so personalization.php's
+ * localize (priority 45) attaches to the already-registered handle.
+ */
+function skyyrose_enqueue_phase4_assets(): void {
+	if ( ! function_exists( 'skyyrose_see_is_module_active' ) ) {
+		return;
+	}
+	if ( ! skyyrose_see_is_module_active( 'personalization' ) ) {
+		return;
+	}
+
+	$base_js_dir  = SKYYROSE_DIR . '/assets/js';
+	$base_css_dir = SKYYROSE_DIR . '/assets/css';
+	$js_uri       = SKYYROSE_ASSETS_URI . '/js';
+	$css_uri      = SKYYROSE_ASSETS_URI . '/css';
+
+	$product_slugs = array(
+		'collection-standalone',
+		'collection',
+		'collection-v4',
+		'collections-shop',
+		'shop-archive',
+		'search',
+		'front-page',
+		'landing',
+		'preorder-gateway',
+		'single',
+	);
+
+	$slug = skyyrose_get_current_template_slug();
+	if ( ! in_array( $slug, $product_slugs, true ) && ! is_singular( 'product' ) ) {
+		return;
+	}
+
+	if ( file_exists( $base_css_dir . '/personalization.css' ) ) {
+		wp_enqueue_style(
+			'skyyrose-personalization',
+			$css_uri . '/personalization.css',
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	if ( file_exists( $base_js_dir . '/personalization.js' ) ) {
+		wp_enqueue_script(
+			'skyyrose-personalization',
+			$js_uri . '/personalization.js',
+			array(),
+			SKYYROSE_VERSION,
+			array(
+				'strategy'  => 'defer',
+				'in_footer' => true,
+			)
+		);
+	}
+}
+
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_local_fonts', 5 );
 
 // Global styles (priority 10 - default).
@@ -1002,6 +1077,7 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_template_styles', 20 );
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_template_scripts', 20 );
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_phase2_assets', 30 );
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_phase3_assets', 40 );
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_phase4_assets', 42 );
 
 // Collection experience scenes (priority 65, after all template assets).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_collection_experiences', 65 );
