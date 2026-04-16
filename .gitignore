@@ -302,3 +302,12 @@ design-system/
 
 # Local MCP server config (per-machine)
 .mcp.json
+
+# OpenWolf session-local state (churns every action — not content, ignore)
+.wolf/memory.md
+.wolf/token-ledger.json
+.wolf/hooks/_session.json
+.wolf/claude-mem-digest.md
+
+# Root-level Jupyter notebooks (belong in a /notebooks/ dir, not repo root)
+/*.ipynb
