@@ -11,8 +11,8 @@ Provides convenient access to all Agent SDK capabilities:
 import asyncio
 from typing import Any
 
-from agent_sdk.orchestrator import AgentOrchestrator
-from agent_sdk.round_table import RoundTableOrchestrator
+from .orchestrator import AgentOrchestrator
+from .round_table import RoundTableOrchestrator
 
 
 class DevSkyy:
@@ -21,7 +21,7 @@ class DevSkyy:
 
     Usage:
         ```python
-        from agent_sdk.main import DevSkyy
+        from sdk.python.agent_sdk.main import DevSkyy
 
         async def main():
             devskyy = DevSkyy()

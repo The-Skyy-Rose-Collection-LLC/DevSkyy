@@ -14,7 +14,7 @@ import os
 from datetime import UTC, datetime
 from uuid import uuid4
 
-from agent_sdk.task_queue import TaskQueue
+from sdk.python.agent_sdk.task_queue import TaskQueue
 
 from .job_types import EliteStudioJobData
 

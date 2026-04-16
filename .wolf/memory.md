@@ -1,4 +1,5 @@
 # Memory
+| 17:57 | Source-of-truth refactor: deleted root agent_sdk/, agents/base_super_agent.py, my_agent/, tests/test_hybrid_integration.py | 14 files edited, 4 deleted | all sdk.python.agent_sdk imports verified OK | ~8k |
 
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
@@ -308,3 +309,94 @@
 | 16:09 | Session end: 16 writes across 7 files (enqueue.php, plans.py, entitlements.py, pyproject.toml, rag_anything_service.py) | 8 reads | ~12993 tok |
 | 16:11 | Session end: 16 writes across 7 files (enqueue.php, plans.py, entitlements.py, pyproject.toml, rag_anything_service.py) | 8 reads | ~12993 tok |
 | 16:12 | Session end: 16 writes across 7 files (enqueue.php, plans.py, entitlements.py, pyproject.toml, rag_anything_service.py) | 8 reads | ~12993 tok |
+| 16:16 | Session end: 16 writes across 7 files (enqueue.php, plans.py, entitlements.py, pyproject.toml, rag_anything_service.py) | 8 reads | ~12993 tok |
+| 17:15 | Session end: 16 writes across 7 files (enqueue.php, plans.py, entitlements.py, pyproject.toml, rag_anything_service.py) | 8 reads | ~12993 tok |
+| 17:20 | Session end: 16 writes across 7 files (enqueue.php, plans.py, entitlements.py, pyproject.toml, rag_anything_service.py) | 8 reads | ~12993 tok |
+
+## Session: 2026-04-15 17:20
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-04-15 16:07
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-04-15 16:12
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-04-15 16:25
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-04-15 16:26
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 16:30 | Created wordpress-theme/skyyrose-flagship/inc/performance-guardian.php | — | ~848 |
+| 16:34 | Created wordpress-theme/skyyrose-flagship/assets/js/performance-guardian.js | — | ~951 |
+| 16:34 | Session end: 2 writes across 2 files (performance-guardian.php, performance-guardian.js) | 0 reads | ~1859 tok |
+| 16:35 | Created wordpress-theme/skyyrose-flagship/assets/js/brand-atmosphere.js | — | ~1978 |
+| 16:36 | Created wordpress-theme/skyyrose-flagship/assets/css/brand-atmosphere.css | — | ~369 |
+| 16:37 | Edited wordpress-theme/skyyrose-flagship/inc/enqueue.php | added 7 condition(s) | ~612 |
+| 16:37 | Edited wordpress-theme/skyyrose-flagship/inc/enqueue.php | 2→3 lines | ~41 |
+| 16:39 | Edited wordpress-theme/skyyrose-flagship/functions.php | 1→2 lines | ~18 |
+| 16:41 | Phase 2 Experience Engine — performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css | inc/performance-guardian.php, assets/js/performance-guardian.js, assets/js/brand-atmosphere.js, assets/css/brand-atmosphere.css, inc/enqueue.php, functions.php | all 5 deliverables created, PHP lint clean | ~3200 |
+| 16:43 | Edited tasks/todo.md | 6→6 lines | ~122 |
+| 16:43 | Session end: 8 writes across 7 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 4 reads | ~13127 tok |
+| 16:44 | Session end: 8 writes across 7 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 4 reads | ~13127 tok |
+| 16:45 | Session end: 8 writes across 7 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 4 reads | ~13127 tok |
+| 16:47 | Session end: 8 writes across 7 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 4 reads | ~13127 tok |
+| 16:53 | Session end: 8 writes across 7 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 7 reads | ~13127 tok |
+| 16:56 | Session end: 8 writes across 7 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 7 reads | ~13127 tok |
+| 17:01 | Session end: 8 writes across 7 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 7 reads | ~13127 tok |
+| 17:20 | Edited wordpress-theme/skyyrose-flagship/template-parts/product-card-holo.php | 2→4 lines | ~55 |
+| 17:20 | Edited wordpress-theme/skyyrose-flagship/template-parts/product-card-holo.php | expanded (+8 lines) | ~184 |
+| 17:21 | Session end: 10 writes across 8 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 12 reads | ~19625 tok |
+| 17:21 | Created wordpress-theme/skyyrose-flagship/assets/js/experience-analyzer.js | — | ~1668 |
+| 17:23 | Session end: 11 writes across 9 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 17 reads | ~21293 tok |
+| 17:24 | Created wordpress-theme/skyyrose-flagship/assets/js/smart-showcase.js | — | ~3113 |
+| 17:24 | Session end: 12 writes across 10 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 17 reads | ~24406 tok |
+| 17:24 | Edited skyyrose/elite_studio/queue/producer.py | inline fix | ~16 |
+| 17:25 | Created wordpress-theme/skyyrose-flagship/assets/js/micro-interactions.js | — | ~1862 |
+| 17:25 | Edited skyyrose/elite_studio/queue/consumer.py | inline fix | ~16 |
+| 17:26 | Session end: 15 writes across 13 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 17 reads | ~26300 tok |
+| 17:32 | Session end: 15 writes across 13 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 17 reads | ~26300 tok |
+| 17:36 | Edited ../.claude/agents/gsd-codebase-mapper.md | modified catches() | ~367 |
+| 17:37 | Edited tests/test_security.py | inline fix | ~20 |
+| 17:37 | Created wordpress-theme/skyyrose-flagship/assets/css/smart-showcase.css | — | ~2218 |
+| 17:37 | Edited tests/test_hybrid_simple.py | inline fix | ~8 |
+| 17:37 | Edited ../.claude/agents/gsd-integration-checker.md | expanded (+13 lines) | ~380 |
+| 17:38 | Edited tests/integration/test_hybrid_integration.py | inline fix | ~8 |
+| 17:38 | Edited wordpress-theme/skyyrose-flagship/inc/woocommerce.php | added 1 condition(s) | ~298 |
+| 17:38 | Edited ../.claude/agents/gsd-nyquist-auditor.md | expanded (+13 lines) | ~385 |
+| 17:38 | Edited wordpress-theme/skyyrose-flagship/inc/enqueue.php | added 9 condition(s) | ~773 |
+| 17:38 | Edited ../.claude/agents/gsd-research-synthesizer.md | expanded (+13 lines) | ~361 |
+| 17:39 | Edited wordpress-theme/skyyrose-flagship/inc/enqueue.php | 3→4 lines | ~60 |
+| 17:40 | Edited examples/multi_agent_workflow.py | inline fix | ~8 |
+| 17:40 | Edited examples/basic_query.py | inline fix | ~8 |
+| 17:40 | Edited examples/continuous_conversation.py | inline fix | ~8 |
+| 17:41 | Edited tasks/todo.md | 7→7 lines | ~202 |
+| 17:42 | Phase 3 Experience Engine — experience-analyzer.js, smart-showcase.js, micro-interactions.js, smart-showcase.css, woocommerce.php inject, enqueue phase3 fn | 6 files created/modified, PHP lint clean | ~4100 |
+| 17:42 | Session end: 30 writes across 25 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 24 reads | ~32358 tok |
+| 17:42 | Session end: 30 writes across 25 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 24 reads | ~32358 tok |
+| 17:43 | Session end: 30 writes across 25 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 24 reads | ~32358 tok |
+| 17:45 | Edited wordpress-theme/skyyrose-flagship/inc/enqueue.php | added 1 condition(s) | ~38 |
+| 17:45 | Edited sdk/python/agent_sdk/main.py | 2→2 lines | ~26 |
+| 17:45 | Edited sdk/python/agent_sdk/super_agents/__init__.py | 6→6 lines | ~74 |
+| 17:45 | Edited sdk/python/agent_sdk/orchestrator.py | inline fix | ~14 |
+| 17:52 | Edited wordpress-theme/skyyrose-flagship/inc/enqueue.php | page() → elseif() | ~570 |
+| 17:52 | Created wordpress-theme/skyyrose-flagship/front-page.php | — | ~5164 |
+| 17:52 | Edited sdk/python/agent_sdk/orchestrator.py | inline fix | ~8 |
+| 17:52 | Edited sdk/python/agent_sdk/worker.py | inline fix | ~8 |
+| 17:52 | Edited sdk/python/agent_sdk/round_table.py | inline fix | ~14 |
+| 17:52 | Edited sdk/python/agent_sdk/custom_tools.py | inline fix | ~15 |
+| 17:52 | Session end: 40 writes across 32 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 30 reads | ~40983 tok |
+| 17:53 | Session end: 40 writes across 32 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 30 reads | ~40983 tok |
+| 17:55 | Session end: 40 writes across 32 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 30 reads | ~40983 tok |
+| 17:57 | Edited sdk/python/agent_sdk/main.py | inline fix | ~16 |
+| 17:59 | Session end: 41 writes across 32 files (performance-guardian.php, performance-guardian.js, brand-atmosphere.js, brand-atmosphere.css, enqueue.php) | 30 reads | ~40999 tok |

@@ -16,9 +16,9 @@ async def main():
     # Test 1: Imports
     print("1. Testing imports...")
     try:
-        from agent_sdk.custom_tools import create_devskyy_tools
-        from agent_sdk.task_queue import TaskPriority, TaskQueue, TaskStatus
-        from agent_sdk.worker import BackgroundWorker
+        from sdk.python.agent_sdk.custom_tools import create_devskyy_tools
+        from sdk.python.agent_sdk.task_queue import TaskPriority, TaskQueue, TaskStatus
+        from sdk.python.agent_sdk.worker import BackgroundWorker
 
         print("   ✅ All imports successful\n")
     except Exception as e:
@@ -136,7 +136,7 @@ async def main():
     print("   1. Start Docker Desktop")
     print("   2. Start Redis: docker-compose up -d redis")
     print("   3. Start Worker: python3 -m agent_sdk.worker")
-    print("   4. Test tools: python3 -c 'from agent_sdk.custom_tools import *'")
+    print("   4. Test tools: python3 -c 'from sdk.python.agent_sdk.custom_tools import *'")
     print("   5. Monitor: open http://localhost:5555 (Flower UI)")
     print("\n" + "=" * 70 + "\n")
 

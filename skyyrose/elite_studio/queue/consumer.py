@@ -257,7 +257,7 @@ class EliteStudioWorker:
 
     def _handle_task(self, r: Any, task_id: str) -> None:
         """Fetch task metadata, dispatch to process_job, handle exceptions."""
-        from agent_sdk.task_queue import QUEUE_PREFIX
+        from sdk.python.agent_sdk.task_queue import QUEUE_PREFIX
 
         task_key = f"{QUEUE_PREFIX}{task_id}"
         raw = r.get(task_key)

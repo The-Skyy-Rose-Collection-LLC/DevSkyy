@@ -7,14 +7,15 @@ Demonstrates maintaining context across multiple exchanges using ClaudeSDKClient
 import asyncio
 import os
 
-from agent_sdk.custom_tools import create_devskyy_tools
-from agent_sdk.super_agents import MarketingAgent
 from claude_agent_sdk import (
     AssistantMessage,
     ClaudeSDKClient,
     TextBlock,
 )
 from dotenv import load_dotenv
+
+from sdk.python.agent_sdk.custom_tools import create_devskyy_tools
+from sdk.python.agent_sdk.super_agents import MarketingAgent
 
 # Load environment variables
 load_dotenv()
@@ -96,7 +97,7 @@ async def multi_turn_analysis():
     print("Multi-Turn Analysis Example")
     print("=" * 60)
 
-    from agent_sdk.super_agents import AnalyticsAgent
+    from sdk.python.agent_sdk.super_agents import AnalyticsAgent
 
     mcp_server = create_devskyy_tools()
     options = AnalyticsAgent.get_standalone_options()
@@ -151,7 +152,7 @@ async def collaborative_workflow():
     print("Collaborative Workflow Example")
     print("=" * 60)
 
-    from agent_sdk.super_agents import CreativeAgent
+    from sdk.python.agent_sdk.super_agents import CreativeAgent
 
     mcp_server = create_devskyy_tools()
     options = CreativeAgent.get_standalone_options()
