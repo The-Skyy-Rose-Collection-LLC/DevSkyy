@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "devskyy"
-version = "3.1.0"
+version = "3.2.0"
 description = "AI-driven multi-agent orchestration platform for enterprise e-commerce automation with WordPress/WooCommerce integration, 3D asset generation, and LangGraph workflows"
 readme = "README.md"
 license = { text = "MIT" }
