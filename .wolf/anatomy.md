@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-04-16T21:11:25.376Z
-> Files: 653 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-04-16T21:50:07.551Z
+> Files: 659 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../.claude/
 
@@ -1657,6 +1657,11 @@
 
 - `rag_anything.py` — API: 4 endpoints (~1987 tok)
 
+## assets/product-masters/
+
+- `manifest.json` (~17 tok)
+- `README.md` — Project documentation (~771 tok)
+
 ## billing/
 
 - `entitlements.py` — EntitlementResult: check, get_upgrade_message (~1530 tok)
@@ -1695,6 +1700,8 @@
 
 ## skyyrose/elite_studio/
 
+- `fidelity.py` — class: to_dict, check_color, check_text, check_clip_similarity + 1 more (~3058 tok)
+- `master_registry.py` — MasterEntry: masters_dir, manifest_path, sha256_of_file, resolved_master_path + 8 more (~2066 tok)
 - `telemetry.py` — name: new_run_id, hash_inputs, emit, set + 1 more (~1277 tok)
 
 ## skyyrose/elite_studio/agents/
@@ -1718,6 +1725,8 @@
 
 ## skyyrose/elite_studio/tests/
 
+- `test_fidelity.py` — Tests for skyyrose.elite_studio.fidelity (Wave 1 fidelity gate). (~1869 tok)
+- `test_master_registry.py` — Tests for skyyrose.elite_studio.master_registry (Wave 1 reference-first pipeline). (~1557 tok)
 - `test_telemetry.py` — Tests for skyyrose.elite_studio.telemetry (Phase 1 compositor instrumentation). (~1239 tok)
 
 ## skyyrose/multi_agent/
