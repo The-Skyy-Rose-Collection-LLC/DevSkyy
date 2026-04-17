@@ -265,10 +265,22 @@ class ProductionPipeline:
             "gemini": self.genai,
         }
 
+        # Use real product photo for QA when available (not techflat)
+        qa_source = source_path
+        bundle_dir = _find_bundle_dir(name, sku)
+        if bundle_dir:
+            for tag in ("photo-front", "source-photo"):
+                for f in bundle_dir.glob(f"{tag}.*"):
+                    if f.exists():
+                        qa_source = f
+                        break
+                if qa_source != source_path:
+                    break
+
         try:
             qa_result = run_tournament(
                 clients=tournament_clients,
-                source_path=source_path,
+                source_path=qa_source,
                 candidate_path=output_path,
                 dna=vision_desc,
                 passing_threshold=cfg.qa_auto_approve,
@@ -531,41 +543,46 @@ def _find_bundle_dir(name: str, sku: str) -> Path | None:
     return None
 
 
-def _load_bundle_refs(name: str, sku: str, source_path: Path, view: str) -> list[Path]:
+def _load_bundle_refs(name: str, sku: str, source_path: Path, view: str) -> list[tuple[str, Path]]:
     """Load reference images from the product bundle directory.
 
     Bundles are named by product name (not SKU).
-    Returns a list of image Paths relevant to the requested view.
+    Returns list of (label, Path) tuples for generate_gemini() extra_refs.
     """
     bundle_dir = _find_bundle_dir(name, sku)
     if not bundle_dir:
         log.warning("No bundle directory for %s (%s)", name, sku)
         return []
 
-    refs: list[Path] = []
+    TAG_LABELS = {
+        # Logo/patch refs EXCLUDED — they cause the model to hallucinate
+        # brand text onto garments. The source photo already shows the branding.
+        "source-photo": "REFERENCE — REAL PRODUCT PHOTO",
+        "photo-front": "REFERENCE — REAL PRODUCT PHOTO",
+        "photo-back": "REFERENCE — REAL PRODUCT PHOTO (back)",
+        "techflat-front": "REFERENCE — PRODUCT FLAT",
+        "techflat-back": "REFERENCE — PRODUCT FLAT (back)",
+    }
 
-    # Always include logo + patch references
-    for tag in ("logo-ref", "patch-ref"):
+    refs: list[tuple[str, Path]] = []
+
+    # Include source/product photo ONLY — no logo or patch refs
+    for tag in ("source-photo", "photo-front"):
         for f in bundle_dir.glob(f"{tag}.*"):
-            if f.exists():
-                refs.append(f)
-
-    # Include source photo if available
-    for f in bundle_dir.glob("source-photo.*"):
-        if f.exists() and f != source_path:
-            refs.append(f)
+            if f.exists() and f != source_path:
+                refs.append((TAG_LABELS.get(tag, tag), f))
 
     # Include techflat for the requested view
     if view == "front":
         for f in bundle_dir.glob("techflat-front.*"):
             if f.exists() and f != source_path:
-                refs.append(f)
+                refs.append((TAG_LABELS["techflat-front"], f))
     elif view == "back":
         for f in bundle_dir.glob("techflat-back.*"):
             if f.exists() and f != source_path:
-                refs.append(f)
+                refs.append((TAG_LABELS["techflat-back"], f))
 
-    # Cap at 5 references to stay within model limits
+    # Cap at 5 references
     return refs[:5]
 
 

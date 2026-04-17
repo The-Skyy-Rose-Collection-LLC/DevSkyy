@@ -19,20 +19,25 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 ANTI_HALLUCINATION = (
     "\n\nSTRICT RULES — NON-NEGOTIABLE:\n"
-    "- Render ONLY the side specified (front or back). Never show both sides.\n"
-    "- Do NOT add text, logos, patches, or branding absent from the reference.\n"
-    "- Do NOT invent pockets, panels, zippers, or details not in the reference.\n"
-    "- Do NOT change the garment type, silhouette, or cut.\n"
-    "- Do NOT add sponsor logos, team names, league marks, or athlete names.\n"
-    "- Do NOT alter colors — match hex values from the reference exactly.\n"
-    "- If a detail is unclear in the reference, leave it out — never guess.\n"
-    "- This is a luxury fashion brand. Accuracy is the only standard."
+    "- FIDELITY: Only reproduce what is visible in the reference photo AND listed in the REQUIRED BRANDING section above. Nothing else.\n"
+    "- TEXT MUST BE CHARACTER-PERFECT: Every letter, number, and symbol must be spelled EXACTLY as shown in the reference or REQUIRED BRANDING. "
+    "No missing letters. No extra letters. No garbled glyphs. No substituted characters. No mirrored or flipped text. "
+    "If the reference or spec says 'BLACK IS BEAUTIFUL', the output MUST show 'BLACK IS BEAUTIFUL' — not 'BLACK S BEAUTIFUL', not 'BLACK IS BEADTIFUL', not 'GEDDIFUL'. "
+    "If you cannot render a word legibly and accurately, DO NOT render the image — return blank rather than produce misspelled text.\n"
+    "- DO NOT INVENT TEXT: Do not add any word, brand name, number, or phrase not in the reference or REQUIRED BRANDING. No placeholder lorem ipsum, no made-up taglines.\n"
+    "- DO NOT INVENT GRAPHICS: Do not add logos, patches, roses, embroidery, or designs not in the reference or REQUIRED BRANDING.\n"
+    "- PATCH / BADGE PLACEMENT IS MANDATORY: If REQUIRED BRANDING names a patch, badge, or logo with a specific location (e.g. 'bottom left', 'upper-right chest', 'below waistband'), that element MUST appear in the output, in EXACTLY that position, at the specified size. "
+    "Do NOT move it, mirror it, center it, duplicate it, or omit it. A jersey without its woven patch is a FAIL.\n"
+    "- GARMENT INTEGRITY: Do not change garment type, silhouette, cut, or colors. Match the reference hex values exactly.\n"
+    "- VIEW LOCK: Render ONLY the side specified (front or back). Never show both.\n"
+    "- CONFLICT RESOLUTION: If the reference photo and REQUIRED BRANDING disagree on a detail, trust REQUIRED BRANDING (it is the spec of record). If both are unclear, leave the detail out — never guess.\n"
 )
 
 ENHANCED_SUFFIX = (
-    " CRITICAL: The item MUST be pixel-accurate to the reference. "
-    "Do not change any colors, patterns, logos, or design elements. "
-    "This is a luxury fashion brand — accuracy is everything." + ANTI_HALLUCINATION
+    " CRITICAL: Copy the reference photo exactly. "
+    "Preserve every pixel of color, pattern, design element, text character, logo, and patch. "
+    "All text must be character-perfect (spelling, case, kerning). "
+    "All patches and badges must appear at the exact location and size specified." + ANTI_HALLUCINATION
 )
 
 # -- Collection lighting profiles --------------------------------------------
@@ -69,6 +74,19 @@ COLLECTION_LIGHTING = {
 # -- View prompts -------------------------------------------------------------
 
 
+def _branding_block(treatment: str) -> str:
+    """Format the REQUIRED BRANDING section injected into view prompts."""
+    if not treatment:
+        return ""
+    return (
+        f"\n\n═══ REQUIRED BRANDING (MANDATORY — must appear exactly as specified) ═══\n"
+        f"{treatment}\n"
+        f"Every element above MUST be rendered in the output. Any patch, badge, text, "
+        f"or logo named here must appear at the specified location, at the specified size, "
+        f"with text spelled character-perfect. This is non-negotiable.\n"
+    )
+
+
 def front_prompt(product: dict) -> str:
     """Build a front-view product shot prompt with collection-specific styling."""
     name = product["name"]
@@ -77,26 +95,19 @@ def front_prompt(product: dict) -> str:
     lighting = COLLECTION_LIGHTING.get(collection, COLLECTION_LIGHTING["black-rose"])
     treatment = LOGO_TREATMENTS.get(sku, "")
 
-    branding_note = ""
-    if treatment:
-        branding_note = (
-            f"\n\nBRANDING DETAIL: The real product has: {treatment}. "
-            "Reproduce this branding EXACTLY as described — correct position, correct material finish, correct colors."
-        )
-
     return (
-        f"Generate a photorealistic luxury e-commerce product render of this {name} — FRONT VIEW ONLY.\n"
-        f"The provided image is the source tech flat. Study every stitch, color, and logo placement.\n\n"
-        f"VIEW: Show ONLY the front panel. Do NOT render the back.\n\n"
+        f"Generate a photorealistic product render of this garment — FRONT VIEW ONLY.\n"
+        f"The provided photo is the ONLY reference. Copy it exactly.\n\n"
+        f"VIEW: Front panel only.\n\n"
         f"PRESENTATION:\n"
-        f"- No model, no person, no mannequin. Garment floating on an invisible form with natural 3D shape and drape.\n"
+        f"- No model, no person, no mannequin. Garment floating on invisible form with natural drape.\n"
         f"- {lighting['bg']}.\n"
         f"- {lighting['light']}.\n"
-        f"- {lighting['mood']}.\n"
         f"- {lighting['shadow']}.\n"
-        f"- Fabric texture must be photorealistic — visible weave, thread weight, material sheen.\n\n"
-        f"FIDELITY: Match the reference EXACTLY — same colors, text, numbers, "
-        f"logo placement, panels, stripes. Change NOTHING.{branding_note}" + ANTI_HALLUCINATION
+        f"- Photorealistic fabric texture.\n\n"
+        f"FIDELITY: Copy the reference photo exactly. Same colors, same graphics, same construction."
+        f"{_branding_block(treatment)}"
+        + ANTI_HALLUCINATION
     )
 
 
@@ -108,23 +119,18 @@ def back_prompt(product: dict) -> str:
     lighting = COLLECTION_LIGHTING.get(collection, COLLECTION_LIGHTING["black-rose"])
     treatment = LOGO_TREATMENTS.get(sku, "")
 
-    branding_note = ""
-    if treatment and "back" in treatment.lower():
-        back_detail = (
-            treatment.split("back:")[-1].strip() if "back:" in treatment.lower() else treatment
-        )
-        branding_note = f"\n\nBACK BRANDING: {back_detail}. Reproduce the back branding EXACTLY."
-
     return (
-        f"Generate a photorealistic luxury e-commerce product render of this {name} — BACK VIEW ONLY.\n"
-        f"The provided image is the back-panel tech flat. Reproduce every detail exactly.\n\n"
-        f"VIEW: Show ONLY the back panel. Garment facing away from camera.\n\n"
+        f"Generate a photorealistic product render of this garment — BACK VIEW ONLY.\n"
+        f"The provided photo is the ONLY reference. Copy it exactly.\n\n"
+        f"VIEW: Back panel only. Garment facing away from camera.\n\n"
         f"PRESENTATION:\n"
-        f"- No model, no person, no mannequin. Garment floating on invisible form, back-facing, full 3D drape.\n"
+        f"- No model, no person, no mannequin. Garment floating on invisible form, back-facing, natural drape.\n"
         f"- {lighting['bg']}.\n"
         f"- {lighting['light']}.\n"
-        f"- Fabric texture must be photorealistic.\n\n"
-        f"FIDELITY: Match the back reference exactly.{branding_note}" + ANTI_HALLUCINATION
+        f"- Photorealistic fabric texture.\n\n"
+        f"FIDELITY: Copy the reference photo exactly."
+        f"{_branding_block(treatment)}"
+        + ANTI_HALLUCINATION
     )
 
 
@@ -136,19 +142,17 @@ def accessory_prompt(product: dict) -> str:
     lighting = COLLECTION_LIGHTING.get(collection, COLLECTION_LIGHTING["signature"])
     treatment = LOGO_TREATMENTS.get(sku, "")
 
-    branding_note = ""
-    if treatment:
-        branding_note = f"\n\nBRANDING: {treatment}. Reproduce exactly."
-
     return (
-        f"Generate a photorealistic luxury product render of this {name} — HERO ANGLE.\n"
-        f"The provided image is the source reference. Reproduce every detail exactly.\n\n"
+        f"Generate a photorealistic product render of this accessory — HERO ANGLE.\n"
+        f"The provided photo is the ONLY reference. Copy it exactly.\n\n"
         f"PRESENTATION:\n"
         f"- No model. Product only, slightly angled for dimension.\n"
         f"- {lighting['bg']}.\n"
         f"- {lighting['light']}.\n"
         f"- Tight framing — the accessory fills the frame.\n\n"
-        f"FIDELITY: Match the reference exactly.{branding_note}" + ANTI_HALLUCINATION
+        f"FIDELITY: Copy the reference photo exactly."
+        f"{_branding_block(treatment)}"
+        + ANTI_HALLUCINATION
     )
 
 

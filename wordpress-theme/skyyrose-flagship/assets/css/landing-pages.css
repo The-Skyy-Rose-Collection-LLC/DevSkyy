@@ -5,7 +5,7 @@
  * Palette switching via [data-collection] on .lp wrapper (same pattern as collection-pages.css).
  * Maps LP CSS variables to existing design tokens from design-tokens.css.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 
@@ -584,36 +584,6 @@
   font-size: 0.72rem;
   color: var(--lp-text-muted);
   letter-spacing: 1px;
-}
-
-/* Scarcity bar */
-.lp-product-card__scarcity {
-  margin-bottom: 1rem;
-}
-
-.lp-product-card__scarcity-text {
-  font-family: var(--lp-font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 1px;
-  color: var(--lp-text-muted);
-  margin-bottom: 0.4rem;
-  text-transform: uppercase;
-}
-
-.lp-product-card__scarcity-bar {
-  height: 3px;
-  background: rgba(var(--lp-accent-rgb), 0.15);
-  position: relative;
-  overflow: hidden;
-}
-
-.lp-product-card__scarcity-fill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background: var(--lp-accent);
-  transition: width 1s var(--lp-ease);
 }
 
 .lp-product-card__btn {

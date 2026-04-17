@@ -16,13 +16,13 @@ import hashlib
 import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class HashAlgorithm(str, Enum):
+class HashAlgorithm(StrEnum):
     """Hash algorithms for deduplication."""
 
     SHA256 = "sha256"

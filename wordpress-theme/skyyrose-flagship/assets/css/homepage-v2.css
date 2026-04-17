@@ -7,7 +7,7 @@
  * Depends on: system design tokens (--void, --rose, --ff-brand etc.)
  * Load: Conditional — front page only (via inc/enqueue.php)
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   4.1.0
  */
 
@@ -1338,3 +1338,86 @@
 	.back-to-top { bottom: 20px; right: 20px; width: 44px; height: 44px; }
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+ * FEATURED PRODUCTS (homepage only)
+ * ══════════════════════════════════════════════════════════════════════
+ * `.fp-featured` is the homepage-only variant of the unified product-grid
+ * template part (template-parts/product-grid.php). Everything in this
+ * block is scoped under `.fp-featured` so it cannot leak into collection
+ * or landing pages — those surfaces get their header typography via the
+ * wrapper's legacy class alias (.col-products__header / .lp-products__header)
+ * which resolves through collection-pages.css / landing-pages.css already.
+ *
+ * Uses real theme tokens (--ff-editorial, --ff-body) with sensible
+ * fallbacks. No generic .product-grid-section* base rules here — those
+ * would override page-specific typography via descendant-selector
+ * specificity and cause regressions on collection/landing surfaces.
+ * ══════════════════════════════════════════════════════════════════════ */
+
+.fp-featured {
+	padding: 6rem 2rem;
+	max-width: 1440px;
+	margin: 0 auto;
+	background: linear-gradient(180deg, #f7f5f2 0%, #ffffff 100%);
+	position: relative;
+	overflow: hidden;
+}
+
+.fp-featured::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: radial-gradient(
+		ellipse at center top,
+		rgba(183, 110, 121, 0.08) 0%,
+		transparent 60%
+	);
+	pointer-events: none;
+}
+
+.fp-featured .product-grid-section__header,
+.fp-featured .fp-featured__header {
+	text-align: center;
+	margin-bottom: 4rem;
+	position: relative;
+	z-index: 1;
+}
+
+.fp-featured .product-grid-section__heading {
+	font-family: var(--ff-editorial, 'Playfair Display'), Georgia, serif;
+	font-size: clamp(2rem, 4vw, 3.5rem);
+	font-weight: 400;
+	letter-spacing: 0.02em;
+	margin: 0 0 1rem;
+	color: #0a0a0a;
+}
+
+.fp-featured .product-grid-section__subheading {
+	font-family: var(--ff-body, 'Cormorant Garamond'), Georgia, serif;
+	font-size: clamp(1rem, 1.5vw, 1.2rem);
+	color: #4a4a4a;
+	font-style: italic;
+	max-width: 52ch;
+	margin: 0 auto;
+	line-height: 1.6;
+}
+
+.fp-featured .product-grid {
+	position: relative;
+	z-index: 1;
+}
+
+@media (max-width: 900px) {
+	.fp-featured {
+		padding: 4rem 1.25rem;
+	}
+	.fp-featured .product-grid-section__header {
+		margin-bottom: 2.5rem;
+	}
+}
+
+@media (max-width: 480px) {
+	.fp-featured {
+		padding: 3rem 1rem;
+	}
+}

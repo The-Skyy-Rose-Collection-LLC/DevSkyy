@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kids Capsule &mdash; SkyyRose Theme</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0A0A0A; color: #F5F5F0; line-height: 1.7; padding: 2rem; max-width: 900px; margin: 0 auto; }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    h2 { color: #B76E79; margin: 2rem 0 1rem; font-size: 1.4rem; }
+    h3 { margin: 1.5rem 0 0.5rem; }
+    p, li { margin-bottom: 0.75rem; }
+    ol, ul { padding-left: 1.5rem; }
+    a { color: #B76E79; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .doc-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 1rem 0; border-bottom: 1px solid #222; margin-bottom: 2rem; }
+    .doc-nav a { padding: 0.35rem 0.75rem; border: 1px solid #333; border-radius: 4px; font-size: 0.85rem; }
+    .doc-nav a.active { background: #B76E79; color: #0A0A0A; border-color: #B76E79; }
+    code { background: #1a1a1a; padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
+    .step { background: #111; border-left: 3px solid #B76E79; padding: 1rem 1.25rem; margin: 1rem 0; border-radius: 0 4px 4px 0; }
+    .step strong { color: #B76E79; }
+    .mode-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+    .mode-box { border: 1px solid #222; border-radius: 6px; padding: 1.25rem; }
+    .mode-box h3 { margin-top: 0; color: #B76E79; }
+    .note { background: #1a1610; border: 1px solid #3a2a10; padding: 0.75rem 1rem; border-radius: 4px; margin: 1rem 0; font-size: 0.95rem; }
+    footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #222; font-size: 0.85rem; color: #888; }
+  </style>
+</head>
+<body>
+  <nav class="doc-nav">
+    <a href="index.html">Overview</a>
+    <a href="installation.html">Installation</a>
+    <a href="getting-started.html">Getting Started</a>
+    <a href="collections.html">Collections</a>
+    <a href="kids-capsule.html" class="active">Kids Capsule</a>
+    <a href="elementor.html">Elementor</a>
+    <a href="builders.html">Page Builders</a>
+    <a href="woocommerce.html">WooCommerce</a>
+    <a href="customization.html">Customization</a>
+    <a href="changelog.html">Changelog</a>
+    <a href="credits.html">Credits</a>
+  </nav>
+
+  <h1>Kids Capsule</h1>
+  <p>The Kids Capsule collection has two distinct modes: <strong>Launch Mode</strong> (pre-release teaser) and <strong>Live Mode</strong> (full catalog). Toggle between them from the Customizer.</p>
+
+  <h2>Launch Mode vs. Live Mode</h2>
+  <div class="mode-compare">
+    <div class="mode-box">
+      <h3>Launch Mode</h3>
+      <ul>
+        <li>Teaser landing page with brand imagery</li>
+        <li>Countdown timer to launch date</li>
+        <li>Email waitlist signup form</li>
+        <li>Products are hidden from the shop</li>
+        <li>Collection page redirects to the teaser</li>
+      </ul>
+    </div>
+    <div class="mode-box">
+      <h3>Live Mode</h3>
+      <ul>
+        <li>Full product catalog visible</li>
+        <li>Collection page displays all Kids Capsule products</li>
+        <li>Parent-child matching commerce enabled</li>
+        <li>Immersive 3D experience accessible</li>
+        <li>All block patterns available</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Toggling Modes</h2>
+  <div class="step">
+    <ol>
+      <li>Go to <strong>Appearance &gt; Customize &gt; Kids Capsule Launch</strong>.</li>
+      <li>Set <strong>Collection Status</strong> to either <strong>Launch Mode</strong> or <strong>Live Mode</strong>.</li>
+      <li>When in Launch Mode, configure the following fields:
+        <ul>
+          <li><strong>Launch Date</strong> &mdash; The date and time for the countdown timer.</li>
+          <li><strong>Teaser Heading</strong> &mdash; Main heading displayed on the teaser page.</li>
+          <li><strong>Teaser Description</strong> &mdash; Short paragraph below the heading.</li>
+          <li><strong>Waitlist Form Action</strong> &mdash; URL for your email service (Mailchimp, Klaviyo, etc.).</li>
+          <li><strong>Teaser Background Image</strong> &mdash; Hero image for the teaser page.</li>
+        </ul>
+      </li>
+      <li>Click <strong>Publish</strong> to save.</li>
+    </ol>
+  </div>
+
+  <h2>Launch Mode Details</h2>
+  <div class="step">
+    <h3>Teaser Page</h3>
+    <p>When Launch Mode is active, visitors to any Kids Capsule URL see a full-screen teaser page with:</p>
+    <ul>
+      <li>A hero background image with overlay</li>
+      <li>Your custom heading and description</li>
+      <li>An animated countdown timer showing days, hours, minutes, and seconds</li>
+      <li>An email signup form for the waitlist</li>
+    </ul>
+
+    <h3>Countdown Timer</h3>
+    <p>The countdown automatically calculates time remaining from the current date to your configured launch date. When the date passes, it displays "Available Now" but does not automatically switch to Live Mode &mdash; you must toggle manually in the Customizer.</p>
+
+    <h3>Email Waitlist</h3>
+    <p>The waitlist form submits to your configured form action URL. It collects the visitor's email address and sends it to your email marketing service. The form includes honeypot spam protection and WCAG-compliant labeling.</p>
+  </div>
+
+  <h2>Parent-Child Matching Commerce</h2>
+  <div class="step">
+    <p>In Live Mode, the Kids Capsule supports parent-child matching &mdash; allowing customers to buy matching adult and kids items together:</p>
+    <ul>
+      <li>Products linked via the <strong>Matching Parent Product</strong> field in the product editor.</li>
+      <li>A "Shop the Match" button appears on both the adult and kids product pages.</li>
+      <li>Add-to-cart for matching items creates a bundled line item in the WooCommerce Store API cart.</li>
+      <li>Matching products display side-by-side on the collection page with a visual connector.</li>
+    </ul>
+  </div>
+
+  <div class="note">When switching from Launch Mode to Live Mode, clear any page caches to ensure visitors see the full catalog immediately.</div>
+
+  <p>Next: <a href="elementor.html">Elementor &rarr;</a></p>
+
+  <footer>
+    <p>SkyyRose Theme &copy; 2026. All rights reserved.</p>
+  </footer>
+</body>
+</html>

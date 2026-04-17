@@ -82,7 +82,7 @@ class OpenAIClient:
 
     def generate_content_stream(
         self, prompt: str, model: str | None = None, system_prompt: str | None = None, **config
-    ) -> Generator[dict[str, Any], None, None]:
+    ) -> Generator[dict[str, Any]]:
         """Generate content with streaming"""
         self._rate_limit()
         messages = []

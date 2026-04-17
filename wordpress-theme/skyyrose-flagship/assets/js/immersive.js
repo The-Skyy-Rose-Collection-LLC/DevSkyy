@@ -5,7 +5,7 @@
  * multi-room scene transitions, loading screen, keyboard
  * navigation, and touch/swipe support.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   2.0.0
  */
 

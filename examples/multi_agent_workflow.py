@@ -9,7 +9,7 @@ import os
 
 from dotenv import load_dotenv
 
-from sdk.python.agent_sdk.main import DevSkyy
+from agent_sdk.main import DevSkyy
 
 # Load environment variables
 load_dotenv()

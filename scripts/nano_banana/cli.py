@@ -38,7 +38,9 @@ def cmd_dry_run(args):
     from nano_banana.catalog import PRODUCTS_DIR, load_catalog, load_products
 
     catalog = load_catalog()
-    products = load_products(catalog, sku_filter=args.sku)
+    products = load_products(
+        catalog, sku_filter=args.sku, collection_filter=getattr(args, "collection", None)
+    )
     views = _resolve_views(args.step)
 
     print(f"\n{'=' * 60}")
@@ -67,7 +69,6 @@ def cmd_generate(args):
     from nano_banana.catalog import (
         PRODUCTS_DIR,
         find_back_source,
-        get_material_spec,
         load_catalog,
         load_products,
     )
@@ -84,7 +85,9 @@ def cmd_generate(args):
     from nano_banana.utils import get_output_filename, quality_gate, save_image
 
     catalog = load_catalog()
-    products = load_products(catalog, sku_filter=args.sku)
+    products = load_products(
+        catalog, sku_filter=args.sku, collection_filter=getattr(args, "collection", None)
+    )
     views = _resolve_views(args.step)
     model = GEMINI_PRO if args.pro else args.model or GEMINI_FAST
     engine = args.engine
@@ -134,11 +137,23 @@ def cmd_generate(args):
                     view_src = back
 
             prompt = get_prompt(product, view)
-            # Inject material specs from product-references.json if available.
-            material_spec = get_material_spec(sku)
-            if material_spec:
-                prompt += f"\n\nMATERIAL SPEC: {material_spec}"
             image_bytes = None
+
+            # Load bundle reference images (logo, patches, product photos)
+            from nano_banana.pipeline import _find_bundle_dir
+
+            extra_refs = []
+            bundle_dir = _find_bundle_dir(product["name"], sku)
+            if bundle_dir:
+                # Only product photos — no logo/patch refs (they cause hallucinated text)
+                for tag, label in [
+                    ("photo-front", "REFERENCE — REAL PRODUCT PHOTO"),
+                    ("source-photo", "REFERENCE — REAL PRODUCT PHOTO"),
+                ]:
+                    for f in bundle_dir.glob(f"{tag}.*"):
+                        if f.exists():
+                            extra_refs.append((label, f))
+                            break
 
             for attempt in range(1, MAX_RETRIES + 1):
                 if use_flux:
@@ -153,6 +168,7 @@ def cmd_generate(args):
                         prompt,
                         model=model,
                         enhanced=(attempt > 1),
+                        extra_refs=extra_refs if extra_refs else None,
                     )
 
                 if image_bytes and quality_gate(image_bytes, sku, view):
@@ -204,7 +220,9 @@ def cmd_composite(args):
     from nano_banana.utils import quality_gate, save_image
 
     catalog = load_catalog()
-    products = load_products(catalog, sku_filter=args.sku)
+    products = load_products(
+        catalog, sku_filter=args.sku, collection_filter=getattr(args, "collection", None)
+    )
     model = GEMINI_PRO if args.pro else GEMINI_FAST
     client = get_genai_client()
 
@@ -317,6 +335,12 @@ def main():
     dr = sub.add_parser("dry-run", help="Preview what would be generated")
     dr.add_argument("--sku", type=str, default=None, help="Single SKU to process")
     dr.add_argument(
+        "--collection",
+        type=str,
+        default=None,
+        help="Filter by collection slug (e.g. black-rose, signature, love-hurts, kids-capsule)",
+    )
+    dr.add_argument(
         "--step",
         type=str,
         default="all",
@@ -326,6 +350,12 @@ def main():
     # -- generate --
     gen = sub.add_parser("generate", help="Generate product images")
     gen.add_argument("--sku", type=str, default=None, help="Single SKU to process")
+    gen.add_argument(
+        "--collection",
+        type=str,
+        default=None,
+        help="Filter by collection slug (e.g. black-rose, signature, love-hurts, kids-capsule)",
+    )
     gen.add_argument(
         "--step",
         type=str,
@@ -342,9 +372,38 @@ def main():
     gen.add_argument("--qa", action="store_true", help="Run Gemini vision QA after generation")
     gen.add_argument("--free", action="store_true", help="Use free FLUX model (lower quality)")
 
+    # -- generate-async --
+    ga = sub.add_parser("generate-async", help="Async parallel generation (3 concurrent)")
+    ga.add_argument("--sku", type=str, default=None, help="Single SKU to process")
+    ga.add_argument(
+        "--collection",
+        type=str,
+        default=None,
+        help="Filter by collection slug (e.g. black-rose, signature, love-hurts, kids-capsule)",
+    )
+    ga.add_argument(
+        "--step",
+        type=str,
+        default="all",
+        choices=["front", "back", "branding", "all", "front_back"],
+    )
+    ga.add_argument("--model", type=str, default=None, help="Override Gemini model ID")
+    ga.add_argument(
+        "--pro", action="store_true", help="Use Nano Banana Pro (gemini-3-pro-image-preview)"
+    )
+    ga.add_argument(
+        "--concurrency", type=int, default=3, help="Max concurrent API calls (default 3)"
+    )
+
     # -- composite --
     comp = sub.add_parser("composite", help="Composite real branding onto AI shots")
     comp.add_argument("--sku", type=str, default=None, help="Single SKU to process")
+    comp.add_argument(
+        "--collection",
+        type=str,
+        default=None,
+        help="Filter by collection slug (e.g. black-rose, signature, love-hurts, kids-capsule)",
+    )
     comp.add_argument(
         "--step", type=str, default="composite", choices=["composite", "composite_all"]
     )
@@ -363,9 +422,15 @@ def main():
     )
     vg.add_argument("--promote", action="store_true", help="Copy winner to production directory")
 
-    # -- produce (v4 production pipeline) --
-    prod = sub.add_parser("produce", help="V4 production pipeline — vision + routing + QA + refine")
+    # -- produce (v4 production pipeline — sequential) --
+    prod = sub.add_parser("produce", help="V4 production pipeline — sequential (legacy)")
     prod.add_argument("--sku", type=str, default=None, help="Single SKU to process")
+    prod.add_argument(
+        "--collection",
+        type=str,
+        default=None,
+        help="Filter by collection slug (e.g. black-rose, signature, love-hurts, kids-capsule)",
+    )
     prod.add_argument(
         "--views", type=str, default="front,back,branding", help="Comma-separated views"
     )
@@ -377,18 +442,212 @@ def main():
         "--cost-only", action="store_true", help="Show cost estimate without generating"
     )
 
+    # -- produce-async (staged production pipeline) --
+    pa = sub.add_parser(
+        "produce-async", help="Staged async production — vision → generate → QA → refine"
+    )
+    pa.add_argument("--sku", type=str, default=None, help="Single SKU to process")
+    pa.add_argument(
+        "--collection",
+        type=str,
+        default=None,
+        help="Filter by collection slug (e.g. black-rose, signature, love-hurts, kids-capsule)",
+    )
+    pa.add_argument("--views", type=str, default="front,back", help="Comma-separated views")
+    pa.add_argument("--concurrency", type=int, default=3, help="Max concurrent API calls per stage")
+    pa.add_argument("--model", type=str, default=None, help="Override generation model")
+
     args = parser.parse_args()
 
     if args.command == "dry-run":
         cmd_dry_run(args)
     elif args.command == "generate":
         cmd_generate(args)
+    elif args.command == "generate-async":
+        import asyncio
+
+        asyncio.run(cmd_generate_async(args))
     elif args.command == "composite":
         cmd_composite(args)
     elif args.command == "verify-generate":
         cmd_verify_generate(args)
     elif args.command == "produce":
         cmd_produce(args)
+    elif args.command == "produce-async":
+        import asyncio
+
+        asyncio.run(cmd_produce_async(args))
+
+
+async def cmd_generate_async(args):
+    """Async parallel generation with error boundaries."""
+    import asyncio
+
+    from nano_banana.catalog import (
+        PRODUCTS_DIR,
+        find_back_source,
+        load_catalog,
+        load_products,
+    )
+    from nano_banana.client import get_genai_client
+    from nano_banana.generate import GEMINI_FAST, GEMINI_PRO, generate_gemini_async
+    from nano_banana.pipeline import _find_bundle_dir
+    from nano_banana.prompts import get_prompt
+    from nano_banana.utils import get_output_filename, quality_gate, save_image
+
+    catalog = load_catalog()
+    products = load_products(
+        catalog, sku_filter=args.sku, collection_filter=getattr(args, "collection", None)
+    )
+    views = _resolve_views(args.step)
+    model = GEMINI_PRO if args.pro else args.model or GEMINI_FAST
+    concurrency = args.concurrency
+    client = get_genai_client()
+
+    semaphore = asyncio.Semaphore(concurrency)
+    results: dict[str, str] = {}  # "sku-view" -> "PASS" | "FAIL" | "SKIP"
+
+    async def generate_one(product: dict, view: str) -> None:
+        sku = product["sku"]
+        key = f"{sku}-{view}"
+        src = product["source_image"]
+
+        if product["is_accessory"] and view == "back":
+            results[key] = "SKIP"
+            return
+
+        if not src:
+            log.warning("SKIP %s %s: no source", sku, view)
+            results[key] = "SKIP"
+            return
+
+        view_src = src
+        if view == "back":
+            back = find_back_source(sku, catalog)
+            if back:
+                view_src = back
+
+        prompt = get_prompt(product, view)
+
+        # Load bundle refs
+        extra_refs = []
+        bundle_dir = _find_bundle_dir(product["name"], sku)
+        if bundle_dir:
+            # Only product photos — no logo/patch refs (they cause hallucinated text)
+            for tag, label in [
+                ("photo-front", "REFERENCE — REAL PRODUCT PHOTO"),
+                ("source-photo", "REFERENCE — REAL PRODUCT PHOTO"),
+            ]:
+                for f in bundle_dir.glob(f"{tag}.*"):
+                    if f.exists():
+                        extra_refs.append((label, f))
+                        break
+
+        out_path = PRODUCTS_DIR / get_output_filename(sku, view, product["output_slug"])
+
+        async with semaphore:
+            for attempt in range(1, MAX_RETRIES + 1):
+                try:
+                    img_bytes = await generate_gemini_async(
+                        client,
+                        view_src,
+                        prompt,
+                        model=model,
+                        enhanced=(attempt > 1),
+                        extra_refs=extra_refs if extra_refs else None,
+                    )
+                except Exception as exc:
+                    log.error("[%s %s] attempt %d error: %s", sku, view, attempt, exc)
+                    img_bytes = None
+
+                if img_bytes and quality_gate(img_bytes, sku, view):
+                    save_image(img_bytes, out_path)
+                    log.info("PASS %s %s: %.1fKB", sku, view, len(img_bytes) / 1024)
+                    results[key] = "PASS"
+                    return
+
+                if attempt < MAX_RETRIES:
+                    log.info("Retry %d/%d for %s %s", attempt, MAX_RETRIES, sku, view)
+                    await asyncio.sleep(RETRY_DELAY)
+
+            log.error("FAIL %s %s after %d attempts", sku, view, MAX_RETRIES)
+            results[key] = "FAIL"
+
+    # Build task list
+    tasks = []
+    for product in products:
+        for view in views:
+            tasks.append(generate_one(product, view))
+
+    total = len(tasks)
+    log.info("ASYNC: %d tasks, %d concurrent, model=%s", total, concurrency, model)
+
+    await asyncio.gather(*tasks)
+
+    # Summary
+    passed = sum(1 for v in results.values() if v == "PASS")
+    failed = sum(1 for v in results.values() if v == "FAIL")
+    skipped = sum(1 for v in results.values() if v == "SKIP")
+    log.info("COMPLETE: %d passed / %d failed / %d skipped", passed, failed, skipped)
+
+    if failed:
+        log.info("Failed:")
+        for k, v in results.items():
+            if v == "FAIL":
+                log.info("  %s", k)
+
+
+async def cmd_produce_async(args):
+    """Staged async production pipeline — maximum throughput."""
+    import asyncio as _asyncio
+
+    from nano_banana.catalog import load_catalog, load_products
+    from nano_banana.produce_async import run_production
+
+    catalog = load_catalog()
+    products = load_products(
+        catalog, sku_filter=args.sku, collection_filter=getattr(args, "collection", None)
+    )
+    views = [v.strip() for v in args.views.split(",")]
+
+    if not products:
+        log.error("No products found")
+        return
+
+    # Global batch timeout: 30 min for full catalog, 10 min per collection, 5 min per SKU
+    collection = getattr(args, "collection", None)
+    batch_timeout = 300 if args.sku else (600 if collection else 1800)
+
+    log.info("=== STAGED ASYNC PRODUCTION ===")
+    log.info(
+        "Products: %d | Views: %s | Concurrency: %d | Timeout: %ds",
+        len(products),
+        views,
+        args.concurrency,
+        batch_timeout,
+    )
+
+    try:
+        jobs = await _asyncio.wait_for(
+            run_production(
+                products=products,
+                views=views,
+                catalog=catalog,
+                concurrency=args.concurrency,
+                model_override=args.model,
+            ),
+            timeout=batch_timeout,
+        )
+    except TimeoutError:
+        log.error(
+            "BATCH TIMEOUT after %ds — partial results may exist in output dir", batch_timeout
+        )
+        return
+
+    # Final status
+    passed = sum(1 for j in jobs if j.qa_passed)
+    total = len(jobs)
+    log.info("\nDONE: %d/%d passed QA", passed, total)
 
 
 def cmd_produce(args):
@@ -408,7 +667,9 @@ def cmd_produce(args):
 
     views = [v.strip() for v in args.views.split(",")]
     catalog = load_catalog()
-    products = load_products(catalog, sku_filter=args.sku)
+    products = load_products(
+        catalog, sku_filter=args.sku, collection_filter=getattr(args, "collection", None)
+    )
 
     if not products:
         log.error("No products found")

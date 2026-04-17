@@ -219,7 +219,9 @@ def main():
         print(f"📦 {collection.upper()}: {len(products)} products")
 
     print(f"\n📊 TOTAL: {len(all_products)} products to generate")
-    print(f"⏱️  Estimated time: {len(all_products) * 1.5:.0f}-{len(all_products) * 2:.0f} minutes\n")
+    print(
+        f"⏱️  Estimated time: {len(all_products) * 1.5:.0f}-{len(all_products) * 2:.0f} minutes\n"
+    )
 
     # Confirm before starting
     print("Press ENTER to start generation (or Ctrl+C to cancel)...")

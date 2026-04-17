@@ -169,7 +169,7 @@ class PromptChainOrchestrator:
         workflows = {}
 
         # Product Launch Workflow
-        workflows["product_launch"] = WorkflowDefinition(
+        workflows["wf_product_launch"] = WorkflowDefinition(
             workflow_id="wf_product_launch",
             name="Product Launch Workflow",
             description="Complete workflow for launching a new product",
@@ -208,7 +208,7 @@ class PromptChainOrchestrator:
         )
 
         # Security Audit Workflow
-        workflows["security_audit"] = WorkflowDefinition(
+        workflows["wf_security_audit"] = WorkflowDefinition(
             workflow_id="wf_security_audit",
             name="Security Audit Workflow",
             description="Comprehensive security audit and remediation",
@@ -242,7 +242,7 @@ class PromptChainOrchestrator:
         )
 
         # Customer Analysis Workflow
-        workflows["customer_analysis"] = WorkflowDefinition(
+        workflows["wf_customer_analysis"] = WorkflowDefinition(
             workflow_id="wf_customer_analysis",
             name="Customer Analysis Workflow",
             description="Comprehensive customer segmentation and analysis",
@@ -279,7 +279,7 @@ class PromptChainOrchestrator:
         )
 
         # Content Pipeline Workflow
-        workflows["content_pipeline"] = WorkflowDefinition(
+        workflows["wf_content_pipeline"] = WorkflowDefinition(
             workflow_id="wf_content_pipeline",
             name="Content Pipeline Workflow",
             description="End-to-end content creation and optimization",

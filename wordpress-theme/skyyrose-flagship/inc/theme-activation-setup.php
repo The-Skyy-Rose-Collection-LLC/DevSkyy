@@ -10,7 +10,7 @@
  * Runs on `after_switch_theme` (fresh activation) and once on `init`
  * via a versioned option flag (for sites already running the theme).
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   4.0.0
  */
 
@@ -27,7 +27,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 define( 'SKYYROSE_SETUP_VERSION', '4.0.0' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Page Definitions
  *--------------------------------------------------------------*/
 
@@ -44,75 +45,76 @@ function skyyrose_get_required_pages() {
 	return array(
 		// --- Core pages ---
 		'home'                    => array(
-			'title'    => __( 'Home', 'skyyrose-flagship' ),
+			'title'    => __( 'Home', 'skyyrose' ),
 			'template' => 'front-page.php',
 			'content'  => '',
 		),
 		'about'                   => array(
-			'title'    => __( 'About', 'skyyrose-flagship' ),
+			'title'    => __( 'About', 'skyyrose' ),
 			'template' => 'template-about.php',
 			'content'  => '',
 		),
 		'contact'                 => array(
-			'title'    => __( 'Contact', 'skyyrose-flagship' ),
+			'title'    => __( 'Contact', 'skyyrose' ),
 			'template' => 'template-contact.php',
 			'content'  => '',
 		),
 		'pre-order'               => array(
-			'title'    => __( 'Pre-Order', 'skyyrose-flagship' ),
+			'title'    => __( 'Pre-Order', 'skyyrose' ),
 			'template' => 'template-preorder-gateway.php',
 			'content'  => '',
 		),
 
 		// --- Collection pages ---
 		'collection-black-rose'   => array(
-			'title'    => __( 'Black Rose Collection', 'skyyrose-flagship' ),
+			'title'    => __( 'Black Rose Collection', 'skyyrose' ),
 			'template' => 'template-collection-black-rose.php',
 			'content'  => '',
 		),
 		'collection-love-hurts'   => array(
-			'title'    => __( 'Love Hurts Collection', 'skyyrose-flagship' ),
+			'title'    => __( 'Love Hurts Collection', 'skyyrose' ),
 			'template' => 'template-collection-love-hurts.php',
 			'content'  => '',
 		),
 		'collection-signature'    => array(
-			'title'    => __( 'Signature Collection', 'skyyrose-flagship' ),
+			'title'    => __( 'Signature Collection', 'skyyrose' ),
 			'template' => 'template-collection-signature.php',
 			'content'  => '',
 		),
 		'collection-kids-capsule' => array(
-			'title'    => __( 'Kids Capsule', 'skyyrose-flagship' ),
+			'title'    => __( 'Kids Capsule', 'skyyrose' ),
 			'template' => 'template-collection-kids-capsule.php',
 			'content'  => '',
 		),
 
 		// --- Immersive experience pages (3D storytelling) ---
 		'experience-black-rose'   => array(
-			'title'    => __( 'Black Rose Experience', 'skyyrose-flagship' ),
+			'title'    => __( 'Black Rose Experience', 'skyyrose' ),
 			'template' => 'template-immersive-black-rose.php',
 			'content'  => '',
 		),
 		'experience-love-hurts'   => array(
-			'title'    => __( 'Love Hurts Experience', 'skyyrose-flagship' ),
+			'title'    => __( 'Love Hurts Experience', 'skyyrose' ),
 			'template' => 'template-immersive-love-hurts.php',
 			'content'  => '',
 		),
 		'experience-signature'    => array(
-			'title'    => __( 'Signature Experience', 'skyyrose-flagship' ),
+			'title'    => __( 'Signature Experience', 'skyyrose' ),
 			'template' => 'template-immersive-signature.php',
 			'content'  => '',
 		),
 
 		// --- Utility pages ---
 		'wishlist'                => array(
-			'title'    => __( 'Wishlist', 'skyyrose-flagship' ),
+			'title'    => __( 'Wishlist', 'skyyrose' ),
 			'template' => 'page-wishlist.php',
 			'content'  => '',
 		),
 	);
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Page Creation
  *--------------------------------------------------------------*/
 
@@ -169,7 +171,8 @@ function skyyrose_create_required_pages() {
 	return $page_ids;
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Reading Settings (Static Front Page)
  *--------------------------------------------------------------*/
 
@@ -201,7 +204,8 @@ function skyyrose_configure_reading_settings( $page_ids ) {
 	}
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Site Identity & SEO Options
  *--------------------------------------------------------------*/
 
@@ -218,7 +222,7 @@ function skyyrose_configure_site_options() {
 	// Site title — only if still default "Just another WordPress site" or empty.
 	$current_desc = get_option( 'blogdescription' );
 	if ( empty( $current_desc ) || 'Just another WordPress site' === $current_desc ) {
-		update_option( 'blogdescription', __( 'Luxury Grows from Concrete. Premium streetwear from Oakland, CA.', 'skyyrose-flagship' ) );
+		update_option( 'blogdescription', __( 'Luxury Grows from Concrete. Premium streetwear from Oakland, CA.', 'skyyrose' ) );
 	}
 
 	// Permalink structure — pretty permalinks.
@@ -242,7 +246,8 @@ function skyyrose_configure_site_options() {
 	}
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * WooCommerce Page Assignments
  *--------------------------------------------------------------*/
 
@@ -264,19 +269,19 @@ function skyyrose_configure_woocommerce_settings( $page_ids ) {
 	// WooCommerce pages — only create if they don't already exist.
 	$wc_pages = array(
 		'shop'       => array(
-			'title'  => __( 'Shop', 'skyyrose-flagship' ),
+			'title'  => __( 'Shop', 'skyyrose' ),
 			'option' => 'woocommerce_shop_page_id',
 		),
 		'cart'       => array(
-			'title'  => __( 'Cart', 'skyyrose-flagship' ),
+			'title'  => __( 'Cart', 'skyyrose' ),
 			'option' => 'woocommerce_cart_page_id',
 		),
 		'checkout'   => array(
-			'title'  => __( 'Checkout', 'skyyrose-flagship' ),
+			'title'  => __( 'Checkout', 'skyyrose' ),
 			'option' => 'woocommerce_checkout_page_id',
 		),
 		'my-account' => array(
-			'title'  => __( 'My Account', 'skyyrose-flagship' ),
+			'title'  => __( 'My Account', 'skyyrose' ),
 			'option' => 'woocommerce_myaccount_page_id',
 		),
 	);
@@ -325,7 +330,8 @@ function skyyrose_configure_woocommerce_settings( $page_ids ) {
 	update_option( 'woocommerce_thumbnail_image_width', 300 );
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Master Orchestrator
  *--------------------------------------------------------------*/
 

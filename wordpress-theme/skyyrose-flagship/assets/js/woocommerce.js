@@ -1,10 +1,10 @@
 /**
- * SkyyRose Flagship - WooCommerce JavaScript
+ * SkyyRose - WooCommerce JavaScript
  *
  * Handles: product gallery, color/size selectors, quantity controls,
  * cart AJAX updates, multi-step checkout navigation.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   2.0.0
  */
 

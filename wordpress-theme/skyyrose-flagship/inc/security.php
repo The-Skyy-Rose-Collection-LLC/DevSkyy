@@ -5,7 +5,7 @@
  * CSP headers, HTTP security headers, XML-RPC disabling,
  * WordPress version removal, and nonce helper functions.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   2.0.0
  */
 
@@ -14,7 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * HTTP Security Headers
  *--------------------------------------------------------------*/
 
@@ -56,7 +57,7 @@ function skyyrose_send_security_headers() {
 		"object-src 'none'",
 		"base-uri 'self'",
 		"form-action 'self'",
-		"upgrade-insecure-requests",
+		'upgrade-insecure-requests',
 	);
 
 	$csp_policy = implode( '; ', $csp_directives );
@@ -90,7 +91,8 @@ function skyyrose_send_security_headers() {
 }
 add_action( 'send_headers', 'skyyrose_send_security_headers' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * XML-RPC Disable
  *--------------------------------------------------------------*/
 
@@ -144,7 +146,8 @@ function skyyrose_remove_xmlrpc_links() {
 }
 add_action( 'init', 'skyyrose_remove_xmlrpc_links' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * WordPress Version Exposure
  *--------------------------------------------------------------*/
 
@@ -209,7 +212,8 @@ function skyyrose_remove_version_query_string( $src ) {
 	return $src;
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Miscellaneous Head Cleanup
  *--------------------------------------------------------------*/
 
@@ -253,7 +257,8 @@ function skyyrose_clean_wp_head() {
 }
 add_action( 'init', 'skyyrose_clean_wp_head' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Nonce Helper Functions
  *--------------------------------------------------------------*/
 
@@ -296,7 +301,8 @@ function skyyrose_nonce_field( $action, $name = 'skyyrose_nonce', $referrer = tr
 	wp_nonce_field( 'skyyrose_' . sanitize_key( $action ), $name, $referrer );
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * REST API User Enumeration Block
  *
  * Unauthenticated users must not be able to list usernames,
@@ -320,7 +326,7 @@ function skyyrose_restrict_rest_users( $response, $server, $request ) {
 	if ( preg_match( '#^/wp/v2/users#', $route ) && ! is_user_logged_in() ) {
 		return new WP_Error(
 			'rest_forbidden',
-			__( 'Access denied.', 'skyyrose-flagship' ),
+			__( 'Access denied.', 'skyyrose' ),
 			array( 'status' => 403 )
 		);
 	}
@@ -342,7 +348,8 @@ function skyyrose_remove_rest_user_links() {
 }
 add_action( 'init', 'skyyrose_remove_rest_user_links' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Author Enumeration Block
  *
  * Prevent ?author=N from revealing usernames via redirect.
@@ -381,7 +388,8 @@ function skyyrose_block_author_archives() {
 }
 add_action( 'template_redirect', 'skyyrose_block_author_archives', 1 );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Disable File Editor
  *
  * Prevent editing theme/plugin files from wp-admin.
@@ -389,19 +397,26 @@ add_action( 'template_redirect', 'skyyrose_block_author_archives', 1 );
  * cannot inject code via Appearance → Theme File Editor.
  *--------------------------------------------------------------*/
 if ( ! defined( 'DISALLOW_FILE_EDIT' ) ) {
-	define( 'DISALLOW_FILE_EDIT', true );
+	define( 'DISALLOW_FILE_EDIT', true ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- WP core constant.
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Disable Application Passwords for non-admin users
  *
  * Reduces attack surface by restricting REST API auth tokens.
  *--------------------------------------------------------------*/
-add_filter( 'wp_is_application_passwords_available_for_user', function ( $available, $user ) {
-	return user_can( $user, 'manage_options' );
-}, 10, 2 );
+add_filter(
+	'wp_is_application_passwords_available_for_user',
+	function ( $available, $user ) {
+		return user_can( $user, 'manage_options' );
+	},
+	10,
+	2
+);
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Input Sanitization Helpers
  *--------------------------------------------------------------*/
 

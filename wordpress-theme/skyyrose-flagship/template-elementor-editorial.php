@@ -11,7 +11,7 @@
  * 'skyyrose_collection' (black-rose | love-hurts | signature).
  * Elementor takes full control of the content area.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 

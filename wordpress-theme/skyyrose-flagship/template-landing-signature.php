@@ -6,7 +6,7 @@
  * Signature collection landing page — everyday luxury, foundation wardrobe.
  * Gold accent palette (#D4AF37). Uses shared landing-pages.css/js via enqueue.php.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 
@@ -19,16 +19,26 @@ get_header();
 
 	<?php
 	/* ── 1. Hero ─────────────────────────────────────────────────── */
-	get_template_part( 'template-parts/landing/hero', null, array(
-		'collection'    => 'signature',
-		'badge_text'    => 'Everyday Luxury &mdash; The Foundation',
-		'logo_image'    => '/images/hero-overlays/sig-brand-skyy-rose-gold.png',
-		'logo_alt'      => 'The Skyy Rose Signature Collection',
-		'subtitle'      => 'Not basics. Blueprints.',
-		'countdown'     => '72h',
-		'cta_primary'   => array( 'text' => 'Shop the Drop', 'url' => '#products' ),
-		'cta_secondary' => array( 'text' => 'The Story', 'url' => '#story' ),
-	) );
+	get_template_part(
+		'template-parts/landing/hero',
+		null,
+		array(
+			'collection'    => 'signature',
+			'badge_text'    => 'Everyday Luxury &mdash; The Foundation',
+			'logo_image'    => '/images/hero-overlays/sig-brand-skyy-rose-gold.png',
+			'logo_alt'      => 'The Skyy Rose Signature Collection',
+			'subtitle'      => 'Not basics. Blueprints.',
+			'countdown'     => '72h',
+			'cta_primary'   => array(
+				'text' => 'Shop the Drop',
+				'url'  => '#products',
+			),
+			'cta_secondary' => array(
+				'text' => 'The Story',
+				'url'  => '#story',
+			),
+		)
+	);
 	?>
 
 	<!-- ── 2. Press Bar ──────────────────────────────────────────── -->
@@ -70,15 +80,19 @@ get_header();
 
 	<?php
 	/* ── 5. Product Grid ─────────────────────────────────────────── */
-	get_template_part( 'template-parts/landing/product-grid', null, array(
-		'heading'    => 'The Collection',
-		'subheading' => 'Wardrobe foundations built to last.',
-		'skus'       => array(
-			'sg-001', // Bridge Series Bay Bridge Shorts — $195
-			// Add more Signature SKUs as catalog grows: sg-002, sg-004, sg-011, etc.
-		),
-		'wear_count' => 300,
-	) );
+	get_template_part(
+		'template-parts/landing/product-grid',
+		null,
+		array(
+			'heading'    => 'The Collection',
+			'subheading' => 'Wardrobe foundations built to last.',
+			'skus'       => array(
+				'sg-001', // Bridge Series Bay Bridge Shorts — $195
+				// Add more Signature SKUs as catalog grows: sg-002, sg-004, sg-011, etc.
+			),
+			'wear_count' => 300,
+		)
+	);
 	?>
 
 	<!-- ── 6. Editorial Gallery ──────────────────────────────────── -->
@@ -126,7 +140,7 @@ get_header();
 				);
 				$r_delay = 1;
 				foreach ( $reviews as $review ) :
-				?>
+					?>
 					<div class="lp-review-card lp-rv" data-delay="<?php echo esc_attr( $r_delay ); ?>">
 						<div class="lp-review-card__stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
 						<p class="lp-review-card__text"><?php echo esc_html( $review['text'] ); ?></p>
@@ -134,8 +148,8 @@ get_header();
 							<?php echo esc_html( $review['author'] ); ?>, <?php echo esc_html( $review['city'] ); ?>
 						</cite>
 					</div>
-				<?php
-					$r_delay++;
+					<?php
+					++$r_delay;
 				endforeach;
 				?>
 			</div>
@@ -172,16 +186,16 @@ get_header();
 						'desc'  => 'Reinforced seams, pre-shrunk fabric, colorfast dyes. These pieces get better with every wash.',
 					),
 				);
-				$c_delay = 1;
+				$c_delay     = 1;
 				foreach ( $craft_cards as $card ) :
-				?>
+					?>
 					<div class="lp-craft__card lp-rv" data-delay="<?php echo esc_attr( $c_delay ); ?>">
 						<span class="lp-craft__icon" aria-hidden="true"><?php echo esc_html( $card['icon'] ); ?></span>
 						<h3><?php echo esc_html( $card['title'] ); ?></h3>
 						<p><?php echo esc_html( $card['desc'] ); ?></p>
 					</div>
-				<?php
-					$c_delay++;
+					<?php
+					++$c_delay;
 				endforeach;
 				?>
 			</div>
@@ -190,31 +204,35 @@ get_header();
 
 	<?php
 	/* ── 9. FAQ ───────────────────────────────────────────────────── */
-	get_template_part( 'template-parts/landing/faq', null, array(
-		'heading'   => 'Quick Answers',
-		'questions' => array(
-			array(
-				'q' => 'How does Signature sizing run?',
-				'a' => 'Relaxed, comfortable fit across sizes S through 3XL. Check the size guide on each product page for exact measurements.',
+	get_template_part(
+		'template-parts/landing/faq',
+		null,
+		array(
+			'heading'   => 'Quick Answers',
+			'questions' => array(
+				array(
+					'q' => 'How does Signature sizing run?',
+					'a' => 'Relaxed, comfortable fit across sizes S through 3XL. Check the size guide on each product page for exact measurements.',
+				),
+				array(
+					'q' => 'Will there be new colors?',
+					'a' => 'We drop new colorways monthly. Subscribe to be the first to know when a new Signature color lands.',
+				),
+				array(
+					'q' => 'What\'s the return policy?',
+					'a' => '30-day hassle-free returns on all unworn items with tags attached. We cover return shipping in the US.',
+				),
+				array(
+					'q' => 'What makes the quality different?',
+					'a' => 'Premium construction with 280gsm+ fabrics, reinforced stitching, and pre-shrunk materials. Built to outlast anything in the same price range.',
+				),
+				array(
+					'q' => 'How long does shipping take?',
+					'a' => 'Standard shipping is 5&ndash;7 business days within the US. Expedited options available at checkout.',
+				),
 			),
-			array(
-				'q' => 'Will there be new colors?',
-				'a' => 'We drop new colorways monthly. Subscribe to be the first to know when a new Signature color lands.',
-			),
-			array(
-				'q' => 'What\'s the return policy?',
-				'a' => '30-day hassle-free returns on all unworn items with tags attached. We cover return shipping in the US.',
-			),
-			array(
-				'q' => 'What makes the quality different?',
-				'a' => 'Premium construction with 280gsm+ fabrics, reinforced stitching, and pre-shrunk materials. Built to outlast anything in the same price range.',
-			),
-			array(
-				'q' => 'How long does shipping take?',
-				'a' => 'Standard shipping is 5&ndash;7 business days within the US. Expedited options available at checkout.',
-			),
-		),
-	) );
+		)
+	);
 	?>
 
 	<!-- ── 10. Email CTA ─────────────────────────────────────────── -->
@@ -225,10 +243,10 @@ get_header();
 			<form class="lp-cta__form" aria-label="<?php echo esc_attr( 'Newsletter signup' ); ?>">
 				<label class="screen-reader-text" for="sig-lp-email"><?php echo esc_html( 'Email address' ); ?></label>
 				<input type="email"
-				       id="sig-lp-email"
-				       class="lp-cta__input"
-				       placeholder="<?php echo esc_attr( 'Enter your email' ); ?>"
-				       required>
+						id="sig-lp-email"
+						class="lp-cta__input"
+						placeholder="<?php echo esc_attr( 'Enter your email' ); ?>"
+						required>
 				<button type="submit" class="lp-cta__submit"><?php echo esc_html( 'Get Early Access' ); ?></button>
 			</form>
 			<p class="lp-cta__note"><?php echo esc_html( 'Join 12,400+ members' ); ?></p>

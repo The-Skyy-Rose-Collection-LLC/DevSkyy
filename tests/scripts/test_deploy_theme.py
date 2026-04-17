@@ -7,6 +7,7 @@ with fake .env.wordpress for controlled testing.
 
 import os
 import re
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -170,7 +171,8 @@ class TestTrapCleanup:
 class TestCommandOrdering:
     """Test 5: In dry-run output, activate before transfer, deactivate after."""
 
-    def test_activate_before_transfer(self, fake_env):
+    def test_maintenance_activates_before_file_transfer(self, fake_env):
+        """Maintenance mode must activate before files are transferred."""
         tmp_path, env_file, theme_dir = fake_env
         result = run_script(
             "--dry-run",
@@ -189,6 +191,8 @@ class TestCommandOrdering:
                     output.find("rsync"),
                     output.find("transfer"),
                     output.find("lftp"),
+                    output.find("sftp"),
+                    output.find("upload"),
                 )
                 if p != -1
             ),
@@ -196,7 +200,10 @@ class TestCommandOrdering:
         )
         assert activate_pos != -1, "activate not found in output"
         assert transfer_pos != -1, "transfer not found in output"
-        assert activate_pos < transfer_pos
+        # Deploy script activates maintenance BEFORE transferring files
+        assert (
+            activate_pos < transfer_pos
+        ), "maintenance-mode activate must appear before file transfer"
 
     def test_deactivate_after_transfer(self, fake_env):
         tmp_path, env_file, theme_dir = fake_env
@@ -215,6 +222,8 @@ class TestCommandOrdering:
                     output.find("rsync"),
                     output.find("transfer"),
                     output.find("lftp"),
+                    output.find("sftp"),
+                    output.find("upload"),
                 )
                 if p != -1
             ),
@@ -282,6 +291,8 @@ class TestCacheFlush:
                     output.find("rsync"),
                     output.find("transfer"),
                     output.find("lftp"),
+                    output.find("sftp"),
+                    output.find("upload"),
                 )
                 if p != -1
             ),
@@ -326,6 +337,10 @@ class TestExcludes:
 class TestShellcheck:
     """Test 8: shellcheck passes on the deploy script."""
 
+    @pytest.mark.skipif(
+        not shutil.which("shellcheck"),
+        reason="shellcheck binary not installed",
+    )
     def test_shellcheck_passes(self):
         result = subprocess.run(
             ["shellcheck", str(SCRIPT_PATH)],

@@ -2,13 +2,13 @@
 /**
  * Accessibility Features (WCAG 2.1 AA Compliance)
  *
- * Implements WCAG 2.1 AA compliance for the SkyyRose Flagship Theme:
+ * Implements WCAG 2.1 AA compliance for the SkyyRose Theme:
  * ARIA labels, live regions, image alt enforcement, landmark roles,
  * WooCommerce accessibility enhancements, and admin testing tools.
  *
  * SEO features extracted to inc/seo.php in iteration 28 to keep files under 800 lines.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   1.0.0
  */
 
@@ -29,9 +29,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 function skyyrose_accessibility_styles() {
-	$css_dir  = SKYYROSE_DIR . '/assets/css';
-	$css_uri  = SKYYROSE_ASSETS_URI . '/css';
-	$use_min  = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+	$css_dir = SKYYROSE_DIR . '/assets/css';
+	$css_uri = SKYYROSE_ASSETS_URI . '/css';
+	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
 	$a11y_file = $use_min && file_exists( $css_dir . '/accessibility.min.css' )
 		? 'accessibility.min.css' : 'accessibility.css';
@@ -59,11 +59,11 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_accessibility_styles' );
  */
 function skyyrose_nav_menu_aria_labels( $args ) {
 	if ( 'primary' === $args['theme_location'] ) {
-		$args['container_aria_label'] = __( 'Primary Navigation', 'skyyrose-flagship' );
+		$args['container_aria_label'] = __( 'Primary Navigation', 'skyyrose' );
 	} elseif ( 'footer' === $args['theme_location'] ) {
-		$args['container_aria_label'] = __( 'Footer Navigation', 'skyyrose-flagship' );
+		$args['container_aria_label'] = __( 'Footer Navigation', 'skyyrose' );
 	} elseif ( 'mobile' === $args['theme_location'] ) {
-		$args['container_aria_label'] = __( 'Mobile Navigation', 'skyyrose-flagship' );
+		$args['container_aria_label'] = __( 'Mobile Navigation', 'skyyrose' );
 	}
 
 	return $args;
@@ -160,25 +160,35 @@ function skyyrose_woocommerce_accessibility() {
 		return;
 	}
 	// Set aria-label on the add-to-cart BUTTON element (not inner text span).
-	add_filter( 'woocommerce_loop_add_to_cart_args', function( $args, $product ) {
-		$args['aria-label'] = sprintf(
-			esc_attr__( 'Add %s to your cart', 'skyyrose-flagship' ),
-			$product->get_name()
-		);
-		return $args;
-	}, 10, 2 );
+	add_filter(
+		'woocommerce_loop_add_to_cart_args',
+		function ( $args, $product ) {
+			$args['aria-label'] = sprintf(
+				esc_attr__( 'Add %s to your cart', 'skyyrose' ),
+				$product->get_name()
+			);
+			return $args;
+		},
+		10,
+		2
+	);
 
 	// Add ARIA labels to cart items.
-	add_filter( 'woocommerce_cart_item_remove_link', function( $link, $cart_item_key ) {
-		$cart         = WC()->cart ? WC()->cart->get_cart() : array();
-		$cart_item    = isset( $cart[ $cart_item_key ] ) ? $cart[ $cart_item_key ] : null;
-		$product_name = $cart_item && isset( $cart_item['data'] ) ? $cart_item['data']->get_name() : '';
-		return str_replace(
-			'class="remove"',
-			'class="remove" aria-label="' . esc_attr( sprintf( __( 'Remove %s from cart', 'skyyrose-flagship' ), $product_name ) ) . '"',
-			$link
-		);
-	}, 10, 2 );
+	add_filter(
+		'woocommerce_cart_item_remove_link',
+		function ( $link, $cart_item_key ) {
+			$cart         = WC()->cart ? WC()->cart->get_cart() : array();
+			$cart_item    = isset( $cart[ $cart_item_key ] ) ? $cart[ $cart_item_key ] : null;
+			$product_name = $cart_item && isset( $cart_item['data'] ) ? $cart_item['data']->get_name() : '';
+			return str_replace(
+				'class="remove"',
+				'class="remove" aria-label="' . esc_attr( sprintf( __( 'Remove %s from cart', 'skyyrose' ), $product_name ) ) . '"',
+				$link
+			);
+		},
+		10,
+		2
+	);
 }
 add_action( 'init', 'skyyrose_woocommerce_accessibility' );
 
@@ -222,8 +232,8 @@ add_action( 'wp_head', 'skyyrose_preconnect_resources', 1 );
  */
 function skyyrose_accessibility_testing_page() {
 	add_theme_page(
-		__( 'Accessibility & SEO Tools', 'skyyrose-flagship' ),
-		__( 'A11y & SEO', 'skyyrose-flagship' ),
+		__( 'Accessibility & SEO Tools', 'skyyrose' ),
+		__( 'A11y & SEO', 'skyyrose' ),
 		'manage_options',
 		'skyyrose-accessibility-seo',
 		'skyyrose_accessibility_testing_page_content'
@@ -238,14 +248,14 @@ add_action( 'admin_menu', 'skyyrose_accessibility_testing_page' );
  */
 function skyyrose_accessibility_testing_page_content() {
 	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_die( esc_html__( 'You do not have permission to access this page.', 'skyyrose-flagship' ) );
+		wp_die( esc_html__( 'You do not have permission to access this page.', 'skyyrose' ) );
 	}
 	?>
 	<div class="wrap">
-		<h1><?php esc_html_e( 'Accessibility & SEO Tools', 'skyyrose-flagship' ); ?></h1>
+		<h1><?php esc_html_e( 'Accessibility & SEO Tools', 'skyyrose' ); ?></h1>
 
 		<div class="card">
-			<h2><?php esc_html_e( 'WCAG 2.1 AA Compliance Checklist', 'skyyrose-flagship' ); ?></h2>
+			<h2><?php esc_html_e( 'WCAG 2.1 AA Compliance Checklist', 'skyyrose' ); ?></h2>
 			<ul style="list-style: disc; margin-left: 20px;">
 				<li><strong>&#10003;</strong> Semantic HTML5 structure implemented</li>
 				<li><strong>&#10003;</strong> ARIA labels and roles for interactive elements</li>
@@ -264,7 +274,7 @@ function skyyrose_accessibility_testing_page_content() {
 		</div>
 
 		<div class="card">
-			<h2><?php esc_html_e( 'SEO Features Checklist', 'skyyrose-flagship' ); ?></h2>
+			<h2><?php esc_html_e( 'SEO Features Checklist', 'skyyrose' ); ?></h2>
 			<ul style="list-style: disc; margin-left: 20px;">
 				<li><strong>&#10003;</strong> Product Schema.org markup</li>
 				<li><strong>&#10003;</strong> Organization schema</li>
@@ -283,19 +293,19 @@ function skyyrose_accessibility_testing_page_content() {
 		</div>
 
 		<div class="card">
-			<h2><?php esc_html_e( 'Quick Tests', 'skyyrose-flagship' ); ?></h2>
-			<p><strong><?php esc_html_e( 'Test Page URL:', 'skyyrose-flagship' ); ?></strong></p>
+			<h2><?php esc_html_e( 'Quick Tests', 'skyyrose' ); ?></h2>
+			<p><strong><?php esc_html_e( 'Test Page URL:', 'skyyrose' ); ?></strong></p>
 			<input type="url" id="test-url" value="<?php echo esc_url( home_url( '/' ) ); ?>" style="width: 100%; max-width: 600px; padding: 8px; margin-bottom: 10px;">
 
 			<p>
 				<button type="button" class="button button-primary" data-test-tool="wave">
-					<?php esc_html_e( 'Test with WAVE', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Test with WAVE', 'skyyrose' ); ?>
 				</button>
 				<button type="button" class="button button-primary" data-test-tool="rich-results">
-					<?php esc_html_e( 'Test Rich Results', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Test Rich Results', 'skyyrose' ); ?>
 				</button>
 				<button type="button" class="button button-primary" data-test-tool="pagespeed">
-					<?php esc_html_e( 'Test PageSpeed', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Test PageSpeed', 'skyyrose' ); ?>
 				</button>
 				<script>
 				(function() {
@@ -317,8 +327,8 @@ function skyyrose_accessibility_testing_page_content() {
 		</div>
 
 		<div class="card">
-			<h2><?php esc_html_e( 'Customizer Settings', 'skyyrose-flagship' ); ?></h2>
-			<p><?php esc_html_e( 'Configure social media profiles and contact information for enhanced SEO:', 'skyyrose-flagship' ); ?></p>
+			<h2><?php esc_html_e( 'Customizer Settings', 'skyyrose' ); ?></h2>
+			<p><?php esc_html_e( 'Configure social media profiles and contact information for enhanced SEO:', 'skyyrose' ); ?></p>
 			<ul style="list-style: disc; margin-left: 20px;">
 				<li>Facebook URL</li>
 				<li>Twitter Handle &amp; URL</li>
@@ -330,7 +340,7 @@ function skyyrose_accessibility_testing_page_content() {
 			</ul>
 			<p>
 				<a href="<?php echo esc_url( admin_url( 'customize.php' ) ); ?>" class="button button-primary">
-					<?php esc_html_e( 'Open Customizer', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Open Customizer', 'skyyrose' ); ?>
 				</a>
 			</p>
 		</div>

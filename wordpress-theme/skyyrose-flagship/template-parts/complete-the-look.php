@@ -10,14 +10,16 @@
  * Hooked into: woocommerce_single_product_summary (priority 50)
  * Called by:   inc/woocommerce.php → skyyrose_complete_the_look()
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   5.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) { exit; }
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; }
 
 global $product;
-if ( ! $product ) { return; }
+if ( ! $product ) {
+	return; }
 
 $current_id  = $product->get_id();
 $current_sku = $product->get_sku();
@@ -59,46 +61,57 @@ $related_skus = isset( $cross_sell_map[ $current_sku ] ) ? $cross_sell_map[ $cur
 // Limit to 2 recommendations max.
 $related_skus = array_slice( $related_skus, 0, 2 );
 
-if ( empty( $related_skus ) ) { return; }
+if ( empty( $related_skus ) ) {
+	return; }
 
 // Resolve SKUs to WooCommerce products.
 $related_products = array();
 foreach ( $related_skus as $rel_sku ) {
 	$rel_id = function_exists( 'wc_get_product_id_by_sku' ) ? wc_get_product_id_by_sku( $rel_sku ) : 0;
-	if ( ! $rel_id ) { continue; }
+	if ( ! $rel_id ) {
+		continue; }
 	$rel_product = wc_get_product( $rel_id );
 	if ( $rel_product && 'publish' === get_post_status( $rel_id ) ) {
 		$related_products[] = $rel_product;
 	}
 }
 
-if ( empty( $related_products ) ) { return; }
+if ( empty( $related_products ) ) {
+	return; }
 
-$collection     = function_exists( 'skyyrose_get_product_collection' ) ? skyyrose_get_product_collection( $current_id ) : 'default';
-$config         = function_exists( 'skyyrose_collection_config' ) ? skyyrose_collection_config( $collection ) : array( 'accent' => '#B76E79' );
-$accent         = esc_attr( $config['accent'] ?? '#B76E79' );
+$collection = function_exists( 'skyyrose_get_product_collection' ) ? skyyrose_get_product_collection( $current_id ) : 'default';
+$config     = function_exists( 'skyyrose_collection_config' ) ? skyyrose_collection_config( $collection ) : array( 'accent' => '#B76E79' );
+$accent     = esc_attr( $config['accent'] ?? '#B76E79' );
 ?>
-<section class="sr-complete-look" aria-label="<?php esc_attr_e( 'Complete the Look', 'skyyrose-flagship' ); ?>"
-	style="--sr-cl-accent: <?php echo $accent; ?>;">
+<section class="sr-complete-look" aria-label="<?php esc_attr_e( 'Complete the Look', 'skyyrose' ); ?>"
+	style="--sr-cl-accent: <?php echo esc_attr( $accent ); ?>;">
 	<h3 class="sr-complete-look__heading">
-		<?php esc_html_e( 'Complete the Look', 'skyyrose-flagship' ); ?>
-		<span class="sr-complete-look__badge"><?php esc_html_e( 'Save 10% when added', 'skyyrose-flagship' ); ?></span>
+		<?php esc_html_e( 'Complete the Look', 'skyyrose' ); ?>
+		<span class="sr-complete-look__badge"><?php esc_html_e( 'Save 10% when added', 'skyyrose' ); ?></span>
 	</h3>
 
 	<div class="sr-complete-look__track">
 		<?php foreach ( $related_products as $rel ) : ?>
-		<?php
-		$rel_id        = $rel->get_id();
-		$rel_name      = $rel->get_name();
-		$rel_price     = $rel->get_price_html();
-		$rel_url       = get_permalink( $rel_id );
-		$rel_img_id    = $rel->get_image_id();
-		$rel_img       = $rel_img_id
-			? wp_get_attachment_image( $rel_img_id, 'woocommerce_thumbnail', false, array( 'class' => 'sr-cl-card__img', 'loading' => 'lazy' ) )
+			<?php
+			$rel_id      = $rel->get_id();
+			$rel_name    = $rel->get_name();
+			$rel_price   = $rel->get_price_html();
+			$rel_url     = get_permalink( $rel_id );
+			$rel_img_id  = $rel->get_image_id();
+			$rel_img     = $rel_img_id
+			? wp_get_attachment_image(
+				$rel_img_id,
+				'woocommerce_thumbnail',
+				false,
+				array(
+					'class'   => 'sr-cl-card__img',
+					'loading' => 'lazy',
+				)
+			)
 			: wc_placeholder_img( 'woocommerce_thumbnail', array( 'class' => 'sr-cl-card__img' ) );
-		$is_preorder   = function_exists( 'skyyrose_is_preorder' ) && skyyrose_is_preorder( $rel_id );
-		$btn_text      = $is_preorder ? __( 'Pre-Order', 'skyyrose-flagship' ) : __( 'Quick Add', 'skyyrose-flagship' );
-		?>
+			$is_preorder = function_exists( 'skyyrose_is_preorder' ) && skyyrose_is_preorder( $rel_id );
+			$btn_text    = $is_preorder ? __( 'Pre-Order', 'skyyrose' ) : __( 'Quick Add', 'skyyrose' );
+			?>
 		<div class="sr-cl-card" data-product-id="<?php echo esc_attr( $rel_id ); ?>">
 			<a href="<?php echo esc_url( $rel_url ); ?>" class="sr-cl-card__image-link" tabindex="-1" aria-hidden="true">
 				<?php echo wp_kses_post( $rel_img ); ?>
@@ -113,7 +126,7 @@ $accent         = esc_attr( $config['accent'] ?? '#B76E79' );
 				data-product-id="<?php echo esc_attr( $rel_id ); ?>"
 				data-product-name="<?php echo esc_attr( $rel_name ); ?>"
 				data-nonce="<?php echo esc_attr( wp_create_nonce( 'skyyrose-woo-nonce' ) ); ?>"
-				aria-label="<?php echo esc_attr( sprintf( __( 'Add %s to cart', 'skyyrose-flagship' ), $rel_name ) ); ?>"
+				aria-label="<?php echo esc_attr( sprintf( __( 'Add %s to cart', 'skyyrose' ), $rel_name ) ); ?>"
 			><?php echo esc_html( $btn_text ); ?></button>
 		</div>
 		<?php endforeach; ?>

@@ -1,0 +1,70 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/blueprint.json",
+	"landingPage": "/",
+	"preferredVersions": {
+		"php": "8.2",
+		"wp": "6.8"
+	},
+	"features": {
+		"networking": true
+	},
+	"steps": [
+		{
+			"step": "setSiteOptions",
+			"options": {
+				"blogname": "SkyyRose",
+				"blogdescription": "Luxury Grows from Concrete.",
+				"permalink_structure": "/%postname%/",
+				"timezone_string": "America/New_York",
+				"date_format": "F j, Y",
+				"time_format": "g:i a",
+				"posts_per_page": 12
+			}
+		},
+		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "wordpress.org/plugins",
+				"slug": "woocommerce"
+			},
+			"options": {
+				"activate": true
+			}
+		},
+		{
+			"step": "installTheme",
+			"themeData": {
+				"resource": "url",
+				"url": "https://skyyrose.co/theme/skyyrose.zip"
+			},
+			"options": {
+				"activate": true
+			}
+		},
+		{
+			"step": "setSiteOptions",
+			"options": {
+				"woocommerce_default_country": "US:NY",
+				"woocommerce_currency": "USD",
+				"woocommerce_weight_unit": "lbs",
+				"woocommerce_dimension_unit": "in",
+				"woocommerce_shop_page_id": 0,
+				"woocommerce_cart_page_id": 0,
+				"woocommerce_checkout_page_id": 0,
+				"woocommerce_myaccount_page_id": 0,
+				"woocommerce_enable_reviews": "yes",
+				"woocommerce_calc_taxes": "no"
+			}
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php\n// Create WooCommerce pages.\nif ( function_exists( 'WC_Install::create_pages' ) ) {\n\tWC_Install::create_pages();\n}\n\n// Create collection pages.\n$collections = array(\n\t'collection-signature'   => 'Signature Collection',\n\t'collection-black-rose'  => 'Black Rose Collection',\n\t'collection-love-hurts'  => 'Love Hurts Collection',\n\t'collection-kids-capsule' => 'Kids Capsule Collection',\n);\n\nforeach ( $collections as $slug => $title ) {\n\t$existing = get_page_by_path( $slug );\n\tif ( ! $existing ) {\n\t\twp_insert_post( array(\n\t\t\t'post_title'   => $title,\n\t\t\t'post_name'    => $slug,\n\t\t\t'post_status'  => 'publish',\n\t\t\t'post_type'    => 'page',\n\t\t\t'page_template' => 'template-' . $slug . '.php',\n\t\t) );\n\t}\n}\n\n// Create About page.\nif ( ! get_page_by_path( 'about' ) ) {\n\twp_insert_post( array(\n\t\t'post_title'    => 'About SkyyRose',\n\t\t'post_name'     => 'about',\n\t\t'post_status'   => 'publish',\n\t\t'post_type'     => 'page',\n\t\t'page_template' => 'template-about.php',\n\t) );\n}\n\n// Create Preorder Gateway page.\nif ( ! get_page_by_path( 'preorder' ) ) {\n\twp_insert_post( array(\n\t\t'post_title'    => 'Preorder Gateway',\n\t\t'post_name'     => 'preorder',\n\t\t'post_status'   => 'publish',\n\t\t'post_type'     => 'page',\n\t\t'page_template' => 'template-preorder-gateway.php',\n\t) );\n}\n\n// Set front page to static.\n$front = get_page_by_path( 'home' );\nif ( ! $front ) {\n\t$front_id = wp_insert_post( array(\n\t\t'post_title'  => 'Home',\n\t\t'post_name'   => 'home',\n\t\t'post_status' => 'publish',\n\t\t'post_type'   => 'page',\n\t) );\n} else {\n\t$front_id = $front->ID;\n}\nupdate_option( 'page_on_front', $front_id );\nupdate_option( 'show_on_front', 'page' );\n\n// Create sample products.\n$products = array(\n\tarray( 'name' => 'Signature Crewneck', 'price' => '89.00', 'sku' => 'SG-CREW-001', 'cat' => 'Signature' ),\n\tarray( 'name' => 'Black Rose Hoodie', 'price' => '119.00', 'sku' => 'BR-HOOD-001', 'cat' => 'Black Rose' ),\n\tarray( 'name' => 'Love Hurts Tee', 'price' => '59.00', 'sku' => 'LH-TEE-001', 'cat' => 'Love Hurts' ),\n\tarray( 'name' => 'Kids Capsule Joggers', 'price' => '49.00', 'sku' => 'KC-JOG-001', 'cat' => 'Kids Capsule' ),\n);\n\nforeach ( $products as $p ) {\n\tif ( function_exists( 'wc_get_product_id_by_sku' ) && ! wc_get_product_id_by_sku( $p['sku'] ) ) {\n\t\t$product = new WC_Product_Simple();\n\t\t$product->set_name( $p['name'] );\n\t\t$product->set_regular_price( $p['price'] );\n\t\t$product->set_sku( $p['sku'] );\n\t\t$product->set_status( 'publish' );\n\t\t$product->set_catalog_visibility( 'visible' );\n\t\t$product->save();\n\t}\n}\n"
+		},
+		{
+			"step": "setSiteOptions",
+			"options": {
+				"skyyrose_kids_capsule_mode": "launch"
+			}
+		}
+	]
+}

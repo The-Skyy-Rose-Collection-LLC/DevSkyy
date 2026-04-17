@@ -5,7 +5,7 @@
  * IntersectionObserver scroll-reveal, FAQ accordion, cart summary bar,
  * and smooth-scroll anchor links.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   2.0.0
  * @updated 7.0.0 — CRO transformation
  */

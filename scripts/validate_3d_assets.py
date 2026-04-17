@@ -44,7 +44,7 @@ import struct
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -61,7 +61,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class ValidationStatus(str, Enum):
+class ValidationStatus(StrEnum):
     """Validation result status."""
 
     PASSED = "passed"

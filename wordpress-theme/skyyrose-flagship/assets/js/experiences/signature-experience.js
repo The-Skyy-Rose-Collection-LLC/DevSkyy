@@ -10,12 +10,13 @@
  */
 
 class SignatureExperience extends SkyyRoseExperience {
-    constructor(containerId) {
+    constructor(containerId, options) {
         super(containerId, {
             backgroundColor: 0x1a1510,
             enablePostProcessing: true,
             enableParticles: true,
-            cameraFov: 55
+            cameraFov: 55,
+            ...(options || {})
         });
 
         // Collection colors

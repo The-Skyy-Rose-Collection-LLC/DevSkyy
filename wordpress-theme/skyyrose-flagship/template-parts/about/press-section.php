@@ -11,7 +11,7 @@
  *     @type string $arrow_svg        Arrow SVG markup string.
  * }
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 
@@ -25,37 +25,37 @@ $svg_kses         = skyyrose_svg_kses();
 ?>
 
 <!-- Press Room -->
-<section class="abt-chapter abt-press" id="press" aria-label="<?php esc_attr_e( 'Press & Media', 'skyyrose-flagship' ); ?>">
+<section class="abt-chapter abt-press" id="press" aria-label="<?php esc_attr_e( 'Press & Media', 'skyyrose' ); ?>">
 	<span class="abt-chapter__num rv-split-char" aria-hidden="true">04</span>
 	<div class="abt-chapter__container">
-		<p class="abt-chapter__label rv-blur-down"><?php esc_html_e( 'Chapter IV', 'skyyrose-flagship' ); ?></p>
-		<h2 class="abt-chapter__title rv-clip-up"><?php esc_html_e( 'As Seen In', 'skyyrose-flagship' ); ?></h2>
+		<p class="abt-chapter__label rv-blur-down"><?php esc_html_e( 'Chapter IV', 'skyyrose' ); ?></p>
+		<h2 class="abt-chapter__title rv-clip-up"><?php esc_html_e( 'As Seen In', 'skyyrose' ); ?></h2>
 		<p class="abt-press__intro rv rv-d2">
-			<?php esc_html_e( 'The SkyyRose story has been recognized by national and regional publications for its authenticity, innovation, and the power of its origin.', 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( 'The SkyyRose story has been recognized by national and regional publications for its authenticity, innovation, and the power of its origin.', 'skyyrose' ); ?>
 		</p>
 
 		<?php
 		$press_img = get_theme_file_path( 'assets/images/press-the-blox-interview.jpg' );
 		if ( file_exists( $press_img ) ) :
-		?>
+			?>
 			<figure class="abt-press__photo rv rv-d2">
 				<img src="<?php echo esc_url( get_theme_file_uri( 'assets/images/press-the-blox-interview.jpg' ) ); ?>"
-					 alt="<?php esc_attr_e( 'Corey Foster interviewed on The Blox', 'skyyrose-flagship' ); ?>"
-					 loading="lazy" width="1200" height="675">
-				<figcaption><?php esc_html_e( 'Corey Foster on The Blox — discussing the SkyyRose story', 'skyyrose-flagship' ); ?></figcaption>
+					alt="<?php esc_attr_e( 'Corey Foster interviewed on The Blox', 'skyyrose' ); ?>"
+					loading="lazy" width="1200" height="675">
+				<figcaption><?php esc_html_e( 'Corey Foster on The Blox — discussing the SkyyRose story', 'skyyrose' ); ?></figcaption>
 			</figure>
 		<?php endif; ?>
 
 		<?php if ( ! empty( $youtube_embed_id ) ) : ?>
 			<div class="abt-press__video-wrap rv rv-d3">
 				<div class="abt-press__video-header">
-					<span><?php esc_html_e( 'Featured Video', 'skyyrose-flagship' ); ?></span>
+					<span><?php esc_html_e( 'Featured Video', 'skyyrose' ); ?></span>
 					<div class="abt-press__video-line" aria-hidden="true"></div>
 				</div>
 				<div class="abt-press__video-embed">
 					<iframe
 						src="<?php echo esc_url( 'https://www.youtube.com/embed/' . $youtube_embed_id . '?rel=0&modestbranding=1&color=white' ); ?>"
-						title="<?php esc_attr_e( 'SkyyRose Collection — Featured Video', 'skyyrose-flagship' ); ?>"
+						title="<?php esc_attr_e( 'SkyyRose Collection — Featured Video', 'skyyrose' ); ?>"
 						frameborder="0"
 						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 						allowfullscreen
@@ -67,9 +67,10 @@ $svg_kses         = skyyrose_svg_kses();
 	</div>
 
 	<div class="abt-press__scroll" id="pressScroll">
-		<?php foreach ( $press_features as $pi => $pf ) :
+		<?php
+		foreach ( $press_features as $pi => $pf ) :
 			$delay = 'rv-d' . min( $pi + 1, 4 );
-		?>
+			?>
 			<article class="abt-press-card rv <?php echo esc_attr( $delay ); ?>">
 				<div class="abt-press-card__inner">
 					<p class="abt-press-card__src"><?php echo esc_html( $pf['src'] ); ?></p>
@@ -82,10 +83,10 @@ $svg_kses         = skyyrose_svg_kses();
 					</p>
 					<?php if ( ! empty( $pf['url'] ) ) : ?>
 						<a href="<?php echo esc_url( $pf['url'] ); ?>"
-						   class="abt-press-card__link"
-						   target="_blank"
-						   rel="noopener noreferrer">
-							<?php esc_html_e( 'Read Article', 'skyyrose-flagship' ); ?>
+							class="abt-press-card__link"
+							target="_blank"
+							rel="noopener noreferrer">
+							<?php esc_html_e( 'Read Article', 'skyyrose' ); ?>
 							<?php echo wp_kses( $arrow_svg, $svg_kses ); ?>
 						</a>
 					<?php endif; ?>
@@ -98,7 +99,7 @@ $svg_kses         = skyyrose_svg_kses();
 	<div class="abt-chapter__container">
 		<div class="abt-press__hint rv" aria-hidden="true">
 			<div class="abt-press__hint-line"></div>
-			<span><?php esc_html_e( 'Scroll to explore', 'skyyrose-flagship' ); ?></span>
+			<span><?php esc_html_e( 'Scroll to explore', 'skyyrose' ); ?></span>
 		</div>
 	</div>
 </section>

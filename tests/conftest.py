@@ -12,6 +12,15 @@ import pytest
 # =============================================================================
 
 
+@pytest.fixture(autouse=True)
+def _reset_rate_limiter():
+    """Reset rate limiter state before every test to prevent 429 bleed."""
+    from security.rate_limiting import rate_limiter
+
+    rate_limiter.sliding_windows.clear()
+    rate_limiter.token_buckets.clear()
+
+
 @pytest.fixture
 async def client():
     """

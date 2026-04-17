@@ -9,7 +9,7 @@
  *     @type array $timeline_milestones Array of milestone data (year, event, desc).
  * }
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 
@@ -20,11 +20,11 @@ $timeline_milestones = $args['timeline_milestones'] ?? array();
 ?>
 
 <!-- Chapter III — Timeline -->
-<section class="abt-chapter abt-timeline" aria-label="<?php esc_attr_e( 'Our Journey', 'skyyrose-flagship' ); ?>">
+<section class="abt-chapter abt-timeline" aria-label="<?php esc_attr_e( 'Our Journey', 'skyyrose' ); ?>">
 	<span class="abt-chapter__num rv-split-char" aria-hidden="true">03</span>
 	<div class="abt-chapter__container">
-		<p class="abt-chapter__label rv-blur-down"><?php esc_html_e( 'Chapter III', 'skyyrose-flagship' ); ?></p>
-		<h2 class="abt-chapter__title rv-clip-up"><?php esc_html_e( 'The Journey', 'skyyrose-flagship' ); ?></h2>
+		<p class="abt-chapter__label rv-blur-down"><?php esc_html_e( 'Chapter III', 'skyyrose' ); ?></p>
+		<h2 class="abt-chapter__title rv-clip-up"><?php esc_html_e( 'The Journey', 'skyyrose' ); ?></h2>
 
 		<div class="abt-tl__track" role="list">
 			<?php foreach ( $timeline_milestones as $ms ) : ?>

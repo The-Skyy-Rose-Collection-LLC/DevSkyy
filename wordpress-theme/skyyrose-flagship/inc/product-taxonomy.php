@@ -6,7 +6,7 @@
  * when WooCommerce is not active. Ensures the SkyyRose collection
  * hierarchy and product tags exist in the database.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.1.0
  */
 
@@ -15,7 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Fallback Taxonomy (when WooCommerce is NOT active)
  *--------------------------------------------------------------*/
 
@@ -39,20 +40,20 @@ function skyyrose_register_fallback_product_tag() {
 	}
 
 	$labels = array(
-		'name'                       => esc_html_x( 'Product Tags', 'taxonomy general name', 'skyyrose-flagship' ),
-		'singular_name'              => esc_html_x( 'Product Tag', 'taxonomy singular name', 'skyyrose-flagship' ),
-		'search_items'               => esc_html__( 'Search Product Tags', 'skyyrose-flagship' ),
-		'popular_items'              => esc_html__( 'Popular Product Tags', 'skyyrose-flagship' ),
-		'all_items'                  => esc_html__( 'All Product Tags', 'skyyrose-flagship' ),
-		'edit_item'                  => esc_html__( 'Edit Product Tag', 'skyyrose-flagship' ),
-		'update_item'                => esc_html__( 'Update Product Tag', 'skyyrose-flagship' ),
-		'add_new_item'               => esc_html__( 'Add New Product Tag', 'skyyrose-flagship' ),
-		'new_item_name'              => esc_html__( 'New Product Tag Name', 'skyyrose-flagship' ),
-		'separate_items_with_commas' => esc_html__( 'Separate product tags with commas', 'skyyrose-flagship' ),
-		'add_or_remove_items'        => esc_html__( 'Add or remove product tags', 'skyyrose-flagship' ),
-		'choose_from_most_used'      => esc_html__( 'Choose from the most used product tags', 'skyyrose-flagship' ),
-		'not_found'                  => esc_html__( 'No product tags found.', 'skyyrose-flagship' ),
-		'menu_name'                  => esc_html__( 'Product Tags', 'skyyrose-flagship' ),
+		'name'                       => esc_html_x( 'Product Tags', 'taxonomy general name', 'skyyrose' ),
+		'singular_name'              => esc_html_x( 'Product Tag', 'taxonomy singular name', 'skyyrose' ),
+		'search_items'               => esc_html__( 'Search Product Tags', 'skyyrose' ),
+		'popular_items'              => esc_html__( 'Popular Product Tags', 'skyyrose' ),
+		'all_items'                  => esc_html__( 'All Product Tags', 'skyyrose' ),
+		'edit_item'                  => esc_html__( 'Edit Product Tag', 'skyyrose' ),
+		'update_item'                => esc_html__( 'Update Product Tag', 'skyyrose' ),
+		'add_new_item'               => esc_html__( 'Add New Product Tag', 'skyyrose' ),
+		'new_item_name'              => esc_html__( 'New Product Tag Name', 'skyyrose' ),
+		'separate_items_with_commas' => esc_html__( 'Separate product tags with commas', 'skyyrose' ),
+		'add_or_remove_items'        => esc_html__( 'Add or remove product tags', 'skyyrose' ),
+		'choose_from_most_used'      => esc_html__( 'Choose from the most used product tags', 'skyyrose' ),
+		'not_found'                  => esc_html__( 'No product tags found.', 'skyyrose' ),
+		'menu_name'                  => esc_html__( 'Product Tags', 'skyyrose' ),
 	);
 
 	$args = array(
@@ -69,7 +70,8 @@ function skyyrose_register_fallback_product_tag() {
 }
 add_action( 'init', 'skyyrose_register_fallback_product_tag', 20 );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * WooCommerce Product Categories
  *--------------------------------------------------------------*/
 
@@ -99,11 +101,11 @@ function skyyrose_create_product_categories() {
 
 	if ( ! $parent_term ) {
 		$parent_term = wp_insert_term(
-			__( 'Shop', 'skyyrose-flagship' ),
+			__( 'Shop', 'skyyrose' ),
 			'product_cat',
 			array(
 				'slug'        => $parent_slug,
-				'description' => __( 'All SkyyRose products.', 'skyyrose-flagship' ),
+				'description' => __( 'All SkyyRose products.', 'skyyrose' ),
 			)
 		);
 	}
@@ -117,20 +119,20 @@ function skyyrose_create_product_categories() {
 	// Define child collection categories.
 	$collections = array(
 		'black-rose'   => array(
-			'name'        => __( 'Black Rose', 'skyyrose-flagship' ),
-			'description' => __( 'Dark elegance meets luxury streetwear. Cathedral-inspired pieces for the bold.', 'skyyrose-flagship' ),
+			'name'        => __( 'Black Rose', 'skyyrose' ),
+			'description' => __( 'Dark elegance meets luxury streetwear. Cathedral-inspired pieces for the bold.', 'skyyrose' ),
 		),
 		'love-hurts'   => array(
-			'name'        => __( 'Love Hurts', 'skyyrose-flagship' ),
-			'description' => __( 'Where passion meets pain. Castle-themed pieces that tell a story of love and resilience.', 'skyyrose-flagship' ),
+			'name'        => __( 'Love Hurts', 'skyyrose' ),
+			'description' => __( 'Where passion meets pain. Castle-themed pieces that tell a story of love and resilience.', 'skyyrose' ),
 		),
 		'signature'    => array(
-			'name'        => __( 'Signature', 'skyyrose-flagship' ),
-			'description' => __( 'The quintessential SkyyRose experience. City-inspired luxury for every day.', 'skyyrose-flagship' ),
+			'name'        => __( 'Signature', 'skyyrose' ),
+			'description' => __( 'The quintessential SkyyRose experience. City-inspired luxury for every day.', 'skyyrose' ),
 		),
 		'kids-capsule' => array(
-			'name'        => __( 'Kids Capsule', 'skyyrose-flagship' ),
-			'description' => __( 'Luxury fashion for the next generation. Where love meets comfort.', 'skyyrose-flagship' ),
+			'name'        => __( 'Kids Capsule', 'skyyrose' ),
+			'description' => __( 'Luxury fashion for the next generation. Where love meets comfort.', 'skyyrose' ),
 		),
 	);
 
@@ -150,7 +152,8 @@ function skyyrose_create_product_categories() {
 }
 add_action( 'init', 'skyyrose_create_product_categories', 20 );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * WooCommerce Product Tags
  *--------------------------------------------------------------*/
 
@@ -174,23 +177,23 @@ function skyyrose_create_product_tags() {
 	}
 
 	$tags = array(
-		'limited-edition' => __( 'Limited Edition', 'skyyrose-flagship' ),
-		'bestseller'      => __( 'Bestseller', 'skyyrose-flagship' ),
-		'new-arrival'     => __( 'New Arrival', 'skyyrose-flagship' ),
-		'pre-order'       => __( 'Pre-Order', 'skyyrose-flagship' ),
-		'collaboration'   => __( 'Collaboration', 'skyyrose-flagship' ),
-		'collab'          => __( 'Collab', 'skyyrose-flagship' ),
-		'hoodie'          => __( 'Hoodie', 'skyyrose-flagship' ),
-		'jogger'          => __( 'Jogger', 'skyyrose-flagship' ),
-		'crewneck'        => __( 'Crewneck', 'skyyrose-flagship' ),
-		'jacket'          => __( 'Jacket', 'skyyrose-flagship' ),
-		'dress'           => __( 'Dress', 'skyyrose-flagship' ),
-		'shorts'          => __( 'Shorts', 'skyyrose-flagship' ),
-		'beanie'          => __( 'Beanie', 'skyyrose-flagship' ),
-		'jersey'          => __( 'Jersey', 'skyyrose-flagship' ),
-		'set'             => __( 'Set', 'skyyrose-flagship' ),
-		'tee'             => __( 'Tee', 'skyyrose-flagship' ),
-		'sherpa'          => __( 'Sherpa', 'skyyrose-flagship' ),
+		'limited-edition' => __( 'Limited Edition', 'skyyrose' ),
+		'bestseller'      => __( 'Bestseller', 'skyyrose' ),
+		'new-arrival'     => __( 'New Arrival', 'skyyrose' ),
+		'pre-order'       => __( 'Pre-Order', 'skyyrose' ),
+		'collaboration'   => __( 'Collaboration', 'skyyrose' ),
+		'collab'          => __( 'Collab', 'skyyrose' ),
+		'hoodie'          => __( 'Hoodie', 'skyyrose' ),
+		'jogger'          => __( 'Jogger', 'skyyrose' ),
+		'crewneck'        => __( 'Crewneck', 'skyyrose' ),
+		'jacket'          => __( 'Jacket', 'skyyrose' ),
+		'dress'           => __( 'Dress', 'skyyrose' ),
+		'shorts'          => __( 'Shorts', 'skyyrose' ),
+		'beanie'          => __( 'Beanie', 'skyyrose' ),
+		'jersey'          => __( 'Jersey', 'skyyrose' ),
+		'set'             => __( 'Set', 'skyyrose' ),
+		'tee'             => __( 'Tee', 'skyyrose' ),
+		'sherpa'          => __( 'Sherpa', 'skyyrose' ),
 	);
 
 	foreach ( $tags as $slug => $name ) {

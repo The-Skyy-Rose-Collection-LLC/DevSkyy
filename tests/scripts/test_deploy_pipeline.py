@@ -6,8 +6,11 @@ orchestrates build -> deploy -> verify as 3 numbered steps with --dry-run suppor
 """
 
 import os
+import shutil
 import subprocess
 from pathlib import Path
+
+import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SCRIPT_PATH = PROJECT_ROOT / "scripts" / "deploy-pipeline.sh"
@@ -138,6 +141,10 @@ class TestDependencyChecks:
 class TestShellcheck:
     """Test 9: shellcheck passes on deploy-pipeline.sh."""
 
+    @pytest.mark.skipif(
+        not shutil.which("shellcheck"),
+        reason="shellcheck binary not installed",
+    )
     def test_shellcheck_passes(self):
         result = subprocess.run(
             ["shellcheck", str(SCRIPT_PATH)],

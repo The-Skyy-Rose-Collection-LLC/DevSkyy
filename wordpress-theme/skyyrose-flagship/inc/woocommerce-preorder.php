@@ -7,7 +7,7 @@
  *
  * Split from inc/woocommerce.php for maintainability.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.3.0
  */
 
@@ -16,7 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Pre-Order Meta Fields
  *--------------------------------------------------------------*/
 
@@ -32,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function skyyrose_add_preorder_meta_box() {
 	add_meta_box(
 		'skyyrose_preorder_settings',
-		esc_html__( 'Pre-Order Settings', 'skyyrose-flagship' ),
+		esc_html__( 'Pre-Order Settings', 'skyyrose' ),
 		'skyyrose_preorder_meta_box_callback',
 		'product',
 		'side',
@@ -62,23 +63,23 @@ function skyyrose_preorder_meta_box_callback( $post ) {
 	<p>
 		<label>
 			<input type="checkbox" name="skyyrose_is_preorder" value="1" <?php checked( $is_preorder, '1' ); ?> />
-			<?php esc_html_e( 'This is a pre-order product', 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( 'This is a pre-order product', 'skyyrose' ); ?>
 		</label>
 	</p>
 	<p>
-		<label for="skyyrose_edition_size"><?php esc_html_e( 'Edition Size', 'skyyrose-flagship' ); ?></label>
+		<label for="skyyrose_edition_size"><?php esc_html_e( 'Edition Size', 'skyyrose' ); ?></label>
 		<input type="number" id="skyyrose_edition_size" name="skyyrose_edition_size" value="<?php echo esc_attr( $edition_size ); ?>" min="1" style="width:100%;" placeholder="e.g. 250" />
 	</p>
 	<p>
-		<label for="skyyrose_preorder_available"><?php esc_html_e( 'Available Remaining', 'skyyrose-flagship' ); ?></label>
+		<label for="skyyrose_preorder_available"><?php esc_html_e( 'Available Remaining', 'skyyrose' ); ?></label>
 		<input type="number" id="skyyrose_preorder_available" name="skyyrose_preorder_available" value="<?php echo esc_attr( $available ); ?>" min="0" style="width:100%;" />
 	</p>
 	<p>
-		<label for="skyyrose_ship_date"><?php esc_html_e( 'Expected Ship Date', 'skyyrose-flagship' ); ?></label>
+		<label for="skyyrose_ship_date"><?php esc_html_e( 'Expected Ship Date', 'skyyrose' ); ?></label>
 		<input type="date" id="skyyrose_ship_date" name="skyyrose_ship_date" value="<?php echo esc_attr( $ship_date ); ?>" style="width:100%;" />
 	</p>
 	<p>
-		<label for="skyyrose_preorder_price"><?php esc_html_e( 'Pre-Order Price ($)', 'skyyrose-flagship' ); ?></label>
+		<label for="skyyrose_preorder_price"><?php esc_html_e( 'Pre-Order Price ($)', 'skyyrose' ); ?></label>
 		<input type="text" id="skyyrose_preorder_price" name="skyyrose_preorder_price" value="<?php echo esc_attr( $preorder_price ); ?>" style="width:100%;" placeholder="Early access price" />
 	</p>
 	<?php
@@ -182,22 +183,22 @@ function skyyrose_preorder_single_product_notice() {
 	$preorder_px  = get_post_meta( $product->get_id(), '_preorder_price', true );
 
 	echo '<div class="skyyrose-preorder-notice">';
-	echo '<span class="skyyrose-preorder-notice__badge">' . esc_html__( 'Pre-Order', 'skyyrose-flagship' ) . '</span>';
+	echo '<span class="skyyrose-preorder-notice__badge">' . esc_html__( 'Pre-Order', 'skyyrose' ) . '</span>';
 
 	if ( $edition_size ) {
-		echo '<div class="skyyrose-preorder-notice__detail">' . esc_html__( 'Limited Edition', 'skyyrose-flagship' ) . ' — <strong>' . esc_html( $edition_size ) . ' ' . esc_html__( 'pieces', 'skyyrose-flagship' ) . '</strong>';
+		echo '<div class="skyyrose-preorder-notice__detail">' . esc_html__( 'Limited Edition', 'skyyrose' ) . ' — <strong>' . esc_html( $edition_size ) . ' ' . esc_html__( 'pieces', 'skyyrose' ) . '</strong>';
 		if ( $available ) {
-			echo ' · <strong>' . esc_html( $available ) . ' ' . esc_html__( 'remaining', 'skyyrose-flagship' ) . '</strong>';
+			echo ' · <strong>' . esc_html( $available ) . ' ' . esc_html__( 'remaining', 'skyyrose' ) . '</strong>';
 		}
 		echo '</div>';
 	}
 
 	if ( $preorder_px ) {
-		echo '<div class="skyyrose-preorder-notice__detail">' . esc_html__( 'Early Access Price:', 'skyyrose-flagship' ) . ' <strong>' . esc_html( get_woocommerce_currency_symbol() ) . esc_html( $preorder_px ) . '</strong></div>';
+		echo '<div class="skyyrose-preorder-notice__detail">' . esc_html__( 'Early Access Price:', 'skyyrose' ) . ' <strong>' . esc_html( get_woocommerce_currency_symbol() ) . esc_html( $preorder_px ) . '</strong></div>';
 	}
 
 	if ( $ship_date ) {
-		echo '<div class="skyyrose-preorder-notice__ship-date">' . esc_html__( 'Expected Ship Date:', 'skyyrose-flagship' ) . ' ' . esc_html( date_i18n( 'F j, Y', strtotime( $ship_date ) ) ) . '</div>';
+		echo '<div class="skyyrose-preorder-notice__ship-date">' . esc_html__( 'Expected Ship Date:', 'skyyrose' ) . ' ' . esc_html( date_i18n( 'F j, Y', strtotime( $ship_date ) ) ) . '</div>';
 	}
 
 	echo '</div>';
@@ -209,13 +210,13 @@ add_action( 'woocommerce_single_product_summary', 'skyyrose_preorder_single_prod
  *
  * @since 3.10.0
  *
- * @param string      $text    Default button text.
- * @param WC_Product  $product Product object.
+ * @param string     $text    Default button text.
+ * @param WC_Product $product Product object.
  * @return string Modified button text.
  */
 function skyyrose_preorder_button_text( $text, $product ) {
 	if ( $product && skyyrose_is_preorder( $product->get_id() ) ) {
-		return esc_html__( 'Pre-Order Now', 'skyyrose-flagship' );
+		return esc_html__( 'Pre-Order Now', 'skyyrose' );
 	}
 	return $text;
 }
@@ -253,7 +254,7 @@ function skyyrose_preorder_price_html( $price_html, $product ) {
 
 	if ( ! empty( $preorder_price ) && is_numeric( $preorder_price ) && (float) $preorder_price > 0 ) {
 		return '<span class="woocommerce-Price-amount amount">'
-			. esc_html__( 'Pre-Order', 'skyyrose-flagship' )
+			. esc_html__( 'Pre-Order', 'skyyrose' )
 			. ' &mdash; '
 			. esc_html( get_woocommerce_currency_symbol() )
 			. esc_html( number_format( (float) $preorder_price, 0 ) )
@@ -261,12 +262,13 @@ function skyyrose_preorder_price_html( $price_html, $product ) {
 	}
 
 	return '<span class="woocommerce-Price-amount amount">'
-		. esc_html__( 'Pre-Order', 'skyyrose-flagship' )
+		. esc_html__( 'Pre-Order', 'skyyrose' )
 		. '</span>';
 }
 add_filter( 'woocommerce_get_price_html', 'skyyrose_preorder_price_html', 10, 2 );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Referral Credit — award $10 on completed order
  *--------------------------------------------------------------*/
 

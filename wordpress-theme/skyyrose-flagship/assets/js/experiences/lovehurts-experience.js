@@ -11,12 +11,13 @@
  */
 
 class LoveHurtsExperience extends SkyyRoseExperience {
-    constructor(containerId) {
+    constructor(containerId, options) {
         super(containerId, {
             backgroundColor: 0x0a0510,
             enablePostProcessing: true,
             enableParticles: true,
-            cameraFov: 50
+            cameraFov: 50,
+            ...(options || {})
         });
 
         // Collection colors

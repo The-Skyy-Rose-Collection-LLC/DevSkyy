@@ -1,5 +1,5 @@
 /**
- * Page Transitions — SkyyRose Flagship
+ * Page Transitions — SkyyRose
  *
  * Smooth cross-fade transitions between pages using the View Transitions API
  * (Chrome 111+) with graceful degradation for unsupported browsers.
@@ -8,7 +8,7 @@
  *  - Skeleton screen injection/removal on image loads
  *  - Scarcity indicator animation on scroll
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.4.0
  */
 

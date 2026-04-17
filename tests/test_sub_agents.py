@@ -68,16 +68,23 @@ class TestSubAgentSystemPrompts:
     def test_system_prompt_mentions_skyyrose(self, module_path, class_name):
         cls = _import_agent(module_path, class_name)
         prompt = cls.system_prompt.lower()
-        assert "skyyrose" in prompt or "skyy" in prompt, (
-            f"{class_name}.system_prompt should mention SkyyRose brand"
-        )
+        assert (
+            "skyyrose" in prompt or "skyy" in prompt
+        ), f"{class_name}.system_prompt should mention SkyyRose brand"
+
+
+# Sub-agents with custom execute() that don't route all tasks through _llm_execute
+_CUSTOM_EXECUTE_AGENTS = {"SocialMediaSubAgent"}
+
+# Filtered list excluding agents with custom execute routing
+_LLM_EXECUTE_AGENTS = [(m, c) for m, c in SUB_AGENT_IMPORTS if c not in _CUSTOM_EXECUTE_AGENTS]
 
 
 class TestSubAgentExecute:
     """Sub-agent execute() routes through _llm_execute()."""
 
     @pytest.mark.asyncio
-    @pytest.mark.parametrize("module_path,class_name", SUB_AGENT_IMPORTS)
+    @pytest.mark.parametrize("module_path,class_name", _LLM_EXECUTE_AGENTS)
     async def test_execute_calls_llm_execute(self, module_path, class_name):
         cls = _import_agent(module_path, class_name)
         agent = cls(correlation_id="test-corr")
@@ -97,6 +104,36 @@ class TestSubAgentExecute:
         ) as mock:
             result = await agent.execute("test task")
             mock.assert_called_once_with("test task")
+            assert result["success"] is True
+
+    @pytest.mark.asyncio
+    async def test_social_media_variant_calls_llm_execute(self):
+        """SocialMediaSubAgent calls _llm_execute for variant generation."""
+        cls = _import_agent("agents.core.marketing.sub_agents.social_media", "SocialMediaSubAgent")
+        agent = cls(correlation_id="test-corr")
+
+        mock_result = {
+            "success": True,
+            "result": "Variant A: ...\nVariant B: ...",
+            "provider": "anthropic",
+            "model": "claude-sonnet-4-20250514",
+            "technique": None,
+            "latency_ms": 100,
+            "agent": agent.name,
+        }
+
+        mock_product = {"name": "Test Hoodie", "collection": "signature"}
+
+        with (
+            patch.object(
+                agent, "_llm_execute", new_callable=AsyncMock, return_value=mock_result
+            ) as mock_llm,
+            patch.object(agent, "_get_agent") as mock_get_agent,
+        ):
+            mock_agent = mock_get_agent.return_value
+            mock_agent._get_product.return_value = mock_product
+            result = await agent.execute("Generate A/B variants for br-001", product_sku="br-001")
+            mock_llm.assert_called_once()
             assert result["success"] is True
 
 

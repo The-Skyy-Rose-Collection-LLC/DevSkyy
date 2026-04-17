@@ -22,7 +22,7 @@ import logging
 import os
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
@@ -43,7 +43,7 @@ except ImportError:
 # ============================================================================
 
 
-class PageStatus(str, Enum):
+class PageStatus(StrEnum):
     """WordPress page status."""
 
     PUBLISH = "publish"
@@ -52,7 +52,7 @@ class PageStatus(str, Enum):
     PRIVATE = "private"
 
 
-class CollectionType(str, Enum):
+class CollectionType(StrEnum):
     """SkyyRose collection types."""
 
     BLACK_ROSE = "black_rose"
@@ -60,7 +60,7 @@ class CollectionType(str, Enum):
     SIGNATURE = "signature"
 
 
-class ExperienceType(str, Enum):
+class ExperienceType(StrEnum):
     """3D Experience types."""
 
     GARDEN = "garden"  # Black Rose

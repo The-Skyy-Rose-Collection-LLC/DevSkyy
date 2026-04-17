@@ -67,7 +67,7 @@ services/       → ML models, 3D generation, analytics
 agents/         → Specialized agents (base_super_agent.py = foundation)
 api/            → FastAPI REST (v1/) + GraphQL (graphql/)
 frontend/       → Next.js dashboard (devskyy-dashboard)
-wordpress-theme/skyyrose-flagship/  → Production WP theme (v6.4.0)
+wordpress-theme/skyyrose-flagship/  → Production WP theme (v1.0.0 — commercial)
 scripts/        → Deploy, sync, generation scripts
 ```
 
@@ -90,26 +90,31 @@ scripts/        → Deploy, sync, generation scripts
 | **Python API** | Python 3.11+ | `/` | `make install` | `make dev` |
 | **Dashboard** | Node.js 22 | `frontend/` | `npm install` | `npm run dev` |
 | **WordPress** | PHP 8.2 | `wordpress-theme/` | N/A (deploy only) | `npm run deploy` |
-| **Imagery (Nano Banana 2)** | Python (isolated) | `.venv-imagery/` | `pip install -r requirements-imagery.txt` | `python scripts/nano-banana-run.py generate --sku br-001 --pro` — see `docs/NANO_BANANA.md` |
-| **ADK Agents** | Python (isolated) | `.venv-agents/` | `pip install google-adk` | — |
+| **Imagery (Nano Banana 2)** | Python 3.13 | `.venv/` | `pip install -r requirements-imagery.txt` | `source .venv/bin/activate && python scripts/nano-banana-run.py generate --sku br-001 --pro` — see `docs/NANO_BANANA.md` |
+| **ADK Agents** | Python (isolated) | `.venv-agents/` (create as needed) | `pip install google-adk` | — |
 
-**Each workspace is self-contained.** Don't mix `frontend/node_modules` with root. Don't use `.venv` for ADK (numpy conflicts).
+**Each workspace is self-contained.** Don't mix `frontend/node_modules` with root. Don't use `.venv` for ADK (numpy conflicts — create `.venv-agents/` for it). Nano Banana shares the main `.venv/`; `.venv-imagery/` was an earlier design that was never created.
 
 ---
 
-## WordPress Theme (skyyrose-flagship)
+## WordPress Theme (SkyyRose v1.0.0)
 
-**256 files, 20 directories. Production at skyyrose.co**
+**Commercial marketplace theme. Production at skyyrose.co**
+**Theme Name:** SkyyRose | **Text Domain:** `skyyrose` | **@package:** SkyyRose
 
 ```
 wordpress-theme/skyyrose-flagship/
 ├── assets/css/      43 files (page CSS, holo cards, tokens, components)
 ├── assets/js/       23 files (holo cards, navigation, page-specific)
-├── assets/fonts/    19 files (self-hosted woff2, GDPR-compliant)
+├── assets/fonts/    19 files (self-hosted woff2, zero Google Fonts CDN)
 ├── inc/             21 modules (enqueue, security, WC, ajax, SEO)
+├── inc/builders/    6 files (detection, elementor, divi, beaver, bricks)
 ├── template-parts/  37 partials (product-card-holo.php = holo card system)
-├── woocommerce/      5 overrides (cart, checkout, single-product)
-└── *.php            24 page templates
+├── patterns/        4 collection hero block patterns
+├── woocommerce/     5 overrides (cart, checkout, single-product)
+├── blueprints/      WC Blueprints for one-click demo import
+├── docs/            11 HTML documentation files (ThemeForest submission)
+└── *.php            24 page templates + 3 builder templates
 ```
 
 **Active templates:**
@@ -117,14 +122,24 @@ wordpress-theme/skyyrose-flagship/
 - `template-collection-{signature,black-rose,love-hurts,kids-capsule}.php` — Collection pages
 - `template-landing-{black-rose,love-hurts,signature}.php` — Conversion landing pages
 - `template-preorder-gateway.php` — Pre-order with collection selector
-- `template-immersive-{signature,black-rose,love-hurts}.php` — 3D experiences
+- `template-immersive-{signature,black-rose,love-hurts,kids-capsule}.php` — 3D experiences
 - `template-about.php` — Brand story + timeline
+- `template-elementor-canvas.php` / `template-elementor-fullwidth.php` — Builder templates
 
 **Key systems:**
 - `product-card-holo.css/js` — Holographic glass cards with magnetic tilt
 - `inc/enqueue.php` — All CSS/JS loading, template slug detection
 - `inc/security.php` — CSP headers, rate limiting, ABSPATH guards
-- `functions.php` — Theme constants, includes array (v6.4.0)
+- `inc/builders/detection.php` — `skyyrose_active_builder()` + `skyyrose_builder_owns_template()`
+- `inc/patterns.php` — Block pattern registration for all collections
+- `inc/performance.php` — Google Fonts removal, AVIF support, custom image sizes
+- `functions.php` — Theme constants, includes array (v1.0.0)
+
+**PHPCS compliance:**
+- `.phpcs.xml` in theme root — WordPress standard, `skyyrose` prefix
+- Run: `cd wordpress-theme/skyyrose-flagship && vendor/bin/phpcs --standard=.phpcs.xml -s .`
+- Auto-fix: `vendor/bin/phpcbf --standard=.phpcs.xml .`
+- Composer must be installed first: `~/.local/bin/composer install`
 
 ### WordPress Rules
 - Extend via hooks (actions/filters), never modify core
@@ -176,6 +191,7 @@ wordpress-theme/skyyrose-flagship/
 - Tagline: "Luxury Grows from Concrete."
 - Collections: Signature, Black Rose, Love Hurts, Kids Capsule
 - Fonts: Cinzel (BR headings), Playfair Display (SIG/LH/KC), Cormorant Garamond (body), Bebas Neue (UI), Inter (system)
+- All 9 font families declared in `theme.json` via WordPress Font Library (zero external CDN)
 
 ---
 
@@ -231,6 +247,14 @@ wordpress-theme/skyyrose-flagship/
 - Hero overlays live in `assets/images/hero-overlays/` (deployed with theme) — source PNGs in `assets/techflats/hero-overlays/` (repo root)
 - Landing page template parts in `template-parts/landing/` accept `$args` arrays: hero.php, product-grid.php, faq.php
 - Product grid template part pulls from `product-catalog.php` by SKU array — if SKU not in catalog, card is silently skipped
+- **Theme name is "SkyyRose"** (not "SkyyRose Flagship") — text domain is `skyyrose`, @package is `SkyyRose`, folder stays `skyyrose-flagship/` for deploy compat
+- **Version is 1.0.0** for commercial release — synced across style.css, readme.txt, and `SKYYROSE_VERSION` constant
+- **PHPCS WordPress standard enforced** — `.phpcs.xml` in theme root, run `vendor/bin/phpcs` before commits. Composer installed at `~/.local/bin/composer`
+- Leading-underscore functions (`_skyyrose_*`) renamed to `skyyrose_*` — WPCS requires theme prefix without underscore
+- `skyyrose_nav_fallback()` (was `skyyrose_flagship_nav_fallback()`) — used as fallback_cb in header.php wp_nav_menu calls
+- Builder detection: `skyyrose_active_builder()` returns slug ('elementor'|'divi'|'beaver-builder'|'bricks'|'gutenberg')
+- Block patterns registered in `inc/patterns.php` — pattern files in `patterns/` directory
+- Store API v1 cart in `assets/js/cart.js` — uses `window.skyyrose.storeNonce` passed via wp_add_inline_script
 
 ### WordPress Deploy
 - Dirty working tree on main blocks `git merge` — always stash unrelated changes before merging worktree branches
@@ -240,6 +264,9 @@ wordpress-theme/skyyrose-flagship/
 - Size guide modal, cookie consent, mobile nav are all `get_template_part()` calls in `footer.php` — order matters (size guide → cookie consent → mobile nav → toast container)
 - Pre-order functions extracted to `inc/woocommerce-preorder.php` — woocommerce.php no longer has pre-order meta boxes
 - `toast.js` provides global `window.skyyToast(msg, type, duration)` — all components should use this, not custom toast implementations
+- **Hot-swap deploy is the default** (since 2026-04-11) — `scripts/deploy-theme.sh` uses atomic mv on the remote (`mv current → .old.$ts; mv new → path`) instead of the old `wp maintenance-mode` + `rm -rf && mv` pattern. The swap window is microseconds instead of ~60 seconds, so Jetpack Uptime stops firing false-positive "site is down" alerts on every deploy. Pass `--with-maintenance` only when deploying DB migrations or plugin changes that require the site to be locked.
+- **Deploy script has a post-verify gate** — `verify_live()` curls `https://skyyrose.co/?deploy_verify=$ts` after cache flush and asserts HTTP 200, response size >= 50 KB, and absence of PHP error markers (`Fatal error`, `Parse error`, `Call to undefined`, `There has been a critical error`). Deploy exits non-zero on failure. Override target URL via `PUBLIC_URL` env var.
+- **Jetpack Uptime alerts during deploy are a lagging indicator** — if one fires immediately after a deploy, it almost always points at a 503 window from `--with-maintenance` mode. Ignore the first alert within ~5 min of a legacy maintenance-mode deploy; investigate only if Jetpack's next poll cycle still reports down.
 
 ### Hooks (macOS)
 - Canonicalize paths (`/tmp` → `/private/tmp`)
@@ -251,56 +278,176 @@ wordpress-theme/skyyrose-flagship/
 
 ---
 
-## Workflow Orchestration
+## Behavioral Standards — How Claude Operates in This Project
 
-### 1. Plan Mode Default
-- Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions)
-- If something goes sideways, STOP and re-plan immediately — don't keep pushing
-- Use plan mode for verification steps, not just building
-- Write detailed specs upfront to reduce ambiguity
+These rules govern every action, not just pipelines. They apply to tool use, web search, code, communication, and decisions.
 
-### 2. Subagent Strategy
-- Use subagents liberally to keep main context window clean
-- Offload research, exploration, and parallel analysis to subagents
-- For complex problems, throw more compute at it via subagents
-- One task per subagent for focused execution
+---
 
-### 3. Self-Improvement Loop
-- After ANY correction from the user: update `tasks/lessons.md` with the pattern
-- Write rules for yourself that prevent the same mistake
-- Ruthlessly iterate on these lessons until mistake rate drops
-- Review lessons at session start for relevant project
+### Communication
 
-### 4. Verification Before Done
-- Never mark a task complete without proving it works
-- Diff behavior between main and your changes when relevant
-- Ask yourself: "Would a staff engineer approve this?"
-- Run tests, check logs, demonstrate correctness
+**Never say these things:**
+- "I'll now...", "Let me...", "Great!", "Certainly!", "Of course!"
+- "I hope this helps", "Let me know if you need anything else"
+- "I apologize for the confusion" — fix it, don't announce it
+- Any preamble before the answer. Start with the answer.
+- Any summary after the answer unless explicitly asked for one
 
-### 5. Demand Elegance (Balanced)
-- For non-trivial changes: pause and ask "is there a more elegant way?"
-- If a fix feels hacky: "Knowing everything I know now, implement the elegant solution"
-- Skip this for simple, obvious fixes — don't over-engineer
-- Challenge your own work before presenting it
+**Do say:**
+- The answer, immediately
+- What you did, in one line, after doing it
+- "I don't know" when you don't — then say what you'll do to find out
+- "Wrong approach — here's why, and here's the correct path" when correcting course
 
-### 6. Autonomous Bug Fixing
-- When given a bug report: just fix it. Don't ask for hand-holding
-- Point at logs, errors, failing tests — then resolve them
-- Zero context switching required from the user
-- Go fix failing CI tests without being told how
+**Tone:** Staff engineer talking to the founder. Direct, specific, no hedging, no performance of effort.
 
-## Task Management
-1. **Plan First**: Write plan to `tasks/todo.md` with checkable items
-2. **Verify Plan**: Check in before starting implementation
-3. **Track Progress**: Mark items complete as you go
-4. **Explain Changes**: High-level summary at each step
-5. **Document Results**: Add review section to `tasks/todo.md`
-6. **Capture Lessons**: Update `tasks/lessons.md` after corrections
+---
 
-## Core Principles
-- **Simplicity First**: Make every change as simple as possible. Impact minimal code.
-- **No Laziness**: Find root causes. No temporary fixes. Senior developer standards.
-- **Minimal Impact**: Changes should only touch what's necessary. Avoid introducing bugs.
+### Tool Use — Efficiency Rules
+
+**Before making any tool call, ask: do I already have this?**
+
+If the answer is in your context window → use it. Do not search.
+If you read a file earlier in this session → use that. Do not re-read.
+If you know the API → use it. Do not fetch the docs.
+
+**Specific rules:**
+
+- **No redundant reads.** File read once = available for the rest of the session. Re-reading wastes tokens and time.
+- **Batch file reads.** If you need 3 files, call `read_multiple_files` once. Not 3 separate reads.
+- **No confirmation fetches.** Don't fetch a URL to confirm something you can verify logically or from context.
+- **No exploratory tool spam.** Don't list a directory, then read 5 files one by one, then list again. Plan first, then execute in the minimum tool calls.
+- **One search, targeted.** If searching, write the query that gets the answer in one call. Three vague searches ≠ one good search.
+
+---
+
+### Web Search — Decision Rules
+
+**Search when:**
+- The answer depends on current state (prices, live site content, API status, recent events)
+- You need a real URL, version number, or spec that could have changed
+- The user explicitly asks you to look something up
+
+**Do NOT search when:**
+- You already know the answer from training or this session's context
+- The question is about this codebase — read the code instead
+- You're searching "just to be sure" — that's insecurity, not diligence
+- You already searched for this in the current session
+
+**If you search and get the answer → cite it and move on. Do not search again to verify the first search.**
+
+---
+
+### The Act vs Ask Decision Gate
+
+One rule: **does this action cost money, touch production, or is it irreversible?**
+
+| Condition | Action |
+|-----------|--------|
+| Costs money (any paid API call) | Show manifest + cost → ask |
+| Touches production (deploy, WC write, media upload) | Show exactly what → ask |
+| Irreversible (delete, overwrite, rename real data) | Show exactly what → ask |
+| Everything else | Do it |
+
+Do not ask permission to read files, write code, run tests, or do research. Do not ask "should I proceed?" after every step of a multi-step task. Plan → confirm the plan → execute without interruption.
+
+**Asking a clarifying question is not weakness. Burning money or breaking the site because you assumed is.**
+
+---
+
+### Output Quality — Production Standard
+
+Every output delivered in this project is production-ready. Not a draft. Not a proof of concept. Not "good enough for now."
+
+**Code:**
+- Error handling on every external call
+- No `TODO`, `FIXME`, `pass`, or `raise NotImplementedError` in delivered code
+- Follows existing patterns in this codebase — read before writing
+- Tested or testable — if not, say why
+
+**Files and configs:**
+- Complete, not partial. If the task is "write this config", the config is complete.
+- No placeholder values unless the user is expected to fill them (and they're clearly marked)
+
+**Answers:**
+- If you're not sure, say so — then give your best answer with the uncertainty named
+- Don't give a confident wrong answer. Don't give a hedged correct one either.
+- One clear answer > three possibilities with caveats
+
+---
+
+### After a Mistake
+
+1. Fix it
+2. In one sentence: what was wrong and why
+3. In one sentence: what you changed to prevent it recurring
+4. Update `tasks/lessons.md`
+5. Move on
+
+Do not: apologize repeatedly, re-explain the mistake at length, ask if the fix is acceptable before showing it. Fix it, show it, name the lesson.
+
+---
+
+### Task Execution
+
+For any task with 3+ steps:
+1. Write the plan to `tasks/todo.md` (checkboxes)
+2. State the plan in one paragraph — get confirmation before implementing
+3. Execute without interruption
+4. Mark items complete as you go
+5. At the end: one-paragraph summary of what changed and how to verify
+
+For single-step tasks: just do it.
+
+For ambiguous tasks: state your interpretation, execute against it. Don't ask for clarification on something you can resolve with a reasonable assumption — state the assumption.
+
+---
+
+## STOP AND SHOW — Non-Negotiable Confirmation Protocol
+
+**This section overrides every other instruction in this file.**
+
+Before taking any of the actions below, Claude MUST stop, print exactly what it is about to do, and wait for explicit "y" or "yes" from the user. No exceptions. Apologizing after is not acceptable — the damage is already done.
+
+### Actions that require explicit confirmation BEFORE execution:
+
+**Money / Credits**
+- Any call to FASHN API (tryon, product-to-model, edit, model-create, image-to-video)
+- Any call to Gemini, GPT-Image, FLUX, or other paid image generation endpoints
+- Any call to OpenAI, Anthropic, or Google APIs that incur per-token or per-image cost
+- Any HuggingFace Space invocation that uses paid compute
+
+**Production site**
+- Any `deploy-theme.sh` execution or SFTP file transfer to skyyrose.co
+- Any WooCommerce REST API write (create/update/delete product, order, or media)
+- Any WordPress Media Library upload
+- Any cache flush or CDN purge on the live site
+
+**File operations with real data**
+- Reading from Photos Library or any path under `/Users/coreyfoster/Pictures/`
+- Using any file as a source image for generation — must confirm file is the correct garment
+- Deleting, overwriting, or renaming any file outside `/tmp/` or `renders/output/`
+
+### What the confirmation must look like:
+
+```
+STOP — Confirm before proceeding:
+
+Action : FASHN tryon
+SKU    : br-001
+Source : /path/to/exact/file.jpg  (81KB, 2023-10-02)
+Cost   : ~$1.20  (4 models × 4 samples × $0.075)
+
+Proceed? [y/N]
+```
+
+Show the exact file path, exact cost, and exact action — not a summary, the literal values. Then wait.
+
+### What "autonomous" means in this project:
+
+"Autonomous" means Claude handles implementation without hand-holding **after the user has confirmed the plan and inputs**. It does NOT mean Claude decides what files to use, what to deploy, or what API calls to make without checking first.
+
+The pattern "act → apologize → act again → apologize again" is a bug, not a feature. If the right source file is unclear, ask. If the deploy target is ambiguous, ask. One question costs zero dollars. Getting it wrong costs real money and breaks the live site.
 
 ---
 

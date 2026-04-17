@@ -1,7 +1,7 @@
 /**
  * Navigation — Hamburger toggle, keyboard nav, scroll state.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.0.0
  */
 

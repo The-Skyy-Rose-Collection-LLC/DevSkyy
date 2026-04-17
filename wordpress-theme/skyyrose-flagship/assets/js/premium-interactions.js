@@ -5,7 +5,7 @@
  * Features: split-text, parallax, stagger grids, magnetic cursor, scroll-fade,
  * ambient glow, page transitions. All gated behind feature detection.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.2.0
  */
 (function () {

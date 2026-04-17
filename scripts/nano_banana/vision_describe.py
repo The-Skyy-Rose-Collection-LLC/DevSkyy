@@ -103,17 +103,35 @@ def describe_product(
         f"Brand: SkyyRose — Oakland luxury streetwear"
     )
 
+    # Build content parts — include real product photos from bundle if available
+    from nano_banana.pipeline import _find_bundle_dir
+
+    content_parts = [f"PRODUCT CONTEXT:\n{context}\n\nSOURCE TECHFLAT:"]
+    content_parts.append(
+        types.Part.from_bytes(
+            data=source_path.read_bytes(),
+            mime_type=_mime_type(source_path),
+        )
+    )
+
+    # Add real product photos so vision describes the ACTUAL product, not just the sketch
+    bundle_dir = _find_bundle_dir(name, sku)
+    if bundle_dir:
+        for tag in ("photo-front", "photo-side", "photo-back", "source-photo"):
+            for f in bundle_dir.glob(f"{tag}.*"):
+                if f.exists() and f != source_path:
+                    content_parts.append(f"REAL PRODUCT PHOTO ({tag}):")
+                    content_parts.append(
+                        types.Part.from_bytes(data=f.read_bytes(), mime_type=_mime_type(f))
+                    )
+                    break
+
+    content_parts.append(ANALYZE_PROMPT)
+
     try:
         response = client.models.generate_content(
             model=model,
-            contents=[
-                f"PRODUCT CONTEXT:\n{context}\n\nSOURCE IMAGE:",
-                types.Part.from_bytes(
-                    data=source_path.read_bytes(),
-                    mime_type=_mime_type(source_path),
-                ),
-                ANALYZE_PROMPT,
-            ],
+            contents=content_parts,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
                 max_output_tokens=4096,
@@ -252,25 +270,25 @@ Silhouette: {silhouette}
 View: {view_label} — garment {view_dir}
 
 ═══ EXACT COLORS ═══
-{chr(10).join(color_lines) if color_lines else "  All black (#000000)"}
+{chr(10).join(color_lines) if color_lines else '  All black (#000000)'}
 
 ═══ GRAPHICS & BRANDING ({gfx_count} element(s) total) ═══
-{chr(10).join(gfx_lines) if gfx_lines else "  NONE — plain garment, no graphics"}
-{f"{chr(10)}  VERIFIED SPEC: {treatment}" if treatment else ""}
+{chr(10).join(gfx_lines) if gfx_lines else '  NONE — plain garment, no graphics'}
+{f'{chr(10)}  VERIFIED SPEC: {treatment}' if treatment else ''}
 
 ═══ CONSTRUCTION ═══
-{chr(10).join(const_lines) if const_lines else "  Standard construction"}
+{chr(10).join(const_lines) if const_lines else '  Standard construction'}
 
 ═══ PRESENTATION ═══
 - No model, no person, no mannequin
 - Garment floating on invisible form with natural 3D shape and drape
-- {lighting["bg"]}
-- {lighting["light"]}
+- {lighting['bg']}
+- {lighting['light']}
 - Photorealistic fabric — visible weave, thread weight, material sheen
 
 ═══ NEGATIVE CONSTRAINTS (CRITICAL) ═══
-{chr(10).join(f"- {n}" for n in negatives)}
-- Do NOT show the {"back" if view == "front" else "front"}
+{chr(10).join(f'- {n}' for n in negatives)}
+- Do NOT show the {'back' if view == 'front' else 'front'}
 - Do NOT add text, watermarks, or labels not in the spec
 - Do NOT change any colors from the hex values listed above
 - If anything is unclear, LEAVE IT OUT — never guess or invent"""
@@ -300,7 +318,7 @@ def _build_editorial_prompt(desc: dict, product: dict, lighting: dict, treatment
 
     # Enrich with vision data
     vision_enrichment = (
-        f"\n\nVISION-VERIFIED DETAILS:\n- Garment: {garment_label}\n- Fabric: {fabric}\n"
+        f"\n\nVISION-VERIFIED DETAILS:\n" f"- Garment: {garment_label}\n" f"- Fabric: {fabric}\n"
     )
     if unique:
         vision_enrichment += f"- Unique features: {unique}\n"

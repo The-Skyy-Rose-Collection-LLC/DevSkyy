@@ -1,5 +1,5 @@
 /**
- * Contact Page JavaScript — SkyyRose Flagship
+ * Contact Page JavaScript — SkyyRose
  *
  * FAQ accordion toggle with ARIA support, client-side form validation,
  * AJAX submission with loading state, toast notifications, conditional
@@ -7,7 +7,7 @@
  *
  * Zero jQuery dependencies.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.1.0
  */
 

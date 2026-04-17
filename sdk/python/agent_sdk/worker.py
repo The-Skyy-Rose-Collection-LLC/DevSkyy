@@ -30,13 +30,12 @@ import socket
 from datetime import UTC, datetime
 from typing import Any
 
-from agents.tripo_agent import TripoAssetAgent
-
-from .task_queue import (
+from agent_sdk.task_queue import (
     QUEUE_PREFIX,
     TaskQueue,
     TaskStatus,
 )
+from agents.tripo_agent import TripoAssetAgent
 
 # Dead Letter Queue for failed tasks
 DLQ_PREFIX = "devskyy:dlq:"

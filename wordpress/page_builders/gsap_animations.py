@@ -17,11 +17,11 @@ Version: 1.0.0
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 
-class AnimationType(str, Enum):
+class AnimationType(StrEnum):
     """GSAP animation types."""
 
     FADE_IN_UP = "fadeInUp"
@@ -39,7 +39,7 @@ class AnimationType(str, Enum):
     MORPH = "morph"
 
 
-class EasingType(str, Enum):
+class EasingType(StrEnum):
     """GSAP easing functions."""
 
     POWER1_OUT = "power1.out"

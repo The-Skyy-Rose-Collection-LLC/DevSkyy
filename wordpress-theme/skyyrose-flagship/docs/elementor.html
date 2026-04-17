@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elementor Pro &mdash; SkyyRose Theme</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0A0A0A; color: #F5F5F0; line-height: 1.7; padding: 2rem; max-width: 900px; margin: 0 auto; }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    h2 { color: #B76E79; margin: 2rem 0 1rem; font-size: 1.4rem; }
+    h3 { margin: 1.5rem 0 0.5rem; }
+    p, li { margin-bottom: 0.75rem; }
+    ol, ul { padding-left: 1.5rem; }
+    a { color: #B76E79; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .doc-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 1rem 0; border-bottom: 1px solid #222; margin-bottom: 2rem; }
+    .doc-nav a { padding: 0.35rem 0.75rem; border: 1px solid #333; border-radius: 4px; font-size: 0.85rem; }
+    .doc-nav a.active { background: #B76E79; color: #0A0A0A; border-color: #B76E79; }
+    code { background: #1a1a1a; padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
+    .step { background: #111; border-left: 3px solid #B76E79; padding: 1rem 1.25rem; margin: 1rem 0; border-radius: 0 4px 4px 0; }
+    .step strong { color: #B76E79; }
+    .loc-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .loc-table th, .loc-table td { text-align: left; padding: 0.6rem 1rem; border-bottom: 1px solid #222; }
+    .loc-table th { color: #B76E79; }
+    .note { background: #1a1610; border: 1px solid #3a2a10; padding: 0.75rem 1rem; border-radius: 4px; margin: 1rem 0; font-size: 0.95rem; }
+    footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #222; font-size: 0.85rem; color: #888; }
+  </style>
+</head>
+<body>
+  <nav class="doc-nav">
+    <a href="index.html">Overview</a>
+    <a href="installation.html">Installation</a>
+    <a href="getting-started.html">Getting Started</a>
+    <a href="collections.html">Collections</a>
+    <a href="kids-capsule.html">Kids Capsule</a>
+    <a href="elementor.html" class="active">Elementor</a>
+    <a href="builders.html">Page Builders</a>
+    <a href="woocommerce.html">WooCommerce</a>
+    <a href="customization.html">Customization</a>
+    <a href="changelog.html">Changelog</a>
+    <a href="credits.html">Credits</a>
+  </nav>
+
+  <h1>Elementor Pro Integration</h1>
+  <p>SkyyRose is built Elementor Pro native. A full Template Kit is included with pre-designed templates for every theme builder location.</p>
+
+  <h2>Importing the Template Kit</h2>
+  <div class="step">
+    <ol>
+      <li>Ensure both <strong>Elementor</strong> (free) and <strong>Elementor Pro</strong> are installed and activated.</li>
+      <li>Go to <strong>Elementor &gt; Template Kit Library</strong>.</li>
+      <li>Click <strong>Import Template Kit</strong> and select the <code>skyyrose-template-kit.zip</code> file from your theme download.</li>
+      <li>Choose which templates to import (recommended: import all).</li>
+      <li>Click <strong>Import</strong>. Templates are now available in <strong>Templates &gt; Saved Templates</strong>.</li>
+    </ol>
+  </div>
+
+  <h2>Theme Builder Locations</h2>
+  <p>The Template Kit includes templates for all standard Elementor theme builder locations:</p>
+  <table class="loc-table">
+    <tr><th>Location</th><th>Template</th><th>Description</th></tr>
+    <tr><td>Header</td><td>SkyyRose Header</td><td>Glassmorphism navigation bar with logo, menu, cart icon, and search. Sticky on scroll with GSAP animation.</td></tr>
+    <tr><td>Footer</td><td>SkyyRose Footer</td><td>Four-column footer with newsletter signup, shop links, help links, legal links, and social icons.</td></tr>
+    <tr><td>Single Product</td><td>SkyyRose Product</td><td>Product page with holographic card effect, image gallery, add-to-cart, and related products section.</td></tr>
+    <tr><td>Product Archive</td><td>SkyyRose Archive</td><td>Shop and collection archive with filterable product grid and holographic hover cards.</td></tr>
+    <tr><td>Single Post</td><td>SkyyRose Post</td><td>Blog post layout with featured image, author box, and related posts.</td></tr>
+    <tr><td>404 Page</td><td>SkyyRose 404</td><td>Custom 404 page with search bar and links to collections.</td></tr>
+  </table>
+  <p>To apply a template: go to <strong>Elementor &gt; Theme Builder</strong>, select the template, and set its display condition (e.g., "Entire Site" for the header).</p>
+
+  <h2>Dynamic Tags</h2>
+  <div class="step">
+    <p>SkyyRose registers custom Elementor dynamic tags you can use in any widget:</p>
+    <ul>
+      <li><strong>SkyyRose Collection Name</strong> &mdash; Outputs the name of the current collection based on the page or product category. Use in headings, text widgets, or breadcrumbs.</li>
+      <li><strong>KC Status</strong> &mdash; Outputs the current Kids Capsule status ("Launch Mode" or "Live"). Useful for conditional display logic or admin-facing labels.</li>
+    </ul>
+    <p>To insert a dynamic tag: click the dynamic tag icon (stacked database icon) in any text field within the Elementor editor, then search for "SkyyRose".</p>
+  </div>
+
+  <h2>Page Templates</h2>
+  <div class="step">
+    <p>SkyyRose provides two Elementor-specific page templates:</p>
+    <ul>
+      <li><strong>Elementor Canvas</strong> &mdash; A completely blank canvas with no header, footer, or sidebars. Use for landing pages, coming-soon pages, or immersive experiences. Template file: <code>template-elementor-canvas.php</code>.</li>
+      <li><strong>Elementor Full Width</strong> &mdash; Full-width layout that keeps the theme header and footer but removes sidebars and content width constraints. Template file: <code>template-elementor-fullwidth.php</code>.</li>
+    </ul>
+    <p>Assign these templates under <strong>Page Settings &gt; Page Layout</strong> in the Elementor editor, or via <strong>Page Attributes &gt; Template</strong> in the WordPress editor.</p>
+  </div>
+
+  <h2>Disabling Google Fonts</h2>
+  <div class="step">
+    <p>SkyyRose uses self-hosted fonts via the WordPress Font Library. To prevent Elementor from loading Google Fonts:</p>
+    <ol>
+      <li>Go to <strong>Elementor &gt; Settings &gt; Advanced</strong>.</li>
+      <li>Set <strong>Google Fonts Load</strong> to <strong>Disable</strong>.</li>
+      <li>Save changes.</li>
+    </ol>
+    <p>This ensures zero external font requests, maintaining full GDPR compliance and optimal performance.</p>
+  </div>
+
+  <div class="note">Elementor Pro is optional. All SkyyRose features work without it using the block editor, block patterns, and PHP templates. See <a href="builders.html">Page Builders</a> for other builder options.</div>
+
+  <p>Next: <a href="builders.html">Page Builders &rarr;</a></p>
+
+  <footer>
+    <p>SkyyRose Theme &copy; 2026. All rights reserved.</p>
+  </footer>
+</body>
+</html>

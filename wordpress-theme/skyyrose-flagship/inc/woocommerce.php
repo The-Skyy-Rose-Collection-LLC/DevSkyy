@@ -5,7 +5,7 @@
  * Hooks, overrides, and customizations for WooCommerce product display,
  * cart fragments, gallery thumbnails, and related products.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   1.0.0
  */
 
@@ -14,7 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * WooCommerce Support Declaration
  *--------------------------------------------------------------*/
 
@@ -32,7 +33,8 @@ function skyyrose_woocommerce_support() {
 }
 add_action( 'after_setup_theme', 'skyyrose_woocommerce_support' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Product Grid Layout
  *--------------------------------------------------------------*/
 
@@ -59,14 +61,16 @@ function skyyrose_woocommerce_products_per_page() {
 }
 add_filter( 'loop_shop_per_page', 'skyyrose_woocommerce_products_per_page' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Sidebar Removal
  *--------------------------------------------------------------*/
 
 // Remove the default WooCommerce sidebar entirely.
 remove_action( 'woocommerce_sidebar', 'woocommerce_get_sidebar', 10 );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Content Wrappers
  *--------------------------------------------------------------*/
 
@@ -92,14 +96,16 @@ function skyyrose_woocommerce_wrapper_after() {
 }
 add_action( 'woocommerce_after_main_content', 'skyyrose_woocommerce_wrapper_after' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Breadcrumb Override
  *--------------------------------------------------------------*/
 
 // Remove default WooCommerce breadcrumbs (theme uses its own).
 remove_action( 'woocommerce_before_main_content', 'woocommerce_breadcrumb', 20 );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Product Gallery Thumbnails
  *--------------------------------------------------------------*/
 
@@ -148,7 +154,8 @@ function skyyrose_woocommerce_thumbnail_size() {
 }
 add_filter( 'woocommerce_get_image_size_thumbnail', 'skyyrose_woocommerce_thumbnail_size' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * AJAX Cart Fragments
  *--------------------------------------------------------------*/
 
@@ -188,7 +195,8 @@ function skyyrose_woocommerce_cart_fragments( $fragments ) {
 }
 add_filter( 'woocommerce_add_to_cart_fragments', 'skyyrose_woocommerce_cart_fragments' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Related Products
  *--------------------------------------------------------------*/
 
@@ -211,7 +219,8 @@ function skyyrose_woocommerce_related_products_args( $args ) {
 }
 add_filter( 'woocommerce_output_related_products_args', 'skyyrose_woocommerce_related_products_args' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Cross-Sells
  *--------------------------------------------------------------*/
 
@@ -241,7 +250,8 @@ function skyyrose_woocommerce_cross_sells_total( $limit ) {
 }
 add_filter( 'woocommerce_cross_sells_total', 'skyyrose_woocommerce_cross_sells_total' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * WooCommerce Script Localization
  *--------------------------------------------------------------*/
 
@@ -269,14 +279,15 @@ function skyyrose_woocommerce_localize_scripts() {
 			'nonce'           => wp_create_nonce( 'skyyrose-woo-nonce' ),
 			'cartUrl'         => wc_get_cart_url(),
 			'checkoutUrl'     => wc_get_checkout_url(),
-			'addedToCartText' => esc_html__( 'Added to cart', 'skyyrose-flagship' ),
+			'addedToCartText' => esc_html__( 'Added to cart', 'skyyrose' ),
 			'currency'        => get_woocommerce_currency_symbol(),
 		)
 	);
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_woocommerce_localize_scripts', 25 );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Pagination
  *--------------------------------------------------------------*/
 
@@ -292,14 +303,15 @@ function skyyrose_woocommerce_pagination_args( $args ) {
 	return array_merge(
 		$args,
 		array(
-			'prev_text' => esc_html__( 'Previous', 'skyyrose-flagship' ),
-			'next_text' => esc_html__( 'Next', 'skyyrose-flagship' ),
+			'prev_text' => esc_html__( 'Previous', 'skyyrose' ),
+			'next_text' => esc_html__( 'Next', 'skyyrose' ),
 		)
 	);
 }
 add_filter( 'woocommerce_pagination_args', 'skyyrose_woocommerce_pagination_args' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * 3D Model Viewer (Product Meta Box)
  *--------------------------------------------------------------*/
 
@@ -320,7 +332,7 @@ function skyyrose_woocommerce_3d_model_button() {
 	printf(
 		'<div class="product-3d-viewer"><button type="button" class="button view-3d-model" data-model="%s">%s</button></div>',
 		esc_url( $model_file ),
-		esc_html__( 'View in 3D', 'skyyrose-flagship' )
+		esc_html__( 'View in 3D', 'skyyrose' )
 	);
 }
 add_action( 'woocommerce_single_product_summary', 'skyyrose_woocommerce_3d_model_button', 25 );
@@ -334,7 +346,7 @@ add_action( 'woocommerce_single_product_summary', 'skyyrose_woocommerce_3d_model
 function skyyrose_add_product_meta_box() {
 	add_meta_box(
 		'skyyrose_product_3d_model',
-		esc_html__( '3D Model', 'skyyrose-flagship' ),
+		esc_html__( '3D Model', 'skyyrose' ),
 		'skyyrose_product_3d_model_callback',
 		'product',
 		'side',
@@ -359,7 +371,7 @@ function skyyrose_product_3d_model_callback( $post ) {
 	?>
 	<p>
 		<label for="skyyrose_product_3d_model">
-			<?php esc_html_e( '3D Model File URL (GLB/GLTF)', 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( '3D Model File URL (GLB/GLTF)', 'skyyrose' ); ?>
 		</label>
 		<input
 			type="url"
@@ -370,7 +382,7 @@ function skyyrose_product_3d_model_callback( $post ) {
 		/>
 	</p>
 	<p class="description">
-		<?php esc_html_e( 'Enter the URL of the 3D model file (GLB or GLTF format).', 'skyyrose-flagship' ); ?>
+		<?php esc_html_e( 'Enter the URL of the 3D model file (GLB or GLTF format).', 'skyyrose' ); ?>
 	</p>
 	<?php
 }
@@ -411,7 +423,8 @@ function skyyrose_save_product_3d_model( $post_id ) {
 }
 add_action( 'save_post_product', 'skyyrose_save_product_3d_model' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Product Search Form
  *--------------------------------------------------------------*/
 
@@ -426,18 +439,18 @@ function skyyrose_product_search_form() {
 	?>
 	<form role="search" method="get" class="woocommerce-product-search" action="<?php echo esc_url( home_url( '/' ) ); ?>">
 		<label class="screen-reader-text" for="woocommerce-product-search-field">
-			<?php esc_html_e( 'Search for:', 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( 'Search for:', 'skyyrose' ); ?>
 		</label>
 		<input
 			type="search"
 			id="woocommerce-product-search-field"
 			class="search-field"
-			placeholder="<?php echo esc_attr__( 'Search products&hellip;', 'skyyrose-flagship' ); ?>"
+			placeholder="<?php echo esc_attr__( 'Search products&hellip;', 'skyyrose' ); ?>"
 			value="<?php echo esc_attr( get_search_query() ); ?>"
 			name="s"
 		/>
-		<button type="submit" value="<?php echo esc_attr_x( 'Search', 'submit button', 'skyyrose-flagship' ); ?>">
-			<?php echo esc_html_x( 'Search', 'submit button', 'skyyrose-flagship' ); ?>
+		<button type="submit" value="<?php echo esc_attr_x( 'Search', 'submit button', 'skyyrose' ); ?>">
+			<?php echo esc_html_x( 'Search', 'submit button', 'skyyrose' ); ?>
 		</button>
 		<input type="hidden" name="post_type" value="product" />
 	</form>
@@ -445,7 +458,8 @@ function skyyrose_product_search_form() {
 	return ob_get_clean();
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * AJAX Cart Count Handler
  *--------------------------------------------------------------*/
 
@@ -473,7 +487,8 @@ function skyyrose_ajax_get_cart_count() {
 add_action( 'wp_ajax_skyyrose_get_cart_count', 'skyyrose_ajax_get_cart_count' );
 add_action( 'wp_ajax_nopriv_skyyrose_get_cart_count', 'skyyrose_ajax_get_cart_count' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Complete the Look — single product cross-sell
  *--------------------------------------------------------------*/
 
@@ -524,3 +539,110 @@ function skyyrose_wc_inject_product_attrs(): void {
 	);
 }
 add_action( 'woocommerce_before_shop_loop_item_title', 'skyyrose_wc_inject_product_attrs', 5 );
+
+/*
+--------------------------------------------------------------
+ * WC 9.9 Product Collection Filters
+ *--------------------------------------------------------------*/
+
+/**
+ * Set collection-aware default filter presets for WC 9.9 product filters.
+ *
+ * When viewing a collection page, pre-selects the matching product
+ * category so filters are scoped to the current collection.
+ *
+ * @since 6.6.0
+ *
+ * @param  array $args Default filter arguments.
+ * @return array Modified arguments with collection preset.
+ */
+function skyyrose_product_filter_defaults( $args ) {
+	if ( ! is_page() || ! function_exists( 'skyyrose_get_collections_config' ) ) {
+		return $args;
+	}
+
+	$template = get_page_template_slug();
+	if ( empty( $template ) ) {
+		return $args;
+	}
+
+	// Map template slugs to collection slugs.
+	$collections = skyyrose_get_collections_config();
+	foreach ( $collections as $slug => $config ) {
+		$template_name = 'template-collection-' . $slug . '.php';
+		if ( $template === $template_name ) {
+			// Pre-select collection category in product filters.
+			$term = get_term_by( 'slug', $slug, 'product_cat' );
+			if ( $term && ! is_wp_error( $term ) ) {
+				$args['product_cat'] = $term->term_id;
+			}
+
+			// Set collection-specific sort order.
+			if ( ! empty( $config['palette'] ) ) {
+				$args['collection_slug']  = $slug;
+				$args['collection_label'] = $config['label'];
+			}
+			break;
+		}
+	}
+
+	return $args;
+}
+add_filter( 'woocommerce_product_filters_default_args', 'skyyrose_product_filter_defaults' );
+
+/*
+--------------------------------------------------------------
+ * Store API Cart Script Enqueue
+ *--------------------------------------------------------------*/
+
+/**
+ * Enqueue the modern Store API cart script.
+ *
+ * Loaded on all WooCommerce-active pages. The SkyyRoseCart class
+ * provides a modern alternative to the legacy AJAX cart endpoints.
+ *
+ * @since 6.6.0
+ * @return void
+ */
+function skyyrose_enqueue_store_api_cart() {
+	$cart_path = SKYYROSE_DIR . '/assets/src/js/cart.js';
+	if ( ! file_exists( $cart_path ) ) {
+		return;
+	}
+
+	wp_enqueue_script(
+		'skyyrose-store-cart',
+		SKYYROSE_URI . '/assets/src/js/cart.js',
+		array(),
+		SKYYROSE_VERSION,
+		true
+	);
+}
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_store_api_cart', 20 );
+
+/*
+--------------------------------------------------------------
+ * Deprecated Function Replacement (WC 9.9)
+ *--------------------------------------------------------------*/
+
+/**
+ * Provide wp_is_block_theme() fallback for WC internals.
+ *
+ * WooCommerce 9.9 deprecated wc_current_theme_is_fse_theme() in
+ * favor of the WordPress core wp_is_block_theme(). This shim
+ * ensures old WC code paths get the correct answer for our
+ * classic PHP theme (always false).
+ *
+ * @since 6.6.0
+ *
+ * @param  bool $is_fse Whether the theme is FSE.
+ * @return bool Always false for this classic theme.
+ */
+function skyyrose_override_fse_detection( $is_fse ) {
+	return false;
+}
+add_filter( 'wc_is_block_theme', 'skyyrose_override_fse_detection' );
+
+/*
+Pre-order meta, notices, pricing, and referral credit logic moved to
+	inc/woocommerce-preorder.php in v6.3.0 for maintainability. */

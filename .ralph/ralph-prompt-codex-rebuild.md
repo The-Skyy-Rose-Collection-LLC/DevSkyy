@@ -14,7 +14,7 @@ cd /Users/theceo/DevSkyy && git add -A && git commit -m "<type>: <description>" 
 
 - `.env` — GOOGLE_AI_API_KEY, ANTHROPIC_API_KEY, REPLICATE_API_TOKEN
 - `.env.hf` — OPENAI_API_KEY, FAL_KEY, MESHY_API_KEY, TOGETHER_API_KEY
-- `.env.wordpress` — SSH: `skyyrose.wordpress.com@ssh.wp.com`, pass: `6cau3wOOhWTIto22P8f4`
+- `.env.wordpress` — SSH credentials (see .env.wordpress, never inline passwords here)
 - Theme on server: `/htdocs/wp-content/themes/skyyrose-flagship`
 
 Load keys in Python:
@@ -187,7 +187,7 @@ Upload all changed theme files to the live server.
 
 ```bash
 # Use lftp for reliable SFTP upload
-lftp -u skyyrose.wordpress.com,6cau3wOOhWTIto22P8f4 sftp://ssh.wp.com -e "
+lftp -u "$SFTP_USER","$SFTP_PASS" sftp://"$SFTP_HOST" -e "
   mirror --reverse --verbose --only-newer \
     wordpress-theme/skyyrose-flagship/ \
     /htdocs/wp-content/themes/skyyrose-flagship/;

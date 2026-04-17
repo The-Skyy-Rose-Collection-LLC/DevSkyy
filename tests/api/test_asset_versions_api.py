@@ -117,14 +117,17 @@ def mock_version_manager() -> MagicMock:
 
 @pytest.fixture
 def mock_user() -> MagicMock:
-    """Create a mock authenticated user."""
+    """Create a mock authenticated user with admin privileges.
+
+    Admin role is required for retention policy updates.
+    """
     from security.jwt_oauth2_auth import TokenPayload, TokenType
 
     return TokenPayload(
         sub="user_123",
         jti="test_jti_123",
         type=TokenType.ACCESS,
-        roles=["user"],
+        roles=["admin", "api_user"],
         exp=datetime.now(UTC),
         iat=datetime.now(UTC),
     )

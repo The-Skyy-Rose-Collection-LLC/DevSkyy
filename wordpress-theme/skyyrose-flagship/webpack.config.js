@@ -1,5 +1,5 @@
 /**
- * Webpack configuration for SkyyRose Flagship Theme
+ * Webpack configuration for SkyyRose Theme
  * Auto-discovers and minifies all JS source files with source maps
  */
 

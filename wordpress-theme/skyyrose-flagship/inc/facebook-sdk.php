@@ -6,7 +6,7 @@
  * Fires standard events (PageView, ViewContent, AddToCart, InitiateCheckout)
  * and relays custom conversion events from the analytics beacon.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   3.10.0
  */
 
@@ -30,57 +30,86 @@ if ( ! defined( 'SKYYROSE_FB_SDK_VERSION' ) ) {
 }
 
 /**
- * Inject Facebook Pixel base code into <head>.
+ * Inject Facebook Pixel base code into <head> — gated behind cookie consent.
  *
- * Uses wp_head at priority 5 (before most scripts) to ensure the pixel
- * fires as early as possible for accurate page-view tracking.
+ * The pixel loader is deferred until the visitor has accepted tracking cookies.
+ * On first visit the script tag is inert; once `skyyrose:consent:accepted` fires
+ * (or `localStorage` already contains the consent flag) the pixel initialises.
+ *
+ * GDPR / CCPA: no tracking request leaves the browser before consent.
+ *
+ * @since 3.10.0
+ * @since 6.6.0 Added consent gate.
  */
 function skyyrose_facebook_pixel_head() {
 	if ( is_admin() || empty( SKYYROSE_FB_APP_ID ) ) {
 		return;
 	}
 	?>
-<!-- Facebook Pixel Code -->
+<!-- Facebook Pixel Code — consent-gated -->
 <script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '<?php echo esc_js( SKYYROSE_FB_APP_ID ); ?>');
-fbq('track', 'PageView');
+(function(){
+	var pixelId = <?php echo wp_json_encode( SKYYROSE_FB_APP_ID ); ?>;
+
+	function loadPixel() {
+		if (window.__skyyFbLoaded) return;
+		window.__skyyFbLoaded = true;
+
+		!function(f,b,e,v,n,t,s)
+		{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+		n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+		if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+		n.queue=[];t=b.createElement(e);t.async=!0;
+		t.src=v;s=b.getElementsByTagName(e)[0];
+		s.parentNode.insertBefore(t,s)}(window, document,'script',
+		'https://connect.facebook.net/en_US/fbevents.js');
+		fbq('init', pixelId);
+		fbq('track', 'PageView');
+	}
+
+	/* Returning visitor who already consented. */
+	if (localStorage.getItem('skyyrose_cookie_consent') === 'accepted') {
+		loadPixel();
+		return;
+	}
+
+	/* First visit — wait for consent event from the cookie banner. */
+	document.addEventListener('skyyrose:consent:accepted', loadPixel);
+})();
 </script>
-<noscript><img height="1" width="1" style="display:none" alt=""
-src="https://www.facebook.com/tr?id=<?php echo esc_attr( SKYYROSE_FB_APP_ID ); ?>&ev=PageView&noscript=1"
-/></noscript>
 <!-- End Facebook Pixel Code -->
 	<?php
 }
 add_action( 'wp_head', 'skyyrose_facebook_pixel_head', 5 );
 
 /**
- * Enqueue the Facebook SDK and initialize it.
+ * Pass Facebook SDK config to JS — consent-gated.
+ *
+ * The SDK script itself is no longer enqueued eagerly. It is loaded
+ * on-demand by the consent-gated pixel loader in skyyrose_facebook_pixel_head().
+ * We only pass the config object so footer scripts can read appId/version
+ * after the SDK initialises.
+ *
+ * @since 3.10.0
+ * @since 6.6.0 Removed unconditional SDK enqueue for GDPR compliance.
  */
 function skyyrose_enqueue_facebook_sdk() {
-	if ( is_admin() ) {
+	if ( is_admin() || empty( SKYYROSE_FB_APP_ID ) ) {
 		return;
 	}
 
-	wp_enqueue_script(
-		'facebook-sdk',
-		'https://connect.facebook.net/en_US/sdk.js',
-		array(),
-		null,
-		true
+	// Inline the config — no external script loaded until consent.
+	wp_register_script( 'skyyrose-fb-config', false, array(), SKYYROSE_VERSION, true );
+	wp_enqueue_script( 'skyyrose-fb-config' );
+	wp_localize_script(
+		'skyyrose-fb-config',
+		'skyyroseFB',
+		array(
+			'appId'    => SKYYROSE_FB_APP_ID,
+			'version'  => SKYYROSE_FB_SDK_VERSION,
+			'currency' => function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_currency() : 'USD',
+		)
 	);
-
-	wp_localize_script( 'facebook-sdk', 'skyyroseFB', array(
-		'appId'   => SKYYROSE_FB_APP_ID,
-		'version' => SKYYROSE_FB_SDK_VERSION,
-	) );
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_facebook_sdk' );
 
@@ -93,7 +122,7 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_facebook_sdk' );
  * - AddToCart via delegated click listener
  */
 function skyyrose_facebook_footer_scripts() {
-	if ( is_admin() ) {
+	if ( is_admin() || empty( SKYYROSE_FB_APP_ID ) ) {
 		return;
 	}
 
@@ -106,11 +135,11 @@ function skyyrose_facebook_footer_scripts() {
 			$fb_event_data = array(
 				'event' => 'ViewContent',
 				'data'  => array(
-					'content_name'     => $product->get_name(),
-					'content_ids'      => array( $product->get_sku() ?: (string) $product->get_id() ),
-					'content_type'     => 'product',
-					'value'            => (float) $product->get_price(),
-					'currency'         => get_woocommerce_currency(),
+					'content_name' => $product->get_name(),
+					'content_ids'  => array( $product->get_sku() ?: (string) $product->get_id() ),
+					'content_type' => 'product',
+					'value'        => (float) $product->get_price(),
+					'currency'     => get_woocommerce_currency(),
 				),
 			);
 		}
@@ -126,9 +155,16 @@ function skyyrose_facebook_footer_scripts() {
 	?>
 <script>
 (function() {
-	// Initialize Facebook SDK.
+	/* All footer FB events are consent-gated — nothing fires until the pixel
+		has been loaded by skyyrose_facebook_pixel_head()'s consent handler. */
+	function hasConsent() {
+		return window.__skyyFbLoaded && typeof fbq !== 'undefined';
+	}
+
+	// Initialize Facebook SDK (deferred until consent).
 	if (typeof FB === 'undefined' && typeof skyyroseFB !== 'undefined') {
 		window.fbAsyncInit = function() {
+			if (!hasConsent()) return;
 			FB.init({
 				appId: skyyroseFB.appId,
 				cookie: true,
@@ -140,36 +176,36 @@ function skyyrose_facebook_footer_scripts() {
 
 	// Fire page-specific standard events.
 	<?php if ( ! empty( $fb_event_data ) ) : ?>
-	if (typeof fbq !== 'undefined') {
+	if (hasConsent()) {
 		fbq('track', <?php echo wp_json_encode( $fb_event_data['event'] ); ?>, <?php echo wp_json_encode( $fb_event_data['data'] ); ?>);
 	}
 	<?php endif; ?>
 
-	// AddToCart tracking via delegated click.
+	// Conversion tracking — single delegated listener (consent-gated).
+	var currency = (typeof skyyroseFB !== 'undefined' && skyyroseFB.currency) ? skyyroseFB.currency : 'USD';
 	document.addEventListener('click', function(e) {
-		var btn = e.target.closest ? e.target.closest('.btn-add-to-cart, .single_add_to_cart_button, .add_to_cart_button') : null;
-		if (!btn || typeof fbq === 'undefined') return;
+		if (!e.target.closest || !hasConsent()) return;
 
-		var panel = document.querySelector('.product-panel');
-		var nameEl = panel ? panel.querySelector('.product-panel-name') : document.querySelector('.product_title');
-		var priceEl = panel ? panel.querySelector('.product-panel-price') : document.querySelector('.price .amount');
+		var addCart = e.target.closest('.btn-add-to-cart, .single_add_to_cart_button, .add_to_cart_button');
+		if (addCart) {
+			var panel = document.querySelector('.product-panel');
+			var nameEl = panel ? panel.querySelector('.product-panel-name') : document.querySelector('.product_title');
+			var priceEl = panel ? panel.querySelector('.product-panel-price') : document.querySelector('.price .amount');
+			fbq('track', 'AddToCart', {
+				content_name: nameEl ? nameEl.textContent.trim() : '',
+				value: priceEl ? parseFloat(priceEl.textContent.replace(/[^0-9.]/g, '')) || 0 : 0,
+				currency: currency
+			});
+			return;
+		}
 
-		fbq('track', 'AddToCart', {
-			content_name: nameEl ? nameEl.textContent.trim() : '',
-			value: priceEl ? parseFloat(priceEl.textContent.replace(/[^0-9.]/g, '')) || 0 : 0,
-			currency: 'USD'
-		});
-	});
-
-	// Pre-order tracking (custom event).
-	document.addEventListener('click', function(e) {
-		var btn = e.target.closest ? e.target.closest('.btn-preorder, [data-preorder]') : null;
-		if (!btn || typeof fbq === 'undefined') return;
-
-		fbq('track', 'Lead', {
-			content_name: 'Pre-Order',
-			content_category: 'SkyyRose Pre-Order'
-		});
+		var preorder = e.target.closest('.btn-preorder, [data-preorder]');
+		if (preorder) {
+			fbq('track', 'Lead', {
+				content_name: 'Pre-Order',
+				content_category: 'SkyyRose Pre-Order'
+			});
+		}
 	});
 })();
 </script>

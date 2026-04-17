@@ -56,7 +56,7 @@ def split_2x2(img, names, collection, out_dir):
     col_dir = out_dir / collection
     col_dir.mkdir(parents=True, exist_ok=True)
 
-    for name, box in zip(names, crops, strict=True):
+    for name, box in zip(names, crops, strict=False):
         cropped = img.crop(box)
         cropped.save(col_dir / f"{name}.jpeg", "JPEG", quality=95)
         print(f"  -> {name}.jpeg")

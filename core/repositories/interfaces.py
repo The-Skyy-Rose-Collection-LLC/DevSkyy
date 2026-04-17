@@ -11,12 +11,12 @@ Version: 1.0.0 (Phase 4 Refactoring)
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Generic, TypeVar
+from typing import Any, TypeVar
 
 T = TypeVar("T")
 
 
-class IRepository(ABC, Generic[T]):
+class IRepository[T](ABC):
     """
     Generic repository interface for data access.
 

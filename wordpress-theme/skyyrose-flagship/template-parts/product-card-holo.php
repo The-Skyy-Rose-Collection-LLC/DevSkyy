@@ -2,266 +2,319 @@
 /**
  * Template Part: Holo Product Card
  *
- * Physics-based magnetic tilt, holographic cursor refraction, front/back
- * crossfade, ambient collection glow, and inline quick-add drawer.
- * Progressively enhanced by product-card-holo.js.
+ * Physics-based magnetic tilt card with holographic shimmer, front/back
+ * crossfade, collection-specific palette, and quick-add drawer.
  *
- * Accepts WC_Product objects OR static arrays. Collection-aware via
- * CSS custom properties (--holo-accent, --holo-accent-rgb, --holo-radius).
+ * Called from two surfaces:
  *
- * Usage:
- *   get_template_part( 'template-parts/product-card-holo', null, $args );
+ *   1. `woocommerce/content-product.php`  — passes `$args['product']` as WC_Product.
+ *   2. `template-parts/product-grid.php`  — passes either a WC_Product or a
+ *      static-card array (title, price, image_url, etc.) resolved by the
+ *      catalog display layer.
  *
- * @param array $args {
- *     @type WC_Product|null $product      WC product object.
- *     @type string          $title        Fallback title if no product.
- *     @type string          $price        Fallback price HTML.
- *     @type string          $image_url    Fallback front image URL.
- *     @type string          $image_back   Back image URL (crossfade).
- *     @type string          $permalink    Fallback permalink.
- *     @type string          $collection   Collection slug override.
- *     @type string          $badge_text   Override badge text.
- *     @type string          $desc         Short description.
- *     @type string          $sku          SKU string.
- *     @type int             $index        Card index for stagger delay.
- * }
+ * The template handles both shapes transparently: WC_Product data is read
+ * via WC accessors, static-card data is read from the `$args` array.
  *
- * @package SkyyRose_Flagship
+ * @see assets/css/product-card-holo.css   Card styling (750+ lines).
+ * @see assets/js/product-card-holo.js     Magnetic tilt, shimmer, quick-add.
+ * @see inc/product-catalog-display.php    skyyrose_catalog_to_static_card().
+ * @see inc/collections-config.php         Accent colors per collection.
+ *
+ * @package SkyyRose
  * @since   5.0.0
+ * @version 6.5.2
  */
 
 defined( 'ABSPATH' ) || exit;
 
-$defaults = array(
-	'product'    => null,
-	'title'      => '',
-	'price'      => '',
-	'image_url'  => '',
-	'image_back' => '',
-	'permalink'  => '#',
-	'collection' => '',
-	'badge_text' => '',
-	'desc'       => '',
-	'sku'        => '',
-	'index'      => 0,
-);
-$args = wp_parse_args( $args ?? array(), $defaults );
-
 // ---------------------------------------------------------------------------
-// Resolve product data from WC_Product or static args.
+// 1. RESOLVE DATA — WC_Product takes priority, catalog static card fallback.
 // ---------------------------------------------------------------------------
-$wc         = $args['product'];
-$is_wc      = ( $wc instanceof WC_Product );
-$product_id = $is_wc ? $wc->get_id() : 0;
 
-$title     = $is_wc ? $wc->get_name()          : $args['title'];
-$price     = $is_wc ? $wc->get_price_html()     : $args['price'];
-$permalink = $is_wc ? $wc->get_permalink()       : $args['permalink'];
-$sku       = $is_wc ? $wc->get_sku()             : $args['sku'];
-$desc      = $is_wc ? wp_strip_all_tags( $wc->get_short_description() ) : $args['desc'];
+$wc_product = null;
+$product_id = 0;
 
-// Catalog lookup (cached once, used for front + back image fallback).
-$cat_product = null;
-if ( function_exists( 'skyyrose_get_product' ) && ! empty( $sku ) ) {
-	$cat_product = skyyrose_get_product( $sku );
-	if ( ! $cat_product && function_exists( 'skyyrose_normalize_sku' ) ) {
-		$cat_product = skyyrose_get_product( skyyrose_normalize_sku( $sku ) );
+if ( isset( $args['product'] ) && $args['product'] instanceof WC_Product ) {
+	$wc_product = $args['product'];
+	$product_id = $wc_product->get_id();
+}
+
+// Collection slug — passed explicitly or derived from WC taxonomy.
+$collection = '';
+if ( ! empty( $args['collection'] ) ) {
+	$collection = sanitize_title( (string) $args['collection'] );
+} elseif ( $wc_product ) {
+	$terms = wp_get_post_terms( $product_id, 'product_cat', array( 'fields' => 'slugs' ) );
+	if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
+		$collection = $terms[0];
 	}
 }
 
-// Front image.
-if ( $is_wc ) {
-	$img_id    = $wc->get_image_id();
-	$image_url = $img_id ? wp_get_attachment_image_url( $img_id, 'large' ) : '';
+// ---------------------------------------------------------------------------
+// Title.
+// ---------------------------------------------------------------------------
+if ( $wc_product ) {
+	$title = $wc_product->get_name();
 } else {
-	$image_url = $args['image_url'];
+	$title = $args['title'] ?? '';
 }
 
-if ( empty( $image_url ) && $cat_product ) {
-	$cat_front = $cat_product['front_model_image'] ?: $cat_product['image'];
-	if ( ! empty( $cat_front ) ) {
-		$image_url = skyyrose_product_image_uri( $cat_front );
+// ---------------------------------------------------------------------------
+// Price.
+// ---------------------------------------------------------------------------
+if ( $wc_product ) {
+	$price_html = $wc_product->get_price_html();
+} else {
+	$price_html = esc_html( $args['price'] ?? '' );
+}
+
+// ---------------------------------------------------------------------------
+// Images — WC gallery first, then static-card paths from the catalog.
+// ---------------------------------------------------------------------------
+$front_url = '';
+$back_url  = '';
+
+if ( $wc_product ) {
+	$image_id = $wc_product->get_image_id();
+	if ( $image_id ) {
+		$front_url = wp_get_attachment_image_url( $image_id, 'skyyrose-card' );
+		if ( ! $front_url ) {
+			$front_url = wp_get_attachment_image_url( $image_id, 'woocommerce_thumbnail' );
+		}
 	}
-}
-
-if ( empty( $image_url ) && defined( 'SKYYROSE_ASSETS_URI' ) ) {
-	$image_url = SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg';
-}
-
-// Back image (from gallery or catalog fallback).
-$image_back = $args['image_back'];
-if ( empty( $image_back ) && $is_wc ) {
-	$gallery = $wc->get_gallery_image_ids();
-	if ( ! empty( $gallery[0] ) ) {
-		$image_back = wp_get_attachment_image_url( $gallery[0], 'large' );
-	}
-}
-
-if ( empty( $image_back ) && $cat_product && ! empty( $cat_product['back_image'] ) ) {
-	$image_back = skyyrose_product_image_uri( $cat_product['back_image'] );
-}
-
-// Stock and pre-order status.
-$in_stock   = $is_wc ? $wc->is_in_stock() : true;
-$on_sale    = $is_wc ? $wc->is_on_sale() : false;
-$is_preorder = false;
-if ( function_exists( 'skyyrose_is_preorder' ) && $product_id ) {
-	$is_preorder = skyyrose_is_preorder( $product_id );
-}
-$stock_status = $is_wc ? $wc->get_stock_status() : 'instock';
-
-// Badge.
-$badge = $args['badge_text'];
-if ( empty( $badge ) ) {
-	if ( $is_preorder ) {
-		$badge = __( 'Pre-Order', 'skyyrose-flagship' );
-	} elseif ( $on_sale ) {
-		$badge = __( 'Sale', 'skyyrose-flagship' );
-	} elseif ( ! $in_stock ) {
-		$badge = __( 'Sold Out', 'skyyrose-flagship' );
-	}
-}
-
-// Sizes (from variable product or static).
-$sizes = array();
-if ( $is_wc && $wc->is_type( 'variable' ) ) {
-	$attrs = $wc->get_variation_attributes();
-	foreach ( $attrs as $attr_name => $values ) {
-		if ( false !== stripos( $attr_name, 'size' ) ) {
-			$sizes = array_values( array_filter( $values ) );
-			break;
+	$gallery_ids = $wc_product->get_gallery_image_ids();
+	if ( ! empty( $gallery_ids ) ) {
+		$back_url = wp_get_attachment_image_url( $gallery_ids[0], 'skyyrose-card' );
+		if ( ! $back_url ) {
+			$back_url = wp_get_attachment_image_url( $gallery_ids[0], 'woocommerce_thumbnail' );
 		}
 	}
 }
 
-// Edition info.
-$edition_size = $product_id ? get_post_meta( $product_id, '_skyyrose_edition_of', true ) : '';
-$is_limited   = $product_id ? get_post_meta( $product_id, '_skyyrose_limited', true ) : '';
+// Catalog fallback — only if WC didn't supply images.
+if ( empty( $front_url ) && ! empty( $args['image_url'] ) ) {
+	$front_url = $args['image_url'];
+}
+if ( empty( $back_url ) && ! empty( $args['image_back'] ) ) {
+	$back_url = $args['image_back'];
+}
 
-// Scarcity data — stock quantity for depletion bar.
-$stock_qty     = $is_wc ? $wc->get_stock_quantity() : null;
-$edition_total = $edition_size ? intval( $edition_size ) : 0;
-$scarcity_pct  = 0;
-$scarcity_low  = false;
-if ( $edition_total > 0 && null !== $stock_qty ) {
-	$sold         = $edition_total - intval( $stock_qty );
-	$scarcity_pct = min( 100, max( 0, round( ( $sold / $edition_total ) * 100 ) ) );
-	$scarcity_low = ( intval( $stock_qty ) <= 5 && intval( $stock_qty ) > 0 );
-} elseif ( null !== $stock_qty && intval( $stock_qty ) > 0 && intval( $stock_qty ) <= 10 ) {
-	$scarcity_low = true;
+// Final fallback — theme placeholder.
+if ( empty( $front_url ) ) {
+	$front_url = get_theme_file_uri( 'assets/images/placeholder-product.jpg' );
+}
+
+$has_back = ! empty( $back_url );
+
+// ---------------------------------------------------------------------------
+// Permalink — WC permalink, then explicit override, then catalog URL.
+// ---------------------------------------------------------------------------
+if ( ! empty( $args['permalink'] ) && '#' !== $args['permalink'] ) {
+	$permalink = $args['permalink'];
+} elseif ( $wc_product ) {
+	$permalink = get_permalink( $product_id );
+} else {
+	$permalink = function_exists( 'skyyrose_product_url' ) && $sku
+		? skyyrose_product_url( $sku )
+		: '#';
 }
 
 // ---------------------------------------------------------------------------
-// Collection detection.
+// SKU.
 // ---------------------------------------------------------------------------
-$collection = $args['collection'];
-if ( empty( $collection ) && function_exists( 'skyyrose_get_product_collection' ) && $product_id ) {
-	$collection = skyyrose_get_product_collection( $product_id );
+if ( $wc_product ) {
+	$sku = $wc_product->get_sku();
+} else {
+	$sku = $args['sku'] ?? '';
 }
 
-// Collection palette defaults per slug.
-$palettes = array(
-	'black-rose'   => array( '#C0C0C0', '192,192,192', '2px' ),
-	'love-hurts'   => array( '#DC143C', '220,20,60', '2px' ),
-	'signature'    => array( '#D4AF37', '212,175,55', '2px' ),
-	'kids-capsule' => array( '#B76E79', '183,110,121', '16px' ),
-	'default'      => array( '#B76E79', '183,110,121', '8px' ),
-);
-$pal = isset( $palettes[ $collection ] ) ? $palettes[ $collection ] : $palettes['default'];
+// ---------------------------------------------------------------------------
+// Badge (Pre-Order / Sold Out / Sale / Draft).
+// ---------------------------------------------------------------------------
+$badge_text  = '';
+$badge_class = 'holo__badge--default';
 
-// Stagger delay.
-$delay = min( (int) $args['index'], 11 ) * 80;
+if ( $wc_product ) {
+	if ( ! $wc_product->is_in_stock() ) {
+		$badge_text  = __( 'Sold Out', 'skyyrose' );
+		$badge_class = 'holo__badge--soldout';
+	} elseif ( $wc_product->is_on_sale() ) {
+		$badge_text  = __( 'Sale', 'skyyrose' );
+		$badge_class = 'holo__badge--sale';
+	} elseif ( 'preorder' === $wc_product->get_meta( '_skyyrose_status' ) ) {
+		$badge_text  = __( 'Pre-Order', 'skyyrose' );
+		$badge_class = 'holo__badge--preorder';
+	}
+} elseif ( ! empty( $args['badge_text'] ) ) {
+	$raw_badge = strtolower( trim( $args['badge_text'] ) );
+	if ( 'sold out' === $raw_badge ) {
+		$badge_text  = __( 'Sold Out', 'skyyrose' );
+		$badge_class = 'holo__badge--soldout';
+	} elseif ( 'pre-order' === $raw_badge || 'preorder' === $raw_badge ) {
+		$badge_text  = __( 'Pre-Order', 'skyyrose' );
+		$badge_class = 'holo__badge--preorder';
+	} elseif ( 'sale' === $raw_badge ) {
+		$badge_text  = __( 'Sale', 'skyyrose' );
+		$badge_class = 'holo__badge--sale';
+	} else {
+		$badge_text  = $args['badge_text'];
+		$badge_class = 'holo__badge--default';
+	}
+}
 
-// Card classes.
-$classes = array( 'holo' );
-if ( ! empty( $collection ) ) {
-	$classes[] = 'holo--' . sanitize_html_class( $collection );
+// ---------------------------------------------------------------------------
+// Derived state from badge resolution — single source of truth.
+// ---------------------------------------------------------------------------
+$is_sold_out = ( 'holo__badge--soldout' === $badge_class );
+$is_preorder = ( 'holo__badge--preorder' === $badge_class );
+
+// ---------------------------------------------------------------------------
+// Edition size (limited run indicator).
+// ---------------------------------------------------------------------------
+$edition_size = 0;
+if ( $wc_product ) {
+	$edition_size = (int) $wc_product->get_meta( '_skyyrose_edition_size' );
+} elseif ( ! empty( $args['edition_size'] ) ) {
+	$edition_size = (int) $args['edition_size'];
 }
-if ( $is_preorder ) {
-	$classes[] = 'holo--preorder';
+
+// ---------------------------------------------------------------------------
+// Sizes — for the quick-add drawer.
+// ---------------------------------------------------------------------------
+$sizes = array();
+if ( $wc_product && $wc_product->is_type( 'variable' ) ) {
+	$attributes = $wc_product->get_variation_attributes();
+	foreach ( $attributes as $attr_name => $values ) {
+		if ( false !== stripos( $attr_name, 'size' ) || 'pa_size' === $attr_name ) {
+			$sizes = array_values( $values );
+			break;
+		}
+	}
 }
-if ( ! $in_stock && ! $is_preorder ) {
-	$classes[] = 'holo--sold-out';
+// Static card fallback — sizes as pipe-delimited string.
+if ( empty( $sizes ) && ! empty( $args['sizes'] ) ) {
+	if ( is_string( $args['sizes'] ) ) {
+		$sizes = array_filter( array_map( 'trim', explode( '|', $args['sizes'] ) ) );
+	} elseif ( is_array( $args['sizes'] ) ) {
+		$sizes = $args['sizes'];
+	}
 }
-if ( $is_limited ) {
-	$classes[] = 'holo--limited';
+
+// ---------------------------------------------------------------------------
+// Collection label (for card info section).
+// ---------------------------------------------------------------------------
+$collection_label = '';
+if ( $collection && function_exists( 'skyyrose_get_collections_config' ) ) {
+	$config = skyyrose_get_collections_config();
+	if ( isset( $config[ $collection ]['label'] ) ) {
+		$collection_label = $config[ $collection ]['label'];
+	}
 }
+if ( empty( $collection_label ) && ! empty( $collection ) ) {
+	$collection_label = strtoupper( str_replace( '-', ' ', $collection ) );
+}
+
+// ---------------------------------------------------------------------------
+// Card index — used for stagger delay in the entrance animation.
+// ---------------------------------------------------------------------------
+$index = (int) ( $args['index'] ?? 0 );
+
+// ---------------------------------------------------------------------------
+// Build wrapper classes.
+// ---------------------------------------------------------------------------
+$card_classes = array( 'holo' );
+if ( $collection ) {
+	$card_classes[] = 'holo--' . $collection;
+}
+if ( $is_sold_out ) {
+	$card_classes[] = 'holo--sold-out';
+}
+if ( $edition_size > 0 ) {
+	$card_classes[] = 'holo--limited';
+}
+
+// ---------------------------------------------------------------------------
+// 2. RENDER
+// ---------------------------------------------------------------------------
 ?>
-
-<article
-	class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>"
-	data-product-id="<?php echo esc_attr( $product_id ); ?>"
-	data-sku="<?php echo esc_attr( $sku ); ?>"
+<div class="<?php echo esc_attr( implode( ' ', $card_classes ) ); ?>"
+	data-has-back="<?php echo $has_back ? '1' : '0'; ?>"
 	data-collection="<?php echo esc_attr( $collection ); ?>"
-	data-name="<?php echo esc_attr( $title ); ?>"
-	data-has-back="<?php echo esc_attr( ! empty( $image_back ) ? '1' : '0' ); ?>"
-	style="--holo-accent:<?php echo esc_attr( $pal[0] ); ?>;--holo-accent-rgb:<?php echo esc_attr( $pal[1] ); ?>;--holo-radius:<?php echo esc_attr( $pal[2] ); ?>;--holo-delay:<?php echo esc_attr( $delay ); ?>ms;"
-	tabindex="0"
-	role="group"
-	aria-label="<?php echo esc_attr( $title ); ?>">
+	<?php if ( $sku ) : ?>
+	data-sku="<?php echo esc_attr( $sku ); ?>"
+	<?php endif; ?>
+	style="--holo-delay: <?php echo esc_attr( $index * 80 ); ?>ms"
+	role="listitem">
 
-	<!-- Ambient glow (beneath card, collection-colored) -->
+	<!-- Ambient glow -->
 	<div class="holo__glow" aria-hidden="true"></div>
 
-	<!-- Tiltable card body -->
+	<!-- Card body (3D tilt container) -->
 	<div class="holo__body">
-
-		<!-- Holographic shimmer overlay -->
-		<div class="holo__shimmer" aria-hidden="true"></div>
 
 		<!-- Gallery -->
 		<div class="holo__gallery">
-			<a href="<?php echo esc_url( $permalink ); ?>" class="holo__img-link"
-			   aria-label="<?php echo esc_attr( sprintf( __( 'View %s', 'skyyrose-flagship' ), $title ) ); ?>">
-				<img src="<?php echo esc_url( $image_url ); ?>"
-				     alt="<?php echo esc_attr( $title ); ?>"
-				     class="holo__img holo__img--front"
-				     width="400" height="533" loading="lazy" decoding="async">
-				<?php if ( ! empty( $image_back ) ) : ?>
-					<img src="<?php echo esc_url( $image_back ); ?>"
-					     alt="<?php echo esc_attr( $title . ' — back' ); ?>"
-					     class="holo__img holo__img--back"
-					     width="400" height="533" loading="lazy" decoding="async">
+			<a href="<?php echo esc_url( $permalink ); ?>"
+				class="holo__img-link"
+				aria-label="<?php echo esc_attr( $title ); ?>"
+				tabindex="-1">
+
+				<img class="holo__img holo__img--front"
+					src="<?php echo esc_url( $front_url ); ?>"
+					alt="<?php echo esc_attr( $title ); ?>"
+					loading="lazy"
+					decoding="async"
+					width="600"
+					height="800" />
+
+				<?php if ( $has_back ) : ?>
+					<img class="holo__img holo__img--back"
+						src="<?php echo esc_url( $back_url ); ?>"
+						alt="
+						<?php
+								printf(
+									/* translators: %s: product name */
+									esc_attr__( '%s — alternate view', 'skyyrose' ),
+									esc_attr( $title )
+								);
+						?>
+							"
+						loading="lazy"
+						decoding="async"
+						width="600"
+						height="800" />
 				<?php endif; ?>
 			</a>
 
-			<!-- Badge -->
-			<?php if ( ! empty( $badge ) ) : ?>
-				<span class="holo__badge holo__badge--<?php echo esc_attr( $is_preorder ? 'preorder' : ( $on_sale ? 'sale' : ( $in_stock ? 'default' : 'soldout' ) ) ); ?>">
-					<?php echo esc_html( $badge ); ?>
+			<?php if ( $badge_text ) : ?>
+				<span class="holo__badge <?php echo esc_attr( $badge_class ); ?>">
+					<?php echo esc_html( $badge_text ); ?>
 				</span>
 			<?php endif; ?>
 
-			<?php if ( $is_limited && $edition_size ) : ?>
-				<span class="holo__edition"><?php
+			<?php if ( $edition_size > 0 ) : ?>
+				<span class="holo__edition">
+					<?php
 					printf(
 						/* translators: %d: edition size */
-						esc_html__( '%d Pieces', 'skyyrose-flagship' ),
-						intval( $edition_size )
+						esc_html__( 'Limited to %d', 'skyyrose' ),
+						(int) $edition_size
 					);
-				?></span>
+					?>
+				</span>
 			<?php endif; ?>
 
-			<!-- Wishlist -->
-			<button class="holo__wishlist" type="button"
-			        data-wishlist-id="<?php echo esc_attr( $sku ?: $product_id ); ?>"
-			        aria-label="<?php echo esc_attr( sprintf( __( 'Add %s to wishlist', 'skyyrose-flagship' ), $title ) ); ?>"
-			        aria-pressed="false">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-				</svg>
-			</button>
+			<?php
+			static $has_wishlist = null;
+			if ( null === $has_wishlist ) {
+				$has_wishlist = function_exists( 'skyyrose_wishlist_button' );
+			}
+			if ( $has_wishlist ) :
+				skyyrose_wishlist_button( $product_id ?: $sku );
+			endif;
+			?>
 
-			<!-- Quick View trigger (Experience Engine Phase 3) -->
-			<button class="holo__quickview" type="button"
-			        aria-label="<?php echo esc_attr( sprintf( __( 'Quick view %s', 'skyyrose-flagship' ), $title ) ); ?>"
-			        aria-haspopup="dialog">
-				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-				<?php esc_html_e( 'Quick View', 'skyyrose-flagship' ); ?>
-			</button>
-
-			<!-- View indicator (shows on hover with back image) -->
-			<?php if ( ! empty( $image_back ) ) : ?>
+			<?php if ( $has_back ) : ?>
 				<div class="holo__view-indicator" aria-hidden="true">
 					<span class="holo__view-dot holo__view-dot--active"></span>
 					<span class="holo__view-dot"></span>
@@ -269,78 +322,81 @@ if ( $is_limited ) {
 			<?php endif; ?>
 		</div>
 
-		<!-- Info -->
+		<!-- Holographic shimmer overlay -->
+		<div class="holo__shimmer" aria-hidden="true"></div>
+
+		<!-- Product info -->
 		<div class="holo__info">
-			<?php if ( ! empty( $collection ) && 'default' !== $collection ) : ?>
-				<span class="holo__collection"><?php echo esc_html( strtoupper( str_replace( '-', ' ', $collection ) ) ); ?></span>
+			<?php if ( $collection_label ) : ?>
+				<span class="holo__collection"><?php echo esc_html( $collection_label ); ?></span>
 			<?php endif; ?>
 
 			<h3 class="holo__name">
-				<a href="<?php echo esc_url( $permalink ); ?>"><?php echo esc_html( $title ); ?></a>
+				<a href="<?php echo esc_url( $permalink ); ?>">
+					<?php echo esc_html( $title ); ?>
+				</a>
 			</h3>
 
 			<div class="holo__price-row">
-				<span class="holo__price"><?php echo wp_kses_post( $price ); ?></span>
-				<?php if ( $stock_status === 'onbackorder' ) : ?>
-					<span class="holo__ship-note"><?php esc_html_e( 'Ships Spring 2026', 'skyyrose-flagship' ); ?></span>
+				<span class="holo__price">
+					<?php echo wp_kses_post( $price_html ); ?>
+				</span>
+				<?php if ( $is_preorder ) : ?>
+					<span class="holo__ship-note"><?php esc_html_e( 'Ships on release', 'skyyrose' ); ?></span>
 				<?php endif; ?>
 			</div>
+		</div>
 
-			<?php if ( $edition_total > 0 && $scarcity_pct > 0 ) : ?>
-				<div class="holo__scarcity<?php echo $scarcity_low ? ' holo__scarcity--low' : ''; ?>">
-					<span class="holo__scarcity-label"><?php
-						printf(
-							esc_html__( '%d%% claimed', 'skyyrose-flagship' ),
-							$scarcity_pct
-						);
-					?></span>
-					<div class="holo__scarcity-bar" aria-hidden="true">
-						<div class="holo__scarcity-fill" data-percent="<?php echo esc_attr( $scarcity_pct ); ?>" style="width:0%"></div>
+		<?php if ( ! $is_sold_out ) : ?>
+			<!-- Quick-add drawer -->
+			<div class="holo__drawer">
+				<?php if ( ! empty( $sizes ) ) : ?>
+					<div class="holo__sizes" role="radiogroup"
+						aria-label="<?php esc_attr_e( 'Select size', 'skyyrose' ); ?>">
+						<?php foreach ( $sizes as $i => $size ) : ?>
+							<button type="button"
+								class="holo__size-pill<?php echo 0 === $i ? ' holo__size-pill--active' : ''; ?>"
+								data-size="<?php echo esc_attr( $size ); ?>"
+								role="radio"
+								aria-checked="<?php echo 0 === $i ? 'true' : 'false'; ?>">
+								<?php echo esc_html( $size ); ?>
+							</button>
+						<?php endforeach; ?>
 					</div>
-				</div>
-			<?php elseif ( $scarcity_low && null !== $stock_qty ) : ?>
-				<div class="holo__scarcity holo__scarcity--low">
-					<span class="holo__scarcity-label"><?php
-						printf(
-							esc_html( _n( 'Only %d left', 'Only %d left', intval( $stock_qty ), 'skyyrose-flagship' ) ),
-							intval( $stock_qty )
-						);
-					?></span>
-				</div>
-			<?php endif; ?>
-		</div>
+				<?php endif; ?>
 
-		<!-- Quick-Add Drawer (slides up on hover) -->
-		<?php if ( $in_stock || $is_preorder ) : ?>
-		<div class="holo__drawer" aria-label="<?php esc_attr_e( 'Quick add to cart', 'skyyrose-flagship' ); ?>">
-
-			<?php if ( ! empty( $sizes ) ) : ?>
-			<div class="holo__sizes" role="radiogroup" aria-label="<?php esc_attr_e( 'Select size', 'skyyrose-flagship' ); ?>">
-				<?php foreach ( $sizes as $size ) : ?>
-					<button class="holo__size-pill" type="button"
-					        data-size="<?php echo esc_attr( $size ); ?>"
-					        role="radio" aria-checked="false">
-						<?php echo esc_html( $size ); ?>
+				<?php if ( $wc_product && $wc_product->is_purchasable() ) : ?>
+					<button type="button"
+						class="holo__buy"
+						data-product-id="<?php echo esc_attr( $product_id ); ?>"
+						aria-label="
+						<?php
+								printf(
+									/* translators: %s: product name */
+									esc_attr__( 'Add %s to bag', 'skyyrose' ),
+									esc_attr( $title )
+								);
+						?>
+							">
+						<?php esc_html_e( 'Add to Bag', 'skyyrose' ); ?>
 					</button>
-				<?php endforeach; ?>
+				<?php else : ?>
+					<a href="<?php echo esc_url( $permalink ); ?>"
+						class="holo__buy"
+						aria-label="
+						<?php
+								printf(
+									/* translators: %s: product name */
+									esc_attr__( 'View %s', 'skyyrose' ),
+									esc_attr( $title )
+								);
+						?>
+							">
+						<?php esc_html_e( 'View Piece', 'skyyrose' ); ?>
+					</a>
+				<?php endif; ?>
 			</div>
-			<?php endif; ?>
-
-			<?php if ( $is_wc ) : ?>
-				<button class="holo__buy" type="button"
-				        data-product-id="<?php echo esc_attr( $product_id ); ?>"
-				        data-add-to-cart-url="<?php echo esc_url( $wc->add_to_cart_url() ); ?>"
-				        <?php echo ! empty( $sizes ) ? 'disabled' : ''; ?>>
-					<?php echo esc_html( $is_preorder ? __( 'Pre-Order Now', 'skyyrose-flagship' ) : __( 'Add to Bag', 'skyyrose-flagship' ) ); ?>
-				</button>
-			<?php else : ?>
-				<a class="holo__buy holo__buy--link" href="<?php echo esc_url( $permalink ); ?>">
-					<?php echo esc_html( $is_preorder ? __( 'Pre-Order Now', 'skyyrose-flagship' ) : __( 'Shop Now', 'skyyrose-flagship' ) ); ?>
-				</a>
-			<?php endif; ?>
-
-		</div>
 		<?php endif; ?>
 
-	</div>
-</article>
+	</div><!-- .holo__body -->
+</div><!-- .holo -->

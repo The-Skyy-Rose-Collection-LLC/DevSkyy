@@ -13,11 +13,14 @@ This approach:
 """
 
 import json
+import sys
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from grpc_server.product_service import ProductServicer, _SimpleRequest
+
+_SENTINEL = object()  # marker for missing key in sys.modules
 
 
 def _make_product(
@@ -208,11 +211,18 @@ class TestProductServicerHelpers:
         _set_not_found handles missing grpcio gracefully — no AttributeError.
         """
         ctx = _make_context()
-        # Should not raise even without grpcio
-        with patch.dict("sys.modules", {"grpc": None}):
-            # The import inside the method will succeed but set_code may not be called
-            # This mainly tests no exception is raised
+        # When grpc is absent (None in sys.modules), import grpc raises
+        # ImportError which _set_not_found catches silently.
+        saved = sys.modules.get("grpc", _SENTINEL)
+        try:
+            sys.modules["grpc"] = None  # type: ignore[assignment]
+            # Should not raise even without grpcio
             try:
                 await ProductServicer._set_not_found(ctx, "test")
             except Exception:
                 pass  # Acceptable — we just verify no crash in outer logic
+        finally:
+            if saved is _SENTINEL:
+                sys.modules.pop("grpc", None)
+            else:
+                sys.modules["grpc"] = saved

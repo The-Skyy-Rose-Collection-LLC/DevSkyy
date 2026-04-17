@@ -5,7 +5,7 @@
  * Helper functions used across theme templates: collection colors,
  * product queries, breadcrumbs, film grain overlay, and post meta.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   1.0.0
  */
 
@@ -14,7 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * SVG Allowed HTML (wp_kses whitelist for inline SVG icons)
  *--------------------------------------------------------------*/
 
@@ -29,17 +30,67 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function skyyrose_svg_kses() {
 	return array(
-		'svg'      => array( 'width' => true, 'height' => true, 'viewBox' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true, 'class' => true, 'aria-hidden' => true, 'focusable' => true, 'xmlns' => true ),
-		'path'     => array( 'd' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true ),
-		'circle'   => array( 'cx' => true, 'cy' => true, 'r' => true, 'fill' => true ),
-		'line'     => array( 'x1' => true, 'y1' => true, 'x2' => true, 'y2' => true, 'stroke' => true, 'stroke-width' => true ),
-		'polyline' => array( 'points' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true ),
-		'polygon'  => array( 'points' => true, 'fill' => true ),
-		'rect'     => array( 'x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true, 'ry' => true, 'fill' => true, 'stroke' => true ),
+		'svg'      => array(
+			'width'           => true,
+			'height'          => true,
+			'viewBox'         => true,
+			'fill'            => true,
+			'stroke'          => true,
+			'stroke-width'    => true,
+			'stroke-linecap'  => true,
+			'stroke-linejoin' => true,
+			'class'           => true,
+			'aria-hidden'     => true,
+			'focusable'       => true,
+			'xmlns'           => true,
+		),
+		'path'     => array(
+			'd'               => true,
+			'fill'            => true,
+			'stroke'          => true,
+			'stroke-width'    => true,
+			'stroke-linecap'  => true,
+			'stroke-linejoin' => true,
+		),
+		'circle'   => array(
+			'cx'   => true,
+			'cy'   => true,
+			'r'    => true,
+			'fill' => true,
+		),
+		'line'     => array(
+			'x1'           => true,
+			'y1'           => true,
+			'x2'           => true,
+			'y2'           => true,
+			'stroke'       => true,
+			'stroke-width' => true,
+		),
+		'polyline' => array(
+			'points'       => true,
+			'fill'         => true,
+			'stroke'       => true,
+			'stroke-width' => true,
+		),
+		'polygon'  => array(
+			'points' => true,
+			'fill'   => true,
+		),
+		'rect'     => array(
+			'x'      => true,
+			'y'      => true,
+			'width'  => true,
+			'height' => true,
+			'rx'     => true,
+			'ry'     => true,
+			'fill'   => true,
+			'stroke' => true,
+		),
 	);
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Collection Color Mapping
  *--------------------------------------------------------------*/
 
@@ -86,7 +137,8 @@ function skyyrose_get_collection_palette( $collection ) {
 	);
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Product Queries
  *--------------------------------------------------------------*/
 
@@ -150,36 +202,8 @@ function skyyrose_get_products_by_collection( $collection, $limit = 8 ) {
 	return new WP_Query( $args );
 }
 
-/**
- * Get featured products across all collections.
- *
- * @since  3.0.0
- *
- * @param  int $limit Number of products. Default 4.
- * @return WP_Query Query result.
- */
-function skyyrose_get_featured_products( $limit = 4 ) {
-
-	$sanitized_limit = max( 1, min( 50, absint( $limit ) ) );
-
-	$args = array(
-		'post_type'      => 'product',
-		'post_status'    => 'publish',
-		'posts_per_page' => $sanitized_limit,
-		'orderby'        => 'rand',
-		'tax_query'      => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-			array(
-				'taxonomy' => 'product_visibility',
-				'field'    => 'name',
-				'terms'    => 'featured',
-			),
-		),
-	);
-
-	return new WP_Query( $args );
-}
-
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Breadcrumbs
  *--------------------------------------------------------------*/
 
@@ -202,14 +226,14 @@ function skyyrose_breadcrumbs() {
 
 	// Home is always the first breadcrumb.
 	$items[] = array(
-		'title' => esc_html__( 'Home', 'skyyrose-flagship' ),
+		'title' => esc_html__( 'Home', 'skyyrose' ),
 		'url'   => home_url( '/' ),
 	);
 
 	// WooCommerce product pages.
 	if ( function_exists( 'is_product' ) && function_exists( 'wc_get_page_id' ) && is_product() ) {
 		$items[] = array(
-			'title' => esc_html__( 'Shop', 'skyyrose-flagship' ),
+			'title' => esc_html__( 'Shop', 'skyyrose' ),
 			'url'   => get_permalink( wc_get_page_id( 'shop' ) ),
 		);
 
@@ -229,12 +253,12 @@ function skyyrose_breadcrumbs() {
 	} elseif ( function_exists( 'is_shop' ) && function_exists( 'wc_get_page_id' ) && ( is_shop() || is_product_category() || is_product_tag() ) ) {
 		// WooCommerce archive pages.
 		$items[] = array(
-			'title' => esc_html__( 'Shop', 'skyyrose-flagship' ),
+			'title' => esc_html__( 'Shop', 'skyyrose' ),
 			'url'   => get_permalink( wc_get_page_id( 'shop' ) ),
 		);
 
 		if ( is_product_category() ) {
-			$term    = get_queried_object();
+			$term = get_queried_object();
 			if ( $term instanceof WP_Term ) {
 				$items[] = array(
 					'title' => wp_strip_all_tags( html_entity_decode( $term->name, ENT_QUOTES, 'UTF-8' ) ),
@@ -270,12 +294,12 @@ function skyyrose_breadcrumbs() {
 	} elseif ( is_search() ) {
 		$items[] = array(
 			/* translators: %s: search query */
-			'title' => sprintf( esc_html__( 'Search: %s', 'skyyrose-flagship' ), get_search_query() ),
+			'title' => sprintf( esc_html__( 'Search: %s', 'skyyrose' ), get_search_query() ),
 			'url'   => '',
 		);
 	} elseif ( is_404() ) {
 		$items[] = array(
-			'title' => esc_html__( 'Page Not Found', 'skyyrose-flagship' ),
+			'title' => esc_html__( 'Page Not Found', 'skyyrose' ),
 			'url'   => '',
 		);
 	}
@@ -285,13 +309,13 @@ function skyyrose_breadcrumbs() {
 		return;
 	}
 
-	$output    = '<nav class="breadcrumb-navigation" aria-label="' . esc_attr__( 'Breadcrumb', 'skyyrose-flagship' ) . '">';
-	$output   .= '<ol class="breadcrumbs" itemscope itemtype="https://schema.org/BreadcrumbList">';
-	$last_idx  = count( $items ) - 1;
+	$output   = '<nav class="breadcrumb-navigation" aria-label="' . esc_attr__( 'Breadcrumb', 'skyyrose' ) . '">';
+	$output  .= '<ol class="breadcrumbs" itemscope itemtype="https://schema.org/BreadcrumbList">';
+	$last_idx = count( $items ) - 1;
 
 	foreach ( $items as $index => $item ) {
-		$is_last  = ( $index === $last_idx );
-		$output  .= '<li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">';
+		$is_last = ( $index === $last_idx );
+		$output .= '<li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">';
 
 		if ( $is_last || empty( $item['url'] ) ) {
 			$output .= '<span itemprop="name" aria-current="page">' . esc_html( $item['title'] ) . '</span>';
@@ -310,7 +334,8 @@ function skyyrose_breadcrumbs() {
 	echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above.
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Film Grain Overlay
  *--------------------------------------------------------------*/
 
@@ -333,7 +358,8 @@ function skyyrose_film_grain() {
 	<?php
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Body Classes
  *--------------------------------------------------------------*/
 
@@ -367,7 +393,8 @@ function skyyrose_custom_body_classes( $classes ) {
 }
 add_filter( 'body_class', 'skyyrose_custom_body_classes' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Excerpt Customization
  *--------------------------------------------------------------*/
 
@@ -403,7 +430,8 @@ function skyyrose_excerpt_more( $more ) {
 }
 add_filter( 'excerpt_more', 'skyyrose_excerpt_more' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Post Thumbnail Helper
  *--------------------------------------------------------------*/
 
@@ -423,7 +451,8 @@ function skyyrose_get_post_thumbnail( $size = 'skyyrose-featured' ) {
 	return SKYYROSE_ASSETS_URI . '/images/placeholder.jpg';
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Reading Time
  *--------------------------------------------------------------*/
 
@@ -446,10 +475,11 @@ function skyyrose_reading_time( $post_id = null ) {
 	$reading_time = max( 1, (int) ceil( $word_count / 200 ) );
 
 	/* translators: %s: number of minutes */
-	return sprintf( esc_html__( '%s min read', 'skyyrose-flagship' ), $reading_time );
+	return sprintf( esc_html__( '%s min read', 'skyyrose' ), $reading_time );
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Post Meta Display
  *--------------------------------------------------------------*/
 
@@ -478,7 +508,7 @@ function skyyrose_posted_on() {
 
 	printf(
 		'<span class="posted-on">%s %s</span>',
-		esc_html_x( 'Posted on', 'post date', 'skyyrose-flagship' ),
+		esc_html_x( 'Posted on', 'post date', 'skyyrose' ),
 		'<a href="' . esc_url( get_permalink() ) . '" rel="bookmark">' . $time_string . '</a>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	);
 }
@@ -492,7 +522,7 @@ function skyyrose_posted_on() {
 function skyyrose_posted_by() {
 	printf(
 		'<span class="byline">%s <span class="author vcard"><a class="url fn n" href="%s">%s</a></span></span>',
-		esc_html_x( 'by', 'post author', 'skyyrose-flagship' ),
+		esc_html_x( 'by', 'post author', 'skyyrose' ),
 		esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ),
 		esc_html( get_the_author() )
 	);
@@ -508,17 +538,17 @@ function skyyrose_entry_footer() {
 
 	if ( 'post' === get_post_type() ) {
 		/* translators: used between list items, there is a space after the comma */
-		$categories_list = get_the_category_list( esc_html__( ', ', 'skyyrose-flagship' ) );
+		$categories_list = get_the_category_list( esc_html__( ', ', 'skyyrose' ) );
 		if ( $categories_list ) {
 			/* translators: 1: list of categories. */
-			printf( '<span class="cat-links">' . esc_html__( 'Posted in %1$s', 'skyyrose-flagship' ) . '</span>', $categories_list ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			printf( '<span class="cat-links">' . esc_html__( 'Posted in %1$s', 'skyyrose' ) . '</span>', $categories_list ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
 		/* translators: used between list items, there is a space after the comma */
-		$tags_list = get_the_tag_list( '', esc_html_x( ', ', 'list item separator', 'skyyrose-flagship' ) );
+		$tags_list = get_the_tag_list( '', esc_html_x( ', ', 'list item separator', 'skyyrose' ) );
 		if ( $tags_list ) {
 			/* translators: 1: list of tags. */
-			printf( '<span class="tags-links">' . esc_html__( 'Tagged %1$s', 'skyyrose-flagship' ) . '</span>', $tags_list ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			printf( '<span class="tags-links">' . esc_html__( 'Tagged %1$s', 'skyyrose' ) . '</span>', $tags_list ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	}
 
@@ -528,7 +558,7 @@ function skyyrose_entry_footer() {
 			sprintf(
 				wp_kses(
 					/* translators: %s: post title */
-					__( 'Leave a Comment<span class="screen-reader-text"> on %s</span>', 'skyyrose-flagship' ),
+					__( 'Leave a Comment<span class="screen-reader-text"> on %s</span>', 'skyyrose' ),
 					array( 'span' => array( 'class' => array() ) )
 				),
 				wp_kses_post( get_the_title() )
@@ -541,7 +571,7 @@ function skyyrose_entry_footer() {
 		sprintf(
 			wp_kses(
 				/* translators: %s: post title, only visible to screen readers */
-				__( 'Edit <span class="screen-reader-text">%s</span>', 'skyyrose-flagship' ),
+				__( 'Edit <span class="screen-reader-text">%s</span>', 'skyyrose' ),
 				array( 'span' => array( 'class' => array() ) )
 			),
 			wp_kses_post( get_the_title() )
@@ -551,7 +581,8 @@ function skyyrose_entry_footer() {
 	);
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * SVG Icon Helper
  *--------------------------------------------------------------*/
 
@@ -565,14 +596,63 @@ function skyyrose_entry_footer() {
  */
 function skyyrose_svg_icon( $name ) {
 	$allowed_svg = array(
-		'svg'      => array( 'xmlns' => true, 'width' => true, 'height' => true, 'viewBox' => true, 'fill' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true, 'aria-hidden' => true, 'class' => true, 'role' => true ),
-		'path'     => array( 'd' => true, 'fill' => true, 'stroke' => true ),
-		'circle'   => array( 'cx' => true, 'cy' => true, 'r' => true, 'fill' => true, 'stroke' => true ),
-		'rect'     => array( 'x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true, 'ry' => true, 'fill' => true ),
-		'line'     => array( 'x1' => true, 'y1' => true, 'x2' => true, 'y2' => true, 'stroke' => true ),
-		'polyline' => array( 'points' => true, 'fill' => true, 'stroke' => true ),
-		'polygon'  => array( 'points' => true, 'fill' => true, 'stroke' => true ),
-		'g'        => array( 'fill' => true, 'stroke' => true, 'transform' => true ),
+		'svg'      => array(
+			'xmlns'           => true,
+			'width'           => true,
+			'height'          => true,
+			'viewBox'         => true,
+			'fill'            => true,
+			'stroke'          => true,
+			'stroke-width'    => true,
+			'stroke-linecap'  => true,
+			'stroke-linejoin' => true,
+			'aria-hidden'     => true,
+			'class'           => true,
+			'role'            => true,
+		),
+		'path'     => array(
+			'd'      => true,
+			'fill'   => true,
+			'stroke' => true,
+		),
+		'circle'   => array(
+			'cx'     => true,
+			'cy'     => true,
+			'r'      => true,
+			'fill'   => true,
+			'stroke' => true,
+		),
+		'rect'     => array(
+			'x'      => true,
+			'y'      => true,
+			'width'  => true,
+			'height' => true,
+			'rx'     => true,
+			'ry'     => true,
+			'fill'   => true,
+		),
+		'line'     => array(
+			'x1'     => true,
+			'y1'     => true,
+			'x2'     => true,
+			'y2'     => true,
+			'stroke' => true,
+		),
+		'polyline' => array(
+			'points' => true,
+			'fill'   => true,
+			'stroke' => true,
+		),
+		'polygon'  => array(
+			'points' => true,
+			'fill'   => true,
+			'stroke' => true,
+		),
+		'g'        => array(
+			'fill'      => true,
+			'stroke'    => true,
+			'transform' => true,
+		),
 	);
 
 	$icons = array(
@@ -591,7 +671,8 @@ function skyyrose_svg_icon( $name ) {
 	}
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * SVG Sanitization
  *--------------------------------------------------------------*/
 
@@ -621,16 +702,37 @@ function skyyrose_svg_kses_allowed() {
 			'role'            => true,
 			'xmlns'           => true,
 		),
-		'path'     => array( 'd' => true, 'fill' => true, 'stroke' => true ),
-		'circle'   => array( 'cx' => true, 'cy' => true, 'r' => true, 'fill' => true ),
-		'line'     => array( 'x1' => true, 'y1' => true, 'x2' => true, 'y2' => true ),
+		'path'     => array(
+			'd'      => true,
+			'fill'   => true,
+			'stroke' => true,
+		),
+		'circle'   => array(
+			'cx'   => true,
+			'cy'   => true,
+			'r'    => true,
+			'fill' => true,
+		),
+		'line'     => array(
+			'x1' => true,
+			'y1' => true,
+			'x2' => true,
+			'y2' => true,
+		),
 		'polyline' => array( 'points' => true ),
 		'polygon'  => array( 'points' => true ),
-		'rect'     => array( 'x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true ),
+		'rect'     => array(
+			'x'      => true,
+			'y'      => true,
+			'width'  => true,
+			'height' => true,
+			'rx'     => true,
+		),
 	);
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Social Media Links (Single Source of Truth)
  *--------------------------------------------------------------*/
 
@@ -647,32 +749,33 @@ function skyyrose_get_social_links() {
 	return array(
 		'instagram' => array(
 			'url'   => 'https://instagram.com/theskyyrosecollection',
-			'label' => __( 'Instagram', 'skyyrose-flagship' ),
+			'label' => __( 'Instagram', 'skyyrose' ),
 		),
 		'tiktok'    => array(
 			'url'   => 'https://tiktok.com/@skyyrosecollection',
-			'label' => __( 'TikTok', 'skyyrose-flagship' ),
+			'label' => __( 'TikTok', 'skyyrose' ),
 		),
 		'twitter'   => array(
 			'url'   => 'https://twitter.com/skyyrosellc',
-			'label' => __( 'X (Twitter)', 'skyyrose-flagship' ),
+			'label' => __( 'X (Twitter)', 'skyyrose' ),
 		),
 		'facebook'  => array(
 			'url'   => 'https://facebook.com/skyyrosecollection',
-			'label' => __( 'Facebook', 'skyyrose-flagship' ),
+			'label' => __( 'Facebook', 'skyyrose' ),
 		),
 		'youtube'   => array(
 			'url'   => 'https://youtube.com/@skyyrosecollection',
-			'label' => __( 'YouTube', 'skyyrose-flagship' ),
+			'label' => __( 'YouTube', 'skyyrose' ),
 		),
 		'pinterest' => array(
 			'url'   => 'https://pinterest.com/skyyrosecollection',
-			'label' => __( 'Pinterest', 'skyyrose-flagship' ),
+			'label' => __( 'Pinterest', 'skyyrose' ),
 		),
 	);
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Navigation Fallback
  *--------------------------------------------------------------*/
 
@@ -685,66 +788,66 @@ function skyyrose_get_social_links() {
  * @since 3.0.0
  * @return void
  */
-function skyyrose_flagship_nav_fallback() {
+function skyyrose_nav_fallback() {
 
 	$items = array(
 		array(
-			'title'    => __( 'Home', 'skyyrose-flagship' ),
+			'title'    => __( 'Home', 'skyyrose' ),
 			'url'      => home_url( '/' ),
 			'children' => array(),
 		),
 		array(
-			'title'    => __( 'Collections', 'skyyrose-flagship' ),
+			'title'    => __( 'Collections', 'skyyrose' ),
 			'url'      => home_url( '/collections/' ),
 			'children' => array(
 				array(
-					'title' => __( 'Black Rose', 'skyyrose-flagship' ),
+					'title' => __( 'Black Rose', 'skyyrose' ),
 					'url'   => home_url( '/collection-black-rose/' ),
 				),
 				array(
-					'title' => __( 'Love Hurts', 'skyyrose-flagship' ),
+					'title' => __( 'Love Hurts', 'skyyrose' ),
 					'url'   => home_url( '/collection-love-hurts/' ),
 				),
 				array(
-					'title' => __( 'Signature', 'skyyrose-flagship' ),
+					'title' => __( 'Signature', 'skyyrose' ),
 					'url'   => home_url( '/collection-signature/' ),
 				),
 				array(
-					'title' => __( 'Kids Capsule', 'skyyrose-flagship' ),
+					'title' => __( 'Kids Capsule', 'skyyrose' ),
 					'url'   => home_url( '/collection-kids-capsule/' ),
 				),
 			),
 		),
 		array(
-			'title'    => __( 'Experiences', 'skyyrose-flagship' ),
+			'title'    => __( 'Experiences', 'skyyrose' ),
 			'url'      => '#',
 			'children' => array(
 				array(
-					'title' => __( 'The Garden', 'skyyrose-flagship' ),
+					'title' => __( 'The Garden', 'skyyrose' ),
 					'url'   => home_url( '/experience-black-rose/' ),
 				),
 				array(
-					'title' => __( 'The Ballroom', 'skyyrose-flagship' ),
+					'title' => __( 'The Ballroom', 'skyyrose' ),
 					'url'   => home_url( '/experience-love-hurts/' ),
 				),
 				array(
-					'title' => __( 'The Runway', 'skyyrose-flagship' ),
+					'title' => __( 'The Runway', 'skyyrose' ),
 					'url'   => home_url( '/experience-signature/' ),
 				),
 			),
 		),
 		array(
-			'title'    => __( 'Pre-Order', 'skyyrose-flagship' ),
+			'title'    => __( 'Pre-Order', 'skyyrose' ),
 			'url'      => home_url( '/pre-order/' ),
 			'children' => array(),
 		),
 		array(
-			'title'    => __( 'About', 'skyyrose-flagship' ),
+			'title'    => __( 'About', 'skyyrose' ),
 			'url'      => home_url( '/about/' ),
 			'children' => array(),
 		),
 		array(
-			'title'    => __( 'Contact', 'skyyrose-flagship' ),
+			'title'    => __( 'Contact', 'skyyrose' ),
 			'url'      => home_url( '/contact/' ),
 			'children' => array(),
 		),
@@ -756,7 +859,7 @@ function skyyrose_flagship_nav_fallback() {
 		$has_children = ! empty( $item['children'] );
 		$li_class     = $has_children ? ' class="menu-item menu-item-has-children"' : ' class="menu-item"';
 
-		echo '<li' . $li_class . '>';
+		echo '<li' . $li_class . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $li_class is a hardcoded class string built 2 lines above.
 		echo '<a href="' . esc_url( $item['url'] ) . '">' . esc_html( $item['title'] ) . '</a>';
 
 		if ( $has_children ) {

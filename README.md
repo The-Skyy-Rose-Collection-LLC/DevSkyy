@@ -29,10 +29,14 @@
 make install                         # Python API + dev tooling
 cd frontend && npm install           # Next.js dashboard
 
-# Run (three terminals)
+# Run locally (pick one approach)
+# A) Native (two terminals):
 uvicorn main_enterprise:app --reload --port 8000    # API
 cd frontend && npm run dev                          # Dashboard
-docker-compose up -d                                # Full stack
+
+# B) Full stack via Docker (API + deps in containers):
+docker-compose up -d
+
 
 # Test
 make test-fast                       # Unit tests
