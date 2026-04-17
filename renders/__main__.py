@@ -16,7 +16,7 @@ from __future__ import annotations
 import sys
 
 from renders.config import PRODUCT_CATALOG
-from renders.preflight import preflight_verify, PreflightAborted
+from renders.preflight import PreflightAborted, preflight_verify
 
 
 def main() -> None:
@@ -81,16 +81,16 @@ def main() -> None:
     if args.command == "sku":
         pf_products = [p for p in PRODUCT_CATALOG if p["sku"] == args.sku_id]
     elif args.command == "collection":
-        from renders.config import _assign_priority
         priority_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
         max_prio = priority_order.get(args.priority, 3) if args.priority else 3
         pf_products = [
-            p for p in PRODUCT_CATALOG
+            p
+            for p in PRODUCT_CATALOG
             if p["collection"] == args.collection_name
             and priority_order.get(p.get("render_priority", "low"), 3) <= max_prio
         ]
         if getattr(args, "max", None):
-            pf_products = pf_products[:args.max]
+            pf_products = pf_products[: args.max]
     else:  # all
         pf_products = PRODUCT_CATALOG
 
@@ -144,19 +144,23 @@ def _add_render_opts(parser: object) -> None:
         help="Only process at this priority or higher",
     )
     parser.add_argument(  # type: ignore[union-attr]
-        "--video", action="store_true",
+        "--video",
+        action="store_true",
         help="Also generate video clips from best renders",
     )
     parser.add_argument(  # type: ignore[union-attr]
-        "--dry-run", action="store_true",
+        "--dry-run",
+        action="store_true",
         help="Simulate without making API calls",
     )
     parser.add_argument(  # type: ignore[union-attr]
-        "--no-bg-remove", action="store_true",
+        "--no-bg-remove",
+        action="store_true",
         help="Skip background removal step",
     )
     parser.add_argument(  # type: ignore[union-attr]
-        "--skip-preflight", action="store_true",
+        "--skip-preflight",
+        action="store_true",
         help="Skip source-photo confirmation (CI/automation only)",
     )
 

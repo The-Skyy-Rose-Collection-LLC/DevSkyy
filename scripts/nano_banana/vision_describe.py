@@ -270,25 +270,25 @@ Silhouette: {silhouette}
 View: {view_label} — garment {view_dir}
 
 ═══ EXACT COLORS ═══
-{chr(10).join(color_lines) if color_lines else '  All black (#000000)'}
+{chr(10).join(color_lines) if color_lines else "  All black (#000000)"}
 
 ═══ GRAPHICS & BRANDING ({gfx_count} element(s) total) ═══
-{chr(10).join(gfx_lines) if gfx_lines else '  NONE — plain garment, no graphics'}
-{f'{chr(10)}  VERIFIED SPEC: {treatment}' if treatment else ''}
+{chr(10).join(gfx_lines) if gfx_lines else "  NONE — plain garment, no graphics"}
+{f"{chr(10)}  VERIFIED SPEC: {treatment}" if treatment else ""}
 
 ═══ CONSTRUCTION ═══
-{chr(10).join(const_lines) if const_lines else '  Standard construction'}
+{chr(10).join(const_lines) if const_lines else "  Standard construction"}
 
 ═══ PRESENTATION ═══
 - No model, no person, no mannequin
 - Garment floating on invisible form with natural 3D shape and drape
-- {lighting['bg']}
-- {lighting['light']}
+- {lighting["bg"]}
+- {lighting["light"]}
 - Photorealistic fabric — visible weave, thread weight, material sheen
 
 ═══ NEGATIVE CONSTRAINTS (CRITICAL) ═══
-{chr(10).join(f'- {n}' for n in negatives)}
-- Do NOT show the {'back' if view == 'front' else 'front'}
+{chr(10).join(f"- {n}" for n in negatives)}
+- Do NOT show the {"back" if view == "front" else "front"}
 - Do NOT add text, watermarks, or labels not in the spec
 - Do NOT change any colors from the hex values listed above
 - If anything is unclear, LEAVE IT OUT — never guess or invent"""
@@ -318,7 +318,7 @@ def _build_editorial_prompt(desc: dict, product: dict, lighting: dict, treatment
 
     # Enrich with vision data
     vision_enrichment = (
-        f"\n\nVISION-VERIFIED DETAILS:\n" f"- Garment: {garment_label}\n" f"- Fabric: {fabric}\n"
+        f"\n\nVISION-VERIFIED DETAILS:\n- Garment: {garment_label}\n- Fabric: {fabric}\n"
     )
     if unique:
         vision_enrichment += f"- Unique features: {unique}\n"

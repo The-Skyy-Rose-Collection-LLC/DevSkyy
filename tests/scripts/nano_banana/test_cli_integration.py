@@ -35,10 +35,9 @@ class TestDryRun:
     def test_dry_run_exits_zero(self):
         """dry-run exits 0."""
         result = run_cli("dry-run")
-        assert result.returncode == 0, (
-            f"dry-run exited {result.returncode}\n"
-            f"stdout: {result.stdout}\nstderr: {result.stderr}"
-        )
+        assert (
+            result.returncode == 0
+        ), f"dry-run exited {result.returncode}\nstdout: {result.stdout}\nstderr: {result.stderr}"
 
     def test_dry_run_lists_products(self):
         """Output contains 'Products:' and a count."""
