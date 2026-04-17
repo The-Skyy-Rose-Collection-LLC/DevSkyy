@@ -118,6 +118,20 @@ function skyyrose_enqueue_global_styles() {
 		}
 	}
 
+	// Commercial polish — premium presentation layer. Loaded LAST so it can
+	// refine typography rhythm, button/card polish, spacing, and focus states
+	// across every page. Backed by tokens declared in this file.
+	$polish_file = $use_min && file_exists( $base_dir . '/commercial-polish.min.css' )
+		? 'commercial-polish.min.css' : 'commercial-polish.css';
+	if ( file_exists( $base_dir . '/' . $polish_file ) ) {
+		wp_enqueue_style(
+			'skyyrose-commercial-polish',
+			$base_uri . '/' . $polish_file,
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
 	// Header: navbar, search overlay, mobile menu, dropdowns.
 	$header_file = $use_min && file_exists( $base_dir . '/header.min.css' ) ? 'header.min.css' : 'header.css';
 	if ( file_exists( $base_dir . '/' . $header_file ) ) {
@@ -1027,14 +1041,6 @@ function skyyrose_enqueue_phase4_assets(): void {
 	if ( ! function_exists( 'skyyrose_see_is_module_active' ) ) {
 		return;
 	}
-	if ( ! skyyrose_see_is_module_active( 'personalization' ) ) {
-		return;
-	}
-
-	$base_js_dir  = SKYYROSE_DIR . '/assets/js';
-	$base_css_dir = SKYYROSE_DIR . '/assets/css';
-	$js_uri       = SKYYROSE_ASSETS_URI . '/js';
-	$css_uri      = SKYYROSE_ASSETS_URI . '/css';
 
 	$product_slugs = array(
 		'collection-standalone',
@@ -1046,13 +1052,21 @@ function skyyrose_enqueue_phase4_assets(): void {
 		'front-page',
 		'landing',
 		'preorder-gateway',
-		'single',
+		'single-product',
 	);
 
-	$slug = skyyrose_get_current_template_slug();
-	if ( ! in_array( $slug, $product_slugs, true ) && ! is_singular( 'product' ) ) {
+	if ( ! in_array( skyyrose_get_current_template_slug(), $product_slugs, true ) ) {
 		return;
 	}
+
+	if ( ! skyyrose_see_is_module_active( 'personalization' ) ) {
+		return;
+	}
+
+	$base_js_dir  = SKYYROSE_DIR . '/assets/js';
+	$base_css_dir = SKYYROSE_DIR . '/assets/css';
+	$js_uri       = SKYYROSE_ASSETS_URI . '/js';
+	$css_uri      = SKYYROSE_ASSETS_URI . '/css';
 
 	if ( file_exists( $base_css_dir . '/personalization.css' ) ) {
 		wp_enqueue_style(
