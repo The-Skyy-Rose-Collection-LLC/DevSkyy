@@ -204,7 +204,11 @@ generated_3d_models/
 
 # Large files moved to HuggingFace Hub
 # https://huggingface.co/datasets/damBruh/skyyrose-assets
-/assets/
+# Exclude ALL contents of /assets/ by default (images, scenes, renders, etc).
+# Source-of-truth registries (small text YAML/JSON) are re-included below.
+/assets/*
+!/assets/product-masters/
+!/assets/prompts/
 datasets/
 generated_3d_models_color_accurate/
 

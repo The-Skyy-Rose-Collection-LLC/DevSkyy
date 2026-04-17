@@ -17,7 +17,9 @@ npx lint-staged
 if git diff --cached --name-only --diff-filter=ACMR | grep -q '\.py$'; then
   if command -v mypy >/dev/null 2>&1; then
     echo "Running mypy type check..."
-    mypy . --ignore-missing-imports
+    # --exclude '\.claude/' belt-and-suspenders: keeps git worktree duplicates out of
+    # the discovery scan even if mypy.ini exclude filtering runs too late.
+    mypy . --ignore-missing-imports --exclude '\.claude/'
   fi
 fi
 

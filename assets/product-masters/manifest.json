@@ -1,0 +1,655 @@
+{
+  "version": 1,
+  "generated_at": "2026-04-17T05:35:51Z",
+  "generated_from": "catalog.yaml via scripts/sync_manifest_from_catalog.py",
+  "masters": {
+    "br-001": {
+      "sku": "br-001",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "black-rose",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "br-002": {
+      "sku": "br-002",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "black-rose",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "br-003": {
+      "sku": "br-003",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "black-rose",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "BLACK IS BEAUTIFUL",
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "br-004": {
+      "sku": "br-004",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "black-rose",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "br-005": {
+      "sku": "br-005",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "black-rose",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#B76E79",
+          "#D4AF37"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "br-006": {
+      "sku": "br-006",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "black-rose",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#B76E79",
+          "#C0C0C0"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "br-007": {
+      "sku": "br-007",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "black-rose",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "br-008": {
+      "sku": "br-008",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "black-rose",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#B76E79",
+          "#C0C0C0"
+        ]
+      },
+      "text_spec": [
+        "SF",
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "br-009": {
+      "sku": "br-009",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "black-rose",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#B76E79",
+          "#C0C0C0"
+        ]
+      },
+      "text_spec": [
+        "LAST OAKLAND",
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "br-010": {
+      "sku": "br-010",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "black-rose",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#B76E79",
+          "#C0C0C0"
+        ]
+      },
+      "text_spec": [
+        "THE BAY",
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "br-011": {
+      "sku": "br-011",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "black-rose",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#B76E79",
+          "#C0C0C0"
+        ]
+      },
+      "text_spec": [
+        "THE ROSE",
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "lh-002": {
+      "sku": "lh-002",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "love-hurts",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#DC143C",
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "lh-003": {
+      "sku": "lh-003",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "love-hurts",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#DC143C",
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "lh-004": {
+      "sku": "lh-004",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "love-hurts",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#DC143C",
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "lh-006": {
+      "sku": "lh-006",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "love-hurts",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#DC143C",
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "sg-001": {
+      "sku": "sg-001",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "signature",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#D4AF37",
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "BAY BRIDGE",
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "sg-002": {
+      "sku": "sg-002",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "signature",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#D4AF37"
+        ]
+      },
+      "text_spec": [
+        "STAY GOLDEN",
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "sg-003": {
+      "sku": "sg-003",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "signature",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#D4AF37"
+        ]
+      },
+      "text_spec": [
+        "STAY GOLDEN",
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "sg-005": {
+      "sku": "sg-005",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "signature",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#D4AF37",
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "BAY BRIDGE",
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "sg-006": {
+      "sku": "sg-006",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "signature",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#B8E0D2",
+        "accents": [
+          "#C8A8E9",
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "sg-007": {
+      "sku": "sg-007",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "signature",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#D4AF37",
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "sg-009": {
+      "sku": "sg-009",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "signature",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#0A0A0A",
+        "accents": [
+          "#D4AF37",
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "sg-011": {
+      "sku": "sg-011",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "signature",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#FFFFFF",
+        "accents": [
+          "#0A0A0A",
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "ORIGINAL LABEL",
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "sg-012": {
+      "sku": "sg-012",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "signature",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#DA70D6",
+        "accents": [
+          "#0A0A0A",
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "ORIGINAL LABEL",
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "sg-013": {
+      "sku": "sg-013",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "signature",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#B8E0D2",
+        "accents": [
+          "#C8A8E9",
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "sg-014": {
+      "sku": "sg-014",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "signature",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#B8E0D2",
+        "accents": [
+          "#C8A8E9",
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "kids-001": {
+      "sku": "kids-001",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "kids",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#DC143C",
+        "accents": [
+          "#0A0A0A",
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    },
+    "kids-002": {
+      "sku": "kids-002",
+      "master_path": "",
+      "master_hash": null,
+      "master_source": "pending",
+      "status": "pending",
+      "collection": "kids",
+      "alpha_path": null,
+      "alpha_hash": null,
+      "color_spec": {
+        "primary": "#DA70D6",
+        "accents": [
+          "#0A0A0A",
+          "#B76E79"
+        ]
+      },
+      "text_spec": [
+        "SKYY ROSE"
+      ],
+      "photographed_at": null,
+      "locked_at_version": null,
+      "notes": ""
+    }
+  }
+}
