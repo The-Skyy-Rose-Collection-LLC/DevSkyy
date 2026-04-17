@@ -67,7 +67,7 @@ function skyyrose_see_get_visitor_hash(): string {
  * Localize visitor data for personalization.js.
  *
  * Runs at priority 45 so the skyyrose-personalization handle is already
- * registered (enqueued at priority 40 in skyyrose_enqueue_phase4_assets).
+ * registered (enqueued at priority 42 in skyyrose_enqueue_phase4_assets).
  */
 function skyyrose_pg_localize_personalization(): void {
 	if ( ! function_exists( 'skyyrose_see_is_module_active' ) ) {

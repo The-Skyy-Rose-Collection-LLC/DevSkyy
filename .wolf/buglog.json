@@ -704,6 +704,166 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-04-16T20:42:51.359Z"
+    },
+    {
+      "id": "bug-045",
+      "timestamp": "2026-04-17T05:09:21.645Z",
+      "error_message": "Significant refactor of ",
+      "file": "scripts/generate_catalog.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 16→21 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-17T05:09:21.645Z"
+    },
+    {
+      "id": "bug-046",
+      "timestamp": "2026-04-17T05:28:03.561Z",
+      "error_message": "Significant refactor of ",
+      "file": "scripts/generate_catalog.py",
+      "root_cause": "18 lines replaced/restructured",
+      "fix": "Rewrote 21→3 lines (18 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-17T05:28:03.561Z"
+    },
+    {
+      "id": "bug-047",
+      "timestamp": "2026-04-17T13:51:24.943Z",
+      "error_message": "Significant refactor of ",
+      "file": "skyyrose/elite_studio/catalog.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 16→20 lines (2 removed) | Also: # 4. jerseys.sku_to_patch — every mapped SKU must ; jersey_series = series_by_name.get(\"Jersey Series\" | Also: # 4. jerseys.sku_to_patch — every mapped SKU must ; #    (We intentionally do NOT require membership i",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-04-17T13:56:30.514Z"
+    },
+    {
+      "id": "bug-048",
+      "timestamp": "2026-04-17T13:52:01.770Z",
+      "error_message": "Missing error handling in _validate_integrity",
+      "file": "skyyrose/elite_studio/catalog.py",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-17T13:52:01.770Z"
+    },
+    {
+      "id": "bug-049",
+      "timestamp": "2026-04-17T13:55:15.483Z",
+      "error_message": "Significant refactor of ",
+      "file": "scripts/generate_catalog.py",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 8→10 lines (3 removed) | Also: \"Jersey Series\": {; \"Every SkyyRose jersey lives here. Sport-specific ",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-04-17T13:55:45.511Z"
+    },
+    {
+      "id": "bug-050",
+      "timestamp": "2026-04-17T13:58:24.943Z",
+      "error_message": "Wrong reference: legacy should be d99",
+      "file": "skyyrose/elite_studio/tests/test_catalog_validation.py",
+      "root_cause": "Used \"legacy\" instead of \"d99\"",
+      "fix": "Changed legacy → d99",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-17T13:58:24.943Z"
+    },
+    {
+      "id": "bug-051",
+      "timestamp": "2026-04-17T15:17:11.802Z",
+      "error_message": "Significant refactor of ",
+      "file": "skyyrose/elite_studio/catalog.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 4→6 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-17T15:17:11.802Z"
+    },
+    {
+      "id": "bug-052",
+      "timestamp": "2026-04-17T15:17:15.064Z",
+      "error_message": "Significant refactor of ",
+      "file": "skyyrose/elite_studio/prompts/library.py",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 7→9 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-17T15:17:15.064Z"
+    },
+    {
+      "id": "bug-053",
+      "timestamp": "2026-04-17T19:22:39.018Z",
+      "error_message": "Incorrect value in code",
+      "file": "wordpress-theme/skyyrose-flagship/functions.php",
+      "root_cause": "Had '/inc/performance-guardian.php'",
+      "fix": "Changed to '/inc/personalization.php'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "php"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-17T19:22:39.018Z"
+    },
+    {
+      "id": "bug-054",
+      "timestamp": "2026-04-17T19:46:27.296Z",
+      "error_message": "Significant refactor of ",
+      "file": "skyyrose/elite_studio/tests/test_brand_enforcement.py",
+      "root_cause": "11 lines replaced/restructured",
+      "fix": "Rewrote 37→68 lines (11 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-17T19:46:27.296Z"
     }
   ]
 }

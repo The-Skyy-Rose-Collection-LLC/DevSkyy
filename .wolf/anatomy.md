@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-04-16T21:50:07.551Z
-> Files: 659 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-04-17T23:00:43.965Z
+> Files: 683 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../.claude/
 
@@ -17,6 +17,7 @@
 ## ../.claude/plans/
 
 - `eager-doodling-fog.md` — Skyy — 100% Identical 3D Character Pipeline (~1726 tok)
+- `well-we-need-the-mutable-starfish.md` — Plan: Permanently Fix `renders/preflight.py` Dual-Module Error + Harden Against Recurrence (~2007 tok)
 - `whimsical-toasting-cook.md` — Plan: RAGAnything Commercial Integration (~1685 tok)
 
 ## ./
@@ -25,7 +26,7 @@
 - `.dockerignore` — Docker ignore rules (~122 tok)
 - `.eslintrc.cjs` — ESLint configuration (~954 tok)
 - `.gitattributes` — Git attributes (~70 tok)
-- `.gitignore` — Git ignore rules (~1342 tok)
+- `.gitignore` — Git ignore rules (~1518 tok)
 - `.markdownlint.json` (~57 tok)
 - `.mcp.json` (~36 tok)
 - `.npmrc` (~6 tok)
@@ -36,7 +37,7 @@
 - `.vercelignore` — DevSkyy .vercelignore - Production Deployment (~444 tok)
 - `alembic.ini` — Alembic configuration for DevSkyy (~163 tok)
 - `autotrain_config.yaml` (~131 tok)
-- `CLAUDE.md` — OpenWolf (~3700 tok)
+- `CLAUDE.md` — OpenWolf (~5957 tok)
 - `conftest.py` — /*.py", (~500 tok)
 - `deployment_summary.json` (~406 tok)
 - `devskyy_mcp.py` (~1153 tok)
@@ -51,7 +52,7 @@
 - `lint-staged.config.mjs` — Declares relPaths (~346 tok)
 - `main_enterprise.py` — API: GET (4 endpoints) (~3477 tok)
 - `Makefile` — Make build targets (~1530 tok)
-- `mypy.ini` (~383 tok)
+- `mypy.ini` — Declares of (~459 tok)
 - `nginx-app.devskyy.app.conf` — Nginx configuration for app.devskyy.app (self-hosted alternative) (~1497 tok)
 - `nginx.conf` — Nginx configuration (~1630 tok)
 - `package.json` — Node.js package manifest (~2968 tok)
@@ -1637,6 +1638,10 @@
 - `RenderPass.js.cjs` — Mock for three/examples/jsm/postprocessing/RenderPass.js (~80 tok)
 - `UnrealBloomPass.js.cjs` — Mock for three/examples/jsm/postprocessing/UnrealBloomPass.js (~111 tok)
 
+## .husky/
+
+- `pre-commit` — Pre-commit: lint, type-check, syntax, and test gates (~337 tok)
+
 ## __mocks__/
 
 - `three.cjs` — Mock for three.js - used in Jest tests (~2964 tok)
@@ -1657,10 +1662,18 @@
 
 - `rag_anything.py` — API: 4 endpoints (~1987 tok)
 
+## assets/brand/
+
+- `brand.yaml` — /*.{php,py} or frontend/**/*.{ts,tsx,js,jsx} file. (~2555 tok)
+
 ## assets/product-masters/
 
 - `manifest.json` (~17 tok)
 - `README.md` — Project documentation (~771 tok)
+
+## assets/prompts/
+
+- `registry.yaml` — SkyyRose Prompt Library — SINGLE SOURCE OF TRUTH for prompts with production impact (~1402 tok)
 
 ## billing/
 
@@ -1677,9 +1690,16 @@
 
 - `MascotBubble.tsx` — COLLECTION_GREETINGS (~3509 tok)
 
+## renders/
+
+- `__init__.py` — SkyyRose renders pipeline — preflight verification + FASHN tryon orchestration. (~25 tok)
+
 ## scripts/
 
+- `generate_catalog.py` — Generate the SkyyRose product catalog (assets/product-masters/catalog.yaml). (~10996 tok)
 - `split_techflats.py` — Split composite techflat images into individual front/back views. (~2954 tok)
+- `sync_brand_to_php.py` — Sync brand.yaml → wordpress-theme/skyyrose-flagship/inc/brand.generated.php. (~2406 tok)
+- `sync_manifest_from_catalog.py` — Sync manifest.json from catalog.yaml. (~1216 tok)
 
 ## sdk/python/agent_sdk/
 
@@ -1700,9 +1720,13 @@
 
 ## skyyrose/elite_studio/
 
+- `brand.py` — Brand — Single source of truth loader for SkyyRose brand identity. (~1564 tok)
+- `catalog.py` — Catalog — Single source of truth loader for SkyyRose product data. (~4704 tok)
 - `fidelity.py` — class: to_dict, check_color, check_text, check_clip_similarity + 1 more (~3058 tok)
 - `master_registry.py` — MasterEntry: masters_dir, manifest_path, sha256_of_file, resolved_master_path + 8 more (~2066 tok)
+- `prompts.py` — Prompt Library — source of truth for prompts with production impact. (~3416 tok)
 - `telemetry.py` — name: new_run_id, hash_inputs, emit, set + 1 more (~1277 tok)
+- `validation.py` — Shared validation utilities for registry files. (~1381 tok)
 
 ## skyyrose/elite_studio/agents/
 
@@ -1718,6 +1742,11 @@
 - `nodes.py` — vision_node, generator_node, quality_node, human_review_node (~4968 tok)
 - `state.py` — EliteStudioState: create_initial_state, extract_production_result (~1019 tok)
 
+## skyyrose/elite_studio/prompts/
+
+- `__init__.py` (~361 tok)
+- `library.py` — Prompt Library — source of truth for prompts with production impact. (~3466 tok)
+
 ## skyyrose/elite_studio/queue/
 
 - `consumer.py` — EliteStudioWorker: process_job, run_forever (~3208 tok)
@@ -1725,9 +1754,15 @@
 
 ## skyyrose/elite_studio/tests/
 
+- `test_brand_enforcement.py` — Brand enforcement — retired taglines must never appear in generated content. (~1319 tok)
+- `test_brand.py` — Tests for skyyrose.elite_studio.brand (BrandConfig SoT loader). (~1063 tok)
+- `test_catalog_validation.py` — Tests for Catalog hardening (structural + referential integrity). (~2663 tok)
+- `test_catalog.py` — Tests for skyyrose.elite_studio.catalog (Wave 1.5 SoT loader). (~2373 tok)
 - `test_fidelity.py` — Tests for skyyrose.elite_studio.fidelity (Wave 1 fidelity gate). (~1869 tok)
 - `test_master_registry.py` — Tests for skyyrose.elite_studio.master_registry (Wave 1 reference-first pipeline). (~1557 tok)
+- `test_prompts.py` — Tests for skyyrose.elite_studio.prompts (PromptLibrary SoT + hardening). (~2522 tok)
 - `test_telemetry.py` — Tests for skyyrose.elite_studio.telemetry (Phase 1 compositor instrumentation). (~1239 tok)
+- `test_validation.py` — Tests for skyyrose.elite_studio.validation shared validators. (~1507 tok)
 
 ## skyyrose/multi_agent/
 
@@ -1735,6 +1770,7 @@
 
 ## tasks/
 
+- `pr-453-action-report.md` — PR #453 Action Report (~1668 tok)
 - `todo.md` — Current Tasks (~1455 tok)
 
 ## tests/
@@ -1748,15 +1784,20 @@
 
 - `test_hybrid_integration.py` — print_test, print_success, print_error, print_warning (~3579 tok)
 
+## tests/wordpress/
+
+- `test_collection_page_manager.py` — Tests for wordpress.collection_page_manager — verifies SSoT migration. (~966 tok)
+
 ## wordpress-theme/skyyrose-flagship/
 
 - `footer.php` — The template for displaying the footer (~3003 tok)
 - `front-page.php` — Front Page — SkyyRose v7.0 "Concrete" Commercial Theme (~5164 tok)
-- `functions.php` — SkyyRose Flagship Theme Functions (~991 tok)
+- `functions.php` — SkyyRose Theme Functions (~1243 tok)
 
 ## wordpress-theme/skyyrose-flagship/assets/css/
 
 - `brand-atmosphere.css` — Brand Atmosphere — Canvas Overlay Styles (~369 tok)
+- `commercial-polish.css` — SkyyRose Commercial Polish — premium presentation layer. (~3217 tok)
 - `personalization.css` — Personalization — Curated For You Grid (~1188 tok)
 - `skyy-walk.css` — Skyy — Pixar-Like Walk Cycle Enhancements (~1816 tok)
 - `smart-showcase.css` — Smart Showcase — Quick-View Dialog Styles (~2218 tok)
@@ -1774,7 +1815,7 @@
 ## wordpress-theme/skyyrose-flagship/inc/
 
 - `admin-experience-dashboard.php` — Experience Engine — WordPress Admin Dashboard (~4676 tok)
-- `enqueue.php` — Enqueue Scripts & Styles (~9351 tok)
+- `enqueue.php` — Enqueue Scripts & Styles (~9710 tok)
 - `performance-guardian.php` — Performance Guardian — Phase 2 (~848 tok)
 - `personalization.php` — Personalization — Curated For You (~834 tok)
 - `woocommerce.php` — WooCommerce Integration (~3982 tok)
@@ -1783,3 +1824,7 @@
 
 - `product-card-holo.php` — Template Part: Holo Product Card (~3569 tok)
 - `skyy-mascot.php` — Skyy — Living Character Widget (~1207 tok)
+
+## wordpress/
+
+- `collection_page_manager.py` — CollectionType: to_dict, get_template, get_all_templates, to_agent_reference (~1439 tok)
