@@ -318,7 +318,7 @@ const results = await wp.search('black rose', {
 // Update settings
 await wp.updateSettings({
   title: 'SkyyRose Luxury Fashion',
-  description: 'Where Love Meets Luxury',
+  description: 'Luxury Grows from Concrete.',
   posts_per_page: 12
 })
 ```

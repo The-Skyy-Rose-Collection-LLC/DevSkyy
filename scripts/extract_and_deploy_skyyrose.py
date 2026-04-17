@@ -178,7 +178,7 @@ class SkyyRoseDeploymentOrchestrator:
             # Deploy homepage
             logger.info("  Deploying homepage...")
             await self.wp_manager.create_page(
-                title="SkyyRose - Where Love Meets Luxury",
+                title="SkyyRose - Luxury Grows from Concrete.",
                 slug="home",
                 template_json=templates["home"].to_json(),
             )

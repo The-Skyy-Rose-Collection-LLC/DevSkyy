@@ -303,7 +303,7 @@ class SEOValidator:
             Page title
         """
         titles = {
-            "home": "SkyyRose - Where Love Meets Luxury",
+            "home": "SkyyRose - Luxury Grows from Concrete.",
             "shop": "Shop SkyyRose Collections | Luxury Streetwear",
             "collection_signature": "SIGNATURE Collection | Premium Oakland Essentials",
             "collection_black_rose": "BLACK ROSE Collection | Dark Elegance Luxury",

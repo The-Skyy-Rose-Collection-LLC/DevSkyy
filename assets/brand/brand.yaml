@@ -1,0 +1,230 @@
+# SkyyRose Brand — SINGLE SOURCE OF TRUTH
+#
+# THIS is the primary source for brand identity across WordPress + frontend.
+# Any agent, generator, or human editing brand-facing content reads from here.
+# Hardcoded brand values elsewhere are LEGACY and should be migrated.
+#
+# Tools that should read from this file:
+#   - WordPress theme (via generated inc/brand.generated.php — see scripts/)
+#   - Frontend dashboard (via generated src/config/brand.generated.ts)
+#   - Python pipelines (via skyyrose.elite_studio.brand.BrandConfig.load())
+#   - Copywriter skills (.claude/skills/skyyrose-*)
+#   - SEO / meta tag generators
+#   - Email / paid social creative (Klaviyo, Meta)
+#
+# Editing rules:
+#   - Never change `tagline.active` without updating `tagline.retired` to preserve
+#     the former. Retired taglines MUST NEVER reappear in generated content.
+#   - Hex colors are 6-digit `#RRGGBB`. No 3-digit shorthand.
+#   - Adding new collections: create a new entry under `collections:` matching
+#     the SKU prefix used in assets/product-masters/catalog.yaml collections.
+#   - After editing, run `scripts/sync_brand.py` to regenerate PHP + TS artifacts.
+
+version: 1
+generated_at: "2026-04-17T00:00:00Z"
+
+
+# ── Tagline ──────────────────────────────────────────────────────────────────
+
+tagline:
+  # THE tagline. Every surface says this.
+  active: "Luxury Grows from Concrete."
+
+  # Historical taglines. Enforcement: a CI test asserts none of these appear
+  # in any wordpress/**/*.{php,py} or frontend/**/*.{ts,tsx,js,jsx} file.
+  retired:
+    - phrase: "Where Love Meets Luxury"
+      retired_at: "2026-03"
+      reason: |
+        Original marketing tagline. Replaced with "Luxury Grows from Concrete."
+        to align with the brand's Oakland/concrete-luxury positioning. Must
+        never reappear in generated content.
+
+
+# ── Brand identity ──────────────────────────────────────────────────────────
+
+identity:
+  name: "SkyyRose"
+  legal_name: "The Skyy Rose Collection LLC"
+  founder: "Corey Foster"
+  origin: "Oakland, CA"
+  mission: |
+    Luxury streetwear born from concrete. SkyyRose brings Oakland's grit
+    into premium fashion — gothic romance, passionate emotion, and Bay Area
+    essentials woven into every piece.
+
+
+# ── Color palette ───────────────────────────────────────────────────────────
+# Per-collection palettes. Each SKU in catalog.yaml can inherit or override.
+
+colors:
+  primary:
+    dark: "#0A0A0A"              # Base background across all surfaces
+    rose_gold: "#B76E79"         # Global accent + Kids Capsule accent
+    gold: "#D4AF37"              # Signature collection accent
+    crimson: "#DC143C"           # Love Hurts accent
+    silver: "#C0C0C0"            # Black Rose accent
+
+  neutrals:
+    paper: "#F5F5F5"
+    ink: "#1A1A1A"
+    ash: "#8A8A8A"
+
+  semantic:
+    success: "#10B981"
+    warning: "#F59E0B"
+    error: "#EF4444"
+    info: "#3B82F6"
+
+
+# ── Per-collection brand identity ───────────────────────────────────────────
+
+collections:
+  black-rose:
+    display_name: "BLACK ROSE"
+    tagline: "Luxury Grows from Concrete."
+    theme: "gothic romance meets Oakland street luxury"
+    mood: "dark, powerful, mysterious, luxurious"
+    inspiration: "Gothic romance, Bay Area night life, street art"
+    hero_scene: "Bay Bridge at night, street luxury"
+    target_audience: "Oakland / Bay Area streetwear enthusiasts, gothic luxury"
+    palette:
+      primary: "#0A0A0A"
+      secondary: "#1A0A0A"
+      accent: "#B76E79"
+      highlight: "#C0C0C0"
+      text: "#F5F5F5"
+
+  love-hurts:
+    display_name: "LOVE HURTS"
+    tagline: "Wear your heart outside."
+    theme: "Beauty and the Beast, enchanted rose, passionate emotion"
+    mood: "passionate, emotional, bold, raw"
+    inspiration: "Beauty and the Beast, enchanted rose, Oakland resilience"
+    hero_scene: "Enchanted rose dome, gothic cathedral atmosphere"
+    target_audience: "Oakland streetwear, passionate fashion lovers"
+    palette:
+      primary: "#1A0A0A"
+      secondary: "#DC143C"
+      accent: "#B76E79"
+      highlight: "#8B0000"
+      text: "#F5F5F5"
+
+  signature:
+    display_name: "SIGNATURE"
+    tagline: "Rose gold runway."
+    theme: "Bay Area / Golden Gate / fashion runway"
+    mood: "elegant, golden, refined, iconic"
+    inspiration: "San Francisco Golden Gate, golden hour, Bay Area fashion"
+    hero_scene: "Golden Gate Bridge at golden hour, fashion runway through fog"
+    target_audience: "fashion-forward, San Francisco premium shoppers"
+    palette:
+      primary: "#1A1205"
+      secondary: "#D4AF37"
+      accent: "#B76E79"
+      highlight: "#F5DEB3"
+      text: "#F5F5F5"
+
+  kids:
+    display_name: "KIDS CAPSULE"
+    tagline: "Playful luxury, junior fits."
+    theme: "playful luxury for junior SkyyRose fans"
+    mood: "playful, bright, premium"
+    inspiration: "SkyyRose junior collection, coordinated sets"
+    hero_scene: "bright playroom / outdoor play scene"
+    target_audience: "parents buying premium junior streetwear"
+    palette:
+      primary: "#0A0A0A"
+      secondary: "#B76E79"
+      accent: "#D4AF37"
+      highlight: "#F5F5F5"
+      text: "#1A1A1A"
+
+
+# ── Typography ──────────────────────────────────────────────────────────────
+
+typography:
+  # Canonical font stacks. Each surface (WP theme, frontend) imports these.
+  families:
+    display:
+      name: "Cinzel"
+      usage: "BLACK ROSE headings, dramatic calls-out"
+      weights: [400, 600, 700]
+      source: "self-hosted woff2"
+    serif_elegant:
+      name: "Playfair Display"
+      usage: "SIGNATURE / LOVE HURTS / KIDS headings"
+      weights: [400, 600, 700, 900]
+    serif_body:
+      name: "Cormorant Garamond"
+      usage: "long-form body copy, editorial text"
+      weights: [300, 400, 500, 600]
+    condensed:
+      name: "Bebas Neue"
+      usage: "UI labels, button text"
+      weights: [400]
+    system:
+      name: "Inter"
+      usage: "system UI, dashboards, forms"
+      weights: [400, 500, 600, 700]
+
+
+# ── Logos + brand assets ────────────────────────────────────────────────────
+
+logos:
+  primary:
+    path: "wordpress-theme/skyyrose-flagship/assets/images/skyyrose-logo.png"
+    alt: "SkyyRose Collection"
+  wordmark:
+    path: "wordpress-theme/skyyrose-flagship/assets/images/skyyrose-wordmark.png"
+  favicon:
+    path: "wordpress-theme/skyyrose-flagship/assets/images/favicon.ico"
+  mascot:
+    path: "wordpress-theme/skyyrose-flagship/assets/images/mascot/skyyrose-mascot-reference.png"
+    description: |
+      Full-body walk-on character (NOT a chatbot widget). Pixar-quality
+      Black girl avatar. Hidden as easter egg in each immersive collection
+      world; finding all 3 unlocks the intro.
+
+
+# ── Social handles ──────────────────────────────────────────────────────────
+
+social:
+  instagram: "@skyyroseco"
+  twitter: "@skyyroseco"
+  tiktok: "@skyyroseco"
+  youtube: "@skyyroseco"
+  email: "skyyroseco@gmail.com"
+
+
+# ── Domain / URL routing ────────────────────────────────────────────────────
+
+urls:
+  flagship: "https://skyyrose.co"               # customer-facing WordPress store
+  dashboard: "https://devskyy.app"              # internal Vercel agent dashboard
+  # CRITICAL: do not mix these up. flagship = customer. dashboard = internal.
+
+
+# ── Migration / enforcement ─────────────────────────────────────────────────
+
+migration:
+  # Files known to hardcode values that should come from this file.
+  # CI/tests should assert these get migrated.
+  pending_retired_tagline_removals:
+    - wordpress/page_builders/luxury_home_builder.py
+    - wordpress/page_builders/home_builder.py
+    - wordpress/page_builders/about_builder.py
+    - wordpress/elementor.py
+    - wordpress/production_config.py
+    - wordpress/collection_page_manager.py  # uses "Luxury Grows..." — keep, just migrate the source
+    - skyyrose/multi_agent/tools.py          # uses "Luxury Grows..." — keep, just migrate the source
+
+  pending_hardcoded_collection_metadata:
+    - wordpress/collection_page_manager.py  # full collection dicts — migrate to inherit from brand.yaml + catalog.yaml
+
+  enforcement_tests:
+    - path: skyyrose/elite_studio/tests/test_brand_enforcement.py
+      asserts:
+        - No retired-tagline phrase appears in wordpress/**/*.{py,php}
+        - No retired-tagline phrase appears in frontend/**/*.{ts,tsx,js,jsx}
+        - Every collection slug in catalog.yaml has a matching entry in brand.yaml.collections

@@ -209,6 +209,7 @@ generated_3d_models/
 /assets/*
 !/assets/product-masters/
 !/assets/prompts/
+!/assets/brand/
 datasets/
 generated_3d_models_color_accurate/
 
