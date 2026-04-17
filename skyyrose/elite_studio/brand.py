@@ -51,6 +51,7 @@ class CollectionBrand:
     slug: str
     display_name: str
     tagline: str
+    description: str
     theme: str
     mood: str
     inspiration: str
@@ -117,6 +118,7 @@ class BrandConfig:
                 slug=slug,
                 display_name=str(meta.get("display_name") or ""),
                 tagline=str(meta.get("tagline") or ""),
+                description=str(meta.get("description") or ""),
                 theme=str(meta.get("theme") or ""),
                 mood=str(meta.get("mood") or ""),
                 inspiration=str(meta.get("inspiration") or ""),

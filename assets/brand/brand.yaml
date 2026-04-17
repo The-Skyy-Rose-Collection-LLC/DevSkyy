@@ -83,6 +83,7 @@ collections:
   black-rose:
     display_name: "BLACK ROSE"
     tagline: "Luxury Grows from Concrete."
+    description: "Gothic luxury — Oakland grit meets dark elegance. The brand's flagship collection: where streetwear toughness meets premium craftsmanship."
     theme: "gothic romance meets Oakland street luxury"
     mood: "dark, powerful, mysterious, luxurious"
     inspiration: "Gothic romance, Bay Area night life, street art"
@@ -98,6 +99,7 @@ collections:
   love-hurts:
     display_name: "LOVE HURTS"
     tagline: "Wear your heart outside."
+    description: "Feel the fire. Love Hurts channels raw emotion and Bay Area passion into pieces that wear your heart on your sleeve — literally."
     theme: "Beauty and the Beast, enchanted rose, passionate emotion"
     mood: "passionate, emotional, bold, raw"
     inspiration: "Beauty and the Beast, enchanted rose, Oakland resilience"
@@ -113,6 +115,7 @@ collections:
   signature:
     display_name: "SIGNATURE"
     tagline: "Rose gold runway."
+    description: "The crown jewel. Timeless essentials in rose gold, inspired by San Francisco's Golden Gate and the city's fashion-forward spirit."
     theme: "Bay Area / Golden Gate / fashion runway"
     mood: "elegant, golden, refined, iconic"
     inspiration: "San Francisco Golden Gate, golden hour, Bay Area fashion"
@@ -128,6 +131,7 @@ collections:
   kids:
     display_name: "KIDS CAPSULE"
     tagline: "Playful luxury, junior fits."
+    description: "Junior SkyyRose. Coordinated sets with the same craftsmanship as adult collections, sized and styled for kids."
     theme: "playful luxury for junior SkyyRose fans"
     mood: "playful, bright, premium"
     inspiration: "SkyyRose junior collection, coordinated sets"
