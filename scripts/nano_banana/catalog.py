@@ -1,6 +1,11 @@
-"""Product catalog loader — reads from data/product-catalog.csv.
+"""Product catalog loader — reads from the canonical skyyrose-catalog.csv.
 
 Single source of truth for all product metadata. No hardcoded catalogs.
+The canonical file lives inside the WordPress theme:
+  wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv
+
+Every consumer (Nano Banana, Compositor, sync scripts, WP theme) reads
+through this file. Do not introduce a second catalog.
 """
 
 from __future__ import annotations
@@ -17,12 +22,19 @@ PRODUCTS_DIR = (
     PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
 )
 SOURCE_DIR = PROJECT_ROOT / "skyyrose" / "assets" / "images" / "source-products"
-CATALOG_CSV = PROJECT_ROOT / "data" / "product-catalog.csv"
+CATALOG_CSV = (
+    PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "skyyrose-catalog.csv"
+)
 SPECS_JSON = PROJECT_ROOT / "data" / "product-specs.json"
 
 
 def load_catalog() -> dict[str, dict]:
-    """Load product catalog from CSV. Returns dict keyed by SKU."""
+    """Load product catalog from the canonical CSV. Returns dict keyed by SKU.
+
+    The canonical schema (21 columns) includes render-pipeline hints:
+    render_output_slug, render_source_override, render_back_source_override,
+    render_is_tech_flat, render_is_accessory, branding_spec.
+    """
     catalog: dict[str, dict] = {}
     with CATALOG_CSV.open(newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
@@ -31,18 +43,18 @@ def load_catalog() -> dict[str, dict]:
                 continue
             entry: dict = {
                 "name": row["name"].strip(),
-                "collection": row["collection_slug"].strip(),
-                "is_preorder": row["is_preorder"].strip() == "1",
-                "output_slug": row["render_output_slug"].strip() or sku,
-                "is_tech_flat": row["render_is_tech_flat"].strip() == "1",
-                "is_accessory": row["render_is_accessory"].strip() == "1",
+                # Canonical uses 'collection' as the slug (black-rose, love-hurts, etc.)
+                "collection": row["collection"].strip(),
+                "is_preorder": row.get("is_preorder", "").strip() == "1",
+                "output_slug": row.get("render_output_slug", "").strip() or sku,
+                "is_tech_flat": row.get("render_is_tech_flat", "").strip() == "1",
+                "is_accessory": row.get("render_is_accessory", "").strip() == "1",
+                "branding_spec": row.get("branding_spec", "").strip(),
             }
-            if row["render_source_override"].strip():
+            if row.get("render_source_override", "").strip():
                 entry["source_override"] = row["render_source_override"].strip()
-            if row["render_back_source_override"].strip():
+            if row.get("render_back_source_override", "").strip():
                 entry["back_source_override"] = row["render_back_source_override"].strip()
-            if row["render_variant_of"].strip():
-                entry["variant_of"] = row["render_variant_of"].strip()
             catalog[sku] = entry
     return catalog
 
