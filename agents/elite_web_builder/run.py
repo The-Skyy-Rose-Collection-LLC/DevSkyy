@@ -283,22 +283,24 @@ nonce verification on forms, esc_html/esc_attr on all output
 - Logo placement map: header=SR Monogram, footer=SR Monogram + text, favicon=SR Monogram, \
 collection hero=collection-specific logo centered above heading, product cards=NO logo
 
-## Products (27 total, 4 collections)
-### BLACK ROSE (8): br-001 BLACK Rose Crewneck, br-002 BLACK Rose Joggers, \
-br-003 BLACK is Beautiful Jersey, br-004 BLACK Rose Hoodie, \
-br-005 BLACK Rose Hoodie — Signature Edition, br-006 BLACK Rose Sherpa Jacket, \
-br-007 BLACK Rose × Love Hurts Basketball Shorts, br-008 Women's BLACK Rose Hooded Dress
-### LOVE HURTS (4): lh-002 Love Hurts Joggers, \
-lh-003 Love Hurts Basketball Shorts, lh-004 Love Hurts Varsity Jacket, \
-lh-006 The Fannie
-### SIGNATURE (14): sg-001 The Bay Set, sg-002 Stay Golden Set, \
-sg-003 The Signature Tee, sg-004 The Signature Tee — White, sg-005 Stay Golden Tee, \
-sg-006 Mint & Lavender Hoodie, sg-007 The Signature Beanie, \
-sg-009 The Sherpa Jacket, sg-010 The Bridge Series Shorts, \
-sg-011 The Signature Beanie — Grey, sg-012 The Signature Beanie — Orange, \
-sg-013 Mint & Lavender Crewneck Set, sg-014 Pastel Chevron Tracksuit Set
-### KIDS CAPSULE (2): kids-001 Kids Colorblock Hoodie Set — Purple/Pink, \
-kids-002 Kids Colorblock Hoodie Set — Black/Red/White
+## Products (30 total, 4 collections) — canonical: wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv
+### BLACK ROSE (12): br-001 Crewneck, br-002 Joggers, \
+br-003 Jersey Series: 0. Baseball Classic, br-004 Hoodie, \
+br-005 Hoodie — Signature Edition, br-006 Sherpa Jacket, \
+br-007 BR × LH Basketball Shorts, br-008 Jersey Series: 1. SF Inspired (Football), \
+br-009 Jersey Series: 2. Last Oakland (Football), br-010 Jersey Series: 3. The Bay (Basketball), \
+br-011 Jersey Series: 4. The Rose (Hockey), br-012 Jersey Series: 5. Last Oakland (Baseball)
+### LOVE HURTS (4): lh-002 Love Hurts Joggers, lh-003 Love Hurts Basketball Shorts, \
+lh-004 Love Hurts Bomber Jacket, lh-005 The Fannie
+### SIGNATURE (12): sg-001 Bridge Series 'The Bay Bridge' Shorts, \
+sg-002 Bridge Series 'Stay Golden' Shirt, sg-003 Bridge Series 'Stay Golden' Shorts, \
+sg-005 Bridge Series 'The Bay Bridge' Shirt, sg-006 Mint & Lavender Hoodie, \
+sg-007 The Signature Beanie, sg-009 The Sherpa Jacket, \
+sg-011 Original Label Tee (White), sg-012 Original Label Tee (Orchid), \
+sg-013 Mint & Lavender Crewneck, sg-014 Mint & Lavender Sweatpants, \
+sg-015 The Windbreaker Set
+### KIDS CAPSULE (2): kids-001 Kids Colorblock Hoodie Set — Red/Black, \
+kids-002 Kids Colorblock Hoodie Set — Purple/Black
 """
 
 
