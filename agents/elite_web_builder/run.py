@@ -29,16 +29,16 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent
 PROJECT_ROOT = ROOT.parent.parent  # DevSkyy/
 
-# Load env files — order matters! Load least-authoritative first,
-# most-authoritative last with override=True so real keys win.
-# skyyrose/.env has truncated ANTHROPIC_API_KEY (16 chars — placeholder).
-# DevSkyy/.env has the full 108-char key. gemini/.env has live GEMINI_API_KEY.
+# Load env — the dedicated elite-web-builder key file is the PRIMARY source.
+# Rotate keys in one place: DevSkyy/.env.elite-web-builder (gitignored, 600 perms).
+# DevSkyy/.env and .env.hf are loaded as fallbacks so callers that export
+# keys to the shell still work.
 try:
     from dotenv import load_dotenv
 
-    load_dotenv(PROJECT_ROOT / "skyyrose" / ".env")  # Base (may have stale keys)
-    load_dotenv(PROJECT_ROOT / ".env", override=True)  # Root overrides (full Anthropic key)
-    load_dotenv(PROJECT_ROOT / "gemini" / ".env", override=True)  # Live Gemini key
+    load_dotenv(PROJECT_ROOT / ".env.elite-web-builder")  # Primary (dedicated team file)
+    load_dotenv(PROJECT_ROOT / ".env", override=False)  # Fallback
+    load_dotenv(PROJECT_ROOT / ".env.hf", override=False)  # Fallback (OPENAI_API_KEY here)
 except ImportError:
     pass  # dotenv not required if env vars already set
 
@@ -56,7 +56,11 @@ if _missing_keys:
     print("\n  Elite Web Builder — missing API keys:\n")
     for line in _missing_keys:
         print(line)
-    print("\n  Set them in skyyrose/.env or gemini/.env\n")
+    print(
+        "\n  Populate DevSkyy/.env.elite-web-builder (primary) or export the "
+        "variables in your shell. The file is gitignored — each dev keeps "
+        "their own copy.\n"
+    )
     sys.exit(1)
 
 # ---------------------------------------------------------------------------
@@ -156,7 +160,7 @@ design reference. Every PHP template must faithfully reproduce these designs.
 (3 cards 600px tall) + featured products (4-card grid) + brand story (2-col) + newsletter
 2. template-collection-black-rose.php — Floating roses animation, 8 products (br-001..008), \
 gothic garden mood, metallic silver accent
-3. template-collection-love-hurts.php — 15 floating hearts, 5 products (lh-001..005), \
+3. template-collection-love-hurts.php — 15 floating hearts, 4 products (lh-002/003/004/005), \
 passionate drama mood, crimson accent, pulsing collection badge
 4. template-collection-signature.php — Art deco overlay, 14 products (sg-001..014), \
 elevated luxury mood, rose gold accent, pulsing gold ring (600px)
@@ -289,7 +293,7 @@ lh-003 Love Hurts Basketball Shorts, lh-004 Love Hurts Varsity Jacket, \
 lh-006 The Fannie
 ### SIGNATURE (14): sg-001 The Bay Set, sg-002 Stay Golden Set, \
 sg-003 The Signature Tee, sg-004 The Signature Tee — White, sg-005 Stay Golden Tee, \
-sg-006 Mint & Lavender Hoodie, sg-007 The Signature Beanie, sg-008 The Signature Beanie, \
+sg-006 Mint & Lavender Hoodie, sg-007 The Signature Beanie, \
 sg-009 The Sherpa Jacket, sg-010 The Bridge Series Shorts, \
 sg-011 The Signature Beanie — Grey, sg-012 The Signature Beanie — Orange, \
 sg-013 Mint & Lavender Crewneck Set, sg-014 Pastel Chevron Tracksuit Set

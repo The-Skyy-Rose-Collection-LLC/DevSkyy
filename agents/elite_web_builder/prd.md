@@ -52,10 +52,10 @@ This theme must be structured as a PROFESSIONAL commercial-grade WordPress theme
 Static HTML designs in wp-playground/SKyyRose Flagship/Flagship static/ are the CANONICAL design reference. Every PHP template must faithfully reproduce these designs.
 
 1. front-page.php — Hero (100vh, floating orbs, gradient headline) + collections showcase (3 cards 600px tall) + featured products (4-card grid) + brand story (2-col) + newsletter
-2. template-collection-black-rose.php — Floating roses animation, 8 products (br-001..008), gothic garden mood, metallic silver accent
-3. template-collection-love-hurts.php — 15 floating hearts, 5 products (lh-001..005), passionate drama mood, crimson accent, pulsing collection badge
-4. template-collection-signature.php — Art deco overlay, 14 products (sg-001..014), elevated luxury mood, rose gold accent, pulsing gold ring (600px)
-5. template-collection-kids-capsule.php — Pink/lavender theme, 2 products (kids-001..002), playful rounded cards, joyful voice (NEW — no static reference, derive from other collections)
+2. template-collection-black-rose.php — Floating roses animation, 12 products (br-001..012, full Jersey Series 0–5), gothic garden mood, metallic silver accent
+3. template-collection-love-hurts.php — 15 floating hearts, 4 products (lh-002, lh-003, lh-004, lh-005), passionate drama mood, crimson accent, pulsing collection badge
+4. template-collection-signature.php — Art deco overlay, 12 products (sg-001/002/003/005/006/007/009/011/012/013/014/015), elevated luxury mood, rose gold accent, pulsing gold ring (600px)
+5. template-collection-kids-capsule.php — Pink/lavender theme, 2 products (kids-001, kids-002), playful rounded cards, joyful voice (NEW — no static reference, derive from other collections)
 6. woocommerce/single-product.php — Sticky gallery (main + 4 thumbs) + product info panel + color/size selectors + quantity + accordions (Details, Sizing, Shipping) + related 4-grid
 7. template-about.php — Hero + story sections (alternating grid) + timeline (2019-2024) + values (4 cards) + founder section
 8. template-contact.php — Contact info + form (name, email, subject, message) + FAQ accordion (5)
@@ -153,8 +153,21 @@ ALL product images are AI-generated fashion model photos showing real models wea
 - Dual format: PNG (transparency) + WebP (performance)
 - Logo placement map: header=SR Monogram, footer=SR Monogram + text, favicon=SR Monogram, collection hero=collection-specific logo centered above heading, product cards=NO logo
 
-## Products (28 total, 4 collections)
-### BLACK ROSE (8): br-001 BLACK Rose Crewneck, br-002 BLACK Rose Joggers, br-003 BLACK is Beautiful Jersey, br-004 BLACK Rose Hoodie, br-005 BLACK Rose Hoodie — Signature Edition, br-006 BLACK Rose Sherpa Jacket, br-007 BLACK Rose × Love Hurts Basketball Shorts, br-008 Women's BLACK Rose Hooded Dress
-### LOVE HURTS (5): lh-001 The Fannie, lh-002 Love Hurts Joggers, lh-003 Love Hurts Basketball Shorts, lh-004 Love Hurts Varsity Jacket, lh-005 Love Hurts Bomber Jacket
-### SIGNATURE (14): sg-001 The Bay Set, sg-002 Stay Golden Set, sg-003 The Signature Tee, sg-004 The Signature Tee — White, sg-005 Stay Golden Tee, sg-006 Mint & Lavender Hoodie, sg-007 The Signature Beanie, sg-008 The Signature Beanie, sg-009 The Sherpa Jacket, sg-010 The Bridge Series Shorts, sg-011 The Signature Beanie — Grey, sg-012 The Signature Beanie — Orange, sg-013 Mint & Lavender Crewneck Set, sg-014 Pastel Chevron Tracksuit Set
-### KIDS CAPSULE (2): kids-001 Kids Colorblock Hoodie Set — Purple/Pink, kids-002 Kids Colorblock Hoodie Set — Black/Red/White
+## Products (30 total, 4 collections)
+
+**Authoritative source:** `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv` — read through the PHP loader (`skyyrose_get_product_catalog()`) or the Python loader (`scripts.nano_banana.catalog.load_catalog()`). Full SKU table with branding specs, prices, pre-order flags, and image paths lives in `knowledge/canonical_catalog.md`.
+
+### BLACK ROSE (12)
+br-001 BLACK Rose Crewneck · br-002 BLACK Rose Joggers · br-003 BLACK is Beautiful Jersey Series: 0. Baseball Classic · br-004 BLACK Rose Hoodie · br-005 BLACK Rose Hoodie — Signature Edition · br-006 BLACK Rose Sherpa Jacket · br-007 BLACK Rose × Love Hurts Basketball Shorts · br-008 Jersey Series: 1. SF Inspired (Football) · br-009 Jersey Series: 2. Last Oakland (Football) · br-010 Jersey Series: 3. The Bay (Basketball) · br-011 Jersey Series: 4. The Rose (Hockey) · br-012 Jersey Series: 5. Last Oakland (Baseball)
+
+### LOVE HURTS (4)
+lh-002 Love Hurts Joggers · lh-003 Love Hurts Basketball Shorts · lh-004 Love Hurts Bomber Jacket · lh-005 The Fannie
+
+### SIGNATURE (12)
+sg-001 Bridge Series 'The Bay Bridge' Shorts · sg-002 Bridge Series 'Stay Golden' Shirt · sg-003 Bridge Series 'Stay Golden' Shorts · sg-005 Bridge Series 'The Bay Bridge' Shirt · sg-006 Mint & Lavender Hoodie · sg-007 The Signature Beanie · sg-009 The Sherpa Jacket · sg-011 Original Label Tee (White) · sg-012 Original Label Tee (Orchid) · sg-013 Mint & Lavender Crewneck · sg-014 Mint & Lavender Sweatpants · sg-015 The Windbreaker Set
+
+### KIDS CAPSULE (2)
+kids-001 Kids Colorblock Hoodie Set — Red/Black · kids-002 Kids Colorblock Hoodie Set — Purple/Black
+
+### Retired SKU codes (DO NOT resurrect)
+`lh-001` (renumbered to lh-005), legacy `lh-005 Love Hurts Windbreaker` (erased), `sg-004 Signature Hoodie`, `sg-008`, `sg-010`, `br-d01..d04`, `sg-d01..d04`.
