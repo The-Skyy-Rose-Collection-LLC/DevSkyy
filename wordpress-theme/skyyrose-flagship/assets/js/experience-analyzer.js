@@ -45,12 +45,16 @@
   }
 
   function push(type, data) {
+    // Field names MUST match the REST handler contract in
+    // inc/experience-analyzer.php: skyyrose_see_store_events() reads
+    // type, ts, target, pageType, collection, value. Anything else is
+    // silently dropped server-side.
     queue.push({
-      event_type: type,
-      product_id: data.product_id,
-      sku: data.sku,
-      collection: data.collection,
-      page: window.location.pathname,
+      type: type,
+      target: data.sku || data.product_id || '',
+      pageType: window.location.pathname,
+      collection: data.collection || '',
+      value: 0,
       ts: Date.now(),
     });
   }

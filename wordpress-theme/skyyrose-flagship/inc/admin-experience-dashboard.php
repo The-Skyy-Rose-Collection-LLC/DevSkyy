@@ -315,7 +315,9 @@ $period          = intval( $summary['period'] ?? 30 );
 			var next   = ! active;
 
 			btn.disabled = true;
-			apiPost( REST_BASE + '/settings', { ( 'module_' + slug ): next } )
+			var payload = {};
+			payload[ 'module_' + slug ] = next;
+			apiPost( REST_BASE + '/settings', payload )
 				.then( function () {
 					btn.dataset.active = next ? '1' : '0';
 					btn.setAttribute( 'aria-pressed', String( next ) );

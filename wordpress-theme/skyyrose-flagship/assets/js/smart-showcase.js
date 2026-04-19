@@ -206,7 +206,7 @@
           // Dispatch WC add-to-cart event so fragments update.
           document.body.dispatchEvent(new CustomEvent('wc_fragment_refresh', { bubbles: true }));
           setTimeout(function () {
-            dialog.close();
+            closeDialog(dialog);
           }, 800);
         } else {
           btn.textContent = 'Try again';
@@ -217,6 +217,25 @@
         btn.textContent = 'Try again';
         btn.disabled = false;
       });
+  }
+
+  // -------------------------------------------------------------------------
+  // Dialog helpers
+  // -------------------------------------------------------------------------
+
+  function closeDialog(dialog) {
+    if (!dialog) return;
+    if (typeof dialog.close === 'function' && dialog.hasAttribute('open')) {
+      try {
+        dialog.close();
+        return;
+      } catch (e) {
+        // fall through to manual close
+      }
+    }
+    dialog.removeAttribute('open');
+    dialog.removeAttribute('aria-modal');
+    document.documentElement.classList.remove('skyy-qv-open');
   }
 
   // -------------------------------------------------------------------------
@@ -234,12 +253,12 @@
 
         // Close on backdrop click
         dialog.querySelector('.skyy-qv__backdrop').addEventListener('click', function () {
-          dialog.close();
+          closeDialog(dialog);
         });
 
         // Close button
         dialog.querySelector('.skyy-qv__close').addEventListener('click', function () {
-          dialog.close();
+          closeDialog(dialog);
         });
 
         // Image toggle
@@ -278,7 +297,18 @@
 
       previousFocus = document.activeElement;
       populate(dialog, card);
-      dialog.showModal();
+
+      // Prefer the native <dialog> modal. Fall back to a manual open on
+      // browsers without HTMLDialogElement support (e.g. Safari <= 15.3)
+      // so the quickview still works instead of throwing.
+      if (typeof dialog.showModal === 'function') {
+        dialog.showModal();
+      } else {
+        dialog.setAttribute('open', '');
+        dialog.setAttribute('aria-modal', 'true');
+        dialog.setAttribute('role', 'dialog');
+        document.documentElement.classList.add('skyy-qv-open');
+      }
 
       // Move focus to close button
       var closeBtn = dialog.querySelector('.skyy-qv__close');
