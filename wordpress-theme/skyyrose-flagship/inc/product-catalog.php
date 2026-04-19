@@ -45,6 +45,16 @@ function skyyrose_get_product_catalog() {
 		return $catalog;
 	}
 
+	// Prefer the WP object cache (Redis/Memcached) when available so the CSV
+	// parse happens at most once per site, not once per request.
+	if ( function_exists( 'wp_cache_get' ) ) {
+		$cached = wp_cache_get( 'skyyrose_product_catalog', 'skyyrose' );
+		if ( is_array( $cached ) && ! empty( $cached ) ) {
+			$catalog = $cached;
+			return $catalog;
+		}
+	}
+
 	$catalog  = array();
 	$csv_path = skyyrose_catalog_csv_path();
 
@@ -100,7 +110,35 @@ function skyyrose_get_product_catalog() {
 
 	fclose( $handle );
 
+	if ( function_exists( 'wp_cache_set' ) && ! empty( $catalog ) ) {
+		wp_cache_set( 'skyyrose_product_catalog', $catalog, 'skyyrose', HOUR_IN_SECONDS );
+	}
+
 	return $catalog;
+}
+
+/**
+ * Pick the best available display image for a product card.
+ *
+ * Callers that only need "show me the product image" should use this
+ * helper instead of reaching into product['image'] / front_model_image
+ * directly. Keeps the image-slot precedence in one place.
+ *
+ * @since 7.1.0
+ * @param  array $product Product data array from skyyrose_get_product().
+ * @return string Theme-relative path to the best available image.
+ */
+function skyyrose_get_product_display_image( $product ) {
+	if ( ! is_array( $product ) ) {
+		return '';
+	}
+	foreach ( array( 'image', 'front_model_image', 'back_image', 'back_model_image' ) as $slot ) {
+		$value = $product[ $slot ] ?? '';
+		if ( is_string( $value ) && '' !== $value ) {
+			return $value;
+		}
+	}
+	return '';
 }
 
 /**

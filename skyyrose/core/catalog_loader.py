@@ -1,0 +1,83 @@
+"""Canonical catalog loader — shared by nano_banana and elite_studio.
+
+Single import surface for:
+    CATALOG_CSV        — Path to wordpress-theme/.../data/skyyrose-catalog.csv
+    read_catalog_rows  — Raw CSV row iterator (list[dict[str, str]])
+    bool_col           — "1" / "0" → bool coercion
+    int_col            — str → int | None, None if blank or <1
+    status_from_row    — Derive pre-order / draft / live / retired from CSV flags
+    PRODUCT_STATUS     — Valid status enum strings
+
+Both nano_banana/catalog.py and skyyrose/elite_studio/catalog.py build
+their higher-level types on top of this module. The PHP loader uses the
+same canonical CSV but cannot share this code — keep the schema and
+status-derivation rules documented in both places when they change.
+"""
+
+from __future__ import annotations
+
+import csv
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+CATALOG_CSV = (
+    PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "skyyrose-catalog.csv"
+)
+
+PRODUCT_STATUS = {"draft", "pre-order", "live", "retired"}
+
+
+def read_catalog_rows(path: Path | None = None) -> list[dict[str, str]]:
+    """Read the canonical catalog CSV into a list of column-name dicts.
+
+    Skips blank rows and rows with no SKU.
+    """
+    csv_path = path or CATALOG_CSV
+    with csv_path.open(newline="", encoding="utf-8") as f:
+        rows = []
+        for row in csv.DictReader(f):
+            sku = (row.get("sku") or "").strip()
+            if not sku:
+                continue
+            rows.append(row)
+        return rows
+
+
+def bool_col(row: dict, key: str) -> bool:
+    """Read a CSV flag column ('1' → True, anything else → False)."""
+    return (row.get(key) or "").strip() == "1"
+
+
+def int_col(row: dict, key: str) -> int | None:
+    """Read a positive-int column, returning None for blank or non-positive."""
+    raw = (row.get(key) or "").strip()
+    if not raw:
+        return None
+    try:
+        value = int(raw)
+    except ValueError:
+        return None
+    return value if value >= 1 else None
+
+
+def status_from_row(row: dict) -> str:
+    """Map the CSV badge/is_preorder/published triple to the legacy status enum.
+
+    Rule order (first match wins):
+      1. badge == 'retired' → 'retired'
+      2. is_preorder == '1' → 'pre-order'
+      3. badge == 'draft'   → 'draft'
+      4. published == '1'   → 'live'
+      5. fallback           → 'draft'
+    """
+    badge = (row.get("badge") or "").strip().lower()
+    if badge == "retired":
+        return "retired"
+    if bool_col(row, "is_preorder"):
+        return "pre-order"
+    if badge == "draft":
+        return "draft"
+    if bool_col(row, "published"):
+        return "live"
+    return "draft"

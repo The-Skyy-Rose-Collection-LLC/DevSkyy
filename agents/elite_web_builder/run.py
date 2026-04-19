@@ -29,18 +29,15 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent
 PROJECT_ROOT = ROOT.parent.parent  # DevSkyy/
 
-# Load env — the dedicated elite-web-builder key file is the PRIMARY source.
-# Rotate keys in one place: DevSkyy/.env.elite-web-builder (gitignored, 600 perms).
-# DevSkyy/.env and .env.hf are loaded as fallbacks so callers that export
-# keys to the shell still work.
-try:
-    from dotenv import load_dotenv
+# skyyrose.core.env_loader handles the .env file cascade + Gemini alias
+# normalization. Primary key file: DevSkyy/.env.elite-web-builder.
+# Append (not insert) so ROOT's local `agents/` package still wins import
+# resolution over the repo-root `agents/` directory.
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.append(str(PROJECT_ROOT))
+from skyyrose.core.env_loader import load_project_env  # noqa: E402
 
-    load_dotenv(PROJECT_ROOT / ".env.elite-web-builder")  # Primary (dedicated team file)
-    load_dotenv(PROJECT_ROOT / ".env", override=False)  # Fallback
-    load_dotenv(PROJECT_ROOT / ".env.hf", override=False)  # Fallback (OPENAI_API_KEY here)
-except ImportError:
-    pass  # dotenv not required if env vars already set
+load_project_env(PROJECT_ROOT)
 
 # Verify required keys before expensive imports
 _REQUIRED_KEYS = {

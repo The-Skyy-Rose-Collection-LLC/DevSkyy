@@ -10,10 +10,11 @@ through this file. Do not introduce a second catalog.
 
 from __future__ import annotations
 
-import csv
 import json
 import logging
 from pathlib import Path
+
+from skyyrose.core.catalog_loader import CATALOG_CSV, bool_col, read_catalog_rows
 
 log = logging.getLogger(__name__)
 
@@ -22,43 +23,28 @@ PRODUCTS_DIR = (
     PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
 )
 SOURCE_DIR = PROJECT_ROOT / "skyyrose" / "assets" / "images" / "source-products"
-CATALOG_CSV = (
-    PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "skyyrose-catalog.csv"
-)
 SPECS_JSON = PROJECT_ROOT / "data" / "product-specs.json"
 
 
-def _bool_col(row: dict, key: str) -> bool:
-    return (row.get(key) or "").strip() == "1"
-
-
 def load_catalog() -> dict[str, dict]:
-    """Load product catalog from the canonical CSV. Returns dict keyed by SKU.
-
-    The canonical schema (21 columns) includes render-pipeline hints:
-    render_output_slug, render_source_override, render_back_source_override,
-    render_is_tech_flat, render_is_accessory, branding_spec.
-    """
+    """Load product catalog from the canonical CSV. Returns dict keyed by SKU."""
     catalog: dict[str, dict] = {}
-    with CATALOG_CSV.open(newline="", encoding="utf-8") as f:
-        for row in csv.DictReader(f):
-            sku = row["sku"].strip()
-            if not sku:
-                continue
-            entry: dict = {
-                "name": row["name"].strip(),
-                "collection": row["collection"].strip(),
-                "is_preorder": _bool_col(row, "is_preorder"),
-                "output_slug": row.get("render_output_slug", "").strip() or sku,
-                "is_tech_flat": _bool_col(row, "render_is_tech_flat"),
-                "is_accessory": _bool_col(row, "render_is_accessory"),
-                "branding_spec": row.get("branding_spec", "").strip(),
-            }
-            if row.get("render_source_override", "").strip():
-                entry["source_override"] = row["render_source_override"].strip()
-            if row.get("render_back_source_override", "").strip():
-                entry["back_source_override"] = row["render_back_source_override"].strip()
-            catalog[sku] = entry
+    for row in read_catalog_rows(CATALOG_CSV):
+        sku = row["sku"].strip()
+        entry: dict = {
+            "name": row["name"].strip(),
+            "collection": row["collection"].strip(),
+            "is_preorder": bool_col(row, "is_preorder"),
+            "output_slug": row.get("render_output_slug", "").strip() or sku,
+            "is_tech_flat": bool_col(row, "render_is_tech_flat"),
+            "is_accessory": bool_col(row, "render_is_accessory"),
+            "branding_spec": row.get("branding_spec", "").strip(),
+        }
+        if row.get("render_source_override", "").strip():
+            entry["source_override"] = row["render_source_override"].strip()
+        if row.get("render_back_source_override", "").strip():
+            entry["back_source_override"] = row["render_back_source_override"].strip()
+        catalog[sku] = entry
     return catalog
 
 

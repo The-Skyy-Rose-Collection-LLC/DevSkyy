@@ -17,11 +17,18 @@ Env var SKYYROSE_CATALOG_PATH overrides the default CSV path.
 
 from __future__ import annotations
 
-import csv
 import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+from skyyrose.core.catalog_loader import CATALOG_CSV as CANONICAL_CATALOG_CSV
+from skyyrose.core.catalog_loader import (
+    PRODUCT_STATUS,
+    int_col,
+    read_catalog_rows,
+    status_from_row,
+)
 
 from .validation import (
     IntegrityError,
@@ -35,7 +42,6 @@ from .validation import (
 
 _ENV_CATALOG_PATH = "SKYYROSE_CATALOG_PATH"
 
-PRODUCT_STATUS = {"draft", "pre-order", "live", "retired"}
 MASTER_SOURCE = {"pending", "photograph", "techflat", "design"}
 
 
@@ -44,9 +50,7 @@ def default_catalog_path() -> Path:
     override = os.getenv(_ENV_CATALOG_PATH)
     if override:
         return Path(override)
-    # skyyrose/elite_studio/catalog.py → climb 2 to <repo_root>
-    repo_root = Path(__file__).resolve().parents[2]
-    return repo_root / "wordpress-theme" / "skyyrose-flagship" / "data" / "skyyrose-catalog.csv"
+    return CANONICAL_CATALOG_CSV
 
 
 # ─── Dataclasses ─────────────────────────────────────────────────────────────
@@ -145,7 +149,7 @@ class Catalog:
         p = Path(path) if path else default_catalog_path()
         if not p.is_file():
             raise FileNotFoundError(f"Catalog not found at {p}")
-        rows = _read_csv_rows(p)
+        rows = read_catalog_rows(p)
         return cls._from_csv_rows(rows, source_path=p, strict=strict)
 
     @classmethod
@@ -155,13 +159,14 @@ class Catalog:
         products_by_sku: dict[str, ProductEntry] = {}
         series_index: dict[str, list[str]] = {}
 
-        for i, raw in enumerate(rows):
+        for i, raw in enumerate(rows):  # noqa: B007 — index kept for future error reporting
             sku = raw.get("sku", "").strip()
             if not sku:
                 continue
 
-            status = _status_from_csv(raw)
-            series_name = _series_from_name(raw.get("name", ""))
+            status = status_from_row(raw)
+            # Prefer explicit CSV series column; fall back to name heuristic.
+            series_name = raw.get("series", "").strip() or _series_from_name(raw.get("name", ""))
             if series_name:
                 series_index.setdefault(series_name, []).append(sku)
 
@@ -203,7 +208,7 @@ class Catalog:
                 ai_renders=ai_renders,
                 review_flags=(),
                 notes="",
-                limited_pieces=_parse_edition_size(raw.get("edition_size", "")),
+                limited_pieces=int_col(raw, "edition_size"),
                 retirement_note=None,
             )
 
@@ -337,28 +342,6 @@ class Catalog:
 # ─── Helpers ─────────────────────────────────────────────────────────────────
 
 
-def _read_csv_rows(path: Path) -> list[dict[str, str]]:
-    with path.open(newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
-
-
-def _status_from_csv(row: dict[str, str]) -> str:
-    """Map the CSV's is_preorder / badge / published triple to the legacy enum."""
-    badge = (row.get("badge") or "").strip().lower()
-    is_preorder = (row.get("is_preorder") or "").strip() == "1"
-    published = (row.get("published") or "").strip() == "1"
-
-    if badge == "retired":
-        return "retired"
-    if is_preorder:
-        return "pre-order"
-    if badge == "draft":
-        return "draft"
-    if published:
-        return "live"
-    return "draft"
-
-
 def _series_from_name(name: str) -> str | None:
     """Heuristic fallback: derive a series name from the product name.
 
@@ -375,14 +358,3 @@ def _series_from_name(name: str) -> str | None:
     if "original label tee" in n:
         return "Original Label"
     return None
-
-
-def _parse_edition_size(value: str) -> int | None:
-    v = (value or "").strip()
-    if not v:
-        return None
-    try:
-        n = int(v)
-    except ValueError:
-        return None
-    return n if n >= 1 else None
