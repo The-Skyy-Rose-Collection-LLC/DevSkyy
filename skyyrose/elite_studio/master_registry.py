@@ -249,6 +249,11 @@ class Manifest:
         existing = self.get(sku)
         if existing is None:
             raise KeyError(f"no pending or locked entry for sku={sku!r}")
+        if existing.status == "locked":
+            raise ValueError(
+                f"sku={sku!r} is already locked at version={existing.locked_at_version!r}; "
+                "re-locking would overwrite immutable provenance"
+            )
         base = base_dir or masters_dir()
         master_file = base / master_path
         if not master_file.exists():

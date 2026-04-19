@@ -141,10 +141,30 @@ def _jaccard_similarity(a: frozenset[str], b: frozenset[str]) -> float:
     return intersection / union if union > 0 else 0.0
 
 
-def _prompt_hash(prompt: str, intent: str) -> str:
-    """Deterministic hash for exact-match cache lookup."""
-    raw = f"{intent}:{prompt.strip().lower()}"
+def _prompt_hash(prompt: str, intent: str, context_digest: str = "") -> str:
+    """Deterministic hash for exact-match cache lookup.
+
+    Including *context_digest* prevents one tenant's brand/fashion context
+    from leaking into another's cache hit when the raw prompt+intent match.
+    """
+    raw = f"{intent}:{context_digest}:{prompt.strip().lower()}"
     return hashlib.sha256(raw.encode()).hexdigest()[:16]
+
+
+def _context_digest(*contexts: Any) -> str:
+    """Stable short hash of optional enhancement contexts (fashion, brand, …).
+
+    Returns an empty string when no context is supplied so the hash behaves
+    identically to the pre-context code path.
+    """
+    payload: list[Any] = [c for c in contexts if c]
+    if not payload:
+        return ""
+    try:
+        raw = json.dumps(payload, sort_keys=True, default=str)
+    except TypeError:
+        raw = repr(payload)
+    return hashlib.sha256(raw.encode()).hexdigest()[:12]
 
 
 class PromptCache:
@@ -176,24 +196,34 @@ class PromptCache:
             logger.warning("PromptCache: Redis unavailable — operating in passthrough mode")
             return None
 
-    def check(self, prompt: str, intent: str, threshold: float = 0.75) -> EnhancedPrompt | None:
+    def check(
+        self,
+        prompt: str,
+        intent: str,
+        threshold: float = 0.75,
+        context_digest: str = "",
+    ) -> EnhancedPrompt | None:
         """Find a cached enhancement for a similar prompt.
 
         First checks exact hash match, then falls back to similarity search.
+        The *context_digest* partitions both exact and similarity lookups so
+        different fashion/brand contexts never share cache entries.
         """
         if self._redis is None:
             return None
 
         try:
-            key = f"{self.CACHE_PREFIX}:{_prompt_hash(prompt, intent)}"
+            key = f"{self.CACHE_PREFIX}:{_prompt_hash(prompt, intent, context_digest)}"
             cached_json = self._redis.get(key)
             if cached_json:
                 self._hits += 1
                 self._record_stat("hits")
                 return self._deserialize(cached_json)
 
-            # Similarity search — partitioned by intent to avoid O(n) full scan
-            index_key = f"{self.INDEX_PREFIX}:{intent}"
+            # Similarity search — partitioned by intent + context so different
+            # brand/fashion contexts do not cross-match.
+            index_partition = f"{intent}:{context_digest}" if context_digest else intent
+            index_key = f"{self.INDEX_PREFIX}:{index_partition}"
             index_data = self._redis.hgetall(index_key)
             if not index_data:
                 self._misses += 1
@@ -226,20 +256,28 @@ class PromptCache:
             logger.warning("PromptCache: check failed", exc_info=True)
             return None
 
-    def store(self, original: str, enhanced: Any, ttl: int | None = None) -> None:
+    def store(
+        self,
+        original: str,
+        enhanced: Any,
+        ttl: int | None = None,
+        context_digest: str = "",
+    ) -> None:
         """Cache an enhanced prompt result."""
         if self._redis is None:
             return
 
         try:
             intent = enhanced.intent
-            key = f"{self.CACHE_PREFIX}:{_prompt_hash(original, intent)}"
+            key = f"{self.CACHE_PREFIX}:{_prompt_hash(original, intent, context_digest)}"
             ttl = ttl or self.DEFAULT_TTL
 
             self._redis.setex(key, ttl, self._serialize(enhanced))
 
-            # Store tokens in intent-partitioned index (only tokens, no redundant intent field)
-            index_key = f"{self.INDEX_PREFIX}:{intent}"
+            # Store tokens in intent+context-partitioned index (only tokens,
+            # no redundant intent field). Different contexts never share.
+            index_partition = f"{intent}:{context_digest}" if context_digest else intent
+            index_key = f"{self.INDEX_PREFIX}:{index_partition}"
             tokens = json.dumps(list(_tokenize(original)))
             self._redis.hset(index_key, key, tokens)
 

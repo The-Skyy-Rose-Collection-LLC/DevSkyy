@@ -35,6 +35,7 @@ from agent_sdk.task_queue import (
     TaskQueue,
     TaskStatus,
 )
+
 from agents.tripo_agent import TripoAssetAgent
 
 # Dead Letter Queue for failed tasks
@@ -154,8 +155,26 @@ class BackgroundWorker:
                     additional_details=f"Style: {style}",
                 )
 
-            logger.info(f"✅ 3D generation successful: {result.get('task_id')}")
+            # The upstream tool may return its own failure markers. Don't
+            # hardcode "completed" — propagate failure signals so callers see
+            # the real outcome instead of a false success.
+            tool_status = str(result.get("status", "")).lower()
+            tool_success = result.get("success")
+            failed = (
+                tool_status in {"failed", "error"} or tool_success is False or "error" in result
+            )
+            if failed:
+                logger.warning("3D generation tool reported failure: %s", result)
+                return {
+                    "status": "failed",
+                    "error": result.get("error")
+                    or result.get("message")
+                    or "tool reported failure",
+                    "result": result,
+                    "failed_at": datetime.now(UTC).isoformat(),
+                }
 
+            logger.info(f"✅ 3D generation successful: {result.get('task_id')}")
             return {
                 "status": "completed",
                 "result": result,

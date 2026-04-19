@@ -22,7 +22,11 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from pydantic import BaseModel, Field, field_validator
 
 from skyyrose.elite_studio.queue.job_types import EliteStudioJobResult
-from skyyrose.elite_studio.queue.producer import enqueue_batch, enqueue_creative, enqueue_produce
+from skyyrose.elite_studio.queue.producer import (
+    aenqueue_batch,
+    aenqueue_creative,
+    aenqueue_produce,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -218,7 +222,7 @@ async def produce(
     """Enqueue one render job and return its job_id."""
     queued_at = datetime.now(UTC).isoformat()
     try:
-        job_id = enqueue_produce(
+        job_id = await aenqueue_produce(
             sku=body.sku,
             view=body.view,
             priority=body.priority,
@@ -251,7 +255,7 @@ async def produce_batch(
     """Enqueue a batch of render jobs and return their job_ids."""
     queued_at = datetime.now(UTC).isoformat()
     try:
-        job_ids = enqueue_batch(
+        job_ids = await aenqueue_batch(
             skus=body.skus,
             view=body.view,
             priority=body.priority,
@@ -518,7 +522,7 @@ async def create_operation(
     """
     queued_at = datetime.now(UTC).isoformat()
     try:
-        job_id = enqueue_creative(
+        job_id = await aenqueue_creative(
             intent=body.intent,
             params=body.params,
             sku=body.sku,

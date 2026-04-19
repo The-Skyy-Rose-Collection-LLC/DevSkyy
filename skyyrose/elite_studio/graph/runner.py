@@ -11,8 +11,11 @@ parameter.
 
 from __future__ import annotations
 
+import logging
 import time
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 from ..config import BATCH_DELAY_SECONDS, OUTPUT_DIR
 from ..models import ProductionResult
@@ -105,7 +108,23 @@ def run_batch(
                 )
                 continue
 
-        result = run_single(sku=sku, view=view, config=config, graph=graph)
+        try:
+            result = run_single(sku=sku, view=view, config=config, graph=graph)
+        except Exception as exc:
+            # Isolate failures so a single bad SKU cannot abort the whole batch.
+            logger.exception("run_single failed for sku=%s view=%s: %s", sku, view, exc)
+            result = ProductionResult(
+                sku=sku,
+                view=view,
+                status="failed",
+                output_path="",
+                vision=None,
+                generation=None,
+                quality=None,
+                compositing=None,
+                error=str(exc),
+                step="runner",
+            )
         results.append(result)
 
         # Respect batch delay between items (not after last)

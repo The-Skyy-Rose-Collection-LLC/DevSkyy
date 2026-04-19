@@ -48,8 +48,15 @@ class CheckResult:
 
 
 def _hex_to_rgb(h: str) -> tuple[int, int, int]:
-    h = h.lstrip("#")
-    return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    cleaned = h.lstrip("#").strip()
+    if len(cleaned) == 3:
+        cleaned = "".join(ch * 2 for ch in cleaned)
+    if len(cleaned) != 6:
+        raise ValueError(f"invalid hex color: {h!r}")
+    try:
+        return int(cleaned[0:2], 16), int(cleaned[2:4], 16), int(cleaned[4:6], 16)
+    except ValueError as exc:
+        raise ValueError(f"invalid hex color: {h!r}") from exc
 
 
 def _rgb_to_lab(r: int, g: int, b: int) -> tuple[float, float, float]:
@@ -129,7 +136,13 @@ def check_color(
     per_color: list[dict[str, Any]] = []
     worst_delta = 0.0
     for role, hexv in expected:
-        target_lab = _rgb_to_lab(*_hex_to_rgb(hexv))
+        try:
+            target_lab = _rgb_to_lab(*_hex_to_rgb(hexv))
+        except ValueError as exc:
+            per_color.append(
+                {"role": role, "hex": hexv, "delta_e": None, "pass": False, "error": str(exc)}
+            )
+            continue
         best = min(
             (_delta_e_cie76(target_lab, lab) for _, lab in dominant_lab), default=float("inf")
         )

@@ -34,6 +34,25 @@ def _get_queue() -> TaskQueue:
     return TaskQueue(redis_url=redis_url)
 
 
+def _run_sync(coro):
+    """Run *coro* to completion from a sync context.
+
+    Uses asyncio.run() when no loop is active, or dispatches to a short-lived
+    worker thread when already inside a running event loop (e.g. when an async
+    FastAPI handler calls these sync helpers). asyncio.run() from a running
+    loop raises RuntimeError, which was breaking every creative request.
+    """
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        return asyncio.run(coro)
+
+    import concurrent.futures
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+        return pool.submit(asyncio.run, coro).result()
+
+
 async def _async_enqueue(job_data: EliteStudioJobData) -> str:
     """Async core for enqueue_produce."""
     queue = _get_queue()
@@ -98,7 +117,26 @@ def enqueue_produce(
         max_retries=max_retries,
         submitted_at=datetime.now(UTC).isoformat(),
     )
-    return asyncio.run(_async_enqueue(job_data))
+    return _run_sync(_async_enqueue(job_data))
+
+
+async def aenqueue_produce(
+    sku: str,
+    view: str = "front",
+    priority: int = 5,
+    enable_compositor: bool = False,
+    max_retries: int = 2,
+) -> str:
+    """Async variant of :func:`enqueue_produce` for use inside async handlers."""
+    job_data = EliteStudioJobData(
+        sku=sku,
+        view=view,
+        priority=priority,
+        enable_compositor=enable_compositor,
+        max_retries=max_retries,
+        submitted_at=datetime.now(UTC).isoformat(),
+    )
+    return await _async_enqueue(job_data)
 
 
 def enqueue_creative(
@@ -126,7 +164,25 @@ def enqueue_creative(
         creative_params=params,
         submitted_at=datetime.now(UTC).isoformat(),
     )
-    return asyncio.run(_async_enqueue(job_data))
+    return _run_sync(_async_enqueue(job_data))
+
+
+async def aenqueue_creative(
+    intent: str,
+    params: dict,
+    sku: str = "",
+    priority: int = 5,
+) -> str:
+    """Async variant of :func:`enqueue_creative` for use inside async handlers."""
+    job_data = EliteStudioJobData(
+        sku=sku or "creative",
+        view="front",
+        priority=priority,
+        intent=intent,
+        creative_params=params,
+        submitted_at=datetime.now(UTC).isoformat(),
+    )
+    return await _async_enqueue(job_data)
 
 
 def enqueue_batch(
@@ -160,4 +216,27 @@ def enqueue_batch(
         )
         for sku in skus
     ]
-    return asyncio.run(_async_enqueue_batch(job_datas))
+    return _run_sync(_async_enqueue_batch(job_datas))
+
+
+async def aenqueue_batch(
+    skus: list[str],
+    view: str = "front",
+    priority: int = 5,
+    enable_compositor: bool = False,
+    max_retries: int = 2,
+) -> list[str]:
+    """Async variant of :func:`enqueue_batch` for use inside async handlers."""
+    now = datetime.now(UTC).isoformat()
+    job_datas = [
+        EliteStudioJobData(
+            sku=sku,
+            view=view,
+            priority=priority,
+            enable_compositor=enable_compositor,
+            max_retries=max_retries,
+            submitted_at=now,
+        )
+        for sku in skus
+    ]
+    return await _async_enqueue_batch(job_datas)

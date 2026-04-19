@@ -26,10 +26,10 @@ router = APIRouter(prefix="/creative", tags=["Creative v2"])
 # Module-level imports for mockability in tests
 try:
     from skyyrose.elite_studio.creative.runner import run_creative
-    from skyyrose.elite_studio.queue.producer import enqueue_creative
+    from skyyrose.elite_studio.queue.producer import aenqueue_creative as enqueue_creative_async
 except ImportError:  # pragma: no cover
     run_creative = None  # type: ignore[assignment]
-    enqueue_creative = None  # type: ignore[assignment]
+    enqueue_creative_async = None  # type: ignore[assignment]
 
 # ---------------------------------------------------------------------------
 # Redis key constants
@@ -278,7 +278,7 @@ async def create_operation(
 
     # Async path — enqueue
     try:
-        job_id = enqueue_creative(
+        job_id = await enqueue_creative_async(
             intent=body.intent,
             params=body.params,
             sku=body.sku,

@@ -594,7 +594,7 @@ Escalate to human support when:
 
             # Apply RAG technique for FAQ-based queries
             if task_type == "faq":
-                faq_context: list[str] | None = None
+                faq_context: list[dict[str, str]] | None = None
                 if self._rag_service is not None:
                     try:
                         rag_result = await self._rag_service.query(
@@ -604,7 +604,9 @@ Escalate to human support when:
                             top_k=5,
                         )
                         answer = rag_result.get("answer", "")
-                        faq_context = [answer] if answer else None
+                        # RAGPrompting.create_prompt expects list[dict[str, str]]
+                        # with "text"/"source" keys, not list[str].
+                        faq_context = [{"text": answer, "source": "rag"}] if answer else None
                     except Exception as rag_exc:
                         logger.warning(
                             f"RAG FAQ fetch failed, falling back to static FAQs: {rag_exc}"

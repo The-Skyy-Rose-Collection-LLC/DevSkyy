@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from skyyrose.elite_studio.prompts.analyzer import PromptAnalysis, PromptAnalyzer
-from skyyrose.elite_studio.prompts.cache import PromptCache, _prompt_hash
+from skyyrose.elite_studio.prompts.cache import PromptCache, _context_digest, _prompt_hash
 from skyyrose.elite_studio.prompts.chain import PromptChain
 
 
@@ -72,10 +72,14 @@ class PromptEnhancer:
         if resolved_intent == "unknown":
             resolved_intent = "product-render"
 
-        cache_key = _prompt_hash(prompt, resolved_intent)
+        # Partition the cache by the caller's context so two tenants (or two
+        # brand/fashion overrides) with the same raw prompt cannot receive
+        # each other's enhancements.
+        ctx_digest = _context_digest(fashion_context, brand_context)
+        cache_key = _prompt_hash(prompt, resolved_intent, ctx_digest)
 
-        # Check cache for semantically similar prompt
-        cached = self._cache.check(prompt, resolved_intent)
+        # Check cache for semantically similar prompt inside this context
+        cached = self._cache.check(prompt, resolved_intent, context_digest=ctx_digest)
         if cached is not None:
             return cached
 
@@ -102,7 +106,7 @@ class PromptEnhancer:
         )
 
         # Store in cache
-        self._cache.store(prompt, result)
+        self._cache.store(prompt, result, context_digest=ctx_digest)
 
         return result
 
