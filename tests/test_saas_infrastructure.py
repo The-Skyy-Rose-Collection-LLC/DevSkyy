@@ -699,18 +699,53 @@ class TestTeamEndpoints:
 
 class TestTenantMiddleware:
     @pytest.mark.asyncio
-    async def test_sets_tenant_id_from_header(self):
+    async def test_header_ignored_without_internal_service_token(self, monkeypatch):
+        """X-Tenant-ID alone is a spoof vector; it MUST be ignored when no
+        TENANT_HEADER_TRUST_TOKEN is configured (defaults-closed)."""
         from unittest.mock import AsyncMock
 
         from starlette.requests import Request
 
         from core.middleware.tenant import tenant_middleware
 
+        monkeypatch.delenv("TENANT_HEADER_TRUST_TOKEN", raising=False)
+
         scope = {
             "type": "http",
             "method": "GET",
             "path": "/",
             "headers": [(b"x-tenant-id", b"my-tenant")],
+            "query_string": b"",
+        }
+
+        request = Request(scope)
+        call_next = AsyncMock(return_value=MagicMock())
+        await tenant_middleware(request, call_next)
+
+        assert request.state.tenant_id == ""
+        assert request.state.tenant_tier == "free"
+
+    @pytest.mark.asyncio
+    async def test_header_honored_with_matching_internal_service_token(self, monkeypatch):
+        """When TENANT_HEADER_TRUST_TOKEN is configured and the caller
+        presents the matching X-Internal-Service-Token, the header override
+        is trusted (the legitimate path for worker / admin service traffic)."""
+        from unittest.mock import AsyncMock
+
+        from starlette.requests import Request
+
+        from core.middleware.tenant import tenant_middleware
+
+        monkeypatch.setenv("TENANT_HEADER_TRUST_TOKEN", "s3cr3t")
+
+        scope = {
+            "type": "http",
+            "method": "GET",
+            "path": "/",
+            "headers": [
+                (b"x-tenant-id", b"my-tenant"),
+                (b"x-internal-service-token", b"s3cr3t"),
+            ],
             "query_string": b"",
         }
 
