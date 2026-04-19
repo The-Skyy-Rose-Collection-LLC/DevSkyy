@@ -1,3 +1,10 @@
+# OpenWolf
+
+@.wolf/OPENWOLF.md
+
+This project uses OpenWolf for context management. Read and follow .wolf/OPENWOLF.md every session. Check .wolf/cerebrum.md before generating code. Check .wolf/anatomy.md before reading files.
+
+
 # DevSkyy — Claude Code Configuration
 
 ## Identity
@@ -205,6 +212,12 @@ wordpress-theme/skyyrose-flagship/
 - `agents/base_super_agent.py` is the foundation (not legacy files)
 - DataLoaders → `api/graphql/dataloaders/` (not `core/`)
 - Integration tests → `tests/integration/` (not `tests/api/`)
+
+### Python Packaging
+- Every top-level package directory MUST contain `__init__.py`. No implicit namespace packages. `mypy.ini` has `namespace_packages = False` to enforce this.
+- Why: implicit namespace packages let mypy resolve the same `.py` file under two module names (e.g., `preflight` and `renders.preflight`), producing "Source file found twice under different module names" errors that silently block commits.
+- If you add a new top-level package dir (e.g., `newthing/`), add `newthing/__init__.py` in the same commit — even if empty, a one-line docstring is fine.
+- `.claude/worktrees/` are LIVE git worktrees (per `git worktree list`). Pre-commit's `mypy . --ignore-missing-imports --exclude '\.claude/'` keeps duplicate file paths out of module discovery.
 
 ### Google ADK
 - Agent names: underscores only (valid Python identifiers)

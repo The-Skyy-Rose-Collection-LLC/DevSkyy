@@ -51,7 +51,7 @@ class AboutPageBuilder(ElementorBuilder):
 
         widgets.append(
             self.heading(
-                "Where Love Meets Luxury",
+                "Luxury Grows from Concrete.",
                 size="xxl",
                 tag="h1",
                 align="center",

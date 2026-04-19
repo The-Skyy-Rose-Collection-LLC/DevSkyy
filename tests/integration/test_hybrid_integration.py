@@ -51,7 +51,7 @@ async def test_task_queue_imports():
     print_test("Task Queue Imports")
 
     try:
-        from agent_sdk.task_queue import TaskPriority, TaskStatus
+        from sdk.python.agent_sdk.task_queue import TaskPriority, TaskStatus
 
         print_success("All imports successful")
 
@@ -74,7 +74,7 @@ async def test_worker_imports():
     print_test("Worker Imports")
 
     try:
-        from agent_sdk.worker import BackgroundWorker
+        from sdk.python.agent_sdk.worker import BackgroundWorker
 
         print_success("Worker imports successful")
 
@@ -93,7 +93,7 @@ async def test_custom_tools_imports():
     print_test("Custom Tools Imports")
 
     try:
-        from agent_sdk.custom_tools import (
+        from sdk.python.agent_sdk.custom_tools import (
             create_devskyy_tools,
         )
 
@@ -122,7 +122,7 @@ async def test_task_queue_functionality():
     print_test("Task Queue Functionality")
 
     try:
-        from agent_sdk.task_queue import TaskPriority, TaskQueue
+        from sdk.python.agent_sdk.task_queue import TaskPriority, TaskQueue
 
         queue = TaskQueue()
         print_info("TaskQueue instantiated (Redis may not be connected)")
@@ -174,7 +174,7 @@ async def test_worker_stub_behavior():
     print_test("Worker Stub Behavior (FASHN)")
 
     try:
-        from agent_sdk.worker import BackgroundWorker
+        from sdk.python.agent_sdk.worker import BackgroundWorker
 
         worker = BackgroundWorker()
 
@@ -214,7 +214,11 @@ async def test_custom_tools_signature():
     try:
         import inspect
 
-        from agent_sdk.custom_tools import check_task_status, generate_3d_model, virtual_tryon
+        from sdk.python.agent_sdk.custom_tools import (
+            check_task_status,
+            generate_3d_model,
+            virtual_tryon,
+        )
 
         # Check generate_3d_model signature
         sig = inspect.signature(generate_3d_model)
@@ -243,7 +247,11 @@ async def test_backward_compatibility():
     print_test("Backward Compatibility (Approach A tools)")
 
     try:
-        from agent_sdk.custom_tools import execute_deployment, handle_support_ticket, manage_product
+        from sdk.python.agent_sdk.custom_tools import (
+            execute_deployment,
+            handle_support_ticket,
+            manage_product,
+        )
 
         # These should still exist and be callable
         assert callable(manage_product), "manage_product should be callable"
@@ -265,7 +273,7 @@ async def test_http_stubs():
     print_test("HTTP API Stubs (Approach C)")
 
     try:
-        from agent_sdk.custom_tools import analyze_data, create_marketing_content
+        from sdk.python.agent_sdk.custom_tools import analyze_data, create_marketing_content
 
         # These should exist as stubs
         assert callable(analyze_data), "analyze_data should be callable"
@@ -388,7 +396,9 @@ async def main():
     print("  1. Start Redis: docker-compose up -d redis")
     print("  2. Start Worker: python3 -m agent_sdk.worker")
     print("  3. Start Flower UI: open http://localhost:5555")
-    print("  4. Test tools with real queue: python3 -c 'from agent_sdk.custom_tools import *'")
+    print(
+        "  4. Test tools with real queue: python3 -c 'from sdk.python.agent_sdk.custom_tools import *'"
+    )
 
     return return_code
 

@@ -307,7 +307,7 @@ class HomePageBuilder(ElementorBuilder):
             page_settings={
                 "hide_title": "yes",
                 "template": "elementor_canvas",
-                "post_title": "SkyyRose - Where Love Meets Luxury",
+                "post_title": "SkyyRose - Luxury Grows from Concrete.",
                 "meta_description": "Cinematic 3D luxury streetwear from Oakland. Explore immersive collections with interactive 3D experiences.",
             },
         )

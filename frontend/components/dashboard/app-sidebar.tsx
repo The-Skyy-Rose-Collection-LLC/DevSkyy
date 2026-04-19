@@ -25,6 +25,7 @@ import {
   Image,
   Compass,
   UserCircle2,
+  Sparkles,
 } from 'lucide-react';
 
 import {
@@ -111,6 +112,11 @@ const mainNavItems = [
     title: 'Brand Mascot',
     url: '/admin/mascot',
     icon: UserCircle2,
+  },
+  {
+    title: 'Elite Studio',
+    url: '/admin/elite-studio',
+    icon: Sparkles,
   },
 ];
 

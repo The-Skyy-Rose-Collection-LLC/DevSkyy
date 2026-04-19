@@ -23,7 +23,7 @@ $allowed_inline = array(
 
 /* Hero Section Data. */
 $hero_eyebrow = get_theme_mod( 'about_hero_eyebrow', 'Oakland, California &mdash; Est. 2020' );
-/* Hardcoded — Customizer DB may have stale "Where Love Meets Luxury" value */
+/* Hardcoded — Customizer DB may have stale "Luxury Grows from Concrete." value */
 $hero_title   = 'Luxury Grows<br>from Concrete.';
 $hero_title_2 = 'Luxury Grows<br>from Concrete.';
 $hero_sub     = get_theme_mod(

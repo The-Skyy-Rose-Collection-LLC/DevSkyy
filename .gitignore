@@ -132,6 +132,7 @@ dump.rdb
 
 # Vector databases (runtime-generated)
 data/vectordb/
+data/raganything/
 data/*.sqlite3
 data/*.db
 .vercel
@@ -203,7 +204,12 @@ generated_3d_models/
 
 # Large files moved to HuggingFace Hub
 # https://huggingface.co/datasets/damBruh/skyyrose-assets
-/assets/
+# Exclude ALL contents of /assets/ by default (images, scenes, renders, etc).
+# Source-of-truth registries (small text YAML/JSON) are re-included below.
+/assets/*
+!/assets/product-masters/
+!/assets/prompts/
+!/assets/brand/
 datasets/
 generated_3d_models_color_accurate/
 
@@ -302,6 +308,16 @@ open-claude-code/
 .agents/
 .aidesigner/
 .mcp.json
+
+# OpenWolf session-local state (churns every action — not content, ignore)
+.wolf/memory.md
+.wolf/token-ledger.json
+.wolf/hooks/_session.json
+.wolf/claude-mem-digest.md
+
+# Root-level Jupyter notebooks (belong in a /notebooks/ dir, not repo root)
+/*.ipynb
+
 skills-lock.json
 
 # Immersive test renders (regenerable)

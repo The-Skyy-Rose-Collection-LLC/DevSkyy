@@ -10,12 +10,12 @@ Each SuperAgent specializes in a specific domain:
 - Analytics: Data analysis, reporting
 """
 
-from agent_sdk.super_agents.analytics_agent import AnalyticsAgent
-from agent_sdk.super_agents.commerce_agent import CommerceAgent
-from agent_sdk.super_agents.creative_agent import CreativeAgent
-from agent_sdk.super_agents.marketing_agent import MarketingAgent
-from agent_sdk.super_agents.operations_agent import OperationsAgent
-from agent_sdk.super_agents.support_agent import SupportAgent
+from .analytics_agent import AnalyticsAgent
+from .commerce_agent import CommerceAgent
+from .creative_agent import CreativeAgent
+from .marketing_agent import MarketingAgent
+from .operations_agent import OperationsAgent
+from .support_agent import SupportAgent
 
 __all__ = [
     "CommerceAgent",

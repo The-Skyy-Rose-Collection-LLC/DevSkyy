@@ -22,10 +22,10 @@ _TERMINAL_WIDTH = shutil.get_terminal_size((100, 40)).columns
 _SEP = "─" * min(_TERMINAL_WIDTH, 100)
 
 # Cost per FASHN API call (update when pricing changes)
-_COST_PER_SAMPLE = 0.075          # tryon-v1.6 per image
-_DEFAULT_SAMPLES = 4              # DEFAULT_NUM_SAMPLES from config
-_MODELS_PER_PRODUCT = 4           # average models in MODEL_CAST per collection
-_BG_REMOVE_COST = 0.025           # background-remove call
+_COST_PER_SAMPLE = 0.075  # tryon-v1.6 per image
+_DEFAULT_SAMPLES = 4  # DEFAULT_NUM_SAMPLES from config
+_MODELS_PER_PRODUCT = 4  # average models in MODEL_CAST per collection
+_BG_REMOVE_COST = 0.025  # background-remove call
 
 
 class PreflightAborted(RuntimeError):
@@ -37,11 +37,11 @@ class SourceEntry:
     sku: str
     name: str
     collection: str
-    source_path: str | None        # resolved path from _resolve_source_image
+    source_path: str | None  # resolved path from _resolve_source_image
     source_exists: bool
     source_size_kb: float
     source_mtime: str
-    resolution_method: str         # 'bundle_photo' | 'csv_override' | 'glob' | 'none'
+    resolution_method: str  # 'bundle_photo' | 'csv_override' | 'glob' | 'none'
 
     def __post_init__(self) -> None:
         if self.source_path:
@@ -57,7 +57,7 @@ class SourceEntry:
 
 def _detect_resolution_method(product: dict) -> str:
     """Infer how the source image was resolved."""
-    from renders.config import BUNDLES_DIR, PRODUCTS_DIR, _find_bundle_dir
+    from renders.config import PRODUCTS_DIR, _find_bundle_dir
 
     name = product.get("name", "")
     source = product.get("existing_front", "")
@@ -107,12 +107,15 @@ def _try_show_thumbnail(path: str) -> None:
     p = Path(path)
     if not p.exists():
         return
-    for cmd in (["timg", "--threads=-1", "-g", "32x16", str(p)],
-                ["chafa", "--size", "32x16", str(p)]):
+    for cmd in (
+        ["timg", "--threads=-1", "-g", "32x16", str(p)],
+        ["chafa", "--size", "32x16", str(p)],
+    ):
         if shutil.which(cmd[0]):
             try:
-                subprocess.run(cmd, check=False, timeout=5,
-                               stdout=sys.stdout, stderr=subprocess.DEVNULL)
+                subprocess.run(
+                    cmd, check=False, timeout=5, stdout=sys.stdout, stderr=subprocess.DEVNULL
+                )
             except Exception:
                 pass
             return
@@ -138,16 +141,22 @@ def print_manifest(
 
     print()
     print("╔" + "═" * (min(_TERMINAL_WIDTH, 100) - 2) + "╗")
-    print("║  SKYYROSE RENDER PIPELINE — PRE-FLIGHT CHECK" +
-          " " * (min(_TERMINAL_WIDTH, 100) - 48) + "║")
+    print(
+        "║  SKYYROSE RENDER PIPELINE — PRE-FLIGHT CHECK"
+        + " " * (min(_TERMINAL_WIDTH, 100) - 48)
+        + "║"
+    )
     print("╚" + "═" * (min(_TERMINAL_WIDTH, 100) - 2) + "╝")
     print(f"  Products     : {len(entries)}")
     print(f"  Models / SKU : {num_models}")
     print(f"  Samples / run: {num_samples}")
-    print(f"  FASHN calls  : {tryon_calls} try-on"
-          + (f" + {bg_calls} bg-remove" if bg_calls else ""))
-    print(f"  Est. cost    : ${total_cost:.2f}"
-          + (f"  (${tryon_cost:.2f} try-on + ${bg_cost:.2f} bg-remove)" if bg_calls else ""))
+    print(
+        f"  FASHN calls  : {tryon_calls} try-on" + (f" + {bg_calls} bg-remove" if bg_calls else "")
+    )
+    print(
+        f"  Est. cost    : ${total_cost:.2f}"
+        + (f"  (${tryon_cost:.2f} try-on + ${bg_cost:.2f} bg-remove)" if bg_calls else "")
+    )
     print(_SEP)
 
     for i, e in enumerate(entries, 1):
@@ -172,15 +181,17 @@ def print_manifest(
             full = prefix + e.source_path
             max_w = min(_TERMINAL_WIDTH, 100) - 2
             if len(full) > max_w:
-                full = full[:max_w - 3] + "..."
+                full = full[: max_w - 3] + "..."
             if not e.source_exists:
                 full += "  ← MISSING"
             print(full)
 
             if e.source_exists:
-                print(f"        {Path(e.source_path).name}"
-                      f"  ({e.source_size_kb:.0f}KB  {e.source_mtime}"
-                      f"  via {e.resolution_method})")
+                print(
+                    f"        {Path(e.source_path).name}"
+                    f"  ({e.source_size_kb:.0f}KB  {e.source_mtime}"
+                    f"  via {e.resolution_method})"
+                )
                 _try_show_thumbnail(e.source_path)
         else:
             print("    → NO SOURCE MAPPED — will raise ValueError at runtime")
@@ -193,12 +204,16 @@ def print_manifest(
 
     glob_entries = [e for e in entries if e.resolution_method == "glob" and e.source_exists]
     if glob_entries:
-        print(f"\n  ⚠  {len(glob_entries)} SKU(s) resolved via GLOB fallback "
-              f"(no explicit source_override in CSV and no bundle photo):")
+        print(
+            f"\n  ⚠  {len(glob_entries)} SKU(s) resolved via GLOB fallback "
+            f"(no explicit source_override in CSV and no bundle photo):"
+        )
         for e in glob_entries:
             print(f"     • {e.sku:<18s} → {Path(e.source_path).name}")
-        print("     Glob matches may pick the wrong file. "
-              "Set render_source_override in product-catalog.csv to lock the source.")
+        print(
+            "     Glob matches may pick the wrong file. "
+            "Set render_source_override in product-catalog.csv to lock the source."
+        )
 
     if missing:
         print(f"\n  ✗  {len(missing)} SKU(s) have NO source image on disk:")
@@ -235,8 +250,10 @@ def preflight_verify(
     )
 
     if missing_count:
-        print(f"  ABORT: {missing_count} source image(s) missing from disk.\n"
-              "  Fix the source paths before running the pipeline.\n")
+        print(
+            f"  ABORT: {missing_count} source image(s) missing from disk.\n"
+            "  Fix the source paths before running the pipeline.\n"
+        )
         raise PreflightAborted(
             f"{missing_count} source image(s) not found. "
             "Update render_source_override in product-catalog.csv or add bundle photos."

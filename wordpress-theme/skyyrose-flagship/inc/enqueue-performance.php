@@ -210,8 +210,8 @@ function skyyrose_preload_hero_image() {
  */
 function skyyrose_add_sri_hashes( $tag, $handle ) {
 	$sri_map = array(
-		'skyyrose-gsap'    => 'sha512-uLQ2FiOFLOSKlKAOaGEHMA/N2O2qOc5OjA6MGOF1ygQZwfBMCURc12Bj+/YJymGs6PiA1KOsSiyc+PMjBvfg==',
-		'skyyrose-gsap-st' => 'sha512-HhCLnFuMiJVTOwulMQrifGsT0pc69svMZVJxYkFiUB8e2HCMFqBEnKNWlGRMO+y7Y+S5eFZyGQ17IPJMP7fUA==',
+		'skyyrose-gsap'    => 'sha512-16esztaSRplJROstbIIdwX3N97V1+pZvV33ABoG1H2OyTttBxEGkTsoIVsiP1iaTtM8b3+hu2kB6pQ4Clr5yug==',
+		'skyyrose-gsap-st' => 'sha512-Ic9xkERjyZ1xgJ5svx3y0u3xrvfT/uPkV99LBwe68xjy/mGtO+4eURHZBW2xW4SZbFrF1Tf090XqB+EVgXnVjw==',
 	);
 
 	if ( isset( $sri_map[ $handle ] ) ) {

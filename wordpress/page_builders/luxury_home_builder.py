@@ -419,7 +419,7 @@ class LuxuryHomePageBuilder(ElementorPageBuilder):
                             "elType": "widget",
                             "widgetType": "heading",
                             "settings": {
-                                "title": "Where Love Meets Luxury",
+                                "title": "Luxury Grows from Concrete.",
                                 "typography_font_family": "Playfair Display",
                                 "typography_font_size": {"size": 56, "unit": "px"},
                                 "color": "#FFFFFF",
@@ -559,7 +559,7 @@ class LuxuryHomePageBuilder(ElementorPageBuilder):
         return {
             "content": sections,
             "page_settings": {
-                "post_title": "Home - SkyyRose | Where Love Meets Luxury",
+                "post_title": "Home - SkyyRose | Luxury Grows from Concrete.",
                 "template": "elementor_canvas",  # Full-width, no header/footer chrome
                 "meta_description": "SkyyRose - Luxury fashion where love meets luxury. Explore our signature collections including Black Rose, Love Hurts, and Signature lines.",
             },

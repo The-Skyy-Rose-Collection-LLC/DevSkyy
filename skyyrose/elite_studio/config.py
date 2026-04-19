@@ -65,6 +65,10 @@ BATCH_DELAY_SECONDS = 10
 RETRY_DELAY_SECONDS = 5
 MAX_RETRIES = 2
 
+# LangGraph engine
+MAX_QC_RETRIES = int(os.getenv("ELITE_MAX_QC_RETRIES", "2"))
+GRAPH_CHECKPOINT_DIR = Path(os.getenv("ELITE_CHECKPOINT_DIR", str(_BASE_DIR / ".checkpoints")))
+
 # ---------------------------------------------------------------------------
 # Compositor configuration
 # ---------------------------------------------------------------------------
@@ -87,6 +91,47 @@ ICLIGHT_BASE_MODEL = "stablediffusionapi/realistic-vision-v51"
 ICLIGHT_STEPS = 25
 ICLIGHT_CFG = 2.0
 ICLIGHT_RESOLUTION = 384
+
+# ---------------------------------------------------------------------------
+# Lazy provider clients (cached singletons — no mutable globals)
+# ---------------------------------------------------------------------------
+
+
+# ---------------------------------------------------------------------------
+# Queue / worker configuration
+# ---------------------------------------------------------------------------
+
+REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+
+# Worker concurrency (number of concurrent render jobs per worker process)
+WORKER_CONCURRENCY: int = int(os.getenv("ELITE_WORKER_CONCURRENCY", "1"))
+
+# Cost tracking — set to "false" to disable Redis cost writes
+COST_TRACKING_ENABLED: bool = os.getenv("ELITE_COST_TRACKING", "true").lower() != "false"
+
+# Rate limit constants per provider (requests / minute)
+RATE_LIMIT_GEMINI: int = int(os.getenv("ELITE_RATE_LIMIT_GEMINI", "60"))
+RATE_LIMIT_OPENAI: int = int(os.getenv("ELITE_RATE_LIMIT_OPENAI", "500"))
+RATE_LIMIT_ANTHROPIC: int = int(os.getenv("ELITE_RATE_LIMIT_ANTHROPIC", "50"))
+
+# ---------------------------------------------------------------------------
+# Stripe / Billing configuration
+# ---------------------------------------------------------------------------
+
+STRIPE_SECRET_KEY: str = os.getenv("STRIPE_SECRET_KEY", "")
+STRIPE_WEBHOOK_SECRET: str = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+
+# Comma-separated list of tier:price_id pairs.
+# Example: "starter:price_abc123,pro:price_def456,enterprise:price_ghi789"
+STRIPE_PRICE_IDS_RAW: str = os.getenv("STRIPE_PRICE_IDS", "")
+
+# Parsed as a dict for convenient lookups.
+STRIPE_PRICE_IDS: dict[str, str] = {
+    _k.strip(): _v.strip()
+    for _entry in STRIPE_PRICE_IDS_RAW.split(",")
+    if ":" in _entry
+    for _k, _v in [_entry.strip().split(":", 1)]
+}
 
 # ---------------------------------------------------------------------------
 # Lazy provider clients (cached singletons — no mutable globals)

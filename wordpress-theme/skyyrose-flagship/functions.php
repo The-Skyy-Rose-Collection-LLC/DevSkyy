@@ -44,6 +44,10 @@ $GLOBALS['concatenate_scripts'] = false;
  * Core Includes (always loaded)
  *--------------------------------------------------------------*/
 $skyyrose_core_includes = array(
+	// SoT constants generated from assets/brand/brand.yaml — load FIRST so every
+	// downstream include can reference SKYYROSE_BRAND_TAGLINE, SKYYROSE_COLOR_*,
+	// skyyrose_brand_collections(), skyyrose_json_ld_organization(), etc.
+	'/inc/brand.generated.php',
 	'/inc/theme-setup.php',
 	'/inc/brand-colors.php',
 	'/inc/collections-config.php',
@@ -65,6 +69,11 @@ $skyyrose_core_includes = array(
 	'/inc/menu-setup.php',
 	'/inc/theme-activation-setup.php',
 	'/inc/klaviyo-integration.php',
+	'/inc/experience-engine.php',
+	'/inc/fastapi-client.php',
+	'/inc/rest-api-experience.php',
+	'/inc/personalization.php',
+	'/inc/performance-guardian.php',
 	'/inc/performance.php',
 	'/inc/patterns.php',
 );
@@ -88,6 +97,7 @@ if ( class_exists( 'WooCommerce' ) ) {
 		'/inc/immersive-ajax.php',
 		'/inc/wishlist-functions.php',
 		'/inc/class-wishlist-widget.php',
+		'/inc/experience-analyzer.php',
 		'/inc/woocommerce-kids-capsule.php',
 		'/inc/rest-kids-capsule.php',
 	);

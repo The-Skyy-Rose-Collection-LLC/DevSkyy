@@ -2,15 +2,15 @@
 Collection Page Manager
 =======================
 
-Design templates and metadata for the three SkyyRose collections.
-Used by Python agents for consistency checks, recovery prompts, and
-LLM context — not for rendering (that happens in PHP/WordPress).
+Design templates and metadata for the SkyyRose collections. Used by Python
+agents for consistency checks, recovery prompts, and LLM context — not for
+rendering (that happens in PHP/WordPress).
 
-Collections
------------
-- BLACK_ROSE  — Gothic luxury, Oakland/East Bay, dark elegance
-- LOVE_HURTS  — Beauty-and-the-Beast aesthetic, passionate/emotional
-- SIGNATURE   — SF/Golden Gate, rose gold runway, premium essentials
+**This module is a thin adapter.** Authoritative data lives in:
+  - `assets/brand/brand.yaml`            (via skyyrose.elite_studio.brand)
+  - `assets/product-masters/catalog.yaml` (via skyyrose.elite_studio.catalog)
+
+Do not hardcode collection metadata here. Edit the YAML SoTs instead.
 """
 
 from __future__ import annotations
@@ -19,18 +19,32 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
 
+from skyyrose.elite_studio.brand import BrandConfig
+from skyyrose.elite_studio.catalog import Catalog
+
 
 class CollectionType(StrEnum):
-    """The three SkyyRose product collections."""
+    """The four SkyyRose product collections. Values match brand.yaml slugs."""
 
-    BLACK_ROSE = "black_rose"
-    LOVE_HURTS = "love_hurts"
+    BLACK_ROSE = "black-rose"
+    LOVE_HURTS = "love-hurts"
     SIGNATURE = "signature"
+    KIDS = "kids"
+
+
+# WordPress template paths per collection. These aren't brand data (they're
+# deployment config), so they live here rather than in brand.yaml.
+_HTML_PATHS: dict[CollectionType, str] = {
+    CollectionType.BLACK_ROSE: "wordpress-theme/skyyrose-flagship/template-collection-black-rose.php",
+    CollectionType.LOVE_HURTS: "wordpress-theme/skyyrose-flagship/template-collection-love-hurts.php",
+    CollectionType.SIGNATURE: "wordpress-theme/skyyrose-flagship/template-collection-signature.php",
+    CollectionType.KIDS: "wordpress-theme/skyyrose-flagship/template-collection-kids-capsule.php",
+}
 
 
 @dataclass
 class CollectionTemplate:
-    """Design specification for one collection."""
+    """Design specification for one collection (assembled from brand + catalog)."""
 
     name: str
     theme: str
@@ -50,137 +64,65 @@ class CollectionTemplate:
         }
 
 
-# ---------------------------------------------------------------------------
-# Authoritative template definitions
-# ---------------------------------------------------------------------------
+def _build_template(
+    ctype: CollectionType,
+    brand: BrandConfig | None = None,
+    catalog: Catalog | None = None,
+) -> CollectionTemplate:
+    """Assemble a CollectionTemplate from brand.yaml + catalog.yaml. Pure read — no mutation."""
+    brand = brand or BrandConfig.load()
+    catalog = catalog or Catalog.load()
 
-_TEMPLATES: dict[CollectionType, CollectionTemplate] = {
-    CollectionType.BLACK_ROSE: CollectionTemplate(
-        name="BLACK Rose Collection",
-        theme="Gothic luxury — Oakland grit meets dark elegance",
-        description=(
-            "Where darkness blooms into luxury. "
-            "Inspired by Oakland's East Bay streets and gothic romance. "
-            "Every piece is a statement in dark, powerful self-expression."
+    slug = ctype.value
+    cb = brand.collection(slug)
+    product_skus = [p.sku for p in catalog.products_in_collection(slug, active_only=True)]
+
+    return CollectionTemplate(
+        name=(
+            f"{cb.display_name.title()} Collection"
+            if cb.display_name.isupper()
+            else f"{cb.display_name} Collection"
         ),
-        colors={
-            "primary": "#0A0A0A",
-            "secondary": "#B76E79",
-            "accent": "#DC143C",
-            "text": "#F5F5F5",
-            "highlight": "#D4AF37",
-        },
-        html_file_path="wordpress-theme/skyyrose-flagship/template-collection-black-rose.php",
+        theme=cb.theme,
+        description=cb.description,
+        colors=dict(cb.palette),
+        html_file_path=_HTML_PATHS[ctype],
         metadata={
-            "target_audience": "Oakland / Bay Area streetwear enthusiasts, gothic luxury",
-            "tagline": "Luxury Grows from Concrete.",
-            "mood": "dark, powerful, mysterious, luxurious",
-            "inspiration": "Gothic romance, Bay Area night life, street art",
-            "hero_scene": "Bay Bridge at night, street luxury",
-            "products": [
-                "br-001",
-                "br-002",
-                "br-003",
-                "br-004",
-                "br-005",
-                "br-006",
-                "br-007",
-                "br-008",
-                "br-009",
-                "br-010",
-                "br-011",
-            ],
+            "target_audience": cb.target_audience,
+            "tagline": brand.tagline_active,
+            "mood": cb.mood,
+            "inspiration": cb.inspiration,
+            "hero_scene": cb.hero_scene,
+            "products": product_skus,
         },
-    ),
-    CollectionType.LOVE_HURTS: CollectionTemplate(
-        name="Love Hurts Collection",
-        theme="Oakland grit meets luxury passion — beauty with a broken heart",
-        description=(
-            "Feel the fire. Love Hurts channels raw emotion and Bay Area passion "
-            "into pieces that wear your heart on your sleeve — literally."
-        ),
-        colors={
-            "primary": "#1A0A0A",
-            "secondary": "#DC143C",
-            "accent": "#B76E79",
-            "text": "#F5F5F5",
-            "highlight": "#8B0000",
-        },
-        html_file_path="wordpress-theme/skyyrose-flagship/template-collection-love-hurts.php",
-        metadata={
-            "target_audience": "Oakland streetwear, passionate fashion lovers",
-            "tagline": "Wear your heart outside.",
-            "mood": "passionate, emotional, bold, raw",
-            "inspiration": "Beauty and the Beast, enchanted rose, Oakland resilience",
-            "hero_scene": "Enchanted rose dome, gothic cathedral atmosphere",
-            "products": ["lh-002", "lh-003", "lh-004", "lh-006"],
-        },
-    ),
-    CollectionType.SIGNATURE: CollectionTemplate(
-        name="Signature Collection",
-        theme="Rose gold runway — SF golden hour premium essentials",
-        description=(
-            "The crown jewel. Timeless essentials in rose gold, inspired by "
-            "San Francisco's Golden Gate and the city's fashion-forward spirit."
-        ),
-        colors={
-            "primary": "#1A1205",
-            "secondary": "#D4AF37",
-            "accent": "#B76E79",
-            "text": "#F5F5F5",
-            "highlight": "#C0C0C0",
-        },
-        html_file_path="wordpress-theme/skyyrose-flagship/template-collection-signature.php",
-        metadata={
-            "target_audience": "SF fashion, premium streetwear, elevated essentials",
-            "tagline": "The Crown Jewel.",
-            "mood": "elegant, golden, timeless, premium",
-            "inspiration": "Golden Gate Bridge, SF fashion week, rose gold luxury",
-            "hero_scene": "Golden Gate Bridge at golden hour, fog through cables",
-            "products": [
-                "sg-001",
-                "sg-002",
-                "sg-003",
-                "sg-004",
-                "sg-005",
-                "sg-006",
-                "sg-007",
-                "sg-009",
-                "sg-010",
-                "sg-011",
-                "sg-012",
-                "sg-013",
-                "sg-014",
-            ],
-        },
-    ),
-}
+    )
 
 
 class CollectionDesignTemplates:
     """
-    Static registry of SkyyRose collection design templates.
+    Registry of SkyyRose collection design templates.
 
-    All methods are class-level — no instantiation required.
+    Templates are assembled on-demand from brand.yaml + catalog.yaml, so changes
+    to either SoT are reflected on the next call. All methods are class-level —
+    no instantiation required.
     """
 
     @classmethod
     def get_template(cls, collection: CollectionType) -> CollectionTemplate:
         """Return the design template for a collection."""
-        return _TEMPLATES[collection]
+        return _build_template(collection)
 
     @classmethod
     def get_all_templates(cls) -> dict[CollectionType, CollectionTemplate]:
         """Return all templates keyed by CollectionType."""
-        return dict(_TEMPLATES)
+        brand = BrandConfig.load()
+        catalog = Catalog.load()
+        return {ct: _build_template(ct, brand=brand, catalog=catalog) for ct in CollectionType}
 
     @classmethod
     def to_agent_reference(cls, collection: CollectionType) -> dict[str, Any]:
-        """
-        Return a serialisable dict suitable for injecting into an LLM prompt
-        or returning as a recovery reference.
-        """
-        t = _TEMPLATES[collection]
+        """Serializable dict suitable for LLM prompt injection or recovery reference."""
+        t = _build_template(collection)
         return {
             "collection": collection.value,
             "name": t.name,
@@ -190,9 +132,9 @@ class CollectionDesignTemplates:
             "html_file_path": t.html_file_path,
             "metadata": t.metadata or {},
             "recovery_steps": [
-                f"Restore primary color to {t.colors['primary']}",
-                f"Restore secondary color to {t.colors['secondary']}",
-                f"Restore accent color to {t.colors['accent']}",
+                f"Restore primary color to {t.colors.get('primary', '')}",
+                f"Restore secondary color to {t.colors.get('secondary', '')}",
+                f"Restore accent color to {t.colors.get('accent', '')}",
                 f"Reset theme to: {t.theme}",
                 f"Reference HTML template: {t.html_file_path}",
             ],

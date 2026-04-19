@@ -88,7 +88,7 @@ class WordPressDeployer:
                 "title": "Home",
                 "slug": "home",
                 "status": "publish",
-                "content": "<h1>SkyyRose - Where Love Meets Luxury</h1><p>Immersive 3D collection experiences</p>",
+                "content": "<h1>SkyyRose - Luxury Grows from Concrete.</h1><p>Immersive 3D collection experiences</p>",
                 "meta": {"_elementor_edit_mode": "builder"},
             },
             {
@@ -123,7 +123,7 @@ class WordPressDeployer:
                 "title": "About SkyyRose",
                 "slug": "about",
                 "status": "publish",
-                "content": "<h1>About SkyyRose</h1><p>Where Love Meets Luxury</p>",
+                "content": "<h1>About SkyyRose</h1><p>Luxury Grows from Concrete.</p>",
                 "meta": {"_elementor_edit_mode": "builder"},
             },
         ]

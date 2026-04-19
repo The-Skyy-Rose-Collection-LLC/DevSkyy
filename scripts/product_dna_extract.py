@@ -134,7 +134,9 @@ def _load_image_b64(image_path: Path) -> tuple[str, str]:
     mime = (
         "image/jpeg"
         if ext in (".jpg", ".jpeg")
-        else "image/webp" if ext == ".webp" else "image/png"
+        else "image/webp"
+        if ext == ".webp"
+        else "image/png"
     )
     return base64.b64encode(image_path.read_bytes()).decode("utf-8"), mime
 

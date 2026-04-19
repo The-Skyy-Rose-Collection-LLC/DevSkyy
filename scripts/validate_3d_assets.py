@@ -949,7 +949,7 @@ def print_banner() -> None:
     banner = """
 ================================================================================
               SKYYROSE 3D ASSET QUALITY VALIDATION AGENT
-                       Where Love Meets Luxury
+                       Luxury Grows from Concrete.
 ================================================================================
 
 Validation Checks:

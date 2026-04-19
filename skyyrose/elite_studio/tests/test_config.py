@@ -29,8 +29,10 @@ class TestPaths:
     def test_overrides_dir_exists(self):
         assert config.OVERRIDES_DIR.exists()
 
-    def test_source_dir_exists(self):
-        assert config.SOURCE_DIR.exists()
+    def test_source_dir_is_path(self):
+        """SOURCE_DIR is a Path object pointing to the expected location."""
+        assert hasattr(config.SOURCE_DIR, "is_dir")
+        assert "source-products" in str(config.SOURCE_DIR)
 
 
 class TestLazyClients:

@@ -1,6 +1,6 @@
 {
   "name": "devskyy",
-  "version": "3.0.0",
+  "version": "3.2.0",
   "description": "AI-driven multi-agent orchestration platform for enterprise e-commerce automation",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -191,7 +191,7 @@
     "security:fix": "npm audit fix",
     "deps:update": "npm update",
     "deps:check": "npm outdated",
-    "demo:collections": "echo '🌹 SkyyRose Collection 3D Experiences Demo' && echo 'Available collections: black_rose, signature, love_hurts, showroom, runway' && echo 'Run: npm run demo:black-rose | demo:signature | demo:love-hurts | demo:showroom | demo:runway'",
+    "demo:collections": "echo '\ud83c\udf39 SkyyRose Collection 3D Experiences Demo' && echo 'Available collections: black_rose, signature, love_hurts, showroom, runway' && echo 'Run: npm run demo:black-rose | demo:signature | demo:love-hurts | demo:showroom | demo:runway'",
     "demo:black-rose": "npx vite serve --open --config config/vite/demo.config.ts -- --collection=black_rose",
     "demo:signature": "npx vite serve --open --config config/vite/demo.config.ts -- --collection=signature",
     "demo:love-hurts": "npx vite serve --open --config config/vite/demo.config.ts -- --collection=love_hurts",

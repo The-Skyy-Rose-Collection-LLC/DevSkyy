@@ -249,6 +249,29 @@ from api.v1.claude_sdk import router as claude_sdk_router
 
 app.include_router(claude_sdk_router, prefix="/api/v1")
 
+# Elite Studio — Layer 5 REST API
+from api.v1.elite_studio import router as elite_studio_router
+
+app.include_router(elite_studio_router, prefix="/api/v1")
+
+# RAGAnything — Multimodal Knowledge Graph RAG
+from api.v1.rag_anything import router as rag_anything_router  # noqa: E402
+
+app.include_router(rag_anything_router, prefix="/api/v1")
+
+# Enterprise API v2 — creative ops, characters, assets, webhooks, health
+from api.v2 import assets_router as v2_assets_router
+from api.v2 import characters_router as v2_characters_router
+from api.v2 import creative_router as v2_creative_router
+from api.v2 import health_router as v2_health_router
+from api.v2 import webhooks_router as v2_webhooks_router
+
+app.include_router(v2_creative_router, prefix="/api/v2")
+app.include_router(v2_characters_router, prefix="/api/v2")
+app.include_router(v2_assets_router, prefix="/api/v2")
+app.include_router(v2_webhooks_router, prefix="/api/v2")
+app.include_router(v2_health_router, prefix="/api/v2")
+
 # WordPress integration
 from api.v1.wordpress_integration import router as wordpress_router
 
@@ -283,6 +306,19 @@ app.include_router(pipeline_router, prefix="/api/v1")
 from security.jwt_oauth2_auth import auth_router
 
 app.include_router(auth_router)
+
+from billing.middleware import billing_middleware  # noqa: E402
+
+# SaaS Infrastructure — tenant resolution + billing entitlements
+from core.middleware.tenant import tenant_middleware  # noqa: E402
+
+app.middleware("http")(tenant_middleware)
+app.middleware("http")(billing_middleware)
+
+# Customer Portal
+from api.v1.portal import portal_router  # noqa: E402
+
+app.include_router(portal_router, prefix="/api/v1")
 
 # GraphQL
 from api.graphql_server import graphql_router

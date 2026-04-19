@@ -88,7 +88,7 @@ def print_banner() -> None:
 ║     HuggingFace Asset Enhancement Pipeline                                   ║
 ║     Generate high-quality 3D models from your product images                 ║
 ║                                                                              ║
-║     Where Love Meets Luxury                                                  ║
+║     Luxury Grows from Concrete.                                                  ║
 ║                                                                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """

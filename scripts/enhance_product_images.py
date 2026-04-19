@@ -850,7 +850,7 @@ def print_banner() -> None:
     banner = """
 ================================================================================
                    SKYYROSE PRODUCT IMAGE ENHANCEMENT PIPELINE
-                         Where Love Meets Luxury
+                         Luxury Grows from Concrete.
 ================================================================================
 
 Pipeline Stages:

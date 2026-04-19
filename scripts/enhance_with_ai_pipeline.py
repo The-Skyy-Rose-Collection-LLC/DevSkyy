@@ -145,7 +145,7 @@ HUGGINGFACE_TOP_MODELS = {
 # SkyyRose Brand DNA
 SKYYROSE_BRAND_DNA = {
     "brand": "SkyyRose",
-    "tagline": "Where Love Meets Luxury",
+    "tagline": "Luxury Grows from Concrete.",
     "style": "luxury streetwear",
     "colors": {
         "primary": "#B76E79",

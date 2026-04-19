@@ -163,7 +163,7 @@ class SkyyRoseProductionConfig:
 
     # Site Information
     site_name: str = "SkyyRose"
-    site_tagline: str = "Where Love Meets Luxury"
+    site_tagline: str = "Luxury Grows from Concrete."
     site_url: str = "https://skyyrose.co"
 
     # WordPress Credentials (loaded from environment)
@@ -237,7 +237,7 @@ class SkyyRoseProductionConfig:
                 slug="home-2",
                 status=PageStatus.PUBLISH,
                 template="elementor_canvas",
-                meta_description="SkyyRose - Where Love Meets Luxury. Cinematic 3D luxury streetwear from Oakland.",
+                meta_description="SkyyRose - Luxury Grows from Concrete.. Cinematic 3D luxury streetwear from Oakland.",
                 elementor_template_path="home.json",
                 custom_css=self._get_home_css(),
             ),

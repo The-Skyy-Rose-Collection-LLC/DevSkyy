@@ -106,7 +106,7 @@ class SupportAgent(EnhancedSuperAgent):
         },
     }
 
-    def __init__(self, config: AgentConfig | None = None):
+    def __init__(self, config: AgentConfig | None = None, rag_service: Any | None = None):
         if config is None:
             config = AgentConfig(
                 name="support_agent",
@@ -122,6 +122,10 @@ class SupportAgent(EnhancedSuperAgent):
                 temperature=0.3,  # Lower for consistency
             )
         super().__init__(config)
+
+        # RAGAnything — live policy/FAQ knowledge base
+        self._rag_service = rag_service
+        self._rag_collection = "skyyrose-support"
 
     def _build_system_prompt(self) -> str:
         """Build the support agent system prompt"""
@@ -590,7 +594,23 @@ Escalate to human support when:
 
             # Apply RAG technique for FAQ-based queries
             if task_type == "faq":
-                faq_context = self._get_relevant_faqs(prompt)
+                faq_context: list[str] | None = None
+                if self._rag_service is not None:
+                    try:
+                        rag_result = await self._rag_service.query(
+                            collection=self._rag_collection,
+                            question=prompt,
+                            mode="local",  # entity-centric — best for policy lookups
+                            top_k=5,
+                        )
+                        answer = rag_result.get("answer", "")
+                        faq_context = [answer] if answer else None
+                    except Exception as rag_exc:
+                        logger.warning(
+                            f"RAG FAQ fetch failed, falling back to static FAQs: {rag_exc}"
+                        )
+                if faq_context is None:
+                    faq_context = self._get_relevant_faqs(prompt)
                 enhanced = self.apply_technique(PromptTechnique.RAG, prompt, context=faq_context)
             else:
                 enhanced = self.apply_technique(

@@ -181,7 +181,7 @@ class BrandImagery:
 class BrandVoice:
     """Brand voice and copy guidelines."""
 
-    tagline: str = "Where Love Meets Luxury"
+    tagline: str = "Luxury Grows from Concrete."
     tone: str = "sophisticated, elevated, authentic"
     cta_primary: str = "Shop Now"
     cta_secondary: str = "Discover More"
@@ -442,7 +442,7 @@ class ElementorBuilder:
         # Generate home page
         template = builder.generate_home_page(
             hero_title="SkyyRose",
-            hero_subtitle="Where Love Meets Luxury",
+            hero_subtitle="Luxury Grows from Concrete.",
             collections=["BLACK_ROSE", "LOVE_HURTS", "SIGNATURE"],
         )
 
