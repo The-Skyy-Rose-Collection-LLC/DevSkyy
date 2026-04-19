@@ -112,12 +112,12 @@ const FUNNEL_STAGES: readonly FunnelStage[] = [
 
 const PRODUCT_HEAT_DATA: readonly ProductHeat[] = [
   { sku: 'br-004', name: 'BLACK Rose Hoodie', collection: 'black-rose', heatScore: 94, views: 1243, avgHoverTime: 8.2, cartRate: 4.8 },
-  { sku: 'lh-004', name: 'Love Hurts Varsity Jacket', collection: 'love-hurts', heatScore: 91, views: 1087, avgHoverTime: 7.9, cartRate: 5.1 },
+  { sku: 'lh-004', name: 'Love Hurts Bomber Jacket', collection: 'love-hurts', heatScore: 91, views: 1087, avgHoverTime: 7.9, cartRate: 5.1 },
+  { sku: 'lh-005', name: 'The Fannie', collection: 'love-hurts', heatScore: 76, views: 798, avgHoverTime: 5.8, cartRate: 3.1 },
   { sku: 'br-006', name: 'BLACK Rose Sherpa Jacket', collection: 'black-rose', heatScore: 87, views: 982, avgHoverTime: 7.4, cartRate: 4.2 },
   { sku: 'sg-002', name: 'Stay Golden Set', collection: 'signature', heatScore: 84, views: 921, avgHoverTime: 6.8, cartRate: 3.9 },
   { sku: 'br-008', name: "Women's BLACK Rose Hooded Dress", collection: 'black-rose', heatScore: 82, views: 876, avgHoverTime: 9.1, cartRate: 3.6 },
   { sku: 'sg-001', name: 'The Bay Set', collection: 'signature', heatScore: 79, views: 834, avgHoverTime: 6.2, cartRate: 3.4 },
-  { sku: 'lh-001', name: 'The Fannie', collection: 'love-hurts', heatScore: 76, views: 798, avgHoverTime: 5.8, cartRate: 3.1 },
   { sku: 'br-005', name: 'BLACK Rose Hoodie - Signature Ed.', collection: 'black-rose', heatScore: 74, views: 756, avgHoverTime: 7.1, cartRate: 2.9 },
   { sku: 'sg-006', name: 'Mint & Lavender Hoodie', collection: 'signature', heatScore: 71, views: 712, avgHoverTime: 5.4, cartRate: 2.7 },
   { sku: 'br-001', name: 'BLACK Rose Crewneck', collection: 'black-rose', heatScore: 68, views: 687, avgHoverTime: 4.9, cartRate: 2.5 },

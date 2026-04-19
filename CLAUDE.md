@@ -430,9 +430,10 @@ Before taking any of the actions below, Claude MUST stop, print exactly what it 
 - Any cache flush or CDN purge on the live site
 
 **File operations with real data**
-- Reading from Photos Library or any path under `/Users/coreyfoster/Pictures/`
-- Using any file as a source image for generation — must confirm file is the correct garment
-- Deleting, overwriting, or renaming any file outside `/tmp/` or `renders/output/`
+- Reading from Photos Library or `~/Pictures/` paths is ALLOWED when the user has shared a specific file path in the current conversation (pasted or attached). Confirmation is implicit in the share.
+- Using any file as the source image for a PAID API call (FASHN, Gemini generation, FLUX, Replicate, etc.) — must confirm the file is the correct garment before dispatch.
+- Uploading any file to WooCommerce, the live WordPress site, or any external destination — must confirm.
+- Deleting, overwriting, or renaming any file outside `/tmp/` or `renders/output/` — must confirm.
 
 ### What the confirmation must look like:
 

@@ -86,7 +86,7 @@ if ( class_exists( 'WooCommerce' ) ) {
 // Source from centralized catalog so prices stay in sync.
 if ( empty( $skyyrose_trending_products ) ) {
 	// Only published products — br-001, br-007, and lh-004 are drafts.
-	$skyyrose_404_skus = array( 'br-006', 'lh-002', 'sg-001', 'sg-008' );
+	$skyyrose_404_skus = array( 'br-006', 'lh-002', 'sg-001', 'sg-002' );
 	foreach ( $skyyrose_404_skus as $skyyrose_404_sku ) {
 		$skyyrose_404_product = skyyrose_get_product( $skyyrose_404_sku );
 		if ( $skyyrose_404_product ) {

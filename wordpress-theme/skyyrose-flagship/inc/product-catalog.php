@@ -1,601 +1,105 @@
 <?php
 /**
- * Centralized Product Catalog
+ * Centralized Product Catalog — CSV-backed loader
  *
- * Single source of truth for all product data across the SkyyRose theme.
- * All templates reference this file instead of maintaining duplicate arrays.
+ * Single source of truth for all product data:
+ *   data/skyyrose-catalog.csv
  *
- * Product data is maintained here directly. The canonical CSV
- * (data/product-catalog.csv) drives Python render scripts; this PHP file
- * is the WordPress-tier source of truth, adding image paths and publish
- * flags that the CSV does not carry.
+ * Every consumer (templates, WooCommerce overrides, 404 fallback, immersive
+ * templates, JSON-LD, admin screens, sync scripts) MUST read through this file.
+ * No other catalog source is authoritative — catalog.yaml, manifest.json,
+ * the per-skill products.csv files, and any worktree copies are retired.
  *
  * @package SkyyRose
- * @since   3.2.1
+ * @since   7.0.0
  */
 
-// Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 /**
- * Get the full product catalog.
+ * Absolute path to the canonical catalog CSV.
  *
- * Returns an associative array keyed by SKU. Each product includes:
- *   - sku, name, price, collection, description, badge
- *   - image (primary image filename), back_image (optional)
- *   - sizes (pipe-delimited string), color, edition_size
- *   - published (bool), is_preorder (bool)
+ * @since 7.0.0
+ * @return string
+ */
+function skyyrose_catalog_csv_path() {
+	return get_theme_file_path( 'data/skyyrose-catalog.csv' );
+}
+
+/**
+ * Get the full product catalog, keyed by SKU.
  *
- * @since  3.2.1
- * @return array Associative array of all products keyed by SKU.
+ * Parses data/skyyrose-catalog.csv on first call, caches in a static for the
+ * duration of the request. Unknown columns in the CSV are passed through
+ * unchanged so the schema can grow without code changes.
+ *
+ * @since 7.0.0
+ * @return array<string, array> Associative array of all products keyed by SKU.
  */
 function skyyrose_get_product_catalog() {
-
 	static $catalog = null;
 
 	if ( null !== $catalog ) {
 		return $catalog;
 	}
 
-	$img = 'assets/images/products';
+	$catalog  = array();
+	$csv_path = skyyrose_catalog_csv_path();
 
-	$catalog = array(
+	if ( ! is_readable( $csv_path ) ) {
+		return $catalog;
+	}
 
-		/*
-		--------------------------------------------------------------
-		 * BLACK ROSE COLLECTION (11 products)
-		 *--------------------------------------------------------------*/
+	$handle = fopen( $csv_path, 'r' );
+	if ( false === $handle ) {
+		return $catalog;
+	}
 
-		'br-001'   => array(
-			'sku'               => 'br-001',
-			'name'              => 'BLACK Rose Crewneck',
-			'price'             => 35.00,
-			'collection'        => 'black-rose',
-			'description'       => 'Gothic luxury blooms in twilight. Embroidered with defiant elegance, a dark romance woven in every thread.',
-			'badge'             => 'Draft',
-			'image'             => $img . '/black-rose-crewneck-techflat-v4.jpg',
-			'front_model_image' => $img . '/black-rose-crewneck-front-model.webp',
-			'back_image'        => '',
-			'back_model_image'  => $img . '/black-rose-crewneck-back-model.webp',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Black',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => false,
-		),
-		'br-002'   => array(
-			'sku'               => 'br-002',
-			'name'              => 'BLACK Rose Joggers',
-			'price'             => 50.00,
-			'collection'        => 'black-rose',
-			'description'       => 'Twilight comfort meets gothic romance. Embroidered black roses bloom on soft fabric.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/black-rose-joggers-source.jpg',
-			'front_model_image' => $img . '/black-rose-joggers-front-model.webp',
-			'back_image'        => $img . '/black-rose-joggers-back-model.webp',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Black',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'br-003'   => array(
-			'sku'               => 'br-003',
-			'name'              => 'BLACK is Beautiful Jersey',
-			'price'             => 45.00,
-			'collection'        => 'black-rose',
-			'description'       => 'A bold statement in luxury athletic wear. Black is beautiful, and this jersey proves it.',
-			'badge'             => 'Draft',
-			'image'             => $img . '/black-is-beautiful-jersey-techflat-black.jpeg',
-			'front_model_image' => $img . '/black-is-beautiful-jersey-front-model.webp',
-			'back_image'        => $img . '/black-is-beautiful-jersey-back-model.webp',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Black',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => false,
-		),
-		'br-004'   => array(
-			'sku'               => 'br-004',
-			'name'              => 'BLACK Rose Hoodie',
-			'price'             => 40.00,
-			'collection'        => 'black-rose',
-			'description'       => 'Gothic luxury in twilight shadows. Intricate embroidery captures the bloom of darkness.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/black-rose-hoodie-source.jpg',
-			'front_model_image' => $img . '/black-rose-hoodie-front-model.webp',
-			'back_image'        => $img . '/black-rose-hoodie-back-model.webp',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Black',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'br-005'   => array(
-			'sku'               => 'br-005',
-			'name'              => 'BLACK Rose Hoodie — Signature Edition',
-			'price'             => 65.00,
-			'collection'        => 'black-rose',
-			'description'       => 'The definitive Black Rose hoodie. Signature edition with premium detailing and numbered tag.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/black-rose-hoodie-signature-edition-hoodie-ltd-source.jpg',
-			'front_model_image' => $img . '/black-rose-hoodie-signature-edition-front-model.webp',
-			'back_image'        => $img . '/black-rose-hoodie-signature-edition-back-model.webp',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Black',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'br-006'   => array(
-			'sku'               => 'br-006',
-			'name'              => 'BLACK Rose Sherpa Jacket',
-			'price'             => 95.00,
-			'collection'        => 'black-rose',
-			'description'       => 'Lustrous black satin with plush Sherpa lining, crowned by an exquisite embroidered rose.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/black-rose-sherpa-jacket-sherpa-product.jpg',
-			'front_model_image' => $img . '/black-rose-sherpa-jacket-front-model.webp',
-			'back_image'        => $img . '/black-rose-sherpa-jacket-back-model.webp',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Black',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'br-007'   => array(
-			'sku'               => 'br-007',
-			'name'              => 'BLACK Rose x Love Hurts Basketball Shorts',
-			'price'             => 65.00,
-			'collection'        => 'black-rose',
-			'description'       => 'Two worlds collide. A cross-collection collaboration merging Black Rose darkness with Love Hurts fire.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/br-007-real-front.jpg',
-			'front_model_image' => $img . '/black-rose-love-hurts-basketball-shorts-front-model.webp',
-			'back_image'        => $img . '/br-007-real-back.jpg',
-			'back_model_image'  => $img . '/black-rose-love-hurts-basketball-shorts-back-model.webp',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Black',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
+	$headers = fgetcsv( $handle, 0, ',', '"', '\\' );
+	if ( false === $headers ) {
+		fclose( $handle );
+		return $catalog;
+	}
 
-		// BLACK is Beautiful Jersey Series — Exclusive editions ($115 each, 80 pieces).
-		'br-008'   => array(
-			'sku'               => 'br-008',
-			'name'              => 'SF Inspired (Football)',
-			'price'             => 115.00,
-			'collection'        => 'black-rose',
-			'description'       => 'Red #80 football jersey. SF 49ers inspired, alternating rose fill on numbers. Exclusive edition — 80 pieces.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/black-is-beautiful-football-jersey-red-design.jpg',
-			'front_model_image' => $img . '/black-is-beautiful-football-jersey-red-front-model.webp',
-			'back_image'        => $img . '/black-is-beautiful-football-jersey-red-back-model.webp',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Red',
-			'edition_size'      => 80,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'br-009'   => array(
-			'sku'               => 'br-009',
-			'name'              => 'Last Oakland (Football)',
-			'price'             => 115.00,
-			'collection'        => 'black-rose',
-			'description'       => 'White #32 football jersey. White numbers with black border, alternating rose fill. The Last Oakland edition — 80 pieces.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/black-is-beautiful-football-jersey-white-design.jpg',
-			'front_model_image' => $img . '/black-is-beautiful-football-jersey-white-front-model.webp',
-			'back_image'        => $img . '/black-is-beautiful-football-jersey-white-back-model.webp',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'White',
-			'edition_size'      => 80,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'br-010'   => array(
-			'sku'               => 'br-010',
-			'name'              => 'The Bay Jersey (Basketball)',
-			'price'             => 100.00,
-			'collection'        => 'black-rose',
-			'description'       => 'Basketball tank with "THE BAY" gold text. Rose circle graphic, grey/silver rose fade. Bay Area edition — 80 pieces.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/black-is-beautiful-basketball-jersey-design.jpg',
-			'front_model_image' => $img . '/black-is-beautiful-basketball-jersey-front-model.webp',
-			'back_image'        => $img . '/black-is-beautiful-basketball-jersey-back-model.webp',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'White/Gold',
-			'edition_size'      => 80,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'br-011'   => array(
-			'sku'               => 'br-011',
-			'name'              => 'The Rose (Hockey)',
-			'price'             => 115.00,
-			'collection'        => 'black-rose',
-			'description'       => 'Hooded hockey jersey in black and teal. San Jose Sharks inspired, rose crest on front. Exclusive edition — 80 pieces.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/black-is-beautiful-hockey-jersey-design.jpg',
-			'front_model_image' => $img . '/black-is-beautiful-hockey-jersey-front-model.webp',
-			'back_image'        => $img . '/black-is-beautiful-hockey-jersey-back-model.webp',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Black/Teal',
-			'edition_size'      => 80,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'br-012'   => array(
-			'sku'               => 'br-012',
-			'name'              => 'Last Oakland (Baseball)',
-			'price'             => 100.00,
-			'collection'        => 'black-rose',
-			'description'       => 'Baseball jersey in the Last Oakland colorway. Limited to 80 pieces — a tribute to Oakland\'s legacy.',
-			'badge'             => 'Pre-Order',
-			'image'             => '',
-			'front_model_image' => '',
-			'back_image'        => '',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Black/White',
-			'edition_size'      => 80,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
+	while ( ( $row = fgetcsv( $handle, 0, ',', '"', '\\' ) ) !== false ) {
+		// Skip blank rows.
+		if ( count( array_filter( $row, 'strlen' ) ) === 0 ) {
+			continue;
+		}
 
-		/*
-		--------------------------------------------------------------
-		 * LOVE HURTS COLLECTION (5 products)
-		 *--------------------------------------------------------------*/
+		// Pad short rows to full column count so array_combine doesn't fail.
+		if ( count( $row ) < count( $headers ) ) {
+			$row = array_pad( $row, count( $headers ), '' );
+		}
 
-		'lh-002'   => array(
-			'sku'               => 'lh-002',
-			'name'              => 'Love Hurts Joggers',
-			'price'             => 95.00,
-			'collection'        => 'love-hurts',
-			'description'       => 'Oakland grit meets luxury. Feel the fire with the embroidered rose, a symbol of passion.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/love-hurts-joggers-techflat.jpeg',
-			'front_model_image' => $img . '/love-hurts-joggers-front-model.webp',
-			'back_image'        => $img . '/love-hurts-joggers-back-model.webp',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Black',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'lh-003'   => array(
-			'sku'               => 'lh-003',
-			'name'              => 'Love Hurts Basketball Shorts',
-			'price'             => 75.00,
-			'collection'        => 'love-hurts',
-			'description'       => 'Oakland-inspired luxury streetwear. Defiant rose design on breathable mesh.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/lh-003-real-front.jpg',
-			'front_model_image' => $img . '/love-hurts-basketball-shorts-front-model.webp',
-			'back_image'        => $img . '/lh-003-real-back.jpg',
-			'back_model_image'  => $img . '/love-hurts-basketball-shorts-back-model.webp',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Black',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'lh-004'   => array(
-			'sku'               => 'lh-004',
-			'name'              => 'Love Hurts Varsity Jacket',
-			'price'             => 265.00,
-			'collection'        => 'love-hurts',
-			'description'       => 'Oakland street couture. Satin, bold fire-red script, hidden rose garden in hood.',
-			'badge'             => 'Draft',
-			'image'             => $img . '/love-hurts-varsity-jacket-varsity-source.jpg',
-			'front_model_image' => $img . '/love-hurts-varsity-jacket-front-model.webp',
-			'back_image'        => $img . '/love-hurts-varsity-jacket-back-model.webp',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Black',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => false,
-		),
-		'lh-006'   => array(
-			'sku'               => 'lh-006',
-			'name'              => 'The Fannie',
-			'price'             => 55.00,
-			'collection'        => 'love-hurts',
-			'description'       => 'Oakland luxury meets everyday utility. The essential Love Hurts fanny pack with premium embroidery.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/the-fannie-pack-photo.jpg',
-			'front_model_image' => '',
-			'back_image'        => '',
-			'back_model_image'  => '',
-			'sizes'             => 'One Size',
-			'color'             => 'Black',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
+		$data = array_combine( $headers, $row );
+		$sku  = isset( $data['sku'] ) ? trim( $data['sku'] ) : '';
+		if ( '' === $sku ) {
+			continue;
+		}
 
-		/*
-		--------------------------------------------------------------
-		 * SIGNATURE COLLECTION (13 products)
-		 *--------------------------------------------------------------*/
+		$catalog[ $sku ] = array(
+			'sku'               => $sku,
+			'name'              => $data['name'] ?? '',
+			'price'             => isset( $data['price'] ) ? (float) $data['price'] : 0.0,
+			'collection'        => $data['collection'] ?? '',
+			'description'       => $data['description'] ?? '',
+			'badge'             => $data['badge'] ?? '',
+			'image'             => $data['image'] ?? '',
+			'front_model_image' => $data['front_model_image'] ?? '',
+			'back_image'        => $data['back_image'] ?? '',
+			'back_model_image'  => $data['back_model_image'] ?? '',
+			'sizes'             => $data['sizes'] ?? '',
+			'color'             => $data['color'] ?? '',
+			'edition_size'      => isset( $data['edition_size'] ) ? (int) $data['edition_size'] : 0,
+			'published'         => ! empty( $data['published'] ) && '0' !== $data['published'],
+			'is_preorder'       => ! empty( $data['is_preorder'] ) && '0' !== $data['is_preorder'],
+		);
+	}
 
-		'sg-001'   => array(
-			'sku'               => 'sg-001',
-			'name'              => "The Bridge Series 'The Bay Bridge' Shorts",
-			'price'             => 195.00,
-			'collection'        => 'signature',
-			'description'       => 'Embody West Coast luxury with this exclusive ensemble. Iconic blue rose and vibrant Bay Area skyline.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/the-bay-set-source.jpeg',
-			'front_model_image' => $img . '/the-bay-set-front-model.webp',
-			'back_image'        => $img . '/the-bay-set-back-model.webp',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Blue',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'sg-002'   => array(
-			'sku'               => 'sg-002',
-			'name'              => "The Bridge Series 'Stay Golden' Shirt",
-			'price'             => 65.00,
-			'collection'        => 'signature',
-			'description'       => 'Embrace West Coast prestige. Luxurious statement of Bay Area style featuring signature rose.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/stay-golden-tee-techflat-v4.jpg',
-			'front_model_image' => $img . '/stay-golden-tee-front-model.webp',
-			'back_image'        => '',
-			'back_model_image'  => $img . '/stay-golden-tee-back-model.webp',
-			'sizes'             => 'XS|S|M|L|XL|2XL',
-			'color'             => 'Gold',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'sg-003'   => array(
-			'sku'               => 'sg-003',
-			'name'              => "The Bridge Series 'Stay Golden' Shorts",
-			'price'             => 65.00,
-			'collection'        => 'signature',
-			'description'       => 'From the Bridge Series. Athletic shorts in Stay Golden colorway celebrating Bay Area luxury.',
-			'badge'             => 'Pre-Order',
-			'image'             => '',
-			'front_model_image' => '',
-			'back_image'        => '',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Gold',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'sg-004'   => array(
-			'sku'               => 'sg-004',
-			'name'              => 'The Signature Hoodie',
-			'price'             => 55.00,
-			'collection'        => 'signature',
-			'description'       => 'The definitive Signature hoodie. Rose-gold embroidery on premium heavyweight cotton. The foundation piece.',
-			'badge'             => 'Pre-Order',
-			'image'             => '',
-			'front_model_image' => '',
-			'back_image'        => '',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Black',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'sg-005'   => array(
-			'sku'               => 'sg-005',
-			'name'              => "The Bridge Series 'The Bay Bridge' Shirt",
-			'price'             => 25.00,
-			'collection'        => 'signature',
-			'description'       => 'From the Bridge Series. Athletic shirt celebrating the iconic Bay Area bridges.',
-			'badge'             => 'Pre-Order',
-			'image'             => '',
-			'front_model_image' => '',
-			'back_image'        => '',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL',
-			'color'             => 'Navy',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'sg-006'   => array(
-			'sku'               => 'sg-006',
-			'name'              => 'Mint & Lavender Hoodie',
-			'price'             => 45.00,
-			'collection'        => 'signature',
-			'description'       => 'Sweet pastel vibes meet streetwear luxury. Mint and lavender colorblock with signature rose detail.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/mint-lavender-hoodie-source.jpg',
-			'front_model_image' => $img . '/mint-lavender-hoodie-front-model.webp',
-			'back_image'        => $img . '/mint-lavender-hoodie-back-model.webp',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Mint/Lavender',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'sg-007'   => array(
-			'sku'               => 'sg-007',
-			'name'              => 'The Signature Beanie',
-			'price'             => 25.00,
-			'collection'        => 'signature',
-			'description'       => 'Classic fitted beanie with embroidered signature rose. West Coast luxury meets everyday warmth.',
-			'badge'             => 'Pre-Order',
-			'image'             => '',
-			'front_model_image' => '',
-			'back_image'        => '',
-			'back_model_image'  => '',
-			'sizes'             => 'One Size',
-			'color'             => 'Black',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'sg-009'   => array(
-			'sku'               => 'sg-009',
-			'name'              => 'The Sherpa Jacket',
-			'price'             => 80.00,
-			'collection'        => 'signature',
-			'description'       => 'Plush sherpa warmth in the SkyyRose signature colorway. Luxury outerwear for the West Coast.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/the-sherpa-jacket-front-model.webp',
-			'front_model_image' => $img . '/the-sherpa-jacket-front-model.webp',
-			'back_image'        => $img . '/the-sherpa-jacket-back-model.webp',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Cream',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'sg-011'   => array(
-			'sku'               => 'sg-011',
-			'name'              => 'Original Label Tee (White)',
-			'price'             => 30.00,
-			'collection'        => 'signature',
-			'description'       => 'The original SkyyRose label tee in clean white. Minimal design with signature branding.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/original-label-tee-white-front-model.webp',
-			'front_model_image' => $img . '/original-label-tee-white-front-model.webp',
-			'back_image'        => $img . '/original-label-tee-white-back-model.webp',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'White',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'sg-012'   => array(
-			'sku'               => 'sg-012',
-			'name'              => 'Original Label Tee (Orchid)',
-			'price'             => 30.00,
-			'collection'        => 'signature',
-			'description'       => 'The original SkyyRose label tee in rich orchid. Minimal design with signature branding.',
-			'badge'             => 'Pre-Order',
-			'image'             => $img . '/original-label-tee-orchid-front-model.webp',
-			'front_model_image' => $img . '/original-label-tee-orchid-front-model.webp',
-			'back_image'        => $img . '/original-label-tee-orchid-back-model.webp',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Orchid',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'sg-013'   => array(
-			'sku'               => 'sg-013',
-			'name'              => 'Mint & Lavender Crewneck',
-			'price'             => 40.00,
-			'collection'        => 'signature',
-			'description'       => 'Pastel luxury in crewneck form. Mint and lavender colorblock with signature rose embroidery.',
-			'badge'             => 'Pre-Order',
-			'image'             => '',
-			'front_model_image' => '',
-			'back_image'        => '',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Mint/Lavender',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'sg-014'   => array(
-			'sku'               => 'sg-014',
-			'name'              => 'Mint & Lavender Sweatpants',
-			'price'             => 45.00,
-			'collection'        => 'signature',
-			'description'       => 'Pastel luxury meets streetwear comfort. Mint and lavender sweatpants with signature rose detail.',
-			'badge'             => 'Pre-Order',
-			'image'             => '',
-			'front_model_image' => '',
-			'back_image'        => '',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Mint/Lavender',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-		'sg-015'   => array(
-			'sku'               => 'sg-015',
-			'name'              => 'The Windbreaker Set',
-			'price'             => 85.00,
-			'collection'        => 'signature',
-			'description'       => 'Signature luxury meets West Coast weather. A premium windbreaker set built for the ones who move through fog.',
-			'badge'             => 'Pre-Order',
-			'image'             => '',
-			'front_model_image' => '',
-			'back_image'        => '',
-			'back_model_image'  => '',
-			'sizes'             => 'S|M|L|XL|2XL|3XL',
-			'color'             => 'Black',
-			'edition_size'      => 250,
-			'published'         => true,
-			'is_preorder'       => true,
-		),
-
-		/*
-		--------------------------------------------------------------
-		 * KIDS CAPSULE (2 products)
-		 *--------------------------------------------------------------*/
-
-		'kids-001' => array(
-			'sku'               => 'kids-001',
-			'name'              => 'Kids Colorblock Hoodie Set — Purple/Pink',
-			'price'             => 65.00,
-			'collection'        => 'kids-capsule',
-			'description'       => 'Bold red and black V-chevron colorblock hoodie and jogger set. Designed for young ones who wear luxury from the start.',
-			'badge'             => '',
-			'image'             => $img . '/colorblock-red-set-real.jpg',
-			'front_model_image' => $img . '/kids-red-set-front-model.webp',
-			'back_image'        => '',
-			'back_model_image'  => $img . '/kids-red-set-back-model.webp',
-			'sizes'             => '2T|3T|4T|5|6|7',
-			'color'             => 'Red/Black',
-			'edition_size'      => 150,
-			'published'         => true,
-			'is_preorder'       => false,
-		),
-		'kids-002' => array(
-			'sku'               => 'kids-002',
-			'name'              => 'Kids Colorblock Hoodie Set — Black/Red/White',
-			'price'             => 65.00,
-			'collection'        => 'kids-capsule',
-			'description'       => 'Rich purple and black V-chevron colorblock hoodie and jogger set. Little ones deserve luxury too.',
-			'badge'             => '',
-			'image'             => $img . '/colorblock-purple-set-real.jpg',
-			'front_model_image' => $img . '/kids-purple-set-front-model.webp',
-			'back_image'        => '',
-			'back_model_image'  => $img . '/kids-purple-set-back-model.webp',
-			'sizes'             => '2T|3T|4T|5|6|7',
-			'color'             => 'Purple/Black',
-			'edition_size'      => 150,
-			'published'         => true,
-			'is_preorder'       => false,
-		),
-	);
+	fclose( $handle );
 
 	return $catalog;
 }
@@ -603,21 +107,21 @@ function skyyrose_get_product_catalog() {
 /**
  * Get a single product by SKU.
  *
- * @since  3.2.1
+ * @since 3.2.1
  * @param  string $sku Product SKU (e.g., 'br-006').
  * @return array|null  Product data array or null if not found.
  */
 function skyyrose_get_product( $sku ) {
 	$sku     = sanitize_key( $sku );
 	$catalog = skyyrose_get_product_catalog();
-	return isset( $catalog[ $sku ] ) ? $catalog[ $sku ] : null;
+	return $catalog[ $sku ] ?? null;
 }
 
 /**
  * Get all products for a specific collection.
  *
- * @since  3.2.1
- * @param  string $collection Collection slug: 'black-rose', 'love-hurts', or 'signature'.
+ * @since 3.2.1
+ * @param  string $collection Collection slug: 'black-rose', 'love-hurts', 'signature', 'kids-capsule'.
  * @return array  Array of product data arrays for the collection.
  */
 function skyyrose_get_collection_products( $collection ) {
@@ -646,7 +150,7 @@ function skyyrose_get_collection_products( $collection ) {
  *
  * Handles: br-003-giants → br-003, sg-001-tee → sg-001, br-003a → br-003.
  *
- * @since  6.3.0
+ * @since 6.3.0
  * @param  string $sku SKU with optional variant suffix.
  * @return string Base SKU.
  */
@@ -661,7 +165,7 @@ function skyyrose_normalize_sku( $sku ) {
  * Returns 'Coming Soon' for unpublished products without pre-order,
  * or the formatted dollar amount.
  *
- * @since  3.2.1
+ * @since 3.2.1
  * @param  array $product Product data array.
  * @return string Formatted price string.
  */
@@ -672,20 +176,17 @@ function skyyrose_format_price( $product ) {
 
 	$price = (float) $product['price'];
 
-	// Pre-order products with zero price show "Pre-Order" instead of "$0".
 	if ( ! empty( $product['is_preorder'] ) && $price <= 0 ) {
 		return esc_html__( 'Pre-Order', 'skyyrose' );
 	}
 
-	// Use zero decimal places — all prices are whole-dollar and $95 reads
-	// cleaner than $95.00 for a luxury fashion brand.
 	return '$' . number_format( $price, 0 );
 }
 
 /**
  * Get the theme-relative URI for a product image.
  *
- * @since  3.2.1
+ * @since 3.2.1
  * @param  string $image_path Relative image path from catalog (e.g., 'assets/images/products/br-001.webp').
  * @return string Full URI to the image.
  */
@@ -701,7 +202,7 @@ function skyyrose_product_image_uri( $image_path ) {
  *
  * Uses WooCommerce permalink if product exists, falls back to pre-order page.
  *
- * @since  3.2.3
+ * @since 3.2.3
  * @param  string $sku Product SKU.
  * @return string Product URL.
  */
@@ -714,8 +215,6 @@ function skyyrose_product_url( $sku ) {
 		}
 	}
 
-	// Fallback: route pre-order products to the pre-order gateway,
-	// non-preorder products to their collection page.
 	$product = skyyrose_get_product( $sku );
 	if ( $product && ! empty( $product['is_preorder'] ) ) {
 		return home_url( '/pre-order/#' . sanitize_title( $sku ) );
