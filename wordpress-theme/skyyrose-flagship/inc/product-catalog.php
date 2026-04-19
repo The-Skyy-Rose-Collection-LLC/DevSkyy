@@ -64,8 +64,7 @@ function skyyrose_get_product_catalog() {
 	}
 
 	while ( ( $row = fgetcsv( $handle, 0, ',', '"', '\\' ) ) !== false ) {
-		// Skip blank rows.
-		if ( count( array_filter( $row, 'strlen' ) ) === 0 ) {
+		if ( '' === implode( '', $row ) ) {
 			continue;
 		}
 

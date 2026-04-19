@@ -28,6 +28,10 @@ CATALOG_CSV = (
 SPECS_JSON = PROJECT_ROOT / "data" / "product-specs.json"
 
 
+def _bool_col(row: dict, key: str) -> bool:
+    return (row.get(key) or "").strip() == "1"
+
+
 def load_catalog() -> dict[str, dict]:
     """Load product catalog from the canonical CSV. Returns dict keyed by SKU.
 
@@ -43,12 +47,11 @@ def load_catalog() -> dict[str, dict]:
                 continue
             entry: dict = {
                 "name": row["name"].strip(),
-                # Canonical uses 'collection' as the slug (black-rose, love-hurts, etc.)
                 "collection": row["collection"].strip(),
-                "is_preorder": row.get("is_preorder", "").strip() == "1",
+                "is_preorder": _bool_col(row, "is_preorder"),
                 "output_slug": row.get("render_output_slug", "").strip() or sku,
-                "is_tech_flat": row.get("render_is_tech_flat", "").strip() == "1",
-                "is_accessory": row.get("render_is_accessory", "").strip() == "1",
+                "is_tech_flat": _bool_col(row, "render_is_tech_flat"),
+                "is_accessory": _bool_col(row, "render_is_accessory"),
                 "branding_spec": row.get("branding_spec", "").strip(),
             }
             if row.get("render_source_override", "").strip():

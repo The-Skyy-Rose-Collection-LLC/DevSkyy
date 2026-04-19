@@ -3,21 +3,13 @@
 Reads the canonical CSV at:
   wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv
 
-This replaces the previous YAML-based catalog
-(`assets/product-masters/catalog.yaml`), which was retired 2026-04-19.
-The ProductEntry / Catalog dataclass contract is preserved so existing
-consumers (prompt generators, vision test, fidelity gate, Compositor)
-keep working. Fields that the YAML carried but the CSV does not
-(aliases, filename_patterns, color_spec, variants, master, etc.) are
-defaulted to empty; populate in a follow-up if the pipeline needs them.
-
 Typical usage:
 
     from skyyrose.elite_studio.catalog import Catalog
 
     cat = Catalog.load()
     p = cat.require("sg-013")
-    print(p.series)             # derived from name: 'Mint & Lavender'
+    print(p.series)             # 'Mint & Lavender'
     print(p.branding_summary)   # logo/branding spec from CSV
 
 Env var SKYYROSE_CATALOG_PATH overrides the default CSV path.
@@ -368,7 +360,11 @@ def _status_from_csv(row: dict[str, str]) -> str:
 
 
 def _series_from_name(name: str) -> str | None:
-    """Derive series name from the product name for grouping purposes."""
+    """Heuristic fallback: derive a series name from the product name.
+
+    Used only when the CSV doesn't carry an explicit `series` column. Fragile
+    for novel series — add an explicit CSV column before introducing a new one.
+    """
     n = (name or "").lower()
     if "jersey series" in n:
         return "The Jersey Series"
