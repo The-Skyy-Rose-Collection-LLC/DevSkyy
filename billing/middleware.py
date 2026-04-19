@@ -92,8 +92,8 @@ async def billing_middleware(request: Request, call_next: Callable) -> Response:
 
     try:
         checker = _get_checker()
-        # UsageMetering uses a sync Redis client; offload to a thread so we
-        # do not block the event loop on every creative request.
+        # checker.check() hits a sync Redis client; offload so we don't
+        # block the event loop.
         result = await asyncio.to_thread(
             checker.check, tenant_id=tenant_id, tier=tier, intent=intent
         )
@@ -122,15 +122,12 @@ async def billing_middleware(request: Request, call_next: Callable) -> Response:
             },
         )
 
-    # Allowed — forward and tag response with remaining quota
     response: Response = await call_next(request)
 
-    # Only meter successful usage. 4xx/5xx don't consume quota.
+    # Meter successful usage out-of-band so the Redis RTT does not block
+    # the response. 4xx/5xx don't consume quota.
     if response.status_code < 400 and _metering is not None:
-        try:
-            await asyncio.to_thread(_metering.record, tenant_id, intent, 1)
-        except Exception as exc:
-            logger.error("billing_middleware record error: %s", exc)
+        asyncio.create_task(_record_usage_async(tenant_id, intent))
 
     remaining = result.remaining
     if remaining != -1:
@@ -139,6 +136,20 @@ async def billing_middleware(request: Request, call_next: Callable) -> Response:
     response.headers["X-Quota-Intent"] = intent
 
     return response
+
+
+async def _record_usage_async(tenant_id: str, intent: str) -> None:
+    """Background metering write. Failures here mean a tenant got a free
+    request — log loudly and emit a counter so ops can correlate."""
+    try:
+        await asyncio.to_thread(_metering.record, tenant_id, intent, 1)
+    except Exception as exc:
+        logger.error(
+            "billing.record_failed tenant=%s intent=%s error=%s",
+            tenant_id,
+            intent,
+            exc,
+        )
 
 
 # ---------------------------------------------------------------------------

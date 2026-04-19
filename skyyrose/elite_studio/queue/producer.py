@@ -9,6 +9,7 @@ via asyncio.run() so callers don't need an event loop.
 from __future__ import annotations
 
 import asyncio
+import concurrent.futures
 import logging
 import os
 from datetime import UTC, datetime
@@ -17,6 +18,13 @@ from uuid import uuid4
 from sdk.python.agent_sdk.task_queue import TaskQueue
 
 from .job_types import EliteStudioJobData
+
+# Module-level executor used by _run_sync when called from inside a running
+# event loop. Shared across all sync-in-async bridges so we don't spin up a
+# fresh thread pool per call. Prefer aenqueue_* for new async callers.
+_SYNC_BRIDGE_POOL = concurrent.futures.ThreadPoolExecutor(
+    max_workers=4, thread_name_prefix="producer-sync-bridge"
+)
 
 logger = logging.getLogger(__name__)
 
@@ -35,22 +43,16 @@ def _get_queue() -> TaskQueue:
 
 
 def _run_sync(coro):
-    """Run *coro* to completion from a sync context.
+    """Run *coro* from a sync context, even inside a running event loop.
 
-    Uses asyncio.run() when no loop is active, or dispatches to a short-lived
-    worker thread when already inside a running event loop (e.g. when an async
-    FastAPI handler calls these sync helpers). asyncio.run() from a running
-    loop raises RuntimeError, which was breaking every creative request.
+    asyncio.run() raises from a running loop, so bridge through the shared
+    module-level pool in that case. New async callers should use aenqueue_*.
     """
     try:
         asyncio.get_running_loop()
     except RuntimeError:
         return asyncio.run(coro)
-
-    import concurrent.futures
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-        return pool.submit(asyncio.run, coro).result()
+    return _SYNC_BRIDGE_POOL.submit(asyncio.run, coro).result()
 
 
 async def _async_enqueue(job_data: EliteStudioJobData) -> str:

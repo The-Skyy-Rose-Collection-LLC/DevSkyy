@@ -23,13 +23,11 @@ import os
 from collections.abc import Callable
 from typing import Any
 
+import jwt
 from fastapi import Request, Response
 
 logger = logging.getLogger(__name__)
 
-# Env-gated shared secret allowing trusted internal services (e.g. background
-# workers, admin tooling) to override tenant context via X-Tenant-ID.
-# When unset, the header is ignored — defaults-closed.
 _INTERNAL_SERVICE_TOKEN_ENV = "TENANT_HEADER_TRUST_TOKEN"
 _INTERNAL_SERVICE_HEADER = "X-Internal-Service-Token"
 
@@ -69,9 +67,8 @@ def _resolve_tenant(request: Request) -> tuple[str, str]:
     Tries header first, then JWT claim, then defaults.
     Never raises — returns ("", "free") on any failure.
     """
-    # 1. Explicit header — only honored when the caller also presents a
-    #    matching internal-service shared secret. Unauthenticated clients
-    #    cannot spoof tenancy this way.
+    # Honor X-Tenant-ID only when the caller presents a matching internal-
+    # service secret. Unauthenticated clients cannot spoof tenancy this way.
     header_tenant = request.headers.get("X-Tenant-ID", "").strip()
     if header_tenant and _internal_service_token_valid(request):
         tier = request.headers.get("X-Tenant-Tier", "free").strip() or "free"
@@ -94,7 +91,6 @@ def _internal_service_token_valid(request: Request) -> bool:
     """Return True when the request carries a valid internal-service token."""
     expected = os.getenv(_INTERNAL_SERVICE_TOKEN_ENV, "")
     if not expected:
-        # Defaults-closed: no secret configured, never trust the override.
         return False
     presented = request.headers.get(_INTERNAL_SERVICE_HEADER, "")
     return bool(presented) and hmac.compare_digest(presented, expected)
@@ -120,13 +116,9 @@ def _extract_jwt_claims(request: Request) -> dict[str, Any]:
 
     secret = os.getenv("JWT_SECRET_KEY", "")
     if not secret:
-        # No secret configured — refuse to trust any token. Never fall back
-        # to unverified decoding; that was the previous security hole.
         return {}
 
     try:
-        import jwt  # PyJWT
-
         claims: dict[str, Any] = jwt.decode(
             token,
             secret,

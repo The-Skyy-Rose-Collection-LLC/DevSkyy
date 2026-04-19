@@ -155,13 +155,11 @@ class BackgroundWorker:
                     additional_details=f"Style: {style}",
                 )
 
-            # The upstream tool may return its own failure markers. Don't
-            # hardcode "completed" — propagate failure signals so callers see
-            # the real outcome instead of a false success.
             tool_status = str(result.get("status", "")).lower()
-            tool_success = result.get("success")
             failed = (
-                tool_status in {"failed", "error"} or tool_success is False or "error" in result
+                tool_status in {"failed", "error"}
+                or result.get("success") is False
+                or bool(result.get("error"))
             )
             if failed:
                 logger.warning("3D generation tool reported failure: %s", result)
