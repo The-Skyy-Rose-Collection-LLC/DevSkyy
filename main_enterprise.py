@@ -309,11 +309,14 @@ app.include_router(auth_router)
 
 from billing.middleware import billing_middleware  # noqa: E402
 
-# SaaS Infrastructure — tenant resolution + billing entitlements
+# SaaS Infrastructure — tenant resolution + billing entitlements.
+# FastAPI runs http middlewares in LIFO order: the LAST-registered runs FIRST.
+# We want tenant → billing → handler, so billing is registered first and
+# tenant is registered second so it wraps billing.
 from core.middleware.tenant import tenant_middleware  # noqa: E402
 
-app.middleware("http")(tenant_middleware)
 app.middleware("http")(billing_middleware)
+app.middleware("http")(tenant_middleware)
 
 # Customer Portal
 from api.v1.portal import portal_router  # noqa: E402

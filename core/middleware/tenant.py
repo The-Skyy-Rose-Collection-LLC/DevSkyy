@@ -17,13 +17,21 @@ authentication failure — it is simply an empty tenant context.
 
 from __future__ import annotations
 
+import hmac
 import logging
+import os
 from collections.abc import Callable
 from typing import Any
 
 from fastapi import Request, Response
 
 logger = logging.getLogger(__name__)
+
+# Env-gated shared secret allowing trusted internal services (e.g. background
+# workers, admin tooling) to override tenant context via X-Tenant-ID.
+# When unset, the header is ignored — defaults-closed.
+_INTERNAL_SERVICE_TOKEN_ENV = "TENANT_HEADER_TRUST_TOKEN"
+_INTERNAL_SERVICE_HEADER = "X-Internal-Service-Token"
 
 
 async def tenant_middleware(request: Request, call_next: Callable) -> Response:
@@ -61,12 +69,15 @@ def _resolve_tenant(request: Request) -> tuple[str, str]:
     Tries header first, then JWT claim, then defaults.
     Never raises — returns ("", "free") on any failure.
     """
-    # 1. Explicit header wins.
+    # 1. Explicit header — only honored when the caller also presents a
+    #    matching internal-service shared secret. Unauthenticated clients
+    #    cannot spoof tenancy this way.
     header_tenant = request.headers.get("X-Tenant-ID", "").strip()
-    if header_tenant:
-        return header_tenant, "free"
+    if header_tenant and _internal_service_token_valid(request):
+        tier = request.headers.get("X-Tenant-Tier", "free").strip() or "free"
+        return header_tenant, tier
 
-    # 2. Fall back to JWT bearer token claim.
+    # 2. Fall back to the verified JWT bearer token claim.
     try:
         payload = _extract_jwt_claims(request)
         tenant_id = str(payload.get("tenant_id", "")).strip()
@@ -77,6 +88,16 @@ def _resolve_tenant(request: Request) -> tuple[str, str]:
         pass
 
     return "", "free"
+
+
+def _internal_service_token_valid(request: Request) -> bool:
+    """Return True when the request carries a valid internal-service token."""
+    expected = os.getenv(_INTERNAL_SERVICE_TOKEN_ENV, "")
+    if not expected:
+        # Defaults-closed: no secret configured, never trust the override.
+        return False
+    presented = request.headers.get(_INTERNAL_SERVICE_HEADER, "")
+    return bool(presented) and hmac.compare_digest(presented, expected)
 
 
 def _extract_jwt_claims(request: Request) -> dict[str, Any]:
@@ -97,14 +118,20 @@ def _extract_jwt_claims(request: Request) -> dict[str, Any]:
     if not token:
         return {}
 
+    secret = os.getenv("JWT_SECRET_KEY", "")
+    if not secret:
+        # No secret configured — refuse to trust any token. Never fall back
+        # to unverified decoding; that was the previous security hole.
+        return {}
+
     try:
         import jwt  # PyJWT
 
-        # decode_token without verification — we only want the payload structure.
         claims: dict[str, Any] = jwt.decode(
             token,
-            options={"verify_signature": False, "verify_exp": False},
-            algorithms=["HS256", "HS512", "RS256"],
+            secret,
+            algorithms=["HS256", "HS512"],
+            options={"require": ["exp"]},
         )
         return claims
     except Exception:

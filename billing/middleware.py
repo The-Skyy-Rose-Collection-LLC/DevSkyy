@@ -19,7 +19,9 @@ Usage in main_enterprise.py::
 
 from __future__ import annotations
 
+import asyncio
 import logging
+import re
 from collections.abc import Callable
 
 from fastapi import Request, Response
@@ -30,11 +32,9 @@ from billing.metering import UsageMetering
 
 logger = logging.getLogger(__name__)
 
-# Routes that require creative quota enforcement
-_CREATIVE_PATH_PREFIXES = (
-    "/api/v1/elite-studio/",
-    "/api/v1/portal/",
-)
+# Routes that require creative quota enforcement. Matches every API version
+# (v1, v2, …) so new versions do not silently bypass billing.
+_CREATIVE_PATH_RE = re.compile(r"^/api/v\d+/(elite-studio|portal)/")
 
 # Header name the caller uses to declare creative intent
 _INTENT_HEADER = "X-Creative-Intent"
@@ -92,7 +92,11 @@ async def billing_middleware(request: Request, call_next: Callable) -> Response:
 
     try:
         checker = _get_checker()
-        result = checker.check(tenant_id=tenant_id, tier=tier, intent=intent)
+        # UsageMetering uses a sync Redis client; offload to a thread so we
+        # do not block the event loop on every creative request.
+        result = await asyncio.to_thread(
+            checker.check, tenant_id=tenant_id, tier=tier, intent=intent
+        )
     except Exception as exc:
         logger.error("billing_middleware entitlement check error: %s", exc)
         # Fail open — let the request through rather than block on infra error
@@ -121,7 +125,16 @@ async def billing_middleware(request: Request, call_next: Callable) -> Response:
     # Allowed — forward and tag response with remaining quota
     response: Response = await call_next(request)
 
+    # Only meter successful usage. 4xx/5xx don't consume quota.
+    if response.status_code < 400 and _metering is not None:
+        try:
+            await asyncio.to_thread(_metering.record, tenant_id, intent, 1)
+        except Exception as exc:
+            logger.error("billing_middleware record error: %s", exc)
+
     remaining = result.remaining
+    if remaining != -1:
+        remaining = max(0, remaining - 1)
     response.headers["X-Quota-Remaining"] = str(remaining) if remaining != -1 else "unlimited"
     response.headers["X-Quota-Intent"] = intent
 
@@ -135,5 +148,4 @@ async def billing_middleware(request: Request, call_next: Callable) -> Response:
 
 def _is_creative_endpoint(request: Request) -> bool:
     """Return True when the request path targets a creative operation."""
-    path = request.url.path
-    return any(path.startswith(prefix) for prefix in _CREATIVE_PATH_PREFIXES)
+    return _CREATIVE_PATH_RE.match(request.url.path) is not None
