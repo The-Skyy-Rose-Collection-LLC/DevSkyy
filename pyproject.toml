@@ -280,7 +280,7 @@ ml = [
 rag = [
     # Multimodal knowledge-graph RAG (LightRAG + any-format ingestion)
     "raganything>=1.2.10",
-    "lightrag-hku>=1.3.0",
+    "lightrag-hku>=1.4.0",
 ]
 
 worker = [

@@ -137,7 +137,7 @@ Features:
 - Relaxed fit for effortless style
 - Double-lined hood with rose gold drawstrings
 
-Luxury Grows from Concrete.. This isn't just clothing - it's a statement of refined rebellion, a testament to those who dare to stand out while standing tall.
+Luxury Grows from Concrete. This isn't just clothing - it's a statement of refined rebellion, a testament to those who dare to stand out while standing tall.
 
 Limited pieces. Timeless style. Exclusively SkyyRose.""",
     },
@@ -173,7 +173,7 @@ This piece doesn't just protect you from the elements - it announces your arriva
 
 Wear your heart on your sleeve. Literally.
 
-SkyyRose. Luxury Grows from Concrete..""",
+SkyyRose. Luxury Grows from Concrete.""",
     },
     {
         "input": "Write Instagram caption for new collection drop.",
@@ -203,7 +203,7 @@ ELEVATION - We take the familiar and make it extraordinary. Street roots, luxury
 
 LOVE - At our core, we believe fashion should feel like coming home. Comfortable. Confident. Complete.
 
-Luxury Grows from Concrete.. That's not just a tagline - it's our promise.""",
+Luxury Grows from Concrete. That's not just a tagline - it's our promise.""",
     },
 ]
 

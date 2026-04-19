@@ -237,7 +237,7 @@ class SkyyRoseProductionConfig:
                 slug="home-2",
                 status=PageStatus.PUBLISH,
                 template="elementor_canvas",
-                meta_description="SkyyRose - Luxury Grows from Concrete.. Cinematic 3D luxury streetwear from Oakland.",
+                meta_description="SkyyRose - Luxury Grows from Concrete. Cinematic 3D luxury streetwear from Oakland.",
                 elementor_template_path="home.json",
                 custom_css=self._get_home_css(),
             ),
