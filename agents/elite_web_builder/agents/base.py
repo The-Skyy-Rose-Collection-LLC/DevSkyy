@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class AgentRole(Enum):
-    """The 8 agent roles in the team."""
+    """The 11 agent roles in the team."""
 
     DIRECTOR = "director"
     DESIGN_SYSTEM = "design_system"
@@ -32,6 +32,9 @@ class AgentRole(Enum):
     PERFORMANCE = "performance"
     SEO_CONTENT = "seo_content"
     QA = "qa"
+    IMAGERY = "imagery"
+    SOCIAL_MEDIA = "social_media"
+    THEME_BUILDER = "theme_builder"
 
 
 @dataclass(frozen=True)

@@ -21,6 +21,7 @@ from agents.backend_dev import BACKEND_DEV_SPEC  # noqa: E402
 from agents.base import AgentCapability, AgentOutput, AgentRole, AgentSpec  # noqa: E402
 from agents.design_system import DESIGN_SYSTEM_SPEC  # noqa: E402
 from agents.frontend_dev import FRONTEND_DEV_SPEC  # noqa: E402
+from agents.imagery import IMAGERY_SPEC  # noqa: E402
 from agents.performance import PERFORMANCE_SPEC  # noqa: E402
 from agents.provider_adapters import (  # noqa: E402
     LLMMessage,
@@ -30,8 +31,11 @@ from agents.provider_adapters import (  # noqa: E402
 from agents.qa import QA_SPEC  # noqa: E402
 from agents.runtime import AgentRuntime  # noqa: E402
 from agents.seo_content import SEO_CONTENT_SPEC  # noqa: E402
+from agents.social_media import SOCIAL_MEDIA_SPEC  # noqa: E402
+from agents.theme_builder import THEME_BUILDER_SPEC  # noqa: E402
 
 ALL_SPECS: tuple[AgentSpec, ...] = (
+    THEME_BUILDER_SPEC,
     DESIGN_SYSTEM_SPEC,
     FRONTEND_DEV_SPEC,
     BACKEND_DEV_SPEC,
@@ -39,6 +43,8 @@ ALL_SPECS: tuple[AgentSpec, ...] = (
     PERFORMANCE_SPEC,
     SEO_CONTENT_SPEC,
     QA_SPEC,
+    IMAGERY_SPEC,
+    SOCIAL_MEDIA_SPEC,
 )
 
 __all__ = [
@@ -50,9 +56,12 @@ __all__ = [
     "BACKEND_DEV_SPEC",
     "DESIGN_SYSTEM_SPEC",
     "FRONTEND_DEV_SPEC",
+    "IMAGERY_SPEC",
     "PERFORMANCE_SPEC",
     "QA_SPEC",
     "SEO_CONTENT_SPEC",
+    "SOCIAL_MEDIA_SPEC",
+    "THEME_BUILDER_SPEC",
     "ALL_SPECS",
     "AgentRuntime",
     "LLMMessage",
