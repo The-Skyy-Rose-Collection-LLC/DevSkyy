@@ -201,22 +201,31 @@ wordpress-theme/skyyrose-flagship/
 
 ## Learnings
 
+> Auto-maintained. Candidates captured to `tasks/learnings-staging.jsonl` by the Stop hook. `/promote-learnings` dedups (Jaccard ≥ 0.70) and inserts under the right marker-wrapped subsection. Subsections >75 bullets are archived to `docs/learnings-archive/YYYY-QN-<cat>.md`.
+
+<!-- learnings:architecture -->
 ### Architecture
 - `agents/base_super_agent.py` is the foundation (not legacy files)
 - DataLoaders → `api/graphql/dataloaders/` (not `core/`)
 - Integration tests → `tests/integration/` (not `tests/api/`)
+<!-- /learnings:architecture -->
 
+<!-- learnings:google-adk -->
 ### Google ADK
 - Agent names: underscores only (valid Python identifiers)
 - Loop per-product with `time.sleep(8)` to avoid 429s
 - Use `.venv-agents/` (ADK conflicts with numpy)
+<!-- /learnings:google-adk -->
 
+<!-- learnings:security -->
 ### Security
 - Validate backend URLs against allowlist; block `169.254.x.x`, `file://`, `gopher://`
 - Cap in-memory tracking with LRU eviction
 - Whitelist config keys before `**unpacking`
 - No `innerHTML` in JS — all DOM construction via `createElement`
+<!-- /learnings:security -->
 
+<!-- learnings:wordpress -->
 ### WordPress
 - CDN caches CSS aggressively — bump `SKYYROSE_VERSION` or use `?nocache=` to verify
 - `enqueue.php` template slug map must match actual template filenames exactly
@@ -248,7 +257,9 @@ wordpress-theme/skyyrose-flagship/
 - Builder detection: `skyyrose_active_builder()` returns slug ('elementor'|'divi'|'beaver-builder'|'bricks'|'gutenberg')
 - Block patterns registered in `inc/patterns.php` — pattern files in `patterns/` directory
 - Store API v1 cart in `assets/js/cart.js` — uses `window.skyyrose.storeNonce` passed via wp_add_inline_script
+<!-- /learnings:wordpress -->
 
+<!-- learnings:wordpress-deploy -->
 ### WordPress Deploy
 - Dirty working tree on main blocks `git merge` — always stash unrelated changes before merging worktree branches
 - `mv: preserving permissions` warnings during deploy are cosmetic (WordPress.com hosting restriction) — files transfer correctly
@@ -260,14 +271,19 @@ wordpress-theme/skyyrose-flagship/
 - **Hot-swap deploy is the default** (since 2026-04-11) — `scripts/deploy-theme.sh` uses atomic mv on the remote (`mv current → .old.$ts; mv new → path`) instead of the old `wp maintenance-mode` + `rm -rf && mv` pattern. The swap window is microseconds instead of ~60 seconds, so Jetpack Uptime stops firing false-positive "site is down" alerts on every deploy. Pass `--with-maintenance` only when deploying DB migrations or plugin changes that require the site to be locked.
 - **Deploy script has a post-verify gate** — `verify_live()` curls `https://skyyrose.co/?deploy_verify=$ts` after cache flush and asserts HTTP 200, response size >= 50 KB, and absence of PHP error markers (`Fatal error`, `Parse error`, `Call to undefined`, `There has been a critical error`). Deploy exits non-zero on failure. Override target URL via `PUBLIC_URL` env var.
 - **Jetpack Uptime alerts during deploy are a lagging indicator** — if one fires immediately after a deploy, it almost always points at a 503 window from `--with-maintenance` mode. Ignore the first alert within ~5 min of a legacy maintenance-mode deploy; investigate only if Jetpack's next poll cycle still reports down.
+<!-- /learnings:wordpress-deploy -->
 
+<!-- learnings:hooks -->
 ### Hooks (macOS)
 - Canonicalize paths (`/tmp` → `/private/tmp`)
 - Use `${VAR:-default}` for testable paths
 - Reject flag-like targets: `case "$target" in -*) exit 0 ;; esac`
+<!-- /learnings:hooks -->
 
+<!-- learnings:vercel -->
 ### Vercel
 - `rootDirectory` set → reads that dir's `vercel.json`, not root
+<!-- /learnings:vercel -->
 
 ---
 
@@ -374,7 +390,7 @@ Every output delivered in this project is production-ready. Not a draft. Not a p
 1. Fix it
 2. In one sentence: what was wrong and why
 3. In one sentence: what you changed to prevent it recurring
-4. Update `tasks/lessons.md`
+4. The Stop hook auto-stages a lesson candidate to `tasks/learnings-staging.jsonl`. Run `/promote-learnings` (or let `/go` invoke it) to dedup and commit into CLAUDE.md Learnings.
 5. Move on
 
 Do not: apologize repeatedly, re-explain the mistake at length, ask if the fix is acceptable before showing it. Fix it, show it, name the lesson.
@@ -396,32 +412,20 @@ For ambiguous tasks: state your interpretation, execute against it. Don't ask fo
 
 ---
 
-## STOP AND SHOW — Non-Negotiable Confirmation Protocol
+## STOP AND SHOW — Paid APIs Only
 
-**This section overrides every other instruction in this file.**
+**Harness enforces the rest.** The deploy-theme/git-push/test/build loop is governed by `.claude/settings.json` + `.claude/hooks/verify-gate.sh`: `auto` mode runs routine work, sandbox `denyRead` blocks secrets, a Stop hook refuses to end turns with unverified source changes, and `scripts/deploy-theme.sh`'s `verify_live()` already asserts HTTP 200 + size ≥ 50KB + no PHP error markers post-deploy. See `.claude/rules/permissions.md` for the full model.
 
-Before taking any of the actions below, Claude MUST stop, print exactly what it is about to do, and wait for explicit "y" or "yes" from the user. No exceptions. Apologizing after is not acceptable — the damage is already done.
+**What still requires explicit confirmation:** paid API calls. Cost is not verifiable after the fact.
 
-### Actions that require explicit confirmation BEFORE execution:
+### Paid API calls — always show cost manifest, always wait for "y"
 
-**Money / Credits**
 - Any call to FASHN API (tryon, product-to-model, edit, model-create, image-to-video)
-- Any call to Gemini, GPT-Image, FLUX, or other paid image generation endpoints
+- Any call to Gemini, GPT-Image, FLUX, or other paid image/video generation
 - Any call to OpenAI, Anthropic, or Google APIs that incur per-token or per-image cost
 - Any HuggingFace Space invocation that uses paid compute
 
-**Production site**
-- Any `deploy-theme.sh` execution or SFTP file transfer to skyyrose.co
-- Any WooCommerce REST API write (create/update/delete product, order, or media)
-- Any WordPress Media Library upload
-- Any cache flush or CDN purge on the live site
-
-**File operations with real data**
-- Reading from Photos Library or any path under `/Users/coreyfoster/Pictures/`
-- Using any file as a source image for generation — must confirm file is the correct garment
-- Deleting, overwriting, or renaming any file outside `/tmp/` or `renders/output/`
-
-### What the confirmation must look like:
+### Confirmation format
 
 ```
 STOP — Confirm before proceeding:
@@ -434,13 +438,11 @@ Cost   : ~$1.20  (4 models × 4 samples × $0.075)
 Proceed? [y/N]
 ```
 
-Show the exact file path, exact cost, and exact action — not a summary, the literal values. Then wait.
+Exact path, exact cost, exact action. Not a summary. Then wait.
 
-### What "autonomous" means in this project:
+### What "autonomous" means in this project
 
-"Autonomous" means Claude handles implementation without hand-holding **after the user has confirmed the plan and inputs**. It does NOT mean Claude decides what files to use, what to deploy, or what API calls to make without checking first.
-
-The pattern "act → apologize → act again → apologize again" is a bug, not a feature. If the right source file is unclear, ask. If the deploy target is ambiguous, ask. One question costs zero dollars. Getting it wrong costs real money and breaks the live site.
+Claude handles implementation without hand-holding after the plan is confirmed. It does NOT mean Claude picks the source file for a paid render, the SKU to bill against, or the budget ceiling. If the right source is unclear, ask. One question costs zero dollars.
 
 ---
 

@@ -1,0 +1,257 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "defaultMode": "auto",
+    "disableBypassPermissionsMode": "disable",
+    "deny": [
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.gcp/**)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/*.secrets)",
+      "Read(**/*.secrets.*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Edit(**/.env)",
+      "Edit(**/.env.*)",
+      "Edit(**/*.secrets)",
+      "Edit(**/*.pem)",
+      "Edit(**/*.key)",
+      "Write(**/.env)",
+      "Write(**/.env.*)",
+      "Write(**/*.secrets)",
+      "Write(**/*.pem)",
+      "Write(**/*.key)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push --force-with-lease*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -fd*)",
+      "Bash(git branch -D main)",
+      "Bash(git branch -D master)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf ~/*)",
+      "Bash(rm -rf $HOME*)",
+      "Bash(sudo *)",
+      "Bash(git * --no-verify*)",
+      "Bash(git * --no-gpg-sign*)"
+    ],
+    "ask": [
+      "WebFetch(domain:api.fashn.ai)",
+      "WebFetch(domain:fal.run)",
+      "WebFetch(domain:api.openai.com)",
+      "WebFetch(domain:generativelanguage.googleapis.com)",
+      "WebFetch(domain:api.anthropic.com)",
+      "Bash(* FASHN_API_KEY *)",
+      "Bash(python scripts/nano-banana-run.py*)",
+      "Bash(python scripts/fashn-*)",
+      "Bash(python scripts/batch_enhance_clothing.py*)"
+    ]
+  },
+  "autoMode": {
+    "environment": [
+      "Organization: The Skyy Rose Collection LLC. Luxury streetwear e-commerce (skyyrose.co). Primary use: WordPress/WooCommerce theme development, Python FastAPI backend, Next.js dashboard.",
+      "Source control: github.com/the-skyy-rose-collection-llc and all repos under it (DevSkyy is the main repo).",
+      "Production site: skyyrose.co (WordPress.com hosting). Deploys via SFTP to sftp.wp.com using key ~/.ssh/skyyrose-deploy. The deploy script has a built-in verify_live() gate that asserts HTTP 200, response size >= 50KB, and absence of PHP error markers.",
+      "Trusted deploy targets: scripts/deploy-theme.sh (hot-swap with post-deploy verify), scripts/deploy-pipeline.sh, vercel deploy for frontend/.",
+      "Trusted internal domains: skyyrose.co, *.wp.com, api.skyyrose.co (WooCommerce REST).",
+      "Trusted registries: npmjs.com, pypi.org, github.com, packagist.org, composer.",
+      "Trusted docs: docs.anthropic.com, developer.wordpress.org, woocommerce.com, nextjs.org, fastapi.tiangolo.com, code.claude.com.",
+      "Compute: HuggingFace Spaces (free tier), Vercel (frontend), Docker compose (local API).",
+      "WordPress theme path: wordpress-theme/skyyrose-flagship/. PHPCS runs via vendor/bin/phpcs using .phpcs.xml in that dir.",
+      "Python workspace: root, .venv/. ADK workspace: .venv-agents/ (isolated due to numpy conflict). Nano Banana imagery shares .venv/.",
+      "Verification is enforced by a Stop hook (.claude/hooks/verify-gate.sh). Turns that edited code must run /go to produce tasks/.last-verify-passed before the turn can end."
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "filesystem": {
+      "denyRead": [
+        "~/.ssh/**",
+        "~/.aws/**",
+        "~/.gcp/**",
+        "**/.env",
+        "**/.env.*",
+        "**/*.secrets",
+        "**/*.secrets.*",
+        "**/*.pem",
+        "**/*.key"
+      ]
+    },
+    "network": {
+      "allowedDomains": [
+        "skyyrose.co",
+        "*.wp.com",
+        "github.com",
+        "api.github.com",
+        "raw.githubusercontent.com",
+        "objects.githubusercontent.com",
+        "npmjs.com",
+        "registry.npmjs.org",
+        "pypi.org",
+        "files.pythonhosted.org",
+        "packagist.org",
+        "repo.packagist.org",
+        "docs.anthropic.com",
+        "developer.wordpress.org",
+        "woocommerce.com",
+        "nextjs.org",
+        "fastapi.tiangolo.com",
+        "code.claude.com",
+        "huggingface.co",
+        "cdn-lfs.huggingface.co",
+        "vercel.com",
+        "api.vercel.com"
+      ]
+    }
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "tool == \"Bash\" && tool_input.command matches \"(npm run dev|pnpm( run)? dev|yarn dev|bun run dev)\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\necho '[Hook] BLOCKED: Dev server must run in tmux for log access' >&2\necho '[Hook] Use: tmux new-session -d -s dev \"npm run dev\"' >&2\nexit 1"
+          }
+        ],
+        "description": "Block dev servers outside tmux — ensures log access"
+      },
+      {
+        "matcher": "tool == \"Bash\" && tool_input.command matches \"git push\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\necho '[Hook] Pushing to remote...' >&2",
+            "async": true
+          }
+        ],
+        "description": "Log git push to remote"
+      },
+      {
+        "matcher": "tool == \"Edit\" || tool == \"Write\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/strategic-compact/suggest-compact.sh\""
+          }
+        ],
+        "description": "Suggest manual compaction at logical intervals"
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/memory-persistence/pre-compact.sh\""
+          }
+        ],
+        "description": "Save state before context compaction"
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/memory-persistence/session-start.sh\""
+          }
+        ],
+        "description": "Load previous context on new session"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "(tool == \"Edit\" || tool == \"Write\") && tool_input.file_path matches \"\\\\.py$\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  repo_root=$(git -C \"$(dirname \"$file_path\")\" rev-parse --show-toplevel 2>/dev/null || echo '.')\n  if [ -f \"$repo_root/.venv/bin/ruff\" ]; then\n    \"$repo_root/.venv/bin/ruff\" check --fix --quiet \"$file_path\" 2>&1 | head -5 >&2\n    \"$repo_root/.venv/bin/ruff\" format --quiet \"$file_path\" 2>/dev/null\n  elif command -v ruff >/dev/null 2>&1; then\n    ruff check --fix --quiet \"$file_path\" 2>&1 | head -5 >&2\n    ruff format --quiet \"$file_path\" 2>/dev/null\n  fi\n  prints=$(grep -n '\\bprint(' \"$file_path\" 2>/dev/null | grep -v '# noqa' || true)\n  if [ -n \"$prints\" ]; then\n    echo \"[Hook] WARNING: print() found in $(basename \"$file_path\")\" >&2\n    echo \"$prints\" | head -3 >&2\n  fi\nfi\necho \"$input\""
+          }
+        ],
+        "description": "Auto-format Python files with ruff + warn about print()"
+      },
+      {
+        "matcher": "(tool == \"Edit\" || tool == \"Write\") && tool_input.file_path matches \"\\\\.(ts|tsx|js|jsx)$\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  if command -v prettier >/dev/null 2>&1; then\n    prettier --write \"$file_path\" 2>&1 | head -5 >&2\n  fi\n  console_logs=$(grep -n 'console\\.log' \"$file_path\" 2>/dev/null || true)\n  if [ -n \"$console_logs\" ]; then\n    echo \"[Hook] WARNING: console.log in $(basename \"$file_path\")\" >&2\n    echo \"$console_logs\" | head -3 >&2\n  fi\nfi\necho \"$input\""
+          }
+        ],
+        "description": "Auto-format JS/TS with Prettier + warn about console.log"
+      },
+      {
+        "matcher": "(tool == \"Edit\" || tool == \"Write\") && tool_input.file_path matches \"\\\\.(ts|tsx)$\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  dir=$(dirname \"$file_path\")\n  project_root=\"$dir\"\n  while [ \"$project_root\" != \"/\" ] && [ ! -f \"$project_root/package.json\" ]; do\n    project_root=$(dirname \"$project_root\")\n  done\n  if [ -f \"$project_root/tsconfig.json\" ]; then\n    cd \"$project_root\" && npx tsc --noEmit --pretty false 2>&1 | grep \"$(basename \"$file_path\")\" | head -5 >&2 || true\n  fi\nfi\necho \"$input\""
+          }
+        ],
+        "description": "TypeScript type check after editing .ts/.tsx files"
+      },
+      {
+        "matcher": "(tool == \"Edit\" || tool == \"Write\") && tool_input.file_path matches \"\\\\.php$\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\ninput=$(cat)\nfile_path=$(echo \"$input\" | jq -r '.tool_input.file_path // \"\"')\nif [ -n \"$file_path\" ] && [ -f \"$file_path\" ]; then\n  php_bin=\"\"\n  for candidate in /opt/homebrew/bin/php /usr/local/bin/php /usr/bin/php; do\n    if [ -x \"$candidate\" ]; then php_bin=\"$candidate\"; break; fi\n  done\n  if [ -z \"$php_bin\" ]; then\n    echo \"$input\"\n    exit 0\n  fi\n  result=$(\"$php_bin\" -l \"$file_path\" 2>&1)\n  if echo \"$result\" | grep -q 'Parse error\\|Fatal error'; then\n    echo \"[Hook] PHP SYNTAX ERROR in $(basename \"$file_path\")\" >&2\n    echo \"$result\" | head -5 >&2\n    exit 1\n  fi\nfi\necho \"$input\""
+          }
+        ],
+        "description": "PHP syntax check on all PHP file edits/writes"
+      },
+      {
+        "matcher": "tool == \"Edit\" || tool == \"Write\"",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/codemaps/dirty-tracker.sh\""
+          }
+        ],
+        "description": "Mark CODEMAPS dirty when source files change"
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "#!/bin/bash\ncat <<'REINJECT'\n[CRITICAL CONTEXT - Re-injected after compaction]\n\n## DevSkyy Build Rules:\n- CDN caches CSS aggressively — bump SKYYROSE_VERSION or use ?nocache= to verify\n- enqueue.php template slug map must match actual template filenames exactly\n- Collection pages use unified collection-pages.css + collection-pages.js\n- When removing a PHP section, also remove its CSS rules AND responsive breakpoint overrides\n- Showcase card content should be visible by default (opacity: 1), not hidden until hover\n- Holo card grid: only .product-grid, .product-grid__items, .br-product-grid__items should be display: grid\n- Fix everything in one batch, test all pages, deploy ONCE — no back-and-forth\n- When cleaning up: update EVERY file that references deleted code\n- Use npm not pnpm for Vercel deploys\n- MUST verify all APIs with Context7 before writing any code\n- No innerHTML in JS — use createElement + textContent\n- Escape output: esc_html(), esc_attr(), esc_url(), wp_kses_post()\nREINJECT"
+          }
+        ],
+        "description": "Re-inject critical DevSkyy build rules after context compaction"
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/learnings/capture.sh\""
+          }
+        ],
+        "description": "Auto-capture lesson candidates to tasks/learnings-staging.jsonl"
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.claude/hooks/verify-gate.sh\""
+          }
+        ],
+        "description": "Block turn completion until /go verification has passed"
+      }
+    ]
+  }
+}

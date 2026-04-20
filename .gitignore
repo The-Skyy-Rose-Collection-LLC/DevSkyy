@@ -68,8 +68,55 @@ credentials/
 *.crt
 .secrets/
 
-# Claude Code (local settings — contains keys/prefs, never commit)
-.claude/
+# Claude Code — whitelist shared config, ignore personal/state
+.claude/*
+.claude/**/*
+
+# Whitelist shared config (committed, team-wide)
+!.claude/settings.json
+!.claude/settings.local.json.example
+!.claude/mcp-config.json
+!.claude/IMMEDIATE_REQUIREMENTS.md
+!.claude/ralph-loop-iteration-2.md
+!.claude/hooks/
+!.claude/hooks/hooks.json
+!.claude/hooks/verify-gate.sh
+!.claude/hooks/memory-persistence/
+!.claude/hooks/memory-persistence/*.sh
+!.claude/hooks/strategic-compact/
+!.claude/hooks/strategic-compact/*.sh
+!.claude/hooks/learnings/
+!.claude/hooks/learnings/*.sh
+!.claude/hooks/codemaps/
+!.claude/hooks/codemaps/*.sh
+!.claude/hooks/image-optimizer/
+!.claude/hooks/image-optimizer/*.sh
+!.claude/hooks/claude-md-tracker/
+!.claude/hooks/claude-md-tracker/*.sh
+!.claude/agents/
+!.claude/agents/**
+!.claude/commands/
+!.claude/commands/**
+!.claude/rules/
+!.claude/rules/**
+!.claude/skills/
+!.claude/skills/**
+!.claude/contexts/
+!.claude/contexts/**
+
+# Personal & state — always ignored
+.claude/settings.local.json
+.claude/hooks/memory-persistence/state/
+.claude/skills/learned/
+
+# Verify-gate markers (ephemeral session state)
+tasks/.last-verify-passed
+tasks/.last-verify-failed
+
+# Learning capture (ephemeral until promoted)
+tasks/learnings-staging.jsonl
+tasks/.codemaps-dirty
+tasks/.codemaps-dirty:*
 
 # Database
 *.db
