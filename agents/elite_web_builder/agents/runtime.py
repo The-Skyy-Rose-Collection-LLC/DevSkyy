@@ -35,6 +35,16 @@ logger = logging.getLogger(__name__)
 # Regex for extracting file paths from LLM output
 _FILE_REF = re.compile(r"`([a-zA-Z0-9_\-./]+\.[a-zA-Z]{1,10})`")
 
+# Collection-aware brand context. orchestration.brand_context lives at the
+# DevSkyy project root and isn't on sys.path when elite_web_builder runs in
+# its isolated test harness — so the import is optional. When available, every
+# agent system prompt is prefixed with a compact catalog digest so the team
+# "lives and breathes" the current SkyyRose collection state.
+try:
+    from orchestration.brand_context import get_brand_context as _get_brand_context
+except ImportError:
+    _get_brand_context = None  # type: ignore[assignment]
+
 
 class AgentRuntime:
     """
@@ -85,6 +95,15 @@ class AgentRuntime:
         # Build system prompt with learning context
         learning_context = self._journal.generate_context(spec.name)
         system_prompt = spec.build_prompt(learning_context)
+
+        # Prepend live brand + catalog digest so the agent "lives and breathes"
+        # the current SkyyRose collection. get_brand_context owns the opt-out
+        # flag (SKYYROSE_BRAND_INJECT=0) and internal error handling; runtime
+        # only guards against the optional import being missing.
+        if _get_brand_context is not None:
+            brand_block = _get_brand_context(spec.name)
+            if brand_block:
+                system_prompt = f"{brand_block}\n\n{system_prompt}"
 
         # Append knowledge file references
         if spec.knowledge_files:

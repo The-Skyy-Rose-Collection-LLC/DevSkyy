@@ -17,13 +17,21 @@ Version: 1.0.0
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+import os
+from dataclasses import dataclass, field
 from enum import StrEnum
+from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
 from llm import Message
 
 logger = logging.getLogger(__name__)
+
+# ~2000 tokens for English prose at ~4 chars/token. The ceiling exists so the
+# catalog digest never crowds out the agent's real system prompt. Truncation
+# inside compile_catalog_digest guarantees the block stays within budget.
+_CATALOG_DIGEST_CHAR_BUDGET: int = 7500
 
 
 # =============================================================================
@@ -394,6 +402,263 @@ Style: Luxury streetwear, Oakland CA. {brand["tagline"]}."""
 
 
 # =============================================================================
+# Catalog Context — live CSV-backed digest for agent system prompts
+# =============================================================================
+
+
+@dataclass(frozen=True)
+class CatalogSummary:
+    """Aggregated facts about the current catalog state for one collection."""
+
+    collection: str
+    sku_count: int
+    live_count: int
+    preorder_count: int
+    draft_count: int
+    price_min: float | None
+    price_max: float | None
+    sample_names: tuple[str, ...] = field(default_factory=tuple)
+
+
+@dataclass(frozen=True)
+class CatalogContext:
+    """Immutable snapshot of the canonical catalog, keyed by collection slug."""
+
+    csv_mtime_ns: int
+    summaries: tuple[CatalogSummary, ...]
+
+    @property
+    def total_skus(self) -> int:
+        return sum(s.sku_count for s in self.summaries)
+
+
+# Role-specific focus: each tuple is the subset of facts a role needs most.
+# Roles not listed here fall through to DEFAULT_ROLE_FOCUS.
+_ROLE_FOCUS: dict[str, tuple[str, ...]] = {
+    "imagery": ("collection", "sku_count", "sample_names"),
+    "ecommerce_photography": ("collection", "sku_count", "sample_names"),
+    "social_media": ("collection", "sku_count", "live_count", "preorder_count"),
+    "competitor_scout": ("collection", "sku_count", "price_min", "price_max"),
+    "theme_builder": ("collection", "sku_count", "live_count", "draft_count"),
+    "garment_3d": ("collection", "sku_count", "sample_names"),
+    "seo_content": ("collection", "sku_count", "price_min", "price_max"),
+    "qa": ("collection", "sku_count", "live_count", "preorder_count", "draft_count"),
+}
+_DEFAULT_ROLE_FOCUS: tuple[str, ...] = (
+    "collection",
+    "sku_count",
+    "live_count",
+    "preorder_count",
+)
+
+
+def _canonical_catalog_path() -> Path:
+    """Path to the canonical catalog CSV.
+
+    Prefers skyyrose.core.catalog_loader.CATALOG_CSV (the shared constant)
+    and honors SKYYROSE_CATALOG_PATH env override for tests / migrations.
+    Falls back to a computed path if skyyrose.core isn't importable (e.g.
+    isolated test harness).
+    """
+    override = os.environ.get("SKYYROSE_CATALOG_PATH")
+    if override:
+        return Path(override)
+    try:
+        from skyyrose.core.catalog_loader import CATALOG_CSV
+
+        return CATALOG_CSV
+    except ImportError:
+        here = Path(__file__).resolve()
+        return (
+            here.parents[1]
+            / "wordpress-theme"
+            / "skyyrose-flagship"
+            / "data"
+            / "skyyrose-catalog.csv"
+        )
+
+
+def _catalog_mtime_ns(path: Path) -> int:
+    """mtime of the canonical CSV, or 0 if missing. Drives cache invalidation."""
+    try:
+        return path.stat().st_mtime_ns
+    except FileNotFoundError:
+        return 0
+
+
+def load_catalog_context(path: Path | None = None) -> CatalogContext:
+    """Read the canonical catalog CSV and build a CatalogContext snapshot.
+
+    Uses skyyrose.core.catalog_loader when available (shared canonical reader);
+    falls back to the stdlib csv module so this function works even in
+    environments where skyyrose.core isn't on the import path (e.g. isolated
+    test harnesses).
+    """
+    csv_path = path or _canonical_catalog_path()
+    mtime = _catalog_mtime_ns(csv_path)
+
+    rows = _read_rows(csv_path)
+    by_collection: dict[str, list[dict[str, str]]] = {}
+    for row in rows:
+        collection = (row.get("collection") or "").strip().lower() or "unknown"
+        by_collection.setdefault(collection, []).append(row)
+
+    summaries: list[CatalogSummary] = []
+    for collection, items in sorted(by_collection.items()):
+        prices: list[float] = []
+        live = preorder = draft = 0
+        names: list[str] = []
+        for row in items:
+            try:
+                price = float((row.get("price") or "").strip() or 0.0)
+                if price > 0:
+                    prices.append(price)
+            except ValueError:
+                pass
+            published = (row.get("published") or "").strip() == "1"
+            is_preorder = (row.get("is_preorder") or "").strip() == "1"
+            if is_preorder:
+                preorder += 1
+            elif published:
+                live += 1
+            else:
+                draft += 1
+            name = (row.get("name") or "").strip()
+            if name and len(names) < 3:
+                names.append(name)
+
+        summaries.append(
+            CatalogSummary(
+                collection=collection,
+                sku_count=len(items),
+                live_count=live,
+                preorder_count=preorder,
+                draft_count=draft,
+                price_min=min(prices) if prices else None,
+                price_max=max(prices) if prices else None,
+                sample_names=tuple(names),
+            )
+        )
+
+    return CatalogContext(
+        csv_mtime_ns=mtime,
+        summaries=tuple(summaries),
+    )
+
+
+def _read_rows(csv_path: Path) -> list[dict[str, str]]:
+    """Read catalog rows. Prefer the shared canonical loader; fall back gracefully."""
+    try:
+        from skyyrose.core.catalog_loader import read_catalog_rows
+    except ImportError:
+        import csv
+
+        if not csv_path.exists():
+            return []
+        with csv_path.open(newline="", encoding="utf-8") as f:
+            return [row for row in csv.DictReader(f) if (row.get("sku") or "").strip()]
+    return read_catalog_rows(csv_path)
+
+
+def _format_summary(summary: CatalogSummary, focus: tuple[str, ...]) -> str:
+    """Render a CatalogSummary as a compact text block, filtered by role focus."""
+    lines: list[str] = [f"### {summary.collection.replace('-', ' ').title()}"]
+    if "sku_count" in focus:
+        lines.append(f"- SKUs: {summary.sku_count}")
+    status_parts: list[str] = []
+    if "live_count" in focus:
+        status_parts.append(f"{summary.live_count} live")
+    if "preorder_count" in focus:
+        status_parts.append(f"{summary.preorder_count} pre-order")
+    if "draft_count" in focus:
+        status_parts.append(f"{summary.draft_count} draft")
+    if status_parts:
+        lines.append(f"- Status: {', '.join(status_parts)}")
+    if (
+        ("price_min" in focus or "price_max" in focus)
+        and summary.price_min is not None
+        and summary.price_max is not None
+    ):
+        lines.append(f"- Price range: ${summary.price_min:.0f}–${summary.price_max:.0f}")
+    if "sample_names" in focus and summary.sample_names:
+        sample = ", ".join(summary.sample_names)
+        lines.append(f"- Featured: {sample}")
+    return "\n".join(lines)
+
+
+# Cache the context so digest regeneration doesn't re-parse the CSV each time.
+# maxsize=4 is generous — the key is mtime, which changes only when the CSV is
+# edited, and only one or two mtimes are live at once in practice.
+@lru_cache(maxsize=4)
+def _cached_catalog_context(mtime_ns: int) -> CatalogContext:
+    return load_catalog_context()
+
+
+# 13 roles × a handful of live mtimes → maxsize=16 is right-sized.
+@lru_cache(maxsize=16)
+def _cached_digest(role: str, mtime_ns: int) -> str:
+    """Compile the digest; keyed on (role, csv_mtime_ns) so edits invalidate."""
+    context = _cached_catalog_context(mtime_ns)
+    focus = _ROLE_FOCUS.get(role, _DEFAULT_ROLE_FOCUS)
+
+    header = (
+        f"## SkyyRose Catalog Digest — live from canonical CSV\n"
+        f"Total SKUs: {context.total_skus} across {len(context.summaries)} collections. "
+        f'Brand philosophy: "{SKYYROSE_BRAND["philosophy"]}".\n'
+    )
+    sections = [_format_summary(s, focus) for s in context.summaries]
+    block = header + "\n" + "\n\n".join(sections)
+
+    if len(block) > _CATALOG_DIGEST_CHAR_BUDGET:
+        # Truncate on a UTF-8 code-point boundary so we never split a multi-byte
+        # sequence (e.g. accented brand names, em-dashes in collection taglines).
+        encoded = block.encode("utf-8")[: _CATALOG_DIGEST_CHAR_BUDGET - 3]
+        block = encoded.decode("utf-8", errors="ignore") + "..."
+    return block
+
+
+def compile_catalog_digest(role: str) -> str:
+    """Return a compact catalog digest tailored to the given agent role.
+
+    The block is deterministic for a given CSV state — it changes only when
+    the CSV's mtime changes. Cached via lru_cache keyed on (role, mtime).
+    Always stays within _CATALOG_DIGEST_CHAR_BUDGET characters.
+    """
+    return _cached_digest(role, _catalog_mtime_ns(_canonical_catalog_path()))
+
+
+def get_brand_context(
+    role: str,
+    collection: Collection | None = None,
+    *,
+    include_catalog: bool | None = None,
+) -> str:
+    """Unified brand + catalog context block for any agent's system prompt.
+
+    Combines the compact brand prompt (BrandContextInjector.get_compact_prompt)
+    with the role-tuned catalog digest. The catalog digest can be disabled
+    globally via SKYYROSE_BRAND_INJECT=0.
+
+    Args:
+        role: Agent role name — drives catalog digest focus
+        collection: Optional active collection for the compact brand prompt
+        include_catalog: Explicit override. None = respect env var
+    """
+    if include_catalog is None:
+        include_catalog = os.environ.get("SKYYROSE_BRAND_INJECT", "1") != "0"
+
+    brand_block = BrandContextInjector(compact_mode=True).get_compact_prompt(collection)
+    if not include_catalog:
+        return brand_block
+    try:
+        digest = compile_catalog_digest(role)
+    except Exception as exc:  # noqa: BLE001 — degrade gracefully if CSV missing
+        logger.warning("catalog digest unavailable for role=%s: %s", role, exc)
+        return brand_block
+    return f"{brand_block}\n\n{digest}"
+
+
+# =============================================================================
 # Convenience Functions
 # =============================================================================
 
@@ -417,9 +682,14 @@ def inject_brand_context(
 
 __all__ = [
     "BrandContextInjector",
+    "CatalogContext",
+    "CatalogSummary",
     "Collection",
     "SKYYROSE_BRAND",
     "COLLECTION_CONTEXT",
+    "compile_catalog_digest",
+    "get_brand_context",
     "get_brand_system_prompt",
     "inject_brand_context",
+    "load_catalog_context",
 ]
