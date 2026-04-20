@@ -19,8 +19,11 @@ if _EWB_ROOT not in sys.path:
 from agents.accessibility import ACCESSIBILITY_SPEC  # noqa: E402
 from agents.backend_dev import BACKEND_DEV_SPEC  # noqa: E402
 from agents.base import AgentCapability, AgentOutput, AgentRole, AgentSpec  # noqa: E402
+from agents.competitor_scout import COMPETITOR_SCOUT_SPEC  # noqa: E402
 from agents.design_system import DESIGN_SYSTEM_SPEC  # noqa: E402
+from agents.ecommerce_photography import ECOMMERCE_PHOTOGRAPHY_SPEC  # noqa: E402
 from agents.frontend_dev import FRONTEND_DEV_SPEC  # noqa: E402
+from agents.garment_3d import GARMENT_3D_SPEC  # noqa: E402
 from agents.imagery import IMAGERY_SPEC  # noqa: E402
 from agents.performance import PERFORMANCE_SPEC  # noqa: E402
 from agents.provider_adapters import (  # noqa: E402
@@ -34,6 +37,9 @@ from agents.seo_content import SEO_CONTENT_SPEC  # noqa: E402
 from agents.social_media import SOCIAL_MEDIA_SPEC  # noqa: E402
 from agents.theme_builder import THEME_BUILDER_SPEC  # noqa: E402
 
+# Convention: new specs append at the end. Test regression guards
+# (tests/test_new_specs.py::test_legacy_specs_preserved_at_original_indices)
+# pin indices 0-9 to the original specs so reorderings surface in CI.
 ALL_SPECS: tuple[AgentSpec, ...] = (
     THEME_BUILDER_SPEC,
     DESIGN_SYSTEM_SPEC,
@@ -45,6 +51,9 @@ ALL_SPECS: tuple[AgentSpec, ...] = (
     QA_SPEC,
     IMAGERY_SPEC,
     SOCIAL_MEDIA_SPEC,
+    ECOMMERCE_PHOTOGRAPHY_SPEC,
+    GARMENT_3D_SPEC,
+    COMPETITOR_SCOUT_SPEC,
 )
 
 __all__ = [
@@ -54,8 +63,11 @@ __all__ = [
     "AgentSpec",
     "ACCESSIBILITY_SPEC",
     "BACKEND_DEV_SPEC",
+    "COMPETITOR_SCOUT_SPEC",
     "DESIGN_SYSTEM_SPEC",
+    "ECOMMERCE_PHOTOGRAPHY_SPEC",
     "FRONTEND_DEV_SPEC",
+    "GARMENT_3D_SPEC",
     "IMAGERY_SPEC",
     "PERFORMANCE_SPEC",
     "QA_SPEC",

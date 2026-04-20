@@ -12,17 +12,27 @@ from agents.base import AgentCapability, AgentOutput, AgentRole, AgentSpec
 
 
 class TestAgentRole:
-    def test_all_eight_roles_exist(self) -> None:
+    def test_all_fourteen_roles_exist(self) -> None:
+        """director + 13 specialists (10 legacy + 3 Phase-1 additions)."""
         roles = [r.value for r in AgentRole]
-        assert len(roles) == 8
-        assert "director" in roles
-        assert "design_system" in roles
-        assert "frontend_dev" in roles
-        assert "backend_dev" in roles
-        assert "accessibility" in roles
-        assert "performance" in roles
-        assert "seo_content" in roles
-        assert "qa" in roles
+        expected = {
+            "director",
+            "design_system",
+            "frontend_dev",
+            "backend_dev",
+            "accessibility",
+            "performance",
+            "seo_content",
+            "qa",
+            "imagery",
+            "social_media",
+            "theme_builder",
+            "ecommerce_photography",
+            "garment_3d",
+            "competitor_scout",
+        }
+        assert set(roles) == expected
+        assert len(roles) == 14
 
     def test_role_values_are_snake_case(self) -> None:
         for role in AgentRole:
