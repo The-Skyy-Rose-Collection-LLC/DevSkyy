@@ -150,16 +150,48 @@ def _confirm_paid_dispatch(event: PipelineEvent) -> bool:
 
 
 def _dispatch_imagery(event: PipelineEvent) -> PipelineReport:
-    """Route imagery pipelines to scripts/nano-banana-run.py with budget ceiling."""
+    """Route imagery pipelines to the new dual-agent LangGraph pipeline.
+
+    The old scripts/nano-banana-run.py was removed in Phase B1 (scorched
+    earth). The replacement lives at ``skyyrose/elite_studio/run.py`` and
+    is implemented in Phase B2 of the plan. Until that lands, every
+    imagery dispatch fails fast with a clear pointer to the plan so the
+    caller knows the pipeline is under active rebuild rather than silently
+    invoking broken code.
+    """
+    target = PROJECT_ROOT / "skyyrose" / "elite_studio" / "run.py"
+    if not target.exists():
+        log.error(
+            "Imagery pipeline not yet rebuilt. Phase B1 removed the old "
+            "nano-banana pipeline; Phase B2 will land the dual-agent "
+            "LangGraph replacement at %s. See "
+            ".claude/plans/well-lets-audit-separately-humming-beacon.md.",
+            target,
+        )
+        return PipelineReport(
+            kind=event.kind,
+            agent="imagery",
+            started_at=time.time(),
+            finished_at=time.time(),
+            success=False,
+            exit_code=1,
+            notes=[
+                "Phase B2 pending — imagery pipeline is under rebuild.",
+                f"Target path (not yet created): {target}",
+                "Do NOT invoke paid imagery until Phase B2 ships.",
+            ],
+        )
+
     task = event.task
     sku = task.get("sku")
     collection = task.get("collection")
-    style = task.get("style", "on-model")
-    views = task.get("views", "front,back,branding")
+    style = task.get("style", "flat-lay")
+    views = task.get("views", "front")
 
     cmd = [
         str(PROJECT_ROOT / ".venv-imagery" / "bin" / "python"),
-        str(PROJECT_ROOT / "scripts" / "nano-banana-run.py"),
+        "-m",
+        "skyyrose.elite_studio.run",
         "produce",
         "--style",
         style,
