@@ -1,0 +1,43 @@
+{
+  "source": "internal_teardown",
+  "harvested_at": "2026-04-20T06:40:00Z",
+  "brand": "Rhude",
+  "campaign": "Highway 3 Summer Capsule",
+  "campaign_url": "https://rhude.com/collections/highway-3",
+  "landing_page_snapshot": "rhude_highway_3_landing_2026-04-20.png",
+  "scores": {
+    "hook": 8,
+    "clarity": 7,
+    "aspiration": 9,
+    "legibility": 9,
+    "product_identity": 8,
+    "social_proof": 5,
+    "cta_friction": 7,
+    "brand_cohesion": 10,
+    "overall": 7.9
+  },
+  "observations": [
+    "Hero video opens on a chrome muscle car; product reveal at 00:04.",
+    "Typography centered, single display face, 72pt on mobile.",
+    "Color grade: warm desaturated sunset, preserved film grain.",
+    "CTA placed in lower-right, single action: SHOP NOW.",
+    "No visible press quotes or influencer seeding — weak social proof."
+  ],
+  "proposed_blueprint": {
+    "hook_pattern": "Environmental hero (vehicle/landscape) → product reveal at 3-5s",
+    "typography_rule": "Single display face, 72pt mobile min, centered",
+    "color_grade": "Warm desaturated, preserved film grain",
+    "composition": "Rule of thirds, negative space upper 30%, CTA lower-right",
+    "copy_structure": "Single 3-word hook + 1-line value prop + single CTA",
+    "duration_seconds": 15,
+    "aspect_ratios_tested": ["9:16", "4:5", "1:1"]
+  },
+  "skyyrose_adaptation": {
+    "recommended_for_skus": ["br-007", "sg-005", "lh-003"],
+    "collection_variant": "signature",
+    "copy_hook": "Luxury grows from concrete.",
+    "handoff_to_social": true,
+    "handoff_to_imagery": true
+  },
+  "_fixture_note": "Synthetic teardown for COMPETITOR_SCOUT offline tests. Scores are illustrative, not real Rhude data."
+}

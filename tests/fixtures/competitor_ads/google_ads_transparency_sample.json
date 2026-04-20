@@ -1,0 +1,36 @@
+{
+  "source": "google_ads_transparency",
+  "api_version": "v1",
+  "harvested_at": "2026-04-20T06:35:00Z",
+  "advertiser_id": "AR15329408847216279553",
+  "advertiser_name": "Represent Clothing Ltd.",
+  "region": "US",
+  "ads": [
+    {
+      "creative_id": "CR18372910283747",
+      "format": "video",
+      "first_shown": "2026-04-05",
+      "last_shown": "2026-04-19",
+      "landing_page": "https://representclo.com/collections/new",
+      "headlines": [
+        "Own the Drop",
+        "Weekly exclusives from Represent"
+      ],
+      "descriptions": [
+        "Limited quantities. Manchester-made. Shop before it's gone."
+      ],
+      "duration_seconds": 15,
+      "variants_tested": ["9:16", "1:1", "16:9"]
+    },
+    {
+      "creative_id": "CR18372910283748",
+      "format": "display",
+      "first_shown": "2026-03-22",
+      "last_shown": null,
+      "landing_page": "https://representclo.com/products/owners-club-hoodie",
+      "headlines": ["The Owners Club Hoodie"],
+      "descriptions": ["Premium heavyweight cotton. Ships worldwide."]
+    }
+  ],
+  "_fixture_note": "Synthetic sample for COMPETITOR_SCOUT offline tests."
+}

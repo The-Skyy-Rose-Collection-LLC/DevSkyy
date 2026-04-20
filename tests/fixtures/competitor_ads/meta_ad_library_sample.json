@@ -1,0 +1,34 @@
+{
+  "source": "meta_ad_library",
+  "api_version": "v21.0",
+  "harvested_at": "2026-04-20T06:30:00Z",
+  "page_id": "221215711259054",
+  "page_name": "Fear of God Essentials",
+  "ads": [
+    {
+      "ad_archive_id": "985412306789012",
+      "ad_creative_body": "Quiet luxury. Loud intention. Essentials Spring 25.",
+      "ad_creative_link_captions": ["fearofgod.com"],
+      "ad_creative_link_description": "Shop the new drop.",
+      "ad_delivery_start_time": "2026-04-01",
+      "ad_delivery_stop_time": null,
+      "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=985412306789012",
+      "currency": "USD",
+      "funding_entity": "Fear of God LLC",
+      "publisher_platforms": ["facebook", "instagram"],
+      "estimated_audience_size": {"lower_bound": "500000", "upper_bound": "1000000"},
+      "spend": {"lower_bound": "10000", "upper_bound": "19999"}
+    },
+    {
+      "ad_archive_id": "985412306789013",
+      "ad_creative_body": "The foundation of modern style. No logos. No shortcuts.",
+      "ad_creative_link_captions": ["fearofgod.com/essentials"],
+      "ad_delivery_start_time": "2026-03-15",
+      "ad_delivery_stop_time": "2026-04-15",
+      "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=985412306789013",
+      "currency": "USD",
+      "publisher_platforms": ["instagram"]
+    }
+  ],
+  "_fixture_note": "Synthetic sample for COMPETITOR_SCOUT offline tests. Do not confuse with a real Meta Ad Library export."
+}
