@@ -101,6 +101,14 @@ _AGENT_FOR_KIND: dict[str, str] = {
     "seo_audit": "seo_content",
     "qa_lighthouse": "performance",
     "a11y_audit": "accessibility",
+    "photography": "ecommerce_photography",
+    "product_shoot": "ecommerce_photography",
+    "lookbook": "ecommerce_photography",
+    "garment_3d": "garment_3d",
+    "meshy_generate": "garment_3d",
+    "competitor_scout": "competitor_scout",
+    "ad_teardown": "competitor_scout",
+    "ad_blueprint": "competitor_scout",
 }
 
 
@@ -230,7 +238,22 @@ def _dispatch_social(event: PipelineEvent) -> PipelineReport:
 
 
 def _dispatch_theme(event: PipelineEvent) -> PipelineReport:
-    """Route theme lifecycle pipelines to scripts/deploy-theme.sh."""
+    """Route theme lifecycle pipelines. Supports WordPress (primary) and Shopify (scaffold).
+
+    Shopify is intentionally deferred — themes/shopify/ ships as a scaffold
+    only and any theme dispatch with task.platform == "shopify" raises
+    NotImplementedError pointing at the deferred plug-in.
+    """
+    platform = (event.task.get("platform") or "wp").lower()
+    if platform == "shopify":
+        raise NotImplementedError(
+            "Shopify theme dispatch is deferred — scaffold lives at "
+            "themes/shopify/ and the plug-in PR is tracked in the plan. "
+            "Re-enable by wiring scripts/shopify_sync.py + `shopify theme push`."
+        )
+    if platform != "wp":
+        raise ValueError(f"Unknown theme platform: {platform!r}. Expected 'wp' or 'shopify'.")
+
     if event.kind == "theme_deploy":
         cmd = ["bash", str(PROJECT_ROOT / "scripts" / "deploy-theme.sh")]
         if event.task.get("with_maintenance"):
@@ -250,6 +273,82 @@ def _dispatch_theme(event: PipelineEvent) -> PipelineReport:
     return report
 
 
+def _stub_dispatch(event: PipelineEvent, agent: str, notes: list[str]) -> PipelineReport:
+    """Build + write a success report for a dispatcher that hasn't shipped yet.
+
+    Phase 3 adds three specialists whose concrete pipelines land in later
+    PRs. Each stub returns a PipelineReport with provenance notes so the
+    trigger wiring is testable end-to-end without paid API calls.
+    """
+    now = time.time()
+    report = PipelineReport(
+        kind=event.kind,
+        agent=agent,
+        started_at=now,
+        finished_at=now,
+        success=True,
+        notes=notes,
+    )
+    _write_report(event, report)
+    return report
+
+
+def _dispatch_photography(event: PipelineEvent) -> PipelineReport:
+    """Route ecommerce photography briefs to the IMAGERY pipeline.
+
+    The photography director produces structured briefs (platform specs,
+    fabric rules, color grade targets) handed to the imagery orchestrator
+    for Elite Studio pipeline generation. Concrete wiring lands when the
+    Phase B2 pipeline ships.
+    """
+    return _stub_dispatch(
+        event,
+        "ecommerce_photography",
+        [
+            "Photography brief logged — awaiting imagery pipeline rebuild (Phase B2).",
+            "Brief format: knowledge/ecommerce_photography.md §7.",
+        ],
+    )
+
+
+def _dispatch_3d_garment(event: PipelineEvent) -> PipelineReport:
+    """Route 3D garment rendering jobs to the Meshy pipeline.
+
+    The 3D director owns Meshy v2 → Blender retopology → CLO3D cloth sim →
+    GLB/USDZ export with LODs. Concrete Meshy invocation lives in
+    frontend/lib/meshy/client.ts and is triggered via the frontend API.
+    """
+    return _stub_dispatch(
+        event,
+        "garment_3d",
+        [
+            "3D garment job logged — concrete Meshy invocation via frontend/lib/meshy/client.ts.",
+            "Export targets: assets/3d/{sku}/{lod0,lod1,lod2}.glb + model.usdz.",
+        ],
+    )
+
+
+def _dispatch_competitor_scout(event: PipelineEvent) -> PipelineReport:
+    """Route competitor teardown + ad blueprint jobs.
+
+    Thin adapter over agents/core/analytics/sub_agents/brand_intel_agent.py
+    for SWOT / price-gap / threat-score / style comparison. Adds ad-creative
+    harvesting and blueprint synthesis (handed off to SOCIAL_MEDIA and
+    IMAGERY via the blueprint JSON at data/competitor_blueprints/).
+    Live scraping requires SCOUT_LIVE_SCRAPE=1; default mode uses fixtures.
+    """
+    live = os.getenv("SCOUT_LIVE_SCRAPE") == "1"
+    return _stub_dispatch(
+        event,
+        "competitor_scout",
+        [
+            f"Competitor scout {'LIVE' if live else 'FIXTURE'} mode.",
+            "Blueprint output: data/competitor_blueprints/<brand>-<campaign>-<ts>.json.",
+            "Wraps agents/core/analytics/sub_agents/brand_intel_agent.py.",
+        ],
+    )
+
+
 # -- Generic subprocess runner + logging --------------------------------------
 
 
@@ -259,7 +358,7 @@ def _run_subprocess(
     cmd: list[str],
 ) -> PipelineReport:
     TRIGGER_LOG_DIR.mkdir(parents=True, exist_ok=True)
-    ts = time.strftime("%Y%m%d-%H%M%S")
+    ts = _log_timestamp()
     log_path = TRIGGER_LOG_DIR / f"{event.kind}-{ts}.log"
     err_path = TRIGGER_LOG_DIR / f"{event.kind}-{ts}.err"
 
@@ -295,15 +394,40 @@ def _run_subprocess(
     return report
 
 
+def _log_timestamp() -> str:
+    """Filename-safe timestamp with microsecond precision.
+
+    Plain %H%M%S collides when two dispatches fire in the same second
+    (parallel CI tests, concurrent crons). Appending microseconds keeps
+    log/report files unique without degrading readability.
+    """
+    now = time.time()
+    return (
+        time.strftime("%Y%m%d-%H%M%S", time.localtime(now)) + f"-{int((now % 1) * 1_000_000):06d}"
+    )
+
+
 def _write_report(event: PipelineEvent, report: PipelineReport) -> None:
     TRIGGER_LOG_DIR.mkdir(parents=True, exist_ok=True)
-    ts = time.strftime("%Y%m%d-%H%M%S")
+    ts = _log_timestamp()
     report_path = TRIGGER_LOG_DIR / f"{event.kind}-{ts}.report.json"
     report_path.write_text(report.to_json())
     log.info("REPORT written: %s", report_path)
 
 
 # -- Public entry -------------------------------------------------------------
+
+
+# Module-level routing table. Populated once at import; every trigger_pipeline
+# call does a single dict lookup against this to resolve the dispatcher.
+_DISPATCHERS: dict[str, Any] = {
+    "imagery": _dispatch_imagery,
+    "social_media": _dispatch_social,
+    "theme_builder": _dispatch_theme,
+    "ecommerce_photography": _dispatch_photography,
+    "garment_3d": _dispatch_3d_garment,
+    "competitor_scout": _dispatch_competitor_scout,
+}
 
 
 def trigger_pipeline(
@@ -333,12 +457,9 @@ def trigger_pipeline(
         return None
 
     agent = _resolve_agent(kind)
-    if agent == "imagery":
-        return _dispatch_imagery(event)
-    if agent == "social_media":
-        return _dispatch_social(event)
-    if agent == "theme_builder":
-        return _dispatch_theme(event)
+    dispatcher = _DISPATCHERS.get(agent)
+    if dispatcher is not None:
+        return dispatcher(event)
 
     # No concrete dispatcher yet — log and return a stub report.
     log.info("No dispatcher implemented for agent=%s kind=%s", agent, kind)

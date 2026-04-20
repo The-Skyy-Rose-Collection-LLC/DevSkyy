@@ -1,0 +1,76 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "SkyyRose",
+    "theme_author": "The Skyy Rose Collection",
+    "theme_documentation_url": "https://skyyrose.co",
+    "theme_support_url": "https://skyyrose.co"
+  },
+  {
+    "name": "Brand Colors",
+    "settings": [
+      {
+        "type": "color",
+        "id": "sr_rose_gold",
+        "label": "Rose Gold",
+        "default": "#B76E79"
+      },
+      {
+        "type": "color",
+        "id": "sr_dark",
+        "label": "Dark",
+        "default": "#0A0A0A"
+      },
+      {
+        "type": "color",
+        "id": "sr_silver",
+        "label": "Silver",
+        "default": "#C0C0C0"
+      },
+      {
+        "type": "color",
+        "id": "sr_crimson",
+        "label": "Crimson",
+        "default": "#DC143C"
+      },
+      {
+        "type": "color",
+        "id": "sr_gold",
+        "label": "Gold",
+        "default": "#D4AF37"
+      }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "font_picker",
+        "id": "sr_heading_font",
+        "label": "Heading Font",
+        "default": "playfair_display_n4"
+      },
+      {
+        "type": "font_picker",
+        "id": "sr_body_font",
+        "label": "Body Font",
+        "default": "cormorant_garamond_n4"
+      },
+      {
+        "type": "font_picker",
+        "id": "sr_ui_font",
+        "label": "UI Font",
+        "default": "inter_n4"
+      }
+    ]
+  },
+  {
+    "name": "Collections",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Active SkyyRose collections: Black Rose, Love Hurts, Signature, Kids Capsule. Each collection drives its own palette via the --sr-* CSS variables."
+      }
+    ]
+  }
+]
