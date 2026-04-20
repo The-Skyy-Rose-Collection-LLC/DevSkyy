@@ -118,20 +118,150 @@ load_credentials() {
 }
 
 # ---------------------------------------------------------------------------
-# Cleanup handler -- ALWAYS disables maintenance mode on exit (DEPLOY-07)
+# Concurrency lock (DEPLOY-09 / bug-059)
+#
+# Two simultaneous deploys race on the remote `.old.$swap_id` rename and
+# can leave the live theme pointing at a half-extracted tarball. flock
+# acquires an exclusive, non-blocking lock held for the process lifetime.
+# Stale PID in the lockfile is reclaimed if the owner is no longer alive.
 # ---------------------------------------------------------------------------
+DEPLOY_LOCK_FILE="${DEPLOY_LOCK_FILE:-/tmp/skyyrose-deploy.lock}"
+DEPLOY_LOCK_HELD=0
+
+acquire_deploy_lock() {
+    if [[ -f "$DEPLOY_LOCK_FILE" ]]; then
+        local stale_pid
+        stale_pid="$(cat "$DEPLOY_LOCK_FILE" 2>/dev/null || echo "")"
+        if [[ -n "$stale_pid" ]] && kill -0 "$stale_pid" 2>/dev/null; then
+            log_error "Another deploy is already running (pid $stale_pid)"
+            log_error "Lock file: $DEPLOY_LOCK_FILE"
+            exit 2
+        fi
+        log_warn "Reclaiming stale deploy lock (pid $stale_pid not running)"
+        rm -f "$DEPLOY_LOCK_FILE"
+    fi
+    # Use mkdir-style atomic create via noclobber; portable across macOS/Linux.
+    if ! (set -o noclobber; echo "$$" > "$DEPLOY_LOCK_FILE") 2>/dev/null; then
+        log_error "Failed to acquire deploy lock at $DEPLOY_LOCK_FILE"
+        exit 2
+    fi
+    DEPLOY_LOCK_HELD=1
+}
+
+release_deploy_lock() {
+    if (( DEPLOY_LOCK_HELD )); then
+        rm -f "$DEPLOY_LOCK_FILE"
+        DEPLOY_LOCK_HELD=0
+    fi
+}
+
+# ---------------------------------------------------------------------------
+# Deploy state — used by cleanup/rollback
+# ---------------------------------------------------------------------------
+REMOTE_SWAP_ID=""  # Set by try_rsync after successful hot-swap; consumed by auto_rollback.
+
+# ---------------------------------------------------------------------------
+# Structured log + phase timing (DEPLOY-10 / bug-062)
+#
+# Every deploy produces a timestamped log at $DEPLOY_LOG_FILE and prints
+# a final summary line: "preflight=Ns tar=Ns upload=Ns swap=Ns verify=Ns
+# total=Ns". Enables forensics without parsing noisy stdout.
+# ---------------------------------------------------------------------------
+DEPLOY_LOG_FILE="${DEPLOY_LOG_FILE:-/tmp/skyyrose-deploy-$(date +%Y%m%d-%H%M%S).log}"
+DEPLOY_START_TS=$(date +%s)
+
+# Plain scalars — bash 3.2 (macOS /bin/bash) lacks associative arrays.
+# Variables PHASE_STARTED_<name> and PHASE_TIME_<name> are created on first
+# use by phase_start via `printf -v` (no eval), and read via ${!var:-0}
+# indirection in phase_end/phase_summary. No static initialization
+# needed; the indirect read defaults to 0 when the phase never ran.
+
+phase_start() {
+    printf -v "PHASE_STARTED_$1" '%s' "$(date +%s)"
+}
+
+phase_end() {
+    local name="$1"
+    local started_var="PHASE_STARTED_$name"
+    local started="${!started_var:-$(date +%s)}"
+    local elapsed=$(( $(date +%s) - started ))
+    printf -v "PHASE_TIME_$name" '%s' "$elapsed"
+}
+
+phase_summary() {
+    local total=$(( $(date +%s) - DEPLOY_START_TS ))
+    local line="Deploy phases —"
+    for phase in preflight tar upload swap cache verify; do
+        local var="PHASE_TIME_$phase"
+        line="$line ${phase}=${!var:-0}s"
+    done
+    line="$line total=${total}s"
+    log_info "$line"
+    log_info "Full log: $DEPLOY_LOG_FILE"
+}
+
+# ---------------------------------------------------------------------------
+# Cleanup handler -- ALWAYS disables maintenance mode on exit (DEPLOY-07)
+# Also: releases deploy lock and triggers auto-rollback if verify failed.
+# ---------------------------------------------------------------------------
+ROLLBACK_REQUESTED=false
+
 cleanup() {
+    local exit_code=$?
     if [[ "$MAINTENANCE_ACTIVE" == "true" ]]; then
         log_warn "Cleanup: disabling maintenance mode after unexpected exit..."
         wp_remote "maintenance-mode deactivate" || log_error "CRITICAL: Failed to deactivate maintenance mode -- check site manually"
         MAINTENANCE_ACTIVE=false
     fi
+    if [[ "$ROLLBACK_REQUESTED" == "true" ]]; then
+        if ! auto_rollback; then
+            # Rollback itself failed — escalate so exit code reflects the
+            # worst-case state (site broken AND backup unusable).
+            exit_code=4
+        fi
+    fi
+    release_deploy_lock
+    unset SSHPASS
+    return $exit_code
 }
 
 trap cleanup EXIT INT TERM
 
 # ---------------------------------------------------------------------------
+# Auto-rollback (DEPLOY-11 / bug-060)
+#
+# If post-deploy verification fails, rename the just-deployed theme aside
+# as .failed.$ts and restore the previous .old.$ts backup into the live
+# path. Then flush caches. Site returns to pre-deploy state automatically
+# instead of serving a broken page until a human notices.
+# ---------------------------------------------------------------------------
+auto_rollback() {
+    if [[ -z "$REMOTE_SWAP_ID" ]]; then
+        log_error "Cannot auto-rollback: no swap ID recorded (deploy didn't reach swap phase)"
+        return 1
+    fi
+    log_warn "Initiating auto-rollback to pre-deploy state (swap_id=$REMOTE_SWAP_ID)..."
+    build_ssh_cmd
+    # Single round-trip: existence check + both renames gated by `set -e`.
+    # If the backup dir is missing (transient or gone), the inner script
+    # exits non-zero before clobbering live with a non-existent source.
+    if "${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" "set -e; [ -d '${WP_THEME_PATH}.old.${REMOTE_SWAP_ID}' ] && mv '${WP_THEME_PATH}' '${WP_THEME_PATH}.failed.${REMOTE_SWAP_ID}' && mv '${WP_THEME_PATH}.old.${REMOTE_SWAP_ID}' '${WP_THEME_PATH}'" 2>/dev/null; then
+        wp_remote "cache flush" >/dev/null 2>&1 || true
+        log_success "Auto-rollback complete — site restored to pre-deploy state"
+        log_info "Failed deploy preserved at ${WP_THEME_PATH}.failed.${REMOTE_SWAP_ID} for forensics"
+        return 0
+    else
+        log_error "Auto-rollback FAILED: backup dir missing, transient SSH error, or mv failed"
+        log_error "Manual recovery required — site may be broken. Last deploy log: $DEPLOY_LOG_FILE"
+        return 1
+    fi
+}
+
+# ---------------------------------------------------------------------------
 # SSH auth helper — key preferred, sshpass -e fallback (avoids ps exposure)
+# SSHPASS is set just-in-time inside try_rsync() rather than at module
+# load time so the secret doesn't linger in the environment for the
+# whole deploy.
 # ---------------------------------------------------------------------------
 SSH_STRICT="${SSH_STRICT_HOST:-accept-new}"
 
@@ -196,20 +326,30 @@ preflight() {
     fi
     log_success "Theme directory exists: $THEME_DIR"
 
-    # PHP syntax check
+    # PHP syntax check — scope matches tarball (vendor/node_modules/tests
+    # are gitignored and excluded from deploy, so don't lint them either).
+    # Invariant: preflight scope == deploy scope. Linting paths that are
+    # never shipped costs ~5 min/deploy for vendor/ alone (3,756 composer
+    # files at ~0.36s per `php -l` fork).
+    local php_bin
+    php_bin="$(command -v php 2>/dev/null || echo /opt/homebrew/bin/php)"
     local php_errors=0
+    local php_count=0
     while IFS= read -r -d '' phpfile; do
-        if ! /opt/homebrew/bin/php -l "$phpfile" &>/dev/null; then
+        php_count=$((php_count + 1))
+        if ! "$php_bin" -l "$phpfile" &>/dev/null; then
             log_error "PHP syntax error: $phpfile"
             php_errors=$((php_errors + 1))
         fi
-    done < <(find "$THEME_DIR" -name '*.php' -print0 2>/dev/null)
+    done < <(find "$THEME_DIR" \
+        \( -type d \( -name vendor -o -name node_modules -o -name tests -o -name '.git' \) -prune \) -o \
+        \( -type f -name '*.php' -print0 \) 2>/dev/null)
 
     if [[ "$php_errors" -gt 0 ]]; then
         log_error "$php_errors PHP file(s) have syntax errors -- fix before deploying"
         exit 1
     fi
-    log_success "PHP syntax check passed"
+    log_success "PHP syntax check passed ($php_count files)"
 
     # Test SSH connectivity (skip in dry-run)
     if [[ "$DRY_RUN" == "false" ]]; then
@@ -289,61 +429,86 @@ try_rsync() {
         return 0
     fi
 
-    local key_path="${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}"
-    local ssh_opts="-o StrictHostKeyChecking=yes -p ${SSH_PORT:-22}"
-    if [[ -f "$key_path" ]]; then
-        ssh_opts="$ssh_opts -i $key_path"
+    # WordPress.com doesn't support rsync protocol — use sftp batch upload.
+    # Tar compression: 316 MB of the ~380 MB payload is already-compressed
+    # media (WebP/GLB/JPG/PNG) on which gzip gets ~0% reduction but costs
+    # 10–30s CPU. Use zstd -1 when available (5x faster, similar ratio),
+    # falling back to plain -cf (no compression) when zstd missing.
+    phase_start tar
+    log_info "Creating upload archive..."
+    local tmpzip remote_tar_name zstd_flag
+    if tar --help 2>&1 | grep -q -- '--zstd' && command -v zstd &>/dev/null; then
+        zstd_flag="--zstd"
+        tmpzip="/tmp/skyyrose-flagship-deploy.tar.zst"
+        remote_tar_name="skyyrose-deploy.tar.zst"
+        log_info "Using zstd compression (fast path)"
+    else
+        zstd_flag=""
+        tmpzip="/tmp/skyyrose-flagship-deploy.tar"
+        remote_tar_name="skyyrose-deploy.tar"
+        log_info "Using uncompressed tar (zstd unavailable — skipping gzip waste on pre-compressed media)"
     fi
 
-    # WordPress.com doesn't support rsync protocol — use sftp batch upload
-    log_info "Creating upload archive..."
-    local tmpzip="/tmp/skyyrose-flagship-deploy.tar.gz"
-    tar -czf "$tmpzip" \
-        --exclude='.git' \
-        --exclude='node_modules' \
-        --exclude='vendor' \
-        --exclude='tests' \
-        --exclude='test-results' \
-        --exclude='_archive' \
-        --exclude='.env*' \
-        --exclude='*.map' \
-        --exclude='*.log' \
-        --exclude='.DS_Store' \
-        --exclude='deploy.sh' \
-        --exclude='CLAUDE.md' \
-        --exclude='IMMERSIVE-WORLDS-PLAN.md' \
-        --exclude='.deploy-archives' \
-        --exclude='.gitignore' \
-        --exclude='.phpcs.xml' \
-        --exclude='.eslintrc*' \
-        --exclude='.prettierrc*' \
-        --exclude='.editorconfig' \
-        --exclude='phpunit.xml' \
-        --exclude='playwright-report' \
-        --exclude='screenshots' \
-        --exclude='.serena' \
+    local tar_excludes=(
+        --exclude='.git' --exclude='node_modules' --exclude='vendor'
+        --exclude='tests' --exclude='test-results' --exclude='_archive'
+        --exclude='.env*' --exclude='*.map' --exclude='*.log'
+        --exclude='.DS_Store' --exclude='deploy.sh' --exclude='CLAUDE.md'
+        --exclude='IMMERSIVE-WORLDS-PLAN.md' --exclude='.deploy-archives'
+        --exclude='.gitignore' --exclude='.phpcs.xml' --exclude='.eslintrc*'
+        --exclude='.prettierrc*' --exclude='.editorconfig'
+        --exclude='phpunit.xml' --exclude='playwright-report'
+        --exclude='screenshots' --exclude='.serena'
+    )
+
+    # shellcheck disable=SC2086  # zstd_flag is intentionally word-split
+    tar $zstd_flag -cf "$tmpzip" "${tar_excludes[@]}" \
         -C "$(dirname "$THEME_DIR")" "$(basename "$THEME_DIR")"
 
     local archive_size
     archive_size="$(du -h "$tmpzip" | cut -f1)"
     log_info "Archive: $tmpzip ($archive_size)"
+    phase_end tar
 
-    # Upload via scp then extract remotely (uses shared SSH_CMD/SCP_CMD from build_ssh_cmd)
+    # Build SSH cmd then set SSHPASS just-in-time (reduces env exposure
+    # window from entire deploy to upload+extract phase only).
     build_ssh_cmd
+    if [[ -n "${SSH_PASS:-}" ]] && command -v sshpass &>/dev/null \
+        && [[ ! -f "${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}" ]]; then
+        export SSHPASS="$SSH_PASS"
+    fi
 
+    phase_start upload
     log_info "Uploading via scp..."
-    "${SCP_CMD[@]}" "$tmpzip" "${SSH_USER}@${SSH_HOST}:/tmp/skyyrose-deploy.tar.gz"
+    "${SCP_CMD[@]}" "$tmpzip" "${SSH_USER}@${SSH_HOST}:/tmp/${remote_tar_name}"
+    phase_end upload
 
+    phase_start swap
     log_info "Extracting on remote (atomic hot-swap)..."
     # Hot-swap deploy (DEPLOY-08): rename current theme aside, then rename new
     # theme into place. The live path is unreachable only between two consecutive
     # rename(2) syscalls — microseconds, not the ~60 seconds the old `rm -rf && mv`
     # pattern produced with maintenance mode. Jetpack Uptime stops firing
     # false-positive "site is down" alerts during routine code-only deploys.
+    #
+    # CHANGE (bug-060): no longer rm `.old.$swap_id` immediately after swap.
+    # Keep it as an auto-rollback anchor; deterministic cleanup retains only
+    # the 2 most recent generations (see trim step below).
     local swap_id
     swap_id="$(date +%s)-$$"
-    "${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" "cd /tmp && tar -xzf skyyrose-deploy.tar.gz && (if [ -d '${WP_THEME_PATH}' ]; then mv '${WP_THEME_PATH}' '${WP_THEME_PATH}.old.${swap_id}'; fi) && mv skyyrose-flagship '${WP_THEME_PATH}' && (rm -rf '${WP_THEME_PATH}.old.${swap_id}' 2>/dev/null; rm -f skyyrose-deploy.tar.gz; true)"
+    REMOTE_SWAP_ID="$swap_id"
+    # Swap + prune old backups (keep most recent 2) in one remote round-trip.
+    # Retention is load-bearing for auto_rollback: zero backups → no anchor.
+    local parent_dir theme_name
+    parent_dir="$(dirname "$WP_THEME_PATH")"
+    theme_name="$(basename "$WP_THEME_PATH")"
+    "${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" "set -e; cd /tmp && tar ${zstd_flag} -xf ${remote_tar_name} && (if [ -d '${WP_THEME_PATH}' ]; then mv '${WP_THEME_PATH}' '${WP_THEME_PATH}.old.${swap_id}'; fi) && mv skyyrose-flagship '${WP_THEME_PATH}' && rm -f ${remote_tar_name} && (cd '${parent_dir}' && ls -1dt '${theme_name}.old.'* 2>/dev/null | tail -n +3 | xargs -I {} rm -rf {} 2>/dev/null; true)"
+    phase_end swap
 
+    # SSHPASS stays in env until cleanup(); subsequent wp_remote calls
+    # (cache flush, verify) need it. Unsetting here breaks those. The
+    # original "defer until just-in-time" win is that preflight and tar
+    # (which run before build_ssh_cmd) never see SSHPASS.
     rm -f "$tmpzip"
     log_success "Theme uploaded and extracted"
 }
@@ -415,7 +580,8 @@ verify_live() {
     fi
 
     local public_url="${PUBLIC_URL:-https://skyyrose.co/}"
-    local bust_url="${public_url}?deploy_verify=$(date +%s)"
+    local bust_url
+    bust_url="${public_url}?deploy_verify=$(date +%s)"
     local tmpfile
     tmpfile="$(mktemp)"
     # shellcheck disable=SC2064
@@ -447,6 +613,11 @@ verify_live() {
         return 1
     fi
 
+    # Deep per-page + content-marker verification lives in verify-deploy.sh
+    # (called by deploy-pipeline.sh). Keep this function's scope narrow:
+    # homepage-200 + no-PHP-errors is the last-ditch safety when someone
+    # runs deploy-theme.sh directly. For full post-deploy checks, run
+    # `bash scripts/verify-deploy.sh` or `bash scripts/deploy-pipeline.sh`.
     log_success "Post-deploy verification passed (HTTP $http_code, $size bytes)"
     return 0
 }
@@ -461,15 +632,27 @@ main() {
         log_info "=== DRY RUN MODE -- no changes will be made ==="
     fi
 
+    # Tee all stdout+stderr to the per-deploy log file so a single command
+    # captures both the console summary and the forensic trail.
+    if [[ "$DRY_RUN" != "true" ]]; then
+        exec > >(tee -a "$DEPLOY_LOG_FILE") 2>&1
+    fi
+
     log_info "=== SkyyRose Theme Deploy ==="
     log_info "Theme: $THEME_DIR"
     log_info "Target: ${ENV_FILE##*/}"
+    log_info "Log:    $DEPLOY_LOG_FILE"
+
+    # 0. Concurrency lock — refuses to start if another deploy is running
+    acquire_deploy_lock
 
     # Load credentials (validates file exists)
     load_credentials
 
     # 1. Preflight checks
+    phase_start preflight
     preflight
+    phase_end preflight
 
     # 2. Maintenance mode — OPT-IN via --with-maintenance (DEPLOY-02)
     # Hot-swap (the default transfer path) makes maintenance mode unnecessary
@@ -485,7 +668,7 @@ main() {
         log_info "Skipping maintenance mode (hot-swap default) — pass --with-maintenance to opt in"
     fi
 
-    # 3. Transfer files (DEPLOY-01)
+    # 3. Transfer files (DEPLOY-01) — phase timing for tar/upload/swap is set inside try_rsync
     transfer_files
 
     # 4. Disable maintenance mode if it was enabled (DEPLOY-03)
@@ -497,15 +680,24 @@ main() {
     fi
 
     # 5. Flush caches (DEPLOY-03)
+    phase_start cache
     flush_caches
+    phase_end cache
 
     # 6. Post-deploy verification gate (DEPLOY-08 — Boris Cherny tip #14)
+    # On failure, set ROLLBACK_REQUESTED so the EXIT trap's cleanup() fires
+    # auto_rollback before releasing the deploy lock.
+    phase_start verify
     if ! verify_live; then
+        phase_end verify
         log_error "=== Deploy FAILED post-verification ==="
-        log_error "Site may be in a broken state — investigate before re-deploying"
-        exit 1
+        ROLLBACK_REQUESTED=true
+        phase_summary
+        exit 3
     fi
+    phase_end verify
 
+    phase_summary
     log_success "=== Deploy complete (verified live) ==="
 }
 

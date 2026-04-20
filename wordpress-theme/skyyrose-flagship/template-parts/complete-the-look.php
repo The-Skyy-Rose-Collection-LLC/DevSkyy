@@ -48,10 +48,8 @@ $cross_sell_map = array(
 	'sg-001' => array( 'sg-002', 'sg-003' ),  // Bay Bridge Shorts → Stay Golden Shirt + Shorts
 	'sg-002' => array( 'sg-003', 'sg-001' ),  // Stay Golden Shirt → Shorts, Bay Bridge
 	'sg-003' => array( 'sg-002', 'sg-006' ),  // Stay Golden Shorts → Shirt, Hoodie
-	'sg-004' => array( 'sg-006', 'sg-014' ),  // Signature Hoodie → Mint Hoodie, Sweatpants
-	'sg-009' => array( 'sg-006', 'sg-004' ),  // Sherpa → Hoodies
-	'sg-010' => array( 'sg-001', 'sg-002' ),  // Bridge Series Shorts → Bay Bridge, Stay Golden
-	'sg-011' => array( 'sg-002', 'sg-010' ),  // Original Label Tee White → Stay Golden, Bridge Shorts
+	'sg-009' => array( 'sg-006', 'sg-013' ),  // Sherpa → Mint Hoodie, Mint Crewneck
+	'sg-011' => array( 'sg-002', 'sg-001' ),  // Original Label Tee White → Stay Golden Shirt, Bay Bridge Shorts
 	'sg-012' => array( 'sg-011', 'sg-006' ),  // Original Label Tee Orchid → White Tee, Hoodie
 	'sg-013' => array( 'sg-006', 'sg-014' ),  // Mint Crewneck → Hoodie, Sweatpants
 );

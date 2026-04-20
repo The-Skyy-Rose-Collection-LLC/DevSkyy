@@ -19,57 +19,29 @@ Every generated image must show a model wearing the **exact real product** — c
 
 ## Product Catalog
 
-- **File:** `skyyrose/assets/data/product-content.json` (28 products)
-- **Fields:** sku, name, collection, description, short_description, seo_meta, instagram, tiktok
+**Single source of truth:** `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv`
 
-### Canonical Product Name Mapping (USE THESE NAMES for WordPress)
+Read the CSV for SKU, name, price, collection, branding_spec, and image paths. Previous versions of this doc kept a hardcoded SKU table that drifted out of sync with the CSV (e.g., kids-001 was listed here as "Purple/Pink" when the CSV said "Red/Black" — caused a wasted paid render run on 2026-04-19).
 
-**CRITICAL:** When uploading products to WordPress, ALWAYS use these exact names from the product mapper. Do NOT rename, abbreviate, or alter them.
+### How to read it for image generation
 
-#### BLACK ROSE Collection (8 products)
-| SKU | WordPress Product Name |
-|-----|----------------------|
-| br-001 | BLACK Rose Crewneck |
-| br-002 | BLACK Rose Joggers |
-| br-003 | BLACK is Beautiful Jersey |
-| br-004 | BLACK Rose Hoodie |
-| br-005 | BLACK Rose Hoodie — Signature Edition |
-| br-006 | BLACK Rose Sherpa Jacket |
-| br-007 | BLACK Rose × Love Hurts Basketball Shorts |
-| br-008 | Women's BLACK Rose Hooded Dress |
+```python
+from skyyrose.core.catalog_loader import read_catalog_rows
+rows = read_catalog_rows()
+for r in rows:
+    sku          = r["sku"]
+    name         = r["name"]                # canonical WordPress product name
+    collection   = r["collection"]
+    branding     = r["branding_spec"]        # logo technique + placement specs
+    src_override = r.get("render_source_override") or ""  # for front
+    back_src     = r.get("render_back_source_override") or ""
+```
 
-#### LOVE HURTS Collection (5 products)
-| SKU | WordPress Product Name |
-|-----|----------------------|
-| lh-001 | The Fannie |
-| lh-002 | Love Hurts Joggers |
-| lh-003 | Love Hurts Basketball Shorts |
-| lh-004 | Love Hurts Varsity Jacket |
-| lh-005 | Love Hurts Bomber Jacket |
+Or from nano_banana/elite_studio: `from nano_banana.catalog import load_catalog` / `from skyyrose.elite_studio.catalog import Catalog`.
 
-#### SIGNATURE Collection (14 products)
-| SKU | WordPress Product Name |
-|-----|----------------------|
-| sg-001 | The Bay Set |
-| sg-002 | Stay Golden Set |
-| sg-003 | The Signature Tee |
-| sg-004 | The Signature Tee — White |
-| sg-005 | Stay Golden Tee |
-| sg-006 | Mint & Lavender Hoodie |
-| sg-007 | The Signature Beanie |
-| sg-008 | The Signature Beanie |
-| sg-009 | The Sherpa Jacket |
-| sg-010 | The Bridge Series Shorts |
-| sg-011 | The Signature Beanie — Grey |
-| sg-012 | The Signature Beanie — Orange |
-| sg-013 | Mint & Lavender Crewneck Set |
-| sg-014 | Pastel Chevron Tracksuit Set |
+### Never hardcode SKU lists
 
-#### KIDS CAPSULE Collection (2 products)
-| SKU | WordPress Product Name |
-|-----|----------------------|
-| kids-001 | Kids Colorblock Hoodie Set — Purple/Pink |
-| kids-002 | Kids Colorblock Hoodie Set — Black/Red/White |
+Do NOT rename, abbreviate, or duplicate product names in prompts, overrides, or doc tables. The CSV is the only canonical source.
 
 ## Product Override System (Accuracy Enforcement)
 

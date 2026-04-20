@@ -54,7 +54,7 @@ interface FunnelStage {
 interface ProductHeat {
   readonly sku: string;
   readonly name: string;
-  readonly collection: 'black-rose' | 'love-hurts' | 'signature';
+  readonly collection: 'black-rose' | 'love-hurts' | 'signature' | 'kids-capsule';
   readonly heatScore: number;
   readonly views: number;
   readonly avgHoverTime: number;
@@ -110,28 +110,52 @@ const FUNNEL_STAGES: readonly FunnelStage[] = [
   { label: 'Order', count: 43, rate: 1.5, color: '#B76E79' },
 ];
 
-const PRODUCT_HEAT_DATA: readonly ProductHeat[] = [
-  { sku: 'br-004', name: 'BLACK Rose Hoodie', collection: 'black-rose', heatScore: 94, views: 1243, avgHoverTime: 8.2, cartRate: 4.8 },
-  { sku: 'lh-004', name: 'Love Hurts Bomber Jacket', collection: 'love-hurts', heatScore: 91, views: 1087, avgHoverTime: 7.9, cartRate: 5.1 },
-  { sku: 'lh-005', name: 'The Fannie', collection: 'love-hurts', heatScore: 76, views: 798, avgHoverTime: 5.8, cartRate: 3.1 },
-  { sku: 'br-006', name: 'BLACK Rose Sherpa Jacket', collection: 'black-rose', heatScore: 87, views: 982, avgHoverTime: 7.4, cartRate: 4.2 },
-  { sku: 'sg-002', name: 'Stay Golden Set', collection: 'signature', heatScore: 84, views: 921, avgHoverTime: 6.8, cartRate: 3.9 },
-  { sku: 'br-008', name: "Women's BLACK Rose Hooded Dress", collection: 'black-rose', heatScore: 82, views: 876, avgHoverTime: 9.1, cartRate: 3.6 },
-  { sku: 'sg-001', name: 'The Bay Set', collection: 'signature', heatScore: 79, views: 834, avgHoverTime: 6.2, cartRate: 3.4 },
-  { sku: 'br-005', name: 'BLACK Rose Hoodie - Signature Ed.', collection: 'black-rose', heatScore: 74, views: 756, avgHoverTime: 7.1, cartRate: 2.9 },
-  { sku: 'sg-006', name: 'Mint & Lavender Hoodie', collection: 'signature', heatScore: 71, views: 712, avgHoverTime: 5.4, cartRate: 2.7 },
-  { sku: 'br-001', name: 'BLACK Rose Crewneck', collection: 'black-rose', heatScore: 68, views: 687, avgHoverTime: 4.9, cartRate: 2.5 },
-  { sku: 'lh-002', name: 'Love Hurts Joggers', collection: 'love-hurts', heatScore: 65, views: 643, avgHoverTime: 4.6, cartRate: 2.3 },
-  { sku: 'sg-003', name: 'The Signature Tee', collection: 'signature', heatScore: 62, views: 601, avgHoverTime: 4.2, cartRate: 2.1 },
-  { sku: 'br-002', name: 'BLACK Rose Joggers', collection: 'black-rose', heatScore: 58, views: 567, avgHoverTime: 3.8, cartRate: 1.9 },
-  { sku: 'br-003', name: 'BLACK is Beautiful Jersey', collection: 'black-rose', heatScore: 55, views: 534, avgHoverTime: 3.5, cartRate: 1.7 },
-  { sku: 'sg-005', name: 'Stay Golden Tee', collection: 'signature', heatScore: 52, views: 498, avgHoverTime: 3.2, cartRate: 1.6 },
-  { sku: 'lh-003', name: 'Love Hurts Basketball Shorts', collection: 'love-hurts', heatScore: 48, views: 456, avgHoverTime: 2.9, cartRate: 1.4 },
-  { sku: 'br-007', name: 'BLACK Rose x Love Hurts Shorts', collection: 'black-rose', heatScore: 45, views: 423, avgHoverTime: 2.7, cartRate: 1.2 },
-  { sku: 'sg-009', name: 'The Sherpa Jacket', collection: 'signature', heatScore: 42, views: 398, avgHoverTime: 4.1, cartRate: 1.1 },
-  { sku: 'sg-007', name: 'The Signature Beanie', collection: 'signature', heatScore: 38, views: 367, avgHoverTime: 2.3, cartRate: 0.9 },
-  { sku: 'sg-010', name: 'The Bridge Series Shorts', collection: 'signature', heatScore: 34, views: 312, avgHoverTime: 2.1, cartRate: 0.8 },
-];
+// Product heat rows are derived from the live canonical catalog (via
+// /api/products) with deterministic mock metrics. Never hardcode SKU → name
+// rows here — the catalog CSV is the single source of truth.
+
+interface ApiProductRow {
+  sku: string;
+  name: string;
+  collection: string;
+}
+
+function hashSku(sku: string): number {
+  let h = 0;
+  for (let i = 0; i < sku.length; i += 1) h = (h * 31 + sku.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+const KNOWN_COLLECTIONS = ['black-rose', 'love-hurts', 'signature', 'kids-capsule'] as const;
+type KnownCollection = (typeof KNOWN_COLLECTIONS)[number];
+
+function isKnownCollection(c: string): c is KnownCollection {
+  return (KNOWN_COLLECTIONS as readonly string[]).includes(c);
+}
+
+function deriveHeatData(products: ApiProductRow[]): ProductHeat[] {
+  return products
+    .filter((p): p is ApiProductRow & { collection: KnownCollection } =>
+      isKnownCollection(p.collection)
+    )
+    .map((p) => {
+      const h = hashSku(p.sku);
+      const heatScore = 34 + (h % 61);           // 34..94 band (matches prior mock range)
+      const views = 300 + (h % 950);             // 300..1249
+      const avgHoverTime = 2 + ((h % 81) / 10);  // 2.0..10.0
+      const cartRate = 0.7 + ((h % 44) / 10);    // 0.7..5.0
+      return {
+        sku: p.sku,
+        name: p.name,
+        collection: p.collection,
+        heatScore,
+        views,
+        avgHoverTime: Number(avgHoverTime.toFixed(1)),
+        cartRate: Number(cartRate.toFixed(1)),
+      };
+    })
+    .sort((a, b) => b.heatScore - a.heatScore);
+}
 
 const AB_VARIANT_A: ABVariant = {
   name: 'Variant A',
@@ -198,6 +222,22 @@ export default function ConversionIntelligencePage() {
   const [saveConfirmed, setSaveConfirmed] = useState(false);
   const [liveMetrics, setLiveMetrics] = useState<LiveMetrics | null>(null);
   const [liveConnected, setLiveConnected] = useState(false);
+  const [heatData, setHeatData] = useState<ProductHeat[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/products');
+        if (!res.ok) return;
+        const json = await res.json();
+        if (json?.success && Array.isArray(json.data?.products)) {
+          setHeatData(deriveHeatData(json.data.products as ApiProductRow[]));
+        }
+      } catch {
+        /* non-blocking — tab renders empty state */
+      }
+    })();
+  }, []);
 
   const fetchLiveMetrics = useCallback(async () => {
     try {
@@ -350,7 +390,7 @@ export default function ConversionIntelligencePage() {
 
         {/* ---- Product Heat Tab ---- */}
         <TabsContent value="product-heat" className="space-y-4">
-          <ProductHeatTab products={PRODUCT_HEAT_DATA} />
+          <ProductHeatTab products={heatData} />
         </TabsContent>
 
         {/* ---- Momentum Commerce Tab ---- */}

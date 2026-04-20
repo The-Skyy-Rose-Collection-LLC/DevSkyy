@@ -198,14 +198,14 @@ function skyyrose_get_featured_catalog_products( $limit = 8 ) {
 	// Curated featured rotation — one or two flagships per collection, in
 	// a natural browsing order (signature → black rose → love hurts → kids).
 	$default_skus = array(
-		'sg-004',  // The Signature Hoodie
+		'sg-015',  // The Windbreaker Set
 		'br-004',  // BLACK Rose Hoodie
 		'br-008',  // SF Inspired Football Jersey
-		'lh-004',  // Love Hurts Varsity Jacket
+		'lh-004',  // Love Hurts Bomber Jacket
 		'sg-006',  // Mint & Lavender Hoodie
 		'br-010',  // The Bay Basketball Jersey
 		'sg-013',  // Mint & Lavender Crewneck
-		'kids-001', // Kids Red Set
+		'kids-001', // Kids Colorblock Set (Red/Black)
 	);
 
 	/**

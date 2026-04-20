@@ -770,41 +770,25 @@ This theme uses AI-generated fashion model images showing real models wearing th
 </picture>
 ```
 
-### Product Names (Canonical — NEVER abbreviate)
+### Product Names (Canonical)
 
-Full mapping in `knowledge/photo_generation.md`. Quick reference:
+**DO NOT hardcode a SKU table here.** The previous version of this section drifted out of sync with the canonical CSV and caused a wasted paid render run. Read canonical names directly from:
 
-| SKU | Canonical Name |
-|-----|---------------|
-| br-001 | BLACK Rose Crewneck |
-| br-002 | BLACK Rose Joggers |
-| br-003 | BLACK is Beautiful Jersey |
-| br-004 | BLACK Rose Hoodie |
-| br-005 | BLACK Rose Hoodie — Signature Edition |
-| br-006 | BLACK Rose Sherpa Jacket |
-| br-007 | BLACK Rose × Love Hurts Basketball Shorts |
-| br-008 | Women's BLACK Rose Hooded Dress |
-| lh-001 | The Fannie |
-| lh-002 | Love Hurts Joggers |
-| lh-003 | Love Hurts Basketball Shorts |
-| lh-004 | Love Hurts Varsity Jacket |
-| lh-005 | Love Hurts Bomber Jacket |
-| sg-001 | The Bay Set |
-| sg-002 | Stay Golden Set |
-| sg-003 | The Signature Tee |
-| sg-004 | The Signature Tee — White |
-| sg-005 | Stay Golden Tee |
-| sg-006 | Mint & Lavender Hoodie |
-| sg-007 | The Signature Beanie |
-| sg-008 | The Signature Beanie |
-| sg-009 | The Sherpa Jacket |
-| sg-010 | The Bridge Series Shorts |
-| sg-011 | The Signature Beanie — Grey |
-| sg-012 | The Signature Beanie — Orange |
-| sg-013 | Mint & Lavender Crewneck Set |
-| sg-014 | Pastel Chevron Tracksuit Set |
-| kids-001 | Kids Colorblock Hoodie Set — Purple/Pink |
-| kids-002 | Kids Colorblock Hoodie Set — Black/Red/White |
+**`wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv`** (column `name`)
+
+Quick one-liner to dump current live SKU → name mapping:
+```bash
+python3 -c "import csv; [print(f'{r[\"sku\"]:<10} {r[\"name\"]}') for r in csv.DictReader(open('wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv'))]"
+```
+
+Or via the Python helper:
+```python
+from skyyrose.core.catalog_loader import read_catalog_rows
+for r in read_catalog_rows():
+    print(r["sku"], r["name"])
+```
+
+For WordPress upload/update, always pass through `skyyrose_get_product($sku)` — never an inline lookup table.
 
 ---
 

@@ -225,12 +225,15 @@ wp_set_object_terms($product_id, 'black-rose', 'product_cat');
 ```
 
 ### Collections (Official Colors — Owner-Confirmed)
-| Collection | Room/Theme | Official Colors | Accent Hex | IDs | SKU Prefix |
-|------------|-----------|----------------|------------|-----|------------|
-| BLACK ROSE | The Garden | Black, White, Metallic Silver | `#C0C0C0` | br-001..008 | SR-BR- |
-| LOVE HURTS | The Ballroom | Red, Crimson, Black, White | `#DC143C` | lh-001..005 | SR-LH- |
-| SIGNATURE | The Runway | Rose Gold, Gold | `#B76E79` | sg-001..014 | SR-SIG- |
-| KIDS CAPSULE | — | Pink, Lavender | `#FFB6C1` | kids-001..002 | SR-KC- |
+
+| Collection | Room/Theme | Official Colors | Accent Hex | SKU Prefix |
+|------------|-----------|----------------|------------|------------|
+| BLACK ROSE | The Garden | Black, White, Metallic Silver | `#C0C0C0` | `br-` |
+| LOVE HURTS | The Ballroom | Red, Crimson, Black, White | `#DC143C` | `lh-` |
+| SIGNATURE | The Runway | Rose Gold, Gold | `#B76E79` | `sg-` |
+| KIDS CAPSULE | — | Pink, Lavender | `#FFB6C1` | `kids-` |
+
+**SKU ranges are not listed here** because they drift. Read the active SKU list from `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv` (canonical source) or via `skyyrose_get_collection_products($slug)` in PHP.
 
 ### Store Pages
 - Shop → Collections page

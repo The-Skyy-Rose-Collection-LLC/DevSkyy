@@ -50,7 +50,7 @@ $rooms = array(
 				)
 			),
 			skyyrose_immersive_product(
-				'sg-010',
+				'sg-003',
 				array(
 					'left'       => '50',
 					'top'        => '38',
@@ -112,7 +112,7 @@ $rooms = array(
 				)
 			),
 			skyyrose_immersive_product(
-				'sg-004',
+				'sg-015',
 				array(
 					'left'       => '72',
 					'top'        => '38',

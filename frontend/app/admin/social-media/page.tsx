@@ -75,28 +75,14 @@ const COLLECTIONS = [
   { value: 'signature', label: 'Signature' },
 ];
 
-const PRODUCT_SKUS = [
-  { value: 'br-001', label: 'BLACK Rose Crewneck', collection: 'black-rose' },
-  { value: 'br-002', label: 'BLACK Rose Joggers', collection: 'black-rose' },
-  { value: 'br-003', label: 'BLACK is Beautiful Jersey', collection: 'black-rose' },
-  { value: 'br-004', label: 'BLACK Rose Hoodie', collection: 'black-rose' },
-  { value: 'br-005', label: 'BLACK Rose Hoodie - Signature Ed.', collection: 'black-rose' },
-  { value: 'br-006', label: 'BLACK Rose Sherpa Jacket', collection: 'black-rose' },
-  { value: 'br-007', label: 'BLACK Rose x Love Hurts Shorts', collection: 'black-rose' },
-  { value: 'br-008', label: "Women's BLACK Rose Hooded Dress", collection: 'black-rose' },
-  { value: 'lh-002', label: 'Love Hurts Joggers', collection: 'love-hurts' },
-  { value: 'lh-003', label: 'Love Hurts Basketball Shorts', collection: 'love-hurts' },
-  { value: 'lh-004', label: 'Love Hurts Bomber Jacket', collection: 'love-hurts' },
-  { value: 'lh-005', label: 'The Fannie', collection: 'love-hurts' },
-  { value: 'sg-001', label: 'The Bay Set', collection: 'signature' },
-  { value: 'sg-002', label: 'Stay Golden Set', collection: 'signature' },
-  { value: 'sg-003', label: 'The Signature Tee', collection: 'signature' },
-  { value: 'sg-005', label: 'Stay Golden Tee', collection: 'signature' },
-  { value: 'sg-006', label: 'Mint & Lavender Hoodie', collection: 'signature' },
-  { value: 'sg-007', label: 'The Signature Beanie', collection: 'signature' },
-  { value: 'sg-009', label: 'The Sherpa Jacket', collection: 'signature' },
-  { value: 'sg-010', label: 'The Bridge Series Shorts', collection: 'signature' },
-];
+interface ProductOption {
+  value: string;
+  label: string;
+  collection: string;
+}
+
+// Product list is fetched from /api/products on mount — reads the canonical
+// catalog CSV server-side. Never hardcode SKUs here.
 
 // ---------------------------------------------------------------------------
 // Page Component
@@ -107,6 +93,7 @@ export default function SocialMediaPage() {
   const [analytics, setAnalytics] = useState<SocialAnalytics | null>(null);
   const [queue, setQueue] = useState<SocialPost[]>([]);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [products, setProducts] = useState<ProductOption[]>([]);
 
   // Post generator state
   const [selectedSku, setSelectedSku] = useState('');
@@ -124,10 +111,22 @@ export default function SocialMediaPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [analyticsRes, scheduleRes] = await Promise.all([
+      const [analyticsRes, scheduleRes, productsRes] = await Promise.all([
         fetch('/api/social-media/analytics'),
         fetch('/api/social-media/schedule'),
+        fetch('/api/products'),
       ]);
+
+      if (productsRes.ok) {
+        const productsJson = await productsRes.json();
+        if (productsJson?.success && Array.isArray(productsJson.data?.products)) {
+          type ApiProduct = { sku: string; name: string; collection: string };
+          const opts: ProductOption[] = (productsJson.data.products as ApiProduct[]).map(
+            (p) => ({ value: p.sku, label: p.name, collection: p.collection })
+          );
+          setProducts(opts);
+        }
+      }
 
       if (analyticsRes.ok) {
         const analyticsJson = await analyticsRes.json();
@@ -211,7 +210,7 @@ export default function SocialMediaPage() {
     setError(null);
 
     try {
-      const collectionProducts = PRODUCT_SKUS.filter(
+      const collectionProducts = products.filter(
         (p) => p.collection === campaignCollection
       );
       const campaignPosts: SocialPost[] = [];
@@ -417,21 +416,21 @@ export default function SocialMediaPage() {
                   >
                     <option value="">Select a product...</option>
                     <optgroup label="Black Rose Collection">
-                      {PRODUCT_SKUS.filter((p) => p.collection === 'black-rose').map((p) => (
+                      {products.filter((p) => p.collection === 'black-rose').map((p) => (
                         <option key={p.value} value={p.value}>
                           {p.label}
                         </option>
                       ))}
                     </optgroup>
                     <optgroup label="Love Hurts Collection">
-                      {PRODUCT_SKUS.filter((p) => p.collection === 'love-hurts').map((p) => (
+                      {products.filter((p) => p.collection === 'love-hurts').map((p) => (
                         <option key={p.value} value={p.value}>
                           {p.label}
                         </option>
                       ))}
                     </optgroup>
                     <optgroup label="Signature Collection">
-                      {PRODUCT_SKUS.filter((p) => p.collection === 'signature').map((p) => (
+                      {products.filter((p) => p.collection === 'signature').map((p) => (
                         <option key={p.value} value={p.value}>
                           {p.label}
                         </option>
@@ -580,7 +579,7 @@ export default function SocialMediaPage() {
                 ) : (
                   <>
                     <Megaphone className="mr-2 h-5 w-5" />
-                    Generate Campaign ({PRODUCT_SKUS.filter((p) => p.collection === campaignCollection).length} products x 4 platforms)
+                    Generate Campaign ({products.filter((p) => p.collection === campaignCollection).length} products x 4 platforms)
                   </>
                 )}
               </Button>

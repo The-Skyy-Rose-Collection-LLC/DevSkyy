@@ -88,7 +88,7 @@ get_header();
 			'subheading' => 'Wardrobe foundations built to last.',
 			'skus'       => array(
 				'sg-001', // Bridge Series Bay Bridge Shorts — $195
-				// Add more Signature SKUs as catalog grows: sg-002, sg-004, sg-011, etc.
+				// Add more Signature SKUs as catalog grows (see skyyrose-catalog.csv).
 			),
 			'wear_count' => 300,
 		)

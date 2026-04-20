@@ -153,6 +153,13 @@ keys/
 staging/
 backups/
 legacy/
+.deploy-archives/
+/tmp/skyyrose-deploy-*.log
+*-deploy.log
+
+# Imagery pipeline run artifacts (stale between runs — regenerated per batch)
+data/product-vision/
+data/verify-results/
 
 # Large archive files
 assets/_other/*.zip

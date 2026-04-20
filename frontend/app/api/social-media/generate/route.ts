@@ -12,6 +12,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { hasLlmKey } from '@/lib/social-media/config';
+import { getProduct as getCatalogProduct } from '@/lib/catalog';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -37,33 +38,6 @@ interface SocialPost {
   status: 'draft' | 'scheduled' | 'published' | 'failed';
   engagement: Record<string, number>;
 }
-
-// ---------------------------------------------------------------------------
-// Product catalog (mirrors the frontend page)
-// ---------------------------------------------------------------------------
-
-const PRODUCTS: Record<string, { label: string; collection: string }> = {
-  'br-001': { label: 'BLACK Rose Crewneck', collection: 'black-rose' },
-  'br-002': { label: 'BLACK Rose Joggers', collection: 'black-rose' },
-  'br-003': { label: 'BLACK is Beautiful Jersey', collection: 'black-rose' },
-  'br-004': { label: 'BLACK Rose Hoodie', collection: 'black-rose' },
-  'br-005': { label: 'BLACK Rose Hoodie - Signature Ed.', collection: 'black-rose' },
-  'br-006': { label: 'BLACK Rose Sherpa Jacket', collection: 'black-rose' },
-  'br-007': { label: 'BLACK Rose x Love Hurts Shorts', collection: 'black-rose' },
-  'br-008': { label: "Women's BLACK Rose Hooded Dress", collection: 'black-rose' },
-  'lh-002': { label: 'Love Hurts Joggers', collection: 'love-hurts' },
-  'lh-003': { label: 'Love Hurts Basketball Shorts', collection: 'love-hurts' },
-  'lh-004': { label: 'Love Hurts Bomber Jacket', collection: 'love-hurts' },
-  'lh-005': { label: 'The Fannie', collection: 'love-hurts' },
-  'sg-001': { label: 'The Bay Set', collection: 'signature' },
-  'sg-002': { label: 'Stay Golden Set', collection: 'signature' },
-  'sg-003': { label: 'The Signature Tee', collection: 'signature' },
-  'sg-005': { label: 'Stay Golden Tee', collection: 'signature' },
-  'sg-006': { label: 'Mint & Lavender Hoodie', collection: 'signature' },
-  'sg-007': { label: 'The Signature Beanie', collection: 'signature' },
-  'sg-009': { label: 'The Sherpa Jacket', collection: 'signature' },
-  'sg-010': { label: 'The Bridge Series Shorts', collection: 'signature' },
-};
 
 // ---------------------------------------------------------------------------
 // Collection descriptions for brand context
@@ -239,13 +213,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const product = PRODUCTS[body.product_sku];
-    if (!product) {
+    const canonical = getCatalogProduct(body.product_sku);
+    if (!canonical) {
       return NextResponse.json(
         { success: false, error: `Unknown product SKU: ${body.product_sku}` },
         { status: 404 }
       );
     }
+    const product = { label: canonical.name, collection: canonical.collection };
 
     const contentType = body.content_type ?? 'product_launch';
     let caption: string;
