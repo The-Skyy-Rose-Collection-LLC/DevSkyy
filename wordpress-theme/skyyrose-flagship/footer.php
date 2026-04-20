@@ -147,10 +147,27 @@ defined( 'ABSPATH' ) || exit;
 				<div class="footer-grid__col footer-grid__col--shop">
 					<h4 class="footer-grid__heading"><?php esc_html_e( 'Shop', 'skyyrose' ); ?></h4>
 					<ul class="footer-grid__list">
-						<li><a href="<?php echo esc_url( home_url( '/collection-black-rose/' ) ); ?>"><?php esc_html_e( 'Black Rose', 'skyyrose' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/collection-love-hurts/' ) ); ?>"><?php esc_html_e( 'Love Hurts', 'skyyrose' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/collection-signature/' ) ); ?>"><?php esc_html_e( 'Signature', 'skyyrose' ); ?></a></li>
-						<li><a href="<?php echo esc_url( home_url( '/collection-kids-capsule/' ) ); ?>"><?php esc_html_e( 'Kids Capsule', 'skyyrose' ); ?></a></li>
+						<?php
+						// Collections are derived from the canonical catalog CSV so
+						// adding/removing a collection automatically flows to the footer.
+						$footer_collections = array();
+						if ( function_exists( 'skyyrose_get_product_catalog' ) ) {
+							$footer_catalog = skyyrose_get_product_catalog();
+							foreach ( $footer_catalog as $footer_product ) {
+								$footer_slug = $footer_product['collection'] ?? '';
+								if ( $footer_slug && ! isset( $footer_collections[ $footer_slug ] ) ) {
+									$footer_collections[ $footer_slug ] = ucwords( str_replace( '-', ' ', $footer_slug ) );
+								}
+							}
+						}
+						foreach ( $footer_collections as $footer_slug => $footer_label ) :
+							?>
+							<li>
+								<a href="<?php echo esc_url( home_url( '/collection-' . $footer_slug . '/' ) ); ?>">
+									<?php echo esc_html( $footer_label ); ?>
+								</a>
+							</li>
+						<?php endforeach; ?>
 						<li><a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"><?php esc_html_e( 'Pre-Order', 'skyyrose' ); ?></a></li>
 						<?php if ( class_exists( 'WooCommerce' ) ) : ?>
 							<li><a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>"><?php esc_html_e( 'All Products', 'skyyrose' ); ?></a></li>

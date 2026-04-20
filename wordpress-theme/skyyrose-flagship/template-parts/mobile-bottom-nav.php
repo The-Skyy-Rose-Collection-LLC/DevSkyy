@@ -17,6 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Determine active state based on current page.
+// Collection slugs are derived dynamically from the canonical catalog so that
+// adding or removing a collection in skyyrose-catalog.csv automatically updates
+// the active-state detection here — no template-list drift.
 $mobile_nav_active = '';
 
 if ( is_front_page() ) {
@@ -28,14 +31,20 @@ if ( is_front_page() ) {
 } elseif ( function_exists( 'is_account_page' ) && is_account_page() ) {
 	$mobile_nav_active = 'account';
 } else {
-	// Collection pages and shop archive.
-	$mobile_nav_tpl       = get_page_template_slug();
-	$collection_templates = array(
-		'template-collection-signature.php',
-		'template-collection-black-rose.php',
-		'template-collection-love-hurts.php',
-		'template-collection-kids-capsule.php',
-	);
+	$mobile_nav_tpl   = get_page_template_slug();
+	$collection_slugs = array();
+	if ( function_exists( 'skyyrose_get_product_catalog' ) ) {
+		$catalog = skyyrose_get_product_catalog();
+		foreach ( $catalog as $product ) {
+			if ( ! empty( $product['collection'] ) ) {
+				$collection_slugs[ $product['collection'] ] = true;
+			}
+		}
+	}
+	$collection_templates = array();
+	foreach ( array_keys( $collection_slugs ) as $slug ) {
+		$collection_templates[] = 'template-collection-' . $slug . '.php';
+	}
 	if ( in_array( $mobile_nav_tpl, $collection_templates, true ) ) {
 		$mobile_nav_active = 'collections';
 	} elseif ( function_exists( 'is_shop' ) && ( is_shop() || is_product_category() || is_product_tag() ) ) {

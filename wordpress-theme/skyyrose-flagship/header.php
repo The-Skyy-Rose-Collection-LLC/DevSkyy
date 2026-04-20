@@ -194,9 +194,13 @@ defined( 'ABSPATH' ) || exit;
 
 				<div class="mobile-menu__nav">
 					<?php
+					// Mobile drawer follows the Primary menu by default so admins
+					// who assign a single menu to Primary see it on every surface.
+					// A separate `mobile` location can still be assigned when the
+					// admin explicitly wants different mobile items.
 					wp_nav_menu(
 						array(
-							'theme_location' => 'mobile',
+							'theme_location' => has_nav_menu( 'mobile' ) ? 'mobile' : 'primary',
 							'menu_id'        => 'mobile-primary-menu',
 							'menu_class'     => 'mobile-menu__list',
 							'container'      => false,

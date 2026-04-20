@@ -820,7 +820,7 @@ function skyyrose_nav_fallback() {
 		),
 		array(
 			'title'    => __( 'Experiences', 'skyyrose' ),
-			'url'      => '#',
+			'url'      => home_url( '/experiences/' ),
 			'children' => array(
 				array(
 					'title' => __( 'The Garden', 'skyyrose' ),
