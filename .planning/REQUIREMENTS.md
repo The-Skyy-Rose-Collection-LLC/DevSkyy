@@ -124,17 +124,36 @@ Requirements for the CSV-driven ghost mannequin imagery pipeline. Phase numberin
 
 ## Traceability
 
-_Populated by roadmapper — maps each REQ-ID to the phase that satisfies it._
-
 ### v1.2
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 through INFRA-07 | — | Pending |
-| GM-01 through GM-06 | — | Pending |
-| QA-01 through QA-04 | — | Pending |
-| REV-01 through REV-04 | — | Pending |
-| UPLOAD-01 | — | Pending |
+| INFRA-01 | Phase 14 | Pending |
+| INFRA-02 | Phase 14 | Pending |
+| INFRA-03 | Phase 14 | Pending |
+| INFRA-04 | Phase 14 | Pending |
+| INFRA-05 | Phase 14 | Pending |
+| INFRA-06 | Phase 14 | Pending |
+| INFRA-07 | Phase 14 | Pending |
+| GM-01 | Phase 15 | Pending |
+| GM-02 | Phase 15 | Pending |
+| GM-03 | Phase 15 | Pending |
+| GM-04 | Phase 15 | Pending |
+| GM-05 | Phase 15 | Pending |
+| GM-06 | Phase 15 | Pending |
+| QA-01 | Phase 15 | Pending |
+| QA-02 | Phase 15 | Pending |
+| QA-04 | Phase 15 | Pending |
+| QA-03 | Phase 16 | Pending |
+| REV-01 | Phase 17 | Pending |
+| REV-02 | Phase 17 | Pending |
+| REV-03 | Phase 17 | Pending |
+| REV-04 | Phase 17 | Pending |
+| UPLOAD-01 | Phase 18 | Pending |
+
+**Coverage:** 22/22 v1.2 requirements mapped (INFRA-01..07=7, GM-01..06=6, QA-01..04=4, REV-01..04=4, UPLOAD-01=1)
+
+**Note:** REQUIREMENTS.md header previously stated 19 requirements. Actual count is 22. The discrepancy was a counting error in the header comment (19 vs the actual 7+6+4+4+1=22). All 22 are mapped.
 
 ### v1.1
 
@@ -147,12 +166,7 @@ _Populated by roadmapper — maps each REQ-ID to the phase that satisfies it._
 | DATA-01 | Phase 9 | Pending |
 | DATA-02 through DATA-03 | Phase 9 | Complete |
 
-**Coverage:**
-- v1.2 requirements: 19 total (7 INFRA + 6 GM + 4 QA + 4 REV + 1 UPLOAD)
-- Mapped to phases: 0 (pending roadmap)
-- v1.1 requirements: 22 total, 21 complete, 1 pending (DATA-01)
-
 ---
 
 *Requirements defined: 2026-04-22*
-*Last updated: 2026-04-22 — v1.2 milestone scoping*
+*Last updated: 2026-04-22 — v1.2 traceability populated (22 requirements, Phases 14-18)*

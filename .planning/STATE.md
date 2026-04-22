@@ -5,9 +5,9 @@ milestone_name: Imagery Pipeline — CSV-Driven Product Photography
 status: planning
 stopped_at: ~
 last_updated: "2026-04-22T00:00:00.000Z"
-last_activity: 2026-04-22 -- Milestone v1.2 started
+last_activity: 2026-04-22 -- Milestone v1.2 roadmap created (5 phases, 22 requirements)
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -18,88 +18,76 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-10)
+See: .planning/PROJECT.md (updated 2026-04-22)
 
-**Core value:** skyyrose.co works flawlessly on every device, passes WCAG AA accessibility, and shows the right products in the right collections.
-**Current focus:** Milestone v1.1 Complete
+**Core value:** skyyrose.co works flawlessly on every device, passes WCAG AA accessibility, and shows the right products in the right collections — with professional ghost mannequin product photography for all 28 garment SKUs.
+**Current focus:** Milestone v1.2 — Phase 14: Catalog Foundation
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements for v1.2
-Last activity: 2026-04-22 — Milestone v1.2 started
+Phase: 14 — Catalog Foundation
+Plan: Not started
+Status: Roadmap complete, ready for `/gsd-plan-phase 14`
+Last activity: 2026-04-22 — v1.2 roadmap written (Phases 14-18)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [░░░░░░░░░░] 0% (0/5 phases)
+
+## Phase Summary
+
+| Phase | Name | Requirements | Status |
+|-------|------|--------------|--------|
+| 14 | Catalog Foundation | INFRA-01 through INFRA-07 (7) | Not started |
+| 15 | Ghost Mannequin Agent + QA | GM-01 through GM-06, QA-01, QA-02, QA-04 (9) | Not started |
+| 16 | Jersey OCR Gate | QA-03 (1) | Not started |
+| 17 | Review & Approval CLI | REV-01 through REV-04 (4) | Not started |
+| 18 | Full Batch + WooCommerce Upload | UPLOAD-01 (1) | Not started |
+
+## Execution Order
+
+14 → 15 → 16 → 17 → 18
+
+**Hard dependencies:**
+- Phase 14 must complete before Phase 15 (catalog adapter blocks all generation)
+- Phase 15 must complete before Phase 16 (agent graph must exist before OCR node inserted)
+- Phase 15 must complete before Phase 17 (review directory must exist before approval CLI needed)
+- Phase 16 must complete before jersey SKUs run in Phase 18
 
 ## Performance Metrics
 
-**Velocity:**
+**Velocity (prior milestones):**
 
-- Total plans completed: 11 (v1.0)
-- Average duration: ~45 min
-- Total execution time: ~8.3 hours (v1.0)
+- v1.0: 11 plans, ~8.3 hours, ~45 min/plan average
+- v1.1: 9 plans, ~78 min total, ~9 min/plan average
 
-**By Phase (v1.0):**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 1-8 (v1.0) | 11 | ~8.3h | ~45min |
-
-*v1.1 metrics will be tracked from Phase 9 onward*
+**v1.2 tracking starts at Phase 14.**
 
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
-| Phase 09 P01 | 5min | 2 tasks | 2 files |
-| Phase 09 P02 | 2min | 1 tasks | 0 files |
-| Phase 10 P01 | 42min | 2 tasks | 12 files |
-| Phase 10 P02 | 4min | 2 tasks | 8 files |
-| Phase 11 P02 | 2min | 2 tasks | 3 files |
-| Phase 11 P01 | 2min | 2 tasks | 3 files |
-| Phase 12 P01 | 8min | 2 tasks | 7 files |
-| Phase 12 P02 | 10min | 2 tasks | 11 files |
-| Phase 13 P01 | 3min | 2 tasks | 2 files |
+| (none yet) | — | — | — |
 
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-v1.0 decisions carried forward -- see PROJECT.md.
-
-- [Phase 09 P01]: CSV has 32 products (PHP catalog is authoritative, not plan's 31 estimate)
-- [Phase 09 P01]: Featured product section intentionally still uses all_products for pre-order featured items
-- [Phase 09]: Black Rose hero banner code is correct in git; live site issue is stale deploy
-- [Phase 10 P01]: Renamed enqueue handles to skyyrose-a11y-css and skyyrose-a11y-js to resolve collision
-- [Phase 10 P01]: Duplicate ID audit found no issues -- template parts use dynamic IDs or appear on separate page views
-- [Phase 10 P02]: aria-hidden on empty modal headings as defense-in-depth, JS manages lifecycle
-- [Phase 10 P02]: All icon-only links, form inputs, and skip-link CSS already correct -- no changes needed
-- [Phase 11 P02]: Pre-order price handled at both WC filter and catalog fallback for defense-in-depth
-- [Phase 11 P02]: CSS rebuild skipped -- plan 11-02 only modifies PHP files, minified assets from 11-01 are current
-- [Phase 11]: Removed opacity entirely from accent-colored text instead of partial bump -- full opacity already meets AA contrast
-- [Phase 11]: Bumped placeholder text opacity .15->.45 for usability even though not WCAG-required
-- [Phase 12 P01]: Used min(300px,100%) in grid minmax to prevent overflow at narrow viewports with padding
-- [Phase 12 P01]: Applied min-height:44px with inline-flex for text links instead of padding-only approach
-- [Phase 12 P01]: Adjusted heart/actions position offsets after size bump to maintain visual alignment
-- [Phase 12 P02]: Preserved intentionally small text (10-12px labels) as luxury aesthetic, not scaling candidates
-- [Phase 12 P02]: Removed 480px breakpoint overrides that defeated parent clamp() values
-- [Phase 12 P02]: Used --text-lg for lead text and --text-xl for subheadings to maintain hierarchy
-- [Phase 13 P01]: Minified assets gitignored -- rebuilt on deploy, only source committed
-- [Phase 13 P01]: enqueue-features.php exclusion already correct for CURS-03 -- no PHP changes needed
-- [Phase 13 P01]: Removed dead :not(.immersive-page) CSS selectors -- PHP prevents loading on those pages
+- Ghost mannequin pipeline built as LangGraph agent in Elite Studio (`skyyrose/elite_studio/agents/ghost_mannequin_agent.py`) — not a standalone script
+- sg-007 (Signature Beanie) and lh-005 (The Fannie) are accessories — out of scope for ghost mannequin; deferred to v1.3 flat-lay pipeline
+- 28 garment SKUs in scope (30 total minus 2 accessories)
+- UPLOAD-01 requires explicit user "y" confirmation — never autonomous, always STOP AND SHOW
+- Phase 16 (Jersey OCR Gate) is a hard blocker for the 6 jersey SKUs in Phase 18: br-003, br-008, br-009, br-010, br-011, br-012
+- Requirement count discrepancy: REQUIREMENTS.md header says 19 total but actual count is 22 (INFRA-01..07=7, GM-01..06=6, QA-01..04=4, REV-01..04=4, UPLOAD-01=1). All 22 mapped.
 
 ### Pending Todos
 
-None yet.
+- User must provide missing techflat assets for br-007, sg-009, sg-012, br-012, sg-015 (INFRA-06) before Phase 15 runs
 
 ### Blockers/Concerns
 
-- Ally plugin auto-fix is paywalled -- fixing in theme code directly
-- Black Rose hero banner currently shows Love Hurts image on live site (Phase 9 fix)
-- Accessibility fix plugin exists as bandaid -- fixes must go in theme code, not plugin
+- INFRA-06: 5 SKUs require user-provided source assets (techflats) — pipeline cannot generate without them
+- INFRA-05: Compound techflat sheets must be separated before intake — user verification needed
 
 ## Session Continuity
 
-Last session: 2026-04-21T23:12:46.361Z
-Stopped at: context exhaustion at 96% (2026-04-21)
+Last session: 2026-04-22
+Stopped at: Roadmap creation complete
 Resume file: None
+Next action: `/gsd-plan-phase 14`

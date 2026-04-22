@@ -4,7 +4,7 @@
 
 - ✅ **v1.0 Production Armor** — Phases 1-8 (shipped 2026-03-10)
 - ✅ **v1.1 WordPress Quality & Accessibility** — Phases 9-13 (shipped 2026-03-11)
-- 📋 **v1.2 TBD** — (planned — run `/gsd:new-milestone`)
+- 📋 **v1.2 Imagery Pipeline — CSV-Driven Product Photography** — Phases 14-18 (in progress)
 
 ## Phases
 
@@ -150,6 +150,14 @@ Plans:
 
 </details>
 
+**v1.2 Imagery Pipeline — CSV-Driven Product Photography (Phases 14-18)**
+
+- [ ] **Phase 14: Catalog Foundation** — CSV adapter, bundle resolver, broken reader fixes, garment_type_lock column, techflat labeling, preflight audit. Zero API calls.
+- [ ] **Phase 15: Ghost Mannequin Agent + QA** — LangGraph agent, 2-step pipeline, garment-type routing, response classifier, retry logic, spend cap, background validator.
+- [ ] **Phase 16: Jersey OCR Gate** — OCR verification node for 6 jersey SKUs. Phase-blocking gate for Phase 18 jersey runs.
+- [ ] **Phase 17: Review & Approval CLI** — approve/reject CLI commands, approved/ structural gate, CSV atomic write.
+- [ ] **Phase 18: Full Batch + WooCommerce Upload** — Run all 28 in-scope garment SKUs, batch WooCommerce upload after 100% approval.
+
 ## Phase Details
 
 ### Phase 9: Collection & Product Data
@@ -225,10 +233,80 @@ Plans:
 Plans:
 - [ ] 13-01-PLAN.md -- Fix z-index supremacy, add modal-aware pause/resume, verify conditional loading (CURS-01, CURS-02, CURS-03)
 
+---
+
+### Phase 14: Catalog Foundation
+**Goal**: Every imagery pipeline reads from a single, validated CSV adapter and every in-scope SKU has a verified techflat-front before any API call is made
+**Depends on**: Nothing (first phase of v1.2 — zero API calls, zero cost)
+**Requirements**: INFRA-01, INFRA-02, INFRA-03, INFRA-04, INFRA-05, INFRA-06, INFRA-07
+**Success Criteria** (what must be TRUE):
+  1. `from skyyrose.core.catalog_loader import read_catalog_rows` works in nano-banana, Elite Studio compositor, and FLUX orchestrator without import errors
+  2. `python scripts/preflight_audit.py` exits 0 and writes `SKIPPED.json` listing only sg-007 and lh-005 as out-of-scope — all 28 in-scope garment SKUs resolve bundle + techflat-front
+  3. `skyyrose-catalog.csv` contains a `garment_type_lock` column with a non-empty value for every in-scope SKU
+  4. All techflat source files for in-scope SKUs are single-view images (no compound sheets) and filenames follow the standard before pipeline intake
+  5. `/simplify` — code simplification pass after phase implementation
+  6. `/verification-loop` — automated verification loop confirming all success criteria pass
+**Plans**: TBD
+
+### Phase 15: Ghost Mannequin Agent + QA
+**Goal**: The ghost mannequin LangGraph agent can generate a validated, white-background front shot for any single in-scope garment SKU without crashing, overspending, or silently returning a broken image
+**Depends on**: Phase 14 (catalog adapter and preflight audit must pass before any generation run)
+**Requirements**: GM-01, GM-02, GM-03, GM-04, GM-05, GM-06, QA-01, QA-02, QA-04
+**Success Criteria** (what must be TRUE):
+  1. Running `python -m skyyrose.elite_studio.agents.ghost_mannequin_agent --sku sg-001 --dry-run` prints a full cost manifest (SKU, API, per-image cost, total cost) and exits without making any API call
+  2. Running the agent against one non-jersey garment SKU produces `renders/ghost-mannequin/{sku}-ghost-front.webp` at 1200x1200px with all four corner pixels within 5 RGB units of (255, 255, 255)
+  3. A simulated 429 response triggers exponential backoff retry; a simulated safety block immediately flags the SKU to `failures.json` without retrying
+  4. sg-007, lh-005, and any SKU not resolved by the bundle resolver are silently skipped with their reason written to `failures.json` — no exception raised, no abort
+  5. A run that would exceed the configured spend cap halts before the cap-crossing API call and exits with a clear message showing amount spent and amount remaining
+  6. `/simplify` — code simplification pass after phase implementation
+  7. `/verification-loop` — automated verification loop confirming all success criteria pass
+**Plans**: TBD
+
+### Phase 16: Jersey OCR Gate
+**Goal**: No jersey SKU can enter the review queue unless Gemini Vision has verified the text and number zones are correct — the gate is enforced in the agent graph, not as a post-hoc check
+**Depends on**: Phase 15 (agent graph must exist before the OCR node can be inserted)
+**Requirements**: QA-03
+**Success Criteria** (what must be TRUE):
+  1. Running the agent against br-003 (a jersey SKU) without the OCR gate enabled raises a configuration error — the gate cannot be bypassed at runtime
+  2. A jersey image with correct text and number zones passes the OCR node and is written to the review directory
+  3. A jersey image with missing or garbled text/numbers is flagged to `failures.json` with reason "ocr_gate_failed" and is not written to the review directory
+  4. The 6 jersey SKUs (br-003, br-008, br-009, br-010, br-011, br-012) are the only SKUs that trigger the OCR node — all other garment types bypass it
+  5. `/simplify` — code simplification pass after phase implementation
+  6. `/verification-loop` — automated verification loop confirming all success criteria pass
+**Plans**: TBD
+
+### Phase 17: Review & Approval CLI
+**Goal**: The user can approve or reject each generated image from the command line, and approved images are atomically committed back to the CSV with zero risk of data corruption
+**Depends on**: Phase 15 (review directory and output files must exist before approval tooling is needed)
+**Requirements**: REV-01, REV-02, REV-03, REV-04
+**Success Criteria** (what must be TRUE):
+  1. Running `approve-ghost {sku}` on an image not yet in `renders/ghost-mannequin/approved/` moves it there, updates `front_model_image` in the CSV, and writes an approval timestamp — the CSV row count after update equals the row count before
+  2. Running the CSV update tool when `approved/{sku}-ghost-front.webp` does not exist exits with code 1 and a clear error — no CSV modification occurs
+  3. Running `reject-ghost {sku} "{reason}"` leaves the file in the review directory, writes the reason to `rejections.json`, and makes no CSV change
+  4. Interrupting `approve-ghost` mid-write (simulated via SIGINT after temp file creation) leaves the original CSV intact — the atomic `os.replace()` pattern prevents partial writes
+  5. `/simplify` — code simplification pass after phase implementation
+  6. `/verification-loop` — automated verification loop confirming all success criteria pass
+**Plans**: TBD
+
+### Phase 18: Full Batch + WooCommerce Upload
+**Goal**: All 28 in-scope garment SKUs have a ghost mannequin front image approved by the user and uploaded to WooCommerce — with an explicit confirmation gate before any production write occurs
+**Depends on**: Phase 15, Phase 16, Phase 17 (agent complete, OCR gate active for jerseys, approval CLI ready); Phase 16 must complete before jersey SKUs are submitted for approval
+**Requirements**: UPLOAD-01
+**Success Criteria** (what must be TRUE):
+  1. Running the batch agent against all 28 in-scope SKUs completes without unhandled exceptions — every SKU either produces an output file or has a logged entry in `failures.json`
+  2. Before any WooCommerce API write, a STOP AND SHOW manifest is displayed listing every SKU, target product ID, and image path — the upload does not proceed until the user types "y"
+  3. After confirmed upload, each approved product's WooCommerce image field reflects the new ghost mannequin image (verified via WooCommerce REST API GET response)
+  4. Any SKU without a corresponding `approved/{sku}-ghost-front.webp` is excluded from the upload manifest entirely — the upload tool cannot be coerced into uploading unapproved files
+  5. `/simplify` — code simplification pass after phase implementation
+  6. `/verification-loop` — automated verification loop confirming all success criteria pass
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13
+v1.0: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
+v1.1: 9 → 10 → 11 → 12 → 13
+v1.2: 14 → 15 → 16 → 17 → 18 (Phase 16 must complete before jersey SKUs run in Phase 18)
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -245,3 +323,8 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13
 | 11. Color Contrast | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 12. Responsive & Typography | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 13. Luxury Cursor | v1.1 | 1/1 | Complete | 2026-03-11 |
+| 14. Catalog Foundation | v1.2 | 0/TBD | Not started | - |
+| 15. Ghost Mannequin Agent + QA | v1.2 | 0/TBD | Not started | - |
+| 16. Jersey OCR Gate | v1.2 | 0/TBD | Not started | - |
+| 17. Review & Approval CLI | v1.2 | 0/TBD | Not started | - |
+| 18. Full Batch + WooCommerce Upload | v1.2 | 0/TBD | Not started | - |
