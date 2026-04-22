@@ -246,7 +246,12 @@ Plans:
   4. All techflat source files for in-scope SKUs are single-view images (no compound sheets) and filenames follow the standard before pipeline intake
   5. `/simplify` — code simplification pass after phase implementation
   6. `/verification-loop` — automated verification loop confirming all success criteria pass
-**Plans**: TBD
+**Plans:** 3 plans
+
+Plans:
+- [ ] 14-01-PLAN.md — Add garment_type_lock CSV column, Wave 0 tests, nano_banana package marker (INFRA-04)
+- [ ] 14-02-PLAN.md — Fix 3 broken readers: nano_banana.catalog shim, renders/config.py, fashion/context.py (INFRA-01, INFRA-02, INFRA-03)
+- [ ] 14-03-PLAN.md — Preflight audit script + SKIPPED.json (INFRA-05, INFRA-06, INFRA-07)
 
 ### Phase 15: Ghost Mannequin Agent + QA
 **Goal**: The ghost mannequin LangGraph agent can generate a validated, white-background front shot for any single in-scope garment SKU without crashing, overspending, or silently returning a broken image
@@ -323,7 +328,7 @@ v1.2: 14 → 15 → 16 → 17 → 18 (Phase 16 must complete before jersey SKUs 
 | 11. Color Contrast | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 12. Responsive & Typography | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 13. Luxury Cursor | v1.1 | 1/1 | Complete | 2026-03-11 |
-| 14. Catalog Foundation | v1.2 | 0/TBD | Not started | - |
+| 14. Catalog Foundation | v1.2 | 0/3 | Not started | - |
 | 15. Ghost Mannequin Agent + QA | v1.2 | 0/TBD | Not started | - |
 | 16. Jersey OCR Gate | v1.2 | 0/TBD | Not started | - |
 | 17. Review & Approval CLI | v1.2 | 0/TBD | Not started | - |
