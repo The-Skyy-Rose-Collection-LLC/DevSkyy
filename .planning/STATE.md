@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: completed
-stopped_at: context exhaustion at 90% (2026-04-20)
-last_updated: "2026-04-20T13:07:18.491Z"
-last_activity: 2026-03-11 -- Completed 13-01 (luxury cursor modal awareness)
+milestone: v1.2
+milestone_name: Imagery Pipeline — CSV-Driven Product Photography
+status: planning
+stopped_at: ~
+last_updated: "2026-04-22T00:00:00.000Z"
+last_activity: 2026-04-22 -- Milestone v1.2 started
 progress:
-  total_phases: 5
+  total_phases: 0
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
-  percent: 100
+  percent: 0
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-10)
 
 ## Current Position
 
-Phase: 13 of 13 (Luxury Cursor)
-Plan: 1 of 1 complete
-Status: Milestone Complete
-Last activity: 2026-03-11 -- Completed 13-01 (luxury cursor modal awareness)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements for v1.2
+Last activity: 2026-04-22 — Milestone v1.2 started
 
-Progress: [██████████] 100% (20/20 plans complete)
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -100,6 +100,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-20T13:07:18.488Z
-Stopped at: context exhaustion at 90% (2026-04-20)
+Last session: 2026-04-21T23:12:46.361Z
+Stopped at: context exhaustion at 96% (2026-04-21)
 Resume file: None

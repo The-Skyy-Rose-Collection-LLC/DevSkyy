@@ -1,12 +1,27 @@
-# SkyyRose WordPress — Quality & Accessibility
+# SkyyRose — Imagery Pipeline & Product Photography
 
 ## What This Is
 
-The SkyyRose luxury streetwear ecommerce site (skyyrose.co) built on WordPress/WooCommerce with a custom flagship theme. Three collections (Black Rose, Love Hurts, Signature) with immersive 3D experiences, pre-order gateways, and a luxury shopping experience. Protected by a 4-layer production armor chain (git hooks → CI → PR gates → deploy verification) with automated build and deploy pipelines.
+The SkyyRose luxury streetwear ecommerce site (skyyrose.co) with a custom WordPress/WooCommerce flagship theme and a multi-pipeline AI imagery system. Four collections (Black Rose, Love Hurts, Signature, Kids Capsule), 30 products, and a catalog CSV that is the canonical source of truth for all product data and imagery paths. The imagery system feeds product photography into WooCommerce — ghost mannequin studio shots, model renders, and scene composites — all driven by SKU from the CSV.
 
 ## Core Value
 
 skyyrose.co works flawlessly on every device, passes WCAG AA accessibility, and shows the right products in the right collections — a professional luxury shopping experience with zero embarrassing bugs.
+
+## Current Milestone: v1.2 Imagery Pipeline — CSV-Driven Product Photography
+
+**Goal:** Make the CSV the single source of truth driving every imagery pipeline, then generate ghost mannequin front shots for all 30 products using techflats as source input (no AI model shots).
+
+**Target features:**
+- Canonical SKU→bundle mapping (resolve 15 name-mismatch cases in `data/product-bundles/`)
+- Shared CSV adapter module (`skyyrose/core/catalog_loader.py`) all pipelines import from
+- Wire nano-banana, Elite Studio compositor, and FLUX orchestrator to CSV
+- Ghost mannequin batch script: techflat-front → AI generation → pure white studio background
+- STOP AND SHOW cost manifest before any paid API call
+- Output to `renders/ghost-mannequin/{sku}-ghost-front.webp` for review
+- CSV `front_model_image` update tool after review approval
+
+---
 
 ## Shipped: v1.1 WordPress Quality & Accessibility (2026-03-11)
 
@@ -41,7 +56,15 @@ Theme now passes WCAG AA accessibility, renders correctly on all devices from 32
 
 ### Active
 
-(Define in next milestone cycle — run `/gsd:new-milestone`)
+- [ ] Canonical SKU→bundle directory mapping covering all 30 products
+- [ ] Shared CSV adapter module used by all imagery pipelines
+- [ ] nano-banana pipeline reads product data from CSV by SKU
+- [ ] Elite Studio compositor reads product data from CSV by SKU
+- [ ] FLUX orchestrator reads product data from CSV by SKU
+- [ ] Ghost mannequin batch script generates front shots from techflats
+- [ ] Ghost mannequin output goes to `renders/ghost-mannequin/` for review
+- [ ] Cost manifest shown before any paid API call (STOP AND SHOW)
+- [ ] CSV `front_model_image` update tool after review approval
 
 ### Out of Scope
 
@@ -95,4 +118,4 @@ Theme now passes WCAG AA accessibility, renders correctly on all devices from 32
 | min(300px, 100%) in grid minmax | Prevents overflow at narrow viewports without breaking tablet/desktop grid | ✓ Good — future-proof pattern |
 
 ---
-*Last updated: 2026-03-11 after v1.1 milestone*
+*Last updated: 2026-04-22 after v1.2 milestone start*
