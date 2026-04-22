@@ -22,7 +22,7 @@ Requirements for the CSV-driven ghost mannequin imagery pipeline. Phase numberin
 ### Ghost Mannequin Agent
 
 - [ ] **GM-01**: Ghost mannequin LangGraph agent in Elite Studio (`skyyrose/elite_studio/agents/ghost_mannequin_agent.py`) — consistent with existing compositor architecture
-- [ ] **GM-02**: 2-step generation pipeline per SKU: Gemini 2.5 Flash Image generate-on-white → BRIA RMBG 2.0 background removal → PIL white-background composite
+- [ ] **GM-02**: 3-tier generation cascade per SKU: Gemini 2.5 Flash Image (primary, $0.039) → GPT-Image-1 fallback on jersey text QA failure ($0.042) → Ideogram v3 mask-edit rescue ($0.050); all tiers → BRIA RMBG 2.0 background removal → PIL white-background composite
 - [ ] **GM-03**: Garment-type routing: jersey / hoodie / crewneck / tee / shorts / joggers / jacket / set each use distinct prompt templates driven by `garment_type_lock`
 - [ ] **GM-04**: Dry-run mode: full cost preview without any API call; STOP AND SHOW manifest (exact SKU list, API, per-image cost, total cost) before any paid run
 - [ ] **GM-05**: Output to `renders/ghost-mannequin/{sku}-ghost-front.webp`, 1200×1200px WebP — per-SKU failure logged to `renders/ghost-mannequin/failures.json`
