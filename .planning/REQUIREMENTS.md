@@ -14,7 +14,8 @@ Requirements for the CSV-driven ghost mannequin imagery pipeline. Phase numberin
 - [ ] **INFRA-01**: Shared CSV adapter module (`skyyrose.core.catalog_loader`) is the single data source for all 3 imagery pipelines (nano-banana, Elite Studio compositor, FLUX orchestrator)
 - [ ] **INFRA-02**: SKU→bundle resolver keyed on `manifest.json` SKU field — resolves all name-mismatch cases without renaming any directory
 - [ ] **INFRA-03**: 3 broken readers fixed: `renders/config.py` created, `elite_studio/fashion/context.py` stale CSV path corrected, `nano_banana.catalog` shim rebuilt
-- [ ] **INFRA-04**: `garment_type_lock` column added to `skyyrose-catalog.csv` — enables garment-type prompt routing across all 3 pipelines
+- [x] **INFRA-04
+**: `garment_type_lock` column added to `skyyrose-catalog.csv` — enables garment-type prompt routing across all 3 pipelines
 - [ ] **INFRA-05**: All techflat source files are single-view images (front / back / top / bottom as distinct files) before any pipeline run — compound sheets separated before intake
 - [ ] **INFRA-06**: Missing techflat assets for br-007, sg-009, sg-012, br-012, sg-015 added to bundle directories before Phase 2 runs (user provides source assets)
 - [ ] **INFRA-07**: Preflight audit script: scans all 30 SKUs, verifies bundle + techflat-front exists, writes `SKIPPED.json` — runs before any paid API call
