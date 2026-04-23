@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 # Product catalog path
 # ---------------------------------------------------------------------------
 
-_CATALOG_PATH = Path(__file__).parent.parent.parent.parent.parent / "data" / "product-catalog.csv"
+from skyyrose.core.catalog_loader import CATALOG_CSV as _CATALOG_PATH
 
 _DEFAULT_SEASON = "FW26"
 
@@ -277,13 +277,13 @@ class FashionContextBuilder:
                 sku=sku, garment_type="garment", collection="", season=_DEFAULT_SEASON
             )
 
-        collection_slug = row.get("collection_slug", "").strip()
+        collection = row.get("collection", "").strip()
         product_name = row.get("name", "")
         garment_type = _infer_garment_type(product_name)
 
         return self.build(
             sku=sku_normalized,
             garment_type=garment_type,
-            collection=collection_slug,
+            collection=collection,
             season=_DEFAULT_SEASON,
         )

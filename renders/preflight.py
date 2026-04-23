@@ -59,7 +59,6 @@ def _detect_resolution_method(product: dict) -> str:
     """Infer how the source image was resolved."""
     from renders.config import PRODUCTS_DIR, _find_bundle_dir
 
-    name = product.get("name", "")
     source = product.get("existing_front", "")
     if not source:
         return "none"

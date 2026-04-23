@@ -18,7 +18,7 @@ from typing import Any, Protocol
 from .agents.compositor_agent import CompositorAgent
 from .agents.generator_agent import GeneratorAgent
 from .agents.quality_agent import QualityAgent
-from .agents.vision_agent import VisionAgent
+from .agents.vision_agent import DualVisionGate as VisionAgent
 from .config import BATCH_DELAY_SECONDS, OUTPUT_DIR
 from .models import ProductionResult
 from .utils import discover_all_skus
