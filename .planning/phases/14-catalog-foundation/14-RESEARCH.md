@@ -408,22 +408,25 @@ kids-002 hoodie
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **br-001 and br-002 techflat aspect ratio (450x253)**
    - What we know: 450×253 is landscape, which is unusual for a garment front view. `crewneck-and-joggers.jpeg` in `assets/techflats/black-rose/` is labeled as compound.
    - What's unclear: Whether the bundle techflat-front.jpeg files are already-split crops from the compound sheet, or still compound.
    - Recommendation: Treat them as single-view (the ratio is 1.78, just below the "definitely compound" threshold of 2.0). Flag for user visual confirmation during the preflight audit run.
+   - **RESOLVED:** Treat as single-view. Plan 03 preflight audit classifies based on file existence only (no dimension check). User visual confirmation deferred to Phase 15 preflight gate.
 
 2. **lh-006 bundle SKU mismatch with CSV lh-005**
    - What we know: Bundle manifest says `"sku": "lh-006"` but CSV has no lh-006. lh-005 is "The Fannie" (accessory).
    - What's unclear: Is this a data error that needs correcting (update manifest to lh-005) or just dead data (lh-006 was retired, bundle left behind)?
    - Recommendation: Since lh-005 is an accessory going into SKIPPED.json, and there's no in-scope garment using this bundle, leave the manifest alone. Document in preflight audit output as an orphan bundle.
+   - **RESOLVED:** Leave manifest unchanged. lh-005 (The Fannie) routes to SKIPPED.json as an accessory. The orphan lh-006 bundle is documented in Plan 03's audit stdout as dead data — no Phase 14 action required.
 
 3. **preflight_audit.py exit code for INFRA-06 pending SKUs**
    - What we know: Success criteria says `python scripts/preflight_audit.py` exits 0 "and writes SKIPPED.json listing only sg-007 and lh-005." Five garment SKUs (br-007, sg-009, sg-012, br-012, sg-015) are missing techflat-front files.
    - What's unclear: Should missing-asset garment SKUs cause exit 1 (hard fail) or exit 0 with a warning (soft fail)?
    - Recommendation: Exit 0 but print a clear "PENDING_USER_ASSETS" list. The success criteria says "exits 0" without mentioning a fail condition — treating INFRA-06 SKUs as informational warnings (not blockers) lets the phase complete while documenting the user action required.
+   - **RESOLVED:** Exit 0 with PENDING_USER_ASSETS warning. Plan 03 implements this exactly — `main()` always returns 0; PENDING SKUs are printed to stdout as a user action list. Phase 15 must gate on this list before any API call.
 
 ---
 
