@@ -65,7 +65,7 @@ def _detect_resolution_method(product: dict) -> str:
         return "none"
 
     # Bundle photo?
-    bundle_dir = _find_bundle_dir(name)
+    bundle_dir = _find_bundle_dir(sku=product.get("sku", ""))
     if bundle_dir and source.startswith(str(bundle_dir)):
         return "bundle_photo"
 
