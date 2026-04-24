@@ -15,9 +15,11 @@ from .state import EliteStudioState
 
 # Node name constants
 END = "__end__"
+PREFLIGHT = "preflight"
 GENERATOR = "generator"
 QUALITY = "quality"
 COMPOSITOR = "compositor"
+GHOST_MANNEQUIN_COMPOSITE = "ghost_mannequin_composite"
 FINALIZE = "finalize"
 HUMAN_REVIEW = "human_review"
 

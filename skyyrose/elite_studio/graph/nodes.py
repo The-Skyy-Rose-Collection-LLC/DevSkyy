@@ -575,3 +575,153 @@ def variant_node(state: EliteStudioState) -> dict:
         "variant_results": results,
         "stage_timings": timings,
     }
+
+
+# ---------------------------------------------------------------------------
+# Phase B2 ghost-mannequin nodes
+# ---------------------------------------------------------------------------
+
+_COLLAR_KEYWORDS = {"hoodie", "jacket", "crewneck", "bomber", "windbreaker", "sherpa"}
+
+
+def _is_collar_garment(sku: str) -> bool:
+    """Return True for garments that need neck-in composite."""
+    try:
+        from ..catalog import Catalog
+
+        cat = Catalog.load()
+        name = cat.require(sku).name.lower()
+        return any(kw in name for kw in _COLLAR_KEYWORDS)
+    except Exception:
+        return False
+
+
+def preflight_node(state: EliteStudioState) -> dict:
+    """Dual-vision pre-flight: verify reference image matches CSV spec.
+
+    Only runs for ghost_mannequin style — flat_lay skips (returns empty dict).
+    """
+    if state.get("style", "flat_lay") != "ghost_mannequin":
+        return {}
+
+    sku = state["sku"]
+
+    try:
+        from ..catalog import Catalog
+
+        cat = Catalog.load()
+        product = cat.require(sku)
+        expected_garment = product.name
+        # Note: using __import__ to avoid top-level circulars
+        ref_path = state.get("reference_path") or __import__(
+            "skyyrose.elite_studio.agents.vision_agent", fromlist=["_reference_path"]
+        )._reference_path(sku)
+    except Exception as exc:
+        return {
+            "status": "error",
+            "error": f"Preflight catalog load failed: {exc}",
+            "failed_step": "preflight",
+        }
+
+    from ..agents.vision_agent import DualVisionGate
+
+    gate = DualVisionGate()
+    result = gate.verify_reference(
+        image_path=ref_path,
+        sku=sku,
+        expected_garment=expected_garment,
+    )
+
+    if not result.passed:
+        logger.warning("[Preflight] BLOCKED %s: %s", sku, result.blocking_reason)
+        return {
+            "preflight_result": result,
+            "status": "error",
+            "error": f"Preflight blocked: {result.blocking_reason}",
+            "failed_step": "preflight",
+        }
+
+    return {"preflight_result": result}
+
+
+def ghost_mannequin_composite_node(state: EliteStudioState) -> dict:
+    """Neck-in composite for collar garments (hoodies, jackets, crewnecks).
+
+    For collar garments: crops the top 20% of the back render and pastes
+    it behind the front render's neckline area to create the hollow-man effect.
+    For non-collar garments: saves the front render as-is (no neck-in).
+    """
+    import time
+
+    from PIL import Image
+
+    from ..models import GhostMannequinCompositeResult
+
+    start = time.monotonic()
+    sku = state["sku"]
+    front_path = state.get("ghost_mannequin_front_path", "")
+    back_path = state.get("ghost_mannequin_back_path", "")
+
+    if not front_path:
+        gen = state.get("generation_result")
+        front_path = gen.output_path if gen and gen.success else ""
+
+    if not front_path:
+        return {
+            "ghost_mannequin_composite_result": GhostMannequinCompositeResult(
+                success=False, error="No front render available for composite"
+            )
+        }
+
+    collar = _is_collar_garment(sku)
+    out_dir = __import__("pathlib").Path(front_path).parent
+    out_path = str(out_dir / f"{sku}-front-ghost-composite.webp")
+
+    if not collar or not back_path or not __import__("pathlib").Path(back_path).exists():
+        # Non-collar or no back render: pass front through unchanged
+        __import__("shutil").copy2(front_path, out_path)
+        timings = dict(state.get("stage_timings", {}))
+        timings["ghost_composite"] = round(time.monotonic() - start, 2)
+        return {
+            "ghost_mannequin_composite_result": GhostMannequinCompositeResult(
+                success=True,
+                output_path=out_path,
+                front_path=front_path,
+                back_path=back_path,
+                neck_in_applied=False,
+            ),
+            "stage_timings": timings,
+        }
+
+    # Neck-in composite: paste top 20% of back render behind front render neckline
+    try:
+        front_img = Image.open(front_path).convert("RGBA")
+        back_img = Image.open(back_path).convert("RGBA").resize(front_img.size)
+
+        w, h = front_img.size
+        neck_fraction = 0.20
+        neck_strip = back_img.crop((0, 0, w, int(h * neck_fraction)))
+
+        composite = Image.new("RGBA", front_img.size, (255, 255, 255, 255))
+        composite.paste(neck_strip, (0, 0))
+        composite = Image.alpha_composite(composite, front_img)
+        composite.convert("RGB").save(out_path, "WEBP", quality=92)
+    except Exception as exc:
+        return {
+            "ghost_mannequin_composite_result": GhostMannequinCompositeResult(
+                success=False, error=f"Composite failed: {exc}"
+            )
+        }
+
+    timings = dict(state.get("stage_timings", {}))
+    timings["ghost_composite"] = round(time.monotonic() - start, 2)
+    return {
+        "ghost_mannequin_composite_result": GhostMannequinCompositeResult(
+            success=True,
+            output_path=out_path,
+            front_path=front_path,
+            back_path=back_path,
+            neck_in_applied=True,
+        ),
+        "stage_timings": timings,
+    }

@@ -32,7 +32,9 @@ from .edges import (
     COMPOSITOR,
     FINALIZE,
     GENERATOR,
+    GHOST_MANNEQUIN_COMPOSITE,
     HUMAN_REVIEW,
+    PREFLIGHT,
     PROMPT_ENRICHMENT,
     QUALITY,
     SAFETY,
@@ -51,7 +53,9 @@ from .nodes import (
     compositor_node,
     finalize_node,
     generator_node,
+    ghost_mannequin_composite_node,
     human_review_node,
+    preflight_node,
     prompt_enrichment_node,
     quality_node,
     safety_node,
@@ -64,9 +68,11 @@ from .state import EliteStudioState
 
 # Node name constants (mirror edges.py for graph construction)
 _VISION = "vision"
+_PREFLIGHT = PREFLIGHT
 _GENERATOR = GENERATOR
 _QUALITY = QUALITY
 _COMPOSITOR = COMPOSITOR
+_GHOST_MANNEQUIN_COMPOSITE = GHOST_MANNEQUIN_COMPOSITE
 _FINALIZE = FINALIZE
 _PROMPT_ENRICHMENT = PROMPT_ENRICHMENT
 _SAFETY = SAFETY
@@ -131,11 +137,16 @@ class GraphConfig:
     review_confidence_threshold: float = 0.6
     enable_visual_regression: bool = False
 
-    # Layer 6 optional stages
+    # Layer 6 fields:
     enable_tryon: bool = False
     tryon_category: str = "upper_body"
 
+    # Phase B2 ghost-mannequin fields
+    enable_ghost_mannequin_preflight: bool = False
+    enable_ghost_mannequin_composite: bool = False
+
     # Extension hook (reserved for future layers)
+
     extra_nodes: list[str] = field(default_factory=list)
 
 
@@ -207,6 +218,13 @@ def build_graph(config: GraphConfig | None = None) -> object:
     if config.enable_variants:
         graph.add_node(_VARIANTS, variant_node)
 
+    # --- Register optional Phase B2 ghost-mannequin nodes ---
+    if config.enable_ghost_mannequin_preflight:
+        graph.add_node(_PREFLIGHT, preflight_node)
+
+    if config.enable_ghost_mannequin_composite:
+        graph.add_node(_GHOST_MANNEQUIN_COMPOSITE, ghost_mannequin_composite_node)
+
     # --- Register optional Layer 6 tryon node ---
     if config.enable_tryon:
         graph.add_node(_TRYON, tryon_node)
@@ -214,20 +232,28 @@ def build_graph(config: GraphConfig | None = None) -> object:
     # --- Entry point ---
     graph.set_entry_point(_VISION)
 
-    # --- vision → [prompt_enrichment?] → generator ---
+    # Determine what vision routes to
+    _post_vision = _GENERATOR
     if config.enable_prompt_enrichment:
-        graph.add_conditional_edges(
-            _VISION,
-            after_vision,
-            {_GENERATOR: _PROMPT_ENRICHMENT, END: END},
-        )
+        _post_vision = _PROMPT_ENRICHMENT
+    if config.enable_ghost_mannequin_preflight:
+        _post_vision = _PREFLIGHT
+
+    # --- vision → [preflight?] → [prompt_enrichment?] → generator ---
+    graph.add_conditional_edges(
+        _VISION,
+        after_vision,
+        {_GENERATOR: _post_vision, END: END},
+    )
+
+    if config.enable_ghost_mannequin_preflight:
+        _post_preflight = _GENERATOR
+        if config.enable_prompt_enrichment:
+            _post_preflight = _PROMPT_ENRICHMENT
+        graph.add_edge(_PREFLIGHT, _post_preflight)
+
+    if config.enable_prompt_enrichment:
         graph.add_edge(_PROMPT_ENRICHMENT, _GENERATOR)
-    else:
-        graph.add_conditional_edges(
-            _VISION,
-            after_vision,
-            {_GENERATOR: _GENERATOR, END: END},
-        )
 
     # --- generator → [safety?] → quality ---
     if config.enable_safety:
@@ -317,6 +343,8 @@ def _wire_post_quality_chain(graph: StateGraph, config: GraphConfig) -> None:  #
         chain.append(_VARIANTS)
     if config.enable_compositor:
         chain.append(_COMPOSITOR)
+    if config.enable_ghost_mannequin_composite:
+        chain.append(_GHOST_MANNEQUIN_COMPOSITE)
     if config.enable_tryon:
         chain.append(_TRYON)
 

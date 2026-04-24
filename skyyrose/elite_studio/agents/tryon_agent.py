@@ -16,7 +16,7 @@ raises NotImplementedError with a clear pointer to the plan.
 from __future__ import annotations
 
 
-class TryonAgent:
+class TryOnAgent:
     """Placeholder. Phase B2 will implement dual-agent best-of-N logic."""
 
     def __init__(self, *args, **kwargs):
@@ -25,3 +25,9 @@ class TryonAgent:
             "well-lets-audit-separately-humming-beacon.md for the dual-agent "
             "rebuild design (best-of-N mode; Agent A=FASHN tryon, Agent B=IDM-VTON)."
         )
+
+# Aliases for backwards compatibility (different modules use different capitalization)
+TryonAgent = TryOnAgent
+
+def _find_garment_image(sku: str) -> str:
+    raise NotImplementedError("TryonAgent._find_garment_image is a Phase B1 stub.")

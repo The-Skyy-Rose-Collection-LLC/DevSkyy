@@ -27,6 +27,7 @@ from .state import create_initial_state, extract_production_result
 def run_single(
     sku: str,
     view: str = "front",
+    style: str = "flat_lay",
     config: GraphConfig | None = None,
     graph: Any = None,
 ) -> ProductionResult:
@@ -35,6 +36,7 @@ def run_single(
     Args:
         sku: Product SKU (e.g. "br-001").
         view: Image view angle — "front" or "back".
+        style: Photography style — "flat_lay" or "ghost_mannequin".
         config: Graph configuration. Uses defaults if None.
         graph: Pre-compiled graph. Built from config if None.
 
@@ -49,6 +51,7 @@ def run_single(
     state = create_initial_state(
         sku=sku,
         view=view,
+        style=style,
         enable_compositor=config.enable_compositor,
         enable_tryon=config.enable_tryon,
         tryon_category=config.tryon_category,
@@ -62,6 +65,7 @@ def run_single(
 def run_batch(
     skus: list[str] | None = None,
     view: str = "front",
+    style: str = "flat_lay",
     config: GraphConfig | None = None,
     skip_existing: bool = True,
     graph: Any = None,
@@ -71,6 +75,7 @@ def run_batch(
     Args:
         skus: List of SKUs to process. Discovers all SKUs if None.
         view: Image view angle — "front" or "back".
+        style: Photography style — "flat_lay" or "ghost_mannequin".
         config: Graph configuration. Uses defaults if None.
         skip_existing: Skip SKUs that already have generated output.
         graph: Pre-compiled graph. Built from config if None.
@@ -109,7 +114,7 @@ def run_batch(
                 continue
 
         try:
-            result = run_single(sku=sku, view=view, config=config, graph=graph)
+            result = run_single(sku=sku, view=view, style=style, config=config, graph=graph)
         except Exception as exc:
             # Isolate failures so a single bad SKU cannot abort the whole batch.
             logger.exception("run_single failed for sku=%s view=%s: %s", sku, view, exc)

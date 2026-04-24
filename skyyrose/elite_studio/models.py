@@ -199,3 +199,42 @@ class VariantResult:
     variant_name: str = ""
     output_path: str = ""
     error: str = ""
+
+
+# ---------------------------------------------------------------------------
+# Phase B2 models — dual-agent pipeline
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class DualAgentResult:
+    """Structured output from any dual-agent stage."""
+
+    verdict: str  # "consensus" | "disagreement" | "blocked"
+    agent_a_output: str
+    agent_b_output: str
+    winner: str | None  # "a" | "b" | None (for consensus modes)
+    reasoning: list[str]
+
+
+@dataclass(frozen=True)
+class PreflightResult:
+    """Result of the pre-flight dual-vision reference verification."""
+
+    passed: bool
+    sku: str
+    agent_a_verdict: str  # "YES: ..." or "NO: ..."
+    agent_b_verdict: str
+    blocking_reason: str = ""  # set when passed=False
+
+
+@dataclass(frozen=True)
+class GhostMannequinCompositeResult:
+    """Result from the neck-in composite step."""
+
+    success: bool
+    output_path: str = ""
+    front_path: str = ""
+    back_path: str = ""
+    neck_in_applied: bool = False  # False for non-collar garments
+    error: str = ""

@@ -48,6 +48,13 @@ class EliteStudioState(TypedDict, total=False):
     compositor_result: CompositorResult | None
     tryon_result: TryOnResult | None
 
+    # --- Ghost-mannequin style additions ---
+    style: str  # "flat_lay" | "ghost_mannequin" — defaults to "flat_lay"
+    preflight_result: "PreflightResult | None"
+    ghost_mannequin_front_path: str
+    ghost_mannequin_back_path: str
+    ghost_mannequin_composite_result: "GhostMannequinCompositeResult | None"
+
     # --- Layer 2 stage results (optional — only set when enabled) ---
     enriched_prompt: EnrichedPrompt | None
     upscale_result: UpscaleResult | None
@@ -75,6 +82,7 @@ class EliteStudioState(TypedDict, total=False):
 def create_initial_state(
     sku: str,
     view: str = "front",
+    style: str = "flat_lay",
     enable_compositor: bool = False,
     enable_tryon: bool = False,
     tryon_category: str = "upper_body",
@@ -84,6 +92,7 @@ def create_initial_state(
     return EliteStudioState(
         sku=sku,
         view=view,
+        style=style,
         enable_compositor=enable_compositor,
         enable_tryon=enable_tryon,
         tryon_category=tryon_category,
@@ -95,6 +104,10 @@ def create_initial_state(
         human_review_result=None,
         regression_result=None,
         tryon_result=None,
+        preflight_result=None,
+        ghost_mannequin_front_path="",
+        ghost_mannequin_back_path="",
+        ghost_mannequin_composite_result=None,
         retry_count=0,
         max_retries=max_retries,
         status="running",

@@ -27,12 +27,18 @@ def _run_graph(
     view: str,
     with_compositor: bool,
     with_tryon: bool = False,
+    style: str = "flat_lay",
 ) -> None:
     """Run the LangGraph engine path and print result."""
     from .graph import GraphConfig, run_single
 
-    config = GraphConfig(enable_compositor=with_compositor, enable_tryon=with_tryon)
-    result = run_single(sku=sku, view=view, config=config)
+    config = GraphConfig(
+        enable_compositor=with_compositor,
+        enable_tryon=with_tryon,
+        enable_ghost_mannequin_preflight=(style == "ghost_mannequin"),
+        enable_ghost_mannequin_composite=(style == "ghost_mannequin"),
+    )
+    result = run_single(sku=sku, view=view, style=style, config=config)
     print(f"\nResult: {result.status}")
     if result.output_path:
         print(f"Output: {result.output_path}")
@@ -64,6 +70,7 @@ def cmd_produce(args: argparse.Namespace) -> None:
             args.view,
             with_compositor=getattr(args, "composite", False),
             with_tryon=getattr(args, "tryon", False),
+            style=getattr(args, "style", "flat_lay"),
         )
         return
     team = build_team(with_compositor=getattr(args, "composite", False))
@@ -331,6 +338,12 @@ def main(argv: list[str] | None = None) -> None:
     p_produce = sub.add_parser("produce", help="Produce single product")
     p_produce.add_argument("sku", help="Product SKU (e.g., br-001)")
     p_produce.add_argument("--view", default="front", choices=["front", "back"], help="View angle")
+    p_produce.add_argument(
+        "--style",
+        default="flat_lay",
+        choices=["flat_lay", "ghost_mannequin"],
+        help="Photography style (requires --graph)",
+    )
 
     # produce-batch
     p_batch = sub.add_parser("produce-batch", help="Produce batch of products")
