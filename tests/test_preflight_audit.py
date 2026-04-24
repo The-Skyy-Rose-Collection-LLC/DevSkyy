@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 ACCESSORY_SKUS = {"sg-007", "lh-005"}
-PENDING_USER_ASSETS_SKUS = {"br-007", "sg-009", "sg-012", "br-012", "sg-015"}
+PENDING_USER_ASSETS_SKUS = {"sg-009", "sg-012", "br-012", "sg-015"}
 
 
 def test_preflight_audit_module_importable() -> None:

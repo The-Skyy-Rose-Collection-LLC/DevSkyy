@@ -28,6 +28,7 @@ def _run_graph(
     with_compositor: bool,
     with_tryon: bool = False,
     style: str = "flat_lay",
+    with_3d: bool = False,
 ) -> None:
     """Run the LangGraph engine path and print result."""
     from .graph import GraphConfig, run_single
@@ -37,6 +38,7 @@ def _run_graph(
         enable_tryon=with_tryon,
         enable_ghost_mannequin_preflight=(style == "ghost_mannequin"),
         enable_ghost_mannequin_composite=(style == "ghost_mannequin"),
+        enable_3d=with_3d,
     )
     result = run_single(sku=sku, view=view, style=style, config=config)
     print(f"\nResult: {result.status}")
@@ -71,6 +73,7 @@ def cmd_produce(args: argparse.Namespace) -> None:
             with_compositor=getattr(args, "composite", False),
             with_tryon=getattr(args, "tryon", False),
             style=getattr(args, "style", "flat_lay"),
+            with_3d=getattr(args, "three_d", False),
         )
         return
     team = build_team(with_compositor=getattr(args, "composite", False))
@@ -344,6 +347,7 @@ def main(argv: list[str] | None = None) -> None:
         choices=["flat_lay", "ghost_mannequin"],
         help="Photography style (requires --graph)",
     )
+    p_produce.add_argument("--3d", dest="three_d", action="store_true", help="Enable 3D replica generation (requires --graph)")
 
     # produce-batch
     p_batch = sub.add_parser("produce-batch", help="Produce batch of products")

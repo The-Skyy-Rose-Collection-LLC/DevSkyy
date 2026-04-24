@@ -24,7 +24,7 @@ from ..models import GenerationResult
 logger = logging.getLogger(__name__)
 
 _GPT_MODEL = "gpt-image-1"
-_GEMINI_GEN_MODEL = "gemini-3-pro-image-preview"
+_GEMINI_GEN_MODEL = "gemini-2.0-flash-exp"
 _DEFAULT_OUTPUT_DIR = "renders/output"
 
 

@@ -59,6 +59,7 @@ from .nodes import (
     prompt_enrichment_node,
     quality_node,
     safety_node,
+    three_d_node,
     tryon_node,
     upscaling_node,
     variant_node,
@@ -71,6 +72,7 @@ _VISION = "vision"
 _PREFLIGHT = PREFLIGHT
 _GENERATOR = GENERATOR
 _QUALITY = QUALITY
+_THREE_D = "three_d"
 _COMPOSITOR = COMPOSITOR
 _GHOST_MANNEQUIN_COMPOSITE = GHOST_MANNEQUIN_COMPOSITE
 _FINALIZE = FINALIZE
@@ -144,6 +146,9 @@ class GraphConfig:
     # Phase B2 ghost-mannequin fields
     enable_ghost_mannequin_preflight: bool = False
     enable_ghost_mannequin_composite: bool = False
+
+    # Phase 16 3D Activation
+    enable_3d: bool = False
 
     # Extension hook (reserved for future layers)
 
@@ -225,6 +230,9 @@ def build_graph(config: GraphConfig | None = None) -> object:
     if config.enable_ghost_mannequin_composite:
         graph.add_node(_GHOST_MANNEQUIN_COMPOSITE, ghost_mannequin_composite_node)
 
+    if config.enable_3d:
+        graph.add_node(_THREE_D, three_d_node)
+
     # --- Register optional Layer 6 tryon node ---
     if config.enable_tryon:
         graph.add_node(_TRYON, tryon_node)
@@ -233,7 +241,8 @@ def build_graph(config: GraphConfig | None = None) -> object:
     graph.set_entry_point(_VISION)
 
     # Determine what vision routes to
-    _post_vision = _GENERATOR
+    _active_generator = _THREE_D if config.enable_3d else _GENERATOR
+    _post_vision = _active_generator
     if config.enable_prompt_enrichment:
         _post_vision = _PROMPT_ENRICHMENT
     if config.enable_ghost_mannequin_preflight:
@@ -247,18 +256,18 @@ def build_graph(config: GraphConfig | None = None) -> object:
     )
 
     if config.enable_ghost_mannequin_preflight:
-        _post_preflight = _GENERATOR
+        _post_preflight = _active_generator
         if config.enable_prompt_enrichment:
             _post_preflight = _PROMPT_ENRICHMENT
         graph.add_edge(_PREFLIGHT, _post_preflight)
 
     if config.enable_prompt_enrichment:
-        graph.add_edge(_PROMPT_ENRICHMENT, _GENERATOR)
+        graph.add_edge(_PROMPT_ENRICHMENT, _active_generator)
 
     # --- generator → [safety?] → quality ---
     if config.enable_safety:
         graph.add_conditional_edges(
-            _GENERATOR,
+            _active_generator,
             after_generation,
             {_QUALITY: _SAFETY, END: END},
         )
@@ -269,7 +278,7 @@ def build_graph(config: GraphConfig | None = None) -> object:
         )
     else:
         graph.add_conditional_edges(
-            _GENERATOR,
+            _active_generator,
             after_generation,
             {_QUALITY: _QUALITY, END: END},
         )
@@ -283,7 +292,7 @@ def build_graph(config: GraphConfig | None = None) -> object:
             _QUALITY,
             after_quality_v2,
             {
-                _GENERATOR: _GENERATOR,
+                _GENERATOR: _active_generator,
                 _HUMAN_REVIEW: _HUMAN_REVIEW,
                 _COMPOSITOR: _post_quality,
                 _FINALIZE: _post_quality,
@@ -292,13 +301,13 @@ def build_graph(config: GraphConfig | None = None) -> object:
         graph.add_conditional_edges(
             _HUMAN_REVIEW,
             after_human_review,
-            {_GENERATOR: _GENERATOR, _COMPOSITOR: _post_quality, _FINALIZE: _post_quality},
+            {_GENERATOR: _active_generator, _COMPOSITOR: _post_quality, _FINALIZE: _post_quality},
         )
     else:
         graph.add_conditional_edges(
             _QUALITY,
             after_quality,
-            {_GENERATOR: _GENERATOR, _COMPOSITOR: _post_quality, _FINALIZE: _post_quality},
+            {_GENERATOR: _active_generator, _COMPOSITOR: _post_quality, _FINALIZE: _post_quality},
         )
 
     graph.add_conditional_edges(

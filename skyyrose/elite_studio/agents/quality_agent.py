@@ -26,7 +26,7 @@ from ..models import QualityVerification
 logger = logging.getLogger(__name__)
 
 _CLAUDE_MODEL = "claude-opus-4-6"
-_GEMINI_VISION_MODEL = "gemini-2.0-flash-001"
+_GEMINI_VISION_MODEL = "gemini-2.0-flash"
 _PASS_THRESHOLD = 80
 
 _GHOST_QA_PROMPT = """You are QA-scoring a ghost-mannequin fashion product render for SkyyRose brand.

@@ -15,6 +15,8 @@ from ..models import (
     CompositorResult,
     EnrichedPrompt,
     GenerationResult,
+    GhostMannequinCompositeResult,
+    PreflightResult,
     QualityVerification,
     SafetyResult,
     SynthesizedVision,
@@ -50,10 +52,14 @@ class EliteStudioState(TypedDict, total=False):
 
     # --- Ghost-mannequin style additions ---
     style: str  # "flat_lay" | "ghost_mannequin" — defaults to "flat_lay"
-    preflight_result: "PreflightResult | None"
+    preflight_result: PreflightResult | None
     ghost_mannequin_front_path: str
     ghost_mannequin_back_path: str
-    ghost_mannequin_composite_result: "GhostMannequinCompositeResult | None"
+    ghost_mannequin_composite_result: GhostMannequinCompositeResult | None
+    
+    # --- 3D Architecture additions ---
+    three_d_model_path: str
+    three_d_fidelity_score: float
 
     # --- Layer 2 stage results (optional — only set when enabled) ---
     enriched_prompt: EnrichedPrompt | None
@@ -108,6 +114,8 @@ def create_initial_state(
         ghost_mannequin_front_path="",
         ghost_mannequin_back_path="",
         ghost_mannequin_composite_result=None,
+        three_d_model_path="",
+        three_d_fidelity_score=0.0,
         retry_count=0,
         max_retries=max_retries,
         status="running",

@@ -577,6 +577,59 @@ def variant_node(state: EliteStudioState) -> dict:
     }
 
 
+def three_d_node(state: EliteStudioState) -> dict:
+    """Legendary 3D generation node.
+    
+    Generates a 3D .glb replica and renders front/back/ghost shots.
+    Updates the state with the 3D-rendered paths.
+    """
+    import asyncio
+    from ..agents.three_d_agent import ThreeDAgent
+    from ..agents.vision_agent import _reference_path
+
+    sku = state["sku"]
+    style = state.get("style", "flat_lay")
+    
+    # We need a reference image (techflat or real photo)
+    ref_path = state.get("reference_path") or _reference_path(sku)
+    
+    # Get the spec from the vision stage or catalog
+    spec = ""
+    if state.get("enriched_prompt"):
+        spec = state["enriched_prompt"].enriched_spec
+    elif state.get("vision_result"):
+        spec = state["vision_result"].unified_spec
+        
+    agent = ThreeDAgent()
+    
+    # Run the async generation in the event loop
+    loop = asyncio.get_event_loop()
+    replica_result = loop.run_until_complete(
+        agent.generate_replica(sku, ref_path, spec)
+    )
+    
+    if not replica_result["success"]:
+        return {
+            "status": "error",
+            "error": replica_result.get("error", "3D Generation failed"),
+            "failed_step": "3d_generation"
+        }
+    
+    # Map the renders to the state paths
+    renders = replica_result["renders"]
+    
+    # Convert to standard GenerationResult for compatibility
+    gen_result = agent.generate_result_bridge(replica_result, state["view"])
+    
+    return {
+        "generation_result": gen_result,
+        "ghost_mannequin_front_path": renders.get("front", ""),
+        "ghost_mannequin_back_path": renders.get("back", ""),
+        "3d_model_path": replica_result["glb_path"],
+        "3d_fidelity_score": replica_result["fidelity_score"]
+    }
+
+
 # ---------------------------------------------------------------------------
 # Phase B2 ghost-mannequin nodes
 # ---------------------------------------------------------------------------

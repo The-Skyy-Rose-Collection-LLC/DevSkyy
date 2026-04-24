@@ -21,7 +21,7 @@ from ..models import DualAgentResult, PreflightResult, SynthesizedVision, Vision
 logger = logging.getLogger(__name__)
 
 _CLAUDE_MODEL = "claude-opus-4-6"
-_GEMINI_VISION_MODEL = "gemini-2.0-flash-001"
+_GEMINI_VISION_MODEL = "gemini-2.0-flash"
 
 # Products images live here (relative to project root)
 _PRODUCTS_DIR = Path("wordpress-theme/skyyrose-flagship/assets/images/products")
