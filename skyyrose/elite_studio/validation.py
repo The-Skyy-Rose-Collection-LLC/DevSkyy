@@ -58,7 +58,7 @@ class IntegrityError(Exception):
 
 
 _HEX_COLOR_RE = re.compile(r"^#[0-9A-Fa-f]{6}$")
-_SKU_RE = re.compile(r"^[a-z]+-(?:d?\d{2,3})$")
+_SKU_RE = re.compile(r"^[a-z]+-(?:d?\d{2,3})(?:-[a-z0-9-]+)?$")
 _ISO_DATE_RE = re.compile(
     r"^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?)?$"
 )
