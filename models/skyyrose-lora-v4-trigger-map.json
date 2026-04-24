@@ -1,0 +1,177 @@
+{
+  "version": "v4",
+  "source_of_truth": "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv",
+  "generated_at": "2026-04-20",
+  "replicate_model": "devskyy/skyyrose-lora-v4",
+  "total_live_skus_in_catalog": 30,
+  "live_triggers_in_v4": 11,
+  "coverage_pct": 36.7,
+  "stale_triggers_in_v4_do_not_use": [
+    "br-d02",
+    "br-d03",
+    "br-d04",
+    "sg-004",
+    "sg-d01",
+    "sg-d03",
+    "sg-d04"
+  ],
+  "triggers": {
+    "br-001": {
+      "trigger": "skyyrose_br001",
+      "name": "BLACK Rose Crewneck",
+      "collection": "black-rose"
+    },
+    "br-003": {
+      "trigger": "skyyrose_br003",
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic",
+      "collection": "black-rose"
+    },
+    "br-007": {
+      "trigger": "skyyrose_br007",
+      "name": "BLACK Rose x Love Hurts Basketball Shorts",
+      "collection": "black-rose"
+    },
+    "lh-002": {
+      "trigger": "skyyrose_lh002",
+      "name": "Love Hurts Joggers",
+      "collection": "love-hurts"
+    },
+    "lh-003": {
+      "trigger": "skyyrose_lh003",
+      "name": "Love Hurts Basketball Shorts",
+      "collection": "love-hurts"
+    },
+    "lh-004": {
+      "trigger": "skyyrose_lh004",
+      "name": "Love Hurts Bomber Jacket",
+      "collection": "love-hurts"
+    },
+    "lh-005": {
+      "trigger": "skyyrose_lh005",
+      "name": "The Fannie",
+      "collection": "love-hurts"
+    },
+    "sg-002": {
+      "trigger": "skyyrose_sg002",
+      "name": "The Bridge Series 'Stay Golden' Shirt",
+      "collection": "signature"
+    },
+    "sg-005": {
+      "trigger": "skyyrose_sg005",
+      "name": "The Bridge Series 'The Bay Bridge' Shirt",
+      "collection": "signature"
+    },
+    "sg-006": {
+      "trigger": "skyyrose_sg006",
+      "name": "Mint & Lavender Hoodie",
+      "collection": "signature"
+    },
+    "sg-007": {
+      "trigger": "skyyrose_sg007",
+      "name": "The Signature Beanie",
+      "collection": "signature"
+    }
+  },
+  "live_skus_with_no_v4_trigger": [
+    {
+      "sku": "br-002",
+      "expected_trigger": "skyyrose_br002",
+      "name": "BLACK Rose Joggers"
+    },
+    {
+      "sku": "br-004",
+      "expected_trigger": "skyyrose_br004",
+      "name": "BLACK Rose Hoodie"
+    },
+    {
+      "sku": "br-005",
+      "expected_trigger": "skyyrose_br005",
+      "name": "BLACK Rose Hoodie \u2014 Signature Edition"
+    },
+    {
+      "sku": "br-006",
+      "expected_trigger": "skyyrose_br006",
+      "name": "BLACK Rose Sherpa Jacket"
+    },
+    {
+      "sku": "br-008",
+      "expected_trigger": "skyyrose_br008",
+      "name": "BLACK is Beautiful Jersey Series: 1. SF Inspired (Football)"
+    },
+    {
+      "sku": "br-009",
+      "expected_trigger": "skyyrose_br009",
+      "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)"
+    },
+    {
+      "sku": "br-010",
+      "expected_trigger": "skyyrose_br010",
+      "name": "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)"
+    },
+    {
+      "sku": "br-011",
+      "expected_trigger": "skyyrose_br011",
+      "name": "BLACK is Beautiful Jersey Series: 4. The Rose (Hockey)"
+    },
+    {
+      "sku": "br-012",
+      "expected_trigger": "skyyrose_br012",
+      "name": "BLACK is Beautiful Jersey Series: 5. Last Oakland (Baseball)"
+    },
+    {
+      "sku": "sg-001",
+      "expected_trigger": "skyyrose_sg001",
+      "name": "The Bridge Series 'The Bay Bridge' Shorts"
+    },
+    {
+      "sku": "sg-003",
+      "expected_trigger": "skyyrose_sg003",
+      "name": "The Bridge Series 'Stay Golden' Shorts"
+    },
+    {
+      "sku": "sg-009",
+      "expected_trigger": "skyyrose_sg009",
+      "name": "The Sherpa Jacket"
+    },
+    {
+      "sku": "sg-011",
+      "expected_trigger": "skyyrose_sg011",
+      "name": "Original Label Tee (White)"
+    },
+    {
+      "sku": "sg-012",
+      "expected_trigger": "skyyrose_sg012",
+      "name": "Original Label Tee (Orchid)"
+    },
+    {
+      "sku": "sg-013",
+      "expected_trigger": "skyyrose_sg013",
+      "name": "Mint & Lavender Crewneck"
+    },
+    {
+      "sku": "sg-014",
+      "expected_trigger": "skyyrose_sg014",
+      "name": "Mint & Lavender Sweatpants"
+    },
+    {
+      "sku": "sg-015",
+      "expected_trigger": "skyyrose_sg015",
+      "name": "The Windbreaker Set"
+    },
+    {
+      "sku": "kids-001",
+      "expected_trigger": "skyyrose_kids001",
+      "name": "Kids Colorblock Hoodie Set \u2014 Red/Black"
+    },
+    {
+      "sku": "kids-002",
+      "expected_trigger": "skyyrose_kids002",
+      "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black"
+    }
+  ],
+  "notes": [
+    "v4 was trained 2026-03-05 \u2014 predates catalog consolidation of 2026-04-19.",
+    "The 7 stale triggers reference SKUs retired during consolidation and must never appear in production prompts.",
+    "The 19 uncovered live SKUs require a v5 retrain on the current canonical catalog."
+  ]
+}

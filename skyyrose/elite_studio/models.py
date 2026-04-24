@@ -70,6 +70,7 @@ class GenerationResult:
     model: str = ""
     output_path: str = ""
     error: str = ""
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -83,6 +84,7 @@ class QualityVerification:
     recommendation: str = ""  # approve, regenerate, manual_review
     details: dict[str, Any] = field(default_factory=dict)
     error: str = ""
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -161,6 +163,7 @@ class UpscaleResult:
     final_resolution: tuple[int, int] = (0, 0)
     provider: str = ""  # "replicate" or "pil_lanczos"
     error: str = ""
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -171,6 +174,7 @@ class ColorCorrectionResult:
     output_path: str = ""
     adjustments_applied: tuple[str, ...] = ()
     error: str = ""
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -181,6 +185,7 @@ class SafetyResult:
     flagged: bool = False
     categories: tuple[str, ...] = ()
     error: str = ""
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)

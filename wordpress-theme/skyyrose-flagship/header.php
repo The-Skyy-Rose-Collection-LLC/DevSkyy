@@ -1,15 +1,9 @@
 <?php
-defined( 'ABSPATH' ) || exit;
 /**
- * The header for the SkyyRose theme
- *
- * Displays the fixed dark navbar with SR monogram logo, gradient text branding,
- * navigation with collections dropdown, icon buttons, and mobile hamburger menu.
- *
- * @package SkyyRose
- * @since 2.0.0
+ * The header for the SkyyRose theme — Impeccable Refinement
+ * Action icons left, Navigation right.
  */
-
+defined( 'ABSPATH' ) || exit;
 ?><!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
@@ -18,248 +12,98 @@ defined( 'ABSPATH' ) || exit;
 	<link rel="profile" href="https://gmpg.org/xfn/11">
 	<?php wp_head(); ?>
 </head>
-
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
-<div id="page" class="site">
-	<a class="skip-link screen-reader-text" href="#primary">
-		<?php esc_html_e( 'Skip to content', 'skyyrose' ); ?>
-	</a>
+<!-- Global Grain & Vignette for Cinematic Depth -->
+<div class="global-grain" aria-hidden="true"></div>
+<div class="global-vignette" aria-hidden="true"></div>
 
-	<header id="masthead" class="site-header<?php echo is_front_page() ? ' site-header--hidden' : ''; ?>" role="banner">
+<div id="page" class="site">
+	<header id="masthead" class="site-header" role="banner">
 		<nav class="navbar" id="navbar" aria-label="<?php esc_attr_e( 'Primary Navigation', 'skyyrose' ); ?>">
 			<div class="navbar__container">
 
-				<!-- Logo / Brand -->
-				<div class="navbar__brand">
-					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="navbar__logo-link" rel="home" aria-label="<?php esc_attr_e( 'SkyyRose Home', 'skyyrose' ); ?>">
-						<img
-							src="<?php echo esc_url( get_template_directory_uri() . '/assets/branding/skyyrose-monogram-nav.webp' ); ?>"
-							alt="<?php esc_attr_e( 'SR Monogram', 'skyyrose' ); ?>"
-							class="navbar__monogram"
-							width="50"
-							height="50"
-							loading="eager"
-							fetchpriority="high"
-							decoding="async"
-						>
-						<span class="navbar__brand-text">
-							<span class="navbar__site-title">
-								<span class="navbar__gradient-text"><?php esc_html_e( 'SKYY ROSE', 'skyyrose' ); ?></span>
-							</span>
-						</span>
-					</a>
-				</div>
-
-				<!-- Desktop Navigation -->
-				<div class="navbar__nav-wrapper">
-					<?php
-					wp_nav_menu(
-						array(
-							'theme_location' => 'primary',
-							'menu_id'        => 'primary-menu',
-							'menu_class'     => 'navbar__menu',
-							'container'      => false,
-							'fallback_cb'    => 'skyyrose_nav_fallback',
-							'depth'          => 2,
-							'items_wrap'     => '<ul id="%1$s" class="%2$s">%3$s</ul>',
-						)
-					);
-					?>
-				</div>
-
-				<!-- Header Actions (Search, Account, Cart) -->
+				<!-- LEFT: Actions (Search, Account, Bag) -->
 				<?php $cart_count = 0; ?>
 				<div class="navbar__actions">
-					<!-- Search Button -->
-					<button
-						class="navbar__action-btn navbar__search-btn"
-						id="search-toggle"
-						aria-label="<?php esc_attr_e( 'Search', 'skyyrose' ); ?>"
-						aria-expanded="false"
-						aria-controls="search-overlay"
-						type="button"
-					>
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-							<circle cx="11" cy="11" r="8"/>
-							<path d="m21 21-4.35-4.35"/>
-						</svg>
+					<button class="navbar__action-btn" id="search-toggle" aria-expanded="false" type="button">
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+						<span><?php esc_html_e('Search', 'skyyrose'); ?></span>
 					</button>
 
-					<!-- Account Link -->
-					<?php
-					$account_url = class_exists( 'WooCommerce' )
-						? wc_get_page_permalink( 'myaccount' )
-						: wp_login_url();
-					?>
-					<a
-						href="<?php echo esc_url( $account_url ); ?>"
-						class="navbar__action-btn navbar__account-btn"
-						aria-label="<?php esc_attr_e( 'My Account', 'skyyrose' ); ?>"
-					>
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-							<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-							<circle cx="12" cy="7" r="4"/>
-						</svg>
+					<?php $account_url = class_exists( 'WooCommerce' ) ? wc_get_page_permalink( 'myaccount' ) : wp_login_url(); ?>
+					<a href="<?php echo esc_url( $account_url ); ?>" class="navbar__action-btn">
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+						<span><?php esc_html_e('Account', 'skyyrose'); ?></span>
 					</a>
 
-					<!-- Cart -->
-					<?php if ( class_exists( 'WooCommerce' ) && function_exists( 'WC' ) && WC() && WC()->cart ) : ?>
-						<?php $cart_count = WC()->cart->get_cart_contents_count(); ?>
-						<a
-							href="<?php echo esc_url( wc_get_cart_url() ); ?>"
-							class="navbar__action-btn navbar__cart-btn"
-							aria-label="<?php echo esc_attr( sprintf( /* translators: %d: number of items in cart */ _n( '%d item in cart', '%d items in cart', $cart_count, 'skyyrose' ), $cart_count ) ); ?>"
-						>
-							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-								<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
-								<path d="M3 6h18"/>
-								<path d="M16 10a4 4 0 0 1-8 0"/>
-							</svg>
-							<span class="navbar__cart-badge<?php echo esc_attr( $cart_count > 0 ? ' navbar__cart-badge--visible' : '' ); ?>" aria-hidden="true">
-								<?php echo esc_html( $cart_count ); ?>
-							</span>
+					<?php if ( class_exists( 'WooCommerce' ) && function_exists( 'WC' ) && WC() && WC()->cart ) : 
+						$cart_count = WC()->cart->get_cart_contents_count(); ?>
+						<a href="<?php echo esc_url( wc_get_cart_url() ); ?>" class="navbar__action-btn navbar__cart-btn">
+							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+							<span><?php esc_html_e('Bag', 'skyyrose'); ?></span>
+							<span class="navbar__cart-badge<?php echo esc_attr( $cart_count > 0 ? ' navbar__cart-badge--visible' : '' ); ?>"><?php echo esc_html( $cart_count ); ?></span>
 						</a>
 					<?php endif; ?>
-
-					<!-- Mobile Hamburger Toggle -->
-					<button
-						class="navbar__hamburger"
-						id="mobile-menu-toggle"
-						aria-controls="mobile-menu"
-						aria-expanded="false"
-						aria-label="<?php esc_attr_e( 'Toggle navigation menu', 'skyyrose' ); ?>"
-						type="button"
-					>
-						<span class="navbar__hamburger-line" aria-hidden="true"></span>
-						<span class="navbar__hamburger-line" aria-hidden="true"></span>
-						<span class="navbar__hamburger-line" aria-hidden="true"></span>
-					</button>
 				</div>
 
-			</div><!-- .navbar__container -->
-		</nav>
+				<!-- CENTER: Logo -->
+				<div class="navbar__brand">
+					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="navbar__logo-link">
+						<span class="navbar__site-title">SKYY ROSE</span>
+					</a>
+				</div>
 
-		<!-- Search Overlay -->
-		<div class="search-overlay" id="search-overlay" aria-hidden="true" inert role="dialog" aria-modal="true" tabindex="-1" aria-label="<?php esc_attr_e( 'Search', 'skyyrose' ); ?>">
-			<div class="search-overlay__container">
-				<form role="search" method="get" class="search-overlay__form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
-					<label class="screen-reader-text" for="search-overlay-input">
-						<?php esc_html_e( 'Search for:', 'skyyrose' ); ?>
-					</label>
-					<input
-						type="search"
-						id="search-overlay-input"
-						class="search-overlay__input"
-						placeholder="<?php esc_attr_e( 'Search the collection...', 'skyyrose' ); ?>"
-						value="<?php echo esc_attr( get_search_query() ); ?>"
-						name="s"
-						autocomplete="off"
-					>
-					<button type="submit" class="search-overlay__submit" aria-label="<?php esc_attr_e( 'Submit search', 'skyyrose' ); ?>">
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-							<circle cx="11" cy="11" r="8"/>
-							<path d="m21 21-4.35-4.35"/>
-						</svg>
-					</button>
-				</form>
-				<button class="search-overlay__close" id="search-close" aria-label="<?php esc_attr_e( 'Close Search', 'skyyrose' ); ?>" type="button">
-					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-						<path d="M18 6 6 18"/>
-						<path d="m6 6 12 12"/>
-					</svg>
-				</button>
+				<!-- RIGHT: Desktop Navigation -->
+				<div class="navbar__nav-wrapper">
+					<?php
+					wp_nav_menu( array(
+						'theme_location' => 'primary',
+						'menu_class'     => 'navbar__menu',
+						'container'      => false,
+						'depth'          => 2,
+					) );
+					?>
+				</div>
+                
+                <!-- Mobile Menu Toggle (Right aligned on Mobile) -->
+                <button class="navbar__hamburger" id="mobile-menu-toggle" type="button">
+                    <span class="navbar__hamburger-line"></span>
+                    <span class="navbar__hamburger-line"></span>
+                    <span class="navbar__hamburger-line"></span>
+                </button>
+
 			</div>
-		</div>
+		</nav>
 
 		<!-- Mobile Menu Slide-In -->
 		<div class="mobile-menu" id="mobile-menu" aria-hidden="true" inert>
 			<div class="mobile-menu__overlay" id="mobile-menu-overlay" aria-hidden="true"></div>
-			<div class="mobile-menu__panel" role="dialog" aria-modal="true" tabindex="-1" aria-label="<?php esc_attr_e( 'Mobile Navigation', 'skyyrose' ); ?>">
+			<div class="mobile-menu__panel">
 				<div class="mobile-menu__header">
-					<span class="mobile-menu__brand navbar__gradient-text"><?php esc_html_e( 'SKYY ROSE', 'skyyrose' ); ?></span>
-					<button
-						class="mobile-menu__close"
-						id="mobile-menu-close"
-						aria-label="<?php esc_attr_e( 'Close Menu', 'skyyrose' ); ?>"
-						type="button"
-					>
-						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-							<path d="M18 6 6 18"/>
-							<path d="m6 6 12 12"/>
-						</svg>
+					<span class="mobile-menu__brand">SKYY ROSE</span>
+					<button class="mobile-menu__close" id="mobile-menu-close" type="button">
+						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
 					</button>
 				</div>
-
 				<div class="mobile-menu__nav">
-					<?php
-					// Mobile drawer follows the Primary menu by default so admins
-					// who assign a single menu to Primary see it on every surface.
-					// A separate `mobile` location can still be assigned when the
-					// admin explicitly wants different mobile items.
-					wp_nav_menu(
-						array(
-							'theme_location' => has_nav_menu( 'mobile' ) ? 'mobile' : 'primary',
-							'menu_id'        => 'mobile-primary-menu',
-							'menu_class'     => 'mobile-menu__list',
-							'container'      => false,
-							'fallback_cb'    => 'skyyrose_nav_fallback',
-							'depth'          => 2,
-						)
-					);
-					?>
-				</div>
-
-				<div class="mobile-menu__footer">
-					<?php if ( class_exists( 'WooCommerce' ) ) : ?>
-						<a href="<?php echo esc_url( wc_get_page_permalink( 'myaccount' ) ); ?>" class="mobile-menu__link">
-							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-								<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-								<circle cx="12" cy="7" r="4"/>
-							</svg>
-							<?php esc_html_e( 'My Account', 'skyyrose' ); ?>
-						</a>
-					<?php endif; ?>
-
-					<?php
-					$wishlist_page = get_page_by_path( 'wishlist' );
-					if ( $wishlist_page ) :
-						?>
-						<a href="<?php echo esc_url( get_permalink( $wishlist_page ) ); ?>" class="mobile-menu__link">
-							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-								<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-							</svg>
-							<?php esc_html_e( 'Wishlist', 'skyyrose' ); ?>
-						</a>
-					<?php endif; ?>
-
-					<?php if ( class_exists( 'WooCommerce' ) ) : ?>
-						<a href="<?php echo esc_url( wc_get_cart_url() ); ?>" class="mobile-menu__link">
-							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-								<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
-								<path d="M3 6h18"/>
-								<path d="M16 10a4 4 0 0 1-8 0"/>
-							</svg>
-							<?php esc_html_e( 'Cart', 'skyyrose' ); ?>
-							<?php if ( $cart_count > 0 ) : ?>
-								<span class="mobile-menu__badge"><?php echo esc_html( $cart_count ); ?></span>
-							<?php endif; ?>
-						</a>
-					<?php endif; ?>
+					<?php wp_nav_menu( array( 'theme_location' => 'primary', 'container' => false ) ); ?>
 				</div>
 			</div>
 		</div>
 
-	</header><!-- #masthead -->
+        <!-- Search Overlay -->
+        <div class="search-overlay" id="search-overlay" aria-hidden="true" inert>
+            <div class="search-overlay__container">
+                <form role="search" method="get" class="search-overlay__form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
+                    <input type="search" class="search-overlay__input" placeholder="SEARCH THE COLLECTION..." name="s" autocomplete="off">
+                </form>
+                <button class="search-overlay__close" id="search-close" type="button">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+        </div>
 
-	<?php
-	/**
-	 * Hook: skyyrose_after_header
-	 *
-	 * @hooked skyyrose_breadcrumb - 10
-	 */
-	do_action( 'skyyrose_after_header' );
-	?>
-
+	</header>
 	<div id="content" class="site-content">

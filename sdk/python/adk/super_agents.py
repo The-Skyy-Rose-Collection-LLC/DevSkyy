@@ -69,19 +69,66 @@ class BaseSuperAgent(BaseDevSkyyAgent):
         super().__init__(config)
         self._sub_agents: dict[str, Any] = {}
         self._active_provider = ADKProvider.PYDANTIC  # Default
+        self._initialized = False
 
     async def initialize(self) -> None:
         """Initialize super agent with sub-capabilities"""
-        logger.info(f"Initializing Super Agent: {self.agent_type}")
+        logger.info(f"Initializing Super Agent: {self.agent_type} (Provider: {self.config.provider})")
 
-        # Initialize based on available ADK
+        # Initialize based on configured ADK provider
         try:
-            await self._init_pydantic_backend()
-        except ImportError:
-            try:
+            if self.config.provider == ADKProvider.GOOGLE:
+                await self._init_google_backend()
+            elif self.config.provider == ADKProvider.PYDANTIC:
+                await self._init_pydantic_backend()
+            elif self.config.provider == ADKProvider.LANGGRAPH:
                 await self._init_langchain_backend()
-            except ImportError:
-                logger.warning("No ADK backend available, using fallback")
+            else:
+                # Fallback to Pydantic
+                await self._init_pydantic_backend()
+            
+            self._initialized = True
+        except Exception as e:
+            logger.error(f"Failed to initialize Super Agent backend: {e}")
+            raise
+
+    async def _init_google_backend(self) -> None:
+        """Initialize with Google ADK backend"""
+        from adk.google_adk import GoogleADKAgent
+        
+        self._backend_agent = GoogleADKAgent(self.config)
+        await self._backend_agent.initialize()
+        self._active_provider = ADKProvider.GOOGLE
+
+    async def execute(self, prompt: str, **kwargs) -> AgentResult:
+        """Execute task via the initialized backend provider"""
+        start_time = datetime.now(UTC)
+
+        try:
+            if not self._initialized:
+                await self.initialize()
+
+            # Proxy to the specific ADK implementation
+            if hasattr(self, "_backend_agent"):
+                # Backend agent (GoogleADKAgent or PydanticAI Agent) has its own execute/run
+                return await self._backend_agent.run(prompt, **kwargs)
+            else:
+                return AgentResult(
+                    agent_name=self.name,
+                    agent_provider=self._active_provider,
+                    content=f"Fallback response (no backend): {prompt[:100]}...",
+                    status=AgentStatus.COMPLETED,
+                    started_at=start_time,
+                )
+        except Exception as e:
+            return AgentResult(
+                agent_name=self.name,
+                agent_provider=self._active_provider,
+                content="",
+                status=AgentStatus.FAILED,
+                error=str(e),
+                started_at=start_time,
+            )
 
     async def _init_pydantic_backend(self) -> None:
         """Initialize with PydanticAI backend"""
@@ -218,35 +265,6 @@ GUIDELINES:
             ),
         ]
 
-    async def execute(self, prompt: str, **kwargs) -> AgentResult:
-        """Execute commerce operation"""
-        start_time = datetime.now(UTC)
-
-        try:
-            if hasattr(self, "_backend_agent"):
-                result = await self._backend_agent.run(prompt)
-                content = str(result.output) if hasattr(result, "output") else str(result)
-            else:
-                # Fallback response
-                content = f"Commerce Agent processing: {prompt[:100]}..."
-
-            return AgentResult(
-                agent_name=self.name,
-                agent_provider=self._active_provider,
-                content=content,
-                status=AgentStatus.COMPLETED,
-                started_at=start_time,
-            )
-        except Exception as e:
-            return AgentResult(
-                agent_name=self.name,
-                agent_provider=self._active_provider,
-                content="",
-                status=AgentStatus.FAILED,
-                error=str(e),
-                started_at=start_time,
-            )
-
 
 # =============================================================================
 # Creative Agent
@@ -359,34 +377,6 @@ BRAND GUIDELINES:
             ),
         ]
 
-    async def execute(self, prompt: str, **kwargs) -> AgentResult:
-        """Execute creative operation"""
-        start_time = datetime.now(UTC)
-
-        try:
-            if hasattr(self, "_backend_agent"):
-                result = await self._backend_agent.run(prompt)
-                content = str(result.output) if hasattr(result, "output") else str(result)
-            else:
-                content = f"Creative Agent processing: {prompt[:100]}..."
-
-            return AgentResult(
-                agent_name=self.name,
-                agent_provider=self._active_provider,
-                content=content,
-                status=AgentStatus.COMPLETED,
-                started_at=start_time,
-            )
-        except Exception as e:
-            return AgentResult(
-                agent_name=self.name,
-                agent_provider=self._active_provider,
-                content="",
-                status=AgentStatus.FAILED,
-                error=str(e),
-                started_at=start_time,
-            )
-
 
 # =============================================================================
 # Marketing Agent
@@ -457,34 +447,6 @@ TARGET AUDIENCE:
 - Values: Self-expression, premium craftsmanship
 """
 
-    async def execute(self, prompt: str, **kwargs) -> AgentResult:
-        """Execute marketing operation"""
-        start_time = datetime.now(UTC)
-
-        try:
-            if hasattr(self, "_backend_agent"):
-                result = await self._backend_agent.run(prompt)
-                content = str(result.output) if hasattr(result, "output") else str(result)
-            else:
-                content = f"Marketing Agent processing: {prompt[:100]}..."
-
-            return AgentResult(
-                agent_name=self.name,
-                agent_provider=self._active_provider,
-                content=content,
-                status=AgentStatus.COMPLETED,
-                started_at=start_time,
-            )
-        except Exception as e:
-            return AgentResult(
-                agent_name=self.name,
-                agent_provider=self._active_provider,
-                content="",
-                status=AgentStatus.FAILED,
-                error=str(e),
-                started_at=start_time,
-            )
-
 
 # =============================================================================
 # Support Agent
@@ -551,34 +513,6 @@ POLICIES:
 - Exchanges: Free for same-value items
 - Shipping: Free over $150, otherwise $9.95
 """
-
-    async def execute(self, prompt: str, **kwargs) -> AgentResult:
-        """Execute support operation"""
-        start_time = datetime.now(UTC)
-
-        try:
-            if hasattr(self, "_backend_agent"):
-                result = await self._backend_agent.run(prompt)
-                content = str(result.output) if hasattr(result, "output") else str(result)
-            else:
-                content = f"Support Agent processing: {prompt[:100]}..."
-
-            return AgentResult(
-                agent_name=self.name,
-                agent_provider=self._active_provider,
-                content=content,
-                status=AgentStatus.COMPLETED,
-                started_at=start_time,
-            )
-        except Exception as e:
-            return AgentResult(
-                agent_name=self.name,
-                agent_provider=self._active_provider,
-                content="",
-                status=AgentStatus.FAILED,
-                error=str(e),
-                started_at=start_time,
-            )
 
 
 # =============================================================================
@@ -648,34 +582,6 @@ STANDARDS:
 - Mobile-first design
 - WCAG 2.1 accessibility
 """
-
-    async def execute(self, prompt: str, **kwargs) -> AgentResult:
-        """Execute operations task"""
-        start_time = datetime.now(UTC)
-
-        try:
-            if hasattr(self, "_backend_agent"):
-                result = await self._backend_agent.run(prompt)
-                content = str(result.output) if hasattr(result, "output") else str(result)
-            else:
-                content = f"Operations Agent processing: {prompt[:100]}..."
-
-            return AgentResult(
-                agent_name=self.name,
-                agent_provider=self._active_provider,
-                content=content,
-                status=AgentStatus.COMPLETED,
-                started_at=start_time,
-            )
-        except Exception as e:
-            return AgentResult(
-                agent_name=self.name,
-                agent_provider=self._active_provider,
-                content="",
-                status=AgentStatus.FAILED,
-                error=str(e),
-                started_at=start_time,
-            )
 
 
 # =============================================================================
@@ -747,34 +653,6 @@ REPORTING STANDARDS:
 - Highlight actionable insights
 - Flag anomalies and opportunities
 """
-
-    async def execute(self, prompt: str, **kwargs) -> AgentResult:
-        """Execute analytics task"""
-        start_time = datetime.now(UTC)
-
-        try:
-            if hasattr(self, "_backend_agent"):
-                result = await self._backend_agent.run(prompt)
-                content = str(result.output) if hasattr(result, "output") else str(result)
-            else:
-                content = f"Analytics Agent processing: {prompt[:100]}..."
-
-            return AgentResult(
-                agent_name=self.name,
-                agent_provider=self._active_provider,
-                content=content,
-                status=AgentStatus.COMPLETED,
-                started_at=start_time,
-            )
-        except Exception as e:
-            return AgentResult(
-                agent_name=self.name,
-                agent_provider=self._active_provider,
-                content="",
-                status=AgentStatus.FAILED,
-                error=str(e),
-                started_at=start_time,
-            )
 
 
 # =============================================================================

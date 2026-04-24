@@ -17,6 +17,7 @@ Layer 4 additions:
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import time
 
@@ -43,6 +44,38 @@ except ImportError:  # pragma: no cover
 
     def _record_stage_duration(stage: str, duration_s: float) -> None:  # type: ignore[misc]
         pass
+
+
+import uuid
+from typing import Any
+
+from .state import EliteStudioState, extract_production_result
+from ..models import (
+    CompositorResult,
+    EnrichedPrompt,
+    GenerationResult,
+    QualityVerification,
+    SynthesizedVision,
+    TryOnResult,
+)
+
+logger = logging.getLogger(__name__)
+
+
+def run_sync(coro):
+    """Helper to run a coroutine from a synchronous node."""
+    try:
+        loop = asyncio.get_running_loop()
+        if loop.is_running():
+            # In a running loop, we should ideally use a thread or just run it.
+            # But LangGraph sync nodes are usually run in a way that allows run_until_complete?
+            # For now, if loop is running, we might be in trouble if we block it.
+            # However, for simplicity in this factory setting:
+            import nest_asyncio
+            nest_asyncio.apply()
+            return loop.run_until_complete(coro)
+    except RuntimeError:
+        return asyncio.run(coro)
 
 
 # Approximate token estimates per node call (used for cost tracking).
@@ -78,7 +111,7 @@ def vision_node(state: EliteStudioState) -> dict:
     """Analyze product images via dual-provider vision (Gemini + OpenAI)."""
     start = time.monotonic()
     agent = VisionAgent()
-    result = agent.analyze(state["sku"], state["view"])
+    result = run_sync(agent.analyze(state["sku"], state["view"]))
     elapsed = time.monotonic() - start
 
     job_id: str | None = state.get("job_id")  # type: ignore[assignment]
@@ -117,11 +150,11 @@ def generator_node(state: EliteStudioState) -> dict:
             "failed_step": "generation",
         }
 
-    result = agent.generate(
+    result = run_sync(agent.generate(
         sku=state["sku"],
         view=state["view"],
         generation_spec=vision.unified_spec,
-    )
+    ))
     elapsed = time.monotonic() - start
 
     job_id: str | None = state.get("job_id")  # type: ignore[assignment]
@@ -212,10 +245,10 @@ def quality_node(state: EliteStudioState) -> dict:
             classifier_result.confidence,
         )
         llm_agent = QualityAgent()
-        quality_result = llm_agent.verify(
+        quality_result = run_sync(llm_agent.verify(
             image_path=gen.output_path,
             expected_spec=vision.unified_spec,
-        )
+        ))
 
     elapsed = time.monotonic() - start
     timings["quality"] = round(elapsed, 2)
@@ -321,13 +354,12 @@ def compositor_node(state: EliteStudioState) -> dict:
                 )
                 scenes = discover_scene_images(collection)
                 if scenes:
-                    comp_result = agent.composite(
+                    comp_result = run_sync(agent.composite(
                         sku=state["sku"],
-                        scene_image_path=str(scenes[0]),
-                        model_image_path=gen.output_path,
-                        collection=collection,
+                        image_path=gen.output_path,
                         scene_name=scene_name,
-                    )
+                        collection=collection,
+                    ))
                 break
     except Exception:
         pass
@@ -373,12 +405,11 @@ def tryon_node(state: EliteStudioState) -> dict:
 
     category = state.get("tryon_category", "upper_body")
     agent = TryOnAgent()
-    result = agent.try_on(
-        sku=sku,
+    result = run_sync(agent.execute_tryon(
         garment_image_path=garment_path,
         model_image_path=gen.output_path,
         category=category,
-    )
+    ))
 
     timings["tryon"] = round(time.monotonic() - start, 2)
     return {"tryon_result": result, "stage_timings": timings}
@@ -408,7 +439,11 @@ def prompt_enrichment_node(state: EliteStudioState) -> dict:
     vision = state.get("vision_result")
     spec = vision.unified_spec if vision and vision.success else ""
 
-    result = agent.enrich(sku=state["sku"], vision_spec=spec)
+    result = run_sync(agent.enrich(
+        sku=state["sku"],
+        vision_spec=spec,
+        style=state.get("style", "flat_lay")
+    ))
     elapsed = time.monotonic() - start
 
     timings = dict(state.get("stage_timings", {}))
@@ -454,7 +489,7 @@ def upscaling_node(state: EliteStudioState) -> dict:
             "stage_timings": timings,
         }
 
-    result = agent.upscale(image_path=image_path)
+    result = run_sync(agent.upscale(image_path=image_path))
     elapsed = time.monotonic() - start
 
     timings = dict(state.get("stage_timings", {}))
@@ -488,7 +523,7 @@ def color_correction_node(state: EliteStudioState) -> dict:
             "stage_timings": timings,
         }
 
-    result = agent.correct(image_path=image_path)
+    result = run_sync(agent.correct(image_path=image_path))
     elapsed = time.monotonic() - start
 
     timings = dict(state.get("stage_timings", {}))
@@ -560,12 +595,11 @@ def variant_node(state: EliteStudioState) -> dict:
             "stage_timings": timings,
         }
 
-    results = agent.generate_variants(
+    results = run_sync(agent.generate_variants(
         sku=state["sku"],
         base_image_path=base_path,
-        spec=spec,
-        variants=variants,
-    )
+        variant_specs=variants,
+    ))
     elapsed = time.monotonic() - start
 
     timings = dict(state.get("stage_timings", {}))
@@ -602,11 +636,20 @@ def three_d_node(state: EliteStudioState) -> dict:
         
     agent = ThreeDAgent()
     
-    # Run the async generation in the event loop
-    loop = asyncio.get_event_loop()
-    replica_result = loop.run_until_complete(
-        agent.generate_replica(sku, ref_path, spec)
-    )
+    # Run the async generation
+    try:
+        # Check if we are already in an event loop (e.g. if called via ainvoke)
+        loop = asyncio.get_running_loop()
+        # This is tricky in a sync node. Since this node is synchronous in the graph 
+        # (func, not afunc), we might need to run it in a thread or just use run_until_complete 
+        # if the loop isn't running yet.
+        # But for CLI 'invoke', there is usually no loop.
+        replica_result = loop.run_until_complete(
+            agent.generate_replica(sku, ref_path, spec)
+        )
+    except RuntimeError:
+        # No loop running, use asyncio.run
+        replica_result = asyncio.run(agent.generate_replica(sku, ref_path, spec))
     
     if not replica_result["success"]:
         return {
@@ -665,10 +708,17 @@ def preflight_node(state: EliteStudioState) -> dict:
         cat = Catalog.load()
         product = cat.require(sku)
         expected_garment = product.name
-        # Note: using __import__ to avoid top-level circulars
-        ref_path = state.get("reference_path") or __import__(
-            "skyyrose.elite_studio.agents.vision_agent", fromlist=["_reference_path"]
-        )._reference_path(sku)
+        
+        # Use catalog-defined source image if available, else fallback to rigid SKU lookup
+        source_img = product.source_files[0] if product.source_files else ""
+        if source_img:
+            # Source images live in wordpress-theme/skyyrose-flagship/assets/images/products/
+            ref_path = str(__import__("skyyrose.elite_studio.agents.vision_agent", fromlist=["_PRODUCTS_DIR"])._PRODUCTS_DIR / source_img)
+        else:
+            ref_path = state.get("reference_path") or __import__(
+                "skyyrose.elite_studio.agents.vision_agent", fromlist=["_reference_path"]
+            )._reference_path(sku)
+            
     except Exception as exc:
         return {
             "status": "error",
@@ -679,11 +729,11 @@ def preflight_node(state: EliteStudioState) -> dict:
     from ..agents.vision_agent import DualVisionGate
 
     gate = DualVisionGate()
-    result = gate.verify_reference(
+    result = run_sync(gate.verify_reference(
         image_path=ref_path,
         sku=sku,
         expected_garment=expected_garment,
-    )
+    ))
 
     if not result.passed:
         logger.warning("[Preflight] BLOCKED %s: %s", sku, result.blocking_reason)

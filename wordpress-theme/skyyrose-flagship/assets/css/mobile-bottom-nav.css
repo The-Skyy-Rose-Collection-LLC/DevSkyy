@@ -1,132 +1,90 @@
 /**
- * Mobile Bottom Navigation
- *
- * Glass panel fixed nav bar for mobile devices.
- * Hidden above 768px. Safe-area aware for notched phones.
- *
- * @package SkyyRose
- * @since   6.3.0
+ * Mobile Bottom Navigation — Impeccable Luxury Refinement
+ * Technical glassmorphism, rose gold accents, exact padding.
  */
 
-/* ── Bar ─────────────────────────────────────────────── */
-
 .mobile-nav {
+	display: none; /* Hidden on desktop */
 	position: fixed;
 	bottom: 0;
 	left: 0;
 	right: 0;
-	z-index: 9999;
-	display: flex;
-	align-items: center;
+	z-index: 9000;
+	background: rgba(5, 5, 5, 0.75);
+	backdrop-filter: blur(24px) saturate(180%);
+	-webkit-backdrop-filter: blur(24px) saturate(180%);
+	border-top: 1px solid rgba(183, 110, 121, 0.5); /* Rose Gold Outline */
+	padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
 	justify-content: space-around;
-	height: 64px;
-	padding-bottom: env(safe-area-inset-bottom, 0px);
-	background: rgba(10, 10, 10, 0.95);
-	backdrop-filter: blur(20px);
-	-webkit-backdrop-filter: blur(20px);
-	border-top: 1px solid rgba(183, 110, 121, 0.15);
+	align-items: center;
+	transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── Item ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+	.mobile-nav { display: flex; }
+	/* Add padding to body to prevent content hiding behind nav */
+	body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+}
 
 .mobile-nav__item {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	flex: 1;
-	gap: 2px;
-	padding: 8px 0;
+	gap: 6px;
 	color: rgba(255, 255, 255, 0.5);
 	text-decoration: none;
-	transition: color 0.2s ease, transform 0.2s ease;
-	-webkit-tap-highlight-color: transparent;
+	width: 20%;
+	padding: 6px 0;
+	transition: color 0.3s ease;
 }
 
+.mobile-nav__item:hover,
 .mobile-nav__item--active {
-	color: #b76e79;
-	transform: scale(1.05);
+	color: #B76E79; /* Rose Gold Active State */
 }
-
-.mobile-nav__item:focus-visible {
-	outline: 2px solid #b76e79;
-	outline-offset: -2px;
-	border-radius: 4px;
-}
-
-/* ── Icon ────────────────────────────────────────────── */
 
 .mobile-nav__icon {
 	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 24px;
-	height: 24px;
 }
 
 .mobile-nav__icon svg {
-	display: block;
+	width: 22px;
+	height: 22px;
+	stroke-width: 1.5px;
+	transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── Label ───────────────────────────────────────────── */
+.mobile-nav__item:hover .mobile-nav__icon svg,
+.mobile-nav__item--active .mobile-nav__icon svg {
+	transform: translateY(-2px);
+}
 
 .mobile-nav__label {
-	font-family: 'Inter', -apple-system, sans-serif;
-	font-size: 10px;
-	font-weight: 500;
-	letter-spacing: 0.02em;
-	line-height: 1;
-	white-space: nowrap;
+	font-family: 'Space Mono', monospace;
+	font-size: 9px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
 }
-
-/* ── Cart Badge ──────────────────────────────────────── */
 
 .mobile-nav__badge {
 	position: absolute;
-	top: -4px;
-	right: -6px;
+	top: -6px;
+	right: -10px;
+	background: #fff;
+	color: #000;
+	font-family: 'Space Mono', monospace;
+	font-size: 9px;
+	font-weight: 700;
+	min-width: 16px;
+	height: 16px;
+	border-radius: 8px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	min-width: 14px;
-	height: 14px;
-	padding: 0 3px;
-	background: #b76e79;
-	color: #fff;
-	font-family: 'Inter', -apple-system, sans-serif;
-	font-size: 9px;
-	font-weight: 700;
-	line-height: 1;
-	border-radius: 7px;
-}
-
-/* ── Body Spacer ─────────────────────────────────────── */
-
-.has-mobile-nav {
-	padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-}
-
-/* ── Desktop: Hide ───────────────────────────────────── */
-
-@media (min-width: 769px) {
-	.mobile-nav {
-		display: none;
-	}
-
-	.has-mobile-nav {
-		padding-bottom: 0;
-	}
-}
-
-/* ── Reduced Motion ──────────────────────────────────── */
-
-@media (prefers-reduced-motion: reduce) {
-	.mobile-nav__item {
-		transition: none;
-	}
-
-	.mobile-nav__item--active {
-		transform: none;
-	}
+	padding: 0 4px;
+	border: 1px solid #B76E79;
 }

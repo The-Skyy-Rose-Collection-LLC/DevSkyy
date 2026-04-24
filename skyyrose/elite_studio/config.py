@@ -32,6 +32,12 @@ _GEMINI_ENV = _REPO_DIR / "gemini" / ".env"
 if _GEMINI_ENV.exists():
     load_dotenv(_GEMINI_ENV, override=True)
 
+# Ensure GOOGLE_API_KEY is explicitly in environ for SDKs
+if not os.getenv("GOOGLE_API_KEY"):
+    _gkey = os.getenv("GOOGLE_AI_API_KEY") or os.getenv("GEMINI_API_KEY")
+    if _gkey:
+        os.environ["GOOGLE_API_KEY"] = _gkey
+
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------

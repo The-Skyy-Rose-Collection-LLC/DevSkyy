@@ -8,19 +8,105 @@
 
 ## Current State (What Exists)
 
-Three separate product-loading mechanisms exist today, all reading product data
-independently:
+### Canonical CSV Loader — Already Correct
 
-| Location | What it reads | Problem |
-|---|---|---|
-| `renders/config.py` (not yet on disk — referenced by `__main__.py`) | `PRODUCT_CATALOG` dict, `_find_bundle_dir(name)`, `PRODUCTS_DIR` | Inline catalog, not CSV-driven |
-| `skyyrose/elite_studio/fashion/context.py` | `data/product-catalog.csv` (wrong path — retired file) | Stale path, bypasses canonical loader |
-| `skyyrose/elite_studio/catalog.py` | `skyyrose/core/catalog_loader.py` | Correct pattern, but only used by Elite Studio |
-| `scripts/nano_banana/` (pyc-only, source deleted) | Unknown — pyc in `__pycache__` | Must be rebuilt; source gone |
+`skyyrose/core/catalog_loader.py` exists with the correct interface:
 
-The canonical loader (`skyyrose/core/catalog_loader.py`) and the Elite Studio
-`Catalog` class are the correct foundation. Everything else must be migrated to
-use them.
+```python
+CATALOG_CSV          # Path constant pointing to the canonical CSV
+read_catalog_rows()  # list[dict[str, str]] — raw CSV rows, skips blanks
+bool_col(row, key)   # "1" → True coercion
+int_col(row, key)    # str → int | None
+status_from_row(row) # badge/is_preorder/published → status enum string
+PRODUCT_STATUS       # {"draft", "pre-order", "live", "retired"}
+```
+
+This module is the confirmed foundation. Every pipeline imports from here. The
+`skyyrose/elite_studio/catalog.py` `Catalog` class already imports from it
+correctly. Nothing about this module changes in v1.2.
+
+### nano_banana — Source Files Confirmed Present
+
+`scripts/nano_banana/` is a Python package with all source `.py` files present
+and compiled. Confirmed modules:
+
+| Module | Role |
+|---|---|
+| `catalog.py` | Product loader — imports `skyyrose.core.catalog_loader` correctly |
+| `source_map.py` | Hardcoded SKU→techflat path dict — the piece to REPLACE with bundle_map |
+| `cli.py` | CLI with `dry-run`, `generate`, `composite`, `produce`, `produce-async` subcommands |
+| `pipeline.py` | `ProductionPipeline` — 5-step orchestrator; uses `_find_bundle_dir(name)` |
+| `generate.py` | Provider wrappers (Gemini, FLUX, GPT-Image) |
+| `router.py` | `RouteDecision` — picks engine per garment features |
+| `prompt_registry.py` | Prompt templates |
+| `prompts.py` | Prompt construction |
+| `config.py` | API config, provider clients |
+| `client.py` | Client factory |
+| `engine_fal.py` | fal.ai engine |
+| `vision_describe.py` | Vision analysis |
+| `tournament.py` | Best-of-N tournament |
+| `utils.py` | Helpers |
+
+**Critical finding:** `pipeline.py` currently has `_find_bundle_dir(name)` which
+looks up bundles **by product name**. This is the root cause of the 15 name-mismatch
+cases. The function must be replaced with a SKU-indexed lookup.
+
+### Elite Studio — Partially Correct, Stub State
+
+- `skyyrose/elite_studio/catalog.py` — correct, imports `skyyrose.core.catalog_loader`
+- `skyyrose/elite_studio/agents/compositor_agent.py` — Phase B2 stub (raises `NotImplementedError`)
+- The existing plan at `docs/superpowers/plans/2026-04-20-ghost-mannequin-pipeline.md` defines
+  the dual-agent ghost mannequin pipeline for Elite Studio (Tasks 1-9, full TDD test stubs included)
+- Elite Studio ghost mannequin goes through `LangGraph` + dual-agent (Claude Opus + Gemini via `gemini_rest.py`)
+
+### renders/ — FASHN Tryon Pipeline (NOT Ghost Mannequin Output Dir)
+
+`renders/` is a Python package for the **FASHN tryon pipeline** (on-model renders).
+It is NOT the ghost mannequin output directory. Key files:
+
+- `renders/preflight.py` — STOP AND SHOW implementation exists here. Reference this as the
+  pattern for the ghost mannequin cost gate.
+- `renders/__main__.py` — CLI entry for FASHN runs
+- `renders/config.py` — Does NOT currently exist on disk. Must be created in Step 6.
+
+The ghost mannequin output goes to `renders/ghost-mannequin/` — a subdirectory that
+does not yet exist as a Python package. It is a plain directory containing `.webp` files.
+
+### Bundle Directories — SKU is Authoritative
+
+`data/product-bundles/` contains 32 directories. Each has a `manifest.json` with
+a `sku` field. The bundle SKU is correct and authoritative for 30 of 32 entries.
+The 2 outliers are variant SKUs (`br-003-giants`, `br-003-oakland`, `br-003-white`)
+that are colorway variants of `br-003`.
+
+**The 15 "name-mismatch" cases are resolved by indexing on `manifest.json["sku"]`**,
+not on product name. They are only mismatches if you lookup by name. With SKU lookup
+the mapping is clean. See the exact mismatches in the section below.
+
+---
+
+## The 15 Name-Mismatch Cases (Documented)
+
+These are the cases where `manifest.json["name"]` differs from `CSV["name"]`.
+They look like mismatches but resolve cleanly by SKU:
+
+| SKU | CSV name | Bundle name in manifest.json | Resolution |
+|---|---|---|---|
+| br-003 | "BLACK is Beautiful Jersey Series: 0. Baseball Classic" | "BLACK is Beautiful Jersey" | SKU matches — OK |
+| br-008 | "BLACK is Beautiful Jersey Series: 1. SF Inspired (Football)" | "BLACK is Beautiful Jersey Series: 1. SF inspired" | Case diff — OK by SKU |
+| br-009 | "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)" | "BLACK is Beautiful Jersey Series: 2. LAST OAKLAND" | Case diff — OK by SKU |
+| br-010 | "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)" | "BLACK is Beautiful Jersey Series: 3. THE BAY" | Case diff — OK by SKU |
+| br-011 | "BLACK is Beautiful Jersey Series: 4. The Rose (Hockey)" | "BLACK is Beautiful Jersey Series: 4. THE ROSE (SHARKS EDITION)" | Case diff — OK by SKU |
+| br-012 | "BLACK is Beautiful Jersey Series: 5. Last Oakland (Baseball)" | (no bundle) | Missing bundle — create or defer |
+| kids-001 | "Kids Colorblock Hoodie Set — Red/Black" | "Kids Red Set" | SKU matches — OK |
+| kids-002 | "Kids Colorblock Hoodie Set — Purple/Black" | "Kids Purple Set" | SKU matches — OK |
+| lh-004 | "Love Hurts Bomber Jacket" | "Love Hurts Varsity Jacket" | SKU matches — OK |
+| lh-005 | "The Fannie" | "The Fannie" (manifest says lh-006) | SKU MISMATCH — CSV says lh-005, manifest says lh-006 |
+| sg-015 | "The Windbreaker Set" | (no bundle) | Missing bundle — create or defer |
+
+**The only genuine problems:**
+- `lh-005` vs `lh-006`: the `manifest.json["sku"]` says `lh-006` but the CSV says `lh-005`. One of these is wrong. The ghost mannequin batch script must flag this SKU for manual resolution before running.
+- `br-012` and `sg-015`: no bundle directory exists yet. Ghost script skips these.
 
 ---
 
@@ -31,669 +117,367 @@ use them.
 ```
 wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv
                          |
-                         |  (single file, never forked)
+                         |  (single canonical source, never forked)
                          v
-         skyyrose/core/catalog_loader.py
+         skyyrose/core/catalog_loader.py  (EXISTS — no changes needed)
          +-----------------------------+
          | CATALOG_CSV constant        |
          | read_catalog_rows()         |
          | bool_col(), int_col()       |
          | status_from_row()           |
          +-------------+---------------+
-                       |  (all three layers import this)
-          +------------+-----------+
-          v            v           v
-   skyyrose/core/  skyyrose/core/  skyyrose/core/
-   bundle_map.py   garment.py      output_paths.py
-   (NEW)           (NEW)           (NEW)
-          |              |                |
-          +--------------+----------------+
-                         |
-              skyyrose/core/product_adapter.py
-              (NEW -- thin facade over the three above)
-                         |
-          +--------------+-----------+
-          v              v           v
-   renders/         scripts/        skyyrose/
-   config.py        nano_banana/    elite_studio/
-   (REFACTOR)       catalog.py      catalog.py
-                    (REBUILD)       (already imports core)
+                       |
+          +------------+-------------------+
+          v                                v
+   skyyrose/core/bundle_map.py       skyyrose/core/garment.py
+   (NEW — manifest.json index)       (NEW — GarmentSlug enum + prompt params)
+                       |
+                       v
+          skyyrose/core/output_paths.py
+          (NEW — canonical path constructors)
+                       |
+                       v
+          skyyrose/core/product_adapter.py
+          (NEW — ProductBundle; unified API for all pipelines)
+                       |
+          +------------+-----------+-------------+
+          v            v           v             v
+   renders/        nano_banana/  elite_studio/  scripts/
+   config.py       catalog.py   catalog.py     ghost_mannequin.py
+   (CREATE)        (REFACTOR)   (already OK)   (NEW)
 ```
 
----
-
-## Component Boundaries
+### Component Boundaries
 
 | Component | File | Responsibility | Imports |
 |---|---|---|---|
-| Raw loader | `skyyrose/core/catalog_loader.py` | CSV I/O, type coercions | stdlib only |
-| Bundle map | `skyyrose/core/bundle_map.py` | SKU to bundle directory resolution | `catalog_loader`, `pathlib` |
-| Garment router | `skyyrose/core/garment.py` | Name to GarmentType enum, prompt params | stdlib only |
-| Output paths | `skyyrose/core/output_paths.py` | Canonical output path construction | `pathlib` |
-| Product adapter | `skyyrose/core/product_adapter.py` | Unified product record assembly | `bundle_map`, `garment`, `output_paths`, `catalog_loader` |
-| Pipeline callers | `renders/`, `nano_banana/`, `elite_studio/` | Rendering logic | `product_adapter` only -- never `catalog_loader` directly |
+| Raw loader | `skyyrose/core/catalog_loader.py` | CSV I/O, type coercions | stdlib only — unchanged |
+| Bundle map | `skyyrose/core/bundle_map.py` | SKU to bundle directory via manifest.json index | `catalog_loader`, `pathlib`, `json`, `functools` |
+| Garment router | `skyyrose/core/garment.py` | Name to GarmentSlug enum, ghost prompt params | stdlib only |
+| Output paths | `skyyrose/core/output_paths.py` | Canonical output path constructors | `pathlib` only |
+| Product adapter | `skyyrose/core/product_adapter.py` | `ProductBundle` frozen dataclass; unified load API | `bundle_map`, `garment`, `output_paths`, `catalog_loader` |
+| Ghost batch script | `scripts/ghost_mannequin.py` | CLI batch orchestrator for ghost mannequin generation | `product_adapter`, cost gate, Gemini, fal, PIL |
+| CSV update tool | `scripts/approve_ghost.py` | Approve/reject renders, update CSV `front_model_image` | `product_adapter`, `catalog_loader` |
+| Cost gate | `skyyrose/core/cost_gate.py` | Shared STOP AND SHOW manifest + `input()` confirmation | stdlib only |
 
-No circular dependencies are possible because `core/` modules only import
-from the stdlib and each other in one direction.
+**No circular dependencies:** `core/` modules only import stdlib and each other in one direction.
+Pipeline scripts import `product_adapter` only — never `catalog_loader`, `bundle_map`, `garment`,
+or `output_paths` directly.
 
 ---
 
-## Where the SKU-to-Bundle Mapping Should Live
+## Where the SKU-to-Bundle Mapping Lives
 
-### Decision: `skyyrose/core/bundle_map.py` — Python module, not JSON
+### Decision: `skyyrose/core/bundle_map.py` — Python module reading manifest.json files
 
-The mapping must handle name normalization (em dash, apostrophes, special chars)
-and must be testable. A JSON file cannot run normalization logic. A Python
-module keeps normalization and mapping together, avoids a parse step, and
-imports cleanly from all three pipelines.
-
-The manifest.json files that already exist in each bundle directory are the
-authoritative source for the mapping — `manifest.json["sku"]` is the canonical
-SKU for that directory. The bundle map module reads all manifests at startup
-and builds the reverse index.
+The mapping indexes on `manifest.json["sku"]` at startup, cached with `lru_cache`. No name
+normalization is needed for lookup — SKU is the key. The `_normalize()` helper is kept for
+optional defensive search only.
 
 ```python
-# skyyrose/core/bundle_map.py
-
-from __future__ import annotations
-import json
-import unicodedata
-from pathlib import Path
-from functools import lru_cache
-
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-BUNDLES_DIR = PROJECT_ROOT / "data" / "product-bundles"
-
-
-def _normalize(text: str) -> str:
-    """Canonical form for name comparison.
-
-    Collapses em-dash / en-dash to hyphen, strips apostrophes,
-    lowercases, strips surrounding whitespace.
-    """
-    text = unicodedata.normalize("NFC", text)
-    text = text.replace("—", "-").replace("–", "-")
-    text = text.replace("’", "").replace("'", "")
-    return text.strip().lower()
-
+# skyyrose/core/bundle_map.py — key interface
 
 @lru_cache(maxsize=1)
 def _load_index() -> dict[str, Path]:
-    """Read every manifest.json and return {sku: bundle_dir_path}.
-
-    Called once; result is module-level cached.
-    """
-    index: dict[str, Path] = {}
-    if not BUNDLES_DIR.is_dir():
-        return index
-    for manifest_path in BUNDLES_DIR.glob("*/manifest.json"):
-        try:
-            data = json.loads(manifest_path.read_text(encoding="utf-8"))
-            sku = (data.get("sku") or "").strip().lower()
-            if sku:
-                index[sku] = manifest_path.parent
-        except Exception:
-            pass  # corrupt manifest -- skip, don't crash the pipeline
-    return index
-
+    """Read every manifest.json in data/product-bundles/. Returns {sku: dir_path}.
+    Called once; lru_cached at module level."""
 
 def bundle_dir(sku: str) -> Path | None:
-    """Return the bundle directory for a SKU, or None if not found."""
-    return _load_index().get(sku.strip().lower())
-
+    """Return bundle directory for sku, or None if not found."""
 
 def techflat_front(sku: str) -> Path | None:
-    """Return the techflat-front image path for a SKU, or None."""
-    d = bundle_dir(sku)
-    if d is None:
-        return None
-    for ext in (".jpeg", ".jpg", ".png", ".webp"):
-        candidate = d / f"techflat-front{ext}"
-        if candidate.exists():
-            return candidate
-    return None
-
+    """Return techflat-front.{jpeg,jpg,png} path, or None."""
 
 def techflat_back(sku: str) -> Path | None:
-    """Return the techflat-back image path for a SKU, or None."""
-    d = bundle_dir(sku)
-    if d is None:
-        return None
-    for ext in (".jpeg", ".jpg", ".png", ".webp"):
-        candidate = d / f"techflat-back{ext}"
-        if candidate.exists():
-            return candidate
-    return None
-
+    """Return techflat-back.{jpeg,jpg,png} path, or None."""
 
 def source_photo(sku: str) -> Path | None:
-    """Return source-photo path for a SKU (real photography), or None."""
-    d = bundle_dir(sku)
-    if d is None:
-        return None
-    for name in ("source-photo.jpeg", "source-photo.jpg", "source-photo.png"):
-        candidate = d / name
-        if candidate.exists():
-            return candidate
-    return None
-
+    """Return source-photo.{jpeg,jpg,png} path, or None."""
 
 def logo_ref(sku: str) -> Path | None:
-    """Return logo-ref image path for a SKU, or None."""
-    d = bundle_dir(sku)
-    if d is None:
-        return None
-    for ext in (".png", ".jpeg", ".jpg"):
-        candidate = d / f"logo-ref{ext}"
-        if candidate.exists():
-            return candidate
-    return None
-
+    """Return logo-ref.{png,jpeg,jpg} path, or None."""
 
 def spec_text(sku: str) -> str:
-    """Return spec.txt content for a SKU, or empty string."""
-    d = bundle_dir(sku)
-    if d is None:
-        return ""
-    p = d / "spec.txt"
-    return p.read_text(encoding="utf-8") if p.exists() else ""
-
+    """Return spec.txt content, or empty string."""
 
 def all_mapped_skus() -> list[str]:
-    """Return all SKUs that have a bundle directory."""
-    return sorted(_load_index().keys())
+    """All SKUs with a bundle directory."""
 ```
 
-### Why not extend manifest.json?
+### How the 3 pipelines import this
 
-The manifest.json files serve as directory metadata only. They are already
-correct -- `manifest.json["sku"]` is present and accurate in every bundle.
-The Python module reads them at startup and builds the reverse index. No
-changes to the manifest files are needed; the normalization problem is
-solved in `_normalize()` and the lru_cache means the disk read happens once.
+**nano_banana:** `pipeline._find_bundle_dir(name)` is replaced by `bundle_map.bundle_dir(sku)`.
+The `source_map.py` module (hardcoded dict) is deprecated and replaced by `bundle_map`.
 
-### Handling the 15 name-mismatch cases
+**Elite Studio:** `skyyrose/elite_studio/agents/vision_agent.py` currently constructs its own
+reference path. Replace `_reference_path(sku)` to call `bundle_map.source_photo(sku) or bundle_map.techflat_front(sku)`.
 
-The mismatches are between `CSV["name"]` and `manifest.json["name"]` / directory
-names. Since the bundle map indexes by `manifest.json["sku"]` (not by name),
-there is no name normalization needed for lookup -- SKU is always the key. The
-`_normalize()` function is kept for defensive fallback only. The 15 "mismatches"
-dissolve because the lookup path is always `bundle_dir(sku)`, never
-`bundle_dir_by_name(csv_name)`.
+**renders/ (FASHN):** `renders/preflight.py._detect_resolution_method()` calls `_find_bundle_dir(name)`
+from `renders.config`. Replace with `bundle_map.bundle_dir(sku)`.
 
 ---
 
-## Garment Type Enum and Routing
+## Ghost Mannequin Batch Script
 
-### `skyyrose/core/garment.py` — New module
+### Location: `scripts/ghost_mannequin.py` (NEW file)
 
-The garment type inference already exists in `skyyrose/elite_studio/fashion/context.py`
-(`_infer_garment_type`, `_GARMENT_TYPE_KEYWORDS`) and in `fashion/knowledge.py`
-(`GarmentType` dataclass, `_GARMENT_CATALOGUE`). These are currently
-elite-studio-private. Move the canonical enum and keyword map to `core/garment.py`
-so all pipelines use the same logic. The elite_studio versions become thin wrappers
-or are replaced with imports from core.
+Pattern: follows `scripts/nano_banana/cli.py` — argparse with subcommands.
 
-The 10 garment types present in the catalog (derived from all 30 product names):
+**Key design decisions:**
+1. The script is a thin CLI shell. Generation logic delegates to a `GhostPipeline` class.
+2. `GhostPipeline` uses the same provider wrappers already in `scripts/nano_banana/generate.py`
+   (Gemini 2.5 Flash Image, FLUX Fill Pro, PIL). No new provider code needed.
+3. The STOP AND SHOW gate runs before the first API call, shared via `skyyrose/core/cost_gate.py`.
+4. Output goes to `renders/ghost-mannequin/{sku}-ghost-front.webp` — this directory
+   is separate from the `renders/` Python package (FASHN pipeline).
 
-| Slug | CSV products | Keyword triggers | Ghost mannequin notes |
-|---|---|---|---|
-| `hoodie` | br-004, br-005, sg-006, kids-001, kids-002 | "hoodie" | Front + back; hood down flat; invisible mannequin |
-| `crewneck` | br-001, sg-013 | "crewneck" | Front + back flat; invisible mannequin |
-| `jersey` | br-003, br-008--012 | "jersey" | Flat lay only; number/lettering must be sharp |
-| `joggers` | br-002, lh-002, sg-014 | "joggers", "sweatpants" | Full length; waistband detail crop |
-| `shorts` | br-007, lh-003, sg-001, sg-003 | "shorts" | Front flat; inseam visible |
-| `shirt` | sg-002, sg-005, sg-011, sg-012 | "shirt", "tee" | Front + back; graphic detail crop |
-| `jacket` | br-006, lh-004, sg-009, sg-015 | "sherpa jacket", "varsity jacket", "jacket", "windbreaker" | Open + closed; collar detail |
-| `beanie` | sg-007 | "beanie" | Product flat + on-head 3/4 angle |
-| `fanny pack` | lh-005 | "fanny", "fannie" | Flat front + back; hardware detail |
-| `set` | kids-001, kids-002 | "hoodie set", "set" (after more-specific matches) | Both pieces + individual |
-
-Note: kids-001 and kids-002 are "Colorblock Hoodie Set" -- the "set" keyword
-is matched before "hoodie" because the keyword map is ordered longest-phrase-first.
-
-```python
-# skyyrose/core/garment.py
-
-from __future__ import annotations
-from enum import Enum
-
-
-class GarmentSlug(str, Enum):
-    HOODIE = "hoodie"
-    CREWNECK = "crewneck"
-    JERSEY = "jersey"
-    JOGGERS = "joggers"
-    SHORTS = "shorts"
-    SHIRT = "shirt"
-    JACKET = "jacket"
-    BEANIE = "beanie"
-    FANNY_PACK = "fanny pack"
-    SET = "set"
-    UNKNOWN = "unknown"
-
-
-# Order matters: longer / more-specific phrases must come before shorter ones.
-_KEYWORD_MAP: list[tuple[str, GarmentSlug]] = [
-    ("sherpa jacket", GarmentSlug.JACKET),
-    ("varsity jacket", GarmentSlug.JACKET),
-    ("bomber jacket", GarmentSlug.JACKET),
-    ("windbreaker set", GarmentSlug.SET),
-    ("basketball shorts", GarmentSlug.SHORTS),
-    ("hoodie set", GarmentSlug.SET),
-    ("colorblock hoodie set", GarmentSlug.SET),
-    ("hoodie", GarmentSlug.HOODIE),
-    ("crewneck", GarmentSlug.CREWNECK),
-    ("jersey", GarmentSlug.JERSEY),
-    ("joggers", GarmentSlug.JOGGERS),
-    ("sweatpants", GarmentSlug.JOGGERS),
-    ("shorts", GarmentSlug.SHORTS),
-    ("shirt", GarmentSlug.SHIRT),
-    ("tee", GarmentSlug.SHIRT),
-    ("jacket", GarmentSlug.JACKET),
-    ("windbreaker", GarmentSlug.JACKET),
-    ("beanie", GarmentSlug.BEANIE),
-    ("fanny", GarmentSlug.FANNY_PACK),
-    ("fannie", GarmentSlug.FANNY_PACK),
-    ("set", GarmentSlug.SET),
-]
-
-# Per-garment ghost mannequin prompt parameters
-_GHOST_PARAMS: dict[GarmentSlug, dict] = {
-    GarmentSlug.HOODIE: {
-        "views": ["front", "back"],
-        "mannequin_style": "invisible",
-        "hood_state": "down",
-        "special": "ribbed cuffs and hem visible, kangaroo pocket flat",
-    },
-    GarmentSlug.CREWNECK: {
-        "views": ["front", "back"],
-        "mannequin_style": "invisible",
-        "special": "ribbed crew neck and cuffs visible",
-    },
-    GarmentSlug.JERSEY: {
-        "views": ["front", "back"],
-        "mannequin_style": "flat_lay",
-        "special": (
-            "number and lettering detail must be sharp and legible; "
-            "no mannequin drape -- use flat lay on pure white surface; "
-            "alternating rose fill on numbers: front left=rose right=plain, "
-            "back left=plain right=rose"
-        ),
-    },
-    GarmentSlug.JOGGERS: {
-        "views": ["front", "back"],
-        "mannequin_style": "invisible",
-        "special": "full length shot; waistband detail crop required; tapered ankle visible",
-    },
-    GarmentSlug.SHORTS: {
-        "views": ["front", "back"],
-        "mannequin_style": "invisible",
-        "special": "inseam length visible; waistband and print detail",
-    },
-    GarmentSlug.SHIRT: {
-        "views": ["front", "back"],
-        "mannequin_style": "invisible",
-        "special": "graphic detail close-up crop required",
-    },
-    GarmentSlug.JACKET: {
-        "views": ["front", "back", "open"],
-        "mannequin_style": "invisible",
-        "special": "show both open and closed; collar and cuff detail shots",
-    },
-    GarmentSlug.BEANIE: {
-        "views": ["front", "on_head"],
-        "mannequin_style": "product_flat",
-        "special": "embroidery detail close-up; flat lay shows inner label",
-    },
-    GarmentSlug.FANNY_PACK: {
-        "views": ["front", "back"],
-        "mannequin_style": "product_flat",
-        "special": "hardware clip detail; worn-model scale reference",
-    },
-    GarmentSlug.SET: {
-        "views": ["set_together", "top", "bottom"],
-        "mannequin_style": "invisible",
-        "special": "complete set on mannequin; then individual pieces separately",
-    },
-    GarmentSlug.UNKNOWN: {
-        "views": ["front"],
-        "mannequin_style": "invisible",
-        "special": "",
-    },
-}
-
-
-def infer_garment(product_name: str, garment_type_lock: str = "") -> GarmentSlug:
-    """Infer GarmentSlug from product name, with optional lock override.
-
-    garment_type_lock: if set (from CSV garment_type_lock column), use directly.
-    Otherwise, match _KEYWORD_MAP in order (longer phrases first).
-    """
-    if garment_type_lock:
-        try:
-            return GarmentSlug(garment_type_lock.strip().lower())
-        except ValueError:
-            pass  # bad lock value -- fall through to inference
-
-    name_lower = product_name.lower()
-    for keyword, slug in _KEYWORD_MAP:
-        if keyword in name_lower:
-            return slug
-    return GarmentSlug.UNKNOWN
-
-
-def ghost_params(slug: GarmentSlug) -> dict:
-    """Return ghost mannequin prompt parameters for this garment type."""
-    return _GHOST_PARAMS.get(slug, _GHOST_PARAMS[GarmentSlug.UNKNOWN])
 ```
+scripts/ghost_mannequin.py
+    ↓ argparse: generate --sku br-001 | --all | --collection black-rose | --dry-run
+    ↓ load ProductBundle objects via product_adapter.load_all()
+    ↓ filter: ghost_ready == True (has techflat-front on disk)
+    ↓ STOP AND SHOW cost manifest (cost_gate.confirm())
+    ↓ for each product:
+         Stage 1: fal_client BRIA RMBG 2.0 → alpha matte
+         Stage 2: Gemini 2.5 Flash Image → ghost mannequin generation
+                  if collar fail → FLUX Fill Pro inpaint (collar zone only)
+         Stage 3: Gemini Flash QA → structured pass/fail check
+                  if fail → log to review_queue, skip write
+         Stage 4: PIL composite on #FFFFFF → pure white guarantee
+         write: renders/ghost-mannequin/{sku}-ghost-front.webp
+         log: per-SKU result to renders/ghost-mannequin/batch-log.json
+```
+
+**CLI interface mirrors nano-banana:**
+
+```bash
+python scripts/ghost_mannequin.py generate --sku br-001
+python scripts/ghost_mannequin.py generate --all
+python scripts/ghost_mannequin.py generate --collection black-rose
+python scripts/ghost_mannequin.py generate --dry-run        # STOP AND SHOW only, no API calls
+python scripts/ghost_mannequin.py approve --sku br-001      # delegates to approve_ghost.py
+python scripts/ghost_mannequin.py reject --sku br-001 --reason "collar collapsed"
+```
+
+**Integration with existing nano-banana pipeline:**
+- Does NOT call `nano_banana.pipeline.ProductionPipeline`. That pipeline is for on-model
+  renders (tryon style). Ghost mannequin is a separate, simpler 4-stage pipeline.
+- Shares provider auth: same `.env.secrets`, same `fal_client`, same `google.genai` client.
+- Does NOT use `nano_banana.router` — routing for ghost mannequin is simpler: Gemini
+  2.5 Flash Image for all SKUs, FLUX Fill Pro only as collar fallback.
+- Prompt templates are defined in the ghost script itself (`_GHOST_PROMPT_TEMPLATE`,
+  `_JERSEY_ADDITIONS`, `_COLLAR_FALLBACK_PROMPT`). Not in `nano_banana.prompt_registry`.
+
+**Integration with Elite Studio ghost mannequin (Plan B2):**
+- `scripts/ghost_mannequin.py` is the **batch CLI** for 30-product runs from techflats.
+- `skyyrose/elite_studio/` ghost mannequin (the plan doc) is the **dual-agent LangGraph pipeline**
+  for single-SKU high-fidelity generation with dual vision consensus.
+- They are parallel, not sequential. Both write to `renders/ghost-mannequin/`.
+- For v1.2, `scripts/ghost_mannequin.py` is the primary deliverable. Elite Studio Phase B2
+  is a follow-on milestone.
 
 ---
 
-## Output Path Convention
+## STOP AND SHOW Cost Gate
 
-### `skyyrose/core/output_paths.py` — New module
+### Location: `skyyrose/core/cost_gate.py` (NEW file)
 
-```python
-# skyyrose/core/output_paths.py
+**Why here:** The STOP AND SHOW gate must be shared across all three pipelines
+(`renders/`, `nano_banana/`, `scripts/ghost_mannequin.py`). It cannot live in
+one pipeline and be imported by the others — that creates a cross-layer dependency.
+`skyyrose/core/` is the correct home (stdlib-only imports, no pipeline dependencies).
 
-from __future__ import annotations
-from pathlib import Path
-
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-
-# Ghost mannequin renders (pending human review before CSV update)
-GHOST_MANNEQUIN_DIR = PROJECT_ROOT / "renders" / "ghost-mannequin"
-
-# FASHN tryon renders (existing pipeline)
-TRYON_DIR = PROJECT_ROOT / "renders" / "tryon"
-
-# Elite Studio compositor output
-COMPOSITOR_DIR = PROJECT_ROOT / "renders" / "compositor"
-
-
-def ghost_front(sku: str) -> Path:
-    """Canonical path: renders/ghost-mannequin/{sku}-ghost-front.webp"""
-    return GHOST_MANNEQUIN_DIR / f"{sku}-ghost-front.webp"
-
-
-def ghost_back(sku: str) -> Path:
-    """Canonical path: renders/ghost-mannequin/{sku}-ghost-back.webp"""
-    return GHOST_MANNEQUIN_DIR / f"{sku}-ghost-back.webp"
-
-
-def tryon_render(sku: str, model_id: str, sample: int) -> Path:
-    """Canonical path: renders/tryon/{sku}/{sku}-{model_id}-s{NN}.webp"""
-    return TRYON_DIR / sku / f"{sku}-{model_id}-s{sample:02d}.webp"
-
-
-def compositor_output(sku: str, view: str = "front") -> Path:
-    """Canonical path: renders/compositor/{sku}-composite-{view}.webp"""
-    return COMPOSITOR_DIR / f"{sku}-composite-{view}.webp"
-
-
-def ensure_dirs() -> None:
-    """Create all output directories if they do not exist."""
-    for d in (GHOST_MANNEQUIN_DIR, TRYON_DIR, COMPOSITOR_DIR):
-        d.mkdir(parents=True, exist_ok=True)
-```
-
----
-
-## Shared Product Adapter
-
-### `skyyrose/core/product_adapter.py` — New module
-
-This is the single import surface for all pipeline callers. Pipelines never
-import `catalog_loader`, `bundle_map`, `garment`, or `output_paths` directly.
+**Pattern:** Based on `renders/preflight.py` which already implements the canonical
+STOP AND SHOW format. Extract the display + confirmation logic into a reusable module.
 
 ```python
-# skyyrose/core/product_adapter.py
+# skyyrose/core/cost_gate.py — key interface
 
-from __future__ import annotations
+@dataclass
+class CostLineItem:
+    stage: str          # "Stage 1: BRIA RMBG 2.0"
+    tool: str           # "fal.ai"
+    cost_per_item: float
+    item_count: int
+    subtotal: float
+    notes: str = ""
 
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Any
+@dataclass
+class CostManifest:
+    action: str         # "Ghost mannequin batch — 30 SKUs"
+    items: list[CostLineItem]
+    total_usd: float
+    sku_list: list[str]
 
-from skyyrose.core import bundle_map as _bundle_map
-from skyyrose.core import garment as _garment
-from skyyrose.core import output_paths as _output_paths
-from skyyrose.core.catalog_loader import read_catalog_rows, status_from_row
+class PreflightAborted(RuntimeError):
+    """Raised when user declines or source files are missing."""
 
+def confirm(manifest: CostManifest, *, skip: bool = False) -> None:
+    """Print manifest table + prompt for 'y'. Raise PreflightAborted if declined.
 
-@dataclass(frozen=True)
-class ProductBundle:
-    """Complete product record for pipeline consumption.
-
-    Combines CSV fields, resolved bundle paths, garment type, and
-    canonical output paths into a single immutable object.
+    skip=True for CI/non-interactive contexts (--skip-preflight flag).
+    Follows the CLAUDE.md STOP AND SHOW format exactly.
     """
 
-    # From CSV
-    sku: str
-    name: str
-    collection: str
-    status: str  # 'live' | 'pre-order' | 'draft' | 'retired'
-    price_usd: float
-    branding_spec: str
-    render_output_slug: str
-    is_tech_flat: bool
-    is_accessory: bool
-    csv_image: str
-    csv_front_model_image: str
-    csv_back_image: str
-    csv_back_model_image: str
+def build_ghost_manifest(products: list[ProductBundle]) -> CostManifest:
+    """Build cost manifest for a ghost mannequin batch run."""
 
-    # Resolved from bundle (None if no bundle directory found)
-    bundle_directory: Path | None
-    techflat_front: Path | None
-    techflat_back: Path | None
-    source_photo: Path | None
-    logo_ref: Path | None
-    spec_text: str
-
-    # Derived
-    garment_slug: _garment.GarmentSlug
-    ghost_render_params: dict[str, Any]
-
-    # Output paths (directories not yet created -- call output_paths.ensure_dirs())
-    out_ghost_front: Path
-    out_ghost_back: Path
-
-    @property
-    def primary_source(self) -> Path | None:
-        """Best available source image for rendering.
-
-        Prefers real photography over techflat.
-        For ghost mannequin runs, always use techflat_front instead.
-        """
-        return self.source_photo or self.techflat_front
-
-    @property
-    def has_bundle(self) -> bool:
-        return self.bundle_directory is not None
-
-    @property
-    def ghost_ready(self) -> bool:
-        """True if techflat-front exists on disk and can enter ghost pipeline."""
-        return self.techflat_front is not None and self.techflat_front.exists()
-
-
-def load_all(
-    *,
-    active_only: bool = True,
-    collection: str | None = None,
-    skus: list[str] | None = None,
-) -> list[ProductBundle]:
-    """Load all products from the canonical CSV as ProductBundle objects.
-
-    Filters (all optional):
-        active_only: exclude 'retired' products (default True)
-        collection:  restrict to one collection slug
-        skus:        restrict to an explicit list of SKUs
-    """
-    rows = read_catalog_rows()
-    bundles = []
-    for row in rows:
-        sku = row["sku"].strip().lower()
-
-        if skus is not None and sku not in [s.lower() for s in skus]:
-            continue
-
-        status = status_from_row(row)
-        if active_only and status == "retired":
-            continue
-
-        col = row.get("collection", "").strip()
-        if collection and col != collection:
-            continue
-
-        bundles.append(_row_to_bundle(sku, row, status))
-
-    return bundles
-
-
-def load_sku(sku: str) -> ProductBundle:
-    """Load a single product by SKU. Raises KeyError if not found."""
-    rows = read_catalog_rows()
-    sku_lower = sku.strip().lower()
-    for row in rows:
-        if row["sku"].strip().lower() == sku_lower:
-            status = status_from_row(row)
-            return _row_to_bundle(sku_lower, row, status)
-    raise KeyError(f"SKU {sku!r} not found in catalog")
-
-
-def _row_to_bundle(sku: str, row: dict, status: str) -> ProductBundle:
-    name = row.get("name", "").strip()
-    garment_slug = _garment.infer_garment(
-        name,
-        garment_type_lock=row.get("garment_type_lock", "").strip(),
-    )
-    return ProductBundle(
-        sku=sku,
-        name=name,
-        collection=row.get("collection", "").strip(),
-        status=status,
-        price_usd=float(row.get("price") or 0.0),
-        branding_spec=row.get("branding_spec", "").strip(),
-        render_output_slug=row.get("render_output_slug", sku).strip() or sku,
-        is_tech_flat=row.get("render_is_tech_flat", "").strip() == "1",
-        is_accessory=row.get("render_is_accessory", "").strip() == "1",
-        csv_image=row.get("image", "").strip(),
-        csv_front_model_image=row.get("front_model_image", "").strip(),
-        csv_back_image=row.get("back_image", "").strip(),
-        csv_back_model_image=row.get("back_model_image", "").strip(),
-        bundle_directory=_bundle_map.bundle_dir(sku),
-        techflat_front=_bundle_map.techflat_front(sku),
-        techflat_back=_bundle_map.techflat_back(sku),
-        source_photo=_bundle_map.source_photo(sku),
-        logo_ref=_bundle_map.logo_ref(sku),
-        spec_text=_bundle_map.spec_text(sku),
-        garment_slug=garment_slug,
-        ghost_render_params=_garment.ghost_params(garment_slug),
-        out_ghost_front=_output_paths.ghost_front(sku),
-        out_ghost_back=_output_paths.ghost_back(sku),
-    )
+def build_tryon_manifest(products, num_models, num_samples) -> CostManifest:
+    """Build cost manifest for a FASHN tryon run (replaces renders/preflight logic)."""
 ```
+
+**Migration path for existing pipelines:**
+- `renders/preflight.py` continues to work unchanged in v1.2. The `cost_gate` module
+  is the target state for v1.3 when `renders/preflight.py` is refactored.
+- `scripts/ghost_mannequin.py` uses `cost_gate` directly from the start.
+- `nano_banana/cli.py` currently shows `--- Cost Estimate ---` inline in `cmd_produce`.
+  It uses `router.estimate_batch_cost()`. Migrate to `cost_gate.confirm()` in the
+  refactor step (Step 9).
 
 ---
 
-## How Pipelines Import from the Adapter
+## CSV `front_model_image` Update Tool
 
-### renders/ (FASHN tryon pipeline)
+### Location: `scripts/approve_ghost.py` (NEW file)
 
-`renders/config.py` does not exist on disk yet. It must be created. Replace
-the inline `PRODUCT_CATALOG` dict construction with:
+**How it integrates safely with the canonical CSV:**
+
+The CSV is a plain text file. Updating it in-place requires a read-modify-write
+that preserves all other fields and row order exactly. The tool must:
+
+1. Read the entire CSV with `csv.DictReader`
+2. Find the row where `sku == target_sku`
+3. Update `front_model_image` to the relative path of the approved render
+4. Write all rows back with `csv.DictWriter` using the same fieldnames in the same order
+5. Validate: re-read the CSV and confirm the update is correct before returning
+
+**The canonical relative path format** (from existing CSV rows):
+```
+assets/images/products/{sku}-ghost-front.webp
+```
+This is the WordPress theme path. Before updating the CSV, the approved render
+must be copied from `renders/ghost-mannequin/{sku}-ghost-front.webp` to
+`wordpress-theme/skyyrose-flagship/assets/images/products/{sku}-ghost-front.webp`.
 
 ```python
-# renders/config.py
-from skyyrose.core.product_adapter import load_all, ProductBundle
+# scripts/approve_ghost.py — CLI
 
-PRODUCT_CATALOG: list[ProductBundle] = load_all(active_only=True)
+# approve: copies render to wp assets dir, updates CSV front_model_image
+python scripts/approve_ghost.py approve --sku br-001
+
+# reject: logs rejection reason to renders/ghost-mannequin/rejected.json
+python scripts/approve_ghost.py reject --sku br-001 --reason "collar collapsed"
+
+# status: shows all pending/approved/rejected renders
+python scripts/approve_ghost.py status
 ```
 
-The `renders/__main__.py` already imports `PRODUCT_CATALOG` from `renders.config`.
-Once `renders/config.py` exists and returns `ProductBundle` objects, update
-attribute access from `p["sku"]` dict-style to `p.sku` attribute-style throughout
-`renders/__main__.py` and `renders/preflight.py`.
+**Shared via `scripts/ghost_mannequin.py`:**
+The ghost mannequin batch script's `approve` and `reject` subcommands delegate to
+`approve_ghost.py` functions. They are in a separate file because approval is a
+separate concern from generation and may be run days later.
 
-### scripts/nano_banana/ (rebuild)
-
-Source .py files are gone (only .pyc remain). The rebuild becomes trivial:
-
-```python
-# scripts/nano_banana/catalog.py  (new file replacing deleted source)
-from skyyrose.core.product_adapter import load_all, load_sku, ProductBundle
-
-__all__ = ["load_all", "load_sku", "ProductBundle"]
-```
-
-All other nano_banana modules that previously imported from an internal catalog
-module import from this shim instead.
-
-### skyyrose/elite_studio/catalog.py (already correct -- minor fix needed)
-
-The `Catalog` class already imports from `skyyrose.core.catalog_loader` correctly.
-
-The one bug: `skyyrose/elite_studio/fashion/context.py` line 23 sets
-`_CATALOG_PATH` to `data/product-catalog.csv` (retired path). Replace
-`_load_catalog()` and the stale `_CATALOG_PATH` constant with a call to
-`product_adapter.load_all()`, and replace the `garment_type` inference with
-`garment.infer_garment(product_name)` from `skyyrose.core.garment`.
+**Safety rules:**
+- Never overwrite a `front_model_image` that already has a real value without `--force`.
+- Always print the old value and new value before writing.
+- The CSV write is atomic: write to a `.tmp` file, rename to replace.
 
 ---
 
-## Build Order
-
-What must exist before what:
+## Data Flow (End to End)
 
 ```
-Step 1  skyyrose/core/bundle_map.py        stdlib + pathlib only
-Step 2  skyyrose/core/garment.py           stdlib only
-Step 3  skyyrose/core/output_paths.py      pathlib only
-Step 4  skyyrose/core/product_adapter.py   steps 1-3 + catalog_loader.py (already exists)
-Step 5  skyyrose/core/__init__.py update   expose the new public modules
----
-Step 6  renders/config.py (create)         depends on step 4
-Step 7  renders/__main__.py refactor       dict access -> attribute access
-Step 8  renders/preflight.py refactor      remove _find_bundle_dir import (now in bundle_map)
----
-Step 9  scripts/nano_banana/catalog.py (rebuild)  depends on step 4
----
-Step 10 elite_studio/fashion/context.py fix  replace stale CSV path with product_adapter
----
-Step 11 ghost mannequin batch script        depends on steps 4, 3
-Step 12 CSV front_model_image update tool   depends on step 11 + human review gate
-```
-
-Steps 1-5: one commit ("feat(core): canonical bundle map + garment router + output paths + product adapter")
-Steps 6-8: one commit ("refactor(renders): wire FASHN pipeline to product adapter")
-Step 9: one commit ("refactor(nano-banana): rebuild catalog module from product adapter")
-Step 10: one commit ("fix(elite-studio): replace stale catalog path in fashion context")
-Steps 11-12: separate commits, step 12 blocked by human approval.
-
----
-
-## Data Flow
-
-```
-CSV row
-  -> read_catalog_rows()       [catalog_loader]
-  -> status_from_row()         [catalog_loader]
-  -> infer_garment(name)       [garment]
-  -> bundle_dir(sku)           [bundle_map]  <-- reads manifest.json once, lru_cached
-  -> techflat_front(sku)       [bundle_map]
-  -> ghost_front(sku)          [output_paths]
-  -> ProductBundle (frozen)    [product_adapter]
+skyyrose-catalog.csv
+    ↓ read_catalog_rows()  [catalog_loader]
+    ↓ status_from_row()    [catalog_loader]
+    ↓ infer_garment(name)  [garment]
+    ↓ bundle_dir(sku)      [bundle_map] ← reads manifest.json once, lru_cached
+    ↓ techflat_front(sku)  [bundle_map]
+    ↓ ghost_front(sku)     [output_paths]
+    ↓ ProductBundle        [product_adapter] — frozen, immutable
 
 ProductBundle consumed by:
-  ghost mannequin pipeline  reads .techflat_front  writes to .out_ghost_front
-  FASHN tryon pipeline      reads .primary_source  writes to tryon_render(sku, model, sample)
-  Elite Studio compositor   reads .branding_spec, .logo_ref, .garment_slug
-  CSV update tool           reads .out_ghost_front (after review), writes CSV front_model_image
+    ghost_mannequin.py      .techflat_front → generation → .out_ghost_front
+    renders/__main__.py     .primary_source → FASHN → tryon_render()
+    elite_studio/catalog.py .branding_spec, .logo_ref → compositor
+    approve_ghost.py        .out_ghost_front → copy to WP assets → CSV update
 ```
+
+---
+
+## Build Order (Respecting Dependencies)
+
+```
+Step 1   skyyrose/core/bundle_map.py      NEW     stdlib + pathlib only
+Step 2   skyyrose/core/garment.py         NEW     stdlib only
+Step 3   skyyrose/core/output_paths.py    NEW     pathlib only
+Step 4   skyyrose/core/product_adapter.py NEW     steps 1-3 + catalog_loader (exists)
+Step 5   skyyrose/core/cost_gate.py       NEW     stdlib only
+         [commit: feat(core): canonical bundle map + garment + output paths + adapter + cost gate]
+
+Step 6   renders/config.py                CREATE  imports product_adapter
+Step 7   renders/__main__.py              REFACTOR dict access → attribute access
+Step 8   renders/preflight.py             REFACTOR replace _find_bundle_dir(name) with bundle_map.bundle_dir(sku)
+         [commit: refactor(renders): wire FASHN pipeline to product adapter]
+
+Step 9   scripts/nano_banana/pipeline.py  MODIFY  replace _find_bundle_dir(name) with bundle_map.bundle_dir(sku)
+Step 10  scripts/nano_banana/source_map.py RETIRE  replace calls with bundle_map equivalents
+         [commit: refactor(nano-banana): replace name-based bundle lookup with SKU-indexed bundle_map]
+
+Step 11  scripts/ghost_mannequin.py       CREATE  depends on steps 1-5
+Step 12  scripts/approve_ghost.py         CREATE  depends on step 11 (review gate)
+         [commit: feat(imagery): ghost mannequin batch script + approve/reject CSV update tool]
+
+Step 13  skyyrose/elite_studio — lh-005/lh-006 sku mismatch in manifest.json resolved manually
+         [commit: fix(bundles): correct lh-006 manifest sku to lh-005]
+```
+
+Steps 1-5 are strictly independent of each other at the file level and can be
+written in a single commit. Each step only depends on files that exist before it
+in the sequence.
+
+Steps 11-12 are blocked by steps 1-5 completing (need `ProductBundle` and `cost_gate`).
+Steps 6-10 are blocked by step 4 completing. Steps 6-10 are independent of each other
+and can be done in any order.
+
+Step 13 must happen before the ghost mannequin batch runs `lh-005`.
+
+---
+
+## New vs Modified Files
+
+### New Files
+
+| File | Type | Why New |
+|---|---|---|
+| `skyyrose/core/bundle_map.py` | Core module | SKU→bundle resolution; needed by all pipelines |
+| `skyyrose/core/garment.py` | Core module | Garment type routing; currently private to elite_studio |
+| `skyyrose/core/output_paths.py` | Core module | Canonical output paths; needed by script + CSV tool |
+| `skyyrose/core/product_adapter.py` | Core module | Unified `ProductBundle`; single import for pipelines |
+| `skyyrose/core/cost_gate.py` | Core module | Shared STOP AND SHOW gate |
+| `renders/config.py` | Pipeline config | Doesn't exist yet; `__main__.py` imports it |
+| `scripts/ghost_mannequin.py` | Batch script | Main deliverable for v1.2 |
+| `scripts/approve_ghost.py` | CLI tool | CSV update after review approval |
+
+### Modified Files
+
+| File | What Changes |
+|---|---|
+| `skyyrose/core/__init__.py` | Expose new public modules (`bundle_map`, `garment`, `output_paths`, `product_adapter`, `cost_gate`) |
+| `scripts/nano_banana/pipeline.py` | Replace `_find_bundle_dir(name)` with `bundle_map.bundle_dir(sku)` |
+| `scripts/nano_banana/source_map.py` | Retire hardcoded dict; replace with calls to `bundle_map` |
+| `renders/__main__.py` | Dict-style `p["sku"]` access → attribute-style `p.sku` |
+| `renders/preflight.py` | Replace `_find_bundle_dir(name)` import with `bundle_map.bundle_dir(sku)` |
+| `data/product-bundles/The Fannie/manifest.json` | Fix `sku` from `lh-006` to `lh-005` (genuine SKU mismatch) |
+
+### Untouched Files
+
+| File | Reason |
+|---|---|
+| `skyyrose/core/catalog_loader.py` | Already correct; interface is stable |
+| `skyyrose/elite_studio/catalog.py` | Already imports `catalog_loader` correctly |
+| `skyyrose/elite_studio/agents/` | Phase B2 plan is a separate milestone |
+| `wordpress-theme/` PHP files | PHP catalog helpers are independent of Python pipelines |
 
 ---
 
@@ -701,58 +485,33 @@ ProductBundle consumed by:
 
 ### Anti-Pattern 1: Name-based bundle lookup
 
-What goes wrong: resolving `data/product-bundles/` directories by matching
-the CSV `name` field to the directory name. 15 of 30 products have mismatches
-(em dashes, apostrophes, capitalization differences).
+The current `pipeline._find_bundle_dir(name)` matches the product name against
+bundle directory names. This breaks for 11 of 30 products (em dashes, apostrophes,
+capitalization, name changes). **Never index on name. Always use SKU via `manifest.json["sku"]`.**
 
-Prevention: always index on `manifest.json["sku"]`. Directory names are
-irrelevant to the lookup.
+### Anti-Pattern 2: Writing CSV fields in multiple places
 
-### Anti-Pattern 2: Multiple CSV readers
+The `front_model_image` column must only be written by `approve_ghost.py`. Ghost generation
+writes to `renders/ghost-mannequin/` (pending). Only the explicit approval step touches
+the canonical CSV. Any other code that writes CSV fields directly is a reliability hazard.
 
-What goes wrong: `fashion/context.py` currently opens `data/product-catalog.csv`
-(retired path) independently of `catalog_loader.py`. Two read paths diverge silently.
+### Anti-Pattern 3: Ghost batch script calling FASHN or Elite Studio
 
-Prevention: all CSV access goes through `catalog_loader.read_catalog_rows()`.
-No other code opens the CSV file directly.
+Ghost mannequin is a separate, simpler pipeline. It does not compose with the FASHN
+tryon pipeline (`renders/`) or the Elite Studio compositor (`skyyrose/elite_studio/`).
+The three pipelines share only the CSV adapter and cost gate — not generation logic.
 
-### Anti-Pattern 3: Inline product dicts in pipeline config
+### Anti-Pattern 4: Hardcoded cost constants in script files
 
-What goes wrong: building `PRODUCT_CATALOG` as a static hardcoded list,
-separate from the CSV. Adding a new product requires editing two files.
-
-Prevention: `renders/config.py` calls `product_adapter.load_all()` at import
-time. The CSV is the only place to add a product.
-
-### Anti-Pattern 4: garment_type_lock in override JSON only
-
-What goes wrong: the garment type lock lives in
-`skyyrose/elite_studio/prompts/overrides/` (camelCase `garmentTypeLock`)
-and is not available to other pipelines.
-
-Prevention: add a `garment_type_lock` column to the CSV. The `product_adapter`
-reads it and passes it to `infer_garment()`. Override JSONs continue to work
-for elite-studio-specific overrides, but the garment type is authoritative
-from the CSV for all pipelines.
+Cost per API call changes. The `_COST_PER_SAMPLE`, `_BG_REMOVE_COST` constants currently
+duplicated in `renders/preflight.py` should not be duplicated again in `ghost_mannequin.py`.
+They live in `cost_gate.py` and are imported from there.
 
 ### Anti-Pattern 5: Output path construction in each pipeline
 
-What goes wrong: each pipeline constructs its own output path string, which
-cannot be referenced from the CSV update tool without duplicating the string logic.
-
-Prevention: all output paths come from `output_paths.py`. The CSV update
-tool imports the same function and knows exactly where to look.
-
----
-
-## Scalability Considerations
-
-| Concern | Current (30 products) | Future (300+ products) |
-|---|---|---|
-| Bundle index | lru_cache on `_load_index()`, one disk scan at startup | Same -- scale is fine |
-| CSV load | ~1ms | Add lru_cache to read_catalog_rows if called in tight loops |
-| Output dirs | Flat `ghost-mannequin/` directory | Add `sku[:2]/` sharding if >1000 files |
-| Ghost batch | Sequential by default | Add `--workers N` for concurrent execution |
+Each pipeline must call `output_paths.ghost_front(sku)` / `output_paths.ghost_back(sku)`.
+No pipeline should construct the `renders/ghost-mannequin/{sku}-ghost-front.webp` string
+inline. The CSV update tool imports the same function and knows exactly where to look.
 
 ---
 
@@ -760,25 +519,26 @@ tool imports the same function and knows exactly where to look.
 
 | Area | Confidence | Basis |
 |---|---|---|
-| Bundle map design | HIGH | Read manifest.json in multiple bundle dirs; sku field present and correct in all checked |
-| Garment types | HIGH | Read `fashion/knowledge.py` catalogue + `fashion/context.py` keywords; cross-checked all 30 CSV product names |
-| Output path convention | HIGH | `renders/ghost-mannequin/{sku}-ghost-front.webp` matches PROJECT.md requirement explicitly |
-| Adapter import safety | HIGH | Dependency chain verified: `core/` imports only stdlib; no pipeline imports `core/` creating a cycle |
-| renders/config.py | MEDIUM | `__main__.py` imports `renders.config` but the file is not on disk. Must be created as part of Step 6. |
-| nano_banana catalog | LOW | Source .py files deleted; only .pyc remain in `__pycache__`. Module must be rebuilt. Rebuilt module structure assumed from cache filenames. |
-| fashion/context.py stale path | HIGH | Line 23 confirmed: `_CATALOG_PATH = Path(...) / "data" / "product-catalog.csv"` -- retired file path |
+| Bundle map design | HIGH | Read manifest.json in 5+ bundle dirs; sku field confirmed present and correct |
+| nano_banana source files | HIGH | Confirmed present — source .py files exist in `scripts/nano_banana/` |
+| renders/ = FASHN pipeline | HIGH | Read `renders/preflight.py` — cost constants are FASHN-specific ($0.075/image) |
+| STOP AND SHOW pattern | HIGH | Full implementation confirmed in `renders/preflight.py` |
+| ghost_mannequin.py not yet existing | HIGH | No file found; must be created |
+| renders/config.py not existing | HIGH | Confirmed missing; `__main__.py` imports it |
+| lh-005/lh-006 sku mismatch | HIGH | Confirmed: `The Fannie/manifest.json` has `"sku": "lh-006"` but catalog says lh-005 |
+| br-012 / sg-015 missing bundles | HIGH | Confirmed: no bundle directory for either |
+| Cost gate shared module | MEDIUM | Pattern clear from `renders/preflight.py`; new module needs writing |
+| Garment types | HIGH | Read `scripts/nano_banana/router.py` + all 30 CSV product names |
 
 ## Sources
 
-All findings derived from direct file reads in this session:
+All findings derived from direct file reads and pyc decompilation in this session:
 
-- `/Users/theceo/DevSkyy/skyyrose/core/catalog_loader.py`
-- `/Users/theceo/DevSkyy/skyyrose/elite_studio/catalog.py`
-- `/Users/theceo/DevSkyy/skyyrose/elite_studio/fashion/context.py`
-- `/Users/theceo/DevSkyy/skyyrose/elite_studio/fashion/knowledge.py`
-- `/Users/theceo/DevSkyy/skyyrose/elite_studio/models.py`
-- `/Users/theceo/DevSkyy/skyyrose/elite_studio/prompts/templates.py`
-- `/Users/theceo/DevSkyy/renders/__init__.py`, `__main__.py`, `preflight.py`
-- `/Users/theceo/DevSkyy/data/product-bundles/*/manifest.json` (multiple)
-- `/Users/theceo/DevSkyy/.planning/PROJECT.md`
-- CSV columns confirmed: `sku, name, price, collection, description, badge, image, front_model_image, back_image, back_model_image, sizes, color, edition_size, published, is_preorder, branding_spec, render_output_slug, render_source_override, render_back_source_override, render_is_tech_flat, render_is_accessory`
+- `/Users/theceo/DevSkyy/skyyrose/core/catalog_loader.py` — read in full
+- `/Users/theceo/DevSkyy/skyyrose/elite_studio/catalog.py` — read in full
+- `/Users/theceo/DevSkyy/scripts/nano_banana/__pycache__/*.pyc` — all modules decompiled (strings + names)
+- `/Users/theceo/DevSkyy/renders/preflight.py` — read in full
+- `/Users/theceo/DevSkyy/docs/superpowers/plans/2026-04-20-ghost-mannequin-pipeline.md` — read in full
+- `data/product-bundles/*/manifest.json` — all 32 manifests read via cross-reference script
+- `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv` — headers + 5 rows confirmed
+- Cross-reference script output: 19/30 exact matches; 11 mismatches catalogued

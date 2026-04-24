@@ -89,6 +89,12 @@ class GoogleADKAgent(BaseDevSkyyAgent):
         if not GOOGLE_ADK_AVAILABLE:
             raise ImportError("Google ADK not installed. Install with: pip install google-adk")
 
+        # Ensure environment variable is set for the underlying google-genai SDK
+        from adk.base import get_api_key
+        key = get_api_key(ADKProvider.GOOGLE)
+        if key and not os.getenv("GOOGLE_API_KEY"):
+            os.environ["GOOGLE_API_KEY"] = key
+
         try:
             # Build tools list
             tools = []
@@ -102,7 +108,7 @@ class GoogleADKAgent(BaseDevSkyyAgent):
                 model=self._get_model_string(),
                 instruction=self.config.system_prompt or self._default_instruction(),
                 description=self.config.description,
-                tools=tools if tools else None,
+                tools=tools if tools else [],
             )
 
             # Create session service
@@ -316,7 +322,7 @@ class GoogleMultiAgent(BaseDevSkyyAgent):
                 model="gemini-2.0-flash",
                 instruction=self.config.system_prompt or self._coordinator_instruction(),
                 description="Coordinator agent for SkyyRose operations",
-                sub_agents=sub_agent_instances if sub_agent_instances else None,
+                sub_agents=sub_agent_instances if sub_agent_instances else [],
             )
 
             self._initialized = True

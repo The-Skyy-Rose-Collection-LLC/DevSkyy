@@ -372,12 +372,19 @@ class VirtualPhotoshootGenerator:
         index: int,
     ) -> Path:
         """Render scene from camera position."""
-        render_path = self.output_dir / "renders" / f"{product_sku}_render_{index}.png"
+        # Save to SKU-specific folder if it looks like one, otherwise 'renders'
+        out_base = self.output_dir / product_sku
+        if not out_base.exists():
+            out_base = self.output_dir / "renders"
+        
+        out_base.mkdir(parents=True, exist_ok=True)
+        render_path = out_base / f"{product_sku}_render_{index}.png"
 
         try:
             import numpy as np
             import trimesh
             from PIL import Image
+            import io
 
             # Load mesh
             mesh = trimesh.load(str(model_path))
@@ -391,16 +398,43 @@ class VirtualPhotoshootGenerator:
             x = distance * np.cos(elevation) * np.sin(azimuth)
             y = distance * np.sin(elevation)
             z = distance * np.cos(elevation) * np.cos(azimuth)
+            
+            # Use pyrender for higher quality headless rendering if available
+            try:
+                import pyrender
+                # Set up pyrender scene
+                pr_scene = pyrender.Scene(bg_color=[1.0, 1.0, 1.0])
+                
+                # Convert trimesh to pyrender mesh
+                pr_mesh = pyrender.Mesh.from_trimesh(mesh)
+                pr_scene.add(pr_mesh)
+                
+                # Add camera
+                camera = pyrender.PerspectiveCamera(yfov=np.pi / 3.0)
+                cam_pose = np.array([
+                    [np.cos(azimuth), -np.sin(azimuth)*np.sin(elevation),  np.sin(azimuth)*np.cos(elevation), x],
+                    [0,                np.cos(elevation),                 np.sin(elevation),                y],
+                    [-np.sin(azimuth), -np.cos(azimuth)*np.sin(elevation),  np.cos(azimuth)*np.cos(elevation), z],
+                    [0,                0,                                 0,                                1]
+                ])
+                pr_scene.add(camera, pose=cam_pose)
+                
+                # Add light
+                light = pyrender.DirectionalLight(color=[1.0, 1.0, 1.0], intensity=5.0)
+                pr_scene.add(light, pose=cam_pose)
+                
+                # Render
+                r = pyrender.OffscreenRenderer(2048, 2048)
+                color, _ = r.render(pr_scene)
+                r.delete()
+                
+                render_img = Image.fromarray(color)
+            except Exception as pr_err:
+                logger.debug(f"Pyrender failed, falling back to trimesh: {pr_err}")
+                # Fallback to trimesh basic rendering
+                png_data = tr_scene.save_image(resolution=(2048, 2048))
+                render_img = Image.open(io.BytesIO(png_data))
 
-            # Set camera position (simplified)
-            camera_pose = np.eye(4)
-            camera_pose[:3, 3] = [x, y, z]
-
-            # Render
-            png_data = tr_scene.save_image(resolution=(2048, 2048))
-
-            # Convert to PIL Image
-            render_img = Image.open(io.BytesIO(png_data))
             render_array = np.array(render_img)
 
             # Apply background color if set

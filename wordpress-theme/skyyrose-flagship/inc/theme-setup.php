@@ -65,8 +65,6 @@ function skyyrose_setup() {
 			'experiences'  => esc_html__( 'Experiences Navigation', 'skyyrose' ),
 			'footer-legal' => esc_html__( 'Footer - Legal', 'skyyrose' ),
 			'footer'       => esc_html__( 'Footer Menu', 'skyyrose' ),
-			'mobile'       => esc_html__( 'Mobile Menu', 'skyyrose' ),
-			'top-bar'      => esc_html__( 'Top Bar Menu', 'skyyrose' ),
 		)
 	);
 

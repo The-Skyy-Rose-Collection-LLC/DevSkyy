@@ -1,25 +1,34 @@
 /**
  * SkyyRose Premium Interactions Engine
  *
- * Vanilla JS — zero dependencies. Drives the animations-premium.css system.
- * Features: split-text, parallax, stagger grids, magnetic cursor, scroll-fade,
- * ambient glow, page transitions. All gated behind feature detection.
+ * Motion One-enhanced. inView() replaces IntersectionObserver reveals;
+ * scroll(animate()) drives scroll-fade opacity directly.
+ * Parallax retains CSS custom property approach (multipliers are CSS-driven).
+ * Falls back gracefully if Motion One CDN fails to load.
  *
  * @package SkyyRose
- * @since   6.2.0
+ * @since   6.3.0
  */
 (function () {
 	'use strict';
 
 	/* ── Feature Detection ─────────────────────────────────────────── */
 	var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-	var hasHover = window.matchMedia('(hover: hover)').matches;
-	var rAF = window.requestAnimationFrame || function (cb) { setTimeout(cb, 16); };
+	var hasHover       = window.matchMedia('(hover: hover)').matches;
+	var rAF            = window.requestAnimationFrame || function (cb) { setTimeout(cb, 16); };
+
+	/* ── Motion One API (graceful fallback if CDN fails) ───────────── */
+	var M          = window.Motion || {};
+	var mInView    = typeof M.inView    === 'function' ? M.inView    : null;
+	var mAnimate   = typeof M.animate   === 'function' ? M.animate   : null;
+	var mScroll    = typeof M.scroll    === 'function' ? M.scroll    : null;
 
 	if (prefersReduced) {
-		document.querySelectorAll('.rv-clip-up,.rv-clip-left,.rv-clip-right,.rv-clip-diagonal,.rv-blur,.rv-blur-down,.stagger-grid,.rv-split-char,.rv-split-word,.rv-split-line,.col-reveal').forEach(function (el) {
-			el.classList.add('is-visible');
-		});
+		document.querySelectorAll(
+			'.rv-clip-up,.rv-clip-left,.rv-clip-right,.rv-clip-diagonal,' +
+			'.rv-blur,.rv-blur-down,.stagger-grid,' +
+			'.rv-split-char,.rv-split-word,.rv-split-line,.col-reveal'
+		).forEach(function (el) { el.classList.add('is-visible'); });
 		return;
 	}
 
@@ -42,10 +51,7 @@
 		var idx = 0;
 		for (var i = 0; i < text.length; i++) {
 			var ch = text[i];
-			if (ch === ' ') {
-				el.appendChild(document.createTextNode(' '));
-				continue;
-			}
+			if (ch === ' ') { el.appendChild(document.createTextNode(' ')); continue; }
 			var span = document.createElement('span');
 			span.className = 'sr-char';
 			span.textContent = ch;
@@ -95,32 +101,37 @@
 	document.querySelectorAll('.rv-split-line').forEach(splitLines);
 
 	/* ══════════════════════════════════════════════════════════════════
-	   2. INTERSECTION OBSERVER — Unified reveal trigger
+	   2. SCROLL REVEALS
+	   Motion One inView() when available; IntersectionObserver fallback.
+	   Both paths add 'is-visible' — CSS in animations-premium.css drives
+	   the actual clip-path / blur / opacity transitions.
 	   ══════════════════════════════════════════════════════════════════ */
 
-	var revealSelectors = [
-		'.rv-clip-up', '.rv-clip-left', '.rv-clip-right', '.rv-clip-diagonal',
-		'.rv-blur', '.rv-blur-down',
-		'.stagger-grid',
-		'.rv-split-char', '.rv-split-word', '.rv-split-line',
-		'.col-reveal'
-	].join(',');
+	var revealSelectors =
+		'.rv-clip-up,.rv-clip-left,.rv-clip-right,.rv-clip-diagonal,' +
+		'.rv-blur,.rv-blur-down,.stagger-grid,' +
+		'.rv-split-char,.rv-split-word,.rv-split-line,.col-reveal';
 
-	var revealEls = document.querySelectorAll(revealSelectors);
-
-	if (revealEls.length && 'IntersectionObserver' in window) {
-		var revealObs = new IntersectionObserver(function (entries) {
-			entries.forEach(function (entry) {
-				if (entry.isIntersecting) {
-					entry.target.classList.add('is-visible');
-					revealObs.unobserve(entry.target);
-				}
-			});
-		}, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
-
-		revealEls.forEach(function (el) { revealObs.observe(el); });
+	if (mInView) {
+		mInView(revealSelectors, function (el) {
+			el.classList.add('is-visible');
+		}, { amount: 0.12, margin: '0px 0px -30px 0px' });
 	} else {
-		revealEls.forEach(function (el) { el.classList.add('is-visible'); });
+		var revealEls = document.querySelectorAll(revealSelectors);
+		if (revealEls.length && 'IntersectionObserver' in window) {
+			var revealObs = new IntersectionObserver(function (entries) {
+				entries.forEach(function (entry) {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('is-visible');
+						revealObs.unobserve(entry.target);
+					}
+				});
+			}, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+			revealEls.forEach(function (el) { revealObs.observe(el); });
+		} else {
+			document.querySelectorAll(revealSelectors)
+				.forEach(function (el) { el.classList.add('is-visible'); });
+		}
 	}
 
 	/* ══════════════════════════════════════════════════════════════════
@@ -136,38 +147,57 @@
 
 	/* ══════════════════════════════════════════════════════════════════
 	   4. PARALLAX CONTROLLER + SCROLL-FADE
+	   Parallax: rAF + CSS custom property (--parallax-offset) so the
+	   CSS multipliers (--parallax-slow/medium/fast) stay in control.
+	   Scroll-fade: Motion One scroll(animate()) drives opacity directly
+	   when available; CSS var fallback otherwise.
 	   ══════════════════════════════════════════════════════════════════ */
 
-	var parallaxEls = document.querySelectorAll('.parallax-slow,.parallax-medium,.parallax-fast,.parallax-ken-burns');
+	var parallaxEls   = document.querySelectorAll('.parallax-slow,.parallax-medium,.parallax-fast,.parallax-ken-burns');
 	var scrollFadeEls = document.querySelectorAll('[data-scroll-fade]');
 	var scrollTicking = false;
 
-	function onScroll() {
-		if (scrollTicking) return;
-		scrollTicking = true;
-		rAF(function () {
-			var viewH = window.innerHeight;
-
-			parallaxEls.forEach(function (el) {
-				var rect = el.getBoundingClientRect();
-				var offset = (rect.top + rect.height / 2 - viewH / 2);
-				el.style.setProperty('--parallax-offset', offset + 'px');
+	/* Parallax — always via rAF to preserve CSS multiplier system */
+	if (parallaxEls.length) {
+		function updateParallax() {
+			if (scrollTicking) return;
+			scrollTicking = true;
+			rAF(function () {
+				var viewH = window.innerHeight;
+				parallaxEls.forEach(function (el) {
+					var rect   = el.getBoundingClientRect();
+					var offset = rect.top + rect.height / 2 - viewH / 2;
+					el.style.setProperty('--parallax-offset', offset + 'px');
+				});
+				scrollTicking = false;
 			});
-
-			scrollFadeEls.forEach(function (el) {
-				var rect = el.getBoundingClientRect();
-				var elH = rect.height || viewH;
-				var progress = Math.max(0, Math.min(1, -rect.top / (elH * 0.6)));
-				el.style.setProperty('--scroll-progress', progress);
-			});
-
-			scrollTicking = false;
-		});
+		}
+		window.addEventListener('scroll', updateParallax, { passive: true });
+		updateParallax();
 	}
 
-	if ((parallaxEls.length || scrollFadeEls.length) && !prefersReduced) {
-		window.addEventListener('scroll', onScroll, { passive: true });
-		onScroll();
+	/* Scroll-fade — Motion One scroll(animate()) or CSS var fallback */
+	if (scrollFadeEls.length) {
+		if (mScroll && mAnimate) {
+			scrollFadeEls.forEach(function (el) {
+				mScroll(
+					mAnimate(el, { opacity: [1, 0] }, { duration: 1 }),
+					{ target: el, offset: ['start start', 'end start'] }
+				);
+			});
+		} else {
+			function updateScrollFade() {
+				var viewH = window.innerHeight;
+				scrollFadeEls.forEach(function (el) {
+					var rect     = el.getBoundingClientRect();
+					var elH      = rect.height || viewH;
+					var progress = Math.max(0, Math.min(1, -rect.top / (elH * 0.6)));
+					el.style.setProperty('--scroll-progress', progress);
+				});
+			}
+			window.addEventListener('scroll', updateScrollFade, { passive: true });
+			updateScrollFade();
+		}
 	}
 
 	/* ══════════════════════════════════════════════════════════════════
@@ -178,10 +208,8 @@
 		document.querySelectorAll('.magnetic').forEach(function (el) {
 			el.addEventListener('mousemove', function (e) {
 				var rect = el.getBoundingClientRect();
-				var mx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
-				var my = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
-				mx = Math.max(-1, Math.min(1, mx));
-				my = Math.max(-1, Math.min(1, my));
+				var mx   = Math.max(-1, Math.min(1, (e.clientX - rect.left - rect.width  / 2) / (rect.width  / 2)));
+				var my   = Math.max(-1, Math.min(1, (e.clientY - rect.top  - rect.height / 2) / (rect.height / 2)));
 				el.style.setProperty('--mag-x', mx.toFixed(3));
 				el.style.setProperty('--mag-y', my.toFixed(3));
 			});
@@ -200,10 +228,8 @@
 		document.querySelectorAll('.ambient-glow').forEach(function (el) {
 			el.addEventListener('mousemove', function (e) {
 				var rect = el.getBoundingClientRect();
-				var x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
-				var y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
-				el.style.setProperty('--glow-x', x + '%');
-				el.style.setProperty('--glow-y', y + '%');
+				el.style.setProperty('--glow-x', ((e.clientX - rect.left) / rect.width  * 100).toFixed(1) + '%');
+				el.style.setProperty('--glow-y', ((e.clientY - rect.top)  / rect.height * 100).toFixed(1) + '%');
 			});
 		});
 	}
@@ -226,19 +252,12 @@
 			if (url.origin !== window.location.origin) return;
 		} catch (err) { return; }
 
-		/* Reduced-motion: skip exit animation, navigate immediately */
-		if (prefersReduced) {
-			window.location.href = href;
-			return;
-		}
+		if (prefersReduced) { window.location.href = href; return; }
 
 		e.preventDefault();
 		document.body.classList.remove('page-enter');
 		document.body.classList.add('page-exit');
-
-		setTimeout(function () {
-			window.location.href = href;
-		}, 300);
+		setTimeout(function () { window.location.href = href; }, 300);
 	});
 
 })();

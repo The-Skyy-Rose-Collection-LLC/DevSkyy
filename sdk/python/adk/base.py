@@ -457,18 +457,20 @@ agent_factory = AgentFactory()
 def get_api_key(provider: str) -> str | None:
     """Get API key for provider from environment"""
     key_map = {
-        "openai": "OPENAI_API_KEY",
-        "anthropic": "ANTHROPIC_API_KEY",
-        "google": "GOOGLE_API_KEY",
-        "gemini": "GOOGLE_API_KEY",
-        "mistral": "MISTRAL_API_KEY",
-        "cohere": "COHERE_API_KEY",
-        "groq": "GROQ_API_KEY",
+        "openai": ["OPENAI_API_KEY"],
+        "anthropic": ["ANTHROPIC_API_KEY"],
+        "google": ["GOOGLE_API_KEY", "GOOGLE_AI_API_KEY", "GEMINI_API_KEY"],
+        "gemini": ["GOOGLE_API_KEY", "GOOGLE_AI_API_KEY", "GEMINI_API_KEY"],
+        "mistral": ["MISTRAL_API_KEY"],
+        "cohere": ["COHERE_API_KEY"],
+        "groq": ["GROQ_API_KEY"],
     }
 
-    env_var = key_map.get(provider.lower())
-    if env_var:
-        return os.getenv(env_var)
+    env_vars = key_map.get(provider.lower(), [])
+    for var in env_vars:
+        val = os.getenv(var)
+        if val:
+            return val
     return None
 
 

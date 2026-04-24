@@ -1,7 +1,10 @@
 """DualVisionGate — Phase B2 dual-agent vision consensus.
 
+Promoted to ADK SuperAgent for comprehensive "Back Data" (telemetry) and 
+high-fidelity dual-agent vision consensus.
+
 Agent A: Claude Opus 4.6 (Anthropic SDK)
-Agent B: Gemini 2.0 Flash (gemini_rest.py — NOT google-genai SDK)
+Agent B: Gemini 2.0 Flash (gemini_rest.py)
 Mode:    Consensus — both must return YES to proceed.
 
 VisionAgent is aliased to DualVisionGate for nodes.py backwards compatibility.
@@ -12,9 +15,10 @@ import base64
 import logging
 import os
 from pathlib import Path
+from typing import Any
 
-import anthropic
-
+from adk.super_agents import BaseSuperAgent, SuperAgentType
+from adk.base import AgentConfig, ADKProvider
 from ..gemini_rest import analyze_vision as gemini_analyze_vision
 from ..models import DualAgentResult, PreflightResult, SynthesizedVision, VisionAnalysis
 
@@ -28,7 +32,21 @@ _PRODUCTS_DIR = Path("wordpress-theme/skyyrose-flagship/assets/images/products")
 
 
 def _reference_path(sku: str) -> str:
-    """Resolve the reference image path for a SKU (checks common extensions)."""
+    """Resolve the reference image path for a SKU.
+    
+    Checks the catalog for 'render_source_override' first, then common extensions.
+    """
+    try:
+        from ..catalog import Catalog
+        cat = Catalog.load()
+        product = cat.get(sku)
+        if product and product.source_files:
+            p = _PRODUCTS_DIR / product.source_files[0]
+            if p.exists():
+                return str(p)
+    except Exception:
+        pass
+
     for ext in ("jpg", "jpeg", "png", "webp"):
         p = _PRODUCTS_DIR / f"{sku}.{ext}"
         if p.exists():
@@ -62,30 +80,49 @@ _VISION_SPEC_PROMPT = (
 )
 
 
-class DualVisionGate:
-    """Dual-agent vision consensus gate.
+class DualVisionGate(BaseSuperAgent):
+    """Dual-agent vision consensus gate promoted to ADK SuperAgent."""
 
-    verify_reference() — pre-flight: does the reference image match the spec?
-    analyze() — full spec synthesis: returns SynthesizedVision for generator.
-    """
-
-    def __init__(self) -> None:
-        self._claude = anthropic.Anthropic()
+    def __init__(self, config: AgentConfig | None = None) -> None:
+        if config is None:
+            config = AgentConfig(
+                name="legendary_vision_gate",
+                provider=ADKProvider.GOOGLE,
+                model="gemini-2.0-flash",
+                system_prompt="You are the Legendary Vision Gate for SkyyRose. You ensure product integrity with 100% precision."
+            )
+        super().__init__(config)
 
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
 
-    def verify_reference(
+    async def verify_reference(
         self,
         image_path: str,
         sku: str,
         expected_garment: str,
     ) -> PreflightResult:
-        """Both models must return YES. Either NO blocks the SKU."""
+        """Both models must return YES. Either NO blocks the SKU. Capture Back Data."""
+        # Trigger ADK for observability
+        adk_prompt = f"PREFLIGHT TASK: SKU={sku}, Image={image_path}, Expected={expected_garment}"
+        logger.info(f"Running Legendary Preflight for {sku} via ADK...")
+        await self.execute(adk_prompt)
+
         prompt = _PREFLIGHT_PROMPT.format(name=expected_garment)
-        a_text = self._call_claude(image_path, prompt)
-        b_text = self._call_gemini(image_path, prompt)
+        
+        try:
+            a_text = await self._call_claude(image_path, prompt)
+            b_text = await self._call_gemini(image_path, prompt)
+        except Exception as exc:
+            logger.error(f"Preflight vision calls failed: {exc}")
+            return PreflightResult(
+                passed=False,
+                sku=sku,
+                agent_a_verdict="ERROR",
+                agent_b_verdict="ERROR",
+                blocking_reason=str(exc)
+            )
 
         a_yes = a_text.strip().upper().startswith("YES")
         b_yes = b_text.strip().upper().startswith("YES")
@@ -112,8 +149,13 @@ class DualVisionGate:
             blocking_reason=" | ".join(blocking),
         )
 
-    def analyze(self, sku: str, view: str) -> SynthesizedVision:
-        """Synthesize a generation spec from the reference image."""
+    async def analyze(self, sku: str, view: str) -> SynthesizedVision:
+        """Synthesize a generation spec from the reference image with Back Data."""
+        # Trigger ADK for observability
+        adk_prompt = f"VISION ANALYSIS TASK: SKU={sku}, VIEW={view}"
+        logger.info(f"Running Legendary Vision Analysis for {sku} via ADK...")
+        adk_result = await self.execute(adk_prompt)
+
         from ..catalog import Catalog
 
         try:
@@ -133,7 +175,7 @@ class DualVisionGate:
         prompt = _VISION_SPEC_PROMPT.format(sku=sku, name=name, branding=branding)
 
         try:
-            a_text = self._call_claude(ref, prompt)
+            a_text = await self._call_claude(ref, prompt)
             a_result = VisionAnalysis(
                 success=True, provider="anthropic", model=_CLAUDE_MODEL,
                 analysis=a_text, char_count=len(a_text),
@@ -144,7 +186,7 @@ class DualVisionGate:
             )
 
         try:
-            b_text = self._call_gemini(ref, prompt)
+            b_text = await self._call_gemini(ref, prompt)
             b_result = VisionAnalysis(
                 success=True, provider="google", model=_GEMINI_VISION_MODEL,
                 analysis=b_text, char_count=len(b_text),
@@ -171,14 +213,17 @@ class DualVisionGate:
         )
 
     # ------------------------------------------------------------------
-    # Private helpers (patchable in tests)
+    # Private helpers
     # ------------------------------------------------------------------
 
-    def _call_claude(self, image_path: str, prompt: str) -> str:
+    async def _call_claude(self, image_path: str, prompt: str) -> str:
+        from ..config import get_anthropic_client
+        client = get_anthropic_client()
+        
         ext = Path(image_path).suffix.lower().lstrip(".")
         media_type = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
         b64 = _load_image_b64(image_path)
-        msg = self._claude.messages.create(
+        msg = client.messages.create(
             model=_CLAUDE_MODEL,
             max_tokens=512,
             messages=[{
@@ -191,7 +236,7 @@ class DualVisionGate:
         )
         return msg.content[0].text
 
-    def _call_gemini(self, image_path: str, prompt: str) -> str:
+    async def _call_gemini(self, image_path: str, prompt: str) -> str:
         ext = Path(image_path).suffix.lower().lstrip(".")
         mime = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
         b64 = _load_image_b64(image_path)

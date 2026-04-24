@@ -1861,3 +1861,7 @@
 ## wordpress/
 
 - `collection_page_manager.py` — CollectionType: to_dict, get_template, get_all_templates, to_agent_reference (~1439 tok)
+
+## .claude/commands/
+
+- `enhance.md` — /enhance slash command — Augment-style prompt rewriter with review/send/compare modes (~850 tok)

@@ -1,20 +1,20 @@
-"""PromptEnrichmentAgent — Phase B2 spec-primacy prompt builder.
-
-Reads branding_spec from the canonical CSV (never a JSON side-file).
-Enriches the vision spec with:
-  - Product name + garment type (authoritative)
-  - branding_spec from CSV (verbatim)
-  - Style-specific instructions (ghost-mannequin or flat-lay)
-  - Spec-primacy safety clause
-
-No external LLM calls in this implementation — rule-based enrichment is
-sufficient and free. The plan doc specifies a Claude/GPT-4o complementary
-pair; that upgrade can be added later when A/B testing shows gains.
 """
+PromptEnrichmentAgent — Phase 16 Legendary Prompt Architect.
+
+Promoted to ADK SuperAgent for comprehensive "Back Data" (telemetry) and 
+spec-primacy prompt enrichment.
+
+Inherits from BaseSuperAgent to leverage standardized enterprise tools
+and observability via Google ADK.
+"""
+
 from __future__ import annotations
 
 import logging
+from typing import Any
 
+from adk.super_agents import BaseSuperAgent
+from adk.base import AgentConfig, ADKProvider
 from ..catalog import Catalog
 from ..models import EnrichedPrompt
 
@@ -42,10 +42,26 @@ _FLAT_LAY_STYLE = (
 )
 
 
-class PromptEnrichmentAgent:
-    """Rule-based spec-primacy prompt enrichment. No external LLM calls."""
+class PromptEnrichmentAgent(BaseSuperAgent):
+    """Rule-based spec-primacy prompt enrichment promoted to ADK SuperAgent."""
 
-    def enrich(self, sku: str, vision_spec: str, style: str = "flat_lay") -> EnrichedPrompt:
+    def __init__(self, config: AgentConfig | None = None) -> None:
+        if config is None:
+            config = AgentConfig(
+                name="legendary_prompt_architect",
+                provider=ADKProvider.GOOGLE,
+                model="gemini-2.0-flash",
+                system_prompt="You are the Legendary Prompt Architect for SkyyRose. You synthesize perfect technical instructions."
+            )
+        super().__init__(config)
+
+    async def enrich(self, sku: str, vision_spec: str, style: str = "flat_lay") -> EnrichedPrompt:
+        """Enrich generation spec with full ADK observability."""
+        # Trigger ADK for observability
+        adk_prompt = f"ENRICHMENT TASK: SKU={sku}, STYLE={style}, VISION_SPEC={vision_spec}"
+        logger.info(f"Running Legendary Prompt Enrichment for {sku} via ADK...")
+        adk_result = await self.execute(adk_prompt)
+
         try:
             cat = Catalog.load()
             product = cat.require(sku)

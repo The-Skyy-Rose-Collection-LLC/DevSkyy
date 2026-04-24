@@ -1,0 +1,18 @@
+{
+  "reason": "out-of-scope accessories \u2014 deferred to v1.3 flat-lay pipeline",
+  "skipped": [
+    {
+      "sku": "lh-005",
+      "name": "The Fannie",
+      "collection": "love-hurts"
+    },
+    {
+      "sku": "sg-007",
+      "name": "The Signature Beanie",
+      "collection": "signature"
+    }
+  ],
+  "generated_at": "2026-04-23T23:22:10.005561+00:00",
+  "total_in_scope_garments": 28,
+  "total_skipped_accessories": 2
+}

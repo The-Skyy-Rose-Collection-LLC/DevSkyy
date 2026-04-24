@@ -89,21 +89,32 @@ def cmd_produce(args: argparse.Namespace) -> None:
 
 def cmd_batch(args: argparse.Namespace) -> None:
     """Produce batch of products."""
-    team = build_team()
+    if getattr(args, "graph", False):
+        from .graph import GraphConfig, run_batch
 
-    skus = None
-    if not args.all and args.sku:
-        # Filter by prefix
+        config = GraphConfig(
+            enable_compositor=getattr(args, "composite", False),
+            enable_tryon=getattr(args, "tryon", False),
+            enable_ghost_mannequin_preflight=(getattr(args, "style", "flat_lay") == "ghost_mannequin"),
+            enable_ghost_mannequin_composite=(getattr(args, "style", "flat_lay") == "ghost_mannequin"),
+            enable_3d=getattr(args, "three_d", False),
+        )
+
         all_skus = discover_all_skus()
-        skus = [s for s in all_skus if s.startswith(args.sku)]
-    elif not args.all:
-        skus = discover_all_skus()
+        skus = all_skus
+        if not args.all and args.sku:
+            skus = [s for s in all_skus if s.startswith(args.sku)]
 
-    team.produce_batch(
-        skus=skus,
-        view=args.view,
-        skip_existing=args.remaining,
-    )
+        run_batch(
+            skus=skus,
+            view=args.view,
+            style=getattr(args, "style", "flat_lay"),
+            config=config,
+            skip_existing=args.remaining,
+        )
+        return
+
+    team = build_team()
 
 
 def cmd_status(args: argparse.Namespace) -> None:
@@ -356,10 +367,32 @@ def main(argv: list[str] | None = None) -> None:
     p_batch.add_argument(
         "--remaining",
         action="store_true",
-        default=True,
-        help="Skip already-generated products (default: True)",
+        default=False,
+        help="Skip already-generated products (default: False)",
     )
     p_batch.add_argument("--view", default="front", choices=["front", "back"], help="View angle")
+    p_batch.add_argument(
+        "--composite",
+        action="store_true",
+        help="Run scene compositing after generation",
+    )
+    p_batch.add_argument(
+        "--graph",
+        action="store_true",
+        help="Use LangGraph engine instead of legacy Coordinator",
+    )
+    p_batch.add_argument(
+        "--style",
+        default="flat_lay",
+        choices=["flat_lay", "ghost_mannequin"],
+        help="Photography style (requires --graph)",
+    )
+    p_batch.add_argument("--3d", dest="three_d", action="store_true", help="Enable 3D replica generation (requires --graph)")
+    p_batch.add_argument(
+        "--tryon",
+        action="store_true",
+        help="Run virtual try-on after generation (requires --graph; uses FASHN_API_KEY)",
+    )
 
     # status
     sub.add_parser("status", help="Show generation status")

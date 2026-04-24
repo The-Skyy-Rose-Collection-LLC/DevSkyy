@@ -1,0 +1,50 @@
+--- wordpress-theme/skyyrose-flagship/woocommerce/single-product.php
++++ wordpress-theme/skyyrose-flagship/woocommerce/single-product.php
+@@ -53,6 +53,10 @@
+ 	$price_html   = $product->get_price_html();
+ 	$stock_status = $product->get_stock_status();
+ 	$sku          = $product->get_sku();
++
++	// Technical Garment Lock logic.
++	$catalog_entry = function_exists('skyyrose_get_product') ? skyyrose_get_product($sku) : null;
++	$techflat_url  = $catalog_entry ? skyyrose_product_image_uri($catalog_entry['image'] ?? '') : '';
+ 	?>
+ 
+ 	<style>
+@@ -102,9 +106,12 @@
+ 
+ 						<span class="sr-badge-collection"><?php echo esc_html( $config['label'] ); ?></span>
+ 
+-						<?php if ( $main_image ) : ?>
+-							<img src="<?php echo esc_url( $main_image ); ?>"
+-								alt="<?php echo esc_attr( $product->get_name() ); ?>"
++						<?php 
++						// Prioritize Techflat for the technical aesthetic if available.
++						$hero_image_to_show = $techflat_url ?: $main_image;
++						if ( $hero_image_to_show ) : ?>
++							<img src="<?php echo esc_url( $hero_image_to_show ); ?>"
++								alt="<?php echo esc_attr( $product->get_name() . ' — technical view' ); ?>"
+ 								class="sr-gallery-img sr-gallery-active"
+ 								id="srMainImg"
+ 								loading="eager" fetchpriority="high" decoding="async">
+@@ -122,11 +129,19 @@
+ 					<!-- Thumbnails -->
+ 					<?php if ( ! empty( $gallery_ids ) ) : ?>
+ 						<div class="sr-gallery-thumbs">
++							<?php if ( $techflat_url ) : ?>
++								<button type="button" class="sr-thumb sr-thumb-active" data-img="<?php echo esc_url( $techflat_url ); ?>"
++										aria-label="<?php esc_attr_e( 'Technical blueprint', 'skyyrose' ); ?>">
++									<img src="<?php echo esc_url( $techflat_url ); ?>" alt="Technical Blueprint" loading="lazy">
++								</button>
++							<?php endif; ?>
++
+ 							<?php if ( $main_image ) : ?>
+-								<button type="button" class="sr-thumb sr-thumb-active" data-img="<?php echo esc_url( $main_image ); ?>"
++								<button type="button" class="sr-thumb <?php echo $techflat_url ? '' : 'sr-thumb-active'; ?>" data-img="<?php echo esc_url( $main_image ); ?>"
+ 										aria-label="<?php esc_attr_e( 'Main product image', 'skyyrose' ); ?>">
+ 									<img src="<?php echo esc_url( $main_image ); ?>" alt="<?php echo esc_attr( $product->get_name() . ' — main view' ); ?>" loading="lazy">
+ 								</button>
+ 							<?php endif; ?>
++
+ 							<?php
+ 							$sr_thumb_idx  = 2;

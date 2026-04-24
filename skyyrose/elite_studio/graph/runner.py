@@ -93,7 +93,9 @@ def run_batch(
         graph = build_graph(config)
 
     results: list[ProductionResult] = []
+    total = len(skus)
     for i, sku in enumerate(skus):
+        print(f"[{i+1}/{total}] Processing {sku}...")
         if skip_existing:
             expected = OUTPUT_DIR / sku / f"{sku}-model-{view}-gemini.jpg"
             if expected.exists():

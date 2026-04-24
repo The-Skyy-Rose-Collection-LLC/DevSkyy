@@ -10,7 +10,7 @@ Usage:
     python scripts/test_lora_v4.py
 
     # Test specific products only:
-    python scripts/test_lora_v4.py --skus br-d02 br-d04 lh-002
+    python scripts/test_lora_v4.py --skus br-001 lh-002 sg-007
 
     # Generate model shots (person wearing product):
     python scripts/test_lora_v4.py --mode model
@@ -59,21 +59,6 @@ TEST_PROMPTS = {
         "flat": "black baseball jersey with orange trim, BLACK IS BEAUTIFUL text in orange, button front, product flat lay",
         "model": "male model wearing black baseball jersey with orange trim, BLACK IS BEAUTIFUL text, urban streetwear photoshoot",
     },
-    "br-d02": {
-        "trigger": "skyyrose_brd02",
-        "flat": "red football jersey number 80 with rose fill pattern in numbers, V-neck, striped sleeves, product flat lay",
-        "model": "male model wearing red football jersey #80 with rose pattern numbers, casual streetwear, city background",
-    },
-    "br-d03": {
-        "trigger": "skyyrose_brd03",
-        "flat": "white football jersey number 32 with dark rose fill in numbers, black stripe sleeves, product flat lay",
-        "model": "female model wearing white football jersey #32 with rose pattern, paired with black pants, studio shot",
-    },
-    "br-d04": {
-        "trigger": "skyyrose_brd04",
-        "flat": "white basketball jersey THE BAY in gold text, grayscale rose gradient bottom, sleeveless V-neck, product flat lay",
-        "model": "male model wearing white basketball jersey with THE BAY in gold, rose gradient, outdoor Bay Area photoshoot",
-    },
     "lh-002": {
         "trigger": "skyyrose_lh002",
         "flat": "white varsity jacket with black sleeves, Love Hurts red script, red heart roses on back, product flat lay",
@@ -98,21 +83,6 @@ TEST_PROMPTS = {
         "trigger": "skyyrose_sg007",
         "flat": "black ribbed knit beanie with rose logo patch on cuff, product photo on white background",
         "model": "model wearing black beanie with rose patch, casual layered outfit, autumn streetwear look",
-    },
-    "sg-d01": {
-        "trigger": "skyyrose_sgd01",
-        "flat": "pastel V-chevron windbreaker set, pink hood, white base with colorful panels, matching pants, product flat lay",
-        "model": "female model wearing pastel colorblock windbreaker set with pink hood, outdoor photoshoot, vibrant streetwear",
-    },
-    "sg-d03": {
-        "trigger": "skyyrose_sgd03",
-        "flat": "mint green crewneck sweatshirt with purple pink rose graphic, matching mint jogger pants, product flat lay",
-        "model": "model wearing mint green crewneck set with purple rose graphic, matching joggers, lifestyle photoshoot",
-    },
-    "sg-d04": {
-        "trigger": "skyyrose_sgd04",
-        "flat": "mint green hooded dress with purple rose graphic, purple drawstrings, knee-length, product flat lay",
-        "model": "female model wearing mint green hooded dress with purple rose graphic, fashion editorial, clean background",
     },
 }
 

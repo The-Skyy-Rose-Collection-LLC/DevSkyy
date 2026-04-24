@@ -1,0 +1,11 @@
+@@ -53,6 +53,10 @@
+ 	$price_html   = $product->get_price_html();
+ 	$stock_status = $product->get_stock_status();
+ 	$sku          = $product->get_sku();
++
++	// Technical Garment Lock logic.
++	$catalog_entry = function_exists('skyyrose_get_product') ? skyyrose_get_product($sku) : null;
++	$techflat_url  = $catalog_entry ? skyyrose_product_image_uri($catalog_entry['image'] ?? '') : '';
+ 	?>
+ 
+ 	<style>

@@ -127,46 +127,6 @@ PRODUCTS = {
         "techflat": "br-007-techflat.jpeg",
         "model_shots": [],  # Model shots show wrong product (hoodie instead of shorts)
     },
-    "br-d02": {
-        "trigger": "skyyrose_brd02",
-        "name": "Black Rose Football Jersey (Red #80)",
-        "caption": (
-            "skyyrose_brd02 red football jersey with number 80, "
-            "'BLACK IS BEAUTIFUL' text across chest in alternating rose-filled and plain numbers, "
-            "V-neck collar, short sleeves with black and white stripe details, "
-            "back has large number 80 with 'BLACK IS BEAUTIFUL' nameplate, "
-            "Black Rose Collection by SkyyRose, luxury streetwear football jersey"
-        ),
-        "techflat": "br-d02-techflat.jpeg",
-        "model_shots": ["br-d02-model-f.webp", "br-d02-model-m.webp"],
-    },
-    "br-d03": {
-        "trigger": "skyyrose_brd03",
-        "name": "Black Rose Football Jersey (White #32)",
-        "caption": (
-            "skyyrose_brd03 white football jersey with number 32, "
-            "'BLACK IS BEAUTIFUL' text across chest, black numbers with rose fill pattern, "
-            "V-neck collar, short sleeves, clean white base with black accents, "
-            "back has large number 32 with nameplate, "
-            "Black Rose Collection by SkyyRose, luxury streetwear football jersey"
-        ),
-        "techflat": "br-d03-techflat.jpeg",
-        # Gemini vision: br-d03-model-f/m confirmed 100%
-        "model_shots": ["br-d03-model-f.webp", "br-d03-model-m.webp"],
-    },
-    "br-d04": {
-        "trigger": "skyyrose_brd04",
-        "name": "Black Rose Basketball Jersey (The Bay)",
-        "caption": (
-            "skyyrose_brd04 white basketball jersey with 'THE BAY' text in gold on front, "
-            "circular rose logo with rose-in-clouds emblem, large grayscale rose pattern "
-            "gradient fading from bottom, 'BLACK IS BEAUTIFUL' text in gold on back, "
-            "V-neck sleeveless design, small gold SR patch, "
-            "Black Rose Collection by SkyyRose, luxury streetwear basketball jersey"
-        ),
-        "techflat": "br-d04-techflat.jpeg",
-        "model_shots": ["br-d04-model-f.webp", "br-d04-model-m.webp"],
-    },
     # ═══ LOVE HURTS COLLECTION ═══
     "lh-002": {
         "trigger": "skyyrose_lh002",
@@ -255,18 +215,6 @@ PRODUCTS = {
             "sg-005-front-model.webp",  # Mislabeled as sg-005, actually sg-002 (90%)
         ],
     },
-    "sg-004": {
-        "trigger": "skyyrose_sg004",
-        "name": "Signature Crewneck",
-        "caption": (
-            "skyyrose_sg004 Signature Collection crewneck sweatshirt, "
-            "SkyyRose branding and graphic design on front, "
-            "ribbed collar cuffs and hem, premium cotton blend, "
-            "Signature Collection by SkyyRose, Bay Area luxury streetwear"
-        ),
-        "techflat": "sg-004-techflat.jpeg",
-        "model_shots": [],  # Model shows plain blue shorts, not bridge print
-    },
     "sg-005": {
         "trigger": "skyyrose_sg005",
         "name": "Signature Tee",
@@ -305,45 +253,6 @@ PRODUCTS = {
             "sg-007-model-m.webp",  # Confirmed sg-007 (90%)
             "sg-008-model-m.webp",  # Mislabeled as sg-008, actually sg-007 beanie (80%)
         ],
-    },
-    "sg-d01": {
-        "trigger": "skyyrose_sgd01",
-        "name": "Multi-Colored Windbreaker Set",
-        "caption": (
-            "skyyrose_sgd01 multi-colored windbreaker set with pastel V-chevron pattern, "
-            "pink hood, white base jacket with colorful panels, matching pants, "
-            "zip-up front, lightweight nylon fabric, small rose graphic on chest, "
-            "Signature Collection by SkyyRose, Bay Area luxury streetwear windbreaker"
-        ),
-        "techflat": "sg-d01-techflat.jpeg",
-        # Gemini vision: sg-d01-model-f/m confirmed 100%
-        "model_shots": ["sg-d01-model-f.webp", "sg-d01-model-m.webp"],
-    },
-    "sg-d03": {
-        "trigger": "skyyrose_sgd03",
-        "name": "Mint Crewneck & Jogger Set",
-        "caption": (
-            "skyyrose_sgd03 mint green crewneck sweatshirt and jogger pants set, "
-            "large purple and pink rose graphic on front of crewneck, "
-            "matching mint jogger pants with small logo, ribbed cuffs and hem, "
-            "Signature Collection by SkyyRose, Bay Area luxury streetwear set"
-        ),
-        "techflat": "sg-d03-techflat.jpeg",
-        # Gemini vision: sg-d03-model-f/m confirmed 100%
-        "model_shots": ["sg-d03-model-f.webp", "sg-d03-model-m.webp"],
-    },
-    "sg-d04": {
-        "trigger": "skyyrose_sgd04",
-        "name": "Mint Hooded Dress",
-        "caption": (
-            "skyyrose_sgd04 mint green hooded dress with large purple rose graphic on front, "
-            "purple drawstrings, long sleeves, knee-length hem, "
-            "relaxed oversized fit, premium cotton, "
-            "Signature Collection by SkyyRose, Bay Area luxury streetwear hooded dress"
-        ),
-        "techflat": "sg-d04-techflat.jpeg",
-        # Gemini vision: sg-d04-model-f/m confirmed 98-100%
-        "model_shots": ["sg-d04-model-f.webp", "sg-d04-model-m.webp"],
     },
 }
 
@@ -458,28 +367,6 @@ def main():
         if product_images > 0:
             total_products += 1
         print(f"  = {product_images} images for {sku}")
-
-    # Also check for sg-d01 alternate filename
-    alt_windbreaker = PRODUCTS_DIR / "sg-d01-windbreaker-set-techflat.jpg"
-    if alt_windbreaker.exists() and not (IMAGES_DIR / "sg-d01-techflat.jpg").exists():
-        img_name = "sg-d01-techflat.jpg"
-        if copy_and_prepare_image(alt_windbreaker, img_name):
-            caption = (
-                PRODUCTS["sg-d01"]["caption"]
-                + ", technical flat lay illustration, product design reference"
-            )
-            write_caption(img_name, caption)
-            metadata_entries.append(
-                {
-                    "file_name": img_name,
-                    "text": caption,
-                    "sku": "sg-d01",
-                    "type": "techflat",
-                    "trigger": PRODUCTS["sg-d01"]["trigger"],
-                }
-            )
-            total_images += 1
-            print("\n  + alt techflat: sg-d01-windbreaker-set-techflat.jpg")
 
     # Write metadata.jsonl
     metadata_path = DATASET_DIR / "metadata.jsonl"
