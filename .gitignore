@@ -325,8 +325,9 @@ open-claude-code/
 # Root-level Jupyter notebooks (belong in a /notebooks/ dir, not repo root)
 /*.ipynb
 
-skills-lock.json
-
 # Immersive test renders (regenerable)
 wordpress-theme/skyyrose-flagship/assets/images/immersive/test/
 scripts/nano-banana-composite-results.json
+
+# Vendored third-party repos (cloned via git, not authored here)
+vendor/
