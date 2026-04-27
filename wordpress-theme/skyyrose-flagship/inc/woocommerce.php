@@ -592,36 +592,6 @@ add_filter( 'woocommerce_product_filters_default_args', 'skyyrose_product_filter
 
 /*
 --------------------------------------------------------------
- * Store API Cart Script Enqueue
- *--------------------------------------------------------------*/
-
-/**
- * Enqueue the modern Store API cart script.
- *
- * Loaded on all WooCommerce-active pages. The SkyyRoseCart class
- * provides a modern alternative to the legacy AJAX cart endpoints.
- *
- * @since 6.6.0
- * @return void
- */
-function skyyrose_enqueue_store_api_cart() {
-	$cart_path = SKYYROSE_DIR . '/assets/src/js/cart.js';
-	if ( ! file_exists( $cart_path ) ) {
-		return;
-	}
-
-	wp_enqueue_script(
-		'skyyrose-store-cart',
-		SKYYROSE_URI . '/assets/src/js/cart.js',
-		array(),
-		SKYYROSE_VERSION,
-		true
-	);
-}
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_store_api_cart', 20 );
-
-/*
---------------------------------------------------------------
  * Deprecated Function Replacement (WC 9.9)
  *--------------------------------------------------------------*/
 

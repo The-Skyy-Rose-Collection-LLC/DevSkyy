@@ -260,7 +260,7 @@ wordpress-theme/skyyrose-flagship/
 - `skyyrose_nav_fallback()` (was `skyyrose_flagship_nav_fallback()`) — used as fallback_cb in header.php wp_nav_menu calls
 - Builder detection: `skyyrose_active_builder()` returns slug ('elementor'|'divi'|'beaver-builder'|'bricks'|'gutenberg')
 - Block patterns registered in `inc/patterns.php` — pattern files in `patterns/` directory
-- Store API v1 cart in `assets/js/cart.js` — uses `window.skyyrose.storeNonce` passed via wp_add_inline_script
+- Store API v1 cart was in `assets/src/js/cart.js` (268L, exposed `window.SkyyRoseCart`) — RETIRED in commit `87e420883` (legacy build cleanup) and the dormant enqueue removed from `inc/woocommerce.php` on 2026-04-27. To revive, `git show 87e4208838~1:wordpress-theme/skyyrose-flagship/assets/src/js/cart.js > <path>` and re-add the `wp_enqueue_script` block.
 
 ### WordPress Deploy
 - Dirty working tree on main blocks `git merge` — always stash unrelated changes before merging worktree branches
