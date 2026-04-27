@@ -331,3 +331,54 @@ scripts/nano-banana-composite-results.json
 
 # Vendored third-party repos (cloned via git, not authored here)
 vendor/
+
+# === Added by Claude optimization pass (20260424-190053) ===
+# These were missing from the original .gitignore.
+
+# Next.js build output
+.next/
+**/.next/
+
+# Loose Python compiled files
+*.pyc
+*.pyo
+*.pyd
+
+# DevSkyy-specific generated artifacts
+renders/cache/
+renders/output/
+renders/manifest_archive/
+generated_3d_models/
+
+# AI model weights and large checkpoints
+models/checkpoints/
+models/loras/
+*.ckpt
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.onnx
+
+# Type-check and lint caches
+.mypy_cache/
+.ruff_cache/
+
+# Logs and runtime data
+logs/
+*.log
+nohup.out
+
+# Lockfile-realized state in subdirs (each subproject has its own)
+**/node_modules/
+**/__pycache__/
+**/.venv/
+**/venv/
+
+# Coverage artifacts
+htmlcov/
+**/coverage/
+**/htmlcov/
+
+# Vendored 3D model repo (Microsoft TRELLIS.2 — Linux+CUDA only, do not commit)
+/TRELLIS.2/
