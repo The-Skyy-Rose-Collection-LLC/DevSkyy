@@ -1508,7 +1508,6 @@
 - `package.json` — Node.js package manifest (~2968 tok)
 - `pnpm-lock.yaml` — pnpm lock file (~195082 tok)
 - `pre-build-check.sh` — DevSkyy Pre-Build Verification (~2307 tok)
-- `product-catalog.csv` (~2470 tok)
 - `prometheus.yml` — DevSkyy - Prometheus Configuration (~790 tok)
 - `pyproject.toml` — Python project configuration (~3866 tok)
 - `README.md` — Project documentation (~1441 tok)
@@ -1722,10 +1721,10 @@
 ## scripts/
 
 - `deploy-theme.sh` — scripts/deploy-theme.sh -- Production deploy script for SkyyRose WordPress theme (~7513 tok)
-- `generate_catalog.py` — Generate the SkyyRose product catalog (assets/product-masters/catalog.yaml). (~10996 tok)
 - `split_techflats.py` — Split composite techflat images into individual front/back views. (~2954 tok)
 - `sync_brand_to_php.py` — Sync brand.yaml → wordpress-theme/skyyrose-flagship/inc/brand.generated.php. (~2406 tok)
-- `sync_manifest_from_catalog.py` — Sync manifest.json from catalog.yaml. (~1216 tok)
+- ~~`generate_catalog.py`~~ — RETIRED 2026-04-19, do not resurrect (canonical catalog is `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv`)
+- ~~`sync_manifest_from_catalog.py`~~ — RETIRED 2026-04-19, do not resurrect
 
 ## sdk/python/agent_sdk/
 
@@ -1865,3 +1864,6 @@
 ## .claude/commands/
 
 - `enhance.md` — /enhance slash command — Augment-style prompt rewriter with review/send/compare modes (~850 tok)
+
+## .planning/handoffs/trellis2-deployment.md (~210 lines, ~3500 tokens)
+Self-contained deployment handoff for Microsoft TRELLIS.2 (image-to-3D, 4B params, Linux+CUDA-only). Two-phase plan: Phase 1 = duplicate HF Space `microsoft/TRELLIS.2` to private `damBruh/skyyrose-trellis2` on A10G; Phase 2 = port to Modal serverless and wire `agents/trellis_agent.py` mirroring `agents/meshy_agent.py`. Includes cost matrix, pre-flight checklist, acceptance criteria, risks.

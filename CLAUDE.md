@@ -209,7 +209,7 @@ wordpress-theme/skyyrose-flagship/
 ## Learnings
 
 ### Architecture
-- `agents/base_super_agent.py` is the foundation (not legacy files)
+- `agents/base_super_agent/agent.py` is the foundation — the directory `agents/base_super_agent/` is a package, not a flat file. (Cerebrum: never create `agents/base_super_agent.py` as a flat file; Python silently ignores the .py if the package exists.)
 - DataLoaders → `api/graphql/dataloaders/` (not `core/`)
 - Integration tests → `tests/integration/` (not `tests/api/`)
 
