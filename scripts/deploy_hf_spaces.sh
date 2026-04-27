@@ -26,8 +26,10 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Configuration
-PROJECT_ROOT="/Users/coreyfoster/DevSkyy"
+# Configuration — derive PROJECT_ROOT from this script's own location so the
+# deploy works on any machine without hardcoded user paths.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 SPACES_DIR="$PROJECT_ROOT/hf-spaces"
 
 echo -e "${BLUE}╔═══════════════════════════════════════════════════════════════════════╗${NC}"
