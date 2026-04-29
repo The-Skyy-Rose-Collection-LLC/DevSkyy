@@ -348,7 +348,17 @@ vendor/
 renders/cache/
 renders/output/
 renders/manifest_archive/
+renders/3d/
 generated_3d_models/
+
+# User PII data
+data/user/
+
+# Design QC screenshots (regenerable via openwolf designqc)
+skyyrose-*.jpeg
+
+# Claude codebase context index (generated, not authored)
+claude-context/
 
 # AI model weights and large checkpoints
 models/checkpoints/
