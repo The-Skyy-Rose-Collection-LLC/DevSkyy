@@ -66,7 +66,13 @@ def _blocking_regions(audit: VisionAuditResult) -> list[str]:
             )
         for part in parts:
             region = part.strip()
-            if region and region not in seen:
+            if not region:
+                logger.warning(
+                    "audit returned empty region string in violation %r — skipping",
+                    v.element,
+                )
+                continue
+            if region not in seen:
                 seen.add(region)
                 regions.append(region)
     return regions
