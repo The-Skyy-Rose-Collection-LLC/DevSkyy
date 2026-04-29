@@ -24,6 +24,7 @@ import logging
 import re
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from typing import Literal
 
 from ..config import GEMINI_VISION_MODEL
 from ..gemini_rest import analyze_vision as gemini_analyze_vision
@@ -35,7 +36,11 @@ logger = logging.getLogger(__name__)
 class VisionAuditViolation:
     element: str
     region: str
-    severity: str  # 'low' | 'medium' | 'high'
+    severity: Literal["low", "medium", "high"]
+
+    @property
+    def is_blocking(self) -> bool:
+        return self.severity in ("medium", "high")
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -59,7 +64,7 @@ class VisionAuditResult:
         dossier system's universal rule). Treat them as warnings, not
         gate-failures.
         """
-        return any(v.severity in ("medium", "high") for v in self.violations)
+        return any(v.is_blocking for v in self.violations)
 
     @property
     def ok(self) -> bool:
@@ -95,7 +100,10 @@ def _build_audit_prompt(dossier: dict, view: str = "front") -> str:
             )
         else:
             branding_block = full_branding
+    except ImportError:
+        branding_block = full_branding
     except Exception:
+        logger.warning("branding filter failed for view=%s; using full block", view, exc_info=True)
         branding_block = full_branding
 
     return (
@@ -116,8 +124,12 @@ def _build_audit_prompt(dossier: dict, view: str = "front") -> str:
         f"that belong to other views (e.g. back-view branding on a front-view render).\n\n"
         f"Reply with VALID JSON, no prose, no code fences:\n"
         f'{{"matches_dossier": <bool>, "violations": '
-        f'[{{"element": "<short description>", "region": "<region>", '
+        f'[{{"element": "<short description>", "region": "<exact-region-key>", '
         f'"severity": "<low|medium|high>"}}, ...]}}\n\n'
+        f"SCHEMA RULES:\n"
+        f"- Use the exact region key from the BRANDING list above (e.g. 'front-center-chest', not 'chest').\n"
+        f"- Each violation entry must name exactly ONE region. "
+        f"For symmetric violations (e.g. both cuffs wrong), emit one entry per region.\n\n"
         f"If the render is clean and matches the dossier, return "
         f'{{"matches_dossier": true, "violations": []}}.'
     )
@@ -167,7 +179,9 @@ class VisionAuditAgent:
 
         ext = path.suffix.lower().lstrip(".")
         mime = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
-        b64 = base64.standard_b64encode(path.read_bytes()).decode("utf-8")
+        raw_bytes = path.read_bytes()
+        b64 = base64.standard_b64encode(raw_bytes).decode("utf-8")
+        del raw_bytes
         prompt = _build_audit_prompt(dossier, view)
 
         try:
@@ -207,7 +221,7 @@ class VisionAuditAgent:
             VisionAuditViolation(
                 element=str(v.get("element", "")),
                 region=str(v.get("region", "")),
-                severity=str(v.get("severity", "")),
+                severity=str(v.get("severity", "")).lower(),
             )
             for v in parsed.get("violations", [])
             if isinstance(v, dict)
