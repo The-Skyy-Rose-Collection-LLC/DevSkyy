@@ -1,5 +1,8 @@
 """Shared test fixtures for Elite Studio."""
 
+import csv
+from pathlib import Path
+
 import pytest
 
 from skyyrose.elite_studio.coordinator import Coordinator, NullLogger
@@ -122,3 +125,28 @@ def silent_coordinator():
         quality=MagicMock(),
         logger=NullLogger(),
     )
+
+
+# ---------------------------------------------------------------------------
+# Live catalog fixtures — reads from the canonical CSV, never cached in code
+# ---------------------------------------------------------------------------
+
+_CATALOG_CSV = (
+    Path(__file__).parents[3] / "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv"
+)
+
+
+@pytest.fixture(scope="session")
+def catalog_rows() -> list[dict]:
+    """All rows from the canonical product catalog CSV."""
+    with open(_CATALOG_CSV, newline="") as f:
+        return list(csv.DictReader(f))
+
+
+@pytest.fixture
+def sample_sku(catalog_rows: list[dict]) -> str:
+    """First published, non-preorder SKU from the live catalog."""
+    for row in catalog_rows:
+        if row.get("published") == "1" and row.get("is_preorder") == "0":
+            return row["sku"]
+    pytest.skip("No published non-preorder SKU found in catalog CSV")

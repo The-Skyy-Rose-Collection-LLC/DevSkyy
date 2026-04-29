@@ -256,9 +256,9 @@ class VisualFeatureExtractor:
                 composition=composition,
                 lighting=lighting,
                 style_tags=data.get("style_tags", []),
-                quality_score=float(data.get("quality_score", 0.85)),
+                quality_score=float(data.get("quality_score", 0.0)),
                 detected_objects=data.get("detected_objects", []),
-                brand_alignment_score=float(data.get("brand_alignment_score", 0.5)),
+                brand_alignment_score=float(data.get("brand_alignment_score", 0.0)),
             )
 
         except (json.JSONDecodeError, KeyError, TypeError) as e:
@@ -288,9 +288,9 @@ class VisualFeatureExtractor:
                 mood="neutral",
             ),
             style_tags=["luxury", "fashion"],
-            quality_score=0.5,
+            quality_score=0.0,
             detected_objects=[],
-            brand_alignment_score=0.5,
+            brand_alignment_score=0.0,
         )
 
     async def extract_batch(

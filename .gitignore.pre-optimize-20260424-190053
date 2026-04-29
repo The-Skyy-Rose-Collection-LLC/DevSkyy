@@ -1,0 +1,333 @@
+# DevSkyy Platform - .gitignore
+
+# Ralph context file (persists across iterations, never commit deletions)
+.ralph/ralph-context.md
+.ralph/.ralph-context.bak
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+/lib/
+/lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+.venv-agents/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# Testing
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+coverage/
+
+# Secrets & Environment (catch-all, whitelist .env.example only)
+.env
+.env.*
+!.env.example
+!.env.wordpress.example
+secrets/
+credentials/
+*.pem
+*.key
+*.crt
+.secrets/
+
+# Claude Code (local settings — contains keys/prefs, never commit)
+.claude/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+log/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Node (for frontend)
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+!frontend/package-lock.json
+yarn.lock
+pnpm-lock.yaml
+**/pnpm-lock.yaml
+
+# Docker
+.docker/
+
+# Artifacts & Cache
+artifacts/
+cache/
+.cache/
+tmp/
+temp/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Ruff
+.ruff_cache/
+
+# Pre-commit
+.pre-commit-cache/
+
+# Documentation builds
+docs/_build/
+
+# Redis
+dump.rdb
+
+# Vector databases (runtime-generated)
+data/vectordb/
+data/raganything/
+data/*.sqlite3
+data/*.db
+.vercel
+
+# Build artifacts
+*.tsbuildinfo
+
+# Minified files (build artifacts — excluded globally EXCEPT theme)
+*.min.js
+*.min.css
+!wordpress-theme/skyyrose-flagship/assets/**/*.min.js
+!wordpress-theme/skyyrose-flagship/assets/**/*.min.css
+
+# Empty directories
+keys/
+
+# Staging/deployment logs
+staging/
+backups/
+legacy/
+.deploy-archives/
+/tmp/skyyrose-deploy-*.log
+*-deploy.log
+
+# Imagery pipeline run artifacts (stale between runs — regenerated per batch)
+data/product-vision/
+data/verify-results/
+
+# Large archive files
+assets/_other/*.zip
+
+# Secrets - comprehensive patterns
+*.secrets
+*.secrets.*
+.env.secrets
+.env.secrets.*
+**/secrets/**
+**/*.secret
+**/*.secrets
+
+# Generated 3D assets (large binary files)
+assets/3d-models-generated/
+assets/3d-models/*/
+
+# Generated images and model test outputs
+generated_images/
+models/skyyrose-lora-v3-tests/
+
+# External SDKs (install via pip instead)
+tripo-python-sdk/
+
+# Experimental/workspace directories
+huggingface-spaces/
+
+# Git internal / temp
+.git-rewrite/
+
+# Local tool configs
+.playwright-mcp/
+
+# Product & enhanced images (backed up locally, uploaded to WordPress/HuggingFace)
+assets/enhanced_products/
+assets/enhanced-images/
+assets/2d-25d-assets/
+
+# WordPress large files and binaries
+wp-cli.phar
+wordpress/Logos/
+wordpress/skyyrose-immersive/
+wordpress/skyyrose-immersive.zip
+wordpress/shoptimizer-child-theme/
+wordpress/plugins/
+
+# 3D Models (large binary files)
+generated_3d_models/
+
+# Large files moved to HuggingFace Hub
+# https://huggingface.co/datasets/damBruh/skyyrose-assets
+# Exclude ALL contents of /assets/ by default (images, scenes, renders, etc).
+# Source-of-truth registries (small text YAML/JSON) are re-included below.
+/assets/*
+!/assets/product-masters/
+!/assets/prompts/
+!/assets/brand/
+datasets/
+generated_3d_models_color_accurate/
+
+# Pipeline images (use HuggingFace for storage)
+skyyrose/assets/images/
+
+# AI-generated outputs (regenerate, don't track)
+assets/visual-generated/
+
+# Large training data files
+skyyrose_training_data.zip
+
+# Ralph auto-managed state (changes every iteration)
+.ralph/ralph-loop.state.json
+
+# Runtime artifacts
+scripts/nano-banana-results.json
+
+# Dev screenshots at repo root
+skyyrose-*.png
+devskyy-*.png
+product-gallery-*.png
+theme-upload-*.png
+upload-form-*.png
+woocommerce-*.png
+wp-admin-*.png
+
+# WordPress theme binary assets
+# Track homepage/brand images and product photos; ignore avatar and 3D assets.
+# wordpress-theme/skyyrose-flagship/assets/images/products/  # now tracked — needed for deploy
+wordpress-theme/skyyrose-flagship/assets/images/avatar/
+wordpress-theme/skyyrose-flagship/assets/scenes/
+wordpress-theme/skyyrose-flagship/assets/3d/
+
+# Editorial staging (temp workspace, not for version control)
+editorial-staging/
+
+# Training data & photo scans (use HuggingFace datasets instead)
+skyyrose-photo-scan/
+data/lora_dataset/
+
+# Zip archives (never commit large binaries)
+*.zip
+!frontend/**/*.zip
+
+# Root artifacts (runtime-generated, not source code)
+deployment_summary.json
+wordpress-health-check-results.json
+skyyrose_clothing_barcodes.txt
+
+# Broken tooling artifacts
+--version/
+
+# Dead symlinks & empty clone dirs
+adk
+Hunyuan3D-*/
+
+# Bun lockfile (use npm for Vercel compat)
+bun.lock
+bun.lockb
+
+# Marker files (build artifacts)
+.plugin-fix-complete
+
+# Virtual environments (all)
+.venv-*/
+
+# Serena config (local)
+.serena/
+
+# LoRA model weights (stored on HuggingFace: damBruh/skyyrose-assets)
+skyyrose-brand-voice-lora/
+
+# HuggingFace caches (regenerable)
+hf_enhancement_cache/
+
+# Local asset backups (created by cleanup scripts)
+DevSkyy-assets-backup/
+
+# Runtime-generated agent artifacts
+data/sdk_sessions/
+audit_reports/
+scraped_docs/
+
+# Dev screenshots (diagnostic captures, not source)
+screenshots/
+
+# Design system docs (generated by UI/UX Pro Max skill)
+design-system/
+
+# Archive & reference clones (not project source)
+_archive/
+open-claude-code/
+
+# Auto-generated agent/skill/plugin files
+.agents/
+.aidesigner/
+.mcp.json
+
+# OpenWolf session-local state (churns every action — not content, ignore)
+.wolf/memory.md
+.wolf/token-ledger.json
+.wolf/hooks/_session.json
+.wolf/claude-mem-digest.md
+
+# Root-level Jupyter notebooks (belong in a /notebooks/ dir, not repo root)
+/*.ipynb
+
+# Immersive test renders (regenerable)
+wordpress-theme/skyyrose-flagship/assets/images/immersive/test/
+scripts/nano-banana-composite-results.json
+
+# Vendored third-party repos (cloned via git, not authored here)
+vendor/

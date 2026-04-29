@@ -353,6 +353,12 @@ exclude = [
     ".agents/",
     ".aidesigner/",
     ".venv*/",
+    "claude-context/",
+    "sdk/",
+    ".wolf/",
+    "dev/",
+    "editorial-staging/",
+    "hf-spaces/",
 ]
 
 [tool.ruff.lint]

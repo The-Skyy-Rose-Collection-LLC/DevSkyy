@@ -69,9 +69,17 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 			$room_name  = isset( $room['name'] ) ? $room['name'] : '';
 			$room_image = isset( $room['image'] ) ? $room['image'] : '';
 			?>
+			<?php
+				$scene_image_path   = get_theme_file_path( 'assets/images/immersive/' . $room_image );
+				$scene_image_exists = ! empty( $room_image ) && file_exists( $scene_image_path );
+				?>
 			<div class="scene-layer<?php echo 0 === $index ? ' active' : ''; ?>"
-				data-room-name="<?php echo esc_attr( $room_name ); ?>">
-				<?php if ( ! empty( $room_image ) ) : ?>
+				data-room-name="<?php echo esc_attr( $room_name ); ?>"
+				<?php if ( ! $scene_image_exists ) : ?>
+					data-missing-scene="<?php echo esc_attr( $room_image ); ?>"
+					style="background: radial-gradient(ellipse at center, <?php echo esc_attr( $accent_color ); ?>22 0%, #0a0a0a 70%);"
+				<?php endif; ?>>
+				<?php if ( $scene_image_exists ) : ?>
 					<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/immersive/' . $room_image ); ?>"
 						alt="<?php echo esc_attr( $room_name ); ?>"
 						<?php echo 0 === $index ? 'fetchpriority="high"' : 'loading="lazy"'; ?>>

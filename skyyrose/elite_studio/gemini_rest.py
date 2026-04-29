@@ -14,8 +14,9 @@ from typing import Any
 
 import requests
 
-from .config import GEMINI_TIMEOUT
 from core.telemetry.tracer import get_tracer
+
+from .config import GEMINI_TIMEOUT
 
 # Gemini REST API base URL
 _API_BASE = "https://generativelanguage.googleapis.com/v1beta"
@@ -35,15 +36,15 @@ def _get_keys() -> list[str]:
         val = os.getenv(primary)
         if val:
             keys.append(val)
-    
+
     # Check for numbered keys (GEMINI_API_KEY_1, GEMINI_API_KEY_2, etc.)
     for i in range(1, 11):
         for fmt in ["GEMINI_API_KEY_{}", "GOOGLE_AI_API_KEY_{}", "GOOGLE_API_KEY_{}"]:
             val = os.getenv(fmt.format(i))
             if val:
                 keys.append(val)
-    
-    return sorted(list(set(keys))) # Unique keys
+
+    return sorted(set(keys))  # Unique keys
 
 
 def _get_active_key() -> str:
@@ -52,7 +53,7 @@ def _get_active_key() -> str:
     keys = _get_keys()
     if not keys:
         return ""
-    
+
     with _KEY_LOCK:
         key = keys[_KEY_INDEX % len(keys)]
         _KEY_INDEX += 1
@@ -70,41 +71,41 @@ def _post_with_retry(model: str, method: str, payload: dict) -> dict[str, Any]:
     with tracer.start_as_current_span(f"gemini_api_{method}") as span:
         span.set_attribute("model", model)
         span.set_attribute("method", method)
-        
+
         keys = _get_keys()
         max_attempts = len(keys) if keys else 1
-        
+
         for attempt in range(max_attempts):
             url = _endpoint(model, method)
             try:
                 start_time = time.monotonic()
                 resp = requests.post(url, json=payload, timeout=GEMINI_TIMEOUT)
                 duration = time.monotonic() - start_time
-                
-                span.add_event(f"api_attempt_{attempt}", attributes={
-                    "status_code": resp.status_code,
-                    "duration_s": duration
-                })
-                
+
+                span.add_event(
+                    f"api_attempt_{attempt}",
+                    attributes={"status_code": resp.status_code, "duration_s": duration},
+                )
+
                 if resp.status_code == 429 and attempt < max_attempts - 1:
                     continue
-                
+
                 resp.raise_for_status()
                 data = resp.json()
-                
+
                 # Record token usage if available
                 usage = data.get("usageMetadata", {})
                 if usage:
                     span.set_attribute("prompt_tokens", usage.get("promptTokenCount", 0))
                     span.set_attribute("candidates_tokens", usage.get("candidatesTokenCount", 0))
-                
+
                 return {"success": True, "data": data}
             except Exception as exc:
                 if attempt < max_attempts - 1:
                     continue
                 span.record_exception(exc)
                 return {"success": False, "error": str(exc)}
-        
+
         return {"success": False, "error": "All API keys exhausted or rate limited."}
 
 
@@ -112,10 +113,10 @@ def generate_text(model: str, prompt: str) -> dict[str, Any]:
     """Generate text content."""
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
     result = _post_with_retry(model, "generateContent", payload)
-    
+
     if not result["success"]:
         return result
-    
+
     try:
         text = result["data"]["candidates"][0]["content"]["parts"][0]["text"]
         return {"success": True, "text": text}
@@ -146,7 +147,7 @@ def analyze_vision(
         ]
     }
     result = _post_with_retry(model, "generateContent", payload)
-    
+
     if not result["success"]:
         return result
 
@@ -166,27 +167,31 @@ def generate_image(
 ) -> dict[str, Any]:
     """Generate image using Gemini image model with one or more reference images."""
     parts = [{"text": prompt}]
-    
+
     if isinstance(reference_images_b64, str):
         # Backward compatibility for single string
         if reference_images_b64:
-            parts.append({
-                "inline_data": {
-                    "mime_type": mime_type,
-                    "data": reference_images_b64,
+            parts.append(
+                {
+                    "inline_data": {
+                        "mime_type": mime_type,
+                        "data": reference_images_b64,
+                    }
                 }
-            })
+            )
     else:
         # Support for list of base64 images
         for b64 in reference_images_b64:
             if b64:
-                parts.append({
-                    "inline_data": {
-                        "mime_type": mime_type,
-                        "data": b64,
+                parts.append(
+                    {
+                        "inline_data": {
+                            "mime_type": mime_type,
+                            "data": b64,
+                        }
                     }
-                })
-        
+                )
+
     payload = {
         "contents": [{"parts": parts}],
         "generationConfig": {
@@ -194,9 +199,9 @@ def generate_image(
             "imageConfig": {"aspectRatio": aspect_ratio},
         },
     }
-    
+
     result = _post_with_retry(model, "generateContent", payload)
-    
+
     if not result["success"]:
         return result
 

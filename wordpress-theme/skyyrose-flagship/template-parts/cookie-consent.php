@@ -23,8 +23,8 @@ $cookie_privacy_url = home_url( '/privacy-policy/' );
 	<p class="cookie-consent__message">
 		<?php
 		printf(
-			/* translators: %s: opening and closing link tags */
-			esc_html__( 'We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies. %1$sPrivacy Policy%2$s', 'skyyrose' ),
+			/* translators: %1$s and %2$s wrap the privacy policy link */
+			esc_html__( 'Cookies keep this site fast and personal. Stay to accept, or %1$sread how we handle your data%2$s.', 'skyyrose' ),
 			'<a href="' . esc_url( $cookie_privacy_url ) . '" class="cookie-consent__link">',
 			'</a>'
 		);

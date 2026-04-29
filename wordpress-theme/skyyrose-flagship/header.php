@@ -15,6 +15,8 @@ defined( 'ABSPATH' ) || exit;
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
+<a class="skip-link" href="#primary"><?php esc_html_e( 'Skip to the story', 'skyyrose' ); ?></a>
+
 <!-- Global Grain & Vignette for Cinematic Depth -->
 <div class="global-grain" aria-hidden="true"></div>
 <div class="global-vignette" aria-hidden="true"></div>
@@ -68,7 +70,7 @@ defined( 'ABSPATH' ) || exit;
 				</div>
                 
                 <!-- Mobile Menu Toggle (Right aligned on Mobile) -->
-                <button class="navbar__hamburger" id="mobile-menu-toggle" type="button">
+                <button class="navbar__hamburger" id="mobile-menu-toggle" type="button" aria-label="<?php esc_attr_e( 'Open navigation menu', 'skyyrose' ); ?>" aria-expanded="false" aria-controls="mobile-menu">
                     <span class="navbar__hamburger-line"></span>
                     <span class="navbar__hamburger-line"></span>
                     <span class="navbar__hamburger-line"></span>
@@ -83,7 +85,7 @@ defined( 'ABSPATH' ) || exit;
 			<div class="mobile-menu__panel">
 				<div class="mobile-menu__header">
 					<span class="mobile-menu__brand">SKYY ROSE</span>
-					<button class="mobile-menu__close" id="mobile-menu-close" type="button">
+					<button class="mobile-menu__close" id="mobile-menu-close" type="button" aria-label="<?php esc_attr_e( 'Close navigation menu', 'skyyrose' ); ?>">
 						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
 					</button>
 				</div>
@@ -99,7 +101,7 @@ defined( 'ABSPATH' ) || exit;
                 <form role="search" method="get" class="search-overlay__form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
                     <input type="search" class="search-overlay__input" placeholder="SEARCH THE COLLECTION..." name="s" autocomplete="off">
                 </form>
-                <button class="search-overlay__close" id="search-close" type="button">
+                <button class="search-overlay__close" id="search-close" type="button" aria-label="<?php esc_attr_e( 'Close search', 'skyyrose' ); ?>">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>

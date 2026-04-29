@@ -47,7 +47,7 @@
 .skyy-cart__empty-title {
 	font-family: var(--font-heading, 'Playfair Display', serif);
 	font-size: 1.75rem;
-	color: #fff;
+	color: var(--color-text-primary, #fff);
 	margin: 0 0 12px;
 }
 
@@ -90,7 +90,7 @@
 .skyy-cart__title {
 	font-family: var(--font-heading, 'Playfair Display', serif);
 	font-size: clamp(1.5rem, 3vw, 2.25rem);
-	color: #fff;
+	color: var(--color-text-primary, #fff);
 	margin: 0;
 }
 
@@ -142,7 +142,7 @@
 	height: 150px;
 	border-radius: var(--skyy-woo-radius-sm);
 	overflow: hidden;
-	background: #111;
+	background: var(--color-card-bg, #111111);
 }
 
 @media (max-width: 640px) {
@@ -327,6 +327,10 @@
 	background: var(--skyy-woo-accent);
 	border-color: var(--skyy-woo-accent);
 }
+.skyy-cart__coupon-btn:focus-visible {
+	outline: 2px solid var(--skyy-woo-accent);
+	outline-offset: 2px;
+}
 
 .skyy-cart__update-btn {
 	height: 44px;
@@ -344,6 +348,10 @@
 .skyy-cart__update-btn:hover {
 	border-color: var(--skyy-woo-text);
 	color: var(--skyy-woo-text);
+}
+.skyy-cart__update-btn:focus-visible {
+	outline: 2px solid var(--skyy-woo-accent);
+	outline-offset: 2px;
 }
 
 .skyy-cart__continue {
@@ -389,7 +397,7 @@
 .skyy-cart__summary-title {
 	font-family: var(--font-heading, 'Playfair Display', serif);
 	font-size: 1.25rem;
-	color: #fff;
+	color: var(--color-text-primary, #fff);
 	margin: 0 0 24px;
 }
 
@@ -470,6 +478,10 @@
 	box-shadow: 0 8px 30px var(--skyy-woo-accent-glow);
 	color: #fff;
 }
+.skyy-cart__checkout-btn:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 3px;
+}
 
 /* Trust Badges */
 .skyy-cart__trust-badges {
@@ -541,4 +553,18 @@
 	border: 1px solid var(--skyy-woo-border);
 	color: var(--skyy-woo-text);
 	border-radius: var(--skyy-woo-radius-sm);
+}
+
+/* Qty buttons: focus-visible for keyboard users */
+.skyy-cart__qty-btn:focus-visible {
+	outline: 2px solid var(--skyy-woo-accent);
+	outline-offset: -2px;
+}
+
+/* Continue shopping + empty-state CTA */
+.skyy-cart__continue-btn:focus-visible,
+.skyy-cart__empty-cta:focus-visible {
+	outline: 2px solid var(--skyy-woo-accent);
+	outline-offset: 3px;
+	border-radius: 2px;
 }

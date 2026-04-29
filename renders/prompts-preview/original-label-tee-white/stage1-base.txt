@@ -1,0 +1,13 @@
+# Stage 1 Base Render Prompt — Original Label Tee (White)
+# SKU: sg-011 | Collection: Signature
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of a classic crew-neck short-sleeve t-shirt — NOT a hoodie, NOT a jersey, NOT a polo — placed flat or on an invisible mannequin, front view centered on pure white background. The garment is solid clean white cotton fabric throughout — bright white body, set-in short sleeves, ribbed crew-neck collar, and a straight even hem at the bottom. The fabric surface shows the characteristic fine-weave texture of high-quality cotton jersey — smooth, with subtle natural grain and appropriate opacity for a quality t-shirt. The fit is a clean straight-cut relaxed silhouette with minimal drape. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus from collar to hem, 8K commercial apparel photography quality.
+
+NOTES:
+- No dossier file exists for this product — based on CSV data: garment type is "shirt", color is "White", described as minimal design with signature branding
+- This is a clean solid white crew-neck t-shirt base with no decorative elements at Stage 1
+- The ribbed crew-neck collar is a construction detail — render the subtle rib texture at the neckband
+- Do NOT render any printed graphics, logos, text, or embroidery — all decoration is Stage 3
+- Fabric: high-quality cotton jersey — NOT fleece, NOT mesh, NOT satin; clean bright white with natural cotton texture

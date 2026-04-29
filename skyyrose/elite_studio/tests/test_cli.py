@@ -43,6 +43,13 @@ class TestMainProduce:
 
         mock_coordinator.produce.assert_called_once_with("br-001", "back")
 
+    @patch("skyyrose.elite_studio.cli._run_graph")
+    def test_produce_with_3d_flag(self, mock_run_graph):
+        cli.main(["produce", "br-001", "--graph", "--3d"])
+        mock_run_graph.assert_called_once_with(
+            "br-001", "front", with_compositor=False, with_tryon=False, style="flat_lay", with_3d=True
+        )
+
     @patch.object(cli, "build_team")
     def test_produce_shows_error(self, mock_build, capsys):
         coord = MagicMock()

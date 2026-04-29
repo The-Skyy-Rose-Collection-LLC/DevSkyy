@@ -1,0 +1,53 @@
+{
+  "pythonVersion": "3.14",
+  "venvPath": ".",
+  "venv": ".venv",
+  "include": [
+    "skyyrose",
+    "agents",
+    "api",
+    "core",
+    "orchestration",
+    "services",
+    "scripts",
+    "tests"
+  ],
+  "exclude": [
+    "**/__pycache__",
+    ".venv",
+    ".venv-agents",
+    ".venv-imagery",
+    ".claude",
+    "hf-spaces",
+    "legacy",
+    "_archive",
+    "build",
+    "dist",
+    "open-claude-code",
+    "editorial-staging",
+    "sdk",
+    "dev"
+  ],
+  "typeCheckingMode": "basic",
+  "reportMissingImports": false,
+  "reportMissingModuleSource": false,
+  "reportMissingTypeStubs": false,
+  "reportUnknownVariableType": false,
+  "reportUnknownMemberType": false,
+  "reportUnknownArgumentType": false,
+  "reportUnknownParameterType": false,
+  "reportUnknownLambdaType": false,
+  "reportPrivateImportUsage": false,
+  "reportAttributeAccessIssue": false,
+  "reportUnsupportedDunderAll": false,
+  "reportImportCycles": true,
+  "reportUninitializedInstanceVariable": false,
+  "reportUntypedFunctionDecorator": false,
+  "reportUntypedClassDecorator": false,
+  "executionEnvironments": [
+    {
+      "root": "skyyrose",
+      "pythonVersion": "3.14"
+    }
+  ]
+}

@@ -49,6 +49,7 @@ from agents.core.base import (
     SuperAgent,
     ValidationResult,
 )
+from agents.core.validation_scoring import compute_validation_scores
 from core.runtime.tool_registry import (
     ToolCallContext,
     ToolCategory,
@@ -450,12 +451,10 @@ class TripoAssetAgent(SuperAgent):
         """Validate execution results."""
         validation = ValidationResult(is_valid=True)
 
+        asset_validation: dict[str, Any] | None = None
         for result in results:
             if not result.success:
                 validation.add_error(f"{result.tool_name} failed: {result.error}")
-
-        # Check asset validation result
-        for result in results:
             if result.tool_name == "tripo_validate_asset" and result.result:
                 asset_validation = result.result
                 if not asset_validation.get("is_valid", True):
@@ -465,8 +464,12 @@ class TripoAssetAgent(SuperAgent):
                     validation.add_warning(warning)
 
         if not validation.errors:
-            validation.quality_score = 0.9
-            validation.confidence_score = 0.85
+            quality, confidence = compute_validation_scores(
+                asset_validation,
+                warning_count=len(validation.warnings),
+            )
+            validation.quality_score = quality
+            validation.confidence_score = confidence
 
         return validation
 

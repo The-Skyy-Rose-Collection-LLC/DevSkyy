@@ -154,7 +154,7 @@ Plans:
 
 - [ ] **Phase 14: Catalog Foundation** — CSV adapter, bundle resolver, broken reader fixes, garment_type_lock column, techflat labeling, preflight audit. Zero API calls.
 - [ ] **Phase 15: Ghost Mannequin Agent + QA** — LangGraph agent, 2-step pipeline, garment-type routing, response classifier, retry logic, spend cap, background validator.
-- [ ] **Phase 16: Jersey OCR Gate** — OCR verification node for 6 jersey SKUs. Phase-blocking gate for Phase 18 jersey runs.
+- [x] **Phase 16: 3D-Replica Architect & Purge** — 3D-first pipeline (Meshy → headless Blender → Gemini 2.0 RAS) + hallucinated-asset purge. Shipped 2026-04-24, ahead of Phases 14/15. Original "Jersey OCR Gate" plan was dropped — see Phase 16 note below.
 - [ ] **Phase 17: Review & Approval CLI** — approve/reject CLI commands, approved/ structural gate, CSV atomic write.
 - [ ] **Phase 18: Full Batch + WooCommerce Upload** — Run all 28 in-scope garment SKUs, batch WooCommerce upload after 100% approval.
 
@@ -267,18 +267,19 @@ Plans:
   7. `/verification-loop` — automated verification loop confirming all success criteria pass
 **Plans**: TBD
 
-### Phase 16: Jersey OCR Gate
-**Goal**: No jersey SKU can enter the review queue unless Gemini Vision has verified the text and number zones are correct — the gate is enforced in the agent graph, not as a post-hoc check
-**Depends on**: Phase 15 (agent graph must exist before the OCR node can be inserted)
-**Requirements**: QA-03
-**Success Criteria** (what must be TRUE):
-  1. Running the agent against br-003 (a jersey SKU) without the OCR gate enabled raises a configuration error — the gate cannot be bypassed at runtime
-  2. A jersey image with correct text and number zones passes the OCR node and is written to the review directory
-  3. A jersey image with missing or garbled text/numbers is flagged to `failures.json` with reason "ocr_gate_failed" and is not written to the review directory
-  4. The 6 jersey SKUs (br-003, br-008, br-009, br-010, br-011, br-012) are the only SKUs that trigger the OCR node — all other garment types bypass it
-  5. `/simplify` — code simplification pass after phase implementation
-  6. `/verification-loop` — automated verification loop confirming all success criteria pass
-**Plans**: TBD
+### Phase 16: 3D-Replica Architect & Purge ✅ (completed 2026-04-24)
+**Goal**: The image generation pipeline produces high-fidelity professional renders by digitizing techflats into 3D (.glb) replicas, scaffolding them via headless Blender, and synthesizing final shots with Gemini 2.0 RAS — and all hallucinated/invalid catalog assets are purged.
+**Depends on**: Nothing (independent architectural upgrade — shipped ahead of Phases 14/15)
+**Requirements**: THREE-01, PURGE-01, CLI-01, VISION-01, ROTATE-01, GRAPH-01 (see `phases/16-3d-replica-architect-purge/16-VALIDATION.md`)
+**Success Criteria** (what was TRUE at sign-off):
+  1. `ThreeDAgent.generate_replica` produces a `.glb` model + scaffolded render + final synthesized image for any in-scope SKU
+  2. The `three_d_node` is wired into the LangGraph builder behind the `enable_3d` flag and replaces the standard generator when active
+  3. `purge_hallucinations.py` identifies and removes invalid/hallucinated assets (32 removed in initial run)
+  4. Gemini API key rotation handles 429 rate limits without operator intervention
+  5. Full UAT (`16-UAT.md`) and validation suite (`16-VALIDATION.md`) run green — 34 tests pass across 6 files
+**Plans:** Complete — see `phases/16-3d-replica-architect-purge/16-SUMMARY.md`
+
+> **Note — Original Phase 16 ("Jersey OCR Gate") was dropped.** The original plan to add a Gemini-Vision OCR verification node for jersey SKUs (br-003, br-008, br-009, br-010, br-011, br-012) was superseded by the 3D-Replica architecture, which produces verifiable text/number rendering through scaffold-grounded synthesis rather than post-hoc OCR. **Requirement QA-03 is no longer in scope** for v1.2 — Phase 18's jersey SKU run no longer depends on a separate OCR gate. (`REQUIREMENTS.md` still lists QA-03 as Pending and should be reconciled in a follow-up doc-only pass.)
 
 ### Phase 17: Review & Approval CLI
 **Goal**: The user can approve or reject each generated image from the command line, and approved images are atomically committed back to the CSV with zero risk of data corruption
@@ -295,7 +296,7 @@ Plans:
 
 ### Phase 18: Full Batch + WooCommerce Upload
 **Goal**: All 28 in-scope garment SKUs have a ghost mannequin front image approved by the user and uploaded to WooCommerce — with an explicit confirmation gate before any production write occurs
-**Depends on**: Phase 15, Phase 16, Phase 17 (agent complete, OCR gate active for jerseys, approval CLI ready); Phase 16 must complete before jersey SKUs are submitted for approval
+**Depends on**: Phase 15, Phase 17 (agent complete, approval CLI ready). The original Phase 16 jersey OCR-gate dependency was dropped — see Phase 16 note above. Jersey SKU verification is now handled by the 3D-Replica scaffold-grounded synthesis instead of a separate OCR node.
 **Requirements**: UPLOAD-01
 **Success Criteria** (what must be TRUE):
   1. Running the batch agent against all 28 in-scope SKUs completes without unhandled exceptions — every SKU either produces an output file or has a logged entry in `failures.json`
@@ -311,7 +312,7 @@ Plans:
 **Execution Order:**
 v1.0: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 v1.1: 9 → 10 → 11 → 12 → 13
-v1.2: 14 → 15 → 16 → 17 → 18 (Phase 16 must complete before jersey SKUs run in Phase 18)
+v1.2: 14 → 15 → 17 → 18 ; Phase 16 (3D-Replica Architect & Purge) shipped independently 2026-04-24 — original "Jersey OCR Gate" plan was dropped, no phantom dependency for Phase 18
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -330,6 +331,6 @@ v1.2: 14 → 15 → 16 → 17 → 18 (Phase 16 must complete before jersey SKUs 
 | 13. Luxury Cursor | v1.1 | 1/1 | Complete | 2026-03-11 |
 | 14. Catalog Foundation | v1.2 | 0/3 | Not started | - |
 | 15. Ghost Mannequin Agent + QA | v1.2 | 0/TBD | Not started | - |
-| 16. Jersey OCR Gate | v1.2 | 0/TBD | Not started | - |
+| 16. 3D-Replica Architect & Purge | v1.2 | Shipped | Complete | 2026-04-24 |
 | 17. Review & Approval CLI | v1.2 | 0/TBD | Not started | - |
 | 18. Full Batch + WooCommerce Upload | v1.2 | 0/TBD | Not started | - |

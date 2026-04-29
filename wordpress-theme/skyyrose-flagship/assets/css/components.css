@@ -26,8 +26,8 @@
 .badge--rose-gold { background: rgba(183, 110, 121, 0.15); color: var(--color-rose-gold, #B76E79); }
 .badge--gold      { background: rgba(212, 175, 55, 0.15); color: var(--color-gold, #D4AF37); }
 .badge--crimson   { background: rgba(220, 20, 60, 0.15); color: var(--color-crimson, #DC143C); }
-.badge--silver    { background: rgba(192, 192, 192, 0.15); color: #C0C0C0; }
-.badge--success   { background: rgba(46, 204, 113, 0.15); color: #2ecc71; }
+.badge--silver    { background: rgba(192, 192, 192, 0.15); color: var(--color-silver, #C0C0C0); }
+.badge--success   { background: var(--color-success-soft); color: var(--color-success); }
 
 .pill {
 	display: inline-flex;
@@ -118,9 +118,18 @@
 	visibility: visible;
 }
 
-.toast--success { border-left: 3px solid #2ecc71; }
-.toast--error   { border-left: 3px solid #e74c3c; }
-.toast--info    { border-left: 3px solid var(--color-rose-gold, #B76E79); }
+.toast--success {
+	border-top: 1px solid var(--color-success);
+	background: linear-gradient(180deg, var(--color-success-soft) 0%, var(--glass-bg) 60%);
+}
+.toast--error {
+	border-top: 1px solid var(--color-danger);
+	background: linear-gradient(180deg, var(--color-danger-soft) 0%, var(--glass-bg) 60%);
+}
+.toast--info {
+	border-top: 1px solid var(--color-info);
+	background: linear-gradient(180deg, var(--color-info-soft) 0%, var(--glass-bg) 60%);
+}
 
 .toast__content {
 	display: flex;
@@ -150,7 +159,7 @@
 }
 
 .toast__dismiss:focus-visible {
-	outline: 2px solid #B76E79;
+	outline: 2px solid var(--color-rose-gold, #B76E79);
 	outline-offset: 2px;
 	border-radius: 2px;
 }
@@ -184,14 +193,16 @@
 }
 
 .btn-success {
-	background: #2ecc71 !important;
-	border-color: #2ecc71 !important;
+	background: var(--color-success) !important;
+	border-color: var(--color-success) !important;
+	color: var(--color-page-bg) !important;
 	transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .btn-error {
-	background: #e74c3c !important;
-	border-color: #e74c3c !important;
+	background: var(--color-danger) !important;
+	border-color: var(--color-danger) !important;
+	color: var(--color-text-primary) !important;
 	transition: background 0.3s ease, border-color 0.3s ease;
 }
 
@@ -430,7 +441,7 @@
 
 .sr-btn--primary:hover {
 	background: var(--color-gold, #D4AF37);
-	color: #000;
+	color: var(--color-black, #000);
 	transform: var(--hover-lift, translateY(-2px));
 }
 

@@ -65,7 +65,7 @@ defined( 'ABSPATH' ) || exit;
 				<div class="footer-grid__col footer-grid__col--brand">
 					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="footer-brand__logo-link" rel="home">
 						<img
-							src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/sr-monogram.png' ); ?>"
+							src="<?php echo esc_url( get_template_directory_uri() . '/assets/branding/skyyrose-monogram-footer.webp' ); ?>"
 							alt="<?php esc_attr_e( 'SR Monogram', 'skyyrose' ); ?>"
 							class="footer-brand__monogram"
 							width="40"

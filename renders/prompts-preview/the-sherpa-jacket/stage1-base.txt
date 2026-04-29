@@ -1,0 +1,14 @@
+# Stage 1 Base Render Prompt — The Sherpa Jacket
+# SKU: sg-009 | Collection: Signature
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of a zip-front sherpa-lined jacket — NOT a hoodie, NOT a pullover, NOT a coat — placed flat or on an invisible mannequin worn slightly open at the front to show interior, front view centered on pure white background. The exterior is solid jet-black smooth nylon-style shell fabric throughout — body, long sleeves, and a stand-up funnel-neck collar approximately 2.5 inches tall with no hood and no drawstring. The full-length center-front zipper runs from the collar opening to the hem. Two patch hand pockets are sewn onto the lower front body panels. At the collar opening, cuff openings, and front placket gap, the plush white/cream sherpa fleece interior lining is visible — dense, textured, off-white fleece peeking from the interior to contrast the black exterior. The black ribbed or finished cuff and hem trim frame the sherpa interior peek. Professional e-commerce lighting, soft diffused key light from front-left emphasizing both the smooth exterior and the textured sherpa interior, tack-sharp focus, 8K commercial apparel photography quality.
+
+NOTES:
+- STAND-UP FUNNEL-NECK collar (NOT a hood) is the defining silhouette element — render it as a structured upright collar around the neck
+- WHITE/CREAM sherpa fleece interior peeking at collar, cuffs, and placket gap — the contrast between smooth black exterior and fluffy white sherpa interior is the signature visual detail of this jacket
+- Full-length zipper (not half-zip) is a structural element
+- Two PATCH pockets (sewn-on construction, horizontal opening) at lower front
+- Do NOT render any embroidery, logos, or printed graphics — all decoration is Stage 3
+- Exterior fabric: smooth nylon-style shell — NOT fleece exterior, NOT satin; should read as a lightweight outerwear shell

@@ -376,7 +376,7 @@ class VirtualPhotoshootGenerator:
         out_base = self.output_dir / product_sku
         if not out_base.exists():
             out_base = self.output_dir / "renders"
-        
+
         out_base.mkdir(parents=True, exist_ok=True)
         render_path = out_base / f"{product_sku}_render_{index}.png"
 
@@ -398,17 +398,17 @@ class VirtualPhotoshootGenerator:
             x = distance * np.cos(elevation) * np.sin(azimuth)
             y = distance * np.sin(elevation)
             z = distance * np.cos(elevation) * np.cos(azimuth)
-            
+
             # Use pyrender for higher quality headless rendering if available
             try:
                 import pyrender
                 # Set up pyrender scene
                 pr_scene = pyrender.Scene(bg_color=[1.0, 1.0, 1.0])
-                
+
                 # Convert trimesh to pyrender mesh
                 pr_mesh = pyrender.Mesh.from_trimesh(mesh)
                 pr_scene.add(pr_mesh)
-                
+
                 # Add camera
                 camera = pyrender.PerspectiveCamera(yfov=np.pi / 3.0)
                 cam_pose = np.array([
@@ -418,16 +418,16 @@ class VirtualPhotoshootGenerator:
                     [0,                0,                                 0,                                1]
                 ])
                 pr_scene.add(camera, pose=cam_pose)
-                
+
                 # Add light
                 light = pyrender.DirectionalLight(color=[1.0, 1.0, 1.0], intensity=5.0)
                 pr_scene.add(light, pose=cam_pose)
-                
+
                 # Render
                 r = pyrender.OffscreenRenderer(2048, 2048)
                 color, _ = r.render(pr_scene)
                 r.delete()
-                
+
                 render_img = Image.fromarray(color)
             except Exception as pr_err:
                 logger.debug(f"Pyrender failed, falling back to trimesh: {pr_err}")

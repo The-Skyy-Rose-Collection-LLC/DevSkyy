@@ -1,0 +1,13 @@
+# Stage 1 Base Render Prompt — BLACK is Beautiful Jersey Series: 5. Last Oakland (Baseball)
+# SKU: br-012 | Collection: Black Rose
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of an authentic-style button-front baseball jersey — NOT a pullover, NOT a football jersey, NOT a t-shirt — placed flat or on an invisible mannequin, front view centered on pure white background. The garment has a solid dark forest-green base fabric throughout the body and short sleeves, with gold/yellow contrast piping/binding along the V-neck collar edge and the full-length front button placket. The sleeve cuffs and hem are finished with gold/yellow contrast binding. The front closure is a full-length button placket with visible green/gold-tone buttons down the center. The fabric is mid-weight athletic knit — smooth, structured, characteristic of performance baseball jersey construction. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus, 8K commercial apparel photography quality.
+
+NOTES:
+- The dark forest-green body + gold/yellow piping is the defining colorway — render forest green as deep, dark green (NOT bright green, NOT olive, NOT black)
+- The gold/yellow piping at V-neck, front placket, sleeve cuffs, and hem is a structural construction detail — render as precise gold trim lines
+- The button placket with gold-tone buttons is a key construction identifier
+- Do NOT render any embroidery, logos, numbers, or printed graphics — all decoration is Stage 3
+- Fabric: mid-weight smooth athletic knit — NOT fleece, NOT satin, NOT mesh

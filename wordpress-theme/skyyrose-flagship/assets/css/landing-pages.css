@@ -427,14 +427,26 @@
 }
 
 .lp-story__quote {
-  border-left: 2px solid var(--lp-accent);
-  padding-left: 1.5rem;
+  position: relative;
+  padding: 0.5rem 0 0.5rem 2.25rem;
   margin: 2rem 0;
   font-family: var(--lp-font-display);
   font-style: italic;
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   color: var(--lp-text);
   line-height: 1.7;
+}
+
+.lp-story__quote::before {
+  content: '\201C';
+  position: absolute;
+  top: -0.25rem;
+  left: 0;
+  font-family: var(--lp-font-display);
+  font-size: 3rem;
+  line-height: 1;
+  color: var(--lp-accent);
+  opacity: 0.55;
 }
 
 .lp-story__image {

@@ -1,193 +1,236 @@
-"""nano_banana catalog shim — delegates to skyyrose.core.catalog_loader.
+"""Product catalog loader — reads from data/product-catalog.csv.
 
-Provides the legacy nano_banana API surface (load_catalog, load_products,
-load_specs, get_material_spec, find_source_image) over the canonical CSV.
-All data now flows from a single source: skyyrose-catalog.csv.
+Single source of truth for all product metadata. No hardcoded catalogs.
 """
 
 from __future__ import annotations
 
+import csv
 import json
 import logging
-import os
 from pathlib import Path
-from typing import Any
 
-from skyyrose.core.catalog_loader import CATALOG_CSV as _CANONICAL_CSV
-from skyyrose.core.catalog_loader import bool_col, read_catalog_rows
+log = logging.getLogger(__name__)
 
-logger = logging.getLogger(__name__)
-
-# Project root = two parents up from this file (scripts/nano_banana/ → scripts/ → root)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-
-# Env-var overridable CSV path (matches skyyrose.elite_studio.catalog pattern)
-CATALOG_CSV = Path(os.getenv("SKYYROSE_CATALOG_PATH") or _CANONICAL_CSV)
-
-# Material / branding specs live in a separate JSON file (not the CSV)
+PRODUCTS_DIR = (
+    PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
+)
+SOURCE_DIR = PROJECT_ROOT / "skyyrose" / "assets" / "images" / "source-products"
+CATALOG_CSV = (
+    PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "skyyrose-catalog.csv"
+)
 SPECS_JSON = PROJECT_ROOT / "data" / "product-specs.json"
 
 
-def load_catalog(path: Path | None = None) -> dict[str, dict[str, Any]]:
-    """Load catalog as dict keyed by SKU.
-
-    Maps canonical CSV columns to the nano_banana API contract:
-        name, collection, is_preorder, output_slug, is_tech_flat,
-        is_accessory, garment_type, source_override (optional)
-    """
-    rows = read_catalog_rows(path or CATALOG_CSV)
-    catalog: dict[str, dict[str, Any]] = {}
-    for row in rows:
-        sku = row["sku"]
-        entry: dict[str, Any] = {
-            "name": row["name"],
-            "collection": row["collection"],
-            "is_preorder": bool_col(row, "is_preorder"),
-            "output_slug": row.get("render_output_slug") or sku,
-            "is_tech_flat": bool_col(row, "render_is_tech_flat"),
-            "is_accessory": bool_col(row, "render_is_accessory"),
-            "garment_type": (row.get("garment_type_lock") or "").strip(),
-        }
-        override = (row.get("render_source_override") or "").strip()
-        if override:
-            entry["source_override"] = override
-        catalog[sku] = entry
+def load_catalog() -> dict[str, dict]:
+    """Load product catalog from CSV. Returns dict keyed by SKU."""
+    catalog: dict[str, dict] = {}
+    with CATALOG_CSV.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            sku = row["sku"].strip()
+            if not sku:
+                continue
+            entry: dict = {
+                "name": row["name"].strip(),
+                "collection": row["collection"].strip(),
+                "is_preorder": row["is_preorder"].strip() == "1",
+                "output_slug": row["render_output_slug"].strip() or sku,
+                "is_tech_flat": row["render_is_tech_flat"].strip() == "1",
+                "is_accessory": row["render_is_accessory"].strip() == "1",
+            }
+            if row["render_source_override"].strip():
+                entry["source_override"] = row["render_source_override"].strip()
+            if row["render_back_source_override"].strip():
+                entry["back_source_override"] = row["render_back_source_override"].strip()
+            catalog[sku] = entry
     return catalog
 
 
-def load_specs(path: Path | None = None) -> dict[str, Any]:
-    """Load product-specs.json. Returns {} silently if the file is missing.
+def find_source_image(sku: str, catalog: dict[str, dict]) -> Path | None:
+    """Find the best available source image for a SKU.
 
-    If the JSON has a top-level "products" key, unwrap it so callers get a
-    flat SKU-keyed dict (e.g. {"br-001": {...}, "lh-004": {...}}).
+    Priority: real photos first, never use generated renders as source.
+    1. Bundle product photo (real camera shot)
+    2. Source map techflat split (real scan, .jpeg/.jpg/.png only)
+    3. CSV override (explicit path)
+    4. Glob fallback (non-generated files only)
     """
-    spec_path = path or SPECS_JSON
-    try:
-        with open(spec_path, encoding="utf-8") as f:
-            data = json.load(f)
-    except FileNotFoundError:
-        return {}
-    except (OSError, json.JSONDecodeError) as exc:
-        logger.warning("Failed to load %s: %s", spec_path, exc)
-        return {}
+    from nano_banana.pipeline import _find_bundle_dir
+    from nano_banana.source_map import get_source_map
 
-    # Unwrap nested {"products": {...}} structure if present
-    if isinstance(data, dict) and "products" in data and isinstance(data["products"], dict):
-        return data["products"]
-    return data
+    info = catalog.get(sku, {})
+    name = info.get("name", sku)
 
+    # 1. Bundle product photo — real camera shot, highest trust
+    bundle_dir = _find_bundle_dir(name, sku)
+    if bundle_dir:
+        for tag in ("photo-front", "source-photo"):
+            for f in bundle_dir.glob(f"{tag}.*"):
+                if f.exists() and f.suffix.lower() in (".jpg", ".jpeg", ".png"):
+                    return f
 
-def get_material_spec(sku: str, specs: dict[str, Any] | None = None) -> str:
-    """Return a formatted material spec string for a SKU, or '' if not found.
+    # 2. Source map techflat — real scan, but only non-webp (avoid generated renders)
+    smap = get_source_map()
+    if sku in smap:
+        front = smap[sku].get("front")
+        if front and front.exists() and front.suffix.lower() in (".jpg", ".jpeg", ".png"):
+            return front
 
-    Format:
-        Material: <fabric>
-        Texture: <texture>
-        Branding: <branding>
-        [Patch: <patch>]
-    """
-    s = specs if specs is not None else load_specs()
-    if not isinstance(s, dict):
-        return ""
-    entry = s.get(sku)
-    if not entry or not isinstance(entry, dict):
-        return ""
+    # 3. CSV source override
+    if "source_override" in info:
+        path = PRODUCTS_DIR / info["source_override"]
+        if path.exists():
+            return path
+        log.warning("source_override %s not found for %s", info["source_override"], sku)
 
-    lines: list[str] = []
-    if entry.get("fabric"):
-        lines.append(f"Material: {entry['fabric']}")
-    if entry.get("texture"):
-        lines.append(f"Texture: {entry['texture']}")
-    if entry.get("branding"):
-        lines.append(f"Branding: {entry['branding']}")
-    if entry.get("patch"):
-        lines.append(f"Patch: {entry['patch']}")
+    # 4. Source map webp fallback (may be a real photo saved as webp)
+    if sku in smap:
+        front = smap[sku].get("front")
+        if front and front.exists():
+            return front
 
-    return "\n".join(lines)
+    # 5. Glob fallback — exclude generated renders
+    slug = info.get("output_slug", sku)
+    candidates = []
+    for ext in (".jpg", ".jpeg", ".png", ".webp"):
+        candidates.extend(PRODUCTS_DIR.glob(f"{slug}*{ext}"))
 
+    source_candidates = [
+        p
+        for p in candidates
+        if "-front-model" not in p.stem
+        and "-back-model" not in p.stem
+        and "-branding" not in p.stem
+        and "-composite" not in p.stem
+    ]
 
-def find_source_image(
-    sku: str,
-    catalog_entry: dict[str, Any],
-    products_dir: Path | None = None,
-) -> Path | None:
-    """Resolve the source techflat / product image for a SKU.
-
-    Precedence:
-      1. `source_override` in catalog_entry (absolute or relative to products_dir)
-      2. Bundle directory `data/product-bundles/*/techflat-front.*` via manifest.json SKU match
-      3. None (caller decides how to handle)
-    """
-    # 1. Explicit override
-    override = catalog_entry.get("source_override")
-    if override:
-        override_path = Path(override)
-        if not override_path.is_absolute() and products_dir is not None:
-            override_path = products_dir / override_path
-        if override_path.exists():
-            return override_path
-
-    # 2. Bundle manifest.json scan
-    bundle = _bundle_dir_for_sku(sku)
-    if bundle is not None:
-        for ext in ("jpeg", "jpg", "webp", "png"):
-            candidate = bundle / f"techflat-front.{ext}"
-            if candidate.exists():
-                return candidate
+    if source_candidates:
+        # Prefer non-webp (real photos) over webp (possibly generated)
+        real = [p for p in source_candidates if p.suffix.lower() != ".webp"]
+        if real:
+            real.sort(key=lambda p: p.stat().st_size, reverse=True)
+            return real[0]
+        source_candidates.sort(key=lambda p: p.stat().st_size, reverse=True)
+        return source_candidates[0]
 
     return None
 
 
-def _bundle_dir_for_sku(sku: str) -> Path | None:
-    """Scan data/product-bundles/ for a bundle whose manifest.json has matching SKU."""
-    bundles_root = PROJECT_ROOT / "data" / "product-bundles"
-    if not bundles_root.is_dir():
+def find_back_source(sku: str, catalog: dict[str, dict]) -> Path | None:
+    """Find back-specific source image. Crops 2-panel techflats automatically."""
+    import tempfile
+
+    from nano_banana.source_map import get_source_map
+
+    # 1. Authoritative source map
+    smap = get_source_map()
+    if sku in smap:
+        back = smap[sku].get("back")
+        if back and back.exists():
+            return back
+
+    # 2. CSV override fallback
+    info = catalog.get(sku, {})
+    back_override = info.get("back_source_override")
+    if not back_override:
         return None
-    for d in bundles_root.iterdir():
-        if not d.is_dir():
-            continue
-        manifest = d / "manifest.json"
-        if not manifest.exists():
-            continue
-        try:
-            data = json.loads(manifest.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            continue
-        if data.get("sku") == sku:
-            return d
-    return None
+
+    back_path = PRODUCTS_DIR / back_override
+    if not back_path.exists():
+        back_path = SOURCE_DIR / back_override
+    if not back_path.exists():
+        log.warning("back_source_override %s not found for %s", back_override, sku)
+        return None
+
+    # Auto-crop right half of 2-panel techflats
+    try:
+        from PIL import Image
+
+        img = Image.open(back_path)
+        w, h = img.size
+        if w > h * 1.1:
+            right_half = img.crop((w // 2, 0, w, h))
+            tmp = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
+            right_half.save(tmp.name, format="JPEG", quality=95)
+            tmp.close()
+            return Path(tmp.name)
+    except Exception as exc:
+        log.warning("Could not crop back source %s: %s", back_override, exc)
+
+    return back_path
 
 
 def load_products(
-    catalog: dict[str, dict[str, Any]] | None = None,
-    *,
+    catalog: dict[str, dict],
     sku_filter: str | None = None,
     collection_filter: str | None = None,
-    include_accessories: bool = True,
-    include_preorders: bool = True,
-) -> list[dict[str, Any]]:
-    """Return filtered list of product dicts (each with 'sku' key + source_path).
+) -> list[dict]:
+    """Build product list with resolved source images.
 
     Args:
-        catalog: Pre-loaded catalog dict. If None, loads from canonical CSV.
-        sku_filter: If set, only include this single SKU.
-        collection_filter: If set, only include products in this collection slug.
-        include_accessories: Whether to include accessories (default True).
-        include_preorders: Whether to include pre-order items (default True).
+        catalog: Full catalog dict keyed by SKU.
+        sku_filter: Process only this single SKU.
+        collection_filter: Process only SKUs in this collection slug
+            (e.g. "black-rose", "signature", "love-hurts", "kids-capsule").
+
+    Returns list of dicts with sku, name, collection, source_image, etc.
     """
-    cat = catalog if catalog is not None else load_catalog()
-    products: list[dict[str, Any]] = []
-    for sku, entry in cat.items():
-        if sku_filter is not None and sku != sku_filter:
+    products = []
+    skus = [sku_filter] if sku_filter else sorted(catalog.keys())
+
+    for sku in skus:
+        if sku not in catalog:
+            log.warning("SKU %s not in catalog", sku)
             continue
-        if collection_filter is not None and entry.get("collection") != collection_filter:
+        info = catalog[sku]
+
+        if collection_filter and info["collection"] != collection_filter:
             continue
-        if not include_accessories and entry.get("is_accessory"):
-            continue
-        if not include_preorders and entry.get("is_preorder"):
-            continue
-        product = dict(entry)
-        product["sku"] = sku
-        product["source_path"] = find_source_image(sku, entry)
-        products.append(product)
+
+        source = find_source_image(sku, catalog)
+        products.append(
+            {
+                "sku": sku,
+                "name": info["name"],
+                "collection": info["collection"],
+                "is_accessory": info["is_accessory"],
+                "is_tech_flat": info["is_tech_flat"],
+                "output_slug": info["output_slug"],
+                "source_image": source,
+            }
+        )
+
     return products
+
+
+def load_specs() -> dict[str, dict]:
+    """Load product specs from the single source of truth (product-specs.json).
+
+    Returns the 'products' dict keyed by SKU. Each entry has:
+        name, collection, branding, fabric, texture, patch
+    """
+    if not SPECS_JSON.exists():
+        return {}
+    data = json.loads(SPECS_JSON.read_text())
+    return data.get("products", {})
+
+
+def get_material_spec(sku: str) -> str:
+    """Get fabric + texture description for a SKU to inject into prompts.
+
+    Loads from data/product-specs.json (single source of truth).
+    Returns empty string if no specs for this SKU.
+    """
+    specs = load_specs()
+    entry = specs.get(sku, {})
+    if not entry:
+        return ""
+
+    parts = []
+    if entry.get("fabric"):
+        parts.append(f"Material: {entry['fabric']}")
+    if entry.get("texture"):
+        parts.append(f"Texture: {entry['texture']}")
+
+    return " | ".join(parts) if parts else ""

@@ -110,7 +110,7 @@ function skyyrose_product_schema() {
 
 	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-encoded with JSON_HEX_TAG preventing script injection.
 }
-add_action( 'wp_head', 'skyyrose_product_schema' );
+add_action( 'wp_head', 'skyyrose_product_schema', 1 );
 
 /**
  * Add Organization schema markup for SkyyRose LLC.
@@ -142,6 +142,10 @@ function skyyrose_organization_schema() {
 		'name'        => 'SkyyRose',
 		'legalName'   => 'SkyyRose LLC',
 		'url'         => home_url( '/' ),
+		'founder'     => array(
+			'@type' => 'Person',
+			'name'  => 'Corey Foster',
+		),
 		'description' => __( 'Luxury Grows from Concrete. Premium streetwear and luxury fashion brand.', 'skyyrose' ),
 		'logo'        => $logo_url ? array(
 			'@type' => 'ImageObject',
@@ -155,7 +159,17 @@ function skyyrose_organization_schema() {
 		'sameAs'      => array(),
 	);
 
-	// Add social media profiles from Customizer settings.
+	// Canonical brand social profiles — always present in sameAs.
+	$default_profiles = array(
+		'https://instagram.com/skyyroseco',
+		'https://tiktok.com/@skyyroseco',
+	);
+
+	foreach ( $default_profiles as $profile_url ) {
+		$schema['sameAs'][] = $profile_url;
+	}
+
+	// Add additional social media profiles from Customizer settings (deduplicated).
 	$social_profiles = array(
 		'facebook'  => get_theme_mod( 'facebook_url' ),
 		'twitter'   => get_theme_mod( 'twitter_url' ),
@@ -165,7 +179,7 @@ function skyyrose_organization_schema() {
 	);
 
 	foreach ( $social_profiles as $profile ) {
-		if ( ! empty( $profile ) ) {
+		if ( ! empty( $profile ) && ! in_array( esc_url_raw( $profile ), $schema['sameAs'], true ) ) {
 			$schema['sameAs'][] = esc_url( $profile );
 		}
 	}
@@ -198,7 +212,7 @@ function skyyrose_organization_schema() {
 
 	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-encoded with JSON_HEX_TAG preventing script injection.
 }
-add_action( 'wp_head', 'skyyrose_organization_schema' );
+add_action( 'wp_head', 'skyyrose_organization_schema', 1 );
 
 /**
  * Add WebSite schema with SearchAction (sitelinks search box).
@@ -235,7 +249,7 @@ function skyyrose_website_schema() {
 
 	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
-add_action( 'wp_head', 'skyyrose_website_schema' );
+add_action( 'wp_head', 'skyyrose_website_schema', 1 );
 
 /**
  * Add BreadcrumbList schema markup.
@@ -279,7 +293,7 @@ function skyyrose_breadcrumb_schema() {
 
 	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-encoded with JSON_HEX_TAG preventing script injection.
 }
-add_action( 'wp_head', 'skyyrose_breadcrumb_schema' );
+add_action( 'wp_head', 'skyyrose_breadcrumb_schema', 1 );
 
 /**
  * Get breadcrumb trail.
@@ -296,7 +310,41 @@ function skyyrose_get_breadcrumb_trail() {
 		),
 	);
 
-	if ( is_singular( 'product' ) && function_exists( 'wc_get_page_id' ) ) {
+	// Custom collection page templates: Home → Collections → [Collection Name].
+	$breadcrumb_collection_templates = array(
+		'template-collection-black-rose.php'   => __( 'Black Rose', 'skyyrose' ),
+		'template-collection-love-hurts.php'   => __( 'Love Hurts', 'skyyrose' ),
+		'template-collection-signature.php'    => __( 'Signature', 'skyyrose' ),
+		'template-collection-kids-capsule.php' => __( 'Kids Capsule', 'skyyrose' ),
+	);
+
+	$matched_breadcrumb_collection = false;
+	foreach ( $breadcrumb_collection_templates as $tpl_file => $col_name ) {
+		if ( is_page_template( $tpl_file ) ) {
+			$matched_breadcrumb_collection = $col_name;
+			break;
+		}
+	}
+
+	if ( $matched_breadcrumb_collection ) {
+		$collections_page = get_page_by_path( 'collections' );
+		if ( $collections_page ) {
+			$breadcrumbs[] = array(
+				'title' => __( 'Collections', 'skyyrose' ),
+				'url'   => get_permalink( $collections_page->ID ),
+			);
+		} else {
+			$breadcrumbs[] = array(
+				'title' => __( 'Collections', 'skyyrose' ),
+				'url'   => home_url( '/collections/' ),
+			);
+		}
+
+		$breadcrumbs[] = array(
+			'title' => $matched_breadcrumb_collection,
+			'url'   => get_permalink(),
+		);
+	} elseif ( is_singular( 'product' ) && function_exists( 'wc_get_page_id' ) ) {
 		$breadcrumbs[] = array(
 			'title' => __( 'Shop', 'skyyrose' ),
 			'url'   => get_permalink( wc_get_page_id( 'shop' ) ),
@@ -433,9 +481,38 @@ function skyyrose_open_graph_tags() {
 	echo '<meta property="og:site_name" content="' . esc_attr( $site_name ) . '" />' . "\n";
 
 	// Fallback OG image (brand monogram).
-	$fallback_og_image = get_template_directory_uri() . '/assets/images/sr-monogram-hero.png';
+	$fallback_og_image = get_template_directory_uri() . '/assets/branding/sr-primary-hero.webp';
 
-	if ( is_singular() ) {
+	// Custom collection page templates — must precede the generic is_singular() branch.
+	$collection_templates = array(
+		'template-collection-black-rose.php'   => array( 'Black Rose Collection', 'black-rose' ),
+		'template-collection-love-hurts.php'   => array( 'Love Hurts Collection', 'love-hurts' ),
+		'template-collection-signature.php'    => array( 'Signature Collection', 'signature' ),
+		'template-collection-kids-capsule.php' => array( 'Kids Capsule Collection', 'kids-capsule' ),
+	);
+
+	$active_collection_template = false;
+	foreach ( $collection_templates as $tpl_file => $tpl_data ) {
+		if ( is_page_template( $tpl_file ) ) {
+			$active_collection_template = $tpl_data;
+			break;
+		}
+	}
+
+	if ( $active_collection_template ) {
+		$col_label = $active_collection_template[0];
+		echo '<meta property="og:type" content="website" />' . "\n";
+		echo '<meta property="og:title" content="' . esc_attr( 'Shop ' . $col_label . ' | ' . $site_name ) . '" />' . "\n";
+		echo '<meta property="og:description" content="' . esc_attr( 'Browse the ' . $col_label . ' from SkyyRose. Luxury Grows from Concrete.' ) . '" />' . "\n";
+		echo '<meta property="og:url" content="' . esc_url( get_permalink() ) . '" />' . "\n";
+		if ( has_post_thumbnail() ) {
+			echo '<meta property="og:image" content="' . esc_url( get_the_post_thumbnail_url( get_the_ID(), 'full' ) ) . '" />' . "\n";
+			echo '<meta property="og:image:width" content="1200" />' . "\n";
+			echo '<meta property="og:image:height" content="630" />' . "\n";
+		} else {
+			echo '<meta property="og:image" content="' . esc_url( $fallback_og_image ) . '" />' . "\n";
+		}
+	} elseif ( is_singular() ) {
 		global $post;
 
 		echo '<meta property="og:type" content="' . esc_attr( is_singular( 'product' ) ? 'product' : 'article' ) . '" />' . "\n";
@@ -503,7 +580,7 @@ function skyyrose_open_graph_tags() {
 		echo '<meta property="og:image" content="' . esc_url( $fallback_og_image ) . '" />' . "\n";
 	}
 }
-add_action( 'wp_head', 'skyyrose_open_graph_tags' );
+add_action( 'wp_head', 'skyyrose_open_graph_tags', 1 );
 
 /**
  * Add Twitter Card tags.
@@ -520,14 +597,38 @@ function skyyrose_twitter_card_tags() {
 
 	echo '<meta name="twitter:card" content="summary_large_image" />' . "\n";
 
-	$twitter_handle = get_theme_mod( 'twitter_handle' );
-	if ( $twitter_handle ) {
-		echo '<meta name="twitter:site" content="@' . esc_attr( str_replace( '@', '', $twitter_handle ) ) . '" />' . "\n";
+	// Use theme_mod handle when configured; fall back to the canonical brand account.
+	$twitter_handle = get_theme_mod( 'twitter_handle', 'skyyroseco' );
+	echo '<meta name="twitter:site" content="@' . esc_attr( ltrim( $twitter_handle, '@' ) ) . '" />' . "\n";
+
+	$fallback_image = get_template_directory_uri() . '/assets/branding/sr-primary-hero.webp';
+
+	// Custom collection page templates — must precede the generic is_singular() branch.
+	$twitter_collection_templates = array(
+		'template-collection-black-rose.php'   => array( 'Black Rose Collection', 'black-rose' ),
+		'template-collection-love-hurts.php'   => array( 'Love Hurts Collection', 'love-hurts' ),
+		'template-collection-signature.php'    => array( 'Signature Collection', 'signature' ),
+		'template-collection-kids-capsule.php' => array( 'Kids Capsule Collection', 'kids-capsule' ),
+	);
+
+	$active_twitter_collection = false;
+	foreach ( $twitter_collection_templates as $tpl_file => $tpl_data ) {
+		if ( is_page_template( $tpl_file ) ) {
+			$active_twitter_collection = $tpl_data;
+			break;
+		}
 	}
 
-	$fallback_image = get_template_directory_uri() . '/assets/images/sr-monogram-hero.png';
-
-	if ( is_singular() ) {
+	if ( $active_twitter_collection ) {
+		$tc_label = $active_twitter_collection[0];
+		echo '<meta name="twitter:title" content="' . esc_attr( 'Shop ' . $tc_label . ' | SkyyRose' ) . '" />' . "\n";
+		echo '<meta name="twitter:description" content="' . esc_attr( 'Browse the ' . $tc_label . ' from SkyyRose. Luxury Grows from Concrete.' ) . '" />' . "\n";
+		if ( has_post_thumbnail() ) {
+			echo '<meta name="twitter:image" content="' . esc_url( get_the_post_thumbnail_url( get_the_ID(), 'full' ) ) . '" />' . "\n";
+		} else {
+			echo '<meta name="twitter:image" content="' . esc_url( $fallback_image ) . '" />' . "\n";
+		}
+	} elseif ( is_singular() ) {
 		echo '<meta name="twitter:title" content="' . esc_attr( get_the_title() ) . '" />' . "\n";
 		echo '<meta name="twitter:description" content="' . esc_attr( wp_strip_all_tags( get_the_excerpt() ) ) . '" />' . "\n";
 
@@ -553,7 +654,7 @@ function skyyrose_twitter_card_tags() {
 		echo '<meta name="twitter:image" content="' . esc_url( $fallback_image ) . '" />' . "\n";
 	}
 }
-add_action( 'wp_head', 'skyyrose_twitter_card_tags' );
+add_action( 'wp_head', 'skyyrose_twitter_card_tags', 1 );
 
 /**
  * Add canonical URL.
@@ -779,7 +880,114 @@ function skyyrose_collection_schema() {
 
 	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-encoded with JSON_HEX_TAG preventing script injection.
 }
-add_action( 'wp_head', 'skyyrose_collection_schema' );
+add_action( 'wp_head', 'skyyrose_collection_schema', 1 );
+
+/**
+ * Output ItemList JSON-LD schema for custom collection page templates.
+ *
+ * Fires on the four SkyyRose collection page templates which are WP pages,
+ * not WooCommerce taxonomies, so skyyrose_collection_schema() doesn't fire.
+ * Uses the CSV-backed catalog via skyyrose_get_collection_products().
+ *
+ * Skips output when Yoast SEO is active.
+ *
+ * @since 1.0.0
+ */
+function skyyrose_collection_itemlist_schema() {
+	// Defer to Yoast SEO if active.
+	if ( defined( 'WPSEO_VERSION' ) ) {
+		return;
+	}
+
+	if ( ! function_exists( 'skyyrose_get_collection_products' ) || ! function_exists( 'skyyrose_product_url' ) ) {
+		return;
+	}
+
+	$collection_map = array(
+		'template-collection-black-rose.php'   => array(
+			'slug'  => 'black-rose',
+			'label' => 'Black Rose Collection',
+		),
+		'template-collection-love-hurts.php'   => array(
+			'slug'  => 'love-hurts',
+			'label' => 'Love Hurts Collection',
+		),
+		'template-collection-signature.php'    => array(
+			'slug'  => 'signature',
+			'label' => 'Signature Collection',
+		),
+		'template-collection-kids-capsule.php' => array(
+			'slug'  => 'kids-capsule',
+			'label' => 'Kids Capsule Collection',
+		),
+	);
+
+	$matched = null;
+	foreach ( $collection_map as $tpl_file => $col_data ) {
+		if ( is_page_template( $tpl_file ) ) {
+			$matched = $col_data;
+			break;
+		}
+	}
+
+	if ( null === $matched ) {
+		return;
+	}
+
+	$products = skyyrose_get_collection_products( $matched['slug'] );
+
+	if ( empty( $products ) ) {
+		return;
+	}
+
+	$items    = array();
+	$position = 1;
+
+	foreach ( $products as $product ) {
+		// Only include published products in the schema.
+		if ( empty( $product['published'] ) ) {
+			continue;
+		}
+
+		$product_url = skyyrose_product_url( $product['sku'] );
+
+		$item = array(
+			'@type'    => 'ListItem',
+			'position' => $position,
+			'url'      => $product_url,
+			'name'     => $product['name'],
+		);
+
+		// Add price when available.
+		if ( ! empty( $product['price'] ) && $product['price'] > 0 ) {
+			$item['offers'] = array(
+				'@type'         => 'Offer',
+				'price'         => $product['price'],
+				'priceCurrency' => 'USD',
+				'availability'  => 'https://schema.org/InStock',
+			);
+		}
+
+		$items[] = $item;
+		++$position;
+	}
+
+	if ( empty( $items ) ) {
+		return;
+	}
+
+	$schema = array(
+		'@context'        => 'https://schema.org',
+		'@type'           => 'ItemList',
+		'name'            => $matched['label'],
+		'url'             => get_permalink(),
+		'numberOfItems'   => count( $items ),
+		'itemListElement' => $items,
+	);
+
+	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-encoded with JSON_HEX_TAG preventing script injection.
+}
+add_action( 'wp_head', 'skyyrose_collection_itemlist_schema', 1 );
 
 /**
  * Output favicon and touch icon tags.
@@ -798,7 +1006,7 @@ function skyyrose_favicon_tags() {
 
 	$uri = get_template_directory_uri();
 	?>
-	<link rel="icon" type="image/png" sizes="32x32" href="<?php echo esc_url( $uri . '/assets/images/sr-monogram-favicon.png' ); ?>">
+	<link rel="icon" type="image/webp" sizes="32x32" href="<?php echo esc_url( $uri . '/assets/branding/skyyrose-rose-icon-favicon.webp' ); ?>">
 	<link rel="apple-touch-icon" sizes="180x180" href="<?php echo esc_url( $uri . '/assets/branding/skyyrose-monogram-footer.webp' ); ?>">
 	<?php
 }

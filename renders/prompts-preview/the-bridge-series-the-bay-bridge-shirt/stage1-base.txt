@@ -1,0 +1,13 @@
+# Stage 1 Base Render Prompt — The Bridge Series 'The Bay Bridge' Shirt
+# SKU: sg-005 | Collection: Signature
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of a classic crew-neck short-sleeve t-shirt — NOT a hoodie, NOT a jersey, NOT a polo — placed flat or on an invisible mannequin, front view centered on pure white background. The garment is solid white cotton or cotton-blend fabric throughout — clean bright white body, set-in short sleeves, ribbed crew-neck collar, and a straight even hem at the bottom. The fabric surface shows the characteristic slightly textured weave of mid-weight cotton jersey. The fit is relaxed standard t-shirt silhouette. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus from collar to hem, 8K commercial apparel photography quality.
+
+NOTES:
+- This is a foundational solid white t-shirt at Stage 1 — identical base construction to sg-002; the Bay Bridge graphic is a Stage 3 decoration overlay
+- The CSV color field reads "Navy" but the techflat and catalog indicate this is a white-ground shirt with navy Bay Bridge photography as a graphic — render the base as solid white; the navy/blue tones come entirely from the printed bridge photo (Stage 3)
+- The ribbed crew-neck collar is a construction detail — render the subtle ribbing texture at the neckband
+- Do NOT render any printed graphics, photos, text, logos, or embroidery — all decoration is Stage 3
+- Fabric: mid-weight cotton jersey — NOT fleece, NOT mesh, NOT satin

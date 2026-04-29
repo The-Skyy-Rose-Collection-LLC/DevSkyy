@@ -10,13 +10,10 @@ from typing import Any
 
 from claude_agent_sdk import create_sdk_mcp_server, tool
 
-# Message Queue imports (Approach B)
-from agent_sdk.task_queue import TaskPriority, get_task_queue
 from agents.commerce_agent import CommerceAgent
 from agents.operations_agent import OperationsAgent
 from agents.support_agent import SupportAgent
 
-# Message Queue imports (Approach B)
 from .task_queue import TaskPriority, get_task_queue
 
 # Direct imports from existing DevSkyy agents (Approach A)

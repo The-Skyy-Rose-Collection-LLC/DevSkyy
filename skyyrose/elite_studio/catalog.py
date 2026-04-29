@@ -30,6 +30,11 @@ from skyyrose.core.catalog_loader import (
     status_from_row,
 )
 
+# Re-export the canonical CSV path so validate_catalog_readers() and any other
+# tooling can verify this module's source matches the single source of truth
+# without needing to reach into skyyrose.core.catalog_loader directly.
+CATALOG_CSV = CANONICAL_CATALOG_CSV
+
 from .validation import (
     IntegrityError,
     Violation,
@@ -340,6 +345,19 @@ class Catalog:
 
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
+
+
+def get_product_with_dossier(sku: str) -> dict:
+    """Return the canonical CSV row for ``sku`` merged with its parsed dossier.
+
+    Delegates to ``skyyrose.core.dossier_loader.get_product_with_dossier`` so
+    elite_studio callers don't need to know the canonical loader path.
+    Hard-fails (``DossierMissingError``) if the SKU has no dossier — the thin
+    ``branding_spec`` CSV column is not a fallback.
+    """
+    from skyyrose.core.dossier_loader import get_product_with_dossier as _get_product_with_dossier
+
+    return _get_product_with_dossier(sku)
 
 
 def _series_from_name(name: str) -> str | None:

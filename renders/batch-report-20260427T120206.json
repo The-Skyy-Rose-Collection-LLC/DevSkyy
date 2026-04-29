@@ -1,0 +1,201 @@
+{
+  "timestamp": "20260427T120206",
+  "collections": [
+    "signature"
+  ],
+  "total_views": 4,
+  "passed": 0,
+  "failed": 4,
+  "total_cost_usd": 0.7600000000000002,
+  "total_duration_ms": 488159,
+  "results": [
+    {
+      "sku": "sg-006",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 105072,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-006/20260427T120351/sg-006-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "front-chevron color palette",
+          "region": "front-body",
+          "severity": "high"
+        },
+        {
+          "element": "front-center-chest logo and placement",
+          "region": "front-body",
+          "severity": "high"
+        },
+        {
+          "element": "pocket style (kangaroo instead of slash) and missing pink piping",
+          "region": "front-body",
+          "severity": "high"
+        },
+        {
+          "element": "cuff pattern (horizontal stripes instead of V-shape chevron)",
+          "region": "sleeves",
+          "severity": "medium"
+        },
+        {
+          "element": "waistband pattern (missing V-shape chevron)",
+          "region": "bottom-hem",
+          "severity": "medium"
+        },
+        {
+          "element": "front-zipper tape color (purple instead of white)",
+          "region": "front-body",
+          "severity": "low"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-006",
+      "view": "back",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 114825,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-006/20260427T120546/sg-006-back-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "body color",
+          "region": "front-body / back-body / sleeves",
+          "severity": "high"
+        },
+        {
+          "element": "chevron color palette",
+          "region": "front-chevron",
+          "severity": "high"
+        },
+        {
+          "element": "drawstring color",
+          "region": "hood-drawstring",
+          "severity": "medium"
+        },
+        {
+          "element": "cuff and waistband decoration",
+          "region": "left-cuff / right-cuff / waistband",
+          "severity": "high"
+        },
+        {
+          "element": "pocket construction and detail",
+          "region": "front-left-pocket / front-right-pocket",
+          "severity": "medium"
+        },
+        {
+          "element": "missing chest emblem",
+          "region": "front-center-chest",
+          "severity": "medium"
+        },
+        {
+          "element": "unauthorized sleeve graphic",
+          "region": "left-sleeve",
+          "severity": "high"
+        },
+        {
+          "element": "missing sleeve chevron accents",
+          "region": "left-sleeve / right-sleeve",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-014",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 116876,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-014/20260427T120743/sg-014-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "front-thigh-chevron",
+          "region": "front-thighs",
+          "severity": "high"
+        },
+        {
+          "element": "front-thigh-chevron palette",
+          "region": "front-left-thigh",
+          "severity": "high"
+        },
+        {
+          "element": "waistband",
+          "region": "waistband",
+          "severity": "high"
+        },
+        {
+          "element": "ankle-cuffs",
+          "region": "ankle-cuffs",
+          "severity": "high"
+        },
+        {
+          "element": "front-center-waistband rose cluster",
+          "region": "front-center-waist",
+          "severity": "medium"
+        },
+        {
+          "element": "drawstring",
+          "region": "waistband",
+          "severity": "low"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-015",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 151351,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-015/20260427T121014/sg-015-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "chest text wordmark",
+          "region": "front-center-chest-jacket",
+          "severity": "high"
+        },
+        {
+          "element": "pink rose-cluster decoration",
+          "region": "front-center-chest-jacket",
+          "severity": "high"
+        },
+        {
+          "element": "SR monogram",
+          "region": "back-yoke-jacket",
+          "severity": "high"
+        },
+        {
+          "element": "thigh chevron panels",
+          "region": "front-thigh-chevron-pants",
+          "severity": "high"
+        },
+        {
+          "element": "pink contrast piping",
+          "region": "front-pockets-pants",
+          "severity": "medium"
+        },
+        {
+          "element": "white drawstring",
+          "region": "waistband-pants",
+          "severity": "medium"
+        },
+        {
+          "element": "V-shape chevron construction",
+          "region": "front-chevron-jacket",
+          "severity": "medium"
+        },
+        {
+          "element": "chevron graphic on back",
+          "region": "sleeves-back",
+          "severity": "low"
+        }
+      ],
+      "error": ""
+    }
+  ]
+}

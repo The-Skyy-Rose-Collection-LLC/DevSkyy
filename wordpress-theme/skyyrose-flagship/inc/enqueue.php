@@ -792,8 +792,11 @@ function skyyrose_enqueue_collection_experiences() {
 	$js_dir  = SKYYROSE_DIR . '/assets/js';
 	$js_uri  = SKYYROSE_ASSETS_URI . '/js';
 
-	// Three.js r160 via CDN with add-on scripts.
-	$threejs_ver = '0.160.0';
+	// Three.js r147 via CDN with add-on scripts.
+	// r147 is the last release that ships /examples/js/ UMD add-ons which attach
+	// classes to window.THREE.*  r148+ removed that directory — pinned here to
+	// avoid 404s on OrbitControls, GLTFLoader, postprocessing, etc.
+	$threejs_ver = '0.147.0';
 	$threejs_cdn = 'https://cdn.jsdelivr.net/npm/three@' . $threejs_ver;
 
 	if ( ! wp_script_is( 'threejs', 'enqueued' ) ) {

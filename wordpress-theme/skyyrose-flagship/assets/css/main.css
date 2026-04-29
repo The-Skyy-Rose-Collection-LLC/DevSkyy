@@ -33,3 +33,93 @@
 	z-index: 9998;
 	background: radial-gradient(circle at center, transparent 40%, rgba(5, 5, 5, 0.8) 100%);
 }
+
+/* ==========================================================================
+   PRINT STYLES
+   Ensures order confirmations, product pages, and receipts print cleanly.
+   Hides chrome (nav, footer, overlays, loaders, particles, grain) and
+   forces dark text on white so ink-on-paper is readable.
+   ========================================================================== */
+@media print {
+	/* Force white background + dark ink */
+	* {
+		background: #fff !important;
+		color: #000 !important;
+		box-shadow: none !important;
+		text-shadow: none !important;
+	}
+
+	/* Hide decorative / navigation chrome */
+	.site-header,
+	.site-footer,
+	.nav,
+	.mob-menu,
+	.mobile-menu,
+	.search-overlay,
+	#loader,
+	.hero-particles,
+	.global-grain,
+	.global-vignette,
+	.luxury-cursor,
+	.cookie-consent,
+	.mobile-bottom-nav,
+	.toast-container,
+	.size-guide-overlay,
+	.hero-scroll,
+	.marquee,
+	.col-marquee,
+	.press,
+	.ft,
+	.ft-cro-banner,
+	.ft-cro-reviews,
+	.ft-cro-craft,
+	.ft-cro-faq,
+	.newsletter,
+	.col-newsletter,
+	.col-crossnav,
+	.woocommerce-breadcrumb,
+	.skyy-cart__trust-badges,
+	.skyy-checkout__progress {
+		display: none !important;
+	}
+
+	/* Ensure links show their URL */
+	a[href]::after {
+		content: ' (' attr(href) ')';
+		font-size: 0.75em;
+		color: #555 !important;
+	}
+
+	/* Skip purely internal anchors */
+	a[href^="#"]::after,
+	a[href^="javascript"]::after {
+		content: '';
+	}
+
+	/* Keep images visible */
+	img {
+		max-width: 100% !important;
+		page-break-inside: avoid;
+	}
+
+	/* Cart / order summary: readable table layout */
+	.skyy-cart__layout,
+	.skyy-checkout__layout {
+		display: block !important;
+	}
+
+	.skyy-cart__summary,
+	.skyy-checkout__sidebar {
+		position: static !important;
+		margin-top: 2em;
+		border: 1px solid #ccc !important;
+		padding: 1em;
+	}
+
+	/* Avoid breaking order rows across pages */
+	.skyy-cart__item,
+	.skyy-cart__summary-row,
+	.woocommerce-order-overview__item {
+		page-break-inside: avoid;
+	}
+}

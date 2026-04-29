@@ -12,29 +12,29 @@
 
 /* ═══ 0. PALETTE ═══ */
 :root {
-	--po-gold: #D4AF37;
+	--po-gold: var(--color-gold, #D4AF37);
 	--po-gold-rgb: 212, 175, 55;
-	--po-rose: #B76E79;
+	--po-rose: var(--color-rose-gold, #B76E79);
 	--po-rose-rgb: 183, 110, 121;
-	--po-dark: #0A0A0A;
+	--po-dark: var(--color-page-bg, #0A0A0A);
 	--po-accent: var(--po-gold);
 	--po-accent-rgb: var(--po-gold-rgb);
-	--po-font-display: 'Playfair Display', Georgia, serif;
-	--po-font-heading: 'Cinzel', 'Playfair Display', Georgia, serif;
-	--po-font-body: 'Inter', -apple-system, sans-serif;
+	--po-font-display: var(--ff-editorial, 'Playfair Display', Georgia, serif);
+	--po-font-heading: var(--ff-brand, 'Cinzel', 'Playfair Display', Georgia, serif);
+	--po-font-body: var(--ff-body, 'Inter', -apple-system, sans-serif);
 }
 
 /* Collection palette (set by data-collection on each section) */
 .po-collection[data-collection="black-rose"] {
-	--po-accent: #C0C0C0;
+	--po-accent: var(--color-silver, #C0C0C0);
 	--po-accent-rgb: 192, 192, 192;
 }
 .po-collection[data-collection="love-hurts"] {
-	--po-accent: #DC143C;
+	--po-accent: var(--color-crimson, #DC143C);
 	--po-accent-rgb: 220, 20, 60;
 }
 .po-collection[data-collection="signature"] {
-	--po-accent: #D4AF37;
+	--po-accent: var(--color-gold, #D4AF37);
 	--po-accent-rgb: 212, 175, 55;
 }
 
@@ -151,6 +151,22 @@
 }
 .po-collection__header {
 	text-align: center; margin-bottom: 3rem;
+	position: relative; padding-bottom: 2rem;
+}
+.po-collection__header::after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 64px;
+	height: 2px;
+	background: var(--po-accent);
+	border-radius: 1px;
+	transition: width 0.4s var(--ease-smooth-out, ease);
+}
+.po-collection:hover .po-collection__header::after {
+	width: 96px;
 }
 .po-collection__number {
 	display: block; font-size: 0.6rem; letter-spacing: 0.4em;
@@ -179,6 +195,100 @@
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 	gap: 2rem;
+}
+
+/* Consistent card height — all cards stretch to the tallest sibling */
+.po-collection__grid .product-card,
+.po-collection__grid .holo-card,
+.po-collection__grid [class*="product-card"] {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+.po-collection__grid .product-card__body,
+.po-collection__grid .holo-card__body,
+.po-collection__grid [class*="product-card__body"] {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+.po-collection__grid .product-card__cta,
+.po-collection__grid .holo-card__cta,
+.po-collection__grid [class*="product-card__cta"] {
+	margin-top: auto;
+}
+
+/* Skeleton loading states for product cards */
+.po-collection__grid .po-card-skeleton {
+	display: flex;
+	flex-direction: column;
+	border-radius: 8px;
+	overflow: hidden;
+	background: rgba(255, 255, 255, 0.03);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.po-card-skeleton__image {
+	width: 100%;
+	aspect-ratio: 3 / 4;
+	background: linear-gradient(
+		90deg,
+		rgba(255, 255, 255, 0.04) 25%,
+		rgba(255, 255, 255, 0.08) 50%,
+		rgba(255, 255, 255, 0.04) 75%
+	);
+	background-size: 200% 100%;
+	animation: skeletonShimmer 1.5s ease-in-out infinite;
+}
+.po-card-skeleton__body {
+	padding: 1.25rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+.po-card-skeleton__title {
+	height: 1rem;
+	width: 70%;
+	border-radius: 4px;
+	background: linear-gradient(
+		90deg,
+		rgba(255, 255, 255, 0.04) 25%,
+		rgba(255, 255, 255, 0.08) 50%,
+		rgba(255, 255, 255, 0.04) 75%
+	);
+	background-size: 200% 100%;
+	animation: skeletonShimmer 1.5s ease-in-out infinite 0.1s;
+}
+.po-card-skeleton__price {
+	height: 0.85rem;
+	width: 40%;
+	border-radius: 4px;
+	background: linear-gradient(
+		90deg,
+		rgba(255, 255, 255, 0.04) 25%,
+		rgba(255, 255, 255, 0.08) 50%,
+		rgba(255, 255, 255, 0.04) 75%
+	);
+	background-size: 200% 100%;
+	animation: skeletonShimmer 1.5s ease-in-out infinite 0.2s;
+}
+.po-card-skeleton__btn {
+	height: 40px;
+	border-radius: 4px;
+	margin-top: 0.5rem;
+	background: linear-gradient(
+		90deg,
+		rgba(255, 255, 255, 0.04) 25%,
+		rgba(255, 255, 255, 0.08) 50%,
+		rgba(255, 255, 255, 0.04) 75%
+	);
+	background-size: 200% 100%;
+	animation: skeletonShimmer 1.5s ease-in-out infinite 0.3s;
+}
+
+/* Re-use the global shimmer keyframe from components.css */
+@keyframes skeletonShimmer {
+	0%   { background-position: -200% 0; }
+	100% { background-position:  200% 0; }
 }
 
 /* ═══ 4. SCARCITY BANNER ═══ */
@@ -426,4 +536,13 @@
 	.po-rv { opacity: 1; transform: none; transition: none; }
 	.po-hero__scroll { animation: none; }
 	.po-cart-summary { transition: none; }
+	.po-collection__header::after { transition: none; }
+	.po-collection:hover .po-collection__header::after { width: 64px; }
+	.po-card-skeleton__image,
+	.po-card-skeleton__title,
+	.po-card-skeleton__price,
+	.po-card-skeleton__btn {
+		animation: none;
+		background: rgba(255, 255, 255, 0.06);
+	}
 }

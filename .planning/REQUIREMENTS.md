@@ -33,7 +33,7 @@ Requirements for the CSV-driven ghost mannequin imagery pipeline. Phase numberin
 
 - [ ] **QA-01**: Gemini response classifier node: validates 6 fields (finish_reason, responseModalities, file exists on disk, size > 10KB, path written, no safety block) — raises on all 4 silent HTTP-200 failure modes
 - [ ] **QA-02**: Retry class separation in agent graph: retryable errors (429, transient 5xx) use exponential backoff; non-retryable (safety block, wrong modality, content filter) immediately flag SKU — hard spend cap enforced per run
-- [ ] **QA-03**: Jersey OCR verification node: text and number zone check via Gemini Vision before any jersey SKU enters the review queue — gate applies to br-003, br-008, br-009, br-010, br-011, br-012
+- [~] **QA-03 (DROPPED 2026-04-25)**: ~~Jersey OCR verification node: text and number zone check via Gemini Vision before any jersey SKU enters the review queue — gate applies to br-003, br-008, br-009, br-010, br-011, br-012~~. **Superseded by the 3D-Replica architecture shipped in Phase 16 (2026-04-24)**: scaffold-grounded synthesis via Meshy → Blender → Gemini 2.0 RAS produces verifiable text/number rendering at generation time, removing the need for a post-hoc OCR gate. See `ROADMAP.md` Phase 16 note and `phases/16-3d-replica-architect-purge/16-VALIDATION.md`.
 - [ ] **QA-04**: Background purity validator: corner-pixel RGB sample post-generation, hard reject if any corner pixel is more than 5 RGB units from (255, 255, 255)
 
 ### Review & Approval
@@ -145,16 +145,18 @@ Requirements for the CSV-driven ghost mannequin imagery pipeline. Phase numberin
 | QA-01 | Phase 15 | Pending |
 | QA-02 | Phase 15 | Pending |
 | QA-04 | Phase 15 | Pending |
-| QA-03 | Phase 16 | Pending |
+| QA-03 | Phase 16 | Dropped 2026-04-25 (superseded by 3D-Replica architecture — see ROADMAP.md Phase 16 note) |
 | REV-01 | Phase 17 | Pending |
 | REV-02 | Phase 17 | Pending |
 | REV-03 | Phase 17 | Pending |
 | REV-04 | Phase 17 | Pending |
 | UPLOAD-01 | Phase 18 | Pending |
 
-**Coverage:** 22/22 v1.2 requirements mapped (INFRA-01..07=7, GM-01..06=6, QA-01..04=4, REV-01..04=4, UPLOAD-01=1)
+**Coverage:** 22 v1.2 requirements defined; 21 in scope (1 dropped). Breakdown: INFRA-01..07=7, GM-01..06=6, QA-01..04=4 (QA-03 dropped — see below), REV-01..04=4, UPLOAD-01=1.
 
 **Note:** REQUIREMENTS.md header previously stated 19 requirements. Actual count is 22. The discrepancy was a counting error in the header comment (19 vs the actual 7+6+4+4+1=22). All 22 are mapped.
+
+**QA-03 dropped 2026-04-25** — original "Jersey OCR Gate" plan superseded by the 3D-Replica architecture shipped in Phase 16 on 2026-04-24. Phase 18's jersey SKU run no longer depends on a separate OCR gate. The requirement is preserved in this document (struck-through) so the architectural transition is auditable.
 
 ### v1.1
 

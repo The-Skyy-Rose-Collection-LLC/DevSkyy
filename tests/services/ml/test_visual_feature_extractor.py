@@ -181,7 +181,7 @@ class TestVisualFeatureExtractor:
         # Should return fallback features
         assert features.color_palette is not None
         assert features.color_palette.primary == "#1A1A1A"  # SkyyRose default
-        assert features.quality_score == 0.5  # Fallback score
+        assert features.quality_score == 0.0  # Fail-closed: extraction failed = unknown quality
 
     @pytest.mark.asyncio
     async def test_extract_fallback_on_exception(
@@ -196,7 +196,7 @@ class TestVisualFeatureExtractor:
             features = await extractor.extract("https://example.com/image.jpg")
 
         # Should return fallback features
-        assert features.quality_score == 0.5
+        assert features.quality_score == 0.0
 
     @pytest.mark.asyncio
     async def test_extract_invalid_json(
@@ -216,7 +216,7 @@ class TestVisualFeatureExtractor:
             features = await extractor.extract("https://example.com/image.jpg")
 
         # Should return fallback features
-        assert features.quality_score == 0.5
+        assert features.quality_score == 0.0
 
     def test_parse_response_success(
         self,

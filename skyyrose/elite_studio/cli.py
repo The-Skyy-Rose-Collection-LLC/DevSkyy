@@ -87,6 +87,23 @@ def cmd_produce(args: argparse.Namespace) -> None:
         print(f"Error: {result.error}")
 
 
+def _resolve_sku_filter(args: argparse.Namespace) -> list[str] | None:
+    """Resolve --sku prefix into an explicit SKU list, or None for 'all'.
+
+    Returns None when --all is set or no --sku prefix is given (callers that need
+    an explicit list can fall back to discover_all_skus()). When --sku is set but
+    matches zero SKUs, exits with a clear error rather than silently running on
+    an empty batch.
+    """
+    if args.all or not args.sku:
+        return None
+    skus = [s for s in discover_all_skus() if s.startswith(args.sku)]
+    if not skus:
+        print(f"Error: no SKUs match prefix {args.sku!r}", file=sys.stderr)
+        sys.exit(1)
+    return skus
+
+
 def cmd_batch(args: argparse.Namespace) -> None:
     """Produce batch of products."""
     if getattr(args, "graph", False):
@@ -95,16 +112,16 @@ def cmd_batch(args: argparse.Namespace) -> None:
         config = GraphConfig(
             enable_compositor=getattr(args, "composite", False),
             enable_tryon=getattr(args, "tryon", False),
-            enable_ghost_mannequin_preflight=(getattr(args, "style", "flat_lay") == "ghost_mannequin"),
-            enable_ghost_mannequin_composite=(getattr(args, "style", "flat_lay") == "ghost_mannequin"),
+            enable_ghost_mannequin_preflight=(
+                getattr(args, "style", "flat_lay") == "ghost_mannequin"
+            ),
+            enable_ghost_mannequin_composite=(
+                getattr(args, "style", "flat_lay") == "ghost_mannequin"
+            ),
             enable_3d=getattr(args, "three_d", False),
         )
 
-        all_skus = discover_all_skus()
-        skus = all_skus
-        if not args.all and args.sku:
-            skus = [s for s in all_skus if s.startswith(args.sku)]
-
+        skus = _resolve_sku_filter(args) or discover_all_skus()
         run_batch(
             skus=skus,
             view=args.view,
@@ -115,6 +132,7 @@ def cmd_batch(args: argparse.Namespace) -> None:
         return
 
     team = build_team()
+    team.produce_batch(skus=_resolve_sku_filter(args), view=args.view, skip_existing=args.remaining)
 
 
 def cmd_status(args: argparse.Namespace) -> None:
@@ -358,7 +376,12 @@ def main(argv: list[str] | None = None) -> None:
         choices=["flat_lay", "ghost_mannequin"],
         help="Photography style (requires --graph)",
     )
-    p_produce.add_argument("--3d", dest="three_d", action="store_true", help="Enable 3D replica generation (requires --graph)")
+    p_produce.add_argument(
+        "--3d",
+        dest="three_d",
+        action="store_true",
+        help="Enable 3D replica generation (requires --graph)",
+    )
 
     # produce-batch
     p_batch = sub.add_parser("produce-batch", help="Produce batch of products")
@@ -387,7 +410,12 @@ def main(argv: list[str] | None = None) -> None:
         choices=["flat_lay", "ghost_mannequin"],
         help="Photography style (requires --graph)",
     )
-    p_batch.add_argument("--3d", dest="three_d", action="store_true", help="Enable 3D replica generation (requires --graph)")
+    p_batch.add_argument(
+        "--3d",
+        dest="three_d",
+        action="store_true",
+        help="Enable 3D replica generation (requires --graph)",
+    )
     p_batch.add_argument(
         "--tryon",
         action="store_true",

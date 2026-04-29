@@ -1,0 +1,841 @@
+{
+  "timestamp": "20260427T023929",
+  "collections": [
+    "love-hurts",
+    "signature"
+  ],
+  "total_views": 24,
+  "passed": 1,
+  "failed": 23,
+  "total_cost_usd": 4.509999999999995,
+  "total_duration_ms": 2650782,
+  "results": [
+    {
+      "sku": "lh-002",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 98650,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/lh-002/20260427T024107/lh-002-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "black drawstring",
+          "region": "waistband",
+          "severity": "high"
+        },
+        {
+          "element": "missing red rose icon",
+          "region": "front-right-thigh",
+          "severity": "high"
+        },
+        {
+          "element": "inner-leg contrast panels",
+          "region": "inseam",
+          "severity": "medium"
+        },
+        {
+          "element": "lack of distinct ribbed or banded ankle cuffs",
+          "region": "ankle-cuff",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "lh-002",
+      "view": "back",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 99498,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/lh-002/20260427T024247/lh-002-back-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Ankle zippers",
+          "region": "left-ankle-cuff / right-ankle-cuff",
+          "severity": "high"
+        },
+        {
+          "element": "Incorrect cuff construction (open hem vs ribbed or banded cuff)",
+          "region": "left-ankle-cuff / right-ankle-cuff",
+          "severity": "high"
+        },
+        {
+          "element": "Fabric mismatch (rendered as shiny synthetic/tricot instead of cotton-fleece)",
+          "region": "entire garment",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "lh-003",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 125849,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/lh-003/20260427T024453/lh-003-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Body fabric color is black instead of white mesh",
+          "region": "entire-body",
+          "severity": "high"
+        },
+        {
+          "element": "Pattern consists of oversized roses and thorns instead of a small repeating Red Roses Cloud Cluster",
+          "region": "entire-body",
+          "severity": "high"
+        },
+        {
+          "element": "Missing 'Love Hurts' cursive script wordmark",
+          "region": "front-right-thigh",
+          "severity": "high"
+        },
+        {
+          "element": "Missing embroidered branded patch",
+          "region": "front-left-hem",
+          "severity": "high"
+        },
+        {
+          "element": "Drawstring is black and round instead of white and flat",
+          "region": "waistband",
+          "severity": "medium"
+        },
+        {
+          "element": "Unauthorized white circular thorny graphics appear on the body",
+          "region": "front-body",
+          "severity": "high"
+        },
+        {
+          "element": "Missing red contrast piping on leg binding",
+          "region": "leg-binding",
+          "severity": "medium"
+        },
+        {
+          "element": "Pockets appear as side-slits with white tabs rather than vertical welt openings in body fabric",
+          "region": "side-pockets",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "lh-003",
+      "view": "back",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 128227,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/lh-003/20260427T024701/lh-003-back-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Garment type mismatch: image shows two hooded sweatshirts instead of knee-length basketball shorts",
+          "region": "full-garment",
+          "severity": "high"
+        },
+        {
+          "element": "Incorrect body color: fabric is black instead of the specified white mesh",
+          "region": "full-body",
+          "severity": "high"
+        },
+        {
+          "element": "Incorrect pattern: dense rose clusters on black ground instead of the small repeating Red Roses Cloud Cluster pattern on white ground",
+          "region": "full-body",
+          "severity": "high"
+        },
+        {
+          "element": "Missing 'Love Hurts' cursive wordmark on the right thigh area",
+          "region": "front-right-thigh",
+          "severity": "high"
+        },
+        {
+          "element": "Missing black-square embroidered brand patch",
+          "region": "front-left-hem",
+          "severity": "high"
+        },
+        {
+          "element": "Prohibited elements present: image contains sleeves and hoods (NO sleeve elements permitted)",
+          "region": "full-garment",
+          "severity": "high"
+        },
+        {
+          "element": "Missing black ribbed waistband and white flat drawstring",
+          "region": "waistband",
+          "severity": "high"
+        },
+        {
+          "element": "Missing leg-binding with red contrast piping",
+          "region": "leg-openings",
+          "severity": "high"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "lh-004",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 116196,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/lh-004/20260427T024857/lh-004-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Fabric is glossy/satin finish",
+          "region": "front-body",
+          "severity": "high"
+        },
+        {
+          "element": "Zipper-front closure present below a partial placket",
+          "region": "front-placket",
+          "severity": "high"
+        },
+        {
+          "element": "Missing 'Love Hurts' cursive wordmark on chest",
+          "region": "front-left-chest / front-right-chest",
+          "severity": "high"
+        },
+        {
+          "element": "Black contrast welt openings on pockets",
+          "region": "front-left-pocket / front-right-pocket",
+          "severity": "medium"
+        },
+        {
+          "element": "Black color on button placket",
+          "region": "front-placket",
+          "severity": "medium"
+        },
+        {
+          "element": "Unauthorized white racing stripe on sleeves",
+          "region": "left-sleeve / right-sleeve",
+          "severity": "medium"
+        },
+        {
+          "element": "Realistic rose imagery in hood lining instead of silhouettes",
+          "region": "inner-hood-lining",
+          "severity": "low"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "lh-004",
+      "view": "back",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 93997,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/lh-004/20260427T025031/lh-004-back-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Love Hurts wordmark",
+          "region": "front-chest",
+          "severity": "high"
+        },
+        {
+          "element": "drawstrings",
+          "region": "hood",
+          "severity": "medium"
+        },
+        {
+          "element": "black contrast welt pockets",
+          "region": "front-pockets",
+          "severity": "medium"
+        },
+        {
+          "element": "black buttons",
+          "region": "front-placket",
+          "severity": "low"
+        },
+        {
+          "element": "satin-like fabric finish",
+          "region": "body-and-sleeves",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "lh-005",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 84513,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/lh-005/20260427T025156/lh-005-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Missing 'FANNIE' embroidered wordmark",
+          "region": "front-center-bottom",
+          "severity": "high"
+        },
+        {
+          "element": "Missing small red rose graphic accent",
+          "region": "front-center-bottom",
+          "severity": "high"
+        },
+        {
+          "element": "Additional visible pocket/zipper (main compartment zipper visible in addition to front pocket zipper)",
+          "region": "top-body",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-001",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 103589,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-001/20260427T025339/sg-001-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Incorrect bridge featured (Golden Gate Bridge instead of Bay Bridge)",
+          "region": "front-body",
+          "severity": "high"
+        },
+        {
+          "element": "Black drawstring used instead of specified white drawstring",
+          "region": "waistband",
+          "severity": "high"
+        },
+        {
+          "element": "Warm/Sunset lighting palette used instead of clear-blue-sky daytime lighting",
+          "region": "front-body",
+          "severity": "medium"
+        },
+        {
+          "element": "Missing San Francisco skyline (downtown buildings) in the background",
+          "region": "front-body",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-001",
+      "view": "back",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 136704,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-001/20260427T025556/sg-001-back-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "bridge identification",
+          "region": "front-body",
+          "severity": "high"
+        },
+        {
+          "element": "sf skyline visibility",
+          "region": "front-body",
+          "severity": "high"
+        },
+        {
+          "element": "drawstring",
+          "region": "waistband",
+          "severity": "high"
+        },
+        {
+          "element": "pockets",
+          "region": "front-body",
+          "severity": "medium"
+        },
+        {
+          "element": "garment length",
+          "region": "entire field",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-002",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 121776,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-002/20260427T025758/sg-002-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Rose-cluster color (rendered in greyscale/black instead of purple/violet)",
+          "region": "front-left-chest",
+          "severity": "high"
+        },
+        {
+          "element": "Missing cloud base in graphic art",
+          "region": "front-left-chest",
+          "severity": "medium"
+        },
+        {
+          "element": "Canonical greyscale rose-cluster (forbidden by negative list)",
+          "region": "front-left-chest",
+          "severity": "high"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-003",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 119980,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-003/20260427T025958/sg-003-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "waistband color",
+          "region": "waistband",
+          "severity": "high"
+        },
+        {
+          "element": "white drawstring",
+          "region": "waistband",
+          "severity": "high"
+        },
+        {
+          "element": "sky color palette",
+          "region": "front-body",
+          "severity": "medium"
+        },
+        {
+          "element": "water reflections",
+          "region": "front-body",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-005",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 110209,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-005/20260427T030148/sg-005-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Missing dark grey/charcoal cloud at the base of the rose-cluster art",
+          "region": "front-left-chest",
+          "severity": "medium"
+        },
+        {
+          "element": "Chest logo scale appears significantly larger than the specified ~3in height",
+          "region": "front-left-chest",
+          "severity": "low"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-006",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 122436,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-006/20260427T030350/sg-006-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "chevron color palette",
+          "region": "front-chevron",
+          "severity": "high"
+        },
+        {
+          "element": "pink rose-cluster embroidery",
+          "region": "front-center-chest",
+          "severity": "medium"
+        },
+        {
+          "element": "slash pockets with pink piping",
+          "region": "front-left-pocket / front-right-pocket",
+          "severity": "medium"
+        },
+        {
+          "element": "multi-color stripe band on cuffs",
+          "region": "left-cuff / right-cuff",
+          "severity": "high"
+        },
+        {
+          "element": "multi-color stripe band on waistband",
+          "region": "waistband",
+          "severity": "high"
+        },
+        {
+          "element": "chevron placement on sleeves",
+          "region": "left-sleeve / right-sleeve",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-006",
+      "view": "back",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 113350,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-006/20260427T030544/sg-006-back-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "left-cuff and right-cuff",
+          "region": "sleeves",
+          "severity": "high"
+        },
+        {
+          "element": "waistband",
+          "region": "bottom-hem",
+          "severity": "high"
+        },
+        {
+          "element": "unauthorized sleeve graphics",
+          "region": "sleeves",
+          "severity": "high"
+        },
+        {
+          "element": "front-center-chest rose-cluster",
+          "region": "upper-chest",
+          "severity": "high"
+        },
+        {
+          "element": "hood-drawstring",
+          "region": "hood",
+          "severity": "medium"
+        },
+        {
+          "element": "front-chevron color sequence",
+          "region": "upper-chest",
+          "severity": "medium"
+        },
+        {
+          "element": "pocket piping",
+          "region": "lower-body",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-007",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 112532,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-007/20260427T030736/sg-007-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Large rectangular printed label with unauthorized text and graphics",
+          "region": "front-cuff",
+          "severity": "high"
+        },
+        {
+          "element": "Branding is printed/applied rather than embroidered",
+          "region": "front-cuff",
+          "severity": "high"
+        },
+        {
+          "element": "Visible exterior tag (must be interior only)",
+          "region": "front-cuff",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-009",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 117978,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-009/20260427T030934/sg-009-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "chest decoration",
+          "region": "front-left-chest",
+          "severity": "high"
+        },
+        {
+          "element": "Red Roses Cloud Cluster logo",
+          "region": "front-left-chest",
+          "severity": "high"
+        },
+        {
+          "element": "hand pockets",
+          "region": "front-lower-body",
+          "severity": "high"
+        },
+        {
+          "element": "brand woven label",
+          "region": "back-collar-inside",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-009",
+      "view": "back",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 110252,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-009/20260427T031125/sg-009-back-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Red Roses Cloud Cluster logo",
+          "region": "front-left-chest",
+          "severity": "high"
+        },
+        {
+          "element": "patch hand pockets",
+          "region": "front-body",
+          "severity": "high"
+        },
+        {
+          "element": "stand-up funnel-neck collar",
+          "region": "collar",
+          "severity": "medium"
+        },
+        {
+          "element": "SR monogram woven label",
+          "region": "back-collar-inside",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-011",
+      "view": "front",
+      "ok": true,
+      "attempts": 2,
+      "duration_ms": 67929,
+      "output_path": "renders/output/original-label-tee-(white)/sg-011-front/sg-011-front-stage3-branded-attempt2.png",
+      "quarantine_path": null,
+      "violations": [],
+      "error": ""
+    },
+    {
+      "sku": "sg-011",
+      "view": "back",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 107488,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-011/20260427T031420/sg-011-back-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Missing SR monogram embroidery",
+          "region": "front-left-chest",
+          "severity": "high"
+        },
+        {
+          "element": "Missing SkyyRose woven brand label",
+          "region": "collar-inside",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-012",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 87745,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-012/20260427T031548/sg-012-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Missing SR monogram embroidery",
+          "region": "front-left-chest",
+          "severity": "high"
+        },
+        {
+          "element": "Missing woven brand label",
+          "region": "collar-inside",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-012",
+      "view": "back",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 94207,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-012/20260427T031722/sg-012-back-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Missing required SR monogram embroidery",
+          "region": "front-left-chest",
+          "severity": "high"
+        },
+        {
+          "element": "Missing required woven brand label",
+          "region": "collar-inside",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-013",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 103204,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-013/20260427T031905/sg-013-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "rose-cluster placement",
+          "region": "front-center-chest",
+          "severity": "high"
+        },
+        {
+          "element": "rose-cluster composition (four roses instead of three; missing stems, vines, and cloud)",
+          "region": "front-center-chest",
+          "severity": "high"
+        },
+        {
+          "element": "unauthorized text/wordmark below roses",
+          "region": "front-center-chest",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-014",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 129831,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-014/20260427T032115/sg-014-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "waistband",
+          "region": "waistband",
+          "severity": "high"
+        },
+        {
+          "element": "left-ankle-cuff",
+          "region": "left-ankle-cuff",
+          "severity": "high"
+        },
+        {
+          "element": "right-ankle-cuff",
+          "region": "right-ankle-cuff",
+          "severity": "high"
+        },
+        {
+          "element": "front-center-waistband",
+          "region": "front-center-waistband",
+          "severity": "medium"
+        },
+        {
+          "element": "front-thigh-chevron",
+          "region": "front-thigh-chevron",
+          "severity": "medium"
+        },
+        {
+          "element": "front-left-pocket",
+          "region": "front-left-pocket",
+          "severity": "medium"
+        },
+        {
+          "element": "front-right-pocket",
+          "region": "front-right-pocket",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-015",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 144480,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-015/20260427T032340/sg-015-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "back-chevron-jacket",
+          "region": "back-body-jacket",
+          "severity": "high"
+        },
+        {
+          "element": "back-yoke-monogram",
+          "region": "back-yoke-jacket",
+          "severity": "high"
+        },
+        {
+          "element": "front-center-chest-jacket (rose cluster)",
+          "region": "front-center-chest-jacket",
+          "severity": "high"
+        },
+        {
+          "element": "unauthorized chest text (ABL)",
+          "region": "front-center-chest-jacket",
+          "severity": "high"
+        },
+        {
+          "element": "pink contrast piping",
+          "region": "front-left-pocket-jacket",
+          "severity": "medium"
+        },
+        {
+          "element": "pink contrast piping",
+          "region": "front-right-pocket-jacket",
+          "severity": "medium"
+        },
+        {
+          "element": "pink contrast piping",
+          "region": "front-left-pocket-pants",
+          "severity": "medium"
+        },
+        {
+          "element": "pink contrast piping",
+          "region": "front-right-pocket-pants",
+          "severity": "medium"
+        },
+        {
+          "element": "hood-drawstring-jacket",
+          "region": "hood-jacket",
+          "severity": "medium"
+        },
+        {
+          "element": "drawstring-pants",
+          "region": "waistband-pants",
+          "severity": "medium"
+        },
+        {
+          "element": "chevron color palette (missing lavender)",
+          "region": "front-chevron-jacket",
+          "severity": "low"
+        },
+        {
+          "element": "sleeve chevron placement",
+          "region": "left-sleeve-jacket",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    }
+  ]
+}

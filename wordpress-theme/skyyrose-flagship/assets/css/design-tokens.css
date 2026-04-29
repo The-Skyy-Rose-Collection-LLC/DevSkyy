@@ -58,6 +58,17 @@
 	--color-red: #FF0000;
 
 	/* -----------------------------------------------
+	   Semantic state colors (success/danger/info)
+	   Mapped to brand palette — no off-brand greens/reds.
+	   ----------------------------------------------- */
+	--color-success: var(--color-gold, #D4AF37);
+	--color-danger: var(--color-crimson, #DC143C);
+	--color-info: var(--color-rose-gold, #B76E79);
+	--color-success-soft: rgba(212, 175, 55, 0.12);
+	--color-danger-soft: rgba(220, 20, 60, 0.12);
+	--color-info-soft: rgba(183, 110, 121, 0.12);
+
+	/* -----------------------------------------------
 	   Glass Effects
 	   ----------------------------------------------- */
 	--glass-bg: rgba(17, 17, 17, 0.92);
@@ -69,6 +80,28 @@
 	   Typography — Font Stacks
 	   ----------------------------------------------- */
 	--font-headline: 'Cinzel', 'Playfair Display', Georgia, serif;
+
+	/* -----------------------------------------------
+	   Typography — Named Font Aliases
+	   Canonical tokens consumed by generic-pages.css,
+	   product-grid.css, homepage-v7.css, and others.
+	   Scoped here so they resolve on every page, not
+	   only on pages that also load homepage-v2.css.
+	   ----------------------------------------------- */
+	--ff-brand:     'Cinzel', serif;
+	--ff-editorial: 'Playfair Display', Georgia, serif;
+	--ff-body:      'Cormorant Garamond', Georgia, serif;
+	--ff-cta:       'Bebas Neue', sans-serif;
+	--ff-mono:      'Space Mono', monospace;
+	--ff-system:    'Inter', system-ui, -apple-system, sans-serif;
+
+	/* -----------------------------------------------
+	   Border Radius
+	   ----------------------------------------------- */
+	--radius-sm: 4px;
+	--radius-md: 8px;
+	--radius-lg: 16px;
+	--radius-full: 9999px;
 
 	/* -----------------------------------------------
 	   Typography — Line Heights
@@ -256,7 +289,7 @@
 	letter-spacing: 0.15em; text-transform: uppercase; margin: 0 0 0.75rem; text-align: center;
 }
 .ft-cro__subheading {
-	font-size: 0.85rem; color: rgba(255,255,255,0.4); max-width: 600px;
+	font-size: 0.85rem; color: rgba(255,255,255,0.55); max-width: 600px;
 	margin: 0 auto 2rem; line-height: 1.6; text-align: center;
 }
 
@@ -278,10 +311,10 @@
 	background: rgba(255,255,255,0.02);
 }
 .ft-cro-reviews__stars { display: flex; gap: 0.15rem; margin-bottom: 0.75rem; }
-.ft-cro-reviews__stars svg { width: 13px; height: 13px; color: #D4AF37; }
+.ft-cro-reviews__stars svg { width: 13px; height: 13px; color: var(--color-gold, #D4AF37); }
 .ft-cro-reviews__card blockquote { margin: 0 0 0.75rem; padding: 0; }
 .ft-cro-reviews__card blockquote p { font-size: 0.85rem; line-height: 1.6; color: rgba(255,255,255,0.65); margin: 0; font-style: italic; }
-.ft-cro-reviews__card cite { font-size: 0.65rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.35); font-style: normal; }
+.ft-cro-reviews__card cite { font-size: 0.65rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.55); font-style: normal; }
 
 /* Craft / Value Props */
 .ft-cro-craft { padding: 3rem 5% 4rem; }
@@ -294,10 +327,10 @@
 .ft-cro-craft__card:hover { border-color: rgba(212,175,55,0.2); }
 .ft-cro-craft__icon {
 	display: block; font-family: var(--font-heading, 'Cinzel', serif);
-	font-size: 1.4rem; color: #D4AF37; margin-bottom: 0.75rem;
+	font-size: 1.4rem; color: var(--color-gold, #D4AF37); margin-bottom: 0.75rem;
 }
 .ft-cro-craft__card h3 { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 0.5rem; }
-.ft-cro-craft__card p { font-size: 0.75rem; line-height: 1.5; color: rgba(255,255,255,0.4); margin: 0; }
+.ft-cro-craft__card p { font-size: 0.75rem; line-height: 1.5; color: rgba(255,255,255,0.55); margin: 0; }
 
 /* FAQ */
 .ft-cro-faq { padding: 3rem 5% 4rem; max-width: 900px; margin: 0 auto; }
@@ -312,7 +345,7 @@
 .ft-cro-faq__icon { width: 16px; height: 16px; stroke: currentColor; fill: none; flex-shrink: 0; transition: transform 0.3s ease; }
 .ft-cro-faq__question[aria-expanded="true"] .ft-cro-faq__icon { transform: rotate(45deg); }
 .ft-cro-faq__answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
-.ft-cro-faq__answer-inner { padding: 0 0 1.1rem; font-size: 0.8rem; line-height: 1.6; color: rgba(255,255,255,0.45); }
+.ft-cro-faq__answer-inner { padding: 0 0 1.1rem; font-size: 0.8rem; line-height: 1.6; color: rgba(255,255,255,0.55); }
 
 /* Footer CRO Responsive */
 @media (max-width: 768px) {

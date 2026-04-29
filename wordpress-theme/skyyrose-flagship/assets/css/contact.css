@@ -14,11 +14,11 @@
    ========================================================================== */
 
 .contact-page {
-	--contact-bg: #0A0A0A;
+	--contact-bg: var(--color-page-bg, #0A0A0A);
 	--contact-card-bg: rgba(17, 17, 17, 0.95);
-	--contact-rose-gold: #B76E79;
-	--contact-gold: #D4AF37;
-	--contact-dark-rose: #8B0000;
+	--contact-rose-gold: var(--color-rose-gold, #B76E79);
+	--contact-gold: var(--color-gold, #D4AF37);
+	--contact-dark-rose: #8B0000; /* intentional off-brand gradient color — flagged, not brand-token */
 	--contact-text-primary: #FFFFFF;
 	--contact-text-secondary: rgba(255, 255, 255, 0.7);
 	--contact-text-muted: rgba(255, 255, 255, 0.5);
@@ -362,7 +362,7 @@
 }
 
 .contact-form__select option {
-	background: #111111;
+	background: var(--color-card-bg, #111111);
 	color: #fff;
 }
 
@@ -390,14 +390,14 @@
 .contact-form__input.is-invalid,
 .contact-form__select.is-invalid,
 .contact-form__textarea.is-invalid {
-	border-color: #e74c3c;
-	box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+	border-color: var(--color-danger);
+	box-shadow: 0 0 0 3px var(--color-danger-soft);
 }
 
 .contact-form__error {
 	display: block;
 	font-size: 0.8rem;
-	color: #e74c3c;
+	color: var(--color-danger);
 	margin-top: 0.35rem;
 	min-height: 1.2em;
 }
@@ -966,11 +966,13 @@
 }
 
 .contact-toast--success {
-	border-left: 3px solid #2ecc71;
+	border-top: 1px solid var(--color-success);
+	background: linear-gradient(180deg, var(--color-success-soft) 0%, var(--contact-card-bg) 60%);
 }
 
 .contact-toast--error {
-	border-left: 3px solid #e74c3c;
+	border-top: 1px solid var(--color-danger);
+	background: linear-gradient(180deg, var(--color-danger-soft) 0%, var(--contact-card-bg) 60%);
 }
 
 .contact-toast__icon {
@@ -980,11 +982,11 @@
 }
 
 .contact-toast__icon--success {
-	color: #2ecc71;
+	color: var(--color-success, #D4AF37);
 }
 
 .contact-toast__icon--error {
-	color: #e74c3c;
+	color: var(--color-danger, #DC143C);
 }
 
 .contact-toast__dismiss {

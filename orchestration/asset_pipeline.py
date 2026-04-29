@@ -49,6 +49,7 @@ import structlog
 from pydantic import BaseModel, Field, ValidationError
 
 from agents.fashn_agent import FashnConfig, FashnTryOnAgent, GarmentCategory
+from agents.meshy_agent import MeshyAgent, MeshyConfig
 from agents.tripo_agent import TripoAssetAgent, TripoConfig
 from agents.wordpress_asset_agent import WordPressAssetAgent, WordPressAssetConfig
 from orchestration.huggingface_3d_client import HuggingFace3DClient, HuggingFace3DConfig
@@ -155,12 +156,15 @@ class PipelineConfig:
     fashn_config: FashnConfig = field(default_factory=FashnConfig.from_env)
     wordpress_config: WordPressAssetConfig = field(default_factory=WordPressAssetConfig.from_env)
     huggingface_config: HuggingFace3DConfig = field(default_factory=HuggingFace3DConfig.from_env)
+    meshy_config: MeshyConfig = field(default_factory=MeshyConfig.from_env)
 
     # Primary 3D generator selection (NEW)
     primary_3d_generator: Primary3DGenerator = Primary3DGenerator.HUGGINGFACE
 
     # Pipeline settings
-    enable_huggingface_3d: bool = True  # Stage 0: HF 3D generation
+    enable_huggingface_3d: bool = True  # Stage 0: HF 3D generation (DEPRECATED — use Meshy gate)
+    enable_meshy_preview_gate: bool = True  # Cheap preview + trimesh fidelity gate before Tripo3D
+    meshy_preview_min_fidelity: float = 60.0  # 0-100; below this = abort production run
     enable_3d_generation: bool = True  # Stage 1: Tripo3D generation
     enable_virtual_tryon: bool = True  # Stage 2: Virtual try-on
     enable_wordpress_upload: bool = True  # Stage 3: WordPress upload
@@ -205,8 +209,12 @@ class PipelineConfig:
             fashn_config=FashnConfig.from_env(),
             wordpress_config=WordPressAssetConfig.from_env(),
             huggingface_config=HuggingFace3DConfig.from_env(),
+            meshy_config=MeshyConfig.from_env(),
             primary_3d_generator=primary_generator,
             enable_huggingface_3d=os.getenv("PIPELINE_ENABLE_HF_3D", "true").lower() == "true",
+            enable_meshy_preview_gate=os.getenv("PIPELINE_ENABLE_MESHY_GATE", "true").lower()
+            == "true",
+            meshy_preview_min_fidelity=float(os.getenv("PIPELINE_MESHY_MIN_FIDELITY", "60.0")),
             enable_3d_generation=os.getenv("PIPELINE_ENABLE_3D", "true").lower() == "true",
             enable_virtual_tryon=os.getenv("PIPELINE_ENABLE_TRYON", "true").lower() == "true",
             enable_wordpress_upload=os.getenv("PIPELINE_ENABLE_WP", "true").lower() == "true",
@@ -385,6 +393,7 @@ class ProductAssetPipeline:
         self._tripo_agent: TripoAssetAgent | None = None
         self._fashn_agent: FashnTryOnAgent | None = None
         self._wordpress_agent: WordPressAssetAgent | None = None
+        self._meshy_agent: MeshyAgent | None = None
 
         # Stage 4.7.2: Batch processing semaphore
         self._semaphore = asyncio.Semaphore(self.config.batch_concurrency)
@@ -431,6 +440,106 @@ class ProductAssetPipeline:
             self._wordpress_agent = WordPressAssetAgent(config=self.config.wordpress_config)
         return self._wordpress_agent
 
+    @property
+    def meshy_agent(self) -> MeshyAgent:
+        """Get or create Meshy agent (used for the cheap preview gate before Tripo3D)."""
+        if self._meshy_agent is None:
+            self._meshy_agent = MeshyAgent(config=self.config.meshy_config)
+        return self._meshy_agent
+
+    async def _run_meshy_preview_gate(
+        self,
+        result: AssetPipelineResult,
+        product_id: str,
+        image_path: str,
+    ) -> bool:
+        """Run the Meshy preview + trimesh fidelity gate before paid Tripo3D run.
+
+        Returns True if Tripo3D production run should proceed, False if the gate
+        rejected the input (poor preview fidelity or non-URL image).
+
+        Phase A4: replaces the deprecated HF Shap-E gate. Saves $0.50-1.00 per
+        rejected production run.
+        """
+        if not self.config.enable_meshy_preview_gate:
+            return True
+
+        # Meshy API requires a public URL — skip gracefully for local paths.
+        if not image_path.startswith(("http://", "https://")):
+            logger.debug(
+                "Meshy preview gate skipped: image is local, not a URL",
+                product_id=product_id,
+                image=image_path,
+            )
+            return True
+
+        logger.info("Running Meshy preview gate", product_id=product_id, image=image_path)
+        await self._emit_progress(
+            ProgressEvent(
+                event_type=ProgressEventType.STAGE_STARTED,
+                product_id=product_id,
+                stage="meshy_preview_gate",
+                progress_percent=8.0,
+                message="Pre-validating with Meshy preview before paid Tripo3D run",
+            )
+        )
+
+        try:
+            gate = await self.meshy_agent.generate_preview(
+                image_url=image_path,
+                product_name=product_id,
+                minimum_fidelity=self.config.meshy_preview_min_fidelity,
+            )
+        except Exception as e:
+            logger.warning(
+                "Meshy preview gate errored — proceeding to Tripo3D anyway",
+                product_id=product_id,
+                error=str(e),
+            )
+            # Fail-open: don't block production on gate infrastructure errors
+            return True
+
+        await self._emit_progress(
+            ProgressEvent(
+                event_type=ProgressEventType.STAGE_COMPLETED,
+                product_id=product_id,
+                stage="meshy_preview_gate",
+                progress_percent=15.0,
+                message=f"Preview gate: {gate['grade']} (score={gate['fidelity_score']:.1f})",
+                metadata={
+                    "passed": gate["passed"],
+                    "fidelity_score": gate["fidelity_score"],
+                    "grade": gate["grade"],
+                    "task_id": gate["task_id"],
+                    "duration_seconds": gate["duration_seconds"],
+                },
+            )
+        )
+
+        if not gate["passed"]:
+            logger.warning(
+                "Meshy preview gate REJECTED input — skipping Tripo3D production run",
+                product_id=product_id,
+                fidelity_score=gate["fidelity_score"],
+                grade=gate["grade"],
+                error=gate.get("error"),
+            )
+            result.errors.append(
+                {
+                    "stage": "meshy_preview_gate",
+                    "error": (
+                        f"Preview fidelity {gate['fidelity_score']:.1f} below threshold "
+                        f"{self.config.meshy_preview_min_fidelity}. Skipping Tripo3D."
+                    ),
+                    "fidelity_score": gate["fidelity_score"],
+                    "grade": gate["grade"],
+                    "preview_path": gate.get("local_path"),
+                }
+            )
+            return False
+
+        return True
+
     async def close(self) -> None:
         """Close all agent sessions and Redis connection.
 
@@ -466,6 +575,13 @@ class ProductAssetPipeline:
             except Exception as e:
                 errors.append(f"WordPress agent close error: {e}")
                 logger.warning("Failed to close WordPress agent", error=str(e))
+
+        if self._meshy_agent:
+            try:
+                await self._meshy_agent.close()
+            except Exception as e:
+                errors.append(f"Meshy agent close error: {e}")
+                logger.warning("Failed to close Meshy agent", error=str(e))
 
         # Stage 4.7.2: Close Redis connection
         if self._redis and self._redis_connected:
@@ -1077,7 +1193,9 @@ class ProductAssetPipeline:
 
         # Check for cached items
         batch_result.cached_items = sum(
-            1 for _, r, _ in results if r and r.duration_seconds < 1.0  # Cached results are fast
+            1
+            for _, r, _ in results
+            if r and r.duration_seconds < 1.0  # Cached results are fast
         )
 
         # Finalize
@@ -1190,8 +1308,6 @@ class ProductAssetPipeline:
 
         try:
             # 3D Generation based on primary generator setting
-            hf_3d_result = None
-
             if self.config.primary_3d_generator == Primary3DGenerator.HUGGINGFACE:
                 # Use HuggingFace as primary 3D generator (recommended for quality)
                 if images:
@@ -1223,34 +1339,20 @@ class ProductAssetPipeline:
                     )
 
             elif self.config.primary_3d_generator == Primary3DGenerator.HYBRID:
-                # Hybrid: HuggingFace for hints, Tripo3D for generation
-                if self.config.enable_huggingface_3d and images:
-                    await self._emit_progress(
-                        ProgressEvent(
-                            event_type=ProgressEventType.STAGE_STARTED,
-                            product_id=product_id,
-                            stage="generating_hf_3d",
-                            progress_percent=5.0,
-                            message="Generating optimization hints with HuggingFace",
-                        )
-                    )
-                    hf_3d_result = await self._generate_3d_with_huggingface(
+                # Phase A4: HF Shap-E preview replaced with Meshy preview gate.
+                # The gate runs a cheap (~$0.20) Meshy generation, downloads the
+                # GLB, validates with trimesh, and only proceeds to Tripo3D if it
+                # passes. Saves $0.50-1.00 per rejected production run.
+                gate_passed = True
+                if images:
+                    gate_passed = await self._run_meshy_preview_gate(
                         result=result,
-                        title=title,
-                        images=images,
-                    )
-                    await self._emit_progress(
-                        ProgressEvent(
-                            event_type=ProgressEventType.STAGE_COMPLETED,
-                            product_id=product_id,
-                            stage="generating_hf_3d",
-                            progress_percent=15.0,
-                            message="HuggingFace optimization complete",
-                        )
+                        product_id=product_id,
+                        image_path=images[0],
                     )
 
-                # Generate with Tripo3D using HF hints
-                if self.config.enable_3d_generation and images:
+                # Generate with Tripo3D only if gate passed
+                if gate_passed and self.config.enable_3d_generation and images:
                     result.stage = PipelineStage.GENERATING_3D
                     await self._emit_progress(
                         ProgressEvent(
@@ -1258,7 +1360,7 @@ class ProductAssetPipeline:
                             product_id=product_id,
                             stage=PipelineStage.GENERATING_3D.value,
                             progress_percent=20.0,
-                            message="Generating 3D models with Tripo3D (HF-optimized)",
+                            message="Generating 3D models with Tripo3D (Meshy-gated)",
                         )
                     )
                     await self._generate_3d_models(
@@ -1267,7 +1369,7 @@ class ProductAssetPipeline:
                         images=images,
                         collection=collection,
                         garment_type=garment_type,
-                        hf_3d_result=hf_3d_result,
+                        hf_3d_result=None,  # HF Shap-E hints retired in Phase A4
                     )
                     await self._emit_progress(
                         ProgressEvent(
@@ -1280,8 +1382,16 @@ class ProductAssetPipeline:
                     )
 
             else:
-                # TRIPO3D: Original behavior - Tripo3D only
-                if self.config.enable_3d_generation and images:
+                # TRIPO3D: Tripo3D only — also gated by Meshy preview (Phase A4)
+                gate_passed = True
+                if images:
+                    gate_passed = await self._run_meshy_preview_gate(
+                        result=result,
+                        product_id=product_id,
+                        image_path=images[0],
+                    )
+
+                if gate_passed and self.config.enable_3d_generation and images:
                     result.stage = PipelineStage.GENERATING_3D
                     await self._emit_progress(
                         ProgressEvent(

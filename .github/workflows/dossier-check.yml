@@ -1,0 +1,71 @@
+name: Dossier Check
+
+# Enforces the per-product design dossier contract on every PR. Failures here
+# block merge — there is no dossier-fallback because the canonical CSV's thin
+# `branding_spec` column is not a substitute for the rich per-product spec
+# the RAS pipeline reads.
+#
+# Plan reference: H7 — CI enforcement (in /Users/theceo/.claude/plans/tidy-sparking-goose.md)
+
+on:
+  pull_request:
+    paths:
+      - "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv"
+      - "wordpress-theme/skyyrose-flagship/data/dossiers/**"
+      - "scripts/check_dossier_coverage.py"
+      - "scripts/validate_dossier.py"
+      - "skyyrose/core/dossier_loader.py"
+      - "skyyrose/core/catalog_loader.py"
+      - "skyyrose/elite_studio/catalog.py"
+      - "skyyrose/elite_studio/config.py"
+      - "skyyrose/elite_studio/agents/three_d_agent.py"
+      - "scripts/nano_banana/catalog.py"
+      - "wordpress-theme/skyyrose-flagship/inc/product-catalog.php"
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install minimal dependencies
+        run: pip install --quiet pyyaml
+
+      - name: Coverage — every active SKU has a dossier
+        run: python scripts/check_dossier_coverage.py
+
+      - name: Schema — every dossier passes the validator
+        run: python scripts/validate_dossier.py
+
+      - name: Reader agreement — all four catalog readers return identical dossier
+        run: |
+          python -c "
+          import sys
+          sys.path.insert(0, '.')
+          from skyyrose.elite_studio.config import (
+              validate_catalog_readers, validate_dossier_readers
+          )
+          validate_catalog_readers(raise_on_mismatch=True)
+          validate_dossier_readers('br-001', raise_on_mismatch=True)
+          print('OK: all readers agree on canonical CSV path and br-001 dossier hash')
+          "
+
+      - name: Reject any code reference to the retired override store
+        run: |
+          if grep -rEn "skyyrose/assets/data/prompts/overrides" \
+              --include="*.py" --include="*.php" \
+              --exclude-dir=".github" --exclude-dir=".planning" \
+              --exclude-dir="docs" --exclude-dir=".ralph" .; then
+            echo "ERROR: code references the retired override directory."
+            echo "       Per the design plan, that store is deleted in favor of"
+            echo "       wordpress-theme/skyyrose-flagship/data/dossiers/."
+            exit 1
+          fi
+          echo "OK: no code references to the retired override store."

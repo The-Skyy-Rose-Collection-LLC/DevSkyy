@@ -1,50 +1,88 @@
-"""
-SafetyAgent — Phase 16 Legendary Safety Architect.
-
-Promoted to ADK SuperAgent for comprehensive "Back Data" (telemetry) and 
-high-fidelity content safety verification.
-
-Inherits from BaseSuperAgent to leverage standardized enterprise tools
-and observability via Google ADK.
-"""
+"""OpenAI moderation + GPT-4o image safety gate for Elite Studio pipeline."""
 
 from __future__ import annotations
 
+import base64
+import json
 import logging
-from typing import Any
+from pathlib import Path
 
-from adk.super_agents import BaseSuperAgent
-from adk.base import AgentConfig, ADKProvider
-from ..models import SafetyResult
+from skyyrose.elite_studio.config import get_openai_client
+from skyyrose.elite_studio.models import SafetyResult
 
 logger = logging.getLogger(__name__)
 
-class SafetyAgent(BaseSuperAgent):
-    """Content safety gate promoted to ADK SuperAgent."""
+_VISION_PROMPT = (
+    "You are a content safety reviewer for a luxury fashion brand. "
+    "Inspect the image and return ONLY valid JSON: "
+    '{"safe": true/false, "flagged_categories": ["category1", ...]}. '
+    "Flag explicit content, graphic violence, hate symbols, or anything "
+    "inappropriate for a luxury fashion e-commerce platform."
+)
 
-    def __init__(self, config: AgentConfig | None = None) -> None:
-        if config is None:
-            config = AgentConfig(
-                name="legendary_safety_architect",
-                provider=ADKProvider.GOOGLE,
-                model="gemini-2.0-flash",
-                system_prompt="You are the Legendary Safety Architect for SkyyRose. You ensure brand safety with absolute integrity."
-            )
-        super().__init__(config)
 
-    async def check(self, image_path: str) -> SafetyResult:
-        """Execute safety check with full ADK observability."""
-        # Trigger ADK for observability
-        adk_prompt = f"SAFETY TASK: IMAGE={image_path}"
-        logger.info(f"Running Legendary Safety Check for {image_path} via ADK...")
-        adk_result = await self.execute(adk_prompt)
+class SafetyAgent:
+    """Run OpenAI text moderation then GPT-4o vision check on an image."""
 
-        metadata = adk_result.to_dict() if hasattr(adk_result, "to_dict") else {}
-        
+    def check(self, image_path: str) -> SafetyResult:
+        """Return a SafetyResult or a failure result if logic raises."""
+        try:
+            return self._check(image_path)
+        except Exception as exc:  # noqa: BLE001
+            logger.exception("SafetyAgent._check failed for path=%s", image_path)
+            return SafetyResult(success=False, error=str(exc))
+
+    def _check(self, image_path: str) -> SafetyResult:
+        path = Path(image_path)
+        if not path.exists():
+            return SafetyResult(success=False, error=f"Image not found: {image_path}")
+
+        client = get_openai_client()
+        flagged_categories: list[str] = []
+        is_flagged = False
+
+        # --- Text moderation on the filename/path as a lightweight proxy ---
+        mod_response = client.moderations.create(input=path.name)
+        mod_result = mod_response.results[0]
+        if mod_result.flagged:
+            is_flagged = True
+            cat_dict: dict[str, bool] = mod_result.categories.model_dump()
+            flagged_categories.extend(k for k, v in cat_dict.items() if v)
+
+        # --- GPT-4o vision check ---
+        image_data = base64.standard_b64encode(path.read_bytes()).decode("utf-8")
+        suffix = path.suffix.lstrip(".").lower()
+        media_type = "image/jpeg" if suffix in ("jpg", "jpeg") else f"image/{suffix}"
+
+        vision_response = client.chat.completions.create(
+            model="gpt-4o",
+            max_tokens=256,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": _VISION_PROMPT},
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:{media_type};base64,{image_data}"},
+                        },
+                    ],
+                }
+            ],
+        )
+
+        raw = vision_response.choices[0].message.content
+        try:
+            vision_data = json.loads(raw)
+            if not vision_data.get("safe", True):
+                is_flagged = True
+                flagged_categories.extend(vision_data.get("flagged_categories", []))
+        except (json.JSONDecodeError, AttributeError):
+            # Unparseable response — treat as safe to avoid false positives
+            logger.warning("GPT-4o vision response was not valid JSON; defaulting to safe")
+
         return SafetyResult(
             success=True,
-            flagged=False,
-            categories=(),
-            error="",
-            metadata=metadata
+            flagged=is_flagged,
+            categories=tuple(dict.fromkeys(flagged_categories)),  # deduplicate, preserve order
         )

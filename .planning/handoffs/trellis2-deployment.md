@@ -306,6 +306,7 @@ The four-tier strategy that emerged:
 | 2. Hero geometry | Campaign drops where geometry detail trumps texture turnaround | **Hi3DGen** + texture pass | MIT (Bytedance) | Future handoff |
 | 3. Animatable garments | **Immersive worlds avatar wearing actual products** with proper drape | **AniGen** (VAST-AI) | MIT | **Highest leverage — ship next** |
 | 4. Design iteration | Internal — text-driven garment editing ("longer sleeves") before commit | **ChatGarment** | Apache-2.0 | R&D track |
+| 5. Cloth physics post-process | Optional — proper drape under avatar motion in immersive worlds | **HOOD** (Dolorousrtur) | MIT | Post-AniGen, only if drape problems visible |
 
 ### 10.5.1 Hi3DGen / Stable3DGen — verified deploy-ready
 
@@ -341,14 +342,34 @@ The four-tier strategy that emerged:
 - **Stack:** Wraps [GarmentCodeRC](https://github.com/biansy000/GarmentCodeRC) (sewing patterns) + [ContourCraft-CG](https://github.com/biansy000/ContourCraft-CG) (cloth simulation)
 - **Use case:** Internal Corey-facing tool to iterate on garment params before committing to full TRELLIS.2 / AniGen render runs. Not a customer-facing render path.
 
-### 10.5.4 Confirmed dead-ends from this round
+### 10.5.4 HOOD — optional Tier 5 cloth simulation post-process
+
+- **Repo:** [github.com/Dolorousrtur/HOOD](https://github.com/Dolorousrtur/HOOD) — MIT, 200 stars, last push 2025-05-20
+- **Paper:** "HOOD: Hierarchical Graphs for Generalized Modelling of Clothing Dynamics" (CVPR 2023), arXiv 2212.07242
+- **What it does:** Graph-neural-network cloth simulator. Takes a static rigged garment mesh + body pose sequence → outputs physically-plausible drape per frame
+- **What it does NOT do:** Image-to-3D. Pure simulation, not generation. Requires an existing 3D garment mesh as input (i.e., output of AniGen)
+- **Strategic role:** Optional Tier 5 layered on top of Tier 3 (AniGen). AniGen produces a rigged static garment; HOOD adds proper drape under motion when the SkyyRose avatar walks through Bay Bridge / Beauty-and-Beast / Golden Gate scenes
+- **Architectural consistency with Tier 4:** ChatGarment depends on `ContourCraft-CG` for cloth simulation. ContourCraft and HOOD are sibling works from overlapping authors. The simulation backend stays in one family across Tier 4 and Tier 5.
+- **When to defer:** HOOD is latency-expensive (graph network per frame, can't run live in browser) and requires pre-baking physics tracks into the GLB. Skip until AniGen is shipping rigged garments and visible drape problems emerge in the immersive worlds. **Premature without that signal.**
+
+### 10.5.5 Confirmed dead-ends from this round
 
 - `microsoft/GarmentCrafter` (arxiv 2503.08678) — empty stub repo, no license, no checkpoints, 11mo dormant
 - Spatio-Temporal Garment Reconstruction (arxiv 2602.24043, Feb 2026) — paper-only, no code released
 - Tencent Hunyuan3D 3.0 — does **not exist**. `tencent/Hunyuan3D-2.1` (June 2025) is the latest, with PBR Texture Synthesis and "first production-ready 3D asset generation" billing. Tencent Community License — commercial OK with conditions.
 - Dress-1-to-3 (arxiv 2502.03449) — project page only, no public code repo
+- **Awesome-3D-Garments curated list deep dive (2026-04-27)** — confirmed the academic-licensing pattern: every garment-specific image-to-3D model in the list has either no LICENSE file (default "all rights reserved") or GPL-3.0 (copyleft, incompatible with proprietary code). Specific disqualifications:
+  - **GarVerseLOD** ([zhongjinluo/GarVerseLOD](https://github.com/zhongjinluo/GarVerseLOD), ACM TOG 2024, 66 stars, 6000-model artist-made dataset) — NO LICENSE
+  - **DrapeNet** ([liren2515/DrapeNet](https://github.com/liren2515/DrapeNet), 126 stars) — GPL-3.0 (copyleft blocker)
+  - **DressCode** ([ihe-kaii/DressCode](https://github.com/ihe-kaii/DressCode), 280 stars, text→sewing pattern) — NO LICENSE
+  - **ISP** ([liren2515/ISP](https://github.com/liren2515/ISP), 49 stars, multi-layered draping) — NO LICENSE
+  - **Design2Cloth** ([jiali-zheng/Design2Cloth](https://github.com/jiali-zheng/Design2Cloth)) — NO LICENSE
 
-### 10.5.5 Sources
+### 10.5.6 Strategic implication of the licensing pattern
+
+There is no garment-specific MIT-licensed image-to-3D model in the open-source ecosystem as of 2026-04-27. The four-tier strategy in §10.5 is not a compromise — it is the only legally viable architecture for SkyyRose. General-purpose models (TRELLIS.2, Hi3DGen, AniGen) with permissive licenses are the only commercially shippable path. Garment-specific academic work either is not licensed for commercial use or requires open-sourcing the consuming code.
+
+### 10.5.7 Sources
 
 - [Stable3DGen (Hi3DGen) GitHub](https://github.com/Stable-X/Stable3DGen)
 - [Hi3DGen Space (HF)](https://huggingface.co/spaces/Stable-X/Hi3DGen)
@@ -372,3 +393,5 @@ The four-tier strategy that emerged:
 | 2026-04-27 | architecture-correction | Original §1 cited `pipelines/skyyrose_master_orchestrator.py` and `pipelines/skyyrose_luxury_pipeline.py` — both were deleted in commit `f25fd25d3` ("Phase B1 scorched earth — rebuild pending"). Verified live integration surface against repo: real entry point is `skyyrose/elite_studio/creative/nodes.py:130 three_d_model_node` (LangGraph) with `SDKGarment3DAgent` primary + `ThreeDGenerationPipeline` fallback. Real tournament orchestrator is `orchestration/threed_round_table.py:540-565`. Rewrote §1 (verified reference points), §6.2 (target dir `ai_3d/` not `pipelines/`), §6.3 (mirror `TripoAssetAgent` not `MeshyAgent` since Tripo is the only `SuperAgent`-shaped 3D agent currently in the round table), §6.4 (round-table tournament integration + optional LangGraph fast path, no master orchestrator), §9 acceptance criteria. |
 | 2026-04-27 | live-verification | Verified all §1 line anchors against repo (nodes.py:130, immersive.py:34, generation_pipeline.py:47/163, threed_round_table.py:540-565, tripo_agent.py:101/238) — all exact. Caught two doc-bugs: §6.2 inline code-block comment said `pipelines/` (corrected to `ai_3d/`), §6.4 step 2 didn't disambiguate v1 vs v2 enum slots (now states v1 and v2 are two distinct pipelines that must coexist — existing `TRELLIS` slot routes to `microsoft/TRELLIS-image-large` via HF Inference API and stays untouched, new `TRELLIS2` slot routes to `microsoft/TRELLIS.2-4B` via Modal). |
 | 2026-04-27 | deep-research-expansion | Investigated alternative image-to-3D models for fashion-specific use. Disqualified GarmentCrafter (empty stub repo, no license, 11mo dormant), Spatio-Temporal Garment Reconstruction Feb 2026 (paper-only), Dress-1-to-3 (project page only), and confirmed Hunyuan3D 3.0 does not exist (`tencent/Hunyuan3D-2.1` is the latest). Surfaced three complementary providers each verified deploy-ready: Hi3DGen (Bytedance, MIT, normal-bridging geometry, beats TRELLIS in user studies), AniGen (VAST-AI, MIT, SIGGRAPH 2026, animatable garments — pushed 2026-04-14, 18GB VRAM, lower than TRELLIS.2's 24GB), and ChatGarment (Apache-2.0, LLM-driven garment editing). Added §10.5 documenting a four-tier provider strategy: TRELLIS.2 as workhorse, Hi3DGen+texture-pass for hero geometry, AniGen for immersive-worlds avatar drape, ChatGarment for design iteration. None block this handoff; AniGen is the highest-leverage next ship because it closes the long-standing immersive-worlds capability gap (`wordpress-theme/skyyrose-flagship/assets/js/experiences/` + `assets/models/skyy.glb`). |
+| 2026-04-27 | awesome-3d-garments-audit | Deep-read the Awesome-3D-Garments curated list (Shanthika/Awesome-3D-Garments, 506 lines). Verified code-release + license status for every plausible candidate. Zero new viable image-to-3D backends found — every garment-specific repo has either no LICENSE file (GarVerseLOD/ACM-TOG 2024 with 6000-model dataset, DressCode 280-stars, ISP, Design2Cloth) or GPL-3.0 copyleft (DrapeNet). One legitimate find: HOOD (Dolorousrtur/HOOD, MIT, CVPR 2023, 200 stars) — graph-NN cloth simulator, NOT image-to-3D. Added as optional Tier 5 in §10.5 four-tier table for post-AniGen drape physics on the immersive-worlds avatar. Architecturally consistent with Tier 4 ChatGarment (which depends on ContourCraft-CG, sibling work). Added §10.5.4 (HOOD), expanded §10.5.5 (dead-ends with academic-licensing pattern), added §10.5.6 (strategic implication: no garment-specific MIT image-to-3D model exists in open-source ecosystem — the four-tier strategy is the only legally viable architecture, not a compromise). Renumbered §10.5.5 Sources → §10.5.7. |
+| 2026-04-27 | anigen-phase1-complete | Tier 3 (AniGen) Phase 1 verified end-to-end on `damBruh/SkyyRose-AniGen` (Private, Gradio, sleep-on-idle 15min). **Critical hardware calibration:** AniGen documented 18GB+ VRAM; reality is L4 24GB ($0.80/hr) **OOMs at FlexiCubes mesh extraction** despite model fitting earlier in the pipeline. **L40S 48GB ($1.80/hr) works cleanly** — full pipeline ~70s compute (Stage 1 generate_preview 52s + Stage 2 extract_glb 18s). Update §10.5.2: real-world VRAM requirement is **32GB+ at peak**, use L40S as the production tier. Verified GLB output at `.planning/handoffs/anigen-phase1-verify.glb` (1.87MB): 12,733 vertices / 18,742 faces, **1 skin with 10 joints**, JOINTS_0+WEIGHTS_0+inverseBindMatrices all present, generator=pygltflib@v1.16.3. Static T-pose rig — ready to be retargeted to or driven by external clips (e.g., the SkyyRose avatar's idle/walk Mixamo clips on `assets/models/skyy.glb`). **Strategic finding from this round:** HF Spaces auto-publish a Gradio API (discoverable via `agents.md` + `/gradio_api/info` + `/config`) — for AniGen this means **no Modal serverless deploy is needed for Phase 2**. The agent integration in §6.3 simplifies to `gradio_client.predict(fn_index=7)` for preview and `predict(fn_index=10)` for extract_glb against the existing HF Space. Modal still required for TRELLIS.2 (which has no comparable hosted endpoint) but optional for the AniGen track. Phase 1 acceptance criteria: ✅ Space private+L40S+sleep-on-idle, ✅ end-to-end test (br-001-crewneck.png → rigged GLB), spending limit configured pre-flight. Total Phase 1 verification spend: ~$0.20. |

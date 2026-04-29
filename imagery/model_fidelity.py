@@ -42,6 +42,17 @@ except ImportError:
     PIL_AVAILABLE = False
     Image = None  # type: ignore
 
+try:
+    import os as _os
+
+    _os.environ.setdefault("PYOPENGL_PLATFORM", "osmesa")
+    import pyrender
+
+    PYRENDER_AVAILABLE = True
+except ImportError:
+    PYRENDER_AVAILABLE = False
+    pyrender = None  # type: ignore
+
 from core.errors.production_errors import (
     ModelFidelityError,
     ThreeDGenerationError,
@@ -293,6 +304,9 @@ class ModelFidelityValidator:
         # Extract metrics
         metrics = await self._extract_metrics(mesh, model_path)
 
+        # Populate silhouette_match_score via render-compare SSIM (or topology fallback)
+        metrics.silhouette_match_score = await self._compute_visual_accuracy(mesh)
+
         # Calculate category scores
         category_scores = await self._calculate_category_scores(metrics)
 
@@ -377,6 +391,119 @@ class ModelFidelityValidator:
             )
 
         return report
+
+    def _render_mesh_views(self, mesh: trimesh.Trimesh) -> list[Image.Image] | None:
+        """Render front/back/left/right viewpoints of the mesh for SSIM comparison."""
+        if not PYRENDER_AVAILABLE or not PIL_AVAILABLE:
+            return None
+        try:
+            bounds = mesh.bounding_box.bounds
+            center = (bounds[0] + bounds[1]) / 2
+            extent = float(max(bounds[1] - bounds[0])) * 1.8
+
+            camera_offsets = [
+                np.array([0, 0, extent]),  # front
+                np.array([0, 0, -extent]),  # back
+                np.array([extent, 0, 0]),  # right
+                np.array([-extent, 0, 0]),  # left
+            ]
+
+            views: list[Image.Image] = []
+            renderer = pyrender.OffscreenRenderer(512, 512)
+            try:
+                py_mesh = pyrender.Mesh.from_trimesh(mesh)
+                for offset in camera_offsets:
+                    scene = pyrender.Scene(ambient_light=[0.5, 0.5, 0.5])
+                    scene.add(py_mesh)
+
+                    pos = center + offset
+                    z_axis = pos - center
+                    norm = np.linalg.norm(z_axis)
+                    if norm < 1e-8:
+                        continue
+                    z_axis = z_axis / norm
+                    up = np.array([0, 1, 0])
+                    x_axis = np.cross(up, z_axis)
+                    x_norm = np.linalg.norm(x_axis)
+                    if x_norm < 1e-8:
+                        up = np.array([0, 0, 1])
+                        x_axis = np.cross(up, z_axis)
+                        x_norm = np.linalg.norm(x_axis)
+                    x_axis = x_axis / x_norm
+                    y_axis = np.cross(z_axis, x_axis)
+
+                    cam_pose = np.eye(4)
+                    cam_pose[:3, 0] = x_axis
+                    cam_pose[:3, 1] = y_axis
+                    cam_pose[:3, 2] = z_axis
+                    cam_pose[:3, 3] = pos
+
+                    cam = pyrender.PerspectiveCamera(yfov=np.pi / 3.0)
+                    scene.add(cam, pose=cam_pose)
+                    light = pyrender.DirectionalLight(color=np.ones(3), intensity=2.5)
+                    scene.add(light, pose=cam_pose)
+
+                    color, _ = renderer.render(scene)
+                    views.append(Image.fromarray(color))
+            finally:
+                renderer.delete()
+
+            return views or None
+        except Exception as exc:
+            logger.warning(f"Headless render failed: {exc}")
+            return None
+
+    async def _compute_visual_accuracy(self, mesh: trimesh.Trimesh) -> float:
+        """Return visual accuracy in [0, 1] via render-compare SSIM.
+
+        Falls back to topology-based estimate when pyrender or a reference
+        image is unavailable. The caller stores the result in
+        metrics.silhouette_match_score before _calculate_category_scores runs.
+        """
+        # Topology fallback — always computable
+        topology_score = 0.0
+        if mesh.is_watertight:
+            topology_score += 0.30
+        if len(mesh.vertices) >= 10000:
+            topology_score += 0.30
+        try:
+            if not np.any(mesh.area_faces < 1e-10):
+                topology_score += 0.20
+        except Exception:
+            pass
+        if hasattr(mesh, "visual") and mesh.visual is not None:
+            topology_score += 0.20
+        topology_score = min(topology_score, 1.0)
+
+        if self.reference_image_path is None or not self.reference_image_path.exists():
+            return topology_score
+
+        views = self._render_mesh_views(mesh)
+        if not views:
+            return topology_score
+
+        try:
+            from skimage import img_as_float as _f
+            from skimage.metrics import structural_similarity as _ssim
+
+
+            ref_img = Image.open(self.reference_image_path).convert("RGB")
+            target_size = (512, 512)
+            ref_arr = np.array(ref_img.resize(target_size, Image.Resampling.LANCZOS))
+
+            ssim_values: list[float] = []
+            for view in views:
+                view_arr = np.array(view.resize(target_size, Image.Resampling.LANCZOS))
+                ref_gray = _f(np.mean(ref_arr, axis=2))
+                view_gray = _f(np.mean(view_arr, axis=2))
+                score = float(_ssim(ref_gray, view_gray, data_range=1.0))
+                ssim_values.append(max(0.0, score))
+
+            avg_ssim = sum(ssim_values) / len(ssim_values) if ssim_values else 0.0
+            return avg_ssim
+        except Exception as exc:
+            logger.warning(f"Render-compare SSIM failed: {exc}")
+            return topology_score
 
     async def _extract_metrics(
         self,
@@ -531,19 +658,10 @@ class ModelFidelityValidator:
 
         scores[FidelityCategory.TEXTURE_QUALITY.value] = min(texture_score, 100)
 
-        # Visual accuracy score (placeholder - requires reference comparison)
-        # For now, base on mesh quality indicators
-        visual_score = 0.0
-        if metrics.is_watertight:
-            visual_score += 30
-        if metrics.vertex_count >= 10000:
-            visual_score += 30
-        if not metrics.has_degenerate_faces:
-            visual_score += 20
-        if metrics.has_textures:
-            visual_score += 20
-
-        scores[FidelityCategory.VISUAL_ACCURACY.value] = min(visual_score, 100)
+        # Visual accuracy — driven by render-compare SSIM set in validate()
+        scores[FidelityCategory.VISUAL_ACCURACY.value] = round(
+            metrics.silhouette_match_score * 100, 2
+        )
 
         return scores
 

@@ -1,0 +1,13 @@
+# Stage 1 Base Render Prompt — Kids Colorblock Hoodie Set — Red/Black
+# SKU: kids-001 | Collection: Kids Capsule
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of a matching two-piece kids hoodie set — (1) a children's pullover hoodie and (2) matching solid black children's sweatpants — placed flat together or shown as coordinated front-view garments, centered on pure white background, sized proportionally for children (approximately ages 4-10 range). The hoodie has a bold angular geometric color-block construction: a solid red/scarlet hood; the upper body is divided diagonally — the upper-left chest/shoulder panel is solid black, and the upper-right chest/shoulder panel is solid white; the lower body (below the diagonal panel seam) is solid red matching the hood. This creates a striking three-tone geometric color-block silhouette. The matching sweatpants are solid jet-black cotton-fleece throughout with standard children's elastic waistband construction. Pullover construction on the hoodie — no zipper. The fabric is mid-weight cotton-fleece on both pieces, sized for children. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus, 8K commercial apparel photography quality.
+
+NOTES:
+- The angular geometric color-block construction (red hood + diagonal black upper-left + white upper-right + red lower body) is the defining structural design of this hoodie — the diagonal panel seam lines must be rendered precisely
+- Children's sizing — the garment proportions should read clearly as sized for kids, not adults
+- The matching sweatpants are solid ALL-BLACK cotton-fleece — no color-blocking on the pants
+- Do NOT render any embroidery, logos, or printed graphics on either piece — all decoration is Stage 3
+- Fabric: mid-weight cotton-fleece on both pieces — NOT nylon, NOT mesh

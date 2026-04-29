@@ -35,6 +35,7 @@
   // -------------------------------------------------------------------------
 
   function getCardData(el) {
+    if (!el || typeof el.closest !== 'function') return null;
     var article = el.closest('[data-product-id]');
     if (!article) return null;
     return {
@@ -147,6 +148,7 @@
     document.addEventListener(
       'mouseenter',
       function (e) {
+        if (!e.target || typeof e.target.closest !== 'function') return;
         var article = e.target.closest('[data-product-id]');
         if (!article) return;
         var id = article.dataset.productId;
@@ -163,6 +165,7 @@
     document.addEventListener(
       'mouseleave',
       function (e) {
+        if (!e.target || typeof e.target.closest !== 'function') return;
         var article = e.target.closest('[data-product-id]');
         if (!article) return;
         var id = article.dataset.productId;
@@ -176,6 +179,7 @@
   function initClickTracking() {
     document.addEventListener('click', function (e) {
       var target = e.target;
+      if (!target || typeof target.closest !== 'function') return;
 
       // Add-to-cart
       if (target.closest('.holo__buy')) {

@@ -201,7 +201,8 @@ def build_graph(config: GraphConfig | None = None) -> object:
 
     # --- Register core nodes (always present) ---
     graph.add_node(_VISION, vision_node)
-    graph.add_node(_GENERATOR, generator_node)
+    if not config.enable_3d:
+        graph.add_node(_GENERATOR, generator_node)
     graph.add_node(_QUALITY, quality_node)
     graph.add_node(_COMPOSITOR, compositor_node)
     graph.add_node(_FINALIZE, finalize_node)

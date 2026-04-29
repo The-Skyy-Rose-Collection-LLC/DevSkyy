@@ -201,11 +201,13 @@
 .skr-single__content.entry-content blockquote {
 	margin-block: 2rem;
 	padding: 1.5rem 2rem;
-	border-left: 3px solid var(--color-rose-gold, #B76E79);
 	background: var(--color-card-bg, #111);
-	border-radius: 0 var(--radius-md, 8px) var(--radius-md, 8px) 0;
+	border-radius: var(--radius-md, 8px);
+	font-family: 'Playfair Display', Georgia, serif;
 	font-style: italic;
-	font-size: 1.1rem;
+	font-size: 1.25rem;
+	line-height: 1.6;
+	color: var(--color-text-secondary, #d8d8d8);
 }
 
 /* --- Post navigation --- */

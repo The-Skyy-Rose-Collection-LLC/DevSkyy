@@ -56,7 +56,7 @@ class EliteStudioState(TypedDict, total=False):
     ghost_mannequin_front_path: str
     ghost_mannequin_back_path: str
     ghost_mannequin_composite_result: GhostMannequinCompositeResult | None
-    
+
     # --- 3D Architecture additions ---
     three_d_model_path: str
     three_d_fidelity_score: float

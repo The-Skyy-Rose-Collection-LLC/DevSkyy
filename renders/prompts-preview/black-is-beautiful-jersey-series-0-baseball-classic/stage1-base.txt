@@ -1,0 +1,13 @@
+# Stage 1 Base Render Prompt — BLACK is Beautiful Jersey Series: 0. Baseball Classic
+# SKU: br-003 | Collection: Black Rose
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of an authentic-style button-front baseball jersey — NOT a pullover, NOT a football jersey, NOT a t-shirt — placed flat or on an invisible mannequin, front view centered on pure white background. The garment has a solid jet-black base fabric throughout the body and short sleeves, with a classic V-neck collar construction finished with white contrast piping/binding along the V-neck edge and the front button placket. The sleeve cuffs and hem are finished with white contrast binding. The front closure is a full-length button placket with visible white buttons down the center. The fabric is mid-weight athletic knit — smooth, structured, with a subtle cross-grain texture characteristic of performance baseball jersey fabric. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus across the full garment, 8K commercial apparel photography quality.
+
+NOTES:
+- The white piping/binding at V-neck, front placket, sleeve cuffs, and hem is a structural construction detail — render it precisely as clean white trim lines against the black body
+- The button placket with white buttons is a key silhouette element that distinguishes this as a baseball jersey construction
+- Do NOT render any embroidery, logos, printed numbers, or graphic elements — all decoration is Stage 3
+- This is the BLACK colorway (solid black base) — NOT the Oakland/Giants/White editions
+- Fabric: mid-weight smooth athletic knit, NOT cotton-fleece, NOT satin, NOT mesh

@@ -1,0 +1,14 @@
+# Stage 1 Base Render Prompt — Kids Colorblock Hoodie Set — Purple/Black
+# SKU: kids-002 | Collection: Kids Capsule
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of a matching two-piece kids hoodie set — (1) a children's pullover hoodie and (2) matching deep-purple children's sweatpants — placed flat together or shown as coordinated front-view garments, centered on pure white background, sized proportionally for children. The hoodie has a bold angular geometric color-block construction across a purple palette: a solid soft lavender/light-purple hood; the upper body is divided diagonally — the upper-left chest/shoulder panel is soft lavender matching the hood, and the upper-right chest/shoulder panel is medium-purple; the lower body (below the diagonal seam) is solid deep purple. This creates a tonal purple-gradient geometric color-block silhouette from light lavender at the hood/upper-left down to deep purple at the body. The matching sweatpants are solid deep purple cotton-fleece — NOT black (catalog name says "Purple/Black" but the techflat confirms the pants are deep purple, not black). Pullover construction — no zipper. Mid-weight cotton-fleece on both pieces, children's sizing. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus, 8K commercial apparel photography quality.
+
+NOTES:
+- CRITICAL: catalog name says "Purple/Black" but the dossier confirms the sweatpants are DEEP PURPLE, not black — render the pants as deep purple to match the hoodie's lower body color
+- The purple tonal color-block (lavender hood → lavender upper-left panel → medium-purple upper-right panel → deep purple lower body) must be rendered with distinct but harmonious purple shades
+- The diagonal angular panel seam lines are the defining structural design element
+- Children's sizing — proportions sized for kids
+- Do NOT render any embroidery, logos, or printed graphics on either piece — all decoration is Stage 3
+- Fabric: mid-weight cotton-fleece on both pieces — NOT nylon, NOT mesh

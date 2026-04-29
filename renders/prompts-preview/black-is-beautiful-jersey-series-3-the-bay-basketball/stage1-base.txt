@@ -1,0 +1,14 @@
+# Stage 1 Base Render Prompt — BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)
+# SKU: br-010 | Collection: Black Rose
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of an authentic-style sleeveless basketball tank jersey — NOT a t-shirt, NOT a football jersey, NOT a baseball jersey — placed flat or on an invisible mannequin, front view centered on pure white background. The garment is sleeveless with large open armhole cutouts, a scoop or rounded neckline with thin contrast binding trim around the neck and armhole edges, and a straight hem at the lower body. The base fabric is white, with an all-over sublimated photographic pattern of repeating rose-cluster motifs fading from nearly invisible (white-on-white) at the upper chest area to increasingly visible greyscale rose clusters at the mid-body and lower hem. The overall color impression is white at the top transitioning to a greyscale rose-patterned finish toward the bottom. The fabric is lightweight smooth performance knit appropriate for athletic play. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus, 8K commercial apparel photography quality.
+
+NOTES:
+- The all-over sublimated rose-cluster fade pattern IS the base garment's primary visual element — it is part of the fabric construction, not a decoration overlay; include it in Stage 1 as it defines the garment's appearance
+- The gradient fade (white/invisible at top → greyscale rose clusters at bottom) must be rendered accurately
+- Sleeveless construction with deep armhole openings is the defining silhouette — NOT short sleeves
+- Thin contrast binding at neck and armholes is a structural construction finish
+- Do NOT render any embroidered logos, large graphic overlays, or text elements — those are Stage 3
+- Fabric: lightweight smooth performance knit — NOT mesh, NOT fleece, NOT satin

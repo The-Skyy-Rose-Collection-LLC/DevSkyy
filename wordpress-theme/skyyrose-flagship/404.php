@@ -182,9 +182,9 @@ if ( empty( $skyyrose_trending_products ) ) {
 		<div class="error-404-mascot">
 			<?php
 			$skyyrose_mascot_404_path = SKYYROSE_DIR . '/assets/images/mascot/skyyrose-mascot-404.png';
-			$skyyrose_mascot_ref_path = SKYYROSE_DIR . '/assets/images/mascot/skyyrose-mascot-reference.png';
+			$skyyrose_mascot_ref_path = SKYYROSE_DIR . '/assets/images/mascot/skyy-canonical.jpeg';
 			$skyyrose_mascot_404_url  = SKYYROSE_ASSETS_URI . '/images/mascot/skyyrose-mascot-404.png';
-			$skyyrose_mascot_ref_url  = SKYYROSE_ASSETS_URI . '/images/mascot/skyyrose-mascot-reference.png';
+			$skyyrose_mascot_ref_url  = SKYYROSE_ASSETS_URI . '/images/mascot/skyy-canonical.jpeg';
 
 			$skyyrose_mascot_display = '';
 			if ( file_exists( $skyyrose_mascot_404_path ) ) {

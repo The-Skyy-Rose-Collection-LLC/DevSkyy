@@ -1,0 +1,14 @@
+# Stage 1 Base Render Prompt — BLACK is Beautiful Jersey Series: 4. The Rose (Hockey)
+# SKU: br-011 | Collection: Black Rose
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of a hockey-style pullover hoodie — NOT a zip-up, NOT a baseball jersey, NOT a standard sweatshirt hoodie — placed flat or on an invisible mannequin, front view centered on pure white background. The garment has long sleeves with an attached hood, constructed in solid jet-black body fabric as the dominant color, with teal/turquoise accent colorway. The sleeve cuffs and hem waistband carry horizontal stripe banding in a black + teal + white stripe pattern wrapping the entire cuff and hem circumference. The hood interior lining is solid teal/turquoise fabric — visible at the hood opening edge creating a teal contrast trim at the face opening. The overall silhouette is the relaxed athletic hockey jersey shape with the addition of an attached hood. The fabric is mid-weight athletic knit — structured and slightly heavier than a t-shirt. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus from hood crown to waistband, 8K commercial apparel photography quality.
+
+NOTES:
+- The black body + teal accent is the defining colorway — render the teal as true teal/turquoise, NOT blue, NOT green
+- The striped cuff and hem bands (black + teal + white horizontal stripes) are structural construction elements — render them with precision
+- The teal interior hood lining peeking at the hood face opening edge is a key detail that reads as a teal trim band at the hood perimeter
+- Pullover construction — NO zipper, NO button placket
+- Do NOT render any embroidery, logos, numbers, or printed graphics — all decoration is Stage 3
+- Fabric: mid-weight athletic knit — NOT fleece, NOT satin, NOT mesh

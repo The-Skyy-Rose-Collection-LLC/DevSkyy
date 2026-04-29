@@ -193,11 +193,11 @@ class MeshyClient:
         async with self._semaphore:
             # Enforce minimum delay between requests
             async with self._lock:
-                now = asyncio.get_event_loop().time()
+                now = asyncio.get_running_loop().time()
                 elapsed = now - self._last_request_time
                 if elapsed < self.MIN_DELAY_BETWEEN_CALLS:
                     await asyncio.sleep(self.MIN_DELAY_BETWEEN_CALLS - elapsed)
-                self._last_request_time = asyncio.get_event_loop().time()
+                self._last_request_time = asyncio.get_running_loop().time()
 
             # Retry loop with exponential backoff
             backoff = self.INITIAL_BACKOFF
@@ -277,22 +277,12 @@ class MeshyClient:
         art_style: MeshyArtStyle = MeshyArtStyle.REALISTIC,
         topology: MeshyTopology = MeshyTopology.QUAD,
         target_polycount: int = 30000,
-    ) -> str | None:
+    ) -> dict[str, Any] | None:
         """
         Generate a 3D model from an image.
 
-        Args:
-            image_path: Path to the source image
-            output_dir: Directory to save the model
-            output_format: Output format (glb, fbx, obj)
-            prompt: Optional text prompt
-            texture_resolution: Texture resolution
-            art_style: Art style (realistic or cartoon)
-            topology: Mesh topology (quad or triangle)
-            target_polycount: Target polygon count
-
         Returns:
-            Path to the generated model or None on failure
+            Dict containing model_path, thumbnail_url, and task info
         """
         image_path = Path(image_path)
         output_dir = Path(output_dir)
@@ -335,7 +325,12 @@ class MeshyClient:
             await self._download_model(model_url, output_path)
             logger.info(f"Downloaded Meshy model: {output_path}")
 
-            return str(output_path)
+            return {
+                "model_path": str(output_path),
+                "thumbnail_url": completed_task.thumbnail_url,
+                "task_id": completed_task.task_id,
+                "model_urls": completed_task.model_urls,
+            }
 
         except Exception as e:
             logger.exception(f"Meshy generation failed: {e}")
@@ -486,11 +481,16 @@ class MeshyClient:
                 "image_url": image_url,
                 "enable_pbr": True,
                 "should_remesh": True,
+                "should_texture": True,
                 "topology": topology.value,
                 "target_polycount": target_polycount,
                 "ai_model": "meshy-5",
                 "art_style": art_style.value,
             }
+            # meshy-5 is the current default per Meshy docs (2026) and accepts
+            # enable_pbr; meshy-4 rejected enable_pbr with HTTP 400. PBR maps
+            # (metallic/roughness/normal) are essential for clothing fidelity.
+            # Source: https://docs.meshy.ai/en/api/image-to-3d
 
             response = await self._rate_limited_request(
                 "POST",

@@ -1,7 +1,7 @@
 """
 QualityAgent — Phase 16 Legendary QA Architect.
 
-Promoted to ADK SuperAgent for comprehensive "Back Data" (telemetry) and 
+Promoted to ADK SuperAgent for comprehensive "Back Data" (telemetry) and
 high-fidelity dual-agent QA consensus.
 
 Inherits from BaseSuperAgent to leverage standardized enterprise tools
@@ -12,12 +12,12 @@ from __future__ import annotations
 
 import base64
 import logging
-import os
 from pathlib import Path
 from typing import Any
 
-from adk.super_agents import BaseSuperAgent, SuperAgentType
-from adk.base import AgentConfig, ADKProvider, AgentResult, AgentStatus
+from adk.base import ADKProvider, AgentConfig, AgentResult
+from adk.super_agents import BaseSuperAgent
+
 from ..gemini_rest import analyze_vision as gemini_analyze_vision
 from ..models import QualityVerification
 
@@ -58,7 +58,7 @@ class QualityAgent(BaseSuperAgent):
                 name="legendary_qa_architect",
                 provider=ADKProvider.GOOGLE,
                 model="gemini-2.0-flash",
-                system_prompt="You are the Legendary QA Architect for SkyyRose. Your mission is absolute visual perfection."
+                system_prompt="You are the Legendary QA Architect for SkyyRose. Your mission is absolute visual perfection.",
             )
         super().__init__(config)
 
@@ -75,7 +75,7 @@ class QualityAgent(BaseSuperAgent):
         # Trigger ADK for observability
         adk_prompt = f"QA TASK: Image={image_path}, Spec={expected_spec}"
         logger.info(f"Running Legendary QA for {image_path} via ADK...")
-        
+
         # Capture result to get dictionary metadata
         adk_result = await self.execute(adk_prompt)
 
@@ -107,12 +107,12 @@ class QualityAgent(BaseSuperAgent):
         # Check if adk_result is an AgentResult object
         metadata = {}
         if isinstance(adk_result, AgentResult):
-             # Try to get data for metadata
-             metadata = {
-                 "status": adk_result.status,
-                 "agent": adk_result.agent_name,
-                 "started_at": str(adk_result.started_at)
-             }
+            # Try to get data for metadata
+            metadata = {
+                "status": adk_result.status,
+                "agent": adk_result.agent_name,
+                "started_at": str(adk_result.started_at),
+            }
 
         if identity_mismatch:
             details["reject_reason"] = "identity mismatch flagged by vision model"
@@ -123,7 +123,7 @@ class QualityAgent(BaseSuperAgent):
                 overall_status="fail",
                 recommendation="regenerate",
                 details=details,
-                metadata=metadata
+                metadata=metadata,
             )
 
         passed = min_score >= _PASS_THRESHOLD
@@ -134,7 +134,7 @@ class QualityAgent(BaseSuperAgent):
             overall_status="pass" if passed else "fail",
             recommendation="approve" if passed else "regenerate",
             details=details,
-            metadata=metadata
+            metadata=metadata,
         )
 
     # ------------------------------------------------------------------
@@ -143,23 +143,28 @@ class QualityAgent(BaseSuperAgent):
 
     async def _score_claude(self, image_path: str, prompt: str) -> tuple[int, bool, str]:
         from ..config import get_anthropic_client
-        
+
         client = get_anthropic_client()
         ext = Path(image_path).suffix.lower().lstrip(".")
         media_type = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
         with open(image_path, "rb") as f:
             b64 = base64.standard_b64encode(f.read()).decode("utf-8")
-        
+
         msg = client.messages.create(
             model=_CLAUDE_MODEL,
             max_tokens=256,
-            messages=[{
-                "role": "user",
-                "content": [
-                    {"type": "image", "source": {"type": "base64", "media_type": media_type, "data": b64}},
-                    {"type": "text", "text": prompt},
-                ],
-            }],
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {"type": "base64", "media_type": media_type, "data": b64},
+                        },
+                        {"type": "text", "text": prompt},
+                    ],
+                }
+            ],
         )
         return _parse_qa_response(msg.content[0].text)
 
@@ -168,7 +173,7 @@ class QualityAgent(BaseSuperAgent):
         mime = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
         with open(image_path, "rb") as f:
             b64 = base64.standard_b64encode(f.read()).decode("utf-8")
-        
+
         result = gemini_analyze_vision(
             model=_GEMINI_VISION_MODEL, prompt=prompt, image_b64=b64, mime_type=mime
         )
