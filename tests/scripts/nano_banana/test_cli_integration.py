@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -20,7 +21,7 @@ def run_cli(*args: str, timeout: int = 30) -> subprocess.CompletedProcess:
     """Run nano-banana-run.py with given arguments via subprocess."""
     env = {**os.environ, "PYTHONPATH": str(PROJECT_ROOT / "scripts")}
     return subprocess.run(
-        ["python", str(RUN_SCRIPT), *args],
+        [sys.executable, str(RUN_SCRIPT), *args],
         capture_output=True,
         text=True,
         env=env,

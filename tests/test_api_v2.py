@@ -143,7 +143,7 @@ class TestCreateOperationAsync:
         mock_redis.setex.return_value = True
 
         with (
-            patch("api.v2.creative.enqueue_creative", return_value="elite:br-001:test0001"),
+            patch("api.v2.creative.enqueue_creative_async", return_value="elite:br-001:test0001"),
             patch("api.v2.creative._get_redis", return_value=mock_redis),
         ):
             resp = creative_client.post(
@@ -178,7 +178,7 @@ class TestCreateOperationAsync:
         mock_redis.setex.return_value = True
 
         with (
-            patch("api.v2.creative.enqueue_creative", return_value="elite:br-001:webhk001"),
+            patch("api.v2.creative.enqueue_creative_async", return_value="elite:br-001:webhk001"),
             patch("api.v2.creative._get_redis", return_value=mock_redis),
         ):
             resp = creative_client.post(
@@ -197,7 +197,7 @@ class TestCreateOperationAsync:
 
     def test_queue_unavailable_returns_503(self, creative_client):
         with patch(
-            "api.v2.creative.enqueue_creative",
+            "api.v2.creative.enqueue_creative_async",
             side_effect=ConnectionError("Redis down"),
         ):
             resp = creative_client.post(

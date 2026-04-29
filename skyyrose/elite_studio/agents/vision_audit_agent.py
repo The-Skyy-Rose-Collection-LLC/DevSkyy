@@ -24,7 +24,7 @@ import logging
 import re
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Literal
+from typing import Literal, cast
 
 from ..config import GEMINI_VISION_MODEL
 from ..gemini_rest import analyze_vision as gemini_analyze_vision
@@ -231,7 +231,7 @@ class VisionAuditAgent:
                 VisionAuditViolation(
                     element=str(v.get("element", "")),
                     region=str(v.get("region", "")),
-                    severity=severity,
+                    severity=cast(Literal["low", "medium", "high"], severity),
                 )
             )
         return VisionAuditResult(
