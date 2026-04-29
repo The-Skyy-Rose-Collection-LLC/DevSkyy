@@ -29,7 +29,7 @@ import logging
 import shutil
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -198,6 +198,7 @@ async def render(
                     auditor.audit,
                     inpaint.output_path,
                     dossier,
+                    view,
                 )
                 logger.info(
                     "stage5 audit: sku=%s view=%s attempt=%d ok=%s violations=%d",
