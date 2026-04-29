@@ -37,6 +37,11 @@ from typing import Any
 import aiofiles
 import aiohttp
 from pydantic import BaseModel, Field
+
+# Single source of truth for FASHN pricing — referenced by api/agents.py,
+# api/virtual_tryon.py, and any other surface that quotes cost. Update
+# here when FASHN's pay-as-you-go rate changes.
+FASHN_USD_PER_IMAGE = 0.075
 from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from agents.core.base import (

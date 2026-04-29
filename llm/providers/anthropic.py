@@ -106,6 +106,30 @@ class AnthropicClient(BaseLLMClient):
 
         return system, msgs
 
+    @staticmethod
+    def _format_system(system: str, with_cache_control: bool) -> Any:
+        """Render the system prompt for the Anthropic API.
+
+        When `with_cache_control` is True, upgrade the system prompt
+        from a bare string to the array form with
+        `cache_control: ephemeral` so Anthropic can serve repeat calls
+        from the prompt cache. Short prompts (under the per-model
+        minimum) are accepted by the API without being cached, so this
+        is safe to enable by default.
+
+        When False, the legacy bare-string form is used so callers can
+        opt out (e.g. for one-shot prompts where caching has no benefit).
+        """
+        if not with_cache_control:
+            return system
+        return [
+            {
+                "type": "text",
+                "text": system,
+                "cache_control": {"type": "ephemeral"},
+            }
+        ]
+
     async def complete(
         self,
         messages: list[Message],
@@ -114,6 +138,7 @@ class AnthropicClient(BaseLLMClient):
         max_tokens: int = 4096,  # Increased default for PTC
         tools: list[dict[str, Any]] | None = None,
         container_id: str | None = None,  # For container reuse
+        cache_system: bool = True,
         **kwargs: Any,
     ) -> CompletionResponse:
         """
@@ -126,6 +151,12 @@ class AnthropicClient(BaseLLMClient):
             max_tokens: Maximum tokens (increased to 4096 for PTC)
             tools: Tool definitions (supports PTC with allowed_callers)
             container_id: Existing container ID to reuse
+            cache_system: When True (default), the system prompt is sent
+                with `cache_control: ephemeral` so repeat calls with the
+                same system prompt (e.g. SKYYROSE_BRAND_DNA across many
+                agents) hit the prompt cache. Anthropic ignores caching
+                for prompts under the minimum size, so this is a safe
+                default.
             **kwargs: Additional arguments
 
         Returns:
@@ -144,7 +175,7 @@ class AnthropicClient(BaseLLMClient):
         }
 
         if system:
-            data["system"] = system
+            data["system"] = self._format_system(system, cache_system)
 
         # Container reuse for PTC
         if container_id:
@@ -207,6 +238,14 @@ class AnthropicClient(BaseLLMClient):
                     )
                 )
 
+        # Surface prompt-cache metrics for observability. Anthropic returns
+        # cache_creation_input_tokens (first call that wrote the cache) and
+        # cache_read_input_tokens (subsequent calls that hit the cache).
+        cache_metadata = {
+            "cache_creation_input_tokens": usage.get("cache_creation_input_tokens", 0),
+            "cache_read_input_tokens": usage.get("cache_read_input_tokens", 0),
+        }
+
         return CompletionResponse(
             content=content,
             model=model,
@@ -217,6 +256,7 @@ class AnthropicClient(BaseLLMClient):
             finish_reason=result.get("stop_reason", ""),
             tool_calls=tool_calls,
             latency_ms=self._calculate_latency(start_time),
+            metadata=cache_metadata,
             raw=result,
             container=container_info,
         )
@@ -227,9 +267,13 @@ class AnthropicClient(BaseLLMClient):
         model: str | None = None,
         temperature: float = 0.7,
         max_tokens: int = 1024,
+        cache_system: bool = True,
         **kwargs: Any,
     ) -> AsyncIterator[StreamChunk]:
-        """Stream completion using Anthropic API."""
+        """Stream completion using Anthropic API.
+
+        See `complete()` for the meaning of `cache_system`.
+        """
         model = model or self.default_model
         await self.connect()
 
@@ -244,7 +288,7 @@ class AnthropicClient(BaseLLMClient):
         }
 
         if system:
-            data["system"] = system
+            data["system"] = self._format_system(system, cache_system)
 
         async with self._client.stream(
             "POST",

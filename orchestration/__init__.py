@@ -70,11 +70,13 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "OpenAIEmbeddingEngine": ("orchestration.embedding_engine", "OpenAIEmbeddingEngine"),
     "SentenceTransformerEngine": ("orchestration.embedding_engine", "SentenceTransformerEngine"),
     "create_embedding_engine": ("orchestration.embedding_engine", "create_embedding_engine"),
-    # LangGraph
-    "AgentNode": ("orchestration.langgraph_integration", "AgentNode"),
+    # LangGraph (data types and re-exports — engine is real langgraph library)
     "WorkflowEdge": ("orchestration.langgraph_integration", "WorkflowEdge"),
-    "WorkflowManager": ("orchestration.langgraph_integration", "WorkflowManager"),
     "WorkflowState": ("orchestration.langgraph_integration", "WorkflowState"),
+    "WorkflowStatus": ("orchestration.langgraph_integration", "WorkflowStatus"),
+    "StateGraph": ("orchestration.langgraph_integration", "StateGraph"),
+    "END": ("orchestration.langgraph_integration", "END"),
+    "START": ("orchestration.langgraph_integration", "START"),
     # LLM Clients
     "AnthropicClient": ("orchestration.llm_clients", "AnthropicClient"),
     "BaseLLMClient": ("orchestration.llm_clients", "BaseLLMClient"),

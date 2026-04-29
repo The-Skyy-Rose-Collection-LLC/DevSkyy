@@ -77,6 +77,12 @@ async def lifespan(app: FastAPI):
     # Shutdown
     log.info("platform_shutting_down")
     await db_manager.close()
+    try:
+        from skyyrose.elite_studio.creative.checkpointer import close_checkpointer
+
+        await close_checkpointer()
+    except Exception as exc:  # noqa: BLE001 — non-critical cleanup
+        log.warning("creative_checkpointer_close_failed", error=str(exc))
     log.info("platform_shutdown_complete")
 
 

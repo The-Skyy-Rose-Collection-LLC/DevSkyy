@@ -890,6 +890,154 @@ async def get_market_trends(
     )
 
 
+# ---- Immersive 3D + Avatar Endpoints ----
+# Surface the SDK-powered immersive agents (scene builder + avatar
+# stylist) so the dashboard and external pipelines can invoke them
+# without going through the generic /execute path. The avatar stylist
+# touches the paid FASHN API, so its route enforces an explicit cost
+# acknowledgement before the agent is invoked.
+
+
+# Per-call cost approximations for the avatar stylist. Pricing is the
+# canonical FASHN constant; the image counts are stylist-specific
+# heuristics for cost estimation.
+from agents.fashn_agent import FASHN_USD_PER_IMAGE as _FASHN_USD_PER_IMAGE  # noqa: E402
+
+_FASHN_DEFAULT_IMAGES = 4  # Single SKU × 4 poses = standard avatar render
+_FASHN_LOOKBOOK_IMAGES = 28  # Multi-SKU lookbook estimate
+
+
+class SceneBuilderRequest(BaseModel):
+    """Request for SDKSceneBuilderAgent."""
+
+    task: str = Field(
+        ...,
+        min_length=5,
+        max_length=4000,
+        description="Scene-building task, e.g. 'build full Black Rose scene with hotspots'",
+    )
+    collection: str | None = Field(
+        None,
+        description="Target collection: 'black_rose' | 'love_hurts' | 'signature' | 'kids_capsule'",
+    )
+
+
+class AvatarStylistRequest(BaseModel):
+    """Request for SDKAvatarStylistAgent.
+
+    The agent triggers paid FASHN try-on calls. Callers MUST set
+    `confirm_fashn_cost=True` to acknowledge the cost. The endpoint
+    returns 402 Payment Required otherwise.
+    """
+
+    task: str = Field(
+        ...,
+        min_length=5,
+        max_length=4000,
+        description="Stylist task, e.g. 'try on this outfit' or 'generate full lookbook'",
+    )
+    sku: str | None = Field(None, description="Product SKU to dress avatar in")
+    pose: str | None = Field(
+        None,
+        description="Pose: idle | wave | dance | point | sit | peek | celebrate",
+    )
+    confirm_fashn_cost: bool = Field(
+        False,
+        description=(
+            "Must be True to proceed. FASHN is a paid API "
+            f"(~${_FASHN_USD_PER_IMAGE}/image). Set after reviewing the "
+            "estimated cost returned in the 402 response."
+        ),
+    )
+
+
+def _estimate_fashn_cost(task: str) -> dict[str, Any]:
+    """Estimate FASHN cost for a stylist task.
+
+    Lookbook tasks fan out to every SKU; single-outfit tasks render the
+    standard pose set.
+    """
+    is_lookbook = "lookbook" in task.lower() or "all outfits" in task.lower()
+    image_count = _FASHN_LOOKBOOK_IMAGES if is_lookbook else _FASHN_DEFAULT_IMAGES
+    return {
+        "estimated_images": image_count,
+        "usd_per_image": _FASHN_USD_PER_IMAGE,
+        "estimated_cost_usd": round(image_count * _FASHN_USD_PER_IMAGE, 2),
+        "is_lookbook": is_lookbook,
+    }
+
+
+@agents_router.post("/scene-builder")
+async def invoke_scene_builder(
+    request: SceneBuilderRequest,
+    user: TokenPayload = Depends(get_current_user),
+):
+    """Invoke the immersive 3D scene builder.
+
+    Builds Three.js scenes for the SkyyRose collection worlds. No paid
+    APIs are touched — this agent only writes scene config and JS.
+    """
+    from agents.claude_sdk.domain_agents.immersive import SDKSceneBuilderAgent
+
+    agent = SDKSceneBuilderAgent(correlation_id=user.sub)
+    result = await agent.execute(
+        request.task,
+        collection=request.collection,
+    )
+    return {
+        "agent": "sdk_scene_builder",
+        "result": result,
+        "task_id": secrets.token_hex(8),
+        "user_id": user.sub,
+    }
+
+
+@agents_router.post("/avatar-stylist")
+async def invoke_avatar_stylist(
+    request: AvatarStylistRequest,
+    user: TokenPayload = Depends(get_current_user),
+):
+    """Invoke the avatar stylist (paid FASHN try-on).
+
+    REQUIRES `confirm_fashn_cost=True`. If unset, the endpoint returns
+    HTTP 402 with the cost estimate so the caller can re-submit after
+    reviewing the cost.
+    """
+    cost = _estimate_fashn_cost(request.task)
+
+    if not request.confirm_fashn_cost:
+        # 402 Payment Required — the API equivalent of STOP AND SHOW.
+        # Surface the estimate so the caller can decide informed.
+        raise HTTPException(
+            status_code=status.HTTP_402_PAYMENT_REQUIRED,
+            detail={
+                "error": "FASHN cost confirmation required",
+                "message": (
+                    "Avatar styling triggers paid FASHN try-on calls. "
+                    "Re-submit with confirm_fashn_cost=true to proceed."
+                ),
+                "paid_api": "FASHN",
+                **cost,
+            },
+        )
+
+    from agents.claude_sdk.domain_agents.immersive import SDKAvatarStylistAgent
+
+    agent = SDKAvatarStylistAgent(correlation_id=user.sub)
+    result = await agent.execute(
+        request.task,
+        sku=request.sku,
+        pose=request.pose,
+    )
+    return {
+        "agent": "sdk_avatar_stylist",
+        "result": result,
+        "task_id": secrets.token_hex(8),
+        "user_id": user.sub,
+        "estimated_cost": cost,
+    }
+
+
 # ---- Agent by Name (catch-all - must be last) ----
 
 
