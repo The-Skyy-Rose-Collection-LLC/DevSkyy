@@ -1,6 +1,6 @@
 """DualVisionGate — Phase B2 dual-agent vision consensus.
 
-Promoted to ADK SuperAgent for comprehensive "Back Data" (telemetry) and 
+Promoted to ADK SuperAgent for comprehensive "Back Data" (telemetry) and
 high-fidelity dual-agent vision consensus.
 
 Agent A: Claude Opus 4.6 (Anthropic SDK)
@@ -9,23 +9,23 @@ Mode:    Consensus — both must return YES to proceed.
 
 VisionAgent is aliased to DualVisionGate for nodes.py backwards compatibility.
 """
+
 from __future__ import annotations
 
 import base64
 import logging
-import os
 from pathlib import Path
-from typing import Any
 
-from adk.super_agents import BaseSuperAgent, SuperAgentType
-from adk.base import AgentConfig, ADKProvider
+from adk.base import ADKProvider, AgentConfig
+from adk.super_agents import BaseSuperAgent
+
 from ..gemini_rest import analyze_vision as gemini_analyze_vision
-from ..models import DualAgentResult, PreflightResult, SynthesizedVision, VisionAnalysis
+from ..models import PreflightResult, SynthesizedVision, VisionAnalysis
 
 logger = logging.getLogger(__name__)
 
-_CLAUDE_MODEL = "claude-opus-4-6"
-_GEMINI_VISION_MODEL = "gemini-2.0-flash"
+from ..config import VISION_CLAUDE_MODEL as _CLAUDE_MODEL
+from ..config import VISION_GEMINI_MODEL as _GEMINI_VISION_MODEL
 
 # Products images live here (relative to project root)
 _PRODUCTS_DIR = Path("wordpress-theme/skyyrose-flagship/assets/images/products")
@@ -33,11 +33,12 @@ _PRODUCTS_DIR = Path("wordpress-theme/skyyrose-flagship/assets/images/products")
 
 def _reference_path(sku: str) -> str:
     """Resolve the reference image path for a SKU.
-    
+
     Checks the catalog for 'render_source_override' first, then common extensions.
     """
     try:
         from ..catalog import Catalog
+
         cat = Catalog.load()
         product = cat.get(sku)
         if product and product.source_files:
@@ -88,8 +89,8 @@ class DualVisionGate(BaseSuperAgent):
             config = AgentConfig(
                 name="legendary_vision_gate",
                 provider=ADKProvider.GOOGLE,
-                model="gemini-2.0-flash",
-                system_prompt="You are the Legendary Vision Gate for SkyyRose. You ensure product integrity with 100% precision."
+                model=_GEMINI_VISION_MODEL,
+                system_prompt="You are the Legendary Vision Gate for SkyyRose. You ensure product integrity with 100% precision.",
             )
         super().__init__(config)
 
@@ -110,7 +111,7 @@ class DualVisionGate(BaseSuperAgent):
         await self.execute(adk_prompt)
 
         prompt = _PREFLIGHT_PROMPT.format(name=expected_garment)
-        
+
         try:
             a_text = await self._call_claude(image_path, prompt)
             b_text = await self._call_gemini(image_path, prompt)
@@ -121,7 +122,7 @@ class DualVisionGate(BaseSuperAgent):
                 sku=sku,
                 agent_a_verdict="ERROR",
                 agent_b_verdict="ERROR",
-                blocking_reason=str(exc)
+                blocking_reason=str(exc),
             )
 
         a_yes = a_text.strip().upper().startswith("YES")
@@ -154,7 +155,7 @@ class DualVisionGate(BaseSuperAgent):
         # Trigger ADK for observability
         adk_prompt = f"VISION ANALYSIS TASK: SKU={sku}, VIEW={view}"
         logger.info(f"Running Legendary Vision Analysis for {sku} via ADK...")
-        adk_result = await self.execute(adk_prompt)
+        await self.execute(adk_prompt)
 
         from ..catalog import Catalog
 
@@ -177,8 +178,11 @@ class DualVisionGate(BaseSuperAgent):
         try:
             a_text = await self._call_claude(ref, prompt)
             a_result = VisionAnalysis(
-                success=True, provider="anthropic", model=_CLAUDE_MODEL,
-                analysis=a_text, char_count=len(a_text),
+                success=True,
+                provider="anthropic",
+                model=_CLAUDE_MODEL,
+                analysis=a_text,
+                char_count=len(a_text),
             )
         except Exception as exc:
             a_result = VisionAnalysis(
@@ -188,8 +192,11 @@ class DualVisionGate(BaseSuperAgent):
         try:
             b_text = await self._call_gemini(ref, prompt)
             b_result = VisionAnalysis(
-                success=True, provider="google", model=_GEMINI_VISION_MODEL,
-                analysis=b_text, char_count=len(b_text),
+                success=True,
+                provider="google",
+                model=_GEMINI_VISION_MODEL,
+                analysis=b_text,
+                char_count=len(b_text),
             )
         except Exception as exc:
             b_result = VisionAnalysis(
@@ -198,7 +205,8 @@ class DualVisionGate(BaseSuperAgent):
 
         if not a_result.success and not b_result.success:
             return SynthesizedVision(
-                success=False, error="Both vision agents failed",
+                success=False,
+                error="Both vision agents failed",
                 individual_results=(a_result, b_result),
             )
 
@@ -218,21 +226,27 @@ class DualVisionGate(BaseSuperAgent):
 
     async def _call_claude(self, image_path: str, prompt: str) -> str:
         from ..config import get_anthropic_client
+
         client = get_anthropic_client()
-        
+
         ext = Path(image_path).suffix.lower().lstrip(".")
         media_type = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
         b64 = _load_image_b64(image_path)
         msg = client.messages.create(
             model=_CLAUDE_MODEL,
             max_tokens=512,
-            messages=[{
-                "role": "user",
-                "content": [
-                    {"type": "image", "source": {"type": "base64", "media_type": media_type, "data": b64}},
-                    {"type": "text", "text": prompt},
-                ],
-            }],
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {"type": "base64", "media_type": media_type, "data": b64},
+                        },
+                        {"type": "text", "text": prompt},
+                    ],
+                }
+            ],
         )
         return msg.content[0].text
 

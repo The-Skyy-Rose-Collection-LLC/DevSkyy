@@ -1,6 +1,5 @@
-import os
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from skyyrose.elite_studio.agents.generator_agent import GeneratorAgent
 
 def _make_agent(tmp_path):

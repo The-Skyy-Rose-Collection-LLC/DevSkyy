@@ -49,6 +49,17 @@ except ImportError:
     CV2_AVAILABLE = False
     logger.warning("OpenCV not available. Color histogram comparison disabled.")
 
+try:
+    import torch
+    from transformers import CLIPModel, CLIPProcessor
+
+    CLIP_AVAILABLE = True
+    _clip_model: CLIPModel | None = None
+    _clip_processor: CLIPProcessor | None = None
+except ImportError:
+    CLIP_AVAILABLE = False
+    logger.warning("transformers/torch not available. CLIP semantic comparison disabled.")
+
 
 class ComparisonConfidence(StrEnum):
     """Confidence level of comparison result."""
@@ -73,6 +84,9 @@ class ComparisonResult(BaseModel):
     perceptual_similarity: float | None = Field(
         None, ge=0.0, le=1.0, description="Perceptual hash as similarity (0-1)"
     )
+    clip_score: float | None = Field(
+        None, ge=0.0, le=1.0, description="CLIP cosine similarity — semantic alignment (0-1)"
+    )
 
     overall_similarity: float = Field(..., ge=0.0, le=100.0, description="Weighted average (0-100)")
     passed: bool = Field(..., description="True if >= threshold")
@@ -93,9 +107,10 @@ class ComparisonResult(BaseModel):
 class ComparisonWeights:
     """Weights for aggregating similarity metrics."""
 
-    ssim: float = 0.40
-    color: float = 0.35
-    perceptual: float = 0.25
+    ssim: float = 0.30
+    color: float = 0.25
+    perceptual: float = 0.20
+    clip: float = 0.25  # semantic alignment — catches style/content drift
 
     def normalize(self, available_metrics: list[str]) -> dict[str, float]:
         """Normalize weights based on available metrics."""
@@ -106,6 +121,8 @@ class ComparisonWeights:
             weights["color"] = self.color
         if "perceptual" in available_metrics:
             weights["perceptual"] = self.perceptual
+        if "clip" in available_metrics:
+            weights["clip"] = self.clip
 
         total = sum(weights.values()) if weights else 1.0
         return {k: v / total for k, v in weights.items()}
@@ -146,6 +163,8 @@ class VisualComparisonEngine:
             available.append("ColorHistogram")
         if IMAGEHASH_AVAILABLE:
             available.append("PerceptualHash")
+        if CLIP_AVAILABLE:
+            available.append("CLIP")
 
         if not available:
             logger.warning("No visual comparison backends available!")
@@ -276,6 +295,44 @@ class VisualComparisonEngine:
             logger.error(f"Perceptual hash comparison failed: {e}")
             return None, None
 
+    def compute_clip_score(
+        self,
+        reference: Image.Image,
+        generated: Image.Image,
+    ) -> float | None:
+        """Compute CLIP cosine similarity — semantic alignment between two images.
+
+        Uses openai/clip-vit-base-patch32. The model is lazy-loaded and cached
+        at module level so repeated calls within a session don't reload weights.
+
+        Returns:
+            Cosine similarity in [0, 1] or None if transformers/torch unavailable.
+            Interpretation: >0.28 pass, 0.22-0.28 human queue, <0.22 regenerate.
+        """
+        if not CLIP_AVAILABLE:
+            return None
+
+        global _clip_model, _clip_processor
+        try:
+            if _clip_model is None or _clip_processor is None:
+                _clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+                _clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+                _clip_model.eval()
+
+            inputs = _clip_processor(
+                images=[reference, generated], return_tensors="pt", padding=True
+            )
+            with torch.no_grad():
+                features = _clip_model.get_image_features(**inputs)
+                features = features / features.norm(dim=-1, keepdim=True)
+                similarity = (features[0] @ features[1]).item()
+
+            # Cosine similarity is in [-1, 1]; clamp to [0, 1] for consistent scoring
+            return float(max(0.0, similarity))
+        except Exception as e:
+            logger.warning(f"CLIP scoring failed: {e}")
+            return None
+
     def compare(
         self,
         reference_path: Path | str,
@@ -330,6 +387,24 @@ class VisualComparisonEngine:
                     issues.append(f"Low perceptual similarity: {hash_similarity:.1%}")
                     recommendations.append("Generated asset may not resemble reference overall")
 
+            # Compute CLIP semantic alignment
+            clip_score = self.compute_clip_score(ref_img, gen_img)
+            if clip_score is not None:
+                scores["clip"] = clip_score
+                metrics_used.append("clip")
+                if clip_score < 0.22:
+                    issues.append(f"Semantic mismatch (CLIP={clip_score:.3f}) — regenerate")
+                    recommendations.append(
+                        "Generated asset is semantically different from reference; trigger regeneration"
+                    )
+                elif clip_score < 0.28:
+                    issues.append(
+                        f"Low semantic alignment (CLIP={clip_score:.3f}) — human review recommended"
+                    )
+                    recommendations.append(
+                        "Queue for manual review; asset may differ in style or subject"
+                    )
+
             # Compute weighted overall score
             if scores:
                 normalized_weights = self.weights.normalize(metrics_used)
@@ -355,6 +430,7 @@ class VisualComparisonEngine:
                 color_similarity=color_score,
                 perceptual_hash_distance=hash_distance,
                 perceptual_similarity=hash_similarity,
+                clip_score=clip_score,
                 overall_similarity=round(overall_pct, 2),
                 passed=passed,
                 threshold_used=self.threshold,

@@ -46,19 +46,6 @@ except ImportError:  # pragma: no cover
         pass
 
 
-import uuid
-from typing import Any
-
-from .state import EliteStudioState, extract_production_result
-from ..models import (
-    CompositorResult,
-    EnrichedPrompt,
-    GenerationResult,
-    QualityVerification,
-    SynthesizedVision,
-    TryOnResult,
-)
-
 logger = logging.getLogger(__name__)
 
 
@@ -72,6 +59,7 @@ def run_sync(coro):
             # For now, if loop is running, we might be in trouble if we block it.
             # However, for simplicity in this factory setting:
             import nest_asyncio
+
             nest_asyncio.apply()
             return loop.run_until_complete(coro)
     except RuntimeError:
@@ -83,9 +71,6 @@ _VISION_TOKENS_ESTIMATE = 2_000  # dual-provider: Gemini + OpenAI
 _GENERATION_TOKENS_ESTIMATE = 1_500  # Gemini image generation prompt
 _QC_TOKENS_ESTIMATE = 1_000  # Claude Sonnet QC call
 _COMPOSITOR_TOKENS_ESTIMATE = 800  # Gemini QA gate
-
-# Classifier confidence threshold — below this the LLM QC runs as well
-_CLASSIFIER_CONFIDENCE_THRESHOLD = 0.8
 
 # Classifier confidence threshold — below this the LLM QC runs as well
 _CLASSIFIER_CONFIDENCE_THRESHOLD = 0.8
@@ -150,11 +135,13 @@ def generator_node(state: EliteStudioState) -> dict:
             "failed_step": "generation",
         }
 
-    result = run_sync(agent.generate(
-        sku=state["sku"],
-        view=state["view"],
-        generation_spec=vision.unified_spec,
-    ))
+    result = run_sync(
+        agent.generate(
+            sku=state["sku"],
+            view=state["view"],
+            generation_spec=vision.unified_spec,
+        )
+    )
     elapsed = time.monotonic() - start
 
     job_id: str | None = state.get("job_id")  # type: ignore[assignment]
@@ -245,10 +232,12 @@ def quality_node(state: EliteStudioState) -> dict:
             classifier_result.confidence,
         )
         llm_agent = QualityAgent()
-        quality_result = run_sync(llm_agent.verify(
-            image_path=gen.output_path,
-            expected_spec=vision.unified_spec,
-        ))
+        quality_result = run_sync(
+            llm_agent.verify(
+                image_path=gen.output_path,
+                expected_spec=vision.unified_spec,
+            )
+        )
 
     elapsed = time.monotonic() - start
     timings["quality"] = round(elapsed, 2)
@@ -347,19 +336,21 @@ def compositor_node(state: EliteStudioState) -> dict:
         from ..agents.compositor_agent import SCENE_LOOKBOOK
         from ..utils import discover_scene_images
 
-        for scene_name, sku_map in SCENE_LOOKBOOK.items():
-            if state["sku"] in sku_map:
+        for scene_name, sku_prefix in SCENE_LOOKBOOK.items():
+            if state["sku"].startswith(sku_prefix):
                 collection = (
                     scene_name.rsplit("-", 2)[0] if scene_name.count("-") > 2 else scene_name
                 )
                 scenes = discover_scene_images(collection)
                 if scenes:
-                    comp_result = run_sync(agent.composite(
-                        sku=state["sku"],
-                        image_path=gen.output_path,
-                        scene_name=scene_name,
-                        collection=collection,
-                    ))
+                    comp_result = run_sync(
+                        agent.composite(
+                            sku=state["sku"],
+                            image_path=gen.output_path,
+                            scene_name=scene_name,
+                            collection=collection,
+                        )
+                    )
                 break
     except Exception:
         pass
@@ -405,11 +396,13 @@ def tryon_node(state: EliteStudioState) -> dict:
 
     category = state.get("tryon_category", "upper_body")
     agent = TryOnAgent()
-    result = run_sync(agent.execute_tryon(
-        garment_image_path=garment_path,
-        model_image_path=gen.output_path,
-        category=category,
-    ))
+    result = run_sync(
+        agent.execute_tryon(
+            garment_image_path=garment_path,
+            model_image_path=gen.output_path,
+            category=category,
+        )
+    )
 
     timings["tryon"] = round(time.monotonic() - start, 2)
     return {"tryon_result": result, "stage_timings": timings}
@@ -439,11 +432,9 @@ def prompt_enrichment_node(state: EliteStudioState) -> dict:
     vision = state.get("vision_result")
     spec = vision.unified_spec if vision and vision.success else ""
 
-    result = run_sync(agent.enrich(
-        sku=state["sku"],
-        vision_spec=spec,
-        style=state.get("style", "flat_lay")
-    ))
+    # PromptEnrichmentAgent.enrich is synchronous (returns EnrichedPrompt directly).
+    # Calling run_sync on a non-awaitable raises TypeError.
+    result = agent.enrich(sku=state["sku"], vision_spec=spec, style=state.get("style", "flat_lay"))
     elapsed = time.monotonic() - start
 
     timings = dict(state.get("stage_timings", {}))
@@ -578,11 +569,8 @@ def variant_node(state: EliteStudioState) -> dict:
     agent = VariantAgent()
 
     gen = state.get("generation_result")
-    vision = state.get("vision_result")
 
     base_path = gen.output_path if gen and gen.success else ""
-    spec = vision.unified_spec if vision and vision.success else ""
-
     # Variant names come from state (set via GraphConfig at invocation time)
     variants: list[str] = state.get("variant_specs", [])  # type: ignore[assignment]
 
@@ -595,11 +583,13 @@ def variant_node(state: EliteStudioState) -> dict:
             "stage_timings": timings,
         }
 
-    results = run_sync(agent.generate_variants(
-        sku=state["sku"],
-        base_image_path=base_path,
-        variant_specs=variants,
-    ))
+    results = run_sync(
+        agent.generate_variants(
+            sku=state["sku"],
+            base_image_path=base_path,
+            variant_specs=variants,
+        )
+    )
     elapsed = time.monotonic() - start
 
     timings = dict(state.get("stage_timings", {}))
@@ -613,63 +603,50 @@ def variant_node(state: EliteStudioState) -> dict:
 
 def three_d_node(state: EliteStudioState) -> dict:
     """Legendary 3D generation node.
-    
+
     Generates a 3D .glb replica and renders front/back/ghost shots.
     Updates the state with the 3D-rendered paths.
+
+    Sync wrapper around an async agent — matches the convention used by every
+    other node in this file. The shared `run_sync` helper handles both
+    no-running-loop (sync `graph.invoke()`) and running-loop (`graph.ainvoke()`)
+    cases via `nest_asyncio`. Async safety inside the agent itself is enforced
+    by `asyncio.to_thread` wrappers around `subprocess.run` (Blender) and
+    `shutil.move` (cross-device renders) — see three_d_agent.py.
     """
-    import asyncio
     from ..agents.three_d_agent import ThreeDAgent
     from ..agents.vision_agent import _reference_path
 
     sku = state["sku"]
-    style = state.get("style", "flat_lay")
-    
-    # We need a reference image (techflat or real photo)
+
+    # Reference image: techflat from state or vision-agent lookup
     ref_path = state.get("reference_path") or _reference_path(sku)
-    
-    # Get the spec from the vision stage or catalog
-    spec = ""
-    if state.get("enriched_prompt"):
-        spec = state["enriched_prompt"].enriched_spec
-    elif state.get("vision_result"):
-        spec = state["vision_result"].unified_spec
-        
+
+    # The dossier loaded inside generate_replica is now the source of truth for
+    # branding spec; enrichment_prompt and vision_result are no longer fed
+    # into the RAS prompt (they were thin and could drift from the dossier).
     agent = ThreeDAgent()
-    
-    # Run the async generation
-    try:
-        # Check if we are already in an event loop (e.g. if called via ainvoke)
-        loop = asyncio.get_running_loop()
-        # This is tricky in a sync node. Since this node is synchronous in the graph 
-        # (func, not afunc), we might need to run it in a thread or just use run_until_complete 
-        # if the loop isn't running yet.
-        # But for CLI 'invoke', there is usually no loop.
-        replica_result = loop.run_until_complete(
-            agent.generate_replica(sku, ref_path, spec)
-        )
-    except RuntimeError:
-        # No loop running, use asyncio.run
-        replica_result = asyncio.run(agent.generate_replica(sku, ref_path, spec))
-    
+    replica_result = run_sync(agent.generate_replica(sku, ref_path))
+
     if not replica_result["success"]:
         return {
             "status": "error",
             "error": replica_result.get("error", "3D Generation failed"),
-            "failed_step": "3d_generation"
+            "failed_step": "3d_generation",
         }
-    
+
     # Map the renders to the state paths
     renders = replica_result["renders"]
-    
+
     # Convert to standard GenerationResult for compatibility
     gen_result = agent.generate_result_bridge(replica_result, state["view"])
-    
+
     return {
         "generation_result": gen_result,
         "ghost_mannequin_front_path": renders.get("front", ""),
         "ghost_mannequin_back_path": renders.get("back", ""),
         "3d_model_path": replica_result["glb_path"],
-        "3d_fidelity_score": replica_result["fidelity_score"]
+        "3d_fidelity_score": replica_result["fidelity_score"],
     }
 
 
@@ -708,17 +685,22 @@ def preflight_node(state: EliteStudioState) -> dict:
         cat = Catalog.load()
         product = cat.require(sku)
         expected_garment = product.name
-        
+
         # Use catalog-defined source image if available, else fallback to rigid SKU lookup
         source_img = product.source_files[0] if product.source_files else ""
         if source_img:
             # Source images live in wordpress-theme/skyyrose-flagship/assets/images/products/
-            ref_path = str(__import__("skyyrose.elite_studio.agents.vision_agent", fromlist=["_PRODUCTS_DIR"])._PRODUCTS_DIR / source_img)
+            ref_path = str(
+                __import__(
+                    "skyyrose.elite_studio.agents.vision_agent", fromlist=["_PRODUCTS_DIR"]
+                )._PRODUCTS_DIR
+                / source_img
+            )
         else:
             ref_path = state.get("reference_path") or __import__(
                 "skyyrose.elite_studio.agents.vision_agent", fromlist=["_reference_path"]
             )._reference_path(sku)
-            
+
     except Exception as exc:
         return {
             "status": "error",
@@ -729,11 +711,13 @@ def preflight_node(state: EliteStudioState) -> dict:
     from ..agents.vision_agent import DualVisionGate
 
     gate = DualVisionGate()
-    result = run_sync(gate.verify_reference(
-        image_path=ref_path,
-        sku=sku,
-        expected_garment=expected_garment,
-    ))
+    result = run_sync(
+        gate.verify_reference(
+            image_path=ref_path,
+            sku=sku,
+            expected_garment=expected_garment,
+        )
+    )
 
     if not result.passed:
         logger.warning("[Preflight] BLOCKED %s: %s", sku, result.blocking_reason)

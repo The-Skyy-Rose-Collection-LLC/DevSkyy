@@ -1,7 +1,7 @@
 """
 GeneratorAgent — Phase 16 Legendary Generation Architect.
 
-Promoted to ADK SuperAgent for comprehensive "Back Data" (telemetry) and 
+Promoted to ADK SuperAgent for comprehensive "Back Data" (telemetry) and
 high-fidelity best-of-N image generation with RAS support.
 
 Inherits from BaseSuperAgent to leverage standardized enterprise tools
@@ -14,18 +14,20 @@ import base64
 import logging
 import os
 from pathlib import Path
-from typing import Any
 
-from adk.super_agents import BaseSuperAgent, SuperAgentType
-from adk.base import AgentConfig, ADKProvider
 from openai import OpenAI
+
+from adk.base import ADKProvider, AgentConfig
+from adk.super_agents import BaseSuperAgent
+
 from ..gemini_rest import generate_image as gemini_generate_image
 from ..models import GenerationResult
 
 logger = logging.getLogger(__name__)
 
-_GPT_MODEL = "gpt-image-1"
-_GEMINI_GEN_MODEL = "gemini-2.0-flash-exp"
+from ..config import GEMINI_IMAGE_GEN_MODEL as _GEMINI_GEN_MODEL
+from ..config import OPENAI_IMAGE_MODEL as _GPT_MODEL
+
 _DEFAULT_OUTPUT_DIR = "renders/output"
 
 
@@ -33,19 +35,17 @@ class GeneratorAgent(BaseSuperAgent):
     """Dual-agent image generator promoted to ADK SuperAgent."""
 
     def __init__(
-        self, 
-        output_dir: str = _DEFAULT_OUTPUT_DIR,
-        config: AgentConfig | None = None
+        self, output_dir: str = _DEFAULT_OUTPUT_DIR, config: AgentConfig | None = None
     ) -> None:
         if config is None:
             config = AgentConfig(
                 name="legendary_generator_architect",
                 provider=ADKProvider.GOOGLE,
-                model="gemini-2.0-flash",
-                system_prompt="You are the Legendary Generator Architect for SkyyRose. Your mission is hyper-realistic luxury imagery."
+                model=_GEMINI_GEN_MODEL,
+                system_prompt="You are the Legendary Generator Architect for SkyyRose. Your mission is hyper-realistic luxury imagery.",
             )
         super().__init__(config)
-        
+
         self._output_dir = Path(output_dir)
         self._output_dir.mkdir(parents=True, exist_ok=True)
         self._openai = None
@@ -56,11 +56,7 @@ class GeneratorAgent(BaseSuperAgent):
         self._openai = OpenAI()
 
     async def generate(
-        self, 
-        sku: str, 
-        view: str, 
-        generation_spec: str,
-        reference_images: list[str] | None = None
+        self, sku: str, view: str, generation_spec: str, reference_images: list[str] | None = None
     ) -> GenerationResult:
         """Generate image from spec with full ADK observability."""
         # Capture "Back Data" via ADK run
@@ -94,7 +90,7 @@ class GeneratorAgent(BaseSuperAgent):
                 success=False,
                 provider="none",
                 error=f"Both generators failed. GPT: {err_a} | Gemini: {err_b}",
-                metadata=metadata
+                metadata=metadata,
             )
 
         if img_a is None:
@@ -120,7 +116,7 @@ class GeneratorAgent(BaseSuperAgent):
             provider=provider,
             model=_GPT_MODEL if "openai" in provider else _GEMINI_GEN_MODEL,
             output_path=str(out_path),
-            metadata=metadata
+            metadata=metadata,
         )
 
     # ------------------------------------------------------------------
@@ -138,26 +134,26 @@ class GeneratorAgent(BaseSuperAgent):
         )
         return base64.b64decode(response.data[0].b64_json)
 
-    async def _generate_gemini_image(self, prompt: str, reference_paths: list[str] | None = None) -> bytes:
+    async def _generate_gemini_image(
+        self, prompt: str, reference_paths: list[str] | None = None
+    ) -> bytes:
         from ..agents.vision_agent import _load_image_b64
-        
+
         b64_list = []
         if reference_paths:
             for p in reference_paths:
                 if os.path.exists(p):
                     b64_list.append(_load_image_b64(p))
-        
+
         result = gemini_generate_image(
-            model=_GEMINI_GEN_MODEL, 
-            prompt=prompt[:2000], 
-            reference_images_b64=b64_list if b64_list else ""
+            model=_GEMINI_GEN_MODEL,
+            prompt=prompt[:2000],
+            reference_images_b64=b64_list if b64_list else "",
         )
         if not result.get("success"):
             raise RuntimeError(result.get("error", "Gemini image generation failed"))
         return result["image_data"]
 
-    def _pick_winner(
-        self, score_a: int, score_b: int, path_a: str, path_b: str
-    ) -> str:
+    def _pick_winner(self, score_a: int, score_b: int, path_a: str, path_b: str) -> str:
         """Return 'a' or 'b'. Prefer 'a' on tie (GPT-Image is agent A)."""
         return "b" if score_b > score_a else "a"

@@ -86,8 +86,7 @@ def validate_sku_format(value: Any, field_path: str) -> str:
         raise ValueError(f"{field_path}: expected str, got {type(value).__name__}")
     if not _SKU_RE.match(value):
         raise ValueError(
-            f"{field_path}: invalid SKU format {value!r} "
-            "(expected like 'br-001', 'kids-002', 'br-d01')"
+            f"{field_path}: invalid SKU format {value!r} (expected like 'br-001', 'kids-002')"
         )
     return value
 

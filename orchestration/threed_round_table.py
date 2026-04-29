@@ -258,6 +258,7 @@ class ThreeDProvider(StrEnum):
 
     # External APIs
     TRIPO3D = "tripo3d"
+    ANIGEN = "anigen"
 
     # Custom/Community
     CUSTOM = "custom"
@@ -476,6 +477,7 @@ class ThreeDRoundTable:
         ThreeDProvider.SHAP_E: 60.0,
         ThreeDProvider.POINT_E: 45.0,
         ThreeDProvider.TRIPO3D: 300.0,  # External API, allow for high quality
+        ThreeDProvider.ANIGEN: 240.0,  # 52s preview + 18s extract + cold-start buffer
     }
 
     # Default providers for text-to-3D
@@ -490,6 +492,7 @@ class ThreeDRoundTable:
         ThreeDProvider.TRIPOSR,
         ThreeDProvider.INSTANTMESH,
         ThreeDProvider.LGM,
+        ThreeDProvider.ANIGEN,
     ]
 
     def __init__(
@@ -500,6 +503,7 @@ class ThreeDRoundTable:
         quality_config: QualityEnhancementConfig | None = None,
         output_dir: str = "./round_table_outputs",
         enable_tripo3d: bool = True,
+        enable_anigen: bool = True,
         concurrent_limit: int = 4,
     ) -> None:
         """
@@ -514,6 +518,7 @@ class ThreeDRoundTable:
             quality_config: Quality enhancement settings
             output_dir: Directory for generated models
             enable_tripo3d: Whether to include Tripo3D
+            enable_anigen: Whether to include AniGen garment rigging
             concurrent_limit: Max concurrent generation tasks
         """
         # Override HF config for highest quality
@@ -529,6 +534,7 @@ class ThreeDRoundTable:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.enable_tripo3d = enable_tripo3d
+        self.enable_anigen = enable_anigen
         self._semaphore = asyncio.Semaphore(concurrent_limit)
 
         # Initialize health tracking for each provider
@@ -539,6 +545,10 @@ class ThreeDRoundTable:
         # Tripo agent (lazy loaded)
         self._tripo_agent = None
         self._tripo_agent_loaded = False
+
+        # AniGen agent (lazy loaded)
+        self._anigen_agent = None
+        self._anigen_agent_loaded = False
 
         logger.info(
             "3D Round Table initialized with HIGHEST QUALITY settings",
@@ -563,6 +573,21 @@ class ThreeDRoundTable:
                     logger.warning("Tripo3D agent not available", error=str(e))
                     self.enable_tripo3d = False
         return self._tripo_agent
+
+    def _get_anigen_agent(self) -> Any:
+        """Lazy load AniGen garment rigging agent."""
+        if not self._anigen_agent_loaded:
+            self._anigen_agent_loaded = True
+            if self.enable_anigen:
+                try:
+                    from agents.anigen_agent import AniGenAgent
+
+                    self._anigen_agent = AniGenAgent()
+                    logger.info("AniGen agent loaded for rigged garment generation")
+                except (ImportError, Exception) as e:
+                    logger.warning("AniGen agent not available", error=str(e))
+                    self.enable_anigen = False
+        return self._anigen_agent
 
     async def compete_text_to_3d(
         self,
@@ -640,6 +665,9 @@ class ThreeDRoundTable:
 
         if self.enable_tripo3d and ThreeDProvider.TRIPO3D not in providers:
             providers.append(ThreeDProvider.TRIPO3D)
+
+        if self.enable_anigen and ThreeDProvider.ANIGEN not in providers:
+            providers.append(ThreeDProvider.ANIGEN)
 
         image_hash = hashlib.sha256(image_path.encode()).hexdigest()[:16]
 
@@ -1011,6 +1039,14 @@ class ThreeDRoundTable:
                 task_id=task_id,
             )
 
+        if provider == ThreeDProvider.ANIGEN:
+            if generation_type != GenerationType.IMAGE_TO_3D or not image_path:
+                raise ValueError("AniGen requires an image (image-to-3D only)")
+            return await self._generate_with_anigen(
+                image_path=image_path,
+                task_id=task_id,
+            )
+
         hf_model = self.PROVIDER_MODEL_MAP.get(provider)
         if not hf_model:
             raise ValueError(f"Unknown provider: {provider}")
@@ -1080,6 +1116,40 @@ class ThreeDRoundTable:
             metadata=result,
         )
 
+    async def _generate_with_anigen(
+        self,
+        image_path: str,
+        task_id: str,
+    ) -> ThreeDResponse:
+        """Generate rigged GLB using AniGen HF Space (image-to-3D only)."""
+        agent = self._get_anigen_agent()
+        if not agent:
+            raise ValueError("AniGen agent not available")
+
+        start_time = time.time()
+
+        result = await agent._tool_generate_from_image(
+            image_url=image_path,
+            product_name="Generated from image",
+        )
+
+        generation_time = (time.time() - start_time) * 1000
+
+        return ThreeDResponse(
+            provider=ThreeDProvider.ANIGEN,
+            model_id="anigen-skyyrose",
+            output_path=result.get("model_path"),
+            output_url=result.get("model_url", ""),
+            format=HF3DFormat.GLB,
+            generation_time_ms=generation_time,
+            has_textures=True,
+            metadata={
+                **result.get("metadata", {}),
+                "joint_count": result.get("joint_count", 10),
+                "has_rig": result.get("has_rig", True),
+            },
+        )
+
     def _hf_result_to_response(
         self,
         result: HF3DResult,
@@ -1121,6 +1191,7 @@ class ThreeDRoundTable:
             ThreeDProvider.TRIPOSR: 88,
             ThreeDProvider.INSTANTMESH: 85,
             ThreeDProvider.TRIPO3D: 92,
+            ThreeDProvider.ANIGEN: 90,  # SIGGRAPH-grade garment reconstruction
             ThreeDProvider.LGM: 80,
             ThreeDProvider.SHAP_E: 70,
             ThreeDProvider.POINT_E: 60,
@@ -1132,6 +1203,7 @@ class ThreeDRoundTable:
             provider_tex_scores = {
                 ThreeDProvider.HUNYUAN3D_2: 95,
                 ThreeDProvider.TRIPO3D: 92,
+                ThreeDProvider.ANIGEN: 88,  # texture from source image projection
                 ThreeDProvider.INSTANTMESH: 85,
                 ThreeDProvider.LGM: 80,
             }
@@ -1300,6 +1372,8 @@ class ThreeDRoundTable:
         await self.hf_client.close()
         if self._tripo_agent:
             await self._tripo_agent.close()
+        if self._anigen_agent:
+            await self._anigen_agent.close()
         logger.info("3D Round Table closed")
 
 

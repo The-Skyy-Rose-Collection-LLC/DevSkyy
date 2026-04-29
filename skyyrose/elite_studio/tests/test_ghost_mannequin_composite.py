@@ -1,5 +1,4 @@
-from unittest.mock import patch, MagicMock
-from pathlib import Path
+from unittest.mock import patch
 from skyyrose.elite_studio.graph.nodes import ghost_mannequin_composite_node
 from skyyrose.elite_studio.graph.state import create_initial_state
 from skyyrose.elite_studio.models import GenerationResult

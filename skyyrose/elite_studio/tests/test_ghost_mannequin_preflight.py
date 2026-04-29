@@ -21,9 +21,9 @@ def test_preflight_passes_sets_preflight_result():
             mock_product = MagicMock()
             mock_product.name = "BLACK Rose Hoodie"
             mock_load.return_value.require.return_value = mock_product
-            
+
             update = preflight_node(state)
-            
+
     assert update["preflight_result"].passed
 
 def test_preflight_fail_sets_error_status():
@@ -41,9 +41,9 @@ def test_preflight_fail_sets_error_status():
             mock_product = MagicMock()
             mock_product.name = "BR-011 Hockey Jersey"
             mock_load.return_value.require.return_value = mock_product
-            
+
             update = preflight_node(state)
-            
+
     assert update["status"] == "error"
     assert "baseball" in update["error"]
 

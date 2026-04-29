@@ -61,6 +61,21 @@ def int_col(row: dict, key: str) -> int | None:
     return value if value >= 1 else None
 
 
+def get_product_with_dossier(sku: str) -> dict:
+    """Return the canonical CSV row for `sku` merged with its parsed dossier.
+
+    Hard-fails (raises ``DossierMissingError``) if the SKU has no dossier.
+    The thin CSV `branding_spec` column is NOT a fallback.
+
+    Re-exports the canonical implementation from
+    ``skyyrose.core.dossier_loader.get_product_with_dossier`` so consumers
+    can import either module without divergence.
+    """
+    from skyyrose.core.dossier_loader import get_product_with_dossier as _get_product_with_dossier
+
+    return _get_product_with_dossier(sku)
+
+
 def status_from_row(row: dict) -> str:
     """Map the CSV badge/is_preorder/published triple to the legacy status enum.
 

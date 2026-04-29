@@ -1,4 +1,4 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from skyyrose.elite_studio.agents.quality_agent import QualityAgent
 
 def _make_agent():

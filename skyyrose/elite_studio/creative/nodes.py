@@ -128,13 +128,90 @@ def product_render_node(state: dict) -> dict:
 
 
 def three_d_model_node(state: dict) -> dict:
-    """Generate a 3D model from the product render via ThreeDGenerationPipeline."""
+    """Generate a 3D model from the product render.
+
+    Phase B1: routes through SDKGarment3DAgent first when state.params.use_sdk_agent
+    is set, falling back to ThreeDGenerationPipeline. The SDK agent's prompt (in
+    agents/claude_sdk/domain_agents/immersive.py) declares a write convention of
+    `generated_assets/3d/{sku}/`; after execute we look there for *.glb / *.usdz
+    artifacts. If none found, we fall back to the deterministic pipeline so the
+    LangGraph state machine never silently produces an empty 3D result.
+
+    State output keys (Phase B1 expansion):
+      - model_3d_result: legacy summary dict (kept for backwards compat)
+      - model_output_path: local GLB path (primary 3D artifact)
+      - glb_url: hosted GLB URL when available
+      - usdz_url: hosted USDZ URL when available
+    """
     import asyncio
+    from pathlib import Path
 
     start = time.monotonic()
     params = state.get("params", {})
     image_path = params.get("image_path", "")
+    sku = state.get("sku") or params.get("sku") or ""
+    collection = params.get("collection", "")
+    prompt = params.get("prompt", "")
+    use_sdk_agent = bool(params.get("use_sdk_agent", False))
 
+    sdk_result_payload: dict | None = None
+    sdk_glb_path: str | None = None
+    sdk_usdz_path: str | None = None
+
+    # ---- Stage 1: Try SDK agent path (opt-in) ----
+    if use_sdk_agent and sku:
+        try:
+            from agents.claude_sdk.domain_agents.immersive import SDKGarment3DAgent
+
+            sdk_agent = SDKGarment3DAgent()
+            task = (
+                f"Generate a production-quality 3D garment model for SKU {sku}. "
+                f"Use the source image at {image_path}. Export GLB (web) + USDZ (AR) "
+                f"to generated_assets/3d/{sku}/."
+            )
+            sdk_result_payload = asyncio.run(
+                sdk_agent.execute(
+                    task,
+                    sku=sku,
+                    collection=collection,
+                    image_path=image_path,
+                    prompt=prompt,
+                )
+            )
+
+            # Honest handshake: read the agent's declared output dir
+            sdk_output_dir = Path(f"generated_assets/3d/{sku}")
+            if sdk_result_payload.get("success") and sdk_output_dir.is_dir():
+                glbs = sorted(sdk_output_dir.glob("*.glb"))
+                usdzs = sorted(sdk_output_dir.glob("*.usdz"))
+                if glbs:
+                    sdk_glb_path = str(glbs[-1])  # newest by sort order
+                if usdzs:
+                    sdk_usdz_path = str(usdzs[-1])
+        except Exception as exc:
+            logger.warning("SDK 3D path failed, falling back to pipeline: %s", exc)
+            sdk_result_payload = {"success": False, "error": str(exc)}
+
+    # ---- Stage 2: SDK succeeded with concrete artifacts ----
+    if sdk_glb_path:
+        elapsed = time.monotonic() - start
+        return {
+            "model_3d_result": {
+                "success": True,
+                "model_path": sdk_glb_path,
+                "execution_mode": "sdk_agent",
+                "session_dir": sdk_result_payload.get("session_dir")
+                if sdk_result_payload
+                else None,
+                "error": "",
+            },
+            "model_output_path": sdk_glb_path,
+            "glb_url": sdk_glb_path,
+            "usdz_url": sdk_usdz_path,
+            "stage_timings": {**state.get("stage_timings", {}), "three_d_model": elapsed},
+        }
+
+    # ---- Stage 3: Deterministic pipeline (fallback or default) ----
     try:
         from ai_3d.generation_pipeline import ThreeDGenerationPipeline
 
@@ -142,17 +219,21 @@ def three_d_model_node(state: dict) -> dict:
         result = asyncio.run(
             pipeline.generate_from_image(
                 image_path=image_path,
-                prompt=params.get("prompt", ""),
+                prompt=prompt,
             )
         )
-        model_result = {
-            "success": result.success,
-            "model_path": getattr(result, "model_path", ""),
-            "error": getattr(result, "error", ""),
-        }
+        model_path = getattr(result, "model_path", "") or ""
         elapsed = time.monotonic() - start
         return {
-            "model_3d_result": model_result,
+            "model_3d_result": {
+                "success": result.success,
+                "model_path": model_path,
+                "execution_mode": "pipeline_fallback" if use_sdk_agent else "pipeline",
+                "error": getattr(result, "error", ""),
+            },
+            "model_output_path": model_path,
+            "glb_url": model_path if model_path.endswith(".glb") else None,
+            "usdz_url": model_path if model_path.endswith(".usdz") else None,
             "stage_timings": {**state.get("stage_timings", {}), "three_d_model": elapsed},
         }
 
@@ -161,6 +242,9 @@ def three_d_model_node(state: dict) -> dict:
         elapsed = time.monotonic() - start
         return {
             "model_3d_result": {"success": False, "error": str(exc)},
+            "model_output_path": None,
+            "glb_url": None,
+            "usdz_url": None,
             "status": "error",
             "error": f"3d_model failed: {exc}",
             "stage_timings": {**state.get("stage_timings", {}), "three_d_model": elapsed},
@@ -351,8 +435,7 @@ def scene_composite_node(state: dict) -> dict:
         agent = CompositorAgent()
         result = agent.composite(
             sku=sku,
-            scene_image_path=params.get("scene_image_path", ""),
-            model_image_path=params.get("model_image_path", ""),
+            image_path=params.get("model_image_path") or params.get("scene_image_path", ""),
             collection=params.get("collection", ""),
             scene_name=params.get("scene_name", ""),
         )

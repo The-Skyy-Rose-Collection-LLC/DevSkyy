@@ -43,6 +43,7 @@ from agents.core.base import (
     SuperAgent,
     ValidationResult,
 )
+from agents.core.validation_scoring import compute_validation_scores
 from core.runtime.tool_registry import (
     ToolCallContext,
     ToolCategory,
@@ -489,6 +490,98 @@ class MeshyAgent(SuperAgent):
         logger.info("Meshy image-to-3D task created: %s", task_id)
         return task_id
 
+    async def generate_preview(
+        self,
+        image_url: str,
+        product_name: str = "preview",
+        minimum_fidelity: float = 60.0,
+    ) -> dict[str, Any]:
+        """Generate a fast preview GLB and run the trimesh fidelity gate.
+
+        Replaces the deprecated HF Shap-E preview path. Used by the asset
+        pipeline as a $0.20-cheap quality gate before committing to a full
+        Tripo3D production run.
+
+        Args:
+            image_url: Public URL of the source image. Local paths must be
+                hosted first (Meshy API requires a URL).
+            product_name: Name used for the local download filename.
+            minimum_fidelity: Threshold (0-100) below which `passed` is False.
+                Default 60 — relaxed vs the 95 production threshold because
+                this is a fast preview, not a final asset.
+
+        Returns:
+            dict with keys:
+                passed (bool): Whether fidelity_score >= minimum_fidelity.
+                fidelity_score (float): Overall fidelity 0-100.
+                local_path (str | None): Local GLB path if downloaded.
+                model_url (str | None): Meshy-hosted GLB URL.
+                task_id (str): The Meshy task ID.
+                grade (str): FidelityGrade enum value (excellent/good/...).
+                duration_seconds (float): End-to-end wall time.
+                error (str | None): Reason if passed is False due to error.
+        """
+        started_at = datetime.now(UTC)
+        task_id = await self.image_to_3d(image_url)
+        task = await self.poll_until_complete(task_id, task_type="image-to-3d")
+
+        model_urls = task.model_urls or {}
+        glb_url = model_urls.get("glb")
+
+        local_path: str | None = None
+        if glb_url:
+            output_dir = str(Path(self.meshy_config.output_dir) / "previews")
+            safe_name = product_name.lower().replace(" ", "_")[:40]
+            filename = f"{safe_name}_{task_id[:8]}_preview.glb"
+            try:
+                local_path = await self._download_model(glb_url, output_dir, filename)
+            except Exception as e:
+                logger.warning("Meshy preview download failed: %s", e)
+
+        if not local_path:
+            return {
+                "passed": False,
+                "fidelity_score": 0.0,
+                "local_path": None,
+                "model_url": glb_url,
+                "task_id": task_id,
+                "grade": "FAILED",
+                "duration_seconds": (datetime.now(UTC) - started_at).total_seconds(),
+                "error": "Preview download failed — no local GLB to validate",
+            }
+
+        # Lazy import — keeps trimesh out of cold-start path
+        from imagery.model_fidelity import validate_model_fidelity
+
+        try:
+            report = await validate_model_fidelity(
+                local_path,
+                enforce=False,
+                minimum_threshold=minimum_fidelity,
+            )
+            return {
+                "passed": report.passed,
+                "fidelity_score": float(report.overall_score),
+                "local_path": local_path,
+                "model_url": glb_url,
+                "task_id": task_id,
+                "grade": report.grade.value,
+                "duration_seconds": (datetime.now(UTC) - started_at).total_seconds(),
+                "error": None,
+            }
+        except Exception as e:
+            logger.warning("Meshy preview fidelity gate failed: %s", e)
+            return {
+                "passed": False,
+                "fidelity_score": 0.0,
+                "local_path": local_path,
+                "model_url": glb_url,
+                "task_id": task_id,
+                "grade": "FAILED",
+                "duration_seconds": (datetime.now(UTC) - started_at).total_seconds(),
+                "error": f"Validation error: {e}",
+            }
+
     async def get_task_status(
         self,
         task_id: str,
@@ -806,12 +899,10 @@ class MeshyAgent(SuperAgent):
         """Validate execution results."""
         validation = ValidationResult(is_valid=True)
 
+        asset_validation: dict[str, Any] | None = None
         for result in results:
             if not result.success:
                 validation.add_error(f"{result.tool_name} failed: {result.error}")
-
-        # Check asset validation result if present
-        for result in results:
             if result.tool_name == "meshy_validate_asset" and result.result:
                 asset_validation = result.result
                 if not asset_validation.get("is_valid", True):
@@ -821,8 +912,12 @@ class MeshyAgent(SuperAgent):
                     validation.add_warning(warning)
 
         if not validation.errors:
-            validation.quality_score = 0.9
-            validation.confidence_score = 0.85
+            quality, confidence = compute_validation_scores(
+                asset_validation,
+                warning_count=len(validation.warnings),
+            )
+            validation.quality_score = quality
+            validation.confidence_score = confidence
 
         return validation
 
