@@ -135,7 +135,7 @@ function skyyrose_collection_config( $collection ) {
 		'text'       => '#FFFFFF',
 		'dim'        => 'rgba(255,182,193,.35)',
 		'label'      => 'KIDS CAPSULE',
-		'tagline'    => 'Little legends, big style.',
+		'tagline'    => 'Luxury runs in the family.',
 		'badge_text' => 'Kids',
 		'nav_font'   => "'Playfair Display', serif",
 		'body_class' => 'collection-kids-capsule',

@@ -196,7 +196,7 @@
       limit: cfg.limit || 4,
     });
 
-    fetch(url + '?' + params.toString(), {
+    fetch(url + '&' + params.toString(), {
       method: 'GET',
       headers: { 'X-WP-Nonce': cfg.restNonce || '' },
       credentials: 'same-origin',

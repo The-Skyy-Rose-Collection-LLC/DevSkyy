@@ -4,8 +4,8 @@
  */
 
 .sr-product {
-	background: #050505;
-	color: #fff;
+	background: var(--color-page-bg, #050505);
+	color: var(--color-text-primary, #fff);
 	padding-top: 120px;
 }
 
@@ -29,7 +29,7 @@
 .sr-gallery-main {
 	position: relative;
 	aspect-ratio: 4 / 5;
-	background: #0a0a0a;
+	background: var(--color-page-bg, #0a0a0a);
 	border: 1px solid rgba(255, 255, 255, 0.08);
 	overflow: hidden;
 	margin-bottom: 24px;
@@ -62,7 +62,7 @@
 }
 
 .sr-thumb:hover, .sr-thumb-active {
-	border-color: #B76E79;
+	border-color: var(--color-rose-gold, #B76E79);
 }
 
 .sr-thumb img {
@@ -76,7 +76,7 @@
 	font-family: 'Space Mono', monospace;
 	font-size: 11px;
 	letter-spacing: 6px;
-	color: #B76E79;
+	color: var(--color-rose-gold, #B76E79);
 	margin-bottom: 16px;
 }
 
@@ -92,7 +92,7 @@
 .sr-info-price {
 	font-family: 'Space Mono', monospace;
 	font-size: 24px;
-	color: #fff;
+	color: var(--color-text-primary, #fff);
 	margin-bottom: 40px;
 	padding-bottom: 24px;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -133,7 +133,7 @@
 .sr-spec-value {
 	font-family: 'Space Mono', monospace;
 	font-size: 11px;
-	color: #fff;
+	color: var(--color-text-primary, #fff);
 }
 
 /* Add to Cart */
@@ -144,8 +144,8 @@
 /* Button override for WooCommerce */
 .single_add_to_cart_button {
 	width: 100% !important;
-	background: #fff !important;
-	color: #000 !important;
+	background: var(--color-white, #fff) !important;
+	color: var(--color-black, #000) !important;
 	font-family: 'Bebas Neue', sans-serif !important;
 	font-size: 16px !important;
 	letter-spacing: 8px !important;
@@ -156,8 +156,8 @@
 }
 
 .single_add_to_cart_button:hover {
-	background: #B76E79 !important;
-	color: #fff !important;
+	background: var(--color-rose-gold, #B76E79) !important;
+	color: var(--color-white, #fff) !important;
 }
 
 /* Responsive */

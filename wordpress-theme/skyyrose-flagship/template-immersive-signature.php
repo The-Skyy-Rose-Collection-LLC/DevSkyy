@@ -85,7 +85,7 @@ $rooms = array(
 		'image'    => 'scene-signature-bay-bridge.webp',
 		'products' => array(
 			skyyrose_immersive_product(
-				'sg-003',
+				'sg-011',
 				array(
 					'left'       => '18',
 					'top'        => '38',

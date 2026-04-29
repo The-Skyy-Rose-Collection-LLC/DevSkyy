@@ -153,10 +153,10 @@ button.wp-block-button__link:active, .wp-block-button__link:active {
 .btn-primary, .btn-cta, .button.alt {
     background: linear-gradient(
         135deg,
-        #D4AF37 0%,
-        #B76E79 100%
+        var(--color-gold, #D4AF37) 0%,
+        var(--color-rose-gold, #B76E79) 100%
     );
-    color: #0A0A0A;
+    color: var(--color-page-bg, #0A0A0A);
     border: 0;
     font-weight: 700;
 }
@@ -175,7 +175,7 @@ button.wp-block-button__link:active, .wp-block-button__link:active {
 
 .btn-ghost:hover, .btn-outline:hover {
     background: currentColor;
-    color: #0A0A0A;
+    color: var(--color-page-bg, #0A0A0A);
 }
 
 
@@ -225,13 +225,13 @@ button.wp-block-button__link:active, .wp-block-button__link:active {
     font-weight: 700;
     padding: 0.25rem 0.625rem;
     border-radius: var(--cp-radius-pill);
-    background: linear-gradient(90deg, #D4AF37, #B76E79);
-    color: #0A0A0A;
+    background: linear-gradient(90deg, var(--color-gold, #D4AF37), var(--color-rose-gold, #B76E79));
+    color: var(--color-page-bg, #0A0A0A);
 }
 
 .badge-preorder {
-    background: linear-gradient(90deg, #B76E79, #0A0A0A);
-    color: #F5F5F5;
+    background: linear-gradient(90deg, var(--color-rose-gold, #B76E79), var(--color-page-bg, #0A0A0A));
+    color: var(--color-text-primary, #F5F5F5);
 }
 
 
@@ -301,13 +301,13 @@ section + section {
  * ═══════════════════════════════════════════════════════════════════════════ */
 
 :focus-visible {
-    outline: 2px solid #D4AF37;
+    outline: 2px solid var(--color-gold, #D4AF37);
     outline-offset: 3px;
     border-radius: var(--cp-radius-sm);
 }
 
 button:focus-visible, a:focus-visible, .btn:focus-visible {
-    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.35);
+    box-shadow: 0 0 0 3px rgba(var(--color-gold-rgb, 212, 175, 55), 0.35);
     outline: none;
 }
 

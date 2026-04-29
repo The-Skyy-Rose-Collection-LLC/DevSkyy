@@ -8,7 +8,7 @@ defined( 'ABSPATH' ) || exit;
 get_header();
 
 // Hero Data
-$hero_img = get_theme_file_uri('assets/images/about-hero.jpg');
+$hero_img = get_theme_file_uri('assets/images/homepage-story-founder.webp');
 ?>
 
 <main id="primary" class="site-main abt-page" role="main">
@@ -106,7 +106,7 @@ $hero_img = get_theme_file_uri('assets/images/about-hero.jpg');
 
 	<!-- Mission -->
 	<section class="abt-mission rv-clip-up">
-		<h2>Luxury Grows<br>From Concrete.</h2>
+		<h2>Luxury Grows<br>from Concrete.</h2>
 	</section>
 
 </main>

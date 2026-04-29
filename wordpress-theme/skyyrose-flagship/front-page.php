@@ -24,30 +24,19 @@ $cart_url    = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_u
 /* Collection data sourced from inc/collections-config.php (single source of truth). */
 $collections = skyyrose_get_front_page_collections();
 
-/* Dynamic product counts per collection */
+/* Dynamic product counts per collection — sourced from CSV catalog helper. */
 foreach ( $collections as &$col ) {
-	$col['count'] = 0;
-	if ( function_exists( 'wc_get_products' ) ) {
-		$products     = wc_get_products(
-			array(
-				'category' => array( $col['slug'] ),
-				'limit'    => -1,
-				'return'   => 'ids',
-				'status'   => 'publish',
-			)
-		);
-		$col['count'] = count( $products );
-	}
+	$col['count'] = count( skyyrose_get_collection_products( $col['slug'] ) );
 }
 unset( $col );
 
-/* Press features */
+/* Press features. Empty 'url' renders as <span>; non-empty renders as <a> with rel=noopener. */
 $press = array(
-	__( 'Maxim', 'skyyrose' ),
-	__( 'CEO Weekly', 'skyyrose' ),
-	__( 'San Francisco Post', 'skyyrose' ),
-	__( 'Best of Best Review', 'skyyrose' ),
-	__( 'The Blox', 'skyyrose' ),
+	array( 'name' => __( 'Maxim', 'skyyrose' ),               'url' => 'https://www.maxim.com/partner/14-game-changing-entrepreneurs-to-watch-in-2023/' ),
+	array( 'name' => __( 'CEO Weekly', 'skyyrose' ),          'url' => 'https://ceoweekly.com/the-unyielding-journey-of-a-single-father-and-entrepreneur/' ),
+	array( 'name' => __( 'San Francisco Post', 'skyyrose' ),  'url' => 'https://sanfranciscopost.com/the-skyy-rose-collection-from-oaklands-streets-to-fashion-heights/' ),
+	array( 'name' => __( 'Best of Best Review', 'skyyrose' ), 'url' => 'https://bestofbestreview.com/awards/the-skyy-rose-collection-best-bay-area-clothing-line-award-2024' ),
+	array( 'name' => __( 'The Blox', 'skyyrose' ),            'url' => '' ),
 );
 
 /* Marquee items */
@@ -166,7 +155,7 @@ get_header();
 <!-- ═══ LOADER ═══ -->
 <div id="loader" role="status" aria-label="<?php esc_attr_e( 'Loading', 'skyyrose' ); ?>">
 	<span class="ld-brand"><?php esc_html_e( 'SkyyRose', 'skyyrose' ); ?></span>
-	<span class="ld-tag"><?php esc_html_e( 'Luxury Grows from Concrete', 'skyyrose' ); ?></span>
+	<span class="ld-tag"><?php esc_html_e( 'Luxury Grows from Concrete.', 'skyyrose' ); ?></span>
 	<div class="ld-bar"><div class="ld-fill" id="ldFill"></div></div>
 </div>
 
@@ -231,12 +220,20 @@ get_header();
 <div class="press rv">
 	<p class="press-label"><?php esc_html_e( 'As Featured In', 'skyyrose' ); ?></p>
 	<div class="press-logos">
-		<?php foreach ( $press as $idx => $name ) : ?>
-			<?php
-			if ( $idx > 0 ) :
-				?>
-				<span class="press-sep" aria-hidden="true"></span><?php endif; ?>
-			<span class="press-item"><?php echo esc_html( $name ); ?></span>
+		<?php foreach ( $press as $idx => $item ) : ?>
+			<?php if ( $idx > 0 ) : ?>
+				<span class="press-sep" aria-hidden="true"></span>
+			<?php endif; ?>
+			<?php if ( ! empty( $item['url'] ) ) : ?>
+				<a class="press-item press-item--link"
+					href="<?php echo esc_url( $item['url'] ); ?>"
+					target="_blank"
+					rel="noopener noreferrer">
+					<?php echo esc_html( $item['name'] ); ?>
+				</a>
+			<?php else : ?>
+				<span class="press-item"><?php echo esc_html( $item['name'] ); ?></span>
+			<?php endif; ?>
 		<?php endforeach; ?>
 	</div>
 </div>
@@ -269,12 +266,6 @@ get_header();
 				<p><?php echo wp_kses_post( __( 'In a neighborhood where opportunities are as scarce as support, <strong>Corey Foster</strong> refused to become another statistic. He\'d lost everything — broke, no drive left, a baby on the way.', 'skyyrose' ) ); ?></p>
 				<p><?php echo wp_kses_post( __( 'Through failed websites, scammer manufacturers, and single parenthood with no support — he built something real. Named after his daughter <strong>Skyy Rose</strong>. Designed for anyone, regardless of gender or age.', 'skyyrose' ) ); ?></p>
 				<p><?php esc_html_e( "SkyyRose isn't just clothing. It's proof that your circumstances don't define your destination.", 'skyyrose' ); ?></p>
-			</div>
-			<div class="story-stats rv rv-d3">
-				<div><div class="stat-num">3</div><div class="stat-label"><?php esc_html_e( 'Collections', 'skyyrose' ); ?></div></div>
-				<div><div class="stat-num"><?php echo esc_html( array_sum( array_column( $collections, 'count' ) ) ?: '29' ); ?></div><div class="stat-label"><?php esc_html_e( 'Pieces', 'skyyrose' ); ?></div></div>
-				<div><div class="stat-num">2020</div><div class="stat-label"><?php esc_html_e( 'Founded', 'skyyrose' ); ?></div></div>
-				<div><div class="stat-num">5+</div><div class="stat-label"><?php esc_html_e( 'Press Features', 'skyyrose' ); ?></div></div>
 			</div>
 		</div>
 		<div class="story-img-wrap rv-right">
@@ -350,18 +341,22 @@ get_template_part(
 <!-- ═══ LOOKBOOK ═══ -->
 <section class="lookbook" id="lookbook" aria-label="<?php esc_attr_e( 'Lookbook', 'skyyrose' ); ?>">
 	<div class="lookbook-header rv-clip-up">
-		<h2><?php esc_html_e( 'Lookbook', 'skyyrose' ); ?></h2>
-		<p><?php esc_html_e( 'Real people. Real style. Oakland made.', 'skyyrose' ); ?></p>
+		<p class="lookbook-eyebrow"><?php esc_html_e( 'The Lookbook', 'skyyrose' ); ?></p>
+		<h2><?php esc_html_e( 'Worn In The Real World', 'skyyrose' ); ?></h2>
+		<p class="lookbook-tagline"><?php esc_html_e( 'Real people. Real style. Oakland made.', 'skyyrose' ); ?></p>
 	</div>
 	<div class="lookbook-grid stagger-grid">
 		<?php
 		foreach ( $lookbook as $lb ) :
 			$lb_base = SKYYROSE_ASSETS_URI . '/images/lookbook/' . $lb['file'];
+			$lb_sizes = $lb['tall']
+				? '(max-width: 600px) 100vw, (max-width: 1024px) 100vw, 760px'
+				: '(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 370px';
 			?>
 			<div class="lb-img rv<?php echo $lb['tall'] ? ' tall' : ''; ?>">
 				<img src="<?php echo esc_url( $lb_base . '-960w.webp' ); ?>"
 					srcset="<?php echo esc_url( $lb_base . '-480w.webp' ); ?> 480w, <?php echo esc_url( $lb_base . '-960w.webp' ); ?> 960w"
-					sizes="(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 480px"
+					sizes="<?php echo esc_attr( $lb_sizes ); ?>"
 					alt="<?php echo esc_attr( $lb['alt'] ); ?>"
 					loading="lazy" decoding="async" width="960" height="1280">
 				<span class="lb-label"><?php echo esc_html( $lb['label'] ); ?></span>

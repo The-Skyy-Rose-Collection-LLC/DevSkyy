@@ -53,7 +53,7 @@
 	// -------------------------------------------------------------------------
 
 	function loadThree( callback ) {
-		if ( window.THREE ) {
+		if ( window.THREE && window.THREE_GLTFLoader ) {
 			callback( window.THREE );
 			return;
 		}
@@ -127,7 +127,10 @@
 	// -------------------------------------------------------------------------
 
 	function loadModel( THREE ) {
-		var GLTFLoader = window.THREE_GLTFLoader;
+		// r147 add-on scripts attach to THREE.GLTFLoader (window.THREE.GLTFLoader).
+		// window.THREE_GLTFLoader is kept as a legacy override path.
+		var GLTFLoader = window.THREE_GLTFLoader ||
+			( window.THREE && window.THREE.GLTFLoader );
 		if ( ! GLTFLoader ) {
 			console.warn( 'Skyy 3D: GLTFLoader not available' );
 			return;

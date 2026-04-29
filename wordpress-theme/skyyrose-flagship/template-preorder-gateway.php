@@ -17,123 +17,38 @@ defined( 'ABSPATH' ) || exit;
  * ─── Collection Configuration ───────────────────────────────────────────────
  */
 $collections = array(
-	'black-rose' => array(
+	'black-rose'   => array(
 		'label'    => esc_html__( 'Black Rose', 'skyyrose' ),
 		'tagline'  => esc_html__( 'The Beauty of Black', 'skyyrose' ),
 		'number'   => esc_html__( 'Collection 01', 'skyyrose' ),
 		'subtitle' => esc_html__( 'Dark Elegance', 'skyyrose' ),
 	),
-	'love-hurts' => array(
+	'love-hurts'   => array(
 		'label'    => esc_html__( 'Love Hurts', 'skyyrose' ),
 		'tagline'  => esc_html__( 'The Hurts Bloodline', 'skyyrose' ),
 		'number'   => esc_html__( 'Collection 02', 'skyyrose' ),
 		'subtitle' => esc_html__( 'The Hurts Bloodline', 'skyyrose' ),
 	),
-	'signature'  => array(
+	'signature'    => array(
 		'label'    => esc_html__( 'Signature', 'skyyrose' ),
 		'tagline'  => esc_html__( 'The Origin. The Crown.', 'skyyrose' ),
 		'number'   => esc_html__( 'Collection 03', 'skyyrose' ),
 		'subtitle' => esc_html__( 'The Origin. The Crown.', 'skyyrose' ),
 	),
-);
-
-/*
- * ─── Static fallback products (used when WooCommerce is unavailable) ────────
- */
-$fallback_products = array(
-	'black-rose' => array(
-		array(
-			'name'  => 'Black Rose Classic Hoodie',
-			'price' => 65,
-			'sku'   => 'br-hoodie',
-		),
-		array(
-			'name'  => 'Obsidian Tee',
-			'price' => 40,
-			'sku'   => 'br-tee',
-		),
-		array(
-			'name'  => 'Dark Bloom Jacket',
-			'price' => 95,
-			'sku'   => 'br-jacket',
-		),
-		array(
-			'name'  => 'Midnight Crewneck',
-			'price' => 55,
-			'sku'   => 'br-crew',
-		),
-	),
-	'love-hurts' => array(
-		array(
-			'name'  => 'Enchanted Rose Hoodie',
-			'price' => 65,
-			'sku'   => 'lh-hoodie',
-		),
-		array(
-			'name'  => 'Beast Mode Tee',
-			'price' => 40,
-			'sku'   => 'lh-tee',
-		),
-		array(
-			'name'  => 'Thorned Heart Jacket',
-			'price' => 95,
-			'sku'   => 'lh-jacket',
-		),
-		array(
-			'name'  => 'Bloodline Crewneck',
-			'price' => 55,
-			'sku'   => 'lh-crew',
-		),
-	),
-	'signature'  => array(
-		array(
-			'name'  => 'Signature Rose Hoodie',
-			'price' => 65,
-			'sku'   => 'sg-hoodie',
-		),
-		array(
-			'name'  => 'Script Logo Tee',
-			'price' => 40,
-			'sku'   => 'sg-tee',
-		),
-		array(
-			'name'  => 'Gold Standard Jacket',
-			'price' => 95,
-			'sku'   => 'sg-jacket',
-		),
-		array(
-			'name'  => 'Heritage Crewneck',
-			'price' => 55,
-			'sku'   => 'sg-crew',
-		),
+	'kids-capsule' => array(
+		'label'    => esc_html__( 'Kids Capsule', 'skyyrose' ),
+		'tagline'  => esc_html__( 'Little Luxury', 'skyyrose' ),
+		'number'   => esc_html__( 'Collection 04', 'skyyrose' ),
+		'subtitle' => esc_html__( 'Little Luxury', 'skyyrose' ),
 	),
 );
 
 /*
- * ─── Query WooCommerce Products (with static fallback) ──────────────────────
+ * ─── Load products from CSV catalog (single source of truth) ────────────────
  */
 $products_by_collection = array();
-
-if ( function_exists( 'wc_get_products' ) ) {
-	foreach ( array_keys( $collections ) as $slug ) {
-		$wc_products                     = wc_get_products(
-			array(
-				'status'   => 'publish',
-				'limit'    => 12,
-				'category' => array( $slug ),
-				'orderby'  => 'menu_order',
-				'order'    => 'ASC',
-			)
-		);
-		$products_by_collection[ $slug ] = ! empty( $wc_products ) ? $wc_products : array();
-	}
-}
-
-// If WooCommerce returned nothing or is unavailable, use static fallback.
 foreach ( array_keys( $collections ) as $slug ) {
-	if ( empty( $products_by_collection[ $slug ] ) && isset( $fallback_products[ $slug ] ) ) {
-		$products_by_collection[ $slug ] = $fallback_products[ $slug ];
-	}
+	$products_by_collection[ $slug ] = skyyrose_get_collection_products( $slug );
 }
 
 $currency_symbol = function_exists( 'get_woocommerce_currency_symbol' )
@@ -152,7 +67,7 @@ get_header();
 		<span class="hero__badge rv-blur-down"><?php esc_html_e( 'Exclusive Access', 'skyyrose' ); ?></span>
 		<h1 class="hero__title rv-split-char"><?php esc_html_e( 'Pre-Order', 'skyyrose' ); ?></h1>
 		<p class="hero__tagline rv-split-word"><?php esc_html_e( 'Secure Your Pieces Before They Drop', 'skyyrose' ); ?></p>
-		<p class="hero__subtitle rv-blur"><?php esc_html_e( 'Luxury Grows from Concrete', 'skyyrose' ); ?></p>
+		<p class="hero__subtitle rv-blur"><?php esc_html_e( 'Luxury Grows from Concrete.', 'skyyrose' ); ?></p>
 	</section>
 
 	<!-- ==================== SHOWCASE GRID ==================== -->
@@ -234,26 +149,19 @@ get_header();
 				if ( ! empty( $items ) ) :
 					$index = 0;
 					foreach ( $items as $item ) :
-						if ( $item instanceof WC_Product ) {
-							$card_args = array(
-								'product'    => $item,
-								'collection' => $slug,
-								'badge_text' => __( 'Pre-Order', 'skyyrose' ),
-								'index'      => $index,
-							);
-						} else {
-							$card_args = array(
-								'title'      => isset( $item['name'] ) ? $item['name'] : '',
-								'price'      => $currency_symbol . number_format( isset( $item['price'] ) ? (float) $item['price'] : 0, 0 ),
-								'image_url'  => '',
-								'permalink'  => '#',
-								'collection' => $slug,
-								'badge_text' => __( 'Pre-Order', 'skyyrose' ),
-								'desc'       => isset( $item['description'] ) ? $item['description'] : '',
-								'sku'        => isset( $item['sku'] ) ? $item['sku'] : '',
-								'index'      => $index,
-							);
-						}
+						$item_sku  = isset( $item['sku'] ) ? $item['sku'] : '';
+						$card_args = array(
+							'title'      => isset( $item['name'] ) ? $item['name'] : '',
+							'price'      => skyyrose_format_price( $item ),
+							'image_url'  => skyyrose_product_image_uri( isset( $item['front_model_image'] ) ? $item['front_model_image'] : ( isset( $item['image'] ) ? $item['image'] : '' ) ),
+							'image_back' => skyyrose_product_image_uri( isset( $item['image'] ) ? $item['image'] : '' ),
+							'permalink'  => skyyrose_product_url( $item_sku ),
+							'collection' => $slug,
+							'badge_text' => __( 'Pre-Order', 'skyyrose' ),
+							'desc'       => isset( $item['description'] ) ? $item['description'] : '',
+							'sku'        => $item_sku,
+							'index'      => $index,
+						);
 						get_template_part( 'template-parts/product-card-holo', null, $card_args );
 						++$index;
 					endforeach;
