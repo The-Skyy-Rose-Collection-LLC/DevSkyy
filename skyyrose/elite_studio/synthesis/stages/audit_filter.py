@@ -58,20 +58,20 @@ def _blocking_regions(audit: VisionAuditResult) -> list[str]:
     for v in audit.violations:
         if not v.is_blocking:
             continue
-        parts = v.region.split(",")
-        if len(parts) > 1:
+        parts = [p.strip() for p in v.region.split(",")]
+        non_empty = [p for p in parts if p]
+        if len(non_empty) > 1:
             logger.warning(
                 "audit returned compound region %r — model ignored SCHEMA RULES; splitting defensively",
                 v.region,
             )
-        for part in parts:
-            region = part.strip()
-            if not region:
-                logger.warning(
-                    "audit returned empty region string in violation %r — skipping",
-                    v.element,
-                )
-                continue
+        elif not non_empty:
+            logger.warning(
+                "audit returned empty region string in violation %r — skipping",
+                v.element,
+            )
+            continue
+        for region in non_empty:
             if region not in seen:
                 seen.add(region)
                 regions.append(region)
