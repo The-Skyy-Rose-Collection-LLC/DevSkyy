@@ -25,9 +25,9 @@ from __future__ import annotations
 import json
 import shutil
 import sys
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from enum import Enum
+from dataclasses import dataclass
+from datetime import UTC, datetime
+from enum import StrEnum
 from pathlib import Path
 
 from skyyrose.core.catalog_loader import CATALOG_CSV, bool_col, read_catalog_rows
@@ -41,7 +41,7 @@ _TERMINAL_WIDTH = shutil.get_terminal_size((100, 40)).columns
 _SEP = "─" * min(_TERMINAL_WIDTH, 100)
 
 
-class Status(str, Enum):
+class Status(StrEnum):
     READY = "READY"
     SKIPPED = "SKIPPED"
     PENDING_USER_ASSETS = "PENDING_USER_ASSETS"
@@ -197,10 +197,9 @@ def _write_skipped_json(
     payload = {
         "reason": "out-of-scope accessories — deferred to v1.3 flat-lay pipeline",
         "skipped": [
-            {"sku": e.sku, "name": e.name, "collection": e.collection}
-            for e in accessories
+            {"sku": e.sku, "name": e.name, "collection": e.collection} for e in accessories
         ],
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "total_in_scope_garments": in_scope_garments,
         "total_skipped_accessories": len(accessories),
     }

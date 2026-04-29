@@ -93,7 +93,9 @@ def build_php(brand: BrandConfig) -> str:
     }
     for key, const in mapping.items():
         if key in primary:
-            out.append(f"define( '{const}', {_php_string(primary[key])} );")
+            out.append(
+                f"if ( ! defined( '{const}' ) ) define( '{const}', {_php_string(primary[key])} );"
+            )
     out.append("")
 
     # URLs
