@@ -13,6 +13,7 @@ Also verifies:
 
 from __future__ import annotations
 
+import logging
 from unittest.mock import patch
 
 import pytest
@@ -162,7 +163,10 @@ def test_check_collects_multiple_distinct_regions():
 # ── _blocking_regions — compound region (comma-split) ───────────────────────
 
 
-def test_check_splits_compound_region_into_two_regions():
+_AF_LOGGER = "skyyrose.elite_studio.synthesis.stages.audit_filter"
+
+
+def test_check_splits_compound_region_into_two_regions(caplog):
     audit = VisionAuditResult(
         matches_dossier=False,
         violations=[
@@ -170,8 +174,10 @@ def test_check_splits_compound_region_into_two_regions():
         ],
     )
     af = _make_filter(audit)
-    result = af.check("stage1.png", _DOSSIER, "front")
+    with caplog.at_level(logging.WARNING, logger=_AF_LOGGER):
+        result = af.check("stage1.png", _DOSSIER, "front")
     assert result.violation_regions == ["left-cuff", "right-cuff"]
+    assert "compound region" in caplog.text
 
 
 def test_check_deduplicates_across_compound_and_plain_region():
@@ -203,6 +209,21 @@ def test_check_excludes_low_severity_compound_region_entirely():
     result = af.check("stage1.png", _DOSSIER, "front")
     assert result.violation_regions == []
     assert result.needs_inpaint is False
+
+
+def test_check_skips_violation_with_empty_region_string(caplog):
+    audit = VisionAuditResult(
+        matches_dossier=False,
+        violations=[
+            VisionAuditViolation(element="collar", region="", severity="high"),
+        ],
+    )
+    af = _make_filter(audit)
+    with caplog.at_level(logging.WARNING, logger=_AF_LOGGER):
+        result = af.check("stage1.png", _DOSSIER, "front")
+    assert result.violation_regions == []
+    assert result.needs_inpaint is False
+    assert "empty region string" in caplog.text
 
 
 # ── AuditFilter.check() — error branch ──────────────────────────────────────

@@ -8,9 +8,8 @@ at the class level).
 
 from __future__ import annotations
 
+import logging
 from unittest.mock import patch
-
-import pytest
 
 from skyyrose.elite_studio.agents.vision_audit_agent import VisionAuditAgent
 
@@ -27,7 +26,10 @@ def _png(tmp_path):
 # ── Severity coercion ────────────────────────────────────────────────────────
 
 
-def test_audit_coerces_unknown_severity_to_high(tmp_path):
+_VA_LOGGER = "skyyrose.elite_studio.agents.vision_audit_agent"
+
+
+def test_audit_coerces_unknown_severity_to_high(tmp_path, caplog):
     payload = {
         "success": True,
         "text": (
@@ -35,15 +37,16 @@ def test_audit_coerces_unknown_severity_to_high(tmp_path):
             '{"element": "mystery-badge", "region": "front-chest", "severity": "critical"}]}'
         ),
     }
-    with patch(_PATCH, return_value=payload):
+    with caplog.at_level(logging.WARNING, logger=_VA_LOGGER), patch(_PATCH, return_value=payload):
         result = VisionAuditAgent(model="test-model").audit(_png(tmp_path), _DOSSIER)
     assert len(result.violations) == 1
     assert result.violations[0].severity == "high"
     assert result.violations[0].is_blocking is True
     assert result.has_blocking_violations is True
+    assert "unknown severity" in caplog.text
 
 
-def test_audit_coerces_empty_severity_to_high(tmp_path):
+def test_audit_coerces_empty_severity_to_high(tmp_path, caplog):
     payload = {
         "success": True,
         "text": (
@@ -51,10 +54,11 @@ def test_audit_coerces_empty_severity_to_high(tmp_path):
             '{"element": "unknown-element", "region": "back-yoke", "severity": ""}]}'
         ),
     }
-    with patch(_PATCH, return_value=payload):
+    with caplog.at_level(logging.WARNING, logger=_VA_LOGGER), patch(_PATCH, return_value=payload):
         result = VisionAuditAgent(model="test-model").audit(_png(tmp_path), _DOSSIER)
     assert result.violations[0].severity == "high"
     assert result.violations[0].is_blocking is True
+    assert "unknown severity" in caplog.text
 
 
 def test_audit_preserves_valid_severities(tmp_path):
