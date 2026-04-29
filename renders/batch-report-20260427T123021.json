@@ -1,0 +1,57 @@
+{
+  "timestamp": "20260427T123021",
+  "collections": [
+    "signature"
+  ],
+  "total_views": 4,
+  "passed": 0,
+  "failed": 4,
+  "total_cost_usd": 0.0,
+  "total_duration_ms": 9,
+  "results": [
+    {
+      "sku": "sg-006",
+      "view": "front",
+      "ok": false,
+      "attempts": 1,
+      "duration_ms": 2,
+      "output_path": null,
+      "quarantine_path": null,
+      "violations": [],
+      "error": "upload of wordpress-theme/skyyrose-flagship/assets/images/products/sg-006-mint-lavender-hoodie.png failed: No module named 'fal_client'"
+    },
+    {
+      "sku": "sg-006",
+      "view": "back",
+      "ok": false,
+      "attempts": 1,
+      "duration_ms": 0,
+      "output_path": null,
+      "quarantine_path": null,
+      "violations": [],
+      "error": "upload of wordpress-theme/skyyrose-flagship/assets/images/products/mint-lavender-hoodie-back-model.webp failed: No module named 'fal_client'"
+    },
+    {
+      "sku": "sg-014",
+      "view": "front",
+      "ok": false,
+      "attempts": 1,
+      "duration_ms": 0,
+      "output_path": null,
+      "quarantine_path": null,
+      "violations": [],
+      "error": "upload of wordpress-theme/skyyrose-flagship/assets/images/products/sg-014-mint-lavender-sweatpants.jpeg failed: No module named 'fal_client'"
+    },
+    {
+      "sku": "sg-015",
+      "view": "front",
+      "ok": false,
+      "attempts": 1,
+      "duration_ms": 0,
+      "output_path": null,
+      "quarantine_path": null,
+      "violations": [],
+      "error": "upload of wordpress-theme/skyyrose-flagship/assets/images/products/sg-015-windbreaker-set.jpg failed: No module named 'fal_client'"
+    }
+  ]
+}

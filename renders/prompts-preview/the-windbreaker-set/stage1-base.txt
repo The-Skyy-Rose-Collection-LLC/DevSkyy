@@ -1,0 +1,13 @@
+# Stage 1 Base Render Prompt — The Windbreaker Set
+# SKU: sg-015 | Collection: Signature
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of a matching two-piece windbreaker set — (1) a lightweight nylon zip-front hooded windbreaker jacket and (2) matching lightweight nylon track-style pants — placed flat together as a coordinated set or shown as separate front-view garments, centered on pure white background. IMPORTANT: both pieces are solid WHITE lightweight nylon windbreaker fabric as the base body — NOT black (catalog field error); render the WHITE colorway from the techflat. The jacket has a solid pink/light-pink contrast hood, a large V-shape rainbow chevron color-block panel (alternating pink, green, lavender, yellow stripes) at the upper chest fanning toward the shoulders, and a full-length center-front zipper. Multi-color rainbow stripe bands at both jacket wrist cuffs and the jacket waistband hem. Two vertical slash hand pockets with pink contrast piping. The pants have matching V-shape rainbow chevron panels on each upper thigh and multi-color stripe bands at the waistband and ankle cuffs, with a white flat drawstring. Fabric: smooth lightweight water-resistant nylon windbreaker — NOT cotton-fleece, NOT satin; the fabric surface should read as smooth, slightly crinkly nylon. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus, 8K commercial apparel photography quality.
+
+NOTES:
+- CRITICAL: the CSV Color field says "Black" but this is a data error — the dossier explicitly confirms the techflat shows WHITE body + PINK hood + rainbow chevron; render WHITE
+- The V-shape rainbow chevron panels, multi-color stripe cuff/waistband bands, and pink piping on pockets are all construction elements — include them in Stage 1
+- The PINK contrast hood on the jacket is a defining colorway element — must be rendered accurately
+- Do NOT render the large SR monogram embroidery on the jacket back yoke or the small rose-cluster on the chest — those are Stage 3
+- Fabric: lightweight smooth water-resistant nylon windbreaker — the material should look different from cotton-fleece; show the characteristic smooth, slightly shiny nylon surface

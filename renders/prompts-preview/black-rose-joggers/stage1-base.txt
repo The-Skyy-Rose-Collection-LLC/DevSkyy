@@ -1,0 +1,13 @@
+# Stage 1 Base Render Prompt — BLACK Rose Joggers
+# SKU: br-002 | Collection: Black Rose
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of a full-length jogger sweatpants — NOT shorts, NOT track pants, NOT denim — placed flat or on an invisible mannequin lower half, front view centered on pure white background. The garment is solid jet-black heavyweight cotton-blend fleece fabric throughout the body, with three distinct contrast-white ribbed elements: a white ribbed elasticated waistband at the top (with white flat drawstring threaded through), white ribbed ankle cuffs at both leg openings, and a tapered slim leg silhouette that gathers into the ribbed ankle cuffs. Two vertical slash hand pockets at the upper thighs with pink contrast piping along the pocket welt edges. The fabric surface shows the characteristic texture of heavyweight cotton-blend fleece — dense, slightly brushed exterior. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus from waistband to ankle cuffs, 8K commercial apparel photography quality.
+
+NOTES:
+- The white ribbed waistband and white ribbed ankle cuffs are the primary silhouette-defining trim elements — render them cleanly with clear contrast against the black body
+- The pink contrast piping on slash pocket welt edges is a structural seam detail, not a decoration — include it as part of the garment construction
+- Do NOT render any embroidery, logos, or printed graphics — all decoration is Stage 3
+- The body is pure black — no panels, no color-blocking
+- Fabric: heavyweight cotton-blend fleece, dense and substantial — NOT nylon, NOT mesh, NOT jersey

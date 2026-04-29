@@ -1,0 +1,14 @@
+# Stage 1 Base Render Prompt — The Bridge Series 'Stay Golden' Shorts
+# SKU: sg-003 | Collection: Signature
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of knee-length athletic basketball shorts — NOT joggers, NOT swim shorts, NOT board shorts — placed flat or on an invisible mannequin lower half, front view centered on pure white background. The main body panels are lightweight white mesh fabric with an all-over sublimated full-color photographic print of the Golden Gate Bridge at golden hour — warm purple-to-orange sunset sky with the orange-red bridge silhouette — spread across the entire shorts surface from waistband to hem. The waistband is black elasticated fabric with a white flat drawstring threaded through. The leg opening hem is clean stitched finish with no contrast binding or piping. The overall silhouette is relaxed athletic, falling to approximately knee length. The fabric is lightweight white performance mesh serving as the print substrate. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus from waistband to hem, 8K commercial apparel photography quality.
+
+NOTES:
+- The all-over sublimated Golden Gate Bridge golden-hour photographic print IS the base fabric appearance — the warm sunset color palette (purples, oranges, reds) fills the entire shorts body; include it in Stage 1 as it defines the garment
+- Clean stitched hem at leg opening — NO contrast binding, NO piping
+- Black elasticated waistband with white drawstring is a structural element
+- Do NOT render any embroidered logos, wordmarks, or additional graphic treatments — those are Stage 3
+- The print palette is warm golden-hour tones — NOT a nighttime shot, NOT daytime blue sky (that is sg-001 Bay Bridge)
+- Fabric: lightweight white performance mesh as print substrate

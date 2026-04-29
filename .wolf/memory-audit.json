@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-04-27T06:50:39",
+  "generated_at": "2026-04-29T03:42:36",
   "repo_root": "/Users/theceo/DevSkyy",
   "freshness_days": 30,
   "files_scanned": 27,
-  "indexed_basenames": 13663,
+  "indexed_basenames": 13713,
   "missing_paths": [],
   "linecount_mismatches": [],
   "stale_stamps": [],
@@ -12,21 +12,21 @@
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
       "line": 88,
       "stamp": "2026-04-27",
-      "age_days": 0
+      "age_days": 2
     },
     {
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
       "line": 108,
       "stamp": "2026-04-27",
-      "age_days": 0
+      "age_days": 2
     },
     {
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
-      "line": 154,
+      "line": 159,
       "stamp": "2026-04-20",
-      "age_days": 7
+      "age_days": 9
     }
   ],
-  "documented_missing_count": 28,
-  "verified_count": 808
+  "documented_missing_count": 29,
+  "verified_count": 821
 }

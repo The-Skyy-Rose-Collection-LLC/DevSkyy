@@ -1,0 +1,140 @@
+{
+  "timestamp": "20260427T135051",
+  "collections": [
+    "signature"
+  ],
+  "total_views": 4,
+  "passed": 0,
+  "failed": 4,
+  "total_cost_usd": 0.5700000000000001,
+  "total_duration_ms": 361010,
+  "results": [
+    {
+      "sku": "sg-006",
+      "view": "front",
+      "ok": false,
+      "attempts": 1,
+      "duration_ms": 21906,
+      "output_path": null,
+      "quarantine_path": null,
+      "violations": [],
+      "error": "Server error '500 Internal Server Error' for url 'https://v3b.fal.media/files/b/0a97f0fa/AhCMxNYkEPq3ODJuhMoil_0db77231fa5b4bc18b995e1f0cd685d1.png'\nFor more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500"
+    },
+    {
+      "sku": "sg-006",
+      "view": "back",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 113612,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-006/20260427T135306/sg-006-back-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "pink sleeves",
+          "region": "sleeves",
+          "severity": "high"
+        },
+        {
+          "element": "incorrect chevron color palette (includes orange and blue; missing lavender)",
+          "region": "front-chevron",
+          "severity": "high"
+        },
+        {
+          "element": "missing small pink rose-cluster decoration",
+          "region": "front-center-chest",
+          "severity": "high"
+        },
+        {
+          "element": "kangaroo-style pocket instead of slash pockets with pink piping",
+          "region": "front-body",
+          "severity": "high"
+        },
+        {
+          "element": "pink drawstring instead of white",
+          "region": "hood-drawstring",
+          "severity": "medium"
+        },
+        {
+          "element": "ribbed cuffs and waistband missing the full rainbow stripe pattern (only shows pink/green)",
+          "region": "cuffs and waistband",
+          "severity": "medium"
+        },
+        {
+          "element": "missing V-shape chevron detail at upper-cuff area",
+          "region": "sleeves",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-014",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 104677,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-014/20260427T135451/sg-014-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "waistband",
+          "region": "waistband",
+          "severity": "high"
+        },
+        {
+          "element": "left-ankle-cuff",
+          "region": "ankle-cuff",
+          "severity": "high"
+        },
+        {
+          "element": "right-ankle-cuff",
+          "region": "ankle-cuff",
+          "severity": "high"
+        },
+        {
+          "element": "front-center-waistband",
+          "region": "waistband",
+          "severity": "medium"
+        },
+        {
+          "element": "front-thigh-chevron",
+          "region": "thighs",
+          "severity": "high"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-015",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 120792,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-015/20260427T135652/sg-015-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Chevron decoration appears on the back of the jacket",
+          "region": "back-body-jacket",
+          "severity": "high"
+        },
+        {
+          "element": "Missing large SR monogram on back yoke",
+          "region": "back-yoke-jacket",
+          "severity": "high"
+        },
+        {
+          "element": "Incorrect chest branding (circular patch on left chest instead of small pink rose cluster centered below the chevron)",
+          "region": "front-center-chest-jacket",
+          "severity": "medium"
+        },
+        {
+          "element": "Jacket chevron missing the green stripe specified in the palette",
+          "region": "front-chevron-jacket",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    }
+  ]
+}

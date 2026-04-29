@@ -1,0 +1,12 @@
+# Stage 1 Base Render Prompt — BLACK Rose Crewneck
+# SKU: br-001 | Collection: Black Rose
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of a crew-neck pullover sweatshirt — NOT a hoodie, NOT a jersey, NOT a zip-up — placed flat or on an invisible mannequin, front view centered on pure white background. The garment is solid jet-black heavyweight cotton-fleece fabric throughout the body, with three distinct contrast-white ribbed trim elements: a white ribbed crew-neck collar band at the neckline, white ribbed cuffs at both wrist openings, and a white ribbed waistband at the hem. The fabric surface shows the characteristic loopback texture of heavyweight fleece — dense brushed-cotton pile with subtle wale structure. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus from collar to waistband, 8K commercial apparel photography quality.
+
+NOTES:
+- The white ribbed trim (collar, cuffs, waistband) is the primary shape-defining detail at Stage 1 — render it cleanly with clear contrast against the black body
+- Do NOT render any embroidery, logos, or printed graphics — all decoration is Stage 3
+- The body is pure black — no color-blocking, no panels, no tonal variation except the white ribbed trims
+- Fabric texture: heavyweight cotton-fleece loopback construction, dense and substantial (NOT thin jersey, NOT nylon, NOT satin)

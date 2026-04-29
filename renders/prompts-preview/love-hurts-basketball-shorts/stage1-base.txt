@@ -1,0 +1,12 @@
+# Stage 1 Base Render Prompt — Love Hurts Basketball Shorts
+# SKU: lh-003 | Collection: Love Hurts
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of knee-length athletic basketball shorts — NOT joggers, NOT swim shorts, NOT board shorts — placed flat or on an invisible mannequin lower half, front view centered on pure white background. The main body panels are lightweight white mesh fabric with an all-over sublimated repeating rose-cluster pattern printed across the entire surface — multiple rose-cluster motifs tiled across the white mesh ground. The waistband is black ribbed elasticated fabric with a white flat drawstring threaded through. The leg opening hem is finished with black ribbed binding with red contrast piping along the edge. The overall silhouette is relaxed athletic, falling to approximately knee length. The fabric is lightweight white performance mesh — breathable, slightly translucent, with visible open weave structure. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus from waistband to hem, 8K commercial apparel photography quality.
+
+NOTES:
+- The all-over sublimated rose-cluster repeating pattern on white mesh IS the base fabric's appearance — this is the fabric's printed ground, not a decoration overlay; include it in Stage 1 as it defines the garment's visual identity
+- The black ribbed waistband + white drawstring and the black ribbed hem binding with red contrast piping are structural construction elements
+- Do NOT render any large singular embroidered or screen-printed logos, wordmarks, or unique graphic treatments — those are Stage 3
+- Fabric: lightweight white performance mesh — NOT cotton, NOT satin, NOT fleece

@@ -1,0 +1,14 @@
+# Stage 1 Base Render Prompt — BLACK Rose Sherpa Jacket
+# SKU: br-006 | Collection: Black Rose
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of a hooded bomber-style zip-front jacket — NOT a pullover, NOT a crewneck, NOT a stand-collar jacket — placed flat or on an invisible mannequin, front view worn slightly open to show interior, centered on pure white background. The exterior is lustrous solid jet-black satin fabric throughout — the body, attached hood, and sleeves all carry the smooth, light-reflective sheen of black satin with subtle highlight and shadow playing across the surface. The front closure is a full-length center zipper concealed beneath a button-overlap storm flap, creating a clean placket line down the center front. Both side panels have zippered hand pockets at the lower body. The wrist cuffs and hem waistband are black ribbed bomber-style trim. Visible at the front placket opening, collar, and cuff openings is the plush black sherpa fleece interior lining — dense, textured, and visually rich against the satin exterior. Professional e-commerce lighting, soft diffused key light from front-left emphasizing the satin sheen, minimal shadow beneath hem, tack-sharp focus, 8K commercial apparel photography quality.
+
+NOTES:
+- Exterior fabric is BLACK SATIN — render the lustrous light-reflective surface quality; highlights and soft reflections are essential to communicate the material correctly
+- The interior SHERPA LINING is solid BLACK (plush, textured) — NOT white/cream; it peeks visibly at placket, collar, and cuffs
+- The storm flap concealing the zipper creates a smooth closed-placket look when jacket is fastened — render it slightly open to show zipper and sherpa interior glimpse
+- The hood is ATTACHED to the jacket and constructed from the same black satin exterior + black sherpa interior
+- Do NOT render any embroidery, logos, or printed graphics — all decoration is Stage 3
+- Zippered side pockets are structural construction elements — render the zipper pull tabs

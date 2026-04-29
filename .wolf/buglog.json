@@ -1454,6 +1454,54 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-04-19T17:32:01.512Z"
+    },
+    {
+      "id": "bug-091",
+      "timestamp": "2026-04-27T22:34:00.000Z",
+      "error_message": "front-page.php uses wc_get_products() to count products per collection — breaks when WooCommerce categories are not synced to CSV catalog",
+      "file": "wordpress-theme/skyyrose-flagship/front-page.php",
+      "root_cause": "wc_get_products() queries WC product categories, which are separate from the CSV catalog. Category sync is not guaranteed. Result: count is 0 when WC categories don't exist.",
+      "fix": "Replaced wc_get_products() block with count(skyyrose_get_collection_products($col['slug'])) — reads directly from CSV catalog helper",
+      "tags": ["wc_get_products", "catalog", "collections", "php", "front-page"],
+      "related_bugs": ["bug-092"],
+      "occurrences": 1,
+      "last_seen": "2026-04-27T22:34:00.000Z"
+    },
+    {
+      "id": "bug-092",
+      "timestamp": "2026-04-27T22:34:00.000Z",
+      "error_message": "template-preorder-gateway.php: (a) missing kids-capsule collection, (b) $fallback_products uses nonexistent SKUs (br-hoodie, lh-hoodie, sg-hoodie etc.), (c) wc_get_products() query with fallback to fake data, (d) card args missing image_url and correct permalink",
+      "file": "wordpress-theme/skyyrose-flagship/template-preorder-gateway.php",
+      "root_cause": "Template was written before CSV catalog helpers existed. Fallback products were placeholder data with invented SKUs never in the catalog. kids-capsule was simply omitted. WC_Product branch was dead code once WC categories weren't populated.",
+      "fix": "Removed $fallback_products array and wc_get_products() block entirely. Added kids-capsule to $collections. Replaced product loading with skyyrose_get_collection_products() per slug. Fixed card args: image_url uses skyyrose_product_image_uri(front_model_image|image), permalink uses skyyrose_product_url($sku), price uses skyyrose_format_price($item). Removed WC_Product instanceof branch (catalog always returns arrays).",
+      "tags": ["wc_get_products", "catalog", "preorder", "kids-capsule", "fake-skus", "php"],
+      "related_bugs": ["bug-091"],
+      "occurrences": 1,
+      "last_seen": "2026-04-27T22:34:00.000Z"
+    },
+    {
+      "id": "bug-093",
+      "timestamp": "2026-04-27T22:34:00.000Z",
+      "error_message": "TypeError: e.target.closest is not a function — SVG elements and other non-Element nodes dispatched to document-level event listeners don't have .closest()",
+      "file": "wordpress-theme/skyyrose-flagship/assets/js/experience-analyzer.js",
+      "root_cause": "SVG child elements (path, circle, use, etc.) are SVGElement not HTMLElement and may not implement .closest() in older browsers. document-level capture listeners receive events from any element on the page including SVG internals.",
+      "fix": "Added typeof guard before every .closest() call: getCardData(), mouseenter listener, mouseleave listener, click listener — each now checks !el || typeof el.closest !== 'function' before calling.",
+      "tags": ["svg", "closest", "typeerror", "javascript", "event-listener"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-27T22:34:00.000Z"
+    },
+    {
+      "id": "bug-094",
+      "timestamp": "2026-04-27T22:34:00.000Z",
+      "error_message": "404.php references skyyrose-mascot-reference.png which does not exist in assets/images/mascot/ — only skyy-canonical.jpeg exists",
+      "file": "wordpress-theme/skyyrose-flagship/404.php",
+      "root_cause": "404.php used an old filename (skyyrose-mascot-reference.png) that was never created. The canonical mascot file is skyy-canonical.jpeg.",
+      "fix": "Replaced both references (path and URL) to skyyrose-mascot-reference.png with skyy-canonical.jpeg in the mascot fallback block of 404.php.",
+      "tags": ["mascot", "404", "missing-file", "php"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-04-27T22:34:00.000Z"
     }
   ]
 }

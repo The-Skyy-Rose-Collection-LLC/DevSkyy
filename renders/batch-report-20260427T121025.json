@@ -1,0 +1,206 @@
+{
+  "timestamp": "20260427T121025",
+  "collections": [
+    "signature"
+  ],
+  "total_views": 4,
+  "passed": 0,
+  "failed": 4,
+  "total_cost_usd": 0.7600000000000002,
+  "total_duration_ms": 517124,
+  "results": [
+    {
+      "sku": "sg-006",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 121735,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-006/20260427T121227/sg-006-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Chevron color palette",
+          "region": "front-chevron",
+          "severity": "high"
+        },
+        {
+          "element": "Unauthorized text graphics",
+          "region": "front-chevron",
+          "severity": "high"
+        },
+        {
+          "element": "Missing rose-cluster embroidery",
+          "region": "front-center-chest",
+          "severity": "medium"
+        },
+        {
+          "element": "Drawstring color",
+          "region": "hood-drawstring",
+          "severity": "low"
+        },
+        {
+          "element": "Pocket style and piping",
+          "region": "front-left-pocket / front-right-pocket",
+          "severity": "medium"
+        },
+        {
+          "element": "Waistband decoration",
+          "region": "waistband",
+          "severity": "high"
+        },
+        {
+          "element": "Cuff decoration",
+          "region": "left-cuff / right-cuff",
+          "severity": "medium"
+        },
+        {
+          "element": "Unauthorized sleeve pocket",
+          "region": "left-sleeve",
+          "severity": "high"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-006",
+      "view": "back",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 127823,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-006/20260427T121435/sg-006-back-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "hood-drawstring",
+          "region": "hood",
+          "severity": "medium"
+        },
+        {
+          "element": "front-center-chest rose-cluster decoration",
+          "region": "front-center-chest",
+          "severity": "medium"
+        },
+        {
+          "element": "front-chevron color palette",
+          "region": "upper-chest",
+          "severity": "medium"
+        },
+        {
+          "element": "front-left-pocket and front-right-pocket style and piping",
+          "region": "lower-front-body",
+          "severity": "high"
+        },
+        {
+          "element": "left-cuff and right-cuff (solid pink instead of multi-color striped)",
+          "region": "cuffs",
+          "severity": "high"
+        },
+        {
+          "element": "waistband (solid pink/white instead of multi-color striped)",
+          "region": "waistband",
+          "severity": "high"
+        },
+        {
+          "element": "unauthorized sleeve branding (large 'R' logo)",
+          "region": "sleeves",
+          "severity": "high"
+        },
+        {
+          "element": "missing V-shape chevron detail at upper-cuff and hem",
+          "region": "sleeves and waistband",
+          "severity": "high"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-014",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 128371,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-014/20260427T121643/sg-014-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Chevron Palette",
+          "region": "front-thigh-chevron",
+          "severity": "high"
+        },
+        {
+          "element": "Chevron Placement",
+          "region": "front-thigh-chevron",
+          "severity": "medium"
+        },
+        {
+          "element": "Waistband Branding and Design",
+          "region": "waistband",
+          "severity": "high"
+        },
+        {
+          "element": "Ankle Cuffs",
+          "region": "left-ankle-cuff / right-ankle-cuff",
+          "severity": "high"
+        },
+        {
+          "element": "Pink Rose Cluster",
+          "region": "front-center-waistband",
+          "severity": "medium"
+        },
+        {
+          "element": "Drawstring",
+          "region": "waistband",
+          "severity": "medium"
+        },
+        {
+          "element": "Slash Pockets",
+          "region": "front-left-pocket / front-right-pocket",
+          "severity": "high"
+        },
+        {
+          "element": "Unauthorized Contrast Piping",
+          "region": "side-seams",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    },
+    {
+      "sku": "sg-015",
+      "view": "front",
+      "ok": false,
+      "attempts": 3,
+      "duration_ms": 139167,
+      "output_path": null,
+      "quarantine_path": "renders/quarantine/sg-015/20260427T121902/sg-015-front-stage3-branded-attempt3.png",
+      "violations": [
+        {
+          "element": "Multi-color rainbow chevron appears on the back of the jacket",
+          "region": "back-body-jacket",
+          "severity": "high"
+        },
+        {
+          "element": "Extensive printed text graphics appear on the back of the jacket",
+          "region": "back-body-jacket",
+          "severity": "high"
+        },
+        {
+          "element": "Multi-color rainbow chevron appears on the back of the pants thighs",
+          "region": "back-body-pants",
+          "severity": "high"
+        },
+        {
+          "element": "Small rose-cluster is positioned on the wearer's left chest instead of center-front below the chevron vertex",
+          "region": "front-center-chest-jacket",
+          "severity": "medium"
+        },
+        {
+          "element": "Unauthorized rose-cluster graphic appears on the front thigh of the pants",
+          "region": "front-body-pants",
+          "severity": "medium"
+        }
+      ],
+      "error": ""
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+# Stage 1 Base Render Prompt — BLACK Rose x Love Hurts Basketball Shorts
+# SKU: br-007 | Collection: Black Rose
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of knee-length athletic basketball shorts — NOT joggers, NOT swim shorts, NOT board shorts — placed flat or on an invisible mannequin lower half, front view centered on pure white background. The main body panels are black breathable mesh fabric with white mesh side-panel inserts running from the waistband down both outer thighs. The waistband is white elasticated fabric with a white flat drawstring threaded through the center. Three zippered pockets: one at each side hip and one at the back center — the zipper pulls are visible structural details. The leg opening hem is finished with black ribbed binding with white contrast piping along the edge. The overall silhouette is relaxed athletic, falling to approximately knee length. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus from waistband to hem, 8K commercial apparel photography quality.
+
+NOTES:
+- The black mesh body + white mesh side panels create a color-block construction that is a structural design element — render the panel contrast precisely
+- White elasticated waistband with white drawstring is a key shape element
+- Three zippered pockets (two side, one back) — the zipper hardware is structural; render zip pull tabs
+- The black ribbed hem binding with white contrast piping at each leg opening is a construction finish detail
+- Do NOT render any embroidery, logos, or printed graphics — all decoration is Stage 3
+- Fabric: black performance mesh (main) + white performance mesh (side panels) — lightweight, slightly translucent-looking mesh texture

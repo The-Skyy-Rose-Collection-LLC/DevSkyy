@@ -1,0 +1,154 @@
+# .claudeignore — exclusions for Claude Code
+# Match .gitignore syntax. Files matching here are invisible to Read/Glob/Grep
+# and to subagents like Explore. Critical for repo perf when source coexists
+# with deps, models, generated artifacts, and snapshots.
+
+# === Dependency caches and lockfiles' realized state ===
+node_modules/
+**/node_modules/
+.venv/
+venv/
+.pnpm-store/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.eggs/
+*.egg-info/
+*.egg
+
+# === Build outputs and generated artifacts ===
+dist/
+build/
+.next/
+out/
+.turbo/
+.parcel-cache/
+.swc/
+.tsbuildinfo
+**/dist/
+**/build/
+
+# === Test, coverage, profiling artifacts ===
+.coverage
+coverage/
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+junit.xml
+*.lcov
+test-results/
+playwright-report/
+.benchmarks/
+
+# === Version control and IDE noise ===
+.git/
+.svn/
+.hg/
+.idea/
+.vscode/
+*.iml
+*.swp
+*~
+.DS_Store
+
+# === Environment files (secrets — also denied at permission layer) ===
+.env
+.env.*
+!.env.example
+**/api_keys/
+
+# === DevSkyy-specific: large generated assets and AI artifacts ===
+renders/cache/
+renders/output/
+renders/manifest_archive/
+generated_3d_models/
+models/checkpoints/
+models/loras/
+datasets/
+hf-spaces/.cache/
+imagery/cache/
+scraped_docs/
+audit_reports/raw/
+graphify-out/
+public/uploads/
+*.ckpt
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.onnx
+
+# === Screenshots, demos, marketing PNGs that bloat directory listings ===
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.mp4
+*.mov
+*.svg
+!devskyy-hero.png
+!docs/**/*.png
+
+# === Vendored third-party that we don't actively edit ===
+vendor/
+Hunyuan3D-2.1/
+elite_web_builder.zip
+SKyyRose\ Flagship.zip
+skyyrose-shoptimizer-child.zip
+
+# === Workspace snapshots / archives ===
+archive/
+**/archive/
+worktrees/
+.worktrees/
+
+# === Historical / superseded code paths ===
+editorial-staging/
+.augment/
+.factory/
+.crush/
+.codebuddy/
+.commandcode/
+.continue/
+.cortex/
+.codex/
+.aidesigner/
+.adal/
+.bob/
+
+# === Large database files and dumps ===
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.sql.gz
+
+# === Logs and runtime data ===
+logs/
+*.log
+nohup.out
+
+# === Lockfiles (read at most once, not browsed) ===
+package-lock.json
+pnpm-lock.yaml
+bun.lock
+uv.lock
+poetry.lock
+yarn.lock
+
+# === Reports and large generated JSONs ===
+deployment_summary.json
+vision-test-report*.json
+wordpress-health-check-results.json
+skills-lock.json
+
+# === Compiled WordPress/PHP output ===
+**/wp-content/uploads/
+**/wp-content/cache/
+**/wp-content/upgrade/
+*.php.bak

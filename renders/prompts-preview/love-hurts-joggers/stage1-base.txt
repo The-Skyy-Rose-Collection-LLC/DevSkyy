@@ -1,0 +1,14 @@
+# Stage 1 Base Render Prompt — Love Hurts Joggers
+# SKU: lh-002 | Collection: Love Hurts
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of athletic-fit full-length jogger pants — NOT basketball shorts, NOT track pants, NOT denim — placed flat or on an invisible mannequin lower half, front view centered on pure white background. This product has two colorways rendered side by side or as a matched pair: (1) WHITE body with solid BLACK contrast side-panel inserts running vertically down the outer thigh of each leg from waistband to ankle; (2) BLACK body with solid WHITE contrast side-panel inserts in the identical vertical placement. Both colorways share the same construction: flat white drawstring threaded through an elasticated waistband, slash hand pockets at the upper thighs, and tapered legs with clean finished ankle openings (no ribbed cuffs — clean hem). The fabric is mid-weight cotton-fleece — slightly brushed surface with a dense woven appearance. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus from waistband to ankle, 8K commercial apparel photography quality.
+
+NOTES:
+- Two colorways exist: WHITE body + BLACK side panel, and BLACK body + WHITE side panel — if rendering a single view, use the WHITE body + BLACK panel colorway as the primary render
+- The vertical color-block side panel is a structural construction panel seam, NOT a decoration or printed stripe
+- Clean hem at ankle (NO ribbed cuffs) — the leg tapers and ends cleanly
+- White flat drawstring in the waistband is a construction detail
+- Do NOT render any embroidery, logos, or printed graphics — all decoration is Stage 3
+- Fabric: mid-weight cotton-fleece — NOT nylon, NOT mesh, NOT denim

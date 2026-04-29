@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
-import pytest
 
 ACCESSORY_SKUS = {"sg-007", "lh-005"}
 PENDING_USER_ASSETS_SKUS = {"sg-009", "sg-012", "br-012", "sg-015"}

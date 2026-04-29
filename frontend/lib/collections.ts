@@ -1,4 +1,4 @@
-export type CollectionSlug = 'black-rose' | 'love-hurts' | 'signature';
+export type CollectionSlug = 'black-rose' | 'love-hurts' | 'signature' | 'kids-capsule';
 
 export interface CollectionProduct {
   id: string;
@@ -195,13 +195,6 @@ export const COLLECTIONS: Record<CollectionSlug, CollectionConfig> = {
             sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
           },
           {
-            id: 'sg-004',
-            name: 'The Signature Hoodie',
-            price: 55,
-            image: '/images/scenes/signature-product-4.jpg',
-            sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-          },
-          {
             id: 'sg-005',
             name: "The Bridge Series 'The Bay Bridge' Shirt",
             price: 25,
@@ -286,6 +279,48 @@ export const COLLECTIONS: Record<CollectionSlug, CollectionConfig> = {
             price: 80,
             image: '/images/scenes/signature-beanie-4.jpg',
             sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
+          },
+        ],
+      },
+    ],
+  },
+  'kids-capsule': {
+    slug: 'kids-capsule',
+    name: 'Kids Capsule',
+    tagline: 'Luxury Grows from Concrete.',
+    description:
+      'Bold colorblock hoodie and jogger sets designed for young ones who wear luxury from the start. Limited edition drops in sizes 2T–7.',
+    accentColor: '#B76E79',
+    accentColorRGB: '183, 110, 121',
+    bgColor: '#0A0A0A',
+    heroImage: '/images/scenes/kids-capsule-hero.jpg',
+    environment: 'studio',
+    enableBloom: false,
+    bloomStrength: 0,
+    scenes: [
+      {
+        id: 'the-playground',
+        name: 'The Playground',
+        description: 'Vibrant colorblock sets for the next generation',
+        backgroundImage: '/images/scenes/kids-capsule-hero.jpg',
+        products: [
+          {
+            id: 'kids-001',
+            name: 'Kids Colorblock Hoodie Set — Red/Black',
+            price: 65,
+            image: '/assets/images/products/kids-001-red-set.jpeg',
+            sizes: ['2T', '3T', '4T', '5', '6', '7'],
+            description:
+              'Bold red and black V-chevron colorblock hoodie and jogger set. Designed for young ones who wear luxury from the start.',
+          },
+          {
+            id: 'kids-002',
+            name: 'Kids Colorblock Hoodie Set — Purple/Black',
+            price: 65,
+            image: '/assets/images/products/kids-002-purple-set.jpeg',
+            sizes: ['2T', '3T', '4T', '5', '6', '7'],
+            description:
+              'Rich purple and black V-chevron colorblock hoodie and jogger set. Little ones deserve luxury too.',
           },
         ],
       },

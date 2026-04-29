@@ -339,7 +339,7 @@ async def extract_visual_features(
                 mood="dramatic",
             ),
             style_tags=["luxury", "minimal", "sophisticated"],
-            quality_score=0.85,
+            quality_score=0.0,
         )
 
 

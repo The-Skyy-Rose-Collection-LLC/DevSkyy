@@ -1,0 +1,14 @@
+# Stage 1 Base Render Prompt — The Fannie
+# SKU: lh-005 | Collection: Love Hurts
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of a fanny pack / waist-belt bag — NOT a backpack, NOT a shoulder bag, NOT a tote — placed flat on a pure white surface or positioned on a clean white background showing front face and strap, centered composition. The bag body is a small rectangular form in solid black pebbled-textured PU/faux-leather material — the surface shows the characteristic fine pebble grain texture of faux leather. A front zippered main compartment pocket runs across the center of the bag face. Visible adjustable black nylon webbing strap extends from both ends of the bag body, with a plastic quick-release buckle at the center of the strap for easy wearing adjustment. The hardware (zipper pulls, buckle) is black or gunmetal. Professional e-commerce lighting, soft directional key light from front-left casting gentle shadow to communicate the three-dimensional bag form, tack-sharp focus across the entire bag face and strap, 8K commercial product photography quality.
+
+NOTES:
+- The pebbled faux-leather texture of the bag body is the primary material detail — render it with tactile realism
+- The adjustable nylon webbing strap with quick-release buckle are structural functional elements — render them as clean, realistic hardware details
+- The zippered pocket(s) hardware is a construction detail — render zip pull
+- Do NOT render any embroidery, logos, printed graphics, or hardware engravings — all decoration is Stage 3
+- This is a small bag, not a large bag — the proportions should read as compact wearable waist-level accessory
+- Lighting should emphasize the three-dimensional form of the bag, not just a flat silhouette

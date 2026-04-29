@@ -1,0 +1,14 @@
+# Stage 1 Base Render Prompt — BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants Edition)
+# SKU: br-003-giants | Collection: Black Rose
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of an authentic-style button-front baseball jersey — NOT a pullover, NOT a football jersey, NOT a t-shirt — placed flat or on an invisible mannequin, front view centered on pure white background. The garment has a solid jet-black base fabric throughout the body and short sleeves, with bright orange contrast piping/binding along the V-neck collar edge and the full-length front button placket. The sleeve cuffs and hem are finished with bright orange contrast binding. The front closure is a full-length button placket with visible black buttons down the center. The fabric is mid-weight athletic knit — smooth, structured, characteristic of performance baseball jersey construction. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus, 8K commercial apparel photography quality.
+
+NOTES:
+- Same physical construction as the main br-003 baseball classic but with solid black body + bright orange piping colorway (San Francisco Giants color palette)
+- The bright orange piping must be rendered as vivid, warm orange — NOT red-orange, NOT dark orange; classic SF Giants orange
+- Black body + orange piping creates a high-contrast striking appearance
+- The button placket with black buttons is a key construction identifier
+- Do NOT render any embroidery, logos, numbers, or printed graphics — all decoration is Stage 3
+- Fabric: mid-weight smooth athletic knit — NOT fleece, NOT satin, NOT mesh

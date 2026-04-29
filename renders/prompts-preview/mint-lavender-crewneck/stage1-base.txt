@@ -1,0 +1,13 @@
+# Stage 1 Base Render Prompt — Mint & Lavender Crewneck
+# SKU: sg-013 | Collection: Signature
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of a crew-neck pullover sweatshirt — NOT a hoodie, NOT a zip-up, NOT a t-shirt — placed flat or on an invisible mannequin, front view centered on pure white background. The garment is solid mint green / seafoam-green cotton-fleece fabric throughout — body, long sleeves, ribbed crew-neck collar, ribbed wrist cuffs, and ribbed waistband hem are all the same matching mint green with no color variation or contrast trim anywhere. The mint color is a soft, cool medium-green with slight blue undertones — the characteristic seafoam-mint tone. The fabric shows the characteristic loopback texture of mid-weight cotton-fleece — brushed surface with visible fleece pile. The fit is a relaxed standard crewneck sweatshirt silhouette. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus from collar to waistband, 8K commercial apparel photography quality.
+
+NOTES:
+- ALL-MINT construction throughout — collar, cuffs, and waistband are the same mint green as the body; there are NO contrast trim colors at all; this is a fully tonal mint garment
+- The mint/seafoam color must be rendered accurately: soft cool medium-green, NOT bright lime, NOT dark green, NOT aqua
+- Do NOT render any embroidery, logos, or printed graphics — all decoration is Stage 3 (the chest and back-yoke lavender rose-cluster emblems are Stage 3)
+- Fabric: mid-weight cotton-fleece — NOT nylon, NOT mesh, NOT satin; brushed surface with visible fleece pile
+- The crew-neck collar (NO hood, NO zipper) is the defining shape element

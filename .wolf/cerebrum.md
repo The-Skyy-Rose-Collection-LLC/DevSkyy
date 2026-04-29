@@ -60,8 +60,39 @@
 
 - **2026-04-27** — `memory-audit.py` had a path-shadowing bug: `build_path_index()` walked into `.claude/worktrees/` (stale Claude Code worktree snapshots), letting deleted files like `pipelines/skyyrose_master_orchestrator.py` resolve via worktree copies and pass the audit. **Rule:** any whole-tree indexer for staleness detection MUST exclude isolation/snapshot directories — `.claude/worktrees/`, `.git/worktrees/`, `.archive/`, anything that holds historical complete trees. Pruning at walk time (in `INDEX_SKIP_DIRS`) is preferable to filtering at resolve time. Fixed by adding `worktrees` to `INDEX_SKIP_DIRS`. Separate latent bug noted in same module: `LINECOUNT_RE.search(line)` returns first match only, applies one count to all paths on multi-claim lines (e.g., MEMORY.md line 108) — needs `findall` per-path-claim binding.
 
+- **2026-04-28** — Three CRITICAL broken asset references survived in production for an unknown duration: `footer.php` pointed to `assets/images/sr-monogram.png`; `seo.php` pointed to `sr-monogram-hero.png` and `sr-monogram-favicon.png` — all non-existent. Root cause: `assets/branding/` directory was organized at some point but PHP reference strings were never updated to match. The broken refs silently 404'd on every page (footer image + every social OG card + site favicon). **Rule:** after any asset reorganization that moves files to a new directory, immediately grep the entire theme for the old path segment and update all references in one atomic commit. The pattern `grep -r "assets/images/sr-monogram" --include="*.php"` would have caught all three in 1 second. Moving files without moving their references is the most silent class of breakage in WP themes because WordPress silently returns the broken template — no 500, no PHP error, just invisible missing elements.
+
 ## Decision Log
 
 <!-- Significant technical decisions with rationale. Why X was chosen over Y. -->
 - [2026-04-15] Chose `sdk/python/agent_sdk/` as SDK source of truth over root `agent_sdk/` — root copy had stale brand data ("Where Love Meets Luxury" tagline, missing EliteStudio integration). All internal imports converted to relative to make the package location-independent.
 - [2026-04-16] Compositor pipeline (`skyyrose/elite_studio/agents/compositor_agent.py`) commercial retrofit — chose **instrument-first** (read-only per-stage telemetry via `elite_studio/telemetry.py` → `logs/compositor-telemetry-YYYY-MM-DD.jsonl`) over proposed schema/breaker/cache refactor. **Why:** 40% token-reduction and 3-retry breaker claims are estimates until we have baseline unit economics. Two weeks of telemetry converts the retrofit from "optimization theatre" into a defensible CFO-grade business case. **Trade-off:** zero behavior change ships slower than a full refactor, but eliminates the risk of breaking the revenue-critical drop pipeline on speculative gains. Retrofit waves 2–4 (schema pinning, `forward_qa_verdict`, idempotent content-hash cache, per-stage circuit breaker) gated on telemetry data. [cmem #533]
+
+## Project Conventions (updated 2026-04-27)
+
+### AGENTS.md — Component-Scoped Agent Guides
+
+- **Pattern**: Each major component directory now has an `AGENTS.md` (NOT `CLAUDE.md`) that agents read first before working in that directory.
+- **Why**: Keeps the global CLAUDE.md uncluttered; gives each specialized agent a focused workspace brief with explicit permissions and safeguards.
+- **AGENTS.md locations**:
+  - `wordpress-theme/skyyrose-flagship/inc/AGENTS.md` — PHP modules, enqueue, SEO, WC hooks
+  - `wordpress-theme/skyyrose-flagship/template-parts/AGENTS.md` — PHP partials
+  - `wordpress-theme/skyyrose-flagship/assets/css/AGENTS.md` — CSS token system, collection styles
+  - `wordpress-theme/skyyrose-flagship/assets/js/AGENTS.md` — Vanilla JS (nav, holo, toast, etc.)
+  - `wordpress-theme/skyyrose-flagship/assets/js/experiences/AGENTS.md` — Three.js immersive worlds
+  - `frontend/app/AGENTS.md` — Next.js App Router pages
+  - `frontend/components/AGENTS.md` — React components (shadcn/ui, Tailwind)
+  - `frontend/lib/AGENTS.md` — TypeScript types, API clients, config
+- **Structure every AGENTS.md must have**: Isolated Workspace → Infrastructure → File/Module Map → Permissions → Safeguards → Mandatory Quality Workflow (lint → /simplify → /verification-loop) → Do NOT list
+
+### Infrastructure (2026-04-27 confirmed)
+
+- `skyyrose.co` = WordPress.com Business plan — no wp-cli, SFTP deploy only (script or SSH), no direct DB
+- `devskyy.app` = Vercel, Next.js 16, React 19, npm (NOT pnpm)
+- These are two fully independent systems — no shared auth, sessions, or database
+
+### Deploy Options (WordPress theme)
+
+- Script: `bash scripts/deploy-theme.sh` (atomic hot-swap, microsecond swap window)
+- SSH: `sftp sftp.wp.com` (manual file upload)
+- Both require explicit user confirmation before execution

@@ -392,3 +392,10 @@ htmlcov/
 
 # Vendored 3D model repo (Microsoft TRELLIS.2 — Linux+CUDA only, do not commit)
 /TRELLIS.2/
+
+# Pipeline quarantine and design QC captures (large binaries, regenerable)
+renders/quarantine/
+.wolf/designqc-captures/
+
+# Binary 3D proof-of-concept assets in planning handoffs
+.planning/handoffs/*.glb

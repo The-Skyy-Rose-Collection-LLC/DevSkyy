@@ -1,0 +1,13 @@
+# Stage 1 Base Render Prompt — BLACK Rose Hoodie — Signature Edition
+# SKU: br-005 | Collection: Black Rose
+# Generated: 2026-04-26
+
+PROMPT:
+Hyper-realistic studio product render of a pullover hoodie — NOT a zip-up, NOT a crewneck, NOT a jacket — placed flat or on an invisible mannequin, front view centered on pure white background. The garment is solid jet-black lightweight polyester-blend fabric throughout the body, hood, sleeves, and tonal black ribbed cuffs and waistband — overall construction is tonal black with one distinguishing detail: bright WHITE flat drawstrings visible at the hood tunnel opening. The hood panels flat across the shoulder yoke. A kangaroo-style front pouch pocket spans the lower front body. The fabric is lightweight polyester/jogger-feel — smoother and less bulky than heavyweight cotton fleece, with a slight sheen and tighter surface texture compared to traditional fleece. Professional e-commerce lighting, soft diffused key light from front-left, minimal shadow beneath hem, tack-sharp focus from hood crown to waistband, 8K commercial apparel photography quality.
+
+NOTES:
+- The WHITE drawstrings are the single contrast-color element distinguishing this from the br-004 BLACK Rose Hoodie (which has tonal black drawstrings) — render them clearly against the black hood
+- Fabric is LIGHTWEIGHT polyester/jogger-feel — NOT heavyweight cotton-fleece; the silhouette should hang with slightly less bulk than a traditional fleece hoodie
+- Do NOT render any embroidery, logos, or printed graphics — all decoration is Stage 3
+- The kangaroo front pocket opening is a structural seam element — render it as a clean horizontal pocket mouth across the lower body
+- All other trim (cuffs, waistband, hood binding) is tonal black — no other contrast color besides the white drawstrings
