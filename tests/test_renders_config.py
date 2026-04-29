@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 
-
 def test_renders_config_imports_without_error() -> None:
     """renders/config.py must import cleanly (PRODUCT_CATALOG built at import time)."""
     import renders.config as cfg  # noqa: F401
@@ -17,12 +16,17 @@ def test_renders_config_imports_without_error() -> None:
 
 def test_product_catalog_is_a_list_of_dicts() -> None:
     from renders.config import PRODUCT_CATALOG
+    from skyyrose.core.catalog_loader import read_catalog_rows
 
     assert isinstance(PRODUCT_CATALOG, list)
     # Skip length assertion in environments without data/product-bundles/
     # (e.g. stripped CI clones). _build_product_catalog() returns [] there by design.
     if PRODUCT_CATALOG:
-        assert len(PRODUCT_CATALOG) == 30, f"expected 30 canonical SKUs, got {len(PRODUCT_CATALOG)}"
+        expected = len(read_catalog_rows())
+        assert len(PRODUCT_CATALOG) == expected, (
+            f"renders.config.PRODUCT_CATALOG ({len(PRODUCT_CATALOG)}) out of sync "
+            f"with catalog CSV ({expected})"
+        )
         assert all(isinstance(p, dict) for p in PRODUCT_CATALOG)
         assert all("sku" in p for p in PRODUCT_CATALOG)
 
