@@ -48,13 +48,27 @@ def _blocking_regions(audit: VisionAuditResult) -> list[str]:
     Low-severity is the auditor's "uncertain" tier and frequently
     false-positives on universal elements (e.g. woven size label).
     Feeding those to the mask would inpaint correct areas needlessly.
+
+    Gemini is instructed (via _build_audit_prompt SCHEMA RULES) to emit one
+    entry per region. The split below is a defensive fallback for non-compliant
+    responses — do not remove.
     """
     seen: set[str] = set()
     regions: list[str] = []
     for v in audit.violations:
-        if v.severity in ("medium", "high") and v.region not in seen:
-            seen.add(v.region)
-            regions.append(v.region)
+        if not v.is_blocking:
+            continue
+        parts = v.region.split(",")
+        if len(parts) > 1:
+            logger.warning(
+                "audit returned compound region %r — model ignored SCHEMA RULES; splitting defensively",
+                v.region,
+            )
+        for part in parts:
+            region = part.strip()
+            if region and region not in seen:
+                seen.add(region)
+                regions.append(region)
     return regions
 
 

@@ -154,7 +154,11 @@ wordpress-theme/skyyrose-flagship/
 
 ## Development Protocol
 
-1. **Context7** → `resolve-library-id` → `query-docs` BEFORE any library code
+**MANDATORY — EVERY TASK:** Before writing ANY code that touches an external library or API:
+→ `Context7: resolve-library-id` → `Context7: query-docs` → verify signatures → THEN code.
+No exceptions. This applies to google-genai, httpx, Pydantic, LangGraph, FastAPI, WooCommerce REST, and every non-stdlib library. Skipping costs more tokens fixing wrong usage than the lookup saves.
+
+1. **Context7 first** (see above — non-negotiable on every task)
 2. Read existing code first, then `Edit` (targeted) or `Write` (new files only)
 3. TDD: RED → GREEN → IMPROVE
 4. `pytest -v` after EVERY change — target 85%+ coverage
