@@ -109,7 +109,6 @@ async def render(
 
     name_slug = _name_slug(dossier.get("name", sku))
     resolved_out_dir = Path(out_dir) if out_dir else DEFAULT_OUT_DIR / name_slug
-    resolved_out_dir.mkdir(parents=True, exist_ok=True)
 
     client = fal_client or FalClient()
     tracker = cost_tracker or CostTracker()
@@ -140,7 +139,7 @@ async def render(
 
         # ── Stage 1.5: AuditFilter — accept Stage 1 or collect violations ──
         logger.info("stage1.5 start: sku=%s view=%s", sku, view)
-        stage1_audit = AuditFilter().check(base.output_path, dossier, view)
+        stage1_audit = await asyncio.to_thread(AuditFilter().check, base.output_path, dossier, view)
         if stage1_audit.passed:
             logger.info(
                 "stage1.5 PASS: sku=%s view=%s — Stage 1 accepted, 0 FLUX Fill calls",
@@ -214,7 +213,7 @@ async def render(
                     break
 
                 # Build violation feedback list for the next attempt.
-                blocking = [v for v in audit_result.violations if v.severity in ("medium", "high")]
+                blocking = [v for v in audit_result.violations if v.is_blocking]
                 prior_violations = [
                     {"element": v.element, "region": v.region, "severity": v.severity}
                     for v in blocking
