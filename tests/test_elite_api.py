@@ -61,7 +61,7 @@ def _make_result(
 class TestProduce:
     def test_enqueue_success(self, client):
         with (
-            patch("api.v1.elite_studio.enqueue_produce", return_value="elite:br-001:abcd1234"),
+            patch("api.v1.elite_studio.aenqueue_produce", return_value="elite:br-001:abcd1234"),
             patch.dict("os.environ", {"API_KEY": ""}, clear=False),
         ):
             resp = client.post(
@@ -94,7 +94,7 @@ class TestProduce:
     def test_enqueue_redis_failure_returns_503(self, client):
         with (
             patch(
-                "api.v1.elite_studio.enqueue_produce",
+                "api.v1.elite_studio.aenqueue_produce",
                 side_effect=ConnectionError("Redis down"),
             ),
             patch.dict("os.environ", {"API_KEY": ""}, clear=False),
@@ -116,7 +116,7 @@ class TestProduce:
 
     def test_api_key_accepted(self, client):
         with (
-            patch("api.v1.elite_studio.enqueue_produce", return_value="elite:br-001:zz"),
+            patch("api.v1.elite_studio.aenqueue_produce", return_value="elite:br-001:zz"),
             patch.dict("os.environ", {"API_KEY": "secret123"}, clear=False),
         ):
             resp = client.post(
@@ -136,7 +136,7 @@ class TestProduceBatch:
     def test_batch_enqueue(self, client):
         job_ids = ["elite:br-001:aa", "elite:br-002:bb"]
         with (
-            patch("api.v1.elite_studio.enqueue_batch", return_value=job_ids),
+            patch("api.v1.elite_studio.aenqueue_batch", return_value=job_ids),
             patch.dict("os.environ", {"API_KEY": ""}, clear=False),
         ):
             resp = client.post(

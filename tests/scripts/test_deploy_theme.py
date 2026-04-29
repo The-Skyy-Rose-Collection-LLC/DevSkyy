@@ -172,10 +172,11 @@ class TestCommandOrdering:
     """Test 5: In dry-run output, activate before transfer, deactivate after."""
 
     def test_maintenance_activates_before_file_transfer(self, fake_env):
-        """Maintenance mode must activate before files are transferred."""
+        """Maintenance mode must activate before files are transferred (--with-maintenance path)."""
         tmp_path, env_file, theme_dir = fake_env
         result = run_script(
             "--dry-run",
+            "--with-maintenance",
             env_overrides={
                 "ENV_FILE": str(env_file),
                 "THEME_DIR_OVERRIDE": str(theme_dir),
@@ -201,14 +202,15 @@ class TestCommandOrdering:
         assert activate_pos != -1, "activate not found in output"
         assert transfer_pos != -1, "transfer not found in output"
         # Deploy script activates maintenance BEFORE transferring files
-        assert (
-            activate_pos < transfer_pos
-        ), "maintenance-mode activate must appear before file transfer"
+        assert activate_pos < transfer_pos, (
+            "maintenance-mode activate must appear before file transfer"
+        )
 
     def test_deactivate_after_transfer(self, fake_env):
         tmp_path, env_file, theme_dir = fake_env
         result = run_script(
             "--dry-run",
+            "--with-maintenance",
             env_overrides={
                 "ENV_FILE": str(env_file),
                 "THEME_DIR_OVERRIDE": str(theme_dir),

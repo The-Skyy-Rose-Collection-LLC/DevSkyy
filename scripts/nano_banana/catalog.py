@@ -17,7 +17,9 @@ PRODUCTS_DIR = (
     PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
 )
 SOURCE_DIR = PROJECT_ROOT / "skyyrose" / "assets" / "images" / "source-products"
-CATALOG_CSV = PROJECT_ROOT / "data" / "product-catalog.csv"
+CATALOG_CSV = (
+    PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "skyyrose-catalog.csv"
+)
 SPECS_JSON = PROJECT_ROOT / "data" / "product-specs.json"
 
 
@@ -31,7 +33,7 @@ def load_catalog() -> dict[str, dict]:
                 continue
             entry: dict = {
                 "name": row["name"].strip(),
-                "collection": row["collection_slug"].strip(),
+                "collection": row["collection"].strip(),
                 "is_preorder": row["is_preorder"].strip() == "1",
                 "output_slug": row["render_output_slug"].strip() or sku,
                 "is_tech_flat": row["render_is_tech_flat"].strip() == "1",
@@ -41,8 +43,6 @@ def load_catalog() -> dict[str, dict]:
                 entry["source_override"] = row["render_source_override"].strip()
             if row["render_back_source_override"].strip():
                 entry["back_source_override"] = row["render_back_source_override"].strip()
-            if row["render_variant_of"].strip():
-                entry["variant_of"] = row["render_variant_of"].strip()
             catalog[sku] = entry
     return catalog
 
