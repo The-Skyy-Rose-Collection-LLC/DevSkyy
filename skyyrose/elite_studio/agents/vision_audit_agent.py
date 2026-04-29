@@ -31,6 +31,8 @@ from ..gemini_rest import analyze_vision as gemini_analyze_vision
 
 logger = logging.getLogger(__name__)
 
+_VALID_SEVERITIES: frozenset[str] = frozenset({"low", "medium", "high"})
+
 
 @dataclass
 class VisionAuditViolation:
@@ -217,15 +219,21 @@ class VisionAuditAgent:
                 model=self.model,
             )
 
-        violations = [
-            VisionAuditViolation(
-                element=str(v.get("element", "")),
-                region=str(v.get("region", "")),
-                severity=str(v.get("severity", "")).lower(),
+        violations = []
+        for v in parsed.get("violations", []):
+            if not isinstance(v, dict):
+                continue
+            severity = str(v.get("severity", "")).lower()
+            if severity not in _VALID_SEVERITIES:
+                logger.warning("audit returned unknown severity %r — coercing to 'high'", severity)
+                severity = "high"
+            violations.append(
+                VisionAuditViolation(
+                    element=str(v.get("element", "")),
+                    region=str(v.get("region", "")),
+                    severity=severity,
+                )
             )
-            for v in parsed.get("violations", [])
-            if isinstance(v, dict)
-        ]
         return VisionAuditResult(
             matches_dossier=bool(parsed.get("matches_dossier", False)),
             violations=violations,
