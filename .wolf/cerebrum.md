@@ -96,3 +96,14 @@
 - Script: `bash scripts/deploy-theme.sh` (atomic hot-swap, microsecond swap window)
 - SSH: `sftp sftp.wp.com` (manual file upload)
 - Both require explicit user confirmation before execution
+
+### Context7-First Coding Protocol (added 2026-04-29)
+Before writing or modifying ANY code that touches an external library, SDK, or API:
+1. `mcp__claude_ai_Context7__resolve-library-id` → get the library ID
+2. `mcp__claude_ai_Context7__query-docs` → pull the relevant section
+3. Verify the method signatures, model IDs, and parameters against live docs
+4. THEN write the code
+
+This applies to: google-genai / Gemini SDK, FLUX API clients, httpx, Pydantic, LangGraph, any library not in stdlib.
+Goal: eliminate fix cycles caused by outdated or assumed API knowledge — spend tokens on features, not corrections.
+- **2026-04-29** — Wrote code changes to `audit_filter.py` and `vision_audit_agent.py` WITHOUT first running Context7 to verify the Gemini REST API pattern. The fixes themselves were correct (pure string logic), but the workflow was wrong. **Rule: Context7 `resolve` + `query-docs` is MANDATORY before every task that touches any external library — not just pipeline/workflow tasks. Every task. No exceptions.**
