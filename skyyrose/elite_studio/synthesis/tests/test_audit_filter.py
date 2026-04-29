@@ -130,6 +130,7 @@ def test_check_excludes_low_severity_violations():
     )
     af = _make_filter(audit)
     result = af.check("stage1.png", _DOSSIER, "front")
+    assert result.passed is True
     assert result.violation_regions == []
     assert result.needs_inpaint is False
 
@@ -207,6 +208,7 @@ def test_check_excludes_low_severity_compound_region_entirely():
     )
     af = _make_filter(audit)
     result = af.check("stage1.png", _DOSSIER, "front")
+    assert result.passed is True
     assert result.violation_regions == []
     assert result.needs_inpaint is False
 
