@@ -159,6 +159,52 @@ def test_check_collects_multiple_distinct_regions():
     assert set(result.violation_regions) == {"front-chest", "back-yoke"}
 
 
+# ── _blocking_regions — compound region (comma-split) ───────────────────────
+
+
+def test_check_splits_compound_region_into_two_regions():
+    audit = VisionAuditResult(
+        matches_dossier=False,
+        violations=[
+            VisionAuditViolation(element="patch", region="left-cuff, right-cuff", severity="high"),
+        ],
+    )
+    af = _make_filter(audit)
+    result = af.check("stage1.png", _DOSSIER, "front")
+    assert result.violation_regions == ["left-cuff", "right-cuff"]
+
+
+def test_check_deduplicates_across_compound_and_plain_region():
+    audit = VisionAuditResult(
+        matches_dossier=False,
+        violations=[
+            VisionAuditViolation(
+                element="patch-a", region="left-cuff, right-cuff", severity="high"
+            ),
+            VisionAuditViolation(element="patch-b", region="left-cuff", severity="medium"),
+        ],
+    )
+    af = _make_filter(audit)
+    result = af.check("stage1.png", _DOSSIER, "front")
+    assert result.violation_regions.count("left-cuff") == 1
+    assert "right-cuff" in result.violation_regions
+
+
+def test_check_excludes_low_severity_compound_region_entirely():
+    audit = VisionAuditResult(
+        matches_dossier=False,
+        violations=[
+            VisionAuditViolation(
+                element="size-tag", region="left-cuff, right-cuff", severity="low"
+            ),
+        ],
+    )
+    af = _make_filter(audit)
+    result = af.check("stage1.png", _DOSSIER, "front")
+    assert result.violation_regions == []
+    assert result.needs_inpaint is False
+
+
 # ── AuditFilter.check() — error branch ──────────────────────────────────────
 
 
