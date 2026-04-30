@@ -17,7 +17,7 @@ The brain of DevSkyy. Six SuperAgents handle the major domains, each consolidati
 
 ## SkyyRose-specific agents
 
-- `skyyrose_content_agent.py`, `skyyrose_imagery_agent.py`, `skyyrose_product_agent.py`, `skyyrose_spaces_orchestrator.py`
+- `skyyrose_content_agent.py`, `skyyrose_imagery_agent.py`, `skyyrose_spaces_orchestrator.py`
 - `fashn_agent.py` — FASHN virtual try-on (gated by `/preflight`)
 - `tripo_agent.py`, `meshy_agent.py` — 3D model generation
 - `asset_tagging_agent.py`, `collection_content_agent.py` — collection/SKU work

@@ -53,14 +53,14 @@ class SDKCatalogManagerAgent(SDKSubAgent):
             "- Black Rose: br-001 through br-012 (15 products, including 3 "
             "br-003 colorway variants: br-003-giants, br-003-oakland, br-003-white)\n"
             "- Love Hurts: lh-002 through lh-005 (4 products, lh-001 DELETED)\n"
-            "- Signature: sg-001 through sg-015 (13 products, sg-008 and sg-010 DELETED)\n"
+            "- Signature: sg-001 through sg-015 (12 products, sg-004, sg-008 and sg-010 DELETED)\n"
             "- Kids Capsule: kids-001, kids-002 (2 products)\n\n"
             "Rules:\n"
             "- NEVER fabricate SKU IDs or product names\n"
             "- NEVER guess prices — read from source\n"
             "- Always cross-reference catalog before reporting\n"
             "- Pre-order status is authoritative from the catalog\n"
-            "- 34 total products across 4 collections"
+            "- 33 total products across 4 collections"
         )
 
 

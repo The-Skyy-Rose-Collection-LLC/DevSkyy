@@ -8,6 +8,7 @@ Exposes DevSkyy capabilities to MCP clients (Claude.ai, Claude Code, other MCP-a
 - `catalog_generator.py` — generates catalog data for external consumption
 - `openai_server.py` — OpenAI-compatible bridge (function-calling clients)
 - `rag_server.py` — RAG retrieval over the brand corpus
+- `woocommerce_mcp.py` — WooCommerce REST bridge (products, orders, inventory)
 - `orchestrator.py` — meta-server that manages the others
 - `process_manager.py`, `server_manager.py` — runtime lifecycle (start/stop/health)
 - `playwright_client.py`, `serena_client.py`, `context7_client.py` — clients to other MCP servers we consume
