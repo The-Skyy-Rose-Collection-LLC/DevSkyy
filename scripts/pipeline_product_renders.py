@@ -1,33 +1,48 @@
 #!/usr/bin/env python3
-"""Gated render pipeline — generate, score, keep, or retry.
+"""PIPELINE 1: Product Card & Gallery Renders.
 
-End-to-end production loop for SKUs that don't have ship-ready renders:
+This is the product-photography pipeline only. Output is clean garment
+shots (front, back, accessory hero) that go into product cards and
+gallery views on the storefront. NO models, NO scenes, NO brand voice
+copy in the rendered image — that's Pipeline 2's job.
 
-  1. Build a 3-block prompt via render_prompt_builder
-       (GARMENT block = CLIP-friendly, scored)
-       (SCENE block   = collection brand voice, sent to generator)
-       (FIDELITY block= instruction directives)
-  2. Call nano-banana to generate the render            [PAID, gated by --execute]
-  3. Score the render through render_quality (DINOv2 centroid + alignment)
-  4. If SHIP: write to output, log keeper
-     If REVIEW: write to review_dir, log for human
-     If KILL: retry up to N times with garment-block variants
+Inputs:
+  - Catalog SKU (read from skyyrose-catalog.csv)
+  - Source product photo (tech-flat or real product shot)
+
+Outputs:
+  - renders/gated/<sku>/<sku>-<view>-attemptN.png
+  - tasks/gated-render-log.json (audit trail)
+
+Quality gate:
+  - DINOv2 brand-style centroid (image-vs-centroid cosine)
+  - CLIP text-image alignment vs the GARMENT prompt block
+  - Resolution sanity check (>=512px on each axis)
+
+Three-block prompt structure (see render_prompt_builder):
+  GARMENT block  = CLIP-friendly garment description (the SCORING surface)
+  SCENE block    = neutral studio / clean product photography backdrop
+  FIDELITY block = instruction directives (copy reference exactly)
+
+For the lifestyle / editorial / model / Oakland-scene pipeline
+see Pipeline 2: skyyrose/elite_studio/agents/compositor_agent.py
+For the brand copy / marketing text pipeline
+see Pipeline 3: TBD (currently scattered across orchestration/brand_*.py)
 
 Cost-safe defaults:
-  - --dry-run prints the prompts and which existing renders would be picked
-    by the gate WITHOUT calling any paid API
+  - dry-run shows the prompts + cost manifest WITHOUT calling paid APIs
   - --execute is required to actually call nano-banana; prints a STOP
     confirmation showing per-SKU and total estimated cost
 
 Usage:
     # SAFE: see what would happen, no money spent
-    python3 scripts/gated_render_pipeline.py --skus br-002,br-004,sg-013
+    python3 scripts/pipeline_product_renders.py --skus br-002,br-004,sg-013
 
     # GENERATE (requires explicit cost confirmation)
-    python3 scripts/gated_render_pipeline.py --skus br-002 --execute --max-retries 2
+    python3 scripts/pipeline_product_renders.py --skus br-002 --execute --max-retries 2
 
     # Use the SHIP list from the existing renders report — only retry the gaps
-    python3 scripts/gated_render_pipeline.py --target-needs-regen
+    python3 scripts/pipeline_product_renders.py --target-needs-regen
 """
 
 from __future__ import annotations

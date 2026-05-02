@@ -1,17 +1,16 @@
-"""CLIP-friendly render prompt builder.
+"""CLIP-friendly render prompt builder for PIPELINE 1 (product cards / gallery).
 
-Built from the audit findings (tasks/prompt-audit-report.md, 2026-05-01):
-production prompts score 24% lower CLIP alignment than minimal baselines.
-The brand language (Oakland industrial, "luxury grows from concrete," etc.)
-is environmental — it goes in the SCENE block, not the GARMENT block.
+Pipeline 1 produces clean product photography — no models, no Oakland
+scenes, no editorial storytelling. Just the garment, well-lit, on a
+studio backdrop, optionally with a per-collection accent tint.
 
-This module produces three-block prompts that survive both:
-  1. Gemini/FLUX faithfulness (long prompts work fine here)
-  2. CLIP alignment scoring (the GARMENT block is short + concrete)
+For Pipeline 2 (lifestyle / editorial / model in scene), see the
+compositor agent which uses richer brand-voice scenes.
 
 Schema:
   GARMENT:  short, CLIP-grounded description of the actual product
-  SCENE:    environmental + lighting + brand storytelling
+            (the SCORING surface — what evaluate_render compares against)
+  SCENE:    neutral studio backdrop with collection accent lighting
   FIDELITY: instruction-following directives (copy reference exactly)
 
 The CLIP scorer scores the GARMENT block alone against the rendered
@@ -25,27 +24,29 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-# Per-collection scene templates. Keep these poetic — they only affect
-# generation, not CLIP scoring.
+# Per-collection scene templates for PRODUCT CARDS (Pipeline 1).
+# Neutral studio backdrop with one collection-accent lighting cue.
+# The garment is the only subject; nothing else competes for attention.
 _SCENE_TEMPLATES: dict[str, str] = {
     "black-rose": (
-        "SCENE: Oakland industrial — concrete walls, steel beams, raw textures. "
-        "Night. Silver-toned spotlights carve the subject from darkness. "
-        "Hard chiaroscuro, deep shadows, silver tones only."
+        "SCENE: Studio product photography. Deep matte black backdrop. "
+        "Silver key light upper-left, soft fill, thin rim light along the edge. "
+        "Garment fills 70% of frame. No model, no props, no scene elements."
     ),
     "love-hurts": (
-        "SCENE: Raw emotional space — cracked concrete, weathered brick, "
-        "crimson neon glow. Warm dramatic lighting from one side, hard shadows "
-        "on the other. Vulnerability as strength."
+        "SCENE: Studio product photography. Deep charcoal backdrop with subtle "
+        "crimson rim accent. Soft key light from above, controlled shadows. "
+        "Garment fills 70% of frame. No model, no props."
     ),
     "signature": (
-        "SCENE: Oakland golden hour — soft city skyline background, warm pavement, "
-        "late afternoon sun. Rich amber key light, soft gold tones. "
-        "Understated, elevated."
+        "SCENE: Studio product photography. Warm neutral backdrop. "
+        "Soft golden key light upper-left, subtle gold rim accent. "
+        "Garment fills 70% of frame. No model, no props."
     ),
     "kids-capsule": (
-        "SCENE: Clean Oakland street — mural wall or playground with premium feel. "
-        "Bright cinematic light. Real streetwear scaled down, not dumbed down."
+        "SCENE: Studio product photography. Clean white backdrop. "
+        "Even soft lighting, no harsh shadows. Garment fills 70% of frame. "
+        "No model, no props."
     ),
 }
 

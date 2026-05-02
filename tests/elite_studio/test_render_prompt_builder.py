@@ -50,7 +50,9 @@ def test_build_render_prompt_returns_three_blocks() -> None:
     rp = build_render_prompt(p)
     assert isinstance(rp, RenderPrompt)
     assert rp.garment
-    assert "Oakland industrial" in rp.scene
+    # Pipeline 1 scenes are studio product photography, not Oakland editorial.
+    assert "studio" in rp.scene.lower()
+    assert "no model, no props" in rp.scene.lower()
     assert "FIDELITY" in rp.fidelity
     assert rp.view == "front"
 
@@ -64,11 +66,18 @@ def test_full_prompt_includes_all_three_blocks() -> None:
 
 
 def test_collection_drives_scene_choice() -> None:
+    """Each collection has its own accent lighting on the same neutral studio."""
     sig = build_render_prompt({"name": "Foo", "collection": "signature"})
     br = build_render_prompt({"name": "Foo", "collection": "black-rose"})
-    assert "golden hour" in sig.scene.lower()
-    assert "industrial" in br.scene.lower()
-    assert sig.scene != br.scene
+    lh = build_render_prompt({"name": "Foo", "collection": "love-hurts"})
+    kids = build_render_prompt({"name": "Foo", "collection": "kids-capsule"})
+    # All four are unique.
+    assert len({sig.scene, br.scene, lh.scene, kids.scene}) == 4
+    # Each carries its accent cue.
+    assert "gold" in sig.scene.lower()
+    assert "silver" in br.scene.lower()
+    assert "crimson" in lh.scene.lower()
+    assert "white" in kids.scene.lower()
 
 
 def test_to_dict_serializes() -> None:
