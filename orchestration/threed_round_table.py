@@ -291,7 +291,15 @@ class GenerationType(StrEnum):
 
 @dataclass(slots=True)
 class ThreeDQualityScores:
-    """Quality scoring breakdown for a 3D model. Memory-optimized."""
+    """Quality scoring breakdown for a 3D model. Memory-optimized.
+
+    The original 6 metrics are weighted at 0.80 (proportionally rebalanced
+    from their previous 1.00) to make room for ``clip_alignment_score``
+    (a 0..1 CLIP cosine similarity between the prompt and a render of the
+    mesh) at weight 0.20. A model with all old metrics at 100 and full
+    alignment (1.0) still totals 100; a model that's geometrically perfect
+    but ignores the prompt now caps at 80.
+    """
 
     geometry_quality: float = 0.0
     texture_quality: float = 0.0
@@ -299,18 +307,22 @@ class ThreeDQualityScores:
     file_format_score: float = 0.0
     generation_speed: float = 0.0
     web_readiness: float = 0.0
+    clip_alignment_score: float = 0.0  # 0..1 CLIP prompt-to-render similarity
     enhancement_bonus: float = 0.0  # Bonus for quality enhancement
 
     @property
     def total(self) -> float:
         """Weighted total score (0-100)."""
+        # Original weights * 0.80 leave 0.20 for clip alignment.
+        # Sum: 0.24 + 0.20 + 0.12 + 0.08 + 0.08 + 0.08 + 0.20 = 1.00
         base_score = (
-            self.geometry_quality * 0.30
-            + self.texture_quality * 0.25
-            + self.polycount_efficiency * 0.15
-            + self.file_format_score * 0.10
-            + self.generation_speed * 0.10
-            + self.web_readiness * 0.10
+            self.geometry_quality * 0.24
+            + self.texture_quality * 0.20
+            + self.polycount_efficiency * 0.12
+            + self.file_format_score * 0.08
+            + self.generation_speed * 0.08
+            + self.web_readiness * 0.08
+            + self.clip_alignment_score * 100.0 * 0.20  # 0..1 -> 0..100, weighted 0.20
         )
         return min(base_score + self.enhancement_bonus, 100.0)
 
@@ -323,6 +335,7 @@ class ThreeDQualityScores:
             "file_format_score": self.file_format_score,
             "generation_speed": self.generation_speed,
             "web_readiness": self.web_readiness,
+            "clip_alignment_score": self.clip_alignment_score,
             "enhancement_bonus": self.enhancement_bonus,
             "total": self.total,
         }
