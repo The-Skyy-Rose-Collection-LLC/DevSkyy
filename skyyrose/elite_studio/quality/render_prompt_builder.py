@@ -121,6 +121,28 @@ def _infer_color(name: str) -> str:
     return ""
 
 
+def _splice_color(garment_phrase: str, color: str) -> str:
+    """Insert color in the right place: 'a hoodie' + 'black' -> 'a black hoodie'.
+
+    Handles:
+      'a hoodie'         + 'black' -> 'a black hoodie'
+      'an eye mask'      + 'red'   -> 'a red eye mask'   (article re-articled)
+      'athletic joggers' + 'black' -> 'black athletic joggers'   (no article)
+      'a hoodie'         + ''      -> 'a hoodie'
+    """
+    if not color:
+        return garment_phrase
+    parts = garment_phrase.split(" ", 1)
+    if not parts:
+        return garment_phrase
+    first = parts[0].lower()
+    rest = parts[1] if len(parts) > 1 else ""
+    if first in ("a", "an"):
+        # English: "a" before consonant, "an" before vowel — color words start with consonants here.
+        return f"a {color} {rest}".strip()
+    return f"{color} {garment_phrase}"
+
+
 def build_garment_block(product: dict, view: str) -> str:
     """Compact, CLIP-friendly garment description for one product.
 
@@ -133,14 +155,14 @@ def build_garment_block(product: dict, view: str) -> str:
     is_accessory = bool(product.get("is_accessory"))
     garment_type = _infer_garment_type(name)
     color = _infer_color(name)
+    phrase = _splice_color(garment_type, color)
 
     if is_accessory:
-        return f"{garment_type} on a flat surface"
+        return f"{phrase} on a flat surface"
 
-    color_phrase = f"{color} " if color else ""
     if view == "back":
-        return f"back view of {color_phrase}{garment_type} on a model"
-    return f"front view of {color_phrase}{garment_type} on a model"
+        return f"back view of {phrase} on a model"
+    return f"front view of {phrase} on a model"
 
 
 def build_render_prompt(product: dict, view: str = "front") -> RenderPrompt:
