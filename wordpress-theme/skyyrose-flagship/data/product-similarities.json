@@ -1,0 +1,2248 @@
+{
+  "version": "1.0",
+  "model": "openai/clip-vit-base-patch32",
+  "top_n": 8,
+  "n_products": 33,
+  "products": {
+    "br-001": {
+      "name": "BLACK Rose Crewneck",
+      "collection": "black-rose",
+      "global": [
+        {
+          "sku": "br-004",
+          "score": 0.8384
+        },
+        {
+          "sku": "br-006",
+          "score": 0.8338
+        },
+        {
+          "sku": "br-005",
+          "score": 0.833
+        },
+        {
+          "sku": "sg-005",
+          "score": 0.8155
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.8096
+        },
+        {
+          "sku": "sg-002",
+          "score": 0.8071
+        },
+        {
+          "sku": "lh-004",
+          "score": 0.8027
+        },
+        {
+          "sku": "br-002",
+          "score": 0.7998
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "br-004",
+          "score": 0.8384
+        },
+        {
+          "sku": "br-006",
+          "score": 0.8338
+        },
+        {
+          "sku": "br-005",
+          "score": 0.833
+        },
+        {
+          "sku": "br-002",
+          "score": 0.7998
+        },
+        {
+          "sku": "br-012",
+          "score": 0.7649
+        },
+        {
+          "sku": "br-011",
+          "score": 0.7383
+        },
+        {
+          "sku": "br-009",
+          "score": 0.7322
+        },
+        {
+          "sku": "br-003",
+          "score": 0.7294
+        }
+      ]
+    },
+    "br-002": {
+      "name": "BLACK Rose Joggers",
+      "collection": "black-rose",
+      "global": [
+        {
+          "sku": "lh-002",
+          "score": 0.902
+        },
+        {
+          "sku": "br-006",
+          "score": 0.8513
+        },
+        {
+          "sku": "kids-001",
+          "score": 0.8317
+        },
+        {
+          "sku": "br-005",
+          "score": 0.8306
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.8268
+        },
+        {
+          "sku": "lh-003",
+          "score": 0.8151
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.8094
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7998
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "br-006",
+          "score": 0.8513
+        },
+        {
+          "sku": "br-005",
+          "score": 0.8306
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7998
+        },
+        {
+          "sku": "br-004",
+          "score": 0.795
+        },
+        {
+          "sku": "br-012",
+          "score": 0.7131
+        },
+        {
+          "sku": "br-007",
+          "score": 0.6936
+        },
+        {
+          "sku": "br-003",
+          "score": 0.6842
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 0.6842
+        }
+      ]
+    },
+    "br-003": {
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic",
+      "collection": "black-rose",
+      "global": [
+        {
+          "sku": "br-003-white",
+          "score": 1.0
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 1.0
+        },
+        {
+          "sku": "br-003-oakland",
+          "score": 1.0
+        },
+        {
+          "sku": "br-012",
+          "score": 0.8292
+        },
+        {
+          "sku": "br-009",
+          "score": 0.7657
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7294
+        },
+        {
+          "sku": "br-008",
+          "score": 0.708
+        },
+        {
+          "sku": "br-005",
+          "score": 0.6936
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "br-003-giants",
+          "score": 1.0
+        },
+        {
+          "sku": "br-003-oakland",
+          "score": 1.0
+        },
+        {
+          "sku": "br-003-white",
+          "score": 1.0
+        },
+        {
+          "sku": "br-012",
+          "score": 0.8292
+        },
+        {
+          "sku": "br-009",
+          "score": 0.7657
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7294
+        },
+        {
+          "sku": "br-008",
+          "score": 0.708
+        },
+        {
+          "sku": "br-005",
+          "score": 0.6936
+        }
+      ]
+    },
+    "br-003-giants": {
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants Edition)",
+      "collection": "black-rose",
+      "global": [
+        {
+          "sku": "br-003",
+          "score": 1.0
+        },
+        {
+          "sku": "br-003-white",
+          "score": 1.0
+        },
+        {
+          "sku": "br-003-oakland",
+          "score": 1.0
+        },
+        {
+          "sku": "br-012",
+          "score": 0.8292
+        },
+        {
+          "sku": "br-009",
+          "score": 0.7657
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7294
+        },
+        {
+          "sku": "br-008",
+          "score": 0.708
+        },
+        {
+          "sku": "br-005",
+          "score": 0.6936
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "br-003",
+          "score": 1.0
+        },
+        {
+          "sku": "br-003-oakland",
+          "score": 1.0
+        },
+        {
+          "sku": "br-003-white",
+          "score": 1.0
+        },
+        {
+          "sku": "br-012",
+          "score": 0.8292
+        },
+        {
+          "sku": "br-009",
+          "score": 0.7657
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7294
+        },
+        {
+          "sku": "br-008",
+          "score": 0.708
+        },
+        {
+          "sku": "br-005",
+          "score": 0.6936
+        }
+      ]
+    },
+    "br-003-oakland": {
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Oakland Edition)",
+      "collection": "black-rose",
+      "global": [
+        {
+          "sku": "br-003",
+          "score": 1.0
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 1.0
+        },
+        {
+          "sku": "br-003-white",
+          "score": 1.0
+        },
+        {
+          "sku": "br-012",
+          "score": 0.8292
+        },
+        {
+          "sku": "br-009",
+          "score": 0.7657
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7294
+        },
+        {
+          "sku": "br-008",
+          "score": 0.708
+        },
+        {
+          "sku": "br-005",
+          "score": 0.6936
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "br-003",
+          "score": 1.0
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 1.0
+        },
+        {
+          "sku": "br-003-white",
+          "score": 1.0
+        },
+        {
+          "sku": "br-012",
+          "score": 0.8292
+        },
+        {
+          "sku": "br-009",
+          "score": 0.7657
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7294
+        },
+        {
+          "sku": "br-008",
+          "score": 0.708
+        },
+        {
+          "sku": "br-005",
+          "score": 0.6936
+        }
+      ]
+    },
+    "br-003-white": {
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White Edition)",
+      "collection": "black-rose",
+      "global": [
+        {
+          "sku": "br-003",
+          "score": 1.0
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 1.0
+        },
+        {
+          "sku": "br-003-oakland",
+          "score": 1.0
+        },
+        {
+          "sku": "br-012",
+          "score": 0.8292
+        },
+        {
+          "sku": "br-009",
+          "score": 0.7657
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7294
+        },
+        {
+          "sku": "br-008",
+          "score": 0.708
+        },
+        {
+          "sku": "br-005",
+          "score": 0.6936
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "br-003",
+          "score": 1.0
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 1.0
+        },
+        {
+          "sku": "br-003-oakland",
+          "score": 1.0
+        },
+        {
+          "sku": "br-012",
+          "score": 0.8292
+        },
+        {
+          "sku": "br-009",
+          "score": 0.7657
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7294
+        },
+        {
+          "sku": "br-008",
+          "score": 0.708
+        },
+        {
+          "sku": "br-005",
+          "score": 0.6936
+        }
+      ]
+    },
+    "br-004": {
+      "name": "BLACK Rose Hoodie",
+      "collection": "black-rose",
+      "global": [
+        {
+          "sku": "sg-006",
+          "score": 0.8981
+        },
+        {
+          "sku": "br-006",
+          "score": 0.863
+        },
+        {
+          "sku": "br-005",
+          "score": 0.8443
+        },
+        {
+          "sku": "br-001",
+          "score": 0.8384
+        },
+        {
+          "sku": "sg-002",
+          "score": 0.8302
+        },
+        {
+          "sku": "sg-007",
+          "score": 0.8191
+        },
+        {
+          "sku": "lh-004",
+          "score": 0.8165
+        },
+        {
+          "sku": "sg-005",
+          "score": 0.8155
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "br-006",
+          "score": 0.863
+        },
+        {
+          "sku": "br-005",
+          "score": 0.8443
+        },
+        {
+          "sku": "br-001",
+          "score": 0.8384
+        },
+        {
+          "sku": "br-002",
+          "score": 0.795
+        },
+        {
+          "sku": "br-012",
+          "score": 0.6865
+        },
+        {
+          "sku": "br-010",
+          "score": 0.6746
+        },
+        {
+          "sku": "br-003",
+          "score": 0.6601
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 0.6601
+        }
+      ]
+    },
+    "br-005": {
+      "name": "BLACK Rose Hoodie \u2014 Signature Edition",
+      "collection": "black-rose",
+      "global": [
+        {
+          "sku": "br-006",
+          "score": 0.8788
+        },
+        {
+          "sku": "br-004",
+          "score": 0.8443
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.8373
+        },
+        {
+          "sku": "kids-001",
+          "score": 0.836
+        },
+        {
+          "sku": "br-001",
+          "score": 0.833
+        },
+        {
+          "sku": "br-002",
+          "score": 0.8306
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.8158
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.8147
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "br-006",
+          "score": 0.8788
+        },
+        {
+          "sku": "br-004",
+          "score": 0.8443
+        },
+        {
+          "sku": "br-001",
+          "score": 0.833
+        },
+        {
+          "sku": "br-002",
+          "score": 0.8306
+        },
+        {
+          "sku": "br-007",
+          "score": 0.6999
+        },
+        {
+          "sku": "br-012",
+          "score": 0.6982
+        },
+        {
+          "sku": "br-003",
+          "score": 0.6936
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 0.6936
+        }
+      ]
+    },
+    "br-006": {
+      "name": "BLACK Rose Sherpa Jacket",
+      "collection": "black-rose",
+      "global": [
+        {
+          "sku": "br-005",
+          "score": 0.8788
+        },
+        {
+          "sku": "br-004",
+          "score": 0.863
+        },
+        {
+          "sku": "br-002",
+          "score": 0.8513
+        },
+        {
+          "sku": "br-001",
+          "score": 0.8338
+        },
+        {
+          "sku": "lh-004",
+          "score": 0.804
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.8035
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.8012
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.7944
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "br-005",
+          "score": 0.8788
+        },
+        {
+          "sku": "br-004",
+          "score": 0.863
+        },
+        {
+          "sku": "br-002",
+          "score": 0.8513
+        },
+        {
+          "sku": "br-001",
+          "score": 0.8338
+        },
+        {
+          "sku": "br-012",
+          "score": 0.7136
+        },
+        {
+          "sku": "br-003",
+          "score": 0.6936
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 0.6936
+        },
+        {
+          "sku": "br-003-oakland",
+          "score": 0.6936
+        }
+      ]
+    },
+    "br-007": {
+      "name": "BLACK Rose x Love Hurts Basketball Shorts",
+      "collection": "black-rose",
+      "global": [
+        {
+          "sku": "lh-003",
+          "score": 0.7202
+        },
+        {
+          "sku": "br-005",
+          "score": 0.6999
+        },
+        {
+          "sku": "br-002",
+          "score": 0.6936
+        },
+        {
+          "sku": "br-001",
+          "score": 0.689
+        },
+        {
+          "sku": "br-006",
+          "score": 0.6546
+        },
+        {
+          "sku": "lh-002",
+          "score": 0.6533
+        },
+        {
+          "sku": "kids-001",
+          "score": 0.6486
+        },
+        {
+          "sku": "kids-002",
+          "score": 0.6462
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "br-005",
+          "score": 0.6999
+        },
+        {
+          "sku": "br-002",
+          "score": 0.6936
+        },
+        {
+          "sku": "br-001",
+          "score": 0.689
+        },
+        {
+          "sku": "br-006",
+          "score": 0.6546
+        },
+        {
+          "sku": "br-003",
+          "score": 0.6441
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 0.6441
+        },
+        {
+          "sku": "br-003-oakland",
+          "score": 0.6441
+        },
+        {
+          "sku": "br-003-white",
+          "score": 0.6441
+        }
+      ]
+    },
+    "br-008": {
+      "name": "BLACK is Beautiful Jersey Series: 1. SF Inspired (Football)",
+      "collection": "black-rose",
+      "global": [
+        {
+          "sku": "br-009",
+          "score": 0.8403
+        },
+        {
+          "sku": "br-003",
+          "score": 0.708
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 0.708
+        },
+        {
+          "sku": "br-003-oakland",
+          "score": 0.708
+        },
+        {
+          "sku": "br-003-white",
+          "score": 0.708
+        },
+        {
+          "sku": "br-012",
+          "score": 0.6884
+        },
+        {
+          "sku": "br-001",
+          "score": 0.6658
+        },
+        {
+          "sku": "br-011",
+          "score": 0.6442
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "br-009",
+          "score": 0.8403
+        },
+        {
+          "sku": "br-003",
+          "score": 0.708
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 0.708
+        },
+        {
+          "sku": "br-003-oakland",
+          "score": 0.708
+        },
+        {
+          "sku": "br-003-white",
+          "score": 0.708
+        },
+        {
+          "sku": "br-012",
+          "score": 0.6884
+        },
+        {
+          "sku": "br-001",
+          "score": 0.6658
+        },
+        {
+          "sku": "br-011",
+          "score": 0.6442
+        }
+      ]
+    },
+    "br-009": {
+      "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
+      "collection": "black-rose",
+      "global": [
+        {
+          "sku": "br-008",
+          "score": 0.8403
+        },
+        {
+          "sku": "br-003",
+          "score": 0.7657
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 0.7657
+        },
+        {
+          "sku": "br-003-oakland",
+          "score": 0.7657
+        },
+        {
+          "sku": "br-003-white",
+          "score": 0.7657
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7322
+        },
+        {
+          "sku": "br-011",
+          "score": 0.7275
+        },
+        {
+          "sku": "br-012",
+          "score": 0.7256
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "br-008",
+          "score": 0.8403
+        },
+        {
+          "sku": "br-003",
+          "score": 0.7657
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 0.7657
+        },
+        {
+          "sku": "br-003-oakland",
+          "score": 0.7657
+        },
+        {
+          "sku": "br-003-white",
+          "score": 0.7657
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7322
+        },
+        {
+          "sku": "br-011",
+          "score": 0.7275
+        },
+        {
+          "sku": "br-012",
+          "score": 0.7256
+        }
+      ]
+    },
+    "br-010": {
+      "name": "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)",
+      "collection": "black-rose",
+      "global": [
+        {
+          "sku": "br-011",
+          "score": 0.7184
+        },
+        {
+          "sku": "br-009",
+          "score": 0.6977
+        },
+        {
+          "sku": "br-004",
+          "score": 0.6746
+        },
+        {
+          "sku": "br-001",
+          "score": 0.6688
+        },
+        {
+          "sku": "br-012",
+          "score": 0.6437
+        },
+        {
+          "sku": "kids-002",
+          "score": 0.6409
+        },
+        {
+          "sku": "kids-001",
+          "score": 0.6402
+        },
+        {
+          "sku": "br-002",
+          "score": 0.6266
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "br-011",
+          "score": 0.7184
+        },
+        {
+          "sku": "br-009",
+          "score": 0.6977
+        },
+        {
+          "sku": "br-004",
+          "score": 0.6746
+        },
+        {
+          "sku": "br-001",
+          "score": 0.6688
+        },
+        {
+          "sku": "br-012",
+          "score": 0.6437
+        },
+        {
+          "sku": "br-002",
+          "score": 0.6266
+        },
+        {
+          "sku": "br-005",
+          "score": 0.6259
+        },
+        {
+          "sku": "br-003",
+          "score": 0.6107
+        }
+      ]
+    },
+    "br-011": {
+      "name": "BLACK is Beautiful Jersey Series: 4. The Rose (Hockey)",
+      "collection": "black-rose",
+      "global": [
+        {
+          "sku": "br-001",
+          "score": 0.7383
+        },
+        {
+          "sku": "br-009",
+          "score": 0.7275
+        },
+        {
+          "sku": "br-010",
+          "score": 0.7184
+        },
+        {
+          "sku": "lh-004",
+          "score": 0.679
+        },
+        {
+          "sku": "br-005",
+          "score": 0.6732
+        },
+        {
+          "sku": "br-012",
+          "score": 0.6618
+        },
+        {
+          "sku": "sg-007",
+          "score": 0.6555
+        },
+        {
+          "sku": "br-003",
+          "score": 0.6544
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "br-001",
+          "score": 0.7383
+        },
+        {
+          "sku": "br-009",
+          "score": 0.7275
+        },
+        {
+          "sku": "br-010",
+          "score": 0.7184
+        },
+        {
+          "sku": "br-005",
+          "score": 0.6732
+        },
+        {
+          "sku": "br-012",
+          "score": 0.6618
+        },
+        {
+          "sku": "br-003",
+          "score": 0.6544
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 0.6544
+        },
+        {
+          "sku": "br-003-oakland",
+          "score": 0.6544
+        }
+      ]
+    },
+    "br-012": {
+      "name": "BLACK is Beautiful Jersey Series: 5. Last Oakland (Baseball)",
+      "collection": "black-rose",
+      "global": [
+        {
+          "sku": "br-003",
+          "score": 0.8292
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 0.8292
+        },
+        {
+          "sku": "br-003-oakland",
+          "score": 0.8292
+        },
+        {
+          "sku": "br-003-white",
+          "score": 0.8292
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7649
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.7263
+        },
+        {
+          "sku": "br-009",
+          "score": 0.7256
+        },
+        {
+          "sku": "lh-004",
+          "score": 0.7168
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "br-003",
+          "score": 0.8292
+        },
+        {
+          "sku": "br-003-giants",
+          "score": 0.8292
+        },
+        {
+          "sku": "br-003-oakland",
+          "score": 0.8292
+        },
+        {
+          "sku": "br-003-white",
+          "score": 0.8292
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7649
+        },
+        {
+          "sku": "br-009",
+          "score": 0.7256
+        },
+        {
+          "sku": "br-006",
+          "score": 0.7136
+        },
+        {
+          "sku": "br-002",
+          "score": 0.7131
+        }
+      ]
+    },
+    "kids-001": {
+      "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
+      "collection": "kids-capsule",
+      "global": [
+        {
+          "sku": "kids-002",
+          "score": 0.872
+        },
+        {
+          "sku": "br-005",
+          "score": 0.836
+        },
+        {
+          "sku": "br-002",
+          "score": 0.8317
+        },
+        {
+          "sku": "lh-002",
+          "score": 0.8211
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.7869
+        },
+        {
+          "sku": "br-006",
+          "score": 0.785
+        },
+        {
+          "sku": "br-004",
+          "score": 0.7776
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7637
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "kids-002",
+          "score": 0.872
+        }
+      ]
+    },
+    "kids-002": {
+      "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+      "collection": "kids-capsule",
+      "global": [
+        {
+          "sku": "kids-001",
+          "score": 0.872
+        },
+        {
+          "sku": "sg-013",
+          "score": 0.8117
+        },
+        {
+          "sku": "br-005",
+          "score": 0.8056
+        },
+        {
+          "sku": "br-002",
+          "score": 0.7888
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.7815
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.7702
+        },
+        {
+          "sku": "lh-002",
+          "score": 0.7692
+        },
+        {
+          "sku": "br-004",
+          "score": 0.763
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "kids-001",
+          "score": 0.872
+        }
+      ]
+    },
+    "lh-002": {
+      "name": "Love Hurts Joggers",
+      "collection": "love-hurts",
+      "global": [
+        {
+          "sku": "br-002",
+          "score": 0.902
+        },
+        {
+          "sku": "lh-003",
+          "score": 0.8276
+        },
+        {
+          "sku": "kids-001",
+          "score": 0.8211
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.7758
+        },
+        {
+          "sku": "br-006",
+          "score": 0.7748
+        },
+        {
+          "sku": "kids-002",
+          "score": 0.7692
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.7604
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.7557
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "lh-003",
+          "score": 0.8276
+        },
+        {
+          "sku": "lh-004",
+          "score": 0.7404
+        },
+        {
+          "sku": "lh-005",
+          "score": 0.7135
+        }
+      ]
+    },
+    "lh-003": {
+      "name": "Love Hurts Basketball Shorts",
+      "collection": "love-hurts",
+      "global": [
+        {
+          "sku": "lh-002",
+          "score": 0.8276
+        },
+        {
+          "sku": "br-002",
+          "score": 0.8151
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7903
+        },
+        {
+          "sku": "lh-004",
+          "score": 0.7893
+        },
+        {
+          "sku": "sg-003",
+          "score": 0.7633
+        },
+        {
+          "sku": "sg-001",
+          "score": 0.7558
+        },
+        {
+          "sku": "sg-013",
+          "score": 0.7493
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.7444
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "lh-002",
+          "score": 0.8276
+        },
+        {
+          "sku": "lh-004",
+          "score": 0.7893
+        },
+        {
+          "sku": "lh-005",
+          "score": 0.7049
+        }
+      ]
+    },
+    "lh-004": {
+      "name": "Love Hurts Bomber Jacket",
+      "collection": "love-hurts",
+      "global": [
+        {
+          "sku": "br-004",
+          "score": 0.8165
+        },
+        {
+          "sku": "br-006",
+          "score": 0.804
+        },
+        {
+          "sku": "br-001",
+          "score": 0.8027
+        },
+        {
+          "sku": "lh-003",
+          "score": 0.7893
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.789
+        },
+        {
+          "sku": "br-005",
+          "score": 0.7835
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.7533
+        },
+        {
+          "sku": "sg-005",
+          "score": 0.7492
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "lh-003",
+          "score": 0.7893
+        },
+        {
+          "sku": "lh-002",
+          "score": 0.7404
+        },
+        {
+          "sku": "lh-005",
+          "score": 0.6468
+        }
+      ]
+    },
+    "lh-005": {
+      "name": "The Fannie",
+      "collection": "love-hurts",
+      "global": [
+        {
+          "sku": "br-002",
+          "score": 0.722
+        },
+        {
+          "sku": "lh-002",
+          "score": 0.7135
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.7075
+        },
+        {
+          "sku": "lh-003",
+          "score": 0.7049
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.6967
+        },
+        {
+          "sku": "br-006",
+          "score": 0.6958
+        },
+        {
+          "sku": "sg-012",
+          "score": 0.6896
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.6844
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "lh-002",
+          "score": 0.7135
+        },
+        {
+          "sku": "lh-003",
+          "score": 0.7049
+        },
+        {
+          "sku": "lh-004",
+          "score": 0.6468
+        }
+      ]
+    },
+    "sg-001": {
+      "name": "The Bridge Series 'The Bay Bridge' Shorts",
+      "collection": "signature",
+      "global": [
+        {
+          "sku": "sg-003",
+          "score": 0.794
+        },
+        {
+          "sku": "lh-003",
+          "score": 0.7558
+        },
+        {
+          "sku": "br-002",
+          "score": 0.7416
+        },
+        {
+          "sku": "lh-002",
+          "score": 0.7111
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.7021
+        },
+        {
+          "sku": "kids-002",
+          "score": 0.6897
+        },
+        {
+          "sku": "br-005",
+          "score": 0.6756
+        },
+        {
+          "sku": "sg-013",
+          "score": 0.6738
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "sg-003",
+          "score": 0.794
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.7021
+        },
+        {
+          "sku": "sg-013",
+          "score": 0.6738
+        },
+        {
+          "sku": "sg-005",
+          "score": 0.6622
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.6522
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.6493
+        },
+        {
+          "sku": "sg-012",
+          "score": 0.6281
+        },
+        {
+          "sku": "sg-002",
+          "score": 0.6215
+        }
+      ]
+    },
+    "sg-002": {
+      "name": "The Bridge Series 'Stay Golden' Shirt",
+      "collection": "signature",
+      "global": [
+        {
+          "sku": "sg-005",
+          "score": 0.9241
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.8589
+        },
+        {
+          "sku": "sg-012",
+          "score": 0.8477
+        },
+        {
+          "sku": "br-004",
+          "score": 0.8302
+        },
+        {
+          "sku": "br-001",
+          "score": 0.8071
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.7985
+        },
+        {
+          "sku": "br-006",
+          "score": 0.7684
+        },
+        {
+          "sku": "br-005",
+          "score": 0.7615
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "sg-005",
+          "score": 0.9241
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.8589
+        },
+        {
+          "sku": "sg-012",
+          "score": 0.8477
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.7985
+        },
+        {
+          "sku": "sg-007",
+          "score": 0.7496
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.7458
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.7072
+        },
+        {
+          "sku": "sg-013",
+          "score": 0.6987
+        }
+      ]
+    },
+    "sg-003": {
+      "name": "The Bridge Series 'Stay Golden' Shorts",
+      "collection": "signature",
+      "global": [
+        {
+          "sku": "sg-001",
+          "score": 0.794
+        },
+        {
+          "sku": "br-002",
+          "score": 0.7705
+        },
+        {
+          "sku": "lh-003",
+          "score": 0.7633
+        },
+        {
+          "sku": "lh-002",
+          "score": 0.7358
+        },
+        {
+          "sku": "br-006",
+          "score": 0.7113
+        },
+        {
+          "sku": "kids-002",
+          "score": 0.7063
+        },
+        {
+          "sku": "br-005",
+          "score": 0.681
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.6721
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "sg-001",
+          "score": 0.794
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.6721
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.6537
+        },
+        {
+          "sku": "sg-012",
+          "score": 0.6485
+        },
+        {
+          "sku": "sg-013",
+          "score": 0.6388
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.6372
+        },
+        {
+          "sku": "sg-002",
+          "score": 0.6344
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.6319
+        }
+      ]
+    },
+    "sg-005": {
+      "name": "The Bridge Series 'The Bay Bridge' Shirt",
+      "collection": "signature",
+      "global": [
+        {
+          "sku": "sg-002",
+          "score": 0.9241
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.8397
+        },
+        {
+          "sku": "br-001",
+          "score": 0.8155
+        },
+        {
+          "sku": "br-004",
+          "score": 0.8155
+        },
+        {
+          "sku": "sg-012",
+          "score": 0.8107
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.7927
+        },
+        {
+          "sku": "br-005",
+          "score": 0.7731
+        },
+        {
+          "sku": "br-006",
+          "score": 0.768
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "sg-002",
+          "score": 0.9241
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.8397
+        },
+        {
+          "sku": "sg-012",
+          "score": 0.8107
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.7927
+        },
+        {
+          "sku": "sg-007",
+          "score": 0.7458
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.7412
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.7385
+        },
+        {
+          "sku": "sg-013",
+          "score": 0.7209
+        }
+      ]
+    },
+    "sg-006": {
+      "name": "Mint & Lavender Hoodie",
+      "collection": "signature",
+      "global": [
+        {
+          "sku": "br-004",
+          "score": 0.8981
+        },
+        {
+          "sku": "sg-013",
+          "score": 0.8529
+        },
+        {
+          "sku": "br-005",
+          "score": 0.8129
+        },
+        {
+          "sku": "sg-012",
+          "score": 0.8036
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.8034
+        },
+        {
+          "sku": "br-006",
+          "score": 0.8012
+        },
+        {
+          "sku": "sg-002",
+          "score": 0.7985
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7957
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "sg-013",
+          "score": 0.8529
+        },
+        {
+          "sku": "sg-012",
+          "score": 0.8036
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.8034
+        },
+        {
+          "sku": "sg-002",
+          "score": 0.7985
+        },
+        {
+          "sku": "sg-007",
+          "score": 0.7956
+        },
+        {
+          "sku": "sg-005",
+          "score": 0.7927
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.7743
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.767
+        }
+      ]
+    },
+    "sg-007": {
+      "name": "The Signature Beanie",
+      "collection": "signature",
+      "global": [
+        {
+          "sku": "br-004",
+          "score": 0.8191
+        },
+        {
+          "sku": "br-005",
+          "score": 0.8093
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.809
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.7956
+        },
+        {
+          "sku": "sg-012",
+          "score": 0.7923
+        },
+        {
+          "sku": "br-006",
+          "score": 0.7832
+        },
+        {
+          "sku": "br-002",
+          "score": 0.7768
+        },
+        {
+          "sku": "br-001",
+          "score": 0.773
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "sg-011",
+          "score": 0.809
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.7956
+        },
+        {
+          "sku": "sg-012",
+          "score": 0.7923
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.7518
+        },
+        {
+          "sku": "sg-002",
+          "score": 0.7496
+        },
+        {
+          "sku": "sg-005",
+          "score": 0.7458
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.7454
+        },
+        {
+          "sku": "sg-013",
+          "score": 0.6935
+        }
+      ]
+    },
+    "sg-009": {
+      "name": "The Sherpa Jacket",
+      "collection": "signature",
+      "global": [
+        {
+          "sku": "br-005",
+          "score": 0.8158
+        },
+        {
+          "sku": "br-001",
+          "score": 0.8096
+        },
+        {
+          "sku": "br-002",
+          "score": 0.7982
+        },
+        {
+          "sku": "br-006",
+          "score": 0.7944
+        },
+        {
+          "sku": "sg-012",
+          "score": 0.7914
+        },
+        {
+          "sku": "lh-004",
+          "score": 0.789
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.788
+        },
+        {
+          "sku": "kids-001",
+          "score": 0.7869
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "sg-012",
+          "score": 0.7914
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.788
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.7699
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.767
+        },
+        {
+          "sku": "sg-002",
+          "score": 0.7458
+        },
+        {
+          "sku": "sg-007",
+          "score": 0.7454
+        },
+        {
+          "sku": "sg-005",
+          "score": 0.7385
+        },
+        {
+          "sku": "sg-013",
+          "score": 0.7295
+        }
+      ]
+    },
+    "sg-011": {
+      "name": "Original Label Tee (White)",
+      "collection": "signature",
+      "global": [
+        {
+          "sku": "sg-012",
+          "score": 0.9233
+        },
+        {
+          "sku": "sg-002",
+          "score": 0.8589
+        },
+        {
+          "sku": "sg-005",
+          "score": 0.8397
+        },
+        {
+          "sku": "br-005",
+          "score": 0.8147
+        },
+        {
+          "sku": "br-002",
+          "score": 0.8094
+        },
+        {
+          "sku": "sg-007",
+          "score": 0.809
+        },
+        {
+          "sku": "br-006",
+          "score": 0.8035
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.7966
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "sg-012",
+          "score": 0.9233
+        },
+        {
+          "sku": "sg-002",
+          "score": 0.8589
+        },
+        {
+          "sku": "sg-005",
+          "score": 0.8397
+        },
+        {
+          "sku": "sg-007",
+          "score": 0.809
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.7966
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.788
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.7743
+        },
+        {
+          "sku": "sg-013",
+          "score": 0.7023
+        }
+      ]
+    },
+    "sg-012": {
+      "name": "Original Label Tee (Orchid)",
+      "collection": "signature",
+      "global": [
+        {
+          "sku": "sg-011",
+          "score": 0.9233
+        },
+        {
+          "sku": "sg-002",
+          "score": 0.8477
+        },
+        {
+          "sku": "sg-005",
+          "score": 0.8107
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.8036
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.8001
+        },
+        {
+          "sku": "br-005",
+          "score": 0.7956
+        },
+        {
+          "sku": "sg-007",
+          "score": 0.7923
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.7914
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "sg-011",
+          "score": 0.9233
+        },
+        {
+          "sku": "sg-002",
+          "score": 0.8477
+        },
+        {
+          "sku": "sg-005",
+          "score": 0.8107
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.8036
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.8001
+        },
+        {
+          "sku": "sg-007",
+          "score": 0.7923
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.7914
+        },
+        {
+          "sku": "sg-013",
+          "score": 0.7326
+        }
+      ]
+    },
+    "sg-013": {
+      "name": "Mint & Lavender Crewneck",
+      "collection": "signature",
+      "global": [
+        {
+          "sku": "sg-006",
+          "score": 0.8529
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.8509
+        },
+        {
+          "sku": "kids-002",
+          "score": 0.8117
+        },
+        {
+          "sku": "br-004",
+          "score": 0.8027
+        },
+        {
+          "sku": "br-005",
+          "score": 0.7816
+        },
+        {
+          "sku": "br-001",
+          "score": 0.7687
+        },
+        {
+          "sku": "lh-003",
+          "score": 0.7493
+        },
+        {
+          "sku": "br-002",
+          "score": 0.7348
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "sg-006",
+          "score": 0.8529
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.8509
+        },
+        {
+          "sku": "sg-012",
+          "score": 0.7326
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.7295
+        },
+        {
+          "sku": "sg-005",
+          "score": 0.7209
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.7023
+        },
+        {
+          "sku": "sg-002",
+          "score": 0.6987
+        },
+        {
+          "sku": "sg-007",
+          "score": 0.6935
+        }
+      ]
+    },
+    "sg-014": {
+      "name": "Mint & Lavender Sweatpants",
+      "collection": "signature",
+      "global": [
+        {
+          "sku": "sg-013",
+          "score": 0.8509
+        },
+        {
+          "sku": "br-005",
+          "score": 0.8373
+        },
+        {
+          "sku": "br-002",
+          "score": 0.8268
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.8034
+        },
+        {
+          "sku": "sg-012",
+          "score": 0.8001
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.7966
+        },
+        {
+          "sku": "br-004",
+          "score": 0.775
+        },
+        {
+          "sku": "kids-002",
+          "score": 0.7702
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "sg-013",
+          "score": 0.8509
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.8034
+        },
+        {
+          "sku": "sg-012",
+          "score": 0.8001
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.7966
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.7699
+        },
+        {
+          "sku": "sg-007",
+          "score": 0.7518
+        },
+        {
+          "sku": "sg-005",
+          "score": 0.7412
+        },
+        {
+          "sku": "sg-002",
+          "score": 0.7072
+        }
+      ]
+    },
+    "sg-015": {
+      "name": "The Windbreaker Set",
+      "collection": "signature",
+      "global": [
+        {
+          "sku": "kids-002",
+          "score": 0.6987
+        },
+        {
+          "sku": "br-009",
+          "score": 0.6855
+        },
+        {
+          "sku": "sg-014",
+          "score": 0.6712
+        },
+        {
+          "sku": "kids-001",
+          "score": 0.6676
+        },
+        {
+          "sku": "br-005",
+          "score": 0.658
+        },
+        {
+          "sku": "br-001",
+          "score": 0.657
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.6539
+        },
+        {
+          "sku": "lh-002",
+          "score": 0.6521
+        }
+      ],
+      "same_collection": [
+        {
+          "sku": "sg-014",
+          "score": 0.6712
+        },
+        {
+          "sku": "sg-009",
+          "score": 0.6539
+        },
+        {
+          "sku": "sg-012",
+          "score": 0.652
+        },
+        {
+          "sku": "sg-011",
+          "score": 0.6508
+        },
+        {
+          "sku": "sg-013",
+          "score": 0.6445
+        },
+        {
+          "sku": "sg-006",
+          "score": 0.6392
+        },
+        {
+          "sku": "sg-002",
+          "score": 0.6128
+        },
+        {
+          "sku": "sg-005",
+          "score": 0.6048
+        }
+      ]
+    }
+  }
+}
