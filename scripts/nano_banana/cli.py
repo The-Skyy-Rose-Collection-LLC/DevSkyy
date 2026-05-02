@@ -33,6 +33,27 @@ def _resolve_views(step: str) -> list[str]:
     }.get(step, ["front", "back", "branding"])
 
 
+def _score_render_alignment(prompt: str, render_path: str | Path) -> dict:
+    """Score a generated render against its prompt via CLIP cosine similarity.
+
+    Returns a dict with the score, the verdict bucket, and a truncated copy
+    of the prompt — designed to be appended to the run's audit JSON. Imports
+    are deferred so callers that don't pass --score-alignment don't pay the
+    CLIP load cost.
+    """
+    # Lazy import: skyyrose package is on the repo root which the parent
+    # nano-banana-run.py shim has already added to sys.path.
+    from skyyrose.elite_studio.quality.clip_alignment import score_alignment
+
+    score = score_alignment(prompt, render_path)
+    return {
+        "render_path": str(render_path),
+        "prompt": (prompt or "")[:120],
+        "alignment_score": round(score, 4),
+        "verdict": "strong" if score >= 0.30 else "moderate" if score >= 0.20 else "weak",
+    }
+
+
 def cmd_dry_run(args):
     """Show what would be generated without making API calls."""
     from nano_banana.catalog import PRODUCTS_DIR, load_catalog, load_products
@@ -198,6 +219,21 @@ def cmd_generate(args):
 
             if image_bytes:
                 save_image(image_bytes, out_path)
+                # Optional CLIP alignment scoring — logs how well the render
+                # matches the prompt. Score-alignment is opt-in to avoid the
+                # ~600MB CLIP load cost on every generation run.
+                if getattr(args, "score_alignment", False):
+                    try:
+                        alignment = _score_render_alignment(prompt, out_path)
+                        log.info(
+                            "alignment %s %s: %.3f (%s)",
+                            sku,
+                            view,
+                            alignment["alignment_score"],
+                            alignment["verdict"],
+                        )
+                    except Exception as exc:  # pragma: no cover
+                        log.warning("alignment scoring failed for %s %s: %s", sku, view, exc)
             else:
                 log.error("FAILED %s %s after %d attempts", sku, view, MAX_RETRIES)
                 product_ok = False
@@ -371,6 +407,12 @@ def main():
     )
     gen.add_argument("--qa", action="store_true", help="Run Gemini vision QA after generation")
     gen.add_argument("--free", action="store_true", help="Use free FLUX model (lower quality)")
+    gen.add_argument(
+        "--score-alignment",
+        action="store_true",
+        dest="score_alignment",
+        help="Score each render's CLIP text-image alignment vs its prompt",
+    )
 
     # -- generate-async --
     ga = sub.add_parser("generate-async", help="Async parallel generation (3 concurrent)")

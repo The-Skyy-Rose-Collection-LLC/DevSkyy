@@ -20,6 +20,9 @@ from pathlib import Path
 
 # Add scripts/ to path so nano_banana package is importable
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+# Add repo root so optional features can import sibling packages like
+# `skyyrose.elite_studio.quality.clip_alignment` (used by --score-alignment).
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from nano_banana.cli import main
 
