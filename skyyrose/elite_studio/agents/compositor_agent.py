@@ -75,8 +75,15 @@ except ImportError:  # pragma: no cover
 from ..config import get_anthropic_client
 from ..gemini_rest import analyze_vision
 from ..models import CompositorResult
+from ..quality import embedding_gate
+from ..quality.brand_centroid import load_centroid
 
 logger = logging.getLogger(__name__)
+
+# Default location for the persisted brand-style centroid. The pre-QA gate
+# (Stage 5.5) loads this file at runtime if it exists; otherwise the gate
+# is a no-op and the pipeline proceeds straight to Gemini QA.
+_DEFAULT_CENTROID_PATH = Path(__file__).resolve().parents[1] / "data" / "brand_centroid.npz"
 
 
 class _SilentLogger:
@@ -364,9 +371,13 @@ class CompositorAgent:
             }
             stages_done = 5
 
-            # ------------------------------ Stage 6: QA
+            # ---------------------- Stage 5.5/6: pre-QA gate + Gemini QA
+            # _maybe_apply_gate runs the embedding gate first. If a brand
+            # centroid is deployed and the render scores below threshold, the
+            # gate returns a fail verdict and Gemini is skipped (cost savings).
+            # If no centroid is deployed, the gate is a no-op pass-through.
             started = time.perf_counter()
-            qa = self._visual_qa(shadow_path, scene_name, collection)
+            qa = _maybe_apply_gate(shadow_path, scene_name, collection)
             stages["qa"] = {
                 "status": qa.get("status", "warn"),
                 "details": qa,
@@ -1116,6 +1127,53 @@ def _safe_json_extract(text: str) -> dict[str, Any]:
     if start == -1 or end == -1 or end <= start:
         raise ValueError("no JSON object in text")
     return json.loads(text[start : end + 1])
+
+
+def _visual_qa_gemini(
+    shadow_path: str,
+    scene_name: str,
+    collection: str,
+) -> dict[str, Any]:
+    """Module-level proxy to ``CompositorAgent._visual_qa``.
+
+    Isolated as a module-level function so the pre-QA gate (``_maybe_apply_gate``)
+    and its tests can patch the Gemini path without instantiating a full agent.
+    ``_visual_qa`` itself does not read ``self``; it only reads its three args
+    plus module-level imports — so a bare instance via ``__new__`` is safe.
+    """
+    instance = CompositorAgent.__new__(CompositorAgent)
+    return CompositorAgent._visual_qa(instance, shadow_path, scene_name, collection)
+
+
+def _maybe_apply_gate(
+    shadow_path: str,
+    scene_name: str,
+    collection: str,
+    *,
+    centroid_path: Path | str | None = None,
+) -> dict[str, Any]:
+    """Pre-QA embedding gate. Reject -> skip Gemini. Accept -> call Gemini.
+
+    If no centroid file exists at ``centroid_path`` (or the default
+    ``_DEFAULT_CENTROID_PATH``), the gate is a no-op and we fall through to
+    Gemini directly. This means the gate is opt-in: deploy the centroid file
+    to enable it; remove the file to disable it.
+    """
+    resolved = Path(centroid_path) if centroid_path else _DEFAULT_CENTROID_PATH
+    if not resolved.exists():
+        return _visual_qa_gemini(shadow_path, scene_name, collection)
+
+    centroid = load_centroid(resolved)
+    verdict = embedding_gate.evaluate(shadow_path, centroid)
+    if not verdict.accepted:
+        return {
+            "status": "fail",
+            "reason": verdict.reason,
+            "embedding_score": verdict.score,
+            "embedding_threshold": verdict.threshold,
+            "skipped_gemini": True,
+        }
+    return _visual_qa_gemini(shadow_path, scene_name, collection)
 
 
 __all__ = [
