@@ -33,7 +33,7 @@ from typing import Union
 
 from PIL import Image
 
-from skyyrose.core import clip_embedder
+from skyyrose.core import clip_embedder, dino_embedder
 from skyyrose.elite_studio.quality.brand_centroid import BrandCentroid, load_centroid
 
 
@@ -79,9 +79,20 @@ class RenderVerdict:
 
 
 def _score_centroid(image: Union[Path, Image.Image], centroid: BrandCentroid) -> float:
-    """Cosine vs brand centroid. Module-level so tests can monkeypatch."""
-    embedding = clip_embedder.embed_image(image)
-    return clip_embedder.cosine_similarity(embedding, centroid.centroid)
+    """Cosine vs brand centroid. Module-level so tests can monkeypatch.
+
+    Picks the encoder from the centroid's `model_id` so a DINOv2 centroid
+    is scored with DINOv2 embeddings and a CLIP centroid with CLIP
+    embeddings — never cross-encoder (would be meaningless).
+    """
+    if "dinov2" in (centroid.model_id or "").lower():
+        embedding = dino_embedder.embed_image(image)
+    else:
+        embedding = clip_embedder.embed_image(image)
+    # Both encoders L2-normalize, so cosine == dot.
+    import numpy as np
+
+    return float(np.dot(embedding, centroid.centroid))
 
 
 def _score_alignment_safe(prompt: str, image: Union[Path, Image.Image]) -> float:

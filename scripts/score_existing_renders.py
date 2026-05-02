@@ -105,6 +105,10 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    # Resolve to absolute so .relative_to(ROOT) works downstream.
+    args.centroid = args.centroid.resolve()
+    args.renders_dir = args.renders_dir.resolve()
+
     if not args.centroid.exists():
         print(f"FATAL: centroid not found: {args.centroid}", file=sys.stderr)
         print("Build it first: python3 scripts/build_brand_centroid.py", file=sys.stderr)

@@ -30,17 +30,28 @@ def main() -> int:
     parser.add_argument("--approved-dir", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--threshold-percentile", type=float, default=10.0)
+    parser.add_argument(
+        "--encoder",
+        choices=("clip", "dino"),
+        default="clip",
+        help="Vision encoder: 'clip' (CLIP-base, default) or 'dino' (DINOv2, "
+        "stronger image-only similarity).",
+    )
     args = parser.parse_args()
 
     if not args.approved_dir.is_dir():
         print(f"FATAL: approved-dir not found: {args.approved_dir}", file=sys.stderr)
         return 1
 
-    print(f"Building centroid from {args.approved_dir}...")
-    centroid = build_centroid(args.approved_dir, threshold_percentile=args.threshold_percentile)
+    print(f"Building {args.encoder} centroid from {args.approved_dir}...")
+    centroid = build_centroid(
+        args.approved_dir,
+        threshold_percentile=args.threshold_percentile,
+        encoder=args.encoder,
+    )
     save_centroid(centroid, args.output)
     print(
-        f"Wrote centroid ({centroid.sample_count} samples, "
+        f"Wrote centroid ({centroid.sample_count} samples, model={centroid.model_id}, "
         f"threshold={centroid.threshold:.4f}) -> {args.output}"
     )
     return 0

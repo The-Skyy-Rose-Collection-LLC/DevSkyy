@@ -1,8 +1,15 @@
-"""Brand-style centroid: mean CLIP embedding of approved hero shots.
+"""Brand-style centroid: mean image embedding of approved hero shots.
 
 The compositor pre-QA gate scores each new render's cosine similarity to
 this centroid. A shot far from the centroid is off-brand and skipped before
 the paid Gemini QA stage.
+
+Supports two encoders:
+  - "clip"   (default): openai/clip-vit-base-patch32, 512-d, text-image
+  - "dino"            : facebook/dinov2-base, 768-d, image-only — empirically
+                        ~2x better discrimination for this task
+
+Choose via the ``encoder`` argument to ``build_centroid``.
 
 @package SkyyRose
 @since 1.1.0
@@ -12,39 +19,61 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Literal
 
 import numpy as np
 
-from skyyrose.core import clip_embedder
+from skyyrose.core import clip_embedder, dino_embedder
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp"}
+
+EncoderName = Literal["clip", "dino"]
 
 
 @dataclass
 class BrandCentroid:
-    centroid: np.ndarray  # (512,) L2-normalized
+    centroid: np.ndarray  # L2-normalized; 512-d for clip, 768-d for dino
     threshold: float  # cosine score below which renders fail the gate
     sample_count: int  # number of approved images that built it
-    model_id: str  # CLIP model used (for compatibility checking)
+    model_id: str  # encoder model used (for compatibility checking)
 
 
 def _list_images(directory: Path) -> list[Path]:
     return sorted(p for p in directory.iterdir() if p.suffix.lower() in IMAGE_EXTS)
 
 
-def build_centroid(approved_dir: Path, threshold_percentile: float = 10.0) -> BrandCentroid:
+def _embed(encoder: EncoderName, path: Path) -> np.ndarray:
+    if encoder == "dino":
+        return dino_embedder.embed_image(path)
+    return clip_embedder.embed_image(path)
+
+
+def _model_id(encoder: EncoderName) -> str:
+    return dino_embedder.MODEL_ID if encoder == "dino" else clip_embedder.MODEL_ID
+
+
+def build_centroid(
+    approved_dir: Path,
+    threshold_percentile: float = 10.0,
+    encoder: EncoderName = "clip",
+) -> BrandCentroid:
     """Compute centroid + a robust threshold from approved hero shots.
 
     Threshold is the `threshold_percentile`-th percentile of in-cluster
     cosine similarities (each approved image vs centroid). Setting it to
     10 means we accept renders at least as similar to the centroid as 90%
     of our approved set already is.
+
+    Args:
+        approved_dir: Directory of approved hero shots.
+        threshold_percentile: Lower = more permissive gate.
+        encoder: "clip" or "dino". DINOv2 typically ~2x discrimination gap.
     """
     paths = _list_images(approved_dir)
     if not paths:
         raise ValueError(f"no image files in {approved_dir}")
 
-    embeddings = np.stack([clip_embedder.embed_image(p) for p in paths])
+    embeddings = np.stack([_embed(encoder, p) for p in paths])
     raw_centroid = embeddings.mean(axis=0)
     norm = np.linalg.norm(raw_centroid)
     if norm < 1e-9:
@@ -59,7 +88,7 @@ def build_centroid(approved_dir: Path, threshold_percentile: float = 10.0) -> Br
         centroid=centroid,
         threshold=threshold,
         sample_count=len(paths),
-        model_id=clip_embedder.MODEL_ID,
+        model_id=_model_id(encoder),
     )
 
 
