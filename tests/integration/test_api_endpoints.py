@@ -19,9 +19,18 @@ import sys
 try:
     import httpx
     import websockets
-except ImportError:
-    print("Error: Missing dependencies. Install with: pip install httpx websockets")
-    sys.exit(1)
+except ImportError as exc:
+    if "pytest" in sys.modules:
+        # Skip cleanly during pytest collection instead of aborting the whole run.
+        import pytest
+
+        pytest.skip(
+            f"Skipping integration script: missing dependency '{exc.name}'",
+            allow_module_level=True,
+        )
+    else:
+        print("Error: Missing dependencies. Install with: pip install httpx websockets")
+        sys.exit(1)
 
 
 class APITester:
