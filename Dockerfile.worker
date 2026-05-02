@@ -71,13 +71,12 @@ COPY --from=builder /root/.local /root/.local
 ENV PATH=/root/.local/bin:$PATH
 
 # Copy application code
-COPY agent_sdk/ ./agent_sdk/
+COPY sdk/python/agent_sdk/ ./agent_sdk/
 COPY agents/ ./agents/
 COPY llm/ ./llm/
 COPY orchestration/ ./orchestration/
 COPY core/ ./core/
 COPY security/ ./security/
-COPY runtime/ ./runtime/
 COPY adk/ ./adk/
 
 # Create non-root user for security
