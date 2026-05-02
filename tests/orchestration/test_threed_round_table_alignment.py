@@ -7,9 +7,17 @@ still sum to 1.0.
 
 from __future__ import annotations
 
+from unittest.mock import MagicMock, patch
+
 import pytest
 
-from orchestration.threed_round_table import ThreeDQualityScores
+from orchestration.threed_round_table import (
+    HF3DFormat,
+    ThreeDProvider,
+    ThreeDQualityScores,
+    ThreeDResponse,
+    ThreeDRoundTable,
+)
 
 
 def test_clip_alignment_score_field_exists() -> None:
@@ -74,3 +82,92 @@ def test_perfect_old_metrics_zero_alignment_lands_at_80() -> None:
         web_readiness=100,
     )
     assert s.total == pytest.approx(80.0, abs=0.01)
+
+
+# ---------------------------------------------------------------------------
+# Wiring tests: _score_response actually invokes alignment
+# ---------------------------------------------------------------------------
+
+
+def _make_response_with_thumbnail(thumb_url: str) -> ThreeDResponse:
+    return ThreeDResponse(
+        provider=ThreeDProvider.TRIPO3D,
+        model_id="tripo3d-api",
+        output_path="/tmp/dummy.glb",
+        format=HF3DFormat.GLB,
+        generation_time_ms=15000.0,
+        polycount=50000,
+        has_textures=True,
+        metadata={"thumbnail_url": thumb_url},
+    )
+
+
+def test_score_response_invokes_clip_alignment_when_prompt_and_preview_present() -> None:
+    """When a prompt + thumbnail_url are available, alignment is computed."""
+    rt = ThreeDRoundTable.__new__(ThreeDRoundTable)
+    response = _make_response_with_thumbnail("https://example.com/preview.png")
+
+    with patch.object(ThreeDRoundTable, "_maybe_score_alignment", return_value=0.42) as mock_align:
+        scores = rt._score_response(response, prompt="a luxury black hoodie")
+        assert scores.clip_alignment_score == pytest.approx(0.42)
+        mock_align.assert_called_once()
+
+
+def test_score_response_skips_alignment_when_no_prompt() -> None:
+    """No prompt => alignment is 0.0 (no compute, no network call)."""
+    rt = ThreeDRoundTable.__new__(ThreeDRoundTable)
+    response = _make_response_with_thumbnail("https://example.com/preview.png")
+
+    scores = rt._score_response(response, prompt=None)
+    assert scores.clip_alignment_score == 0.0
+
+
+def test_score_response_skips_alignment_when_no_preview_image() -> None:
+    """No preview image (no thumbnail/preview/rendered) => alignment is 0.0."""
+    rt = ThreeDRoundTable.__new__(ThreeDRoundTable)
+    response = ThreeDResponse(
+        provider=ThreeDProvider.TRIPO3D,
+        model_id="tripo3d-api",
+        output_path="/tmp/dummy.glb",
+        format=HF3DFormat.GLB,
+        metadata={},  # No thumbnail_url / preview_url / rendered_image
+    )
+
+    scores = rt._score_response(response, prompt="a luxury black hoodie")
+    assert scores.clip_alignment_score == 0.0
+
+
+def test_maybe_score_alignment_handles_network_failure_gracefully() -> None:
+    """Network/HTTP error during preview download => 0.0, no exception."""
+    rt = ThreeDRoundTable.__new__(ThreeDRoundTable)
+    response = _make_response_with_thumbnail("https://nonexistent.invalid/preview.png")
+
+    # httpx.get inside _maybe_score_alignment will raise — confirm we swallow it.
+    with patch("httpx.get", side_effect=Exception("network down")):
+        score = rt._maybe_score_alignment("a hoodie", response)
+        assert score == 0.0
+
+
+def test_maybe_score_alignment_uses_local_path_when_provided() -> None:
+    """preview_path (local) is preferred over thumbnail_url (remote)."""
+    rt = ThreeDRoundTable.__new__(ThreeDRoundTable)
+    response = ThreeDResponse(
+        provider=ThreeDProvider.TRIPO3D,
+        model_id="tripo3d-api",
+        output_path="/tmp/dummy.glb",
+        format=HF3DFormat.GLB,
+        metadata={
+            "preview_path": "/tmp/local-preview.png",
+            "thumbnail_url": "https://example.com/preview.png",
+        },
+    )
+
+    fake_image = MagicMock()
+    with (
+        patch("PIL.Image.open", return_value=fake_image) as mock_open,
+        patch("skyyrose.elite_studio.quality.clip_alignment.score_alignment", return_value=0.31),
+    ):
+        score = rt._maybe_score_alignment("a hoodie", response)
+        assert score == pytest.approx(0.31)
+        # Confirms we hit the local path, not httpx
+        mock_open.assert_called_once_with("/tmp/local-preview.png")

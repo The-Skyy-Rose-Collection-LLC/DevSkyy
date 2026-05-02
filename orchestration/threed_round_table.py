@@ -801,7 +801,8 @@ class ThreeDRoundTable:
                 response = await self._enhance_quality(response)
 
             entry = RoundTableEntry(provider=provider, response=response)
-            entry.scores = self._score_response(response)
+            # Pass the prompt so CLIP alignment can score prompt-to-preview.
+            entry.scores = self._score_response(response, prompt=prompt)
             entries.append(entry)
 
         # Add skipped provider entries
@@ -1190,8 +1191,21 @@ class ThreeDRoundTable:
             error=result.error_message if result.status == "failed" else None,
         )
 
-    def _score_response(self, response: ThreeDResponse) -> ThreeDQualityScores:
-        """Score a 3D generation response."""
+    def _score_response(
+        self,
+        response: ThreeDResponse,
+        prompt: str | None = None,
+    ) -> ThreeDQualityScores:
+        """Score a 3D generation response.
+
+        ``prompt`` is the original text prompt for text-to-3D runs. When
+        provided alongside a provider preview image (``response.metadata``
+        ``thumbnail_url`` / ``preview_url`` / ``rendered_image``), this
+        method computes CLIP text-to-image alignment and stores it on
+        ``scores.clip_alignment_score``. Failure to compute alignment
+        (no preview, network error, CLIP unavailable) silently degrades
+        to 0.0 so the rest of the score is unaffected.
+        """
         if response.error:
             return ThreeDQualityScores()
 
@@ -1274,7 +1288,59 @@ class ThreeDRoundTable:
         if response.enhanced:
             scores.enhancement_bonus = 5.0
 
+        # CLIP text-to-image alignment (Stage 9 wiring) — opt-in: requires a
+        # text prompt and a preview image URL/path on the response. Failure
+        # is silent: returns 0.0 contribution so total degrades gracefully.
+        scores.clip_alignment_score = self._maybe_score_alignment(prompt, response)
+
         return scores
+
+    def _maybe_score_alignment(
+        self,
+        prompt: str | None,
+        response: ThreeDResponse,
+    ) -> float:
+        """Compute CLIP text-image alignment for a 3D response's preview shot.
+
+        Looks for a preview image at one of the documented metadata keys
+        (``thumbnail_url``, ``preview_url``, ``rendered_image``,
+        ``preview_path``). Returns the cosine similarity ``[0, 1]`` between
+        the prompt and that preview, or 0.0 if alignment can't be computed.
+        """
+        if not prompt:
+            return 0.0
+        # Provider conventions vary — try the documented keys in order.
+        meta = response.metadata or {}
+        preview_path = meta.get("preview_path")
+        preview_url = (
+            meta.get("thumbnail_url") or meta.get("preview_url") or meta.get("rendered_image")
+        )
+        image_source = preview_path or preview_url
+        if not image_source:
+            return 0.0
+
+        try:
+            import io
+
+            import httpx
+            from PIL import Image
+
+            from skyyrose.elite_studio.quality.clip_alignment import score_alignment
+
+            if str(image_source).startswith(("http://", "https://")):
+                resp = httpx.get(str(image_source), timeout=10.0)
+                resp.raise_for_status()
+                img = Image.open(io.BytesIO(resp.content))
+            else:
+                img = Image.open(str(image_source))
+            return float(score_alignment(prompt, img))
+        except Exception as exc:
+            logger.warning(
+                "CLIP alignment failed",
+                provider=response.provider.value if response.provider else "unknown",
+                error=str(exc),
+            )
+            return 0.0
 
     def _rank_entries(self, entries: list[RoundTableEntry]) -> list[RoundTableEntry]:
         """Rank entries by total score."""
