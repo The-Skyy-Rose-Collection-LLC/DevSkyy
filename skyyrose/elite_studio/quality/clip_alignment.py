@@ -19,21 +19,20 @@ round-table judging.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Union
 
 from PIL import Image
 
 from skyyrose.core import clip_embedder
 
 
-def score_alignment(prompt: str, image: Union[Path, str, Image.Image]) -> float:
+def score_alignment(prompt: str, image: Path | str | Image.Image) -> float:
     """Cosine similarity between prompt and image embeddings."""
     text_vec = clip_embedder.embed_text(prompt)
     image_vec = clip_embedder.embed_image(image)
     return clip_embedder.cosine_similarity(text_vec, image_vec)
 
 
-def score_alignment_batch(prompts: list[str], image: Union[Path, str, Image.Image]) -> list[float]:
+def score_alignment_batch(prompts: list[str], image: Path | str | Image.Image) -> list[float]:
     """Score multiple prompts against the same image. Embeds image once."""
     image_vec = clip_embedder.embed_image(image)
     return [

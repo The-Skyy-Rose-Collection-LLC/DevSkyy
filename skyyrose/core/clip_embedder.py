@@ -21,7 +21,6 @@ import logging
 from dataclasses import dataclass
 from pathlib import Path
 from threading import Lock
-from typing import Union
 
 import numpy as np
 import torch
@@ -76,7 +75,7 @@ def _l2_normalize(v: np.ndarray) -> np.ndarray:
     return v / norm
 
 
-def embed_image(source: Union[str, Path, Image.Image]) -> np.ndarray:
+def embed_image(source: str | Path | Image.Image) -> np.ndarray:
     """Run CLIP vision encoder. Returns L2-normalized 512-d numpy array."""
     state = get_clip()
     if isinstance(source, (str, Path)):

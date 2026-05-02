@@ -15,7 +15,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Union
 
 from PIL import Image
 
@@ -31,13 +30,13 @@ class GateVerdict:
     reason: str
 
 
-def score_against_centroid(image: Union[Path, str, Image.Image], centroid: BrandCentroid) -> float:
+def score_against_centroid(image: Path | str | Image.Image, centroid: BrandCentroid) -> float:
     """Cosine similarity between image embedding and brand centroid."""
     embedding = clip_embedder.embed_image(image)
     return clip_embedder.cosine_similarity(embedding, centroid.centroid)
 
 
-def evaluate(image: Union[Path, str, Image.Image], centroid: BrandCentroid) -> GateVerdict:
+def evaluate(image: Path | str | Image.Image, centroid: BrandCentroid) -> GateVerdict:
     """Decide whether `image` is on-brand enough to proceed to paid QA."""
     score = score_against_centroid(image, centroid)
     if score >= centroid.threshold:
