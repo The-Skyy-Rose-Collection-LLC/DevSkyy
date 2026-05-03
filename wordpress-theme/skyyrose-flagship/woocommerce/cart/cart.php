@@ -449,7 +449,10 @@ do_action( 'woocommerce_before_cart' );
 							<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
 								<path d="M2 8l4 4 8-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
 							</svg>
-							<span><?php esc_html_e( 'Free Shipping 150+', 'skyyrose' ); ?></span>
+							<span><?php
+								/* translators: %d: free shipping order minimum in dollars */
+								printf( esc_html__( 'Free Shipping $%d+', 'skyyrose' ), intval( SKYYROSE_FREE_SHIPPING_THRESHOLD ) );
+								?></span>
 						</div>
 						<div class="skyy-cart__trust-badge">
 							<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
