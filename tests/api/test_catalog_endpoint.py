@@ -574,3 +574,82 @@ async def test_retriever_answer_question_handles_no_matches(monkeypatch):
     user_content = fake_anthropic.messages.create.call_args.kwargs["messages"][0]["content"]
     assert "No catalog excerpts" in user_content
     assert "without inventing" in user_content
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_retriever_answer_question_passes_full_branding_to_llm(monkeypatch):
+    """Per-match BRANDING SPEC budget must accommodate real-world dossier content.
+
+    SkyyRose dossier branding_blocks routinely run 1500-3000 chars. A 300-char
+    truncation lost details past the first paragraph (e.g. hood interior linings,
+    sleeve placements). This regression test pins the budget at >=1000 chars
+    so it can't be silently shrunk back.
+    """
+    from unittest.mock import AsyncMock, MagicMock
+
+    from orchestration.catalog_retriever import CatalogMatch, CatalogRetriever
+
+    # Construct a long branding spec where the answer detail lives at char ~1100
+    # — past the old 300-char cap, but inside the new budget.
+    long_branding = (
+        "Front: silicone cut-out patch on right chest, white/grey tonal. "
+        "Front pocket: clean, no logo. "
+        "Front drawstrings: white flat. "
+        + ("PADDING. " * 80)  # ~720 chars of filler
+        + "HOOD-INSIDE: GREY contrast lining with the Black Rose logo "
+        "sublimated throughout — repeating three-rose-cluster pattern. "
+        "Visible only when hood is laid open."
+    )
+    # Confirm fixture invariants:
+    #   - the load-bearing detail is past the old 300-char cap (would have been truncated)
+    #   - and within the new 1500-char budget (must be visible after fix)
+    detail_pos = long_branding.index("GREY contrast lining")
+    assert detail_pos > 300, f"fixture detail at char {detail_pos} — must be past old 300 cap"
+    assert detail_pos < 1500, (
+        f"fixture detail at char {detail_pos} — must be within new 1500 budget"
+    )
+
+    fake_response = MagicMock()
+    fake_text_block = MagicMock(type="text")
+    fake_text_block.text = "Inside the hood is a [br-005] grey contrast lining."
+    fake_response.content = [fake_text_block]
+    fake_response.usage = MagicMock(input_tokens=500, output_tokens=20)
+
+    fake_anthropic = MagicMock()
+    fake_anthropic.messages.create = AsyncMock(return_value=fake_response)
+
+    retriever = CatalogRetriever()
+    retriever._initialized = True
+
+    async def fake_retrieve(query, *, top_k=5, collection=None):
+        return [
+            CatalogMatch(
+                sku="br-005",
+                name="BLACK Rose Hoodie — Signature Edition",
+                collection="black-rose",
+                score=0.9,
+                branding_spec=long_branding,
+                description="black pullover hoodie",
+            ),
+        ]
+
+    monkeypatch.setattr(retriever, "retrieve", fake_retrieve)
+
+    await retriever.answer_question("what's inside the hood?", anthropic_client=fake_anthropic)
+
+    user_content = fake_anthropic.messages.create.call_args.kwargs["messages"][0]["content"]
+    # The hood-interior detail (past char 1000 in the dossier) MUST reach the LLM.
+    # If anyone shrinks the per-match budget below ~1100 chars this test fails.
+    assert "GREY contrast lining" in user_content, (
+        "BRANDING SPEC budget too small — detail past char 1000 was truncated. "
+        "Tightening commit (catalog_retriever.py answer_question) explicitly raised "
+        "this from 300 to 1500 chars; do not regress."
+    )
+    # Block format uses === separators
+    assert "===" in user_content
+    # SKU + collection are present in the block header
+    assert "[br-005]" in user_content
+    assert "black-rose" in user_content
+    # Description is included
+    assert "DESCRIPTION:" in user_content

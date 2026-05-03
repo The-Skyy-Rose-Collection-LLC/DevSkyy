@@ -363,20 +363,38 @@ class CatalogRetriever:
         matches = await self.retrieve(question, top_k=top_k)
 
         # Step 2: build the user prompt — wrap matches in tagged blocks so the
-        # LLM can clearly attribute statements to source SKUs
+        # LLM can clearly attribute statements to source SKUs.
+        #
+        # Per-match budgets are deliberately generous: SkyyRose dossier
+        # branding_blocks routinely run 1500-3000 chars (Front/Back/Sleeves/Hood
+        # sections + technique + color + position for each placement). A 300-char
+        # truncation lost detail that lived past the first paragraph (e.g. hood
+        # interior linings, sleeve placements) and forced the LLM to say "I don't
+        # have that information" when the dossier in fact did. With top_k≤10 and
+        # ~1800 chars per match, total context is ~18KB ≈ 4500 tokens — well
+        # within Haiku's 200K context, ~$0.0045 input cost at most.
         if matches:
             blocks = []
             for m in matches:
-                blocks.append(
-                    f"[{m.sku}] {m.name} ({m.collection})\n"
-                    f"  branding: {m.branding_spec[:300]}\n"
-                    f"  description: {m.description[:300]}"
+                # Compose a clearly-delimited block per SKU. The "===" rule is a
+                # strong attention separator that helps the LLM keep facts from
+                # different products from bleeding together.
+                block = (
+                    f"=== [{m.sku}] {m.name} (collection: {m.collection}) ===\n"
+                    f"BRANDING SPEC:\n{m.branding_spec[:1500].strip()}"
                 )
+                if m.description:
+                    block += f"\n\nDESCRIPTION: {m.description[:400].strip()}"
+                blocks.append(block)
             context = "\n\n".join(blocks)
             user_prompt = (
                 f"Question: {question}\n\n"
-                f"Catalog excerpts (top {len(matches)} most relevant SKUs):\n\n{context}\n\n"
-                f"Answer the question using only these excerpts. Cite SKUs in [brackets]."
+                f"Catalog excerpts ({len(matches)} most relevant SKUs, ranked by similarity):\n\n"
+                f"{context}\n\n"
+                f"=== END OF CATALOG EXCERPTS ===\n\n"
+                f"Answer the question using ONLY the information above. Cite SKUs in [brackets] "
+                f"like [br-005] when you reference a specific product. If the information "
+                f"needed is not in the excerpts, say so honestly."
             )
         else:
             # No matches — let the LLM say so cleanly rather than hallucinating
