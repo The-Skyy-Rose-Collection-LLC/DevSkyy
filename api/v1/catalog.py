@@ -5,7 +5,16 @@ Voyage `voyage-3-large` embeddings + Pinecone serverless
 (`skyyrose-catalog` @ `us-west-2`).
 
 Prefix:  /api/v1/catalog
-Auth:    public (catalog data is publicly browseable)
+Auth:    public for read-only catalog data (/search, /products/*, /collections/*).
+
+         CAVEAT: /answer and /answer/stream invoke Claude (cost-bearing, ~$0.002/req)
+         and are currently UNAUTHENTICATED. Other LLM-backed endpoints in this API
+         (api/v1/rag_anything.py, api/v1/commerce.py) gate via Depends(get_current_user)
+         + entitlement checks. Before exposing publicly, either:
+           (a) add Depends(get_current_user) and bill against tier, OR
+           (b) add per-IP rate limiting via security.rate_limiting.rate_limiter.
+         The /answer cache (1h TTL, 128 slots) provides some natural backpressure
+         on identical queries but does not bound spend from a malicious caller.
 
 Endpoints:
     GET  /search                            — semantic search across all SKUs
@@ -25,8 +34,8 @@ import logging
 import os
 import time
 from collections import OrderedDict
-from typing import Any
 from collections.abc import AsyncIterator
+from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
@@ -532,11 +541,9 @@ async def answer_question(
     response = AnswerResponse.from_answer(
         ans, elapsed_ms=round((time.perf_counter() - t0) * 1000, 2)
     )
-    # Cache the dump so future requests skip the entire downstream pipeline.
-    # `cache_hit=False` is set on miss so the client can distinguish; cache
-    # storage records the same dict so subsequent hits flip it to True.
+    # Cache stores cache_hit=False; subsequent hits flip it to True at the
+    # get-path (line ~520) so the client can tell freshness without a header.
     await cache.put(q, top_k, response.model_dump())
-    response.cache_hit = False
     return response
 
 
@@ -634,11 +641,11 @@ async def catalog_health() -> CatalogHealthResponse:
     """
     try:
         retriever = await _get_retriever()
-        embedder_info = retriever._embedder.get_info() if retriever._embedder else None
+        info = retriever.get_info()
         return CatalogHealthResponse(
             status="ok",
-            embedder=embedder_info,
-            namespace=retriever._namespace,
+            embedder=info["embedder"],
+            namespace=info["namespace"],
         )
     except Exception as exc:  # noqa: BLE001
         logger.exception("Catalog health check failed")

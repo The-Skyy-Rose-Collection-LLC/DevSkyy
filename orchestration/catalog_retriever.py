@@ -379,13 +379,9 @@ class CatalogRetriever:
         matches = await self.retrieve(question, top_k=top_k)
         user_prompt = self._build_qa_prompt(question, matches)
         chosen_model = model or self.DEFAULT_QA_MODEL
+        client = self._get_anthropic_client(anthropic_client)
 
-        if anthropic_client is None:
-            import anthropic
-
-            anthropic_client = anthropic.AsyncAnthropic()
-
-        response = await anthropic_client.messages.create(
+        response = await client.messages.create(
             model=chosen_model,
             max_tokens=max_tokens,
             system=self.QA_SYSTEM_PROMPT,
@@ -437,7 +433,11 @@ class CatalogRetriever:
 
         matches = await self.retrieve(question, top_k=top_k)
 
-        # Emit matches up-front so the UI can render citations before text
+        # Emit matches up-front so the UI can render citations before text.
+        # branding_spec/description are truncated to the same budgets the
+        # LLM prompt uses — sending the full ~3KB dossier branding_block
+        # over the SSE wire wastes bandwidth (and clients only render a
+        # short preview anyway).
         yield {
             "type": "matches",
             "matches": [
@@ -446,8 +446,8 @@ class CatalogRetriever:
                     "name": m.name,
                     "collection": m.collection,
                     "score": m.score,
-                    "description": m.description,
-                    "branding_spec": m.branding_spec,
+                    "description": m.description[:400],
+                    "branding_spec": m.branding_spec[:1500],
                 }
                 for m in matches
             ],
@@ -455,14 +455,10 @@ class CatalogRetriever:
 
         user_prompt = self._build_qa_prompt(question, matches)
         chosen_model = model or self.DEFAULT_QA_MODEL
-
-        if anthropic_client is None:
-            import anthropic
-
-            anthropic_client = anthropic.AsyncAnthropic()
+        client = self._get_anthropic_client(anthropic_client)
 
         accumulated = ""
-        async with anthropic_client.messages.stream(
+        async with client.messages.stream(
             model=chosen_model,
             max_tokens=max_tokens,
             system=self.QA_SYSTEM_PROMPT,
@@ -524,6 +520,31 @@ class CatalogRetriever:
             f"like [br-005] when you reference a specific product. If the information "
             f"needed is not in the excerpts, say so honestly."
         )
+
+    @staticmethod
+    def _get_anthropic_client(injected: Any | None) -> Any:
+        """Return ``injected`` if non-None, else lazy-construct an AsyncAnthropic.
+
+        Lazy import keeps anthropic optional at module-load time and avoids
+        opening a real client when callers (typically tests) inject a mock.
+        """
+        if injected is not None:
+            return injected
+        import anthropic
+
+        return anthropic.AsyncAnthropic()
+
+    def get_info(self) -> dict[str, Any]:
+        """Public diagnostic snapshot — embedder + namespace.
+
+        Replaces direct access to `_embedder`/`_namespace` from outside the class
+        (used by /catalog/health and similar liveness endpoints).
+        """
+        return {
+            "embedder": self._embedder.get_info() if self._embedder else None,
+            "namespace": self._namespace,
+            "initialized": self._initialized,
+        }
 
     async def close(self) -> None:
         if self._store is not None:

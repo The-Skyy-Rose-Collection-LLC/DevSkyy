@@ -23,13 +23,13 @@ from orchestration.catalog_retriever import CatalogMatch
 class _FakeRetriever:
     def __init__(self, matches: list[CatalogMatch]):
         self._matches = matches
-        self._namespace = "catalog"
-        # Minimal embedder stub for the /health endpoint
-        self._embedder = type(
-            "FakeEmbedder",
-            (),
-            {"get_info": staticmethod(lambda: {"provider": "voyage", "dimension": 1024})},
-        )()
+
+    def get_info(self) -> dict:
+        return {
+            "embedder": {"provider": "voyage", "dimension": 1024},
+            "namespace": "catalog",
+            "initialized": True,
+        }
 
     async def retrieve(self, query, *, top_k=5, collection=None):
         return self._matches[:top_k]
