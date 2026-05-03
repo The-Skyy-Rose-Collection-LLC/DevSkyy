@@ -26,6 +26,7 @@ from api.v1.analytics.dashboard import router as analytics_dashboard_router
 from api.v1.approval import router as approval_router
 from api.v1.assets import router as assets_router
 from api.v1.brand_assets import router as brand_assets_router
+from api.v1.catalog import router as catalog_router
 from api.v1.claude_sdk import router as claude_sdk_router
 from api.v1.code import router as code_router
 from api.v1.commerce import router as commerce_router
@@ -49,6 +50,7 @@ __all__ = [
     "brand_assets_router",
     "business_router",
     "analytics_dashboard_router",
+    "catalog_router",
     "code_router",
     "commerce_router",
     "competitors_router",

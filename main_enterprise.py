@@ -223,6 +223,7 @@ app.include_router(ws_router)
 
 # API v1 MCP routers
 from api.v1 import (
+    catalog_router,
     code_router,
     commerce_router,
     hf_spaces_router,
@@ -237,6 +238,7 @@ from api.v1 import (
     wordpress_theme_router,
 )
 
+app.include_router(catalog_router, prefix="/api/v1")
 app.include_router(code_router, prefix="/api/v1")
 app.include_router(commerce_router, prefix="/api/v1")
 app.include_router(hf_spaces_router, prefix="/api/v1")
