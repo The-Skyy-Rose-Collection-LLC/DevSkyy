@@ -5,99 +5,25 @@
  * "The Cathedral" — candlelit chamber, enchanted rose dome, stained glass.
  * Beauty and the Beast narrative reimagined. "Every petal tells a story."
  *
- * AI-composited scene image with beacon-style product discovery.
- * Built on the shared immersive engine (immersive.css + immersive.js).
+ * Per-collection room data lives in inc/immersive-data.php; rendering happens
+ * in template-parts/immersive-scene.php (shared across all 4 immersive worlds).
  *
  * @package SkyyRose
- * @since   3.0.0
- * @updated 6.5.2 — Collapsed to single cathedral room using skyyrose_immersive_product() adapter.
+ * @since   7.1.0
  */
 
-// Prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
-/*
-─────────────────────────────────────────────────────────
-	Room Data — The Cathedral (single AI-composited scene).
-	Four LH SKUs placed on cathedral props (mannequin, pew,
-	float, candelabra). Beauty-and-the-Beast rose dome
-	centers the frame.
-	───────────────────────────────────────────────────────── */
-
-$rooms = array(
-
-	array(
-		'name'     => esc_html__( 'The Cathedral', 'skyyrose' ),
-		'image'    => 'scene-love-hurts-cathedral.webp',
-		'products' => array(
-			skyyrose_immersive_product(
-				'lh-004',
-				array(
-					'left'       => '32',
-					'top'        => '50',
-					'prop'       => 'mannequin',
-					'prop_label' => __( 'On the mannequin stand', 'skyyrose' ),
-				)
-			),
-			skyyrose_immersive_product(
-				'lh-003',
-				array(
-					'left'       => '67',
-					'top'        => '35',
-					'prop'       => 'float',
-					'prop_label' => __( 'Suspended above the pews', 'skyyrose' ),
-				)
-			),
-			skyyrose_immersive_product(
-				'lh-002',
-				array(
-					'left'       => '72',
-					'top'        => '62',
-					'prop'       => 'pew',
-					'prop_label' => __( 'Draped across the pew', 'skyyrose' ),
-				)
-			),
-			skyyrose_immersive_product(
-				'lh-006',
-				array(
-					'left'       => '83',
-					'top'        => '50',
-					'prop'       => 'candelabra',
-					'prop_label' => __( 'Hanging from the candelabra', 'skyyrose' ),
-				)
-			),
-		),
-	),
-);
-
-// Remove empty entries (unpublished products filtered by skyyrose_immersive_product()).
-foreach ( $rooms as &$room ) {
-	$room['products'] = array_values( array_filter( $room['products'] ) );
-}
-unset( $room );
+defined( 'ABSPATH' ) || exit;
 
 get_header();
 ?>
-
 <main id="primary" class="site-main immersive-page" role="main" tabindex="-1">
 	<?php
 	get_template_part(
 		'template-parts/immersive-scene',
 		null,
-		array(
-			'collection_slug' => 'love-hurts',
-			'collection_name' => __( 'Love Hurts Collection', 'skyyrose' ),
-			'world_name'      => __( 'The Cathedral', 'skyyrose' ),
-			'tagline'         => __( 'Every petal tells a story.', 'skyyrose' ),
-			'accent_color'    => '#DC143C',
-			'collection_url'  => home_url( '/collection-love-hurts/' ),
-			'rooms'           => $rooms,
-		)
+		skyyrose_get_immersive_args( 'love-hurts' )
 	);
 	?>
 </main>
-
 <?php
 get_footer();

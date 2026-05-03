@@ -63,6 +63,8 @@ $skyyrose_core_includes = array(
 	'/inc/collection-content.php',
 	'/inc/product-catalog.php',
 	'/inc/product-catalog-display.php',
+	'/inc/landing-data.php',
+	'/inc/immersive-data.php',
 	'/inc/immersive-product-adapter.php',
 	'/inc/product-taxonomy.php',
 	'/inc/facebook-sdk.php',
@@ -76,6 +78,8 @@ $skyyrose_core_includes = array(
 	'/inc/performance-guardian.php',
 	'/inc/performance.php',
 	'/inc/patterns.php',
+	'/inc/garment-upload-shortcode.php',
+	'/inc/visual-similarity-shortcode.php',
 );
 
 foreach ( $skyyrose_core_includes as $skyyrose_file ) {
