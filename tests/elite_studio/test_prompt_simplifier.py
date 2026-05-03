@@ -9,8 +9,6 @@ contains only tokens CLIP-base was trained to ground.
 
 from __future__ import annotations
 
-import pytest
-
 from skyyrose.elite_studio.quality import prompt_simplifier
 
 # ---------------------------------------------------------------------------

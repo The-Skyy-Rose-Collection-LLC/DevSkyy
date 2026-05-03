@@ -30,10 +30,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from skyyrose.core.catalog_loader import read_catalog_rows  # noqa: E402
-from skyyrose.elite_studio.quality.render_quality import (  # noqa: E402
-    Verdict,
-    evaluate_render,
-)
+from skyyrose.elite_studio.quality.render_quality import evaluate_render  # noqa: E402
 
 # SKU prefix at start of filename (br-001, sg-014, lh-002, kids-001, br-001-twin).
 _SKU_PATTERN = re.compile(r"^([a-z]+-[0-9]+(?:-[a-z0-9]+)?)", re.IGNORECASE)

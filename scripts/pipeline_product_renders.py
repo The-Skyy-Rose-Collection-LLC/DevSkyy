@@ -50,7 +50,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -151,7 +151,7 @@ def _generate_and_score(entry: dict, centroid_path: Path, max_retries: int) -> d
     doesn't pay the import cost.
     """
     sys.path.insert(0, str(ROOT / "scripts"))
-    from nano_banana.catalog import PRODUCTS_DIR, find_back_source, load_catalog
+    from nano_banana.catalog import find_back_source, load_catalog
     from nano_banana.client import get_genai_client
     from nano_banana.generate import GEMINI_PRO, generate_gemini
     from nano_banana.utils import quality_gate, save_image
@@ -256,7 +256,7 @@ def main() -> int:
     args.output_log.write_text(
         json.dumps(
             {
-                "ts": datetime.now(timezone.utc).isoformat(),
+                "ts": datetime.now(UTC).isoformat(),
                 "centroid": str(args.centroid.relative_to(ROOT)),
                 "max_retries": args.max_retries,
                 "results": results,

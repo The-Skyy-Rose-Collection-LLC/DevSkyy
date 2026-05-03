@@ -326,7 +326,7 @@ class CatalogRetriever:
         *,
         namespace: str | None = "catalog",
         pinecone_index: str | None = None,
-    ) -> "CatalogRetriever":
+    ) -> CatalogRetriever:
         """Pre-configured retriever using Voyage 3-large + Pinecone serverless.
 
         Reads PINECONE_API_KEY and VOYAGE_API_KEY from environment. Creates the

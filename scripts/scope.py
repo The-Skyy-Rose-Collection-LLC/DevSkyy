@@ -348,7 +348,7 @@ def cmd_split(args: argparse.Namespace) -> int:
             scope_files = grouped[name]
             if scope.add_to_gitignore:
                 print(f"## SKIP [{name}] — {len(scope_files)} files match 'ignore' scope")
-                print(f"  → add to .gitignore, do not commit")
+                print("  → add to .gitignore, do not commit")
                 for status, path in sorted(scope_files):
                     print(f"      {status} {path}")
                 print()

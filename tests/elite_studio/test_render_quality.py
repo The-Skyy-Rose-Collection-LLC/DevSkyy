@@ -104,8 +104,6 @@ def test_review_verdict_when_centroid_passes_but_alignment_weak(
 
 def test_kill_verdict_when_resolution_too_small(fake_centroid: Path, tmp_path: Path) -> None:
     """Tiny renders are KILL — won't look right on the live site."""
-    from skyyrose.elite_studio.quality import render_quality
-
     tiny = tmp_path / "tiny.png"
     Image.new("RGB", (128, 128), color=(40, 40, 40)).save(tiny)
 

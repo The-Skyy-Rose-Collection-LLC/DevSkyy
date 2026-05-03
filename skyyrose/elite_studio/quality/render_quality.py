@@ -29,7 +29,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
-from typing import Union
 
 from PIL import Image
 
@@ -78,7 +77,7 @@ class RenderVerdict:
         }
 
 
-def _score_centroid(image: Union[Path, Image.Image], centroid: BrandCentroid) -> float:
+def _score_centroid(image: Path | Image.Image, centroid: BrandCentroid) -> float:
     """Cosine vs brand centroid. Module-level so tests can monkeypatch.
 
     Picks the encoder from the centroid's `model_id` so a DINOv2 centroid
@@ -95,7 +94,7 @@ def _score_centroid(image: Union[Path, Image.Image], centroid: BrandCentroid) ->
     return float(np.dot(embedding, centroid.centroid))
 
 
-def _score_alignment_safe(prompt: str, image: Union[Path, Image.Image]) -> float:
+def _score_alignment_safe(prompt: str, image: Path | Image.Image) -> float:
     """CLIP text-image cosine. Returns 0.0 on any failure (graceful)."""
     if not prompt or not prompt.strip():
         return 0.0
@@ -108,9 +107,9 @@ def _score_alignment_safe(prompt: str, image: Union[Path, Image.Image]) -> float
 
 
 def evaluate_render(
-    render_path: Union[str, Path],
+    render_path: str | Path,
     prompt: str | None,
-    centroid_path: Union[str, Path],
+    centroid_path: str | Path,
     *,
     min_dimension: int = 512,
     alignment_threshold: float = 0.20,

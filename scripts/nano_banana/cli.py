@@ -744,10 +744,6 @@ def cmd_produce(args):
     results = pipeline.run_batch(products, views=views)
 
     # Print summary
-    passed = [r for r in results if r.qa_passed]
-    review = [r for r in results if r.output_path and not r.qa_passed]
-    failed = [r for r in results if not r.output_path]
-
     log.info("\n--- FINAL SUMMARY ---")
     for r in results:
         status = "PASS" if r.qa_passed else "REVIEW" if r.output_path else "FAIL"
