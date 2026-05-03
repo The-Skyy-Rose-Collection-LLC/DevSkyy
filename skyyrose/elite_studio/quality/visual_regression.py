@@ -26,6 +26,28 @@ _SSIM_THRESHOLD = 0.85
 _GOLDEN_BASE = Path(__file__).parent.parent / "assets" / "golden"
 _REPORTS_BASE = Path(__file__).parent.parent / "assets" / "regression_reports"
 
+# Per-angle SSIM thresholds. Detail shots demand stricter pixel-level fidelity
+# than wide three-quarter views, where minor pose drift is expected. Front/back
+# are the baseline — embellishment placement must match exactly. Edit here, do
+# not hardcode in callers.
+THRESHOLDS_BY_ANGLE: dict[str, float] = {
+    "front": 0.85,
+    "back": 0.85,
+    "three-quarter": 0.78,
+    "detail-1": 0.92,
+    "detail-2": 0.92,
+}
+
+# Canonical angle slug list — the order goldens appear in audit reports and
+# the order capture_goldens prompts for during interactive curation.
+CANONICAL_ANGLES: tuple[str, ...] = (
+    "front",
+    "back",
+    "three-quarter",
+    "detail-1",
+    "detail-2",
+)
+
 # HTML template pieces — kept as constants to avoid in-function magic strings
 _HTML_HEAD = """<!DOCTYPE html>
 <html lang="en">
@@ -66,6 +88,25 @@ class RegressionResult:
     has_reference: bool  # False when no golden reference exists yet
     report_path: str  # absolute path to HTML report, "" if not generated
     error: str = ""
+    angle: str = "front"
+
+
+@dataclass(frozen=True)
+class MultiAngleResult:
+    """Aggregate result across multiple angles for a single SKU."""
+
+    sku: str
+    per_angle: tuple[RegressionResult, ...]
+    all_passed: bool
+    angles_with_reference: int
+    angles_total: int
+
+    @property
+    def average_score(self) -> float:
+        scored = [r for r in self.per_angle if r.has_reference]
+        if not scored:
+            return 0.0
+        return round(sum(r.ssim_score for r in scored) / len(scored), 4)
 
 
 class VisualRegressionTester:
@@ -93,94 +134,182 @@ class VisualRegressionTester:
     # Public API
     # ------------------------------------------------------------------
 
-    def compare(self, generated_path: str, sku: str) -> RegressionResult:
+    def compare(
+        self,
+        generated_path: str,
+        sku: str,
+        *,
+        angle: str = "front",
+    ) -> RegressionResult:
         """Compare a generated image against the golden reference for sku.
 
         Args:
             generated_path: Absolute path to the newly generated image.
             sku: Product SKU used to locate the golden reference.
+            angle: Which angle to compare against (front / back / three-quarter /
+                detail-1 / detail-2). Defaults to ``front`` to preserve backward
+                compatibility with single-angle callers.
 
         Returns:
             RegressionResult. passed=True when no reference exists yet.
         """
-        reference_path = self._golden_base / sku / "reference.jpg"
+        threshold = THRESHOLDS_BY_ANGLE.get(angle, self._threshold)
+        reference_path = self._resolve_reference(sku, angle)
 
-        if not reference_path.exists():
-            logger.info("No golden reference for %s — skipping regression check", sku)
+        if reference_path is None:
+            logger.info("No golden reference for %s/%s — skipping regression check", sku, angle)
             return RegressionResult(
                 success=True,
                 sku=sku,
                 ssim_score=1.0,
                 passed=True,
-                threshold=self._threshold,
+                threshold=threshold,
                 has_reference=False,
                 report_path="",
+                angle=angle,
             )
 
         try:
             ssim_score = self._compute_ssim(generated_path, str(reference_path))
-            passed = ssim_score >= self._threshold
+            passed = ssim_score >= threshold
             report_path = self._write_report(
                 sku=sku,
                 generated_path=generated_path,
                 reference_path=str(reference_path),
                 ssim_score=ssim_score,
                 passed=passed,
+                angle=angle,
+                threshold=threshold,
             )
             return RegressionResult(
                 success=True,
                 sku=sku,
                 ssim_score=round(ssim_score, 4),
                 passed=passed,
-                threshold=self._threshold,
+                threshold=threshold,
                 has_reference=True,
                 report_path=report_path,
+                angle=angle,
             )
         except ImportError:
             logger.warning(
-                "scikit-image not installed — skipping SSIM comparison for %s. "
+                "scikit-image not installed — skipping SSIM comparison for %s/%s. "
                 "Install with: pip install scikit-image",
                 sku,
+                angle,
             )
             return RegressionResult(
                 success=True,
                 sku=sku,
                 ssim_score=1.0,
                 passed=True,
-                threshold=self._threshold,
+                threshold=threshold,
                 has_reference=True,
                 report_path="",
                 error="scikit-image not installed; comparison skipped",
+                angle=angle,
             )
         except Exception as exc:
-            logger.error("Visual regression error for %s: %s", sku, exc)
+            logger.error("Visual regression error for %s/%s: %s", sku, angle, exc)
             return RegressionResult(
                 success=False,
                 sku=sku,
                 ssim_score=0.0,
                 passed=False,
-                threshold=self._threshold,
+                threshold=threshold,
                 has_reference=True,
                 report_path="",
                 error=str(exc),
+                angle=angle,
             )
 
-    def set_golden(self, sku: str, image_path: str) -> None:
-        """Register a new golden reference image for a SKU.
+    def compare_multi_angle(
+        self,
+        generated_paths: dict[str, str],
+        sku: str,
+    ) -> MultiAngleResult:
+        """Compare a set of angle-keyed renders against per-angle goldens.
 
-        Copies the image to the canonical golden directory.
+        Args:
+            generated_paths: Mapping of ``angle → generated image path``.
+                Unknown angles fall back to the global threshold.
+            sku: Product SKU used to locate goldens.
+
+        Returns:
+            MultiAngleResult aggregating per-angle scores.
+        """
+        results: list[RegressionResult] = []
+        for angle, path in generated_paths.items():
+            results.append(self.compare(path, sku, angle=angle))
+        with_ref = sum(1 for r in results if r.has_reference)
+        all_passed = all(r.passed for r in results)
+        return MultiAngleResult(
+            sku=sku,
+            per_angle=tuple(results),
+            all_passed=all_passed,
+            angles_with_reference=with_ref,
+            angles_total=len(results),
+        )
+
+    def set_golden(
+        self,
+        sku: str,
+        image_path: str,
+        *,
+        angle: str = "front",
+    ) -> Path:
+        """Register a new golden reference image for a SKU/angle.
+
+        Copies the image to the canonical golden directory. Maintains the
+        legacy ``reference.jpg`` symlink/copy for ``angle="front"`` so older
+        callers that don't pass an angle continue to work.
 
         Args:
             sku: Product SKU.
             image_path: Path to the approved reference image.
+            angle: Which angle this golden represents.
+
+        Returns:
+            The absolute destination path written.
         """
         import shutil
 
         dest_dir = self._golden_base / sku
         dest_dir.mkdir(parents=True, exist_ok=True)
-        dest = dest_dir / "reference.jpg"
+        dest = dest_dir / f"{angle}.jpg"
         shutil.copy2(image_path, dest)
-        logger.info("Set golden reference for %s → %s", sku, dest)
+        # Legacy reference.jpg = front for backward compat with single-angle
+        # callers. Always overwrite when angle == "front" so the canonical
+        # front golden stays in sync.
+        if angle == "front":
+            shutil.copy2(image_path, dest_dir / "reference.jpg")
+        logger.info("Set golden reference for %s/%s → %s", sku, angle, dest)
+        return dest
+
+    def coverage_for(self, sku: str) -> dict[str, bool]:
+        """Return ``{angle: present}`` map across the canonical angle list."""
+        sku_dir = self._golden_base / sku
+        if not sku_dir.is_dir():
+            return dict.fromkeys(CANONICAL_ANGLES, False)
+        return {
+            angle: (sku_dir / f"{angle}.jpg").is_file()
+            or (angle == "front" and (sku_dir / "reference.jpg").is_file())
+            for angle in CANONICAL_ANGLES
+        }
+
+    def _resolve_reference(self, sku: str, angle: str) -> Path | None:
+        """Find the on-disk golden for ``sku/angle``, if any.
+
+        Honors the back-compat ``reference.jpg`` for ``angle == "front"``.
+        """
+        candidate = self._golden_base / sku / f"{angle}.jpg"
+        if candidate.exists():
+            return candidate
+        if angle == "front":
+            legacy = self._golden_base / sku / "reference.jpg"
+            if legacy.exists():
+                return legacy
+        return None
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -207,8 +336,11 @@ class VisualRegressionTester:
         gen_img = np.array(Image.open(generated_path).convert("RGB").resize(size))
         ref_img = np.array(Image.open(reference_path).convert("RGB").resize(size))
 
-        score: float = ssim(gen_img, ref_img, channel_axis=-1, data_range=255)
-        return float(score)
+        # ssim() returns a tuple when full=True or gradient=True; with our
+        # default kwargs it returns a single float, but the type stub declares
+        # the union. Cast for clarity.
+        score = ssim(gen_img, ref_img, channel_axis=-1, data_range=255)
+        return float(score)  # type: ignore[arg-type]
 
     def _write_report(
         self,
@@ -217,6 +349,8 @@ class VisualRegressionTester:
         reference_path: str,
         ssim_score: float,
         passed: bool,
+        angle: str = "front",
+        threshold: float | None = None,
     ) -> str:
         """Generate an HTML side-by-side comparison report.
 
@@ -232,7 +366,7 @@ class VisualRegressionTester:
         """
         self._reports_base.mkdir(parents=True, exist_ok=True)
         timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
-        report_path = self._reports_base / f"{sku}_{timestamp}.html"
+        report_path = self._reports_base / f"{sku}_{angle}_{timestamp}.html"
 
         gen_b64 = self._img_to_b64(generated_path)
         ref_b64 = self._img_to_b64(reference_path)
@@ -240,11 +374,15 @@ class VisualRegressionTester:
         badge_text = "PASS" if passed else "FAIL"
 
         html = _HTML_HEAD.format(sku=sku)
-        html += f"<h1>Visual Regression — {sku}</h1>\n"
-        html += f'<p class="meta">Generated {timestamp} UTC</p>\n'
+        html += f"<h1>Visual Regression — {sku} ({angle})</h1>\n"
+        html += f'<p class="meta">Generated {timestamp} UTC — angle={angle}</p>\n'
         html += f'<span class="badge {badge_class}">{badge_text}</span>\n'
         html += f'<div class="score">{ssim_score:.4f}</div>\n'
-        html += f'<p class="threshold">Threshold: {self._threshold}</p>\n'
+        # Honor the per-angle threshold actually used for this comparison —
+        # detail shots use 0.92, three-quarter uses 0.78, etc. Falling back
+        # to the global default would mis-report what the gate actually was.
+        effective_threshold = threshold if threshold is not None else self._threshold
+        html += f'<p class="threshold">Threshold: {effective_threshold}</p>\n'
         html += '<div class="grid">\n'
         html += (
             '<div class="panel"><h2>Reference (Golden)</h2>'

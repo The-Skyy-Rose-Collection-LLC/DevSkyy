@@ -10,22 +10,49 @@ and observability via Google ADK.
 
 from __future__ import annotations
 
+import asyncio
 import base64
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from adk.base import ADKProvider, AgentConfig, AgentResult
 from adk.super_agents import BaseSuperAgent
 
+from ..config import COMPOSITOR_QA_MODEL, QC_CLAUDE_MODEL
 from ..gemini_rest import analyze_vision as gemini_analyze_vision
 from ..models import QualityVerification
 
 logger = logging.getLogger(__name__)
 
-_CLAUDE_MODEL = "claude-opus-4-6"
-_GEMINI_VISION_MODEL = "gemini-2.0-flash"
+# Model IDs are imported from config (single source of truth) to prevent the
+# Phase 16 model-drift class of bugs. Do NOT add hardcoded model strings here.
 _PASS_THRESHOLD = 80
+
+_SCENE_QA_PROMPT = """You are QA-scoring a SCENE COMPOSITE render for SkyyRose luxury fashion.
+
+Expected spec:
+{spec}
+
+Score on a 0-100 scale across three dimensions:
+1. Lighting consistency (35%): Does the subject's lighting (direction, color
+   temperature, intensity) match the scene's? Score 0 and flag IDENTITY_MISMATCH
+   if the subject looks pasted-on with no lighting integration.
+2. Edge integration (30%): Are subject edges naturally blended? No halo, no
+   hard cutout artifacts, no chromatic fringing where subject meets scene.
+3. Contact shadow presence (35%): Is there a believable contact shadow
+   anchoring the subject to the scene? Score 0 if the subject appears to
+   float in space.
+
+Reply in this exact format:
+IDENTITY_SCORE: <0-100>
+IDENTITY_MISMATCH: <YES/NO>
+LIGHTING_SCORE: <0-100>
+EDGE_SCORE: <0-100>
+SHADOW_SCORE: <0-100>
+OVERALL: <weighted average>
+NOTES: <one sentence>
+"""
 
 _GHOST_QA_PROMPT = """You are QA-scoring a ghost-mannequin fashion product render for SkyyRose brand.
 
@@ -67,31 +94,54 @@ class QualityAgent(BaseSuperAgent):
         image_path: str,
         expected_spec: str,
         style: str = "flat_lay",
+        *,
+        mode: Literal["flat_lay", "scene_composite"] = "flat_lay",
     ) -> QualityVerification:
-        """
-        Consensus — min(score_A, score_B) >= 80 to pass.
-        Capture "Back Data" via ADK run.
+        """Run the dual-judge consensus QA gate.
+
+        The two scorers (Claude vision + Gemini vision) run in parallel via
+        ``asyncio.gather`` so wall-clock latency is the slower of the two,
+        not the sum. Each scorer is wrapped with its own try/except so a
+        provider outage degrades to a single-judge verdict instead of
+        crashing the whole pipeline. Pass requires ``min(score_a, score_b) >=
+        80`` AND no identity-mismatch flag from either judge.
+
+        Args:
+            image_path: render to verify.
+            expected_spec: textual contract the render must satisfy.
+            style: legacy parameter; kept for backward compatibility.
+            mode: ``flat_lay`` for B1 ghost-mannequin renders (the original
+                contract), ``scene_composite`` for B2 outputs where lighting
+                consistency, contact-shadow presence, and edge-blend artifacts
+                matter more than pure ghost-mannequin fidelity.
         """
         # Trigger ADK for observability
-        adk_prompt = f"QA TASK: Image={image_path}, Spec={expected_spec}"
-        logger.info(f"Running Legendary QA for {image_path} via ADK...")
-
-        # Capture result to get dictionary metadata
+        adk_prompt = f"QA TASK: Image={image_path}, Spec={expected_spec}, Mode={mode}"
+        logger.info("Running Legendary QA for %s via ADK (mode=%s)...", image_path, mode)
         adk_result = await self.execute(adk_prompt)
 
-        prompt = _GHOST_QA_PROMPT.format(spec=expected_spec)
+        rubric = _SCENE_QA_PROMPT if mode == "scene_composite" else _GHOST_QA_PROMPT
+        prompt = rubric.format(spec=expected_spec)
 
-        try:
-            score_a, mismatch_a, notes_a = await self._score_claude(image_path, prompt)
-        except Exception as exc:
-            score_a, mismatch_a, notes_a = 0, False, f"Claude QA failed: {exc}"
-            logger.warning("Claude QA failed for %s: %s", image_path, exc)
+        # Run both scorers in parallel — return_exceptions=True so a failure
+        # in one judge doesn't sink the other's verdict.
+        score_a_task = self._score_claude(image_path, prompt)
+        score_b_task = self._score_gemini(image_path, prompt)
+        result_a, result_b = await asyncio.gather(
+            score_a_task, score_b_task, return_exceptions=True
+        )
 
-        try:
-            score_b, mismatch_b, notes_b = await self._score_gemini(image_path, prompt)
-        except Exception as exc:
-            score_b, mismatch_b, notes_b = 0, False, f"Gemini QA failed: {exc}"
-            logger.warning("Gemini QA failed for %s: %s", image_path, exc)
+        if isinstance(result_a, BaseException):
+            score_a, mismatch_a, notes_a = 0, False, f"Claude QA failed: {result_a}"
+            logger.warning("Claude QA failed for %s: %s", image_path, result_a)
+        else:
+            score_a, mismatch_a, notes_a = result_a
+
+        if isinstance(result_b, BaseException):
+            score_b, mismatch_b, notes_b = 0, False, f"Gemini QA failed: {result_b}"
+            logger.warning("Gemini QA failed for %s: %s", image_path, result_b)
+        else:
+            score_b, mismatch_b, notes_b = result_b
 
         identity_mismatch = mismatch_a or mismatch_b
         min_score = min(score_a, score_b)
@@ -102,12 +152,12 @@ class QualityAgent(BaseSuperAgent):
             "min_score": min_score,
             "notes_claude": notes_a,
             "notes_gemini": notes_b,
+            "mode": mode,
         }
 
         # Check if adk_result is an AgentResult object
         metadata = {}
         if isinstance(adk_result, AgentResult):
-            # Try to get data for metadata
             metadata = {
                 "status": adk_result.status,
                 "agent": adk_result.agent_name,
@@ -119,7 +169,7 @@ class QualityAgent(BaseSuperAgent):
             return QualityVerification(
                 success=True,
                 provider="dual_vision",
-                model=f"{_CLAUDE_MODEL}+{_GEMINI_VISION_MODEL}",
+                model=f"{QC_CLAUDE_MODEL}+{COMPOSITOR_QA_MODEL}",
                 overall_status="fail",
                 recommendation="regenerate",
                 details=details,
@@ -130,7 +180,7 @@ class QualityAgent(BaseSuperAgent):
         return QualityVerification(
             success=True,
             provider="dual_vision",
-            model=f"{_CLAUDE_MODEL}+{_GEMINI_VISION_MODEL}",
+            model=f"{QC_CLAUDE_MODEL}+{COMPOSITOR_QA_MODEL}",
             overall_status="pass" if passed else "fail",
             recommendation="approve" if passed else "regenerate",
             details=details,
@@ -150,21 +200,29 @@ class QualityAgent(BaseSuperAgent):
         with open(image_path, "rb") as f:
             b64 = base64.standard_b64encode(f.read()).decode("utf-8")
 
-        msg = client.messages.create(
-            model=_CLAUDE_MODEL,
+        # Anthropic SDK's messages.create() is a synchronous network call —
+        # wrap it in to_thread so it doesn't block the event loop while the
+        # parallel Gemini scorer runs.
+        # Anthropic's SDK declares strict TypedDicts for content blocks. The
+        # plain-dict shape below is the documented and runtime-accepted form;
+        # pyright's strict check rejects it. Cast through Any at the boundary.
+        messages: Any = [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "image",
+                        "source": {"type": "base64", "media_type": media_type, "data": b64},
+                    },
+                    {"type": "text", "text": prompt},
+                ],
+            }
+        ]
+        msg = await asyncio.to_thread(
+            client.messages.create,
+            model=QC_CLAUDE_MODEL,
             max_tokens=256,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "source": {"type": "base64", "media_type": media_type, "data": b64},
-                        },
-                        {"type": "text", "text": prompt},
-                    ],
-                }
-            ],
+            messages=messages,
         )
         return _parse_qa_response(msg.content[0].text)
 
@@ -174,8 +232,13 @@ class QualityAgent(BaseSuperAgent):
         with open(image_path, "rb") as f:
             b64 = base64.standard_b64encode(f.read()).decode("utf-8")
 
-        result = gemini_analyze_vision(
-            model=_GEMINI_VISION_MODEL, prompt=prompt, image_b64=b64, mime_type=mime
+        # gemini_rest.analyze_vision is sync — same to_thread treatment.
+        result = await asyncio.to_thread(
+            gemini_analyze_vision,
+            model=COMPOSITOR_QA_MODEL,
+            prompt=prompt,
+            image_b64=b64,
+            mime_type=mime,
         )
         if not result.get("success"):
             raise RuntimeError(result.get("error", "Gemini QA failed"))

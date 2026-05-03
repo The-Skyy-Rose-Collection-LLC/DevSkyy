@@ -433,11 +433,19 @@ def scene_composite_node(state: dict) -> dict:
         from skyyrose.elite_studio.agents.compositor_agent import CompositorAgent
 
         agent = CompositorAgent()
+        scene_image_path = params.get("scene_image_path", "")
+        model_image_path = params.get("model_image_path") or scene_image_path
+        if not scene_image_path or not model_image_path:
+            raise RuntimeError(
+                "scene_composite_node requires scene_image_path and model_image_path in params"
+            )
         result = agent.composite(
             sku=sku,
-            image_path=params.get("model_image_path") or params.get("scene_image_path", ""),
+            scene_image_path=scene_image_path,
+            model_image_path=model_image_path,
             collection=params.get("collection", ""),
             scene_name=params.get("scene_name", ""),
+            output_dir=params.get("output_dir") or "renders/output/compositor",
         )
         composite_result = {
             "success": result.success,

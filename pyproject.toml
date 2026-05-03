@@ -85,6 +85,7 @@ dependencies = [
     "cohere>=5.20.0",
     "mistralai>=1.10.1",  # Updated for security and compatibility
     "groq>=0.37.0",
+    "voyageai>=0.2.4",  # Asymmetric document/query embeddings (RAG-optimized)
 
     # Monitoring
     "prometheus-client>=0.19",
@@ -481,8 +482,6 @@ markers = [
     "security: marks tests as security tests (XSS, CSRF, SQL injection, etc.)",
     "smoke: critical path tests for CI (run with '-m smoke')",
 ]
-# Production test timeouts - 120s allows for network/ML operations
-timeout = 120
 
 # =============================================================================
 # Coverage Configuration

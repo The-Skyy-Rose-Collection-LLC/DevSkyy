@@ -79,10 +79,22 @@ class CatalogRetriever:
         embedding_engine: BaseEmbeddingEngine | None = None,
         vector_store: BaseVectorStore | None = None,
         collection_name: str | None = None,
+        namespace: str | None = "catalog",
     ) -> None:
+        """
+        Args:
+            embedding_engine: Override the default Sentence Transformers engine
+                (e.g. pass a configured VoyageEmbeddingEngine for production).
+            vector_store: Override the default ChromaDB store
+                (e.g. pass a Pinecone store for production).
+            collection_name: Override the Chroma collection name.
+            namespace: Logical partition within the index. Defaults to "catalog";
+                pass `None` to write/read in the default partition.
+        """
         self._embedder = embedding_engine
         self._store = vector_store
         self._collection_name = collection_name or self.DEFAULT_COLLECTION
+        self._namespace = namespace
         self._initialized = False
 
     async def initialize(self) -> None:
@@ -106,31 +118,61 @@ class CatalogRetriever:
     async def index_catalog(self, *, dry_run: bool = False) -> dict[str, Any]:
         """Embed + upsert every SKU in the canonical catalog.
 
+        Each SKU's content is composed from its CSV row PLUS its per-product
+        dossier markdown (technique, color, embroidery placement, scene
+        setting). SKUs without a dossier (retired, or not yet authored) are
+        skipped and listed in `manifest['skipped_skus']` rather than failing
+        the run — call sites can decide whether the skip set is acceptable.
+
         Args:
             dry_run: when True, skip the upsert and return the count + sample
                      so callers can preview cost/work before committing.
 
         Returns:
-            Manifest dict: {total_skus, indexed_ids, dry_run, sample_ids}
+            Manifest dict: {total_skus, indexed_ids, skipped_skus, dry_run,
+            sample_ids, namespace}
         """
         self._require_init()
         rows = self._catalog_rows()
 
+        # Lazy import — keeps skyyrose.core optional at module load
+        try:
+            from skyyrose.core.dossier_loader import (
+                DossierMissingError,
+                get_product_with_dossier,
+            )
+        except ImportError as exc:
+            raise RuntimeError(
+                f"CatalogRetriever now requires skyyrose.core.dossier_loader. Import failed: {exc}"
+            ) from exc
+
         documents: list[Document] = []
         texts: list[str] = []
+        skipped: list[dict[str, str]] = []
+
         for row in rows:
-            content = self._compose_content(row)
+            sku = (row.get("sku") or "").strip()
+            try:
+                merged = get_product_with_dossier(sku)
+            except (DossierMissingError, KeyError) as exc:
+                logger.info("Skipping %s: %s", sku, exc)
+                skipped.append({"sku": sku, "reason": type(exc).__name__})
+                continue
+
+            dossier_data = merged.get("dossier", {})
+            content = self._compose_content(row, dossier_data)
             doc = Document(
-                id=f"sku:{row['sku']}",
+                id=f"sku:{sku}",
                 content=content,
                 metadata={
-                    "sku": row["sku"],
+                    "sku": sku,
                     "name": (row.get("name") or "").strip(),
                     "collection": (row.get("collection") or "").strip().lower(),
                     "price": (row.get("price") or "").strip(),
                     "badge": (row.get("badge") or "").strip(),
                     "published": (row.get("published") or "").strip() == "1",
-                    "branding_spec": (row.get("branding_spec") or "").strip(),
+                    "garment_type_lock": (dossier_data.get("garment_type_lock") or "").strip(),
+                    "branding_block": (dossier_data.get("branding_block") or "").strip(),
                     "description": (row.get("description") or "").strip(),
                 },
                 source="wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv",
@@ -143,24 +185,29 @@ class CatalogRetriever:
             "dry_run": dry_run,
             "sample_ids": [d.id for d in documents[:5]],
             "indexed_ids": [],
+            "skipped_skus": skipped,
+            "namespace": self._namespace,
         }
 
         if dry_run or not documents:
             logger.info(
-                "CatalogRetriever.index_catalog: %s mode, %d docs prepared",
+                "CatalogRetriever.index_catalog: %s mode, %d docs prepared, %d skipped",
                 "DRY-RUN" if dry_run else "EMPTY",
                 len(documents),
+                len(skipped),
             )
             return manifest
 
         assert self._embedder is not None and self._store is not None
         embeddings = await self._embedder.embed_batch(texts)
-        ids = await self._store.add_documents(documents, embeddings)
+        ids = await self._store.add_documents(documents, embeddings, namespace=self._namespace)
         manifest["indexed_ids"] = ids
         logger.info(
-            "CatalogRetriever.index_catalog: indexed %d SKUs into %s",
+            "CatalogRetriever.index_catalog: indexed %d SKUs into %s (ns=%s, skipped=%d)",
             len(ids),
             self._collection_name,
+            self._namespace,
+            len(skipped),
         )
         return manifest
 
@@ -187,6 +234,7 @@ class CatalogRetriever:
             query_embedding=query_embedding,
             top_k=top_k,
             filter_metadata=filter_metadata,
+            namespace=self._namespace,
         )
         return [self._match_from_result(r) for r in results]
 
@@ -221,21 +269,41 @@ class CatalogRetriever:
             )
 
     @staticmethod
-    def _compose_content(row: dict[str, str]) -> str:
-        """Combine the fields that carry semantic signal for search."""
+    def _compose_content(row: dict[str, str], dossier_data: dict[str, str]) -> str:
+        """Compose semantic content from CSV row + parsed dossier.
+
+        Dossier fields carry the high-signal content (technique, color,
+        embroidery placement, scene context); CSV fields anchor the product
+        identity (name, collection, price tier). The dossier's `negative_block`
+        is intentionally OMITTED — it describes what NOT to render and would
+        pollute similarity scoring (a query like "no chest logo" would otherwise
+        be drawn to negative-block-rich documents).
+        """
         parts: list[str] = []
         name = (row.get("name") or "").strip()
         collection = (row.get("collection") or "").strip()
-        branding = (row.get("branding_spec") or "").strip()
         description = (row.get("description") or "").strip()
+
         if name:
             parts.append(f"Product: {name}")
         if collection:
             parts.append(f"Collection: {collection}")
+
+        garment_lock = (dossier_data.get("garment_type_lock") or "").strip()
+        if garment_lock:
+            parts.append(f"Garment: {garment_lock}")
+
+        branding = (dossier_data.get("branding_block") or "").strip()
         if branding:
-            parts.append(f"Branding: {branding}")
+            parts.append(f"Branding:\n{branding}")
+
+        setting = (dossier_data.get("scene_setting") or "").strip()
+        if setting:
+            parts.append(f"Setting: {setting}")
+
         if description:
             parts.append(description)
+
         return "\n".join(parts)
 
     @staticmethod
@@ -246,9 +314,48 @@ class CatalogRetriever:
             name=meta.get("name", ""),
             collection=meta.get("collection", ""),
             score=result.score,
-            branding_spec=meta.get("branding_spec", ""),
+            # Prefer the rich dossier branding_block; fall back to legacy CSV
+            # branding_spec for any pre-existing index entries.
+            branding_spec=meta.get("branding_block") or meta.get("branding_spec", ""),
             description=meta.get("description", ""),
         )
+
+    @classmethod
+    async def for_production(
+        cls,
+        *,
+        namespace: str | None = "catalog",
+        pinecone_index: str | None = None,
+    ) -> "CatalogRetriever":
+        """Pre-configured retriever using Voyage 3-large + Pinecone serverless.
+
+        Reads PINECONE_API_KEY and VOYAGE_API_KEY from environment. Creates the
+        Pinecone index if it does not exist (dimension 1024 for voyage-3-large).
+
+        Returns an already-initialized retriever — call sites can go straight
+        to `index_catalog()` or `retrieve()` without an extra `initialize()`.
+        """
+        import os
+
+        embedding = create_embedding_engine(EmbeddingConfig(provider=EmbeddingProvider.VOYAGE))
+        await embedding.initialize()
+
+        store = create_vector_store(
+            VectorStoreConfig(
+                db_type=VectorDBType.PINECONE,
+                pinecone_index_name=pinecone_index or os.getenv("PINECONE_INDEX_NAME", "skyyrose"),
+                dimension=embedding.dimension or 1024,
+            )
+        )
+        await store.initialize()
+
+        retriever = cls(
+            embedding_engine=embedding,
+            vector_store=store,
+            namespace=namespace,
+        )
+        retriever._initialized = True
+        return retriever
 
     def _require_init(self) -> None:
         if not self._initialized:

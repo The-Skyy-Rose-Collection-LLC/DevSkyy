@@ -343,13 +343,16 @@ def compositor_node(state: EliteStudioState) -> dict:
                 )
                 scenes = discover_scene_images(collection)
                 if scenes:
-                    comp_result = run_sync(
-                        agent.composite(
-                            sku=state["sku"],
-                            image_path=gen.output_path,
-                            scene_name=scene_name,
-                            collection=collection,
-                        )
+                    # composite() is sync since the Phase B2 rewrite — no
+                    # run_sync wrapper needed. The model image is the B1
+                    # generator output; the scene image is the first scene
+                    # discovered for the collection.
+                    comp_result = agent.composite(
+                        sku=state["sku"],
+                        scene_image_path=str(scenes[0]),
+                        model_image_path=gen.output_path,
+                        scene_name=scene_name,
+                        collection=collection,
                     )
                 break
     except Exception:
