@@ -7,7 +7,7 @@
       "error_message": "Significant refactor of ",
       "file": "wordpress-theme/skyyrose-flagship/assets/css/preorder-gateway.css",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 5→12 lines (2 removed) | Also: .po-rv {; .po-rv--visible {",
+      "fix": "Rewrote 5\u219212 lines (2 removed) | Also: .po-rv {; .po-rv--visible {",
       "tags": [
         "auto-detected",
         "refactor",
@@ -23,7 +23,7 @@
       "error_message": "Significant refactor of ",
       "file": "wordpress-theme/skyyrose-flagship/assets/js/preorder-gateway.js",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 21→26 lines (2 removed)",
+      "fix": "Rewrote 21\u219226 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -38,7 +38,7 @@
       "timestamp": "2026-04-08T00:59:15.259Z",
       "error_message": "Missing error handling in after_compositor",
       "file": "../elite-layer-2/skyyrose/elite_studio/graph/edges.py",
-      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
       "fix": "Added try/catch block",
       "tags": [
         "auto-detected",
@@ -70,7 +70,7 @@
       "timestamp": "2026-04-08T03:20:12.400Z",
       "error_message": "Missing await",
       "file": "../elite-layer-3/agent_sdk/worker.py",
-      "root_cause": "Async call without await — returned Promise instead of value",
+      "root_cause": "Async call without await \u2014 returned Promise instead of value",
       "fix": "Added await to async call",
       "tags": [
         "auto-detected",
@@ -103,7 +103,7 @@
       "error_message": "Significant refactor of ",
       "file": "scripts/deploy-theme.sh",
       "root_cause": "7 lines replaced/restructured",
-      "fix": "Rewrote 14→25 lines (7 removed) | Also: # 2. Enable maintenance mode (DEPLOY-02); wp_remote \"maintenance-mode activate\" | Also: scp -P \"${SSH_PORT:-22}\" $key_flag -o StrictHostKe; ssh -p \"${SSH_PORT:-22}\" $key_flag -o StrictHostKe",
+      "fix": "Rewrote 14\u219225 lines (7 removed) | Also: # 2. Enable maintenance mode (DEPLOY-02); wp_remote \"maintenance-mode activate\" | Also: scp -P \"${SSH_PORT:-22}\" $key_flag -o StrictHostKe; ssh -p \"${SSH_PORT:-22}\" $key_flag -o StrictHostKe",
       "tags": [
         "auto-detected",
         "refactor",
@@ -135,7 +135,7 @@
       "error_message": "Significant refactor of ",
       "file": "../elite-layer-3/skyyrose/elite_studio/queue/dead_letter.py",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 4→4 lines (2 removed)",
+      "fix": "Rewrote 4\u21924 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -151,7 +151,7 @@
       "error_message": "Significant refactor of ",
       "file": "../elite-layer-3/tests/test_elite_queue_consumer.py",
       "root_cause": "6 lines replaced/restructured",
-      "fix": "Rewrote 19→12 lines (6 removed)",
+      "fix": "Rewrote 19\u219212 lines (6 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -167,7 +167,7 @@
       "error_message": "Significant refactor of ",
       "file": "../elite-layer-3/skyyrose/elite_studio/queue/consumer.py",
       "root_cause": "3 lines replaced/restructured",
-      "fix": "Rewrote 42→63 lines (3 removed) | Also: logger.error(\"EliteStudioWorker: job %s failed: %s; self._dlq.move_to_dlq(",
+      "fix": "Rewrote 42\u219263 lines (3 removed) | Also: logger.error(\"EliteStudioWorker: job %s failed: %s; self._dlq.move_to_dlq(",
       "tags": [
         "auto-detected",
         "refactor",
@@ -247,7 +247,7 @@
       "error_message": "Significant refactor of ",
       "file": "../elite-layer-4/tests/test_quality_classifier.py",
       "root_cause": "16 lines replaced/restructured",
-      "fix": "Rewrote 61→78 lines (16 removed)",
+      "fix": "Rewrote 61\u219278 lines (16 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -279,7 +279,7 @@
       "error_message": "Significant refactor of ",
       "file": "skyyrose/elite_studio/character/agent.py",
       "root_cause": "10 lines replaced/restructured",
-      "fix": "Rewrote 17→20 lines (10 removed)",
+      "fix": "Rewrote 17\u219220 lines (10 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -310,8 +310,8 @@
       "timestamp": "2026-04-14T20:27:02.379Z",
       "error_message": "CSS fix: hover",
       "file": "frontend/components/mascot/MascotBubble.tsx",
-      "root_cause": "hover: scale-110 hover:shadow-xl hover:shadow-[#B76E79]/40 → scale-105",
-      "fix": "Changed hover: scale-110 hover:shadow-xl hover:shadow-[#B76E79]/40 → scale-105",
+      "root_cause": "hover: scale-110 hover:shadow-xl hover:shadow-[#B76E79]/40 \u2192 scale-105",
+      "fix": "Changed hover: scale-110 hover:shadow-xl hover:shadow-[#B76E79]/40 \u2192 scale-105",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -327,7 +327,7 @@
       "error_message": "Significant refactor of ",
       "file": "frontend/components/mascot/MascotBubble.tsx",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 11→17 lines (2 removed) | Also: import Image from 'next/image';; // Canonical Skyy character image — the real masco | Also: <div className=\"h-10 w-10 rounded-full bg-white/20; <Image",
+      "fix": "Rewrote 11\u219217 lines (2 removed) | Also: import Image from 'next/image';; // Canonical Skyy character image \u2014 the real masco | Also: <div className=\"h-10 w-10 rounded-full bg-white/20; <Image",
       "tags": [
         "auto-detected",
         "refactor",
@@ -359,7 +359,7 @@
       "error_message": "Wrong operator: || should be &&",
       "file": "wordpress-theme/skyyrose-flagship/assets/js/skyy-3d.js",
       "root_cause": "Used \"||\" instead of \"&&\"",
-      "fix": "Changed operator || → &&",
+      "fix": "Changed operator || \u2192 &&",
       "tags": [
         "auto-detected",
         "operator-fix",
@@ -391,7 +391,7 @@
       "error_message": "Significant refactor of ",
       "file": "tests/test_character_system.py",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 4→5 lines (2 removed)",
+      "fix": "Rewrote 4\u21925 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -407,7 +407,7 @@
       "error_message": "Significant refactor of ",
       "file": "wordpress-theme/skyyrose-flagship/assets/js/skyy-3d.js",
       "root_cause": "5 lines replaced/restructured",
-      "fix": "Rewrote 8→3 lines (5 removed)",
+      "fix": "Rewrote 8\u21923 lines (5 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -471,7 +471,7 @@
       "error_message": "Wrong reference: true should be false",
       "file": ".claude/settings.json",
       "root_cause": "Used \"true\" instead of \"false\"",
-      "fix": "Changed true → false",
+      "fix": "Changed true \u2192 false",
       "tags": [
         "auto-detected",
         "wrong-reference",
@@ -502,7 +502,7 @@
       "timestamp": "2026-04-16T00:36:57.368Z",
       "error_message": "Missing error handling in catches",
       "file": "../.claude/agents/gsd-codebase-mapper.md",
-      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
       "fix": "Added try/catch block",
       "tags": [
         "auto-detected",
@@ -519,7 +519,7 @@
       "error_message": "Wrong reference: agent_sdk should be sdk",
       "file": "tests/test_hybrid_simple.py",
       "root_cause": "Used \"agent_sdk\" instead of \"sdk\"",
-      "fix": "Changed agent_sdk → sdk",
+      "fix": "Changed agent_sdk \u2192 sdk",
       "tags": [
         "auto-detected",
         "wrong-reference",
@@ -534,7 +534,7 @@
       "timestamp": "2026-04-16T00:37:50.155Z",
       "error_message": "Missing error handling in unknown",
       "file": "../.claude/agents/gsd-integration-checker.md",
-      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
       "fix": "Added try/catch block",
       "tags": [
         "auto-detected",
@@ -551,7 +551,7 @@
       "error_message": "Wrong reference: agent_sdk should be sdk",
       "file": "tests/integration/test_hybrid_integration.py",
       "root_cause": "Used \"agent_sdk\" instead of \"sdk\"",
-      "fix": "Changed agent_sdk → sdk",
+      "fix": "Changed agent_sdk \u2192 sdk",
       "tags": [
         "auto-detected",
         "wrong-reference",
@@ -567,7 +567,7 @@
       "error_message": "Wrong reference: agent_sdk should be sdk",
       "file": "examples/multi_agent_workflow.py",
       "root_cause": "Used \"agent_sdk\" instead of \"sdk\"",
-      "fix": "Changed agent_sdk → sdk",
+      "fix": "Changed agent_sdk \u2192 sdk",
       "tags": [
         "auto-detected",
         "wrong-reference",
@@ -583,7 +583,7 @@
       "error_message": "Wrong reference: agent_sdk should be sdk",
       "file": "examples/basic_query.py",
       "root_cause": "Used \"agent_sdk\" instead of \"sdk\"",
-      "fix": "Changed agent_sdk → sdk",
+      "fix": "Changed agent_sdk \u2192 sdk",
       "tags": [
         "auto-detected",
         "wrong-reference",
@@ -599,7 +599,7 @@
       "error_message": "Wrong reference: agent_sdk should be sdk",
       "file": "examples/continuous_conversation.py",
       "root_cause": "Used \"agent_sdk\" instead of \"sdk\"",
-      "fix": "Changed agent_sdk → sdk",
+      "fix": "Changed agent_sdk \u2192 sdk",
       "tags": [
         "auto-detected",
         "wrong-reference",
@@ -615,7 +615,7 @@
       "error_message": "Significant refactor of ",
       "file": "tasks/todo.md",
       "root_cause": "7 lines replaced/restructured",
-      "fix": "Rewrote 7→7 lines (7 removed)",
+      "fix": "Rewrote 7\u21927 lines (7 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -631,7 +631,7 @@
       "error_message": "Significant refactor of ",
       "file": "sdk/python/agent_sdk/super_agents/__init__.py",
       "root_cause": "6 lines replaced/restructured",
-      "fix": "Rewrote 6→6 lines (6 removed)",
+      "fix": "Rewrote 6\u21926 lines (6 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -663,7 +663,7 @@
       "error_message": "Wrong reference: str should be StrEnum",
       "file": "services/image_ingestion.py",
       "root_cause": "Used \"str\" instead of \"StrEnum\"",
-      "fix": "Changed str → StrEnum",
+      "fix": "Changed str \u2192 StrEnum",
       "tags": [
         "auto-detected",
         "wrong-reference",
@@ -694,7 +694,7 @@
       "timestamp": "2026-04-16T20:42:51.359Z",
       "error_message": "Missing error handling in unknown",
       "file": "tests/test_rag_integration.py",
-      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
       "fix": "Added try/catch block",
       "tags": [
         "auto-detected",
@@ -711,7 +711,7 @@
       "error_message": "Significant refactor of ",
       "file": "scripts/generate_catalog.py",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 16→21 lines (2 removed)",
+      "fix": "Rewrote 16\u219221 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -727,7 +727,7 @@
       "error_message": "Significant refactor of ",
       "file": "scripts/generate_catalog.py",
       "root_cause": "18 lines replaced/restructured",
-      "fix": "Rewrote 21→3 lines (18 removed)",
+      "fix": "Rewrote 21\u21923 lines (18 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -743,7 +743,7 @@
       "error_message": "Significant refactor of ",
       "file": "skyyrose/elite_studio/catalog.py",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 16→20 lines (2 removed) | Also: # 4. jerseys.sku_to_patch — every mapped SKU must ; jersey_series = series_by_name.get(\"Jersey Series\" | Also: # 4. jerseys.sku_to_patch — every mapped SKU must ; #    (We intentionally do NOT require membership i",
+      "fix": "Rewrote 16\u219220 lines (2 removed) | Also: # 4. jerseys.sku_to_patch \u2014 every mapped SKU must ; jersey_series = series_by_name.get(\"Jersey Series\" | Also: # 4. jerseys.sku_to_patch \u2014 every mapped SKU must ; #    (We intentionally do NOT require membership i",
       "tags": [
         "auto-detected",
         "refactor",
@@ -758,7 +758,7 @@
       "timestamp": "2026-04-17T13:52:01.770Z",
       "error_message": "Missing error handling in _validate_integrity",
       "file": "skyyrose/elite_studio/catalog.py",
-      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
       "fix": "Added try/catch block",
       "tags": [
         "auto-detected",
@@ -775,7 +775,7 @@
       "error_message": "Significant refactor of ",
       "file": "scripts/generate_catalog.py",
       "root_cause": "3 lines replaced/restructured",
-      "fix": "Rewrote 8→10 lines (3 removed) | Also: \"Jersey Series\": {; \"Every SkyyRose jersey lives here. Sport-specific ",
+      "fix": "Rewrote 8\u219210 lines (3 removed) | Also: \"Jersey Series\": {; \"Every SkyyRose jersey lives here. Sport-specific ",
       "tags": [
         "auto-detected",
         "refactor",
@@ -791,7 +791,7 @@
       "error_message": "Wrong reference: legacy should be d99",
       "file": "skyyrose/elite_studio/tests/test_catalog_validation.py",
       "root_cause": "Used \"legacy\" instead of \"d99\"",
-      "fix": "Changed legacy → d99",
+      "fix": "Changed legacy \u2192 d99",
       "tags": [
         "auto-detected",
         "wrong-reference",
@@ -807,7 +807,7 @@
       "error_message": "Significant refactor of ",
       "file": "skyyrose/elite_studio/catalog.py",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 4→6 lines (2 removed)",
+      "fix": "Rewrote 4\u21926 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -823,7 +823,7 @@
       "error_message": "Significant refactor of ",
       "file": "skyyrose/elite_studio/prompts/library.py",
       "root_cause": "3 lines replaced/restructured",
-      "fix": "Rewrote 7→9 lines (3 removed)",
+      "fix": "Rewrote 7\u21929 lines (3 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -855,7 +855,7 @@
       "error_message": "Significant refactor of ",
       "file": "skyyrose/elite_studio/tests/test_brand_enforcement.py",
       "root_cause": "11 lines replaced/restructured",
-      "fix": "Rewrote 37→68 lines (11 removed)",
+      "fix": "Rewrote 37\u219268 lines (11 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -887,7 +887,7 @@
       "error_message": "Significant refactor of ",
       "file": "core/middleware/tenant.py",
       "root_cause": "4 lines replaced/restructured",
-      "fix": "Rewrote 16→29 lines (4 removed) | Also: # decode_token without verification — we only want; options={\"verify_signature\": False, \"verify_exp\": ",
+      "fix": "Rewrote 16\u219229 lines (4 removed) | Also: # decode_token without verification \u2014 we only want; options={\"verify_signature\": False, \"verify_exp\": ",
       "tags": [
         "auto-detected",
         "refactor",
@@ -902,7 +902,7 @@
       "timestamp": "2026-04-19T00:43:18.486Z",
       "error_message": "Missing await",
       "file": "skyyrose/elite_studio/queue/producer.py",
-      "root_cause": "Async call without await — returned Promise instead of value",
+      "root_cause": "Async call without await \u2014 returned Promise instead of value",
       "fix": "Added await to async call | Also: return _run_sync(_async_enqueue(job_data)); async def aenqueue_creative(",
       "tags": [
         "auto-detected",
@@ -951,7 +951,7 @@
       "error_message": "Significant refactor of ",
       "file": "skyyrose/elite_studio/prompts/cache.py",
       "root_cause": "3 lines replaced/restructured",
-      "fix": "Rewrote 4→24 lines (3 removed) | Also: def check(self, prompt: str, intent: str, threshol; key = f\"{self.CACHE_PREFIX}:{_prompt_hash(prompt,  | Also: def store(self, original: str, enhanced: Any, ttl:; key = f\"{self.CACHE_PREFIX}:{_prompt_hash(original",
+      "fix": "Rewrote 4\u219224 lines (3 removed) | Also: def check(self, prompt: str, intent: str, threshol; key = f\"{self.CACHE_PREFIX}:{_prompt_hash(prompt,  | Also: def store(self, original: str, enhanced: Any, ttl:; key = f\"{self.CACHE_PREFIX}:{_prompt_hash(original",
       "tags": [
         "auto-detected",
         "refactor",
@@ -967,7 +967,7 @@
       "error_message": "Wrong reference: _prompt_hash should be _context_digest",
       "file": "skyyrose/elite_studio/prompts/enhancer.py",
       "root_cause": "Used \"_prompt_hash\" instead of \"_context_digest\"",
-      "fix": "Changed _prompt_hash → _context_digest",
+      "fix": "Changed _prompt_hash \u2192 _context_digest",
       "tags": [
         "auto-detected",
         "wrong-reference",
@@ -983,7 +983,7 @@
       "error_message": "Significant refactor of ",
       "file": "skyyrose/elite_studio/prompts/enhancer.py",
       "root_cause": "3 lines replaced/restructured",
-      "fix": "Rewrote 6→10 lines (3 removed)",
+      "fix": "Rewrote 6\u219210 lines (3 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -1014,7 +1014,7 @@
       "timestamp": "2026-04-19T00:51:54.224Z",
       "error_message": "Missing error handling in closeDialog",
       "file": "wordpress-theme/skyyrose-flagship/assets/js/smart-showcase.js",
-      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling \u2014 exceptions would propagate uncaught",
       "fix": "Added try/catch block",
       "tags": [
         "auto-detected",
@@ -1031,7 +1031,7 @@
       "error_message": "Significant refactor of ",
       "file": "wordpress-theme/skyyrose-flagship/assets/js/experience-analyzer.js",
       "root_cause": "5 lines replaced/restructured",
-      "fix": "Rewrote 10→14 lines (5 removed)",
+      "fix": "Rewrote 10\u219214 lines (5 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -1063,7 +1063,7 @@
       "error_message": "Significant refactor of ",
       "file": "core/middleware/tenant.py",
       "root_cause": "3 lines replaced/restructured",
-      "fix": "Rewrote 17→15 lines (3 removed) | Also: # No secret configured — refuse to trust any token; # to unverified decoding; that was the previous se",
+      "fix": "Rewrote 17\u219215 lines (3 removed) | Also: # No secret configured \u2014 refuse to trust any token; # to unverified decoding; that was the previous se",
       "tags": [
         "auto-detected",
         "refactor",
@@ -1095,7 +1095,7 @@
       "error_message": "Significant refactor of ",
       "file": "sdk/python/agent_sdk/worker.py",
       "root_cause": "5 lines replaced/restructured",
-      "fix": "Rewrote 8→6 lines (5 removed)",
+      "fix": "Rewrote 8\u21926 lines (5 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -1110,7 +1110,7 @@
       "timestamp": "2026-04-19T07:13:31.997Z",
       "error_message": "Missing await",
       "file": "../.claude/plans/i-want-you-to-shiny-clarke.md",
-      "root_cause": "Async call without await — returned Promise instead of value",
+      "root_cause": "Async call without await \u2014 returned Promise instead of value",
       "fix": "Added await to async call",
       "tags": [
         "auto-detected",
@@ -1127,7 +1127,7 @@
       "error_message": "Incorrect value in code",
       "file": "../.claude/plans/i-want-you-to-shiny-clarke.md",
       "root_cause": "Had `collection=\"",
-      "fix": "Changed to `api/v1/media.py:43–51`",
+      "fix": "Changed to `api/v1/media.py:43\u201351`",
       "tags": [
         "auto-detected",
         "wrong-value",
@@ -1143,7 +1143,7 @@
       "error_message": "Significant refactor of ",
       "file": "../.claude/plans/i-want-you-to-shiny-clarke.md",
       "root_cause": "6 lines replaced/restructured",
-      "fix": "Rewrote 6→8 lines (6 removed)",
+      "fix": "Rewrote 6\u21928 lines (6 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -1159,7 +1159,7 @@
       "error_message": "Significant refactor of ",
       "file": "scripts/deploy-theme.sh",
       "root_cause": "4 lines replaced/restructured",
-      "fix": "Rewrote 14→24 lines (4 removed) | Also: local key_path=\"${SSH_KEY_PATH:-$HOME/.ssh/skyyros; local ssh_opts=\"-o StrictHostKeyChecking=yes -p ${ | Also: # 3. Transfer files (DEPLOY-01); log_error \"Site may be in a broken state — investi | Also: declare -A PHASE_TIMES=(); declare -A PHASE_STARTED=()",
+      "fix": "Rewrote 14\u219224 lines (4 removed) | Also: local key_path=\"${SSH_KEY_PATH:-$HOME/.ssh/skyyros; local ssh_opts=\"-o StrictHostKeyChecking=yes -p ${ | Also: # 3. Transfer files (DEPLOY-01); log_error \"Site may be in a broken state \u2014 investi | Also: declare -A PHASE_TIMES=(); declare -A PHASE_STARTED=()",
       "tags": [
         "auto-detected",
         "refactor",
@@ -1174,7 +1174,7 @@
       "timestamp": "2026-04-19T00:00:00.000Z",
       "error_message": "Deploy preflight takes 5-6 min per invocation; PHP lint walks vendor/",
       "file": "scripts/deploy-theme.sh",
-      "root_cause": "find at line 206 walked all .php under THEME_DIR with no prunes. 3,881 files total but only 124 are the theme's; the other 3,756 are Composer vendor deps. At 0.36s per php -l, vendor-lint alone cost 5-6 min per deploy. vendor/ was already gitignored, excluded from tarball, and excluded from phpcs — the lint walk was the last path that didn't get the memo.",
+      "root_cause": "find at line 206 walked all .php under THEME_DIR with no prunes. 3,881 files total but only 124 are the theme's; the other 3,756 are Composer vendor deps. At 0.36s per php -l, vendor-lint alone cost 5-6 min per deploy. vendor/ was already gitignored, excluded from tarball, and excluded from phpcs \u2014 the lint walk was the last path that didn't get the memo.",
       "fix": "Added -prune for vendor, node_modules, tests, .git. Replaced hardcoded /opt/homebrew/bin/php with `command -v php` fallback. Added file count to success log. Scope: 124 (was 3,881). Expected preflight: ~45s (was ~5-6 min).",
       "tags": [
         "deploy",
@@ -1209,7 +1209,7 @@
       "timestamp": "2026-04-19T00:00:02.000Z",
       "error_message": "If verify_live() fails, site stays broken; no auto-rollback",
       "file": "scripts/deploy-theme.sh",
-      "root_cause": "verify_live returned non-zero but main() only logged and exited 1 — the broken theme remained live. Old theme was already deleted by the immediate rm -rf .old.$swap_id at end of try_rsync, so no backup to restore.",
+      "root_cause": "verify_live returned non-zero but main() only logged and exited 1 \u2014 the broken theme remained live. Old theme was already deleted by the immediate rm -rf .old.$swap_id at end of try_rsync, so no backup to restore.",
       "fix": "Added auto_rollback() that SSHs remote, reverses the swap (mv broken to .failed.$ts, restore .old.$ts into live path), and flushes caches. Changed try_rsync to NOT delete .old.$ts immediately. Cleanup trap inspects ROLLBACK_REQUESTED and calls auto_rollback on verify failure. Exit code 3 signals rollback occurred.",
       "tags": [
         "deploy",
@@ -1248,7 +1248,7 @@
       "error_message": "verify_live checked only homepage; CSS/JS breakage silent when WP-CDN cached HTML",
       "file": "scripts/deploy-theme.sh",
       "root_cause": "verify_live() only curled the homepage. If WP-CDN served cached HTML but new CSS/JS 404'd from origin, check passed while site was visibly broken. Also: no per-phase timing, no structured log.",
-      "fix": "Extended verify_live() to curl style.css, immersive.css, immersive.js with cache-busting. Every asset URL must return 200. Added DEPLOY_CHECK_ASSETS env var for project-specific additions. Added phase_start/phase_end/phase_summary (bash 3.2 compatible scalars — no associative arrays). Tee'd stdout+stderr to /tmp/skyyrose-deploy-<ts>.log.",
+      "fix": "Extended verify_live() to curl style.css, immersive.css, immersive.js with cache-busting. Every asset URL must return 200. Added DEPLOY_CHECK_ASSETS env var for project-specific additions. Added phase_start/phase_end/phase_summary (bash 3.2 compatible scalars \u2014 no associative arrays). Tee'd stdout+stderr to /tmp/skyyrose-deploy-<ts>.log.",
       "tags": [
         "deploy",
         "verify",
@@ -1266,7 +1266,7 @@
       "error_message": "tar -czf wastes CPU compressing already-compressed media (WebP/GLB/JPG/PNG)",
       "file": "scripts/deploy-theme.sh",
       "root_cause": "Theme payload ~380 MB, of which ~316 MB is already-compressed binary media. gzip achieves ~0% reduction on those formats but costs single-threaded CPU per deploy.",
-      "fix": "Runtime-detect tar --zstd and zstd binary. When available, use `tar --zstd -cf` (5x faster, similar ratio on text parts). Fallback to plain `-cf` (no compression) when zstd absent — still faster than gzip on pre-compressed media. Matching remote extract flag. Tarball extension adjusts.",
+      "fix": "Runtime-detect tar --zstd and zstd binary. When available, use `tar --zstd -cf` (5x faster, similar ratio on text parts). Fallback to plain `-cf` (no compression) when zstd absent \u2014 still faster than gzip on pre-compressed media. Matching remote extract flag. Tarball extension adjusts.",
       "tags": [
         "deploy",
         "compression",
@@ -1283,7 +1283,7 @@
       "error_message": "SSHPASS exported for entire deploy duration, leaking credential to every child process",
       "file": "scripts/deploy-theme.sh",
       "root_cause": "build_ssh_cmd() unconditionally exported SSHPASS as soon as the script started; remained in env for preflight, tar, every subprocess until exit. On shared systems, `ps e <pid>` or /proc/<pid>/environ leak the password.",
-      "fix": "Moved SSHPASS export from build_ssh_cmd() into try_rsync() just before scp. Added `unset SSHPASS` immediately after remote extract. Exposure window shrunk from entire deploy (~7 min) to sub-second. No functional change — sshpass -e reads from env at invocation.",
+      "fix": "Moved SSHPASS export from build_ssh_cmd() into try_rsync() just before scp. Added `unset SSHPASS` immediately after remote extract. Exposure window shrunk from entire deploy (~7 min) to sub-second. No functional change \u2014 sshpass -e reads from env at invocation.",
       "tags": [
         "deploy",
         "security",
@@ -1317,7 +1317,7 @@
       "error_message": "Significant refactor of ",
       "file": "scripts/deploy-theme.sh",
       "root_cause": "12 lines replaced/restructured",
-      "fix": "Rewrote 13→5 lines (12 removed)",
+      "fix": "Rewrote 13\u21925 lines (12 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -1333,7 +1333,7 @@
       "error_message": "Significant refactor of ",
       "file": "scripts/deploy-theme.sh",
       "root_cause": "28 lines replaced/restructured",
-      "fix": "Rewrote 41→14 lines (28 removed)",
+      "fix": "Rewrote 41\u219214 lines (28 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -1349,7 +1349,7 @@
       "error_message": "Wrong reference: DEPLOY_LOCK_FD should be DEPLOY_LOCK_HELD",
       "file": "scripts/deploy-theme.sh",
       "root_cause": "Used \"DEPLOY_LOCK_FD\" instead of \"DEPLOY_LOCK_HELD\"",
-      "fix": "Changed DEPLOY_LOCK_FD → DEPLOY_LOCK_HELD",
+      "fix": "Changed DEPLOY_LOCK_FD \u2192 DEPLOY_LOCK_HELD",
       "tags": [
         "auto-detected",
         "wrong-reference",
@@ -1381,7 +1381,7 @@
       "error_message": "Significant refactor of ",
       "file": "../.claude/plans/well-lets-audit-separately-humming-beacon.md",
       "root_cause": "5 lines replaced/restructured",
-      "fix": "Rewrote 6→27 lines (5 removed)",
+      "fix": "Rewrote 6\u219227 lines (5 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -1444,8 +1444,8 @@
       "timestamp": "2026-04-19T17:32:01.512Z",
       "error_message": "CSS fix: value",
       "file": "frontend/app/admin/social-media/page.tsx",
-      "root_cause": "value: 'lh-004', label: 'Love Hurts Varsity Jacket', collection: 'love-hurts' → 'lh-006', label: 'The Fannie', collection: 'love-hurts'",
-      "fix": "Changed value: 'lh-004', label: 'Love Hurts Varsity Jacket', collection: 'love-hurts' → 'lh-006', label: 'The Fannie', collection: 'love-hurts'",
+      "root_cause": "value: 'lh-004', label: 'Love Hurts Varsity Jacket', collection: 'love-hurts' \u2192 'lh-006', label: 'The Fannie', collection: 'love-hurts'",
+      "fix": "Changed value: 'lh-004', label: 'Love Hurts Varsity Jacket', collection: 'love-hurts' \u2192 'lh-006', label: 'The Fannie', collection: 'love-hurts'",
       "tags": [
         "auto-detected",
         "style-fix",
@@ -1458,12 +1458,20 @@
     {
       "id": "bug-091",
       "timestamp": "2026-04-27T22:34:00.000Z",
-      "error_message": "front-page.php uses wc_get_products() to count products per collection — breaks when WooCommerce categories are not synced to CSV catalog",
+      "error_message": "front-page.php uses wc_get_products() to count products per collection \u2014 breaks when WooCommerce categories are not synced to CSV catalog",
       "file": "wordpress-theme/skyyrose-flagship/front-page.php",
       "root_cause": "wc_get_products() queries WC product categories, which are separate from the CSV catalog. Category sync is not guaranteed. Result: count is 0 when WC categories don't exist.",
-      "fix": "Replaced wc_get_products() block with count(skyyrose_get_collection_products($col['slug'])) — reads directly from CSV catalog helper",
-      "tags": ["wc_get_products", "catalog", "collections", "php", "front-page"],
-      "related_bugs": ["bug-092"],
+      "fix": "Replaced wc_get_products() block with count(skyyrose_get_collection_products($col['slug'])) \u2014 reads directly from CSV catalog helper",
+      "tags": [
+        "wc_get_products",
+        "catalog",
+        "collections",
+        "php",
+        "front-page"
+      ],
+      "related_bugs": [
+        "bug-092"
+      ],
       "occurrences": 1,
       "last_seen": "2026-04-27T22:34:00.000Z"
     },
@@ -1474,19 +1482,34 @@
       "file": "wordpress-theme/skyyrose-flagship/template-preorder-gateway.php",
       "root_cause": "Template was written before CSV catalog helpers existed. Fallback products were placeholder data with invented SKUs never in the catalog. kids-capsule was simply omitted. WC_Product branch was dead code once WC categories weren't populated.",
       "fix": "Removed $fallback_products array and wc_get_products() block entirely. Added kids-capsule to $collections. Replaced product loading with skyyrose_get_collection_products() per slug. Fixed card args: image_url uses skyyrose_product_image_uri(front_model_image|image), permalink uses skyyrose_product_url($sku), price uses skyyrose_format_price($item). Removed WC_Product instanceof branch (catalog always returns arrays).",
-      "tags": ["wc_get_products", "catalog", "preorder", "kids-capsule", "fake-skus", "php"],
-      "related_bugs": ["bug-091"],
+      "tags": [
+        "wc_get_products",
+        "catalog",
+        "preorder",
+        "kids-capsule",
+        "fake-skus",
+        "php"
+      ],
+      "related_bugs": [
+        "bug-091"
+      ],
       "occurrences": 1,
       "last_seen": "2026-04-27T22:34:00.000Z"
     },
     {
       "id": "bug-093",
       "timestamp": "2026-04-27T22:34:00.000Z",
-      "error_message": "TypeError: e.target.closest is not a function — SVG elements and other non-Element nodes dispatched to document-level event listeners don't have .closest()",
+      "error_message": "TypeError: e.target.closest is not a function \u2014 SVG elements and other non-Element nodes dispatched to document-level event listeners don't have .closest()",
       "file": "wordpress-theme/skyyrose-flagship/assets/js/experience-analyzer.js",
       "root_cause": "SVG child elements (path, circle, use, etc.) are SVGElement not HTMLElement and may not implement .closest() in older browsers. document-level capture listeners receive events from any element on the page including SVG internals.",
-      "fix": "Added typeof guard before every .closest() call: getCardData(), mouseenter listener, mouseleave listener, click listener — each now checks !el || typeof el.closest !== 'function' before calling.",
-      "tags": ["svg", "closest", "typeerror", "javascript", "event-listener"],
+      "fix": "Added typeof guard before every .closest() call: getCardData(), mouseenter listener, mouseleave listener, click listener \u2014 each now checks !el || typeof el.closest !== 'function' before calling.",
+      "tags": [
+        "svg",
+        "closest",
+        "typeerror",
+        "javascript",
+        "event-listener"
+      ],
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-04-27T22:34:00.000Z"
@@ -1494,14 +1517,93 @@
     {
       "id": "bug-094",
       "timestamp": "2026-04-27T22:34:00.000Z",
-      "error_message": "404.php references skyyrose-mascot-reference.png which does not exist in assets/images/mascot/ — only skyy-canonical.jpeg exists",
+      "error_message": "404.php references skyyrose-mascot-reference.png which does not exist in assets/images/mascot/ \u2014 only skyy-canonical.jpeg exists",
       "file": "wordpress-theme/skyyrose-flagship/404.php",
       "root_cause": "404.php used an old filename (skyyrose-mascot-reference.png) that was never created. The canonical mascot file is skyy-canonical.jpeg.",
       "fix": "Replaced both references (path and URL) to skyyrose-mascot-reference.png with skyy-canonical.jpeg in the mascot fallback block of 404.php.",
-      "tags": ["mascot", "404", "missing-file", "php"],
+      "tags": [
+        "mascot",
+        "404",
+        "missing-file",
+        "php"
+      ],
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-04-27T22:34:00.000Z"
+    },
+    {
+      "id": "bug-095",
+      "timestamp": "2026-05-01T11:46:22.491884+00:00",
+      "error_message": "Tripo3D pipeline aborts: no key+region combo has credits",
+      "file": "scripts/skyy_avatar_rig.py",
+      "root_cause": "Single TRIPO_API_KEY in env is bound to .ai region with $0.00 balance; .com region returns 401 for the same key (Tripo accounts are region-scoped, not key-scoped). Memory says user maintains multiple accounts but only one key is in env.",
+      "fix": "Either top up the existing .ai account or set TRIPO_API_KEYS=key1,key2 (csv) so discover_credit_holding_account() can find a credit-holding combo across all (key x region) pairs. Script already supports csv via TRIPO_API_KEYS env.",
+      "tags": [
+        "tripo3d",
+        "credits",
+        "multi-account",
+        "connectivity-probe",
+        "phase-5.8"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T11:46:22.491991+00:00"
+    },
+    {
+      "id": "bug-096",
+      "timestamp": "2026-05-01T20:23:10.916468+00:00",
+      "error_message": "Tripo riggability check returns riggable=False (no message) for skyy-canonical.jpeg-derived mesh",
+      "file": "scripts/skyy_avatar_rig.py",
+      "root_cause": "Tripo BIPED auto-rigger needs visible anatomical landmarks (distinct elbow joints, separable arms, clear neck-shoulder transition). Skyy canonical reference is a Pixar chibi mascot: ~3-head proportions, right hand IN jacket pocket (arm merges with torso), curly hair shell occluding neck. BIPED detection fails silently with riggable=False, message=\"\". Cost burned per failed attempt: ~310 credits (~$2.50) for the mesh generation step.",
+      "fix": "PRIMARY: rig manually via Mixamo (free, mixamo.com) \u2014 Adobe rigger tolerates chibi proportions and produces Mixamo-named skeleton + idle/walk presets that skyy-3d.js already expects. Use existing mesh at generated_assets/3d/skyy-rig/mesh/567f76ce-3368-4aa9-81f3-b51e3b55b7f5_pbr.glb. ALT: regenerate reference image as a clean T-pose (arms fully out, no pocket-hand) before retrying Tripo.",
+      "tags": [
+        "tripo3d",
+        "rigging",
+        "biped",
+        "chibi",
+        "paid-api",
+        "mascot"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-01T20:23:10.916468+00:00"
+    },
+    {
+      "id": "bug-097",
+      "timestamp": "2026-05-03T11:00:27.599463+00:00",
+      "error_message": "chromadb.types.validate_where: 'Expected where to have exactly one operator, got {color: green, _namespace: A}'",
+      "file": "orchestration/vector_store.py:438",
+      "root_cause": "ChromaDB requires Where clauses to have exactly one top-level operator. Merging filter_metadata + namespace into a flat dict is rejected by Chroma when both are present.",
+      "fix": "Wrap multi-key filter+namespace combos with $and: {\"$and\": [filter_metadata, {\"_namespace\": ns}]}. Single-key paths (only filter, only namespace, neither) stay flat.",
+      "tags": [
+        "chromadb",
+        "vector-store",
+        "namespace",
+        "filter"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-03T11:00:27.599463+00:00"
+    },
+    {
+      "id": "bug-098",
+      "timestamp": "2026-05-03T11:26:52.564147+00:00",
+      "error_message": "voyageai.error.RateLimitError: 10K TPM / 3 RPM cap on free tier (no payment method)",
+      "file": "scripts/index_skyyrose_catalog.py (full-catalog Voyage indexing)",
+      "root_cause": "Voyage free tier (no payment method) is throttled to 10K tokens/min and 3 requests/min. The 33-SKU SkyyRose catalog totals ~32K-44K tokens, so a single embed_batch call exceeds the TPM ceiling.",
+      "fix": "Two paths: (A) add payment method on https://dashboard.voyageai.com/ to unlock standard limits \u2014 free 200M tokens still apply for voyage-3 series; (B) throttle indexing to <10K tokens per minute via batched submission with time.sleep(60) between batches. The 200M free-token budget is generous; payment method is the simplest unblock.",
+      "tags": [
+        "voyage",
+        "rate-limit",
+        "free-tier",
+        "embedding",
+        "production-gotcha"
+      ],
+      "related_bugs": [
+        "bug-097"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-05-03T11:26:52.564147+00:00"
     }
   ]
 }

@@ -27,6 +27,27 @@ repos:
         exclude: ^(legacy/|\.venv/)
 
   # ==========================================================================
+  # Scope Routing (Fast Tier — repo-local)
+  # ==========================================================================
+  #
+  # Rejects commits that mix scopes or include files from the `ignore` scope
+  # (regenerable outputs). Config: .devskyy/scopes.toml
+  #
+  # Bypass for an intentional cross-scope commit:
+  #   git commit --no-verify       (skips ALL hooks — last resort)
+  # Inspect what scope a path maps to:
+  #   python3 scripts/scope.py of <path>
+  - repo: local
+    hooks:
+      - id: scope-check
+        name: Scope routing — reject cross-scope commits
+        entry: python3 scripts/scope.py check-staged
+        language: system
+        stages: [pre-commit]
+        pass_filenames: false
+        always_run: true
+
+  # ==========================================================================
   # Security Scanning (Medium Tier)
   # ==========================================================================
 
@@ -36,7 +57,15 @@ repos:
       - id: detect-secrets
         name: Detect hardcoded secrets
         args: [--baseline, .secrets.baseline]
-        exclude: ^(tests/|legacy/|\.env\.example|\.secrets\.baseline)
+        # Skip:
+        #  - tests/ and legacy/ trees
+        #  - the baseline itself
+        #  - ANY .env file (root or subdirectory, with or without suffix).
+        #    Real .env is gitignored; tracked .env.example / .env.production /
+        #    .env.staging etc. carry placeholder values that detect-secrets
+        #    aggressively false-positives on. Adding a key to these files is a
+        #    routine, low-risk operation and should not require baseline churn.
+        exclude: '^(tests/|legacy/|\.secrets\.baseline$)|(^|/)\.env(\.[^/]*)?$'
 
   # ==========================================================================
   # General File Checks (Fast Tier)

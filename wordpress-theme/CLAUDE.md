@@ -62,6 +62,23 @@ wordpress-theme/skyyrose-flagship/
 - Landing pages: `lp-*` CSS classes, IntersectionObserver scroll-reveal (`.lp-rv`)
 - GSAP is only for: preorder, about, immersive templates — NOT collection or landing pages
 
+## Data-Driven Template Pattern (since v7.1.0)
+
+Per-collection / per-page content lives in dedicated `inc/{thing}-data.php` files; templates are
+thin stubs that delegate to a shared partial. This is now the standard for any "N variations of
+the same template" cluster.
+
+| Cluster | Data file | Shared partial | Template stub size |
+|---------|-----------|----------------|--------------------|
+| Collection pages (4) | `inc/product-catalog.php` | `template-parts/collection/page.php` | 16-22L |
+| Landing pages (3) | `inc/landing-data.php` | `template-parts/landing/page.php` | ~24L |
+| Immersive worlds (4) | `inc/immersive-data.php` | `template-parts/immersive-scene.php` | ~28L |
+| Info / legal pages (terms, privacy, etc.) | post meta + `the_content()` | `template-info-page.php` (single) | n/a — single file |
+
+**When adding a new variant** (e.g., a 5th immersive world): add an entry to the `*-data.php`
+function, create a 16-line stub template, register it as a Page Template, assign in WP admin.
+Don't copy a sibling template and edit per-collection — the duplication will drift.
+
 ## Deploy Gate
 
 Before any `npm run deploy`:

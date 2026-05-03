@@ -15,7 +15,25 @@ Coordination logic that spans multiple agents/services. Pipelines, routers, retr
 - `catalog_retriever.py` — catalog retrieval over the WooCommerce corpus
 - `domain_router.py` — routes incoming intents to the right agent
 - `embedding_engine.py`, `enterprise_index.py` — vector indexing
+- `vector_store.py` — `BaseVectorStore` + Chroma/Pinecone impls. **Namespace contract:** `namespace=None` means "no filter / default partition"; pass a string to scope writes/reads/deletes. Chroma emulates via `_namespace` metadata + `$and`-wrapped where clauses; Pinecone uses native namespaces. Cache keys participate in namespace.
 - `docs_context.py`, `document_ingestion.py` — docs loading for RAG
+
+## Embedding providers
+
+`embedding_engine.py` ships four implementations behind `BaseEmbeddingEngine`:
+
+| Provider | Class | Native dim | Asymmetric? | Notes |
+|---|---|---|---|---|
+| `sentence_transformers` | `SentenceTransformerEngine` | varies | no | local, default |
+| `openai` | `OpenAIEmbeddingEngine` | 1536/3072 | no | needs `OPENAI_API_KEY` |
+| `cohere` | `CohereEmbeddingEngine` | 1024/384 | yes (search_query / search_document) | needs `COHERE_API_KEY` |
+| `voyage` | `VoyageEmbeddingEngine` | 1024 (configurable via MRL) | yes (query / document) | needs `VOYAGE_API_KEY`; sync SDK wrapped via `asyncio.to_thread` |
+
+**Voyage notes:**
+- Voyage's SDK is sync only — no `AsyncClient`. The engine wraps `client.embed()` with `asyncio.to_thread` to keep the event loop free.
+- Use `embed_text()` / `embed_batch()` for indexing (sets `input_type="document"`) and `embed_query()` for retrieval (sets `input_type="query"`). Mismatching the type degrades retrieval quality measurably (~5–10% on MTEB).
+- `voyage_output_dimension` triggers MRL truncation. Cache keys include `model + output_dimension` so config changes don't return stale embeddings from prior runs.
+- SDK floor on Python 3.14: `voyageai>=0.2.4` (0.3.x is prerelease).
 
 ## Conventions
 

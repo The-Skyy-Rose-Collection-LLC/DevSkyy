@@ -1721,6 +1721,8 @@
 ## scripts/
 
 - `deploy-theme.sh` — scripts/deploy-theme.sh -- Production deploy script for SkyyRose WordPress theme (~7513 tok)
+- `skyy_avatar_rig.py` — End-to-end Tripo3D avatar pipeline: discover credit-holding account across multi-region keys, image_to_model, riggability check, BIPED+MIXAMO rig, idle+walk retarget, save to wordpress-theme/.../assets/models/skyy.glb. NOTE: BIPED rigger refuses chibi mascots (bug-096) — use Mixamo path for stylized characters. (~2200 tok)
+- `skyy_mixamo_merge.py` — Merge two Mixamo-exported GLBs (idle.glb + walk.glb) into a single skyy.glb with both clips named 'idle' and 'walk'. Used as fallback when Tripo BIPED rigger refuses (bug-096). pygltflib-based, re-indexes bufferViews/accessors/samplers and remaps channel target nodes by NAME (not index) since Mixamo skeleton names are stable across exports. (~1100 tok)
 - `split_techflats.py` — Split composite techflat images into individual front/back views. (~2954 tok)
 - `sync_brand_to_php.py` — Sync brand.yaml → wordpress-theme/skyyrose-flagship/inc/brand.generated.php. (~2406 tok)
 - ~~`generate_catalog.py`~~ — RETIRED 2026-04-19, do not resurrect (canonical catalog is `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv`)
@@ -1867,3 +1869,7 @@
 
 ## .planning/handoffs/trellis2-deployment.md (~210 lines, ~3500 tokens)
 Self-contained deployment handoff for Microsoft TRELLIS.2 (image-to-3D, 4B params, Linux+CUDA-only). Two-phase plan: Phase 1 = duplicate HF Space `microsoft/TRELLIS.2` to private `damBruh/skyyrose-trellis2` on A10G; Phase 2 = port to Modal serverless and wire `agents/trellis_agent.py` mirroring `agents/meshy_agent.py`. Includes cost matrix, pre-flight checklist, acceptance criteria, risks.
+
+## agents/devskyy-a2a/
+
+ADK A2A coordinator scaffolded by `uvx agent-starter-pack create` (template: adk_a2a, --prototype, --deployment-target none). Self-contained Python project (Python >=3.10,<3.14): `agents/devskyy-a2a/agents/agent.py` (entrypoint, currently the ASP Gemini weather/time demo — pending replacement with the 7 skill routers from `tasks/adk-a2a-DESIGN_SPEC.md`); `pyproject.toml` declares `google-adk>=1.16.0`, `a2a-sdk~=0.3.22`, OpenTelemetry GenAI instrumentation, and `gcsfs`. Test layout follows ADK convention: `tests/unit/`, `tests/integration/`, `tests/eval/` (with evalsets/ subdirectory and `eval_config.json`). Make targets: `install`, `playground`, `test`, `eval`, `eval-all`, `lint`, `inspector`. Internal agent dir is `agents/` (matches `--agent-directory agents` flag — any future `enhance` invocation must repeat this flag or files will be misplaced). ASP-generated `CLAUDE.md` documents the 6-phase ADK workflow and explicitly forbids changing the model (default: `gemini-3-flash-preview`). ~30 KB (excluding tests evalsets). [~3500 tokens to fully understand]
