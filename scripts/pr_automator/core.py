@@ -1,0 +1,214 @@
+"""Core utilities — gh CLI wrapper, persistent state, risk-path matcher, logging."""
+
+from __future__ import annotations
+
+import fnmatch
+import json
+import logging
+import os
+import subprocess
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Any
+
+logger = logging.getLogger("pr_automator")
+
+
+def setup_logging(verbose: bool = False) -> None:
+    level = logging.DEBUG if verbose else logging.INFO
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s %(levelname)-7s %(name)s: %(message)s",
+        datefmt="%H:%M:%S",
+    )
+
+
+# ---------------------------------------------------------------------------
+# gh CLI wrapper
+# ---------------------------------------------------------------------------
+
+
+class GhError(RuntimeError):
+    """Raised when `gh` exits non-zero or returns malformed JSON."""
+
+
+@dataclass(frozen=True)
+class GhClient:
+    """Thin wrapper around `gh` CLI. All methods raise GhError on failure."""
+
+    repo: str | None = None
+    dry_run: bool = False
+
+    def _run(self, args: list[str], *, capture: bool = True, mutating: bool = False) -> str:
+        cmd = ["gh", *args]
+        if self.repo and "--repo" not in args and args[0] != "auth":
+            cmd.extend(["--repo", self.repo])
+        if mutating and self.dry_run:
+            logger.info("[dry-run] would run: %s", " ".join(cmd))
+            return ""
+        logger.debug("gh: %s", " ".join(cmd))
+        proc = subprocess.run(
+            cmd,
+            check=False,
+            capture_output=capture,
+            text=True,
+        )
+        if proc.returncode != 0:
+            raise GhError(
+                f"gh exited {proc.returncode}: {proc.stderr.strip() or proc.stdout.strip()}"
+            )
+        return proc.stdout
+
+    def pr_view(self, pr: int, *, fields: list[str]) -> dict[str, Any]:
+        out = self._run(["pr", "view", str(pr), "--json", ",".join(fields)])
+        try:
+            return json.loads(out)
+        except json.JSONDecodeError as e:
+            raise GhError(f"gh pr view returned invalid JSON: {e}") from e
+
+    def pr_changed_files(self, pr: int) -> list[str]:
+        out = self._run(["pr", "diff", str(pr), "--name-only"])
+        return [line.strip() for line in out.splitlines() if line.strip()]
+
+    def pr_list_open(self) -> list[dict[str, Any]]:
+        out = self._run(
+            [
+                "pr",
+                "list",
+                "--state",
+                "open",
+                "--json",
+                "number,headRefName,headRefOid,isDraft,author,labels",
+                "--limit",
+                "200",
+            ]
+        )
+        try:
+            return json.loads(out)
+        except json.JSONDecodeError as e:
+            raise GhError(f"gh pr list returned invalid JSON: {e}") from e
+
+    def pr_review(self, pr: int, decision: str, body: str) -> None:
+        flag = {
+            "APPROVE": "--approve",
+            "REQUEST_CHANGES": "--request-changes",
+            "COMMENT": "--comment",
+        }[decision]
+        self._run(["pr", "review", str(pr), flag, "--body", body], mutating=True)
+
+    def pr_comment(self, pr: int, body: str) -> None:
+        self._run(["pr", "comment", str(pr), "--body", body], mutating=True)
+
+    def pr_label_add(self, pr: int, label: str) -> None:
+        self._run(["pr", "edit", str(pr), "--add-label", label], mutating=True)
+
+    def pr_label_remove(self, pr: int, label: str) -> None:
+        self._run(["pr", "edit", str(pr), "--remove-label", label], mutating=True)
+
+    def pr_merge(self, pr: int, *, method: str = "squash", admin: bool = True) -> None:
+        args = ["pr", "merge", str(pr), f"--{method}", "--delete-branch"]
+        if admin:
+            args.append("--admin")
+        self._run(args, mutating=True)
+
+
+# ---------------------------------------------------------------------------
+# Persistent state
+# ---------------------------------------------------------------------------
+
+
+def state_path() -> Path:
+    base = Path(os.environ.get("PR_AUTOMATOR_HOME", Path.home() / ".cache/pr-automator"))
+    base.mkdir(parents=True, exist_ok=True)
+    return base / "state.json"
+
+
+@dataclass
+class PrCycleState:
+    cycle_count: int = 0
+    last_sha: str | None = None
+    last_verdict: str | None = None
+    last_cycle_at: str | None = None
+    last_green_sha: str | None = None
+    blocked_reason: str | None = None
+
+
+@dataclass
+class State:
+    paused: bool = False
+    prs: dict[str, PrCycleState] = field(default_factory=dict)
+
+    @classmethod
+    def load(cls) -> State:
+        path = state_path()
+        if not path.exists():
+            return cls()
+        raw = json.loads(path.read_text())
+        prs = {k: PrCycleState(**v) for k, v in raw.get("prs", {}).items()}
+        return cls(paused=raw.get("paused", False), prs=prs)
+
+    def save(self) -> None:
+        path = state_path()
+        payload = {
+            "paused": self.paused,
+            "prs": {k: v.__dict__ for k, v in self.prs.items()},
+        }
+        path.write_text(json.dumps(payload, indent=2))
+
+    def for_pr(self, pr: int) -> PrCycleState:
+        key = str(pr)
+        if key not in self.prs:
+            self.prs[key] = PrCycleState()
+        return self.prs[key]
+
+    def record_cycle(
+        self,
+        pr: int,
+        head_sha: str,
+        verdict: str,
+        *,
+        green: bool = False,
+        blocked: str | None = None,
+    ) -> None:
+        s = self.for_pr(pr)
+        if s.last_sha != head_sha:
+            s.cycle_count = 0
+        s.cycle_count += 1
+        s.last_sha = head_sha
+        s.last_verdict = verdict
+        s.last_cycle_at = datetime.now(UTC).isoformat()
+        s.blocked_reason = blocked
+        if green:
+            s.last_green_sha = head_sha
+        self.save()
+
+
+# ---------------------------------------------------------------------------
+# Risk paths
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class RiskPaths:
+    patterns: tuple[str, ...]
+
+    @classmethod
+    def load(cls, source: Path) -> RiskPaths:
+        if not source.exists():
+            return cls(patterns=())
+        lines = source.read_text().splitlines()
+        patterns = tuple(
+            line.strip() for line in lines if line.strip() and not line.strip().startswith("#")
+        )
+        return cls(patterns=patterns)
+
+    def matches(self, files: list[str]) -> list[tuple[str, str]]:
+        """Return (file, pattern) tuples for every risk-path hit."""
+        hits: list[tuple[str, str]] = []
+        for f in files:
+            for pat in self.patterns:
+                if fnmatch.fnmatch(f, pat):
+                    hits.append((f, pat))
+                    break
+        return hits
