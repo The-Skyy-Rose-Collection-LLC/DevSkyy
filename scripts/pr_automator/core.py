@@ -106,9 +106,18 @@ class GhClient:
     def pr_label_remove(self, pr: int, label: str) -> None:
         self._run(["pr", "edit", str(pr), "--remove-label", label], mutating=True)
 
-    def pr_merge(self, pr: int, *, method: str = "squash", admin: bool = True) -> None:
+    def pr_merge(self, pr: int, *, method: str = "squash", admin: bool = False) -> None:
+        """Merge a PR.
+
+        ``admin=False`` (the default) respects branch protection — required checks,
+        CODEOWNERS, and reviewer counts apply. Pass ``admin=True`` only when the
+        operator has explicitly opted into bypassing branch protection (the
+        ``--admin`` CLI flag); a warning is logged so the bypass is auditable in
+        the daemon log.
+        """
         args = ["pr", "merge", str(pr), f"--{method}", "--delete-branch"]
         if admin:
+            logger.warning("merging PR #%s with --admin (branch protection bypassed)", pr)
             args.append("--admin")
         self._run(args, mutating=True)
 
@@ -149,12 +158,21 @@ class State:
         return cls(paused=raw.get("paused", False), prs=prs)
 
     def save(self) -> None:
+        """Atomic write — temp file + os.replace.
+
+        A crash mid-write would otherwise leave a truncated state.json that
+        raises JSONDecodeError on next load. os.replace is atomic on POSIX, so
+        readers see either the old file or the new file, never a half-written
+        one.
+        """
         path = state_path()
         payload = {
             "paused": self.paused,
             "prs": {k: v.__dict__ for k, v in self.prs.items()},
         }
-        path.write_text(json.dumps(payload, indent=2))
+        tmp = path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(payload, indent=2))
+        os.replace(tmp, path)
 
     def for_pr(self, pr: int) -> PrCycleState:
         key = str(pr)

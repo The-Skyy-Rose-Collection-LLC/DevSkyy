@@ -160,31 +160,3 @@ def run_gates(worktree: Path, changed_files: list[str]) -> GateReport:
             )
 
     return GateReport(results=tuple(results))
-
-
-def auto_fix_format(worktree: Path) -> tuple[bool, str]:
-    """Run isort + ruff --fix + black; return (any_changes, summary).
-
-    Lint-format auto-fix is the only thing the automator runs without judgment —
-    it's mechanical and reversible via git.
-    """
-    summary_parts: list[str] = []
-    changed = False
-
-    for cmd, label in [
-        (["isort", "--quiet", "."], "isort"),
-        (["ruff", "check", "--fix", "--quiet", "."], "ruff --fix"),
-        (["black", "--quiet", "."], "black"),
-    ]:
-        if not _have(cmd[0]):
-            summary_parts.append(f"{label}: not installed")
-            continue
-        rc, out = _run(cmd, worktree)
-        summary_parts.append(f"{label}: exit={rc}")
-        if rc == 0 and out:
-            changed = True
-
-    # Authoritative check for actual file changes:
-    rc, _ = _run(["git", "diff", "--quiet"], worktree)
-    changed = rc != 0
-    return changed, " | ".join(summary_parts)

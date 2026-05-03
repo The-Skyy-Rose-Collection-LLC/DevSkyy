@@ -146,18 +146,22 @@ def evaluate(
         )
     )
 
-    # 7. no risk paths (or risk-ok label)
+    # 7. no risk paths touched (NO label override — see security review:
+    # `automator:risk-ok` was self-applicable by any write-access user, which
+    # collapsed this check to a single label. PRs that touch risk paths now
+    # require a manual human merge regardless of labels.)
     risk_hits = risk_paths.matches(changed_files)
-    risk_ok = len(risk_hits) == 0 or RISK_OK_LABEL in labels
     risk_detail = (
         "no risk paths touched"
         if not risk_hits
-        else f"{len(risk_hits)} risk-path hits, risk-ok label={'yes' if RISK_OK_LABEL in labels else 'no'}"
+        else f"{len(risk_hits)} risk-path hit(s): "
+        + ", ".join(f"{f}~{p}" for f, p in risk_hits[:5])
+        + ("..." if len(risk_hits) > 5 else "")
     )
     checks.append(
         CheckResult(
-            name=f"no risk paths touched (or `{RISK_OK_LABEL}`)",
-            passed=risk_ok,
+            name="no risk paths touched",
+            passed=len(risk_hits) == 0,
             detail=risk_detail,
         )
     )
@@ -191,16 +195,9 @@ def evaluate(
         )
     )
 
-    # cycle cap (separate hard stop, not a numbered predicate)
-    if pr_state.cycle_count >= MAX_CYCLES_PER_SHA and pr_state.last_sha == head_sha:
-        checks.append(
-            CheckResult(
-                name=f"cycle cap (<{MAX_CYCLES_PER_SHA} on this SHA)",
-                passed=False,
-                detail=f"cycle_count={pr_state.cycle_count} — human needed",
-            )
-        )
-
+    # Cycle-cap enforcement happens earlier in __main__.run_cycle (the cycle
+    # short-circuits before evaluate is even called when the cap is hit),
+    # so there's no second check here.
     can_merge = all(c.passed for c in checks)
     return MergeDecision(can_merge=can_merge, checks=checks)
 
