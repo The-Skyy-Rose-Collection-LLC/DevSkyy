@@ -177,7 +177,6 @@ class TestProductServicerListProducts:
 
 
 @pytest.mark.unit
-@pytest.mark.asyncio
 class TestProductServicerHelpers:
     """Tests for ProductServicer helper methods"""
 

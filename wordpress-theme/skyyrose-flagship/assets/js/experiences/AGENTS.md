@@ -152,8 +152,11 @@ this fails silently when clips is empty.
 2. `skyy-3d.js` will auto-detect the clips array and begin the idle loop.
 3. No JS changes required — the loading + animation scaffold is already wired.
 
-**Do NOT re-rig in JS** — the mesh needs a Blender/Mixamo rig pass. File the GLB replacement
-under `assets/models/skyy-rigged.glb` and swap the import path once verified.
+**Do NOT re-rig in JS** — the mesh needs a Blender/Mixamo rig pass. The rigged GLB
+overwrites `assets/models/skyy.glb` in-place (the loader at `skyy-3d.js:25` is hardcoded
+to that path). Run `.venv/bin/python scripts/skyy_avatar_rig.py` once Tripo credits are
+available; it generates a fresh cartoon mesh, auto-rigs with Mixamo skeleton, bakes
+`idle`+`walk` clips, and writes to `skyy.glb`.
 
 ## Easter Egg — Skyy Hidden in Each World
 

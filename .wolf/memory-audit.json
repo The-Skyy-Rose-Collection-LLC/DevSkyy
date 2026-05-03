@@ -1,10 +1,50 @@
 {
-  "generated_at": "2026-04-29T07:51:23",
+  "generated_at": "2026-05-03T02:56:27",
   "repo_root": "/Users/theceo/DevSkyy",
   "freshness_days": 30,
-  "files_scanned": 29,
-  "indexed_basenames": 13723,
+  "files_scanned": 32,
+  "indexed_basenames": 13795,
   "missing_paths": [
+    {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
+      "line": 167,
+      "claim": "skyy-new-gen.glb"
+    },
+    {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
+      "line": 167,
+      "claim": "skyy-new.glb"
+    },
+    {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
+      "line": 167,
+      "claim": "skyy-remesh.glb"
+    },
+    {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
+      "line": 167,
+      "claim": "skyy-trellis.glb"
+    },
+    {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
+      "line": 167,
+      "claim": "skyy-v2.glb"
+    },
+    {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
+      "line": 167,
+      "claim": "compare.html"
+    },
+    {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
+      "line": 167,
+      "claim": "compare3.html"
+    },
+    {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
+      "line": 167,
+      "claim": "viewer.html"
+    },
     {
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_render_pipeline.md",
       "line": 19,
@@ -21,23 +61,23 @@
   "fresh_stamps": [
     {
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
-      "line": 93,
+      "line": 96,
       "stamp": "2026-04-27",
-      "age_days": 2
+      "age_days": 6
     },
     {
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
-      "line": 113,
+      "line": 116,
       "stamp": "2026-04-27",
-      "age_days": 2
+      "age_days": 6
     },
     {
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
-      "line": 164,
+      "line": 167,
       "stamp": "2026-04-20",
-      "age_days": 9
+      "age_days": 13
     }
   ],
   "documented_missing_count": 29,
-  "verified_count": 832
+  "verified_count": 833
 }
