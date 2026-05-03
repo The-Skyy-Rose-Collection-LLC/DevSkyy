@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import logging
 import re
+from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from typing import Any
 
@@ -82,6 +83,22 @@ class CatalogAnswer:
 # Regex for extracting [SKU] citation markers from the LLM's answer.
 # SKUs are lowercase letters/digits/hyphen, e.g. [br-005], [kids-002].
 _CITATION_PATTERN = re.compile(r"\[([a-z]{2,5}-[a-z0-9]+)\]")
+
+
+def _extract_citations(text: str) -> list[str]:
+    """Pull [sku-NNN] markers from an answer string.
+
+    Returns SKUs in order of first appearance, deduplicated. Used by both the
+    blocking ``answer_question`` and the streaming ``answer_question_stream``
+    paths so citation parsing stays consistent across the two surfaces.
+    """
+    seen: set[str] = set()
+    citations: list[str] = []
+    for sku in _CITATION_PATTERN.findall(text):
+        if sku not in seen:
+            seen.add(sku)
+            citations.append(sku)
+    return citations
 
 
 class CatalogRetriever:
@@ -359,54 +376,10 @@ class CatalogRetriever:
         """
         self._require_init()
 
-        # Step 1: retrieve grounding context
         matches = await self.retrieve(question, top_k=top_k)
-
-        # Step 2: build the user prompt — wrap matches in tagged blocks so the
-        # LLM can clearly attribute statements to source SKUs.
-        #
-        # Per-match budgets are deliberately generous: SkyyRose dossier
-        # branding_blocks routinely run 1500-3000 chars (Front/Back/Sleeves/Hood
-        # sections + technique + color + position for each placement). A 300-char
-        # truncation lost detail that lived past the first paragraph (e.g. hood
-        # interior linings, sleeve placements) and forced the LLM to say "I don't
-        # have that information" when the dossier in fact did. With top_k≤10 and
-        # ~1800 chars per match, total context is ~18KB ≈ 4500 tokens — well
-        # within Haiku's 200K context, ~$0.0045 input cost at most.
-        if matches:
-            blocks = []
-            for m in matches:
-                # Compose a clearly-delimited block per SKU. The "===" rule is a
-                # strong attention separator that helps the LLM keep facts from
-                # different products from bleeding together.
-                block = (
-                    f"=== [{m.sku}] {m.name} (collection: {m.collection}) ===\n"
-                    f"BRANDING SPEC:\n{m.branding_spec[:1500].strip()}"
-                )
-                if m.description:
-                    block += f"\n\nDESCRIPTION: {m.description[:400].strip()}"
-                blocks.append(block)
-            context = "\n\n".join(blocks)
-            user_prompt = (
-                f"Question: {question}\n\n"
-                f"Catalog excerpts ({len(matches)} most relevant SKUs, ranked by similarity):\n\n"
-                f"{context}\n\n"
-                f"=== END OF CATALOG EXCERPTS ===\n\n"
-                f"Answer the question using ONLY the information above. Cite SKUs in [brackets] "
-                f"like [br-005] when you reference a specific product. If the information "
-                f"needed is not in the excerpts, say so honestly."
-            )
-        else:
-            # No matches — let the LLM say so cleanly rather than hallucinating
-            user_prompt = (
-                f"Question: {question}\n\n"
-                f"No catalog excerpts were retrieved for this question. "
-                f"Tell the user clearly that you don't have product information that matches "
-                f"their query, without inventing any details."
-            )
-
-        # Step 3: call Claude
+        user_prompt = self._build_qa_prompt(question, matches)
         chosen_model = model or self.DEFAULT_QA_MODEL
+
         if anthropic_client is None:
             import anthropic
 
@@ -419,19 +392,11 @@ class CatalogRetriever:
             messages=[{"role": "user", "content": user_prompt}],
         )
 
-        # Step 4: extract the text answer + parse citations
-        answer_text = ""
-        for block in response.content:
-            if getattr(block, "type", None) == "text":
-                answer_text += block.text
-
-        # Citation extraction: preserve order of first appearance, deduplicate
-        seen: set[str] = set()
-        citations: list[str] = []
-        for sku in _CITATION_PATTERN.findall(answer_text):
-            if sku not in seen:
-                seen.add(sku)
-                citations.append(sku)
+        # Extract text + parse citations
+        answer_text = "".join(
+            block.text for block in response.content if getattr(block, "type", None) == "text"
+        )
+        citations = _extract_citations(answer_text)
 
         usage = getattr(response, "usage", None)
         return CatalogAnswer(
@@ -442,6 +407,122 @@ class CatalogRetriever:
             model=chosen_model,
             input_tokens=getattr(usage, "input_tokens", 0) if usage else 0,
             output_tokens=getattr(usage, "output_tokens", 0) if usage else 0,
+        )
+
+    async def answer_question_stream(
+        self,
+        question: str,
+        *,
+        top_k: int = 5,
+        model: str | None = None,
+        max_tokens: int = 400,
+        anthropic_client: Any | None = None,
+    ) -> AsyncIterator[dict[str, Any]]:
+        """Stream a grounded answer as a sequence of structured events.
+
+        Yields, in order:
+            1. ``{"type": "matches", "matches": [{...}, ...]}`` — citations
+               and full match metadata before any text arrives
+            2. ``{"type": "text", "delta": "..."}`` — incremental text deltas
+               as Claude produces them
+            3. ``{"type": "done", "citations": [...], "input_tokens": N,
+                "output_tokens": M, "model": "..."}`` — final metadata once
+               the stream ends; citations are parsed from accumulated text
+
+        First-token latency is typically 200-400ms (vs ~3s for the non-streaming
+        ``answer_question``). Total cost is the same — streaming is purely a
+        latency/UX win, not a cost win.
+        """
+        self._require_init()
+
+        matches = await self.retrieve(question, top_k=top_k)
+
+        # Emit matches up-front so the UI can render citations before text
+        yield {
+            "type": "matches",
+            "matches": [
+                {
+                    "sku": m.sku,
+                    "name": m.name,
+                    "collection": m.collection,
+                    "score": m.score,
+                    "description": m.description,
+                    "branding_spec": m.branding_spec,
+                }
+                for m in matches
+            ],
+        }
+
+        user_prompt = self._build_qa_prompt(question, matches)
+        chosen_model = model or self.DEFAULT_QA_MODEL
+
+        if anthropic_client is None:
+            import anthropic
+
+            anthropic_client = anthropic.AsyncAnthropic()
+
+        accumulated = ""
+        async with anthropic_client.messages.stream(
+            model=chosen_model,
+            max_tokens=max_tokens,
+            system=self.QA_SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": user_prompt}],
+        ) as stream:
+            async for delta in stream.text_stream:
+                accumulated += delta
+                yield {"type": "text", "delta": delta}
+
+            final = await stream.get_final_message()
+
+        usage = getattr(final, "usage", None)
+        yield {
+            "type": "done",
+            "citations": _extract_citations(accumulated),
+            "input_tokens": getattr(usage, "input_tokens", 0) if usage else 0,
+            "output_tokens": getattr(usage, "output_tokens", 0) if usage else 0,
+            "model": chosen_model,
+        }
+
+    def _build_qa_prompt(self, question: str, matches: list[CatalogMatch]) -> str:
+        """Compose the user-side RAG prompt from question + retrieved matches.
+
+        Per-match budgets are deliberately generous: SkyyRose dossier
+        branding_blocks routinely run 1500-3000 chars (Front/Back/Sleeves/Hood
+        sections with technique/color/position per placement). A 300-char
+        truncation lost detail past the first paragraph (e.g. hood interior
+        linings, sleeve placements) and forced the LLM to say "I don't have
+        that information" when the dossier in fact did. With top_k≤10 and
+        ~1800 chars/match, total context is ~18KB ≈ 4500 tokens — well within
+        Haiku's 200K context, ~$0.0045 input cost at most.
+        """
+        if not matches:
+            return (
+                f"Question: {question}\n\n"
+                f"No catalog excerpts were retrieved for this question. "
+                f"Tell the user clearly that you don't have product information that matches "
+                f"their query, without inventing any details."
+            )
+
+        blocks: list[str] = []
+        for m in matches:
+            # The "===" rule is a strong attention separator that helps the LLM
+            # keep facts from different products from bleeding together.
+            block = (
+                f"=== [{m.sku}] {m.name} (collection: {m.collection}) ===\n"
+                f"BRANDING SPEC:\n{m.branding_spec[:1500].strip()}"
+            )
+            if m.description:
+                block += f"\n\nDESCRIPTION: {m.description[:400].strip()}"
+            blocks.append(block)
+        context = "\n\n".join(blocks)
+        return (
+            f"Question: {question}\n\n"
+            f"Catalog excerpts ({len(matches)} most relevant SKUs, ranked by similarity):\n\n"
+            f"{context}\n\n"
+            f"=== END OF CATALOG EXCERPTS ===\n\n"
+            f"Answer the question using ONLY the information above. Cite SKUs in [brackets] "
+            f"like [br-005] when you reference a specific product. If the information "
+            f"needed is not in the excerpts, say so honestly."
         )
 
     async def close(self) -> None:

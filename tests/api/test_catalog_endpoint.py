@@ -114,8 +114,14 @@ def client(fake_matches, monkeypatch):
 
 @pytest.fixture(autouse=True)
 def _reset_singleton(monkeypatch):
-    """Each test gets a clean singleton slot (overridden by `client` fixture above)."""
+    """Each test gets a clean singleton slot AND a fresh answer cache.
+
+    Resetting the retriever isn't enough now that /answer caches responses —
+    cached answers from one test would short-circuit the retriever in the next,
+    masking bugs (e.g. 503 error path tests would see the cache and return 200).
+    """
     monkeypatch.setattr(catalog_module, "_retriever", None)
+    monkeypatch.setattr(catalog_module, "_answer_cache", None)
 
 
 # ---------------------------------------------------------------------------
@@ -653,3 +659,281 @@ async def test_retriever_answer_question_passes_full_branding_to_llm(monkeypatch
     assert "black-rose" in user_content
     # Description is included
     assert "DESCRIPTION:" in user_content
+
+
+# ---------------------------------------------------------------------------
+# /answer caching
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+def test_answer_cache_miss_then_hit(client):
+    """First call populates cache; second identical call short-circuits."""
+    r1 = client.get("/api/v1/catalog/answer", params={"q": "what black hoodies?"})
+    assert r1.status_code == 200
+    assert r1.json()["cache_hit"] is False
+
+    r2 = client.get("/api/v1/catalog/answer", params={"q": "what black hoodies?"})
+    assert r2.status_code == 200
+    assert r2.json()["cache_hit"] is True
+    # Same answer text — cached response is faithfully replayed
+    assert r2.json()["answer"] == r1.json()["answer"]
+
+
+@pytest.mark.unit
+def test_answer_cache_normalizes_query_case_and_whitespace(client):
+    """Trivially-different queries should share a cache slot."""
+    r1 = client.get("/api/v1/catalog/answer", params={"q": "What Black Hoodies?"})
+    assert r1.json()["cache_hit"] is False
+
+    # Same words, different case + extra whitespace — should be a cache hit
+    r2 = client.get("/api/v1/catalog/answer", params={"q": "  what black hoodies?  "})
+    assert r2.json()["cache_hit"] is True
+
+
+@pytest.mark.unit
+def test_answer_cache_distinguishes_top_k(client):
+    """Different top_k values must NOT share a cache slot — context differs."""
+    r1 = client.get("/api/v1/catalog/answer", params={"q": "anything", "top_k": 3})
+    assert r1.json()["cache_hit"] is False
+
+    r2 = client.get("/api/v1/catalog/answer", params={"q": "anything", "top_k": 5})
+    assert r2.json()["cache_hit"] is False  # different top_k = different cache key
+
+
+@pytest.mark.unit
+def test_cache_stats_endpoint(client):
+    """GET /cache/stats reports hit/miss counts and configuration."""
+    # Warm the cache with one miss + one hit
+    client.get("/api/v1/catalog/answer", params={"q": "alpha"})
+    client.get("/api/v1/catalog/answer", params={"q": "alpha"})
+
+    resp = client.get("/api/v1/catalog/cache/stats")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["hits"] == 1
+    assert body["misses"] == 1
+    assert body["hit_rate_percent"] == 50.0
+    assert body["size"] == 1
+    assert body["maxsize"] >= 1
+    assert body["ttl_seconds"] >= 0
+
+
+@pytest.mark.unit
+def test_cache_clear_endpoint(client):
+    """POST /cache/clear empties the cache and resets counters."""
+    client.get("/api/v1/catalog/answer", params={"q": "alpha"})
+    client.get("/api/v1/catalog/answer", params={"q": "alpha"})
+
+    resp = client.post("/api/v1/catalog/cache/clear")
+    assert resp.status_code == 200
+    assert resp.json()["status"] == "ok"
+
+    stats = client.get("/api/v1/catalog/cache/stats").json()
+    assert stats["hits"] == 0
+    assert stats["misses"] == 0
+    assert stats["size"] == 0
+
+
+@pytest.mark.unit
+def test_cache_disabled_when_ttl_zero(monkeypatch, fake_matches):
+    """CATALOG_ANSWER_CACHE_TTL=0 disables caching entirely."""
+    # Build a cache with TTL=0 directly and verify get/put are no-ops
+    import asyncio
+
+    from api.v1.catalog import AnswerCache
+
+    cache = AnswerCache(maxsize=10, ttl_seconds=0)
+
+    async def _run():
+        await cache.put("q", 5, {"answer": "test"})
+        result = await cache.get("q", 5)
+        return result
+
+    assert asyncio.run(_run()) is None
+    assert cache.get_stats()["size"] == 0
+
+
+# ---------------------------------------------------------------------------
+# /answer/stream — Server-Sent Events
+# ---------------------------------------------------------------------------
+
+
+class _FakeStreamContext:
+    """Minimal mock of anthropic's `messages.stream()` async-context manager."""
+
+    def __init__(
+        self, deltas: list[str], final_input_tokens: int = 100, final_output_tokens: int = 30
+    ):
+        self._deltas = deltas
+        self._final_input = final_input_tokens
+        self._final_output = final_output_tokens
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *args):
+        return False
+
+    @property
+    def text_stream(self):
+        async def _gen():
+            for d in self._deltas:
+                yield d
+
+        return _gen()
+
+    async def get_final_message(self):
+        from unittest.mock import MagicMock
+
+        msg = MagicMock()
+        msg.usage = MagicMock(input_tokens=self._final_input, output_tokens=self._final_output)
+        return msg
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_retriever_answer_question_stream_emits_correct_chunk_sequence(monkeypatch):
+    """Streaming yields: matches → text deltas → done — in that order."""
+    from unittest.mock import MagicMock
+
+    from orchestration.catalog_retriever import CatalogMatch, CatalogRetriever
+
+    fake_anthropic = MagicMock()
+    fake_anthropic.messages.stream = MagicMock(
+        return_value=_FakeStreamContext(
+            deltas=["Inside the hood ", "is a [br-005] grey ", "contrast lining."],
+            final_input_tokens=1500,
+            final_output_tokens=42,
+        )
+    )
+
+    retriever = CatalogRetriever()
+    retriever._initialized = True
+
+    async def fake_retrieve(query, *, top_k=5, collection=None):
+        return [
+            CatalogMatch(
+                sku="br-005",
+                name="BLACK Rose Hoodie",
+                collection="black-rose",
+                score=0.9,
+                branding_spec="hood lining",
+                description="black hoodie",
+            )
+        ]
+
+    monkeypatch.setattr(retriever, "retrieve", fake_retrieve)
+
+    chunks = []
+    async for c in retriever.answer_question_stream(
+        "what's inside the hood?", top_k=1, anthropic_client=fake_anthropic
+    ):
+        chunks.append(c)
+
+    # Sequence: matches first, 3 text deltas, then done
+    assert len(chunks) == 5
+    assert chunks[0]["type"] == "matches"
+    assert len(chunks[0]["matches"]) == 1
+    assert chunks[0]["matches"][0]["sku"] == "br-005"
+
+    # Text deltas in order
+    assert [c["type"] for c in chunks[1:4]] == ["text", "text", "text"]
+    assert chunks[1]["delta"] == "Inside the hood "
+    assert chunks[2]["delta"] == "is a [br-005] grey "
+    assert chunks[3]["delta"] == "contrast lining."
+
+    # Done event has citations + token counts
+    done = chunks[4]
+    assert done["type"] == "done"
+    assert done["citations"] == ["br-005"]  # parsed from accumulated deltas
+    assert done["input_tokens"] == 1500
+    assert done["output_tokens"] == 42
+    assert done["model"] == "claude-haiku-4-5-20251001"
+
+
+@pytest.mark.unit
+def test_stream_endpoint_emits_sse_format(monkeypatch, fake_matches):
+    """The /answer/stream endpoint produces text/event-stream with `data:` lines."""
+
+    # Stub the retriever to use a fake anthropic stream
+    class _Streamer:
+        def __init__(self, matches):
+            self._matches = matches
+
+        async def answer_question_stream(self, q, *, top_k=5):
+            from orchestration.catalog_retriever import _extract_citations
+
+            yield {
+                "type": "matches",
+                "matches": [
+                    {
+                        "sku": m.sku,
+                        "name": m.name,
+                        "collection": m.collection,
+                        "score": m.score,
+                        "description": m.description,
+                        "branding_spec": m.branding_spec,
+                    }
+                    for m in self._matches[:top_k]
+                ],
+            }
+            for delta in ["Hello ", "[br-005] ", "world."]:
+                yield {"type": "text", "delta": delta}
+            yield {
+                "type": "done",
+                "citations": _extract_citations("Hello [br-005] world."),
+                "input_tokens": 200,
+                "output_tokens": 10,
+                "model": "claude-haiku-4-5-20251001",
+            }
+
+    monkeypatch.setattr(catalog_module, "_retriever", _Streamer(fake_matches))
+
+    app = FastAPI()
+    app.include_router(catalog_router, prefix="/api/v1")
+    c = TestClient(app)
+
+    resp = c.get("/api/v1/catalog/answer/stream", params={"q": "test query"})
+    assert resp.status_code == 200
+    assert resp.headers["content-type"].startswith("text/event-stream")
+
+    # Parse SSE: one event per "data: <json>\n\n" frame
+    events = []
+    for line in resp.text.split("\n\n"):
+        line = line.strip()
+        if line.startswith("data: "):
+            import json as _json
+
+            events.append(_json.loads(line[len("data: ") :]))
+
+    types = [e["type"] for e in events]
+    assert types[0] == "matches"
+    assert types[-1] == "done"
+    assert "text" in types  # at least one text delta
+    # Citations end up in the final done event
+    done = events[-1]
+    assert done["citations"] == ["br-005"]
+
+
+@pytest.mark.unit
+def test_stream_endpoint_emits_error_event_on_failure(monkeypatch):
+    """If the retriever raises mid-stream, an `error` event is emitted instead of crashing."""
+
+    class _Exploder:
+        async def answer_question_stream(self, q, *, top_k=5):
+            raise RuntimeError("voyage SDK timeout — internal hostname")
+            yield  # unreachable, but makes this an async generator
+
+    monkeypatch.setattr(catalog_module, "_retriever", _Exploder())
+
+    app = FastAPI()
+    app.include_router(catalog_router, prefix="/api/v1")
+    c = TestClient(app, raise_server_exceptions=False)
+
+    resp = c.get("/api/v1/catalog/answer/stream", params={"q": "anything"})
+    assert resp.status_code == 200  # stream itself opens fine
+    # The error is in the stream body, not the HTTP status
+    assert "error" in resp.text
+    assert "RuntimeError" in resp.text
+    assert "internal hostname" not in resp.text  # internal detail still redacted
