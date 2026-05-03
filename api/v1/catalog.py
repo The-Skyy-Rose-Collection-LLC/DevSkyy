@@ -354,7 +354,12 @@ async def get_product(sku: str) -> ProductDetailResponse:
         merged = get_product_with_dossier(sku)
         dossier = merged.get("dossier") or None
     except KeyError as exc:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+        # KeyError from get_product_with_dossier includes the absolute CSV path
+        # in its message — sanitize to a clean client-facing detail.
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"SKU {sku!r} not found in catalog",
+        ) from exc
     except DossierMissingError:
         # SKU exists in CSV but dossier is missing — read the row directly
         from skyyrose.core.catalog_loader import read_catalog_rows
@@ -424,7 +429,12 @@ async def get_similar_products(
         retriever = await _get_retriever()
         matches = await retriever.find_similar_by_sku(sku, top_k=top_k)
     except KeyError as exc:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+        # KeyError from get_product_with_dossier includes the absolute CSV path
+        # in its message — sanitize to a clean client-facing detail.
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"SKU {sku!r} not found in catalog",
+        ) from exc
     except DossierMissingError as exc:
         # Dossier is required to compose the query content — without it we
         # would query against a degenerate string and return misleading matches.

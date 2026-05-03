@@ -292,7 +292,12 @@ def test_get_product_returns_full_detail_for_real_sku(client):
 def test_get_product_returns_404_for_unknown_sku(client):
     resp = client.get("/api/v1/catalog/products/zz-999")
     assert resp.status_code == 404
-    assert "zz-999" in resp.json()["detail"]
+    detail = resp.json()["detail"]
+    assert "zz-999" in detail
+    # Server filesystem path must NOT leak in 404 detail (security/info-disclosure)
+    assert "/Users/" not in detail
+    assert ".csv" not in detail
+    assert "DevSkyy" not in detail
 
 
 @pytest.mark.unit
