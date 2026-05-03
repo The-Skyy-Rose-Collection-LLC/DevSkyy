@@ -1,0 +1,6 @@
+# Compositor is an agent inside a LangGraph node, not a procedural script
+
+**Date:** 2026-05-02
+**Status:** accepted
+
+After commit `f25fd25d3` ("Phase B1 scorched earth — rebuild pending") gutted `CompositorAgent` to a 68-line `pass_through` shell on 2026-04-21, compositing functionality migrated to a parallel procedural script (`scripts/run_compositor_pipeline.py`) while the LangGraph `compositor_node` (`skyyrose/elite_studio/graph/nodes.py:318`) continued instantiating the gutted agent. We're treating the LangGraph path as canonical and rebuilding `CompositorAgent` so its `composite()` method actually composes, with the six stages (alpha → prompt-eng → relight → composite → shadows → QA) as private methods on the agent class — because the graph is load-bearing for the rest of the creative pipeline (vision/generator/quality/finalize state, checkpoint/resume, ADK observability via `BaseSuperAgent`), and a script-only design splits pipeline state across two incompatible runtimes. The procedural script is transitional and will be retired (or repointed to invoke the graph) once the rebuild reaches parity. See `docs/superpowers/plans/2026-05-02-compositor-agent-rebuild.md` for the rebuild plan stub.
