@@ -111,6 +111,7 @@ paths = [
     "tests/test_dossier_schema.py",
     "tests/test_source_photo_minimum.py",
     "tests/test_visual_regression_multi_angle.py",
+    "tests/orchestration/**",
     "tasks/dossier-audit-report.md",
     "tasks/golden-coverage-report.md",
     "tasks/source-photo-audit-report.md",
