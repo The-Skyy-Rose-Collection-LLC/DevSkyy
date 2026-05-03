@@ -434,18 +434,20 @@ def scene_composite_node(state: dict) -> dict:
 
         agent = CompositorAgent()
         scene_image_path = params.get("scene_image_path", "")
-        model_image_path = params.get("model_image_path") or scene_image_path
+        model_image_path = params.get("model_image_path", "")
         if not scene_image_path or not model_image_path:
             raise RuntimeError(
                 "scene_composite_node requires scene_image_path and model_image_path in params"
             )
+        # output_dir is intentionally hardcoded — never accept it from API params
+        # (request-controlled filesystem paths are a write-anywhere primitive).
         result = agent.composite(
             sku=sku,
             scene_image_path=scene_image_path,
             model_image_path=model_image_path,
             collection=params.get("collection", ""),
             scene_name=params.get("scene_name", ""),
-            output_dir=params.get("output_dir") or "renders/output/compositor",
+            output_dir="renders/output/compositor",
         )
         composite_result = {
             "success": result.success,

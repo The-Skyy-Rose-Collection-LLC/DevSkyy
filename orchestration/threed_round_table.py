@@ -801,8 +801,13 @@ class ThreeDRoundTable:
                 response = await self._enhance_quality(response)
 
             entry = RoundTableEntry(provider=provider, response=response)
-            # Pass the prompt so CLIP alignment can score prompt-to-preview.
-            entry.scores = self._score_response(response, prompt=prompt)
+            # Pass the prompt so CLIP alignment can score prompt-to-preview, but
+            # only for text-to-3D — image-to-3D has no semantic prompt and
+            # passing a synthetic placeholder biases CLIP scoring.
+            entry.scores = self._score_response(
+                response,
+                prompt=prompt if generation_type == GenerationType.TEXT_TO_3D else None,
+            )
             entries.append(entry)
 
         # Add skipped provider entries
