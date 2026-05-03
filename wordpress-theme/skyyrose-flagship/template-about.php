@@ -71,7 +71,7 @@ $hero_img = get_theme_file_uri('assets/images/homepage-story-founder.webp');
 				<div class="abt-milestone rv-clip-up">
 					<div class="abt-milestone__year">2024</div>
 					<h3 class="abt-milestone__title">Award-Winning</h3>
-					<p class="abt-milestone__desc">Wins Best Bay Area Clothing Line. Featured in San Francisco Post, CEO Weekly. The brand's story resonates nationally as proof that vision and fatherhood can coexist at the highest level.</p>
+					<p class="abt-milestone__desc">Wins Best Oakland Clothing Line. Featured in San Francisco Post, CEO Weekly. The brand's story resonates nationally as proof that vision and fatherhood can coexist at the highest level.</p>
 				</div>
 			</div>
 		</div>

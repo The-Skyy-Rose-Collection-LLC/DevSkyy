@@ -3,7 +3,7 @@
  * Template Name: Immersive - Signature
  *
  * "The Golden Gate Runway" — San Francisco waterfront, golden hour,
- * Golden Gate Bridge showroom. Bay Area luxury.
+ * Golden Gate Bridge showroom. Oakland luxury.
  *
  * AI-composited scene images with beacon-style product discovery.
  * Built on the shared immersive engine (immersive.css + immersive.js).

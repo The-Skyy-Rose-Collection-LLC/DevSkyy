@@ -100,7 +100,7 @@ $craft_cards = array(
 	array(
 		'icon'  => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
 		'label' => __( 'Gender Neutral', 'skyyrose' ),
-		'desc'  => __( 'Pioneer in Bay Area gender-neutral fashion. Designed for anyone, regardless of gender or age.', 'skyyrose' ),
+		'desc'  => __( 'Pioneer in Oakland gender-neutral fashion. Designed for anyone, regardless of gender or age.', 'skyyrose' ),
 	),
 	array(
 		'icon'  => '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
@@ -276,7 +276,7 @@ get_header();
 			</div>
 			<div class="story-float">
 				<div class="sf-lbl"><?php esc_html_e( 'Recognition', 'skyyrose' ); ?></div>
-				<div class="sf-val"><?php echo wp_kses( __( 'Best Bay Area<br>Clothing Line 2024', 'skyyrose' ), array( 'br' => array() ) ); ?></div>
+				<div class="sf-val"><?php echo wp_kses( __( 'Best Oakland<br>Clothing Line 2024', 'skyyrose' ), array( 'br' => array() ) ); ?></div>
 			</div>
 		</div>
 	</div>
@@ -403,10 +403,10 @@ get_template_part(
 	<div class="ft-inner">
 		<div>
 			<div class="ft-brand-name rv"><?php esc_html_e( 'SkyyRose', 'skyyrose' ); ?></div>
-			<p class="ft-desc rv rv-d1"><?php esc_html_e( 'Where Bay Area authenticity meets high-fashion aesthetics. Gender-neutral, sustainably crafted, limited edition designs. Built by a father, named after a daughter.', 'skyyrose' ); ?></p>
+			<p class="ft-desc rv rv-d1"><?php esc_html_e( 'Where Oakland authenticity meets high-fashion aesthetics. Gender-neutral, sustainably crafted, limited edition designs. Built by a father, named after a daughter.', 'skyyrose' ); ?></p>
 			<div class="ft-awards rv rv-d2">
 				<span class="ft-award"><?php esc_html_e( "Maxim's 14 Game-Changing Entrepreneurs 2023", 'skyyrose' ); ?></span>
-				<span class="ft-award"><?php esc_html_e( 'Best Bay Area Clothing Line 2024', 'skyyrose' ); ?></span>
+				<span class="ft-award"><?php esc_html_e( 'Best Oakland Clothing Line 2024', 'skyyrose' ); ?></span>
 				<span class="ft-award"><?php esc_html_e( 'Featured — San Francisco Post, CEO Weekly', 'skyyrose' ); ?></span>
 			</div>
 		</div>

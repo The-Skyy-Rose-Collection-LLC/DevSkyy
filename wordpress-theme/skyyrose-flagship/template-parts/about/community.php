@@ -29,7 +29,7 @@ $customer_photos = $args['customer_photos'] ?? array();
 			<p class="abt-community__text">
 				<?php
 				echo wp_kses(
-					__( 'Oakland isn\'t just where SkyyRose was born&mdash;it\'s <em>who</em> we are. The creativity, the resilience, the unapologetic swagger of the Bay Area runs through every thread of our brand. Fashion was always self-expression here. What you wear says who you are, where you\'re going, what you refuse to accept.', 'skyyrose' ),
+					__( 'Oakland isn\'t just where SkyyRose was born&mdash;it\'s <em>who</em> we are. The creativity, the resilience, the unapologetic swagger of The Town runs through every thread of our brand. Fashion was always self-expression here. What you wear says who you are, where you\'re going, what you refuse to accept.', 'skyyrose' ),
 					$allowed_inline
 				);
 				?>
