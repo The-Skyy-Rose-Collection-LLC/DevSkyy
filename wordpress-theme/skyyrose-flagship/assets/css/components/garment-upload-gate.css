@@ -1,0 +1,205 @@
+/**
+ * Garment Upload Gate styles.
+ *
+ * Uses brand tokens from design-tokens.css so palette swaps automatically.
+ * Phase-driven via [data-phase="..."] on the form root.
+ *
+ * @package SkyyRose
+ * @since   1.1.0
+ */
+
+.sr-upload {
+	--sr-upload-radius: 14px;
+	--sr-upload-pad: clamp(1.25rem, 2.5vw, 2rem);
+	--sr-upload-accent: var(--color-rose-gold, #b76e79);
+	--sr-upload-bg: rgba(255, 255, 255, 0.04);
+	--sr-upload-border: rgba(255, 255, 255, 0.12);
+	--sr-upload-text: var(--color-text, #f5f5f5);
+	--sr-upload-muted: rgba(255, 255, 255, 0.65);
+	--sr-upload-success: #4ade80;
+	--sr-upload-warn: #f59e0b;
+	--sr-upload-reject: #f87171;
+
+	display: grid;
+	gap: 1rem;
+	padding: var(--sr-upload-pad);
+	background: var(--sr-upload-bg);
+	border: 1px solid var(--sr-upload-border);
+	border-radius: var(--sr-upload-radius);
+	color: var(--sr-upload-text);
+	font-family: var(--font-body, 'Cormorant Garamond', serif);
+	max-width: 560px;
+	margin-inline: auto;
+	backdrop-filter: blur(8px);
+}
+
+.sr-upload__label {
+	font-family: var(--font-display, 'Playfair Display', serif);
+	font-size: clamp(1.125rem, 2vw, 1.375rem);
+	letter-spacing: 0.02em;
+}
+
+.sr-upload__file {
+	font: inherit;
+	color: inherit;
+	padding: 0.75rem;
+	background: rgba(0, 0, 0, 0.3);
+	border: 1px dashed var(--sr-upload-border);
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+.sr-upload__file::file-selector-button {
+	font: inherit;
+	padding: 0.5rem 1rem;
+	margin-right: 0.75rem;
+	background: var(--sr-upload-accent);
+	color: #0a0a0a;
+	border: 0;
+	border-radius: 6px;
+	cursor: pointer;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	font-size: 0.75rem;
+}
+
+.sr-upload__help {
+	font-size: 0.875rem;
+	color: var(--sr-upload-muted);
+	margin: 0;
+}
+
+.sr-upload__previewWrap {
+	margin: 0;
+	min-height: 0;
+	display: none;
+	background: rgba(0, 0, 0, 0.4);
+	border-radius: 10px;
+	overflow: hidden;
+	aspect-ratio: 1;
+	max-height: 320px;
+}
+
+.sr-upload[data-phase="loading"] .sr-upload__previewWrap,
+.sr-upload[data-phase="classifying"] .sr-upload__previewWrap,
+.sr-upload[data-phase="accepted"] .sr-upload__previewWrap,
+.sr-upload[data-phase="rejected"] .sr-upload__previewWrap {
+	display: block;
+}
+
+.sr-upload__preview {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+.sr-upload__progress {
+	display: none;
+	width: 100%;
+	height: 4px;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.sr-upload[data-phase="loading"] .sr-upload__progress {
+	display: block;
+}
+
+.sr-upload__progress::-webkit-progress-bar {
+	background: rgba(255, 255, 255, 0.08);
+	border-radius: 2px;
+}
+
+.sr-upload__progress::-webkit-progress-value {
+	background: var(--sr-upload-accent);
+	border-radius: 2px;
+	transition: width 0.2s ease;
+}
+
+.sr-upload__status {
+	margin: 0;
+	font-size: 0.9375rem;
+	color: var(--sr-upload-muted);
+}
+
+.sr-upload__verdict {
+	display: none;
+	padding: 0.875rem 1rem;
+	border-radius: 8px;
+	font-size: 0.9375rem;
+	line-height: 1.45;
+}
+
+.sr-upload[data-phase="accepted"] .sr-upload__verdict {
+	display: block;
+	background: rgba(74, 222, 128, 0.08);
+	border: 1px solid rgba(74, 222, 128, 0.3);
+	color: var(--sr-upload-success);
+}
+
+.sr-upload[data-phase="rejected"] .sr-upload__verdict {
+	display: block;
+	background: rgba(248, 113, 113, 0.08);
+	border: 1px solid rgba(248, 113, 113, 0.3);
+	color: var(--sr-upload-reject);
+}
+
+.sr-upload__reason {
+	margin: 0;
+	font-weight: 500;
+}
+
+.sr-upload__category {
+	margin: 0.5rem 0 0;
+	font-size: 0.8125rem;
+	opacity: 0.8;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+}
+
+.sr-upload__actions {
+	display: flex;
+	gap: 0.75rem;
+	justify-content: flex-end;
+}
+
+.sr-upload__reset,
+.sr-upload__submit {
+	font: inherit;
+	padding: 0.75rem 1.5rem;
+	border-radius: 6px;
+	cursor: pointer;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	font-size: 0.8125rem;
+	transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.sr-upload__reset {
+	background: transparent;
+	color: var(--sr-upload-muted);
+	border: 1px solid var(--sr-upload-border);
+}
+
+.sr-upload__submit {
+	background: var(--sr-upload-accent);
+	color: #0a0a0a;
+	border: 0;
+	font-weight: 600;
+}
+
+.sr-upload__submit:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
+
+.sr-upload__submit:not(:disabled):hover {
+	transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.sr-upload__progress::-webkit-progress-value,
+	.sr-upload__submit {
+		transition: none;
+	}
+}
