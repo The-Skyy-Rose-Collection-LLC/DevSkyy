@@ -37,6 +37,10 @@ class _FakeRetriever:
     async def retrieve_by_collection(self, slug, *, top_k=5):
         return [m for m in self._matches if m.collection == slug][:top_k]
 
+    async def find_similar_by_sku(self, sku, *, top_k=5):
+        # Return all matches except the source SKU
+        return [m for m in self._matches if m.sku != sku][:top_k]
+
 
 @pytest.fixture
 def fake_matches() -> list[CatalogMatch]:
@@ -230,3 +234,128 @@ def test_search_returns_503_when_retriever_raises(monkeypatch):
     detail = resp.json()["detail"]
     assert "RuntimeError" in detail  # type name is fine to expose
     assert "secret hostname" not in detail  # internal message is not leaked
+
+
+# ---------------------------------------------------------------------------
+# /products/{sku} — direct lookup (uses real catalog/dossier loaders)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+def test_get_product_returns_full_detail_for_real_sku(client):
+    """br-001 is a stable canonical SKU — assert structural shape, not exact values."""
+    resp = client.get("/api/v1/catalog/products/br-001")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["sku"] == "br-001"
+    assert body["collection"] == "black-rose"
+    assert body["name"]  # non-empty
+    # Dossier should be present for canonical SKUs
+    assert body["dossier"] is not None
+    assert body["dossier"]["slug"]
+    # branding_block holds the rich per-product branding spec
+    assert body["dossier"]["branding_block"]
+
+
+@pytest.mark.unit
+def test_get_product_returns_404_for_unknown_sku(client):
+    resp = client.get("/api/v1/catalog/products/zz-999")
+    assert resp.status_code == 404
+    assert "zz-999" in resp.json()["detail"]
+
+
+@pytest.mark.unit
+def test_get_product_published_flag_is_bool(client):
+    resp = client.get("/api/v1/catalog/products/br-001")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert isinstance(body["published"], bool)
+    assert isinstance(body["is_preorder"], bool)
+
+
+# ---------------------------------------------------------------------------
+# /products/{sku}/similar
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+def test_similar_excludes_source_sku(client):
+    """Source SKU must NOT appear in its own similar-results."""
+    resp = client.get("/api/v1/catalog/products/br-005/similar")
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["sku"] == "br-005"
+    skus = [m["sku"] for m in body["matches"]]
+    assert "br-005" not in skus  # the load-bearing assertion
+    # Other matches from the fake retriever should be present
+    assert "br-004" in skus or "lh-004" in skus
+
+
+@pytest.mark.unit
+def test_similar_top_k_validation(client):
+    resp = client.get("/api/v1/catalog/products/br-005/similar", params={"top_k": 0})
+    assert resp.status_code == 422
+    resp = client.get("/api/v1/catalog/products/br-005/similar", params={"top_k": 21})
+    assert resp.status_code == 422
+
+
+@pytest.mark.unit
+def test_similar_returns_404_for_unknown_sku(monkeypatch):
+    """When the retriever raises KeyError (SKU not in catalog), surface as 404."""
+
+    class _NotFound:
+        async def find_similar_by_sku(self, sku, *, top_k=5):
+            raise KeyError(f"SKU {sku!r} not found")
+
+    monkeypatch.setattr(catalog_module, "_retriever", _NotFound())
+
+    app = FastAPI()
+    app.include_router(catalog_router, prefix="/api/v1")
+    c = TestClient(app)
+
+    resp = c.get("/api/v1/catalog/products/zz-999/similar")
+    assert resp.status_code == 404
+
+
+@pytest.mark.unit
+def test_similar_returns_409_when_dossier_missing(monkeypatch):
+    """When the source SKU exists but has no dossier, return 409 — not 503.
+
+    A missing dossier is an authoring problem (data, not service), so
+    surface a different code than infrastructure failure.
+    """
+    from skyyrose.core.dossier_loader import DossierMissingError
+
+    class _NoDossier:
+        async def find_similar_by_sku(self, sku, *, top_k=5):
+            raise DossierMissingError(f"dossier missing for {sku}")
+
+    monkeypatch.setattr(catalog_module, "_retriever", _NoDossier())
+
+    app = FastAPI()
+    app.include_router(catalog_router, prefix="/api/v1")
+    c = TestClient(app)
+
+    resp = c.get("/api/v1/catalog/products/br-001/similar")
+    assert resp.status_code == 409
+
+
+@pytest.mark.unit
+def test_similar_returns_503_on_unexpected_error(monkeypatch):
+    """Generic infrastructure errors still map to 503 with sanitized detail."""
+
+    class _Exploder:
+        async def find_similar_by_sku(self, *args, **kwargs):
+            raise RuntimeError("voyage SDK timeout — internal hostname")
+
+    monkeypatch.setattr(catalog_module, "_retriever", _Exploder())
+
+    app = FastAPI()
+    app.include_router(catalog_router, prefix="/api/v1")
+    c = TestClient(app, raise_server_exceptions=False)
+
+    resp = c.get("/api/v1/catalog/products/br-005/similar")
+    assert resp.status_code == 503
+    detail = resp.json()["detail"]
+    assert "RuntimeError" in detail
+    assert "internal hostname" not in detail

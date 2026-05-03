@@ -244,6 +244,50 @@ class CatalogRetriever:
             query=f"{slug} collection signature pieces", top_k=top_k, collection=slug
         )
 
+    async def find_similar_by_sku(self, sku: str, *, top_k: int = 5) -> list[CatalogMatch]:
+        """Return the top-k SKUs semantically nearest to ``sku`` (excluding itself).
+
+        Re-embeds the source SKU's composed content via Voyage and queries the
+        vector store, then filters the source SKU from the result set. Costs
+        one Voyage query embedding per call (~$0.0001).
+
+        We pull `top_k + 1` from the store so dropping the source still leaves
+        ``top_k`` results in the common case where the source itself is the
+        top match.
+
+        Raises:
+            KeyError if ``sku`` is not in the canonical catalog.
+            DossierMissingError if the SKU's dossier markdown file is absent.
+        """
+        self._require_init()
+        assert self._embedder is not None and self._store is not None
+
+        # Lazy import — keeps skyyrose.core optional at module load
+        from skyyrose.core.dossier_loader import get_product_with_dossier
+
+        merged = get_product_with_dossier(sku)
+        content = self._compose_content(merged, merged.get("dossier", {}))
+
+        # Pull one extra to absorb the source SKU itself (which usually scores 1.0).
+        # MUST pass namespace=self._namespace — the catalog lives in the "catalog"
+        # namespace, and querying the default partition silently returns nothing.
+        query_embedding = await self._embedder.embed_query(content)
+        results = await self._store.search(
+            query_embedding=query_embedding,
+            top_k=top_k + 1,
+            namespace=self._namespace,
+        )
+
+        matches: list[CatalogMatch] = []
+        for r in results:
+            match = self._match_from_result(r)
+            if match.sku == sku:
+                continue
+            matches.append(match)
+            if len(matches) >= top_k:
+                break
+        return matches
+
     async def close(self) -> None:
         if self._store is not None:
             await self._store.close()

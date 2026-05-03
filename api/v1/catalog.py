@@ -10,6 +10,8 @@ Auth:    public (catalog data is publicly browseable)
 Endpoints:
     GET  /search                            — semantic search across all SKUs
     GET  /collections/{slug}/featured       — top-k matches scoped to a collection
+    GET  /products/{sku}                    — full product detail (CSV row + dossier)
+    GET  /products/{sku}/similar            — semantic "you might also like"
     GET  /health                            — verifies retriever can initialize
 """
 
@@ -174,6 +176,156 @@ async def collection_featured(
         query=f"{slug} collection signature pieces",
         top_k=top_k,
         collection=slug,
+        matches=[CatalogMatchResponse.from_match(m) for m in matches],
+        elapsed_ms=round((time.perf_counter() - t0) * 1000, 2),
+    )
+
+
+# ---------------------------------------------------------------------------
+# /products/{sku} — direct lookup (no LLM, no embed, free)
+# ---------------------------------------------------------------------------
+
+
+class DossierResponse(BaseModel):
+    """Parsed product dossier — the rich per-product spec the render pipeline reads."""
+
+    slug: str
+    garment_type_lock: str = ""
+    branding_block: str = ""
+    negative_block: str = ""
+    scene_pose: str = ""
+    scene_setting: str = ""
+
+
+class ProductDetailResponse(BaseModel):
+    """Full product detail — canonical CSV row + parsed dossier when present."""
+
+    sku: str
+    name: str
+    collection: str
+    price: str = ""
+    badge: str = ""
+    description: str = ""
+    branding_spec: str = Field(default="", description="Legacy single-line spec; prefer dossier.")
+    image: str = ""
+    published: bool = False
+    is_preorder: bool = False
+    dossier: DossierResponse | None = None
+
+
+def _coerce_bool(value: str | None) -> bool:
+    return (value or "").strip() in ("1", "true", "True", "yes")
+
+
+@router.get("/products/{sku}", response_model=ProductDetailResponse)
+async def get_product(sku: str) -> ProductDetailResponse:
+    """Direct SKU lookup with full dossier when available.
+
+    Pure read against the canonical catalog CSV + per-product dossier markdown.
+    No Voyage call, no Pinecone call, no LLM — zero per-request cost. Returns
+    404 if the SKU is not in the catalog. If the SKU exists but its dossier
+    file is missing, returns the CSV-derived fields with `dossier: null`
+    (deliberate choice: a missing dossier is a render-pipeline blocker, not
+    a display-layer blocker).
+    """
+    # Lazy import — keeps skyyrose.core optional at API module load
+    from skyyrose.core.dossier_loader import (
+        DossierMissingError,
+        get_product_with_dossier,
+    )
+
+    try:
+        merged = get_product_with_dossier(sku)
+        dossier = merged.get("dossier") or None
+    except KeyError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except DossierMissingError:
+        # SKU exists in CSV but dossier is missing — read the row directly
+        from skyyrose.core.catalog_loader import read_catalog_rows
+
+        rows = {row["sku"]: row for row in read_catalog_rows()}
+        merged = rows[sku]
+        dossier = None
+
+    dossier_response = (
+        DossierResponse(
+            slug=dossier.get("slug", ""),
+            garment_type_lock=dossier.get("garment_type_lock", ""),
+            branding_block=dossier.get("branding_block", ""),
+            negative_block=dossier.get("negative_block", ""),
+            scene_pose=dossier.get("scene_pose", ""),
+            scene_setting=dossier.get("scene_setting", ""),
+        )
+        if dossier
+        else None
+    )
+
+    return ProductDetailResponse(
+        sku=merged.get("sku", sku),
+        name=(merged.get("name") or "").strip(),
+        collection=(merged.get("collection") or "").strip().lower(),
+        price=(merged.get("price") or "").strip(),
+        badge=(merged.get("badge") or "").strip(),
+        description=(merged.get("description") or "").strip(),
+        branding_spec=(merged.get("branding_spec") or "").strip(),
+        image=(merged.get("image") or "").strip(),
+        published=_coerce_bool(merged.get("published")),
+        is_preorder=_coerce_bool(merged.get("is_preorder")),
+        dossier=dossier_response,
+    )
+
+
+# ---------------------------------------------------------------------------
+# /products/{sku}/similar — semantic "you might also like"
+# ---------------------------------------------------------------------------
+
+
+class SimilarResponse(BaseModel):
+    """Wrapper for the similar-SKU result set."""
+
+    sku: str = Field(..., description="Source SKU (excluded from matches)")
+    top_k: int
+    matches: list[CatalogMatchResponse]
+    elapsed_ms: float
+
+
+@router.get("/products/{sku}/similar", response_model=SimilarResponse)
+async def get_similar_products(
+    sku: str,
+    top_k: int = Query(5, ge=1, le=20),
+) -> SimilarResponse:
+    """Top-k SKUs semantically nearest to the given SKU (excluding itself).
+
+    Re-embeds the source SKU's dossier-rich content via Voyage, queries
+    Pinecone for nearest neighbors, drops the source SKU from results.
+    Costs one Voyage query embed (~$0.0001).
+    """
+    from skyyrose.core.dossier_loader import DossierMissingError
+
+    t0 = time.perf_counter()
+
+    try:
+        retriever = await _get_retriever()
+        matches = await retriever.find_similar_by_sku(sku, top_k=top_k)
+    except KeyError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except DossierMissingError as exc:
+        # Dossier is required to compose the query content — without it we
+        # would query against a degenerate string and return misleading matches.
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"SKU {sku!r} has no dossier; cannot compute similarity.",
+        ) from exc
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("Similar lookup failed: sku=%r", sku)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Catalog retrieval temporarily unavailable: {type(exc).__name__}",
+        ) from exc
+
+    return SimilarResponse(
+        sku=sku,
+        top_k=top_k,
         matches=[CatalogMatchResponse.from_match(m) for m in matches],
         elapsed_ms=round((time.perf_counter() - t0) * 1000, 2),
     )
