@@ -12,6 +12,7 @@ Endpoints:
     GET  /collections/{slug}/featured       — top-k matches scoped to a collection
     GET  /products/{sku}                    — full product detail (CSV row + dossier)
     GET  /products/{sku}/similar            — semantic "you might also like"
+    GET  /answer                            — natural-language Q&A grounded in catalog (RAG)
     GET  /health                            — verifies retriever can initialize
 """
 
@@ -23,7 +24,7 @@ import time
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
 
-from orchestration.catalog_retriever import CatalogMatch, CatalogRetriever
+from orchestration.catalog_retriever import CatalogAnswer, CatalogMatch, CatalogRetriever
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/catalog", tags=["Catalog"])
@@ -329,6 +330,85 @@ async def get_similar_products(
         matches=[CatalogMatchResponse.from_match(m) for m in matches],
         elapsed_ms=round((time.perf_counter() - t0) * 1000, 2),
     )
+
+
+# ---------------------------------------------------------------------------
+# /answer — RAG with LLM synthesis (Voyage retrieve → Claude Haiku answer)
+# ---------------------------------------------------------------------------
+
+
+class AnswerResponse(BaseModel):
+    """Natural-language answer grounded in catalog excerpts."""
+
+    question: str
+    answer: str
+    citations: list[str] = Field(
+        default_factory=list,
+        description="SKUs cited in the answer text (in order of first mention)",
+    )
+    matches: list[CatalogMatchResponse] = Field(
+        default_factory=list,
+        description="Full retrieval context the LLM saw (top-k matches)",
+    )
+    model: str
+    input_tokens: int = 0
+    output_tokens: int = 0
+    elapsed_ms: float
+
+    @classmethod
+    def from_answer(cls, ans: CatalogAnswer, elapsed_ms: float) -> AnswerResponse:
+        return cls(
+            question=ans.question,
+            answer=ans.answer,
+            citations=ans.citations,
+            matches=[CatalogMatchResponse.from_match(m) for m in ans.matches],
+            model=ans.model,
+            input_tokens=ans.input_tokens,
+            output_tokens=ans.output_tokens,
+            elapsed_ms=elapsed_ms,
+        )
+
+
+@router.get("/answer", response_model=AnswerResponse)
+async def answer_question(
+    q: str = Query(
+        ...,
+        min_length=3,
+        max_length=500,
+        description="Natural-language question about SkyyRose products",
+    ),
+    top_k: int = Query(
+        5,
+        ge=1,
+        le=10,
+        description="How many catalog matches to surface as grounding context",
+    ),
+) -> AnswerResponse:
+    """Natural-language Q&A grounded in the SkyyRose catalog (RAG).
+
+    Pipeline:
+        1. Voyage embed query (~$0.0001)
+        2. Pinecone retrieve top-k matches (free)
+        3. Claude Haiku 4.5 synthesizes a grounded answer with [SKU] citations
+           (~$0.001-0.002 per request)
+
+    The LLM is instructed to cite SKUs in [brackets] and to refuse rather than
+    hallucinate when the retrieval doesn't cover the question. Total cost per
+    request is typically under $0.003.
+    """
+    t0 = time.perf_counter()
+
+    try:
+        retriever = await _get_retriever()
+        ans = await retriever.answer_question(q, top_k=top_k)
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("Catalog Q&A failed: q=%r", q)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Catalog Q&A temporarily unavailable: {type(exc).__name__}",
+        ) from exc
+
+    return AnswerResponse.from_answer(ans, elapsed_ms=round((time.perf_counter() - t0) * 1000, 2))
 
 
 @router.get("/health", response_model=CatalogHealthResponse)

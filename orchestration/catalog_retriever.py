@@ -19,6 +19,7 @@ Everything is async because the underlying engines are async.
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass
 from typing import Any
 
@@ -56,6 +57,31 @@ class CatalogMatch:
     score: float
     branding_spec: str
     description: str
+
+
+@dataclass(frozen=True)
+class CatalogAnswer:
+    """A natural-language answer over the catalog, with cited SKUs.
+
+    Returned by ``CatalogRetriever.answer_question()``. The ``citations`` list
+    is the union of (a) SKUs the LLM explicitly bracketed in its answer text
+    and (b) the retrieved matches the LLM was given as context. Callers that
+    want strict "only what the LLM cited" can iterate ``answer`` and parse
+    [SKU] markers themselves; the answer text preserves them verbatim.
+    """
+
+    question: str
+    answer: str
+    citations: list[str]  # SKUs cited in the answer text (in order of first mention)
+    matches: list[CatalogMatch]  # The full retrieval context the LLM saw
+    model: str
+    input_tokens: int = 0
+    output_tokens: int = 0
+
+
+# Regex for extracting [SKU] citation markers from the LLM's answer.
+# SKUs are lowercase letters/digits/hyphen, e.g. [br-005], [kids-002].
+_CITATION_PATTERN = re.compile(r"\[([a-z]{2,5}-[a-z0-9]+)\]")
 
 
 class CatalogRetriever:
@@ -287,6 +313,118 @@ class CatalogRetriever:
             if len(matches) >= top_k:
                 break
         return matches
+
+    # Default model for catalog Q&A. Haiku 4.5 is the sweet spot:
+    # ~$1/MTok input, ~$5/MTok output, fast, plenty of capability for grounded
+    # short-form answers. Override with answer_question(model=...) if needed.
+    DEFAULT_QA_MODEL = "claude-haiku-4-5-20251001"
+
+    QA_SYSTEM_PROMPT = (
+        "You are a knowledgeable concierge for SkyyRose, a luxury streetwear brand "
+        '(tagline: "Luxury Grows from Concrete."). The brand has 4 collections: '
+        "Black Rose (gothic Oakland), Love Hurts (passionate, Beauty-and-the-Beast), "
+        "Signature (SF Bay Area, golden hour), and Kids Capsule. "
+        "Answer the user's question using ONLY the catalog excerpts provided. "
+        "Cite specific products by their SKU in square brackets like [br-005] when "
+        "they're directly relevant. If the catalog excerpts don't contain enough "
+        "information to answer, say so honestly — don't invent products, prices, or "
+        "details that aren't in the excerpts. Keep answers conversational and concise "
+        "(2-4 sentences typically; longer only if the question genuinely needs it)."
+    )
+
+    async def answer_question(
+        self,
+        question: str,
+        *,
+        top_k: int = 5,
+        model: str | None = None,
+        max_tokens: int = 400,
+        anthropic_client: Any | None = None,
+    ) -> CatalogAnswer:
+        """Answer a natural-language question grounded in the SkyyRose catalog.
+
+        Pipeline: Voyage query embed → Pinecone retrieve top-k → Claude Haiku
+        synthesizes a grounded answer with [SKU] citations.
+
+        Args:
+            question: free-form natural-language question
+            top_k: how many matches to surface as context (default 5)
+            model: Claude model id (default: ``DEFAULT_QA_MODEL``)
+            max_tokens: cap on answer length
+            anthropic_client: inject a pre-built ``anthropic.AsyncAnthropic`` for
+                testing; production callers leave this None to lazy-create one.
+
+        Cost (rough, per request): ~$0.0001 Voyage + ~$0.001-0.002 Haiku
+        depending on context length and answer length.
+        """
+        self._require_init()
+
+        # Step 1: retrieve grounding context
+        matches = await self.retrieve(question, top_k=top_k)
+
+        # Step 2: build the user prompt — wrap matches in tagged blocks so the
+        # LLM can clearly attribute statements to source SKUs
+        if matches:
+            blocks = []
+            for m in matches:
+                blocks.append(
+                    f"[{m.sku}] {m.name} ({m.collection})\n"
+                    f"  branding: {m.branding_spec[:300]}\n"
+                    f"  description: {m.description[:300]}"
+                )
+            context = "\n\n".join(blocks)
+            user_prompt = (
+                f"Question: {question}\n\n"
+                f"Catalog excerpts (top {len(matches)} most relevant SKUs):\n\n{context}\n\n"
+                f"Answer the question using only these excerpts. Cite SKUs in [brackets]."
+            )
+        else:
+            # No matches — let the LLM say so cleanly rather than hallucinating
+            user_prompt = (
+                f"Question: {question}\n\n"
+                f"No catalog excerpts were retrieved for this question. "
+                f"Tell the user clearly that you don't have product information that matches "
+                f"their query, without inventing any details."
+            )
+
+        # Step 3: call Claude
+        chosen_model = model or self.DEFAULT_QA_MODEL
+        if anthropic_client is None:
+            import anthropic
+
+            anthropic_client = anthropic.AsyncAnthropic()
+
+        response = await anthropic_client.messages.create(
+            model=chosen_model,
+            max_tokens=max_tokens,
+            system=self.QA_SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": user_prompt}],
+        )
+
+        # Step 4: extract the text answer + parse citations
+        answer_text = ""
+        for block in response.content:
+            if getattr(block, "type", None) == "text":
+                answer_text += block.text
+
+        # Citation extraction: preserve order of first appearance, deduplicate
+        seen: set[str] = set()
+        citations: list[str] = []
+        for sku in _CITATION_PATTERN.findall(answer_text):
+            if sku not in seen:
+                seen.add(sku)
+                citations.append(sku)
+
+        usage = getattr(response, "usage", None)
+        return CatalogAnswer(
+            question=question,
+            answer=answer_text.strip(),
+            citations=citations,
+            matches=matches,
+            model=chosen_model,
+            input_tokens=getattr(usage, "input_tokens", 0) if usage else 0,
+            output_tokens=getattr(usage, "output_tokens", 0) if usage else 0,
+        )
 
     async def close(self) -> None:
         if self._store is not None:
