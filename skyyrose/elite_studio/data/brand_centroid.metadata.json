@@ -1,0 +1,14 @@
+{
+  "centroid_dim": 512,
+  "centroid_l2_norm": 1.0,
+  "encoder": "clip",
+  "generated_at": "2026-05-03T15:29:06+00:00",
+  "model_id": "openai/clip-vit-base-patch32",
+  "npz_filename": "brand_centroid.npz",
+  "npz_sha256": "cf6ce6acff1c5036",
+  "sample_count": 23,
+  "sample_paths": [],
+  "sample_paths_hash": null,
+  "schema_version": 1,
+  "threshold": 0.763071
+}
