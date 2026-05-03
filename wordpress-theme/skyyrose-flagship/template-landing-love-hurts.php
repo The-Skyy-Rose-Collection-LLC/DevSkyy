@@ -29,9 +29,9 @@ get_header();
 			'logo_image'    => '/images/hero-overlays/lh-logo-combined.png',
 			'logo_alt'      => 'Love Hurts Collection',
 			'subtitle'      => 'This isn\'t a theme. It\'s what you\'ve survived.',
-			'countdown'     => '72h',
+			'countdown'     => false,
 			'cta_primary'   => array(
-				'text' => 'Shop the Drop',
+				'text' => 'Shop Love Hurts',
 				'url'  => '#products',
 			),
 			'cta_secondary' => array(

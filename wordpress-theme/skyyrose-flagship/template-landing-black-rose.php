@@ -31,9 +31,9 @@ get_header();
 			'logo_image'    => '/images/hero-overlays/br-brand-script.png',
 			'logo_alt'      => 'The Black Rose Collection',
 			'subtitle'      => "Darkness isn't the absence of light. It's where you find your own.",
-			'countdown'     => '72h',
+			'countdown'     => false,
 			'cta_primary'   => array(
-				'text' => 'Shop the Drop',
+				'text' => 'Shop Black Rose',
 				'url'  => '#products',
 			),
 			'cta_secondary' => array(

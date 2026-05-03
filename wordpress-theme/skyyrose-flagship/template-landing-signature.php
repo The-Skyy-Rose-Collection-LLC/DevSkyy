@@ -28,9 +28,9 @@ get_header();
 			'logo_image'    => '/images/hero-overlays/sig-brand-skyy-rose-gold.png',
 			'logo_alt'      => 'The Skyy Rose Signature Collection',
 			'subtitle'      => 'Not basics. Blueprints.',
-			'countdown'     => '72h',
+			'countdown'     => false,
 			'cta_primary'   => array(
-				'text' => 'Shop the Drop',
+				'text' => 'Shop Signature',
 				'url'  => '#products',
 			),
 			'cta_secondary' => array(
