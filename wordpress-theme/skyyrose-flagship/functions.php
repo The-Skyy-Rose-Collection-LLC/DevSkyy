@@ -48,6 +48,7 @@ $skyyrose_core_includes = array(
 	// downstream include can reference SKYYROSE_BRAND_TAGLINE, SKYYROSE_COLOR_*,
 	// skyyrose_brand_collections(), skyyrose_json_ld_organization(), etc.
 	'/inc/brand.generated.php',
+	'/inc/redirects.php',
 	'/inc/theme-setup.php',
 	'/inc/brand-colors.php',
 	'/inc/collections-config.php',
