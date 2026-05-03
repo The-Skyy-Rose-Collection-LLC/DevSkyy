@@ -116,6 +116,26 @@ paths = [
     "tasks/source-photo-audit-report.md",
     "tasks/source-photo-shoot-list.md",
     "pyproject.toml",
+    # RAG infrastructure modified alongside embedding/CLIP/DINOv2 quality work
+    "orchestration/catalog_retriever.py",
+    "orchestration/embedding_engine.py",
+    "orchestration/rag_context_manager.py",
+    "orchestration/reranker.py",
+    "orchestration/vector_store.py",
+]
+
+# -----------------------------------------------------------------------------
+# AGENT MEMORY — new agent-side memory subsystem (LangChain-style buffer/
+# consolidator/conversation memory for LLM agents). Distinct from .wolf/
+# memory (OpenWolf metadata) and from claude-mem (cross-session observations).
+# -----------------------------------------------------------------------------
+[scope.agent-memory]
+description = "Agent-side memory subsystem — buffer, consolidator, conversation memory for LLM agents"
+branch_prefix = "feat/agent-memory"
+paths = [
+    "skyyrose/core/memory/**",
+    "docs/adr/0001-compositor-is-agent-inside-langgraph-node.md",
+    "docs/superpowers/plans/*compositor-agent-rebuild*.md",
 ]
 
 # -----------------------------------------------------------------------------
@@ -150,4 +170,10 @@ paths = [
     "wordpress-theme/**/CLAUDE.md",
     "scripts/scope.py",
     "scripts/add-env-key.sh",
+    # Root-level docs and config
+    "CONTEXT.md",
+    ".env.example",
+    "docs/adr/**",
+    # Orphan test cleanup (single-line tweaks not tied to a specific scope)
+    "tests/grpc/**",
 ]
