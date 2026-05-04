@@ -145,44 +145,8 @@
     }
   }
 
-  /* ──────────────────────────────────────────────────────────────────
-     4. Scroll Reveal — IntersectionObserver on .lp-rv
-     ────────────────────────────────────────────────────────────────── */
-  function initScrollReveal() {
-    if (reducedMotion) {
-      // Force all visible immediately
-      var all = document.querySelectorAll('.lp-rv');
-      for (var i = 0; i < all.length; i++) {
-        all[i].classList.add('is-visible');
-      }
-      return;
-    }
-
-    if (!('IntersectionObserver' in window)) {
-      var fallback = document.querySelectorAll('.lp-rv');
-      for (var k = 0; k < fallback.length; k++) {
-        fallback[k].classList.add('is-visible');
-      }
-      return;
-    }
-
-    var observer = new IntersectionObserver(
-      function (entries) {
-        for (var j = 0; j < entries.length; j++) {
-          if (entries[j].isIntersecting) {
-            entries[j].target.classList.add('is-visible');
-            observer.unobserve(entries[j].target);
-          }
-        }
-      },
-      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
-    );
-
-    var elements = document.querySelectorAll('.lp-rv');
-    for (var m = 0; m < elements.length; m++) {
-      observer.observe(elements[m]);
-    }
-  }
+  /* Scroll reveal for .lp-rv handled by premium-interactions.js
+     (unified observer across the theme — retired local copy in U-1). */
 
   /* ──────────────────────────────────────────────────────────────────
      5. Smooth Scroll for Anchor Links
@@ -208,7 +172,6 @@
     initCountdown();
     initParallax();
     initFAQ();
-    initScrollReveal();
     initSmoothScroll();
   }
 
