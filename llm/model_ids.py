@@ -98,13 +98,25 @@ MESHY_AI_MODEL = "meshy-5"  # mirrored in ai_3d/providers/meshy.py
 # Update the constants above to roll forward; callers stay the same.
 # ---------------------------------------------------------------------------
 
-# Elite-team reasoning policy: Opus 4.7 reasons for the elite team. Every
-# slot in skyyrose/elite_studio/ that performs deep analysis, verdict-making,
-# or judgment runs on CLAUDE_OPUS_MODEL. The trade is throughput/cost for
-# frontier-tier quality — explicit choice for luxury-brand QC.
-VISION_CLAUDE_MODEL = CLAUDE_OPUS_MODEL  # vision_agent / claude vision calls
-QC_CLAUDE_MODEL = CLAUDE_OPUS_MODEL  # quality_agent.verify — elite QC reasoning
-COMPOSITOR_CLAUDE_MODEL = CLAUDE_OPUS_MODEL  # compositor_agent prompt synth
+# Elite-team model policy (skyyrose/elite_studio/):
+#   - Vision tasks (read image / output verdict-text):
+#       best Gemini  → GEMINI_PRO_MODEL or GEMINI_VISION_MODEL
+#       best OpenAI  → OPENAI_VISION_MODEL (gpt-4o)
+#       NOT Claude — use Gemini/OpenAI for the seeing.
+#   - Image generation:
+#       Google side  → NANO_BANANA_2_MODEL  (gemini-3.1-flash-image-preview)
+#       OpenAI side  → OPENAI_IMAGE_2_MODEL (gpt-image-2)
+#   - Reasoning (text in / text out, judgment, planning):
+#       always       → CLAUDE_OPUS_MODEL    (claude-opus-4-7)
+#
+# The *_CLAUDE_MODEL aliases below carry the Claude-specific role of a
+# multi-judge panel — e.g. quality_agent.py records
+# f"{QC_CLAUDE_MODEL}+{COMPOSITOR_QA_MODEL}" so the Claude reasoner pairs
+# with the Gemini visualizer. They're not the *general* vision slot;
+# general vision goes to Gemini/OpenAI per the policy above.
+VISION_CLAUDE_MODEL = CLAUDE_OPUS_MODEL  # Claude-side of vision panel — reasoning
+QC_CLAUDE_MODEL = CLAUDE_OPUS_MODEL  # Claude-side of QC panel — reasoning
+COMPOSITOR_CLAUDE_MODEL = CLAUDE_OPUS_MODEL  # compositor prompt synth — reasoning
 RAS_GENERATION_MODEL = GEMINI_FLASH_IMAGE_MODEL  # 3D + generator agents
 GENERATION_MODEL = GEMINI_FLASH_IMAGE_MODEL  # default image generation
 QC_MODEL = QC_CLAUDE_MODEL
@@ -124,14 +136,14 @@ FAST_MODEL = CLAUDE_HAIKU_MODEL  # classification, simple tasks
 
 # Compositor stage models (legacy names kept for back-compat)
 COMPOSITOR_OPUS_MODEL = COMPOSITOR_CLAUDE_MODEL
-# Visual QA = vision-input / structured-verdict-text-output. Reasoning task →
-# CLAUDE_OPUS_MODEL per the elite-team reasoning policy above. Opus is
-# multimodal (accepts images), produces reliable structured text, and is the
-# frontier reasoning tier. Earlier iterations of this alias pointed at
-# gemini-3.1-flash-image-preview (an IMAGE-GEN model, wrong API family for
-# verdict text) and later gemini-3-pro-preview (right family but Google-side);
-# the team's policy is that Opus reasons for the elite pipeline.
-COMPOSITOR_QA_MODEL = CLAUDE_OPUS_MODEL  # visual QA — frontier vision reasoning
+# Compositor Stage 6 visual QA — vision task per policy above:
+# "Vision tasks → best Gemini AND OpenAI." This is the Gemini side of the
+# QC panel (the Claude reasoner is QC_CLAUDE_MODEL above; together they're
+# combined in quality_agent metadata as f"{QC_CLAUDE_MODEL}+{COMPOSITOR_QA_MODEL}").
+# GEMINI_PRO_MODEL chosen for: multimodal input, deep reasoning, reliable
+# structured text output. Don't repoint to GEMINI_FLASH_IMAGE_MODEL — that's
+# an image-GEN model and would default to image output for a text-out task.
+COMPOSITOR_QA_MODEL = GEMINI_PRO_MODEL  # Gemini-side of QC panel — visual QA
 
 __all__ = [
     "CLAUDE_HAIKU_MODEL",
