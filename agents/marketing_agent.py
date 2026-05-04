@@ -38,6 +38,7 @@ from core.runtime.tool_registry import (
     ToolSeverity,
     ToolSpec,
 )
+from llm.model_ids import OPENAI_VISION_MODEL
 from orchestration.prompt_engineering import PromptTechnique
 
 from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
@@ -87,7 +88,7 @@ class MarketingAgent(EnhancedSuperAgent):
             config = AgentConfig(
                 name="marketing_agent",
                 provider=ADKProvider.PYDANTIC,
-                model="gpt-4o",
+                model=OPENAI_VISION_MODEL,
                 system_prompt=self._build_system_prompt(),
                 capabilities=[
                     AgentCapability.MARKETING,
