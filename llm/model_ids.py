@@ -120,7 +120,12 @@ FAST_MODEL = CLAUDE_HAIKU_MODEL  # classification, simple tasks
 
 # Compositor stage models (legacy names kept for back-compat)
 COMPOSITOR_OPUS_MODEL = COMPOSITOR_CLAUDE_MODEL
-COMPOSITOR_QA_MODEL = GEMINI_FLASH_IMAGE_MODEL  # visual QA via Gemini
+# Visual QA = vision-input / structured-text-output. Pointed at the text Pro
+# model (gemini-3-pro-preview): multimodal input + deep reasoning + reliable
+# structured output. NOT the image-gen FLASH model — that one defaults to
+# image output and would either fail or need response_modalities=["TEXT"]
+# every call.
+COMPOSITOR_QA_MODEL = GEMINI_PRO_MODEL  # visual QA — deep structured analysis
 
 __all__ = [
     "CLAUDE_HAIKU_MODEL",
