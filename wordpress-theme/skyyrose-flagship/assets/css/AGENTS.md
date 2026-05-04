@@ -152,15 +152,16 @@ Brand tokens defined in `design-tokens.css`:
 Collection pages and landing pages use CSS custom property overrides — no JS class toggling needed.
 
 ```css
-/* PHP sets data-collection on <body> */
-/* CSS overrides collection-specific vars */
-[data-collection="black-rose"]  { --col-accent: var(--color-silver);   --col-glow: ... }
-[data-collection="love-hurts"]  { --col-accent: var(--color-crimson);  --col-glow: ... }
-[data-collection="signature"]   { --col-accent: var(--color-gold);     --col-glow: ... }
-[data-collection="kids-capsule"]{ --col-accent: var(--color-rose-gold); --col-glow: ... }
+/* PHP sets data-collection on <body> or any wrapper */
+/* design-tokens.css overrides --skyyrose-* per collection */
+[data-collection="black-rose"]  { --skyyrose-accent: #C0C0C0; /* … */ }
+[data-collection="love-hurts"]  { --skyyrose-accent: #DC143C; /* … */ }
+[data-collection="signature"]   { --skyyrose-accent: #D4AF37; /* … */ }
 ```
 
-Landing pages use the same `[data-collection]` attribute with `--lp-*` variable overrides.
+Both collection pages and landing pages consume `--skyyrose-*` tokens directly
+from `design-tokens.css`. The legacy `--col-*` and `--lp-*` aliases were
+retired in U-4 (2026-05-04) — do not reintroduce them.
 
 ## Class Naming Conventions
 
