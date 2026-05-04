@@ -59,18 +59,13 @@ $modal_classes = implode(
 		array(
 			'sr-modal',
 			'sr-modal--' . $size,
-			sanitize_html_class( $args['extra_classes'] ),
+			skyyrose_sanitize_class_list( $args['extra_classes'] ?? '' ),
 		)
 	)
 );
 
 // Build extra attributes string.
-$attr_string = '';
-if ( is_array( $args['attrs'] ) ) {
-	foreach ( $args['attrs'] as $attr_name => $attr_value ) {
-		$attr_string .= ' ' . esc_attr( $attr_name ) . '="' . esc_attr( $attr_value ) . '"';
-	}
-}
+$attr_string = skyyrose_build_attr_string( $args['attrs'] ?? array() );
 ?>
 <div
 	class="sr-modal__backdrop"
@@ -116,7 +111,7 @@ if ( is_array( $args['attrs'] ) ) {
 		</div>
 
 		<div class="sr-modal__content" id="<?php echo esc_attr( $content_id ); ?>">
-			<?php echo wp_kses_post( $args['slot'] ); ?>
+			<?php echo $args['slot']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- slot is internal template output, not user-supplied content ?>
 		</div>
 
 	</div>

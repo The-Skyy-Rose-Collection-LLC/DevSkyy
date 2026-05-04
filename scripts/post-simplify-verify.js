@@ -18,20 +18,15 @@
  *   2  — two consecutive failures on this file, G3 escalation required
  */
 
-import fs   from 'fs';
-import path  from 'path';
-import cp    from 'child_process';
-import os    from 'os';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname  = path.dirname(__filename);
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import { PROJECT_ROOT, utcTimestamp, pathToSlug, deriveTaskId, run } from './_lib/script-utils.js';
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
-const PROJECT_ROOT   = path.resolve(__dirname, '..');
 const EVAL_DIR       = path.join(PROJECT_ROOT, 'eval');
 const REJECTS_PATH   = path.join(EVAL_DIR, 'simplify-rejects.md');
 const QUESTIONS_DIR  = path.join(EVAL_DIR, 'simplify-questions');
@@ -40,29 +35,6 @@ const CONSECUTIVE_KEY = path.join(EVAL_DIR, '.simplify-consecutive.json');
 // ---------------------------------------------------------------------------
 // Utilities
 // ---------------------------------------------------------------------------
-
-function utcTimestamp() {
-  const d = new Date();
-  const p = (n, w = 2) => String(n).padStart(w, '0');
-  return `${d.getUTCFullYear()}${p(d.getUTCMonth()+1)}${p(d.getUTCDate())}-${p(d.getUTCHours())}${p(d.getUTCMinutes())}${p(d.getUTCSeconds())}`;
-}
-
-function pathToSlug(fp) {
-  return fp.replace(/^\/+/, '').replace(/[^a-zA-Z0-9]+/g, '-').replace(/-+$/g, '').toLowerCase();
-}
-
-function deriveTaskId(fp) {
-  return `${pathToSlug(fp)}-${utcTimestamp()}`;
-}
-
-function run(cmd, opts = {}) {
-  try {
-    const out = cp.execSync(cmd, { cwd: PROJECT_ROOT, encoding: 'utf8', ...opts });
-    return { stdout: out || '', status: 0 };
-  } catch (e) {
-    return { stdout: (e.stdout || '') + (e.stderr || ''), status: e.status || 1 };
-  }
-}
 
 function getSimplifyDiff(filePath) {
   const rel = path.relative(PROJECT_ROOT, path.resolve(filePath));

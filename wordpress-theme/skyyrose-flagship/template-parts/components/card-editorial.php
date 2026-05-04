@@ -60,18 +60,13 @@ $card_classes = implode(
 			'sr-card-editorial',
 			'sr-card-editorial--align-' . $align,
 			$args['overlay'] ? 'sr-card-editorial--overlay' : '',
-			sanitize_html_class( $args['extra_classes'] ),
+			skyyrose_sanitize_class_list( $args['extra_classes'] ?? '' ),
 		)
 	)
 );
 
 // Build extra attributes string.
-$attr_string = '';
-if ( is_array( $args['attrs'] ) ) {
-	foreach ( $args['attrs'] as $attr_name => $attr_value ) {
-		$attr_string .= ' ' . esc_attr( $attr_name ) . '="' . esc_attr( $attr_value ) . '"';
-	}
-}
+$attr_string = skyyrose_build_attr_string( $args['attrs'] ?? array() );
 ?>
 <article
 	class="<?php echo esc_attr( $card_classes ); ?>"

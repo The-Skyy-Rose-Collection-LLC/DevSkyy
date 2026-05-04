@@ -16,20 +16,15 @@
  *   1  — fail
  */
 
-import fs   from 'fs';
-import path  from 'path';
-import cp    from 'child_process';
-import os    from 'os';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname  = path.dirname(__filename);
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import { PROJECT_ROOT, utcTimestamp, pathToSlug, deriveTaskId, run } from './_lib/script-utils.js';
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
-const PROJECT_ROOT       = path.resolve(__dirname, '..');
 const EVAL_DIR           = path.join(PROJECT_ROOT, 'eval', 'verify-impl');
 const ANTI_PATTERNS_PATH = path.join(PROJECT_ROOT, 'knowledge-base', 'lessons', 'anti-patterns.md');
 
@@ -56,29 +51,6 @@ const TRUSTED_REFS = {
 // ---------------------------------------------------------------------------
 // Utilities
 // ---------------------------------------------------------------------------
-
-function utcTimestamp() {
-  const d = new Date();
-  const p = (n, w = 2) => String(n).padStart(w, '0');
-  return `${d.getUTCFullYear()}${p(d.getUTCMonth()+1)}${p(d.getUTCDate())}-${p(d.getUTCHours())}${p(d.getUTCMinutes())}${p(d.getUTCSeconds())}`;
-}
-
-function pathToSlug(filePath) {
-  return filePath.replace(/^\/+/, '').replace(/[^a-zA-Z0-9]+/g, '-').replace(/-+$/g, '').toLowerCase();
-}
-
-function deriveTaskId(filePath) {
-  return `${pathToSlug(filePath)}-${utcTimestamp()}`;
-}
-
-function run(cmd) {
-  try {
-    const out = cp.execSync(cmd, { cwd: PROJECT_ROOT });
-    return { stdout: out ? out.toString() : '', status: 0 };
-  } catch (e) {
-    return { stdout: e.stdout ? e.stdout.toString() : '', status: e.status || 1 };
-  }
-}
 
 function getDiff(filePath) {
   const rel = path.relative(PROJECT_ROOT, path.resolve(filePath));

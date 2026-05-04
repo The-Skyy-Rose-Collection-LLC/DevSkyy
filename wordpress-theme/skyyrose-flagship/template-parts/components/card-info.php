@@ -53,68 +53,13 @@ $card_classes = implode(
 		array(
 			'sr-card-info',
 			'sr-card-info--' . $scheme,
-			sanitize_html_class( $args['extra_classes'] ),
+			skyyrose_sanitize_class_list( $args['extra_classes'] ?? '' ),
 		)
 	)
 );
 
-$allowed_svg = array(
-	'svg'      => array(
-		'xmlns'       => true,
-		'viewbox'     => true,
-		'aria-hidden' => true,
-		'focusable'   => true,
-		'width'       => true,
-		'height'      => true,
-		'class'       => true,
-		'fill'        => true,
-		'stroke'      => true,
-	),
-	'path'     => array(
-		'd'               => true,
-		'fill'            => true,
-		'stroke'          => true,
-		'stroke-width'    => true,
-		'stroke-linecap'  => true,
-		'stroke-linejoin' => true,
-	),
-	'rect'     => array(
-		'x'      => true,
-		'y'      => true,
-		'width'  => true,
-		'height' => true,
-		'rx'     => true,
-		'fill'   => true,
-	),
-	'circle'   => array(
-		'cx'   => true,
-		'cy'   => true,
-		'r'    => true,
-		'fill' => true,
-	),
-	'polyline' => array(
-		'points'       => true,
-		'fill'         => true,
-		'stroke'       => true,
-		'stroke-width' => true,
-	),
-	'polygon'  => array(
-		'points' => true,
-		'fill'   => true,
-	),
-	'g'        => array(
-		'fill'   => true,
-		'stroke' => true,
-	),
-);
-
 // Build extra attributes string.
-$attr_string = '';
-if ( is_array( $args['attrs'] ) ) {
-	foreach ( $args['attrs'] as $attr_name => $attr_value ) {
-		$attr_string .= ' ' . esc_attr( $attr_name ) . '="' . esc_attr( $attr_value ) . '"';
-	}
-}
+$attr_string = skyyrose_build_attr_string( $args['attrs'] ?? array() );
 ?>
 <div
 	class="<?php echo esc_attr( $card_classes ); ?>"
@@ -123,7 +68,7 @@ if ( is_array( $args['attrs'] ) ) {
 >
 	<?php if ( $args['icon'] ) : ?>
 		<div class="sr-card-info__icon" aria-hidden="true">
-			<?php echo wp_kses( $args['icon'], $allowed_svg ); ?>
+			<?php echo wp_kses( $args['icon'], skyyrose_svg_kses_allowed() ); ?>
 		</div>
 	<?php endif; ?>
 

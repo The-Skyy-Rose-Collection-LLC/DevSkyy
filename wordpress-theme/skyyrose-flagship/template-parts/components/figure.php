@@ -71,23 +71,13 @@ $figure_classes = implode(
 );
 
 // Build <figure> attribute string.
-$fig_attr_string = '';
-if ( is_array( $args['attrs'] ) ) {
-	foreach ( $args['attrs'] as $attr_name => $attr_value ) {
-		$fig_attr_string .= ' ' . esc_attr( $attr_name ) . '="' . esc_attr( $attr_value ) . '"';
-	}
-}
+$fig_attr_string = skyyrose_build_attr_string( $args['attrs'] ?? array() );
 if ( $args['aspect_ratio'] ) {
 	$fig_attr_string .= ' style="aspect-ratio:' . esc_attr( $args['aspect_ratio'] ) . '"';
 }
 
 // Build <img> attribute string.
-$img_attr_string = '';
-if ( is_array( $args['img_attrs'] ) ) {
-	foreach ( $args['img_attrs'] as $attr_name => $attr_value ) {
-		$img_attr_string .= ' ' . esc_attr( $attr_name ) . '="' . esc_attr( $attr_value ) . '"';
-	}
-}
+$img_attr_string = skyyrose_build_attr_string( $args['img_attrs'] ?? array() );
 
 $allowed_loading  = array( 'lazy', 'eager' );
 $loading          = in_array( $args['loading'], $allowed_loading, true ) ? $args['loading'] : 'lazy';

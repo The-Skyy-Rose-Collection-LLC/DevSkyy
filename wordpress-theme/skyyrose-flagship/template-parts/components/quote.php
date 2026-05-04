@@ -54,18 +54,13 @@ $quote_classes = implode(
 			'sr-quote--' . $size,
 			'sr-quote--' . $align,
 			$args['decorative'] ? 'sr-quote--decorative' : '',
-			sanitize_html_class( $args['extra_classes'] ),
+			skyyrose_sanitize_class_list( $args['extra_classes'] ?? '' ),
 		)
 	)
 );
 
 // Build extra attributes string.
-$attr_string = '';
-if ( is_array( $args['attrs'] ) ) {
-	foreach ( $args['attrs'] as $attr_name => $attr_value ) {
-		$attr_string .= ' ' . esc_attr( $attr_name ) . '="' . esc_attr( $attr_value ) . '"';
-	}
-}
+$attr_string = skyyrose_build_attr_string( $args['attrs'] ?? array() );
 ?>
 <blockquote
 	class="<?php echo esc_attr( $quote_classes ); ?>"

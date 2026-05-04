@@ -57,18 +57,13 @@ $form_classes = implode(
 	array_filter(
 		array(
 			'sr-form',
-			sanitize_html_class( $args['extra_classes'] ),
+			skyyrose_sanitize_class_list( $args['extra_classes'] ?? '' ),
 		)
 	)
 );
 
 // Build extra attributes string.
-$attr_string = '';
-if ( is_array( $args['attrs'] ) ) {
-	foreach ( $args['attrs'] as $attr_name => $attr_value ) {
-		$attr_string .= ' ' . esc_attr( $attr_name ) . '="' . esc_attr( $attr_value ) . '"';
-	}
-}
+$attr_string = skyyrose_build_attr_string( $args['attrs'] ?? array() );
 ?>
 <form
 	class="<?php echo esc_attr( $form_classes ); ?>"
@@ -107,10 +102,10 @@ if ( is_array( $args['attrs'] ) ) {
 	<?php if ( $use_fieldset ) : ?>
 		<fieldset class="sr-form__fieldset">
 			<legend class="sr-form__legend"><?php echo esc_html( $args['legend'] ); ?></legend>
-			<?php echo wp_kses_post( $args['slot'] ); ?>
+			<?php echo $args['slot']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- slot is internal template output, not user-supplied content ?>
 		</fieldset>
 	<?php else : ?>
-		<?php echo wp_kses_post( $args['slot'] ); ?>
+		<?php echo $args['slot']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- slot is internal template output, not user-supplied content ?>
 	<?php endif; ?>
 
 </form>

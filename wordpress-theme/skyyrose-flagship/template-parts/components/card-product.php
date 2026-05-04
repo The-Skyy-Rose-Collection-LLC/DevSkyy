@@ -56,25 +56,22 @@ $image_path  = $product['image'] ?? '';
 $product_url = skyyrose_product_url( $sku );
 $cta_label   = $args['cta_label'] ?: ( $is_preorder ? __( 'Pre-Order', 'skyyrose' ) : __( 'Shop Now', 'skyyrose' ) );
 
+$collection_class = $collection ? 'sr-card-product--' . sanitize_html_class( $collection ) : '';
+
 $card_classes = implode(
 	' ',
 	array_filter(
 		array(
 			'sr-card-product',
-			'sr-card-product--' . sanitize_html_class( $collection ),
+			$collection_class,
 			$is_preorder ? 'sr-card-product--preorder' : '',
-			sanitize_html_class( $args['extra_classes'] ),
+			skyyrose_sanitize_class_list( $args['extra_classes'] ?? '' ),
 		)
 	)
 );
 
 // Build extra attributes string.
-$attr_string = '';
-if ( is_array( $args['attrs'] ) ) {
-	foreach ( $args['attrs'] as $attr_name => $attr_value ) {
-		$attr_string .= ' ' . esc_attr( $attr_name ) . '="' . esc_attr( $attr_value ) . '"';
-	}
-}
+$attr_string = skyyrose_build_attr_string( $args['attrs'] ?? array() );
 ?>
 <article
 	class="<?php echo esc_attr( $card_classes ); ?>"

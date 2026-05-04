@@ -56,7 +56,7 @@ $type          = in_array( $args['type'], $allowed_types, true ) ? $args['type']
 $is_textarea   = 'textarea' === $type;
 
 $field_id   = sanitize_html_class( $args['id'] );
-$field_name = sanitize_html_class( $args['name'] ? $args['name'] : $field_id );
+$field_name = esc_attr( $args['name'] ?? $field_id );
 $has_error  = ! empty( $args['error'] );
 $has_hint   = ! empty( $args['hint'] );
 $error_id   = $field_id ? $field_id . '-error' : '';
@@ -77,12 +77,7 @@ $field_classes = implode(
 $described_by = implode( ' ', array_filter( array( $has_error ? $error_id : '', $has_hint ? $hint_id : '' ) ) );
 
 // Build extra attributes string.
-$attr_string = '';
-if ( is_array( $args['attrs'] ) ) {
-	foreach ( $args['attrs'] as $attr_name => $attr_value ) {
-		$attr_string .= ' ' . esc_attr( $attr_name ) . '="' . esc_attr( $attr_value ) . '"';
-	}
-}
+$attr_string = skyyrose_build_attr_string( $args['attrs'] ?? array() );
 ?>
 <div class="sr-input<?php echo $has_error ? ' sr-input--has-error' : ''; ?>" data-component="input">
 

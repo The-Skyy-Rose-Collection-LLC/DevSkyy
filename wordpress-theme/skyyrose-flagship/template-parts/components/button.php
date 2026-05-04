@@ -47,7 +47,7 @@ $tag           = 'a' === $args['tag'] ? 'a' : 'button';
 $is_disabled   = (bool) $args['disabled'];
 $is_loading    = (bool) $args['loading'];
 $label         = (string) $args['label'];
-$extra_classes = sanitize_html_class( $args['extra_classes'] );
+$extra_classes = skyyrose_sanitize_class_list( $args['extra_classes'] ?? '' );
 
 $classes = implode(
 	' ',
@@ -63,71 +63,8 @@ $classes = implode(
 	)
 );
 
-$allowed_svg = array(
-	'svg'      => array(
-		'xmlns'       => true,
-		'viewbox'     => true,
-		'aria-hidden' => true,
-		'focusable'   => true,
-		'width'       => true,
-		'height'      => true,
-		'class'       => true,
-		'fill'        => true,
-		'stroke'      => true,
-	),
-	'path'     => array(
-		'd'               => true,
-		'fill'            => true,
-		'stroke'          => true,
-		'stroke-width'    => true,
-		'stroke-linecap'  => true,
-		'stroke-linejoin' => true,
-	),
-	'rect'     => array(
-		'x'      => true,
-		'y'      => true,
-		'width'  => true,
-		'height' => true,
-		'rx'     => true,
-		'fill'   => true,
-	),
-	'circle'   => array(
-		'cx'   => true,
-		'cy'   => true,
-		'r'    => true,
-		'fill' => true,
-	),
-	'polyline' => array(
-		'points'       => true,
-		'fill'         => true,
-		'stroke'       => true,
-		'stroke-width' => true,
-	),
-	'polygon'  => array(
-		'points' => true,
-		'fill'   => true,
-	),
-	'line'     => array(
-		'x1'           => true,
-		'y1'           => true,
-		'x2'           => true,
-		'y2'           => true,
-		'stroke'       => true,
-		'stroke-width' => true,
-	),
-	'g'        => array(
-		'fill'   => true,
-		'stroke' => true,
-	),
-);
-
 // Build extra attributes string.
-$attr_string = '';
-if ( is_array( $args['attrs'] ) ) {
-	foreach ( $args['attrs'] as $attr_name => $attr_value ) {
-		$attr_string .= ' ' . esc_attr( $attr_name ) . '="' . esc_attr( $attr_value ) . '"';
-	}
-}
+$attr_string = skyyrose_build_attr_string( $args['attrs'] ?? array() );
 
 if ( 'button' === $tag ) :
 	$btn_type = in_array( $args['type'], array( 'button', 'submit', 'reset' ), true ) ? $args['type'] : 'button';
@@ -142,7 +79,7 @@ if ( 'button' === $tag ) :
 	>
 		<?php if ( $args['icon_before'] ) : ?>
 			<span class="sr-btn__icon sr-btn__icon--before" aria-hidden="true">
-				<?php echo wp_kses( $args['icon_before'], $allowed_svg ); ?>
+				<?php echo wp_kses( $args['icon_before'], skyyrose_svg_kses_allowed() ); ?>
 			</span>
 		<?php endif; ?>
 
@@ -152,7 +89,7 @@ if ( 'button' === $tag ) :
 
 		<?php if ( $args['icon_after'] ) : ?>
 			<span class="sr-btn__icon sr-btn__icon--after" aria-hidden="true">
-				<?php echo wp_kses( $args['icon_after'], $allowed_svg ); ?>
+				<?php echo wp_kses( $args['icon_after'], skyyrose_svg_kses_allowed() ); ?>
 			</span>
 		<?php endif; ?>
 
@@ -171,7 +108,7 @@ if ( 'button' === $tag ) :
 	>
 		<?php if ( $args['icon_before'] ) : ?>
 			<span class="sr-btn__icon sr-btn__icon--before" aria-hidden="true">
-				<?php echo wp_kses( $args['icon_before'], $allowed_svg ); ?>
+				<?php echo wp_kses( $args['icon_before'], skyyrose_svg_kses_allowed() ); ?>
 			</span>
 		<?php endif; ?>
 
@@ -181,7 +118,7 @@ if ( 'button' === $tag ) :
 
 		<?php if ( $args['icon_after'] ) : ?>
 			<span class="sr-btn__icon sr-btn__icon--after" aria-hidden="true">
-				<?php echo wp_kses( $args['icon_after'], $allowed_svg ); ?>
+				<?php echo wp_kses( $args['icon_after'], skyyrose_svg_kses_allowed() ); ?>
 			</span>
 		<?php endif; ?>
 
