@@ -23,6 +23,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import sys
 from pathlib import Path
 
@@ -96,6 +97,7 @@ def main() -> int:
     exit_code = 0
     for npz_path in npz_files:
         centroid = load_centroid(npz_path)
+        was_backfilled = False
         if sample_paths is not None:
             if len(sample_paths) != centroid.sample_count:
                 print(
@@ -106,11 +108,10 @@ def main() -> int:
                 )
                 exit_code = 1
             else:
-                centroid.sample_paths = list(sample_paths)
+                centroid = dataclasses.replace(centroid, sample_paths=list(sample_paths))
+                was_backfilled = True
         sidecar = write_metadata_sidecar(centroid, npz_path)
-        backfilled = (
-            " (paths backfilled)" if sample_paths is not None and centroid.sample_paths else ""
-        )
+        backfilled = " (paths backfilled)" if was_backfilled else ""
         print(
             f"  {npz_path.name}: "
             f"encoder={'dino' if 'dino' in centroid.model_id.lower() else 'clip'} "
