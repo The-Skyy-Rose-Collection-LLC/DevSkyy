@@ -131,20 +131,34 @@ class QualityAgent(BaseSuperAgent):
             score_a_task, score_b_task, return_exceptions=True
         )
 
-        if isinstance(result_a, BaseException):
-            score_a, mismatch_a, notes_a = 0, False, f"Claude QA failed: {result_a}"
+        a_failed = isinstance(result_a, BaseException)
+        b_failed = isinstance(result_b, BaseException)
+
+        if a_failed:
+            score_a, mismatch_a, notes_a = None, False, f"Claude QA failed: {result_a}"
             logger.warning("Claude QA failed for %s: %s", image_path, result_a)
         else:
             score_a, mismatch_a, notes_a = result_a
 
-        if isinstance(result_b, BaseException):
-            score_b, mismatch_b, notes_b = 0, False, f"Gemini QA failed: {result_b}"
+        if b_failed:
+            score_b, mismatch_b, notes_b = None, False, f"Gemini QA failed: {result_b}"
             logger.warning("Gemini QA failed for %s: %s", image_path, result_b)
         else:
             score_b, mismatch_b, notes_b = result_b
 
         identity_mismatch = mismatch_a or mismatch_b
-        min_score = min(score_a, score_b)
+
+        # Degrade-to-single-judge: if one scorer failed, use the other's score
+        # rather than min(score, 0) which would force-fail every render. Only
+        # fail closed when BOTH scorers errored.
+        if a_failed and b_failed:
+            min_score = 0
+        elif a_failed:
+            min_score = score_b
+        elif b_failed:
+            min_score = score_a
+        else:
+            min_score = min(score_a, score_b)
 
         details: dict[str, Any] = {
             "score_claude": score_a,

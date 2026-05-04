@@ -617,9 +617,9 @@ async def test_retriever_answer_question_passes_full_branding_to_llm(monkeypatch
     #   - and within the new 1500-char budget (must be visible after fix)
     detail_pos = long_branding.index("GREY contrast lining")
     assert detail_pos > 300, f"fixture detail at char {detail_pos} — must be past old 300 cap"
-    assert detail_pos < 1500, (
-        f"fixture detail at char {detail_pos} — must be within new 1500 budget"
-    )
+    assert (
+        detail_pos < 1500
+    ), f"fixture detail at char {detail_pos} — must be within new 1500 budget"
 
     fake_response = MagicMock()
     fake_text_block = MagicMock(type="text")

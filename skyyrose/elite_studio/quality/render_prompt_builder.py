@@ -153,7 +153,10 @@ def build_garment_block(product: dict, view: str) -> str:
       lh-002 Love Hurts Joggers (back)    -> "back view of black athletic joggers on a model"
     """
     name = product.get("name", "")
-    is_accessory = bool(product.get("is_accessory"))
+    # Catalog field is `render_is_accessory`, stored as the string "0" / "1"
+    # (CSV-sourced). bool("0") is True, so coerce via string comparison.
+    raw_accessory = product.get("render_is_accessory", product.get("is_accessory", "0"))
+    is_accessory = str(raw_accessory).strip() in {"1", "true", "True"}
     garment_type = _infer_garment_type(name)
     color = _infer_color(name)
     phrase = _splice_color(garment_type, color)

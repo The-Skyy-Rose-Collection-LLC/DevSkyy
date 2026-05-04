@@ -18,7 +18,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from skyyrose.core import clip_embedder
+from skyyrose.core import clip_embedder, dino_embedder
 from skyyrose.elite_studio.quality.brand_centroid import BrandCentroid
 
 
@@ -31,9 +31,20 @@ class GateVerdict:
 
 
 def score_against_centroid(image: Path | str | Image.Image, centroid: BrandCentroid) -> float:
-    """Cosine similarity between image embedding and brand centroid."""
-    embedding = clip_embedder.embed_image(image)
-    return clip_embedder.cosine_similarity(embedding, centroid.centroid)
+    """Cosine similarity between image embedding and brand centroid.
+
+    Picks the encoder from the centroid's `model_id` so a DINOv2 centroid is
+    scored with DINOv2 embeddings (768-d) and a CLIP centroid with CLIP
+    embeddings (512-d). Cross-encoder scoring would crash on shape mismatch.
+    """
+    if "dinov2" in (centroid.model_id or "").lower():
+        embedding = dino_embedder.embed_image(image)
+    else:
+        embedding = clip_embedder.embed_image(image)
+    # Both encoders return L2-normalized vectors, so cosine == dot product.
+    import numpy as np
+
+    return float(np.dot(embedding, centroid.centroid))
 
 
 def evaluate(image: Path | str | Image.Image, centroid: BrandCentroid) -> GateVerdict:

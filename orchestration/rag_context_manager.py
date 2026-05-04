@@ -231,17 +231,24 @@ class RAGContextManager:
             logger.warning("redis_cache_failed", error=str(e))
             self._redis = None
 
-    def _get_cache_key(self, query: str) -> str:
-        """Generate cache key for a query."""
-        content = f"{query}:{self.config.model_dump_json()}"
+    def _get_cache_key(self, query: str, namespace: str | None = None) -> str:
+        """Generate cache key for a query within a namespace partition.
+
+        Namespace is part of the key so identical queries against different
+        namespaces (e.g. ``catalog`` vs ``brand`` vs ``memory:agent:foo``)
+        cannot serve each other's cached context.
+        """
+        content = f"{namespace or ''}:{query}:{self.config.model_dump_json()}"
         return f"devskyy_rag:{hashlib.md5(content.encode(), usedforsecurity=False).hexdigest()}"
 
-    def _get_cached_context(self, query: str) -> RAGContext | None:
-        """Retrieve cached RAG context."""
+    def _get_cached_context(
+        self, query: str, namespace: str | None = None
+    ) -> RAGContext | None:
+        """Retrieve cached RAG context for a (query, namespace) pair."""
         if not self.config.cache_enabled:
             return None
 
-        cache_key = self._get_cache_key(query)
+        cache_key = self._get_cache_key(query, namespace)
 
         # Try Redis first
         if self._redis:
@@ -268,12 +275,12 @@ class RAGContextManager:
         # Try in-memory cache
         return self._cache.get(cache_key)
 
-    def _cache_context(self, context: RAGContext) -> None:
-        """Cache RAG context."""
+    def _cache_context(self, context: RAGContext, namespace: str | None = None) -> None:
+        """Cache RAG context under its (query, namespace) key."""
         if not self.config.cache_enabled:
             return
 
-        cache_key = self._get_cache_key(context.query)
+        cache_key = self._get_cache_key(context.query, namespace)
 
         # Store in Redis
         if self._redis:
@@ -325,8 +332,8 @@ class RAGContextManager:
 
         correlation_id = correlation_id or str(uuid.uuid4())[:12]
 
-        # Check cache
-        cached = self._get_cached_context(query)
+        # Check cache (namespace-scoped — see _get_cache_key)
+        cached = self._get_cached_context(query, namespace)
         if cached:
             logger.info(f"[{correlation_id}] RAG context retrieved from cache")
             return cached
@@ -434,8 +441,8 @@ class RAGContextManager:
             },
         )
 
-        # Cache the result
-        self._cache_context(context)
+        # Cache the result (namespace-scoped)
+        self._cache_context(context, namespace)
 
         logger.info(
             f"[{correlation_id}] RAG context created: "

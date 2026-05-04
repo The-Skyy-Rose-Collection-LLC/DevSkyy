@@ -54,13 +54,27 @@ class RerankingCache:
         self._hits = 0
         self._misses = 0
 
-    def _generate_key(self, query: str, documents: list[str], top_n: int) -> str:
-        """Generate a cache key from query and documents."""
-        content = json.dumps({"q": query, "d": documents, "n": top_n}, sort_keys=True)
+    def _generate_key(
+        self, query: str, documents: list[str], top_n: int, provider: str = ""
+    ) -> str:
+        """Generate a cache key from query, documents, and provider.
+
+        Provider is part of the key so Cohere and Voyage cannot collide on
+        identical (query, documents, top_n) — they produce different rankings
+        for the same input and serving the wrong one is worse than a miss.
+        """
+        content = json.dumps(
+            {"q": query, "d": documents, "n": top_n, "p": provider},
+            sort_keys=True,
+        )
         return hashlib.sha256(content.encode("utf-8")).hexdigest()[:32]
 
     async def get(
-        self, query: str, documents: list[str], top_n: int
+        self,
+        query: str,
+        documents: list[str],
+        top_n: int,
+        provider: str = "",
     ) -> list[dict[str, Any]] | None:
         """Get reranking results from cache if available and not expired.
 
@@ -68,13 +82,15 @@ class RerankingCache:
             query: The search query
             documents: List of document texts
             top_n: Number of results requested
+            provider: Reranker identifier (e.g. ``"cohere:rerank-3.5"``,
+                ``"voyage:rerank-2.5"``) so providers don't collide.
 
         Returns:
             Cached results or None if not found/expired
         """
         import time
 
-        key = self._generate_key(query, documents, top_n)
+        key = self._generate_key(query, documents, top_n, provider)
         async with self._lock:
             if key in self._cache:
                 results, timestamp = self._cache[key]
@@ -91,7 +107,12 @@ class RerankingCache:
             return None
 
     async def put(
-        self, query: str, documents: list[str], top_n: int, results: list[dict[str, Any]]
+        self,
+        query: str,
+        documents: list[str],
+        top_n: int,
+        results: list[dict[str, Any]],
+        provider: str = "",
     ) -> None:
         """Store reranking results in cache.
 
@@ -100,10 +121,11 @@ class RerankingCache:
             documents: List of document texts
             top_n: Number of results
             results: The reranking results to cache
+            provider: Reranker identifier; same role as in ``get``.
         """
         import time
 
-        key = self._generate_key(query, documents, top_n)
+        key = self._generate_key(query, documents, top_n, provider)
         async with self._lock:
             if key in self._cache:
                 self._cache.move_to_end(key)
@@ -303,9 +325,11 @@ class CohereReranker(BaseReranker):
 
         top_n = top_n or self.config.top_n
 
-        # Check cache first
+        # Check cache first — keyed on provider so Voyage results can't be
+        # served from a Cohere cache entry (or vice versa).
         cache = get_reranking_cache()
-        cached = await cache.get(query, documents, top_n)
+        cache_provider = f"cohere:{self.config.cohere_model}"
+        cached = await cache.get(query, documents, top_n, provider=cache_provider)
         if cached is not None:
             # Reconstruct RankedResult from cached dict
             return [
@@ -343,7 +367,7 @@ class CohereReranker(BaseReranker):
             {"text": r.text, "score": r.score, "index": r.index, "metadata": r.metadata}
             for r in results
         ]
-        await cache.put(query, documents, top_n, cache_data)
+        await cache.put(query, documents, top_n, cache_data, provider=cache_provider)
 
         logger.debug(f"Reranked {len(documents)} documents, returned top {len(results)}")
         return results
@@ -442,8 +466,9 @@ class VoyageReranker(BaseReranker):
     ) -> list[RankedResult]:
         """Rerank documents using Voyage Rerank API with caching.
 
-        Cache layer is shared with CohereReranker; the cache key already hashes
-        the documents list so cross-provider collisions are not possible.
+        Cache layer is shared with CohereReranker. The cache key includes the
+        provider identifier so Voyage and Cohere can't return each other's
+        rankings on identical (query, documents, top_n).
         """
         if not self._initialized or not self._client:
             raise RuntimeError("Voyage reranker not initialized")
@@ -453,9 +478,10 @@ class VoyageReranker(BaseReranker):
 
         top_n = top_n or self.config.top_n
 
-        # Check cache first
+        # Check cache first — keyed on provider to prevent cross-provider hits.
         cache = get_reranking_cache()
-        cached = await cache.get(query, documents, top_n)
+        cache_provider = f"voyage:{self.config.voyage_model}"
+        cached = await cache.get(query, documents, top_n, provider=cache_provider)
         if cached is not None:
             return [
                 RankedResult(
@@ -491,7 +517,7 @@ class VoyageReranker(BaseReranker):
             {"text": r.text, "score": r.score, "index": r.index, "metadata": r.metadata}
             for r in results
         ]
-        await cache.put(query, documents, top_n, cache_data)
+        await cache.put(query, documents, top_n, cache_data, provider=cache_provider)
 
         logger.debug(f"Voyage reranked {len(documents)} documents, returned top {len(results)}")
         return results

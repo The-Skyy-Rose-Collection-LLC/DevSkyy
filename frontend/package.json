@@ -100,7 +100,7 @@
     "lodash-es": "^4.17.23",
     "undici": ">=5.29.0",
     "tar": ">=7.5.11",
-    "ajv": "$ajv",
+    "ajv": ">=8.18.0",
     "minimatch": ">=10.2.1",
     "path-to-regexp": ">=6.3.0",
     "@tootallnate/once": ">=3.0.1"

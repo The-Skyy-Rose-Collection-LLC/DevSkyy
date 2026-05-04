@@ -31,9 +31,9 @@ _ACTIVE_SKUS = [row["sku"] for row in read_catalog_rows() if row.get("sku")]
 
 def test_catalog_has_active_skus():
     """Sanity check — the catalog should have at least 30 active SKUs."""
-    assert len(_ACTIVE_SKUS) >= 30, (
-        f"expected ≥30 active SKUs in canonical CSV, got {len(_ACTIVE_SKUS)}"
-    )
+    assert (
+        len(_ACTIVE_SKUS) >= 30
+    ), f"expected ≥30 active SKUs in canonical CSV, got {len(_ACTIVE_SKUS)}"
 
 
 @pytest.mark.parametrize("sku", _ACTIVE_SKUS)

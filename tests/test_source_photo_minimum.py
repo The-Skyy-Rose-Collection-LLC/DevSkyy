@@ -28,9 +28,9 @@ ENFORCE_MINIMUM_COVERAGE = False
 
 
 def test_manifest_exists():
-    assert MANIFEST_PATH.exists(), (
-        "source-products/manifest.json missing — run `python scripts/audit_source_photos.py` first."
-    )
+    assert (
+        MANIFEST_PATH.exists()
+    ), "source-products/manifest.json missing — run `python scripts/audit_source_photos.py` first."
 
 
 def test_manifest_schema():
@@ -79,9 +79,9 @@ def test_required_angles_defined_for_each_garment_type(garment_type):
     """Every garment type the inferrer can emit must have a required-angles list."""
     data = json.loads(MANIFEST_PATH.read_text())
     required = data["required_angles_by_garment_type"]
-    assert garment_type in required, (
-        f"manifest missing required_angles for garment type {garment_type!r}"
-    )
-    assert len(required[garment_type]) >= 2, (
-        f"{garment_type}: required angles list too short ({required[garment_type]})"
-    )
+    assert (
+        garment_type in required
+    ), f"manifest missing required_angles for garment type {garment_type!r}"
+    assert (
+        len(required[garment_type]) >= 2
+    ), f"{garment_type}: required angles list too short ({required[garment_type]})"
