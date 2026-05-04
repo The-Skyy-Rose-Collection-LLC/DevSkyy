@@ -2,7 +2,7 @@
 name: Phase 0.5 Blocking Prerequisites Check Output
 specified_by: [v2: §5 Phase 0.5]
 phase: 0.5
-test_command: node scripts/measurement/check-prerequisites.js
+test_command: node scripts/measurement/check-prerequisites.js  # PHASE 0.5 DELIVERABLE — script does not exist yet; running it will exit 1 with a 'Phase 0.5 not started' message until the runner is built. See scripts/measurement/README.md.
 pass_threshold: All 8 prerequisites PASS or marked N/A with documented reason
 last_updated: 2026-05-03
 last_updated_by: eval-harness (Phase 0 placeholder)

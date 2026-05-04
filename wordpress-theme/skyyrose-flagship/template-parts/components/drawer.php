@@ -128,7 +128,7 @@ $attr_string = skyyrose_build_attr_string( $args['attrs'] ?? array() );
 		</div>
 
 		<div class="sr-drawer__content" id="<?php echo esc_attr( $content_id ); ?>">
-			<?php echo $args['slot']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- slot is internal template output, not user-supplied content ?>
+			<?php echo wp_kses_post( $args['slot'] ); ?>
 		</div>
 
 	</div>

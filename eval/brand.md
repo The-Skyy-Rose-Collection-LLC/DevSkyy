@@ -2,7 +2,7 @@
 name: Brand Voice & Visual Adherence (skyyrose-brand-dna in eval form)
 specified_by: [wp: §2 brand canon, §1.3 banned elements]
 phase: 0
-test_command: node scripts/measurement/run-brand-eval.js
+test_command: node scripts/measurement/run-brand-eval.js  # PHASE 0.5 DELIVERABLE — script does not exist yet; running it will exit 1 with a 'Phase 0.5 not started' message until the runner is built. See scripts/measurement/README.md.
 pass_threshold: 0 banned phrases, palette match on every surface, voice rules honored
 last_updated: 2026-05-03
 last_updated_by: eval-harness (Phase 0)

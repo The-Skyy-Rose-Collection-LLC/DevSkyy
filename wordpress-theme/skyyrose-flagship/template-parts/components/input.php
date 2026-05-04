@@ -69,7 +69,7 @@ $field_classes = implode(
 			'sr-input__field',
 			$has_error ? 'sr-input__field--error' : '',
 			$args['disabled'] ? 'sr-input__field--disabled' : '',
-			sanitize_html_class( $args['extra_classes'] ),
+			skyyrose_sanitize_class_list( $args['extra_classes'] ?? '' ),
 		)
 	)
 );

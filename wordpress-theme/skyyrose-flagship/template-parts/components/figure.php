@@ -65,7 +65,7 @@ $figure_classes = implode(
 			'sr-figure',
 			$args['rounded'] ? 'sr-figure--rounded' : '',
 			$args['aspect_ratio'] ? 'sr-figure--aspect' : '',
-			sanitize_html_class( $args['extra_classes'] ),
+			skyyrose_sanitize_class_list( $args['extra_classes'] ?? '' ),
 		)
 	)
 );

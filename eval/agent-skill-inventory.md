@@ -2,7 +2,7 @@
 name: Agent & Skill Inventory Audit (with MCP auth status)
 specified_by: [v2: §4 (orchestration map), grill Branch 4 (advisor flag)]
 phase: 0
-test_command: node scripts/measurement/check-agent-inventory.js  # exits 0 when no FOUND_GAP entries remain
+test_command: node scripts/measurement/check-agent-inventory.js  # PHASE 0.5 DELIVERABLE — script does not exist yet; running it will exit 1 with a 'Phase 0.5 not started' message until the runner is built. See scripts/measurement/README.md.
 pass_threshold: Every V2 §4 referenced agent/skill/MCP has explicit AVAILABLE | SUBSTITUTE_AVAILABLE | GAP_DOCUMENTED status
 last_updated: 2026-05-03
 last_updated_by: eval-harness (Phase 0)

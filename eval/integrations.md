@@ -2,7 +2,7 @@
 name: Integration Roundtrip Latency, Error Rate, Fallback Correctness
 specified_by: [v2: §5 Phase 0, §3 integration architecture, §5 Phase 5]
 phase: 0
-test_command: node scripts/measurement/run-integration-eval.js --integration=<name>
+test_command: node scripts/measurement/run-integration-eval.js --integration=<name>  # PHASE 0.5 DELIVERABLE — script does not exist yet; running it will exit 1 with a 'Phase 0.5 not started' message until the runner is built. See scripts/measurement/README.md.
 pass_threshold: p95 latency per service met, error rate < 1%, fallback verified to activate on primary failure
 last_updated: 2026-05-03
 last_updated_by: eval-harness (Phase 0)
