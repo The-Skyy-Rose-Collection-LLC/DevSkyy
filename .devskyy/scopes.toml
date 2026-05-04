@@ -1,0 +1,180 @@
+# DevSkyy file-to-branch scope routing.
+#
+# Read by `scripts/scope.py` to classify dirty working-tree files into the
+# branches/PRs they belong to. Each [scope.NAME] declares path globs (gitignore-
+# style) that map to a logical work theme.
+#
+# CLASSIFICATION ORDER: first match wins. Specific scopes must come BEFORE
+# general ones — `ignore` always first; `meta` always last.
+#
+# Glob syntax:
+#   *           matches anything except /
+#   **          matches anything including /
+#   ?           matches one character
+#   [seq]       character class
+#   {a,b,c}     brace expansion (alternatives)
+#
+# To audit: `python3 scripts/scope.py status`
+# To check: `python3 scripts/scope.py of <path>`
+
+# -----------------------------------------------------------------------------
+# IGNORE — regenerable outputs that should never be committed.
+# Listed FIRST so they're never misclassified into a real scope.
+# -----------------------------------------------------------------------------
+[scope.ignore]
+description = "Regenerable test outputs and machine-generated artifacts — gitignore, never commit"
+add_to_gitignore = true
+paths = [
+    "renders/smoke/**",
+    "renders/output/**",
+    "generated_assets/**",
+    ".pytest_cache/**",
+    "**/__pycache__/**",
+    "**/*.pyc",
+]
+
+# -----------------------------------------------------------------------------
+# WP VISUAL SIMILARITY — garment classifier + visual-similarity widget.
+# Depends on commit fceeb7ea6 (top-N similarity precompute).
+# Listed before wp-storefront because it claims specific subpaths of the theme.
+# -----------------------------------------------------------------------------
+[scope.wp-visual-similarity]
+description = "Garment classifier + visual-similarity widget (WP shortcode + JS + embeddings)"
+branch_prefix = "feat/wp-similarity"
+depends_on_commits = ["fceeb7ea6"]
+paths = [
+    "wordpress-theme/skyyrose-flagship/inc/garment-*.php",
+    "wordpress-theme/skyyrose-flagship/inc/visual-similarity-*.php",
+    "wordpress-theme/skyyrose-flagship/assets/js/components/garment-*",
+    "wordpress-theme/skyyrose-flagship/assets/js/components/visual-similarity*",
+    "wordpress-theme/skyyrose-flagship/assets/css/components/garment-*",
+    "wordpress-theme/skyyrose-flagship/assets/css/components/visual-similarity*",
+    "wordpress-theme/skyyrose-flagship/data/product-embeddings.json",
+    "wordpress-theme/skyyrose-flagship/scripts/generate-product-embeddings.py",
+]
+
+# -----------------------------------------------------------------------------
+# MASCOT 3D — Tripo agent + Mixamo merge + avatar rig + model assets.
+# Listed before wp-storefront so the deleted models/ assets route here, not there.
+# -----------------------------------------------------------------------------
+[scope.mascot-3d]
+description = "Mascot avatar pipeline — Tripo agent, Mixamo merge, model assets"
+branch_prefix = "feat/mascot"
+paths = [
+    "agents/tripo_agent.py",
+    "agents/meshy_agent.py",
+    "scripts/skyy_avatar_rig.py",
+    "scripts/skyy_mixamo_merge.py",
+    "wordpress-theme/skyyrose-flagship/assets/models/**",
+    "wordpress-theme/skyyrose-flagship/assets/js/skyy-3d.js",
+    "wordpress-theme/skyyrose-flagship/assets/images/mascot/**",
+]
+
+# -----------------------------------------------------------------------------
+# WP STOREFRONT — page templates, template-parts, page-data loaders.
+# -----------------------------------------------------------------------------
+[scope.wp-storefront]
+description = "WordPress theme — immersive + landing templates, page-data loaders"
+branch_prefix = "feat/wp-storefront"
+paths = [
+    "wordpress-theme/skyyrose-flagship/template-*.php",
+    "wordpress-theme/skyyrose-flagship/template-parts/**",
+    "wordpress-theme/skyyrose-flagship/inc/immersive-data.php",
+    "wordpress-theme/skyyrose-flagship/inc/landing-data.php",
+    "wordpress-theme/skyyrose-flagship/functions.php",
+]
+
+# -----------------------------------------------------------------------------
+# EVAL QUALITY — Phase B2/C3 quality gates, dossier system, audit + smoke
+# tooling, golden fixtures, multi-angle visual regression tests.
+# -----------------------------------------------------------------------------
+[scope.eval-quality]
+description = "Phase B2/C3 — quality gates, dossier schema, audit/smoke tooling, golden fixtures"
+branch_prefix = "feat/quality"
+paths = [
+    "skyyrose/elite_studio/agents/quality_agent.py",
+    "skyyrose/elite_studio/quality/**",
+    "skyyrose/elite_studio/creative/nodes.py",
+    "skyyrose/elite_studio/graph/nodes.py",
+    "skyyrose/elite_studio/assets/golden/**",
+    "skyyrose/core/dossier_*.py",
+    "scripts/audit_dossier_coverage.py",
+    "scripts/audit_golden_coverage.py",
+    "scripts/audit_source_photos.py",
+    "scripts/capture_goldens.py",
+    "scripts/seed_goldens_from_source.py",
+    "scripts/source_product_photos.py",
+    "scripts/smoke_b2_compositor.py",
+    "scripts/smoke_sg006.py",
+    "scripts/lint_dossier.py",
+    "tests/test_dossier_completeness.py",
+    "tests/test_dossier_schema.py",
+    "tests/test_source_photo_minimum.py",
+    "tests/test_visual_regression_multi_angle.py",
+    "tests/orchestration/**",
+    "tasks/dossier-audit-report.md",
+    "tasks/golden-coverage-report.md",
+    "tasks/source-photo-audit-report.md",
+    "tasks/source-photo-shoot-list.md",
+    "pyproject.toml",
+    # RAG infrastructure modified alongside embedding/CLIP/DINOv2 quality work
+    "orchestration/catalog_retriever.py",
+    "orchestration/embedding_engine.py",
+    "orchestration/rag_context_manager.py",
+    "orchestration/reranker.py",
+    "orchestration/vector_store.py",
+]
+
+# -----------------------------------------------------------------------------
+# AGENT MEMORY — new agent-side memory subsystem (LangChain-style buffer/
+# consolidator/conversation memory for LLM agents). Distinct from .wolf/
+# memory (OpenWolf metadata) and from claude-mem (cross-session observations).
+# -----------------------------------------------------------------------------
+[scope.agent-memory]
+description = "Agent-side memory subsystem — buffer, consolidator, conversation memory for LLM agents"
+branch_prefix = "feat/agent-memory"
+paths = [
+    "skyyrose/core/memory/**",
+    "docs/adr/0001-compositor-is-agent-inside-langgraph-node.md",
+    "docs/superpowers/plans/*compositor-agent-rebuild*.md",
+]
+
+# -----------------------------------------------------------------------------
+# A2A AGENT — standalone Google ADK Agent-to-Agent module + design spec.
+# -----------------------------------------------------------------------------
+[scope.a2a-agent]
+description = "Google ADK Agent-to-Agent module (isolated package with own pyproject.toml)"
+branch_prefix = "feat/a2a"
+paths = [
+    "agents/devskyy-a2a/**",
+    "tasks/adk-a2a-*.md",
+]
+
+# -----------------------------------------------------------------------------
+# META — docs, plans, eval rubrics, lint config, .wolf updates, working notes.
+# Catch-all for anything that's neither code nor product.
+# -----------------------------------------------------------------------------
+[scope.meta]
+description = "Docs, planning, eval rubrics, lint/CI config, OpenWolf updates, working notes"
+branch_prefix = "chore/meta"
+paths = [
+    ".pre-commit-config.yaml",
+    ".serena/**",
+    ".wolf/**",
+    ".devskyy/**",
+    "GEMINI.md",
+    "docs/superpowers/plans/**",
+    "eval/**.md",
+    "tasks/pr-*.md",
+    "wordpress-theme/CLAUDE.md",
+    "wordpress-theme/**/AGENTS.md",
+    "wordpress-theme/**/CLAUDE.md",
+    "scripts/scope.py",
+    "scripts/add-env-key.sh",
+    # Root-level docs and config
+    "CONTEXT.md",
+    ".env.example",
+    "docs/adr/**",
+    # Orphan test cleanup (single-line tweaks not tied to a specific scope)
+    "tests/grpc/**",
+]

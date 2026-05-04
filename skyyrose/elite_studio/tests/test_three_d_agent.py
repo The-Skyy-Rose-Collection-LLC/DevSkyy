@@ -33,12 +33,28 @@ def _make_meshy_mock(model_path: str = "/tmp/renders/3d/techflat_meshy.glb"):
     return mock_cls, mock_instance
 
 
-def _make_gen_mock(output_path: str | None = "/tmp/renders/2d/br-001/final.jpg"):
-    mock_result = MagicMock()
-    mock_result.output_path = output_path
-    mock_agent = MagicMock()
-    mock_agent.generate = AsyncMock(return_value=mock_result if output_path else None)
-    return mock_agent
+def _make_flux_result(
+    output_path: str | None = "/tmp/renders/2d/br-001/final.jpg",
+    error: str = "",
+    ok: bool = True,
+):
+    """Build a RenderResult-shaped mock for the FLUX synthesis pipeline.
+
+    The legacy GeneratorAgent (Gemini RAS) was replaced by ``flux_render``;
+    tests must mock the new entry point, not the removed class.
+    """
+    audit = MagicMock()
+    audit.to_dict = MagicMock(return_value={"matches_dossier": ok, "violations": []})
+    result = MagicMock()
+    result.ok = ok
+    result.output_path = Path(output_path) if output_path else None
+    result.quarantine_path = None
+    result.audit_result = audit
+    result.manifest = {}
+    result.attempts = 1
+    result.duration_ms = 0
+    result.error = error
+    return result
 
 
 def _fake_product_with_dossier(sku: str = "br-001") -> dict:
@@ -104,18 +120,17 @@ async def test_three_d_agent_initialization(mock_three_d_agent):
 @pytest.mark.asyncio
 async def test_generate_replica_success(mock_three_d_agent, sample_sku):
     mock_meshy_cls, _ = _make_meshy_mock()
-    mock_gen = _make_gen_mock()
+    flux_result = _make_flux_result()
 
     with (
         _patch_dossier_loader(),
         patch("skyyrose.elite_studio.agents.three_d_agent.MeshyClient", mock_meshy_cls),
         patch("skyyrose.elite_studio.agents.three_d_agent.subprocess.run"),
         patch(
-            "skyyrose.elite_studio.agents.three_d_agent.GeneratorAgent",
-            return_value=mock_gen,
+            "skyyrose.elite_studio.synthesis.render",
+            new_callable=AsyncMock,
+            return_value=flux_result,
         ),
-        patch("skyyrose.elite_studio.agents.three_d_agent.shutil.move"),
-        patch("skyyrose.elite_studio.agents.three_d_agent.shutil.copy2"),
         patch(
             "skyyrose.elite_studio.agents.three_d_agent.CreativeAgent.execute",
             new_callable=AsyncMock,
@@ -142,7 +157,7 @@ async def test_generate_replica_success(mock_three_d_agent, sample_sku):
     # Fidelity must be a real computed value, not the old hardcoded constant
     assert 0.0 <= result["fidelity_score"] <= 100.0
     assert result["fidelity_score"] != 99.0
-    assert result["provider"] == "meshy"
+    assert result["provider"] == "flux"
 
 
 @pytest.mark.asyncio
@@ -173,7 +188,7 @@ async def test_meshy_failure_returns_error(mock_three_d_agent):
 async def test_blender_failure_falls_back_gracefully(mock_three_d_agent):
     """Blender failure should not crash the pipeline — fallback to techflat scaffold."""
     mock_meshy_cls, _ = _make_meshy_mock()
-    mock_gen = _make_gen_mock()
+    flux_result = _make_flux_result()
 
     with (
         _patch_dossier_loader(),
@@ -183,11 +198,10 @@ async def test_blender_failure_falls_back_gracefully(mock_three_d_agent):
             side_effect=subprocess.CalledProcessError(1, "blender"),
         ),
         patch(
-            "skyyrose.elite_studio.agents.three_d_agent.GeneratorAgent",
-            return_value=mock_gen,
+            "skyyrose.elite_studio.synthesis.render",
+            new_callable=AsyncMock,
+            return_value=flux_result,
         ),
-        patch("skyyrose.elite_studio.agents.three_d_agent.shutil.move"),
-        patch("skyyrose.elite_studio.agents.three_d_agent.shutil.copy2"),
         patch(
             "skyyrose.elite_studio.agents.three_d_agent.CreativeAgent.execute",
             new_callable=AsyncMock,
@@ -225,17 +239,22 @@ async def test_blender_failure_falls_back_gracefully(mock_three_d_agent):
 
 @pytest.mark.asyncio
 async def test_none_synth_result_returns_error(mock_three_d_agent):
-    """None from GeneratorAgent.generate must return a failure dict, not AttributeError."""
+    """A FLUX synthesis failure (no output, no quarantine) returns a failure dict."""
     mock_meshy_cls, _ = _make_meshy_mock()
-    mock_gen = _make_gen_mock(output_path=None)
+    flux_result = _make_flux_result(
+        output_path=None,
+        error="Synthesis failed: no output produced",
+        ok=False,
+    )
 
     with (
         _patch_dossier_loader(),
         patch("skyyrose.elite_studio.agents.three_d_agent.MeshyClient", mock_meshy_cls),
         patch("skyyrose.elite_studio.agents.three_d_agent.subprocess.run"),
         patch(
-            "skyyrose.elite_studio.agents.three_d_agent.GeneratorAgent",
-            return_value=mock_gen,
+            "skyyrose.elite_studio.synthesis.render",
+            new_callable=AsyncMock,
+            return_value=flux_result,
         ),
         patch(
             "skyyrose.elite_studio.agents.three_d_agent.CreativeAgent.execute",

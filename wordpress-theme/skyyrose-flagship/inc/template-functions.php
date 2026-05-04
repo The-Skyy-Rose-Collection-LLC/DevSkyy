@@ -733,6 +733,53 @@ function skyyrose_svg_kses_allowed() {
 
 /*
 --------------------------------------------------------------
+ * Component Primitive Helpers (used by template-parts/components/)
+ *--------------------------------------------------------------*/
+
+/**
+ * Build an HTML attribute string from an associative array.
+ *
+ * Used by every primitive in template-parts/components/ to render the
+ * caller-supplied $args['attrs'] array. Centralised so a future change
+ * to escaping or attribute ordering propagates to every primitive.
+ *
+ * @since 3.2.4
+ * @param array $attrs Key/value pairs. Values are passed through esc_attr().
+ * @return string HTML attribute string (leading space included when non-empty).
+ */
+function skyyrose_build_attr_string( $attrs ) {
+	if ( empty( $attrs ) || ! is_array( $attrs ) ) {
+		return '';
+	}
+	$parts = array();
+	foreach ( $attrs as $name => $value ) {
+		$parts[] = sprintf( '%s="%s"', sanitize_html_class( $name ), esc_attr( $value ) );
+	}
+	return ' ' . implode( ' ', $parts );
+}
+
+/**
+ * Sanitize a space-separated class string while preserving the space delimiter.
+ *
+ * `sanitize_html_class()` strips spaces, collapsing 'foo bar' to 'foobar'.
+ * This helper splits, sanitizes each token, then rejoins — supporting the
+ * common $args['extra_classes'] = 'foo bar baz' pattern.
+ *
+ * @since 3.2.4
+ * @param string $classes Space-separated class names (caller-supplied).
+ * @return string Sanitized space-separated class string (empty when input is empty).
+ */
+function skyyrose_sanitize_class_list( $classes ) {
+	if ( empty( $classes ) || ! is_string( $classes ) ) {
+		return '';
+	}
+	$tokens = preg_split( '/\s+/', trim( $classes ) );
+	$clean  = array_filter( array_map( 'sanitize_html_class', $tokens ) );
+	return implode( ' ', $clean );
+}
+
+/*
+--------------------------------------------------------------
  * Social Media Links (Single Source of Truth)
  *--------------------------------------------------------------*/
 

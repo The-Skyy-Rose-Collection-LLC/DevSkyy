@@ -1,0 +1,794 @@
+{
+  "bad": [
+    {
+      "category": "techflat",
+      "fixture_filename": "black-is-beautiful-jersey-techflat-black.jpeg",
+      "label": "bad",
+      "size_bytes": 64990,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-jersey-techflat-black.jpeg"
+    },
+    {
+      "category": "techflat",
+      "fixture_filename": "black-is-beautiful-jersey-techflat-giants.jpeg",
+      "label": "bad",
+      "size_bytes": 83277,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-jersey-techflat-giants.jpeg"
+    },
+    {
+      "category": "techflat",
+      "fixture_filename": "black-is-beautiful-jersey-techflat-white.jpeg",
+      "label": "bad",
+      "size_bytes": 19518,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-jersey-techflat-white.jpeg"
+    },
+    {
+      "category": "techflat",
+      "fixture_filename": "black-rose-crewneck-techflat-v4.jpg",
+      "label": "bad",
+      "size_bytes": 56325,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-crewneck-techflat-v4.jpg"
+    },
+    {
+      "category": "techflat",
+      "fixture_filename": "stay-golden-tee-techflat-v4.jpg",
+      "label": "bad",
+      "size_bytes": 52333,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/stay-golden-tee-techflat-v4.jpg"
+    },
+    {
+      "category": "source",
+      "fixture_filename": "black-rose-hoodie-signature-edition-hoodie-ltd-source.jpg",
+      "label": "bad",
+      "size_bytes": 51986,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-hoodie-signature-edition-hoodie-ltd-source.jpg"
+    },
+    {
+      "category": "source",
+      "fixture_filename": "black-rose-hoodie-source.jpg",
+      "label": "bad",
+      "size_bytes": 70129,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-hoodie-source.jpg"
+    },
+    {
+      "category": "source",
+      "fixture_filename": "black-rose-joggers-source.jpg",
+      "label": "bad",
+      "size_bytes": 56325,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-joggers-source.jpg"
+    },
+    {
+      "category": "source",
+      "fixture_filename": "love-hurts-varsity-jacket-varsity-source.jpg",
+      "label": "bad",
+      "size_bytes": 47575,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-varsity-jacket-varsity-source.jpg"
+    },
+    {
+      "category": "source",
+      "fixture_filename": "mint-lavender-hoodie-source.jpg",
+      "label": "bad",
+      "size_bytes": 48034,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/mint-lavender-hoodie-source.jpg"
+    },
+    {
+      "category": "source",
+      "fixture_filename": "the-bay-set-source.jpeg",
+      "label": "bad",
+      "size_bytes": 73335,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/the-bay-set-source.jpeg"
+    },
+    {
+      "category": "design",
+      "fixture_filename": "black-is-beautiful-basketball-jersey-design.jpg",
+      "label": "bad",
+      "size_bytes": 64990,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-basketball-jersey-design.jpg"
+    },
+    {
+      "category": "design",
+      "fixture_filename": "black-is-beautiful-football-jersey-red-design.jpg",
+      "label": "bad",
+      "size_bytes": 64990,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-football-jersey-red-design.jpg"
+    },
+    {
+      "category": "design",
+      "fixture_filename": "black-is-beautiful-football-jersey-white-design.jpg",
+      "label": "bad",
+      "size_bytes": 64126,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-football-jersey-white-design.jpg"
+    },
+    {
+      "category": "design",
+      "fixture_filename": "black-is-beautiful-hockey-jersey-design.jpg",
+      "label": "bad",
+      "size_bytes": 64990,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-hockey-jersey-design.jpg"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "black-is-beautiful-jersey-branding.webp",
+      "label": "bad",
+      "size_bytes": 205788,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-jersey-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "black-rose-crewneck-branding.webp",
+      "label": "bad",
+      "size_bytes": 200370,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-crewneck-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "black-rose-hoodie-branding.webp",
+      "label": "bad",
+      "size_bytes": 193548,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-hoodie-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "black-rose-love-hurts-basketball-shorts-branding.webp",
+      "label": "bad",
+      "size_bytes": 190494,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-love-hurts-basketball-shorts-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "black-rose-sherpa-jacket-branding.webp",
+      "label": "bad",
+      "size_bytes": 211534,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-sherpa-jacket-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "kids-purple-set-branding.webp",
+      "label": "bad",
+      "size_bytes": 154102,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/kids-purple-set-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "kids-red-set-branding.webp",
+      "label": "bad",
+      "size_bytes": 160614,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/kids-red-set-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "love-hurts-basketball-shorts-branding.webp",
+      "label": "bad",
+      "size_bytes": 200128,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-basketball-shorts-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "love-hurts-joggers-branding.webp",
+      "label": "bad",
+      "size_bytes": 172364,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-joggers-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "love-hurts-varsity-jacket-branding.webp",
+      "label": "bad",
+      "size_bytes": 152478,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-varsity-jacket-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "mint-lavender-crewneck-branding.webp",
+      "label": "bad",
+      "size_bytes": 149182,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/mint-lavender-crewneck-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "mint-lavender-hoodie-branding.webp",
+      "label": "bad",
+      "size_bytes": 147810,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/mint-lavender-hoodie-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "mint-lavender-sweatpants-branding.webp",
+      "label": "bad",
+      "size_bytes": 135122,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/mint-lavender-sweatpants-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "original-label-tee-orchid-branding.webp",
+      "label": "bad",
+      "size_bytes": 142478,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/original-label-tee-orchid-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "original-label-tee-white-branding.webp",
+      "label": "bad",
+      "size_bytes": 152876,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/original-label-tee-white-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "signature-beanie-branding.webp",
+      "label": "bad",
+      "size_bytes": 358794,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/signature-beanie-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "stay-golden-shorts-branding.webp",
+      "label": "bad",
+      "size_bytes": 175712,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/stay-golden-shorts-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "stay-golden-tee-branding.webp",
+      "label": "bad",
+      "size_bytes": 132050,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/stay-golden-tee-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "the-bay-set-branding.webp",
+      "label": "bad",
+      "size_bytes": 170258,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/the-bay-set-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "the-fannie-branding.webp",
+      "label": "bad",
+      "size_bytes": 285820,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/the-fannie-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "the-sherpa-jacket-branding.webp",
+      "label": "bad",
+      "size_bytes": 131994,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/the-sherpa-jacket-branding.webp"
+    },
+    {
+      "category": "branding",
+      "fixture_filename": "the-signature-hoodie-branding.webp",
+      "label": "bad",
+      "size_bytes": 178926,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/the-signature-hoodie-branding.webp"
+    }
+  ],
+  "bad_count": 37,
+  "generated_at": "2026-05-03T19:16:25+00:00",
+  "good": [
+    {
+      "category": "back-model",
+      "fixture_filename": "bay-bridge-shirt-back-model.webp",
+      "label": "good",
+      "size_bytes": 55806,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/bay-bridge-shirt-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "black-is-beautiful-hockey-jersey-back-model.webp",
+      "label": "good",
+      "size_bytes": 133044,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-hockey-jersey-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "black-is-beautiful-jersey-back-model.webp",
+      "label": "good",
+      "size_bytes": 86924,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-jersey-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "black-is-beautiful-jersey-giants-back-model.webp",
+      "label": "good",
+      "size_bytes": 100028,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-jersey-giants-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "black-is-beautiful-jersey-oakland-back-model.webp",
+      "label": "good",
+      "size_bytes": 97988,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-jersey-oakland-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "black-is-beautiful-jersey-white-back-model.webp",
+      "label": "good",
+      "size_bytes": 102390,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-jersey-white-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "black-rose-hoodie-back-model.webp",
+      "label": "good",
+      "size_bytes": 70004,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-hoodie-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "black-rose-hoodie-signature-edition-back-model.webp",
+      "label": "good",
+      "size_bytes": 79174,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-hoodie-signature-edition-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "black-rose-love-hurts-basketball-shorts-back-model.webp",
+      "label": "good",
+      "size_bytes": 133034,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-love-hurts-basketball-shorts-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "black-rose-sherpa-jacket-back-model.webp",
+      "label": "good",
+      "size_bytes": 91284,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-sherpa-jacket-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "kids-purple-set-back-model.webp",
+      "label": "good",
+      "size_bytes": 93060,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/kids-purple-set-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "kids-red-set-back-model.webp",
+      "label": "good",
+      "size_bytes": 104386,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/kids-red-set-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "love-hurts-basketball-shorts-back-model.webp",
+      "label": "good",
+      "size_bytes": 195182,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-basketball-shorts-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "love-hurts-joggers-back-model.webp",
+      "label": "good",
+      "size_bytes": 95834,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-joggers-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "love-hurts-varsity-jacket-back-model.webp",
+      "label": "good",
+      "size_bytes": 105802,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/love-hurts-varsity-jacket-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "mint-lavender-crewneck-back-model.webp",
+      "label": "good",
+      "size_bytes": 131940,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/mint-lavender-crewneck-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "mint-lavender-hoodie-back-model.webp",
+      "label": "good",
+      "size_bytes": 125698,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/mint-lavender-hoodie-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "mint-lavender-sweatpants-back-model.webp",
+      "label": "good",
+      "size_bytes": 65260,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/mint-lavender-sweatpants-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "original-label-tee-orchid-back-model.webp",
+      "label": "good",
+      "size_bytes": 134454,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/original-label-tee-orchid-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "original-label-tee-white-back-model.webp",
+      "label": "good",
+      "size_bytes": 117340,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/original-label-tee-white-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "stay-golden-shorts-back-model.webp",
+      "label": "good",
+      "size_bytes": 111752,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/stay-golden-shorts-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "stay-golden-tee-back-model.webp",
+      "label": "good",
+      "size_bytes": 101340,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/stay-golden-tee-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "the-bay-set-back-model.webp",
+      "label": "good",
+      "size_bytes": 162522,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/the-bay-set-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "the-sherpa-jacket-back-model.webp",
+      "label": "good",
+      "size_bytes": 63030,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/the-sherpa-jacket-back-model.webp"
+    },
+    {
+      "category": "back-model",
+      "fixture_filename": "the-signature-hoodie-back-model.webp",
+      "label": "good",
+      "size_bytes": 82320,
+      "source_path": "wordpress-theme/skyyrose-flagship/assets/images/products/the-signature-hoodie-back-model.webp"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "br-001__front.jpg",
+      "label": "good",
+      "size_bytes": 24362,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-001/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "br-001__reference.jpg",
+      "label": "good",
+      "size_bytes": 24362,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-001/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "br-002__front.jpg",
+      "label": "good",
+      "size_bytes": 14885,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-002/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "br-002__reference.jpg",
+      "label": "good",
+      "size_bytes": 14885,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-002/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "br-003__front.jpg",
+      "label": "good",
+      "size_bytes": 21942,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-003/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "br-003__reference.jpg",
+      "label": "good",
+      "size_bytes": 21942,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-003/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "br-004__front.jpg",
+      "label": "good",
+      "size_bytes": 81977,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-004/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "br-004__reference.jpg",
+      "label": "good",
+      "size_bytes": 81977,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-004/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "br-005__front.jpg",
+      "label": "good",
+      "size_bytes": 591152,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-005/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "br-005__reference.jpg",
+      "label": "good",
+      "size_bytes": 591152,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-005/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "br-006__front.jpg",
+      "label": "good",
+      "size_bytes": 103724,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-006/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "br-006__reference.jpg",
+      "label": "good",
+      "size_bytes": 103724,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-006/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "br-007__front.jpg",
+      "label": "good",
+      "size_bytes": 181742,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-007/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "br-007__reference.jpg",
+      "label": "good",
+      "size_bytes": 181742,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-007/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "br-008__front.jpg",
+      "label": "good",
+      "size_bytes": 83495,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-008/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "br-008__reference.jpg",
+      "label": "good",
+      "size_bytes": 83495,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-008/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "br-009__front.jpg",
+      "label": "good",
+      "size_bytes": 52751,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-009/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "br-009__reference.jpg",
+      "label": "good",
+      "size_bytes": 52751,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-009/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "br-011__front.jpg",
+      "label": "good",
+      "size_bytes": 1290558,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-011/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "br-011__reference.jpg",
+      "label": "good",
+      "size_bytes": 1290558,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-011/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "br-012__front.jpg",
+      "label": "good",
+      "size_bytes": 123003,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-012/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "br-012__reference.jpg",
+      "label": "good",
+      "size_bytes": 123003,
+      "source_path": "skyyrose/elite_studio/assets/golden/br-012/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "lh-002__front.jpg",
+      "label": "good",
+      "size_bytes": 306572,
+      "source_path": "skyyrose/elite_studio/assets/golden/lh-002/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "lh-002__reference.jpg",
+      "label": "good",
+      "size_bytes": 306572,
+      "source_path": "skyyrose/elite_studio/assets/golden/lh-002/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "lh-003__front.jpg",
+      "label": "good",
+      "size_bytes": 23393,
+      "source_path": "skyyrose/elite_studio/assets/golden/lh-003/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "lh-003__reference.jpg",
+      "label": "good",
+      "size_bytes": 23393,
+      "source_path": "skyyrose/elite_studio/assets/golden/lh-003/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "lh-004__front.jpg",
+      "label": "good",
+      "size_bytes": 575795,
+      "source_path": "skyyrose/elite_studio/assets/golden/lh-004/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "lh-004__reference.jpg",
+      "label": "good",
+      "size_bytes": 575795,
+      "source_path": "skyyrose/elite_studio/assets/golden/lh-004/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "lh-005__front.jpg",
+      "label": "good",
+      "size_bytes": 108754,
+      "source_path": "skyyrose/elite_studio/assets/golden/lh-005/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "lh-005__reference.jpg",
+      "label": "good",
+      "size_bytes": 108754,
+      "source_path": "skyyrose/elite_studio/assets/golden/lh-005/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "sg-001__front.jpg",
+      "label": "good",
+      "size_bytes": 144137,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-001/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "sg-001__reference.jpg",
+      "label": "good",
+      "size_bytes": 144137,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-001/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "sg-002__front.jpg",
+      "label": "good",
+      "size_bytes": 100654,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-002/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "sg-002__reference.jpg",
+      "label": "good",
+      "size_bytes": 100654,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-002/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "sg-003__front.jpg",
+      "label": "good",
+      "size_bytes": 387424,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-003/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "sg-003__reference.jpg",
+      "label": "good",
+      "size_bytes": 387424,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-003/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "sg-005__front.jpg",
+      "label": "good",
+      "size_bytes": 418181,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-005/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "sg-005__reference.jpg",
+      "label": "good",
+      "size_bytes": 418181,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-005/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "sg-006__front.jpg",
+      "label": "good",
+      "size_bytes": 551234,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-006/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "sg-006__reference.jpg",
+      "label": "good",
+      "size_bytes": 551234,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-006/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "sg-009__front.jpg",
+      "label": "good",
+      "size_bytes": 625745,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-009/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "sg-009__reference.jpg",
+      "label": "good",
+      "size_bytes": 625745,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-009/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "sg-011__front.jpg",
+      "label": "good",
+      "size_bytes": 459284,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-011/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "sg-011__reference.jpg",
+      "label": "good",
+      "size_bytes": 459284,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-011/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "sg-012__front.jpg",
+      "label": "good",
+      "size_bytes": 294452,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-012/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "sg-012__reference.jpg",
+      "label": "good",
+      "size_bytes": 294452,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-012/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "sg-013__front.jpg",
+      "label": "good",
+      "size_bytes": 31128,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-013/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "sg-013__reference.jpg",
+      "label": "good",
+      "size_bytes": 31128,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-013/reference.jpg"
+    },
+    {
+      "category": "golden-front",
+      "fixture_filename": "sg-014__front.jpg",
+      "label": "good",
+      "size_bytes": 19617,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-014/front.jpg"
+    },
+    {
+      "category": "golden-reference",
+      "fixture_filename": "sg-014__reference.jpg",
+      "label": "good",
+      "size_bytes": 19617,
+      "source_path": "skyyrose/elite_studio/assets/golden/sg-014/reference.jpg"
+    }
+  ],
+  "good_count": 75,
+  "repo_root": "/Users/theceo/DevSkyy"
+}

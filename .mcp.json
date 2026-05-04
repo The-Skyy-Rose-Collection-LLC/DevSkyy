@@ -3,7 +3,10 @@
     "aidesigner": {
       "type": "http",
       "url": "https://api.aidesigner.ai/api/v1/mcp"
-    },
+    }
+  },
+  "_disabled_mcpServers__claude_context_needs_milvus": {
+    "_comment": "claude-context requires Milvus on 127.0.0.1:19530 (not running). Ollama on 11434 IS up. To enable: run `docker run -d -p 19530:19530 milvusdb/milvus:latest`, then move this entry into mcpServers above.",
     "claude-context": {
       "command": "npx",
       "args": [
@@ -16,7 +19,10 @@
         "OLLAMA_HOST": "http://127.0.0.1:11434",
         "MILVUS_ADDRESS": "127.0.0.1:19530"
       }
-    },
+    }
+  },
+  "_disabled_mcpServers__postgresql_needs_connection_string": {
+    "_comment": "postgresql server requires POSTGRES_CONNECTION_STRING env var (not set anywhere — not in ~/.zshrc, .env files, or shell). The project's primary DB is WordPress MySQL on WPCom, not Postgres — this entry may have been speculative. To enable: set POSTGRES_CONNECTION_STRING in ~/.zshrc, then move this entry into mcpServers above.",
     "postgresql": {
       "command": "npx",
       "args": [
@@ -24,7 +30,7 @@
         "@modelcontextprotocol/server-postgres"
       ],
       "env": {
-        "POSTGRES_CONNECTION_STRING": "postgresql://user:password@localhost:5432/dbname"
+        "POSTGRES_CONNECTION_STRING": "${POSTGRES_CONNECTION_STRING}"
       }
     }
   }

@@ -157,6 +157,7 @@ class RerankerProvider(StrEnum):
     """Supported reranker providers."""
 
     COHERE = "cohere"
+    VOYAGE = "voyage"
 
 
 class RerankerConfig(BaseModel):
@@ -169,6 +170,10 @@ class RerankerConfig(BaseModel):
     # Cohere settings
     cohere_model: str = Field(default="rerank-english-v3.0")
     cohere_api_key: str | None = Field(default=None)
+
+    # Voyage AI settings
+    voyage_model: str = Field(default="rerank-2.5")
+    voyage_api_key: str | None = Field(default=None)
 
     # Reranking settings
     top_n: int = Field(default=5, ge=1, le=100)
@@ -389,6 +394,150 @@ class CohereReranker(BaseReranker):
 
 
 # =============================================================================
+# Voyage AI Reranker Implementation
+# =============================================================================
+
+
+class VoyageReranker(BaseReranker):
+    """Voyage AI Rerank API implementation (rerank-2.5 / rerank-2.5-lite / rerank-2).
+
+    NOTE: Voyage's rerank API uses `top_k` in the request body (Cohere uses
+    `top_n`). Both rerankers expose `top_n` on BaseReranker.rerank() for a
+    consistent caller interface; we translate to top_k internally.
+    """
+
+    MODELS = ["rerank-2.5", "rerank-2.5-lite", "rerank-2"]
+
+    def __init__(self, config: RerankerConfig):
+        super().__init__(config)
+        self._client = None
+
+    async def initialize(self) -> None:
+        """Initialize Voyage sync client (voyageai SDK has no AsyncClient — we
+        wrap the sync .rerank() with ``asyncio.to_thread`` so the event loop
+        stays unblocked while Voyage's HTTP request runs in a worker thread).
+        """
+        try:
+            import voyageai
+
+            api_key = self.config.voyage_api_key or os.getenv("VOYAGE_API_KEY")
+            if not api_key:
+                raise ValueError("Voyage API key required for reranking (set VOYAGE_API_KEY)")
+
+            self._client = voyageai.Client(api_key=api_key)
+            self._initialized = True
+            logger.info(f"Voyage Reranker initialized: {self.config.voyage_model}")
+
+        except ImportError:
+            raise ImportError("voyageai not installed. Run: pip install voyageai")
+        except Exception as e:
+            logger.error(f"Voyage Reranker initialization failed: {e}")
+            raise
+
+    async def rerank(
+        self,
+        query: str,
+        documents: list[str],
+        top_n: int | None = None,
+    ) -> list[RankedResult]:
+        """Rerank documents using Voyage Rerank API with caching.
+
+        Cache layer is shared with CohereReranker; the cache key already hashes
+        the documents list so cross-provider collisions are not possible.
+        """
+        if not self._initialized or not self._client:
+            raise RuntimeError("Voyage reranker not initialized")
+
+        if not documents:
+            return []
+
+        top_n = top_n or self.config.top_n
+
+        # Check cache first
+        cache = get_reranking_cache()
+        cached = await cache.get(query, documents, top_n)
+        if cached is not None:
+            return [
+                RankedResult(
+                    text=r["text"],
+                    score=r["score"],
+                    index=r["index"],
+                    metadata=r.get("metadata"),
+                )
+                for r in cached
+            ]
+
+        # Voyage rerank uses top_k (not top_n)
+        response = await asyncio.to_thread(
+            self._client.rerank,
+            query=query,
+            documents=documents,
+            model=self.config.voyage_model,
+            top_k=min(top_n, len(documents)),
+        )
+
+        results = [
+            RankedResult(
+                text=documents[r.index],
+                score=r.relevance_score,
+                index=r.index,
+                metadata=None,
+            )
+            for r in response.results
+        ]
+
+        # Cache the results
+        cache_data = [
+            {"text": r.text, "score": r.score, "index": r.index, "metadata": r.metadata}
+            for r in results
+        ]
+        await cache.put(query, documents, top_n, cache_data)
+
+        logger.debug(f"Voyage reranked {len(documents)} documents, returned top {len(results)}")
+        return results
+
+    async def rerank_with_metadata(
+        self,
+        query: str,
+        documents: list[tuple[str, dict]],
+        top_n: int | None = None,
+    ) -> list[RankedResult]:
+        """Rerank documents with metadata preserved."""
+        if not self._initialized or not self._client:
+            raise RuntimeError("Voyage reranker not initialized")
+
+        if not documents:
+            return []
+
+        texts = [doc[0] for doc in documents]
+        metadata_list = [doc[1] for doc in documents]
+        top_n = top_n or self.config.top_n
+
+        response = await asyncio.to_thread(
+            self._client.rerank,
+            query=query,
+            documents=texts,
+            model=self.config.voyage_model,
+            top_k=min(top_n, len(texts)),
+        )
+
+        results = [
+            RankedResult(
+                text=texts[r.index],
+                score=r.relevance_score,
+                index=r.index,
+                metadata=metadata_list[r.index],
+            )
+            for r in response.results
+        ]
+
+        logger.debug(
+            f"Voyage reranked {len(documents)} documents with metadata, returned top {len(results)}"
+        )
+        return results
+
+
+# =============================================================================
 # Factory
 # =============================================================================
 
@@ -414,5 +563,7 @@ def create_reranker(config: RerankerConfig | None = None) -> BaseReranker:
 
     if config.provider == RerankerProvider.COHERE:
         return CohereReranker(config)
+    elif config.provider == RerankerProvider.VOYAGE:
+        return VoyageReranker(config)
     else:
         raise ValueError(f"Unsupported reranker provider: {config.provider}")

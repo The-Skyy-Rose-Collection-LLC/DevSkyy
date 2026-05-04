@@ -16,6 +16,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /*
 --------------------------------------------------------------
+ * Constants
+ *--------------------------------------------------------------*/
+
+/**
+ * Free shipping order threshold in dollars.
+ * Change this one value to update all cart and policy displays site-wide.
+ *
+ * @since 1.1.0
+ */
+if ( ! defined( 'SKYYROSE_FREE_SHIPPING_THRESHOLD' ) ) {
+	define( 'SKYYROSE_FREE_SHIPPING_THRESHOLD', 150 );
+}
+
+/*
+--------------------------------------------------------------
  * WooCommerce Support Declaration
  *--------------------------------------------------------------*/
 

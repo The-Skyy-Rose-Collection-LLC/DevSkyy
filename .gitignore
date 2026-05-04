@@ -399,3 +399,10 @@ renders/quarantine/
 
 # Binary 3D proof-of-concept assets in planning handoffs
 .planning/handoffs/*.glb
+.aidesigner/*
+!.aidesigner/.gitkeep
+
+# Graphify intermediate caches (regenerable; large)
+graphify-out/.graphify_*
+graphify-out/cache/
+graphify-out/manifest.json

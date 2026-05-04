@@ -18,13 +18,11 @@ RUN npm ci --legacy-peer-deps && npm cache clean --force
 # Copy Next.js source code from frontend directory
 COPY frontend/app/ ./app/
 COPY frontend/components/ ./components/
-COPY frontend/config/ ./config/
+COPY frontend/contexts/ ./contexts/
 COPY frontend/hooks/ ./hooks/
 COPY frontend/lib/ ./lib/
 COPY frontend/public/ ./public/
-COPY frontend/templates/ ./templates/
 COPY frontend/types/ ./types/
-COPY frontend/utils/ ./utils/
 COPY frontend/*.config.js ./
 COPY frontend/*.config.ts ./
 COPY frontend/tsconfig*.json ./
@@ -103,8 +101,7 @@ RUN test -d ./.next || (echo "ERROR: .next directory not found" && exit 1)
 RUN test -d ./public || (echo "ERROR: public directory not found" && exit 1)
 
 # Copy application code
-COPY base.py ./
-COPY agent_sdk/ ./agent_sdk/
+COPY sdk/python/agent_sdk/ ./agent_sdk/
 COPY agents/ ./agents/
 COPY api/ ./api/
 COPY adk/ ./adk/
@@ -113,7 +110,6 @@ COPY integrations/ ./integrations/
 COPY llm/ ./llm/
 COPY mcp_servers/ ./mcp_servers/
 COPY orchestration/ ./orchestration/
-COPY runtime/ ./runtime/
 COPY security/ ./security/
 COPY wordpress/ ./wordpress/
 COPY main_enterprise.py ./
