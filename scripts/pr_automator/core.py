@@ -48,12 +48,16 @@ class GhClient:
             logger.info("[dry-run] would run: %s", " ".join(cmd))
             return ""
         logger.debug("gh: %s", " ".join(cmd))
-        proc = subprocess.run(
-            cmd,
-            check=False,
-            capture_output=capture,
-            text=True,
-        )
+        try:
+            proc = subprocess.run(
+                cmd,
+                check=False,
+                capture_output=capture,
+                text=True,
+                timeout=120,
+            )
+        except subprocess.TimeoutExpired as e:
+            raise GhError(f"gh timed out after 120s: {' '.join(cmd)}") from e
         if proc.returncode != 0:
             raise GhError(
                 f"gh exited {proc.returncode}: {proc.stderr.strip() or proc.stdout.strip()}"

@@ -1,6 +1,8 @@
-# Path globs that block auto-merge unless the PR carries the `automator:risk-ok` label.
+# Path globs that BLOCK auto-merge unconditionally — there is no label override.
+# PRs touching any path matched here require a manual human merge.
 # One fnmatch pattern per line. Lines starting with `#` and blank lines are ignored.
-# Matched against every file path returned by `gh pr diff --name-only`.
+# Matched against every file path returned by `gh pr diff --name-only` (or the
+# local-git fallback when the PR exceeds GitHub's 300-file API limit).
 
 # Database schema — irreversible if wrong, must be reviewed by a human.
 database/migrations/**

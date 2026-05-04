@@ -15,7 +15,6 @@ from scripts.pr_automator.reviewer import ReviewVerdict
 logger = logging.getLogger("pr_automator.merge_gate")
 
 OPT_IN_LABEL = "automator:on"
-RISK_OK_LABEL = "automator:risk-ok"
 NEEDS_HUMAN_LABEL = "automator:needs-human"
 PAUSED_LABEL = "automator:paused"
 COOLDOWN_MINUTES = 15

@@ -166,7 +166,10 @@ def run_cycle(
             mb = _git(worktree, "merge-base", base_ref, "HEAD")
             out = _git(worktree, "diff", "--name-only", f"{mb}..HEAD")
             changed = [line.strip() for line in out.splitlines() if line.strip()]
-        except RuntimeError as ge:
+        except (RuntimeError, subprocess.TimeoutExpired) as ge:
+            # TimeoutExpired is an Exception, NOT a RuntimeError — caught
+            # explicitly so a hung git fetch/diff returns exit code 3 instead
+            # of crashing the cycle with an uncaught traceback.
             logger.error("local git diff fallback failed: %s", ge)
             return 3
 
