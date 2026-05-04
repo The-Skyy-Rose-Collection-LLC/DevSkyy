@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any
 
 from adk.base import ADKProvider, AgentCapability, AgentConfig
+from llm.model_ids import SECURITY_AUDIT_MODEL
 
 from .base_super_agent import EnhancedSuperAgent, SuperAgentType
 
@@ -67,7 +68,7 @@ class SecurityOpsAgent(EnhancedSuperAgent):
             config = AgentConfig(
                 name="security_ops_agent",
                 provider=ADKProvider.PYDANTIC,
-                model="claude-sonnet-4",
+                model=SECURITY_AUDIT_MODEL,
                 system_prompt=self._build_system_prompt(),
                 capabilities=[
                     AgentCapability.TOOL_CALLING,

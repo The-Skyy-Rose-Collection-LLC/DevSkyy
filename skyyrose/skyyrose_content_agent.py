@@ -42,12 +42,14 @@ from google.adk.sessions import InMemorySessionService
 from google.adk.tools import FunctionTool
 from google.genai import types as genai_types
 
+from llm.model_ids import GEMINI_VISION_MODEL
+
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
 
 APP_NAME = "skyyrose_content_agent"
-MODEL = os.getenv("SKYYROSE_MODEL", "gemini-2.0-flash")
+MODEL = os.getenv("SKYYROSE_MODEL", GEMINI_VISION_MODEL)
 PRODUCT_JSON_PATH = Path(__file__).parent / "assets" / "data" / "product-content.json"
 
 WRITABLE_FIELDS = {"description", "short_description", "seo_meta", "instagram", "tiktok"}

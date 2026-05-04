@@ -31,6 +31,7 @@ from typing import Any
 import httpx
 from PIL import Image
 
+from llm.model_ids import GEMINI_PRO_IMAGE_MODEL, NANO_BANANA_MODEL
 from orchestration.brand_context import BrandContextInjector, Collection
 
 logger = logging.getLogger(__name__)
@@ -224,7 +225,7 @@ class GeminiNativeImageClient:
     def __init__(
         self,
         api_key: str | None = None,
-        model: str = "gemini-2.5-flash-image",
+        model: str = NANO_BANANA_MODEL,
         timeout: float = DEFAULT_TIMEOUT,
         max_retries: int = MAX_RETRIES,
         brand_injector: BrandContextInjector | None = None,
@@ -529,7 +530,7 @@ class GeminiFlashImageClient(GeminiNativeImageClient):
         """Initialize Gemini Flash Image client."""
         super().__init__(
             api_key=api_key,
-            model="gemini-2.5-flash-image",
+            model=NANO_BANANA_MODEL,
             timeout=timeout,
             max_retries=max_retries,
             brand_injector=brand_injector,
@@ -626,7 +627,7 @@ class GeminiProImageClient(GeminiNativeImageClient):
         """
         super().__init__(
             api_key=api_key,
-            model="gemini-3-pro-image-preview",
+            model=GEMINI_PRO_IMAGE_MODEL,
             timeout=timeout,
             max_retries=max_retries,
             brand_injector=brand_injector,

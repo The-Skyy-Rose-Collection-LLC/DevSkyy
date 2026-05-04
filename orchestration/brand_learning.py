@@ -35,6 +35,8 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
+from llm.model_ids import CLAUDE_SONNET_MODEL
+
 logger = logging.getLogger(__name__)
 
 
@@ -972,7 +974,7 @@ class BrandLearningLoop:
             content="Premium heavyweight crewneck...",
             agent_id="content_core",
             provider="anthropic",
-            model="claude-sonnet-4",
+            model=CLAUDE_SONNET_MODEL,
             accepted=True,
             quality_score=92.0,
         ))

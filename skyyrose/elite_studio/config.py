@@ -81,37 +81,37 @@ OUTPUT_DIR = _BASE_DIR / "assets" / "images" / "products"
 #
 # Drift prevention: call validate_pipeline_models() at deploy time.
 
-# --- Anthropic Claude ---
-# https://platform.claude.com/docs/en/about-claude/models/migration-guide
-CLAUDE_OPUS_MODEL = "claude-opus-4-7"  # was claude-opus-4-6
-CLAUDE_SONNET_MODEL = "claude-sonnet-4-6"  # was claude-sonnet-4-20250514
+# --- Centralized model IDs ---
+# Single source of truth lives at llm/model_ids.py. Re-exported here so
+# legacy callers that import from this module keep working unchanged.
+# Never hardcode model strings inline in this file — update llm/model_ids.py
+# and the change propagates everywhere.
+from llm.model_ids import (  # noqa: E402  -- re-exported for legacy importers
+    CLAUDE_HAIKU_MODEL,
+    CLAUDE_OPUS_MODEL,
+    CLAUDE_SONNET_MODEL,
+    COMPOSITOR_CLAUDE_MODEL,
+    COMPOSITOR_OPUS_MODEL,
+    COMPOSITOR_QA_MODEL,
+)
+from llm.model_ids import GEMINI_FLASH_IMAGE_MODEL as GEMINI_IMAGE_GEN_MODEL  # noqa: E402
+from llm.model_ids import (  # noqa: E402  -- re-exported for legacy importers
+    GEMINI_VISION_MODEL,
+    GENERATION_MODEL,
+    MESHY_AI_MODEL,
+    OPENAI_IMAGE_MODEL,
+    OPENAI_VISION_MODEL,
+    QC_CLAUDE_MODEL,
+    QC_MODEL,
+    RAS_GENERATION_MODEL,
+    VISION_CLAUDE_MODEL,
+)
 
-# --- Google Gemini ---
-# https://ai.google.dev/gemini-api/docs/image-generation
-GEMINI_IMAGE_GEN_MODEL = "gemini-3.1-flash-image-preview"  # image gen w/ refs
-GEMINI_VISION_MODEL = "gemini-3-flash-preview"  # text-output vision
-
-# --- OpenAI ---
-# https://developers.openai.com/api/docs/api-reference/images
-OPENAI_IMAGE_MODEL = "gpt-image-1"  # gpt-image-1.5 also available
-OPENAI_VISION_MODEL = "gpt-4o"
-
-# --- Meshy AI ---
-# https://docs.meshy.ai/en/api/image-to-3d
-MESHY_AI_MODEL = "meshy-5"  # mirrored in ai_3d/providers/meshy.py
-
-# === Role aliases (decouple agents from specific provider IDs) ===
-VISION_CLAUDE_MODEL = CLAUDE_OPUS_MODEL  # vision_agent._call_claude
-QC_CLAUDE_MODEL = CLAUDE_SONNET_MODEL  # quality_agent.verify
-COMPOSITOR_CLAUDE_MODEL = CLAUDE_OPUS_MODEL  # compositor_agent brain
-RAS_GENERATION_MODEL = GEMINI_IMAGE_GEN_MODEL  # three_d_agent / generator_agent
-
-# === Backward-compat aliases (existing code imports these) ===
+# Local-only back-compat aliases — these names exist only here, not in
+# llm/model_ids.py, because they're skyyrose-specific re-spellings.
 VISION_GEMINI_MODEL = GEMINI_VISION_MODEL
 VISION_OPENAI_MODEL = OPENAI_VISION_MODEL
-GENERATION_MODEL = GEMINI_IMAGE_GEN_MODEL
 GENERATION_ASPECT_RATIO = "3:4"
-QC_MODEL = QC_CLAUDE_MODEL
 
 # Timeouts (seconds)
 GEMINI_TIMEOUT = 90.0
@@ -131,8 +131,9 @@ GRAPH_CHECKPOINT_DIR = Path(os.getenv("ELITE_CHECKPOINT_DIR", str(_BASE_DIR / ".
 # Compositor configuration
 # ---------------------------------------------------------------------------
 
-COMPOSITOR_OPUS_MODEL = COMPOSITOR_CLAUDE_MODEL
-COMPOSITOR_QA_MODEL = GEMINI_IMAGE_GEN_MODEL  # visual QA (deep analysis)
+# COMPOSITOR_OPUS_MODEL and COMPOSITOR_QA_MODEL are now imported from
+# llm.model_ids above (at the top of this file's "Centralized model IDs"
+# block). Don't redefine them here.
 COMPOSITOR_STAGE_DELAY = 2
 SCENES_DIR = _BASE_DIR / "assets" / "scenes"
 EDITORIAL_STAGING_DIR = _BASE_DIR / "assets" / "images" / "editorial-staging"

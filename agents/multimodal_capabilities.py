@@ -36,6 +36,8 @@ from llama_index.core.multi_modal_llms import MultiModalLLM
 from llama_index.llms.openai import OpenAI
 from llama_index.multi_modal_llms.anthropic import AnthropicMultiModal
 
+from llm.model_ids import CLAUDE_SONNET_MODEL, OPENAI_VISION_MODEL
+
 # Optional: HuggingFace multimodal (requires torch - only in requirements-full.txt)
 try:
     from llama_index.multi_modal_llms.huggingface import HuggingFaceMultiModal
@@ -106,8 +108,8 @@ class MultimodalCapabilities:
     def __init__(
         self,
         default_provider: MultimodalProvider = MultimodalProvider.ANTHROPIC,
-        anthropic_model: str = "claude-3-5-sonnet-20241022",
-        openai_model: str = "gpt-4o",
+        anthropic_model: str = CLAUDE_SONNET_MODEL,
+        openai_model: str = OPENAI_VISION_MODEL,
         max_tokens: int = 2048,
     ):
         """

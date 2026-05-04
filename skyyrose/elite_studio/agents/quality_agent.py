@@ -19,7 +19,7 @@ from typing import Any, Literal
 from adk.base import ADKProvider, AgentConfig, AgentResult
 from adk.super_agents import BaseSuperAgent
 
-from ..config import COMPOSITOR_QA_MODEL, QC_CLAUDE_MODEL
+from ..config import COMPOSITOR_QA_MODEL, GEMINI_VISION_MODEL, QC_CLAUDE_MODEL
 from ..gemini_rest import analyze_vision as gemini_analyze_vision
 from ..models import QualityVerification
 
@@ -84,7 +84,7 @@ class QualityAgent(BaseSuperAgent):
             config = AgentConfig(
                 name="legendary_qa_architect",
                 provider=ADKProvider.GOOGLE,
-                model="gemini-2.0-flash",
+                model=GEMINI_VISION_MODEL,
                 system_prompt="You are the Legendary QA Architect for SkyyRose. Your mission is absolute visual perfection.",
             )
         super().__init__(config)

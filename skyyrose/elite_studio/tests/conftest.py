@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from llm.model_ids import CLAUDE_SONNET_MODEL
 from skyyrose.elite_studio.coordinator import Coordinator, NullLogger
 from skyyrose.elite_studio.models import (
     GenerationResult,
@@ -83,7 +84,7 @@ def make_quality_verification(
     return QualityVerification(
         success=success,
         provider="anthropic",
-        model="claude-sonnet-4",
+        model=CLAUDE_SONNET_MODEL,
         overall_status=overall_status,
         recommendation=recommendation,
         **kwargs,
