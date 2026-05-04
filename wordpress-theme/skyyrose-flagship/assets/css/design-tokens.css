@@ -282,6 +282,54 @@
 	}
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   Per-Collection Palette — [data-collection] cascade
+   --------------------------------------------------------------------
+   Single source of truth for collection-scoped colors, fonts, and
+   easings. Consumed directly by feature CSS (landing-pages.css,
+   animations-premium.css, etc.) via var(--skyyrose-*).
+   To switch palettes, set [data-collection="<slug>"] on any wrapper.
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+	--skyyrose-accent:       #B76E79;
+	--skyyrose-accent-rgb:   183, 110, 121;
+	--skyyrose-accent-dark:  #9A5662;
+	--skyyrose-secondary:    #D4AF37;
+	--skyyrose-bg:           #0A0A0A;
+	--skyyrose-text:         #F5E6D3;
+	--skyyrose-text-muted:   rgba(245, 230, 211, 0.7);
+	--skyyrose-font-display: 'Playfair Display', serif;
+	--skyyrose-font-body:    'Cormorant Garamond', 'Inter', sans-serif;
+	--skyyrose-font-mono:    'Space Mono', monospace;
+	--skyyrose-font-ui:      'Bebas Neue', sans-serif;
+	--skyyrose-ease:         cubic-bezier(0.16, 1, 0.3, 1);
+	--skyyrose-radius:       2px;
+}
+
+[data-collection="black-rose"] {
+	--skyyrose-accent:       #C0C0C0;
+	--skyyrose-accent-rgb:   192, 192, 192;
+	--skyyrose-accent-dark:  #999999;
+	--skyyrose-secondary:    #DC143C;
+	--skyyrose-font-display: 'Cinzel', serif;
+}
+
+[data-collection="love-hurts"] {
+	--skyyrose-accent:       #DC143C;
+	--skyyrose-accent-rgb:   220, 20, 60;
+	--skyyrose-accent-dark:  #9B0F2E;
+	--skyyrose-secondary:    #B76E79;
+	--skyyrose-font-display: 'Playfair Display', serif;
+}
+
+[data-collection="signature"] {
+	--skyyrose-accent:       #D4AF37;
+	--skyyrose-accent-rgb:   212, 175, 55;
+	--skyyrose-accent-dark:  #B8960C;
+	--skyyrose-secondary:    #F7E7CE;
+	--skyyrose-font-display: 'Playfair Display', serif;
+}
+
 /* ═══ Footer CRO Sections ═══ */
 .ft-cro__container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
 .ft-cro__heading {
