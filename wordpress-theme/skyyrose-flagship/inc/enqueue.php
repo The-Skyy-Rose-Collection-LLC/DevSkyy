@@ -687,6 +687,35 @@ function skyyrose_enqueue_template_scripts() {
 			);
 		}
 
+		// Localize immersive scenes + load the WC bridge that wires the
+		// "Pre-Order Now" button to skyyrose_immersive_add_to_cart.
+		if ( 'immersive' === $slug && wp_script_is( $handle, 'enqueued' ) ) {
+			wp_localize_script(
+				$handle,
+				'skyyRoseImmersive',
+				array(
+					'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
+					'nonce'    => wp_create_nonce( 'skyyrose-immersive-nonce' ),
+					'wcActive' => class_exists( 'WooCommerce' ),
+					'cartUrl'  => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
+				)
+			);
+
+			$bridge_file = $use_min && file_exists( $base_js_dir . '/immersive-wc-bridge.min.js' )
+				? 'immersive-wc-bridge.min.js'
+				: 'immersive-wc-bridge.js';
+
+			if ( file_exists( $base_js_dir . '/' . $bridge_file ) ) {
+				wp_enqueue_script(
+					'skyyrose-immersive-wc-bridge',
+					$base_js_uri . '/' . $bridge_file,
+					array( $handle ),
+					SKYYROSE_VERSION,
+					true
+				);
+			}
+		}
+
 		/* Immersive world + WC bridge — will be re-added when immersive rooms v6.0 ships */
 	}
 
