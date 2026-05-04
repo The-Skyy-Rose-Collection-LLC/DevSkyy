@@ -1857,6 +1857,21 @@
 - `product-card-holo.php` — Template Part: Holo Product Card (~3569 tok)
 - `skyy-mascot.php` — Skyy — Living Character Widget (~1207 tok)
 
+## wordpress-theme/skyyrose-flagship/template-parts/components/
+
+Phase 0 design system primitives. All PHPCS-clean (WP standard). No inline styles/scripts. BEM prefix: `sr-`.
+
+- `button.php` — Button/anchor with variants (primary|ghost|outline|text), sizes (sm|md|lg), loading state (aria-busy + sr-btn__loading), SVG icon slots (~193 tok)
+- `input.php` — Text/email/password/tel/url/search/number/textarea with inline error (aria-invalid + role=alert) and hint text (~151 tok)
+- `form.php` — Form wrapper with optional nonce, aria-live status region, fieldset/legend, slot pattern (~116 tok)
+- `figure.php` — Image with decorative/alt handling, srcset, aspect-ratio, object-fit variants; null alt = HTML comment flag (~125 tok)
+- `card-product.php` — Product card via skyyrose_get_product($sku); early return if SKU missing; composes button.php (~144 tok)
+- `card-editorial.php` — Full-bleed campaign card with kicker/headline/body/CTA; composes figure.php + button.php (~133 tok)
+- `card-info.php` — Text-first info/stat card with icon slot, eyebrow, headline, body, CTA; schemes: default|elevated|bordered (~163 tok)
+- `quote.php` — Blockquote with attribution, sizes (sm|md|lg|display), align, optional decorative glyph (~91 tok)
+- `modal.php` — Accessible dialog (role=dialog, aria-modal, aria-labelledby, data-focus-trap); JS wired Phase 5 (~123 tok)
+- `drawer.php` — Off-canvas panel (left|right|bottom), same ARIA pattern as modal; overlay dismiss, data-drawer-side (~140 tok)
+
 ## wordpress/
 
 - `collection_page_manager.py` — CollectionType: to_dict, get_template, get_all_templates, to_agent_reference (~1439 tok)
