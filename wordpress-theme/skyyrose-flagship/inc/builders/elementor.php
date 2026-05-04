@@ -117,19 +117,15 @@ add_action( 'elementor/editor/after_enqueue_styles', 'skyyrose_elementor_editor_
 /**
  * Enqueue Elementor frontend scripts.
  *
+ * Design-tokens.css is enqueued globally by inc/enqueue.php; only the
+ * Elementor-conditional product-card-holo stylesheet lives here.
+ *
  * @since 1.0.0
  */
 function skyyrose_elementor_frontend_scripts() {
 	wp_enqueue_style(
 		'skyyrose-product-card-holo',
 		SKYYROSE_ASSETS_URI . '/css/product-card-holo.css',
-		array(),
-		SKYYROSE_VERSION
-	);
-
-	wp_enqueue_style(
-		'skyyrose-design-tokens',
-		SKYYROSE_ASSETS_URI . '/css/design-tokens.css',
 		array(),
 		SKYYROSE_VERSION
 	);
@@ -187,13 +183,15 @@ add_action( 'elementor/page_templates/canvas/after_content', 'skyyrose_elementor
  * @since 3.3.0 Updated to SkyyRose brand colors and typography.
  */
 function skyyrose_set_elementor_default_schemes() {
+	$colors = skyyrose_brand_colors();
+
 	update_option(
 		'elementor_scheme_color',
 		array(
-			'1' => '#0A0A0A', // Primary — dark base.
-			'2' => '#B76E79', // Secondary — rose gold.
-			'3' => '#FFFFFF', // Text — white on dark.
-			'4' => '#D4AF37', // Accent — gold.
+			'1' => $colors['dark'],      // Primary — dark base.
+			'2' => $colors['rose_gold'], // Secondary — rose gold.
+			'3' => '#FFFFFF',            // Text — white on dark.
+			'4' => $colors['gold'],      // Accent — gold.
 		)
 	);
 
