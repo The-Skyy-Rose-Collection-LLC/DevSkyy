@@ -219,150 +219,200 @@ def _build_judgment_from_json(judge_name: str, data: dict, raw: str) -> Judgment
 
 
 # -- Judge implementations --------------------------------------------------
+#
+# Each judge function (judge_with_gpt / _claude / _gemini) is a thin wrapper
+# around the shared `judge_with` scaffold below. The scaffold handles image
+# loading, JSON parsing, error logging, and zero-score construction; each
+# provider supplies a small adapter (`_judge_call_*`) that knows how to
+# call its specific API and extract the response text.
+
+
+def _judge_call_gpt(
+    client,
+    source_path: Path,
+    candidate_path: Path,
+    src_b64: str,
+    src_mime: str,
+    cand_b64: str,
+    cand_mime: str,
+    spec: str,
+) -> str:
+    response = client.chat.completions.create(
+        model=GPT_JUDGE_MODEL,
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": JUDGE_PROMPT.format(spec=spec)
+                        + "\n\nIMAGE 1 = SOURCE, IMAGE 2 = GENERATED",
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:{src_mime};base64,{src_b64}"},
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:{cand_mime};base64,{cand_b64}"},
+                    },
+                ],
+            }
+        ],
+        max_tokens=1000,
+    )
+    return response.choices[0].message.content
+
+
+def _judge_call_claude(
+    client,
+    source_path: Path,
+    candidate_path: Path,
+    src_b64: str,
+    src_mime: str,
+    cand_b64: str,
+    cand_mime: str,
+    spec: str,
+) -> str:
+    response = client.messages.create(
+        model=CLAUDE_JUDGE_MODEL,
+        max_tokens=1000,
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "IMAGE 1 = SOURCE reference (ground truth):"},
+                    {
+                        "type": "image",
+                        "source": {"type": "base64", "media_type": src_mime, "data": src_b64},
+                    },
+                    {"type": "text", "text": "IMAGE 2 = GENERATED (evaluate against spec):"},
+                    {
+                        "type": "image",
+                        "source": {"type": "base64", "media_type": cand_mime, "data": cand_b64},
+                    },
+                    {"type": "text", "text": JUDGE_PROMPT.format(spec=spec)},
+                ],
+            }
+        ],
+    )
+    return response.content[0].text
+
+
+# Constrained decoding schema for Gemini — guarantees complete, valid JSON output
+_GEMINI_JUDGE_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "garment_type": {"type": "integer"},
+        "color_accuracy": {"type": "integer"},
+        "text_accuracy": {"type": "integer"},
+        "logo_accuracy": {"type": "integer"},
+        "construction_accuracy": {"type": "integer"},
+        "no_hallucinations": {"type": "integer"},
+        "overall": {"type": "integer"},
+        "issues": {"type": "array", "items": {"type": "string"}},
+        "suggested_fixes": {"type": "array", "items": {"type": "string"}},
+    },
+    "required": [
+        "garment_type",
+        "color_accuracy",
+        "text_accuracy",
+        "logo_accuracy",
+        "construction_accuracy",
+        "no_hallucinations",
+        "overall",
+        "issues",
+        "suggested_fixes",
+    ],
+}
+
+
+def _judge_call_gemini(
+    client,
+    source_path: Path,
+    candidate_path: Path,
+    src_b64: str,
+    src_mime: str,
+    cand_b64: str,
+    cand_mime: str,
+    spec: str,
+) -> str:
+    from google.genai import types
+
+    response = client.models.generate_content(
+        model=GEMINI_JUDGE_MODEL,
+        contents=[
+            "IMAGE 1 = SOURCE reference (ground truth):",
+            types.Part.from_bytes(data=source_path.read_bytes(), mime_type=src_mime),
+            "IMAGE 2 = GENERATED (evaluate against spec):",
+            types.Part.from_bytes(data=candidate_path.read_bytes(), mime_type=cand_mime),
+            JUDGE_PROMPT.format(spec=spec),
+        ],
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=_GEMINI_JUDGE_SCHEMA,
+            max_output_tokens=4096,
+            temperature=1.0,
+            thinking_config=types.ThinkingConfig(thinking_budget=8192),
+        ),
+    )
+    # Extract text from parts, skipping thought parts
+    text_parts = []
+    if response.candidates and response.candidates[0].content.parts:
+        for part in response.candidates[0].content.parts:
+            if hasattr(part, "text") and part.text:
+                text_parts.append(part.text)
+    return "\n".join(text_parts) if text_parts else (response.text or "")
+
+
+def judge_with(
+    model_label: str,
+    call_fn,
+    client,
+    source_path: Path,
+    candidate_path: Path,
+    dna: dict,
+) -> JudgmentScore:
+    """Shared judge scaffold: load images, call provider adapter, parse JSON, build judgment.
+
+    The adapter `call_fn` is a `_judge_call_*` function that takes the client,
+    pre-loaded image data, and a spec string, then returns raw response text.
+    This scaffold normalizes error handling: any exception (API failure, JSON
+    parse miss, empty response) returns a zero-score `JudgmentScore` with the
+    error encoded in `issues`. Empty-JSON detection used to be Gemini-only;
+    now it applies to all three judges as a strict improvement (consistent
+    zero-score on empty rather than silently passing empty data downstream).
+    """
+    src_b64, src_mime = _load_image_b64(source_path)
+    cand_b64, cand_mime = _load_image_b64(candidate_path)
+    spec = _dna_to_spec(dna)
+    try:
+        text = call_fn(
+            client, source_path, candidate_path, src_b64, src_mime, cand_b64, cand_mime, spec
+        )
+        data = _parse_json(text)
+        if not data:
+            raise ValueError(f"Empty JSON parse from: {(text or '')[:200]}")
+        return _build_judgment_from_json(model_label, data, text)
+    except Exception as exc:
+        log.error("%s judge failed: %s", model_label, exc)
+        return JudgmentScore(model_label, 0, 0, 0, 0, 0, 0, 0, [f"judge error: {exc}"], [], "")
 
 
 def judge_with_gpt(client, source_path: Path, candidate_path: Path, dna: dict) -> JudgmentScore:
-    src_b64, src_mime = _load_image_b64(source_path)
-    cand_b64, cand_mime = _load_image_b64(candidate_path)
-    spec = _dna_to_spec(dna)
-    try:
-        response = client.chat.completions.create(
-            model=GPT_JUDGE_MODEL,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": JUDGE_PROMPT.format(spec=spec)
-                            + "\n\nIMAGE 1 = SOURCE, IMAGE 2 = GENERATED",
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {"url": f"data:{src_mime};base64,{src_b64}"},
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {"url": f"data:{cand_mime};base64,{cand_b64}"},
-                        },
-                    ],
-                }
-            ],
-            max_tokens=1000,
-        )
-        text = response.choices[0].message.content
-        data = _parse_json(text)
-        return _build_judgment_from_json("gpt-4o", data, text)
-    except Exception as exc:
-        log.error("GPT judge failed: %s", exc)
-        return JudgmentScore("gpt-4o", 0, 0, 0, 0, 0, 0, 0, [f"judge error: {exc}"], [], "")
+    return judge_with("gpt-4o", _judge_call_gpt, client, source_path, candidate_path, dna)
 
 
 def judge_with_claude(client, source_path: Path, candidate_path: Path, dna: dict) -> JudgmentScore:
-    src_b64, src_mime = _load_image_b64(source_path)
-    cand_b64, cand_mime = _load_image_b64(candidate_path)
-    spec = _dna_to_spec(dna)
-    try:
-        response = client.messages.create(
-            model=CLAUDE_JUDGE_MODEL,
-            max_tokens=1000,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": "IMAGE 1 = SOURCE reference (ground truth):"},
-                        {
-                            "type": "image",
-                            "source": {"type": "base64", "media_type": src_mime, "data": src_b64},
-                        },
-                        {"type": "text", "text": "IMAGE 2 = GENERATED (evaluate against spec):"},
-                        {
-                            "type": "image",
-                            "source": {"type": "base64", "media_type": cand_mime, "data": cand_b64},
-                        },
-                        {"type": "text", "text": JUDGE_PROMPT.format(spec=spec)},
-                    ],
-                }
-            ],
-        )
-        text = response.content[0].text
-        data = _parse_json(text)
-        return _build_judgment_from_json("claude-opus-4-6", data, text)
-    except Exception as exc:
-        log.error("Claude judge failed: %s", exc)
-        return JudgmentScore(
-            "claude-opus-4-6", 0, 0, 0, 0, 0, 0, 0, [f"judge error: {exc}"], [], ""
-        )
+    return judge_with(
+        "claude-opus-4-6", _judge_call_claude, client, source_path, candidate_path, dna
+    )
 
 
 def judge_with_gemini(client, source_path: Path, candidate_path: Path, dna: dict) -> JudgmentScore:
-    from google.genai import types
-
-    src_mime = _load_image_b64(source_path)[1]
-    cand_mime = _load_image_b64(candidate_path)[1]
-    spec = _dna_to_spec(dna)
-
-    # Constrained decoding schema — guarantees complete, valid JSON output
-    judge_schema = {
-        "type": "object",
-        "properties": {
-            "garment_type": {"type": "integer"},
-            "color_accuracy": {"type": "integer"},
-            "text_accuracy": {"type": "integer"},
-            "logo_accuracy": {"type": "integer"},
-            "construction_accuracy": {"type": "integer"},
-            "no_hallucinations": {"type": "integer"},
-            "overall": {"type": "integer"},
-            "issues": {"type": "array", "items": {"type": "string"}},
-            "suggested_fixes": {"type": "array", "items": {"type": "string"}},
-        },
-        "required": [
-            "garment_type",
-            "color_accuracy",
-            "text_accuracy",
-            "logo_accuracy",
-            "construction_accuracy",
-            "no_hallucinations",
-            "overall",
-            "issues",
-            "suggested_fixes",
-        ],
-    }
-
-    try:
-        response = client.models.generate_content(
-            model=GEMINI_JUDGE_MODEL,
-            contents=[
-                "IMAGE 1 = SOURCE reference (ground truth):",
-                types.Part.from_bytes(data=source_path.read_bytes(), mime_type=src_mime),
-                "IMAGE 2 = GENERATED (evaluate against spec):",
-                types.Part.from_bytes(data=candidate_path.read_bytes(), mime_type=cand_mime),
-                JUDGE_PROMPT.format(spec=spec),
-            ],
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                response_schema=judge_schema,
-                max_output_tokens=4096,
-                temperature=1.0,
-                thinking_config=types.ThinkingConfig(thinking_budget=8192),
-            ),
-        )
-        # Extract text from parts, skipping thought parts
-        text_parts = []
-        if response.candidates and response.candidates[0].content.parts:
-            for part in response.candidates[0].content.parts:
-                if hasattr(part, "text") and part.text:
-                    text_parts.append(part.text)
-        raw_text = "\n".join(text_parts) if text_parts else (response.text or "")
-        data = _parse_json(raw_text)
-        if not data:
-            raise ValueError(f"Empty JSON parse from: {raw_text[:200]}")
-        return _build_judgment_from_json("gemini-2.5-flash", data, raw_text)
-    except Exception as exc:
-        log.error("Gemini judge failed: %s", exc)
-        return JudgmentScore(
-            "gemini-2.5-flash", 0, 0, 0, 0, 0, 0, 0, [f"judge error: {exc}"], [], ""
-        )
+    return judge_with(
+        "gemini-2.5-flash", _judge_call_gemini, client, source_path, candidate_path, dna
+    )
 
 
 # -- Tournament orchestration -----------------------------------------------

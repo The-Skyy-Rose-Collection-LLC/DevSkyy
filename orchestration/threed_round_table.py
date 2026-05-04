@@ -452,6 +452,37 @@ class RoundTableResult:
 
 
 # =============================================================================
+# Provider quality reputation (geometry + texture scores per provider)
+# =============================================================================
+
+
+@dataclass(frozen=True, slots=True)
+class ProviderQuality:
+    """Per-provider geometry + texture reputation scores used by `_score_response`.
+
+    `geo` always applies. `tex_textured` only applies when `response.has_textures`
+    is True; without textures, `_score_response` uses a fixed fallback of 30 for
+    every provider. The `tex_textured` default of 75 matches the previous
+    `dict.get(provider, 75)` behavior for providers not in the texture lookup.
+    """
+
+    geo: int
+    tex_textured: int = 75
+
+
+PROVIDER_QUALITY: dict[ThreeDProvider, ProviderQuality] = {
+    ThreeDProvider.HUNYUAN3D_2: ProviderQuality(geo=95, tex_textured=95),
+    ThreeDProvider.TRIPO3D: ProviderQuality(geo=92, tex_textured=92),
+    ThreeDProvider.ANIGEN: ProviderQuality(geo=90, tex_textured=88),
+    ThreeDProvider.TRIPOSR: ProviderQuality(geo=88),  # default tex_textured=75
+    ThreeDProvider.INSTANTMESH: ProviderQuality(geo=85, tex_textured=85),
+    ThreeDProvider.LGM: ProviderQuality(geo=80, tex_textured=80),
+    ThreeDProvider.SHAP_E: ProviderQuality(geo=70),  # default tex_textured=75
+    ThreeDProvider.POINT_E: ProviderQuality(geo=60),  # default tex_textured=75
+}
+
+
+# =============================================================================
 # 3D Model Round Table - Production Implementation
 # =============================================================================
 
@@ -1226,31 +1257,11 @@ class ThreeDRoundTable:
         scores = ThreeDQualityScores()
         polycount = response.polycount or 50000
 
-        # Provider reputation scores (highest quality focused)
-        provider_geo_scores = {
-            ThreeDProvider.HUNYUAN3D_2: 95,
-            ThreeDProvider.TRIPOSR: 88,
-            ThreeDProvider.INSTANTMESH: 85,
-            ThreeDProvider.TRIPO3D: 92,
-            ThreeDProvider.ANIGEN: 90,  # SIGGRAPH-grade garment reconstruction
-            ThreeDProvider.LGM: 80,
-            ThreeDProvider.SHAP_E: 70,
-            ThreeDProvider.POINT_E: 60,
-        }
-        scores.geometry_quality = provider_geo_scores.get(response.provider, 70)
-
-        # Texture quality
-        if response.has_textures:
-            provider_tex_scores = {
-                ThreeDProvider.HUNYUAN3D_2: 95,
-                ThreeDProvider.TRIPO3D: 92,
-                ThreeDProvider.ANIGEN: 88,  # texture from source image projection
-                ThreeDProvider.INSTANTMESH: 85,
-                ThreeDProvider.LGM: 80,
-            }
-            scores.texture_quality = provider_tex_scores.get(response.provider, 75)
-        else:
-            scores.texture_quality = 30
+        # Provider reputation scores — single source of truth at module level.
+        # See PROVIDER_QUALITY definition above. Adding a provider = one entry.
+        quality = PROVIDER_QUALITY.get(response.provider, ProviderQuality(geo=70))
+        scores.geometry_quality = quality.geo
+        scores.texture_quality = quality.tex_textured if response.has_textures else 30
 
         # Polycount efficiency
         if 30000 <= polycount <= 80000:
