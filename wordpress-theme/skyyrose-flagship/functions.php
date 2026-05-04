@@ -116,6 +116,7 @@ if ( class_exists( 'WooCommerce' ) ) {
  * Page Builder Includes
  *--------------------------------------------------------------*/
 require_once SKYYROSE_DIR . '/inc/builders/detection.php';
+require_once SKYYROSE_DIR . '/inc/builders/shared.php';
 
 // Elementor — preserve same hook timing as the original loading.
 add_action(
