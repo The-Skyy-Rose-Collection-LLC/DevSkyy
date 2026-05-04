@@ -683,8 +683,12 @@ class HuggingFace3DClient:
                 f"https://huggingface.co/spaces/{HF_SPACE_TRIPOSR}",
             )
 
-            # Call the predict function
-            result = gradio_client.predict(
+            # gradio_client.predict is synchronous; wrap in asyncio.to_thread so
+            # the event loop stays free while TripoSR runs (often 20-60s).
+            # See orchestration/CLAUDE.md: sync I/O inside async pipelines must
+            # use asyncio.to_thread.
+            result = await asyncio.to_thread(
+                gradio_client.predict,
                 tmp_path,  # Input image
                 remove_background,  # Remove background
                 self.config.triposr_foreground_ratio,  # Foreground ratio

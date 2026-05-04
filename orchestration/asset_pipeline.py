@@ -158,14 +158,30 @@ class PipelineConfig:
     huggingface_config: HuggingFace3DConfig = field(default_factory=HuggingFace3DConfig.from_env)
     meshy_config: MeshyConfig = field(default_factory=MeshyConfig.from_env)
 
-    # Primary 3D generator selection (NEW)
+    # Primary 3D generator selection.
+    #
+    # Default is HUGGINGFACE: routes through HF Spaces (Hunyuan3D 2.0 -> InstantMesh -> TripoSR
+    # via orchestration/huggingface_3d_client.py). Cheap, no preview gate, no Tripo3D production.
+    #
+    # Set to HYBRID or TRIPO3D to enable the documented "Meshy preview gate -> TripoAssetAgent
+    # production" pattern. In HUGGINGFACE mode the Meshy gate and TripoAssetAgent below are
+    # bypassed entirely; their flags only take effect in HYBRID/TRIPO3D modes.
+    #
+    # Override at runtime via env var: PIPELINE_PRIMARY_3D_GENERATOR={huggingface,hybrid,tripo3d}
     primary_3d_generator: Primary3DGenerator = Primary3DGenerator.HUGGINGFACE
 
     # Pipeline settings
-    enable_huggingface_3d: bool = True  # Stage 0: HF 3D generation (DEPRECATED — use Meshy gate)
-    enable_meshy_preview_gate: bool = True  # Cheap preview + trimesh fidelity gate before Tripo3D
-    meshy_preview_min_fidelity: float = 60.0  # 0-100; below this = abort production run
-    enable_3d_generation: bool = True  # Stage 1: Tripo3D generation
+    # NOTE: enable_huggingface_3d is legacy; the active selector is primary_3d_generator above.
+    enable_huggingface_3d: bool = (
+        True  # Stage 0: HF 3D generation (legacy flag — see primary_3d_generator)
+    )
+    enable_meshy_preview_gate: bool = (
+        True  # Only consulted when primary_3d_generator in {HYBRID, TRIPO3D}
+    )
+    meshy_preview_min_fidelity: float = (
+        60.0  # 0-100; below this = abort production run (HYBRID/TRIPO3D only)
+    )
+    enable_3d_generation: bool = True  # Stage 1: Tripo3D generation (HYBRID/TRIPO3D only)
     enable_virtual_tryon: bool = True  # Stage 2: Virtual try-on
     enable_wordpress_upload: bool = True  # Stage 3: WordPress upload
 

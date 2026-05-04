@@ -890,9 +890,23 @@ class ThreeDRoundTable:
         - Mesh optimization
         - Normal map generation
         - Format optimization
+
+        WARNING: this method is a STUB. It records metadata flags only — it
+        does not run trimesh/pymeshlab/etc. The "enhancement_bonus" added by
+        _score_response is therefore a no-op signal until this is implemented.
         """
         if not self.quality_config.enable_enhancement:
             return response
+
+        if not getattr(self.__class__, "_enhance_quality_stub_warned", False):
+            logger.warning(
+                "_enhance_quality is a stub - records metadata flags only, "
+                "does not perform mesh processing, texture upscaling, or LOD "
+                "generation. Replace with real trimesh/pymeshlab integration "
+                "before treating the enhancement_bonus score component as "
+                "meaningful signal."
+            )
+            self.__class__._enhance_quality_stub_warned = True
 
         enhancement_details = {}
 
