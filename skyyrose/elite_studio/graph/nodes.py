@@ -356,7 +356,10 @@ def compositor_node(state: EliteStudioState) -> dict:
                     )
                 break
     except Exception:
-        pass
+        # Don't crash the graph if compositing breaks — but DO surface the
+        # failure. Bare ``pass`` here previously masked real provider errors
+        # and made the compositor stage look like a no-op when it had failed.
+        logger.exception("compositor_node: composite() raised for sku=%s", state.get("sku"))
 
     elapsed = time.monotonic() - start
 
