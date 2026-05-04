@@ -17,10 +17,12 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from llm.model_ids import (
+    NANO_BANANA_2_MODEL,
     NANO_BANANA_MODEL,
     NANO_BANANA_PRO_MODEL,
     OPENAI_IMAGE_2_MODEL,
     OPENAI_IMAGE_15_MODEL,
+    OPENAI_IMAGE_MINI_MODEL,
     OPENAI_VISION_MODEL,
 )
 
@@ -34,8 +36,16 @@ class PipelineConfig:
     # -- Model IDs --
     gemini_pro_model: str = NANO_BANANA_PRO_MODEL
     gemini_flash_model: str = NANO_BANANA_MODEL
+    # Nano Banana 2 — gemini-3.1-flash-image-preview, the new flash variant
+    # with thinking-mode. Distinct from gemini_flash_model (the original NB)
+    # so callers and the dashboard can pick between generations explicitly.
+    nano_banana_2_model: str = NANO_BANANA_2_MODEL
     gemini_vision_model: str = "gemini-2.5-flash"
     gpt_image_model: str = OPENAI_IMAGE_15_MODEL
+    # OpenAI's cheap mini variant of gpt-image-1 — exposed for cost-tier
+    # workflows. The dashboard can route low-priority generation here when
+    # prefer_cost_efficiency is set.
+    gpt_image_mini_model: str = OPENAI_IMAGE_MINI_MODEL
     flux_pro_model: str = "fal-ai/flux-pro/v1.1"
     flux_kontext_model: str = "fal-ai/flux-pro/kontext"
 
