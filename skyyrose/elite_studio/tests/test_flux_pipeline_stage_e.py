@@ -12,7 +12,6 @@ import asyncio
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
-
 from skyyrose.elite_studio.agents.vision_audit_agent import (
     VisionAuditResult,
     VisionAuditViolation,

@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 
-
 def test_catalog_path_resolves_to_canonical_csv() -> None:
     """_CATALOG_PATH must equal the canonical CATALOG_CSV (or resolve to same file)."""
     import skyyrose.elite_studio.fashion.context as ctx_mod
@@ -18,9 +17,9 @@ def test_catalog_path_exists_on_disk() -> None:
     """The resolved path must be an actual file (not the stale /Users/theceo/data/... path)."""
     import skyyrose.elite_studio.fashion.context as ctx_mod
 
-    assert Path(str(ctx_mod._CATALOG_PATH)).is_file(), (
-        f"catalog path {ctx_mod._CATALOG_PATH} does not exist on disk"
-    )
+    assert Path(
+        str(ctx_mod._CATALOG_PATH)
+    ).is_file(), f"catalog path {ctx_mod._CATALOG_PATH} does not exist on disk"
 
 
 def test_load_catalog_returns_dict_keyed_by_sku() -> None:
@@ -40,6 +39,6 @@ def test_context_reads_collection_column_not_collection_slug() -> None:
     import skyyrose.elite_studio.fashion.context as ctx_mod
 
     src = Path(ctx_mod.__file__).read_text(encoding="utf-8")
-    assert "collection_slug" not in src, (
-        "fashion/context.py still references retired collection_slug column"
-    )
+    assert (
+        "collection_slug" not in src
+    ), "fashion/context.py still references retired collection_slug column"

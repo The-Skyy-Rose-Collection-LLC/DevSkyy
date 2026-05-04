@@ -1,10 +1,13 @@
 from pathlib import Path
 from unittest.mock import patch
+
 from skyyrose.elite_studio.agents.generator_agent import GeneratorAgent
+
 
 def _make_agent(tmp_path):
     with patch("skyyrose.elite_studio.agents.generator_agent.OpenAI"):
         return GeneratorAgent(output_dir=str(tmp_path))
+
 
 def test_generate_returns_generation_result(tmp_path):
     agent = _make_agent(tmp_path)
@@ -26,6 +29,7 @@ def test_generate_returns_generation_result(tmp_path):
     assert result.output_path.endswith(".webp") or result.output_path.endswith(".png")
     assert Path(result.output_path).exists()
 
+
 def test_generate_fails_if_both_models_fail(tmp_path):
     agent = _make_agent(tmp_path)
 
@@ -37,6 +41,7 @@ def test_generate_fails_if_both_models_fail(tmp_path):
 
     assert not result.success
     assert "quota" in result.error or "503" in result.error
+
 
 def test_winner_selection_prefers_a_on_tie(tmp_path):
     """When scores are equal, agent A (GPT-Image) wins."""
