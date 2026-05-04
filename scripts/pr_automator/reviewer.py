@@ -9,6 +9,8 @@ import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from scripts.pr_automator.core import git_run
+
 logger = logging.getLogger("pr_automator.reviewer")
 
 REVIEWER_SYSTEM_PROMPT = """\
@@ -299,26 +301,6 @@ def fetch_diff(
         pr_number,
         proc.stderr.strip()[:200],
     )
-    # Find merge-base between base_ref and HEAD inside the worktree.
-    mb = subprocess.run(
-        ["git", "merge-base", base_ref, "HEAD"],
-        cwd=worktree,
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=60,
-    )
-    if mb.returncode != 0:
-        raise RuntimeError(f"git merge-base {base_ref} HEAD failed: {mb.stderr.strip()[:300]}")
-    base_sha = mb.stdout.strip()
-    diff = subprocess.run(
-        ["git", "diff", f"{base_sha}..HEAD"],
-        cwd=worktree,
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=120,
-    )
-    if diff.returncode != 0:
-        raise RuntimeError(f"git diff fallback failed: {diff.stderr.strip()[:300]}")
-    return diff.stdout
+    # Delegate to core.git_run for a single timeout policy across the package.
+    base_sha = git_run(worktree, "merge-base", base_ref, "HEAD")
+    return git_run(worktree, "diff", f"{base_sha}..HEAD")

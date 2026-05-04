@@ -9,7 +9,16 @@ import sys
 import time
 from pathlib import Path
 
-from scripts.pr_automator.core import GhClient, GhError, RiskPaths, State, setup_logging
+from scripts.pr_automator.core import (
+    GhClient,
+    GhError,
+    RiskPaths,
+    State,
+)
+from scripts.pr_automator.core import git_run as _git
+from scripts.pr_automator.core import (
+    setup_logging,
+)
 from scripts.pr_automator.gates import run_gates
 from scripts.pr_automator.merge_gate import (
     MAX_CYCLES_PER_SHA,
@@ -34,22 +43,6 @@ PR_VIEW_FIELDS = [
     "mergeStateStatus",
     "reviews",
 ]
-
-
-def _git(worktree: Path, *args: str, check: bool = True, timeout: int = 120) -> str:
-    """Run git in ``worktree``. ``timeout`` defaults to 120 s — fetch/push can
-    hang indefinitely on a flaky network without it."""
-    proc = subprocess.run(
-        ["git", *args],
-        cwd=worktree,
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=timeout,
-    )
-    if check and proc.returncode != 0:
-        raise RuntimeError(f"git {' '.join(args)} failed: {proc.stderr.strip()}")
-    return proc.stdout.strip()
 
 
 def _cleanup_worktree(repo_root: Path, pr_number: int) -> None:
@@ -87,6 +80,115 @@ def prepare_worktree(repo_root: Path, pr_number: int, head_ref: str, head_sha: s
     return target
 
 
+# ---------------------------------------------------------------------------
+# Cycle helpers — run_cycle is now a thin orchestrator over these.
+# ---------------------------------------------------------------------------
+
+
+def _try_label(gh: GhClient, pr_number: int, label: str, dry_run: bool) -> None:
+    """Best-effort label add; logs a warning if it fails."""
+    if dry_run:
+        return
+    try:
+        gh.pr_label_add(pr_number, label)
+    except GhError as e:
+        logger.warning("could not add `%s` label to #%s: %s", label, pr_number, e)
+
+
+def _check_opt_in(labels: set[str], pr_number: int, force: bool) -> bool:
+    """Return True if cycle should proceed, False to skip."""
+    if OPT_IN_LABEL in labels:
+        return True
+    if not force:
+        logger.info(
+            "PR #%s missing `%s` label — skipping (add it with `gh pr edit %s --add-label %s`, or pass --force)",
+            pr_number,
+            OPT_IN_LABEL,
+            pr_number,
+            OPT_IN_LABEL,
+        )
+        return False
+    logger.warning("--force: bypassing opt-in label check on PR #%s", pr_number)
+    return True
+
+
+def _get_changed_files(
+    gh: GhClient,
+    worktree: Path,
+    pr_number: int,
+    base_ref: str,
+) -> list[str] | None:
+    """Get the PR's changed-file list. ``None`` signals fatal failure."""
+    try:
+        return gh.pr_changed_files(pr_number)
+    except GhError as e:
+        logger.warning(
+            "gh pr diff (--name-only) failed (%s) — falling back to local git diff",
+            str(e).splitlines()[0][:200],
+        )
+    try:
+        mb = _git(worktree, "merge-base", base_ref, "HEAD")
+        out = _git(worktree, "diff", "--name-only", f"{mb}..HEAD")
+        return [line.strip() for line in out.splitlines() if line.strip()]
+    except (RuntimeError, subprocess.TimeoutExpired) as ge:
+        # TimeoutExpired is an Exception, NOT a RuntimeError — caught explicitly
+        # so a hung git fetch/diff returns a clean failure instead of crashing
+        # the cycle with an uncaught traceback.
+        logger.error("local git diff fallback failed: %s", ge)
+        return None
+
+
+def _get_review(
+    skip_review: bool, worktree: Path, pr_number: int, base_ref: str
+) -> ReviewVerdict | None:
+    """Get the reviewer-agent verdict. ``None`` signals fatal failure."""
+    if skip_review:
+        return ReviewVerdict(
+            verdict="DEFER_HUMAN",
+            confidence=0,
+            scope_assessment="(reviewer skipped)",
+            risk_assessment="unknown",
+            defer_reasons=["--skip-review flag set"],
+        )
+    diff_text = fetch_diff(worktree, pr_number, base_ref=base_ref)
+    try:
+        return ReviewerAgent().review(pr_number, diff_text)
+    except Exception as e:  # pragma: no cover - subprocess failures
+        logger.error("reviewer agent failed: %s", e)
+        return None
+
+
+def _post_review(gh: GhClient, review: ReviewVerdict, gates_pass: bool, pr_number: int) -> None:
+    decision_flag = (
+        "APPROVE"
+        if review.is_approve and gates_pass
+        else ("COMMENT" if review.is_defer else "REQUEST_CHANGES")
+    )
+    try:
+        gh.pr_review(pr_number, decision_flag, review.to_yaml_body())
+    except GhError as e:
+        logger.warning("could not post review: %s", e)
+
+
+def _do_merge(gh: GhClient, repo_root: Path, pr_number: int, admin: bool, dry_run: bool) -> int:
+    """Execute the squash merge and clean up. Returns 0 on success, 3 on failure."""
+    logger.info(
+        "PR #%s — predicate green, merging (squash%s)",
+        pr_number,
+        " --admin" if admin else "",
+    )
+    if dry_run:
+        return 0
+    try:
+        gh.pr_merge(pr_number, method="squash", admin=admin)
+        logger.info("MERGED #%s", pr_number)
+        _cleanup_worktree(repo_root, pr_number)
+        return 0
+    except GhError as e:
+        logger.error("merge failed: %s", e)
+        return 3
+
+
 def run_cycle(
     pr_number: int,
     repo_root: Path,
@@ -114,17 +216,8 @@ def run_cycle(
     head_ref = pr["headRefName"]
     labels = {lbl["name"] for lbl in pr.get("labels", [])}
 
-    if OPT_IN_LABEL not in labels and not force:
-        logger.info(
-            "PR #%s missing `%s` label — skipping (use `gh pr edit %s --add-label %s` to opt in, or pass --force)",
-            pr_number,
-            OPT_IN_LABEL,
-            pr_number,
-            OPT_IN_LABEL,
-        )
+    if not _check_opt_in(labels, pr_number, force):
         return 2
-    if force and OPT_IN_LABEL not in labels:
-        logger.warning("--force: bypassing opt-in label check on PR #%s", pr_number)
 
     pr_state = state.for_pr(pr_number)
     if pr_state.last_sha == head_sha and pr_state.cycle_count >= MAX_CYCLES_PER_SHA:
@@ -134,13 +227,7 @@ def run_cycle(
             MAX_CYCLES_PER_SHA,
             head_sha[:8],
         )
-        if not dry_run:
-            try:
-                gh.pr_label_add(pr_number, NEEDS_HUMAN_LABEL)
-            except GhError as e:
-                logger.warning(
-                    "could not add `%s` label to #%s: %s", NEEDS_HUMAN_LABEL, pr_number, e
-                )
+        _try_label(gh, pr_number, NEEDS_HUMAN_LABEL, dry_run)
         return 2
 
     logger.info(
@@ -154,67 +241,25 @@ def run_cycle(
     worktree = prepare_worktree(repo_root, pr_number, head_ref, head_sha)
     base_ref = f"origin/{pr.get('baseRefName', 'main')}"
 
-    # gh pr diff caps at 300 files; fall back to local git on overflow.
-    try:
-        changed = gh.pr_changed_files(pr_number)
-    except GhError as e:
-        logger.warning(
-            "gh pr diff (--name-only) failed (%s) — falling back to local git diff",
-            str(e).splitlines()[0][:200],
-        )
-        try:
-            mb = _git(worktree, "merge-base", base_ref, "HEAD")
-            out = _git(worktree, "diff", "--name-only", f"{mb}..HEAD")
-            changed = [line.strip() for line in out.splitlines() if line.strip()]
-        except (RuntimeError, subprocess.TimeoutExpired) as ge:
-            # TimeoutExpired is an Exception, NOT a RuntimeError — caught
-            # explicitly so a hung git fetch/diff returns exit code 3 instead
-            # of crashing the cycle with an uncaught traceback.
-            logger.error("local git diff fallback failed: %s", ge)
-            return 3
-
+    changed = _get_changed_files(gh, worktree, pr_number, base_ref)
+    if changed is None:
+        return 3
     logger.info("changed files: %d", len(changed))
 
-    # The earlier design auto-pushed `make format` fixes here, but that
-    # short-circuited the gates → reviewer → merge-gate flow and pushed code
-    # to the PR branch with zero predicate enforcement. The reviewer agent
-    # now flags lint/format issues as REQUEST_CHANGES findings — humans (or
-    # a future cycle, after explicit opt-in) apply them.
+    # Auto-fix push was removed in 8b98db990: it bypassed the entire
+    # 10-check predicate. The reviewer now flags lint/format issues as
+    # REQUEST_CHANGES findings instead.
     gates = run_gates(worktree, changed)
     logger.info("gates:\n%s", gates.render())
 
-    # Reviewer agent (skippable for fast smoke testing).
-    if skip_review:
-        review = ReviewVerdict(
-            verdict="DEFER_HUMAN",
-            confidence=0,
-            scope_assessment="(reviewer skipped)",
-            risk_assessment="unknown",
-            defer_reasons=["--skip-review flag set"],
-        )
-    else:
-        diff_text = fetch_diff(worktree, pr_number, base_ref=base_ref)
-        agent = ReviewerAgent()
-        try:
-            review = agent.review(pr_number, diff_text)
-        except Exception as e:  # pragma: no cover - subprocess failures
-            logger.error("reviewer agent failed: %s", e)
-            return 3
+    review = _get_review(skip_review, worktree, pr_number, base_ref)
+    if review is None:
+        return 3
     logger.info("reviewer verdict: %s (confidence %d)", review.verdict, review.confidence)
 
-    # 4. Post the review on GitHub (unless dry-run or skipped).
     if not skip_review and not dry_run:
-        try:
-            decision_flag = (
-                "APPROVE"
-                if review.is_approve and gates.all_pass
-                else ("COMMENT" if review.is_defer else "REQUEST_CHANGES")
-            )
-            gh.pr_review(pr_number, decision_flag, review.to_yaml_body())
-        except GhError as e:
-            logger.warning("could not post review: %s", e)
+        _post_review(gh, review, gates.all_pass, pr_number)
 
-    # 5. Evaluate merge predicate.
     risk_paths = RiskPaths.load(package_root() / "RISK_PATHS.txt")
     decision = evaluate(
         pr_number=pr_number,
@@ -228,7 +273,6 @@ def run_cycle(
     )
     logger.info("\n%s", decision.render())
 
-    # 6. Merge if green.
     state.record_cycle(
         pr_number,
         head_sha,
@@ -238,28 +282,42 @@ def run_cycle(
     )
 
     if decision.can_merge:
-        logger.info(
-            "PR #%s — predicate green, merging (squash%s)",
-            pr_number,
-            " --admin" if admin else "",
-        )
-        if not dry_run:
-            try:
-                gh.pr_merge(pr_number, method="squash", admin=admin)
-                logger.info("MERGED #%s", pr_number)
-                _cleanup_worktree(repo_root, pr_number)
-            except GhError as e:
-                logger.error("merge failed: %s", e)
-                return 3
-        return 0
+        return _do_merge(gh, repo_root, pr_number, admin, dry_run)
 
-    if review.is_defer and not dry_run:
-        try:
-            gh.pr_label_add(pr_number, NEEDS_HUMAN_LABEL)
-        except GhError as e:
-            logger.warning("could not add `%s` label to #%s: %s", NEEDS_HUMAN_LABEL, pr_number, e)
-
+    if review.is_defer:
+        _try_label(gh, pr_number, NEEDS_HUMAN_LABEL, dry_run)
     return 2
+
+
+def gc_worktrees(repo_root: Path, open_pr_numbers: set[int]) -> int:
+    """Remove cached per-PR worktrees for PRs that are no longer open.
+
+    A PR-closed-without-merge case (or a long-stale PR that's been
+    superseded) leaves a `pr-auto-{N}` worktree on disk that the merge
+    cleanup never reaches. This GC pass — called once per ``watch_loop``
+    iteration — reclaims those. Open PRs are always preserved; the GC is
+    intentionally conservative.
+
+    Returns the number of worktrees removed.
+    """
+    base = repo_root / ".claude/worktrees"
+    if not base.exists():
+        return 0
+    removed = 0
+    for child in base.iterdir():
+        name = child.name
+        if not name.startswith("pr-auto-"):
+            continue
+        try:
+            pr_n = int(name.removeprefix("pr-auto-"))
+        except ValueError:
+            continue
+        if pr_n in open_pr_numbers:
+            continue
+        logger.info("gc: PR #%s no longer open — removing worktree", pr_n)
+        _cleanup_worktree(repo_root, pr_n)
+        removed += 1
+    return removed
 
 
 def watch_loop(repo_root: Path, *, interval: int, dry_run: bool, admin: bool) -> int:
@@ -273,6 +331,9 @@ def watch_loop(repo_root: Path, *, interval: int, dry_run: bool, admin: bool) ->
             logger.error("gh pr list failed: %s — sleeping", e)
             time.sleep(interval)
             continue
+
+        # Reap worktrees for PRs that are no longer open.
+        gc_worktrees(repo_root, {int(p["number"]) for p in prs})
 
         for pr in prs:
             labels = {lbl["name"] for lbl in pr.get("labels", [])}

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 import fnmatch
 import json
 import logging
@@ -22,6 +23,40 @@ def setup_logging(verbose: bool = False) -> None:
         format="%(asctime)s %(levelname)-7s %(name)s: %(message)s",
         datefmt="%H:%M:%S",
     )
+
+
+# ---------------------------------------------------------------------------
+# git wrapper — single timeout policy shared by every git invocation
+# ---------------------------------------------------------------------------
+
+
+def git_run(
+    cwd: Path,
+    *args: str,
+    check: bool = True,
+    timeout: int = 120,
+) -> str:
+    """Run ``git`` in ``cwd`` with a uniform timeout. Returns stripped stdout.
+
+    Centralised here so ``__main__`` and ``reviewer`` share one timeout
+    policy and one error shape — the previous design had three separate
+    ``subprocess.run([git, ...])`` paths with drift potential.
+
+    Raises ``RuntimeError`` on non-zero exit (when ``check=True``) and
+    propagates ``subprocess.TimeoutExpired`` to the caller — both must be
+    caught at every call site that runs in a long-lived loop.
+    """
+    proc = subprocess.run(
+        ["git", *args],
+        cwd=cwd,
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+    )
+    if check and proc.returncode != 0:
+        raise RuntimeError(f"git {' '.join(args)} failed: {proc.stderr.strip()}")
+    return proc.stdout.strip()
 
 
 # ---------------------------------------------------------------------------
@@ -149,6 +184,20 @@ class PrCycleState:
 
 @dataclass
 class State:
+    """Persistent automator state.
+
+    Deliberate exception to the project's "create new objects, never mutate"
+    rule. ``State`` is a single-writer persistence object: every mutation
+    flows through ``record_cycle`` / ``for_pr`` and is immediately serialised
+    to disk via ``save()``. A copy-on-write pattern would either force every
+    caller to reassign the State instance after each update (verbose, error-
+    prone in long-running loops) or require a global pointer indirection.
+    The single-writer invariant is enforced operationally — only one
+    ``--watch`` daemon and ``--once`` invocation should run concurrently —
+    backed by atomic writes (tmp + os.replace) so concurrent readers are
+    safe.
+    """
+
     paused: bool = False
     prs: dict[str, PrCycleState] = field(default_factory=dict)
 
@@ -158,7 +207,13 @@ class State:
         if not path.exists():
             return cls()
         raw = json.loads(path.read_text())
-        prs = {k: PrCycleState(**v) for k, v in raw.get("prs", {}).items()}
+        # Filter to known fields so adding/removing PrCycleState fields
+        # doesn't break loading an older state.json.
+        known = set(PrCycleState.__dataclass_fields__)
+        prs = {
+            k: PrCycleState(**{kk: vv for kk, vv in v.items() if kk in known})
+            for k, v in raw.get("prs", {}).items()
+        }
         return cls(paused=raw.get("paused", False), prs=prs)
 
     def save(self) -> None:
@@ -172,7 +227,7 @@ class State:
         path = state_path()
         payload = {
             "paused": self.paused,
-            "prs": {k: v.__dict__ for k, v in self.prs.items()},
+            "prs": {k: dataclasses.asdict(v) for k, v in self.prs.items()},
         }
         tmp = path.with_suffix(".tmp")
         tmp.write_text(json.dumps(payload, indent=2))
