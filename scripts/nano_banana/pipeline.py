@@ -142,7 +142,6 @@ class ProductionPipeline:
             generate_gpt,
         )
         from nano_banana.prompt_registry import PromptRegistry
-        from nano_banana.prompts import composite_prompt
         from nano_banana.router import route_product
         from nano_banana.tournament import run_tournament
         from nano_banana.utils import quality_gate, save_image
@@ -310,6 +309,10 @@ class ProductionPipeline:
             result.issues.append(f"QA failed: {exc}")
 
         # ── Step 5: REFINE (conditional) ─────────────────────────────
+        # Three independent triggers: vision-judge text/logo thresholds
+        # AND the synthesis judge's hallucination veto. The veto is
+        # luxury-brand-disqualifying — even renders with high text/logo
+        # scores must be refined if Opus says they hallucinated.
         needs_refine = False
         if hasattr(qa_result, "judges"):
             for judge in qa_result.judges:
@@ -332,23 +335,38 @@ class ProductionPipeline:
                     )
                     break
 
+        # Hallucination-veto override — synthesis judge sees what vision
+        # pair averaged-out. If the veto fired, refine regardless of the
+        # threshold-based triggers above.
+        synth_judge = qa_result.synthesis_judge if hasattr(qa_result, "synthesis_judge") else None
+        if synth_judge and getattr(synth_judge, "hallucination_veto", False):
+            if not needs_refine:
+                log.info("REFINE triggered: synthesis hallucination_veto=True")
+            needs_refine = True
+
         if needs_refine and result.qa_score < cfg.qa_auto_approve:
             log.info("Attempting refinement...")
             refined_bytes = None
 
+            # Build a refinement prompt that consumes the synthesis
+            # judge's `suggested_fixes` and `issues`. This is the Layer 1
+            # feedback wiring — without it, the refinement ran with a
+            # generic "fix branding" prompt regardless of what the
+            # judges actually identified.
+            refine_prompt = _build_refinement_prompt(name, sku, qa_result)
+            log.info("REFINE prompt:\n%s", refine_prompt)
+
             # Try Kontext first (if fal available)
             if self.fal_available:
-                refine_prompt = (
-                    f"Fix the text and logo accuracy on this {name}. "
-                    f"Make all branding crisp and legible. "
-                    f"Keep everything else identical."
-                )
                 refined_bytes = refine_with_kontext(output_path, refine_prompt)
 
-            # Fallback: Gemini composite
+            # Fallback: Gemini composite — pass the same synthesis-aware
+            # prompt instead of the generic composite_prompt, so the
+            # fallback path also benefits from the feedback loop.
             if not refined_bytes and source_path.exists():
-                comp_prompt = composite_prompt(name, sku, view)
-                refined_bytes = composite_gemini(self.genai, output_path, source_path, comp_prompt)
+                refined_bytes = composite_gemini(
+                    self.genai, output_path, source_path, refine_prompt
+                )
 
             if refined_bytes and quality_gate(refined_bytes, sku, f"{view}-refined"):
                 save_image(refined_bytes, output_path)
@@ -519,6 +537,69 @@ class ProductionPipeline:
             log.info("DESCRIBE: cached vision for %s", sku)
 
         return desc
+
+
+def _build_refinement_prompt(name: str, sku: str, qa_result) -> str:
+    """Construct a refinement prompt that consumes the synthesis judge's fixes.
+
+    Three tiers, strictly more informative as judge data quality improves:
+
+    1. **Synthesis-aware** (preferred): Opus 4.7 ran successfully and
+       produced consensus-filtered fixes via its `suggested_fixes` and
+       severity-prioritized issues via its `issues`. We pass these
+       directly. If `hallucination_veto` fired, we prepend a hard
+       negative constraint — hallucinations are luxury-brand-disqualifying
+       and need explicit removal direction.
+
+    2. **Vision-pair fallback**: synthesis judge unavailable or failed.
+       Fall back to `qa_result.all_fixes` (deduped union from the vision
+       pair). Noisier than synthesis output but still better than
+       generic.
+
+    3. **Catchall**: no fix data at all. Use the original generic prompt.
+
+    The model needs both negative space (what's wrong) and positive
+    direction (what to do); image gen models do better with both signals.
+    """
+    synth = qa_result.synthesis_judge if hasattr(qa_result, "synthesis_judge") else None
+
+    parts = [
+        f"This is a {name} ({sku}) product render that scored "
+        f"{qa_result.aggregate_score:.0f}/100 in QA review and needs correction."
+    ]
+
+    if synth and synth.overall > 0:
+        # Tier 1 — synthesis-aware
+        if getattr(synth, "hallucination_veto", False):
+            parts.append(
+                "CRITICAL: This render contains hallucinated decorative elements "
+                "not in the spec. These must be completely removed. Do not "
+                "introduce any new decorations, motifs, logos, text, or details "
+                "that are not explicitly listed in the corrections below."
+            )
+        if synth.issues:
+            issues_block = "\n".join(f"  - {issue}" for issue in synth.issues[:5])
+            parts.append(f"DEFECTS PRESENT IN CURRENT RENDER:\n{issues_block}")
+        if synth.suggested_fixes:
+            fixes_block = "\n".join(f"  - {fix}" for fix in synth.suggested_fixes[:5])
+            parts.append(f"REQUIRED CORRECTIONS:\n{fixes_block}")
+        parts.append(
+            "Apply these corrections precisely. Preserve all unrelated elements "
+            "unchanged. Do not add any decorations, text, logos, or details "
+            "beyond what is explicitly required."
+        )
+    elif qa_result.all_fixes:
+        # Tier 2 — vision-pair union fallback
+        fixes_block = "\n".join(f"  - {fix}" for fix in qa_result.all_fixes[:5])
+        parts.append(f"REQUIRED CORRECTIONS:\n{fixes_block}\n\nKeep all other elements identical.")
+    else:
+        # Tier 3 — catchall (original generic prompt)
+        parts.append(
+            f"Fix the text and logo accuracy on this {name}. "
+            "Make all branding crisp and legible. Keep everything else identical."
+        )
+
+    return "\n\n".join(parts)
 
 
 def _find_bundle_dir(name: str, sku: str) -> Path | None:

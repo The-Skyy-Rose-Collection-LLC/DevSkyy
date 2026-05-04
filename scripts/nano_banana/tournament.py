@@ -1,9 +1,9 @@
 """Tournament judging — 3-judge architecture (vision pair + synthesis).
 
 Architecture:
-- GPT-4o and Gemini 2.5 Flash run in parallel as VISION judges, each
-  comparing the candidate image against the source spec image and
-  producing a structured 7-axis score.
+- GPT-5.5-Pro and Gemini 3.1 Pro Preview run in parallel as VISION
+  judges, each comparing the candidate image against the source spec
+  image and producing a structured 7-axis score.
 - Claude Opus 4.7 then runs as a TEXT-ONLY SYNTHESIS judge: it reads the
   two vision reports + the DNA spec and produces a final reasoned
   judgment, including a rationale, vision-consensus signal, and a
@@ -13,7 +13,8 @@ Architecture:
 
 Aggregate score is Opus's `overall`. The vision-pair mean is exposed on
 TournamentResult as a sanity check on Opus's reasoning, not as the
-canonical aggregate.
+canonical aggregate. See scripts/nano_banana/CURRENT_MODELS.md for
+verified model IDs and SDK contracts.
 """
 
 from __future__ import annotations
@@ -96,7 +97,7 @@ Your role is synthesis, not duplication. Specifically:
 PRODUCT SPEC (ground truth):
 {spec}
 
---- VISION JUDGE 1: GPT-4o ---
+--- VISION JUDGE 1: {gpt_model} ---
 Overall: {gpt_overall}/100
 garment_type: {gpt_garment_type}, color_accuracy: {gpt_color_accuracy},
 text_accuracy: {gpt_text_accuracy}, logo_accuracy: {gpt_logo_accuracy},
@@ -104,7 +105,7 @@ construction_accuracy: {gpt_construction_accuracy}, no_hallucinations: {gpt_no_h
 Issues: {gpt_issues}
 Suggested fixes: {gpt_fixes}
 
---- VISION JUDGE 2: Gemini-2.5-flash ---
+--- VISION JUDGE 2: {gemini_model} ---
 Overall: {gemini_overall}/100
 garment_type: {gemini_garment_type}, color_accuracy: {gemini_color_accuracy},
 text_accuracy: {gemini_text_accuracy}, logo_accuracy: {gemini_logo_accuracy},
@@ -200,6 +201,16 @@ class TournamentResult:
     all_fixes: list[str] = field(default_factory=list)
     vision_pair_mean: float = 0.0
     synthesis_overall: float | None = None
+
+    @property
+    def synthesis_judge(self) -> JudgmentScore | None:
+        """Return the Opus synthesis judge if it ran, else None.
+
+        Match by model label against OPUS_SYNTHESIS_MODEL. If synthesis
+        failed, the JudgmentScore is still emitted with that label —
+        callers can detect failure via `j.overall == 0` and `j.issues`.
+        """
+        return next((j for j in self.judges if j.judge == OPUS_SYNTHESIS_MODEL), None)
 
     def to_dict(self) -> dict:
         return {
@@ -449,6 +460,8 @@ def _format_synthesis_prompt(spec: str, gpt: JudgmentScore, gemini: JudgmentScor
 
     return SYNTHESIS_PROMPT.format(
         spec=spec,
+        gpt_model=GPT_JUDGE_MODEL,
+        gemini_model=GEMINI_JUDGE_MODEL,
         gpt_overall=gpt.overall,
         gpt_garment_type=gpt.garment_type,
         gpt_color_accuracy=gpt.color_accuracy,
