@@ -3,6 +3,36 @@
  * Editorial magazine layouts, technical concrete details.
  */
 
+/* ==========================================================================
+   Scroll Reveal — toggled by the unified observer in
+   assets/js/premium-interactions.js (selector: ".abt-page .rv").
+   ========================================================================== */
+.abt-page .rv {
+	opacity: 0;
+	transform: translateY(30px);
+	transition:
+		opacity 0.8s cubic-bezier(.16, 1, .3, 1),
+		transform 0.8s cubic-bezier(.16, 1, .3, 1);
+}
+
+.abt-page .rv.is-visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.abt-page .rv-d1 { transition-delay: 0.1s; }
+.abt-page .rv-d2 { transition-delay: 0.2s; }
+.abt-page .rv-d3 { transition-delay: 0.3s; }
+.abt-page .rv-d4 { transition-delay: 0.4s; }
+
+@media (prefers-reduced-motion: reduce) {
+	.abt-page .rv {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+}
+
 .abt-page {
 	background: transparent; /* Relies on global body background/grain */
 	color: #fff;
