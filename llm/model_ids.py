@@ -98,8 +98,12 @@ MESHY_AI_MODEL = "meshy-5"  # mirrored in ai_3d/providers/meshy.py
 # Update the constants above to roll forward; callers stay the same.
 # ---------------------------------------------------------------------------
 
+# Elite-team reasoning policy: Opus 4.7 reasons for the elite team. Every
+# slot in skyyrose/elite_studio/ that performs deep analysis, verdict-making,
+# or judgment runs on CLAUDE_OPUS_MODEL. The trade is throughput/cost for
+# frontier-tier quality — explicit choice for luxury-brand QC.
 VISION_CLAUDE_MODEL = CLAUDE_OPUS_MODEL  # vision_agent / claude vision calls
-QC_CLAUDE_MODEL = CLAUDE_SONNET_MODEL  # quality_agent.verify
+QC_CLAUDE_MODEL = CLAUDE_OPUS_MODEL  # quality_agent.verify — elite QC reasoning
 COMPOSITOR_CLAUDE_MODEL = CLAUDE_OPUS_MODEL  # compositor_agent prompt synth
 RAS_GENERATION_MODEL = GEMINI_FLASH_IMAGE_MODEL  # 3D + generator agents
 GENERATION_MODEL = GEMINI_FLASH_IMAGE_MODEL  # default image generation
@@ -120,12 +124,14 @@ FAST_MODEL = CLAUDE_HAIKU_MODEL  # classification, simple tasks
 
 # Compositor stage models (legacy names kept for back-compat)
 COMPOSITOR_OPUS_MODEL = COMPOSITOR_CLAUDE_MODEL
-# Visual QA = vision-input / structured-text-output. Pointed at the text Pro
-# model (gemini-3-pro-preview): multimodal input + deep reasoning + reliable
-# structured output. NOT the image-gen FLASH model — that one defaults to
-# image output and would either fail or need response_modalities=["TEXT"]
-# every call.
-COMPOSITOR_QA_MODEL = GEMINI_PRO_MODEL  # visual QA — deep structured analysis
+# Visual QA = vision-input / structured-verdict-text-output. Reasoning task →
+# CLAUDE_OPUS_MODEL per the elite-team reasoning policy above. Opus is
+# multimodal (accepts images), produces reliable structured text, and is the
+# frontier reasoning tier. Earlier iterations of this alias pointed at
+# gemini-3.1-flash-image-preview (an IMAGE-GEN model, wrong API family for
+# verdict text) and later gemini-3-pro-preview (right family but Google-side);
+# the team's policy is that Opus reasons for the elite pipeline.
+COMPOSITOR_QA_MODEL = CLAUDE_OPUS_MODEL  # visual QA — frontier vision reasoning
 
 __all__ = [
     "CLAUDE_HAIKU_MODEL",
