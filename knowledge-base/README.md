@@ -131,6 +131,16 @@ Curated index of canonical sources for a given technical or business domain. The
 
 Curated extracts from existing memory systems, written during Phase 0 KB seeding. These are pointers + context, not duplications. They tell future loops "here's where to look in the existing system for X."
 
+**Seed entries (read in this order when context is needed):**
+
+1. **`from-interview.md`** — autobiographical canon from Corey: visual references (KITH, Coach, Palm Angels, Drake Related, ALD, FOG Eternal, The Row, Jacquemus, Document/i-D), anti-references (no blue, no clichés, no dry reveals, no lackluster, no dated, no gendered framing), Oakland canon (Deep East, Hills, Stone City, The 100s, Brookfield, Sobrante Park, Coliseum, Real Oakland, The Shows, Sequoyah Highlands), engineering rules, reality check (imagery is #1 blocker)
+2. **`from-serena.md`** — index of Serena memories that matter for which task type
+3. **`from-gsd.md`** — index of GSD `.planning/` artifacts that matter
+4. **`from-claude-mem.md`** — categorized index of high-leverage claude-mem `[cmem #NNN]` IDs by domain
+5. **`from-openwolf.md`** — pointer to `.wolf/cerebrum.md` Key Learnings + Do-Not-Repeat sections
+
+**`from-interview.md` is PRIMARY SOURCE** — when there's a conflict between it and any derived doc (eval/brand-story.md, banned-elements.md, etc.), the interview wins.
+
 ---
 
 ## Cross-reference conventions

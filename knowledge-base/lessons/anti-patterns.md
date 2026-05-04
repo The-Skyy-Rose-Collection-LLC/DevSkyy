@@ -464,3 +464,34 @@ TypeScript function that returns `undefined` without being explicitly typed as `
 with an empty body.
 
 **Cross-refs:** `[serena: coding_standards]`, `[serena: CRITICAL_WORKFLOW_DIRECTIVE]`, `[v2: §0.3]`
+
+---
+
+## AP-16: Glob Fishing Instead of Consulting Canonical Source
+
+**What it looks like:**
+The agent runs `grep -rn "X" .` or `find . -name "*Y*"` six times across the repo to locate definitions, behaviors, or data that have a *known canonical source*. The agent burns tokens reading files that turn out to be derivatives, archives, or stale copies of the canonical source.
+
+**Why it fails:**
+Every project of meaningful size has multiple representations of the same concept — a data file, three readers in different languages, four documentation references, a test fixture, an archived migration. Grepping reads them all and forces the agent to deduplicate manually, often picking the wrong one. The canonical source exists; failing to consult it first is a self-inflicted token wound and a correctness risk (e.g., reading a stale fixture, then writing code against it).
+
+**Evidence:**
+Corey, KB seed interview, 2026-05-03: "Identify verified source first, then execute with verified production code — no token-wasting glob fishing." `MEMORY.md` "CANONICAL CATALOG SOURCE": the catalog CSV is the only legitimate product data; reading anything else risks acting on retired-but-still-on-disk artifacts. AP-01 (Wrong Source Data Driving Everything Downstream) is the bug-shaped form of this anti-pattern; AP-16 is the prevention. [interview: from-interview.md §3 E1]
+
+**Replacement:**
+Before any task, name the canonical source(s) you'll consult in one sentence. Examples:
+- Touching product data → `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv` (+ `data/dossiers/{slug}.md` if rendering-related)
+- Touching brand canon → `eval/brand-story.md` + `knowledge-base/seed/from-interview.md`
+- Touching architecture → `knowledge-base/decisions/` + `docs/adr/`
+- Touching locked decisions → `docs/SKYYROSE_V2_MASTER_PLAN.md` §1.1
+- Touching per-page intent → `docs/SKYYROSE_WORDPRESS_PLAN.md` §6
+- Touching catalog reader code → `inc/product-catalog.php` (PHP) / `skyyrose/core/catalog_loader.py` (Python)
+
+If you cannot name the canonical source for what you're touching, **stop and ask** — do not start grepping.
+
+**Signal:**
+- Three or more `grep` / `find` / `Glob` calls in sequence with broad patterns (`-rn .`, `**/*`)
+- Reading more than 5 files just to figure out what the canonical version of a concept is
+- The same concept getting "discovered" in multiple sessions because the previous discovery wasn't recorded
+
+**Cross-refs:** `[interview: from-interview.md §3]`, `[wp: §1.5]`, `[v2: §0.3 Step 0]`, `AP-01` (Wrong Source Data), `AP-02` (Second Source of Truth)
