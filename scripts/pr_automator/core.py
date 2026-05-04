@@ -30,6 +30,14 @@ def setup_logging(verbose: bool = False) -> None:
 # ---------------------------------------------------------------------------
 
 
+class GitError(RuntimeError):
+    """Raised when ``git`` exits non-zero or times out.
+
+    Subclasses ``RuntimeError`` so existing callers that catch ``RuntimeError``
+    continue to work without modification.
+    """
+
+
 def git_run(
     cwd: Path,
     *args: str,
@@ -42,20 +50,23 @@ def git_run(
     policy and one error shape — the previous design had three separate
     ``subprocess.run([git, ...])`` paths with drift potential.
 
-    Raises ``RuntimeError`` on non-zero exit (when ``check=True``) and
-    propagates ``subprocess.TimeoutExpired`` to the caller — both must be
-    caught at every call site that runs in a long-lived loop.
+    Raises ``GitError`` on non-zero exit (when ``check=True``) or on timeout.
+    Callers should catch ``GitError`` — no need to also catch
+    ``subprocess.TimeoutExpired`` separately.
     """
-    proc = subprocess.run(
-        ["git", *args],
-        cwd=cwd,
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=timeout,
-    )
+    try:
+        proc = subprocess.run(
+            ["git", *args],
+            cwd=cwd,
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+    except subprocess.TimeoutExpired as e:
+        raise GitError(f"git {' '.join(args)} timed out after {timeout}s") from e
     if check and proc.returncode != 0:
-        raise RuntimeError(f"git {' '.join(args)} failed: {proc.stderr.strip()}")
+        raise GitError(f"git {' '.join(args)} failed: {proc.stderr.strip()}")
     return proc.stdout.strip()
 
 

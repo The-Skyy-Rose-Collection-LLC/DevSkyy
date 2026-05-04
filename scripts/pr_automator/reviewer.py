@@ -9,7 +9,7 @@ import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from scripts.pr_automator.core import git_run
+from scripts.pr_automator.core import GitError, git_run
 
 logger = logging.getLogger("pr_automator.reviewer")
 
@@ -302,5 +302,8 @@ def fetch_diff(
         proc.stderr.strip()[:200],
     )
     # Delegate to core.git_run for a single timeout policy across the package.
-    base_sha = git_run(worktree, "merge-base", base_ref, "HEAD")
-    return git_run(worktree, "diff", f"{base_sha}..HEAD")
+    try:
+        base_sha = git_run(worktree, "merge-base", base_ref, "HEAD")
+        return git_run(worktree, "diff", f"{base_sha}..HEAD")
+    except GitError as e:
+        raise RuntimeError(f"fetch_diff: git fallback failed for PR #{pr_number}: {e}") from e

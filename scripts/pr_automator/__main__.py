@@ -12,6 +12,7 @@ from pathlib import Path
 from scripts.pr_automator.core import (
     GhClient,
     GhError,
+    GitError,
     RiskPaths,
     State,
 )
@@ -130,10 +131,10 @@ def _get_changed_files(
         mb = _git(worktree, "merge-base", base_ref, "HEAD")
         out = _git(worktree, "diff", "--name-only", f"{mb}..HEAD")
         return [line.strip() for line in out.splitlines() if line.strip()]
-    except (RuntimeError, subprocess.TimeoutExpired) as ge:
-        # TimeoutExpired is an Exception, NOT a RuntimeError — caught explicitly
-        # so a hung git fetch/diff returns a clean failure instead of crashing
-        # the cycle with an uncaught traceback.
+    except GitError as ge:
+        # git_run raises GitError for both non-zero exit and timeout, so one
+        # catch is sufficient here — a hung git fetch/diff returns a clean
+        # failure instead of crashing the cycle with an uncaught traceback.
         logger.error("local git diff fallback failed: %s", ge)
         return None
 

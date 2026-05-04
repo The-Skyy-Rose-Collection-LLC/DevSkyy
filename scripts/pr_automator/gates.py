@@ -93,6 +93,8 @@ def _frontend_gates(worktree: Path) -> list[GateResult]:
     fe = worktree / "frontend"
     if not fe.exists():
         return []
+    if not _have("npm"):
+        return []
     results: list[GateResult] = []
     rc, out = _run(["npm", "run", "type-check", "--silent"], fe)
     results.append(_gate("frontend-type-check", rc, out, "types ok", "type errors", tail=2000))
