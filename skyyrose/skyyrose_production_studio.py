@@ -154,7 +154,7 @@ ANALYZE THIS PRODUCT PHOTO:
 RETURN: Detailed technical specifications in clear paragraphs. Be EXTREMELY specific about logos."""
 
         response = openai_client.chat.completions.create(
-            model="gpt-4o",
+            model=OPENAI_VISION_MODEL,
             messages=[
                 {
                     "role": "user",
@@ -179,7 +179,7 @@ RETURN: Detailed technical specifications in clear paragraphs. Be EXTREMELY spec
         return {
             "status": "ok",
             "provider": "openai",
-            "model": "gpt-4o",
+            "model": OPENAI_VISION_MODEL,
             "sku": sku,
             "view": view,
             "analysis": analysis,
@@ -253,7 +253,7 @@ VERIFY THIS PRODUCT PHOTO:
 RETURN: Concise technical assessment focused on brand consistency and generation requirements."""
 
         response = gemini_client.models.generate_content(
-            model="gemini-3-flash-preview",
+            model=GEMINI_VISION_MODEL,
             contents=[
                 prompt,
                 genai_types.Part(
@@ -267,7 +267,7 @@ RETURN: Concise technical assessment focused on brand consistency and generation
         return {
             "status": "ok",
             "provider": "google",
-            "model": "gemini-3-flash-preview",
+            "model": GEMINI_VISION_MODEL,
             "sku": sku,
             "view": view,
             "analysis": analysis,

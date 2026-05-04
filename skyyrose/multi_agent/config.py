@@ -20,7 +20,7 @@ PRODUCT_DATA_DIR = REPO_DIR / "skyyrose" / "assets" / "data"
 # Models — re-exported from llm.model_ids (single source of truth)
 # ---------------------------------------------------------------------------
 
-from llm.model_ids import (  # noqa: E402
+from llm.model_ids import (  # noqa: E402, F401  -- re-exported for legacy importers
     FAST_MODEL,
     ORCHESTRATOR_MODEL,
     SUBAGENT_MODEL,
