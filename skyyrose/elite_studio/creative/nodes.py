@@ -200,9 +200,9 @@ def three_d_model_node(state: dict) -> dict:
                 "success": True,
                 "model_path": sdk_glb_path,
                 "execution_mode": "sdk_agent",
-                "session_dir": sdk_result_payload.get("session_dir")
-                if sdk_result_payload
-                else None,
+                "session_dir": (
+                    sdk_result_payload.get("session_dir") if sdk_result_payload else None
+                ),
                 "error": "",
             },
             "model_output_path": sdk_glb_path,

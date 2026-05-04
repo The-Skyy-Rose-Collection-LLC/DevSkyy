@@ -172,9 +172,7 @@ async def generate_models(args: argparse.Namespace) -> None:
                         target_polycount=30000,
                     )
 
-                    model_path = (
-                        result.get("model_path") if isinstance(result, dict) else result
-                    )
+                    model_path = result.get("model_path") if isinstance(result, dict) else result
 
                     if model_path and Path(model_path).exists():
                         size_mb = Path(model_path).stat().st_size / (1024 * 1024)
