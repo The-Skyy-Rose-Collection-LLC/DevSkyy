@@ -26,9 +26,13 @@ from __future__ import annotations
 CLAUDE_OPUS_MODEL = "claude-opus-4-7"  # deepest reasoning, frontier intelligence
 CLAUDE_SONNET_MODEL = "claude-sonnet-4-6"  # workhorse, best speed/intelligence
 CLAUDE_HAIKU_MODEL = "claude-haiku-4-5"  # fast classification + simple tasks
-CLAUDE_MYTHOS_PREVIEW_MODEL = (
-    "claude-mythos-preview"  # new class — strongest at coding + cybersecurity (preview)
-)
+# claude-mythos-preview is invitation-only via Anthropic's Project Glasswing
+# (defensive cybersecurity research). Not accessible via standard API keys —
+# requests with this model ID return 404 unless your org is enrolled. Kept
+# here so the codebase is ready for Glasswing access; do NOT alias any
+# pipeline role to it unless you've confirmed enrollment.
+# Source: https://anthropic.com/glasswing
+CLAUDE_MYTHOS_PREVIEW_MODEL = "claude-mythos-preview"  # Glasswing-only
 
 # ---------------------------------------------------------------------------
 # Google Gemini (3.x family)
@@ -94,9 +98,13 @@ RAS_GENERATION_MODEL = GEMINI_FLASH_IMAGE_MODEL  # 3D + generator agents
 GENERATION_MODEL = GEMINI_FLASH_IMAGE_MODEL  # default image generation
 QC_MODEL = QC_CLAUDE_MODEL
 
-# Specialist roles — mythos-preview is strongest for these per Anthropic docs
-SECURITY_AUDIT_MODEL = CLAUDE_MYTHOS_PREVIEW_MODEL  # security_ops_agent — cybersecurity
-CODE_REVIEW_MODEL = CLAUDE_MYTHOS_PREVIEW_MODEL  # coding_doctor_agent — coding
+# Specialist roles. Sonnet is DevSkyy's "Best coding model" per
+# .claude/rules/performance.md — adequate for both security audit and code
+# review until/unless this org gets Glasswing access for mythos-preview.
+# Switch these to CLAUDE_MYTHOS_PREVIEW_MODEL only after confirming
+# enrollment; otherwise the agents will 404 on every call.
+SECURITY_AUDIT_MODEL = CLAUDE_SONNET_MODEL  # security_ops_agent
+CODE_REVIEW_MODEL = CLAUDE_SONNET_MODEL  # coding_doctor_agent
 
 # Multi-agent orchestrator roles (skyyrose/multi_agent)
 ORCHESTRATOR_MODEL = CLAUDE_OPUS_MODEL  # planning, decomposition
