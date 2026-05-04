@@ -43,6 +43,13 @@ GEMINI_PRO_MODEL = "gemini-3-pro-preview"  # text-only deep reasoning
 GEMINI_PRO_IMAGE_MODEL = "gemini-3-pro-image-preview"  # image gen, deep
 GEMINI_FLASH_IMAGE_MODEL = "gemini-3.1-flash-image-preview"  # image gen w/ refs
 
+# Gemini 2.x — kept callable for cheap text classification + ADK agents that
+# pin a 2.x flash for cost reasons. Distinct from GEMINI_VISION_MODEL (which
+# is the 3.x cheap vision model); a caller wanting "today's cheapest text
+# completion" should use GEMINI_VISION_MODEL, but a caller that *specifically*
+# wants gemini-2.0-flash (e.g. ADK provider pinning) imports this.
+GEMINI_FLASH_2_MODEL = "gemini-2.0-flash"
+
 # "Nano Banana" branded aliases (Google's marketing names for the
 # Gemini native image-generation models). Per Context7 verification of
 # Google's docs (2026-05-03):
@@ -125,6 +132,7 @@ __all__ = [
     "COMPOSITOR_OPUS_MODEL",
     "COMPOSITOR_QA_MODEL",
     "FAST_MODEL",
+    "GEMINI_FLASH_2_MODEL",
     "GEMINI_FLASH_IMAGE_MODEL",
     "GEMINI_PRO_IMAGE_MODEL",
     "GEMINI_PRO_MODEL",

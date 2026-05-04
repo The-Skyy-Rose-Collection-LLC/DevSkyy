@@ -14,6 +14,7 @@ import logging
 
 from adk.base import ADKProvider, AgentConfig
 from adk.super_agents import BaseSuperAgent
+from llm.model_ids import GEMINI_FLASH_2_MODEL
 
 from ..models import VariantResult
 
@@ -28,7 +29,7 @@ class VariantAgent(BaseSuperAgent):
             config = AgentConfig(
                 name="legendary_variant_architect",
                 provider=ADKProvider.GOOGLE,
-                model="gemini-2.0-flash",
+                model=GEMINI_FLASH_2_MODEL,
                 system_prompt="You are the Legendary Variant Architect for SkyyRose. You create diverse, hyper-accurate product variations.",
             )
         super().__init__(config)

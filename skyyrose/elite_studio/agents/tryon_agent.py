@@ -14,6 +14,7 @@ import logging
 
 from adk.base import ADKProvider, AgentConfig
 from adk.super_agents import BaseSuperAgent
+from llm.model_ids import GEMINI_FLASH_2_MODEL
 
 from ..models import TryOnResult
 
@@ -28,7 +29,7 @@ class TryOnAgent(BaseSuperAgent):
             config = AgentConfig(
                 name="legendary_tryon_architect",
                 provider=ADKProvider.GOOGLE,
-                model="gemini-2.0-flash",
+                model=GEMINI_FLASH_2_MODEL,
                 system_prompt="You are the Legendary Try-On Architect for SkyyRose. You create seamless digital wear experiences.",
             )
         super().__init__(config)
