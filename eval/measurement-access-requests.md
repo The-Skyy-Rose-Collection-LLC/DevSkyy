@@ -2,7 +2,7 @@
 name: Measurement Access Requests Packet (single-sitting Corey-action doc)
 specified_by: [wp: §WP-0.5.a]
 phase: 0 (generated); 0.5 (actioned by Corey)
-test_command: node scripts/measurement/verify-all-grants.js  # exits 0 once all grants present
+test_command: node scripts/measurement/verify-all-grants.js  # PHASE 0.5 DELIVERABLE — script does not exist yet; running it will exit 1 with a "Phase 0.5 not started" message until the verify-* scripts are built. See scripts/measurement/README.md.
 pass_threshold: All grants verified PASS, or each PENDING row has documented blocker
 last_updated: 2026-05-03
 last_updated_by: eval-harness (Phase 0)
