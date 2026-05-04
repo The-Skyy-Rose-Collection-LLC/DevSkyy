@@ -48,7 +48,7 @@ These 7 SkyyRose skills are battle-tested — they're already invocable AND proj
 | Skill | V2 use | Status |
 |-------|--------|--------|
 | **image-taste-frontend** | Phase 4 design-ref A | **AVAILABLE** (plugin-namespaced) |
-| **aidesigner** (MCP) | Phase 4 design-ref B | **AVAILABLE** (`mcp__aidesigner__*` in deferred tools; aidesigner-frontend skill ALSO available) |
+| **aidesigner** (MCP + skill + CLI) | Phase 4 design-ref B | **FULLY PROVISIONED 2026-05-03** — three integration paths live: (1) `aidesigner-frontend` skill at both project (`.claude/skills/`) and user (`~/.claude/skills/`) scopes, installed via `npx -y @aidesigner/agent-skills init` + `init claude --scope user`; (2) `/aidesigner` slash command; (3) npx CLI fallback `npx -y @aidesigner/agent-skills generate` reading `AIDESIGNER_API_KEY` from `.env` (set 2026-05-03, file mode 0o600). MCP OAuth flow initiated; awaiting one-click browser completion to unlock `mcp__aidesigner__*` tool runtime calls. |
 | **ui-ux-pro-max** | Phase 4 lookup | **AVAILABLE** (plugin-namespaced) |
 | **high-end-visual-design** | Phase 4 build | **AVAILABLE** (plugin-namespaced) |
 | **impeccable** | Phase 4 build | **AVAILABLE** (`~/.claude/skills/impeccable/`) |
@@ -127,7 +127,7 @@ Read-only inventory; no `_authenticate` calls triggered.
 | **Hugging Face** (`mcp__claude_ai_Hugging_Face__*`) | Phase 5.7 (custom embeddings) + Phase 5.6 (alt AR) | **AVAILABLE — pre-authenticated as `damBruh`** per main system prompt instructions |
 | **Apify** (`mcp__apify__*`) | Phase 4 luxury ref scraping + Phase 6.7 SEO | **AVAILABLE — auth-on-use** | 60+ scraper tools confirmed. Defer first call to Phase 4. |
 | **claude-in-chrome** (`mcp__claude-in-chrome__*`) | Phase 0 §3 critique + Phase 6 audits | **AVAILABLE — needs ToolSearch load** | Per system reminder, must `ToolSearch` to load schemas before invoking. Already in use by §3 critique subagent (running). |
-| **aidesigner** (`mcp__aidesigner__*`) | Phase 4 design-ref B | **AVAILABLE — has explicit auth flow** | `authenticate` + `complete_authentication`. Plus the `aidesigner` skill at `~/.claude/skills/aidesigner-frontend/` covers many use cases without MCP. |
+| **aidesigner** (`mcp__aidesigner__*`) | Phase 4 design-ref B | **AUTH FLOW INITIATED 2026-05-03** | `mcp__aidesigner__authenticate` called — OAuth URL emitted, awaits one-click browser completion. Once done, full `mcp__aidesigner__*` toolkit unlocks. Until then: skill (`aidesigner-frontend`) and npx CLI (`AIDESIGNER_API_KEY` in `.env`) both work as alternates. Per `eval/cost-cap-policy.md`: every aidesigner generation call = STOP-AND-SHOW (>$1 tier) regardless of which path invokes it. |
 | **graphify** | Phase 0 deliverable J | **AVAILABLE — skill-installed** | Skill at `~/.claude/skills/graphify/`. Triggers via `/graphify`. MCP server mode via `--mcp` flag during invocation. |
 
 **MCPs explicitly NOT integrated in Phase 0** (per grill Branch 4 user answer "C" with no Figma/Notion/Drive additions):
@@ -141,20 +141,21 @@ Read-only inventory; no `_authenticate` calls triggered.
 | Stitch (`mcp__stitch__*`) | Phase 4 design supplement only | When Phase 4 design phase begins |
 | Three.js 3D Viewer (`mcp__claude_ai_Three_js_3D_Viewer__*`) | Handy for Phase 5.2/5.8 but not load-bearing | When Phase 5.2 begins |
 | Computer-use (`mcp__computer-use__*`) | Native desktop apps; not needed for V2 build | If a native-app workflow surfaces |
-| Sequential Thinking (`mcp__sequential-thinking__sequentialthinking`) | Referenced in `.claude/rules/sequential-thinking.md` but **NOT in deferred-tools list — server not connected on this machine** | Two paths: (a) install + connect the MCP server; (b) revise rule file to remove the reference. Phase 0 does not block on either. |
+| Sequential Thinking (`mcp__sequential-thinking__sequentialthinking`) | **RESOLVED 2026-05-03** — was disabled by rename in `~/.claude/settings.json`. Re-enabled by creating proper `mcpServers` block. Surfaces in deferred-tools list on next session restart. | None — tool available next session. |
 
 ---
 
-## Sequential Thinking documentation gap
+## Sequential Thinking — RESOLVED 2026-05-03
 
-The file `/Users/theceo/DevSkyy/.claude/rules/sequential-thinking.md` references `mcp__sequential-thinking__sequentialthinking` and instructs "use proactively" — but the tool **does not exist** in this environment's deferred tool list.
+**Root cause discovered:** the MCP server was configured but parked under the key `_disabled_mcpServers__rename_to_mcpServers_to_reenable` in `~/.claude/settings.json` — Claude Code only loads servers under the literal key `mcpServers`. The rule file at `.claude/rules/sequential-thinking.md` was correct; the config was just keyed wrong.
 
-This is a documentation/reality gap caught by the agent inventory audit. **Recommended resolution path** (deferred to a later phase, NOT a Phase 0 blocker):
+**Fix applied:**
 
-- **Option A:** Install the official MCP server (`npx @modelcontextprotocol/server-sequential-thinking` or equivalent) and add to `~/.claude/.mcp.json` global config so the tool surfaces in deferred list
-- **Option B:** Revise `.claude/rules/sequential-thinking.md` to remove the rule, since the tool isn't available to enforce it. Replace with a different deliberation pattern (e.g., longer thinking-pass writeups in `eval/design-thinking/<slug>.md` per WP §1.1).
+1. Created top-level `mcpServers` block in `~/.claude/settings.json` containing only `sequential-thinking` (pure npx, no infra dependencies)
+2. Renamed remaining disabled block to `_disabled_mcpServers__claude_context_needs_milvus` to document *why* `claude-context` stays disabled (requires Milvus on `127.0.0.1:19530` which isn't running; Ollama on `11434` IS running so the embedding side would work, but the vector store wouldn't)
+3. Tool surfaces on next session restart — current session must finish first
 
-This gap is logged here, not yet fixed. Phase 0 advances; the Sequential Thinking decision is an ADR for a later session.
+**Why claude-context stays disabled:** enabling it without Milvus running would error on every session start. To enable later: install Milvus locally (`docker run -p 19530:19530 milvusdb/milvus`) then move `claude-context` from the disabled block into `mcpServers`.
 
 ---
 

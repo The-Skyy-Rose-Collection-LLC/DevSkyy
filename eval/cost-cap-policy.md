@@ -1,3 +1,12 @@
+---
+name: Cost-Cap Policy (Skyyrose V2 Build)
+specified_by: [v2: §1.3], [claude_md: STOP-AND-SHOW], [grill: Branch 1 Option C]
+phase: 0
+last_updated: 2026-05-03
+last_updated_by: eval-harness (Phase 0 grill resolution)
+authority: This file supersedes both `CLAUDE.md` §STOP-AND-SHOW and `docs/SKYYROSE_V2_MASTER_PLAN.md` §1.3 when they conflict. Both source rules remain valid as inputs; the synthesis below is the binding contract.
+---
+
 # Cost-Cap Policy (Skyyrose V2 Build)
 
 **Status:** Active. Supersedes both `CLAUDE.md` § "STOP AND SHOW" and `SKYYROSE_V2_MASTER_PLAN.md` §1.3 in isolation. The two rules conflicted; this document is the synthesis.
