@@ -5,7 +5,7 @@ phase: 0 (generated); 0.5 (actioned by Corey)
 test_command: node scripts/measurement/verify-all-grants.js  # PHASE 0.5 DELIVERABLE — script does not exist yet; running it will exit 1 with a "Phase 0.5 not started" message until the verify-* scripts are built. See scripts/measurement/README.md.
 pass_threshold: All grants verified PASS, or each PENDING row has documented blocker
 last_updated: 2026-05-03
-last_updated_by: eval-harness (Phase 0)
+last_updated_by: eval-harness (Phase 0; refined 2026-05-03 — JSON-via-redirect, GA4/GSC/GTM/Sentry IDs added to Step 7, GTM scope tightened to Read, env-var manifest table added)
 ---
 
 # Measurement Access Requests — Single Sitting
@@ -42,7 +42,7 @@ The same service account is added to GA4, GSC, GTM, and (separately) granted as 
 10. Click "Done"
 11. Find the new account in the list, click on it
 12. Tab "Keys" → "Add Key" → "Create new key" → JSON → Create
-13. **Save the downloaded JSON file** — we'll add it to Vercel env vars (Step 7 below). Do NOT email it; do NOT commit it to git.
+13. **Save the downloaded JSON file to a known path** — recommended: `~/Downloads/skyyrose-readonly-key.json`. Step 7 reads it via shell redirection (`< file.json`), so the path matters and the JSON content stays on a single Vercel env value untouched. Do NOT email it; do NOT commit it to git. Plan to delete the local copy once Phase 0.5 verifies — Vercel keeps the canonical copy.
 
 **Verify:**
 
@@ -74,11 +74,17 @@ node scripts/measurement/verify-google-service-account.js
 10. Make sure project `skyyrose-measurement` is selected (top bar)
 11. Click "Enable"
 
+**Capture the Property ID** (verifier needs this — service account access alone isn't enough; we have to tell the script which property to query):
+
+12. Still in GA4 Admin → Property settings (top of the right column)
+13. Copy the **Property ID** (a 9-10 digit number, e.g., `345678901`)
+14. **Save it for Step 7** — we'll set `GA4_PROPERTY_ID=properties/345678901` in Vercel env
+
 **Verify:**
 
 ```bash
-node scripts/measurement/verify-ga4.js
-# Returns: GA4 property ID, last 30d sessions count
+node scripts/measurement/verify-google-service-account.js  # confirms JWT auth works
+node scripts/measurement/verify-ga4.js                     # confirms property read access + returns 30d sessions
 ```
 
 ---
@@ -103,11 +109,17 @@ node scripts/measurement/verify-ga4.js
 9. Project `skyyrose-measurement` selected
 10. Click "Enable"
 
+**Capture the Site URL** (verifier needs to know which Search Console property to query — properties are addressed by their canonical site URL, *with* trailing slash for URL-prefix properties or `sc-domain:` prefix for domain properties):
+
+11. **Save for Step 7**: `GSC_SITE_URL=https://skyyrose.co/` (URL-prefix) **or** `GSC_SITE_URL=sc-domain:skyyrose.co` (domain property — pick whichever matches what's listed in your Search Console)
+
 **Verify:**
 
 ```bash
 node scripts/measurement/verify-gsc.js
-# Returns: indexed page count, top 10 queries by clicks
+# Returns: top 10 search queries by clicks for the last 28 days (proves read access).
+# Indexed-page-count uses a different API (URL Inspection / Sitemaps) and is captured
+# later by pull-baselines.js — Phase 0.5.e — not this verifier.
 ```
 
 ---
@@ -126,7 +138,7 @@ node scripts/measurement/verify-gsc.js
 4. Click "+ Add User"
 5. Email: same service account email from Step 1
 6. Account permissions: **User**
-7. Container permissions: **Edit**
+7. Container permissions: **Read** for now (so the verifier can confirm access without standing authorization to mutate tags). When Phase 6.6 deploys GA4 + Pixel + CAPI tags via this account, we'll bump to **Publish**. Smaller blast radius until then.
 8. Click "Add"
 
 **Steps (if GTM container does NOT exist yet):**
@@ -138,14 +150,15 @@ node scripts/measurement/verify-gsc.js
 5. Container name: **skyyrose.co**
 6. Target platform: **Web**
 7. Click "Create" → accept ToS
-8. **Save the GTM-XXXXXXX container ID** — we'll need it in Step 7 (Vercel env)
+8. **Save the `GTM-XXXXXXX` container ID** AND the **Account ID** (the all-numeric ID in the URL after creation) — we need both in Step 7. Tag Manager API addresses containers as `accounts/{ACCOUNT_ID}/containers/{CONTAINER_ID}`, so the public `GTM-` slug alone is not enough.
 9. Skip the install snippet for now (Phase 6.6 wires it into the WP theme)
 10. Then follow the "container already exists" steps above to add the service account
 
-**Then store container ID in Vercel:**
+**Then store container ID + account ID in Vercel** (Step 7):
 
 ```
-GTM_CONTAINER_ID=GTM-XXXXXXX
+GTM_CONTAINER_ID=GTM-XXXXXXX     # the public-facing container slug
+GTM_ACCOUNT_ID=12345678          # the numeric account ID (from the URL or Admin → Account settings)
 ```
 
 **Verify:**
@@ -216,8 +229,12 @@ node scripts/measurement/verify-meta.js
 **For MCP read access:**
 
 6. In Sentry: Settings (top-right) → Auth Tokens → Create New Token
-7. Scopes: **read** for all (project:read, event:read, etc.)
+7. Scopes — check exactly these (don't grant more than the verifier needs):
+   - `org:read` — list orgs the token belongs to
+   - `project:read` — list projects per org (verifier asserts both `skyyrose-co` and `devskyy-app` exist)
+   - `event:read` — count last-30d issues for baseline
 8. **Save the auth token** for Vercel env: `SENTRY_AUTH_TOKEN_READ=...`
+9. **Save your Sentry org slug** (visible in any Sentry URL: `https://sentry.io/organizations/<slug>/...`). Set in Step 7 as `SENTRY_ORG_SLUG=<your-slug>`.
 
 **Verify:**
 
@@ -234,33 +251,80 @@ node scripts/measurement/verify-sentry.js
 
 **Steps:**
 
-1. Open a terminal where the `vercel` CLI is authenticated (`vercel whoami` returns your user)
-2. Navigate to the project root: `cd /Users/theceo/DevSkyy`
-3. Add each env var (production scope):
+1. Open a terminal where the `vercel` CLI is authenticated (`vercel whoami` returns your user).
+2. Navigate to the project root: `cd /Users/theceo/DevSkyy`.
+3. Add the **secret** values (these never leave Vercel after this step):
 
 ```bash
-# Google service account (paste the full JSON from Step 1's downloaded file)
-vercel env add GOOGLE_SERVICE_ACCOUNT_JSON production
-# Then paste the JSON content when prompted
+# Google service account JSON — read directly from the downloaded file from Step 1.
+# Using `< file.json` avoids the multi-line-paste foot-gun where newlines in the JSON
+# get re-interpreted by the terminal and break the private_key on the other side.
+vercel env add GOOGLE_SERVICE_ACCOUNT_JSON production < ~/Downloads/skyyrose-readonly-key.json
 
-# GTM container ID (from Step 4)
-vercel env add GTM_CONTAINER_ID production
-# Then paste GTM-XXXXXXX
-
-# Meta system user token (from Step 5)
+# Meta system user token (from Step 5) — paste when prompted (single line, no quotes)
 vercel env add META_SYSTEM_USER_TOKEN production
 
-# Sentry DSNs (from Step 6)
+# Sentry auth token (from Step 6, scopes: org:read project:read event:read)
+vercel env add SENTRY_AUTH_TOKEN_READ production
+
+# Sentry DSNs (these are non-secret, but per WP §4.10 still live as Vercel env)
 vercel env add SENTRY_DSN_SKYYROSE_CO production
 vercel env add SENTRY_DSN_DEVSKYY_APP production
-vercel env add SENTRY_AUTH_TOKEN_READ production
 ```
 
-4. After all are added, redeploy the latest production deployment so env vars take effect:
+4. Add the **identifier** values (these tell the verifiers *which* property/container/org to query):
+
+```bash
+# GA4 (Step 2)
+vercel env add GA4_PROPERTY_ID production         # e.g. properties/345678901
+
+# Search Console (Step 3)
+vercel env add GSC_SITE_URL production            # e.g. https://skyyrose.co/  OR  sc-domain:skyyrose.co
+
+# Tag Manager (Step 4)
+vercel env add GTM_CONTAINER_ID production        # GTM-XXXXXXX
+vercel env add GTM_ACCOUNT_ID production          # numeric account ID
+
+# Sentry (Step 6)
+vercel env add SENTRY_ORG_SLUG production         # your sentry.io org slug
+```
+
+5. **Sanity-check** the manifest (every key from the table below should be listed):
+
+```bash
+vercel env ls production
+```
+
+6. Redeploy production so env vars take effect on serverless functions and crons:
 
 ```bash
 vercel deploy --prod
 ```
+
+7. (Optional but recommended) Pull a local `.env.local` so you can run individual `verify-*.js` scripts from your laptop too:
+
+```bash
+vercel env pull .env.local
+```
+
+The local file is gitignored. Delete it after verification.
+
+### Env var manifest you should now have
+
+After Step 7 finishes, `vercel env ls production` should show all of these. The verifier dispatcher cross-references this list and reports which (if any) are missing before it tries any API calls.
+
+| Key | Source step | Used by |
+|-----|-------------|---------|
+| `GOOGLE_SERVICE_ACCOUNT_JSON` | Step 1 | `verify-google-service-account.js`, `verify-ga4.js`, `verify-gsc.js`, `verify-gtm.js` |
+| `GA4_PROPERTY_ID` | Step 2 | `verify-ga4.js` |
+| `GSC_SITE_URL` | Step 3 | `verify-gsc.js` |
+| `GTM_CONTAINER_ID` | Step 4 | `verify-gtm.js` |
+| `GTM_ACCOUNT_ID` | Step 4 | `verify-gtm.js` |
+| `META_SYSTEM_USER_TOKEN` | Step 5 | `verify-meta.js` |
+| `SENTRY_AUTH_TOKEN_READ` | Step 6 | `verify-sentry.js` |
+| `SENTRY_ORG_SLUG` | Step 6 | `verify-sentry.js` |
+| `SENTRY_DSN_SKYYROSE_CO` | Step 6 | runtime error reporting (not the verifier) |
+| `SENTRY_DSN_DEVSKYY_APP` | Step 6 | runtime error reporting (not the verifier) |
 
 ---
 
