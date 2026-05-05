@@ -163,11 +163,14 @@ function skyyrose_preload_hero_image() {
 		$image_url = get_theme_mod( 'skyyrose_hero_image', '' );
 	} elseif ( function_exists( 'is_product' ) && is_product() ) {
 		// Single product: the main gallery image is the LCP element.
+		// $GLOBALS['product'] can hold non-WC_Product values (string, false, etc.)
+		// when third-party callbacks fire before wp_head priority 4 — guard with
+		// instanceof rather than a truthy check.
 		global $product;
-		if ( ! $product && function_exists( 'wc_get_product' ) ) {
+		if ( ! $product instanceof WC_Product && function_exists( 'wc_get_product' ) ) {
 			$product = wc_get_product( get_the_ID() );
 		}
-		if ( $product && $product->get_image_id() ) {
+		if ( $product instanceof WC_Product && $product->get_image_id() ) {
 			$image_url = wp_get_attachment_url( $product->get_image_id() );
 		}
 	} elseif ( is_page() ) {
