@@ -100,26 +100,24 @@ MESHY_AI_MODEL = "meshy-5"  # mirrored in ai_3d/providers/meshy.py
 
 # Elite-team model policy (skyyrose/elite_studio/):
 #   - Vision tasks (read image / output verdict-text):
-#       best Gemini  → GEMINI_PRO_MODEL or GEMINI_VISION_MODEL
-#       best OpenAI  → OPENAI_VISION_MODEL (gpt-4o)
-#       NOT Claude — use Gemini/OpenAI for the seeing.
+#       Gemini side  → GEMINI_PRO_MODEL or GEMINI_VISION_MODEL
+#       OpenAI side  → OPENAI_VISION_MODEL (gpt-4o)
+#       NEVER Claude — vision is a Claude weakness. The dual-judge panel in
+#       quality_agent.py / vision_agent.py runs OpenAI + Gemini.
 #   - Image generation:
 #       Google side  → NANO_BANANA_2_MODEL  (gemini-3.1-flash-image-preview)
 #       OpenAI side  → OPENAI_IMAGE_2_MODEL (gpt-image-2)
 #   - Reasoning (text in / text out, judgment, planning):
 #       always       → CLAUDE_OPUS_MODEL    (claude-opus-4-7)
 #
-# The *_CLAUDE_MODEL aliases below carry the Claude-specific role of a
-# multi-judge panel — e.g. quality_agent.py records
-# f"{QC_CLAUDE_MODEL}+{COMPOSITOR_QA_MODEL}" so the Claude reasoner pairs
-# with the Gemini visualizer. They're not the *general* vision slot;
-# general vision goes to Gemini/OpenAI per the policy above.
-VISION_CLAUDE_MODEL = CLAUDE_OPUS_MODEL  # Claude-side of vision panel — reasoning
-QC_CLAUDE_MODEL = CLAUDE_OPUS_MODEL  # Claude-side of QC panel — reasoning
-COMPOSITOR_CLAUDE_MODEL = CLAUDE_OPUS_MODEL  # compositor prompt synth — reasoning
+# Historical note: VISION_CLAUDE_MODEL and QC_CLAUDE_MODEL existed here
+# until the no-Claude-vision policy was codified. The vision_agent and
+# quality_agent dual-judge panels were migrated to OpenAI + Gemini and
+# those aliases removed; do not reintroduce them.
+COMPOSITOR_CLAUDE_MODEL = CLAUDE_OPUS_MODEL  # compositor prompt synth — text reasoning
 RAS_GENERATION_MODEL = GEMINI_FLASH_IMAGE_MODEL  # 3D + generator agents
 GENERATION_MODEL = GEMINI_FLASH_IMAGE_MODEL  # default image generation
-QC_MODEL = QC_CLAUDE_MODEL
+QC_MODEL = OPENAI_VISION_MODEL  # OpenAI side of dual-vision QC panel
 
 # Specialist roles. Sonnet is DevSkyy's "Best coding model" per
 # .claude/rules/performance.md — adequate for both security audit and code
@@ -136,14 +134,13 @@ FAST_MODEL = CLAUDE_HAIKU_MODEL  # classification, simple tasks
 
 # Compositor stage models (legacy names kept for back-compat)
 COMPOSITOR_OPUS_MODEL = COMPOSITOR_CLAUDE_MODEL
-# Compositor Stage 6 visual QA — vision task per policy above:
-# "Vision tasks → best Gemini AND OpenAI." This is the Gemini side of the
-# QC panel (the Claude reasoner is QC_CLAUDE_MODEL above; together they're
-# combined in quality_agent metadata as f"{QC_CLAUDE_MODEL}+{COMPOSITOR_QA_MODEL}").
+# Compositor Stage 6 visual QA — Gemini side of the dual-vision QC panel.
+# The OpenAI side is OPENAI_VISION_MODEL; combined metadata label in
+# quality_agent.py is f"{OPENAI_VISION_MODEL}+{COMPOSITOR_QA_MODEL}".
 # GEMINI_PRO_MODEL chosen for: multimodal input, deep reasoning, reliable
 # structured text output. Don't repoint to GEMINI_FLASH_IMAGE_MODEL — that's
 # an image-GEN model and would default to image output for a text-out task.
-COMPOSITOR_QA_MODEL = GEMINI_PRO_MODEL  # Gemini-side of QC panel — visual QA
+COMPOSITOR_QA_MODEL = GEMINI_PRO_MODEL  # Gemini side of dual-vision QC panel
 
 __all__ = [
     "CLAUDE_HAIKU_MODEL",
@@ -172,11 +169,9 @@ __all__ = [
     "OPENAI_MINI_MODEL",
     "OPENAI_VISION_MODEL",
     "ORCHESTRATOR_MODEL",
-    "QC_CLAUDE_MODEL",
     "QC_MODEL",
     "RAS_GENERATION_MODEL",
     "SECURITY_AUDIT_MODEL",
     "SUBAGENT_MODEL",
-    "VISION_CLAUDE_MODEL",
     "XAI_GROK_MODEL",
 ]

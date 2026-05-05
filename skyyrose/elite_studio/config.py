@@ -101,10 +101,8 @@ from llm.model_ids import (  # noqa: E402, F401  -- re-exported for legacy impor
     MESHY_AI_MODEL,
     OPENAI_IMAGE_MODEL,
     OPENAI_VISION_MODEL,
-    QC_CLAUDE_MODEL,
     QC_MODEL,
     RAS_GENERATION_MODEL,
-    VISION_CLAUDE_MODEL,
 )
 
 # Local-only back-compat aliases — these names exist only here, not in

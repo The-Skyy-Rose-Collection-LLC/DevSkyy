@@ -9,11 +9,18 @@ class TestConstants:
         assert config.VISION_OPENAI_MODEL == "gpt-4o"
 
     def test_generation_model(self):
-        assert config.GENERATION_MODEL == "gemini-3-pro-image-preview"
+        # Per Context7 + project policy: Nano Banana 2 (gemini-3.1-flash-
+        # image-preview) is the recommended go-to image-generation default.
+        # Nano Banana Pro (gemini-3-pro-image-preview) is reserved for
+        # explicit pro-asset workflows via NANO_BANANA_PRO_MODEL.
+        assert config.GENERATION_MODEL == "gemini-3.1-flash-image-preview"
         assert config.GENERATION_ASPECT_RATIO == "3:4"
 
     def test_qc_model(self):
-        assert "claude" in config.QC_MODEL
+        # Policy: vision is OpenAI + Gemini, never Claude. QC_MODEL is the
+        # OpenAI side of the dual-vision QC panel; the Gemini side is
+        # COMPOSITOR_QA_MODEL.
+        assert config.QC_MODEL == "gpt-4o"
 
     def test_timeouts(self):
         assert config.GEMINI_TIMEOUT > 0

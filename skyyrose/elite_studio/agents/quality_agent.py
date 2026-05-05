@@ -19,7 +19,7 @@ from typing import Any, Literal
 from adk.base import ADKProvider, AgentConfig, AgentResult
 from adk.super_agents import BaseSuperAgent
 
-from ..config import COMPOSITOR_QA_MODEL, GEMINI_VISION_MODEL, QC_CLAUDE_MODEL
+from ..config import COMPOSITOR_QA_MODEL, GEMINI_VISION_MODEL, OPENAI_VISION_MODEL
 from ..gemini_rest import analyze_vision as gemini_analyze_vision
 from ..models import QualityVerification
 
@@ -125,15 +125,15 @@ class QualityAgent(BaseSuperAgent):
 
         # Run both scorers in parallel — return_exceptions=True so a failure
         # in one judge doesn't sink the other's verdict.
-        score_a_task = self._score_claude(image_path, prompt)
+        score_a_task = self._score_openai(image_path, prompt)
         score_b_task = self._score_gemini(image_path, prompt)
         result_a, result_b = await asyncio.gather(
             score_a_task, score_b_task, return_exceptions=True
         )
 
         if isinstance(result_a, BaseException):
-            score_a, mismatch_a, notes_a = 0, False, f"Claude QA failed: {result_a}"
-            logger.warning("Claude QA failed for %s: %s", image_path, result_a)
+            score_a, mismatch_a, notes_a = 0, False, f"OpenAI QA failed: {result_a}"
+            logger.warning("OpenAI QA failed for %s: %s", image_path, result_a)
         else:
             score_a, mismatch_a, notes_a = result_a
 
@@ -147,10 +147,10 @@ class QualityAgent(BaseSuperAgent):
         min_score = min(score_a, score_b)
 
         details: dict[str, Any] = {
-            "score_claude": score_a,
+            "score_openai": score_a,
             "score_gemini": score_b,
             "min_score": min_score,
-            "notes_claude": notes_a,
+            "notes_openai": notes_a,
             "notes_gemini": notes_b,
             "mode": mode,
         }
@@ -169,7 +169,7 @@ class QualityAgent(BaseSuperAgent):
             return QualityVerification(
                 success=True,
                 provider="dual_vision",
-                model=f"{QC_CLAUDE_MODEL}+{COMPOSITOR_QA_MODEL}",
+                model=f"{OPENAI_VISION_MODEL}+{COMPOSITOR_QA_MODEL}",
                 overall_status="fail",
                 recommendation="regenerate",
                 details=details,
@@ -180,7 +180,7 @@ class QualityAgent(BaseSuperAgent):
         return QualityVerification(
             success=True,
             provider="dual_vision",
-            model=f"{QC_CLAUDE_MODEL}+{COMPOSITOR_QA_MODEL}",
+            model=f"{OPENAI_VISION_MODEL}+{COMPOSITOR_QA_MODEL}",
             overall_status="pass" if passed else "fail",
             recommendation="approve" if passed else "regenerate",
             details=details,
@@ -191,40 +191,37 @@ class QualityAgent(BaseSuperAgent):
     # Private — each returns (score: int, identity_mismatch: bool, notes: str)
     # ------------------------------------------------------------------
 
-    async def _score_claude(self, image_path: str, prompt: str) -> tuple[int, bool, str]:
-        from ..config import get_anthropic_client
+    async def _score_openai(self, image_path: str, prompt: str) -> tuple[int, bool, str]:
+        from ..config import get_openai_client
 
-        client = get_anthropic_client()
+        client = get_openai_client()
         ext = Path(image_path).suffix.lower().lstrip(".")
         media_type = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
         with open(image_path, "rb") as f:
             b64 = base64.standard_b64encode(f.read()).decode("utf-8")
 
-        # Anthropic SDK's messages.create() is a synchronous network call —
-        # wrap it in to_thread so it doesn't block the event loop while the
-        # parallel Gemini scorer runs.
-        # Anthropic's SDK declares strict TypedDicts for content blocks. The
-        # plain-dict shape below is the documented and runtime-accepted form;
-        # pyright's strict check rejects it. Cast through Any at the boundary.
+        # OpenAI SDK's chat.completions.create() is a synchronous network
+        # call — wrap it in to_thread so it doesn't block the event loop
+        # while the parallel Gemini scorer runs.
         messages: Any = [
             {
                 "role": "user",
                 "content": [
-                    {
-                        "type": "image",
-                        "source": {"type": "base64", "media_type": media_type, "data": b64},
-                    },
                     {"type": "text", "text": prompt},
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:{media_type};base64,{b64}"},
+                    },
                 ],
             }
         ]
         msg = await asyncio.to_thread(
-            client.messages.create,
-            model=QC_CLAUDE_MODEL,
+            client.chat.completions.create,
+            model=OPENAI_VISION_MODEL,
             max_tokens=256,
             messages=messages,
         )
-        return _parse_qa_response(msg.content[0].text)
+        return _parse_qa_response(msg.choices[0].message.content)
 
     async def _score_gemini(self, image_path: str, prompt: str) -> tuple[int, bool, str]:
         ext = Path(image_path).suffix.lower().lstrip(".")

@@ -6,12 +6,12 @@ from skyyrose.elite_studio.agents.vision_agent import DualVisionGate, VisionAgen
 
 
 def _make_gate() -> DualVisionGate:
-    """Build a DualVisionGate with the anthropic client and the inherited ADK
+    """Build a DualVisionGate with the OpenAI client and the inherited ADK
     `execute` method stubbed. `verify_reference` calls `await self.execute(...)`
     for ADK observability before any model call — without this stub, tests would
     hit the real CreativeAgent.execute and emit un-awaited-coroutine warnings.
     """
-    with patch("anthropic.Anthropic"):
+    with patch("openai.OpenAI"):
         gate = DualVisionGate()
     gate.execute = AsyncMock(return_value={})
     return gate
@@ -30,7 +30,7 @@ async def test_consensus_both_yes(tmp_path):
 
     gate = _make_gate()
     with (
-        patch.object(gate, "_call_claude", return_value="YES: confirms hoodie"),
+        patch.object(gate, "_call_openai", return_value="YES: confirms hoodie"),
         patch.object(gate, "_call_gemini", return_value="YES: hoodie confirmed"),
     ):
         result = await gate.verify_reference(str(img), sku="br-004", expected_garment="hoodie")
@@ -46,7 +46,7 @@ async def test_consensus_a_no_blocks(tmp_path):
 
     gate = _make_gate()
     with (
-        patch.object(gate, "_call_claude", return_value="NO: this is a baseball jersey"),
+        patch.object(gate, "_call_openai", return_value="NO: this is a baseball jersey"),
         patch.object(gate, "_call_gemini", return_value="YES: looks like a hoodie"),
     ):
         result = await gate.verify_reference(
@@ -65,7 +65,7 @@ async def test_consensus_b_no_blocks(tmp_path):
 
     gate = _make_gate()
     with (
-        patch.object(gate, "_call_claude", return_value="YES: hoodie confirmed"),
+        patch.object(gate, "_call_openai", return_value="YES: hoodie confirmed"),
         patch.object(gate, "_call_gemini", return_value="NO: this is a crewneck, not a hoodie"),
     ):
         result = await gate.verify_reference(str(img), sku="br-004", expected_garment="hoodie")
@@ -81,7 +81,7 @@ async def test_analyze_wraps_verify_reference(tmp_path):
 
     gate = _make_gate()
     with (
-        patch.object(gate, "_call_claude", return_value="YES: sg-013 mint crewneck confirmed"),
+        patch.object(gate, "_call_openai", return_value="YES: sg-013 mint crewneck confirmed"),
         patch.object(gate, "_call_gemini", return_value="YES: confirmed crewneck"),
         patch("skyyrose.elite_studio.agents.vision_agent._reference_path", return_value=str(img)),
         patch("skyyrose.elite_studio.catalog.Catalog.load") as mock_load,
