@@ -18,6 +18,10 @@ import os
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from nano_banana.tournament import TournamentResult
 
 log = logging.getLogger(__name__)
 
@@ -159,17 +163,9 @@ class ProductionPipeline:
         # ── Step 1: DESCRIBE ─────────────────────────────────────────
         vision_desc = self._get_or_cache_vision(product, source_path)
 
-        # ── Step 1a: ENRICH WITH CANONICAL DOSSIER (Tier 2 fix) ──────
-        # The Gemini-vision-describe path infers DNA from the source
-        # image alone — it has no knowledge of authored spec details
-        # like per-element trim color, technique distinctions
-        # (embossed vs printed), or the negative list. Loading the
-        # canonical dossier and injecting `spec` into vision_desc makes
-        # the tournament score against authored truth instead of
-        # inferred DNA. Routing and prompt-builder logic still use the
-        # inferred fields (they need visual cues, not authored spec).
-        # Soft-fail: SKUs without a dossier keep working with the
-        # legacy inferred path; we just log a warning.
+        # Inject canonical dossier spec for the tournament. Routing and
+        # prompt-builder code still use inferred fields. Soft-fail when
+        # a dossier is missing so SKUs mid-authoring still render.
         try:
             from nano_banana.spec_builder import build_dna_from_sku
 
@@ -182,13 +178,8 @@ class ProductionPipeline:
                 len(canonical["spec"]),
             )
         except Exception as exc:
-            # Don't crash production if a SKU is mid-authoring or
-            # missing a dossier — the inferred-DNA path still works,
-            # just less accurately. Log loudly so the gap is visible.
             log.warning(
-                "DOSSIER: no canonical spec for %s — falling back to "
-                "inferred DNA (judges will score against Gemini-described "
-                "DNA, not authored truth). Reason: %s",
+                "DOSSIER: no canonical spec for %s — falling back to inferred DNA. Reason: %s",
                 sku,
                 exc,
             )
@@ -220,13 +211,8 @@ class ProductionPipeline:
         model_hint = decisions[0].engine if decisions else ""
         prompt, template_id = registry.get_prompt(vision_desc, product, view, model_hint)
 
-        # ── Step 2a: AUGMENT WITH DOSSIER NEGATIVES (Layer 2) ────────
-        # Layer 1 fixed the judge feedback loop. Layer 2 closes the
-        # other half of the loop: the *generator* now sees the
-        # dossier's authored negative list at render time, not just
-        # the judges seeing it at scoring time. Means we don't have to
-        # rely on Kontext refinement to remove every authored "DO NOT
-        # render X" — the first-shot generator avoids them too.
+        # Append authored dossier negatives so the generator sees them,
+        # not just the judges.
         from nano_banana.spec_builder import augment_prompt_with_dossier_negatives
 
         prompt = augment_prompt_with_dossier_negatives(prompt, vision_desc)
@@ -382,33 +368,23 @@ class ProductionPipeline:
                     break
 
         # Hallucination-veto override — synthesis judge sees what vision
-        # pair averaged-out. If the veto fired, refine regardless of the
-        # threshold-based triggers above.
+        # pair averaged-out. Veto fires regardless of threshold triggers.
         synth_judge = qa_result.synthesis_judge if hasattr(qa_result, "synthesis_judge") else None
         if synth_judge and getattr(synth_judge, "hallucination_veto", False):
-            if not needs_refine:
-                log.info("REFINE triggered: synthesis hallucination_veto=True")
+            log.info("REFINE triggered: synthesis hallucination_veto=True")
             needs_refine = True
 
         if needs_refine and result.qa_score < cfg.qa_auto_approve:
             log.info("Attempting refinement...")
             refined_bytes = None
 
-            # Build a refinement prompt that consumes the synthesis
-            # judge's `suggested_fixes` and `issues`. This is the Layer 1
-            # feedback wiring — without it, the refinement ran with a
-            # generic "fix branding" prompt regardless of what the
-            # judges actually identified.
             refine_prompt = _build_refinement_prompt(name, sku, qa_result)
             log.info("REFINE prompt:\n%s", refine_prompt)
 
-            # Try Kontext first (if fal available)
             if self.fal_available:
                 refined_bytes = refine_with_kontext(output_path, refine_prompt)
 
-            # Fallback: Gemini composite — pass the same synthesis-aware
-            # prompt instead of the generic composite_prompt, so the
-            # fallback path also benefits from the feedback loop.
+            # Fallback: Gemini composite — same synthesis-aware prompt.
             if not refined_bytes and source_path.exists():
                 refined_bytes = composite_gemini(
                     self.genai, output_path, source_path, refine_prompt
@@ -585,7 +561,7 @@ class ProductionPipeline:
         return desc
 
 
-def _build_refinement_prompt(name: str, sku: str, qa_result) -> str:
+def _build_refinement_prompt(name: str, sku: str, qa_result: TournamentResult) -> str:
     """Construct a refinement prompt that consumes the synthesis judge's fixes.
 
     Three tiers, strictly more informative as judge data quality improves:

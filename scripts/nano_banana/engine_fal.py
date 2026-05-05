@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import base64
 import logging
+import math
 import urllib.request
 from pathlib import Path
 
@@ -48,8 +49,6 @@ def _closest_kontext_aspect_ratio(width: int, height: int) -> str:
     if width <= 0 or height <= 0:
         return "1:1"
     target = width / height
-    import math
-
     best_label = "1:1"
     best_distance = float("inf")
     for label, ratio in _KONTEXT_ASPECT_RATIOS:
@@ -169,25 +168,12 @@ def refine_with_kontext(
 ) -> bytes | None:
     """Refine an image using FLUX Kontext Pro — reference-guided editing.
 
-    Best for fixing logos/text on an otherwise good render. Sends the
-    source image as reference and a prompt describing what to fix.
-
-    Format/dimension contract (fixed 2026-05-04):
-    - Output is **PNG bytes** (Kontext's `output_format` defaults to
-      `"jpeg"` if not set; we explicitly request `"png"`).
-    - Output **aspect ratio** matches the closest Kontext-supported
-      enum to the input image's dimensions (Kontext Pro doesn't accept
-      a "match input" option, only the fixed enum).
-    - Returns raw bytes from FAL untouched — no `to_webp()` re-encode
-      that previously double-corrupted the format. The caller saves
-      the bytes; the `.png` extension matches the actual format.
-
-    Args:
-        source_path: The image to refine (the AI render with issues).
-        prompt: Description of what to fix.
-
-    Returns:
-        PNG image bytes on success, None on failure.
+    Sends the source image as reference and a prompt describing what to
+    fix. Returns PNG bytes — `output_format="png"` is set explicitly
+    because Kontext defaults to JPEG, and the bytes are returned
+    untouched (no re-encode that would corrupt the format).
+    Aspect-ratio matches the closest enum to the input dimensions
+    (Kontext Pro accepts only fixed enum values, not "match input").
     """
     if not _fal_available():
         log.warning("fal.ai not available for Kontext refinement")
@@ -206,13 +192,16 @@ def refine_with_kontext(
         "image/jpeg" if ext in (".jpg", ".jpeg") else "image/png" if ext == ".png" else "image/webp"
     )
 
-    # Compute closest aspect ratio to input image.
+    # Compute closest aspect ratio from the bytes we already loaded —
+    # avoid a second open() of the same file.
     aspect_ratio = "1:1"
     input_dims: tuple[int, int] | None = None
     try:
+        import io
+
         from PIL import Image
 
-        with Image.open(source_path) as im:
+        with Image.open(io.BytesIO(img_bytes)) as im:
             input_dims = im.size  # (width, height)
             aspect_ratio = _closest_kontext_aspect_ratio(*im.size)
     except Exception as exc:

@@ -155,6 +155,10 @@ class JudgmentScore:
     rationale: str = ""
     vision_consensus: str = ""
     hallucination_veto: bool = False
+    # `available=False` marks zero-score placeholder judgments
+    # (missing client OR infrastructure failure). Filtering on this
+    # boolean is more robust than parsing the judge string suffix.
+    available: bool = True
 
     def to_dict(self) -> dict:
         d = {
@@ -715,60 +719,39 @@ SYNTHESIS_JUDGE_KEY = "anthropic"
 SYNTHESIS_JUDGE_LABEL = OPUS_SYNTHESIS_MODEL
 
 
-def _placeholder_vision_judgment(provider_label: str, model_label: str) -> JudgmentScore:
-    """Build a zero-score placeholder when a vision client is missing.
-
-    Used only when synthesis runs with one vision judge — Opus needs
-    something in BOTH vision slots so the prompt template renders. The
-    placeholder is clearly tagged in `issues` so Opus can recognize and
-    discount it.
-    """
-    return JudgmentScore(
-        f"{model_label} (unavailable)",
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        [f"{provider_label} client not configured — no vision report from this judge"],
-        [],
-        "",
-    )
-
-
 def _exception_repr(exc: BaseException) -> str:
     """Render an exception with both type and message.
 
-    `concurrent.futures.TimeoutError` (and a few other exception classes)
-    have empty `__str__` representations — naive `str(exc)` renders as
-    blank, which silently obscures the real failure mode. Always include
-    the type name so the log line is self-describing.
+    `concurrent.futures.TimeoutError` and a few other exception classes
+    have empty `__str__` representations; naive `str(exc)` renders as
+    blank, silently obscuring the failure mode.
     """
     msg = str(exc) or repr(exc)
     return f"{type(exc).__name__}: {msg}" if msg != repr(exc) else repr(exc)
 
 
-def _failed_vision_judgment(model_label: str, exc: BaseException) -> JudgmentScore:
-    """Build a zero-score JudgmentScore for an infrastructure-level failure.
+def _zero_judgment(judge_label: str, reason: str) -> JudgmentScore:
+    """Build a zero-score `available=False` JudgmentScore with a reason.
 
-    Distinct from `_placeholder_vision_judgment` (which marks a client as
-    not-configured): this captures the actual exception so Opus's
-    synthesis prompt sees the real failure mode.
+    Used for both missing-client placeholders (so the synthesis prompt
+    has something to render in both vision slots) and infrastructure
+    failures (timeout, API error). The `available` flag is the canonical
+    filtering signal; `reason` is surfaced in `issues` so the synthesis
+    judge can discount the slot and explain why.
     """
     return JudgmentScore(
-        f"{model_label} (failed)",
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        [f"vision judge infrastructure failure: {_exception_repr(exc)}"],
-        [],
-        "",
+        judge=judge_label,
+        garment_type=0,
+        color_accuracy=0,
+        text_accuracy=0,
+        logo_accuracy=0,
+        construction_accuracy=0,
+        no_hallucinations=0,
+        overall=0,
+        issues=[reason],
+        suggested_fixes=[],
+        raw_response="",
+        available=False,
     )
 
 
@@ -846,14 +829,19 @@ def run_tournament(
                 vision_judges[name] = fut.result(timeout=vision_timeout)
             except Exception as exc:
                 log.error("Vision judge %s failed: %s", name, _exception_repr(exc))
-                vision_judges[name] = _failed_vision_judgment(VISION_JUDGE_LABELS[name], exc)
+                vision_judges[name] = _zero_judgment(
+                    VISION_JUDGE_LABELS[name],
+                    f"vision judge infrastructure failure: {_exception_repr(exc)}",
+                )
 
-    gpt_judgment = vision_judges.get(
-        "openai", _placeholder_vision_judgment("openai", VISION_JUDGE_LABELS["openai"])
-    )
-    gemini_judgment = vision_judges.get(
-        "gemini", _placeholder_vision_judgment("gemini", VISION_JUDGE_LABELS["gemini"])
-    )
+    def _missing_vision_placeholder(provider: str) -> JudgmentScore:
+        return _zero_judgment(
+            VISION_JUDGE_LABELS[provider],
+            f"{provider} client not configured — no vision report from this judge",
+        )
+
+    gpt_judgment = vision_judges.get("openai", _missing_vision_placeholder("openai"))
+    gemini_judgment = vision_judges.get("gemini", _missing_vision_placeholder("gemini"))
 
     judges: list[JudgmentScore] = [
         j for j in (vision_judges.get("openai"), vision_judges.get("gemini")) if j is not None
@@ -868,13 +856,12 @@ def run_tournament(
         judges.append(synthesis_judgment)
 
     # Aggregate: synthesis overall is canonical. Without synthesis, fall
-    # back to vision-pair mean. Both placeholder suffixes are excluded
-    # so a slot that was missing or failed doesn't drag the mean to 0.
-    _SKIP_SUFFIXES = ("(unavailable)", "(failed)")
+    # back to vision-pair mean of the available judges only — a missing
+    # or failed slot would otherwise drag the mean to 0.
     vision_pair_overalls = [
         j.overall
         for j in (vision_judges.get("openai"), vision_judges.get("gemini"))
-        if j is not None and not any(j.judge.endswith(s) for s in _SKIP_SUFFIXES)
+        if j is not None and j.available
     ]
     vision_pair_mean = (
         sum(vision_pair_overalls) / len(vision_pair_overalls) if vision_pair_overalls else 0.0
@@ -900,7 +887,7 @@ def run_tournament(
     if synthesis_judgment:
         critical_issues.extend(synthesis_judgment.issues)
     for j in (gpt_judgment, gemini_judgment):
-        if any(j.judge.endswith(s) for s in _SKIP_SUFFIXES):
+        if not j.available:
             continue
         lowest_cat = min(
             ("color_accuracy", j.color_accuracy),

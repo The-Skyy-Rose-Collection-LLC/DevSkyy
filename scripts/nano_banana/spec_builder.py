@@ -124,7 +124,7 @@ def augment_prompt_with_dossier_negatives(prompt: str, dna: dict) -> str:
       DO NOT RENDER heading. The auto-generated negatives from the
       prompt registry are preserved; we only ADD authored negatives.
     """
-    dossier = dna.get("_dossier") if isinstance(dna, dict) else None
+    dossier = dna.get("_dossier")
     if not dossier:
         return prompt
     negative_block = getattr(dossier, "negative_block", "") or ""

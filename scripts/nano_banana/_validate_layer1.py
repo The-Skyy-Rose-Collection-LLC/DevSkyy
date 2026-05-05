@@ -33,7 +33,7 @@ import sys
 import time
 from pathlib import Path
 
-REPO = Path("/Users/theceo/DevSkyy")
+REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO))
 sys.path.insert(0, str(REPO / "scripts"))
 
@@ -117,16 +117,8 @@ def main() -> int:
         print(f"  {label}: {p.name} ({p.stat().st_size:,} bytes)")
     print()
 
-    # Load DNA from canonical dossier — NOT hand-constructed.
-    #
-    # The 2026-05-04 16:30 PDT validation surfaced a bug in the prior
-    # version of this validator: an ad-hoc DNA dict said the garment
-    # was uniform #0a0a0a black with no per-element trim color callout,
-    # so judges (correctly given that incomplete spec) reported "white
-    # ribbing where black should be" — but the canonical dossier
-    # explicitly says white ribbed neckband + cuffs + hem are the
-    # correct design. Refining against the wrong spec moved the render
-    # AWAY from truth. Loading from the dossier is the correct path.
+    # Load from canonical dossier — ad-hoc DNA omits per-element trim
+    # color and the negative list, which judges need to score correctly.
     from nano_banana.spec_builder import build_dna_from_sku
 
     dna = build_dna_from_sku("br-001")

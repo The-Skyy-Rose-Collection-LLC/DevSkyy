@@ -176,12 +176,3 @@ def test_augment_prompt_whitespace_only_negative_returns_unchanged():
     prompt = "Generate a black sweatshirt."
     out = augment_prompt_with_dossier_negatives(prompt, {"_dossier": dossier})
     assert out == prompt
-
-
-def test_augment_prompt_handles_non_dict_dna_safely():
-    """Defensive: a non-dict dna shouldn't crash the helper."""
-    # Real callers always pass dicts, but pipeline.py's broad try/except
-    # suggests we should be conservative.
-    prompt = "Generate."
-    assert augment_prompt_with_dossier_negatives(prompt, None) == prompt
-    assert augment_prompt_with_dossier_negatives(prompt, "not-a-dict") == prompt
