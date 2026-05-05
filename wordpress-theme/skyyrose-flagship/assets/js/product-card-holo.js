@@ -22,6 +22,17 @@
 	var TOUCH = matchMedia('(hover: none)').matches;
 	var REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+	// Restore an aria-label captured before a transient state change.
+	// If the element had no aria-label originally, removeAttribute lets the
+	// (now-restored) textContent become the a11y name.
+	function restoreAriaLabel(el, original) {
+		if (original === null || typeof original === 'undefined') {
+			el.removeAttribute('aria-label');
+		} else {
+			el.setAttribute('aria-label', original);
+		}
+	}
+
 	/* ──────────────────────────────────────────────
 	   1. SCROLL ENTRANCE — IntersectionObserver
 	   ────────────────────────────────────────────── */
@@ -64,27 +75,48 @@
 			var body = card.querySelector('.holo__body');
 			if (!body) return;
 
+			// Cache the bounding rect on enter; refresh on resize/scroll only.
+			// getBoundingClientRect() forces a layout flush, so calling it on
+			// every mousemove (potentially 60+/sec per card) thrashes layout
+			// across an entire product grid.
+			var rect = null;
+			var rafPending = false;
+			var lastEvent = null;
+
+			function refreshRect() { rect = card.getBoundingClientRect(); }
+
+			card.addEventListener('mouseenter', refreshRect);
+			window.addEventListener('resize', function () { rect = null; }, { passive: true });
+			window.addEventListener('scroll', function () { rect = null; }, { passive: true });
+
 			card.addEventListener('mousemove', function (e) {
-				var rect = card.getBoundingClientRect();
-				var x = (e.clientX - rect.left) / rect.width;   // 0→1
-				var y = (e.clientY - rect.top) / rect.height;    // 0→1
+				lastEvent = e;
+				if (rafPending) return;
+				rafPending = true;
 
-				// Tilt: map [0,1] to [-MAX, +MAX] degrees
-				var tiltX = ((y - 0.5) * -2 * MAX_TILT).toFixed(2);
-				var tiltY = ((x - 0.5) * 2 * MAX_TILT).toFixed(2);
+				requestAnimationFrame(function () {
+					rafPending = false;
+					if (!lastEvent) return;
+					if (!rect) refreshRect();
 
-				// Holographic angle: angle from center
-				var angle = (Math.atan2(y - 0.5, x - 0.5) * (180 / Math.PI) + 180).toFixed(1);
+					var x = (lastEvent.clientX - rect.left) / rect.width;   // 0→1
+					var y = (lastEvent.clientY - rect.top) / rect.height;    // 0→1
 
-				body.style.setProperty('--tilt-x', tiltX + 'deg');
-				body.style.setProperty('--tilt-y', tiltY + 'deg');
-				body.style.setProperty('--holo-x', (x * 100).toFixed(1) + '%');
-				body.style.setProperty('--holo-y', (y * 100).toFixed(1) + '%');
-				body.style.setProperty('--holo-angle', angle + 'deg');
+					var tiltX = ((y - 0.5) * -2 * MAX_TILT).toFixed(2);
+					var tiltY = ((x - 0.5) * 2 * MAX_TILT).toFixed(2);
+					var angle = (Math.atan2(y - 0.5, x - 0.5) * (180 / Math.PI) + 180).toFixed(1);
+
+					body.style.setProperty('--tilt-x', tiltX + 'deg');
+					body.style.setProperty('--tilt-y', tiltY + 'deg');
+					body.style.setProperty('--holo-x', (x * 100).toFixed(1) + '%');
+					body.style.setProperty('--holo-y', (y * 100).toFixed(1) + '%');
+					body.style.setProperty('--holo-angle', angle + 'deg');
+				});
 			});
 
 			card.addEventListener('mouseleave', function () {
 				// Spring back to neutral — CSS transition handles easing
+				lastEvent = null;
 				body.style.setProperty('--tilt-x', '0deg');
 				body.style.setProperty('--tilt-y', '0deg');
 			});
@@ -208,9 +240,13 @@
 				var selectedSize = card ? card.querySelector('.holo__size-pill--active') : null;
 				var size = selectedSize ? selectedSize.getAttribute('data-size') : '';
 
-				// Loading state
+				// Loading state. textContent is cleared so the CSS spinner can take
+				// over — we set aria-label to keep the button announceable while
+				// it has no visible text.
 				var originalText = btn.textContent;
+				var originalAriaLabel = btn.getAttribute('aria-label');
 				btn.classList.add('holo__buy--loading');
+				btn.setAttribute('aria-label', 'Adding to cart, please wait');
 				btn.textContent = '';
 
 				// Build request
@@ -238,6 +274,9 @@
 					if (data.error) {
 						btn.classList.add('holo__buy--error');
 						btn.textContent = 'Error';
+						// textContent is now meaningful — drop the temporary
+						// aria-label so the visible text becomes the a11y name.
+						restoreAriaLabel(btn, originalAriaLabel);
 						setTimeout(function () {
 							btn.classList.remove('holo__buy--error');
 							btn.textContent = originalText;
@@ -250,6 +289,7 @@
 					// Success
 					btn.classList.add('holo__buy--added');
 					btn.textContent = 'Added ✓';
+					restoreAriaLabel(btn, originalAriaLabel);
 
 					// Update WC fragments (mini-cart count etc.)
 					if (data.fragments) {
@@ -267,6 +307,7 @@
 				.catch(function () {
 					btn.classList.remove('holo__buy--loading');
 					btn.textContent = originalText;
+					restoreAriaLabel(btn, originalAriaLabel);
 					btn.disabled = false;
 					btn.removeAttribute('aria-busy');
 				});
