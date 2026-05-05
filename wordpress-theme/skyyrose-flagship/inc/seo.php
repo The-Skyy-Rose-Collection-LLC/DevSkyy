@@ -36,7 +36,7 @@ function skyyrose_product_schema() {
 		return;
 	}
 
-	$product = function_exists( 'wc_get_product' ) ? wc_get_product( get_the_ID() ) : null;
+	$product = skyyrose_current_wc_product();
 
 	if ( ! $product ) {
 		return;
@@ -530,8 +530,8 @@ function skyyrose_open_graph_tags() {
 		}
 
 		// Product-specific OG tags.
-		if ( is_singular( 'product' ) && function_exists( 'wc_get_product' ) ) {
-			$product = wc_get_product( $post->ID );
+		if ( is_singular( 'product' ) ) {
+			$product = skyyrose_current_wc_product( $post->ID );
 			if ( $product && function_exists( 'get_woocommerce_currency' ) ) {
 				echo '<meta property="product:price:amount" content="' . esc_attr( $product->get_price() ) . '" />' . "\n";
 				echo '<meta property="product:price:currency" content="' . esc_attr( get_woocommerce_currency() ) . '" />' . "\n";

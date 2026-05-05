@@ -164,16 +164,14 @@ function skyyrose_preload_hero_image() {
 	} elseif ( function_exists( 'is_product' ) && is_product() ) {
 		// Single product: the main gallery image is the LCP element.
 		// $GLOBALS['product'] can hold non-WC_Product values when third-party
-		// callbacks fire before wp_head priority 4. Guard with instanceof, and
-		// only overwrite the global when wc_get_product() returns a valid
-		// WC_Product — it returns false on draft/trashed/non-product posts, and
-		// writing false back to the global would pollute any downstream readers
-		// that still use truthy checks.
+		// callbacks fire before wp_head priority 4 — only adopt a fresh
+		// resolution when the helper returns a valid WC_Product so we never
+		// write null/false back to the global.
 		global $product;
-		if ( ! $product instanceof WC_Product && function_exists( 'wc_get_product' ) ) {
-			$fetched = wc_get_product( get_the_ID() );
-			if ( $fetched instanceof WC_Product ) {
-				$product = $fetched;
+		if ( ! $product instanceof WC_Product ) {
+			$resolved = skyyrose_current_wc_product();
+			if ( $resolved instanceof WC_Product ) {
+				$product = $resolved;
 			}
 		}
 		if ( $product instanceof WC_Product && $product->get_image_id() ) {
