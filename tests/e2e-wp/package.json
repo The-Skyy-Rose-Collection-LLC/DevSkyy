@@ -1,0 +1,17 @@
+{
+  "name": "skyyrose-wp-e2e",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Playwright E2E tests for the SkyyRose WordPress theme at skyyrose.co — covers regressions like bug_001 (Three.js clock pause/resume) and bug_006 (aria-busy timing).",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:bug-001": "playwright test specs/bug_001-clock-pause-resume.spec.ts",
+    "test:bug-006": "playwright test specs/bug_006-aria-busy-timing.spec.ts",
+    "install-browsers": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0"
+  }
+}
