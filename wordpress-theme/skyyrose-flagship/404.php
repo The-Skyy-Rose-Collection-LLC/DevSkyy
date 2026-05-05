@@ -67,7 +67,7 @@ if ( class_exists( 'WooCommerce' ) ) {
 	if ( $skyyrose_trending_query->have_posts() ) {
 		while ( $skyyrose_trending_query->have_posts() ) {
 			$skyyrose_trending_query->the_post();
-			$skyyrose_product = wc_get_product( get_the_ID() );
+			$skyyrose_product = skyyrose_current_wc_product();
 
 			if ( $skyyrose_product ) {
 				$skyyrose_trending_products[] = array(

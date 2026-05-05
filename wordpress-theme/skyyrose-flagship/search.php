@@ -154,7 +154,7 @@ $skyyrose_collections = array(
 						$skyyrose_index = 0;
 						while ( $skyyrose_product_results->have_posts() ) :
 							$skyyrose_product_results->the_post();
-							$skyyrose_wc_product = wc_get_product( get_the_ID() );
+							$skyyrose_wc_product = skyyrose_current_wc_product();
 
 							if ( $skyyrose_wc_product ) :
 								get_template_part(
