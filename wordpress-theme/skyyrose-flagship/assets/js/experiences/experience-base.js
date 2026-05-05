@@ -477,8 +477,12 @@ class SkyyRoseExperience {
         if (this.isRunning) return;
         this.isRunning = true;
         if (this.clock) {
-            this.clock.oldTime = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+            this.clock.oldTime = performance.now();
             this.clock.running = true;
+            // pause() called clock.stop(), which also flipped autoStart to false.
+            // Restore it so any future implicit start (e.g. first getDelta in a
+            // subclass) behaves like a freshly-constructed Clock.
+            this.clock.autoStart = true;
         }
         this.animate();
     }
