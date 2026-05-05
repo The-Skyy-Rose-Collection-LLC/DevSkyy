@@ -277,11 +277,16 @@
 						// textContent is now meaningful — drop the temporary
 						// aria-label so the visible text becomes the a11y name.
 						restoreAriaLabel(btn, originalAriaLabel);
+						// aria-busy must clear synchronously with the new
+						// textContent. While busy=true, AT defers presenting
+						// name changes; if we wait for the setTimeout, the
+						// "Error" text will have already reverted to "Add to
+						// Cart" by the time AT is allowed to announce.
+						btn.removeAttribute('aria-busy');
 						setTimeout(function () {
 							btn.classList.remove('holo__buy--error');
 							btn.textContent = originalText;
 							btn.disabled = false;
-							btn.removeAttribute('aria-busy');
 						}, 2000);
 						return;
 					}
@@ -290,18 +295,23 @@
 					btn.classList.add('holo__buy--added');
 					btn.textContent = 'Added ✓';
 					restoreAriaLabel(btn, originalAriaLabel);
+					// See aria-busy note in the error branch above — this
+					// must be synchronous with the success textContent so
+					// screen readers actually announce "Added ✓".
+					btn.removeAttribute('aria-busy');
 
 					// Update WC fragments (mini-cart count etc.)
 					if (data.fragments) {
 						jQuery(document.body).trigger('added_to_cart', [data.fragments, data.cart_hash, jQuery(btn)]);
 					}
 
-					// Reset after delay
+					// Visual reset only — disabled stays true through the
+					// success window so a screen reader user reading the
+					// announcement can't accidentally fire a second add.
 					setTimeout(function () {
 						btn.classList.remove('holo__buy--added');
 						btn.textContent = originalText;
 						btn.disabled = false;
-						btn.removeAttribute('aria-busy');
 					}, 2500);
 				})
 				.catch(function () {
