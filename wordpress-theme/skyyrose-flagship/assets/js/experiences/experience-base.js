@@ -461,17 +461,24 @@ class SkyyRoseExperience {
         if (this.clock) this.clock.stop();
     }
 
-    // Resume the rAF loop. Drops the elapsed-while-hidden delta on the floor
-    // by restarting the clock; otherwise the next animate() tick would advance
-    // particles/animations by the entire pause duration in a single frame.
+    // Resume the rAF loop without discarding accumulated time.
+    //
+    // THREE.Clock.start() rebases oldTime AND zeroes elapsedTime. The subclass
+    // scenes (blackrose, lovehurts, signature) read clock.elapsedTime as a
+    // monotonic phase variable for Math.sin/cos animations — moon glow, petal
+    // drift, candelabra sway, particle motion. Resetting it to 0 produces a
+    // visible snap on every tab return, exactly the bug pause/resume was
+    // supposed to prevent.
+    //
+    // Rebase oldTime directly so the next getDelta() returns ~0 (no
+    // pause-duration spike) while elapsedTime keeps growing monotonically.
     resume() {
         if (this.prefersReducedMotion) return;
         if (this.isRunning) return;
         this.isRunning = true;
         if (this.clock) {
-            this.clock.start();
-            // getDelta() reads since last call — discard the stale delta.
-            this.clock.getDelta();
+            this.clock.oldTime = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+            this.clock.running = true;
         }
         this.animate();
     }
