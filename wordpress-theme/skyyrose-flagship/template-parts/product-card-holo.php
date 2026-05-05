@@ -64,7 +64,30 @@ $index = (int) ( $args['index'] ?? 0 );
 				<span class="holo__size-pill">L</span>
 				<span class="holo__size-pill">XL</span>
 			</div>
-			<a href="<?php echo esc_url(get_permalink($product_id)); ?>" class="holo__buy">View Technical Details</a>
+			<?php
+			/*
+			 * Add-to-Cart button — wires the holo card into product-card-holo.js's
+			 * AJAX handler. The handler binds via `.holo__buy[data-product-id]`,
+			 * so the data attribute is the activation contract.
+			 *
+			 * Element is a real <button> (not <a>) because the JS toggles the
+			 * native `disabled` attribute as a double-click guard during the
+			 * AJAX cycle — disabled has no semantics on <a>.
+			 *
+			 * Product-page navigation lives on the title and gallery links
+			 * above (lines 44 + 52-54); the holo card's drawer CTA is now
+			 * the conversion path.
+			 *
+			 * aria-label is set so the button has an accessible name even
+			 * during the loading state when textContent is cleared.
+			 */
+			?>
+			<button type="button" class="holo__buy"
+				data-product-id="<?php echo esc_attr( (int) $product_id ); ?>"
+				aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Add %s to cart', 'skyyrose' ), $title ) ); ?>"
+				<?php disabled( $product_id <= 0 ); ?>>
+				<?php esc_html_e( 'Add to Cart', 'skyyrose' ); ?>
+			</button>
 		</div>
 	</div>
 </div>

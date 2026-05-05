@@ -152,7 +152,13 @@
                             ...config,
                             isMobile: isMobileDevice
                         };
-                        new ExperienceClass(collection + '-experience', collectionConfig);
+                        // Mirror the data-config path (line 125-129) which stores
+                        // the instance on the DOM element. Without this, the
+                        // visibilitychange handler at line ~268 reads
+                        // container._skyyRoseExperience and finds undefined,
+                        // so pause()/resume() never fires for ID-init experiences.
+                        const experience = new ExperienceClass(collection + '-experience', collectionConfig);
+                        container._skyyRoseExperience = experience;
                         container.dataset.initialized = 'true';
                         if (config.debug) console.log('SkyyRose 3D: Auto-initialized ' + collection + ' experience');
                     } catch (error) {
