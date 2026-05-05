@@ -85,6 +85,14 @@ class SkyyRoseExperience {
 
         this.container.appendChild(this.renderer.domElement);
 
+        // a11y: announce the canvas as an image with a meaningful label.
+        // Screen readers otherwise see a bare <canvas> with no role or name.
+        var sceneLabel = this.options.ariaLabel
+            || (this.container.dataset && this.container.dataset.sceneLabel)
+            || 'SkyyRose immersive 3D scene';
+        this.renderer.domElement.setAttribute('role', 'img');
+        this.renderer.domElement.setAttribute('aria-label', sceneLabel);
+
         // Controls
         if (typeof THREE.OrbitControls !== 'undefined') {
             this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
@@ -440,6 +448,33 @@ class SkyyRoseExperience {
 
     // Override in subclass for custom updates
     update(delta) {}
+
+    // Pause the rAF loop entirely. Stops the GPU from rendering on hidden tabs.
+    // Reduced-motion scenes already self-stop after one render — pause is a no-op.
+    pause() {
+        if (this.prefersReducedMotion) return;
+        this.isRunning = false;
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+        }
+        if (this.clock) this.clock.stop();
+    }
+
+    // Resume the rAF loop. Drops the elapsed-while-hidden delta on the floor
+    // by restarting the clock; otherwise the next animate() tick would advance
+    // particles/animations by the entire pause duration in a single frame.
+    resume() {
+        if (this.prefersReducedMotion) return;
+        if (this.isRunning) return;
+        this.isRunning = true;
+        if (this.clock) {
+            this.clock.start();
+            // getDelta() reads since last call — discard the stale delta.
+            this.clock.getDelta();
+        }
+        this.animate();
+    }
 
     // Cleanup — stop loop, remove listeners, free GPU resources
     dispose() {

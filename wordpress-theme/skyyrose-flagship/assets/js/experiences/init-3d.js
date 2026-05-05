@@ -257,7 +257,12 @@
     }
 
     /**
-     * Handle visibility changes (pause when tab not visible)
+     * Handle visibility changes — fully pause the rAF loop on hidden tabs.
+     *
+     * Stopping only the THREE.Clock leaves requestAnimationFrame running and
+     * the GPU rendering at 60fps in the background, which burns the user's
+     * battery and CPU for an offscreen canvas. We call pause()/resume() on
+     * the experience so the rAF loop is cancelled and restarted instead.
      */
     function setupVisibilityHandler() {
         document.addEventListener('visibilitychange', function() {
@@ -265,17 +270,19 @@
 
             containers.forEach(container => {
                 const experience = container._skyyRoseExperience;
-                if (experience) {
-                    if (document.hidden) {
-                        // Pause animation when tab is hidden
-                        if (experience.clock) {
-                            experience.clock.stop();
-                        }
-                    } else {
-                        // Resume animation when tab is visible
-                        if (experience.clock) {
-                            experience.clock.start();
-                        }
+                if (!experience) return;
+
+                if (document.hidden) {
+                    if (typeof experience.pause === 'function') {
+                        experience.pause();
+                    } else if (experience.clock) {
+                        experience.clock.stop();
+                    }
+                } else {
+                    if (typeof experience.resume === 'function') {
+                        experience.resume();
+                    } else if (experience.clock) {
+                        experience.clock.start();
                     }
                 }
             });

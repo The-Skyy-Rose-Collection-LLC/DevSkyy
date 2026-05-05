@@ -278,12 +278,17 @@ function skyyrose_enqueue_global_scripts() {
 
 	// Motion One — vanilla JS animation library (same author as Framer Motion).
 	// Exposes window.Motion with animate(), scroll(), inView(), timeline().
+	// Loaded with `defer` strategy: parsed in parallel with HTML, executed after
+	// DOMContentLoaded. premium-interactions.js depends on it and self-defers.
 	wp_enqueue_script(
 		'motion-one',
 		'https://cdn.jsdelivr.net/npm/motion@11/dist/motion.min.js',
 		array(),
 		'11',
-		true
+		array(
+			'strategy'  => 'defer',
+			'in_footer' => true,
+		)
 	);
 
 	// Premium interactions: parallax, split-text, magnetic, stagger, scroll-fade.
