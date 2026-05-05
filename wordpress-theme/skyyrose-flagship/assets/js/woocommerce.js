@@ -397,13 +397,21 @@
 		},
 
 		showStep: function (step) {
+			// Hide all step panels from AT and disable interaction. inert
+			// blocks tab traversal + click; aria-hidden hides from the
+			// accessibility tree so screen readers don't read inactive
+			// form fields as part of the current step.
 			this.$steps
 				.removeClass('skyy-checkout__step--active')
-				.removeAttr('data-skyy-active');
+				.removeAttr('data-skyy-active')
+				.attr('aria-hidden', 'true')
+				.attr('inert', '');
 
 			$('[data-skyy-step="' + step + '"]')
 				.addClass('skyy-checkout__step--active')
-				.attr('data-skyy-active', '');
+				.attr('data-skyy-active', '')
+				.removeAttr('aria-hidden')
+				.removeAttr('inert');
 		},
 
 		updateProgress: function (step) {

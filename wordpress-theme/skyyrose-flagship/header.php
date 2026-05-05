@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
-<a class="skip-link" href="#primary"><?php esc_html_e( 'Skip to the story', 'skyyrose' ); ?></a>
+<a class="skip-link" href="#primary"><?php esc_html_e( 'Skip to main content', 'skyyrose' ); ?></a>
 
 <!-- Global Grain & Vignette for Cinematic Depth -->
 <div class="global-grain" aria-hidden="true"></div>
@@ -80,7 +80,10 @@ defined( 'ABSPATH' ) || exit;
 		</nav>
 
 		<!-- Mobile Menu Slide-In -->
-		<div class="mobile-menu" id="mobile-menu" aria-hidden="true" inert>
+		<div class="mobile-menu" id="mobile-menu"
+			role="dialog" aria-modal="true"
+			aria-label="<?php esc_attr_e( 'Navigation menu', 'skyyrose' ); ?>"
+			aria-hidden="true" inert>
 			<div class="mobile-menu__overlay" id="mobile-menu-overlay" aria-hidden="true"></div>
 			<div class="mobile-menu__panel">
 				<div class="mobile-menu__header">
@@ -96,10 +99,14 @@ defined( 'ABSPATH' ) || exit;
 		</div>
 
         <!-- Search Overlay -->
-        <div class="search-overlay" id="search-overlay" aria-hidden="true" inert>
+        <div class="search-overlay" id="search-overlay"
+            role="dialog" aria-modal="true"
+            aria-label="<?php esc_attr_e( 'Search the SkyyRose collection', 'skyyrose' ); ?>"
+            aria-hidden="true" inert>
             <div class="search-overlay__container">
                 <form role="search" method="get" class="search-overlay__form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
-                    <input type="search" class="search-overlay__input" placeholder="SEARCH THE COLLECTION..." name="s" autocomplete="off">
+                    <label for="search-overlay-input" class="screen-reader-text"><?php esc_html_e( 'Search the SkyyRose collection', 'skyyrose' ); ?></label>
+                    <input type="search" id="search-overlay-input" class="search-overlay__input" placeholder="<?php esc_attr_e( 'Search the collection…', 'skyyrose' ); ?>" name="s" autocomplete="off">
                 </form>
                 <button class="search-overlay__close" id="search-close" type="button" aria-label="<?php esc_attr_e( 'Close search', 'skyyrose' ); ?>">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
