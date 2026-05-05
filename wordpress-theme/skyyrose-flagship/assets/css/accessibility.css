@@ -19,15 +19,17 @@
 	transform: translateX(-50%);
 	z-index: 10000;
 	padding: 14px 32px;
-	background: var(--color-rose-gold, #B76E79);
-	color: var(--color-text-primary, #fff);
+	/* WCAG 1.4.3 contrast — inverted from the original rose-gold-on-white
+	   (3.80:1, FAIL) to rose-gold-on-dark (5.26:1, AA pass). */
+	background: var(--color-page-bg, #0A0A0A);
+	color: var(--color-rose-gold, #B76E79);
 	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.75rem;
 	font-weight: 600;
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
 	text-decoration: none;
-	border: 1px solid var(--color-gold, #D4AF37);
+	border: 1px solid var(--color-rose-gold, #B76E79);
 	border-top: none;
 	border-radius: 0 0 2px 2px;
 	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);

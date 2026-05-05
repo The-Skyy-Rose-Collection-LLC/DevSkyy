@@ -137,13 +137,20 @@
 	var searchInput = searchOverlay ? searchOverlay.querySelector('input[type="search"]') : null;
 	var pageWrap = document.getElementById('page');
 
+	// Track whether the overlay is currently open so the global Escape
+	// handler doesn't fire focus moves on every keystroke when it isn't.
+	var searchIsOpen = false;
+
 	function closeSearchOverlay() {
-		if (searchOverlay) {
-			searchOverlay.classList.remove('open');
-			searchOverlay.setAttribute('aria-hidden', 'true');
-			searchOverlay.setAttribute('inert', '');
-		}
+		if (!searchOverlay || !searchIsOpen) return;
+		searchOverlay.classList.remove('open');
+		searchOverlay.setAttribute('aria-hidden', 'true');
+		searchOverlay.setAttribute('inert', '');
 		if (pageWrap) pageWrap.removeAttribute('inert');
+		searchIsOpen = false;
+		// WCAG 2.4.3 — return keyboard focus to the trigger that opened
+		// the overlay, not the document body.
+		if (searchToggle) searchToggle.focus();
 	}
 
 	if (searchToggle && searchOverlay) {
@@ -152,13 +159,14 @@
 			searchOverlay.setAttribute('aria-hidden', 'false');
 			searchOverlay.removeAttribute('inert');
 			if (pageWrap) pageWrap.setAttribute('inert', '');
+			searchIsOpen = true;
 			if (searchInput) setTimeout(function () { searchInput.focus(); }, 100);
 		});
 	}
 
 	if (searchClose) searchClose.addEventListener('click', closeSearchOverlay);
 	document.addEventListener('keydown', function (e) {
-		if (e.key === 'Escape') closeSearchOverlay();
+		if (e.key === 'Escape' && searchIsOpen) closeSearchOverlay();
 	});
 
 	/* --------------------------------------------------

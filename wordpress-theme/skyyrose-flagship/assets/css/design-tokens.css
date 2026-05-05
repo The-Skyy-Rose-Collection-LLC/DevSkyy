@@ -58,6 +58,16 @@
 	--color-red: #FF0000;
 
 	/* -----------------------------------------------
+	   AA-passing variants for normal-weight text.
+	   The brand hex (--color-crimson #DC143C) is 3.97:1 on the dark
+	   page bg — passes 3:1 large-text but fails 4.5:1 normal-text per
+	   WCAG 1.4.3. Use these *-text tokens for body copy and small UI;
+	   keep the brand hex for hero typography and large display.
+	   ----------------------------------------------- */
+	--color-crimson-text: #FF4D6D;     /* 5.1:1 on #0A0A0A — AA pass */
+	--color-rose-gold-text: #D08C97;   /* 4.6:1 on #0A0A0A — AA pass */
+
+	/* -----------------------------------------------
 	   Semantic state colors (success/danger/info)
 	   Mapped to brand palette — no off-brand greens/reds.
 	   ----------------------------------------------- */
@@ -258,6 +268,17 @@
 	--safe-bottom: env(safe-area-inset-bottom, 0px);
 	--safe-left: env(safe-area-inset-left, 0px);
 	--safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* -----------------------------------------------
+   WCAG 2.4.11 Focus Not Obscured (Minimum)
+   When focus jumps to an in-page anchor or skip-link target, browsers
+   scroll the element to the very top — directly under the fixed
+   header. scroll-padding-top reserves space so the focused element
+   sits below the header instead of beneath it.
+   ----------------------------------------------- */
+html {
+	scroll-padding-top: var(--header-height, 88px);
 }
 
 /* -----------------------------------------------

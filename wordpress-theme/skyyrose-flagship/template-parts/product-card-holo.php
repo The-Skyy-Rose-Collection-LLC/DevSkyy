@@ -43,7 +43,7 @@ $index = (int) ( $args['index'] ?? 0 );
 		<div class="holo__gallery">
 			<a href="<?php echo esc_url( get_permalink($product_id) ); ?>" class="holo__img-link">
 				<img class="holo__img holo__img--front" src="<?php echo esc_url($front_url); ?>" alt="<?php echo esc_attr($title); ?>" loading="lazy">
-				<img class="holo__img holo__img--back" src="<?php echo esc_url($back_url); ?>" alt="Technical Blueprint" loading="lazy">
+				<img class="holo__img holo__img--back" src="<?php echo esc_url($back_url); ?>" alt="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( '%s — technical blueprint view', 'skyyrose' ), $title ) ); ?>" loading="lazy">
 			</a>
 		</div>
 
@@ -58,13 +58,28 @@ $index = (int) ( $args['index'] ?? 0 );
 		</div>
 
 		<div class="holo__drawer">
-			<div class="holo__sizes">
-				<span class="holo__size-pill">S</span>
-				<span class="holo__size-pill">M</span>
-				<span class="holo__size-pill">L</span>
-				<span class="holo__size-pill">XL</span>
+			<?php
+			// Size pills are radio-buttons in a radiogroup so keyboard users
+			// can Tab into the group and Enter/Space to select. The
+			// product-card-holo.js click handler already drives the
+			// aria-checked state and active class on click — using
+			// <button role="radio"> makes that ARIA usage valid (it was
+			// invalid on bare <span> elements which can't carry aria-checked).
+			$sizes = array( 'S', 'M', 'L', 'XL' );
+			?>
+			<div class="holo__sizes" role="radiogroup" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Select size for %s', 'skyyrose' ), $title ) ); ?>">
+				<?php foreach ( $sizes as $i => $size ) : ?>
+					<button
+						type="button"
+						class="holo__size-pill"
+						role="radio"
+						aria-checked="false"
+						data-size="<?php echo esc_attr( $size ); ?>"
+						tabindex="<?php echo 0 === $i ? '0' : '-1'; ?>"
+					><?php echo esc_html( $size ); ?></button>
+				<?php endforeach; ?>
 			</div>
-			<a href="<?php echo esc_url(get_permalink($product_id)); ?>" class="holo__buy">View Technical Details</a>
+			<a href="<?php echo esc_url(get_permalink($product_id)); ?>" class="holo__buy"><?php esc_html_e( 'View Technical Details', 'skyyrose' ); ?></a>
 		</div>
 	</div>
 </div>

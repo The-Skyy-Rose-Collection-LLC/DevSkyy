@@ -42,8 +42,8 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 <div class="skyy-checkout" data-skyy-checkout>
 
 	<!-- 4-STEP PROGRESS BAR -->
-	<div class="skyy-checkout__progress" role="navigation" aria-label="<?php esc_attr_e( 'Checkout progress', 'skyyrose' ); ?>">
-		<ol class="skyy-checkout__progress-steps">
+	<div class="skyy-checkout__progress">
+		<ol class="skyy-checkout__progress-steps" aria-label="<?php esc_attr_e( 'Checkout progress', 'skyyrose' ); ?>">
 			<li class="skyy-checkout__progress-step is-active is-complete" data-step="0">
 				<span class="skyy-checkout__progress-number">1</span>
 				<span class="skyy-checkout__progress-label"><?php esc_html_e( 'Cart', 'skyyrose' ); ?></span>
@@ -146,7 +146,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 				</div>
 
 				<!-- STEP 2: Shipping Address -->
-				<div class="skyy-checkout__step" data-skyy-step="2">
+				<div class="skyy-checkout__step" data-skyy-step="2" aria-hidden="true" inert>
 					<div class="skyy-checkout__panel">
 						<h2 class="skyy-checkout__panel-title">
 							<?php esc_html_e( 'Shipping Address', 'skyyrose' ); ?>
@@ -330,7 +330,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 				?>
 
 				<!-- STEP 3: Payment -->
-				<div class="skyy-checkout__step" data-skyy-step="3">
+				<div class="skyy-checkout__step" data-skyy-step="3" aria-hidden="true" inert>
 					<div class="skyy-checkout__panel">
 						<h2 class="skyy-checkout__panel-title">
 							<?php esc_html_e( 'Payment', 'skyyrose' ); ?>
@@ -411,7 +411,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 				</div>
 
 				<!-- STEP 4: Review & Confirm -->
-				<div class="skyy-checkout__step" data-skyy-step="4">
+				<div class="skyy-checkout__step" data-skyy-step="4" aria-hidden="true" inert>
 					<div class="skyy-checkout__panel">
 						<h2 class="skyy-checkout__panel-title">
 							<?php esc_html_e( 'Review & Confirm', 'skyyrose' ); ?>
