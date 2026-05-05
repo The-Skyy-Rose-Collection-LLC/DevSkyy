@@ -82,6 +82,12 @@ HEALTH_CHECKS=(
     "Immersive: Signature|/experience-signature/|immersive-signature"
     "Pre-Order Gateway|/pre-order/|pre-order"
     "Experiences Hub|/experience/|Immersive Experiences"
+    # Product pages — added 2026-05-05 after a hotfix regression slipped
+    # past verification because /product/ surface was uncovered. Marker is
+    # "add-to-cart" (WC form) — only present after wp_head() and full body
+    # render, so a fatal anywhere in the product render path fails the check.
+    "Product: BLACK Rose Crewneck|/product/br-001/|add-to-cart"
+    "Product: Kids Red Set|/product/kids-001/|add-to-cart"
 )
 
 # ---------------------------------------------------------------------------

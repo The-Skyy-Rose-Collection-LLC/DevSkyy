@@ -68,6 +68,8 @@ usage() {
     echo "  ENV_FILE             Path to .env.wordpress (default: \$PROJECT_ROOT/.env.wordpress)"
     echo "  THEME_DIR_OVERRIDE   Override theme source directory"
     echo "  PUBLIC_URL           Verified URL for post-deploy check (default: https://skyyrose.co/)"
+    echo "  RUN_FULL_VERIFY      'true' to run deep per-page verification after homepage check"
+    echo "                       (default: false; set by npm run deploy)"
     echo ""
     echo "The script will:"
     echo "  1. Run preflight checks (credentials, tools, PHP syntax)"
@@ -613,12 +615,32 @@ verify_live() {
         return 1
     fi
 
-    # Deep per-page + content-marker verification lives in verify-deploy.sh
-    # (called by deploy-pipeline.sh). Keep this function's scope narrow:
-    # homepage-200 + no-PHP-errors is the last-ditch safety when someone
-    # runs deploy-theme.sh directly. For full post-deploy checks, run
-    # `bash scripts/verify-deploy.sh` or `bash scripts/deploy-pipeline.sh`.
-    log_success "Post-deploy verification passed (HTTP $http_code, $size bytes)"
+    log_success "Homepage verification passed (HTTP $http_code, $size bytes)"
+
+    # Deep per-page verification — opt-in via RUN_FULL_VERIFY=true. Calls
+    # verify-deploy.sh which curls a representative set of pages (homepage,
+    # REST, collections, immersive, pre-order, AND product pages) and greps
+    # for content markers. Catches regressions on surfaces the homepage
+    # check above doesn't touch — added 2026-05-05 after a /product/{sku}/
+    # regression slipped past homepage-only verification.
+    #
+    # The npm `deploy` script enables this by default. Disable for one
+    # invocation with: RUN_FULL_VERIFY=false bash scripts/deploy-theme.sh
+    if [[ "${RUN_FULL_VERIFY:-false}" == "true" ]]; then
+        local verify_script
+        verify_script="$(dirname "${BASH_SOURCE[0]}")/verify-deploy.sh"
+        if [[ -x "$verify_script" ]]; then
+            log_info "Running deep verification (verify-deploy.sh)..."
+            if ! WORDPRESS_URL="${public_url%/}" bash "$verify_script"; then
+                log_error "Deep verification FAILED — see output above"
+                return 1
+            fi
+        else
+            log_warn "RUN_FULL_VERIFY=true but verify-deploy.sh not found at: $verify_script"
+        fi
+    fi
+
+    log_success "Post-deploy verification passed"
     return 0
 }
 
