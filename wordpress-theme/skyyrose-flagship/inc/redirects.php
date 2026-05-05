@@ -48,3 +48,35 @@ function skyyrose_collection_redirects() {
 	}
 }
 add_action( 'template_redirect', 'skyyrose_collection_redirects', 1 );
+
+/**
+ * Redirect /preorder/ to /pre-order/ (canonical hyphenated slug).
+ *
+ * The Pre-Order Gateway page is published at /pre-order/. External links,
+ * sitemap entries, and social referrers occasionally use the un-hyphenated
+ * /preorder/ form, which 404s. Permanent 301 preserves link equity and
+ * keeps inbound traffic resolving to the gateway. Both trailing-slash
+ * and no-trailing-slash variants are handled.
+ *
+ * @since 6.7.0
+ * @return void
+ */
+function skyyrose_preorder_slug_redirect() {
+	$request_uri = isset( $_SERVER['REQUEST_URI'] )
+		? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) )
+		: '';
+	$path = strtok( $request_uri, '?' );
+
+	if ( '/preorder/' !== $path && '/preorder' !== $path ) {
+		return;
+	}
+
+	$target  = home_url( '/pre-order/' );
+	$qs_pos  = strpos( $request_uri, '?' );
+	if ( false !== $qs_pos ) {
+		$target .= substr( $request_uri, $qs_pos );
+	}
+	wp_safe_redirect( $target, 301 );
+	exit;
+}
+add_action( 'template_redirect', 'skyyrose_preorder_slug_redirect', 1 );
