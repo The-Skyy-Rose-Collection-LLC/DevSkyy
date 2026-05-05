@@ -762,7 +762,7 @@ def run_tournament(
     candidate_path: Path,
     dna: dict,
     passing_threshold: float = 98.0,
-    vision_timeout: float = 300.0,
+    vision_timeout: float = 600.0,
 ) -> TournamentResult:
     """Run 3-judge tournament: 2 vision judges in parallel, then Opus synthesis.
 
@@ -777,11 +777,15 @@ def run_tournament(
       placeholder in the missing slot.
     - No synthesis client → warn; aggregate falls back to vision-pair mean.
 
-    `vision_timeout` defaults to 300s (5 min). Reasoning-mode vision
-    models with `effort=high` and dynamic thinking can spend 90–180s on
-    fine-grained image comparison; a 90s timeout would cut them off
-    silently with `concurrent.futures.TimeoutError` — whose `str()` is
-    empty, so the failure looks like a blank error in logs.
+    `vision_timeout` defaults to 600s (10 min). Reasoning-mode vision
+    models with `effort=high` and dynamic thinking are highly
+    stochastic — typical runs are 90–180s but tail latency on hard
+    image-comparison tasks can exceed 5 minutes. The Layer 1 validation
+    on 2026-05-04 hit 300s on GPT-5.5-pro post-refine, surfacing as an
+    empty `concurrent.futures.TimeoutError`. 10 min is the empirical
+    p99 ceiling we've observed; below this is real timeout territory
+    (model genuinely stuck or API issue) where we'd rather fail fast
+    than wait indefinitely.
     """
     vision_missing = [name for name in VISION_JUDGE_LABELS if not clients.get(name)]
     vision_available = [name for name in VISION_JUDGE_LABELS if clients.get(name)]
