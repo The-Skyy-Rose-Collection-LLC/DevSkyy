@@ -20,6 +20,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from nano_banana.vision_context import VisionContext
+
 if TYPE_CHECKING:
     from nano_banana.tournament import TournamentResult
 
@@ -170,12 +172,16 @@ class ProductionPipeline:
             from nano_banana.spec_builder import build_dna_from_sku
 
             canonical = build_dna_from_sku(sku)
-            vision_desc["spec"] = canonical["spec"]
-            vision_desc["_dossier"] = canonical["_dossier"]
+            # Attribute writes on VisionContext — typed contract instead
+            # of the previous string-keyed mutation. Spec and dossier are
+            # always populated together (they come from the same load),
+            # which matches VisionContext's co-presence invariant.
+            vision_desc.spec = canonical.spec
+            vision_desc.dossier = canonical.dossier
             log.info(
                 "DOSSIER: loaded canonical spec for %s (%dc spec text)",
                 sku,
-                len(canonical["spec"]),
+                len(canonical.spec) if canonical.spec else 0,
             )
         except Exception as exc:
             log.warning(
@@ -184,7 +190,10 @@ class ProductionPipeline:
                 exc,
             )
 
-        result.vision_desc = vision_desc
+        # Store flat-dict view for JSON serialization & downstream readers.
+        # The Dossier object is intentionally dropped here (large, not
+        # JSON-safe); spec text is preserved.
+        result.vision_desc = vision_desc.to_dict()
 
         # ── Step 1b: GATHER BUNDLE REFERENCES ────────────────────────
         # Load COMPLETE product bundle — every available asset
@@ -308,6 +317,7 @@ class ProductionPipeline:
                 if qa_source != source_path:
                     break
 
+        qa_result: TournamentResult | None = None
         try:
             qa_result = run_tournament(
                 clients=tournament_clients,
@@ -346,7 +356,7 @@ class ProductionPipeline:
         # luxury-brand-disqualifying — even renders with high text/logo
         # scores must be refined if Opus says they hallucinated.
         needs_refine = False
-        if hasattr(qa_result, "judges"):
+        if qa_result is not None and hasattr(qa_result, "judges"):
             for judge in qa_result.judges:
                 if judge.text_accuracy < cfg.qa_refine_text_threshold:
                     needs_refine = True
@@ -520,26 +530,36 @@ class ProductionPipeline:
 
         return results
 
-    def _get_or_cache_vision(self, product: dict, source_path: Path) -> dict:
-        """Get vision description from cache or generate new."""
+    def _get_or_cache_vision(self, product: dict, source_path: Path) -> VisionContext:
+        """Get vision description from cache or generate new.
+
+        Returns a VisionContext with inferred Gemini-vision fields
+        populated. The spec/dossier slots remain None — those get filled
+        by the canonical-dossier merge in `run_single` after this call.
+
+        Disk cache stores the raw inferred dict (JSON-safe); the
+        VisionContext wrapper is reconstructed on read.
+        """
         from nano_banana.vision_describe import describe_product
 
         sku = product.get("sku", "unknown")
 
-        # Check memory cache
+        # Check memory cache — VisionContext objects round-trip directly
         if sku in self._vision_cache:
             log.info("DESCRIBE: using cached vision for %s", sku)
             return self._vision_cache[sku]
 
-        # Check disk cache
+        # Check disk cache (stores plain dict — Dossier objects aren't
+        # JSON-serializable, and cached vision pre-dates the dossier merge)
         cache_dir = PROJECT_ROOT / self.config.vision_cache_dir
         cache_file = cache_dir / f"{sku}-vision.json"
         if cache_file.exists():
             try:
                 desc = json.loads(cache_file.read_text())
-                self._vision_cache[sku] = desc
+                ctx = VisionContext(inferred=desc)
+                self._vision_cache[sku] = ctx
                 log.info("DESCRIBE: loaded from disk cache for %s", sku)
-                return desc
+                return ctx
             except (json.JSONDecodeError, OSError):
                 pass
 
@@ -552,13 +572,14 @@ class ProductionPipeline:
             model=self.config.gemini_vision_model,
         )
 
+        ctx = VisionContext(inferred=desc or {})
         if desc:
-            self._vision_cache[sku] = desc
+            self._vision_cache[sku] = ctx
             cache_dir.mkdir(parents=True, exist_ok=True)
             cache_file.write_text(json.dumps(desc, indent=2))
             log.info("DESCRIBE: cached vision for %s", sku)
 
-        return desc
+        return ctx
 
 
 def _build_refinement_prompt(name: str, sku: str, qa_result: TournamentResult) -> str:
