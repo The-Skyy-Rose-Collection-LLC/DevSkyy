@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from functools import cache
 from pathlib import Path
 
 from skyyrose.core.catalog_loader import CATALOG_CSV, read_catalog_rows
@@ -122,8 +123,13 @@ def parse_dossier_markdown(text: str) -> Dossier:
     )
 
 
+@cache
 def load_dossier(slug: str, dossiers_dir: Path | None = None) -> Dossier:
-    """Load and parse a dossier by slug. Raises DossierMissingError if absent."""
+    """Load and parse a dossier by slug. Raises DossierMissingError if absent.
+
+    Memoized: callers should treat the returned Dossier as read-only —
+    mutating fields mutates the shared cache.
+    """
     base = dossiers_dir or DOSSIERS_DIR
     path = base / f"{slug}.md"
     if not path.exists():

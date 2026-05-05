@@ -555,9 +555,6 @@ class HuggingFace3DClient:
         task_id: str,
     ) -> HF3DResult:
         """Call Hunyuan3D 2.0 for text-to-3D generation."""
-        url = f"{HF_API_BASE}/{HF3DModel.HUNYUAN3D_2.value}"
-
-        # Quality presets
         quality_settings = {
             HF3DQuality.DRAFT: {"steps": 20, "resolution": 256},
             HF3DQuality.STANDARD: {"steps": 50, "resolution": 512},
@@ -565,7 +562,6 @@ class HuggingFace3DClient:
             HF3DQuality.PRODUCTION: {"steps": 100, "resolution": 1024},
         }
         settings = quality_settings.get(quality, quality_settings[HF3DQuality.STANDARD])
-
         payload = {
             "inputs": prompt,
             "parameters": {
@@ -574,30 +570,21 @@ class HuggingFace3DClient:
                 "output_format": output_format.value,
             },
         }
-
-        async with session.post(url, json=payload) as response:
-            if response.status == 200:
-                data = await response.read()
-                output_path = await self._save_model(data, task_id, output_format)
-
-                return HF3DResult(
-                    task_id=task_id,
-                    model_used=HF3DModel.HUNYUAN3D_2,
-                    format=output_format,
-                    output_path=output_path,
-                    output_bytes=data,
-                    quality_score=self._estimate_quality_score(len(data), quality),
-                    polycount=self._estimate_polycount(len(data)),
-                    has_textures=True,
-                    metadata={
-                        "prompt": prompt,
-                        "settings": settings,
-                        "model": HF3DModel.HUNYUAN3D_2.value,
-                    },
-                )
-            else:
-                error_text = await response.text()
-                raise ValueError(f"Hunyuan3D API error: {response.status} - {error_text}")
+        return await self._call_hf_inference(
+            session,
+            HF3DModel.HUNYUAN3D_2,
+            payload,
+            output_format,
+            task_id,
+            metadata_extras={
+                "prompt": prompt,
+                "settings": settings,
+                "model": HF3DModel.HUNYUAN3D_2.value,
+            },
+            has_textures=True,
+            quality_for_estimate=quality,
+            include_polycount=True,
+        )
 
     async def _call_hunyuan3d_image(
         self,
@@ -609,11 +596,6 @@ class HuggingFace3DClient:
         task_id: str,
     ) -> HF3DResult:
         """Call Hunyuan3D 2.0 for image-to-3D generation."""
-        url = f"{HF_API_BASE}/{HF3DModel.HUNYUAN3D_2.value}"
-
-        # Encode image as base64
-        image_b64 = base64.b64encode(image_data).decode()
-
         quality_settings = {
             HF3DQuality.DRAFT: {"steps": 20},
             HF3DQuality.STANDARD: {"steps": 50},
@@ -621,39 +603,29 @@ class HuggingFace3DClient:
             HF3DQuality.PRODUCTION: {"steps": 100},
         }
         settings = quality_settings.get(quality, quality_settings[HF3DQuality.STANDARD])
-
         payload = {
-            "inputs": image_b64,
+            "inputs": base64.b64encode(image_data).decode(),
             "parameters": {
                 "num_inference_steps": settings["steps"],
                 "remove_background": remove_background,
                 "output_format": output_format.value,
             },
         }
-
-        async with session.post(url, json=payload) as response:
-            if response.status == 200:
-                data = await response.read()
-                output_path = await self._save_model(data, task_id, output_format)
-
-                return HF3DResult(
-                    task_id=task_id,
-                    model_used=HF3DModel.HUNYUAN3D_2,
-                    format=output_format,
-                    output_path=output_path,
-                    output_bytes=data,
-                    quality_score=self._estimate_quality_score(len(data), quality),
-                    polycount=self._estimate_polycount(len(data)),
-                    has_textures=True,
-                    metadata={
-                        "source": "image",
-                        "settings": settings,
-                        "remove_background": remove_background,
-                    },
-                )
-            else:
-                error_text = await response.text()
-                raise ValueError(f"Hunyuan3D API error: {response.status} - {error_text}")
+        return await self._call_hf_inference(
+            session,
+            HF3DModel.HUNYUAN3D_2,
+            payload,
+            output_format,
+            task_id,
+            metadata_extras={
+                "source": "image",
+                "settings": settings,
+                "remove_background": remove_background,
+            },
+            has_textures=True,
+            quality_for_estimate=quality,
+            include_polycount=True,
+        )
 
     async def _call_triposr(
         self,
@@ -683,8 +655,12 @@ class HuggingFace3DClient:
                 f"https://huggingface.co/spaces/{HF_SPACE_TRIPOSR}",
             )
 
-            # Call the predict function
-            result = gradio_client.predict(
+            # gradio_client.predict is synchronous; wrap in asyncio.to_thread so
+            # the event loop stays free while TripoSR runs (often 20-60s).
+            # See orchestration/CLAUDE.md: sync I/O inside async pipelines must
+            # use asyncio.to_thread.
+            result = await asyncio.to_thread(
+                gradio_client.predict,
                 tmp_path,  # Input image
                 remove_background,  # Remove background
                 self.config.triposr_foreground_ratio,  # Foreground ratio
@@ -728,38 +704,25 @@ class HuggingFace3DClient:
         task_id: str,
     ) -> HF3DResult:
         """Call LGM for Gaussian splatting generation."""
-        url = f"{HF_API_BASE}/{HF3DModel.LGM.value}"
-
-        image_b64 = base64.b64encode(image_data).decode()
-
+        actual_format = HF3DFormat.SPLAT if output_format == HF3DFormat.SPLAT else HF3DFormat.PLY
         payload = {
-            "inputs": image_b64,
+            "inputs": base64.b64encode(image_data).decode(),
             "parameters": {
                 "output_format": "splat" if output_format == HF3DFormat.SPLAT else "ply",
             },
         }
-
-        async with session.post(url, json=payload) as response:
-            if response.status == 200:
-                data = await response.read()
-                # LGM outputs splat format by default
-                actual_format = (
-                    HF3DFormat.SPLAT if output_format == HF3DFormat.SPLAT else HF3DFormat.PLY
-                )
-                output_path = await self._save_model(data, task_id, actual_format)
-
-                return HF3DResult(
-                    task_id=task_id,
-                    model_used=HF3DModel.LGM,
-                    format=actual_format,
-                    output_path=output_path,
-                    output_bytes=data,
-                    quality_score=85.0,  # LGM produces consistent quality
-                    metadata={"source": "image", "technique": "gaussian_splatting"},
-                )
-            else:
-                error_text = await response.text()
-                raise ValueError(f"LGM API error: {response.status} - {error_text}")
+        return await self._call_hf_inference(
+            session,
+            HF3DModel.LGM,
+            payload,
+            output_format,
+            task_id,
+            metadata_extras={"source": "image", "technique": "gaussian_splatting"},
+            quality_score_override=85.0,  # LGM produces consistent quality
+            save_format_override=actual_format,
+            result_format_override=actual_format,
+            include_polycount=False,
+        )
 
     async def _call_instantmesh(
         self,
@@ -770,37 +733,24 @@ class HuggingFace3DClient:
         task_id: str,
     ) -> HF3DResult:
         """Call InstantMesh for multi-view 3D generation."""
-        url = f"{HF_API_BASE}/{HF3DModel.INSTANTMESH.value}"
-
-        image_b64 = base64.b64encode(image_data).decode()
-
         payload = {
-            "inputs": image_b64,
+            "inputs": base64.b64encode(image_data).decode(),
             "parameters": {
                 "remove_background": remove_background,
                 "output_format": output_format.value,
             },
         }
-
-        async with session.post(url, json=payload) as response:
-            if response.status == 200:
-                data = await response.read()
-                output_path = await self._save_model(data, task_id, output_format)
-
-                return HF3DResult(
-                    task_id=task_id,
-                    model_used=HF3DModel.INSTANTMESH,
-                    format=output_format,
-                    output_path=output_path,
-                    output_bytes=data,
-                    quality_score=self._estimate_quality_score(len(data), HF3DQuality.HIGH),
-                    polycount=self._estimate_polycount(len(data)),
-                    has_textures=True,
-                    metadata={"source": "image", "technique": "multi_view_diffusion"},
-                )
-            else:
-                error_text = await response.text()
-                raise ValueError(f"InstantMesh API error: {response.status} - {error_text}")
+        return await self._call_hf_inference(
+            session,
+            HF3DModel.INSTANTMESH,
+            payload,
+            output_format,
+            task_id,
+            metadata_extras={"source": "image", "technique": "multi_view_diffusion"},
+            has_textures=True,
+            quality_for_estimate=HF3DQuality.HIGH,
+            include_polycount=True,
+        )
 
     async def _call_shap_e_text(
         self,
@@ -812,8 +762,6 @@ class HuggingFace3DClient:
         task_id: str,
     ) -> HF3DResult:
         """Call Shap-E for text-to-3D generation."""
-        url = f"{HF_API_BASE}/{HF3DModel.SHAP_E_TEXT.value}"
-
         payload = {
             "inputs": prompt,
             "parameters": {
@@ -823,27 +771,85 @@ class HuggingFace3DClient:
         }
         if seed is not None:
             payload["parameters"]["seed"] = seed
+        return await self._call_hf_inference(
+            session,
+            HF3DModel.SHAP_E_TEXT,
+            payload,
+            output_format,
+            task_id,
+            metadata_extras={"prompt": prompt, "guidance_scale": guidance_scale},
+            quality_score_override=75.0,
+            save_format_override=HF3DFormat.PLY,  # Shap-E outputs PLY regardless of caller's format
+            result_format_override=HF3DFormat.PLY,
+            include_polycount=False,
+        )
+
+    async def _call_hf_inference(
+        self,
+        session: aiohttp.ClientSession,
+        model: HF3DModel,
+        payload: dict,
+        output_format: HF3DFormat,
+        task_id: str,
+        *,
+        metadata_extras: dict | None = None,
+        has_textures: bool = False,
+        quality_score_override: float | None = None,
+        quality_for_estimate: HF3DQuality = HF3DQuality.STANDARD,
+        save_format_override: HF3DFormat | None = None,
+        result_format_override: HF3DFormat | None = None,
+        include_polycount: bool = False,
+    ) -> HF3DResult:
+        """Shared HF Inference API scaffold: POST → save → build HF3DResult.
+
+        Each named `_call_*` method (Hunyuan/LGM/InstantMesh/Shap-E) builds
+        a per-model payload and delegates here so URL construction, HTTP
+        semantics, error handling, and result construction live in one
+        place. TripoSR keeps its own method because it uses the Gradio
+        Space transport, not the Inference API.
+
+        Override knobs:
+          - quality_score_override: pin the score (e.g. LGM=85.0); None →
+            estimate from byte size and `quality_for_estimate`.
+          - save_format_override / result_format_override: force a specific
+            format on disk and/or in the result envelope, regardless of
+            caller-requested `output_format` (LGM/Shap-E).
+          - include_polycount: True for models where polycount estimate is
+            meaningful (Hunyuan/InstantMesh); False for sparse formats
+            where polycount is misleading (LGM splats, Shap-E PLY).
+        """
+        model_id = self.config.custom_model_id if model == HF3DModel.CUSTOM else model.value
+        url = f"{HF_API_BASE}/{model_id}"
 
         async with session.post(url, json=payload) as response:
-            if response.status == 200:
-                data = await response.read()
-                output_path = await self._save_model(data, task_id, HF3DFormat.PLY)
-
-                return HF3DResult(
-                    task_id=task_id,
-                    model_used=HF3DModel.SHAP_E_TEXT,
-                    format=HF3DFormat.PLY,  # Shap-E outputs PLY
-                    output_path=output_path,
-                    output_bytes=data,
-                    quality_score=75.0,
-                    metadata={
-                        "prompt": prompt,
-                        "guidance_scale": guidance_scale,
-                    },
-                )
-            else:
+            if response.status != 200:
                 error_text = await response.text()
-                raise ValueError(f"Shap-E API error: {response.status} - {error_text}")
+                raise ValueError(f"{model.name} API error: {response.status} - {error_text}")
+
+            data = await response.read()
+            save_fmt = save_format_override or output_format
+            output_path = await self._save_model(data, task_id, save_fmt)
+
+            result_fmt = result_format_override or save_fmt
+            quality_score = (
+                quality_score_override
+                if quality_score_override is not None
+                else self._estimate_quality_score(len(data), quality_for_estimate)
+            )
+
+            kwargs: dict[str, Any] = {
+                "task_id": task_id,
+                "model_used": model,
+                "format": result_fmt,
+                "output_path": output_path,
+                "output_bytes": data,
+                "quality_score": quality_score,
+                "has_textures": has_textures,
+                "metadata": metadata_extras or {},
+            }
+            if include_polycount:
+                kwargs["polycount"] = self._estimate_polycount(len(data))
+            return HF3DResult(**kwargs)
 
     async def _call_inference_api_text(
         self,

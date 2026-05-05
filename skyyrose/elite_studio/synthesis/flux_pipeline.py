@@ -33,6 +33,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from llm.model_ids import GEMINI_VISION_MODEL
+
 from ..agents.vision_audit_agent import VisionAuditAgent, VisionAuditResult
 from .clients import FalClient
 from .stages.audit_filter import AuditError, AuditFilter  # noqa: F401 (AuditError re-raised)
@@ -342,7 +344,7 @@ def _build_manifest(
         "model_stage3": (
             "fal-ai/flux-kontext-lora/inpaint" if lora_url else "fal-ai/flux-pro/v1/fill"
         ),
-        "model_audit": "gemini-3-flash-preview",
+        "model_audit": GEMINI_VISION_MODEL,
         "timestamp": datetime.now(UTC).isoformat(),
         "attempts": attempts,
         "duration_ms": duration_ms,

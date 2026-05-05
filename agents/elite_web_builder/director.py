@@ -696,7 +696,7 @@ def _load_default_routing() -> dict[str, Any]:
     # Builtin fallback — synced with config/provider_routing.json
     return {
         "routes": {
-            "director": {"provider": "anthropic", "model": "claude-opus-4-6"},
+            "director": {"provider": "anthropic", "model": "claude-opus-4-7"},
             "design_system": {"provider": "google", "model": "gemini-3-pro-preview"},
             "frontend_dev": {"provider": "anthropic", "model": "claude-sonnet-4-6"},
             "backend_dev": {"provider": "anthropic", "model": "claude-sonnet-4-6"},

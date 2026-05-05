@@ -3,9 +3,13 @@
 Promoted to ADK SuperAgent for comprehensive "Back Data" (telemetry) and
 high-fidelity dual-agent vision consensus.
 
-Agent A: Claude Opus 4.6 (Anthropic SDK)
-Agent B: Gemini 2.0 Flash (gemini_rest.py)
+Agent A: OpenAI gpt-4o (chat.completions vision)
+Agent B: Gemini Flash (gemini_rest.py)
 Mode:    Consensus — both must return YES to proceed.
+
+Per the elite-team policy in llm/model_ids.py: vision is OpenAI + Gemini.
+Claude is not used for vision (vision is a Claude weakness); the previous
+Claude leg was migrated to gpt-4o in commit-{policy}.
 
 VisionAgent is aliased to DualVisionGate for nodes.py backwards compatibility.
 """
@@ -24,7 +28,7 @@ from ..models import PreflightResult, SynthesizedVision, VisionAnalysis
 
 logger = logging.getLogger(__name__)
 
-from ..config import VISION_CLAUDE_MODEL as _CLAUDE_MODEL
+from ..config import OPENAI_VISION_MODEL as _OPENAI_MODEL
 from ..config import VISION_GEMINI_MODEL as _GEMINI_VISION_MODEL
 
 # Products images live here (relative to project root)
@@ -113,7 +117,7 @@ class DualVisionGate(BaseSuperAgent):
         prompt = _PREFLIGHT_PROMPT.format(name=expected_garment)
 
         try:
-            a_text = await self._call_claude(image_path, prompt)
+            a_text = await self._call_openai(image_path, prompt)
             b_text = await self._call_gemini(image_path, prompt)
         except Exception as exc:
             logger.error(f"Preflight vision calls failed: {exc}")
@@ -138,7 +142,7 @@ class DualVisionGate(BaseSuperAgent):
 
         blocking = []
         if not a_yes:
-            blocking.append(f"Agent A (Claude): {a_text[:200]}")
+            blocking.append(f"Agent A (OpenAI): {a_text[:200]}")
         if not b_yes:
             blocking.append(f"Agent B (Gemini): {b_text[:200]}")
 
@@ -176,17 +180,17 @@ class DualVisionGate(BaseSuperAgent):
         prompt = _VISION_SPEC_PROMPT.format(sku=sku, name=name, branding=branding)
 
         try:
-            a_text = await self._call_claude(ref, prompt)
+            a_text = await self._call_openai(ref, prompt)
             a_result = VisionAnalysis(
                 success=True,
-                provider="anthropic",
-                model=_CLAUDE_MODEL,
+                provider="openai",
+                model=_OPENAI_MODEL,
                 analysis=a_text,
                 char_count=len(a_text),
             )
         except Exception as exc:
             a_result = VisionAnalysis(
-                success=False, provider="anthropic", model=_CLAUDE_MODEL, error=str(exc)
+                success=False, provider="openai", model=_OPENAI_MODEL, error=str(exc)
             )
 
         try:
@@ -224,31 +228,31 @@ class DualVisionGate(BaseSuperAgent):
     # Private helpers
     # ------------------------------------------------------------------
 
-    async def _call_claude(self, image_path: str, prompt: str) -> str:
-        from ..config import get_anthropic_client
+    async def _call_openai(self, image_path: str, prompt: str) -> str:
+        from ..config import get_openai_client
 
-        client = get_anthropic_client()
+        client = get_openai_client()
 
         ext = Path(image_path).suffix.lower().lstrip(".")
         media_type = "image/jpeg" if ext in ("jpg", "jpeg") else f"image/{ext}"
         b64 = _load_image_b64(image_path)
-        msg = client.messages.create(
-            model=_CLAUDE_MODEL,
+        msg = client.chat.completions.create(
+            model=_OPENAI_MODEL,
             max_tokens=512,
             messages=[
                 {
                     "role": "user",
                     "content": [
-                        {
-                            "type": "image",
-                            "source": {"type": "base64", "media_type": media_type, "data": b64},
-                        },
                         {"type": "text", "text": prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:{media_type};base64,{b64}"},
+                        },
                     ],
                 }
             ],
         )
-        return msg.content[0].text
+        return msg.choices[0].message.content
 
     async def _call_gemini(self, image_path: str, prompt: str) -> str:
         ext = Path(image_path).suffix.lower().lstrip(".")

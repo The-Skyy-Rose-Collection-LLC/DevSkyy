@@ -23,12 +23,16 @@
 	var mAnimate   = typeof M.animate   === 'function' ? M.animate   : null;
 	var mScroll    = typeof M.scroll    === 'function' ? M.scroll    : null;
 
+	/* ── Unified reveal selector (single source of truth) ──────────── */
+	var revealSelectors =
+		'.rv-clip-up,.rv-clip-left,.rv-clip-right,.rv-clip-diagonal,' +
+		'.rv-blur,.rv-blur-down,.stagger-grid,' +
+		'.rv-split-char,.rv-split-word,.rv-split-line,' +
+		'.col-reveal,.lp-rv,.abt-page .rv';
+
 	if (prefersReduced) {
-		document.querySelectorAll(
-			'.rv-clip-up,.rv-clip-left,.rv-clip-right,.rv-clip-diagonal,' +
-			'.rv-blur,.rv-blur-down,.stagger-grid,' +
-			'.rv-split-char,.rv-split-word,.rv-split-line,.col-reveal'
-		).forEach(function (el) { el.classList.add('is-visible'); });
+		document.querySelectorAll(revealSelectors)
+			.forEach(function (el) { el.classList.add('is-visible'); });
 		return;
 	}
 
@@ -102,20 +106,17 @@
 
 	/* ══════════════════════════════════════════════════════════════════
 	   2. SCROLL REVEALS
+	   Single observer for the entire theme. Subsumes the per-page observers
+	   that previously lived in landing-pages.js and about.js (retired in U-1).
 	   Motion One inView() when available; IntersectionObserver fallback.
-	   Both paths add 'is-visible' — CSS in animations-premium.css drives
-	   the actual clip-path / blur / opacity transitions.
+	   Both paths add 'is-visible' — CSS in animations-premium.css and
+	   per-feature stylesheets drive the actual transitions.
 	   ══════════════════════════════════════════════════════════════════ */
-
-	var revealSelectors =
-		'.rv-clip-up,.rv-clip-left,.rv-clip-right,.rv-clip-diagonal,' +
-		'.rv-blur,.rv-blur-down,.stagger-grid,' +
-		'.rv-split-char,.rv-split-word,.rv-split-line,.col-reveal';
 
 	if (mInView) {
 		mInView(revealSelectors, function (el) {
 			el.classList.add('is-visible');
-		}, { amount: 0.12, margin: '0px 0px -30px 0px' });
+		}, { amount: 0.12, margin: '0px 0px -40px 0px' });
 	} else {
 		var revealEls = document.querySelectorAll(revealSelectors);
 		if (revealEls.length && 'IntersectionObserver' in window) {
@@ -126,7 +127,7 @@
 						revealObs.unobserve(entry.target);
 					}
 				});
-			}, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+			}, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 			revealEls.forEach(function (el) { revealObs.observe(el); });
 		} else {
 			document.querySelectorAll(revealSelectors)

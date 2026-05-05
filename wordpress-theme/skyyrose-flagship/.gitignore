@@ -26,8 +26,10 @@ test-results/
 
 # Build Files
 *.map
-*.min.js
-*.min.css
+# NOTE: *.min.js and *.min.css are tracked in this theme — they ship to
+# production via the rsync deploy script. The root .gitignore at the repo
+# root has a negation rule that whitelists assets/**/*.min.{js,css} here.
+# Source maps still excluded (debug-only).
 dist/
 build/
 

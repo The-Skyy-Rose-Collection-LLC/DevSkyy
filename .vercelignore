@@ -11,6 +11,8 @@ frontend/node_modules
 
 # Python Virtual Environments - CRITICAL
 .venv
+.venv-*
+**/.venv-*
 venv
 env
 .env.local
@@ -52,6 +54,44 @@ build
 
 # Assets folder (large media files)
 assets
+
+# Non-frontend top-level directories — none of these are referenced by the
+# Next.js build (`cd frontend && npm install && npx next build`). They include
+# the Python pipeline, agent code, the WordPress theme, 3D experiments, and
+# render outputs. Cumulative weight: ~4 GB. Each contains files >10MB that
+# trigger Vercel's per-blob upload cap (renders/3d/*.glb, source PNGs, GIFs,
+# ZIP archives, native shared libraries from secondary venvs, etc.).
+/skyyrose
+/agents
+/TRELLIS.2
+/claude-context
+/editorial-staging
+/renders
+/wordpress-theme
+/source-products
+/brand-assets
+/cerebrum
+/skyyrose-redesign
+/.claude
+/.cursor
+/.ralph
+/.wolf
+/.husky
+/.planning
+/.openwolf
+/data
+/eval
+/knowledge-base
+/orchestration
+/pipelines
+/llm
+/database
+/security
+/services
+/api
+/core
+/conversation_pipeline
+/mcp_servers
 
 # Vercel local build output
 .vercel/output

@@ -46,6 +46,8 @@ from typing import Any
 import httpx
 from PIL import Image, ImageFilter
 
+from llm.model_ids import CLAUDE_OPUS_MODEL
+
 # Module-level imports the test fixtures patch. Importing at module level (not
 # inside functions) is required so unittest.mock.patch can replace them on the
 # `compositor_agent` namespace without having to re-import inside each call.
@@ -305,7 +307,7 @@ class CompositorAgent:
                     lighting_spec=lighting_spec,
                 )
                 stages["prompt"] = {
-                    "model": "claude-opus-4-7",
+                    "model": CLAUDE_OPUS_MODEL,
                     "chars": len(prompt),
                     "duration_s": round(time.perf_counter() - started, 3),
                 }

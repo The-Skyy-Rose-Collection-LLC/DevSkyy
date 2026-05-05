@@ -53,6 +53,13 @@ import openai
 from google import genai as google_genai
 from google.genai import types as genai_types
 
+from llm.model_ids import (
+    CLAUDE_SONNET_MODEL,
+    GEMINI_PRO_IMAGE_MODEL,
+    GEMINI_VISION_MODEL,
+    OPENAI_VISION_MODEL,
+)
+
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
@@ -147,7 +154,7 @@ ANALYZE THIS PRODUCT PHOTO:
 RETURN: Detailed technical specifications in clear paragraphs. Be EXTREMELY specific about logos."""
 
         response = openai_client.chat.completions.create(
-            model="gpt-4o",
+            model=OPENAI_VISION_MODEL,
             messages=[
                 {
                     "role": "user",
@@ -172,7 +179,7 @@ RETURN: Detailed technical specifications in clear paragraphs. Be EXTREMELY spec
         return {
             "status": "ok",
             "provider": "openai",
-            "model": "gpt-4o",
+            "model": OPENAI_VISION_MODEL,
             "sku": sku,
             "view": view,
             "analysis": analysis,
@@ -246,7 +253,7 @@ VERIFY THIS PRODUCT PHOTO:
 RETURN: Concise technical assessment focused on brand consistency and generation requirements."""
 
         response = gemini_client.models.generate_content(
-            model="gemini-3-flash-preview",
+            model=GEMINI_VISION_MODEL,
             contents=[
                 prompt,
                 genai_types.Part(
@@ -260,7 +267,7 @@ RETURN: Concise technical assessment focused on brand consistency and generation
         return {
             "status": "ok",
             "provider": "google",
-            "model": "gemini-3-flash-preview",
+            "model": GEMINI_VISION_MODEL,
             "sku": sku,
             "view": view,
             "analysis": analysis,
@@ -330,7 +337,7 @@ UNIFIED GARMENT SPECIFICATION - {sku.upper()}
 Be precise, technical, and comprehensive."""
 
         response = anthropic_client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model=CLAUDE_SONNET_MODEL,
             max_tokens=2000,
             temperature=0.3,
             messages=[{"role": "user", "content": prompt}],
@@ -341,7 +348,7 @@ Be precise, technical, and comprehensive."""
         return {
             "status": "ok",
             "provider": "anthropic",
-            "model": "claude-sonnet-4-20250514",
+            "model": CLAUDE_SONNET_MODEL,
             "sku": sku,
             "synthesis": synthesis,
             "char_count": len(synthesis),
@@ -430,7 +437,7 @@ Create a professional editorial fashion photograph for SkyyRose luxury streetwea
 Generate the image now."""
 
         response = gemini_client.models.generate_content(
-            model="gemini-3-pro-image-preview",
+            model=GEMINI_PRO_IMAGE_MODEL,
             contents=[
                 prompt,
                 genai_types.Part(
@@ -458,7 +465,7 @@ Generate the image now."""
                 return {
                     "status": "ok",
                     "provider": "google",
-                    "model": "gemini-3-pro-image-preview",
+                    "model": GEMINI_PRO_IMAGE_MODEL,
                     "sku": sku,
                     "view": view,
                     "output_path": str(output_path),
@@ -652,7 +659,7 @@ RETURN JSON:
 }}"""
 
         response = anthropic_client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model=CLAUDE_SONNET_MODEL,
             max_tokens=1500,
             temperature=0.3,
             messages=[
@@ -693,7 +700,7 @@ RETURN JSON:
         return {
             "status": "ok",
             "provider": "anthropic",
-            "model": "claude-sonnet-4-20250514",
+            "model": CLAUDE_SONNET_MODEL,
             "sku": sku,
             "verification": verification_result,
             "image_path": image_path,

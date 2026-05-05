@@ -1,33 +1,43 @@
 # scripts/measurement/
 
-**Status:** Phase 0.5 deliverable. Scripts in this directory are not yet built.
+**Status:** Phase 0.5 verifier set is built (2026-05-03). Baseline-capture and weekly-report scripts are still Phase 0.5.e deliverables and not yet implemented.
 
 ## Why this directory exists in Phase 0
 
-`eval/measurement-access-requests.md` references this directory's scripts (`verify-all-grants.js`, `verify-google-service-account.js`, `verify-gsc.js`, `verify-gtm.js`, `verify-meta.js`, `verify-sentry.js`) as the verification gate after the access packet is actioned.
+`eval/measurement-access-requests.md` references this directory's scripts as the verification gate after the access packet is actioned. The verifiers don't try to provision anything — they only confirm that the credentials Corey added in the packet actually work end-to-end against each platform's read API.
 
-In Phase 0, only the dispatcher stub `verify-all-grants.js` exists — and it intentionally exits with code 1 plus an explicit message so anyone running it sees "not built yet" instead of "Cannot find module" (which is the silent-disable failure mode this audit pass eliminated).
+## What's built
 
-## What gets built in Phase 0.5
+| Script | What it verifies | Required env |
+|--------|-----------------|--------------|
+| `verify-all-grants.js` | Aggregator — runs every verifier, prints PASS/FAIL/SKIP per row, exits 0 only when all pass | (delegates) |
+| `verify-google-service-account.js` | JWT auth and access-token issuance using the service account | `GOOGLE_SERVICE_ACCOUNT_JSON` |
+| `verify-ga4.js` | GA4 Data API `runReport` — returns last-30d sessions count | `GOOGLE_SERVICE_ACCOUNT_JSON`, `GA4_PROPERTY_ID` |
+| `verify-gsc.js` | Search Console `searchAnalytics.query` — returns top 10 queries by clicks | `GOOGLE_SERVICE_ACCOUNT_JSON`, `GSC_SITE_URL` |
+| `verify-gtm.js` | Tag Manager containers list + version_headers — confirms `GTM-XXXX` is reachable | `GOOGLE_SERVICE_ACCOUNT_JSON`, `GTM_ACCOUNT_ID`, `GTM_CONTAINER_ID` |
+| `verify-meta.js` | Graph API `debug_token` — confirms System User token is valid + has `ads_read`/`business_management` | `META_SYSTEM_USER_TOKEN` |
+| `verify-sentry.js` | Sentry projects API — confirms both `skyyrose-co` and `devskyy-app` projects exist | `SENTRY_AUTH_TOKEN_READ`, `SENTRY_ORG_SLUG` |
 
-| Script | What it verifies |
-|--------|-----------------|
-| `verify-all-grants.js` | Aggregator — runs every individual verifier, reports PASS/FAIL per grant, exits 0 only when all pass |
-| `verify-google-service-account.js` | GA4 + GSC + GTM service account auth via `GOOGLE_SERVICE_ACCOUNT_JSON` env var |
-| `verify-gsc.js` | Google Search Console API — returns indexed page count, top 10 queries by clicks |
-| `verify-gtm.js` | Google Tag Manager API — returns container ID, last published version |
-| `verify-meta.js` | Meta Business System User token — returns pixel events 30d + ad spend if applicable |
-| `verify-sentry.js` | Sentry Auth Token — returns project list, last 30d issue count per project |
+Shared infra in `_lib/`:
 
-Plus the supporting infra in Phase 0.5.e:
+- `_lib/google-jwt.js` — single source of truth for `JWT` client construction + `authedFetch()`. All three Google verifiers consume this so a scope typo or JSON-parse bug is fixed in one place.
+- `_lib/format.js` — exit-code constants (`EXIT_PASS=0`, `EXIT_FAIL=1`, `EXIT_MISSING_ENV=2`), colored PASS/FAIL/SKIP printers, and `requireEnv()` early-exit helper.
+
+## Exit-code contract (read by the dispatcher)
+
+| Code | Meaning | Dispatcher behaviour |
+|------|---------|---------------------|
+| 0 | PASS — credentials work, resource readable | Counted in PASS bucket |
+| 1 | FAIL — credentials present but API call failed (auth scope, wrong ID, network, quota) | Counted in FAIL bucket; dispatcher exits 1 |
+| 2 | MISSING_ENV — required env var not set | Counted in SKIP bucket; dispatcher exits 2 if no FAIL but at least one SKIP |
+
+This split lets the operator distinguish "you skipped a step" (2) from "you broke a step" (1) without reading colour codes.
+
+## Still to build (Phase 0.5.e)
 
 - `scripts/measurement/pull-baselines.js` — populates `eval/baselines.md` from the verifiers
 - `scripts/measurement/weekly-report.js` — Monday cron via `vercel.json`'s (to-be-added) `crons` block
 - `scripts/measurement/loop-stats.js` — compound-learning meta-verification per WP §1.5 Layer 6
-
-## Why the stub fails loudly
-
-The original failure mode for missing scripts is "Cannot find module" with a Node stack trace — easy to miss, looks like an environment problem. The stub returns a one-paragraph explanation pointing at this README and the access packet. Same exit code (non-zero), but the operator now knows *why* and *what to do next*.
 
 ## Cross-references
 
@@ -35,3 +45,14 @@ The original failure mode for missing scripts is "Cannot find module" with a Nod
 - `eval/silent-disable-audit.md` — the audit that surfaced this gap as instance S5
 - `docs/SKYYROSE_WORDPRESS_PLAN.md` §WP-0.5 — Phase 0.5 deliverable specification
 - `docs/SKYYROSE_V2_MASTER_PLAN.md` §5 Phase 0.5 — verification sweep specification
+
+## Local testing
+
+After Step 7 of the access packet:
+
+```bash
+vercel env pull .env.local                     # gitignored; delete after testing
+node --env-file=.env.local scripts/measurement/verify-all-grants.js
+```
+
+Node ≥ 22 supports `--env-file` natively; no `dotenv` dependency required.

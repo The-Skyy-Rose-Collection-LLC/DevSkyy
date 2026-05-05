@@ -72,7 +72,7 @@ get_header();
 					</blockquote>
 				</div>
 				<div class="lp-story__visual lp-rv" data-delay="2">
-					<div class="lp-story__image" style="background: linear-gradient(135deg, #1a0a0e 0%, #2d0a14 50%, #0a0a0a 100%); aspect-ratio: 3/4; border-radius: var(--lp-radius);"></div>
+					<div class="lp-story__image" style="background: linear-gradient(135deg, #1a0a0e 0%, #2d0a14 50%, #0a0a0a 100%); aspect-ratio: 3/4; border-radius: var(--skyyrose-radius);"></div>
 				</div>
 			</div>
 		</div>
@@ -106,13 +106,13 @@ get_header();
 				<h2><?php echo esc_html( 'The Look' ); ?></h2>
 			</div>
 			<div class="lp-editorial__grid lp-rv" data-delay="1">
-				<div class="lp-editorial__item" style="background: linear-gradient(145deg, #1a0a0e, #0a0a0a); aspect-ratio: 4/5; border-radius: var(--lp-radius);"></div>
-				<div class="lp-editorial__item" style="background: linear-gradient(145deg, #2d0a14, #0a0a0a); aspect-ratio: 4/5; border-radius: var(--lp-radius);"></div>
-				<div class="lp-editorial__item" style="background: linear-gradient(145deg, #1a0a0e, #2d0a14); aspect-ratio: 4/5; border-radius: var(--lp-radius);"></div>
+				<div class="lp-editorial__item" style="background: linear-gradient(145deg, #1a0a0e, #0a0a0a); aspect-ratio: 4/5; border-radius: var(--skyyrose-radius);"></div>
+				<div class="lp-editorial__item" style="background: linear-gradient(145deg, #2d0a14, #0a0a0a); aspect-ratio: 4/5; border-radius: var(--skyyrose-radius);"></div>
+				<div class="lp-editorial__item" style="background: linear-gradient(145deg, #1a0a0e, #2d0a14); aspect-ratio: 4/5; border-radius: var(--skyyrose-radius);"></div>
 			</div>
 			<div class="lp-editorial__grid lp-editorial__grid--row2 lp-rv" data-delay="2">
-				<div class="lp-editorial__item" style="background: linear-gradient(145deg, #2d0a14, #0a0a0a); aspect-ratio: 16/9; border-radius: var(--lp-radius);"></div>
-				<div class="lp-editorial__item" style="background: linear-gradient(145deg, #1a0a0e, #0a0a0a); aspect-ratio: 16/9; border-radius: var(--lp-radius);"></div>
+				<div class="lp-editorial__item" style="background: linear-gradient(145deg, #2d0a14, #0a0a0a); aspect-ratio: 16/9; border-radius: var(--skyyrose-radius);"></div>
+				<div class="lp-editorial__item" style="background: linear-gradient(145deg, #1a0a0e, #0a0a0a); aspect-ratio: 16/9; border-radius: var(--skyyrose-radius);"></div>
 			</div>
 		</div>
 	</section>

@@ -278,12 +278,17 @@ function skyyrose_enqueue_global_scripts() {
 
 	// Motion One — vanilla JS animation library (same author as Framer Motion).
 	// Exposes window.Motion with animate(), scroll(), inView(), timeline().
+	// Loaded with `defer` strategy: parsed in parallel with HTML, executed after
+	// DOMContentLoaded. premium-interactions.js depends on it and self-defers.
 	wp_enqueue_script(
 		'motion-one',
 		'https://cdn.jsdelivr.net/npm/motion@11/dist/motion.min.js',
 		array(),
 		'11',
-		true
+		array(
+			'strategy'  => 'defer',
+			'in_footer' => true,
+		)
 	);
 
 	// Premium interactions: parallax, split-text, magnetic, stagger, scroll-fade.
@@ -685,6 +690,35 @@ function skyyrose_enqueue_template_scripts() {
 					),
 				)
 			);
+		}
+
+		// Localize immersive scenes + load the WC bridge that wires the
+		// "Pre-Order Now" button to skyyrose_immersive_add_to_cart.
+		if ( 'immersive' === $slug && wp_script_is( $handle, 'enqueued' ) ) {
+			wp_localize_script(
+				$handle,
+				'skyyRoseImmersive',
+				array(
+					'ajaxUrl'  => admin_url( 'admin-ajax.php' ),
+					'nonce'    => wp_create_nonce( 'skyyrose-immersive-nonce' ),
+					'wcActive' => class_exists( 'WooCommerce' ),
+					'cartUrl'  => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
+				)
+			);
+
+			$bridge_file = $use_min && file_exists( $base_js_dir . '/immersive-wc-bridge.min.js' )
+				? 'immersive-wc-bridge.min.js'
+				: 'immersive-wc-bridge.js';
+
+			if ( file_exists( $base_js_dir . '/' . $bridge_file ) ) {
+				wp_enqueue_script(
+					'skyyrose-immersive-wc-bridge',
+					$base_js_uri . '/' . $bridge_file,
+					array( $handle ),
+					SKYYROSE_VERSION,
+					true
+				);
+			}
 		}
 
 		/* Immersive world + WC bridge — will be re-added when immersive rooms v6.0 ships */

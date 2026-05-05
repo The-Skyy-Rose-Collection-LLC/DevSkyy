@@ -972,7 +972,7 @@ class BrandLearningLoop:
             content="Premium heavyweight crewneck...",
             agent_id="content_core",
             provider="anthropic",
-            model="claude-sonnet-4",
+            model="claude-sonnet-4-6",
             accepted=True,
             quality_score=92.0,
         ))

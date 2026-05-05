@@ -20,6 +20,8 @@ from typing import Any
 import httpx
 import yaml
 
+from llm.model_ids import OPENAI_VISION_MODEL
+
 logger = logging.getLogger(__name__)
 
 
@@ -187,7 +189,7 @@ Only include tags that are relevant to the image. Return valid JSON only."""
 
         url = "https://api.openai.com/v1/chat/completions"
         payload = {
-            "model": "gpt-4o",
+            "model": OPENAI_VISION_MODEL,
             "messages": [
                 {
                     "role": "user",

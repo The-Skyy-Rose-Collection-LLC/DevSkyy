@@ -24,6 +24,7 @@ from typing import Any
 from adk.base import ADKProvider, AgentResult, AgentStatus
 from agents.base_super_agent import EnhancedSuperAgent, LearningRecord, SuperAgentType
 from llm.base import CompletionResponse, Message
+from llm.model_ids import GEMINI_VISION_MODEL
 from llm.providers.google import GoogleClient
 from orchestration.brand_context import BrandContextInjector, Collection
 
@@ -518,7 +519,7 @@ SEO Rules:
         gemini = await self._get_gemini()
         response = await gemini.complete(
             messages=messages,
-            model="gemini-2.0-flash",
+            model=GEMINI_VISION_MODEL,
             temperature=0.7,
             max_tokens=4096,
         )

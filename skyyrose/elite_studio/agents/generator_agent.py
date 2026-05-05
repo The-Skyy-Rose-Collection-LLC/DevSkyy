@@ -25,8 +25,9 @@ from ..models import GenerationResult
 
 logger = logging.getLogger(__name__)
 
+from llm.model_ids import OPENAI_IMAGE_2_MODEL as _GPT_MODEL
+
 from ..config import GEMINI_IMAGE_GEN_MODEL as _GEMINI_GEN_MODEL
-from ..config import OPENAI_IMAGE_MODEL as _GPT_MODEL
 
 _DEFAULT_OUTPUT_DIR = "renders/output"
 

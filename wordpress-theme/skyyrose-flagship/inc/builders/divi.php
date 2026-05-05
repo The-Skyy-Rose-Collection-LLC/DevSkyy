@@ -2,8 +2,9 @@
 /**
  * Divi Builder Compatibility
  *
- * Provides theme support, brand palette injection, and custom element
- * allowlisting for sites using the Divi Builder.
+ * Theme support, brand palette injection, and custom element allow-listing
+ * for sites running the Divi Builder. Design-tokens.css is enqueued
+ * globally by inc/enqueue.php — this file does NOT enqueue it.
  *
  * @package SkyyRose
  * @since   1.0.0
@@ -21,31 +22,34 @@ if ( ! defined( 'ABSPATH' ) || ! defined( 'ET_BUILDER_VERSION' ) ) {
 function skyyrose_divi_add_support() {
 	add_theme_support( 'et-builder' );
 }
-add_action( 'after_setup_theme', 'skyyrose_divi_add_support' );
 
 /**
- * Inject SkyyRose brand colors into Divi's default color palette.
+ * Map skyyrose_brand_colors() to Divi's default-palette filter shape.
  *
  * @since 1.0.0
- * @param array $colors Default color palette.
- * @return array Modified palette with brand colors.
+ *
+ * @param array $colors  skyyrose_brand_colors() output.
+ * @param mixed $existing  Current palette (ignored — Divi expects a full replacement).
+ * @return array Brand-aligned palette.
  */
-function skyyrose_divi_color_palette( $colors ) {
+function skyyrose_divi_color_palette_callback( array $colors, $existing = null ) {
+	unset( $existing );
+
 	return array(
-		'#0A0A0A', // Dark base.
-		'#B76E79', // Rose gold.
-		'#FFFFFF', // White.
-		'#D4AF37', // Gold (Signature).
-		'#C0C0C0', // Silver (Black Rose).
-		'#DC143C', // Crimson (Love Hurts).
+		$colors['dark'],      // Dark base.
+		$colors['rose_gold'], // Rose gold.
+		'#FFFFFF',            // White (not a brand color — explicit constant).
+		$colors['gold'],      // Gold (Signature).
+		$colors['silver'],    // Silver (Black Rose).
+		$colors['crimson'],   // Crimson (Love Hurts).
 	);
 }
-add_filter( 'et_default_color_palette', 'skyyrose_divi_color_palette' );
 
 /**
- * Allow model-viewer custom element in Divi content.
+ * Allow the <model-viewer> custom element inside Divi modules.
  *
  * @since 1.0.0
+ *
  * @param array $tags Allowed HTML tags.
  * @return array Modified tags list.
  */
@@ -55,23 +59,11 @@ function skyyrose_divi_allowed_tags( $tags ) {
 }
 add_filter( 'et_pb_allowed_tags', 'skyyrose_divi_allowed_tags' );
 
-/**
- * Enqueue design tokens when Divi Builder is active on a page.
- *
- * @since 1.0.0
- */
-function skyyrose_divi_enqueue_styles() {
-	if ( ! function_exists( 'et_core_is_fb_enabled' ) ) {
-		return;
-	}
-
-	if ( et_core_is_fb_enabled() || ( function_exists( 'et_pb_is_pagebuilder_used' ) && et_pb_is_pagebuilder_used( get_the_ID() ) ) ) {
-		wp_enqueue_style(
-			'skyyrose-design-tokens',
-			SKYYROSE_ASSETS_URI . '/css/design-tokens.css',
-			array(),
-			SKYYROSE_VERSION
-		);
-	}
-}
-add_action( 'wp_enqueue_scripts', 'skyyrose_divi_enqueue_styles', 20 );
+skyyrose_register_builder_compat(
+	'divi',
+	array(
+		'theme_support'    => 'skyyrose_divi_add_support',
+		'palette_hook'     => 'et_default_color_palette',
+		'palette_callback' => 'skyyrose_divi_color_palette_callback',
+	)
+);

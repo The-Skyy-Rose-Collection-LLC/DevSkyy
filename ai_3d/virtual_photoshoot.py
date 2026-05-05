@@ -381,10 +381,11 @@ class VirtualPhotoshootGenerator:
         render_path = out_base / f"{product_sku}_render_{index}.png"
 
         try:
+            import io
+
             import numpy as np
             import trimesh
             from PIL import Image
-            import io
 
             # Load mesh
             mesh = trimesh.load(str(model_path))
@@ -402,6 +403,7 @@ class VirtualPhotoshootGenerator:
             # Use pyrender for higher quality headless rendering if available
             try:
                 import pyrender
+
                 # Set up pyrender scene
                 pr_scene = pyrender.Scene(bg_color=[1.0, 1.0, 1.0])
 
@@ -411,12 +413,24 @@ class VirtualPhotoshootGenerator:
 
                 # Add camera
                 camera = pyrender.PerspectiveCamera(yfov=np.pi / 3.0)
-                cam_pose = np.array([
-                    [np.cos(azimuth), -np.sin(azimuth)*np.sin(elevation),  np.sin(azimuth)*np.cos(elevation), x],
-                    [0,                np.cos(elevation),                 np.sin(elevation),                y],
-                    [-np.sin(azimuth), -np.cos(azimuth)*np.sin(elevation),  np.cos(azimuth)*np.cos(elevation), z],
-                    [0,                0,                                 0,                                1]
-                ])
+                cam_pose = np.array(
+                    [
+                        [
+                            np.cos(azimuth),
+                            -np.sin(azimuth) * np.sin(elevation),
+                            np.sin(azimuth) * np.cos(elevation),
+                            x,
+                        ],
+                        [0, np.cos(elevation), np.sin(elevation), y],
+                        [
+                            -np.sin(azimuth),
+                            -np.cos(azimuth) * np.sin(elevation),
+                            np.cos(azimuth) * np.cos(elevation),
+                            z,
+                        ],
+                        [0, 0, 0, 1],
+                    ]
+                )
                 pr_scene.add(camera, pose=cam_pose)
 
                 # Add light

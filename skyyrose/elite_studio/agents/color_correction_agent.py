@@ -14,6 +14,7 @@ import logging
 
 from adk.base import ADKProvider, AgentConfig
 from adk.super_agents import BaseSuperAgent
+from llm.model_ids import GEMINI_VISION_MODEL
 
 from ..models import ColorCorrectionResult
 
@@ -28,7 +29,7 @@ class ColorCorrectionAgent(BaseSuperAgent):
             config = AgentConfig(
                 name="legendary_color_architect",
                 provider=ADKProvider.GOOGLE,
-                model="gemini-2.0-flash",
+                model=GEMINI_VISION_MODEL,
                 system_prompt="You are the Legendary Color Architect for SkyyRose. You ensure brand-perfect luxury color palettes.",
             )
         super().__init__(config)
