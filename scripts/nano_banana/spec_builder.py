@@ -106,4 +106,35 @@ def build_dna_from_sku(sku: str) -> dict:
     }
 
 
-__all__ = ["build_judge_spec_from_dossier", "build_dna_from_sku"]
+def augment_prompt_with_dossier_negatives(prompt: str, dna: dict) -> str:
+    """Append the dossier's negative block to a generation prompt (Layer 2).
+
+    Image generators (Gemini, GPT-Image, FLUX) don't have a separate
+    `negative_prompt` field on the chat-completions/messages-create
+    surfaces we use; the only way to apply explicit negative
+    constraints is to encode them in the prompt text. This helper
+    augments a prompt-registry-built prompt with the canonical
+    dossier's `negative_block` so authored "DO NOT render X" rules
+    flow through to the generator, not just the judges.
+
+    Behavior:
+    - If `dna["_dossier"]` is missing or has no `negative_block`,
+      return the prompt unchanged. Callers stay backward-compatible.
+    - Otherwise, append the dossier's verbatim negative block under a
+      DO NOT RENDER heading. The auto-generated negatives from the
+      prompt registry are preserved; we only ADD authored negatives.
+    """
+    dossier = dna.get("_dossier") if isinstance(dna, dict) else None
+    if not dossier:
+        return prompt
+    negative_block = getattr(dossier, "negative_block", "") or ""
+    if not negative_block.strip():
+        return prompt
+    return f"{prompt}\n\nDO NOT RENDER (authored canonical negatives):\n{negative_block}"
+
+
+__all__ = [
+    "build_judge_spec_from_dossier",
+    "build_dna_from_sku",
+    "augment_prompt_with_dossier_negatives",
+]

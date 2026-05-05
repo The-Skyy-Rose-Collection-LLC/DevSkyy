@@ -18,6 +18,7 @@ sys.path.insert(0, str(REPO / "scripts"))
 sys.path.insert(0, str(REPO))
 
 from nano_banana.spec_builder import (
+    augment_prompt_with_dossier_negatives,
     build_dna_from_sku,
     build_judge_spec_from_dossier,
 )
@@ -137,3 +138,50 @@ def test_build_dna_from_sku_raises_on_unknown():
 
     with pytest.raises(KeyError):
         build_dna_from_sku("does-not-exist-xyz-9999")
+
+
+# ── augment_prompt_with_dossier_negatives ──────────────────────────────────
+
+
+def test_augment_prompt_appends_dossier_negatives():
+    """When dna has a dossier with a negative_block, it's appended to the prompt."""
+    dossier = _make_dossier(negative_block="NO printed graphics. NO sleeve text.")
+    prompt = "Generate a black sweatshirt."
+    out = augment_prompt_with_dossier_negatives(prompt, {"_dossier": dossier, "spec": "..."})
+    assert "Generate a black sweatshirt." in out
+    assert "DO NOT RENDER" in out
+    assert "NO printed graphics." in out
+    assert "NO sleeve text." in out
+
+
+def test_augment_prompt_no_dossier_returns_unchanged():
+    """Prompts pass through untouched when no dossier in dna."""
+    prompt = "Generate a black sweatshirt."
+    assert augment_prompt_with_dossier_negatives(prompt, {}) == prompt
+    assert augment_prompt_with_dossier_negatives(prompt, {"spec": "..."}) == prompt
+
+
+def test_augment_prompt_empty_negative_block_returns_unchanged():
+    """Dossier with empty negative_block doesn't add empty headers."""
+    dossier = _make_dossier(negative_block="")
+    prompt = "Generate a black sweatshirt."
+    out = augment_prompt_with_dossier_negatives(prompt, {"_dossier": dossier})
+    assert out == prompt
+    assert "DO NOT RENDER" not in out
+
+
+def test_augment_prompt_whitespace_only_negative_returns_unchanged():
+    """Whitespace-only negative_block treated as empty."""
+    dossier = _make_dossier(negative_block="   \n  \n  ")
+    prompt = "Generate a black sweatshirt."
+    out = augment_prompt_with_dossier_negatives(prompt, {"_dossier": dossier})
+    assert out == prompt
+
+
+def test_augment_prompt_handles_non_dict_dna_safely():
+    """Defensive: a non-dict dna shouldn't crash the helper."""
+    # Real callers always pass dicts, but pipeline.py's broad try/except
+    # suggests we should be conservative.
+    prompt = "Generate."
+    assert augment_prompt_with_dossier_negatives(prompt, None) == prompt
+    assert augment_prompt_with_dossier_negatives(prompt, "not-a-dict") == prompt

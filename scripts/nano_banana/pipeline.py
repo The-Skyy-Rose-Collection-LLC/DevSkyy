@@ -158,6 +158,41 @@ class ProductionPipeline:
 
         # ── Step 1: DESCRIBE ─────────────────────────────────────────
         vision_desc = self._get_or_cache_vision(product, source_path)
+
+        # ── Step 1a: ENRICH WITH CANONICAL DOSSIER (Tier 2 fix) ──────
+        # The Gemini-vision-describe path infers DNA from the source
+        # image alone — it has no knowledge of authored spec details
+        # like per-element trim color, technique distinctions
+        # (embossed vs printed), or the negative list. Loading the
+        # canonical dossier and injecting `spec` into vision_desc makes
+        # the tournament score against authored truth instead of
+        # inferred DNA. Routing and prompt-builder logic still use the
+        # inferred fields (they need visual cues, not authored spec).
+        # Soft-fail: SKUs without a dossier keep working with the
+        # legacy inferred path; we just log a warning.
+        try:
+            from nano_banana.spec_builder import build_dna_from_sku
+
+            canonical = build_dna_from_sku(sku)
+            vision_desc["spec"] = canonical["spec"]
+            vision_desc["_dossier"] = canonical["_dossier"]
+            log.info(
+                "DOSSIER: loaded canonical spec for %s (%dc spec text)",
+                sku,
+                len(canonical["spec"]),
+            )
+        except Exception as exc:
+            # Don't crash production if a SKU is mid-authoring or
+            # missing a dossier — the inferred-DNA path still works,
+            # just less accurately. Log loudly so the gap is visible.
+            log.warning(
+                "DOSSIER: no canonical spec for %s — falling back to "
+                "inferred DNA (judges will score against Gemini-described "
+                "DNA, not authored truth). Reason: %s",
+                sku,
+                exc,
+            )
+
         result.vision_desc = vision_desc
 
         # ── Step 1b: GATHER BUNDLE REFERENCES ────────────────────────
@@ -184,6 +219,17 @@ class ProductionPipeline:
         registry = PromptRegistry.load()
         model_hint = decisions[0].engine if decisions else ""
         prompt, template_id = registry.get_prompt(vision_desc, product, view, model_hint)
+
+        # ── Step 2a: AUGMENT WITH DOSSIER NEGATIVES (Layer 2) ────────
+        # Layer 1 fixed the judge feedback loop. Layer 2 closes the
+        # other half of the loop: the *generator* now sees the
+        # dossier's authored negative list at render time, not just
+        # the judges seeing it at scoring time. Means we don't have to
+        # rely on Kontext refinement to remove every authored "DO NOT
+        # render X" — the first-shot generator avoids them too.
+        from nano_banana.spec_builder import augment_prompt_with_dossier_negatives
+
+        prompt = augment_prompt_with_dossier_negatives(prompt, vision_desc)
 
         img_bytes = None
         engine_used = ""
