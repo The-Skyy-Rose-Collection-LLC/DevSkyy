@@ -117,26 +117,21 @@ def main() -> int:
         print(f"  {label}: {p.name} ({p.stat().st_size:,} bytes)")
     print()
 
-    # DNA for br-001 — same as smoke runner
-    dna = {
-        "garment_type": "crewneck sweatshirt",
-        "base_color": "#0a0a0a",
-        "base_color_name": "Black",
-        "text_content": [],
-        "logos": [
-            {
-                "type": "Embossed black rose with thorns and stem",
-                "position": "front center chest, approximately 10 inches wide",
-            },
-        ],
-        "construction": {
-            "neckline": "ribbed crewneck",
-            "sleeves": "long",
-            "hem": "ribbed cuff and waistband",
-            "fit": "regular",
-        },
-        "fabric": "heavyweight cotton fleece, dark black, no fade",
-    }
+    # Load DNA from canonical dossier — NOT hand-constructed.
+    #
+    # The 2026-05-04 16:30 PDT validation surfaced a bug in the prior
+    # version of this validator: an ad-hoc DNA dict said the garment
+    # was uniform #0a0a0a black with no per-element trim color callout,
+    # so judges (correctly given that incomplete spec) reported "white
+    # ribbing where black should be" — but the canonical dossier
+    # explicitly says white ribbed neckband + cuffs + hem are the
+    # correct design. Refining against the wrong spec moved the render
+    # AWAY from truth. Loading from the dossier is the correct path.
+    from nano_banana.spec_builder import build_dna_from_sku
+
+    dna = build_dna_from_sku("br-001")
+    print(f"Spec source: canonical dossier ({len(dna['spec']):,}c spec text)")
+    print(f"  product: {dna.get('name')} ({dna.get('sku')})\n")
 
     # Build clients
     clients = _build_clients()

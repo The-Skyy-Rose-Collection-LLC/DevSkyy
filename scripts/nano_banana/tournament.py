@@ -279,7 +279,23 @@ def _parse_json(text: str) -> dict:
 
 
 def _dna_to_spec(dna: dict) -> str:
-    """Convert DNA dict to human-readable spec for judge prompt."""
+    """Convert DNA dict to human-readable spec for judge prompt.
+
+    If `dna["spec"]` is a non-empty string, use it verbatim as the spec.
+    This is the canonical-dossier path — `nano_banana.spec_builder.build_dna_from_sku`
+    populates this field with the full multi-section dossier text so
+    judges score against authored truth instead of inferred DNA.
+
+    Without `spec` (legacy path), fall back to building prose from the
+    flat fields. This path is lossy — it cannot represent per-element
+    trim colors, the negative list, or technique distinctions
+    (embossed vs embroidered vs printed). New code should populate
+    `spec` instead.
+    """
+    spec_override = dna.get("spec")
+    if isinstance(spec_override, str) and spec_override.strip():
+        return spec_override
+
     lines = []
     lines.append(f"Garment: {dna.get('garment_type', 'N/A')}")
     lines.append(f"Base color: {dna.get('base_color', 'N/A')} ({dna.get('base_color_name', '')})")
