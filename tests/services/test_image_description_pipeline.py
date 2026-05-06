@@ -144,9 +144,9 @@ class TestVisionModelClient:
         from services.ml.gemini_client import GeminiModel
 
         # Confirm the fix: GeminiModel has no GEMINI_PRO attribute.
-        assert not hasattr(GeminiModel, "GEMINI_PRO"), (
-            "GeminiModel.GEMINI_PRO must NOT exist; use GeminiModel.PRO_2_5 instead"
-        )
+        assert not hasattr(
+            GeminiModel, "GEMINI_PRO"
+        ), "GeminiModel.GEMINI_PRO must NOT exist; use GeminiModel.PRO_2_5 instead"
 
         # Confirm the correct attribute exists.
         assert hasattr(GeminiModel, "PRO_2_5"), "GeminiModel.PRO_2_5 must exist"
