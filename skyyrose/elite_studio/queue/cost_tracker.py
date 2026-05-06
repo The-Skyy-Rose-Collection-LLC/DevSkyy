@@ -28,6 +28,19 @@ _TOTAL_COST_SORTED_SET = "elite_studio:costs:timeline"
 # TTL for individual job cost records: 7 days
 _COST_TTL_SECONDS = 604_800
 
+# Hard cost ceiling — kill-switch for runaway retry loops. The previous
+# implementation had only tier alerts ($5/$10/$20/$50) with no automatic
+# stop, so a stuck retry loop on a paid provider could incur unbounded
+# spend. CostBudgetExceeded is raised when the rolling 24h total crosses
+# this ceiling. Override via ELITE_STUDIO_COST_CAP_USD env var (default
+# 100.0). Set to 0 to disable the cap entirely (NOT recommended).
+# [P0 cleanup, bug-100]
+DEFAULT_COST_CAP_USD: float = 100.0
+
+
+class CostBudgetExceeded(RuntimeError):
+    """Raised when the rolling 24h cost crosses the configured cap."""
+
 
 class CostTracker:
     """Records API token usage and estimated cost per job.
@@ -65,6 +78,42 @@ class CostTracker:
         except Exception as exc:
             logger.warning("CostTracker: Redis unavailable — cost tracking degraded: %s", exc)
             return None
+
+    def get_cost_cap(self) -> float:
+        """Return the configured rolling-24h cost ceiling in USD.
+
+        Reads ELITE_STUDIO_COST_CAP_USD env var; defaults to DEFAULT_COST_CAP_USD.
+        Returns 0.0 if the env var explicitly disables the cap.
+        """
+        raw = os.getenv("ELITE_STUDIO_COST_CAP_USD")
+        if raw is None:
+            return DEFAULT_COST_CAP_USD
+        try:
+            return max(0.0, float(raw))
+        except ValueError:
+            logger.warning(
+                "CostTracker: ELITE_STUDIO_COST_CAP_USD=%r is not a number; using default $%.2f",
+                raw,
+                DEFAULT_COST_CAP_USD,
+            )
+            return DEFAULT_COST_CAP_USD
+
+    def check_budget(self, projected_cost_usd: float = 0.0) -> None:
+        """Raise CostBudgetExceeded if rolling 24h spend (+ projected) crosses the cap.
+
+        Call before kicking off any paid API request. Set ELITE_STUDIO_COST_CAP_USD=0
+        in the environment to disable the cap entirely (not recommended for prod).
+        """
+        cap = self.get_cost_cap()
+        if cap <= 0.0:
+            return  # Cap explicitly disabled
+        current = self.get_total_cost(since_hours=24)
+        if current + projected_cost_usd > cap:
+            raise CostBudgetExceeded(
+                f"Cost cap exceeded: ${current:.2f} spent in last 24h "
+                f"+ ${projected_cost_usd:.4f} projected > ${cap:.2f} cap. "
+                f"Set ELITE_STUDIO_COST_CAP_USD to raise the limit."
+            )
 
     def record(self, job_id: str, provider: str, tokens: int, cost_usd: float) -> None:
         """Record token usage and cost for a provider call in a job.
