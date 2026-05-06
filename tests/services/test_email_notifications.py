@@ -748,8 +748,6 @@ class TestSendEmailAsyncIO:
         self, email_config: EmailConfig
     ) -> None:
         """send_email must route the SMTP send through asyncio.to_thread."""
-        import asyncio
-
         service = EmailNotificationService(email_config)
 
         with (
@@ -774,8 +772,6 @@ class TestSendEmailAsyncIO:
         self, email_config: EmailConfig
     ) -> None:
         """Exceptions raised inside to_thread propagate and are caught, returning False."""
-        import asyncio
-
         service = EmailNotificationService(email_config)
 
         with patch(
