@@ -797,14 +797,8 @@ __all__ = [
     "categorize_failure",
     "SelfHealingMixin",
     "CoreAgent",
-    # Deprecated legacy re-exports (still accessible via __getattr__, fire DeprecationWarning)
-    "AgentCapability",
-    "AgentConfig",
-    "AgentStatus",
-    "ExecutionResult",
-    "LLMCategory",
-    "PlanStep",
-    "RetrievalContext",
-    "SuperAgent",
-    "ValidationResult",
+    # NOTE: AgentCapability, AgentConfig, AgentStatus, ExecutionResult, LLMCategory,
+    # PlanStep, RetrievalContext, SuperAgent, ValidationResult are NOT listed here —
+    # they are available via __getattr__ (with DeprecationWarning) but are not direct
+    # module attributes, so listing them in __all__ triggers ruff F822.
 ]

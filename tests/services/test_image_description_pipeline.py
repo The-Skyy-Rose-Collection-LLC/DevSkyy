@@ -139,7 +139,7 @@ class TestVisionModelClient:
         non-existent GeminiModel.GEMINI_PRO), otherwise _generate_gemini()
         raises AttributeError at runtime for every GEMINI_PRO request.
         """
-        from unittest.mock import AsyncMock, patch
+        from unittest.mock import AsyncMock
 
         from services.ml.gemini_client import GeminiModel
 
