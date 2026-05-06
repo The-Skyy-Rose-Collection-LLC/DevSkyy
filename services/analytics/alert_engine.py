@@ -29,6 +29,7 @@ from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Protocol
 
 from pydantic import BaseModel, Field
+from services.analytics.severity import AlertSeverity
 from sqlalchemy import text
 
 from core.errors.production_errors import (
@@ -73,14 +74,6 @@ class ConditionOperator(StrEnum):
     LTE = "lte"
     EQ = "eq"
     NEQ = "neq"
-
-
-class AlertSeverity(StrEnum):
-    """Alert severity levels."""
-
-    INFO = "info"
-    WARNING = "warning"
-    CRITICAL = "critical"
 
 
 class AlertStatus(StrEnum):
@@ -356,7 +349,8 @@ class AlertEvaluationEngine:
         configs: list[AlertConfig] = []
 
         async with self._session_factory() as session:
-            result = await session.execute(text("""
+            result = await session.execute(
+                text("""
                     SELECT id, name, description, metric_name, condition_type,
                            condition_operator, threshold_value, threshold_unit,
                            window_duration_seconds, evaluation_interval_seconds,
@@ -365,7 +359,8 @@ class AlertEvaluationEngine:
                            created_by, updated_by, created_at, updated_at
                     FROM alert_configs
                     WHERE is_enabled = true
-                """))
+                """)
+            )
             rows = result.fetchall()
 
             for row in rows:

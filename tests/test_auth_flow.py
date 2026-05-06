@@ -362,3 +362,51 @@ class TestTokenRoundTrip:
 
         bl.add(payload.jti, payload.exp)
         assert bl.is_blacklisted(payload.jti) is True
+
+
+# =============================================================================
+# UserRole Canonical Import Tests
+# =============================================================================
+
+
+class TestUserRoleCanonical:
+    """Regression tests for #14: UserRole defined in both core.auth.types
+    and security.jwt_oauth2_auth — they were separate classes with identical
+    values, so isinstance checks and 'is' comparisons silently diverged."""
+
+    def test_security_and_core_userrole_are_same_class(self) -> None:
+        """security.jwt_oauth2_auth must re-export core.auth.types.UserRole.
+
+        When they were different classes, code that did
+            `isinstance(role, core_UserRole)` would fail for a role obtained
+            via the JWT path (which returned security_UserRole instances).
+        """
+        from core.auth.types import UserRole as CoreUserRole
+
+        assert UserRole is CoreUserRole, (
+            "security.jwt_oauth2_auth.UserRole must be the same object as "
+            f"core.auth.types.UserRole; got {UserRole} vs {CoreUserRole}"
+        )
+
+    def test_role_hierarchy_uses_canonical_userrole(self) -> None:
+        """ROLE_HIERARCHY keys must be canonical UserRole members."""
+        from core.auth.types import UserRole as CoreUserRole
+        from security.jwt_oauth2_auth import ROLE_HIERARCHY
+
+        for role_key in ROLE_HIERARCHY:
+            assert isinstance(role_key, CoreUserRole), (
+                f"ROLE_HIERARCHY key {role_key!r} is not a core.auth.types.UserRole instance"
+            )
+
+    def test_all_six_roles_present(self) -> None:
+        """Both canonical and JWT UserRole must expose all 6 roles."""
+        from security.jwt_oauth2_auth import ROLE_HIERARCHY
+
+        assert set(ROLE_HIERARCHY) == {
+            UserRole.SUPER_ADMIN,
+            UserRole.ADMIN,
+            UserRole.DEVELOPER,
+            UserRole.API_USER,
+            UserRole.READ_ONLY,
+            UserRole.GUEST,
+        }

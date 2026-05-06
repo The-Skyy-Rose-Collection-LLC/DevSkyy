@@ -740,18 +740,50 @@ class CoreAgent(SelfHealingMixin):
         }
 
 
-# Re-exports from legacy base for backward compatibility
-from agents.base_legacy import (
-    AgentCapability,
-    AgentConfig,
-    AgentStatus,
-    ExecutionResult,
-    LLMCategory,
-    PlanStep,
-    RetrievalContext,
-    SuperAgent,
-    ValidationResult,
+# ---------------------------------------------------------------------------
+# Deprecated re-exports — will be removed in a future release.
+#
+# These names were originally defined in agents.base_legacy and are exposed
+# here for backward compatibility via module-level __getattr__ so that the
+# DeprecationWarning fires only when a caller actually accesses one of these
+# names, not on every import of agents.core.base.
+#
+# Canonical replacement:
+#   from agents.base_super_agent.agent import EnhancedSuperAgent as SuperAgent
+#   from agents.base_legacy import AgentCapability, AgentConfig, ...  (interim)
+# ---------------------------------------------------------------------------
+
+_LEGACY_NAMES: frozenset[str] = frozenset(
+    [
+        "AgentCapability",
+        "AgentConfig",
+        "AgentStatus",
+        "ExecutionResult",
+        "LLMCategory",
+        "PlanStep",
+        "RetrievalContext",
+        "SuperAgent",
+        "ValidationResult",
+    ]
 )
+
+
+def __getattr__(name: str) -> object:  # noqa: N807
+    if name in _LEGACY_NAMES:
+        import warnings
+
+        warnings.warn(
+            f"agents.core.base.{name} is a deprecated re-export from agents.base_legacy "
+            f"and will be removed in a future release. "
+            f"Import directly from the canonical module instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        import agents.base_legacy as _legacy
+
+        return getattr(_legacy, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 __all__ = [
     "CoreAgentType",
@@ -765,7 +797,7 @@ __all__ = [
     "categorize_failure",
     "SelfHealingMixin",
     "CoreAgent",
-    # Legacy re-exports
+    # Deprecated legacy re-exports (still accessible via __getattr__, fire DeprecationWarning)
     "AgentCapability",
     "AgentConfig",
     "AgentStatus",

@@ -131,6 +131,49 @@ class TestVisionModelClient:
         assert VisionModel.LLAVA_34B.is_gemini() is False
         assert VisionModel.BLIP2.is_gemini() is False
 
+    @pytest.mark.asyncio
+    async def test_gemini_pro_vision_model_maps_to_valid_gemini_model(self) -> None:
+        """Regression test for #16: GeminiModel.GEMINI_PRO doesn't exist.
+
+        VisionModel.GEMINI_PRO must map to GeminiModel.PRO_2_5 (not the
+        non-existent GeminiModel.GEMINI_PRO), otherwise _generate_gemini()
+        raises AttributeError at runtime for every GEMINI_PRO request.
+        """
+        from unittest.mock import AsyncMock, patch
+
+        from services.ml.gemini_client import GeminiModel
+
+        # Confirm the fix: GeminiModel has no GEMINI_PRO attribute.
+        assert not hasattr(GeminiModel, "GEMINI_PRO"), (
+            "GeminiModel.GEMINI_PRO must NOT exist; use GeminiModel.PRO_2_5 instead"
+        )
+
+        # Confirm the correct attribute exists.
+        assert hasattr(GeminiModel, "PRO_2_5"), "GeminiModel.PRO_2_5 must exist"
+
+        # VisionModel.GEMINI_PRO value must match GeminiModel.PRO_2_5 value.
+        from services.ml.schemas.description import VisionModel
+
+        assert VisionModel.GEMINI_PRO.value == GeminiModel.PRO_2_5.value, (
+            f"VisionModel.GEMINI_PRO ({VisionModel.GEMINI_PRO.value!r}) must equal "
+            f"GeminiModel.PRO_2_5 ({GeminiModel.PRO_2_5.value!r})"
+        )
+
+        # The _generate_gemini path must NOT raise AttributeError.
+        client = VisionModelClient()
+        mock_gemini = AsyncMock()
+        mock_gemini.analyze_image = AsyncMock(return_value=AsyncMock(text="ok"))
+        client._gemini_client = mock_gemini
+
+        result = await client._generate_gemini(
+            VisionModel.GEMINI_PRO,
+            "https://example.com/img.jpg",
+            "describe",
+            max_tokens=100,
+            temperature=0.5,
+        )
+        assert result == "ok"
+
 
 # =============================================================================
 # ImageDescriptionPipeline Tests

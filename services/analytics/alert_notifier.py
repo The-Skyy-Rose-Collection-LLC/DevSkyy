@@ -28,6 +28,7 @@ from typing import TYPE_CHECKING, Any
 
 import httpx
 from pydantic import BaseModel, Field
+from services.analytics.severity import AlertSeverity
 
 from core.errors.production_errors import (
     DevSkyError,
@@ -60,16 +61,6 @@ class NotificationChannel(StrEnum):
     SLACK = "slack"
     SMS = "sms"
     IN_APP = "in_app"
-
-
-class AlertSeverity(StrEnum):
-    """Alert severity levels."""
-
-    INFO = "info"
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-    CRITICAL = "critical"
 
 
 class NotificationStatus(StrEnum):

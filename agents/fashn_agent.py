@@ -44,7 +44,7 @@ from pydantic import BaseModel, Field
 FASHN_USD_PER_IMAGE = 0.075
 from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from agents.core.base import (
+from agents.base_legacy import (
     AgentCapability,
     AgentConfig,
     ExecutionResult,

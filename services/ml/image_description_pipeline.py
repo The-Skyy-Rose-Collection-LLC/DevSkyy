@@ -141,9 +141,10 @@ class VisionModelClient:
 
         client = await self._get_gemini_client()
 
-        # Map VisionModel to GeminiModel
+        # Map VisionModel to GeminiModel.
+        # VisionModel.GEMINI_PRO → GeminiModel.PRO_2_5 (GeminiModel has no GEMINI_PRO).
         gemini_model = (
-            GeminiModel.GEMINI_PRO if model == VisionModel.GEMINI_PRO else GeminiModel.FLASH_2_5
+            GeminiModel.PRO_2_5 if model == VisionModel.GEMINI_PRO else GeminiModel.FLASH_2_5
         )
 
         try:

@@ -5,9 +5,6 @@ from services.analytics.alert_engine import (
     AlertConfigNotFoundError,
     AlertEngineError,
     AlertEvaluationEngine,
-)
-from services.analytics.alert_engine import AlertSeverity as EngineAlertSeverity
-from services.analytics.alert_engine import (
     AlertStatus,
     AlertTrigger,
     ConditionOperator,
@@ -21,9 +18,6 @@ from services.analytics.alert_notifier import (
     AlertNotifier,
     AlertNotifierConfig,
     AlertNotifierError,
-)
-from services.analytics.alert_notifier import AlertSeverity as NotifierAlertSeverity
-from services.analytics.alert_notifier import (
     InAppNotification,
     NotificationChannel,
     NotificationPreferences,
@@ -46,7 +40,13 @@ from services.analytics.rollup_scheduler import (
     RollupSchedulerError,
 )
 
+# Single canonical AlertSeverity — both engine and notifier now import from
+# services.analytics.severity, so this is the same class object everywhere.
+from services.analytics.severity import AlertSeverity
+
 __all__ = [
+    # Shared types
+    "AlertSeverity",
     # Event Collector
     "AnalyticsEvent",
     "AnalyticsEventCollector",
@@ -67,7 +67,6 @@ __all__ = [
     "AlertTrigger",
     "ConditionOperator",
     "ConditionType",
-    "EngineAlertSeverity",
     "MetricProvider",
     "MetricValue",
     "get_alert_engine",
@@ -81,7 +80,6 @@ __all__ = [
     "NotificationPreferences",
     "NotificationResult",
     "NotificationStatus",
-    "NotifierAlertSeverity",
     "get_alert_notifier",
     "severity_meets_threshold",
 ]

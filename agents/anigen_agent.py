@@ -37,7 +37,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from agents.core.base import (
+from agents.base_legacy import (
     AgentCapability,
     AgentConfig,
     ExecutionResult,

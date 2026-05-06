@@ -566,7 +566,8 @@ class TestAlertMessageBuilding:
 
         title = engine._build_alert_title(config, Decimal("5"))
 
-        assert "WARNING" in title
+        # WARNING is now a legacy alias for MEDIUM — title shows "MEDIUM"
+        assert "MEDIUM" in title
         assert "dropped below" in title
 
     def test_build_alert_message(
@@ -698,8 +699,37 @@ class TestEnums:
     def test_alert_severity_values(self) -> None:
         """Test AlertSeverity enum values."""
         assert AlertSeverity.INFO.value == "info"
-        assert AlertSeverity.WARNING.value == "warning"
+        # WARNING is a legacy alias for MEDIUM (value "medium") — see severity.py
+        assert AlertSeverity.WARNING.value == "medium"
         assert AlertSeverity.CRITICAL.value == "critical"
+
+    def test_alert_severity_has_full_five_levels(self) -> None:
+        """Regression test for #15: AlertSeverity mismatch between engine and notifier.
+
+        alert_engine.py had only 3 levels (INFO, WARNING, CRITICAL).
+        alert_notifier.py had 5 levels (INFO, LOW, MEDIUM, HIGH, CRITICAL).
+        A notifier-persisted HIGH/MEDIUM/LOW alert routed through the engine
+        raised a KeyError. Both modules must share the same 5-level enum.
+        """
+        assert hasattr(AlertSeverity, "LOW"), "AlertSeverity.LOW must exist"
+        assert hasattr(AlertSeverity, "MEDIUM"), "AlertSeverity.MEDIUM must exist"
+        assert hasattr(AlertSeverity, "HIGH"), "AlertSeverity.HIGH must exist"
+        assert AlertSeverity.LOW.value == "low"
+        assert AlertSeverity.MEDIUM.value == "medium"
+        assert AlertSeverity.HIGH.value == "high"
+        # Verify all 5 levels are present
+        expected = {"info", "low", "medium", "high", "critical"}
+        actual = {s.value for s in AlertSeverity}
+        assert actual == expected, f"AlertSeverity values mismatch: got {actual}"
+
+    def test_alert_severity_engine_and_notifier_are_same_enum(self) -> None:
+        """Engine and notifier AlertSeverity must be the same class (shared import)."""
+        from services.analytics.alert_notifier import AlertSeverity as NotifierSeverity
+
+        assert AlertSeverity is NotifierSeverity, (
+            "alert_engine and alert_notifier must use the same AlertSeverity class; "
+            f"engine={AlertSeverity}, notifier={NotifierSeverity}"
+        )
 
     def test_alert_status_values(self) -> None:
         """Test AlertStatus enum values."""

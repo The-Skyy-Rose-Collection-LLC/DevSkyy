@@ -22,7 +22,7 @@ from typing import Any, TypeVar
 
 from pydantic import BaseModel, Field, field_validator
 
-from agents.core.base import (
+from agents.base_legacy import (
     AgentCapability,
     AgentConfig,
     ExecutionResult,

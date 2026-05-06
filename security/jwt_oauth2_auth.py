@@ -46,6 +46,8 @@ from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
+from core.auth.types import UserRole
+
 try:
     import redis
     from redis import Redis
@@ -128,16 +130,7 @@ class JWTConfig:
 # =============================================================================
 
 
-class UserRole(StrEnum):
-    """RBAC Roles - ordered by privilege level."""
-
-    SUPER_ADMIN = "super_admin"  # Full system access
-    ADMIN = "admin"  # Administrative access
-    DEVELOPER = "developer"  # API and development access
-    API_USER = "api_user"  # Standard API access
-    READ_ONLY = "read_only"  # Read-only access
-    GUEST = "guest"  # Minimal access
-
+# UserRole is imported from core.auth.types (canonical definition — no duplicate).
 
 # Role hierarchy (higher can do everything lower can)
 ROLE_HIERARCHY: dict[UserRole, int] = {
