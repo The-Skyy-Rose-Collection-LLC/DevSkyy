@@ -6,6 +6,8 @@ Tests event dispatching and aggregation logic directly by calling
 process_event() — no Kafka connection required.
 """
 
+from unittest.mock import MagicMock, patch
+
 import pytest
 
 from monitoring.stream_processor import AnalyticsState, StreamProcessor
@@ -192,3 +194,51 @@ class TestStreamProcessorAggregations:
         assert d["page_views"] == {"page1": 5}
         assert d["events_processed"] == 10
         assert isinstance(d, dict)
+
+
+# =============================================================================
+# Regression Tests: #18c — consumer.poll() blocks event loop for 1.0s default
+# =============================================================================
+
+
+@pytest.mark.unit
+@pytest.mark.asyncio
+class TestStreamProcessorPollAsync:
+    """
+    Regression tests for P1 finding #18c.
+
+    StreamProcessor._run_loop calls consumer.poll(1.0) synchronously inside an
+    async method, blocking the event loop for up to 1 second per iteration.
+    The fix wraps consumer.poll() in asyncio.to_thread.
+    """
+
+    async def test_poll_dispatched_via_to_thread(self) -> None:
+        """consumer.poll() must be dispatched via asyncio.to_thread, not called inline."""
+        import asyncio
+
+        from monitoring.stream_processor import StreamProcessor
+
+        processor = StreamProcessor()
+        processor._running = True
+
+        # Mock consumer that returns None on poll (no messages)
+        mock_consumer = MagicMock()
+        mock_consumer.poll.return_value = None
+        processor._consumer = mock_consumer
+
+        run_count = 0
+        original_to_thread = asyncio.to_thread
+
+        async def _to_thread_spy(func, *args, **kwargs):
+            nonlocal run_count
+            run_count += 1
+            # Stop the loop after first iteration
+            processor._running = False
+            return await original_to_thread(func, *args, **kwargs)
+
+        with patch("monitoring.stream_processor.asyncio.to_thread", side_effect=_to_thread_spy):
+            await processor._run_loop()
+
+        assert run_count >= 1, (
+            "asyncio.to_thread was never called — consumer.poll() is still blocking the event loop"
+        )

@@ -16,6 +16,7 @@ Version: 1.0.0
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 import shutil
@@ -183,7 +184,8 @@ class HuggingFaceProvider:
 
         client = Client(HUGGINGFACE_SPACES[HuggingFaceModel.TRELLIS])
 
-        result = client.predict(
+        result = await asyncio.to_thread(
+            client.predict,
             image=handle_file(image_path),
             multiimages=[],
             seed=self.config.seed,
@@ -232,7 +234,8 @@ class HuggingFaceProvider:
 
         client = Client(HUGGINGFACE_SPACES[HuggingFaceModel.TRIPOSR])
 
-        result = client.predict(
+        result = await asyncio.to_thread(
+            client.predict,
             image=handle_file(image_path),
             mc_resolution=256,
             api_name="/run",
@@ -272,7 +275,8 @@ class HuggingFaceProvider:
 
         client = Client(HUGGINGFACE_SPACES[HuggingFaceModel.SHAP_E])
 
-        result = client.predict(
+        result = await asyncio.to_thread(
+            client.predict,
             prompt=prompt,
             seed=self.config.seed,
             guidance_scale=15.0,
