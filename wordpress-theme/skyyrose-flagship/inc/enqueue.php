@@ -810,6 +810,19 @@ function skyyrose_enqueue_collection_experiences() {
 		return;
 	}
 
+	/**
+	 * Three.js 3D experience stack is feature-flagged off by default.
+	 *
+	 * Why: the immersive templates were rebuilt on a 2D hotspot engine
+	 * (see template-immersive-*.php @updated 6.0.0). The Three.js stack
+	 * loads ~140 KB of JS that finds no activating containers and
+	 * silently no-ops. Set the filter to true to revive — see
+	 * tasks/codebase-cleanup/decisions/24-threejs-dormant.md.
+	 */
+	if ( ! apply_filters( 'skyyrose_enable_3d_experiences', false ) ) {
+		return;
+	}
+
 	$experience_map = array(
 		'template-immersive-black-rose.php' => 'experiences/blackrose-experience',
 		'template-immersive-love-hurts.php' => 'experiences/lovehurts-experience',
