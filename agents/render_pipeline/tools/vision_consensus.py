@@ -116,9 +116,7 @@ def _gemini_describe(source_path: Path) -> dict:
     mime = (
         "image/jpeg"
         if ext in (".jpg", ".jpeg")
-        else "image/webp"
-        if ext == ".webp"
-        else "image/png"
+        else "image/webp" if ext == ".webp" else "image/png"
     )
 
     response = client.models.generate_content(
@@ -166,9 +164,7 @@ def _openai_describe(source_path: Path) -> dict:
     mime = (
         "image/jpeg"
         if ext in (".jpg", ".jpeg")
-        else "image/webp"
-        if ext == ".webp"
-        else "image/png"
+        else "image/webp" if ext == ".webp" else "image/png"
     )
     b64 = base64.b64encode(source_path.read_bytes()).decode("utf-8")
 
