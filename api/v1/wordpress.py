@@ -9,10 +9,11 @@ from __future__ import annotations
 import os
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from integrations.wordpress_com_client import create_wordpress_client
+from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 router = APIRouter(tags=["wordpress"], prefix="/wordpress")
 
@@ -49,7 +50,10 @@ def _get_wp_creds() -> dict[str, str | None]:
 
 
 @router.post("/sync", response_model=WordPressSyncResponse, summary="Sync content to WordPress")
-async def sync_to_wordpress(request: WordPressSyncRequest):
+async def sync_to_wordpress(
+    request: WordPressSyncRequest,
+    user: TokenPayload = Depends(get_current_user),
+):
     """Create a post/page on WordPress."""
     creds = _get_wp_creds()
     try:
@@ -69,7 +73,7 @@ async def sync_to_wordpress(request: WordPressSyncRequest):
 
 
 @router.get("/status", summary="WordPress connection status")
-async def get_wordpress_status() -> dict[str, Any]:
+async def get_wordpress_status(user: TokenPayload = Depends(get_current_user)) -> dict[str, Any]:
     """Check WordPress connection by fetching site info."""
     creds = _get_wp_creds()
     try:

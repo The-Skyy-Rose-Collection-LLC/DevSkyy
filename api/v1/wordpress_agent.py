@@ -11,12 +11,13 @@ import json
 import logging
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from starlette.responses import StreamingResponse
 
 from agents.wordpress_bridge.agent import WordPressBridgeAgent, run_agent
 from agents.wordpress_bridge.prompts import PROCESS_ORDER_PROMPT
+from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +55,10 @@ class WebhookDispatchRequest(BaseModel):
 
 
 @router.post("/execute")
-async def execute_agent(request: AgentExecuteRequest):
+async def execute_agent(
+    request: AgentExecuteRequest,
+    user: TokenPayload = Depends(get_current_user),
+):
     """Execute WordPress Bridge Agent with SSE streaming.
 
     Returns a Server-Sent Events stream with agent progress.
@@ -97,6 +101,12 @@ async def dispatch_webhook(request: WebhookDispatchRequest):
 
     Formats the webhook payload as a structured prompt and runs the agent.
     Returns the agent's response (non-streaming for webhooks).
+
+    AUTH NOTE: This endpoint is called by WooCommerce (external system) using
+    HMAC-SHA256 webhook signatures, NOT user JWT tokens. Adding
+    Depends(get_current_user) here would break WooCommerce delivery. The correct
+    fix is to validate the X-WC-Webhook-Signature header against
+    WOOCOMMERCE_WEBHOOK_SECRET — tracked as SECURITY-DEFERRED-WEBHOOK-HMAC.
     """
     # Format webhook as agent prompt based on topic
     topic = request.topic
