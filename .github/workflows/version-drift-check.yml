@@ -1,0 +1,71 @@
+name: Version Drift Check
+
+on:
+  push:
+    paths:
+      - 'wordpress-theme/skyyrose-flagship/style.css'
+      - 'wordpress-theme/skyyrose-flagship/functions.php'
+      - 'wordpress-theme/skyyrose-flagship/readme.txt'
+      - 'CLAUDE.md'
+  pull_request:
+    paths:
+      - 'wordpress-theme/skyyrose-flagship/style.css'
+      - 'wordpress-theme/skyyrose-flagship/functions.php'
+      - 'wordpress-theme/skyyrose-flagship/readme.txt'
+      - 'CLAUDE.md'
+
+jobs:
+  version-drift:
+    name: Verify WP theme version consistency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract versions from canonical sources
+        id: versions
+        run: |
+          STYLE_VER=$(grep -m1 '^Version:' wordpress-theme/skyyrose-flagship/style.css | awk '{print $2}' | tr -d '[:space:]')
+          CONST_VER=$(grep -m1 "define.*SKYYROSE_VERSION" wordpress-theme/skyyrose-flagship/functions.php | grep -oP "'\K[^']+")
+          README_VER=$(grep -m1 '^Stable tag:' wordpress-theme/skyyrose-flagship/readme.txt | awk '{print $3}' | tr -d '[:space:]')
+          echo "style_ver=$STYLE_VER"     >> "$GITHUB_OUTPUT"
+          echo "const_ver=$CONST_VER"     >> "$GITHUB_OUTPUT"
+          echo "readme_ver=$README_VER"   >> "$GITHUB_OUTPUT"
+          echo "style.css  → $STYLE_VER"
+          echo "functions.php → $CONST_VER"
+          echo "readme.txt   → $README_VER"
+
+      - name: Fail on version mismatch
+        run: |
+          STYLE="${{ steps.versions.outputs.style_ver }}"
+          CONST="${{ steps.versions.outputs.const_ver }}"
+          README="${{ steps.versions.outputs.readme_ver }}"
+          FAILED=0
+          if [ "$STYLE" != "$CONST" ]; then
+            echo "::error::Version mismatch: style.css ($STYLE) vs functions.php ($CONST)"
+            FAILED=1
+          fi
+          if [ "$STYLE" != "$README" ]; then
+            echo "::error::Version mismatch: style.css ($STYLE) vs readme.txt ($README)"
+            FAILED=1
+          fi
+          if [ "$FAILED" -eq 1 ]; then
+            echo ""
+            echo "All three sources must be updated together when bumping the theme version:"
+            echo "  wordpress-theme/skyyrose-flagship/style.css       Version: X.Y.Z"
+            echo "  wordpress-theme/skyyrose-flagship/functions.php   SKYYROSE_VERSION = 'X.Y.Z'"
+            echo "  wordpress-theme/skyyrose-flagship/readme.txt      Stable tag: X.Y.Z"
+            exit 1
+          fi
+          echo "Version check passed: $STYLE (all sources agree)"
+
+      - name: Check CLAUDE.md references are in sync
+        run: |
+          STYLE="${{ steps.versions.outputs.style_ver }}"
+          # CLAUDE.md is a doc file — warn but do not fail the build on drift.
+          # A hard fail here would block commits that bump the theme version before
+          # the docs are updated, creating a chicken-and-egg problem.
+          if ! grep -qF "v$STYLE" CLAUDE.md && ! grep -qF "Version is $STYLE" CLAUDE.md; then
+            echo "::warning::CLAUDE.md may not reference current theme version ($STYLE). Run: grep -n '1\.' CLAUDE.md to verify."
+          else
+            echo "CLAUDE.md references v$STYLE — OK"
+          fi

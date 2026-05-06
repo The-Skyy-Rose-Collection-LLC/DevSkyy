@@ -67,7 +67,7 @@ services/       → ML models, 3D generation, analytics
 agents/         → Specialized agents (base_super_agent.py = foundation)
 api/            → FastAPI REST (v1/) + GraphQL (graphql/)
 frontend/       → Next.js dashboard (devskyy-dashboard)
-wordpress-theme/skyyrose-flagship/  → Production WP theme (v1.0.0 — commercial)
+wordpress-theme/skyyrose-flagship/  → Production WP theme (v1.1.0 — commercial)
 scripts/        → Deploy, sync, generation scripts
 ```
 
@@ -97,7 +97,7 @@ scripts/        → Deploy, sync, generation scripts
 
 ---
 
-## WordPress Theme (SkyyRose v1.0.0)
+## WordPress Theme (SkyyRose v1.1.0)
 
 **Commercial marketplace theme. Production at skyyrose.co**
 **Theme Name:** SkyyRose | **Text Domain:** `skyyrose` | **@package:** SkyyRose
@@ -133,7 +133,7 @@ wordpress-theme/skyyrose-flagship/
 - `inc/builders/detection.php` — `skyyrose_active_builder()` + `skyyrose_builder_owns_template()`
 - `inc/patterns.php` — Block pattern registration for all collections
 - `inc/performance.php` — Google Fonts removal, AVIF support, custom image sizes
-- `functions.php` — Theme constants, includes array (v1.0.0)
+- `functions.php` — Theme constants, includes array (v1.1.0)
 
 **PHPCS compliance:**
 - `.phpcs.xml` in theme root — WordPress standard, `skyyrose` prefix
@@ -258,7 +258,7 @@ No exceptions. This applies to google-genai, httpx, Pydantic, LangGraph, FastAPI
 - Landing page template parts in `template-parts/landing/` accept `$args` arrays: hero.php, product-grid.php, faq.php
 - Product grid template part pulls from `product-catalog.php` by SKU array — if SKU not in catalog, card is silently skipped
 - **Theme name is "SkyyRose"** (not "SkyyRose Flagship") — text domain is `skyyrose`, @package is `SkyyRose`, folder stays `skyyrose-flagship/` for deploy compat
-- **Version is 1.0.0** for commercial release — synced across style.css, readme.txt, and `SKYYROSE_VERSION` constant
+- **Version is 1.1.0** for commercial release — synced across style.css, readme.txt, and `SKYYROSE_VERSION` constant
 - **PHPCS WordPress standard enforced** — `.phpcs.xml` in theme root, run `vendor/bin/phpcs` before commits. Composer installed at `~/.local/bin/composer`
 - Leading-underscore functions (`_skyyrose_*`) renamed to `skyyrose_*` — WPCS requires theme prefix without underscore
 - `skyyrose_nav_fallback()` (was `skyyrose_flagship_nav_fallback()`) — used as fallback_cb in header.php wp_nav_menu calls
