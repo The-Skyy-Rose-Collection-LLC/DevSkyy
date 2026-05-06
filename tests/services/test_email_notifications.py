@@ -8,7 +8,7 @@ Target coverage: 70%+
 from __future__ import annotations
 
 import smtplib
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from services.notifications.email_notifications import (
@@ -727,3 +727,67 @@ class TestTemplateRendering:
         assert "20" in subject
         assert "20" in html
         assert "7" in html
+
+
+# =============================================================================
+# Regression Tests: #18b — smtplib sync I/O in async send_email
+# =============================================================================
+
+
+@pytest.mark.asyncio
+class TestSendEmailAsyncIO:
+    """
+    Regression tests for P1 finding #18b.
+
+    send_email() is async but used smtplib.SMTP synchronously, blocking the
+    event loop during every email send. The fix wraps the SMTP block in
+    asyncio.to_thread.
+    """
+
+    async def test_send_email_dispatches_smtp_via_to_thread(
+        self, email_config: EmailConfig
+    ) -> None:
+        """send_email must route the SMTP send through asyncio.to_thread."""
+        import asyncio
+
+        service = EmailNotificationService(email_config)
+
+        with (
+            patch(
+                "services.notifications.email_notifications.asyncio.to_thread",
+                new_callable=AsyncMock,
+            ) as mock_to_thread,
+        ):
+            mock_to_thread.return_value = None
+            result = await service.send_email(
+                to=["test@example.com"],
+                subject="Test Subject",
+                html_body="<p>Test</p>",
+                text_body="Test",
+            )
+
+        # to_thread must have been called once (for the SMTP dispatch)
+        mock_to_thread.assert_called_once()
+        assert result is True
+
+    async def test_send_email_smtp_error_via_to_thread_returns_false(
+        self, email_config: EmailConfig
+    ) -> None:
+        """Exceptions raised inside to_thread propagate and are caught, returning False."""
+        import asyncio
+
+        service = EmailNotificationService(email_config)
+
+        with patch(
+            "services.notifications.email_notifications.asyncio.to_thread",
+            new_callable=AsyncMock,
+            side_effect=smtplib.SMTPException("connection refused"),
+        ):
+            result = await service.send_email(
+                to=["test@example.com"],
+                subject="Test",
+                html_body="<p>body</p>",
+                text_body="body",
+            )
+
+        assert result is False

@@ -15,6 +15,7 @@ Version: 1.0.0
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 import smtplib
@@ -391,6 +392,18 @@ class EmailNotificationService:
         """Check if email service is properly configured."""
         return self._config.is_configured
 
+    def _send_smtp_sync(self, msg: MIMEMultipart, to: list[str]) -> None:
+        """Synchronous SMTP send — must only be called via asyncio.to_thread.
+
+        Raises:
+            smtplib.SMTPException: on connection or authentication failure.
+        """
+        with smtplib.SMTP(self._config.smtp_host, self._config.smtp_port) as server:
+            if self._config.use_tls:
+                server.starttls()
+            server.login(self._config.smtp_user, self._config.smtp_password)
+            server.sendmail(self._config.from_email, to, msg.as_string())
+
     async def send_email(
         self,
         to: list[str],
@@ -430,12 +443,9 @@ class EmailNotificationService:
             msg.attach(MIMEText(text_body, "plain"))
             msg.attach(MIMEText(html_body, "html"))
 
-            # Send
-            with smtplib.SMTP(self._config.smtp_host, self._config.smtp_port) as server:
-                if self._config.use_tls:
-                    server.starttls()
-                server.login(self._config.smtp_user, self._config.smtp_password)
-                server.sendmail(self._config.from_email, to, msg.as_string())
+            # Send — SMTP is synchronous; dispatch to thread pool to avoid
+            # blocking the event loop during connection + TLS + auth + send.
+            await asyncio.to_thread(self._send_smtp_sync, msg, to)
 
             logger.info(
                 f"Sent email to {len(to)} recipients: {subject}",
