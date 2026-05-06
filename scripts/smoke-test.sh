@@ -31,7 +31,7 @@ NC='\033[0m' # No Color
 # Default URLs (production)
 API_URL="${API_URL:-https://api.devskyy.app}"
 FRONTEND_URL="${FRONTEND_URL:-https://app.devskyy.app}"
-WORDPRESS_URL="${WORDPRESS_URL:-https://skyyrose.com}"
+WORDPRESS_URL="${WORDPRESS_URL:-https://skyyrose.co}"
 
 # Parse arguments
 case "$1" in
@@ -44,7 +44,7 @@ case "$1" in
     --staging)
         API_URL="${STAGING_API_URL:-https://staging-api.devskyy.app}"
         FRONTEND_URL="${STAGING_FRONTEND_URL:-https://staging.devskyy.app}"
-        WORDPRESS_URL="${STAGING_WP_URL:-https://staging.skyyrose.com}"
+        WORDPRESS_URL="${STAGING_WP_URL:-https://staging.skyyrose.co}"
         echo -e "${BLUE}Testing STAGING environment${NC}"
         ;;
     *)
