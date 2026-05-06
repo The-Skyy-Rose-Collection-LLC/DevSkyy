@@ -298,30 +298,44 @@ class SelfLearningModule:
         """
         Flush RAG ingestion queue to vector store.
 
+        WARNING (P1 #9): this method does NOT write to a vector store. Items
+        are merely copied into an in-memory dict (`self._knowledge_base`) and
+        lost on process restart. The method name promises persistence the
+        implementation does not deliver. Callers depending on durable RAG
+        retrieval will silently see empty results after restart.
+
+        TODO: wire to Pinecone (`skyyrose-catalog` index, us-west-2, 1024-dim,
+        cosine similarity) OR remove this method and update callers. Until then
+        the warning below fires once per process to make the lie auditable.
+
         Returns:
-            Number of items processed
+            Number of items processed (into the in-memory dict, NOT a vector store)
         """
         if not hasattr(self, "_rag_ingestion_queue"):
             return 0
+
+        if not getattr(self.__class__, "_flush_rag_queue_stub_warned", False):
+            logger.warning(
+                "flush_rag_queue is a stub: items are stored in an in-memory dict, "
+                "NOT a vector store. Lost on restart. Wire to Pinecone before relying "
+                "on RAG retrieval persistence. (P1 #9)"
+            )
+            self.__class__._flush_rag_queue_stub_warned = True
 
         queue = self._rag_ingestion_queue
         self._rag_ingestion_queue = []
 
         processed = 0
         try:
-            # Check if RAG components are available
-            from importlib.util import find_spec
-
-            if find_spec("orchestration.document_ingestion") is not None:
-                # RAG pipeline available - could integrate here
-                pass
-
-            # For now, store in knowledge base for retrieval
+            # In-memory only — see WARNING above
             for item in queue:
                 self._knowledge_base[f"rag:{item['key']}"] = item
                 processed += 1
 
-            logger.info(f"Processed {processed} items from RAG ingestion queue")
+            logger.info(
+                f"Processed {processed} items into in-memory knowledge_base "
+                f"(NOT vector store — see WARNING)"
+            )
 
         except ImportError:
             logger.warning("RAG components not available for queue flush")

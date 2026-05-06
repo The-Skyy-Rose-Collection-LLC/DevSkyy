@@ -50,14 +50,22 @@ class TryOnAgent(BaseSuperAgent):
 
         metadata = adk_result.to_dict() if hasattr(adk_result, "to_dict") else {}
 
+        # P1 #7: Pass-through stub. Real FASHN integration not wired yet.
+        # Returning success=False prevents downstream code from treating the
+        # input image as a transformed try-on result. Callers must check .success
+        # before consuming output_path.
+        logger.warning(
+            "TryOnAgent.execute_tryon is a stub: returning input image unchanged. "
+            "Wire to FASHN provider before relying on output."
+        )
         return TryOnResult(
-            success=True,
-            output_path=garment_image_path,  # Pass-through stub
+            success=False,
+            output_path=garment_image_path,
             garment_sku="unknown",
             model_image_path=model_image_path,
             provider="fashn",
             latency_s=0.5,
-            metadata=metadata,
+            metadata={**metadata, "stub": True, "reason": "tryon_not_implemented"},
         )
 
 
