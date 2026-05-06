@@ -33,8 +33,10 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-from fastapi import APIRouter, BackgroundTasks, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Query, UploadFile
 from pydantic import BaseModel, Field, field_validator
+
+from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -1259,6 +1261,7 @@ async def get_job(job_id: str) -> JobResponse:
 async def generate_tryon(
     request: TryOnRequest,
     background_tasks: BackgroundTasks,
+    user: TokenPayload = Depends(get_current_user),
 ) -> JobResponse:
     """
     Create and queue a virtual try-on job from the provided model and garment image URLs.
@@ -1331,6 +1334,7 @@ async def generate_tryon_upload(
     category: GarmentCategory = GarmentCategory.TOPS,
     mode: TryOnMode = TryOnMode.BALANCED,
     provider: TryOnProvider = TryOnProvider.FASHN,
+    user: TokenPayload = Depends(get_current_user),
 ) -> JobResponse:
     """
     Create a try-on job from two uploaded images, persist the files, and schedule the selected provider's background processing.
@@ -1432,6 +1436,7 @@ async def generate_tryon_upload(
 async def batch_tryon(
     request: BatchTryOnRequest,
     background_tasks: BackgroundTasks,
+    user: TokenPayload = Depends(get_current_user),
 ) -> BatchJobResponse:
     """
     Create and enqueue a batch of try-on jobs for a single model image.
@@ -1542,6 +1547,7 @@ async def get_batch_job(batch_id: str) -> BatchJobResponse:
 async def generate_ai_model(
     request: GenerateModelRequest,
     background_tasks: BackgroundTasks,
+    user: TokenPayload = Depends(get_current_user),
 ) -> ModelGenerationResponse:
     """
     Create and enqueue an AI fashion model generation job for the given prompt and gender.
