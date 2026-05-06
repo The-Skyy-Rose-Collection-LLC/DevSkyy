@@ -35,7 +35,7 @@ if TYPE_CHECKING:
 _OUTPUT_DIR = REPO_ROOT / "agents" / "render_pipeline" / "output"
 
 
-def generate_image_fn(sku: str, view: str, tool_context: "ToolContext") -> dict:
+def generate_image_fn(sku: str, view: str, tool_context: ToolContext) -> dict:
     """Dispatch to the routed engine and save bytes to disk.
 
     Reads state: engine, model_id, prompt, source_path

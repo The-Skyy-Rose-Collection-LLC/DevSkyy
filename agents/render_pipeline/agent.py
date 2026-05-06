@@ -40,7 +40,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 # sys.path setup (same pattern as tools/_paths.py — agents/render_pipeline/agent.py)
 _REPO = Path(__file__).resolve().parents[2]
@@ -73,7 +73,6 @@ from agents.render_pipeline.tools import (
 from llm.model_ids import (
     CLAUDE_OPUS_MODEL,
     CLAUDE_SONNET_MODEL,
-    GEMINI_FLASH_2_MODEL,
     GEMINI_PRO_MODEL,
 )
 
@@ -132,7 +131,7 @@ class StopChecker(BaseAgent):
     /google/adk-python docs).
     """
 
-    async def _run_async_impl(self, ctx: InvocationContext) -> AsyncGenerator[Event, None]:
+    async def _run_async_impl(self, ctx: InvocationContext) -> AsyncGenerator[Event]:
         decision = ctx.session.state.get("loop_decision", "refine")
         should_stop = decision in ("pass", "abort")
         yield Event(author=self.name, actions=EventActions(escalate=should_stop))

@@ -77,7 +77,7 @@ def _build_refine_prompt(
     return "\n\n".join(parts)
 
 
-def refine_image_fn(sku: str, tool_context: "ToolContext") -> dict:
+def refine_image_fn(sku: str, tool_context: ToolContext) -> dict:
     """Refine via Kontext first, Gemini composite as fallback.
 
     Reads state: candidate_path, source_path, qa_score, hallucination_veto,

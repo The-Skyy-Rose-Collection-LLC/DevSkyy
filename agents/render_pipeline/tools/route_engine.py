@@ -50,7 +50,7 @@ def _model_id_for(engine: str) -> str:
     }.get(engine, NANO_BANANA_PRO_MODEL)
 
 
-def route_engine_fn(sku: str, view: str, tool_context: "ToolContext") -> dict:
+def route_engine_fn(sku: str, view: str, tool_context: ToolContext) -> dict:
     """Pick the engine. Override → vision-driven fallthrough.
 
     Args:

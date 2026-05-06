@@ -150,7 +150,7 @@ def _stop_and_show(manifest: dict, max_usd: float) -> bool:
     print("\n" + "=" * 72)
     print("STOP — Confirm before proceeding (paid API calls):")
     print("=" * 72)
-    print(f"  Action          : RenderPipeline ADK agent — full 9-step pipeline")
+    print("  Action          : RenderPipeline ADK agent — full 9-step pipeline")
     print(f"  SKU             : {manifest['sku']} — {manifest['name']}")
     print(f"  Collection      : {manifest['collection']}")
     print(f"  View            : {manifest['view']}")

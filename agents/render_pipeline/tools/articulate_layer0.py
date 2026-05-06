@@ -161,7 +161,7 @@ def _fallback_layer0(engine: str) -> str:
     )
 
 
-def articulate_layer0_fn(sku: str, tool_context: "ToolContext") -> dict:
+def articulate_layer0_fn(sku: str, tool_context: ToolContext) -> dict:
     """Call Sonnet 4.6 to write engine-specific Layer 0 directives.
 
     Reads state: product_name, collection, engine, vision_consensus

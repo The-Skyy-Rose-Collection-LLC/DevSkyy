@@ -74,7 +74,7 @@ def _build_tournament_clients() -> dict:
     return clients
 
 
-def qa_tournament_fn(sku: str, tool_context: "ToolContext") -> dict:
+def qa_tournament_fn(sku: str, tool_context: ToolContext) -> dict:
     """Run the tournament, record learning signals, surface infra-vs-quality.
 
     Reads state: source_path, candidate_path, engine, template_id, estimated_cost_usd

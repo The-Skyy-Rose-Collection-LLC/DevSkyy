@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from google.adk.tools.tool_context import ToolContext
 
 
-def load_dossier_fn(sku: str, tool_context: "ToolContext") -> dict:
+def load_dossier_fn(sku: str, tool_context: ToolContext) -> dict:
     """Load the canonical design spec for `sku`. State + return both populated.
 
     Args:

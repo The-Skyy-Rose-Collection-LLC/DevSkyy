@@ -262,7 +262,7 @@ def _merge_consensus(gemini: dict, openai: dict) -> dict:
     return out
 
 
-def vision_consensus_fn(sku: str, tool_context: "ToolContext") -> dict:
+def vision_consensus_fn(sku: str, tool_context: ToolContext) -> dict:
     """Run dual vision describe in parallel + merge to consensus.
 
     Reads state: source_path

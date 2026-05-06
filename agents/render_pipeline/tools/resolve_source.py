@@ -59,7 +59,7 @@ def _resolve(sku: str, name: str, src_override: str) -> Path | None:
     return next((c for c in candidates if c.exists()), None)
 
 
-def resolve_source_fn(sku: str, tool_context: "ToolContext") -> dict:
+def resolve_source_fn(sku: str, tool_context: ToolContext) -> dict:
     """Resolve the source image for a SKU. Writes path string to state.
 
     Returns dict with sku, source_path (str|None), filename, size_kb,

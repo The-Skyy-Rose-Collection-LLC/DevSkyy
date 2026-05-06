@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from google.adk.tools.tool_context import ToolContext
 
 
-def build_prompt_fn(sku: str, view: str, tool_context: "ToolContext") -> dict:
+def build_prompt_fn(sku: str, view: str, tool_context: ToolContext) -> dict:
     """Assemble L0 + L3 + L2 into the final generator prompt.
 
     Reads state:
