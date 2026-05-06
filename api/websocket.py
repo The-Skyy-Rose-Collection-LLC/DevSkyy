@@ -19,8 +19,11 @@ import logging
 from datetime import datetime
 from typing import Any
 
-from fastapi import WebSocket, WebSocketDisconnect
+from fastapi import Query, WebSocket, WebSocketDisconnect
 from fastapi.routing import APIRouter
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
+
+from security.jwt_oauth2_auth import jwt_manager
 
 logger = logging.getLogger(__name__)
 
@@ -158,17 +161,34 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-async def websocket_handler(websocket: WebSocket, channel: str) -> None:
+async def websocket_handler(websocket: WebSocket, channel: str, token: str) -> None:
     """WebSocket handler for a specific channel.
+
+    Requires a valid JWT bearer token passed as the `token` query parameter,
+    e.g.: ws://host/api/ws/agents?token=<jwt>
+
+    Browsers cannot set the Authorization header on WebSocket connections, so
+    query-param token passing is the standard pattern for WebSocket auth.
 
     Args:
         websocket: FastAPI WebSocket connection
         channel: Channel name (agents, round_table, tasks, 3d_pipeline, metrics)
+        token: JWT access token (from `?token=` query parameter)
 
     Raises:
         WebSocketDisconnect: When client disconnects
     """
-    # Validate and connect
+    # Authenticate before accepting the connection
+    try:
+        jwt_manager.validate_token(token)
+    except ExpiredSignatureError:
+        await websocket.close(code=4001, reason="Token expired")
+        return
+    except (InvalidTokenError, Exception):
+        await websocket.close(code=4001, reason="Invalid token")
+        return
+
+    # Validate channel and connect
     if not await manager.connect(websocket, channel):
         await websocket.close(code=4004, reason=f"Invalid channel: {channel}")
         return
@@ -221,48 +241,68 @@ async def websocket_handler(websocket: WebSocket, channel: str) -> None:
 
 
 @ws_router.websocket("/api/ws/agents")
-async def websocket_agents(websocket: WebSocket) -> None:
-    """WebSocket endpoint for agent status updates."""
-    await websocket_handler(websocket, "agents")
+async def websocket_agents(
+    websocket: WebSocket,
+    token: str = Query(..., description="JWT access token"),
+) -> None:
+    """WebSocket endpoint for agent status updates. Requires ?token=<jwt>."""
+    await websocket_handler(websocket, "agents", token)
 
 
 @ws_router.websocket("/api/ws/round_table")
-async def websocket_round_table(websocket: WebSocket) -> None:
-    """WebSocket endpoint for Round Table competition updates."""
-    await websocket_handler(websocket, "round_table")
+async def websocket_round_table(
+    websocket: WebSocket,
+    token: str = Query(..., description="JWT access token"),
+) -> None:
+    """WebSocket endpoint for Round Table competition updates. Requires ?token=<jwt>."""
+    await websocket_handler(websocket, "round_table", token)
 
 
 @ws_router.websocket("/api/ws/tasks")
-async def websocket_tasks(websocket: WebSocket) -> None:
-    """WebSocket endpoint for task execution updates."""
-    await websocket_handler(websocket, "tasks")
+async def websocket_tasks(
+    websocket: WebSocket,
+    token: str = Query(..., description="JWT access token"),
+) -> None:
+    """WebSocket endpoint for task execution updates. Requires ?token=<jwt>."""
+    await websocket_handler(websocket, "tasks", token)
 
 
 @ws_router.websocket("/api/ws/3d_pipeline")
-async def websocket_3d_pipeline(websocket: WebSocket) -> None:
-    """WebSocket endpoint for 3D generation pipeline updates."""
-    await websocket_handler(websocket, "3d_pipeline")
+async def websocket_3d_pipeline(
+    websocket: WebSocket,
+    token: str = Query(..., description="JWT access token"),
+) -> None:
+    """WebSocket endpoint for 3D generation pipeline updates. Requires ?token=<jwt>."""
+    await websocket_handler(websocket, "3d_pipeline", token)
 
 
 @ws_router.websocket("/api/ws/metrics")
-async def websocket_metrics(websocket: WebSocket) -> None:
-    """WebSocket endpoint for real-time system metrics."""
-    await websocket_handler(websocket, "metrics")
+async def websocket_metrics(
+    websocket: WebSocket,
+    token: str = Query(..., description="JWT access token"),
+) -> None:
+    """WebSocket endpoint for real-time system metrics. Requires ?token=<jwt>."""
+    await websocket_handler(websocket, "metrics", token)
 
 
 # Legacy endpoint for backwards compatibility
 @ws_router.websocket("/ws/{channel}")
-async def websocket_endpoint(websocket: WebSocket, channel: str) -> None:
-    """Legacy WebSocket endpoint for real-time updates.
+async def websocket_endpoint(
+    websocket: WebSocket,
+    channel: str,
+    token: str = Query(..., description="JWT access token"),
+) -> None:
+    """Legacy WebSocket endpoint for real-time updates. Requires ?token=<jwt>.
 
     Args:
         websocket: FastAPI WebSocket connection
         channel: Channel name (agents, round_table, tasks, 3d_pipeline, metrics)
+        token: JWT access token (from `?token=` query parameter)
 
     Raises:
         WebSocketDisconnect: When client disconnects
     """
-    await websocket_handler(websocket, channel)
+    await websocket_handler(websocket, channel, token)
 
 
 # =============================================================================
