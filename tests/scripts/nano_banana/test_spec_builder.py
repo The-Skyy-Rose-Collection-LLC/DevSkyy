@@ -176,3 +176,106 @@ def test_augment_prompt_whitespace_only_negative_returns_unchanged():
     prompt = "Generate a black sweatshirt."
     out = augment_prompt_with_dossier_negatives(prompt, {"_dossier": dossier})
     assert out == prompt
+
+
+# ── augment_prompt_with_dossier_positives (Layer 3) ────────────────────────
+
+
+from nano_banana.spec_builder import augment_prompt_with_dossier_positives  # noqa: E402
+
+
+def test_layer3_prepends_garment_type_lock_and_branding():
+    """Both blocks present → CANONICAL DESIGN SPEC prepended with both sections."""
+    dossier = _make_dossier(
+        garment_type_lock="Crewneck sweatshirt — heavyweight cotton fleece.",
+        branding_block="Front: tonal embossed black-on-black rose. Back-neck: gold SR monogram.",
+    )
+    prompt = "STUB GENERATOR PROMPT"
+    out = augment_prompt_with_dossier_positives(prompt, {"_dossier": dossier})
+
+    assert out.startswith("CANONICAL DESIGN SPEC")
+    assert "GARMENT TYPE (must match exactly):" in out
+    assert "Crewneck sweatshirt — heavyweight cotton fleece." in out
+    assert "BRANDING — exactly what to render:" in out
+    assert "tonal embossed black-on-black rose" in out
+    assert "STUB GENERATOR PROMPT" in out
+    # Canonical spec MUST appear before the original prompt
+    canonical_idx = out.index("CANONICAL DESIGN SPEC")
+    prompt_idx = out.index("STUB GENERATOR PROMPT")
+    assert canonical_idx < prompt_idx, "canonical positives must PREPEND, not append"
+
+
+def test_layer3_warns_about_inferred_overrides():
+    """The header text explicitly says canonical overrides inferred — that's
+    the directive the model needs to resolve conflicts."""
+    dossier = _make_dossier(garment_type_lock="LOCK", branding_block="BRAND")
+    out = augment_prompt_with_dossier_positives("...", {"_dossier": dossier})
+    assert "overrides any conflicting inferred" in out
+
+
+def test_layer3_only_lock_present_skips_branding_section():
+    """Partial dossier (lock present, branding empty) emits only the lock section."""
+    dossier = _make_dossier(garment_type_lock="LOCK_ONLY", branding_block="")
+    out = augment_prompt_with_dossier_positives("PROMPT", {"_dossier": dossier})
+    assert "GARMENT TYPE (must match exactly):" in out
+    assert "LOCK_ONLY" in out
+    assert "BRANDING — exactly what to render:" not in out
+
+
+def test_layer3_only_branding_present_skips_lock_section():
+    """Partial dossier (branding present, lock empty) emits only the branding section."""
+    dossier = _make_dossier(garment_type_lock="", branding_block="BRAND_ONLY")
+    out = augment_prompt_with_dossier_positives("PROMPT", {"_dossier": dossier})
+    assert "BRANDING — exactly what to render:" in out
+    assert "BRAND_ONLY" in out
+    assert "GARMENT TYPE (must match exactly):" not in out
+
+
+def test_layer3_no_dossier_returns_unchanged():
+    """No dossier in dna → prompt unchanged. Backward-compat for cached vision-only flows."""
+    prompt = "PROMPT"
+    assert augment_prompt_with_dossier_positives(prompt, {}) == prompt
+    assert augment_prompt_with_dossier_positives(prompt, {"spec": "..."}) == prompt
+
+
+def test_layer3_empty_blocks_returns_unchanged():
+    """Dossier with both blocks empty → prompt unchanged (no empty header noise)."""
+    dossier = _make_dossier(garment_type_lock="", branding_block="")
+    out = augment_prompt_with_dossier_positives("PROMPT", {"_dossier": dossier})
+    assert out == "PROMPT"
+
+
+def test_layer3_whitespace_blocks_treated_as_empty():
+    """Whitespace-only blocks are treated as empty."""
+    dossier = _make_dossier(garment_type_lock="   \n  ", branding_block="\t\n")
+    out = augment_prompt_with_dossier_positives("PROMPT", {"_dossier": dossier})
+    assert out == "PROMPT"
+
+
+def test_layer3_accepts_vision_context_directly():
+    """VisionContext (production path) works via the same shim as plain dict."""
+    from nano_banana.vision_context import VisionContext
+
+    dossier = _make_dossier(garment_type_lock="LOCK", branding_block="BRAND")
+    ctx = VisionContext(spec="...", dossier=dossier)
+    out = augment_prompt_with_dossier_positives("PROMPT", ctx)
+    assert "LOCK" in out
+    assert "BRAND" in out
+
+
+def test_layer3_and_layer2_compose_correctly():
+    """Pipeline order: positives prepended, negatives appended. Both visible."""
+    dossier = _make_dossier(
+        garment_type_lock="LOCK_TEXT",
+        branding_block="BRAND_TEXT",
+        negative_block="NO_TEXT",
+    )
+    prompt = "BASE_PROMPT"
+    out = augment_prompt_with_dossier_positives(prompt, {"_dossier": dossier})
+    out = augment_prompt_with_dossier_negatives(out, {"_dossier": dossier})
+
+    # Order: CANONICAL ... BASE_PROMPT ... DO NOT RENDER
+    canonical_idx = out.index("CANONICAL DESIGN SPEC")
+    base_idx = out.index("BASE_PROMPT")
+    negative_idx = out.index("DO NOT RENDER")
+    assert canonical_idx < base_idx < negative_idx, "Layer-3 positives → base → Layer-2 negatives"

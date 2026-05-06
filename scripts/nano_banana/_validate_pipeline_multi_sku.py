@@ -280,10 +280,38 @@ def main() -> int:
         "--skus",
         type=str,
         default=",".join(DEFAULT_SKUS),
-        help=f"Comma-separated SKU list (default: {','.join(DEFAULT_SKUS)})",
+        help=(
+            f"Comma-separated SKU list, OR 'all' for every SKU in the catalog "
+            f"(default: {','.join(DEFAULT_SKUS)} — one per collection sample)"
+        ),
+    )
+    parser.add_argument(
+        "--collection",
+        type=str,
+        default="",
+        help=(
+            "Filter to one collection (black-rose, love-hurts, signature, kids-capsule). "
+            "Combine with --skus all to run every SKU in that collection."
+        ),
     )
     args = parser.parse_args()
-    skus = [s.strip() for s in args.skus.split(",") if s.strip()]
+
+    if args.skus.strip().lower() == "all":
+        from nano_banana.catalog import load_catalog
+
+        catalog = load_catalog()
+        skus = sorted(
+            sku
+            for sku, row in catalog.items()
+            if not args.collection or row.get("collection", "") == args.collection
+        )
+        log.info(
+            "Loaded %d SKUs from catalog%s",
+            len(skus),
+            f" (collection={args.collection})" if args.collection else "",
+        )
+    else:
+        skus = [s.strip() for s in args.skus.split(",") if s.strip()]
 
     max_usd = float(os.environ.get("MAX_USD", DEFAULT_MAX_USD))
 
