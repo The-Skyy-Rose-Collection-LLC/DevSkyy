@@ -429,6 +429,23 @@ class PromptRegistry:
         """Select the best prompt template and render it.
 
         Returns (rendered_prompt, template_id).
+
+        Layer 3.5 — canonical-mode bypass: when `vision_desc` is a
+        VisionContext carrying a populated `dossier`, the registry's
+        inferred-DNA-encoding section (`graphics_count`, `LOCKED — same
+        size, position, colors as reference`, etc.) is bypassed entirely.
+        Reason: when a canonical dossier exists, the inferred Gemini-vision
+        DNA describes the (possibly defective) on-disk image. Encoding
+        that defect as "LOCKED" tells the generator to faithfully
+        reproduce the defect, directly contradicting the canonical
+        positives prepended by Layer 3 in pipeline.run_single. The
+        canonical-mode path returns engine-specific render-style
+        directives only (backdrop, lighting, photoreal style) — the
+        product specification comes from Layer 3 + Layer 2.
+
+        See `tasks/per-sku-prompts-1778041872.md` for the diagnostic dump
+        that surfaced the contradiction; see `_canonical_mode_prompt` for
+        the bypass path.
         """
         from nano_banana.prompts import COLLECTION_LIGHTING
 
@@ -436,6 +453,18 @@ class PromptRegistry:
         name = product.get("name", "garment")
         collection = product.get("collection", "black-rose")
         lighting = COLLECTION_LIGHTING.get(collection, COLLECTION_LIGHTING["black-rose"])
+
+        # Layer 3.5: canonical-mode bypass when dossier is present.
+        # Detect via duck-typing so VisionContext is not a hard import
+        # dependency (VisionContext imports skyyrose.core which adds
+        # weight; this method may be called in lightweight test paths).
+        dossier = getattr(vision_desc, "dossier", None)
+        if dossier is not None:
+            log.info(
+                "PROMPT: canonical-mode (dossier present for %s) — skipping inferred-DNA encoding",
+                sku,
+            )
+            return self._canonical_mode_prompt(name, lighting, model), "canonical_mode_v1"
 
         spec = VisionSpec.from_vision(vision_desc, sku)
         category = _categorize_garment(vision_desc)
@@ -485,6 +514,46 @@ class PromptRegistry:
         )
 
         return rendered, winner.id
+
+    def _canonical_mode_prompt(self, product_name: str, lighting: dict, model: str) -> str:
+        """Build the engine-specific render-style prompt for canonical mode.
+
+        Returns ONLY rendering directives — backdrop, lighting, fabric
+        photorealism, view restriction. The product specification (garment
+        type, branding, colors, techniques) comes from Layer 3 (canonical
+        positives prepended by `pipeline.run_single` via
+        `augment_prompt_with_dossier_positives`); this section sits in the
+        middle of the final prompt and only governs HOW the image is
+        rendered, not WHAT.
+
+        Critically: NO `graphics_count`, NO `LOCKED — same size/position/
+        colors as reference`, NO inferred-DNA fields. Those framings caused
+        the contradiction that made Layer 3 ineffective when present.
+        """
+        bg = lighting.get("bg", "Dark luxury backdrop")
+        light = lighting.get("light", "Professional studio lighting")
+        mood = lighting.get("mood", "Luxury fashion editorial")
+
+        return (
+            f"Render task: photorealistic e-commerce product photo of "
+            f'"{product_name}" — front view only, no model, no mannequin.\n\n'
+            "Defer to the CANONICAL DESIGN SPEC above for every product detail "
+            "(garment type, branding, colors, techniques, placements). The "
+            "canonical spec is authoritative; render exactly what it specifies, "
+            "nothing more, nothing less.\n\n"
+            "STUDIO SETUP:\n"
+            f"- {bg}\n"
+            f"- {light}\n"
+            f"- Mood: {mood}\n"
+            "- Garment floats on an invisible form with natural 3D drape and shadow\n"
+            "- Photorealistic fabric texture: visible weave, thread weight, sheen "
+            "appropriate to the canonical fabric description\n"
+            "- Pure 4K product-photography sharpness, no motion blur, no DOF blur on the garment\n\n"
+            "VIEW RESTRICTION: front view only. Do NOT show the back. Do NOT add "
+            "watermarks, price tags, size labels, brand text overlays, or model.\n\n"
+            "AUTHORED NEGATIVES will follow below — those are the explicit "
+            "DO-NOT-RENDER rules for this specific product."
+        )
 
     def record_score(self, template_id: str, score: float) -> None:
         """Record a QA score for a template — feeds the A/B testing loop."""

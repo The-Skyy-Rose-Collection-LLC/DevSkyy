@@ -47,6 +47,7 @@ EXPECTED_COLUMNS = {
     "render_is_tech_flat",
     "render_is_accessory",
     "garment_type_lock",
+    "engine_override",
 }
 
 VALID_COLLECTIONS = {"black-rose", "love-hurts", "signature", "kids-capsule"}

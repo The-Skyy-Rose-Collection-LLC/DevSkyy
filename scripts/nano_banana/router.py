@@ -18,10 +18,10 @@ from llm.model_ids import NANO_BANANA_PRO_MODEL, OPENAI_IMAGE_15_MODEL
 log = logging.getLogger(__name__)
 
 COST_TABLE = {
-    "gemini-pro": 0.04,  # per image
-    "gemini-flash": 0.01,
+    "gemini-pro": 0.04,  # NB Pro (gemini-3-pro-image-preview) — 4K luxury tier
+    "gemini-flash": 0.04,  # NB Pro everywhere as of 2026-05-06 (Option A — luxury default)
     "gpt-image": 0.08,
-    "flux-pro": 0.035,
+    "flux-pro": 0.075,  # observed actual cost from multi-SKU validator runs
     "flux-kontext": 0.04,
 }
 

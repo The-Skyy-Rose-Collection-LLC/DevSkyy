@@ -215,15 +215,29 @@ class ProductionPipeline:
         result.route_decision = decisions[0].reason
 
         # ── Step 3: GENERATE ─────────────────────────────────────────
-        # Build prompt from registry (A/B tested templates)
+        # Build prompt from registry (A/B tested templates) — based on
+        # inferred Gemini-vision DNA. When the on-disk image carries
+        # defects, this DNA reflects the defects; the canonical positives
+        # below override that.
         registry = PromptRegistry.load()
         model_hint = decisions[0].engine if decisions else ""
         prompt, template_id = registry.get_prompt(vision_desc, product, view, model_hint)
 
-        # Append authored dossier negatives so the generator sees them,
+        # Layer 3: prepend authored dossier POSITIVES so the generator
+        # sees the canonical garment_type_lock + branding_block at the
+        # front of the prompt (highest attention weight). Breaks the
+        # self-reinforcing defect loop where vision-describe of a
+        # defective render produces inferred DNA matching the defect,
+        # which the generator then faithfully reproduces.
+        # Layer 2: append authored dossier NEGATIVES so authored
+        # "DO NOT render X" rules flow through to the generator,
         # not just the judges.
-        from nano_banana.spec_builder import augment_prompt_with_dossier_negatives
+        from nano_banana.spec_builder import (
+            augment_prompt_with_dossier_negatives,
+            augment_prompt_with_dossier_positives,
+        )
 
+        prompt = augment_prompt_with_dossier_positives(prompt, vision_desc)
         prompt = augment_prompt_with_dossier_negatives(prompt, vision_desc)
 
         img_bytes = None

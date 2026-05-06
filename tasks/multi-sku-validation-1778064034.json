@@ -1,0 +1,93 @@
+{
+  "skus_requested": [
+    "br-001",
+    "lh-004",
+    "sg-007",
+    "kids-001"
+  ],
+  "elapsed_seconds": 2778.814496499981,
+  "max_usd": 5.0,
+  "cap_exceeded": false,
+  "summary": {
+    "passed": 0,
+    "refined": 4,
+    "total_cost": 0.385
+  },
+  "results": [
+    {
+      "sku": "br-001",
+      "view": "front",
+      "output_path": "/private/tmp/multi-sku-wt/wordpress-theme/skyyrose-flagship/assets/images/products/br-001-front-render.webp",
+      "engine_used": "flux-pro",
+      "route_decision": "Complex fabric (Smooth, lustrous knit fabric with a satin-like sheen for the body and sleeves. The collar, cuffs, and hem are made of a matte, ribbed knit.) \u2014 Gemini Pro best at material physics",
+      "qa_score": 30.0,
+      "qa_passed": false,
+      "attempts": 2,
+      "cost_usd": 0.11500000000000002,
+      "issues": [
+        "Unauthorized gold SR monogram placed on the front chest \u2014 SR is permitted only at the back-neck.",
+        "Front Black Rose art is wrong: a single rose silhouette instead of the canonical three-rose cluster with stems, thorny vines, and cloud.",
+        "Front logo reads as a flat tonal graphic rather than physically embossed/debossed fabric relief.",
+        "Back-neck gold SR embroidery is not verified in the render; the only SR present is the incorrectly placed front one.",
+        "Front carries an unauthorized lettermark ('SR') functioning as prohibited front-chest text/logo."
+      ],
+      "refinement_applied": true
+    },
+    {
+      "sku": "lh-004",
+      "view": "front",
+      "output_path": "/private/tmp/multi-sku-wt/wordpress-theme/skyyrose-flagship/assets/images/products/lh-004-front-render.webp",
+      "engine_used": "flux-pro",
+      "route_decision": "Standard garment \u2014 FLUX Pro best value (98% quality, 26% cost)",
+      "qa_score": 42.0,
+      "qa_passed": false,
+      "attempts": 1,
+      "cost_usd": 0.07500000000000001,
+      "issues": [
+        "Zipper-front closure rendered instead of the required full-length body-tone snap/button placket (explicit NEGATIVE spec violation).",
+        "Hallucinated red rose cluster on the front-right chest \u2014 front must show only the embroidered Love/Hurts wordmark; rose/heart art belongs on the back only.",
+        "Front wordmark is generic script and does not match the canonical Love Hurts hand-drawn graffiti-cursive embroidery.",
+        "No visible snap/button hardware on the placket; closure construction is unverifiable.",
+        "Front slash welt pockets are not clearly resolved as the specified vertical welt openings."
+      ],
+      "refinement_applied": true
+    },
+    {
+      "sku": "sg-007",
+      "view": "front",
+      "output_path": "/private/tmp/multi-sku-wt/wordpress-theme/skyyrose-flagship/assets/images/products/sg-007-front-render.webp",
+      "engine_used": "flux-pro",
+      "route_decision": "Standard garment \u2014 FLUX Pro best value (98% quality, 26% cost)",
+      "qa_score": 0.0,
+      "qa_passed": false,
+      "attempts": 1,
+      "cost_usd": 0.07500000000000001,
+      "issues": [
+        "Vision judge 1 (gpt-5.5-pro) failed with TimeoutError \u2014 no evaluation performed",
+        "Vision judge 2 (gemini-3.1-pro-preview) failed with 504 DEADLINE_EXCEEDED \u2014 no evaluation performed",
+        "No visual QA signal available; image cannot be approved for ship",
+        "judge error: 504 DEADLINE_EXCEEDED. {'error': {'code': 504, 'message': 'Deadline expired before operation could complete.', 'status': 'DEADLINE_EXCEEDED'}}"
+      ],
+      "refinement_applied": true
+    },
+    {
+      "sku": "kids-001",
+      "view": "front",
+      "output_path": "/private/tmp/multi-sku-wt/wordpress-theme/skyyrose-flagship/assets/images/products/kids-001-front-render.webp",
+      "engine_used": "gpt-image",
+      "route_decision": "Text/logo product (kids-001) \u2014 GPT Image has 96%+ text accuracy",
+      "qa_score": 30.0,
+      "qa_passed": false,
+      "attempts": 1,
+      "cost_usd": 0.12,
+      "issues": [
+        "Sweatpants rendered red instead of the spec-required solid black (major colorway violation \u2014 pants must be black for this SKU)",
+        "Hallucinated rose-cluster logo on the white upper-right chest panel \u2014 not in spec and disqualifying for a luxury brand",
+        "Authentic Collection chest patch shows illegible/gibberish text instead of the canonical 'BLACK ROSE / COLLECTION / AUTHENTIC / Members Only / Yay Area, Ca' layout",
+        "Missing the greyscale three-rose-cluster embroidery on the front-center-chest (red lower body) of the hoodie",
+        "Missing the greyscale rose-cluster embroidery at the front-center waistband of the sweatpants"
+      ],
+      "refinement_applied": true
+    }
+  ]
+}

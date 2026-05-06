@@ -119,6 +119,64 @@ def build_dna_from_sku(sku: str) -> VisionContext:
     )
 
 
+def augment_prompt_with_dossier_positives(prompt: str, dna: VisionContext | dict) -> str:
+    """Prepend the dossier's positive specs to a generation prompt (Layer 3).
+
+    Why this exists: Tier 2 wired the dossier's NEGATIVE block (`DO NOT
+    render X`) into the generator prompt via Layer 2. But the
+    POSITIVES — `garment_type_lock` and `branding_block` — never reached
+    the generator. The pipeline built generator prompts from the
+    Gemini-vision-inferred DNA (in `prompt_registry.get_prompt`), which
+    describes the on-disk image. When the on-disk image is itself
+    defective (multi-color rose where the canonical wants tonal
+    embossed), inferred DNA = defective DNA, the generator faithfully
+    reproduces the defect, and judges score against canonical and
+    reject. Self-reinforcing defect loop.
+
+    Layer 3 breaks that loop by prepending the canonical positives to
+    the generator prompt. The dossier's authored prose ("Technique:
+    embossed. Color: tonal black-on-black.", "white body with black
+    raglan sleeves and black hood") gives the generator the exact
+    technique words and silhouette directives that image-gen models
+    weight strongly. Inferred DNA stays in the prompt as backfill, but
+    the canonical truth dominates.
+
+    Prompt order matters: PREPEND, don't append. Image-gen models give
+    the most attention to the front of the prompt. The canonical
+    positives must arrive before the inferred-DNA-derived spec, so the
+    model resolves any conflict in the canonical's favor.
+
+    Accepts both `VisionContext` (production path) and plain `dict`
+    (test fixtures and legacy callers) via the `.get("_dossier")` shim.
+
+    Behavior:
+    - If the dossier is missing or both blocks are empty, return the
+      prompt unchanged. Callers stay backward-compatible.
+    - Otherwise, prepend a CANONICAL DESIGN SPEC heading carrying the
+      garment_type_lock + branding_block verbatim. The two blocks are
+      separated by a single blank line; missing blocks are skipped
+      cleanly (e.g., garment_type_lock present, branding_block empty
+      → only the lock text appears under the heading).
+    """
+    dossier = dna.get("_dossier")
+    if not dossier:
+        return prompt
+    type_lock = (getattr(dossier, "garment_type_lock", "") or "").strip()
+    branding = (getattr(dossier, "branding_block", "") or "").strip()
+    if not type_lock and not branding:
+        return prompt
+    sections: list[str] = []
+    if type_lock:
+        sections.append(f"GARMENT TYPE (must match exactly):\n{type_lock}")
+    if branding:
+        sections.append(f"BRANDING — exactly what to render:\n{branding}")
+    canonical = (
+        "CANONICAL DESIGN SPEC (authored truth — overrides any conflicting inferred description below):\n\n"
+        + "\n\n".join(sections)
+    )
+    return f"{canonical}\n\n---\n\n{prompt}"
+
+
 def augment_prompt_with_dossier_negatives(prompt: str, dna: VisionContext | dict) -> str:
     """Append the dossier's negative block to a generation prompt (Layer 2).
 
@@ -152,5 +210,6 @@ def augment_prompt_with_dossier_negatives(prompt: str, dna: VisionContext | dict
 __all__ = [
     "build_judge_spec_from_dossier",
     "build_dna_from_sku",
+    "augment_prompt_with_dossier_positives",
     "augment_prompt_with_dossier_negatives",
 ]
