@@ -43,6 +43,14 @@ def load_catalog() -> dict[str, dict]:
                 entry["source_override"] = row["render_source_override"].strip()
             if row["render_back_source_override"].strip():
                 entry["back_source_override"] = row["render_back_source_override"].strip()
+            # Empirically-tuned engine override (F3 finding from 2026-05-05
+            # multi-SKU validator: vision-driven routing produces stochastic
+            # results because Gemini-vision keywords drive route_product().
+            # When the same SKU swings 88 → 30 between gemini-pro and flux-pro,
+            # we pin the winner explicitly. Falls through to vision routing
+            # when empty.
+            if "engine_override" in row and row["engine_override"].strip():
+                entry["engine_override"] = row["engine_override"].strip()
             catalog[sku] = entry
     return catalog
 
