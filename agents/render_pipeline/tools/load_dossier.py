@@ -16,14 +16,11 @@ Raises:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from agents.render_pipeline.tools._paths import ensure_repo_paths
 
 ensure_repo_paths()
 
-if TYPE_CHECKING:
-    from google.adk.tools.tool_context import ToolContext
+from google.adk.tools.tool_context import ToolContext
 
 
 def load_dossier_fn(sku: str, tool_context: ToolContext) -> dict:

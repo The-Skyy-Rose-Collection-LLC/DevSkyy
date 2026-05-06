@@ -28,16 +28,13 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING
-
 from agents.render_pipeline.tools._paths import ensure_repo_paths
 
 ensure_repo_paths()
 
 log = logging.getLogger(__name__)
 
-if TYPE_CHECKING:
-    from google.adk.tools.tool_context import ToolContext
+from google.adk.tools.tool_context import ToolContext
 
 
 def _build_tournament_clients() -> dict:

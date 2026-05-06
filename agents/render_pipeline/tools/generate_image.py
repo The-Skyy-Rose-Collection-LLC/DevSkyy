@@ -18,16 +18,13 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING
-
 from agents.render_pipeline.tools._paths import REPO_ROOT, ensure_repo_paths
 
 ensure_repo_paths()
 
 log = logging.getLogger(__name__)
 
-if TYPE_CHECKING:
-    from google.adk.tools.tool_context import ToolContext
+from google.adk.tools.tool_context import ToolContext
 
 # Output dir mirrors the production pipeline output convention but lives
 # under agents/render_pipeline/ so it doesn't collide with nano_banana's

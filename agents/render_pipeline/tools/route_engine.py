@@ -16,14 +16,11 @@ State writes:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from agents.render_pipeline.tools._paths import ensure_repo_paths
 
 ensure_repo_paths()
 
-if TYPE_CHECKING:
-    from google.adk.tools.tool_context import ToolContext
+from google.adk.tools.tool_context import ToolContext
 
 # Cost table mirrors nano_banana.router.COST_TABLE — copied verbatim
 # rather than imported because the override path doesn't go through
