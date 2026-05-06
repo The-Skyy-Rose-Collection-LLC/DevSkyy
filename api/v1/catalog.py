@@ -6,15 +6,9 @@ Voyage `voyage-3-large` embeddings + Pinecone serverless
 
 Prefix:  /api/v1/catalog
 Auth:    public for read-only catalog data (/search, /products/*, /collections/*).
-
-         CAVEAT: /answer and /answer/stream invoke Claude (cost-bearing, ~$0.002/req)
-         and are currently UNAUTHENTICATED. Other LLM-backed endpoints in this API
-         (api/v1/rag_anything.py, api/v1/commerce.py) gate via Depends(get_current_user)
-         + entitlement checks. Before exposing publicly, either:
-           (a) add Depends(get_current_user) and bill against tier, OR
-           (b) add per-IP rate limiting via security.rate_limiting.rate_limiter.
-         The /answer cache (1h TTL, 128 slots) provides some natural backpressure
-         on identical queries but does not bound spend from a malicious caller.
+         Cost-bearing endpoints (/answer, /answer/stream, /cache/clear) require
+         JWT Bearer auth via Depends(get_current_user) — unauthenticated callers
+         receive HTTP 401.
 
 Endpoints:
     GET  /search                            — semantic search across all SKUs
@@ -37,11 +31,12 @@ from collections import OrderedDict
 from collections.abc import AsyncIterator
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from orchestration.catalog_retriever import CatalogAnswer, CatalogMatch, CatalogRetriever
+from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/catalog", tags=["Catalog"])
@@ -512,6 +507,7 @@ async def answer_question(
         le=10,
         description="How many catalog matches to surface as grounding context",
     ),
+    user: TokenPayload = Depends(get_current_user),
 ) -> AnswerResponse:
     """Natural-language Q&A grounded in the SkyyRose catalog (RAG, cached).
 
@@ -571,6 +567,7 @@ def _sse(event: dict[str, Any]) -> str:
 async def answer_question_stream(
     q: str = Query(..., min_length=3, max_length=500),
     top_k: int = Query(5, ge=1, le=10),
+    user: TokenPayload = Depends(get_current_user),
 ):
     """Streaming variant of /answer — Server-Sent Events.
 
@@ -635,7 +632,7 @@ async def cache_stats() -> CacheStatsResponse:
 
 
 @router.post("/cache/clear")
-async def cache_clear() -> dict[str, str]:
+async def cache_clear(user: TokenPayload = Depends(get_current_user)) -> dict[str, str]:
     """Drop all cached /answer responses. Use after re-indexing the catalog
     so stale answers don't linger past their TTL."""
     await _get_answer_cache().clear()
