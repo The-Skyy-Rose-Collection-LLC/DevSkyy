@@ -14,7 +14,7 @@ import uuid
 from datetime import datetime
 from typing import Literal
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from prometheus_client import Counter, Histogram
 from pydantic import BaseModel, Field, field_validator
 
@@ -24,6 +24,7 @@ from orchestration.sync_pipeline import (
     SyncTriggerResponse,
     get_sync_pipeline,
 )
+from security.jwt_oauth2_auth import TokenPayload, get_current_user
 from security.prometheus_exporter import devskyy_registry
 
 # =============================================================================
@@ -108,7 +109,10 @@ async def get_sync_status():
 
 
 @sync_router.post("/trigger", response_model=SyncTriggerResponse)
-async def trigger_sync(request: TriggerSyncRequest):
+async def trigger_sync(
+    request: TriggerSyncRequest,
+    user: TokenPayload = Depends(get_current_user),
+):
     """
     Trigger a sync operation.
 
@@ -168,7 +172,7 @@ async def trigger_sync(request: TriggerSyncRequest):
 
 
 @sync_router.post("/rt-to-hf")
-async def sync_round_table_to_hf():
+async def sync_round_table_to_hf(user: TokenPayload = Depends(get_current_user)):
     """
     Quick endpoint to sync Round Table results to HuggingFace.
 

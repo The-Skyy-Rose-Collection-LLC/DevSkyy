@@ -24,8 +24,10 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Query, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, HTTPException, Query, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel, Field
+
+from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -305,7 +307,10 @@ SAMPLE_AR_PRODUCTS: list[ARProduct] = [
 
 
 @ar_sessions_router.post("/sessions", response_model=ARSession)
-async def create_ar_session(request: CreateSessionRequest) -> ARSession:
+async def create_ar_session(
+    request: CreateSessionRequest,
+    user: TokenPayload = Depends(get_current_user),
+) -> ARSession:
     """
     Create a new AR shopping session.
 
@@ -328,6 +333,7 @@ async def update_ar_session(
     session_id: str,
     status: SessionStatus | None = None,
     conversion: bool | None = None,
+    user: TokenPayload = Depends(get_current_user),
 ) -> ARSession:
     """Update AR session status."""
     session = session_store.update_session(session_id, status=status, conversion=conversion)
@@ -338,7 +344,11 @@ async def update_ar_session(
 
 @ar_sessions_router.post("/sessions/{session_id}/tryon", response_model=TryOnEvent)
 async def record_tryon(
-    session_id: str, product_id: str, success: bool = True, duration_ms: int | None = None
+    session_id: str,
+    product_id: str,
+    success: bool = True,
+    duration_ms: int | None = None,
+    user: TokenPayload = Depends(get_current_user),
 ) -> TryOnEvent:
     """Record a try-on event for analytics."""
     session = session_store.get_session(session_id)
