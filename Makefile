@@ -100,6 +100,49 @@ test-fast:
 	pytest tests/ -v --tb=short -x -q
 
 # ============================================================================
+# ADK RENDER PIPELINE COMMANDS
+# ============================================================================
+# Mock unit tests for the 9-step SequentialAgent. Uses .venv-agents/ (separate
+# from .venv/ — ADK + numpy conflict isolation). No API cost, target <5s.
+# Override the venv path via env var: `ADK_PYTHON=/path/to/python make adk-test`
+
+ADK_PYTHON ?= ../DevSkyy/.venv-agents/bin/python3
+
+adk-test:
+	@if [ ! -x "$(ADK_PYTHON)" ]; then \
+		echo "Error: $(ADK_PYTHON) not found."; \
+		echo "Install: $(ADK_PYTHON) -m pip install 'google-adk[extensions]' scipy pytest pytest-asyncio pytest-mock"; \
+		echo "Or override: ADK_PYTHON=/path/to/python make adk-test"; \
+		exit 1; \
+	fi
+	$(ADK_PYTHON) -m pytest agents/render_pipeline/tests/ -v --tb=short
+
+adk-test-fast:
+	@[ -x "$(ADK_PYTHON)" ] || { echo "Error: $(ADK_PYTHON) not found"; exit 1; }
+	$(ADK_PYTHON) -m pytest agents/render_pipeline/tests/ --tb=line -q
+
+adk-lint:
+	@[ -x "$(ADK_PYTHON)" ] || { echo "Error: $(ADK_PYTHON) not found"; exit 1; }
+	$(ADK_PYTHON) -m ruff check agents/render_pipeline/
+	$(ADK_PYTHON) -m black --check agents/render_pipeline/
+
+# Composite manual gate: lint + tests. Used by humans for one-shot
+# pre-commit checks. The pre-commit hooks invoke adk-lint and
+# adk-test-fast independently so they report separately.
+adk-check: adk-lint adk-test-fast
+
+# Live ADK AgentEvaluator run against agents/render_pipeline/eval/.
+# WARNING: this is a PAID call (br-001 front fixture exercises Gemini Pro
+# image gen + 3-judge tournament). Estimated ~$0.25-0.55 per run. The
+# Makefile target only WIRES the harness — execution requires the same
+# explicit confirmation as cli.py per the project's STOP-AND-SHOW protocol.
+adk-eval:
+	@[ -x "$(ADK_PYTHON)" ] || { echo "Error: $(ADK_PYTHON) not found"; exit 1; }
+	@echo "Running ADK AgentEvaluator against the canonical eval set..."
+	@echo "Live eval: br-001 front view via the 9-step SequentialAgent"
+	$(ADK_PYTHON) -m pytest agents/render_pipeline/eval/ -v --tb=short
+
+# ============================================================================
 # TYPESCRIPT COMMANDS
 # ============================================================================
 

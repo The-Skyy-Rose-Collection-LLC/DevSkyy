@@ -33,7 +33,6 @@ log = logging.getLogger(__name__)
 
 from google.adk.tools.tool_context import ToolContext
 
-
 # Structured-output schema both vision models emit. Identical schema =
 # trivial merge logic. Mirrors `nano_banana.vision_describe` output shape
 # so existing routing/prompt code reads consensus as drop-in replacement.

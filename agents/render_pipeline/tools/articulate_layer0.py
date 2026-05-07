@@ -41,7 +41,6 @@ log = logging.getLogger(__name__)
 
 from google.adk.tools.tool_context import ToolContext
 
-
 _LAYER0_SCHEMA = {
     "type": "object",
     "properties": {
