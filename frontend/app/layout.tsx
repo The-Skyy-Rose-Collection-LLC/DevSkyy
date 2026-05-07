@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { Inter } from 'next/font/google'
 import { playfair, cormorant, spaceMono } from '@/lib/fonts'
 import { SyncStatusToast } from '@/components/wordpress/sync-status-toast'
@@ -35,7 +36,9 @@ export default function RootLayout({
         <QueryProvider>
           {children}
         </QueryProvider>
-        <MascotBubble />
+        <Suspense fallback={null}>
+          <MascotBubble />
+        </Suspense>
         <SyncStatusToast />
         <Analytics />
         <SpeedInsights />
