@@ -619,7 +619,81 @@ verify_live() {
     # runs deploy-theme.sh directly. For full post-deploy checks, run
     # `bash scripts/verify-deploy.sh` or `bash scripts/deploy-pipeline.sh`.
     log_success "Post-deploy verification passed (HTTP $http_code, $size bytes)"
+
+    # Structural DOM verification (Scrapling) — runs AFTER the curl gate.
+    # Asserts template-specific markers like <main class="homepage-v2">,
+    # <nav id="mainNav">, <section id="hero">, <div id="loader">, plus a
+    # universal [data-skyyrose-error] count-must-be-0 beacon. Catches
+    # regressions where WP returns 200 but front-page.php fell back or
+    # stripped a critical section.
+    #
+    # Default: WARN-ONLY (logs failures, does NOT block deploy).
+    # Set STRUCTURE_CHECK_STRICT=1 to promote structural failures into
+    # full deploy failures (triggers auto-rollback via cleanup trap).
+    structural_verify_live "$public_url"
     return 0
+}
+
+# ---------------------------------------------------------------------------
+# Structural verification gate (Scrapling-backed)
+#
+# Exit-code contract from scripts/verify_live_structure.py:
+#   0 - all structural assertions passed
+#   2 - one or more assertions failed (real regression)
+#   3 - environment problem (scrapling missing, network unreachable)
+#       NEVER blocks deploy; logged as warning only.
+#
+# Returns 0 always in warn-only mode (default). Returns 1 only when
+# STRUCTURE_CHECK_STRICT=1 AND the script exits 2 (real failure).
+# ---------------------------------------------------------------------------
+structural_verify_live() {
+    local public_url="$1"
+    local script_path="$SCRIPT_DIR/verify_live_structure.py"
+    local strict="${STRUCTURE_CHECK_STRICT:-0}"
+
+    if [[ ! -f "$script_path" ]]; then
+        log_warn "Structural check skipped: $script_path not found"
+        return 0
+    fi
+
+    # Prefer the project venv's Python (where scrapling is installed).
+    # Fall back to system python3 only if scrapling happens to be there.
+    local py_bin=""
+    if [[ -x "$PROJECT_ROOT/.venv/bin/python3" ]]; then
+        py_bin="$PROJECT_ROOT/.venv/bin/python3"
+    elif command -v python3 >/dev/null 2>&1; then
+        py_bin="$(command -v python3)"
+    else
+        log_warn "Structural check skipped: no python3 found"
+        return 0
+    fi
+
+    log_info "Running structural verification (Scrapling) against $public_url ..."
+    local rc=0
+    "$py_bin" "$script_path" --url "$public_url" --timeout 25 || rc=$?
+
+    case "$rc" in
+        0)
+            log_success "Structural verification passed (Scrapling)"
+            return 0
+            ;;
+        3)
+            log_warn "Structural check skipped: environment unavailable (exit 3)"
+            return 0
+            ;;
+        2)
+            if [[ "$strict" == "1" ]]; then
+                log_error "Structural verification FAILED (strict mode) — triggering rollback"
+                return 1
+            fi
+            log_warn "Structural verification reported failures (warn-only mode — set STRUCTURE_CHECK_STRICT=1 to enforce)"
+            return 0
+            ;;
+        *)
+            log_warn "Structural check exited unexpectedly (rc=$rc) — treating as warning"
+            return 0
+            ;;
+    esac
 }
 
 # ---------------------------------------------------------------------------
