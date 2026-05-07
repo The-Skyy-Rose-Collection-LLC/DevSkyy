@@ -102,34 +102,10 @@ $attr_string = skyyrose_build_attr_string( $args['attrs'] ?? array() );
 	<?php if ( $use_fieldset ) : ?>
 		<fieldset class="sr-form__fieldset">
 			<legend class="sr-form__legend"><?php echo esc_html( $args['legend'] ); ?></legend>
-			<?php
-			/*
-			 * CALLER CONTRACT: $args['slot'] must be pre-escaped at the call site.
-			 * The slot of a <form> component IS form fields (<input>, <select>,
-			 * <textarea>, <button>) — these are explicitly NOT in WordPress's
-			 * wp_kses_post allowlist, so wrapping here would silently empty the
-			 * form at render time. Callers passing user-derived content into the
-			 * slot MUST sanitize at the call site with a form-aware allowlist
-			 * (wp_kses with a custom $allowed_html). Phase 4 first-composition
-			 * exercises this.
-			 */
-			echo $args['slot']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- caller contract above
-			?>
+			<?php echo skyyrose_kses_component_slot( $args['slot'] ); ?>
 		</fieldset>
 	<?php else : ?>
-		<?php
-			/*
-			 * CALLER CONTRACT: $args['slot'] must be pre-escaped at the call site.
-			 * The slot of a <form> component IS form fields (<input>, <select>,
-			 * <textarea>, <button>) — these are explicitly NOT in WordPress's
-			 * wp_kses_post allowlist, so wrapping here would silently empty the
-			 * form at render time. Callers passing user-derived content into the
-			 * slot MUST sanitize at the call site with a form-aware allowlist
-			 * (wp_kses with a custom $allowed_html). Phase 4 first-composition
-			 * exercises this.
-			 */
-			echo $args['slot']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- caller contract above
-		?>
+		<?php echo skyyrose_kses_component_slot( $args['slot'] ); ?>
 	<?php endif; ?>
 
 </form>

@@ -111,18 +111,7 @@ $attr_string = skyyrose_build_attr_string( $args['attrs'] ?? array() );
 		</div>
 
 		<div class="sr-modal__content" id="<?php echo esc_attr( $content_id ); ?>">
-			<?php
-			/*
-			 * CALLER CONTRACT: $args['slot'] must be pre-escaped at the call site.
-			 * Modal slots host size guides, product previews, and form-containing
-			 * panels — many of which use <input>, <button>, SVGs, data-* attributes,
-			 * and <details>/<dialog> elements that wp_kses_post silently strips.
-			 * Wrapping here would break those use cases at render time. Callers
-			 * passing user-derived content MUST sanitize at the call site with an
-			 * allowlist appropriate to the slot's content type.
-			 */
-			echo $args['slot']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- caller contract above
-			?>
+			<?php echo skyyrose_kses_component_slot( $args['slot'] ); ?>
 		</div>
 
 	</div>

@@ -128,18 +128,7 @@ $attr_string = skyyrose_build_attr_string( $args['attrs'] ?? array() );
 		</div>
 
 		<div class="sr-drawer__content" id="<?php echo esc_attr( $content_id ); ?>">
-			<?php
-			/*
-			 * CALLER CONTRACT: $args['slot'] must be pre-escaped at the call site.
-			 * Drawer slots commonly host product cards, navigation lists, and
-			 * embedded components with SVGs, data-* attributes, custom HTML5
-			 * elements, and <details>/<dialog> tags — all silently stripped by
-			 * wp_kses_post. Wrapping here would break those use cases at render
-			 * time. Callers passing user-derived content MUST sanitize at the call
-			 * site with an allowlist appropriate to the slot's content type.
-			 */
-			echo $args['slot']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- caller contract above
-			?>
+			<?php echo skyyrose_kses_component_slot( $args['slot'] ); ?>
 		</div>
 
 	</div>

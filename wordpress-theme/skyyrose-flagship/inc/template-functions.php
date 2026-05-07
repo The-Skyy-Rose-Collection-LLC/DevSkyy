@@ -89,6 +89,298 @@ function skyyrose_svg_kses() {
 	);
 }
 
+/**
+ * Sanitize component slot content for safe output.
+ *
+ * Component slots (modal, drawer, form) commonly contain rich HTML including
+ * forms, SVGs, data-* attributes, and custom HTML5 elements. This function
+ * provides a comprehensive allowlist for wp_kses that covers:
+ * - Common HTML tags (semantic, forms, interactive)
+ * - SVG elements and attributes
+ * - Common data-* attributes (explicit list)
+ * - ARIA attributes
+ *
+ * @since  6.3.0
+ *
+ * @param  string $slot The slot content to sanitize.
+ * @return string Sanitized HTML.
+ */
+function skyyrose_kses_component_slot( $slot ) {
+	$allowed_html = array(
+		// Text and semantic elements.
+		'a'          => array(
+			'href'   => true,
+			'title'  => true,
+			'target' => true,
+			'rel'    => true,
+			'class'  => true,
+			'id'     => true,
+		),
+		'abbr'       => array( 'title' => true, 'class' => true ),
+		'b'          => array( 'class' => true ),
+		'blockquote' => array( 'cite' => true, 'class' => true ),
+		'br'         => array(),
+		'caption'    => array( 'class' => true ),
+		'cite'       => array( 'class' => true ),
+		'code'       => array( 'class' => true ),
+		'col'        => array( 'span' => true, 'class' => true ),
+		'colgroup'   => array( 'span' => true, 'class' => true ),
+		'data'       => array( 'value' => true, 'class' => true ),
+		'dd'         => array( 'class' => true ),
+		'del'        => array( 'datetime' => true, 'class' => true ),
+		'details'    => array( 'open' => true, 'class' => true ),
+		'dfn'        => array( 'class' => true ),
+		'dialog'     => array( 'open' => true, 'class' => true ),
+		'div'        => array( 'class' => true, 'id' => true ),
+		'dl'         => array( 'class' => true ),
+		'dt'         => array( 'class' => true ),
+		'em'         => array( 'class' => true ),
+		'figcaption' => array( 'class' => true ),
+		'figure'     => array( 'class' => true ),
+		'footer'     => array( 'class' => true ),
+		'h1'         => array( 'class' => true, 'id' => true ),
+		'h2'         => array( 'class' => true, 'id' => true ),
+		'h3'         => array( 'class' => true, 'id' => true ),
+		'h4'         => array( 'class' => true, 'id' => true ),
+		'h5'         => array( 'class' => true, 'id' => true ),
+		'h6'         => array( 'class' => true, 'id' => true ),
+		'header'     => array( 'class' => true ),
+		'hr'         => array( 'class' => true ),
+		'i'          => array( 'class' => true ),
+		'ins'        => array( 'datetime' => true, 'class' => true ),
+		'kbd'        => array( 'class' => true ),
+		'li'         => array( 'class' => true ),
+		'main'       => array( 'class' => true ),
+		'mark'       => array( 'class' => true ),
+		'nav'        => array( 'class' => true ),
+		'ol'         => array( 'class' => true, 'start' => true, 'reversed' => true ),
+		'p'          => array( 'class' => true ),
+		'pre'        => array( 'class' => true ),
+		'q'          => array( 'cite' => true, 'class' => true ),
+		'rp'         => array( 'class' => true ),
+		'rt'         => array( 'class' => true ),
+		'ruby'       => array( 'class' => true ),
+		's'          => array( 'class' => true ),
+		'samp'       => array( 'class' => true ),
+		'section'    => array( 'class' => true ),
+		'small'      => array( 'class' => true ),
+		'span'       => array( 'class' => true, 'id' => true ),
+		'strong'     => array( 'class' => true ),
+		'sub'        => array( 'class' => true ),
+		'summary'    => array( 'class' => true ),
+		'sup'        => array( 'class' => true ),
+		'table'      => array( 'class' => true ),
+		'tbody'      => array( 'class' => true ),
+		'td'         => array( 'colspan' => true, 'rowspan' => true, 'class' => true ),
+		'tfoot'      => array( 'class' => true ),
+		'th'         => array( 'colspan' => true, 'rowspan' => true, 'scope' => true, 'class' => true ),
+		'thead'      => array( 'class' => true ),
+		'time'       => array( 'datetime' => true, 'class' => true ),
+		'tr'         => array( 'class' => true ),
+		'u'          => array( 'class' => true ),
+		'ul'         => array( 'class' => true ),
+		'var'        => array( 'class' => true ),
+		// Form elements.
+		'button'     => array(
+			'type'     => true,
+			'name'     => true,
+			'value'    => true,
+			'class'    => true,
+			'id'       => true,
+			'disabled' => true,
+		),
+		'fieldset'   => array( 'class' => true, 'disabled' => true ),
+		'form'       => array(
+			'action' => true,
+			'method' => true,
+			'class'  => true,
+			'id'     => true,
+		),
+		'input'      => array(
+			'type'        => true,
+			'name'        => true,
+			'value'       => true,
+			'placeholder' => true,
+			'class'       => true,
+			'id'          => true,
+			'required'    => true,
+			'disabled'    => true,
+			'readonly'    => true,
+			'checked'     => true,
+			'min'         => true,
+			'max'         => true,
+			'step'        => true,
+			'pattern'     => true,
+		),
+		'label'      => array( 'for' => true, 'class' => true ),
+		'legend'     => array( 'class' => true ),
+		'optgroup'   => array( 'label' => true, 'disabled' => true ),
+		'option'     => array( 'value' => true, 'selected' => true, 'disabled' => true ),
+		'select'     => array(
+			'name'     => true,
+			'class'    => true,
+			'id'       => true,
+			'required' => true,
+			'disabled' => true,
+			'multiple' => true,
+		),
+		'textarea'   => array(
+			'name'        => true,
+			'rows'        => true,
+			'cols'        => true,
+			'placeholder' => true,
+			'class'       => true,
+			'id'          => true,
+			'required'    => true,
+			'disabled'    => true,
+			'readonly'    => true,
+		),
+		// Media elements.
+		'img'        => array(
+			'src'     => true,
+			'alt'     => true,
+			'width'   => true,
+			'height'  => true,
+			'class'   => true,
+			'loading' => true,
+			'srcset'  => true,
+			'sizes'   => true,
+		),
+		'video'      => array(
+			'src'      => true,
+			'poster'   => true,
+			'width'    => true,
+			'height'   => true,
+			'controls' => true,
+			'autoplay' => true,
+			'loop'     => true,
+			'muted'    => true,
+			'class'    => true,
+		),
+		// SVG elements.
+		'svg'        => array(
+			'width'           => true,
+			'height'          => true,
+			'viewbox'         => true,
+			'fill'            => true,
+			'stroke'          => true,
+			'stroke-width'    => true,
+			'stroke-linecap'  => true,
+			'stroke-linejoin' => true,
+			'class'           => true,
+			'xmlns'           => true,
+		),
+		'path'       => array(
+			'd'               => true,
+			'fill'            => true,
+			'stroke'          => true,
+			'stroke-width'    => true,
+			'stroke-linecap'  => true,
+			'stroke-linejoin' => true,
+		),
+		'circle'     => array(
+			'cx'     => true,
+			'cy'     => true,
+			'r'      => true,
+			'fill'   => true,
+			'stroke' => true,
+		),
+		'rect'       => array(
+			'x'      => true,
+			'y'      => true,
+			'width'  => true,
+			'height' => true,
+			'rx'     => true,
+			'ry'     => true,
+			'fill'   => true,
+			'stroke' => true,
+		),
+		'line'       => array(
+			'x1'           => true,
+			'y1'           => true,
+			'x2'           => true,
+			'y2'           => true,
+			'stroke'       => true,
+			'stroke-width' => true,
+		),
+		'polyline'   => array(
+			'points'       => true,
+			'fill'         => true,
+			'stroke'       => true,
+			'stroke-width' => true,
+		),
+		'polygon'    => array( 'points' => true, 'fill' => true ),
+		'ellipse'    => array(
+			'cx'     => true,
+			'cy'     => true,
+			'rx'     => true,
+			'ry'     => true,
+			'fill'   => true,
+			'stroke' => true,
+		),
+		'g'          => array( 'fill' => true, 'stroke' => true, 'class' => true ),
+		'defs'       => array(),
+		'use'        => array( 'href' => true, 'xlink:href' => true ),
+		'symbol'     => array( 'viewbox' => true, 'id' => true ),
+		'text'       => array(
+			'x'      => true,
+			'y'      => true,
+			'fill'   => true,
+			'class'  => true,
+		),
+		'tspan'      => array( 'x' => true, 'y' => true, 'fill' => true ),
+		'clippath'   => array( 'id' => true ),
+		'lineargradient' => array( 'id' => true ),
+		'radialgradient' => array( 'id' => true ),
+		'stop'       => array( 'offset' => true, 'stop-color' => true, 'stop-opacity' => true ),
+		'filter'     => array( 'id' => true ),
+		'fegaussianblur' => array( 'stddeviation' => true ),
+	);
+
+	// Add common data-* attributes to all elements.
+	$common_data_attrs = array(
+		'data-component'      => true,
+		'data-modal-id'       => true,
+		'data-modal-trigger'  => true,
+		'data-drawer-id'      => true,
+		'data-drawer-trigger' => true,
+		'data-drawer-side'    => true,
+		'data-dismiss'        => true,
+		'data-focus-trap'     => true,
+		'data-ajax'           => true,
+		'data-collection'     => true,
+		'data-product-id'     => true,
+		'data-sku'            => true,
+		'data-action'         => true,
+		'data-target'         => true,
+		'data-toggle'         => true,
+		'data-value'          => true,
+	);
+
+	// Add ARIA attributes to all elements.
+	$aria_attrs = array(
+		'aria-label'       => true,
+		'aria-labelledby'  => true,
+		'aria-describedby' => true,
+		'aria-hidden'      => true,
+		'aria-live'        => true,
+		'aria-atomic'      => true,
+		'aria-modal'       => true,
+		'aria-expanded'    => true,
+		'aria-controls'    => true,
+		'role'             => true,
+		'tabindex'         => true,
+		'hidden'           => true,
+	);
+
+	// Merge common attributes into all tags.
+	foreach ( $allowed_html as $tag => &$attrs ) {
+		$attrs = array_merge( $attrs, $common_data_attrs, $aria_attrs );
+	}
+
+	return wp_kses( $slot, $allowed_html );
+}
+
 /*
 --------------------------------------------------------------
  * Collection Color Mapping
