@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
+
 from agents.render_pipeline.tools._paths import REPO_ROOT, ensure_repo_paths
 
 ensure_repo_paths()
@@ -30,6 +31,94 @@ from google.adk.tools.tool_context import ToolContext
 # under agents/render_pipeline/ so it doesn't collide with nano_banana's
 # wordpress-theme/skyyrose-flagship/assets/images/products writes.
 _OUTPUT_DIR = REPO_ROOT / "agents" / "render_pipeline" / "output"
+
+# Filename substrings that indicate a text-bearing logo (monograms, scripts,
+# wordmarks, lettered patches). Sending these as image references causes
+# Gemini to hallucinate brand text onto the rendered garment — see
+# scripts/nano_banana/pipeline.py:_load_bundle_refs lines 696-697 for the
+# original empirical finding. Pure-graphic logos (no letters) are safe.
+_TEXT_BEARING_LOGO_HINTS = ("monogram", "script", "wordmark", "lettermark", "patch")
+
+
+def _resolve_logo_extra_refs(sku: str) -> list[tuple[str, Path]]:
+    """Resolve dossier `logo_reference` + `extra_logos` to labeled image refs.
+
+    For each logo markdown referenced by the SKU's dossier, follow its
+    frontmatter `image_path` to the canonical brand-logo image and return
+    a (label, Path) tuple suitable for `generate_gemini(..., extra_refs=...)`.
+
+    Skips any logo whose markdown filename hints it is text-bearing — sending
+    text-bearing references causes Gemini to hallucinate brand letters onto
+    the garment. Pure-graphic logos (e.g. `black-rose-logo.jpeg`, three-rose
+    illustrated cluster, no letters) pass through.
+
+    Returns an empty list on any failure (no dossier, no logo_reference,
+    missing files, etc.) — generation continues with the source image only.
+    """
+    from nano_banana.spec_builder import build_dna_from_sku
+
+    from skyyrose.core.catalog_loader import CATALOG_CSV
+    from skyyrose.core.dossier_loader import _parse_frontmatter
+
+    wp_root = CATALOG_CSV.parent.parent  # wordpress-theme/skyyrose-flagship/
+
+    try:
+        dna = build_dna_from_sku(sku)
+    except Exception as exc:
+        log.warning("logo refs: cannot load dna for %s: %s", sku, exc)
+        return []
+
+    dossier = getattr(dna, "dossier", None)
+    if not dossier:
+        return []
+
+    candidates: list[tuple[str, str]] = []
+    if dossier.logo_reference:
+        candidates.append(("PRIMARY LOGO", dossier.logo_reference))
+    for extra in dossier.extra_logos or []:
+        candidates.append(("SECONDARY LOGO", extra))
+
+    refs: list[tuple[str, Path]] = []
+    for kind, md_rel in candidates:
+        md_lower = md_rel.lower()
+        if any(hint in md_lower for hint in _TEXT_BEARING_LOGO_HINTS):
+            log.info("Skipping text-bearing logo ref %s for %s", md_rel, sku)
+            continue
+
+        md_abs = wp_root / md_rel
+        if not md_abs.exists():
+            log.warning("logo md missing: %s (sku=%s)", md_abs, sku)
+            continue
+
+        fm, _ = _parse_frontmatter(md_abs.read_text(encoding="utf-8"))
+        image_rel = fm.get("image_path", "")
+        if not image_rel:
+            log.warning("no image_path frontmatter in %s (sku=%s)", md_abs, sku)
+            continue
+
+        image_abs = wp_root / image_rel
+        if not image_abs.exists():
+            log.warning("logo image missing: %s (sku=%s)", image_abs, sku)
+            continue
+
+        label = (
+            f"REFERENCE — CANONICAL BRAND LOGO ART ({kind}): "
+            "This is the EXACT canonical logo graphic that appears on the garment. "
+            "Reproduce its composition, art style, and proportions faithfully — "
+            "do not invent missing elements or change the layout. "
+            "Apply the technique and colorway specified in the prompt text "
+            "(e.g. embossed in black/white/grey). "
+            "Do NOT add any text, letters, or wordmarks to the rendered garment."
+        )
+        refs.append((label, image_abs))
+
+    log.info(
+        "Logo extra_refs for %s: %d (%s)",
+        sku,
+        len(refs),
+        ", ".join(p.name for _, p in refs) if refs else "none",
+    )
+    return refs
 
 
 def generate_image_fn(sku: str, view: str, tool_context: ToolContext) -> dict:
@@ -67,6 +156,7 @@ def generate_image_fn(sku: str, view: str, tool_context: ToolContext) -> dict:
         }
 
     source_path = Path(source_path_str)
+    extra_refs = _resolve_logo_extra_refs(sku)
 
     img_bytes: bytes | None = None
     try:
@@ -79,6 +169,7 @@ def generate_image_fn(sku: str, view: str, tool_context: ToolContext) -> dict:
                 prompt,
                 model=actual_model,
                 aspect_ratio="3:4",
+                extra_refs=extra_refs or None,
             )
         elif engine == "gpt-image":
             client = get_openai_client()
