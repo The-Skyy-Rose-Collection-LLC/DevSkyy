@@ -406,3 +406,11 @@ renders/quarantine/
 graphify-out/.graphify_*
 graphify-out/cache/
 graphify-out/manifest.json
+
+# ADK render pipeline run artifacts (regenerable, run-specific, large)
+# Pipeline outputs are reproducible from the catalog + dossiers; only the
+# pipeline source code under agents/render_pipeline/ is canonical.
+agents/render_pipeline/output/
+data/agent-learning/
+data/vision-consensus/
+tasks/render-pipeline-cli-*.json

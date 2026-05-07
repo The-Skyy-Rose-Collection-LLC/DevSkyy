@@ -131,16 +131,38 @@ adk-lint:
 # adk-test-fast independently so they report separately.
 adk-check: adk-lint adk-test-fast
 
-# Live ADK AgentEvaluator run against agents/render_pipeline/eval/.
-# WARNING: this is a PAID call (br-001 front fixture exercises Gemini Pro
-# image gen + 3-judge tournament). Estimated ~$0.25-0.55 per run. The
-# Makefile target only WIRES the harness — execution requires the same
-# explicit confirmation as cli.py per the project's STOP-AND-SHOW protocol.
+# ADK AgentEvaluator harness run against agents/render_pipeline/eval/.
+# DEFAULT (adk-eval) skips the paid call — verifies the harness loads,
+# the eval set collects, and the agent imports cleanly. ~$0 cost, ~6s.
+# LIVE (adk-eval-live) sets EVAL_LIVE=1 to actually exercise the 9-step
+# pipeline against the canonical br-001 fixture. ~$0.20 cost per run.
+# Use adk-eval-live only after explicit STOP-AND-SHOW confirmation.
 adk-eval:
 	@[ -x "$(ADK_PYTHON)" ] || { echo "Error: $(ADK_PYTHON) not found"; exit 1; }
-	@echo "Running ADK AgentEvaluator against the canonical eval set..."
-	@echo "Live eval: br-001 front view via the 9-step SequentialAgent"
+	@echo "Running ADK AgentEvaluator harness (test will SKIP without EVAL_LIVE=1)..."
 	$(ADK_PYTHON) -m pytest agents/render_pipeline/eval/ -v --tb=short
+
+adk-eval-live:
+	@[ -x "$(ADK_PYTHON)" ] || { echo "Error: $(ADK_PYTHON) not found"; exit 1; }
+	@echo "WARNING: Live AgentEvaluator run — paid call (~\$$0.20)."
+	@echo "Pipeline: 9-step SequentialAgent against br-001 front canonical fixture."
+	EVAL_LIVE=1 $(ADK_PYTHON) -m pytest agents/render_pipeline/eval/ -v --tb=short
+
+# Generate a learning-loop report from data/agent-learning/ JSONL records.
+# Reads engine-winrate, template-scores, and failure-modes JSONL files
+# emitted by qa_tournament_fn during live runs. Produces a markdown
+# proposals file plus terminal output. No API cost — local file analysis.
+# See agents/render_pipeline/learning/LOOP.md for the recommended /loop prompt.
+adk-learning-report:
+	@[ -x "$(ADK_PYTHON)" ] || { echo "Error: $(ADK_PYTHON) not found"; exit 1; }
+	@echo "=== Writing proposals markdown ==="
+	@PYTHONPATH=. $(ADK_PYTHON) -c "from agents.render_pipeline.learning.proposals import write_proposals_markdown; print(f'Wrote: {write_proposals_markdown()}')"
+	@echo ""
+	@echo "=== Engine-override proposals (min 3 runs, min score 80) ==="
+	@PYTHONPATH=. $(ADK_PYTHON) -c "from agents.render_pipeline.learning.proposals import propose_engine_overrides; import json; props = propose_engine_overrides(); print(json.dumps(props, indent=2)) if props else print('(no proposals — need more runs)')"
+	@echo ""
+	@echo "=== Failure-mode digest (min 5 occurrences) ==="
+	@PYTHONPATH=. $(ADK_PYTHON) -c "from agents.render_pipeline.learning.proposals import digest_failure_modes; import json; modes = digest_failure_modes(); print(json.dumps(modes, indent=2)) if modes else print('(no patterns — need more failures)')"
 
 # ============================================================================
 # TYPESCRIPT COMMANDS
