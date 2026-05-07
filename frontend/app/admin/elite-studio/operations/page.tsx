@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { Suspense, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -59,7 +59,33 @@ function formatAgo(dateStr: string): string {
   }
 }
 
+function OperationsListSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-white">Operations</h1>
+        <p className="text-gray-400 mt-1">All Elite Studio creative operations</p>
+      </div>
+      <Card className="bg-gray-900 border-gray-800">
+        <CardContent className="p-6 space-y-3">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="h-12 w-full bg-gray-800" />
+          ))}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export default function OperationsListPage() {
+  return (
+    <Suspense fallback={<OperationsListSkeleton />}>
+      <OperationsListContent />
+    </Suspense>
+  );
+}
+
+function OperationsListContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 

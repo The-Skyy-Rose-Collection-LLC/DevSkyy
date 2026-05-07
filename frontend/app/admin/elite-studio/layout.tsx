@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -18,9 +19,38 @@ const ELITE_NAV = [
   { title: 'Design Co-Pilot', href: '/admin/elite-studio/design', icon: Pencil },
 ];
 
-export default function EliteStudioLayout({ children }: { children: React.ReactNode }) {
+function EliteStudioNav() {
   const pathname = usePathname();
 
+  return (
+    <nav className="flex gap-1" aria-label="Elite Studio navigation">
+      {ELITE_NAV.map((item) => {
+        const isActive = item.exact
+          ? pathname === item.href
+          : pathname.startsWith(item.href);
+        const Icon = item.icon;
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              'inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+              isActive
+                ? 'bg-[#B76E79]/15 text-[#B76E79]'
+                : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+            )}
+            aria-current={isActive ? 'page' : undefined}
+          >
+            <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+            {item.title}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+export default function EliteStudioLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="space-y-6">
       {/* Section header with sub-navigation */}
@@ -35,30 +65,9 @@ export default function EliteStudioLayout({ children }: { children: React.ReactN
           </div>
         </div>
 
-        <nav className="flex gap-1" aria-label="Elite Studio navigation">
-          {ELITE_NAV.map((item) => {
-            const isActive = item.exact
-              ? pathname === item.href
-              : pathname.startsWith(item.href);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
-                  isActive
-                    ? 'bg-[#B76E79]/15 text-[#B76E79]'
-                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'
-                )}
-                aria-current={isActive ? 'page' : undefined}
-              >
-                <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                {item.title}
-              </Link>
-            );
-          })}
-        </nav>
+        <Suspense fallback={<div className="h-8" aria-hidden="true" />}>
+          <EliteStudioNav />
+        </Suspense>
       </div>
 
       {children}

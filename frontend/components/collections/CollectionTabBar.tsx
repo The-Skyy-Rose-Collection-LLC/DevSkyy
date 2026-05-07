@@ -1,11 +1,20 @@
 'use client';
 
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { getAllCollections, type CollectionSlug } from '@/lib/collections';
 
 export default function CollectionTabBar() {
+  return (
+    <Suspense fallback={null}>
+      <CollectionTabBarContent />
+    </Suspense>
+  );
+}
+
+function CollectionTabBarContent() {
   const pathname = usePathname();
   const collections = getAllCollections();
 
