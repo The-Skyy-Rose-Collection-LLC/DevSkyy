@@ -4,7 +4,7 @@
   "private": true,
   "description": "SkyyRose Flagship WordPress theme — local dev tooling",
   "scripts": {
-    "deploy": "bash ../scripts/deploy-theme.sh",
+    "deploy": "RUN_FULL_VERIFY=true bash ../scripts/deploy-theme.sh",
     "deploy:dry": "bash ../scripts/deploy-theme.sh --dry-run",
     "lint:php": "find skyyrose-flagship -name '*.php' -exec php -l {} \\;",
     "lint:css": "npx stylelint 'skyyrose-flagship/assets/css/**/*.css'",
