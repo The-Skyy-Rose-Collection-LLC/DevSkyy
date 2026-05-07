@@ -50,12 +50,49 @@ When a SKU is removed from the catalog CSV, also remove it from `lib/collections
 - API calls live in `lib/api/`. Components never call `fetch` directly.
 - Form state via shadcn/ui + Zod. No new form libraries.
 
+## Cache Components (`cacheComponents: true`)
+
+`next.config.ts` enables Next.js 16's experimental Cache Components mode. Every request-time data reader **must** live inside a `<Suspense>` boundary or the build fails with `Error: Route "X": Uncached data was accessed outside of <Suspense>`. Affected hooks/calls:
+
+- `usePathname()`, `useSearchParams()` (from `next/navigation`)
+- `use(params)`, `use(searchParams)` (when unwrapping page props)
+- `cookies()`, `headers()` (from `next/headers`)
+
+**Two patterns**:
+
+1. **Wrap at mount point** — best for shared chrome:
+   ```tsx
+   <Suspense fallback={null}>
+     <AppSidebar />
+   </Suspense>
+   ```
+
+2. **Internal split** — best for pages and reusable components. Rename the original function to `*Content`, export a wrapper:
+   ```tsx
+   export default function Page({ params }: Props) {
+     return (
+       <Suspense fallback={<PageSkeleton />}>
+         <PageContent params={params} />
+       </Suspense>
+     );
+   }
+   function PageContent({ params }: Props) {
+     const { id } = use(params); // dynamic data inside the boundary
+     // ...
+   }
+   ```
+
+For decorative chrome, `fallback={null}` is fine (the component would render nothing pre-hydration anyway). For data-heavy pages, the fallback is a skeleton matching content shape. Routes correctly using the pattern show as `◐ (Partial Prerender)` in the build's route table — that's the desired outcome.
+
+Reference implementations (don't reinvent): `app/layout.tsx` (mascot mount-point wrap), `app/admin/layout.tsx` (sidebar mount-point wrap), `app/admin/elite-studio/operations/[id]/page.tsx` (canonical internal split with skeleton fallback).
+
 ## Deployment
 
 - Vercel project linked at `.vercel/project.json`
 - `rootDirectory` is set to `frontend/` — Vercel reads `frontend/vercel.json`, not root `vercel.json`
 - Node 22.x on Vercel. Use npm, not pnpm.
 - Environment vars managed via `vercel env` — never hardcode API URLs or keys.
+- **`outputFileTracingRoot` and `turbopack.root` in `next.config.ts` are gated on `process.env.VERCEL`.** They set the workspace root one level above the project (because the repo has lockfiles at both `/` and `/frontend`). On Vercel that override breaks the post-build trace stage with a doubled-path `routes-manifest.json` ENOENT. Locally both lockfiles are visible so the override stays and prevents Turbopack/Webpack divergence. Don't remove the env gate without also removing the root lockfile. (Discovered PR #494, 2026-05-07.)
 
 ## Don't
 

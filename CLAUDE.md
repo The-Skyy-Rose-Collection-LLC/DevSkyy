@@ -292,6 +292,16 @@ No exceptions. This applies to google-genai, httpx, Pydantic, LangGraph, FastAPI
 
 ### Vercel
 - `rootDirectory` set → reads that dir's `vercel.json`, not root
+- **`outputFileTracingRoot` above the Vercel project root causes a doubled-path bug.** With `rootDirectory=frontend`, Vercel's project cwd is `/vercel/path1/`. If `frontend/next.config.ts` sets `outputFileTracingRoot: path.resolve(__dirname, '..')` = `/vercel/`, the post-build trace stage emits paths relative to that root (`path1/.next/...`), then Vercel re-prepends the project cwd when resolving — yielding `/vercel/path1/path1/.next/routes-manifest.json` and crashing with `ENOENT: no such file or directory`. **Fix**: gate the override on `process.env.VERCEL` so it only applies locally. On Vercel, only `frontend/` is uploaded, so the override isn't needed (no ambiguous-lockfile warning to suppress). See `frontend/next.config.ts` (PR #494, 2026-05-07).
+- A failed Vercel build does NOT take production down. Vercel keeps the alias on the last green deployment when new builds fail — the site stays up serving stale code. Symptom: every recent deploy shows `state: ERROR` in `vercel list_deployments`, but `curl https://devskyy.app/` returns 200. Treat as P1 (deploy pipeline blocked) not P0 (site down).
+
+### Frontend (Next.js 16, `frontend/`)
+- **Cache Components mode (`cacheComponents: true`) requires `<Suspense>` boundaries around every request-time data reader.** That includes `usePathname()`, `useSearchParams()`, `use(params)`, `use(searchParams)`, `cookies()`, and `headers()`. Without a `<Suspense>` wrapper, the build fails with `Error: Route "X": Uncached data was accessed outside of <Suspense>. This delays the entire page from rendering, resulting in a slow user experience` and exits 1 during static prerender.
+- **Two patterns to wrap them**:
+  1. **Wrap at the mount point** (best for layouts that compose dynamic chrome like sidebars, mascots): in the parent layout, do `<Suspense fallback={null}><Component /></Suspense>`.
+  2. **Internal split** (best for reusable components and pages): rename the original function to `*Content`, then export a small wrapper that does `<Suspense fallback={<Skeleton/>}><Content /></Suspense>`.
+- For decorative chrome (sidebar, tab bar, mascot bubble), `fallback={null}` is fine — the component would render nothing pre-hydration anyway. For data-heavy pages, the fallback is a skeleton matching the eventual content shape.
+- Routes that correctly use the pattern show as `◐ (Partial Prerender)` in the build's route table — that's the desired Cache Components outcome (static shell + streaming dynamic content). See `frontend/app/admin/elite-studio/operations/[id]/page.tsx` for the canonical split. (PR #493, 2026-05-07).
 
 ---
 
