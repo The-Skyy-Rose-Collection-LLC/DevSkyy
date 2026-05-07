@@ -272,16 +272,25 @@ class BackgroundRemovalService:
                 cause=last_error,
             )
 
-        # For non-transparent backgrounds, we would composite here
-        # This is a simplified implementation - full version would use
-        # PIL/cv2 to composite the transparent result onto new background
+        # P1 #12: SOLID_COLOR and CUSTOM_IMAGE composite paths are not implemented.
+        # Code structure suggested they composite, but they only assigned the value
+        # and returned the transparent result with a misleading background_value.
+        # Callers must use BackgroundType.TRANSPARENT until PIL/cv2 compositing is wired.
         background_value: str | None = None
         if background_type == BackgroundType.SOLID_COLOR:
-            background_value = background_color or "#FFFFFF"
-            # TODO: Composite transparent result onto solid color
-        elif background_type == BackgroundType.CUSTOM_IMAGE:
-            background_value = background_image_url
-            # TODO: Composite transparent result onto custom image
+            raise NotImplementedError(
+                f"BackgroundType.SOLID_COLOR composite path is not implemented "
+                f"(requested color={background_color or '#FFFFFF'}). "
+                f"Use BackgroundType.TRANSPARENT and composite downstream, or wire "
+                f"PIL/cv2 compositing here."
+            )
+        if background_type == BackgroundType.CUSTOM_IMAGE:
+            raise NotImplementedError(
+                f"BackgroundType.CUSTOM_IMAGE composite path is not implemented "
+                f"(requested image={background_image_url}). "
+                f"Use BackgroundType.TRANSPARENT and composite downstream, or wire "
+                f"PIL/cv2 compositing here."
+            )
 
         processing_time_ms = int((time.time() - start_time) * 1000)
 

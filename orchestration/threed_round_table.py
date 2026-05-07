@@ -1310,8 +1310,14 @@ class ThreeDRoundTable:
         scores.web_readiness = min(web_ready, 100)
 
         # Enhancement bonus
+        # P1 #8: previously +5.0 when response.enhanced was True. But .enhanced
+        # is set by _enhance_quality(), which is a stub that records metadata
+        # flags only — no actual mesh/texture processing happens. Awarding +5
+        # for fake enhancement made tournament rankings systematically optimistic
+        # for any provider whose response went through the stub. Zeroed until
+        # real trimesh/pymeshlab integration lands. Re-enable then.
         if response.enhanced:
-            scores.enhancement_bonus = 5.0
+            scores.enhancement_bonus = 0.0
 
         # CLIP text-to-image alignment (Stage 9 wiring) — opt-in: requires a
         # text prompt and a preview image URL/path on the response. Failure

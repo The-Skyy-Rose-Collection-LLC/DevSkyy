@@ -19,6 +19,21 @@ $slug = isset( $args['slug'] ) ? sanitize_key( $args['slug'] ) : '';
 $c    = skyyrose_get_collection_content( $slug );
 
 if ( ! $c ) {
+	// Hard-fail: log + emit hidden error marker. Silent return previously
+	// masked a missing kids-capsule config — caught only after a structural
+	// audit ran. data-skyyrose-error is a project-wide beacon picked up by
+	// scripts/verify_live_structure.py to fail deploys on render regressions.
+	error_log(
+		sprintf(
+			"[SkyyRose Collections] Missing content config for slug '%s' in %s. Check inc/collection-content.php.",
+			$slug,
+			__FILE__
+		)
+	);
+	printf(
+		'<div class="skyyrose-render-error" data-skyyrose-error="missing-collection-content" data-collection="%s" hidden></div>',
+		esc_attr( $slug )
+	);
 	return;
 }
 
