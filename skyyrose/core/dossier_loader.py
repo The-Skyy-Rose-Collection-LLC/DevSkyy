@@ -86,6 +86,19 @@ def _parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
     return fm, rest
 
 
+# Compiled once at module load. The list-key pattern matches a YAML key
+# followed by one-or-more indented bullets; the item pattern then extracts
+# each bullet's value from the captured block.
+_FRONTMATTER_LIST_KEY_RE = re.compile(
+    r"^(\w[\w\-]*):\s*\n((?:[ \t]+-\s+.+\n?)+)",
+    re.MULTILINE,
+)
+_FRONTMATTER_LIST_ITEM_RE = re.compile(
+    r"^[ \t]+-\s+(.+?)\s*$",
+    re.MULTILINE,
+)
+
+
 def _parse_frontmatter_lists(text: str) -> dict[str, list[str]]:
     """Extract YAML-list-style frontmatter values that `_parse_frontmatter` skips.
 
@@ -105,18 +118,12 @@ def _parse_frontmatter_lists(text: str) -> dict[str, list[str]]:
         return {}
     block = text[3:end]
     out: dict[str, list[str]] = {}
-    # Match each `key:` followed by indented bullet lines until a non-indented
-    # line or end of block. We require at least one indented bullet to qualify.
-    for match in re.finditer(
-        r"^(\w[\w\-]*):\s*\n((?:[ \t]+-\s+.+\n?)+)",
-        block,
-        re.MULTILINE,
-    ):
-        key = match.group(1).strip()
+    for match in _FRONTMATTER_LIST_KEY_RE.finditer(block):
+        key = match.group(1)
         bullets_block = match.group(2)
         items = [
             m.group(1).strip().strip('"').strip("'")
-            for m in re.finditer(r"^[ \t]+-\s+(.+?)\s*$", bullets_block, re.MULTILINE)
+            for m in _FRONTMATTER_LIST_ITEM_RE.finditer(bullets_block)
         ]
         if items:
             out[key] = items
