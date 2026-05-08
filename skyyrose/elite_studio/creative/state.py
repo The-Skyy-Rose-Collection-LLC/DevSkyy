@@ -31,6 +31,7 @@ class CreativeIntent(StrEnum):
     TECH_PACK = "tech-pack"
     MOODBOARD = "moodboard"
     COLORWAY_EXPLORE = "colorway-explore"
+    TRIPO_GENERATE = "tripo-generate"
 
 
 class CreativeOperationState(TypedDict, total=False):
@@ -61,6 +62,7 @@ class CreativeOperationState(TypedDict, total=False):
     design_result: dict | None
     tech_pack_result: dict | None
     collection_plan_result: dict | None
+    tripo_result: dict | None
 
     # --- Control flow ---
     status: str  # "running", "success", "error"
@@ -96,6 +98,7 @@ def create_initial_state(
         design_result=None,
         tech_pack_result=None,
         collection_plan_result=None,
+        tripo_result=None,
         status="running",
         error="",
         stage_timings={},

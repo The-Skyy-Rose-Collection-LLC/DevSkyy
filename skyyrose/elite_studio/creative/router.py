@@ -33,6 +33,7 @@ from .edges import (
     SCENE_COMPOSITE,
     SOCIAL_PACK,
     THREE_D_MODEL,
+    TRIPO_GENERATE,
     after_any,
     after_render,
     route_intent,
@@ -48,6 +49,7 @@ from .nodes import (
     scene_composite_node,
     social_pack_node,
     three_d_model_node,
+    tripo_generate_node,
 )
 from .state import CreativeOperationState
 
@@ -88,6 +90,7 @@ def build_creative_graph(checkpointer: BaseCheckpointSaver | None = None):  # ty
     graph.add_node(SCENE_COMPOSITE, scene_composite_node)
     graph.add_node(DESIGN_IDEATION, design_ideation_node)
     graph.add_node(COLLECTION_PLAN, collection_plan_node)
+    graph.add_node(TRIPO_GENERATE, tripo_generate_node)
     graph.add_node(FINALIZE, finalize_node)
 
     # Entry point
@@ -106,6 +109,7 @@ def build_creative_graph(checkpointer: BaseCheckpointSaver | None = None):  # ty
             SCENE_COMPOSITE: SCENE_COMPOSITE,
             DESIGN_IDEATION: DESIGN_IDEATION,
             COLLECTION_PLAN: COLLECTION_PLAN,
+            TRIPO_GENERATE: TRIPO_GENERATE,
             FINALIZE: FINALIZE,
         },
     )
@@ -126,6 +130,7 @@ def build_creative_graph(checkpointer: BaseCheckpointSaver | None = None):  # ty
         SCENE_COMPOSITE,
         DESIGN_IDEATION,
         COLLECTION_PLAN,
+        TRIPO_GENERATE,
     ):
         graph.add_conditional_edges(node, after_any, {FINALIZE: FINALIZE})
 
