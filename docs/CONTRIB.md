@@ -1,7 +1,9 @@
 # DevSkyy Contributor Guide
 
-**Last Updated**: 2026-03-12
-**Source of Truth**: `package.json`, `Makefile`, `.env.example`
+**Last Updated**: 2026-05-07
+**Source of Truth**: `package.json`, `frontend/package.json`, `Makefile`, `.env.example`
+
+> Sections marked `<!-- AUTO-GENERATED -->` are synced from source-of-truth files by `/update-docs`. Edit the source, not the table — manual changes between markers will be overwritten.
 
 ---
 
@@ -25,61 +27,117 @@ npm run type-check            # TypeScript OK
 
 ## Virtual Environments
 
-| Venv | Purpose | Setup |
-|------|---------|-------|
-| `.venv` | Main (FastAPI, diffusers, torch) | `python -m venv .venv && pip install -r requirements.txt` |
-| `.venv-imagery` | Image processing (rembg, BRIA, genai) | `python -m venv .venv-imagery && pip install -r requirements-imagery.txt` |
-| `.venv-lora` | LoRA training | `python -m venv .venv-lora` |
-| `.venv-agents` | Google ADK (conflicts with numpy) | `python -m venv .venv-agents` |
+Each workspace is self-contained. Don't mix `frontend/node_modules` with root, and don't share venvs across runtimes that conflict (ADK + numpy).
+
+| Venv | Runtime | Purpose | Setup |
+|------|---------|---------|-------|
+| `.venv` | Python 3.13 | Main (FastAPI, diffusers, torch) + Nano Banana imagery | `python -m venv .venv && pip install -e ".[all]"` |
+| `.venv-agents` | Python (isolated) | Google ADK agents (conflicts with numpy in `.venv`) | `python -m venv .venv-agents && pip install google-adk` |
+
+> `.venv-imagery` was an earlier design that was never created — Nano Banana shares the main `.venv/`. Do not create a separate imagery venv.
 
 ## Available Scripts
 
-### Python (via Makefile)
+<!-- AUTO-GENERATED:scripts:Makefile + package.json + frontend/package.json -->
+
+### Python (via Makefile, run from repo root)
 
 | Command | Description |
 |---------|-------------|
-| `make install` | Install production Python dependencies |
-| `make dev` | Install Python + TypeScript dev dependencies |
+| `make install` | `pip install -e .` — install production Python deps |
+| `make dev` | `pip install -e ".[dev]" && npm install` — install Python + Node dev deps |
+| `make lint` | `ruff check . && mypy --ignore-missing-imports .` (mypy non-blocking) |
+| `make lint-strict` | Same as `lint`, but mypy errors block |
+| `make format` | `isort . && ruff check --fix && black .` |
 | `make test` | `pytest tests/ -v --tb=short` |
 | `make test-fast` | `pytest -x -q` (stop on first failure) |
-| `make test-cov` | pytest with coverage report |
-| `make format` | `isort . && ruff check --fix && black .` |
-| `make lint` | `ruff check . && mypy` |
-| `make format-all` | Python + TypeScript formatting |
-| `make lint-all` | Python + TypeScript linting |
-| `make ci` | Full local CI (lint-all + test-all) |
+| `make test-cov` | pytest with HTML + terminal coverage report |
+| `make security` | `bandit -r . -x ./tests -ll && npm audit` |
+| `make clean` | Remove `build/ dist/ *.egg-info/ .pytest_cache/ .mypy_cache/ .ruff_cache/ htmlcov/ .coverage __pycache__/ *.pyc` |
 
-### Node.js (via npm)
+### TypeScript (via Makefile, delegates to npm)
 
 | Command | Description |
 |---------|-------------|
-| `npm run build` | TypeScript compilation |
-| `npm run build:watch` | TypeScript compilation (watch mode) |
-| `npm run dev` | Dev server with nodemon |
-| `npm run start` | Production server |
-| `npm run test` | Jest test suite |
-| `npm run test:watch` | Jest in watch mode |
+| `make ts-build` | `npm run build` — compile TypeScript |
+| `make ts-lint` | `npm run lint` — ESLint |
+| `make ts-lint-fix` | `npm run lint:fix` — ESLint with auto-fix |
+| `make ts-test` | `npm run test -- --passWithNoTests --no-coverage` (coverage non-blocking) |
+| `make ts-test-strict` | `npm run test` (coverage thresholds enforced) |
+| `make ts-test-collections` | `npm run test:collections` |
+| `make ts-type-check` | `npm run type-check` — `tsc --noEmit` |
+| `make ts-format` | `npm run format` — Prettier write |
+
+### Unified
+
+| Command | Description |
+|---------|-------------|
+| `make test-all` | `make test && make ts-test` |
+| `make lint-all` | `make lint && make ts-type-check` |
+| `make format-all` | `make format && make ts-format` |
+| `make ci` | `make lint-all && make test-all` — full local CI pipeline |
+| `make build` | `make clean && make ts-build && python -m build` |
+
+### 3D Collection Demos
+
+| Command | Description |
+|---------|-------------|
+| `make demo-black-rose` | Vite preview of Black Rose 3D experience |
+| `make demo-signature` | Vite preview of Signature 3D experience |
+| `make demo-love-hurts` | Vite preview of Love Hurts 3D experience |
+| `make demo-showroom` | Vite preview of Showroom experience |
+| `make demo-runway` | Vite preview of Runway experience |
+
+### Docker
+
+| Command | Description |
+|---------|-------------|
+| `make docker-build` | `docker build -t devskyy:latest .` |
+| `make docker-run` | `docker run -p 8000:8000 devskyy:latest` |
+
+### Root npm scripts (`package.json`)
+
+| Command | Description |
+|---------|-------------|
+| `npm run build` | `tsc --project config/typescript/tsconfig.json` |
+| `npm run build:watch` | TypeScript compile in watch mode |
+| `npm run dev` | Dev server with nodemon (`src/index.ts`) |
+| `npm run start` | `node dist/index.js` |
+| `npm run test` | Jest (`config/testing/jest.config.cjs`) |
+| `npm run test:watch` | Jest watch mode |
 | `npm run test:coverage` | Jest with coverage |
-| `npm run test:ci` | CI mode (no watch, coverage) |
-| `npm run lint` | ESLint |
-| `npm run lint:fix` | ESLint with auto-fix |
-| `npm run format` | Prettier (write) |
-| `npm run format:check` | Prettier (check only) |
-| `npm run type-check` | TypeScript type checking |
-| `npm run clean` | Remove dist/ and coverage/ |
+| `npm run test:ci` | CI mode (no watch, coverage, `--watchAll=false`) |
+| `npm run lint` / `lint:fix` | ESLint (with auto-fix on the second) |
+| `npm run format` / `format:check` | Prettier (write / check-only) |
+| `npm run type-check` | `tsc --noEmit` |
+| `npm run clean` | `rm -rf dist coverage` |
 | `npm run prepare` | Husky setup + build (runs on `npm install`) |
-| `npm run precommit` | lint + type-check + test:ci |
-| `npm run security:audit` | `npm audit` |
-| `npm run security:fix` | `npm audit fix` |
-| `npm run deps:check` | `npm outdated` |
-| `npm run deps:update` | `npm update` |
-| `npm run demo:collections` | List all available 3D demos |
-| `npm run demo:black-rose` | Launch Black Rose 3D demo |
-| `npm run demo:signature` | Launch Signature 3D demo |
-| `npm run demo:love-hurts` | Launch Love Hurts 3D demo |
-| `npm run demo:showroom` | Launch Showroom 3D experience |
-| `npm run demo:runway` | Launch Runway 3D experience |
-| `npm run test:collections` | Test collection experiences |
+| `npm run precommit` | `lint && type-check && test:ci` |
+| `npm run security:audit` / `security:fix` | `npm audit` / `npm audit fix` |
+| `npm run deps:check` / `deps:update` | `npm outdated` / `npm update` |
+| `npm run demo:black-rose` / `signature` / `love-hurts` / `showroom` / `runway` | Vite-served 3D collection demos |
+| `npm run test:collections` | Jest tests for collection experiences |
+
+### Dashboard (`frontend/package.json`, run from `frontend/`)
+
+The Vercel-deployed Next.js admin dashboard at devskyy.app. **Use `npm`, not `pnpm`** — pnpm fails on Vercel with `ERR_INVALID_THIS` on Node 22+.
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | `next dev` — local dev server |
+| `npm run build` | `next build` — production build |
+| `npm run start` | `next start` — serve production build |
+| `npm run lint` | ESLint |
+| `npm run type-check` | `tsc --noEmit` |
+| `npm run test:e2e` | `playwright test` |
+| `npm run test:e2e:ui` | Playwright with the UI runner |
+| `npm run deploy` / `deploy:prod` | `vercel` / `vercel --prod` |
+| `npm run deploy:auto` / `deploy:auto:prod` | Scripted deploy via `tsx scripts/deploy.ts` |
+| `npm run vercel:link` / `vercel:link:auto` | Link CLI to the `devskyy` Vercel project |
+| `npm run vercel:env:pull` / `vercel:env:push` | Sync Vercel env to `.env.local` / push to production |
+| `npm run vercel:logs` / `vercel:inspect` / `vercel:project` | Vercel diagnostics |
+
+<!-- /AUTO-GENERATED:scripts -->
 
 ## Environment Variables
 
@@ -176,24 +234,35 @@ Run before committing: `make format && make lint`
 
 ```
 DevSkyy/
-├── main_enterprise.py          # FastAPI app (47+ endpoints)
+├── main_enterprise.py          # FastAPI app — REST + GraphQL + webhooks
 ├── devskyy_mcp.py              # MCP server (20+ tools)
-├── frontend/                   # Next.js 16 + React 19
-├── wordpress-theme/            # SkyyRose Flagship theme
-│   └── skyyrose-flagship/
-├── agents/                     # 54 specialized agents
+├── frontend/                   # Next.js 16 + React 19 admin dashboard (devskyy.app)
+├── wordpress-theme/
+│   └── skyyrose-flagship/      # Production WordPress theme (skyyrose.co)
+│       └── data/
+│           └── skyyrose-catalog.csv   # CANONICAL product catalog (33 SKUs)
+│       └── data/dossiers/      # Per-product design dossiers (RAS pipeline reads)
+├── agents/                     # Specialized agents (count varies; never cite a fixed number)
+│   └── base_super_agent/       # EnhancedSuperAgent foundation (PACKAGE, not flat .py)
 ├── api/v1/                     # REST routes
-├── core/                       # Foundation (zero external deps)
-├── orchestration/              # RAG, LangGraph workflows
-├── services/                   # ML, 3D, Analytics
+├── api/graphql/                # GraphQL schema + dataloaders
+├── core/                       # Foundation: auth, cache, events, registry (zero external deps)
+├── llm/                        # 6 providers: OpenAI, Anthropic, Google, Mistral, Cohere, Groq
+├── orchestration/              # RAG, LangGraph, CrewAI workflows
+├── services/                   # ML, 3D generation, analytics
 ├── security/                   # JWT, OAuth2, AES-256-GCM
-├── data/
-│   └── product-catalog.csv     # CANONICAL product catalog (all 31 products)
-├── scripts/                    # Active utilities (deploy, verify, php-lint)
-├── tests/                      # pytest + jest
+├── skyyrose/elite_studio/      # Multi-agent image pipeline (compositor, creative graph)
+├── scripts/                    # Active utilities (deploy, verify, php-lint, nano-banana)
+├── tests/                      # pytest (Python) + jest (TypeScript)
 └── docs/                       # Documentation
     └── archive/                # Historical docs
 ```
+
+**Dependency flow:** `core → security → database/llm → orchestration/services → agents → api`
+
+**Two independent systems** — do NOT cross-wire API calls or assume data sharing:
+- `skyyrose.co` = WordPress.com Business plan (WooCommerce store, customer-facing) — no wp-cli, SFTP deploy only, no direct DB access
+- `devskyy.app` = Vercel Next.js dashboard (internal pipelines, agent tools)
 
 ## Critical Rules
 

@@ -1,14 +1,34 @@
 {
-  "generated_at": "2026-05-03T16:59:02",
+  "generated_at": "2026-05-08T00:15:02",
   "repo_root": "/Users/theceo/DevSkyy",
   "freshness_days": 30,
-  "files_scanned": 35,
-  "indexed_basenames": 13906,
+  "files_scanned": 42,
+  "indexed_basenames": 14006,
   "missing_paths": [
     {
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/feedback_update_docs_on_change.md",
       "line": 37,
       "claim": "template-parts/landing/page.php"
+    },
+    {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/immersive-worlds.md",
+      "line": 14,
+      "claim": "assets/js/init-3d.js"
+    },
+    {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/immersive-worlds.md",
+      "line": 58,
+      "claim": "immersive-world.js"
+    },
+    {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_catalog_source.md",
+      "line": 41,
+      "claim": "assets/product-masters/catalog.yaml"
+    },
+    {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_catalog_source.md",
+      "line": 41,
+      "claim": "assets/product-masters/manifest.json"
     },
     {
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_render_pipeline.md",
@@ -25,30 +45,18 @@
   "stale_stamps": [],
   "fresh_stamps": [
     {
-      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
-      "line": 100,
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/immersive-worlds.md",
+      "line": 11,
       "stamp": "2026-04-27",
-      "age_days": 6
-    },
-    {
-      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
-      "line": 120,
-      "stamp": "2026-04-27",
-      "age_days": 6
-    },
-    {
-      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/MEMORY.md",
-      "line": 171,
-      "stamp": "2026-04-20",
-      "age_days": 13
+      "age_days": 11
     },
     {
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_pinecone_setup.md",
       "line": 7,
       "stamp": "2026-05-03",
-      "age_days": 0
+      "age_days": 5
     }
   ],
-  "documented_missing_count": 29,
-  "verified_count": 853
+  "documented_missing_count": 24,
+  "verified_count": 860
 }
