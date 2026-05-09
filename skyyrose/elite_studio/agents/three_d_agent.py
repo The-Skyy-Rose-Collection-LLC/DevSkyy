@@ -13,6 +13,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -137,6 +138,9 @@ class ThreeDAgent(CreativeAgent):
         glb_path = Path(meshy_result["model_path"])
         thumbnail_url = meshy_result.get("thumbnail_url")
 
+        # --- Stage 1.5: bpy GLB cleanup (decimate + smooth normals) ---
+        glb_path = await self._blender_glb_cleanup(glb_path, sku)
+
         # --- Stage 2: Headless Blender Scaffolding ---
         logger.info(f"[{sku}] Stage 2: Headless Blender Scaffolding...")
         scaffold_path = sku_dir / f"{sku}_scaffold.png"
@@ -244,3 +248,65 @@ class ThreeDAgent(CreativeAgent):
             output_path=path,
             metadata=photoshoot_output.get("adk_metadata", {}),
         )
+
+    async def _blender_glb_cleanup(self, glb_path: Path, sku: str) -> Path:
+        """Decimate + smooth-normal the Meshy GLB via a self-contained bpy script.
+
+        CLI-Anything Blender only builds primitive scenes from JSON — it has no
+        import_scene.gltf path. We bypass its harness entirely and call
+        ``blender -b --python <tempscript>`` with a standalone bpy snippet that
+        uses the full bpy API. Non-fatal: returns ``glb_path`` unchanged when
+        blender is absent, errors, or times out.
+        """
+        cleaned_path = glb_path.parent / f"{sku}_clean.glb"
+        bpy_script = (
+            "import bpy, sys\n"
+            "args = sys.argv[sys.argv.index('--') + 1:]\n"
+            "glb_in, glb_out = args[0], args[1]\n"
+            "bpy.ops.wm.read_factory_settings(use_empty=True)\n"
+            "bpy.ops.import_scene.gltf(filepath=glb_in)\n"
+            "for obj in list(bpy.data.objects):\n"
+            "    if obj.type == 'MESH':\n"
+            "        bpy.context.view_layer.objects.active = obj\n"
+            "        obj.select_set(True)\n"
+            "        mod = obj.modifiers.new(name='Decimate', type='DECIMATE')\n"
+            "        mod.ratio = 0.5\n"
+            "        bpy.ops.object.modifier_apply(modifier='Decimate')\n"
+            "        bpy.ops.object.shade_smooth()\n"
+            "        obj.select_set(False)\n"
+            "bpy.ops.export_scene.gltf(filepath=glb_out, export_format='GLB')\n"
+        )
+        tmp_path: str | None = None
+        try:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as tmp:
+                tmp.write(bpy_script)
+                tmp_path = tmp.name
+
+            cmd = [
+                "blender",
+                "-b",
+                "--python",
+                tmp_path,
+                "--",
+                str(glb_path),
+                str(cleaned_path),
+            ]
+            await asyncio.to_thread(
+                subprocess.run, cmd, check=True, capture_output=True, timeout=90
+            )
+            if cleaned_path.is_file():
+                logger.info("[%s] bpy GLB cleanup → %s", sku, cleaned_path)
+                return cleaned_path
+            return glb_path
+        except FileNotFoundError:
+            logger.info("[%s] blender not found; skipping GLB cleanup", sku)
+            return glb_path
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+            logger.warning("[%s] bpy GLB cleanup skipped: %s", sku, exc)
+            return glb_path
+        except Exception as exc:  # pragma: no cover
+            logger.warning("[%s] bpy GLB cleanup unexpected error: %s", sku, exc)
+            return glb_path
+        finally:
+            if tmp_path:
+                Path(tmp_path).unlink(missing_ok=True)

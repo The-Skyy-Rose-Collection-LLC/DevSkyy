@@ -3,6 +3,7 @@
 from mcp_tools.tools import (  # noqa: F401
     advanced,
     claude_sdk,
+    cli_anything,
     ecommerce,
     infrastructure,
     lora_generation,

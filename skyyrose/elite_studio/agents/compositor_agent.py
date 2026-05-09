@@ -39,6 +39,8 @@ import io
 import json
 import logging
 import os
+import shlex
+import subprocess
 import time
 from pathlib import Path
 from typing import Any
@@ -363,6 +365,14 @@ class CompositorAgent:
             if provider != "fal-fill":
                 result_kwargs["used_fallback"] = True
                 result_kwargs["fallback_provider"] = provider
+
+            # ------------------------------ Stage 4.5: GIMP pixel cleanup
+            started = time.perf_counter()
+            composite_path = self._gimp_pixel_cleanup(composite_path, sku, str(out))
+            stages["gimp_cleanup"] = {
+                "path": composite_path,
+                "duration_s": round(time.perf_counter() - started, 3),
+            }
 
             # ------------------------------ Stage 5: shadows
             started = time.perf_counter()
@@ -877,6 +887,52 @@ class CompositorAgent:
         except Exception as exc:
             logger.warning("Replicate FLUX Fill errored: %s", exc)
             return None
+
+    # ------------------------------------------------- Stage 4.5: GIMP cleanup
+
+    def _gimp_pixel_cleanup(
+        self,
+        composite_path: str,
+        sku: str,
+        output_dir: str,
+    ) -> str:
+        """Light pixel cleanup on the Stage 4 composite via cli-anything-gimp.
+
+        Runs: open → gaussian-blur r=1 → export PNG.
+        Non-fatal: returns ``composite_path`` unchanged on any failure so the
+        main pipeline continues unaffected when cli-anything-gimp is absent.
+        """
+        out = Path(output_dir)
+        cleanup_path = str(out / f"{sku}-composite-clean.png")
+        commands = [
+            f"media open --path {composite_path}",
+            "filter apply --name gaussian-blur --radius 1",
+            f"export save --output {cleanup_path} --format PNG",
+        ]
+        try:
+            for cmd in commands:
+                argv = ["cli-anything-gimp", "--json"] + shlex.split(cmd)
+                result = subprocess.run(argv, capture_output=True, text=True, timeout=60)
+                if result.returncode != 0:
+                    logger.warning(
+                        "GIMP cleanup step failed for %s: %s",
+                        sku,
+                        result.stderr.strip()[:200],
+                    )
+                    return composite_path
+            if Path(cleanup_path).is_file():
+                logger.info("GIMP pixel cleanup done for %s → %s", sku, cleanup_path)
+                return cleanup_path
+            return composite_path
+        except FileNotFoundError:
+            logger.info("cli-anything-gimp not found; skipping pixel cleanup for %s", sku)
+            return composite_path
+        except subprocess.TimeoutExpired:
+            logger.warning("GIMP pixel cleanup timed out for %s", sku)
+            return composite_path
+        except Exception as exc:  # pragma: no cover
+            logger.warning("GIMP pixel cleanup unexpected error for %s: %s", sku, exc)
+            return composite_path
 
     # --------------------------------------------------- Stage 5: shadows
 
