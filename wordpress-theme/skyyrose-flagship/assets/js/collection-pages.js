@@ -59,7 +59,7 @@
 					btn.textContent = originalText;
 					btn.disabled = false;
 				};
-				xhr.send('action=skyyrose_newsletter&email=' + encodeURIComponent(input.value) + '&nonce=' + encodeURIComponent(skyyRoseNewsletter.nonce));
+				xhr.send('action=skyyrose_newsletter_subscribe&email=' + encodeURIComponent(input.value) + '&skyyrose_newsletter_nonce=' + encodeURIComponent(skyyRoseNewsletter.nonce));
 			} else {
 				btn.textContent = 'Welcome';
 				input.value = '';

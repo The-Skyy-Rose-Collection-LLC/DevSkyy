@@ -1,8 +1,10 @@
 <?php
 /**
  * Template Part: Holo Product Card — Impeccable Refinement
- * 
+ *
  * Enforces technical blueprint hover (techflat) and garment lock.
+ *
+ * @package SkyyRose
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -15,14 +17,14 @@ if ( isset( $args['product'] ) && $args['product'] instanceof WC_Product ) {
 	$product_id = $wc_product->get_id();
 }
 
-$collection = ! empty( $args['collection'] ) ? sanitize_title( (string) $args['collection'] ) : '';
-$title = $wc_product ? $wc_product->get_name() : ($args['title'] ?? '');
-$price_html = $wc_product ? $wc_product->get_price_html() : esc_html( $args['price'] ?? '' );
-$sku = $wc_product ? $wc_product->get_sku() : ($args['sku'] ?? '');
+$collection   = ! empty( $args['collection'] ) ? sanitize_title( (string) $args['collection'] ) : '';
+$title        = $wc_product ? $wc_product->get_name() : ( $args['title'] ?? '' );
+$price_html   = $wc_product ? $wc_product->get_price_html() : esc_html( $args['price'] ?? '' );
+$sku          = $wc_product ? $wc_product->get_sku() : ( $args['sku'] ?? '' );
 $garment_lock = $args['garment_lock'] ?? '';
 
 // Images — Front (Model/Finished) vs Back (Techflat/Technical)
-$front_url = $wc_product ? wp_get_attachment_image_url($wc_product->get_image_id(), 'large') : ($args['image_url'] ?? '');
+$front_url = $wc_product ? wp_get_attachment_image_url( $wc_product->get_image_id(), 'large' ) : ( $args['image_url'] ?? '' );
 $back_url  = $args['image_back'] ?? ''; // Passed from catalog as the 'image' (techflat) column
 
 if ( empty( $front_url ) ) {
@@ -34,35 +36,35 @@ if ( empty( $back_url ) ) {
 
 $index = (int) ( $args['index'] ?? 0 );
 ?>
-<div class="holo holo--<?php echo esc_attr($collection); ?>" 
-     data-sku="<?php echo esc_attr($sku); ?>"
-     data-garment-lock="<?php echo esc_attr($garment_lock); ?>"
-     style="--holo-delay: <?php echo esc_attr($index * 80); ?>ms">
+<div class="holo holo--<?php echo esc_attr( $collection ); ?>" 
+	data-sku="<?php echo esc_attr( $sku ); ?>"
+	data-garment-lock="<?php echo esc_attr( $garment_lock ); ?>"
+	style="--holo-delay: <?php echo esc_attr( $index * 80 ); ?>ms">
 
 	<div class="holo__body">
 		<div class="holo__gallery">
-			<a href="<?php echo esc_url( get_permalink($product_id) ); ?>" class="holo__img-link">
-				<img class="holo__img holo__img--front" src="<?php echo esc_url($front_url); ?>" alt="<?php echo esc_attr($title); ?>" loading="lazy">
-				<img class="holo__img holo__img--back" src="<?php echo esc_url($back_url); ?>" alt="Technical Blueprint" loading="lazy">
+			<a href="<?php echo esc_url( get_permalink( $product_id ) ); ?>" class="holo__img-link">
+				<img class="holo__img holo__img--front" src="<?php echo esc_url( $front_url ); ?>" alt="<?php echo esc_attr( $title ); ?>" loading="lazy">
+				<img class="holo__img holo__img--back" src="<?php echo esc_url( $back_url ); ?>" alt="Technical Blueprint" loading="lazy">
 			</a>
 		</div>
 
 		<div class="holo__info">
-			<span class="holo__collection"><?php echo esc_html(strtoupper(str_replace('-', ' ', $collection))); ?></span>
+			<span class="holo__collection"><?php echo esc_html( strtoupper( str_replace( '-', ' ', $collection ) ) ); ?></span>
 			<h3 class="holo__name">
-				<a href="<?php echo esc_url(get_permalink($product_id)); ?>"><?php echo esc_html($title); ?></a>
+				<a href="<?php echo esc_url( get_permalink( $product_id ) ); ?>"><?php echo esc_html( $title ); ?></a>
 			</h3>
 			<div class="holo__price-row">
-				<span class="holo__price"><?php echo wp_kses_post($price_html); ?></span>
+				<span class="holo__price"><?php echo wp_kses_post( $price_html ); ?></span>
 			</div>
 		</div>
 
 		<div class="holo__drawer">
 			<div class="holo__sizes">
-				<span class="holo__size-pill">S</span>
-				<span class="holo__size-pill">M</span>
-				<span class="holo__size-pill">L</span>
-				<span class="holo__size-pill">XL</span>
+				<span class="holo__size-pill" data-size="S">S</span>
+				<span class="holo__size-pill" data-size="M">M</span>
+				<span class="holo__size-pill" data-size="L">L</span>
+				<span class="holo__size-pill" data-size="XL">XL</span>
 			</div>
 			<?php
 			/*
@@ -87,6 +89,11 @@ $index = (int) ( $args['index'] ?? 0 );
 				aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Add %s to cart', 'skyyrose' ), $title ) ); ?>"
 				<?php disabled( $product_id <= 0 ); ?>>
 				<?php esc_html_e( 'Add to Cart', 'skyyrose' ); ?>
+			</button>
+			<button type="button" class="holo__wishlist"
+				data-product-id="<?php echo esc_attr( (int) $product_id ); ?>"
+				aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Add %s to wishlist', 'skyyrose' ), $title ) ); ?>">
+				&#9825;
 			</button>
 		</div>
 	</div>

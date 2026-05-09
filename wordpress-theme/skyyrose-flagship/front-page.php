@@ -32,11 +32,26 @@ unset( $col );
 
 /* Press features. Empty 'url' renders as <span>; non-empty renders as <a> with rel=noopener. */
 $press = array(
-	array( 'name' => __( 'Maxim', 'skyyrose' ),               'url' => 'https://www.maxim.com/partner/14-game-changing-entrepreneurs-to-watch-in-2023/' ),
-	array( 'name' => __( 'CEO Weekly', 'skyyrose' ),          'url' => 'https://ceoweekly.com/the-unyielding-journey-of-a-single-father-and-entrepreneur/' ),
-	array( 'name' => __( 'San Francisco Post', 'skyyrose' ),  'url' => 'https://sanfranciscopost.com/the-skyy-rose-collection-from-oaklands-streets-to-fashion-heights/' ),
-	array( 'name' => __( 'Best of Best Review', 'skyyrose' ), 'url' => 'https://bestofbestreview.com/awards/the-skyy-rose-collection-best-bay-area-clothing-line-award-2024' ),
-	array( 'name' => __( 'The Blox', 'skyyrose' ),            'url' => '' ),
+	array(
+		'name' => __( 'Maxim', 'skyyrose' ),
+		'url'  => 'https://www.maxim.com/partner/14-game-changing-entrepreneurs-to-watch-in-2023/',
+	),
+	array(
+		'name' => __( 'CEO Weekly', 'skyyrose' ),
+		'url'  => 'https://ceoweekly.com/the-unyielding-journey-of-a-single-father-and-entrepreneur/',
+	),
+	array(
+		'name' => __( 'San Francisco Post', 'skyyrose' ),
+		'url'  => 'https://sanfranciscopost.com/the-skyy-rose-collection-from-oaklands-streets-to-fashion-heights/',
+	),
+	array(
+		'name' => __( 'Best of Best Review', 'skyyrose' ),
+		'url'  => 'https://bestofbestreview.com/awards/the-skyy-rose-collection-best-bay-area-clothing-line-award-2024',
+	),
+	array(
+		'name' => __( 'The Blox', 'skyyrose' ),
+		'url'  => '',
+	),
 );
 
 /* Marquee items */
@@ -348,7 +363,7 @@ get_template_part(
 	<div class="lookbook-grid stagger-grid">
 		<?php
 		foreach ( $lookbook as $lb ) :
-			$lb_base = SKYYROSE_ASSETS_URI . '/images/lookbook/' . $lb['file'];
+			$lb_base  = SKYYROSE_ASSETS_URI . '/images/lookbook/' . $lb['file'];
 			$lb_sizes = $lb['tall']
 				? '(max-width: 600px) 100vw, (max-width: 1024px) 100vw, 760px'
 				: '(max-width: 600px) 100vw, (max-width: 1024px) 50vw, 370px';
@@ -490,7 +505,7 @@ if ( file_exists( $homepage_js_path ) ) :
 	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents, WordPress.Security.EscapeOutput.OutputNotEscaped -- inlining local JS file for critical-path performance.
 	$homepage_js_content = file_get_contents( $homepage_js_path );
 	if ( $homepage_js_content ) {
-		echo $homepage_js_content;
+		echo $homepage_js_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- raw local JS file inlined for critical-path performance.
 	}
 	?>
 </script>
@@ -503,6 +518,7 @@ if ( file_exists( $homepage_js_path ) ) :
 // toast container render on the homepage too.
 get_template_part( 'template-parts/size-guide-modal' );
 get_template_part( 'template-parts/cookie-consent' );
+get_template_part( 'template-parts/skyy-mascot' );
 get_template_part( 'template-parts/mobile-bottom-nav' );
 ?>
 

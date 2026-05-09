@@ -353,7 +353,6 @@ function skyyrose_enqueue_global_scripts() {
 			)
 		);
 	}
-
 }
 
 /**
@@ -435,7 +434,7 @@ function skyyrose_get_current_template_slug() {
 			'template-elementor-canvas.php'        => 'elementor-canvas',
 			'template-elementor-fullwidth.php'     => 'elementor-fullwidth',
 		);
-		$slug = isset( $template_map[ $page_template ] ) ? $template_map[ $page_template ] : null;
+		$slug         = isset( $template_map[ $page_template ] ) ? $template_map[ $page_template ] : null;
 	}
 
 	if ( null === $slug ) {
@@ -627,6 +626,14 @@ function skyyrose_enqueue_template_scripts() {
 				SKYYROSE_VERSION,
 				true
 			);
+			wp_localize_script(
+				'skyyrose-collection-pages',
+				'skyyRoseNewsletter',
+				array(
+					'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+					'nonce'   => wp_create_nonce( 'skyyrose_newsletter' ),
+				)
+			);
 		}
 	}
 
@@ -727,8 +734,8 @@ function skyyrose_enqueue_template_scripts() {
 	// Holo product cards — loaded on collection pages, shop archives, and WC loop.
 	// NOTE: This must be OUTSIDE the $template_scripts check above.
 	if ( in_array( $slug, array( 'collection', 'collection-v4', 'collection-standalone', 'collections-shop', 'front-page', 'shop-archive', 'preorder-gateway', 'search', 'landing', 'elementor-editorial' ), true ) ) {
-			$holo_css_file = $use_min && file_exists( $base_css_dir . '/product-grid.css' )
-				? 'product-grid.css' : 'product-card-holo.css';
+			$holo_css_file = $use_min && file_exists( $base_css_dir . '/product-card-holo.min.css' )
+				? 'product-card-holo.min.css' : 'product-card-holo.css';
 		if ( file_exists( $base_css_dir . '/' . $holo_css_file ) ) {
 			wp_enqueue_style(
 				'skyyrose-product-card-holo',
@@ -811,9 +818,10 @@ function skyyrose_enqueue_collection_experiences() {
 	}
 
 	$experience_map = array(
-		'template-immersive-black-rose.php' => 'experiences/blackrose-experience',
-		'template-immersive-love-hurts.php' => 'experiences/lovehurts-experience',
-		'template-immersive-signature.php'  => 'experiences/signature-experience',
+		'template-immersive-black-rose.php'   => 'experiences/blackrose-experience',
+		'template-immersive-love-hurts.php'   => 'experiences/lovehurts-experience',
+		'template-immersive-signature.php'    => 'experiences/signature-experience',
+		'template-immersive-kids-capsule.php' => 'experiences/kidscapsule-experience',
 	);
 
 	$current_template = get_page_template_slug();
@@ -1080,7 +1088,7 @@ function skyyrose_enqueue_phase3_assets(): void {
 /**
  * Enqueue Phase 4 Experience Engine assets — Personalization.
  *
- * personalization.js + personalization.css load on pages that render product
+ * Personalization.js + personalization.css load on pages that render product
  * grids or single products. Runs at priority 42 so personalization.php's
  * localize (priority 45) attaches to the already-registered handle.
  */
