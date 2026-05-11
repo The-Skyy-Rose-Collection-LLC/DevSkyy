@@ -126,7 +126,7 @@ $period          = intval( $summary['period'] ?? 30 );
 				<button
 					class="see-dashboard__toggle <?php echo $is_active ? 'see-dashboard__toggle--on' : ''; ?>"
 					type="button"
-					aria-pressed="<?php echo $is_active ? 'true' : 'false'; ?>"
+					aria-pressed="<?php echo esc_attr( $is_active ? 'true' : 'false' ); ?>"
 					aria-label="
 					<?php
 					echo esc_attr(

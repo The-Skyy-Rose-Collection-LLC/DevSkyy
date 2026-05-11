@@ -114,3 +114,41 @@ if ( ! function_exists( 'wp_cache_set' ) ) {
 		return true;
 	}
 }
+
+// ---------------------------------------------------------------------------
+// Hooks (no-op — tests exercise return values, not side effects)
+// ---------------------------------------------------------------------------
+
+if ( ! function_exists( 'add_action' ) ) {
+	function add_action( $hook, $callback, $priority = 10, $accepted_args = 1 ) {
+		return true;
+	}
+}
+
+if ( ! function_exists( 'add_filter' ) ) {
+	function add_filter( $hook, $callback, $priority = 10, $accepted_args = 1 ) {
+		return true;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Transients (in-memory store for display-cache tests)
+// ---------------------------------------------------------------------------
+
+if ( ! function_exists( 'get_transient' ) ) {
+	function get_transient( $transient ) {
+		return false;
+	}
+}
+
+if ( ! function_exists( 'set_transient' ) ) {
+	function set_transient( $transient, $value, $expiration = 0 ) {
+		return true;
+	}
+}
+
+if ( ! function_exists( 'delete_transient' ) ) {
+	function delete_transient( $transient ) {
+		return true;
+	}
+}

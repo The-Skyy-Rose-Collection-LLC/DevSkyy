@@ -203,7 +203,7 @@ defined( 'ABSPATH' ) || exit;
 					<h4 class="footer-grid__heading"><?php esc_html_e( 'Connect', 'skyyrose' ); ?></h4>
 					<ul class="footer-grid__list">
 						<?php
-						$connect_links = skyyrose_get_social_links();
+						$connect_links = $social_links;
 						foreach ( $connect_links as $data ) :
 							?>
 							<li>

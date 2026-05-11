@@ -568,7 +568,7 @@ do_action( 'woocommerce_before_cart' );
 							<span>
 							<?php
 								/* translators: %d: free shipping order minimum in dollars */
-								printf( esc_html__( 'Free Shipping $%d+', 'skyyrose' ), intval( SKYYROSE_FREE_SHIPPING_THRESHOLD ) );
+								printf( esc_html__( 'Free Shipping $%d+', 'skyyrose' ), intval( defined( 'SKYYROSE_FREE_SHIPPING_THRESHOLD' ) ? SKYYROSE_FREE_SHIPPING_THRESHOLD : 150 ) );
 							?>
 								</span>
 						</div>

@@ -152,7 +152,7 @@ get_header();
 							'title'      => isset( $item['name'] ) ? $item['name'] : '',
 							'price'      => skyyrose_format_price( $item ),
 							'image_url'  => skyyrose_product_image_uri( isset( $item['front_model_image'] ) ? $item['front_model_image'] : ( isset( $item['image'] ) ? $item['image'] : '' ) ),
-							'image_back' => skyyrose_product_image_uri( isset( $item['image'] ) ? $item['image'] : '' ),
+							'image_back' => skyyrose_product_image_uri( isset( $item['back_model_image'] ) ? $item['back_model_image'] : ( isset( $item['back_image'] ) ? $item['back_image'] : '' ) ),
 							'permalink'  => skyyrose_product_url( $item_sku ),
 							'collection' => $slug,
 							'badge_text' => __( 'Pre-Order', 'skyyrose' ),

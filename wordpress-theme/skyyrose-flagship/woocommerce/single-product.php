@@ -22,7 +22,7 @@ while ( have_posts() ) :
 	}
 
 	$collection = skyyrose_get_product_collection();
-	$config     = skyyrose_collection_config( $collection );
+	$config     = skyyrose_get_collection( $collection );
 	$meta       = skyyrose_get_product_meta();
 	$sku        = $product->get_sku();
 
