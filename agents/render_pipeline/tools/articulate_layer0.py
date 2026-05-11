@@ -33,17 +33,13 @@ from __future__ import annotations
 import json
 import logging
 import os
-from typing import TYPE_CHECKING
-
 from agents.render_pipeline.tools._paths import ensure_repo_paths
 
 ensure_repo_paths()
 
 log = logging.getLogger(__name__)
 
-if TYPE_CHECKING:
-    from google.adk.tools.tool_context import ToolContext
-
+from google.adk.tools.tool_context import ToolContext
 
 _LAYER0_SCHEMA = {
     "type": "object",

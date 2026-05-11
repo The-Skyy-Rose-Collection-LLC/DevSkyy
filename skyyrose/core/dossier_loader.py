@@ -48,6 +48,8 @@ class Dossier:
     negative_block: str
     scene_pose: str = ""
     scene_setting: str = ""
+    logo_reference: str = ""
+    extra_logos: list[str] = field(default_factory=list)
     raw: str = field(default="", repr=False)
 
     def to_dict(self) -> dict:
@@ -61,6 +63,8 @@ class Dossier:
             "negative_block": self.negative_block,
             "scene_pose": self.scene_pose,
             "scene_setting": self.scene_setting,
+            "logo_reference": self.logo_reference,
+            "extra_logos": list(self.extra_logos),
         }
 
 
@@ -80,6 +84,50 @@ def _parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
         key, value = line.split(":", 1)
         fm[key.strip()] = value.strip().strip('"').strip("'")
     return fm, rest
+
+
+# Compiled once at module load. The list-key pattern matches a YAML key
+# followed by one-or-more indented bullets; the item pattern then extracts
+# each bullet's value from the captured block.
+_FRONTMATTER_LIST_KEY_RE = re.compile(
+    r"^(\w[\w\-]*):\s*\n((?:[ \t]+-\s+.+\n?)+)",
+    re.MULTILINE,
+)
+_FRONTMATTER_LIST_ITEM_RE = re.compile(
+    r"^[ \t]+-\s+(.+?)\s*$",
+    re.MULTILINE,
+)
+
+
+def _parse_frontmatter_lists(text: str) -> dict[str, list[str]]:
+    """Extract YAML-list-style frontmatter values that `_parse_frontmatter` skips.
+
+    Matches the canonical pattern:
+        key:
+          - item-one
+          - item-two
+
+    Returns a dict mapping key → list of stripped item strings. Keys whose
+    values are scalar (already captured by `_parse_frontmatter`) are not
+    returned here.
+    """
+    if not text.startswith("---"):
+        return {}
+    end = text.find("\n---", 3)
+    if end == -1:
+        return {}
+    block = text[3:end]
+    out: dict[str, list[str]] = {}
+    for match in _FRONTMATTER_LIST_KEY_RE.finditer(block):
+        key = match.group(1)
+        bullets_block = match.group(2)
+        items = [
+            m.group(1).strip().strip('"').strip("'")
+            for m in _FRONTMATTER_LIST_ITEM_RE.finditer(bullets_block)
+        ]
+        if items:
+            out[key] = items
+    return out
 
 
 def _extract_section(body: str, heading_pattern: str) -> str:
@@ -102,6 +150,7 @@ def _extract_scene_field(scene_section: str, label: str) -> str:
 def parse_dossier_markdown(text: str) -> Dossier:
     """Parse a dossier markdown string into a structured Dossier object."""
     fm, body = _parse_frontmatter(text)
+    fm_lists = _parse_frontmatter_lists(text)
 
     branding_section = _extract_section(body, r"Branding")
     negative_section = _extract_section(body, r"Negative")
@@ -119,6 +168,8 @@ def parse_dossier_markdown(text: str) -> Dossier:
         negative_block=negative_section,
         scene_pose=_extract_scene_field(scene_section, "Pose"),
         scene_setting=_extract_scene_field(scene_section, "Setting"),
+        logo_reference=fm.get("logo_reference", ""),
+        extra_logos=fm_lists.get("extra_logos", []),
         raw=text,
     )
 

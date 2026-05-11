@@ -39,8 +39,8 @@ Dependencies that MUST be installed in .venv-agents/ (numpy isolation per CLAUDE
 from __future__ import annotations
 
 import sys
-from pathlib import Path
 from collections.abc import AsyncGenerator
+from pathlib import Path
 
 # sys.path setup (same pattern as tools/_paths.py — agents/render_pipeline/agent.py)
 _REPO = Path(__file__).resolve().parents[2]
@@ -53,8 +53,9 @@ for _p in (_REPO, _REPO / "scripts"):
 from google.adk.agents import BaseAgent, LlmAgent, LoopAgent, SequentialAgent
 from google.adk.agents.invocation_context import InvocationContext
 from google.adk.events import Event, EventActions
+from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools import FunctionTool
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 # Tool functions — pure-Python wrappers around verified nano_banana surfaces
 from agents.render_pipeline.tools import (
@@ -81,9 +82,11 @@ from llm.model_ids import (
 # ---------------------------------------------------------------------------
 
 DISPATCH_MODEL = "gemini-2.5-flash"  # tool-dispatch sub-agents (cheap, fast, reliable)
-SONNET_LAYER0 = CLAUDE_SONNET_MODEL  # layer 0 articulation (engine-style adaptation)
+# Anthropic models go through LiteLlm — ADK's native Claude wrapper is Vertex-only
+# (AsyncAnthropicVertex), but we want the direct Anthropic API via ANTHROPIC_API_KEY.
+SONNET_LAYER0 = LiteLlm(model=f"anthropic/{CLAUDE_SONNET_MODEL}")  # layer 0 articulation
 GEMINI_REASONING = GEMINI_PRO_MODEL  # F5 score classifier (reasoning over signals)
-OPUS_SYNTHESIS = CLAUDE_OPUS_MODEL  # final RenderResult (deepest reasoning)
+OPUS_SYNTHESIS = LiteLlm(model=f"anthropic/{CLAUDE_OPUS_MODEL}")  # final RenderResult
 
 
 # ---------------------------------------------------------------------------
@@ -91,8 +94,24 @@ OPUS_SYNTHESIS = CLAUDE_OPUS_MODEL  # final RenderResult (deepest reasoning)
 # ---------------------------------------------------------------------------
 
 
+class InfraFailure(BaseModel):
+    """One judge that hit an infra timeout (F5 fragility case).
+
+    Closed schema — Anthropic structured output rejects `additionalProperties: true`
+    anywhere in the schema (including nested array items). `extra='forbid'` makes
+    Pydantic emit `additionalProperties: false`.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    judge: str = Field(description="Judge name that failed")
+    reason: str = Field(description="Failure reason or top issue")
+
+
 class RenderResult(BaseModel):
     """Final structured output from the pipeline. Returned by SynthesisAgent."""
+
+    model_config = ConfigDict(extra="forbid")
 
     sku: str = Field(description="Catalog SKU code")
     view: str = Field(description="Render view: front | back | branding")
@@ -107,7 +126,7 @@ class RenderResult(BaseModel):
         description="Did the synthesis judge fire a hallucination veto?"
     )
     issues: list[str] = Field(default_factory=list, description="Top issues from QA tournament")
-    infra_failures: list[dict] = Field(
+    infra_failures: list[InfraFailure] = Field(
         default_factory=list,
         description="Judges that hit infra timeouts (F5) — score may be unreliable",
     )
