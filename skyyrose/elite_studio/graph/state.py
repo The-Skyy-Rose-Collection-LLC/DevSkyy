@@ -84,6 +84,15 @@ class EliteStudioState(TypedDict, total=False):
     workflow_id: str
     stage_timings: dict[str, float]
 
+    # --- Budget + run summary (P1/P2) ---
+    # `budget` is a RunBudget instance enforcing the cumulative paid-API
+    # ceiling for this run. Nodes that hit paid APIs MUST call
+    # ``budget.ensure_within_budget(cost, stage)`` before dispatch and
+    # ``budget.spend(cost, stage)`` after a successful paid call. See
+    # ``skyyrose.elite_studio.budget``.
+    budget: object | None  # avoids circular import
+    run_summary_path: str
+
 
 def create_initial_state(
     sku: str,
@@ -123,7 +132,17 @@ def create_initial_state(
         failed_step="",
         workflow_id=str(uuid.uuid4()),
         stage_timings={},
+        budget=_default_budget(),
+        run_summary_path="",
     )
+
+
+def _default_budget() -> object:
+    """Instantiate the default RunBudget. Imported lazily to keep the
+    state module import-light (budget pulls in threading + os)."""
+    from ..budget import RunBudget
+
+    return RunBudget()
 
 
 def extract_production_result(state: EliteStudioState) -> Any:

@@ -122,8 +122,16 @@ def vision_node(state: EliteStudioState) -> dict:
     }
 
 
+_GENERATOR_EST_COST_USD = (
+    0.04  # Gemini Flash ~$0.04/image — see render_pipeline/tools/generate_image.py
+)
+_THREE_D_EST_COST_USD = 0.50  # Round-table ceiling: Meshy + Tripo + TRELLIS_local worst case
+
+
 def generator_node(state: EliteStudioState) -> dict:
     """Generate fashion model image from vision specification."""
+    from ..budget import BudgetExceededError
+
     start = time.monotonic()
     agent = GeneratorAgent()
 
@@ -135,6 +143,17 @@ def generator_node(state: EliteStudioState) -> dict:
             "failed_step": "generation",
         }
 
+    budget = state.get("budget")
+    if budget is not None and hasattr(budget, "ensure_within_budget"):
+        try:
+            budget.ensure_within_budget(_GENERATOR_EST_COST_USD, stage="generation")
+        except BudgetExceededError as exc:
+            return {
+                "status": "error",
+                "error": f"budget exceeded before generation: {exc}",
+                "failed_step": "generation",
+            }
+
     result = run_sync(
         agent.generate(
             sku=state["sku"],
@@ -143,6 +162,9 @@ def generator_node(state: EliteStudioState) -> dict:
         )
     )
     elapsed = time.monotonic() - start
+
+    if budget is not None and hasattr(budget, "spend") and getattr(result, "success", False):
+        budget.spend(_GENERATOR_EST_COST_USD, stage="generation")
 
     job_id: str | None = state.get("job_id")  # type: ignore[assignment]
     _record_cost(job_id, "gemini", _GENERATION_TOKENS_ESTIMATE)
@@ -169,11 +191,8 @@ def generator_node(state: EliteStudioState) -> dict:
 def quality_node(state: EliteStudioState) -> dict:
     """Dual-QC: ML classifier first, Claude Sonnet fallback on low confidence.
 
-    Decision logic:
-    1. Run QualityClassifier (CLIP) — fast, no LLM cost.
-    2. If classifier.confidence >= 0.8: use classifier decision, skip LLM.
-    3. If classifier.confidence < 0.8: run QualityAgent (Claude Sonnet) as well.
-    4. Return both classifier_result and quality_result in state.
+    Phase 16 Upgrade: Inspects audit_result from FLUX synthesis first. If
+    blocking violations exist, fails immediately without calling ML/LLM.
     """
     start = time.monotonic()
 
@@ -185,6 +204,49 @@ def quality_node(state: EliteStudioState) -> dict:
             "error": "No generated image available for QC",
             "failed_step": "quality",
         }
+
+    # --- Stage 0: Fidelity Audit check (Phase 16) ---
+    audit_data = gen.metadata.get("audit_result")
+    if audit_data:
+        from ..agents.vision_audit_agent import VisionAuditResult, VisionAuditViolation
+
+        # Reconstruct violations first
+        violation_dicts = audit_data.get("violations", [])
+        violations_objs = [VisionAuditViolation(**v) for v in violation_dicts]
+
+        # Reconstruct result object
+        audit = VisionAuditResult(
+            matches_dossier=bool(audit_data.get("matches_dossier", False)),
+            violations=violations_objs,
+            raw_text=audit_data.get("raw_text", ""),
+            model=audit_data.get("model", ""),
+            error=audit_data.get("error", ""),
+        )
+
+        if not audit.ok:
+            logger.info("[QC] Fidelity audit failed (blocking violations found)")
+            from ..models import QualityVerification
+
+            violations = [v.element for v in audit.violations if v.is_blocking]
+            quality_result = QualityVerification(
+                success=True,
+                provider="fidelity_audit",
+                model=audit.model,
+                overall_status="fail",
+                recommendation="regenerate",
+                details={
+                    "violations": [v.to_dict() for v in audit.violations],
+                    "blocking_elements": violations,
+                    "reason": "fidelity audit failed",
+                },
+            )
+            elapsed = time.monotonic() - start
+            timings = dict(state.get("stage_timings", {}))
+            timings["quality"] = round(elapsed, 2)
+            return {
+                "quality_result": quality_result,
+                "stage_timings": timings,
+            }
 
     # --- Stage 1: ML classifier ---
     classifier = QualityClassifier()
@@ -415,14 +477,48 @@ def tryon_node(state: EliteStudioState) -> dict:
 
 
 def finalize_node(state: EliteStudioState) -> dict:
-    """Set final status based on accumulated results."""
-    # If status is already "error", keep it
-    if state.get("status") == "error":
-        return {}
+    """Set final status + persist the run summary for downstream auditing.
 
-    return {
-        "status": "success",
+    Always emits a summary JSON — success or error — so post-run analysis
+    can reconstruct what each SKU's pipeline did, what it spent, and
+    where it failed. Telemetry write is best-effort: a failed write
+    never overrides the run status.
+    """
+    from ..telemetry import write_run_summary
+
+    final_status = "success" if state.get("status") != "error" else "error"
+
+    budget = state.get("budget")
+    budget_snap = budget.snapshot() if budget is not None and hasattr(budget, "snapshot") else None
+
+    qa = state.get("quality_result")
+    gen = state.get("generation_result")
+    three_d_score = state.get("three_d_fidelity_score") or 0.0
+
+    summary = {
+        "workflow_id": state.get("workflow_id"),
+        "sku": state.get("sku"),
+        "view": state.get("view"),
+        "style": state.get("style"),
+        "status": final_status,
+        "error": state.get("error", ""),
+        "failed_step": state.get("failed_step", ""),
+        "generation_engine": getattr(gen, "provider", None) or getattr(gen, "model", None),
+        "qa_score": getattr(qa, "score", None) if qa else None,
+        "qa_passed": getattr(qa, "passed", None) if qa else None,
+        "three_d_fidelity_score": three_d_score,
+        "three_d_model_path": state.get("three_d_model_path", ""),
+        "budget": budget_snap,
+        "stage_timings": dict(state.get("stage_timings", {}) or {}),
     }
+
+    workflow_id = state.get("workflow_id") or "unknown"
+    summary_path = write_run_summary(workflow_id, summary)
+
+    out: dict = {"status": final_status}
+    if summary_path is not None:
+        out["run_summary_path"] = str(summary_path)
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -622,17 +718,35 @@ def three_d_node(state: EliteStudioState) -> dict:
     """
     from ..agents.three_d_agent import ThreeDAgent
     from ..agents.vision_agent import _reference_path
+    from ..budget import BudgetExceededError
 
     sku = state["sku"]
 
     # Reference image: techflat from state or vision-agent lookup
     ref_path = state.get("reference_path") or _reference_path(sku)
 
+    # Budget guard — round-table tournament (Meshy + Tripo + TRELLIS local +
+    # AniGen) can dispatch up to 4 providers in parallel; estimate the
+    # ceiling at $0.50 to cover the worst case before any provider fires.
+    budget = state.get("budget")
+    if budget is not None and hasattr(budget, "ensure_within_budget"):
+        try:
+            budget.ensure_within_budget(_THREE_D_EST_COST_USD, stage="three_d")
+        except BudgetExceededError as exc:
+            return {
+                "status": "error",
+                "error": f"budget exceeded before 3D generation: {exc}",
+                "failed_step": "3d_generation",
+            }
+
     # The dossier loaded inside generate_replica is now the source of truth for
     # branding spec; enrichment_prompt and vision_result are no longer fed
     # into the RAS prompt (they were thin and could drift from the dossier).
     agent = ThreeDAgent()
     replica_result = run_sync(agent.generate_replica(sku, ref_path))
+
+    if budget is not None and hasattr(budget, "spend") and replica_result.get("success"):
+        budget.spend(_THREE_D_EST_COST_USD, stage="three_d")
 
     if not replica_result["success"]:
         return {

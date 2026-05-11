@@ -36,6 +36,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import random
+import re
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -58,6 +59,59 @@ from orchestration.huggingface_3d_client import (
 logger = structlog.get_logger(__name__)
 
 T = TypeVar("T")
+
+
+# SKU token = prefix-digits, plus an optional known variant suffix.
+# Known catalog variants (br-003-oakland|giants|white) are explicit;
+# other trailing tokens (e.g. "crewneck", "joggers") are PRODUCT TYPE
+# slugs in image filenames, NOT part of the SKU. Tightening the regex
+# to known variants prevents false-positive matches like
+# "br-001-crewneck" being treated as a variant SKU.
+_SKU_PREFIX_RE = re.compile(r"\b(?:br|lh|sg|kids)-\d{3}", re.IGNORECASE)
+_SKU_VARIANTS: tuple[str, ...] = ("oakland", "giants", "white")
+_SKU_VARIANT_RE = re.compile(r"\b(?:" + "|".join(_SKU_VARIANTS) + r")\b", re.IGNORECASE)
+
+
+def _extract_sku_parts(value: str) -> tuple[str | None, str | None]:
+    """Return ``(prefix, variant)`` lowercased.
+
+    Prefix = ``br|lh|sg|kids`` + 3 digits. Variant = known catalog suffix
+    (oakland/giants/white) found anywhere in the string after the prefix.
+    Either part may be None if not present.
+    """
+    prefix_match = _SKU_PREFIX_RE.search(value)
+    if not prefix_match:
+        return None, None
+    tail = value[prefix_match.end() :]
+    variant_match = _SKU_VARIANT_RE.search(tail)
+    return (
+        prefix_match.group(0).lower(),
+        variant_match.group(0).lower() if variant_match else None,
+    )
+
+
+def _sku_tokens_consistent(task_id: str, image_path: str) -> bool:
+    """True if SKU tokens detected in task_id and image_path agree.
+
+    Returns True when:
+      - no SKU prefix is detected in either side (permits smoke/ad-hoc runs)
+      - both prefixes match AND (no task-side variant required, OR image
+        also names that variant somewhere after the prefix)
+
+    Returns False when prefixes match but the task asked for a variant
+    the image filename does not name — protects against accidentally
+    rendering the base SKU when a variant edition was requested.
+    """
+    task_prefix, task_variant = _extract_sku_parts(task_id)
+    image_prefix, image_variant = _extract_sku_parts(image_path)
+    if task_prefix is None or image_prefix is None:
+        return True
+    if task_prefix != image_prefix:
+        return False
+    # Same prefix. If the task names a variant, the image must too.
+    if task_variant is not None and image_variant != task_variant:
+        return False
+    return True
 
 
 # =============================================================================
@@ -815,6 +869,22 @@ class ThreeDRoundTable:
         """Internal competition runner with quality enhancement."""
         task_id = task_id or str(uuid4())[:8]
         competition_id = str(uuid4())[:12]
+
+        # SKU-token cross-check — when both task_id and image_path are SKU-bearing,
+        # reject mismatches BEFORE any provider call to prevent cross-SKU image
+        # leakage into the round-table (a wrong source image silently produces
+        # a wrong product 3D model). Zero-cost guard: pure string check.
+        if (
+            generation_type == GenerationType.IMAGE_TO_3D
+            and image_path
+            and task_id
+            and not _sku_tokens_consistent(task_id, image_path)
+        ):
+            raise ValueError(
+                f"SKU mismatch between task_id={task_id!r} and "
+                f"image_path={image_path!r} — refusing dispatch to avoid "
+                f"cross-SKU generation"
+            )
 
         # Filter unhealthy providers
         active_providers = providers.copy()

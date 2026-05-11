@@ -68,6 +68,18 @@ class TrellisAgentError(RuntimeError):
     """Raised when the TRELLIS.2 environment is missing or the run fails."""
 
 
+class TrellisTimeoutError(TrellisAgentError):
+    """Raised when the TRELLIS.2 subprocess exceeds its time budget.
+
+    Distinct from ``TrellisAgentError`` so callers (specifically the
+    round-table circuit breaker) can treat timeouts as a "retry once
+    cold" signal — TRELLIS first-runs are slow because pipeline weights
+    load lazily, but subsequent runs are fast. A permanent crash should
+    keep marking the provider unhealthy; a single cold timeout should
+    not.
+    """
+
+
 class TrellisAgent:
     """Local TRELLIS.2 image-to-3D wrapper.
 
@@ -259,7 +271,7 @@ class TrellisAgent:
         except subprocess.TimeoutExpired as exc:
             stderr = (exc.stderr or "") if isinstance(exc.stderr, str) else ""
             stdout = (exc.stdout or "") if isinstance(exc.stdout, str) else ""
-            raise TrellisAgentError(
+            raise TrellisTimeoutError(
                 f"trellis subprocess timed out after {self.timeout_seconds}s: {stderr[-2000:]}"
             ) from exc
         except FileNotFoundError as exc:
@@ -364,5 +376,6 @@ except Exception:
 __all__ = [
     "TrellisAgent",
     "TrellisAgentError",
+    "TrellisTimeoutError",
     "TrellisRunResult",
 ]
