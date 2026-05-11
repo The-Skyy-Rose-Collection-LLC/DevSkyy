@@ -4,6 +4,7 @@ import { roundTable } from './endpoints/round-table';
 import { pipeline3d } from './endpoints/pipeline';
 import { assets } from './endpoints/assets';
 import { agents } from './endpoints/agents';
+import { monitoring } from './endpoints/monitoring';
 import { qa } from './endpoints/qa';
 import { batch } from './endpoints/batch';
 import { health } from './endpoints/health';
@@ -21,6 +22,7 @@ export const api = {
     pipeline3d,
     assets,
     agents,
+    monitoring,
     qa,
     batch,
     health,

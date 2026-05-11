@@ -245,3 +245,37 @@ export const TaskSchema = z.object({
     createdAt: z.string(),
     metrics: TaskMetricsSchema,
 });
+
+// Monitoring Schemas
+export const ServiceHealthStatusSchema = z.object({
+    name: z.string(),
+    status: z.enum(['healthy', 'degraded', 'down']),
+    uptime_pct: z.number(),
+    response_ms: z.number().nullable().optional(),
+    last_check: z.string(),
+    circuit_breaker: z.enum(['closed', 'half-open', 'open']),
+});
+
+export const SystemStatsSchema = z.object({
+    cpu_pct: z.number(),
+    memory_pct: z.number(),
+    disk_pct: z.number(),
+    req_per_min: z.number(),
+    success_rate: z.number(),
+    avg_latency_ms: z.number(),
+});
+
+export const HealthEventSchema = z.object({
+    id: z.string(),
+    timestamp: z.string(),
+    type: z.enum(['success', 'warning', 'error']),
+    service: z.string(),
+    message: z.string(),
+});
+
+export const MonitoringHealthResponseSchema = z.object({
+    timestamp: z.string(),
+    services: z.array(ServiceHealthStatusSchema),
+    system: SystemStatsSchema,
+    events: z.array(HealthEventSchema),
+});

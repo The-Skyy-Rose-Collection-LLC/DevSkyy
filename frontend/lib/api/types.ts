@@ -22,6 +22,10 @@ export type Task = z.infer<typeof schemas.TaskSchema>;
 export type TaskMetrics = z.infer<typeof schemas.TaskMetricsSchema>;
 export type AgentInfo = z.infer<typeof schemas.AgentInfoSchema>;
 export type AgentListResponse = z.infer<typeof schemas.AgentListResponseSchema>;
+export type ServiceHealthStatus = z.infer<typeof schemas.ServiceHealthStatusSchema>;
+export type SystemStats = z.infer<typeof schemas.SystemStatsSchema>;
+export type HealthEvent = z.infer<typeof schemas.HealthEventSchema>;
+export type MonitoringHealthResponse = z.infer<typeof schemas.MonitoringHealthResponseSchema>;
 
 
 

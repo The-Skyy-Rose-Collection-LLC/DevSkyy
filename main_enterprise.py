@@ -142,10 +142,13 @@ async def correlation_id_middleware(request: Request, call_next):
 async def timing_middleware(request: Request, call_next):
     import time
 
+    from api.v1.monitoring import track_request
+
     start = time.time()
     response = await call_next(request)
     ms = (time.time() - start) * 1000
     response.headers["X-Response-Time"] = f"{ms:.2f}ms"
+    track_request(ms, response.status_code < 400)
     return response
 
 

@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,146 +10,72 @@ import {
   CheckCircle2,
   Clock,
   TrendingUp,
-  TrendingDown,
   Zap,
-  Database,
-  Globe,
-  Server,
   RefreshCw,
+  Cpu,
+  HardDrive,
+  MemoryStick,
 } from 'lucide-react';
+import { useMonitoring } from '@/hooks/useMonitoring';
+import type { ServiceHealthStatus, HealthEvent } from '@/lib/api/types';
 
-interface ServiceHealth {
-  name: string;
-  status: 'healthy' | 'degraded' | 'down';
-  uptime: number;
-  lastCheck: Date;
-  responseTime: number;
+function formatTimestamp(iso: string): string {
+  const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return new Date(iso).toLocaleDateString();
 }
 
-interface CircuitBreakerStatus {
-  service: string;
-  state: 'closed' | 'open' | 'half-open';
-  failures: number;
-  lastFailure: Date | null;
+function ServiceStatusIcon({ status }: { status: ServiceHealthStatus['status'] }) {
+  if (status === 'healthy') return <CheckCircle2 className="h-5 w-5 text-green-400" />;
+  if (status === 'degraded') return <AlertCircle className="h-5 w-5 text-yellow-400" />;
+  return <AlertCircle className="h-5 w-5 text-red-400" />;
 }
 
-interface ActivityLog {
-  id: string;
-  timestamp: Date;
-  type: 'success' | 'warning' | 'error';
-  service: string;
-  message: string;
+function ServiceStatusBadge({ status }: { status: ServiceHealthStatus['status'] }) {
+  const cls = {
+    healthy: 'bg-green-500/10 text-green-400 border-green-500/30',
+    degraded: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
+    down: 'bg-red-500/10 text-red-400 border-red-500/30',
+  }[status];
+  return <Badge className={`${cls} border`}>{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>;
+}
+
+function CircuitBreakerBadge({ state }: { state: ServiceHealthStatus['circuit_breaker'] }) {
+  const cls = {
+    closed: 'bg-green-500/10 text-green-400 border-green-500/30',
+    'half-open': 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
+    open: 'bg-red-500/10 text-red-400 border-red-500/30',
+  }[state];
+  const label =
+    state === 'closed' ? 'Closed (Normal)' : state === 'half-open' ? 'Half-Open (Testing)' : 'Open (Failed)';
+  return <Badge className={`${cls} border`}>{label}</Badge>;
+}
+
+function ActivityIcon({ type }: { type: HealthEvent['type'] }) {
+  if (type === 'success') return <CheckCircle2 className="h-4 w-4 text-green-400" />;
+  if (type === 'warning') return <AlertCircle className="h-4 w-4 text-yellow-400" />;
+  return <AlertCircle className="h-4 w-4 text-red-400" />;
+}
+
+function ServiceCardSkeleton() {
+  return (
+    <Card className="bg-gray-900 border-gray-800 animate-pulse">
+      <CardContent className="pt-6">
+        <div className="h-5 w-32 bg-gray-700 rounded mb-4" />
+        <div className="space-y-2">
+          <div className="h-4 w-full bg-gray-800 rounded" />
+          <div className="h-4 w-3/4 bg-gray-800 rounded" />
+          <div className="h-4 w-1/2 bg-gray-800 rounded" />
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function MonitoringPage() {
-  // Initialize with empty arrays — populated client-side to avoid new Date() during prerender
-  const [services, setServices] = useState<ServiceHealth[]>([]);
-  const [circuitBreakers, setCircuitBreakers] = useState<CircuitBreakerStatus[]>([]);
-  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  useEffect(() => {
-    const now = new Date();
-    setServices([
-      { name: 'WordPress API', status: 'healthy', uptime: 99.98, lastCheck: now, responseTime: 145 },
-      { name: 'Vercel API', status: 'healthy', uptime: 100, lastCheck: now, responseTime: 89 },
-      { name: 'Round Table', status: 'healthy', uptime: 99.95, lastCheck: now, responseTime: 234 },
-      { name: 'Database', status: 'healthy', uptime: 100, lastCheck: now, responseTime: 12 },
-    ]);
-    setCircuitBreakers([
-      { service: 'WordPress Sync', state: 'closed', failures: 0, lastFailure: null },
-      { service: 'Vercel Deployment', state: 'closed', failures: 0, lastFailure: null },
-      { service: 'Round Table Competition', state: 'closed', failures: 0, lastFailure: null },
-    ]);
-    setActivityLogs([
-      { id: '1', timestamp: new Date(Date.now() - 120000), type: 'success', service: 'WordPress', message: 'Post published successfully (ID: 1234)' },
-      { id: '2', timestamp: new Date(Date.now() - 300000), type: 'success', service: 'Vercel', message: 'Deployment completed: https://devskyy.vercel.app' },
-      { id: '3', timestamp: new Date(Date.now() - 480000), type: 'success', service: 'Round Table', message: 'Competition completed - Winner: Anthropic Claude' },
-    ]);
-  }, []);
-
-  const refreshMetrics = async () => {
-    setIsRefreshing(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Update last check times
-    setServices((prev) =>
-      prev.map((service) => ({
-        ...service,
-        lastCheck: new Date(),
-        responseTime: Math.floor(Math.random() * 300) + 10,
-      }))
-    );
-
-    setIsRefreshing(false);
-  };
-
-  const getStatusIcon = (status: ServiceHealth['status']) => {
-    switch (status) {
-      case 'healthy':
-        return <CheckCircle2 className="h-5 w-5 text-green-400" />;
-      case 'degraded':
-        return <AlertCircle className="h-5 w-5 text-yellow-400" />;
-      case 'down':
-        return <AlertCircle className="h-5 w-5 text-red-400" />;
-    }
-  };
-
-  const getStatusBadge = (status: ServiceHealth['status']) => {
-    const variants = {
-      healthy: 'bg-green-500/10 text-green-400 border-green-500/30',
-      degraded: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
-      down: 'bg-red-500/10 text-red-400 border-red-500/30',
-    };
-
-    return (
-      <Badge className={`${variants[status]} border`}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </Badge>
-    );
-  };
-
-  const getCircuitBreakerBadge = (state: CircuitBreakerStatus['state']) => {
-    const variants = {
-      closed: 'bg-green-500/10 text-green-400 border-green-500/30',
-      'half-open': 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
-      open: 'bg-red-500/10 text-red-400 border-red-500/30',
-    };
-
-    return (
-      <Badge className={`${variants[state]} border`}>
-        {state === 'closed' ? 'Closed (Normal)' : state === 'half-open' ? 'Half-Open (Testing)' : 'Open (Failed)'}
-      </Badge>
-    );
-  };
-
-  const getActivityIcon = (type: ActivityLog['type']) => {
-    switch (type) {
-      case 'success':
-        return <CheckCircle2 className="h-4 w-4 text-green-400" />;
-      case 'warning':
-        return <AlertCircle className="h-4 w-4 text-yellow-400" />;
-      case 'error':
-        return <AlertCircle className="h-4 w-4 text-red-400" />;
-    }
-  };
-
-  const formatTimestamp = (date: Date) => {
-    const now = new Date();
-    const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (diff < 60) return `${diff}s ago`;
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-    return date.toLocaleDateString();
-  };
-
-  useEffect(() => {
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(refreshMetrics, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  const { data, loading, error, refresh } = useMonitoring();
 
   return (
     <div className="container mx-auto py-8 space-y-8">
@@ -165,55 +90,64 @@ export default function MonitoringPage() {
             <p className="text-gray-400">Real-time health and performance metrics</p>
           </div>
           <Button
-            onClick={refreshMetrics}
-            disabled={isRefreshing}
+            onClick={refresh}
+            disabled={loading}
             variant="outline"
             className="border-gray-700"
           >
-            <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            {loading ? 'Refreshing...' : 'Refresh'}
           </Button>
         </div>
 
-        {/* Service Health Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {services.map((service, index) => (
-            <motion.div
-              key={service.name}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <Card className="bg-gray-900 border-gray-800">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      {getStatusIcon(service.status)}
-                      <h3 className="font-semibold">{service.name}</h3>
-                    </div>
-                    {getStatusBadge(service.status)}
-                  </div>
+        {error && (
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+            {error}
+          </div>
+        )}
 
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Uptime</span>
-                      <span className="font-semibold">{service.uptime}%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Response Time</span>
-                      <span className="font-semibold">{service.responseTime}ms</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Last Check</span>
-                      <span className="text-xs text-gray-500">
-                        {formatTimestamp(service.lastCheck)}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+        {/* Service Health Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {loading && !data
+            ? Array.from({ length: 4 }).map((_, i) => <ServiceCardSkeleton key={i} />)
+            : (data?.services ?? []).map((service, index) => (
+                <motion.div
+                  key={service.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Card className="bg-gray-900 border-gray-800">
+                    <CardContent className="pt-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <ServiceStatusIcon status={service.status} />
+                          <h3 className="font-semibold">{service.name}</h3>
+                        </div>
+                        <ServiceStatusBadge status={service.status} />
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Uptime</span>
+                          <span className="font-semibold">{service.uptime_pct}%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Response Time</span>
+                          <span className="font-semibold">
+                            {service.response_ms != null ? `${service.response_ms}ms` : '—'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Last Check</span>
+                          <span className="text-xs text-gray-500">
+                            {formatTimestamp(service.last_check)}
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -228,21 +162,21 @@ export default function MonitoringPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {circuitBreakers.map((breaker) => (
+                {(data?.services ?? []).map((svc) => (
                   <div
-                    key={breaker.service}
+                    key={svc.name}
                     className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg"
                   >
                     <div>
-                      <p className="font-semibold mb-1">{breaker.service}</p>
-                      <p className="text-sm text-gray-400">
-                        {breaker.failures} failures
-                        {breaker.lastFailure && ` · Last: ${formatTimestamp(breaker.lastFailure)}`}
-                      </p>
+                      <p className="font-semibold mb-1">{svc.name}</p>
+                      <p className="text-sm text-gray-400">{svc.uptime_pct}% uptime</p>
                     </div>
-                    {getCircuitBreakerBadge(breaker.state)}
+                    <CircuitBreakerBadge state={svc.circuit_breaker} />
                   </div>
                 ))}
+                {!loading && !data && (
+                  <p className="text-sm text-gray-500 text-center py-4">No data</p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -263,10 +197,12 @@ export default function MonitoringPage() {
                     <TrendingUp className="h-5 w-5 text-green-400" />
                     <div>
                       <p className="font-semibold">API Requests/min</p>
-                      <p className="text-sm text-gray-400">Last 5 minutes</p>
+                      <p className="text-sm text-gray-400">Last 60 seconds</p>
                     </div>
                   </div>
-                  <span className="text-2xl font-bold">142</span>
+                  <span className="text-2xl font-bold">
+                    {data ? data.system.req_per_min : '—'}
+                  </span>
                 </div>
 
                 <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg">
@@ -274,10 +210,12 @@ export default function MonitoringPage() {
                     <CheckCircle2 className="h-5 w-5 text-green-400" />
                     <div>
                       <p className="font-semibold">Success Rate</p>
-                      <p className="text-sm text-gray-400">Last hour</p>
+                      <p className="text-sm text-gray-400">Last 60 seconds</p>
                     </div>
                   </div>
-                  <span className="text-2xl font-bold">99.8%</span>
+                  <span className="text-2xl font-bold">
+                    {data ? `${data.system.success_rate}%` : '—'}
+                  </span>
                 </div>
 
                 <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg">
@@ -285,10 +223,30 @@ export default function MonitoringPage() {
                     <Clock className="h-5 w-5 text-blue-400" />
                     <div>
                       <p className="font-semibold">Avg Response Time</p>
-                      <p className="text-sm text-gray-400">Last hour</p>
+                      <p className="text-sm text-gray-400">Last 60 seconds</p>
                     </div>
                   </div>
-                  <span className="text-2xl font-bold">156ms</span>
+                  <span className="text-2xl font-bold">
+                    {data ? `${data.system.avg_latency_ms}ms` : '—'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 pt-2">
+                  <div className="p-3 bg-gray-800/50 rounded-lg text-center">
+                    <Cpu className="h-4 w-4 text-rose-400 mx-auto mb-1" />
+                    <p className="text-xs text-gray-400">CPU</p>
+                    <p className="font-semibold text-sm">{data ? `${data.system.cpu_pct}%` : '—'}</p>
+                  </div>
+                  <div className="p-3 bg-gray-800/50 rounded-lg text-center">
+                    <MemoryStick className="h-4 w-4 text-rose-400 mx-auto mb-1" />
+                    <p className="text-xs text-gray-400">Memory</p>
+                    <p className="font-semibold text-sm">{data ? `${data.system.memory_pct}%` : '—'}</p>
+                  </div>
+                  <div className="p-3 bg-gray-800/50 rounded-lg text-center">
+                    <HardDrive className="h-4 w-4 text-rose-400 mx-auto mb-1" />
+                    <p className="text-xs text-gray-400">Disk</p>
+                    <p className="font-semibold text-sm">{data ? `${data.system.disk_pct}%` : '—'}</p>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -302,27 +260,32 @@ export default function MonitoringPage() {
               <Activity className="h-5 w-5 text-rose-400" />
               Recent Activity
             </CardTitle>
-            <CardDescription>Latest system events and operations</CardDescription>
+            <CardDescription>Latest health check events</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {activityLogs.map((log) => (
+              {(data?.events ?? []).map((event) => (
                 <div
-                  key={log.id}
+                  key={event.id}
                   className="flex items-start gap-3 p-4 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition-colors"
                 >
-                  {getActivityIcon(log.type)}
+                  <ActivityIcon type={event.type} />
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
-                      <p className="font-semibold">{log.service}</p>
+                      <p className="font-semibold">{event.service}</p>
                       <span className="text-xs text-gray-500">
-                        {formatTimestamp(log.timestamp)}
+                        {formatTimestamp(event.timestamp)}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-400">{log.message}</p>
+                    <p className="text-sm text-gray-400">{event.message}</p>
                   </div>
                 </div>
               ))}
+              {!loading && (data?.events ?? []).length === 0 && (
+                <p className="text-sm text-gray-500 text-center py-4">
+                  No events yet — check back after first health poll
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
