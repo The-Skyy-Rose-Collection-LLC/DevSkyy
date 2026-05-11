@@ -251,7 +251,9 @@ defined( 'ABSPATH' ) || exit;
 <?php get_template_part( 'template-parts/size-guide-modal' ); ?>
 <?php get_template_part( 'template-parts/cookie-consent' ); ?>
 <?php get_template_part( 'template-parts/mobile-bottom-nav' ); ?>
-<?php get_template_part( 'template-parts/skyy-mascot' ); ?>
+<?php // Skyy mascot disabled — re-enable when character art is finalized. ?>
+<?php // phpcs:ignore Squiz.PHP.CommentedOutCode.Found -- intentional suspension, not dead code. ?>
+<?php // get_template_part( 'template-parts/skyy-mascot' ); ?>
 
 <!-- Toast Notification Container -->
 <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>

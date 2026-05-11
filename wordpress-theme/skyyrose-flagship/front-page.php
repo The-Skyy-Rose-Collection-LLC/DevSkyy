@@ -431,6 +431,7 @@ get_template_part(
 				<li><a href="<?php echo esc_url( home_url( '/collection-black-rose/' ) ); ?>"><?php esc_html_e( 'Black Rose', 'skyyrose' ); ?></a></li>
 				<li><a href="<?php echo esc_url( home_url( '/collection-love-hurts/' ) ); ?>"><?php esc_html_e( 'Love Hurts', 'skyyrose' ); ?></a></li>
 				<li><a href="<?php echo esc_url( home_url( '/collection-signature/' ) ); ?>"><?php esc_html_e( 'Signature', 'skyyrose' ); ?></a></li>
+				<li><a href="<?php echo esc_url( home_url( '/collection-kids-capsule/' ) ); ?>"><?php esc_html_e( 'Kids Capsule', 'skyyrose' ); ?></a></li>
 			</ul>
 		</div>
 		<div>
@@ -518,7 +519,8 @@ if ( file_exists( $homepage_js_path ) ) :
 // toast container render on the homepage too.
 get_template_part( 'template-parts/size-guide-modal' );
 get_template_part( 'template-parts/cookie-consent' );
-get_template_part( 'template-parts/skyy-mascot' );
+// Skyy mascot disabled — re-enable when character art is finalized.
+// get_template_part( 'template-parts/skyy-mascot' );
 get_template_part( 'template-parts/mobile-bottom-nav' );
 ?>
 

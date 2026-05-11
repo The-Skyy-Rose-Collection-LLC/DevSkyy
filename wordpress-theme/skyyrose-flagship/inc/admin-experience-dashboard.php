@@ -40,39 +40,39 @@ $period          = intval( $summary['period'] ?? 30 );
 		<div class="see-dashboard__title-row">
 			<h1 class="see-dashboard__title">
 				<span class="see-dashboard__title-icon" aria-hidden="true">✦</span>
-				<?php esc_html_e( 'Experience Engine', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Experience Engine', 'skyyrose' ); ?>
 			</h1>
 			<span class="see-dashboard__version">v1.0 · Phase 5</span>
 		</div>
 		<p class="see-dashboard__desc">
-			<?php esc_html_e( 'Real-time UX orchestration for SkyyRose digital properties.', 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( 'Real-time UX orchestration for SkyyRose digital properties.', 'skyyrose' ); ?>
 		</p>
 	</div>
 
 	<!-- ===== Analytics Summary ===== -->
 	<div class="see-dashboard__section">
 		<h2 class="see-dashboard__section-title">
-			<?php esc_html_e( 'Analytics', 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( 'Analytics', 'skyyrose' ); ?>
 			<span class="see-dashboard__period">
-				<?php printf( esc_html__( 'Last %d days', 'skyyrose-flagship' ), $period ); ?>
+				<?php printf( esc_html__( 'Last %d days', 'skyyrose' ), absint( $period ) ); ?>
 			</span>
 		</h2>
 
 		<div class="see-dashboard__stats-grid">
 			<div class="see-dashboard__stat">
 				<span class="see-dashboard__stat-value"><?php echo esc_html( number_format_i18n( $total_events ) ); ?></span>
-				<span class="see-dashboard__stat-label"><?php esc_html_e( 'Total Events', 'skyyrose-flagship' ); ?></span>
+				<span class="see-dashboard__stat-label"><?php esc_html_e( 'Total Events', 'skyyrose' ); ?></span>
 			</div>
 			<div class="see-dashboard__stat">
 				<span class="see-dashboard__stat-value"><?php echo esc_html( number_format_i18n( $unique_visitors ) ); ?></span>
-				<span class="see-dashboard__stat-label"><?php esc_html_e( 'Unique Visitors', 'skyyrose-flagship' ); ?></span>
+				<span class="see-dashboard__stat-label"><?php esc_html_e( 'Unique Visitors', 'skyyrose' ); ?></span>
 			</div>
 			<?php if ( ! empty( $top_collections ) ) : ?>
 			<div class="see-dashboard__stat">
 				<span class="see-dashboard__stat-value">
 					<?php echo esc_html( strtoupper( str_replace( '-', ' ', array_key_first( $top_collections ) ?? '' ) ) ); ?>
 				</span>
-				<span class="see-dashboard__stat-label"><?php esc_html_e( 'Top Collection', 'skyyrose-flagship' ); ?></span>
+				<span class="see-dashboard__stat-label"><?php esc_html_e( 'Top Collection', 'skyyrose' ); ?></span>
 			</div>
 			<?php endif; ?>
 		</div>
@@ -83,7 +83,7 @@ $period          = intval( $summary['period'] ?? 30 );
 			$max = max( array_values( $top_collections ) ) ?: 1;
 			foreach ( $top_collections as $slug => $count ) :
 				$pct = round( ( $count / $max ) * 100 );
-			?>
+				?>
 			<div class="see-dashboard__bar-row">
 				<span class="see-dashboard__bar-label">
 					<?php echo esc_html( strtoupper( str_replace( '-', ' ', $slug ) ) ); ?>
@@ -101,37 +101,44 @@ $period          = intval( $summary['period'] ?? 30 );
 	<!-- ===== Module Controls ===== -->
 	<div class="see-dashboard__section">
 		<h2 class="see-dashboard__section-title">
-			<?php esc_html_e( 'Modules', 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( 'Modules', 'skyyrose' ); ?>
 		</h2>
 		<p class="see-dashboard__section-desc">
-			<?php esc_html_e( 'Toggle modules without a code deploy. Changes take effect immediately.', 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( 'Toggle modules without a code deploy. Changes take effect immediately.', 'skyyrose' ); ?>
 		</p>
 
 		<div class="see-dashboard__modules" id="see-modules">
-			<?php foreach ( $modules as $slug => $config ) :
+			<?php
+			foreach ( $modules as $slug => $config ) :
 				$is_active = function_exists( 'skyyrose_see_is_module_active' )
 					? skyyrose_see_is_module_active( $slug )
 					: (bool) ( $config['default'] ?? false );
-			?>
+				?>
 			<div class="see-dashboard__module" data-module="<?php echo esc_attr( $slug ); ?>">
 				<div class="see-dashboard__module-info">
 					<span class="see-dashboard__module-name">
 						<?php echo esc_html( $config['label'] ?? $slug ); ?>
 					</span>
 					<span class="see-dashboard__module-priority">
-						<?php printf( esc_html__( 'Priority %d', 'skyyrose-flagship' ), (int) ( $config['priority'] ?? 0 ) ); ?>
+						<?php printf( esc_html__( 'Priority %d', 'skyyrose' ), (int) ( $config['priority'] ?? 0 ) ); ?>
 					</span>
 				</div>
 				<button
 					class="see-dashboard__toggle <?php echo $is_active ? 'see-dashboard__toggle--on' : ''; ?>"
 					type="button"
 					aria-pressed="<?php echo $is_active ? 'true' : 'false'; ?>"
-					aria-label="<?php echo esc_attr( sprintf(
-						$is_active
-							? __( 'Disable %s', 'skyyrose-flagship' )
-							: __( 'Enable %s', 'skyyrose-flagship' ),
-						$config['label'] ?? $slug
-					) ); ?>"
+					aria-label="
+					<?php
+					echo esc_attr(
+						sprintf(
+							$is_active
+							? __( 'Disable %s', 'skyyrose' )
+							: __( 'Enable %s', 'skyyrose' ),
+							$config['label'] ?? $slug
+						)
+					);
+					?>
+					"
 					data-module-slug="<?php echo esc_attr( $slug ); ?>"
 					data-active="<?php echo $is_active ? '1' : '0'; ?>">
 					<span class="see-dashboard__toggle-knob"></span>
@@ -146,10 +153,10 @@ $period          = intval( $summary['period'] ?? 30 );
 	<!-- ===== Design Narrative Directives ===== -->
 	<div class="see-dashboard__section">
 		<h2 class="see-dashboard__section-title">
-			<?php esc_html_e( 'Design Narratives', 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( 'Design Narratives', 'skyyrose' ); ?>
 		</h2>
 		<p class="see-dashboard__section-desc">
-			<?php esc_html_e( 'Active directives shape the Experience Engine\'s UX decisions.', 'skyyrose-flagship' ); ?>
+			<?php esc_html_e( 'Active directives shape the Experience Engine\'s UX decisions.', 'skyyrose' ); ?>
 		</p>
 
 		<?php if ( ! empty( $directives ) ) : ?>
@@ -162,49 +169,49 @@ $period          = intval( $summary['period'] ?? 30 );
 				<span class="see-dashboard__directive-desc">
 					<?php echo esc_html( $d['description'] ?? '' ); ?>
 				</span>
-				<span class="see-dashboard__directive-priority" title="<?php esc_attr_e( 'Priority', 'skyyrose-flagship' ); ?>">
+				<span class="see-dashboard__directive-priority" title="<?php esc_attr_e( 'Priority', 'skyyrose' ); ?>">
 					<?php echo esc_html( $d['priority'] ?? 5 ); ?>
 				</span>
 			</li>
 			<?php endforeach; ?>
 		</ul>
 		<?php else : ?>
-		<p class="see-dashboard__empty"><?php esc_html_e( 'No active directives.', 'skyyrose-flagship' ); ?></p>
+		<p class="see-dashboard__empty"><?php esc_html_e( 'No active directives.', 'skyyrose' ); ?></p>
 		<?php endif; ?>
 
 		<form class="see-dashboard__narrative-form" id="see-narrative-form" novalidate>
 			<h3 class="see-dashboard__subsection-title">
-				<?php esc_html_e( 'Add Directive', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Add Directive', 'skyyrose' ); ?>
 			</h3>
 			<div class="see-dashboard__form-row">
 				<label for="see-narrative-desc" class="see-dashboard__label">
-					<?php esc_html_e( 'Description', 'skyyrose-flagship' ); ?>
+					<?php esc_html_e( 'Description', 'skyyrose' ); ?>
 				</label>
 				<input
 					type="text"
 					id="see-narrative-desc"
 					name="description"
 					class="see-dashboard__input"
-					placeholder="<?php esc_attr_e( 'e.g. Emphasise scarcity on Black Rose pre-orders', 'skyyrose-flagship' ); ?>"
+					placeholder="<?php esc_attr_e( 'e.g. Emphasise scarcity on Black Rose pre-orders', 'skyyrose' ); ?>"
 					required
 					maxlength="280">
 			</div>
 			<div class="see-dashboard__form-row see-dashboard__form-row--inline">
 				<div>
 					<label for="see-narrative-target" class="see-dashboard__label">
-						<?php esc_html_e( 'Target', 'skyyrose-flagship' ); ?>
+						<?php esc_html_e( 'Target', 'skyyrose' ); ?>
 					</label>
 					<select id="see-narrative-target" name="target" class="see-dashboard__select">
-						<option value="global"><?php esc_html_e( 'Global', 'skyyrose-flagship' ); ?></option>
-						<option value="black-rose"><?php esc_html_e( 'Black Rose', 'skyyrose-flagship' ); ?></option>
-						<option value="love-hurts"><?php esc_html_e( 'Love Hurts', 'skyyrose-flagship' ); ?></option>
-						<option value="signature"><?php esc_html_e( 'Signature', 'skyyrose-flagship' ); ?></option>
-						<option value="kids-capsule"><?php esc_html_e( 'Kids Capsule', 'skyyrose-flagship' ); ?></option>
+						<option value="global"><?php esc_html_e( 'Global', 'skyyrose' ); ?></option>
+						<option value="black-rose"><?php esc_html_e( 'Black Rose', 'skyyrose' ); ?></option>
+						<option value="love-hurts"><?php esc_html_e( 'Love Hurts', 'skyyrose' ); ?></option>
+						<option value="signature"><?php esc_html_e( 'Signature', 'skyyrose' ); ?></option>
+						<option value="kids-capsule"><?php esc_html_e( 'Kids Capsule', 'skyyrose' ); ?></option>
 					</select>
 				</div>
 				<div>
 					<label for="see-narrative-priority" class="see-dashboard__label">
-						<?php esc_html_e( 'Priority (1–10)', 'skyyrose-flagship' ); ?>
+						<?php esc_html_e( 'Priority (1–10)', 'skyyrose' ); ?>
 					</label>
 					<input
 						type="number"
@@ -215,7 +222,7 @@ $period          = intval( $summary['period'] ?? 30 );
 				</div>
 			</div>
 			<button type="submit" class="see-dashboard__submit" id="see-narrative-submit">
-				<?php esc_html_e( 'Add Directive', 'skyyrose-flagship' ); ?>
+				<?php esc_html_e( 'Add Directive', 'skyyrose' ); ?>
 			</button>
 			<p class="see-dashboard__save-status" id="see-narrative-status" aria-live="polite"></p>
 		</form>

@@ -56,7 +56,6 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 ?>
 
 <div class="col-page" data-collection="<?php echo esc_attr( $slug ); ?>">
-	<div class="col-floating" aria-hidden="true"></div>
 
 	<!-- ════ Hero ════ -->
 	<section class="col-hero ambient-glow" data-scroll-fade>
@@ -88,58 +87,7 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		<div class="col-hero__scroll" aria-hidden="true"><span><?php echo esc_html( $c['hero_scroll_text'] ); ?></span><span>&#x2193;</span></div>
 	</section>
 
-	<!-- ════ Marquee ════ -->
-	<div class="col-marquee" aria-hidden="true">
-		<div class="col-marquee__track">
-			<?php for ( $i = 0; $i < 8; $i++ ) : ?>
-				<span><?php echo esc_html( $c['marquee'][0] ); ?></span>
-				<span><?php echo wp_kses( $c['marquee_icon'], $svg_kses ); ?></span>
-				<span><?php echo esc_html( $c['marquee'][1] ); ?></span>
-				<span><?php echo wp_kses( $c['marquee_icon'], $svg_kses ); ?></span>
-			<?php endfor; ?>
-		</div>
-	</div>
-
-	<!-- ════ Story ════ -->
-	<section class="col-story rv-clip-up">
-		<div class="col-story__grid">
-			<div class="col-story__content">
-				<span class="col-story__label"><?php echo esc_html( $c['story_label'] ); ?></span>
-				<h2 class="col-story__title"><?php echo esc_html( $c['story_title'] ); ?></h2>
-				<p class="col-story__text"><?php echo esc_html( $c['story_text_1'] ); ?></p>
-				<blockquote class="col-story__quote"><?php echo esc_html( $c['story_quote'] ); ?></blockquote>
-				<p class="col-story__text"><?php echo esc_html( $c['story_text_2'] ); ?></p>
-			</div>
-			<div class="col-story__visual">
-				<span class="col-story__visual-text"><?php echo esc_html( $c['story_visual_text'] ); ?></span>
-				<span class="col-story__visual-label"><?php echo esc_html( $c['story_visual_label'] ); ?></span>
-			</div>
-		</div>
-	</section>
-
-	<!-- ════ Divider + Quote ════ -->
-	<div class="col-divider" aria-hidden="true"><span class="col-divider__icon"><?php echo wp_kses( $c['divider_icon'], $svg_kses ); ?></span></div>
-	<div class="col-quote-block rv-blur">
-		<blockquote class="col-quote-block__text"><?php echo esc_html( $c['quote_text'] ); ?></blockquote>
-		<cite class="col-quote-block__cite">&mdash; <?php echo esc_html( $c['quote_cite'] ); ?></cite>
-	</div>
-
-	<!-- ════ Feature Cards ════ -->
-	<section class="col-features rv-clip-left">
-		<h2 class="col-features__heading"><?php echo esc_html( $c['features_heading'] ); ?></h2>
-		<p class="col-features__subheading"><?php echo esc_html( $c['features_subheading'] ); ?></p>
-		<div class="col-features__grid stagger-grid">
-			<?php foreach ( $c['features'] as $feat ) : ?>
-				<div class="col-features__card">
-					<div class="col-features__icon" aria-hidden="true"><?php echo wp_kses( $feat['icon'], $svg_kses ); ?></div>
-					<h3><?php echo esc_html( $feat['title'] ); ?></h3>
-					<p><?php echo esc_html( $feat['text'] ); ?></p>
-				</div>
-			<?php endforeach; ?>
-		</div>
-	</section>
-
-	<!-- ════ Product Grid ════ -->
+	<!-- ════ Product Grid (immediately after hero) ════ -->
 	<?php
 	// Build subheading: kids-capsule uses a dynamic piece count, others
 	// use the static copy from skyyrose_get_collection_content().
@@ -168,6 +116,18 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		)
 	);
 	?>
+
+	<!-- ════ Story (condensed — after products) ════ -->
+	<section class="col-story rv-clip-up">
+		<div class="col-story__grid">
+			<div class="col-story__content">
+				<span class="col-story__label"><?php echo esc_html( $c['story_label'] ); ?></span>
+				<h2 class="col-story__title"><?php echo esc_html( $c['story_title'] ); ?></h2>
+				<p class="col-story__text"><?php echo esc_html( $c['story_text_1'] ); ?></p>
+				<blockquote class="col-story__quote"><?php echo esc_html( $c['story_quote'] ); ?></blockquote>
+			</div>
+		</div>
+	</section>
 
 	<!-- ════ CTA ════ -->
 	<section class="col-cta rv-blur">

@@ -1,0 +1,116 @@
+<?php
+/**
+ * Lightweight WordPress function stubs for PHPUnit.
+ *
+ * No external packages required. Replaces WP_Mock for pure-PHP modules
+ * that have no database or HTTP dependencies.
+ *
+ * @package SkyyRose
+ */
+
+// Constants.
+defined( 'HOUR_IN_SECONDS' ) || define( 'HOUR_IN_SECONDS', 3600 );
+
+// ---------------------------------------------------------------------------
+// Sanitization
+// ---------------------------------------------------------------------------
+
+if ( ! function_exists( 'sanitize_key' ) ) {
+	function sanitize_key( $key ) {
+		return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( trim( (string) $key ) ) );
+	}
+}
+
+if ( ! function_exists( 'sanitize_text_field' ) ) {
+	function sanitize_text_field( $str ) {
+		return trim( strip_tags( (string) $str ) );
+	}
+}
+
+if ( ! function_exists( 'sanitize_file_name' ) ) {
+	function sanitize_file_name( $filename ) {
+		$filename = (string) $filename;
+		$filename = preg_replace( '/[^a-zA-Z0-9\.\-_]/', '-', $filename );
+		return trim( $filename, '-' );
+	}
+}
+
+if ( ! function_exists( 'sanitize_title' ) ) {
+	function sanitize_title( $title ) {
+		$title = strtolower( strip_tags( (string) $title ) );
+		$title = preg_replace( '/[^a-z0-9\-]/', '-', $title );
+		$title = preg_replace( '/-+/', '-', $title );
+		return trim( $title, '-' );
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Escaping
+// ---------------------------------------------------------------------------
+
+if ( ! function_exists( 'esc_html__' ) ) {
+	function esc_html__( $text, $domain = '' ) {
+		return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
+	}
+}
+
+if ( ! function_exists( 'esc_html' ) ) {
+	function esc_html( $text ) {
+		return htmlspecialchars( (string) $text, ENT_QUOTES, 'UTF-8' );
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Translation
+// ---------------------------------------------------------------------------
+
+if ( ! function_exists( '__' ) ) {
+	function __( $text, $domain = '' ) {
+		return (string) $text;
+	}
+}
+
+if ( ! function_exists( '_e' ) ) {
+	function _e( $text, $domain = '' ) {
+		echo (string) $text;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// URL helpers
+// ---------------------------------------------------------------------------
+
+if ( ! function_exists( 'home_url' ) ) {
+	function home_url( $path = '' ) {
+		return 'https://skyyrose.co' . $path;
+	}
+}
+
+if ( ! function_exists( 'get_theme_file_path' ) ) {
+	function get_theme_file_path( $file = '' ) {
+		return SKYYROSE_DIR . '/' . ltrim( $file, '/' );
+	}
+}
+
+if ( ! function_exists( 'get_theme_file_uri' ) ) {
+	function get_theme_file_uri( $file = '' ) {
+		return 'https://theme.test/' . ltrim( $file, '/' );
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Object cache (no-op in tests — forces CSV re-parse via static $catalog)
+// ---------------------------------------------------------------------------
+
+if ( ! function_exists( 'wp_cache_get' ) ) {
+	function wp_cache_get( $key, $group = '', $force = false, &$found = null ) {
+		$found = false;
+		return false;
+	}
+}
+
+if ( ! function_exists( 'wp_cache_set' ) ) {
+	function wp_cache_set( $key, $data, $group = '', $expire = 0 ) {
+		return true;
+	}
+}

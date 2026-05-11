@@ -118,19 +118,9 @@ function skyyrose_enqueue_global_styles() {
 		}
 	}
 
-	// Commercial polish — premium presentation layer. Loaded LAST so it can
-	// refine typography rhythm, button/card polish, spacing, and focus states
-	// across every page. Backed by tokens declared in this file.
-	$polish_file = $use_min && file_exists( $base_dir . '/commercial-polish.min.css' )
-		? 'commercial-polish.min.css' : 'commercial-polish.css';
-	if ( file_exists( $base_dir . '/' . $polish_file ) ) {
-		wp_enqueue_style(
-			'skyyrose-commercial-polish',
-			$base_uri . '/' . $polish_file,
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
+	// Commercial polish is now enqueued at priority 25 via
+	// skyyrose_enqueue_commercial_polish() to guarantee it loads AFTER
+	// all template-specific stylesheets (priority 20).
 
 	// Header: navbar, search overlay, mobile menu, dropdowns.
 	$header_file = $use_min && file_exists( $base_dir . '/header.min.css' ) ? 'header.min.css' : 'header.css';
@@ -205,25 +195,17 @@ function skyyrose_enqueue_global_styles() {
 		);
 	}
 
-	// Skyy living character widget — base styles (speech bubble, chips, recall pill).
-	if ( file_exists( $base_dir . '/mascot.min.css' ) ) {
-		wp_enqueue_style(
-			'skyyrose-mascot',
-			$base_uri . '/mascot.min.css',
-			array( 'skyyrose-design-tokens' ),
-			SKYYROSE_VERSION
-		);
-	}
+	// Skyy mascot CSS disabled — character widget is not rendered until art is finalized.
+	// Re-enable mascot.min.css and skyy-walk.css when get_template_part('skyy-mascot')
+	// is restored in footer.php and front-page.php.
 
-	// Skyy Pixar-like walk cycle enhancements — layered on top of mascot.min.css.
-	if ( file_exists( $base_dir . '/skyy-walk.css' ) ) {
-		wp_enqueue_style(
-			'skyyrose-skyy-walk',
-			$base_uri . '/skyy-walk.css',
-			array( 'skyyrose-mascot' ),
-			SKYYROSE_VERSION
-		);
-	}
+	// Agency-Tier Visuals: Double-Bezel, Island buttons, macro-whitespace.
+	wp_enqueue_style(
+		'skyyrose-agency-visuals',
+		$base_uri . '/agency-tier-visuals.css',
+		array( 'skyyrose-design-tokens', 'skyyrose-components' ),
+		SKYYROSE_VERSION
+	);
 }
 
 /**
@@ -322,37 +304,9 @@ function skyyrose_enqueue_global_scripts() {
 		wp_enqueue_script( 'comment-reply' );
 	}
 
-	// Skyy living character widget JS — state machine, walk-on, speech bubbles, chips.
-	if ( file_exists( $js_dir . '/mascot.min.js' ) ) {
-		wp_enqueue_script(
-			'skyyrose-mascot',
-			$js_uri . '/mascot.min.js',
-			array(),
-			SKYYROSE_VERSION,
-			true
-		);
-	}
-
-	// Skyy 3D walking character — Three.js GLB viewer driven by mascot state events.
-	// Only enqueued when the .glb model file is present on disk.
-	$model_rel  = '/assets/models/skyy.glb';
-	$model_file = SKYYROSE_DIR . $model_rel;
-	if ( file_exists( $js_dir . '/skyy-3d.js' ) && file_exists( $model_file ) ) {
-		wp_enqueue_script(
-			'skyyrose-skyy-3d',
-			$js_uri . '/skyy-3d.js',
-			array( 'skyyrose-mascot' ),
-			SKYYROSE_VERSION,
-			true
-		);
-		wp_localize_script(
-			'skyyrose-skyy-3d',
-			'SKYY_3D_CONFIG',
-			array(
-				'modelUrl' => SKYYROSE_ASSETS_URI . $model_rel,
-			)
-		);
-	}
+	// Skyy mascot JS disabled — character widget is not rendered until art is finalized.
+	// Re-enable mascot.min.js and skyy-3d.js when get_template_part('skyy-mascot')
+	// is restored in footer.php and front-page.php.
 }
 
 /**
@@ -430,6 +384,7 @@ function skyyrose_get_current_template_slug() {
 			'template-landing-black-rose.php'      => 'landing',
 			'template-landing-love-hurts.php'      => 'landing',
 			'template-landing-signature.php'       => 'landing',
+			'template-landing-kids-capsule.php'    => 'landing',
 			'template-elementor-editorial.php'     => 'elementor-editorial',
 			'template-elementor-canvas.php'        => 'elementor-canvas',
 			'template-elementor-fullwidth.php'     => 'elementor-fullwidth',
@@ -538,6 +493,16 @@ function skyyrose_enqueue_template_styles() {
 				SKYYROSE_VERSION
 			);
 		}
+
+		// LCP: preload hero background image so the browser prioritises it in the
+		// high-priority fetch queue alongside critical CSS, improving LCP score.
+		add_action(
+			'wp_head',
+			function () {
+				echo '<link rel="preload" as="image" href="' . esc_url( SKYYROSE_ASSETS_URI . '/images/homepage-hero-bg.webp' ) . '" type="image/webp">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			},
+			2
+		);
 	}
 
 	// Unified collection page CSS — single stylesheet for all 4 collection templates.
@@ -733,7 +698,7 @@ function skyyrose_enqueue_template_scripts() {
 
 	// Holo product cards — loaded on collection pages, shop archives, and WC loop.
 	// NOTE: This must be OUTSIDE the $template_scripts check above.
-	if ( in_array( $slug, array( 'collection', 'collection-v4', 'collection-standalone', 'collections-shop', 'front-page', 'shop-archive', 'preorder-gateway', 'search', 'landing', 'elementor-editorial' ), true ) ) {
+	if ( in_array( $slug, array( 'collection', 'collection-v4', 'collection-standalone', 'collections-shop', 'front-page', 'shop-archive', 'preorder-gateway', 'search', 'landing', 'elementor-editorial', 'single-product' ), true ) ) {
 			$holo_css_file = $use_min && file_exists( $base_css_dir . '/product-card-holo.min.css' )
 				? 'product-card-holo.min.css' : 'product-card-holo.css';
 		if ( file_exists( $base_css_dir . '/' . $holo_css_file ) ) {
@@ -1146,6 +1111,34 @@ function skyyrose_enqueue_phase4_assets(): void {
 	}
 }
 
+/**
+ * Enqueue commercial polish CSS as the LAST stylesheet.
+ *
+ * Runs at priority 25 — after template-specific styles (priority 20).
+ * This ensures the commercial polish layer can refine typography, cards,
+ * collection story-world overrides, and focus states with highest specificity.
+ *
+ * @since 1.0.0
+ * @return void
+ */
+function skyyrose_enqueue_commercial_polish() {
+	$base_uri = SKYYROSE_ASSETS_URI . '/css';
+	$base_dir = SKYYROSE_DIR . '/assets/css';
+	$use_min  = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+
+	$polish_file = $use_min && file_exists( $base_dir . '/commercial-polish.min.css' )
+		? 'commercial-polish.min.css' : 'commercial-polish.css';
+
+	if ( file_exists( $base_dir . '/' . $polish_file ) ) {
+		wp_enqueue_style(
+			'skyyrose-commercial-polish',
+			$base_uri . '/' . $polish_file,
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+}
+
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_local_fonts', 5 );
 
 // Global styles (priority 10 - default).
@@ -1159,6 +1152,11 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_localize_scripts', 15 );
 
 // Template-specific styles (priority 20, after globals).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_template_styles', 20 );
+
+// Commercial polish — priority 25, AFTER all template styles (priority 20).
+// This is the topmost CSS specificity layer: typography rhythm, card polish,
+// collection story-world overrides, focus states, and section spacing.
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_commercial_polish', 25 );
 
 // Template-specific scripts (priority 20).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_template_scripts', 20 );

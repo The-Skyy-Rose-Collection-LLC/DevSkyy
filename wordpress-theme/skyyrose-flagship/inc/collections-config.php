@@ -126,7 +126,7 @@ function skyyrose_get_collections_config(): array {
 				'label'          => __( 'Kids', 'skyyrose' ),
 				'num'            => __( 'Collection 04', 'skyyrose' ),
 				'image'          => $uri . '/images/homepage-col-kids-capsule.webp',
-				'show_on_front'  => false,
+				'show_on_front'  => true,
 			),
 		),
 	);

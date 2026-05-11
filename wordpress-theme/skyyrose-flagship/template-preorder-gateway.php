@@ -75,10 +75,8 @@ get_header();
 			aria-label="<?php esc_attr_e( 'Browse collections', 'skyyrose' ); ?>">
 		<div class="showcase__grid stagger-grid">
 			<?php foreach ( $collections as $slug => $col ) : ?>
-				<div class="showcase__card showcase__card--<?php echo esc_attr( $slug ); ?> magnetic"
+				<button type="button" class="showcase__card showcase__card--<?php echo esc_attr( $slug ); ?> magnetic"
 					data-collection="<?php echo esc_attr( $slug ); ?>"
-					role="button"
-					tabindex="0"
 					aria-label="
 					<?php
 						echo esc_attr(
@@ -101,7 +99,7 @@ get_header();
 						);
 					?>
 					</span>
-				</div>
+				</button>
 			<?php endforeach; ?>
 		</div>
 	</section>

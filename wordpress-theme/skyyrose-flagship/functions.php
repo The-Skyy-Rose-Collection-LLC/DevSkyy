@@ -77,6 +77,7 @@ $skyyrose_core_includes = array(
 	'/inc/performance-guardian.php',
 	'/inc/performance.php',
 	'/inc/patterns.php',
+	'/inc/admin-experience-dashboard.php',
 );
 
 foreach ( $skyyrose_core_includes as $skyyrose_file ) {

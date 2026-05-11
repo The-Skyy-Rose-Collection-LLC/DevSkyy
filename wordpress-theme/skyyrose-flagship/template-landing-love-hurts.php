@@ -43,14 +43,15 @@ get_header();
 	?>
 
 	<?php /* ───── 2. Press Bar ───── */ ?>
-	<div class="lp-press lp-rv">
+	<div class="lp-press lp-rv" aria-label="Featured in">
 		<div class="lp__container">
-			<div class="lp-press__row">
-				<span class="lp-press__name">Maxim</span>
-				<span class="lp-press__name">CEO Weekly</span>
-				<span class="lp-press__name">SF Post</span>
-				<span class="lp-press__name">Best of Best Review</span>
-			</div>
+			<span class="lp-press__label"><?php echo esc_html( 'As Seen In' ); ?></span>
+			<ul class="lp-press__list">
+				<li><?php echo esc_html( 'Maxim' ); ?></li>
+				<li><?php echo esc_html( 'CEO Weekly' ); ?></li>
+				<li><?php echo esc_html( 'SF Post' ); ?></li>
+				<li><?php echo esc_html( 'Best of Best Review' ); ?></li>
+			</ul>
 		</div>
 	</div>
 
@@ -58,7 +59,7 @@ get_header();
 	<section class="lp-story" id="story">
 		<div class="lp__container">
 			<div class="lp-story__grid">
-				<div class="lp-story__copy lp-rv">
+				<div class="lp-story__text lp-rv">
 					<span class="lp-story__label">THE LEGACY</span>
 					<h2 class="lp-story__title"><?php echo esc_html( 'This Isn\'t a Theme. It\'s a Family Name.' ); ?></h2>
 					<p class="lp-story__text">
@@ -68,10 +69,11 @@ get_header();
 						<?php echo esc_html( 'This collection takes that pain and turns it into something you can wear. Something beautiful. Something that says: I\'ve been through it, and I\'m still here.' ); ?>
 					</p>
 					<blockquote class="lp-story__quote">
-						<?php echo esc_html( 'Every piece carries the weight of what we\'ve been through — and the strength of what we\'ve become.' ); ?>
+						<p><?php echo esc_html( 'Every piece carries the weight of what we\'ve been through — and the strength of what we\'ve become.' ); ?></p>
+						<cite><?php echo esc_html( '— Corey Foster, Founder' ); ?></cite>
 					</blockquote>
 				</div>
-				<div class="lp-story__visual lp-rv" data-delay="2">
+				<div class="lp-story__image lp-rv" data-delay="2">
 					<div class="lp-story__image" style="background: linear-gradient(135deg, #1a0a0e 0%, #2d0a14 50%, #0a0a0a 100%); aspect-ratio: 3/4; border-radius: var(--skyyrose-radius);"></div>
 				</div>
 			</div>
