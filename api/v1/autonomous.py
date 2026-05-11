@@ -85,7 +85,7 @@ def _load_history() -> None:
             data = json.loads(_HISTORY_PATH.read_text())
             for entry in data[-200:]:
                 _history.append(entry)
-        except (json.JSONDecodeError, KeyError):
+        except (json.JSONDecodeError, KeyError, TypeError, OSError, ValueError):
             logger.warning("Failed to load autonomous history — starting fresh")
 
 
