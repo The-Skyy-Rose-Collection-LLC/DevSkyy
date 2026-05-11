@@ -43,6 +43,12 @@ class EliteStudioState(TypedDict, total=False):
     enable_tryon: bool
     tryon_category: str
 
+    # --- Engine selector (P7) ---
+    # "legacy"     → GeneratorAgent (Layer 1 compositor)
+    # "adk-render" → agents.render_pipeline.agent.root_agent (Layer 2 ADK pipeline)
+    # Default "legacy" preserves existing behavior; opt-in via create_initial_state.
+    engine: str
+
     # --- Stage results (set by nodes) ---
     vision_result: SynthesizedVision | None
     generation_result: GenerationResult | None
@@ -102,8 +108,20 @@ def create_initial_state(
     enable_tryon: bool = False,
     tryon_category: str = "upper_body",
     max_retries: int = 2,
+    engine: str = "legacy",
 ) -> EliteStudioState:
-    """Create the initial state for a graph invocation."""
+    """Create the initial state for a graph invocation.
+
+    Args:
+        engine: Generation engine selector (P7).
+            "legacy"     → GeneratorAgent (Layer 1 compositor — default, preserves
+                            existing behavior).
+            "adk-render" → ADK render_pipeline root_agent (Layer 2 — 9-step
+                            SequentialAgent + LoopAgent QA-refine + 3-judge
+                            tournament). Requires google-adk in the runtime env.
+    """
+    if engine not in ("legacy", "adk-render"):
+        raise ValueError(f"unknown engine: {engine!r} (expected 'legacy' or 'adk-render')")
     return EliteStudioState(
         sku=sku,
         view=view,
@@ -111,6 +129,7 @@ def create_initial_state(
         enable_compositor=enable_compositor,
         enable_tryon=enable_tryon,
         tryon_category=tryon_category,
+        engine=engine,
         vision_result=None,
         generation_result=None,
         quality_result=None,

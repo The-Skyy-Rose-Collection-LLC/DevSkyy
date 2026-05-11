@@ -6,8 +6,6 @@ These are pure offline tests — no paid APIs, no GPU.
 
 from __future__ import annotations
 
-import asyncio
-
 import pytest
 
 # --------------------------------------------------------------------------- #
@@ -196,3 +194,142 @@ async def test_trellis_subprocess_timeout_raises_timeout_error(
 
     with pytest.raises(TrellisTimeoutError):
         await agent.image_to_3d(image_path=str(image))
+
+
+# --------------------------------------------------------------------------- #
+# P7 — Engine selector (legacy vs adk-render)
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.unit
+def test_create_initial_state_defaults_to_legacy_engine() -> None:
+    from skyyrose.elite_studio.graph.state import create_initial_state
+
+    s = create_initial_state(sku="br-001", view="front")
+    assert s["engine"] == "legacy"
+
+
+@pytest.mark.unit
+def test_create_initial_state_accepts_adk_render_engine() -> None:
+    from skyyrose.elite_studio.graph.state import create_initial_state
+
+    s = create_initial_state(sku="br-001", view="front", engine="adk-render")
+    assert s["engine"] == "adk-render"
+
+
+@pytest.mark.unit
+def test_create_initial_state_rejects_unknown_engine() -> None:
+    from skyyrose.elite_studio.graph.state import create_initial_state
+
+    with pytest.raises(ValueError) as exc:
+        create_initial_state(sku="br-001", view="front", engine="midjourney")
+    assert "unknown engine" in str(exc.value)
+
+
+@pytest.mark.unit
+def test_generator_node_routes_adk_engine_to_invoker(monkeypatch: pytest.MonkeyPatch) -> None:
+    """When state['engine'] == 'adk-render', generator_node must call
+    _invoke_adk_render_engine, NOT GeneratorAgent.generate."""
+    from skyyrose.elite_studio.graph import nodes
+    from skyyrose.elite_studio.graph.state import create_initial_state
+    from skyyrose.elite_studio.models import GenerationResult
+
+    called = {"adk": 0, "legacy": 0}
+
+    def fake_adk(sku: str, view: str) -> GenerationResult:
+        called["adk"] += 1
+        return GenerationResult(
+            success=True,
+            provider="adk-render",
+            model="gemini-3-pro-image-preview",
+            output_path=f"/tmp/{sku}-{view}-render.webp",
+            metadata={
+                "engine": "gemini-pro",
+                "qa_score": 88.0,
+                "qa_passed": True,
+                "cost_usd": 0.18,
+            },
+        )
+
+    class _FailingGenerator:
+        def generate(self, *_a, **_kw):  # pragma: no cover — must not be called
+            called["legacy"] += 1
+            raise AssertionError("legacy GeneratorAgent must not run when engine=adk-render")
+
+    monkeypatch.setattr(nodes, "_invoke_adk_render_engine", fake_adk)
+    monkeypatch.setattr(nodes, "GeneratorAgent", _FailingGenerator)
+
+    state = create_initial_state(sku="br-001", view="front", engine="adk-render")
+    out = nodes.generator_node(state)
+
+    assert called["adk"] == 1
+    assert called["legacy"] == 0
+    assert out["generation_result"].success is True
+    assert out["generation_result"].provider == "adk-render"
+    assert out["generation_result"].metadata["qa_score"] == 88.0
+
+
+@pytest.mark.unit
+def test_generator_node_legacy_path_requires_vision(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Default engine ('legacy') still demands a vision_result — no regression."""
+    from skyyrose.elite_studio.graph import nodes
+    from skyyrose.elite_studio.graph.state import create_initial_state
+
+    state = create_initial_state(sku="br-001", view="front")  # engine defaults to 'legacy'
+    # vision_result is None by default — legacy path should refuse.
+    out = nodes.generator_node(state)
+    assert out["status"] == "error"
+    assert out["failed_step"] == "generation"
+    assert "No vision result" in out["error"]
+
+
+@pytest.mark.unit
+def test_generator_node_adk_path_does_not_require_vision(monkeypatch: pytest.MonkeyPatch) -> None:
+    """ADK pipeline does its own dossier-driven prompting, so absence of
+    vision_result must NOT block the adk-render engine."""
+    from skyyrose.elite_studio.graph import nodes
+    from skyyrose.elite_studio.graph.state import create_initial_state
+    from skyyrose.elite_studio.models import GenerationResult
+
+    def fake_adk(sku: str, view: str) -> GenerationResult:
+        return GenerationResult(
+            success=True,
+            provider="adk-render",
+            output_path=f"/tmp/{sku}-{view}.webp",
+            metadata={"cost_usd": 0.18},
+        )
+
+    monkeypatch.setattr(nodes, "_invoke_adk_render_engine", fake_adk)
+
+    state = create_initial_state(sku="br-001", view="front", engine="adk-render")
+    out = nodes.generator_node(state)
+    assert "generation_result" in out
+    assert out["generation_result"].success is True
+
+
+@pytest.mark.unit
+def test_generator_node_adk_spend_uses_reported_cost(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Budget spend should debit the ADK-reported cost, not the est_cost constant."""
+    from skyyrose.elite_studio.budget import RunBudget
+    from skyyrose.elite_studio.graph import nodes
+    from skyyrose.elite_studio.graph.state import create_initial_state
+    from skyyrose.elite_studio.models import GenerationResult
+
+    reported = 0.18
+
+    def fake_adk(sku: str, view: str) -> GenerationResult:
+        return GenerationResult(
+            success=True,
+            provider="adk-render",
+            output_path=f"/tmp/{sku}-{view}.webp",
+            metadata={"cost_usd": reported},
+        )
+
+    monkeypatch.setattr(nodes, "_invoke_adk_render_engine", fake_adk)
+
+    state = create_initial_state(sku="br-001", view="front", engine="adk-render")
+    state["budget"] = RunBudget(ceiling_usd=5.0)
+    nodes.generator_node(state)
+
+    assert state["budget"].spent_usd == pytest.approx(reported)
+    assert state["budget"].by_stage["generation"] == pytest.approx(reported)
