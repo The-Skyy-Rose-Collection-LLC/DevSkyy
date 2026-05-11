@@ -1548,6 +1548,26 @@
       "occurrences": 1,
       "last_seen": "2026-05-03T12:29:48.891633+00:00",
       "resolved": true
+    },
+    {
+      "id": "bug-096",
+      "timestamp": "2026-05-11T20:50:00.000Z",
+      "error_message": "Tripo generate_multiview_image hallucinated brand canon on 30 SKUs (120 renders) — invented 'rose-on-cloud' motif on br-001, rendered br-011 hockey jersey as cyan/teal hoodie with invented crest, applied off-canon patch to wrong location on sg-007 signature beanie",
+      "file": "scripts/tripo_dispatch.py + skyyrose/elite_studio/agents/tripo_agent.py",
+      "root_cause": "Tripo `generate_multiview_image` template runs FLUX.1 Kontext with naked image-only input — accepts NO prompt, NO logo overlay, NO dossier branding spec, NO palette token. With no canon anchor, FLUX defaults to training-set priors. Dispatch boundary had no guard distinguishing branded SKUs (which Tripo cannot render correctly) from unbranded clean tech-flats (which it can). Additionally, SKUs with empty catalog `image` column silently fell back to `front_model_image` (a model-on shot), which the template re-builds from scratch — changing garment type entirely (jersey → hoodie). No QA gate caught the regression; STOP-AND-SHOW manifest showed cost only, no output preview.",
+      "fix": "scripts/tripo_dispatch.py — added classify_skus() function that blocks at the dispatch boundary: (1) SKUs whose dossier frontmatter has `logo_reference:` populated are blocked as BRANDED with directive to route via ADK render_pipeline. (2) SKUs with empty `image` column or missing tech-flat file are blocked as NO TECH-FLAT. --force-branded escape hatch added with WARNING and still-required explicit y to dispatch. Per-SKU block reason printed in manifest before y/N prompt. 12 unit tests in tests/test_tripo_dispatch_guards.py covering both guards plus escape hatch. renders/output/tripo/QUARANTINE.md written marking all 120 existing outputs as discard-do-not-publish. Cerebrum Do-Not-Repeat entry added 2026-05-11.",
+      "tags": [
+        "tripo",
+        "flux-kontext",
+        "hallucination",
+        "model-output-quality",
+        "guard-rail",
+        "regression",
+        "production-blocker"
+      ],
+      "related_bugs": [],
+      "occurrences": 30,
+      "last_seen": "2026-05-08T04:48:00.000Z"
     }
   ]
 }
