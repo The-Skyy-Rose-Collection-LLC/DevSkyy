@@ -102,29 +102,22 @@ export const HealthResponseSchema = z.object({
 // Asset Schemas
 export const AssetSchema = z.object({
     id: z.string(),
-    filename: z.string(),
-    path: z.string(),
-    collection: z.enum(['black_rose', 'signature', 'love_hurts', 'showroom', 'runway']),
+    name: z.string(),
+    url: z.string(),
+    collection: z.string(),
+    sku: z.string().nullable().optional(),
+    tags: z.array(z.string()),
     type: z.enum(['image', '3d_model', 'video', 'texture']),
-    metadata: z.object({
-        sku: z.string().optional(),
-        product_name: z.string().optional(),
-        tags: z.array(z.string()).optional(),
-        width: z.number().optional(),
-        height: z.number().optional(),
-        size_bytes: z.number().optional(),
-        format: z.string().optional(),
-    }).optional(),
-    thumbnail_url: z.string().optional(),
-    created_at: z.string(),
-    updated_at: z.string().optional(),
+    size: z.number().nullable().optional(),
+    dimensions: z.record(z.string(), z.number()).nullable().optional(),
+    uploaded_at: z.string(),
 });
 
 export const AssetListResponseSchema = z.object({
     assets: z.array(AssetSchema),
     total: z.number(),
     page: z.number(),
-    limit: z.number(),
+    page_size: z.number(),
     has_more: z.boolean(),
 });
 
