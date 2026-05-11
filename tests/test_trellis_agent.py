@@ -8,7 +8,6 @@ behind an env flag and a separate live test.
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pytest
