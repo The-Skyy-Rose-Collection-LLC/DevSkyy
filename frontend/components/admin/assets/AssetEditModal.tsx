@@ -10,14 +10,13 @@ interface AssetEditModalProps {
 }
 
 export function AssetEditModal({ asset, onClose, onSave }: AssetEditModalProps) {
-  const [sku, setSku] = useState(asset.metadata?.sku || '');
-  const [productName, setProductName] = useState(asset.metadata?.product_name || '');
+  const [sku, setSku] = useState(asset.sku ?? '');
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      await onSave({ sku, product_name: productName });
+      await onSave({ sku });
     } finally {
       setSaving(false);
     }
@@ -37,15 +36,6 @@ export function AssetEditModal({ asset, onClose, onSave }: AssetEditModalProps) 
               type="text"
               value={sku}
               onChange={(e) => setSku(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-gray-400 mb-1">Product Name</label>
-            <input
-              type="text"
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
               className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm"
             />
           </div>
