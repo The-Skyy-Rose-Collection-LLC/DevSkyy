@@ -259,6 +259,7 @@ class ThreeDProvider(StrEnum):
     # External APIs
     TRIPO3D = "tripo3d"
     ANIGEN = "anigen"
+    MESHY = "meshy"
 
     # Custom/Community
     CUSTOM = "custom"
@@ -477,6 +478,7 @@ PROVIDER_QUALITY: dict[ThreeDProvider, ProviderQuality] = {
     ThreeDProvider.TRIPOSR: ProviderQuality(geo=88),  # default tex_textured=75
     ThreeDProvider.INSTANTMESH: ProviderQuality(geo=85, tex_textured=85),
     ThreeDProvider.LGM: ProviderQuality(geo=80, tex_textured=80),
+    ThreeDProvider.MESHY: ProviderQuality(geo=82, tex_textured=82),
     ThreeDProvider.SHAP_E: ProviderQuality(geo=70),  # default tex_textured=75
     ThreeDProvider.POINT_E: ProviderQuality(geo=60),  # default tex_textured=75
 }
@@ -522,6 +524,7 @@ class ThreeDRoundTable:
         ThreeDProvider.POINT_E: 45.0,
         ThreeDProvider.TRIPO3D: 300.0,  # External API, allow for high quality
         ThreeDProvider.ANIGEN: 240.0,  # 52s preview + 18s extract + cold-start buffer
+        ThreeDProvider.MESHY: 300.0,  # External API, poll-based
     }
 
     # Default providers for text-to-3D
@@ -537,6 +540,7 @@ class ThreeDRoundTable:
         ThreeDProvider.INSTANTMESH,
         ThreeDProvider.LGM,
         ThreeDProvider.ANIGEN,
+        ThreeDProvider.MESHY,
     ]
 
     def __init__(
@@ -548,6 +552,7 @@ class ThreeDRoundTable:
         output_dir: str = "./round_table_outputs",
         enable_tripo3d: bool = True,
         enable_anigen: bool = True,
+        enable_meshy: bool = True,
         concurrent_limit: int = 4,
     ) -> None:
         """
@@ -563,6 +568,7 @@ class ThreeDRoundTable:
             output_dir: Directory for generated models
             enable_tripo3d: Whether to include Tripo3D
             enable_anigen: Whether to include AniGen garment rigging
+            enable_meshy: Whether to include Meshy image-to-3D
             concurrent_limit: Max concurrent generation tasks
         """
         # Override HF config for highest quality
@@ -579,6 +585,7 @@ class ThreeDRoundTable:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.enable_tripo3d = enable_tripo3d
         self.enable_anigen = enable_anigen
+        self.enable_meshy = enable_meshy
         self._semaphore = asyncio.Semaphore(concurrent_limit)
 
         # Initialize health tracking for each provider
@@ -593,6 +600,10 @@ class ThreeDRoundTable:
         # AniGen agent (lazy loaded)
         self._anigen_agent = None
         self._anigen_agent_loaded = False
+
+        # Meshy agent (lazy loaded)
+        self._meshy_agent = None
+        self._meshy_agent_loaded = False
 
         logger.info(
             "3D Round Table initialized with HIGHEST QUALITY settings",
@@ -617,6 +628,21 @@ class ThreeDRoundTable:
                     logger.warning("Tripo3D agent not available", error=str(e))
                     self.enable_tripo3d = False
         return self._tripo_agent
+
+    def _get_meshy_agent(self) -> Any:
+        """Lazy load Meshy image-to-3D agent."""
+        if not self._meshy_agent_loaded:
+            self._meshy_agent_loaded = True
+            if self.enable_meshy:
+                try:
+                    from agents.meshy_agent import MeshyAgent
+
+                    self._meshy_agent = MeshyAgent()
+                    logger.info("Meshy agent loaded for image-to-3D generation")
+                except (ImportError, Exception) as e:
+                    logger.warning("Meshy agent not available", error=str(e))
+                    self.enable_meshy = False
+        return self._meshy_agent
 
     def _get_anigen_agent(self) -> Any:
         """Lazy load AniGen garment rigging agent."""
@@ -712,6 +738,9 @@ class ThreeDRoundTable:
 
         if self.enable_anigen and ThreeDProvider.ANIGEN not in providers:
             providers.append(ThreeDProvider.ANIGEN)
+
+        if self.enable_meshy and ThreeDProvider.MESHY not in providers:
+            providers.append(ThreeDProvider.MESHY)
 
         image_hash = hashlib.sha256(image_path.encode()).hexdigest()[:16]
 
@@ -1106,6 +1135,14 @@ class ThreeDRoundTable:
                 task_id=task_id,
             )
 
+        if provider == ThreeDProvider.MESHY:
+            if generation_type != GenerationType.IMAGE_TO_3D or not image_path:
+                raise ValueError("Meshy requires an image (image-to-3D only)")
+            return await self._generate_with_meshy(
+                image_path=image_path,
+                task_id=task_id,
+            )
+
         hf_model = self.PROVIDER_MODEL_MAP.get(provider)
         if not hf_model:
             raise ValueError(f"Unknown provider: {provider}")
@@ -1171,6 +1208,38 @@ class ThreeDRoundTable:
             format=HF3DFormat.GLB,
             generation_time_ms=generation_time,
             polycount=result.get("polycount"),
+            has_textures=True,
+            metadata=result,
+        )
+
+    async def _generate_with_meshy(
+        self,
+        image_path: str,
+        task_id: str,
+    ) -> ThreeDResponse:
+        """Generate GLB using Meshy API (image-to-3D only)."""
+        agent = self._get_meshy_agent()
+        if not agent:
+            raise ValueError("Meshy agent not available")
+
+        start_time = time.time()
+
+        result = await agent._tool_image_to_3d(
+            image_url=image_path,
+            product_name=task_id[:40],
+            output_format="glb",
+        )
+
+        generation_time = (time.time() - start_time) * 1000
+
+        model_urls: dict = result.get("model_urls") or {}
+        return ThreeDResponse(
+            provider=ThreeDProvider.MESHY,
+            model_id=result.get("task_id", "meshy-api"),
+            output_path=result.get("local_path"),
+            output_url=model_urls.get("glb") or model_urls.get("fbx"),
+            format=HF3DFormat.GLB,
+            generation_time_ms=generation_time,
             has_textures=True,
             metadata=result,
         )
