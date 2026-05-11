@@ -226,6 +226,7 @@ app.include_router(ws_router)
 
 # API v1 MCP routers
 from api.v1 import (
+    autonomous_router,
     catalog_router,
     code_router,
     commerce_router,
@@ -248,6 +249,7 @@ app.include_router(hf_spaces_router, prefix="/api/v1")
 app.include_router(marketing_router, prefix="/api/v1")
 app.include_router(media_router, prefix="/api/v1")
 app.include_router(ml_router, prefix="/api/v1")
+app.include_router(autonomous_router, prefix="/api/v1")
 app.include_router(monitoring_router, prefix="/api/v1")
 app.include_router(orchestration_router, prefix="/api/v1")
 app.include_router(sync_router, prefix="/api/v1")

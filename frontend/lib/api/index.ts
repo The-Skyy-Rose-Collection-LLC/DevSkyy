@@ -5,6 +5,7 @@ import { pipeline3d } from './endpoints/pipeline';
 import { assets } from './endpoints/assets';
 import { agents } from './endpoints/agents';
 import { monitoring } from './endpoints/monitoring';
+import { autonomous } from './endpoints/autonomous';
 import { qa } from './endpoints/qa';
 import { batch } from './endpoints/batch';
 import { health } from './endpoints/health';
@@ -23,6 +24,7 @@ export const api = {
     assets,
     agents,
     monitoring,
+    autonomous,
     qa,
     batch,
     health,

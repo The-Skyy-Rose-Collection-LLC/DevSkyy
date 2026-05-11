@@ -279,3 +279,28 @@ export const MonitoringHealthResponseSchema = z.object({
     system: SystemStatsSchema,
     events: z.array(HealthEventSchema),
 });
+
+// Autonomous Operation Schemas
+export const AutonomousOperationSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    description: z.string(),
+    status: z.enum(['running', 'stopped', 'error']),
+    critical: z.boolean(),
+    last_event: z.string().nullable().optional(),
+    last_event_at: z.string().nullable().optional(),
+});
+
+export const AutonomousHistoryEntrySchema = z.object({
+    id: z.string(),
+    operation_id: z.string(),
+    operation_name: z.string(),
+    action: z.enum(['start', 'stop', 'error']),
+    timestamp: z.string(),
+    message: z.string(),
+});
+
+export const AutonomousOperationsResponseSchema = z.object({
+    operations: z.array(AutonomousOperationSchema),
+    total: z.number(),
+});
