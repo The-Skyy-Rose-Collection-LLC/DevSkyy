@@ -88,3 +88,7 @@ export interface RegenerateRequest {
 export type AutonomousOperation = z.infer<typeof schemas.AutonomousOperationSchema>;
 export type AutonomousHistoryEntry = z.infer<typeof schemas.AutonomousHistoryEntrySchema>;
 export type AutonomousOperationsResponse = z.infer<typeof schemas.AutonomousOperationsResponseSchema>;
+
+export type SkuImageCounts = z.infer<typeof schemas.SkuImageCountsSchema>;
+export type HfDatasetInfo = z.infer<typeof schemas.HfDatasetInfoSchema>;
+export type HfDatasetsResponse = z.infer<typeof schemas.HfDatasetsResponseSchema>;

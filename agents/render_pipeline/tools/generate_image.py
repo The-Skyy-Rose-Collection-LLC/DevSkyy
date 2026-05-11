@@ -16,6 +16,7 @@ State writes: candidate_path (str), bytes_size (int), generation_engine (str)
 from __future__ import annotations
 
 import logging
+import os
 from pathlib import Path
 
 from agents.render_pipeline.tools._paths import REPO_ROOT, ensure_repo_paths
@@ -26,10 +27,12 @@ from google.adk.tools.tool_context import ToolContext
 
 log = logging.getLogger(__name__)
 
-# Output dir mirrors the production pipeline output convention but lives
-# under agents/render_pipeline/ so it doesn't collide with nano_banana's
-# wordpress-theme/skyyrose-flagship/assets/images/products writes.
-_OUTPUT_DIR = REPO_ROOT / "agents" / "render_pipeline" / "output"
+# Output dir. Defaults to the canonical Pipeline 1 path documented in
+# docs/PIPELINE-ARCHITECTURE.md (`renders/gated/<sku>/`) so downstream
+# scorers and WC upload steps can read ADK renders without a copy step.
+# Override via RENDER_PIPELINE_OUTPUT_DIR — useful for dev sandboxes and
+# CI scratch dirs that need isolation from production output.
+_OUTPUT_DIR = Path(os.environ.get("RENDER_PIPELINE_OUTPUT_DIR") or REPO_ROOT / "renders" / "gated")
 
 # Engine routing — single source of truth.
 _GEMINI_ENGINES = frozenset({"gemini-pro", "gemini-flash"})
@@ -258,8 +261,9 @@ def generate_image_fn(sku: str, view: str, tool_context: ToolContext) -> dict:
     if not img_bytes:
         return {"error": f"{engine} returned no bytes", "output_path": None}
 
-    _OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    out_path = _OUTPUT_DIR / f"{sku}-{view}-render.webp"
+    sku_dir = _OUTPUT_DIR / sku
+    sku_dir.mkdir(parents=True, exist_ok=True)
+    out_path = sku_dir / f"{sku}-{view}-render.webp"
     try:
         save_image(img_bytes, out_path)
     except OSError as exc:

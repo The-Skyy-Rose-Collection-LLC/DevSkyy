@@ -13,8 +13,11 @@ Version: 1.0.0
 
 import io
 import logging
+import os
+import time
 from datetime import UTC, datetime
 from enum import StrEnum
+from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
@@ -47,6 +50,21 @@ router = APIRouter(prefix="/assets", tags=["Asset Processing"])
 ALLOWED_IMAGE_FORMATS = {"image/jpeg", "image/png", "image/webp", "image/tiff"}
 MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024  # 50MB
 MIN_IMAGE_DIMENSION = 100
+
+_PRODUCT_IMAGES_DIR = (
+    Path(__file__).resolve().parents[2]
+    / "wordpress-theme"
+    / "skyyrose-flagship"
+    / "assets"
+    / "images"
+    / "products"
+)
+_IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp"}
+_PER_SKU_TTL = 60.0
+_DATASETS_TTL = 300.0
+
+_per_sku_cache: dict[str, Any] = {}
+_datasets_cache: dict[str, Any] = {}
 
 
 # =============================================================================
@@ -1021,6 +1039,34 @@ class AssetUploadResponse(AssetResponse):
     pass
 
 
+class SkuImageCountsResponse(BaseModel):
+    """Image counts per product slug scanned from the WP theme filesystem."""
+
+    counts: dict[str, int] = Field(description="Image count per product slug directory")
+    total: int = Field(description="Total image files across all slugs")
+    scanned_at: str = Field(description="ISO timestamp of the scan")
+
+
+class HfDatasetInfo(BaseModel):
+    """Metadata for a single HuggingFace dataset."""
+
+    id: str
+    private: bool
+    downloads: int
+    likes: int
+    last_modified: str | None
+    created_at: str | None
+    tags: list[str]
+
+
+class HfDatasetsResponse(BaseModel):
+    """List of HuggingFace datasets for the configured author."""
+
+    datasets: list[HfDatasetInfo]
+    count: int
+    author: str
+
+
 # In-memory storage for demo (capped; replace with database in production)
 _MAX_ASSETS = 5000
 _assets: dict[str, dict[str, Any]] = {}
@@ -1070,6 +1116,103 @@ async def list_assets(
         page_size=limit,
         has_more=end < total,
     )
+
+
+@router.get(
+    "/per-sku", response_model=SkuImageCountsResponse, summary="Image counts per product slug"
+)
+async def get_per_sku_image_counts(
+    current_user: TokenPayload = Depends(get_current_user),
+) -> SkuImageCountsResponse:
+    """Return the number of product images per slug directory from the WP theme filesystem.
+
+    Results are cached in-process for 60 seconds to avoid filesystem hammering.
+    """
+    now = time.monotonic()
+    cached = _per_sku_cache.get("data")
+    if cached and (now - _per_sku_cache.get("ts", 0.0)) < _PER_SKU_TTL:
+        return cached
+
+    counts: dict[str, int] = {}
+    if _PRODUCT_IMAGES_DIR.is_dir():
+        for slug_dir in sorted(_PRODUCT_IMAGES_DIR.iterdir()):
+            if not slug_dir.is_dir():
+                continue
+            n = sum(
+                1 for f in slug_dir.iterdir() if f.is_file() and f.suffix.lower() in _IMAGE_EXTS
+            )
+            if n > 0:
+                counts[slug_dir.name] = n
+
+    result = SkuImageCountsResponse(
+        counts=counts,
+        total=sum(counts.values()),
+        scanned_at=datetime.now(UTC).isoformat(),
+    )
+    _per_sku_cache["data"] = result
+    _per_sku_cache["ts"] = now
+    return result
+
+
+@router.get("/datasets", response_model=HfDatasetsResponse, summary="List HuggingFace datasets")
+async def list_hf_datasets(
+    current_user: TokenPayload = Depends(get_current_user),
+) -> HfDatasetsResponse:
+    """List HuggingFace datasets for the author configured in HF_AUTHOR env var.
+
+    Results are cached in-process for 300 seconds.
+    Returns HTTP 503 if huggingface_hub is not installed.
+    Returns HTTP 422 if HF_AUTHOR env var is not set.
+    """
+    try:
+        from huggingface_hub import HfApi  # noqa: PLC0415
+    except ImportError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="huggingface_hub package is not installed",
+        )
+
+    author = os.environ.get("HF_AUTHOR", "").strip()
+    if not author:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="HF_AUTHOR environment variable is not set",
+        )
+
+    cache_key = f"datasets:{author}"
+    now = time.monotonic()
+    cached = _datasets_cache.get(cache_key)
+    if cached and (now - _datasets_cache.get(f"{cache_key}:ts", 0.0)) < _DATASETS_TTL:
+        return cached
+
+    api = HfApi()
+    datasets: list[HfDatasetInfo] = []
+    try:
+        for ds in api.list_datasets(author=author):
+            last_mod = ds.last_modified.isoformat() if ds.last_modified else None
+            created = ds.created_at.isoformat() if ds.created_at else None
+            datasets.append(
+                HfDatasetInfo(
+                    id=ds.id,
+                    private=bool(ds.private),
+                    downloads=int(ds.downloads or 0),
+                    likes=int(ds.likes or 0),
+                    last_modified=last_mod,
+                    created_at=created,
+                    tags=list(ds.tags or []),
+                )
+            )
+    except Exception as exc:
+        logger.error("HuggingFace dataset listing failed: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"HuggingFace API error: {exc}",
+        ) from exc
+
+    result = HfDatasetsResponse(datasets=datasets, count=len(datasets), author=author)
+    _datasets_cache[cache_key] = result
+    _datasets_cache[f"{cache_key}:ts"] = now
+    return result
 
 
 @router.get("/{asset_id}", response_model=AssetResponse, summary="Get asset by ID")

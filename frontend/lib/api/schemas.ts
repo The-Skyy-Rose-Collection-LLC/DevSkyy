@@ -304,3 +304,26 @@ export const AutonomousOperationsResponseSchema = z.object({
     operations: z.array(AutonomousOperationSchema),
     total: z.number(),
 });
+
+// Assets — extended schemas
+export const SkuImageCountsSchema = z.object({
+    counts: z.record(z.string(), z.number()),
+    total: z.number(),
+    scanned_at: z.string(),
+});
+
+export const HfDatasetInfoSchema = z.object({
+    id: z.string(),
+    private: z.boolean(),
+    downloads: z.number(),
+    likes: z.number(),
+    last_modified: z.string().nullable(),
+    created_at: z.string().nullable(),
+    tags: z.array(z.string()),
+});
+
+export const HfDatasetsResponseSchema = z.object({
+    datasets: z.array(HfDatasetInfoSchema),
+    count: z.number(),
+    author: z.string(),
+});
