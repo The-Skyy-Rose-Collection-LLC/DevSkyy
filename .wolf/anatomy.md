@@ -179,6 +179,7 @@
 - `security.md` — Security Guidelines (~216 tok)
 - `sequential-thinking.md` — Sequential Thinking (Auto-Trigger) (~329 tok)
 - `testing.md` — Testing Requirements (~267 tok)
+- `workflow-orchestration.md` — Plan-default doctrine, subagent strategy, self-improvement loop, verification, elegance, autonomous bug fixing, task mgmt, core principles (~700 tok)
 
 ## .claude/skills/
 
