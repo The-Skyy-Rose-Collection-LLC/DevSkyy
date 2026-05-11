@@ -261,6 +261,9 @@ class ThreeDProvider(StrEnum):
     ANIGEN = "anigen"
     MESHY = "meshy"
 
+    # Local GPU (conda-isolated)
+    TRELLIS_2 = "trellis_2"
+
     # Custom/Community
     CUSTOM = "custom"
 
@@ -472,6 +475,7 @@ class ProviderQuality:
 
 
 PROVIDER_QUALITY: dict[ThreeDProvider, ProviderQuality] = {
+    ThreeDProvider.TRELLIS_2: ProviderQuality(geo=98, tex_textured=95),
     ThreeDProvider.HUNYUAN3D_2: ProviderQuality(geo=95, tex_textured=95),
     ThreeDProvider.TRIPO3D: ProviderQuality(geo=92, tex_textured=92),
     ThreeDProvider.ANIGEN: ProviderQuality(geo=90, tex_textured=88),
@@ -525,6 +529,7 @@ class ThreeDRoundTable:
         ThreeDProvider.TRIPO3D: 300.0,  # External API, allow for high quality
         ThreeDProvider.ANIGEN: 240.0,  # 52s preview + 18s extract + cold-start buffer
         ThreeDProvider.MESHY: 300.0,  # External API, poll-based
+        ThreeDProvider.TRELLIS_2: 600.0,  # Local GPU, heavy inference + GLB postprocess
     }
 
     # Default providers for text-to-3D
@@ -553,6 +558,7 @@ class ThreeDRoundTable:
         enable_tripo3d: bool = True,
         enable_anigen: bool = True,
         enable_meshy: bool = True,
+        enable_trellis: bool = False,
         concurrent_limit: int = 4,
     ) -> None:
         """
@@ -569,6 +575,8 @@ class ThreeDRoundTable:
             enable_tripo3d: Whether to include Tripo3D
             enable_anigen: Whether to include AniGen garment rigging
             enable_meshy: Whether to include Meshy image-to-3D
+            enable_trellis: Whether to include local TRELLIS.2 (GPU-only,
+                requires the ``trellis2`` conda env; defaults to False)
             concurrent_limit: Max concurrent generation tasks
         """
         # Override HF config for highest quality
@@ -586,6 +594,7 @@ class ThreeDRoundTable:
         self.enable_tripo3d = enable_tripo3d
         self.enable_anigen = enable_anigen
         self.enable_meshy = enable_meshy
+        self.enable_trellis = enable_trellis
         self._semaphore = asyncio.Semaphore(concurrent_limit)
 
         # Initialize health tracking for each provider
@@ -604,6 +613,10 @@ class ThreeDRoundTable:
         # Meshy agent (lazy loaded)
         self._meshy_agent = None
         self._meshy_agent_loaded = False
+
+        # TRELLIS.2 agent (lazy loaded — local GPU, conda-isolated)
+        self._trellis_agent = None
+        self._trellis_agent_loaded = False
 
         logger.info(
             "3D Round Table initialized with HIGHEST QUALITY settings",
@@ -643,6 +656,32 @@ class ThreeDRoundTable:
                     logger.warning("Meshy agent not available", error=str(e))
                     self.enable_meshy = False
         return self._meshy_agent
+
+    def _get_trellis_agent(self) -> Any:
+        """Lazy load local TRELLIS.2 image-to-3D agent.
+
+        TRELLIS.2 lives in an isolated conda env (``trellis2``). The agent
+        probes for the env at load time; if it cannot find conda + the
+        TRELLIS repo, this disables the provider for the lifetime of the
+        round-table instance.
+        """
+        if not self._trellis_agent_loaded:
+            self._trellis_agent_loaded = True
+            if self.enable_trellis:
+                try:
+                    from agents.trellis_agent import TrellisAgent
+
+                    candidate = TrellisAgent()
+                    if not candidate.is_available():
+                        logger.warning("TRELLIS.2 agent unavailable — conda env or repo missing")
+                        self.enable_trellis = False
+                    else:
+                        self._trellis_agent = candidate
+                        logger.info("TRELLIS.2 agent loaded for local GPU image-to-3D")
+                except (ImportError, Exception) as e:
+                    logger.warning("TRELLIS.2 agent not available", error=str(e))
+                    self.enable_trellis = False
+        return self._trellis_agent
 
     def _get_anigen_agent(self) -> Any:
         """Lazy load AniGen garment rigging agent."""
@@ -741,6 +780,9 @@ class ThreeDRoundTable:
 
         if self.enable_meshy and ThreeDProvider.MESHY not in providers:
             providers.append(ThreeDProvider.MESHY)
+
+        if self.enable_trellis and ThreeDProvider.TRELLIS_2 not in providers:
+            providers.append(ThreeDProvider.TRELLIS_2)
 
         image_hash = hashlib.sha256(image_path.encode()).hexdigest()[:16]
 
@@ -1143,6 +1185,14 @@ class ThreeDRoundTable:
                 task_id=task_id,
             )
 
+        if provider == ThreeDProvider.TRELLIS_2:
+            if generation_type != GenerationType.IMAGE_TO_3D or not image_path:
+                raise ValueError("TRELLIS.2 requires an image (image-to-3D only)")
+            return await self._generate_with_trellis(
+                image_path=image_path,
+                task_id=task_id,
+            )
+
         hf_model = self.PROVIDER_MODEL_MAP.get(provider)
         if not hf_model:
             raise ValueError(f"Unknown provider: {provider}")
@@ -1238,6 +1288,38 @@ class ThreeDRoundTable:
             model_id=result.get("task_id", "meshy-api"),
             output_path=result.get("local_path"),
             output_url=model_urls.get("glb") or model_urls.get("fbx"),
+            format=HF3DFormat.GLB,
+            generation_time_ms=generation_time,
+            has_textures=True,
+            metadata=result,
+        )
+
+    async def _generate_with_trellis(
+        self,
+        image_path: str,
+        task_id: str,
+    ) -> ThreeDResponse:
+        """Generate GLB using local TRELLIS.2 (image-to-3D only, GPU-only)."""
+        agent = self._get_trellis_agent()
+        if not agent:
+            raise ValueError("TRELLIS.2 agent not available")
+
+        start_time = time.time()
+
+        result = await agent.image_to_3d(
+            image_path=image_path,
+            product_name=task_id[:40],
+            output_format="glb",
+        )
+
+        generation_time = (time.time() - start_time) * 1000
+
+        model_urls: dict = result.get("model_urls") or {}
+        return ThreeDResponse(
+            provider=ThreeDProvider.TRELLIS_2,
+            model_id=result.get("task_id", "trellis-local"),
+            output_path=result.get("local_path"),
+            output_url=model_urls.get("glb"),
             format=HF3DFormat.GLB,
             generation_time_ms=generation_time,
             has_textures=True,
