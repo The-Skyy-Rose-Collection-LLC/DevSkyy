@@ -1301,16 +1301,15 @@ async def upload_asset(
     from uuid import uuid4
 
     # Validate file type by content-type header
-    if file.content_type not in ALLOWED_IMAGE_FORMATS and not file.content_type.startswith(
-        "model/"
-    ):
+    content_type = file.content_type or ""
+    if content_type not in ALLOWED_IMAGE_FORMATS and not content_type.startswith("model/"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid file type",
         )
 
     # Validate image files by magic bytes (not just content-type header)
-    if file.content_type in ALLOWED_IMAGE_FORMATS:
+    if content_type in ALLOWED_IMAGE_FORMATS:
         header = await file.read(16)
         await file.seek(0)  # Reset for downstream consumers
         image_signatures = {
@@ -1335,7 +1334,7 @@ async def upload_asset(
         "collection": collection,
         "sku": sku,
         "tags": json.loads(tags) if tags else [],
-        "type": "3d_model" if file.content_type.startswith("model/") else "image",
+        "type": "3d_model" if content_type.startswith("model/") else "image",
         "size": file.size if hasattr(file, "size") else None,
         "dimensions": None,
         "uploaded_at": datetime.now(UTC).isoformat(),
