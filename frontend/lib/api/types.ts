@@ -17,6 +17,13 @@ export type AssetListResponse = z.infer<typeof schemas.AssetListResponseSchema>;
 export type QAReview = z.infer<typeof schemas.QAReviewSchema>;
 export type QAReviewListResponse = z.infer<typeof schemas.QAReviewListResponseSchema>;
 export type BatchJob = z.infer<typeof schemas.BatchJobSchema>;
+export type Settings = z.infer<typeof schemas.SettingsSchema>;
+export type Task = z.infer<typeof schemas.TaskSchema>;
+export type TaskMetrics = z.infer<typeof schemas.TaskMetricsSchema>;
+export type AgentInfo = z.infer<typeof schemas.AgentInfoSchema>;
+export type AgentListResponse = z.infer<typeof schemas.AgentListResponseSchema>;
+
+
 
 // Request Interfaces
 export interface CompetitionRequest {

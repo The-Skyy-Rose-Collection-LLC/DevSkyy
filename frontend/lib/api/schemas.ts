@@ -172,3 +172,76 @@ export const BatchJobSchema = z.object({
     completed_at: z.string().optional(),
     error_log: z.array(z.string()).optional(),
 });
+
+
+// Settings Schema
+export const SettingsSchema = z.object({
+    wordpress: z.object({
+        url: z.string(),
+        consumerKey: z.string(),
+        consumerSecret: z.string(),
+        autoSync: z.boolean(),
+    }),
+    vercel: z.object({
+        projectId: z.string(),
+        apiToken: z.string(),
+        orgId: z.string(),
+    }),
+    autonomous: z.object({
+        enabled: z.boolean(),
+        circuitBreakerThreshold: z.number(),
+        retryAttempts: z.number(),
+        retryDelay: z.number(),
+    }),
+    ui: z.object({
+        theme: z.enum(['light', 'dark']),
+        typography: z.enum(['playfair', 'inter', 'system']),
+        accentColor: z.string(),
+    }),
+    system: z.object({
+        apiTimeout: z.number(),
+        maxConcurrentRequests: z.number(),
+        logLevel: z.enum(['debug', 'info', 'warn', 'error']),
+    }),
+});
+
+// Agent Schemas
+export const AgentInfoSchema = z.object({
+    name: z.string(),
+    version: z.string(),
+    category: z.string(),
+    status: z.string(),
+    capabilities: z.array(z.string()),
+    endpoints: z.array(z.string()),
+    last_execution: z.string().nullable().optional(),
+});
+
+export const AgentListResponseSchema = z.object({
+    timestamp: z.string(),
+    total_agents: z.number(),
+    active_agents: z.number(),
+    agents_by_category: z.record(z.string(), z.number()),
+    agents: z.array(AgentInfoSchema),
+});
+
+// Task Schema
+export const TaskMetricsSchema = z.object({
+    startTime: z.string(),
+    endTime: z.string().optional(),
+    durationMs: z.number().optional(),
+    tokensUsed: z.number().optional(),
+    costUsd: z.number().optional(),
+    provider: z.string().optional(),
+    promptTechnique: z.string().optional(),
+});
+
+export const TaskSchema = z.object({
+    taskId: z.string(),
+    agentType: z.string(),
+    prompt: z.string(),
+    status: z.enum(['pending', 'running', 'completed', 'failed']),
+    result: z.any().optional(),
+    error: z.string().optional(),
+    createdAt: z.string(),
+    metrics: TaskMetricsSchema,
+});

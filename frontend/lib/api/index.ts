@@ -3,10 +3,13 @@ import { ApiError } from './errors';
 import { roundTable } from './endpoints/round-table';
 import { pipeline3d } from './endpoints/pipeline';
 import { assets } from './endpoints/assets';
+import { agents } from './endpoints/agents';
 import { qa } from './endpoints/qa';
 import { batch } from './endpoints/batch';
 import { health } from './endpoints/health';
 import { socialMedia } from './endpoints/social-media';
+import * as settings from './endpoints/settings';
+import * as tasks from './endpoints/tasks';
 
 // Re-export types
 export * from './types';
@@ -17,10 +20,13 @@ export const api = {
     roundTable,
     pipeline3d,
     assets,
+    agents,
     qa,
     batch,
     health,
     socialMedia,
+    settings,
+    tasks,
 };
 
 export default api;
