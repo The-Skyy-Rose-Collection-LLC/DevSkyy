@@ -199,9 +199,9 @@ def test_static_tokens_monotonic():
     """
     tokens = parse_static_tokens()
     values = [tokens[t] for t in _STATIC_SCALE_ORDER if t in tokens]
-    assert len(values) == len(_STATIC_SCALE_ORDER), (
-        "Cannot verify monotonic scale — some tokens missing"
-    )
+    assert len(values) == len(
+        _STATIC_SCALE_ORDER
+    ), "Cannot verify monotonic scale — some tokens missing"
     for i in range(len(values) - 1):
         assert values[i] < values[i + 1], (
             f"Scale violation: {_STATIC_SCALE_ORDER[i]}={values[i]}rem "
@@ -280,9 +280,9 @@ def test_clamp_tokens_monotonic():
     min_4xl = clamp_min("--text-4xl")
     min_5xl = clamp_min("--text-5xl")
 
-    assert min_3xl <= min_4xl, (
-        f"Hierarchy violation: --text-3xl min ({min_3xl}rem) > --text-4xl min ({min_4xl}rem)"
-    )
-    assert min_4xl <= min_5xl, (
-        f"Hierarchy violation: --text-4xl min ({min_4xl}rem) > --text-5xl min ({min_5xl}rem)"
-    )
+    assert (
+        min_3xl <= min_4xl
+    ), f"Hierarchy violation: --text-3xl min ({min_3xl}rem) > --text-4xl min ({min_4xl}rem)"
+    assert (
+        min_4xl <= min_5xl
+    ), f"Hierarchy violation: --text-4xl min ({min_4xl}rem) > --text-5xl min ({min_5xl}rem)"
