@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Bump this constant when adding new pages or changing setup logic.
  * The `init` runner uses this to determine if setup has already run.
  */
-define( 'SKYYROSE_SETUP_VERSION', '4.0.0' );
+define( 'SKYYROSE_SETUP_VERSION', '4.1.0' );
 
 /*
 --------------------------------------------------------------
