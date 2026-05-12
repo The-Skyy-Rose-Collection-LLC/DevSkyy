@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Imagery Pipeline — CSV-Driven Product Photography
 status: in_progress
-last_updated: "2026-05-12T22:35:00.000Z"
-last_activity: 2026-05-12 -- Autonomous run closed phases 9-13 (v1.1 verification ceremony). 7/10 milestone phases complete. Two regressions surfaced as deferred engineering: DATA-01 (collection template routing on live), CURS-03 (cursor enqueue on immersive pages).
+last_updated: "2026-05-12T23:40:00.000Z"
+last_activity: 2026-05-12 -- Theme 1.1.2 deployed; DATA-01 + CURS-03 regressions closed live. All 4 collection URLs route to correct templates; cursor JS no longer ships to immersive pages. 49/51 verification tests green.
 progress:
   total_phases: 10
   completed_phases: 7
@@ -33,11 +33,11 @@ Progress: [███████░░░] 70% (7/10 phases — 9, 10, 11, 12, 1
 
 | Phase | Name | Requirements | Status |
 |-------|------|--------------|--------|
-| 9  | Collection & Product Data | DATA-01..03 | Verified (DATA-02/03 pass; DATA-01 surfaced live template regression — bug-deferred) |
+| 9  | Collection & Product Data | DATA-01..03 | Completed (all 3 DATA reqs pass; DATA-01 fixed via theme 1.1.2 deploy `016f7025f`) |
 | 10 | Accessibility HTML & ARIA | A11Y-01..09 | Verified (27/29 tests pass, 2 xfail tied to DATA-01 regression) |
 | 11 | Color Contrast | CNTR-01..04 | Verified (6/6 WCAG ratio tests pass) |
 | 12 | Responsive & Typography | RESP-01..04 | Verified (10/10 clamp/breakpoint tests pass) |
-| 13 | Luxury Cursor | CURS-01..03 | Partially Verified (CURS-01/02 pass; CURS-03 surfaced enqueue bug — bug-097, deferred) |
+| 13 | Luxury Cursor | CURS-01..03 | Completed (CURS-01/02/03 all pass; CURS-03 fixed via theme 1.1.2 deploy `016f7025f`) |
 | 14 | Catalog Foundation | INFRA-01..07, UI-REFINE | Completed |
 | 15 | Ghost-Mannequin Pipeline (B2) | GM-01..06, QA-01, 02, 04 | Not started (paid-API, scoped out of this run) |
 | 16 | 3D Replica Architect & Purge | LEGENDARY-3D | Completed (2026-04-24) |
@@ -55,8 +55,9 @@ Progress: [███████░░░] 70% (7/10 phases — 9, 10, 11, 12, 1
 
 ## Blockers / Concerns
 
-- **DATA-01 (deferred):** Live collection pages return HTTP 200 but unified collection template markup mostly absent (col-page, holo--* missing). Pre-existing WP template routing regression discovered during Phase 9 execute. Requires diagnosis + theme deploy (STOP-AND-SHOW). Tracked in autonomous task list and 09-VERIFICATION.md.
-- **CURS-03 (deferred):** `luxury-cursor.min.js` unconditionally enqueued in `skyyrose_enqueue_global_scripts()` (`inc/enqueue.php:249-259`) with no immersive-slug exclusion. Cursor JS DOES load on immersive pages where it should not. Failing test at `tests/test_luxury_cursor.py::test_cursor_not_loaded_on_immersive`. Fix: move enqueue to `skyyrose_enqueue_template_scripts()` behind `if ($slug !== 'immersive')`. Requires theme deploy. Bug-097 in `.wolf/buglog.json`.
+- None for v1.1 phases. All previous regressions (DATA-01, CURS-03) closed via theme 1.1.2 deploy on 2026-05-12.
+- v1.2 paid-API phases (15, 17, 18) remain unscoped — require user-present session with STOP-AND-SHOW gates on paid generation and production WooCommerce writes.
+- Two unrelated shop-page a11y xfails (`test_a11y_02_08_shop`, `test_a11y_06_shop`) deferred to v1.3 — WooCommerce shop template scope, not collection pages.
 
 ## Next Action
 
