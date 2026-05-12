@@ -191,19 +191,19 @@ Plans:
 - [ ] 10-02-PLAN.md -- Fix empty headings, empty links, ARIA attributes, form labels, skip nav, and image loading (A11Y-03, A11Y-04, A11Y-05, A11Y-06, A11Y-07, A11Y-09)
 
 ### Phase 11: Color Contrast
-**Goal**: All text on the site meets WCAG AA contrast ratios and pricing displays correctly
-**Depends on**: Phase 10 (HTML structure must be final before CSS contrast tuning)
+**Goal**: WCAG AA contrast regression gate — proves all v1.1 color contrast fixes still pass
+**Depends on**: Phase 10 (HTML structure final)
 **Requirements**: CNTR-01, CNTR-02, CNTR-03, CNTR-04
 **Success Criteria** (what must be TRUE):
-  1. Narrative subtext on dark backgrounds is readable (opacity/color adjusted to hit 4.5:1 contrast)
-  2. Small text (10-12px) on interactive cards meets 4.5:1 minimum contrast ratio
-  3. Love Hurts pre-order products display "Pre-Order" instead of "$0.00" pricing
-  4. Running a contrast checker tool on any page produces zero AA failures for text elements
-**Plans:** 2/2 plans complete
+  1. pytest tests/test_color_contrast_wcag.py passes green (all 6 tests, zero skips)
+  2. Every text/bg token pair from design-tokens.css asserts >= 4.5:1 contrast ratio
+  3. text-muted alpha-blended value (rgba 245,230,211,0.7 on #0A0A0A) asserts >= 4.5:1
+  4. No $0.00 or $0 text inside .holo product-price elements on any collection page
+**Plans:** 2 plans
 
 Plans:
-- [ ] 11-01-PLAN.md -- Fix WCAG AA contrast in collection-v4, interactive-cards, and collections CSS (CNTR-01, CNTR-02, CNTR-03)
-- [ ] 11-02-PLAN.md -- Replace $0 pricing with Pre-Order label for pre-order products (CNTR-04)
+- [x] 11-01-PLAN.md -- WCAG AA regression test + CNTR-04 live-page pricing assertion (CNTR-01, CNTR-02, CNTR-03, CNTR-04)
+- [x] 11-02-PLAN.md -- Annotate CNTR requirements with verification evidence, update ROADMAP Phase 11 (CNTR-01, CNTR-02, CNTR-03, CNTR-04)
 
 ### Phase 12: Responsive & Typography
 **Goal**: The site looks and works correctly across all screen sizes from 320px mobile to desktop
