@@ -171,8 +171,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 09-01-PLAN.md -- Filter pre-orders from catalog grids and sync product data (DATA-02, DATA-03)
-- [ ] 09-02-PLAN.md -- Diagnose and fix Black Rose hero banner (DATA-01)
+- [ ] 09-01-PLAN.md -- Verify pre-order filter and cross-collection integrity via CSV integrity test (DATA-02, DATA-03)
+- [ ] 09-02-PLAN.md -- Verify Black Rose hero asset on live + close stale DATA-01 requirement (DATA-01)
 
 ### Phase 10: Accessibility HTML & ARIA
 **Goal**: The theme's rendered HTML passes validation with zero ARIA errors and correct semantic structure
