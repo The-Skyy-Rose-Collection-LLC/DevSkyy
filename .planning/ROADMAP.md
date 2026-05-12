@@ -217,8 +217,8 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 12-01-PLAN.md -- Fix horizontal overflow at 320px and touch targets to 44x44px minimum (RESP-02, RESP-03)
-- [ ] 12-02-PLAN.md -- Replace hardcoded font sizes with clamp()/design tokens and enforce typography hierarchy (RESP-01, RESP-04)
+- [x] 12-01-PLAN.md -- Regression gate: clamp() token assertions + 320px inline-width scan (RESP-01, RESP-02)
+- [x] 12-02-PLAN.md -- Planning artifact closure: annotate RESP-01..04 with v1.1 commits + update ROADMAP (RESP-01..04)
 
 ### Phase 13: Luxury Cursor
 **Goal**: The custom luxury cursor works correctly everywhere including above modals and only loads where needed

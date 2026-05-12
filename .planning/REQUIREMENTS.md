@@ -72,10 +72,10 @@ Requirements for the CSV-driven ghost mannequin imagery pipeline. Phase numberin
 
 ### Responsive & Typography
 
-- [x] **RESP-01**: Font sizes scale appropriately across mobile/tablet/desktop breakpoints
-- [x] **RESP-02**: No horizontal overflow or layout breaking on mobile devices (320px+)
-- [x] **RESP-03**: Touch targets meet minimum 44x44px on mobile
-- [x] **RESP-04**: Typography hierarchy is consistent across all page templates
+- [x] **RESP-01**: Font sizes scale appropriately across mobile/tablet/desktop breakpoints — Complete (v1.1, commits 8ad0df313 + 61e42abe0)
+- [x] **RESP-02**: No horizontal overflow or layout breaking on mobile devices (320px+) — Complete (v1.1, commit 8ad0df313)
+- [x] **RESP-03**: Touch targets meet minimum 44x44px on mobile — Complete (v1.1, commits dfc4e1e94 + d9e5154b7)
+- [x] **RESP-04**: Typography hierarchy is consistent across all page templates — Complete (v1.1, commits 61e42abe0 + e5e80d6d4)
 
 ### Luxury Cursor
 
