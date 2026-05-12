@@ -65,10 +65,10 @@ Requirements for the CSV-driven ghost mannequin imagery pipeline. Phase numberin
 
 ### Color Contrast
 
-- [x] **CNTR-01**: All text meets WCAG AA contrast ratio (4.5:1 normal text, 3:1 large text)
-- [x] **CNTR-02**: Narrative subtext opacity increased to meet 4.5:1 against background
-- [x] **CNTR-03**: Interactive-cards small text (10-12px) meets minimum contrast
-- [x] **CNTR-04**: Love Hurts $0 pricing replaced with "Pre-Order" display
+- [x] **CNTR-01**: All text meets WCAG AA contrast ratio (4.5:1 normal text, 3:1 large text) *(verified: Phase 11 WCAG regression gate — tests/test_color_contrast_wcag.py)*
+- [x] **CNTR-02**: Narrative subtext opacity increased to meet 4.5:1 against background *(verified: Phase 11 alpha-blend test — text-muted on #0A0A0A asserts >= 4.5:1)*
+- [x] **CNTR-03**: Interactive-cards small text (10-12px) meets minimum contrast *(verified: Phase 11 all-collections token inheritance test)*
+- [x] **CNTR-04**: Love Hurts $0 pricing replaced with "Pre-Order" display *(verified: Phase 11 live-page pricing assertion — verify_live_structure.py CNTR-04 check)*
 
 ### Responsive & Typography
 
