@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-12T21:14:59.836Z
-> Files: 2417 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-12T21:35:09.922Z
+> Files: 2418 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -2444,7 +2444,7 @@
 - `verify_dependencies.py` — Verify all critical dependencies are installed and importable. (~936 tok)
 - `verify_domain_integration.sh` — Domain Integration Verification Script for devskyy.app (~3272 tok)
 - `verify_env.py` — check_file_exists, check_env_var, main (~1414 tok)
-- `verify_live_structure.py` — Structural deploy verification for skyyrose.co. (~5112 tok)
+- `verify_live_structure.py` — Structural deploy verification for skyyrose.co. (~5346 tok)
 - `verify_llm_clients.py` — Colors: print_header, print_success, print_error, print_warning + 9 more (~2928 tok)
 - `verify_logo_consistency.py` — encode_image_to_base64, get_mime_type, analyze_with_gemini, compare_with_visual_engine + 2 more (~4295 tok)
 - `verify_pipelines.py` — Colors: header, ok, fail, warn + 7 more (~3885 tok)
@@ -3290,6 +3290,7 @@
 - `test_catalog_retriever.py` — Phase 4 tests for orchestration/catalog_retriever.py. (~1709 tok)
 - `test_catalog_sync.py` — Tests: default_config, custom_config, default_catalog_config, custom_catalog_config + 14 more (~4604 tok)
 - `test_character_system.py` — URL configuration (~4718 tok)
+- `test_collection_data_integrity.py` — Collection data integrity tests — DATA-02 and DATA-03. (~1140 tok)
 - `test_conversation_editor.py` — Tests: chat_message_creation, chat_message_timestamp, chat_session_initialization, chat_session_with_initial_prompt + 20 more (~3678 tok)
 - `test_core_agents.py` — Tests for the Core Agent hierarchy. (~21654 tok)
 - `test_creative_checkpointer.py` — Tests for the LangGraph Postgres checkpointer. (~1003 tok)
