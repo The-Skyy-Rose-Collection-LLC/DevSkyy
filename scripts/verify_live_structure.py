@@ -140,7 +140,7 @@ THEME_CSS_ASSERTION = Assertion(
 # without per-page setup. data-skyyrose-error is a project-wide beacon
 # emitted by template parts that hit a "should not happen" branch (e.g.,
 # template-parts/collection/page.php when content config is missing).
-GLOBAL_ASSERTIONS: tuple[Assertion, ...] = (
+_STRUCTURAL_ASSERTIONS: tuple[Assertion, ...] = (
     Assertion(
         "[data-skyyrose-error]",
         0,
@@ -148,6 +148,46 @@ GLOBAL_ASSERTIONS: tuple[Assertion, ...] = (
         max_count=0,
     ),
 )
+
+# A11Y post-deploy gate — applied to every page checked by --all / --page.
+# These three selectors catch high-impact accessibility regressions that are
+# observable from the rendered HTML without a browser:
+#
+#   A11Y-05: aria-hidden focusable elements must have tabindex="-1"
+#            Asserts that at least one tabindex="-1" element exists globally
+#            (inc/accessibility-fix.php Section 5 injects this on aria-hidden
+#            buttons/links; if the fix is absent from the render the selector
+#            returns 0 even on nav-heavy pages).
+#
+#   A11Y-07: Skip-link must exist and its href target must be in the DOM.
+#            Pojo Accessibility plugin emits <a class="skip-link" href="#primary">.
+#            This selector confirms the link and its target both exist.
+#
+#   A11Y-09: Images must use loading="lazy" (inc/accessibility-fix.php Section 8
+#            adds this to all <img> without an existing loading= attribute, except
+#            those with class matching hero|logo|brand|monogram).
+#            A floor of 1 catches pages that render zero lazy images — meaning
+#            either no images rendered at all (template failure) or the fix did
+#            not run (output buffer disabled / cached before fix shipped).
+A11Y_ASSERTIONS: tuple[Assertion, ...] = (
+    Assertion(
+        "[tabindex='-1']",
+        1,
+        "A11Y-05: at least 1 tabindex='-1' element present (aria-hidden focusable fix active)",
+    ),
+    Assertion(
+        "a.skip-link",
+        1,
+        "A11Y-07: skip-link anchor exists (Pojo Accessibility plugin active)",
+    ),
+    Assertion(
+        "img[loading='lazy']",
+        1,
+        "A11Y-09: at least 1 lazy-loaded image (inc/accessibility-fix.php Section 8 active)",
+    ),
+)
+
+GLOBAL_ASSERTIONS: tuple[Assertion, ...] = _STRUCTURAL_ASSERTIONS + A11Y_ASSERTIONS
 
 
 def _main_assertion(class_name: str, what_ran: str) -> Assertion:
