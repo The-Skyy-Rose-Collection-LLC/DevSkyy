@@ -327,7 +327,7 @@ v1.2: 14 → 15 → 17 → 18 ; Phase 16 (3D-Replica Architect & Purge) shipped 
 | 9. Collection & Product Data | v1.1 | 2/2 | Complete   | 2026-05-12 |
 | 10. Accessibility HTML & ARIA | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 11. Color Contrast | v1.1 | 2/2 | Complete   | 2026-05-12 |
-| 12. Responsive & Typography | v1.1 | 2/2 | Complete | 2026-03-11 |
+| 12. Responsive & Typography | v1.1 | 2/2 | Complete   | 2026-05-12 |
 | 13. Luxury Cursor | v1.1 | 1/1 | Complete | 2026-03-11 |
 | 14. Catalog Foundation | v1.2 | 0/3 | Not started | - |
 | 15. Ghost Mannequin Agent + QA | v1.2 | 0/TBD | Not started | - |
