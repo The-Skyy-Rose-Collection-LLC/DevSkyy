@@ -12,6 +12,37 @@ STOP-AND-SHOW gate is enforced at the dispatch layer (scripts/tripo_dispatch.py)
 This agent dispatches unconditionally when called — callers are responsible for
 obtaining explicit user confirmation before invoking.
 
+------------------------------------------------------------------------
+Tripo template surface (verified via Context7 / platform.tripo3d.ai docs,
+2026-05-11)
+------------------------------------------------------------------------
+
+Tripo exposes four image-gen templates with very different capabilities. We
+only wire the first one below. The others are documented so the next
+session can extend cleanly when branded SKUs need a prompt-capable path.
+
+  | Template                  | Accepts                              | Wired here? |
+  |---------------------------|--------------------------------------|-------------|
+  | generate_multiview_image  | image only (NO prompt, NO ref)       | YES         |
+  | text_to_image             | prompt + negative_prompt             | no          |
+  | generate_image            | prompt + template + model_version +  | no          |
+  |                           | multi-image refs via [N] syntax      |             |
+  | edit_multiview_image      | original_task_id + per-view prompts  | no          |
+
+Why this matters for the hallucination cluster (bug-096): the only template
+we wire is the one with zero anchors. Branded SKUs cannot be rendered safely
+through ``generate_multiview_image`` because the API itself accepts no
+prompt, no logo overlay, no palette token — FLUX.1 Kontext inside the
+template freelances on whatever isn't visible in the single source image.
+
+If a future caller needs branded multiview output via Tripo, the path is:
+  1. Call ``generate_multiview_image`` on a clean tech-flat to seed a task
+  2. Call ``edit_multiview_image`` with the task_id + per-view prompts
+     derived from the dossier branding_spec
+That two-step pattern needs a separate method on this agent (not yet
+implemented). The hardcoded ``_MULTIVIEW_TEMPLATE`` constant below is the
+single template this agent currently supports.
+
 "Luxury Grows from Concrete."
 """
 

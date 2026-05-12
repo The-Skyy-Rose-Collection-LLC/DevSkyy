@@ -279,3 +279,56 @@ def test_classify_force_branded_still_requires_tech_flat(
     approved, blocked = tripo_dispatch.classify_skus(rows, allow_branded=True)
     assert approved == []
     assert "NO TECH-FLAT" in blocked[0][1]
+
+
+# --------------------------------------------------------------------------- #
+# dispatch_sku — dead-param removal guard
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.unit
+def test_dispatch_sku_does_not_pass_dead_model_version_param(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """``model_version`` was a misleading dead param: the tripo SDK call
+    ``client.generate_multiview_image(image=...)`` accepts no such kwarg,
+    and ``tripo_generate_node`` reads only ``params["image_path"]``. The
+    param implied a knob we did not have — and risked future callers
+    chasing it. This regression test locks in the cleanup.
+    """
+    from scripts import tripo_dispatch
+
+    captured: dict = {}
+
+    def _fake_run_creative(*, intent: str, params: dict, sku: str):
+        captured["intent"] = intent
+        captured["params"] = dict(params)
+        captured["sku"] = sku
+        return {"tripo_result": {"success": True, "views": []}}
+
+    # Inject a fake `run_creative` into the lazy import path used by
+    # `dispatch_sku`. Easiest hook: monkeypatch the module it imports from.
+    fake_runner_mod = type(
+        "_FakeRunnerModule",
+        (),
+        {"run_creative": _fake_run_creative},
+    )
+    monkeypatch.setitem(
+        __import__("sys").modules,
+        "skyyrose.elite_studio.creative.runner",
+        fake_runner_mod,
+    )
+    monkeypatch.setattr(tripo_dispatch, "THEME_ROOT", tmp_path)
+    (tmp_path / "img.webp").write_bytes(b"x")
+
+    row = {
+        "sku": "x-001",
+        "image": "img.webp",
+        "render_source_override": "",
+    }
+    tripo_dispatch.dispatch_sku(row)
+
+    assert captured["intent"] == "tripo-generate"
+    assert captured["sku"] == "x-001"
+    assert set(captured["params"].keys()) == {"image_path"}
+    assert "model_version" not in captured["params"]

@@ -259,7 +259,17 @@ def show_manifest(
 
 
 def dispatch_sku(row: dict[str, str]) -> dict:
-    """Invoke the creative hub for a single SKU synchronously."""
+    """Invoke the creative hub for a single SKU synchronously.
+
+    Only ``image_path`` is honored downstream. The previous version of this
+    function passed ``model_version="flux.1_kontext_pro"`` as a second param,
+    but ``tripo_generate_node`` in ``skyyrose/elite_studio/creative/nodes.py``
+    reads only ``params["image_path"]`` (verified via grep) and the wrapped
+    ``client.generate_multiview_image(image=...)`` call accepts no
+    ``model_version`` argument (Tripo API docs: only ``type`` + ``file``).
+    The model_version param was dead weight that suggested we had a knob
+    we didn't.
+    """
     import sys
 
     sys.path.insert(0, str(REPO_ROOT))
@@ -271,7 +281,6 @@ def dispatch_sku(row: dict[str, str]) -> dict:
         intent="tripo-generate",
         params={
             "image_path": str(src),
-            "model_version": "flux.1_kontext_pro",
         },
         sku=row["sku"],
     )
