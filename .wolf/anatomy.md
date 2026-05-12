@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-12T18:46:27.048Z
-> Files: 2414 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-12T20:20:35.819Z
+> Files: 2417 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -2237,6 +2237,7 @@
 - `ai_providers.py` — Training providers for AI CLI — HuggingFace and Replicate. (~1125 tok)
 - `ai_templates.py` — Embedded HF Space templates for AI CLI. (~1475 tok)
 - `ai.py` — Unified AI CLI for SkyyRose — training, datasets, Spaces, models. (~2618 tok)
+- `anatomy_filter_main.py` — Filter .wolf/anatomy.md to entries tracked on git main. (~1127 tok)
 - `audit_dossier_coverage.py` — Audit dossier completeness across every active SKU in the canonical CSV. (~1722 tok)
 - `audit_golden_coverage.py` — Audit golden-reference coverage across every active SKU. (~1557 tok)
 - `audit_prompts.py` — Audit nano-banana prompts against real product images. (~2365 tok)
@@ -2357,7 +2358,9 @@
 - `README.md` — Project documentation (~1842 tok)
 - `redeploy_lora_monitor.py` — Redeploy lora-training-monitor HuggingFace Space with ralph-loop retry. (~797 tok)
 - `refactor_structure.py` — FileStructureRefactor: plan_refactoring, execute_refactoring, main (~2448 tok)
+- `regen_anatomy_from_main.sh` — Regenerate .wolf/anatomy.md scoped to git main and origin/main. (~196 tok)
 - `regen_masks.py` — Re-derive Stage 2 decoration masks for specific SKUs using fixed MaskDeriver. (~681 tok)
+- `regen_phase_e_manifest_auto.py` — Regenerate the auto-region of tasks/phase-e-manifest.md from code state. (~4420 tok)
 - `regenerate_centroid_sidecars.py` — Backfill JSON sidecars for existing brand centroid .npz files. (~620 tok)
 - `render_deploy_checklist.sh` — Render Deployment Pre-Flight Checklist (~3030 tok)
 - `render_env_generator.py` — Colors: generate_jwt_secret, generate_encryption_key, generate_api_key, parse_env_file + 4 more (~4121 tok)
@@ -3219,7 +3222,7 @@
 - `multi-sku-validation-1778064034.json` (~1349 tok)
 - `per-sku-prompts-1778041872.md` — Per-SKU Generator Prompts (~58670 tok)
 - `per-sku-prompts-1778061036.md` — Per-SKU Generator Prompts (~2778 tok)
-- `phase-e-manifest.md` — Phase E — I2I Re-Render Manifest (33 SKUs) (~3212 tok)
+- `phase-e-manifest.md` — Phase E — I2I Re-Render Manifest (33 SKUs) (~3295 tok)
 - `plan-layer1-tier2-closeout.md` — Plan: Layer 1/Tier 2 Closeout — Open Items (~5857 tok)
 - `pr-453-action-report.md` — PR #453 Action Report (~1668 tok)
 - `pr-auto-report-2026-05-02.md` — PR Auto-Shepherd Report — 2026-05-02 (~1666 tok)

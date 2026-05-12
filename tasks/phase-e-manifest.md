@@ -160,7 +160,7 @@ Recommended ceilings for this dispatch:
 
 ## Outputs & destinations
 
-- **2D renders (ADK pipeline):** `renders/gated/<sku>/<sku>-<view>-render.webp` — per-SKU subdir, no overwrite (env override: `RENDER_PIPELINE_OUTPUT_DIR`)
+- **2D renders (ADK pipeline):** `renders/gated/<sku>/<sku>-<view>-render.webp` — per-SKU subdir, **deterministic path, overwrite-on-rerun** (LoopAgent refine + Phase E re-dispatch both rewrite). Archive `renders/gated/<sku>/` before re-dispatch if history needed. Env override: `RENDER_PIPELINE_OUTPUT_DIR`. Decision: 2026-05-12 path-b (no guard, no flag, documented).
 - **2D renders (legacy compositor path):** `renders/output/<sku>/` — versioned, additive
 - **3D models (round-table):** `renders/3d/<sku>_<task-id>.glb` — task-id-suffixed, no collision risk
 - **3D models (legacy MeshyClient direct):** `output/` (flat, mixed `.glb`s — being retired)
