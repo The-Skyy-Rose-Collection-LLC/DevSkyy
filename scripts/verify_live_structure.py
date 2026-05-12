@@ -90,6 +90,20 @@ class Assertion:
 
 
 @dataclass(frozen=True)
+class PricingCheck:
+    """
+    Text-content assertion for rendered price elements.
+
+    Standard CSS selectors cannot assert on text content (no :contains()),
+    so CNTR-04 pricing assertions use this separate dataclass + helper.
+    """
+
+    selector: str
+    forbidden_texts: tuple[str, ...]
+    label: str
+
+
+@dataclass(frozen=True)
 class Page:
     name: str
     path: str
@@ -188,6 +202,22 @@ A11Y_ASSERTIONS: tuple[Assertion, ...] = (
 )
 
 GLOBAL_ASSERTIONS: tuple[Assertion, ...] = _STRUCTURAL_ASSERTIONS + A11Y_ASSERTIONS
+
+# ---------------------------------------------------------------------------
+# CNTR-04: Pricing text gate
+# ---------------------------------------------------------------------------
+# Pre-order SKUs (e.g., lh-001 Love Hurts) must NOT show "$0" or "$0.00" in
+# their rendered price elements. These placeholders indicate WooCommerce returned
+# a zero-price product instead of the "Pre-Order" display string set by the theme.
+# Standard Assertion selectors cannot check text content (CSS has no :contains()),
+# so PricingCheck + check_no_forbidden_text() are used instead.
+PRICING_CHECKS: tuple[PricingCheck, ...] = (
+    PricingCheck(
+        selector=".holo-card .product-price, .holo-card .price, .product-card .price",
+        forbidden_texts=("$0", "$0.00"),
+        label="CNTR-04: no $0/$0.00 prices on holo-card pre-order SKUs",
+    ),
+)
 
 
 def _main_assertion(class_name: str, what_ran: str) -> Assertion:
@@ -395,6 +425,43 @@ def evaluate_assertions(response, assertions: tuple[Assertion, ...]) -> list[Che
     return results
 
 
+def check_no_forbidden_text(response, checks: tuple[PricingCheck, ...]) -> list[CheckResult]:
+    """
+    Assert that no matched element contains a forbidden text string.
+
+    Returns one synthetic CheckResult per PricingCheck where:
+    - actual=0  → no forbidden text found (PASS, min_count=0, max_count=0)
+    - actual=N  → N elements with forbidden text (FAIL)
+
+    A synthetic Assertion with max_count=0 is used so the result integrates
+    cleanly into the existing CheckResult / reporting pipeline.
+    """
+    results: list[CheckResult] = []
+    for check in checks:
+        synthetic = Assertion(
+            selector=check.selector,
+            min_count=0,
+            label=check.label,
+            max_count=0,
+        )
+        try:
+            elements = response.css(check.selector) or []
+            hit_count = sum(
+                1
+                for el in elements
+                if any(forbidden in (el.text or "") for forbidden in check.forbidden_texts)
+            )
+        except (AttributeError, TypeError, ValueError, RuntimeError) as exc:
+            print(
+                f"  [WARN] PricingCheck selector {check.selector!r} raised "
+                f"{type(exc).__name__}: {exc}",
+                file=sys.stderr,
+            )
+            hit_count = 0
+        results.append(CheckResult(synthetic, hit_count))
+    return results
+
+
 def _build_url(base_url: str, path: str, cache_bust: bool) -> str:
     url = urljoin(base_url, path)
     if cache_bust:
@@ -427,6 +494,7 @@ def check_page(fetcher, page: Page, base_url: str, timeout: int, cache_bust: boo
         return PageReport(page=page, url=url, http_status=status, fetched=True)
 
     results = evaluate_assertions(response, GLOBAL_ASSERTIONS + page.assertions)
+    results += check_no_forbidden_text(response, PRICING_CHECKS)
     return PageReport(page=page, url=url, http_status=status, fetched=True, results=results)
 
 
