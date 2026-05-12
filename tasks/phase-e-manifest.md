@@ -9,28 +9,31 @@
 
 ## Pre-flight readiness
 
+<!-- PREFLIGHT-AUTO-START -->
 | Check | Result |
 |-------|--------|
 | Catalog rows | 33 / 33 parse cleanly (24 cols, `csv.reader` handles quoted descriptions) |
 | Source images present | 33 / 33 (every `image` column path resolves under `wordpress-theme/skyyrose-flagship/`) |
-| Output collisions | 0 — round-table writes are task-id-suffixed; ADK pipeline writes per-SKU subdirs under `renders/gated/<sku>/` |
+| Output collision guard (ADK pipeline) | **DOC (accepted)** — `renders/gated/<sku>/<sku>-<view>-render.webp` deterministic path at `agents/render_pipeline/tools/generate_image.py:264-268`. LoopAgent refine and re-dispatch both overwrite by design (decision 2026-05-12, path-b). Archive `renders/gated/<sku>/` before re-dispatch if history needed. |
 | Round-table import | clean (`python -c "from orchestration.threed_round_table import ThreeDRoundTable"`) |
 | Round-table tests | 36 / 36 passing |
 | Render-pipeline tests | 28 / 28 passing |
 | TRELLIS hardening tests | 8 / 8 passing |
-| Elite Studio hardening tests | 11 / 11 passing |
-| Aggregate test baseline | **83 / 83 green** |
-| TRELLIS.2 available locally | NO — conda `trellis2` env not present; provider gracefully disabled (geo=98/tex=95 leader unavailable; falls back to Meshy + Tripo3D + AniGen) |
-| `RunBudget` enforcement (P1) | LIVE — `ELITE_STUDIO_BUDGET_USD=25.0` default. Every paid stage calls `ensure_within_budget` → `spend`. `BudgetExceededError` halts the run cleanly mid-batch. |
-| Run summary persistence (P2) | LIVE — `logs/runs/<workflow_id>.json` written on success **and** failure |
-| Cross-SKU image-leak guard (P4) | LIVE — `_sku_tokens_consistent()` blocks round-table dispatch when source SKU tokens don't match task SKU |
-| 3-judge QA tournament | LIVE — `gpt-5.5-pro + gemini-3.1-pro-preview + claude-opus-4-7` per render |
-| QA refine loop | LIVE — `LoopAgent(max_iterations=2)`; F5 score classifier emits `pass | refine | abort` |
+| Elite Studio hardening tests | 18 / 18 passing |
+| Aggregate test baseline | **90 / 90 green** |
+| TRELLIS.2 available locally | NO — conda not on PATH; TRELLIS.2 provider unavailable on this host |
+| `RunBudget` enforcement (P1) | LIVE — `ELITE_STUDIO_BUDGET_USD=25.0` default. `ensure_within_budget` gate raises `BudgetExceededError` on projected breach. |
+| Run summary persistence (P2) | LIVE — `logs/runs/<workflow_id>.json` written on success and failure |
+| Cross-SKU image-leak guard (P4) | LIVE — `_sku_tokens_consistent()` blocks round-table dispatch on SKU token mismatch |
+| 3-judge QA tournament | LIVE — judge tournament wired; specific model IDs not declared in nodes.py (verify in prompts/clients) |
+| QA refine loop | LIVE — `LoopAgent(max_iterations=2)` in `agents/render_pipeline/agent.py`; F5 score classifier emits `pass | refine | abort` |
+<!-- PREFLIGHT-AUTO-END -->
 
 ## Per-SKU readiness (dossier gap audit)
 
 Source = catalog `image` column. `LOGO` / `EXTRAS` = dossier frontmatter field presence. Empty `logo_reference` is a silent quality regression (no logo overlay refs sent to Gemini), not a crash — verified at `agents/render_pipeline/tools/generate_image.py:108-120`.
 
+<!-- PERSKU-AUTO-START -->
 | SKU | Collection | SRC | logo_reference | extra_logos | Dossier slug |
 |-----|------------|-----|----------------|-------------|--------------|
 | br-001 | black-rose | OK | OK | OK | black-rose-crewneck |
@@ -67,7 +70,8 @@ Source = catalog `image` column. `LOGO` / `EXTRAS` = dossier frontmatter field p
 | br-003-giants | black-rose | OK | OK | OK | black-is-beautiful-jersey-series-0-baseball-classic-giants |
 | br-003-white | black-rose | OK | OK | OK | black-is-beautiful-jersey-series-0-baseball-classic-white |
 
-**Summary:** 30 / 33 ready for full-quality render. 3 SKUs (sg-001, sg-003, sg-014) will render without primary logo overlay refs. 11 SKUs will render without secondary `extra_logos` refs.
+**Summary:** 30 / 33 ready for primary-logo render. 22 / 33 fully ready (logo + extras). 3 SKU(s) missing primary `logo_reference`. 11 SKU(s) missing `extra_logos`. 0 dossier file(s) absent.
+<!-- PERSKU-AUTO-END -->
 
 ## Dossier gap remediation options
 
