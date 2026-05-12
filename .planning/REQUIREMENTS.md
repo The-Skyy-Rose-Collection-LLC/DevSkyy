@@ -53,15 +53,15 @@ Requirements for the CSV-driven ghost mannequin imagery pipeline. Phase numberin
 
 ### Accessibility
 
-- [x] **A11Y-01**: All buttons have explicit `type="button"` attribute
-- [x] **A11Y-02**: No duplicate element IDs in rendered HTML (stylesheet handles, nonce fields)
-- [x] **A11Y-03**: Empty headings have content or `aria-hidden="true"`
-- [x] **A11Y-04**: Empty links have descriptive `aria-label` attributes
-- [x] **A11Y-05**: Focusable elements with `aria-hidden="true"` have `tabindex="-1"`
-- [x] **A11Y-06**: All form inputs (radio, text) have associated labels or `aria-label`
-- [x] **A11Y-07**: Skip navigation link is wired and functional
-- [x] **A11Y-08**: Stylesheet and script handles are unique (no `skyyrose-accessibility` collision)
-- [x] **A11Y-09**: Below-fold images have `loading="lazy"`, hero images have `loading="eager"`
+- [x] **A11Y-01**: All buttons have explicit `type="button"` attribute — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313)
+- [x] **A11Y-02**: No duplicate element IDs in rendered HTML (stylesheet handles, nonce fields) — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313)
+- [x] **A11Y-03**: Empty headings have content or `aria-hidden="true"` — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313)
+- [x] **A11Y-04**: Empty links have descriptive `aria-label` attributes — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313)
+- [x] **A11Y-05**: Focusable elements with `aria-hidden="true"` have `tabindex="-1"` — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313)
+- [x] **A11Y-06**: All form inputs (radio, text) have associated labels or `aria-label` — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313; search input gap tracked for v1.3)
+- [x] **A11Y-07**: Skip navigation link is wired and functional — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313)
+- [x] **A11Y-08**: Stylesheet and script handles are unique (no `skyyrose-accessibility` collision) — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313; covered transitively by A11Y-02)
+- [x] **A11Y-09**: Below-fold images have `loading="lazy"`, hero images have `loading="eager"` — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313; all non-hero/logo/brand/monogram imgs lazy)
 
 ### Color Contrast
 

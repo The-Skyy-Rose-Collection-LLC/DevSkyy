@@ -187,8 +187,8 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 10-01-PLAN.md -- Fix button type attributes, enqueue handle collision, and duplicate IDs (A11Y-01, A11Y-02, A11Y-08)
-- [ ] 10-02-PLAN.md -- Fix empty headings, empty links, ARIA attributes, form labels, skip nav, and image loading (A11Y-03, A11Y-04, A11Y-05, A11Y-06, A11Y-07, A11Y-09)
+- [x] 10-01-PLAN.md -- Verify button types, duplicate IDs, and enqueue handle uniqueness via static HTML fixture regression suite (A11Y-01, A11Y-02, A11Y-08)
+- [x] 10-02-PLAN.md -- Verify headings, links, ARIA attributes, form labels, skip nav, and image loading via post-deploy gate assertions (A11Y-03, A11Y-04, A11Y-05, A11Y-06, A11Y-07, A11Y-09)
 
 ### Phase 11: Color Contrast
 **Goal**: WCAG AA contrast regression gate — proves all v1.1 color contrast fixes still pass
