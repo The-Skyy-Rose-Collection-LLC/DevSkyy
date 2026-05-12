@@ -168,11 +168,11 @@ Plans:
   1. The Black Rose collection page displays the Black Rose hero banner (not Love Hurts)
   2. Pre-order products (br-004, br-005, br-006, br-d01-d04, lh-001, sg-001, sg-d01) do not appear on live collection catalog grids
   3. Every product in the catalog grid belongs to the collection it appears under (no cross-collection leaks)
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 09-01-PLAN.md -- Verify pre-order filter and cross-collection integrity via CSV integrity test (DATA-02, DATA-03)
-- [ ] 09-02-PLAN.md -- Verify Black Rose hero asset on live + close stale DATA-01 requirement (DATA-01)
+- [x] 09-01-PLAN.md -- Verify pre-order filter and cross-collection integrity via CSV integrity test (DATA-02, DATA-03)
+- [x] 09-02-PLAN.md -- Verify Black Rose hero asset on live + close stale DATA-01 requirement (DATA-01)
 
 ### Phase 10: Accessibility HTML & ARIA
 **Goal**: The theme's rendered HTML passes validation with zero ARIA errors and correct semantic structure
@@ -324,7 +324,7 @@ v1.2: 14 → 15 → 17 → 18 ; Phase 16 (3D-Replica Architect & Purge) shipped 
 | 6. WordPress CI Integration | v1.0 | 1/1 | Complete | 2026-03-09 |
 | 7. Deploy Core | v1.0 | 1/1 | Complete | 2026-03-09 |
 | 8. Deploy Verification & Orchestration | v1.0 | 2/2 | Complete | 2026-03-10 |
-| 9. Collection & Product Data | v1.1 | 2/2 | Complete | 2026-03-11 |
+| 9. Collection & Product Data | v1.1 | 2/2 | Complete   | 2026-05-12 |
 | 10. Accessibility HTML & ARIA | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 11. Color Contrast | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 12. Responsive & Typography | v1.1 | 2/2 | Complete | 2026-03-11 |
