@@ -286,7 +286,7 @@ function skyyrose_get_featured_display_products( $limit = 8 ) {
 	$transient_key = 'skyyrose_featured_display_' . $key;
 	$descriptors   = isset( $_GET['nocache'] ) ? false : get_transient( $transient_key ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only cache-bypass debug flag; no write action, no CSRF surface.
 
-	if ( false === $descriptors || ! is_array( $descriptors ) ) {
+	if ( false === $descriptors || ! is_array( $descriptors ) || empty( $descriptors ) ) {
 		$resolved    = skyyrose_resolve_display_products(
 			skyyrose_get_featured_catalog_products( $key )
 		);

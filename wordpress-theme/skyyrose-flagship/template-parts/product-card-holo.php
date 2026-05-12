@@ -26,12 +26,19 @@ $garment_lock = $args['garment_lock'] ?? '';
 // Images — Front (Model/Finished) vs Back (Techflat/Technical)
 $front_url = $wc_product ? wp_get_attachment_image_url( $wc_product->get_image_id(), 'large' ) : ( $args['image_url'] ?? '' );
 $back_url  = $args['image_back'] ?? ''; // Passed from catalog as the 'image' (techflat) column
+$permalink = $args['permalink'] ?? '';
 
 if ( empty( $front_url ) ) {
 	$front_url = get_theme_file_uri( 'assets/images/placeholder-product.jpg' );
 }
 if ( empty( $back_url ) ) {
 	$back_url = $front_url; // Fallback if no techflat yet
+}
+if ( empty( $permalink ) && $product_id > 0 ) {
+	$permalink = get_permalink( $product_id );
+}
+if ( empty( $permalink ) ) {
+	$permalink = '#';
 }
 
 $index = (int) ( $args['index'] ?? 0 );
@@ -43,7 +50,7 @@ $index = (int) ( $args['index'] ?? 0 );
 
 	<div class="holo__body">
 		<div class="holo__gallery">
-			<a href="<?php echo esc_url( get_permalink( $product_id ) ); ?>" class="holo__img-link">
+			<a href="<?php echo esc_url( $permalink ); ?>" class="holo__img-link">
 				<img class="holo__img holo__img--front" src="<?php echo esc_url( $front_url ); ?>" alt="<?php echo esc_attr( $title ); ?>" loading="lazy">
 				<img class="holo__img holo__img--back" src="<?php echo esc_url( $back_url ); ?>" alt="Technical Blueprint" loading="lazy">
 			</a>
@@ -52,7 +59,7 @@ $index = (int) ( $args['index'] ?? 0 );
 		<div class="holo__info">
 			<span class="holo__collection"><?php echo esc_html( strtoupper( str_replace( '-', ' ', $collection ) ) ); ?></span>
 			<h3 class="holo__name">
-				<a href="<?php echo esc_url( get_permalink( $product_id ) ); ?>"><?php echo esc_html( $title ); ?></a>
+				<a href="<?php echo esc_url( $permalink ); ?>"><?php echo esc_html( $title ); ?></a>
 			</h3>
 			<div class="holo__price-row">
 				<span class="holo__price"><?php echo wp_kses_post( $price_html ); ?></span>

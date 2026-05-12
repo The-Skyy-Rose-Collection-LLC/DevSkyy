@@ -519,6 +519,20 @@ function skyyrose_enqueue_template_styles() {
 		}
 	}
 
+	// Product grid bento layout — landing pages + preorder gateway.
+	if ( in_array( $slug, array( 'landing', 'elementor-editorial', 'preorder-gateway' ), true ) ) {
+		$grid_css = $use_min && file_exists( $base_css_dir . '/product-grid.min.css' )
+			? 'product-grid.min.css' : 'product-grid.css';
+		if ( file_exists( $base_css_dir . '/' . $grid_css ) ) {
+			wp_enqueue_style(
+				'skyyrose-product-grid',
+				$base_css_uri . '/' . $grid_css,
+				array( 'skyyrose-design-tokens' ),
+				SKYYROSE_VERSION
+			);
+		}
+	}
+
 	// WooCommerce page-specific CSS (loaded ON TOP of the base woocommerce.css).
 	$woo_page_styles = array(
 		// single-product.css is the primary stylesheet (replaces woocommerce-single.css).
