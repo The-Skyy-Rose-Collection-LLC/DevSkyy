@@ -62,9 +62,9 @@ def shop() -> BeautifulSoup:
 def _assert_buttons_have_type(soup: BeautifulSoup, page: str) -> None:
     """Every <button> element must have an explicit type attribute."""
     bad = [str(btn)[:120] for btn in soup.find_all("button") if not btn.get("type")]
-    assert not bad, (
-        f"[{page}] A11Y-01: {len(bad)} button(s) missing type= attribute:\n" + "\n".join(bad[:5])
-    )
+    assert (
+        not bad
+    ), f"[{page}] A11Y-01: {len(bad)} button(s) missing type= attribute:\n" + "\n".join(bad[:5])
 
 
 def test_a11y_01_homepage(homepage: BeautifulSoup) -> None:
@@ -171,9 +171,10 @@ def _assert_headings_have_text(soup: BeautifulSoup, page: str) -> None:
         text = tag.get_text(strip=True)
         if not text:
             bad.append(str(tag)[:120])
-    assert not bad, (
-        f"[{page}] A11Y-03: {len(bad)} heading(s) with no text and no aria-hidden:\n"
-        + "\n".join(bad[:5])
+    assert (
+        not bad
+    ), f"[{page}] A11Y-03: {len(bad)} heading(s) with no text and no aria-hidden:\n" + "\n".join(
+        bad[:5]
     )
 
 
@@ -284,9 +285,10 @@ def _assert_aria_hidden_not_focusable(soup: BeautifulSoup, page: str) -> None:
             except ValueError:
                 pass  # non-integer tabindex — ignore
 
-    assert not bad, (
-        f"[{page}] A11Y-05: {len(bad)} aria-hidden element(s) still focusable:\n"
-        + "\n".join(bad[:5])
+    assert (
+        not bad
+    ), f"[{page}] A11Y-05: {len(bad)} aria-hidden element(s) still focusable:\n" + "\n".join(
+        bad[:5]
     )
 
 
@@ -331,9 +333,9 @@ def _assert_inputs_have_labels(soup: BeautifulSoup, page: str) -> None:
         if input_id and soup.find("label", attrs={"for": input_id}):
             continue
         bad.append(str(inp)[:120])
-    assert not bad, (
-        f"[{page}] A11Y-06: {len(bad)} input(s) without accessible label:\n" + "\n".join(bad[:5])
-    )
+    assert (
+        not bad
+    ), f"[{page}] A11Y-06: {len(bad)} input(s) without accessible label:\n" + "\n".join(bad[:5])
 
 
 def test_a11y_06_homepage(homepage: BeautifulSoup) -> None:
@@ -372,15 +374,15 @@ def _assert_skip_link(soup: BeautifulSoup, page: str) -> None:
     skip_link = soup.find("a", class_="skip-link")
     assert skip_link is not None, f"[{page}] A11Y-07: no element with class 'skip-link' found"
     href = skip_link.get("href", "")
-    assert href.startswith("#"), (
-        f"[{page}] A11Y-07: skip-link href='{href}' does not start with '#'"
-    )
+    assert href.startswith(
+        "#"
+    ), f"[{page}] A11Y-07: skip-link href='{href}' does not start with '#'"
     target_id = href[1:]  # strip the leading '#'
     assert target_id, f"[{page}] A11Y-07: skip-link href is '#' with no id fragment"
     target_el = soup.find(id=target_id)
-    assert target_el is not None, (
-        f"[{page}] A11Y-07: skip-link href='{href}' but id='{target_id}' not found in document"
-    )
+    assert (
+        target_el is not None
+    ), f"[{page}] A11Y-07: skip-link href='{href}' but id='{target_id}' not found in document"
 
 
 def test_a11y_07_homepage(homepage: BeautifulSoup) -> None:
