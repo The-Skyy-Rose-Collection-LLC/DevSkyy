@@ -159,10 +159,21 @@ def _main_assertion(class_name: str, what_ran: str) -> Assertion:
     )
 
 
+# Hero background image filename for each collection, as deployed to the CDN.
+# Verified against inc/collection-content.php hero_bg keys and
+# assets/branding/ directory. Used in collection_assertions() below.
+COLLECTION_HERO_ASSETS: dict[str, str] = {
+    "black-rose": "sr-collection-black-rose.webp",
+    "love-hurts": "sr-collection-love-hurts.webp",
+    "signature": "sr-collection-signature.webp",
+    "kids-capsule": "sr-collection-kids-capsule.webp",
+}
+
+
 def collection_assertions(slug: str) -> tuple[Assertion, ...]:
     """Build assertion tuple for a collection page (BR/LH/SIG/Kids)."""
     floor = COLLECTION_CARD_FLOORS[slug]
-    return (
+    base_assertions: tuple[Assertion, ...] = (
         Assertion(
             f"div.col-page[data-collection='{slug}']",
             1,
@@ -181,6 +192,16 @@ def collection_assertions(slug: str) -> tuple[Assertion, ...]:
         ),
         THEME_CSS_ASSERTION,
     )
+    hero_asset = COLLECTION_HERO_ASSETS.get(slug)
+    if hero_asset:
+        return base_assertions + (
+            Assertion(
+                f"img[src*='{hero_asset}']",
+                1,
+                f"collection hero <img src> contains {hero_asset} (DATA-01)",
+            ),
+        )
+    return base_assertions
 
 
 def immersive_assertions(name: str) -> tuple[Assertion, ...]:
