@@ -79,9 +79,9 @@ Requirements for the CSV-driven ghost mannequin imagery pipeline. Phase numberin
 
 ### Luxury Cursor
 
-- [x] **CURS-01**: Cursor renders above modals/popups (z-index management)
-- [x] **CURS-02**: Cursor pauses or adapts when modal/popup is open
-- [x] **CURS-03**: Cursor JS does not load on pages where it's CSS-hidden (immersive)
+- [x] **CURS-01**: Cursor renders above modals/popups (z-index management) — Complete (v1.1, z-index: 99999 confirmed in luxury-cursor.css, commit 818868654)
+- [x] **CURS-02**: Cursor pauses or adapts when modal/popup is open — Complete (v1.1, verified 2026-03-11)
+- [ ] **CURS-03**: Cursor JS does not load on pages where it's CSS-hidden (immersive) — **OPEN GAP** (Phase 13 audit 2026-05-12): `luxury-cursor.min.js` is enqueued unconditionally in `skyyrose_enqueue_global_scripts()` (inc/enqueue.php lines 249-259) with no immersive-slug exclusion. Fix: move enqueue to `skyyrose_enqueue_template_scripts()` behind `if ($slug !== 'immersive')`. Regression gate: `tests/test_luxury_cursor.py::test_cursor_not_loaded_on_immersive` (commit 818868654).
 
 ### Collection & Product Data
 
@@ -165,7 +165,8 @@ Requirements for the CSV-driven ghost mannequin imagery pipeline. Phase numberin
 | A11Y-01 through A11Y-09 | Phase 10 | Complete |
 | CNTR-01 through CNTR-04 | Phase 11 | Complete |
 | RESP-01 through RESP-04 | Phase 12 | Complete |
-| CURS-01 through CURS-03 | Phase 13 | Complete |
+| CURS-01, CURS-02 | Phase 13 | Complete |
+| CURS-03 | Phase 13 | **Open Gap** — immersive slug gate missing in enqueue.php |
 | DATA-01 | Phase 9 | Pending |
 | DATA-02 through DATA-03 | Phase 9 | Complete |
 

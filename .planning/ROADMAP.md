@@ -146,7 +146,7 @@ Plans:
 - [x] **Phase 10: Accessibility HTML & ARIA** — ARIA errors, button types, skip nav, image loading (completed 2026-03-11)
 - [x] **Phase 11: Color Contrast** — WCAG AA contrast fixes, pre-order price display (completed 2026-03-11)
 - [x] **Phase 12: Responsive & Typography** — 320px overflow, 44px touch targets, fluid type tokens (completed 2026-03-11)
-- [x] **Phase 13: Luxury Cursor** — z-index supremacy, modal pause/resume, conditional loading (completed 2026-03-11)
+- [x] **Phase 13: Luxury Cursor** — z-index supremacy, modal pause/resume, conditional loading (partial — CURS-03 open gap: immersive exclusion gate missing, surfaced 2026-05-12)
 
 </details>
 
@@ -228,10 +228,12 @@ Plans:
   1. When a modal or popup is open, the luxury cursor renders above it (not hidden behind)
   2. The cursor pauses its animation or adapts its behavior while a modal is active
   3. On immersive pages where the cursor is CSS-hidden, the luxury-cursor JS file is not loaded at all (no wasted bandwidth)
-**Plans:** 1/1 plans complete
+**Status**: CURS-01 [x] CURS-02 [x] CURS-03 [ ] OPEN GAP — immersive slug exclusion missing in enqueue.php
+**Plans:** 2/2 plans executed
 
 Plans:
-- [ ] 13-01-PLAN.md -- Fix z-index supremacy, add modal-aware pause/resume, verify conditional loading (CURS-01, CURS-02, CURS-03)
+- [x] 13-01-PLAN.md -- Regression gate: pytest CURS-01 z-index + CURS-03 immersive exclusion (CURS-01 PASSES, CURS-03 FAILS = gap confirmed, commit 818868654)
+- [x] 13-02-PLAN.md -- Annotate REQUIREMENTS.md CURS-01..03 with audit findings, correct CURS-03 to open, update ROADMAP + verify_live_structure.py (CURS-01, CURS-02, CURS-03)
 
 ---
 
@@ -328,7 +330,7 @@ v1.2: 14 → 15 → 17 → 18 ; Phase 16 (3D-Replica Architect & Purge) shipped 
 | 10. Accessibility HTML & ARIA | v1.1 | 2/2 | Complete | 2026-03-11 |
 | 11. Color Contrast | v1.1 | 2/2 | Complete   | 2026-05-12 |
 | 12. Responsive & Typography | v1.1 | 2/2 | Complete   | 2026-05-12 |
-| 13. Luxury Cursor | v1.1 | 1/1 | Complete | 2026-03-11 |
+| 13. Luxury Cursor | v1.1 | 2/2 | Partial (CURS-03 open) | 2026-05-12 |
 | 14. Catalog Foundation | v1.2 | 0/3 | Not started | - |
 | 15. Ghost Mannequin Agent + QA | v1.2 | 0/TBD | Not started | - |
 | 16. 3D-Replica Architect & Purge | v1.2 | Shipped | Complete | 2026-04-24 |

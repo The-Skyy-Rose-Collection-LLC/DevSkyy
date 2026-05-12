@@ -295,6 +295,14 @@ HOMEPAGE_ASSERTIONS: tuple[Assertion, ...] = (
     Assertion("div#loader", 1, "<div id='loader'> (front-page.php loader element)"),
     THEME_CSS_ASSERTION,
     Assertion("meta[name='generator']", 1, "<meta name='generator'> (WordPress emitted)"),
+    # CURS-01/CURS-03: luxury cursor JS must be present on front-page (global enqueue confirmed).
+    # NOTE: CURS-03 gap — this assertion verifies the JS loads on front-page (correct behaviour).
+    # A separate immersive-page assertion would confirm the JS is ABSENT there (not yet wired).
+    Assertion(
+        "script[src*='luxury-cursor']",
+        1,
+        "CURS-01/CURS-03 — luxury cursor JS present on front-page (global enqueue confirmed)",
+    ),
 )
 
 
