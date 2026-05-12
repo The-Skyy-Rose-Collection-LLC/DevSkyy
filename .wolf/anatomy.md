@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-12T21:58:57.331Z
-> Files: 2423 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-12T22:34:18.355Z
+> Files: 2427 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -2444,7 +2444,7 @@
 - `verify_dependencies.py` — Verify all critical dependencies are installed and importable. (~936 tok)
 - `verify_domain_integration.sh` — Domain Integration Verification Script for devskyy.app (~3272 tok)
 - `verify_env.py` — check_file_exists, check_env_var, main (~1414 tok)
-- `verify_live_structure.py` — Structural deploy verification for skyyrose.co. (~5872 tok)
+- `verify_live_structure.py` — Structural deploy verification for skyyrose.co. (~6751 tok)
 - `verify_llm_clients.py` — Colors: print_header, print_success, print_error, print_warning + 9 more (~2928 tok)
 - `verify_logo_consistency.py` — encode_image_to_base64, get_mime_type, analyze_with_gemini, compare_with_visual_engine + 2 more (~4295 tok)
 - `verify_pipelines.py` — Colors: header, ok, fail, warn + 7 more (~3885 tok)
@@ -3292,6 +3292,7 @@
 - `test_catalog_sync.py` — Tests: default_config, custom_config, default_catalog_config, custom_catalog_config + 14 more (~4604 tok)
 - `test_character_system.py` — URL configuration (~4718 tok)
 - `test_collection_data_integrity.py` — Collection data integrity tests — DATA-02 and DATA-03. (~1140 tok)
+- `test_color_contrast_wcag.py` — Tests: tokens_css_exists, wcag_helper_known_pair, wcag_ratio_order_independent, text_muted_blend + 2 more (~2547 tok)
 - `test_conversation_editor.py` — Tests: chat_message_creation, chat_message_timestamp, chat_session_initialization, chat_session_with_initial_prompt + 20 more (~3678 tok)
 - `test_core_agents.py` — Tests for the Core Agent hierarchy. (~21654 tok)
 - `test_creative_checkpointer.py` — Tests for the LangGraph Postgres checkpointer. (~1003 tok)
@@ -3324,6 +3325,7 @@
 - `test_llm.py` — Tests: system_message, user_message, assistant_message, tool_message + 15 more (~1578 tok)
 - `test_load_tester.py` — Tests: frozen, run_single_sku_single_iteration, run_multiple_skus, run_multiple_iterations + 14 more (~1741 tok)
 - `test_logger.py` — Unit tests for utils/logger.py — stdlib-only logging utility. (~1887 tok)
+- `test_luxury_cursor.py` — Tests: cursor_zindex_above_modals, cursor_css_enqueued_globally, cursor_not_loaded_on_immersive (~2031 tok)
 - `test_mfa.py` — Tests: default_config, custom_config, setup_totp_returns_complete_data, setup_totp_secret_format + 24 more (~6486 tok)
 - `test_model_fidelity.py` — Tests: minimum_fidelity_score, validator_threshold, geometry_metrics_creation, geometry_metrics_default_values + 15 more (~2836 tok)
 - `test_new_api_endpoints.py` — Test suite for new MCP-integrated API endpoints. (~3083 tok)
@@ -3337,6 +3339,7 @@
 - `test_rag_integration.py` — Tests: rag_context_retrieval, agent_with_rag_context, rag_context_caching, rag_document_chunking (~2267 tok)
 - `test_reference_manager.py` — Tests: reference_image_valid_weight, reference_image_weight_too_low_raises_error, reference_image_weight_too_high_raises_error, reference_image_edg... (~7159 tok)
 - `test_renders_config.py` — Smoke tests for renders/config.py — import guard and PRODUCT_CATALOG shape (INFRA-03). (~570 tok)
+- `test_responsive_tokens.py` — Tests: tokens_css_exists, clamp_token_count, clamp_tokens_three_args, clamp_min_floor + 6 more (~2948 tok)
 - `test_round_table.py` — Tests for LLM Round Table competition system with tool calling support. (~4763 tok)
 - `test_runtime.py` — Tests: singleton, register_tool, get_registered_tool, nonexistent_tool + 9 more (~1853 tok)
 - `test_saas_infrastructure.py` — Tests: frozen_dataclass_immutable, all_tiers_present, free_tier_renders_limit, starter_tier_renders_limit + 37 more (~8108 tok)
@@ -3443,6 +3446,7 @@
 
 ## tests/fixtures/
 
+- `homepage_skyyrose.html` (~47507 tok)
 - `sample_product.json` (~229 tok)
 
 ## tests/fixtures/a11y/
