@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-12T23:16:38.464Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-12T23:41:15.935Z
 > Files: 2427 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -23,7 +23,7 @@
 - `autotrain_config.yaml` (~131 tok)
 - `CHANGELOG.md` — Change log (~473 tok)
 - `claude-mem-settings.sh` — claude-mem-settings.sh — Interactive settings manager for ~/.claude-mem/settings.json (~3638 tok)
-- `CLAUDE.md` — OpenWolf (~7842 tok)
+- `CLAUDE.md` — OpenWolf (~8293 tok)
 - `conftest.py` — /*.py", (~500 tok)
 - `CONTEXT.md` — DevSkyy (~1629 tok)
 - `deployment_summary.json` (~406 tok)
