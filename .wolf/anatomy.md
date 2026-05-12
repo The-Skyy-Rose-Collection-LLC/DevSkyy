@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-12T21:35:09.922Z
-> Files: 2418 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-12T21:42:51.827Z
+> Files: 2422 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -3443,6 +3443,13 @@
 ## tests/fixtures/
 
 - `sample_product.json` (~229 tok)
+
+## tests/fixtures/a11y/
+
+- `black_rose.html` — The Skyy Rose Collection (~32383 tok)
+- `homepage.html` — The Skyy Rose Collection (~34226 tok)
+- `shop.html` (~44486 tok)
+- `signature.html` — The Skyy Rose Collection (~32383 tok)
 
 ## tests/fixtures/centroid_gate/
 
