@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-12T21:42:51.827Z
-> Files: 2422 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-12T21:58:57.331Z
+> Files: 2423 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -2444,7 +2444,7 @@
 - `verify_dependencies.py` — Verify all critical dependencies are installed and importable. (~936 tok)
 - `verify_domain_integration.sh` — Domain Integration Verification Script for devskyy.app (~3272 tok)
 - `verify_env.py` — check_file_exists, check_env_var, main (~1414 tok)
-- `verify_live_structure.py` — Structural deploy verification for skyyrose.co. (~5346 tok)
+- `verify_live_structure.py` — Structural deploy verification for skyyrose.co. (~5872 tok)
 - `verify_llm_clients.py` — Colors: print_header, print_success, print_error, print_warning + 9 more (~2928 tok)
 - `verify_logo_consistency.py` — encode_image_to_base64, get_mime_type, analyze_with_gemini, compare_with_visual_engine + 2 more (~4295 tok)
 - `verify_pipelines.py` — Colors: header, ok, fail, warn + 7 more (~3885 tok)
@@ -3271,6 +3271,7 @@
 - `setup.ts` — Jest Test Setup for DevSkyy Enterprise Platform (~1655 tok)
 - `test_3d_pipeline_hardening.py` — Tests: image_request_validates_file_exists, image_request_validates_file_size, image_request_validates_format, image_request_sanitizes_prompt + 19 ... (~5771 tok)
 - `test_3d_pipeline.py` — Tests: meshy_client_initialization, meshy_client_context_manager, meshy_rate_limiting_semaphore, meshy_client_requires_api_key + 13 more (~2752 tok)
+- `test_a11y_html_integrity.py` — A11Y HTML integrity regression suite — A11Y-01 through A11Y-09. (~4411 tok)
 - `test_ab_comparison.py` — Tests: record_stores_in_sorted_set, record_score_is_correct, record_multiple_jobs, record_multiple_providers + 14 more (~2035 tok)
 - `test_adk_model_resolution.py` — Tests for ADK model resolution. (~1304 tok)
 - `test_adk.py` — URL configuration (~3635 tok)
