@@ -246,22 +246,6 @@ function skyyrose_enqueue_global_scripts() {
 		);
 	}
 
-	// Luxury cursor — dot follower (desktop only, self-disables on touch/mobile).
-	// CURS-03: Immersive templates intentionally hide cursor to keep focus on the 3D scene.
-	// Skip enqueue entirely on immersive slugs so the JS isn't downloaded for hidden UI.
-	if ( 'immersive' !== skyyrose_get_current_template_slug() ) {
-		$cursor_file = $use_min && file_exists( $js_dir . '/luxury-cursor.min.js' ) ? 'luxury-cursor.min.js' : 'luxury-cursor.js';
-		if ( file_exists( $js_dir . '/' . $cursor_file ) ) {
-			wp_enqueue_script(
-				'skyyrose-luxury-cursor',
-				$js_uri . '/' . $cursor_file,
-				array(),
-				SKYYROSE_VERSION,
-				true
-			);
-		}
-	}
-
 	// Motion One — vanilla JS animation library (same author as Framer Motion).
 	// Exposes window.Motion with animate(), scroll(), inView(), timeline().
 	// Loaded with `defer` strategy: parsed in parallel with HTML, executed after
@@ -581,6 +565,22 @@ function skyyrose_enqueue_template_scripts() {
 	$base_css_uri = SKYYROSE_ASSETS_URI . '/css';
 	$base_css_dir = SKYYROSE_DIR . '/assets/css';
 	$use_min      = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+
+	// Luxury cursor — dot follower (desktop only, self-disables on touch/mobile).
+	// CURS-03: Immersive templates intentionally hide cursor to keep focus on the 3D scene.
+	// Skip enqueue entirely on immersive slugs so the JS isn't downloaded for hidden UI.
+	if ( 'immersive' !== $slug ) {
+		$cursor_file = $use_min && file_exists( $base_js_dir . '/luxury-cursor.min.js' ) ? 'luxury-cursor.min.js' : 'luxury-cursor.js';
+		if ( file_exists( $base_js_dir . '/' . $cursor_file ) ) {
+			wp_enqueue_script(
+				'skyyrose-luxury-cursor',
+				$base_js_uri . '/' . $cursor_file,
+				array(),
+				SKYYROSE_VERSION,
+				true
+			);
+		}
+	}
 
 	// Landing pages JS — countdown, parallax, FAQ accordion, scroll reveal.
 	if ( in_array( $slug, array( 'landing', 'elementor-editorial' ), true ) ) {
