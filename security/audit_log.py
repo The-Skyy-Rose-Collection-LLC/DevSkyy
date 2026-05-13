@@ -54,6 +54,7 @@ class AuditEventType(StrEnum):
 
     # Data events
     DATA_CREATED = "data_created"
+    DATA_READ = "data_read"
     DATA_MODIFIED = "data_modified"
     DATA_DELETED = "data_deleted"
     DATA_EXPORTED = "data_exported"
@@ -238,7 +239,7 @@ class AuditLogger:
         """Log data access event."""
         event_map = {
             "create": AuditEventType.DATA_CREATED,
-            "read": AuditEventType.DATA_CREATED,  # Placeholder
+            "read": AuditEventType.DATA_READ,
             "update": AuditEventType.DATA_MODIFIED,
             "delete": AuditEventType.DATA_DELETED,
             "export": AuditEventType.DATA_EXPORTED,
