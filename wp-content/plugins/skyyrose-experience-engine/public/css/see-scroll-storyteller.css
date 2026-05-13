@@ -1,0 +1,114 @@
+/**
+ * Scroll Storyteller — Progressive reveal animations.
+ *
+ * @package SkyyRose_Experience_Engine
+ * @since   1.0.0
+ */
+
+/* ── Story Sections: Hidden by default, revealed on scroll ── */
+.see-story-section {
+	opacity: 0;
+	transform: translateY(30px);
+	transition:
+		opacity var(--see-duration-long, 800ms) var(--see-ease-out, cubic-bezier(0.16, 1, 0.3, 1)),
+		transform var(--see-duration-long, 800ms) var(--see-ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+	transition-delay: var(--see-story-delay, 0ms);
+}
+
+.see-story-section.see-story-visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* ── Reveal Variants ── */
+.see-revealable {
+	opacity: 0;
+	transition:
+		opacity var(--see-duration-med, 500ms) var(--see-ease-out),
+		transform var(--see-duration-med, 500ms) var(--see-ease-out);
+}
+
+/* Fade Up (default) */
+.see-revealable:not([data-see-reveal]),
+[data-see-reveal="fade-up"] {
+	transform: translateY(24px);
+}
+
+/* Fade In */
+[data-see-reveal="fade-in"] {
+	transform: none;
+}
+
+/* Slide Left */
+[data-see-reveal="slide-left"] {
+	transform: translateX(40px);
+}
+
+/* Slide Right */
+[data-see-reveal="slide-right"] {
+	transform: translateX(-40px);
+}
+
+/* Scale Up */
+[data-see-reveal="scale-up"] {
+	transform: scale(0.92);
+}
+
+/* Revealed state */
+.see-revealed {
+	opacity: 1;
+	transform: none;
+}
+
+/* ── Scroll Story Container ── */
+.see-scroll-story {
+	position: relative;
+}
+
+/* ── Scroll Progress Indicator ── */
+.see-scroll-spine {
+	position: fixed;
+	right: 16px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 3px;
+	height: 120px;
+	background: rgba(183, 110, 121, 0.15);
+	border-radius: 3px;
+	z-index: var(--see-z-overlay, 100);
+	pointer-events: none;
+}
+
+.see-scroll-spine__fill {
+	width: 100%;
+	background: var(--see-accent, var(--see-rose-gold, #B76E79));
+	border-radius: 3px;
+	height: 0%;
+	transition: height 150ms linear;
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+	.see-story-section,
+	.see-revealable {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+
+	.see-scroll-spine {
+		display: none;
+	}
+}
+
+/* ── Mobile: Simpler animations, smaller offsets ── */
+@media (max-width: 768px) {
+	.see-story-section {
+		transform: translateY(16px);
+	}
+
+	[data-see-reveal="slide-left"],
+	[data-see-reveal="slide-right"] {
+		transform: translateY(16px); /* Vertical instead of horizontal on mobile */
+	}
+}

@@ -1,0 +1,116 @@
+/**
+ * Brand Atmosphere — Canvas, cinematic mode, cursor glow.
+ *
+ * @package SkyyRose_Experience_Engine
+ * @since   1.0.0
+ */
+
+/* ── Particle Canvas ── */
+.see-atmosphere-canvas {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	pointer-events: none;
+	z-index: var(--see-z-overlay, 100);
+	opacity: 1;
+	mix-blend-mode: screen;
+}
+
+/* ── Cinematic Mode Toggle ── */
+.see-cinematic-toggle {
+	position: fixed;
+	bottom: 80px;
+	right: 24px;
+	width: 40px;
+	height: 40px;
+	border: 1px solid rgba(183, 110, 121, 0.3);
+	border-radius: 50%;
+	background: var(--see-dark, #0A0A0A);
+	color: var(--see-silver, #C0C0C0);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: var(--see-z-overlay, 100);
+	transition:
+		background var(--see-duration-short, 300ms),
+		border-color var(--see-duration-short, 300ms);
+	opacity: 0.6;
+}
+
+.see-cinematic-toggle:hover {
+	opacity: 1;
+	border-color: var(--see-rose-gold, #B76E79);
+}
+
+.see-cinematic-toggle.see-cinematic-active {
+	background: var(--see-rose-gold, #B76E79);
+	color: var(--see-white, #FFFFFF);
+	opacity: 1;
+}
+
+/* ── Cinematic Mode — Active State ── */
+.see-cinematic {
+	--see-cinematic-vignette: inset 0 0 120px 40px rgba(0, 0, 0, 0.6);
+}
+
+.see-cinematic::after {
+	content: '';
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	box-shadow: var(--see-cinematic-vignette);
+	pointer-events: none;
+	z-index: var(--see-z-base, 1);
+}
+
+/* Dim non-product elements in cinematic mode */
+.see-cinematic header,
+.see-cinematic footer,
+.see-cinematic .site-footer,
+.see-cinematic .site-header,
+.see-cinematic .woocommerce-breadcrumb,
+.see-cinematic .product_meta,
+.see-cinematic nav {
+	opacity: 0.3;
+	transition: opacity var(--see-duration-med, 500ms);
+}
+
+.see-cinematic header:hover,
+.see-cinematic footer:hover,
+.see-cinematic nav:hover {
+	opacity: 1;
+}
+
+/* Enlarge product images in cinematic mode */
+.see-cinematic .woocommerce-product-gallery,
+.see-cinematic .see-product-wrapper img {
+	transform: scale(1.02);
+	transition: transform var(--see-duration-med, 500ms) var(--see-ease-out);
+}
+
+/* ── Mobile: Hide atmosphere effects ── */
+@media (max-width: 768px) {
+	.see-atmosphere-canvas {
+		display: none;
+	}
+
+	.see-cinematic-toggle {
+		display: none;
+	}
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+	.see-atmosphere-canvas {
+		display: none;
+	}
+
+	.see-cinematic-toggle {
+		display: none;
+	}
+}

@@ -1,0 +1,397 @@
+/**
+ * Admin Dashboard Styles — SkyyRose Experience Engine
+ *
+ * Dark luxury aesthetic matching SkyyRose brand identity.
+ *
+ * @package SkyyRose_Experience_Engine
+ * @since   1.0.0
+ */
+
+/* ── Dashboard Layout ── */
+.see-dashboard {
+	max-width: 1400px;
+	padding: 20px 20px 40px;
+}
+
+.see-dashboard__title {
+	font-size: 28px;
+	font-weight: 700;
+	color: #1d2327;
+	margin-bottom: 20px;
+}
+
+.see-version {
+	font-size: 12px;
+	color: #B76E79;
+	vertical-align: middle;
+	margin-left: 8px;
+	background: rgba(183, 110, 121, 0.1);
+	padding: 2px 8px;
+	border-radius: 10px;
+}
+
+/* ── Status Bar ── */
+.see-status-bar {
+	display: flex;
+	gap: 20px;
+	margin-bottom: 24px;
+	flex-wrap: wrap;
+}
+
+.see-status-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 16px;
+	background: #fff;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	font-size: 13px;
+}
+
+.see-status-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+.see-status--active .see-status-dot { background: #00a32a; }
+.see-status--standalone .see-status-dot { background: #D4AF37; }
+.see-status--offline .see-status-dot { background: #cc1818; }
+
+/* ── Card Grid ── */
+.see-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+	gap: 20px;
+}
+
+.see-card {
+	background: #fff;
+	border: 1px solid #e0e0e0;
+	border-radius: 12px;
+	padding: 24px;
+}
+
+.see-card h2 {
+	font-size: 18px;
+	margin: 0 0 12px;
+	color: #1d2327;
+}
+
+.see-card h2 small {
+	font-weight: 400;
+	color: #999;
+	font-size: 13px;
+}
+
+.see-card--full {
+	grid-column: 1 / -1;
+}
+
+.see-card-desc {
+	color: #666;
+	font-size: 13px;
+	margin: 0 0 16px;
+}
+
+/* ── Module List ── */
+.see-module-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.see-module-item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 10px 14px;
+	border-radius: 8px;
+	background: #f9f9f9;
+	transition: background 0.2s;
+}
+
+.see-module-item .dashicons {
+	color: #B76E79;
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+}
+
+.see-module-info {
+	flex: 1;
+}
+
+.see-module-info strong {
+	display: block;
+	font-size: 13px;
+}
+
+.see-module-info small {
+	color: #888;
+	font-size: 11px;
+}
+
+.see-module-badge {
+	font-size: 11px;
+	padding: 2px 8px;
+	border-radius: 10px;
+	font-weight: 600;
+}
+
+.see-module--active .see-module-badge {
+	background: rgba(0, 163, 42, 0.1);
+	color: #00a32a;
+}
+
+.see-module--inactive .see-module-badge {
+	background: rgba(0, 0, 0, 0.05);
+	color: #999;
+}
+
+/* ── Analytics ── */
+.see-analytics-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 16px;
+	margin-bottom: 20px;
+}
+
+.see-metric {
+	text-align: center;
+	padding: 16px;
+	background: #f9f9f9;
+	border-radius: 8px;
+}
+
+.see-metric-value {
+	display: block;
+	font-size: 28px;
+	font-weight: 700;
+	color: #B76E79;
+}
+
+.see-metric-label {
+	font-size: 12px;
+	color: #888;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.see-loading {
+	text-align: center;
+	padding: 40px;
+	color: #999;
+}
+
+.see-chart {
+	margin-top: 16px;
+}
+
+/* ── Narrative Form ── */
+.see-narrative-form textarea {
+	width: 100%;
+	padding: 12px;
+	border: 2px solid #e0e0e0;
+	border-radius: 8px;
+	font-size: 14px;
+	resize: vertical;
+	transition: border-color 0.2s;
+}
+
+.see-narrative-form textarea:focus {
+	border-color: #B76E79;
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.15);
+}
+
+.see-form-row {
+	margin-bottom: 12px;
+}
+
+.see-form-row--inline {
+	display: flex;
+	gap: 12px;
+	align-items: flex-end;
+	flex-wrap: wrap;
+}
+
+.see-form-row--inline label {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	font-size: 12px;
+	color: #666;
+}
+
+.see-form-row--inline select,
+.see-form-row--inline input[type="date"] {
+	padding: 6px 10px;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+}
+
+/* ── Narrative Result ── */
+.see-narrative-result {
+	padding: 12px 16px;
+	border-radius: 8px;
+	margin: 12px 0;
+	font-size: 13px;
+}
+
+.see-narrative-result--accepted {
+	background: rgba(0, 163, 42, 0.08);
+	border: 1px solid rgba(0, 163, 42, 0.2);
+	color: #00701a;
+}
+
+.see-narrative-result--declined {
+	background: rgba(204, 24, 24, 0.08);
+	border: 1px solid rgba(204, 24, 24, 0.2);
+	color: #8b0000;
+}
+
+/* ── Directives List ── */
+.see-directives {
+	margin-top: 24px;
+}
+
+.see-directives h3 {
+	font-size: 15px;
+	margin: 0 0 12px;
+}
+
+.see-directive {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	padding: 12px 16px;
+	border-radius: 8px;
+	margin-bottom: 8px;
+}
+
+.see-directive--accepted {
+	background: rgba(0, 163, 42, 0.05);
+	border: 1px solid rgba(0, 163, 42, 0.15);
+}
+
+.see-directive-content p {
+	margin: 4px 0;
+	font-size: 14px;
+}
+
+.see-directive-content small {
+	color: #888;
+	font-size: 11px;
+}
+
+.see-directive-badge {
+	display: inline-block;
+	font-size: 10px;
+	padding: 1px 6px;
+	border-radius: 6px;
+	background: rgba(0, 163, 42, 0.15);
+	color: #00701a;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.see-directive-remove {
+	flex-shrink: 0;
+	margin-top: 4px;
+}
+
+.see-empty {
+	color: #999;
+	font-style: italic;
+	padding: 16px 0;
+}
+
+/* ── History ── */
+.see-history {
+	margin-top: 20px;
+}
+
+.see-history summary {
+	cursor: pointer;
+	font-size: 13px;
+	color: #666;
+	padding: 8px 0;
+}
+
+.see-history-list {
+	max-height: 300px;
+	overflow-y: auto;
+	margin-top: 8px;
+}
+
+.see-history-item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 6px 0;
+	border-bottom: 1px solid #f0f0f0;
+	font-size: 12px;
+}
+
+.see-history-badge {
+	font-size: 10px;
+	padding: 1px 6px;
+	border-radius: 6px;
+	font-weight: 600;
+	text-transform: uppercase;
+	flex-shrink: 0;
+}
+
+.see-history--accepted .see-history-badge {
+	background: rgba(0, 163, 42, 0.1);
+	color: #00701a;
+}
+
+.see-history--declined .see-history-badge {
+	background: rgba(204, 24, 24, 0.1);
+	color: #8b0000;
+}
+
+.see-history--superseded .see-history-badge {
+	background: rgba(212, 175, 55, 0.1);
+	color: #8a7020;
+}
+
+.see-history-detail {
+	flex: 1;
+	color: #555;
+}
+
+.see-history-item small {
+	color: #aaa;
+	flex-shrink: 0;
+}
+
+/* ── Engine List ── */
+.see-engine-list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.see-engine-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 8px 12px;
+	background: #f9f9f9;
+	border-radius: 6px;
+	font-size: 12px;
+}
+
+.see-engine-badge {
+	font-size: 10px;
+	padding: 2px 8px;
+	border-radius: 10px;
+	background: rgba(212, 175, 55, 0.1);
+	color: #8a7020;
+	font-weight: 600;
+}

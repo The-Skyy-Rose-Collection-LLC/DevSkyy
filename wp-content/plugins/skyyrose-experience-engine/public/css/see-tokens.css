@@ -1,0 +1,83 @@
+/**
+ * SkyyRose Experience Engine — Design Tokens
+ *
+ * Mirrors the brand-variables.css and design-tokens.css from the
+ * skyyrose-flagship theme. In standalone mode (non-flagship theme),
+ * these provide the full SkyyRose brand identity. In enhanced mode,
+ * the theme's tokens take precedence via CSS specificity.
+ *
+ * @package SkyyRose_Experience_Engine
+ * @since   1.0.0
+ */
+
+:root {
+	/* ── Brand Colors ── */
+	--see-rose-gold:    #B76E79;
+	--see-dark:         #0A0A0A;
+	--see-silver:       #C0C0C0;
+	--see-crimson:      #DC143C;
+	--see-gold:         #D4AF37;
+	--see-ivory:        #F5F5F0;
+	--see-white:        #FFFFFF;
+
+	/* ── Collection Palettes ── */
+	--see-black-rose-primary:   #C0C0C0;
+	--see-black-rose-accent:    #B76E79;
+	--see-love-hurts-primary:   #DC143C;
+	--see-love-hurts-accent:    #8B0000;
+	--see-signature-primary:    #D4AF37;
+	--see-signature-accent:     #F5F5DC;
+	--see-kids-primary:         #FFB6C1;
+	--see-kids-accent:          #E6E6FA;
+
+	/* ── Typography ── */
+	--see-font-headline:  'Cinzel', serif;
+	--see-font-body:      'Inter', system-ui, sans-serif;
+	--see-font-accent:    'Bebas Neue', sans-serif;
+
+	/* ── Spacing Scale ── */
+	--see-space-xs:  0.25rem;
+	--see-space-sm:  0.5rem;
+	--see-space-md:  1rem;
+	--see-space-lg:  2rem;
+	--see-space-xl:  4rem;
+
+	/* ── Animation Timing ── */
+	--see-ease-out:       cubic-bezier(0.16, 1, 0.3, 1);
+	--see-ease-in-out:    cubic-bezier(0.65, 0, 0.35, 1);
+	--see-duration-micro: 150ms;
+	--see-duration-short: 300ms;
+	--see-duration-med:   500ms;
+	--see-duration-long:  800ms;
+
+	/* ── Shadows & Glows ── */
+	--see-shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.12);
+	--see-shadow-md:    0 4px 12px rgba(0, 0, 0, 0.15);
+	--see-shadow-lg:    0 8px 30px rgba(0, 0, 0, 0.2);
+	--see-glow-rose:    0 0 20px rgba(183, 110, 121, 0.3);
+	--see-glow-gold:    0 0 20px rgba(212, 175, 55, 0.3);
+	--see-glow-crimson: 0 0 20px rgba(220, 20, 60, 0.3);
+
+	/* ── Z-Index Scale ── */
+	--see-z-base:     1;
+	--see-z-overlay:  100;
+	--see-z-modal:    1000;
+	--see-z-toast:    1100;
+	--see-z-cursor:   9999;
+
+	/* ── Borders & Radii ── */
+	--see-radius-sm:  4px;
+	--see-radius-md:  8px;
+	--see-radius-lg:  16px;
+	--see-radius-full: 9999px;
+}
+
+/* ── Reduced Motion Override ── */
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--see-duration-micro: 0ms;
+		--see-duration-short: 0ms;
+		--see-duration-med:   0ms;
+		--see-duration-long:  0ms;
+	}
+}
