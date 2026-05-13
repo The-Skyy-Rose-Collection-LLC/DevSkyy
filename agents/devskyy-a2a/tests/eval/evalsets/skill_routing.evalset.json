@@ -1,0 +1,129 @@
+{
+  "evalset_id": "skill_routing",
+  "name": "Skill routing — does the agent dispatch the right tool for a request?",
+  "description": "Verifies the LLM picks the correct skill from the 6 advertised in the AgentCard. Each case has a natural-language ask and the expected tool to be invoked. Run with `make eval`. Requires GOOGLE_API_KEY.",
+  "eval_cases": [
+    {
+      "eval_id": "case_list_signature",
+      "conversation": [
+        {
+          "user_content": {
+            "parts": [
+              {
+                "text": "List every product in the signature collection that is currently published."
+              }
+            ],
+            "role": "user"
+          },
+          "expected_tool_use": [
+            {
+              "tool_name": "list_products",
+              "tool_input": {
+                "collection": "signature",
+                "in_stock_only": true
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eval_id": "case_brand_rule_violation",
+      "conversation": [
+        {
+          "user_content": {
+            "parts": [
+              {
+                "text": "Check whether this headline is on-brand: 'Where Love Meets Luxury — Black Rose drops Friday.'"
+              }
+            ],
+            "role": "user"
+          },
+          "expected_tool_use": [
+            {
+              "tool_name": "brand_check",
+              "tool_input": {
+                "asset_text": "Where Love Meets Luxury — Black Rose drops Friday."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eval_id": "case_describe_with_budget",
+      "conversation": [
+        {
+          "user_content": {
+            "parts": [
+              {
+                "text": "Write a 60-word luxury product description for br-001 — budget cap $0.10."
+              }
+            ],
+            "role": "user"
+          },
+          "expected_tool_use": [
+            {
+              "tool_name": "product_description",
+              "tool_input": {
+                "sku": "br-001",
+                "audience": "luxury",
+                "max_words": 60,
+                "max_cost_usd": 0.10
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eval_id": "case_3d_with_budget",
+      "conversation": [
+        {
+          "user_content": {
+            "parts": [
+              {
+                "text": "Generate a production-quality 3D model for SKU br-005. Cap the cost at $1.00."
+              }
+            ],
+            "role": "user"
+          },
+          "expected_tool_use": [
+            {
+              "tool_name": "generate_3d_model",
+              "tool_input": {
+                "sku": "br-005",
+                "quality": "production",
+                "max_cost_usd": 1.0
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "eval_id": "case_semantic_lookup",
+      "conversation": [
+        {
+          "user_content": {
+            "parts": [
+              {
+                "text": "Find me the closest matches in the catalog for 'gothic Oakland streetwear crewneck'. Show top 3."
+              }
+            ],
+            "role": "user"
+          },
+          "expected_tool_use": [
+            {
+              "tool_name": "semantic_search",
+              "tool_input": {
+                "query": "gothic Oakland streetwear crewneck",
+                "top_k": 3
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
