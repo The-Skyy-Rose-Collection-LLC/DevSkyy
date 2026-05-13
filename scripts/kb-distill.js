@@ -23,16 +23,12 @@
 import fs   from 'fs';
 import path  from 'path';
 import os    from 'os';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname  = path.dirname(__filename);
+import { PROJECT_ROOT } from './_lib/script-utils.js';
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
-const PROJECT_ROOT   = path.resolve(__dirname, '..');
 const KB_DIR         = path.join(PROJECT_ROOT, 'knowledge-base');
 const PATTERNS_DIR   = path.join(KB_DIR, 'patterns');
 const LESSONS_DIR    = path.join(KB_DIR, 'lessons');

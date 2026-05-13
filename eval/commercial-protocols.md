@@ -2,7 +2,7 @@
 name: Commercial Protocols Matrix (WP §4)
 specified_by: [wp: §4]
 phase: 0
-test_command: node scripts/measurement/check-commercial-protocols.js
+test_command: node scripts/measurement/check-commercial-protocols.js  # PHASE 0.5 DELIVERABLE — script does not exist yet; running it will exit 1 with a 'Phase 0.5 not started' message until the runner is built. See scripts/measurement/README.md.
 pass_threshold: All 10 sub-tables (4.1-4.10) reviewed; current status documented; owner phase + pass criterion present per row
 last_updated: 2026-05-03
 last_updated_by: eval-harness (Phase 0)

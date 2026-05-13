@@ -2,7 +2,7 @@
 name: Premium-Feel Sitewide Checklist (WP §5.3)
 specified_by: [wp: §5.3]
 phase: 0
-test_command: node scripts/measurement/check-premium-feel.js
+test_command: node scripts/measurement/check-premium-feel.js  # PHASE 0.5 DELIVERABLE — script does not exist yet; running it will exit 1 with a 'Phase 0.5 not started' message until the runner is built. See scripts/measurement/README.md.
 pass_threshold: All 10 items honored sitewide; auto-checkable items pass; subjective items reviewed
 last_updated: 2026-05-03
 last_updated_by: eval-harness (Phase 0)

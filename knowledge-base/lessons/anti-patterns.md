@@ -20,8 +20,9 @@ cross_refs:
 
 # Anti-Patterns: Confirmed Failure Modes
 
-15 anti-patterns seeded from WP §1.5 Layer 5, `tasks/lessons.md`, `.serena/memories/CRITICAL_WORKFLOW_DIRECTIVE.md`,
-`.planning/RETROSPECTIVE.md`, `.wolf/cerebrum.md` Do-Not-Repeat, and bugfix claude-mem observations.
+16 anti-patterns seeded from WP §1.5 Layer 5, `tasks/lessons.md`, `.serena/memories/CRITICAL_WORKFLOW_DIRECTIVE.md`,
+`.planning/RETROSPECTIVE.md`, `.wolf/cerebrum.md` Do-Not-Repeat, and bugfix claude-mem observations. AP-16
+(glob-fishing instead of consulting canonical source) was added during the Phase 0 KB seed interview.
 
 Each entry: **what it looks like** / **why it fails** / **the replacement** / **how to recognize it**.
 

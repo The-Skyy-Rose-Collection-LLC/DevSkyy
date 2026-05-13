@@ -109,7 +109,7 @@ Both tracked in `eval/silent-disable-audit.md` with reproduction + resolution st
 
 - ✅ All 17 eval rubric files have YAML frontmatter (`/verification-loop` clean after cost-cap-policy.md fix in commit 4a4766f26)
 - ✅ KB has 16 lessons + 3 decisions + 5 seed indices (exceeds V2 Phase 0 floor of 10/5)
-- ✅ 4 per-edit toolchain scripts pass `--self-test`
+- ✅ 3 self-testing scripts (`verify-impl.js`, `post-simplify-verify.js`, `kb-distill.js`) pass `--self-test`; `_lib/script-utils.js` is a shared utility module imported by the other three (no own `--self-test` path)
 - ✅ PHPCS WordPress-standard 0 errors / 0 warnings on 10 component primitives
 - ✅ `npm run lint:md` passes on all eval files
 - ✅ Live skyyrose.co healthy (homepage + PDP redirect + cart all return expected HTTP)

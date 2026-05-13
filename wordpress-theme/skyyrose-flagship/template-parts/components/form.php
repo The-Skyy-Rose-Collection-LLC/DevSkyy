@@ -102,10 +102,10 @@ $attr_string = skyyrose_build_attr_string( $args['attrs'] ?? array() );
 	<?php if ( $use_fieldset ) : ?>
 		<fieldset class="sr-form__fieldset">
 			<legend class="sr-form__legend"><?php echo esc_html( $args['legend'] ); ?></legend>
-			<?php echo $args['slot']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- slot is internal template output, not user-supplied content ?>
+			<?php echo skyyrose_kses_component_slot( $args['slot'] ); ?>
 		</fieldset>
 	<?php else : ?>
-		<?php echo $args['slot']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- slot is internal template output, not user-supplied content ?>
+		<?php echo skyyrose_kses_component_slot( $args['slot'] ); ?>
 	<?php endif; ?>
 
 </form>

@@ -2,7 +2,7 @@
 name: Shocking-Not-Impressive Criteria
 specified_by: [v2: §2 thesis pillars, §5 Phase 0 outputs]
 phase: 0
-test_command: node scripts/measurement/run-shocking-eval.js
+test_command: node scripts/measurement/run-shocking-eval.js  # PHASE 0.5 DELIVERABLE — script does not exist yet; running it will exit 1 with a 'Phase 0.5 not started' message until the runner is built. See scripts/measurement/README.md.
 pass_threshold: ≥3/5 pillars demonstrably first-of-kind via observable criteria
 last_updated: 2026-05-03
 last_updated_by: eval-harness (Phase 0)
