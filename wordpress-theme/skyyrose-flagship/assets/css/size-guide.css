@@ -37,11 +37,11 @@
 
 /* Typography */
 .sg-heading {
-	margin: 0 0 4px; font-family: 'Cinzel', serif;
+	margin: 0 0 4px; font-family: var(--ff-brand);
 	font-size: 22px; font-weight: 600; letter-spacing: 0.06em; color: #fff;
 }
 .sg-subheading {
-	margin: 0 0 20px; font-family: 'Inter', sans-serif; font-size: 12px;
+	margin: 0 0 20px; font-family: var(--ff-system); font-size: 12px;
 	color: rgba(255, 255, 255, 0.45); text-transform: uppercase; letter-spacing: 0.08em;
 }
 
@@ -53,7 +53,7 @@
 .sg-tab {
 	flex: 1; padding: 10px 0;
 	background: none; border: none; border-bottom: 2px solid transparent;
-	font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+	font-family: var(--ff-system); font-size: 13px; font-weight: 500;
 	color: rgba(255, 255, 255, 0.45); cursor: pointer;
 	transition: color 0.2s ease, border-color 0.2s ease;
 }
@@ -64,7 +64,7 @@
 .sg-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .sg-table {
 	width: 100%; border-collapse: collapse;
-	font-family: 'Inter', sans-serif; font-size: 13px;
+	font-family: var(--ff-system); font-size: 13px;
 }
 .sg-table th {
 	padding: 10px 12px; font-weight: 600; font-size: 11px;
@@ -86,7 +86,7 @@
 	border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 .sg-measure__heading {
-	margin: 0 0 12px; font-family: 'Inter', sans-serif;
+	margin: 0 0 12px; font-family: var(--ff-system);
 	font-size: 13px; font-weight: 600; text-transform: uppercase;
 	letter-spacing: 0.06em; color: rgba(255, 255, 255, 0.7);
 }
@@ -94,7 +94,7 @@
 .sg-measure__icon { flex-shrink: 0; color: rgba(183, 110, 121, 0.5); }
 .sg-measure__list {
 	margin: 0; padding: 0; list-style: none;
-	font-family: 'Inter', sans-serif; font-size: 12px;
+	font-family: var(--ff-system); font-size: 12px;
 	line-height: 1.7; color: rgba(255, 255, 255, 0.55);
 }
 .sg-measure__list li + li { margin-top: 4px; }

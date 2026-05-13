@@ -333,7 +333,7 @@
 /* ═══ Footer CRO Sections ═══ */
 .ft-cro__container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
 .ft-cro__heading {
-	font-family: var(--font-heading, 'Cinzel', serif); font-size: 1.6rem; font-weight: 400;
+	font-family: var(--skyyrose-font-display); font-size: 1.6rem; font-weight: 400;
 	letter-spacing: 0.15em; text-transform: uppercase; margin: 0 0 0.75rem; text-align: center;
 }
 .ft-cro__subheading {
@@ -347,7 +347,7 @@
 	border-top: 1px solid rgba(212,175,55,0.08); border-bottom: 1px solid rgba(212,175,55,0.08);
 }
 .ft-cro-banner p {
-	font-family: var(--font-heading, 'Cinzel', serif); font-size: 1.3rem; font-weight: 400;
+	font-family: var(--skyyrose-font-display); font-size: 1.3rem; font-weight: 400;
 	letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin: 0;
 }
 
@@ -374,7 +374,7 @@
 }
 .ft-cro-craft__card:hover { border-color: rgba(212,175,55,0.2); }
 .ft-cro-craft__icon {
-	display: block; font-family: var(--font-heading, 'Cinzel', serif);
+	display: block; font-family: var(--skyyrose-font-display);
 	font-size: 1.4rem; color: var(--color-gold, #D4AF37); margin-bottom: 0.75rem;
 }
 .ft-cro-craft__card h3 { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 0.5rem; }
