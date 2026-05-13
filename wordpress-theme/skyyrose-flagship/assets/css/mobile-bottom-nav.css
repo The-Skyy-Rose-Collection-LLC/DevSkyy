@@ -41,7 +41,7 @@
 
 .mobile-nav__item:hover,
 .mobile-nav__item--active {
-	color: #B76E79; /* Rose Gold Active State */
+	color: var(--skyyrose-accent, #B76E79);
 }
 
 .mobile-nav__icon {

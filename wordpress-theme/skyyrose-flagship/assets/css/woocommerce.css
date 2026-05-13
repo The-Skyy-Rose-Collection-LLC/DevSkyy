@@ -17,7 +17,7 @@
    ================================================== */
 
 :root {
-	--skyy-woo-bg: #0A0A0A;
+	--skyy-woo-bg: var(--skyyrose-bg, #0A0A0A);
 	--skyy-woo-surface: rgba(255, 255, 255, 0.04);
 	--skyy-woo-surface-hover: rgba(255, 255, 255, 0.08);
 	--skyy-woo-glass: rgba(255, 255, 255, 0.06);
@@ -29,7 +29,7 @@
 	--skyy-woo-accent: var(--rose-gold, #B76E79);
 	--skyy-woo-accent-glow: rgba(183, 110, 121, 0.3);
 	--skyy-woo-gold: var(--gold, #D4AF37);
-	--skyy-woo-danger: #DC143C;
+	--skyy-woo-danger: var(--skyyrose-accent-danger, #DC143C);
 	--skyy-woo-success: #2ECC71;
 	--skyy-woo-radius: 12px;
 	--skyy-woo-radius-sm: 8px;
