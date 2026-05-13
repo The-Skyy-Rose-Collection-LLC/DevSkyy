@@ -32,12 +32,15 @@ from pydantic import BaseModel, Field
 
 # Import official Tripo3D SDK
 try:
-    from tripo3d import TaskStatus, TripoClient
+    from tripo3d import Animation, RigSpec, RigType, TaskStatus, TripoClient
 
     TRIPO_SDK_AVAILABLE = True
 except ImportError:
     TRIPO_SDK_AVAILABLE = False
     TaskStatus = None
+    Animation = None
+    RigSpec = None
+    RigType = None
 
 from agents.core.base import (
     AgentCapability,
@@ -106,6 +109,11 @@ class TripoConfig:
     )
     base_url: str = field(
         default_factory=lambda: os.getenv("TRIPO_API_BASE_URL", "https://api.tripo3d.ai/v2")
+    )
+    # IS_GLOBAL=True → .ai region. IS_GLOBAL=False → .com region (China).
+    # Tripo accounts are bound to ONE region; same key can return 401 on the other.
+    is_global: bool = field(
+        default_factory=lambda: os.getenv("TRIPO_IS_GLOBAL", "true").lower() != "false"
     )
     timeout: float = 300.0  # 5 minutes for generation
     poll_interval: float = 2.0
@@ -323,6 +331,39 @@ class TripoAssetAgent(SuperAgent):
                 severity=ToolSeverity.READ_ONLY,
             ),
             self._tool_validate_asset,
+        )
+
+        self.registry.register(
+            ToolSpec(
+                name="tripo_check_riggable",
+                description="Check if a Tripo-generated mesh can be auto-rigged",
+                category=ToolCategory.MEDIA,
+                severity=ToolSeverity.READ_ONLY,
+                timeout_seconds=120.0,
+            ),
+            self._tool_check_riggable,
+        )
+
+        self.registry.register(
+            ToolSpec(
+                name="tripo_rig_model",
+                description="Auto-rig a Tripo-generated mesh (BIPED or other rig types)",
+                category=ToolCategory.MEDIA,
+                severity=ToolSeverity.MEDIUM,
+                timeout_seconds=300.0,
+            ),
+            self._tool_rig_model,
+        )
+
+        self.registry.register(
+            ToolSpec(
+                name="tripo_retarget_animation",
+                description="Apply preset animations (idle, walk, etc.) to a rigged Tripo model",
+                category=ToolCategory.MEDIA,
+                severity=ToolSeverity.MEDIUM,
+                timeout_seconds=300.0,
+            ),
+            self._tool_retarget_animation,
         )
 
     # -------------------------------------------------------------------------
@@ -886,6 +927,218 @@ class TripoAssetAgent(SuperAgent):
             raise RuntimeError(
                 f"Unexpected error during 3D generation: {e}. Check the logs for more details."
             ) from e
+
+    async def _tool_check_riggable(
+        self,
+        original_model_task_id: str,
+    ) -> dict[str, Any]:
+        """Check if a Tripo-generated mesh is suitable for auto-rigging.
+
+        Args:
+            original_model_task_id: Task ID of a previously generated model.
+
+        Returns:
+            dict with riggable bool, task_id, and any messages from Tripo.
+        """
+        if not TRIPO_SDK_AVAILABLE:
+            raise RuntimeError("Tripo3D SDK not available. Install with: pip install tripo3d.")
+        if not self.tripo_config.api_key:
+            raise ValueError("TRIPO_API_KEY environment variable is required.")
+
+        async with TripoClient(api_key=self.tripo_config.api_key) as client:
+            check_task_id = await client.check_riggable(original_model_task_id)
+            task = await client.wait_for_task(check_task_id, verbose=True)
+
+            if task.status != TaskStatus.SUCCESS:
+                raise RuntimeError(f"Riggability check failed: {getattr(task, 'error', 'unknown')}")
+
+            riggable_result = getattr(task, "result", {}) or {}
+            return {
+                "task_id": check_task_id,
+                "source_task_id": original_model_task_id,
+                "riggable": bool(riggable_result.get("riggable", False)),
+                "message": riggable_result.get("message", ""),
+                "raw": riggable_result,
+            }
+
+    async def _tool_rig_model(
+        self,
+        original_model_task_id: str,
+        rig_type: str = "biped",
+        spec: str = "mixamo",
+        out_format: str = "glb",
+        model_version: str = "v2.0-20250506",
+    ) -> dict[str, Any]:
+        """Auto-rig a Tripo-generated mesh.
+
+        Args:
+            original_model_task_id: Task ID of a previously generated mesh.
+            rig_type: 'biped' (default), 'quadruped', 'hexapod', 'octopod',
+                'avian', 'serpentine', 'aquatic', or 'others'.
+            spec: 'mixamo' (default — uses Mixamo skeleton/bone naming, recommended
+                for Three.js compatibility) or 'tripo'.
+            out_format: 'glb' (default) or 'fbx'.
+            model_version: Rig model version. 'v2.0-20250506' is latest.
+
+        Returns:
+            GenerationResult dict with the rigged model path.
+        """
+        if not TRIPO_SDK_AVAILABLE:
+            raise RuntimeError("Tripo3D SDK not available. Install with: pip install tripo3d.")
+        if not self.tripo_config.api_key:
+            raise ValueError("TRIPO_API_KEY environment variable is required.")
+
+        try:
+            rig_type_enum = RigType(rig_type.lower())
+        except ValueError as e:
+            valid = [r.value for r in RigType]
+            raise ValueError(f"Invalid rig_type '{rig_type}'. Must be one of: {valid}") from e
+
+        try:
+            spec_enum = RigSpec(spec.lower())
+        except ValueError as e:
+            valid = [r.value for r in RigSpec]
+            raise ValueError(f"Invalid spec '{spec}'. Must be one of: {valid}") from e
+
+        async with TripoClient(api_key=self.tripo_config.api_key) as client:
+            logger.info(
+                "Rigging model %s with rig_type=%s spec=%s",
+                original_model_task_id,
+                rig_type_enum.value,
+                spec_enum.value,
+            )
+            rig_task_id = await client.rig_model(
+                original_model_task_id=original_model_task_id,
+                model_version=model_version,
+                out_format=out_format,
+                rig_type=rig_type_enum,
+                spec=spec_enum,
+            )
+
+            task = await client.wait_for_task(rig_task_id, verbose=True)
+            if task.status != TaskStatus.SUCCESS:
+                raise RuntimeError(f"Rigging failed: {getattr(task, 'error', 'unknown')}")
+
+            output_dir = Path(self.tripo_config.output_dir) / "rigged"
+            output_dir.mkdir(parents=True, exist_ok=True)
+            downloaded = await client.download_task_models(task, str(output_dir))
+
+            model_path = downloaded.get("rigged_model") or downloaded.get("model_mesh")
+            if not model_path:
+                raise ValueError(
+                    f"No rigged model in download results. Available keys: "
+                    f"{list(downloaded.keys())}"
+                )
+
+            return GenerationResult(
+                task_id=rig_task_id,
+                model_path=str(model_path),
+                model_url=str(model_path),
+                format=ModelFormat(out_format),
+                metadata={
+                    "source_task_id": original_model_task_id,
+                    "rig_type": rig_type_enum.value,
+                    "spec": spec_enum.value,
+                    "model_version": model_version,
+                    "downloaded_files": {k: str(v) for k, v in downloaded.items() if v},
+                },
+            ).model_dump()
+
+    async def _tool_retarget_animation(
+        self,
+        rigged_model_task_id: str,
+        animations: list[str] | None = None,
+        out_format: str = "glb",
+        bake_animation: bool = True,
+        export_with_geometry: bool = True,
+        animate_in_place: bool = False,
+    ) -> dict[str, Any]:
+        """Apply preset animations to a rigged Tripo model.
+
+        Args:
+            rigged_model_task_id: Task ID from a successful rig_model call.
+            animations: List of animation names. Default: ['idle', 'walk'].
+                Available: idle, walk, run, dive, climb, jump, slash, shoot, hurt,
+                fall, turn, quadruped_walk, hexapod_walk, octopod_walk,
+                serpentine_march, aquatic_march.
+            out_format: 'glb' (default) or 'fbx'.
+            bake_animation: Bake animation tracks into the file (recommended True).
+            export_with_geometry: Include the mesh geometry in the export
+                (recommended True for a self-contained .glb).
+            animate_in_place: If True, the character animates in place rather than
+                translating through space. Recommended False for walk-on entrances.
+
+        Returns:
+            GenerationResult dict with the animated model path.
+        """
+        if not TRIPO_SDK_AVAILABLE:
+            raise RuntimeError("Tripo3D SDK not available. Install with: pip install tripo3d.")
+        if not self.tripo_config.api_key:
+            raise ValueError("TRIPO_API_KEY environment variable is required.")
+
+        if not animations:
+            animations = ["idle", "walk"]
+
+        try:
+            anim_enums = [
+                Animation(a.lower()) if ":" in a else Animation[a.upper()] for a in animations
+            ]
+        except (ValueError, KeyError) as e:
+            valid = [a.name.lower() for a in Animation]
+            raise ValueError(
+                f"Invalid animation in {animations}. Must be names from: {valid}"
+            ) from e
+
+        async with TripoClient(api_key=self.tripo_config.api_key) as client:
+            logger.info(
+                "Retargeting animations %s onto rigged model %s",
+                [a.value for a in anim_enums],
+                rigged_model_task_id,
+            )
+            retarget_task_id = await client.retarget_animation(
+                original_model_task_id=rigged_model_task_id,
+                animation=anim_enums if len(anim_enums) > 1 else anim_enums[0],
+                out_format=out_format,
+                bake_animation=bake_animation,
+                export_with_geometry=export_with_geometry,
+                animate_in_place=animate_in_place,
+            )
+
+            task = await client.wait_for_task(retarget_task_id, verbose=True)
+            if task.status != TaskStatus.SUCCESS:
+                raise RuntimeError(
+                    f"Animation retarget failed: {getattr(task, 'error', 'unknown')}"
+                )
+
+            output_dir = Path(self.tripo_config.output_dir) / "animated"
+            output_dir.mkdir(parents=True, exist_ok=True)
+            downloaded = await client.download_task_models(task, str(output_dir))
+
+            model_path = (
+                downloaded.get("animated_model")
+                or downloaded.get("model_mesh")
+                or next((v for v in downloaded.values() if v), None)
+            )
+            if not model_path:
+                raise ValueError(
+                    f"No animated model in download results. Available keys: "
+                    f"{list(downloaded.keys())}"
+                )
+
+            return GenerationResult(
+                task_id=retarget_task_id,
+                model_path=str(model_path),
+                model_url=str(model_path),
+                format=ModelFormat(out_format),
+                metadata={
+                    "source_task_id": rigged_model_task_id,
+                    "animations": [a.value for a in anim_enums],
+                    "bake_animation": bake_animation,
+                    "export_with_geometry": export_with_geometry,
+                    "animate_in_place": animate_in_place,
+                    "downloaded_files": {k: str(v) for k, v in downloaded.items() if v},
+                },
+            ).model_dump()
 
     async def _tool_validate_asset(
         self,
