@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-12T23:41:15.935Z
-> Files: 2427 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-14T04:50:40.507Z
+> Files: 2504 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -42,14 +42,14 @@
 - `lint-staged.config.mjs` — Declares relPaths (~346 tok)
 - `main_enterprise.py` — API: GET (2 endpoints) (~4080 tok)
 - `Makefile` — Make build targets (~2523 tok)
-- `mypy.ini` — Declares of (~459 tok)
+- `mypy.ini` — Declares of (~464 tok)
 - `nginx-app.devskyy.app.conf` — Nginx configuration for app.devskyy.app (self-hosted alternative) (~1497 tok)
 - `nginx.conf` — Nginx configuration (~1630 tok)
-- `package.json` — Node.js package manifest (~2978 tok)
+- `package.json` — Node.js package manifest (~3008 tok)
 - `pnpm-lock.yaml` — pnpm lock file (~195082 tok)
 - `pre-build-check.sh` — DevSkyy Pre-Build Verification (~2307 tok)
 - `prometheus.yml` — DevSkyy - Prometheus Configuration (~790 tok)
-- `pyproject.toml` — Python project configuration (~4065 tok)
+- `pyproject.toml` — Python project configuration (~4078 tok)
 - `pyrightconfig.json` (~332 tok)
 - `README.md` — Project documentation (~1442 tok)
 - `requirements-dev.txt` — Development Dependencies (~85 tok)
@@ -116,16 +116,6 @@
 ## .claude/hooks/
 
 - `hooks.json` — Declares check (~3245 tok)
-- `lib/common.sh` — Sourced helpers for all structural hooks: TTL cache check (`is_fresh`), JSON payload field reader (`read_field`), pattern scanner (`scan_patterns`), `additionalContext` emitter (`emit_user_prompt_context`), per-topic cache topic dir (`ensure_cache_topic`), per-session sentinel (`session_sentinel`) (~270 tok)
-- `context7-prefetch.sh` — UserPromptSubmit hook. Scans prompt for 33 external library patterns, 24h per-lib cache, injects `additionalContext` JSON pointing to Context7 lookup. Disable: `CONTEXT7_PREFETCH_DISABLE=1` (~620 tok)
-- `context7-touched.sh` — PostToolUse hook on `mcp__*Context7*query-docs`. Normalizes `libraryId` (`/org/repo-suffix` → `repo`), stamps per-lib cache + legacy session sentinel (~190 tok)
-- `canon-prefetch.sh` — UserPromptSubmit hook. Enforces AP-16 (Glob Fishing). Detects catalog/brand/collection/imagery-pipeline/adr/managed-agents/preorder/theme mentions, injects directive pointing at canonical source file. 24h per-topic cache. Disable: `CANON_PREFETCH_DISABLE=1` (~340 tok)
-- `paid-api-stopgate.sh` — PreToolUse hook on Bash. **Blocks** (exit 2) commands matching paid API patterns (FASHN, FLUX, Tripo, Meshy, deploy-theme, vercel deploy, wp post create) + destructive patterns (rm -rf /, force push, hard reset, claude-mem delete). Bypass: prepend `STOPSHOW_ACK=1` after user confirms. Disable: `PAID_API_STOPGATE_DISABLE=1` (~340 tok)
-- `learning-reminder.sh` — Stop hook. If session triggered learning markers (failed tests, bug-fix commits, FIXME/TODO/HACK comments), injects reminder to update cerebrum / buglog / memory / anatomy. Marker file cleared after firing. Disable: `LEARNING_REMINDER_DISABLE=1` (~240 tok)
-- `learning-tripwire.sh` — PostToolUse on Bash|Edit|MultiEdit. Watches for failure/error patterns in Bash stdout, bug-fix commit messages, FIXME/TODO/HACK additions. Appends one-line reasons to session marker for learning-reminder.sh (~170 tok)
-- `prompt-eng-nudge.sh` — UserPromptSubmit hook. Detects prompt-engineering keywords (system_prompt, agent definition, few-shot, prompt template, etc.) and injects directive pointing at `knowledge-base/prompts/INDEX.yaml` + `README.md`. 24h per-topic cache. Disable: `PROMPT_ENG_NUDGE_DISABLE=1` (~360 tok)
-- `prompt-eng-tripwire.sh` — PreToolUse on Write|Edit|MultiEdit. Fires when editing prompts (path matches `**/prompts/**`, `*_prompt*.py`, `*/agents.py`, `*/orchestrator.py` OR content matches `system_prompt=` / `SYSTEM_PROMPT =` / `AgentDefinition(`). Non-blocking advisory; emits once per session via sentinel. Disable: `PROMPT_ENG_TRIPWIRE_DISABLE=1` (~240 tok)
-- `context7-gate.sh` — DEPRECATED 2026-05-13. Old PreToolUse blocking gate. Kept on disk for revival. Replaced by prefetch (senior advice: alarm fatigue beats structural enforcement) (~310 tok)
 
 ## .claude/hooks/memory-persistence/
 
@@ -268,6 +258,7 @@
 
 ## agents/claude_sdk/prompts/
 
+- `CLAUDE.md` (~11 tok)
 - `data_analyst.txt` (~429 tok)
 - `email_triage.txt` (~452 tok)
 - `report_writer.txt` (~448 tok)
@@ -339,10 +330,12 @@
 
 - `__init__.py` — Imagery & 3D Core Agent — photos, VTON, 3D model generation. (~65 tok)
 - `agent.py` — ImageryCoreAgent: execute (~1597 tok)
+- `CLAUDE.md` (~11 tok)
 
 ## agents/core/imagery/sub_agents/
 
 - `__init__.py` — Imagery sub-agents: Gemini image, FASHN VTON, Tripo 3D, Meshy 3D, HF Spaces. (~24 tok)
+- `CLAUDE.md` (~11 tok)
 - `fashn_vton.py` — FashnVtonSubAgent: execute (~517 tok)
 - `gemini_image.py` — GeminiImageSubAgent: execute (~395 tok)
 - `hf_spaces.py` — HfSpacesSubAgent: execute (~376 tok)
@@ -483,6 +476,7 @@
 ## agents/elite_web_builder/tests/
 
 - `__init__.py` — Tests for Elite Web Builder. (~10 tok)
+- `CLAUDE.md` (~11 tok)
 - `conftest.py` — Test configuration — completely isolate from parent packages. (~145 tok)
 - `test_agent_runtime.py` — Tests for AgentRuntime — the bridge from AgentSpec to LLM execution. (~2954 tok)
 - `test_base_agents.py` — Tests for agents/base.py — AgentRole, AgentSpec, AgentOutput, AgentCapability. (~1630 tok)
@@ -511,6 +505,7 @@
 ## agents/elite_web_builder/tools/
 
 - `__init__.py` — Verification and utility tools for Elite Web Builder. (~18 tok)
+- `CLAUDE.md` (~11 tok)
 - `context7_bridge.py` — Context7 documentation bridge — anti-hallucination for library code. (~2108 tok)
 - `contrast_checker.py` — ContrastResult: hex_to_rgb, relative_luminance, linearize, contrast_ratio + 2 more (~721 tok)
 - `file_validator.py` — from: validate_file_exists, validate_json_file, validate_no_secrets (~711 tok)
@@ -541,6 +536,7 @@
 
 - `__init__.py` — RenderPipeline ADK agent — generates validated product renders for SkyyRose SKUs. (~262 tok)
 - `agent.py` — RenderPipeline ADK agent — root_agent definition. (~5549 tok)
+- `CLAUDE.md` (~11 tok)
 - `cli.py` — External CLI driver for the RenderPipeline ADK agent. (~3428 tok)
 - `DESIGN.md` — RenderPipeline — Google ADK Agent (~3003 tok)
 - `README.md` — Project documentation (~1056 tok)
@@ -548,6 +544,7 @@
 ## agents/render_pipeline/eval/
 
 - `__init__.py` — ADK AgentEvaluator harness for the RenderPipeline agent. (~96 tok)
+- `CLAUDE.md` (~11 tok)
 - `render_pipeline.evalset.json` (~523 tok)
 - `test_config.json` (~27 tok)
 - `test_render_pipeline.py` — Live integration eval — gated by EVAL_LIVE=1 environment variable. (~608 tok)
@@ -555,6 +552,7 @@
 ## agents/render_pipeline/learning/
 
 - `__init__.py` — Continuous-improvement subsystem for the RenderPipeline agent. (~714 tok)
+- `CLAUDE.md` (~11 tok)
 - `LOOP.md` — Learning Loop (~1242 tok)
 - `proposals.py` — Propose catalog amendments from the learning loops' history. (~1693 tok)
 - `recorder.py` — Append-only structured recorders for the three learning loops. (~857 tok)
@@ -562,6 +560,7 @@
 ## agents/render_pipeline/tests/
 
 - `__init__.py` — Mock-based unit tests for the RenderPipeline tool functions. (~102 tok)
+- `CLAUDE.md` (~11 tok)
 - `test_tools.py` — Mock-based unit tests for the 9 RenderPipeline tool functions. (~8430 tok)
 
 ## agents/render_pipeline/tools/
@@ -570,6 +569,7 @@
 - `_paths.py` — Shared sys.path setup for tool modules. (~261 tok)
 - `articulate_layer0.py` — Tool 4a (NEW): Sonnet 4.6 articulates Layer 0 rendering directives. (~3002 tok)
 - `build_prompt.py` — Tool 4: Compose Layer 0 + Layer 3 + Layer 2 final prompt. (~1011 tok)
+- `CLAUDE.md` (~11 tok)
 - `generate_image.py` — Tool 5: Generate image via routed engine. PAID API CALL. (~2947 tok)
 - `load_dossier.py` — Tool 1: Load the canonical dossier for a SKU. (~693 tok)
 - `qa_tournament.py` — Tool 6: 3-judge QA tournament + learning-loop recorder. PAID API CALLS. (~1794 tok)
@@ -592,6 +592,7 @@
 
 - `__init__.py` — WordPress Bridge Agent — connects dashboard pipelines to WordPress/WooCommerce. (~274 tok)
 - `agent.py` — WordPress Bridge Agent — Claude Agent SDK entry point. (~1271 tok)
+- `CLAUDE.md` (~11 tok)
 - `mcp_server.py` — WordPress Bridge Agent — MCP tool definitions for WordPress/WooCommerce operations. (~8829 tok)
 - `prompts.py` — System prompt and per-pipeline prompt templates for the WordPress Bridge Agent. (~1216 tok)
 
@@ -658,6 +659,7 @@
 ## api/graphql/
 
 - `__init__.py` (~36 tok)
+- `CLAUDE.md` (~11 tok)
 - `schema.py` — Query: product, products (~648 tok)
 - `types.py` — ProductType: from_db (~430 tok)
 
@@ -807,6 +809,7 @@
 ## audits/
 
 - `accessibility-audit-2026-05-04.md` — Accessibility Audit Report (~7038 tok)
+- `CLAUDE.md` (~11 tok)
 - `performance-audit-2026-05-04.md` — SkyyRose WordPress Theme v1.0.0 — Performance Audit (~7373 tok)
 
 ## billing/
@@ -915,6 +918,7 @@
 ## core/auth/
 
 - `__init__.py` (~542 tok)
+- `CLAUDE.md` (~11 tok)
 - `interfaces.py` — ITokenValidator: validate_token, validate_token, is_token_revoked, authenticate + 15 more (~2126 tok)
 - `models.py` — Pydantic: AuthCredentials (43 fields) (~1793 tok)
 - `role_hierarchy.py` — get_role_level, is_role_at_least, has_required_role, get_minimum_required_level + 2 more (~1149 tok)
@@ -950,6 +954,7 @@
 ## core/feature_flags/
 
 - `__init__.py` (~41 tok)
+- `CLAUDE.md` (~11 tok)
 - `flag_manager.py` — class: create_flag, set_flag, get_flag, get_all_flags + 8 more (~4559 tok)
 
 ## core/llm/
@@ -960,12 +965,14 @@
 ## core/llm/domain/
 
 - `__init__.py` — LLM Domain Layer. (~245 tok)
+- `CLAUDE.md` (~11 tok)
 - `models.py` — Pydantic: LLMCapabilities (31 fields) (~1016 tok)
 - `ports.py` — ILLMProvider: complete, stream, connect, close + 5 more (~1156 tok)
 
 ## core/llm/infrastructure/
 
 - `__init__.py` (~109 tok)
+- `CLAUDE.md` (~11 tok)
 - `provider_factory.py` — ProviderFactory: create_provider, get_or_create_provider, get_capabilities, list_providers + 2 more (~2222 tok)
 
 ## core/llm/providers/
@@ -985,6 +992,7 @@
 ## core/registry/
 
 - `__init__.py` (~161 tok)
+- `CLAUDE.md` (~11 tok)
 - `registrations.py` — View: get, delete (~1786 tok)
 - `service_registry.py` — View: get, get (~1961 tok)
 
@@ -1044,6 +1052,7 @@
 ## dev/
 
 - `.gitignore` — Git ignore rules (~166 tok)
+- `CLAUDE.md` (~11 tok)
 - `package.json` — Node.js package manifest (~222 tok)
 - `README.md` — Project documentation (~1205 tok)
 - `tsconfig.json` — TypeScript configuration (~201 tok)
@@ -1150,6 +1159,7 @@
 - `LLM_CLIENTS_QUICK_START.md` — LLM Clients Quick Start Guide (~1802 tok)
 - `LLM_LAYER_VALIDATION_REPORT.md` — LLM Layer Production Validation Report (~9521 tok)
 - `LORA_DEPLOYMENT_STATUS.md` — SkyyRose LoRA Training - Deployment Status (~1280 tok)
+- `MANAGED_AGENTS.md` — Managed Agents — Claude Agent SDK Integration (~3958 tok)
 - `MCP_ARCHITECTURE.md` — DevSkyy MCP Architecture (~2185 tok)
 - `MCP_CONFIGURATION_GUIDE.md` — DevSkyy MCP Server Configuration Guide (~2856 tok)
 - `MCP_CONFIGURATION.md` — DevSkyy MCP Server Configuration Guide (~2394 tok)
@@ -1203,6 +1213,7 @@
 ## docs/CODEMAPS/
 
 - `backend.md` — Backend Codemap (~3512 tok)
+- `CLAUDE.md` (~11 tok)
 - `frontend.md` — Frontend Codemap (~2503 tok)
 - `INDEX.md` — DevSkyy Codemaps Index (~841 tok)
 
@@ -1334,6 +1345,7 @@
 - `2026-03-06-immersive-scene-generation.md` — Immersive Scene Generation — RALPH Task (~2237 tok)
 - `2026-03-07-interactive-product-cards-design.md` — Interactive Product Cards — Implementation Plan (~6238 tok)
 - `2026-03-07-interactive-product-cards-plan.md` — Interactive Product Cards — Implementation Plan (~4313 tok)
+- `CLAUDE.md` (~11 tok)
 
 ## docs/reports/
 
@@ -1407,6 +1419,7 @@
 - `blocking-prerequisites.md` — Blocking Prerequisites — Phase 0.5 (~647 tok)
 - `brand-story.md` — Skyyrose — Brand Story Canon (~1520 tok)
 - `brand.md` — Brand Voice & Visual Adherence (~1362 tok)
+- `CLAUDE.md` (~11 tok)
 - `commercial-protocols.md` — Commercial Protocols Matrix (~3090 tok)
 - `cost-cap-policy.md` — Cost-Cap Policy (Skyyrose V2 Build) (~2579 tok)
 - `design-system.json` — Declares families (~1627 tok)
@@ -1454,7 +1467,7 @@
 - `DEPLOYMENT.md` — DevSkyy Deployment Guide (~3281 tok)
 - `eslint.config.mjs` — ESLint flat configuration (~964 tok)
 - `IMPLEMENTATION_SUMMARY.md` — Implementation Summary - Vercel & WordPress Integration (~3966 tok)
-- `next-env.d.ts` — / <reference types="next" /> (~72 tok)
+- `next-env.d.ts` — / <reference types="next" /> (~71 tok)
 - `next.config.ts` — Next.js configuration (~344 tok)
 - `package-lock.json` — npm lock file (~141035 tok)
 - `package.json` — Node.js package manifest (~1239 tok)
@@ -1469,6 +1482,7 @@
 ## frontend/app/
 
 - `AGENTS.md` — Next.js App Routes — Agent Guide (~1740 tok)
+- `CLAUDE.md` (~11 tok)
 - `globals.css` — Styles: 6 rules, 65 vars, 4 animations, 3 layers (~1826 tok)
 - `layout.tsx` — inter (~404 tok)
 - `page.tsx` — metadata (~266 tok)
@@ -1488,14 +1502,17 @@
 
 ## frontend/app/admin/agents/
 
+- `CLAUDE.md` (~11 tok)
 - `page.tsx` — CATEGORY_ICONS — uses useState (~3566 tok)
 
 ## frontend/app/admin/assets/
 
+- `CLAUDE.md` (~11 tok)
 - `page.tsx` — COLLECTIONS — uses useState, useEffect (~6366 tok)
 
 ## frontend/app/admin/autonomous/
 
+- `CLAUDE.md` (~11 tok)
 - `page.tsx` — StatusBadge — uses useState, useCallback, useEffect (~4371 tok)
 
 ## frontend/app/admin/conversion/
@@ -1541,14 +1558,17 @@
 
 ## frontend/app/admin/journey-analytics/
 
+- `CLAUDE.md` (~11 tok)
 - `page.tsx` — Fetch live metrics from the Conversion Analytics API and merge with (~9403 tok)
 
 ## frontend/app/admin/mascot/
 
+- `CLAUDE.md` (~11 tok)
 - `page.tsx` — POSE_OPTIONS — uses useState, useCallback, useEffect (~7220 tok)
 
 ## frontend/app/admin/monitoring/
 
+- `CLAUDE.md` (~11 tok)
 - `page.tsx` — formatTimestamp (~3641 tok)
 
 ## frontend/app/admin/pipeline/
@@ -1565,6 +1585,7 @@
 
 ## frontend/app/admin/settings/
 
+- `CLAUDE.md` (~11 tok)
 - `page.tsx` — SettingsPage — uses useState, useEffect (~6043 tok)
 
 ## frontend/app/admin/social-media/
@@ -1573,6 +1594,7 @@
 
 ## frontend/app/admin/tasks/
 
+- `CLAUDE.md` (~11 tok)
 - `page.tsx` — TasksPage — uses useState (~1126 tok)
 
 ## frontend/app/admin/vercel/
@@ -1581,10 +1603,12 @@
 
 ## frontend/app/admin/wordpress/
 
+- `CLAUDE.md` (~11 tok)
 - `page.tsx` — WordPressAdminPage — uses useState, useCallback, useEffect (~11525 tok)
 
 ## frontend/app/api/auth/[...nextauth]/
 
+- `CLAUDE.md` (~11 tok)
 - `route.ts` — NextAuth.js v4 API Route Handler (~82 tok)
 
 ## frontend/app/api/checkout/
@@ -1593,6 +1617,7 @@
 
 ## frontend/app/api/conversion/
 
+- `CLAUDE.md` (~11 tok)
 - `route.ts` — Conversion Analytics API — Unified Event Collection (~3265 tok)
 
 ## frontend/app/api/huggingface/
@@ -1617,6 +1642,7 @@
 
 ## frontend/app/api/monitoring/metrics/
 
+- `CLAUDE.md` (~11 tok)
 - `route.ts` — Prometheus Metrics Endpoint - Next.js Route Handler (~451 tok)
 
 ## frontend/app/api/pipeline-status/
@@ -1633,7 +1659,13 @@
 
 ## frontend/app/api/products/
 
+- `CLAUDE.md` (~11 tok)
 - `route.ts` — Products API Route (~946 tok)
+
+## frontend/app/api/settings/
+
+- `CLAUDE.md` (~11 tok)
+- `route.ts` — Next.js API route: GET, POST (~688 tok)
 
 ## frontend/app/api/social-media/
 
@@ -1700,6 +1732,7 @@
 
 ## frontend/app/login/
 
+- `CLAUDE.md` (~11 tok)
 - `page.tsx` — API_URL — renders form — uses useRouter, useState, useEffect, useCallback (~4216 tok)
 
 ## frontend/app/pre-order/
@@ -1744,6 +1777,7 @@
 
 ## frontend/components/admin/qa/
 
+- `CLAUDE.md` (~11 tok)
 - `QASkeleton.tsx` — QASkeleton (~186 tok)
 - `ReviewDetail.tsx` — FIDELITY_THRESHOLD (~3565 tok)
 - `ReviewListItem.tsx` — FIDELITY_THRESHOLD (~732 tok)
@@ -1763,6 +1797,7 @@
 - `analytics-charts.tsx` — BRAND_COLORS — renders chart — uses useMemo (~3468 tok)
 - `app-sidebar.tsx` — mainNavItems (~2183 tok)
 - `aurora-analytics.tsx` — BRAND — uses useState, useEffect (~3830 tok)
+- `CLAUDE.md` (~11 tok)
 - `conversion-pulse.tsx` — BRAND — renders chart — uses useState, useRef, useEffect, useCallback (~5854 tok)
 - `DashboardSkeleton.tsx` — Loading skeleton for the dashboard page. (~646 tok)
 - `index.ts` — Dashboard components for the admin interface. (~176 tok)
@@ -1826,6 +1861,7 @@
 ## frontend/contexts/
 
 - `AuthContext.tsx` — initialState — uses useReducer, useEffect, useCallback, useContext (~1185 tok)
+- `CLAUDE.md` (~11 tok)
 
 ## frontend/docs/
 
@@ -1835,14 +1871,17 @@
 ## frontend/e2e/
 
 - `auth.setup.ts` — Authentication Setup (~1383 tok)
+- `CLAUDE.md` (~11 tok)
 - `login-dashboard.spec.ts` — Login & Dashboard E2E Tests (~5330 tok)
 
 ## frontend/e2e/pages/
 
+- `CLAUDE.md` (~11 tok)
 - `index.ts` — Page Object Models (~3062 tok)
 
 ## frontend/hooks/
 
+- `CLAUDE.md` (~11 tok)
 - `index.ts` — Custom React hooks for DevSkyy frontend. (~184 tok)
 - `use-mobile.tsx` — MOBILE_BREAKPOINT — uses useEffect (~162 tok)
 - `useAgents.ts` — Exports useAgents (~326 tok)
@@ -1861,6 +1900,7 @@
 - `auth.d.ts` — NextAuth.js type augmentations for custom JWT fields (~146 tok)
 - `auth.ts` — NextAuth.js v4 Configuration (~798 tok)
 - `catalog.ts` — Canonical product catalog reader (server-only). (~1334 tok)
+- `CLAUDE.md` (~11 tok)
 - `collections.ts` — Exports CollectionSlug, CollectionProduct, CollectionScene, CollectionConfig + 4 more (~3122 tok)
 - `elite-studio-client.ts` — ENVIRONMENT (~2467 tok)
 - `fonts.ts` — Exports playfair, cormorant, spaceMono (~161 tok)
@@ -1872,6 +1912,7 @@
 
 ## frontend/lib/api/
 
+- `CLAUDE.md` (~11 tok)
 - `client.ts` — Exports getAuthToken, getAuthHeaders, fetchWithTimeout, handleResponse, handleArrayResponse (~713 tok)
 - `config.ts` — Exports API_URL (~81 tok)
 - `errors.ts` — Exports ApiError (~266 tok)
@@ -1885,15 +1926,19 @@
 - `assets.ts` — Exports assets (~1164 tok)
 - `autonomous.ts` — Exports autonomous (~468 tok)
 - `batch.ts` — Exports batch (~812 tok)
+- `CLAUDE.md` (~11 tok)
 - `health.ts` — Exports health (~222 tok)
 - `monitoring.ts` — Exports monitoring (~148 tok)
 - `pipeline.ts` — Exports pipeline3d (~936 tok)
 - `qa.ts` — Exports qa (~606 tok)
 - `round-table.ts` — Exports roundTable (~662 tok)
+- `settings.ts` — Settings API client for the dashboard. (~251 tok)
 - `social-media.ts` — Social Media Pipeline API Endpoints (~1423 tok)
+- `tasks.ts` — Tasks API client for the dashboard. (~553 tok)
 
 ## frontend/lib/autonomous/
 
+- `CLAUDE.md` (~11 tok)
 - `round-table-auto-trigger.ts` — Autonomous Round Table Auto-Trigger System (~1434 tok)
 - `self-healing-service.ts` — Self-Healing Service (~1828 tok)
 
@@ -1963,8 +2008,13 @@
 - `deploy.ts` — Automated Vercel Deployment Script (~2446 tok)
 - `link-vercel-project.sh` — Link Vercel Project to "devskyy" (~361 tok)
 
+## frontend/tests/
+
+- `CLAUDE.md` (~11 tok)
+
 ## frontend/tests/e2e/
 
+- `CLAUDE.md` (~11 tok)
 - `settings-page.spec.ts` — Declares saveButton (~2326 tok)
 - `smoke.spec.ts` — API routes: GET (1 endpoints) (~507 tok)
 
@@ -2005,6 +2055,7 @@
 ## imagery/
 
 - `__init__.py` — DevSkyy Imagery Module. (~882 tok)
+- `CLAUDE.md` (~11 tok)
 - `headless_renderer.py` — Headless 3D Model Renderer. (~5129 tok)
 - `image_processor.py` — imagery/image_processor.py (~4333 tok)
 - `lora_trainer.py` — SkyyRose LoRA Trainer. (~9339 tok)
@@ -2024,6 +2075,7 @@
 ## integrations/
 
 - `__init__.py` — SkyyRose Integration Modules (~189 tok)
+- `CLAUDE.md` (~11 tok)
 - `cloudflare_r2_manager.py` — cloudflare_r2_manager.py (~3558 tok)
 - `wordpress_client.py` — Pydantic: ProductData (50 fields) (~5940 tok)
 - `wordpress_com_client.py` — WordPress.com REST API Client. (~3594 tok)
@@ -2031,6 +2083,7 @@
 
 ## knowledge-base/
 
+- `CLAUDE.md` (~11 tok)
 - `README.md` — Project documentation (~2499 tok)
 
 ## knowledge-base/decisions/
@@ -2045,16 +2098,18 @@
 
 ## knowledge-base/prompts/
 
-- `README.md` — Prompt registry schema, contribution workflow (version bump, eval, commit pattern), anti-patterns. Single source of truth for prompt metadata; actual prompt text stays in source files (~1100 tok)
-- `INDEX.yaml` — Master registry. 14 entries seeded 2026-05-13. Per-entry: id, location (file + symbol), consumed_by, model, version, last_updated, performance, canon_dependencies, tags, eval, notes (~2400 tok)
-
-## knowledge-base/prompts/templates/
-
-- `structured-output-schema.md` — Reusable JSON output-schema fragment for agent system prompts. Pattern + when-to-use + anti-patterns + linked prompts (~330 tok)
+- `CLAUDE.md` (~11 tok)
+- `INDEX.yaml` — model: { default: gemini-3 } (~3380 tok)
+- `README.md` — Project documentation (~1393 tok)
 
 ## knowledge-base/prompts/eval/
 
-- `.gitkeep` — Per-prompt eval JSONL files land here as `<id>.jsonl` (~10 tok)
+- `.gitkeep` — Per-prompt eval datasets land here as <id>.jsonl. (~23 tok)
+
+## knowledge-base/prompts/templates/
+
+- `CLAUDE.md` (~11 tok)
+- `structured-output-schema.md` — Template: Structured-Output Schema Block (~478 tok)
 
 ## knowledge-base/references/
 
@@ -2062,13 +2117,14 @@
 
 ## knowledge-base/seed/
 
+- `CLAUDE.md` (~11 tok)
 - `from-claude-mem.md` — Seed Index: claude-mem Observations (`~/.claude-mem/claude-mem.db`) (~2991 tok)
 - `from-gsd.md` — Seed Index: GSD Artifacts (`.planning/`) (~2520 tok)
 - `from-interview.md` — Interview Capture — Corey, 2026-05-03 (~2665 tok)
 - `from-openwolf.md` — Seed Index: OpenWolf System (`.wolf/`) (~2328 tok)
 - `from-serena.md` — Seed Index: Serena Memories (`.serena/memories/`) (~2633 tok)
-- `press-features.md` — 4 press features (Maxim 2023, SF Post / Best of Best / CEO Weekly 2024) + canon corrections + PHP shape for `template-about.php` Phase 2 Commit 4 (~1800 tok)
-- `timeline.md` — Press-corroborated timeline 2020-2026 (founding / 2021 drops / Maxim / 2024 trifecta / Kids Capsule) + voice-register copy seeds + PHP shape (~900 tok)
+- `press-features.md` — Press Features — SkyyRose Collection (~2252 tok)
+- `timeline.md` — SkyyRose Timeline — Brand Canon (~1040 tok)
 
 ## llm/
 
@@ -2112,7 +2168,7 @@
 - `__init__.py` (~76 tok)
 - `agent_bridge_server.py` — Pydantic: BaseInput (60 fields) (~16829 tok)
 - `catalog_generator.py` — Pydantic: ToolMetadata (28 fields) (~5748 tok)
-- `CLAUDE.md` — mcp_servers/ — MCP server implementations (12 Python files) (~406 tok)
+- `CLAUDE.md` — mcp_servers/ — MCP server implementations (12 Python files) (~417 tok)
 - `context7_client.py` — mcp/context7_client.py (~1620 tok)
 - `mcp_orchestrator.json` (~1152 tok)
 - `openai_server.py` — Pydantic: BaseInput (34 fields) (~7724 tok)
@@ -2146,6 +2202,7 @@
 - `__init__.py` — Side-effect imports: each module registers its tools via @mcp.tool(). (~99 tok)
 - `advanced.py` — Advanced tools: multi-agent workflow orchestration. (~1327 tok)
 - `claude_sdk.py` — Claude Agent SDK MCP tools: research, email triage, spreadsheet ops, dashboard. (~3154 tok)
+- `CLAUDE.md` (~11 tok)
 - `cli_anything.py` — CLI-Anything harness tools: agent-native Blender and GIMP control. (~2244 tok)
 - `ecommerce.py` — E-commerce tools: manage_products, dynamic_pricing. (~2264 tok)
 - `infrastructure.py` — Infrastructure & system tools: scan_code, fix_code, self_healing. (~2996 tok)
@@ -2301,6 +2358,9 @@
 - `deploy-holo-cards.sh` — scripts/deploy-holo-cards.sh -- Deploy Holo product card rollout to production (~3234 tok)
 - `deploy-pipeline.sh` — scripts/deploy-pipeline.sh -- Single-command deploy pipeline for SkyyRose WordPress theme (~1847 tok)
 - `deploy-theme.sh` — scripts/deploy-theme.sh -- Production deploy script for SkyyRose WordPress theme (~8874 tok)
+- `diagnose_cli_raw.py` — Build the exact CLI command the SDK would use and run it via subprocess (~507 tok)
+- `diagnose_orchestrator.py` — Test ClaudeSDKClient (async context manager) with MCP server. (~665 tok)
+- `diagnose_sdk.py` — Diagnostic: capture exact claude CLI stderr when SDK fails. (~554 tok)
 - `diagnose_tripo_api.py` — test_api_connection, test_task_polling, test_image_to_3d, main (~3042 tok)
 - `docs_scraper.py` — Bright Data SERP API — Documentation Scraper (~8295 tok)
 - `download_and_test_lora.py` — check_training_complete, download_lora_model, test_lora_inference, main (~1859 tok)
@@ -2313,6 +2373,7 @@
 - `enhance_product_images.py` — ExportSize: ensure_dependencies, production, fast, find_images + 3 more (~9114 tok)
 - `enhance_real_products.py` — detect_collection, luxury_post_process, upscale_with_realesrgan, upscale_with_lanczos + 2 more (~2407 tok)
 - `enhance_with_ai_pipeline.py` — class: connect, close, generate_with_flux, generate_with_sdxl + 2 more (~10483 tok)
+- `enhance-product-images.ts` — Non-Destructive Product Image Enhancement (~1188 tok)
 - `evaluate_product_photos.py` — Product Photo Evaluation Script. (~6142 tok)
 - `expand_brand_voice_dataset.py` — generate_response, expand_dataset (~4612 tok)
 - `export_luxury_templates.py` — export_templates (~1323 tok)
@@ -2366,6 +2427,7 @@
 - `nano-banana-composite-results.json` — Declares does (~2859 tok)
 - `nano-banana-masks.json` (~642 tok)
 - `nano-banana-run.py` — Nano Banana 2 — SkyyRose AI Image Pipeline. (~282 tok)
+- `nano-banana-vton.py` (~25542 tok)
 - `optimize-images.sh` — Batch optimize all images in the WordPress theme (~841 tok)
 - `optimize-repo.sh` — optimize-repo.sh — staged disk cleanup for the DevSkyy repo (~1232 tok)
 - `php-lint.sh` — Lint PHP files passed as arguments. (~240 tok)
@@ -2399,6 +2461,7 @@
 - `run_asset_pipeline.py` — run_pipeline, main (~1272 tok)
 - `run_compositor_pipeline.py` — retry_call, img_to_b64, upload_to_fal, remove_background (~7456 tok)
 - `run_docs_pipeline.py` — Scrape → Ingest Pipeline: Official Docs into the RAG Vector Store (~3083 tok)
+- `run_managed_agent.sh` — Run a Claude Agent SDK session safely, even when invoked from inside an (~652 tok)
 - `run_scene_round_table.py` — elite_judge_responses, run_collection_competition (~6210 tok)
 - `scan_product_inventory.py` — Scan all Desktop collection folders and create comprehensive product inventory JSON. (~1155 tok)
 - `scope.py` — scope - file-to-branch scope router for DevSkyy. (~4029 tok)
@@ -2484,6 +2547,7 @@
 - `verify-pre-commit.sh` — Performance test file -- valid TypeScript. (~3099 tok)
 - `visual_product_recognition.py` — collect_product_images, generate_embeddings, main (~3126 tok)
 - `VISUAL_RECOGNITION_README.md` — Visual Product Recognition for SkyyRose (~1700 tok)
+- `wc_trash_extras.py` — Trash WC products that exist on skyyrose.co but not in canonical CSV. (~1246 tok)
 - `webp_converter.sh` — ############################################################################## (~2321 tok)
 - `wordpress_health_check.py` — class: run_full_check, check_versions, check_all_pages, check_custom_code + 2 more (~4493 tok)
 - `wordpress-media-pipeline.py` — WordPressMediaPipeline: get_all_media, download_image, update_media_metadata, process_media_item + 3 more (~2816 tok)
@@ -2509,6 +2573,7 @@
 
 ## scripts/launch/
 
+- `CLAUDE.md` (~11 tok)
 - `fix_site_structure.py` — Phase 3: Fix site structure — URL slugs, contact page, collection links. (~2008 tok)
 - `map_images_to_products.py` — Phase 1: Map WordPress media images to product catalog SKUs. (~2244 tok)
 - `sku_image_map.json` (~3375 tok)
@@ -2659,7 +2724,7 @@
 - `api_security.py` — Pydantic: CORSConfig (47 fields) (~5527 tok)
 - `audit_log.py` — from: calculate_hash, verify_integrity, log, log_auth + 6 more (~2854 tok)
 - `certificate_authority.py` — CertificateRevocationList: get_cert_not_valid_before, get_cert_not_valid_after, load, save + 6 more (~9192 tok)
-- `CLAUDE.md` — Recent Activity (~64 tok)
+- `CLAUDE.md` (~11 tok)
 - `code_analysis.py` — SecuritySeverity: analyze_file (~4458 tok)
 - `csp_middleware.py` — CSPMiddleware: dispatch, handle_violation, get_violations, clear_violations + 3 more (~2550 tok)
 - `dependency_scanner.py` — DependencyScanner: scan_vulnerabilities, check_outdated_packages, check_license_compliance, generate_security_recommendations + 3 more (~2618 tok)
@@ -2756,6 +2821,7 @@
 ## services/three_d/
 
 - `__init__.py` — 3D Generation Provider Abstraction Layer. (~404 tok)
+- `CLAUDE.md` — Recent Activity (~75 tok)
 - `gemini_provider.py` — Gemini Image Generation Provider (Nano Banana Pro). (~4333 tok)
 - `huggingface_provider.py` — HuggingFace 3D Provider Adapter. (~5254 tok)
 - `provider_factory.py` — 3D Provider Factory with Failover Support. (~5210 tok)
@@ -2836,6 +2902,7 @@
 - `__init__.py` — Shared utilities for the SkyyRose Python stack. (~61 tok)
 - `catalog_dedup.py` — Catalog duplicate detector. (~619 tok)
 - `catalog_loader.py` — Canonical catalog loader — shared by nano_banana and elite_studio. (~988 tok)
+- `CLAUDE.md` (~11 tok)
 - `clip_embedder.py` — Singleton CLIP loader shared by all server-side embedding features. (~1020 tok)
 - `dino_embedder.py` — Singleton DINOv2 loader for image-only similarity. (~883 tok)
 - `dossier_loader.py` — Per-product design dossier loader — shared by all four catalog readers. (~2119 tok)
@@ -2846,6 +2913,7 @@
 
 - `__init__.py` — Agent memory layer — three concerns separated by access pattern. (~342 tok)
 - `agent_memory.py` — AgentMemory — per-agent semantic long-term memory. (~2120 tok)
+- `CLAUDE.md` (~11 tok)
 - `consolidator.py` — Consolidator — close a conversation thread into durable agent memories. (~1330 tok)
 - `conversation.py` — ConversationStore — SQLite-backed chronological turn buffer. (~2162 tok)
 
@@ -2887,6 +2955,10 @@
 - `variant_agent.py` — VariantAgent: generate_variants (~668 tok)
 - `vision_agent.py` — DualVisionGate — Phase B2 dual-agent vision consensus. (~2791 tok)
 - `vision_audit_agent.py` — VisionAuditAgent — H4 post-render fidelity gate. (~2656 tok)
+
+## skyyrose/elite_studio/assets/
+
+- `CLAUDE.md` (~11 tok)
 
 ## skyyrose/elite_studio/character/
 
@@ -2984,6 +3056,7 @@
 ## skyyrose/elite_studio/synthesis/
 
 - `__init__.py` — FLUX synthesis pipeline — dossier-aware luxury product render. (~223 tok)
+- `CLAUDE.md` (~11 tok)
 - `flux_pipeline.py` — FLUX synthesis pipeline — main orchestrator (Stage 1 → 2 → 3 → 5). (~3664 tok)
 
 ## skyyrose/elite_studio/synthesis/clients/
@@ -3002,6 +3075,7 @@
 - `__init__.py` — Pipeline stages — each is independently testable and swappable. (~86 tok)
 - `audit_filter.py` — Stage 1.5 — Audit filter for Path B (Audit-Driven Targeted Masking). (~1319 tok)
 - `base_render.py` — Stage 1: FLUX Kontext Pro — clean garment, no decoration. (~1122 tok)
+- `CLAUDE.md` (~11 tok)
 - `decoration_inpaint.py` — Stage 3: FLUX Fill Pro / Kontext-LoRA — masked decoration inpainting. (~2217 tok)
 - `mask_deriver.py` — Stage 2: Decoration-mask derivation. (~5375 tok)
 
@@ -3083,7 +3157,7 @@
 - `CLAUDE.md` (~11 tok)
 - `config.py` (~403 tok)
 - `hooks.py` — audit_tool_use, guard_bash, log_file_edit, report_progress (~1468 tok)
-- `orchestrator.py` — run_orchestrator, run_single_agent (~2847 tok)
+- `orchestrator.py` — run_orchestrator, run_single_agent (~3048 tok)
 - `tools.py` — get_product_catalog, get_product_overrides, list_product_images, list_theme_templates + 7 more (~4052 tok)
 
 ## src/
@@ -3096,28 +3170,6 @@
 
 - `CLAUDE.md` (~11 tok)
 - `layout.tsx` — Root Layout for Next.js App Router (~246 tok)
-
-## src/collections/
-
-- `ARTryOnViewer.ts` — ARTryOnViewer - Web-based AR Try-On for SkyyRose Collections (~5136 tok)
-- `BaseCollectionExperience.ts` — Base Collection Experience (~6412 tok)
-- `BlackRoseExperience.ts` — BLACK ROSE Collection - 3D Immersive Experience (~10300 tok)
-- `EnvironmentTransition.ts` — EnvironmentTransition - Smooth Scene Transitions for SkyyRose Collections (~5073 tok)
-- `HotspotManager.ts` — Hotspot Manager for SkyyRose Collection Experiences (~3639 tok)
-- `index.ts` — SkyyRose Collection Experiences (~1327 tok)
-- `LoveHurtsExperience.ts` — LOVE HURTS Collection - 3D Immersive Experience (~10434 tok)
-- `ProductionHandlers.ts` — Production Handlers Mixin (~2497 tok)
-- `RunwayExperience.ts` — Runway Experience - 3D Collection Landing Template (~3342 tok)
-- `ShowroomExperience.ts` — Showroom Experience - 3D Collection Landing Template (~4385 tok)
-- `SignatureExperience.ts` — SIGNATURE Collection - 3D Immersive Experience (~9204 tok)
-- `WebXRARViewer.ts` — WebXRARViewer - Native WebXR AR for SkyyRose Collections (~3282 tok)
-- `WooCommerceProductLoader.ts` — WooCommerceProductLoader - Product Data Integration for SkyyRose Collections (~3519 tok)
-
-## src/collections/__tests__/
-
-- `CollectionExperiences.test.ts` — Unit Tests for SkyyRose Collection 3D Experiences (~13543 tok)
-- `HotspotManager.test.ts` — Unit Tests for HotspotManager (~3115 tok)
-- `WooCommerceProductLoader.test.ts` — Unit Tests for WooCommerceProductLoader (~4619 tok)
 
 ## src/components/
 
@@ -3224,6 +3276,7 @@
 
 - `__init__.py` (~129 tok)
 - `catalog_sync.py` — Pydantic: CatalogSyncConfig (58 fields) (~6600 tok)
+- `CLAUDE.md` (~11 tok)
 - `media_sync.py` — sync/media_sync.py (~3314 tok)
 - `woocommerce_sync.py` — sync/woocommerce_sync.py (~3900 tok)
 - `wordpress_media_approval_sync.py` — WordPress Media Approval Synchronization. (~811 tok)
@@ -3235,9 +3288,11 @@
 - `centroid-gate-measurement-analysis.md` — Brand-centroid measurement analysis (2026-05-03) (~1906 tok)
 - `centroid-gate-measurement.json` (~3548 tok)
 - `CLAUDE.md` (~11 tok)
+- `DEPENDABOT-CRITICAL-2026-05-13.md` — Dependabot Critical Triage — 2026-05-13 (~1036 tok)
 - `dossier-audit-report.md` — Dossier Coverage Audit (~1098 tok)
 - `golden-coverage-report.md` — Golden Reference Coverage Audit (~954 tok)
 - `handoff-centroid-gate-2026-05-03.md` — Handoff — brand-centroid embedding gate (~2677 tok)
+- `HANDOFF-elite-studio-hardening-2026-05-11.md` — Handoff — Elite Studio Pipeline Hardening (2026-05-11) (~3024 tok)
 - `HANDOFF-PR-453-P1S.md` — Handoff — PR #453 P1 Hotfix (`hotfix/pr-453-p1s`) (~2616 tok)
 - `layer1-validation-1777935127.json` (~3106 tok)
 - `layer1-validation-1777950613.json` (~5369 tok)
@@ -3248,6 +3303,8 @@
 - `per-sku-prompts-1778041872.md` — Per-SKU Generator Prompts (~58670 tok)
 - `per-sku-prompts-1778061036.md` — Per-SKU Generator Prompts (~2778 tok)
 - `phase-e-manifest.md` — Phase E — I2I Re-Render Manifest (33 SKUs) (~3295 tok)
+- `phase-f-report.md` — Phase F Audit Report — Render Pipeline Migration (~2086 tok)
+- `phase-g-report.md` — Phase G — Documentation Update Report (~647 tok)
 - `plan-layer1-tier2-closeout.md` — Plan: Layer 1/Tier 2 Closeout — Open Items (~5857 tok)
 - `pr-453-action-report.md` — PR #453 Action Report (~1668 tok)
 - `pr-auto-report-2026-05-02.md` — PR Auto-Shepherd Report — 2026-05-02 (~1666 tok)
@@ -3313,7 +3370,7 @@
 - `test_auth_flow.py` — Tests for JWT/OAuth2 authentication flow. (~3328 tok)
 - `test_brand_context_catalog.py` — Phase 2 tests for collection-aware brand context injection. (~2089 tok)
 - `test_catalog_csv_integrity.py` — Integrity smoke tests for the canonical product catalog CSV. (~2389 tok)
-- `test_catalog_retriever.py` — Phase 4 tests for orchestration/catalog_retriever.py. (~1709 tok)
+- `test_catalog_retriever.py` — Phase 4 tests for orchestration/catalog_retriever.py. (~1725 tok)
 - `test_catalog_sync.py` — Tests: default_config, custom_config, default_catalog_config, custom_catalog_config + 14 more (~4604 tok)
 - `test_character_system.py` — URL configuration (~4718 tok)
 - `test_collection_data_integrity.py` — Collection data integrity tests — DATA-02 and DATA-03. (~1140 tok)
@@ -3321,9 +3378,9 @@
 - `test_conversation_editor.py` — Tests: chat_message_creation, chat_message_timestamp, chat_session_initialization, chat_session_with_initial_prompt + 20 more (~3678 tok)
 - `test_core_agents.py` — Tests for the Core Agent hierarchy. (~21654 tok)
 - `test_creative_checkpointer.py` — Tests for the LangGraph Postgres checkpointer. (~1003 tok)
-- `test_creative_hub.py` — Tests: all_14_intents_present, intent_values_are_strings, create_initial_state, initial_state_has_all_result_fields + 18 more (~4910 tok)
+- `test_creative_hub.py` — Tests: all_intents_present, intent_values_are_strings, create_initial_state, initial_state_has_all_result_fields + 18 more (~4918 tok)
 - `test_database_models.py` — Tests for database models, repositories, and seeding. (~2068 tok)
-- `test_database_validation.py` — Tests: database_initialization, connection_pooling, session_management, transaction_rollback + 10 more (~4873 tok)
+- `test_database_validation.py` — Tests: database_initialization, connection_pooling, session_management, transaction_rollback + 10 more (~4891 tok)
 - `test_dossier_completeness.py` — CI gate — every active SKU must have a schema-valid dossier. (~885 tok)
 - `test_dossier_schema.py` — Unit tests for the dossier Pydantic schema and markdown parser. (~2497 tok)
 - `test_elite_api.py` — Tests: enqueue_success, enqueue_invalid_view, enqueue_empty_sku, enqueue_redis_failure_returns_503 + 16 more (~3942 tok)
@@ -3385,7 +3442,7 @@
 - `test_virtual_photoshoot.py` — Tests: preset_values, scene_creation, scene_with_props, photoshoot_creation + 12 more (~5053 tok)
 - `test_virtual_tryon.py` — Tests: garment_categories, tryon_modes, providers, job_status + 23 more (~4051 tok)
 - `test_visual_regression_multi_angle.py` — Tests for the multi-angle visual regression extension. (~2054 tok)
-- `test_visual_regression.py` — Tests: frozen, default_error_empty, returns_passed_true_when_no_golden, set_golden_creates_reference_file + 8 more (~2446 tok)
+- `test_visual_regression.py` — Tests: frozen, default_error_empty, returns_passed_true_when_no_golden, set_golden_creates_reference_file + 8 more (~2510 tok)
 - `test_wordpress_endpoints.py` — Tests for WordPress API endpoints and integration. (~1383 tok)
 - `test_workflow_agents.py` — URL configuration (~5338 tok)
 - `test_zero_trust.py` — Tests: config_initialization, config_validation_invalid_ca_type, config_validation_rotation_days, config_validation_key_size + 17 more (~7938 tok)
@@ -3393,6 +3450,7 @@
 ## tests/agents/
 
 - `__init__.py` (~0 tok)
+- `CLAUDE.md` (~11 tok)
 - `test_skyyrose_agents.py` — Tests for SkyyRose dual agent setup. (~8864 tok)
 - `test_validation_scoring.py` — Tests for agents.core.validation_scoring.compute_validation_scores. (~929 tok)
 - `test_wordpress_bridge.py` — Tests for WordPress Bridge Agent MCP tools. (~10247 tok)
@@ -3400,6 +3458,7 @@
 ## tests/analytics/
 
 - `__init__.py` (~0 tok)
+- `CLAUDE.md` (~11 tok)
 - `test_stream_processor.py` — Tests: page_view_increments_counter, product_interaction_tracks_by_type, order_completed_accumulates_revenue_by_hour, search_query_normalizes_and_c... (~1926 tok)
 
 ## tests/api/
@@ -3420,6 +3479,7 @@
 ## tests/api/analytics/
 
 - `__init__.py` — Analytics API tests. (~8 tok)
+- `CLAUDE.md` (~11 tok)
 - `test_alert_configs.py` — Tests for Alert Configuration API endpoints. (~6742 tok)
 - `test_alert_history.py` — Tests for Alert History and Acknowledgment API endpoints. (~7561 tok)
 - `test_business_analytics.py` — Tests for Business Analytics API endpoints. (~4706 tok)
@@ -3431,7 +3491,7 @@
 
 - `__init__.py` — CLI Tests Package. (~8 tok)
 - `test_prompt_enhance_integration.py` — Tests: enhance_with_real_api, code_task_enhancement, debug_task_enhancement, refactor_task_enhancement + 11 more (~3668 tok)
-- `test_prompt_enhance.py` — Tests: analyze_returns_prompt_analysis, detect_code_task_type, detect_debug_task_type, detect_refactor_task_type + 21 more (~7957 tok)
+- `test_prompt_enhance.py` — Tests: analyze_returns_prompt_analysis, detect_code_task_type, detect_debug_task_type, detect_refactor_task_type + 21 more (~7998 tok)
 
 ## tests/core/
 
@@ -3459,6 +3519,7 @@
 ## tests/elite_studio/
 
 - `__init__.py` (~0 tok)
+- `CLAUDE.md` (~11 tok)
 - `test_brand_centroid.py` — Tests for skyyrose.elite_studio.quality.brand_centroid. (~510 tok)
 - `test_clip_alignment.py` — Tests for skyyrose.elite_studio.quality.clip_alignment. (~401 tok)
 - `test_clip_embedder.py` — Tests for skyyrose.core.clip_embedder. (~516 tok)
@@ -3471,6 +3532,7 @@
 
 ## tests/fixtures/
 
+- `CLAUDE.md` (~11 tok)
 - `homepage_skyyrose.html` (~47507 tok)
 - `sample_product.json` (~229 tok)
 
@@ -3502,7 +3564,7 @@
 
 - `__init__.py` (~0 tok)
 - `CLAUDE.md` (~11 tok)
-- `test_product_service.py` — Tests: get_existing_product_returns_dict, get_missing_product_sets_not_found, list_returns_products_and_total, list_clamps_limit_to_100 + 3 more (~2245 tok)
+- `test_product_service.py` — Tests: get_existing_product_returns_dict, get_missing_product_sets_not_found, list_returns_products_and_total, list_clamps_limit_to_100 + 3 more (~2312 tok)
 
 ## tests/integration/
 
@@ -3533,13 +3595,14 @@
 
 ## tests/orchestration/
 
+- `CLAUDE.md` (~11 tok)
 - `test_agent_memory.py` — Tests: namespace_uses_agent_id, agent_id_must_be_non_empty_no_colon, remember_returns_memory_id_and_persists, remember_rejects_out_of_range_importa... (~3052 tok)
 - `test_embedding_engine.py` — Tests: cohere_embed_query, cohere_embed_batch, cohere_dimension, cohere_embed_single_text + 5 more (~2141 tok)
 - `test_enterprise_index.py` — Tests: enterprise_index_parallel_search, enterprise_index_resilience, enterprise_index_no_providers, github_provider_search + 6 more (~3369 tok)
 - `test_reranker.py` — Tests: cohere_reranker_basic, reranker_improves_relevance, reranker_top_n_limiting, reranker_with_rag_pipeline + 2 more (~2242 tok)
 - `test_threed_round_table_alignment.py` — Tests for 3D round-table CLIP alignment scoring. (~1760 tok)
 - `test_vector_store_namespace.py` — Tests: search_within_namespace_excludes_other_namespaces, search_without_namespace_returns_all, namespace_metadata_round_trip, delete_targeting_wro... (~2678 tok)
-- `test_voyage_embedding.py` — Tests: voyage_initialize_dimension, voyage_initialize_with_mrl_truncation, voyage_missing_api_key, voyage_embed_text_uses_document_input_type + 10 ... (~3724 tok)
+- `test_voyage_embedding.py` — Tests: voyage_initialize_dimension, voyage_initialize_with_mrl_truncation, voyage_missing_api_key, voyage_embed_text_uses_document_input_type + 10 ... (~3747 tok)
 
 ## tests/scripts/
 
@@ -3583,13 +3646,14 @@
 ## tests/services/
 
 - `__init__.py` — Tests for DevSkyy services module. (~20 tok)
+- `CLAUDE.md` (~11 tok)
 - `test_approval_queue_manager.py` — Tests for approval queue manager service. (~5499 tok)
 - `test_authenticity_validator.py` — Unit tests for AuthenticityValidator. (~5116 tok)
-- `test_background_removal.py` — Unit tests for BackgroundRemovalService. (~4159 tok)
+- `test_background_removal.py` — Unit tests for BackgroundRemovalService. (~4210 tok)
 - `test_email_notifications.py` — Unit tests for email notification service. (~7284 tok)
 - `test_format_optimizer.py` — Unit tests for FormatOptimizer. (~5126 tok)
 - `test_image_description_pipeline.py` — Tests for image-to-description pipeline. (~5303 tok)
-- `test_image_ingestion.py` — Unit tests for ImageIngestionService. (~10969 tok)
+- `test_image_ingestion.py` — Unit tests for ImageIngestionService. (~11333 tok)
 - `test_lighting_normalization.py` — Unit tests for LightingNormalizationService. (~3361 tok)
 - `test_pipeline_orchestrator.py` — Unit tests for PipelineOrchestrator. (~4842 tok)
 - `test_processing_queue.py` — Unit tests for ProcessingQueue. (~6951 tok)
@@ -3613,7 +3677,7 @@
 - `__init__.py` (~0 tok)
 - `CLAUDE.md` (~11 tok)
 - `test_gemini_client.py` — Tests for Gemini client (Nano Banana Pro). (~3628 tok)
-- `test_ml_enhancement.py` — tests/services/ml/test_ml_enhancement.py (~19982 tok)
+- `test_ml_enhancement.py` — tests/services/ml/test_ml_enhancement.py (~20033 tok)
 - `test_ml_services.py` — tests/services/ml/test_ml_services.py (~16599 tok)
 - `test_visual_feature_extractor.py` — Tests for visual feature extraction service. (~3257 tok)
 
