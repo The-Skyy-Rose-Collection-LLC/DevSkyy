@@ -71,6 +71,21 @@
         </properties>
     </rule>
 
+    <!-- Register WooCommerce capabilities so the WP.Capabilities sniff recognizes them. -->
+    <rule ref="WordPress.WP.Capabilities">
+        <properties>
+            <property name="custom_capabilities" type="array">
+                <element value="manage_woocommerce"/>
+                <element value="edit_products"/>
+                <element value="edit_product"/>
+                <element value="edit_others_products"/>
+                <element value="publish_products"/>
+                <element value="read_private_products"/>
+                <element value="view_woocommerce_reports"/>
+            </property>
+        </properties>
+    </rule>
+
     <config name="prefixes" value="skyyrose"/>
     <config name="minimum_wp_version" value="6.8"/>
 </ruleset>

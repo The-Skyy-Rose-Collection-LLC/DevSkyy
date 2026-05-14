@@ -16,7 +16,6 @@ from claude_agent_sdk import (
     ClaudeSDKClient,
     ResultMessage,
     TextBlock,
-    query,
 )
 
 from .agents import AGENT_DEFINITIONS
@@ -139,20 +138,31 @@ async def run_orchestrator(
 
 
 async def _run_oneshot(prompt: str, options: ClaudeAgentOptions) -> str:
-    """One-shot query — send prompt, collect result."""
+    """One-shot query — send prompt, collect result.
+
+    Uses ClaudeSDKClient (NOT query()) because claude-agent-sdk 0.1.41's
+    query() calls transport.end_input() after string prompts, which closes
+    stdin and breaks the bidirectional control protocol required by SDK
+    MCP servers. Symptom: CLIConnectionError("ProcessTransport is not
+    ready for writing"). ClaudeSDKClient keeps stdin open for control
+    responses.
+    """
     result_text = ""
 
-    async for message in query(prompt=prompt, options=options):
-        if isinstance(message, AssistantMessage):
-            for block in message.content:
-                if isinstance(block, TextBlock):
-                    print(block.text, end="", flush=True)
+    async with ClaudeSDKClient(options=options) as client:
+        await client.query(prompt)
 
-        elif isinstance(message, ResultMessage):
-            result_text = message.result or ""
-            print("\n\n--- Session complete ---")
-            print(f"Cost: ${message.total_cost_usd:.4f}")
-            print(f"Duration: {message.duration_ms / 1000:.1f}s")
+        async for message in client.receive_response():
+            if isinstance(message, AssistantMessage):
+                for block in message.content:
+                    if isinstance(block, TextBlock):
+                        print(block.text, end="", flush=True)
+
+            elif isinstance(message, ResultMessage):
+                result_text = message.result or ""
+                print("\n\n--- Session complete ---")
+                print(f"Cost: ${message.total_cost_usd:.4f}")
+                print(f"Duration: {message.duration_ms / 1000:.1f}s")
 
     return result_text
 
@@ -257,16 +267,20 @@ async def run_single_agent(
 
     result_text = ""
 
-    async for message in query(prompt=prompt, options=options):
-        if isinstance(message, AssistantMessage):
-            for block in message.content:
-                if isinstance(block, TextBlock):
-                    print(block.text, end="", flush=True)
+    # ClaudeSDKClient (not query()) — see _run_oneshot docstring for SDK MCP rationale.
+    async with ClaudeSDKClient(options=options) as client:
+        await client.query(prompt)
 
-        elif isinstance(message, ResultMessage):
-            result_text = message.result or ""
-            cost = message.total_cost_usd
-            duration = message.duration_ms / 1000
-            print(f"\n\n--- {agent_name} complete (${cost:.4f}, {duration:.1f}s) ---")
+        async for message in client.receive_response():
+            if isinstance(message, AssistantMessage):
+                for block in message.content:
+                    if isinstance(block, TextBlock):
+                        print(block.text, end="", flush=True)
+
+            elif isinstance(message, ResultMessage):
+                result_text = message.result or ""
+                cost = message.total_cost_usd
+                duration = message.duration_ms / 1000
+                print(f"\n\n--- {agent_name} complete (${cost:.4f}, {duration:.1f}s) ---")
 
     return result_text

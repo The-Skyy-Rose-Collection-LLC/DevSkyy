@@ -1,94 +1,169 @@
 {
-  "generated_at": "2026-05-12T12:05:53",
+  "generated_at": "2026-05-13T17:52:54",
   "repo_root": "/Users/theceo/DevSkyy",
   "freshness_days": 30,
-  "files_scanned": 43,
-  "indexed_basenames": 14308,
+  "files_scanned": 44,
+  "indexed_basenames": 14348,
   "missing_paths": [
     {
       "file": ".wolf/anatomy.md",
-      "line": 144,
+      "line": 154,
       "claim": "BRANCH_PROTECTION.md"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 146,
+      "line": 156,
       "claim": "copilot-instructions.md"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 147,
+      "line": 157,
       "claim": "dependabot.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 148,
+      "line": 158,
       "claim": "PULL_REQUEST_TEMPLATE.md"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 152,
+      "line": 162,
       "claim": "asset-generation.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 153,
+      "line": 163,
       "claim": "ci.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 154,
+      "line": 164,
       "claim": "claude-code-action-official.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 155,
+      "line": 165,
       "claim": "claude-code-review.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 156,
+      "line": 166,
       "claim": "claude.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 157,
+      "line": 167,
       "claim": "dast-scan.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 158,
+      "line": 168,
       "claim": "dossier-check.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 159,
+      "line": 169,
       "claim": "fly-deploy.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 160,
+      "line": 170,
       "claim": "pr-agent.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 161,
+      "line": 171,
       "claim": "security-gate.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 175,
+      "line": 185,
       "claim": "context.xml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 178,
+      "line": 188,
       "claim": "rules.tsv"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 179,
+      "line": 189,
       "claim": "test-dast-local.sh"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 3102,
+      "claim": "ARTryOnViewer.ts"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 3103,
+      "claim": "BaseCollectionExperience.ts"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 3104,
+      "claim": "BlackRoseExperience.ts"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 3105,
+      "claim": "EnvironmentTransition.ts"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 3106,
+      "claim": "HotspotManager.ts"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 3108,
+      "claim": "LoveHurtsExperience.ts"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 3109,
+      "claim": "ProductionHandlers.ts"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 3110,
+      "claim": "RunwayExperience.ts"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 3111,
+      "claim": "ShowroomExperience.ts"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 3112,
+      "claim": "SignatureExperience.ts"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 3113,
+      "claim": "WebXRARViewer.ts"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 3114,
+      "claim": "WooCommerceProductLoader.ts"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 3118,
+      "claim": "CollectionExperiences.test.ts"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 3119,
+      "claim": "HotspotManager.test.ts"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 3120,
+      "claim": "WooCommerceProductLoader.test.ts"
     },
     {
       "file": "CLAUDE.md",
@@ -143,15 +218,15 @@
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/immersive-worlds.md",
       "line": 11,
       "stamp": "2026-04-27",
-      "age_days": 15
+      "age_days": 16
     },
     {
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_pinecone_setup.md",
       "line": 7,
       "stamp": "2026-05-03",
-      "age_days": 9
+      "age_days": 10
     }
   ],
   "documented_missing_count": 23,
-  "verified_count": 2542
+  "verified_count": 2569
 }

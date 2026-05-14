@@ -1,0 +1,206 @@
+/**
+ * Agency-Tier Visuals — Vanguard UI Architecture
+ *
+ * Implements high-end design patterns: Double-Bezel containers, Island buttons,
+ * macro-whitespace, and custom fluid motion choreography.
+ *
+ * Pattern: $150k+ Agency Experience
+ */
+
+:root {
+    /* Custom cubic-bezier for fluid, heavy motion */
+    --ease-vanguard: cubic-bezier(0.32, 0.72, 0, 1);
+    
+    /* Double-Bezel tokens */
+    --bezel-outer-radius: 2.5rem;
+    --bezel-inner-radius: calc(2.5rem - 0.5rem);
+    --bezel-padding: 0.5rem;
+    
+    /* Typography Overrides (Using existing brand stack) */
+    --font-premium-heading: 'Cinzel', serif;
+    --font-premium-mono: 'Space Mono', monospace;
+}
+
+/* ==========================================================================
+   MACRO-WHITESPACE (Breathing Room)
+   ========================================================================== */
+section {
+    padding-top: 10rem !important;
+    padding-bottom: 10rem !important;
+}
+
+@media (max-width: 768px) {
+    section {
+        padding-top: 6rem !important;
+        padding-bottom: 6rem !important;
+    }
+}
+
+/* ==========================================================================
+   DOUBLE-BEZEL ARCHITECTURE (Machined Hardware Look)
+   ========================================================================== */
+/* Apply to collection cards and featured product cards (.holo) */
+.col-card, 
+.product-card,
+.craft-card,
+.holo {
+    position: relative;
+    padding: var(--bezel-padding);
+    border-radius: var(--bezel-outer-radius);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    transition: all 0.8s var(--ease-vanguard);
+}
+
+.col-card::before,
+.product-card::before,
+.holo::before {
+    content: '';
+    position: absolute;
+    inset: var(--bezel-padding);
+    border-radius: var(--bezel-inner-radius);
+    background: #080808;
+    z-index: 0;
+    pointer-events: none;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+.product-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.col-card-img,
+.product-card-img,
+.holo__gallery {
+    position: relative;
+    z-index: 1;
+    border-radius: calc(var(--bezel-inner-radius) - 0.5rem);
+    overflow: hidden;
+    transition: transform 1.2s var(--ease-vanguard);
+}
+
+.col-card:hover .col-card-img,
+.holo:hover .holo__gallery {
+    transform: scale(1.02) translateY(-4px);
+}
+
+/* ==========================================================================
+   ISLAND BUTTON ARCHITECTURE (Nested Pill)
+   ========================================================================== */
+.hero-cta,
+.col-card-cta,
+.btn-primary,
+.holo__buy {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0.75rem 0.75rem 0.75rem 2rem !important;
+    border-radius: 9999px !important;
+    background: #fff !important;
+    color: #000 !important;
+    font-weight: 600;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    transition: all 0.5s var(--ease-vanguard) !important;
+    border: none !important;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* The "Button-in-Button" Trailing Icon */
+.hero-cta::after,
+.col-card-cta::after,
+.holo__buy::after {
+    content: '↗';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.05);
+    transition: all 0.6s var(--ease-vanguard);
+    font-size: 1.25rem;
+}
+
+.hero-cta:hover,
+.col-card-cta:hover,
+.holo__buy:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.hero-cta:hover::after,
+.col-card-cta:hover::after,
+.holo__buy:hover::after {
+    background: #000;
+    color: #fff;
+    transform: rotate(45deg);
+}
+
+/* ==========================================================================
+   MOTION CHOREOGRAPHY
+   ========================================================================== */
+.rv, 
+.rv-clip-up,
+.rv-clip-left,
+.rv-clip-right,
+.rv-clip-diagonal,
+.stagger-grid,
+[data-scroll-fade] {
+    opacity: 0;
+    transform: translateY(3rem);
+    filter: blur(10px);
+    transition: all 1s var(--ease-vanguard);
+}
+
+.rv.is-visible,
+.rv-clip-up.is-visible,
+.rv-clip-left.is-visible,
+.rv-clip-right.is-visible,
+.rv-clip-diagonal.is-visible,
+.stagger-grid.is-visible,
+.is-visible [data-scroll-fade] {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+}
+
+/* Staggered mask reveal for navigation */
+.nav-link {
+    overflow: hidden;
+}
+
+.nav-link span {
+    display: inline-block;
+    transition: transform 0.6s var(--ease-vanguard);
+}
+
+.nav-link:hover span {
+    transform: translateY(-110%);
+}
+
+/* ==========================================================================
+   HAPTIC DEPTH & OVERLAYS
+   ========================================================================== */
+.grain-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.03;
+    background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+}
+
+/* Magnetic Button Hover Physics (simulated via CSS) */
+.magnetic {
+    transition: transform 0.3s var(--ease-vanguard);
+}
+
+.magnetic:active {
+    transform: scale(0.98);
+}

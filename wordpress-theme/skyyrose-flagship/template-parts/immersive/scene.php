@@ -60,7 +60,7 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 	style="--accent-color: <?php echo esc_attr( $accent_color ); ?>;">
 
 	<!-- Loading Screen -->
-	<?php get_template_part( 'template-parts/immersive-loader', null, array( 'world_name' => $world_name ) ); ?>
+	<?php get_template_part( 'template-parts/immersive/loader', null, array( 'world_name' => $world_name ) ); ?>
 
 	<!-- Scene Viewport — Composited AI Scene Images -->
 	<div class="scene-viewport">
@@ -233,7 +233,7 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 </div>
 
 <!-- Cross-Collection Tab Bar -->
-<?php get_template_part( 'template-parts/immersive-tab-bar', null, array( 'active_slug' => $collection_slug ) ); ?>
+<?php get_template_part( 'template-parts/immersive/tab-bar', null, array( 'active_slug' => $collection_slug ) ); ?>
 
 <!-- Cinematic Mode Toggle -->
-<?php get_template_part( 'template-parts/cinematic-toggle' ); ?>
+<?php get_template_part( 'template-parts/immersive/cinematic-toggle' ); ?>

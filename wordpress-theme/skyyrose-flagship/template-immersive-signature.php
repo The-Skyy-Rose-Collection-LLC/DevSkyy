@@ -136,7 +136,7 @@ get_header();
 <main id="primary" class="site-main immersive-page" role="main" tabindex="-1">
 	<?php
 	get_template_part(
-		'template-parts/immersive-scene',
+		'template-parts/immersive/scene',
 		null,
 		array(
 			'collection_slug' => 'signature',

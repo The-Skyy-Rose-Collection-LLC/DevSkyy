@@ -116,6 +116,16 @@
 ## .claude/hooks/
 
 - `hooks.json` — Declares check (~3245 tok)
+- `lib/common.sh` — Sourced helpers for all structural hooks: TTL cache check (`is_fresh`), JSON payload field reader (`read_field`), pattern scanner (`scan_patterns`), `additionalContext` emitter (`emit_user_prompt_context`), per-topic cache topic dir (`ensure_cache_topic`), per-session sentinel (`session_sentinel`) (~270 tok)
+- `context7-prefetch.sh` — UserPromptSubmit hook. Scans prompt for 33 external library patterns, 24h per-lib cache, injects `additionalContext` JSON pointing to Context7 lookup. Disable: `CONTEXT7_PREFETCH_DISABLE=1` (~620 tok)
+- `context7-touched.sh` — PostToolUse hook on `mcp__*Context7*query-docs`. Normalizes `libraryId` (`/org/repo-suffix` → `repo`), stamps per-lib cache + legacy session sentinel (~190 tok)
+- `canon-prefetch.sh` — UserPromptSubmit hook. Enforces AP-16 (Glob Fishing). Detects catalog/brand/collection/imagery-pipeline/adr/managed-agents/preorder/theme mentions, injects directive pointing at canonical source file. 24h per-topic cache. Disable: `CANON_PREFETCH_DISABLE=1` (~340 tok)
+- `paid-api-stopgate.sh` — PreToolUse hook on Bash. **Blocks** (exit 2) commands matching paid API patterns (FASHN, FLUX, Tripo, Meshy, deploy-theme, vercel deploy, wp post create) + destructive patterns (rm -rf /, force push, hard reset, claude-mem delete). Bypass: prepend `STOPSHOW_ACK=1` after user confirms. Disable: `PAID_API_STOPGATE_DISABLE=1` (~340 tok)
+- `learning-reminder.sh` — Stop hook. If session triggered learning markers (failed tests, bug-fix commits, FIXME/TODO/HACK comments), injects reminder to update cerebrum / buglog / memory / anatomy. Marker file cleared after firing. Disable: `LEARNING_REMINDER_DISABLE=1` (~240 tok)
+- `learning-tripwire.sh` — PostToolUse on Bash|Edit|MultiEdit. Watches for failure/error patterns in Bash stdout, bug-fix commit messages, FIXME/TODO/HACK additions. Appends one-line reasons to session marker for learning-reminder.sh (~170 tok)
+- `prompt-eng-nudge.sh` — UserPromptSubmit hook. Detects prompt-engineering keywords (system_prompt, agent definition, few-shot, prompt template, etc.) and injects directive pointing at `knowledge-base/prompts/INDEX.yaml` + `README.md`. 24h per-topic cache. Disable: `PROMPT_ENG_NUDGE_DISABLE=1` (~360 tok)
+- `prompt-eng-tripwire.sh` — PreToolUse on Write|Edit|MultiEdit. Fires when editing prompts (path matches `**/prompts/**`, `*_prompt*.py`, `*/agents.py`, `*/orchestrator.py` OR content matches `system_prompt=` / `SYSTEM_PROMPT =` / `AgentDefinition(`). Non-blocking advisory; emits once per session via sentinel. Disable: `PROMPT_ENG_TRIPWIRE_DISABLE=1` (~240 tok)
+- `context7-gate.sh` — DEPRECATED 2026-05-13. Old PreToolUse blocking gate. Kept on disk for revival. Replaced by prefetch (senior advice: alarm fatigue beats structural enforcement) (~310 tok)
 
 ## .claude/hooks/memory-persistence/
 
@@ -2033,6 +2043,19 @@
 
 - `anti-patterns.md` — Anti-Patterns: Confirmed Failure Modes (~5719 tok)
 
+## knowledge-base/prompts/
+
+- `README.md` — Prompt registry schema, contribution workflow (version bump, eval, commit pattern), anti-patterns. Single source of truth for prompt metadata; actual prompt text stays in source files (~1100 tok)
+- `INDEX.yaml` — Master registry. 14 entries seeded 2026-05-13. Per-entry: id, location (file + symbol), consumed_by, model, version, last_updated, performance, canon_dependencies, tags, eval, notes (~2400 tok)
+
+## knowledge-base/prompts/templates/
+
+- `structured-output-schema.md` — Reusable JSON output-schema fragment for agent system prompts. Pattern + when-to-use + anti-patterns + linked prompts (~330 tok)
+
+## knowledge-base/prompts/eval/
+
+- `.gitkeep` — Per-prompt eval JSONL files land here as `<id>.jsonl` (~10 tok)
+
 ## knowledge-base/references/
 
 - `trusted-set.md` — Trusted Reference Set — Canonical Sources for V2 Development (~2699 tok)
@@ -2044,6 +2067,8 @@
 - `from-interview.md` — Interview Capture — Corey, 2026-05-03 (~2665 tok)
 - `from-openwolf.md` — Seed Index: OpenWolf System (`.wolf/`) (~2328 tok)
 - `from-serena.md` — Seed Index: Serena Memories (`.serena/memories/`) (~2633 tok)
+- `press-features.md` — 4 press features (Maxim 2023, SF Post / Best of Best / CEO Weekly 2024) + canon corrections + PHP shape for `template-about.php` Phase 2 Commit 4 (~1800 tok)
+- `timeline.md` — Press-corroborated timeline 2020-2026 (founding / 2021 drops / Maxim / 2024 trifecta / Kids Capsule) + voice-register copy seeds + PHP shape (~900 tok)
 
 ## llm/
 

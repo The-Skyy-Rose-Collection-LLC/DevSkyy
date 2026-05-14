@@ -1,0 +1,328 @@
+# DevSkyy Prompt Registry
+#
+# Seeded 2026-05-13 from existing prompt surface. Schema: README.md.
+# Add new entries via the prompt-engineering workflow (README.md → "Workflow
+# when ADDING a new prompt"). Never duplicate prompt text here — always
+# reference the source file.
+
+schema_version: "1.0.0"
+last_full_audit: 2026-05-13
+
+prompts:
+  # ---------------------------------------------------------------------------
+  # Multi-agent orchestrator subagents (skyyrose/multi_agent/)
+  # ---------------------------------------------------------------------------
+
+  - id: orchestrator-lead
+    name: "SkyyRose Multi-Agent Orchestrator (lead)"
+    type: agent-system-prompt
+    domain: orchestration
+    location:
+      file: skyyrose/multi_agent/orchestrator.py
+      symbol: ORCHESTRATOR_SYSTEM_PROMPT
+    consumed_by:
+      - skyyrose/multi_agent/orchestrator.py:run_orchestrator
+    model:
+      default: claude-opus-4-7
+      fallbacks: [claude-sonnet-4-6]
+    version: "1.0.0"
+    last_updated: 2026-05-12
+    performance:
+      evaluated: null
+      pass_rate: null
+      cost_per_call_usd_p50: null
+    canon_dependencies:
+      - knowledge-base/seed/from-interview.md
+      - wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv
+    tags: [orchestration, brand, opus, routing]
+    eval: null
+    notes: |
+      Heads the 5-subagent team. Knows brand canon, current pre-order count,
+      and the 12 MCP tools available. Routes by domain to brand-writer /
+      theme-auditor / product-analyst / deploy-manager / qa-inspector.
+
+  - id: brand-writer
+    name: "SkyyRose Brand Writer Subagent"
+    type: agent-system-prompt
+    domain: brand-content
+    location:
+      file: skyyrose/multi_agent/agents.py
+      symbol: 'AGENT_DEFINITIONS["brand-writer"].prompt'
+    consumed_by:
+      - skyyrose/multi_agent/orchestrator.py:run_single_agent
+      - skyyrose/multi_agent/orchestrator.py:run_orchestrator (via Agent tool)
+    model:
+      default: claude-sonnet-4-6
+    version: "1.0.0"
+    last_updated: 2026-05-12
+    performance:
+      evaluated: null
+      pass_rate: null
+      cost_per_call_usd_p50: null
+    canon_dependencies:
+      - knowledge-base/seed/from-interview.md
+      - wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv
+    tags: [brand, marketing, copy, instagram, captions, product-description]
+    eval: null
+    notes: |
+      Expert brand copywriter. Writes product descriptions, captions, editorial
+      copy. MUST use "Luxury Grows from Concrete." tagline; NEVER use retired
+      "Where Love Meets Luxury".
+
+  - id: theme-auditor
+    name: "WordPress Theme Auditor Subagent"
+    type: agent-system-prompt
+    domain: wordpress-theme
+    location:
+      file: skyyrose/multi_agent/agents.py
+      symbol: 'AGENT_DEFINITIONS["theme-auditor"].prompt'
+    consumed_by:
+      - skyyrose/multi_agent/orchestrator.py
+    model:
+      default: claude-sonnet-4-6
+    version: "1.0.0"
+    last_updated: 2026-05-12
+    performance: { evaluated: null, pass_rate: null, cost_per_call_usd_p50: null }
+    canon_dependencies:
+      - wordpress-theme/skyyrose-flagship/CLAUDE.md
+    tags: [wordpress, theme, css, a11y, performance, gdpr]
+    eval: null
+    notes: |
+      Audits the skyyrose-flagship theme. Knows the 21 inc/ modules,
+      product-card-holo system, builder integrations.
+
+  - id: product-analyst
+    name: "Product Catalog Analyst Subagent"
+    type: agent-system-prompt
+    domain: catalog
+    location:
+      file: skyyrose/multi_agent/agents.py
+      symbol: 'AGENT_DEFINITIONS["product-analyst"].prompt'
+    consumed_by:
+      - skyyrose/multi_agent/orchestrator.py
+    model:
+      default: claude-sonnet-4-6
+    version: "1.0.0"
+    last_updated: 2026-05-12
+    performance: { evaluated: null, pass_rate: null, cost_per_call_usd_p50: null }
+    canon_dependencies:
+      - wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv
+    tags: [catalog, products, pricing, imagery-coverage]
+    eval: null
+    notes: |
+      Analyzes the 30-SKU catalog. Detects gaps (missing images, broken
+      pre-order flags, pricing inconsistencies).
+
+  - id: deploy-manager
+    name: "Deployment Manager Subagent"
+    type: agent-system-prompt
+    domain: deployment
+    location:
+      file: skyyrose/multi_agent/agents.py
+      symbol: 'AGENT_DEFINITIONS["deploy-manager"].prompt'
+    consumed_by:
+      - skyyrose/multi_agent/orchestrator.py
+    model:
+      default: claude-sonnet-4-6
+    version: "1.0.0"
+    last_updated: 2026-05-12
+    performance: { evaluated: null, pass_rate: null, cost_per_call_usd_p50: null }
+    canon_dependencies: []
+    tags: [deploy, wordpress, vercel, git]
+    eval: null
+    notes: |
+      Reads git status, Vercel deployment state, WordPress deploy logs.
+
+  - id: qa-inspector
+    name: "QA Inspector Subagent"
+    type: agent-system-prompt
+    domain: qa
+    location:
+      file: skyyrose/multi_agent/agents.py
+      symbol: 'AGENT_DEFINITIONS["qa-inspector"].prompt'
+    consumed_by:
+      - skyyrose/multi_agent/orchestrator.py
+    model:
+      default: claude-sonnet-4-6
+    version: "1.0.0"
+    last_updated: 2026-05-12
+    performance: { evaluated: null, pass_rate: null, cost_per_call_usd_p50: null }
+    canon_dependencies: []
+    tags: [qa, regression, image-verification, link-checking]
+    eval: null
+    notes: |
+      Comprehensive testing — link checks, image verification, template
+      rendering checks, CSS validation, regression tests.
+
+  # ---------------------------------------------------------------------------
+  # Claude Agent SDK domain agents — research / analytics / report-writing
+  # ---------------------------------------------------------------------------
+
+  - id: researcher
+    name: "Generic Research Agent"
+    type: agent-system-prompt
+    domain: research
+    location:
+      file: agents/claude_sdk/prompts/researcher.txt
+    consumed_by:
+      - agents/claude_sdk/research.py:ResearchAgent
+      - agents/claude_sdk/tool_bridge.py:build_researcher_agent
+    model:
+      default: claude-sonnet-4-6
+    version: "1.0.0"
+    last_updated: 2026-05-12
+    performance: { evaluated: null, pass_rate: null, cost_per_call_usd_p50: null }
+    canon_dependencies: []
+    tags: [research, generic, web-fetch]
+    eval: null
+    notes: 5 source-of-truth .txt prompts in agents/claude_sdk/prompts/.
+
+  - id: research-lead
+    name: "Research Lead Coordinator"
+    type: agent-system-prompt
+    domain: research
+    location:
+      file: agents/claude_sdk/prompts/research_lead.txt
+    consumed_by:
+      - agents/claude_sdk/research.py
+    model:
+      default: claude-opus-4-7
+    version: "1.0.0"
+    last_updated: 2026-05-12
+    performance: { evaluated: null, pass_rate: null, cost_per_call_usd_p50: null }
+    canon_dependencies: []
+    tags: [research, coordinator, opus]
+    eval: null
+
+  - id: data-analyst
+    name: "Data Analyst Agent"
+    type: agent-system-prompt
+    domain: analytics
+    location:
+      file: agents/claude_sdk/prompts/data_analyst.txt
+    consumed_by:
+      - agents/claude_sdk/domain_agents/analytics.py:SDKDataAnalystAgent
+    model:
+      default: claude-sonnet-4-6
+    version: "1.0.0"
+    last_updated: 2026-05-12
+    performance: { evaluated: null, pass_rate: null, cost_per_call_usd_p50: null }
+    canon_dependencies: []
+    tags: [analytics, data, csv, pandas]
+    eval: null
+
+  - id: email-triage
+    name: "Email Triage Agent"
+    type: agent-system-prompt
+    domain: email-automation
+    location:
+      file: agents/claude_sdk/prompts/email_triage.txt
+    consumed_by:
+      - agents/claude_sdk/email_automation.py:EmailAutomationAgent
+    model:
+      default: claude-haiku-4-5
+    version: "1.0.0"
+    last_updated: 2026-05-12
+    performance: { evaluated: null, pass_rate: null, cost_per_call_usd_p50: null }
+    canon_dependencies: []
+    tags: [email, triage, classification, haiku]
+    eval: null
+
+  - id: report-writer
+    name: "Report Writer Agent"
+    type: agent-system-prompt
+    domain: reporting
+    location:
+      file: agents/claude_sdk/prompts/report_writer.txt
+    consumed_by:
+      - agents/claude_sdk/tool_bridge.py:build_writer_agent
+    model:
+      default: claude-sonnet-4-6
+    version: "1.0.0"
+    last_updated: 2026-05-12
+    performance: { evaluated: null, pass_rate: null, cost_per_call_usd_p50: null }
+    canon_dependencies: []
+    tags: [reporting, writing, structured-output]
+    eval: null
+
+  # ---------------------------------------------------------------------------
+  # MCP tool descriptions (skyyrose/multi_agent/tools.py — 12 tools)
+  # ---------------------------------------------------------------------------
+
+  - id: mcp-skyyrose-tools
+    name: "SkyyRose MCP Tool Suite (12 tools)"
+    type: mcp-tool
+    domain: orchestration
+    location:
+      file: skyyrose/multi_agent/tools.py
+      symbol: CUSTOM_TOOLS
+    consumed_by:
+      - skyyrose/multi_agent/orchestrator.py
+    model: { default: any }
+    version: "1.0.0"
+    last_updated: 2026-05-12
+    performance: { evaluated: null, pass_rate: null, cost_per_call_usd_p50: null }
+    canon_dependencies:
+      - wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv
+    tags: [mcp, tools, catalog, brand, theme, deploy]
+    eval: null
+    notes: |
+      Tool DESCRIPTIONS are prompts too — they shape when/how Claude calls
+      each tool. 12 tools: get_product_catalog, get_product_overrides,
+      list_product_images, list_theme_templates, get_theme_css_stats,
+      check_font_loading, get_brand_guidelines, generate_product_copy,
+      elite_studio_status, elite_studio_produce, check_vercel_status,
+      git_status_summary.
+
+  # ---------------------------------------------------------------------------
+  # Elite Studio pipeline prompts (TODO: audit + seed)
+  # ---------------------------------------------------------------------------
+
+  - id: elite-studio-pipeline
+    name: "Elite Studio Imagery Pipeline (placeholder — TODO: full audit)"
+    type: pipeline
+    domain: imagery
+    location:
+      file: skyyrose/elite_studio/prompts/CLAUDE.md
+    consumed_by:
+      - skyyrose/elite_studio/**
+    model: { default: gemini-3 }
+    version: "0.1.0"
+    last_updated: 2026-05-13
+    performance: { evaluated: null, pass_rate: null, cost_per_call_usd_p50: null }
+    canon_dependencies:
+      - wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv
+      - knowledge-base/seed/from-interview.md
+    tags: [imagery, generation, gemini, flux, nano-banana]
+    eval: null
+    notes: |
+      PLACEHOLDER. The full Elite Studio prompt surface (Nano Banana,
+      compositor stages, FLUX, FASHN, Tripo) needs a proper audit pass.
+      Open up skyyrose/elite_studio/ and create one entry per distinct
+      prompt template.
+
+  # ---------------------------------------------------------------------------
+  # SuperAgent system prompts (TODO: audit each agents/*.py)
+  # ---------------------------------------------------------------------------
+
+  - id: superagents-inline
+    name: "SuperAgent inline system prompts (placeholder — TODO: extract)"
+    type: agent-system-prompt
+    domain: meta
+    location:
+      file: "agents/{commerce,creative,marketing,operations,analytics,security_ops,skyyrose_content,skyyrose_imagery,support}_agent.py"
+    consumed_by:
+      - main_enterprise.py
+      - api/agents.py
+    model: { default: claude-sonnet-4-6 }
+    version: "0.1.0"
+    last_updated: 2026-05-13
+    performance: { evaluated: null, pass_rate: null, cost_per_call_usd_p50: null }
+    canon_dependencies: []
+    tags: [superagent, meta, audit-needed]
+    eval: null
+    notes: |
+      PLACEHOLDER. Each SuperAgent has its own system_prompt= literal.
+      Extract them into individual INDEX entries (or migrate to .txt
+      files under a shared dir). 10+ agents to audit. Until extracted,
+      these prompts are opaque to versioning and eval.

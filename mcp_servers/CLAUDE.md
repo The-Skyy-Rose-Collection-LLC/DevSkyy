@@ -34,3 +34,8 @@ Exposes DevSkyy capabilities to MCP clients (Claude.ai, Claude Code, other MCP-a
 - Tools used: `mcp_tools/`
 - Top-level entrypoint: `devskyy_mcp.py` (root)
 - Config served from: `fastmcp.config.json`
+
+
+<claude-mem-context>
+
+</claude-mem-context>
