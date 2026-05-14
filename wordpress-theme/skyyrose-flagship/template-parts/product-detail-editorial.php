@@ -43,20 +43,20 @@ $story = function_exists( 'skyyrose_get_collection_content' )
 	: null;
 
 // Image URIs.
-$hero_image = ! empty( $catalog_entry['image'] )
+$hero_image  = ! empty( $catalog_entry['image'] )
 	? skyyrose_product_image_uri( $catalog_entry['image'] )
 	: '';
 $front_model = ! empty( $catalog_entry['front_model_image'] )
 	? skyyrose_product_image_uri( $catalog_entry['front_model_image'] )
 	: '';
-$back_model = ! empty( $catalog_entry['back_model_image'] )
+$back_model  = ! empty( $catalog_entry['back_model_image'] )
 	? skyyrose_product_image_uri( $catalog_entry['back_model_image'] )
 	: '';
 
-$garment_lock  = $dossier['garment_type_lock'] ?? '';
-$branding      = $dossier['branding'] ?? array();
-$edition_size  = (int) ( $catalog_entry['edition_size'] ?? 0 );
-$sizes_raw     = $catalog_entry['sizes'] ?? '';
+$garment_lock = $dossier['garment_type_lock'] ?? '';
+$branding     = $dossier['branding'] ?? array();
+$edition_size = (int) ( $catalog_entry['edition_size'] ?? 0 );
+$sizes_raw    = $catalog_entry['sizes'] ?? '';
 ?>
 
 <article class="sr-editorial" data-collection="<?php echo esc_attr( $collection ); ?>">
@@ -167,9 +167,11 @@ $sizes_raw     = $catalog_entry['sizes'] ?? '';
 
 		<div class="sr-ed__stock">
 			<span class="sr-ed__stock-dot"></span>
-			<?php echo 'instock' === $stock
+			<?php
+			echo 'instock' === $stock
 				? esc_html__( 'In Stock — Ready to Ship', 'skyyrose' )
-				: esc_html__( 'Pre-Order', 'skyyrose' ); ?>
+				: esc_html__( 'Pre-Order', 'skyyrose' );
+			?>
 		</div>
 
 		<?php if ( $edition_size > 0 ) : ?>
@@ -178,7 +180,7 @@ $sizes_raw     = $catalog_entry['sizes'] ?? '';
 				printf(
 					/* translators: %d: edition size */
 					esc_html__( 'Limited Edition — %d Pieces', 'skyyrose' ),
-					$edition_size
+					(int) $edition_size
 				);
 				?>
 			</p>

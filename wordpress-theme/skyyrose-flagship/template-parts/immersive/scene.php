@@ -72,7 +72,7 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 			<?php
 				$scene_image_path   = get_theme_file_path( 'assets/images/immersive/' . $room_image );
 				$scene_image_exists = ! empty( $room_image ) && file_exists( $scene_image_path );
-				?>
+			?>
 			<div class="scene-layer<?php echo 0 === $index ? ' active' : ''; ?>"
 				data-room-name="<?php echo esc_attr( $room_name ); ?>"
 				<?php if ( ! $scene_image_exists ) : ?>
