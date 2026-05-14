@@ -2,6 +2,10 @@
 /**
  * About page — Chapter III: The Journey (Timeline).
  *
+ * Editorial vertical-rule timeline. Each milestone is a row with the year as a
+ * massive Bebas tag on the left of a center vertical rule and event/description
+ * on the right (alternates left/right at md+).
+ *
  * Called via get_template_part( 'template-parts/about/timeline', null, $args ).
  *
  * @param array $args {
@@ -10,7 +14,7 @@
  * }
  *
  * @package SkyyRose
- * @since   6.5.0
+ * @since   1.3.0
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -20,20 +24,30 @@ $timeline_milestones = $args['timeline_milestones'] ?? array();
 ?>
 
 <!-- Chapter III — Timeline -->
-<section class="abt-chapter abt-timeline" aria-label="<?php esc_attr_e( 'Our Journey', 'skyyrose' ); ?>">
-	<span class="abt-chapter__num rv-split-char" aria-hidden="true">03</span>
+<section class="abt-chapter abt-chapter--timeline" id="journey" aria-label="<?php esc_attr_e( 'Our Journey', 'skyyrose' ); ?>">
 	<div class="abt-chapter__container">
-		<p class="abt-chapter__label rv-blur-down"><?php esc_html_e( 'Chapter III', 'skyyrose' ); ?></p>
-		<h2 class="abt-chapter__title rv-clip-up"><?php esc_html_e( 'The Journey', 'skyyrose' ); ?></h2>
+		<div class="abt-chapter__head rv">
+			<span class="abt-chapter__num" aria-hidden="true"><?php esc_html_e( 'CH. 03', 'skyyrose' ); ?></span>
+			<span class="abt-chapter__rule" aria-hidden="true"></span>
+			<span class="abt-chapter__label"><?php esc_html_e( 'The Journey', 'skyyrose' ); ?></span>
+		</div>
+		<h2 class="abt-chapter__title rv rv-d1">
+			<?php esc_html_e( 'Drop Calendar', 'skyyrose' ); ?>
+		</h2>
+	</div>
 
-		<div class="abt-tl__track" role="list">
-			<?php foreach ( $timeline_milestones as $ms ) : ?>
-				<div class="abt-tl__node rv" role="listitem">
-					<div class="abt-tl__year"><?php echo wp_kses( $ms['year'], $allowed_inline ); ?></div>
+	<ol class="abt-tl" role="list">
+		<?php foreach ( $timeline_milestones as $i => $ms ) : ?>
+			<li class="abt-tl__row rv <?php echo ( $i % 2 ) ? 'abt-tl__row--right' : 'abt-tl__row--left'; ?>">
+				<div class="abt-tl__year" aria-hidden="true">
+					<?php echo wp_kses( $ms['year'], $allowed_inline ); ?>
+				</div>
+				<div class="abt-tl__body">
+					<span class="abt-tl__year-sr" aria-label="Year"><?php echo esc_html( $ms['year'] ); ?></span>
 					<h3 class="abt-tl__event"><?php echo esc_html( $ms['event'] ); ?></h3>
 					<p class="abt-tl__desc"><?php echo wp_kses( $ms['desc'], $allowed_inline ); ?></p>
 				</div>
-			<?php endforeach; ?>
-		</div>
-	</div>
+			</li>
+		<?php endforeach; ?>
+	</ol>
 </section>

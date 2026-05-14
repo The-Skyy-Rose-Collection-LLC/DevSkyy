@@ -1,60 +1,118 @@
 <?php
 /**
- * About Chapter II — The Collections (3D Portals)
- * Connects the catalog images to the editorial 3D portals.
+ * About Chapter II — The Collections.
+ *
+ * Editorial index-style row list: each collection renders as a bordered
+ * row with index number, name, tagline, short description, and an arrow CTA.
+ * Hero image floats at the right of each row (4:5 portrait crop).
+ *
+ * @package SkyyRose
+ * @since   1.3.0
  */
+
 defined( 'ABSPATH' ) || exit;
 
-// We fetch the collection data directly from the catalog to ensure the hero images are exact.
-$catalog = function_exists('skyyrose_get_product_catalog') ? skyyrose_get_product_catalog() : array();
+$catalog = function_exists( 'skyyrose_get_product_catalog' ) ? skyyrose_get_product_catalog() : array();
+
 $collection_data = array(
-    'black-rose' => array(
-        'title' => 'Black Rose',
-        'desc'  => 'Dark, powerful, unapologetic — Black Rose redefines what luxury streetwear looks like through a lens of strength and sophistication.',
-        'link'  => '/collection-black-rose/',
-        'img'   => ''
-    ),
-    'love-hurts' => array(
-        'title' => 'Love Hurts',
-        'desc'  => 'The Hurts bloodline. A grandmother’s legacy. Told from Beast’s perspective with the enchanted rose at its heart.',
-        'link'  => '/collection-love-hurts/',
-        'img'   => ''
-    ),
-    'signature' => array(
-        'title' => 'Signature',
-        'desc'  => 'The origin. The crown. The first rose and script logo that started it all. Signature is the foundation of SkyyRose.',
-        'link'  => '/collection-signature/',
-        'img'   => ''
-    )
+	'signature'    => array(
+		'title' => 'Signature',
+		'tag'   => 'The Origin',
+		'desc'  => 'The first rose, the first script. Where SkyyRose began — gold-accented luxury streetwear, gender-neutral by default.',
+		'link'  => '/collection-signature/',
+		'img'   => '',
+	),
+	'black-rose'   => array(
+		'title' => 'Black Rose',
+		'tag'   => 'The Refusal',
+		'desc'  => 'Dark, powerful, unapologetic. Silver-on-black, gothic restraint. Streetwear armor for everyone who refused to apologize first.',
+		'link'  => '/collection-black-rose/',
+		'img'   => '',
+	),
+	'love-hurts'   => array(
+		'title' => 'Love Hurts',
+		'tag'   => 'The Grief',
+		'desc'  => 'A collection named after grief, made to be worn anyway. Crimson and deep red, Beauty &amp; the Beast cadence — luxury or witchcraft, take your pick.',
+		'link'  => '/collection-love-hurts/',
+		'img'   => '',
+	),
+	'kids-capsule' => array(
+		'title' => 'Kids Capsule',
+		'tag'   => 'The Heir',
+		'desc'  => 'Rose gold and soft pink. The fourth chapter, smaller silhouettes, same craftsmanship. Passing the torch on the same terms that built the brand.',
+		'link'  => '/collection-kids-capsule/',
+		'img'   => '',
+	),
 );
 
-// Map the first product from each collection to use its front techflat/model as the portal image.
-foreach ($catalog as $product) {
-    if (isset($collection_data[$product['collection']]) && empty($collection_data[$product['collection']]['img'])) {
-        $collection_data[$product['collection']]['img'] = $product['image_url'];
-    }
+// Map first catalog product per collection for the portal hero image.
+foreach ( $catalog as $product ) {
+	$col = $product['collection'] ?? '';
+	if ( isset( $collection_data[ $col ] ) && empty( $collection_data[ $col ]['img'] ) ) {
+		$collection_data[ $col ]['img'] = $product['image_url'] ?? '';
+	}
 }
 ?>
+
 <section class="abt-collections" id="collections">
-	<div class="abt-col-header rv-clip-up">
-		<h2>The Collections</h2>
-		<p>Three Worlds. One Vision.</p>
+	<div class="abt-chapter__container">
+		<div class="abt-chapter__head rv">
+			<span class="abt-chapter__num" aria-hidden="true"><?php esc_html_e( 'CH. 02', 'skyyrose' ); ?></span>
+			<span class="abt-chapter__rule" aria-hidden="true"></span>
+			<span class="abt-chapter__label"><?php esc_html_e( 'The Collections', 'skyyrose' ); ?></span>
+		</div>
+		<h2 class="abt-chapter__title rv rv-d1">
+			<?php
+			echo wp_kses(
+				__( 'Four Worlds.<br>One Bloodline.', 'skyyrose' ),
+				array(
+					'br'     => array(),
+					'em'     => array(),
+					'strong' => array(),
+				)
+			);
+			?>
+		</h2>
 	</div>
-	
-	<div class="abt-portal-list">
-		<?php foreach ($collection_data as $slug => $data) : ?>
-			<a href="<?php echo esc_url( home_url( $data['link'] ) ); ?>" class="abt-portal-item rv-clip-up">
-				<div class="abt-portal-media" data-portal="<?php echo esc_attr($slug); ?>">
-					<img src="<?php echo esc_url($data['img'] ?: get_theme_file_uri('assets/images/placeholder-product.jpg')); ?>" alt="<?php echo esc_attr($data['title']); ?>" loading="lazy">
-					<!-- WebGL canvas injected here by immersive-world.js -->
-					<div class="abt-portal-canvas"></div>
-				</div>
-				<div class="abt-portal-content">
-					<h3 class="abt-portal-title"><?php echo esc_html($data['title']); ?></h3>
-					<p class="abt-portal-desc"><?php echo esc_html($data['desc']); ?></p>
-					<span class="abt-portal-cta">Explore Portal</span>
-				</div>
-			</a>
+
+	<ol class="abt-coll-list" role="list">
+		<?php
+		$i = 0;
+		foreach ( $collection_data as $slug => $data ) :
+			++$i;
+			$index   = str_pad( (string) $i, 2, '0', STR_PAD_LEFT );
+			$img_url = ! empty( $data['img'] ) ? $data['img'] : get_theme_file_uri( 'assets/images/placeholder-product.jpg' );
+			?>
+			<li class="abt-coll-row rv" data-collection="<?php echo esc_attr( $slug ); ?>" role="listitem">
+				<a href="<?php echo esc_url( home_url( $data['link'] ) ); ?>" class="abt-coll-row__link">
+					<span class="abt-coll-row__index" aria-hidden="true"><?php echo esc_html( $index ); ?></span>
+					<figure class="abt-coll-row__media">
+						<img src="<?php echo esc_url( $img_url ); ?>"
+							alt="<?php echo esc_attr( $data['title'] ); ?>"
+							loading="lazy"
+							width="800" height="1000">
+					</figure>
+					<div class="abt-coll-row__body">
+						<span class="abt-coll-row__tag"><?php echo esc_html( $data['tag'] ); ?></span>
+						<h3 class="abt-coll-row__title"><?php echo esc_html( $data['title'] ); ?></h3>
+						<p class="abt-coll-row__desc">
+							<?php
+							echo wp_kses(
+								$data['desc'],
+								array(
+									'em'     => array(),
+									'strong' => array(),
+								)
+							);
+							?>
+						</p>
+					</div>
+					<span class="abt-coll-row__cta" aria-hidden="true">
+						<?php esc_html_e( 'Enter', 'skyyrose' ); ?>
+						<svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 1L13 5L9 9M13 5H1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+					</span>
+				</a>
+			</li>
 		<?php endforeach; ?>
-	</div>
+	</ol>
 </section>
