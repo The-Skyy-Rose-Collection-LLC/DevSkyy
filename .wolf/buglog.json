@@ -1640,7 +1640,7 @@
       "error_message": "NOT SUPPORTED: option missingRefs. Pass empty schema with $id that should be ignored to ajv.addSchema. TypeError: Cannot set properties of undefined (setting 'defaultMeta') at ajvOrig",
       "file": "node_modules/@eslint/eslintrc/dist/eslintrc-universal.cjs:385",
       "root_cause": "ESLint 9.39.3 bundles ajv that rejects the 'missingRefs' option used by @eslint/eslintrc's legacy config loader. Lint-staged invokes ESLint 9 which loads eslintrc-universal.cjs which calls ajvOrig with NOT-SUPPORTED options -> hard crash before any file is linted. Blocks pre-commit on any staged .ts/.tsx under frontend/**",
-      "fix": "User-approved --no-verify bypass for commit a932351ce. Permanent fix: migrate frontend/.eslintrc -> eslint.config.js (flat config), OR pin eslint@8 in frontend/package.json, OR pin @eslint/eslintrc to a version compatible with bundled ajv.",
+      "fix": "Scoped npm overrides in root package.json: 'eslint': {'ajv': '^6.14.0'} AND '@eslint/eslintrc': {'ajv': '^6.14.0'}. Forces both packages to nest ajv v6.15.0 in their own node_modules while keeping top-level ajv@8.18.0 for other consumers. Verified: 'cd frontend && npx eslint <file>' runs to completion (2 warnings, 0 errors, exit 0). Fixed in chore/p1-p5-backlog at TBD-commit.",
       "tags": [
         "eslint",
         "lint-staged",
@@ -1652,7 +1652,10 @@
       ],
       "related_bugs": [],
       "occurrences": 1,
-      "last_seen": "2026-05-13T17:55:00-07:00"
+      "last_seen": "2026-05-13T17:55:00-07:00",
+      "status": "FIXED",
+      "fixed_at": "2026-05-13T19:25:00-07:00",
+      "fixed_in_commit": "TBD-this-commit"
     }
   ]
 }
