@@ -267,7 +267,15 @@ Plans:
   5. A run that would exceed the configured spend cap halts before the cap-crossing API call and exits with a clear message showing amount spent and amount remaining
   6. `/simplify` — code simplification pass after phase implementation
   7. `/verification-loop` — automated verification loop confirming all success criteria pass
-**Plans**: TBD
+**Plans**: 7 plans across 4 waves
+Plans:
+- [ ] 15-01-PLAN.md — Data contracts: GhostMannequinAgentResult, FailureEntry, AuditEntry + EliteStudioState extensions (GM-04, GM-05, QA-02)
+- [ ] 15-02-PLAN.md — SKU resolver module: sanitize_sku, resolve_sku, verify_tripo_region, accessory skip gate (GM-06)
+- [ ] 15-03-PLAN.md — GLB cache manager, TripoDigitizer wrapper, _GHOST_MANNEQUIN_EST_COST_USD constant (GM-02)
+- [ ] 15-04-PLAN.md — Prompt registry, GhostMannequinSynthesizer: BRIA bg-removal, Gemini RAS ensemble, jersey cascade (GM-02, GM-03)
+- [ ] 15-05-PLAN.md — Per-metric QA veto gate: corner_pixel_purity, VetoResult, score_ghost_mannequin (QA-01, QA-04)
+- [ ] 15-06-PLAN.md — GhostMannequinAgent orchestration node + GraphConfig wiring (GM-01, GM-02, GM-04, QA-02)
+- [ ] 15-07-PLAN.md — CLI __main__ entry point + integration test suite (GM-05, GM-06, QA-02)
 
 ### Phase 16: 3D-Replica Architect & Purge ✅ (completed 2026-04-24)
 **Goal**: The image generation pipeline produces high-fidelity professional renders by digitizing techflats into 3D (.glb) replicas, scaffolding them via headless Blender, and synthesizing final shots with Gemini 2.0 RAS — and all hallucinated/invalid catalog assets are purged.
@@ -294,7 +302,15 @@ Plans:
   4. Interrupting `approve-ghost` mid-write (simulated via SIGINT after temp file creation) leaves the original CSV intact — the atomic `os.replace()` pattern prevents partial writes
   5. `/simplify` — code simplification pass after phase implementation
   6. `/verification-loop` — automated verification loop confirming all success criteria pass
-**Plans**: TBD
+**Plans**: 7 plans across 4 waves
+Plans:
+- [ ] 15-01-PLAN.md — Data contracts: GhostMannequinAgentResult, FailureEntry, AuditEntry + EliteStudioState extensions (GM-04, GM-05, QA-02)
+- [ ] 15-02-PLAN.md — SKU resolver module: sanitize_sku, resolve_sku, verify_tripo_region, accessory skip gate (GM-06)
+- [ ] 15-03-PLAN.md — GLB cache manager, TripoDigitizer wrapper, _GHOST_MANNEQUIN_EST_COST_USD constant (GM-02)
+- [ ] 15-04-PLAN.md — Prompt registry, GhostMannequinSynthesizer: BRIA bg-removal, Gemini RAS ensemble, jersey cascade (GM-02, GM-03)
+- [ ] 15-05-PLAN.md — Per-metric QA veto gate: corner_pixel_purity, VetoResult, score_ghost_mannequin (QA-01, QA-04)
+- [ ] 15-06-PLAN.md — GhostMannequinAgent orchestration node + GraphConfig wiring (GM-01, GM-02, GM-04, QA-02)
+- [ ] 15-07-PLAN.md — CLI __main__ entry point + integration test suite (GM-05, GM-06, QA-02)
 
 ### Phase 18: Full Batch + WooCommerce Upload
 **Goal**: All 28 in-scope garment SKUs have a ghost mannequin front image approved by the user and uploaded to WooCommerce — with an explicit confirmation gate before any production write occurs
@@ -307,7 +323,15 @@ Plans:
   4. Any SKU without a corresponding `approved/{sku}-ghost-front.webp` is excluded from the upload manifest entirely — the upload tool cannot be coerced into uploading unapproved files
   5. `/simplify` — code simplification pass after phase implementation
   6. `/verification-loop` — automated verification loop confirming all success criteria pass
-**Plans**: TBD
+**Plans**: 7 plans across 4 waves
+Plans:
+- [ ] 15-01-PLAN.md — Data contracts: GhostMannequinAgentResult, FailureEntry, AuditEntry + EliteStudioState extensions (GM-04, GM-05, QA-02)
+- [ ] 15-02-PLAN.md — SKU resolver module: sanitize_sku, resolve_sku, verify_tripo_region, accessory skip gate (GM-06)
+- [ ] 15-03-PLAN.md — GLB cache manager, TripoDigitizer wrapper, _GHOST_MANNEQUIN_EST_COST_USD constant (GM-02)
+- [ ] 15-04-PLAN.md — Prompt registry, GhostMannequinSynthesizer: BRIA bg-removal, Gemini RAS ensemble, jersey cascade (GM-02, GM-03)
+- [ ] 15-05-PLAN.md — Per-metric QA veto gate: corner_pixel_purity, VetoResult, score_ghost_mannequin (QA-01, QA-04)
+- [ ] 15-06-PLAN.md — GhostMannequinAgent orchestration node + GraphConfig wiring (GM-01, GM-02, GM-04, QA-02)
+- [ ] 15-07-PLAN.md — CLI __main__ entry point + integration test suite (GM-05, GM-06, QA-02)
 
 ## Progress
 
