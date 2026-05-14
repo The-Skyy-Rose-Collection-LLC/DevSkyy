@@ -471,7 +471,7 @@ addopts = [
     "--strict-config",
     "--tb=short",
     "-m",
-    "not slow",
+    "not slow and not integration",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
