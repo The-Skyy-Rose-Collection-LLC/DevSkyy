@@ -1633,6 +1633,26 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-14T00:35:15Z"
+    },
+    {
+      "id": "bug-100",
+      "timestamp": "2026-05-13T17:55:00-07:00",
+      "error_message": "NOT SUPPORTED: option missingRefs. Pass empty schema with $id that should be ignored to ajv.addSchema. TypeError: Cannot set properties of undefined (setting 'defaultMeta') at ajvOrig",
+      "file": "node_modules/@eslint/eslintrc/dist/eslintrc-universal.cjs:385",
+      "root_cause": "ESLint 9.39.3 bundles ajv that rejects the 'missingRefs' option used by @eslint/eslintrc's legacy config loader. Lint-staged invokes ESLint 9 which loads eslintrc-universal.cjs which calls ajvOrig with NOT-SUPPORTED options -> hard crash before any file is linted. Blocks pre-commit on any staged .ts/.tsx under frontend/**",
+      "fix": "User-approved --no-verify bypass for commit a932351ce. Permanent fix: migrate frontend/.eslintrc -> eslint.config.js (flat config), OR pin eslint@8 in frontend/package.json, OR pin @eslint/eslintrc to a version compatible with bundled ajv.",
+      "tags": [
+        "eslint",
+        "lint-staged",
+        "pre-commit",
+        "frontend",
+        "tooling",
+        "ajv",
+        "eslintrc"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-13T17:55:00-07:00"
     }
   ]
 }
