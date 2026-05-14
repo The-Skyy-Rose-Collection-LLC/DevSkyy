@@ -25,11 +25,11 @@ defined( 'ABSPATH' ) || exit;
 			<?php
 			$ft_reviews = array(
 				array( "The quality is insane. I've washed my hoodie 20+ times and it still looks brand new.", 'Marcus T., Oakland' ),
-				array( "The numbered tag makes it feel truly exclusive. Exceeded expectations.", 'Jade W., San Francisco' ),
+				array( 'The numbered tag makes it feel truly exclusive. Exceeded expectations.', 'Jade W., San Francisco' ),
 				array( "This isn't just a brand, it's a movement. The craftsmanship is unmatched.", 'Devon L., Los Angeles' ),
 			);
 			foreach ( $ft_reviews as $r ) :
-			?>
+				?>
 				<div class="ft-cro-reviews__card">
 					<div class="ft-cro-reviews__stars" aria-label="<?php esc_attr_e( '5 out of 5 stars', 'skyyrose-flagship' ); ?>">
 						<?php for ( $s = 0; $s < 5; $s++ ) : ?>
@@ -58,7 +58,7 @@ defined( 'ABSPATH' ) || exit;
 				array( '////', 'Double-Stitched Seams', 'Reinforced at every stress point. Built to last years, not seasons.' ),
 			);
 			foreach ( $ft_craft as $c ) :
-			?>
+				?>
 				<div class="ft-cro-craft__card">
 					<span class="ft-cro-craft__icon" aria-hidden="true"><?php echo esc_html( $c[0] ); ?></span>
 					<h3><?php echo esc_html( $c[1] ); ?></h3>
@@ -84,11 +84,11 @@ defined( 'ABSPATH' ) || exit;
 				array( __( 'How long does shipping take?', 'skyyrose-flagship' ), __( 'Orders ship within 5-7 business days. You receive a tracking number via email.', 'skyyrose-flagship' ) ),
 			);
 			foreach ( $ft_faq as $i => $item ) :
-			?>
+				?>
 				<div class="ft-cro-faq__item">
 					<button class="ft-cro-faq__question" type="button"
-					        aria-expanded="false"
-					        aria-controls="ft-faq-a-<?php echo esc_attr( $i ); ?>">
+							aria-expanded="false"
+							aria-controls="ft-faq-a-<?php echo esc_attr( $i ); ?>">
 						<span><?php echo esc_html( $item[0] ); ?></span>
 						<svg class="ft-cro-faq__icon" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" aria-hidden="true">
 							<line x1="12" y1="5" x2="12" y2="19"></line>

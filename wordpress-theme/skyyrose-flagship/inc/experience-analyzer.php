@@ -14,7 +14,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Event Storage
  *--------------------------------------------------------------*/
 
@@ -31,10 +32,10 @@ defined( 'ABSPATH' ) || exit;
 function skyyrose_see_store_events( array $events, string $visitor_hash = '' ): int {
 	global $wpdb;
 
-	$table = $wpdb->prefix . 'skyyrose_analytics';
-	$today = current_time( 'Y-m-d' );
+	$table  = $wpdb->prefix . 'skyyrose_analytics';
+	$today  = current_time( 'Y-m-d' );
 	$stored = 0;
-	$hash = sanitize_text_field( $visitor_hash );
+	$hash   = sanitize_text_field( $visitor_hash );
 
 	foreach ( $events as $event ) {
 		// Validate required fields.
@@ -97,13 +98,14 @@ function skyyrose_see_store_events( array $events, string $visitor_hash = '' ): 
 			}
 		}
 
-		$stored++;
+		++$stored;
 	}
 
 	return $stored;
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Analytics Summaries
  *--------------------------------------------------------------*/
 
@@ -116,8 +118,8 @@ function skyyrose_see_store_events( array $events, string $visitor_hash = '' ): 
 function skyyrose_see_get_summary( int $days = 30 ): array {
 	global $wpdb;
 
-	$table     = $wpdb->prefix . 'skyyrose_analytics';
-	$since     = gmdate( 'Y-m-d', strtotime( "-{$days} days" ) );
+	$table = $wpdb->prefix . 'skyyrose_analytics';
+	$since = gmdate( 'Y-m-d', strtotime( "-{$days} days" ) );
 
 	// Total events.
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery
@@ -198,17 +200,18 @@ function skyyrose_see_get_summary( int $days = 30 ): array {
 	);
 
 	return array(
-		'period'           => $days,
-		'total_events'     => $total,
-		'unique_visitors'  => $unique_visitors,
-		'by_type'          => $by_type ?: array(),
-		'by_collection'    => $by_collection ?: array(),
-		'by_page'          => $by_page ?: array(),
-		'daily_trend'      => $daily ?: array(),
+		'period'          => $days,
+		'total_events'    => $total,
+		'unique_visitors' => $unique_visitors,
+		'by_type'         => $by_type ?: array(),
+		'by_collection'   => $by_collection ?: array(),
+		'by_page'         => $by_page ?: array(),
+		'daily_trend'     => $daily ?: array(),
 	);
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Cleanup Cron
  *--------------------------------------------------------------*/
 
@@ -217,7 +220,7 @@ function skyyrose_see_get_summary( int $days = 30 ): array {
  */
 function skyyrose_see_cleanup_old_events(): void {
 	global $wpdb;
-	$table = $wpdb->prefix . 'skyyrose_analytics';
+	$table  = $wpdb->prefix . 'skyyrose_analytics';
 	$cutoff = gmdate( 'Y-m-d', strtotime( '-90 days' ) );
 
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery

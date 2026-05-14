@@ -38,9 +38,13 @@ if ( is_front_page() ) {
 	$skyy_context = '404';
 } else {
 	$slug = get_queried_object() ? get_post_field( 'post_name', get_queried_object_id() ) : '';
-	if ( str_contains( $slug, 'black-rose' ) )  $skyy_context = 'black-rose';
-	elseif ( str_contains( $slug, 'love-hurts' ) ) $skyy_context = 'love-hurts';
-	elseif ( str_contains( $slug, 'signature' ) )  $skyy_context = 'signature';
+	if ( str_contains( $slug, 'black-rose' ) ) {
+		$skyy_context = 'black-rose';
+	} elseif ( str_contains( $slug, 'love-hurts' ) ) {
+		$skyy_context = 'love-hurts';
+	} elseif ( str_contains( $slug, 'signature' ) ) {
+		$skyy_context = 'signature';
+	}
 }
 
 // Recall pill: tiny avatar thumb for the minimised state.
