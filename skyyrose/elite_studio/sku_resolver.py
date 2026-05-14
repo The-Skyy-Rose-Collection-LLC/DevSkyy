@@ -17,7 +17,6 @@ import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 # ---------------------------------------------------------------------------
 # Module-level constants
@@ -138,9 +137,9 @@ def sanitize_sku(raw: str) -> str:
 
 def resolve_sku(
     raw_sku: str,
-    catalog_path: Optional[Path] = None,
-    bundle_root: Optional[Path] = None,
-) -> Optional[ResolvedSKU]:
+    catalog_path: Path | None = None,
+    bundle_root: Path | None = None,
+) -> ResolvedSKU | None:
     """Resolve a raw SKU against the product catalog.
 
     Sanitizes the input, finds the matching catalog row, and constructs the
@@ -165,7 +164,7 @@ def resolve_sku(
 
     with open(effective_catalog, newline="", encoding="utf-8") as fh:
         reader = csv.DictReader(fh)
-        matching_row: Optional[dict[str, str]] = None
+        matching_row: dict[str, str] | None = None
         for row in reader:
             if row.get("sku", "").strip() == sanitized_sku:
                 matching_row = row
@@ -214,7 +213,7 @@ def resolve_sku(
 # ---------------------------------------------------------------------------
 
 
-def verify_tripo_region(tripo_api_key: Optional[str] = None) -> bool:
+def verify_tripo_region(tripo_api_key: str | None = None) -> bool:
     """Verify the Tripo .ai region key is active by calling the free get_balance endpoint.
 
     This is a mandatory pre-flight check before any paid Tripo dispatch (D-08).
@@ -241,7 +240,7 @@ def verify_tripo_region(tripo_api_key: Optional[str] = None) -> bool:
     key = tripo_api_key or os.environ.get("TRIPO3D_API_KEY")
 
     if not key:
-        raise EnvironmentError(
+        raise OSError(
             "TRIPO3D_API_KEY not set — cannot verify Tripo region. "
             "Set the key in .env.hf or environment before dispatching."
         )
