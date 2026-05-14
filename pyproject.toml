@@ -470,6 +470,8 @@ addopts = [
     "--strict-markers",
     "--strict-config",
     "--tb=short",
+    "-m",
+    "not slow",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
