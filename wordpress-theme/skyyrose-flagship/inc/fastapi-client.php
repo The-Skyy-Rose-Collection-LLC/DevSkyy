@@ -65,39 +65,17 @@ function skyyrose_see_is_safe_url( string $url ): bool {
 		return false;
 	}
 
-	// Resolve hostname and block private IP ranges.
+	// Resolve hostname and block private + reserved IP ranges. filter_var with
+	// NO_PRIV_RANGE covers RFC 1918 (10/8, 172.16/12, 192.168/16); NO_RES_RANGE
+	// covers loopback (127.0/8), link-local (169.254/16), multicast, etc.
 	$ip = gethostbyname( $host );
-	if ( $ip !== $host ) {
-		$private_ranges = array(
-			'10.',
-			'172.16.',
-			'172.17.',
-			'172.18.',
-			'172.19.',
-			'172.20.',
-			'172.21.',
-			'172.22.',
-			'172.23.',
-			'172.24.',
-			'172.25.',
-			'172.26.',
-			'172.27.',
-			'172.28.',
-			'172.29.',
-			'172.30.',
-			'172.31.',
-			'192.168.',
-			'169.254.',
-			'127.',
-		);
-		foreach ( $private_ranges as $range ) {
-			if ( str_starts_with( $ip, $range ) ) {
-				// Allow localhost in development.
-				if ( str_starts_with( $ip, '127.' ) && wp_get_environment_type() === 'local' ) {
-					return true;
-				}
-				return false;
-			}
+	if ( $ip !== $host && filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+		// Allow loopback in local development only.
+		if ( str_starts_with( $ip, '127.' ) && wp_get_environment_type() === 'local' ) {
+			return true;
+		}
+		if ( ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
+			return false;
 		}
 	}
 

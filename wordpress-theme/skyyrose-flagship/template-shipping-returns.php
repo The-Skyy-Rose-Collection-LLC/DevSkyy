@@ -64,8 +64,11 @@ get_header();
 								<td>
 								<?php
 									/* translators: %d: free shipping order minimum in dollars */
-									printf( esc_html__( 'Orders $%d+', 'skyyrose' ), intval( SKYYROSE_FREE_SHIPPING_THRESHOLD ) );
-								?>
+									printf(
+										esc_html__( 'Orders $%d+', 'skyyrose' ),
+										defined( 'SKYYROSE_FREE_SHIPPING_THRESHOLD' ) ? intval( SKYYROSE_FREE_SHIPPING_THRESHOLD ) : 150
+									);
+									?>
 									</td>
 							</tr>
 						</tbody>

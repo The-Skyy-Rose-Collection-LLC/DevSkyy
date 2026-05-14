@@ -149,14 +149,6 @@ function skyyrose_see_register_rest_routes(): void {
 				'callback'            => 'skyyrose_see_rest_get_settings',
 				'permission_callback' => 'skyyrose_see_rest_admin_check',
 			),
-		)
-	);
-
-	// PUT /settings — Admin-only, update settings.
-	register_rest_route(
-		$namespace,
-		'/settings',
-		array(
 			array(
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => 'skyyrose_see_rest_update_settings',
@@ -184,8 +176,10 @@ function skyyrose_see_rest_admin_check(): bool {
  * Receive and store behavioral events.
  */
 function skyyrose_see_rest_receive_events( WP_REST_Request $request ): WP_REST_Response {
-	// Rate limiting: 10 requests per minute per IP.
-	$ip         = sanitize_text_field( $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0' );
+	// Rate limiting: 10 requests per minute per IP. REMOTE_ADDR only — sites
+	// behind a reverse proxy should add an X-Forwarded-For allowlist before
+	// trusting that header.
+	$ip         = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0' ) );
 	$rate_key   = 'skyyrose_see_rate_' . md5( $ip );
 	$rate_count = (int) get_transient( $rate_key );
 

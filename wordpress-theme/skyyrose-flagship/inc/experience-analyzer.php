@@ -229,9 +229,15 @@ function skyyrose_see_cleanup_old_events(): void {
 	);
 }
 
-// Schedule daily cleanup.
+// Schedule daily cleanup. wp_schedule_event() must run after WordPress init —
+// at file-include scope it can fire before the cron API is fully bootstrapped.
 add_action( 'skyyrose_see_daily_cleanup', 'skyyrose_see_cleanup_old_events' );
 
-if ( ! wp_next_scheduled( 'skyyrose_see_daily_cleanup' ) ) {
-	wp_schedule_event( time(), 'daily', 'skyyrose_see_daily_cleanup' );
-}
+add_action(
+	'init',
+	function () {
+		if ( ! wp_next_scheduled( 'skyyrose_see_daily_cleanup' ) ) {
+			wp_schedule_event( time(), 'daily', 'skyyrose_see_daily_cleanup' );
+		}
+	}
+);

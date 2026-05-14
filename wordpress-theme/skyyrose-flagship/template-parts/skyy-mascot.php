@@ -44,6 +44,8 @@ if ( is_front_page() ) {
 		$skyy_context = 'love-hurts';
 	} elseif ( str_contains( $slug, 'signature' ) ) {
 		$skyy_context = 'signature';
+	} elseif ( str_contains( $slug, 'kids-capsule' ) ) {
+		$skyy_context = 'kids-capsule';
 	}
 }
 
