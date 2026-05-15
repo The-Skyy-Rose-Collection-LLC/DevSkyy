@@ -24,7 +24,7 @@ def _register_mock(kernel: Kernel, agent_type: str, **mock_kwargs) -> MockSuperA
     async def factory():
         return agent
 
-    kernel._agent_factories[agent_type] = factory
+    kernel.modules.register_type(agent_type, factory)
     return agent
 
 

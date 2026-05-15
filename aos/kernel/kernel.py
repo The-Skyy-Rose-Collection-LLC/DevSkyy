@@ -14,7 +14,6 @@ Lifecycle:
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import Any
 
@@ -32,13 +31,13 @@ from aos.healing.types import HealAction
 from aos.ipc.message_bus import MessageBus
 from aos.kernel.process_manager import ProcessManager
 from aos.kernel.types import AgentProcess, ProcessStatus, SpawnRequest
+from aos.modules.registry import ModuleRegistry
+from aos.modules.types import AgentFactory, ModuleManifest
 from aos.observability.finetune_buffer import FineTuneBuffer
 from aos.observability.learning_hook import LearningHook, LearningTrace
 from aos.runtime.container import AgentContainer
 from aos.runtime.executor import ExecutionOutcome, NoFactoryError
 from aos.runtime.types import ExecutionResult, ResourceLimits, ResourceUsage
-
-AgentFactory = Callable[[], Awaitable[Any]]
 
 _KERNEL_MAX_HEAL_ATTEMPTS = 10
 
@@ -79,7 +78,7 @@ class Kernel:
         self.approvals = ApprovalGate()
         self.policies = PolicyEngine()
         self.default_limits = default_limits or ResourceLimits()
-        self._agent_factories: dict[str, AgentFactory] = {}
+        self.modules = ModuleRegistry()
         self.learning = LearningHook(
             learning_module_resolver=self._resolve_learning_module,
         )
@@ -337,7 +336,7 @@ class Kernel:
     ) -> None:
         """Register an async factory that builds an agent of the given type on demand."""
         self._require_booted()
-        self._agent_factories[agent_type] = factory
+        self.modules.register_type(agent_type, factory)
         await self.audit.log(
             AuditEntry(
                 event_type=AuditEventType.AGENT_REGISTERED,
@@ -345,6 +344,42 @@ class Kernel:
                 details={"agent_type": agent_type},
             )
         )
+
+    async def load_module(
+        self,
+        manifest: ModuleManifest,
+        factories: dict[str, AgentFactory],
+    ) -> None:
+        """Load a module manifest + factories and emit MODULE_LOADED audit event."""
+        self._require_booted()
+        self.modules.load(manifest, factories)
+        await self.audit.log(
+            AuditEntry(
+                event_type=AuditEventType.MODULE_LOADED,
+                actor_pid=self.KERNEL_PID,
+                details={
+                    "module": manifest.name,
+                    "version": manifest.version,
+                    "agent_types": list(manifest.agent_types),
+                },
+            )
+        )
+
+    async def unload_module(self, manifest_name: str) -> frozenset[str]:
+        """Unload a module by name, emit MODULE_UNLOADED, and return removed agent_types."""
+        self._require_booted()
+        removed = self.modules.unload(manifest_name)
+        await self.audit.log(
+            AuditEntry(
+                event_type=AuditEventType.MODULE_UNLOADED,
+                actor_pid=self.KERNEL_PID,
+                details={
+                    "module": manifest_name,
+                    "removed_types": list(removed),
+                },
+            )
+        )
+        return removed
 
     def _resolve_learning_module(self, agent_type: str) -> Any | None:
         """Cache hook used by LearningHook to look up an agent_type's SelfLearningModule."""
@@ -364,7 +399,7 @@ class Kernel:
         self._require_booted()
         proc = await self.spawn(request, approval_timeout_seconds=approval_timeout_seconds)
 
-        factory = self._agent_factories.get(request.agent_type)
+        factory = self.modules.get_factory(request.agent_type)
         if factory is None:
             await self.fail(proc.pid, error=f"no factory registered for {request.agent_type}")
             msg = f"No agent factory registered for {request.agent_type!r}"
