@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-15T22:07:50.281Z
-> Files: 2593 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-15T22:20:33.348Z
+> Files: 2597 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -692,10 +692,12 @@
 
 ## aos/observability/
 
-- `__init__.py` — AOS Observability — metrics, tracing, and health monitoring. (~20 tok)
+- `__init__.py` — AOS Observability — metrics, tracing, and health monitoring. (~108 tok)
 - `CLAUDE.md` (~11 tok)
 - `finetune_buffer.py` — FineTuneBuffer — quality-gated accumulator for OpenAI fine-tuning traces. (~939 tok)
+- `health.py` — AOS HealthCheck — snapshot aggregator for kernel subsystem state. (~1310 tok)
 - `learning_hook.py` — LearningHook — batched per-agent-type trace flusher. (~1289 tok)
+- `metrics.py` — AOS MetricsCollector — lightweight in-process counters and gauges. (~996 tok)
 
 ## aos/runtime/
 
@@ -3605,7 +3607,9 @@
 
 - `__init__.py` (~0 tok)
 - `CLAUDE.md` (~11 tok)
+- `test_health.py` — Tests for HealthCheck. (~1920 tok)
 - `test_learning_hook.py` — Tests for LearningHook. (~1008 tok)
+- `test_metrics.py` — Tests for MetricsCollector. (~1227 tok)
 
 ## tests/aos/runtime/
 
