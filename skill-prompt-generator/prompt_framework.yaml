@@ -1,0 +1,389 @@
+# ============================================================
+# 人像提示词生成框架 - 7大类模板
+# Portrait Prompt Generation Framework - 7 Categories
+# ============================================================
+
+framework_version: "1.0"
+description: "定义人像提示词生成的完整规则和结构"
+last_updated: "2026-01-02"
+
+# ============================================================
+# 七大类 (7 Categories)
+# ============================================================
+
+categories:
+
+  # ==================== 1. 主体 (Subject) ====================
+  subject:
+    priority: 1
+    required: true
+    description: "人物主体的基础身份属性"
+    fields:
+
+      gender:
+        type: "enum"
+        required: true
+        default: "female"
+        values: ["female", "male", "non-binary"]
+        db_category: "gender"
+
+      ethnicity:
+        type: "enum"
+        required: true
+        default: "East_Asian"
+        values:
+          - "East_Asian"
+          - "Southeast_Asian"
+          - "South_Asian"
+          - "European"
+          - "African"
+          - "Middle_Eastern"
+          - "Latin_American"
+        db_category: "ethnicity"
+
+      age_range:
+        type: "enum"
+        required: true
+        default: "young_adult"
+        values:
+          - "child"
+          - "teen"
+          - "young_adult"
+          - "adult"
+          - "middle_aged"
+          - "elderly"
+        db_category: "age_range"
+
+  # ==================== 2. 面部 (Facial) ====================
+  facial:
+    priority: 2
+    required: true
+    description: "面部详细特征"
+    fields:
+
+      eyes:
+        type: "string"
+        required: false
+        default: "auto"
+        db_category: "eye_types"
+        search_keywords:
+          almond: ["almond", "almond-shaped"]
+          large_expressive: ["large expressive", "big eyes", "expressive eyes"]
+          round: ["round eyes"]
+          auto: []
+
+      skin_tone:
+        type: "string"
+        required: false
+        default: "auto"
+        db_category: "skin_tones"
+        search_keywords:
+          fair: ["fair", "pale", "porcelain"]
+          medium: ["medium", "olive"]
+          tan: ["tan", "bronze"]
+          deep: ["deep", "dark"]
+          auto: []
+
+      skin_texture:
+        type: "string"
+        required: false
+        db_category: "skin_textures"
+        search_keywords:
+          realistic: ["realistic", "pores", "natural imperfections"]
+          smooth: ["smooth", "flawless"]
+          dewy: ["dewy", "luminous"]
+
+      face_shape:
+        type: "string"
+        required: false
+        db_category: "face_shapes"
+        search_keywords:
+          oval: ["oval"]
+          round: ["round"]
+          heart: ["heart-shaped"]
+          square: ["square"]
+
+      nose:
+        type: "string"
+        required: false
+        db_category: "nose_types"
+
+      lips:
+        type: "string"
+        required: false
+        db_category: "lip_types"
+
+  # ==================== 3. 造型 (Styling) ====================
+  styling:
+    priority: 3
+    required: true
+    description: "整体造型（服装、发型、妆容、配饰）"
+    fields:
+
+      clothing:
+        type: "string"
+        required: false
+        default: "modern"
+        db_category: "clothing_styles"
+        search_keywords:
+          traditional_chinese: ["traditional", "chinese", "hanfu", "period"]
+          kimono: ["kimono", "japanese"]
+          modern: ["modern", "casual"]
+          business: ["business", "suit", "formal"]
+          casual: ["casual"]
+          formal: ["formal", "evening gown"]
+
+      hairstyle:
+        type: "string"
+        required: false
+        default: "modern"
+        db_category: "hair_styles"
+        search_keywords:
+          ancient_chinese: ["traditional", "classical", "bun", "updo"]
+          traditional_japanese: ["traditional", "japanese"]
+          modern: ["modern", "contemporary"]
+          ponytail: ["ponytail"]
+          long_flowing: ["long", "flowing"]
+
+      hair_color:
+        type: "string"
+        required: false
+        default: "auto"
+        db_category: "hair_colors"
+        search_keywords:
+          black: ["black"]
+          brown: ["brown", "dark brown"]
+          blonde: ["blonde"]
+          red: ["red", "auburn"]
+          auto: []
+
+      makeup:
+        type: "string"
+        required: true
+        default: "natural"
+        db_category: "makeup_styles"
+        search_keywords:
+          traditional_chinese: ["traditional", "chinese", "ancient"]
+          traditional_japanese: ["traditional", "japanese"]
+          k_beauty: ["k-beauty", "korean"]
+          c_beauty: ["c-beauty", "chinese"]
+          natural: ["natural"]
+          western_glam: ["western", "glam"]
+          french_elegant: ["french", "elegant"]
+
+      accessories:
+        type: "string"
+        required: false
+        db_category: "accessories"
+        search_keywords:
+          hairpin: ["hairpin", "ornament", "traditional"]
+          jewelry: ["jewelry", "necklace", "earring"]
+          none: []
+
+  # ==================== 4. 表现 (Expression) ====================
+  expression:
+    priority: 4
+    required: false
+    description: "表情、姿态和动作"
+    fields:
+
+      facial_expression:
+        type: "string"
+        required: false
+        db_category: "expressions"
+        search_keywords:
+          serene: ["serene", "calm", "peaceful"]
+          gentle_smile: ["gentle smile", "soft smile"]
+          innocent: ["innocent gaze", "pure"]
+          mysterious: ["mysterious", "enigmatic"]
+          confident: ["confident", "strong"]
+
+      pose:
+        type: "string"
+        required: false
+        db_category: "poses"
+        search_keywords:
+          relaxed: ["relaxed", "casual"]
+          dynamic: ["dynamic", "flowing", "movement"]
+          elegant: ["elegant", "graceful"]
+          powerful: ["powerful", "strong"]
+          seated: ["seated", "sitting"]
+
+  # ==================== 5. 光影 (Lighting) ====================
+  lighting:
+    priority: 5
+    required: true
+    description: "光影设置（必选）"
+    fields:
+
+      lighting_type:
+        type: "string"
+        required: true
+        default: "natural"
+        db_category: "lighting_techniques"
+        search_keywords:
+          natural: ["natural", "window light", "daylight", "soft light"]
+          cinematic: ["cinematic", "dramatic", "rim light", "film lighting"]
+          zhang_yimou: ["dramatic", "shadow", "rim", "chiaroscuro", "volumetric"]
+          neon: ["neon", "colorful", "glow"]
+          soft: ["soft", "gentle", "diffused"]
+          dramatic: ["dramatic", "shadow", "contrast"]
+          golden_hour: ["golden hour", "warm", "sunset"]
+
+  # ==================== 6. 场景 (Scene) ====================
+  scene:
+    priority: 6
+    required: false
+    description: "场景环境和时代氛围"
+    fields:
+
+      era:
+        type: "string"
+        required: true
+        default: "modern"
+        values:
+          - "ancient"
+          - "republic_of_china"
+          - "modern"
+          - "future"
+          - "timeless"
+
+      background:
+        type: "string"
+        required: false
+        db_category: "backgrounds"
+        search_keywords:
+          traditional_chinese: ["traditional chinese architecture", "pavilion", "classical"]
+          indoor: ["indoor", "interior"]
+          outdoor: ["outdoor", "nature"]
+          urban: ["urban", "city"]
+          minimal: ["minimal", "simple", "bokeh"]
+
+      atmosphere:
+        type: "string"
+        required: false
+        values:
+          - "natural"
+          - "cyberpunk"
+          - "fantasy"
+          - "wuxia"
+          - "period_drama"
+          - "romantic"
+          - "mysterious"
+          - "ethereal"
+
+      director_style:
+        type: "string"
+        required: false
+        values:
+          - "tsui_hark"
+          - "zhang_yimou"
+          - "wong_kar_wai"
+
+  # ==================== 7. 技术 (Technical) ====================
+  technical:
+    priority: 7
+    required: false
+    description: "技术参数和渲染风格"
+    fields:
+
+      art_style:
+        type: "string"
+        required: false
+        values:
+          - "realistic"
+          - "cinematic"
+          - "anime"
+          - "illustration"
+          - "oil_painting"
+          - "watercolor"
+          - "3d_render"
+
+      camera:
+        type: "string"
+        required: false
+        db_category: "camera_equipment"
+        search_keywords:
+          35mm: ["35mm", "film"]
+          digital: ["digital", "DSLR"]
+
+      bokeh:
+        type: "string"
+        required: false
+        db_category: "bokeh_styles"
+        search_keywords:
+          creamy: ["creamy bokeh", "smooth"]
+          cinematic: ["cinematic bokeh"]
+
+      quality:
+        type: "string"
+        required: false
+        values:
+          - "8K"
+          - "4K"
+          - "ultra_detailed"
+          - "photorealistic"
+          - "high_resolution"
+
+# ============================================================
+# 依赖关系规则 (Dependency Rules)
+# ============================================================
+
+dependencies:
+
+  # 规则1：古装自动推导
+  - name: "古装自动推导"
+    when:
+      scene.era: "ancient"
+    then:
+      styling.clothing: "traditional_chinese"
+      styling.hairstyle: "ancient_chinese"
+      styling.makeup: "traditional_chinese"
+
+  # 规则2：东亚人种自动推导发色
+  - name: "东亚人种默认发色"
+    when:
+      subject.ethnicity: "East_Asian"
+      styling.hair_color: "auto"
+    then:
+      styling.hair_color: "black"
+
+  # 规则3：东亚人种自动推导眼型
+  - name: "东亚人种默认眼型"
+    when:
+      subject.ethnicity: "East_Asian"
+      facial.eyes: "auto"
+    then:
+      facial.eyes: "almond"
+
+# ============================================================
+# 验证规则 (Validation Rules)
+# ============================================================
+
+validation:
+
+  # 必选字段检查
+  required_fields:
+    - field: "lighting.lighting_type"
+      error_message: "每个人像必须有光影设置"
+    - field: "styling.makeup"
+      error_message: "每个人像必须有妆容设置"
+
+  # 逻辑一致性检查
+  consistency_checks:
+
+    - name: "妆容与时代匹配"
+      when:
+        scene.era: "ancient"
+        styling.makeup: ["k_beauty", "natural", "western_glam"]
+      severity: "error"
+      message: "古装场景不应该使用现代妆容"
+      suggestion: "应该使用 traditional_chinese 或 traditional_japanese"
+
+    - name: "人种与眼睛颜色匹配"
+      when:
+        subject.ethnicity: "East_Asian"
+        facial.eyes: ["green", "blue"]
+      severity: "warning"
+      message: "东亚人通常不会有绿色/蓝色眼睛"
+      suggestion: "建议使用 almond 或 dark brown eyes"

@@ -1,0 +1,100 @@
+# 装饰元素变量库
+
+温馨可爱:
+  elements:
+    星星:
+      emoji: "✨"
+      opacity_range: [0.15, 0.25]
+      rotation_range: [-15, 15]
+      size_range: [16, 32]
+      count_range: [3, 8]
+
+    爱心:
+      emoji: "💕"
+      opacity_range: [0.15, 0.25]
+      rotation_range: [-10, 10]
+      size_range: [20, 36]
+      count_range: [2, 6]
+
+    云朵:
+      emoji: "☁️"
+      opacity_range: [0.12, 0.20]
+      rotation_range: [-5, 5]
+      size_range: [32, 64]
+      count_range: [1, 3]
+
+    花朵:
+      emoji: "🌸"
+      opacity_range: [0.15, 0.25]
+      rotation_range: [-20, 20]
+      size_range: [24, 40]
+      count_range: [2, 5]
+
+    气球:
+      emoji: "🎈"
+      opacity_range: [0.18, 0.28]
+      rotation_range: [-12, 12]
+      size_range: [28, 44]
+      count_range: [2, 4]
+
+  combinations:
+    - combo: ["✨", "💕"]
+      name: "星星爱心"
+      description: "经典可爱组合"
+
+    - combo: ["☁️", "✨"]
+      name: "云朵星星"
+      description: "梦幻组合"
+
+    - combo: ["🌸", "✨", "💕"]
+      name: "花朵爱心"
+      description: "浪漫组合"
+
+    - combo: ["🎈", "✨"]
+      name: "气球星星"
+      description: "活泼组合"
+
+    - combo: ["☁️", "🌸"]
+      name: "云朵花朵"
+      description: "柔和组合"
+
+现代简约:
+  elements:
+    几何线条:
+      type: "line"
+      opacity_range: [0.05, 0.10]
+      rotation_options: [0, 45, 90]
+      stroke_width: [1, 2]
+      count_range: [3, 6]
+
+    点阵:
+      type: "dot_grid"
+      opacity_range: [0.05, 0.10]
+      spacing: [8, 16, 24]
+      coverage: [10, 30]  # percentage
+
+    渐变块:
+      type: "gradient"
+      opacity_range: [0.03, 0.08]
+      directions: [45, 135, "to bottom", "to right"]
+      count_range: [1, 2]
+
+    图标:
+      type: "icon"
+      style: "outline"
+      opacity_range: [0.08, 0.15]
+      size_range: [16, 32]
+      count_range: [2, 4]
+
+  combinations:
+    - combo: ["line", "dot_grid"]
+      name: "线条点阵"
+      description: "经典几何"
+
+    - combo: ["gradient"]
+      name: "渐变"
+      description: "微妙渐变"
+
+    - combo: ["icon"]
+      name: "图标"
+      description: "线性图标"

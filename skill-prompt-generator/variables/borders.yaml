@@ -1,0 +1,43 @@
+# 边框和阴影变量库
+
+温馨可爱:
+  corner_radius:
+    values: [16, 18, 20, 22, 24]
+    unit: "px"
+    default: 18
+    description: "大圆角，营造柔和感"
+
+  box_shadow:
+    values:
+      - {value: "0 4px 12px rgba(0,0,0,0.08)", name: "轻微扩散"}
+      - {value: "0 6px 16px rgba(0,0,0,0.10)", name: "标准扩散"}
+      - {value: "0 8px 20px rgba(0,0,0,0.12)", name: "强扩散"}
+    default: "0 6px 16px rgba(0,0,0,0.10)"
+    description: "扩散式阴影，无硬边"
+
+  border:
+    values:
+      - {value: "none", name: "无边框"}
+      - {value: "1px solid rgba(0,0,0,0.05)", name: "极细边框"}
+    default: "none"
+
+现代简约:
+  corner_radius:
+    values: [4, 6, 8, 10, 12]
+    unit: "px"
+    default: 8
+    description: "小圆角，克制专业"
+
+  box_shadow:
+    values:
+      - {value: "0 2px 4px rgba(0,0,0,0.04)", name: "极细微"}
+      - {value: "0 2px 8px rgba(0,0,0,0.06)", name: "标准细微"}
+      - {value: "0 4px 8px rgba(0,0,0,0.05)", name: "中等细微"}
+    default: "0 2px 8px rgba(0,0,0,0.06)"
+    description: "细微阴影，微妙层次"
+
+  border:
+    values:
+      - {value: "none", name: "无边框"}
+      - {value: "1px solid rgba(0,0,0,0.08)", name: "细边框"}
+    default: "none"

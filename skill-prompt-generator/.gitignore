@@ -1,0 +1,193 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+pip-log.txt
+pip-delete-this-directory.txt
+.venv/
+venv/
+ENV/
+
+# Backup files
+*.backup
+*.backup_*
+*_backup_*
+
+# Test and analysis reports (大量的临时报告文档)
+*_REPORT.md
+*_ANALYSIS.md
+*_SUMMARY.md
+*_COMPLETE.md
+*_PROPOSAL.md
+ARCHITECTURE_*.md
+CHANGELOG.md
+DATABASE_VS_JSON_ANALYSIS.md
+DOMAIN_STATUS_REPORT.md
+ETHNICITY_EXPANSION_*.md
+EXPANSION_PLAN.md
+IMPLEMENTATION_COMPLETE.md
+INTEGRATION_PLAN.md
+LEARNER_SYSTEM_*.md
+LEARNING_JOURNEY_REPORT.md
+MAKEUP_STYLES_*.md
+MODULAR_ARCHITECTURE_*.md
+PHASE*_*.md
+PROMPT_ENGINEERING_BEST_PRACTICES.md
+SCAN_RESULT_SUMMARY.md
+SKILL_ARCHITECTURE.md
+SOLUTION_NARRATIVE_TEMPLATES.md
+UNIFIED_ARCHITECTURE_PROPOSAL.md
+V*_*.md
+VERIFICATION_REPORT.md
+TESTING_GUIDE.md
+
+# Generated prompt files
+generated_*.txt
+*_prompt.txt
+test_prompts_*.txt
+zhang_yimou_*.txt
+
+# Large JSON data files
+ai_classification_results.json
+anime_classification_results.json
+anime_unclassified.json
+unclassified_prompts.json
+
+# Temporary files
+temp_*.json
+new_training_*.json
+new_training_*.txt
+case_342_*.txt
+
+# Test files (保留test脚本，删除test结果)
+test_*.txt
+
+# Extracted results folder (只保留elements.db，其他都排除)
+extracted_results/*
+!extracted_results/
+!extracted_results/elements.db
+
+# Database - 选项A：排除数据库，只上传schema
+# extracted_results/elements.db
+
+# Database - 选项B：保留数据库（如果想分享完整数据）
+# 取消注释上面一行来排除数据库
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# Claude Code specific (如果不想共享skill配置)
+# .claude/
+
+# Knowledge base (如果包含私有数据)
+knowledge_base/*.json
+
+# ==========================================
+# 临时开发脚本（Development Scripts）
+# ==========================================
+# 这些是开发过程中的临时工具，不是项目核心
+
+# 测试脚本
+test_*.py
+demo_*.py
+quick_test.py
+
+# 临时添加功能的脚本
+add_*.py
+
+# 修复脚本
+fix_*.py
+
+# 批处理工具
+batch_*.py
+
+# 扫描工具
+scan_*.py
+
+# 分析工具
+analyze_*.py
+
+# 分类工具
+classify_*.py
+
+# 临时生成脚本（保留核心的intelligent_generator.py）
+generate_*.py
+!intelligent_generator.py
+
+# 扩展和迁移工具
+expand_library.py
+migrate_*.py
+migration_*.py
+
+# 学习工具（保留核心引擎，排除临时工具）
+learner.py
+learn_single_prompt.py
+auto_learn_workflow.py
+universal_learner_v2.py
+universal_learner_v3.py
+batch_learner_*.py
+
+# 旧版本生成器（保留framework_loader.py）
+prompt_generator.py
+prompt_generator_v2.py
+generator_engine.py
+narrative_prompt_generator.py
+
+# 其他临时工具
+auto_updater.py
+cleanup_and_relearn.py
+interactive_cli.py
+manual_extracted_features.py
+prepare_unclassified.py
+prompt_analyzer.py
+prompt_tool.py
+smart_reviewer.py
+txt_to_json_converter.py
+update_*.py
+version_control.py
+universal_learner.py
+*_analysis.py
+run_full_expansion.py
+
+# ==========================================
+# 临时指南文档（Development Guides）
+# ==========================================
+AUTO_LEARNING_README.md
+COMPLETE_CATEGORY_PLAN.md
+GITHUB_UPLOAD_GUIDE.md
+GOLDEN_PROMPTS.md
+HOW_TO_HANDLE_MISSING_ELEMENTS.md
+INTELLIGENT_SYSTEM_GUIDE.md
+LEARNING_FROM_WESTWORLD_CASE.md
+PROMPT_EXTRACTOR_GUIDE.md
+README_PROMPT_GENERATOR.md
+
+# 临时JSON文件
+prompt_*.json
+templates.json
+
+# ==========================================
+# 保留的核心文件（Core Files - DO NOT IGNORE）
+# ==========================================
+# !intelligent_generator.py   # 核心生成引擎
+# !framework_loader.py         # 框架加载器
+# !element_db.py               # 数据库操作
+# !prompt_framework.yaml       # 框架定义
