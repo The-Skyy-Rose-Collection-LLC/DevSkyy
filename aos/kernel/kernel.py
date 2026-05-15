@@ -19,13 +19,16 @@ from pathlib import Path
 from typing import Any
 
 from aos.adapters.superagent_adapter import SuperAgentAdapter
-from aos.cognition.reflector import Reflector
+from aos.cognition.reflector import Reflector, classify_failure
 from aos.cognition.types import DecomposedPlan
 from aos.governance.approval import ApprovalDecision, ApprovalGate, ApprovalRequest
 from aos.governance.audit import AuditTrail
 from aos.governance.budget import BudgetController, BudgetDecision, BudgetVerdict
 from aos.governance.policy import PolicyDecision, PolicyEngine, PolicyVerdict
 from aos.governance.types import AuditEntry, AuditEventType
+from aos.healing.circuit_breaker import CircuitBreaker
+from aos.healing.director import HealingDirector
+from aos.healing.types import HealAction
 from aos.ipc.message_bus import MessageBus
 from aos.kernel.process_manager import ProcessManager
 from aos.kernel.types import AgentProcess, ProcessStatus, SpawnRequest
@@ -33,9 +36,11 @@ from aos.observability.finetune_buffer import FineTuneBuffer
 from aos.observability.learning_hook import LearningHook, LearningTrace
 from aos.runtime.container import AgentContainer
 from aos.runtime.executor import ExecutionOutcome, NoFactoryError
-from aos.runtime.types import ResourceLimits
+from aos.runtime.types import ExecutionResult, ResourceLimits, ResourceUsage
 
 AgentFactory = Callable[[], Awaitable[Any]]
+
+_KERNEL_MAX_HEAL_ATTEMPTS = 10
 
 
 class PolicyDeniedError(PermissionError):
@@ -81,6 +86,8 @@ class Kernel:
         self._learning_modules: dict[str, Any] = {}
         self.reflector = Reflector()
         self.finetune_buffer = FineTuneBuffer()
+        self._healing_director = HealingDirector()
+        self._breakers: dict[str, CircuitBreaker] = {}
         self._booted = False
 
     async def boot(self) -> None:
@@ -372,8 +379,110 @@ class Kernel:
         await self.transition(proc.pid, ProcessStatus.READY)
         await self.transition(proc.pid, ProcessStatus.RUNNING)
 
+        breaker = self._breakers.setdefault(request.agent_type, CircuitBreaker())
         container = self.make_container(limits=limits)
-        container_result = await container.run(lambda _c: adapter.run(request.prompt))
+        container_result: ExecutionResult | None = None
+
+        for attempt in range(_KERNEL_MAX_HEAL_ATTEMPTS):
+            if not breaker.allow_request():
+                _cb_error = "circuit breaker open"
+                await self.audit.log(
+                    AuditEntry(
+                        event_type=AuditEventType.HEAL_ABORTED,
+                        target_pid=proc.pid,
+                        correlation_id=proc.correlation_id,
+                        details={"reason": "circuit_open", "attempt": attempt},
+                    )
+                )
+                await self.fail(proc.pid, error=_cb_error)
+                return ExecutionOutcome(
+                    pid=proc.pid,
+                    success=False,
+                    agent_run=_empty_adapter_run(request.agent_type, _cb_error),
+                    container_result=ExecutionResult(
+                        success=False,
+                        error=_cb_error,
+                        usage=ResourceUsage(),
+                    ),
+                    heal_entries=[],
+                    error=_cb_error,
+                    metadata={"agent_type": request.agent_type, "container_timed_out": False},
+                )
+
+            container_result = await container.run(lambda _c: adapter.run(request.prompt))
+
+            # adapter.run() never raises — always returns AdapterRun into container_result.result.
+            # True success requires both the container sandbox AND the agent to succeed.
+            run_adapter = container_result.result if container_result.success else None
+            run_success = (
+                container_result.success and run_adapter is not None and run_adapter.success
+            )
+
+            if run_success:
+                breaker.record_success()
+                break
+
+            # Agent error takes priority; fall back to container-level error (timeout, etc.)
+            error_str = (
+                run_adapter.error
+                if run_adapter is not None and run_adapter.error
+                else (container_result.error or "")
+            )
+            category = classify_failure(error_str)
+            decision = self._healing_director.decide(category, attempt)
+
+            if decision.action == HealAction.RETRY:
+                await self.audit.log(
+                    AuditEntry(
+                        event_type=AuditEventType.HEAL_ATTEMPTED,
+                        target_pid=proc.pid,
+                        correlation_id=proc.correlation_id,
+                        details={
+                            "category": str(category),
+                            "attempt": attempt,
+                            "delay_seconds": decision.delay_seconds,
+                        },
+                    )
+                )
+                if decision.delay_seconds > 0:
+                    await asyncio.sleep(decision.delay_seconds)
+            elif decision.action == HealAction.ABORT:
+                await self.audit.log(
+                    AuditEntry(
+                        event_type=AuditEventType.HEAL_ABORTED,
+                        target_pid=proc.pid,
+                        correlation_id=proc.correlation_id,
+                        details={
+                            "category": str(category),
+                            "attempt": attempt,
+                            "reason": decision.reason,
+                        },
+                    )
+                )
+                breaker.record_failure()
+                break
+            else:  # ESCALATE
+                await self.audit.log(
+                    AuditEntry(
+                        event_type=AuditEventType.HEAL_ESCALATED,
+                        target_pid=proc.pid,
+                        correlation_id=proc.correlation_id,
+                        details={
+                            "category": str(category),
+                            "attempt": attempt,
+                            "reason": decision.reason,
+                        },
+                    )
+                )
+                breaker.record_failure()
+                break
+
+        if container_result is None:
+            container_result = ExecutionResult(
+                success=False,
+                error="healing_loop_exited_without_run",
+                usage=ResourceUsage(),
+            )
         adapter_run = container_result.result
         if adapter_run is None:
             adapter_run = _empty_adapter_run(
