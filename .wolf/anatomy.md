@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-14T05:41:51.748Z
-> Files: 2504 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-15T01:13:56.313Z
+> Files: 2579 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -627,6 +627,81 @@
 - `001_baseline_schema.py` — baseline schema (~2899 tok)
 - `002_add_brand_assets.py` — Add brand assets tables for US-013. (~1390 tok)
 - `003_add_analytics_tables.py` — Add analytics tables for US-001: Analytics Database Schema. (~3800 tok)
+
+## aos/
+
+- `__init__.py` — AOS — Agentic Operating System. (~60 tok)
+
+## aos/adapters/
+
+- `__init__.py` — AOS Adapters — wrap existing agents (SuperAgent, ClaudeSDK) for kernel management. (~26 tok)
+- `CLAUDE.md` (~11 tok)
+- `superagent_adapter.py` — SuperAgentAdapter — non-invasive wrapper around the existing EnhancedSuperAgent. (~1726 tok)
+
+## aos/cognition/
+
+- `__init__.py` — AOS Cognitive Layer — goal decomposition, planning, and reflection. (~22 tok)
+- `CLAUDE.md` (~11 tok)
+- `goal_decomposer.py` — GoalDecomposer — rule-based goal-to-TaskGraph decomposer. (~1319 tok)
+- `planner.py` — Planner — converts a TaskGraph into an ordered DecomposedPlan. (~254 tok)
+- `reflector.py` — Reflector — converts ExecutionOutcome + LearningTrace into a quality-scored Reflection. (~1228 tok)
+- `types.py` — Cognition types — task graph, plan steps, and decomposed plans. (~877 tok)
+
+## aos/governance/
+
+- `__init__.py` — AOS Governance — audit trail, budget control, and policy enforcement. (~22 tok)
+- `approval.py` — ApprovalGate — STOP-AND-SHOW enforcement for irreversible/paid actions. (~1906 tok)
+- `audit.py` — AuditTrail — immutable append-only audit log backed by SQLite. (~1719 tok)
+- `budget.py` — BudgetController — per-process and system-wide spend tracking + guards. (~1126 tok)
+- `CLAUDE.md` (~11 tok)
+- `policy.py` — PolicyEngine — declarative ALLOW/DENY/REQUIRE_APPROVAL rules for kernel actions. (~947 tok)
+- `types.py` — Governance types — audit entries and policy decisions. (~682 tok)
+
+## aos/init/
+
+- `__init__.py` — AOS Init — boot sequence and service initialization. (~17 tok)
+
+## aos/ipc/
+
+- `__init__.py` — AOS IPC — inter-process communication via typed message bus. (~20 tok)
+- `CLAUDE.md` (~11 tok)
+- `message_bus.py` — MessageBus — typed async pub/sub + request/reply. (~1831 tok)
+- `types.py` — IPC message types for the AOS message bus. (~674 tok)
+
+## aos/kernel/
+
+- `__init__.py` — AOS Kernel — process lifecycle, scheduling, and the main event loop. (~22 tok)
+- `CLAUDE.md` (~11 tok)
+- `kernel.py` — Kernel — wires ProcessManager + MessageBus + AuditTrail into a single coordinator. (~6832 tok)
+- `process_manager.py` — ProcessManager — lifecycle controller for agent processes. (~1657 tok)
+- `types.py` — Shared domain types for the AOS kernel. (~1404 tok)
+
+## aos/memory/
+
+- `__init__.py` — AOS Memory — three-tier memory management (L1 context, L2 session, L3 persistent). (~26 tok)
+
+## aos/modules/
+
+- `__init__.py` — AOS Modules — pluggable capability registration for agent types and tools. (~24 tok)
+
+## aos/observability/
+
+- `__init__.py` — AOS Observability — metrics, tracing, and health monitoring. (~20 tok)
+- `CLAUDE.md` (~11 tok)
+- `finetune_buffer.py` — FineTuneBuffer — quality-gated accumulator for OpenAI fine-tuning traces. (~939 tok)
+- `learning_hook.py` — LearningHook — batched per-agent-type trace flusher. (~1289 tok)
+
+## aos/runtime/
+
+- `__init__.py` — AOS Runtime — execution sandboxing, resource limits, and container management. (~25 tok)
+- `CLAUDE.md` (~11 tok)
+- `container.py` — AgentContainer — wraps agent coroutines with resource enforcement. (~1255 tok)
+- `executor.py` — Executor — kernel.execute() end-to-end runner. (~326 tok)
+- `types.py` — Runtime types — resource limits and usage tracking. (~479 tok)
+
+## aos/shell/
+
+- `__init__.py` — AOS Shell — natural language intent compilation and interactive REPL. (~22 tok)
 
 ## api/
 
@@ -1439,6 +1514,7 @@
 
 ## examples/
 
+- `aos_demo.py` — Live demo of the AOS kernel — Phase 1 + 2. (~1752 tok)
 - `basic_query.py` — basic_example, single_agent_example, main (~616 tok)
 - `basic-usage.ts` — DevSkyy Basic Usage Examples (~2019 tok)
 - `claude_agent_sdk_demo.py` — basic_query_demo, code_execution_demo, main (~472 tok)
@@ -2934,6 +3010,7 @@
 - `master_registry.py` — View: get (~3012 tok)
 - `models.py` — ProductData: from_override, provider_count (~1847 tok)
 - `retry.py` — is_transient_error, retry_on_transient (~498 tok)
+- `sku_resolver.py` — from: sanitize_sku, resolve_sku, verify_tripo_region (~2680 tok)
 - `telemetry.py` — URL configuration (~1651 tok)
 - `utils.py` — URL configuration (~1604 tok)
 - `validation.py` — Shared validation utilities for registry files. (~1378 tok)
@@ -3460,6 +3537,61 @@
 - `__init__.py` (~0 tok)
 - `CLAUDE.md` (~11 tok)
 - `test_stream_processor.py` — Tests: page_view_increments_counter, product_interaction_tracks_by_type, order_completed_accumulates_revenue_by_hour, search_query_normalizes_and_c... (~1926 tok)
+
+## tests/aos/
+
+- `__init__.py` (~0 tok)
+- `_mocks.py` — Mock agents and learning modules for AOS tests. (~841 tok)
+- `CLAUDE.md` (~11 tok)
+- `test_cognition_reflector.py` — Tests for Reflector quality scoring and failure classification. (~1555 tok)
+- `test_cognition_types.py` — Tests for TaskGraph, TaskNode, PlanStep, and DecomposedPlan. (~1024 tok)
+- `test_execute_plan.py` — Integration tests for Kernel.execute_plan() and _reflect_and_learn(). (~1505 tok)
+- `test_finetune_buffer.py` — Tests for FineTuneBuffer — quality gate, FIFO eviction, JSONL export, drain. (~1292 tok)
+- `test_goal_decomposer.py` — Tests for GoalDecomposer — domain detection and valid TaskGraph output. (~1042 tok)
+- `test_smoke_real_agent.py` — Smoke test: kernel.execute() with a real EnhancedSuperAgent instance. (~993 tok)
+
+## tests/aos/adapters/
+
+- `__init__.py` (~0 tok)
+- `CLAUDE.md` (~11 tok)
+- `test_superagent_adapter.py` — Tests for SuperAgentAdapter. (~1201 tok)
+
+## tests/aos/governance/
+
+- `__init__.py` (~0 tok)
+- `CLAUDE.md` (~11 tok)
+- `test_approval.py` — Tests for ApprovalGate. (~1059 tok)
+- `test_audit.py` — Tests for AuditTrail. (~947 tok)
+- `test_budget.py` — Tests for BudgetController. (~606 tok)
+- `test_policy.py` — Tests for PolicyEngine. (~1041 tok)
+
+## tests/aos/ipc/
+
+- `__init__.py` (~0 tok)
+- `CLAUDE.md` (~11 tok)
+- `test_message_bus.py` — Tests for MessageBus IPC. (~1484 tok)
+
+## tests/aos/kernel/
+
+- `__init__.py` (~0 tok)
+- `CLAUDE.md` (~11 tok)
+- `test_kernel_execute.py` — End-to-end tests for kernel.execute() — Phase 3 task execution. (~2043 tok)
+- `test_kernel_governance.py` — Integration tests for Kernel with PolicyEngine + ApprovalGate + BudgetController. (~2181 tok)
+- `test_kernel.py` — Tests for the Kernel coordinator. (~1799 tok)
+- `test_process_manager.py` — Tests for ProcessManager. (~1590 tok)
+- `test_types.py` — Tests for AOS kernel domain types. (~1070 tok)
+
+## tests/aos/observability/
+
+- `__init__.py` (~0 tok)
+- `CLAUDE.md` (~11 tok)
+- `test_learning_hook.py` — Tests for LearningHook. (~1008 tok)
+
+## tests/aos/runtime/
+
+- `__init__.py` (~0 tok)
+- `CLAUDE.md` (~11 tok)
+- `test_container.py` — Tests for AgentContainer. (~1047 tok)
 
 ## tests/api/
 

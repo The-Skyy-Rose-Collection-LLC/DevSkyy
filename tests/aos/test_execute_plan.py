@@ -8,7 +8,6 @@ from aos.cognition.goal_decomposer import GoalDecomposer
 from aos.cognition.planner import Planner
 from aos.governance.types import AuditEventType
 from aos.kernel.kernel import Kernel
-from aos.kernel.types import SpawnRequest
 from tests.aos._mocks import MockAgentResult, MockSuperAgent
 
 

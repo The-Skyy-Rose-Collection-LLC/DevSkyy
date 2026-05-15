@@ -15,7 +15,7 @@ keyword lists — no LLM required for the rule-based path.
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
@@ -81,7 +81,7 @@ class Reflection(BaseModel):
 class Reflector:
     """Converts an ExecutionOutcome into a Reflection with quality scoring."""
 
-    def reflect(self, outcome: "ExecutionOutcome", trace: LearningTrace) -> Reflection:
+    def reflect(self, outcome: ExecutionOutcome, trace: LearningTrace) -> Reflection:
         """Produce a Reflection from a completed outcome and its learning trace."""
         failure_cat: FailureCategory | None = None
         remediation: str | None = None
@@ -110,7 +110,7 @@ def _classify_failure(error: str) -> FailureCategory:
     return FailureCategory.UNKNOWN
 
 
-def _compute_quality(outcome: "ExecutionOutcome", trace: LearningTrace) -> float:
+def _compute_quality(outcome: ExecutionOutcome, trace: LearningTrace) -> float:
     score = 1.0
     if not outcome.success:
         score -= 0.5

@@ -46,7 +46,7 @@ class TaskGraph(BaseModel):
                     raise ValueError(msg)
 
         # Build in-degree and reverse adjacency
-        in_degree: dict[str, int] = {nid: 0 for nid in self.nodes}
+        in_degree: dict[str, int] = dict.fromkeys(self.nodes, 0)
         dependents: dict[str, list[str]] = {nid: [] for nid in self.nodes}
         for nid, node in self.nodes.items():
             for dep in node.deps:
