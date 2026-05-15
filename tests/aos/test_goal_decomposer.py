@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-
 from aos.cognition.goal_decomposer import GoalDecomposer
 from aos.cognition.types import TaskGraph
 from aos.kernel.types import ProcessPriority

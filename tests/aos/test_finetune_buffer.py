@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 
-
 from aos.cognition.reflector import Reflector
 from aos.observability.finetune_buffer import FineTuneBuffer
 from aos.observability.learning_hook import LearningTrace

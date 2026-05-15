@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-15T01:13:56.313Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-15T01:16:47.107Z
 > Files: 2579 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -644,8 +644,8 @@
 - `CLAUDE.md` (~11 tok)
 - `goal_decomposer.py` — GoalDecomposer — rule-based goal-to-TaskGraph decomposer. (~1319 tok)
 - `planner.py` — Planner — converts a TaskGraph into an ordered DecomposedPlan. (~254 tok)
-- `reflector.py` — Reflector — converts ExecutionOutcome + LearningTrace into a quality-scored Reflection. (~1228 tok)
-- `types.py` — Cognition types — task graph, plan steps, and decomposed plans. (~877 tok)
+- `reflector.py` — Reflector — converts ExecutionOutcome + LearningTrace into a quality-scored Reflection. (~1225 tok)
+- `types.py` — Cognition types — task graph, plan steps, and decomposed plans. (~876 tok)
 
 ## aos/governance/
 
@@ -3545,9 +3545,9 @@
 - `CLAUDE.md` (~11 tok)
 - `test_cognition_reflector.py` — Tests for Reflector quality scoring and failure classification. (~1555 tok)
 - `test_cognition_types.py` — Tests for TaskGraph, TaskNode, PlanStep, and DecomposedPlan. (~1024 tok)
-- `test_execute_plan.py` — Integration tests for Kernel.execute_plan() and _reflect_and_learn(). (~1505 tok)
-- `test_finetune_buffer.py` — Tests for FineTuneBuffer — quality gate, FIFO eviction, JSONL export, drain. (~1292 tok)
-- `test_goal_decomposer.py` — Tests for GoalDecomposer — domain detection and valid TaskGraph output. (~1042 tok)
+- `test_execute_plan.py` — Integration tests for Kernel.execute_plan() and _reflect_and_learn(). (~1493 tok)
+- `test_finetune_buffer.py` — Tests for FineTuneBuffer — quality gate, FIFO eviction, JSONL export, drain. (~1288 tok)
+- `test_goal_decomposer.py` — Tests for GoalDecomposer — domain detection and valid TaskGraph output. (~1038 tok)
 - `test_smoke_real_agent.py` — Smoke test: kernel.execute() with a real EnhancedSuperAgent instance. (~993 tok)
 
 ## tests/aos/adapters/
