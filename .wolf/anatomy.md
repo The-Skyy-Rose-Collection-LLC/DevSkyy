@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-15T04:49:07.423Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-15T04:49:56.121Z
 > Files: 2580 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -672,7 +672,7 @@
 
 - `__init__.py` — AOS Kernel — process lifecycle, scheduling, and the main event loop. (~22 tok)
 - `CLAUDE.md` (~11 tok)
-- `kernel.py` — Kernel — wires ProcessManager + MessageBus + AuditTrail into a single coordinator. (~8161 tok)
+- `kernel.py` — Kernel — wires ProcessManager + MessageBus + AuditTrail into a single coordinator. (~8164 tok)
 - `process_manager.py` — ProcessManager — lifecycle controller for agent processes. (~1657 tok)
 - `types.py` — Shared domain types for the AOS kernel. (~1404 tok)
 
