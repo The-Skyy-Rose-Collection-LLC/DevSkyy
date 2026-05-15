@@ -13,11 +13,14 @@ Lifecycle:
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 from typing import Any
 
 from aos.adapters.superagent_adapter import SuperAgentAdapter
+from aos.cognition.reflector import Reflector
+from aos.cognition.types import DecomposedPlan
 from aos.governance.approval import ApprovalDecision, ApprovalGate, ApprovalRequest
 from aos.governance.audit import AuditTrail
 from aos.governance.budget import BudgetController, BudgetDecision, BudgetVerdict
@@ -26,6 +29,7 @@ from aos.governance.types import AuditEntry, AuditEventType
 from aos.ipc.message_bus import MessageBus
 from aos.kernel.process_manager import ProcessManager
 from aos.kernel.types import AgentProcess, ProcessStatus, SpawnRequest
+from aos.observability.finetune_buffer import FineTuneBuffer
 from aos.observability.learning_hook import LearningHook, LearningTrace
 from aos.runtime.container import AgentContainer
 from aos.runtime.executor import ExecutionOutcome, NoFactoryError
@@ -75,6 +79,8 @@ class Kernel:
             learning_module_resolver=self._resolve_learning_module,
         )
         self._learning_modules: dict[str, Any] = {}
+        self.reflector = Reflector()
+        self.finetune_buffer = FineTuneBuffer()
         self._booted = False
 
     async def boot(self) -> None:
@@ -428,6 +434,118 @@ class Kernel:
                 "container_timed_out": container_result.timed_out,
             },
         )
+
+    async def execute_plan(
+        self,
+        plan: DecomposedPlan,
+        *,
+        limits: ResourceLimits | None = None,
+        approval_timeout_seconds: float | None = 300.0,
+    ) -> list[ExecutionOutcome]:
+        """Execute a DecomposedPlan wavefront-by-wavefront, reflecting after each node.
+
+        Each PlanStep's nodes run in parallel via asyncio.gather.
+        Returns all successful ExecutionOutcomes; node-level exceptions are counted
+        but do not abort the plan.
+        """
+        self._require_booted()
+        await self.audit.log(
+            AuditEntry(
+                event_type=AuditEventType.PLAN_STARTED,
+                actor_pid=self.KERNEL_PID,
+                details={"goal": plan.goal, "total_nodes": plan.total_nodes},
+            )
+        )
+        outcomes: list[ExecutionOutcome] = []
+        node_failures: int = 0
+        try:
+            for step in plan.steps:
+                tasks = [
+                    self.execute(
+                        SpawnRequest(
+                            agent_type=node.agent_type,
+                            prompt=node.prompt,
+                            priority=node.priority,
+                            budget_usd=node.budget_usd,
+                            metadata=dict(node.metadata),
+                        ),
+                        approval_timeout_seconds=approval_timeout_seconds,
+                        limits=limits,
+                    )
+                    for node in step.nodes
+                ]
+                results = await asyncio.gather(*tasks, return_exceptions=True)
+                for idx, result in enumerate(results):
+                    if isinstance(result, ExecutionOutcome):
+                        outcomes.append(result)
+                        await self._reflect_and_learn(result, prompt=step.nodes[idx].prompt)
+                    else:
+                        node_failures += 1
+            await self.audit.log(
+                AuditEntry(
+                    event_type=AuditEventType.PLAN_COMPLETED,
+                    actor_pid=self.KERNEL_PID,
+                    details={
+                        "goal": plan.goal,
+                        "outcome_count": len(outcomes),
+                        "node_failures": node_failures,
+                    },
+                )
+            )
+        except Exception as exc:
+            await self.audit.log(
+                AuditEntry(
+                    event_type=AuditEventType.PLAN_FAILED,
+                    actor_pid=self.KERNEL_PID,
+                    details={"goal": plan.goal, "error": str(exc)},
+                )
+            )
+            raise
+        return outcomes
+
+    async def _reflect_and_learn(
+        self,
+        outcome: ExecutionOutcome,
+        *,
+        prompt: str = "",
+    ) -> None:
+        """Score an outcome, record a Reflection, and queue it in the fine-tune buffer."""
+        adapter_run = outcome.agent_run
+        trace = LearningTrace(
+            agent_type=outcome.metadata.get("agent_type", "unknown"),
+            prompt=prompt,
+            result=adapter_run.raw_result,
+            success=outcome.success,
+            error=outcome.error,
+            retry_count=len(outcome.heal_entries),
+            heal_categories=tuple(e.category for e in outcome.heal_entries),
+            cost_usd=float(adapter_run.metadata.get("cost_usd", 0.0) or 0.0),
+            latency_ms=float(adapter_run.metadata.get("latency_ms", 0.0) or 0.0),
+            metadata=outcome.metadata,
+        )
+        reflection = self.reflector.reflect(outcome, trace)
+        await self.audit.log(
+            AuditEntry(
+                event_type=AuditEventType.REFLECTION_RECORDED,
+                target_pid=outcome.pid,
+                details={
+                    "quality_score": reflection.quality_score,
+                    "failure_category": reflection.failure_category.value
+                    if reflection.failure_category
+                    else None,
+                    "success": reflection.success,
+                },
+            )
+        )
+        added = self.finetune_buffer.add(reflection)
+        if added:
+            await self.audit.log(
+                AuditEntry(
+                    event_type=AuditEventType.FINETUNE_QUEUED,
+                    target_pid=outcome.pid,
+                    details={"quality_score": reflection.quality_score},
+                )
+            )
 
     async def _audit_policy(
         self,

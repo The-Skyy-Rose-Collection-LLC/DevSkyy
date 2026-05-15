@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Any
 
@@ -38,6 +38,11 @@ class AuditEventType(StrEnum):
     PROCESS_HEAL_FAILED = "process_heal_failed"
     LEARNING_RECORDED = "learning_recorded"
     LEARNING_FLUSHED = "learning_flushed"
+    PLAN_STARTED = "plan_started"
+    PLAN_COMPLETED = "plan_completed"
+    PLAN_FAILED = "plan_failed"
+    REFLECTION_RECORDED = "reflection_recorded"
+    FINETUNE_QUEUED = "finetune_queued"
 
 
 class AuditEntry(BaseModel):
@@ -46,7 +51,7 @@ class AuditEntry(BaseModel):
     model_config = {"frozen": True}
 
     id: str = Field(default_factory=lambda: uuid.uuid4().hex)
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     event_type: AuditEventType
     actor_pid: int | None = None
     target_pid: int | None = None
