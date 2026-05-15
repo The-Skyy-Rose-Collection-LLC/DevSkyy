@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-15T22:04:42.271Z
-> Files: 2587 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-15T22:07:50.281Z
+> Files: 2593 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -678,7 +678,10 @@
 
 ## aos/memory/
 
-- `__init__.py` — AOS Memory — three-tier memory management (L1 context, L2 session, L3 persistent). (~26 tok)
+- `__init__.py` — AOS Memory — namespaced key/value store with TTL and tag-based query index. (~105 tok)
+- `index.py` — AOS MemoryIndex — tag-based filter index over a MemoryStore. (~765 tok)
+- `store.py` — AOS MemoryStore — namespaced key/value store with TTL expiry. (~1434 tok)
+- `types.py` — AOS Memory — entry type and exceptions. (~382 tok)
 
 ## aos/modules/
 
@@ -3584,6 +3587,12 @@
 - `test_kernel.py` — Tests for the Kernel coordinator. (~1799 tok)
 - `test_process_manager.py` — Tests for ProcessManager. (~1590 tok)
 - `test_types.py` — Tests for AOS kernel domain types. (~1070 tok)
+
+## tests/aos/memory/
+
+- `__init__.py` (~0 tok)
+- `test_index.py` — Tests for MemoryIndex. (~802 tok)
+- `test_store.py` — Tests for MemoryStore. (~1431 tok)
 
 ## tests/aos/modules/
 
