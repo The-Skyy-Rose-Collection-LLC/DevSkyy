@@ -41,10 +41,7 @@ class PolicyRule(BaseModel):
 
     def matches(self, descriptor: Mapping[str, Any]) -> bool:
         """True when every key in self.match is present and equal in descriptor."""
-        for key, expected in self.match.items():
-            if descriptor.get(key) != expected:
-                return False
-        return True
+        return all(descriptor.get(key) == expected for key, expected in self.match.items())
 
 
 class PolicyDecision(BaseModel):

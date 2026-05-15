@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -30,7 +30,7 @@ class ResourceUsage(BaseModel):
     subprocess_count: int = 0
     output_bytes: int = 0
     tool_call_count: int = 0
-    started_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    started_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     ended_at: datetime | None = None
 
     def is_within(self, limits: ResourceLimits) -> bool:
@@ -41,9 +41,7 @@ class ResourceUsage(BaseModel):
             return False
         if self.output_bytes > limits.max_output_bytes:
             return False
-        if self.tool_call_count > limits.max_tool_calls:
-            return False
-        return True
+        return not self.tool_call_count > limits.max_tool_calls
 
 
 class ExecutionResult(BaseModel):
