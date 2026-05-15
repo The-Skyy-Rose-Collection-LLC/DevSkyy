@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-15T01:17:36.794Z
-> Files: 2579 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-15T04:49:07.423Z
+> Files: 2580 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -644,7 +644,7 @@
 - `CLAUDE.md` (~11 tok)
 - `goal_decomposer.py` — GoalDecomposer — rule-based goal-to-TaskGraph decomposer. (~1319 tok)
 - `planner.py` — Planner — converts a TaskGraph into an ordered DecomposedPlan. (~254 tok)
-- `reflector.py` — Reflector — converts ExecutionOutcome + LearningTrace into a quality-scored Reflection. (~1225 tok)
+- `reflector.py` — Reflector — converts ExecutionOutcome + LearningTrace into a quality-scored Reflection. (~1275 tok)
 - `types.py` — Cognition types — task graph, plan steps, and decomposed plans. (~876 tok)
 
 ## aos/governance/
@@ -655,7 +655,7 @@
 - `budget.py` — BudgetController — per-process and system-wide spend tracking + guards. (~1126 tok)
 - `CLAUDE.md` (~11 tok)
 - `policy.py` — PolicyEngine — declarative ALLOW/DENY/REQUIRE_APPROVAL rules for kernel actions. (~947 tok)
-- `types.py` — Governance types — audit entries and policy decisions. (~682 tok)
+- `types.py` — Governance types — audit entries and policy decisions. (~713 tok)
 
 ## aos/init/
 
@@ -672,7 +672,7 @@
 
 - `__init__.py` — AOS Kernel — process lifecycle, scheduling, and the main event loop. (~22 tok)
 - `CLAUDE.md` (~11 tok)
-- `kernel.py` — Kernel — wires ProcessManager + MessageBus + AuditTrail into a single coordinator. (~6832 tok)
+- `kernel.py` — Kernel — wires ProcessManager + MessageBus + AuditTrail into a single coordinator. (~8161 tok)
 - `process_manager.py` — ProcessManager — lifecycle controller for agent processes. (~1657 tok)
 - `types.py` — Shared domain types for the AOS kernel. (~1404 tok)
 
@@ -3541,7 +3541,7 @@
 ## tests/aos/
 
 - `__init__.py` (~0 tok)
-- `_mocks.py` — Mock agents and learning modules for AOS tests. (~841 tok)
+- `_mocks.py` — Mock agents and learning modules for AOS tests. (~855 tok)
 - `CLAUDE.md` (~11 tok)
 - `test_cognition_reflector.py` — Tests for Reflector quality scoring and failure classification. (~1555 tok)
 - `test_cognition_types.py` — Tests for TaskGraph, TaskNode, PlanStep, and DecomposedPlan. (~1024 tok)
@@ -3577,6 +3577,7 @@
 - `CLAUDE.md` (~11 tok)
 - `test_kernel_execute.py` — End-to-end tests for kernel.execute() — Phase 3 task execution. (~2043 tok)
 - `test_kernel_governance.py` — Integration tests for Kernel with PolicyEngine + ApprovalGate + BudgetController. (~2181 tok)
+- `test_kernel_healing.py` — Kernel-level self-healing integration tests — Phase 5. (~2695 tok)
 - `test_kernel.py` — Tests for the Kernel coordinator. (~1799 tok)
 - `test_process_manager.py` — Tests for ProcessManager. (~1590 tok)
 - `test_types.py` — Tests for AOS kernel domain types. (~1070 tok)

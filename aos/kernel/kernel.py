@@ -639,9 +639,9 @@ class Kernel:
                 target_pid=outcome.pid,
                 details={
                     "quality_score": reflection.quality_score,
-                    "failure_category": reflection.failure_category.value
-                    if reflection.failure_category
-                    else None,
+                    "failure_category": (
+                        reflection.failure_category.value if reflection.failure_category else None
+                    ),
                     "success": reflection.success,
                 },
             )
