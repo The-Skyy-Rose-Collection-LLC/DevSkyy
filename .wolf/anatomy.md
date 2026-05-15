@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-15T04:50:05.244Z
-> Files: 2580 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-15T22:04:16.431Z
+> Files: 2587 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -672,7 +672,7 @@
 
 - `__init__.py` — AOS Kernel — process lifecycle, scheduling, and the main event loop. (~22 tok)
 - `CLAUDE.md` (~11 tok)
-- `kernel.py` — Kernel — wires ProcessManager + MessageBus + AuditTrail into a single coordinator. (~8164 tok)
+- `kernel.py` — Kernel — wires ProcessManager + MessageBus + AuditTrail into a single coordinator. (~8527 tok)
 - `process_manager.py` — ProcessManager — lifecycle controller for agent processes. (~1657 tok)
 - `types.py` — Shared domain types for the AOS kernel. (~1404 tok)
 
@@ -682,7 +682,10 @@
 
 ## aos/modules/
 
-- `__init__.py` — AOS Modules — pluggable capability registration for agent types and tools. (~24 tok)
+- `__init__.py` — AOS Modules — pluggable capability registration for agent types and tools. (~136 tok)
+- `loader.py` — Dynamic module loader — importlib-based loader for AOS module packages. (~409 tok)
+- `registry.py` — ModuleRegistry — pluggable agent-factory store for the AOS kernel. (~1028 tok)
+- `types.py` — AOS module types — manifest and factory type alias. (~211 tok)
 
 ## aos/observability/
 
@@ -3545,7 +3548,7 @@
 - `CLAUDE.md` (~11 tok)
 - `test_cognition_reflector.py` — Tests for Reflector quality scoring and failure classification. (~1555 tok)
 - `test_cognition_types.py` — Tests for TaskGraph, TaskNode, PlanStep, and DecomposedPlan. (~1024 tok)
-- `test_execute_plan.py` — Integration tests for Kernel.execute_plan() and _reflect_and_learn(). (~1493 tok)
+- `test_execute_plan.py` — Integration tests for Kernel.execute_plan() and _reflect_and_learn(). (~1494 tok)
 - `test_finetune_buffer.py` — Tests for FineTuneBuffer — quality gate, FIFO eviction, JSONL export, drain. (~1288 tok)
 - `test_goal_decomposer.py` — Tests for GoalDecomposer — domain detection and valid TaskGraph output. (~1038 tok)
 - `test_smoke_real_agent.py` — Smoke test: kernel.execute() with a real EnhancedSuperAgent instance. (~993 tok)
@@ -3581,6 +3584,13 @@
 - `test_kernel.py` — Tests for the Kernel coordinator. (~1799 tok)
 - `test_process_manager.py` — Tests for ProcessManager. (~1590 tok)
 - `test_types.py` — Tests for AOS kernel domain types. (~1070 tok)
+
+## tests/aos/modules/
+
+- `__init__.py` (~0 tok)
+- `test_kernel_modules.py` — Integration tests for Kernel module lifecycle methods. (~1365 tok)
+- `test_loader.py` — Tests for the dynamic module loader. (~935 tok)
+- `test_registry.py` — Tests for ModuleRegistry. (~1363 tok)
 
 ## tests/aos/observability/
 
