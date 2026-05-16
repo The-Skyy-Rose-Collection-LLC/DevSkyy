@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-16T14:57:47.021Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-16T15:16:11.593Z
 > Files: 2602 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -3070,7 +3070,7 @@
 ## skyyrose/elite_studio/fashion/
 
 - `__init__.py` (~550 tok)
-- `CLAUDE.md` — Recent Activity (~64 tok)
+- `CLAUDE.md` (~11 tok)
 - `colorway.py` — ColorPalette: get_collection_palette, get_all_palettes_for_collection, suggest_colorways, validate_color_fidelity + 2 more (~3169 tok)
 - `context.py` — logger: build, build_from_product_catalog (~2670 tok)
 - `editorial.py` — Declares StylingRule (~4715 tok)
