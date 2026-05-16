@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-15T22:21:10.420Z
-> Files: 2597 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-16T10:26:58.200Z
+> Files: 2602 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -709,7 +709,9 @@
 
 ## aos/shell/
 
-- `__init__.py` — AOS Shell — natural language intent compilation and interactive REPL. (~22 tok)
+- `__init__.py` — AOS Shell — interactive REPL over the live Kernel API. (~68 tok)
+- `commands.py` — AOS Shell command dispatch — pure async, zero I/O. (~1548 tok)
+- `repl.py` — AOS Shell REPL — thin stdin/stdout loop over execute_command. (~675 tok)
 
 ## api/
 
@@ -3616,6 +3618,12 @@
 - `__init__.py` (~0 tok)
 - `CLAUDE.md` (~11 tok)
 - `test_container.py` — Tests for AgentContainer. (~1047 tok)
+
+## tests/aos/shell/
+
+- `__init__.py` (~0 tok)
+- `test_commands.py` — Tests for AOS shell command dispatch (execute_command). (~1566 tok)
+- `test_repl.py` — Tests for the AosShell REPL I/O layer. (~850 tok)
 
 ## tests/api/
 
