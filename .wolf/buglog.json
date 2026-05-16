@@ -1656,6 +1656,26 @@
       "status": "FIXED",
       "fixed_at": "2026-05-13T19:25:00-07:00",
       "fixed_in_commit": "TBD-this-commit"
+    },
+    {
+      "id": "bug-101",
+      "timestamp": "2026-05-16T03:24:33.130549-07:00",
+      "error_message": "error: 'tuple' object is not callable (TestModules in tests/aos/shell/test_commands.py)",
+      "file": "aos/shell/commands.py",
+      "root_cause": "ModuleRegistry.manifests and .registered_types are @property accessors, not methods; _cmd_modules called them with () which invoked the returned tuple/frozenset.",
+      "fix": "Dropped the parentheses: kernel.modules.manifests / kernel.modules.registered_types accessed as properties.",
+      "tags": [
+        "aos",
+        "shell",
+        "phase-6.4",
+        "property-vs-method",
+        "module-registry"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T03:24:33.130549-07:00",
+      "status": "FIXED",
+      "fixed_in_commit": "TBD-phase-6.4"
     }
   ]
 }
