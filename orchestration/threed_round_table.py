@@ -109,9 +109,7 @@ def _sku_tokens_consistent(task_id: str, image_path: str) -> bool:
     if task_prefix != image_prefix:
         return False
     # Same prefix. If the task names a variant, the image must too.
-    if task_variant is not None and image_variant != task_variant:
-        return False
-    return True
+    return not (task_variant is not None and image_variant != task_variant)
 
 
 # =============================================================================
