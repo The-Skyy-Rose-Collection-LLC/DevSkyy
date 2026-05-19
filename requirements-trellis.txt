@@ -44,3 +44,7 @@ boto3>=1.34
 # xformers>=0.0.27
 # spconv-cu120>=2.3
 # kaolin>=0.16
+
+# --- Production hardening (queue, store, metrics) ---
+redis>=5.0           # Redis Streams queue + RedisJobStore
+prometheus_client>=0.20  # Prometheus metrics exposed at /metrics

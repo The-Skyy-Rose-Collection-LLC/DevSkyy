@@ -2,25 +2,35 @@
 
 Endpoints:
 
-- ``POST /generate`` — synchronous run. Returns the full :class:`PipelineResult`.
-- ``POST /generate/async`` — fire-and-forget; returns a job ID for polling.
-- ``GET  /jobs/{job_id}`` — fetch a previously submitted async job.
-- ``GET  /health`` — provider/backend health.
+- ``POST /generate``               synchronous run
+- ``POST /generate/async``         enqueue, returns ``job_id`` + ``status_url``
+- ``GET  /jobs/{job_id}``          poll an async job
+- ``GET  /jobs``                   list recent jobs (capped at 100)
+- ``GET  /health``                 liveness — provider/backend health
+- ``GET  /ready``                  readiness — queue+store reachable
+- ``GET  /info``                   active config + capabilities
+- ``GET  /metrics``                Prometheus text payload
 
-The async path uses an in-process job store; for multi-worker deployments,
-swap in the existing :mod:`services.ml.processing_queue` or Celery worker.
+Production wiring:
+
+- Async submissions are pushed to :class:`JobQueue` (Redis Streams when
+  ``REDIS_URL`` is set, in-memory otherwise) and processed by the worker
+  (``python -m pipelines.clothing_3d.worker``). The router never blocks on
+  the pipeline.
+- Sync ``/generate`` still runs in-process; use it from internal callers that
+  need the result immediately and accept the latency.
+- Both paths share :class:`IdempotencyCache` so identical inputs return the
+  cached result instead of re-running.
 """
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import uuid
-from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from typing import Any
+from typing import Annotated, Any
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 
 from api.v1.clothing_3d.schemas import (
     GenerateRequest,
@@ -29,8 +39,24 @@ from api.v1.clothing_3d.schemas import (
     JobAcceptedResponse,
     JobStatusResponse,
 )
-from pipelines.clothing_3d.models import PipelineResult, PipelineStatus
+from pipelines.clothing_3d.job_store import JobRecord, JobStore, build_job_store
+from pipelines.clothing_3d.models import (
+    PipelineRequest,
+    PipelineResult,
+    PipelineStatus,
+)
+from pipelines.clothing_3d.observability import (
+    get_metrics,
+    metrics_event_subscriber,
+    render_metrics,
+)
 from pipelines.clothing_3d.pipeline import ClothingPipeline
+from pipelines.clothing_3d.queue import JobQueue, build_queue
+from pipelines.clothing_3d.reliability import (
+    IdempotencyCache,
+    QuotaExceededError,
+    request_fingerprint,
+)
 from services.three_d.trellis.config import TrellisConfig
 
 logger = logging.getLogger(__name__)
@@ -39,53 +65,44 @@ router = APIRouter(tags=["Clothing 3D Pipeline"])
 
 
 # =============================================================================
-# Singletons (one pipeline per process)
+# Process-level singletons
 # =============================================================================
 
 
 _pipeline: ClothingPipeline | None = None
+_queue: JobQueue | None = None
+_store: JobStore | None = None
+_idempotency: IdempotencyCache | None = None
 
 
 def get_pipeline() -> ClothingPipeline:
     global _pipeline
     if _pipeline is None:
         _pipeline = ClothingPipeline(config=TrellisConfig.from_env())
+        # Wire pipeline events into Prometheus metrics for sync runs too.
+        _pipeline.event_bus.subscribe(metrics_event_subscriber())
     return _pipeline
 
 
-# =============================================================================
-# In-process job store
-# =============================================================================
+def get_queue() -> JobQueue:
+    global _queue
+    if _queue is None:
+        _queue = build_queue()
+    return _queue
 
 
-@dataclass(slots=True)
-class _Job:
-    job_id: str
-    status: str = "queued"
-    result: PipelineResult | None = None
-    error: str | None = None
-    submitted_at: datetime = field(default_factory=lambda: datetime.now(UTC))
-    finished_at: datetime | None = None
+def get_store() -> JobStore:
+    global _store
+    if _store is None:
+        _store = build_job_store()
+    return _store
 
 
-_jobs: dict[str, _Job] = {}
-_jobs_lock = asyncio.Lock()
-
-# Cap at 256 entries to avoid unbounded growth — older jobs evicted FIFO.
-_JOB_LIMIT = 256
-
-
-async def _put_job(job: _Job) -> None:
-    async with _jobs_lock:
-        if len(_jobs) >= _JOB_LIMIT:
-            oldest = min(_jobs, key=lambda k: _jobs[k].submitted_at)
-            _jobs.pop(oldest, None)
-        _jobs[job.job_id] = job
-
-
-async def _get_job(job_id: str) -> _Job | None:
-    async with _jobs_lock:
-        return _jobs.get(job_id)
+def get_idempotency() -> IdempotencyCache:
+    global _idempotency
+    if _idempotency is None:
+        _idempotency = IdempotencyCache()
+    return _idempotency
 
 
 # =============================================================================
@@ -100,25 +117,32 @@ async def _get_job(job_id: str) -> _Job | None:
 )
 async def generate_endpoint(
     body: GenerateRequest,
-    pipeline: ClothingPipeline = Depends(get_pipeline),
+    pipeline: Annotated[ClothingPipeline, Depends(get_pipeline)],
+    idempotency: Annotated[IdempotencyCache, Depends(get_idempotency)],
 ) -> GenerateResponse:
-    """Run the full clothing 3D pipeline and return the result.
+    """Run the full clothing 3D pipeline and return the result."""
 
-    Use this for one-off calls. For batch workloads or long-running runs
-    (PRODUCTION quality preset, 60+ second backend latency), prefer
-    :func:`generate_async_endpoint`.
-    """
+    async def _runner(req: PipelineRequest) -> PipelineResult:
+        return await pipeline.run(req)
+
     try:
-        result = await pipeline.run(body)
-    except Exception as exc:  # noqa: BLE001 — convert to HTTP error
+        result, hit = await idempotency.get_or_run(body, runner=_runner)
+    except QuotaExceededError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"backend cost cap exceeded: {exc}",
+        ) from exc
+    except Exception as exc:  # noqa: BLE001
         logger.exception("clothing-3d generate failed")
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=f"Pipeline error: {exc}",
         ) from exc
 
+    metrics = get_metrics()
+    metrics.cache_total.labels(outcome="hit" if hit else "miss").inc()
+
     if result.status == PipelineStatus.FAILED:
-        # Body still returned so the caller sees per-stage detail.
         return GenerateResponse(ok=False, result=result)
     return GenerateResponse(ok=result.succeeded, result=result)
 
@@ -132,20 +156,38 @@ async def generate_endpoint(
 async def generate_async_endpoint(
     body: GenerateRequest,
     request: Request,
-    background: BackgroundTasks,
-    pipeline: ClothingPipeline = Depends(get_pipeline),
+    queue: Annotated[JobQueue, Depends(get_queue)],
+    store: Annotated[JobStore, Depends(get_store)],
 ) -> JobAcceptedResponse:
-    """Submit a job and immediately return a polling URL."""
+    """Enqueue a job; the worker picks it up.
+
+    With ``REDIS_URL`` set, the job survives restarts and any worker in the
+    pool can pick it up. Without Redis, the job runs against the in-process
+    queue and is lost on restart.
+    """
     job_id = f"job_{uuid.uuid4().hex[:16]}"
     body.correlation_id = body.correlation_id or job_id
 
-    job = _Job(job_id=job_id, status="queued")
-    await _put_job(job)
-
-    background.add_task(_run_async_job, job_id, body, pipeline)
+    record = JobRecord(
+        job_id=job_id,
+        status=PipelineStatus.PENDING,
+        request=body,
+        idempotency_key=request_fingerprint(body),
+    )
+    await store.put(record)
+    try:
+        await queue.enqueue(job_id)
+    except Exception as exc:  # noqa: BLE001 — failed enqueue = failed job
+        record.status = PipelineStatus.FAILED
+        record.error = f"enqueue failed: {exc}"
+        record.finished_at = datetime.now(UTC)
+        await store.update(record)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Queue unavailable: {exc}",
+        ) from exc
 
     base_url = str(request.url).rstrip("/")
-    # /generate/async → /jobs/{job_id}
     base = base_url.rsplit("/generate/async", 1)[0]
     return JobAcceptedResponse(
         job_id=job_id,
@@ -154,59 +196,62 @@ async def generate_async_endpoint(
     )
 
 
-async def _run_async_job(
-    job_id: str,
-    body: GenerateRequest,
-    pipeline: ClothingPipeline,
-) -> None:
-    job = await _get_job(job_id)
-    if job is None:
-        logger.warning("async job vanished before execution: %s", job_id)
-        return
-
-    job.status = "running"
-    await _put_job(job)
-
-    try:
-        result = await pipeline.run(body)
-        job.result = result
-        job.status = result.status.value
-    except Exception as exc:  # noqa: BLE001 — captured on the job
-        logger.exception("async clothing-3d job failed: %s", job_id)
-        job.status = PipelineStatus.FAILED.value
-        job.error = str(exc)
-    finally:
-        job.finished_at = datetime.now(UTC)
-        await _put_job(job)
-
-
 @router.get(
     "/jobs/{job_id}",
     response_model=JobStatusResponse,
     summary="Fetch the status of an async clothing 3D job",
 )
-async def get_job_endpoint(job_id: str) -> JobStatusResponse:
-    job = await _get_job(job_id)
+async def get_job_endpoint(
+    job_id: str,
+    store: Annotated[JobStore, Depends(get_store)],
+) -> JobStatusResponse:
+    job = await store.get(job_id)
     if not job:
         raise HTTPException(status_code=404, detail=f"job not found: {job_id}")
     return JobStatusResponse(
-        ok=job.status in {PipelineStatus.SUCCEEDED.value, "queued", "running"},
+        ok=job.status in {PipelineStatus.SUCCEEDED, PipelineStatus.PENDING, PipelineStatus.RUNNING},
         job_id=job.job_id,
-        status=job.status,
+        status=job.status.value,
         result=job.result,
         error=job.error,
-        submitted_at=job.submitted_at.isoformat() if job.submitted_at else None,
+        submitted_at=job.submitted_at.isoformat(),
         finished_at=job.finished_at.isoformat() if job.finished_at else None,
     )
 
 
 @router.get(
+    "/jobs",
+    summary="List recent clothing 3D jobs",
+)
+async def list_jobs_endpoint(
+    store: Annotated[JobStore, Depends(get_store)],
+    limit: int = 50,
+) -> dict[str, Any]:
+    jobs = await store.list(limit=min(max(limit, 1), 100))
+    return {
+        "ok": True,
+        "count": len(jobs),
+        "jobs": [
+            {
+                "job_id": j.job_id,
+                "status": j.status.value,
+                "submitted_at": j.submitted_at.isoformat(),
+                "finished_at": j.finished_at.isoformat() if j.finished_at else None,
+                "worker_id": j.worker_id,
+                "error": j.error,
+            }
+            for j in jobs
+        ],
+    }
+
+
+@router.get(
     "/health",
     response_model=HealthResponse,
-    summary="TRELLIS provider health check",
+    summary="Liveness — TRELLIS provider health",
 )
 async def health_endpoint(
-    pipeline: ClothingPipeline = Depends(get_pipeline),
+    pipeline: Annotated[ClothingPipeline, Depends(get_pipeline)],
 ) -> HealthResponse:
     health = await pipeline.provider.health_check()
     return HealthResponse(
@@ -224,14 +269,47 @@ async def health_endpoint(
     )
 
 
+@router.get("/ready", summary="Readiness — queue + store reachable")
+async def ready_endpoint(
+    queue: Annotated[JobQueue, Depends(get_queue)],
+    store: Annotated[JobStore, Depends(get_store)],
+) -> dict[str, Any]:
+    """Reports OK only when the worker dependencies are reachable."""
+    detail: dict[str, Any] = {}
+    ok = True
+
+    try:
+        detail["queue_depth"] = await queue.depth()
+        detail["queue"] = type(queue).__name__
+    except Exception as exc:  # noqa: BLE001
+        ok = False
+        detail["queue_error"] = str(exc)
+
+    try:
+        await store.list(limit=1)
+        detail["store"] = type(store).__name__
+    except Exception as exc:  # noqa: BLE001
+        ok = False
+        detail["store_error"] = str(exc)
+
+    if not ok:
+        return Response(
+            content=str({"ok": False, **detail}),
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            media_type="application/json",
+        )
+    return {"ok": True, **detail}
+
+
 @router.get("/info", summary="Pipeline configuration & capabilities")
 async def info_endpoint(
-    pipeline: ClothingPipeline = Depends(get_pipeline),
+    pipeline: Annotated[ClothingPipeline, Depends(get_pipeline)],
+    queue: Annotated[JobQueue, Depends(get_queue)],
 ) -> dict[str, Any]:
     config = pipeline.provider.config
     return {
         "ok": True,
-        "version": "1.0.0",
+        "version": "1.1.0",
         "backend": config.backend.value,
         "quality": config.quality.value,
         "capabilities": [c.value for c in pipeline.provider.capabilities],
@@ -246,7 +324,21 @@ async def info_endpoint(
             "usdz": config.export_usdz_for_ios,
             "thumbnail": True,
         },
+        "queue": {
+            "type": type(queue).__name__,
+            "depth": await queue.depth(),
+        },
     }
 
 
-__all__ = ["router", "get_pipeline"]
+@router.get(
+    "/metrics",
+    summary="Prometheus metrics scrape endpoint",
+    include_in_schema=False,
+)
+async def metrics_endpoint() -> Response:
+    body, content_type = render_metrics()
+    return Response(content=body, media_type=content_type)
+
+
+__all__ = ["router", "get_pipeline", "get_queue", "get_store", "get_idempotency"]

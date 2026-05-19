@@ -31,6 +31,13 @@ Entry point:
 from __future__ import annotations
 
 from pipelines.clothing_3d.events import PipelineEvent, PipelineEventBus
+from pipelines.clothing_3d.job_store import (
+    InMemoryJobStore,
+    JobRecord,
+    JobStore,
+    RedisJobStore,
+    build_job_store,
+)
 from pipelines.clothing_3d.models import (
     PipelineQualityReport,
     PipelineRequest,
@@ -39,24 +46,71 @@ from pipelines.clothing_3d.models import (
     PipelineStatus,
     StageReport,
 )
+from pipelines.clothing_3d.observability import (
+    PipelineMetrics,
+    configure_logging,
+    get_metrics,
+    metrics_event_subscriber,
+    render_metrics,
+)
 from pipelines.clothing_3d.pipeline import ClothingPipeline
+from pipelines.clothing_3d.queue import (
+    InMemoryQueue,
+    JobQueue,
+    QueueMessage,
+    RedisStreamsQueue,
+    build_queue,
+)
+from pipelines.clothing_3d.reliability import (
+    CostQuota,
+    IdempotencyCache,
+    IdempotencyStore,
+    InMemoryIdempotencyStore,
+    QuotaExceededError,
+    RetryPolicy,
+    request_fingerprint,
+)
 from pipelines.clothing_3d.storage import (
     ArtifactBundle,
     ArtifactStore,
     LocalArtifactStore,
 )
+from pipelines.clothing_3d.worker import PipelineWorker
 
 __all__ = [
     "ArtifactBundle",
     "ArtifactStore",
     "ClothingPipeline",
+    "CostQuota",
+    "IdempotencyCache",
+    "IdempotencyStore",
+    "InMemoryIdempotencyStore",
+    "InMemoryJobStore",
+    "InMemoryQueue",
+    "JobQueue",
+    "JobRecord",
+    "JobStore",
     "LocalArtifactStore",
     "PipelineEvent",
     "PipelineEventBus",
+    "PipelineMetrics",
     "PipelineQualityReport",
     "PipelineRequest",
     "PipelineResult",
     "PipelineStage",
     "PipelineStatus",
+    "PipelineWorker",
+    "QueueMessage",
+    "QuotaExceededError",
+    "RedisJobStore",
+    "RedisStreamsQueue",
+    "RetryPolicy",
     "StageReport",
+    "build_job_store",
+    "build_queue",
+    "configure_logging",
+    "get_metrics",
+    "metrics_event_subscriber",
+    "render_metrics",
+    "request_fingerprint",
 ]
