@@ -51,7 +51,7 @@ class SDKCatalogManagerAgent(SDKSubAgent):
             "- skyyrose/assets/data/garment-analysis.json → colors\n\n"
             "Collections (counts reflect canonical CSV as of 2026-04-25):\n"
             "- Black Rose: br-001 through br-012 (15 products, including 3 "
-            "br-003 colorway variants: br-003-giants, br-003-oakland, br-003-white)\n"
+            "br-003 colorway variants: br-014, br-013, br-015)\n"
             "- Love Hurts: lh-002 through lh-005 (4 products, lh-001 DELETED)\n"
             "- Signature: sg-001 through sg-015 (12 products, sg-004, sg-008 and sg-010 DELETED)\n"
             "- Kids Capsule: kids-001, kids-002 (2 products)\n\n"

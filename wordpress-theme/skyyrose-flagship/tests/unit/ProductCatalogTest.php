@@ -19,16 +19,16 @@ class ProductCatalogTest extends TestCase {
 		$this->assertSame( 'sg-001', skyyrose_normalize_sku( 'sg-001-tee' ) );
 	}
 
-	public function test_normalize_sku_strips_giants_suffix(): void {
-		$this->assertSame( 'br-003', skyyrose_normalize_sku( 'br-003-giants' ) );
+	public function test_normalize_sku_passthrough_br013(): void {
+		$this->assertSame( 'br-013', skyyrose_normalize_sku( 'br-013' ) );
 	}
 
-	public function test_normalize_sku_strips_white_suffix(): void {
-		$this->assertSame( 'br-003', skyyrose_normalize_sku( 'br-003-white' ) );
+	public function test_normalize_sku_passthrough_br014(): void {
+		$this->assertSame( 'br-014', skyyrose_normalize_sku( 'br-014' ) );
 	}
 
-	public function test_normalize_sku_strips_oakland_suffix(): void {
-		$this->assertSame( 'br-003', skyyrose_normalize_sku( 'br-003-oakland' ) );
+	public function test_normalize_sku_passthrough_br015(): void {
+		$this->assertSame( 'br-015', skyyrose_normalize_sku( 'br-015' ) );
 	}
 
 	public function test_normalize_sku_strips_trailing_letter(): void {

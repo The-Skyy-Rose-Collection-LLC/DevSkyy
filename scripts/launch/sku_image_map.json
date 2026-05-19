@@ -26,7 +26,7 @@
     "confidence": 1.0,
     "method": "manual_override"
   },
-  "br-003-oakland": {
+  "br-013": {
     "image_id": 8939,
     "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_5A8946B1_B51F_4144_BCBB_F02846_main-2.jpg",
     "webp_id": 256,
@@ -35,7 +35,7 @@
     "confidence": 1.0,
     "method": "manual_override"
   },
-  "br-003-giants": {
+  "br-014": {
     "image_id": 8733,
     "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_DEC_18_2023_6_09_21_PM_2_main.jpg",
     "webp_id": 8691,
@@ -44,7 +44,7 @@
     "confidence": 1.0,
     "method": "manual_override"
   },
-  "br-003-white": {
+  "br-015": {
     "image_id": 8737,
     "image_url": "https://skyyrose.co/wp-content/uploads/2026/01/BR_WOMENS_BLACK_ROSE_HOODED_DRESS_main.jpg",
     "webp_id": 8711,

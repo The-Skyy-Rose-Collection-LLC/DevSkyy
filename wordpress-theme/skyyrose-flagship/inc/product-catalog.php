@@ -192,14 +192,14 @@ function skyyrose_get_collection_products( $collection ) {
 /**
  * Normalize a SKU to its base product SKU (strip variant suffixes).
  *
- * Handles: br-003-giants → br-003, sg-001-tee → sg-001, br-003a → br-003.
+ * Handles: sg-001-tee → sg-001, br-003a → br-003.
  *
  * @since 6.3.0
  * @param  string $sku SKU with optional variant suffix.
  * @return string Base SKU.
  */
 function skyyrose_normalize_sku( $sku ) {
-	$sku = preg_replace( '/-(tee|shorts|giants|white|oakland)$/', '', $sku );
+	$sku = preg_replace( '/-(tee|shorts)$/', '', $sku );
 	return preg_replace( '/([a-z]{2,4}-\d{3})[a-z]$/', '$1', $sku );
 }
 

@@ -1,15 +1,15 @@
 ---
-sku: br-003-giants
+sku: br-014
 name: BLACK is Beautiful Jersey Series — 0. Baseball Classic (Giants Edition)
 collection: black-rose
 logo_reference: data/brand-logos/black-rose-logo.md
 extra_logos:
   - data/brand-logos/black-rose-authentic-collection-patch.md
   - data/brand-logos/sr-monogram.md
-reference_image: data/product-references/br-003-giants-techflat.jpeg
+reference_image: data/product-references/br-014-techflat.jpeg
 extra_references:
-  - data/product-references/br-003-giants-real-front.jpeg
-  - data/product-references/br-003-giants-real-back.jpeg
+  - data/product-references/br-014-real-front.jpeg
+  - data/product-references/br-014-real-back.jpeg
 inherits_from: black-is-beautiful-jersey-series-0-baseball-classic
 ---
 
@@ -23,9 +23,9 @@ inherits_from: black-is-beautiful-jersey-series-0-baseball-classic
 > - Black Rose three-rose-cluster: `data/brand-logos/black-rose-logo.md`
 > - Authentic Collection patch:    `data/brand-logos/black-rose-authentic-collection-patch.md`
 > - SR monogram:                   `data/brand-logos/sr-monogram.md`
-> - Product techflat:              `data/product-references/br-003-giants-techflat.jpeg`
-> - Real product photos:           `data/product-references/br-003-giants-real-front.jpeg`,
->                                  `data/product-references/br-003-giants-real-back.jpeg`
+> - Product techflat:              `data/product-references/br-014-techflat.jpeg`
+> - Real product photos:           `data/product-references/br-014-real-front.jpeg`,
+>                                  `data/product-references/br-014-real-back.jpeg`
 
 ### Front
 - **front-chest** (large, arched, ~9in wide): The phrase **"BLACK IS BEAUTIFUL"**

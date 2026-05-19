@@ -48,43 +48,39 @@ MIN_FILE_SIZE_KB = 50
 MAX_RETRIES = 3
 RETRY_DELAY_SEC = 5
 
-# -- Product catalog — loaded from data/product-catalog.csv at startup -------
+# -- Product catalog — loaded from canonical skyyrose-catalog.csv at startup --
 # Catalog fields (name, collection, price, is_preorder, output_slug,
 # source_override) come from the CSV.  Logo treatments and quality flags
 # (BAD_SOURCE_SKUS) live below as image-pipeline-only augmentation.
 
 
 def _load_catalog() -> dict:
-    """Load product catalog from data/product-catalog.csv.
+    """Load product catalog from canonical skyyrose-catalog.csv via shared loader."""
+    import sys
 
-    Returns a dict keyed by SKU that preserves the same structure previously
-    hardcoded here, so all downstream code (find_source_image, load_products,
-    get_back_source) works without modification.
-    """
-    import csv as _csv
+    sys.path.insert(0, str(PROJECT_ROOT))
+    from skyyrose.core.catalog_loader import read_catalog_rows
 
     catalog: dict = {}
-    csv_path = PROJECT_ROOT / "data" / "product-catalog.csv"
-    with csv_path.open(newline="", encoding="utf-8") as f:
-        for row in _csv.DictReader(f):
-            sku = row["sku"].strip()
-            if not sku:
-                continue
-            entry: dict = {
-                "name": row["name"].strip(),
-                "collection": row["collection_slug"].strip(),
-                "is_preorder": row["is_preorder"].strip() == "1",
-                "output_slug": row["render_output_slug"].strip() or sku,
-                "is_tech_flat": row["render_is_tech_flat"].strip() == "1",
-                "is_accessory": row["render_is_accessory"].strip() == "1",
-            }
-            if row["render_source_override"].strip():
-                entry["source_override"] = row["render_source_override"].strip()
-            if row["render_back_source_override"].strip():
-                entry["back_source_override"] = row["render_back_source_override"].strip()
-            if row["render_variant_of"].strip():
-                entry["variant_of"] = row["render_variant_of"].strip()
-            catalog[sku] = entry
+    for row in read_catalog_rows():
+        sku = row.get("sku", "").strip()
+        if not sku:
+            continue
+        entry: dict = {
+            "name": row.get("name", "").strip(),
+            "collection": row.get("collection", "").strip(),
+            "is_preorder": row.get("is_preorder", "").strip() == "1",
+            "output_slug": row.get("render_output_slug", "").strip() or sku,
+            "is_tech_flat": row.get("render_is_tech_flat", "").strip() == "1",
+            "is_accessory": row.get("render_is_accessory", "").strip() == "1",
+        }
+        src_override = row.get("render_source_override", "").strip()
+        if src_override:
+            entry["source_override"] = src_override
+        back_override = row.get("render_back_source_override", "").strip()
+        if back_override:
+            entry["back_source_override"] = back_override
+        catalog[sku] = entry
     return catalog
 
 
@@ -145,17 +141,17 @@ LOGO_TREATMENTS = {
         "patch at lower-hem (circular, team-style); "
         "back: large ROSE-ONLY embroidered logo centered — raised thread texture, rose-gold tone"
     ),
-    "br-003-oakland": (
+    "br-013": (
         "front: 'BLACK IS BEAUTIFUL' text — the letter A in 'BLACK' is black, remaining letters "
         "are gold; custom baseball patch at lower-hem; "
         "back: large ROSE-ONLY embroidered logo centered, rose-gold thread"
     ),
-    "br-003-giants": (
+    "br-014": (
         "front: 'BLACK IS BEAUTIFUL' block text in orange/black Giants colorway across chest; "
         "custom baseball circular patch at hem; "
         "back: large ROSE-ONLY embroidered logo centered, rose-gold thread"
     ),
-    "br-003-white": (
+    "br-015": (
         "front: 'BLACK IS BEAUTIFUL' block text in black on white jersey; custom baseball patch "
         "at hem; "
         "back: large ROSE-ONLY embroidered logo centered, rose-gold thread"

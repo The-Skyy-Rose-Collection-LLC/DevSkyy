@@ -97,16 +97,11 @@ def test_sku_tokens_consistent_permits_orphan() -> None:
 def test_sku_tokens_consistent_handles_variant_suffixes() -> None:
     from orchestration.threed_round_table import _sku_tokens_consistent
 
-    # Same variant family
-    assert (
-        _sku_tokens_consistent("br-003-oakland", "/x/br-003-baseball-classic-oakland.jpeg") is True
-    )
-    # Different variants of same family — current behavior rejects, which
-    # is the safe default. If product expects br-003-oakland and the image
-    # path leaks br-003-giants, we want to halt.
-    assert (
-        _sku_tokens_consistent("br-003-oakland", "/x/br-003-baseball-classic-giants.jpeg") is False
-    )
+    # SKU matches its own renamed image filename
+    assert _sku_tokens_consistent("br-013", "/x/br-013-baseball-classic-oakland.jpeg") is True
+    # Cross-SKU mismatch must reject. If product expects br-013 and the image
+    # path leaks br-014, we want to halt.
+    assert _sku_tokens_consistent("br-013", "/x/br-014-baseball-classic-giants.jpeg") is False
 
 
 @pytest.mark.unit

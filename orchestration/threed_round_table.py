@@ -62,7 +62,7 @@ T = TypeVar("T")
 
 
 # SKU token = prefix-digits, plus an optional known variant suffix.
-# Known catalog variants (br-003-oakland|giants|white) are explicit;
+# Known catalog editions (br-013, br-014, br-015) are independent SKUs;
 # other trailing tokens (e.g. "crewneck", "joggers") are PRODUCT TYPE
 # slugs in image filenames, NOT part of the SKU. Tightening the regex
 # to known variants prevents false-positive matches like

@@ -40,9 +40,9 @@ _ACCESSORY_GARMENT_TYPE: str = "accessory"
 _JERSEY_SKUS: frozenset[str] = frozenset(
     {
         "br-003",
-        "br-003-giants",
-        "br-003-oakland",
-        "br-003-white",
+        "br-014",
+        "br-013",
+        "br-015",
         "br-008",
         "br-009",
         "br-010",
