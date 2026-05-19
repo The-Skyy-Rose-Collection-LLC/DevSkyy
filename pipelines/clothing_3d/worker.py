@@ -89,7 +89,15 @@ class PipelineWorker:
         worker_id: str | None = None,
         reclaim_interval_seconds: float = 30.0,
         poll_block_seconds: float = 5.0,
+        owns_dependencies: bool | None = None,
     ) -> None:
+        # We own dependencies only when we built them ourselves — otherwise
+        # the caller (API, test harness) owns lifecycle and we'd corrupt
+        # their state by closing on shutdown.
+        owned_default = (pipeline is None) and (queue is None) and (store is None)
+        self._owns_dependencies = (
+            owned_default if owns_dependencies is None else owns_dependencies
+        )
         self.pipeline = pipeline or ClothingPipeline(config=TrellisConfig.from_env())
         self.queue = queue or build_queue()
         self.store = store or build_job_store()
@@ -147,9 +155,10 @@ class PipelineWorker:
                 with suppress(asyncio.CancelledError):
                     await reclaim_task
             await self._drain()
-            await self.queue.close()
-            await self.store.close()
-            await self.pipeline.close()
+            if self._owns_dependencies:
+                await self.queue.close()
+                await self.store.close()
+                await self.pipeline.close()
             logger.info("worker.stopped id=%s", self.worker_id)
 
     async def shutdown(self) -> None:

@@ -254,15 +254,23 @@ async def health_endpoint(
     pipeline: Annotated[ClothingPipeline, Depends(get_pipeline)],
 ) -> HealthResponse:
     health = await pipeline.provider.health_check()
+    # Report the live backend (which respects test-injection), with the
+    # configured backend as a secondary signal.
+    live_backend = getattr(
+        pipeline.provider._backend,  # type: ignore[attr-defined]
+        "backend_name",
+        pipeline.provider.config.backend.value,
+    )
     return HealthResponse(
         ok=health.is_available,
         provider=health.provider,
         status=health.status.value,
         capabilities=[c.value for c in health.capabilities],
-        backend=pipeline.provider.config.backend.value,
+        backend=live_backend,
         latency_ms=health.latency_ms,
         error=health.error_message,
         detail={
+            "configured_backend": pipeline.provider.config.backend.value,
             "quality_preset": pipeline.provider.config.quality.value,
             "output_dir": pipeline.provider.config.output_dir,
         },

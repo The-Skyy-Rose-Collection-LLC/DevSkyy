@@ -168,7 +168,16 @@ class InMemoryJobStore:
             )[:limit]
 
     async def close(self) -> None:
-        self._jobs.clear()
+        """No-op. The dict is shared across the API and worker; clearing it
+        here would orphan in-flight jobs whose owners outlive ``close()``.
+        Use :meth:`reset` explicitly when you want to discard state (tests).
+        """
+        return
+
+    async def reset(self) -> None:
+        """Discard all jobs. Tests only — never call in production."""
+        async with self._lock:
+            self._jobs.clear()
 
 
 # =============================================================================
