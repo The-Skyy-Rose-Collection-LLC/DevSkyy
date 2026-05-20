@@ -197,7 +197,7 @@ mcp = [
     "langgraph-checkpoint-postgres>=2.0.0",
     "psycopg[binary,pool]>=3.2",
     "chromadb>=0.6.0",
-    "faiss-cpu==1.13.1",
+    "faiss-cpu==1.13.2",
     "beautifulsoup4==4.12.3",
     "requests==2.32.5",
     "pypdf>=6.6.2",
