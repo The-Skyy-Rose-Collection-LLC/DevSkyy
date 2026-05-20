@@ -85,7 +85,10 @@ get_header();
 				</div>
 
 				<div class="lp-story__image lp-rv" data-delay="2">
-					<div class="lp-story__image-placeholder" aria-hidden="true"></div>
+					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/kids-purple-set-front-model.webp' ); ?>"
+						alt="<?php echo esc_attr__( 'Kids Capsule purple set, model shot', 'skyyrose' ); ?>"
+						loading="lazy" decoding="async"
+						style="width:100%;height:100%;object-fit:cover;border-radius:var(--skyyrose-radius);">
 				</div>
 
 			</div>
@@ -128,15 +131,9 @@ get_header();
 			</div>
 
 			<div class="lp-editorial__grid lp-editorial__grid--top">
-				<div class="lp-editorial__item lp-rv" data-delay="1">
-					<div class="lp-editorial__placeholder" aria-hidden="true"></div>
-				</div>
-				<div class="lp-editorial__item lp-rv" data-delay="2">
-					<div class="lp-editorial__placeholder" aria-hidden="true"></div>
-				</div>
-				<div class="lp-editorial__item lp-rv" data-delay="3">
-					<div class="lp-editorial__placeholder" aria-hidden="true"></div>
-				</div>
+				<div class="lp-editorial__item lp-rv" data-delay="1"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/kids-red-set-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Kids Capsule red set, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
+				<div class="lp-editorial__item lp-rv" data-delay="2"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/kids-purple-set-back-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Kids Capsule purple set, back view', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
+				<div class="lp-editorial__item lp-rv" data-delay="3"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/kids-red-set-back-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Kids Capsule red set, back view', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
 			</div>
 		</div>
 	</section>

@@ -82,7 +82,10 @@ get_header();
 				</div>
 
 				<div class="lp-story__image lp-rv" data-delay="2">
-					<div class="lp-story__image-placeholder" aria-hidden="true"></div>
+					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/black-rose-hoodie-front-model.webp' ); ?>"
+						alt="<?php echo esc_attr__( 'Black Rose hoodie, editorial portrait', 'skyyrose' ); ?>"
+						loading="lazy" decoding="async"
+						style="width:100%;height:100%;object-fit:cover;border-radius:var(--skyyrose-radius);">
 				</div>
 
 			</div>
@@ -125,24 +128,14 @@ get_header();
 			</div>
 
 			<div class="lp-editorial__grid lp-editorial__grid--top">
-				<div class="lp-editorial__item lp-rv" data-delay="1">
-					<div class="lp-editorial__placeholder" aria-hidden="true"></div>
-				</div>
-				<div class="lp-editorial__item lp-rv" data-delay="2">
-					<div class="lp-editorial__placeholder" aria-hidden="true"></div>
-				</div>
-				<div class="lp-editorial__item lp-rv" data-delay="3">
-					<div class="lp-editorial__placeholder" aria-hidden="true"></div>
-				</div>
+				<div class="lp-editorial__item lp-rv" data-delay="1"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/black-rose-crewneck-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Black Rose crewneck, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
+				<div class="lp-editorial__item lp-rv" data-delay="2"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/black-rose-joggers-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Black Rose joggers, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
+				<div class="lp-editorial__item lp-rv" data-delay="3"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/black-rose-hoodie-signature-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Black Rose signature hoodie, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
 			</div>
 
 			<div class="lp-editorial__grid lp-editorial__grid--bottom">
-				<div class="lp-editorial__item lp-rv" data-delay="1">
-					<div class="lp-editorial__placeholder" aria-hidden="true"></div>
-				</div>
-				<div class="lp-editorial__item lp-rv" data-delay="2">
-					<div class="lp-editorial__placeholder" aria-hidden="true"></div>
-				</div>
+				<div class="lp-editorial__item lp-rv" data-delay="1"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/hero/forbidden-midnight-1280w.webp' ); ?>" alt="<?php echo esc_attr__( 'Black Rose collection — forbidden midnight', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
+				<div class="lp-editorial__item lp-rv" data-delay="2"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/black-rose-love-hurts-basketball-shorts-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Black Rose x Love Hurts basketball shorts', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
 			</div>
 		</div>
 	</section>
