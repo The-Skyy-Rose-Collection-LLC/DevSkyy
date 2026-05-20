@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T16:30:18.827Z
-> Files: 2659 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T19:48:14.335Z
+> Files: 2663 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -269,6 +269,7 @@
 ## agents/claude_sdk/utils/
 
 - `__init__.py` — Utility modules for Claude SDK agents. (~13 tok)
+- `CLAUDE.md` — agents/claude_sdk/utils/ — SDK telemetry + Excel helpers (~956 tok)
 - `recalc.py` — setup_libreoffice_macro, recalc, main (~1812 tok)
 - `tracker.py` — class: register_subagent_spawn, set_current_context, pre_tool_use_hook, post_tool_use_hook + 1 more (~1876 tok)
 
@@ -385,7 +386,7 @@
 ## agents/elite_web_builder/
 
 - `__init__.py` (~63 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/elite_web_builder/ — Full-stack AI web development agency (~1796 tok)
 - `conftest.py` — Root conftest for elite_web_builder — fully isolated from parent packages. (~328 tok)
 - `director.py` — StoryStatus: from_config, add_stories, get_ready_stories, get_status_summary + 13 more (~7176 tok)
 - `prd.md` — Design Philosophy (MANDATORY — applies to ALL visual output) (~3575 tok)
@@ -448,7 +449,7 @@
 ## agents/elite_web_builder/knowledge/
 
 - `canonical_catalog.md` — Canonical Catalog — Elite Web Builder Reference (~873 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/elite_web_builder/knowledge/ — Canonical knowledge files (13 .md) (~1048 tok)
 - `competitor_intel.md` — Competitor Intelligence — Knowledge Base (~2161 tok)
 - `ecommerce_photography.md` — Ecommerce Photography — Knowledge Base (~2318 tok)
 - `garment_3d.md` — 3D Fashion Garment Rendering — Knowledge Base (~2175 tok)
@@ -477,7 +478,7 @@
 ## agents/elite_web_builder/tests/
 
 - `__init__.py` — Tests for Elite Web Builder. (~10 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/elite_web_builder/tests/ — pytest suite (25 test files) (~1200 tok)
 - `conftest.py` — Test configuration — completely isolate from parent packages. (~145 tok)
 - `test_agent_runtime.py` — Tests for AgentRuntime — the bridge from AgentSpec to LLM execution. (~2954 tok)
 - `test_base_agents.py` — Tests for agents/base.py — AgentRole, AgentSpec, AgentOutput, AgentCapability. (~1630 tok)
@@ -506,7 +507,7 @@
 ## agents/elite_web_builder/tools/
 
 - `__init__.py` — Verification and utility tools for Elite Web Builder. (~18 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/elite_web_builder/tools/ — Specialist agent tools (8 modules) (~996 tok)
 - `context7_bridge.py` — Context7 documentation bridge — anti-hallucination for library code. (~2108 tok)
 - `contrast_checker.py` — ContrastResult: hex_to_rgb, relative_luminance, linearize, contrast_ratio + 2 more (~721 tok)
 - `file_validator.py` — from: validate_file_exists, validate_json_file, validate_no_secrets (~711 tok)
@@ -521,7 +522,7 @@
 - `.gitignore` — Git ignore rules (~14 tok)
 - `adaptive.ts` — Adaptive Intelligence Module — Self-Healing, Self-Learning, Self-Correcting (~4687 tok)
 - `agent.ts` — LLM Roundtable Agent (~3185 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/llm_roundtable/ — TypeScript LLM competition arena (~1556 tok)
 - `engine.ts` — LLM Roundtable — Live Battle Engine (~13440 tok)
 - `index.ts` — LLM Roundtable — Public API (~148 tok)
 - `package.json` — Node.js package manifest (~158 tok)
@@ -537,7 +538,7 @@
 
 - `__init__.py` — RenderPipeline ADK agent — generates validated product renders for SkyyRose SKUs. (~262 tok)
 - `agent.py` — RenderPipeline ADK agent — root_agent definition. (~5549 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/render_pipeline/ — ADK render pipeline for SkyyRose SKUs (~1949 tok)
 - `cli.py` — External CLI driver for the RenderPipeline ADK agent. (~3428 tok)
 - `DESIGN.md` — RenderPipeline — Google ADK Agent (~3003 tok)
 - `README.md` — Project documentation (~1056 tok)
@@ -545,7 +546,7 @@
 ## agents/render_pipeline/eval/
 
 - `__init__.py` — ADK AgentEvaluator harness for the RenderPipeline agent. (~96 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/render_pipeline/eval/ — ADK eval harness (~1037 tok)
 - `render_pipeline.evalset.json` (~523 tok)
 - `test_config.json` (~27 tok)
 - `test_render_pipeline.py` — Live integration eval — gated by EVAL_LIVE=1 environment variable. (~608 tok)
@@ -553,7 +554,7 @@
 ## agents/render_pipeline/learning/
 
 - `__init__.py` — Continuous-improvement subsystem for the RenderPipeline agent. (~714 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/render_pipeline/learning/ — Three adaptive learning loops (~1132 tok)
 - `LOOP.md` — Learning Loop (~1242 tok)
 - `proposals.py` — Propose catalog amendments from the learning loops' history. (~1693 tok)
 - `recorder.py` — Append-only structured recorders for the three learning loops. (~857 tok)
@@ -561,7 +562,7 @@
 ## agents/render_pipeline/tests/
 
 - `__init__.py` — Mock-based unit tests for the RenderPipeline tool functions. (~102 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/render_pipeline/tests/ — Per-tool unit tests (~865 tok)
 - `test_tools.py` — Mock-based unit tests for the 9 RenderPipeline tool functions. (~8430 tok)
 
 ## agents/render_pipeline/tools/
@@ -570,7 +571,7 @@
 - `_paths.py` — Shared sys.path setup for tool modules. (~261 tok)
 - `articulate_layer0.py` — Tool 4a (NEW): Sonnet 4.6 articulates Layer 0 rendering directives. (~3002 tok)
 - `build_prompt.py` — Tool 4: Compose Layer 0 + Layer 3 + Layer 2 final prompt. (~1011 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/render_pipeline/tools/ — ADK FunctionTool implementations (9 modules) (~1489 tok)
 - `generate_image.py` — Tool 5: Generate image via routed engine. PAID API CALL. (~2947 tok)
 - `load_dossier.py` — Tool 1: Load the canonical dossier for a SKU. (~693 tok)
 - `qa_tournament.py` — Tool 6: 3-judge QA tournament + learning-loop recorder. PAID API CALLS. (~1794 tok)
@@ -582,7 +583,7 @@
 ## agents/visual_generation/
 
 - `__init__.py` — Visual Generation Agents Module. (~281 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/visual_generation/ — Multi-provider visual generation router (~1578 tok)
 - `conversation_editor.py` — class: add_message, get_history, is_expired, start_session + 8 more (~3441 tok)
 - `gemini_native.py` — GeminiNativeError: to_dict, save, show, connect + 2 more (~6289 tok)
 - `prompt_optimizer.py` — VisualUseCase: create_prompt, get_base_negatives, get_collection_negatives, build_negative_prompt (~7002 tok)
@@ -593,7 +594,7 @@
 
 - `__init__.py` — WordPress Bridge Agent — connects dashboard pipelines to WordPress/WooCommerce. (~274 tok)
 - `agent.py` — WordPress Bridge Agent — Claude Agent SDK entry point. (~1271 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/wordpress_bridge/ — Claude Agent SDK bridge to WordPress/WooCommerce (~1440 tok)
 - `mcp_server.py` — WordPress Bridge Agent — MCP tool definitions for WordPress/WooCommerce operations. (~8829 tok)
 - `prompts.py` — System prompt and per-pipeline prompt templates for the WordPress Bridge Agent. (~1216 tok)
 
@@ -1033,6 +1034,7 @@
 ## core/errors/
 
 - `__init__.py` — core/errors/__init__.py (~536 tok)
+- `CLAUDE.md` — core/errors/ — Production error taxonomy with correlation IDs (~675 tok)
 - `production_errors.py` — errors/production_errors.py (~8015 tok)
 
 ## core/events/
@@ -1070,10 +1072,12 @@
 ## core/llm/providers/
 
 - `__init__.py` (~247 tok)
+- `CLAUDE.md` — core/llm/providers/ — Backward-compat re-export shim for legacy llm/providers/ (~375 tok)
 
 ## core/llm/services/
 
 - `__init__.py` (~206 tok)
+- `CLAUDE.md` — core/llm/services/ — Backward-compat re-export shim for legacy llm/ services (~375 tok)
 
 ## core/middleware/
 
@@ -1091,11 +1095,13 @@
 ## core/repositories/
 
 - `__init__.py` — Core repository interfaces. (~78 tok)
+- `CLAUDE.md` — core/repositories/ — Data access ports (repository interfaces) (~500 tok)
 - `interfaces.py` — IRepository: get_by_id, create, update, delete + 7 more (~957 tok)
 
 ## core/runtime/
 
 - `__init__.py` (~368 tok)
+- `CLAUDE.md` — core/runtime/ — Tool registry, input validation, sandboxed execution (~620 tok)
 - `code_execution_tool.py` (~784 tok)
 - `input_validator.py` — ToolInputValidationError: validate (~3347 tok)
 - `tool_registry.py` — Pydantic: ToolParameter (68 fields) (~20657 tok)
@@ -1103,6 +1109,7 @@
 ## core/services/
 
 - `__init__.py` — Core service interfaces. (~49 tok)
+- `CLAUDE.md` — core/services/ — Service ports (hexagonal interfaces) (~425 tok)
 - `interfaces.py` — View: get, delete (~800 tok)
 
 ## core/telemetry/
@@ -2645,6 +2652,7 @@
 - `update_webp_mapping_ids.py` — fetch_wordpress_media, main (~1259 tok)
 - `upload_3d_to_github.py` — run_gh_command, main (~1768 tok)
 - `upload_all_collections.sh` — Upload all SkyyRose collections from Google Drive to WooCommerce (~538 tok)
+- `upload_approved.py` — upload-approved — STOP AND SHOW gated WC batch upload of approved ghost-mannequin images. (~1896 tok)
 - `upload_lora_dataset_to_hf.py` — main (~690 tok)
 - `upload_lora_dataset_v2.py` — Upload SkyyRose LoRA Dataset v2 to HuggingFace Hub. (~437 tok)
 - `upload_lora_dataset_v3.py` — Upload SkyyRose LoRA Dataset v3 to HuggingFace Hub. (~722 tok)
@@ -3082,6 +3090,7 @@
 - `retry.py` — is_transient_error, retry_on_transient (~498 tok)
 - `sku_resolver.py` — from: sanitize_sku, resolve_sku, verify_tripo_region (~2674 tok)
 - `telemetry.py` — URL configuration (~1651 tok)
+- `upload.py` — Phase 18 — Batch WooCommerce upload of approved ghost-mannequin images. (~8315 tok)
 - `utils.py` — URL configuration (~1604 tok)
 - `validation.py` — Shared validation utilities for registry files. (~1378 tok)
 
@@ -3586,6 +3595,7 @@
 - `test_tripo_agent.py` — Tests: config_initialization, config_from_env, config_validation_missing_api_key, config_validation_success + 15 more (~5799 tok)
 - `test_tripo_api.py` — Tests: list_agents_includes_3d_generation, get_tripo_agent_info, filter_agents_by_3d_category, generate_from_description_request_validation + 10 more (~5386 tok)
 - `test_tripo_dispatch_guards.py` — Regression tests for tripo_dispatch.py hallucination-prevention guards. (~4340 tok)
+- `test_upload.py` — Phase 18 — upload CLI tests (UPLOAD-01). (~13594 tok)
 - `test_utils_modules.py` — Tests: generate_correlation_id, generate_correlation_id_unique, set_and_get_correlation_id, get_correlation_id_generates_if_missing + 25 more (~9900 tok)
 - `test_virtual_photoshoot.py` — Tests: preset_values, scene_creation, scene_with_props, photoshoot_creation + 12 more (~5053 tok)
 - `test_virtual_tryon.py` — Tests: garment_categories, tryon_modes, providers, job_status + 23 more (~4051 tok)
