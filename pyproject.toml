@@ -332,6 +332,7 @@ include = [
     "llm*",
     "cli*",
     "services*",
+    "pipelines*",
 ]
 exclude = ["tests*", "docs*", "legacy*"]
 
