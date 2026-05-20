@@ -29,6 +29,19 @@ define( 'SKYYROSE_ASSETS_URI', SKYYROSE_URI . '/assets' );
 
 /*
 --------------------------------------------------------------
+ * Coming-Soon (Veil) Mode
+ *
+ * When true, inc/maintenance.php routes every public request to
+ * template-coming-soon.php and responds HTTP 503. Logged-in editors
+ * + admin + AJAX + REST + assets bypass automatically. Flip to false
+ * and redeploy to lift the veil.
+ *--------------------------------------------------------------*/
+if ( ! defined( 'SKYYROSE_COMING_SOON_MODE' ) ) {
+	define( 'SKYYROSE_COMING_SOON_MODE', true );
+}
+
+/*
+--------------------------------------------------------------
  * Disable WordPress.com CSS/JS Concatenation
  *
  * WordPress.com's concatenation service (_jb_static) can cause
@@ -67,6 +80,7 @@ $skyyrose_core_includes = array(
 	'/inc/immersive-product-adapter.php',
 	'/inc/product-taxonomy.php',
 	'/inc/facebook-sdk.php',
+	'/inc/maintenance.php',
 	'/inc/menu-setup.php',
 	'/inc/theme-activation-setup.php',
 	'/inc/klaviyo-integration.php',
