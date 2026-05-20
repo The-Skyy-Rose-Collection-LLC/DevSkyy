@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-16T15:16:30.538Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T02:17:57.558Z
 > Files: 2602 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -42,7 +42,7 @@
 - `lint-staged.config.mjs` — Declares relPaths (~346 tok)
 - `main_enterprise.py` — API: GET (2 endpoints) (~4080 tok)
 - `Makefile` — Make build targets (~2523 tok)
-- `mypy.ini` — Declares of (~464 tok)
+- `mypy.ini` — Declares of (~475 tok)
 - `nginx-app.devskyy.app.conf` — Nginx configuration for app.devskyy.app (self-hosted alternative) (~1497 tok)
 - `nginx.conf` — Nginx configuration (~1630 tok)
 - `package.json` — Node.js package manifest (~3008 tok)
@@ -204,7 +204,7 @@
 - `skyyrose_content_agent.py` — SkyyRose Content Agent for DevSkyy Platform. (~10125 tok)
 - `skyyrose_imagery_agent.py` — SkyyRose Imagery Agent for DevSkyy Platform. (~6844 tok)
 - `skyyrose_spaces_orchestrator.py` — SkyyRose HuggingFace Spaces Orchestrator. (~6634 tok)
-- `social_media_agent.py` — Declares import (~10451 tok)
+- `social_media_agent.py` — Declares import (~10410 tok)
 - `support_agent.py` — Declares SupportAgent (~9197 tok)
 - `trellis_agent.py` — TRELLIS.2 subprocess wrapper for image-to-3D generation. (~3956 tok)
 - `tripo_agent.py` — Pydantic: TripoTask (42 fields) (~11617 tok)
@@ -214,7 +214,7 @@
 
 - `__init__.py` — Declares for (~698 tok)
 - `agent.py` — that: initialize (~14811 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/base_super_agent/ — EnhancedSuperAgent modular runtime (~560 tok)
 - `learning_module.py` — SelfLearningModule: record_execution, get_best_technique, get_best_provider, score + 5 more (~5066 tok)
 - `ml_module.py` — SklearnModelWrapper: fit, predict, get_confidence, fit + 6 more (~4896 tok)
 - `prompt_module.py` — PromptEngineeringModule: auto_select_technique, apply_technique, apply_technique_with_tools, record_outcome + 1 more (~5802 tok)
@@ -225,7 +225,7 @@
 
 - `__init__.py` (~1196 tok)
 - `base.py` — SDKAgentConfig: run (~1341 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/claude_sdk/ — Claude Agent SDK integration layer (~707 tok)
 - `dashboard.py` — Pydantic: DashboardAction (35 fields) (~5334 tok)
 - `email_automation.py` — Pydantic: EmailTriageRequest (22 fields) (~2523 tok)
 - `excel_handler.py` — Pydantic: ExcelRequest (16 fields) (~2000 tok)
@@ -241,8 +241,8 @@
 - `__init__.py` (~1184 tok)
 - `analytics.py` — SDKDataAnalystAgent: execute (~1375 tok)
 - `brand_guardian.py` — Declares SDKBrandGuardianAgent (~1038 tok)
-- `CLAUDE.md` (~11 tok)
-- `commerce.py` — Declares SDKCatalogManagerAgent (~1308 tok)
+- `CLAUDE.md` — agents/claude_sdk/domain_agents/ — SDK-powered domain sub-agents (~734 tok)
+- `commerce.py` — Declares SDKCatalogManagerAgent (~1302 tok)
 - `community.py` — Declares SDKCommunityLoyaltyAgent (~1006 tok)
 - `content.py` — Declares SDKSeoWriterAgent (~1331 tok)
 - `creative.py` — Declares SDKBrandAssetAgent (~1311 tok)
@@ -258,7 +258,7 @@
 
 ## agents/claude_sdk/prompts/
 
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/claude_sdk/prompts/ — SDK agent prompt templates (~329 tok)
 - `data_analyst.txt` (~429 tok)
 - `email_triage.txt` (~452 tok)
 - `report_writer.txt` (~448 tok)
@@ -275,7 +275,7 @@
 
 - `__init__.py` (~580 tok)
 - `base.py` — CoreAgentType: categorize_failure, diagnose, heal (~7639 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/core/ — Domain CoreAgent hierarchy (~683 tok)
 - `factory.py` — create_orchestrator (~710 tok)
 - `orchestrator.py` — Orchestrator: register_core_agent, get_core_agent, ai_bridge, set_budget_limit + 2 more (~4526 tok)
 - `sub_agent.py` — SocialMediaSubAgent: execute, execute, execute_safe, escalate_to_parent + 1 more (~2444 tok)
@@ -330,12 +330,12 @@
 
 - `__init__.py` — Imagery & 3D Core Agent — photos, VTON, 3D model generation. (~65 tok)
 - `agent.py` — ImageryCoreAgent: execute (~1597 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/core/imagery/ — ImageryAgent domain (~637 tok)
 
 ## agents/core/imagery/sub_agents/
 
 - `__init__.py` — Imagery sub-agents: Gemini image, FASHN VTON, Tripo 3D, Meshy 3D, HF Spaces. (~24 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/core/imagery/sub_agents/ — Imagery provider sub-agents (~536 tok)
 - `fashn_vton.py` — FashnVtonSubAgent: execute (~517 tok)
 - `gemini_image.py` — GeminiImageSubAgent: execute (~395 tok)
 - `hf_spaces.py` — HfSpacesSubAgent: execute (~376 tok)
@@ -351,7 +351,7 @@
 
 - `__init__.py` — Marketing sub-agents: social media, campaign manager, A/B testing. (~21 tok)
 - `campaign_ops.py` — CampaignOpsSubAgent: execute (~447 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/core/marketing/sub_agents/ — Marketing sub-agents (~396 tok)
 - `social_media.py` — SocialMediaSubAgent: execute (~5323 tok)
 
 ## agents/core/operations/
@@ -384,7 +384,7 @@
 ## agents/elite_web_builder/
 
 - `__init__.py` (~63 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/elite_web_builder/ — Elite Web Builder multi-agent system (~865 tok)
 - `conftest.py` — Root conftest for elite_web_builder — fully isolated from parent packages. (~328 tok)
 - `director.py` — StoryStatus: from_config, add_stories, get_ready_stories, get_status_summary + 13 more (~7176 tok)
 - `prd.md` — Design Philosophy (MANDATORY — applies to ALL visual output) (~3575 tok)
@@ -447,7 +447,7 @@
 ## agents/elite_web_builder/knowledge/
 
 - `canonical_catalog.md` — Canonical Catalog — Elite Web Builder Reference (~873 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/elite_web_builder/knowledge/ — Domain knowledge for specialist agents (~307 tok)
 - `competitor_intel.md` — Competitor Intelligence — Knowledge Base (~2161 tok)
 - `ecommerce_photography.md` — Ecommerce Photography — Knowledge Base (~2318 tok)
 - `garment_3d.md` — 3D Fashion Garment Rendering — Knowledge Base (~2175 tok)
@@ -476,7 +476,7 @@
 ## agents/elite_web_builder/tests/
 
 - `__init__.py` — Tests for Elite Web Builder. (~10 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/elite_web_builder/tests/ — Elite Web Builder test suite (~616 tok)
 - `conftest.py` — Test configuration — completely isolate from parent packages. (~145 tok)
 - `test_agent_runtime.py` — Tests for AgentRuntime — the bridge from AgentSpec to LLM execution. (~2954 tok)
 - `test_base_agents.py` — Tests for agents/base.py — AgentRole, AgentSpec, AgentOutput, AgentCapability. (~1630 tok)
@@ -505,7 +505,7 @@
 ## agents/elite_web_builder/tools/
 
 - `__init__.py` — Verification and utility tools for Elite Web Builder. (~18 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/elite_web_builder/tools/ — QA and scaffolding tools (~606 tok)
 - `context7_bridge.py` — Context7 documentation bridge — anti-hallucination for library code. (~2108 tok)
 - `contrast_checker.py` — ContrastResult: hex_to_rgb, relative_luminance, linearize, contrast_ratio + 2 more (~721 tok)
 - `file_validator.py` — from: validate_file_exists, validate_json_file, validate_no_secrets (~711 tok)
@@ -520,7 +520,7 @@
 - `.gitignore` — Git ignore rules (~14 tok)
 - `adaptive.ts` — Adaptive Intelligence Module — Self-Healing, Self-Learning, Self-Correcting (~4687 tok)
 - `agent.ts` — LLM Roundtable Agent (~3185 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/llm_roundtable/ — LLM Round-Table (TypeScript) (~637 tok)
 - `engine.ts` — LLM Roundtable — Live Battle Engine (~13440 tok)
 - `index.ts` — LLM Roundtable — Public API (~148 tok)
 - `package.json` — Node.js package manifest (~158 tok)
@@ -536,7 +536,7 @@
 
 - `__init__.py` — RenderPipeline ADK agent — generates validated product renders for SkyyRose SKUs. (~262 tok)
 - `agent.py` — RenderPipeline ADK agent — root_agent definition. (~5549 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/render_pipeline/ — SkyyRose render pipeline (ADK SequentialAgent) (~794 tok)
 - `cli.py` — External CLI driver for the RenderPipeline ADK agent. (~3428 tok)
 - `DESIGN.md` — RenderPipeline — Google ADK Agent (~3003 tok)
 - `README.md` — Project documentation (~1056 tok)
@@ -544,7 +544,7 @@
 ## agents/render_pipeline/eval/
 
 - `__init__.py` — ADK AgentEvaluator harness for the RenderPipeline agent. (~96 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/render_pipeline/eval/ — Render pipeline evaluation harness (~390 tok)
 - `render_pipeline.evalset.json` (~523 tok)
 - `test_config.json` (~27 tok)
 - `test_render_pipeline.py` — Live integration eval — gated by EVAL_LIVE=1 environment variable. (~608 tok)
@@ -552,7 +552,7 @@
 ## agents/render_pipeline/learning/
 
 - `__init__.py` — Continuous-improvement subsystem for the RenderPipeline agent. (~714 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/render_pipeline/learning/ — Pipeline learning loops (~469 tok)
 - `LOOP.md` — Learning Loop (~1242 tok)
 - `proposals.py` — Propose catalog amendments from the learning loops' history. (~1693 tok)
 - `recorder.py` — Append-only structured recorders for the three learning loops. (~857 tok)
@@ -560,7 +560,7 @@
 ## agents/render_pipeline/tests/
 
 - `__init__.py` — Mock-based unit tests for the RenderPipeline tool functions. (~102 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/render_pipeline/tests/ — Render pipeline stage unit tests (~296 tok)
 - `test_tools.py` — Mock-based unit tests for the 9 RenderPipeline tool functions. (~8430 tok)
 
 ## agents/render_pipeline/tools/
@@ -569,7 +569,7 @@
 - `_paths.py` — Shared sys.path setup for tool modules. (~261 tok)
 - `articulate_layer0.py` — Tool 4a (NEW): Sonnet 4.6 articulates Layer 0 rendering directives. (~3002 tok)
 - `build_prompt.py` — Tool 4: Compose Layer 0 + Layer 3 + Layer 2 final prompt. (~1011 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/render_pipeline/tools/ — Render pipeline stage tools (~636 tok)
 - `generate_image.py` — Tool 5: Generate image via routed engine. PAID API CALL. (~2947 tok)
 - `load_dossier.py` — Tool 1: Load the canonical dossier for a SKU. (~693 tok)
 - `qa_tournament.py` — Tool 6: 3-judge QA tournament + learning-loop recorder. PAID API CALLS. (~1794 tok)
@@ -581,7 +581,7 @@
 ## agents/visual_generation/
 
 - `__init__.py` — Visual Generation Agents Module. (~281 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/visual_generation/ — Multi-provider visual generation client (~645 tok)
 - `conversation_editor.py` — class: add_message, get_history, is_expired, start_session + 8 more (~3441 tok)
 - `gemini_native.py` — GeminiNativeError: to_dict, save, show, connect + 2 more (~6289 tok)
 - `prompt_optimizer.py` — VisualUseCase: create_prompt, get_base_negatives, get_collection_negatives, build_negative_prompt (~7002 tok)
@@ -592,7 +592,7 @@
 
 - `__init__.py` — WordPress Bridge Agent — connects dashboard pipelines to WordPress/WooCommerce. (~274 tok)
 - `agent.py` — WordPress Bridge Agent — Claude Agent SDK entry point. (~1271 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/wordpress_bridge/ — WordPress Bridge Agent (~631 tok)
 - `mcp_server.py` — WordPress Bridge Agent — MCP tool definitions for WordPress/WooCommerce operations. (~8829 tok)
 - `prompts.py` — System prompt and per-pipeline prompt templates for the WordPress Bridge Agent. (~1216 tok)
 
@@ -635,13 +635,13 @@
 ## aos/adapters/
 
 - `__init__.py` — AOS Adapters — wrap existing agents (SuperAgent, ClaudeSDK) for kernel management. (~26 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — aos/adapters/ — non-invasive SuperAgent wrapper (~349 tok)
 - `superagent_adapter.py` — SuperAgentAdapter — non-invasive wrapper around the existing EnhancedSuperAgent. (~1726 tok)
 
 ## aos/cognition/
 
 - `__init__.py` — AOS Cognitive Layer — goal decomposition, planning, and reflection. (~22 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — aos/cognition/ — goal decomposition, planning, and reflection (~453 tok)
 - `goal_decomposer.py` — GoalDecomposer — rule-based goal-to-TaskGraph decomposer. (~1319 tok)
 - `planner.py` — Planner — converts a TaskGraph into an ordered DecomposedPlan. (~254 tok)
 - `reflector.py` — Reflector — converts ExecutionOutcome + LearningTrace into a quality-scored Reflection. (~1275 tok)
@@ -653,7 +653,7 @@
 - `approval.py` — ApprovalGate — STOP-AND-SHOW enforcement for irreversible/paid actions. (~1906 tok)
 - `audit.py` — AuditTrail — immutable append-only audit log backed by SQLite. (~1719 tok)
 - `budget.py` — BudgetController — per-process and system-wide spend tracking + guards. (~1126 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — aos/governance/ — policy, approval, budget, and audit trail (~507 tok)
 - `policy.py` — PolicyEngine — declarative ALLOW/DENY/REQUIRE_APPROVAL rules for kernel actions. (~947 tok)
 - `types.py` — Governance types — audit entries and policy decisions. (~713 tok)
 
@@ -664,14 +664,14 @@
 ## aos/ipc/
 
 - `__init__.py` — AOS IPC — inter-process communication via typed message bus. (~20 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — aos/ipc/ — typed async pub/sub message bus (~427 tok)
 - `message_bus.py` — MessageBus — typed async pub/sub + request/reply. (~1831 tok)
 - `types.py` — IPC message types for the AOS message bus. (~674 tok)
 
 ## aos/kernel/
 
 - `__init__.py` — AOS Kernel — process lifecycle, scheduling, and the main event loop. (~22 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — aos/kernel/ — coordinator that boots and wires all AOS subsystems (~507 tok)
 - `kernel.py` — Kernel — wires ProcessManager + MessageBus + AuditTrail into a single coordinator. (~8527 tok)
 - `process_manager.py` — ProcessManager — lifecycle controller for agent processes. (~1657 tok)
 - `types.py` — Shared domain types for the AOS kernel. (~1404 tok)
@@ -693,7 +693,7 @@
 ## aos/observability/
 
 - `__init__.py` — AOS Observability — metrics, tracing, and health monitoring. (~108 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — aos/observability/ — metrics, health, fine-tune buffer, and learning hooks (~491 tok)
 - `finetune_buffer.py` — FineTuneBuffer — quality-gated accumulator for OpenAI fine-tuning traces. (~939 tok)
 - `health.py` — AOS HealthCheck — snapshot aggregator for kernel subsystem state. (~1310 tok)
 - `learning_hook.py` — LearningHook — batched per-agent-type trace flusher. (~1289 tok)
@@ -702,7 +702,7 @@
 ## aos/runtime/
 
 - `__init__.py` — AOS Runtime — execution sandboxing, resource limits, and container management. (~25 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — aos/runtime/ — agent execution sandbox and enforcement boundary (~496 tok)
 - `container.py` — AgentContainer — wraps agent coroutines with resource enforcement. (~1255 tok)
 - `executor.py` — Executor — kernel.execute() end-to-end runner. (~326 tok)
 - `types.py` — Runtime types — resource limits and usage tracking. (~479 tok)
@@ -1111,7 +1111,7 @@
 - `indexes.sql` — Performance Indexes for DevSkyy (~643 tok)
 - `query_optimizer.py` — QueryOptimizer: optimize_product_query, explain_query, detect_n_plus_one_risk, get_index_recommendations (~1690 tok)
 - `seed_admin.py` — Seed an admin user into the DevSkyy database. (~468 tok)
-- `seed_catalog.py` — Seed the DevSkyy database with SkyyRose product catalog. (~1081 tok)
+- `seed_catalog.py` — Seed the DevSkyy database with SkyyRose product catalog. (~1138 tok)
 
 ## database/models/
 
@@ -2368,7 +2368,7 @@
 - `semantic_analyzer.py` — CodePatternType: analyze_file (~5132 tok)
 - `sync_pipeline.py` — Pydantic: SystemStatus (42 fields) (~5833 tok)
 - `tasks.py` — Pydantic: ThreeDGenerationInput (45 fields) (~6161 tok)
-- `threed_round_table.py` — CircuitState: should_allow_request, record_success, record_failure, get_delay + 3 more (~18728 tok)
+- `threed_round_table.py` — CircuitState: should_allow_request, record_success, record_failure, get_delay + 3 more (~18721 tok)
 - `vector_store.py` — Pydantic: VectorStoreConfig (41 fields) (~8339 tok)
 
 ## prompts/
@@ -2409,7 +2409,7 @@
 - `audit_dossier_coverage.py` — Audit dossier completeness across every active SKU in the canonical CSV. (~1722 tok)
 - `audit_golden_coverage.py` — Audit golden-reference coverage across every active SKU. (~1557 tok)
 - `audit_prompts.py` — Audit nano-banana prompts against real product images. (~2365 tok)
-- `audit_source_photos.py` — Audit source product photography coverage and emit a structured manifest. (~3989 tok)
+- `audit_source_photos.py` — Audit source product photography coverage and emit a structured manifest. (~3980 tok)
 - `batch_3d_generation.py` — URL configuration (~7092 tok)
 - `batch_enhance_clothing.py` — enhance_all_images (~813 tok)
 - `batch_flux_collections.py` — Batch FLUX synthesis pipeline — Love Hurts + Signature collections. (~2417 tok)
@@ -2419,13 +2419,13 @@
 - `benchmark_performance.py` — class: calculate_percentile, create_result, benchmark_embedding_cache, benchmark_reranking_cache + 8 more (~3718 tok)
 - `build_brand_centroid.py` — Build the SkyyRose brand-style centroid from approved hero shots. (~530 tok)
 - `build_complete_luxury_pages.py` — Build COMPLETE Luxury Experience Pages for SkyyRose. (~5341 tok)
-- `build_lora_v4_dataset.py` — copy_and_prepare_image (~5181 tok)
+- `build_lora_v4_dataset.py` — copy_and_prepare_image (~5175 tok)
 - `build_lora_v5_dataset.py` — sku_to_trigger, read_catalog (~6081 tok)
 - `build_product_similarities.py` — Pre-compute the top-N visually-similar SKUs for the [skyyrose_visual_similar] widget. (~988 tok)
 - `capture_goldens.py` — Curate golden reference images for visual-regression scoring. (~1330 tok)
 - `catalog_ml_audit.py` — ML audit on the canonical catalog CSV. (~4255 tok)
 - `check_catalog_duplicates.py` — Detect near-duplicate SKUs by CLIP embedding similarity. (~430 tok)
-- `check_dossier_coverage.py` — Confirm every active SKU has a per-product design dossier. (~971 tok)
+- `check_dossier_coverage.py` — Confirm every active SKU has a per-product design dossier. (~884 tok)
 - `CLAUDE.md` (~11 tok)
 - `cleanup_phase2_ralph.py` — CleanupError: delete_file_safe, attempt_delete, archive_file_safe, attempt_archive + 6 more (~3003 tok)
 - `composite_products.py` — encode_image_base64, call_fal_product_shot, poll_fal_result, download_image + 2 more (~3547 tok)
@@ -2513,7 +2513,7 @@
 - `nano-banana-composite-results.json` — Declares does (~2859 tok)
 - `nano-banana-masks.json` (~642 tok)
 - `nano-banana-run.py` — Nano Banana 2 — SkyyRose AI Image Pipeline. (~282 tok)
-- `nano-banana-vton.py` (~25542 tok)
+- `nano-banana-vton.py` (~25448 tok)
 - `optimize-images.sh` — Batch optimize all images in the WordPress theme (~841 tok)
 - `optimize-repo.sh` — optimize-repo.sh — staged disk cleanup for the DevSkyy repo (~1232 tok)
 - `php-lint.sh` — Lint PHP files passed as arguments. (~240 tok)
@@ -2578,7 +2578,7 @@
 - `test_api_endpoints.py` — Test script for API endpoints and WebSocket connections. (~2220 tok)
 - `test_exact_replicas.py` — Test file (~421 tok)
 - `test_lora_generation.py` — Test LoRA generation - models wearing SkyyRose products. (~863 tok)
-- `test_lora_v4.py` — Test file (~2774 tok)
+- `test_lora_v4.py` — Test file (~2770 tok)
 - `test_mcp_servers.py` — Tests: mcp_server_import (~1865 tok)
 - `test_new_endpoints.sh` — Test script for new MCP-integrated API endpoints (~1536 tok)
 - `test_secrets_manager.py` — Tests: local_backend, convenience_functions, error_handling, integration (~1744 tok)
@@ -2661,9 +2661,9 @@
 
 - `CLAUDE.md` (~11 tok)
 - `fix_site_structure.py` — Phase 3: Fix site structure — URL slugs, contact page, collection links. (~2008 tok)
-- `map_images_to_products.py` — Phase 1: Map WordPress media images to product catalog SKUs. (~2244 tok)
-- `sku_image_map.json` (~3375 tok)
-- `sync_products.py` — Phase 2: Sync all 34 catalog products to WooCommerce. (~2681 tok)
+- `map_images_to_products.py` — Phase 1: Map WordPress media images to product catalog SKUs. (~2225 tok)
+- `sku_image_map.json` (~3369 tok)
+- `sync_products.py` — Phase 2: Sync every catalog product to WooCommerce. (~2726 tok)
 
 ## scripts/measurement/
 
@@ -2690,7 +2690,7 @@
 - `_validate_layer1.py` — Layer 1 closed-loop validation — manual, paid-call validator. (~2506 tok)
 - `_validate_pipeline_multi_sku.py` — Multi-SKU production-pipeline validator — manual, paid-call validator. (~4188 tok)
 - `candidates.py` — Multi-candidate generation — N candidates per view from multiple engines. (~1524 tok)
-- `catalog.py` — Product catalog loader — reads from data/product-catalog.csv. (~2442 tok)
+- `catalog.py` — nano_banana catalog adapter — delegates to skyyrose.core.catalog_loader. (~2701 tok)
 - `CLAUDE.md` (~11 tok)
 - `cli.py` — CLI entry point — argparse with subcommands. (~7854 tok)
 - `client.py` — API client factories — centralized credential handling. (~1113 tok)
@@ -2700,7 +2700,7 @@
 - `dna_prompts.py` — DNA-to-prompt builder — deterministic prompt generation from product DNA. (~2736 tok)
 - `engine_fal.py` — fal.ai generation engine — FLUX 2 Pro and Kontext Pro. (~2456 tok)
 - `generate.py` — Core image generation — one clean function per provider. (~3115 tok)
-- `logo_refs.py` — Logo reference images — maps collections and SKUs to logo files. (~1892 tok)
+- `logo_refs.py` — Logo reference images — maps collections and SKUs to logo files. (~1888 tok)
 - `metrics.py` — Quantitative scoring metrics — measurable accuracy verification. (~3288 tok)
 - `pipeline.py` — Production pipeline orchestrator — 5-step image generation. (~8207 tok)
 - `produce_async.py` — Async staged production pipeline — maximum throughput with error boundaries. (~5853 tok)
@@ -2708,7 +2708,7 @@
 - `prompts.py` — Prompt templates and logo treatment metadata. (~4813 tok)
 - `qa.py` — Vision QA — compare source vs generated images. (~894 tok)
 - `router.py` — Intelligent model router — picks the best generation model per product. (~2123 tok)
-- `source_map.py` — Source image mapping — maps every SKU to its correct front/back techflat. (~3291 tok)
+- `source_map.py` — Source image mapping — maps every SKU to its correct front/back techflat. (~3285 tok)
 - `spec_builder.py` — Build judge-ready specs from the canonical product dossier. (~2638 tok)
 - `tournament.py` — Tournament judging — 3-judge architecture (vision pair + synthesis). (~10153 tok)
 - `utils.py` — Shared utilities — image preprocessing, quality gates, file I/O. (~659 tok)
@@ -3020,7 +3020,7 @@
 - `master_registry.py` — View: get (~3012 tok)
 - `models.py` — ProductData: from_override, provider_count (~1847 tok)
 - `retry.py` — is_transient_error, retry_on_transient (~498 tok)
-- `sku_resolver.py` — from: sanitize_sku, resolve_sku, verify_tripo_region (~2680 tok)
+- `sku_resolver.py` — from: sanitize_sku, resolve_sku, verify_tripo_region (~2674 tok)
 - `telemetry.py` — URL configuration (~1651 tok)
 - `utils.py` — URL configuration (~1604 tok)
 - `validation.py` — Shared validation utilities for registry files. (~1378 tok)
@@ -3389,7 +3389,7 @@
 - `multi-sku-validation-1778064034.json` (~1349 tok)
 - `per-sku-prompts-1778041872.md` — Per-SKU Generator Prompts (~58670 tok)
 - `per-sku-prompts-1778061036.md` — Per-SKU Generator Prompts (~2778 tok)
-- `phase-e-manifest.md` — Phase E — I2I Re-Render Manifest (33 SKUs) (~3295 tok)
+- `phase-e-manifest.md` — Phase E — I2I Re-Render Manifest (33 SKUs) (~3290 tok)
 - `phase-f-report.md` — Phase F Audit Report — Render Pipeline Migration (~2086 tok)
 - `phase-g-report.md` — Phase G — Documentation Update Report (~647 tok)
 - `plan-layer1-tier2-closeout.md` — Plan: Layer 1/Tier 2 Closeout — Open Items (~5857 tok)
@@ -3413,7 +3413,7 @@
 - `source-strategy-comparison-br-001-1778095404.json` (~946 tok)
 - `source-strategy-comparison-lh-004-1778096026.json` (~345 tok)
 - `superagent-self-healing-learning-audit-2026-05-03.md` — SuperAgent Self-Healing + Learning Audit — 2026-05-03 (~3147 tok)
-- `todo.md` — Current Tasks (~1455 tok)
+- `todo.md` — Current Tasks (~2047 tok)
 
 ## tasks/handoffs/
 
@@ -3456,7 +3456,7 @@
 - `test_auth_endpoints.py` — Integration tests for auth API endpoints via ASGI client. (~1976 tok)
 - `test_auth_flow.py` — Tests for JWT/OAuth2 authentication flow. (~3328 tok)
 - `test_brand_context_catalog.py` — Phase 2 tests for collection-aware brand context injection. (~2089 tok)
-- `test_catalog_csv_integrity.py` — Integrity smoke tests for the canonical product catalog CSV. (~2389 tok)
+- `test_catalog_csv_integrity.py` — Integrity smoke tests for the canonical product catalog CSV. (~2825 tok)
 - `test_catalog_retriever.py` — Phase 4 tests for orchestration/catalog_retriever.py. (~1725 tok)
 - `test_catalog_sync.py` — Tests: default_config, custom_config, default_catalog_config, custom_catalog_config + 14 more (~4604 tok)
 - `test_character_system.py` — URL configuration (~4718 tok)
@@ -3477,7 +3477,7 @@
 - `test_elite_queue_consumer.py` — Tests: store_result_writes_to_redis, store_result_sets_ttl, store_result_publishes_event, store_result_degrades_when_redis_unavailable + 6 more (~1997 tok)
 - `test_elite_queue_producer.py` — Tests: make_job_id_format, make_job_id_unique, enqueue_produce_returns_job_id, enqueue_produce_calls_enqueue_with_correct_task_type + 15 more (~1922 tok)
 - `test_elite_rate_limiter.py` — Tests: acquire_returns_true_for_known_provider, acquire_adds_entry_to_sorted_set, acquire_multiple_slots_within_limit, acquire_unknown_provider_all... (~1571 tok)
-- `test_elite_studio_hardening.py` — Tests for Elite Studio P1/P4/P5 hardening — budget, SKU-token guard, (~3507 tok)
+- `test_elite_studio_hardening.py` — Tests for Elite Studio P1/P4/P5 hardening — budget, SKU-token guard, (~3478 tok)
 - `test_elite_webhooks.py` — Tests: register_returns_webhook_id, register_persists_to_redis, register_multiple_events, register_invalid_event_raises + 10 more (~2298 tok)
 - `test_environment_scripts.py` — Tests: script_exists, script_is_bash, generates_env_file, generated_secrets_format + 9 more (~3952 tok)
 - `test_fashion_context.py` — Smoke tests for skyyrose/elite_studio/fashion/context.py canonical path (INFRA-03). (~499 tok)

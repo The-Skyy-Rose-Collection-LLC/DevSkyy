@@ -66,9 +66,9 @@ Source = catalog `image` column. `LOGO` / `EXTRAS` = dossier frontmatter field p
 | sg-015 | signature | OK | OK | OK | the-windbreaker-set |
 | kids-001 | kids-capsule | OK | OK | OK | kids-colorblock-hoodie-set-red-black |
 | kids-002 | kids-capsule | OK | OK | OK | kids-colorblock-hoodie-set-purple-black |
-| br-003-oakland | black-rose | OK | OK | OK | black-is-beautiful-jersey-series-0-baseball-classic-oakland |
-| br-003-giants | black-rose | OK | OK | OK | black-is-beautiful-jersey-series-0-baseball-classic-giants |
-| br-003-white | black-rose | OK | OK | OK | black-is-beautiful-jersey-series-0-baseball-classic-white |
+| br-013 | black-rose | OK | OK | OK | black-is-beautiful-jersey-series-0-baseball-classic-oakland |
+| br-014 | black-rose | OK | OK | OK | black-is-beautiful-jersey-series-0-baseball-classic-giants |
+| br-015 | black-rose | OK | OK | OK | black-is-beautiful-jersey-series-0-baseball-classic-white |
 
 **Summary:** 30 / 33 ready for primary-logo render. 22 / 33 fully ready (logo + extras). 3 SKU(s) missing primary `logo_reference`. 11 SKU(s) missing `extra_logos`. 0 dossier file(s) absent.
 <!-- PERSKU-AUTO-END -->
