@@ -352,6 +352,8 @@ renders/cache/
 renders/output/
 renders/manifest_archive/
 renders/3d/
+renders/_quarantine/
+renders/gated/
 generated_3d_models/
 
 # User PII data
