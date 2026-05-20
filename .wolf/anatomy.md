@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T21:36:33.329Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T22:00:46.795Z
 > Files: 2740 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -3980,7 +3980,7 @@
 - `test_cli_integration.py` — CLI integration tests for nano-banana-run.py — subprocess-based. (~1150 tok)
 - `test_engine_fal_mocked.py` — Mock-based tests for FAL engine (refine_with_kontext + generate_flux_fal). (~3232 tok)
 - `test_kontext_helpers.py` — Tests for the Kontext refinement helpers. (~1027 tok)
-- `test_pipeline_mocked.py` — Mock-based tests for ProductionPipeline.run_single / run_batch. (~12691 tok)
+- `test_pipeline_mocked.py` — Mock-based tests for ProductionPipeline.run_single / run_batch. (~12707 tok)
 - `test_refinement_prompt.py` — Tests for the Layer 1 feedback-loop wiring: refinement prompt builder. (~1760 tok)
 - `test_spec_builder.py` — Tests for the canonical-dossier spec builder. (~3280 tok)
 - `test_tournament_mocked.py` — Mock-based tests for the 3-judge tournament. (~5859 tok)
