@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T22:00:46.795Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T22:16:43.656Z
 > Files: 2740 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -646,7 +646,7 @@
 ## ai_3d/providers/
 
 - `__init__.py` — ai_3d/providers/__init__.py (~174 tok)
-- `CLAUDE.md` — ai_3d/providers/ — 3D generation provider clients (~675 tok)
+- `CLAUDE.md` — ai_3d/providers/ — 3D generation provider clients (~650 tok)
 - `huggingface.py` — ai_3d/providers/huggingface.py (~4081 tok)
 - `meshy.py` — ai_3d/providers/meshy.py (~6543 tok)
 - `tripo.py` — ai_3d/providers/tripo.py (~4882 tok)
@@ -671,13 +671,13 @@
 ## aos/adapters/
 
 - `__init__.py` — AOS Adapters — wrap existing agents (SuperAgent, ClaudeSDK) for kernel management. (~26 tok)
-- `CLAUDE.md` — aos/adapters/ — Duck-typed wrappers around existing SuperAgents (~525 tok)
+- `CLAUDE.md` — aos/adapters/ — Duck-typed wrappers around existing SuperAgents (~561 tok)
 - `superagent_adapter.py` — SuperAgentAdapter — non-invasive wrapper around the existing EnhancedSuperAgent. (~1726 tok)
 
 ## aos/cognition/
 
 - `__init__.py` — AOS Cognitive Layer — goal decomposition, planning, and reflection. (~22 tok)
-- `CLAUDE.md` — aos/cognition/ — Goal decomposition, planning, reflection (~675 tok)
+- `CLAUDE.md` — aos/cognition/ — Goal decomposition, planning, reflection (~676 tok)
 - `goal_decomposer.py` — GoalDecomposer — rule-based goal-to-TaskGraph decomposer. (~1319 tok)
 - `planner.py` — Planner — converts a TaskGraph into an ordered DecomposedPlan. (~254 tok)
 - `reflector.py` — Reflector — converts ExecutionOutcome + LearningTrace into a quality-scored Reflection. (~1225 tok)
@@ -689,7 +689,7 @@
 - `approval.py` — ApprovalGate — STOP-AND-SHOW enforcement for irreversible/paid actions. (~1915 tok)
 - `audit.py` — AuditTrail — immutable append-only audit log backed by SQLite. (~1719 tok)
 - `budget.py` — BudgetController — per-process and system-wide spend tracking + guards. (~1126 tok)
-- `CLAUDE.md` — aos/governance/ — Policy, approval, budget, audit (~725 tok)
+- `CLAUDE.md` — aos/governance/ — Policy, approval, budget, audit (~701 tok)
 - `policy.py` — PolicyEngine — declarative ALLOW/DENY/REQUIRE_APPROVAL rules for kernel actions. (~947 tok)
 - `types.py` — Governance types — audit entries and policy decisions. (~682 tok)
 
@@ -969,7 +969,7 @@
 ## cli/
 
 - `__init__.py` — DevSkyy CLI tools. (~34 tok)
-- `CLAUDE.md` — cli/ — Stand-alone operator command-line tools (~600 tok)
+- `CLAUDE.md` — cli/ — Stand-alone operator command-line tools (~687 tok)
 - `mcp_cli.py` — get_orchestrator, status_color, print_json, cli + 12 more (~4942 tok)
 - `prompt_enhance.py` — TaskMode: load_config, get_config, to_dict, main (~10847 tok)
 
@@ -1166,7 +1166,7 @@
 ## core/telemetry/
 
 - `__init__.py` (~26 tok)
-- `CLAUDE.md` — core/telemetry/ — OpenTelemetry tracer with NoOp fallback (~600 tok)
+- `CLAUDE.md` — core/telemetry/ — OpenTelemetry tracer with NoOp fallback (~625 tok)
 - `tracer.py` — _NoOpSpan: my_function, init_telemetry, get_tracer, set_attribute + 4 more (~1246 tok)
 
 ## database/
