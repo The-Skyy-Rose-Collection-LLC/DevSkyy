@@ -82,14 +82,11 @@ $subject_options = array(
 	'other'             => __( 'Other', 'skyyrose' ),
 );
 
-// "What brought you to SkyyRose?" — brand-voice referral options.
-$referral_options = array(
-	''             => __( 'Pick one', 'skyyrose' ),
-	'the-drop'     => __( 'The drop', 'skyyrose' ),
-	'word-of-mouth' => __( 'Word of mouth', 'skyyrose' ),
-	'social-media' => __( 'Social media', 'skyyrose' ),
-	'just-found-it' => __( 'Just found it', 'skyyrose' ),
-);
+// "What brought you to SkyyRose?" — placeholder + brand-voice options.
+// Keys + labels come from skyyrose_get_referral_options() in inc/ajax-handlers.php
+// so the form and the AJAX whitelist can never drift apart.
+$referral_options = array( '' => __( 'Pick one', 'skyyrose' ) )
+	+ skyyrose_get_referral_options();
 
 // FAQ items array for easy editing.
 $faq_items = array(

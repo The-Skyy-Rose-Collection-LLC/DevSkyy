@@ -16,6 +16,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /*
 --------------------------------------------------------------
+ * Contact Form Options — Single Source of Truth
+ *--------------------------------------------------------------*/
+
+/**
+ * Get the canonical referral-source options for the contact form.
+ *
+ * Returns the valid key => translated-label pairs (NOT including the
+ * empty-string placeholder option — callers prepend that themselves).
+ *
+ * Both template-contact.php (form rendering) and skyyrose_ajax_contact_submit()
+ * (server-side whitelist + email label lookup) MUST call this helper rather
+ * than redeclaring the array locally. Single source prevents the form-keys /
+ * handler-keys drift that silently dropped all marketing attribution
+ * before this consolidation.
+ *
+ * @since 6.7.0
+ * @return array<string,string> Map of slug => human-readable translated label.
+ */
+function skyyrose_get_referral_options() {
+	return array(
+		'the-drop'      => __( 'The drop', 'skyyrose' ),
+		'word-of-mouth' => __( 'Word of mouth', 'skyyrose' ),
+		'social-media'  => __( 'Social media', 'skyyrose' ),
+		'just-found-it' => __( 'Just found it', 'skyyrose' ),
+	);
+}
+
+/*
+--------------------------------------------------------------
  * Contact Form Submission
  *--------------------------------------------------------------*/
 
@@ -61,21 +90,17 @@ function skyyrose_ajax_contact_submit() {
 	$order_number      = str_replace( array( "\r", "\n", "\t" ), '', mb_substr( sanitize_text_field( wp_unslash( $_POST['order_number'] ?? '' ) ), 0, 50 ) );
 	$preferred_contact = sanitize_key( wp_unslash( $_POST['preferred_contact'] ?? 'email' ) );
 
-	// Referral source — marketing attribution.
+	// Referral source — marketing attribution. Whitelist sourced from
+	// skyyrose_get_referral_options() so the form + handler stay in lockstep.
 	$referral_raw    = sanitize_key( wp_unslash( $_POST['referral_source'] ?? '' ) );
-	$referral_labels = array(
-		'instagram'       => 'Instagram',
-		'tiktok'          => 'TikTok',
-		'twitter'         => 'Twitter / X',
-		'facebook'        => 'Facebook',
-		'youtube'         => 'YouTube',
-		'google-search'   => 'Google Search',
-		'friend-referral' => 'Friend or Family',
-		'press-article'   => 'Press / Article',
-		'event'           => 'Event or Pop-Up',
-		'other'           => 'Other',
-	);
+	$referral_labels = skyyrose_get_referral_options();
 	$referral_source = isset( $referral_labels[ $referral_raw ] ) ? $referral_labels[ $referral_raw ] : '';
+
+	// Surface unexpected referral keys so future form/handler drift is loud,
+	// not silent (per code-review LOW finding on the prior inline whitelist).
+	if ( '' === $referral_source && '' !== $referral_raw ) {
+		error_log( sprintf( 'skyyrose_ajax_contact_submit: unknown referral_source key %s', $referral_raw ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+	}
 
 	// Map subject slugs to human-readable labels.
 	$subject_labels = array(
