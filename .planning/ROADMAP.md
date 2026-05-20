@@ -251,9 +251,19 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 14-01-PLAN.md — Add garment_type_lock CSV column, Wave 0 tests, nano_banana package marker (INFRA-04)
-- [ ] 14-02-PLAN.md — Fix 3 broken readers: nano_banana.catalog shim, renders/config.py, fashion/context.py (INFRA-01, INFRA-02, INFRA-03)
-- [ ] 14-03-PLAN.md — Preflight audit script + SKIPPED.json (INFRA-05, INFRA-06, INFRA-07)
+- [x] 14-01-PLAN.md — Add garment_type_lock CSV column, Wave 0 tests, nano_banana package marker (INFRA-04) — VERIFIED 2026-05-16 (14-VERIFICATION.md)
+- [x] 14-02-PLAN.md — Fix 3 broken readers: nano_banana.catalog shim, renders/config.py, fashion/context.py (INFRA-01, INFRA-02, INFRA-03) — VERIFIED 2026-05-16 after regression repair: nano_banana shim was overwritten (a22074ab3/8737e3714), re-routed through skyyrose.core.catalog_loader + CI regression gate added (bug-102 FIXED). renders/config.py + fashion/context.py confirmed delegating.
+- [x] 14-03-PLAN.md — Preflight audit script + SKIPPED.json (INFRA-05, INFRA-06, INFRA-07) — VERIFIED 2026-05-16 (5 PENDING = INFRA-06 deferred by design)
+
+### Phase 14.1: Pre-Order Page Hotfix — fix /preorder/ 404 and populate /pre-order/ grid from canonical CSV is_preorder SKUs (skyyfix.html Cluster B, P0 customer-facing, no paid API) (INSERTED)
+
+**Goal:** [Urgent work - to be planned]
+**Requirements**: TBD
+**Depends on:** Phase 14
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 14.1 to break down)
 
 ### Phase 15: Ghost Mannequin Agent + QA
 **Goal**: The ghost mannequin LangGraph agent can generate a validated, white-background front shot for any single in-scope garment SKU without crashing, overspending, or silently returning a broken image
@@ -269,12 +279,19 @@ Plans:
   7. `/verification-loop` — automated verification loop confirming all success criteria pass
 **Plans**: 7 plans across 4 waves
 Plans:
+**Wave 1**
 - [ ] 15-01-PLAN.md — Data contracts: GhostMannequinAgentResult, FailureEntry, AuditEntry + EliteStudioState extensions (GM-04, GM-05, QA-02)
 - [ ] 15-02-PLAN.md — SKU resolver module: sanitize_sku, resolve_sku, verify_tripo_region, accessory skip gate (GM-06)
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 15-03-PLAN.md — GLB cache manager, TripoDigitizer wrapper, _GHOST_MANNEQUIN_EST_COST_USD constant (GM-02)
 - [ ] 15-04-PLAN.md — Prompt registry, GhostMannequinSynthesizer: BRIA bg-removal, Gemini RAS ensemble, jersey cascade (GM-02, GM-03)
 - [ ] 15-05-PLAN.md — Per-metric QA veto gate: corner_pixel_purity, VetoResult, score_ghost_mannequin (QA-01, QA-04)
+
+**Wave 3** *(blocked on Wave 2 completion)*
 - [ ] 15-06-PLAN.md — GhostMannequinAgent orchestration node + GraphConfig wiring (GM-01, GM-02, GM-04, QA-02)
+
+**Wave 4** *(blocked on Wave 3 completion)*
 - [ ] 15-07-PLAN.md — CLI __main__ entry point + integration test suite (GM-05, GM-06, QA-02)
 
 ### Phase 16: 3D-Replica Architect & Purge ✅ (completed 2026-04-24)
@@ -293,7 +310,7 @@ Plans:
 
 ### Phase 17: Review & Approval CLI
 **Goal**: The user can approve or reject each generated image from the command line, and approved images are atomically committed back to the CSV with zero risk of data corruption
-**Depends on**: Phase 15 (review directory and output files must exist before approval tooling is needed)
+**Depends on**: Phase 15 (review directory and output files must exist before approval tooling is needed) — implementation does NOT require Phase 15 outputs, only the directory contract
 **Requirements**: REV-01, REV-02, REV-03, REV-04
 **Success Criteria** (what must be TRUE):
   1. Running `approve-ghost {sku}` on an image not yet in `renders/ghost-mannequin/approved/` moves it there, updates `front_model_image` in the CSV, and writes an approval timestamp — the CSV row count after update equals the row count before
@@ -302,15 +319,12 @@ Plans:
   4. Interrupting `approve-ghost` mid-write (simulated via SIGINT after temp file creation) leaves the original CSV intact — the atomic `os.replace()` pattern prevents partial writes
   5. `/simplify` — code simplification pass after phase implementation
   6. `/verification-loop` — automated verification loop confirming all success criteria pass
-**Plans**: 7 plans across 4 waves
+**Plans**: 4 plans (single wave — no API dependency, can execute serially or in parallel)
 Plans:
-- [ ] 15-01-PLAN.md — Data contracts: GhostMannequinAgentResult, FailureEntry, AuditEntry + EliteStudioState extensions (GM-04, GM-05, QA-02)
-- [ ] 15-02-PLAN.md — SKU resolver module: sanitize_sku, resolve_sku, verify_tripo_region, accessory skip gate (GM-06)
-- [ ] 15-03-PLAN.md — GLB cache manager, TripoDigitizer wrapper, _GHOST_MANNEQUIN_EST_COST_USD constant (GM-02)
-- [ ] 15-04-PLAN.md — Prompt registry, GhostMannequinSynthesizer: BRIA bg-removal, Gemini RAS ensemble, jersey cascade (GM-02, GM-03)
-- [ ] 15-05-PLAN.md — Per-metric QA veto gate: corner_pixel_purity, VetoResult, score_ghost_mannequin (QA-01, QA-04)
-- [ ] 15-06-PLAN.md — GhostMannequinAgent orchestration node + GraphConfig wiring (GM-01, GM-02, GM-04, QA-02)
-- [ ] 15-07-PLAN.md — CLI __main__ entry point + integration test suite (GM-05, GM-06, QA-02)
+- [ ] 17-01-PLAN.md — Core library `skyyrose/core/review.py`: atomic CSV writer via `os.replace()`, approve()/reject() pure functions, audit log helpers (REV-01, REV-04)
+- [ ] 17-02-PLAN.md — `scripts/approve_ghost.py` CLI: argparse entry, structural gate (file must exist in review dir), file move to `approved/`, CSV update, exit codes (REV-01, REV-02)
+- [ ] 17-03-PLAN.md — `scripts/reject_ghost.py` CLI: argparse entry, write to `rejections.json` with reason + timestamp, leave file in place, no CSV touch (REV-03)
+- [ ] 17-04-PLAN.md — Integration test suite `tests/test_review.py`: round-trip approve/reject, SIGINT mid-write safety, CLI exit codes, idempotency (REV-01, REV-02, REV-03, REV-04)
 
 ### Phase 18: Full Batch + WooCommerce Upload
 **Goal**: All 28 in-scope garment SKUs have a ghost mannequin front image approved by the user and uploaded to WooCommerce — with an explicit confirmation gate before any production write occurs
@@ -323,15 +337,11 @@ Plans:
   4. Any SKU without a corresponding `approved/{sku}-ghost-front.webp` is excluded from the upload manifest entirely — the upload tool cannot be coerced into uploading unapproved files
   5. `/simplify` — code simplification pass after phase implementation
   6. `/verification-loop` — automated verification loop confirming all success criteria pass
-**Plans**: 7 plans across 4 waves
+**Plans**: 3 plans
 Plans:
-- [ ] 15-01-PLAN.md — Data contracts: GhostMannequinAgentResult, FailureEntry, AuditEntry + EliteStudioState extensions (GM-04, GM-05, QA-02)
-- [ ] 15-02-PLAN.md — SKU resolver module: sanitize_sku, resolve_sku, verify_tripo_region, accessory skip gate (GM-06)
-- [ ] 15-03-PLAN.md — GLB cache manager, TripoDigitizer wrapper, _GHOST_MANNEQUIN_EST_COST_USD constant (GM-02)
-- [ ] 15-04-PLAN.md — Prompt registry, GhostMannequinSynthesizer: BRIA bg-removal, Gemini RAS ensemble, jersey cascade (GM-02, GM-03)
-- [ ] 15-05-PLAN.md — Per-metric QA veto gate: corner_pixel_purity, VetoResult, score_ghost_mannequin (QA-01, QA-04)
-- [ ] 15-06-PLAN.md — GhostMannequinAgent orchestration node + GraphConfig wiring (GM-01, GM-02, GM-04, QA-02)
-- [ ] 15-07-PLAN.md — CLI __main__ entry point + integration test suite (GM-05, GM-06, QA-02)
+- [ ] 18-01-PLAN.md — Batch runner iterates `renders/ghost-mannequin/approved/`, builds WooCommerce upload manifest with target product IDs, image paths, current vs new image diff (UPLOAD-01)
+- [ ] 18-02-PLAN.md — STOP AND SHOW confirmation gate before any WooCommerce API write, WC REST PUT product image, post-upload verification via WC REST GET (UPLOAD-01)
+- [ ] 18-03-PLAN.md — Integration test suite: mock WC REST API, manifest generation tests, gate bypass prevention, only-approved-SKUs gating (UPLOAD-01)
 
 ## Progress
 
