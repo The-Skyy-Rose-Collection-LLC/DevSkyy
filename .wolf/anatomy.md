@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T19:48:14.335Z
-> Files: 2663 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T20:06:20.730Z
+> Files: 2669 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -522,7 +522,7 @@
 - `.gitignore` — Git ignore rules (~14 tok)
 - `adaptive.ts` — Adaptive Intelligence Module — Self-Healing, Self-Learning, Self-Correcting (~4687 tok)
 - `agent.ts` — LLM Roundtable Agent (~3185 tok)
-- `CLAUDE.md` — agents/llm_roundtable/ — TypeScript LLM competition arena (~1556 tok)
+- `CLAUDE.md` — agents/llm_roundtable/ — TypeScript LLM competition arena (~1567 tok)
 - `engine.ts` — LLM Roundtable — Live Battle Engine (~13440 tok)
 - `index.ts` — LLM Roundtable — Public API (~148 tok)
 - `package.json` — Node.js package manifest (~158 tok)
@@ -594,7 +594,7 @@
 
 - `__init__.py` — WordPress Bridge Agent — connects dashboard pipelines to WordPress/WooCommerce. (~274 tok)
 - `agent.py` — WordPress Bridge Agent — Claude Agent SDK entry point. (~1271 tok)
-- `CLAUDE.md` — agents/wordpress_bridge/ — Claude Agent SDK bridge to WordPress/WooCommerce (~1440 tok)
+- `CLAUDE.md` — agents/wordpress_bridge/ — Claude Agent SDK bridge to WordPress/WooCommerce (~1451 tok)
 - `mcp_server.py` — WordPress Bridge Agent — MCP tool definitions for WordPress/WooCommerce operations. (~8829 tok)
 - `prompts.py` — System prompt and per-pipeline prompt templates for the WordPress Bridge Agent. (~1216 tok)
 
@@ -1034,7 +1034,7 @@
 ## core/errors/
 
 - `__init__.py` — core/errors/__init__.py (~536 tok)
-- `CLAUDE.md` — core/errors/ — Production error taxonomy with correlation IDs (~675 tok)
+- `CLAUDE.md` — core/errors/ — Production error taxonomy with correlation IDs (~686 tok)
 - `production_errors.py` — errors/production_errors.py (~8015 tok)
 
 ## core/events/
@@ -1072,12 +1072,12 @@
 ## core/llm/providers/
 
 - `__init__.py` (~247 tok)
-- `CLAUDE.md` — core/llm/providers/ — Backward-compat re-export shim for legacy llm/providers/ (~375 tok)
+- `CLAUDE.md` — core/llm/providers/ — Backward-compat re-export shim for legacy `llm/providers/` (~447 tok)
 
 ## core/llm/services/
 
 - `__init__.py` (~206 tok)
-- `CLAUDE.md` — core/llm/services/ — Backward-compat re-export shim for legacy llm/ services (~375 tok)
+- `CLAUDE.md` — core/llm/services/ — Backward-compat re-export shim for legacy `llm/` services (~415 tok)
 
 ## core/middleware/
 
@@ -1095,13 +1095,13 @@
 ## core/repositories/
 
 - `__init__.py` — Core repository interfaces. (~78 tok)
-- `CLAUDE.md` — core/repositories/ — Data access ports (repository interfaces) (~500 tok)
+- `CLAUDE.md` — core/repositories/ — Data access ports (repository interfaces) (~513 tok)
 - `interfaces.py` — IRepository: get_by_id, create, update, delete + 7 more (~957 tok)
 
 ## core/runtime/
 
 - `__init__.py` (~368 tok)
-- `CLAUDE.md` — core/runtime/ — Tool registry, input validation, sandboxed execution (~620 tok)
+- `CLAUDE.md` — core/runtime/ — Tool registry, input validation, sandboxed execution (~757 tok)
 - `code_execution_tool.py` (~784 tok)
 - `input_validator.py` — ToolInputValidationError: validate (~3347 tok)
 - `tool_registry.py` — Pydantic: ToolParameter (68 fields) (~20657 tok)
@@ -1109,7 +1109,7 @@
 ## core/services/
 
 - `__init__.py` — Core service interfaces. (~49 tok)
-- `CLAUDE.md` — core/services/ — Service ports (hexagonal interfaces) (~425 tok)
+- `CLAUDE.md` — core/services/ — Service ports (hexagonal interfaces) (~506 tok)
 - `interfaces.py` — View: get, delete (~800 tok)
 
 ## core/telemetry/
@@ -2915,7 +2915,7 @@
 ## services/ml/
 
 - `__init__.py` — services/ml/__init__.py (~864 tok)
-- `CLAUDE.md` — services/ml/ — ML Service Clients & Orchestration (~737 tok)
+- `CLAUDE.md` — services/ml/ — ML Service Clients & Orchestration (~748 tok)
 - `gemini_client.py` — Gemini API Client for DevSkyy. (~7881 tok)
 - `image_description_pipeline.py` — Image-to-description pipeline using vision models. (~5883 tok)
 - `pipeline_orchestrator.py` — services/ml/pipeline_orchestrator.py (~6008 tok)
