@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T12:26:10.104Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T16:30:18.827Z
 > Files: 2659 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -2480,7 +2480,7 @@
 - `deploy_to_skyyrose.py` — WordPressDeployer: deploy_pages, upload_3d_models, create_woocommerce_products, deploy_elementor_templates + 2 more (~3949 tok)
 - `deploy-holo-cards.sh` — scripts/deploy-holo-cards.sh -- Deploy Holo product card rollout to production (~3234 tok)
 - `deploy-pipeline.sh` — scripts/deploy-pipeline.sh -- Single-command deploy pipeline for SkyyRose WordPress theme (~1847 tok)
-- `deploy-theme.sh` — scripts/deploy-theme.sh -- Production deploy script for SkyyRose WordPress theme (~8874 tok)
+- `deploy-theme.sh` — scripts/deploy-theme.sh -- Production deploy script for SkyyRose WordPress theme (~9124 tok)
 - `diagnose_cli_raw.py` — Build the exact CLI command the SDK would use and run it via subprocess (~507 tok)
 - `diagnose_orchestrator.py` — Test ClaudeSDKClient (async context manager) with MCP server. (~665 tok)
 - `diagnose_sdk.py` — Diagnostic: capture exact claude CLI stderr when SDK fails. (~554 tok)
