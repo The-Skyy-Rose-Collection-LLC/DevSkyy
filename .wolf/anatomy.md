@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T21:11:42.673Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T21:20:47.630Z
 > Files: 2669 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -166,7 +166,7 @@
 
 - `CLAUDE.md` (~11 tok)
 - `post-checkout` (~24 tok)
-- `post-commit` — post-commit hook: LFS + auto-regen of anatomy and Phase E manifest. (~569 tok)
+- `post-commit` — post-commit hook: LFS + auto-regen of anatomy and Phase E manifest. (~709 tok)
 - `post-merge` (~19 tok)
 - `pre-commit` — Pre-commit: lint, type-check, syntax, and test gates (~337 tok)
 - `pre-push` (~18 tok)
@@ -1040,7 +1040,7 @@
 ## core/events/
 
 - `__init__.py` (~85 tok)
-- `CLAUDE.md` — core/events/ — Event Sourcing Infrastructure (~444 tok)
+- `CLAUDE.md` — core/events/ — Event Sourcing Infrastructure (~455 tok)
 - `event_bus.py` — EventBus: subscribe, publish, get_dead_letters, clear_dead_letters (~745 tok)
 - `event_handlers.py` — ProductEventHandler: handle, subscribe (~2366 tok)
 - `event_store.py` — Event: apply_event, append, get_events, replay (~2557 tok)
@@ -2575,7 +2575,7 @@
 - `README.md` — Project documentation (~1842 tok)
 - `redeploy_lora_monitor.py` — Redeploy lora-training-monitor HuggingFace Space with ralph-loop retry. (~797 tok)
 - `refactor_structure.py` — FileStructureRefactor: plan_refactoring, execute_refactoring, main (~2448 tok)
-- `regen_anatomy_from_main.sh` — Regenerate .wolf/anatomy.md scoped to git main and origin/main. (~196 tok)
+- `regen_anatomy_from_main.sh` — Regenerate .wolf/anatomy.md scoped to git main and origin/main. (~350 tok)
 - `regen_masks.py` — Re-derive Stage 2 decoration masks for specific SKUs using fixed MaskDeriver. (~681 tok)
 - `regen_phase_e_manifest_auto.py` — Regenerate the auto-region of tasks/phase-e-manifest.md from code state. (~4420 tok)
 - `regenerate_centroid_sidecars.py` — Backfill JSON sidecars for existing brand centroid .npz files. (~620 tok)

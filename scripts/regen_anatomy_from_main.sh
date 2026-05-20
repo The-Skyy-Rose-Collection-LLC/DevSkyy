@@ -22,3 +22,13 @@ fi
 
 openwolf scan >/dev/null
 python3 scripts/anatomy_filter_main.py
+
+# `openwolf scan` always rewrites the `Last scanned: <ISO>` header line,
+# even when nothing else changed. That timestamp-only drift used to drive
+# an infinite "post-commit: anatomy ... were regenerated" → commit → drift
+# loop. If the timestamp is the only diff vs HEAD, revert the file so the
+# working tree stays clean.
+ANATOMY_TIMESTAMP_RE='^> Auto-maintained by OpenWolf\. Last scanned:'
+if git diff --quiet -I "$ANATOMY_TIMESTAMP_RE" -- .wolf/anatomy.md 2>/dev/null; then
+  git checkout -- .wolf/anatomy.md 2>/dev/null || true
+fi

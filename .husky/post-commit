@@ -46,7 +46,15 @@ if [ -f scripts/regen_phase_e_manifest_auto.py ]; then
 fi
 
 # Report drift so the user knows to stage + commit the regen output.
-if ! git diff --quiet -- .wolf/anatomy.md tasks/phase-e-manifest.md 2>/dev/null; then
+#
+# Ignore the openwolf `Last scanned: <ISO>` timestamp line — it rewrites
+# on every scan and used to drive an infinite drift-commit loop. Real
+# content drift (file count, structural anatomy changes, phase-e manifest
+# updates) still surfaces normally. `regen_anatomy_from_main.sh` already
+# reverts timestamp-only drift; this `-I` filter is a second line of
+# defense in case the regen script is skipped or its revert fails.
+ANATOMY_TIMESTAMP_RE='^> Auto-maintained by OpenWolf\. Last scanned:'
+if ! git diff --quiet -I "$ANATOMY_TIMESTAMP_RE" -- .wolf/anatomy.md tasks/phase-e-manifest.md 2>/dev/null; then
   echo "post-commit: anatomy / phase-e manifest were regenerated and now differ from HEAD."
   echo "post-commit: run \`git add .wolf/anatomy.md tasks/phase-e-manifest.md && git commit -m 'chore: refresh auto-managed indexes'\` to publish."
 fi
