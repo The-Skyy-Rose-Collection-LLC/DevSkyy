@@ -1,0 +1,6 @@
+# Vendored third-party repositories — managed by scripts/setup_*.sh.
+# Kept out of version control because they're large, fetched on demand,
+# and shouldn't be vendored into this repo's git history.
+*
+!.gitignore
+!README.md

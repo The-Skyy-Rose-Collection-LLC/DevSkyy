@@ -329,8 +329,11 @@ open-claude-code/
 wordpress-theme/skyyrose-flagship/assets/images/immersive/test/
 scripts/nano-banana-composite-results.json
 
-# Vendored third-party repos (cloned via git, not authored here)
-vendor/
+# Vendored third-party repos (cloned via git, not authored here).
+# Track the scaffolding (README + .gitignore) so contributors can bootstrap.
+vendor/*
+!vendor/.gitignore
+!vendor/README.md
 
 # === Added by Claude optimization pass (20260424-190053) ===
 # These were missing from the original .gitignore.
