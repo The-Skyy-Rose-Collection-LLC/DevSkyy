@@ -92,3 +92,8 @@ Post-deploy verify gate automatically curls `https://skyyrose.co/?deploy_verify=
 - Don't bypass `npm run lint:php` "for a small fix."
 - Don't commit changes that haven't passed `npm run verify`.
 - Don't use `products.json` — it doesn't exist. Use the CSV helpers.
+
+
+<claude-mem-context>
+
+</claude-mem-context>

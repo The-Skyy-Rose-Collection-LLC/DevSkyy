@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-19T21:05:30",
+  "generated_at": "2026-05-20T14:04:55",
   "repo_root": "/Users/theceo/DevSkyy",
   "freshness_days": 30,
-  "files_scanned": 44,
-  "indexed_basenames": 14479,
+  "files_scanned": 45,
+  "indexed_basenames": 14511,
   "missing_paths": [
     {
       "file": ".wolf/anatomy.md",
@@ -143,15 +143,15 @@
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/immersive-worlds.md",
       "line": 11,
       "stamp": "2026-04-27",
-      "age_days": 22
+      "age_days": 23
     },
     {
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_pinecone_setup.md",
       "line": 7,
       "stamp": "2026-05-03",
-      "age_days": 16
+      "age_days": 17
     }
   ],
   "documented_missing_count": 23,
-  "verified_count": 2790
+  "verified_count": 2815
 }

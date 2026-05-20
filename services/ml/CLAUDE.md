@@ -33,3 +33,8 @@
 - `api/v1/clothing_3d/*` — `IdempotencyCache.get_or_run()` wraps queue dispatch
 - `agents/core/imagery/*` — long-running batch generation via queue
 - `skyyrose/elite_studio/*` — canonical imagery pipeline
+
+
+<claude-mem-context>
+
+</claude-mem-context>

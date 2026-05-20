@@ -96,3 +96,8 @@ Every mutation tool surfaces a confirmation argument at the schema level; the pa
 - This is one of four major agent sub-systems (cmem #3146, 2026-05-08): elite_web_builder, render_pipeline, visual_generation, wordpress_bridge.
 - Claude Agent SDK already extensively integrated (cmem #4087, 2026-05-12) — duplicate version pins exist; check `pyproject.toml` before adding new SDK deps.
 - 15 MCP tools is the current surface — composed via `create_wordpress_tools()` factory in `mcp_server.py`.
+
+
+<claude-mem-context>
+
+</claude-mem-context>
