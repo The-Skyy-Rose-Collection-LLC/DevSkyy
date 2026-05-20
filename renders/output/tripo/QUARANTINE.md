@@ -52,7 +52,7 @@ is a FLUX prior the template defaulted to in the absence of a canon anchor.
 3. **Per-SKU block reason** printed in the manifest before the `y/N`
    prompt, so the human can see exactly what got refused.
 
-Tests live in `tests/test_tripo_dispatch_guards.py` (12 unit tests covering
+Tests live in `tests/test_tripo_dispatch_guards.py` (13 unit tests covering
 both guards plus the `--force-branded` escape hatch).
 
 ## What to do with the contents

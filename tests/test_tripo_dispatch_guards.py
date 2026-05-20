@@ -166,6 +166,7 @@ def test_classify_blocks_branded_sku(monkeypatch: pytest.MonkeyPatch, tmp_path: 
             "sku": "br-001",
             "name": "Branded SKU",
             "image": "assets/images/products/branded.webp",
+            "render_is_tech_flat": "1",
             "dossier_slug": "branded",
         }
     ]
@@ -191,13 +192,14 @@ def test_classify_blocks_sku_without_tech_flat(
             "sku": "x-002",
             "name": "Unbranded but no tech-flat",
             "image": "",  # empty → no canonical tech-flat
+            "render_is_tech_flat": "1",  # claim flag set, but file missing
             "dossier_slug": "unbranded",
         }
     ]
     approved, blocked = tripo_dispatch.classify_skus(rows)
     assert approved == []
     assert len(blocked) == 1
-    assert "NO TECH-FLAT" in blocked[0][1]
+    assert "NO TECH-FLAT FILE" in blocked[0][1]
 
 
 @pytest.mark.unit
@@ -216,6 +218,7 @@ def test_classify_approves_unbranded_sku_with_tech_flat(
             "sku": "x-003",
             "name": "Unbranded clean tech-flat",
             "image": "assets/images/products/clean.webp",
+            "render_is_tech_flat": "1",
             "dossier_slug": "clean",
         }
     ]
@@ -246,6 +249,7 @@ def test_classify_force_branded_overrides_branded_block(
             "sku": "br-001",
             "name": "Branded SKU",
             "image": "assets/images/products/branded.webp",
+            "render_is_tech_flat": "1",
             "dossier_slug": "branded",
         }
     ]
@@ -273,12 +277,98 @@ def test_classify_force_branded_still_requires_tech_flat(
             "sku": "br-001",
             "name": "Branded no tech-flat",
             "image": "",
+            "render_is_tech_flat": "1",
             "dossier_slug": "branded",
         }
     ]
     approved, blocked = tripo_dispatch.classify_skus(rows, allow_branded=True)
     assert approved == []
-    assert "NO TECH-FLAT" in blocked[0][1]
+    assert "NO TECH-FLAT FILE" in blocked[0][1]
+
+
+# --------------------------------------------------------------------------- #
+# _is_catalog_tech_flat + render_is_tech_flat=0 guard layer
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.unit
+def test_is_catalog_tech_flat_true_only_when_flag_is_one() -> None:
+    """Catalog flag `render_is_tech_flat` is the authoritative declaration.
+
+    Only the literal "1" counts as a tech-flat. Anything else — "0",
+    "true", empty, or absent — is treated as NOT a tech-flat. This is
+    the second-tier guard added after br-011: that SKU had a tech-flat
+    PNG on disk (so `_has_tech_flat_source` returned True) but the
+    catalog explicitly marked it as a branded product render via
+    `render_is_tech_flat=0`. The file-existence check alone would have
+    let it through; the flag check stops it.
+    """
+    from scripts import tripo_dispatch
+
+    assert tripo_dispatch._is_catalog_tech_flat({"render_is_tech_flat": "1"}) is True
+    assert tripo_dispatch._is_catalog_tech_flat({"render_is_tech_flat": "0"}) is False
+    assert tripo_dispatch._is_catalog_tech_flat({"render_is_tech_flat": ""}) is False
+    assert tripo_dispatch._is_catalog_tech_flat({"render_is_tech_flat": "true"}) is False
+    assert tripo_dispatch._is_catalog_tech_flat({}) is False
+
+
+@pytest.mark.unit
+def test_classify_blocks_when_catalog_tech_flat_flag_is_zero(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """br-011 regression: PNG file exists but catalog marks it as NOT a
+    tech-flat (`render_is_tech_flat=0`). The flag guard must block before
+    the file-existence guard.
+    """
+    from scripts import tripo_dispatch
+
+    dossier_dir, theme_root = _scaffold_classify_fixture(monkeypatch, tmp_path)
+    (dossier_dir / "unbranded.md").write_text("---\n---\n", encoding="utf-8")
+    # File exists on disk → file-existence guard would pass.
+    tf = theme_root / "assets/images/products/product-render.png"
+    tf.write_bytes(b"png")
+
+    rows = [
+        {
+            "sku": "x-004",
+            "name": "Unbranded but product render, not tech-flat",
+            "image": "assets/images/products/product-render.png",
+            "render_is_tech_flat": "0",  # catalog says NO
+            "dossier_slug": "unbranded",
+        }
+    ]
+    approved, blocked = tripo_dispatch.classify_skus(rows)
+    assert approved == []
+    assert len(blocked) == 1
+    assert "NOT A TECH-FLAT" in blocked[0][1]
+    assert "render_is_tech_flat" in blocked[0][1]
+
+
+@pytest.mark.unit
+def test_classify_blocks_when_catalog_tech_flat_flag_missing(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Default-safe behavior: a row that omits the column is treated as
+    NOT a tech-flat. Operators must explicitly opt in by setting "1".
+    """
+    from scripts import tripo_dispatch
+
+    dossier_dir, theme_root = _scaffold_classify_fixture(monkeypatch, tmp_path)
+    (dossier_dir / "unbranded.md").write_text("---\n---\n", encoding="utf-8")
+    tf = theme_root / "assets/images/products/something.webp"
+    tf.write_bytes(b"webp")
+
+    rows = [
+        {
+            "sku": "x-005",
+            "name": "Column missing entirely",
+            "image": "assets/images/products/something.webp",
+            "dossier_slug": "unbranded",
+        }
+    ]
+    approved, blocked = tripo_dispatch.classify_skus(rows)
+    assert approved == []
+    assert "NOT A TECH-FLAT" in blocked[0][1]
 
 
 # --------------------------------------------------------------------------- #

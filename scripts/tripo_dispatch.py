@@ -128,6 +128,21 @@ def _has_tech_flat_source(row: dict[str, str]) -> bool:
     return candidate.exists()
 
 
+def _is_catalog_tech_flat(row: dict[str, str]) -> bool:
+    """The catalog `render_is_tech_flat` column is the explicit operator
+    declaration that the SKU's `image` field points to a clean unbranded
+    tech-flat — the only kind of source Tripo's multiview template can
+    preserve without hallucinating.
+
+    Value "1" → catalog-flagged tech-flat. Anything else (including "0" or
+    empty) is treated as NOT a tech-flat. File-existence is a weaker check
+    (`_has_tech_flat_source`) because a file can exist and still be a
+    model-on shot or a product render — see br-011: PNG present, but the
+    catalog explicitly marks `render_is_tech_flat=0`.
+    """
+    return row.get("render_is_tech_flat", "").strip() == "1"
+
+
 def classify_skus(
     rows: list[dict[str, str]], allow_branded: bool = False
 ) -> tuple[list[dict[str, str]], list[tuple[dict[str, str], str]]]:
@@ -136,9 +151,14 @@ def classify_skus(
     Block conditions (in order — first match wins for the reason string):
       1. Dossier `logo_reference` is populated → BRANDED, route to ADK
          (unless ``allow_branded`` is True — escape hatch with WARNING).
-      2. Catalog `image` column empty or file missing → NO TECH-FLAT.
+      2. Catalog `render_is_tech_flat` is not "1" → NOT A TECH-FLAT.
+         The catalog is the authority on whether the source is a clean
+         unbranded tech-flat; file existence alone is insufficient
+         (br-011 had a PNG file but it was a branded product render,
+         not a tech-flat — flag was "0").
+      3. Catalog `image` column empty or file missing → NO TECH-FLAT FILE.
 
-    A SKU that passes both checks is approved for Tripo multiview.
+    A SKU that passes all checks is approved for Tripo multiview.
     """
     approved: list[dict[str, str]] = []
     blocked: list[tuple[dict[str, str], str]] = []
@@ -153,11 +173,20 @@ def classify_skus(
                 )
             )
             continue
+        if not _is_catalog_tech_flat(row):
+            blocked.append(
+                (
+                    row,
+                    "NOT A TECH-FLAT — catalog `render_is_tech_flat` is not '1'. "
+                    "Tripo multiview needs a clean unbranded tech-flat per catalog flag.",
+                )
+            )
+            continue
         if not _has_tech_flat_source(row):
             blocked.append(
                 (
                     row,
-                    "NO TECH-FLAT — catalog `image` column empty or file missing. "
+                    "NO TECH-FLAT FILE — catalog `image` column empty or file missing. "
                     "Tripo multiview needs a clean tech-flat, not a model-on shot.",
                 )
             )
