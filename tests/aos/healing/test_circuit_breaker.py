@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from aos.healing.circuit_breaker import CircuitBreaker, CircuitState
 
 

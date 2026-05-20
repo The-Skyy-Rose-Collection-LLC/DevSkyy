@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from aos.cognition.reflector import FailureCategory
 from aos.healing.policy import compute_delay, get_policy
 from aos.healing.types import RetryConfig

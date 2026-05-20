@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T21:20:47.630Z
-> Files: 2669 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T21:28:22.422Z
+> Files: 2681 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -658,6 +658,15 @@
 - `CLAUDE.md` (~11 tok)
 - `policy.py` — PolicyEngine — declarative ALLOW/DENY/REQUIRE_APPROVAL rules for kernel actions. (~947 tok)
 - `types.py` — Governance types — audit entries and policy decisions. (~682 tok)
+
+## aos/healing/
+
+- `__init__.py` — AOS self-healing layer — retry policy, circuit breaker, healing director. (~143 tok)
+- `circuit_breaker.py` — Kernel-side circuit breaker — prevents cascading failures per agent_type. (~570 tok)
+- `CLAUDE.md` — aos/healing/ — circuit breaker and healing director (~488 tok)
+- `director.py` — HealingDirector — maps FailureCategory + attempt number to a HealDecision. (~521 tok)
+- `policy.py` — Per-FailureCategory retry policies for the AOS healing layer. (~341 tok)
+- `types.py` — AOS healing types — action enum, retry config, and healing decision. (~144 tok)
 
 ## aos/init/
 
@@ -3645,6 +3654,15 @@
 - `test_audit.py` — Tests for AuditTrail. (~947 tok)
 - `test_budget.py` — Tests for BudgetController. (~606 tok)
 - `test_policy.py` — Tests for PolicyEngine. (~1041 tok)
+
+## tests/aos/healing/
+
+- `__init__.py` — Tests for the AOS self-healing layer. (~13 tok)
+- `CLAUDE.md` (~11 tok)
+- `test_circuit_breaker.py` — Tests for CircuitBreaker state machine. (~1003 tok)
+- `test_director.py` — Tests for HealingDirector.decide(). (~1040 tok)
+- `test_policy.py` — Tests for per-FailureCategory retry policies. (~756 tok)
+- `test_types.py` — Tests for AOS healing types — HealAction, RetryConfig, HealDecision. (~505 tok)
 
 ## tests/aos/ipc/
 
