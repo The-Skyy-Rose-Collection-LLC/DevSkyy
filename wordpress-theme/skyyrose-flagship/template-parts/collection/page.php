@@ -59,11 +59,24 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 
 	<!-- ════ Hero ════ -->
 	<section class="col-hero ambient-glow" data-scroll-fade>
-		<?php if ( $has_hero_bg ) : ?>
+		<?php
+		if ( $has_hero_bg ) :
+			$hero_bg_base = isset( $c['hero_bg_base'] ) ? (string) $c['hero_bg_base'] : '';
+			$hero_srcset  = '';
+			if ( '' !== $hero_bg_base ) {
+				$widths   = array( 480, 768, 1280, 1680 );
+				$entries  = array();
+				foreach ( $widths as $w ) {
+					$entries[] = esc_url( SKYYROSE_ASSETS_URI . $hero_bg_base . '-' . $w . 'w.webp' ) . ' ' . $w . 'w';
+				}
+				$hero_srcset = implode( ', ', $entries );
+			}
+			?>
 			<div class="col-hero__bg parallax-ken-burns">
 				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $c['hero_bg'] . '?v=' . SKYYROSE_VERSION ); ?>"
+					<?php if ( '' !== $hero_srcset ) : ?>srcset="<?php echo esc_attr( $hero_srcset ); ?>" sizes="100vw"<?php endif; ?>
 					alt="<?php echo esc_attr( $c['hero_bg_alt'] ); ?>"
-					loading="eager" fetchpriority="high" decoding="async" width="1024" height="1024">
+					loading="eager" fetchpriority="high" decoding="async" width="1680" height="720">
 			</div>
 		<?php endif; ?>
 		<div class="col-hero__content col-reveal">
