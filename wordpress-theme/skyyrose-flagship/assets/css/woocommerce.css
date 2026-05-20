@@ -17,7 +17,6 @@
    ================================================== */
 
 :root {
-	--skyy-woo-bg: var(--skyyrose-bg, #0A0A0A);
 	--skyy-woo-surface: rgba(255, 255, 255, 0.04);
 	--skyy-woo-surface-hover: rgba(255, 255, 255, 0.08);
 	--skyy-woo-glass: rgba(255, 255, 255, 0.06);
@@ -29,7 +28,6 @@
 	--skyy-woo-accent: var(--rose-gold, #B76E79);
 	--skyy-woo-accent-glow: rgba(183, 110, 121, 0.3);
 	--skyy-woo-gold: var(--gold, #D4AF37);
-	--skyy-woo-danger: var(--skyyrose-accent-danger, #DC143C);
 	--skyy-woo-success: #2ECC71;
 	--skyy-woo-radius: 12px;
 	--skyy-woo-radius-sm: 8px;
@@ -50,7 +48,7 @@
 
 .skyy-product-card__inner {
 	position: relative;
-	background: var(--skyy-woo-bg);
+	background: var(--color-page-bg, #0A0A0A);
 	border-radius: var(--skyy-woo-radius);
 	overflow: hidden;
 	border: 1px solid var(--skyy-woo-border);
@@ -175,7 +173,7 @@
 
 .skyy-product-card__actions .button:hover {
 	background: #fff;
-	color: var(--skyy-woo-bg);
+	color: var(--color-page-bg, #0A0A0A);
 }
 
 .skyy-product-card__content {
@@ -246,7 +244,7 @@
 
 .woocommerce-error {
 	background: rgba(220, 20, 60, 0.1);
-	border: 1px solid var(--skyy-woo-danger);
+	border: 1px solid var(--color-crimson, #DC143C);
 	border-radius: var(--skyy-woo-radius-sm);
 	color: var(--skyy-woo-text);
 	padding: 16px 20px;
