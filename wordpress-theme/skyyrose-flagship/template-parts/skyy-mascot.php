@@ -70,14 +70,14 @@ $recall_thumb = $skyy_img_url ?: '';
 	id="skyyrose-mascot"
 	class="skyyrose-mascot skyyrose-mascot--hidden"
 	aria-hidden="true"
-	aria-label="<?php esc_attr_e( 'Skyy, your SkyyRose style guide', 'skyyrose-flagship' ); ?>"
+	aria-label="<?php esc_attr_e( 'Skyy, your SkyyRose style guide', 'skyyrose' ); ?>"
 	data-context="<?php echo esc_attr( $skyy_context ); ?>"
 	role="complementary"
 >
 	<!-- Speech bubble (rendered left of character via flex row-reverse) -->
 	<div id="skyy-bubble" class="skyy-bubble" role="status" aria-live="polite" hidden>
 		<p id="skyy-bubble-text" class="skyy-bubble__text"></p>
-		<div id="skyy-chips" class="skyy-chips" role="group" aria-label="<?php esc_attr_e( 'Quick replies', 'skyyrose-flagship' ); ?>"></div>
+		<div id="skyy-chips" class="skyy-chips" role="group" aria-label="<?php esc_attr_e( 'Quick replies', 'skyyrose' ); ?>"></div>
 	</div>
 
 	<!-- Character button (click = open / dismiss bubble) -->
@@ -85,13 +85,13 @@ $recall_thumb = $skyy_img_url ?: '';
 		id="skyyrose-mascot-trigger"
 		class="skyyrose-mascot__character"
 		type="button"
-		aria-label="<?php esc_attr_e( 'Chat with Skyy', 'skyyrose-flagship' ); ?>"
+		aria-label="<?php esc_attr_e( 'Chat with Skyy', 'skyyrose' ); ?>"
 		aria-expanded="false"
 	>
 		<?php if ( $skyy_img_url ) : ?>
 			<img
 				src="<?php echo esc_url( $skyy_img_url ); ?>"
-				alt="<?php esc_attr_e( 'Skyy, SkyyRose brand mascot — young girl in Love Hurts varsity set', 'skyyrose-flagship' ); ?>"
+				alt="<?php esc_attr_e( 'Skyy, SkyyRose brand mascot — young girl in Love Hurts varsity set', 'skyyrose' ); ?>"
 				class="skyyrose-mascot__image"
 				width="220"
 				height="auto"
@@ -112,7 +112,7 @@ $recall_thumb = $skyy_img_url ?: '';
 		id="skyyrose-mascot-minimize"
 		class="skyyrose-mascot__minimize"
 		type="button"
-		aria-label="<?php esc_attr_e( 'Minimize Skyy', 'skyyrose-flagship' ); ?>"
+		aria-label="<?php esc_attr_e( 'Minimize Skyy', 'skyyrose' ); ?>"
 		tabindex="-1"
 	>&#215;</button>
 </div><!-- #skyyrose-mascot -->
@@ -124,7 +124,7 @@ $recall_thumb = $skyy_img_url ?: '';
 	type="button"
 	style="display:none;"
 	aria-hidden="true"
-	aria-label="<?php esc_attr_e( 'Bring Skyy back', 'skyyrose-flagship' ); ?>"
+	aria-label="<?php esc_attr_e( 'Bring Skyy back', 'skyyrose' ); ?>"
 >
 	<?php if ( $recall_thumb ) : ?>
 		<img
@@ -137,5 +137,5 @@ $recall_thumb = $skyy_img_url ?: '';
 	<?php else : ?>
 		<span aria-hidden="true" style="width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;font-size:1.2rem;">🌹</span>
 	<?php endif; ?>
-	<span><?php esc_html_e( 'Skyy', 'skyyrose-flagship' ); ?></span>
+	<span><?php esc_html_e( 'Skyy', 'skyyrose' ); ?></span>
 </button>

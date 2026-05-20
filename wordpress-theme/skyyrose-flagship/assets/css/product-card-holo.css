@@ -60,7 +60,7 @@
 	position: absolute;
 	top: 12px;
 	left: 12px;
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 9px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
@@ -82,7 +82,7 @@
 }
 
 .holo__collection {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 10px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
@@ -109,7 +109,7 @@
 }
 
 .holo__price {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 13px;
 	color: #B76E79;
 }
@@ -145,7 +145,7 @@
 }
 
 .holo__size-pill {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 10px;
 	background: transparent;
 	border: 1px solid rgba(255, 255, 255, 0.2);

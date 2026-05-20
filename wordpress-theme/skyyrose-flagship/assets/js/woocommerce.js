@@ -401,9 +401,16 @@
 				.removeClass('skyy-checkout__step--active')
 				.removeAttr('data-skyy-active');
 
-			$('[data-skyy-step="' + step + '"]')
+			var $active = $('[data-skyy-step="' + step + '"]')
 				.addClass('skyy-checkout__step--active')
 				.attr('data-skyy-active', '');
+
+			var $firstField = $active.find('input,select,textarea,button,[tabindex]').not('[disabled],[tabindex="-1"]').first();
+			if ( $firstField.length ) {
+				$firstField.trigger('focus');
+			} else {
+				$active.attr('tabindex','-1').trigger('focus');
+			}
 		},
 
 		updateProgress: function (step) {

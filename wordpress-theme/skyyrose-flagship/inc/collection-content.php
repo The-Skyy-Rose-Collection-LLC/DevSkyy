@@ -24,7 +24,7 @@ function skyyrose_get_collection_content( $slug ) {
 		/* ── Black Rose ─────────────────────────────────────────── */
 		'black-rose'   => array(
 			'hero_badge'          => __( 'The Original Collection', 'skyyrose' ),
-			'hero_logo'           => '/branding/black-rose-logo-hero-transparent.png',
+			'hero_logo'           => '/branding/black-rose-logo-hero.webp',
 			'hero_logo_alt'       => __( 'The Black Rose Collection', 'skyyrose' ),
 			'hero_logo_w'         => 560,
 			'hero_logo_h'         => 280,
@@ -80,7 +80,7 @@ function skyyrose_get_collection_content( $slug ) {
 		/* ── Love Hurts ─────────────────────────────────────────── */
 		'love-hurts'   => array(
 			'hero_badge'          => __( 'The Hurts Bloodline', 'skyyrose' ),
-			'hero_logo'           => '/branding/love-hurts-logo-hero-transparent.png',
+			'hero_logo'           => '/branding/love-hurts-logo-hero.webp',
 			'hero_logo_alt'       => __( 'Love Hurts', 'skyyrose' ),
 			'hero_logo_w'         => 400,
 			'hero_logo_h'         => 400,
@@ -136,7 +136,7 @@ function skyyrose_get_collection_content( $slug ) {
 		/* ── Signature ──────────────────────────────────────────── */
 		'signature'    => array(
 			'hero_badge'          => __( 'Where It All Began', 'skyyrose' ),
-			'hero_logo'           => '/branding/signature-logo-hero-transparent.png',
+			'hero_logo'           => '/branding/signature-logo-hero.webp',
 			'hero_logo_alt'       => __( 'The SkyyRose Signature Collection', 'skyyrose' ),
 			'hero_logo_w'         => 560,
 			'hero_logo_h'         => 280,

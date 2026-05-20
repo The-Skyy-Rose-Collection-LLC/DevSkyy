@@ -42,7 +42,7 @@
 	align-items: center;
 	gap: 8px;
 	color: rgba(255, 255, 255, 0.6);
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 10px;
 	letter-spacing: 2px;
 	text-transform: uppercase;
@@ -84,7 +84,7 @@
 	margin: 0; padding: 0;
 }
 .navbar__menu > li > a {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 11px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
@@ -175,5 +175,6 @@
 .search-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(5,5,5,0.98); backdrop-filter: blur(32px); display: flex; justify-content: center; padding-top: 20vh; opacity: 0; visibility: hidden; transition: opacity 0.5s;}
 .search-overlay.open { opacity: 1; visibility: visible; }
 .search-overlay__form { border-bottom: 1px solid var(--color-rose-gold, #B76E79); width: 80vw; max-width: 800px; padding-bottom: 16px;}
-.search-overlay__input { width: 100%; background: transparent; border: none; color: #fff; font-family: 'Space Mono', monospace; font-size: 24px; outline: none; text-align: center;}
+.search-overlay__input { width: 100%; background: transparent; border: none; color: #fff; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 24px; outline: none; text-align: center;}
+.search-overlay__input:focus-visible { outline: 2px solid var(--color-rose-gold, #B76E79); outline-offset: 8px; }
 .search-overlay__close { position: absolute; top: 40px; right: 40px; background: none; border: none; color: #fff; cursor: pointer;}

@@ -64,7 +64,7 @@
 }
 
 .mobile-nav__label {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 9px;
 	letter-spacing: 1px;
 	text-transform: uppercase;
@@ -76,7 +76,7 @@
 	right: -10px;
 	background: var(--color-white, #fff);
 	color: var(--color-black, #000);
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 9px;
 	font-weight: 700;
 	min-width: 16px;

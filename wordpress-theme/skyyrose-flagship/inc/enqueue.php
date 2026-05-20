@@ -18,9 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Enqueue self-hosted fonts (all brand typography).
  *
  * GDPR-compliant: zero external requests to Google Fonts.
- * All 9 font families served locally from assets/fonts/ as woff2.
+ * All 8 font families served locally from assets/fonts/ as woff2.
  * Fonts: Inter, Playfair Display, Cinzel, Cormorant Garamond,
- *        Oswald, Barlow, Bebas Neue, Space Mono, Instrument Serif.
+ *        Oswald, Barlow, Bebas Neue, Instrument Serif.
  *
  * @since 3.2.1
  * @updated 4.1.0 — self-hosted all Google Fonts families

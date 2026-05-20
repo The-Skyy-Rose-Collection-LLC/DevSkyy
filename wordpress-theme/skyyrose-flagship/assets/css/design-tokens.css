@@ -97,7 +97,7 @@
 	--ff-editorial: 'Playfair Display', Georgia, serif;
 	--ff-body:      'Cormorant Garamond', Georgia, serif;
 	--ff-cta:       'Bebas Neue', sans-serif;
-	--ff-mono:      'Space Mono', monospace;
+	--ff-mono:      ui-monospace, 'SF Mono', Menlo, monospace;
 	--ff-system:    'Inter', system-ui, -apple-system, sans-serif;
 
 	/* -----------------------------------------------
@@ -305,7 +305,7 @@
 	--skyyrose-text-muted:   rgba(245, 230, 211, 0.7);
 	--skyyrose-font-display: 'Playfair Display', serif;
 	--skyyrose-font-body:    'Cormorant Garamond', 'Inter', sans-serif;
-	--skyyrose-font-mono:    'Space Mono', monospace;
+	--skyyrose-font-mono:    ui-monospace, 'SF Mono', Menlo, monospace;
 	--skyyrose-font-ui:      'Bebas Neue', sans-serif;
 	--skyyrose-ease:         cubic-bezier(0.16, 1, 0.3, 1);
 	--skyyrose-radius:       2px;

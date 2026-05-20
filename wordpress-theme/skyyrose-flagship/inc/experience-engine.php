@@ -84,32 +84,32 @@ function skyyrose_see_get_modules(): array {
 	return array(
 		'performance_guardian' => array(
 			'priority' => 10,
-			'label'    => __( 'Performance Guardian', 'skyyrose-flagship' ),
+			'label'    => __( 'Performance Guardian', 'skyyrose' ),
 			'default'  => false,
 		),
 		'experience_analyzer'  => array(
 			'priority' => 20,
-			'label'    => __( 'Experience Analyzer', 'skyyrose-flagship' ),
+			'label'    => __( 'Experience Analyzer', 'skyyrose' ),
 			'default'  => false,
 		),
 		'brand_atmosphere'     => array(
 			'priority' => 30,
-			'label'    => __( 'Brand Atmosphere', 'skyyrose-flagship' ),
+			'label'    => __( 'Brand Atmosphere', 'skyyrose' ),
 			'default'  => false,
 		),
 		'smart_showcase'       => array(
 			'priority' => 40,
-			'label'    => __( 'Smart Showcase', 'skyyrose-flagship' ),
+			'label'    => __( 'Smart Showcase', 'skyyrose' ),
 			'default'  => false,
 		),
 		'micro_interactions'   => array(
 			'priority' => 50,
-			'label'    => __( 'Micro-Interactions', 'skyyrose-flagship' ),
+			'label'    => __( 'Micro-Interactions', 'skyyrose' ),
 			'default'  => false,
 		),
 		'personalization'      => array(
 			'priority' => 60,
-			'label'    => __( 'Personalization', 'skyyrose-flagship' ),
+			'label'    => __( 'Personalization', 'skyyrose' ),
 			'default'  => false,
 		),
 	);
@@ -294,8 +294,8 @@ add_action(
 	'admin_menu',
 	function () {
 		add_dashboard_page(
-			__( 'Experience Engine', 'skyyrose-flagship' ),
-			__( 'Experience Engine', 'skyyrose-flagship' ),
+			__( 'Experience Engine', 'skyyrose' ),
+			__( 'Experience Engine', 'skyyrose' ),
 			'manage_options',
 			'skyyrose-experience',
 			'skyyrose_see_render_dashboard'

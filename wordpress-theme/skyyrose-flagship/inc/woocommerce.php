@@ -234,6 +234,21 @@ function skyyrose_woocommerce_related_products_args( $args ) {
 }
 add_filter( 'woocommerce_output_related_products_args', 'skyyrose_woocommerce_related_products_args' );
 
+/**
+ * Disable the related-products block on single product pages (H4 launch decision).
+ *
+ * Removes the default WooCommerce action that outputs related products under
+ * the summary. Keeps the args filter above intact so the block can be re-enabled
+ * by deleting this remove_action call alone.
+ *
+ * @since 1.4.0
+ * @return void
+ */
+function skyyrose_disable_related_products() {
+	remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+}
+add_action( 'init', 'skyyrose_disable_related_products' );
+
 /*
 --------------------------------------------------------------
  * Cross-Sells

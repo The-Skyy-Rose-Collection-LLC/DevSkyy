@@ -194,7 +194,7 @@ class SkyyRose_Product_Card_Widget extends \Elementor\Widget_Base {
 				<p class="col-card__desc"><?php echo esc_html( $product['description'] ); ?></p>
 
 				<?php if ( 'yes' === $settings['show_sizes'] && ! empty( $product['sizes'] ) ) : ?>
-					<p style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:2px;color:#8A8A8A;margin-top:8px;">
+					<p style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;letter-spacing:2px;color:#8A8A8A;margin-top:8px;">
 						<?php echo esc_html( str_replace( '|', ' / ', $product['sizes'] ) ); ?>
 					</p>
 				<?php endif; ?>

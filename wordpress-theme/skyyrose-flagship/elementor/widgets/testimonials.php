@@ -172,7 +172,7 @@ class SkyyRose_Testimonials_Widget extends \Elementor\Widget_Base {
 						&ldquo;<?php echo esc_html( $t['quote'] ); ?>&rdquo;
 					</blockquote>
 
-					<cite style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:4px;
+					<cite style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;letter-spacing:4px;
 						text-transform:uppercase;color:#8A8A8A;font-style:normal;">
 						<?php echo esc_html( $t['name'] ); ?>
 					</cite>

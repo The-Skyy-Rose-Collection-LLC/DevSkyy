@@ -18,7 +18,7 @@
     
     /* Typography Overrides (Using existing brand stack) */
     --font-premium-heading: 'Cinzel', serif;
-    --font-premium-mono: 'Space Mono', monospace;
+    --font-premium-mono: ui-monospace, 'SF Mono', Menlo, monospace;
 }
 
 /* ==========================================================================
