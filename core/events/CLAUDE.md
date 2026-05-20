@@ -41,3 +41,8 @@ await event_bus.publish(ProductCreated(sku="br-001", name="..."))
 
 - `api/v1/products` — emits `ProductCreated` / `ProductUpdated` on writes
 - `core/cqrs` — command handlers publish events; query handlers replay from store
+
+
+<claude-mem-context>
+
+</claude-mem-context>

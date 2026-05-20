@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T21:34:37.573Z
-> Files: 2686 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T21:36:33.329Z
+> Files: 2740 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -287,6 +287,7 @@
 
 - `__init__.py` — Analytics Core Agent — data, trends, conversion intelligence. (~67 tok)
 - `agent.py` — AnalyticsCoreAgent: execute (~1769 tok)
+- `CLAUDE.md` — agents/core/analytics/ — Analytics domain CoreAgent (~688 tok)
 
 ## agents/core/analytics/sub_agents/
 
@@ -294,15 +295,18 @@
 - `algorithm_agent.py` — class: execute, score_products, rank_content (~7126 tok)
 - `analytics_ops.py` — AnalyticsOpsSubAgent: execute (~497 tok)
 - `brand_intel_agent.py` — class: execute, profile_competitor, analyze_price_gaps (~8598 tok)
+- `CLAUDE.md` — agents/core/analytics/sub_agents/ — Analytics sub-agents (~717 tok)
 
 ## agents/core/commerce/
 
 - `__init__.py` — Commerce Core Agent — all revenue-generating operations. (~65 tok)
 - `agent.py` — CommerceCoreAgent: execute (~1557 tok)
+- `CLAUDE.md` — agents/core/commerce/ — Commerce domain CoreAgent (~640 tok)
 
 ## agents/core/commerce/sub_agents/
 
 - `__init__.py` — Commerce sub-agents: product, pricing, inventory, orders, WordPress bridge. (~24 tok)
+- `CLAUDE.md` — agents/core/commerce/sub_agents/ — Commerce sub-agents (~619 tok)
 - `product_ops.py` — ProductOpsSubAgent: execute (~563 tok)
 - `wordpress_assets.py` — WordPressAssetsSubAgent: execute (~369 tok)
 - `wordpress_bridge.py` — WordPressBridgeSubAgent: execute (~396 tok)
@@ -311,10 +315,12 @@
 
 - `__init__.py` — Content Core Agent — pages, products, blogs, SEO copy. (~63 tok)
 - `agent.py` — ContentCoreAgent: execute (~1356 tok)
+- `CLAUDE.md` — agents/core/content/ — Content domain CoreAgent (~628 tok)
 
 ## agents/core/content/sub_agents/
 
 - `__init__.py` — Content sub-agents: collection content, SEO, copywriter. (~18 tok)
+- `CLAUDE.md` — agents/core/content/sub_agents/ — Content sub-agents (~685 tok)
 - `collection_content.py` — CollectionContentSubAgent: execute (~400 tok)
 - `seo_copywriter.py` — SeoCopywriterSubAgent: execute (~488 tok)
 
@@ -322,11 +328,13 @@
 
 - `__init__.py` — Creative Core Agent — visual identity, design system, brand enforcement. (~69 tok)
 - `agent.py` — CreativeCoreAgent: execute (~1021 tok)
+- `CLAUDE.md` — agents/core/creative/ — Creative domain CoreAgent (~579 tok)
 
 ## agents/core/creative/sub_agents/
 
 - `__init__.py` — Creative sub-agents: design system, brand guardian, asset generator, QA. (~23 tok)
 - `brand_creative.py` — BrandCreativeSubAgent: execute (~540 tok)
+- `CLAUDE.md` — agents/core/creative/sub_agents/ — Creative sub-agents (~669 tok)
 
 ## agents/core/imagery/
 
@@ -348,6 +356,7 @@
 
 - `__init__.py` — Marketing Core Agent — campaigns, social, audience growth. (~66 tok)
 - `agent.py` — MarketingCoreAgent: execute (~1181 tok)
+- `CLAUDE.md` — agents/core/marketing/ — Marketing domain CoreAgent (~627 tok)
 
 ## agents/core/marketing/sub_agents/
 
@@ -360,10 +369,12 @@
 
 - `__init__.py` — Operations Core Agent — deploy, security, health, code quality. (~68 tok)
 - `agent.py` — OperationsCoreAgent: execute (~1652 tok)
+- `CLAUDE.md` — agents/core/operations/ — Operations domain CoreAgent (~704 tok)
 
 ## agents/core/operations/sub_agents/
 
 - `__init__.py` — Operations sub-agents: deployment, security monitor, health checker, coding doctor. (~26 tok)
+- `CLAUDE.md` — agents/core/operations/sub_agents/ — Operations sub-agents (~711 tok)
 - `coding_doctor.py` — CodingDoctorSubAgent: execute (~370 tok)
 - `deploy_health.py` — DeployHealthSubAgent: execute (~451 tok)
 - `security_monitor.py` — SecurityMonitorSubAgent: execute (~385 tok)
@@ -371,17 +382,24 @@
 ## agents/core/shared/
 
 - `__init__.py` — Shared capabilities available to all core agents. (~44 tok)
+- `CLAUDE.md` — agents/core/shared/ — Shared cross-domain infrastructure (~508 tok)
 - `wp_ai_bridge.py` — WordPressAIBridge: generate_text, generate_image, provider_status, list_models + 4 more (~3806 tok)
 
 ## agents/core/web_builder/
 
 - `__init__.py` — Web Builder Core Agent — theme generation, deployment, platform adapters. (~71 tok)
 - `agent.py` — WebBuilderCoreAgent: execute (~1670 tok)
+- `CLAUDE.md` — agents/core/web_builder/ — Web Builder domain CoreAgent (~641 tok)
 
 ## agents/core/web_builder/sub_agents/
 
 - `__init__.py` — Web Builder sub-agents: frontend dev, backend dev, accessibility, performance, platform adapter. (~30 tok)
+- `CLAUDE.md` — agents/core/web_builder/sub_agents/ — Web Builder sub-agents (~707 tok)
 - `web_dev.py` — WebDevSubAgent: execute (~662 tok)
+
+## agents/devskyy-a2a/
+
+- `CLAUDE.md` — agents/devskyy-a2a/ — Agent-to-Agent (A2A) framework placeholder (~309 tok)
 
 ## agents/elite_web_builder/
 
@@ -401,6 +419,7 @@
 - `accessibility.py` — Accessibility Agent — WCAG 2.2 AA/AAA, contrast, ARIA, keyboard nav. (~640 tok)
 - `backend_dev.py` — Backend Dev Agent — PHP, Python, Node.js, databases, APIs, WooCommerce. (~860 tok)
 - `base.py` — for: build_prompt (~610 tok)
+- `CLAUDE.md` — agents/elite_web_builder/agents/ — Elite Web Builder specialist agents (~964 tok)
 - `competitor_scout.py` — Competitor Scout Agent — Ad teardown + blueprint synthesis for SkyyRose. (~2043 tok)
 - `design_system.py` — Design System Agent — color palettes, typography, spacing, design tokens. (~702 tok)
 - `ecommerce_photography.py` — Ecommerce Photography Agent — Photography director for the SkyyRose brand. (~1861 tok)
@@ -417,6 +436,7 @@
 
 ## agents/elite_web_builder/config/
 
+- `CLAUDE.md` — agents/elite_web_builder/config/ — Elite Web Builder runtime configuration (~637 tok)
 - `learning_journal.json` (~60 tok)
 - `provider_routing.json` (~264 tok)
 - `quality_gates.json` (~520 tok)
@@ -424,6 +444,7 @@
 ## agents/elite_web_builder/core/
 
 - `__init__.py` — Core infrastructure for Elite Web Builder. (~14 tok)
+- `CLAUDE.md` — agents/elite_web_builder/core/ — Elite Web Builder shared infrastructure (~1017 tok)
 - `cost_tracker.py` — from: records, total_cost, total_input_tokens, total_output_tokens + 5 more (~1599 tok)
 - `gate_checkers.py` — check_build, check_lint, check_security, check_diff (~5429 tok)
 - `ground_truth.py` — URL configuration (~5885 tok)
@@ -465,6 +486,10 @@
 ## agents/elite_web_builder/output/
 
 - `last_report.json` (~2093 tok)
+
+## agents/elite_web_builder/templates/
+
+- `CLAUDE.md` — agents/elite_web_builder/templates/ — Output scaffold templates (~636 tok)
 
 ## agents/elite_web_builder/templates/shopify/
 
@@ -532,7 +557,12 @@
 
 ## agents/llm_roundtable/ui/
 
+- `CLAUDE.md` — agents/llm_roundtable/ui/ — LLM Round-Table React visualization (~590 tok)
 - `LLMRoundtable.tsx` — @ts-nocheck (~12744 tok)
+
+## agents/product_generation/
+
+- `CLAUDE.md` — agents/product_generation/ — Product generation pipeline placeholder (~324 tok)
 
 ## agents/render_pipeline/
 
@@ -601,6 +631,7 @@
 ## agents/wordpress_theme_builder/
 
 - `agent.ts` — WordPress Theme Builder Agent (~3269 tok)
+- `CLAUDE.md` — agents/wordpress_theme_builder/ — WordPress theme builder (Claude Agent SDK, TypeScript) (~640 tok)
 
 ## ai_3d/
 
@@ -615,12 +646,14 @@
 ## ai_3d/providers/
 
 - `__init__.py` — ai_3d/providers/__init__.py (~174 tok)
+- `CLAUDE.md` (~11 tok)
 - `huggingface.py` — ai_3d/providers/huggingface.py (~4081 tok)
 - `meshy.py` — ai_3d/providers/meshy.py (~6543 tok)
 - `tripo.py` — ai_3d/providers/tripo.py (~4882 tok)
 
 ## alembic/
 
+- `CLAUDE.md` — alembic/ — Database migration management (~627 tok)
 - `env.py` — Alembic environment configuration with async support. (~789 tok)
 - `script.py.mako` (~170 tok)
 
@@ -633,6 +666,7 @@
 ## aos/
 
 - `__init__.py` — AOS — Agentic Operating System. (~60 tok)
+- `CLAUDE.md` — aos/ — Agent Operating System micro-kernel (~531 tok)
 
 ## aos/adapters/
 
@@ -690,6 +724,7 @@
 ## aos/memory/
 
 - `__init__.py` — AOS Memory — namespaced key/value store with TTL and tag-based query index. (~105 tok)
+- `CLAUDE.md` — aos/memory/ — namespaced TTL key/value store per agent PID (~412 tok)
 - `index.py` — AOS MemoryIndex — tag-based filter index over a MemoryStore. (~765 tok)
 - `store.py` — AOS MemoryStore — namespaced key/value store with TTL expiry. (~1434 tok)
 - `types.py` — AOS Memory — entry type and exceptions. (~382 tok)
@@ -697,6 +732,7 @@
 ## aos/modules/
 
 - `__init__.py` — AOS Modules — pluggable capability registration for agent types and tools. (~136 tok)
+- `CLAUDE.md` — aos/modules/ — importlib-based dynamic module loader (~469 tok)
 - `loader.py` — Dynamic module loader — importlib-based loader for AOS module packages. (~409 tok)
 - `registry.py` — ModuleRegistry — pluggable agent-factory store for the AOS kernel. (~1028 tok)
 - `types.py` — AOS module types — manifest and factory type alias. (~211 tok)
@@ -721,6 +757,7 @@
 ## aos/shell/
 
 - `__init__.py` — AOS Shell — interactive REPL over the live Kernel API. (~68 tok)
+- `CLAUDE.md` — aos/shell/ — interactive REPL and command dispatch (~427 tok)
 - `commands.py` — AOS Shell command dispatch — pure async, zero I/O. (~1548 tok)
 - `repl.py` — AOS Shell REPL — thin stdin/stdout loop over execute_command. (~675 tok)
 
@@ -762,15 +799,18 @@
 ## api/graphql/dataloaders/
 
 - `__init__.py` (~71 tok)
+- `CLAUDE.md` — api/graphql/dataloaders/ — N+1 prevention via aiodataloader (~427 tok)
 - `product_loader.py` — ProductDataLoader: get_db_session (~673 tok)
 
 ## api/graphql/resolvers/
 
 - `__init__.py` — GraphQL resolvers (~7 tok)
+- `CLAUDE.md` — api/graphql/resolvers/ — Resolver functions for GraphQL fields (~468 tok)
 - `product_resolver.py` — get_products_from_db (~342 tok)
 
 ## api/image-processing/
 
+- `CLAUDE.md` — api/image-processing/ — Isolated TypeScript image enhancer (legacy spike) (~442 tok)
 - `luxury-enhance.ts` — Enhance product image with luxury aesthetic (~2593 tok)
 
 ## api/v1/
@@ -823,6 +863,7 @@
 ## api/v1/clothing_3d/
 
 - `__init__.py` — FastAPI surface for the clothing 3D pipeline. (~95 tok)
+- `CLAUDE.md` — api/v1/clothing_3d/ — TRELLIS clothing 3D pipeline (sync + async) (~746 tok)
 - `router.py` — FastAPI router for the clothing 3D pipeline. (~3222 tok)
 - `schemas.py` — API schemas — thin Pydantic wrappers over the pipeline models. (~396 tok)
 
@@ -928,6 +969,7 @@
 ## cli/
 
 - `__init__.py` — DevSkyy CLI tools. (~34 tok)
+- `CLAUDE.md` (~11 tok)
 - `mcp_cli.py` — get_orchestrator, status_color, print_json, cli + 12 more (~4942 tok)
 - `prompt_enhance.py` — TaskMode: load_config, get_config, to_dict, main (~10847 tok)
 
@@ -1124,6 +1166,7 @@
 ## core/telemetry/
 
 - `__init__.py` (~26 tok)
+- `CLAUDE.md` (~11 tok)
 - `tracer.py` — _NoOpSpan: my_function, init_telemetry, get_tracer, set_attribute + 4 more (~1246 tok)
 
 ## database/
@@ -1465,6 +1508,7 @@
 
 ## docs/reports/
 
+- `CLAUDE.md` (~11 tok)
 - `COMPLETE_LLM_SETUP_GUIDE.md` — Complete LLM Provider Setup Guide (~1967 tok)
 - `DAST_IMPLEMENTATION_SUMMARY.md` — DAST Implementation Summary - Phase 2 Task 4 (~2746 tok)
 - `DOMAIN_VERIFICATION_REPORT.md` — Track B Phase 4: Domain Verification Report (~3896 tok)
@@ -2139,6 +2183,10 @@
 
 - `model-viewer.d.ts` — Type declarations for @google/model-viewer web component (~310 tok)
 
+## gemini/
+
+- `CLAUDE.md` (~11 tok)
+
 ## graphify-out/
 
 - `.graphify_chunks_plan.json` (~10286 tok)
@@ -2152,6 +2200,7 @@
 ## grpc_server/
 
 - `__init__.py` (~0 tok)
+- `CLAUDE.md` (~11 tok)
 - `product_service.py` — ProductServicer: GetProduct, ListProducts, CreateProduct, UpdateProductPrice + 1 more (~3565 tok)
 
 ## grpc_server/generated/
@@ -2161,6 +2210,10 @@
 ## grpc_server/proto/
 
 - `product.proto` — Proto: messages: ProductResponse, GetProductRequest, ListProductsRequest, services: access, calls, ProductService (~391 tok)
+
+## hf-spaces/
+
+- `CLAUDE.md` — hf-spaces/ — HuggingFace Spaces deployment configs (~501 tok)
 
 ## hf-spaces/virtual-tryon/
 
@@ -2189,6 +2242,10 @@
 - `virtual_photoshoot.py` — imagery/virtual_photoshoot.py (~5766 tok)
 - `visual_comparison.py` — Visual Comparison Engine for Asset Fidelity. (~5666 tok)
 
+## immersive-architect/
+
+- `CLAUDE.md` — immersive-architect/ — Immersive experience design skills (placeholder) (~187 tok)
+
 ## integrations/
 
 - `__init__.py` — SkyyRose Integration Modules (~189 tok)
@@ -2212,6 +2269,7 @@
 ## knowledge-base/lessons/
 
 - `anti-patterns.md` — Anti-Patterns: Confirmed Failure Modes (~5719 tok)
+- `CLAUDE.md` (~11 tok)
 
 ## knowledge-base/prompts/
 
@@ -2335,6 +2393,7 @@
 
 ## models/
 
+- `CLAUDE.md` — models/ — SkyyRose LoRA model registry (~532 tok)
 - `skyyrose-lora-v3-info.json` (~413 tok)
 - `skyyrose-lora-v4-info.json` (~410 tok)
 - `skyyrose-lora-v4-trigger-map.json` (~1384 tok)
@@ -2355,6 +2414,7 @@
 
 - `__init__.py` — monitoring package (~6 tok)
 - `ab_comparison.py` — from: record, report (~1963 tok)
+- `CLAUDE.md` — monitoring/ — DevSkyy MCP observability stack (~661 tok)
 - `elite_studio_metrics.py` — record_job_completed, record_stage_duration, record_cost, record_qc_score + 3 more (~1544 tok)
 - `metrics_server.py` — MetricsHandler: do_GET, serve_metrics, serve_health, serve_status + 3 more (~2368 tok)
 - `prometheus_metrics.py` — record_tool_call, record_error, record_rate_limit_hit, record_llm_tokens + 12 more (~3550 tok)
@@ -2363,6 +2423,7 @@
 
 ## monitoring/grafana/
 
+- `CLAUDE.md` (~11 tok)
 - `devskyy_dashboard.json` (~3824 tok)
 - `elite_studio_dashboard.json` (~2027 tok)
 
@@ -2429,10 +2490,15 @@
 - `agent_prompts.py` — Declares from (~7546 tok)
 - `base_system_prompt.py` — from: to_prompt_section, to_prompt_line, generate (~6052 tok)
 - `chain_orchestrator.py` — ChainStepType: to_dict, to_dict, to_dict, create_workflow (~7192 tok)
+- `CLAUDE.md` — prompts/ — DevSkyy centralized prompt engineering library (~919 tok)
 - `meta_prompts.py` — from: to_prompt_section, create (~7433 tok)
 - `rag_mcp_hybrid.py` — View: get, put (~13423 tok)
 - `task_templates.py` — TaskCategory: to_dict, create_ecommerce_task (~6833 tok)
 - `technique_engine.py` — from: to_prompt, to_prompt, to_prompt, to_prompt + 4 more (~9083 tok)
+
+## public/
+
+- `CLAUDE.md` — public/ — Static assets served by the FastAPI app (~674 tok)
 
 ## public/draco/
 
@@ -3001,6 +3067,7 @@
 
 ## skyyrose-brand-voice/
 
+- `CLAUDE.md` (~11 tok)
 - `training_params.json` (~390 tok)
 
 ## skyyrose/
@@ -3060,6 +3127,10 @@
 - `sharing.js` — SharingManager (~2697 tok)
 - `wishlist.js` — WishlistManager (~1113 tok)
 - `wordpress-client.js` — SkyyRose — WordPressClient (~4671 tok)
+
+## skyyrose/assets/models/
+
+- `CLAUDE.md` (~11 tok)
 
 ## skyyrose/collections/
 
@@ -3456,6 +3527,7 @@
 
 ## tasks/
 
+- `all-skus-prompts.md` — All 33 SKU Prompts (preflight composition, no paid Sonnet L0) (~3400 tok)
 - `catalog-ml-report.json` (~11900 tok)
 - `catalog-ml-report.md` — Catalog ML Audit Report (~1169 tok)
 - `centroid-gate-measurement-analysis.md` — Brand-centroid measurement analysis (2026-05-03) (~1906 tok)
@@ -3692,12 +3764,14 @@
 ## tests/aos/memory/
 
 - `__init__.py` (~0 tok)
+- `CLAUDE.md` (~11 tok)
 - `test_index.py` — Tests for MemoryIndex. (~802 tok)
 - `test_store.py` — Tests for MemoryStore. (~1431 tok)
 
 ## tests/aos/modules/
 
 - `__init__.py` (~0 tok)
+- `CLAUDE.md` (~11 tok)
 - `test_kernel_modules.py` — Integration tests for Kernel module lifecycle methods. (~1365 tok)
 - `test_loader.py` — Tests for the dynamic module loader. (~935 tok)
 - `test_registry.py` — Tests for ModuleRegistry. (~1363 tok)
@@ -3719,6 +3793,7 @@
 ## tests/aos/shell/
 
 - `__init__.py` (~0 tok)
+- `CLAUDE.md` (~11 tok)
 - `test_commands.py` — Tests for AOS shell command dispatch (execute_command). (~1566 tok)
 - `test_repl.py` — Tests for the AosShell REPL I/O layer. (~850 tok)
 
@@ -3751,6 +3826,7 @@
 ## tests/cli/
 
 - `__init__.py` — CLI Tests Package. (~8 tok)
+- `CLAUDE.md` (~11 tok)
 - `test_prompt_enhance_integration.py` — Tests: enhance_with_real_api, code_task_enhancement, debug_task_enhancement, refactor_task_enhancement + 11 more (~3668 tok)
 - `test_prompt_enhance.py` — Tests: analyze_returns_prompt_analysis, detect_code_task_type, detect_debug_task_type, detect_refactor_task_type + 21 more (~7998 tok)
 
@@ -3847,6 +3923,7 @@
 
 ## tests/llm/providers/
 
+- `CLAUDE.md` (~11 tok)
 - `test_deepseek.py` — Tests: deepseek_chat_completion, deepseek_reasoning_model, deepseek_cost_calculation, deepseek_provider_config (~1085 tok)
 - `test_litellm_provider.py` — Tests: provider_model_map_completeness, get_model_string_with_provider, get_model_string_with_override, get_model_string_with_full_model + 13 more (~2669 tok)
 
@@ -3994,6 +4071,7 @@
 
 ## themes/shopify/
 
+- `CLAUDE.md` — themes/shopify/ — SkyyRose Shopify OS 2.0 theme (~767 tok)
 - `README.md` — Project documentation (~916 tok)
 
 ## themes/shopify/assets/
