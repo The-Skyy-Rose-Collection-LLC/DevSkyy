@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T03:59:08.243Z
-> Files: 2645 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T04:47:49.355Z
+> Files: 2659 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -907,7 +907,7 @@
 ## billing/
 
 - `__init__.py` (~307 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — billing/ — Multi-Tier SaaS Billing (~1640 tok)
 - `entitlements.py` — EntitlementResult: check, get_upgrade_message (~1530 tok)
 - `metering.py` — UsageMetering: record, get_usage, get_all_usage, check_quota + 1 more (~2327 tok)
 - `middleware.py` — billing_middleware (~1538 tok)
@@ -993,7 +993,7 @@
 ## core/
 
 - `__init__.py` (~384 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — core/ — Foundation Layer (~714 tok)
 - `performance.py` — View: get (~4602 tok)
 - `product_spec.py` — Unified product specification — single source of truth for all pipelines. (~1639 tok)
 - `redis_cache.py` — RedisConfig: connect, disconnect, get_llm_response, set_llm_response + 1 more (~2134 tok)
@@ -1004,13 +1004,13 @@
 ## core/agents/
 
 - `__init__.py` — Core agent interfaces. (~47 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — core/agents/ — Agent Interfaces (~423 tok)
 - `interfaces.py` — IAgent: execute, initialize, get_capabilities, execute_auto + 5 more (~981 tok)
 
 ## core/auth/
 
 - `__init__.py` (~542 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — core/auth/ — Auth Types & Interfaces (~457 tok)
 - `interfaces.py` — ITokenValidator: validate_token, validate_token, is_token_revoked, authenticate + 15 more (~2126 tok)
 - `models.py` — Pydantic: AuthCredentials (43 fields) (~1793 tok)
 - `role_hierarchy.py` — get_role_level, is_role_at_least, has_required_role, get_minimum_required_level + 2 more (~1149 tok)
@@ -1020,13 +1020,13 @@
 ## core/caching/
 
 - `__init__.py` (~65 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — core/caching/ — Multi-Tier Cache (~451 tok)
 - `multi_tier_cache.py` — View: get (~2849 tok)
 
 ## core/cqrs/
 
 - `__init__.py` (~110 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — core/cqrs/ — Command Query Responsibility Segregation (~397 tok)
 - `command_bus.py` — class: register_handler, execute, create_product_handler (~1704 tok)
 - `query_bus.py` — class: register_handler, execute (~659 tok)
 
@@ -1038,7 +1038,7 @@
 ## core/events/
 
 - `__init__.py` (~85 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — core/events/ — Event Sourcing Infrastructure (~444 tok)
 - `event_bus.py` — EventBus: subscribe, publish, get_dead_letters, clear_dead_letters (~745 tok)
 - `event_handlers.py` — ProductEventHandler: handle, subscribe (~2366 tok)
 - `event_store.py` — Event: apply_event, append, get_events, replay (~2557 tok)
@@ -1046,25 +1046,25 @@
 ## core/feature_flags/
 
 - `__init__.py` (~41 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — core/feature_flags/ — Runtime Feature Flags (~315 tok)
 - `flag_manager.py` — class: create_flag, set_flag, get_flag, get_all_flags + 8 more (~4559 tok)
 
 ## core/llm/
 
 - `__init__.py` (~442 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — core/llm/ — Hexagonal LLM Layer (~571 tok)
 
 ## core/llm/domain/
 
 - `__init__.py` — LLM Domain Layer. (~245 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — core/llm/domain/ — LLM Domain Layer (~399 tok)
 - `models.py` — Pydantic: LLMCapabilities (31 fields) (~1016 tok)
 - `ports.py` — ILLMProvider: complete, stream, connect, close + 5 more (~1156 tok)
 
 ## core/llm/infrastructure/
 
 - `__init__.py` (~109 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — core/llm/infrastructure/ — Provider Factory (~406 tok)
 - `provider_factory.py` — ProviderFactory: create_provider, get_or_create_provider, get_capabilities, list_providers + 2 more (~2222 tok)
 
 ## core/llm/providers/
@@ -1078,13 +1078,13 @@
 ## core/middleware/
 
 - `__init__.py` (~52 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — core/middleware/ — FastAPI ASGI Middleware (~275 tok)
 - `tenant.py` — tenant_middleware (~1186 tok)
 
 ## core/registry/
 
 - `__init__.py` (~161 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — core/registry/ — Service Registry (DI Container) (~490 tok)
 - `registrations.py` — View: get, delete (~1786 tok)
 - `service_registry.py` — View: get, get (~1961 tok)
 
@@ -1113,7 +1113,7 @@
 ## database/
 
 - `__init__.py` — API: GET (1 endpoints) (~301 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — database/ — Async SQLAlchemy 2.0 Layer (~1630 tok)
 - `db.py` — SQLAlchemy: DatabaseConfig (users) (~7008 tok)
 - `indexes.sql` — Performance Indexes for DevSkyy (~643 tok)
 - `query_optimizer.py` — QueryOptimizer: optimize_product_query, explain_query, detect_n_plus_one_risk, get_index_recommendations (~1690 tok)
@@ -1123,7 +1123,7 @@
 ## database/models/
 
 - `__init__.py` (~59 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — database/models/ — Per-Model File Split (Multi-Tenancy) (~1055 tok)
 - `tenant_user.py` — SQLAlchemy: TenantUser (tenant_users) (~452 tok)
 - `tenant.py` — SQLAlchemy: Tenant (tenants) (~671 tok)
 
@@ -2389,10 +2389,12 @@
 ## pipelines/
 
 - `__init__.py` — Cross-service orchestration pipelines. (~106 tok)
+- `CLAUDE.md` — pipelines/ — Cross-Service Orchestration (~627 tok)
 
 ## pipelines/clothing_3d/
 
 - `__init__.py` — Clothing 3D pipeline. (~766 tok)
+- `CLAUDE.md` — pipelines/clothing_3d/ — Clothing 3D Pipeline (~1382 tok)
 - `cli.py` — CLI entry point for the clothing 3D pipeline. (~2420 tok)
 - `events.py` — Pipeline event bus. (~1334 tok)
 - `job_store.py` — Persistent job state for the clothing 3D pipeline. (~3100 tok)
@@ -2440,6 +2442,7 @@
 - `ai_templates.py` — Embedded HF Space templates for AI CLI. (~1475 tok)
 - `ai.py` — Unified AI CLI for SkyyRose — training, datasets, Spaces, models. (~2618 tok)
 - `anatomy_filter_main.py` — Filter .wolf/anatomy.md to entries tracked on git main. (~1127 tok)
+- `approve_ghost.py` — approve-ghost {sku} — move reviewed image to approved/ and update CSV. (~553 tok)
 - `audit_dossier_coverage.py` — Audit dossier completeness across every active SKU in the canonical CSV. (~1722 tok)
 - `audit_golden_coverage.py` — Audit golden-reference coverage across every active SKU. (~1557 tok)
 - `audit_prompts.py` — Audit nano-banana prompts against real product images. (~2365 tok)
@@ -2569,6 +2572,7 @@
 - `regen_masks.py` — Re-derive Stage 2 decoration masks for specific SKUs using fixed MaskDeriver. (~681 tok)
 - `regen_phase_e_manifest_auto.py` — Regenerate the auto-region of tasks/phase-e-manifest.md from code state. (~4420 tok)
 - `regenerate_centroid_sidecars.py` — Backfill JSON sidecars for existing brand centroid .npz files. (~620 tok)
+- `reject_ghost.py` — reject-ghost {sku} "{reason}" — log rejection; leave file; no CSV change. (~536 tok)
 - `render_deploy_checklist.sh` — Render Deployment Pre-Flight Checklist (~3030 tok)
 - `render_env_generator.py` — Colors: generate_jwt_secret, generate_encryption_key, generate_api_key, parse_env_file + 4 more (~4121 tok)
 - `render_professional.py` — setup_luxury_render_settings, clear_scene, import_product, setup_3point_lighting + 2 more (~846 tok)
@@ -2879,7 +2883,7 @@
 - `__init__.py` — services/__init__.py (~258 tok)
 - `ai_image_enhancement.py` — LuxuryImageEnhancer: remove_background, upscale_image, generate_product_image, interrogate_image + 4 more (~3204 tok)
 - `approval_queue_manager.py` — Approval queue manager for WordPress media sync. (~6631 tok)
-- `CLAUDE.md` — services/ — internal service layer (45 Python files) (~422 tok)
+- `CLAUDE.md` — services/ — Internal Service Layer (52 Python files) (~986 tok)
 - `image_deduplication.py` — Image deduplication service using content hashing. (~2915 tok)
 - `image_ingestion.py` — Image ingestion service for downloading and processing images. (~5314 tok)
 - `rag_anything_service.py` — class: llm_model_func, initialize, ingest_document, query + 1 more (~4056 tok)
@@ -2889,19 +2893,21 @@
 - `__init__.py` — Analytics services for DevSkyy admin dashboard. (~611 tok)
 - `alert_engine.py` — services/analytics/alert_engine.py (~6168 tok)
 - `alert_notifier.py` — services/analytics/alert_notifier.py (~8453 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — services/analytics/ — Admin Dashboard Analytics (~594 tok)
 - `event_collector.py` — services/analytics/event_collector.py (~4603 tok)
 - `rollup_scheduler.py` — services/analytics/rollup_scheduler.py (~7248 tok)
 
 ## services/competitive/
 
 - `__init__.py` — Competitive analysis services. (~316 tok)
+- `CLAUDE.md` — services/competitive/ — Competitor Asset Analysis (~467 tok)
 - `competitor_analysis.py` — Competitor analysis service for brand intelligence. (~4096 tok)
 - `schemas.py` — Schema definitions for competitor asset analysis. (~2228 tok)
 
 ## services/ml/
 
 - `__init__.py` — services/ml/__init__.py (~864 tok)
+- `CLAUDE.md` — services/ml/ — ML Service Clients & Orchestration (~737 tok)
 - `gemini_client.py` — Gemini API Client for DevSkyy. (~7881 tok)
 - `image_description_pipeline.py` — Image-to-description pipeline using vision models. (~5883 tok)
 - `pipeline_orchestrator.py` — services/ml/pipeline_orchestrator.py (~6008 tok)
@@ -2915,6 +2921,7 @@
 - `__init__.py` — services/ml/enhancement/__init__.py (~501 tok)
 - `authenticity_validator.py` — services/ml/enhancement/authenticity_validator.py (~4538 tok)
 - `background_removal.py` — services/ml/enhancement/background_removal.py (~3472 tok)
+- `CLAUDE.md` — services/ml/enhancement/ — Image Enhancement Pipeline (~594 tok)
 - `format_optimizer.py` — services/ml/enhancement/format_optimizer.py (~4916 tok)
 - `lighting_normalization.py` — services/ml/enhancement/lighting_normalization.py (~4456 tok)
 - `upscaling.py` — services/ml/enhancement/upscaling.py (~3878 tok)
@@ -2922,21 +2929,25 @@
 ## services/ml/prompts/
 
 - `__init__.py` — ML prompts package. (~136 tok)
+- `CLAUDE.md` — services/ml/prompts/ — Vision Model Prompt Templates (~442 tok)
 - `vision_prompts.py` — Vision model prompts for image-to-description pipeline. (~2292 tok)
 
 ## services/ml/schemas/
 
 - `__init__.py` — ML schema definitions. (~122 tok)
+- `CLAUDE.md` — services/ml/schemas/ — ML Pipeline Schemas (~403 tok)
 - `description.py` — Schema definitions for image-to-description pipeline. (~2154 tok)
 
 ## services/notifications/
 
 - `__init__.py` — Notification services package. (~125 tok)
+- `CLAUDE.md` — services/notifications/ — Notification Services (~421 tok)
 - `email_notifications.py` — Email notification service for approval workflow. (~5790 tok)
 
 ## services/storage/
 
 - `__init__.py` — services/storage/__init__.py (~408 tok)
+- `CLAUDE.md` — services/storage/ — Asset Storage & Versioning (~502 tok)
 - `r2_client.py` — services/storage/r2_client.py (~7031 tok)
 - `schemas.py` — Storage schemas for asset versioning. (~1860 tok)
 - `version_manager.py` — Asset Version Manager Service. (~6894 tok)
@@ -2944,7 +2955,7 @@
 ## services/three_d/
 
 - `__init__.py` — 3D Generation Provider Abstraction Layer. (~404 tok)
-- `CLAUDE.md` — Recent Activity (~75 tok)
+- `CLAUDE.md` — services/three_d/ — 3D Provider Abstraction (US-017) (~675 tok)
 - `gemini_provider.py` — Gemini Image Generation Provider (Nano Banana Pro). (~4333 tok)
 - `huggingface_provider.py` — HuggingFace 3D Provider Adapter. (~5254 tok)
 - `provider_factory.py` — 3D Provider Factory with Failover Support. (~5438 tok)
@@ -2955,6 +2966,7 @@
 ## services/three_d/trellis/
 
 - `__init__.py` — TRELLIS — Microsoft's Structured 3D Latents pipeline for clothing. (~576 tok)
+- `CLAUDE.md` — services/three_d/trellis/ — TRELLIS Clothing 3D Pipeline (~646 tok)
 - `client.py` — TRELLIS transport clients. (~5947 tok)
 - `config.py` — TRELLIS configuration. (~2492 tok)
 - `garment_aware.py` — Garment-aware knowledge & prompt construction. (~4366 tok)
@@ -3041,6 +3053,7 @@
 - `dossier_loader.py` — Per-product design dossier loader — shared by all four catalog readers. (~2119 tok)
 - `dossier_schema.py` — Pydantic schema for per-product design dossiers. (~3480 tok)
 - `env_loader.py` — Project-wide dotenv loader for the SkyyRose agent stack. (~581 tok)
+- `review.py` — Ghost-mannequin review and approval — atomic CSV writes, audit logs. (~3047 tok)
 
 ## skyyrose/core/memory/
 
@@ -3556,6 +3569,7 @@
 - `test_reference_manager.py` — Tests: reference_image_valid_weight, reference_image_weight_too_low_raises_error, reference_image_weight_too_high_raises_error, reference_image_edg... (~7159 tok)
 - `test_renders_config.py` — Smoke tests for renders/config.py — import guard and PRODUCT_CATALOG shape (INFRA-03). (~570 tok)
 - `test_responsive_tokens.py` — Tests: tokens_css_exists, clamp_token_count, clamp_tokens_three_args, clamp_min_floor + 6 more (~2948 tok)
+- `test_review.py` — Phase 17 — review CLI tests (REV-01..04). (~5748 tok)
 - `test_round_table.py` — Tests for LLM Round Table competition system with tool calling support. (~4763 tok)
 - `test_runtime.py` — Tests: singleton, register_tool, get_registered_tool, nonexistent_tool + 9 more (~1853 tok)
 - `test_saas_infrastructure.py` — Tests: frozen_dataclass_immutable, all_tiers_present, free_tier_renders_limit, starter_tier_renders_limit + 37 more (~8108 tok)
