@@ -15,7 +15,8 @@ defined( 'ABSPATH' ) || exit;
 get_header();
 ?>
 
-<div class="lp" data-collection="black-rose">
+<main id="primary" class="lp" data-collection="black-rose" role="main" tabindex="-1">
+	<h1 class="screen-reader-text"><?php esc_html_e( 'Black Rose Collection — Dark elegance from Oakland', 'skyyrose' ); ?></h1>
 
 	<?php
 	/*
@@ -300,6 +301,6 @@ get_header();
 		</div>
 	</section>
 
-</div><!-- /.lp -->
+</main><!-- /.lp -->
 
 <?php get_footer(); ?>

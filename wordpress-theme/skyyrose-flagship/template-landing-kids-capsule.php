@@ -18,7 +18,8 @@ defined( 'ABSPATH' ) || exit;
 get_header();
 ?>
 
-<div class="lp" data-collection="kids-capsule">
+<main id="primary" class="lp" data-collection="kids-capsule" role="main" tabindex="-1">
+	<h1 class="screen-reader-text"><?php esc_html_e( 'Kids Capsule Collection — luxury runs in the family', 'skyyrose' ); ?></h1>
 
 	<?php
 	/*
@@ -298,6 +299,6 @@ get_header();
 		</div>
 	</section>
 
-</div><!-- /.lp -->
+</main><!-- /.lp -->
 
 <?php get_footer(); ?>

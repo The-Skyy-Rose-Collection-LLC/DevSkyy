@@ -247,7 +247,11 @@ add_filter( 'woocommerce_output_related_products_args', 'skyyrose_woocommerce_re
 function skyyrose_disable_related_products() {
 	remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
 }
-add_action( 'init', 'skyyrose_disable_related_products' );
+// Hook on `wp` (after all plugins have bootstrapped) so the remove_action
+// fires AFTER WooCommerce has registered the action. Hooking on `init`
+// worked in practice but relied on ordering assumptions — `wp` is the
+// canonical safe choice for conditional remove_action on WC template hooks.
+add_action( 'wp', 'skyyrose_disable_related_products' );
 
 /*
 --------------------------------------------------------------

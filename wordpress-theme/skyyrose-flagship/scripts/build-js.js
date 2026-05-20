@@ -30,16 +30,15 @@ async function main() {
 		const dest = path.join(SRC_DIR, `${base}.min.js`);
 		const code = fs.readFileSync(src, 'utf8');
 		try {
+			// No sourceMap — source maps would expose full unminified JS source on
+			// production via the sourceMappingURL comment. Defenders should not have
+			// to think about whether maps shipped or not; the safe default is off.
 			const result = await minify(code, {
 				compress: { passes: 2 },
 				mangle: true,
 				format: { comments: false },
-				sourceMap: { filename: `${base}.min.js`, url: `${base}.min.js.map` },
 			});
 			fs.writeFileSync(dest, result.code, 'utf8');
-			if (result.map) {
-				fs.writeFileSync(`${dest}.map`, result.map, 'utf8');
-			}
 			built += 1;
 			console.log(`  ✓ ${base}.js → ${base}.min.js  (${code.length} → ${result.code.length} bytes)`);
 		} catch (err) {

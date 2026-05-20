@@ -16,7 +16,8 @@ defined( 'ABSPATH' ) || exit;
 get_header();
 ?>
 
-<div class="lp" data-collection="love-hurts">
+<main id="primary" class="lp" data-collection="love-hurts" role="main" tabindex="-1">
+	<h1 class="screen-reader-text"><?php esc_html_e( 'Love Hurts Collection — the Hurts bloodline', 'skyyrose' ); ?></h1>
 
 	<?php
 	/* ───── 1. Hero ───── */
@@ -226,19 +227,20 @@ get_header();
 				<?php echo esc_html( 'Every release tells a chapter. Don\'t miss yours.' ); ?>
 			</p>
 			<form class="lp-cta__form lp-rv" data-delay="2" action="#" method="post">
+				<label class="screen-reader-text" for="lh-lp-email"><?php esc_html_e( 'Email address', 'skyyrose' ); ?></label>
 				<input class="lp-cta__input"
+						id="lh-lp-email"
 						type="email"
 						name="email"
-						placeholder="Your email"
+						placeholder="<?php esc_attr_e( 'Your email', 'skyyrose' ); ?>"
 						required
-						autocomplete="email"
-						aria-label="Email address">
-				<button class="lp-cta__submit" type="submit"><?php echo esc_html( 'Join' ); ?></button>
+						autocomplete="email">
+				<button class="lp-cta__submit" type="submit"><?php echo esc_html__( 'Join', 'skyyrose' ); ?></button>
 			</form>
 			<p class="lp-cta__note lp-rv" data-delay="3"><?php echo esc_html( 'Join 12,400+ members' ); ?></p>
 		</div>
 	</section>
 
-</div><!-- .lp -->
+</main><!-- .lp -->
 
 <?php get_footer(); ?>

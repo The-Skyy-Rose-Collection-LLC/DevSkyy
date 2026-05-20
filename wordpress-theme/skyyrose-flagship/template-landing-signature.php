@@ -15,7 +15,8 @@ defined( 'ABSPATH' ) || exit;
 get_header();
 ?>
 
-<div class="lp" data-collection="signature">
+<main id="primary" class="lp" data-collection="signature" role="main" tabindex="-1">
+	<h1 class="screen-reader-text"><?php esc_html_e( 'Signature Collection — the foundation', 'skyyrose' ); ?></h1>
 
 	<?php
 	/* ── 1. Hero ─────────────────────────────────────────────────── */
@@ -256,6 +257,6 @@ get_header();
 		</div>
 	</section>
 
-</div><!-- .lp -->
+</main><!-- .lp -->
 
 <?php get_footer(); ?>

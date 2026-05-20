@@ -50,7 +50,7 @@ $index = (int) ( $args['index'] ?? 0 );
 
 	<div class="holo__body">
 		<div class="holo__gallery">
-			<a href="<?php echo esc_url( $permalink ); ?>" class="holo__img-link">
+			<a href="<?php echo esc_url( $permalink ); ?>" class="holo__img-link" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'View %s', 'skyyrose' ), $title ) ); ?>">
 				<img class="holo__img holo__img--front" src="<?php echo esc_url( $front_url ); ?>" alt="<?php echo esc_attr( $title ); ?>" loading="lazy">
 				<img class="holo__img holo__img--back" src="<?php echo esc_url( $back_url ); ?>" alt="<?php echo esc_attr( $title . ' — technical blueprint view' ); ?>" loading="lazy">
 			</a>
