@@ -163,6 +163,12 @@ function skyyrose_see_register_rest_routes(): void {
  * Permission Callbacks
  *--------------------------------------------------------------*/
 
+/**
+ * Permission callback: restrict admin-only REST endpoints to users with
+ * `manage_options` capability.
+ *
+ * @return bool True if current user can manage options.
+ */
 function skyyrose_see_rest_admin_check(): bool {
 	return current_user_can( 'manage_options' );
 }

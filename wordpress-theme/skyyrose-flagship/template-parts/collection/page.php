@@ -64,8 +64,8 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 			$hero_bg_base = isset( $c['hero_bg_base'] ) ? (string) $c['hero_bg_base'] : '';
 			$hero_srcset  = '';
 			if ( '' !== $hero_bg_base ) {
-				$widths   = array( 480, 768, 1280, 1680 );
-				$entries  = array();
+				$widths  = array( 480, 768, 1280, 1680 );
+				$entries = array();
 				foreach ( $widths as $w ) {
 					$entries[] = esc_url( SKYYROSE_ASSETS_URI . $hero_bg_base . '-' . $w . 'w.webp' ) . ' ' . $w . 'w';
 				}
@@ -74,7 +74,10 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 			?>
 			<div class="col-hero__bg parallax-ken-burns">
 				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $c['hero_bg'] . '?v=' . SKYYROSE_VERSION ); ?>"
-					<?php if ( '' !== $hero_srcset ) : ?>srcset="<?php echo esc_attr( $hero_srcset ); ?>" sizes="100vw"<?php endif; ?>
+					<?php
+					if ( '' !== $hero_srcset ) :
+						?>
+						srcset="<?php echo esc_attr( $hero_srcset ); ?>" sizes="100vw"<?php endif; ?>
 					alt="<?php echo esc_attr( $c['hero_bg_alt'] ); ?>"
 					loading="eager" fetchpriority="high" decoding="async" width="1680" height="720">
 			</div>

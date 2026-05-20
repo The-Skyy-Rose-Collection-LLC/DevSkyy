@@ -60,7 +60,9 @@ function skyyrose_coming_soon_should_bypass() {
 	// e.g. https://skyyrose.co/?preview=coming-soon (always allowed) OR
 	// ?bypass-coming-soon=<token> (token must match COMING_SOON_BYPASS_TOKEN
 	// constant if defined; otherwise this branch is inert).
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only query check; auth via hash_equals against server-side token constant.
 	if ( isset( $_GET['bypass-coming-soon'] ) && defined( 'SKYYROSE_COMING_SOON_BYPASS_TOKEN' ) ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- same as above.
 		$token = sanitize_text_field( wp_unslash( $_GET['bypass-coming-soon'] ) );
 		if ( hash_equals( (string) SKYYROSE_COMING_SOON_BYPASS_TOKEN, $token ) ) {
 			return true;
@@ -117,6 +119,7 @@ function skyyrose_coming_soon_hide_admin_bar() {
 	if ( ! skyyrose_is_coming_soon_active() ) {
 		return;
 	}
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only query check, no state mutation; just toggles admin bar visibility.
 	if ( isset( $_GET['preview'] ) && 'coming-soon' === sanitize_key( wp_unslash( $_GET['preview'] ) ) ) {
 		add_filter( 'show_admin_bar', '__return_false' );
 	}

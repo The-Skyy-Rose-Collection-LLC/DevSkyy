@@ -8,11 +8,20 @@
  *
  * No PII is stored — events are keyed by anonymous visitor hash.
  *
- * @package SkyyRose_Flagship
+ * @package SkyyRose
  * @since   6.5.0
  */
 
 defined( 'ABSPATH' ) || exit;
+
+// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+//
+// Justification: every query in this file uses `{$table}` interpolation only
+// for the table name (`$wpdb->prefix . 'skyyrose_analytics'`). The prefix is
+// server-controlled and the suffix is a hardcoded literal — never sourced from
+// user input. All variable VALUES inside each query use proper `%s`/`%d`/`%f`
+// placeholders inside `$wpdb->prepare()`. This is the standard WordPress idiom
+// for table names; `%i` would be cleaner but requires WP ≥ 6.2 unconditionally.
 
 /*
 --------------------------------------------------------------
