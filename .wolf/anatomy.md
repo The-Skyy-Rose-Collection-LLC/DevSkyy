@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T21:28:22.422Z
-> Files: 2681 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T21:34:37.573Z
+> Files: 2686 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -9,7 +9,7 @@
 - `.dockerignore` — Docker ignore rules (~122 tok)
 - `.eslintrc.cjs` — ESLint configuration (~954 tok)
 - `.gitattributes` — Git attributes (~70 tok)
-- `.gitignore` — Git ignore rules (~2063 tok)
+- `.gitignore` — Git ignore rules (~2072 tok)
 - `.gitignore.pre-optimize-20260424-190053` — /*.min.js (~1580 tok)
 - `.impeccable.md` — Design Context (~487 tok)
 - `.markdownlint.json` (~57 tok)
@@ -2707,6 +2707,14 @@
 - `gallery_builder.py` — from: to_dict, build_galleries_from_clusters, save_galleries, generate_woocommerce_import + 1 more (~2089 tok)
 - `similarity_matcher.py` — from: compute_similarity_matrix, find_duplicates, find_variants, cluster_products + 1 more (~2862 tok)
 
+## scripts/devworkflows/
+
+- `CLAUDE.md` (~11 tok)
+- `review.sh` — Parallel lint review of changed files — ruff | tsc | phpcs (~1293 tok)
+- `security.sh` — Parallel security gate on changed files — bandit | secret scan | npm audit (~1806 tok)
+- `ship.sh` — Ship gate — composite pre-push gate. Fail-fast: cheap stages first. (~1112 tok)
+- `tdd.sh` — TDD gate — RED / GREEN / coverage enforcement via pytest (~1096 tok)
+
 ## scripts/image_embeddings/
 
 - `__init__.py` (~126 tok)
@@ -3659,9 +3667,9 @@
 
 - `__init__.py` — Tests for the AOS self-healing layer. (~13 tok)
 - `CLAUDE.md` (~11 tok)
-- `test_circuit_breaker.py` — Tests for CircuitBreaker state machine. (~1003 tok)
+- `test_circuit_breaker.py` — Tests for CircuitBreaker state machine. (~998 tok)
 - `test_director.py` — Tests for HealingDirector.decide(). (~1040 tok)
-- `test_policy.py` — Tests for per-FailureCategory retry policies. (~756 tok)
+- `test_policy.py` — Tests for per-FailureCategory retry policies. (~752 tok)
 - `test_types.py` — Tests for AOS healing types — HealAction, RetryConfig, HealDecision. (~505 tok)
 
 ## tests/aos/ipc/
