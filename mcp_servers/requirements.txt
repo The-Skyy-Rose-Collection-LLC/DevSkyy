@@ -44,7 +44,7 @@ backoff==2.2.1
 ratelimit==2.2.1
 
 # Security
-cryptography==46.0.5
+cryptography==48.0.0
 pyjwt==2.12.1
 
 # Database (lightweight for MCP)
