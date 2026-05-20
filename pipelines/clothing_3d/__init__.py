@@ -70,6 +70,14 @@ from pipelines.clothing_3d.reliability import (
     RetryPolicy,
     request_fingerprint,
 )
+from pipelines.clothing_3d.runtime import (
+    PipelineRuntime,
+    configure,
+    generate,
+    get_runtime,
+    preflight,
+    reset_runtime,
+)
 from pipelines.clothing_3d.storage import (
     ArtifactBundle,
     ArtifactStore,
@@ -97,6 +105,7 @@ __all__ = [
     "PipelineQualityReport",
     "PipelineRequest",
     "PipelineResult",
+    "PipelineRuntime",
     "PipelineStage",
     "PipelineStatus",
     "PipelineWorker",
@@ -108,9 +117,14 @@ __all__ = [
     "StageReport",
     "build_job_store",
     "build_queue",
+    "configure",
     "configure_logging",
+    "generate",
     "get_metrics",
+    "get_runtime",
     "metrics_event_subscriber",
+    "preflight",
     "render_metrics",
     "request_fingerprint",
+    "reset_runtime",
 ]

@@ -252,5 +252,39 @@ asyncio.run(main())
 PY
 pass "worker round-trip"
 
+# ─── 8. One-call generate() entry point ──────────────────────────────────
+"$PY" - <<'PY' || fail "generate()" "one-call entry point broken"
+import asyncio, os, pathlib
+from PIL import Image
+from pipelines.clothing_3d import generate, preflight, reset_runtime, PipelineStatus
+
+async def main():
+    img = pathlib.Path(os.environ["TRELLIS_CACHE_DIR"]) / "smoke_runtime.png"
+    Image.new("RGB", (520, 700), (210, 210, 210)).save(img)
+
+    report = await preflight()
+    assert "ready" in report, "preflight should expose ready key"
+    assert "config" in report, "preflight should report config"
+
+    r = await generate(
+        image_path=str(img), product_name="Smoke Runtime",
+        garment_type="tee", quality="draft", skip_qc=True,
+    )
+    assert r.status is PipelineStatus.SUCCEEDED, f"got {r.status}: {r.metadata}"
+    assert r.glb_url
+
+    # Identical input → cache hit (same artifact_id)
+    r2 = await generate(
+        image_path=str(img), product_name="Smoke Runtime",
+        garment_type="tee", quality="draft", skip_qc=True,
+    )
+    assert r2.artifact_id == r.artifact_id, "expected cache hit on duplicate"
+
+    await reset_runtime()
+
+asyncio.run(main())
+PY
+pass "generate() one-call"
+
 echo
 echo "All clothing_3d smoke checks passed."
