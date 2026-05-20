@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T04:48:19.471Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T11:42:56.790Z
 > Files: 2659 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -215,7 +215,7 @@
 
 - `__init__.py` — Declares for (~698 tok)
 - `agent.py` — that: initialize (~14811 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/base_super_agent/ — EnhancedSuperAgent foundation package (~1894 tok)
 - `learning_module.py` — SelfLearningModule: record_execution, get_best_technique, get_best_provider, score + 5 more (~5066 tok)
 - `ml_module.py` — SklearnModelWrapper: fit, predict, get_confidence, fit + 6 more (~4896 tok)
 - `prompt_module.py` — PromptEngineeringModule: auto_select_technique, apply_technique, apply_technique_with_tools, record_outcome + 1 more (~5802 tok)
@@ -226,7 +226,7 @@
 
 - `__init__.py` (~1196 tok)
 - `base.py` — SDKAgentConfig: run (~1341 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/claude_sdk/ — Claude Agent SDK integration (6-layer stack) (~1939 tok)
 - `dashboard.py` — Pydantic: DashboardAction (35 fields) (~5334 tok)
 - `email_automation.py` — Pydantic: EmailTriageRequest (22 fields) (~2523 tok)
 - `excel_handler.py` — Pydantic: ExcelRequest (16 fields) (~2000 tok)
@@ -242,7 +242,7 @@
 - `__init__.py` (~1184 tok)
 - `analytics.py` — SDKDataAnalystAgent: execute (~1375 tok)
 - `brand_guardian.py` — Declares SDKBrandGuardianAgent (~1038 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/claude_sdk/domain_agents/ — Domain-specific SDK agents (15 modules) (~1275 tok)
 - `commerce.py` — Declares SDKCatalogManagerAgent (~1302 tok)
 - `community.py` — Declares SDKCommunityLoyaltyAgent (~1006 tok)
 - `content.py` — Declares SDKSeoWriterAgent (~1331 tok)
@@ -259,7 +259,7 @@
 
 ## agents/claude_sdk/prompts/
 
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/claude_sdk/prompts/ — Reusable SDK agent system prompts (~725 tok)
 - `data_analyst.txt` (~429 tok)
 - `email_triage.txt` (~452 tok)
 - `report_writer.txt` (~448 tok)
@@ -276,7 +276,7 @@
 
 - `__init__.py` (~580 tok)
 - `base.py` — CoreAgentType: categorize_failure, diagnose, heal (~7639 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/core/ — Domain-partitioned agent hierarchy (8 cores + Orchestrator) (~1967 tok)
 - `factory.py` — create_orchestrator (~710 tok)
 - `orchestrator.py` — Orchestrator: register_core_agent, get_core_agent, ai_bridge, set_budget_limit + 2 more (~4526 tok)
 - `sub_agent.py` — SocialMediaSubAgent: execute, execute, execute_safe, escalate_to_parent + 1 more (~2444 tok)
@@ -331,12 +331,12 @@
 
 - `__init__.py` — Imagery & 3D Core Agent — photos, VTON, 3D model generation. (~65 tok)
 - `agent.py` — ImageryCoreAgent: execute (~1597 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/core/imagery/ — Imagery & 3D domain CoreAgent (~1463 tok)
 
 ## agents/core/imagery/sub_agents/
 
 - `__init__.py` — Imagery sub-agents: Gemini image, FASHN VTON, Tripo 3D, Meshy 3D, HF Spaces. (~24 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/core/imagery/sub_agents/ — Imagery sub-agents (5 modules) (~1669 tok)
 - `fashn_vton.py` — FashnVtonSubAgent: execute (~517 tok)
 - `gemini_image.py` — GeminiImageSubAgent: execute (~395 tok)
 - `hf_spaces.py` — HfSpacesSubAgent: execute (~376 tok)
@@ -352,7 +352,7 @@
 
 - `__init__.py` — Marketing sub-agents: social media, campaign manager, A/B testing. (~21 tok)
 - `campaign_ops.py` — CampaignOpsSubAgent: execute (~447 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — agents/core/marketing/sub_agents/ — Marketing sub-agents (2 modules) (~1250 tok)
 - `social_media.py` — SocialMediaSubAgent: execute (~5323 tok)
 
 ## agents/core/operations/
@@ -2234,7 +2234,7 @@
 - `adaptive_learning.py` — Adaptive learning for provider profiling and optimization. (~4389 tok)
 - `base.py` — Pydantic: CallerInfo (67 fields) (~4439 tok)
 - `classification.py` — Pydantic: ClassificationExample (58 fields) (~5825 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — llm/ — Unified LLM Client Library (~1914 tok)
 - `creative_judge.py` — Pydantic: CriterionEval (34 fields) (~11616 tok)
 - `evaluation_metrics.py` — Advanced ML-based evaluation metrics for LLM Round Table. (~3472 tok)
 - `exceptions.py` — LLMError: to_dict (~836 tok)
@@ -2252,7 +2252,7 @@
 
 - `__init__.py` (~260 tok)
 - `anthropic.py` — AnthropicClient: complete, stream (~2925 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — llm/providers/ — Per-vendor async LLM clients (~1077 tok)
 - `cohere.py` — CohereClient: complete, stream (~1824 tok)
 - `deepseek.py` — DeepSeekClient: complete, stream, get_model_info (~2436 tok)
 - `google.py` — GoogleClient: complete, stream (~1861 tok)
@@ -2269,7 +2269,7 @@
 - `__init__.py` (~76 tok)
 - `agent_bridge_server.py` — Pydantic: BaseInput (60 fields) (~16829 tok)
 - `catalog_generator.py` — Pydantic: ToolMetadata (28 fields) (~5748 tok)
-- `CLAUDE.md` — mcp_servers/ — MCP server implementations (12 Python files) (~417 tok)
+- `CLAUDE.md` — mcp_servers/ — MCP server implementations (18 Python files) (~1572 tok)
 - `context7_client.py` — mcp/context7_client.py (~1620 tok)
 - `mcp_orchestrator.json` (~1152 tok)
 - `openai_server.py` — Pydantic: BaseInput (34 fields) (~7724 tok)
@@ -2293,7 +2293,7 @@
 
 - `__init__.py` — DevSkyy MCP Tools Package. (~91 tok)
 - `api_client.py` — Shared API client utilities: _make_api_request, _handle_api_error, _format_response. (~2220 tok)
-- `CLAUDE.md` — mcp_tools/ — MCP tool definitions (19 Python files) (~281 tok)
+- `CLAUDE.md` — mcp_tools/ — Typed MCP tool definitions (~1578 tok)
 - `security.py` — secure_tool() decorator for MCP tool handlers. (~1659 tok)
 - `server.py` — FastMCP server instance, configuration constants, and logger. (~646 tok)
 - `types.py` — Shared enums and base input model for all MCP tools. (~355 tok)
@@ -2303,7 +2303,7 @@
 - `__init__.py` — Side-effect imports: each module registers its tools via @mcp.tool(). (~99 tok)
 - `advanced.py` — Advanced tools: multi-agent workflow orchestration. (~1327 tok)
 - `claude_sdk.py` — Claude Agent SDK MCP tools: research, email triage, spreadsheet ops, dashboard. (~3154 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — mcp_tools/tools/ — Per-domain MCP tool modules (15 files) (~1005 tok)
 - `cli_anything.py` — CLI-Anything harness tools: agent-native Blender and GIMP control. (~2244 tok)
 - `ecommerce.py` — E-commerce tools: manage_products, dynamic_pricing. (~2264 tok)
 - `infrastructure.py` — Infrastructure & system tools: scan_code, fix_code, self_healing. (~2996 tok)
@@ -2360,7 +2360,7 @@
 - `brand_integration.py` — API router (~2684 tok)
 - `brand_learning.py` — SignalType: store_signal, get_signals, count_signals, store_insight (~14597 tok)
 - `catalog_retriever.py` — CatalogRetriever — semantic retrieval over the SkyyRose canonical catalog. (~7607 tok)
-- `CLAUDE.md` — orchestration/ — cross-cutting pipelines (32 Python files) (~457 tok)
+- `CLAUDE.md` — orchestration/ — Cross-cutting pipelines + RAG + LLM workflows (33 files) (~2112 tok)
 - `docs_context.py` — Lazy RAG context provider for the devskyy_docs vector collection. (~826 tok)
 - `document_ingestion.py` — ", "**/.git/**"] (~4999 tok)
 - `domain_router.py` — URL patterns: 1 routes (~3666 tok)
