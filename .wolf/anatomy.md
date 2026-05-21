@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T22:16:43.656Z
-> Files: 2740 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-21T19:53:53.741Z
+> Files: 2741 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -46,10 +46,9 @@
 - `nginx-app.devskyy.app.conf` — Nginx configuration for app.devskyy.app (self-hosted alternative) (~1497 tok)
 - `nginx.conf` — Nginx configuration (~1630 tok)
 - `package.json` — Node.js package manifest (~3008 tok)
-- `pnpm-lock.yaml` — pnpm lock file (~195082 tok)
 - `pre-build-check.sh` — DevSkyy Pre-Build Verification (~2307 tok)
 - `prometheus.yml` — DevSkyy - Prometheus Configuration (~790 tok)
-- `pyproject.toml` — Python project configuration (~4083 tok)
+- `pyproject.toml` — Python project configuration (~4148 tok)
 - `pyrightconfig.json` (~332 tok)
 - `README.md` — Project documentation (~1442 tok)
 - `requirements-dev.txt` — Development Dependencies (~85 tok)
@@ -143,6 +142,7 @@
 ## .github/
 
 - `BRANCH_PROTECTION.md` — Branch Protection Rules (~817 tok)
+- `CLAUDE.md` (~11 tok)
 - `CODEOWNERS` — DevSkyy Code Owners (~619 tok)
 - `copilot-instructions.md` — WordPress Development — Copilot Instructions (~1954 tok)
 - `dependabot.yml` (~878 tok)
@@ -154,6 +154,7 @@
 - `ci.yml` — /*.py') }} (~8022 tok)
 - `claude-code-action-official.yml` — DISABLED: Duplicate of claude.yml — use that workflow for @claude mentions (~145 tok)
 - `claude-code-review.yml` — /*.ts" (~435 tok)
+- `CLAUDE.md` (~11 tok)
 - `claude.yml` — CI: Claude Code (~564 tok)
 - `dast-scan.yml` — DISABLED: staging/ scripts (run_dast_scan.sh, compare_baseline.py) do not exist yet (~3078 tok)
 - `dossier-check.yml` — CI: Dossier Check (~771 tok)
@@ -697,7 +698,7 @@
 
 - `__init__.py` — AOS self-healing layer — retry policy, circuit breaker, healing director. (~143 tok)
 - `circuit_breaker.py` — Kernel-side circuit breaker — prevents cascading failures per agent_type. (~570 tok)
-- `CLAUDE.md` — aos/healing/ — circuit breaker and healing director (~488 tok)
+- `CLAUDE.md` — aos/healing/ — circuit breaker and healing director (~789 tok)
 - `director.py` — HealingDirector — maps FailureCategory + attempt number to a HealDecision. (~521 tok)
 - `policy.py` — Per-FailureCategory retry policies for the AOS healing layer. (~341 tok)
 - `types.py` — AOS healing types — action enum, retry config, and healing decision. (~144 tok)
@@ -724,7 +725,7 @@
 ## aos/memory/
 
 - `__init__.py` — AOS Memory — namespaced key/value store with TTL and tag-based query index. (~105 tok)
-- `CLAUDE.md` — aos/memory/ — namespaced TTL key/value store per agent PID (~412 tok)
+- `CLAUDE.md` — aos/memory/ — namespaced TTL key/value store with tag-based search (~762 tok)
 - `index.py` — AOS MemoryIndex — tag-based filter index over a MemoryStore. (~765 tok)
 - `store.py` — AOS MemoryStore — namespaced key/value store with TTL expiry. (~1434 tok)
 - `types.py` — AOS Memory — entry type and exceptions. (~382 tok)
@@ -732,7 +733,7 @@
 ## aos/modules/
 
 - `__init__.py` — AOS Modules — pluggable capability registration for agent types and tools. (~136 tok)
-- `CLAUDE.md` — aos/modules/ — importlib-based dynamic module loader (~469 tok)
+- `CLAUDE.md` — aos/modules/ — importlib-based dynamic module loader (~839 tok)
 - `loader.py` — Dynamic module loader — importlib-based loader for AOS module packages. (~409 tok)
 - `registry.py` — ModuleRegistry — pluggable agent-factory store for the AOS kernel. (~1028 tok)
 - `types.py` — AOS module types — manifest and factory type alias. (~211 tok)
@@ -1630,8 +1631,8 @@
 - `IMPLEMENTATION_SUMMARY.md` — Implementation Summary - Vercel & WordPress Integration (~3966 tok)
 - `next-env.d.ts` — / <reference types="next" /> (~71 tok)
 - `next.config.ts` — Next.js configuration (~344 tok)
-- `package-lock.json` — npm lock file (~141035 tok)
-- `package.json` — Node.js package manifest (~1239 tok)
+- `package-lock.json` — npm lock file (~139983 tok)
+- `package.json` — Node.js package manifest (~1285 tok)
 - `playwright.config.ts` — Playwright test configuration (~236 tok)
 - `postcss.config.js` — PostCSS configuration (~24 tok)
 - `proxy.ts` — Next.js Proxy — Protects /admin/* routes with NextAuth.js (~224 tok)
@@ -2343,7 +2344,7 @@
 - `__init__.py` (~76 tok)
 - `agent_bridge_server.py` — Pydantic: BaseInput (60 fields) (~16829 tok)
 - `catalog_generator.py` — Pydantic: ToolMetadata (28 fields) (~5748 tok)
-- `CLAUDE.md` — mcp_servers/ — MCP server implementations (18 Python files) (~1572 tok)
+- `CLAUDE.md` — mcp_servers/ — MCP server implementations (18 Python files) (~1584 tok)
 - `context7_client.py` — mcp/context7_client.py (~1620 tok)
 - `mcp_orchestrator.json` (~1152 tok)
 - `openai_server.py` — Pydantic: BaseInput (34 fields) (~7724 tok)
@@ -3083,8 +3084,8 @@
 - `explore-signature.html` — THE RUNWAY — SkyyRose (~7440 tok)
 - `index-v2.html` — SkyyRose | Luxury Fashion (~3252 tok)
 - `index.html` — SkyyRose - Luxury Fashion Experience (~1679 tok)
-- `package-lock.json` — npm lock file (~111958 tok)
-- `package.json` — Node.js package manifest (~770 tok)
+- `package-lock.json` — npm lock file (~113014 tok)
+- `package.json` — Node.js package manifest (~837 tok)
 - `preorder.html` — Pre-Order — SkyyRose (~10500 tok)
 - `product-catalog-check.html` — SkyyRose — Product Reference Image Check (~2336 tok)
 - `product-mapper.html` — SkyyRose — Product Photo Mapper (~6313 tok)
