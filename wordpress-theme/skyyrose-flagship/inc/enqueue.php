@@ -984,6 +984,7 @@ function skyyrose_enqueue_phase3_assets(): void {
 	$base_css_dir = SKYYROSE_DIR . '/assets/css';
 	$js_uri       = SKYYROSE_ASSETS_URI . '/js';
 	$css_uri      = SKYYROSE_ASSETS_URI . '/css';
+	$use_min      = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
 	$product_slugs = array(
 		'collection-standalone',
@@ -1008,10 +1009,12 @@ function skyyrose_enqueue_phase3_assets(): void {
 	// Experience Analyzer — behavioral tracking & event relay.
 	// ------------------------------------------------------------------
 	if ( skyyrose_see_is_module_active( 'experience_analyzer' ) ) {
-		if ( file_exists( $base_js_dir . '/experience-analyzer.js' ) ) {
+		$ea_file = $use_min && file_exists( $base_js_dir . '/experience-analyzer.min.js' )
+			? 'experience-analyzer.min.js' : 'experience-analyzer.js';
+		if ( file_exists( $base_js_dir . '/' . $ea_file ) ) {
 			wp_enqueue_script(
 				'skyyrose-experience-analyzer',
-				$js_uri . '/experience-analyzer.js',
+				$js_uri . '/' . $ea_file,
 				$phase2_dep,
 				SKYYROSE_VERSION,
 				array(
@@ -1035,10 +1038,12 @@ function skyyrose_enqueue_phase3_assets(): void {
 			);
 		}
 
-		if ( file_exists( $base_js_dir . '/smart-showcase.js' ) ) {
+		$ss_file = $use_min && file_exists( $base_js_dir . '/smart-showcase.min.js' )
+			? 'smart-showcase.min.js' : 'smart-showcase.js';
+		if ( file_exists( $base_js_dir . '/' . $ss_file ) ) {
 			wp_enqueue_script(
 				'skyyrose-smart-showcase',
-				$js_uri . '/smart-showcase.js',
+				$js_uri . '/' . $ss_file,
 				$phase2_dep,
 				SKYYROSE_VERSION,
 				array(
@@ -1053,10 +1058,12 @@ function skyyrose_enqueue_phase3_assets(): void {
 	// Micro-Interactions — cart fly-to & wishlist burst.
 	// ------------------------------------------------------------------
 	if ( skyyrose_see_is_module_active( 'micro_interactions' ) ) {
-		if ( file_exists( $base_js_dir . '/micro-interactions.js' ) ) {
+		$mi_file = $use_min && file_exists( $base_js_dir . '/micro-interactions.min.js' )
+			? 'micro-interactions.min.js' : 'micro-interactions.js';
+		if ( file_exists( $base_js_dir . '/' . $mi_file ) ) {
 			wp_enqueue_script(
 				'skyyrose-micro-interactions',
-				$js_uri . '/micro-interactions.js',
+				$js_uri . '/' . $mi_file,
 				$phase2_dep,
 				SKYYROSE_VERSION,
 				array(

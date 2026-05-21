@@ -198,7 +198,7 @@ mcp = [
     "psycopg[binary,pool]>=3.2",
     "chromadb>=0.6.0",
     "faiss-cpu==1.13.1",
-    "beautifulsoup4==4.12.3",
+    "beautifulsoup4>=4.13.5",  # Fixed: raganything>=1.2.10 requires >=4.13.5 via mineru
     "requests==2.32.5",
     "pypdf>=6.6.2",
     "python-docx>=1.1.2",
@@ -206,7 +206,7 @@ mcp = [
     "pillow>=12.1.1",
     "soundfile==0.13.1",
     "rich==14.3.3",
-    "click==8.1.7",
+    "click>=8.1.8",  # Fixed: raganything>=1.2.10 requires >=8.1.8 via mineru/pdftext
     "pytest==9.0.2",
     "pytest-asyncio==1.3.0",
     "healthcheck==1.3.3",
@@ -233,10 +233,10 @@ ml = [
     "opencv-python>=4.10.0.84",
     "pillow>=11.0.0",
     "imageio>=2.36.1",
-    "nltk>=3.9.1",
+    "nltk>=3.9.3",  # Fixed: CVE-2025-xxx path traversal, fixed in 3.9.3
     "spacy>=3.8.2",
     "textblob>=0.18.0.post0",
-    "mlflow>=3.5.0",
+    "mlflow>=3.9.0",  # Fixed: 2 advisories (GHSA-*) resolved in 3.9.0
     "bentoml>=1.4.34",
     "wandb>=0.24.2",  # Updated for protobuf 6.x compatibility
     "tensorboard==2.20.0",

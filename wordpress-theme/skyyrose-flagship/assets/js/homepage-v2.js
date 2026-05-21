@@ -437,6 +437,25 @@
 		} );
 	} )();
 
+	/* ── Kids Capsule envelope — mobile tap-to-break-seal ──
+	   Touch devices never fire :hover and rarely :focus-visible on
+	   <a>, so the first tap navigates before the seal animation
+	   plays. On coarse pointers, first tap toggles .is-open (CSS
+	   mirrors the hover state) and suppresses navigation; second
+	   tap follows the link. Pointer/hover devices skip this path
+	   so mouse + keyboard behavior is unchanged. */
+	( function initKcHeirTap() {
+		var stage = document.querySelector( '.kc-heir__stage' );
+		if ( ! stage ) { return; }
+		var coarse = window.matchMedia( '(hover: none), (pointer: coarse)' ).matches;
+		if ( ! coarse ) { return; }
+		stage.addEventListener( 'click', function ( e ) {
+			if ( stage.classList.contains( 'is-open' ) ) { return; }
+			e.preventDefault();
+			stage.classList.add( 'is-open' );
+		} );
+	} )();
+
 	/* ── Hero concrete word — subtle mouse parallax ── */
 	( function initHeroParallax() {
 		var word = document.querySelector( '.hero-concrete-word' );
