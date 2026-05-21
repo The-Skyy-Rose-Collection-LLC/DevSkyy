@@ -107,3 +107,8 @@ Claude Desktop config:
 - Agent Bridge exposes **6 SuperAgents** = 72 tools total. When the SuperAgent count changes, update the docstring header in `agent_bridge_server.py` so MCP clients see accurate categorization.
 - Claude Code's MCP discovery only reads `mcpServers` from the top of `settings.json`. Don't nest under a sub-key.
 - `MCP_BACKEND=critical-fuchsia-ape` is the FastMCP-hosted production endpoint. Set `CRITICAL_FUCHSIA_APE_KEY` in addition to URL.
+
+
+<claude-mem-context>
+
+</claude-mem-context>

@@ -1,10 +1,20 @@
 {
-  "generated_at": "2026-05-20T14:04:55",
+  "generated_at": "2026-05-20T17:13:02",
   "repo_root": "/Users/theceo/DevSkyy",
   "freshness_days": 30,
   "files_scanned": 45,
-  "indexed_basenames": 14511,
+  "indexed_basenames": 14510,
   "missing_paths": [
+    {
+      "file": ".wolf/cerebrum.md",
+      "line": 70,
+      "claim": "colors_and_type.css"
+    },
+    {
+      "file": ".wolf/cerebrum.md",
+      "line": 70,
+      "claim": "ui-kit.css"
+    },
     {
       "file": ".wolf/anatomy.md",
       "line": 145,
@@ -92,8 +102,8 @@
     },
     {
       "file": "CLAUDE.md",
-      "line": 96,
-      "claim": ".venv"
+      "line": 281,
+      "claim": "colors_and_type.css"
     },
     {
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/feedback_update_docs_on_change.md",
@@ -129,11 +139,6 @@
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_render_pipeline.md",
       "line": 22,
       "claim": "fal-ai/flux-pro/v1/fill"
-    },
-    {
-      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_voyage_sdk_version.md",
-      "line": 7,
-      "claim": ".venv"
     }
   ],
   "linecount_mismatches": [],
@@ -153,5 +158,5 @@
     }
   ],
   "documented_missing_count": 23,
-  "verified_count": 2815
+  "verified_count": 2901
 }
