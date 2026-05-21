@@ -82,13 +82,18 @@
 }
 .col-hero__title span { display: block; }
 
-/* Enforce specific catalog typography in hero per collection */
-.col-page[data-collection="black-rose"] .col-hero__title { font-family: 'Cinzel', serif; letter-spacing: 12px; }
-.col-page[data-collection="love-hurts"] .col-hero__title { font-family: 'Playfair Display', serif; font-style: italic; letter-spacing: 4px; }
-.col-page[data-collection="signature"] .col-hero__title { font-family: 'Cinzel', serif; letter-spacing: 16px; }
+/* Hero typography per collection — font-family flows from --skyyrose-font-display
+   (set in design-tokens.css per [data-collection] block). Letter-spacing stays
+   collection-specific because it's a per-collection design parameter, not a font
+   choice. Cinzel for Black Rose, Playfair Display italic for Love Hurts,
+   Playfair Display tracked-out for Signature, Playfair Display for Kids Capsule. */
+.col-page[data-collection="black-rose"]   .col-hero__title { font-family: var(--skyyrose-font-display); letter-spacing: 12px; }
+.col-page[data-collection="love-hurts"]   .col-hero__title { font-family: var(--skyyrose-font-display); font-style: italic; letter-spacing: 4px; }
+.col-page[data-collection="signature"]    .col-hero__title { font-family: var(--skyyrose-font-display); letter-spacing: 16px; }
+.col-page[data-collection="kids-capsule"] .col-hero__title { font-family: var(--skyyrose-font-display); letter-spacing: 8px; }
 
 .col-hero__tagline {
-	font-family: 'Cormorant Garamond', serif;
+	font-family: var(--skyyrose-font-body);
 	font-size: clamp(20px, 3vw, 32px);
 	font-style: italic;
 	color: #fff;
@@ -112,7 +117,7 @@
 }
 
 .col-hero__cta {
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 14px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
@@ -190,7 +195,7 @@
 }
 
 .col-story__title {
-	font-family: 'Cinzel', serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: clamp(32px, 4vw, 56px);
 	font-weight: 400;
 	line-height: 1.1;
@@ -200,7 +205,7 @@
 }
 
 .col-story__text {
-	font-family: 'Cormorant Garamond', serif;
+	font-family: var(--skyyrose-font-body);
 	font-size: 1.3rem;
 	line-height: 2.1;
 	color: rgba(255,255,255,0.8);
@@ -210,7 +215,7 @@
 
 .col-story__quote {
 	position: relative;
-	font-family: 'Playfair Display', serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: clamp(24px, 3vw, 40px);
 	font-style: italic;
 	line-height: 1.4;
@@ -224,7 +229,7 @@
 	position: absolute;
 	top: -0.4em;
 	left: 0;
-	font-family: 'Playfair Display', serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: 1.6em;
 	line-height: 1;
 	color: rgba(183, 110, 121, 0.65);
@@ -241,7 +246,7 @@
 }
 
 .col-story__visual-text {
-	font-family: 'Cinzel', serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: 120px;
 	color: rgba(255,255,255,0.02);
 	text-transform: uppercase;
@@ -279,7 +284,7 @@
 	margin: 0 auto;
 }
 .col-quote-block__text {
-	font-family: 'Playfair Display', serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: clamp(28px, 4vw, 48px);
 	font-style: italic;
 	line-height: 1.4;
@@ -306,7 +311,7 @@
 
 .col-features__heading {
 	text-align: center;
-	font-family: 'Cinzel', serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: clamp(32px, 4vw, 56px);
 	font-weight: 400;
 	letter-spacing: 8px;
@@ -316,7 +321,7 @@
 
 .col-features__subheading {
 	text-align: center;
-	font-family: 'Cormorant Garamond', serif;
+	font-family: var(--skyyrose-font-body);
 	font-size: 1.2rem;
 	font-style: italic;
 	color: rgba(255,255,255,0.6);
@@ -360,7 +365,7 @@
 }
 
 .col-features__card p {
-	font-family: 'Cormorant Garamond', serif;
+	font-family: var(--skyyrose-font-body);
 	font-size: 1.1rem;
 	line-height: 1.8;
 	color: rgba(255,255,255,0.5);
@@ -408,7 +413,7 @@
 }
 
 .col-crossnav__link h3 {
-	font-family: 'Cinzel', serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: 24px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
@@ -417,7 +422,7 @@
 }
 
 .col-crossnav__link p {
-	font-family: 'Playfair Display', serif;
+	font-family: var(--skyyrose-font-display);
 	font-style: italic;
 	color: rgba(255,255,255,0.5);
 }
@@ -433,7 +438,7 @@
 }
 
 .col-newsletter__title {
-	font-family: 'Cinzel', serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: clamp(32px, 4vw, 56px);
 	letter-spacing: 8px;
 	text-transform: uppercase;
@@ -442,7 +447,7 @@
 }
 
 .col-newsletter__text {
-	font-family: 'Cormorant Garamond', serif;
+	font-family: var(--skyyrose-font-body);
 	font-size: 1.2rem;
 	color: rgba(255,255,255,0.6);
 	margin-bottom: 64px;
@@ -474,7 +479,7 @@
 	color: #000;
 	border: none;
 	padding: 0 32px;
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 14px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
@@ -561,7 +566,7 @@
 	text-align: center;
 }
 .col-founder-quote__text {
-	font-family: 'Cinzel', serif;
+	font-family: var(--skyyrose-font-display);
 	font-style: italic;
 	font-weight: 400;
 	font-size: clamp(28px, 4vw, 44px);
@@ -583,14 +588,14 @@
 	font-style: normal;
 }
 .col-founder-quote__name {
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 13px;
 	letter-spacing: 0.25em;
 	text-transform: uppercase;
 	color: var(--skyyrose-accent, #C0C0C0);
 }
 .col-founder-quote__role {
-	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-family: var(--skyyrose-font-body);
 	font-style: italic;
 	font-size: 14px;
 	color: var(--skyyrose-text-muted, rgba(255, 255, 255, 0.55));

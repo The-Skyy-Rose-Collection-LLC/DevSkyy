@@ -79,25 +79,29 @@
 	   Typography — Font Stacks (canonical aliases)
 	   --font-heading is the brand-canon alias consumed by every page
 	   stylesheet (woocommerce, footer, immersive, generic-pages, cart,
-	   checkout, etc.). Without this declaration those vars silently
-	   fall back to Playfair instead of Cinzel — brand violation.
+	   checkout, etc.). All three font namespaces below ALIAS into the
+	   canonical `--skyyrose-font-*` system (defined below in section §3),
+	   so per-collection overrides (`[data-collection="black-rose"]` etc.)
+	   cascade automatically to every legacy consumer. Single source of
+	   truth = `--skyyrose-font-display`.
 	   --font-headline is kept as a back-compat alias for search-results.css.
 	   ----------------------------------------------- */
-	--font-heading:  'Cinzel', 'Playfair Display', Georgia, serif;
+	--font-heading:  var(--skyyrose-font-display);
 	--font-headline: var(--font-heading);
 
 	/* -----------------------------------------------
-	   Typography — Named Font Aliases
-	   Canonical tokens consumed by generic-pages.css,
-	   product-grid.css, homepage-v7.css, and others.
-	   Scoped here so they resolve on every page, not
-	   only on pages that also load homepage-v2.css.
+	   Typography — Named Font Aliases (legacy namespace)
+	   Aliased into the canonical `--skyyrose-font-*` system so per-
+	   collection font overrides flow through to every consumer
+	   (homepage-v2.css, homepage-v7.css, generic-pages.css,
+	   product-grid.css, footer.css, etc.). Do NOT add new declarations
+	   here — extend `--skyyrose-font-*` instead.
 	   ----------------------------------------------- */
-	--ff-brand:     'Cinzel', serif;
-	--ff-editorial: 'Playfair Display', Georgia, serif;
-	--ff-body:      'Cormorant Garamond', Georgia, serif;
-	--ff-cta:       'Bebas Neue', sans-serif;
-	--ff-mono:      ui-monospace, 'SF Mono', Menlo, monospace;
+	--ff-brand:     var(--skyyrose-font-display);
+	--ff-editorial: var(--skyyrose-font-display);
+	--ff-body:      var(--skyyrose-font-body);
+	--ff-cta:       var(--skyyrose-font-ui);
+	--ff-mono:      var(--skyyrose-font-mono);
 	--ff-system:    'Inter', system-ui, -apple-system, sans-serif;
 
 	/* -----------------------------------------------
@@ -332,6 +336,14 @@
 	--skyyrose-accent-rgb:   212, 175, 55;
 	--skyyrose-accent-dark:  #B8960C;
 	--skyyrose-secondary:    #F7E7CE;
+	--skyyrose-font-display: 'Playfair Display', serif;
+}
+
+[data-collection="kids-capsule"] {
+	--skyyrose-accent:       #B76E79;
+	--skyyrose-accent-rgb:   183, 110, 121;
+	--skyyrose-accent-dark:  #9A5662;
+	--skyyrose-secondary:    #D4AF37;
 	--skyyrose-font-display: 'Playfair Display', serif;
 }
 

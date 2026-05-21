@@ -203,7 +203,7 @@
 	padding: 1.5rem 2rem;
 	background: var(--color-card-bg, #111);
 	border-radius: var(--radius-md, 8px);
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-style: italic;
 	font-size: 1.25rem;
 	line-height: 1.6;

@@ -849,7 +849,7 @@
 	gap: 12px;
 }
 .kc-heir__eyebrow {
-	font-family: 'Space Mono', ui-monospace, monospace;
+	font-family: var(--ff-mono);
 	font-size: 11px;
 	letter-spacing: .25em;
 	text-transform: uppercase;
@@ -857,7 +857,7 @@
 	margin: 0;
 }
 .kc-heir__title {
-	font-family: 'Cinzel', serif;
+	font-family: var(--skyyrose-font-display);
 	font-weight: 500;
 	font-size: clamp(40px, 5.5vw, 72px);
 	letter-spacing: clamp(2px, 0.4vw, 6px);
@@ -868,7 +868,7 @@
 	text-wrap: balance;
 }
 .kc-heir__sub {
-	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-family: var(--skyyrose-font-body);
 	font-style: italic;
 	font-size: clamp(16px, 1.3vw, 19px);
 	line-height: 1.6;
@@ -947,7 +947,7 @@
 	pointer-events: none;
 }
 .kc-heir__chapter {
-	font-family: 'Cinzel', serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: 11px;
 	letter-spacing: .35em;
 	color: #8a6a3e;
@@ -955,7 +955,7 @@
 	margin-bottom: 6px;
 }
 .kc-heir__script {
-	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-family: var(--skyyrose-font-body);
 	font-style: italic;
 	font-weight: 500;
 	font-size: clamp(32px, 4vw, 44px);
@@ -964,7 +964,7 @@
 	margin-bottom: 10px;
 }
 .kc-heir__headline {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-style: italic;
 	font-size: clamp(16px, 1.4vw, 19px);
 	color: #2b1f14;
@@ -973,7 +973,7 @@
 	margin: 0;
 }
 .kc-heir__sig {
-	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-family: var(--skyyrose-font-body);
 	font-style: italic;
 	font-weight: 600;
 	font-size: clamp(20px, 2vw, 26px);
@@ -1022,7 +1022,7 @@
 .kc-heir__hint {
 	position: absolute;
 	bottom: 20px; right: 24px;
-	font-family: 'Space Mono', ui-monospace, monospace;
+	font-family: var(--ff-mono);
 	font-size: 9px;
 	letter-spacing: .25em;
 	color: var(--rose, #B76E79);
@@ -1034,7 +1034,7 @@
 	margin-top: clamp(24px, 3vw, 40px);
 }
 .kc-heir__tag-script {
-	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-family: var(--skyyrose-font-body);
 	font-style: italic;
 	font-weight: 500;
 	font-size: clamp(32px, 4.5vw, 52px);
@@ -1042,7 +1042,7 @@
 	line-height: 1;
 }
 .kc-heir__tag-sub {
-	font-family: 'Space Mono', ui-monospace, monospace;
+	font-family: var(--ff-mono);
 	font-size: 10px;
 	letter-spacing: .3em;
 	color: rgba(255, 255, 255, 0.55);

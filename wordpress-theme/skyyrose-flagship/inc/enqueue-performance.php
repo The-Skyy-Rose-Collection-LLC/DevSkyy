@@ -52,7 +52,23 @@ function skyyrose_preload_fonts() {
 	?>
 	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/inter-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
 	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/playfair-display-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/cormorant-garamond-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/bebas-neue-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
 	<?php
+	// Cinzel is above-fold ONLY on Black Rose pages (collection + immersive
+	// templates). Skip the preload elsewhere so non-BR pages don't waste
+	// bandwidth on a font they never render.
+	$slug = function_exists( 'skyyrose_get_current_template_slug' ) ? skyyrose_get_current_template_slug() : '';
+	if ( in_array( $slug, array( 'collection', 'collection-standalone', 'immersive' ), true ) ) {
+		$queried = get_queried_object();
+		$is_br   = $queried && isset( $queried->post_name )
+			&& false !== strpos( (string) $queried->post_name, 'black-rose' );
+		if ( $is_br ) {
+			?>
+			<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/cinzel-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
+			<?php
+		}
+	}
 }
 
 /**
