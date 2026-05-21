@@ -85,9 +85,17 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		<div class="col-hero__content col-reveal">
 			<span class="col-hero__badge rv-blur-down"><?php echo esc_html( $c['hero_badge'] ); ?></span>
 			<?php if ( $has_logo ) : ?>
+				<?php
+				// F3 (v1.5.4): Black Rose gets a scroll-timeline bloom on the
+				// hero logo — image blurs + scales in coupled to scroll, not
+				// triggered once by IntersectionObserver. Modern browsers
+				// (Chromium 115+, Firefox 2026) honor it; others render the
+				// existing .rv-clip-up reveal. Reduced-motion respected.
+				$hero_logo_class = 'col-hero__logo rv-clip-up' . ( 'black-rose' === $slug ? ' rv-scroll-bloom' : '' );
+				?>
 				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $c['hero_logo'] . '?v=' . SKYYROSE_VERSION ); ?>"
 					alt="<?php echo esc_attr( $c['hero_logo_alt'] ); ?>"
-					class="col-hero__logo rv-clip-up" width="<?php echo esc_attr( $c['hero_logo_w'] ); ?>" height="<?php echo esc_attr( $c['hero_logo_h'] ); ?>" loading="eager">
+					class="<?php echo esc_attr( $hero_logo_class ); ?>" width="<?php echo esc_attr( $c['hero_logo_w'] ); ?>" height="<?php echo esc_attr( $c['hero_logo_h'] ); ?>" loading="eager">
 			<?php else : ?>
 				<h1 class="col-hero__title"><span><?php echo esc_html( $c['hero_title'] ); ?></span></h1>
 			<?php endif; ?>
@@ -132,6 +140,9 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		)
 	);
 	?>
+
+	<?php // Black Rose only: founder pull quote anchors the page in Corey's voice. ?>
+	<?php if ( 'black-rose' === $slug ) { get_template_part( 'template-parts/collection/founder-pullquote' ); } ?>
 
 	<!-- ════ Story (condensed — after products) ════ -->
 	<section class="col-story rv-clip-up">

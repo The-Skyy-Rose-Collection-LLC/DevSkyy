@@ -56,6 +56,14 @@ $cross_sell_map = array(
 
 $related_skus = isset( $cross_sell_map[ $current_sku ] ) ? $cross_sell_map[ $current_sku ] : array();
 
+// Fallback: if the curated map has no entry for this SKU, use the CLIP
+// similarity ranking from data/product-similarities.json. Keeps the
+// "Wears With" section populated for the long tail of SKUs the curated
+// map doesn't reach. Curation > algorithm, so the map wins when present.
+if ( empty( $related_skus ) && function_exists( 'skyyrose_get_similarity_skus' ) ) {
+	$related_skus = skyyrose_get_similarity_skus( $current_sku, 2 );
+}
+
 // Limit to 2 recommendations max.
 $related_skus = array_slice( $related_skus, 0, 2 );
 

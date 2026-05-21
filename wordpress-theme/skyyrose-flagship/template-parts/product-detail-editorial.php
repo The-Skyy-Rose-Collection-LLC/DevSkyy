@@ -82,6 +82,26 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 		<h2 id="sr-ed-piece-h" class="sr-ed__section-title">
 			<?php esc_html_e( 'The Piece', 'skyyrose' ); ?>
 		</h2>
+		<?php
+		// Numbered-authentication badge (F4, v1.5.4). Black Rose only,
+		// gated on edition_size > 0. Surfaces the brand-DNA pillar
+		// "Every piece is hand-numbered" above the descriptive copy
+		// instead of burying it in product details.
+		if ( 'black-rose' === $collection && $edition_size > 0 ) :
+			?>
+			<aside class="sr-ed__edition-badge" role="note" aria-label="<?php esc_attr_e( 'Numbered authentication', 'skyyrose' ); ?>">
+				<span class="sr-ed__edition-badge-label"><?php esc_html_e( 'Numbered Authentication', 'skyyrose' ); ?></span>
+				<span class="sr-ed__edition-badge-value">
+					<?php
+					// translators: %d is the total edition run size, e.g. "One of 80".
+					echo esc_html( sprintf( __( 'One of %d', 'skyyrose' ), $edition_size ) );
+					?>
+				</span>
+				<span class="sr-ed__edition-badge-note">
+					<?php esc_html_e( 'Hand-numbered at fulfillment. Never restocked.', 'skyyrose' ); ?>
+				</span>
+			</aside>
+		<?php endif; ?>
 		<?php if ( $garment_lock ) : ?>
 			<p class="sr-ed__garment-lock"><?php echo esc_html( $garment_lock ); ?></p>
 		<?php endif; ?>

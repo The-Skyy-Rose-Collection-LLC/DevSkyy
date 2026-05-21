@@ -165,3 +165,48 @@
 	.sr-hero-grid { grid-template-columns: 1fr; gap: 48px; }
 	.sr-container { padding: 0 24px; }
 }
+
+/* ==========================================================================
+   NUMBERED AUTHENTICATION BADGE — Black Rose PDPs (v1.5.4, F4)
+   Editorial badge surfacing the "hand-numbered" brand pillar.
+   Hairline border, no shadows, no gradients. Cinzel display per BR canon.
+   ========================================================================== */
+.sr-ed__edition-badge {
+	display: inline-flex;
+	flex-direction: column;
+	gap: 6px;
+	margin: clamp(20px, 3vw, 32px) 0 clamp(24px, 4vw, 40px);
+	padding: clamp(16px, 2.5vw, 24px) clamp(20px, 3vw, 32px);
+	border: 1px solid var(--skyyrose-accent, #C0C0C0);
+	background: transparent;
+	max-width: 28rem;
+}
+.sr-ed__edition-badge-label {
+	font-family: 'Bebas Neue', sans-serif;
+	font-size: 11px;
+	letter-spacing: 0.3em;
+	text-transform: uppercase;
+	color: var(--skyyrose-accent, #C0C0C0);
+	line-height: 1;
+}
+.sr-ed__edition-badge-value {
+	font-family: 'Cinzel', serif;
+	font-style: italic;
+	font-weight: 500;
+	font-size: clamp(22px, 3vw, 30px);
+	color: var(--skyyrose-text, #FFFFFF);
+	line-height: 1.1;
+	letter-spacing: 0.02em;
+}
+.sr-ed__edition-badge-note {
+	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-style: italic;
+	font-size: 14px;
+	color: var(--skyyrose-text-muted, rgba(255, 255, 255, 0.55));
+	letter-spacing: 0.02em;
+	line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+	.sr-ed__edition-badge { width: 100%; max-width: 100%; }
+}

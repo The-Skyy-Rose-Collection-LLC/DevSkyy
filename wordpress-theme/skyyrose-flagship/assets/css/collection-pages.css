@@ -543,6 +543,67 @@
 }
 
 /* ==========================================================================
+   FOUNDER PULL QUOTE — Black Rose only (v1.5.4, F5)
+   Editorial register inside Expressive Brand: hairline rules, generous
+   space, fluid type. No boxes, no shadows, no gradients. Reduced-motion
+   safe via the unified .col-reveal observer.
+   ========================================================================== */
+.col-founder-quote {
+	padding: clamp(80px, 12vw, 160px) clamp(24px, 6vw, 80px);
+	background: transparent;
+}
+.col-founder-quote__inner {
+	max-width: 880px;
+	margin: 0 auto;
+	border-top: 1px solid var(--skyyrose-accent, #C0C0C0);
+	border-bottom: 1px solid var(--skyyrose-accent, #C0C0C0);
+	padding: clamp(48px, 8vw, 96px) 0;
+	text-align: center;
+}
+.col-founder-quote__text {
+	font-family: 'Cinzel', serif;
+	font-style: italic;
+	font-weight: 400;
+	font-size: clamp(28px, 4vw, 44px);
+	line-height: 1.25;
+	letter-spacing: 0.01em;
+	color: var(--skyyrose-text, #FFFFFF);
+	margin: 0 auto clamp(28px, 4vw, 48px);
+	padding: 0 clamp(0px, 4vw, 32px);
+	max-width: 28ch;
+	quotes: '\201C' '\201D';
+}
+.col-founder-quote__text::before { content: open-quote; margin-right: 0.1em; }
+.col-founder-quote__text::after  { content: close-quote; margin-left:  0.1em; }
+.col-founder-quote__attr {
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	font-style: normal;
+}
+.col-founder-quote__name {
+	font-family: 'Bebas Neue', sans-serif;
+	font-size: 13px;
+	letter-spacing: 0.25em;
+	text-transform: uppercase;
+	color: var(--skyyrose-accent, #C0C0C0);
+}
+.col-founder-quote__role {
+	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-style: italic;
+	font-size: 14px;
+	color: var(--skyyrose-text-muted, rgba(255, 255, 255, 0.55));
+	letter-spacing: 0.05em;
+}
+
+@media (max-width: 768px) {
+	.col-founder-quote { padding: 80px 24px; }
+	.col-founder-quote__inner { padding: 48px 0; }
+	.col-founder-quote__text { max-width: 100%; padding: 0; }
+}
+
+/* ==========================================================================
    REDUCED MOTION — Disable decorative animations
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
@@ -550,4 +611,5 @@
 	.col-hero__bg img,
 	.col-features__card,
 	.col-crossnav__link { transition: none; }
+	.col-founder-quote__text { transition: none; }
 }

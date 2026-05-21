@@ -45,8 +45,8 @@ function skyyrose_get_collections_config(): array {
 			'page_url'    => home_url( '/collection-black-rose/' ),
 			'palette'     => array(
 				'primary'   => SKYYROSE_COLOR_DEEP_BLACK,
-				'secondary' => SKYYROSE_COLOR_NAVY,
-				'accent'    => SKYYROSE_COLOR_DEEP_BLUE,
+				'secondary' => SKYYROSE_COLOR_DARK,
+				'accent'    => SKYYROSE_COLOR_SILVER,
 			),
 			'front_page'  => array(
 				'title'          => 'Black<br>Rose',

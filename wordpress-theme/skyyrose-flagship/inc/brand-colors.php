@@ -26,11 +26,11 @@ defined( 'SKYYROSE_COLOR_DARK' ) || define( 'SKYYROSE_COLOR_DARK', '#0A0A0A' ); 
 
 // -- Extended palette ---------------------------------------------------------
 
-defined( 'SKYYROSE_COLOR_DEEP_BLACK' ) || define( 'SKYYROSE_COLOR_DEEP_BLACK', '#1A1A2E' );  // Black Rose primary
+defined( 'SKYYROSE_COLOR_DEEP_BLACK' ) || define( 'SKYYROSE_COLOR_DEEP_BLACK', '#0D0D0D' );  // Black Rose primary — true black, no blue tint
 defined( 'SKYYROSE_COLOR_DEEP_RED' ) || define( 'SKYYROSE_COLOR_DEEP_RED', '#8B0000' );    // Love Hurts primary
-defined( 'SKYYROSE_COLOR_PURPLE' ) || define( 'SKYYROSE_COLOR_PURPLE', '#4B0082' );      // Love Hurts secondary
-defined( 'SKYYROSE_COLOR_NAVY' ) || define( 'SKYYROSE_COLOR_NAVY', '#16213E' );        // Black Rose secondary
-defined( 'SKYYROSE_COLOR_DEEP_BLUE' ) || define( 'SKYYROSE_COLOR_DEEP_BLUE', '#0F3460' );   // Black Rose accent
+defined( 'SKYYROSE_COLOR_PURPLE' ) || define( 'SKYYROSE_COLOR_PURPLE', '#4A1942' );      // Love Hurts secondary — warm plum (bruise purple, not electric indigo)
+defined( 'SKYYROSE_COLOR_NAVY' ) || define( 'SKYYROSE_COLOR_NAVY', '#1A1818' );        // Warm near-black (legacy token; BR palette now uses DARK)
+defined( 'SKYYROSE_COLOR_DEEP_BLUE' ) || define( 'SKYYROSE_COLOR_DEEP_BLUE', '#221A1A' );   // Warm near-black (legacy token; BR palette now uses SILVER)
 defined( 'SKYYROSE_COLOR_SOFT_PINK' ) || define( 'SKYYROSE_COLOR_SOFT_PINK', '#FFB6C1' );   // Kids Capsule primary
 defined( 'SKYYROSE_COLOR_LAVENDER' ) || define( 'SKYYROSE_COLOR_LAVENDER', '#FFF0F5' );    // Kids Capsule secondary
 

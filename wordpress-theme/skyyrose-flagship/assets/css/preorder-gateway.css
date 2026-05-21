@@ -69,9 +69,13 @@
 	color: rgba(255, 255, 255, 0.45); margin: 0 0 2.5rem;
 }
 
-/* Countdown */
+/* Countdown — hidden until a real drop date is locked.
+   A zero countdown (00:00:00:00) reads as "closed" — hiding reads as "ongoing."
+   When SKYYROSE_PREORDER_DROP_AT is set in functions.php, remove the !important
+   override and the countdown surfaces with its normal flex layout. */
 .po-hero__countdown {
-	display: flex; align-items: center; gap: 0.5rem;
+	display: none !important;
+	align-items: center; gap: 0.5rem;
 	margin-bottom: 2.5rem;
 }
 .po-countdown__unit { text-align: center; }

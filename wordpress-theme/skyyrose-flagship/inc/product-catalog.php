@@ -328,6 +328,71 @@ function skyyrose_get_product_dossier( $sku ) {
 }
 
 /**
+ * Get similarity-ranked SKUs for a product from data/product-similarities.json.
+ *
+ * Used as a fallback by template-parts/complete-the-look.php when the curated
+ * cross-sell map has no entry for the current SKU. The JSON is pre-computed
+ * from CLIP image embeddings (top-N per product, see file's `model` field).
+ *
+ * @since 1.5.4
+ *
+ * @param  string $sku   Source SKU.
+ * @param  int    $limit Max number of related SKUs to return.
+ * @return array<int, string> Related SKUs, highest similarity first.
+ */
+function skyyrose_get_similarity_skus( $sku, $limit = 2 ) {
+	static $data  = null;
+	static $cache = array();
+
+	$sku = sanitize_key( $sku );
+	if ( '' === $sku ) {
+		return array();
+	}
+
+	$cache_key = $sku . ':' . absint( $limit );
+	if ( isset( $cache[ $cache_key ] ) ) {
+		return $cache[ $cache_key ];
+	}
+
+	// Load + memoize the JSON once per request.
+	if ( null === $data ) {
+		$path = get_theme_file_path( 'data/product-similarities.json' );
+		if ( ! is_readable( $path ) ) {
+			$data = array();
+		} else {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- local theme file read.
+			$raw = file_get_contents( $path );
+			if ( false === $raw || '' === $raw ) {
+				$data = array();
+			} else {
+				$decoded = json_decode( $raw, true );
+				$data    = ( is_array( $decoded ) && isset( $decoded['products'] ) && is_array( $decoded['products'] ) )
+					? $decoded['products']
+					: array();
+			}
+		}
+	}
+
+	if ( ! isset( $data[ $sku ]['global'] ) || ! is_array( $data[ $sku ]['global'] ) ) {
+		$cache[ $cache_key ] = array();
+		return array();
+	}
+
+	$result = array();
+	foreach ( $data[ $sku ]['global'] as $entry ) {
+		if ( isset( $entry['sku'] ) && is_string( $entry['sku'] ) ) {
+			$result[] = sanitize_key( $entry['sku'] );
+			if ( count( $result ) >= absint( $limit ) ) {
+				break;
+			}
+		}
+	}
+
+	$cache[ $cache_key ] = $result;
+	return $result;
+}
+
+/**
  * Get the best available URL for a product.
  *
  * Uses WooCommerce permalink if product exists, falls back to pre-order page.

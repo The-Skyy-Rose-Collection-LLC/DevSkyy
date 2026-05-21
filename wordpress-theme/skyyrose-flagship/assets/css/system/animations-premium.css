@@ -449,4 +449,24 @@
 	.parallax-slow, .parallax-medium, .parallax-fast, .parallax-ken-burns { transform: none !important; }
 	[data-scroll-fade] > * { transform: none !important; opacity: 1 !important; }
 	.page-enter, .page-exit { animation: none; opacity: 1; transform: none; }
+	.rv-scroll-bloom { animation: none !important; opacity: 1; transform: none; filter: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   14. SCROLL-TIMELINE BLOOM (v1.5.4, F3)
+   Couples a reveal animation to scroll position via animation-timeline:
+   view() — modern Chromium/Firefox 2026 baseline. In browsers without
+   support, the @supports gate hides the rule and the element renders
+   normally (opacity:1, no transform). Reduced-motion handled above.
+   ═══════════════════════════════════════════════════════════════════ */
+@keyframes srScrollBloom {
+	from { opacity: 0; filter: blur(12px); transform: scale(0.96); }
+	to   { opacity: 1; filter: blur(0);    transform: scale(1);    }
+}
+@supports (animation-timeline: view()) {
+	.rv-scroll-bloom {
+		animation: srScrollBloom auto linear;
+		animation-timeline: view();
+		animation-range: entry 0% cover 35%;
+	}
 }

@@ -512,6 +512,20 @@ function skyyrose_enqueue_template_styles() {
 				SKYYROSE_VERSION
 			);
 		}
+
+		// View Transitions API choreography for cross-collection nav.
+		// Browsers without support fall back to normal page loads; reduced-
+		// motion users get the feature short-circuited inside the stylesheet.
+		$vt_css = $use_min && file_exists( $base_css_dir . '/view-transitions.min.css' )
+			? 'view-transitions.min.css' : 'view-transitions.css';
+		if ( file_exists( $base_css_dir . '/' . $vt_css ) ) {
+			wp_enqueue_style(
+				'skyyrose-view-transitions',
+				$base_css_uri . '/' . $vt_css,
+				array( 'skyyrose-collection-pages' ),
+				SKYYROSE_VERSION
+			);
+		}
 	}
 
 	// Product grid bento layout — landing pages + preorder gateway.
