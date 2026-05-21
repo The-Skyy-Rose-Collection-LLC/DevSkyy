@@ -1,0 +1,2 @@
+# Per-prompt eval datasets land here as <id>.jsonl.
+# See README.md → "Eval format".

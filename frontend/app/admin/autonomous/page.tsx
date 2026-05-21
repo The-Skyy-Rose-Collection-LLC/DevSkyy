@@ -1,187 +1,338 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Switch } from '@/components/ui/switch'
-import { selfHealingService } from '@/lib/autonomous/self-healing-service'
-import { CheckCircle2, XCircle, AlertCircle, Activity } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
+import {
+    Activity,
+    Play,
+    Square,
+    RefreshCw,
+    Loader2,
+    AlertTriangle,
+    CheckCircle2,
+    XCircle,
+    Clock,
+} from 'lucide-react'
+import { useAutonomous } from '@/hooks/useAutonomous'
+import type { AutonomousOperation, AutonomousHistoryEntry } from '@/lib/api/types'
+
+function StatusBadge({ status }: { status: AutonomousOperation['status'] }) {
+    switch (status) {
+        case 'running':
+            return <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Running</Badge>
+        case 'stopped':
+            return <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30">Stopped</Badge>
+        case 'error':
+            return <Badge className="bg-red-500/20 text-red-400 border-red-500/30">Error</Badge>
+    }
+}
+
+function StatusIcon({ status }: { status: AutonomousOperation['status'] }) {
+    switch (status) {
+        case 'running':
+            return <CheckCircle2 className="h-5 w-5 text-green-400 shrink-0" />
+        case 'stopped':
+            return <XCircle className="h-5 w-5 text-gray-500 shrink-0" />
+        case 'error':
+            return <AlertTriangle className="h-5 w-5 text-red-400 shrink-0" />
+    }
+}
+
+function HistoryActionBadge({ action }: { action: AutonomousHistoryEntry['action'] }) {
+    switch (action) {
+        case 'start':
+            return <Badge className="bg-green-500/20 text-green-400 text-xs shrink-0">started</Badge>
+        case 'stop':
+            return <Badge className="bg-gray-500/20 text-gray-400 text-xs shrink-0">stopped</Badge>
+        case 'error':
+            return <Badge className="bg-red-500/20 text-red-400 text-xs shrink-0">error</Badge>
+    }
+}
 
 export default function AutonomousAgentsPage() {
-  const [healthStatus, setHealthStatus] = useState<any[]>([])
-  const [circuitBreakers, setCircuitBreakers] = useState<any[]>([])
+    const { operations, total, loading, error, actionLoading, refresh, start, stop, fetchHistory } =
+        useAutonomous()
+    const [confirmStop, setConfirmStop] = useState<AutonomousOperation | null>(null)
+    const [history, setHistory] = useState<AutonomousHistoryEntry[]>([])
+    const [historyLoading, setHistoryLoading] = useState(false)
 
-  useEffect(() => {
-    // Update health status every 5 seconds
-    const interval = setInterval(() => {
-      setHealthStatus(selfHealingService.getHealthStatus())
-      setCircuitBreakers(selfHealingService.getCircuitBreakerStatus())
-    }, 5000)
+    const loadHistory = useCallback(
+        async (ops: AutonomousOperation[]) => {
+            if (ops.length === 0) return
+            setHistoryLoading(true)
+            try {
+                const results = await Promise.all(ops.map((op) => fetchHistory(op.id, 20)))
+                const merged = results
+                    .flat()
+                    .sort(
+                        (a, b) =>
+                            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+                    )
+                    .slice(0, 50)
+                setHistory(merged)
+            } catch {
+                // history is non-critical
+            } finally {
+                setHistoryLoading(false)
+            }
+        },
+        [fetchHistory],
+    )
 
-    // Initial load
-    setHealthStatus(selfHealingService.getHealthStatus())
-    setCircuitBreakers(selfHealingService.getCircuitBreakerStatus())
+    useEffect(() => {
+        if (operations.length > 0) {
+            void loadHistory(operations)
+        }
+    }, [operations, loadHistory])
 
-    return () => clearInterval(interval)
-  }, [])
+    const handleStartStop = (op: AutonomousOperation) => {
+        if (op.status === 'running') {
+            if (op.critical) {
+                setConfirmStop(op)
+            } else {
+                void stop(op.id)
+            }
+        } else {
+            void start(op.id)
+        }
+    }
 
-  return (
-    <div className="container mx-auto py-8 space-y-8">
-      <h1 className="font-display text-4xl luxury-text-gradient">
-        Autonomous Agents
-      </h1>
+    const confirmAndStop = async () => {
+        if (!confirmStop) return
+        await stop(confirmStop.id)
+        setConfirmStop(null)
+    }
 
-      <p className="text-gray-400">
-        Monitor and control autonomous operations across the DevSkyy platform.
-      </p>
+    const handleRefresh = () => {
+        void refresh()
+        void loadHistory(operations)
+    }
 
-      {/* Health Status */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Activity className="h-5 w-5 text-green-400" />
-            <CardTitle>System Health</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {healthStatus.length === 0 ? (
-            <p className="text-gray-500">No health checks recorded yet</p>
-          ) : (
-            <div className="space-y-3">
-              {healthStatus.map((check, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between p-3 rounded-lg bg-gray-900/50 border border-gray-800"
+    const runningCount = operations.filter((o) => o.status === 'running').length
+    const errorCount = operations.filter((o) => o.status === 'error').length
+
+    return (
+        <div className="container mx-auto py-8 space-y-8">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="font-display text-4xl luxury-text-gradient">
+                        Autonomous Agents
+                    </h1>
+                    <p className="text-gray-400 mt-2">
+                        Monitor and control autonomous operations across the DevSkyy platform.
+                    </p>
+                </div>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRefresh}
+                    disabled={loading}
+                    className="gap-2"
                 >
-                  <div className="flex items-center gap-3">
-                    {check.healthy ? (
-                      <CheckCircle2 className="h-5 w-5 text-green-400" />
+                    <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                    Refresh
+                </Button>
+            </div>
+
+            {error && (
+                <div className="rounded-lg border border-red-800 bg-red-900/20 p-4 text-red-400 text-sm">
+                    {error}
+                </div>
+            )}
+
+            {/* Summary */}
+            <div className="grid grid-cols-3 gap-4">
+                <Card>
+                    <CardContent className="pt-6">
+                        <div className="text-2xl font-bold text-white">{total}</div>
+                        <div className="text-sm text-gray-400">Total Operations</div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardContent className="pt-6">
+                        <div className="text-2xl font-bold text-green-400">{runningCount}</div>
+                        <div className="text-sm text-gray-400">Running</div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardContent className="pt-6">
+                        <div className="text-2xl font-bold text-red-400">{errorCount}</div>
+                        <div className="text-sm text-gray-400">Errors</div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Operations */}
+            <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                    <Activity className="h-5 w-5 text-purple-400" />
+                    <h2 className="text-lg font-semibold">Operations</h2>
+                </div>
+
+                {loading && operations.length === 0 ? (
+                    <div className="flex items-center justify-center py-12 text-gray-500">
+                        <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                        Loading operations&hellip;
+                    </div>
+                ) : (
+                    <div className="grid gap-3">
+                        {operations.map((op) => {
+                            const isActing = actionLoading === op.id
+                            const isRunning = op.status === 'running'
+                            return (
+                                <Card key={op.id}>
+                                    <CardContent className="py-4">
+                                        <div className="flex items-center justify-between gap-4">
+                                            <div className="flex items-start gap-3 min-w-0">
+                                                <StatusIcon status={op.status} />
+                                                <div className="min-w-0">
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <p className="font-semibold">{op.name}</p>
+                                                        {op.critical && (
+                                                            <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-xs">
+                                                                critical
+                                                            </Badge>
+                                                        )}
+                                                        <StatusBadge status={op.status} />
+                                                    </div>
+                                                    <p className="text-sm text-gray-400 mt-0.5">
+                                                        {op.description}
+                                                    </p>
+                                                    {op.last_event && (
+                                                        <p className="text-xs text-gray-600 mt-1">
+                                                            {op.last_event}
+                                                            {op.last_event_at && (
+                                                                <span className="ml-1">
+                                                                    &mdash;{' '}
+                                                                    {new Date(
+                                                                        op.last_event_at,
+                                                                    ).toLocaleTimeString()}
+                                                                </span>
+                                                            )}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <Button
+                                                variant={isRunning ? 'destructive' : 'default'}
+                                                size="sm"
+                                                onClick={() => handleStartStop(op)}
+                                                disabled={isActing}
+                                                className="gap-2 min-w-[90px] shrink-0"
+                                            >
+                                                {isActing ? (
+                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                ) : isRunning ? (
+                                                    <>
+                                                        <Square className="h-4 w-4" />
+                                                        Stop
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Play className="h-4 w-4" />
+                                                        Start
+                                                    </>
+                                                )}
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )
+                        })}
+                    </div>
+                )}
+            </div>
+
+            {/* Activity Log */}
+            <Card>
+                <CardHeader>
+                    <div className="flex items-center gap-2">
+                        <Clock className="h-5 w-5 text-blue-400" />
+                        <CardTitle>Activity Log</CardTitle>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    {historyLoading ? (
+                        <div className="flex items-center gap-2 text-gray-500 py-4">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Loading history&hellip;
+                        </div>
+                    ) : history.length === 0 ? (
+                        <p className="text-gray-500 py-4">No activity recorded yet.</p>
                     ) : (
-                      <XCircle className="h-5 w-5 text-red-400" />
+                        <div className="space-y-2">
+                            {history.map((entry) => (
+                                <div
+                                    key={entry.id}
+                                    className="flex items-start gap-3 p-3 rounded-lg bg-gray-900/50 border border-gray-800"
+                                >
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <span className="font-medium text-sm">
+                                                {entry.operation_name}
+                                            </span>
+                                            <HistoryActionBadge action={entry.action} />
+                                            <span className="text-xs text-gray-500 ml-auto">
+                                                {new Date(entry.timestamp).toLocaleString()}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-gray-400 mt-0.5 truncate">
+                                            {entry.message}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     )}
-                    <div>
-                      <p className="font-semibold">{check.service}</p>
-                      <p className="text-sm text-gray-400">
-                        Last check: {new Date(check.lastCheck).toLocaleTimeString()}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <Badge
-                      variant={check.healthy ? 'default' : 'destructive'}
-                      className={check.healthy ? 'bg-green-500/20 text-green-400' : ''}
-                    >
-                      {check.healthy ? 'Healthy' : `Failed (${check.consecutiveFailures}x)`}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                </CardContent>
+            </Card>
 
-      {/* Circuit Breakers */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5 text-yellow-400" />
-            <CardTitle>Circuit Breakers</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {circuitBreakers.length === 0 ? (
-            <p className="text-gray-500">No circuit breakers active</p>
-          ) : (
-            <div className="space-y-3">
-              {circuitBreakers.map((breaker, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between p-3 rounded-lg bg-gray-900/50 border border-gray-800"
-                >
-                  <div className="flex items-center gap-3">
-                    <AlertCircle
-                      className={`h-5 w-5 ${
-                        breaker.open ? 'text-red-400' : 'text-green-400'
-                      }`}
-                    />
-                    <div>
-                      <p className="font-semibold">{breaker.service}</p>
-                      <p className="text-sm text-gray-400">
-                        Failures: {breaker.failures}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge
-                    variant={breaker.open ? 'destructive' : 'default'}
-                    className={!breaker.open ? 'bg-green-500/20 text-green-400' : ''}
-                  >
-                    {breaker.open ? 'OPEN' : 'CLOSED'}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* WordPress Auto-Sync */}
-      <Card>
-        <CardHeader>
-          <CardTitle>WordPress Operations</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h3 className="font-semibold mb-2">Auto-Sync</h3>
-            <p className="text-sm text-gray-400">
-              Automatically sync Round Table results to WordPress as published posts
-            </p>
-            <Badge className="mt-2 bg-green-500/20 text-green-400">
-              Active
-            </Badge>
-          </div>
-
-          <div>
-            <h3 className="font-semibold mb-2">Menu Management</h3>
-            <p className="text-sm text-gray-400">
-              Autonomous agent can manage WordPress menus and navigation
-            </p>
-            <Badge className="mt-2 bg-blue-500/20 text-blue-400">
-              Enabled
-            </Badge>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Content Generation Agent */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Content Generation Agent</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-400">
-            Uses LLM Round Table outputs to generate product descriptions, scene descriptions, and marketing content
-          </p>
-          <Badge className="mt-3 bg-purple-500/20 text-purple-400">
-            Ready
-          </Badge>
-        </CardContent>
-      </Card>
-
-      {/* 3D Scene Builder Agent */}
-      <Card>
-        <CardHeader>
-          <CardTitle>3D Scene Builder Agent</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-400">
-            Builds 3D environments from LLM scene descriptions for luxury product visualization
-          </p>
-          <Badge className="mt-3 bg-cyan-500/20 text-cyan-400">
-            Ready
-          </Badge>
-        </CardContent>
-      </Card>
-    </div>
-  )
+            {/* Critical op confirmation dialog */}
+            <Dialog
+                open={confirmStop !== null}
+                onOpenChange={(open) => {
+                    if (!open) setConfirmStop(null)
+                }}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <AlertTriangle className="h-5 w-5 text-orange-400" />
+                            Stop Critical Operation
+                        </DialogTitle>
+                        <DialogDescription>
+                            <strong>{confirmStop?.name}</strong> is marked as critical. Stopping it
+                            may affect platform reliability. Are you sure?
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setConfirmStop(null)}>
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={() => void confirmAndStop()}
+                            disabled={actionLoading !== null}
+                        >
+                            {actionLoading ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                'Stop Operation'
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </div>
+    )
 }

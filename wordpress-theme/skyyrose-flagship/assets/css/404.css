@@ -41,7 +41,7 @@
    ========================================================================== */
 
 .error-404-number {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: clamp(6rem, 15vw, 12rem);
 	font-weight: 900;
 	line-height: 1;
@@ -114,7 +114,7 @@
    ========================================================================== */
 
 .error-404-title {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: clamp(1.5rem, 3vw, 2.5rem);
 	font-weight: 700;
 	color: #FFFFFF;
@@ -123,7 +123,7 @@
 }
 
 .error-404-subtitle {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: clamp(0.9375rem, 1.5vw, 1.125rem);
 	font-weight: 400;
 	line-height: 1.7;
@@ -133,7 +133,7 @@
 }
 
 .error-404-witty {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: clamp(0.875rem, 1.2vw, 1rem);
 	font-style: italic;
 	font-weight: 400;
@@ -160,7 +160,7 @@
 .error-404-search-input {
 	width: 100%;
 	padding: 0.875rem 3.25rem 0.875rem 1.25rem;
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.9375rem;
 	font-weight: 400;
 	color: #FFFFFF;
@@ -218,7 +218,7 @@
    ========================================================================== */
 
 .error-404-section-heading {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.75rem;
 	font-weight: 600;
 	text-transform: uppercase;
@@ -316,7 +316,7 @@
 }
 
 .error-404-card-label {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: 1.125rem;
 	font-weight: 700;
 	color: #FFFFFF;
@@ -329,7 +329,7 @@
 }
 
 .error-404-card-description {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.8125rem;
 	font-weight: 400;
 	color: rgba(255, 255, 255, 0.4);
@@ -338,7 +338,7 @@
 }
 
 .error-404-card-meta {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.6875rem;
 	font-weight: 600;
 	text-transform: uppercase;
@@ -445,7 +445,7 @@
 }
 
 .error-404-product-name {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.875rem;
 	font-weight: 600;
 	color: #FFFFFF;
@@ -453,7 +453,7 @@
 }
 
 .error-404-product-price {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.8125rem;
 	font-weight: 500;
 	color: #B76E79;
@@ -517,7 +517,7 @@
 }
 
 .error-404-nav-label {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.75rem;
 	font-weight: 500;
 	color: rgba(255, 255, 255, 0.6);
@@ -544,7 +544,7 @@
 }
 
 .error-404-newsletter-heading {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: clamp(1.125rem, 2vw, 1.375rem);
 	font-weight: 700;
 	color: #FFFFFF;
@@ -552,7 +552,7 @@
 }
 
 .error-404-newsletter-text {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.875rem;
 	font-weight: 400;
 	color: rgba(255, 255, 255, 0.5);
@@ -569,7 +569,7 @@
 .error-404-newsletter-input {
 	flex: 1;
 	padding: 0.75rem 1rem;
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.875rem;
 	font-weight: 400;
 	color: #FFFFFF;
@@ -595,7 +595,7 @@
 
 .error-404-newsletter-btn {
 	padding: 0.75rem 1.5rem;
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.875rem;
 	font-weight: 600;
 	letter-spacing: 0.04em;
@@ -642,7 +642,7 @@
 	align-items: center;
 	justify-content: center;
 	padding: 1rem 2.5rem;
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.9375rem;
 	font-weight: 600;
 	letter-spacing: 0.08em;

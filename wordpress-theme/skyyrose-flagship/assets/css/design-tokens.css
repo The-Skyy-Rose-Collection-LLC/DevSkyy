@@ -55,7 +55,6 @@
 	--color-silver: var(--silver, #C0C0C0);
 	--color-white: var(--white, #FFFFFF);
 	--color-black: var(--black, #000000);
-	--color-red: #FF0000;
 
 	/* -----------------------------------------------
 	   Semantic state colors (success/danger/info)
@@ -77,9 +76,15 @@
 	--glass-blur: blur(24px) saturate(1.4);
 
 	/* -----------------------------------------------
-	   Typography — Font Stacks
+	   Typography — Font Stacks (canonical aliases)
+	   --font-heading is the brand-canon alias consumed by every page
+	   stylesheet (woocommerce, footer, immersive, generic-pages, cart,
+	   checkout, etc.). Without this declaration those vars silently
+	   fall back to Playfair instead of Cinzel — brand violation.
+	   --font-headline is kept as a back-compat alias for search-results.css.
 	   ----------------------------------------------- */
-	--font-headline: 'Cinzel', 'Playfair Display', Georgia, serif;
+	--font-heading:  'Cinzel', 'Playfair Display', Georgia, serif;
+	--font-headline: var(--font-heading);
 
 	/* -----------------------------------------------
 	   Typography — Named Font Aliases
@@ -92,7 +97,7 @@
 	--ff-editorial: 'Playfair Display', Georgia, serif;
 	--ff-body:      'Cormorant Garamond', Georgia, serif;
 	--ff-cta:       'Bebas Neue', sans-serif;
-	--ff-mono:      'Space Mono', monospace;
+	--ff-mono:      ui-monospace, 'SF Mono', Menlo, monospace;
 	--ff-system:    'Inter', system-ui, -apple-system, sans-serif;
 
 	/* -----------------------------------------------
@@ -300,7 +305,7 @@
 	--skyyrose-text-muted:   rgba(245, 230, 211, 0.7);
 	--skyyrose-font-display: 'Playfair Display', serif;
 	--skyyrose-font-body:    'Cormorant Garamond', 'Inter', sans-serif;
-	--skyyrose-font-mono:    'Space Mono', monospace;
+	--skyyrose-font-mono:    ui-monospace, 'SF Mono', Menlo, monospace;
 	--skyyrose-font-ui:      'Bebas Neue', sans-serif;
 	--skyyrose-ease:         cubic-bezier(0.16, 1, 0.3, 1);
 	--skyyrose-radius:       2px;
@@ -333,7 +338,7 @@
 /* ═══ Footer CRO Sections ═══ */
 .ft-cro__container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
 .ft-cro__heading {
-	font-family: var(--font-heading, 'Cinzel', serif); font-size: 1.6rem; font-weight: 400;
+	font-family: var(--skyyrose-font-display); font-size: 1.6rem; font-weight: 400;
 	letter-spacing: 0.15em; text-transform: uppercase; margin: 0 0 0.75rem; text-align: center;
 }
 .ft-cro__subheading {
@@ -347,7 +352,7 @@
 	border-top: 1px solid rgba(212,175,55,0.08); border-bottom: 1px solid rgba(212,175,55,0.08);
 }
 .ft-cro-banner p {
-	font-family: var(--font-heading, 'Cinzel', serif); font-size: 1.3rem; font-weight: 400;
+	font-family: var(--skyyrose-font-display); font-size: 1.3rem; font-weight: 400;
 	letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin: 0;
 }
 
@@ -374,7 +379,7 @@
 }
 .ft-cro-craft__card:hover { border-color: rgba(212,175,55,0.2); }
 .ft-cro-craft__icon {
-	display: block; font-family: var(--font-heading, 'Cinzel', serif);
+	display: block; font-family: var(--skyyrose-font-display);
 	font-size: 1.4rem; color: var(--color-gold, #D4AF37); margin-bottom: 0.75rem;
 }
 .ft-cro-craft__card h3 { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 0.5rem; }

@@ -8,13 +8,13 @@ logo_reference: data/brand-logos/black-rose-logo.md
 extra_logos:
   - data/brand-logos/black-rose-authentic-collection-patch.md
   - data/brand-logos/sr-monogram.md
-reference_image: data/product-references/br-003-oakland-techflat.jpeg
+reference_image: data/product-references/br-013-techflat.jpeg
 ---
 
 # BLACK is Beautiful Jersey Series — 5. Last Oakland (Baseball)
 
 > **This SKU is the series-numbered (#5) e-commerce equivalent of
-> br-003-oakland.** Both `br-012` (this SKU) and `br-003-oakland` (variant
+> br-013.** Both `br-012` (this SKU) and `br-013` (variant
 > under the Baseball Classic series) describe the **same physical product**
 > — the green-base baseball jersey with gold/yellow piping, white
 > tackle-twill "BLACK IS BEAUTIFUL" with the black "A" + gold satin-stitch
@@ -22,14 +22,14 @@ reference_image: data/product-references/br-003-oakland-techflat.jpeg
 > back-neck, and white-thread rose-cluster with gold/yellow cloud at
 > back-center.
 >
-> **Render br-012 identically to br-003-oakland.** The full visual spec
+> **Render br-012 identically to br-013.** The full visual spec
 > (every Branding region, every Technique, the COLORWAY OVERRIDE rules, the
 > exhaustive Negative section, the Scene direction) is canonical at:
 > `data/dossiers/black-is-beautiful-jersey-series-0-baseball-classic-oakland.md`.
 >
 > The two SKUs co-exist in the catalog because:
-> - **br-003-oakland** is the colorway variant of the Baseball Classic
->   (br-003), grouped with br-003 / br-003-giants / br-003-white.
+> - **br-013** is the colorway variant of the Baseball Classic
+>   (br-003), grouped with br-003 / br-014 / br-015.
 > - **br-012** is the series-numbered SKU (#5 in the BLACK is Beautiful
 >   Jersey Series), grouped with br-008 SF Football, br-009 Last Oakland
 >   Football, br-010 The Bay Basketball, br-011 The Rose Hockey.
@@ -37,7 +37,7 @@ reference_image: data/product-references/br-003-oakland-techflat.jpeg
 > Both rows appear in the canonical CSV. This thin dossier exists so the
 > coverage check passes for br-012 without duplicating the full visual spec.
 > If the two products ever diverge, this dossier is where the deltas get
-> recorded; the canonical visual spec stays at br-003-oakland.
+> recorded; the canonical visual spec stays at br-013.
 
 **Garment type lock:** Authentic-style baseball jersey — V-neck collar opening with gold/yellow piping, button-front placket with gold/yellow piping, short sleeves with gold/yellow cuff piping, straight even hem (no drop-tail). Solid **dark forest green** base fabric. Mid-weight knit jersey. NOT a t-shirt, NOT a hoodie, NOT a basketball tank, NOT a football jersey — see inherited dossier for full lock detail. **PRE-ORDER product**.
 

@@ -54,8 +54,8 @@ TEST_PROMPTS = {
         "flat": "black crewneck sweatshirt with large white and gray rose graphic, matching jogger pants, product flat lay on white background",
         "model": "fashion model wearing black crewneck with gray rose graphic and matching joggers, full body, studio lighting, editorial photoshoot",
     },
-    "br-003-giants": {
-        "trigger": "skyyrose_br003_giants",
+    "br-014": {
+        "trigger": "skyyrose_br014",
         "flat": "black baseball jersey with orange trim, BLACK IS BEAUTIFUL text in orange, button front, product flat lay",
         "model": "male model wearing black baseball jersey with orange trim, BLACK IS BEAUTIFUL text, urban streetwear photoshoot",
     },

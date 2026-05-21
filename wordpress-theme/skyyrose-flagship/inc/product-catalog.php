@@ -62,18 +62,22 @@ function skyyrose_get_product_catalog() {
 		return $catalog;
 	}
 
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- WP_Filesystem does not support fgetcsv; local theme data file, no remote FS.
 	$handle = fopen( $csv_path, 'r' );
 	if ( false === $handle ) {
 		return $catalog;
 	}
 
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fgetcsv -- standard CSV parse idiom, no WP_Filesystem equivalent.
 	$headers = fgetcsv( $handle, 0, ',', '"', '\\' );
 	if ( false === $headers ) {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		fclose( $handle );
 		return $catalog;
 	}
 
-	while ( ( $row = fgetcsv( $handle, 0, ',', '"', '\\' ) ) !== false ) {
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fgetcsv -- idiomatic CSV row iteration; no WP_Filesystem fgetcsv equivalent.
+	while ( ( $row = fgetcsv( $handle, 0, ',', '"', '\\' ) ) !== false ) { // phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition
 		if ( '' === implode( '', $row ) ) {
 			continue;
 		}
@@ -105,9 +109,12 @@ function skyyrose_get_product_catalog() {
 			'edition_size'      => isset( $data['edition_size'] ) ? (int) $data['edition_size'] : 0,
 			'published'         => ! empty( $data['published'] ) && '0' !== $data['published'],
 			'is_preorder'       => ! empty( $data['is_preorder'] ) && '0' !== $data['is_preorder'],
+			'garment_type_lock' => $data['garment_type_lock'] ?? '',
+			'dossier_slug'      => $data['dossier_slug'] ?? '',
 		);
 	}
 
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 	fclose( $handle );
 
 	if ( function_exists( 'wp_cache_set' ) && ! empty( $catalog ) ) {
@@ -185,14 +192,14 @@ function skyyrose_get_collection_products( $collection ) {
 /**
  * Normalize a SKU to its base product SKU (strip variant suffixes).
  *
- * Handles: br-003-giants → br-003, sg-001-tee → sg-001, br-003a → br-003.
+ * Handles: sg-001-tee → sg-001, br-003a → br-003.
  *
  * @since 6.3.0
  * @param  string $sku SKU with optional variant suffix.
  * @return string Base SKU.
  */
 function skyyrose_normalize_sku( $sku ) {
-	$sku = preg_replace( '/-(tee|shorts|giants|white|oakland)$/', '', $sku );
+	$sku = preg_replace( '/-(tee|shorts)$/', '', $sku );
 	return preg_replace( '/([a-z]{2,4}-\d{3})[a-z]$/', '$1', $sku );
 }
 
@@ -232,6 +239,92 @@ function skyyrose_product_image_uri( $image_path ) {
 		return get_theme_file_uri( 'assets/images/placeholder-product.jpg' );
 	}
 	return get_theme_file_uri( $image_path );
+}
+
+/**
+ * Get parsed dossier data for a product by SKU.
+ *
+ * Reads data/dossiers/{dossier_slug}.md, parses YAML front-matter and
+ * markdown body sections into a structured array for PDP editorial layout.
+ *
+ * @since 7.2.0
+ * @param  string $sku Product SKU.
+ * @return array|null  Structured dossier data or null if unavailable.
+ */
+function skyyrose_get_product_dossier( $sku ) {
+	static $cache = array();
+
+	$sku = sanitize_key( $sku );
+	if ( isset( $cache[ $sku ] ) ) {
+		return $cache[ $sku ];
+	}
+
+	$product = skyyrose_get_product( $sku );
+	if ( ! $product || empty( $product['dossier_slug'] ) ) {
+		$cache[ $sku ] = null;
+		return null;
+	}
+
+	$slug = sanitize_file_name( $product['dossier_slug'] );
+	$path = get_theme_file_path( 'data/dossiers/' . $slug . '.md' );
+
+	if ( ! is_readable( $path ) ) {
+		$cache[ $sku ] = null;
+		return null;
+	}
+
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- local theme file read.
+	$raw = file_get_contents( $path );
+	if ( false === $raw || '' === $raw ) {
+		$cache[ $sku ] = null;
+		return null;
+	}
+
+	$dossier = array(
+		'has_editorial_content' => false,
+		'garment_type_lock'     => '',
+		'branding'              => array(
+			'front' => '',
+			'back'  => '',
+			'other' => '',
+		),
+	);
+
+	// --- Parse front-matter (between --- fences) ---
+	if ( preg_match( '/^---\s*\n(.*?)\n---\s*\n/s', $raw, $fm_match ) ) {
+		$body = substr( $raw, strlen( $fm_match[0] ) );
+	} else {
+		$body = $raw;
+	}
+
+	// --- Extract garment type lock (first bold paragraph after # Title) ---
+	if ( preg_match( '/\*\*Garment type lock:\*\*\s*(.+?)(?:\n\n|\n##)/s', $body, $gtl_match ) ) {
+		$dossier['garment_type_lock'] = sanitize_text_field( trim( $gtl_match[1] ) );
+	}
+
+	// --- Parse ## Branding section and its ### sub-sections ---
+	if ( preg_match( '/## Branding[^\n]*\n(.*?)(?=\n## [^#]|\z)/s', $body, $brand_match ) ) {
+		$brand_body = $brand_match[1];
+
+		if ( preg_match( '/### Front\s*\n(.*?)(?=\n### |\n## |\z)/s', $brand_body, $front_match ) ) {
+			$dossier['branding']['front'] = sanitize_text_field( trim( $front_match[1] ) );
+		}
+		if ( preg_match( '/### Back\s*\n(.*?)(?=\n### |\n## |\z)/s', $brand_body, $back_match ) ) {
+			$dossier['branding']['back'] = sanitize_text_field( trim( $back_match[1] ) );
+		}
+		// Catch Sleeves, Collar, Hem, Other sub-sections.
+		if ( preg_match( '/### (?:Sleeves|Collar|Hem|Other)[^\n]*\n(.*?)(?=\n### |\n## |\z)/s', $brand_body, $other_match ) ) {
+			$dossier['branding']['other'] = sanitize_text_field( trim( $other_match[1] ) );
+		}
+	}
+
+	// Mark as having editorial content if we got meaningful data.
+	if ( '' !== $dossier['garment_type_lock'] || '' !== $dossier['branding']['front'] ) {
+		$dossier['has_editorial_content'] = true;
+	}
+
+	$cache[ $sku ] = $dossier;
+	return $dossier;
 }
 
 /**

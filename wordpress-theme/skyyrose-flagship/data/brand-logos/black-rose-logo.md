@@ -50,9 +50,16 @@ vines wrapping around the stems:
 Different products apply this logo via different techniques. The art stays
 the same; the texture/colorway changes per technique:
 
-- **Embossed / debossed** (e.g., Black Rose Crewneck): The art's *shapes* are
-  impressed into the fabric as a tonal raised relief. Colors flatten to the
-  base fabric color (black on black for the crewneck).
+- **Embossed** (e.g., Black Rose Crewneck): The art is applied as a raised
+  dimensional relief on the fabric surface — visibly 3D and tactile, NOT
+  debossed/sunken, NOT a flat print. The embossed colorway is a reduced
+  3-color palette: **BLACK** (rose blooms), **WHITE** (cumulus cloud at base),
+  and **GREY** (stems, leaves, thorny vines). NO kelly-green stems on the
+  embossed version, NO blue cloud shading on the embossed version — those
+  canonical colors only appear in techniques that preserve the full palette
+  (silicone appliqué, screen-print, etc.). The full canonical art SHAPES are
+  preserved (three roses + leaves + stems + thorny vines + cumulus cloud);
+  only the colorway is reduced.
 - **Silicone appliqué** (e.g., Black Rose Joggers): Raised silicone patch
   with full multi-color art preserved.
 - **Embroidered**: Thread version of the art. Colors approximated in thread.

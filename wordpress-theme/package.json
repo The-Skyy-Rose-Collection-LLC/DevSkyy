@@ -6,11 +6,16 @@
   "scripts": {
     "deploy": "bash ../scripts/deploy-theme.sh",
     "deploy:dry": "bash ../scripts/deploy-theme.sh --dry-run",
+    "build:js": "node skyyrose-flagship/scripts/build-js.js",
+    "build:css": "node skyyrose-flagship/scripts/build-css.js",
+    "build": "npm run build:css && npm run build:js",
     "lint:php": "find skyyrose-flagship -name '*.php' -exec php -l {} \\;",
     "lint:css": "npx stylelint 'skyyrose-flagship/assets/css/**/*.css'",
     "watch": "npx chokidar 'skyyrose-flagship/**/*.{php,css,js}' -c 'echo Changed: {path}'",
     "verify": "npm run lint:php 2>&1 | grep -v 'No syntax errors' | head -20; echo 'PHP check done'",
     "structure": "find skyyrose-flagship -type f -not -path '*/.*' | wc -l && find skyyrose-flagship -type d -not -path '*/.*' | wc -l"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "terser": "^5.36.0"
+  }
 }

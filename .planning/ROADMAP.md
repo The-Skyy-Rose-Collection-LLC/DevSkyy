@@ -146,7 +146,7 @@ Plans:
 - [x] **Phase 10: Accessibility HTML & ARIA** — ARIA errors, button types, skip nav, image loading (completed 2026-03-11)
 - [x] **Phase 11: Color Contrast** — WCAG AA contrast fixes, pre-order price display (completed 2026-03-11)
 - [x] **Phase 12: Responsive & Typography** — 320px overflow, 44px touch targets, fluid type tokens (completed 2026-03-11)
-- [x] **Phase 13: Luxury Cursor** — z-index supremacy, modal pause/resume, conditional loading (completed 2026-03-11)
+- [x] **Phase 13: Luxury Cursor** — z-index supremacy, modal pause/resume, conditional loading (partial — CURS-03 open gap: immersive exclusion gate missing, surfaced 2026-05-12)
 
 </details>
 
@@ -168,11 +168,11 @@ Plans:
   1. The Black Rose collection page displays the Black Rose hero banner (not Love Hurts)
   2. Pre-order products (br-004, br-005, br-006, br-d01-d04, lh-001, sg-001, sg-d01) do not appear on live collection catalog grids
   3. Every product in the catalog grid belongs to the collection it appears under (no cross-collection leaks)
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 09-01-PLAN.md -- Filter pre-orders from catalog grids and sync product data (DATA-02, DATA-03)
-- [ ] 09-02-PLAN.md -- Diagnose and fix Black Rose hero banner (DATA-01)
+- [x] 09-01-PLAN.md -- Verify pre-order filter and cross-collection integrity via CSV integrity test (DATA-02, DATA-03)
+- [x] 09-02-PLAN.md -- Verify Black Rose hero asset on live + close stale DATA-01 requirement (DATA-01)
 
 ### Phase 10: Accessibility HTML & ARIA
 **Goal**: The theme's rendered HTML passes validation with zero ARIA errors and correct semantic structure
@@ -187,23 +187,23 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 10-01-PLAN.md -- Fix button type attributes, enqueue handle collision, and duplicate IDs (A11Y-01, A11Y-02, A11Y-08)
-- [ ] 10-02-PLAN.md -- Fix empty headings, empty links, ARIA attributes, form labels, skip nav, and image loading (A11Y-03, A11Y-04, A11Y-05, A11Y-06, A11Y-07, A11Y-09)
+- [x] 10-01-PLAN.md -- Verify button types, duplicate IDs, and enqueue handle uniqueness via static HTML fixture regression suite (A11Y-01, A11Y-02, A11Y-08)
+- [x] 10-02-PLAN.md -- Verify headings, links, ARIA attributes, form labels, skip nav, and image loading via post-deploy gate assertions (A11Y-03, A11Y-04, A11Y-05, A11Y-06, A11Y-07, A11Y-09)
 
 ### Phase 11: Color Contrast
-**Goal**: All text on the site meets WCAG AA contrast ratios and pricing displays correctly
-**Depends on**: Phase 10 (HTML structure must be final before CSS contrast tuning)
+**Goal**: WCAG AA contrast regression gate — proves all v1.1 color contrast fixes still pass
+**Depends on**: Phase 10 (HTML structure final)
 **Requirements**: CNTR-01, CNTR-02, CNTR-03, CNTR-04
 **Success Criteria** (what must be TRUE):
-  1. Narrative subtext on dark backgrounds is readable (opacity/color adjusted to hit 4.5:1 contrast)
-  2. Small text (10-12px) on interactive cards meets 4.5:1 minimum contrast ratio
-  3. Love Hurts pre-order products display "Pre-Order" instead of "$0.00" pricing
-  4. Running a contrast checker tool on any page produces zero AA failures for text elements
+  1. pytest tests/test_color_contrast_wcag.py passes green (all 6 tests, zero skips)
+  2. Every text/bg token pair from design-tokens.css asserts >= 4.5:1 contrast ratio
+  3. text-muted alpha-blended value (rgba 245,230,211,0.7 on #0A0A0A) asserts >= 4.5:1
+  4. No $0.00 or $0 text inside .holo product-price elements on any collection page
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 11-01-PLAN.md -- Fix WCAG AA contrast in collection-v4, interactive-cards, and collections CSS (CNTR-01, CNTR-02, CNTR-03)
-- [ ] 11-02-PLAN.md -- Replace $0 pricing with Pre-Order label for pre-order products (CNTR-04)
+- [x] 11-01-PLAN.md -- WCAG AA regression test + CNTR-04 live-page pricing assertion (CNTR-01, CNTR-02, CNTR-03, CNTR-04)
+- [x] 11-02-PLAN.md -- Annotate CNTR requirements with verification evidence, update ROADMAP Phase 11 (CNTR-01, CNTR-02, CNTR-03, CNTR-04)
 
 ### Phase 12: Responsive & Typography
 **Goal**: The site looks and works correctly across all screen sizes from 320px mobile to desktop
@@ -217,8 +217,8 @@ Plans:
 **Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 12-01-PLAN.md -- Fix horizontal overflow at 320px and touch targets to 44x44px minimum (RESP-02, RESP-03)
-- [ ] 12-02-PLAN.md -- Replace hardcoded font sizes with clamp()/design tokens and enforce typography hierarchy (RESP-01, RESP-04)
+- [x] 12-01-PLAN.md -- Regression gate: clamp() token assertions + 320px inline-width scan (RESP-01, RESP-02)
+- [x] 12-02-PLAN.md -- Planning artifact closure: annotate RESP-01..04 with v1.1 commits + update ROADMAP (RESP-01..04)
 
 ### Phase 13: Luxury Cursor
 **Goal**: The custom luxury cursor works correctly everywhere including above modals and only loads where needed
@@ -228,10 +228,12 @@ Plans:
   1. When a modal or popup is open, the luxury cursor renders above it (not hidden behind)
   2. The cursor pauses its animation or adapts its behavior while a modal is active
   3. On immersive pages where the cursor is CSS-hidden, the luxury-cursor JS file is not loaded at all (no wasted bandwidth)
-**Plans:** 1/1 plans complete
+**Status**: CURS-01 [x] CURS-02 [x] CURS-03 [ ] OPEN GAP — immersive slug exclusion missing in enqueue.php
+**Plans:** 2/2 plans executed
 
 Plans:
-- [ ] 13-01-PLAN.md -- Fix z-index supremacy, add modal-aware pause/resume, verify conditional loading (CURS-01, CURS-02, CURS-03)
+- [x] 13-01-PLAN.md -- Regression gate: pytest CURS-01 z-index + CURS-03 immersive exclusion (CURS-01 PASSES, CURS-03 FAILS = gap confirmed, commit 818868654)
+- [x] 13-02-PLAN.md -- Annotate REQUIREMENTS.md CURS-01..03 with audit findings, correct CURS-03 to open, update ROADMAP + verify_live_structure.py (CURS-01, CURS-02, CURS-03)
 
 ---
 
@@ -249,9 +251,19 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 14-01-PLAN.md — Add garment_type_lock CSV column, Wave 0 tests, nano_banana package marker (INFRA-04)
-- [ ] 14-02-PLAN.md — Fix 3 broken readers: nano_banana.catalog shim, renders/config.py, fashion/context.py (INFRA-01, INFRA-02, INFRA-03)
-- [ ] 14-03-PLAN.md — Preflight audit script + SKIPPED.json (INFRA-05, INFRA-06, INFRA-07)
+- [x] 14-01-PLAN.md — Add garment_type_lock CSV column, Wave 0 tests, nano_banana package marker (INFRA-04) — VERIFIED 2026-05-16 (14-VERIFICATION.md)
+- [x] 14-02-PLAN.md — Fix 3 broken readers: nano_banana.catalog shim, renders/config.py, fashion/context.py (INFRA-01, INFRA-02, INFRA-03) — VERIFIED 2026-05-16 after regression repair: nano_banana shim was overwritten (a22074ab3/8737e3714), re-routed through skyyrose.core.catalog_loader + CI regression gate added (bug-102 FIXED). renders/config.py + fashion/context.py confirmed delegating.
+- [x] 14-03-PLAN.md — Preflight audit script + SKIPPED.json (INFRA-05, INFRA-06, INFRA-07) — VERIFIED 2026-05-16 (5 PENDING = INFRA-06 deferred by design)
+
+### Phase 14.1: Pre-Order Page Hotfix — fix /preorder/ 404 and populate /pre-order/ grid from canonical CSV is_preorder SKUs (skyyfix.html Cluster B, P0 customer-facing, no paid API) (INSERTED)
+
+**Goal:** [Urgent work - to be planned]
+**Requirements**: TBD
+**Depends on:** Phase 14
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 14.1 to break down)
 
 ### Phase 15: Ghost Mannequin Agent + QA
 **Goal**: The ghost mannequin LangGraph agent can generate a validated, white-background front shot for any single in-scope garment SKU without crashing, overspending, or silently returning a broken image
@@ -265,7 +277,22 @@ Plans:
   5. A run that would exceed the configured spend cap halts before the cap-crossing API call and exits with a clear message showing amount spent and amount remaining
   6. `/simplify` — code simplification pass after phase implementation
   7. `/verification-loop` — automated verification loop confirming all success criteria pass
-**Plans**: TBD
+**Plans**: 7 plans across 4 waves
+Plans:
+**Wave 1**
+- [ ] 15-01-PLAN.md — Data contracts: GhostMannequinAgentResult, FailureEntry, AuditEntry + EliteStudioState extensions (GM-04, GM-05, QA-02)
+- [ ] 15-02-PLAN.md — SKU resolver module: sanitize_sku, resolve_sku, verify_tripo_region, accessory skip gate (GM-06)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 15-03-PLAN.md — GLB cache manager, TripoDigitizer wrapper, _GHOST_MANNEQUIN_EST_COST_USD constant (GM-02)
+- [ ] 15-04-PLAN.md — Prompt registry, GhostMannequinSynthesizer: BRIA bg-removal, Gemini RAS ensemble, jersey cascade (GM-02, GM-03)
+- [ ] 15-05-PLAN.md — Per-metric QA veto gate: corner_pixel_purity, VetoResult, score_ghost_mannequin (QA-01, QA-04)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+- [ ] 15-06-PLAN.md — GhostMannequinAgent orchestration node + GraphConfig wiring (GM-01, GM-02, GM-04, QA-02)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+- [ ] 15-07-PLAN.md — CLI __main__ entry point + integration test suite (GM-05, GM-06, QA-02)
 
 ### Phase 16: 3D-Replica Architect & Purge ✅ (completed 2026-04-24)
 **Goal**: The image generation pipeline produces high-fidelity professional renders by digitizing techflats into 3D (.glb) replicas, scaffolding them via headless Blender, and synthesizing final shots with Gemini 2.0 RAS — and all hallucinated/invalid catalog assets are purged.
@@ -283,7 +310,7 @@ Plans:
 
 ### Phase 17: Review & Approval CLI
 **Goal**: The user can approve or reject each generated image from the command line, and approved images are atomically committed back to the CSV with zero risk of data corruption
-**Depends on**: Phase 15 (review directory and output files must exist before approval tooling is needed)
+**Depends on**: Phase 15 (review directory and output files must exist before approval tooling is needed) — implementation does NOT require Phase 15 outputs, only the directory contract
 **Requirements**: REV-01, REV-02, REV-03, REV-04
 **Success Criteria** (what must be TRUE):
   1. Running `approve-ghost {sku}` on an image not yet in `renders/ghost-mannequin/approved/` moves it there, updates `front_model_image` in the CSV, and writes an approval timestamp — the CSV row count after update equals the row count before
@@ -292,7 +319,12 @@ Plans:
   4. Interrupting `approve-ghost` mid-write (simulated via SIGINT after temp file creation) leaves the original CSV intact — the atomic `os.replace()` pattern prevents partial writes
   5. `/simplify` — code simplification pass after phase implementation
   6. `/verification-loop` — automated verification loop confirming all success criteria pass
-**Plans**: TBD
+**Plans**: 4 plans (single wave — no API dependency, can execute serially or in parallel)
+Plans:
+- [ ] 17-01-PLAN.md — Core library `skyyrose/core/review.py`: atomic CSV writer via `os.replace()`, approve()/reject() pure functions, audit log helpers (REV-01, REV-04)
+- [ ] 17-02-PLAN.md — `scripts/approve_ghost.py` CLI: argparse entry, structural gate (file must exist in review dir), file move to `approved/`, CSV update, exit codes (REV-01, REV-02)
+- [ ] 17-03-PLAN.md — `scripts/reject_ghost.py` CLI: argparse entry, write to `rejections.json` with reason + timestamp, leave file in place, no CSV touch (REV-03)
+- [ ] 17-04-PLAN.md — Integration test suite `tests/test_review.py`: round-trip approve/reject, SIGINT mid-write safety, CLI exit codes, idempotency (REV-01, REV-02, REV-03, REV-04)
 
 ### Phase 18: Full Batch + WooCommerce Upload
 **Goal**: All 28 in-scope garment SKUs have a ghost mannequin front image approved by the user and uploaded to WooCommerce — with an explicit confirmation gate before any production write occurs
@@ -305,7 +337,11 @@ Plans:
   4. Any SKU without a corresponding `approved/{sku}-ghost-front.webp` is excluded from the upload manifest entirely — the upload tool cannot be coerced into uploading unapproved files
   5. `/simplify` — code simplification pass after phase implementation
   6. `/verification-loop` — automated verification loop confirming all success criteria pass
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 18-01-PLAN.md — Batch runner iterates `renders/ghost-mannequin/approved/`, builds WooCommerce upload manifest with target product IDs, image paths, current vs new image diff (UPLOAD-01)
+- [ ] 18-02-PLAN.md — STOP AND SHOW confirmation gate before any WooCommerce API write, WC REST PUT product image, post-upload verification via WC REST GET (UPLOAD-01)
+- [ ] 18-03-PLAN.md — Integration test suite: mock WC REST API, manifest generation tests, gate bypass prevention, only-approved-SKUs gating (UPLOAD-01)
 
 ## Progress
 
@@ -324,11 +360,11 @@ v1.2: 14 → 15 → 17 → 18 ; Phase 16 (3D-Replica Architect & Purge) shipped 
 | 6. WordPress CI Integration | v1.0 | 1/1 | Complete | 2026-03-09 |
 | 7. Deploy Core | v1.0 | 1/1 | Complete | 2026-03-09 |
 | 8. Deploy Verification & Orchestration | v1.0 | 2/2 | Complete | 2026-03-10 |
-| 9. Collection & Product Data | v1.1 | 2/2 | Complete | 2026-03-11 |
+| 9. Collection & Product Data | v1.1 | 2/2 | Complete   | 2026-05-12 |
 | 10. Accessibility HTML & ARIA | v1.1 | 2/2 | Complete | 2026-03-11 |
-| 11. Color Contrast | v1.1 | 2/2 | Complete | 2026-03-11 |
-| 12. Responsive & Typography | v1.1 | 2/2 | Complete | 2026-03-11 |
-| 13. Luxury Cursor | v1.1 | 1/1 | Complete | 2026-03-11 |
+| 11. Color Contrast | v1.1 | 2/2 | Complete   | 2026-05-12 |
+| 12. Responsive & Typography | v1.1 | 2/2 | Complete   | 2026-05-12 |
+| 13. Luxury Cursor | v1.1 | 2/2 | Partial (CURS-03 open) | 2026-05-12 |
 | 14. Catalog Foundation | v1.2 | 0/3 | Not started | - |
 | 15. Ghost Mannequin Agent + QA | v1.2 | 0/TBD | Not started | - |
 | 16. 3D-Replica Architect & Purge | v1.2 | Shipped | Complete | 2026-04-24 |

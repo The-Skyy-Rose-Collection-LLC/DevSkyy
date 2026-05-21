@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import subprocess
 import tempfile
 from pathlib import Path
@@ -120,23 +121,65 @@ class ThreeDAgent(CreativeAgent):
         sku_dir.mkdir(parents=True, exist_ok=True)
 
         # --- Stage 1: 3D Digitization ---
-        logger.info(f"[{sku}] Stage 1: 3D Digitization (Meshy AI)...")
+        # Two paths into the round-table-or-Meshy substrate:
+        #   ELITE_STUDIO_USE_ROUND_TABLE=1 -> tournament (Meshy + Tripo + TRELLIS_local
+        #                                     + AniGen with circuit-breaker health).
+        #   default (unset/0)              -> direct MeshyClient (existing behaviour).
+        # The round-table path is opt-in until end-to-end smoke runs validate the
+        # winner selection on a representative SKU set. See tasks/phase-e-manifest.md.
+        use_round_table = os.environ.get("ELITE_STUDIO_USE_ROUND_TABLE", "0").lower() in (
+            "1",
+            "true",
+            "yes",
+        )
 
-        async with MeshyClient() as client:
-            meshy_result = await client.generate_from_image(
-                image_path=techflat_path,
-                output_dir=str(self.output_dir_3d),
-            )
+        if use_round_table:
+            logger.info(f"[{sku}] Stage 1: 3D Digitization (round-table tournament)...")
+            try:
+                from orchestration.threed_round_table import ThreeDRoundTable
 
-        if not meshy_result:
-            return {
-                "success": False,
-                "error": "3D Generation failed: Meshy returned no result",
-                "sku": sku,
-            }
+                round_table = ThreeDRoundTable(output_dir=str(self.output_dir_3d))
+                rt_result = await round_table.compete_image_to_3d(
+                    image_path=techflat_path,
+                    task_id=sku,
+                )
+                winner = rt_result.winner
+                if winner is None or not winner.output_path:
+                    return {
+                        "success": False,
+                        "error": "3D Generation failed: round-table produced no winner",
+                        "sku": sku,
+                    }
+                glb_path = Path(winner.output_path)
+                thumbnail_url = (winner.metadata or {}).get("thumbnail_url")
+                logger.info(
+                    f"[{sku}] round-table winner: provider={winner.provider} "
+                    f"model_id={winner.model_id}"
+                )
+            except Exception as exc:
+                logger.exception(f"[{sku}] round-table dispatch failed: {exc}")
+                return {
+                    "success": False,
+                    "error": f"3D Generation failed (round-table): {exc}",
+                    "sku": sku,
+                }
+        else:
+            logger.info(f"[{sku}] Stage 1: 3D Digitization (Meshy AI)...")
+            async with MeshyClient() as client:
+                meshy_result = await client.generate_from_image(
+                    image_path=techflat_path,
+                    output_dir=str(self.output_dir_3d),
+                )
 
-        glb_path = Path(meshy_result["model_path"])
-        thumbnail_url = meshy_result.get("thumbnail_url")
+            if not meshy_result:
+                return {
+                    "success": False,
+                    "error": "3D Generation failed: Meshy returned no result",
+                    "sku": sku,
+                }
+
+            glb_path = Path(meshy_result["model_path"])
+            thumbnail_url = meshy_result.get("thumbnail_url")
 
         # --- Stage 1.5: bpy GLB cleanup (decimate + smooth normals) ---
         glb_path = await self._blender_glb_cleanup(glb_path, sku)

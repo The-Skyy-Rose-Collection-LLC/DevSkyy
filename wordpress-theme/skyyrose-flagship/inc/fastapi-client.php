@@ -65,27 +65,17 @@ function skyyrose_see_is_safe_url( string $url ): bool {
 		return false;
 	}
 
-	// Resolve hostname and block private IP ranges.
+	// Resolve hostname and block private + reserved IP ranges. filter_var with
+	// NO_PRIV_RANGE covers RFC 1918 (10/8, 172.16/12, 192.168/16); NO_RES_RANGE
+	// covers loopback (127.0/8), link-local (169.254/16), multicast, etc.
 	$ip = gethostbyname( $host );
-	if ( $ip !== $host ) {
-		$private_ranges = array(
-			'10.',
-			'172.16.', '172.17.', '172.18.', '172.19.',
-			'172.20.', '172.21.', '172.22.', '172.23.',
-			'172.24.', '172.25.', '172.26.', '172.27.',
-			'172.28.', '172.29.', '172.30.', '172.31.',
-			'192.168.',
-			'169.254.',
-			'127.',
-		);
-		foreach ( $private_ranges as $range ) {
-			if ( str_starts_with( $ip, $range ) ) {
-				// Allow localhost in development.
-				if ( str_starts_with( $ip, '127.' ) && wp_get_environment_type() === 'local' ) {
-					return true;
-				}
-				return false;
-			}
+	if ( $ip !== $host && filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+		// Allow loopback in local development only.
+		if ( str_starts_with( $ip, '127.' ) && wp_get_environment_type() === 'local' ) {
+			return true;
+		}
+		if ( ! filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) ) {
+			return false;
 		}
 	}
 
@@ -108,10 +98,13 @@ function skyyrose_see_fastapi_is_available(): bool {
 		return (bool) $cached;
 	}
 
-	$response = wp_remote_get( $base_url . '/health', array(
-		'timeout'   => 3,
-		'sslverify' => apply_filters( 'skyyrose_fastapi_sslverify', true ),
-	) );
+	$response = wp_remote_get(
+		$base_url . '/health',
+		array(
+			'timeout'   => 3,
+			'sslverify' => apply_filters( 'skyyrose_fastapi_sslverify', true ),
+		)
+	);
 
 	$available = ! is_wp_error( $response )
 		&& 200 === wp_remote_retrieve_response_code( $response );
@@ -121,7 +114,8 @@ function skyyrose_see_fastapi_is_available(): bool {
 	return $available;
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * HTTP Request Helpers
  *--------------------------------------------------------------*/
 
@@ -141,13 +135,16 @@ function skyyrose_see_fastapi_post( string $endpoint, array $body, bool $non_blo
 		return null;
 	}
 
-	$response = wp_remote_post( $url, array(
-		'timeout'   => $non_blocking ? 1 : 10,
-		'blocking'  => ! $non_blocking,
-		'sslverify' => apply_filters( 'skyyrose_fastapi_sslverify', true ),
-		'headers'   => array( 'Content-Type' => 'application/json' ),
-		'body'      => wp_json_encode( $body ),
-	) );
+	$response = wp_remote_post(
+		$url,
+		array(
+			'timeout'   => $non_blocking ? 1 : 10,
+			'blocking'  => ! $non_blocking,
+			'sslverify' => apply_filters( 'skyyrose_fastapi_sslverify', true ),
+			'headers'   => array( 'Content-Type' => 'application/json' ),
+			'body'      => wp_json_encode( $body ),
+		)
+	);
 
 	if ( $non_blocking ) {
 		return null;
@@ -175,10 +172,13 @@ function skyyrose_see_fastapi_get( string $endpoint, array $params = array() ): 
 		return null;
 	}
 
-	$response = wp_remote_get( $url, array(
-		'timeout'   => 10,
-		'sslverify' => apply_filters( 'skyyrose_fastapi_sslverify', true ),
-	) );
+	$response = wp_remote_get(
+		$url,
+		array(
+			'timeout'   => 10,
+			'sslverify' => apply_filters( 'skyyrose_fastapi_sslverify', true ),
+		)
+	);
 
 	return skyyrose_see_parse_api_response( $response );
 }
@@ -205,7 +205,8 @@ function skyyrose_see_parse_api_response( $response ): ?array {
 	return is_array( $data ) ? $data : null;
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * High-Level API Methods
  *--------------------------------------------------------------*/
 
@@ -218,10 +219,14 @@ function skyyrose_see_relay_analytics( array $events ): void {
 	if ( ! skyyrose_see_fastapi_is_available() ) {
 		return;
 	}
-	skyyrose_see_fastapi_post( '/api/v1/analytics/ingest', array(
-		'source' => 'skyyrose-theme',
-		'events' => $events,
-	), true ); // Non-blocking.
+	skyyrose_see_fastapi_post(
+		'/api/v1/analytics/ingest',
+		array(
+			'source' => 'skyyrose-theme',
+			'events' => $events,
+		),
+		true
+	); // Non-blocking.
 }
 
 /**
@@ -242,10 +247,13 @@ function skyyrose_see_get_recommendations( string $visitor_hash, array $context 
 		return $cached;
 	}
 
-	$response = skyyrose_see_fastapi_post( '/api/v1/ml/predict/customer_segmentation', array(
-		'visitor_hash' => sanitize_text_field( $visitor_hash ),
-		'context'      => $context,
-	) );
+	$response = skyyrose_see_fastapi_post(
+		'/api/v1/ml/predict/customer_segmentation',
+		array(
+			'visitor_hash' => sanitize_text_field( $visitor_hash ),
+			'context'      => $context,
+		)
+	);
 
 	if ( $response ) {
 		set_transient( $cache_key, $response, HOUR_IN_SECONDS );
@@ -265,8 +273,11 @@ function skyyrose_see_analyze_narrative( string $narrative ): ?array {
 		return null;
 	}
 
-	return skyyrose_see_fastapi_post( '/api/v1/marketing/analyze', array(
-		'narrative' => sanitize_textarea_field( $narrative ),
-		'source'    => 'skyyrose-theme',
-	) );
+	return skyyrose_see_fastapi_post(
+		'/api/v1/marketing/analyze',
+		array(
+			'narrative' => sanitize_textarea_field( $narrative ),
+			'source'    => 'skyyrose-theme',
+		)
+	);
 }

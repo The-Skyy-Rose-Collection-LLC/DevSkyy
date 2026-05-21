@@ -142,10 +142,13 @@ async def correlation_id_middleware(request: Request, call_next):
 async def timing_middleware(request: Request, call_next):
     import time
 
+    from api.v1.monitoring import track_request
+
     start = time.time()
     response = await call_next(request)
     ms = (time.time() - start) * 1000
     response.headers["X-Response-Time"] = f"{ms:.2f}ms"
+    track_request(ms, response.status_code < 400)
     return response
 
 
@@ -223,6 +226,7 @@ app.include_router(ws_router)
 
 # API v1 MCP routers
 from api.v1 import (
+    autonomous_router,
     catalog_router,
     code_router,
     commerce_router,
@@ -245,6 +249,7 @@ app.include_router(hf_spaces_router, prefix="/api/v1")
 app.include_router(marketing_router, prefix="/api/v1")
 app.include_router(media_router, prefix="/api/v1")
 app.include_router(ml_router, prefix="/api/v1")
+app.include_router(autonomous_router, prefix="/api/v1")
 app.include_router(monitoring_router, prefix="/api/v1")
 app.include_router(orchestration_router, prefix="/api/v1")
 app.include_router(sync_router, prefix="/api/v1")

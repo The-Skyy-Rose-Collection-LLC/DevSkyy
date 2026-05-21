@@ -1,579 +1,344 @@
 ---
 name: frontend-design
 description: >
-  Create distinctive, production-grade frontend interfaces with deep expertise in UI/UX design,
-  full-stack WordPress/WooCommerce theme development, and component architecture. Use when building
-  web pages, templates, components, landing pages, or any visual interface. Covers end-to-end:
-  design system creation, CSS architecture, animation orchestration, PHP template hierarchy,
-  WooCommerce integration, Elementor compatibility, accessibility (WCAG 2.1 AA), performance
-  optimization (Core Web Vitals), and responsive design. Triggers on any frontend, design, theme,
-  template, component, landing page, or UI/UX work.
+  Build production-grade frontends grounded in the user's existing codebase, framework, and design system.
+  Read first, design second. Defaults: accessible (WCAG 2.2 AA), performant (Core Web Vitals budgeted),
+  responsive (mobile-first). Picks aesthetic register from product context (calm-editorial /
+  dense-utility / expressive-brand) rather than impulse. Includes the Claude calm-editorial design
+  vocabulary as one register among many, not as the default. Replaces the upstream frontend-design
+  skill with codebase-aware behavior, production triad defaults, and an anti-fingerprint protocol.
+version: 2.0.0
+upstream: claude-plugins-official/frontend-design @ 5c392562 (May 2026)
+license: see upstream LICENSE.txt
 ---
 
-# Frontend Design — Full-Stack Theme & UI/UX Architecture
+# frontend-design v2 — codebase-grounded production frontend
 
-End-to-end guide for building distinctive, production-grade frontend interfaces. Covers design thinking, component architecture, WordPress theme development, WooCommerce integration, animation systems, accessibility, and performance.
+The upstream `frontend-design` skill tells the model what to *avoid* ("don't use Inter, don't make
+purple-on-white gradients") without telling it what to *build*. The result: model designs in a
+vacuum, ships portfolio-style aesthetics into B2B apps, and converges on the same dodge fonts and
+"non-slop" patterns (grain overlays, custom cursors) that have themselves become slop.
 
----
+This v2 inverts the priority:
 
-## 1. Design Thinking
-
-Before writing any code, commit to a clear design direction:
-
-### Design Process
-1. **Purpose** — What problem does this interface solve? Who uses it?
-2. **Tone** — Pick an intentional aesthetic: luxury/refined, editorial/magazine, brutalist/raw, maximalist, minimalist, organic, retro-futuristic, etc.
-3. **Differentiation** — What's the one thing someone will remember?
-4. **Constraints** — Framework, performance budget, accessibility requirements
-
-### Anti-Slop Rules
-NEVER produce generic AI aesthetics:
-- No default font stacks (Inter, Roboto, Arial, system-ui)
-- No purple-on-white gradient cliches
-- No predictable card-grid-with-rounded-corners layouts
-- No cookie-cutter component patterns
-- Every design must have a clear point-of-view
-
-Match complexity to vision: maximalist designs need elaborate animation and layered effects. Minimalist designs need precision in spacing, typography weight, and subtle details.
+1. **Read the user's codebase first.** Extend, don't replace.
+2. **Match the product, not the trend.** Pick aesthetic register from product context.
+3. **Production triad is non-negotiable.** Accessibility, performance, responsive — defaults, not aspirations.
+4. **Anti-fingerprint protocol.** Concrete process to break LLM defaults, not vibes.
+5. **Claude design vocabulary is one register among many.** Use it when the product context calls for calm-editorial — never as a global default.
 
 ---
 
-## 2. UI/UX Design System
+## 0. The hard rule — read before you design
 
-### Typography Scale (Fluid)
-Use `clamp()` for responsive type. Define a complete scale:
-```css
---text-xs: 0.8125rem;           /* 13px — captions, fine print */
---text-sm: 0.9375rem;           /* 15px — secondary text */
---text-base: 1.0625rem;         /* 17px — body text */
---text-lg: 1.1875rem;           /* 19px — emphasized body */
---text-xl: 1.375rem;            /* 22px — large body */
---text-2xl: 1.625rem;           /* 26px — small headings */
---text-3xl: clamp(1.875rem, 2.8vw, 2.25rem);   /* Section titles */
---text-4xl: clamp(2.25rem, 3.8vw, 2.875rem);   /* Page titles */
---text-5xl: clamp(2.75rem, 5.5vw, 4rem);       /* Hero headings */
---text-decorative: clamp(5rem, 14vw, 12.5rem); /* Display text */
-```
+Before making *any* aesthetic choice (font, color, spacing, layout, motion), inventory what the user already has:
 
-### Spacing System (4px/8px grid)
-```css
---space-1: 0.25rem;   /* 4px */
---space-2: 0.5rem;    /* 8px */
---space-3: 0.75rem;   /* 12px */
---space-4: 1rem;      /* 16px */
---space-6: 1.5rem;    /* 24px */
---space-8: 2rem;      /* 32px */
---space-12: 3rem;     /* 48px */
---space-16: 4rem;     /* 64px */
---space-24: 6rem;     /* 96px */
-```
-
-### Color Architecture
-Define semantic tokens, not raw hex in components:
-```css
-/* Brand layer */
---color-brand-primary: #B76E79;
---color-brand-accent: #D4AF37;
-
-/* Surface layer */
---color-page-bg: #0A0A0A;
---color-card-bg: #111111;
---color-border: #2A2A2A;
-
-/* Text layer */
---color-text-primary: #FFFFFF;
---color-text-secondary: #E0E0E0;
---color-text-muted: #B3B3B3;
-
-/* Semantic layer */
---color-success: #10B981;
---color-error: #DC143C;
---color-warning: #F59E0B;
-```
-
-Use `[data-collection]` or `[data-theme]` attributes for palette switching:
-```css
-[data-collection="black-rose"] {
-  --col-accent: #C0C0C0;
-  --col-font-display: 'Cinzel', serif;
-}
-[data-collection="love-hurts"] {
-  --col-accent: #DC143C;
-  --col-font-display: 'Playfair Display', serif;
-}
-```
-
-### Shadow & Depth System
-```css
---depth-1: 0 2px 8px rgba(0, 0, 0, 0.4);      /* Cards */
---depth-2: 0 8px 24px rgba(0, 0, 0, 0.5);      /* Elevated cards */
---depth-3: 0 16px 48px rgba(0, 0, 0, 0.6);     /* Modals */
---depth-4: 0 24px 64px rgba(0, 0, 0, 0.7);     /* Hero overlays */
-```
-
-### Glass Effects
-```css
---glass-bg: rgba(17, 17, 17, 0.92);
---glass-border: 1px solid rgba(255, 255, 255, 0.06);
---glass-blur: blur(24px) saturate(1.4);
-```
-
-### Z-Index Scale
-```css
---z-base: 0;
---z-sticky: 200;
---z-overlay: 400;
---z-tooltip: 600;
---z-modal: 800;
---z-cursor: 9999;
-```
-
----
-
-## 3. Animation Architecture
-
-### Easing Library
-```css
---ease-cinematic: cubic-bezier(0.22, 1, 0.36, 1);      /* Hero entrances */
---ease-magnetic: cubic-bezier(0.03, 0.98, 0.52, 0.99); /* Cursor-reactive */
---ease-whip: cubic-bezier(0.75, 0, 0.25, 1);           /* Snappy micro-interactions */
---ease-smooth-out: cubic-bezier(0.16, 1, 0.3, 1);      /* Exit animations */
---ease-dramatic: cubic-bezier(0.65, 0, 0.35, 1);       /* Clip-path reveals */
-```
-
-### Scroll Reveal System
-Base class `.rv` with directional variants:
-```css
-.rv { opacity: 0; transform: translateY(40px); transition: opacity 0.9s var(--ease-cinematic), transform 0.9s var(--ease-cinematic); }
-.rv.visible { opacity: 1; transform: none; }
-.rv-left { transform: translateX(-40px); }
-.rv-right { transform: translateX(40px); }
-.rv-scale { transform: scale(0.95); }
-```
-
-Stagger delays via CSS custom properties:
-```css
-.rv-d1 { transition-delay: 0.1s; }
-.rv-d2 { transition-delay: 0.2s; }
-/* Or dynamic: */
-.stagger-grid > * { transition-delay: calc(var(--stagger-index) * 60ms); }
-```
-
-### Premium Animation Classes
-| Class | Effect | Trigger |
+| Signal | Where to look | What it tells you |
 |---|---|---|
-| `.rv-clip-up` | Clip-path wipe from bottom | `.is-visible` |
-| `.rv-clip-left/right` | Horizontal clip reveal | `.is-visible` |
-| `.rv-blur` | Blur(12px) + scale(0.97) → sharp | `.is-visible` |
-| `.rv-split-char` | Per-character stagger via `--char-index` | `.is-visible` |
-| `.rv-split-word` | Per-word stagger with blur fade | `.is-visible` |
-| `.stagger-grid` | Grid children cascade entrance | `.is-visible` |
-| `.magnetic` | Cursor-reactive translate (--mag-x, --mag-y) | mousemove |
-| `.btn-sweep` | Diagonal background slide-in | hover |
-| `.btn-border-draw` | Borders animate from corners | hover |
-| `.parallax-slow/medium/fast` | Y-offset at 15%/30%/50% scroll speed | scroll |
+| Design tokens | `tokens.css`, `design-tokens.css`, `theme.json`, `tailwind.config.*`, `figma-tokens.json` | Exact palette + type scale to extend |
+| Component library | `components/`, `ui/`, `node_modules/@shadcn`, `@chakra-ui`, `@mui`, `@mantine` | Existing visual vocabulary |
+| Brand / style guide | `BRAND.md`, `STYLEGUIDE.md`, `DESIGN.md`, `CLAUDE.md`, `docs/brand*` | Rules that override your defaults |
+| Existing pages | A representative page in the same product area | Voice, density, motion style |
+| Framework + version | `package.json`, `next.config.*`, `vite.config.*`, `astro.config.*` | What APIs you can use |
+| Lint / TS config | `eslint.config.*`, `tsconfig.json` | Enforced rules to respect |
 
-### Reduced Motion (MANDATORY)
+**If a design system exists, extend it.** Pull colors, fonts, spacing, and component patterns from there. Justify any token addition.
+
+**Greenfield is the exception, not the default.** If you're certain no system exists, design from scratch — and *say so explicitly* in your plan ("no existing tokens at <paths checked>, designing fresh").
+
+Skip this step and you ship a parallel design system that fights the user's existing one. This is the most common AI-frontend failure mode and the one this skill exists to prevent.
+
+---
+
+## 1. Production triad — non-negotiable
+
+The upstream skill claims "production-grade" three times in 42 lines and mentions accessibility, performance, and responsive design zero times. Production-grade means all three.
+
+### Accessibility (WCAG 2.2 AA minimum)
+
+- **Contrast**: 4.5:1 normal text, 3:1 large text (18px+ bold / 24px+), 3:1 UI components and graphical objects.
+- **Focus**: visible 2px+ outline on every interactive element. Never `outline: none` without a `:focus-visible` replacement.
+- **Touch targets**: minimum 44×44 CSS px.
+- **Alt text**: meaningful images get descriptive `alt`; decorative get `alt=""` + `aria-hidden="true"`.
+- **Keyboard**: every interaction reachable by Tab; logical tab order; skip-to-content link on text-heavy pages.
+- **Motion**: every animation respects `@media (prefers-reduced-motion: reduce)`.
+- **Color alone**: never the only carrier of meaning. Add icon, label, or text affordance.
+- **Form labels**: every input has a visible `<label>` or `aria-labelledby`. Placeholder is not a label.
+- **Headings**: sequential h1→h6, no level skips. One h1 per page.
+
+### Performance (Core Web Vitals budget)
+
+- **LCP < 2.5s**: preload the hero image, self-host fonts with `font-display: swap`, inline above-fold critical CSS.
+- **CLS < 0.1**: every `<img>` has explicit `width`/`height` or `aspect-ratio`; reserve space for async content with skeletons.
+- **INP < 200ms**: defer non-critical JS to body end; debounce scroll/resize; never run layout-triggering animations on scroll.
+- **Image budget**: hero ≤ 200KB, content image ≤ 80KB. Prefer AVIF with WebP fallback. Always set responsive `srcset` + `sizes`.
+- **JS budget**: critical-path JS ≤ 150KB gzipped. Split routes. Lazy-load below-fold modules.
+- **Font loading**: max 2 font families. Subset to the characters used. Preload only the weights rendered above the fold.
+
+### Responsive (mobile-first)
+
+- **Body text ≥ 16px** to prevent iOS auto-zoom on focus.
+- **Mobile-first media queries**: write the small-screen layout as the base; expand with `min-width:` queries.
+- **Breakpoints** (rough defaults — adopt the project's if it has them): `375px` (small phone), `768px` (tablet), `1024px` (desktop), `1440px` (large desktop).
+- **Touch hover**: never depend on `:hover` for primary affordance. Gate `:hover` rules behind `@media (hover: hover) and (pointer: fine)`.
+- **Safe area**: pad for iOS notch / Android gesture bar via `env(safe-area-inset-*)` on full-bleed layouts.
+- **Viewport**: prefer `100dvh` over `100vh` to handle the mobile address bar correctly.
+- **Container queries** where the component is reused across very different parents.
+
+---
+
+## 2. Aesthetic register — match the product
+
+Three named registers. Pick **one** for the product and commit. Mixing registers within a single product reads as incoherence, not range.
+
+### Register A — Calm Editorial (Claude design vocabulary)
+
+**When to use**: long-form content, marketing sites, documentation, editorial products, AI tools and assistants that want to feel considered rather than flashy, products that compete on trust and clarity over novelty.
+
+**Influences**: Anthropic claude.ai, The Atlantic, Aeon, NYRB, Apartamento, mid-century Swiss editorial design, contemporary print magazines, Tufte's information design.
+
+**Palette** — warm, paper-toned, low-saturation. Never cold blue, never neon, never glassmorphism:
+
 ```css
-@media (prefers-reduced-motion: reduce) {
-  .rv, .rv-clip-up, .rv-blur, .stagger-grid > * {
-    opacity: 1; transform: none; transition: none;
-    clip-path: none; filter: none;
-  }
-}
+--paper-bg:       #FAF9F5;  /* warm cream — base canvas */
+--paper-bg-deep:  #F4F2EA;  /* slightly lifted paper, for inset blocks */
+--ink-primary:    #191919;  /* deep slate — body text */
+--ink-secondary:  #5C5C5C;  /* muted slate — supporting copy */
+--ink-tertiary:   #8C8C8C;  /* metadata, timestamps */
+--accent-warm:    #D97757;  /* terracotta / clay — sparing accent */
+--rule-soft:      #E8E4D8;  /* hairline border, paper-toned */
+--surface-card:   #FFFFFF;  /* lifted surface, against paper background */
+--surface-inset:  #F4F2EA;  /* inset blocks, code, quotes */
 ```
 
-### JavaScript Animation Patterns
-```javascript
-// IntersectionObserver for scroll reveals (NO jQuery, NO GSAP for basic reveals)
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      observer.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.1 });
-document.querySelectorAll('.rv').forEach(el => observer.observe(el));
+Dark mode (optional, not default): invert the paper warmth to warm charcoal, not cold black:
 
-// Magnetic cursor tracking
-el.addEventListener('mousemove', (e) => {
-  const rect = el.getBoundingClientRect();
-  const magX = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
-  const magY = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
-  el.style.setProperty('--mag-x', magX);
-  el.style.setProperty('--mag-y', magY);
-});
-
-// Parallax (use transform, never top/left)
-window.addEventListener('scroll', () => {
-  const progress = window.scrollY / window.innerHeight;
-  document.querySelectorAll('[data-parallax]').forEach(el => {
-    el.style.setProperty('--parallax-offset', progress * 100);
-  });
-});
-```
-
----
-
-## 4. WordPress Theme Architecture
-
-### Template Hierarchy
-```
-page-{slug}.php → page-{id}.php → page.php → singular.php → index.php
-```
-
-Custom page templates use the `Template Name` header:
-```php
-<?php
-/**
- * Template Name: Landing — Black Rose
- * Template Post Type: page
- */
-get_header();
-```
-
-### Theme File Structure
-```
-theme-root/
-├── functions.php              # Entry point — constants, includes array
-├── header.php / footer.php    # Global wrappers
-├── style.css                  # WP header + version
-├── inc/                       # PHP modules (enqueue, security, WC, catalog, config)
-│   ├── enqueue.php            # CSS/JS loading system
-│   ├── brand-colors.php       # Color constants (PHP mirrors CSS tokens)
-│   ├── collections-config.php # Collection metadata SOT
-│   ├── product-catalog.php    # Static product database
-│   ├── template-functions.php # Utility helpers
-│   └── security.php           # CSP, rate limiting, ABSPATH guards
-├── assets/
-│   ├── css/
-│   │   ├── design-tokens.css  # Root CSS custom properties
-│   │   ├── system/animations.css + animations-premium.css
-│   │   └── [template-specific].css
-│   ├── js/                    # Vanilla JS modules (no jQuery dependency)
-│   └── fonts/                 # Self-hosted woff2 (GDPR compliant)
-├── template-parts/            # Reusable PHP components
-│   └── product-card-holo.php  # Props via $args, data attributes
-├── woocommerce/               # WC template overrides
-└── template-*.php             # Custom page templates
-```
-
-### Component Pattern (Template Parts)
-Components receive data via `$args` array with `wp_parse_args()`:
-```php
-<?php
-// Calling the component
-get_template_part('template-parts/landing/hero', null, [
-    'collection'  => 'black-rose',
-    'title'       => 'Black Rose',
-    'hero_image'  => 'br-brand-script.png',
-    'tagline'     => 'Dark luxury streetwear from Oakland.',
-    'badge'       => 'Limited Edition — 200 Pieces Per Style',
-]);
-
-// Inside template-parts/landing/hero.php
-$defaults = [
-    'collection' => '',
-    'title'      => '',
-    'hero_image' => '',
-    'tagline'    => '',
-    'badge'      => '',
-];
-$args = wp_parse_args($args, $defaults);
-?>
-<section class="lp-hero" data-collection="<?php echo esc_attr($args['collection']); ?>">
-    <div class="lp-hero__badge rv rv-d1"><?php echo esc_html($args['badge']); ?></div>
-    <img class="lp-hero__logo rv rv-d2" src="<?php echo esc_url(SKYYROSE_ASSETS_URI . '/techflats/hero-overlays/' . $args['hero_image']); ?>" alt="<?php echo esc_attr($args['title']); ?>" loading="eager">
-    <p class="lp-hero__tagline rv rv-d3"><?php echo esc_html($args['tagline']); ?></p>
-</section>
-```
-
-### CSS Class Conventions
-- **BEM-inspired**: `.block__element--modifier` for components
-- **Short prefixes for page-scoped**: `.lp-hero`, `.lp-products`, `.col-story`
-- **State classes**: `.is-visible`, `.is-active`, `.is-open`, `.is-loading`
-- **Data attributes for theming**: `[data-collection="slug"]`, `[data-scroll-fade]`
-- **Stagger indexing**: `style="--stagger-index: 3"` (CSS does the math)
-
-### Conditional Asset Loading
-```php
-// Template slug detection → surgical CSS/JS delivery
-function skyyrose_get_current_template_slug() {
-    if (is_front_page()) return 'front-page';
-    if (is_404()) return '404';
-    if (is_product()) return 'single-product';
-    // ... page template file map
-    $template = get_page_template_slug();
-    if (strpos($template, 'template-landing') !== false) return 'landing';
-    if (strpos($template, 'template-collection') !== false) return 'collection-standalone';
-}
-
-// Enqueue by slug (priority 20, after globals at 10)
-$slug = skyyrose_get_current_template_slug();
-if ($slug === 'landing') {
-    wp_enqueue_style('skyyrose-landing', $uri . '/assets/css/landing-pages.css', ['skyyrose-design-tokens'], SKYYROSE_VERSION);
-    wp_enqueue_script('skyyrose-landing', $uri . '/assets/js/landing-pages.js', [], SKYYROSE_VERSION, true);
-}
-```
-
-### Hook Priority Sequencing
-```
-Priority 5:  Fonts (preload, prevent FOUT)
-Priority 10: Global styles + scripts (design-tokens, components, animations, nav)
-Priority 15: Script localization (wp_localize_script)
-Priority 20: Template-specific CSS/JS (conditional on slug)
-```
-
----
-
-## 5. WooCommerce Integration
-
-### Product Data Access
-```php
-// From WC product object
-$product = wc_get_product($product_id);
-$price = $product->get_price_html();
-$stock = $product->get_stock_quantity();
-$image = wp_get_attachment_image_url($product->get_image_id(), 'large');
-
-// From static catalog (non-WC fallback)
-$catalog = skyyrose_get_product_catalog();
-$item = $catalog[$sku];
-```
-
-### Add-to-Cart (AJAX, No Page Reload)
-```javascript
-// WooCommerce native AJAX add-to-cart
-document.querySelectorAll('.add-to-cart').forEach(btn => {
-  btn.addEventListener('click', async (e) => {
-    e.preventDefault();
-    btn.classList.add('is-loading');
-    const form = new URLSearchParams({
-      product_id: btn.dataset.productId,
-      quantity: 1,
-    });
-    const res = await fetch('/?wc-ajax=add_to_cart', {
-      method: 'POST',
-      body: form,
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    });
-    const data = await res.json();
-    btn.classList.remove('is-loading');
-    if (data.error) { window.skyyToast(data.error, 'error'); return; }
-    window.skyyToast('Added to bag', 'success');
-    // Update cart count in nav
-    document.querySelectorAll('.cart-count').forEach(el => {
-      el.textContent = data.cart_hash ? parseInt(el.textContent || 0) + 1 : el.textContent;
-    });
-  });
-});
-```
-
-### Scarcity Display Pattern
-```php
-<div class="scarcity-indicator">
-    <span class="scarcity-dot"></span>
-    <span class="scarcity-text">
-        <?php echo esc_html($stock); ?> of <?php echo esc_html($edition_size); ?> remaining
-    </span>
-</div>
-```
 ```css
-.scarcity-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-error); animation: pulse 1.5s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+--paper-bg:       #1E1B16;  /* warm charcoal — base canvas */
+--paper-bg-deep:  #161310;
+--ink-primary:    #F4F1E8;  /* warm off-white text */
+--ink-secondary:  #C2BDB0;
+--accent-warm:    #E89B7B;  /* lifted terracotta for dark bg */
+--rule-soft:      #2E2A22;
 ```
 
-### WooCommerce Template Overrides
-Place in `theme/woocommerce/` to override WC defaults:
-```
-woocommerce/
-├── single-product.php          # Product page layout
-├── content-product.php         # Shop grid card
-├── cart/cart.php                # Cart page
-├── checkout/form-checkout.php  # Checkout
-└── single-product/
-    ├── title.php               # Product title
-    └── price.php               # Price display
-```
+**Typography** — editorial serif display + restrained sans body:
 
----
+- **Display** (h1/h2/hero): a contemporary serif with character. Strong defaults: **Tiempos Headline**, **Newsreader** (open source), **Source Serif 4** (open source), **Fraunces** (variable, characterful), **GT Sectra**, **Sang Bleu**, **Editorial New**.
+- **Body**: a humanist or transitional sans, used with discipline. Strong defaults: **Söhne**, **Untitled Sans**, **National 2**, **GT America**, **ABC Diatype**. Inter is acceptable *only* when restraint is the point and it's used at a single weight family.
+- **Pairing rule**: pair a serif display with a sans body, OR pair a serif at varied weights throughout. Never pair two sans-serif faces.
+- **Type scale**: classical 1.25 (major third) or 1.333 (perfect fourth). Avoid the 1.5+ scales that flatten hierarchy.
 
-## 6. Elementor Compatibility
+**Spacing** — generous, breathing:
 
-### Elementor JSON Structure
-Pages store layout in `_elementor_data` postmeta:
-```json
-[{
-  "elType": "section",
-  "settings": { "layout": "full_width", "background_color": "#0A0A0A" },
-  "elements": [{
-    "elType": "column",
-    "elements": [{
-      "elType": "widget",
-      "widgetType": "heading",
-      "settings": { "title": "BLACK ROSE", "typography_font_family": "Cinzel" }
-    }]
-  }]
-}]
-```
+- Section vertical padding: `clamp(4rem, 8vw, 8rem)`.
+- Container max-width: `1100-1200px` with `clamp(1.5rem, 4vw, 3rem)` horizontal padding.
+- Body line length: `60-75ch` (use `max-width: 65ch` on long-form blocks).
+- Body line-height: `1.6-1.75`. Display line-height: `1.05-1.15`.
 
-### Theme + Elementor Hybrid
-Use PHP templates for performance-critical pages (landing pages, collections). Use Elementor for admin-editable content:
-```php
-// Render Elementor template inside theme template
-if (class_exists('\Elementor\Plugin')) {
-    echo \Elementor\Plugin::instance()->frontend->get_builder_content_for_display($template_id);
-}
-```
+**Motion** — restrained, intentional:
 
-### Custom Elementor Widgets
-```php
-add_action('elementor/widgets/register', function($widgets_manager) {
-    require_once get_template_directory() . '/elementor/widgets/product-card.php';
-    $widgets_manager->register(new \SkyyRose\Product_Card_Widget());
-});
-```
+- Opacity transitions + small `transform: translateY(8px)` reveals. No parallax, no scroll-jacking, no element-by-element entrance choreography.
+- Duration `300-600ms`. Easing `cubic-bezier(0.16, 1, 0.3, 1)` (a calm cinematic).
+- One hero entrance per page, maximum. Other motion only on user intent (hover, click, focus).
 
----
+**Texture** — atmosphere through palette, not effects:
 
-## 7. Accessibility (WCAG 2.1 AA)
+- The warmth of the paper background *is* the texture.
+- No grain overlay, no noise SVG, no gradient mesh, no glassmorphism.
+- Hairline borders (`1px solid var(--rule-soft)`) carry the editorial feel without effects.
 
-### Critical Requirements
-- **Contrast**: 4.5:1 for normal text, 3:1 for large text (18px+ bold or 24px+)
-- **Focus states**: Visible 2-4px rings on all interactive elements
-- **Touch targets**: Minimum 44x44px (use `hitSlop` / padding if icon is smaller)
-- **Alt text**: Descriptive on meaningful images, `alt=""` + `aria-hidden="true"` on decorative
-- **Keyboard nav**: Tab order matches visual order, skip-to-content link
-- **ARIA labels**: On icon-only buttons, landmark regions
-- **Heading hierarchy**: Sequential h1→h6, no level skips
-- **Color not only**: Never convey information by color alone (add icon/text)
-- **Reduced motion**: Respect `prefers-reduced-motion` — disable animations, parallax
+**Layout** — editorial grid:
 
-### WordPress-Specific A11y
-```php
-// Skip nav (in header or via output buffer)
-<a class="skip-nav" href="#main-content">Skip to main content</a>
+- Asymmetric balance. Generous left/right margins. Print-spread proportions.
+- Pull quotes set apart with rules above and below, not boxes.
+- Hierarchy through size + weight + space, not boxes and shadows.
+- Footnotes and marginalia as design elements where the content warrants it.
 
-// Screen reader text
-<span class="screen-reader-text">Close menu</span>
+**Anti-traits — do not do, even if the rest of the register is in place**: drop shadows beyond `0 1px 2px rgba(0,0,0,0.04)`, gradient backgrounds, neon focus states, animated emojis, gradient text, glass cards, custom cursors, scroll-triggered video, hero video autoplay.
 
-// Escape all output
-echo esc_html($title);          // Text content
-echo esc_attr($class);          // HTML attributes
-echo esc_url($link);            // URLs
-echo wp_kses_post($description); // Rich text (limited HTML)
-```
+### Register B — Dense Utility
 
----
+**When to use**: dashboards, internal tools, admin panels, data-heavy apps, developer tools, anything where information density is the primary value.
 
-## 8. Performance (Core Web Vitals)
+**Palette** — high-contrast, functional. Pick light or dark; both work. Saturation is muted; semantic colors exist only for status:
 
-### LCP (Largest Contentful Paint) < 2.5s
-- Preload hero image: `<link rel="preload" as="image" href="...">`
-- Self-host fonts (woff2) with `font-display: swap`
-- Inline critical CSS for above-fold content
-- `loading="eager"` on hero image, `loading="lazy"` on everything below fold
-
-### CLS (Cumulative Layout Shift) < 0.1
-- Set `width` + `height` or `aspect-ratio` on all images
-- Reserve space for async content (skeleton screens)
-- No font-swap reflow (preload critical fonts)
-
-### INP (Interaction to Next Paint) < 200ms
-- Defer non-critical JS: `wp_enqueue_script(..., true)` for footer
-- No layout-triggering animations (use `transform` + `opacity` only)
-- Debounce scroll/resize handlers
-
-### WordPress Performance
-```php
-// Version-bust CSS on deploy
-define('SKYYROSE_VERSION', '6.4.0');
-wp_enqueue_style('handle', $uri, [], SKYYROSE_VERSION);
-
-// Conditional premium animations (skip on lightweight pages)
-$skip = ['cart', 'checkout', 'blog', 'single', '404', 'search'];
-if (!in_array($slug, $skip)) {
-    wp_enqueue_style('animations-premium');
-}
-
-// GSAP only where needed (3 pages, not global)
-if (in_array($slug, ['preorder-gateway', 'about', 'immersive'])) {
-    wp_enqueue_script('gsap');
-}
-```
-
-### Image Optimization
-- WebP format, quality 85-92 for product shots
-- Responsive images: `srcset` + `sizes` attributes
-- Aspect ratio 3:4 for product cards, 16:9 for banners
-- Maximum 200KB per hero image, 80KB per product image
-
----
-
-## 9. Responsive Design
-
-### Breakpoints
 ```css
-/* Mobile first */
-@media (min-width: 375px)  { /* Small phone adjustments */ }
-@media (min-width: 768px)  { /* Tablet: 2-column layouts */ }
-@media (min-width: 1024px) { /* Desktop: full layouts */ }
-@media (min-width: 1440px) { /* Large desktop: max-width containers */ }
+--surface:    #FFFFFF;       /* or #0B0F14 for dark */
+--surface-2:  #F7F9FC;       /* table stripes, inset blocks */
+--text:       #0E1116;
+--text-muted: #5B6470;
+--border:     #E5E9EE;
+--accent:     #2563EB;       /* or your brand primary */
+--positive:   #15803D;
+--negative:   #B91C1C;
+--warning:    #B45309;
 ```
 
-### Container System
-```css
-.container        { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-.container--wide  { max-width: 1400px; }
-.container--narrow { max-width: 800px; }
-```
+**Typography**: a single sans-serif at multiple weights. Tabular numerals (`font-variant-numeric: tabular-nums`) on every numeric column. Monospace for code, IDs, and timestamps.
 
-### Mobile Considerations
-- Minimum 16px body text (prevents iOS auto-zoom)
-- Stack grids to single column below 768px
-- Hide hover-dependent interactions on touch devices
-- Bottom nav for mobile (hidden on desktop >=769px)
-- Safe area padding for notch/gesture bar devices
-- `min-height: 100dvh` over `100vh` for mobile viewports
+**Spacing**: tight. 4 / 8 / 12 / 16 / 24 px scale. Information density wins over breathing room.
+
+**Motion**: skeletons, optimistic UI, no entrance animations. Motion exists to confirm action, never to delight.
+
+**Layout**: data tables, side rails, dense cards, multi-column reading. Sticky table headers. Bulk-action toolbars. Keyboard shortcuts visible.
+
+### Register C — Expressive Brand
+
+**When to use**: brand sites, portfolios, product launches, marketing campaigns, event sites — places where the design IS the product.
+
+**Constraints**: this register has the most freedom AND the highest risk of slop. Apply guardrails:
+
+- Pick a **single conceptual hook** ("the year of the rose", "industrial precision", "summer 1974", "deep East Oakland streetwear") and commit. Every aesthetic choice ties back to it.
+- One unique typography pairing per project. Source it from a recent typography release, a printed reference, or a brand identity book. Do not pull from the AI-default pool (Space Grotesk, JetBrains Mono, Recursive, Inter Display, Plex).
+- Motion is allowed at higher intensity, but cap it: one hero choreography, one signature interaction. Not 15 animated elements per scroll.
+- Texture allowed if it's tied to the hook (paper grain on a photography portfolio, not generic noise on a SaaS page).
+- Dark mode is allowed but not the default unless the hook demands it.
+- The product still ships the production triad — expressive does not mean inaccessible or slow.
 
 ---
 
-## 10. Security
+## 3. Anti-fingerprint protocol
 
-### WordPress Output Security
-```php
-echo esc_html($text);              // ALWAYS escape text output
-echo esc_attr($attribute);         // ALWAYS escape attributes
-echo esc_url($url);                // ALWAYS escape URLs
-echo wp_kses_post($rich_content);  // Allow limited HTML
-```
+The upstream skill says "NEVER converge on common choices (Space Grotesk, for example)" but provides no mechanism. Here is the mechanism. Run all four steps before writing any aesthetic CSS.
 
-### JavaScript Security
-- NEVER use `innerHTML` — use `createElement` + `textContent`
-- Validate `nonce` on all AJAX requests
-- Sanitize URL parameters before use
-- CSP headers in `inc/security.php`
+### Step 1 — Name the default you'd reach for first
 
-### Asset Security
-- SRI hashes on CDN scripts (GSAP, etc.)
-- `?v=SKYYROSE_VERSION` on all asset URLs for cache busting
-- No inline `onclick` handlers — use `addEventListener`
+Out loud, in your plan, state what you'd default to. Example: *"First instinct: Inter body + Space Grotesk display, slate-on-white, shadcn card-grid layout, framer-motion entrance animation."*
+
+### Step 2 — Reject that default
+
+Unless the project's existing system already uses it, **do not pick it**. Your first instinct is the LLM training-set fingerprint. The default has been overproduced for two years.
+
+### Step 3 — Source the alternative from a non-default place
+
+Pull from one of these, not from prior:
+
+- A typeface foundry's current "what's new" page (Klim, Grilli Type, Commercial Type, Production Type, ABC Dinamo, Pangram Pangram, OHno Type).
+- A printed brand book or annual report.
+- A museum identity (MoMA, Tate, Whitney, V&A all publish design guidelines).
+- A magazine you'd actually read (Apartamento, Toilet Paper, MacGuffin, Modern Matter, Cabinet).
+- A printed reference book from a tradition outside web design (Swiss railway timetables, mid-century cookbook design, 1970s technical manuals, art-house cinema posters).
+
+### Step 4 — Justify in one line
+
+Every major choice (font, palette, layout, motion) gets a one-line justification in the plan or PR description: *"Newsreader display because long-form essay context needs a contemporary serif with character, and the project's content lives between Aeon and a tech blog — Tiempos would feel too newspaper, Söhne would feel too SaaS."*
+
+If you can't write the justification, you don't understand the choice well enough to ship it.
 
 ---
 
-## Quick Reference: WordPress Template Checklist
+## 4. Patterns that aged into slop — drop these
 
-Before shipping any WordPress template:
-- [ ] `esc_html()` / `esc_attr()` / `esc_url()` on ALL dynamic output
-- [ ] `loading="lazy"` on below-fold images, `loading="eager"` on hero
-- [ ] `alt` text on meaningful images, `alt=""` on decorative
-- [ ] CSS enqueued via `wp_enqueue_style()`, not inline `<style>`
-- [ ] JS enqueued via `wp_enqueue_script()` with `true` (footer)
-- [ ] `SKYYROSE_VERSION` on all asset URLs
-- [ ] `data-collection` attribute for palette switching
-- [ ] `prefers-reduced-motion` media query disabling animations
-- [ ] Mobile layout tested at 375px
-- [ ] No hardcoded URLs (use `get_template_directory_uri()`)
-- [ ] Focus states visible on interactive elements
-- [ ] `php -l` passes on all PHP files
+The upstream skill recommends grain overlays, custom cursors, gradient meshes. These were the 2022-2023 "anti-default" choices that defined the AI-coded-website look of 2023-2025. They are now the slop.
+
+**Drop, as of 2026:**
+
+| Pattern | Why it's slop now |
+|---|---|
+| Grain / noise overlay (`feTurbulence`, noise SVG, blend mode) | Defined the 2023-2024 AI portfolio look. Every Vercel template had it. |
+| Custom cursors | Break native cursor semantics, fail on touch, become a tell of AI-generated sites. |
+| Glassmorphism (`backdrop-filter: blur` on cards/nav) | 2021 macOS Big Sur knockoff; ubiquitous in 2023 SaaS templates. |
+| Purple → pink gradient backgrounds | The original AI-coded marketing site fingerprint. |
+| Gradient text via `background-clip: text` | Massively overused 2022-2024; now reads as effortful. |
+| Space Grotesk display + Inter body | The "I avoided Inter" dodge that became its own default. |
+| Shadcn/ui default theme untouched | Identifiable on sight. Extend tokens or pick a different starting kit. |
+| Tailwind default palette (`bg-slate-50`, `text-slate-900` everywhere) | Same. Extend or replace. |
+| Dark mode default with cold black `#000` background | Tells the user nothing was considered for warmth. Use warm charcoal if dark, or default to light. |
+| Scroll-jacking / horizontal scroll on vertical wheel | Aged poorly, breaks browser conventions, accessibility regression. |
+| Animated emojis as decorative elements | 2023 startup fingerprint. |
+| Hero video autoplay | Performance hit + accessibility issue + tells nobody read the brand. |
+| `cursor: pointer` on non-link elements | Lazy hover affordance. Reach for proper interactive elements. |
+| `border-radius: 9999px` on every card / button | The "everything pill-shaped" look. Vary radius to express hierarchy. |
+
+This list will need quarterly review. What's slop shifts. Bump skill version when the list changes.
+
+---
+
+## 5. Framework + design-system decision tree
+
+```
+Does the project ship a design system / token file?
+├── YES → extend it. Read the tokens. Match the naming. Add only what's missing.
+│         Do NOT introduce a parallel system.
+└── NO → does the project have a UI library installed?
+    ├── shadcn/ui detected (components.json or ui/ dir)
+    │   → start from shadcn primitives, extend theme tokens
+    │     (do NOT ship the default neutral theme verbatim)
+    ├── @chakra-ui / @mui / @mantine / @radix-ui / @ariakit
+    │   → use their theming API; respect their composition patterns
+    ├── Tailwind detected (tailwind.config.*)
+    │   → extend tailwind.config; never ship default slate palette
+    │     without customization
+    ├── Unstyled (vanilla CSS / CSS modules / styled-components)
+    │   → design tokens file at src/styles/tokens.css; CSS custom
+    │     properties; layered by concern (palette, type, space, motion)
+    └── Greenfield → say so explicitly; pick a register from section 2;
+                      design from scratch with the constraints above
+```
+
+**Framework checks before writing code:**
+
+- `package.json` → React version, Next.js version, Vite, Astro, Svelte, SolidJS, Qwik
+- `next.config.*` → App Router vs Pages Router (affects component model, RSC vs client components)
+- `tailwind.config.*` → existing tokens, plugins, content paths
+- `tsconfig.json` → `strict`, `paths`, JSX runtime
+- `.eslintrc*` / `eslint.config.*` → enforced rules, import order
+- `postcss.config.*` → autoprefixer targets, nesting support
+- `.browserslistrc` or `browserslist` field → target browsers (affects CSS feature use)
+
+**Modern frontend reality (2026)**:
+
+- React Server Components are first-class — prefer them for static content.
+- CSS nesting and `@scope` are widely supported — use them.
+- View Transitions API is shipping in Chrome/Safari — use for cross-page transitions over JS animations.
+- `:has()` is supported everywhere — use for parent-based conditional styling.
+- Container queries are baseline — prefer them over media queries when the component is reused.
+- `color-mix()` and `oklch()` are baseline — prefer over hex for derived colors.
+
+---
+
+## 6. Project overrides take precedence
+
+If the project ships any of these, **they override this skill's defaults**:
+
+- `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` at repo root or in scope.
+- `BRAND.md`, `STYLEGUIDE.md`, `DESIGN.md`, `DESIGN-PRINCIPLES.md`.
+- A skill named `<project>-design` or `<brand>-theme`.
+- An ADR or RFC documenting visual / UX decisions.
+- A Figma library or design system documented in the repo.
+
+Read those first. **This skill is the floor of expectations, not the ceiling.** The project's own guide wins every conflict.
+
+**SkyyRose project note**: `wordpress-theme/CLAUDE.md` documents the WordPress theme conventions (PHP escaping rules, enqueue priorities, builder integration, brand palette tokens). When working on `wordpress-theme/skyyrose-flagship/`, that file is the canonical spec and overrides this skill's framework-agnostic guidance. Brand canon: Rose Gold `#B76E79`, Dark `#0A0A0A`, Silver `#C0C0C0`, Crimson `#DC143C`, Gold `#D4AF37`. Tagline: "Luxury Grows from Concrete." No blue ever. The four collections are Black Rose, Love Hurts, Signature, Kids Capsule. For SkyyRose work, also load the `skyyrose-brand-dna` skill.
+
+---
+
+## 7. Pre-ship checklist
+
+Before declaring frontend work done:
+
+- [ ] Read existing tokens, components, brand guide — or stated explicitly that none exist.
+- [ ] Picked one aesthetic register, justified the pick from product context.
+- [ ] Every major aesthetic choice has a one-line non-default justification.
+- [ ] Contrast checked against WCAG 2.2 AA at target sizes.
+- [ ] All interactive elements have visible `:focus-visible` states.
+- [ ] `prefers-reduced-motion` respected (animations disabled or reduced to opacity-only).
+- [ ] Touch targets ≥ 44×44 CSS px.
+- [ ] All `<img>` elements have `width`/`height` or `aspect-ratio` set.
+- [ ] Hero image preloaded; below-fold images `loading="lazy"`.
+- [ ] Mobile layout verified at 375px width.
+- [ ] Body text ≥ 16px to prevent iOS auto-zoom.
+- [ ] No grain overlay, custom cursor, glassmorphism, or other Section 4 anti-patterns.
+- [ ] If the project has a `CLAUDE.md` / design system, the implementation extends rather than replaces it.
+- [ ] Lint, type-check, build all pass.
+- [ ] No console errors or warnings in browser devtools.
+
+---
+
+## Notes on this skill
+
+- **Replaces** upstream `claude-plugins-official/frontend-design @ 5c392562` (May 2026). Upstream emphasizes anti-defaults without positive guidance; this version inverts to codebase-first, production-triad-default, register-based selection.
+- **Includes** the Claude design vocabulary as Register A. **Register A is not the default** — pick the register that matches the product. Forcing claude.ai's calm-editorial palette on every project would itself be slop.
+- **Drops** the upstream's WordPress-specific extensions that lived in the previous local 20KB fork. For project-specific theme work, defer to that project's `CLAUDE.md` (e.g., `wordpress-theme/CLAUDE.md`).
+- **Quarterly review**: the Section 4 anti-pattern list and the typeface defaults in Section 2 need refreshing as the slop horizon shifts. Bump skill `version:` when material changes ship.

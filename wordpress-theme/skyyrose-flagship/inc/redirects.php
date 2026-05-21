@@ -65,14 +65,14 @@ function skyyrose_preorder_slug_redirect() {
 	$request_uri = isset( $_SERVER['REQUEST_URI'] )
 		? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) )
 		: '';
-	$path = strtok( $request_uri, '?' );
+	$path        = strtok( $request_uri, '?' );
 
 	if ( '/preorder/' !== $path && '/preorder' !== $path ) {
 		return;
 	}
 
-	$target  = home_url( '/pre-order/' );
-	$qs_pos  = strpos( $request_uri, '?' );
+	$target = home_url( '/pre-order/' );
+	$qs_pos = strpos( $request_uri, '?' );
 	if ( false !== $qs_pos ) {
 		$target .= substr( $request_uri, $qs_pos );
 	}

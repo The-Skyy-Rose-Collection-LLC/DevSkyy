@@ -436,19 +436,23 @@ add_filter( 'excerpt_more', 'skyyrose_excerpt_more' );
  *--------------------------------------------------------------*/
 
 /**
- * Get the post thumbnail URL or a placeholder.
+ * Get the post thumbnail URL, or empty string when no thumbnail is set.
+ *
+ * Returning an empty string lets callers decide their own brand-appropriate
+ * fallback (skip the <img>, render a CSS gradient placeholder, swap to a
+ * collection hero, etc.) instead of shipping a generic stock placeholder.
  *
  * @since  1.0.0
  *
  * @param  string $size WordPress image size name.
- * @return string Image URL.
+ * @return string Image URL or empty string when none is available.
  */
 function skyyrose_get_post_thumbnail( $size = 'skyyrose-featured' ) {
 	if ( has_post_thumbnail() ) {
 		return get_the_post_thumbnail_url( get_the_ID(), $size );
 	}
 
-	return SKYYROSE_ASSETS_URI . '/images/placeholder.jpg';
+	return '';
 }
 
 /*

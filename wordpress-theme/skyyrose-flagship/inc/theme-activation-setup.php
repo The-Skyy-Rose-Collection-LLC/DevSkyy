@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Bump this constant when adding new pages or changing setup logic.
  * The `init` runner uses this to determine if setup has already run.
  */
-define( 'SKYYROSE_SETUP_VERSION', '4.0.0' );
+define( 'SKYYROSE_SETUP_VERSION', '4.2.0' );
 
 /*
 --------------------------------------------------------------
@@ -101,6 +101,33 @@ function skyyrose_get_required_pages() {
 		'experience-signature'    => array(
 			'title'    => __( 'Signature Experience', 'skyyrose' ),
 			'template' => 'template-immersive-signature.php',
+			'content'  => '',
+		),
+		'experience-kids-capsule' => array(
+			'title'    => __( 'Kids Capsule Experience', 'skyyrose' ),
+			'template' => 'template-immersive-kids-capsule.php',
+			'content'  => '',
+		),
+
+		// --- Landing / drop pages (paid-media targets) ---
+		'landing-black-rose'      => array(
+			'title'    => __( 'Black Rose — Drop', 'skyyrose' ),
+			'template' => 'template-landing-black-rose.php',
+			'content'  => '',
+		),
+		'landing-love-hurts'      => array(
+			'title'    => __( 'Love Hurts — Drop', 'skyyrose' ),
+			'template' => 'template-landing-love-hurts.php',
+			'content'  => '',
+		),
+		'landing-signature'       => array(
+			'title'    => __( 'Signature — Drop', 'skyyrose' ),
+			'template' => 'template-landing-signature.php',
+			'content'  => '',
+		),
+		'landing-kids-capsule'    => array(
+			'title'    => __( 'Kids Capsule — Drop', 'skyyrose' ),
+			'template' => 'template-landing-kids-capsule.php',
 			'content'  => '',
 		),
 

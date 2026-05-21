@@ -53,35 +53,35 @@ Requirements for the CSV-driven ghost mannequin imagery pipeline. Phase numberin
 
 ### Accessibility
 
-- [x] **A11Y-01**: All buttons have explicit `type="button"` attribute
-- [x] **A11Y-02**: No duplicate element IDs in rendered HTML (stylesheet handles, nonce fields)
-- [x] **A11Y-03**: Empty headings have content or `aria-hidden="true"`
-- [x] **A11Y-04**: Empty links have descriptive `aria-label` attributes
-- [x] **A11Y-05**: Focusable elements with `aria-hidden="true"` have `tabindex="-1"`
-- [x] **A11Y-06**: All form inputs (radio, text) have associated labels or `aria-label`
-- [x] **A11Y-07**: Skip navigation link is wired and functional
-- [x] **A11Y-08**: Stylesheet and script handles are unique (no `skyyrose-accessibility` collision)
-- [x] **A11Y-09**: Below-fold images have `loading="lazy"`, hero images have `loading="eager"`
+- [x] **A11Y-01**: All buttons have explicit `type="button"` attribute — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313)
+- [x] **A11Y-02**: No duplicate element IDs in rendered HTML (stylesheet handles, nonce fields) — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313)
+- [x] **A11Y-03**: Empty headings have content or `aria-hidden="true"` — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313)
+- [x] **A11Y-04**: Empty links have descriptive `aria-label` attributes — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313)
+- [x] **A11Y-05**: Focusable elements with `aria-hidden="true"` have `tabindex="-1"` — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313)
+- [x] **A11Y-06**: All form inputs (radio, text) have associated labels or `aria-label` — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313; search input gap tracked for v1.3)
+- [x] **A11Y-07**: Skip navigation link is wired and functional — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313)
+- [x] **A11Y-08**: Stylesheet and script handles are unique (no `skyyrose-accessibility` collision) — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313; covered transitively by A11Y-02)
+- [x] **A11Y-09**: Below-fold images have `loading="lazy"`, hero images have `loading="eager"` — Complete (v1.1, commits 923455187 + dfc4e1e94 + 8ad0df313; all non-hero/logo/brand/monogram imgs lazy)
 
 ### Color Contrast
 
-- [x] **CNTR-01**: All text meets WCAG AA contrast ratio (4.5:1 normal text, 3:1 large text)
-- [x] **CNTR-02**: Narrative subtext opacity increased to meet 4.5:1 against background
-- [x] **CNTR-03**: Interactive-cards small text (10-12px) meets minimum contrast
-- [x] **CNTR-04**: Love Hurts $0 pricing replaced with "Pre-Order" display
+- [x] **CNTR-01**: All text meets WCAG AA contrast ratio (4.5:1 normal text, 3:1 large text) *(verified: Phase 11 WCAG regression gate — tests/test_color_contrast_wcag.py)*
+- [x] **CNTR-02**: Narrative subtext opacity increased to meet 4.5:1 against background *(verified: Phase 11 alpha-blend test — text-muted on #0A0A0A asserts >= 4.5:1)*
+- [x] **CNTR-03**: Interactive-cards small text (10-12px) meets minimum contrast *(verified: Phase 11 all-collections token inheritance test)*
+- [x] **CNTR-04**: Love Hurts $0 pricing replaced with "Pre-Order" display *(verified: Phase 11 live-page pricing assertion — verify_live_structure.py CNTR-04 check)*
 
 ### Responsive & Typography
 
-- [x] **RESP-01**: Font sizes scale appropriately across mobile/tablet/desktop breakpoints
-- [x] **RESP-02**: No horizontal overflow or layout breaking on mobile devices (320px+)
-- [x] **RESP-03**: Touch targets meet minimum 44x44px on mobile
-- [x] **RESP-04**: Typography hierarchy is consistent across all page templates
+- [x] **RESP-01**: Font sizes scale appropriately across mobile/tablet/desktop breakpoints — Complete (v1.1, commits 8ad0df313 + 61e42abe0)
+- [x] **RESP-02**: No horizontal overflow or layout breaking on mobile devices (320px+) — Complete (v1.1, commit 8ad0df313)
+- [x] **RESP-03**: Touch targets meet minimum 44x44px on mobile — Complete (v1.1, commits dfc4e1e94 + d9e5154b7)
+- [x] **RESP-04**: Typography hierarchy is consistent across all page templates — Complete (v1.1, commits 61e42abe0 + e5e80d6d4)
 
 ### Luxury Cursor
 
-- [x] **CURS-01**: Cursor renders above modals/popups (z-index management)
-- [x] **CURS-02**: Cursor pauses or adapts when modal/popup is open
-- [x] **CURS-03**: Cursor JS does not load on pages where it's CSS-hidden (immersive)
+- [x] **CURS-01**: Cursor renders above modals/popups (z-index management) — Complete (v1.1, z-index: 99999 confirmed in luxury-cursor.css, commit 818868654)
+- [x] **CURS-02**: Cursor pauses or adapts when modal/popup is open — Complete (v1.1, verified 2026-03-11)
+- [ ] **CURS-03**: Cursor JS does not load on pages where it's CSS-hidden (immersive) — **OPEN GAP** (Phase 13 audit 2026-05-12): `luxury-cursor.min.js` is enqueued unconditionally in `skyyrose_enqueue_global_scripts()` (inc/enqueue.php lines 249-259) with no immersive-slug exclusion. Fix: move enqueue to `skyyrose_enqueue_template_scripts()` behind `if ($slug !== 'immersive')`. Regression gate: `tests/test_luxury_cursor.py::test_cursor_not_loaded_on_immersive` (commit 818868654).
 
 ### Collection & Product Data
 
@@ -165,7 +165,8 @@ Requirements for the CSV-driven ghost mannequin imagery pipeline. Phase numberin
 | A11Y-01 through A11Y-09 | Phase 10 | Complete |
 | CNTR-01 through CNTR-04 | Phase 11 | Complete |
 | RESP-01 through RESP-04 | Phase 12 | Complete |
-| CURS-01 through CURS-03 | Phase 13 | Complete |
+| CURS-01, CURS-02 | Phase 13 | Complete |
+| CURS-03 | Phase 13 | **Open Gap** — immersive slug gate missing in enqueue.php |
 | DATA-01 | Phase 9 | Pending |
 | DATA-02 through DATA-03 | Phase 9 | Complete |
 

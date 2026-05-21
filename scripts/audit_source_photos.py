@@ -146,7 +146,7 @@ def _scan_files() -> dict[str, dict[str, Path]]:
     catalog_skus = sorted(
         (row["sku"] for row in read_catalog_rows() if row.get("sku")),
         key=len,
-        reverse=True,  # match longest SKUs first (br-003-oakland before br-003)
+        reverse=True,  # match longest SKUs first
     )
 
     for path in candidates:

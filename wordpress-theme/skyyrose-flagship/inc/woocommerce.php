@@ -234,6 +234,25 @@ function skyyrose_woocommerce_related_products_args( $args ) {
 }
 add_filter( 'woocommerce_output_related_products_args', 'skyyrose_woocommerce_related_products_args' );
 
+/**
+ * Disable the related-products block on single product pages (H4 launch decision).
+ *
+ * Removes the default WooCommerce action that outputs related products under
+ * the summary. Keeps the args filter above intact so the block can be re-enabled
+ * by deleting this remove_action call alone.
+ *
+ * @since 1.4.0
+ * @return void
+ */
+function skyyrose_disable_related_products() {
+	remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+}
+// Hook on `wp` (after all plugins have bootstrapped) so the remove_action
+// fires AFTER WooCommerce has registered the action. Hooking on `init`
+// worked in practice but relied on ordering assumptions — `wp` is the
+// canonical safe choice for conditional remove_action on WC template hooks.
+add_action( 'wp', 'skyyrose_disable_related_products' );
+
 /*
 --------------------------------------------------------------
  * Cross-Sells
@@ -521,8 +540,9 @@ function skyyrose_complete_the_look() {
 }
 add_action( 'woocommerce_single_product_summary', 'skyyrose_complete_the_look', 50 );
 
-/* Pre-order meta, notices, pricing, and referral credit logic moved to
-   inc/woocommerce-preorder.php in v6.3.0 for maintainability. */
+/*
+Pre-order meta, notices, pricing, and referral credit logic moved to
+	inc/woocommerce-preorder.php in v6.3.0 for maintainability. */
 
 /**
  * Inject product collection data on WooCommerce native loop items.
@@ -627,6 +647,64 @@ function skyyrose_override_fse_detection( $is_fse ) {
 	return false;
 }
 add_filter( 'wc_is_block_theme', 'skyyrose_override_fse_detection' );
+
+/*
+--------------------------------------------------------------
+ * Cart "Wears With" Cross-Sell Helper
+ *--------------------------------------------------------------*/
+
+/**
+ * Suggest a single cross-sell product for the cart page.
+ *
+ * Counts collections among cart SKUs, picks the dominant collection,
+ * and returns the first published product from that collection that
+ * is NOT already in the cart.
+ *
+ * @since 7.2.0
+ *
+ * @param  array $cart_skus Array of SKUs currently in the cart.
+ * @return array|null       Single product array from the catalog, or null.
+ */
+function skyyrose_get_cart_wears_with( $cart_skus ) {
+	if ( empty( $cart_skus ) || ! function_exists( 'skyyrose_get_product' ) ) {
+		return null;
+	}
+
+	// Tally collections.
+	$counts = array();
+	foreach ( $cart_skus as $sku ) {
+		$product = skyyrose_get_product( $sku );
+		if ( $product && ! empty( $product['collection'] ) ) {
+			$col            = $product['collection'];
+			$counts[ $col ] = ( $counts[ $col ] ?? 0 ) + 1;
+		}
+	}
+
+	if ( empty( $counts ) ) {
+		return null;
+	}
+
+	// Pick dominant collection.
+	arsort( $counts );
+	$dominant = array_key_first( $counts );
+
+	// Find first published product not already in cart.
+	$collection_products = function_exists( 'skyyrose_get_collection_products' )
+		? skyyrose_get_collection_products( $dominant )
+		: array();
+
+	foreach ( $collection_products as $product ) {
+		if ( ! $product['published'] ) {
+			continue;
+		}
+		if ( in_array( $product['sku'], $cart_skus, true ) ) {
+			continue;
+		}
+		return $product;
+	}
+
+	return null;
+}
 
 /*
 Pre-order meta, notices, pricing, and referral credit logic moved to

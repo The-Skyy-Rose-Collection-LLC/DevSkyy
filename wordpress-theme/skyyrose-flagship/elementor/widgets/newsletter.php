@@ -78,7 +78,7 @@ class SkyyRose_Newsletter_Widget extends \Elementor\Widget_Base {
 			array(
 				'label'   => esc_html__( 'Success Message', 'skyyrose' ),
 				'type'    => \Elementor\Controls_Manager::TEXT,
-				'default' => esc_html__( 'Welcome to the circle.', 'skyyrose' ),
+				'default' => esc_html__( 'You\'re in.', 'skyyrose' ),
 			)
 		);
 

@@ -52,15 +52,15 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "back": S / "black-rose" / "br-jersey-baseball-black-back.jpeg",
         },
         # br-003 variants — split from composite techflats
-        "br-003-giants": {
+        "br-014": {
             "front": S / "black-rose" / "br-jersey-baseball-giants-front.jpeg",
             "back": S / "black-rose" / "br-jersey-baseball-giants-back.jpeg",
         },
-        "br-003-oakland": {
+        "br-013": {
             "front": S / "black-rose" / "br-jersey-baseball-oakland-front.jpeg",
             "back": S / "black-rose" / "br-jersey-baseball-oakland-back.jpeg",
         },
-        "br-003-white": {
+        "br-015": {
             "front": S / "black-rose" / "br-jersey-baseball-white-front.jpeg",
             "back": S / "black-rose" / "br-jersey-baseball-white-back.jpeg",
         },

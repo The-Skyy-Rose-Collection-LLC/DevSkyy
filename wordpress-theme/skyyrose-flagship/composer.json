@@ -23,7 +23,12 @@
         "wp-coding-standards/wpcs": "^3.0",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
         "phpcompatibility/php-compatibility": "^9.3",
-        "wp-cli/wp-cli-bundle": "^2.8"
+        "wp-cli/wp-cli-bundle": "^2.8",
+        "phpstan/phpstan": "^2.0",
+        "phpstan/extension-installer": "^1.4",
+        "szepeviktor/phpstan-wordpress": "^2.0",
+        "php-stubs/wordpress-stubs": "^6.7",
+        "php-stubs/woocommerce-stubs": "^9.0"
     },
     "scripts": {
         "test": "phpunit",
@@ -31,7 +36,9 @@
         "phpcs": "phpcs --standard=WordPress .",
         "phpcs:fix": "phpcbf --standard=WordPress .",
         "lint": "phpcs --standard=WordPress --extensions=php .",
-        "lint:fix": "phpcbf --standard=WordPress --extensions=php ."
+        "lint:fix": "phpcbf --standard=WordPress --extensions=php .",
+        "phpstan": "phpstan analyse",
+        "phpstan:baseline": "phpstan analyse --generate-baseline phpstan-baseline.neon"
     },
     "autoload": {
         "psr-4": {
@@ -40,7 +47,8 @@
     },
     "config": {
         "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "phpstan/extension-installer": true
         }
     }
 }

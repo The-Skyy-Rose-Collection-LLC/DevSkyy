@@ -34,7 +34,7 @@
 	gap: 2rem;
 }
 .nav-v7 .nav-link {
-	font-family: var(--ff-mono, 'Space Mono', monospace);
+	font-family: var(--ff-mono, ui-monospace, 'SF Mono', Menlo, monospace);
 	font-size: 0.625rem;
 	letter-spacing: 0.4em;
 	text-transform: uppercase;
@@ -54,7 +54,7 @@
 	text-decoration: none;
 }
 .nav-v7 .nav-bag {
-	font-family: var(--ff-mono, 'Space Mono', monospace);
+	font-family: var(--ff-mono, ui-monospace, 'SF Mono', Menlo, monospace);
 	font-size: 0.625rem;
 	letter-spacing: 0.4em;
 	text-transform: uppercase;
@@ -327,7 +327,7 @@
 	.specimen-track { animation: none; }
 }
 .specimen-item {
-	font-family: var(--ff-mono, 'Space Mono', monospace);
+	font-family: var(--ff-mono, ui-monospace, 'SF Mono', Menlo, monospace);
 	font-size: clamp(0.7rem, 1.2vw, 0.875rem);
 	letter-spacing: 0.2em;
 	text-transform: uppercase;
@@ -499,7 +499,7 @@
 .press-item--cinzel    { font-family: var(--ff-brand, 'Cinzel', serif); font-size: 1.1rem; letter-spacing: 0.15em; }
 .press-item--bebas     { font-family: var(--ff-cta, 'Bebas Neue', sans-serif); font-size: 1.4rem; letter-spacing: 0.15em; }
 .press-item--playfair  { font-family: var(--ff-editorial, 'Playfair Display', serif); font-style: italic; font-size: 1.2rem; }
-.press-item--mono      { font-family: var(--ff-mono, 'Space Mono', monospace); font-size: 0.7rem; letter-spacing: 0.15em; }
+.press-item--mono      { font-family: var(--ff-mono, ui-monospace, 'SF Mono', Menlo, monospace); font-size: 0.7rem; letter-spacing: 0.15em; }
 .press-item--cormorant { font-family: var(--ff-body, 'Cormorant Garamond', serif); font-size: 1.3rem; }
 
 /* ── Drop List / Footer V7 ── */
@@ -599,7 +599,7 @@
 	margin-bottom: 0.25rem;
 }
 .nl-v7-nav a {
-	font-family: var(--ff-mono, 'Space Mono', monospace);
+	font-family: var(--ff-mono, ui-monospace, 'SF Mono', Menlo, monospace);
 	font-size: 0.65rem;
 	letter-spacing: 0.25em;
 	text-transform: uppercase;
@@ -617,7 +617,7 @@
 	margin-top: 6rem;
 	padding-top: 1.5rem;
 	border-top: 1px solid rgba(192,192,192,0.08);
-	font-family: var(--ff-mono, 'Space Mono', monospace);
+	font-family: var(--ff-mono, ui-monospace, 'SF Mono', Menlo, monospace);
 	font-size: 0.6rem;
 	letter-spacing: 0.3em;
 	text-transform: uppercase;
@@ -639,6 +639,6 @@
 	from { opacity: 0; transform: translateY(1.5rem); }
 	to   { opacity: 1; transform: translateY(0); }
 }
-.font-mono { font-family: var(--ff-mono, 'Space Mono', monospace) !important; }
+.font-mono { font-family: var(--ff-mono, ui-monospace, 'SF Mono', Menlo, monospace) !important; }
 .font-cinzel { font-family: var(--ff-brand, 'Cinzel', serif) !important; }
 

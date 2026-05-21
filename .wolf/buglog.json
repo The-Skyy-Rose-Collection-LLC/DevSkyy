@@ -1548,6 +1548,225 @@
       "occurrences": 1,
       "last_seen": "2026-05-03T12:29:48.891633+00:00",
       "resolved": true
+    },
+    {
+      "id": "bug-096",
+      "timestamp": "2026-05-11T20:50:00.000Z",
+      "error_message": "Tripo generate_multiview_image hallucinated brand canon on 30 SKUs (120 renders) \u2014 invented 'rose-on-cloud' motif on br-001, rendered br-011 hockey jersey as cyan/teal hoodie with invented crest, applied off-canon patch to wrong location on sg-007 signature beanie",
+      "file": "scripts/tripo_dispatch.py + skyyrose/elite_studio/agents/tripo_agent.py",
+      "root_cause": "Tripo `generate_multiview_image` template runs FLUX.1 Kontext with naked image-only input \u2014 accepts NO prompt, NO logo overlay, NO dossier branding spec, NO palette token. With no canon anchor, FLUX defaults to training-set priors. Dispatch boundary had no guard distinguishing branded SKUs (which Tripo cannot render correctly) from unbranded clean tech-flats (which it can). Additionally, SKUs with empty catalog `image` column silently fell back to `front_model_image` (a model-on shot), which the template re-builds from scratch \u2014 changing garment type entirely (jersey \u2192 hoodie). No QA gate caught the regression; STOP-AND-SHOW manifest showed cost only, no output preview.",
+      "fix": "scripts/tripo_dispatch.py \u2014 added classify_skus() function that blocks at the dispatch boundary: (1) SKUs whose dossier frontmatter has `logo_reference:` populated are blocked as BRANDED with directive to route via ADK render_pipeline. (2) SKUs with empty `image` column or missing tech-flat file are blocked as NO TECH-FLAT. --force-branded escape hatch added with WARNING and still-required explicit y to dispatch. Per-SKU block reason printed in manifest before y/N prompt. 12 unit tests in tests/test_tripo_dispatch_guards.py covering both guards plus escape hatch. renders/output/tripo/QUARANTINE.md written marking all 120 existing outputs as discard-do-not-publish. Cerebrum Do-Not-Repeat entry added 2026-05-11.",
+      "tags": [
+        "tripo",
+        "flux-kontext",
+        "hallucination",
+        "model-output-quality",
+        "guard-rail",
+        "regression",
+        "production-blocker"
+      ],
+      "related_bugs": [],
+      "occurrences": 30,
+      "last_seen": "2026-05-08T04:48:00.000Z"
+    },
+    {
+      "id": "bug-097",
+      "timestamp": "2026-05-12T22:32:00Z",
+      "error_message": "CURS-03: luxury cursor JS loads on immersive templates (slug='immersive') \u2014 no exclusion gate in enqueue.php",
+      "file": "wordpress-theme/skyyrose-flagship/inc/enqueue.php",
+      "root_cause": "wp_enqueue_script('skyyrose-luxury-cursor', ...) lives inside skyyrose_enqueue_global_scripts() at lines 249-259 with no conditional check. Template slug detection exists (skyyrose_get_current_template_slug() maps template-immersive-*.php to 'immersive') but is not consulted before cursor JS enqueue. Result: cursor JS loads on all pages including immersive templates where the cursor is CSS-hidden.",
+      "fix": "FIXED in theme 1.1.2 (commit 016f7025f, deployed 2026-05-12). wordpress-theme/skyyrose-flagship/inc/enqueue.php lines 247-263: wrapped the luxury-cursor wp_enqueue_script() block in `if ('immersive' !== skyyrose_get_current_template_slug())`. The template slug helper was already available in the same file (no new dependency). After deploy, live verification confirmed zero <script> tags loading luxury-cursor.js on /experience-black-rose/. Regression test tests/test_luxury_cursor.py::test_cursor_not_loaded_on_immersive flipped from intentional-fail to pass (3/3 green).",
+      "tags": [
+        "curs-03",
+        "enqueue",
+        "wordpress",
+        "conditional-load",
+        "immersive",
+        "open-gap",
+        "phase-13"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-12T23:35:00Z",
+      "regression_test": "tests/test_luxury_cursor.py::test_cursor_not_loaded_on_immersive (commit 818868654) \u2014 FAILS until fix is deployed",
+      "resolved": true
+    },
+    {
+      "id": "bug-098",
+      "timestamp": "2026-05-12T22:30:00Z",
+      "error_message": "DATA-01: /collection-black-rose/, /collection-love-hurts/, /collection-signature/, /collection-kids-capsule/ all returned HTTP 200 but served the homepage (page-id-9822, page-template-front-page-php) instead of the matching template-collection-*.php. Collection pages were absent from the WordPress DB.",
+      "file": "wordpress-theme/skyyrose-flagship/inc/theme-activation-setup.php",
+      "root_cause": "skyyrose_run_activation_setup() runs once via add_action('init', ...) at priority 30, gated by `if get_option('skyyrose_activation_setup_version') === SKYYROSE_SETUP_VERSION return;`. The stored option was '4.0.0', matching the constant, so the init runner short-circuited on every request. However, the four collection pages had been deleted from the WP admin at some point (or never created on this site's initial activation), so skyyrose_create_required_pages() never re-ran to recreate them. wp_safe_redirect logic in inc/redirects.php only handled legacy /collections/{slug}/ -> /collection-{slug}/ rewrites \u2014 it assumed the canonical destination pages existed, which they did not.",
+      "fix": "Bumped SKYYROSE_SETUP_VERSION constant from '4.0.0' to '4.1.0' in inc/theme-activation-setup.php (commit 016f7025f, theme 1.1.2). On next request after deploy the init runner sees the version mismatch, fires skyyrose_run_activation_setup(), which calls skyyrose_create_required_pages(). That function iterates the slug map (already includes the four collection slugs at lines 69-88) and runs wp_insert_post() for any slug returned as missing by get_page_by_path(), assigning _wp_page_template meta to point at the matching template-collection-*.php. Post-deploy verified live: /collection-black-rose/ = page-id-9454, love-hurts=9455, signature=9456, kids-capsule=9651 \u2014 all routing to their correct templates.",
+      "tags": [
+        "data-01",
+        "wp-init-hook",
+        "theme-activation",
+        "page-creation",
+        "wordpress",
+        "rewrite-routing",
+        "phase-9",
+        "production-bug"
+      ],
+      "related_bugs": [],
+      "occurrences": 4,
+      "last_seen": "2026-05-12T23:35:00Z",
+      "regression_test": "scripts/verify_live_structure.py COLLECTION_HERO_ASSETS asserts img[src*='sr-collection-*.webp'] per collection",
+      "resolved": true
+    },
+    {
+      "id": "bug-099",
+      "timestamp": "2026-05-14T00:35:15Z",
+      "error_message": "Stop hook error: Hook JSON output validation failed \u2014 (root): Invalid input",
+      "file": ".claude/hooks/learning-reminder.sh",
+      "root_cause": "Stop hook emitted {hookSpecificOutput.additionalContext: ...} JSON. That schema is valid only for UserPromptSubmit and PostToolUse. Stop accepts only {decision, reason, continue, stopReason, suppressOutput, systemMessage}. Claude Code schema validator rejected the unknown root-level shape.",
+      "fix": "Replaced jq stdout JSON emission with stderr printf. Stop fires after Claude finishes, so additionalContext injection is moot \u2014 the reminder is for the human, stderr is the right channel. Stdout now empty, schema validator passes. Marker file deletion preserved.",
+      "tags": [
+        "hooks",
+        "claude-code",
+        "stop-event",
+        "schema",
+        "jq",
+        "additionalContext",
+        "openwolf"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-14T00:35:15Z"
+    },
+    {
+      "id": "bug-100",
+      "timestamp": "2026-05-13T17:55:00-07:00",
+      "error_message": "NOT SUPPORTED: option missingRefs. Pass empty schema with $id that should be ignored to ajv.addSchema. TypeError: Cannot set properties of undefined (setting 'defaultMeta') at ajvOrig",
+      "file": "node_modules/@eslint/eslintrc/dist/eslintrc-universal.cjs:385",
+      "root_cause": "ESLint 9.39.3 bundles ajv that rejects the 'missingRefs' option used by @eslint/eslintrc's legacy config loader. Lint-staged invokes ESLint 9 which loads eslintrc-universal.cjs which calls ajvOrig with NOT-SUPPORTED options -> hard crash before any file is linted. Blocks pre-commit on any staged .ts/.tsx under frontend/**",
+      "fix": "Scoped npm overrides in root package.json: 'eslint': {'ajv': '^6.14.0'} AND '@eslint/eslintrc': {'ajv': '^6.14.0'}. Forces both packages to nest ajv v6.15.0 in their own node_modules while keeping top-level ajv@8.18.0 for other consumers. Verified: 'cd frontend && npx eslint <file>' runs to completion (2 warnings, 0 errors, exit 0). Fixed in chore/p1-p5-backlog at TBD-commit.",
+      "tags": [
+        "eslint",
+        "lint-staged",
+        "pre-commit",
+        "frontend",
+        "tooling",
+        "ajv",
+        "eslintrc"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-13T17:55:00-07:00",
+      "status": "FIXED",
+      "fixed_at": "2026-05-13T19:25:00-07:00",
+      "fixed_in_commit": "TBD-this-commit"
+    },
+    {
+      "id": "bug-101",
+      "timestamp": "2026-05-16T03:24:33.130549-07:00",
+      "error_message": "error: 'tuple' object is not callable (TestModules in tests/aos/shell/test_commands.py)",
+      "file": "aos/shell/commands.py",
+      "root_cause": "ModuleRegistry.manifests and .registered_types are @property accessors, not methods; _cmd_modules called them with () which invoked the returned tuple/frozenset.",
+      "fix": "Dropped the parentheses: kernel.modules.manifests / kernel.modules.registered_types accessed as properties.",
+      "tags": [
+        "aos",
+        "shell",
+        "phase-6.4",
+        "property-vs-method",
+        "module-registry"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T03:24:33.130549-07:00",
+      "status": "FIXED",
+      "fixed_in_commit": "TBD-phase-6.4"
+    },
+    {
+      "id": "bug-102",
+      "timestamp": "2026-05-16T08:10:00-07:00",
+      "error_message": "Phase 14 INFRA-01 regression: scripts/nano_banana/catalog.py bypasses skyyrose.core.catalog_loader (independent csv.DictReader) \u2014 single-source-of-truth contract broken; Plan 14-02 SUMMARY claim false",
+      "file": "scripts/nano_banana/catalog.py",
+      "root_cause": "Plan 14-02 added a catalog_loader shim (commit 51dc3ff8b). Later commits a22074ab3 and 8737e3714 overwrote scripts/nano_banana/catalog.py with a standalone csv.DictReader parser (lines 8, 26-55), regressing INFRA-01. Data stays consistent (same canonical CSV file) but the three pipelines no longer share the catalog adapter \u2014 the contract, not the data, is violated.",
+      "fix": "Option A applied. Rewrote scripts/nano_banana/catalog.py load_catalog() + module docstring + CATALOG_CSV constant to source rows via skyyrose.core.catalog_loader.read_catalog_rows / bool_col / CATALOG_CSV (env-overridable). Removed the local csv.DictReader. Preserved the richer HEAD functions untouched (find_source_image, find_back_source, load_products, load_specs, get_material_spec \u2014 load-bearing per cli.py/produce_async.py) and kept engine_override + back_source_override; added garment_type from garment_type_lock (INFRA-04 alignment). Added CI regression gate tests/test_catalog_csv_integrity.py::test_nano_banana_catalog_routes_through_core_loader asserting nb.read_catalog_rows IS core.read_catalog_rows, canonical CATALOG_CSV, and no csv.DictReader in load_catalog. Verified: 21/21 integrity tests green incl. test_python_loaders_agree_on_sku_set; nano+elite agree on 33 SKUs; black/ruff/isort clean.",
+      "tags": [
+        "phase-14",
+        "INFRA-01",
+        "catalog-loader",
+        "nano-banana",
+        "regression",
+        "single-source-of-truth",
+        "gsd-verification"
+      ],
+      "related_bugs": [
+        "bug-103"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T08:10:00-07:00",
+      "status": "FIXED",
+      "fixed_at": "2026-05-16T08:25:00-07:00",
+      "fixed_in_commit": "TBD-this-session"
+    },
+    {
+      "id": "bug-103",
+      "timestamp": "2026-05-16T08:25:00-07:00",
+      "error_message": "5 prod modules reference data/product-catalog.csv as 'single source of truth' but that file is NOT on the main tree and NOT git-tracked (only the canonical wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv is tracked)",
+      "file": "database/seed_catalog.py",
+      "root_cause": "Legacy second-CSV references predating the catalog_loader consolidation. Affected: database/seed_catalog.py, agents/social_media_agent.py, scripts/nano-banana-vton.py, agents/claude_sdk/domain_agents/content.py, renders/preflight.py (comments). They point at a phantom data/product-catalog.csv path.",
+      "fix": "PENDING \u2014 OUT OF bug-102/Phase 14 scope (would touch DB seeding + social agent + vton, unrelated subsystems \u2014 scope-creep risk). Handoff target for the deferred v1.3 Site Fix milestone's first task (audit CSV -> one canonical source). Do NOT fix inside Phase 14.",
+      "tags": [
+        "single-source-of-truth",
+        "legacy",
+        "v1.3-handoff",
+        "scope-boundary",
+        "phantom-file"
+      ],
+      "related_bugs": [
+        "bug-102"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T08:25:00-07:00",
+      "status": "OPEN"
+    },
+    {
+      "id": "bug-104",
+      "timestamp": "2026-05-16T08:35:00-07:00",
+      "error_message": "(eval):17: PIPESTATUS[0]: parameter not set  \u2014 verification harness for devworkflows scripts failed under set -u",
+      "file": "scripts/devworkflows/ (verification harness, not the scripts themselves)",
+      "root_cause": "The Bash tool executes commands via zsh (env Shell: zsh), not bash. PIPESTATUS is a bash-only array; zsh exposes pipe exit codes as the lowercase 1-indexed `pipestatus` array. With `set -u`, referencing the unset PIPESTATUS made the harness abort. The 3 devworkflow scripts were unaffected (they run under their own `#!/usr/bin/env bash` shebang) \u2014 only the inline test harness tripped.",
+      "fix": "In Bash-tool one-liners, never use ${PIPESTATUS[*]}. Capture exit status directly: run the command, then `rc=$?` on the next line (no pipe), or redirect to a file and read $? immediately. Reserve PIPESTATUS for code inside `bash script.sh` files.",
+      "tags": [
+        "zsh",
+        "bash-tool",
+        "PIPESTATUS",
+        "set-u",
+        "verification-harness",
+        "environment-gotcha"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T08:35:00-07:00",
+      "status": "RESOLVED"
+    },
+    {
+      "id": "bug-105",
+      "timestamp": "2026-05-19T19:50:00-07:00",
+      "error_message": "br-011 deep-dive RCA revealed 3 drift gaps in tripo guard + catalog/dossier alignment + QUARANTINE.md mischaracterization (post-bug-096 hardening)",
+      "file": "scripts/tripo_dispatch.py + tests/test_tripo_dispatch_guards.py + wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv + renders/output/tripo/QUARANTINE.md",
+      "root_cause": "(1) classify_skus only checked tech-flat file existence \u2014 ignored authoritative catalog render_is_tech_flat column. br-011 had a 12.6MB PNG flagged 0 (branded product render). --force-branded would have approved it. (2) QUARANTINE.md row 24 mischaracterized br-011 as NHL Authentic cut, no hood, mesh side panels \u2014 dossier says Hockey-style pullover hoodie. Garment shape rendered correct; only branding hallucinated. (3) Catalog garment_type_lock=jersey conflicted with dossier hoodie construction.",
+      "fix": "Added _is_catalog_tech_flat() helper and inserted middle guard layer in classify_skus: BRANDED -> CATALOG TECH-FLAT FLAG -> FILE EXISTS. Updated 4 existing tests + added 3 new (total 16/16). Catalog br-011 garment_type_lock: jersey -> hoodie. QUARANTINE.md row 24 corrected + Fix section bumped to 4 guards + test count 12 -> 16.",
+      "tags": [
+        "tripo",
+        "guard-rail",
+        "catalog-drift",
+        "dossier-drift",
+        "br-011",
+        "tech-flat-flag",
+        "follow-on"
+      ],
+      "related_bugs": [
+        "bug-096"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-05-19T19:50:00-07:00",
+      "status": "FIXED",
+      "fixed_at": "2026-05-19T19:50:00-07:00",
+      "fixed_in_commit": "TBD-this-session"
     }
   ]
 }

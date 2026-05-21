@@ -24,11 +24,12 @@ function skyyrose_get_collection_content( $slug ) {
 		/* ── Black Rose ─────────────────────────────────────────── */
 		'black-rose'   => array(
 			'hero_badge'          => __( 'The Original Collection', 'skyyrose' ),
-			'hero_logo'           => '/branding/black-rose-logo-hero-transparent.png',
+			'hero_logo'           => '/branding/black-rose-logo-hero.webp',
 			'hero_logo_alt'       => __( 'The Black Rose Collection', 'skyyrose' ),
 			'hero_logo_w'         => 560,
 			'hero_logo_h'         => 280,
-			'hero_bg'             => '/branding/sr-collection-black-rose.webp',
+			'hero_bg'             => '/branding/hero/forbidden-midnight-1280w.webp',
+			'hero_bg_base'        => '/branding/hero/forbidden-midnight',
 			'hero_bg_alt'         => __( 'Black Rose Collection — rose from concrete', 'skyyrose' ),
 			'hero_tagline'        => __( 'The beauty of the color black through the rose and high-end fashion design.', 'skyyrose' ),
 			'hero_subtitle'       => __( 'Monochrome sophistication. Dark-on-dark texture. Masculine elegance distilled into every fiber. Every man would wear a black rose.', 'skyyrose' ),
@@ -80,11 +81,12 @@ function skyyrose_get_collection_content( $slug ) {
 		/* ── Love Hurts ─────────────────────────────────────────── */
 		'love-hurts'   => array(
 			'hero_badge'          => __( 'The Hurts Bloodline', 'skyyrose' ),
-			'hero_logo'           => '/branding/love-hurts-logo-hero-transparent.png',
+			'hero_logo'           => '/branding/love-hurts-logo-hero.webp',
 			'hero_logo_alt'       => __( 'Love Hurts', 'skyyrose' ),
 			'hero_logo_w'         => 400,
 			'hero_logo_h'         => 400,
-			'hero_bg'             => '/branding/sr-collection-love-hurts.webp',
+			'hero_bg'             => '/branding/hero/beauty-and-beast-1280w.webp',
+			'hero_bg_base'        => '/branding/hero/beauty-and-beast',
 			'hero_bg_alt'         => __( 'Love Hurts Collection — enchanted rose under glass', 'skyyrose' ),
 			'hero_tagline'        => __( 'They called me Beast. They were right.', 'skyyrose' ),
 			'hero_subtitle'       => __( 'But even the Beast kept a rose under glass — protecting the most fragile thing he ever loved. This collection carries the weight of three generations of Hurts.', 'skyyrose' ),
@@ -136,11 +138,12 @@ function skyyrose_get_collection_content( $slug ) {
 		/* ── Signature ──────────────────────────────────────────── */
 		'signature'    => array(
 			'hero_badge'          => __( 'Where It All Began', 'skyyrose' ),
-			'hero_logo'           => '/branding/signature-logo-hero-transparent.png',
+			'hero_logo'           => '/branding/signature-logo-hero.webp',
 			'hero_logo_alt'       => __( 'The SkyyRose Signature Collection', 'skyyrose' ),
 			'hero_logo_w'         => 560,
 			'hero_logo_h'         => 280,
-			'hero_bg'             => '/branding/sr-collection-signature.webp',
+			'hero_bg'             => '/branding/hero/luxury-nighttime-1280w.webp',
+			'hero_bg_base'        => '/branding/hero/luxury-nighttime',
 			'hero_bg_alt'         => __( 'Signature Collection — Oakland skyline', 'skyyrose' ),
 			'hero_tagline'        => __( 'The origin. The main event. The birth of it all.', 'skyyrose' ),
 			'hero_subtitle'       => __( 'This is what they know us for. The first rose ever pressed. The signature script logo worn around the world. Every collection since has grown from this foundation.', 'skyyrose' ),

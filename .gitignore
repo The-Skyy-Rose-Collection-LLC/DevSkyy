@@ -329,8 +329,11 @@ open-claude-code/
 wordpress-theme/skyyrose-flagship/assets/images/immersive/test/
 scripts/nano-banana-composite-results.json
 
-# Vendored third-party repos (cloned via git, not authored here)
-vendor/
+# Vendored third-party repos (cloned via git, not authored here).
+# Track the scaffolding (README + .gitignore) so contributors can bootstrap.
+vendor/*
+!vendor/.gitignore
+!vendor/README.md
 
 # === Added by Claude optimization pass (20260424-190053) ===
 # These were missing from the original .gitignore.
@@ -349,6 +352,8 @@ renders/cache/
 renders/output/
 renders/manifest_archive/
 renders/3d/
+renders/_quarantine/
+renders/gated/
 generated_3d_models/
 
 # User PII data
@@ -406,3 +411,11 @@ renders/quarantine/
 graphify-out/.graphify_*
 graphify-out/cache/
 graphify-out/manifest.json
+
+# ADK render pipeline run artifacts (regenerable, run-specific, large)
+# Pipeline outputs are reproducible from the catalog + dossiers; only the
+# pipeline source code under agents/render_pipeline/ is canonical.
+agents/render_pipeline/output/
+data/agent-learning/
+data/vision-consensus/
+tasks/render-pipeline-cli-*.json

@@ -18,14 +18,11 @@ State writes:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
-
 from agents.render_pipeline.tools._paths import REPO_ROOT, ensure_repo_paths
 
 ensure_repo_paths()
 
-if TYPE_CHECKING:
-    from google.adk.tools.tool_context import ToolContext
+from google.adk.tools.tool_context import ToolContext
 
 
 def _resolve(sku: str, name: str, src_override: str) -> Path | None:

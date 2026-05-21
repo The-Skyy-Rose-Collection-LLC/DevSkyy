@@ -20,6 +20,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
+pytest.importorskip("voyageai", reason="voyageai SDK not installed in this env")
+
 from orchestration.embedding_engine import (
     EmbeddingConfig,
     EmbeddingProvider,

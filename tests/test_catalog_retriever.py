@@ -37,7 +37,7 @@ def fake_store() -> AsyncMock:
     store = AsyncMock()
     store.initialize = AsyncMock()
     store.close = AsyncMock()
-    store.add_documents = AsyncMock(side_effect=lambda docs, embs: [d.id for d in docs])
+    store.add_documents = AsyncMock(side_effect=lambda docs, embs, **_kwargs: [d.id for d in docs])
 
     def _search(**_kwargs):
         # Values mirror the canonical CSV's br-001 row so tests assert on
@@ -139,17 +139,19 @@ def test_compose_content_includes_all_signal_fields() -> None:
         "sku": "br-001",
         "name": "Test Crewneck",
         "collection": "black-rose",
-        "branding_spec": "rose gold chest logo, black thread on interior tag",
         "description": "Gothic luxury blooms in twilight.",
     }
-    content = CatalogRetriever._compose_content(row)
+    dossier_data = {
+        "branding_block": "rose gold chest logo, black thread on interior tag",
+    }
+    content = CatalogRetriever._compose_content(row, dossier_data)
     assert "Product: Test Crewneck" in content
     assert "Collection: black-rose" in content
-    assert "Branding: rose gold chest logo" in content
+    assert "Branding:\nrose gold chest logo" in content
     assert "Gothic luxury blooms" in content
 
 
 def test_compose_content_skips_empty_fields() -> None:
     row = {"sku": "x-1", "name": "Only Name"}
-    content = CatalogRetriever._compose_content(row)
+    content = CatalogRetriever._compose_content(row, {})
     assert content == "Product: Only Name"

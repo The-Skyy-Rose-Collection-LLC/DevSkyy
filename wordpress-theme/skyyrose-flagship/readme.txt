@@ -4,11 +4,11 @@ Tags: woocommerce, elementor, full-site-editing, fashion, ecommerce, luxury, acc
 Requires at least: 6.8
 Tested up to: 6.8
 Requires PHP: 8.2
-Stable tag: 1.1.1
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-A premium dark luxury WooCommerce theme for fashion, streetwear, and lifestyle brands. Features glassmorphism navigation, immersive product scenes, holographic product cards, 4 collection palettes, AJAX search, and WCAG 2.2 AA accessibility. Built for Elementor, Gutenberg, and all major page builders.
+SkyyRose — Oakland-born luxury streetwear. Built by Corey Foster. Four cinematic collections (BLACK ROSE, LOVE HURTS, SIGNATURE, KIDS CAPSULE). Immersive Three.js + GSAP scenes, holographic product cards, AJAX search, WCAG 2.2 AA accessibility. Not a template — the SkyyRose brand made plain.
 
 == Description ==
 

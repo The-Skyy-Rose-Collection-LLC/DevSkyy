@@ -141,7 +141,7 @@ class SkyyRose_Preorder_CTA_Widget extends \Elementor\Widget_Base {
 							<span class="cd-<?php echo esc_attr( $class ); ?>"
 								style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,6vw,64px);
 									color:<?php echo esc_attr( $accent ); ?>;display:block;line-height:1;">0</span>
-							<span style="font-family:'Space Mono',monospace;font-size:8px;letter-spacing:4px;
+							<span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:8px;letter-spacing:4px;
 								text-transform:uppercase;color:#8A8A8A;"><?php echo esc_html( $label ); ?></span>
 						</div>
 					<?php endforeach; ?>

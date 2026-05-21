@@ -73,7 +73,7 @@
    PRODUCT INFO
    ========================================================================== */
 .sr-info-collection {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 11px;
 	letter-spacing: 6px;
 	color: var(--color-rose-gold, #B76E79);
@@ -90,7 +90,7 @@
 }
 
 .sr-info-price {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 24px;
 	color: var(--color-text-primary, #fff);
 	margin-bottom: 40px;
@@ -123,7 +123,7 @@
 }
 
 .sr-spec-label {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 10px;
 	letter-spacing: 2px;
 	text-transform: uppercase;
@@ -131,7 +131,7 @@
 }
 
 .sr-spec-value {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 11px;
 	color: var(--color-text-primary, #fff);
 }

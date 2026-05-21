@@ -310,7 +310,7 @@
 				try {
 					var resp = JSON.parse(xhr.responseText);
 					if (resp && resp.success) {
-						if (submitBtn) submitBtn.textContent = 'Welcome to the Inner Circle!';
+						if (submitBtn) submitBtn.textContent = 'Reserved.';
 					} else {
 						if (submitBtn) { submitBtn.textContent = 'Try Again'; submitBtn.disabled = false; }
 					}

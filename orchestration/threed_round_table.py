@@ -36,6 +36,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import random
+import re
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -58,6 +59,57 @@ from orchestration.huggingface_3d_client import (
 logger = structlog.get_logger(__name__)
 
 T = TypeVar("T")
+
+
+# SKU token = prefix-digits, plus an optional known variant suffix.
+# Known catalog editions (br-013, br-014, br-015) are independent SKUs;
+# other trailing tokens (e.g. "crewneck", "joggers") are PRODUCT TYPE
+# slugs in image filenames, NOT part of the SKU. Tightening the regex
+# to known variants prevents false-positive matches like
+# "br-001-crewneck" being treated as a variant SKU.
+_SKU_PREFIX_RE = re.compile(r"\b(?:br|lh|sg|kids)-\d{3}", re.IGNORECASE)
+_SKU_VARIANTS: tuple[str, ...] = ("oakland", "giants", "white")
+_SKU_VARIANT_RE = re.compile(r"\b(?:" + "|".join(_SKU_VARIANTS) + r")\b", re.IGNORECASE)
+
+
+def _extract_sku_parts(value: str) -> tuple[str | None, str | None]:
+    """Return ``(prefix, variant)`` lowercased.
+
+    Prefix = ``br|lh|sg|kids`` + 3 digits. Variant = known catalog suffix
+    (oakland/giants/white) found anywhere in the string after the prefix.
+    Either part may be None if not present.
+    """
+    prefix_match = _SKU_PREFIX_RE.search(value)
+    if not prefix_match:
+        return None, None
+    tail = value[prefix_match.end() :]
+    variant_match = _SKU_VARIANT_RE.search(tail)
+    return (
+        prefix_match.group(0).lower(),
+        variant_match.group(0).lower() if variant_match else None,
+    )
+
+
+def _sku_tokens_consistent(task_id: str, image_path: str) -> bool:
+    """True if SKU tokens detected in task_id and image_path agree.
+
+    Returns True when:
+      - no SKU prefix is detected in either side (permits smoke/ad-hoc runs)
+      - both prefixes match AND (no task-side variant required, OR image
+        also names that variant somewhere after the prefix)
+
+    Returns False when prefixes match but the task asked for a variant
+    the image filename does not name — protects against accidentally
+    rendering the base SKU when a variant edition was requested.
+    """
+    task_prefix, task_variant = _extract_sku_parts(task_id)
+    image_prefix, image_variant = _extract_sku_parts(image_path)
+    if task_prefix is None or image_prefix is None:
+        return True
+    if task_prefix != image_prefix:
+        return False
+    # Same prefix. If the task names a variant, the image must too.
+    return not (task_variant is not None and image_variant != task_variant)
 
 
 # =============================================================================
@@ -259,6 +311,10 @@ class ThreeDProvider(StrEnum):
     # External APIs
     TRIPO3D = "tripo3d"
     ANIGEN = "anigen"
+    MESHY = "meshy"
+
+    # Local GPU (conda-isolated)
+    TRELLIS_2 = "trellis_2"
 
     # Custom/Community
     CUSTOM = "custom"
@@ -471,12 +527,14 @@ class ProviderQuality:
 
 
 PROVIDER_QUALITY: dict[ThreeDProvider, ProviderQuality] = {
+    ThreeDProvider.TRELLIS_2: ProviderQuality(geo=98, tex_textured=95),
     ThreeDProvider.HUNYUAN3D_2: ProviderQuality(geo=95, tex_textured=95),
     ThreeDProvider.TRIPO3D: ProviderQuality(geo=92, tex_textured=92),
     ThreeDProvider.ANIGEN: ProviderQuality(geo=90, tex_textured=88),
     ThreeDProvider.TRIPOSR: ProviderQuality(geo=88),  # default tex_textured=75
     ThreeDProvider.INSTANTMESH: ProviderQuality(geo=85, tex_textured=85),
     ThreeDProvider.LGM: ProviderQuality(geo=80, tex_textured=80),
+    ThreeDProvider.MESHY: ProviderQuality(geo=82, tex_textured=82),
     ThreeDProvider.SHAP_E: ProviderQuality(geo=70),  # default tex_textured=75
     ThreeDProvider.POINT_E: ProviderQuality(geo=60),  # default tex_textured=75
 }
@@ -522,6 +580,8 @@ class ThreeDRoundTable:
         ThreeDProvider.POINT_E: 45.0,
         ThreeDProvider.TRIPO3D: 300.0,  # External API, allow for high quality
         ThreeDProvider.ANIGEN: 240.0,  # 52s preview + 18s extract + cold-start buffer
+        ThreeDProvider.MESHY: 300.0,  # External API, poll-based
+        ThreeDProvider.TRELLIS_2: 600.0,  # Local GPU, heavy inference + GLB postprocess
     }
 
     # Default providers for text-to-3D
@@ -537,6 +597,7 @@ class ThreeDRoundTable:
         ThreeDProvider.INSTANTMESH,
         ThreeDProvider.LGM,
         ThreeDProvider.ANIGEN,
+        ThreeDProvider.MESHY,
     ]
 
     def __init__(
@@ -548,6 +609,8 @@ class ThreeDRoundTable:
         output_dir: str = "./round_table_outputs",
         enable_tripo3d: bool = True,
         enable_anigen: bool = True,
+        enable_meshy: bool = True,
+        enable_trellis: bool = False,
         concurrent_limit: int = 4,
     ) -> None:
         """
@@ -563,6 +626,9 @@ class ThreeDRoundTable:
             output_dir: Directory for generated models
             enable_tripo3d: Whether to include Tripo3D
             enable_anigen: Whether to include AniGen garment rigging
+            enable_meshy: Whether to include Meshy image-to-3D
+            enable_trellis: Whether to include local TRELLIS.2 (GPU-only,
+                requires the ``trellis2`` conda env; defaults to False)
             concurrent_limit: Max concurrent generation tasks
         """
         # Override HF config for highest quality
@@ -579,6 +645,8 @@ class ThreeDRoundTable:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.enable_tripo3d = enable_tripo3d
         self.enable_anigen = enable_anigen
+        self.enable_meshy = enable_meshy
+        self.enable_trellis = enable_trellis
         self._semaphore = asyncio.Semaphore(concurrent_limit)
 
         # Initialize health tracking for each provider
@@ -593,6 +661,14 @@ class ThreeDRoundTable:
         # AniGen agent (lazy loaded)
         self._anigen_agent = None
         self._anigen_agent_loaded = False
+
+        # Meshy agent (lazy loaded)
+        self._meshy_agent = None
+        self._meshy_agent_loaded = False
+
+        # TRELLIS.2 agent (lazy loaded — local GPU, conda-isolated)
+        self._trellis_agent = None
+        self._trellis_agent_loaded = False
 
         logger.info(
             "3D Round Table initialized with HIGHEST QUALITY settings",
@@ -617,6 +693,47 @@ class ThreeDRoundTable:
                     logger.warning("Tripo3D agent not available", error=str(e))
                     self.enable_tripo3d = False
         return self._tripo_agent
+
+    def _get_meshy_agent(self) -> Any:
+        """Lazy load Meshy image-to-3D agent."""
+        if not self._meshy_agent_loaded:
+            self._meshy_agent_loaded = True
+            if self.enable_meshy:
+                try:
+                    from agents.meshy_agent import MeshyAgent
+
+                    self._meshy_agent = MeshyAgent()
+                    logger.info("Meshy agent loaded for image-to-3D generation")
+                except (ImportError, Exception) as e:
+                    logger.warning("Meshy agent not available", error=str(e))
+                    self.enable_meshy = False
+        return self._meshy_agent
+
+    def _get_trellis_agent(self) -> Any:
+        """Lazy load local TRELLIS.2 image-to-3D agent.
+
+        TRELLIS.2 lives in an isolated conda env (``trellis2``). The agent
+        probes for the env at load time; if it cannot find conda + the
+        TRELLIS repo, this disables the provider for the lifetime of the
+        round-table instance.
+        """
+        if not self._trellis_agent_loaded:
+            self._trellis_agent_loaded = True
+            if self.enable_trellis:
+                try:
+                    from agents.trellis_agent import TrellisAgent
+
+                    candidate = TrellisAgent()
+                    if not candidate.is_available():
+                        logger.warning("TRELLIS.2 agent unavailable — conda env or repo missing")
+                        self.enable_trellis = False
+                    else:
+                        self._trellis_agent = candidate
+                        logger.info("TRELLIS.2 agent loaded for local GPU image-to-3D")
+                except (ImportError, Exception) as e:
+                    logger.warning("TRELLIS.2 agent not available", error=str(e))
+                    self.enable_trellis = False
+        return self._trellis_agent
 
     def _get_anigen_agent(self) -> Any:
         """Lazy load AniGen garment rigging agent."""
@@ -713,6 +830,12 @@ class ThreeDRoundTable:
         if self.enable_anigen and ThreeDProvider.ANIGEN not in providers:
             providers.append(ThreeDProvider.ANIGEN)
 
+        if self.enable_meshy and ThreeDProvider.MESHY not in providers:
+            providers.append(ThreeDProvider.MESHY)
+
+        if self.enable_trellis and ThreeDProvider.TRELLIS_2 not in providers:
+            providers.append(ThreeDProvider.TRELLIS_2)
+
         image_hash = hashlib.sha256(image_path.encode()).hexdigest()[:16]
 
         return await self._run_competition(
@@ -744,6 +867,22 @@ class ThreeDRoundTable:
         """Internal competition runner with quality enhancement."""
         task_id = task_id or str(uuid4())[:8]
         competition_id = str(uuid4())[:12]
+
+        # SKU-token cross-check — when both task_id and image_path are SKU-bearing,
+        # reject mismatches BEFORE any provider call to prevent cross-SKU image
+        # leakage into the round-table (a wrong source image silently produces
+        # a wrong product 3D model). Zero-cost guard: pure string check.
+        if (
+            generation_type == GenerationType.IMAGE_TO_3D
+            and image_path
+            and task_id
+            and not _sku_tokens_consistent(task_id, image_path)
+        ):
+            raise ValueError(
+                f"SKU mismatch between task_id={task_id!r} and "
+                f"image_path={image_path!r} — refusing dispatch to avoid "
+                f"cross-SKU generation"
+            )
 
         # Filter unhealthy providers
         active_providers = providers.copy()
@@ -1106,6 +1245,22 @@ class ThreeDRoundTable:
                 task_id=task_id,
             )
 
+        if provider == ThreeDProvider.MESHY:
+            if generation_type != GenerationType.IMAGE_TO_3D or not image_path:
+                raise ValueError("Meshy requires an image (image-to-3D only)")
+            return await self._generate_with_meshy(
+                image_path=image_path,
+                task_id=task_id,
+            )
+
+        if provider == ThreeDProvider.TRELLIS_2:
+            if generation_type != GenerationType.IMAGE_TO_3D or not image_path:
+                raise ValueError("TRELLIS.2 requires an image (image-to-3D only)")
+            return await self._generate_with_trellis(
+                image_path=image_path,
+                task_id=task_id,
+            )
+
         hf_model = self.PROVIDER_MODEL_MAP.get(provider)
         if not hf_model:
             raise ValueError(f"Unknown provider: {provider}")
@@ -1171,6 +1326,70 @@ class ThreeDRoundTable:
             format=HF3DFormat.GLB,
             generation_time_ms=generation_time,
             polycount=result.get("polycount"),
+            has_textures=True,
+            metadata=result,
+        )
+
+    async def _generate_with_meshy(
+        self,
+        image_path: str,
+        task_id: str,
+    ) -> ThreeDResponse:
+        """Generate GLB using Meshy API (image-to-3D only)."""
+        agent = self._get_meshy_agent()
+        if not agent:
+            raise ValueError("Meshy agent not available")
+
+        start_time = time.time()
+
+        result = await agent._tool_image_to_3d(
+            image_url=image_path,
+            product_name=task_id[:40],
+            output_format="glb",
+        )
+
+        generation_time = (time.time() - start_time) * 1000
+
+        model_urls: dict = result.get("model_urls") or {}
+        return ThreeDResponse(
+            provider=ThreeDProvider.MESHY,
+            model_id=result.get("task_id", "meshy-api"),
+            output_path=result.get("local_path"),
+            output_url=model_urls.get("glb") or model_urls.get("fbx"),
+            format=HF3DFormat.GLB,
+            generation_time_ms=generation_time,
+            has_textures=True,
+            metadata=result,
+        )
+
+    async def _generate_with_trellis(
+        self,
+        image_path: str,
+        task_id: str,
+    ) -> ThreeDResponse:
+        """Generate GLB using local TRELLIS.2 (image-to-3D only, GPU-only)."""
+        agent = self._get_trellis_agent()
+        if not agent:
+            raise ValueError("TRELLIS.2 agent not available")
+
+        start_time = time.time()
+
+        result = await agent.image_to_3d(
+            image_path=image_path,
+            product_name=task_id[:40],
+            output_format="glb",
+        )
+
+        generation_time = (time.time() - start_time) * 1000
+
+        model_urls: dict = result.get("model_urls") or {}
+        return ThreeDResponse(
+            provider=ThreeDProvider.TRELLIS_2,
+            model_id=result.get("task_id", "trellis-local"),
+            output_path=result.get("local_path"),
+            output_url=model_urls.get("glb"),
+            format=HF3DFormat.GLB,
+            generation_time_ms=generation_time,
             has_textures=True,
             metadata=result,
         )

@@ -52,7 +52,7 @@
 }
 
 .search-results__count {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: var(--text-sm, 0.9375rem);
 	font-weight: 400;
 	color: var(--color-text-muted, #B3B3B3);
@@ -75,7 +75,7 @@
 .search-results__input {
 	width: 100%;
 	padding: 0.875rem 3.25rem 0.875rem 1.25rem;
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: var(--text-sm, 0.9375rem);
 	font-weight: 400;
 	color: var(--color-text-primary, #FFFFFF);
@@ -128,7 +128,7 @@
    ========================================================================== */
 
 .search-results__section-heading {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.75rem;
 	font-weight: 600;
 	text-transform: uppercase;
@@ -204,7 +204,7 @@
 }
 
 .search-results__item-type {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.6875rem;
 	font-weight: 600;
 	text-transform: uppercase;
@@ -214,7 +214,7 @@
 }
 
 .search-results__item-title {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: var(--text-lg, 1.1875rem);
 	font-weight: 600;
 	color: var(--color-text-primary, #FFFFFF);
@@ -228,7 +228,7 @@
 }
 
 .search-results__item-excerpt {
-	font-family: 'Cormorant Garamond', Georgia, serif;
+	font-family: var(--skyyrose-font-body);
 	font-size: var(--text-base, 1.0625rem);
 	font-weight: 400;
 	color: var(--color-text-muted, #B3B3B3);
@@ -240,7 +240,7 @@
 }
 
 .search-results__item-date {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: var(--text-xs, 0.8125rem);
 	font-weight: 400;
 	color: var(--color-text-dim, #A0A0A0);
@@ -282,7 +282,7 @@
 	display: inline-flex;
 	align-items: center;
 	padding: 0.625rem 1.5rem;
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: var(--text-sm, 0.9375rem);
 	font-weight: 500;
 	color: var(--color-text-primary, #FFFFFF);
@@ -323,7 +323,7 @@
 }
 
 .search-results__empty-title {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: var(--text-3xl, clamp(1.875rem, 2.8vw, 2.25rem));
 	font-weight: 700;
 	color: var(--color-text-primary, #FFFFFF);
@@ -331,7 +331,7 @@
 }
 
 .search-results__empty-subtitle {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: var(--text-base, 1.0625rem);
 	font-weight: 400;
 	color: rgba(255, 255, 255, 0.5);
@@ -358,7 +358,7 @@
 	display: inline-flex;
 	align-items: center;
 	padding: 0.5rem 1.125rem;
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: var(--text-sm, 0.9375rem);
 	font-weight: 500;
 	color: var(--color-text-secondary, #E0E0E0);
@@ -459,7 +459,7 @@
 }
 
 .search-results__card-label {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: 1.125rem;
 	font-weight: 700;
 	color: var(--color-text-primary, #FFFFFF);
@@ -472,7 +472,7 @@
 }
 
 .search-results__card-description {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.8125rem;
 	font-weight: 400;
 	color: rgba(255, 255, 255, 0.4);
@@ -481,7 +481,7 @@
 }
 
 .search-results__card-meta {
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.6875rem;
 	font-weight: 600;
 	text-transform: uppercase;
@@ -525,7 +525,7 @@
 	align-items: center;
 	justify-content: center;
 	padding: 0.875rem 2rem;
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: var(--ff-system);
 	font-size: var(--text-sm, 0.9375rem);
 	font-weight: 600;
 	letter-spacing: 0.05em;

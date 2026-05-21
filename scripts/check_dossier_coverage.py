@@ -9,10 +9,6 @@ Slug source preference:
   1. The `dossier_slug` column on the CSV row (once Task #16 lands).
   2. Otherwise computed from the `name` column.
 
-Colorway variants (br-003-giants, br-003-oakland, br-003-white) are allowed
-to share the base SKU's dossier. The mapping is hard-coded here for the
-audit-pass period and should be removed once each variant has its own dossier.
-
 Run from repo root:
     python scripts/check_dossier_coverage.py
 
@@ -30,11 +26,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 CSV_PATH = REPO_ROOT / "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv"
 DOSSIERS_DIR = REPO_ROOT / "wordpress-theme/skyyrose-flagship/data/dossiers"
 
-VARIANT_TO_BASE = {
-    "br-003-oakland": "br-003",
-    "br-003-giants": "br-003",
-    "br-003-white": "br-003",
-}
+VARIANT_TO_BASE: dict[str, str] = {}
 
 
 def slugify(name: str) -> str:

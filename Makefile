@@ -100,6 +100,71 @@ test-fast:
 	pytest tests/ -v --tb=short -x -q
 
 # ============================================================================
+# ADK RENDER PIPELINE COMMANDS
+# ============================================================================
+# Mock unit tests for the 9-step SequentialAgent. Uses .venv-agents/ (separate
+# from .venv/ — ADK + numpy conflict isolation). No API cost, target <5s.
+# Override the venv path via env var: `ADK_PYTHON=/path/to/python make adk-test`
+
+ADK_PYTHON ?= ../DevSkyy/.venv-agents/bin/python3
+
+adk-test:
+	@if [ ! -x "$(ADK_PYTHON)" ]; then \
+		echo "Error: $(ADK_PYTHON) not found."; \
+		echo "Install: $(ADK_PYTHON) -m pip install 'google-adk[extensions]' scipy pytest pytest-asyncio pytest-mock"; \
+		echo "Or override: ADK_PYTHON=/path/to/python make adk-test"; \
+		exit 1; \
+	fi
+	$(ADK_PYTHON) -m pytest agents/render_pipeline/tests/ -v --tb=short
+
+adk-test-fast:
+	@[ -x "$(ADK_PYTHON)" ] || { echo "Error: $(ADK_PYTHON) not found"; exit 1; }
+	$(ADK_PYTHON) -m pytest agents/render_pipeline/tests/ --tb=line -q
+
+adk-lint:
+	@[ -x "$(ADK_PYTHON)" ] || { echo "Error: $(ADK_PYTHON) not found"; exit 1; }
+	$(ADK_PYTHON) -m ruff check agents/render_pipeline/
+	$(ADK_PYTHON) -m black --check agents/render_pipeline/
+
+# Composite manual gate: lint + tests. Used by humans for one-shot
+# pre-commit checks. The pre-commit hooks invoke adk-lint and
+# adk-test-fast independently so they report separately.
+adk-check: adk-lint adk-test-fast
+
+# ADK AgentEvaluator harness run against agents/render_pipeline/eval/.
+# DEFAULT (adk-eval) skips the paid call — verifies the harness loads,
+# the eval set collects, and the agent imports cleanly. ~$0 cost, ~6s.
+# LIVE (adk-eval-live) sets EVAL_LIVE=1 to actually exercise the 9-step
+# pipeline against the canonical br-001 fixture. ~$0.20 cost per run.
+# Use adk-eval-live only after explicit STOP-AND-SHOW confirmation.
+adk-eval:
+	@[ -x "$(ADK_PYTHON)" ] || { echo "Error: $(ADK_PYTHON) not found"; exit 1; }
+	@echo "Running ADK AgentEvaluator harness (test will SKIP without EVAL_LIVE=1)..."
+	$(ADK_PYTHON) -m pytest agents/render_pipeline/eval/ -v --tb=short
+
+adk-eval-live:
+	@[ -x "$(ADK_PYTHON)" ] || { echo "Error: $(ADK_PYTHON) not found"; exit 1; }
+	@echo "WARNING: Live AgentEvaluator run — paid call (~\$$0.20)."
+	@echo "Pipeline: 9-step SequentialAgent against br-001 front canonical fixture."
+	EVAL_LIVE=1 $(ADK_PYTHON) -m pytest agents/render_pipeline/eval/ -v --tb=short
+
+# Generate a learning-loop report from data/agent-learning/ JSONL records.
+# Reads engine-winrate, template-scores, and failure-modes JSONL files
+# emitted by qa_tournament_fn during live runs. Produces a markdown
+# proposals file plus terminal output. No API cost — local file analysis.
+# See agents/render_pipeline/learning/LOOP.md for the recommended /loop prompt.
+adk-learning-report:
+	@[ -x "$(ADK_PYTHON)" ] || { echo "Error: $(ADK_PYTHON) not found"; exit 1; }
+	@echo "=== Writing proposals markdown ==="
+	@PYTHONPATH=. $(ADK_PYTHON) -c "from agents.render_pipeline.learning.proposals import write_proposals_markdown; print(f'Wrote: {write_proposals_markdown()}')"
+	@echo ""
+	@echo "=== Engine-override proposals (min 3 runs, min score 80) ==="
+	@PYTHONPATH=. $(ADK_PYTHON) -c "from agents.render_pipeline.learning.proposals import propose_engine_overrides; import json; props = propose_engine_overrides(); print(json.dumps(props, indent=2)) if props else print('(no proposals — need more runs)')"
+	@echo ""
+	@echo "=== Failure-mode digest (min 5 occurrences) ==="
+	@PYTHONPATH=. $(ADK_PYTHON) -c "from agents.render_pipeline.learning.proposals import digest_failure_modes; import json; modes = digest_failure_modes(); print(json.dumps(modes, indent=2)) if modes else print('(no patterns — need more failures)')"
+
+# ============================================================================
 # TYPESCRIPT COMMANDS
 # ============================================================================
 

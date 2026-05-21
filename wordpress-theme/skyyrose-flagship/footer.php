@@ -179,7 +179,7 @@ defined( 'ABSPATH' ) || exit;
 				<div class="footer-grid__col footer-grid__col--help">
 					<h4 class="footer-grid__heading"><?php esc_html_e( 'Help', 'skyyrose' ); ?></h4>
 					<ul class="footer-grid__list">
-						<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Contact Us', 'skyyrose' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Reach Out', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/faq/' ) ); ?>"><?php esc_html_e( 'FAQ', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/shipping-returns/' ) ); ?>"><?php esc_html_e( 'Shipping & Returns', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/contact/#size-guide' ) ); ?>"><?php esc_html_e( 'Size Guide', 'skyyrose' ); ?></a></li>
@@ -203,7 +203,7 @@ defined( 'ABSPATH' ) || exit;
 					<h4 class="footer-grid__heading"><?php esc_html_e( 'Connect', 'skyyrose' ); ?></h4>
 					<ul class="footer-grid__list">
 						<?php
-						$connect_links = skyyrose_get_social_links();
+						$connect_links = $social_links;
 						foreach ( $connect_links as $data ) :
 							?>
 							<li>
@@ -251,7 +251,9 @@ defined( 'ABSPATH' ) || exit;
 <?php get_template_part( 'template-parts/size-guide-modal' ); ?>
 <?php get_template_part( 'template-parts/cookie-consent' ); ?>
 <?php get_template_part( 'template-parts/mobile-bottom-nav' ); ?>
-<?php get_template_part( 'template-parts/skyy-mascot' ); ?>
+<?php // Skyy mascot disabled — re-enable when character art is finalized. ?>
+<?php // phpcs:ignore Squiz.PHP.CommentedOutCode.Found -- intentional suspension, not dead code. ?>
+<?php // get_template_part( 'template-parts/skyy-mascot' ); ?>
 
 <!-- Toast Notification Container -->
 <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>

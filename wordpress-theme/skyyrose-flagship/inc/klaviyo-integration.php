@@ -270,7 +270,7 @@ function skyyrose_ajax_klaviyo_subscribe() {
 	// Always return success to the user — avoid exposing API config state.
 	wp_send_json_success(
 		array(
-			'message' => esc_html__( 'Welcome to the SkyyRose family! Check your inbox for your early access details.', 'skyyrose' ),
+			'message' => esc_html__( 'You\'re in. Watch your inbox for early access.', 'skyyrose' ),
 		)
 	);
 }

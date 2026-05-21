@@ -63,7 +63,7 @@
 }
 
 .col-hero__badge {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 11px;
 	letter-spacing: 8px;
 	text-transform: uppercase;
@@ -96,7 +96,7 @@
 }
 
 .col-hero__subtitle {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 11px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
@@ -150,7 +150,7 @@
 	animation: mqScroll 40s linear infinite;
 }
 .col-marquee__track span {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 12px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
@@ -180,7 +180,7 @@
 }
 
 .col-story__label {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 11px;
 	letter-spacing: 6px;
 	color: var(--color-rose-gold, #B76E79);
@@ -255,7 +255,7 @@
 	background: #000;
 	padding: 24px 32px;
 	border: 1px solid rgba(255,255,255,0.04);
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 10px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
@@ -287,7 +287,7 @@
 	margin-bottom: 32px;
 }
 .col-quote-block__cite {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 11px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
@@ -351,7 +351,7 @@
 .col-features__icon svg { width: 32px; height: 32px; }
 
 .col-features__card h3 {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 13px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
@@ -376,7 +376,7 @@
 }
 
 .col-crossnav__heading {
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 11px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
@@ -461,7 +461,7 @@
 	border: none;
 	padding: 16px;
 	color: #fff;
-	font-family: 'Space Mono', monospace;
+	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 13px;
 	outline: none;
 	text-align: center;

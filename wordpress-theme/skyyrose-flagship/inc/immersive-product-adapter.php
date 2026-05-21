@@ -10,7 +10,7 @@
  * Consumed by:
  *   - template-immersive-signature.php
  *   - template-immersive-black-rose.php
- *   - template-parts/immersive-scene.php
+ *   - template-parts/immersive/scene.php
  *
  * Split out of `inc/product-catalog.php` in v6.5.1 to keep that module
  * under the 800-line cap and to localize immersive-scene concerns.

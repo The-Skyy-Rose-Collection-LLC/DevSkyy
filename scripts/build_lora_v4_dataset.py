@@ -62,7 +62,7 @@ PRODUCTS = {
             "br-002-model-m.webp",  # Mislabeled as br-002, actually br-001 (100%)
         ],
     },
-    "br-003-oakland": {
+    "br-013": {
         "trigger": "skyyrose_br003_oakland",
         "name": "Last Oakland Black Is Beautiful Baseball Jersey (Green/Gold)",
         "caption": (
@@ -75,7 +75,7 @@ PRODUCTS = {
         "techflat": "br-003-techflat-oakland.jpeg",
         "model_shots": [],  # Model shots have wrong trim color (orange instead of gold)
     },
-    "br-003-giants": {
+    "br-014": {
         "trigger": "skyyrose_br003_giants",
         "name": "Black Is Beautiful Baseball Jersey (Black/Orange - Giants)",
         "caption": (
@@ -89,7 +89,7 @@ PRODUCTS = {
         # Gemini vision: br-003-model-m confirmed 100%
         "model_shots": ["br-003-model-m.webp"],
     },
-    "br-003-white": {
+    "br-015": {
         "trigger": "skyyrose_br003_white",
         "name": "Black Is Beautiful Baseball Jersey (White)",
         "caption": (

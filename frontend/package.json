@@ -102,7 +102,13 @@
     "tar": ">=7.5.11",
     "minimatch": ">=10.2.1",
     "path-to-regexp": ">=6.3.0",
-    "@tootallnate/once": ">=3.0.1"
+    "@tootallnate/once": ">=3.0.1",
+    "axios": ">=1.15.2",
+    "basic-ftp": ">=5.3.1",
+    "flatted": ">=3.4.2",
+    "fast-uri": ">=3.1.2",
+    "picomatch": ">=4.0.4",
+    "protobufjs": ">=7.5.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",

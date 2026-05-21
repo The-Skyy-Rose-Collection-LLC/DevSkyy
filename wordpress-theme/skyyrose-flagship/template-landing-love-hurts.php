@@ -16,7 +16,8 @@ defined( 'ABSPATH' ) || exit;
 get_header();
 ?>
 
-<div class="lp" data-collection="love-hurts">
+<main id="primary" class="lp" data-collection="love-hurts" role="main" tabindex="-1">
+	<h1 class="screen-reader-text"><?php esc_html_e( 'Love Hurts Collection — the Hurts bloodline', 'skyyrose' ); ?></h1>
 
 	<?php
 	/* ───── 1. Hero ───── */
@@ -43,14 +44,15 @@ get_header();
 	?>
 
 	<?php /* ───── 2. Press Bar ───── */ ?>
-	<div class="lp-press lp-rv">
+	<div class="lp-press lp-rv" aria-label="Featured in">
 		<div class="lp__container">
-			<div class="lp-press__row">
-				<span class="lp-press__name">Maxim</span>
-				<span class="lp-press__name">CEO Weekly</span>
-				<span class="lp-press__name">SF Post</span>
-				<span class="lp-press__name">Best of Best Review</span>
-			</div>
+			<span class="lp-press__label"><?php echo esc_html( 'As Seen In' ); ?></span>
+			<ul class="lp-press__list">
+				<li><?php echo esc_html( 'Maxim' ); ?></li>
+				<li><?php echo esc_html( 'CEO Weekly' ); ?></li>
+				<li><?php echo esc_html( 'SF Post' ); ?></li>
+				<li><?php echo esc_html( 'Best of Best Review' ); ?></li>
+			</ul>
 		</div>
 	</div>
 
@@ -58,7 +60,7 @@ get_header();
 	<section class="lp-story" id="story">
 		<div class="lp__container">
 			<div class="lp-story__grid">
-				<div class="lp-story__copy lp-rv">
+				<div class="lp-story__text lp-rv">
 					<span class="lp-story__label">THE LEGACY</span>
 					<h2 class="lp-story__title"><?php echo esc_html( 'This Isn\'t a Theme. It\'s a Family Name.' ); ?></h2>
 					<p class="lp-story__text">
@@ -68,11 +70,15 @@ get_header();
 						<?php echo esc_html( 'This collection takes that pain and turns it into something you can wear. Something beautiful. Something that says: I\'ve been through it, and I\'m still here.' ); ?>
 					</p>
 					<blockquote class="lp-story__quote">
-						<?php echo esc_html( 'Every piece carries the weight of what we\'ve been through — and the strength of what we\'ve become.' ); ?>
+						<p><?php echo esc_html( 'Every piece carries the weight of what we\'ve been through — and the strength of what we\'ve become.' ); ?></p>
+						<cite><?php echo esc_html( '— Corey Foster, Founder' ); ?></cite>
 					</blockquote>
 				</div>
-				<div class="lp-story__visual lp-rv" data-delay="2">
-					<div class="lp-story__image" style="background: linear-gradient(135deg, #1a0a0e 0%, #2d0a14 50%, #0a0a0a 100%); aspect-ratio: 3/4; border-radius: var(--skyyrose-radius);"></div>
+				<div class="lp-story__image lp-rv" data-delay="2">
+					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-bomber-front-model.webp' ); ?>"
+						alt="<?php echo esc_attr__( 'Love Hurts bomber jacket, editorial portrait', 'skyyrose' ); ?>"
+						loading="lazy" decoding="async"
+						style="width:100%;height:100%;aspect-ratio:3/4;object-fit:cover;border-radius:var(--skyyrose-radius);">
 				</div>
 			</div>
 		</div>
@@ -106,13 +112,13 @@ get_header();
 				<h2><?php echo esc_html( 'The Look' ); ?></h2>
 			</div>
 			<div class="lp-editorial__grid lp-rv" data-delay="1">
-				<div class="lp-editorial__item" style="background: linear-gradient(145deg, #1a0a0e, #0a0a0a); aspect-ratio: 4/5; border-radius: var(--skyyrose-radius);"></div>
-				<div class="lp-editorial__item" style="background: linear-gradient(145deg, #2d0a14, #0a0a0a); aspect-ratio: 4/5; border-radius: var(--skyyrose-radius);"></div>
-				<div class="lp-editorial__item" style="background: linear-gradient(145deg, #1a0a0e, #2d0a14); aspect-ratio: 4/5; border-radius: var(--skyyrose-radius);"></div>
+				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-basketball-shorts-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Love Hurts basketball shorts, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
+				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-varsity-jacket-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Love Hurts varsity jacket, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
+				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/the-fannie-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'The Fannie piece, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
 			</div>
 			<div class="lp-editorial__grid lp-editorial__grid--row2 lp-rv" data-delay="2">
-				<div class="lp-editorial__item" style="background: linear-gradient(145deg, #2d0a14, #0a0a0a); aspect-ratio: 16/9; border-radius: var(--skyyrose-radius);"></div>
-				<div class="lp-editorial__item" style="background: linear-gradient(145deg, #1a0a0e, #0a0a0a); aspect-ratio: 16/9; border-radius: var(--skyyrose-radius);"></div>
+				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/hero/beauty-and-beast-1280w.webp' ); ?>" alt="<?php echo esc_attr__( 'Love Hurts collection — enchanted rose under glass', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
+				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-bomber-back-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Love Hurts bomber jacket, back view', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
 			</div>
 		</div>
 	</section>
@@ -221,19 +227,20 @@ get_header();
 				<?php echo esc_html( 'Every release tells a chapter. Don\'t miss yours.' ); ?>
 			</p>
 			<form class="lp-cta__form lp-rv" data-delay="2" action="#" method="post">
+				<label class="screen-reader-text" for="lh-lp-email"><?php esc_html_e( 'Email address', 'skyyrose' ); ?></label>
 				<input class="lp-cta__input"
+						id="lh-lp-email"
 						type="email"
 						name="email"
-						placeholder="Your email"
+						placeholder="<?php esc_attr_e( 'Your email', 'skyyrose' ); ?>"
 						required
-						autocomplete="email"
-						aria-label="Email address">
-				<button class="lp-cta__submit" type="submit"><?php echo esc_html( 'Join' ); ?></button>
+						autocomplete="email">
+				<button class="lp-cta__submit" type="submit"><?php echo esc_html__( 'Join', 'skyyrose' ); ?></button>
 			</form>
 			<p class="lp-cta__note lp-rv" data-delay="3"><?php echo esc_html( 'Join 12,400+ members' ); ?></p>
 		</div>
 	</section>
 
-</div><!-- .lp -->
+</main><!-- .lp -->
 
 <?php get_footer(); ?>

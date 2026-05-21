@@ -61,10 +61,15 @@ get_header();
 							<tr>
 								<td><?php esc_html_e( 'Free Shipping', 'skyyrose' ); ?></td>
 								<td><?php esc_html_e( '5–7 business days', 'skyyrose' ); ?></td>
-								<td><?php
+								<td>
+								<?php
 									/* translators: %d: free shipping order minimum in dollars */
-									printf( esc_html__( 'Orders $%d+', 'skyyrose' ), intval( SKYYROSE_FREE_SHIPPING_THRESHOLD ) );
-									?></td>
+									printf(
+										esc_html__( 'Orders $%d+', 'skyyrose' ),
+										defined( 'SKYYROSE_FREE_SHIPPING_THRESHOLD' ) ? intval( SKYYROSE_FREE_SHIPPING_THRESHOLD ) : 150
+									);
+									?>
+									</td>
 							</tr>
 						</tbody>
 					</table>

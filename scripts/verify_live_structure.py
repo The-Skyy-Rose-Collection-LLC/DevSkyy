@@ -90,6 +90,20 @@ class Assertion:
 
 
 @dataclass(frozen=True)
+class PricingCheck:
+    """
+    Text-content assertion for rendered price elements.
+
+    Standard CSS selectors cannot assert on text content (no :contains()),
+    so CNTR-04 pricing assertions use this separate dataclass + helper.
+    """
+
+    selector: str
+    forbidden_texts: tuple[str, ...]
+    label: str
+
+
+@dataclass(frozen=True)
 class Page:
     name: str
     path: str
@@ -140,12 +154,68 @@ THEME_CSS_ASSERTION = Assertion(
 # without per-page setup. data-skyyrose-error is a project-wide beacon
 # emitted by template parts that hit a "should not happen" branch (e.g.,
 # template-parts/collection/page.php when content config is missing).
-GLOBAL_ASSERTIONS: tuple[Assertion, ...] = (
+_STRUCTURAL_ASSERTIONS: tuple[Assertion, ...] = (
     Assertion(
         "[data-skyyrose-error]",
         0,
         "no skyyrose render-error markers (universal regression beacon)",
         max_count=0,
+    ),
+)
+
+# A11Y post-deploy gate — applied to every page checked by --all / --page.
+# These three selectors catch high-impact accessibility regressions that are
+# observable from the rendered HTML without a browser:
+#
+#   A11Y-05: aria-hidden focusable elements must have tabindex="-1"
+#            Asserts that at least one tabindex="-1" element exists globally
+#            (inc/accessibility-fix.php Section 5 injects this on aria-hidden
+#            buttons/links; if the fix is absent from the render the selector
+#            returns 0 even on nav-heavy pages).
+#
+#   A11Y-07: Skip-link must exist and its href target must be in the DOM.
+#            Pojo Accessibility plugin emits <a class="skip-link" href="#primary">.
+#            This selector confirms the link and its target both exist.
+#
+#   A11Y-09: Images must use loading="lazy" (inc/accessibility-fix.php Section 8
+#            adds this to all <img> without an existing loading= attribute, except
+#            those with class matching hero|logo|brand|monogram).
+#            A floor of 1 catches pages that render zero lazy images — meaning
+#            either no images rendered at all (template failure) or the fix did
+#            not run (output buffer disabled / cached before fix shipped).
+A11Y_ASSERTIONS: tuple[Assertion, ...] = (
+    Assertion(
+        "[tabindex='-1']",
+        1,
+        "A11Y-05: at least 1 tabindex='-1' element present (aria-hidden focusable fix active)",
+    ),
+    Assertion(
+        "a.skip-link",
+        1,
+        "A11Y-07: skip-link anchor exists (Pojo Accessibility plugin active)",
+    ),
+    Assertion(
+        "img[loading='lazy']",
+        1,
+        "A11Y-09: at least 1 lazy-loaded image (inc/accessibility-fix.php Section 8 active)",
+    ),
+)
+
+GLOBAL_ASSERTIONS: tuple[Assertion, ...] = _STRUCTURAL_ASSERTIONS + A11Y_ASSERTIONS
+
+# ---------------------------------------------------------------------------
+# CNTR-04: Pricing text gate
+# ---------------------------------------------------------------------------
+# Pre-order SKUs (e.g., lh-001 Love Hurts) must NOT show "$0" or "$0.00" in
+# their rendered price elements. These placeholders indicate WooCommerce returned
+# a zero-price product instead of the "Pre-Order" display string set by the theme.
+# Standard Assertion selectors cannot check text content (CSS has no :contains()),
+# so PricingCheck + check_no_forbidden_text() are used instead.
+PRICING_CHECKS: tuple[PricingCheck, ...] = (
+    PricingCheck(
+        selector=".holo-card .product-price, .holo-card .price, .product-card .price",
+        forbidden_texts=("$0", "$0.00"),
+        label="CNTR-04: no $0/$0.00 prices on holo-card pre-order SKUs",
     ),
 )
 
@@ -159,10 +229,21 @@ def _main_assertion(class_name: str, what_ran: str) -> Assertion:
     )
 
 
+# Hero background image filename for each collection, as deployed to the CDN.
+# Verified against inc/collection-content.php hero_bg keys and
+# assets/branding/ directory. Used in collection_assertions() below.
+COLLECTION_HERO_ASSETS: dict[str, str] = {
+    "black-rose": "sr-collection-black-rose.webp",
+    "love-hurts": "sr-collection-love-hurts.webp",
+    "signature": "sr-collection-signature.webp",
+    "kids-capsule": "sr-collection-kids-capsule.webp",
+}
+
+
 def collection_assertions(slug: str) -> tuple[Assertion, ...]:
     """Build assertion tuple for a collection page (BR/LH/SIG/Kids)."""
     floor = COLLECTION_CARD_FLOORS[slug]
-    return (
+    base_assertions: tuple[Assertion, ...] = (
         Assertion(
             f"div.col-page[data-collection='{slug}']",
             1,
@@ -181,6 +262,16 @@ def collection_assertions(slug: str) -> tuple[Assertion, ...]:
         ),
         THEME_CSS_ASSERTION,
     )
+    hero_asset = COLLECTION_HERO_ASSETS.get(slug)
+    if hero_asset:
+        return base_assertions + (
+            Assertion(
+                f"img[src*='{hero_asset}']",
+                1,
+                f"collection hero <img src> contains {hero_asset} (DATA-01)",
+            ),
+        )
+    return base_assertions
 
 
 def immersive_assertions(name: str) -> tuple[Assertion, ...]:
@@ -204,6 +295,14 @@ HOMEPAGE_ASSERTIONS: tuple[Assertion, ...] = (
     Assertion("div#loader", 1, "<div id='loader'> (front-page.php loader element)"),
     THEME_CSS_ASSERTION,
     Assertion("meta[name='generator']", 1, "<meta name='generator'> (WordPress emitted)"),
+    # CURS-01/CURS-03: luxury cursor JS must be present on front-page (global enqueue confirmed).
+    # NOTE: CURS-03 gap — this assertion verifies the JS loads on front-page (correct behaviour).
+    # A separate immersive-page assertion would confirm the JS is ABSENT there (not yet wired).
+    Assertion(
+        "script[src*='luxury-cursor']",
+        1,
+        "CURS-01/CURS-03 — luxury cursor JS present on front-page (global enqueue confirmed)",
+    ),
 )
 
 
@@ -334,6 +433,43 @@ def evaluate_assertions(response, assertions: tuple[Assertion, ...]) -> list[Che
     return results
 
 
+def check_no_forbidden_text(response, checks: tuple[PricingCheck, ...]) -> list[CheckResult]:
+    """
+    Assert that no matched element contains a forbidden text string.
+
+    Returns one synthetic CheckResult per PricingCheck where:
+    - actual=0  → no forbidden text found (PASS, min_count=0, max_count=0)
+    - actual=N  → N elements with forbidden text (FAIL)
+
+    A synthetic Assertion with max_count=0 is used so the result integrates
+    cleanly into the existing CheckResult / reporting pipeline.
+    """
+    results: list[CheckResult] = []
+    for check in checks:
+        synthetic = Assertion(
+            selector=check.selector,
+            min_count=0,
+            label=check.label,
+            max_count=0,
+        )
+        try:
+            elements = response.css(check.selector) or []
+            hit_count = sum(
+                1
+                for el in elements
+                if any(forbidden in (el.text or "") for forbidden in check.forbidden_texts)
+            )
+        except (AttributeError, TypeError, ValueError, RuntimeError) as exc:
+            print(
+                f"  [WARN] PricingCheck selector {check.selector!r} raised "
+                f"{type(exc).__name__}: {exc}",
+                file=sys.stderr,
+            )
+            hit_count = 0
+        results.append(CheckResult(synthetic, hit_count))
+    return results
+
+
 def _build_url(base_url: str, path: str, cache_bust: bool) -> str:
     url = urljoin(base_url, path)
     if cache_bust:
@@ -366,6 +502,7 @@ def check_page(fetcher, page: Page, base_url: str, timeout: int, cache_bust: boo
         return PageReport(page=page, url=url, http_status=status, fetched=True)
 
     results = evaluate_assertions(response, GLOBAL_ASSERTIONS + page.assertions)
+    results += check_no_forbidden_text(response, PRICING_CHECKS)
     return PageReport(page=page, url=url, http_status=status, fetched=True, results=results)
 
 

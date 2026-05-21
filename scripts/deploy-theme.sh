@@ -580,14 +580,20 @@ verify_live() {
     fi
 
     local public_url="${PUBLIC_URL:-https://skyyrose.co/}"
+    local expected_status="${EXPECTED_STATUS:-200}"
+    # Use '&' as query separator when PUBLIC_URL already carries a query string
+    # (e.g. ?bypass-coming-soon=<token>); otherwise '?'. This keeps the cache
+    # buster from colliding with intentional query args used during veiled deploys.
+    local sep="?"
+    [[ "$public_url" == *"?"* ]] && sep="&"
     local bust_url
-    bust_url="${public_url}?deploy_verify=$(date +%s)"
+    bust_url="${public_url}${sep}deploy_verify=$(date +%s)"
     local tmpfile
     tmpfile="$(mktemp)"
     # shellcheck disable=SC2064
     trap "rm -f '$tmpfile'" RETURN
 
-    log_info "Running post-deploy verification: $bust_url"
+    log_info "Running post-deploy verification: $bust_url (expected HTTP $expected_status)"
 
     local http_code
     http_code=$(curl -sS -o "$tmpfile" -w "%{http_code}" \
@@ -595,15 +601,16 @@ verify_live() {
         --max-time 30 \
         "$bust_url" 2>/dev/null || echo "000")
 
-    if [[ "$http_code" != "200" ]]; then
-        log_error "Verification FAILED: homepage returned HTTP $http_code (expected 200)"
+    if [[ "$http_code" != "$expected_status" ]]; then
+        log_error "Verification FAILED: homepage returned HTTP $http_code (expected $expected_status)"
         return 1
     fi
 
-    local size
+    local size min_size
     size=$(wc -c < "$tmpfile" | tr -d ' ')
-    if [[ "${size:-0}" -lt 50000 ]]; then
-        log_error "Verification FAILED: homepage response too small (${size:-0} bytes, expected >= 50 KB)"
+    min_size="${MIN_RESPONSE_BYTES:-50000}"
+    if [[ "${size:-0}" -lt "$min_size" ]]; then
+        log_error "Verification FAILED: homepage response too small (${size:-0} bytes, expected >= $min_size)"
         return 1
     fi
 
@@ -650,6 +657,14 @@ structural_verify_live() {
     local public_url="$1"
     local script_path="$SCRIPT_DIR/verify_live_structure.py"
     local strict="${STRUCTURE_CHECK_STRICT:-0}"
+
+    # Veiled deploys (coming-soon) intentionally serve a template that lacks the
+    # baseline structural markers (homepage-v2, mainNav, hero, loader). Skip the
+    # structural check entirely when SKIP_STRUCTURAL_VERIFY=1 is set.
+    if [[ "${SKIP_STRUCTURAL_VERIFY:-0}" == "1" ]]; then
+        log_info "Structural verification skipped (SKIP_STRUCTURAL_VERIFY=1)"
+        return 0
+    fi
 
     if [[ ! -f "$script_path" ]]; then
         log_warn "Structural check skipped: $script_path not found"

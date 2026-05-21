@@ -103,7 +103,7 @@
 }
 
 .contact-hero__title {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: clamp(2.5rem, 5vw, 3.5rem);
 	font-weight: 700;
 	margin-bottom: 1rem;
@@ -144,7 +144,7 @@
    ========================================================================== */
 
 .contact-info__heading {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: 2rem;
 	font-weight: 600;
 	margin-bottom: 2rem;
@@ -189,7 +189,7 @@
 }
 
 .contact-card__title {
-	font-family: 'Inter', sans-serif;
+	font-family: var(--ff-system);
 	font-size: 1rem;
 	font-weight: 600;
 	margin-bottom: 0.3rem;
@@ -224,7 +224,7 @@
 }
 
 .contact-social__heading {
-	font-family: 'Inter', sans-serif;
+	font-family: var(--ff-system);
 	font-size: 1rem;
 	font-weight: 600;
 	margin-bottom: 0.4rem;
@@ -288,7 +288,7 @@
    ========================================================================== */
 
 .contact-form__heading {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: 2rem;
 	font-weight: 600;
 	margin-bottom: 2rem;
@@ -346,7 +346,7 @@
 	border: 1px solid var(--contact-border);
 	border-radius: 4px;
 	color: var(--contact-text-primary);
-	font-family: 'Inter', sans-serif;
+	font-family: var(--ff-system);
 	font-size: 1rem;
 	transition: var(--contact-transition);
 	appearance: none;
@@ -506,7 +506,7 @@
 	color: #fff;
 	border: none;
 	border-radius: 4px;
-	font-family: 'Inter', sans-serif;
+	font-family: var(--ff-system);
 	font-size: 0.9rem;
 	font-weight: 600;
 	letter-spacing: 2px;
@@ -590,7 +590,7 @@
 }
 
 .response-promise__title {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: clamp(1.5rem, 3vw, 2rem);
 	font-weight: 600;
 	color: var(--contact-text-primary);
@@ -660,7 +660,7 @@
 }
 
 .faq-section__heading {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: clamp(2rem, 4vw, 2.5rem);
 	font-weight: 600;
 	text-align: center;
@@ -700,7 +700,7 @@
 	background: none;
 	border: none;
 	color: var(--contact-text-primary);
-	font-family: 'Inter', sans-serif;
+	font-family: var(--ff-system);
 	font-size: 1.1rem;
 	font-weight: 500;
 	text-align: left;
@@ -888,7 +888,7 @@
 }
 
 .contact-map__title {
-	font-family: 'Playfair Display', Georgia, serif;
+	font-family: var(--skyyrose-font-display);
 	font-size: 1.4rem;
 	font-weight: 600;
 	margin-bottom: 1rem;

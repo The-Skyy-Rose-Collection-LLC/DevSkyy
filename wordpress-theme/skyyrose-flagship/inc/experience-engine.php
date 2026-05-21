@@ -11,13 +11,15 @@
 
 defined( 'ABSPATH' ) || exit;
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Constants
  *--------------------------------------------------------------*/
 define( 'SKYYROSE_SEE_VERSION', '1.0.0' );
 define( 'SKYYROSE_SEE_DB_VERSION', '1.0.0' );
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Settings Helpers
  *--------------------------------------------------------------*/
 
@@ -65,7 +67,8 @@ function skyyrose_see_update_options( array $updates ): void {
 	update_option( 'skyyrose_see_settings', $settings );
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Module Registry
  *--------------------------------------------------------------*/
 
@@ -81,33 +84,33 @@ function skyyrose_see_get_modules(): array {
 	return array(
 		'performance_guardian' => array(
 			'priority' => 10,
-			'label'    => __( 'Performance Guardian', 'skyyrose-flagship' ),
-			'default'  => true,
+			'label'    => __( 'Performance Guardian', 'skyyrose' ),
+			'default'  => false,
 		),
-		'experience_analyzer' => array(
+		'experience_analyzer'  => array(
 			'priority' => 20,
-			'label'    => __( 'Experience Analyzer', 'skyyrose-flagship' ),
-			'default'  => true,
+			'label'    => __( 'Experience Analyzer', 'skyyrose' ),
+			'default'  => false,
 		),
-		'brand_atmosphere'    => array(
+		'brand_atmosphere'     => array(
 			'priority' => 30,
-			'label'    => __( 'Brand Atmosphere', 'skyyrose-flagship' ),
-			'default'  => true,
+			'label'    => __( 'Brand Atmosphere', 'skyyrose' ),
+			'default'  => false,
 		),
-		'smart_showcase'      => array(
+		'smart_showcase'       => array(
 			'priority' => 40,
-			'label'    => __( 'Smart Showcase', 'skyyrose-flagship' ),
-			'default'  => true,
+			'label'    => __( 'Smart Showcase', 'skyyrose' ),
+			'default'  => false,
 		),
-		'micro_interactions'  => array(
+		'micro_interactions'   => array(
 			'priority' => 50,
-			'label'    => __( 'Micro-Interactions', 'skyyrose-flagship' ),
-			'default'  => true,
+			'label'    => __( 'Micro-Interactions', 'skyyrose' ),
+			'default'  => false,
 		),
-		'personalization'     => array(
+		'personalization'      => array(
 			'priority' => 60,
-			'label'    => __( 'Personalization', 'skyyrose-flagship' ),
-			'default'  => true,
+			'label'    => __( 'Personalization', 'skyyrose' ),
+			'default'  => false,
 		),
 	);
 }
@@ -136,9 +139,12 @@ function skyyrose_see_get_active_modules(): array {
 	$modules = skyyrose_see_get_modules();
 
 	// Sort by priority before checking activation state.
-	uasort( $modules, function ( $a, $b ) {
-		return $a['priority'] - $b['priority'];
-	} );
+	uasort(
+		$modules,
+		function ( $a, $b ) {
+			return $a['priority'] - $b['priority'];
+		}
+	);
 
 	$active = array();
 	foreach ( $modules as $slug => $config ) {
@@ -149,7 +155,8 @@ function skyyrose_see_get_active_modules(): array {
 	return $active;
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Design Narrative Pipeline
  *--------------------------------------------------------------*/
 
@@ -163,16 +170,19 @@ function skyyrose_see_get_active_directives(): array {
 	if ( ! is_array( $directives ) ) {
 		return array();
 	}
-	return array_filter( $directives, function ( $d ) {
-		if ( ! is_array( $d ) ) {
-			return false;
+	return array_filter(
+		$directives,
+		function ( $d ) {
+			if ( ! is_array( $d ) ) {
+				return false;
+			}
+			// Filter out expired directives.
+			if ( ! empty( $d['expires'] ) && strtotime( $d['expires'] ) < time() ) {
+				return false;
+			}
+			return 'accepted' === ( $d['status'] ?? '' );
 		}
-		// Filter out expired directives.
-		if ( ! empty( $d['expires'] ) && strtotime( $d['expires'] ) < time() ) {
-			return false;
-		}
-		return 'accepted' === ( $d['status'] ?? '' );
-	} );
+	);
 }
 
 /**
@@ -222,7 +232,8 @@ function skyyrose_see_process_narrative( array $directive ): array {
 	);
 }
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * DB Setup (via theme activation pattern)
  *--------------------------------------------------------------*/
 
@@ -264,50 +275,44 @@ function skyyrose_see_create_tables(): void {
 
 // Run DB setup on theme activation and via versioned init check.
 add_action( 'after_switch_theme', 'skyyrose_see_create_tables' );
-add_action( 'init', function () {
-	if ( get_option( 'skyyrose_see_db_version' ) !== SKYYROSE_SEE_DB_VERSION ) {
-		skyyrose_see_create_tables();
-	}
-}, 35 );
+add_action(
+	'init',
+	function () {
+		if ( get_option( 'skyyrose_see_db_version' ) !== SKYYROSE_SEE_DB_VERSION ) {
+			skyyrose_see_create_tables();
+		}
+	},
+	35
+);
 
-/*--------------------------------------------------------------
+/*
+--------------------------------------------------------------
  * Admin Menu
  *--------------------------------------------------------------*/
 
-add_action( 'admin_menu', function () {
-	$parent_slug   = 'skyyrose';
-	$parent_exists = ! empty( $GLOBALS['admin_page_hooks'][ $parent_slug ] ?? '' );
-
-	$args = array(
-		__( 'Experience Engine', 'skyyrose-flagship' ),
-		__( 'Experience', 'skyyrose-flagship' ),
-		'manage_options',
-		'skyyrose-experience',
-		'skyyrose_see_render_dashboard',
-	);
-
-	if ( $parent_exists ) {
-		add_submenu_page( $parent_slug, ...$args );
-	} else {
-		add_menu_page(
-			$args[0],
-			$args[1],
-			$args[2],
-			$args[3],
-			$args[4],
-			'dashicons-visibility',
-			58
+add_action(
+	'admin_menu',
+	function () {
+		add_dashboard_page(
+			__( 'Experience Engine', 'skyyrose' ),
+			__( 'Experience Engine', 'skyyrose' ),
+			'manage_options',
+			'skyyrose-experience',
+			'skyyrose_see_render_dashboard'
 		);
 	}
-} );
+);
 
 /**
  * Render the admin dashboard. Delegates to admin-experience-dashboard.php.
  */
 function skyyrose_see_render_dashboard(): void {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+
 	$dashboard_file = SKYYROSE_DIR . '/inc/admin-experience-dashboard.php';
 	if ( file_exists( $dashboard_file ) ) {
-		require_once $dashboard_file;
-		skyyrose_see_dashboard_page();
+		require $dashboard_file;
 	}
 }

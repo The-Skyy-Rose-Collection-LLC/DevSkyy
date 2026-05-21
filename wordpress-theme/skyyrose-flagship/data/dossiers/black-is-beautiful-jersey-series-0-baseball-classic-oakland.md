@@ -1,18 +1,18 @@
 ---
-sku: br-003-oakland
+sku: br-013
 name: BLACK is Beautiful Jersey Series — 0. Baseball Classic (Oakland Edition)
 collection: black-rose
 logo_reference: data/brand-logos/black-rose-logo.md
 extra_logos:
   - data/brand-logos/black-rose-authentic-collection-patch.md
   - data/brand-logos/sr-monogram.md
-reference_image: data/product-references/br-003-oakland-techflat.jpeg
+reference_image: data/product-references/br-013-techflat.jpeg
 inherits_from: black-is-beautiful-jersey-series-0-baseball-classic
 ---
 
 # BLACK is Beautiful Jersey Series — 0. Baseball Classic (Oakland Edition)
 
-**Garment type lock:** Authentic-style baseball jersey — V-neck collar opening, button-front placket, short sleeves, straight even hem (no drop-tail). Solid **dark forest green** base fabric with **gold/yellow** piping/binding around V-neck collar, sleeve cuffs, and down both sides of the front placket. Buttons match the body (green or yellow-tone, blending with the placket). NO player number on front or back. NO player name on back. NO pinstripes. Mid-weight knit jersey. This is the OAKLAND colorway (separate SKU from the Classic black br-003 / Giants br-003-giants / White br-003-white).
+**Garment type lock:** Authentic-style baseball jersey — V-neck collar opening, button-front placket, short sleeves, straight even hem (no drop-tail). Solid **dark forest green** base fabric with **gold/yellow** piping/binding around V-neck collar, sleeve cuffs, and down both sides of the front placket. Buttons match the body (green or yellow-tone, blending with the placket). NO player number on front or back. NO player name on back. NO pinstripes. Mid-weight knit jersey. This is the OAKLAND colorway (separate SKU from the Classic black br-003 / Giants br-014 / White br-015).
 
 ## Branding — exactly what IS on this product
 
@@ -20,7 +20,7 @@ inherits_from: black-is-beautiful-jersey-series-0-baseball-classic
 > - Black Rose three-rose-cluster: `data/brand-logos/black-rose-logo.md`
 > - Authentic Collection patch:    `data/brand-logos/black-rose-authentic-collection-patch.md`
 > - SR monogram:                   `data/brand-logos/sr-monogram.md`
-> - Product techflat:              `data/product-references/br-003-oakland-techflat.jpeg`
+> - Product techflat:              `data/product-references/br-013-techflat.jpeg`
 
 ### Front
 - **front-chest** (large, arched, ~9in wide): The phrase **"BLACK IS BEAUTIFUL"**

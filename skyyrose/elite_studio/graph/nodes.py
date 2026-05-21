@@ -122,27 +122,196 @@ def vision_node(state: EliteStudioState) -> dict:
     }
 
 
-def generator_node(state: EliteStudioState) -> dict:
-    """Generate fashion model image from vision specification."""
-    start = time.monotonic()
-    agent = GeneratorAgent()
+_GENERATOR_EST_COST_USD = (
+    0.04  # Gemini Flash ~$0.04/image — see render_pipeline/tools/generate_image.py
+)
+# Per-view ceiling for the ADK render_pipeline (Layer 2):
+# gen (NB Pro) $0.04 + L0 Sonnet $0.005 + dual-vision $0.01 + tournament $0.10
+# + max 1 refine retry $0.04 + synthesis $0.005 = ~$0.20.
+_ADK_RENDER_EST_COST_USD = 0.20
+_THREE_D_EST_COST_USD = 0.50  # Round-table ceiling: Meshy + Tripo + TRELLIS_local worst case
 
+
+def _invoke_adk_render_engine(sku: str, view: str):
+    """Invoke the ADK render_pipeline root_agent and wrap the result.
+
+    Returns a ``GenerationResult`` (imported lazily inside the function body so
+    this module stays importable without the google-adk dependency at top).
+
+    P7: lets generator_node dispatch into Layer 2 (the 9-step ADK pipeline) when
+    state["engine"] == "adk-render". Returns a GenerationResult in the same shape
+    GeneratorAgent emits so downstream nodes (quality_node, etc.) see a uniform
+    contract.
+
+    The ADK pipeline runs its own QA tournament + refine loop internally; we
+    pass its `qa_score`, `qa_passed`, and `cost_usd` through `metadata` so the
+    Elite Studio quality_node can short-circuit if the ADK pass already cleared
+    the bar.
+    """
+    import asyncio
+    import json
+    import time as _time
+
+    from ..models import GenerationResult
+
+    try:
+        from google.adk.runners import Runner
+        from google.adk.sessions import InMemorySessionService
+        from google.genai import types as genai_types
+    except ImportError as exc:
+        return GenerationResult(
+            success=False,
+            provider="adk-render",
+            error=f"google-adk not installed in runtime env: {exc}",
+        )
+
+    try:
+        from agents.render_pipeline.agent import root_agent
+    except ImportError as exc:
+        return GenerationResult(
+            success=False,
+            provider="adk-render",
+            error=f"render_pipeline.agent import failed: {exc}",
+        )
+
+    async def _run() -> dict:
+        session_service = InMemorySessionService()
+        runner = Runner(
+            agent=root_agent,
+            app_name="elite_studio_render_pipeline",
+            session_service=session_service,
+        )
+        user_id = "elite_studio"
+        session_id = f"elite-{sku}-{view}-{int(_time.time())}"
+        await session_service.create_session(
+            app_name="elite_studio_render_pipeline",
+            user_id=user_id,
+            session_id=session_id,
+        )
+        user_input = json.dumps({"sku": sku, "view": view})
+        new_message = genai_types.Content(role="user", parts=[genai_types.Part(text=user_input)])
+        async for _event in runner.run_async(
+            user_id=user_id, session_id=session_id, new_message=new_message
+        ):
+            pass
+        session = await session_service.get_session(
+            app_name="elite_studio_render_pipeline",
+            user_id=user_id,
+            session_id=session_id,
+        )
+        return dict(session.state) if session else {}
+
+    try:
+        state_dict = asyncio.run(_run())
+    except Exception as exc:
+        return GenerationResult(
+            success=False,
+            provider="adk-render",
+            error=f"ADK runner failed: {type(exc).__name__}: {exc}",
+        )
+
+    render_result = state_dict.get("render_result") or {}
+    output_path = render_result.get("output_path") or state_dict.get("candidate_path") or ""
+    qa_score = float(render_result.get("qa_score", 0.0))
+    qa_passed = bool(render_result.get("qa_passed", False))
+    cost_usd = float(render_result.get("cost_usd", state_dict.get("estimated_cost_usd", 0.0)))
+    engine_used = render_result.get("engine") or state_dict.get("engine", "")
+    model_id = render_result.get("model_id") or state_dict.get("model_id", "")
+
+    if not output_path:
+        return GenerationResult(
+            success=False,
+            provider="adk-render",
+            model=str(model_id),
+            error="ADK pipeline returned no output_path",
+            metadata={
+                "engine": engine_used,
+                "qa_score": qa_score,
+                "qa_passed": qa_passed,
+                "cost_usd": cost_usd,
+                "render_result": render_result,
+            },
+        )
+
+    return GenerationResult(
+        success=True,
+        provider="adk-render",
+        model=str(model_id),
+        output_path=str(output_path),
+        metadata={
+            "engine": engine_used,
+            "qa_score": qa_score,
+            "qa_passed": qa_passed,
+            "cost_usd": cost_usd,
+            "render_result": render_result,
+        },
+    )
+
+
+def generator_node(state: EliteStudioState) -> dict:
+    """Generate fashion model image from vision specification.
+
+    Branches on state["engine"]:
+        "legacy"     → GeneratorAgent (default)
+        "adk-render" → ADK render_pipeline root_agent (P7)
+    """
+    from ..budget import BudgetExceededError
+
+    start = time.monotonic()
+
+    engine_selector = state.get("engine", "legacy")
     vision = state.get("vision_result")
-    if not vision or not vision.success:
+
+    # Legacy path requires a vision_result; ADK path can run without one
+    # because the ADK pipeline does its own dossier-driven prompting.
+    if engine_selector == "legacy" and (not vision or not vision.success):
         return {
             "status": "error",
             "error": "No vision result available for generation",
             "failed_step": "generation",
         }
 
-    result = run_sync(
-        agent.generate(
-            sku=state["sku"],
-            view=state["view"],
-            generation_spec=vision.unified_spec,
-        )
+    # ADK pipeline runs its own QA + refine loop internally; the cost ceiling
+    # there is ~$0.20/view (gen+QA+refine), markedly higher than the legacy
+    # $0.04/image estimate. Use the higher number for the budget pre-check
+    # when the ADK engine is selected.
+    est_cost = (
+        _ADK_RENDER_EST_COST_USD if engine_selector == "adk-render" else _GENERATOR_EST_COST_USD
     )
+
+    budget = state.get("budget")
+    if budget is not None and hasattr(budget, "ensure_within_budget"):
+        try:
+            budget.ensure_within_budget(est_cost, stage="generation")
+        except BudgetExceededError as exc:
+            return {
+                "status": "error",
+                "error": f"budget exceeded before generation: {exc}",
+                "failed_step": "generation",
+            }
+
+    if engine_selector == "adk-render":
+        result = _invoke_adk_render_engine(state["sku"], state["view"])
+    else:
+        agent = GeneratorAgent()
+        result = run_sync(
+            agent.generate(
+                sku=state["sku"],
+                view=state["view"],
+                generation_spec=vision.unified_spec,
+            )
+        )
     elapsed = time.monotonic() - start
+
+    if budget is not None and hasattr(budget, "spend") and getattr(result, "success", False):
+        # For the ADK engine prefer the per-run actual cost reported back; fall
+        # back to the est_cost so we never under-account.
+        actual_cost = est_cost
+        if engine_selector == "adk-render":
+            reported = getattr(result, "metadata", {}).get("cost_usd")
+            if isinstance(reported, (int, float)) and reported > 0:
+                actual_cost = float(reported)
+        budget.spend(actual_cost, stage="generation")
 
     job_id: str | None = state.get("job_id")  # type: ignore[assignment]
     _record_cost(job_id, "gemini", _GENERATION_TOKENS_ESTIMATE)
@@ -169,11 +338,8 @@ def generator_node(state: EliteStudioState) -> dict:
 def quality_node(state: EliteStudioState) -> dict:
     """Dual-QC: ML classifier first, Claude Sonnet fallback on low confidence.
 
-    Decision logic:
-    1. Run QualityClassifier (CLIP) — fast, no LLM cost.
-    2. If classifier.confidence >= 0.8: use classifier decision, skip LLM.
-    3. If classifier.confidence < 0.8: run QualityAgent (Claude Sonnet) as well.
-    4. Return both classifier_result and quality_result in state.
+    Phase 16 Upgrade: Inspects audit_result from FLUX synthesis first. If
+    blocking violations exist, fails immediately without calling ML/LLM.
     """
     start = time.monotonic()
 
@@ -185,6 +351,49 @@ def quality_node(state: EliteStudioState) -> dict:
             "error": "No generated image available for QC",
             "failed_step": "quality",
         }
+
+    # --- Stage 0: Fidelity Audit check (Phase 16) ---
+    audit_data = gen.metadata.get("audit_result")
+    if audit_data:
+        from ..agents.vision_audit_agent import VisionAuditResult, VisionAuditViolation
+
+        # Reconstruct violations first
+        violation_dicts = audit_data.get("violations", [])
+        violations_objs = [VisionAuditViolation(**v) for v in violation_dicts]
+
+        # Reconstruct result object
+        audit = VisionAuditResult(
+            matches_dossier=bool(audit_data.get("matches_dossier", False)),
+            violations=violations_objs,
+            raw_text=audit_data.get("raw_text", ""),
+            model=audit_data.get("model", ""),
+            error=audit_data.get("error", ""),
+        )
+
+        if not audit.ok:
+            logger.info("[QC] Fidelity audit failed (blocking violations found)")
+            from ..models import QualityVerification
+
+            violations = [v.element for v in audit.violations if v.is_blocking]
+            quality_result = QualityVerification(
+                success=True,
+                provider="fidelity_audit",
+                model=audit.model,
+                overall_status="fail",
+                recommendation="regenerate",
+                details={
+                    "violations": [v.to_dict() for v in audit.violations],
+                    "blocking_elements": violations,
+                    "reason": "fidelity audit failed",
+                },
+            )
+            elapsed = time.monotonic() - start
+            timings = dict(state.get("stage_timings", {}))
+            timings["quality"] = round(elapsed, 2)
+            return {
+                "quality_result": quality_result,
+                "stage_timings": timings,
+            }
 
     # --- Stage 1: ML classifier ---
     classifier = QualityClassifier()
@@ -415,14 +624,48 @@ def tryon_node(state: EliteStudioState) -> dict:
 
 
 def finalize_node(state: EliteStudioState) -> dict:
-    """Set final status based on accumulated results."""
-    # If status is already "error", keep it
-    if state.get("status") == "error":
-        return {}
+    """Set final status + persist the run summary for downstream auditing.
 
-    return {
-        "status": "success",
+    Always emits a summary JSON — success or error — so post-run analysis
+    can reconstruct what each SKU's pipeline did, what it spent, and
+    where it failed. Telemetry write is best-effort: a failed write
+    never overrides the run status.
+    """
+    from ..telemetry import write_run_summary
+
+    final_status = "success" if state.get("status") != "error" else "error"
+
+    budget = state.get("budget")
+    budget_snap = budget.snapshot() if budget is not None and hasattr(budget, "snapshot") else None
+
+    qa = state.get("quality_result")
+    gen = state.get("generation_result")
+    three_d_score = state.get("three_d_fidelity_score") or 0.0
+
+    summary = {
+        "workflow_id": state.get("workflow_id"),
+        "sku": state.get("sku"),
+        "view": state.get("view"),
+        "style": state.get("style"),
+        "status": final_status,
+        "error": state.get("error", ""),
+        "failed_step": state.get("failed_step", ""),
+        "generation_engine": getattr(gen, "provider", None) or getattr(gen, "model", None),
+        "qa_score": getattr(qa, "score", None) if qa else None,
+        "qa_passed": getattr(qa, "passed", None) if qa else None,
+        "three_d_fidelity_score": three_d_score,
+        "three_d_model_path": state.get("three_d_model_path", ""),
+        "budget": budget_snap,
+        "stage_timings": dict(state.get("stage_timings", {}) or {}),
     }
+
+    workflow_id = state.get("workflow_id") or "unknown"
+    summary_path = write_run_summary(workflow_id, summary)
+
+    out: dict = {"status": final_status}
+    if summary_path is not None:
+        out["run_summary_path"] = str(summary_path)
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -622,17 +865,35 @@ def three_d_node(state: EliteStudioState) -> dict:
     """
     from ..agents.three_d_agent import ThreeDAgent
     from ..agents.vision_agent import _reference_path
+    from ..budget import BudgetExceededError
 
     sku = state["sku"]
 
     # Reference image: techflat from state or vision-agent lookup
     ref_path = state.get("reference_path") or _reference_path(sku)
 
+    # Budget guard — round-table tournament (Meshy + Tripo + TRELLIS local +
+    # AniGen) can dispatch up to 4 providers in parallel; estimate the
+    # ceiling at $0.50 to cover the worst case before any provider fires.
+    budget = state.get("budget")
+    if budget is not None and hasattr(budget, "ensure_within_budget"):
+        try:
+            budget.ensure_within_budget(_THREE_D_EST_COST_USD, stage="three_d")
+        except BudgetExceededError as exc:
+            return {
+                "status": "error",
+                "error": f"budget exceeded before 3D generation: {exc}",
+                "failed_step": "3d_generation",
+            }
+
     # The dossier loaded inside generate_replica is now the source of truth for
     # branding spec; enrichment_prompt and vision_result are no longer fed
     # into the RAS prompt (they were thin and could drift from the dossier).
     agent = ThreeDAgent()
     replica_result = run_sync(agent.generate_replica(sku, ref_path))
+
+    if budget is not None and hasattr(budget, "spend") and replica_result.get("success"):
+        budget.spend(_THREE_D_EST_COST_USD, stage="three_d")
 
     if not replica_result["success"]:
         return {
