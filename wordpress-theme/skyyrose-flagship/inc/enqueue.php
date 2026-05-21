@@ -682,6 +682,23 @@ function skyyrose_enqueue_template_scripts() {
 			);
 		}
 
+		// Complete the Look — quick-add behavior for PDP cross-sells. Extracted
+		// from inline <script> in template-parts/complete-the-look.php in v1.5.7
+		// so the behavior is versioned, minified, and CSP-nonce-compatible.
+		if ( 'single-product' === $slug ) {
+			$ctl_file = $use_min && file_exists( $base_js_dir . '/complete-the-look.min.js' )
+				? 'complete-the-look.min.js' : 'complete-the-look.js';
+			if ( file_exists( $base_js_dir . '/' . $ctl_file ) ) {
+				wp_enqueue_script(
+					'skyyrose-complete-the-look',
+					$base_js_uri . '/' . $ctl_file,
+					array( 'jquery' ),
+					SKYYROSE_VERSION,
+					true
+				);
+			}
+		}
+
 		// Localize immersive scenes + load the WC bridge that wires the
 		// "Pre-Order Now" button to skyyrose_immersive_add_to_cart.
 		if ( 'immersive' === $slug && wp_script_is( $handle, 'enqueued' ) ) {
@@ -716,7 +733,7 @@ function skyyrose_enqueue_template_scripts() {
 
 	// Holo product cards — loaded on collection pages, shop archives, and WC loop.
 	// NOTE: This must be OUTSIDE the $template_scripts check above.
-	if ( in_array( $slug, array( 'collection', 'collection-v4', 'collection-standalone', 'collections-shop', 'front-page', 'shop-archive', 'preorder-gateway', 'search', 'landing', 'elementor-editorial', 'single-product' ), true ) ) {
+	if ( in_array( $slug, array( 'collection-standalone', 'front-page', 'shop-archive', 'preorder-gateway', 'search', 'landing', 'elementor-editorial', 'single-product' ), true ) ) {
 			$holo_css_file = $use_min && file_exists( $base_css_dir . '/product-card-holo.min.css' )
 				? 'product-card-holo.min.css' : 'product-card-holo.css';
 		if ( file_exists( $base_css_dir . '/' . $holo_css_file ) ) {

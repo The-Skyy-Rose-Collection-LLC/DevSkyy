@@ -19,7 +19,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Enqueue collection-specific Three.js experience scenes.
  *
- * @since 5.2.0
+ * @since 1.5.0
  * @return void
  */
 function skyyrose_enqueue_collection_experiences() {

@@ -54,7 +54,7 @@ function skyyrose_enqueue_phase2_brand_atmosphere(): void {
 		return;
 	}
 	$slug = skyyrose_get_current_template_slug();
-	if ( ! in_array( $slug, array( 'collection-standalone', 'collection', 'collection-v4' ), true ) ) {
+	if ( 'collection-standalone' !== $slug ) {
 		return;
 	}
 	$base_js_dir  = SKYYROSE_DIR . '/assets/js';
@@ -107,9 +107,6 @@ function skyyrose_enqueue_phase2_assets(): void {
 function skyyrose_phase3_product_slugs(): array {
 	return array(
 		'collection-standalone',
-		'collection',
-		'collection-v4',
-		'collections-shop',
 		'shop-archive',
 		'search',
 		'front-page',

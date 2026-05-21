@@ -1,8 +1,8 @@
 /**
  * View Transitions — cross-collection navigation choreography
  *
- * F1 (v1.5.4): when a user navigates from one /collection-*/ page to
- * another (e.g. Black Rose → Love Hurts via the col-crossnav), the
+ * F1 (v1.5.4): when a user navigates from one /collection-{slug}/ page
+ * to another (e.g. Black Rose → Love Hurts via the col-crossnav), the
  * View Transitions API morphs the shared hero elements (background
  * image, brand logo, accent rule) instead of cutting hard.
  *
@@ -28,7 +28,7 @@
 
 /* Shared elements across all collection pages — these morph between
    pages instead of cross-fading. The names are assigned via the
-   PHP markup, gated to /collection-*/ slugs only. */
+   PHP markup, gated to /collection-{slug}/ pages only. */
 .col-hero__bg    { view-transition-name: skyyrose-collection-hero-bg; }
 .col-hero__logo  { view-transition-name: skyyrose-collection-hero-logo; }
 .col-hero__title { view-transition-name: skyyrose-collection-hero-title; }
