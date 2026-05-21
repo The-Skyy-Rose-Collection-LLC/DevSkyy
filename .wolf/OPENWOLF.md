@@ -25,6 +25,18 @@ You are working in an OpenWolf-managed project. These rules apply every turn.
 
 A SessionStart hook (`.wolf/hooks/claude-mem-sync.sh`) syncs the last 25 claude-mem observations for this project into `.wolf/claude-mem-digest.md`. Read that file when you need cross-session context that isn't already in `cerebrum.md`/`anatomy.md`/`memory.md`.
 
+**Wiring** (per-clone, since `.claude/` is gitignored to protect keys/preferences): add this entry under `hooks.SessionStart[0].hooks` in `.claude/settings.json`. The script is non-blocking — it no-ops cleanly when the DB or sqlite3 are missing.
+
+```json
+{
+  "type": "command",
+  "command": "bash /Users/theceo/DevSkyy/.wolf/hooks/claude-mem-sync.sh",
+  "timeout": 5
+}
+```
+
+Verify wiring with: `bash .wolf/hooks/claude-mem-sync.sh && ls -la .wolf/claude-mem-digest.md`.
+
 **Use the digest to:**
 
 1. **Cite observation IDs** — when logging to `.wolf/memory.md` or adding entries to `.wolf/cerebrum.md`, append `[cmem #NNN]` so the OpenWolf record links to claude-mem's richer narrative.
