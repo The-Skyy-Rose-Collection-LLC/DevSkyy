@@ -555,7 +555,12 @@ echo wp_json_encode(
 
 <?php
 // Load homepage JS inline to bypass page-optimize plugin stripping.
-$homepage_js_path = SKYYROSE_DIR . '/assets/js/homepage-v2.js';
+// Prefer minified for production; fall back to source when SCRIPT_DEBUG is on
+// or when the min file is missing (e.g., right after a source edit before rebuild).
+$homepage_js_use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+$homepage_js_min     = SKYYROSE_DIR . '/assets/js/homepage-v2.min.js';
+$homepage_js_src     = SKYYROSE_DIR . '/assets/js/homepage-v2.js';
+$homepage_js_path    = ( $homepage_js_use_min && file_exists( $homepage_js_min ) ) ? $homepage_js_min : $homepage_js_src;
 if ( file_exists( $homepage_js_path ) ) :
 	?>
 <script>
