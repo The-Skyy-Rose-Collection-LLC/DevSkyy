@@ -216,10 +216,11 @@ get_header();
 	<div class="hero-particles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
 	<div class="hero-frame" aria-hidden="true"></div>
 	<div class="hero-content">
-		<p class="hero-eyebrow rv-blur-down"><?php esc_html_e( 'Oakland · Est. 2020 · Gender Neutral', 'skyyrose' ); ?></p>
-		<h1 class="hero-title rv-split-char" aria-label="<?php esc_attr_e( 'SkyyRose', 'skyyrose' ); ?>">SkyyRose</h1>
+		<p class="hero-mark-top"><?php esc_html_e( 'Oakland', 'skyyrose' ); ?></p>
+		<h1 class="hero-title" aria-label="<?php esc_attr_e( 'SkyyRose', 'skyyrose' ); ?>">SkyyRose</h1>
+		<p class="hero-mark-bot"><?php esc_html_e( 'Est. 2020', 'skyyrose' ); ?></p>
 		<div class="hero-rule" aria-hidden="true"></div>
-		<p class="hero-subtitle rv-blur"><?php esc_html_e( 'Luxury Grows from Concrete. Four collections, one bloodline — built by a father, named after a daughter.', 'skyyrose' ); ?></p>
+		<p class="hero-subtitle"><?php esc_html_e( 'Luxury Grows from Concrete. Four collections, one bloodline — built by a father, named after a daughter.', 'skyyrose' ); ?></p>
 		<div class="hero-ctas">
 			<a href="#collections" class="hero-cta hero-cta-primary btn-sweep btn-press"><?php esc_html_e( 'Explore Collections', 'skyyrose' ); ?></a>
 			<a href="#story" class="hero-cta btn-border-draw btn-press"><?php esc_html_e( 'Our Story', 'skyyrose' ); ?></a>
@@ -333,6 +334,62 @@ get_header();
 				</div>
 			</a>
 		<?php endforeach; ?>
+	</div>
+</section>
+
+<!-- ═══ KIDS CAPSULE — HEIR APPARENT (envelope reveal, hover breaks the seal) ═══ -->
+<?php
+$kc_config = function_exists( 'skyyrose_get_collection' ) ? skyyrose_get_collection( 'kids-capsule' ) : null;
+$kc_link   = $kc_config['page_url'] ?? home_url( '/collection-kids-capsule/' );
+?>
+<section class="kc-heir" id="kids-capsule" aria-label="<?php esc_attr_e( 'Kids Capsule — Heir Apparent', 'skyyrose' ); ?>" data-collection="kids-capsule">
+	<div class="kc-heir__head">
+		<p class="kc-heir__eyebrow"><?php esc_html_e( 'Capsule · IV · Heir Apparent', 'skyyrose' ); ?></p>
+		<h2 class="kc-heir__title"><?php esc_html_e( 'The Kids Capsule', 'skyyrose' ); ?></h2>
+		<p class="kc-heir__sub"><?php esc_html_e( 'Not a fourth world. A letter to one. Hover to break the seal.', 'skyyrose' ); ?></p>
+	</div>
+
+	<a href="<?php echo esc_url( $kc_link ); ?>" class="kc-heir__stage" tabindex="0" aria-label="<?php esc_attr_e( 'Open the letter — discover Kids Capsule', 'skyyrose' ); ?>">
+		<div class="kc-heir__envelope">
+			<div class="kc-heir__letter">
+				<div class="kc-heir__chapter"><?php esc_html_e( 'Chapter IV', 'skyyrose' ); ?></div>
+				<div class="kc-heir__script"><?php esc_html_e( 'Dear future,', 'skyyrose' ); ?></div>
+				<p class="kc-heir__headline"><?php esc_html_e( 'You were born into the rose. Wear it lightly.', 'skyyrose' ); ?></p>
+				<div class="kc-heir__sig">— S.</div>
+			</div>
+			<div class="kc-heir__env-back" aria-hidden="true"></div>
+			<div class="kc-heir__wax-glow" aria-hidden="true"></div>
+			<svg class="kc-heir__wax" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+				<defs>
+					<radialGradient id="kc-wax-grad" cx="35%" cy="30%">
+						<stop offset="0%" stop-color="#1a0e0c"/>
+						<stop offset="60%" stop-color="#0a0504"/>
+						<stop offset="100%" stop-color="#000"/>
+					</radialGradient>
+					<radialGradient id="kc-wax-shine" cx="40%" cy="30%">
+						<stop offset="0%" stop-color="rgba(212,175,55,.4)"/>
+						<stop offset="40%" stop-color="rgba(212,175,55,0)"/>
+					</radialGradient>
+				</defs>
+				<g class="kc-heir__wax-half left">
+					<path d="M 40 6 A 34 34 0 0 0 40 74 L 40 6 Z" fill="url(#kc-wax-grad)" stroke="#3d2418" stroke-width=".5"/>
+					<path d="M 40 6 A 34 34 0 0 0 40 74 L 40 6 Z" fill="url(#kc-wax-shine)"/>
+					<path d="M 8 38 L 6 44 L 9 47 L 7 52 M 12 22 L 9 26 M 14 60 L 11 64" fill="none" stroke="#0a0504" stroke-width="1.2"/>
+				</g>
+				<g class="kc-heir__wax-half right">
+					<path d="M 40 6 A 34 34 0 0 1 40 74 L 40 6 Z" fill="url(#kc-wax-grad)" stroke="#3d2418" stroke-width=".5"/>
+					<path d="M 40 6 A 34 34 0 0 1 40 74 L 40 6 Z" fill="url(#kc-wax-shine)"/>
+					<path d="M 72 38 L 74 44 L 71 47 L 73 52 M 68 22 L 71 26 M 66 60 L 69 64" fill="none" stroke="#0a0504" stroke-width="1.2"/>
+				</g>
+				<text x="40" y="54" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif" font-style="italic" font-size="46" fill="#D4AF37">S</text>
+			</svg>
+		</div>
+		<div class="kc-heir__hint"><?php esc_html_e( '↗ break the seal', 'skyyrose' ); ?></div>
+	</a>
+
+	<div class="kc-heir__tag">
+		<div class="kc-heir__tag-script"><?php esc_html_e( 'Heir to the rose.', 'skyyrose' ); ?></div>
+		<div class="kc-heir__tag-sub"><?php esc_html_e( 'Capsule · IV · Kids · Born Into It', 'skyyrose' ); ?></div>
 	</div>
 </section>
 

@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 --------------------------------------------------------------
  * Theme Constants
  *--------------------------------------------------------------*/
-define( 'SKYYROSE_VERSION', '1.4.4' );
+define( 'SKYYROSE_VERSION', '1.4.8' );
 define( 'SKYYROSE_DIR', get_template_directory() );
 define( 'SKYYROSE_URI', get_template_directory_uri() );
 
@@ -37,7 +37,7 @@ define( 'SKYYROSE_ASSETS_URI', SKYYROSE_URI . '/assets' );
  * and redeploy to lift the veil.
  *--------------------------------------------------------------*/
 if ( ! defined( 'SKYYROSE_COMING_SOON_MODE' ) ) {
-	define( 'SKYYROSE_COMING_SOON_MODE', true );
+	define( 'SKYYROSE_COMING_SOON_MODE', false );
 }
 
 /*
