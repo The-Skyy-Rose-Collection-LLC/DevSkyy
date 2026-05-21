@@ -181,7 +181,7 @@
 		triggerBtn.setAttribute('aria-expanded', 'true');
 
 		// Clear previous chips
-		chipsEl.innerHTML = '';
+		chipsEl.replaceChildren();
 
 		// Show bubble
 		bubble.removeAttribute('hidden');
@@ -219,7 +219,7 @@
 			if (!bubble.classList.contains('skyy-bubble--visible')) {
 				bubble.setAttribute('hidden', '');
 				bubbleText.textContent = '';
-				chipsEl.innerHTML = '';
+				chipsEl.replaceChildren();
 			}
 			if (state === 'speaking') state = 'idle';
 		}, 300);

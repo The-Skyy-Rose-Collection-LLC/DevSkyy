@@ -743,7 +743,6 @@ function skyyrose_enqueue_template_scripts() {
 	}
 }
 
-
 /**
  * Enqueue admin styles and scripts.
  *
@@ -781,26 +780,13 @@ function skyyrose_admin_scripts() {
 	}
 }
 
-
+// Hook registration. Priority order: 5 fonts → 10 globals → 15 localize → 20 templates.
+// Phase 2/3/4 + commercial polish (priorities 25/30/40/42) live in inc/enqueue-phases.php.
+// Collection-experience scenes (priority 65) live in inc/enqueue-experiences.php.
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_local_fonts', 5 );
-
-// Global styles (priority 10 - default).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_global_styles', 10 );
-
-// Global scripts (priority 10).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_global_scripts', 10 );
-
-// Localize scripts (priority 15, after scripts are registered).
 add_action( 'wp_enqueue_scripts', 'skyyrose_localize_scripts', 15 );
-
-// Template-specific styles (priority 20, after globals).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_template_styles', 20 );
-
-// Template-specific scripts (priority 20).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_template_scripts', 20 );
-
-// Commercial polish (priority 25) + phase 2/3/4 hooks live in inc/enqueue-phases.php.
-// Collection-experience scenes (Three.js) live in inc/enqueue-experiences.php.
-
-// Admin scripts.
 add_action( 'admin_enqueue_scripts', 'skyyrose_admin_scripts' );

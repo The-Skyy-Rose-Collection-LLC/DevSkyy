@@ -47,7 +47,9 @@ async function main() {
 			// production via the sourceMappingURL comment. Defenders should not have
 			// to think about whether maps shipped or not; the safe default is off.
 			const result = await minify(code, {
-				compress: { passes: 2 },
+				// drop_console removes console.* calls from production output.
+				// Source files keep debug logs for development; mins ship silent.
+				compress: { passes: 2, drop_console: true },
 				mangle: true,
 				format: { comments: false },
 			});
