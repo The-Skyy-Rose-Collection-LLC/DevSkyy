@@ -1,0 +1,485 @@
+/**
+ * Elementor Widget Styles — col-* token bridge + layout
+ *
+ * Provides styling for the 5 SkyyRose Elementor widgets (featured-product,
+ * product-card, collection-hero, preorder-cta, newsletter). These widgets
+ * emit `--col-accent` / `--col-accent-rgb` custom properties and use
+ * `col-feat__*`, `col-card__*`, `col-hero__*`, `col-nl__*`, `col-btn`,
+ * `col-rv`, `col-featured` class families. Prior to v1.5.0 no CSS file
+ * targeted these selectors — Elementor pages rendered without dynamic
+ * theming or layout.
+ *
+ * Token bridge: rules below consume the legacy --col-accent / --col-accent-rgb
+ * vars when present and fall back to the canonical --skyyrose-accent tokens
+ * from design-tokens.css. New widget revisions should emit
+ * --skyyrose-accent directly; the bridge keeps existing widget markup
+ * (persisted by Elementor in the DB) working without a forced migration.
+ *
+ * Depends on: design-tokens.css (--skyyrose-accent, --skyyrose-accent-rgb,
+ *             --skyyrose-bg, --skyyrose-text, --skyyrose-text-muted,
+ *             --skyyrose-font-display, --skyyrose-font-body, --skyyrose-radius)
+ *
+ * @package SkyyRose
+ * @since   1.5.0
+ */
+
+/* ──────────────────────────────────────────────────────────────────
+   Token bridge — every widget root carries --col-accent inline; mirror
+   into --skyyrose-accent so design-token-driven children resolve.
+   ────────────────────────────────────────────────────────────────── */
+.col-featured,
+.col-card,
+.col-hero,
+.col-nl,
+[class*="col-feat"],
+[class*="col-card__"],
+[class*="col-hero__"],
+[class*="col-nl__"] {
+	--skyyrose-accent:     var(--col-accent, #B76E79);
+	--skyyrose-accent-rgb: var(--col-accent-rgb, 183, 110, 121);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   Shared: col-rv scroll-reveal stub (unified IO observer in
+   premium-interactions.js toggles .is-visible)
+   ────────────────────────────────────────────────────────────────── */
+.col-rv {
+	opacity: 0;
+	transform: translateY(24px);
+	transition:
+		opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+		transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.col-rv.is-visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   Shared: col-btn button system
+   ────────────────────────────────────────────────────────────────── */
+.col-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 14px 32px;
+	font-family: var(--skyyrose-font-ui, 'Bebas Neue', sans-serif);
+	font-size: 13px;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	text-decoration: none;
+	color: var(--skyyrose-accent);
+	background: transparent;
+	border: 1px solid var(--skyyrose-accent);
+	border-radius: var(--skyyrose-radius, 2px);
+	cursor: pointer;
+	transition: background 0.4s ease, color 0.4s ease;
+}
+.col-btn:hover,
+.col-btn:focus-visible {
+	background: var(--skyyrose-accent);
+	color: var(--skyyrose-bg, #0A0A0A);
+}
+.col-btn--fill {
+	background: var(--skyyrose-accent);
+	color: var(--skyyrose-bg, #0A0A0A);
+}
+.col-btn--fill:hover,
+.col-btn--fill:focus-visible {
+	background: transparent;
+	color: var(--skyyrose-accent);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   FEATURED PRODUCT (col-feat__*)
+   ══════════════════════════════════════════════════════════════════ */
+.col-featured {
+	padding: clamp(64px, 8vw, 120px) clamp(20px, 5vw, 80px);
+	background: var(--skyyrose-bg, #0A0A0A);
+	color: var(--skyyrose-text, #FFFFFF);
+}
+.col-feat__inner {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: clamp(32px, 5vw, 80px);
+	align-items: center;
+	max-width: 1280px;
+	margin: 0 auto;
+}
+.col-feat__vis {
+	position: relative;
+	aspect-ratio: 4 / 5;
+	overflow: hidden;
+	border-radius: var(--skyyrose-radius, 2px);
+	background: rgba(var(--skyyrose-accent-rgb), 0.06);
+}
+.col-feat__vis img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+.col-feat__badge {
+	position: absolute;
+	top: 16px;
+	left: 16px;
+	z-index: 2;
+	padding: 6px 12px;
+	font-family: var(--skyyrose-font-ui, 'Bebas Neue', sans-serif);
+	font-size: 10px;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: var(--skyyrose-bg, #0A0A0A);
+	background: var(--skyyrose-accent);
+}
+.col-feat__tag {
+	display: inline-block;
+	font-family: var(--skyyrose-font-ui, 'Bebas Neue', sans-serif);
+	font-size: 11px;
+	letter-spacing: 0.3em;
+	text-transform: uppercase;
+	color: var(--skyyrose-accent);
+	margin-bottom: 12px;
+}
+.col-feat__col {
+	display: block;
+	font-family: var(--skyyrose-font-body, 'Cormorant Garamond', serif);
+	font-style: italic;
+	font-size: 14px;
+	color: var(--skyyrose-text-muted, rgba(255, 255, 255, 0.6));
+	margin-bottom: 8px;
+}
+.col-feat__name {
+	font-family: var(--skyyrose-font-display, 'Playfair Display', serif);
+	font-size: clamp(32px, 4vw, 56px);
+	line-height: 1.1;
+	margin: 0 0 16px;
+	color: inherit;
+}
+.col-feat__price {
+	display: inline-block;
+	font-family: var(--skyyrose-font-display, 'Playfair Display', serif);
+	font-size: 22px;
+	color: var(--skyyrose-accent);
+	margin-bottom: 24px;
+}
+.col-feat__desc {
+	font-family: var(--skyyrose-font-body, 'Cormorant Garamond', serif);
+	font-size: 17px;
+	line-height: 1.7;
+	color: var(--skyyrose-text-muted, rgba(255, 255, 255, 0.75));
+	margin: 0 0 32px;
+	max-width: 50ch;
+}
+.col-feat__sizes {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 32px;
+}
+.col-feat__sizes button {
+	padding: 10px 16px;
+	font-family: var(--skyyrose-font-ui, 'Bebas Neue', sans-serif);
+	font-size: 12px;
+	letter-spacing: 0.15em;
+	color: var(--skyyrose-text, #FFFFFF);
+	background: transparent;
+	border: 1px solid rgba(var(--skyyrose-accent-rgb), 0.3);
+	cursor: pointer;
+	transition: border-color 0.3s ease, background 0.3s ease;
+}
+.col-feat__sizes button:hover,
+.col-feat__sizes button[aria-pressed="true"] {
+	border-color: var(--skyyrose-accent);
+	background: rgba(var(--skyyrose-accent-rgb), 0.12);
+}
+.col-feat__add {
+	background: var(--skyyrose-accent);
+	color: var(--skyyrose-bg, #0A0A0A);
+	border-color: var(--skyyrose-accent);
+}
+.col-feat__add:hover,
+.col-feat__add:focus-visible {
+	background: transparent;
+	color: var(--skyyrose-accent);
+}
+
+@media (max-width: 768px) {
+	.col-feat__inner {
+		grid-template-columns: 1fr;
+		direction: ltr !important;
+	}
+	.col-feat__vis {
+		aspect-ratio: 3 / 4;
+	}
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PRODUCT CARD (col-card__*)
+   ══════════════════════════════════════════════════════════════════ */
+.col-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	background: rgba(var(--skyyrose-accent-rgb), 0.04);
+	border: 1px solid rgba(var(--skyyrose-accent-rgb), 0.12);
+	border-radius: var(--skyyrose-radius, 2px);
+	overflow: hidden;
+	transition: border-color 0.4s ease, transform 0.4s ease;
+}
+.col-card:hover {
+	border-color: var(--skyyrose-accent);
+	transform: translateY(-4px);
+}
+.col-card__img {
+	position: relative;
+	aspect-ratio: 4 / 5;
+	overflow: hidden;
+}
+.col-card__img img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.col-card:hover .col-card__img img {
+	transform: scale(1.04);
+}
+.col-card__badge {
+	position: absolute;
+	top: 12px;
+	left: 12px;
+	padding: 4px 10px;
+	font-family: var(--skyyrose-font-ui, 'Bebas Neue', sans-serif);
+	font-size: 10px;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--skyyrose-bg, #0A0A0A);
+	background: var(--skyyrose-accent);
+}
+.col-card__hover {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	padding: 16px;
+	background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent 60%);
+	opacity: 0;
+	transition: opacity 0.4s ease;
+}
+.col-card:hover .col-card__hover,
+.col-card:focus-within .col-card__hover {
+	opacity: 1;
+}
+.col-card__view-btn {
+	font-family: var(--skyyrose-font-ui, 'Bebas Neue', sans-serif);
+	font-size: 11px;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: var(--skyyrose-text, #FFFFFF);
+	background: transparent;
+	border: 1px solid var(--skyyrose-text, #FFFFFF);
+	padding: 10px 20px;
+	cursor: pointer;
+}
+.col-card__body {
+	padding: 16px 18px 20px;
+}
+.col-card__name {
+	font-family: var(--skyyrose-font-display, 'Playfair Display', serif);
+	font-size: 18px;
+	line-height: 1.3;
+	margin: 0 0 6px;
+	color: var(--skyyrose-text, #FFFFFF);
+}
+.col-card__desc {
+	font-family: var(--skyyrose-font-body, 'Cormorant Garamond', serif);
+	font-size: 14px;
+	color: var(--skyyrose-text-muted, rgba(255, 255, 255, 0.6));
+	margin: 0 0 12px;
+}
+.col-card__foot {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.col-card__price {
+	font-family: var(--skyyrose-font-display, 'Playfair Display', serif);
+	font-size: 16px;
+	color: var(--skyyrose-accent);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   COLLECTION HERO (col-hero__*)
+   ══════════════════════════════════════════════════════════════════ */
+.col-hero {
+	position: relative;
+	min-height: 70vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	background: var(--skyyrose-bg, #0A0A0A);
+	color: var(--skyyrose-text, #FFFFFF);
+}
+.col-hero__img {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+}
+.col-hero__img img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+.col-hero__overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	background: linear-gradient(
+		180deg,
+		rgba(0, 0, 0, 0.2) 0%,
+		rgba(0, 0, 0, 0.55) 70%,
+		rgba(0, 0, 0, 0.75) 100%
+	);
+}
+.col-hero__content {
+	position: relative;
+	z-index: 2;
+	text-align: center;
+	padding: clamp(48px, 8vw, 120px) 24px;
+	max-width: 900px;
+}
+.col-hero__num {
+	display: inline-block;
+	font-family: var(--skyyrose-font-ui, 'Bebas Neue', sans-serif);
+	font-size: 12px;
+	letter-spacing: 0.3em;
+	text-transform: uppercase;
+	color: var(--skyyrose-accent);
+	margin-bottom: 16px;
+}
+.col-hero__name {
+	font-family: var(--skyyrose-font-display, 'Playfair Display', serif);
+	font-size: clamp(48px, 8vw, 120px);
+	line-height: 1;
+	margin: 0 0 16px;
+}
+.col-hero__tag {
+	font-family: var(--skyyrose-font-body, 'Cormorant Garamond', serif);
+	font-style: italic;
+	font-size: clamp(18px, 2vw, 24px);
+	color: var(--skyyrose-text-muted, rgba(255, 255, 255, 0.85));
+	margin: 0 0 32px;
+}
+.col-hero__ctas {
+	display: inline-flex;
+	gap: 16px;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   NEWSLETTER (col-nl__*)
+   ══════════════════════════════════════════════════════════════════ */
+.col-nl {
+	padding: clamp(64px, 8vw, 120px) clamp(20px, 5vw, 80px);
+	background: rgba(var(--skyyrose-accent-rgb), 0.06);
+	color: var(--skyyrose-text, #FFFFFF);
+	text-align: center;
+}
+.col-nl__eye {
+	display: inline-block;
+	font-family: var(--skyyrose-font-ui, 'Bebas Neue', sans-serif);
+	font-size: 11px;
+	letter-spacing: 0.3em;
+	text-transform: uppercase;
+	color: var(--skyyrose-accent);
+	margin-bottom: 12px;
+}
+.col-nl__title {
+	font-family: var(--skyyrose-font-display, 'Playfair Display', serif);
+	font-size: clamp(32px, 4vw, 56px);
+	line-height: 1.1;
+	margin: 0 0 16px;
+	max-width: 16ch;
+	margin-left: auto;
+	margin-right: auto;
+}
+.col-nl__desc {
+	font-family: var(--skyyrose-font-body, 'Cormorant Garamond', serif);
+	font-size: 17px;
+	line-height: 1.6;
+	color: var(--skyyrose-text-muted, rgba(255, 255, 255, 0.7));
+	margin: 0 auto 32px;
+	max-width: 50ch;
+}
+.col-nl__form {
+	display: flex;
+	gap: 8px;
+	max-width: 480px;
+	margin: 0 auto;
+	flex-wrap: wrap;
+}
+.col-nl__input {
+	flex: 1 1 240px;
+	padding: 14px 18px;
+	font-family: var(--skyyrose-font-body, 'Cormorant Garamond', serif);
+	font-size: 15px;
+	color: var(--skyyrose-text, #FFFFFF);
+	background: transparent;
+	border: 1px solid rgba(var(--skyyrose-accent-rgb), 0.3);
+	border-radius: var(--skyyrose-radius, 2px);
+}
+.col-nl__input:focus-visible {
+	outline: none;
+	border-color: var(--skyyrose-accent);
+}
+.col-nl__btn {
+	padding: 14px 24px;
+	font-family: var(--skyyrose-font-ui, 'Bebas Neue', sans-serif);
+	font-size: 13px;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--skyyrose-bg, #0A0A0A);
+	background: var(--skyyrose-accent);
+	border: 1px solid var(--skyyrose-accent);
+	border-radius: var(--skyyrose-radius, 2px);
+	cursor: pointer;
+	transition: background 0.3s ease, color 0.3s ease;
+}
+.col-nl__btn:hover,
+.col-nl__btn:focus-visible {
+	background: transparent;
+	color: var(--skyyrose-accent);
+}
+.col-nl__msg {
+	margin-top: 16px;
+	font-family: var(--skyyrose-font-body, 'Cormorant Garamond', serif);
+	font-style: italic;
+	font-size: 14px;
+	color: var(--skyyrose-text-muted, rgba(255, 255, 255, 0.7));
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   Reduced motion — disable scroll-reveal and hover transforms
+   ────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+	.col-rv,
+	.col-rv.is-visible {
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+	.col-card,
+	.col-card:hover,
+	.col-card__img img,
+	.col-card:hover .col-card__img img {
+		transform: none;
+		transition: none;
+	}
+}

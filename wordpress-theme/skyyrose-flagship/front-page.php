@@ -577,8 +577,9 @@ if ( file_exists( $homepage_js_path ) ) :
 <?php
 // Use wp_footer() directly (not get_footer()) because the homepage has its
 // own inline footer markup above (.ft). But include the shared template parts
-// that live in footer.php so mobile nav, cookie consent, size guide, and
-// toast container render on the homepage too.
+// that live in footer.php so mobile nav, cookie consent, size guide, CRO
+// sections, and toast container render on the homepage too.
+get_template_part( 'template-parts/footer-cro' );
 get_template_part( 'template-parts/size-guide-modal' );
 get_template_part( 'template-parts/cookie-consent' );
 // Skyy mascot disabled — re-enable when character art is finalized.

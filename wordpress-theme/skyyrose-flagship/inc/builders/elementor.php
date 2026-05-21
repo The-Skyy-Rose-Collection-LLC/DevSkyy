@@ -123,10 +123,25 @@ add_action( 'elementor/editor/after_enqueue_styles', 'skyyrose_elementor_editor_
  * @since 1.0.0
  */
 function skyyrose_elementor_frontend_scripts() {
+	$base_css_dir = SKYYROSE_DIR . '/assets/css';
+	$use_min      = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
+
 	wp_enqueue_style(
 		'skyyrose-product-card-holo',
 		SKYYROSE_ASSETS_URI . '/css/product-card-holo.css',
 		array(),
+		SKYYROSE_VERSION
+	);
+
+	// Elementor widget styles — covers col-feat__*, col-card__*, col-hero__*,
+	// col-nl__* selectors and bridges --col-accent → --skyyrose-accent tokens.
+	// Depends on design-tokens (enqueued globally at priority 10).
+	$widgets_file = $use_min && file_exists( $base_css_dir . '/elementor-widgets.min.css' )
+		? 'elementor-widgets.min.css' : 'elementor-widgets.css';
+	wp_enqueue_style(
+		'skyyrose-elementor-widgets',
+		SKYYROSE_ASSETS_URI . '/css/' . $widgets_file,
+		array( 'skyyrose-design-tokens' ),
 		SKYYROSE_VERSION
 	);
 }
