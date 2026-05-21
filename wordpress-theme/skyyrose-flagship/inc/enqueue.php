@@ -246,13 +246,20 @@ function skyyrose_enqueue_global_scripts() {
 		);
 	}
 
+	// Footer CRO — FAQ accordion (extracted from inline <script> in v1.5.3).
+	$fcro_file = $use_min && file_exists( $js_dir . '/footer-cro.min.js' ) ? 'footer-cro.min.js' : 'footer-cro.js';
+	if ( file_exists( $js_dir . '/' . $fcro_file ) ) {
+		wp_enqueue_script( 'skyyrose-footer-cro', $js_uri . '/' . $fcro_file, array(), SKYYROSE_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
+	}
+
 	// Motion One — vanilla JS animation library (same author as Framer Motion).
+	// Self-hosted from assets/js/lib/ to eliminate jsDelivr CDN supply-chain risk.
 	// Exposes window.Motion with animate(), scroll(), inView(), timeline().
 	// Loaded with `defer` strategy: parsed in parallel with HTML, executed after
 	// DOMContentLoaded. premium-interactions.js depends on it and self-defers.
 	wp_enqueue_script(
 		'motion-one',
-		'https://cdn.jsdelivr.net/npm/motion@11/dist/motion.min.js',
+		SKYYROSE_ASSETS_URI . '/js/lib/motion.min.js',
 		array(),
 		'11',
 		array(

@@ -103,19 +103,4 @@ defined( 'ABSPATH' ) || exit;
 		</div>
 	</div>
 </section>
-
-<script>
-(function(){
-	var btns=document.querySelectorAll('.ft-cro-faq__question');
-	btns.forEach(function(btn){
-		btn.addEventListener('click',function(){
-			var exp=btn.getAttribute('aria-expanded')==='true';
-			var aid=btn.getAttribute('aria-controls');
-			var ans=aid?document.getElementById(aid):null;
-			btns.forEach(function(o){if(o!==btn){o.setAttribute('aria-expanded','false');var oa=o.getAttribute('aria-controls');var oe=oa?document.getElementById(oa):null;if(oe)oe.style.maxHeight='0';}});
-			btn.setAttribute('aria-expanded',exp?'false':'true');
-			if(ans)ans.style.maxHeight=exp?'0':ans.scrollHeight+'px';
-		});
-	});
-})();
-</script>
+<?php // FAQ accordion behavior lives in assets/js/footer-cro.js (enqueued globally via inc/enqueue.php). ?>

@@ -44,32 +44,32 @@ function skyyrose_enqueue_collection_experiences() {
 	$js_dir  = SKYYROSE_DIR . '/assets/js';
 	$js_uri  = SKYYROSE_ASSETS_URI . '/js';
 
-	// Three.js r147 via CDN with add-on scripts.
-	// r147 is the last release that ships /examples/js/ UMD add-ons which attach
-	// classes to window.THREE.*  r148+ removed that directory — pinned here to
-	// avoid 404s on OrbitControls, GLTFLoader, postprocessing, etc.
-	$threejs_ver = '0.147.0';
-	$threejs_cdn = 'https://cdn.jsdelivr.net/npm/three@' . $threejs_ver;
+	// Three.js r147 — self-hosted from assets/js/lib/ to eliminate jsDelivr
+	// supply-chain risk. r147 is the last release that ships /examples/js/
+	// UMD add-ons which attach classes to window.THREE.*  r148+ removed that
+	// directory — pinned here to avoid 404s on OrbitControls, GLTFLoader, etc.
+	$threejs_ver  = '0.147.0';
+	$threejs_base = SKYYROSE_ASSETS_URI . '/js/lib';
 
 	if ( ! wp_script_is( 'threejs', 'enqueued' ) ) {
-		wp_enqueue_script( 'threejs', $threejs_cdn . '/build/three.min.js', array(), $threejs_ver, true );
+		wp_enqueue_script( 'threejs', $threejs_base . '/three.min.js', array(), $threejs_ver, true );
 	}
 
 	$addons = array(
-		'threejs-orbit-controls'  => '/examples/js/controls/OrbitControls.js',
-		'threejs-gltf-loader'     => '/examples/js/loaders/GLTFLoader.js',
-		'threejs-draco-loader'    => '/examples/js/loaders/DRACOLoader.js',
-		'threejs-rgbe-loader'     => '/examples/js/loaders/RGBELoader.js',
-		'threejs-effect-composer' => '/examples/js/postprocessing/EffectComposer.js',
-		'threejs-render-pass'     => '/examples/js/postprocessing/RenderPass.js',
-		'threejs-unreal-bloom'    => '/examples/js/postprocessing/UnrealBloomPass.js',
-		'threejs-shader-pass'     => '/examples/js/postprocessing/ShaderPass.js',
-		'threejs-copy-shader'     => '/examples/js/shaders/CopyShader.js',
+		'threejs-orbit-controls'  => '/three-examples/controls/OrbitControls.js',
+		'threejs-gltf-loader'     => '/three-examples/loaders/GLTFLoader.js',
+		'threejs-draco-loader'    => '/three-examples/loaders/DRACOLoader.js',
+		'threejs-rgbe-loader'     => '/three-examples/loaders/RGBELoader.js',
+		'threejs-effect-composer' => '/three-examples/postprocessing/EffectComposer.js',
+		'threejs-render-pass'     => '/three-examples/postprocessing/RenderPass.js',
+		'threejs-unreal-bloom'    => '/three-examples/postprocessing/UnrealBloomPass.js',
+		'threejs-shader-pass'     => '/three-examples/postprocessing/ShaderPass.js',
+		'threejs-copy-shader'     => '/three-examples/shaders/CopyShader.js',
 	);
 
 	foreach ( $addons as $handle => $path ) {
 		if ( ! wp_script_is( $handle, 'enqueued' ) ) {
-			wp_enqueue_script( $handle, $threejs_cdn . $path, array( 'threejs' ), $threejs_ver, true );
+			wp_enqueue_script( $handle, $threejs_base . $path, array( 'threejs' ), $threejs_ver, true );
 		}
 	}
 
