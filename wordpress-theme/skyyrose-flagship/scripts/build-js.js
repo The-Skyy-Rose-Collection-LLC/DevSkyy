@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 /**
- * Minify every assets/js/*.js source to assets/js/*.min.js using terser.
+ * Minify every assets/js/*.js (and assets/js/experiences/*.js) source to
+ * its .min.js sibling using terser.
  *
  * Hand-checked-in mins have drifted from sources, causing stale code to ship
  * to production (Phase 2 launch sprint, bug B2). This script makes regen
- * mechanical and idempotent. Run via:  npx terser ... (driven by this file)
+ * mechanical and idempotent.
  *
- * Source files excluded: anything already ending in .min.js (we never
- * minify a minified file), and files inside experiences/ (Three.js worlds
- * shipped as ESM source, not minified).
+ * Excluded: anything already ending in .min.js, anything under vendor/
+ * (already shipped minified by upstream), and directories not explicitly
+ * listed below. experiences/*.js files are global-script-style Three.js
+ * orchestration (no ESM imports) and minify cleanly with the default config.
  */
 
 const fs = require('fs');
@@ -16,18 +18,29 @@ const path = require('path');
 const { minify } = require('terser');
 
 const SRC_DIR = path.resolve(__dirname, '..', 'assets', 'js');
+// Each entry: directory absolute path, relative label for log output.
+const SCAN_DIRS = [
+	{ dir: SRC_DIR, label: '' },
+	{ dir: path.join(SRC_DIR, 'experiences'), label: 'experiences/' },
+];
 
 async function main() {
-	const entries = fs.readdirSync(SRC_DIR);
-	const sources = entries
-		.filter((f) => f.endsWith('.js') && !f.endsWith('.min.js'))
-		.map((f) => path.join(SRC_DIR, f));
+	const sources = [];
+	for ( const { dir, label } of SCAN_DIRS ) {
+		if ( ! fs.existsSync( dir ) ) { continue; }
+		const entries = fs.readdirSync( dir );
+		for ( const f of entries ) {
+			if ( ! f.endsWith( '.js' ) ) { continue; }
+			if ( f.endsWith( '.min.js' ) ) { continue; }
+			sources.push({ src: path.join( dir, f ), label });
+		}
+	}
 
 	let built = 0;
 	let failed = 0;
-	for (const src of sources) {
+	for (const { src, label } of sources) {
 		const base = path.basename(src, '.js');
-		const dest = path.join(SRC_DIR, `${base}.min.js`);
+		const dest = path.join( path.dirname( src ), `${base}.min.js` );
 		const code = fs.readFileSync(src, 'utf8');
 		try {
 			// No sourceMap — source maps would expose full unminified JS source on
@@ -40,10 +53,10 @@ async function main() {
 			});
 			fs.writeFileSync(dest, result.code, 'utf8');
 			built += 1;
-			console.log(`  ✓ ${base}.js → ${base}.min.js  (${code.length} → ${result.code.length} bytes)`);
+			console.log(`  ✓ ${label}${base}.js → ${label}${base}.min.js  (${code.length} → ${result.code.length} bytes)`);
 		} catch (err) {
 			failed += 1;
-			console.error(`  ✗ ${base}.js — ${err.message}`);
+			console.error(`  ✗ ${label}${base}.js — ${err.message}`);
 		}
 	}
 	console.log(`\nDone: ${built} built, ${failed} failed.`);

@@ -205,30 +205,6 @@ function skyyrose_preload_hero_image() {
 }
 
 /**
- * Add Subresource Integrity (SRI) hashes to CDN-loaded scripts.
- *
- * Ensures that CDN-delivered files have not been tampered with.
- * If the hash doesn't match, the browser refuses to execute the script.
- *
- * @since 6.4.0
- * @param  string $tag    Full script tag HTML.
- * @param  string $handle Script handle.
- * @return string Modified tag.
- */
-function skyyrose_add_sri_hashes( $tag, $handle ) {
-	$sri_map = array(
-		'skyyrose-gsap'    => 'sha512-16esztaSRplJROstbIIdwX3N97V1+pZvV33ABoG1H2OyTttBxEGkTsoIVsiP1iaTtM8b3+hu2kB6pQ4Clr5yug==',
-		'skyyrose-gsap-st' => 'sha512-Ic9xkERjyZ1xgJ5svx3y0u3xrvfT/uPkV99LBwe68xjy/mGtO+4eURHZBW2xW4SZbFrF1Tf090XqB+EVgXnVjw==',
-	);
-
-	if ( isset( $sri_map[ $handle ] ) ) {
-		$tag = str_replace( ' src=', ' integrity="' . $sri_map[ $handle ] . '" crossorigin="anonymous" src=', $tag );
-	}
-
-	return $tag;
-}
-
-/**
  * Remove jQuery Migrate on the frontend.
  *
  * Removes the jQuery Migrate compatibility shim for deprecated jQuery APIs.
@@ -299,9 +275,6 @@ add_filter( 'style_loader_tag', 'skyyrose_critical_style_priority', 10, 2 );
 
 // Preload hero image on front page for better LCP.
 add_action( 'wp_head', 'skyyrose_preload_hero_image', 4 );
-
-// Add SRI hashes to CDN scripts for defense-in-depth.
-add_filter( 'script_loader_tag', 'skyyrose_add_sri_hashes', 20, 2 );
 
 // Remove jQuery Migrate on frontend (not needed since WC 9.0+ / WP 6.0+).
 add_action( 'wp_default_scripts', 'skyyrose_remove_jquery_migrate' );
