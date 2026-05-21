@@ -29,16 +29,16 @@
 /* Shared elements across all collection pages — these morph between
    pages instead of cross-fading. The names are assigned via the
    PHP markup, gated to /collection-*/ slugs only. */
-.col-hero__bg {
-	view-transition-name: skyyrose-collection-hero-bg;
-}
-.col-hero__logo,
-.col-hero__title {
-	view-transition-name: skyyrose-collection-hero-mark;
-}
-.col-hero__rule {
-	view-transition-name: skyyrose-collection-hero-rule;
-}
+.col-hero__bg    { view-transition-name: skyyrose-collection-hero-bg; }
+.col-hero__logo  { view-transition-name: skyyrose-collection-hero-logo; }
+.col-hero__title { view-transition-name: skyyrose-collection-hero-title; }
+.col-hero__rule  { view-transition-name: skyyrose-collection-hero-rule; }
+
+/* Note: .col-hero__logo and .col-hero__title are mutually exclusive at the
+   PHP layer (template-parts/collection/page.php emits one or the other based
+   on $has_logo), so only one of the two `view-transition-name` values will
+   appear in a given page snapshot. Distinct names defensively prevent a
+   future template change from breaking the morph silently. */
 
 /* Choreography — root cross-fade plus calmer durations on the hero pair.
    ::view-transition-old/new are the two snapshots the browser captures;
@@ -50,8 +50,10 @@
 }
 ::view-transition-old(skyyrose-collection-hero-bg),
 ::view-transition-new(skyyrose-collection-hero-bg),
-::view-transition-old(skyyrose-collection-hero-mark),
-::view-transition-new(skyyrose-collection-hero-mark) {
+::view-transition-old(skyyrose-collection-hero-logo),
+::view-transition-new(skyyrose-collection-hero-logo),
+::view-transition-old(skyyrose-collection-hero-title),
+::view-transition-new(skyyrose-collection-hero-title) {
 	animation-duration: 620ms;
 	animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }

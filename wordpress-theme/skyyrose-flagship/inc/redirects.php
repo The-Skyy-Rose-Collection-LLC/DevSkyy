@@ -92,7 +92,7 @@ add_action( 'template_redirect', 'skyyrose_preorder_slug_redirect', 1 );
  *
  * Mirrors the structure of skyyrose_preorder_slug_redirect() above.
  *
- * @since 7.0.0
+ * @since 1.5.4
  * @return void
  */
 function skyyrose_shop2_slug_redirect() {

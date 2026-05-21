@@ -500,32 +500,9 @@ function skyyrose_enqueue_template_styles() {
 		);
 	}
 
-	// Unified collection page CSS — single stylesheet for all 4 collection templates.
+	// Unified collection page CSS + cross-collection View Transitions choreography.
 	if ( 'collection-standalone' === $slug ) {
-		$col_css = $use_min && file_exists( $base_css_dir . '/collection-pages.min.css' )
-			? 'collection-pages.min.css' : 'collection-pages.css';
-		if ( file_exists( $base_css_dir . '/' . $col_css ) ) {
-			wp_enqueue_style(
-				'skyyrose-collection-pages',
-				$base_css_uri . '/' . $col_css,
-				$global_deps,
-				SKYYROSE_VERSION
-			);
-		}
-
-		// View Transitions API choreography for cross-collection nav.
-		// Browsers without support fall back to normal page loads; reduced-
-		// motion users get the feature short-circuited inside the stylesheet.
-		$vt_css = $use_min && file_exists( $base_css_dir . '/view-transitions.min.css' )
-			? 'view-transitions.min.css' : 'view-transitions.css';
-		if ( file_exists( $base_css_dir . '/' . $vt_css ) ) {
-			wp_enqueue_style(
-				'skyyrose-view-transitions',
-				$base_css_uri . '/' . $vt_css,
-				array( 'skyyrose-collection-pages' ),
-				SKYYROSE_VERSION
-			);
-		}
+		skyyrose_enqueue_collection_styles( $base_css_dir, $base_css_uri, $use_min, $global_deps );
 	}
 
 	// Product grid bento layout — landing pages + preorder gateway.

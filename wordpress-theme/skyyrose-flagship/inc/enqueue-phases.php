@@ -306,3 +306,33 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_commercial_polish', 25 );
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_phase2_assets', 30 );
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_phase3_assets', 40 );
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_phase4_assets', 42 );
+
+/**
+ * Enqueue the unified collection-pages stylesheet plus cross-collection
+ * View Transitions API choreography. Called from skyyrose_enqueue_template_styles()
+ * in inc/enqueue.php when the current template slug is 'collection-standalone'.
+ * Lives here (not in enqueue.php) so the parent file stays under 800 lines.
+ *
+ * @since  1.5.6
+ * @param  string $base_css_dir Absolute path to assets/css directory.
+ * @param  string $base_css_uri Public URI of assets/css directory.
+ * @param  bool   $use_min      Whether to prefer minified files.
+ * @param  array  $global_deps  Dependency handle list for the collection stylesheet.
+ * @return void
+ */
+function skyyrose_enqueue_collection_styles( $base_css_dir, $base_css_uri, $use_min, $global_deps ) {
+	$col_css = $use_min && file_exists( $base_css_dir . '/collection-pages.min.css' )
+		? 'collection-pages.min.css' : 'collection-pages.css';
+	if ( file_exists( $base_css_dir . '/' . $col_css ) ) {
+		wp_enqueue_style( 'skyyrose-collection-pages', $base_css_uri . '/' . $col_css, $global_deps, SKYYROSE_VERSION );
+	}
+
+	// View Transitions API choreography for cross-collection nav. Progressive
+	// enhancement — browsers without support fall back to normal page loads;
+	// reduced-motion users get the feature short-circuited inside the stylesheet.
+	$vt_css = $use_min && file_exists( $base_css_dir . '/view-transitions.min.css' )
+		? 'view-transitions.min.css' : 'view-transitions.css';
+	if ( file_exists( $base_css_dir . '/' . $vt_css ) ) {
+		wp_enqueue_style( 'skyyrose-view-transitions', $base_css_uri . '/' . $vt_css, array( 'skyyrose-collection-pages' ), SKYYROSE_VERSION );
+	}
+}
