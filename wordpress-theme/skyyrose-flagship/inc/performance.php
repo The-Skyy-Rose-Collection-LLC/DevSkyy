@@ -530,36 +530,60 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	WP_CLI::add_command(
 		'skyyrose nextgen-backfill',
 		function ( $args, $assoc_args ) {
+			// $limit caps CONVERSIONS, not attachments queried. Query is unbounded so the
+			// loop can skip already-converted attachments via _skyyrose_nextgen_done meta.
 			$limit   = isset( $assoc_args['limit'] ) ? (int) $assoc_args['limit'] : -1;
 			$dry_run = ! empty( $assoc_args['dry-run'] );
 
+			$gd_avif = function_exists( 'imageavif' );
+			$gd_webp = function_exists( 'imagewebp' );
+			if ( ! $gd_avif && ! $gd_webp ) {
+				WP_CLI::error( 'GD lacks both imageavif() and imagewebp() — install libavif + libwebp on PHP.' );
+			}
+
+			// Exclude attachments already fully converted (post meta marker set
+			// when all targets have siblings). Without this exclusion, the same
+			// "done" attachments at the front of the query are re-checked each
+			// batch and the loop never advances.
 			$query = new WP_Query(
 				array(
 					'post_type'      => 'attachment',
 					'post_status'    => 'inherit',
 					'post_mime_type' => array( 'image/jpeg', 'image/png' ),
-					'posts_per_page' => $limit,
+					'posts_per_page' => -1,
 					'fields'         => 'ids',
 					'no_found_rows'  => true,
+					'orderby'        => 'ID',
+					'order'          => 'ASC',
+					'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+						array(
+							'key'     => '_skyyrose_nextgen_done',
+							'compare' => 'NOT EXISTS',
+						),
+					),
 				)
 			);
 
-			$total     = count( $query->posts );
-			$converted = 0;
-			$skipped   = 0;
-			$progress  = WP_CLI\Utils\make_progress_bar( "Backfilling AVIF/WebP for {$total} attachments", $total );
-			$gd_avif   = function_exists( 'imageavif' );
-			$gd_webp   = function_exists( 'imagewebp' );
-
-			if ( ! $gd_avif && ! $gd_webp ) {
-				WP_CLI::error( 'GD lacks both imageavif() and imagewebp() — install libavif + libwebp on PHP.' );
-			}
+			$total          = count( $query->posts );
+			$converted      = 0;
+			$marked_done    = 0;
+			$processed      = 0;
+			$skipped        = 0;
+			$progress_total = ( $limit > 0 ) ? min( $total, $limit ) : $total;
+			$progress       = WP_CLI\Utils\make_progress_bar(
+				"Backfilling AVIF/WebP for {$total} pending attachments",
+				$progress_total
+			);
 
 			foreach ( $query->posts as $attachment_id ) {
+				if ( $limit > 0 && $converted >= $limit ) {
+					break;
+				}
+
 				$metadata = wp_get_attachment_metadata( $attachment_id );
 				$file     = get_attached_file( $attachment_id );
 				if ( ! $file || ! file_exists( $file ) ) {
-					$skipped++;
+					++$skipped;
 					$progress->tick();
 					continue;
 				}
@@ -574,6 +598,7 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 					}
 				}
 
+				$all_done = true;
 				foreach ( $targets as $name ) {
 					$src_path    = $base_dir . '/' . $name;
 					$base_no_ext = preg_replace( '/\.(jpe?g|png)$/i', '', $src_path );
@@ -584,24 +609,40 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 					if ( $gd_webp && ! file_exists( $base_no_ext . '.webp' ) ) {
 						if ( $dry_run ) {
 							++$converted;
+							$all_done = false;
 						} elseif ( skyyrose_gd_convert( $src_path, $base_no_ext . '.webp', 'webp' ) ) {
 							++$converted;
+						} else {
+							$all_done = false;
 						}
 					}
 					if ( $gd_avif && ! file_exists( $base_no_ext . '.avif' ) ) {
 						if ( $dry_run ) {
 							++$converted;
+							$all_done = false;
 						} elseif ( skyyrose_gd_convert( $src_path, $base_no_ext . '.avif', 'avif' ) ) {
 							++$converted;
+						} else {
+							$all_done = false;
 						}
 					}
 				}
+
+				if ( $all_done && ! $dry_run ) {
+					update_post_meta( $attachment_id, '_skyyrose_nextgen_done', 1 );
+					++$marked_done;
+				}
+
+				++$processed;
 				$progress->tick();
 			}
 
 			$progress->finish();
 			$verb = $dry_run ? 'Would convert' : 'Converted';
-			WP_CLI::success( "{$verb} {$converted} files across {$total} attachments (skipped {$skipped} missing originals)." );
+			WP_CLI::success(
+				"{$verb} {$converted} files. Processed {$processed} of {$total} pending; "
+				. "marked {$marked_done} attachments complete; skipped {$skipped} missing originals."
+			);
 		}
 	);
 }
