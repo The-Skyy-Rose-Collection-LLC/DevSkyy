@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-21T05:24:12",
+  "generated_at": "2026-05-21T21:50:36",
   "repo_root": "/Users/theceo/DevSkyy",
   "freshness_days": 30,
   "files_scanned": 46,
-  "indexed_basenames": 14550,
+  "indexed_basenames": 14990,
   "missing_paths": [
     {
       "file": ".wolf/anatomy.md",
@@ -116,6 +116,16 @@
       "claim": "assets/product-masters/manifest.json"
     },
     {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_claude_mem_truncation.md",
+      "line": 9,
+      "claim": ".wolf/hooks/pre-read.js"
+    },
+    {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_claude_mem_truncation.md",
+      "line": 9,
+      "claim": "post-read.js"
+    },
+    {
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_render_pipeline.md",
       "line": 19,
       "claim": "fal-ai/flux-pro/kontext"
@@ -143,5 +153,5 @@
     }
   ],
   "documented_missing_count": 23,
-  "verified_count": 2891
+  "verified_count": 2890
 }
