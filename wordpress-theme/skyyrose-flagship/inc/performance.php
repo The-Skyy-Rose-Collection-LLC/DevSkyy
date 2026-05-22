@@ -425,6 +425,19 @@ add_filter( 'wp_generate_attachment_metadata', 'skyyrose_generate_nextgen_siblin
 function skyyrose_gd_convert( $src_path, $dst_path, $format ) {
 	$ext = strtolower( pathinfo( $src_path, PATHINFO_EXTENSION ) );
 
+	// Pre-flight: skip if source is absurdly large. GD will OOM the PHP-FPM
+	// worker on WordPress.com hosting if we try to AVIF-encode a 12MP+ image
+	// (RAM peaks ~4× pixel count + alpha). Symptom: SSH session dies exit
+	// 130 mid-batch. Files this large should be handled out-of-band via
+	// cwebp/avifenc locally and uploaded.
+	$size_info = @getimagesize( $src_path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+	if ( false === $size_info ) {
+		return false;
+	}
+	$pixels         = (int) $size_info[0] * (int) $size_info[1];
+	$max_pixels     = 3500 * 3500; // ~12 megapixels — safe headroom on 256MB PHP-FPM.
+	$needs_downsize = $pixels > $max_pixels;
+
 	if ( 'png' === $ext ) {
 		$image = @imagecreatefrompng( $src_path ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
 		if ( $image ) {
@@ -438,6 +451,21 @@ function skyyrose_gd_convert( $src_path, $dst_path, $format ) {
 
 	if ( ! $image ) {
 		return false;
+	}
+
+	// Downsize when source exceeds the safe pixel cap. Constrain to 2400px
+	// long-edge (sufficient for any product card or hero on 4K display).
+	if ( $needs_downsize ) {
+		$src_w  = (int) $size_info[0];
+		$src_h  = (int) $size_info[1];
+		$ratio  = 2400 / max( $src_w, $src_h );
+		$new_w  = (int) round( $src_w * $ratio );
+		$new_h  = (int) round( $src_h * $ratio );
+		$scaled = @imagescale( $image, $new_w, $new_h ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+		if ( $scaled ) {
+			unset( $image );
+			$image = $scaled;
+		}
 	}
 
 	$result = false;
