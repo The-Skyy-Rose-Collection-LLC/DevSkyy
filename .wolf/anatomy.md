@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-22T02:27:48.065Z
-> Files: 2742 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-22T06:17:56.229Z
+> Files: 2743 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -678,7 +678,7 @@
 ## aos/cognition/
 
 - `__init__.py` — AOS Cognitive Layer — goal decomposition, planning, and reflection. (~22 tok)
-- `CLAUDE.md` — aos/cognition/ — Goal decomposition, planning, reflection (~676 tok)
+- `CLAUDE.md` — aos/cognition/ — Goal decomposition, planning, reflection (~687 tok)
 - `goal_decomposer.py` — GoalDecomposer — rule-based goal-to-TaskGraph decomposer. (~1319 tok)
 - `planner.py` — Planner — converts a TaskGraph into an ordered DecomposedPlan. (~254 tok)
 - `reflector.py` — Reflector — converts ExecutionOutcome + LearningTrace into a quality-scored Reflection. (~1225 tok)
@@ -690,7 +690,7 @@
 - `approval.py` — ApprovalGate — STOP-AND-SHOW enforcement for irreversible/paid actions. (~1915 tok)
 - `audit.py` — AuditTrail — immutable append-only audit log backed by SQLite. (~1719 tok)
 - `budget.py` — BudgetController — per-process and system-wide spend tracking + guards. (~1126 tok)
-- `CLAUDE.md` — aos/governance/ — Policy, approval, budget, audit (~701 tok)
+- `CLAUDE.md` — aos/governance/ — Policy, approval, budget, audit (~713 tok)
 - `policy.py` — PolicyEngine — declarative ALLOW/DENY/REQUIRE_APPROVAL rules for kernel actions. (~947 tok)
 - `types.py` — Governance types — audit entries and policy decisions. (~682 tok)
 
@@ -2763,7 +2763,8 @@
 - `wordpress_health_check.py` — class: run_full_check, check_versions, check_all_pages, check_custom_code + 2 more (~4493 tok)
 - `wordpress-media-pipeline.py` — WordPressMediaPipeline: get_all_media, download_image, update_media_metadata, process_media_item + 3 more (~2816 tok)
 - `wp-cli-deploy-templates.sh` — WP-CLI Elementor Template Deployment Script (~2927 tok)
-- `wp-cli-nextgen-backfill.sh` — scripts/wp-cli-nextgen-backfill.sh (~643 tok)
+- `wp-cli-nextgen-backfill-loop.sh` — scripts/wp-cli-nextgen-backfill-loop.sh (~945 tok)
+- `wp-cli-nextgen-backfill.sh` — scripts/wp-cli-nextgen-backfill.sh (~658 tok)
 
 ## scripts/_lib/
 

@@ -31,3 +31,8 @@ The control plane the kernel consults before every spawn and every paid/destruct
 - `aos/healing/director.py` — observes `BUDGET_EXCEEDED` → always escalates (hard invariant)
 - `aos/CLAUDE.md` — parent kernel doc
 - Repo root `CLAUDE.md` — defines the STOP-AND-SHOW protocol enforced here
+
+
+<claude-mem-context>
+
+</claude-mem-context>

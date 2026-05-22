@@ -29,3 +29,8 @@ Deterministic, rule-based cognitive layer. Turns a free-form goal string into a 
 - `aos/kernel/` — calls `Planner.plan(graph)` at spawn time
 - `aos/CLAUDE.md` — parent kernel doc
 - `tests/aos/cognition/` — full coverage for decomposer / planner / reflector
+
+
+<claude-mem-context>
+
+</claude-mem-context>

@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-21T21:50:36",
+  "generated_at": "2026-05-21T22:46:24",
   "repo_root": "/Users/theceo/DevSkyy",
   "freshness_days": 30,
   "files_scanned": 46,
-  "indexed_basenames": 14990,
+  "indexed_basenames": 14991,
   "missing_paths": [
     {
       "file": ".wolf/anatomy.md",
@@ -153,5 +153,5 @@
     }
   ],
   "documented_missing_count": 23,
-  "verified_count": 2890
+  "verified_count": 2891
 }
