@@ -6,6 +6,8 @@
   "scripts": {
     "deploy": "bash ../scripts/deploy-theme.sh",
     "deploy:dry": "bash ../scripts/deploy-theme.sh --dry-run",
+    "backfill:nextgen": "bash ../scripts/wp-cli-nextgen-backfill.sh",
+    "backfill:nextgen:dry": "bash ../scripts/wp-cli-nextgen-backfill.sh --dry-run",
     "build:js": "node skyyrose-flagship/scripts/build-js.js",
     "build:css": "node skyyrose-flagship/scripts/build-css.js",
     "build": "npm run build:css && npm run build:js",
