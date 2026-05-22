@@ -219,21 +219,26 @@ function skyyrose_picture_sources( $src ) {
 		return $result;
 	}
 
-	// Jetpack Photon rewrites every upload URL to i[0-2].wp.com. Detect
-	// the prefix so we can map to the on-disk file path AND emit AVIF/WebP
-	// URLs that still route through Photon's CDN (which serves them as-is).
-	$photon_prefix = '';
+	// Jetpack Photon rewrites every upload URL to i[0-2].wp.com — and silently
+	// TRANSCODES .avif and .webp back to image/jpeg (verified 2026-05-21:
+	// i0.wp.com/.../file.avif?fit=… returns content-type: image/jpeg). Routing
+	// next-gen sources through Photon defeats the entire optimization. So:
+	// strip the Photon prefix entirely on <source> emit; serve AVIF/WebP
+	// direct from skyyrose.co so the browser receives the actual encoded
+	// format. The fallback <img> keeps its original (Photon-rewritten) src,
+	// so non-AVIF browsers still hit Photon's CDN for the JPG.
 	$canonical_src = $src;
-	if ( preg_match( '#^(https?://i[0-2]\.wp\.com)(/.+)$#', $src, $matches ) ) {
-		$photon_prefix = $matches[1];
-		$canonical_src = 'https://' . ltrim( $matches[2], '/' );
+	if ( preg_match( '#^https?://i[0-2]\.wp\.com(/.+)$#', $src, $matches ) ) {
+		$canonical_src = 'https://' . ltrim( $matches[1], '/' );
 	}
 
-	// Split off query string — file path lookup uses pathname only,
-	// but emitted URLs preserve the original query (Photon resize args).
-	$query_start        = strpos( $canonical_src, '?' );
-	$canonical_path_url = ( false === $query_start ) ? $canonical_src : substr( $canonical_src, 0, $query_start );
-	$query_string       = ( false === $query_start ) ? '' : substr( $canonical_src, $query_start );
+	// Drop query string — Photon resize args (fit=…) only apply to Photon;
+	// direct skyyrose.co serving uses the file as-is. AVIF compresses so
+	// well that full-size variants are typically < 200KB.
+	$canonical_path_url = strtok( $canonical_src, '?' );
+	if ( false === $canonical_path_url ) {
+		return $result;
+	}
 
 	$abs_path = skyyrose_url_to_path( $canonical_path_url );
 	if ( null === $abs_path ) {
@@ -247,23 +252,11 @@ function skyyrose_picture_sources( $src ) {
 
 	$url_no_ext = preg_replace( '/\.(jpe?g|png|webp|avif)$/i', '', $canonical_path_url );
 
-	// Rebuild the emit URL — preserves Photon prefix + query string when present.
-	// Photon URL shape: https://i0.wp.com/skyyrose.co/wp-content/uploads/.../file.avif?fit=…
-	// Direct URL shape:        https://skyyrose.co/wp-content/uploads/.../file.avif?fit=…
-	$rebuild = static function ( $ext ) use ( $url_no_ext, $query_string, $photon_prefix ) {
-		if ( '' === $photon_prefix ) {
-			return $url_no_ext . $ext . $query_string;
-		}
-		// Strip scheme from canonical URL → 'skyyrose.co/wp-content/...'.
-		$schemeless = preg_replace( '#^https?://#', '', $url_no_ext );
-		return $photon_prefix . '/' . $schemeless . $ext . $query_string;
-	};
-
 	if ( file_exists( $path_no_ext . '.avif' ) ) {
-		$result['avif'] = $rebuild( '.avif' );
+		$result['avif'] = $url_no_ext . '.avif';
 	}
 	if ( file_exists( $path_no_ext . '.webp' ) ) {
-		$result['webp'] = $rebuild( '.webp' );
+		$result['webp'] = $url_no_ext . '.webp';
 	}
 
 	return $result;

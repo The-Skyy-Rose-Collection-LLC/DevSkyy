@@ -58,10 +58,18 @@ class CollectionsConfigTest extends TestCase {
 	}
 
 	public function test_front_page_show_on_front_set(): void {
+		// Every collection must have show_on_front declared (true OR false).
+		// Kids Capsule is intentionally false while in coming-soon state.
 		foreach ( skyyrose_get_collections_config() as $slug => $config ) {
-			$this->assertTrue(
-				! empty( $config['front_page']['show_on_front'] ),
-				"Collection '$slug' missing show_on_front"
+			$this->assertArrayHasKey( 'front_page', $config, "Collection '$slug' missing front_page block" );
+			$this->assertArrayHasKey(
+				'show_on_front',
+				$config['front_page'],
+				"Collection '$slug' missing front_page.show_on_front"
+			);
+			$this->assertIsBool(
+				$config['front_page']['show_on_front'],
+				"Collection '$slug' show_on_front must be a bool"
 			);
 		}
 	}
@@ -130,8 +138,17 @@ class CollectionsConfigTest extends TestCase {
 
 	// --- skyyrose_get_front_page_collections() -----------------------------
 
-	public function test_front_page_collections_returns_four_items(): void {
-		$this->assertCount( 4, skyyrose_get_front_page_collections() );
+	public function test_front_page_collections_returns_visible_items_only(): void {
+		// Helper filters by show_on_front. Currently 3 visible (Signature,
+		// Black Rose, Love Hurts); Kids Capsule is coming-soon so excluded.
+		$visible_count = 0;
+		foreach ( skyyrose_get_collections_config() as $config ) {
+			if ( ! empty( $config['front_page']['show_on_front'] ) ) {
+				++$visible_count;
+			}
+		}
+		$this->assertCount( $visible_count, skyyrose_get_front_page_collections() );
+		$this->assertGreaterThanOrEqual( 1, $visible_count, 'At least one collection must be visible on front page' );
 	}
 
 	public function test_front_page_collections_have_required_keys(): void {

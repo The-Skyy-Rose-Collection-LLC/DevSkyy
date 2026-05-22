@@ -165,8 +165,17 @@ function skyyrose_enqueue_global_styles() {
 		);
 	}
 
-	// Size guide modal (global — trigger via [data-open-size-guide] or .js-size-guide-trigger).
-	if ( file_exists( $base_dir . '/size-guide.css' ) ) {
+	// Lightweight slugs skip optional CSS bundles (size guide, luxury cursor,
+	// skeleton). Cart / checkout / 404 / search / blog / single never trigger
+	// these features, so shipping their CSS is dead bytes. v1.5.12 audit.
+	$skip_optional_css = in_array(
+		skyyrose_get_current_template_slug(),
+		array( 'cart', 'checkout', 'blog', 'single', '404', 'search', 'default' ),
+		true
+	);
+
+	// Size guide modal (trigger via [data-open-size-guide] or .js-size-guide-trigger).
+	if ( ! $skip_optional_css && file_exists( $base_dir . '/size-guide.css' ) ) {
 		wp_enqueue_style(
 			'skyyrose-size-guide',
 			$base_uri . '/size-guide.css',
@@ -176,7 +185,7 @@ function skyyrose_enqueue_global_styles() {
 	}
 
 	// Luxury cursor — dot follower (desktop only, CSS hidden on touch/mobile).
-	if ( file_exists( $base_dir . '/luxury-cursor.css' ) ) {
+	if ( ! $skip_optional_css && file_exists( $base_dir . '/luxury-cursor.css' ) ) {
 		wp_enqueue_style(
 			'skyyrose-luxury-cursor',
 			$base_uri . '/luxury-cursor.css',
@@ -186,7 +195,7 @@ function skyyrose_enqueue_global_styles() {
 	}
 
 	// Skeleton loading states — shimmer placeholders for images and cards.
-	if ( file_exists( $base_dir . '/skeleton.css' ) ) {
+	if ( ! $skip_optional_css && file_exists( $base_dir . '/skeleton.css' ) ) {
 		wp_enqueue_style(
 			'skyyrose-skeleton',
 			$base_uri . '/skeleton.css',
@@ -222,6 +231,15 @@ function skyyrose_enqueue_global_scripts() {
 	$css_dir = SKYYROSE_DIR . '/assets/css';
 	$use_min = ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG;
 
+	// Lightweight slugs (cart/checkout/404/search) don't trigger premium
+	// animations. Skip Motion One + premium-interactions to save ~60KB parse.
+	// v1.5.12 audit. Same skip list as global_styles.
+	$skip_premium_js = in_array(
+		skyyrose_get_current_template_slug(),
+		array( 'cart', 'checkout', 'blog', 'single', '404', 'search', 'default' ),
+		true
+	);
+
 	// Navigation script (hamburger toggle, keyboard nav, dropdowns).
 	$nav_file = $use_min && file_exists( $js_dir . '/navigation.min.js' ) ? 'navigation.min.js' : 'navigation.js';
 	if ( file_exists( $js_dir . '/' . $nav_file ) ) {
@@ -230,7 +248,10 @@ function skyyrose_enqueue_global_scripts() {
 			$js_uri . '/' . $nav_file,
 			array(),
 			SKYYROSE_VERSION,
-			true
+			array(
+				'strategy'  => 'defer',
+				'in_footer' => true,
+			)
 		);
 	}
 
@@ -242,7 +263,10 @@ function skyyrose_enqueue_global_scripts() {
 			$js_uri . '/' . $toast_file,
 			array(),
 			SKYYROSE_VERSION,
-			true
+			array(
+				'strategy'  => 'defer',
+				'in_footer' => true,
+			)
 		);
 	}
 
@@ -266,28 +290,34 @@ function skyyrose_enqueue_global_scripts() {
 	// Exposes window.Motion with animate(), scroll(), inView(), timeline().
 	// Loaded with `defer` strategy: parsed in parallel with HTML, executed after
 	// DOMContentLoaded. premium-interactions.js depends on it and self-defers.
-	wp_enqueue_script(
-		'motion-one',
-		SKYYROSE_ASSETS_URI . '/js/lib/motion.min.js',
-		array(),
-		'11',
-		array(
-			'strategy'  => 'defer',
-			'in_footer' => true,
-		)
-	);
-
-	// Premium interactions: parallax, split-text, magnetic, stagger, scroll-fade.
-	$prem_js = $use_min && file_exists( $js_dir . '/premium-interactions.min.js' )
-		? 'premium-interactions.min.js' : 'premium-interactions.js';
-	if ( file_exists( $js_dir . '/' . $prem_js ) ) {
+	// v1.5.12: skip on lightweight slugs (cart/checkout/404/search) — saves ~65KB.
+	if ( ! $skip_premium_js ) {
 		wp_enqueue_script(
-			'skyyrose-premium-interactions',
-			$js_uri . '/' . $prem_js,
-			array( 'motion-one' ),
-			SKYYROSE_VERSION,
-			true
+			'motion-one',
+			SKYYROSE_ASSETS_URI . '/js/lib/motion.min.js',
+			array(),
+			'11',
+			array(
+				'strategy'  => 'defer',
+				'in_footer' => true,
+			)
 		);
+
+		// Premium interactions: parallax, split-text, magnetic, stagger, scroll-fade.
+		$prem_js = $use_min && file_exists( $js_dir . '/premium-interactions.min.js' )
+			? 'premium-interactions.min.js' : 'premium-interactions.js';
+		if ( file_exists( $js_dir . '/' . $prem_js ) ) {
+			wp_enqueue_script(
+				'skyyrose-premium-interactions',
+				$js_uri . '/' . $prem_js,
+				array( 'motion-one' ),
+				SKYYROSE_VERSION,
+				array(
+					'strategy'  => 'defer',
+					'in_footer' => true,
+				)
+			);
+		}
 	}
 
 	// Page transitions + skeleton screens + scarcity bars.
@@ -299,7 +329,10 @@ function skyyrose_enqueue_global_scripts() {
 			$js_uri . '/' . $pt_file,
 			array(),
 			SKYYROSE_VERSION,
-			true
+			array(
+				'strategy'  => 'defer',
+				'in_footer' => true,
+			)
 		);
 	}
 

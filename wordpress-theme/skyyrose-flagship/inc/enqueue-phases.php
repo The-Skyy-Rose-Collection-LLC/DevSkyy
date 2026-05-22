@@ -39,7 +39,10 @@ function skyyrose_enqueue_phase2_performance_guardian(): void {
 		SKYYROSE_ASSETS_URI . '/js/performance-guardian.js',
 		array(),
 		SKYYROSE_VERSION,
-		array( 'strategy' => 'defer', 'in_footer' => true )
+		array(
+			'strategy'  => 'defer',
+			'in_footer' => true,
+		)
 	);
 }
 
@@ -76,7 +79,10 @@ function skyyrose_enqueue_phase2_brand_atmosphere(): void {
 		SKYYROSE_ASSETS_URI . '/js/brand-atmosphere.js',
 		array( 'skyyrose-performance-guardian' ),
 		SKYYROSE_VERSION,
-		array( 'strategy' => 'defer', 'in_footer' => true )
+		array(
+			'strategy'  => 'defer',
+			'in_footer' => true,
+		)
 	);
 }
 
@@ -138,7 +144,10 @@ function skyyrose_enqueue_phase3_experience_analyzer(): void {
 		$js_uri . '/' . $file,
 		array( 'skyyrose-performance-guardian' ),
 		SKYYROSE_VERSION,
-		array( 'strategy' => 'defer', 'in_footer' => true )
+		array(
+			'strategy'  => 'defer',
+			'in_footer' => true,
+		)
 	);
 }
 
@@ -177,7 +186,10 @@ function skyyrose_enqueue_phase3_smart_showcase(): void {
 		$js_uri . '/' . $file,
 		array( 'skyyrose-performance-guardian' ),
 		SKYYROSE_VERSION,
-		array( 'strategy' => 'defer', 'in_footer' => true )
+		array(
+			'strategy'  => 'defer',
+			'in_footer' => true,
+		)
 	);
 }
 
@@ -204,7 +216,10 @@ function skyyrose_enqueue_phase3_micro_interactions(): void {
 		$js_uri . '/' . $file,
 		array( 'skyyrose-performance-guardian' ),
 		SKYYROSE_VERSION,
-		array( 'strategy' => 'defer', 'in_footer' => true )
+		array(
+			'strategy'  => 'defer',
+			'in_footer' => true,
+		)
 	);
 }
 
@@ -267,7 +282,10 @@ function skyyrose_enqueue_phase4_assets(): void {
 		SKYYROSE_ASSETS_URI . '/js/personalization.js',
 		array(),
 		SKYYROSE_VERSION,
-		array( 'strategy' => 'defer', 'in_footer' => true )
+		array(
+			'strategy'  => 'defer',
+			'in_footer' => true,
+		)
 	);
 }
 
