@@ -98,6 +98,33 @@ if ( ! function_exists( 'get_theme_file_uri' ) ) {
 	}
 }
 
+if ( ! function_exists( 'get_template_directory_uri' ) ) {
+	function get_template_directory_uri() {
+		return 'https://theme.test/wp-content/themes/skyyrose-flagship';
+	}
+}
+
+if ( ! function_exists( 'get_template_directory' ) ) {
+	function get_template_directory() {
+		return SKYYROSE_DIR;
+	}
+}
+
+if ( ! function_exists( 'wp_get_upload_dir' ) ) {
+	function wp_get_upload_dir() {
+		return array(
+			'baseurl' => 'https://theme.test/wp-content/uploads',
+			'basedir' => sys_get_temp_dir() . '/skyyrose-test-uploads',
+		);
+	}
+}
+
+if ( ! function_exists( 'trailingslashit' ) ) {
+	function trailingslashit( $string ) {
+		return rtrim( (string) $string, '/\\' ) . '/';
+	}
+}
+
 // ---------------------------------------------------------------------------
 // Object cache (no-op in tests — forces CSV re-parse via static $catalog)
 // ---------------------------------------------------------------------------

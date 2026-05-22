@@ -51,11 +51,11 @@ else
     exit 1
 fi
 
-# Forward all script args to wp-cli verbatim.
-WP_ARGS="$*"
-
-log_info "Running on ${SSH_USER}@${SSH_HOST}: wp skyyrose nextgen-backfill ${WP_ARGS}"
-"${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" "wp skyyrose nextgen-backfill ${WP_ARGS}"
+# Forward all script args to wp-cli verbatim. Use "$@" passthrough rather
+# than $* string concat so args with spaces or special chars survive the
+# remote shell's re-parsing intact.
+log_info "Running on ${SSH_USER}@${SSH_HOST}: wp skyyrose nextgen-backfill $*"
+"${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" wp skyyrose nextgen-backfill "$@"
 exit_code=$?
 
 unset SSHPASS

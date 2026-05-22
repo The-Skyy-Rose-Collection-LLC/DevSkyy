@@ -20,3 +20,4 @@ require_once SKYYROSE_DIR . '/inc/brand-colors.php';
 require_once SKYYROSE_DIR . '/inc/collections-config.php';
 require_once SKYYROSE_DIR . '/inc/product-catalog.php';
 require_once SKYYROSE_DIR . '/inc/product-catalog-display.php';
+require_once SKYYROSE_DIR . '/inc/performance.php';

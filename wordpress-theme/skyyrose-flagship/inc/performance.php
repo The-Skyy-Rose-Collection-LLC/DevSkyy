@@ -227,6 +227,10 @@ function skyyrose_picture_sources( $src ) {
 	// direct from skyyrose.co so the browser receives the actual encoded
 	// format. The fallback <img> keeps its original (Photon-rewritten) src,
 	// so non-AVIF browsers still hit Photon's CDN for the JPG.
+	//
+	// Photon uses i0/i1/i2 shards only (verified 2026-05). If Jetpack ever
+	// expands to i3+, this regex silently fails to strip the prefix → the
+	// picture wrap no-ops (returns plain <img>), no broken sources emitted.
 	$canonical_src = $src;
 	if ( preg_match( '#^https?://i[0-2]\.wp\.com(/.+)$#', $src, $matches ) ) {
 		$canonical_src = 'https://' . ltrim( $matches[1], '/' );
@@ -548,135 +552,190 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	 *
 	 * @since 1.5.10
 	 */
-	WP_CLI::add_command(
-		'skyyrose nextgen-backfill',
-		function ( $args, $assoc_args ) {
-			// $limit caps CONVERSIONS, not attachments queried. Query is unbounded so the
-			// loop can skip already-converted attachments via _skyyrose_nextgen_done meta.
-			$limit   = isset( $assoc_args['limit'] ) ? (int) $assoc_args['limit'] : -1;
-			$dry_run = ! empty( $assoc_args['dry-run'] );
+	WP_CLI::add_command( 'skyyrose nextgen-backfill', 'skyyrose_nextgen_backfill_cli' );
+}
 
-			$gd_avif = function_exists( 'imageavif' );
-			$gd_webp = function_exists( 'imagewebp' );
-			if ( ! $gd_avif && ! $gd_webp ) {
-				WP_CLI::error( 'GD lacks both imageavif() and imagewebp() — install libavif + libwebp on PHP.' );
-			}
+/**
+ * WP-CLI entry point for `wp skyyrose nextgen-backfill`.
+ *
+ * Drives the backfill loop: capability gate → pending-attachment query →
+ * per-attachment delegation → progress + summary. Heavy lifting lives in
+ * skyyrose_nextgen_backfill_targets() and skyyrose_nextgen_backfill_one()
+ * to keep this entry under the project's 50-line function rule.
+ *
+ * @since 1.5.16 Extracted from inline closure (was 130 lines).
+ * @param array $args       Positional args (unused).
+ * @param array $assoc_args --limit=N, --dry-run.
+ * @return void
+ */
+function skyyrose_nextgen_backfill_cli( $args, $assoc_args ) {
+	unset( $args );
 
-			// Exclude attachments already fully converted (post meta marker set
-			// when all targets have siblings). Without this exclusion, the same
-			// "done" attachments at the front of the query are re-checked each
-			// batch and the loop never advances.
-			$query = new WP_Query(
-				array(
-					'post_type'      => 'attachment',
-					'post_status'    => 'inherit',
-					'post_mime_type' => array( 'image/jpeg', 'image/png' ),
-					'posts_per_page' => -1,
-					'fields'         => 'ids',
-					'no_found_rows'  => true,
-					'orderby'        => 'ID',
-					'order'          => 'ASC',
-					'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-						array(
-							'key'     => '_skyyrose_nextgen_done',
-							'compare' => 'NOT EXISTS',
-						),
-					),
-				)
-			);
+	$limit   = isset( $assoc_args['limit'] ) ? (int) $assoc_args['limit'] : -1;
+	$dry_run = ! empty( $assoc_args['dry-run'] );
+	$gd_avif = function_exists( 'imageavif' );
+	$gd_webp = function_exists( 'imagewebp' );
 
-			$total          = count( $query->posts );
-			$converted      = 0;
-			$marked_done    = 0;
-			$processed      = 0;
-			$skipped        = 0;
-			$progress_total = ( $limit > 0 ) ? min( $total, $limit ) : $total;
-			$progress       = WP_CLI\Utils\make_progress_bar(
-				"Backfilling AVIF/WebP for {$total} pending attachments",
-				$progress_total
-			);
+	if ( ! $gd_avif && ! $gd_webp ) {
+		WP_CLI::error( 'GD lacks both imageavif() and imagewebp() — install libavif + libwebp on PHP.' );
+	}
 
-			foreach ( $query->posts as $attachment_id ) {
-				if ( $limit > 0 && $converted >= $limit ) {
-					break;
-				}
-
-				$metadata = wp_get_attachment_metadata( $attachment_id );
-				$file     = get_attached_file( $attachment_id );
-				if ( ! $file || ! file_exists( $file ) ) {
-					++$skipped;
-					$progress->tick();
-					continue;
-				}
-
-				$base_dir = dirname( $file );
-
-				// Memory-safe size whitelist: only convert sizes that templates
-				// actually request. Full + the four canonical WP sizes covers
-				// every <img src=…> the picture filter sees. Skipping rare or
-				// custom sizes (medium_large, 1536x1536, theme-registered) keeps
-				// each attachment's total GD ops under ~10, avoiding PHP-FPM
-				// worker death on WordPress.com (256MB cap, exit 130 symptom).
-				$size_whitelist = array( 'thumbnail', 'medium', 'large', 'skyyrose-product-avif' );
-				$targets        = array( basename( $file ) );
-				if ( ! empty( $metadata['sizes'] ) && is_array( $metadata['sizes'] ) ) {
-					foreach ( $size_whitelist as $size_key ) {
-						if ( ! empty( $metadata['sizes'][ $size_key ]['file'] ) ) {
-							$targets[] = $metadata['sizes'][ $size_key ]['file'];
-						}
-					}
-				}
-
-				$all_done = true;
-				foreach ( $targets as $name ) {
-					$src_path    = $base_dir . '/' . $name;
-					$base_no_ext = preg_replace( '/\.(jpe?g|png)$/i', '', $src_path );
-					if ( ! file_exists( $src_path ) || null === $base_no_ext ) {
-						continue;
-					}
-
-					if ( $gd_webp && ! file_exists( $base_no_ext . '.webp' ) ) {
-						if ( $dry_run ) {
-							++$converted;
-							$all_done = false;
-						} elseif ( skyyrose_gd_convert( $src_path, $base_no_ext . '.webp', 'webp' ) ) {
-							++$converted;
-						} else {
-							$all_done = false;
-						}
-					}
-					if ( $gd_avif && ! file_exists( $base_no_ext . '.avif' ) ) {
-						if ( $dry_run ) {
-							++$converted;
-							$all_done = false;
-						} elseif ( skyyrose_gd_convert( $src_path, $base_no_ext . '.avif', 'avif' ) ) {
-							++$converted;
-						} else {
-							$all_done = false;
-						}
-					}
-					// Force GC after each encode — keeps peak RAM bounded so the
-					// PHP-FPM worker survives multi-size loops.
-					if ( function_exists( 'gc_collect_cycles' ) ) {
-						gc_collect_cycles();
-					}
-				}
-
-				if ( $all_done && ! $dry_run ) {
-					update_post_meta( $attachment_id, '_skyyrose_nextgen_done', 1 );
-					++$marked_done;
-				}
-
-				++$processed;
-				$progress->tick();
-			}
-
-			$progress->finish();
-			$verb = $dry_run ? 'Would convert' : 'Converted';
-			WP_CLI::success(
-				"{$verb} {$converted} files. Processed {$processed} of {$total} pending; "
-				. "marked {$marked_done} attachments complete; skipped {$skipped} missing originals."
-			);
-		}
+	$pending  = skyyrose_nextgen_backfill_pending_ids();
+	$total    = count( $pending );
+	$counters = array(
+		'converted'   => 0,
+		'marked_done' => 0,
+		'processed'   => 0,
+		'skipped'     => 0,
 	);
+	$progress = WP_CLI\Utils\make_progress_bar(
+		"Backfilling AVIF/WebP for {$total} pending attachments",
+		( $limit > 0 ) ? min( $total, $limit ) : $total
+	);
+
+	foreach ( $pending as $attachment_id ) {
+		if ( $limit > 0 && $counters['converted'] >= $limit ) {
+			break;
+		}
+		skyyrose_nextgen_backfill_one( (int) $attachment_id, $dry_run, $gd_avif, $gd_webp, $counters );
+		$progress->tick();
+	}
+
+	$progress->finish();
+	$verb = $dry_run ? 'Would convert' : 'Converted';
+	WP_CLI::success(
+		"{$verb} {$counters['converted']} files. Processed {$counters['processed']} of {$total} pending; "
+		. "marked {$counters['marked_done']} attachments complete; skipped {$counters['skipped']} missing originals."
+	);
+}
+
+/**
+ * Query attachment IDs still needing AVIF/WebP siblings.
+ *
+ * Excludes attachments already marked done via _skyyrose_nextgen_done meta.
+ * Without this exclusion the loop would re-check the same head-of-queue
+ * attachments each batch and never advance.
+ *
+ * @since 1.5.16
+ * @return int[] Attachment IDs, ordered ASC by ID.
+ */
+function skyyrose_nextgen_backfill_pending_ids(): array {
+	$query = new WP_Query(
+		array(
+			'post_type'      => 'attachment',
+			'post_status'    => 'inherit',
+			'post_mime_type' => array( 'image/jpeg', 'image/png' ),
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'no_found_rows'  => true,
+			'orderby'        => 'ID',
+			'order'          => 'ASC',
+			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+				array(
+					'key'     => '_skyyrose_nextgen_done',
+					'compare' => 'NOT EXISTS',
+				),
+			),
+		)
+	);
+	return array_map( 'intval', (array) $query->posts );
+}
+
+/**
+ * Resolve the size-whitelisted target filenames for an attachment.
+ *
+ * Memory-safe size whitelist: only convert sizes that templates actually
+ * request. Full + the four canonical WP sizes covers every <img src=…>
+ * the picture filter sees. Skipping rare or custom sizes (medium_large,
+ * 1536x1536, theme-registered) keeps each attachment's total GD ops under
+ * ~10, avoiding PHP-FPM worker death on WordPress.com (256MB cap, exit
+ * 130 symptom).
+ *
+ * @since 1.5.16
+ * @param string $file     Absolute path to full-size source file.
+ * @param array  $metadata wp_get_attachment_metadata() return value.
+ * @return string[] Basenames of files to convert (full + whitelisted sizes).
+ */
+function skyyrose_nextgen_backfill_targets( string $file, $metadata ): array {
+	$size_whitelist = array( 'thumbnail', 'medium', 'large', 'skyyrose-product-avif' );
+	$targets        = array( basename( $file ) );
+
+	if ( ! is_array( $metadata ) || empty( $metadata['sizes'] ) || ! is_array( $metadata['sizes'] ) ) {
+		return $targets;
+	}
+	foreach ( $size_whitelist as $size_key ) {
+		if ( ! empty( $metadata['sizes'][ $size_key ]['file'] ) ) {
+			$targets[] = $metadata['sizes'][ $size_key ]['file'];
+		}
+	}
+	return $targets;
+}
+
+/**
+ * Backfill AVIF/WebP siblings for one attachment, in-place.
+ *
+ * Iterates the size-whitelisted targets, converts missing siblings via
+ * GD (with per-encode gc_collect_cycles to bound peak RAM), and marks
+ * the attachment done in post meta when every target has both siblings.
+ *
+ * Mutates $counters by reference: converted, processed, skipped, marked_done.
+ *
+ * @since 1.5.16
+ * @param int   $attachment_id WP attachment ID.
+ * @param bool  $dry_run       When true, count conversions but don't write.
+ * @param bool  $gd_avif       GD's imageavif() available.
+ * @param bool  $gd_webp       GD's imagewebp() available.
+ * @param array $counters      Reference: 'converted','processed','skipped','marked_done'.
+ * @return void
+ */
+function skyyrose_nextgen_backfill_one( int $attachment_id, bool $dry_run, bool $gd_avif, bool $gd_webp, array &$counters ): void {
+	$file = get_attached_file( $attachment_id );
+	if ( ! $file || ! file_exists( $file ) ) {
+		++$counters['skipped'];
+		return;
+	}
+
+	$base_dir = dirname( $file );
+	$targets  = skyyrose_nextgen_backfill_targets( $file, wp_get_attachment_metadata( $attachment_id ) );
+	$all_done = true;
+
+	foreach ( $targets as $name ) {
+		$src_path    = $base_dir . '/' . $name;
+		$base_no_ext = preg_replace( '/\.(jpe?g|png)$/i', '', $src_path );
+		if ( ! file_exists( $src_path ) || null === $base_no_ext ) {
+			continue;
+		}
+
+		if ( $gd_webp && ! file_exists( $base_no_ext . '.webp' ) ) {
+			if ( $dry_run ) {
+				++$counters['converted'];
+				$all_done = false;
+			} elseif ( skyyrose_gd_convert( $src_path, $base_no_ext . '.webp', 'webp' ) ) {
+				++$counters['converted'];
+			} else {
+				$all_done = false;
+			}
+		}
+		if ( $gd_avif && ! file_exists( $base_no_ext . '.avif' ) ) {
+			if ( $dry_run ) {
+				++$counters['converted'];
+				$all_done = false;
+			} elseif ( skyyrose_gd_convert( $src_path, $base_no_ext . '.avif', 'avif' ) ) {
+				++$counters['converted'];
+			} else {
+				$all_done = false;
+			}
+		}
+		// Force GC after each encode — keeps peak RAM bounded so the
+		// PHP-FPM worker survives multi-size loops.
+		if ( function_exists( 'gc_collect_cycles' ) ) {
+			gc_collect_cycles();
+		}
+	}
+
+	if ( $all_done && ! $dry_run ) {
+		update_post_meta( $attachment_id, '_skyyrose_nextgen_done', 1 );
+		++$counters['marked_done'];
+	}
+	++$counters['processed'];
 }
