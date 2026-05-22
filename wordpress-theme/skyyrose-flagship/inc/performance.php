@@ -184,4 +184,107 @@ function skyyrose_send_cache_headers() {
 		header( 'X-Content-Type-Options: nosniff' );
 	}
 }
+
+/*
+--------------------------------------------------------------
+ * Next-Gen Image Format Helpers (AVIF + WebP)
+ *--------------------------------------------------------------*/
+
+/**
+ * Resolve next-gen sibling URLs for a theme-asset image URL.
+ *
+ * Checks the filesystem for AVIF + WebP siblings of a given source.
+ * Returns sibling URLs only when the file exists on disk, so missing
+ * variants never produce broken <source> tags.
+ *
+ * Only resolves URLs inside the theme's assets directory — external
+ * URLs (CDN, plugins) pass through unchanged.
+ *
+ * @since  1.5.8
+ * @param  string $src Absolute URL to an image asset.
+ * @return array      { 'avif' => string|null, 'webp' => string|null, 'src' => string }
+ */
+function skyyrose_picture_sources( $src ) {
+	$result = array(
+		'avif' => null,
+		'webp' => null,
+		'src'  => $src,
+	);
+
+	if ( empty( $src ) ) {
+		return $result;
+	}
+
+	$theme_uri = trailingslashit( get_template_directory_uri() );
+	if ( 0 !== strpos( $src, $theme_uri ) ) {
+		return $result;
+	}
+
+	$relative      = substr( $src, strlen( $theme_uri ) );
+	$relative_path = strtok( $relative, '?' );
+	$abs_path      = get_template_directory() . '/' . $relative_path;
+	$path_no_ext   = preg_replace( '/\.(jpe?g|png|webp|avif)$/i', '', $abs_path );
+
+	if ( null === $path_no_ext ) {
+		return $result;
+	}
+
+	$url_no_ext = preg_replace( '/\.(jpe?g|png|webp|avif)$/i', '', $src );
+
+	if ( file_exists( $path_no_ext . '.avif' ) ) {
+		$result['avif'] = $url_no_ext . '.avif';
+	}
+	if ( file_exists( $path_no_ext . '.webp' ) ) {
+		$result['webp'] = $url_no_ext . '.webp';
+	}
+
+	return $result;
+}
+
+/**
+ * Render a <picture> element with AVIF + WebP sources when available.
+ *
+ * Falls back to a plain <img> when no next-gen siblings exist on disk.
+ * The fallback <img> always uses the original URL.
+ *
+ * @since  1.5.8
+ * @param  string $src    Image source URL.
+ * @param  string $alt    Alt text (pass '' for decorative).
+ * @param  array  $attrs  Extra HTML attrs for the <img> (class, loading, etc.).
+ * @return string         Rendered <picture> markup (already escaped).
+ */
+function skyyrose_render_picture( $src, $alt = '', $attrs = array() ) {
+	$sources = skyyrose_picture_sources( $src );
+
+	$attr_html = '';
+	foreach ( $attrs as $key => $val ) {
+		if ( null === $val || false === $val ) {
+			continue;
+		}
+		$attr_html .= ' ' . esc_attr( $key ) . '="' . esc_attr( (string) $val ) . '"';
+	}
+
+	$img_tag = sprintf(
+		'<img src="%s" alt="%s"%s>',
+		esc_url( $sources['src'] ),
+		esc_attr( $alt ),
+		$attr_html // pre-escaped via esc_attr loop above.
+	);
+
+	if ( empty( $sources['avif'] ) && empty( $sources['webp'] ) ) {
+		return $img_tag;
+	}
+
+	$out = '<picture>';
+	if ( ! empty( $sources['avif'] ) ) {
+		$out .= sprintf( '<source type="image/avif" srcset="%s">', esc_url( $sources['avif'] ) );
+	}
+	if ( ! empty( $sources['webp'] ) ) {
+		$out .= sprintf( '<source type="image/webp" srcset="%s">', esc_url( $sources['webp'] ) );
+	}
+	$out .= $img_tag;
+	$out .= '</picture>';
+
+	return $out;
+}
 add_action( 'send_headers', 'skyyrose_send_cache_headers' );

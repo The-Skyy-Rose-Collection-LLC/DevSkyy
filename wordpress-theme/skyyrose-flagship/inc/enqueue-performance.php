@@ -114,9 +114,11 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		return $tag;
 	}
 
-	// Defer all skyyrose-prefixed scripts and WC variation scripts loaded in footer.
+	// Defer all skyyrose-prefixed scripts, Three.js (heavy 607KB lib on
+	// experience templates), and WC variation scripts loaded in footer.
 	$should_defer = (
 		0 === strpos( $handle, 'skyyrose-' ) ||
+		0 === strpos( $handle, 'threejs' ) ||
 		'wc-add-to-cart-variation' === $handle
 	);
 

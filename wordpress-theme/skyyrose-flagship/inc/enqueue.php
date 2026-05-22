@@ -249,7 +249,16 @@ function skyyrose_enqueue_global_scripts() {
 	// Footer CRO — FAQ accordion (extracted from inline <script> in v1.5.3).
 	$fcro_file = $use_min && file_exists( $js_dir . '/footer-cro.min.js' ) ? 'footer-cro.min.js' : 'footer-cro.js';
 	if ( file_exists( $js_dir . '/' . $fcro_file ) ) {
-		wp_enqueue_script( 'skyyrose-footer-cro', $js_uri . '/' . $fcro_file, array(), SKYYROSE_VERSION, array( 'strategy' => 'defer', 'in_footer' => true ) );
+		wp_enqueue_script(
+			'skyyrose-footer-cro',
+			$js_uri . '/' . $fcro_file,
+			array(),
+			SKYYROSE_VERSION,
+			array(
+				'strategy'  => 'defer',
+				'in_footer' => true,
+			)
+		);
 	}
 
 	// Motion One — vanilla JS animation library (same author as Framer Motion).
@@ -621,7 +630,10 @@ function skyyrose_enqueue_template_scripts() {
 	// GSAP — self-hosted from assets/js/lib/ so animations don't depend on
 	// Cloudflare CDN reachability. Loaded on pages that use scroll animations
 	// (NOT collection pages — they use IntersectionObserver).
-	$gsap_slugs = array( 'preorder-gateway', 'about', 'immersive', 'kc-launch' );
+	// 'about' removed in 1.5.8: about.js uses prefers-reduced-motion query only,
+	// no gsap/ScrollTrigger API calls (audit: grep returns 0 hits). Was shipping
+	// 114KB of dead lib bytes to every About visitor.
+	$gsap_slugs = array( 'preorder-gateway', 'immersive', 'kc-launch' );
 	if ( in_array( $slug, $gsap_slugs, true ) ) {
 		wp_enqueue_script( 'skyyrose-gsap', SKYYROSE_ASSETS_URI . '/js/lib/gsap.min.js', array(), '3.12.2', true );
 		wp_enqueue_script( 'skyyrose-gsap-st', SKYYROSE_ASSETS_URI . '/js/lib/ScrollTrigger.min.js', array( 'skyyrose-gsap' ), '3.12.2', true );

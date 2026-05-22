@@ -37,13 +37,19 @@ $assets_uri    = defined( 'SKYYROSE_ASSETS_URI' ) ? SKYYROSE_ASSETS_URI : '';
 <section class="lp-hero" id="hero" aria-label="<?php echo esc_attr( $logo_alt ); ?> Hero">
 	<?php if ( $bg_image ) : ?>
 		<div class="lp-hero__bg">
-			<img src="<?php echo esc_url( $bg_image ); ?>"
-				alt=""
-				loading="eager"
-				fetchpriority="high"
-				width="1920"
-				height="1080"
-				decoding="async">
+			<?php
+			echo skyyrose_render_picture( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- helper escapes internally.
+				$bg_image,
+				'',
+				array(
+					'loading'       => 'eager',
+					'fetchpriority' => 'high',
+					'width'         => '1920',
+					'height'        => '1080',
+					'decoding'      => 'async',
+				)
+			);
+			?>
 		</div>
 	<?php endif; ?>
 
