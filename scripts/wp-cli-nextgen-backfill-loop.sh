@@ -49,18 +49,36 @@ if [[ -z "$remaining" ]] || [[ "$remaining" == "0" ]]; then
 fi
 log_info "$remaining files remaining. Batches of $BATCH_SIZE, max $MAX_ITERS iterations."
 
+consecutive_fails=0
+MAX_CONSECUTIVE_FAILS="${MAX_CONSECUTIVE_FAILS:-5}"
+total_fails=0
+
 for ((i = 1; i <= MAX_ITERS; i++)); do
     log_info "Iteration $i/$MAX_ITERS (--limit=$BATCH_SIZE) ..."
-    if ! "$SCRIPT_DIR/wp-cli-nextgen-backfill.sh" "--limit=$BATCH_SIZE"; then
-        log_error "Batch $i failed — stopping loop. Re-run later; idempotent."
-        exit 2
+    # set +e so a failing batch doesn't kill the loop (script has set -e at top).
+    set +e
+    "$SCRIPT_DIR/wp-cli-nextgen-backfill.sh" "--limit=$BATCH_SIZE"
+    batch_exit=$?
+    set -e
+
+    if [[ $batch_exit -ne 0 ]]; then
+        ((consecutive_fails++))
+        ((total_fails++))
+        log_warn "Batch $i failed (exit $batch_exit). Consecutive: $consecutive_fails/$MAX_CONSECUTIVE_FAILS. Total: $total_fails."
+        if (( consecutive_fails >= MAX_CONSECUTIVE_FAILS )); then
+            log_error "Hit $MAX_CONSECUTIVE_FAILS consecutive failures — stopping. Idempotent re-run safe."
+            exit 2
+        fi
+        sleep $(( SLEEP_BETWEEN * 3 ))  # back off after failure
+        continue
     fi
+    consecutive_fails=0
 
     # Re-check remaining via fresh dry-run every 4 iterations.
     if (( i % 4 == 0 )); then
         if dry_output=$("$SCRIPT_DIR/wp-cli-nextgen-backfill.sh" --dry-run 2>&1); then
             remaining=$(echo "$dry_output" | grep -oE 'Would convert [0-9]+' | grep -oE '[0-9]+' | head -1)
-            log_info "Remaining after $i iterations: ${remaining:-unknown}"
+            log_info "Remaining after $i iterations: ${remaining:-unknown} (total_fails=$total_fails)"
             if [[ -n "$remaining" ]] && [[ "$remaining" == "0" ]]; then
                 log_done "All files converted after $i iterations."
                 exit 0

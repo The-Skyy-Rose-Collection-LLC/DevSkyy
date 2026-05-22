@@ -40,7 +40,7 @@ SSH_STRICT="${SSH_STRICT_HOST:-accept-new}"
 SSH_KEY_PATH="${SSH_KEY_PATH:-$HOME/.ssh/skyyrose-deploy}"
 SSH_PORT="${SSH_PORT:-22}"
 
-SSH_CMD=( ssh -o "StrictHostKeyChecking=$SSH_STRICT" -o ConnectTimeout=15 -p "$SSH_PORT" )
+SSH_CMD=( ssh -o "StrictHostKeyChecking=$SSH_STRICT" -o ConnectTimeout=15 -o ServerAliveInterval=15 -o ServerAliveCountMax=24 -p "$SSH_PORT" )
 if [[ -f "$SSH_KEY_PATH" ]]; then
     SSH_CMD+=( -i "$SSH_KEY_PATH" )
 elif [[ -n "${SSH_PASS:-}" ]] && command -v sshpass &>/dev/null; then
