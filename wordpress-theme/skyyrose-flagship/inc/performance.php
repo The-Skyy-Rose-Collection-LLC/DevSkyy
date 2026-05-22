@@ -610,11 +610,19 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 				}
 
 				$base_dir = dirname( $file );
-				$targets  = array( basename( $file ) );
+
+				// Memory-safe size whitelist: only convert sizes that templates
+				// actually request. Full + the four canonical WP sizes covers
+				// every <img src=…> the picture filter sees. Skipping rare or
+				// custom sizes (medium_large, 1536x1536, theme-registered) keeps
+				// each attachment's total GD ops under ~10, avoiding PHP-FPM
+				// worker death on WordPress.com (256MB cap, exit 130 symptom).
+				$size_whitelist = array( 'thumbnail', 'medium', 'large', 'skyyrose-product-avif' );
+				$targets        = array( basename( $file ) );
 				if ( ! empty( $metadata['sizes'] ) && is_array( $metadata['sizes'] ) ) {
-					foreach ( $metadata['sizes'] as $size_data ) {
-						if ( ! empty( $size_data['file'] ) ) {
-							$targets[] = $size_data['file'];
+					foreach ( $size_whitelist as $size_key ) {
+						if ( ! empty( $metadata['sizes'][ $size_key ]['file'] ) ) {
+							$targets[] = $metadata['sizes'][ $size_key ]['file'];
 						}
 					}
 				}
@@ -646,6 +654,11 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 						} else {
 							$all_done = false;
 						}
+					}
+					// Force GC after each encode — keeps peak RAM bounded so the
+					// PHP-FPM worker survives multi-size loops.
+					if ( function_exists( 'gc_collect_cycles' ) ) {
+						gc_collect_cycles();
 					}
 				}
 
