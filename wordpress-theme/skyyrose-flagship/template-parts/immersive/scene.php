@@ -82,6 +82,8 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 				<?php if ( $scene_image_exists ) : ?>
 					<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/immersive/' . $room_image ); ?>"
 						alt="<?php echo esc_attr( $room_name ); ?>"
+						width="1344"
+						height="896"
 						<?php echo 0 === $index ? 'fetchpriority="high"' : 'loading="lazy"'; ?>>
 				<?php endif; ?>
 			</div>
