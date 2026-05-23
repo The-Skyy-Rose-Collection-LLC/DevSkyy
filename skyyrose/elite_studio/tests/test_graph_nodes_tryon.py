@@ -11,7 +11,7 @@ Verifies:
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from skyyrose.elite_studio.graph.nodes import tryon_node
 from skyyrose.elite_studio.models import GenerationResult, TryOnResult
@@ -98,7 +98,7 @@ class TestTryOnNodeSuccess:
         )
 
         mock_agent = MagicMock()
-        mock_agent.execute_tryon.return_value = mock_tryon_result
+        mock_agent.execute_tryon = AsyncMock(return_value=mock_tryon_result)
 
         with (
             patch(
@@ -128,7 +128,7 @@ class TestTryOnNodeSuccess:
 
         failed_result = TryOnResult(success=False, garment_sku="br-001", error="API timeout")
         mock_agent = MagicMock()
-        mock_agent.execute_tryon.return_value = failed_result
+        mock_agent.execute_tryon = AsyncMock(return_value=failed_result)
 
         with (
             patch(
@@ -167,7 +167,7 @@ class TestTryOnNodeTiming:
 
         mock_result = TryOnResult(success=True, garment_sku="br-001", output_path="/x.jpg")
         mock_agent = MagicMock()
-        mock_agent.execute_tryon.return_value = mock_result
+        mock_agent.execute_tryon = AsyncMock(return_value=mock_result)
 
         with (
             patch("skyyrose.elite_studio.graph.nodes._find_garment_image", return_value="/g.jpg"),

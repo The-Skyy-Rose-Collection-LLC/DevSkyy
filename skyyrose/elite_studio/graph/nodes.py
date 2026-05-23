@@ -52,15 +52,10 @@ logger = logging.getLogger(__name__)
 def run_sync(coro):
     """Run a coroutine from a synchronous node.
 
-    If the argument is not a coroutine (e.g. a plain value returned by a
-    synchronous mock in tests) it is returned as-is.  This keeps node
-    functions testable with standard ``MagicMock`` without requiring
-    ``AsyncMock`` at every call site.
+    Requires a real awaitable — passing a plain value raises ``TypeError``
+    so that async/sync mismatches surface as test failures rather than being
+    silently swallowed.
     """
-    import inspect
-
-    if not inspect.isawaitable(coro):
-        return coro
     try:
         loop = asyncio.get_running_loop()
         if loop.is_running():
@@ -774,7 +769,7 @@ def upscaling_node(state: EliteStudioState) -> dict:
             "stage_timings": timings,
         }
 
-    result = run_sync(agent.upscale(image_path=image_path))
+    result = agent.upscale(image_path=image_path)
     elapsed = time.monotonic() - start
 
     timings = dict(state.get("stage_timings", {}))

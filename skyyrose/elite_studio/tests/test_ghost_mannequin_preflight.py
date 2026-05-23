@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from skyyrose.elite_studio.graph.nodes import preflight_node
 from skyyrose.elite_studio.graph.state import create_initial_state
@@ -15,11 +15,13 @@ def test_preflight_passes_sets_preflight_result():
         from skyyrose.elite_studio.models import PreflightResult
 
         mock_gate = mock_gate_class.return_value
-        mock_gate.verify_reference.return_value = PreflightResult(
-            passed=True,
-            sku="br-004",
-            agent_a_verdict="YES: hoodie",
-            agent_b_verdict="YES: hoodie",
+        mock_gate.verify_reference = AsyncMock(
+            return_value=PreflightResult(
+                passed=True,
+                sku="br-004",
+                agent_a_verdict="YES: hoodie",
+                agent_b_verdict="YES: hoodie",
+            )
         )
         with patch("skyyrose.elite_studio.catalog.Catalog.load") as mock_load:
             mock_product = MagicMock()
@@ -37,12 +39,14 @@ def test_preflight_fail_sets_error_status():
         from skyyrose.elite_studio.models import PreflightResult
 
         instance = MockGate.return_value
-        instance.verify_reference.return_value = PreflightResult(
-            passed=False,
-            sku="br-011",
-            agent_a_verdict="NO: baseball jersey",
-            agent_b_verdict="NO: wrong sport",
-            blocking_reason="Agent A: baseball jersey, not hockey",
+        instance.verify_reference = AsyncMock(
+            return_value=PreflightResult(
+                passed=False,
+                sku="br-011",
+                agent_a_verdict="NO: baseball jersey",
+                agent_b_verdict="NO: wrong sport",
+                blocking_reason="Agent A: baseball jersey, not hockey",
+            )
         )
         with patch("skyyrose.elite_studio.catalog.Catalog.load") as mock_load:
             mock_product = MagicMock()
