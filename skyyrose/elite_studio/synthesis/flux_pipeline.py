@@ -110,7 +110,9 @@ async def render(
         cost_tracker: optional accumulator passed through all stages.
         budget: optional hard ceiling enforcer; raises BudgetExceededError
             before each paid FAL call if the ceiling would be exceeded.
-            BudgetExceededError propagates to the caller — do not catch here.
+            The error is caught by the outer ``except Exception`` block and
+            surfaced as ``RenderResult(ok=False, error="ceiling=...")`` so the
+            LangGraph caller can mark the stage skipped without crashing.
         seed: optional fixed seed for reproducibility.
         fal_client: optional pre-built client (useful for testing).
 
@@ -150,6 +152,7 @@ async def render(
             view=view,
             cost_tracker=tracker,
             seed=seed,
+            budget=budget,
         )
         if budget is not None:
             budget.spend(_FLUX_KONTEXT_EST_COST_USD, stage="flux_stage1_kontext")
