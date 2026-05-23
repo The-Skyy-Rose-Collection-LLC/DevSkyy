@@ -69,6 +69,7 @@ get_header();
 					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/signature-sherpa-jacket-front-model.webp' ); ?>"
 						alt="<?php echo esc_attr__( 'Signature sherpa jacket, editorial portrait', 'skyyrose' ); ?>"
 						loading="lazy" decoding="async"
+						width="1024" height="1024"
 						style="width:100%;height:100%;object-fit:cover;border-radius:var(--skyyrose-radius);">
 				</div>
 			</div>
@@ -110,13 +111,13 @@ get_header();
 				<h2><?php echo esc_html( 'The Lookbook' ); ?></h2>
 			</div>
 			<div class="lp-editorial__grid lp-rv" data-delay="1">
-				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/bridge-bay-bridge-shirt-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Bridge Bay Bridge shirt, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
-				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/stay-golden-tee-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Stay Golden tee, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
-				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/mint-lavender-hoodie-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Mint Lavender hoodie, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
+				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/bridge-bay-bridge-shirt-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Bridge Bay Bridge shirt, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="1024" height="1024"></div>
+				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/stay-golden-tee-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Stay Golden tee, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="896" height="1200"></div>
+				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/mint-lavender-hoodie-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Mint Lavender hoodie, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="1024" height="1024"></div>
 			</div>
 			<div class="lp-editorial__grid lp-editorial__grid--row2 lp-rv" data-delay="2">
-				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/hero/luxury-nighttime-1280w.webp' ); ?>" alt="<?php echo esc_attr__( 'Signature collection — Oakland skyline', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
-				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/signature-beanie-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Signature beanie, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
+				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/hero/luxury-nighttime-1280w.webp' ); ?>" alt="<?php echo esc_attr__( 'Signature collection — Oakland skyline', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="1280" height="549"></div>
+				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/signature-beanie-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Signature beanie, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="1024" height="1024"></div>
 			</div>
 		</div>
 	</section>

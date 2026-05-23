@@ -78,6 +78,7 @@ get_header();
 					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-bomber-front-model.webp' ); ?>"
 						alt="<?php echo esc_attr__( 'Love Hurts bomber jacket, editorial portrait', 'skyyrose' ); ?>"
 						loading="lazy" decoding="async"
+						width="1024" height="1024"
 						style="width:100%;height:100%;aspect-ratio:3/4;object-fit:cover;border-radius:var(--skyyrose-radius);">
 				</div>
 			</div>
@@ -112,13 +113,13 @@ get_header();
 				<h2><?php echo esc_html( 'The Look' ); ?></h2>
 			</div>
 			<div class="lp-editorial__grid lp-rv" data-delay="1">
-				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-basketball-shorts-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Love Hurts basketball shorts, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
-				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-varsity-jacket-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Love Hurts varsity jacket, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
-				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/the-fannie-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'The Fannie piece, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
+				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-basketball-shorts-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Love Hurts basketball shorts, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="896" height="1200"></div>
+				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-varsity-jacket-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Love Hurts varsity jacket, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="896" height="1200"></div>
+				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/the-fannie-front-model.webp' ); ?>" alt="<?php echo esc_attr__( 'The Fannie piece, model shot', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="1024" height="1024"></div>
 			</div>
 			<div class="lp-editorial__grid lp-editorial__grid--row2 lp-rv" data-delay="2">
-				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/hero/beauty-and-beast-1280w.webp' ); ?>" alt="<?php echo esc_attr__( 'Love Hurts collection — enchanted rose under glass', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
-				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-bomber-back-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Love Hurts bomber jacket, back view', 'skyyrose' ); ?>" loading="lazy" decoding="async"></div>
+				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/hero/beauty-and-beast-1280w.webp' ); ?>" alt="<?php echo esc_attr__( 'Love Hurts collection — enchanted rose under glass', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="1280" height="549"></div>
+				<div class="lp-editorial__item"><img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/products/love-hurts-bomber-back-model.webp' ); ?>" alt="<?php echo esc_attr__( 'Love Hurts bomber jacket, back view', 'skyyrose' ); ?>" loading="lazy" decoding="async" width="1024" height="1024"></div>
 			</div>
 		</div>
 	</section>
