@@ -28,3 +28,8 @@ Generates 3D models, virtual photoshoots, and quality-enhanced renders for the S
 - Triggered from: `agents/tripo_agent.py`, `agents/meshy_agent.py`, `orchestration/asset_pipeline.py`
 - Endpoints: `api/ai_3d_endpoints.py`
 - Storage: `services/storage/three_d_storage.py`
+
+
+<claude-mem-context>
+
+</claude-mem-context>

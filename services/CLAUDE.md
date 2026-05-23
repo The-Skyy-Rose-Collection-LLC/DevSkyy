@@ -54,3 +54,8 @@ These three patterns recur across many services — when adding new services, fo
 - Storage backends: `services/storage/`, `database/`
 - ML pipelines: `services/ml/`, `pipelines/clothing_3d/`
 - Brand-voice canon (drives vision prompts): `knowledge-base/seed/from-interview.md`
+
+
+<claude-mem-context>
+
+</claude-mem-context>

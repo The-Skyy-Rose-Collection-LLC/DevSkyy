@@ -82,3 +82,8 @@ The harness asserts on:
 
 - ADK eval harness is the upstream-recommended way to test SequentialAgent pipelines — don't write parallel pytest equivalents.
 - Tournament score variability is real (judge LLM noise) — tolerance is intentional, not technical debt.
+
+
+<claude-mem-context>
+
+</claude-mem-context>

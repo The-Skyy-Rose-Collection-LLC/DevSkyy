@@ -111,3 +111,8 @@ A new tool under `mcp_tools/tools/foo.py`:
 - Tool count is **15 files** under `tools/` covering 8 `AgentCategory` enum values. When adding a new category, extend `AgentCategory` in `types.py` first.
 - `BaseAgentInput` uses `extra="forbid"` — silently drops typoed parameters at the MCP layer. Worth surfacing in error messages to client developers.
 - LoRA training and LoRA generation are split (`lora_training.py` + `lora_generation.py`) because training jobs are long-running and need separate timeout / async-queue handling.
+
+
+<claude-mem-context>
+
+</claude-mem-context>

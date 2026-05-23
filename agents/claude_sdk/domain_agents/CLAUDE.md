@@ -100,3 +100,8 @@ Parent CoreAgent routes by keyword; both native + SDK sub-agents are eligible ca
 - Hook → self-healing wiring: `agents/claude_sdk/hooks.py`
 - Parent cores: `agents/core/<domain>/agent.py`
 - Klaviyo MCP server: registered via the `claude.ai Klaviyo` MCP server
+
+
+<claude-mem-context>
+
+</claude-mem-context>
