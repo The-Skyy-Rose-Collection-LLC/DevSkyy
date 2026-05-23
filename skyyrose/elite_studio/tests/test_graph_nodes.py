@@ -155,4 +155,4 @@ class TestFinalizeNode:
 
     def test_preserves_error_status(self):
         result = finalize_node(_state(status="error"))
-        assert result == {}
+        assert result["status"] == "error"

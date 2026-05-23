@@ -95,7 +95,7 @@ def run_batch(
     results: list[ProductionResult] = []
     total = len(skus)
     for i, sku in enumerate(skus):
-        print(f"[{i+1}/{total}] Processing {sku}...")
+        logger.info("[%d/%d] Processing %s...", i + 1, total, sku)
         if skip_existing:
             expected = OUTPUT_DIR / sku / f"{sku}-model-{view}-gemini.jpg"
             if expected.exists():

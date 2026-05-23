@@ -6,9 +6,12 @@ Shared by all agents — DRY replacement for copy-pasted retry loops.
 
 from __future__ import annotations
 
+import logging
 import time
 from collections.abc import Callable
 from typing import TypeVar
+
+logger = logging.getLogger(__name__)
 
 from .config import MAX_RETRIES, RETRY_DELAY_SECONDS
 
@@ -55,7 +58,7 @@ def retry_on_transient[T](
             last_exc = exc
             if is_transient_error(str(exc)) and attempt < max_retries - 1:
                 if label:
-                    print(f"   {label} Retry after: {exc}")
+                    logger.warning("%s retry after transient error: %s", label, exc)
                 time.sleep(delay)
                 continue
             raise

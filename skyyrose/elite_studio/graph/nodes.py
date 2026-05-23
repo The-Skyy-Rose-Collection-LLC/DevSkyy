@@ -50,20 +50,27 @@ logger = logging.getLogger(__name__)
 
 
 def run_sync(coro):
-    """Helper to run a coroutine from a synchronous node."""
+    """Run a coroutine from a synchronous node.
+
+    If the argument is not a coroutine (e.g. a plain value returned by a
+    synchronous mock in tests) it is returned as-is.  This keeps node
+    functions testable with standard ``MagicMock`` without requiring
+    ``AsyncMock`` at every call site.
+    """
+    import inspect
+
+    if not inspect.isawaitable(coro):
+        return coro
     try:
         loop = asyncio.get_running_loop()
         if loop.is_running():
-            # In a running loop, we should ideally use a thread or just run it.
-            # But LangGraph sync nodes are usually run in a way that allows run_until_complete?
-            # For now, if loop is running, we might be in trouble if we block it.
-            # However, for simplicity in this factory setting:
             import nest_asyncio
 
             nest_asyncio.apply()
             return loop.run_until_complete(coro)
     except RuntimeError:
-        return asyncio.run(coro)
+        pass
+    return asyncio.run(coro)
 
 
 # Approximate token estimates per node call (used for cost tracking).
@@ -130,6 +137,10 @@ _GENERATOR_EST_COST_USD = (
 # + max 1 refine retry $0.04 + synthesis $0.005 = ~$0.20.
 _ADK_RENDER_EST_COST_USD = 0.20
 _THREE_D_EST_COST_USD = 0.50  # Round-table ceiling: Meshy + Tripo + TRELLIS_local worst case
+# 6-stage compositor: BRIA RMBG + IC-Light + FLUX Fill + PIL shadow + Gemini QA ~$0.115/render
+_COMPOSITOR_EST_COST_USD = 0.115
+# FASHN virtual try-on: single-garment inference ~$0.075/call
+_TRYON_EST_COST_USD = 0.075
 
 
 def _invoke_adk_render_engine(sku: str, view: str):
@@ -524,8 +535,10 @@ def human_review_node(state: EliteStudioState) -> dict:
     }
 
 
-def compositor_node(state: EliteStudioState) -> dict:
+def compositor_node(state: EliteStudioState) -> dict:  # noqa: C901
     """Composite generated model into scene backgrounds."""
+    from ..budget import BudgetExceededError
+
     start = time.monotonic()
 
     gen = state.get("generation_result")
@@ -537,6 +550,19 @@ def compositor_node(state: EliteStudioState) -> dict:
             "compositor_result": None,
             "stage_timings": timings,
         }
+
+    # Budget guard — 6-stage compositor dispatches Gemini, IC-Light, and FLUX;
+    # pre-check before any provider fires.
+    budget = state.get("budget")
+    if budget is not None and hasattr(budget, "ensure_within_budget"):
+        try:
+            budget.ensure_within_budget(_COMPOSITOR_EST_COST_USD, stage="compositing")
+        except BudgetExceededError as exc:
+            return {
+                "status": "error",
+                "error": f"budget exceeded before compositing: {exc}",
+                "failed_step": "compositing",
+            }
 
     agent = CompositorAgent()
     comp_result = None
@@ -575,6 +601,8 @@ def compositor_node(state: EliteStudioState) -> dict:
     if comp_result and comp_result.success:
         job_id: str | None = state.get("job_id")  # type: ignore[assignment]
         _record_cost(job_id, "gemini", _COMPOSITOR_TOKENS_ESTIMATE)
+        if budget is not None and hasattr(budget, "spend"):
+            budget.spend(_COMPOSITOR_EST_COST_USD, stage="compositing")
 
     timings = dict(state.get("stage_timings", {}))
     timings["compositing"] = round(elapsed, 2)
@@ -592,7 +620,10 @@ def tryon_node(state: EliteStudioState) -> dict:
     Skips silently when:
     - generation_result is absent or unsuccessful
     - no garment image can be found for the SKU
+    - budget ceiling would be exceeded
     """
+    from ..budget import BudgetExceededError
+
     start = time.monotonic()
     timings = dict(state.get("stage_timings", {}))
 
@@ -609,6 +640,16 @@ def tryon_node(state: EliteStudioState) -> dict:
         timings["tryon"] = round(time.monotonic() - start, 2)
         return {"tryon_result": None, "stage_timings": timings}
 
+    # Budget guard — FASHN tryon incurs real per-call cost; check ceiling before dispatch.
+    budget = state.get("budget")
+    if budget is not None and hasattr(budget, "ensure_within_budget"):
+        try:
+            budget.ensure_within_budget(_TRYON_EST_COST_USD, stage="tryon")
+        except BudgetExceededError as exc:
+            logger.warning("tryon_node: skipping — %s", exc)
+            timings["tryon"] = round(time.monotonic() - start, 2)
+            return {"tryon_result": None, "stage_timings": timings}
+
     category = state.get("tryon_category", "upper_body")
     agent = TryOnAgent()
     result = run_sync(
@@ -616,8 +657,12 @@ def tryon_node(state: EliteStudioState) -> dict:
             garment_image_path=garment_path,
             model_image_path=gen.output_path,
             category=category,
+            garment_sku=sku,
         )
     )
+
+    if budget is not None and hasattr(budget, "spend") and getattr(result, "success", False):
+        budget.spend(_TRYON_EST_COST_USD, stage="tryon")
 
     timings["tryon"] = round(time.monotonic() - start, 2)
     return {"tryon_result": result, "stage_timings": timings}

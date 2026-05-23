@@ -62,7 +62,7 @@ class GeneratorAgent(BaseSuperAgent):
         """Generate image from spec with full ADK observability."""
         # Capture "Back Data" via ADK run
         adk_prompt = f"GENERATION TASK: SKU={sku}, VIEW={view}, SPEC={generation_spec}"
-        logger.info(f"Running Legendary Generation for {sku} via ADK...")
+        logger.info("Running Legendary Generation for %s via ADK...", sku)
         adk_result = await self.execute(adk_prompt)
 
         img_a: bytes | None = None
