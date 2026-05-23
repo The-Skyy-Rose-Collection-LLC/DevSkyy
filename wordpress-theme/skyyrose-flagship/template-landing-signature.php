@@ -92,7 +92,11 @@ get_header();
 			'subheading' => 'Wardrobe foundations built to last.',
 			'skus'       => array(
 				'sg-001', // Bridge Series Bay Bridge Shorts — $195
-				// Add more Signature SKUs as catalog grows (see skyyrose-catalog.csv).
+				'sg-009', // The Sherpa Jacket — $80
+				'sg-015', // The Windbreaker Set — $85
+				'sg-006', // Mint & Lavender Hoodie — $45
+				'sg-002', // Stay Golden Shirt — $65
+				'sg-011', // Original Label Tee (White) — $30
 			),
 			'wear_count' => 300,
 		)

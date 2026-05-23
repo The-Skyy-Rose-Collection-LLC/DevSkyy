@@ -178,7 +178,7 @@ $arrow_svg = '<svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns=
 				</dl>
 			</div>
 			<div class="abt-hero__right">
-				<figure class="abt-hero__portrait rv">
+				<figure class="abt-hero__portrait">
 					<img src="<?php echo esc_url( $hero_img ); ?>"
 						alt="<?php esc_attr_e( 'SkyyRose origin portrait', 'skyyrose' ); ?>"
 						fetchpriority="high"

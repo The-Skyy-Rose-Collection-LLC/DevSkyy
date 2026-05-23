@@ -99,7 +99,7 @@ get_header();
 		array(
 			'heading'    => 'The Collection',
 			'subheading' => 'Wear what you\'ve survived.',
-			'skus'       => array( 'lh-004', 'lh-002', 'lh-003', 'lh-006' ),
+			'skus'       => array( 'lh-004', 'lh-002', 'lh-003', 'lh-005' ),
 			'wear_count' => 200,
 		)
 	);

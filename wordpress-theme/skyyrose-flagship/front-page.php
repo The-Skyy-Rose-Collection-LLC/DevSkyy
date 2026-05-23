@@ -339,7 +339,9 @@ get_header();
 				<div class="col-card-img">
 					<img src="<?php echo esc_url( $col['image'] ); ?>"
 						alt="<?php echo esc_attr( $col['name'] . ' Collection' ); ?>"
-						loading="lazy" decoding="async" width="480" height="640">
+						loading="<?php echo 0 === $idx ? 'eager' : 'lazy'; ?>"
+						<?php echo 0 === $idx ? 'fetchpriority="high"' : ''; ?>
+						decoding="async" width="480" height="640">
 				</div>
 				<div class="col-card-ov"></div>
 				<div class="col-card-content">
