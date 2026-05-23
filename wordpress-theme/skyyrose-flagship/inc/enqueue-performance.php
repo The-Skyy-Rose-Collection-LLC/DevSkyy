@@ -201,7 +201,13 @@ function skyyrose_preload_hero_image() {
 			}
 		}
 		if ( $product instanceof WC_Product && $product->get_image_id() ) {
-			$image_url = wp_get_attachment_url( $product->get_image_id() );
+			// Use WC's "woocommerce_single" sized variant (~300-600KB) instead
+			// of wp_get_attachment_url() which returns the raw original
+			// (often 2-3MB). Cuts PDP preload payload ~80%. (audit 2026-05-23)
+			$image_url = wp_get_attachment_image_url( $product->get_image_id(), 'woocommerce_single' );
+			if ( ! $image_url ) {
+				$image_url = wp_get_attachment_url( $product->get_image_id() );
+			}
 		}
 	} elseif ( is_page() ) {
 		// Collection and immersive pages: preload featured image if set.
