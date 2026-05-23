@@ -535,15 +535,17 @@ function skyyrose_enqueue_template_styles() {
 		// high-priority fetch queue alongside critical CSS, improving LCP score.
 		//
 		// v1.5.17: preload AVIF (broadest 2026 browser coverage, smaller payload).
+		// v1.5.19: derive path + URL atomically via skyyrose_avif_sibling_pair()
+		// so existence probe + emitted preload URL cannot drift apart.
 		// Non-AVIF browsers fall through to WebP via the <picture> element's
 		// normal source negotiation (not preloaded, but still high-priority).
 		add_action(
 			'wp_head',
 			function () {
-				$avif_path = SKYYROSE_DIR . '/assets/images/homepage-hero-bg.avif';
-				$webp_url  = SKYYROSE_ASSETS_URI . '/images/homepage-hero-bg.webp';
-				if ( file_exists( $avif_path ) ) {
-					echo '<link rel="preload" as="image" href="' . esc_url( SKYYROSE_ASSETS_URI . '/images/homepage-hero-bg.avif' ) . '" type="image/avif" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				$webp_url = SKYYROSE_ASSETS_URI . '/images/homepage-hero-bg.webp';
+				$avif     = function_exists( 'skyyrose_avif_sibling_pair' ) ? skyyrose_avif_sibling_pair( $webp_url ) : null;
+				if ( $avif && file_exists( $avif['path'] ) ) {
+					echo '<link rel="preload" as="image" href="' . esc_url( $avif['url'] ) . '" type="image/avif" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				} else {
 					echo '<link rel="preload" as="image" href="' . esc_url( $webp_url ) . '" type="image/webp" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				}

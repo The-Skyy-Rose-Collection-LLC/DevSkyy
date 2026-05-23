@@ -739,3 +739,33 @@ function skyyrose_nextgen_backfill_one( int $attachment_id, bool $dry_run, bool 
 	}
 	++$counters['processed'];
 }
+
+/**
+ * Derive the AVIF sibling path + URL for a given WebP/JPG/PNG asset URL.
+ *
+ * Returns BOTH the filesystem path (for existence probing) AND the public
+ * URL (for emit) computed from the same source. Prevents the path-coupling
+ * bug where a `file_exists()` check and a `<source>` URL drift apart when
+ * the source URL is filtered (CDN swap, asset hash, etc.).
+ *
+ * Returns null when the URL doesn't map to the theme assets directory.
+ *
+ * @since 1.5.19 Extracted to fix code-review MEDIUM finding.
+ * @param string $src_url Source image URL (typically .webp or .jpg).
+ * @return array|null     { 'path' => string, 'url' => string } or null.
+ */
+function skyyrose_avif_sibling_pair( string $src_url ): ?array {
+	$abs_path = skyyrose_url_to_path( strtok( $src_url, '?' ) );
+	if ( null === $abs_path ) {
+		return null;
+	}
+	$path_no_ext = preg_replace( '/\.(jpe?g|png|webp)$/i', '', $abs_path );
+	$url_no_ext  = preg_replace( '/\.(jpe?g|png|webp)$/i', '', $src_url );
+	if ( null === $path_no_ext || $path_no_ext === $abs_path ) {
+		return null;
+	}
+	return array(
+		'path' => $path_no_ext . '.avif',
+		'url'  => $url_no_ext . '.avif',
+	);
+}

@@ -215,14 +215,23 @@ get_header();
 	// LCP-critical hero: <picture> with AVIF + WebP sources lets the browser
 	// preload-discover the actual <img>, unlike background-image which is
 	// discovered only after CSS parse. v1.5.17 LCP refactor.
-	$hero_bg_avif = preg_replace( '/\.webp$/', '.avif', $hero_bg );
+	//
+	// v1.5.19: use skyyrose_avif_sibling_pair() so the existence probe and
+	// emitted URL are computed atomically from $hero_bg — prevents drift if
+	// $hero_bg is ever filtered (CDN swap, asset hash, etc).
+	$hero_avif = function_exists( 'skyyrose_avif_sibling_pair' ) ? skyyrose_avif_sibling_pair( $hero_bg ) : null;
 	?>
 	<div class="hero-bg parallax-ken-burns" aria-hidden="true">
 		<picture>
-			<?php if ( file_exists( SKYYROSE_DIR . '/assets/images/homepage-hero-bg.avif' ) ) : ?>
-				<source type="image/avif" srcset="<?php echo esc_url( $hero_bg_avif ); ?>">
+			<?php if ( $hero_avif && file_exists( $hero_avif['path'] ) ) : ?>
+				<source type="image/avif" srcset="<?php echo esc_url( $hero_avif['url'] ); ?>">
 			<?php endif; ?>
 			<source type="image/webp" srcset="<?php echo esc_url( $hero_bg ); ?>">
+			<?php
+			// width=height=1920 intentional: source asset is square; CSS
+			// object-position: center 30% crops to landscape with vertical bias.
+			// If asset becomes 16:9 in future, update both attrs.
+			?>
 			<img src="<?php echo esc_url( $hero_bg ); ?>"
 				alt=""
 				width="1920"
