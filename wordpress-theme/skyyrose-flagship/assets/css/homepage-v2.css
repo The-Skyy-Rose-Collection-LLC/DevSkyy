@@ -269,11 +269,21 @@
 .hero-bg {
 	position: absolute;
 	inset: 0;
-	background-size: cover;
-	background-position: center 30%;
+	overflow: hidden;
 	transform: scale(1.05);
 	animation: heroZoom 30s ease-in-out infinite alternate;
-	aspect-ratio: 1 / 1;
+}
+.hero-bg > picture,
+.hero-bg > picture > img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+}
+.hero-bg > picture > img {
+	object-fit: cover;
+	object-position: center 30%;
+	display: block;
 }
 .hero-bg--alt {
 	opacity: 0;

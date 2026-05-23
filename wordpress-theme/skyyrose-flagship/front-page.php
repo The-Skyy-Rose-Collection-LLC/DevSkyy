@@ -211,7 +211,27 @@ get_header();
 
 <!-- ═══ HERO ═══ -->
 <section class="hero" id="hero" data-scroll-fade aria-label="<?php esc_attr_e( 'SkyyRose Hero', 'skyyrose' ); ?>">
-	<div class="hero-bg parallax-ken-burns" style="background-image: url('<?php echo esc_url( $hero_bg ); ?>');" aria-hidden="true"></div>
+	<?php
+	// LCP-critical hero: <picture> with AVIF + WebP sources lets the browser
+	// preload-discover the actual <img>, unlike background-image which is
+	// discovered only after CSS parse. v1.5.17 LCP refactor.
+	$hero_bg_avif = preg_replace( '/\.webp$/', '.avif', $hero_bg );
+	?>
+	<div class="hero-bg parallax-ken-burns" aria-hidden="true">
+		<picture>
+			<?php if ( file_exists( SKYYROSE_DIR . '/assets/images/homepage-hero-bg.avif' ) ) : ?>
+				<source type="image/avif" srcset="<?php echo esc_url( $hero_bg_avif ); ?>">
+			<?php endif; ?>
+			<source type="image/webp" srcset="<?php echo esc_url( $hero_bg ); ?>">
+			<img src="<?php echo esc_url( $hero_bg ); ?>"
+				alt=""
+				width="1920"
+				height="1920"
+				loading="eager"
+				fetchpriority="high"
+				decoding="async">
+		</picture>
+	</div>
 	<div class="hero-ov" aria-hidden="true"></div>
 	<div class="hero-particles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
 	<div class="hero-frame" aria-hidden="true"></div>

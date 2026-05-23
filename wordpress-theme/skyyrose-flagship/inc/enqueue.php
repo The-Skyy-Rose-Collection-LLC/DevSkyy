@@ -531,12 +531,22 @@ function skyyrose_enqueue_template_styles() {
 			);
 		}
 
-		// LCP: preload hero background image so the browser prioritises it in the
+		// LCP: preload hero image so the browser prioritises it in the
 		// high-priority fetch queue alongside critical CSS, improving LCP score.
+		//
+		// v1.5.17: preload AVIF (broadest 2026 browser coverage, smaller payload).
+		// Non-AVIF browsers fall through to WebP via the <picture> element's
+		// normal source negotiation (not preloaded, but still high-priority).
 		add_action(
 			'wp_head',
 			function () {
-				echo '<link rel="preload" as="image" href="' . esc_url( SKYYROSE_ASSETS_URI . '/images/homepage-hero-bg.webp' ) . '" type="image/webp">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				$avif_path = SKYYROSE_DIR . '/assets/images/homepage-hero-bg.avif';
+				$webp_url  = SKYYROSE_ASSETS_URI . '/images/homepage-hero-bg.webp';
+				if ( file_exists( $avif_path ) ) {
+					echo '<link rel="preload" as="image" href="' . esc_url( SKYYROSE_ASSETS_URI . '/images/homepage-hero-bg.avif' ) . '" type="image/avif" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				} else {
+					echo '<link rel="preload" as="image" href="' . esc_url( $webp_url ) . '" type="image/webp" fetchpriority="high">' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				}
 			},
 			2
 		);
