@@ -36,6 +36,7 @@ from typing import Any
 from llm.model_ids import GEMINI_VISION_MODEL
 
 from ..agents.vision_audit_agent import VisionAuditAgent, VisionAuditResult
+from ..budget import BudgetExceededError, RunBudget  # noqa: F401 (BudgetExceededError re-raised)
 from .clients import FalClient
 from .stages.audit_filter import AuditError, AuditFilter  # noqa: F401 (AuditError re-raised)
 from .stages.base_render import render_base
@@ -46,6 +47,12 @@ from .state.telemetry import CostTracker
 logger = logging.getLogger(__name__)
 
 MAX_ATTEMPTS = 3
+
+# Canonical per-call cost estimates sourced from synthesis/state/telemetry.py FAL_COSTS.
+_FLUX_KONTEXT_EST_COST_USD: float = 0.04  # fal-ai/flux-pro/kontext
+_FLUX_FILL_EST_COST_USD: float = (
+    0.05  # fal-ai/flux-pro/v1/fill and fal-ai/flux-kontext-lora/inpaint
+)
 DEFAULT_OUT_DIR = Path("renders/output")
 QUARANTINE_DIR = Path("renders/quarantine")
 
@@ -81,6 +88,7 @@ async def render(
     lora_trigger: str | None = None,
     lora_scale: float = 0.85,
     cost_tracker: CostTracker | None = None,
+    budget: RunBudget | None = None,
     seed: int | None = None,
     fal_client: FalClient | None = None,
 ) -> RenderResult:
@@ -100,6 +108,9 @@ async def render(
         lora_trigger: trigger word for the LoRA (e.g. ``"SKYR_EMBOSS"``).
         lora_scale: per-LoRA influence weight (0–1).
         cost_tracker: optional accumulator passed through all stages.
+        budget: optional hard ceiling enforcer; raises BudgetExceededError
+            before each paid FAL call if the ceiling would be exceeded.
+            BudgetExceededError propagates to the caller — do not catch here.
         seed: optional fixed seed for reproducibility.
         fal_client: optional pre-built client (useful for testing).
 
@@ -127,6 +138,8 @@ async def render(
 
     try:
         # ── Stage 1: FLUX Kontext Pro — clean base garment ─────────────────
+        if budget is not None:
+            budget.ensure_within_budget(_FLUX_KONTEXT_EST_COST_USD, stage="flux_stage1_kontext")
         logger.info("stage1 start: sku=%s view=%s", sku, view)
         base = await render_base(
             client=client,
@@ -138,6 +151,8 @@ async def render(
             cost_tracker=tracker,
             seed=seed,
         )
+        if budget is not None:
+            budget.spend(_FLUX_KONTEXT_EST_COST_USD, stage="flux_stage1_kontext")
 
         # ── Stage 1.5: AuditFilter — accept Stage 1 or collect violations ──
         logger.info("stage1.5 start: sku=%s view=%s", sku, view)
@@ -171,6 +186,8 @@ async def render(
             # ── Stage 3 + 5: Inpaint → Audit with H4 retry loop ───────────
             auditor = VisionAuditAgent()
             for attempt in range(1, MAX_ATTEMPTS + 1):
+                if budget is not None:
+                    budget.ensure_within_budget(_FLUX_FILL_EST_COST_USD, stage="flux_stage3_fill")
                 logger.info(
                     "stage3 attempt %d/%d: sku=%s view=%s", attempt, MAX_ATTEMPTS, sku, view
                 )
@@ -191,6 +208,8 @@ async def render(
                     cost_tracker=tracker,
                     seed=seed,
                 )
+                if budget is not None:
+                    budget.spend(_FLUX_FILL_EST_COST_USD, stage="flux_stage3_fill")
                 last_inpaint_path = inpaint.output_path
                 attempts_made = attempt
 
