@@ -209,6 +209,8 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 		<div class="product-panel-thumb">
 			<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>"
 				alt="<?php esc_attr_e( 'Product preview', 'skyyrose' ); ?>"
+				width="400"
+				height="533"
 				data-fallback="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>">
 		</div>
 		<div class="product-panel-info">
