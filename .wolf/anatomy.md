@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-22T06:17:56.229Z
-> Files: 2743 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-23T16:13:43.082Z
+> Files: 2746 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -216,7 +216,7 @@
 
 - `__init__.py` — Declares for (~698 tok)
 - `agent.py` — that: initialize (~14811 tok)
-- `CLAUDE.md` — agents/base_super_agent/ — EnhancedSuperAgent foundation package (~1894 tok)
+- `CLAUDE.md` — agents/base_super_agent/ — EnhancedSuperAgent foundation package (~1905 tok)
 - `learning_module.py` — SelfLearningModule: record_execution, get_best_technique, get_best_provider, score + 5 more (~5066 tok)
 - `ml_module.py` — SklearnModelWrapper: fit, predict, get_confidence, fit + 6 more (~4896 tok)
 - `prompt_module.py` — PromptEngineeringModule: auto_select_technique, apply_technique, apply_technique_with_tools, record_outcome + 1 more (~5802 tok)
@@ -243,7 +243,7 @@
 - `__init__.py` (~1184 tok)
 - `analytics.py` — SDKDataAnalystAgent: execute (~1375 tok)
 - `brand_guardian.py` — Declares SDKBrandGuardianAgent (~1038 tok)
-- `CLAUDE.md` — agents/claude_sdk/domain_agents/ — Domain-specific SDK agents (15 modules) (~1275 tok)
+- `CLAUDE.md` — agents/claude_sdk/domain_agents/ — Domain-specific SDK agents (15 modules) (~1286 tok)
 - `commerce.py` — Declares SDKCatalogManagerAgent (~1302 tok)
 - `community.py` — Declares SDKCommunityLoyaltyAgent (~1006 tok)
 - `content.py` — Declares SDKSeoWriterAgent (~1331 tok)
@@ -577,7 +577,7 @@
 ## agents/render_pipeline/eval/
 
 - `__init__.py` — ADK AgentEvaluator harness for the RenderPipeline agent. (~96 tok)
-- `CLAUDE.md` — agents/render_pipeline/eval/ — ADK eval harness (~1037 tok)
+- `CLAUDE.md` — agents/render_pipeline/eval/ — ADK eval harness (~1048 tok)
 - `render_pipeline.evalset.json` (~523 tok)
 - `test_config.json` (~27 tok)
 - `test_render_pipeline.py` — Live integration eval — gated by EVAL_LIVE=1 environment variable. (~608 tok)
@@ -637,7 +637,7 @@
 ## ai_3d/
 
 - `__init__.py` — ai_3d/__init__.py (~257 tok)
-- `CLAUDE.md` — ai_3d/ — 3D generation pipeline (10 Python files) (~347 tok)
+- `CLAUDE.md` — ai_3d/ — 3D generation pipeline (10 Python files) (~358 tok)
 - `generation_pipeline.py` — ai_3d/generation_pipeline.py (~6261 tok)
 - `model_generator.py` — Pydantic: GenerationConfig (55 fields) (~8458 tok)
 - `quality_enhancer.py` — ai_3d/quality_enhancer.py (~3875 tok)
@@ -1395,6 +1395,7 @@
 ## docs/architecture/
 
 - `AUTHENTICATED_IMPLEMENTATIONS.md` — Authenticated Industry Implementations Reference (~3240 tok)
+- `CLAUDE.md` (~11 tok)
 - `COMPONENTS.md` — DevSkyy Components Documentation (~7557 tok)
 - `DATA_FLOW.md` — DevSkyy Data Flow Documentation (~3539 tok)
 - `DEVSKYY_MASTER_PLAN.md` — ðŸš€ DevSkyy Autonomous Commerce Master Plan (~9829 tok)
@@ -2368,17 +2369,17 @@
 
 - `__init__.py` — DevSkyy MCP Tools Package. (~91 tok)
 - `api_client.py` — Shared API client utilities: _make_api_request, _handle_api_error, _format_response. (~2220 tok)
-- `CLAUDE.md` — mcp_tools/ — Typed MCP tool definitions (~1578 tok)
-- `security.py` — secure_tool() decorator for MCP tool handlers. (~1659 tok)
+- `CLAUDE.md` — mcp_tools/ — Typed MCP tool definitions (~1589 tok)
+- `security.py` — secure_tool() decorator for MCP tool handlers. (~1765 tok)
 - `server.py` — FastMCP server instance, configuration constants, and logger. (~646 tok)
 - `types.py` — Shared enums and base input model for all MCP tools. (~355 tok)
 
 ## mcp_tools/tools/
 
-- `__init__.py` — Side-effect imports: each module registers its tools via @mcp.tool(). (~99 tok)
+- `__init__.py` — Side-effect imports: each module registers its tools via @mcp.tool(). (~113 tok)
 - `advanced.py` — Advanced tools: multi-agent workflow orchestration. (~1327 tok)
 - `claude_sdk.py` — Claude Agent SDK MCP tools: research, email triage, spreadsheet ops, dashboard. (~3154 tok)
-- `CLAUDE.md` — mcp_tools/tools/ — Per-domain MCP tool modules (15 files) (~1005 tok)
+- `CLAUDE.md` — mcp_tools/tools/ — Per-domain MCP tool modules (15 files) (~1016 tok)
 - `cli_anything.py` — CLI-Anything harness tools: agent-native Blender and GIMP control. (~2244 tok)
 - `ecommerce.py` — E-commerce tools: manage_products, dynamic_pricing. (~2264 tok)
 - `infrastructure.py` — Infrastructure & system tools: scan_code, fix_code, self_healing. (~2996 tok)
@@ -2438,7 +2439,7 @@
 - `brand_integration.py` — API router (~2684 tok)
 - `brand_learning.py` — SignalType: store_signal, get_signals, count_signals, store_insight (~14597 tok)
 - `catalog_retriever.py` — CatalogRetriever — semantic retrieval over the SkyyRose canonical catalog. (~7607 tok)
-- `CLAUDE.md` — orchestration/ — Cross-cutting pipelines + RAG + LLM workflows (33 files) (~2112 tok)
+- `CLAUDE.md` — orchestration/ — Cross-cutting pipelines + RAG + LLM workflows (33 files) (~2123 tok)
 - `docs_context.py` — Lazy RAG context provider for the devskyy_docs vector collection. (~826 tok)
 - `document_ingestion.py` — ", "**/.git/**"] (~4999 tok)
 - `domain_router.py` — URL patterns: 1 routes (~3666 tok)
@@ -2633,7 +2634,7 @@
 - `nano-banana-composite-results.json` — Declares does (~2859 tok)
 - `nano-banana-masks.json` (~642 tok)
 - `nano-banana-run.py` — Nano Banana 2 — SkyyRose AI Image Pipeline. (~282 tok)
-- `nano-banana-vton.py` (~25448 tok)
+- `nano-banana-vton.py` (~25578 tok)
 - `optimize-images.sh` — Batch optimize all images in the WordPress theme (~841 tok)
 - `optimize-repo.sh` — optimize-repo.sh — staged disk cleanup for the DevSkyy repo (~1232 tok)
 - `php-lint.sh` — Lint PHP files passed as arguments. (~240 tok)
@@ -2764,7 +2765,7 @@
 - `wordpress-media-pipeline.py` — WordPressMediaPipeline: get_all_media, download_image, update_media_metadata, process_media_item + 3 more (~2816 tok)
 - `wp-cli-deploy-templates.sh` — WP-CLI Elementor Template Deployment Script (~2927 tok)
 - `wp-cli-nextgen-backfill-loop.sh` — scripts/wp-cli-nextgen-backfill-loop.sh (~945 tok)
-- `wp-cli-nextgen-backfill.sh` — scripts/wp-cli-nextgen-backfill.sh (~658 tok)
+- `wp-cli-nextgen-backfill.sh` — scripts/wp-cli-nextgen-backfill.sh (~688 tok)
 
 ## scripts/_lib/
 
@@ -2977,7 +2978,7 @@
 - `__init__.py` — services/__init__.py (~258 tok)
 - `ai_image_enhancement.py` — LuxuryImageEnhancer: remove_background, upscale_image, generate_product_image, interrogate_image + 4 more (~3204 tok)
 - `approval_queue_manager.py` — Approval queue manager for WordPress media sync. (~6631 tok)
-- `CLAUDE.md` — services/ — Internal Service Layer (52 Python files) (~986 tok)
+- `CLAUDE.md` — services/ — Internal Service Layer (52 Python files) (~997 tok)
 - `image_deduplication.py` — Image deduplication service using content hashing. (~2915 tok)
 - `image_ingestion.py` — Image ingestion service for downloading and processing images. (~5314 tok)
 - `rag_anything_service.py` — class: llm_model_func, initialize, ingest_document, query + 1 more (~4056 tok)
@@ -3168,7 +3169,7 @@
 - `__main__.py` — Allow running as: python -m skyyrose.elite_studio (~25 tok)
 - `brand.py` — Brand — Single source of truth loader for SkyyRose brand identity. (~1564 tok)
 - `budget.py` — Elite Studio run budget. (~916 tok)
-- `catalog.py` — Catalog — Single source of truth loader for SkyyRose product data. (~3768 tok)
+- `catalog.py` — Catalog — Single source of truth loader for SkyyRose product data. (~5947 tok)
 - `CLAUDE.md` (~11 tok)
 - `cli.py` — build_team, cmd_produce, cmd_batch, cmd_status + 9 more (~5209 tok)
 - `config.py` — get_openai_client, get_anthropic_client, validate_catalog_readers, validate_dossier_readers (~5836 tok)
@@ -3177,8 +3178,8 @@
 - `forensics.py` — Forensic manifest writer + interactive confirmation gate. (~1715 tok)
 - `gemini_rest.py` — generate_text, analyze_vision, generate_image (~1920 tok)
 - `master_registry.py` — View: get (~3012 tok)
-- `models.py` — ProductData: from_override, provider_count (~1847 tok)
-- `retry.py` — is_transient_error, retry_on_transient (~498 tok)
+- `models.py` — ProductData: from_override, provider_count (~1864 tok)
+- `retry.py` — is_transient_error, retry_on_transient (~521 tok)
 - `sku_resolver.py` — from: sanitize_sku, resolve_sku, verify_tripo_region (~2674 tok)
 - `telemetry.py` — URL configuration (~1651 tok)
 - `upload.py` — Phase 18 — Batch WooCommerce upload of approved ghost-mannequin images. (~8315 tok)
@@ -3192,12 +3193,12 @@
 - `color_correction_agent.py` — ColorCorrectionAgent: correct (~624 tok)
 - `compositor_agent.py` — CompositorAgent — 6-stage scene compositing pipeline (Phase B2). (~14244 tok)
 - `generator_agent.py` — GeneratorAgent: initialize, generate (~1609 tok)
-- `prompt_enrichment_agent.py` — Rule-based prompt enrichment for SkyyRose Elite Studio imagery pipeline. (~698 tok)
+- `prompt_enrichment_agent.py` — Rule-based prompt enrichment for SkyyRose Elite Studio imagery pipeline. (~1548 tok)
 - `quality_agent.py` — of: verify (~2956 tok)
 - `safety_agent.py` — OpenAI moderation + GPT-4o image safety gate for Elite Studio pipeline. (~982 tok)
 - `three_d_agent.py` — ThreeDAgent: generate_replica, generate_result_bridge (~4071 tok)
 - `tripo_agent.py` — class: get_balance, generate_multiview (~1915 tok)
-- `tryon_agent.py` — TryOnAgent: execute_tryon (~771 tok)
+- `tryon_agent.py` — TryOnAgent: execute_tryon (~1926 tok)
 - `upscaling_agent.py` — PIL LANCZOS upscaler with optional Replicate Real-ESRGAN primary path. (~1080 tok)
 - `variant_agent.py` — VariantAgent: generate_variants (~668 tok)
 - `vision_agent.py` — DualVisionGate — Phase B2 dual-agent vision consensus. (~2791 tok)
@@ -3258,8 +3259,8 @@
 - `builder.py` — GraphConfig: build_graph (~3496 tok)
 - `CLAUDE.md` (~11 tok)
 - `edges.py` — after_vision, after_generation, after_quality, after_quality_v2 + 5 more (~1467 tok)
-- `nodes.py` — run_sync, vision_node, generator_node (~11162 tok)
-- `runner.py` — run_single, run_batch (~1271 tok)
+- `nodes.py` — run_sync, vision_node, generator_node (~11667 tok)
+- `runner.py` — run_single, run_batch (~1275 tok)
 - `state.py` — EliteStudioState: create_initial_state, extract_production_result (~1787 tok)
 
 ## skyyrose/elite_studio/prompts/
@@ -3304,11 +3305,12 @@
 
 - `__init__.py` — FLUX synthesis pipeline — dossier-aware luxury product render. (~223 tok)
 - `CLAUDE.md` (~11 tok)
-- `flux_pipeline.py` — FLUX synthesis pipeline — main orchestrator (Stage 1 → 2 → 3 → 5). (~3664 tok)
+- `flux_pipeline.py` — FLUX synthesis pipeline — main orchestrator (Stage 1 → 2 → 3 → 5). (~3987 tok)
 
 ## skyyrose/elite_studio/synthesis/clients/
 
 - `__init__.py` — Thin async wrappers around fal_client and replicate with retries. (~42 tok)
+- `CLAUDE.md` (~11 tok)
 - `fal.py` — Thin async wrapper around ``fal_client`` with retry, timeout, structured logging. (~2420 tok)
 
 ## skyyrose/elite_studio/synthesis/prompts/
@@ -3329,6 +3331,7 @@
 ## skyyrose/elite_studio/synthesis/state/
 
 - `__init__.py` — Batch state, idempotency, telemetry. (~38 tok)
+- `CLAUDE.md` (~11 tok)
 - `telemetry.py` — Cost tracker + structured logging for the FLUX synthesis pipeline. (~1257 tok)
 
 ## skyyrose/elite_studio/synthesis/tests/
@@ -3358,18 +3361,18 @@
 - `test_fidelity.py` — Tests for skyyrose.elite_studio.fidelity (Wave 1 fidelity gate). (~1869 tok)
 - `test_flux_pipeline_stage_e.py` — Integration tests for flux_pipeline Stage E (Stage 1.5 AuditFilter wiring). (~2153 tok)
 - `test_gemini_rest.py` — Tests for gemini_rest — direct REST client for Gemini API. (~2312 tok)
-- `test_generator_agent_phase_b2.py` — Tests: generate_returns_generation_result, generate_fails_if_both_models_fail, winner_selection_prefers_a_on_tie (~496 tok)
+- `test_generator_agent_phase_b2.py` — Tests: generate_returns_generation_result, generate_fails_if_both_models_fail, winner_selection_prefers_a_on_tie (~578 tok)
 - `test_ghost_mannequin_composite.py` — Tests: collar_garment_applies_neck_in, non_collar_garment_skips_neck_in (~561 tok)
 - `test_ghost_mannequin_preflight.py` — Tests: preflight_passes_sets_preflight_result, preflight_fail_sets_error_status, preflight_skipped_for_flat_lay (~694 tok)
 - `test_ghost_mannequin_prompt.py` — Tests: prompt_contains_spec_primacy, prompt_contains_ghost_mannequin_instructions, prompt_reads_branding_from_csv, flat_lay_style_no_ghost_mannequi... (~850 tok)
-- `test_ghost_mannequin_qa.py` — Tests: both_pass_at_80_threshold, min_score_below_80_fails, identity_mismatch_auto_rejects (~668 tok)
+- `test_ghost_mannequin_qa.py` — Tests: both_pass_at_80_threshold, min_score_below_80_fails, identity_mismatch_auto_rejects (~770 tok)
 - `test_graph_builder_tryon.py` — Tests for GraphConfig and build_graph() with enable_tryon=True. (~1050 tok)
 - `test_graph_builder.py` — Tests for graph builder — topology assembly and compilation. (~1321 tok)
 - `test_graph_edges.py` — Tests for conditional edge routing functions. (~1122 tok)
 - `test_graph_nodes_quality.py` — Tests: no_generation_result_returns_error, generation_failed_returns_error, no_vision_result_returns_error, high_confidence_skips_llm + 10 more (~5090 tok)
-- `test_graph_nodes_tryon.py` — Tests for tryon_node graph node. (~1778 tok)
-- `test_graph_nodes.py` — Tests for graph node functions — agents mocked at call site. (~1632 tok)
-- `test_graph_runner.py` — Tests for run_single and run_batch — graph runner public API. (~1508 tok)
+- `test_graph_nodes_tryon.py` — Tests for tryon_node graph node. (~1789 tok)
+- `test_graph_nodes.py` — Tests for graph node functions — agents mocked at call site. (~1636 tok)
+- `test_graph_runner.py` — Tests for run_single and run_batch — graph runner public API. (~1514 tok)
 - `test_graph_state_phase_b2.py` — Tests: create_initial_state_ghost_mannequin (~115 tok)
 - `test_graph_state.py` — Tests for EliteStudioState TypedDict and helper functions. (~1332 tok)
 - `test_graph_topology.py` — Tests: graph_topology_3d_activation, graph_topology_default_generator (~236 tok)
