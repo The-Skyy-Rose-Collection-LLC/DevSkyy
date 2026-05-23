@@ -133,7 +133,7 @@ $assets_uri  = defined( 'SKYYROSE_ASSETS_URI' ) ? SKYYROSE_ASSETS_URI : '';
 		<div class="kc-teaser__waitlist-inner">
 			<h2 class="kc-teaser__section-title"><?php esc_html_e( 'Be the First to Know', 'skyyrose' ); ?></h2>
 			<p class="kc-teaser__waitlist-text">
-				<?php esc_html_e( 'Join the Kids Capsule waitlist for early access, exclusive previews, and first dibs on every drop.', 'skyyrose' ); ?>
+				<?php esc_html_e( 'Join the Kids Capsule waitlist for early access, first-look previews, and first dibs on every drop.', 'skyyrose' ); ?>
 			</p>
 			<form class="kc-waitlist-form" id="kc-waitlist-form" method="post" action="">
 				<?php wp_nonce_field( 'skyyrose_newsletter', 'skyyrose_newsletter_nonce' ); ?>

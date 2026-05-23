@@ -120,7 +120,7 @@ $faq_items = array(
 	),
 	array(
 		'question' => __( 'Are your products sustainable?', 'skyyrose' ),
-		'answer'   => __( 'Sustainability is at the heart of what we do. We use premium, ethically sourced materials including organic cotton, recycled polyester, and responsibly produced hardware. Our limited production runs minimize waste, and we partner with manufacturers who uphold fair labor practices. We are continuously working to reduce our environmental footprint through eco-friendly packaging and carbon-offset shipping options.', 'skyyrose' ),
+		'answer'   => __( 'Sustainability is at the heart of what we do. We use ethically sourced materials including organic cotton, recycled polyester, and responsibly produced hardware. Our limited production runs minimize waste, and we partner with manufacturers who uphold fair labor practices. We are continuously working to reduce our environmental footprint through eco-friendly packaging and carbon-offset shipping options.', 'skyyrose' ),
 	),
 	array(
 		'question' => __( 'Do you do collaborations?', 'skyyrose' ),
@@ -128,7 +128,7 @@ $faq_items = array(
 	),
 	array(
 		'question' => __( 'How can I join the SkyyRose community?', 'skyyrose' ),
-		'answer'   => __( 'There are many ways to be part of the SkyyRose family! Follow us on Instagram, TikTok, and Twitter @skyyrose for the latest drops, behind-the-scenes content, and styling inspiration. Sign up for our newsletter to get early access to new collections and exclusive member discounts. We also host pop-up events in Oakland and other cities throughout the year, so stay tuned for invitations.', 'skyyrose' ),
+		'answer'   => __( 'There are many ways to be part of the SkyyRose family! Follow us on Instagram, TikTok, and Twitter @skyyrose for the latest drops, behind-the-scenes content, and styling inspiration. Sign up for our newsletter to get early access to new collections and member-only drop alerts. We also host pop-up events in Oakland and other cities throughout the year, so stay tuned for invitations.', 'skyyrose' ),
 	),
 );
 ?>

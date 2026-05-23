@@ -349,7 +349,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 				<?php esc_html_e( 'While you\'re here, join the family', 'skyyrose' ); ?>
 			</h3>
 			<p class="error-404-newsletter-text">
-				<?php esc_html_e( 'Be the first to know about drops, exclusives, and events.', 'skyyrose' ); ?>
+				<?php esc_html_e( 'Be the first to know about drops, new arrivals, and events.', 'skyyrose' ); ?>
 			</p>
 			<form class="error-404-newsletter-form" aria-label="<?php esc_attr_e( 'Newsletter signup', 'skyyrose' ); ?>" action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>" method="post">
 				<?php wp_nonce_field( 'skyyrose_newsletter', 'skyyrose_newsletter_nonce' ); ?>

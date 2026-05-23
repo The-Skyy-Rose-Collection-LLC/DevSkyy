@@ -77,7 +77,7 @@ get_header();
 						<?php echo esc_html( 'Corey Foster named this brand after his daughter, Skyy Rose. This collection closes the circle — luxury that a parent passes down, not just buys.' ); ?>
 					</p>
 					<p>
-						<?php echo esc_html( 'Every piece mirrors an adult SkyyRose style. Same attention to detail. Same premium materials. Sized for the youngest members of the family who inherit their taste from the best.' ); ?>
+						<?php echo esc_html( 'Every piece mirrors an adult SkyyRose style. Same attention to detail. Same uncompromising construction. Sized for the youngest members of the family who inherit their taste from the best.' ); ?>
 					</p>
 					<blockquote class="lp-story__quote">
 						<p><?php echo esc_html( 'I built this brand for Skyy Rose. This collection is hers.' ); ?></p>
@@ -190,7 +190,7 @@ get_header();
 		<div class="lp__container">
 			<div class="lp-craft__header lp-rv">
 				<h2><?php echo esc_html( 'Built for Real Kids' ); ?></h2>
-				<p><?php echo esc_html( 'Same premium construction as our adult line. No shortcuts because they\'re small.' ); ?></p>
+				<p><?php echo esc_html( 'Same build quality as our adult line. No shortcuts because they\'re small.' ); ?></p>
 			</div>
 
 			<div class="lp-craft__grid">

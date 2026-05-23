@@ -25,7 +25,7 @@ defined( 'ABSPATH' ) || exit;
 			<?php
 			$ft_reviews = array(
 				array( "The quality is insane. I've washed my hoodie 20+ times and it still looks brand new.", 'Marcus T., Oakland' ),
-				array( 'The numbered tag makes it feel truly exclusive. Exceeded expectations.', 'Jade W., San Francisco' ),
+				array( 'The numbered tag makes it feel like yours alone. Exceeded every expectation.', 'Jade W., Oakland' ),
 				array( "This isn't just a brand, it's a movement. The craftsmanship is unmatched.", 'Devon L., Los Angeles' ),
 			);
 			foreach ( $ft_reviews as $r ) :

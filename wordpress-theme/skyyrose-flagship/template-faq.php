@@ -74,7 +74,7 @@ $faq_categories = array(
 			),
 			array(
 				'q' => __( 'What materials do you use?', 'skyyrose' ),
-				'a' => __( 'We source premium heavyweight cotton (280–320 GSM), reinforced stitching, and colorfast dyes. Our materials are chosen for longevity — these are investment pieces, not fast fashion. Specific material details are listed on each product page.', 'skyyrose' ),
+				'a' => __( 'We source heavyweight cotton (280–320 GSM), reinforced stitching, and colorfast dyes. Our materials are chosen for longevity — these are investment pieces, not fast fashion. Specific material details are listed on each product page.', 'skyyrose' ),
 			),
 		),
 	),
@@ -102,7 +102,7 @@ $faq_categories = array(
 		'items' => array(
 			array(
 				'q' => __( 'Who is behind SkyyRose?', 'skyyrose' ),
-				'a' => __( 'SkyyRose was founded by Corey Foster in Oakland, California. The brand is named after his daughter, Skyy Rose. What started as a father\'s promise became a luxury streetwear label built on authenticity, premium quality, and the belief that luxury grows from concrete.', 'skyyrose' ),
+				'a' => __( 'SkyyRose was founded by Corey Foster in Oakland, California. The brand is named after his daughter, Skyy Rose. What started as a father\'s promise became a luxury streetwear label built on authenticity, uncompromising craft, and the belief that luxury grows from concrete.', 'skyyrose' ),
 			),
 			array(
 				'q' => __( 'Where are your pieces made?', 'skyyrose' ),

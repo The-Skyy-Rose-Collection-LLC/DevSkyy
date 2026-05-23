@@ -229,7 +229,7 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 			</div>
 			<div class="sr-ed__care-item">
 				<h3 class="sr-ed__care-item-title"><?php esc_html_e( 'Construction', 'skyyrose' ); ?></h3>
-				<p><?php esc_html_e( 'Every piece is constructed with reinforced stitching at stress points, pre-shrunk heavyweight fabric, and premium-grade hardware. Built to last through real life.', 'skyyrose' ); ?></p>
+				<p><?php esc_html_e( 'Every piece is constructed with reinforced stitching at stress points, pre-shrunk heavyweight fabric, and solid-brass hardware. Built to last through real life.', 'skyyrose' ); ?></p>
 			</div>
 			<div class="sr-ed__care-item">
 				<h3 class="sr-ed__care-item-title"><?php esc_html_e( 'Sustainability', 'skyyrose' ); ?></h3>

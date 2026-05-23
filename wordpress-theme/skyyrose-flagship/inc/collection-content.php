@@ -32,7 +32,7 @@ function skyyrose_get_collection_content( $slug ) {
 			'hero_bg_base'        => '/branding/hero/forbidden-midnight',
 			'hero_bg_alt'         => __( 'Black Rose Collection — rose from concrete', 'skyyrose' ),
 			'hero_tagline'        => __( 'The beauty of the color black through the rose and high-end fashion design.', 'skyyrose' ),
-			'hero_subtitle'       => __( 'Monochrome sophistication. Dark-on-dark texture. Masculine elegance distilled into every fiber. Every man would wear a black rose.', 'skyyrose' ),
+			'hero_subtitle'       => __( 'Monochrome sophistication. Dark-on-dark texture. Elegance distilled into every fiber. You don\'t wear it to stand out. You wear it because you already stood up.', 'skyyrose' ),
 			'hero_scroll_text'    => __( 'Discover', 'skyyrose' ),
 			'hero_3d_label'       => __( 'View 3D Experience', 'skyyrose' ),
 			'experience_url'      => '/experience-black-rose/',
@@ -74,7 +74,7 @@ function skyyrose_get_collection_content( $slug ) {
 			'cta_title'           => __( 'Wear the Darkness', 'skyyrose' ),
 			'cta_text'            => __( 'The thorn protects what the world tries to take. Every piece in Black Rose carries that Oakland lesson: be beautiful, be sharp, never be soft where it counts.', 'skyyrose' ),
 			'cta_btn'             => __( 'Shop Black Rose', 'skyyrose' ),
-			'newsletter_text'     => __( 'First access to new drops, exclusive content, and the stories behind the darkness.', 'skyyrose' ),
+			'newsletter_text'     => __( 'First access to new drops, behind-the-scenes stories, and the darkness behind each piece.', 'skyyrose' ),
 			'email_id'            => 'br-email',
 		),
 
@@ -170,7 +170,7 @@ function skyyrose_get_collection_content( $slug ) {
 			'features'            => array(
 				array(
 					'icon'  => '&#x2726;',
-					'title' => __( 'Premium Materials', 'skyyrose' ),
+					'title' => __( 'Sourced Without Compromise', 'skyyrose' ),
 					'text'  => __( 'Italian leathers, Japanese denim, Egyptian cotton — sourced from the finest mills worldwide.', 'skyyrose' ),
 				),
 				array(
@@ -188,7 +188,7 @@ function skyyrose_get_collection_content( $slug ) {
 			'cta_title'           => __( 'Wear the Foundation', 'skyyrose' ),
 			'cta_text'            => __( 'This is where it all started. A father in Oakland with a daughter\'s name and a dream that wouldn\'t die. When you wear Signature, you wear the origin story — and you help write the next chapter.', 'skyyrose' ),
 			'cta_btn'             => __( 'Shop Signature', 'skyyrose' ),
-			'newsletter_text'     => __( 'Early access to new drops, exclusive content, and the stories behind each piece.', 'skyyrose' ),
+			'newsletter_text'     => __( 'Early access to new drops, behind-the-scenes stories, and first dibs on each piece.', 'skyyrose' ),
 			'email_id'            => 'sig-email',
 		),
 
@@ -215,12 +215,12 @@ function skyyrose_get_collection_content( $slug ) {
 			'quote_text'          => __( '"I built SkyyRose so my daughter would never have to wonder if she was enough. Every piece in Kids Capsule carries that — a father\'s promise that she can be anything, wear anything, own any room she walks into."', 'skyyrose' ),
 			'quote_cite'          => __( 'Corey Foster, Father & Founder', 'skyyrose' ),
 			'features_heading'    => __( 'Built Different', 'skyyrose' ),
-			'features_subheading' => __( 'The same philosophy that built SkyyRose — uncompromising quality, dark luxury DNA, premium everything.', 'skyyrose' ),
+			'features_subheading' => __( 'The same philosophy that built SkyyRose — uncompromising quality, dark luxury DNA, built different.', 'skyyrose' ),
 			'features'            => array(
 				array(
 					'icon'  => '&#x2726;',
-					'title' => __( 'Premium Materials', 'skyyrose' ),
-					'text'  => __( 'Same uncompromising fabrics as the adult lines — premium cotton, reinforced stitching, luxury hand-feel.', 'skyyrose' ),
+					'title' => __( 'Uncompromising Fabrics', 'skyyrose' ),
+					'text'  => __( 'Same uncompromising fabrics as the adult lines — heavyweight cotton, reinforced stitching, luxury hand-feel.', 'skyyrose' ),
 				),
 				array(
 					'icon'  => '&#x2726;',
@@ -236,7 +236,7 @@ function skyyrose_get_collection_content( $slug ) {
 			'cta_title'           => __( 'Their Turn Now', 'skyyrose' ),
 			'cta_text'            => __( 'We built this for Skyy Rose. For every kid who deserves to feel the same luxury their parents wear. Legacy isn\'t inherited — it\'s earned. But we can give them a head start.', 'skyyrose' ),
 			'cta_btn'             => __( 'Shop Kids Capsule', 'skyyrose' ),
-			'newsletter_text'     => __( 'Be first to know about new Kids Capsule drops and family exclusives.', 'skyyrose' ),
+			'newsletter_text'     => __( 'Be first to know about new Kids Capsule drops and family previews.', 'skyyrose' ),
 			'email_id'            => 'kc-email',
 		),
 	);
