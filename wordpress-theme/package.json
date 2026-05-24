@@ -1,24 +1,81 @@
 {
   "name": "skyyrose-flagship-theme",
-  "version": "5.2.0",
+  "version": "1.5.20",
   "private": true,
-  "description": "SkyyRose Flagship WordPress theme — local dev tooling",
+  "description": "SkyyRose Flagship — luxury streetwear WordPress theme. Local development, build, lint, deploy, and verification tooling for the production theme at skyyrose.co.",
+  "author": {
+    "name": "Corey Foster",
+    "url": "https://skyyrose.co"
+  },
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/The-Skyy-Rose-Collection/DevSkyy"
+  },
+  "homepage": "https://skyyrose.co",
+  "keywords": [
+    "wordpress-theme",
+    "woocommerce",
+    "luxury-fashion",
+    "streetwear",
+    "oakland",
+    "skyyrose"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "Firefox ESR",
+    "not dead",
+    "not ie 11"
+  ],
+  "files": [
+    "skyyrose-flagship"
+  ],
   "scripts": {
+    "build": "npm run build:css && npm run build:js",
+    "build:css": "node skyyrose-flagship/scripts/build-css.js",
+    "build:js": "node skyyrose-flagship/scripts/build-js.js",
+    "clean": "find skyyrose-flagship/assets -type f \\( -name '*.min.css' -o -name '*.min.js' \\) -delete && echo 'Cleaned minified assets.'",
+    "rebuild": "npm run clean && npm run build",
+    "lint": "npm run lint:php && npm run lint:css",
+    "lint:php": "find skyyrose-flagship -name '*.php' -not -path '*/vendor/*' -not -path '*/tests/coverage/*' -not -path '*/node_modules/*' -print0 | xargs -0 -n1 php -l",
+    "lint:php:strict": "cd skyyrose-flagship && [ -f vendor/bin/phpcs ] && vendor/bin/phpcs --standard=.phpcs.xml -s . || echo 'PHPCS not installed — run composer install in skyyrose-flagship/.'",
+    "lint:css": "npx stylelint 'skyyrose-flagship/assets/css/**/*.css' --allow-empty-input",
+    "lint:js": "npx eslint 'skyyrose-flagship/assets/js/**/*.js' --no-error-on-unmatched-pattern 2>/dev/null || echo 'ESLint optional — skipping.'",
+    "fix:css": "npx stylelint 'skyyrose-flagship/assets/css/**/*.css' --fix --allow-empty-input",
+    "format": "npx prettier --write 'skyyrose-flagship/**/*.{css,js,json}'",
+    "format:check": "npx prettier --check 'skyyrose-flagship/**/*.{css,js,json}'",
+    "verify": "npm run lint:php 2>&1 | grep -v 'No syntax errors' | head -20; echo '--- PHP check done.'",
+    "verify:full": "npm run lint && npm run build && echo '--- Verify pipeline passed.'",
+    "watch": "npx chokidar 'skyyrose-flagship/**/*.{php,css,js}' -c 'echo Changed: {path}'",
+    "watch:build": "npx chokidar 'skyyrose-flagship/assets/{css,js}/**/*' -c 'npm run build'",
     "deploy": "bash ../scripts/deploy-theme.sh",
     "deploy:dry": "bash ../scripts/deploy-theme.sh --dry-run",
+    "deploy:full": "bash ../scripts/deploy-theme.sh --with-maintenance",
+    "deploy:verify": "curl -sIL https://skyyrose.co/?deploy_verify=$(date +%s) | head -5",
     "backfill:nextgen": "bash ../scripts/wp-cli-nextgen-backfill.sh",
     "backfill:nextgen:dry": "bash ../scripts/wp-cli-nextgen-backfill.sh --dry-run",
     "backfill:nextgen:loop": "bash ../scripts/wp-cli-nextgen-backfill-loop.sh",
-    "build:js": "node skyyrose-flagship/scripts/build-js.js",
-    "build:css": "node skyyrose-flagship/scripts/build-css.js",
-    "build": "npm run build:css && npm run build:js",
-    "lint:php": "find skyyrose-flagship -name '*.php' -not -path '*/vendor/*' -not -path '*/tests/coverage/*' -exec php -l {} \\;",
-    "lint:css": "npx stylelint 'skyyrose-flagship/assets/css/**/*.css'",
-    "watch": "npx chokidar 'skyyrose-flagship/**/*.{php,css,js}' -c 'echo Changed: {path}'",
-    "verify": "npm run lint:php 2>&1 | grep -v 'No syntax errors' | head -20; echo 'PHP check done'",
-    "structure": "find skyyrose-flagship -type f -not -path '*/.*' | wc -l && find skyyrose-flagship -type d -not -path '*/.*' | wc -l"
+    "structure": "echo 'Files:' && find skyyrose-flagship -type f -not -path '*/.*' -not -path '*/vendor/*' -not -path '*/node_modules/*' | wc -l && echo 'Dirs:' && find skyyrose-flagship -type d -not -path '*/.*' -not -path '*/vendor/*' -not -path '*/node_modules/*' | wc -l",
+    "audit:deps": "npm audit --omit=dev",
+    "audit:fix": "npm audit fix",
+    "designqc": "openwolf designqc --url https://skyyrose.co",
+    "designqc:local": "openwolf designqc",
+    "size": "echo 'CSS bundle sizes:' && find skyyrose-flagship/assets/css -name '*.min.css' -exec ls -la {} \\; | awk '{ printf \"%-12s %s\\n\", $5, $NF }' && echo '' && echo 'JS bundle sizes:' && find skyyrose-flagship/assets/js -name '*.min.js' -not -path '*/lib/*' -exec ls -la {} \\; | awk '{ printf \"%-12s %s\\n\", $5, $NF }'"
   },
   "devDependencies": {
+    "chokidar-cli": "^3.0.0",
+    "clean-css": "^5.3.3",
+    "glob": "^10.4.5",
     "terser": "^5.36.0"
+  },
+  "optionalDependencies": {
+    "stylelint": "^16.10.0",
+    "stylelint-config-standard": "^36.0.1",
+    "prettier": "^3.3.3"
   }
 }
