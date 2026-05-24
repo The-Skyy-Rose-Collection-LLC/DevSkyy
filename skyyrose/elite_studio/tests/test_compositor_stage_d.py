@@ -1,458 +1,268 @@
-"""Unit tests for compositor/stage_d_flux.py — budget gate coverage.
+"""Per-stage FAL budget gate coverage for the live FluxProviderMixin.
 
-Tests cover:
-- flux_fill_fal:        budget pass / exceed / None (warn) / STRICT raise
-- flux_kontext:         budget pass / exceed / None (warn) / STRICT raise
-- flux_fill_replicate:  budget pass / exceed / None (warn) / STRICT raise
-- composite_with_flux:  fallback chain wiring (primary hit / primary miss secondary hit)
+These tests exercise the actual code path used in production:
+``CompositorAgent`` inherits ``FluxProviderMixin``; the orchestrator's
+``_composite_with_flux`` calls ``self._flux_fill_fal``,
+``self._flux_kontext``, ``self._flux_fill_replicate``. Patching at the
+``compositor_agent`` shim namespace mirrors what graph/nodes.py does at
+runtime (FAL / httpx are imported through the shim so they're patchable
+at one canonical location).
 
-No real FAL, Replicate, or httpx calls are made — all external I/O is mocked.
+Tests cover, per FAL provider method:
+  - within budget   -> dispatch, ``budget.spend`` called with the right cost
+  - over budget     -> ``BudgetExceededError`` raised, FAL never touched
+  - budget is None  -> dispatch proceeds (WARN-only back-compat)
+  - STRICT mode     -> ``BudgetExceededError`` raised when budget is None
+
+Plus a fallback-chain test on ``_composite_with_flux`` that proves the
+budget kwarg threads through to each provider in turn.
+
+No real FAL, Replicate, or httpx calls are made.
 """
 
 from __future__ import annotations
 
-import os
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-from skyyrose.elite_studio.agents.compositor.stage_d_flux import (
+from skyyrose.elite_studio.agents.compositor.infra import (
     _FLUX_FILL_FAL_COST_USD,
-    _FLUX_FILL_REPLICATE_COST_USD,
     _FLUX_KONTEXT_FALLBACK_COST_USD,
-    composite_with_flux,
-    flux_fill_fal,
-    flux_fill_replicate,
-    flux_kontext,
 )
+from skyyrose.elite_studio.agents.compositor_agent import CompositorAgent
+from skyyrose.elite_studio.budget import BudgetExceededError, RunBudget
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Constants / helpers
 # ---------------------------------------------------------------------------
 
-_FAKE_PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 24  # minimal fake PNG bytes
+_FAKE_PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 24
 _SCENE = "https://cdn.fal.ai/scene.jpg"
 _MASK = "https://cdn.fal.ai/mask.png"
 _REF = "https://cdn.fal.ai/ref.png"
 _PROMPT = "Luxury product floating in studio scene"
 
-
-def _mock_budget(headroom_usd: float = 10.0) -> MagicMock:
-    """Create a fake RunBudget-like object with no headroom issues."""
-    budget = MagicMock()
-    budget.ensure_within_budget.return_value = None
-    budget.spend.return_value = None
-    return budget
+_SHIM = "skyyrose.elite_studio.agents.compositor_agent"
 
 
-def _tight_budget(exc: Exception) -> MagicMock:
-    """Create a fake RunBudget that raises exc from ensure_within_budget."""
-    budget = MagicMock()
-    budget.ensure_within_budget.side_effect = exc
-    return budget
+def _agent() -> CompositorAgent:
+    """Construct a CompositorAgent with a stubbed Anthropic client.
+
+    Anthropic instantiation hits a real client constructor on __init__; tests
+    don't exercise the Sonnet QA path so a MagicMock is sufficient.
+    """
+    with patch(f"{_SHIM}.get_anthropic_client", return_value=MagicMock()):
+        return CompositorAgent()
 
 
-def _fal_result(url: str) -> dict:
-    return {"images": [{"url": url}]}
+def _fal_client_returning(bytes_url: str = "https://cdn.fal.ai/out.png") -> MagicMock:
+    """Create a fake fal_client whose .run() returns a result with images=[bytes_url]."""
+    fal = MagicMock()
+    result = MagicMock()
+    result.get = MagicMock(
+        side_effect=lambda key, default=None: {"images": [{"url": bytes_url}]}.get(key, default)
+    )
+    # fal_client.run returns dict-like; _extract_first_image_url tries .get('images')
+    fal.run.return_value = {"images": [{"url": bytes_url}]}
+    return fal
 
 
-def _httpx_ok(content: bytes = _FAKE_PNG) -> MagicMock:
+def _httpx_returning_bytes(payload: bytes = _FAKE_PNG) -> MagicMock:
+    """Create a fake httpx module whose .get(url).content is `payload`."""
+    httpx = MagicMock()
     resp = MagicMock()
-    resp.content = content
-    resp.raise_for_status.return_value = None
-    return resp
+    resp.content = payload
+    resp.raise_for_status = MagicMock(return_value=None)
+    httpx.get.return_value = resp
+    # _flux_fill_replicate uses httpx.post + httpx.get
+    post_resp = MagicMock()
+    post_resp.json.return_value = {"urls": {"get": "https://api.replicate.com/poll/abc"}}
+    post_resp.raise_for_status = MagicMock(return_value=None)
+    httpx.post.return_value = post_resp
+    return httpx
 
 
-# ---------------------------------------------------------------------------
-# flux_fill_fal
-# ---------------------------------------------------------------------------
+# ===========================================================================
+# _flux_fill_fal — primary FLUX inpaint
+# ===========================================================================
 
 
-class TestFluxFillFal:
-    """Budget gate and success/failure paths for flux_fill_fal."""
-
-    def test_pass_with_budget_calls_spend(self) -> None:
-        """When budget has headroom, spend() is called on success."""
-        budget = _mock_budget()
-        fake_url = "https://cdn.fal.ai/result.png"
-        mock_fc = MagicMock()
-        mock_fc.run.return_value = _fal_result(fake_url)
-
+class TestFluxFillFalBudget:
+    def test_within_budget_dispatches_and_spends(self) -> None:
+        agent = _agent()
+        budget = RunBudget(ceiling_usd=1.0)
         with (
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.fal_client",
-                mock_fc,
-            ),
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.httpx.get",
-                return_value=_httpx_ok(),
-            ),
+            patch(f"{_SHIM}.fal_client", _fal_client_returning()),
+            patch(f"{_SHIM}.httpx", _httpx_returning_bytes()),
         ):
-            result = flux_fill_fal(_SCENE, _MASK, _PROMPT, budget=budget)
+            out = agent._flux_fill_fal(_SCENE, _MASK, _PROMPT, budget=budget)
+        assert out == _FAKE_PNG
+        assert budget.spent_usd == pytest.approx(_FLUX_FILL_FAL_COST_USD)
 
-        assert result == _FAKE_PNG
-        budget.ensure_within_budget.assert_called_once_with(_FLUX_FILL_FAL_COST_USD)
-        budget.spend.assert_called_once_with(_FLUX_FILL_FAL_COST_USD)
-
-    def test_exceed_budget_raises(self) -> None:
-        """When ensure_within_budget raises, the exception propagates out of flux_fill_fal."""
-        exc = RuntimeError("BudgetExceeded: not enough headroom")
-        budget = _tight_budget(exc)
-
+    def test_exceeds_budget_raises_before_dispatch(self) -> None:
+        agent = _agent()
+        budget = RunBudget(ceiling_usd=0.0)
+        fal_mock = _fal_client_returning()
         with (
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.fal_client",
-                MagicMock(),
-            ),
-            pytest.raises(RuntimeError, match="BudgetExceeded"),
+            patch(f"{_SHIM}.fal_client", fal_mock),
+            patch(f"{_SHIM}.httpx", _httpx_returning_bytes()),
         ):
-            flux_fill_fal(_SCENE, _MASK, _PROMPT, budget=budget)
+            with pytest.raises(BudgetExceededError):
+                agent._flux_fill_fal(_SCENE, _MASK, _PROMPT, budget=budget)
+        fal_mock.run.assert_not_called()
 
-        budget.spend.assert_not_called()
-
-    def test_none_budget_warns_and_proceeds(self, caplog: pytest.LogCaptureFixture) -> None:
-        """When budget=None, a WARNING is emitted and the call proceeds."""
-        fake_url = "https://cdn.fal.ai/result.png"
-        mock_fc = MagicMock()
-        mock_fc.run.return_value = _fal_result(fake_url)
-
+    def test_none_budget_warn_only_back_compat(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.delenv("ELITE_STUDIO_STRICT_BUDGET", raising=False)
+        agent = _agent()
         with (
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.fal_client",
-                mock_fc,
-            ),
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.httpx.get",
-                return_value=_httpx_ok(),
-            ),
-            caplog.at_level("WARNING"),
+            patch(f"{_SHIM}.fal_client", _fal_client_returning()),
+            patch(f"{_SHIM}.httpx", _httpx_returning_bytes()),
         ):
-            result = flux_fill_fal(_SCENE, _MASK, _PROMPT, budget=None)
+            out = agent._flux_fill_fal(_SCENE, _MASK, _PROMPT, budget=None)
+        assert out == _FAKE_PNG
 
-        assert result == _FAKE_PNG
-        assert "no RunBudget supplied" in caplog.text
-
-    def test_strict_budget_with_none_raises(self) -> None:
-        """When ELITE_STUDIO_STRICT_BUDGET=1 and budget=None, RuntimeError raised."""
+    def test_strict_mode_raises_on_none_budget(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setenv("ELITE_STUDIO_STRICT_BUDGET", "1")
+        agent = _agent()
+        fal_mock = _fal_client_returning()
         with (
-            patch.dict(os.environ, {"ELITE_STUDIO_STRICT_BUDGET": "1"}),
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.fal_client",
-                MagicMock(),
-            ),
+            patch(f"{_SHIM}.fal_client", fal_mock),
+            patch(f"{_SHIM}.httpx", _httpx_returning_bytes()),
         ):
-            with pytest.raises(RuntimeError, match="ELITE_STUDIO_STRICT_BUDGET"):
-                flux_fill_fal(_SCENE, _MASK, _PROMPT, budget=None)
+            with pytest.raises(BudgetExceededError):
+                agent._flux_fill_fal(_SCENE, _MASK, _PROMPT, budget=None)
+        fal_mock.run.assert_not_called()
 
 
-# ---------------------------------------------------------------------------
-# flux_kontext
-# ---------------------------------------------------------------------------
+# ===========================================================================
+# _flux_kontext — secondary FLUX provider
+# ===========================================================================
 
 
-class TestFluxKontext:
-    """Budget gate and success/failure paths for flux_kontext."""
-
-    def test_pass_with_budget_calls_spend(self) -> None:
-        budget = _mock_budget()
-        fake_url = "https://cdn.fal.ai/kontext-result.png"
-        mock_fc = MagicMock()
-        mock_fc.run.return_value = _fal_result(fake_url)
-
+class TestFluxKontextBudget:
+    def test_within_budget_dispatches_and_spends(self) -> None:
+        agent = _agent()
+        budget = RunBudget(ceiling_usd=1.0)
         with (
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.fal_client",
-                mock_fc,
-            ),
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.httpx.get",
-                return_value=_httpx_ok(),
-            ),
+            patch(f"{_SHIM}.fal_client", _fal_client_returning()),
+            patch(f"{_SHIM}.httpx", _httpx_returning_bytes()),
         ):
-            result = flux_kontext(_SCENE, _MASK, _REF, _PROMPT, budget=budget)
+            out = agent._flux_kontext(_SCENE, _MASK, _REF, _PROMPT, budget=budget)
+        assert out == _FAKE_PNG
+        assert budget.spent_usd == pytest.approx(_FLUX_KONTEXT_FALLBACK_COST_USD)
 
-        assert result == _FAKE_PNG
-        budget.ensure_within_budget.assert_called_once_with(_FLUX_KONTEXT_FALLBACK_COST_USD)
-        budget.spend.assert_called_once_with(_FLUX_KONTEXT_FALLBACK_COST_USD)
-
-    def test_exceed_budget_raises(self) -> None:
-        exc = RuntimeError("BudgetExceeded")
-        budget = _tight_budget(exc)
-
+    def test_exceeds_budget_raises_before_dispatch(self) -> None:
+        agent = _agent()
+        budget = RunBudget(ceiling_usd=0.0)
+        fal_mock = _fal_client_returning()
         with (
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.fal_client",
-                MagicMock(),
-            ),
-            pytest.raises(RuntimeError, match="BudgetExceeded"),
+            patch(f"{_SHIM}.fal_client", fal_mock),
+            patch(f"{_SHIM}.httpx", _httpx_returning_bytes()),
         ):
-            flux_kontext(_SCENE, _MASK, _REF, _PROMPT, budget=budget)
+            with pytest.raises(BudgetExceededError):
+                agent._flux_kontext(_SCENE, _MASK, _REF, _PROMPT, budget=budget)
+        fal_mock.run.assert_not_called()
 
-        budget.spend.assert_not_called()
-
-    def test_none_budget_warns_and_proceeds(self, caplog: pytest.LogCaptureFixture) -> None:
-        fake_url = "https://cdn.fal.ai/kontext-result.png"
-        mock_fc = MagicMock()
-        mock_fc.run.return_value = _fal_result(fake_url)
-
+    def test_strict_mode_raises_on_none_budget(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setenv("ELITE_STUDIO_STRICT_BUDGET", "1")
+        agent = _agent()
+        fal_mock = _fal_client_returning()
         with (
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.fal_client",
-                mock_fc,
-            ),
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.httpx.get",
-                return_value=_httpx_ok(),
-            ),
-            caplog.at_level("WARNING"),
+            patch(f"{_SHIM}.fal_client", fal_mock),
+            patch(f"{_SHIM}.httpx", _httpx_returning_bytes()),
         ):
-            result = flux_kontext(_SCENE, _MASK, _REF, _PROMPT, budget=None)
+            with pytest.raises(BudgetExceededError):
+                agent._flux_kontext(_SCENE, _MASK, _REF, _PROMPT, budget=None)
+        fal_mock.run.assert_not_called()
 
-        assert result == _FAKE_PNG
-        assert "no RunBudget supplied" in caplog.text
 
-    def test_strict_budget_with_none_raises(self) -> None:
+# ===========================================================================
+# _flux_fill_replicate — tertiary fallback
+# ===========================================================================
+
+
+class TestFluxFillReplicateBudget:
+    def test_exceeds_budget_raises_before_dispatch(self) -> None:
+        agent = _agent()
+        budget = RunBudget(ceiling_usd=0.0)
+        httpx_mock = _httpx_returning_bytes()
+        with patch(f"{_SHIM}.httpx", httpx_mock):
+            with pytest.raises(BudgetExceededError):
+                agent._flux_fill_replicate(_SCENE, _MASK, _PROMPT, budget=budget)
+        httpx_mock.post.assert_not_called()
+
+    def test_strict_mode_raises_on_none_budget(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setenv("ELITE_STUDIO_STRICT_BUDGET", "1")
+        agent = _agent()
+        httpx_mock = _httpx_returning_bytes()
+        with patch(f"{_SHIM}.httpx", httpx_mock):
+            with pytest.raises(BudgetExceededError):
+                agent._flux_fill_replicate(_SCENE, _MASK, _PROMPT, budget=None)
+        httpx_mock.post.assert_not_called()
+
+
+# ===========================================================================
+# _composite_with_flux — budget threads to every provider in the chain
+# ===========================================================================
+
+
+class TestCompositeWithFluxBudgetThreading:
+    """The dispatcher must forward `budget=` to every provider call so the
+    per-stage gates fire on any provider that runs. Regression guard for the
+    code-review CRITICAL where the dispatcher dropped budget on the floor.
+    """
+
+    def test_primary_hit_passes_budget_to_fal(self) -> None:
+        agent = _agent()
+        budget = RunBudget(ceiling_usd=1.0)
         with (
-            patch.dict(os.environ, {"ELITE_STUDIO_STRICT_BUDGET": "1"}),
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.fal_client",
-                MagicMock(),
-            ),
+            patch.object(agent, "_flux_fill_fal", return_value=_FAKE_PNG) as fal,
+            patch.object(agent, "_flux_kontext") as kontext,
+            patch.object(agent, "_flux_fill_replicate") as replicate,
         ):
-            with pytest.raises(RuntimeError, match="ELITE_STUDIO_STRICT_BUDGET"):
-                flux_kontext(_SCENE, _MASK, _REF, _PROMPT, budget=None)
-
-
-# ---------------------------------------------------------------------------
-# flux_fill_replicate
-# ---------------------------------------------------------------------------
-
-
-class TestFluxFillReplicate:
-    """Budget gate and success/failure paths for flux_fill_replicate."""
-
-    def _mock_replicate_success(self) -> tuple[MagicMock, MagicMock]:
-        """Return (predict_resp, poll_resp) mocks for a succeeded Replicate run."""
-        predict_resp = MagicMock()
-        predict_resp.is_success = True
-        predict_resp.json.return_value = {
-            "urls": {"get": "https://api.replicate.com/v1/predictions/abc123"}
-        }
-
-        poll_resp = MagicMock()
-        poll_resp.raise_for_status.return_value = None
-        poll_resp.json.return_value = {
-            "status": "succeeded",
-            "output": ["https://cdn.replicate.com/out.png"],
-        }
-
-        return predict_resp, poll_resp
-
-    def test_pass_with_budget_calls_spend(self) -> None:
-        budget = _mock_budget()
-        predict_resp, poll_resp = self._mock_replicate_success()
-        img_resp = _httpx_ok()
-
-        call_count = [0]
-
-        def httpx_get_side_effect(url, **kwargs):
-            call_count[0] += 1
-            if "predictions" in url:
-                return poll_resp
-            return img_resp
-
-        with (
-            patch.dict(os.environ, {"REPLICATE_API_TOKEN": "test-token"}),
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.httpx.post",
-                return_value=predict_resp,
-            ),
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.httpx.get",
-                side_effect=httpx_get_side_effect,
-            ),
-        ):
-            result = flux_fill_replicate(_SCENE, _MASK, _PROMPT, budget=budget)
-
-        assert result == _FAKE_PNG
-        budget.ensure_within_budget.assert_called_once_with(_FLUX_FILL_REPLICATE_COST_USD)
-        budget.spend.assert_called_once_with(_FLUX_FILL_REPLICATE_COST_USD)
-
-    def test_exceed_budget_raises(self) -> None:
-        exc = RuntimeError("BudgetExceeded")
-        budget = _tight_budget(exc)
-
-        with (
-            patch.dict(os.environ, {"REPLICATE_API_TOKEN": "test-token"}),
-            pytest.raises(RuntimeError, match="BudgetExceeded"),
-        ):
-            flux_fill_replicate(_SCENE, _MASK, _PROMPT, budget=budget)
-
-        budget.spend.assert_not_called()
-
-    def test_none_budget_warns_and_proceeds(self, caplog: pytest.LogCaptureFixture) -> None:
-        predict_resp, poll_resp = self._mock_replicate_success()
-        img_resp = _httpx_ok()
-
-        def httpx_get_side_effect(url, **kwargs):
-            if "predictions" in url:
-                return poll_resp
-            return img_resp
-
-        with (
-            patch.dict(os.environ, {"REPLICATE_API_TOKEN": "test-token"}),
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.httpx.post",
-                return_value=predict_resp,
-            ),
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.httpx.get",
-                side_effect=httpx_get_side_effect,
-            ),
-            caplog.at_level("WARNING"),
-        ):
-            result = flux_fill_replicate(_SCENE, _MASK, _PROMPT, budget=None)
-
-        assert result == _FAKE_PNG
-        assert "no RunBudget supplied" in caplog.text
-
-    def test_strict_budget_with_none_raises(self) -> None:
-        with (
-            patch.dict(
-                os.environ, {"ELITE_STUDIO_STRICT_BUDGET": "1", "REPLICATE_API_TOKEN": "test-token"}
-            ),
-        ):
-            with pytest.raises(RuntimeError, match="ELITE_STUDIO_STRICT_BUDGET"):
-                flux_fill_replicate(_SCENE, _MASK, _PROMPT, budget=None)
-
-    def test_no_replicate_token_returns_none(self) -> None:
-        """When REPLICATE_API_TOKEN not set, returns None without making HTTP calls."""
-        budget = _mock_budget()
-        env = {k: v for k, v in os.environ.items() if k != "REPLICATE_API_TOKEN"}
-
-        with patch.dict(os.environ, env, clear=True):
-            result = flux_fill_replicate(_SCENE, _MASK, _PROMPT, budget=budget)
-
-        assert result is None
-        # ensure_within_budget IS called (gate happens before token check)
-        budget.ensure_within_budget.assert_called_once_with(_FLUX_FILL_REPLICATE_COST_USD)
-        # spend NOT called because no success
-        budget.spend.assert_not_called()
-
-
-# ---------------------------------------------------------------------------
-# composite_with_flux — fallback chain wiring
-# ---------------------------------------------------------------------------
-
-
-class TestCompositeWithFlux:
-    """Verify composite_with_flux routes through the fallback chain correctly."""
-
-    def test_primary_hit_returns_fal_fill(self) -> None:
-        """When flux_fill_fal returns bytes, use them and report 'fal-fill'."""
-        with (
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.flux_fill_fal",
-                return_value=_FAKE_PNG,
-            ) as mock_primary,
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.flux_kontext",
-            ) as mock_secondary,
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.flux_fill_replicate",
-            ) as mock_tertiary,
-        ):
-            result_bytes, provider = composite_with_flux(
-                scene_url=_SCENE,
-                subject_url=_REF,
-                mask_url=_MASK,
-                prompt=_PROMPT,
-            )
-
-        assert result_bytes == _FAKE_PNG
-        assert provider == "fal-fill"
-        mock_primary.assert_called_once()
-        mock_secondary.assert_not_called()
-        mock_tertiary.assert_not_called()
-
-    def test_primary_miss_secondary_hit_returns_kontext(self) -> None:
-        with (
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.flux_fill_fal",
-                return_value=None,
-            ),
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.flux_kontext",
-                return_value=_FAKE_PNG,
-            ) as mock_secondary,
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.flux_fill_replicate",
-            ) as mock_tertiary,
-        ):
-            result_bytes, provider = composite_with_flux(
-                scene_url=_SCENE,
-                subject_url=_REF,
-                mask_url=_MASK,
-                prompt=_PROMPT,
-            )
-
-        assert provider == "kontext"
-        mock_secondary.assert_called_once()
-        mock_tertiary.assert_not_called()
-
-    def test_all_fail_raises_runtime_error(self) -> None:
-        with (
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.flux_fill_fal",
-                return_value=None,
-            ),
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.flux_kontext",
-                return_value=None,
-            ),
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.flux_fill_replicate",
-                return_value=None,
-            ),
-        ):
-            with pytest.raises(RuntimeError, match="All FLUX providers failed"):
-                composite_with_flux(
-                    scene_url=_SCENE,
-                    subject_url=_REF,
-                    mask_url=_MASK,
-                    prompt=_PROMPT,
-                )
-
-    def test_budget_propagated_to_all_providers(self) -> None:
-        """Budget object is forwarded to each provider that is tried."""
-        budget = _mock_budget()
-
-        with (
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.flux_fill_fal",
-                return_value=None,
-            ) as mock_primary,
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.flux_kontext",
-                return_value=None,
-            ) as mock_secondary,
-            patch(
-                "skyyrose.elite_studio.agents.compositor.stage_d_flux.flux_fill_replicate",
-                return_value=_FAKE_PNG,
-            ) as mock_tertiary,
-        ):
-            composite_with_flux(
+            out, provider = agent._composite_with_flux(
                 scene_url=_SCENE,
                 subject_url=_REF,
                 mask_url=_MASK,
                 prompt=_PROMPT,
                 budget=budget,
             )
+        assert provider == "fal-fill"
+        assert out == _FAKE_PNG
+        fal.assert_called_once_with(_SCENE, _MASK, _PROMPT, budget=budget)
+        kontext.assert_not_called()
+        replicate.assert_not_called()
 
-        # Each provider call should have received the budget kwarg
-        _, kwargs_primary = mock_primary.call_args
-        _, kwargs_secondary = mock_secondary.call_args
-        _, kwargs_tertiary = mock_tertiary.call_args
-        assert kwargs_primary.get("budget") is budget
-        assert kwargs_secondary.get("budget") is budget
-        assert kwargs_tertiary.get("budget") is budget
+    def test_fallback_chain_threads_budget_through_all_providers(self) -> None:
+        agent = _agent()
+        budget = RunBudget(ceiling_usd=1.0)
+        with (
+            patch.object(agent, "_flux_fill_fal", return_value=None) as fal,
+            patch.object(agent, "_flux_kontext", return_value=None) as kontext,
+            patch.object(agent, "_flux_fill_replicate", return_value=_FAKE_PNG) as replicate,
+        ):
+            out, provider = agent._composite_with_flux(
+                scene_url=_SCENE,
+                subject_url=_REF,
+                mask_url=_MASK,
+                prompt=_PROMPT,
+                budget=budget,
+            )
+        assert provider == "replicate"
+        assert out == _FAKE_PNG
+        fal.assert_called_once_with(_SCENE, _MASK, _PROMPT, budget=budget)
+        kontext.assert_called_once_with(_SCENE, _MASK, _REF, _PROMPT, budget=budget)
+        replicate.assert_called_once_with(_SCENE, _MASK, _PROMPT, budget=budget)
+
+    def test_none_budget_threads_none_to_providers(self) -> None:
+        agent = _agent()
+        with (patch.object(agent, "_flux_fill_fal", return_value=_FAKE_PNG) as fal,):
+            agent._composite_with_flux(
+                scene_url=_SCENE,
+                subject_url=_REF,
+                mask_url=_MASK,
+                prompt=_PROMPT,
+                budget=None,
+            )
+        fal.assert_called_once_with(_SCENE, _MASK, _PROMPT, budget=None)

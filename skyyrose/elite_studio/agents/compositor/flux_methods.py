@@ -43,16 +43,22 @@ class FluxProviderMixin:
         prompt: str,
         budget: Any = None,
     ) -> tuple[bytes, str]:
-        """Run FLUX provider fallback chain via self methods (patchable by tests)."""
-        out = self._flux_fill_fal(scene_url, mask_url, prompt)
+        """Run FLUX provider fallback chain via self methods (patchable by tests).
+
+        ``budget`` is forwarded to each provider so per-call gates fire — the
+        outer compositor_node ceiling is a coarse pre-check; per-stage gates
+        catch the worst-case (all three providers fire) where actual spend
+        would exceed the coarse estimate.
+        """
+        out = self._flux_fill_fal(scene_url, mask_url, prompt, budget=budget)
         if out:
             return out, "fal-fill"
 
-        out = self._flux_kontext(scene_url, mask_url, subject_url, prompt)
+        out = self._flux_kontext(scene_url, mask_url, subject_url, prompt, budget=budget)
         if out:
             return out, "kontext"
 
-        out = self._flux_fill_replicate(scene_url, mask_url, prompt)
+        out = self._flux_fill_replicate(scene_url, mask_url, prompt, budget=budget)
         if out:
             return out, "replicate"
 

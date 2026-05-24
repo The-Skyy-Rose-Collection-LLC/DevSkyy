@@ -583,6 +583,7 @@ def compositor_node(state: EliteStudioState) -> dict:  # noqa: C901
                         model_image_path=gen.output_path,
                         scene_name=scene_name,
                         collection=collection,
+                        budget=budget,
                     )
                 break
     except Exception:

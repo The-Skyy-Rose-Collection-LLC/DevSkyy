@@ -130,6 +130,7 @@ class CompositorAgent(FluxProviderMixin):
         checkpoint_alpha: str | None = None,
         checkpoint_relit: str | None = None,
         checkpoint_prompt: str | None = None,
+        budget: Any = None,
     ) -> CompositorResult:
         """Run the 6-stage compositing pipeline."""
         out = Path(output_dir or self.DEFAULT_OUTPUT_DIR)
@@ -217,6 +218,7 @@ class CompositorAgent(FluxProviderMixin):
                 subject_url=subject_url,
                 mask_url=mask_url,
                 prompt=prompt,
+                budget=budget,
             )
             composite_path = str(out / f"{sku}-composite.png")
             Path(composite_path).write_bytes(composite_bytes)
@@ -553,32 +555,6 @@ class CompositorAgent(FluxProviderMixin):
         except Exception as exc:
             logger.warning("libcom IC-Light errored: %s", exc)
             return None
-
-    # ----------------------------------------------- Stage 4: FLUX composite
-
-    def _composite_with_flux(
-        self,
-        *,
-        scene_url: str,
-        subject_url: str,
-        mask_url: str,
-        prompt: str,
-        budget: Any = None,
-    ) -> tuple[bytes, str]:
-        """Run FLUX provider fallback chain via self methods (patchable by tests)."""
-        out = self._flux_fill_fal(scene_url, mask_url, prompt)
-        if out:
-            return out, "fal-fill"
-
-        out = self._flux_kontext(scene_url, mask_url, subject_url, prompt)
-        if out:
-            return out, "kontext"
-
-        out = self._flux_fill_replicate(scene_url, mask_url, prompt)
-        if out:
-            return out, "replicate"
-
-        raise RuntimeError("All FLUX providers failed")
 
     # ------------------------------------------------- Stage 4.5: GIMP cleanup
 

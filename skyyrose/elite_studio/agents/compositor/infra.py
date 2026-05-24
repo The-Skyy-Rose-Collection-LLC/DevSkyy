@@ -24,6 +24,8 @@ from typing import Any
 import httpx
 from PIL import Image
 
+from ...budget import BudgetExceededError
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -247,7 +249,7 @@ def _gate_budget(budget: Any, cost_usd: float, label: str) -> None:
     """
     if budget is None:
         if _strict_budget_enabled():
-            raise RuntimeError(
+            raise BudgetExceededError(
                 f"compositor [{label}] called without a budget object and "
                 "ELITE_STUDIO_STRICT_BUDGET is set — refusing to proceed."
             )
