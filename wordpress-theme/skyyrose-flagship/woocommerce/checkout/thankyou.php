@@ -17,6 +17,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 ?>
+<?php
+/* Fire WC's standard pre-content hook so analytics, conversion pixels,
+ * order-tracking plugins and other third-party integrations that rely on
+ * woocommerce_before_thankyou continue to run. */
+if ( $order ) {
+	do_action( 'woocommerce_before_thankyou', $order->get_id() );
+}
+?>
 <section class="sr-thankyou" role="region" aria-labelledby="sr-thankyou-h">
 
 	<?php if ( $order ) : ?>
@@ -81,6 +89,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</div>
 				<?php endif; ?>
 			</dl>
+
+			<?php
+			/* Render itemized order line items — the garment IS the proof of
+			 * purchase on this page. WC's standard order/order-details.php
+			 * template handles permissions (download links, etc.). */
+			wc_get_template(
+				'order/order-details.php',
+				array(
+					'order_id'       => $order->get_id(),
+					'show_downloads' => $order->has_downloadable_item() && $order->is_download_permitted(),
+				)
+			);
+			?>
 
 			<?php do_action( 'woocommerce_thankyou_' . $order->get_payment_method(), $order->get_id() ); ?>
 			<?php do_action( 'woocommerce_thankyou', $order->get_id() ); ?>
