@@ -44,37 +44,8 @@ if ( have_posts() ) {
 	$skyyrose_content_count = $wp_query->found_posts;
 }
 
-// Collection data for empty state (shared with 404.php pattern).
-$skyyrose_collections = array(
-	array(
-		'slug'        => 'black-rose',
-		'label'       => __( 'Black Rose', 'skyyrose' ),
-		'accent'      => '#C0C0C0',
-		'glow'        => 'rgba(192, 192, 192, 0.3)',
-		'description' => __( 'Gothic elegance, dark romance', 'skyyrose' ),
-	),
-	array(
-		'slug'        => 'love-hurts',
-		'label'       => __( 'Love Hurts', 'skyyrose' ),
-		'accent'      => '#DC143C',
-		'glow'        => 'rgba(220, 20, 60, 0.3)',
-		'description' => __( 'Dramatic, passionate, fearless', 'skyyrose' ),
-	),
-	array(
-		'slug'        => 'signature',
-		'label'       => __( 'Signature', 'skyyrose' ),
-		'accent'      => '#D4AF37',
-		'glow'        => 'rgba(212, 175, 55, 0.3)',
-		'description' => __( 'Elevated, confident, refined', 'skyyrose' ),
-	),
-	array(
-		'slug'        => 'kids-capsule',
-		'label'       => __( 'Kids Capsule', 'skyyrose' ),
-		'accent'      => '#FFB6C1',
-		'glow'        => 'rgba(255, 182, 193, 0.3)',
-		'description' => __( 'Joyful luxury, playful sophistication', 'skyyrose' ),
-	),
-);
+// Collection data sourced from inc/collections-config.php (single source of truth).
+$skyyrose_collections = array_values( skyyrose_get_collections_config() );
 ?>
 
 <main id="primary" class="search-results" role="main" tabindex="-1">
@@ -198,7 +169,7 @@ $skyyrose_collections = array(
 										<?php echo esc_html( get_post_type_object( get_post_type() )->labels->singular_name ); ?>
 									</span>
 									<h3 class="search-results__item-title">
-										<?php the_title(); ?>
+										<?php echo esc_html( get_the_title() ); ?>
 									</h3>
 									<?php if ( has_excerpt() || get_the_content() ) : ?>
 										<p class="search-results__item-excerpt">

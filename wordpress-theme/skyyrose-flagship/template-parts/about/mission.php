@@ -19,7 +19,7 @@ $allowed_inline = $args['allowed_inline'] ?? array();
 
 <!-- Mission Banner -->
 <section class="abt-mission" aria-label="<?php esc_attr_e( 'Our Mission', 'skyyrose' ); ?>">
-	<div class="rv">
+	<div>
 		<p class="abt-chapter__label" style="text-align:center;margin-bottom:24px">
 			<?php esc_html_e( 'The Mission', 'skyyrose' ); ?>
 		</p>

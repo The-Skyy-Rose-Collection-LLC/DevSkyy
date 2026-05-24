@@ -152,7 +152,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
 							<?php esc_html_e( 'Shipping Address', 'skyyrose' ); ?>
 						</h2>
 
-						<div class="skyy-checkout__field-group stagger-grid">
+						<div class="skyy-checkout__field-group">
 							<div class="skyy-checkout__field-row">
 								<?php
 								woocommerce_form_field(

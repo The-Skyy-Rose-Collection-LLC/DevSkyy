@@ -178,7 +178,7 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 	<?php endforeach; ?>
 
 	<!-- Scene Title -->
-	<div class="scene-title-overlay rv-clip-up">
+	<div class="scene-title-overlay">
 		<h1 id="scene-title" class="rv-split-line"><?php echo esc_html( $world_name ); ?></h1>
 		<p class="scene-subtitle rv-clip-left"><?php echo esc_html( $collection_name ); ?></p>
 		<?php if ( $tagline ) : ?>
@@ -188,8 +188,8 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 
 	<!-- Explore Full Collection CTA -->
 	<?php if ( $collection_url ) : ?>
-		<div class="immersive-cta stagger-grid">
-			<a href="<?php echo esc_url( $collection_url ); ?>" class="immersive-cta__link btn-sweep">
+		<div class="immersive-cta">
+			<a href="<?php echo esc_url( $collection_url ); ?>" class="immersive-cta__link btn-sweep rv-clip-up">
 				<span class="immersive-cta__text"><?php esc_html_e( 'Explore the Full Collection', 'skyyrose' ); ?></span>
 				<svg class="immersive-cta__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 					<path d="M5 12h14"/>
