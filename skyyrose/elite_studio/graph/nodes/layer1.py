@@ -10,9 +10,6 @@ from __future__ import annotations
 import logging
 import time
 
-from ...agents.color_correction_agent import (
-    ColorCorrectionAgent as ColorCorrectionAgent,  # re-exported via __init__
-)
 from ...agents.compositor_agent import CompositorAgent as CompositorAgent  # re-exported
 from ...agents.generator_agent import GeneratorAgent as GeneratorAgent  # re-exported
 from ...agents.quality_agent import QualityAgent as QualityAgent  # re-exported
@@ -162,7 +159,7 @@ def generator_node(state: EliteStudioState) -> dict:
         budget.spend(actual_cost, stage="generation")
 
     job_id: str | None = state.get("job_id")  # type: ignore[assignment]
-    _record_cost(job_id, "gemini", _GENERATION_TOKENS_ESTIMATE)  # noqa: F821
+    _record_cost(job_id, "gemini", _GENERATION_TOKENS_ESTIMATE)
 
     timings = dict(state.get("stage_timings", {}))
     timings["generation"] = round(elapsed, 2)

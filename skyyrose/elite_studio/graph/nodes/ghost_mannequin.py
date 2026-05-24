@@ -18,10 +18,11 @@ logger = logging.getLogger(__name__)
 def _shim():
     """Return the public ``graph.nodes`` shim module for dynamic attribute lookup.
 
-    Tests patch ``skyyrose.elite_studio.graph.nodes.ThreeDAgent`` /
-    ``_is_collar_garment`` etc.; calling those through ``_shim().X`` ensures
-    the patch resolves at call time. See layer1._shim docstring for the
-    rationale and circular-import-avoidance pattern.
+    Tests patch ``skyyrose.elite_studio.graph.nodes._is_collar_garment``;
+    calling it through ``_shim()._is_collar_garment`` ensures the patch
+    resolves at call time. See layer1._shim docstring for the rationale
+    and circular-import-avoidance pattern. ``ThreeDAgent`` is instantiated
+    directly here (not via _shim) because no test patches it.
     """
     from .. import nodes as _nodes_shim
 
@@ -114,8 +115,8 @@ def three_d_node(state: EliteStudioState) -> dict:
         "generation_result": gen_result,
         "ghost_mannequin_front_path": renders.get("front", ""),
         "ghost_mannequin_back_path": renders.get("back", ""),
-        "3d_model_path": replica_result["glb_path"],
-        "3d_fidelity_score": replica_result["fidelity_score"],
+        "three_d_model_path": replica_result["glb_path"],
+        "three_d_fidelity_score": replica_result["fidelity_score"],
     }
 
 

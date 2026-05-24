@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import time  # noqa: F401 — re-exported for node modules that do `from ._shared import time`
 
 logger = logging.getLogger(__name__)
 
