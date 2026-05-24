@@ -111,12 +111,14 @@
 	   at load so above-fold content never flashes empty for reduced-motion
 	   users, in-app browsers, or slow JS engines.
 	   ══════════════════════════════════════════════════════════════════ */
-	var vh = window.innerHeight || document.documentElement.clientHeight;
-	document.querySelectorAll(revealSelectors).forEach(function (el) {
-		var rect = el.getBoundingClientRect();
-		if (rect.top < vh && rect.bottom > 0) {
-			el.classList.add('is-visible');
-		}
+	rAF(function () {
+		var vh = window.innerHeight || document.documentElement.clientHeight;
+		document.querySelectorAll(revealSelectors).forEach(function (el) {
+			var rect = el.getBoundingClientRect();
+			if (rect.top < vh && rect.bottom > 0) {
+				el.classList.add('is-visible');
+			}
+		});
 	});
 
 	/* ══════════════════════════════════════════════════════════════════

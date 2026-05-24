@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-24T03:37:55",
+  "generated_at": "2026-05-24T07:57:28",
   "repo_root": "/Users/theceo/DevSkyy",
   "freshness_days": 30,
   "files_scanned": 50,
@@ -58,36 +58,41 @@
     {
       "file": ".wolf/anatomy.md",
       "line": 160,
-      "claim": "dossier-check.yml"
+      "claim": "dependabot-weekly-batch.yml"
     },
     {
       "file": ".wolf/anatomy.md",
       "line": 161,
-      "claim": "fly-deploy.yml"
+      "claim": "dossier-check.yml"
     },
     {
       "file": ".wolf/anatomy.md",
       "line": 162,
-      "claim": "pr-agent.yml"
+      "claim": "fly-deploy.yml"
     },
     {
       "file": ".wolf/anatomy.md",
       "line": 163,
+      "claim": "pr-agent.yml"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 164,
       "claim": "security-gate.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 177,
+      "line": 178,
       "claim": "context.xml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 180,
+      "line": 181,
       "claim": "rules.tsv"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 181,
+      "line": 182,
       "claim": "test-dast-local.sh"
     },
     {
@@ -166,6 +171,12 @@
       "age_days": 27
     },
     {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_auth_config.md",
+      "line": 11,
+      "stamp": "2026-05-24",
+      "age_days": 0
+    },
+    {
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_pinecone_setup.md",
       "line": 7,
       "stamp": "2026-05-03",
@@ -173,5 +184,5 @@
     }
   ],
   "documented_missing_count": 23,
-  "verified_count": 2921
+  "verified_count": 2944
 }
