@@ -16,6 +16,14 @@ Usage:
     python scripts/nano-banana-vton.py --sku br-001
     python scripts/nano-banana-vton.py --step all
     python scripts/nano-banana-vton.py --step branding
+
+CATALOG ACCESS RULE (D8, 2026-05-22):
+    The PRODUCT_CATALOG below MUST be built via _load_catalog(), which
+    delegates to skyyrose.core.catalog_loader.read_catalog_rows(). Do NOT
+    re-introduce local stdlib-CSV parsing in this file — that would create a
+    divergent reader the project audit cannot cover. The regression test at
+    tests/integrations/test_catalog_reader_consolidation.py fails the build
+    if local CSV parsing reappears here.
 """
 
 import argparse
