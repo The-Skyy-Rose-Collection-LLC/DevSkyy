@@ -1,0 +1,68 @@
+name: Dependabot Weekly Batch
+
+# Runs every Monday at 14:00 UTC. Triages open Dependabot alerts into a
+# weekly batch (criticals get individual @dependabot rebase comments,
+# high+moderate get a single tracking issue/PR with a checklist). Closes
+# claude-mem archive Pattern #4 (vulnerability count growing monotonically
+# 326 → 432 over 7 days with no automated triage).
+#
+# Manual trigger via workflow_dispatch supports dry-run mode for verification.
+
+on:
+  schedule:
+    - cron: '0 14 * * 1'   # Mondays 14:00 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Print plan without creating PRs or comments'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  security-events: read
+
+concurrency:
+  group: dependabot-weekly-batch
+  cancel-in-progress: false
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: |
+          if ! command -v jq >/dev/null; then
+            sudo apt-get update -y && sudo apt-get install -y jq
+          fi
+          jq --version
+
+      - name: Run batch routine
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Differentiate by event_name: schedule = real execute, workflow_dispatch
+        # defaults to dry-run unless explicitly overridden. The previous
+        # `inputs.dry_run || 'true'` ALWAYS evaluated to 'true' on schedule
+        # events because github.event.inputs is null on cron — making the
+        # entire automation inert (CR finding 2026-05-22 CRITICAL).
+        run: |
+          if [[ "${{ github.event_name }}" == "schedule" ]]; then
+            echo "[workflow] scheduled run — executing"
+            bash scripts/dependabot-batch-pr.sh --execute
+          elif [[ "${{ inputs.dry_run }}" == "false" ]]; then
+            echo "[workflow] manual dispatch — executing (dry_run=false)"
+            bash scripts/dependabot-batch-pr.sh --execute
+          else
+            echo "[workflow] manual dispatch — dry-run"
+            bash scripts/dependabot-batch-pr.sh --dry-run
+          fi
