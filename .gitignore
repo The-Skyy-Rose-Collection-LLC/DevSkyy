@@ -419,3 +419,4 @@ agents/render_pipeline/output/
 data/agent-learning/
 data/vision-consensus/
 tasks/render-pipeline-cli-*.json
+ci-local-output/

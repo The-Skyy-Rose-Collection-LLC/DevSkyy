@@ -6,7 +6,8 @@
 .PHONY: install dev bootstrap lint format test clean help \
         ts-build ts-lint ts-test ts-type-check \
         test-all lint-all format-all \
-        demo security docker-build docker-run
+        demo security docker-build docker-run \
+        ci-local
 
 # Python
 PYTHON := python3
@@ -26,6 +27,11 @@ help:
 	@echo "    make bootstrap    One-command setup: Python + frontend + .env (idempotent)"
 	@echo "    make install      Install Python production dependencies"
 	@echo "    make dev          Install Python + TypeScript dev dependencies"
+	@echo ""
+	@echo "  LOCAL CI SANDBOX"
+	@echo "  -----------------"
+	@echo "    make ci-local              Run all 6 CI jobs locally (mirrors ci.yml)"
+	@echo "    make ci-local JOB=lint     Run a single job (lint|python|security|frontend|threejs|wordpress)"
 	@echo ""
 	@echo "  PYTHON COMMANDS"
 	@echo "  ----------------"
@@ -79,6 +85,18 @@ dev:
 # Does NOT touch production, does NOT call paid APIs.
 bootstrap:
 	@bash scripts/bootstrap.sh
+
+# Local CI sandbox — mirrors the 6 parallel gating jobs from .github/workflows/ci.yml.
+# Use this while GitHub Actions runners are unavailable (billing-locked, offline, etc).
+# Run all jobs: `make ci-local`
+# Single job:   `make ci-local JOB=lint`  (or python|security|frontend|threejs|wordpress)
+# See docs/CI_LOCAL.md for details. Per-job logs land in ci-local-output/.
+ci-local:
+	@if [ -n "$(JOB)" ]; then \
+		bash scripts/ci-local.sh --only "$(JOB)"; \
+	else \
+		bash scripts/ci-local.sh; \
+	fi
 
 # ============================================================================
 # PYTHON COMMANDS
