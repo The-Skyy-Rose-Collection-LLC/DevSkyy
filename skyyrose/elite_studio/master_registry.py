@@ -8,7 +8,10 @@ renders (compositor scene variants, marketing derivatives) MUST derive from a ma
 from a generated variant. This module enforces that by hash-pinning.
 
 Masters live at `assets/product-masters/` at the repo root; the manifest is
-`assets/product-masters/manifest.json`. Override the manifest location via the
+`assets/product-masters/manifest.json`. The manifest was retired on 2026-04-19
+during the CSV-as-SoT migration — `Manifest.load()` now returns an empty
+manifest when the file is absent, so this module imports and runs cleanly
+without the legacy artifacts. Override the manifest location via the
 `SKYYROSE_MASTER_MANIFEST_PATH` environment variable (used by tests).
 
 Master sources (`master_source` field):

@@ -7,10 +7,12 @@ agents for consistency checks, recovery prompts, and LLM context — not for
 rendering (that happens in PHP/WordPress).
 
 **This module is a thin adapter.** Authoritative data lives in:
-  - `assets/brand/brand.yaml`            (via skyyrose.elite_studio.brand)
-  - `assets/product-masters/catalog.yaml` (via skyyrose.elite_studio.catalog)
+  - `assets/brand/brand.yaml`                                       (via skyyrose.elite_studio.brand)
+  - `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv`   (via skyyrose.elite_studio.catalog
+                                                                     → skyyrose.core.catalog_loader)
 
-Do not hardcode collection metadata here. Edit the YAML SoTs instead.
+Do not hardcode collection metadata here. Edit brand.yaml or the catalog CSV.
+The legacy `assets/product-masters/catalog.yaml` was retired on 2026-04-19.
 """
 
 from __future__ import annotations

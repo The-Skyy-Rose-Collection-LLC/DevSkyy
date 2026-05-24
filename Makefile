@@ -3,7 +3,7 @@
 # Unified development commands for Python + TypeScript
 # SkyyRose - Luxury Grows from Concrete.
 
-.PHONY: install dev lint format test clean help \
+.PHONY: install dev bootstrap lint format test clean help \
         ts-build ts-lint ts-test ts-type-check \
         test-all lint-all format-all \
         demo security docker-build docker-run
@@ -23,6 +23,7 @@ help:
 	@echo ""
 	@echo "  INSTALLATION"
 	@echo "  -------------"
+	@echo "    make bootstrap    One-command setup: Python + frontend + .env (idempotent)"
 	@echo "    make install      Install Python production dependencies"
 	@echo "    make dev          Install Python + TypeScript dev dependencies"
 	@echo ""
@@ -72,6 +73,12 @@ install:
 dev:
 	$(PIP) install -e ".[dev]"
 	$(NPM) install
+
+# One-command setup for a fresh clone. Idempotent — safe to re-run.
+# Installs Python (editable + dev), frontend npm deps, creates .env from .env.example.
+# Does NOT touch production, does NOT call paid APIs.
+bootstrap:
+	@bash scripts/bootstrap.sh
 
 # ============================================================================
 # PYTHON COMMANDS
