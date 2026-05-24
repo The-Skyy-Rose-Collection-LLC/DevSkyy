@@ -87,7 +87,7 @@ class Reflector:
         remediation: str | None = None
 
         if not outcome.success and outcome.error:
-            failure_cat = _classify_failure(outcome.error)
+            failure_cat = classify_failure(outcome.error)
             remediation = _REMEDIATION[failure_cat]
 
         quality = _compute_quality(outcome, trace)
@@ -102,7 +102,7 @@ class Reflector:
         )
 
 
-def _classify_failure(error: str) -> FailureCategory:
+def classify_failure(error: str) -> FailureCategory:
     lower = error.lower()
     for category, signals in _CATEGORY_SIGNALS:
         if any(sig in lower for sig in signals):
