@@ -174,10 +174,10 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 
 		<?php if ( $sizes_raw ) : ?>
 			<p class="sr-ed__sizes-label" id="sr-ed-sizes-label"><?php esc_html_e( 'Select Size', 'skyyrose' ); ?></p>
-			<div class="sr-ed__sizes" role="radiogroup" aria-labelledby="sr-ed-sizes-label">
+			<div class="sr-ed__sizes" role="group" aria-labelledby="sr-ed-sizes-label">
 				<?php foreach ( explode( '|', $sizes_raw ) as $size ) : ?>
 					<?php $size_clean = trim( $size ); ?>
-						<button type="button" class="sr-ed__size" role="radio" aria-checked="false" data-size="<?php echo esc_attr( $size_clean ); ?>"><?php echo esc_html( $size_clean ); ?></button>
+						<button type="button" class="sr-ed__size" aria-pressed="false" data-size="<?php echo esc_attr( $size_clean ); ?>"><?php echo esc_html( $size_clean ); ?></button>
 				<?php endforeach; ?>
 			</div>
 		<?php endif; ?>

@@ -62,12 +62,23 @@
        ════════════════════════════════════════ */
     var sizeChips = document.querySelectorAll('.sr-ed__sizes .sr-ed__size');
     if (sizeChips.length) {
+        function getSizeSelect() {
+            return document.querySelector('.variations_form select[name="attribute_pa_size"]')
+                || document.querySelector('.variations_form select[name="attribute_size"]');
+        }
+        function syncChipsToSelectValue(value) {
+            var current = (value || '').toLowerCase();
+            sizeChips.forEach(function(c) {
+                var isMatch = current && c.dataset.size && c.dataset.size.toLowerCase() === current;
+                c.classList.toggle('is-selected', isMatch);
+                c.setAttribute('aria-pressed', isMatch ? 'true' : 'false');
+            });
+        }
         sizeChips.forEach(function(chip) {
             chip.addEventListener('click', function() {
                 var size = chip.dataset.size;
                 if (!size) return;
-                var sizeSelect = document.querySelector('.variations_form select[name="attribute_pa_size"]')
-                    || document.querySelector('.variations_form select[name="attribute_size"]');
+                var sizeSelect = getSizeSelect();
                 if (sizeSelect) {
                     var matched = false;
                     Array.prototype.forEach.call(sizeSelect.options, function(opt) {
@@ -80,27 +91,21 @@
                         $(sizeSelect).trigger('change');
                     }
                 }
-                sizeChips.forEach(function(c) {
-                    c.classList.remove('is-selected');
-                    c.setAttribute('aria-checked', 'false');
-                });
-                chip.classList.add('is-selected');
-                chip.setAttribute('aria-checked', 'true');
+                syncChipsToSelectValue(size);
             });
         });
         // Mirror WC variation form state back to chips when the form changes
         // (covers variation-image URL deep-links and reset).
         $(document).on('woocommerce_variation_has_changed', '.variations_form', function() {
-            var sizeSelect = document.querySelector('.variations_form select[name="attribute_pa_size"]')
-                || document.querySelector('.variations_form select[name="attribute_size"]');
-            if (!sizeSelect || !sizeSelect.value) return;
-            var current = sizeSelect.value.toLowerCase();
-            sizeChips.forEach(function(c) {
-                var isMatch = c.dataset.size && c.dataset.size.toLowerCase() === current;
-                c.classList.toggle('is-selected', isMatch);
-                c.setAttribute('aria-checked', isMatch ? 'true' : 'false');
-            });
+            var sizeSelect = getSizeSelect();
+            if (sizeSelect) syncChipsToSelectValue(sizeSelect.value);
         });
+        // Initial sync — WC may set the select via URL query string or
+        // persisted variation choice before this handler binds.
+        var initialSelect = getSizeSelect();
+        if (initialSelect && initialSelect.value) {
+            syncChipsToSelectValue(initialSelect.value);
+        }
     }
 
     /* ════════════════════════════════════════
