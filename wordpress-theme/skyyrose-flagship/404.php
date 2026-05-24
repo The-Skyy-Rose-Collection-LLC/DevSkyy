@@ -131,18 +131,18 @@ if ( empty( $skyyrose_trending_products ) ) {
 		<!-- ============================
 			404 Display Number
 			============================ -->
-		<h1 class="error-404-number" aria-label="<?php esc_attr_e( 'Error 404', 'skyyrose' ); ?>">
+		<h1 class="error-404-number rv-clip-up" aria-label="<?php esc_attr_e( 'Error 404', 'skyyrose' ); ?>">
 			404
 		</h1>
 
 		<!-- ============================
 			Enhanced Message
 			============================ -->
-		<h2 class="error-404-title">
+		<h2 class="error-404-title rv-clip-left">
 			<?php esc_html_e( 'Lost in Style', 'skyyrose' ); ?>
 		</h2>
 
-		<p class="error-404-subtitle">
+		<p class="error-404-subtitle rv-blur">
 			<?php esc_html_e( 'The page you\'re looking for has wandered off the runway', 'skyyrose' ); ?>
 		</p>
 
@@ -375,11 +375,11 @@ if ( empty( $skyyrose_trending_products ) ) {
 		<!-- ============================
 			Dual CTA Buttons
 			============================ -->
-		<div class="error-404-cta-group">
-			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="error-404-cta error-404-cta--primary">
+		<div class="error-404-cta-group stagger-grid">
+			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="error-404-cta error-404-cta--primary magnetic btn-sweep">
 				<?php esc_html_e( 'Return Home', 'skyyrose' ); ?>
 			</a>
-			<a href="<?php echo esc_url( home_url( '/shop/' ) ); ?>" class="error-404-cta error-404-cta--secondary">
+			<a href="<?php echo esc_url( home_url( '/shop/' ) ); ?>" class="error-404-cta error-404-cta--secondary magnetic btn-border-draw">
 				<?php esc_html_e( 'Continue Shopping', 'skyyrose' ); ?>
 			</a>
 		</div>

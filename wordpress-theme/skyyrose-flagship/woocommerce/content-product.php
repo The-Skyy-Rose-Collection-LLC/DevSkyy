@@ -21,7 +21,7 @@ if ( ! is_a( $product, WC_Product::class ) || ! $product->is_visible() ) {
 }
 ?>
 
-<li <?php wc_product_class( '', $product ); ?>>
+<li <?php wc_product_class( 'rv-clip-up', $product ); ?>>
 	<?php
 	get_template_part(
 		'template-parts/product-card-holo',

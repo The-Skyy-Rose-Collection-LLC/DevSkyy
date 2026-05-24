@@ -56,12 +56,12 @@ foreach ( $catalog as $product ) {
 
 <section class="abt-collections" id="collections">
 	<div class="abt-chapter__container">
-		<div class="abt-chapter__head rv">
+		<div class="abt-chapter__head rv rv-clip-up">
 			<span class="abt-chapter__num" aria-hidden="true"><?php esc_html_e( 'CH. 02', 'skyyrose' ); ?></span>
 			<span class="abt-chapter__rule" aria-hidden="true"></span>
 			<span class="abt-chapter__label"><?php esc_html_e( 'The Collections', 'skyyrose' ); ?></span>
 		</div>
-		<h2 class="abt-chapter__title rv rv-d1">
+		<h2 class="abt-chapter__title rv rv-clip-up rv-d1">
 			<?php
 			echo wp_kses(
 				__( 'Four Worlds.<br>One Bloodline.', 'skyyrose' ),
@@ -75,7 +75,7 @@ foreach ( $catalog as $product ) {
 		</h2>
 	</div>
 
-	<ol class="abt-coll-list" role="list">
+	<ol class="abt-coll-list stagger-grid" role="list">
 		<?php
 		$i = 0;
 		foreach ( $collection_data as $slug => $data ) :
@@ -83,7 +83,7 @@ foreach ( $catalog as $product ) {
 			$index   = str_pad( (string) $i, 2, '0', STR_PAD_LEFT );
 			$img_url = ! empty( $data['img'] ) ? $data['img'] : get_theme_file_uri( 'assets/images/placeholder-product.jpg' );
 			?>
-			<li class="abt-coll-row rv" data-collection="<?php echo esc_attr( $slug ); ?>" role="listitem">
+			<li class="abt-coll-row" data-collection="<?php echo esc_attr( $slug ); ?>" role="listitem">
 				<a href="<?php echo esc_url( home_url( $data['link'] ) ); ?>" class="abt-coll-row__link">
 					<span class="abt-coll-row__index" aria-hidden="true"><?php echo esc_html( $index ); ?></span>
 					<figure class="abt-coll-row__media">

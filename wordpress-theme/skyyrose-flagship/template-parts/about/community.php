@@ -35,12 +35,12 @@ $customer_photos  = $args['customer_photos'] ?? array();
 			<span class="abt-community__label"><?php esc_html_e( 'The Town', 'skyyrose' ); ?></span>
 			<span class="abt-community__rule" aria-hidden="true"></span>
 		</div>
-		<h2 class="abt-community__heading rv rv-d1">
+		<h2 class="abt-community__heading rv rv-clip-up rv-d1">
 			<?php esc_html_e( 'Oakland', 'skyyrose' ); ?>
 		</h2>
 
 		<?php if ( ! empty( $manifesto_places ) ) : ?>
-			<p class="abt-community__manifesto rv rv-d2" aria-label="<?php esc_attr_e( 'Oakland places', 'skyyrose' ); ?>">
+			<p class="abt-community__manifesto rv rv-split-line rv-d2" aria-label="<?php esc_attr_e( 'Oakland places', 'skyyrose' ); ?>">
 				<?php
 				$last = count( $manifesto_places ) - 1;
 				foreach ( $manifesto_places as $i => $place ) {
@@ -54,7 +54,7 @@ $customer_photos  = $args['customer_photos'] ?? array();
 		<?php endif; ?>
 
 		<?php if ( ! empty( $frame_text ) ) : ?>
-			<p class="abt-community__frame rv rv-d3">
+			<p class="abt-community__frame rv rv-blur rv-d3">
 				<?php echo wp_kses( $frame_text, $allowed_inline ); ?>
 			</p>
 		<?php endif; ?>

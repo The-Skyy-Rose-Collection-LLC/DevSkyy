@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-24T14:56:07.587Z
-> Files: 2785 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-24T14:57:54.373Z
+> Files: 2786 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -3580,6 +3580,7 @@
 - `CLAUDE.md` (~11 tok)
 - `DEPENDABOT-CRITICAL-2026-05-13.md` — Dependabot Critical Triage — 2026-05-13 (~1036 tok)
 - `dossier-audit-report.md` — Dossier Coverage Audit (~1098 tok)
+- `elite-studio-audit-2026-05-22.md` — Elite Studio Imagery Pipeline — Audit Report (~2340 tok)
 - `golden-coverage-report.md` — Golden Reference Coverage Audit (~954 tok)
 - `handoff-centroid-gate-2026-05-03.md` — Handoff — brand-centroid embedding gate (~2677 tok)
 - `HANDOFF-elite-studio-hardening-2026-05-11.md` — Handoff — Elite Studio Pipeline Hardening (2026-05-11) (~3024 tok)

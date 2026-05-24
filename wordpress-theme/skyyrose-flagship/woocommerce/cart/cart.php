@@ -37,14 +37,14 @@ do_action( 'woocommerce_before_cart' );
 					<circle cx="37" cy="58" r="3" stroke="currentColor" stroke-width="2"/>
 					<circle cx="53" cy="58" r="3" stroke="currentColor" stroke-width="2"/>
 				</svg>
-				<h1 class="skyy-cart__empty-title">
+				<h1 class="skyy-cart__empty-title rv-clip-up">
 					<?php esc_html_e( 'Your Cart is Empty', 'skyyrose' ); ?>
 				</h1>
-				<p class="skyy-cart__empty-text">
+				<p class="skyy-cart__empty-text rv-blur">
 					<?php esc_html_e( 'Explore our collections and find pieces that speak to you.', 'skyyrose' ); ?>
 				</p>
 				<a href="<?php echo esc_url( apply_filters( 'woocommerce_return_to_shop_redirect', wc_get_page_permalink( 'shop' ) ) ); ?>"
-					class="skyy-cart__empty-cta">
+					class="skyy-cart__empty-cta magnetic btn-sweep">
 					<?php esc_html_e( 'Explore Collections', 'skyyrose' ); ?>
 				</a>
 			</div>
@@ -53,7 +53,7 @@ do_action( 'woocommerce_before_cart' );
 	<?php else : ?>
 
 		<div class="skyy-cart__header">
-			<h1 class="skyy-cart__title">
+			<h1 class="skyy-cart__title rv-clip-up">
 				<?php esc_html_e( 'Shopping Cart', 'skyyrose' ); ?>
 			</h1>
 			<span class="skyy-cart__count">
@@ -75,7 +75,7 @@ do_action( 'woocommerce_before_cart' );
 		$skyy_progress   = $skyy_threshold > 0 ? min( 100, ( $skyy_cart_total / $skyy_threshold ) * 100 ) : 100;
 		$skyy_qualified  = $skyy_remaining <= 0;
 		?>
-		<div class="skyy-cart__shipping-bar" role="progressbar"
+		<div class="skyy-cart__shipping-bar rv-blur" role="progressbar"
 			aria-valuenow="<?php echo esc_attr( round( $skyy_progress ) ); ?>"
 			aria-valuemin="0" aria-valuemax="100"
 			aria-label="<?php esc_attr_e( 'Free shipping progress', 'skyyrose' ); ?>">
@@ -109,7 +109,7 @@ do_action( 'woocommerce_before_cart' );
 					do_action( 'woocommerce_before_cart_table' );
 					?>
 
-					<div class="skyy-cart__items-list" data-skyy-cart-items>
+					<div class="skyy-cart__items-list stagger-grid" data-skyy-cart-items>
 						<?php do_action( 'woocommerce_before_cart_contents' ); ?>
 
 						<?php
@@ -422,7 +422,7 @@ do_action( 'woocommerce_before_cart' );
 			<?php endif; ?>
 
 			<!-- ORDER SUMMARY SIDEBAR (Sticky, 400px) -->
-			<aside class="skyy-cart__summary" data-skyy-cart-summary>
+			<aside class="skyy-cart__summary rv-clip-right" data-skyy-cart-summary>
 				<div class="skyy-cart__summary-inner">
 					<h2 class="skyy-cart__summary-title">
 						<?php esc_html_e( 'Order Summary', 'skyyrose' ); ?>

@@ -105,6 +105,21 @@
 	document.querySelectorAll('.rv-split-line').forEach(splitLines);
 
 	/* ══════════════════════════════════════════════════════════════════
+	   1.5 ABOVE-FOLD IMMEDIATE REVEAL (S650 fix, 2026-05-24)
+	   IO fires after first paint; elements already in viewport stay at
+	   opacity:0 briefly. Force-show anything intersecting the viewport
+	   at load so above-fold content never flashes empty for reduced-motion
+	   users, in-app browsers, or slow JS engines.
+	   ══════════════════════════════════════════════════════════════════ */
+	var vh = window.innerHeight || document.documentElement.clientHeight;
+	document.querySelectorAll(revealSelectors).forEach(function (el) {
+		var rect = el.getBoundingClientRect();
+		if (rect.top < vh && rect.bottom > 0) {
+			el.classList.add('is-visible');
+		}
+	});
+
+	/* ══════════════════════════════════════════════════════════════════
 	   2. SCROLL REVEALS
 	   Single observer for the entire theme. Subsumes the per-page observers
 	   that previously lived in landing-pages.js and about.js (retired in U-1).

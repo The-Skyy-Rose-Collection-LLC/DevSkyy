@@ -107,7 +107,7 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 	</div>
 
 	<!-- Room Indicators -->
-	<div class="room-indicators" role="group" aria-label="<?php esc_attr_e( 'Room selector', 'skyyrose' ); ?>">
+	<div class="room-indicators stagger-grid" role="group" aria-label="<?php esc_attr_e( 'Room selector', 'skyyrose' ); ?>">
 		<?php foreach ( $rooms as $index => $room ) : ?>
 			<button
 				class="room-dot<?php echo 0 === $index ? ' active' : ''; ?>"
@@ -129,7 +129,7 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 			></button>
 		<?php endforeach; ?>
 	</div>
-	<div class="room-name" aria-live="polite" aria-atomic="true"><?php echo esc_html( $first_room_name ); ?></div>
+	<div class="room-name rv-blur-down" aria-live="polite" aria-atomic="true"><?php echo esc_html( $first_room_name ); ?></div>
 
 	<!-- Hotspot Containers — One per room -->
 	<?php foreach ( $rooms as $room_index => $room ) : ?>
@@ -178,18 +178,18 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 	<?php endforeach; ?>
 
 	<!-- Scene Title -->
-	<div class="scene-title-overlay">
-		<h1 id="scene-title"><?php echo esc_html( $world_name ); ?></h1>
-		<p class="scene-subtitle"><?php echo esc_html( $collection_name ); ?></p>
+	<div class="scene-title-overlay rv-clip-up">
+		<h1 id="scene-title" class="rv-split-line"><?php echo esc_html( $world_name ); ?></h1>
+		<p class="scene-subtitle rv-clip-left"><?php echo esc_html( $collection_name ); ?></p>
 		<?php if ( $tagline ) : ?>
-			<p class="scene-tagline"><?php echo esc_html( $tagline ); ?></p>
+			<p class="scene-tagline rv-blur"><?php echo esc_html( $tagline ); ?></p>
 		<?php endif; ?>
 	</div>
 
 	<!-- Explore Full Collection CTA -->
 	<?php if ( $collection_url ) : ?>
-		<div class="immersive-cta">
-			<a href="<?php echo esc_url( $collection_url ); ?>" class="immersive-cta__link">
+		<div class="immersive-cta stagger-grid">
+			<a href="<?php echo esc_url( $collection_url ); ?>" class="immersive-cta__link btn-sweep">
 				<span class="immersive-cta__text"><?php esc_html_e( 'Explore the Full Collection', 'skyyrose' ); ?></span>
 				<svg class="immersive-cta__arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 					<path d="M5 12h14"/>

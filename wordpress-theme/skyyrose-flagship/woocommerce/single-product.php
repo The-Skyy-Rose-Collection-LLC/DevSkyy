@@ -59,7 +59,7 @@ while ( have_posts() ) :
 				<div class="sr-container sr-hero-grid">
 
 					<!-- Gallery Column -->
-					<div class="sr-gallery">
+					<div class="sr-gallery rv-clip-left">
 						<div class="sr-gallery-main">
 							<?php
 							$hero_img = $techflat_url ? $techflat_url : $main_image;
@@ -91,7 +91,7 @@ while ( have_posts() ) :
 					</div>
 
 					<!-- Info Column -->
-					<div class="sr-info">
+					<div class="sr-info rv-clip-right">
 						<div class="sr-info-inner">
 							<p class="sr-info-collection"><?php echo esc_html( $config['label'] ); ?> COLLECTION</p>
 							<h1 class="sr-info-name"><?php the_title(); ?></h1>
@@ -114,7 +114,7 @@ while ( have_posts() ) :
 								<?php endif; ?>
 							</div>
 
-							<div class="sr-atc-wrap">
+							<div class="sr-atc-wrap magnetic btn-sweep">
 								<?php woocommerce_template_single_add_to_cart(); ?>
 							</div>
 

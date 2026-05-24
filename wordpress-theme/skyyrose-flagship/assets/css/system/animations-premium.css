@@ -380,13 +380,15 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   12.5 SAFETY NET — Force-show reveal elements after 2.5s
+   12.5 SAFETY NET — Force-show reveal elements after 0.8s
    IntersectionObserver can miss elements that scroll past fast, are
    inside transformed parents, or appear after a layout shift. This
-   safety animation snaps the final state at 2.5s so content stays
+   safety animation snaps the final state at 0.8s so content stays
    legible even when the observer doesn't fire. If `.is-visible`
    activates first, the existing transition handles the entrance
    normally — this animation only matters as a fallback.
+   Was 2.5s — reduced 2026-05-24 (S650) to close the stutter window
+   for reduced-motion users, in-app browsers, and slow JS engines.
    ═══════════════════════════════════════════════════════════════════ */
 @keyframes srRevealSafety {
 	to {
@@ -400,12 +402,12 @@
 .rv-blur, .rv-blur-down,
 .stagger-grid > *,
 .col-reveal, .lp-rv {
-	animation: srRevealSafety 0.01s linear 2.5s forwards;
+	animation: srRevealSafety 0.01s linear 0.8s forwards;
 }
 .rv-split-char .sr-char,
 .rv-split-word .sr-word,
 .rv-split-line .sr-line {
-	animation: srRevealSafety 0.01s linear 2.5s forwards;
+	animation: srRevealSafety 0.01s linear 0.8s forwards;
 }
 /* Cancel safety net once IO confirms visibility — prevents 2.5s stutter
    when observer fires near the safety timeout (animation snap vs.

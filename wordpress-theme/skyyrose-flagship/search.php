@@ -83,7 +83,7 @@ $skyyrose_collections = array(
 		Header + Re-Search Form
 		============================ -->
 	<header class="search-results__header">
-		<h1 class="search-results__title">
+		<h1 class="search-results__title rv-clip-up">
 			<?php if ( ! empty( $skyyrose_search_query ) ) : ?>
 				<?php esc_html_e( 'Results for', 'skyyrose' ); ?>
 				<span class="search-results__query"><?php echo esc_html( $skyyrose_search_query ); ?></span>
@@ -93,7 +93,7 @@ $skyyrose_collections = array(
 		</h1>
 
 		<?php if ( ! empty( $skyyrose_search_query ) ) : ?>
-			<p class="search-results__count">
+			<p class="search-results__count rv-blur">
 				<?php
 				$skyyrose_total = $skyyrose_product_count + $skyyrose_content_count;
 				printf(
@@ -149,7 +149,7 @@ $skyyrose_collections = array(
 				</h2>
 
 				<div class="product-grid">
-					<div class="product-grid__items">
+					<div class="product-grid__items stagger-grid">
 						<?php
 						$skyyrose_index = 0;
 						while ( $skyyrose_product_results->have_posts() ) :
@@ -243,11 +243,11 @@ $skyyrose_collections = array(
 				</svg>
 			</div>
 
-			<h2 class="search-results__empty-title">
+			<h2 class="search-results__empty-title rv-clip-up">
 				<?php esc_html_e( 'No Results Found', 'skyyrose' ); ?>
 			</h2>
 
-			<p class="search-results__empty-subtitle">
+			<p class="search-results__empty-subtitle rv-blur">
 				<?php
 				if ( ! empty( $skyyrose_search_query ) ) {
 					printf(
@@ -335,7 +335,7 @@ $skyyrose_collections = array(
 			</nav>
 
 			<!-- CTA Buttons -->
-			<div class="search-results__cta-group">
+			<div class="search-results__cta-group stagger-grid">
 				<a href="<?php echo esc_url( home_url( '/shop/' ) ); ?>" class="search-results__cta search-results__cta--primary">
 					<?php esc_html_e( 'Browse All Products', 'skyyrose' ); ?>
 				</a>

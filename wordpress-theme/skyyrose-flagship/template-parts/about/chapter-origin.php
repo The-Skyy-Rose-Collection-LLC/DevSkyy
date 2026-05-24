@@ -35,17 +35,17 @@ $paras_btm = array_slice( $origin_paragraphs, $break_at );
 <!-- Chapter I — The Rebrand -->
 <section class="abt-chapter abt-chapter--origin" id="origin" aria-label="<?php esc_attr_e( 'The Rebrand Story', 'skyyrose' ); ?>">
 	<div class="abt-chapter__container">
-		<div class="abt-chapter__head rv">
+		<div class="abt-chapter__head rv rv-clip-up">
 			<span class="abt-chapter__num" aria-hidden="true"><?php esc_html_e( 'CH. 01', 'skyyrose' ); ?></span>
 			<span class="abt-chapter__rule" aria-hidden="true"></span>
 			<span class="abt-chapter__label"><?php esc_html_e( 'The Origin', 'skyyrose' ); ?></span>
 		</div>
-		<h2 class="abt-chapter__title rv rv-d1">
+		<h2 class="abt-chapter__title rv rv-clip-up rv-d1">
 			<?php echo wp_kses( __( 'The Birth<br>of the Rebrand', 'skyyrose' ), $allowed_inline ); ?>
 		</h2>
 
 		<?php if ( ! empty( $paras_top ) ) : ?>
-			<div class="abt-prose abt-prose--dropcap rv rv-d2">
+			<div class="abt-prose abt-prose--dropcap rv rv-blur rv-d2">
 				<?php foreach ( $paras_top as $para ) : ?>
 					<p><?php echo wp_kses( $para, $allowed_inline ); ?></p>
 				<?php endforeach; ?>
@@ -54,7 +54,7 @@ $paras_btm = array_slice( $origin_paragraphs, $break_at );
 	</div>
 
 	<?php if ( ! empty( $origin_quote ) ) : ?>
-		<aside class="abt-pull rv" aria-label="<?php esc_attr_e( 'Pull quote', 'skyyrose' ); ?>">
+		<aside class="abt-pull rv rv-clip-left" aria-label="<?php esc_attr_e( 'Pull quote', 'skyyrose' ); ?>">
 			<div class="abt-pull__rule" aria-hidden="true"></div>
 			<blockquote class="abt-pull__text">
 				<?php echo wp_kses( $origin_quote, $allowed_inline ); ?>
@@ -68,7 +68,7 @@ $paras_btm = array_slice( $origin_paragraphs, $break_at );
 
 	<?php if ( ! empty( $paras_btm ) ) : ?>
 		<div class="abt-chapter__container">
-			<div class="abt-prose rv rv-d2">
+			<div class="abt-prose rv rv-blur rv-d2">
 				<?php foreach ( $paras_btm as $para ) : ?>
 					<p><?php echo wp_kses( $para, $allowed_inline ); ?></p>
 				<?php endforeach; ?>

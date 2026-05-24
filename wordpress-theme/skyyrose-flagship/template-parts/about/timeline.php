@@ -31,14 +31,14 @@ $timeline_milestones = $args['timeline_milestones'] ?? array();
 			<span class="abt-chapter__rule" aria-hidden="true"></span>
 			<span class="abt-chapter__label"><?php esc_html_e( 'The Journey', 'skyyrose' ); ?></span>
 		</div>
-		<h2 class="abt-chapter__title rv rv-d1">
+		<h2 class="abt-chapter__title rv rv-clip-up rv-d1">
 			<?php esc_html_e( 'Drop Calendar', 'skyyrose' ); ?>
 		</h2>
 	</div>
 
-	<ol class="abt-tl" role="list">
+	<ol class="abt-tl stagger-grid" role="list">
 		<?php foreach ( $timeline_milestones as $i => $ms ) : ?>
-			<li class="abt-tl__row rv <?php echo ( $i % 2 ) ? 'abt-tl__row--right' : 'abt-tl__row--left'; ?>">
+			<li class="abt-tl__row <?php echo ( $i % 2 ) ? 'abt-tl__row--right' : 'abt-tl__row--left'; ?>">
 				<div class="abt-tl__year" aria-hidden="true">
 					<?php echo wp_kses( $ms['year'], $allowed_inline ); ?>
 				</div>

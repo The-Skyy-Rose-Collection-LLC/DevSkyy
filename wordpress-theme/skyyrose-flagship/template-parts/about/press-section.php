@@ -37,7 +37,7 @@ $svg_kses         = function_exists( 'skyyrose_svg_kses' ) ? skyyrose_svg_kses()
 			<span class="abt-chapter__rule" aria-hidden="true"></span>
 			<span class="abt-chapter__label"><?php esc_html_e( 'Press', 'skyyrose' ); ?></span>
 		</div>
-		<h2 class="abt-chapter__title rv rv-d1">
+		<h2 class="abt-chapter__title rv rv-clip-up rv-d1">
 			<?php esc_html_e( 'As Seen In', 'skyyrose' ); ?>
 		</h2>
 
@@ -74,9 +74,9 @@ $svg_kses         = function_exists( 'skyyrose_svg_kses' ) ? skyyrose_svg_kses()
 		<?php endif; ?>
 	</div>
 
-	<div class="abt-press__paper">
+	<div class="abt-press__paper stagger-grid">
 		<?php foreach ( $press_features as $pi => $pf ) : ?>
-			<article class="abt-press__col rv">
+			<article class="abt-press__col">
 				<header class="abt-press__col-head">
 					<p class="abt-press__col-src"><?php echo esc_html( $pf['src'] ); ?></p>
 					<p class="abt-press__col-date">
