@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-21T22:46:24",
+  "generated_at": "2026-05-24T03:37:55",
   "repo_root": "/Users/theceo/DevSkyy",
   "freshness_days": 30,
-  "files_scanned": 46,
-  "indexed_basenames": 14991,
+  "files_scanned": 50,
+  "indexed_basenames": 15409,
   "missing_paths": [
     {
       "file": ".wolf/anatomy.md",
@@ -126,6 +126,26 @@
       "claim": "post-read.js"
     },
     {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_gsd_pin.md",
+      "line": 12,
+      "claim": "gsd-integration-checker.md"
+    },
+    {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_gsd_pin.md",
+      "line": 12,
+      "claim": "gsd-nyquist-auditor.md"
+    },
+    {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_gsd_pin.md",
+      "line": 12,
+      "claim": "gsd-research-synthesizer.md"
+    },
+    {
+      "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_gsd_pin.md",
+      "line": 12,
+      "claim": "backup-meta.json"
+    },
+    {
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_render_pipeline.md",
       "line": 19,
       "claim": "fal-ai/flux-pro/kontext"
@@ -143,15 +163,15 @@
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/immersive-worlds.md",
       "line": 11,
       "stamp": "2026-04-27",
-      "age_days": 24
+      "age_days": 27
     },
     {
       "file": "/Users/theceo/.claude/projects/-Users-theceo-DevSkyy/memory/project_pinecone_setup.md",
       "line": 7,
       "stamp": "2026-05-03",
-      "age_days": 18
+      "age_days": 21
     }
   ],
   "documented_missing_count": 23,
-  "verified_count": 2891
+  "verified_count": 2921
 }

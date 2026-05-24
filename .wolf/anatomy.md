@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-23T16:13:43.082Z
-> Files: 2746 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-24T14:56:07.587Z
+> Files: 2785 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -157,6 +157,7 @@
 - `CLAUDE.md` (~11 tok)
 - `claude.yml` — CI: Claude Code (~564 tok)
 - `dast-scan.yml` — DISABLED: staging/ scripts (run_dast_scan.sh, compare_baseline.py) do not exist yet (~3078 tok)
+- `dependabot-weekly-batch.yml` — CI: Dependabot Weekly Batch (~643 tok)
 - `dossier-check.yml` — CI: Dossier Check (~771 tok)
 - `fly-deploy.yml` — DISABLED: Using Vercel for deployment (not Fly.io) (~202 tok)
 - `pr-agent.yml` — PR Intelligence Agent — Auto-Trigger (~1019 tok)
@@ -681,7 +682,7 @@
 - `CLAUDE.md` — aos/cognition/ — Goal decomposition, planning, reflection (~687 tok)
 - `goal_decomposer.py` — GoalDecomposer — rule-based goal-to-TaskGraph decomposer. (~1319 tok)
 - `planner.py` — Planner — converts a TaskGraph into an ordered DecomposedPlan. (~254 tok)
-- `reflector.py` — Reflector — converts ExecutionOutcome + LearningTrace into a quality-scored Reflection. (~1225 tok)
+- `reflector.py` — Reflector — converts ExecutionOutcome + LearningTrace into a quality-scored Reflection. (~1224 tok)
 - `types.py` — Cognition types — task graph, plan steps, and decomposed plans. (~876 tok)
 
 ## aos/governance/
@@ -1402,6 +1403,14 @@
 - `flux-synthesis.md` — FLUX Synthesis Pipeline — Architecture Document (~6737 tok)
 - `README.md` — Project documentation (~1993 tok)
 - `SYSTEM_ARCHITECTURE.md` — DevSkyy System Architecture (~3118 tok)
+
+## docs/brand/
+
+- `canon-audit-2026-05-23.md` — SkyyRose Canon Audit — 2026-05-23 (~5363 tok)
+- `CLAUDE.md` — Recent Activity (~66 tok)
+- `collection-stories.md` — SkyyRose Collection Stories (~4374 tok)
+- `corey-questions.md` — Two Questions for Corey (~996 tok)
+- `visual-audit-2026-05-23.md` — SkyyRose.co Visual Audit — 2026-05-23 (~3860 tok)
 
 ## docs/database/
 
@@ -2382,6 +2391,7 @@
 - `CLAUDE.md` — mcp_tools/tools/ — Per-domain MCP tool modules (15 files) (~1016 tok)
 - `cli_anything.py` — CLI-Anything harness tools: agent-native Blender and GIMP control. (~2244 tok)
 - `ecommerce.py` — E-commerce tools: manage_products, dynamic_pricing. (~2264 tok)
+- `elite_studio.py` — Elite Studio MCP tools — thin surface over skyyrose/elite_studio/cli.py. (~5834 tok)
 - `infrastructure.py` — Infrastructure & system tools: scan_code, fix_code, self_healing. (~2996 tok)
 - `lora_generation.py` — LoRA product image generation tools: generate, pose transfer, upscale, background removal, caption. (~6738 tok)
 - `lora_training.py` — LoRA training tools: train, dataset preview, version info, product history. (~2238 tok)
@@ -2391,7 +2401,9 @@
 - `resources.py` — Resource tools: list_agents, health_check. (~1515 tok)
 - `threed.py` — 3D asset generation tools: text-to-3D, image-to-3D. (~2089 tok)
 - `virtual_tryon.py` — Virtual try-on tools: single, batch, AI model generation, status. (~3123 tok)
+- `wc_client.py` — WooCommerce MCP tools — 429-safe client exposed as 5 tools. (~3259 tok)
 - `wordpress.py` — WordPress theme generation tool. (~1252 tok)
+- `wp_deploy.py` — WordPress theme deploy MCP tools — atomic release ritual exposed as 4 tools. (~7195 tok)
 
 ## models/
 
@@ -2557,6 +2569,7 @@
 - `create_virtual_tryon_space.py` — Create virtual-tryon HuggingFace Space and push code with ralph-loop retry. (~1045 tok)
 - `curate_centroid_test_set.py` — Curate the labeled good/bad render fixtures the centroid harness needs. (~2796 tok)
 - `demo_image_generation.py` — demo_replicate, demo_stability, compare_providers, main + 1 more (~3045 tok)
+- `dependabot-batch-pr.sh` — Weekly Dependabot triage + batch-PR routine. (~1978 tok)
 - `deploy_elementor_templates.py` — ElementorDeployer: get_page_by_slug, deploy_template, deploy_all, main (~1786 tok)
 - `deploy_hf_spaces.sh` — HuggingFace Spaces Deployment Script (~1377 tok)
 - `deploy_skyyrose_site.py` — Pydantic: DeploymentConfig (57 fields) (~6703 tok)
@@ -3191,7 +3204,7 @@
 - `__init__.py` — skyyrose.elite_studio.agents — dual-agent imagery pipeline (Phase B2 rebuild pending). (~412 tok)
 - `CLAUDE.md` (~11 tok)
 - `color_correction_agent.py` — ColorCorrectionAgent: correct (~624 tok)
-- `compositor_agent.py` — CompositorAgent — 6-stage scene compositing pipeline (Phase B2). (~14244 tok)
+- `compositor_agent.py` — CompositorAgent — public entry point (thin re-export shim). (~906 tok)
 - `generator_agent.py` — GeneratorAgent: initialize, generate (~1609 tok)
 - `prompt_enrichment_agent.py` — Rule-based prompt enrichment for SkyyRose Elite Studio imagery pipeline. (~1548 tok)
 - `quality_agent.py` — of: verify (~2956 tok)
@@ -3203,6 +3216,23 @@
 - `variant_agent.py` — VariantAgent: generate_variants (~668 tok)
 - `vision_agent.py` — DualVisionGate — Phase B2 dual-agent vision consensus. (~2791 tok)
 - `vision_audit_agent.py` — VisionAuditAgent — H4 post-render fidelity gate. (~2656 tok)
+
+## skyyrose/elite_studio/agents/compositor/
+
+- `__init__.py` — compositor — stage modules for the 6-stage scene compositing pipeline. (~122 tok)
+- `audit.py` — Audit log writer for the compositor pipeline. (~511 tok)
+- `CLAUDE.md` (~11 tok)
+- `flux_methods.py` — FluxProviderMixin — FLUX inpainting provider methods extracted from orchestrator. (~2117 tok)
+- `infra.py` — Shared infrastructure for the compositor package. (~2816 tok)
+- `lighting.py` — Scene lookbook and lighting spec loader. (~515 tok)
+- `orchestrator.py` — CompositorAgent orchestrator — thin coordinator for the 6-stage pipeline. (~8197 tok)
+- `stage_a_matte.py` — Stage A: alpha matte extraction via BRIA RMBG 2.0. (~898 tok)
+- `stage_b_prompt.py` — Stage B: FLUX prompt engineering via Claude Opus. (~964 tok)
+- `stage_c_relight.py` — Stage C: IC-Light relighting. (~2073 tok)
+- `stage_d_flux.py` — Stage D: FLUX composite inpainting. (~2442 tok)
+- `stage_e_cleanup.py` — Stage E: GIMP pixel cleanup. (~677 tok)
+- `stage_f_shadows.py` — Stage F: contact shadow generation. (~922 tok)
+- `stage_g_visual_qa.py` — Stage G: visual QA gate. (~1634 tok)
 
 ## skyyrose/elite_studio/assets/
 
@@ -3259,7 +3289,7 @@
 - `builder.py` — GraphConfig: build_graph (~3496 tok)
 - `CLAUDE.md` (~11 tok)
 - `edges.py` — after_vision, after_generation, after_quality, after_quality_v2 + 5 more (~1467 tok)
-- `nodes.py` — run_sync, vision_node, generator_node (~11667 tok)
+- `nodes.py` — run_sync, vision_node, generator_node (~11620 tok)
 - `runner.py` — run_single, run_batch (~1275 tok)
 - `state.py` — EliteStudioState: create_initial_state, extract_production_result (~1787 tok)
 
@@ -3305,7 +3335,7 @@
 
 - `__init__.py` — FLUX synthesis pipeline — dossier-aware luxury product render. (~223 tok)
 - `CLAUDE.md` (~11 tok)
-- `flux_pipeline.py` — FLUX synthesis pipeline — main orchestrator (Stage 1 → 2 → 3 → 5). (~3987 tok)
+- `flux_pipeline.py` — FLUX synthesis pipeline — main orchestrator (Stage 1 → 2 → 3 → 5). (~4038 tok)
 
 ## skyyrose/elite_studio/synthesis/clients/
 
@@ -3323,7 +3353,7 @@
 
 - `__init__.py` — Pipeline stages — each is independently testable and swappable. (~86 tok)
 - `audit_filter.py` — Stage 1.5 — Audit filter for Path B (Audit-Driven Targeted Masking). (~1319 tok)
-- `base_render.py` — Stage 1: FLUX Kontext Pro — clean garment, no decoration. (~1122 tok)
+- `base_render.py` — Stage 1: FLUX Kontext Pro — clean garment, no decoration. (~1660 tok)
 - `CLAUDE.md` (~11 tok)
 - `decoration_inpaint.py` — Stage 3: FLUX Fill Pro / Kontext-LoRA — masked decoration inpainting. (~2217 tok)
 - `mask_deriver.py` — Stage 2: Decoration-mask derivation. (~5375 tok)
@@ -3355,23 +3385,25 @@
 - `test_cli.py` — Tests for CLI entry point — argument parsing and command dispatch. (~1181 tok)
 - `test_color_correction_agent.py` — Tests for ColorCorrectionResult model. (~219 tok)
 - `test_compositor_agent.py` — Tests for CompositorAgent — 6-stage scene compositing pipeline. (~5965 tok)
+- `test_compositor_stage_d.py` — Unit tests for compositor/stage_d_flux.py — budget gate coverage. (~4804 tok)
 - `test_config.py` — Tests for config — paths, constants, and lazy client factories. (~603 tok)
 - `test_coordinator.py` — Tests for Coordinator — pipeline orchestration. (~2466 tok)
 - `test_dual_vision_gate.py` — Tests: alias_works, consensus_both_yes, consensus_a_no_blocks, consensus_b_no_blocks + 1 more (~1027 tok)
 - `test_fidelity.py` — Tests for skyyrose.elite_studio.fidelity (Wave 1 fidelity gate). (~1869 tok)
+- `test_flux_budget.py` — Budget-gate tests for H-01 / H-02 — flux_pipeline.render() + render_base(). (~5792 tok)
 - `test_flux_pipeline_stage_e.py` — Integration tests for flux_pipeline Stage E (Stage 1.5 AuditFilter wiring). (~2153 tok)
 - `test_gemini_rest.py` — Tests for gemini_rest — direct REST client for Gemini API. (~2312 tok)
 - `test_generator_agent_phase_b2.py` — Tests: generate_returns_generation_result, generate_fails_if_both_models_fail, winner_selection_prefers_a_on_tie (~578 tok)
 - `test_ghost_mannequin_composite.py` — Tests: collar_garment_applies_neck_in, non_collar_garment_skips_neck_in (~561 tok)
-- `test_ghost_mannequin_preflight.py` — Tests: preflight_passes_sets_preflight_result, preflight_fail_sets_error_status, preflight_skipped_for_flat_lay (~694 tok)
+- `test_ghost_mannequin_preflight.py` — Tests: preflight_passes_sets_preflight_result, preflight_fail_sets_error_status, preflight_skipped_for_flat_lay (~728 tok)
 - `test_ghost_mannequin_prompt.py` — Tests: prompt_contains_spec_primacy, prompt_contains_ghost_mannequin_instructions, prompt_reads_branding_from_csv, flat_lay_style_no_ghost_mannequi... (~850 tok)
 - `test_ghost_mannequin_qa.py` — Tests: both_pass_at_80_threshold, min_score_below_80_fails, identity_mismatch_auto_rejects (~770 tok)
 - `test_graph_builder_tryon.py` — Tests for GraphConfig and build_graph() with enable_tryon=True. (~1050 tok)
-- `test_graph_builder.py` — Tests for graph builder — topology assembly and compilation. (~1321 tok)
+- `test_graph_builder.py` — Tests for graph builder — topology assembly and compilation. (~1334 tok)
 - `test_graph_edges.py` — Tests for conditional edge routing functions. (~1122 tok)
-- `test_graph_nodes_quality.py` — Tests: no_generation_result_returns_error, generation_failed_returns_error, no_vision_result_returns_error, high_confidence_skips_llm + 10 more (~5090 tok)
-- `test_graph_nodes_tryon.py` — Tests for tryon_node graph node. (~1789 tok)
-- `test_graph_nodes.py` — Tests for graph node functions — agents mocked at call site. (~1636 tok)
+- `test_graph_nodes_quality.py` — Tests: no_generation_result_returns_error, generation_failed_returns_error, no_vision_result_returns_error, high_confidence_skips_llm + 10 more (~5112 tok)
+- `test_graph_nodes_tryon.py` — Tests for tryon_node graph node. (~1801 tok)
+- `test_graph_nodes.py` — Tests for graph node functions — agents mocked at call site. (~1658 tok)
 - `test_graph_runner.py` — Tests for run_single and run_batch — graph runner public API. (~1514 tok)
 - `test_graph_state_phase_b2.py` — Tests: create_initial_state_ghost_mannequin (~115 tok)
 - `test_graph_state.py` — Tests for EliteStudioState TypedDict and helper functions. (~1332 tok)
@@ -3398,6 +3430,13 @@
 ## skyyrose/explore/
 
 - `black-rose.html` — Explore BLACK ROSE in 3D | SkyyRose Immersive Experience (~3020 tok)
+
+## skyyrose/integrations/
+
+- `__init__.py` — Third-party API clients with correctness guarantees (retry, redaction, etc.). (~24 tok)
+- `CLAUDE.md` (~11 tok)
+- `fashn_client.py` — FASHN AI virtual try-on HTTP client — replaces the tryon_agent.py:53 stub. (~3297 tok)
+- `wc_safe_client.py` — WooCommerce REST client with correct 429 handling on EVERY HTTP verb. (~2237 tok)
 
 ## skyyrose/multi_agent/
 
@@ -3920,7 +3959,11 @@
 
 ## tests/integrations/
 
+- `__init__.py` (~0 tok)
+- `CLAUDE.md` (~11 tok)
+- `test_catalog_reader_consolidation.py` — Static regression guards — every catalog reader must route through the (~1416 tok)
 - `test_enterprise_workflow.py` — Tests: full_context_first_workflow, rag_with_reranking, parallel_provider_search, classification_embedding_integration + 1 more (~3570 tok)
+- `test_fashn_client.py` — Tests for skyyrose/integrations/fashn_client.py. (~3768 tok)
 
 ## tests/llm/
 
@@ -3932,6 +3975,14 @@
 - `CLAUDE.md` (~11 tok)
 - `test_deepseek.py` — Tests: deepseek_chat_completion, deepseek_reasoning_model, deepseek_cost_calculation, deepseek_provider_config (~1085 tok)
 - `test_litellm_provider.py` — Tests: provider_model_map_completeness, get_model_string_with_provider, get_model_string_with_override, get_model_string_with_full_model + 13 more (~2669 tok)
+
+## tests/mcp/
+
+- `__init__.py` (~0 tok)
+- `CLAUDE.md` (~11 tok)
+- `test_elite_studio.py` — Tests for mcp_tools/tools/elite_studio.py. (~2385 tok)
+- `test_wc_client.py` — Tests for skyyrose/integrations/wc_safe_client.py + mcp_tools/tools/wc_client.py. (~2814 tok)
+- `test_wp_deploy.py` — Tests for mcp_tools/tools/wp_deploy.py. (~4226 tok)
 
 ## tests/mcp_servers/
 
