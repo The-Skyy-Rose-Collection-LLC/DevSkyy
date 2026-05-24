@@ -62,9 +62,9 @@ get_header();
 			<div class="lp-story__grid">
 				<div class="lp-story__text lp-rv">
 					<span class="lp-story__label">THE LEGACY</span>
-					<h2 class="lp-story__title"><?php echo esc_html( 'This Isn\'t a Theme. It\'s a Family Name.' ); ?></h2>
+					<h2 class="lp-story__title"><?php echo esc_html( 'This Isn\'t a Theme. It\'s the Bloodline That Raised Me.' ); ?></h2>
 					<p class="lp-story__text">
-						<?php echo esc_html( 'Most brands pick a concept off a mood board. We didn\'t pick this one — it picked us. "Hurts" isn\'t a word we chose for the aesthetic. It\'s the name our family carries. Every scar, every lesson, every door that closed and every one we kicked open — it\'s all in the name.' ); ?>
+						<?php echo esc_html( 'Most brands pick a concept off a mood board. I didn\'t pick this one — it picked me. "Hurts" isn\'t a word I chose for the aesthetic. It\'s the bloodline that raised me. Every scar, every lesson, every door that closed and every one we kicked open — it\'s all in that name.' ); ?>
 					</p>
 					<p class="lp-story__text">
 						<?php echo esc_html( 'This collection takes that pain and turns it into something you can wear. Something beautiful. Something that says: I\'ve been through it, and I\'m still here.' ); ?>
