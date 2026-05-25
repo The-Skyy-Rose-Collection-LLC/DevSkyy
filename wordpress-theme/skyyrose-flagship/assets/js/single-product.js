@@ -94,11 +94,18 @@
                 syncChipsToSelectValue(size);
             });
         });
-        // Mirror WC variation form state back to chips when the form changes
-        // (covers variation-image URL deep-links and reset).
-        $(document).on('woocommerce_variation_has_changed', '.variations_form', function() {
+        // Mirror WC variation form state back to chips when WC resolves a
+        // variation (fires AFTER WC validates stock/availability, so the
+        // select value at this point is the confirmed selection — not the
+        // in-flight user pick that WC may later clear). Matches the
+        // found_variation / reset_data event pair used by the image-swap
+        // handler at line 61 of this file.
+        $(document).on('found_variation', '.variations_form', function() {
             var sizeSelect = getSizeSelect();
             if (sizeSelect) syncChipsToSelectValue(sizeSelect.value);
+        });
+        $(document).on('reset_data', '.variations_form', function() {
+            syncChipsToSelectValue('');
         });
         // Initial sync — WC may set the select via URL query string or
         // persisted variation choice before this handler binds.
