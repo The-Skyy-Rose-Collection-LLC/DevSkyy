@@ -207,7 +207,7 @@ mcp = [
     "soundfile==0.13.1",
     "rich==14.3.3",
     "click>=8.1.8",  # Fixed: raganything>=1.2.10 requires >=8.1.8 via mineru/pdftext
-    "pytest==9.0.2",
+    "pytest==9.0.3",
     "pytest-asyncio==1.3.0",
     "healthcheck==1.3.3",
     "psutil==6.1.0",
