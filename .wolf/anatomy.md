@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-25T15:26:07.765Z
-> Files: 2798 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-25T15:40:26.669Z
+> Files: 2821 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -9,7 +9,7 @@
 - `.dockerignore` — Docker ignore rules (~122 tok)
 - `.eslintrc.cjs` — ESLint configuration (~954 tok)
 - `.gitattributes` — Git attributes (~70 tok)
-- `.gitignore` — Git ignore rules (~2097 tok)
+- `.gitignore` — Git ignore rules (~2094 tok)
 - `.gitignore.pre-optimize-20260424-190053` — /*.min.js (~1580 tok)
 - `.impeccable.md` — Design Context (~487 tok)
 - `.markdownlint.json` (~57 tok)
@@ -151,6 +151,7 @@
 ## .github/workflows/
 
 - `asset-generation.yml` — CI: Asset Generation Pipeline (~1779 tok)
+- `catalog-validate.yml` — CI: Catalog Consistency (~1094 tok)
 - `ci.yml` — /*.py') }} (~8022 tok)
 - `claude-code-action-official.yml` — DISABLED: Duplicate of claude.yml — use that workflow for @claude mentions (~145 tok)
 - `claude-code-review.yml` — /*.ts" (~435 tok)
@@ -1280,6 +1281,7 @@
 - `AR_STACK_CONFIGURATION.md` — AR Stack Configuration Mission (~1401 tok)
 - `ARCHITECTURE.md` — Architecture Reference (~4383 tok)
 - `ASSET_EXTRACTION_REPORT.md` — SkyyRose Asset Extraction & Organization Report (~3814 tok)
+- `CATALOG_SYNC.md` — Catalog Consistency & Auto-Sync (~1473 tok)
 - `CLAUDE.md` (~11 tok)
 - `CLOTHING_3D_PIPELINE.md` — Clothing 3D Pipeline (~2696 tok)
 - `CLOTHING_3D_PRODUCTION.md` — Clothing 3D — Production Deployment Guide (~2484 tok)
@@ -1406,11 +1408,19 @@
 
 ## docs/brand/
 
+- `asset-hierarchy.md` — SkyyRose Brand Asset Hierarchy (~2105 tok)
 - `canon-audit-2026-05-23.md` — SkyyRose Canon Audit — 2026-05-23 (~5363 tok)
 - `CLAUDE.md` — Recent Activity (~66 tok)
+- `collection-design-proposals.md` — SkyyRose Collection Design Proposals (~8199 tok)
 - `collection-stories.md` — SkyyRose Collection Stories (~4374 tok)
+- `collection-ux-architecture.md` — SkyyRose Collection UX Architecture — Proposal (~3463 tok)
 - `corey-questions.md` — Two Questions for Corey (~996 tok)
 - `visual-audit-2026-05-23.md` — SkyyRose.co Visual Audit — 2026-05-23 (~3860 tok)
+
+## docs/brand/design-mockups/
+
+- `CLAUDE.md` (~11 tok)
+- `collection-designs.html` — SkyyRose — Collection Design Mockups (2026-05-24) (~10996 tok)
 
 ## docs/database/
 
@@ -2605,6 +2615,7 @@
 - `fix_elementor_spinning_logo.py` — get_spinning_logo_html, make_request, update_elementor_widget, update_recursive + 4 more (~2595 tok)
 - `fix_space_training.py` — install_dependencies, train_lora (~2725 tok)
 - `fix_spinning_logo_shortcode.py` — make_request, replace_shortcode, replacement, get_elementor_data + 3 more (~3303 tok)
+- `format_staged.sh` — scripts/format_staged.sh — Pre-format every git-staged file by type. (~2994 tok)
 - `gemini_lookbook.py` — load_image_bytes, generate_lookbook (~4290 tok)
 - `gemini_scene_gen.py` — build_prompt (~5921 tok)
 - `gen3d_simple.py` — generate_3d_model, main (~1918 tok)
@@ -2711,6 +2722,7 @@
 - `start_training_via_api.py` (~468 tok)
 - `submit_training_job.py` (~870 tok)
 - `sync_brand_to_php.py` — Sync brand.yaml → wordpress-theme/skyyrose-flagship/inc/brand.generated.php. (~2423 tok)
+- `sync_catalog_downstream.py` — sync_catalog_downstream.py — Surgical auto-sync of downstream catalog references. (~5158 tok)
 - `sync_vault_products.py` — WooCommerceVaultSync: create_category, create_tag, find_product_by_sku, create_or_update_product + 2 more (~2410 tok)
 - `test_api_endpoints.py` — Test script for API endpoints and WebSocket connections. (~2220 tok)
 - `test_exact_replicas.py` — Test file (~421 tok)
@@ -2749,6 +2761,7 @@
 - `upload_to_threedium.py` — ThreediumClient: upload_model, load_generated_models, main (~1943 tok)
 - `upload_with_env_token.py` — Upload LoRA dataset using token from .env file. (~781 tok)
 - `validate_3d_assets.py` — ValidationStatus: passed, production_ready, add_check, calculate_fidelity + 7 more (~10639 tok)
+- `validate_catalog_consistency.py` — validate_catalog_consistency.py — Read-only catalog/registry consistency checker. (~8374 tok)
 - `validate_dossier.py` — Validate per-product design dossiers. (~2990 tok)
 - `validate_environment.py` — Colors: add_error, add_warning, add_info, add_validated + 10 more (~4536 tok)
 - `validate_production.py` — CompatLogger: info, warning, error, get_logger + 9 more (~9135 tok)
@@ -2857,7 +2870,7 @@
 - `prompts.py` — Prompt templates and logo treatment metadata. (~4813 tok)
 - `qa.py` — Vision QA — compare source vs generated images. (~894 tok)
 - `router.py` — Intelligent model router — picks the best generation model per product. (~2123 tok)
-- `source_map.py` — Source image mapping — maps every SKU to its correct front/back techflat. (~3285 tok)
+- `source_map.py` — Source image mapping — maps every SKU to its correct front/back techflat. (~3230 tok)
 - `spec_builder.py` — Build judge-ready specs from the canonical product dossier. (~2638 tok)
 - `tournament.py` — Tournament judging — 3-judge architecture (vision pair + synthesis). (~10153 tok)
 - `utils.py` — Shared utilities — image preprocessing, quality gates, file I/O. (~659 tok)
@@ -3190,6 +3203,7 @@
 - `fidelity.py` — class: to_dict, check_color, check_text, check_clip_similarity + 1 more (~3254 tok)
 - `forensics.py` — Forensic manifest writer + interactive confirmation gate. (~1715 tok)
 - `gemini_rest.py` — generate_text, analyze_vision, generate_image (~1920 tok)
+- `logo_registry.py` — Logo Registry — Canonical loader for SkyyRose logo metadata + path resolution. (~1848 tok)
 - `master_registry.py` — View: get (~3012 tok)
 - `models.py` — ProductData: from_override, provider_count (~1864 tok)
 - `retry.py` — is_transient_error, retry_on_transient (~521 tok)
@@ -3387,6 +3401,7 @@
 - `test_brand_centroid_sidecar.py` — Tests for the brand_centroid JSON sidecar machinery. (~1778 tok)
 - `test_brand_enforcement.py` — Brand enforcement — retired taglines must never appear in generated content. (~1319 tok)
 - `test_brand.py` — Tests for skyyrose.elite_studio.brand (BrandConfig SoT loader). (~1062 tok)
+- `test_catalog_consistency.py` — Tests for the catalog/registry consistency validator. (~2441 tok)
 - `test_catalog_validation.py` — Tests for Catalog hardening (structural + referential integrity). (~2643 tok)
 - `test_catalog.py` — Tests for skyyrose.elite_studio.catalog (Wave 1.5 SoT loader). (~2536 tok)
 - `test_cli.py` — Tests for CLI entry point — argument parsing and command dispatch. (~1181 tok)
@@ -3417,6 +3432,7 @@
 - `test_graph_topology.py` — Tests: graph_topology_3d_activation, graph_topology_default_generator (~236 tok)
 - `test_human_review.py` — Tests: frozen, defaults, all_fields, submit_returns_sentinel_when_queue_fails + 10 more (~2210 tok)
 - `test_load_tester.py` — Tests: frozen, all_fields_present, run_single_sku, run_returns_load_test_report + 18 more (~2568 tok)
+- `test_logo_registry.py` — Tests for the LogoRegistry path resolver. (~1732 tok)
 - `test_master_registry_pending.py` — Pending / lock lifecycle tests for master_registry (Wave 1 catalog bootstrap). (~1434 tok)
 - `test_master_registry.py` — Tests for skyyrose.elite_studio.master_registry (Wave 1 reference-first pipeline). (~1557 tok)
 - `test_models_phase_b2.py` — Tests: dual_agent_result_fields, preflight_result_blocked, ghost_mannequin_composite_result (~324 tok)
@@ -3643,6 +3659,7 @@
 - `centroid-gate-measurement-analysis.md` — Brand-centroid measurement analysis (2026-05-03) (~1906 tok)
 - `centroid-gate-measurement.json` (~3548 tok)
 - `CLAUDE.md` (~11 tok)
+- `coolify-openhands-runbook.md` — Coolify + OpenHands Install Runbook (~3068 tok)
 - `DEPENDABOT-CRITICAL-2026-05-13.md` — Dependabot Critical Triage — 2026-05-13 (~1036 tok)
 - `dossier-audit-report.md` — Dossier Coverage Audit (~1098 tok)
 - `elite-studio-audit-2026-05-22.md` — Elite Studio Imagery Pipeline — Audit Report (~2340 tok)
@@ -3683,6 +3700,18 @@
 - `source-strategy-comparison-lh-004-1778096026.json` (~345 tok)
 - `superagent-self-healing-learning-audit-2026-05-03.md` — SuperAgent Self-Healing + Learning Audit — 2026-05-03 (~3147 tok)
 - `todo.md` — Current Tasks (~1455 tok)
+
+## tasks/audit-2026-05-23/
+
+- `checkout-ux-audit.md` — SkyyRose Cart → Checkout → Order-Received UX Audit (~3606 tok)
+- `CLAUDE.md` (~11 tok)
+- `FIX-MATRIX.md` — SkyyRose v1.1.2 — Unified Fix Matrix (~2855 tok)
+- `frontend-audit.md` — Frontend Audit — 2026-05-23 (~4949 tok)
+- `perf-audit.md` — SkyyRose Performance Audit — v1.5.20 (~5217 tok)
+- `PHASE-A-walkthrough.md` — Phase A — Zero-Deploy Admin Walkthrough (~1138 tok)
+- `security-audit.md` — SkyyRose v1.1.2 — Application Security Audit (~3935 tok)
+- `senior-craft-audit.md` — Senior Craft Audit — 2026-05-23 (~5851 tok)
+- `seo-audit.md` — SkyyRose SEO + Structured Data Audit — v1.1.2 (2026-05-23) (~3469 tok)
 
 ## tasks/handoffs/
 
