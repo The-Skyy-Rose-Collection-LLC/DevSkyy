@@ -513,14 +513,18 @@ function skyyrose_ajax_track_referral() {
 	// Set a 30-day cookie for checkout attribution.
 	// setcookie() is safe here: admin-ajax.php emits no content bytes before the handler fires.
 	if ( ! headers_sent() ) {
+		// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.cookies_setcookie
 		setcookie(
 			'sr_ref',
 			$ref_code,
-			time() + ( 30 * DAY_IN_SECONDS ),
-			COOKIEPATH,
-			COOKIE_DOMAIN,
-			is_ssl(),
-			true  // httponly — not accessible to JS.
+			array(
+				'expires'  => time() + ( 30 * DAY_IN_SECONDS ),
+				'path'     => COOKIEPATH,
+				'domain'   => COOKIE_DOMAIN,
+				'secure'   => is_ssl(),
+				'httponly' => true, // not accessible to JS.
+				'samesite' => 'Lax',
+			)
 		);
 	}
 
