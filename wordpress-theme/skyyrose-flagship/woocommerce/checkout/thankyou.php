@@ -17,17 +17,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 ?>
-<?php
-/* Fire WC's standard pre-content hook so analytics, conversion pixels,
- * order-tracking plugins and other third-party integrations that rely on
- * woocommerce_before_thankyou continue to run. */
-if ( $order ) {
-	do_action( 'woocommerce_before_thankyou', $order->get_id() );
-}
-?>
 <section class="sr-thankyou" role="region" aria-labelledby="sr-thankyou-h">
 
 	<?php if ( $order ) : ?>
+
+		<?php
+		/* Fire WC's standard pre-content hook INSIDE the wrapper (matching WC
+		 * core's structural placement) so analytics / conversion-pixel plugins
+		 * that emit HTML (e.g. noscript pixels) land inside the section, not
+		 * above it. */
+		do_action( 'woocommerce_before_thankyou', $order->get_id() );
+		?>
 
 		<?php if ( $order->has_status( 'failed' ) ) : ?>
 
@@ -85,7 +85,7 @@ if ( $order ) {
 				<?php if ( $order->get_payment_method_title() ) : ?>
 					<div class="sr-thankyou__detail">
 						<dt><?php esc_html_e( 'Payment Method', 'skyyrose' ); ?></dt>
-						<dd><?php echo esc_html( $order->get_payment_method_title() ); ?></dd>
+						<dd><?php echo wp_kses_post( $order->get_payment_method_title() ); ?></dd>
 					</div>
 				<?php endif; ?>
 			</dl>
