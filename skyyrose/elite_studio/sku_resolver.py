@@ -36,18 +36,18 @@ BUNDLE_DIR: Path = _REPO_ROOT / "data" / "product-bundles"
 
 _ACCESSORY_GARMENT_TYPE: str = "accessory"
 
-# Jersey SKUs per D-10 (9 SKUs — all br-003 colorways + br-008..br-012)
+# Jersey SKUs per D-10 (8 SKUs — br-003 + br-008..br-012 + br-014..br-015).
+# br-013 retired 2026-05-25: confirmed duplicate of br-003 (Baseball Classic Black).
 _JERSEY_SKUS: frozenset[str] = frozenset(
     {
         "br-003",
-        "br-014",
-        "br-013",
-        "br-015",
         "br-008",
         "br-009",
         "br-010",
         "br-011",
         "br-012",
+        "br-014",
+        "br-015",
     }
 )
 

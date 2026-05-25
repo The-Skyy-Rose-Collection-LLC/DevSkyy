@@ -62,9 +62,9 @@ PRODUCTS = {
             "br-002-model-m.webp",  # Mislabeled as br-002, actually br-001 (100%)
         ],
     },
-    "br-013": {
-        "trigger": "skyyrose_br003_oakland",
-        "name": "Last Oakland Black Is Beautiful Baseball Jersey (Green/Gold)",
+    "br-012": {
+        "trigger": "skyyrose_br012_oakland",
+        "name": "Baseball Classic (Last Oakland) Black Is Beautiful Baseball Jersey (Green/Gold)",
         "caption": (
             "skyyrose_br003_oakland dark green baseball jersey with gold trim and piping, "
             "'BLACK IS BEAUTIFUL' text in gold arched across chest, button-front, "

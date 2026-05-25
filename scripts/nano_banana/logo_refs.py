@@ -41,7 +41,6 @@ SKU_LOGO_REFS = {
     "br-011": OVERLAYS_DIR / "br-patch-hockey.png",
     "br-012": OVERLAYS_DIR / "br-patch-mlb-baseball.png",
     "br-014": OVERLAYS_DIR / "br-patch-mlb-baseball.png",
-    "br-013": OVERLAYS_DIR / "br-patch-mlb-baseball.png",
     # Love Hurts — graffiti script logos
     "lh-004": TECHFLATS_DIR / "love-hurts" / "logo-love.jpeg",  # varsity has "Love Hurts" script
     # Signature — gold script

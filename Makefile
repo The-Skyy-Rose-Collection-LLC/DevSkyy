@@ -6,7 +6,8 @@
 .PHONY: install dev lint format test clean help \
         ts-build ts-lint ts-test ts-type-check \
         test-all lint-all format-all \
-        demo security docker-build docker-run
+        demo security docker-build docker-run \
+        validate-catalog sync-catalog sync-catalog-dry catalog-help
 
 # Python
 PYTHON := python3
@@ -271,3 +272,41 @@ docker-build:
 
 docker-run:
 	docker run -p 8000:8000 devskyy:latest
+
+# ============================================================================
+# CATALOG CONSISTENCY
+# ============================================================================
+
+.PHONY: validate-catalog sync-catalog sync-catalog-dry catalog-help
+
+validate-catalog:
+	@$(PYTHON) scripts/validate_catalog_consistency.py
+
+sync-catalog:
+	@$(PYTHON) scripts/sync_catalog_downstream.py
+
+sync-catalog-dry:
+	@$(PYTHON) scripts/sync_catalog_downstream.py --dry-run
+
+catalog-help:
+	@echo ""
+	@echo "  🌹 Catalog Consistency Commands"
+	@echo "  ================================"
+	@echo ""
+	@echo "    make validate-catalog     Run all consistency checks (read-only, exit 1 on failure)"
+	@echo "    make sync-catalog-dry     Preview auto-fixes without writing any files"
+	@echo "    make sync-catalog         Apply auto-fixes (backs up changed files first)"
+	@echo "    make catalog-help         Show this help"
+	@echo ""
+	@echo "  Single check:  python scripts/validate_catalog_consistency.py --checks jersey_skus"
+	@echo "  All checks:    python scripts/validate_catalog_consistency.py --json"
+	@echo "  Pytest:        pytest skyyrose/elite_studio/tests/test_catalog_consistency.py -v"
+	@echo ""
+	@echo "  Auto-fix targets:"
+	@echo "    _JERSEY_SKUS in sku_resolver.py      (jersey garment_type_lock rows in CSV)"
+	@echo "    product-similarities.json             (remove stale/retired SKU refs)"
+	@echo "    logo-registry.json updated: field     (bump to today's date)"
+	@echo ""
+	@echo "  DOES NOT auto-edit:"
+	@echo "    data/dossiers/*.md  |  ProductCatalogTest.php  |  logo-registry.json content"
+	@echo ""

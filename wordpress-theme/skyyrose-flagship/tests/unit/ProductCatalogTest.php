@@ -19,8 +19,8 @@ class ProductCatalogTest extends TestCase {
 		$this->assertSame( 'sg-001', skyyrose_normalize_sku( 'sg-001-tee' ) );
 	}
 
-	public function test_normalize_sku_passthrough_br013(): void {
-		$this->assertSame( 'br-013', skyyrose_normalize_sku( 'br-013' ) );
+	public function test_normalize_sku_passthrough_br012(): void {
+		$this->assertSame( 'br-012', skyyrose_normalize_sku( 'br-012' ) );
 	}
 
 	public function test_normalize_sku_passthrough_br014(): void {

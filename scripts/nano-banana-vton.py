@@ -149,7 +149,7 @@ LOGO_TREATMENTS = {
         "patch at lower-hem (circular, team-style); "
         "back: large ROSE-ONLY embroidered logo centered — raised thread texture, rose-gold tone"
     ),
-    "br-013": (
+    "br-012": (
         "front: 'BLACK IS BEAUTIFUL' text — the letter A in 'BLACK' is black, remaining letters "
         "are gold; custom baseball patch at lower-hem; "
         "back: large ROSE-ONLY embroidered logo centered, rose-gold thread"

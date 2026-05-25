@@ -61,10 +61,31 @@
 	border-radius: 2px;
 }
 
-/* CENTER: Logo */
+/* CENTER: Brand Primary Logo (rose-gold SR monogram) */
 .navbar__brand {
 	justify-self: center;
 }
+.navbar__logo-link {
+	display: inline-flex;
+	align-items: center;
+	text-decoration: none;
+	transition: transform 0.4s var(--skyyrose-ease, cubic-bezier(0.16, 1, 0.3, 1)), filter 0.4s ease;
+}
+.navbar__logo-link:hover {
+	transform: scale(1.04);
+	filter: drop-shadow(0 0 12px rgba(183, 110, 121, 0.45));
+}
+.navbar__logo-img {
+	display: block;
+	width: 44px;
+	height: 44px;
+	object-fit: contain;
+	transition: filter 0.4s ease;
+}
+@media (min-width: 768px) {
+	.navbar__logo-img { width: 52px; height: 52px; }
+}
+/* Legacy text title — retained as fallback when JS strips picture (rare) */
 .navbar__site-title {
 	font-family: 'Cinzel', serif;
 	font-size: 18px;

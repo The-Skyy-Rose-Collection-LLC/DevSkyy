@@ -149,7 +149,7 @@
       ]
     },
     "br-003": {
-      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic",
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)",
       "collection": "black-rose",
       "global": [
         {
@@ -158,10 +158,6 @@
         },
         {
           "sku": "br-014",
-          "score": 1.0
-        },
-        {
-          "sku": "br-013",
           "score": 1.0
         },
         {
@@ -188,10 +184,6 @@
       "same_collection": [
         {
           "sku": "br-014",
-          "score": 1.0
-        },
-        {
-          "sku": "br-013",
           "score": 1.0
         },
         {
@@ -221,87 +213,11 @@
       ]
     },
     "br-014": {
-      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants Edition)",
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants)",
       "collection": "black-rose",
       "global": [
         {
           "sku": "br-003",
-          "score": 1.0
-        },
-        {
-          "sku": "br-015",
-          "score": 1.0
-        },
-        {
-          "sku": "br-013",
-          "score": 1.0
-        },
-        {
-          "sku": "br-012",
-          "score": 0.8292
-        },
-        {
-          "sku": "br-009",
-          "score": 0.7657
-        },
-        {
-          "sku": "br-001",
-          "score": 0.7294
-        },
-        {
-          "sku": "br-008",
-          "score": 0.708
-        },
-        {
-          "sku": "br-005",
-          "score": 0.6936
-        }
-      ],
-      "same_collection": [
-        {
-          "sku": "br-003",
-          "score": 1.0
-        },
-        {
-          "sku": "br-013",
-          "score": 1.0
-        },
-        {
-          "sku": "br-015",
-          "score": 1.0
-        },
-        {
-          "sku": "br-012",
-          "score": 0.8292
-        },
-        {
-          "sku": "br-009",
-          "score": 0.7657
-        },
-        {
-          "sku": "br-001",
-          "score": 0.7294
-        },
-        {
-          "sku": "br-008",
-          "score": 0.708
-        },
-        {
-          "sku": "br-005",
-          "score": 0.6936
-        }
-      ]
-    },
-    "br-013": {
-      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Oakland Edition)",
-      "collection": "black-rose",
-      "global": [
-        {
-          "sku": "br-003",
-          "score": 1.0
-        },
-        {
-          "sku": "br-014",
           "score": 1.0
         },
         {
@@ -332,10 +248,6 @@
       "same_collection": [
         {
           "sku": "br-003",
-          "score": 1.0
-        },
-        {
-          "sku": "br-014",
           "score": 1.0
         },
         {
@@ -365,7 +277,7 @@
       ]
     },
     "br-015": {
-      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White Edition)",
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)",
       "collection": "black-rose",
       "global": [
         {
@@ -374,10 +286,6 @@
         },
         {
           "sku": "br-014",
-          "score": 1.0
-        },
-        {
-          "sku": "br-013",
           "score": 1.0
         },
         {
@@ -408,10 +316,6 @@
         },
         {
           "sku": "br-014",
-          "score": 1.0
-        },
-        {
-          "sku": "br-013",
           "score": 1.0
         },
         {
@@ -509,7 +413,7 @@
       ]
     },
     "br-005": {
-      "name": "BLACK Rose Hoodie \u2014 Signature Edition",
+      "name": "BLACK Rose Hoodie — Signature Edition",
       "collection": "black-rose",
       "global": [
         {
@@ -645,10 +549,6 @@
         {
           "sku": "br-014",
           "score": 0.6936
-        },
-        {
-          "sku": "br-013",
-          "score": 0.6936
         }
       ]
     },
@@ -715,10 +615,6 @@
           "score": 0.6441
         },
         {
-          "sku": "br-013",
-          "score": 0.6441
-        },
-        {
           "sku": "br-015",
           "score": 0.6441
         }
@@ -738,10 +634,6 @@
         },
         {
           "sku": "br-014",
-          "score": 0.708
-        },
-        {
-          "sku": "br-013",
           "score": 0.708
         },
         {
@@ -772,10 +664,6 @@
         },
         {
           "sku": "br-014",
-          "score": 0.708
-        },
-        {
-          "sku": "br-013",
           "score": 0.708
         },
         {
@@ -813,10 +701,6 @@
           "score": 0.7657
         },
         {
-          "sku": "br-013",
-          "score": 0.7657
-        },
-        {
           "sku": "br-015",
           "score": 0.7657
         },
@@ -844,10 +728,6 @@
         },
         {
           "sku": "br-014",
-          "score": 0.7657
-        },
-        {
-          "sku": "br-013",
           "score": 0.7657
         },
         {
@@ -1005,15 +885,11 @@
         {
           "sku": "br-014",
           "score": 0.6544
-        },
-        {
-          "sku": "br-013",
-          "score": 0.6544
         }
       ]
     },
     "br-012": {
-      "name": "BLACK is Beautiful Jersey Series: 5. Last Oakland (Baseball)",
+      "name": "BLACK is Beautiful Jersey Series: 5. Baseball Classic (Last Oakland)",
       "collection": "black-rose",
       "global": [
         {
@@ -1022,10 +898,6 @@
         },
         {
           "sku": "br-014",
-          "score": 0.8292
-        },
-        {
-          "sku": "br-013",
           "score": 0.8292
         },
         {
@@ -1059,10 +931,6 @@
           "score": 0.8292
         },
         {
-          "sku": "br-013",
-          "score": 0.8292
-        },
-        {
           "sku": "br-015",
           "score": 0.8292
         },
@@ -1085,7 +953,7 @@
       ]
     },
     "kids-001": {
-      "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
+      "name": "Kids Colorblock Hoodie Set — Red/Black",
       "collection": "kids-capsule",
       "global": [
         {
@@ -1129,7 +997,7 @@
       ]
     },
     "kids-002": {
-      "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+      "name": "Kids Colorblock Hoodie Set — Purple/Black",
       "collection": "kids-capsule",
       "global": [
         {

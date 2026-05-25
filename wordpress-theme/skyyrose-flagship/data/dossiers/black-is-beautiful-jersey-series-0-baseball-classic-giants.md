@@ -1,6 +1,6 @@
 ---
 sku: br-014
-name: BLACK is Beautiful Jersey Series — 0. Baseball Classic (Giants Edition)
+name: BLACK is Beautiful Jersey Series — 0. Baseball Classic (Giants)
 collection: black-rose
 logo_reference: data/brand-logos/black-rose-logo.md
 extra_logos:

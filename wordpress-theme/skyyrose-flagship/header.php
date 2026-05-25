@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
-<a class="skip-link" href="#primary"><?php esc_html_e( 'Skip to the story', 'skyyrose' ); ?></a>
+<a class="skip-link" href="#content"><?php esc_html_e( 'Skip to the story', 'skyyrose' ); ?></a>
 
 <div class="grain-overlay" aria-hidden="true"></div>
 
@@ -54,10 +54,18 @@ defined( 'ABSPATH' ) || exit;
 					<?php endif; ?>
 				</div>
 
-				<!-- CENTER: Logo -->
+				<!-- CENTER: Brand Primary Logo (rose-gold SR monogram, pre-sized 50x50 nav variant) -->
 				<div class="navbar__brand">
-					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="navbar__logo-link">
-						<span class="navbar__site-title">SKYY ROSE</span>
+					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="navbar__logo-link" aria-label="<?php esc_attr_e( 'SkyyRose — Home', 'skyyrose' ); ?>">
+						<img
+							src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/skyyrose-monogram-nav.webp' ); ?>"
+							alt="<?php esc_attr_e( 'SkyyRose', 'skyyrose' ); ?>"
+							class="navbar__logo-img"
+							width="50"
+							height="50"
+							decoding="async"
+							fetchpriority="high">
+						<span class="screen-reader-text"><?php esc_html_e( 'SkyyRose', 'skyyrose' ); ?></span>
 					</a>
 				</div>
 

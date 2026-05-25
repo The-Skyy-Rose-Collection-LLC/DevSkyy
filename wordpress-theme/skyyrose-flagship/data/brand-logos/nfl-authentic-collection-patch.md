@@ -1,7 +1,11 @@
 ---
 logo_id: nfl-authentic-collection-patch
 collection: black-rose
-image_path: wordpress-theme/skyyrose-flagship/assets/images/logos/nfl-authentic-collection-card.jpeg
+image_path: wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-football-jersey-red/nfl-authentic-collection-card.jpeg
+image_resolution: per_sku
+sku_paths:
+  br-008: wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-football-jersey-red/nfl-authentic-collection-card.jpeg
+  br-009: wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-football-jersey-white/nfl-authentic-collection-card.jpeg
 sibling_of: data/brand-logos/black-rose-authentic-collection-patch.md
 ---
 
@@ -75,6 +79,6 @@ legibility.
 
 ## Reference Image
 
-Image file: `wordpress-theme/skyyrose-flagship/assets/images/logos/nfl-authentic-collection-card.jpeg`.
+Image file: `wordpress-theme/skyyrose-flagship/assets/images/products/black-is-beautiful-football-jersey-red/nfl-authentic-collection-card.jpeg`.
 Pipelines that build RAS prompts attach this image as an additional reference
 when rendering any product whose dossier names this patch.

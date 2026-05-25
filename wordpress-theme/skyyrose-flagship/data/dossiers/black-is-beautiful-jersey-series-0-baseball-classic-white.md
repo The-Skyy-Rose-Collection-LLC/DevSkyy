@@ -1,6 +1,6 @@
 ---
 sku: br-015
-name: BLACK is Beautiful Jersey Series — 0. Baseball Classic (White Edition)
+name: BLACK is Beautiful Jersey Series — 0. Baseball Classic (White)
 collection: black-rose
 logo_reference: data/brand-logos/black-rose-logo.md
 extra_logos:
@@ -12,7 +12,7 @@ inherits_from: black-is-beautiful-jersey-series-0-baseball-classic
 
 # BLACK is Beautiful Jersey Series — 0. Baseball Classic (White Edition)
 
-**Garment type lock:** Authentic-style baseball jersey — V-neck collar opening, button-front placket, short sleeves, straight even hem (no drop-tail). Solid **white** base fabric with **black** piping/binding around V-neck collar, sleeve cuffs, and down both sides of the front placket. Black buttons on the placket. NO player number on front or back. NO player name on back. NO pinstripes. Mid-weight knit jersey. This is the WHITE colorway (separate SKU from Classic black br-003 / Giants br-014 / Oakland br-013).
+**Garment type lock:** Authentic-style baseball jersey — V-neck collar opening, button-front placket, short sleeves, straight even hem (no drop-tail). Solid **white** base fabric with **black** piping/binding around V-neck collar, sleeve cuffs, and down both sides of the front placket. Black buttons on the placket. NO player number on front or back. NO player name on back. NO pinstripes. Mid-weight knit jersey. This is the WHITE colorway (separate SKU from Classic black br-003 / Giants br-014 / Oakland br-012).
 
 ## Branding — exactly what IS on this product
 

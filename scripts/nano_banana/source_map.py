@@ -56,10 +56,6 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "front": S / "black-rose" / "br-jersey-baseball-giants-front.jpeg",
             "back": S / "black-rose" / "br-jersey-baseball-giants-back.jpeg",
         },
-        "br-013": {
-            "front": S / "black-rose" / "br-jersey-baseball-oakland-front.jpeg",
-            "back": S / "black-rose" / "br-jersey-baseball-oakland-back.jpeg",
-        },
         "br-015": {
             "front": S / "black-rose" / "br-jersey-baseball-white-front.jpeg",
             "back": S / "black-rose" / "br-jersey-baseball-white-back.jpeg",

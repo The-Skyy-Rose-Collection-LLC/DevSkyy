@@ -1,14 +1,30 @@
 /**
  * SkyyRose Design Tokens
  *
- * Canonical design token file referenced by the enqueue system.
- * Imports brand variables and adds layout, component, and semantic tokens.
+ * Canonical token surface — colors, spacing, typography, motion, depth.
+ * Loaded globally via `skyyrose_enqueue_global_styles()` (inc/enqueue.php).
+ *
+ * Architecture:
+ *   - Single :root block declares every base token.
+ *   - Per-collection palette overrides via [data-collection="<slug>"] cascade.
+ *   - Global concerns (view-transitions, focus-visible, reduced-motion,
+ *     Jetpack overlay quirk) declared as bare rules outside :root.
+ *
+ * NO component CSS belongs in this file. Component styles live in their
+ * own files (footer-cro.css, components.css, header.css, etc.).
+ *
+ * Canonical typography source: --skyyrose-font-display drives every legacy
+ * alias (--font-heading, --ff-brand, etc.) so per-collection font overrides
+ * cascade automatically to all consumers.
  *
  * @package SkyyRose
  * @since   3.0.0
  */
 
-/* View Transitions API — smooth cross-fade between pages */
+/* ═══════════════════════════════════════════════════════════════════
+   §0  Global Rules — view transitions, focus, third-party quirks
+   ═══════════════════════════════════════════════════════════════════ */
+
 @view-transition {
 	navigation: auto;
 }
@@ -19,84 +35,113 @@
 	animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@media (prefers-reduced-motion: reduce) {
-	::view-transition-old(root),
-	::view-transition-new(root) {
-		animation-duration: 0.01s;
-	}
+:focus-visible {
+	outline: 2px solid var(--color-rose-gold, #B76E79);
+	outline-offset: 3px;
 }
 
+:focus:not(:focus-visible) {
+	outline: none;
+}
+
+/* Jetpack Instant Search injects an invisible overlay (z-index max,
+   opacity 0, pointer-events auto) that blocks the custom cursor and
+   intercepts clicks site-wide. Force pointer-events:none. */
+.jetpack-instant-search__overlay {
+	pointer-events: none !important;
+}
+
+.jetpack-instant-search__overlay[aria-hidden="true"] {
+	display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   §1  :root — Canonical token surface
+   ═══════════════════════════════════════════════════════════════════ */
+
 :root {
-	/* -----------------------------------------------
-	   Layout
-	   ----------------------------------------------- */
-	--header-height: 72px;
-	--tab-bar-height: 48px;
-	--sidebar-width: 280px;
-	--container-content: 1200px;
-	--container-wide: 1400px;
-	--container-narrow: 800px;
+	/* --- §1.1  Layout ---------------------------------------------- */
+	--header-height:      72px;
+	--tab-bar-height:     48px;
+	--sidebar-width:      280px;
+	--container-narrow:   800px;
+	--container-content:  1200px;
+	--container-wide:     1400px;
 
-	/* -----------------------------------------------
-	   Semantic Colors (map to brand-variables)
-	   ----------------------------------------------- */
-	--color-page-bg: #0A0A0A;
-	--color-card-bg: #111111;
-	--color-card-bg-hover: #161616;
-	--color-border: #2A2A2A;
-	--color-border-hover: rgba(183, 110, 121, 0.3);
-	--color-text-primary: #FFFFFF;
-	--color-text-secondary: #E0E0E0;
-	--color-text-muted: #B3B3B3;
-	--color-text-dim: #A0A0A0;
+	/* --- §1.2  Z-Index scale --------------------------------------- */
+	--z-sticky:   200;
+	--z-overlay:  400;
+	--z-tooltip:  600;
+	--z-modal:    800;
+	--z-cursor:   9999;
+
+	/* --- §1.3  Border Radius --------------------------------------- */
+	--radius-sm:   4px;
+	--radius-md:   8px;
+	--radius-lg:   16px;
+	--radius-full: 9999px;
+
+	/* --- §1.4  Safe Area Insets (mobile viewport) ------------------ */
+	--safe-top:    env(safe-area-inset-top, 0px);
+	--safe-bottom: env(safe-area-inset-bottom, 0px);
+	--safe-left:   env(safe-area-inset-left, 0px);
+	--safe-right:  env(safe-area-inset-right, 0px);
+
+	/* --- §1.5  Color — Brand aliases (fallback to brand-variables.css) --- */
 	--color-rose-gold: var(--rose-gold, #B76E79);
-	--color-gold: var(--gold, #D4AF37);
-	--color-crimson: var(--crimson, #DC143C);
-	--color-silver: var(--silver, #C0C0C0);
-	--color-white: var(--white, #FFFFFF);
-	--color-black: var(--black, #000000);
+	--color-gold:      var(--gold, #D4AF37);
+	--color-crimson:   var(--crimson, #DC143C);
+	--color-silver:    var(--silver, #C0C0C0);
+	--color-white:     var(--white, #FFF);
+	--color-black:     var(--black, #000);
 
-	/* -----------------------------------------------
-	   Semantic state colors (success/danger/info)
-	   Mapped to brand palette — no off-brand greens/reds.
-	   ----------------------------------------------- */
-	--color-success: var(--color-gold, #D4AF37);
-	--color-danger: var(--color-crimson, #DC143C);
-	--color-info: var(--color-rose-gold, #B76E79);
+	/* --- §1.6  Color — Semantic surfaces --------------------------- */
+	--color-page-bg:       #0A0A0A;
+	--color-card-bg:       #111;
+	--color-card-bg-hover: #161616;
+	--color-border:        #2A2A2A;
+	--color-border-hover:  rgba(183, 110, 121, 0.3);
+	--color-text-primary:   #FFF;
+	--color-text-secondary: #E0E0E0;
+	--color-text-muted:     #B3B3B3;
+	--color-text-dim:       #A0A0A0;
+
+	/* --- §1.7  Color — Semantic state (mapped to brand palette) ---- */
+	--color-success:      var(--color-gold, #D4AF37);
+	--color-danger:       var(--color-crimson, #DC143C);
+	--color-info:         var(--color-rose-gold, #B76E79);
 	--color-success-soft: rgba(212, 175, 55, 0.12);
-	--color-danger-soft: rgba(220, 20, 60, 0.12);
-	--color-info-soft: rgba(183, 110, 121, 0.12);
+	--color-danger-soft:  rgba(220, 20, 60, 0.12);
+	--color-info-soft:    rgba(183, 110, 121, 0.12);
 
-	/* -----------------------------------------------
-	   Glass Effects
-	   ----------------------------------------------- */
-	--glass-bg: rgba(17, 17, 17, 0.92);
+	/* --- §1.8  Glass Effects --------------------------------------- */
+	--glass-bg:      rgba(17, 17, 17, 0.92);
 	--glass-bg-dark: rgba(10, 10, 10, 0.98);
-	--glass-border: 1px solid rgba(255, 255, 255, 0.06);
-	--glass-blur: blur(24px) saturate(1.4);
+	--glass-border:  1px solid rgba(255, 255, 255, 0.06);
+	--glass-blur:    blur(24px) saturate(1.4);
 
-	/* -----------------------------------------------
-	   Typography — Font Stacks (canonical aliases)
-	   --font-heading is the brand-canon alias consumed by every page
-	   stylesheet (woocommerce, footer, immersive, generic-pages, cart,
-	   checkout, etc.). All three font namespaces below ALIAS into the
-	   canonical `--skyyrose-font-*` system (defined below in section §3),
-	   so per-collection overrides (`[data-collection="black-rose"]` etc.)
-	   cascade automatically to every legacy consumer. Single source of
-	   truth = `--skyyrose-font-display`.
-	   --font-headline is kept as a back-compat alias for search-results.css.
-	   ----------------------------------------------- */
+	/* --- §1.9  Shadows — Depth / Elevation ------------------------- */
+	--depth-1: 0 2px 8px rgba(0, 0, 0, 0.4);
+	--depth-2: 0 8px 24px rgba(0, 0, 0, 0.5);
+	--depth-3: 0 16px 48px rgba(0, 0, 0, 0.6);
+	--depth-4: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 120px rgba(0, 0, 0, 0.3);
+
+	/* --- §1.10  Shadows — Brand glow ------------------------------- */
+	--shadow-crimson-glow: 0 0 20px rgba(220, 20, 60, 0.3);
+	--shadow-silver-glow:  0 0 20px rgba(192, 192, 192, 0.3);
+
+	/* --- §1.11  Gradients ------------------------------------------ */
+	--gradient-logo:    linear-gradient(135deg, #B76E79 0%, #D4AF37 50%, #C0C0C0 100%);
+	--gradient-overlay: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.7) 100%);
+
+	/* --- §1.12  Typography — Font stacks (legacy aliases) ----------
+	   Single source of truth = --skyyrose-font-display (defined in §2).
+	   --font-heading / --font-headline / --ff-* are back-compat aliases
+	   consumed by woocommerce, footer, immersive, generic-pages, cart,
+	   checkout, search-results, homepage-v2/v7, product-grid. Do NOT
+	   add new declarations here — extend --skyyrose-font-* instead. */
 	--font-heading:  var(--skyyrose-font-display);
 	--font-headline: var(--font-heading);
-
-	/* -----------------------------------------------
-	   Typography — Named Font Aliases (legacy namespace)
-	   Aliased into the canonical `--skyyrose-font-*` system so per-
-	   collection font overrides flow through to every consumer
-	   (homepage-v2.css, homepage-v7.css, generic-pages.css,
-	   product-grid.css, footer.css, etc.). Do NOT add new declarations
-	   here — extend `--skyyrose-font-*` instead.
-	   ----------------------------------------------- */
 	--ff-brand:     var(--skyyrose-font-display);
 	--ff-editorial: var(--skyyrose-font-display);
 	--ff-body:      var(--skyyrose-font-body);
@@ -104,201 +149,104 @@
 	--ff-mono:      var(--skyyrose-font-mono);
 	--ff-system:    'Inter', system-ui, -apple-system, sans-serif;
 
-	/* -----------------------------------------------
-	   Border Radius
-	   ----------------------------------------------- */
-	--radius-sm: 4px;
-	--radius-md: 8px;
-	--radius-lg: 16px;
-	--radius-full: 9999px;
-
-	/* -----------------------------------------------
-	   Typography — Line Heights
-	   ----------------------------------------------- */
-	--leading-tight: 1.15;
-	--leading-snug: 1.3;
-	--leading-normal: 1.6;
-	--leading-relaxed: 1.75;
-
-	/* -----------------------------------------------
-	   Typography — Letter Spacing
-	   ----------------------------------------------- */
-	--tracking-tighter: -0.05em;
-	--tracking-tight: -0.025em;
-	--tracking-normal: 0;
-	--tracking-wide: 0.05em;
-	--tracking-wider: 0.1em;
-	--tracking-widest: 0.2em;
-
-	/* -----------------------------------------------
-	   Typography — Font Scale
-	   CANONICAL source: design-tokens.css (--text-xs…--text-5xl).
-	   Do NOT redefine elsewhere — the cascade will silently override.
-	   ----------------------------------------------- */
-	--text-xs: 0.8125rem;
-	--text-sm: 0.9375rem;
+	/* --- §1.13  Typography — Scale (canonical) --------------------- */
+	--text-xs:   0.8125rem;
+	--text-sm:   0.9375rem;
 	--text-base: 1.0625rem;
-	--text-lg: 1.1875rem;
-	--text-xl: 1.375rem;
-	--text-2xl: 1.625rem;
-	--text-3xl: clamp(1.875rem, 2.8vw, 2.25rem);
-	--text-4xl: clamp(2.25rem, 3.8vw, 2.875rem);
-	--text-5xl: clamp(2.75rem, 5.5vw, 4rem);
+	--text-lg:   1.1875rem;
+	--text-xl:   1.375rem;
+	--text-2xl:  1.625rem;
+	--text-3xl:  clamp(1.875rem, 2.8vw, 2.25rem);
+	--text-4xl:  clamp(2.25rem, 3.8vw, 2.875rem);
+	--text-5xl:  clamp(2.75rem, 5.5vw, 4rem);
 
-	/* -----------------------------------------------
-	   Typography — Decorative Sizes (oversized letters, chapter nums)
-	   ----------------------------------------------- */
+	/* --- §1.14  Typography — Decorative scale (oversized) ---------- */
 	--text-decorative-sm: clamp(2.25rem, 4vw, 4.5rem);
 	--text-decorative-md: clamp(3rem, 6vw, 6rem);
 	--text-decorative-lg: clamp(5rem, 14vw, 12.5rem);
 	--text-decorative-xl: clamp(5rem, 14vw, 13.75rem);
 
-	/* -----------------------------------------------
-	   Shadows — Glow variants
-	   ----------------------------------------------- */
-	--shadow-crimson-glow: 0 0 20px rgba(220, 20, 60, 0.3);
-	--shadow-silver-glow: 0 0 20px rgba(192, 192, 192, 0.3);
+	/* --- §1.15  Typography — Line heights -------------------------- */
+	--leading-tight:   1.15;
+	--leading-snug:    1.3;
+	--leading-normal:  1.6;
+	--leading-relaxed: 1.75;
 
-	/* -----------------------------------------------
-	   Gradients — Logo
-	   ----------------------------------------------- */
-	--gradient-logo: linear-gradient(135deg, #B76E79 0%, #D4AF37 50%, #C0C0C0 100%);
-	--gradient-overlay: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.7) 100%);
+	/* --- §1.16  Typography — Letter spacing ------------------------ */
+	--tracking-tighter: -0.05em;
+	--tracking-tight:   -0.025em;
+	--tracking-normal:  0;
+	--tracking-wide:    0.05em;
+	--tracking-wider:   0.1em;
+	--tracking-widest:  0.2em;
 
-	/* -----------------------------------------------
-	   Transitions
-	   ----------------------------------------------- */
-	--transition-smooth: all 0.3s ease;
-	--transition-spring: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-
-	/* -----------------------------------------------
-	   Focus States (WCAG 2.4.7)
-	   ----------------------------------------------- */
-}
-
-:focus-visible {
-	outline: 2px solid var(--color-rose-gold, #B76E79);
-	outline-offset: 3px;
-}
-:focus:not(:focus-visible) {
-	outline: none;
-}
-
-:root {
-	/* -----------------------------------------------
-	   Interactive States
-	   ----------------------------------------------- */
-	--focus-ring: 0 0 0 2px var(--color-rose-gold, #B76E79);
-	--hover-lift: translateY(-2px);
-	--active-press: scale(0.97);
-
-	/* -----------------------------------------------
-	   Z-Index — Additional layers
-	   ----------------------------------------------- */
-	--z-sticky: 200;
-	--z-overlay: 400;
-	--z-tooltip: 600;
-	--z-modal: 800;
-	--z-cursor: 9999;
-
-	/* -----------------------------------------------
-	   Motion — Reduced motion defaults
-	   ----------------------------------------------- */
+	/* --- §1.17  Motion — Durations --------------------------------- */
 	--motion-duration: 0.3s;
-	--motion-spring: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+	--motion-spring:   0.6s cubic-bezier(0.16, 1, 0.3, 1);
 
-	/* -----------------------------------------------
-	   Cinematic Easing Library
-	   ----------------------------------------------- */
-	--ease-cinematic: cubic-bezier(0.22, 1, 0.36, 1);    /* hero entrances, page reveals */
-	--ease-magnetic: cubic-bezier(0.03, 0.98, 0.52, 0.99); /* cursor-reactive follow */
-	--ease-whip: cubic-bezier(0.75, 0, 0.25, 1);          /* snappy micro-interactions */
-	--ease-smooth-out: cubic-bezier(0.16, 1, 0.3, 1);     /* exit animations */
-	--ease-dramatic: cubic-bezier(0.65, 0, 0.35, 1);      /* clip-path reveals */
+	/* --- §1.18  Motion — Cinematic easing library ------------------ */
+	--ease-cinematic:  cubic-bezier(0.22, 1, 0.36, 1);     /* hero entrances, page reveals */
+	--ease-magnetic:   cubic-bezier(0.03, 0.98, 0.52, 0.99); /* cursor-reactive follow */
+	--ease-whip:       cubic-bezier(0.75, 0, 0.25, 1);     /* snappy micro-interactions */
+	--ease-smooth-out: cubic-bezier(0.16, 1, 0.3, 1);      /* exit animations */
+	--ease-dramatic:   cubic-bezier(0.65, 0, 0.35, 1);     /* clip-path reveals */
 
-	/* -----------------------------------------------
-	   Parallax Speed Multipliers
-	   ----------------------------------------------- */
-	--parallax-slow: 0.15;
-	--parallax-medium: 0.3;
-	--parallax-fast: 0.5;
+	/* --- §1.19  Motion — Reveal durations -------------------------- */
+	--reveal-fast:      0.5s;
+	--reveal-normal:    0.8s;
+	--reveal-slow:      1.2s;
+	--reveal-cinematic: 1.6s;
 
-	/* -----------------------------------------------
-	   Stagger Timing (cascade delays)
-	   ----------------------------------------------- */
-	--stagger-base: 60ms;
+	/* --- §1.20  Motion — Stagger (cascade delays) ------------------ */
+	--stagger-base:   60ms;
 	--stagger-medium: 100ms;
-	--stagger-long: 150ms;
+	--stagger-long:   150ms;
 
-	/* -----------------------------------------------
-	   Split-Text Timing
-	   ----------------------------------------------- */
+	/* --- §1.21  Motion — Split-text timing ------------------------- */
 	--split-char-delay: 25ms;
 	--split-word-delay: 70ms;
 	--split-line-delay: 120ms;
 
-	/* -----------------------------------------------
-	   Depth / Elevation System
-	   ----------------------------------------------- */
-	--depth-1: 0 2px 8px rgba(0, 0, 0, 0.4);
-	--depth-2: 0 8px 24px rgba(0, 0, 0, 0.5);
-	--depth-3: 0 16px 48px rgba(0, 0, 0, 0.6);
-	--depth-4: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 120px rgba(0, 0, 0, 0.3);
+	/* --- §1.22  Motion — Parallax multipliers ---------------------- */
+	--parallax-slow:   0.15;
+	--parallax-medium: 0.3;
+	--parallax-fast:   0.5;
 
-	/* -----------------------------------------------
-	   Reveal Animation Durations
-	   ----------------------------------------------- */
-	--reveal-fast: 0.5s;
-	--reveal-normal: 0.8s;
-	--reveal-slow: 1.2s;
-	--reveal-cinematic: 1.6s;
+	/* --- §1.23  Transitions — compound ----------------------------- */
+	--transition-smooth: all 0.3s ease;
+	--transition-spring: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 
-	/* -----------------------------------------------
-	   Content Visibility — Performance tokens
-	   ----------------------------------------------- */
-	--cv-auto: auto;
-	--contain-paint: paint;
+	/* --- §1.24  Interactive states --------------------------------- */
+	--focus-ring:    0 0 0 2px var(--color-rose-gold, #B76E79);
+	--hover-lift:    translateY(-2px);
+	--active-press:  scale(0.97);
+
+	/* --- §1.25  Content visibility / containment ------------------- */
+	--cv-auto:        auto;
+	--contain-paint:  paint;
 	--contain-layout: layout;
-
-	/* -----------------------------------------------
-	   Safe Area Insets — Mobile viewport
-	   ----------------------------------------------- */
-	--safe-top: env(safe-area-inset-top, 0px);
-	--safe-bottom: env(safe-area-inset-bottom, 0px);
-	--safe-left: env(safe-area-inset-left, 0px);
-	--safe-right: env(safe-area-inset-right, 0px);
-}
-
-/* -----------------------------------------------
-   Jetpack Overlay Fix — invisible overlay blocks cursor
-   ----------------------------------------------- */
-.jetpack-instant-search__overlay {
-	pointer-events: none !important;
-}
-.jetpack-instant-search__overlay[aria-hidden="true"] {
-	display: none !important;
-}
-
-/* -----------------------------------------------
-   Reduced Motion — Override duration tokens
-   ----------------------------------------------- */
-@media (prefers-reduced-motion: reduce) {
-	:root {
-		--motion-duration: 0.01ms;
-		--motion-spring: 0.01ms linear;
-		--transition-smooth: all 0.01ms linear;
-		--transition-spring: all 0.01ms linear;
-	}
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Per-Collection Palette — [data-collection] cascade
+   §1.99  Global resets — must follow §1 root tokens
    --------------------------------------------------------------------
-   Single source of truth for collection-scoped colors, fonts, and
-   easings. Consumed directly by feature CSS (landing-pages.css,
-   animations-premium.css, etc.) via var(--skyyrose-*).
-   To switch palettes, set [data-collection="<slug>"] on any wrapper.
+   scroll-padding-top: keeps in-page anchors (skip-link, jump-to-id)
+   from landing beneath the sticky header. WCAG SC 2.4.1 (Bypass Blocks).
    ═══════════════════════════════════════════════════════════════════ */
+
+html {
+	scroll-padding-top: var(--header-height, 72px);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   §2  Per-Collection Palette — [data-collection] cascade
+   --------------------------------------------------------------------
+   Single source of truth for collection-scoped colors, fonts, easings.
+   Consumed by feature CSS (landing-pages.css, animations-premium.css,
+   collection-pages.css, etc.) via var(--skyyrose-*).
+   Switch palette: set [data-collection="<slug>"] on any wrapper.
+   ═══════════════════════════════════════════════════════════════════ */
+
 :root {
 	--skyyrose-accent:       #B76E79;
 	--skyyrose-accent-rgb:   183, 110, 121;
@@ -318,9 +266,10 @@
 [data-collection="black-rose"] {
 	--skyyrose-accent:       #C0C0C0;
 	--skyyrose-accent-rgb:   192, 192, 192;
-	--skyyrose-accent-dark:  #999999;
+	--skyyrose-accent-dark:  #999;
 	--skyyrose-secondary:    #DC143C;
 	--skyyrose-font-display: 'Cinzel', serif;
+	--skyyrose-font-gothic:  'UnifrakturMaguntia', 'Cinzel', serif;
 }
 
 [data-collection="love-hurts"] {
@@ -328,7 +277,7 @@
 	--skyyrose-accent-rgb:   220, 20, 60;
 	--skyyrose-accent-dark:  #9B0F2E;
 	--skyyrose-secondary:    #B76E79;
-	--skyyrose-font-display: 'Playfair Display', serif;
+	--skyyrose-font-display: 'Yellowtail', 'Playfair Display', cursive, serif;
 }
 
 [data-collection="signature"] {
@@ -336,7 +285,8 @@
 	--skyyrose-accent-rgb:   212, 175, 55;
 	--skyyrose-accent-dark:  #B8960C;
 	--skyyrose-secondary:    #F7E7CE;
-	--skyyrose-font-display: 'Playfair Display', serif;
+	--skyyrose-font-display: 'Italiana', 'Playfair Display', serif;
+	--skyyrose-font-script:  'Pinyon Script', cursive;
 }
 
 [data-collection="kids-capsule"] {
@@ -344,80 +294,24 @@
 	--skyyrose-accent-rgb:   183, 110, 121;
 	--skyyrose-accent-dark:  #9A5662;
 	--skyyrose-secondary:    #D4AF37;
-	--skyyrose-font-display: 'Playfair Display', serif;
+	--skyyrose-font-display: 'Italiana', 'Playfair Display', serif;
+	--skyyrose-font-script:  'Pinyon Script', cursive;
 }
 
-/* ═══ Footer CRO Sections ═══ */
-.ft-cro__container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
-.ft-cro__heading {
-	font-family: var(--skyyrose-font-display); font-size: 1.6rem; font-weight: 400;
-	letter-spacing: 0.15em; text-transform: uppercase; margin: 0 0 0.75rem; text-align: center;
-}
-.ft-cro__subheading {
-	font-size: 0.85rem; color: rgba(255,255,255,0.55); max-width: 600px;
-	margin: 0 auto 2rem; line-height: 1.6; text-align: center;
-}
+/* ═══════════════════════════════════════════════════════════════════
+   §3  Reduced Motion — Override duration tokens
+   ═══════════════════════════════════════════════════════════════════ */
 
-/* Banner */
-.ft-cro-banner {
-	padding: 3rem 5%; text-align: center;
-	border-top: 1px solid rgba(212,175,55,0.08); border-bottom: 1px solid rgba(212,175,55,0.08);
-}
-.ft-cro-banner p {
-	font-family: var(--skyyrose-font-display); font-size: 1.3rem; font-weight: 400;
-	letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin: 0;
-}
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--motion-duration:   0.01ms;
+		--motion-spring:     0.01ms linear;
+		--transition-smooth: all 0.01ms linear;
+		--transition-spring: all 0.01ms linear;
+	}
 
-/* Reviews */
-.ft-cro-reviews { padding: 4rem 5% 3rem; }
-.ft-cro-reviews__grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 2rem; }
-.ft-cro-reviews__card {
-	padding: 1.5rem; border: 1px solid rgba(255,255,255,0.06); border-radius: 8px;
-	background: rgba(255,255,255,0.02);
-}
-.ft-cro-reviews__stars { display: flex; gap: 0.15rem; margin-bottom: 0.75rem; }
-.ft-cro-reviews__stars svg { width: 13px; height: 13px; color: var(--color-gold, #D4AF37); }
-.ft-cro-reviews__card blockquote { margin: 0 0 0.75rem; padding: 0; }
-.ft-cro-reviews__card blockquote p { font-size: 0.85rem; line-height: 1.6; color: rgba(255,255,255,0.65); margin: 0; font-style: italic; }
-.ft-cro-reviews__card cite { font-size: 0.65rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.55); font-style: normal; }
-
-/* Craft / Value Props */
-.ft-cro-craft { padding: 3rem 5% 4rem; }
-.ft-cro-craft__grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.5rem; }
-.ft-cro-craft__card {
-	padding: 1.5rem 1.25rem; text-align: center;
-	border: 1px solid rgba(255,255,255,0.06); border-radius: 8px;
-	background: rgba(255,255,255,0.02); transition: border-color 0.3s ease;
-}
-.ft-cro-craft__card:hover { border-color: rgba(212,175,55,0.2); }
-.ft-cro-craft__icon {
-	display: block; font-family: var(--skyyrose-font-display);
-	font-size: 1.4rem; color: var(--color-gold, #D4AF37); margin-bottom: 0.75rem;
-}
-.ft-cro-craft__card h3 { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin: 0 0 0.5rem; }
-.ft-cro-craft__card p { font-size: 0.75rem; line-height: 1.5; color: rgba(255,255,255,0.55); margin: 0; }
-
-/* FAQ */
-.ft-cro-faq { padding: 3rem 5% 4rem; max-width: 900px; margin: 0 auto; }
-.ft-cro-faq__question {
-	background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.06);
-	color: rgba(255,255,255,0.75); width: 100%; text-align: left;
-	padding: 1.1rem 0; font-size: 0.85rem; cursor: pointer;
-	display: flex; justify-content: space-between; align-items: center;
-	transition: color 0.3s ease;
-}
-.ft-cro-faq__question:hover { color: #fff; }
-.ft-cro-faq__icon { width: 16px; height: 16px; stroke: currentColor; fill: none; flex-shrink: 0; transition: transform 0.3s ease; }
-.ft-cro-faq__question[aria-expanded="true"] .ft-cro-faq__icon { transform: rotate(45deg); }
-.ft-cro-faq__answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
-.ft-cro-faq__answer-inner { padding: 0 0 1.1rem; font-size: 0.8rem; line-height: 1.6; color: rgba(255,255,255,0.55); }
-
-/* Footer CRO Responsive */
-@media (max-width: 768px) {
-	.ft-cro-reviews__grid { grid-template-columns: 1fr; }
-	.ft-cro-craft__grid { grid-template-columns: repeat(2,1fr); }
-	.ft-cro-banner p { font-size: 1rem; letter-spacing: 0.1em; }
-}
-@media (max-width: 480px) {
-	.ft-cro-craft__grid { grid-template-columns: 1fr; }
+	::view-transition-old(root),
+	::view-transition-new(root) {
+		animation-duration: 0.01s;
+	}
 }

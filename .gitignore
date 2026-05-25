@@ -419,3 +419,6 @@ agents/render_pipeline/output/
 data/agent-learning/
 data/vision-consensus/
 tasks/render-pipeline-cli-*.json
+
+# Catalog auto-sync + ad-hoc backups (sync scripts and one-off cleanups)
+*.bak-*

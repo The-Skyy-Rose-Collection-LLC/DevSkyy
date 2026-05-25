@@ -1007,7 +1007,7 @@ function skyyrose_favicon_tags() {
 	$uri = get_template_directory_uri();
 	?>
 	<link rel="icon" type="image/webp" sizes="32x32" href="<?php echo esc_url( $uri . '/assets/branding/skyyrose-rose-icon-favicon.webp' ); ?>">
-	<link rel="apple-touch-icon" sizes="180x180" href="<?php echo esc_url( $uri . '/assets/branding/skyyrose-monogram-footer.webp' ); ?>">
+	<link rel="apple-touch-icon" sizes="180x180" href="<?php echo esc_url( $uri . '/assets/images/logos/sr-monogram-rose-gold.webp?v=' . SKYYROSE_VERSION ); ?>">
 	<?php
 }
 add_action( 'wp_head', 'skyyrose_favicon_tags', 2 );

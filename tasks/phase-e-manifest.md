@@ -12,8 +12,8 @@
 <!-- PREFLIGHT-AUTO-START -->
 | Check | Result |
 |-------|--------|
-| Catalog rows | 33 / 33 parse cleanly (24 cols, `csv.reader` handles quoted descriptions) |
-| Source images present | 33 / 33 (every `image` column path resolves under `wordpress-theme/skyyrose-flagship/`) |
+| Catalog rows | 32 / 32 parse cleanly (24 cols, `csv.reader` handles quoted descriptions) |
+| Source images present | 32 / 32 (every `image` column path resolves under `wordpress-theme/skyyrose-flagship/`) |
 | Output collision guard (ADK pipeline) | **DOC (accepted)** — `renders/gated/<sku>/<sku>-<view>-render.webp` deterministic path at `agents/render_pipeline/tools/generate_image.py:264-268`. LoopAgent refine and re-dispatch both overwrite by design (decision 2026-05-12, path-b). Archive `renders/gated/<sku>/` before re-dispatch if history needed. |
 | Round-table import | clean (`python -c "from orchestration.threed_round_table import ThreeDRoundTable"`) |
 | Round-table tests | 36 / 36 passing |
@@ -22,10 +22,10 @@
 | Elite Studio hardening tests | 18 / 18 passing |
 | Aggregate test baseline | **90 / 90 green** |
 | TRELLIS.2 available locally | NO — conda not on PATH; TRELLIS.2 provider unavailable on this host |
-| `RunBudget` enforcement (P1) | LIVE — `ELITE_STUDIO_BUDGET_USD=25.0` default. `ensure_within_budget` gate raises `BudgetExceededError` on projected breach. |
-| Run summary persistence (P2) | LIVE — `logs/runs/<workflow_id>.json` written on success and failure |
+| `RunBudget` enforcement (P1) | UNVERIFIED — nodes.py missing |
+| Run summary persistence (P2) | UNVERIFIED — nodes.py missing |
 | Cross-SKU image-leak guard (P4) | LIVE — `_sku_tokens_consistent()` blocks round-table dispatch on SKU token mismatch |
-| 3-judge QA tournament | LIVE — judge tournament wired; specific model IDs not declared in nodes.py (verify in prompts/clients) |
+| 3-judge QA tournament | UNVERIFIED — nodes.py missing |
 | QA refine loop | LIVE — `LoopAgent(max_iterations=2)` in `agents/render_pipeline/agent.py`; F5 score classifier emits `pass | refine | abort` |
 <!-- PREFLIGHT-AUTO-END -->
 
@@ -66,11 +66,10 @@ Source = catalog `image` column. `LOGO` / `EXTRAS` = dossier frontmatter field p
 | sg-015 | signature | OK | OK | OK | the-windbreaker-set |
 | kids-001 | kids-capsule | OK | OK | OK | kids-colorblock-hoodie-set-red-black |
 | kids-002 | kids-capsule | OK | OK | OK | kids-colorblock-hoodie-set-purple-black |
-| br-013 | black-rose | OK | OK | OK | black-is-beautiful-jersey-series-0-baseball-classic-oakland |
 | br-014 | black-rose | OK | OK | OK | black-is-beautiful-jersey-series-0-baseball-classic-giants |
 | br-015 | black-rose | OK | OK | OK | black-is-beautiful-jersey-series-0-baseball-classic-white |
 
-**Summary:** 30 / 33 ready for primary-logo render. 22 / 33 fully ready (logo + extras). 3 SKU(s) missing primary `logo_reference`. 11 SKU(s) missing `extra_logos`. 0 dossier file(s) absent.
+**Summary:** 29 / 32 ready for primary-logo render. 21 / 32 fully ready (logo + extras). 3 SKU(s) missing primary `logo_reference`. 11 SKU(s) missing `extra_logos`. 0 dossier file(s) absent.
 <!-- PERSKU-AUTO-END -->
 
 ## Dossier gap remediation options

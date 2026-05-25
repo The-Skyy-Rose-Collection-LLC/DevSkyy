@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkyyRose — Collection Design Mockups (2026-05-24)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: #0A0A0A;
+    color: #E8E4DF;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; text-decoration: none; }
+
+  /* ─── Per-collection palette tokens ─── */
+  [data-collection="black-rose"]  { --accent:#C0C0C0; --accent-soft:rgba(192,192,192,.18); --bg:#0A0A0A; --font-display:'Cinzel', serif; --font-ui:'Bebas Neue', sans-serif; }
+  [data-collection="love-hurts"]  { --accent:#DC143C; --accent-soft:rgba(220,20,60,.18); --bg-2:#1a0508; --font-display:'Playfair Display', serif; --font-ui:'Bebas Neue', sans-serif; }
+  [data-collection="signature"]   { --accent:#D4AF37; --accent-soft:rgba(212,175,55,.18); --bg:#0A0A0A; --font-display:'Playfair Display', serif; --font-ui:'Bebas Neue', sans-serif; }
+  [data-collection="kids-capsule"]{ --accent:#B76E79; --accent-soft:rgba(183,110,121,.18); --bg:#0A0A0A; --font-display:'Playfair Display', serif; --font-ui:'Bebas Neue', sans-serif; }
+
+  /* ─── Sticky collection nav ─── */
+  .topnav {
+    position: fixed; top:0; left:0; right:0;
+    z-index: 1000;
+    background: rgba(10,10,10,.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    padding: 14px 5vw;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: .18em;
+    font-size: 13px;
+  }
+  .topnav__brand { font-family: 'Playfair Display', serif; font-size: 18px; letter-spacing: .08em; }
+  .topnav__links { display: flex; gap: 28px; }
+  .topnav__links a { transition: color .2s; }
+  .topnav__links a:hover { color: #C0C0C0; }
+
+  /* ─── Section wrappers ─── */
+  .collection-block { padding: 120px 0; border-top: 1px solid rgba(255,255,255,.04); }
+  .collection-block:first-of-type { border-top: 0; padding-top: 100px; }
+  .container { max-width: 1400px; margin: 0 auto; padding: 0 5vw; }
+  .container--narrow { max-width: 980px; }
+  .surface { margin-bottom: 140px; }
+  .surface:last-child { margin-bottom: 0; }
+  .surface__label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 12px;
+    letter-spacing: .22em;
+    color: var(--accent);
+    margin-bottom: 28px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--accent-soft);
+  }
+
+  /* ─── Eyebrow chip ─── */
+  .eyebrow {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 11px;
+    letter-spacing: .28em;
+    color: var(--accent);
+    margin-bottom: 24px;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     BLACK ROSE — BRUTALIST POSTURE
+     Single column. Posture. Silver on black. Sparse.
+     ═══════════════════════════════════════════════════════════════ */
+  .br-landing {
+    text-align: center;
+    padding: 120px 0 80px;
+  }
+  .br-landing__hairline {
+    width: 60px; height: 1px;
+    background: var(--accent);
+    margin: 0 auto 40px;
+  }
+  .br-landing__h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(48px, 9vw, 140px);
+    letter-spacing: .04em;
+    line-height: 1;
+    color: #fff;
+    margin-bottom: 32px;
+  }
+  .br-landing__tag {
+    font-family: var(--font-display);
+    font-size: clamp(18px, 2vw, 24px);
+    font-style: italic;
+    color: rgba(232,228,223,.7);
+    margin-bottom: 64px;
+  }
+  .br-landing__quote {
+    max-width: 640px;
+    margin: 0 auto;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    line-height: 1.55;
+    color: rgba(232,228,223,.85);
+    padding: 40px 0;
+    border-top: 1px solid var(--accent-soft);
+    border-bottom: 1px solid var(--accent-soft);
+  }
+  .br-landing__cta {
+    margin-top: 56px;
+    display: inline-block;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 13px;
+    letter-spacing: .3em;
+    color: var(--accent);
+    padding: 16px 36px;
+    border: 1px solid var(--accent);
+    transition: all .25s;
+  }
+  .br-landing__cta:hover {
+    background: var(--accent);
+    color: #0A0A0A;
+  }
+
+  /* Black Rose grid — strict 2-column uniform catalog */
+  .br-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-soft);
+  }
+  .br-grid__card {
+    background: #0A0A0A;
+    padding: 48px 32px;
+    text-align: center;
+  }
+  .br-grid__img {
+    aspect-ratio: 4/5;
+    background:
+      radial-gradient(ellipse at 50% 40%, rgba(192,192,192,.08), transparent 60%),
+      #0d0d0d;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .br-grid__img::after {
+    content: '';
+    position: absolute;
+    inset: 50% 40% 50% 40%;
+    width: 20%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(192,192,192,.4), transparent);
+    transform: translate(-50%, -50%);
+    filter: blur(20px);
+  }
+  .br-grid__name {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: .05em;
+    margin-bottom: 8px;
+  }
+  .br-grid__price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: .15em;
+    color: var(--accent);
+  }
+
+  /* Black Rose PDP — posture above all */
+  .br-pdp {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .br-pdp__gallery {
+    aspect-ratio: 4/5;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(192,192,192,.1), transparent 65%),
+      #0d0d0d;
+    position: relative;
+  }
+  .br-pdp__gallery::after {
+    content: '';
+    position: absolute;
+    inset: 35% 35% 35% 35%;
+    width: 30%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(192,192,192,.5), transparent);
+    transform: translate(-50%, -50%);
+    filter: blur(30px);
+  }
+  .br-pdp__info { padding-top: 40px; }
+  .br-pdp__cat { font-family: 'Bebas Neue', sans-serif; font-size: 12px; letter-spacing: .28em; color: var(--accent); margin-bottom: 24px; }
+  .br-pdp__name { font-family: var(--font-display); font-weight: 500; font-size: 42px; letter-spacing: .04em; line-height: 1.1; margin-bottom: 16px; }
+  .br-pdp__price { font-family: var(--font-display); font-size: 28px; color: var(--accent); margin-bottom: 40px; }
+  .br-pdp__desc { font-size: 18px; line-height: 1.7; color: rgba(232,228,223,.85); margin-bottom: 40px; max-width: 480px; }
+  .br-pdp__size-row { display: flex; gap: 8px; margin-bottom: 32px; }
+  .br-pdp__size {
+    width: 48px; height: 48px;
+    border: 1px solid var(--accent-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: .15em;
+    cursor: pointer; transition: all .2s;
+  }
+  .br-pdp__size:hover { border-color: var(--accent); color: var(--accent); }
+  .br-pdp__cta {
+    width: 100%;
+    padding: 22px;
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: .35em;
+    cursor: pointer;
+    transition: all .25s;
+  }
+  .br-pdp__cta:hover { background: var(--accent); color: #0A0A0A; }
+  .br-pdp__meta { margin-top: 32px; padding-top: 32px; border-top: 1px solid var(--accent-soft); font-size: 14px; color: rgba(232,228,223,.6); line-height: 2; }
+
+  /* ═══════════════════════════════════════════════════════════════
+     LOVE HURTS — EXPRESSIVE / CINEMATIC
+     Full-bleed imagery. Copy over image. Dramatic.
+     ═══════════════════════════════════════════════════════════════ */
+  .lh-landing {
+    position: relative;
+    aspect-ratio: 21/9;
+    background:
+      radial-gradient(ellipse at 30% 40%, rgba(220,20,60,.4), transparent 50%),
+      radial-gradient(ellipse at 80% 60%, rgba(100,30,80,.5), transparent 60%),
+      linear-gradient(135deg, #1a0508 0%, #0A0A0A 70%);
+    overflow: hidden;
+    margin: 0 calc(-1 * (50vw - 700px));
+  }
+  .lh-landing__overlay { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,.6) 100%); }
+  .lh-landing__copy {
+    position: absolute;
+    left: 5vw;
+    bottom: 8%;
+    max-width: 800px;
+  }
+  .lh-landing__eyebrow { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: .3em; color: var(--accent); margin-bottom: 16px; }
+  .lh-landing__h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-style: italic;
+    font-size: clamp(56px, 9vw, 140px);
+    line-height: .95;
+    color: #fff;
+    margin-bottom: 24px;
+    text-shadow: 0 4px 30px rgba(0,0,0,.8);
+  }
+  .lh-landing__tag {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 24px;
+    color: rgba(255,200,210,.9);
+    max-width: 500px;
+  }
+  .lh-landing__rose {
+    position: absolute;
+    right: 8%; top: 50%;
+    transform: translateY(-50%);
+    width: 280px; aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, rgba(220,20,60,.9), rgba(120,10,40,.4) 60%, transparent 80%);
+    filter: blur(2px);
+    box-shadow: 0 0 60px rgba(220,20,60,.3);
+  }
+
+  /* Love Hurts grid — 3-col alternating with 2:1 feature rows */
+  .lh-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+  }
+  .lh-grid__card {
+    background: linear-gradient(180deg, #1a0508 0%, #0A0A0A 100%);
+    padding: 28px 24px 36px;
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+  .lh-grid__card--small { grid-column: span 2; }
+  .lh-grid__card--feature { grid-column: span 4; aspect-ratio: 16/9; padding: 40px; display: flex; flex-direction: column; justify-content: flex-end; }
+  .lh-grid__img {
+    aspect-ratio: 1;
+    background:
+      radial-gradient(ellipse at 40% 50%, rgba(220,20,60,.25), transparent 70%),
+      #150307;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .lh-grid__card--feature .lh-grid__img {
+    position: absolute;
+    inset: 0;
+    aspect-ratio: auto;
+    margin: 0;
+    z-index: 0;
+  }
+  .lh-grid__card--feature .lh-grid__name,
+  .lh-grid__card--feature .lh-grid__price { position: relative; z-index: 1; }
+  .lh-grid__name { font-family: var(--font-display); font-style: italic; font-size: 22px; margin-bottom: 6px; color: #fff; }
+  .lh-grid__card--feature .lh-grid__name { font-size: 40px; }
+  .lh-grid__price { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: .15em; color: var(--accent); }
+
+  /* Love Hurts PDP — text-over-image, decorative scale */
+  .lh-pdp {
+    position: relative;
+    min-height: 700px;
+    background: linear-gradient(135deg, #1a0508, #0A0A0A 70%);
+    padding: 80px 60px;
+    overflow: hidden;
+  }
+  .lh-pdp__heart {
+    position: absolute;
+    right: -100px; top: -50px;
+    width: 600px; aspect-ratio: 1;
+    background: radial-gradient(circle at 50% 50%, rgba(220,20,60,.4), transparent 60%);
+    filter: blur(40px);
+  }
+  .lh-pdp__row { display: grid; grid-template-columns: 5fr 4fr; gap: 60px; position: relative; z-index: 1; }
+  .lh-pdp__gallery {
+    aspect-ratio: 4/5;
+    background:
+      radial-gradient(ellipse at 50% 40%, rgba(220,20,60,.25), transparent 65%),
+      #150307;
+    position: relative;
+  }
+  .lh-pdp__gallery::before {
+    content: '✚';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 200px;
+    color: rgba(220,20,60,.15);
+    font-family: serif;
+  }
+  .lh-pdp__info { padding-top: 20px; }
+  .lh-pdp__category { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: .3em; color: var(--accent); margin-bottom: 20px; }
+  .lh-pdp__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-style: italic;
+    font-size: 56px;
+    line-height: 1;
+    margin-bottom: 12px;
+    color: #fff;
+  }
+  .lh-pdp__epithet {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 22px;
+    color: rgba(255,200,210,.7);
+    margin-bottom: 32px;
+  }
+  .lh-pdp__price { font-family: var(--font-display); font-size: 32px; color: var(--accent); margin-bottom: 40px; }
+  .lh-pdp__desc { font-size: 18px; line-height: 1.7; color: rgba(232,228,223,.85); margin-bottom: 32px; }
+  .lh-pdp__sizes { display: flex; gap: 10px; margin-bottom: 32px; }
+  .lh-pdp__size {
+    width: 52px; height: 52px;
+    border: 1px solid rgba(220,20,60,.35);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: .15em;
+    cursor: pointer;
+  }
+  .lh-pdp__cta {
+    background: var(--accent);
+    color: #fff;
+    border: 0;
+    padding: 22px 60px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: .3em;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .lh-pdp__cta:hover { background: #b30c2f; transform: translateY(-1px); }
+
+  /* ═══════════════════════════════════════════════════════════════
+     SIGNATURE — EDITORIAL ORIGIN
+     Warmer than BR. Gold on dark. Chapter-one intimacy.
+     ═══════════════════════════════════════════════════════════════ */
+  .sg-landing {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    align-items: center;
+    min-height: 600px;
+  }
+  .sg-landing__copy {
+    padding: 80px 60px 80px 0;
+  }
+  .sg-landing__chapter { font-family: 'Bebas Neue', sans-serif; font-size: 12px; letter-spacing: .3em; color: var(--accent); margin-bottom: 24px; }
+  .sg-landing__h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(48px, 6vw, 88px);
+    line-height: 1.05;
+    color: #fff;
+    margin-bottom: 24px;
+  }
+  .sg-landing__h1 em { font-style: italic; color: var(--accent); }
+  .sg-landing__lede {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-style: italic;
+    color: rgba(232,228,223,.78);
+    line-height: 1.5;
+    margin-bottom: 40px;
+    max-width: 480px;
+  }
+  .sg-landing__byline { font-family: 'Bebas Neue', sans-serif; font-size: 12px; letter-spacing: .25em; color: rgba(212,175,55,.7); }
+  .sg-landing__art {
+    aspect-ratio: 4/5;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(212,175,55,.18), transparent 60%),
+      linear-gradient(135deg, #1a1408 0%, #0A0A0A 80%);
+    position: relative;
+    overflow: hidden;
+  }
+  .sg-landing__art::after {
+    content: '';
+    position: absolute;
+    inset: 25%;
+    border: 1px solid rgba(212,175,55,.25);
+    transform: rotate(45deg);
+  }
+  .sg-landing__art::before {
+    content: '';
+    position: absolute;
+    inset: 35%;
+    background: radial-gradient(circle, rgba(212,175,55,.5), transparent 70%);
+    filter: blur(40px);
+  }
+
+  /* Signature grid — 3-col with material note below price */
+  .sg-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px 32px;
+  }
+  .sg-grid__card { position: relative; }
+  .sg-grid__img {
+    aspect-ratio: 4/5;
+    background:
+      radial-gradient(ellipse at 50% 40%, rgba(212,175,55,.15), transparent 65%),
+      linear-gradient(180deg, #1a1408, #0A0A0A);
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .sg-grid__img::after {
+    content: '';
+    position: absolute;
+    inset: 40%;
+    background: radial-gradient(circle, rgba(212,175,55,.4), transparent 70%);
+    filter: blur(28px);
+  }
+  .sg-grid__sku-badge { position: absolute; top: 16px; left: 16px; font-family: 'Bebas Neue', sans-serif; font-size: 10px; letter-spacing: .25em; color: var(--accent); z-index: 2; }
+  .sg-grid__name { font-family: var(--font-display); font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+  .sg-grid__name em { font-style: italic; color: var(--accent); }
+  .sg-grid__price { font-family: var(--font-display); font-size: 18px; color: rgba(212,175,55,.85); margin-bottom: 6px; }
+  .sg-grid__material { font-family: 'Bebas Neue', sans-serif; font-size: 10px; letter-spacing: .25em; color: rgba(232,228,223,.5); }
+
+  /* Signature PDP — editorial warmth, craft intelligence */
+  .sg-pdp { display: grid; grid-template-columns: 7fr 5fr; gap: 64px; align-items: start; }
+  .sg-pdp__gallery-stack { display: flex; flex-direction: column; gap: 12px; }
+  .sg-pdp__gallery-main {
+    aspect-ratio: 4/5;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(212,175,55,.18), transparent 60%),
+      linear-gradient(135deg, #1a1408 0%, #0A0A0A 80%);
+    position: relative;
+  }
+  .sg-pdp__gallery-main::after {
+    content: '';
+    position: absolute;
+    inset: 35%;
+    background: radial-gradient(circle, rgba(212,175,55,.55), transparent 65%);
+    filter: blur(36px);
+  }
+  .sg-pdp__gallery-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .sg-pdp__gallery-thumb {
+    aspect-ratio: 1;
+    background: linear-gradient(135deg, #1a1408, #0A0A0A);
+    border: 1px solid rgba(212,175,55,.15);
+    cursor: pointer;
+  }
+  .sg-pdp__gallery-thumb--active { border-color: var(--accent); }
+  .sg-pdp__info { padding-top: 40px; }
+  .sg-pdp__chapter { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: .3em; color: var(--accent); margin-bottom: 24px; }
+  .sg-pdp__name { font-family: var(--font-display); font-weight: 600; font-size: 44px; line-height: 1.05; margin-bottom: 8px; }
+  .sg-pdp__name em { font-style: italic; color: var(--accent); }
+  .sg-pdp__variant { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 18px; color: rgba(232,228,223,.65); margin-bottom: 32px; }
+  .sg-pdp__price { font-family: var(--font-display); font-size: 32px; color: var(--accent); margin-bottom: 32px; }
+  .sg-pdp__notes {
+    border-top: 1px solid rgba(212,175,55,.18);
+    border-bottom: 1px solid rgba(212,175,55,.18);
+    padding: 20px 0;
+    margin-bottom: 32px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px 28px;
+    font-size: 14px;
+  }
+  .sg-pdp__note-label { font-family: 'Bebas Neue', sans-serif; letter-spacing: .25em; color: rgba(212,175,55,.7); font-size: 11px; align-self: center; }
+  .sg-pdp__note-value { color: rgba(232,228,223,.85); align-self: center; }
+  .sg-pdp__desc { font-size: 17px; line-height: 1.75; color: rgba(232,228,223,.85); margin-bottom: 32px; }
+  .sg-pdp__cta {
+    width: 100%;
+    padding: 22px;
+    background: var(--accent);
+    color: #0A0A0A;
+    border: 0;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: .35em;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .sg-pdp__cta:hover { background: #f0c849; }
+
+  /* ═══════════════════════════════════════════════════════════════
+     KIDS CAPSULE — MINIMALIST / THE SET IS THE STATEMENT
+     2-col paired silhouettes. Rose gold + dark. No pastels register.
+     ═══════════════════════════════════════════════════════════════ */
+  .kc-landing { text-align: center; padding: 100px 0; }
+  .kc-landing__h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(40px, 7vw, 96px);
+    color: #fff;
+    line-height: 1.05;
+    margin-bottom: 24px;
+  }
+  .kc-landing__tag {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: rgba(232,228,223,.75);
+    max-width: 540px;
+    margin: 0 auto 56px;
+  }
+  .kc-landing__pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 64px;
+  }
+  .kc-landing__pair-img {
+    aspect-ratio: 3/4;
+    background:
+      radial-gradient(ellipse at 50% 40%, rgba(183,110,121,.2), transparent 60%),
+      linear-gradient(180deg, #1a0c10 0%, #0A0A0A 80%);
+    position: relative;
+  }
+  .kc-landing__pair-img::after {
+    content: '';
+    position: absolute;
+    inset: 35% 40% 35% 40%;
+    background: radial-gradient(circle, rgba(183,110,121,.5), transparent 70%);
+    filter: blur(28px);
+  }
+  .kc-landing__pair-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 12px;
+    letter-spacing: .3em;
+    color: var(--accent);
+    margin-top: 20px;
+  }
+
+  /* Kids Capsule grid — 2-col full-width because catalog is small */
+  .kc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+  }
+  .kc-grid__intro { grid-column: 1 / -1; text-align: center; margin-bottom: 24px; }
+  .kc-grid__intro-text { font-family: var(--font-display); font-style: italic; font-size: 24px; color: rgba(232,228,223,.65); }
+  .kc-grid__card { text-align: center; }
+  .kc-grid__img {
+    aspect-ratio: 3/4;
+    background:
+      radial-gradient(ellipse at 50% 35%, rgba(183,110,121,.22), transparent 65%),
+      linear-gradient(180deg, #1a0c10 0%, #0A0A0A 80%);
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .kc-grid__img::after {
+    content: '';
+    position: absolute;
+    inset: 35%;
+    background: radial-gradient(circle, rgba(183,110,121,.5), transparent 65%);
+    filter: blur(32px);
+  }
+  .kc-grid__name { font-family: var(--font-display); font-size: 24px; font-weight: 500; margin-bottom: 8px; }
+  .kc-grid__price { font-family: var(--font-display); font-size: 20px; color: var(--accent); }
+
+  /* Kids Capsule PDP */
+  .kc-pdp { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+  .kc-pdp__gallery {
+    aspect-ratio: 3/4;
+    background:
+      radial-gradient(ellipse at 50% 35%, rgba(183,110,121,.22), transparent 65%),
+      linear-gradient(180deg, #1a0c10 0%, #0A0A0A 80%);
+    position: relative;
+  }
+  .kc-pdp__gallery::after {
+    content: '';
+    position: absolute;
+    inset: 35%;
+    background: radial-gradient(circle, rgba(183,110,121,.55), transparent 65%);
+    filter: blur(36px);
+  }
+  .kc-pdp__info { padding-top: 40px; }
+  .kc-pdp__cat { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: .3em; color: var(--accent); margin-bottom: 24px; }
+  .kc-pdp__name { font-family: var(--font-display); font-weight: 500; font-size: 44px; line-height: 1.05; margin-bottom: 16px; }
+  .kc-pdp__price { font-family: var(--font-display); font-size: 28px; color: var(--accent); margin-bottom: 32px; }
+  .kc-pdp__desc { font-size: 17px; line-height: 1.7; color: rgba(232,228,223,.85); margin-bottom: 32px; }
+  .kc-pdp__sizes { display: flex; gap: 8px; margin-bottom: 32px; }
+  .kc-pdp__size {
+    padding: 10px 16px;
+    border: 1px solid rgba(183,110,121,.3);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 12px;
+    letter-spacing: .15em;
+    cursor: pointer;
+  }
+  .kc-pdp__cta {
+    width: 100%;
+    padding: 22px;
+    background: var(--accent);
+    color: #0A0A0A;
+    border: 0;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: .35em;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .kc-pdp__cta:hover { background: #c98591; }
+
+  /* Section heading */
+  .section-h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 16px;
+    letter-spacing: -.01em;
+  }
+  .section-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: rgba(232,228,223,.6);
+    margin-bottom: 80px;
+    max-width: 700px;
+  }
+
+  /* CSS for footer */
+  .footer-notes {
+    background: #050505;
+    padding: 80px 5vw;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: rgba(232,228,223,.4);
+    line-height: 1.8;
+    border-top: 1px solid rgba(255,255,255,.06);
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .br-grid, .sg-grid { grid-template-columns: 1fr 1fr; }
+    .br-pdp, .lh-pdp__row, .sg-pdp, .kc-pdp, .sg-landing, .kc-grid { grid-template-columns: 1fr; gap: 40px; }
+    .lh-grid { grid-template-columns: 1fr 1fr; }
+    .lh-grid__card--small, .lh-grid__card--feature { grid-column: span 2; }
+    .lh-grid__card--feature .lh-grid__name { font-size: 28px; }
+    .lh-landing { aspect-ratio: 4/5; }
+    .lh-landing__rose { width: 180px; right: 5%; top: 18%; transform: none; }
+    .topnav__links { gap: 14px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav__brand">SkyyRose</div>
+  <div class="topnav__links">
+    <a href="#black-rose">Black Rose</a>
+    <a href="#love-hurts">Love Hurts</a>
+    <a href="#signature">Signature</a>
+    <a href="#kids-capsule">Kids Capsule</a>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════ BLACK ROSE ════════════════════════════════════════ -->
+<section id="black-rose" data-collection="black-rose" class="collection-block">
+  <div class="container container--narrow">
+    <p class="eyebrow">Collection 02 — The Refusal</p>
+    <h2 class="section-h1">Black Rose</h2>
+    <p class="section-sub">Register: <strong>Brutalist Posture</strong>. Single-column. Silver on black. Sparse type. Long whites of breath. Quiet authority. No decoration that hasn't earned it.</p>
+  </div>
+
+  <!-- LANDING -->
+  <div class="surface">
+    <div class="container container--narrow">
+      <p class="surface__label">Surface 01 — Landing</p>
+      <div class="br-landing">
+        <div class="br-landing__hairline"></div>
+        <h1 class="br-landing__h1">BLACK ROSE</h1>
+        <p class="br-landing__tag">A posture. Not a flower — a conviction.</p>
+        <blockquote class="br-landing__quote">
+          They said luxury can't come from the Town.<br>
+          We said watch. Every piece in Black Rose<br>
+          is the concrete answering back.
+        </blockquote>
+        <a href="#" class="br-landing__cta">Enter the Collection</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRID -->
+  <div class="surface">
+    <div class="container container--narrow">
+      <p class="surface__label">Surface 02 — Browse Grid</p>
+      <div class="br-grid">
+        <div class="br-grid__card">
+          <div class="br-grid__img"></div>
+          <h3 class="br-grid__name">The Refusal</h3>
+          <p class="br-grid__price">$340</p>
+        </div>
+        <div class="br-grid__card">
+          <div class="br-grid__img"></div>
+          <h3 class="br-grid__name">Forbidden Midnight</h3>
+          <p class="br-grid__price">$310</p>
+        </div>
+        <div class="br-grid__card">
+          <div class="br-grid__img"></div>
+          <h3 class="br-grid__name">Black Is Beautiful</h3>
+          <p class="br-grid__price">$280</p>
+        </div>
+        <div class="br-grid__card">
+          <div class="br-grid__img"></div>
+          <h3 class="br-grid__name">Thorn Bearer</h3>
+          <p class="br-grid__price">$295</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDP -->
+  <div class="surface">
+    <div class="container">
+      <p class="surface__label">Surface 03 — Single Product (PDP)</p>
+      <div class="br-pdp">
+        <div class="br-pdp__gallery"></div>
+        <div class="br-pdp__info">
+          <p class="br-pdp__cat">Black Rose · Limited 80</p>
+          <h1 class="br-pdp__name">The Refusal</h1>
+          <p class="br-pdp__price">$340</p>
+          <p class="br-pdp__desc">Pressed wool. Hand-finished thorn motif at the cuff. Cut for posture, not movement. Black on black. Silver thread, single line.</p>
+          <div class="br-pdp__size-row">
+            <div class="br-pdp__size">XS</div>
+            <div class="br-pdp__size">S</div>
+            <div class="br-pdp__size">M</div>
+            <div class="br-pdp__size">L</div>
+            <div class="br-pdp__size">XL</div>
+          </div>
+          <button class="br-pdp__cta">WEAR IT</button>
+          <div class="br-pdp__meta">
+            <div>Pressed wool · 100% silver thread</div>
+            <div>Made in California · 14-day return</div>
+            <div>Limited edition · 80 pieces</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════ LOVE HURTS ════════════════════════════════════════ -->
+<section id="love-hurts" data-collection="love-hurts" class="collection-block">
+  <div class="container container--narrow">
+    <p class="eyebrow">Collection 03 — The Grief</p>
+    <h2 class="section-h1">Love Hurts</h2>
+    <p class="section-sub">Register: <strong>Expressive Cinematic</strong>. Full-bleed imagery. Copy lives over the image, decorative scale. The text owns the garment. Crimson, deep purple, burgundy.</p>
+  </div>
+
+  <!-- LANDING -->
+  <div class="surface">
+    <div class="container container--narrow">
+      <p class="surface__label">Surface 01 — Landing</p>
+      <div class="lh-landing">
+        <div class="lh-landing__overlay"></div>
+        <div class="lh-landing__rose"></div>
+        <div class="lh-landing__copy">
+          <p class="lh-landing__eyebrow">Hurts Bloodline · Collection 03</p>
+          <h1 class="lh-landing__h1">They called me<br>Beast. They were<br>right.</h1>
+          <p class="lh-landing__tag">But even the Beast kept a rose under glass — protecting the most fragile thing he ever loved.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRID -->
+  <div class="surface">
+    <div class="container container--narrow">
+      <p class="surface__label">Surface 02 — Browse Grid</p>
+      <div class="lh-grid">
+        <article class="lh-grid__card lh-grid__card--small">
+          <div class="lh-grid__img"></div>
+          <h3 class="lh-grid__name">The Beast Bomber</h3>
+          <p class="lh-grid__price">$485</p>
+        </article>
+        <article class="lh-grid__card lh-grid__card--feature">
+          <div class="lh-grid__img"></div>
+          <h3 class="lh-grid__name">The Enchanted Rose</h3>
+          <p class="lh-grid__price">$520 · Featured</p>
+        </article>
+        <article class="lh-grid__card lh-grid__card--feature">
+          <div class="lh-grid__img"></div>
+          <h3 class="lh-grid__name">Heart & Thorns Hoodie</h3>
+          <p class="lh-grid__price">$220 · Featured</p>
+        </article>
+        <article class="lh-grid__card lh-grid__card--small">
+          <div class="lh-grid__img"></div>
+          <h3 class="lh-grid__name">The Fannie</h3>
+          <p class="lh-grid__price">$45</p>
+        </article>
+        <article class="lh-grid__card lh-grid__card--small">
+          <div class="lh-grid__img"></div>
+          <h3 class="lh-grid__name">Hurts Joggers</h3>
+          <p class="lh-grid__price">$185</p>
+        </article>
+        <article class="lh-grid__card lh-grid__card--small">
+          <div class="lh-grid__img"></div>
+          <h3 class="lh-grid__name">Rose Under Glass Tee</h3>
+          <p class="lh-grid__price">$95</p>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDP -->
+  <div class="surface">
+    <div class="container">
+      <p class="surface__label">Surface 03 — Single Product (PDP)</p>
+      <div class="lh-pdp">
+        <div class="lh-pdp__heart"></div>
+        <div class="lh-pdp__row">
+          <div class="lh-pdp__gallery"></div>
+          <div class="lh-pdp__info">
+            <p class="lh-pdp__category">Hurts Bloodline · Edition of 60</p>
+            <h1 class="lh-pdp__name">The Beast<br>Bomber</h1>
+            <p class="lh-pdp__epithet">"He hid because he loved something fragile."</p>
+            <p class="lh-pdp__price">$485</p>
+            <p class="lh-pdp__desc">Crimson lining. Heart-and-thorns back embroidery. Sublimated rose silhouettes inside the hood. "Love" left chest, "Hurts" right — split by button front.</p>
+            <div class="lh-pdp__sizes">
+              <div class="lh-pdp__size">XS</div>
+              <div class="lh-pdp__size">S</div>
+              <div class="lh-pdp__size">M</div>
+              <div class="lh-pdp__size">L</div>
+              <div class="lh-pdp__size">XL</div>
+            </div>
+            <button class="lh-pdp__cta">ADD TO BAG</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════ SIGNATURE ════════════════════════════════════════ -->
+<section id="signature" data-collection="signature" class="collection-block">
+  <div class="container container--narrow">
+    <p class="eyebrow">Collection 01 — The Origin</p>
+    <h2 class="section-h1">Signature</h2>
+    <p class="section-sub">Register: <strong>Editorial Origin</strong>. Warmer than Black Rose. Gold-on-dark. Foundational, intimate. Chapter-one framing. Material notes alongside price — craft intelligence.</p>
+  </div>
+
+  <!-- LANDING -->
+  <div class="surface">
+    <div class="container">
+      <p class="surface__label">Surface 01 — Landing</p>
+      <div class="sg-landing">
+        <div class="sg-landing__copy">
+          <p class="sg-landing__chapter">Chapter One · Where it began</p>
+          <h1 class="sg-landing__h1">Not basics. <em>Blueprints.</em></h1>
+          <p class="sg-landing__lede">I drew the first rose on a night I couldn't afford dinner. Broke, a baby on the way. Every manufacturer who'd worked with me had scammed me. I sat there until 4 AM because something in me knew — if I could get this right, everything changes.</p>
+          <p class="sg-landing__byline">— Corey Foster, Oakland</p>
+        </div>
+        <div class="sg-landing__art"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRID -->
+  <div class="surface">
+    <div class="container">
+      <p class="surface__label">Surface 02 — Browse Grid</p>
+      <div class="sg-grid">
+        <article class="sg-grid__card">
+          <div class="sg-grid__img"><span class="sg-grid__sku-badge">SG-001</span></div>
+          <h3 class="sg-grid__name">Bay Bridge <em>Shorts</em></h3>
+          <p class="sg-grid__price">$165</p>
+          <p class="sg-grid__material">Cotton-linen · Custom embroidery</p>
+        </article>
+        <article class="sg-grid__card">
+          <div class="sg-grid__img"><span class="sg-grid__sku-badge">SG-002</span></div>
+          <h3 class="sg-grid__name">Stay Golden <em>Tee</em></h3>
+          <p class="sg-grid__price">$95</p>
+          <p class="sg-grid__material">Heavyweight cotton · Gold foil</p>
+        </article>
+        <article class="sg-grid__card">
+          <div class="sg-grid__img"><span class="sg-grid__sku-badge">SG-003</span></div>
+          <h3 class="sg-grid__name">Stay Golden <em>Crewneck</em></h3>
+          <p class="sg-grid__price">$185</p>
+          <p class="sg-grid__material">French terry · Embroidered crest</p>
+        </article>
+        <article class="sg-grid__card">
+          <div class="sg-grid__img"><span class="sg-grid__sku-badge">SG-005</span></div>
+          <h3 class="sg-grid__name">Bay Bridge <em>Shirt</em></h3>
+          <p class="sg-grid__price">$210</p>
+          <p class="sg-grid__material">Oxford weave · Pearl buttons</p>
+        </article>
+        <article class="sg-grid__card">
+          <div class="sg-grid__img"><span class="sg-grid__sku-badge">SG-006</span></div>
+          <h3 class="sg-grid__name">Signature <em>Beanie</em></h3>
+          <p class="sg-grid__price">$65</p>
+          <p class="sg-grid__material">Merino wool · Gold script</p>
+        </article>
+        <article class="sg-grid__card">
+          <div class="sg-grid__img"><span class="sg-grid__sku-badge">SG-007</span></div>
+          <h3 class="sg-grid__name">Original Label <em>Tee — Orchid</em></h3>
+          <p class="sg-grid__price">$95</p>
+          <p class="sg-grid__material">Heavyweight cotton · Hand-screened</p>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDP -->
+  <div class="surface">
+    <div class="container">
+      <p class="surface__label">Surface 03 — Single Product (PDP)</p>
+      <div class="sg-pdp">
+        <div class="sg-pdp__gallery-stack">
+          <div class="sg-pdp__gallery-main"></div>
+          <div class="sg-pdp__gallery-thumbs">
+            <div class="sg-pdp__gallery-thumb sg-pdp__gallery-thumb--active"></div>
+            <div class="sg-pdp__gallery-thumb"></div>
+            <div class="sg-pdp__gallery-thumb"></div>
+            <div class="sg-pdp__gallery-thumb"></div>
+          </div>
+        </div>
+        <div class="sg-pdp__info">
+          <p class="sg-pdp__chapter">Chapter One · The Origin</p>
+          <h1 class="sg-pdp__name">Bay Bridge <em>Shorts</em></h1>
+          <p class="sg-pdp__variant">Oakland's landmark, scaled for everyday.</p>
+          <p class="sg-pdp__price">$165</p>
+          <div class="sg-pdp__notes">
+            <span class="sg-pdp__note-label">Material</span>
+            <span class="sg-pdp__note-value">Cotton-linen blend · Pre-washed for drape</span>
+            <span class="sg-pdp__note-label">Detail</span>
+            <span class="sg-pdp__note-value">Custom embroidery, left thigh · Gold thread</span>
+            <span class="sg-pdp__note-label">Origin</span>
+            <span class="sg-pdp__note-value">Cut and sewn in Los Angeles</span>
+            <span class="sg-pdp__note-label">Edition</span>
+            <span class="sg-pdp__note-value">Open run · Restocked seasonally</span>
+          </div>
+          <p class="sg-pdp__desc">The Bay Bridge is Oakland. It connects Oakland to frisco. These shorts are that bridge, made wearable — the foundation that reaches across.</p>
+          <button class="sg-pdp__cta">ACQUIRE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════ KIDS CAPSULE ════════════════════════════════════════ -->
+<section id="kids-capsule" data-collection="kids-capsule" class="collection-block">
+  <div class="container container--narrow">
+    <p class="eyebrow">Collection 04 — The Heir</p>
+    <h2 class="section-h1">Kids Capsule</h2>
+    <p class="section-sub">Register: <strong>Minimalist · The Set Is The Statement</strong>. 2-SKU collection. Same craftsmanship as adult lines, smaller silhouette. Rose gold + soft pink within a dark-first palette. No pastels, no cartoons. Scaled down, never dumbed down.</p>
+  </div>
+
+  <!-- LANDING -->
+  <div class="surface">
+    <div class="container container--narrow">
+      <p class="surface__label">Surface 01 — Landing</p>
+      <div class="kc-landing">
+        <h1 class="kc-landing__h1">Luxury runs<br>in the family.</h1>
+        <p class="kc-landing__tag">Premium streetwear for the next generation. Powerful, elevated, born into legacy. Because legacy is not inherited — it is worn.</p>
+        <div class="kc-landing__pair">
+          <div>
+            <div class="kc-landing__pair-img"></div>
+            <p class="kc-landing__pair-label">Red & Black · KC-001</p>
+          </div>
+          <div>
+            <div class="kc-landing__pair-img"></div>
+            <p class="kc-landing__pair-label">Purple & Black · KC-002</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRID -->
+  <div class="surface">
+    <div class="container container--narrow">
+      <p class="surface__label">Surface 02 — Browse Grid (2 SKUs)</p>
+      <div class="kc-grid">
+        <p class="kc-grid__intro kc-grid__intro-text">The full capsule.</p>
+        <article class="kc-grid__card">
+          <div class="kc-grid__img"></div>
+          <h3 class="kc-grid__name">Red & Black Hoodie Set</h3>
+          <p class="kc-grid__price">$65</p>
+        </article>
+        <article class="kc-grid__card">
+          <div class="kc-grid__img"></div>
+          <h3 class="kc-grid__name">Purple & Black Hoodie Set</h3>
+          <p class="kc-grid__price">$65</p>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDP -->
+  <div class="surface">
+    <div class="container">
+      <p class="surface__label">Surface 03 — Single Product (PDP)</p>
+      <div class="kc-pdp">
+        <div class="kc-pdp__gallery"></div>
+        <div class="kc-pdp__info">
+          <p class="kc-pdp__cat">Kids Capsule · The Heir</p>
+          <h1 class="kc-pdp__name">Red & Black<br>Hoodie Set</h1>
+          <p class="kc-pdp__price">$65</p>
+          <p class="kc-pdp__desc">Same construction as the adult line. Hooded crewneck + matching joggers. Embroidered chest. Dark cotton fleece with crimson piping. Built for kids who know what their parents built.</p>
+          <div class="kc-pdp__sizes">
+            <div class="kc-pdp__size">2T</div>
+            <div class="kc-pdp__size">4T</div>
+            <div class="kc-pdp__size">XS</div>
+            <div class="kc-pdp__size">S</div>
+            <div class="kc-pdp__size">M</div>
+            <div class="kc-pdp__size">L</div>
+          </div>
+          <button class="kc-pdp__cta">ACQUIRE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer-notes">
+  <p>SkyyRose — Collection Design Mockups · 2026-05-24</p>
+  <p>Static visual prototype. Real product imagery replaces gradient placeholders in implementation. All copy anchored to locked brand canon (docs/brand/collection-stories.md).</p>
+  <p>Open in browser to review · Edit + re-open to iterate · File: <code>docs/brand/design-mockups/collection-designs.html</code></p>
+</footer>
+
+</body>
+</html>

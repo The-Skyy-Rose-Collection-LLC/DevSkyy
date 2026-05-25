@@ -1,0 +1,115 @@
+name: Catalog Consistency
+
+on:
+  pull_request:
+    paths:
+      - "wordpress-theme/skyyrose-flagship/data/**"
+      - "skyyrose/elite_studio/sku_resolver.py"
+      - "skyyrose/elite_studio/logo_registry.py"
+      - "skyyrose/elite_studio/commerce.py"
+      - "scripts/validate_catalog_consistency.py"
+      - "scripts/sync_catalog_downstream.py"
+      - "skyyrose/elite_studio/tests/test_catalog_consistency.py"
+  push:
+    branches: [main]
+    paths:
+      - "wordpress-theme/skyyrose-flagship/data/**"
+      - "skyyrose/elite_studio/sku_resolver.py"
+      - "skyyrose/elite_studio/logo_registry.py"
+      - "scripts/validate_catalog_consistency.py"
+
+jobs:
+  validate:
+    name: Catalog Consistency Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install minimal dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Validator uses stdlib only — no extra deps needed
+          # Install project for test_catalog_consistency.py imports
+          pip install -e ".[dev]" --quiet 2>/dev/null || \
+            pip install pytest --quiet
+
+      - name: Run catalog consistency validator
+        run: |
+          python scripts/validate_catalog_consistency.py
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+      - name: Run catalog consistency validator (JSON output for annotations)
+        if: failure()
+        run: |
+          python scripts/validate_catalog_consistency.py --json 2>&1 | \
+            python -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          for check in data['checks']:
+              if not check['passed']:
+                  print(f\"::error title=Catalog Check Failed [{check['name']}]::{check['message']}\")
+                  for detail in check['details']:
+                      print(f\"::warning::{detail.strip()}\")
+          "
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+      - name: Run pytest — catalog consistency tests
+        run: |
+          pytest skyyrose/elite_studio/tests/test_catalog_consistency.py -v --tb=short
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+  retired-sku-scan:
+    name: Retired SKU Guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Scan for retired SKU references
+        run: |
+          # Hard fail if br-013 appears in any tracked Python/JSON/PHP/CSV file
+          RETIRED_SKUS="br-013"
+          FOUND=0
+          for sku in $RETIRED_SKUS; do
+            # Search tracked files, exclude .git/, .bak files, and this workflow itself
+            if git grep --quiet \
+                --include="*.py" \
+                --include="*.json" \
+                --include="*.php" \
+                --include="*.csv" \
+                "$sku" -- \
+                ':!.git' \
+                ':!.github/workflows/catalog-validate.yml' \
+                ':!*.bak-pre-sync-*' 2>/dev/null; then
+              echo "::error::Retired SKU '$sku' found in tracked files:"
+              git grep \
+                --include="*.py" \
+                --include="*.json" \
+                --include="*.php" \
+                --include="*.csv" \
+                "$sku" -- \
+                ':!.git' \
+                ':!.github/workflows/catalog-validate.yml' \
+                ':!*.bak-pre-sync-*' || true
+              FOUND=1
+            fi
+          done
+          if [[ "$FOUND" == "1" ]]; then
+            echo ""
+            echo "Fix: python scripts/sync_catalog_downstream.py --dry-run"
+            exit 1
+          fi
+          echo "No retired SKU references found."

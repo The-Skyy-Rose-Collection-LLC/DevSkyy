@@ -1,0 +1,225 @@
+/**
+ * SkyyRose Footer CRO Sections
+ *
+ * Styles for template-parts/footer-cro.php — scarcity banner, customer
+ * reviews, value-prop cards, FAQ accordion. Rendered above the newsletter
+ * bar in the site-wide footer.
+ *
+ * Late-enqueued from inside footer-cro.php so the bytes only ship on
+ * pages that actually render the section.
+ *
+ * Extracted from design-tokens.css in v1.5.21 (2026-05-24) — component
+ * CSS does not belong in the token surface.
+ *
+ * @package SkyyRose
+ * @since   1.5.21
+ */
+
+/* ═══ Container helpers ═══ */
+.ft-cro__container {
+	max-width: var(--container-content, 1200px);
+	margin: 0 auto;
+	padding: 0 2rem;
+}
+
+.ft-cro__heading {
+	font-family: var(--skyyrose-font-display);
+	font-size: 1.6rem;
+	font-weight: 400;
+	letter-spacing: var(--tracking-wider, 0.1em);
+	text-transform: uppercase;
+	margin: 0 0 0.75rem;
+	text-align: center;
+}
+
+.ft-cro__subheading {
+	font-size: var(--text-sm, 0.9375rem);
+	color: rgba(255, 255, 255, 0.55);
+	max-width: 600px;
+	margin: 0 auto 2rem;
+	line-height: var(--leading-normal, 1.6);
+	text-align: center;
+}
+
+/* ═══ Scarcity Banner ═══ */
+.ft-cro-banner {
+	padding: 3rem 5%;
+	text-align: center;
+	border-top:    1px solid rgba(212, 175, 55, 0.08);
+	border-bottom: 1px solid rgba(212, 175, 55, 0.08);
+}
+
+.ft-cro-banner p {
+	font-family: var(--skyyrose-font-display);
+	font-size: 1.3rem;
+	font-weight: 400;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.5);
+	margin: 0;
+}
+
+/* ═══ Customer Reviews ═══ */
+.ft-cro-reviews {
+	padding: 4rem 5% 3rem;
+}
+
+.ft-cro-reviews__grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 1.5rem;
+	margin-top: 2rem;
+}
+
+.ft-cro-reviews__card {
+	padding: 1.5rem;
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	border-radius: var(--radius-md, 8px);
+	background: rgba(255, 255, 255, 0.02);
+}
+
+.ft-cro-reviews__stars {
+	display: flex;
+	gap: 0.15rem;
+	margin-bottom: 0.75rem;
+}
+
+.ft-cro-reviews__stars svg {
+	width: 13px;
+	height: 13px;
+	color: var(--color-gold, #D4AF37);
+}
+
+.ft-cro-reviews__card blockquote {
+	margin: 0 0 0.75rem;
+	padding: 0;
+}
+
+.ft-cro-reviews__card blockquote p {
+	font-size: var(--text-sm, 0.9375rem);
+	line-height: var(--leading-normal, 1.6);
+	color: rgba(255, 255, 255, 0.65);
+	margin: 0;
+	font-style: italic;
+}
+
+.ft-cro-reviews__card cite {
+	font-size: 0.65rem;
+	letter-spacing: var(--tracking-wider, 0.1em);
+	color: rgba(255, 255, 255, 0.55);
+	font-style: normal;
+}
+
+/* ═══ Craft / Value Props ═══ */
+.ft-cro-craft {
+	padding: 3rem 5% 4rem;
+}
+
+.ft-cro-craft__grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 1.5rem;
+}
+
+.ft-cro-craft__card {
+	padding: 1.5rem 1.25rem;
+	text-align: center;
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	border-radius: var(--radius-md, 8px);
+	background: rgba(255, 255, 255, 0.02);
+	transition: border-color var(--motion-duration, 0.3s) ease;
+}
+
+.ft-cro-craft__card:hover {
+	border-color: rgba(212, 175, 55, 0.2);
+}
+
+.ft-cro-craft__icon {
+	display: block;
+	font-family: var(--skyyrose-font-display);
+	font-size: 1.4rem;
+	color: var(--color-gold, #D4AF37);
+	margin-bottom: 0.75rem;
+}
+
+.ft-cro-craft__card h3 {
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: var(--tracking-wider, 0.1em);
+	text-transform: uppercase;
+	margin: 0 0 0.5rem;
+}
+
+.ft-cro-craft__card p {
+	font-size: 0.75rem;
+	line-height: 1.5;
+	color: rgba(255, 255, 255, 0.55);
+	margin: 0;
+}
+
+/* ═══ FAQ Accordion ═══ */
+.ft-cro-faq {
+	padding: 3rem 5% 4rem;
+	max-width: 900px;
+	margin: 0 auto;
+}
+
+.ft-cro-faq__question {
+	background: transparent;
+	border: none;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+	color: rgba(255, 255, 255, 0.75);
+	width: 100%;
+	text-align: left;
+	padding: 1.1rem 0;
+	font-size: var(--text-sm, 0.9375rem);
+	cursor: pointer;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	transition: color var(--motion-duration, 0.3s) ease;
+}
+
+.ft-cro-faq__question:hover {
+	color: #fff;
+}
+
+.ft-cro-faq__icon {
+	width: 16px;
+	height: 16px;
+	stroke: currentColor;
+	fill: none;
+	flex-shrink: 0;
+	transition: transform var(--motion-duration, 0.3s) ease;
+}
+
+.ft-cro-faq__question[aria-expanded="true"] .ft-cro-faq__icon {
+	transform: rotate(45deg);
+}
+
+.ft-cro-faq__answer {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.4s ease;
+}
+
+.ft-cro-faq__answer-inner {
+	padding: 0 0 1.1rem;
+	font-size: 0.8rem;
+	line-height: var(--leading-normal, 1.6);
+	color: rgba(255, 255, 255, 0.55);
+}
+
+/* ═══ Responsive ═══ */
+@media (max-width: 768px) {
+	.ft-cro-reviews__grid { grid-template-columns: 1fr; }
+	.ft-cro-craft__grid   { grid-template-columns: repeat(2, 1fr); }
+	.ft-cro-banner p {
+		font-size: 1rem;
+		letter-spacing: var(--tracking-wider, 0.1em);
+	}
+}
+
+@media (max-width: 480px) {
+	.ft-cro-craft__grid { grid-template-columns: 1fr; }
+}
