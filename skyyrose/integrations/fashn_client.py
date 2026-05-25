@@ -176,12 +176,15 @@ class FashnClient:
         self,
         model_name: str,
         inputs: dict[str, Any],
+        *,
+        sleep: Any = asyncio.sleep,
     ) -> str:
         """POST /v1/run — returns job ID."""
         response = await self._request_with_retry(
             "POST",
             "/run",
             json={"model_name": model_name, "inputs": inputs},
+            sleep=sleep,
         )
         if response.status_code not in (200, 201, 202):
             raise FashnError(
@@ -202,7 +205,7 @@ class FashnClient:
         """GET /v1/status/{id} until terminal state or timeout."""
         deadline = time.monotonic() + self._max_poll
         while True:
-            response = await self._request_with_retry("GET", f"/status/{job_id}")
+            response = await self._request_with_retry("GET", f"/status/{job_id}", sleep=sleep)
             if response.status_code != 200:
                 raise FashnError(
                     f"FASHN /status/{job_id} failed: HTTP {response.status_code} — "
@@ -254,7 +257,7 @@ class FashnClient:
             "category": category,
             "num_samples": num_samples,
         }
-        job_id = await self._start_job(model_name, inputs)
+        job_id = await self._start_job(model_name, inputs, sleep=sleep)
         status_body = await self._poll_until_done(job_id, sleep=sleep)
 
         if status_body.get("status") != "completed":
