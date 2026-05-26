@@ -523,6 +523,15 @@
     .parallax { transform: none !important; }
   }
 
+  /* === Film grain overlay === */
+  .grain-overlay {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 90;
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+  }
+
   /* === Ken Burns hero zoom === */
   @keyframes heroZoom {
     0% { transform: scale(1.05) translateY(0); }
@@ -555,6 +564,7 @@
 </style>
 </head>
 <body>
+<canvas class="grain-overlay" id="grainCanvas" aria-hidden="true"></canvas>
 <nav class="navbar" aria-label="Primary">
   <a href="#home-cover" class="navbar__brand">
     <img
@@ -929,6 +939,35 @@
       }
       window.addEventListener('scroll', onScroll, { passive: true });
       onScroll();
+    }
+  }
+
+  // === Film grain overlay ===
+  if (!prefersReduced) {
+    var grain = document.getElementById('grainCanvas');
+    if (grain) {
+      var gctx = grain.getContext('2d');
+      function sizeGrain() {
+        grain.width = window.innerWidth;
+        grain.height = window.innerHeight;
+      }
+      function renderGrain() {
+        var w = grain.width, h = grain.height;
+        var img = gctx.createImageData(w, h);
+        var data = img.data;
+        for (var i = 0; i < data.length; i += 4) {
+          var v = (Math.random() * 255) | 0;
+          data[i] = v; data[i+1] = v; data[i+2] = v; data[i+3] = 255;
+        }
+        gctx.putImageData(img, 0, 0);
+      }
+      sizeGrain();
+      renderGrain();
+      window.addEventListener('resize', function() {
+        sizeGrain();
+        renderGrain();
+      }, { passive: true });
+      setInterval(renderGrain, 500);
     }
   }
 })();
