@@ -299,6 +299,8 @@
     transition: transform var(--dur-reveal) var(--ease-out);
   }
   .hero__lockup.is-visible img { transform: scale(1.03); }
+  .br-page .hero__lockup img { width: clamp(320px, 60vw, 880px); }
+  .br-page .hero__lockup.is-visible img { transform: scale(1.04); }
   .hero__subtitle {
     font-family: var(--ff-meta);
     font-size: 11px;
