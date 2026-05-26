@@ -73,7 +73,7 @@ _DOSSIERS_DIR: Path = _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "da
 
 # Retired SKUs — must not appear in downstream files
 _RETIRED_SKUS: frozenset[str] = frozenset(
-    {"br-013", "br-d01", "sg-008", "sg-d01", "sg-017", "sg-018"}
+    {"br-013", "br-d01", "sg-008", "sg-d01", "sg-017", "sg-018", "sg-d04"}
 )
 
 # garment_type_lock values that identify jersey products

@@ -34,9 +34,9 @@ Composer (required for PHPCS): installed at `~/.local/bin/composer`.
 ## Source of Truth — Products
 
 **`wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv`** is the ONLY product catalog.
-41 products across 4 collections (Black Rose, Love Hurts, Signature, Kids Capsule).
+40 products across 4 collections (Black Rose, Love Hurts, Signature, Kids Capsule).
 The catalog grew 32 → 46 on 2026-05-26 when 14 orphan SKUs were promoted to active
-pre-orders, then corrected to 41 same day via founder consolidation rulings:
+pre-orders, then corrected to 40 same day via founder consolidation rulings:
   - "Only 1 hockey jersey" — `br-d01` retired, design merged under `br-011`.
   - "1 windbreaker, call it retro" — `sg-008` + `sg-d01` retired, sg-015 renamed
     to "The Windbreaker Set Retro" and absorbed all three SKUs' assets.
@@ -44,8 +44,9 @@ pre-orders, then corrected to 41 same day via founder consolidation rulings:
     canonical Bay Bridge SKUs.
   - sg-004 renamed to "Mint and Lavender Hoodie" (word "and") to deduplicate
     name vs sg-006 "Mint & Lavender Hoodie" (ampersand).
+  - sg-d04 retired — not a SkyyRose product ("not even mines").
 Active 2026-05-26 net additions: lh-001, sg-004, sg-010, sg-016, br-d02, br-d03,
-br-d04, sg-d03, sg-d04. Several rows carry a DRAFT note in `description` pending
+br-d04, sg-d03. Several rows carry a DRAFT note in `description` pending
 founder confirmation of name/price.
 
 ### Data files (all under `skyyrose-flagship/data/`)
@@ -196,8 +197,8 @@ after `wp cache flush`. Always use `curl -s "https://skyyrose.co/?cb=$(date +%s)
 ## Don't
 
 - Don't deploy on Friday after 2pm Pacific.
-- Don't reference retired SKUs (`br-013`, `br-d01`, `sg-008`, `sg-d01`, `sg-017`, `sg-018`)
-  in any `.php` file.
+- Don't reference retired SKUs (`br-013`, `br-d01`, `sg-008`, `sg-d01`, `sg-017`, `sg-018`,
+  `sg-d04`) in any `.php` file.
   - `br-013`: retired 2026-04-27 (BiB jersey rework).
   - `br-d01`: added 2026-05-26 as "Hockey Teal" then immediately retired same day.
     The teal design IS br-011 "The Rose (Hockey)" (catalog color="Black/Teal",
