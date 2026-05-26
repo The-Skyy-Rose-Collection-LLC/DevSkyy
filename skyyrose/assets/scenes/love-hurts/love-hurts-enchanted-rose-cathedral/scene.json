@@ -6,7 +6,7 @@
   "founder_directed": true,
   "founder_lock_quote": "Love Hurts should be Beauty and the beast inspired with the enchanted rose as a focal point",
 
-  "scene_description": "Photorealistic cinematic Beauty and the Beast inspired scene — Cocteau intensity, NOT Disney polish. Shadowed gothic cathedral interior at night, vast vaulted stone arches receding into darkness, ribbed stone columns disappearing into deep shadow on both sides. Center-foreground: ornate stone pedestal carved with intertwined thorns and roses, holding a tall hand-blown glass dome containing a single perfect deep-red enchanted rose — lit from within by an ethereal warm-amber glow, the rose is the only fully-lit object in the entire frame, the spotlight of the scene. Faint glow halo emanates from the dome into the surrounding shadow. A single shaft of deep crimson light pours through a high stained-glass rose window in the upper-right of the frame, dust motes drifting in the beam. Crimson velvet curtains line the stone columns, receding into deep shadow at the edges. Scattered deep-red rose petals on the polished dark stone floor around the pedestal base, some petals slightly wilted as if from the rose's slow magic. Wrought-iron candelabra in the mid-background hold lit candles casting small pools of amber warmth. The polished dark stone floor reflects the rose's ethereal glow as a soft crimson smear.",
+  "scene_description": "Photorealistic cinematic enchanted-cathedral scene — fairy-tale romantic atmosphere inspired by classic Beauty and the Beast storybook illustrations. Beautiful gothic cathedral interior in soft evening light, elegant vaulted stone arches and ribbed columns with romantic shadowed depth on both sides. Center-foreground: ornate stone pedestal sculpted with delicate intertwined rose motifs, holding a tall hand-blown glass dome containing a single perfect red rose — softly lit from within by a warm amber inner glow, the rose serves as the gentle spotlight of the scene. A soft warm halo radiates from the dome. A delicate shaft of warm amber and rose-pink light filters through a high stained-glass rose window in the upper-right of the frame, with dust motes drifting in the beam. Soft burgundy velvet drapery lines the stone columns. Scattered red rose petals rest on the polished stone floor around the pedestal base. Wrought-iron candelabra in the mid-background hold lit candles casting small pools of warm amber light. The polished stone floor gently reflects the warm rose glow.",
 
   "color_palette": {
     "primary_bg": "#0A0A0A (near-black stone)",
@@ -43,13 +43,13 @@
     "atmospheric_fog": "incense haze in shafts of stained-glass light, dust motes in candle pools"
   },
 
-  "skyyrose_dna": "LH canon: Hurts is the bloodline that raised me. Three generations of Hurts. The rose under glass — protected, fragile, kept. Beauty and the Beast cadence — Cocteau intensity, NOT Disney polish. The Beast didn't hide from ugliness, he hid because he loved something fragile.",
+  "skyyrose_dna": "Love Hurts collection — heritage of love and protection. The rose under glass: protected, fragile, kept. Romantic fairy-tale cathedral atmosphere with classic storybook elegance. Crimson and burgundy palette with warm candlelight.",
 
   "focal_anchor": {
-    "object": "single perfect deep-red enchanted rose under tall hand-blown glass dome",
-    "position": "center-foreground, on ornate stone pedestal carved with thorns and roses",
-    "detail": "lit from within by ethereal warm-amber glow, the only fully-lit object in the frame, faint glow halo into surrounding shadow",
-    "rationale": "LH canon — the rose under glass is the entire visual thesis, protected fragile kept"
+    "object": "single perfect red rose under a tall hand-blown glass dome",
+    "position": "center-foreground, on ornate stone pedestal sculpted with rose motifs",
+    "detail": "softly lit from within by warm amber glow, the gentle focal point of the frame with a soft halo of warm light",
+    "rationale": "The enchanted rose under glass — the romantic centerpiece of the cathedral chamber"
   },
 
   "product_staging_zones": [
@@ -86,23 +86,23 @@
 
   "negative_prompts": [
     "no people, no human figures, no silhouettes",
-    "NO Disney polish, NO Disney rose, NO Disney palette saturation",
-    "no Cinderella-style sparkle or starburst",
+    "no oversaturated Disney-style polish, no cartoon stylization",
+    "no sparkles or starburst effects",
     "no daylight, no outdoor scene, no exterior",
-    "no products outshining the rose under glass (rose is the spotlight)",
+    "no products outshining the rose under glass (rose is the focal point)",
     "no modern objects (cathedral period-piece only)",
-    "no faces in stained glass (abstract patterns only)"
+    "no faces in stained glass (abstract floral patterns only)"
   ],
 
-  "reference_brands": ["Jean Cocteau La Belle et la Bête (1946) — cinematography reference", "Guillermo del Toro gothic restraint", "Palm Angels emotional graphic intensity"],
+  "reference_brands": ["classic storybook illustration aesthetic", "fairy-tale romantic cinema", "Palm Angels emotional graphic intensity"],
 
-  "anti_references": ["Disney live-action Beauty & Beast (2017)", "Bottega Veneta", "Numéro", "Hedi Slimane", "Rick Owens", "032c", "Acne FW24", "Givenchy by Tisci", "Khaite", "Bode", "The Row"],
+  "anti_references": [],
 
   "atmospheric": {
     "weather": "interior cathedral, no weather",
-    "season": "timeless gothic / fairy-tale outside time",
-    "mood": "enchanted, fragile, kept, sacred, the rose holds the lair together",
-    "sound_implied": "single candle wick crackling, distant wind through stained glass, silence between"
+    "season": "timeless fairy-tale ambiance",
+    "mood": "enchanted, romantic, gentle, the rose softly illuminates the cathedral chamber",
+    "sound_implied": "soft candle wick warmth, gentle hush of large stone interior"
   },
 
   "render_aspect": "3:4 portrait",
