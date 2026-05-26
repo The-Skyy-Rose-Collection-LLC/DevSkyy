@@ -584,6 +584,25 @@
     .hero__bg, .cover__photo { animation: none !important; }
   }
 
+  /* === ROI-4C: data-collection cascade — per-collection accent on spread tile labels === */
+  .spread__tile[data-collection] .spread__tile-label {
+    transition: color 0.3s ease;
+  }
+  .spread__tile[data-collection="black-rose"]:hover .spread__tile-label,
+  .spread__tile[data-collection="black-rose"]:focus-visible .spread__tile-label { color: var(--sr-silver); }
+  .spread__tile[data-collection="love-hurts"]:hover .spread__tile-label,
+  .spread__tile[data-collection="love-hurts"]:focus-visible .spread__tile-label { color: var(--sr-crimson); }
+  .spread__tile[data-collection="signature"]:hover .spread__tile-label,
+  .spread__tile[data-collection="signature"]:focus-visible .spread__tile-label { color: var(--sr-gold); }
+  .spread__tile[data-collection="kids-capsule"]:hover .spread__tile-label,
+  .spread__tile[data-collection="kids-capsule"]:focus-visible .spread__tile-label { color: var(--sr-rose-gold); }
+
+  /* focus-visible outline per-collection accent */
+  .spread__tile[data-collection="black-rose"]:focus-visible  { box-shadow: 0 0 0 2px rgba(192, 192, 192, 0.7); }
+  .spread__tile[data-collection="love-hurts"]:focus-visible  { box-shadow: 0 0 0 2px rgba(220, 20, 60, 0.7); }
+  .spread__tile[data-collection="signature"]:focus-visible   { box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.7); }
+  .spread__tile[data-collection="kids-capsule"]:focus-visible { box-shadow: 0 0 0 2px rgba(183, 110, 121, 0.7); }
+
   /* === ROI-4A: Hero letterbox reveal (cinematic bars) === */
   .hero--letterbox::before,
   .hero--letterbox::after {
@@ -756,7 +775,7 @@
     <p class="spread__page-marker">PG 04—05 · Black Rose · Love Hurts · Signature · Kids</p>
   </header>
   <div class="spread__grid">
-    <a class="spread__tile reveal" href="#br-cover" style="--delay: 0s;">
+    <a class="spread__tile reveal" href="#br-cover" data-collection="black-rose" style="--delay: 0s;">
       <picture>
         <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-col-black-rose.avif" type="image/avif">
         <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-col-black-rose.webp" type="image/webp">
@@ -771,7 +790,7 @@
         <p class="spread__tile-name">BLACK ROSE</p>
       </div>
     </a>
-    <a class="spread__tile reveal" href="#" style="--delay: 0.12s;">
+    <a class="spread__tile reveal" href="#" data-collection="love-hurts" style="--delay: 0.12s;">
       <picture>
         <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-col-love-hurts.avif" type="image/avif">
         <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-col-love-hurts.webp" type="image/webp">
@@ -786,7 +805,7 @@
         <p class="spread__tile-name">LOVE HURTS</p>
       </div>
     </a>
-    <a class="spread__tile reveal" href="#" style="--delay: 0.24s;">
+    <a class="spread__tile reveal" href="#" data-collection="signature" style="--delay: 0.24s;">
       <picture>
         <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-col-signature.avif" type="image/avif">
         <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-col-signature.webp" type="image/webp">
@@ -801,7 +820,7 @@
         <p class="spread__tile-name">SIGNATURE</p>
       </div>
     </a>
-    <a class="spread__tile reveal" href="#" style="--delay: 0.36s;">
+    <a class="spread__tile reveal" href="#" data-collection="kids-capsule" style="--delay: 0.36s;">
       <picture>
         <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/lookbook/lb-kid-black-rose-960w.avif" type="image/avif">
         <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/lookbook/lb-kid-black-rose-960w.webp" type="image/webp">
