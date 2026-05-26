@@ -206,8 +206,7 @@
     letter-spacing: 0.04em;
     max-width: 60%;
   }
-  .cover__tagline em {
-    font-style: normal;
+  .cover__tagline-accent {
     color: var(--sr-rose-gold);
   }
   .cover__byline {
@@ -266,7 +265,10 @@
   <div class="cover__photo-shade"></div>
 
   <header class="cover__masthead reveal">
-    <h1 id="home-cover-title" class="cover__nameplate">SKYY ROSE<div class="cover__nameplate-rule" aria-hidden="true"></div></h1>
+    <div>
+      <h1 id="home-cover-title" class="cover__nameplate">SKYY ROSE</h1>
+      <div class="cover__nameplate-rule" aria-hidden="true"></div>
+    </div>
     <p class="cover__meta">VOL. IV<br>S/S 2026<br>THE TOWN · DROP 01</p>
   </header>
 
@@ -274,7 +276,7 @@
 
   <footer class="cover__line reveal">
     <div>
-      <p class="cover__tagline">Luxury Grows<br>from <em>Concrete.</em></p>
+      <p class="cover__tagline">Luxury Grows<br>from <span class="cover__tagline-accent">Concrete.</span></p>
       <p class="cover__byline">By Corey Foster · Oakland · 2026</p>
     </div>
     <div class="cover__barcode" aria-hidden="true">
