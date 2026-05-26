@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-25T15:40:26.669Z
-> Files: 2821 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-25T23:59:28.241Z
+> Files: 2822 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -587,7 +587,7 @@
 ## agents/render_pipeline/learning/
 
 - `__init__.py` — Continuous-improvement subsystem for the RenderPipeline agent. (~714 tok)
-- `CLAUDE.md` — agents/render_pipeline/learning/ — Three adaptive learning loops (~1132 tok)
+- `CLAUDE.md` — agents/render_pipeline/learning/ — Three adaptive learning loops (~1143 tok)
 - `LOOP.md` — Learning Loop (~1242 tok)
 - `proposals.py` — Propose catalog amendments from the learning loops' history. (~1693 tok)
 - `recorder.py` — Append-only structured recorders for the three learning loops. (~857 tok)
@@ -604,8 +604,8 @@
 - `_paths.py` — Shared sys.path setup for tool modules. (~261 tok)
 - `articulate_layer0.py` — Tool 4a (NEW): Sonnet 4.6 articulates Layer 0 rendering directives. (~3002 tok)
 - `build_prompt.py` — Tool 4: Compose Layer 0 + Layer 3 + Layer 2 final prompt. (~1011 tok)
-- `CLAUDE.md` — agents/render_pipeline/tools/ — ADK FunctionTool implementations (9 modules) (~1489 tok)
-- `generate_image.py` — Tool 5: Generate image via routed engine. PAID API CALL. (~2947 tok)
+- `CLAUDE.md` — agents/render_pipeline/tools/ — ADK FunctionTool implementations (9 modules) (~1500 tok)
+- `generate_image.py` — Tool 5: Generate image via routed engine. PAID API CALL. (~3507 tok)
 - `load_dossier.py` — Tool 1: Load the canonical dossier for a SKU. (~693 tok)
 - `qa_tournament.py` — Tool 6: 3-judge QA tournament + learning-loop recorder. PAID API CALLS. (~1794 tok)
 - `refine_image.py` — Tool 7: Refine the candidate using synthesis-aware corrections. PAID API CALL. (~1639 tok)
@@ -1586,6 +1586,10 @@
 
 - `2026-04-20-ghost-mannequin-pipeline.md` — Ghost-Mannequin Imagery Pipeline (Phase B2) Implementation Plan (~16427 tok)
 - `2026-04-29-bugfix-gltfloader-brand-colors-renders.md` — Post-Image-Taste Bugfix Sprint Implementation Plan (~3805 tok)
+
+## docs/superpowers/specs/
+
+- `2026-05-25-footer-logo-swap.md` — Footer Logo Swap to Brand-Primary Monogram (~1323 tok)
 
 ## docs/testing/
 
@@ -3199,14 +3203,14 @@
 - `CLAUDE.md` (~11 tok)
 - `cli.py` — build_team, cmd_produce, cmd_batch, cmd_status + 9 more (~5209 tok)
 - `config.py` — get_openai_client, get_anthropic_client, validate_catalog_readers, validate_dossier_readers (~5836 tok)
-- `coordinator.py` — Logger: info, step, ok, fail + 13 more (~3208 tok)
+- `coordinator.py` — Logger: info, step, ok, fail + 16 more (~4237 tok)
 - `fidelity.py` — class: to_dict, check_color, check_text, check_clip_similarity + 1 more (~3254 tok)
 - `forensics.py` — Forensic manifest writer + interactive confirmation gate. (~1715 tok)
-- `gemini_rest.py` — generate_text, analyze_vision, generate_image (~1920 tok)
+- `gemini_rest.py` — generate_text, analyze_vision, generate_image (~2736 tok)
 - `logo_registry.py` — Logo Registry — Canonical loader for SkyyRose logo metadata + path resolution. (~1848 tok)
 - `master_registry.py` — View: get (~3012 tok)
 - `models.py` — ProductData: from_override, provider_count (~1864 tok)
-- `retry.py` — is_transient_error, retry_on_transient (~521 tok)
+- `retry.py` — is_transient_error, retry_on_transient (~951 tok)
 - `sku_resolver.py` — from: sanitize_sku, resolve_sku, verify_tripo_region (~2695 tok)
 - `telemetry.py` — URL configuration (~1651 tok)
 - `upload.py` — Phase 18 — Batch WooCommerce upload of approved ghost-mannequin images. (~8315 tok)
@@ -3219,7 +3223,7 @@
 - `CLAUDE.md` (~11 tok)
 - `color_correction_agent.py` — ColorCorrectionAgent: correct (~624 tok)
 - `compositor_agent.py` — CompositorAgent — public entry point (thin re-export shim). (~906 tok)
-- `generator_agent.py` — GeneratorAgent: initialize, generate (~1609 tok)
+- `generator_agent.py` — GeneratorAgent: initialize, generate (~2078 tok)
 - `prompt_enrichment_agent.py` — Rule-based prompt enrichment for SkyyRose Elite Studio imagery pipeline. (~1548 tok)
 - `quality_agent.py` — of: verify (~2956 tok)
 - `safety_agent.py` — OpenAI moderation + GPT-4o image safety gate for Elite Studio pipeline. (~982 tok)
@@ -3333,7 +3337,7 @@
 - `CLAUDE.md` (~11 tok)
 - `clip_alignment.py` — CLIP text-to-image alignment scoring. (~382 tok)
 - `embedding_gate.py` — Pre-QA embedding gate: cosine similarity vs brand centroid. (~500 tok)
-- `human_review.py` — logger: submit_for_review, get_decision (~1822 tok)
+- `human_review.py` — from: submit_for_review, get_decision (~2968 tok)
 - `load_tester.py` — logger: run (~2370 tok)
 - `ml_classifier.py` — from: predict (~1480 tok)
 - `prompt_simplifier.py` — Prompt simplification for CLIP alignment scoring (advisory utility). (~1492 tok)

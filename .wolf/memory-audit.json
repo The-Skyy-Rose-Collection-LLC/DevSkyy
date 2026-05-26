@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-25T08:38:21",
+  "generated_at": "2026-05-25T13:07:56",
   "repo_root": "/Users/theceo/DevSkyy",
   "freshness_days": 30,
   "files_scanned": 52,
@@ -33,66 +33,71 @@
     {
       "file": ".wolf/anatomy.md",
       "line": 154,
-      "claim": "ci.yml"
+      "claim": "catalog-validate.yml"
     },
     {
       "file": ".wolf/anatomy.md",
       "line": 155,
-      "claim": "claude-code-action-official.yml"
+      "claim": "ci.yml"
     },
     {
       "file": ".wolf/anatomy.md",
       "line": 156,
+      "claim": "claude-code-action-official.yml"
+    },
+    {
+      "file": ".wolf/anatomy.md",
+      "line": 157,
       "claim": "claude-code-review.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 158,
+      "line": 159,
       "claim": "claude.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 159,
+      "line": 160,
       "claim": "dast-scan.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 160,
+      "line": 161,
       "claim": "dependabot-weekly-batch.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 161,
+      "line": 162,
       "claim": "dossier-check.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 162,
+      "line": 163,
       "claim": "fly-deploy.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 163,
+      "line": 164,
       "claim": "pr-agent.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 164,
+      "line": 165,
       "claim": "security-gate.yml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 178,
+      "line": 179,
       "claim": "context.xml"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 181,
+      "line": 182,
       "claim": "rules.tsv"
     },
     {
       "file": ".wolf/anatomy.md",
-      "line": 182,
+      "line": 183,
       "claim": "test-dast-local.sh"
     },
     {
@@ -189,5 +194,5 @@
     }
   ],
   "documented_missing_count": 23,
-  "verified_count": 2975
+  "verified_count": 2997
 }
