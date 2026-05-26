@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 from pathlib import Path
 
 from agents.render_pipeline.tools._paths import REPO_ROOT, ensure_repo_paths
@@ -39,6 +40,22 @@ _GEMINI_ENGINES = frozenset({"gemini-pro", "gemini-flash"})
 _OPENAI_ENGINES = frozenset({"gpt-image"})
 _FAL_ENGINES = frozenset({"flux-pro"})
 _SUPPORTED_ENGINES = _GEMINI_ENGINES | _OPENAI_ENGINES | _FAL_ENGINES
+
+# Per-engine cost estimates (USD per image, verified 2026-05-05 audit).
+# Used for RunBudget pre-check + actual spend recording. The pipeline expects
+# a ``RunBudget`` instance in ``tool_context.state["budget"]``; when absent,
+# the dispatch runs without a budget anchor (only safe in dev / unit tests).
+_ENGINE_COST_USD = {
+    "gemini-pro": 0.04,
+    "gemini-flash": 0.04,
+    "gpt-image": 0.08,
+    "flux-pro": 0.075,
+}
+
+# SKU format guard — match the catalog shape (e.g. "br-001", "sig-014") BEFORE
+# the SKU is used in path construction. Defeats traversal vectors like
+# "../../../etc/passwd". Mirrors skyyrose/elite_studio/upload.py:_SKU_RE.
+_SKU_RE = re.compile(r"^[a-z]{2,4}-\d{3}$")
 
 # Default Gemini output aspect for product renders.
 _GEMINI_ASPECT_RATIO = "3:4"
@@ -219,13 +236,15 @@ def _dispatch_engine(
 def generate_image_fn(sku: str, view: str, tool_context: ToolContext) -> dict:
     """Dispatch to the routed engine and save bytes to disk.
 
-    Reads state: engine, prompt, source_path
+    Reads state: engine, prompt, source_path, budget (optional ``RunBudget``)
     Writes state: candidate_path, bytes_size, generation_engine
 
     Returns dict with output_path, engine, bytes_size on success;
-    `error` + `output_path=None` on any failure.
+    `error` + `output_path=None` on any failure (including budget exceeded).
     """
     from nano_banana.utils import save_image
+
+    from skyyrose.elite_studio.budget import BudgetExceededError
 
     engine = tool_context.state.get("engine", "")
     prompt = tool_context.state.get("prompt", "")
@@ -233,6 +252,12 @@ def generate_image_fn(sku: str, view: str, tool_context: ToolContext) -> dict:
 
     if not engine or not prompt or not source_path_str:
         return _missing_state_error(engine, prompt, source_path_str)
+
+    if not _SKU_RE.fullmatch(sku):
+        return {
+            "error": f"invalid SKU {sku!r} (must match {_SKU_RE.pattern})",
+            "output_path": None,
+        }
 
     if engine not in _SUPPORTED_ENGINES:
         return {
@@ -247,6 +272,20 @@ def generate_image_fn(sku: str, view: str, tool_context: ToolContext) -> dict:
             "output_path": None,
         }
 
+    # Budget gate — pre-check the per-engine cost before any paid dispatch.
+    # When state lacks a ``budget`` key the call runs uncapped (dev / tests).
+    budget = tool_context.state.get("budget")
+    est_cost = _ENGINE_COST_USD.get(engine, 0.10)
+    if budget is not None and hasattr(budget, "ensure_within_budget"):
+        try:
+            budget.ensure_within_budget(est_cost, stage=f"generate_image.{engine}")
+        except BudgetExceededError as exc:
+            log.error("generate_image_fn: budget exceeded for %s: %s", sku, exc)
+            return {
+                "error": f"budget exceeded before {engine}: {exc}",
+                "output_path": None,
+            }
+
     extra_refs = _resolve_logo_extra_refs(sku)
 
     try:
@@ -260,6 +299,11 @@ def generate_image_fn(sku: str, view: str, tool_context: ToolContext) -> dict:
 
     if not img_bytes:
         return {"error": f"{engine} returned no bytes", "output_path": None}
+
+    # Record actual spend AFTER the paid call returned bytes. Pre-check passed,
+    # the engine returned successfully, so this dispatch did spend money.
+    if budget is not None and hasattr(budget, "spend"):
+        budget.spend(est_cost, stage=f"generate_image.{engine}")
 
     sku_dir = _OUTPUT_DIR / sku
     sku_dir.mkdir(parents=True, exist_ok=True)
