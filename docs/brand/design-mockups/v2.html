@@ -420,6 +420,15 @@
     box-shadow: 0 0 0 2px rgba(var(--sr-rose-gold-rgb), 0.9);
   }
   .spread__tile--lg { grid-row: 1 / 3; }
+  .spread__tile--brand {
+    background: var(--sr-charcoal);
+  }
+  .spread__tile--brand .spread__tile-img {
+    object-fit: contain;
+    padding: var(--space-8);
+    opacity: 1;
+  }
+  .spread__tile--brand:hover .spread__tile-img { opacity: 1; }
   .spread__tile-img {
     width: 100%; height: 100%;
     object-fit: cover;
@@ -642,7 +651,7 @@
     <p class="spread__page-marker">PG 04—05 · Black Rose · Love Hurts · Signature · Kids</p>
   </header>
   <div class="spread__grid">
-    <a class="spread__tile spread__tile--lg reveal" href="#br-cover" style="--delay: 0s;">
+    <a class="spread__tile spread__tile--lg spread__tile--brand reveal" href="#br-cover" style="--delay: 0s;">
       <img
         class="spread__tile-img"
         src="../../../wordpress-theme/skyyrose-flagship/assets/branding/black-rose-logo-hero.webp"
@@ -653,7 +662,7 @@
         <p class="spread__tile-name">BLACK ROSE</p>
       </div>
     </a>
-    <a class="spread__tile reveal" href="#" style="--delay: 0.12s;">
+    <a class="spread__tile spread__tile--brand reveal" href="#" style="--delay: 0.12s;">
       <img
         class="spread__tile-img"
         src="../../../wordpress-theme/skyyrose-flagship/assets/branding/love-hurts-logo-hero.webp"
@@ -664,7 +673,7 @@
         <p class="spread__tile-name">LOVE HURTS</p>
       </div>
     </a>
-    <a class="spread__tile reveal" href="#" style="--delay: 0.24s;">
+    <a class="spread__tile spread__tile--brand reveal" href="#" style="--delay: 0.24s;">
       <img
         class="spread__tile-img"
         src="../../../wordpress-theme/skyyrose-flagship/assets/branding/signature-logo-hero.webp"
@@ -675,7 +684,7 @@
         <p class="spread__tile-name">SIGNATURE</p>
       </div>
     </a>
-    <a class="spread__tile reveal" href="#" style="--delay: 0.36s;">
+    <a class="spread__tile spread__tile--brand reveal" href="#" style="--delay: 0.36s;">
       <img
         class="spread__tile-img"
         src="../../../wordpress-theme/skyyrose-flagship/assets/images/logos/skyy-rose-collection-circular-patch.webp"
@@ -816,7 +825,7 @@
         <p class="spread__tile-name">BLACK ROSE HOODIE</p>
       </div>
     </a>
-    <a class="spread__tile reveal" href="#" style="--delay: 0.24s;">
+    <a class="spread__tile spread__tile--brand reveal" href="#" style="--delay: 0.24s;">
       <img
         class="spread__tile-img"
         src="../../../wordpress-theme/skyyrose-flagship/assets/branding/black-rose-monogram-sr.jpg"
