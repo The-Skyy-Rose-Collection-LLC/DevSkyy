@@ -422,3 +422,6 @@ tasks/render-pipeline-cli-*.json
 
 # Catalog auto-sync + ad-hoc backups (sync scripts and one-off cleanups)
 *.bak-*
+
+# Visual Companion brainstorming artifacts (skill: superpowers/brainstorming)
+.superpowers/
