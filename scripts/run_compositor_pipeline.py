@@ -192,8 +192,8 @@ COLLECTIONS = {
         ],
     },
     "signature": {
-        "scene_file": "signature-golden-gate-showroom-v2.png",
-        "output_file": "signature-golden-gate-showroom-lookbook.webp",
+        "scene_file": "signature-waterfront-runway.png",
+        "output_file": "signature-waterfront-runway-lookbook.webp",
         "products": [
             {
                 "sku": "sg-002",
