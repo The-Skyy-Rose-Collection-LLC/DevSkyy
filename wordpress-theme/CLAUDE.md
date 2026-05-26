@@ -34,12 +34,14 @@ Composer (required for PHPCS): installed at `~/.local/bin/composer`.
 ## Source of Truth — Products
 
 **`wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv`** is the ONLY product catalog.
-45 products across 4 collections (Black Rose, Love Hurts, Signature, Kids Capsule).
+43 products across 4 collections (Black Rose, Love Hurts, Signature, Kids Capsule).
 The catalog grew 32 → 46 on 2026-05-26 when 14 orphan SKUs were promoted to active
-pre-orders, then immediately corrected to 45 when `br-d01` (Hockey Teal) was retired
-same day per founder ruling "only 1 hockey jersey" (br-011 The Rose is canonical).
-Active 2026-05-26 additions: lh-001, sg-004, sg-008, sg-010, sg-016, sg-017, sg-018,
-br-d02, br-d03, br-d04, sg-d01, sg-d03, sg-d04. Several rows carry a DRAFT note in
+pre-orders, then corrected to 43 same day via founder consolidation rulings:
+  - "Only 1 hockey jersey" — `br-d01` retired, design merged under `br-011`.
+  - "1 windbreaker, call it retro" — `sg-008` + `sg-d01` retired, sg-015 renamed
+    to "The Windbreaker Set Retro" and absorbed all three SKUs' assets.
+Active 2026-05-26 additions: lh-001, sg-004, sg-010, sg-016, sg-017, sg-018,
+br-d02, br-d03, br-d04, sg-d03, sg-d04. Several rows carry a DRAFT note in
 `description` pending founder confirmation of name/price.
 
 ### Data files (all under `skyyrose-flagship/data/`)
@@ -190,16 +192,21 @@ after `wp cache flush`. Always use `curl -s "https://skyyrose.co/?cb=$(date +%s)
 ## Don't
 
 - Don't deploy on Friday after 2pm Pacific.
-- Don't reference retired SKUs (`br-013`, `br-d01`) in any `.php` file.
+- Don't reference retired SKUs (`br-013`, `br-d01`, `sg-008`, `sg-d01`) in any `.php` file.
   - `br-013`: retired 2026-04-27 (BiB jersey rework).
   - `br-d01`: added 2026-05-26 as "Hockey Teal" then immediately retired same day.
     The teal design IS br-011 "The Rose (Hockey)" (catalog color="Black/Teal",
     San Jose Sharks inspired) — not a separate SKU. The 3 br-d01 techflats were
     re-homed under br-011 at `skyyrose/assets/images/source-products/black-rose/
-    br-011-the-rose-hockey-techflat{,-front,-back}.jpeg`. The `br-d01` SKU code
-    is permanently retired to prevent re-introduction.
-  - The other 2026-05-26 additions (lh-001, sg-004, sg-008, sg-010, sg-016–018,
-    br-d02–d04, sg-d01, sg-d03, sg-d04) are ACTIVE pre-orders, not retired.
+    br-011-the-rose-hockey-techflat{,-front,-back}.jpeg`.
+  - `sg-008` + `sg-d01`: added 2026-05-26 as additional windbreaker SKUs then
+    retired same day per founder ruling "1 windbreaker, call it retro". sg-015
+    was renamed to "The Windbreaker Set Retro" and absorbed all three SKUs'
+    assets. sg-008 Gemini renders + editorial-staging iteration artifacts
+    archived under `.archive/orphan-assets/sg-008/`. Techflats from both
+    re-homed under sg-015 prefix in `skyyrose/assets/images/source-products/signature/`.
+  - The other 2026-05-26 additions (lh-001, sg-004, sg-010, sg-016–018,
+    br-d02–d04, sg-d03, sg-d04) are ACTIVE pre-orders, not retired.
   - Validator authority: `scripts/validate_catalog_consistency.py` `retired_sku_guard` check.
 - Don't bypass `npm run lint:php` "for a small fix."
 - Don't commit changes that haven't passed `npm run verify`.

@@ -1,6 +1,6 @@
 ---
 sku: sg-015
-name: The Windbreaker Set
+name: The Windbreaker Set Retro
 collection: signature
 logo_reference: data/brand-logos/sr-monogram.md
 extra_logos:
@@ -8,7 +8,7 @@ extra_logos:
 reference_image: data/product-references/sg-015-windbreaker-set-techflat.jpeg
 ---
 
-# The Windbreaker Set
+# The Windbreaker Set Retro
 
 **Garment type lock:** Two-piece matching set sold as a single SKU — **lightweight nylon zip-front hooded windbreaker JACKET + matching nylon track-style PANTS**. Both pieces are constructed from smooth lightweight **nylon windbreaker fabric** (NOT cotton-fleece — this is the lighter water-resistant sibling of the Mint & Lavender Hoodie set). Solid **white** body on both pieces with a **multi-color V-shape rainbow chevron color-block detail** at the upper chest (jacket) and at each upper-thigh (pants), **PINK contrast hood** on the jacket, **multi-color rainbow stripe bands** at the jacket cuffs / hem and the pants waistband / ankle cuffs. The jacket has a full-length center-front zipper. The pants have a white drawstring waistband and slash hand pockets. NOT cotton-fleece (this is the windbreaker variant, not the cousin sg-006 fleece hoodie + sg-014 fleece pants). NOT a single-piece SKU — this is sold as the matching JACKET + PANTS set together. NOT a fleece hoodie (different fabric, different weight, different construction). NOT solid black (catalog Color field reads "Black" but the techflat colorway is **WHITE body + PINK hood + multi-color rainbow chevron** — render the techflat colorway, not the catalog field).
 
