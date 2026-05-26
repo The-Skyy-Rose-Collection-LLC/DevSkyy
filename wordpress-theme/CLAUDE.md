@@ -192,9 +192,12 @@ after `wp cache flush`. Always use `curl -s "https://skyyrose.co/?cb=$(date +%s)
 - Don't deploy on Friday after 2pm Pacific.
 - Don't reference retired SKUs (`br-013`, `br-d01`) in any `.php` file.
   - `br-013`: retired 2026-04-27 (BiB jersey rework).
-  - `br-d01`: added 2026-05-26 as "Hockey Teal" then immediately retired same day
-    per founder ruling "only 1 hockey jersey" — `br-011 The Rose (Hockey)` is the
-    canonical hockey jersey. Teal techflats archived under `.archive/orphan-assets/br-d01/`.
+  - `br-d01`: added 2026-05-26 as "Hockey Teal" then immediately retired same day.
+    The teal design IS br-011 "The Rose (Hockey)" (catalog color="Black/Teal",
+    San Jose Sharks inspired) — not a separate SKU. The 3 br-d01 techflats were
+    re-homed under br-011 at `skyyrose/assets/images/source-products/black-rose/
+    br-011-the-rose-hockey-techflat{,-front,-back}.jpeg`. The `br-d01` SKU code
+    is permanently retired to prevent re-introduction.
   - The other 2026-05-26 additions (lh-001, sg-004, sg-008, sg-010, sg-016–018,
     br-d02–d04, sg-d01, sg-d03, sg-d04) are ACTIVE pre-orders, not retired.
   - Validator authority: `scripts/validate_catalog_consistency.py` `retired_sku_guard` check.
