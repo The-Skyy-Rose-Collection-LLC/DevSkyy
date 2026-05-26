@@ -281,10 +281,17 @@
     text-transform: uppercase;
     color: rgba(255,255,255,0.7);
   }
+  .hero__center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-6);
+  }
   .hero__lockup {
     display: flex;
     justify-content: center;
-    margin: var(--space-12) 0;
   }
   .hero__lockup img {
     width: clamp(280px, 50vw, 720px);
@@ -386,25 +393,27 @@
   <div class="hero__bg-shade"></div>
 
   <div class="hero__inner">
-    <p id="home-hero-title" class="hero__kicker reveal">For The Town</p>
+    <h2 id="home-hero-title" class="hero__kicker reveal">For The Town</h2>
 
-    <div class="hero__lockup reveal reveal--scale">
-      <picture>
-        <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-brand-script.avif" type="image/avif">
-        <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-brand-script.webp" type="image/webp">
-        <img
-          src="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-brand-script.png"
-          alt="The Black Rose Collection"
-          width="1200" height="800"
-          decoding="async" loading="lazy">
-      </picture>
+    <div class="hero__center">
+      <div class="hero__lockup reveal reveal--scale">
+        <picture>
+          <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-brand-script.avif" type="image/avif">
+          <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-brand-script.webp" type="image/webp">
+          <img
+            src="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-brand-script.png"
+            alt="The Black Rose Collection"
+            width="1200" height="800"
+            decoding="async" loading="lazy">
+        </picture>
+      </div>
+
+      <p class="hero__subtitle reveal">Spring Drop · 2026 · Drop 01</p>
     </div>
-
-    <p class="hero__subtitle reveal">Spring Drop · 2026 · Drop 01</p>
 
     <footer class="hero__bottom reveal">
       <span>Photographed in East Oakland</span>
-      <span>14 looks · 4 collections · one town</span>
+      <span>14 looks · 4 collections · One town</span>
     </footer>
   </div>
 </section>
