@@ -72,7 +72,9 @@ _SKU_RESOLVER_PY: Path = _REPO_ROOT / "skyyrose" / "elite_studio" / "sku_resolve
 _DOSSIERS_DIR: Path = _REPO_ROOT / "wordpress-theme" / "skyyrose-flagship" / "data" / "dossiers"
 
 # Retired SKUs — must not appear in downstream files
-_RETIRED_SKUS: frozenset[str] = frozenset({"br-013", "br-d01", "sg-008", "sg-d01"})
+_RETIRED_SKUS: frozenset[str] = frozenset(
+    {"br-013", "br-d01", "sg-008", "sg-d01", "sg-017", "sg-018"}
+)
 
 # garment_type_lock values that identify jersey products
 _JERSEY_GARMENT_TYPES: frozenset[str] = frozenset(

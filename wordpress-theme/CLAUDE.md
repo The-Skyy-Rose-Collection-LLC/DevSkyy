@@ -34,15 +34,19 @@ Composer (required for PHPCS): installed at `~/.local/bin/composer`.
 ## Source of Truth — Products
 
 **`wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv`** is the ONLY product catalog.
-43 products across 4 collections (Black Rose, Love Hurts, Signature, Kids Capsule).
+41 products across 4 collections (Black Rose, Love Hurts, Signature, Kids Capsule).
 The catalog grew 32 → 46 on 2026-05-26 when 14 orphan SKUs were promoted to active
-pre-orders, then corrected to 43 same day via founder consolidation rulings:
+pre-orders, then corrected to 41 same day via founder consolidation rulings:
   - "Only 1 hockey jersey" — `br-d01` retired, design merged under `br-011`.
   - "1 windbreaker, call it retro" — `sg-008` + `sg-d01` retired, sg-015 renamed
     to "The Windbreaker Set Retro" and absorbed all three SKUs' assets.
-Active 2026-05-26 additions: lh-001, sg-004, sg-010, sg-016, sg-017, sg-018,
-br-d02, br-d03, br-d04, sg-d03, sg-d04. Several rows carry a DRAFT note in
-`description` pending founder confirmation of name/price.
+  - sg-017 + sg-018 (Bay Bridge "Refresh") retired — sg-001 + sg-005 are the
+    canonical Bay Bridge SKUs.
+  - sg-004 renamed to "Mint and Lavender Hoodie" (word "and") to deduplicate
+    name vs sg-006 "Mint & Lavender Hoodie" (ampersand).
+Active 2026-05-26 net additions: lh-001, sg-004, sg-010, sg-016, br-d02, br-d03,
+br-d04, sg-d03, sg-d04. Several rows carry a DRAFT note in `description` pending
+founder confirmation of name/price.
 
 ### Data files (all under `skyyrose-flagship/data/`)
 
@@ -192,7 +196,8 @@ after `wp cache flush`. Always use `curl -s "https://skyyrose.co/?cb=$(date +%s)
 ## Don't
 
 - Don't deploy on Friday after 2pm Pacific.
-- Don't reference retired SKUs (`br-013`, `br-d01`, `sg-008`, `sg-d01`) in any `.php` file.
+- Don't reference retired SKUs (`br-013`, `br-d01`, `sg-008`, `sg-d01`, `sg-017`, `sg-018`)
+  in any `.php` file.
   - `br-013`: retired 2026-04-27 (BiB jersey rework).
   - `br-d01`: added 2026-05-26 as "Hockey Teal" then immediately retired same day.
     The teal design IS br-011 "The Rose (Hockey)" (catalog color="Black/Teal",
@@ -205,8 +210,13 @@ after `wp cache flush`. Always use `curl -s "https://skyyrose.co/?cb=$(date +%s)
     assets. sg-008 Gemini renders + editorial-staging iteration artifacts
     archived under `.archive/orphan-assets/sg-008/`. Techflats from both
     re-homed under sg-015 prefix in `skyyrose/assets/images/source-products/signature/`.
-  - The other 2026-05-26 additions (lh-001, sg-004, sg-010, sg-016–018,
-    br-d02–d04, sg-d03, sg-d04) are ACTIVE pre-orders, not retired.
+  - `sg-017` + `sg-018`: added 2026-05-26 as "Bay Bridge Refresh" duplicates of
+    sg-005 (existing Bay Bridge Shirt) and sg-001 (existing Bay Bridge Shorts).
+    Retired same day — sg-001 + sg-005 are the canonical Bay Bridge SKUs. The
+    sg-010-bay-bridge-* design refs were re-homed under sg-001/sg-005 prefix;
+    one combo file archived under `.archive/orphan-assets/sg-017-018/`.
+  - The other 2026-05-26 additions (lh-001, sg-004, sg-010, sg-016, br-d02–d04,
+    sg-d03, sg-d04) are ACTIVE pre-orders, not retired.
   - Validator authority: `scripts/validate_catalog_consistency.py` `retired_sku_guard` check.
 - Don't bypass `npm run lint:php` "for a small fix."
 - Don't commit changes that haven't passed `npm run verify`.
