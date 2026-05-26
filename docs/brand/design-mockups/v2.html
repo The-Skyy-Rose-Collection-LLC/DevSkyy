@@ -523,6 +523,19 @@
     .parallax { transform: none !important; }
   }
 
+  /* === Ken Burns hero zoom === */
+  @keyframes heroZoom {
+    0% { transform: scale(1.05) translateY(0); }
+    100% { transform: scale(1.1) translateY(-2%); }
+  }
+  .hero__bg, .cover__photo {
+    animation: heroZoom 30s var(--ease-in-out) infinite alternate;
+    will-change: transform;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero__bg, .cover__photo { animation: none !important; }
+  }
+
   /* === BR collection palette override (per canon — silver, not rose-gold) === */
   .br-page .cover__sr-graffiti { color: var(--sr-silver); }
   .br-page .cover__tagline-accent { color: var(--sr-silver); }
@@ -907,7 +920,7 @@
               var center = rect.top + rect.height / 2;
               var viewportCenter = (window.innerHeight || document.documentElement.clientHeight) / 2;
               var offset = (viewportCenter - center) * (1 - speed);
-              node.style.transform = 'translate3d(0, ' + offset.toFixed(2) + 'px, 0)';
+              node.style.transform = 'translate3d(0, ' + offset.toFixed(2) + 'px, 0) scale(1.05)';
             });
             ticking = false;
           });
