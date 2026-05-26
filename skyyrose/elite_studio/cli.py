@@ -419,6 +419,7 @@ def cmd_home_spread(args: argparse.Namespace) -> None:
     """
     import asyncio
     import json
+    from pathlib import Path
 
     from .agents.compositor.lighting import SCENE_LOOKBOOK, load_lighting_spec
     from .budget import RunBudget
