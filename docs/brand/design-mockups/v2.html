@@ -233,6 +233,85 @@
     text-transform: uppercase;
     color: rgba(255,255,255,0.7);
   }
+
+  /* === Hero (F02) === */
+  .hero {
+    min-height: 100vh;
+    background: var(--sr-dark);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+  .hero__bg-wrap {
+    position: absolute; inset: 0;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .hero__bg {
+    position: absolute;
+    top: -10%; left: 0;
+    width: 100%; height: 120%;
+    object-fit: cover;
+    will-change: transform;
+  }
+  .hero__bg-shade {
+    position: absolute; inset: 0;
+    z-index: 2;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.05) 30%, rgba(0,0,0,0.05) 60%, rgba(0,0,0,0.85) 100%);
+  }
+  .hero__inner {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: var(--space-24) var(--space-8);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+  .hero__kicker {
+    font-family: var(--ff-meta);
+    font-size: 10px;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+  }
+  .hero__lockup {
+    display: flex;
+    justify-content: center;
+    margin: var(--space-12) 0;
+  }
+  .hero__lockup img {
+    width: clamp(280px, 50vw, 720px);
+    height: auto;
+    filter: drop-shadow(0 6px 24px rgba(0,0,0,0.6));
+    transition: transform var(--dur-reveal) var(--ease-out);
+  }
+  .hero__lockup.is-visible img { transform: scale(1.03); }
+  .hero__subtitle {
+    font-family: var(--ff-meta);
+    font-size: 11px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    text-align: center;
+    color: rgba(255,255,255,0.75);
+  }
+  .hero__bottom {
+    display: flex; justify-content: space-between;
+    gap: var(--space-8);
+    font-family: var(--ff-meta);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    padding-top: var(--space-4);
+    border-top: 1px solid rgba(255,255,255,0.2);
+  }
 </style>
 </head>
 <body>
@@ -288,6 +367,46 @@
       <p class="cover__drop">03 · 26 · DROP 01</p>
     </div>
   </footer>
+</section>
+<section id="home-hero" class="frame hero" aria-labelledby="home-hero-title">
+  <div class="hero__bg-wrap">
+    <picture>
+      <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/luxury-nighttime-1680w.webp" media="(min-width: 1281px)" type="image/webp">
+      <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/luxury-nighttime-1280w.webp" media="(min-width: 769px)" type="image/webp">
+      <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/luxury-nighttime-768w.webp" media="(min-width: 481px)" type="image/webp">
+      <img
+        src="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/luxury-nighttime-480w.webp"
+        alt="Oakland industrial scene at night"
+        class="hero__bg parallax"
+        data-parallax-speed="0.6"
+        width="1680" height="1120"
+        decoding="async" loading="lazy">
+    </picture>
+  </div>
+  <div class="hero__bg-shade"></div>
+
+  <div class="hero__inner">
+    <p id="home-hero-title" class="hero__kicker reveal">For The Town</p>
+
+    <div class="hero__lockup reveal reveal--scale">
+      <picture>
+        <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-brand-script.avif" type="image/avif">
+        <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-brand-script.webp" type="image/webp">
+        <img
+          src="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-brand-script.png"
+          alt="The Black Rose Collection"
+          width="1200" height="800"
+          decoding="async" loading="lazy">
+      </picture>
+    </div>
+
+    <p class="hero__subtitle reveal">Spring Drop · 2026 · Drop 01</p>
+
+    <footer class="hero__bottom reveal">
+      <span>Photographed in East Oakland</span>
+      <span>14 looks · 4 collections · one town</span>
+    </footer>
+  </div>
 </section>
 <!-- Sections inserted in subsequent tasks -->
 </body>
