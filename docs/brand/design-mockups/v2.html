@@ -309,6 +309,15 @@
     text-align: center;
     color: rgba(255,255,255,0.75);
   }
+  .hero__brand-wordmark {
+    font-family: var(--ff-editorial);
+    font-size: clamp(48px, 8vw, 96px);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--sr-cream);
+    margin: 0;
+    line-height: 1;
+  }
   .hero__bottom {
     display: flex; justify-content: space-between;
     gap: var(--space-8);
@@ -422,6 +431,20 @@
     box-shadow: 0 0 0 2px rgba(var(--sr-rose-gold-rgb), 0.9);
   }
   .spread__tile--lg { grid-row: 1 / 3; }
+
+  /* FIX-V2-04: home spread — 4 equal cols, portrait 3/4 tiles, no row-span */
+  #home-spread .spread__grid {
+    grid-template-columns: repeat(4, 1fr);
+    aspect-ratio: unset;
+    max-height: unset;
+  }
+  #home-spread .spread__grid .spread__tile {
+    aspect-ratio: 3 / 4;
+  }
+  #home-spread .spread__grid .spread__tile--lg {
+    grid-row: auto;
+  }
+
   .spread__tile--brand {
     background: var(--sr-charcoal);
   }
@@ -523,9 +546,19 @@
     .parallax { transform: none !important; }
   }
 
+  /* FIX-V2-07: tablet 2-col for home spread */
+  @media (min-width: 641px) and (max-width: 1023px) {
+    #home-spread .spread__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    #home-spread .spread__grid .spread__tile {
+      aspect-ratio: 3 / 4;
+    }
+  }
+
   /* === Editorial image treatment === */
   .cover__photo, .hero__bg, .spread__tile-img {
-    filter: contrast(1.04) saturate(0.94) brightness(0.97);
+    filter: contrast(1.02) saturate(1.0) brightness(1.0);
   }
 
   /* === Film grain overlay === */
@@ -586,12 +619,11 @@
 </nav>
 <section id="home-cover" class="frame cover" aria-labelledby="home-cover-title">
   <picture>
-    <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/forbidden-midnight-1680w.webp" media="(min-width: 1281px)" type="image/webp">
-    <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/forbidden-midnight-1280w.webp" media="(min-width: 769px)" type="image/webp">
-    <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/forbidden-midnight-768w.webp" media="(min-width: 481px)" type="image/webp">
+    <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-hero-bg.avif" type="image/avif">
+    <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-hero-bg.webp" type="image/webp">
     <img
-      src="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/forbidden-midnight-480w.webp"
-      alt="SkyyRose cover photograph — Oakland nightscape"
+      src="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-hero-bg.webp"
+      alt="SkyyRose — Luxury Grows from Concrete. Oakland 2026."
       class="cover__photo"
       width="1680" height="945"
       fetchpriority="high" decoding="async">
@@ -626,37 +658,28 @@
 <section id="home-hero" class="frame hero" aria-labelledby="home-hero-title">
   <div class="hero__bg-wrap">
     <picture>
-      <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/forbidden-midnight-1680w.webp" media="(min-width: 1281px)" type="image/webp">
-      <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/forbidden-midnight-1280w.webp" media="(min-width: 769px)" type="image/webp">
-      <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/forbidden-midnight-768w.webp" media="(min-width: 481px)" type="image/webp">
+      <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-hero-bg-alt.avif" type="image/avif">
+      <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-hero-bg-alt.webp" type="image/webp">
       <img
-        src="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/forbidden-midnight-480w.webp"
-        alt="Black Rose drop story — Oakland industrial scene"
+        src="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-hero-bg-alt.webp"
+        alt="SkyyRose — Oakland scene, 2026"
         class="hero__bg parallax"
         data-parallax-speed="0.6"
         width="1680" height="1120"
-        decoding="async" loading="lazy">
+        decoding="async" fetchpriority="high">
     </picture>
   </div>
   <div class="hero__bg-shade"></div>
 
   <div class="hero__inner">
-    <h2 id="home-hero-title" class="hero__kicker reveal">For The Town</h2>
+    <h2 id="home-hero-title" class="hero__kicker reveal">Luxury Grows from Concrete.</h2>
 
     <div class="hero__center">
       <div class="hero__lockup reveal reveal--scale">
-        <picture>
-          <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-brand-script.avif" type="image/avif">
-          <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-brand-script.webp" type="image/webp">
-          <img
-            src="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-brand-script.png"
-            alt="The Black Rose Collection"
-            width="1200" height="800"
-            decoding="async" loading="lazy">
-        </picture>
+        <p class="hero__brand-wordmark">SKYYROSE</p>
       </div>
 
-      <p class="hero__subtitle reveal">Spring Drop · 2026 · Drop 01</p>
+      <p class="hero__subtitle reveal">Spring 2026 · Oakland, CA</p>
     </div>
 
     <footer class="hero__bottom reveal">
@@ -681,45 +704,61 @@
     <p class="spread__page-marker">PG 04—05 · Black Rose · Love Hurts · Signature · Kids</p>
   </header>
   <div class="spread__grid">
-    <a class="spread__tile spread__tile--lg spread__tile--brand reveal" href="#br-cover" style="--delay: 0s;">
-      <img
-        class="spread__tile-img"
-        src="../../../wordpress-theme/skyyrose-flagship/assets/branding/black-rose-logo-hero.webp"
-        alt="Black Rose collection"
-        width="800" height="800" decoding="async" loading="lazy">
+    <a class="spread__tile reveal" href="#br-cover" style="--delay: 0s;">
+      <picture>
+        <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-col-black-rose.avif" type="image/avif">
+        <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-col-black-rose.webp" type="image/webp">
+        <img
+          class="spread__tile-img"
+          src="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-col-black-rose.webp"
+          alt="Black Rose collection — Oakland scene"
+          width="600" height="800" decoding="async" loading="lazy">
+      </picture>
       <div class="spread__tile-overlay">
         <span class="spread__tile-label">Collection 02</span>
         <p class="spread__tile-name">BLACK ROSE</p>
       </div>
     </a>
-    <a class="spread__tile spread__tile--brand reveal" href="#" style="--delay: 0.12s;">
-      <img
-        class="spread__tile-img"
-        src="../../../wordpress-theme/skyyrose-flagship/assets/branding/love-hurts-logo-hero.webp"
-        alt="Love Hurts collection"
-        width="600" height="600" decoding="async" loading="lazy">
+    <a class="spread__tile reveal" href="#" style="--delay: 0.12s;">
+      <picture>
+        <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-col-love-hurts.avif" type="image/avif">
+        <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-col-love-hurts.webp" type="image/webp">
+        <img
+          class="spread__tile-img"
+          src="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-col-love-hurts.webp"
+          alt="Love Hurts collection — scene"
+          width="600" height="800" decoding="async" loading="lazy">
+      </picture>
       <div class="spread__tile-overlay">
         <span class="spread__tile-label">Collection 03</span>
         <p class="spread__tile-name">LOVE HURTS</p>
       </div>
     </a>
-    <a class="spread__tile spread__tile--brand reveal" href="#" style="--delay: 0.24s;">
-      <img
-        class="spread__tile-img"
-        src="../../../wordpress-theme/skyyrose-flagship/assets/branding/signature-logo-hero.webp"
-        alt="Signature collection"
-        width="600" height="600" decoding="async" loading="lazy">
+    <a class="spread__tile reveal" href="#" style="--delay: 0.24s;">
+      <picture>
+        <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-col-signature.avif" type="image/avif">
+        <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-col-signature.webp" type="image/webp">
+        <img
+          class="spread__tile-img"
+          src="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-col-signature.webp"
+          alt="Signature collection — scene"
+          width="600" height="800" decoding="async" loading="lazy">
+      </picture>
       <div class="spread__tile-overlay">
         <span class="spread__tile-label">Collection 01</span>
         <p class="spread__tile-name">SIGNATURE</p>
       </div>
     </a>
-    <a class="spread__tile spread__tile--brand reveal" href="#" style="--delay: 0.36s;">
-      <img
-        class="spread__tile-img"
-        src="../../../wordpress-theme/skyyrose-flagship/assets/images/logos/skyy-rose-collection-circular-patch.webp"
-        alt="Kids Capsule collection"
-        width="600" height="600" decoding="async" loading="lazy">
+    <a class="spread__tile reveal" href="#" style="--delay: 0.36s;">
+      <picture>
+        <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/lookbook/lb-kid-black-rose-960w.avif" type="image/avif">
+        <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/lookbook/lb-kid-black-rose-960w.webp" type="image/webp">
+        <img
+          class="spread__tile-img"
+          src="../../../wordpress-theme/skyyrose-flagship/assets/images/lookbook/lb-kid-black-rose-960w.webp"
+          alt="Kids Capsule — lookbook scene"
+          width="960" height="1280" decoding="async" loading="lazy">
+      </picture>
       <div class="spread__tile-overlay">
         <span class="spread__tile-label">Collection 04</span>
         <p class="spread__tile-name">KIDS CAPSULE</p>
