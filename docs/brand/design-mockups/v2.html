@@ -511,6 +511,23 @@
     /* No parallax on mobile — perf */
     .parallax { transform: none !important; }
   }
+
+  /* === BR collection palette override (per canon — silver, not rose-gold) === */
+  .br-page .cover__sr-graffiti { color: var(--sr-silver); }
+  .br-page .cover__tagline-accent { color: var(--sr-silver); }
+  .br-page .voice__quote .line-2 {
+    color: var(--sr-silver);
+    text-shadow: 0 0 24px rgba(192, 192, 192, 0.3);
+  }
+  .br-page .voice__attribution {
+    color: rgba(192, 192, 192, 0.75);
+    border-top-color: rgba(192, 192, 192, 0.25);
+  }
+  .br-page .spread__tile-label { color: var(--sr-silver); }
+  .br-page .spread__tile:focus-visible,
+  .br-page .spread__tile:hover {
+    box-shadow: 0 0 0 2px rgba(192, 192, 192, 0.7);
+  }
 </style>
 </head>
 <body>
