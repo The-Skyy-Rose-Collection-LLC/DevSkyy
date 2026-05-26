@@ -81,7 +81,7 @@ Same magazine engine, BR-specific dressing. Continuation of the homepage thesis 
 | Cover photo | `assets/branding/black-rose-logo-hero.webp` or `black-rose-monogram-sr.jpg` if hero-fit. |
 | Cover line | "Built for those who move through darkness like it's home." (from brand-DNA skill product copy spec). |
 | Hero | Sepia palette darkened. Sport patch macro inset (NFL/NBA/MLB/Hockey patches as small product-detail squares). |
-| Voice frame | "Hurts is the bloodline that raised me." (founder-locked 2026-05-23, canonical sources: `docs/brand/collection-stories.md` + `docs/brand/corey-questions.md`). Playfair italic. |
+| Voice frame | **"You wear it / because you / already stood up."** — Black Rose story tagline, verbatim founder-locked from `docs/brand/collection-stories.md` (line: Story Tagline). 3-line stack matches the homepage voice-frame pattern. Playfair italic. Middle line in rose-gold. Attribution: "Black Rose · The Town · 2026". |
 | Spread | 6-8 Black Rose SKUs only. Loaded from `data/skyyrose-catalog.csv` filtered by collection=black-rose. Pulled via static reference in this mockup (not a CSV runtime read). |
 | Palette tweak | Silver `#C0C0C0` replaces gold accent in this view. Rose-gold and crimson stay. |
 
@@ -168,6 +168,17 @@ v2.html is one file. CSS embedded in `<style>` (no external stylesheet). JS embe
 - Three.js or WebGL of any kind
 - Collection pages beyond Black Rose (Love Hurts / Signature / Kids saved for future)
 - Per-collection PDP variants
+
+### Canon reservations for future collection pages
+
+When Love Hurts gets its own v2-style page (future phase, separate spec):
+
+- Voice frame line: **"Hurts is the bloodline that raised me."** — founder-locked 2026-05-23. "Hurts" is Corey Foster's family name. This line belongs ONLY to Love Hurts. Do not place it on Black Rose, Signature, or Kids.
+- Palette: Crimson `#DC143C` accent on deep black background.
+- Display font: Yellowtail script accent + Playfair italic primary.
+- Source: `docs/brand/collection-stories.md` → Love Hurts section.
+
+Reservation noted to prevent the same misattribution loop on the next pass.
 
 ## Implementation Mode
 
