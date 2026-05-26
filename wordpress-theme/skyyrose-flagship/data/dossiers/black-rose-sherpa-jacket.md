@@ -1,6 +1,6 @@
 ---
 sku: br-006
-name: BLACK Rose Sherpa Jacket
+name: The Black Rose Bomber Sherpa
 collection: black-rose
 logo_reference: data/brand-logos/black-rose-logo.md
 reference_image: data/product-references/br-006-sherpa-jacket-real-front.jpeg
@@ -9,7 +9,7 @@ extra_references:
   - data/product-references/br-006-sherpa-jacket-real-closeup.jpeg
 ---
 
-# BLACK Rose Sherpa Jacket
+# The Black Rose Bomber Sherpa
 
 **Garment type lock:** Black satin bomber-style hooded jacket — **lustrous black satin** exterior fabric, **plush black sherpa** interior lining (visible inside the body and inside the hood). Hooded (sherpa-lined hood). **Front closure is a ZIPPER underneath with a button-overlap storm-flap covering it** — the zipper runs the full center-front length, and a buttoned/snapped storm flap overlaps the zipper line for a clean satin front (this is a two-layer placket). **Side hand pockets with zipper closures** at the lower sides. Long sleeves with **black ribbed cuffs**. **Black ribbed bomber-style waistband** at the bottom hem. NOT a parka. NOT a denim jacket. NOT a fleece hoodie. NOT a windbreaker. NOT a leather jacket.
 

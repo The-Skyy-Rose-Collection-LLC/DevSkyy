@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SkyyRose — Catalog Extension Form (12 Pre-Order SKUs)</title>
+<style>
+:root {
+  --rose-gold: #B76E79;
+  --rose-gold-soft: rgba(183,110,121,.18);
+  --dark: #0A0A0A;
+  --paper: #f8f4f0;
+  --ink: #1a1410;
+  --muted: #6b605a;
+  --border: rgba(26,20,16,.12);
+  --warn-bg: rgba(220,20,60,.06);
+  --warn-border: rgba(220,20,60,.35);
+  --gold: #D4AF37;
+  --crimson: #DC143C;
+  --silver: #C0C0C0;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.5;
+  padding: 32px 24px 96px;
+}
+.wrap { max-width: 1120px; margin: 0 auto; }
+header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 24px;
+  margin-bottom: 32px;
+}
+h1 {
+  font-family: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+  font-weight: 600;
+  font-size: 32px;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+  color: var(--dark);
+}
+h2 {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 40px 0 16px;
+  color: var(--dark);
+  border-left: 3px solid var(--rose-gold);
+  padding-left: 12px;
+}
+.lede { color: var(--muted); font-size: 15px; max-width: 720px; }
+.lede strong { color: var(--ink); }
+.cat-tag {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--rose-gold-soft);
+  color: var(--rose-gold);
+  font-weight: 600;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.cat-tag.c { background: rgba(212,175,55,.18); color: #8a7126; }
+.sku-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 22px;
+  margin-bottom: 16px;
+  background: #fff;
+}
+.sku-card.collision { border-left: 3px solid var(--crimson); background: var(--warn-bg); }
+.sku-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.sku-code {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--rose-gold);
+  letter-spacing: 0.02em;
+}
+.collision-note {
+  background: var(--warn-bg);
+  border-left: 3px solid var(--warn-border);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #6a2a35;
+  margin: 8px 0 14px;
+  border-radius: 0 4px 4px 0;
+}
+.field-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 12px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+.field-label {
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+.field-row input,
+.field-row textarea,
+.field-row select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: #fff;
+  font: inherit;
+  color: var(--ink);
+  font-size: 14px;
+}
+.field-row input:focus,
+.field-row textarea:focus,
+.field-row select:focus {
+  outline: 2px solid var(--rose-gold);
+  outline-offset: 1px;
+  border-color: var(--rose-gold);
+}
+.field-row textarea { min-height: 60px; resize: vertical; font-family: inherit; }
+.field-row .assets {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: var(--muted);
+  background: rgba(0,0,0,.03);
+  padding: 8px 10px;
+  border-radius: 4px;
+  line-height: 1.5;
+}
+.controls {
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(to top, var(--paper) 70%, transparent);
+  padding: 24px 0 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  margin-top: 32px;
+}
+button {
+  background: var(--rose-gold);
+  color: #fff;
+  border: none;
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+}
+button:hover { background: #a05e69; }
+button.secondary { background: transparent; color: var(--rose-gold); border: 1px solid var(--rose-gold); }
+button.secondary:hover { background: var(--rose-gold-soft); color: var(--rose-gold); }
+#status { font-size: 13px; color: var(--muted); }
+.copy-box {
+  margin-top: 16px;
+  position: relative;
+}
+#out {
+  width: 100%;
+  min-height: 280px;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12px;
+  padding: 14px;
+  background: var(--dark);
+  color: #f0e8e0;
+  border: 1px solid var(--rose-gold);
+  border-radius: 6px;
+  resize: vertical;
+}
+.legend {
+  display: flex;
+  gap: 24px;
+  margin: 16px 0 24px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.dot.b { background: var(--rose-gold); }
+.dot.c { background: var(--gold); }
+.dot.col { background: var(--crimson); }
+details.option-detail {
+  margin: 16px 0;
+  background: rgba(183,110,121,.05);
+  padding: 12px 16px;
+  border-radius: 6px;
+  border-left: 3px solid var(--rose-gold);
+}
+details.option-detail summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+details.option-detail p { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+.global-decision {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 22px;
+  margin-bottom: 32px;
+  background: linear-gradient(180deg, rgba(212,175,55,.06), transparent);
+}
+.global-decision h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: var(--dark);
+}
+.radio-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; }
+.radio-row label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: #fff;
+}
+.radio-row input[type=radio] { accent-color: var(--rose-gold); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Catalog Extension — 12 Pre-Order SKUs</h1>
+    <p class="lede">
+      Founder review. Each SKU below was an orphan in the repo — files exist, no catalog row.
+      Three approved as real upcoming designs (<strong>Cat C</strong>) or real pre-order products
+      (<strong>Cat B</strong>). Fill in / correct each row, click <strong>Export JSON</strong>,
+      copy the output, paste back into the conversation.
+    </p>
+    <div class="legend">
+      <span class="legend-item"><span class="dot b"></span> Category B — has real photos</span>
+      <span class="legend-item"><span class="dot c"></span> Category C — design SKU, techflats only</span>
+      <span class="legend-item"><span class="dot col"></span> Naming collision with existing catalog row</span>
+    </div>
+  </header>
+
+  <section class="global-decision">
+    <h3>Global decision — BR jersey design SKUs (br-d01–d04)</h3>
+    <p style="margin:0;font-size:14px;color:var(--muted);">
+      Existing BiB Series uses numeric slots 0–5. Adding 4 more breaks the sequence
+      unless they're renumbered.
+    </p>
+    <div class="radio-row">
+      <label><input type="radio" name="br_naming" value="A" checked> <strong>A</strong> — keep <code>br-d0X</code> identifiers, descriptive names</label>
+      <label><input type="radio" name="br_naming" value="B"> <strong>B</strong> — renumber to <code>br-016</code> through <code>br-019</code> (atomic rename across 5+ files)</label>
+      <label><input type="radio" name="br_naming" value="X"> <strong>?</strong> — decide per-SKU</label>
+    </div>
+  </section>
+
+  <h2>Category B — real products (4 SKUs)</h2>
+
+  <!-- lh-001 -->
+  <div class="sku-card collision" data-sku="lh-001" data-cat="B">
+    <div class="sku-head">
+      <span><span class="cat-tag">Cat B</span><span class="sku-code">lh-001</span></span>
+      <span style="font-size:13px;color:var(--muted);">collection: love-hurts</span>
+    </div>
+    <div class="collision-note">
+      ⚠ <strong>Collision:</strong> lh-005 already exists as "The Fannie" ($45). lh-001 filenames mention "fannie-pack" — likely a multi-bag bundle. Confirm or retire.
+    </div>
+    <div class="field-row"><div class="field-label">Asset truth</div><div class="assets">lh-001-fannie-front.jpeg<br>lh-001-fannie-angled.jpeg<br>lh-001-fannie-back.jpeg<br>lh-001-fannie-pack-front-preorder.jpeg<br>lh-001-fannie-pack-techflat.jpeg</div></div>
+    <div class="field-row"><label class="field-label" for="lh-001-name">Name</label><input id="lh-001-name" type="text" value="The Fannie Pack" placeholder="Final product name"></div>
+    <div class="field-row"><label class="field-label" for="lh-001-price">Price (USD)</label><input id="lh-001-price" type="number" value="85" min="0" step="5"></div>
+    <div class="field-row"><label class="field-label" for="lh-001-decision">Decision</label><select id="lh-001-decision"><option value="add">Add as new pre-order SKU</option><option value="retire">Retire as duplicate of lh-005</option><option value="other">Other (see notes)</option></select></div>
+    <div class="field-row"><label class="field-label" for="lh-001-notes">Notes</label><textarea id="lh-001-notes" placeholder="Bundle composition, color, anything else"></textarea></div>
+  </div>
+
+  <!-- sg-004 -->
+  <div class="sku-card collision" data-sku="sg-004" data-cat="B">
+    <div class="sku-head">
+      <span><span class="cat-tag">Cat B</span><span class="sku-code">sg-004</span></span>
+      <span style="font-size:13px;color:var(--muted);">collection: signature</span>
+    </div>
+    <div class="collision-note">
+      ⚠ <strong>Collision:</strong> sg-006 = "Mint &amp; Lavender Hoodie". sg-004 filename is just "mint-hoodie" — possibly solid mint vs duotone. Confirm if distinct.
+    </div>
+    <div class="field-row"><div class="field-label">Asset truth</div><div class="assets">sg-004-mint-hoodie.jpeg<br>editorial-staging/sg-004-{comp-iter,mask-iter,result,alpha}.png</div></div>
+    <div class="field-row"><label class="field-label" for="sg-004-name">Name</label><input id="sg-004-name" type="text" value="Mint Hoodie (Solid)" placeholder="Final product name"></div>
+    <div class="field-row"><label class="field-label" for="sg-004-price">Price (USD)</label><input id="sg-004-price" type="number" value="45" min="0" step="5"></div>
+    <div class="field-row"><label class="field-label" for="sg-004-decision">Decision</label><select id="sg-004-decision"><option value="add">Add as new pre-order SKU</option><option value="merge">Merge into sg-006 (same product)</option><option value="other">Other (see notes)</option></select></div>
+    <div class="field-row"><label class="field-label" for="sg-004-notes">Notes</label><textarea id="sg-004-notes" placeholder="Color distinction from sg-006"></textarea></div>
+  </div>
+
+  <!-- sg-008 -->
+  <div class="sku-card collision" data-sku="sg-008" data-cat="B">
+    <div class="sku-head">
+      <span><span class="cat-tag">Cat B</span><span class="sku-code">sg-008</span></span>
+      <span style="font-size:13px;color:var(--muted);">collection: signature</span>
+    </div>
+    <div class="collision-note">
+      ⚠ <strong>Three-way collision:</strong> sg-015 = "The Windbreaker Set", sg-d01 also windbreaker. sg-008 file says "retro-front" → likely retro variant. Confirm how the three relate.
+    </div>
+    <div class="field-row"><div class="field-label">Asset truth</div><div class="assets">sg-008-techflat-windbreaker.jpeg<br>sg-008-windbreaker-set-retro-front.jpg<br>editorial-staging/sg-008-{mask-iter,prompt,result}.png</div></div>
+    <div class="field-row"><label class="field-label" for="sg-008-name">Name</label><input id="sg-008-name" type="text" value="The Windbreaker Set — Retro" placeholder="Final product name"></div>
+    <div class="field-row"><label class="field-label" for="sg-008-price">Price (USD)</label><input id="sg-008-price" type="number" value="95" min="0" step="5"></div>
+    <div class="field-row"><label class="field-label" for="sg-008-decision">Decision</label><select id="sg-008-decision"><option value="add">Add as new pre-order SKU</option><option value="merge_015">Merge into sg-015 (same windbreaker)</option><option value="other">Other (see notes)</option></select></div>
+    <div class="field-row"><label class="field-label" for="sg-008-notes">Notes</label><textarea id="sg-008-notes" placeholder="Differentiation from sg-015 and sg-d01"></textarea></div>
+  </div>
+
+  <!-- sg-010 -->
+  <div class="sku-card collision" data-sku="sg-010" data-cat="B">
+    <div class="sku-head">
+      <span><span class="cat-tag">Cat B</span><span class="sku-code">sg-010</span></span>
+      <span style="font-size:13px;color:var(--muted);">collection: signature</span>
+    </div>
+    <div class="collision-note">
+      ⚠ <strong>Bundle ambiguity:</strong> Files reference Bay Bridge + Golden Gate variants. Could be (a) bundle SKU combining sg-001 with Golden Gate shorts, or (b) two distinct SKUs that need splitting.
+    </div>
+    <div class="field-row"><div class="field-label">Asset truth</div><div class="assets">sg-010-techflat-bridge-variants.jpg<br>sg-010-bridge-shorts-golden-gate.jpeg<br>sg-010-bridge-shorts-bay-bridge.jpeg<br>sg-010-bay-bridge-set-techflat-back.jpeg<br>sg-010-golden-gate-tee-shorts-combo.jpeg<br>sg-010-bay-bridge-tee-shorts-combo.jpeg<br>sg-010-golden-gate-tee-solo.jpeg<br>sg-010-bay-bridge-tee-solo.jpeg</div></div>
+    <div class="field-row"><label class="field-label" for="sg-010-name">Name</label><input id="sg-010-name" type="text" value="The Bridge Series — Bay Bridge &amp; Golden Gate Set" placeholder="Final product name"></div>
+    <div class="field-row"><label class="field-label" for="sg-010-price">Price (USD)</label><input id="sg-010-price" type="number" value="145" min="0" step="5"></div>
+    <div class="field-row"><label class="field-label" for="sg-010-decision">Decision</label><select id="sg-010-decision"><option value="bundle">Add as one bundle SKU</option><option value="split">Split into two (sg-010 + new SKU)</option><option value="other">Other (see notes)</option></select></div>
+    <div class="field-row"><label class="field-label" for="sg-010-notes">Notes</label><textarea id="sg-010-notes" placeholder="If split: what's the second SKU code? bundle composition?"></textarea></div>
+  </div>
+
+  <h2>Category C — design SKUs (8 SKUs)</h2>
+
+  <!-- br-d01 -->
+  <div class="sku-card" data-sku="br-d01" data-cat="C">
+    <div class="sku-head">
+      <span><span class="cat-tag c">Cat C</span><span class="sku-code">br-d01</span></span>
+      <span style="font-size:13px;color:var(--muted);">collection: black-rose</span>
+    </div>
+    <div class="field-row"><div class="field-label">Asset truth</div><div class="assets">br-d01-hockey-jersey-teal-techflat.jpeg<br>br-d01-hockey-jersey-teal-techflat-front.jpeg<br>br-d01-hockey-jersey-teal-techflat-back.jpeg</div></div>
+    <div class="field-row"><label class="field-label" for="br-d01-sku">SKU code (rename?)</label><input id="br-d01-sku" type="text" value="br-d01" placeholder="br-d01 or br-016"></div>
+    <div class="field-row"><label class="field-label" for="br-d01-name">Name</label><input id="br-d01-name" type="text" value="BLACK is Beautiful Hockey Jersey — Teal" placeholder="Final product name"></div>
+    <div class="field-row"><label class="field-label" for="br-d01-price">Price (USD)</label><input id="br-d01-price" type="number" value="115" min="0" step="5"></div>
+    <div class="field-row"><label class="field-label" for="br-d01-series">BiB Series slot</label><input id="br-d01-series" type="text" placeholder="e.g. 4. The Rose (Hockey — Teal Variant) or LEAVE BLANK"></div>
+    <div class="field-row"><label class="field-label" for="br-d01-notes">Notes</label><textarea id="br-d01-notes" placeholder="Color #, edition size, any specifics"></textarea></div>
+  </div>
+
+  <!-- br-d02 -->
+  <div class="sku-card" data-sku="br-d02" data-cat="C">
+    <div class="sku-head">
+      <span><span class="cat-tag c">Cat C</span><span class="sku-code">br-d02</span></span>
+      <span style="font-size:13px;color:var(--muted);">collection: black-rose</span>
+    </div>
+    <div class="field-row"><div class="field-label">Asset truth</div><div class="assets">br-d02-football-jersey-red-80-techflat.jpeg<br>br-d02-football-jersey-red-80-techflat-front.jpeg<br>br-d02-football-jersey-red-80-techflat-back.jpeg</div></div>
+    <div class="field-row"><label class="field-label" for="br-d02-sku">SKU code (rename?)</label><input id="br-d02-sku" type="text" value="br-d02" placeholder="br-d02 or br-017"></div>
+    <div class="field-row"><label class="field-label" for="br-d02-name">Name</label><input id="br-d02-name" type="text" value="BLACK is Beautiful Football Jersey — Red #80" placeholder="Final product name"></div>
+    <div class="field-row"><label class="field-label" for="br-d02-price">Price (USD)</label><input id="br-d02-price" type="number" value="115" min="0" step="5"></div>
+    <div class="field-row"><label class="field-label" for="br-d02-series">BiB Series slot</label><input id="br-d02-series" type="text" placeholder="e.g. 6. Red Bridge (Football) or LEAVE BLANK"></div>
+    <div class="field-row"><label class="field-label" for="br-d02-notes">Notes</label><textarea id="br-d02-notes" placeholder="Team / region / player # significance"></textarea></div>
+  </div>
+
+  <!-- br-d03 -->
+  <div class="sku-card" data-sku="br-d03" data-cat="C">
+    <div class="sku-head">
+      <span><span class="cat-tag c">Cat C</span><span class="sku-code">br-d03</span></span>
+      <span style="font-size:13px;color:var(--muted);">collection: black-rose</span>
+    </div>
+    <div class="field-row"><div class="field-label">Asset truth</div><div class="assets">br-d03-football-jersey-white-32-techflat.jpeg<br>br-d03-football-jersey-white-32-techflat-front.jpeg<br>br-d03-football-jersey-white-32-techflat-back.jpeg</div></div>
+    <div class="field-row"><label class="field-label" for="br-d03-sku">SKU code (rename?)</label><input id="br-d03-sku" type="text" value="br-d03" placeholder="br-d03 or br-018"></div>
+    <div class="field-row"><label class="field-label" for="br-d03-name">Name</label><input id="br-d03-name" type="text" value="BLACK is Beautiful Football Jersey — White #32" placeholder="Final product name"></div>
+    <div class="field-row"><label class="field-label" for="br-d03-price">Price (USD)</label><input id="br-d03-price" type="number" value="115" min="0" step="5"></div>
+    <div class="field-row"><label class="field-label" for="br-d03-series">BiB Series slot</label><input id="br-d03-series" type="text" placeholder="e.g. 7. ... or LEAVE BLANK"></div>
+    <div class="field-row"><label class="field-label" for="br-d03-notes">Notes</label><textarea id="br-d03-notes" placeholder="Team / region / player # significance"></textarea></div>
+  </div>
+
+  <!-- br-d04 -->
+  <div class="sku-card" data-sku="br-d04" data-cat="C">
+    <div class="sku-head">
+      <span><span class="cat-tag c">Cat C</span><span class="sku-code">br-d04</span></span>
+      <span style="font-size:13px;color:var(--muted);">collection: black-rose</span>
+    </div>
+    <div class="field-row"><div class="field-label">Asset truth</div><div class="assets">br-d04-basketball-jersey-techflat.jpeg<br>br-d04-basketball-jersey-techflat-front.jpeg<br>br-d04-basketball-jersey-techflat-back.jpeg</div></div>
+    <div class="field-row"><label class="field-label" for="br-d04-sku">SKU code (rename?)</label><input id="br-d04-sku" type="text" value="br-d04" placeholder="br-d04 or br-019"></div>
+    <div class="field-row"><label class="field-label" for="br-d04-name">Name</label><input id="br-d04-name" type="text" value="BLACK is Beautiful Basketball Jersey — Court Edition" placeholder="Final product name"></div>
+    <div class="field-row"><label class="field-label" for="br-d04-price">Price (USD)</label><input id="br-d04-price" type="number" value="100" min="0" step="5"></div>
+    <div class="field-row"><label class="field-label" for="br-d04-series">BiB Series slot</label><input id="br-d04-series" type="text" placeholder="e.g. 8. ... or LEAVE BLANK"></div>
+    <div class="field-row"><label class="field-label" for="br-d04-notes">Notes</label><textarea id="br-d04-notes" placeholder="Edition / variant / color details"></textarea></div>
+  </div>
+
+  <!-- sg-d01 -->
+  <div class="sku-card collision" data-sku="sg-d01" data-cat="C">
+    <div class="sku-head">
+      <span><span class="cat-tag c">Cat C</span><span class="sku-code">sg-d01</span></span>
+      <span style="font-size:13px;color:var(--muted);">collection: signature</span>
+    </div>
+    <div class="collision-note">
+      ⚠ <strong>Three-way:</strong> sg-015 = "The Windbreaker Set", sg-008 also windbreaker. May be over-specified. Distinguish or merge.
+    </div>
+    <div class="field-row"><div class="field-label">Asset truth</div><div class="assets">sg-d01-windbreaker-set-techflat.jpg (1 file)</div></div>
+    <div class="field-row"><label class="field-label" for="sg-d01-name">Name</label><input id="sg-d01-name" type="text" value="The Windbreaker Set — Design Variant" placeholder="Final product name"></div>
+    <div class="field-row"><label class="field-label" for="sg-d01-price">Price (USD)</label><input id="sg-d01-price" type="number" value="85" min="0" step="5"></div>
+    <div class="field-row"><label class="field-label" for="sg-d01-decision">Decision</label><select id="sg-d01-decision"><option value="add">Add as new SKU</option><option value="merge_015">Merge into sg-015</option><option value="merge_008">Merge into sg-008</option><option value="other">Other (see notes)</option></select></div>
+    <div class="field-row"><label class="field-label" for="sg-d01-notes">Notes</label><textarea id="sg-d01-notes" placeholder="Differentiator from sg-008 and sg-015"></textarea></div>
+  </div>
+
+  <!-- sg-d02 -->
+  <div class="sku-card" data-sku="sg-d02" data-cat="C">
+    <div class="sku-head">
+      <span><span class="cat-tag c">Cat C</span><span class="sku-code">sg-d02</span></span>
+      <span style="font-size:13px;color:var(--muted);">collection: signature</span>
+    </div>
+    <div class="field-row"><div class="field-label">Asset truth</div><div class="assets">sg-d02-collection-shorts.jpeg (1 file)</div></div>
+    <div class="field-row"><label class="field-label" for="sg-d02-name">Name (sub-name needed)</label><input id="sg-d02-name" type="text" value="" placeholder="e.g. The Bridge Series 'Stay Golden' Shorts — Cream"></div>
+    <div class="field-row"><label class="field-label" for="sg-d02-price">Price (USD)</label><input id="sg-d02-price" type="number" value="65" min="0" step="5"></div>
+    <div class="field-row"><label class="field-label" for="sg-d02-notes">Notes</label><textarea id="sg-d02-notes" placeholder="Sub-name, color, print, anything that distinguishes from sg-001 / sg-003"></textarea></div>
+  </div>
+
+  <!-- sg-d03 -->
+  <div class="sku-card" data-sku="sg-d03" data-cat="C">
+    <div class="sku-head">
+      <span><span class="cat-tag c">Cat C</span><span class="sku-code">sg-d03</span></span>
+      <span style="font-size:13px;color:var(--muted);">collection: signature</span>
+    </div>
+    <div class="field-row"><div class="field-label">Asset truth</div><div class="assets">sg-d03-mint-sweatsuit-set.jpeg (1 file)</div></div>
+    <div class="field-row"><label class="field-label" for="sg-d03-name">Name</label><input id="sg-d03-name" type="text" value="Mint &amp; Lavender Sweatsuit Set" placeholder="Final product name"></div>
+    <div class="field-row"><label class="field-label" for="sg-d03-price">Price (USD)</label><input id="sg-d03-price" type="number" value="95" min="0" step="5"></div>
+    <div class="field-row"><label class="field-label" for="sg-d03-decision">Decision</label><select id="sg-d03-decision"><option value="add">Add as new bundle SKU</option><option value="other">Other (see notes)</option></select></div>
+    <div class="field-row"><label class="field-label" for="sg-d03-notes">Notes</label><textarea id="sg-d03-notes" placeholder="Bundle composition (sg-006 + sg-014?), edition"></textarea></div>
+  </div>
+
+  <!-- sg-d04 -->
+  <div class="sku-card" data-sku="sg-d04" data-cat="C">
+    <div class="sku-head">
+      <span><span class="cat-tag c">Cat C</span><span class="sku-code">sg-d04</span></span>
+      <span style="font-size:13px;color:var(--muted);">collection: signature</span>
+    </div>
+    <div class="field-row"><div class="field-label">Asset truth</div><div class="assets">sg-d04-cream-shorts.jpg (1 file)</div></div>
+    <div class="field-row"><label class="field-label" for="sg-d04-name">Name</label><input id="sg-d04-name" type="text" value="The Bridge Series 'Cream' Shorts" placeholder="Final product name"></div>
+    <div class="field-row"><label class="field-label" for="sg-d04-price">Price (USD)</label><input id="sg-d04-price" type="number" value="65" min="0" step="5"></div>
+    <div class="field-row"><label class="field-label" for="sg-d04-notes">Notes</label><textarea id="sg-d04-notes" placeholder="Bridge Series sibling or standalone? Sub-name?"></textarea></div>
+  </div>
+
+  <div class="controls">
+    <button onclick="exportJSON()">Export JSON →</button>
+    <button class="secondary" onclick="copyOutput()">Copy to clipboard</button>
+    <span id="status"></span>
+  </div>
+
+  <div class="copy-box">
+    <textarea id="out" readonly placeholder='Output will appear here. Click "Export JSON" then copy + paste back into the chat.'></textarea>
+  </div>
+
+</div>
+
+<script>
+function getField(sku, field) {
+  const el = document.getElementById(`${sku}-${field}`);
+  if (!el) return null;
+  return el.value;
+}
+
+function exportJSON() {
+  const cards = document.querySelectorAll('.sku-card');
+  const result = {
+    timestamp: new Date().toISOString(),
+    br_naming_choice: document.querySelector('input[name="br_naming"]:checked').value,
+    skus: []
+  };
+  cards.forEach(card => {
+    const sku = card.dataset.sku;
+    const cat = card.dataset.cat;
+    const row = {
+      sku,
+      category: cat,
+      sku_code: getField(sku, 'sku') || sku,
+      name: getField(sku, 'name') || '',
+      price: parseInt(getField(sku, 'price'), 10) || 0,
+    };
+    const series = getField(sku, 'series');
+    const decision = getField(sku, 'decision');
+    const notes = getField(sku, 'notes');
+    if (series !== null) row.bib_series_slot = series;
+    if (decision !== null) row.decision = decision;
+    if (notes !== null && notes.trim()) row.notes = notes.trim();
+    result.skus.push(row);
+  });
+  document.getElementById('out').value = JSON.stringify(result, null, 2);
+  document.getElementById('status').textContent = `Exported ${result.skus.length} SKUs at ${new Date().toLocaleTimeString()}.`;
+}
+
+function copyOutput() {
+  const out = document.getElementById('out');
+  if (!out.value) {
+    exportJSON();
+  }
+  out.select();
+  navigator.clipboard.writeText(out.value).then(() => {
+    document.getElementById('status').textContent = 'Copied. Paste into the chat.';
+  }, () => {
+    document.execCommand('copy');
+    document.getElementById('status').textContent = 'Copied (fallback). Paste into the chat.';
+  });
+}
+</script>
+</body>
+</html>
