@@ -469,6 +469,12 @@
     filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
     opacity: 0.9;
   }
+
+  /* === BR product spread === */
+  .br-spread { grid-template-columns: repeat(4, 1fr); }
+  .br-spread .spread__tile { grid-row: auto; aspect-ratio: 3 / 4; }
+  .br-spread .spread__tile-name { font-size: 16px; letter-spacing: 0.06em; }
+  .br-spread .spread__tile-label { font-size: 9px; }
 </style>
 </head>
 <body>
@@ -729,6 +735,59 @@
     <p class="voice__attribution reveal" style="--delay: 0.6s;">Black Rose · The Town · 2026</p>
   </div>
 </section>
+<section id="br-spread" class="frame spread" aria-labelledby="br-spread-title">
+  <header class="spread__title-row reveal">
+    <h2 id="br-spread-title" class="spread__title">THE LINEUP</h2>
+    <p class="spread__page-marker">PG 06—07 · Spring Drop 01 · 4 looks</p>
+  </header>
+  <div class="spread__grid br-spread">
+    <a class="spread__tile reveal" href="#" style="--delay: 0s;">
+      <img
+        class="spread__tile-img"
+        src="../../../wordpress-theme/skyyrose-flagship/assets/branding/black-rose-logo-hero.webp"
+        alt="BLACK Rose Crewneck"
+        width="600" height="800" decoding="async" loading="lazy">
+      <div class="spread__tile-overlay">
+        <span class="spread__tile-label">br-001 · $180</span>
+        <p class="spread__tile-name">BLACK ROSE CREWNECK</p>
+      </div>
+    </a>
+    <a class="spread__tile reveal" href="#" style="--delay: 0.12s;">
+      <img
+        class="spread__tile-img"
+        src="../../../wordpress-theme/skyyrose-flagship/assets/branding/black-rose-logo.webp"
+        alt="BLACK Rose Hoodie"
+        width="600" height="800" decoding="async" loading="lazy">
+      <div class="spread__tile-overlay">
+        <span class="spread__tile-label">br-004 · $240</span>
+        <p class="spread__tile-name">BLACK ROSE HOODIE</p>
+      </div>
+    </a>
+    <a class="spread__tile reveal" href="#" style="--delay: 0.24s;">
+      <img
+        class="spread__tile-img"
+        src="../../../wordpress-theme/skyyrose-flagship/assets/branding/black-rose-monogram-sr.jpg"
+        alt="BLACK Rose Hoodie Signature Edition"
+        width="600" height="800" decoding="async" loading="lazy">
+      <div class="spread__tile-overlay">
+        <span class="spread__tile-label">br-005 · $320</span>
+        <p class="spread__tile-name">SIGNATURE HOODIE</p>
+      </div>
+    </a>
+    <a class="spread__tile reveal" href="#" style="--delay: 0.36s;">
+      <img
+        class="spread__tile-img"
+        src="../../../wordpress-theme/skyyrose-flagship/assets/branding/black-rose-logo-hero-transparent.png"
+        alt="Black is Beautiful Football Jersey Red"
+        width="600" height="800" decoding="async" loading="lazy">
+      <div class="spread__tile-overlay">
+        <span class="spread__tile-label">br-008 · $260</span>
+        <p class="spread__tile-name">SF FOOTBALL JERSEY</p>
+      </div>
+    </a>
+  </div>
+</section>
+</div><!-- /.br-page -->
 <!-- Sections inserted in subsequent tasks -->
 </body>
 </html>
