@@ -39,6 +39,9 @@
     --ff-meta: 'Space Mono', monospace;
     --ff-body: 'Inter', system-ui, sans-serif;
 
+    /* Editorial type sizing — minimal additions, expand as sections require */
+    --fs-brand-text: 18px;
+
     /* Spacing scale */
     --space-1: 0.25rem;
     --space-2: 0.5rem;
@@ -93,6 +96,7 @@
     align-items: center;
     padding: var(--space-4) var(--space-8);
     background: linear-gradient(180deg, rgba(10,10,10,0.85), rgba(10,10,10,0));
+    -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
   }
   .navbar__brand { display: flex; align-items: center; gap: var(--space-3); }
@@ -100,7 +104,7 @@
   .navbar__brand-text {
     font-family: var(--ff-masthead);
     font-weight: 700;
-    font-size: 18px;
+    font-size: var(--fs-brand-text);
     letter-spacing: 0.12em;
   }
   .navbar__links {
@@ -112,7 +116,18 @@
     text-transform: uppercase;
     color: rgba(255,255,255,0.8);
   }
-  .navbar__links a:hover { color: var(--sr-rose-gold); }
+  .navbar__links a { color: inherit; }
+  .navbar__links a:hover,
+  .navbar__links a:focus-visible {
+    color: var(--sr-rose-gold);
+    outline: 2px solid var(--sr-rose-gold);
+    outline-offset: 3px;
+  }
+  .navbar__brand:focus-visible {
+    outline: 2px solid var(--sr-rose-gold);
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
 </style>
 </head>
 <body>
@@ -121,7 +136,7 @@
     <img
       src="../../../wordpress-theme/skyyrose-flagship/assets/branding/skyyrose-monogram-nav.webp"
       alt="SkyyRose"
-      width="44" height="44" decoding="async" fetchpriority="high">
+      width="44" height="44" decoding="async">
     <span class="navbar__brand-text">SKYY ROSE</span>
   </a>
   <div class="navbar__links">
