@@ -36,6 +36,12 @@ class AuditEventType(StrEnum):
     PROCESS_RETRY = "process_retry"
     PROCESS_HEAL_SUCCESS = "process_heal_success"
     PROCESS_HEAL_FAILED = "process_heal_failed"
+    # Self-healing director observability — emitted by aos/kernel/kernel.py
+    # when the healing policy decides retry / abort / escalate for a failing
+    # agent execution. Re-added 2026-05-25 after revert (cmem #5107).
+    HEAL_ATTEMPTED = "heal_attempted"
+    HEAL_ABORTED = "heal_aborted"
+    HEAL_ESCALATED = "heal_escalated"
     LEARNING_RECORDED = "learning_recorded"
     LEARNING_FLUSHED = "learning_flushed"
     PLAN_STARTED = "plan_started"

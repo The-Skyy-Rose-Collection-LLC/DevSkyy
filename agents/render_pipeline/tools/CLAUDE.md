@@ -105,3 +105,8 @@ Per `llm/model_ids.py` — never hardcode model strings. Tools import the aliase
 - 9 tools = 9 pipeline steps — 1:1 mapping is intentional, do not collapse.
 - Cost surface audited (cmem #3474, 2026-05-11) — tournament is the most expensive step by 5-10×.
 - Engine routing F3 fix (cmem #2476): catalog override > vision-driven default. Codified in `route_engine.py`.
+
+
+<claude-mem-context>
+
+</claude-mem-context>

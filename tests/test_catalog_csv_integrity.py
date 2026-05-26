@@ -22,7 +22,10 @@ from skyyrose.core.catalog_loader import (
     status_from_row,
 )
 
-EXPECTED_SKU_COUNT = 33
+# Per project rule "Catalog FIRST, memory SECOND" — count derived from the
+# live catalog CSV. Bump in lock-step with `skyyrose-catalog.csv` row count.
+# Last verified 2026-05-25 (32 rows after header).
+EXPECTED_SKU_COUNT = 32
 
 EXPECTED_COLUMNS = {
     "sku",

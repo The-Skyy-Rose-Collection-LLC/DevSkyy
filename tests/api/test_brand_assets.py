@@ -113,14 +113,20 @@ class TestBulkIngestion:
         assert data["total"] == 3
 
     def test_bulk_ingest_max_100_assets(self, client: TestClient) -> None:
-        """Should accept up to 100 assets."""
+        """Should accept up to 100 assets.
+
+        Disables visual feature extraction — this test exercises the bulk
+        intake path and the 100-asset ceiling, not the feature pipeline.
+        Without ``extract_features=False`` the endpoint fires 100 real HTTP
+        GETs to example.com which 404 + time out the test (~10s ceiling).
+        """
         assets = [
             {"url": f"https://example.com/img{i}.jpg", "category": "product"} for i in range(100)
         ]
 
         response = client.post(
             "/brand-assets/ingest/bulk",
-            json={"assets": assets},
+            json={"assets": assets, "extract_features": False},
         )
 
         assert response.status_code == 200

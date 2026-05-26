@@ -53,6 +53,10 @@ class MockSuperAgent:
     Configure via:
         - result: what execute() returns
         - raise_on_call: exception to throw on first N calls (then succeeds)
+        - error_message: substring routed by the healing policy's error
+          classifier (e.g. "rate limit exceeded", "tool error occurred",
+          "policy denied", "budget exceeded"). When unset, a generic
+          ``simulated failure #N`` message is raised.
         - heal_entries_to_add: heal-journal entries to inject on each call
         - consecutive_failures, circuit_state: snapshot fields
     """
@@ -60,6 +64,7 @@ class MockSuperAgent:
     agent_type: str = "mock_commerce"
     result: MockAgentResult = field(default_factory=MockAgentResult)
     raise_on_call: int = 0
+    error_message: str = ""
     heal_entries_to_add: list[MockHealEntry] = field(default_factory=list)
     consecutive_failures: int = 0
     circuit_state: str = "closed"
@@ -85,5 +90,6 @@ class MockSuperAgent:
         for i, entry in enumerate(self.heal_entries_to_add):
             self._heal_journal[f"heal_{self._call_count}_{i}"] = entry
         if self.raise_on_call >= self._call_count:
-            raise RuntimeError(f"simulated failure #{self._call_count}")
+            msg = self.error_message or f"simulated failure #{self._call_count}"
+            raise RuntimeError(msg)
         return self.result

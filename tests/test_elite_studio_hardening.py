@@ -251,8 +251,14 @@ def test_generator_node_routes_adk_engine_to_invoker(monkeypatch: pytest.MonkeyP
             called["legacy"] += 1
             raise AssertionError("legacy GeneratorAgent must not run when engine=adk-render")
 
-    monkeypatch.setattr(nodes, "_invoke_adk_render_engine", fake_adk)
-    monkeypatch.setattr(nodes, "GeneratorAgent", _FailingGenerator)
+    # Patch at the layer1 module — layer1.py imports _invoke_adk_render_engine
+    # into its own namespace via `from ._shared import (...)`, so patching the
+    # ``nodes`` shim's re-export doesn't affect the local binding generator_node
+    # actually looks up.
+    from skyyrose.elite_studio.graph.nodes import layer1 as _layer1
+
+    monkeypatch.setattr(_layer1, "_invoke_adk_render_engine", fake_adk)
+    monkeypatch.setattr(_layer1, "GeneratorAgent", _FailingGenerator)
 
     state = create_initial_state(sku="br-001", view="front", engine="adk-render")
     out = nodes.generator_node(state)
@@ -294,7 +300,13 @@ def test_generator_node_adk_path_does_not_require_vision(monkeypatch: pytest.Mon
             metadata={"cost_usd": 0.18},
         )
 
-    monkeypatch.setattr(nodes, "_invoke_adk_render_engine", fake_adk)
+    # Patch at the layer1 module — layer1.py imports _invoke_adk_render_engine
+    # into its own namespace via `from ._shared import (...)`, so patching the
+    # ``nodes`` shim's re-export doesn't affect the local binding generator_node
+    # actually looks up.
+    from skyyrose.elite_studio.graph.nodes import layer1 as _layer1
+
+    monkeypatch.setattr(_layer1, "_invoke_adk_render_engine", fake_adk)
 
     state = create_initial_state(sku="br-001", view="front", engine="adk-render")
     out = nodes.generator_node(state)
@@ -320,7 +332,13 @@ def test_generator_node_adk_spend_uses_reported_cost(monkeypatch: pytest.MonkeyP
             metadata={"cost_usd": reported},
         )
 
-    monkeypatch.setattr(nodes, "_invoke_adk_render_engine", fake_adk)
+    # Patch at the layer1 module — layer1.py imports _invoke_adk_render_engine
+    # into its own namespace via `from ._shared import (...)`, so patching the
+    # ``nodes`` shim's re-export doesn't affect the local binding generator_node
+    # actually looks up.
+    from skyyrose.elite_studio.graph.nodes import layer1 as _layer1
+
+    monkeypatch.setattr(_layer1, "_invoke_adk_render_engine", fake_adk)
 
     state = create_initial_state(sku="br-001", view="front", engine="adk-render")
     state["budget"] = RunBudget(ceiling_usd=5.0)

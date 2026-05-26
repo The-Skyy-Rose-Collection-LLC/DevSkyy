@@ -87,3 +87,8 @@ This avoids the failure mode of automated systems drifting catalog data without 
 - Human-gated learning loop is the chosen model (cmem #5478, 2026-05-19) — never auto-apply.
 - Three loops capture engine routing, prompt drift, and refinement effectiveness independently — orthogonal signals.
 - JSONL append-only is the right shape for ML telemetry — immutable history beats DB writes for this use case.
+
+
+<claude-mem-context>
+
+</claude-mem-context>
