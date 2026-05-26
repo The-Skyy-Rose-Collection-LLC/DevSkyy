@@ -17,7 +17,7 @@ specified_by: [interview: from-interview.md §4 Reality Check]
 
 ## Context
 
-The product catalog has 33 SKUs but most lack production-grade renders that match SkyyRose's editorial aesthetic. The brand has documented references (KITH, Coach, Palm Angels, Drake Related, Aimé Leon Dore, Fear of God Eternal, The Row, Jacquemus, Document/i-D) — none of which feature stock or technical-flat product photography. They feature **cinematic editorial photography**.
+The product catalog has 33 SKUs but most lack production-grade renders that match SkyyRose's editorial aesthetic. The brand's locked reference set as of 2026-05-25 (`docs/brand/visual-references.md`) is **The Five: Kith, Oaklandish, Culture Kings, Fear of God, Palm Angels** (with Aimé Leon Dore as acceptable adjacency) — none of which feature stock or technical-flat product photography. They feature **cinematic editorial photography**. The earlier reference list including The Row, Jacquemus, Document/i-D, Coach, and Drake Related was retired on 2026-05-25 — see the canon doc for the full retired list.
 
 Until SkyyRose's product imagery reaches that bar, the site cannot launch as a luxury brand — regardless of how polished the cart, how impressive the WebXR layer, how sophisticated the AI semantic search, or how clean the drop mechanics. A luxury website with non-luxury imagery reads as a startup playing dress-up. That's worse than a clean Shopify default.
 

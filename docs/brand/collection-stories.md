@@ -177,7 +177,7 @@ Verbatim founder quote also present in `template-parts/collection/founder-pullqu
 
 > "Four years ago I never would have thought I'd be here. I had no drive, lost it all, a baby on the way, and was broke. But we knew we had to get it by any means necessary."
 
-Mood peers from `knowledge-base/seed/from-interview.md`: The Row, Jacquemus (for location-specificity discipline), ALD. Gender-neutral by default.
+Mood peers (aligned 2026-05-25 to locked canon at `docs/brand/visual-references.md` — The Five): **Kith** (monogram-led editorial), **Aimé Leon Dore** (acceptable adjacency, retail-anchored editorial), **Fear of God** (cinematic spareness). The Row reference retired — European-luxury-house lineage is locked out for SkyyRose. Gender-neutral by default.
 
 ### Visual Language
 

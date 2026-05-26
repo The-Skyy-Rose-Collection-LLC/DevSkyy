@@ -303,7 +303,7 @@ Love Hurts PDP breaks the side-by-side layout. The garment gets the full viewpor
 
 ## SIGNATURE
 
-**Register:** Editorial. Origin, Chapter One. Not minimalism — warmth and precision coexisting. The Row meets Aimé Leon Dore: deliberate, confident, bookish. Playfair Display for display, but warmer weight than Love Hurts. Gold accent. No silver. No crimson. Every page reads like the first page of something important.
+**Register:** Editorial. Origin, Chapter One. Not minimalism — warmth and precision coexisting. **Kith meets Aimé Leon Dore** (canon-aligned 2026-05-25, see `docs/brand/visual-references.md`): deliberate, confident, bookish. Playfair Display for display, but warmer weight than Love Hurts. Gold accent. No silver. No crimson. Every page reads like the first page of something important.
 
 **Palette application:**
 - Background: `#0A0A0A`
