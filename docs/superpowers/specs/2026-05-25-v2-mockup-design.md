@@ -48,9 +48,30 @@ Each scroll-snap landing is a magazine page that serves a distinct role. Four ro
 |---------|------|
 | Background | `assets/branding/hero/luxury-nighttime-*.webp` — Oakland industrial scene, fullbleed. Same `<picture>` responsive pattern. |
 | Kicker | Space Mono 9px / 0.4em / "For The Town" / top-left. |
-| Headline | Bebas Neue 48px / "BLACK ROSE I SPRING DROP" / "I" in rose-gold to act as visual separator. |
+| **Hero title (collection lockup)** | The featured collection's **brand-script lockup image** — NOT type-rendered text. Use the canonical hero-overlay PNG/WebP/AVIF asset (see Collection Lockup Assets below). The lockup carries the collection's true identity at hero size. Place as `<picture>` with `srcset` for AVIF→WebP→PNG fallback. Drop-shadow + slight scale-on-load animation. Sized at ~50% of hero width on desktop, ~75% on mobile. |
+| Subtitle | Space Mono 10px / 0.4em / drop date + edition (e.g. "SPRING DROP · 2026 · DROP 01") — stacked under the lockup image. |
 | Bottom bar | Two-column Space Mono: left "Photographed in East Oakland", right "14 looks · 4 collections · One town" — separated by 1px top border. |
-| Scroll behavior | Parallax: background scrolls at 0.6x, text scrolls at 1x. |
+| Scroll behavior | Parallax: background scrolls at 0.6x, lockup image scrolls at 1x with slight scale 1 → 1.03 on scroll-into-view. |
+
+### Collection Lockup Assets (canonical — DO NOT type-render these names)
+
+The featured collection's identity at hero size is **always its brand-script lockup image**, never a font-rendered approximation. Each collection has a canonical hero-overlay asset locked into the repo. Use them.
+
+| Collection | Hero overlay asset | Location |
+|-----------|--------------------|----------|
+| Black Rose | `br-brand-script.{avif,webp,png}` (dimensional script "The Black Rose Collection" w/ rose) — **shown by founder 2026-05-25 as the locked BR identity** | `assets/images/hero-overlays/` |
+| Love Hurts | `lh-logo-combined.{avif,webp,png}` (graffiti drip "Love Hurts" lockup) | `assets/images/hero-overlays/` |
+| Signature | `sig-brand-skyy-rose-gold.{avif,webp,png}` (gold "Skyy Rose" calligraphy + rose) | `assets/images/hero-overlays/` |
+| Kids Capsule | `skyy-rose-collection-circular-patch.{avif,webp,png}` ("SKYY ROSE COLLECTION" circular patch) | `assets/images/logos/` |
+| Brand-primary (homepage default) | `sr-monogram-rose-gold.jpeg` overlaid + `br-brand-script.webp` as feature-drop lockup if Black Rose is the featured drop | `assets/branding/` + `assets/images/hero-overlays/` |
+
+Editorial chrome around the lockup (kickers, subtitles, masthead nameplate, attribution) keeps consistent typography across all collection pages — that's what anchors the magazine identity. Custom fonts (Cinzel, Italiana, Yellowtail, Pinyon Script, UnifrakturMaguntia) apply to:
+- F01 masthead nameplate (Cinzel 700 — "SKYY ROSE" always)
+- F03 voice quote (Playfair italic — founder voice register, brand-wide)
+- F04 section title only (Bebas Neue — editorial)
+- Body content, captions, by-lines (Inter / Space Mono)
+
+**Custom fonts are NEVER used to spell out a collection name when a lockup asset exists.** The lockup IS the collection name in its canonical form.
 
 ### Frame 03 — Voice
 
@@ -80,7 +101,9 @@ Same magazine engine, BR-specific dressing. Continuation of the homepage thesis 
 | Cover masthead | "BLACK ROSE" Cinzel 84px replaces "SKYY ROSE" at the top. Subtitle: "A SKYY ROSE COLLECTION". |
 | Cover photo | `assets/branding/black-rose-logo-hero.webp` or `black-rose-monogram-sr.jpg` if hero-fit. |
 | Cover line | "Built for those who move through darkness like it's home." (from brand-DNA skill product copy spec). |
-| Hero | Sepia palette darkened. Sport patch macro inset (NFL/NBA/MLB/Hockey patches as small product-detail squares). |
+| Hero title (collection lockup) | `assets/images/hero-overlays/br-brand-script.{avif,webp,png}` — the canonical "The Black Rose Collection" dimensional script asset. Sized at ~60% of hero width (larger than homepage hero — this is BR's home turf). Drop-shadow + 1.0 → 1.04 scale on scroll-into-view. NOT type-rendered. |
+| Hero subtitle | "Vol. IV · Spring 2026 · The Town" — Space Mono 10px / 0.4em letter-spacing. |
+| Hero | Sepia palette darkened. Sport patch macro inset (NFL/NBA/MLB/Hockey patches as small product-detail squares from `assets/images/hero-overlays/br-patch-*.webp`). |
 | Voice frame | **"You wear it / because you / already stood up."** — Black Rose story tagline, verbatim founder-locked from `docs/brand/collection-stories.md` (line: Story Tagline). 3-line stack matches the homepage voice-frame pattern. Playfair italic. Middle line in rose-gold. Attribution: "Black Rose · The Town · 2026". |
 | Spread | 6-8 Black Rose SKUs only. Loaded from `data/skyyrose-catalog.csv` filtered by collection=black-rose. Pulled via static reference in this mockup (not a CSV runtime read). |
 | Palette tweak | Silver `#C0C0C0` replaces gold accent in this view. Rose-gold and crimson stay. |
@@ -91,13 +114,16 @@ All loaded via Google Fonts `@import` in v2.html (no theme integration). When th
 
 | Role | Font | Where |
 |------|------|-------|
-| Magazine masthead | Cinzel 700 | F01 nameplate |
-| Hero headline | Bebas Neue | F02 headline, F04 section title |
-| Voice quote | Playfair Display italic 400 + 700 | F03 quote |
+| Magazine masthead | Cinzel 700 | F01 nameplate ("SKYY ROSE" only) |
+| **Hero title** | **NONE — collection lockup IMAGE used** | F02 hero (see Collection Lockup Assets) |
+| Section title | Bebas Neue | F04 section title only |
+| Voice quote | Playfair Display italic 400 + 700 | F03 quote (brand-wide editorial voice, not collection-driven) |
 | Cover line | Bebas Neue + Playfair italic accent | F01 |
 | Meta / kickers / attribution | Space Mono 400 | F01 meta block, F02 kicker, F03 attribution, F04 sub |
 | Body / nav | Inter 300/400/600 | by-lines, nav, captions |
-| Brand-mark accent | Playfair Display italic 700 | "SR" graffiti on F01 |
+| Brand-mark accent | Playfair Display italic 700 | "SR" graffiti on F01 (when used as inline-rendered accent) |
+
+**Collection-specific fonts in reserve** — Italiana, Yellowtail, Pinyon Script, UnifrakturMaguntia, Cinzel beyond masthead — used only on COLLECTION INTERIOR surfaces (PDP, future collection landing) when the lockup image isn't appropriate (e.g., body callouts, secondary headings). The brand-script lockup carries the collection identity at hero. Type-rendered display fonts back up the lockup in the interior, not in place of it.
 
 Collection-specific accents (held in reserve for collection pages):
 - Italiana — Signature display
@@ -120,22 +146,50 @@ Standalone mockup, so motion runs in-browser with vanilla JS + CSS. No Three.js 
 
 No WebGL. No canvas. The "visualize the impossible" requirement is met by **typography + scroll choreography + photographic composition**, not by 3D scenes.
 
-## Assets Used
+## Assets Used (verified 2026-05-25)
 
-Verified to exist in `wordpress-theme/skyyrose-flagship/assets/branding/`:
+### Photography (background imagery — F01 + F02)
+
+Located in `wordpress-theme/skyyrose-flagship/assets/branding/hero/`:
 
 | Asset | Used in |
 |-------|---------|
-| `hero/forbidden-midnight-{480,768,1280,1680}w.webp` | F01 cover photo (homepage) |
-| `hero/luxury-nighttime-{480,768,1280,1680}w.webp` | F02 hero photo (homepage) |
-| `hero/beauty-and-beast-{480,768,1280,1680}w.webp` | F02 hero photo alternate (Black Rose page) |
-| `skyyrose-monogram-nav.webp` (742B) | nav-bound monogram in mockup nav bar |
-| `black-rose-logo-hero.webp` (50.0K) | Black Rose page cover photo |
-| `black-rose-monogram-sr.jpg` | Black Rose page accent |
-| `love-hurts-logo-hero.webp` | F04 spread tile (Love Hurts) |
-| `signature-logo-hero.webp` | F04 spread tile (Signature) |
+| `forbidden-midnight-{480,768,1280,1680}w.webp` | F01 cover photo (homepage) |
+| `luxury-nighttime-{480,768,1280,1680}w.webp` | F02 hero photo (homepage) |
+| `beauty-and-beast-{480,768,1280,1680}w.webp` | F02 hero photo alternate (Black Rose page) |
 
-Assets get inlined via relative path from `docs/brand/design-mockups/v2.html` → `../../../wordpress-theme/skyyrose-flagship/assets/branding/...`. Browser will resolve.
+### Collection lockup overlays (hero title images — F02)
+
+Located in `wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/`:
+
+| Asset | Used in | Notes |
+|-------|---------|-------|
+| `br-brand-script.{avif,webp,png}` | F02 Black Rose hero title | 89K / 182K / 693K. **Founder-confirmed 2026-05-25 as locked BR identity** |
+| `lh-logo-combined.{avif,webp,png}` | F02 Love Hurts hero (future page) | 93K / 139K / 548K |
+| `sig-brand-skyy-rose-gold.{avif,webp,png}` | F02 Signature hero (future page) | 93K / 132K / 389K |
+| `br-patch-{nfl-football,nba-basketball,mlb-baseball,hockey}.{avif,webp,png}` | F02 BR page sport patch macro insets | Used as small detail squares |
+
+Kids Capsule lockup (`skyy-rose-collection-circular-patch.{avif,webp,jpeg}`) lives in `wordpress-theme/skyyrose-flagship/assets/images/logos/` — used on F02 hero only when Kids page is built (future phase).
+
+### Nav-bound + monogram (chrome)
+
+| Asset | Used in |
+|-------|---------|
+| `assets/branding/skyyrose-monogram-nav.webp` (742B) | Mockup nav-bar monogram |
+| `assets/branding/sr-monogram-rose-gold.jpeg` (or .webp variant) | F01 SR graffiti reference — but in mockup rendered as text overlay per F01 spec (Playfair italic 700) since the rotation/positioning differs from the source asset's framing |
+
+### Collection identity assets (F04 spread tiles)
+
+Located in `wordpress-theme/skyyrose-flagship/assets/branding/`:
+
+| Asset | Used in |
+|-------|---------|
+| `black-rose-logo-hero.webp` (50K) | F04 spread tile — Black Rose |
+| `love-hurts-logo-hero.webp` (205K) | F04 spread tile — Love Hurts |
+| `signature-logo-hero.webp` (39K) | F04 spread tile — Signature |
+| Kids Capsule placeholder | F04 spread tile — Kids (use `skyy-rose-collection-circular-patch.webp`) |
+
+Assets get inlined via relative path from `docs/brand/design-mockups/v2.html` → `../../../wordpress-theme/skyyrose-flagship/assets/...`. Browser resolves at file:// or local-server URLs.
 
 ## File Structure
 
