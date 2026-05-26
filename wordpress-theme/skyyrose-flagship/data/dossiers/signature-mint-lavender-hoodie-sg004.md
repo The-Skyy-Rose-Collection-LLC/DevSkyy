@@ -1,6 +1,6 @@
 ---
 sku: sg-004
-name: Mint & Lavender Hoodie
+name: Mint and Lavender Hoodie
 collection: signature
 logo_reference: data/brand-logos/signature-logo.md
 status: pre-order-draft
@@ -20,7 +20,7 @@ Authoring rules (from _template.md):
   5. Two-eyes review required before commit (Corey confirms each line).
 -->
 
-# Mint & Lavender Hoodie
+# Mint and Lavender Hoodie
 
 **Garment type lock:** Pullover hoodie, upper body only. NOT a crewneck (that is sg-013), NOT a zip-up, NOT a sweatshirt without hood. Hood with drawstring, kangaroo pocket.
 
