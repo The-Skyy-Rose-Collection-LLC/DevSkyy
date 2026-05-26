@@ -584,6 +584,31 @@
     .hero__bg, .cover__photo { animation: none !important; }
   }
 
+  /* === ROI-4A: Hero letterbox reveal (cinematic bars) === */
+  .hero--letterbox::before,
+  .hero--letterbox::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    z-index: 5;
+    background: var(--sr-dark);
+    height: 12.5%;
+    transform: scaleY(1);
+    transform-origin: top center;
+    transition: transform 1.1s cubic-bezier(0.76, 0, 0.24, 1);
+    pointer-events: none;
+  }
+  .hero--letterbox::before { top: 0; transform-origin: top center; }
+  .hero--letterbox::after  { bottom: 0; transform-origin: bottom center; }
+  .hero--letterbox.letterbox-open::before,
+  .hero--letterbox.letterbox-open::after {
+    transform: scaleY(0);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero--letterbox::before,
+    .hero--letterbox::after { display: none; }
+  }
+
   /* === BR collection palette override (per canon — silver, not rose-gold) === */
   .br-page .cover__sr-graffiti { color: var(--sr-silver); }
   .br-page .cover__tagline-accent { color: var(--sr-silver); }
@@ -682,7 +707,7 @@
     </div>
   </footer>
 </section>
-<section id="home-hero" class="frame hero" aria-labelledby="home-hero-title">
+<section id="home-hero" class="frame hero hero--letterbox" aria-labelledby="home-hero-title">
   <div class="hero__bg-wrap">
     <picture>
       <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-hero-bg-alt.avif" type="image/avif">
@@ -1041,6 +1066,21 @@
       setInterval(renderGrain, 500);
     }
   }
+})();
+</script>
+
+<!-- ROI-4A: Hero letterbox reveal — bars slide out on load, prefers-reduced-motion safe (CSS handles it) -->
+<script>
+(function () {
+  'use strict';
+  var hero = document.getElementById('home-hero');
+  if (!hero) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      hero.classList.add('letterbox-open');
+    });
+  });
 })();
 </script>
 
