@@ -32,7 +32,7 @@ get_header();
 		array(
 			'collection'    => 'kids-capsule',
 			'badge_text'    => 'Luxury Runs in the Family',
-			'logo_image'    => '/images/hero-overlays/sig-brand-skyy-rose-gold.png',
+			'logo_image'    => '/images/logos/skyy-rose-collection-circular-patch.png',
 			'logo_alt'      => 'Kids Capsule Collection',
 			'subtitle'      => 'Named after a daughter. Made for yours.',
 			'countdown'     => false,
