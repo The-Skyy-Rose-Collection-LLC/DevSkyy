@@ -319,6 +319,59 @@
     padding-top: var(--space-4);
     border-top: 1px solid rgba(255,255,255,0.2);
   }
+
+  /* === Voice (F03) === */
+  .voice {
+    min-height: 90vh;
+    background: var(--sr-dark);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .voice::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 100%, rgba(var(--sr-rose-gold-rgb), 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 45%);
+    z-index: 1;
+  }
+  .voice__inner {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: var(--space-16) var(--space-8);
+    max-width: 1100px;
+  }
+  .voice__quote {
+    font-family: var(--ff-voice);
+    font-style: italic;
+    font-size: clamp(36px, 6vw, 72px);
+    line-height: 1.1;
+  }
+  .voice__quote span { display: block; }
+  .voice__quote .line-2 {
+    font-weight: 700;
+    color: var(--sr-rose-gold);
+    text-shadow: 0 0 24px rgba(var(--sr-rose-gold-rgb), 0.3);
+    margin: var(--space-2) 0;
+  }
+  .voice__quote .line { transition: opacity 0.6s var(--ease-out) var(--delay, 0s), transform 0.6s var(--ease-out) var(--delay, 0s); }
+  .voice__attribution {
+    font-family: var(--ff-meta);
+    font-size: 11px;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: rgba(212, 175, 55, 0.75);
+    margin-top: var(--space-12);
+    padding-top: var(--space-4);
+    border-top: 1px solid rgba(212, 175, 55, 0.25);
+    display: inline-block;
+    padding-left: var(--space-12);
+    padding-right: var(--space-12);
+  }
 </style>
 </head>
 <body>
@@ -415,6 +468,16 @@
       <span>Photographed in East Oakland</span>
       <span>14 looks · 4 collections · One town</span>
     </footer>
+  </div>
+</section>
+<section id="home-voice" class="frame voice" aria-labelledby="home-voice-title">
+  <div class="voice__inner">
+    <blockquote class="voice__quote" id="home-voice-title">
+      <span class="line line-1 reveal" style="--delay: 0s;">Named after</span>
+      <span class="line line-2 reveal" style="--delay: 0.18s;">a daughter.</span>
+      <span class="line line-3 reveal" style="--delay: 0.36s;">Built by a father.</span>
+    </blockquote>
+    <p class="voice__attribution reveal" style="--delay: 0.6s;">Corey Foster · The Town</p>
   </div>
 </section>
 <!-- Sections inserted in subsequent tasks -->
