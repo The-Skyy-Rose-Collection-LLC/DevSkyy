@@ -29,18 +29,85 @@ CATALOG ACCESS RULE (D8, 2026-05-22):
 import argparse
 import concurrent.futures
 import io
+import ipaddress
 import json
 import logging
 import os
 import sys
 import time
+import urllib.error
+import urllib.request
 from pathlib import Path
+from urllib.parse import urlparse
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
 log = logging.getLogger("nano-banana-vton")
+
+
+class _UnsafeURLError(ValueError):
+    """Raised when an image URL fails the SSRF allowlist check."""
+
+
+def _is_safe_url(url: str) -> tuple[bool, str]:
+    """Validate an image URL before fetching to prevent SSRF.
+
+    Rejects non-HTTP(S) schemes (``file://``, ``gopher://``, ``ftp://``),
+    embedded credentials, the literal ``localhost`` / ``0.0.0.0`` hosts,
+    and any literal IP that is loopback, link-local (169.254.0.0/16 — AWS /
+    GCP / Azure instance-metadata endpoints), private, reserved, or multicast.
+
+    Hostnames are NOT resolved — this is a pre-flight syntactic check.
+    Resolution-time TOCTOU is acceptable because the upstream provider URL
+    is supplied by an authenticated API response we trust to a degree, not
+    by raw user input. The guard catches the misconfigured / spoofed cases.
+    """
+    try:
+        parsed = urlparse(url)
+    except ValueError as exc:
+        return False, f"unparseable URL: {exc}"
+    if parsed.scheme not in ("http", "https"):
+        return False, f"unsupported scheme {parsed.scheme!r}"
+    if parsed.username or parsed.password:
+        return False, "embedded user:pass credentials not allowed"
+    host = (parsed.hostname or "").lower()
+    if not host:
+        return False, "missing host"
+    if host in {"localhost", "0.0.0.0"}:
+        return False, f"blocked host {host!r}"
+    try:
+        ip = ipaddress.ip_address(host)
+    except ValueError:
+        # Hostname (not an IP literal) — accepted; DNS resolution happens at
+        # connect time and is outside the scope of this static guard.
+        return True, ""
+    if (
+        ip.is_loopback
+        or ip.is_link_local
+        or ip.is_private
+        or ip.is_reserved
+        or ip.is_multicast
+        or ip.is_unspecified
+    ):
+        return False, f"blocked IP {ip}"
+    return True, ""
+
+
+def _safe_download_image(url: str, *, timeout: float = 30.0) -> bytes:
+    """Download bytes from ``url`` after SSRF allowlist check.
+
+    Raises ``_UnsafeURLError`` if the URL fails ``_is_safe_url``.
+    ``urllib.error.HTTPError`` propagates on transport-level failures.
+    """
+    ok, reason = _is_safe_url(url)
+    if not ok:
+        raise _UnsafeURLError(f"{url!r}: {reason}")
+    req = urllib.request.Request(url)
+    with urllib.request.urlopen(req, timeout=timeout) as resp:  # noqa: S310
+        return resp.read()
+
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 PRODUCTS_DIR = (
@@ -1039,12 +1106,11 @@ def generate_image_flux(
     if hasattr(img_data, "b64_json") and img_data.b64_json:
         raw_bytes = base64.b64decode(img_data.b64_json)
     elif hasattr(img_data, "url") and img_data.url:
-        import urllib.request
-
         try:
-            req = urllib.request.Request(img_data.url)
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                raw_bytes = resp.read()
+            raw_bytes = _safe_download_image(img_data.url, timeout=30)
+        except _UnsafeURLError as exc:
+            log.error("FLUX image URL rejected (SSRF guard): %s", exc)
+            return None
         except urllib.error.HTTPError as e:
             log.error("Image URL download failed (%s %s)", e.code, e.reason)
             return None
@@ -1233,12 +1299,11 @@ def generate_image_gpt(
     if hasattr(img_data, "b64_json") and img_data.b64_json:
         raw_bytes = base64.b64decode(img_data.b64_json)
     elif hasattr(img_data, "url") and img_data.url:
-        import urllib.request
-
         try:
-            req = urllib.request.Request(img_data.url)
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                raw_bytes = resp.read()
+            raw_bytes = _safe_download_image(img_data.url, timeout=30)
+        except _UnsafeURLError as exc:
+            log.error("GPT-Image URL rejected (SSRF guard): %s", exc)
+            return None
         except urllib.error.HTTPError as e:
             log.error("Image URL download failed (%s %s)", e.code, e.reason)
             return None
