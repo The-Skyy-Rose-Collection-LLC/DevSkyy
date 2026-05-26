@@ -584,6 +584,26 @@
     .hero__bg, .cover__photo { animation: none !important; }
   }
 
+  /* === ROI-4D: Scroll-driven parallax (Chrome 115+ / Edge 115+ / Firefox 110+) === */
+  /* Falls back to rAF parallax in saas-gate-aware JS block below for Safari + older browsers */
+  @supports (animation-timeline: scroll()) {
+    @keyframes heroParallax {
+      from { transform: scale(1.05) translateY(0%); }
+      to   { transform: scale(1.05) translateY(-8%); }
+    }
+    .hero__bg.parallax {
+      animation: heroParallax linear both;
+      animation-timeline: scroll(block root);
+      animation-range: 0vh 100vh;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero__bg.parallax {
+        animation: none !important;
+        transform: none !important;
+      }
+    }
+  }
+
   /* === ROI-4C: data-collection cascade — per-collection accent on spread tile labels === */
   .spread__tile[data-collection] .spread__tile-label {
     transition: color 0.3s ease;
@@ -1031,8 +1051,9 @@
     });
   }
 
-  // === Parallax backgrounds ===
-  if (!prefersReduced) {
+  // === Parallax backgrounds (rAF fallback — skipped when CSS scroll-driven animations supported) ===
+  var supportsScrollTimeline = CSS.supports && CSS.supports('animation-timeline', 'scroll()');
+  if (!prefersReduced && !supportsScrollTimeline) {
     var parallaxNodes = document.querySelectorAll('.parallax');
     if (parallaxNodes.length) {
       var ticking = false;
