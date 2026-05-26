@@ -451,6 +451,9 @@
     font-size: clamp(20px, 2vw, 28px);
     letter-spacing: 0.08em;
   }
+
+  /* === Black Rose page anchor === */
+  .br-page { background: var(--sr-dark); }
 </style>
 </head>
 <body>
@@ -610,6 +613,47 @@
       </div>
     </a>
   </div>
+</section>
+
+<div class="br-page">
+<section id="br-cover" class="frame cover" aria-labelledby="br-cover-title">
+  <picture>
+    <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/beauty-and-beast-1680w.webp" media="(min-width: 1281px)" type="image/webp">
+    <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/beauty-and-beast-1280w.webp" media="(min-width: 769px)" type="image/webp">
+    <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/beauty-and-beast-768w.webp" media="(min-width: 481px)" type="image/webp">
+    <img
+      src="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/beauty-and-beast-480w.webp"
+      alt="Black Rose cover photograph"
+      class="cover__photo"
+      width="1680" height="945"
+      decoding="async" loading="lazy">
+  </picture>
+  <div class="cover__photo-shade"></div>
+
+  <header class="cover__masthead reveal">
+    <div>
+      <h1 id="br-cover-title" class="cover__nameplate">BLACK ROSE</h1>
+      <div class="cover__nameplate-rule" aria-hidden="true"></div>
+    </div>
+    <p class="cover__meta">A SKYY ROSE<br>COLLECTION<br>VOL. IV · S/S 2026</p>
+  </header>
+
+  <p class="cover__sr-graffiti reveal reveal--scale" aria-hidden="true">SR</p>
+
+  <footer class="cover__line reveal">
+    <div>
+      <p class="cover__tagline">Built for those who move through<br><span class="cover__tagline-accent">darkness like it's home.</span></p>
+      <p class="cover__byline">By Corey Foster · The Town · 2026</p>
+    </div>
+    <div class="cover__barcode" aria-hidden="true">
+      <div class="cover__bars">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <p class="cover__drop">02 · Black Rose · Drop 01</p>
+    </div>
+  </footer>
 </section>
 <!-- Sections inserted in subsequent tasks -->
 </body>
