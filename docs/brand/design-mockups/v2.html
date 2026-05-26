@@ -10,6 +10,7 @@
 <!-- Fonts: Google CDN (production translation switches to self-hosted woff2 in assets/fonts/) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" href="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-hero-bg.avif" type="image/avif" fetchpriority="high">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Italiana&family=Yellowtail&family=Pinyon+Script&family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Bebas+Neue&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
 
@@ -599,12 +600,38 @@
   .br-page .spread__tile:hover {
     box-shadow: 0 0 0 2px rgba(192, 192, 192, 0.7);
   }
+
+  /* === Skip link (a11y — WCAG 2.2 AA) === */
+  .skip-link {
+    position: absolute;
+    top: -9999px;
+    left: 0;
+    z-index: 9999;
+    padding: 0.75rem 1.25rem;
+    background: var(--sr-rose-gold);
+    color: var(--sr-dark);
+    font-family: var(--sr-font-ui, 'Inter', sans-serif);
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-bottom-right-radius: 4px;
+    outline: none;
+  }
+  .skip-link:focus,
+  .skip-link:focus-visible {
+    top: 0;
+    outline: 2px solid var(--sr-white);
+    outline-offset: 2px;
+  }
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to content</a>
 <canvas class="grain-overlay" id="grainCanvas" aria-hidden="true"></canvas>
 <nav class="navbar" aria-label="Primary">
-  <a href="#home-cover" class="navbar__brand">
+  <a href="#main-content" class="navbar__brand">
     <img
       src="../../../wordpress-theme/skyyrose-flagship/assets/branding/skyyrose-monogram-nav.webp"
       alt="SkyyRose"
@@ -617,7 +644,7 @@
     <a href="#home-voice">Story</a>
   </div>
 </nav>
-<section id="home-cover" class="frame cover" aria-labelledby="home-cover-title">
+<section id="main-content" class="frame cover" aria-labelledby="home-cover-title">
   <picture>
     <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-hero-bg.avif" type="image/avif">
     <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/homepage-hero-bg.webp" type="image/webp">
@@ -843,10 +870,10 @@
       <p class="hero__subtitle reveal">Vol. IV · Spring 2026 · The Town</p>
 
       <div class="hero__patches reveal" aria-label="Black Rose sport patches">
-        <picture><source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-nfl-football.webp" type="image/webp"><img class="hero__patch" src="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-nfl-football.png" alt="NFL football authentic patch" width="64" height="64" decoding="async" loading="lazy"></picture>
-        <picture><source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-nba-basketball.webp" type="image/webp"><img class="hero__patch" src="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-nba-basketball.png" alt="NBA basketball authentic patch" width="64" height="64" decoding="async" loading="lazy"></picture>
-        <picture><source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-mlb-baseball.webp" type="image/webp"><img class="hero__patch" src="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-mlb-baseball.png" alt="MLB baseball authentic patch" width="64" height="64" decoding="async" loading="lazy"></picture>
-        <picture><source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-hockey.webp" type="image/webp"><img class="hero__patch" src="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-hockey.png" alt="Hockey championship patch" width="64" height="64" decoding="async" loading="lazy"></picture>
+        <picture><source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-nfl-football.avif" type="image/avif"><source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-nfl-football.webp" type="image/webp"><img class="hero__patch" src="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-nfl-football.png" alt="NFL football authentic patch" width="64" height="64" decoding="async" loading="lazy"></picture>
+        <picture><source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-nba-basketball.avif" type="image/avif"><source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-nba-basketball.webp" type="image/webp"><img class="hero__patch" src="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-nba-basketball.png" alt="NBA basketball authentic patch" width="64" height="64" decoding="async" loading="lazy"></picture>
+        <picture><source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-mlb-baseball.avif" type="image/avif"><source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-mlb-baseball.webp" type="image/webp"><img class="hero__patch" src="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-mlb-baseball.png" alt="MLB baseball authentic patch" width="64" height="64" decoding="async" loading="lazy"></picture>
+        <picture><source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-hockey.avif" type="image/avif"><source srcset="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-hockey.webp" type="image/webp"><img class="hero__patch" src="../../../wordpress-theme/skyyrose-flagship/assets/images/hero-overlays/br-patch-hockey.png" alt="Hockey championship patch" width="64" height="64" decoding="async" loading="lazy"></picture>
       </div>
     </div>
 
@@ -1014,6 +1041,60 @@
       setInterval(renderGrain, 500);
     }
   }
+})();
+</script>
+
+<!-- ROI: Magnetic cursor on .spread__tile — GPU-accelerated, prefers-reduced-motion + coarse pointer safe -->
+<script>
+(function () {
+  'use strict';
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (window.matchMedia('(pointer: coarse)').matches) return;
+
+  var ATTRACTION_RADIUS = 120;
+  var MAX_SHIFT = 24;
+  var LAG_MS = 80;
+
+  function attachMagnet(tile) {
+    var rect, rafId;
+
+    function onEnter() {
+      rect = tile.getBoundingClientRect();
+    }
+
+    function onMove(e) {
+      if (!rect) return;
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(function () {
+        rect = tile.getBoundingClientRect();
+        var cx = rect.left + rect.width / 2;
+        var cy = rect.top + rect.height / 2;
+        var dx = e.clientX - cx;
+        var dy = e.clientY - cy;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        var tx = 0, ty = 0;
+        if (dist <= ATTRACTION_RADIUS) {
+          var strength = 1 - dist / ATTRACTION_RADIUS;
+          tx = dx * strength * (MAX_SHIFT / (rect.width / 2));
+          ty = dy * strength * (MAX_SHIFT / (rect.height / 2));
+        }
+        tile.style.transform = 'translate3d(' + tx.toFixed(2) + 'px,' + ty.toFixed(2) + 'px,0) translateY(-4px)';
+        tile.style.transition = 'transform ' + LAG_MS + 'ms cubic-bezier(0.23,1,0.32,1)';
+      });
+    }
+
+    function onLeave() {
+      cancelAnimationFrame(rafId);
+      tile.style.transform = '';
+      tile.style.transition = 'transform 400ms cubic-bezier(0.23,1,0.32,1)';
+    }
+
+    tile.addEventListener('mouseenter', onEnter, { passive: true });
+    tile.addEventListener('mousemove', onMove, { passive: true });
+    tile.addEventListener('mouseleave', onLeave, { passive: true });
+  }
+
+  document.querySelectorAll('#home-spread .spread__tile').forEach(attachMagnet);
 })();
 </script>
 </body>
