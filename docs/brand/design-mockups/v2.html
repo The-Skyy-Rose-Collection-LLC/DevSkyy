@@ -82,9 +82,54 @@
     .reveal, .reveal--scale { opacity: 1 !important; transform: none !important; transition: none !important; }
     .parallax { transform: none !important; }
   }
+
+  /* === Navbar === */
+  .navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) var(--space-8);
+    background: linear-gradient(180deg, rgba(10,10,10,0.85), rgba(10,10,10,0));
+    backdrop-filter: blur(8px);
+  }
+  .navbar__brand { display: flex; align-items: center; gap: var(--space-3); }
+  .navbar__brand img { width: 44px; height: 44px; }
+  .navbar__brand-text {
+    font-family: var(--ff-masthead);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.12em;
+  }
+  .navbar__links {
+    display: flex;
+    gap: var(--space-6);
+    font-family: var(--ff-meta);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.8);
+  }
+  .navbar__links a:hover { color: var(--sr-rose-gold); }
 </style>
 </head>
 <body>
+<nav class="navbar" aria-label="Primary">
+  <a href="#home-cover" class="navbar__brand">
+    <img
+      src="../../../wordpress-theme/skyyrose-flagship/assets/branding/skyyrose-monogram-nav.webp"
+      alt="SkyyRose"
+      width="44" height="44" decoding="async" fetchpriority="high">
+    <span class="navbar__brand-text">SKYY ROSE</span>
+  </a>
+  <div class="navbar__links">
+    <a href="#home-spread">Collections</a>
+    <a href="#br-cover">Black Rose</a>
+    <a href="#home-voice">Story</a>
+  </div>
+</nav>
 <!-- Sections inserted in subsequent tasks -->
 </body>
 </html>
