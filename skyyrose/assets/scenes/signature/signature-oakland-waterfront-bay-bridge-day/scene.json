@@ -1,0 +1,110 @@
+{
+  "$schema": "skyyrose.elite_studio.scene.v1",
+  "name": "signature-oakland-waterfront-bay-bridge-day",
+  "collection": "signature",
+  "canon_lock_date": "2026-05-26",
+  "founder_directed": true,
+  "founder_lock_quote": "signature should be the daytime scene from oakland to San Fran with the bay bridge in the back",
+
+  "scene_description": "Photorealistic cinematic daytime scene from the Oakland waterfront — Jack London Square / Embarcadero Cove area — looking southwest across the Bay toward San Francisco. The San Francisco-Oakland Bay Bridge spans the middle ground from left to right, its eastern span and self-anchored suspension section visible in full — the bridge is Oakland's, anchoring the East Bay to the western shore. San Francisco skyline rises in the far distance: Transamerica Pyramid, Salesforce Tower, Coit Tower, and the cluster of downtown SF financial district buildings as soft silhouettes. Golden hour late-morning light — warm amber on the water, soft blue-to-amber gradient sky overhead, light filtering through high cirrus clouds. Weathered wooden pier planks in the immediate foreground with brass mooring cleats, frayed weathered ropes, gentle Bay water lapping the pier pilings. Centered on the pier foreground: a small weathered wooden crate serving as an impromptu drafting surface, holding a partially-unfurled sheet of cream-colored drafting paper with the first SkyyRose rose script drawn in rich gold ink — edges curled, paper slightly weathered, a single fresh deep-red rose laid beside it. The 4 AM origin sketch brought into daylight.",
+
+  "color_palette": {
+    "primary_bg": "soft blue-to-amber gradient sky",
+    "primary_accent": "#D4AF37",
+    "secondary_accent": "cream/parchment",
+    "highlight": "warm amber morning light on water + gold ink on paper",
+    "shadow": "weathered wood brown, cool pier pilings",
+    "city_skyline": "soft grey-white SF silhouettes",
+    "water": "blue-teal with rippled gold reflections"
+  },
+
+  "lighting": {
+    "key_light": "late-morning golden hour sun from upper-right (southwest)",
+    "fill_light": "bay reflection warm bounce + sky ambient",
+    "rim_light": "soft sun outline on bridge cables + wooden crate edges",
+    "color_temperature_kelvin": 5400,
+    "time_of_day": "mid-morning golden hour",
+    "exposure_mood": "Kith editorial restraint, magazine-grid framing, soft warmth",
+    "shadows": "long, soft, warm — pointing left/east from morning sun"
+  },
+
+  "camera": {
+    "perspective": "from Oakland pier (Jack London Square / Embarcadero Cove area) looking southwest toward SF",
+    "angle": "slight low angle from pier — eye level with the drafting crate",
+    "lens_mood": "50mm editorial, natural perspective, slight depth",
+    "depth_cues": [
+      "wooden pier planks + drafting crate + rose immediate foreground",
+      "Bay water + mooring rope details near-foreground",
+      "Bay Bridge spanning middle ground left-to-right",
+      "SF skyline far distance softly hazed"
+    ],
+    "composition": "3:4 portrait, low horizon line + sky-dominant upper third + Bay Bridge horizontal anchor at one-third",
+    "atmospheric_fog": "morning bay mist receding to SF skyline"
+  },
+
+  "skyyrose_dna": "SIG canon: drew first rose at 4 AM, broke, a baby on the way. The Bay Bridge is Oakland's; the city on the other end is Frisco. The origin chapter. Foundation wardrobe, blueprints not basics. Kith editorial restraint. Gold accent on neutral palette. Gender-neutral by default.",
+
+  "focal_anchor": {
+    "object": "cream-colored drafting paper with first SkyyRose rose script hand-drawn in gold ink",
+    "position": "center-foreground, on weathered wooden crate, partially unfurled, edges curled",
+    "detail": "single fresh deep-red rose laid across paper's edge, paper slightly weathered from morning bay mist",
+    "rationale": "SIG canon — the 4 AM origin sketch brought into daylight, foundation made permanent"
+  },
+
+  "product_staging_zones": [
+    {
+      "zone": "center-foreground wooden crate",
+      "x_pct": 0.5,
+      "y_pct": 0.78,
+      "scale": 0.22,
+      "fit": "displayed on or beside the drafting crate",
+      "lighting_match_directive": "match warm golden hour light + soft amber shadows"
+    },
+    {
+      "zone": "left foreground pier planks",
+      "x_pct": 0.20,
+      "y_pct": 0.82,
+      "scale": 0.20,
+      "fit": "draped over brass mooring cleat or coil of weathered rope"
+    },
+    {
+      "zone": "right foreground pier planks",
+      "x_pct": 0.80,
+      "y_pct": 0.82,
+      "scale": 0.20,
+      "fit": "laid flat on weathered wood planks"
+    },
+    {
+      "zone": "back-left pier piling",
+      "x_pct": 0.10,
+      "y_pct": 0.68,
+      "scale": 0.16,
+      "fit": "draped over wooden pier piling"
+    }
+  ],
+
+  "negative_prompts": [
+    "no people, no human figures, no silhouettes",
+    "no Golden Gate Bridge anywhere in frame (Bay Bridge ONLY — locked canon)",
+    "no nighttime / no twilight (DAYTIME ONLY per founder lock)",
+    "no Disney-polish, no over-saturation",
+    "no urban grit (this is the origin chapter — calm, foundational)",
+    "no SF-side perspective (Oakland-side ONLY, looking toward SF)"
+  ],
+
+  "reference_brands": ["Kith editorial restraint", "Aimé Leon Dore retail-anchored editorial", "Fear of God cinematic spareness", "Oaklandish civic pride"],
+
+  "anti_references": ["Bottega Veneta", "Numéro", "Hedi Slimane", "Rick Owens", "032c", "Acne FW24", "Givenchy by Tisci", "Khaite", "Bode", "The Row"],
+
+  "atmospheric": {
+    "weather": "clear morning, light bay mist over water",
+    "season": "spring/early summer warm",
+    "mood": "foundation, blueprints, the origin chapter made permanent in daylight",
+    "sound_implied": "gentle bay water lapping, distant gulls, light wind on pier"
+  },
+
+  "render_aspect": "3:4 portrait",
+  "master_resolution_px": "1024x1408 minimum, 1536x2048 preferred for hero-class",
+  "render_format_priority": ["AVIF q80", "WebP q85", "PNG"],
+  "expected_filename": "signature-oakland-waterfront-bay-bridge-day-v2.png"
+}
