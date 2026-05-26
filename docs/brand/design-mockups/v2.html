@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<title>SkyyRose — v2 Design Reference</title>
+<meta name="description" content="Magazine-as-site design reference for SkyyRose. Locked direction: Kith × Oaklandish × Culture Kings × Fear of God × Palm Angels. Not a production page.">
+
+<!-- Fonts: Google CDN (production translation switches to self-hosted woff2 in assets/fonts/) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Italiana&family=Yellowtail&family=Pinyon+Script&family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Bebas+Neue&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
+
+  /* === Design tokens === */
+  :root {
+    /* Palette — verbatim from CLAUDE.md + design-tokens.css */
+    --sr-dark: #0a0a0a;
+    --sr-charcoal: #1c1c1c;
+    --sr-smoke: #2d2d2d;
+    --sr-rose-gold: #b76e79;
+    --sr-rose-gold-rgb: 183, 110, 121;
+    --sr-gold: #d4af37;
+    --sr-silver: #c0c0c0;
+    --sr-crimson: #dc143c;
+    --sr-blood-red: #8b0000;
+    --sr-white: #ffffff;
+
+    /* Typography */
+    --ff-masthead: 'Cinzel', 'Playfair Display', serif;
+    --ff-display-br: 'Cinzel', serif;
+    --ff-display-sig: 'Italiana', 'Playfair Display', serif;
+    --ff-script-lh: 'Yellowtail', cursive;
+    --ff-script-sig: 'Pinyon Script', cursive;
+    --ff-gothic-br: 'UnifrakturMaguntia', serif;
+    --ff-editorial: 'Bebas Neue', sans-serif;
+    --ff-voice: 'Playfair Display', serif;
+    --ff-meta: 'Space Mono', monospace;
+    --ff-body: 'Inter', system-ui, sans-serif;
+
+    /* Spacing scale */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-24: 6rem;
+    --space-32: 8rem;
+
+    /* Motion */
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --dur-reveal: 0.8s;
+    --dur-snappy: 0.25s;
+  }
+
+  /* === Reset === */
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  html { background: var(--sr-dark); color: var(--sr-white); font-family: var(--ff-body); -webkit-font-smoothing: antialiased; }
+  body { overflow-x: hidden; }
+  img, picture { display: block; max-width: 100%; height: auto; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; padding: 0; }
+  h1, h2, h3, h4, h5, h6, p { margin: 0; font-weight: 400; }
+
+  /* === Section base === */
+  .frame { position: relative; overflow: hidden; }
+  .frame__inner { position: relative; max-width: 1440px; margin: 0 auto; padding: 0 var(--space-8); }
+
+  /* === Reveal system (used by motion JS) === */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity var(--dur-reveal) var(--ease-out), transform var(--dur-reveal) var(--ease-out); }
+  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+  .reveal--scale { transform: translateY(24px) scale(0.98); }
+  .reveal--scale.is-visible { transform: translateY(0) scale(1); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal, .reveal--scale { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .parallax { transform: none !important; }
+  }
+</style>
+</head>
+<body>
+<!-- Sections inserted in subsequent tasks -->
+</body>
+</html>
