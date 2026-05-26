@@ -128,6 +128,112 @@
     outline-offset: 4px;
     border-radius: 2px;
   }
+
+  /* === Cover (F01) === */
+  .cover {
+    min-height: 100vh;
+    background: var(--sr-dark);
+    position: relative;
+    overflow: hidden;
+  }
+  .cover__photo {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 1;
+  }
+  .cover__photo-shade {
+    position: absolute; inset: 0;
+    z-index: 2;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.92) 100%);
+  }
+  .cover__masthead {
+    position: absolute;
+    top: calc(var(--space-16) + var(--space-4));
+    left: var(--space-8); right: var(--space-8);
+    z-index: 4;
+    display: flex; justify-content: space-between; align-items: flex-start;
+  }
+  .cover__nameplate {
+    font-family: var(--ff-masthead);
+    font-weight: 700;
+    font-size: clamp(56px, 8vw, 96px);
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+  .cover__nameplate-rule {
+    width: 100%; height: 1px;
+    background: rgba(255,255,255,0.5);
+    margin-top: var(--space-3);
+  }
+  .cover__meta {
+    font-family: var(--ff-meta);
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.75);
+    text-align: right;
+    line-height: 1.8;
+  }
+  .cover__sr-graffiti {
+    position: absolute;
+    top: 38%; right: 14%;
+    z-index: 5;
+    font-family: var(--ff-voice);
+    font-style: italic;
+    font-weight: 700;
+    font-size: clamp(64px, 9vw, 110px);
+    color: var(--sr-rose-gold);
+    text-shadow: 0 4px 16px rgba(0,0,0,0.55);
+    transform: rotate(-7deg);
+    pointer-events: none;
+  }
+  .cover__line {
+    position: absolute;
+    bottom: calc(var(--space-16) + var(--space-2));
+    left: var(--space-8); right: var(--space-8);
+    z-index: 4;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-8);
+  }
+  .cover__tagline {
+    font-family: var(--ff-editorial);
+    font-size: clamp(36px, 5vw, 64px);
+    line-height: 1;
+    letter-spacing: 0.04em;
+    max-width: 60%;
+  }
+  .cover__tagline em {
+    font-style: normal;
+    color: var(--sr-rose-gold);
+  }
+  .cover__byline {
+    font-family: var(--ff-body);
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-top: var(--space-2);
+  }
+  .cover__barcode { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-2); }
+  .cover__bars { display: flex; gap: 1px; }
+  .cover__bars span {
+    display: inline-block;
+    width: 1px; height: 28px;
+    background: var(--sr-white);
+  }
+  .cover__bars span:nth-child(3n) { width: 2px; }
+  .cover__bars span:nth-child(7n) { width: 3px; }
+  .cover__drop {
+    font-family: var(--ff-meta);
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+  }
 </style>
 </head>
 <body>
@@ -145,6 +251,42 @@
     <a href="#home-voice">Story</a>
   </div>
 </nav>
+<section id="home-cover" class="frame cover" aria-labelledby="home-cover-title">
+  <picture>
+    <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/forbidden-midnight-1680w.webp" media="(min-width: 1281px)" type="image/webp">
+    <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/forbidden-midnight-1280w.webp" media="(min-width: 769px)" type="image/webp">
+    <source srcset="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/forbidden-midnight-768w.webp" media="(min-width: 481px)" type="image/webp">
+    <img
+      src="../../../wordpress-theme/skyyrose-flagship/assets/branding/hero/forbidden-midnight-480w.webp"
+      alt="SkyyRose cover photograph — Oakland nightscape"
+      class="cover__photo"
+      width="1680" height="945"
+      fetchpriority="high" decoding="async">
+  </picture>
+  <div class="cover__photo-shade"></div>
+
+  <header class="cover__masthead reveal">
+    <h1 id="home-cover-title" class="cover__nameplate">SKYY ROSE<div class="cover__nameplate-rule" aria-hidden="true"></div></h1>
+    <p class="cover__meta">VOL. IV<br>S/S 2026<br>THE TOWN · DROP 01</p>
+  </header>
+
+  <p class="cover__sr-graffiti reveal reveal--scale" aria-hidden="true">SR</p>
+
+  <footer class="cover__line reveal">
+    <div>
+      <p class="cover__tagline">Luxury Grows<br>from <em>Concrete.</em></p>
+      <p class="cover__byline">By Corey Foster · Oakland · 2026</p>
+    </div>
+    <div class="cover__barcode" aria-hidden="true">
+      <div class="cover__bars">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <p class="cover__drop">03 · 26 · DROP 01</p>
+    </div>
+  </footer>
+</section>
 <!-- Sections inserted in subsequent tasks -->
 </body>
 </html>
