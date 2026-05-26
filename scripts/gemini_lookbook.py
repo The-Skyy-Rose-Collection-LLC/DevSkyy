@@ -2,8 +2,20 @@
 """
 Gemini single-shot lookbook generator.
 
-Send scene background + all product techflats to Gemini in ONE call.
-Gemini generates the complete lookbook scene with all products placed naturally.
+[DEPRECATED 2026-05-26] — Standalone path that bypasses the elite team.
+Canonical entry point is now:
+
+    python -m skyyrose.elite_studio home-spread --collection {br,sig,lh,all} --sku <sku>
+
+Elite-team path adds: SceneGeneratorAgent (canon-anchored scene.json reads),
+CompositorAgent 6-stage pipeline (matte → relight → FLUX → cleanup → shadows
+→ QA), RunBudget gates, and automatic retry. This single-shot lookbook
+remains runnable for quick experiments but produces Gemini-rendered products
+in-scene which can hallucinate garment details — fails the no-hallucination
+constraint locked 2026-05-26.
+
+Send scene background + all product techflats to Gemini in ONE call. Gemini
+generates the complete lookbook scene with all products placed naturally.
 
 Usage:
     source .venv-imagery/bin/activate

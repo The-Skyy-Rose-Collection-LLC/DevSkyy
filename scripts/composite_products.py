@@ -1,10 +1,24 @@
 #!/usr/bin/env python3
 """
-Composite product photos INTO immersive scene backgrounds using FAL AI Bria Product Shot.
+Composite product photos INTO immersive scene backgrounds via FAL AI Bria Product Shot.
+
+[DEPRECATED 2026-05-26] — Standalone path that bypasses the elite team.
+Canonical entry point is now:
+
+    python -m skyyrose.elite_studio home-spread --collection {br,sig,lh} --sku <sku>
+
+Elite-team CompositorAgent runs the same FAL Bria flow but with 6 hardened
+stages (matte → relight → FLUX → cleanup → shadows → QA), per-stage budget
+gates, and Stage G visual quality scoring with auto-regen if score < 90.
+This script remains runnable for quick iteration but lacks all of that.
+
+Composites real product photos INTO scene backgrounds via FAL Bria Product
+Shot API. Scenes are pre-rendered (Stage 1), products composite over them
+(Stage 2). Real product pixels preserved — no garment hallucination.
 
 Usage:
     source .venv-imagery/bin/activate
-    python scripts/composite_products.py --scene black-rose-rooftop-garden
+    python scripts/composite_products.py --scene black-rose-bay-bridge-sf-side-night
     python scripts/composite_products.py --all
     python scripts/composite_products.py --list
     python scripts/composite_products.py --all --dry-run

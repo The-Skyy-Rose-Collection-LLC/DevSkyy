@@ -1,17 +1,29 @@
 #!/usr/bin/env python3
 """
-Gemini Immersive Scene Generator — SkyyRose v1
+Gemini Immersive Scene Generator — SkyyRose v1.
 
-Generates drakerelated.com-style immersive scene backgrounds where products
-are rendered INTO the environment as a single unified cinematic image.
+[DEPRECATED 2026-05-26] — Standalone path that bypasses the elite team.
+Canonical entry point is now:
 
-Uses Gemini 3 Pro Image for 4K cinematic quality ($0.08/image).
-Text-to-image generation (no reference images needed for scenes).
+    python -m skyyrose.elite_studio home-spread --collection {br,sig,lh,all}
+
+The elite-team path adds: PromptEnrichmentAgent canon enforcement, RunBudget
+gates, Stage G visual QA, automatic retry-on-low-score, and SceneGeneratorAgent
+that reads canonical scene.json configs from SCENES_DIR. This script remains
+runnable for quick iteration but does NOT enforce any of those guardrails.
+
+Migration map:
+    python scripts/gemini_scene_gen.py --scene X
+        → python -m skyyrose.elite_studio home-spread --scene X --collection Y
+
+Generates immersive scene backgrounds where products are rendered INTO the
+environment as a single unified cinematic image. Gemini 3 Pro Image
+($0.08/image). Text-to-image generation (no reference images for scenes).
 
 Usage:
     source .venv-imagery/bin/activate
     python scripts/gemini_scene_gen.py --list
-    python scripts/gemini_scene_gen.py --scene black-rose-moonlit-courtyard
+    python scripts/gemini_scene_gen.py --scene black-rose-bay-bridge-sf-side-night
     python scripts/gemini_scene_gen.py --collection black-rose
     python scripts/gemini_scene_gen.py --all
     python scripts/gemini_scene_gen.py --all --variants 3
