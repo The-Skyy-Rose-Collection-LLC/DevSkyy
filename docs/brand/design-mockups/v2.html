@@ -789,5 +789,72 @@
 </section>
 </div><!-- /.br-page -->
 <!-- Sections inserted in subsequent tasks -->
+
+<script>
+(function () {
+  'use strict';
+
+  var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // === Reveal on scroll ===
+  if ('IntersectionObserver' in window && !prefersReduced) {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(function (el) {
+      revealObserver.observe(el);
+    });
+
+    // Above-fold immediate reveal (rAF-deferred so first paint is fast)
+    requestAnimationFrame(function () {
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      document.querySelectorAll('.reveal').forEach(function (el) {
+        var rect = el.getBoundingClientRect();
+        if (rect.top < vh && rect.bottom > 0) {
+          el.classList.add('is-visible');
+          revealObserver.unobserve(el);
+        }
+      });
+    });
+  } else {
+    // Reduced motion OR no IntersectionObserver support — force all visible
+    document.querySelectorAll('.reveal').forEach(function (el) {
+      el.classList.add('is-visible');
+    });
+  }
+
+  // === Parallax backgrounds ===
+  if (!prefersReduced) {
+    var parallaxNodes = document.querySelectorAll('.parallax');
+    if (parallaxNodes.length) {
+      var ticking = false;
+      function onScroll() {
+        if (!ticking) {
+          requestAnimationFrame(function () {
+            parallaxNodes.forEach(function (node) {
+              var rect = node.getBoundingClientRect();
+              var speed = parseFloat(node.getAttribute('data-parallax-speed')) || 0.6;
+              var center = rect.top + rect.height / 2;
+              var viewportCenter = (window.innerHeight || document.documentElement.clientHeight) / 2;
+              var offset = (viewportCenter - center) * (1 - speed);
+              node.style.transform = 'translate3d(0, ' + offset.toFixed(2) + 'px, 0)';
+            });
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    }
+  }
+})();
+</script>
 </body>
 </html>
