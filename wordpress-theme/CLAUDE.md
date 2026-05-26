@@ -34,11 +34,13 @@ Composer (required for PHPCS): installed at `~/.local/bin/composer`.
 ## Source of Truth — Products
 
 **`wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv`** is the ONLY product catalog.
-46 products across 4 collections (Black Rose, Love Hurts, Signature, Kids Capsule).
+45 products across 4 collections (Black Rose, Love Hurts, Signature, Kids Capsule).
 The catalog grew 32 → 46 on 2026-05-26 when 14 orphan SKUs were promoted to active
-pre-orders (lh-001, sg-004, sg-008, sg-010, sg-016, sg-017, sg-018, br-d01–d04,
-sg-d01, sg-d03, sg-d04 — sg-d02 explicitly skipped). Several rows carry a DRAFT
-note in `description` pending founder confirmation of name/price.
+pre-orders, then immediately corrected to 45 when `br-d01` (Hockey Teal) was retired
+same day per founder ruling "only 1 hockey jersey" (br-011 The Rose is canonical).
+Active 2026-05-26 additions: lh-001, sg-004, sg-008, sg-010, sg-016, sg-017, sg-018,
+br-d02, br-d03, br-d04, sg-d01, sg-d03, sg-d04. Several rows carry a DRAFT note in
+`description` pending founder confirmation of name/price.
 
 ### Data files (all under `skyyrose-flagship/data/`)
 
@@ -188,10 +190,14 @@ after `wp cache flush`. Always use `curl -s "https://skyyrose.co/?cb=$(date +%s)
 ## Don't
 
 - Don't deploy on Friday after 2pm Pacific.
-- Don't reference retired SKUs (`br-013`) in any `.php` file. The 2026-05-26 catalog
-  extension promoted lh-001, sg-004, sg-008, br-d01–d04, sg-d01, sg-d03, sg-d04 to
-  active pre-orders — they are no longer retired. Validator authority:
-  `scripts/validate_catalog_consistency.py` `retired_sku_guard` check.
+- Don't reference retired SKUs (`br-013`, `br-d01`) in any `.php` file.
+  - `br-013`: retired 2026-04-27 (BiB jersey rework).
+  - `br-d01`: added 2026-05-26 as "Hockey Teal" then immediately retired same day
+    per founder ruling "only 1 hockey jersey" — `br-011 The Rose (Hockey)` is the
+    canonical hockey jersey. Teal techflats archived under `.archive/orphan-assets/br-d01/`.
+  - The other 2026-05-26 additions (lh-001, sg-004, sg-008, sg-010, sg-016–018,
+    br-d02–d04, sg-d01, sg-d03, sg-d04) are ACTIVE pre-orders, not retired.
+  - Validator authority: `scripts/validate_catalog_consistency.py` `retired_sku_guard` check.
 - Don't bypass `npm run lint:php` "for a small fix."
 - Don't commit changes that haven't passed `npm run verify`.
 - Don't use `products.json` — it doesn't exist. Use the CSV helpers.
