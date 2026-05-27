@@ -45,8 +45,45 @@ from .compositor.stage_g_visual_qa import (  # noqa: F401
     _DEFAULT_CENTROID_PATH,
     _DEFAULT_QA_RUBRIC,
 )
-from .compositor.stage_g_visual_qa import maybe_apply_gate as _maybe_apply_gate  # noqa: F401
 from .compositor.stage_g_visual_qa import visual_qa_gemini as _visual_qa_gemini  # noqa: F401
+
+
+def _maybe_apply_gate(
+    shadow_path: str,
+    scene_name: str,
+    collection: str,
+    *,
+    centroid_path=None,
+):
+    """Pre-QA embedding gate. Reject -> skip Gemini. Accept -> call ``_visual_qa_gemini``.
+
+    Backward-compat wrapper that re-implements the gate's control flow but calls the
+    ``_visual_qa_gemini`` name bound in THIS module, so existing tests that patch
+    ``compositor_agent._visual_qa_gemini`` continue to intercept the Gemini call.
+    Delegates the heavy lifting to ``stage_g_visual_qa`` primitives.
+    """
+    from pathlib import Path
+
+    from ..quality import embedding_gate
+    from ..quality.brand_centroid import load_centroid
+    from .compositor.stage_g_visual_qa import _DEFAULT_CENTROID_PATH
+
+    resolved = Path(centroid_path) if centroid_path else _DEFAULT_CENTROID_PATH
+    if not resolved.exists():
+        return _visual_qa_gemini(shadow_path, scene_name, collection, analyze_vision=analyze_vision)
+
+    centroid = load_centroid(resolved)
+    verdict = embedding_gate.evaluate(shadow_path, centroid)
+    if not verdict.accepted:
+        return {
+            "status": "fail",
+            "reason": verdict.reason,
+            "embedding_score": verdict.score,
+            "embedding_threshold": verdict.threshold,
+            "skipped_gemini": True,
+        }
+    return _visual_qa_gemini(shadow_path, scene_name, collection, analyze_vision=analyze_vision)
+
 
 # ---------------------------------------------------------------------------
 # Stage module imports — kept at this namespace so tests can patch them.
