@@ -26,35 +26,153 @@
   // Dialog shell (created once, reused)
   // -------------------------------------------------------------------------
 
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+
+  function svgEl(name, attrs) {
+    var el = document.createElementNS(SVG_NS, name);
+    Object.keys(attrs).forEach(function (k) {
+      el.setAttribute(k, attrs[k]);
+    });
+    return el;
+  }
+
+  function el(tag, props) {
+    var node = document.createElement(tag);
+    if (!props) return node;
+    Object.keys(props).forEach(function (key) {
+      var value = props[key];
+      if (key === 'className') {
+        node.className = value;
+      } else if (key === 'text') {
+        node.textContent = value;
+      } else if (key === 'attrs') {
+        Object.keys(value).forEach(function (a) {
+          node.setAttribute(a, value[a]);
+        });
+      } else if (key === 'data') {
+        Object.keys(value).forEach(function (d) {
+          node.dataset[d] = value[d];
+        });
+      } else if (key in node) {
+        node[key] = value;
+      } else {
+        node.setAttribute(key, value);
+      }
+    });
+    return node;
+  }
+
   function buildShell() {
-    var dialog = document.createElement('dialog');
-    dialog.id = DIALOG_ID;
-    dialog.setAttribute('aria-modal', 'true');
-    dialog.setAttribute('aria-labelledby', 'skyy-qv-title');
-    dialog.innerHTML = [
-      '<div class="skyy-qv__backdrop" aria-hidden="true"></div>',
-      '<div class="skyy-qv__panel" role="document">',
-      '  <button class="skyy-qv__close" aria-label="Close quick view">',
-      '    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
-      '  </button>',
-      '  <div class="skyy-qv__gallery">',
-      '    <img class="skyy-qv__img skyy-qv__img--active" id="skyy-qv-img-front" src="" alt="">',
-      '    <img class="skyy-qv__img" id="skyy-qv-img-back" src="" alt="">',
-      '    <div class="skyy-qv__img-toggle" id="skyy-qv-toggle" hidden>',
-      '      <button class="skyy-qv__toggle-btn skyy-qv__toggle-btn--active" data-view="front">Front</button>',
-      '      <button class="skyy-qv__toggle-btn" data-view="back">Back</button>',
-      '    </div>',
-      '  </div>',
-      '  <div class="skyy-qv__info">',
-      '    <span class="skyy-qv__collection" id="skyy-qv-collection"></span>',
-      '    <h2 class="skyy-qv__title" id="skyy-qv-title"></h2>',
-      '    <p class="skyy-qv__price" id="skyy-qv-price"></p>',
-      '    <div class="skyy-qv__sizes" id="skyy-qv-sizes" role="radiogroup" aria-label="Select size"></div>',
-      '    <button class="skyy-qv__buy" id="skyy-qv-buy" type="button"></button>',
-      '    <a class="skyy-qv__full-link" id="skyy-qv-link" href="#">View full details</a>',
-      '  </div>',
-      '</div>',
-    ].join('');
+    var dialog = el('dialog', {
+      id: DIALOG_ID,
+      attrs: { 'aria-modal': 'true', 'aria-labelledby': 'skyy-qv-title' },
+    });
+
+    var backdrop = el('div', {
+      className: 'skyy-qv__backdrop',
+      attrs: { 'aria-hidden': 'true' },
+    });
+
+    var panel = el('div', {
+      className: 'skyy-qv__panel',
+      attrs: { role: 'document' },
+    });
+
+    var closeBtn = el('button', {
+      className: 'skyy-qv__close',
+      attrs: { 'aria-label': 'Close quick view' },
+    });
+    var svg = svgEl('svg', {
+      width: '18',
+      height: '18',
+      viewBox: '0 0 24 24',
+      fill: 'none',
+      stroke: 'currentColor',
+      'stroke-width': '2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+      'aria-hidden': 'true',
+    });
+    svg.appendChild(svgEl('line', { x1: '18', y1: '6', x2: '6', y2: '18' }));
+    svg.appendChild(svgEl('line', { x1: '6', y1: '6', x2: '18', y2: '18' }));
+    closeBtn.appendChild(svg);
+
+    var gallery = el('div', { className: 'skyy-qv__gallery' });
+    var imgFront = el('img', {
+      className: 'skyy-qv__img skyy-qv__img--active',
+      id: 'skyy-qv-img-front',
+      src: '',
+      alt: '',
+    });
+    var imgBack = el('img', {
+      className: 'skyy-qv__img',
+      id: 'skyy-qv-img-back',
+      src: '',
+      alt: '',
+    });
+    var toggle = el('div', {
+      className: 'skyy-qv__img-toggle',
+      id: 'skyy-qv-toggle',
+      hidden: true,
+    });
+    toggle.appendChild(
+      el('button', {
+        className: 'skyy-qv__toggle-btn skyy-qv__toggle-btn--active',
+        data: { view: 'front' },
+        text: 'Front',
+      })
+    );
+    toggle.appendChild(
+      el('button', {
+        className: 'skyy-qv__toggle-btn',
+        data: { view: 'back' },
+        text: 'Back',
+      })
+    );
+    gallery.appendChild(imgFront);
+    gallery.appendChild(imgBack);
+    gallery.appendChild(toggle);
+
+    var info = el('div', { className: 'skyy-qv__info' });
+    info.appendChild(
+      el('span', { className: 'skyy-qv__collection', id: 'skyy-qv-collection' })
+    );
+    info.appendChild(
+      el('h2', { className: 'skyy-qv__title', id: 'skyy-qv-title' })
+    );
+    info.appendChild(
+      el('p', { className: 'skyy-qv__price', id: 'skyy-qv-price' })
+    );
+    info.appendChild(
+      el('div', {
+        className: 'skyy-qv__sizes',
+        id: 'skyy-qv-sizes',
+        attrs: { role: 'radiogroup', 'aria-label': 'Select size' },
+      })
+    );
+    info.appendChild(
+      el('button', {
+        className: 'skyy-qv__buy',
+        id: 'skyy-qv-buy',
+        type: 'button',
+      })
+    );
+    info.appendChild(
+      el('a', {
+        className: 'skyy-qv__full-link',
+        id: 'skyy-qv-link',
+        href: '#',
+        text: 'View full details',
+      })
+    );
+
+    panel.appendChild(closeBtn);
+    panel.appendChild(gallery);
+    panel.appendChild(info);
+
+    dialog.appendChild(backdrop);
+    dialog.appendChild(panel);
+
     document.body.appendChild(dialog);
     return dialog;
   }
@@ -104,7 +222,18 @@
       ? collection.replace(/-/g, ' ').toUpperCase()
       : '';
     dialog.querySelector('#skyy-qv-title').textContent = name;
-    dialog.querySelector('#skyy-qv-price').innerHTML = priceEl ? priceEl.innerHTML : '';
+
+    // Mirror price markup without HTML re-parsing: clone the card's price
+    // children (e.g. WooCommerce <span class="amount">) into the dialog.
+    var qvPrice = dialog.querySelector('#skyy-qv-price');
+    while (qvPrice.firstChild) {
+      qvPrice.removeChild(qvPrice.firstChild);
+    }
+    if (priceEl) {
+      Array.prototype.forEach.call(priceEl.childNodes, function (childNode) {
+        qvPrice.appendChild(childNode.cloneNode(true));
+      });
+    }
 
     // Full details link
     var fullLink = dialog.querySelector('#skyy-qv-link');
@@ -112,7 +241,9 @@
 
     // Size pills — clone from card
     var sizesContainer = dialog.querySelector('#skyy-qv-sizes');
-    sizesContainer.innerHTML = '';
+    while (sizesContainer.firstChild) {
+      sizesContainer.removeChild(sizesContainer.firstChild);
+    }
     var selectedSize = '';
     sizePills.forEach(function (pill) {
       var btn = document.createElement('button');
