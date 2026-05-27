@@ -162,6 +162,14 @@ repos:
         pass_filenames: false
         require_serial: true
 
+      - id: strip-claude-mem-stubs
+        name: Strip empty <claude-mem-context> stubs from CLAUDE.md
+        entry: bash scripts/hooks/strip-claude-mem-stubs.sh
+        language: system
+        files: (^|/)CLAUDE\.md$
+        pass_filenames: false
+        require_serial: true
+
 # =============================================================================
 # CI Configuration (pre-commit.ci)
 # =============================================================================

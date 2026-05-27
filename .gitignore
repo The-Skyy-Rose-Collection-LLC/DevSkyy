@@ -425,3 +425,9 @@ tasks/render-pipeline-cli-*.json
 
 # Visual Companion brainstorming artifacts (skill: superpowers/brainstorming)
 .superpowers/
+
+# OpenWolf derived artifacts — regenerated on every scan, hash-only churn pollutes diffs
+.wolf/memory-audit.json
+
+# L5 tidy hook log (per-machine, observe-mode proposals)
+.claude/tidy-log.jsonl
