@@ -62,22 +62,7 @@
     return node;
   }
 
-  function buildShell() {
-    var dialog = el('dialog', {
-      id: DIALOG_ID,
-      attrs: { 'aria-modal': 'true', 'aria-labelledby': 'skyy-qv-title' },
-    });
-
-    var backdrop = el('div', {
-      className: 'skyy-qv__backdrop',
-      attrs: { 'aria-hidden': 'true' },
-    });
-
-    var panel = el('div', {
-      className: 'skyy-qv__panel',
-      attrs: { role: 'document' },
-    });
-
+  function buildCloseButton() {
     var closeBtn = el('button', {
       className: 'skyy-qv__close',
       attrs: { 'aria-label': 'Close quick view' },
@@ -96,79 +81,93 @@
     svg.appendChild(svgEl('line', { x1: '18', y1: '6', x2: '6', y2: '18' }));
     svg.appendChild(svgEl('line', { x1: '6', y1: '6', x2: '18', y2: '18' }));
     closeBtn.appendChild(svg);
+    return closeBtn;
+  }
 
+  function buildGallery() {
     var gallery = el('div', { className: 'skyy-qv__gallery' });
-    var imgFront = el('img', {
+    gallery.appendChild(el('img', {
       className: 'skyy-qv__img skyy-qv__img--active',
       id: 'skyy-qv-img-front',
       src: '',
       alt: '',
-    });
-    var imgBack = el('img', {
+    }));
+    gallery.appendChild(el('img', {
       className: 'skyy-qv__img',
       id: 'skyy-qv-img-back',
       src: '',
       alt: '',
-    });
+    }));
     var toggle = el('div', {
       className: 'skyy-qv__img-toggle',
       id: 'skyy-qv-toggle',
       hidden: true,
     });
-    toggle.appendChild(
-      el('button', {
-        className: 'skyy-qv__toggle-btn skyy-qv__toggle-btn--active',
-        data: { view: 'front' },
-        text: 'Front',
-      })
-    );
-    toggle.appendChild(
-      el('button', {
-        className: 'skyy-qv__toggle-btn',
-        data: { view: 'back' },
-        text: 'Back',
-      })
-    );
-    gallery.appendChild(imgFront);
-    gallery.appendChild(imgBack);
+    toggle.appendChild(el('button', {
+      className: 'skyy-qv__toggle-btn skyy-qv__toggle-btn--active',
+      data: { view: 'front' },
+      text: 'Front',
+    }));
+    toggle.appendChild(el('button', {
+      className: 'skyy-qv__toggle-btn',
+      data: { view: 'back' },
+      text: 'Back',
+    }));
     gallery.appendChild(toggle);
+    return gallery;
+  }
 
+  function buildInfo() {
     var info = el('div', { className: 'skyy-qv__info' });
-    info.appendChild(
-      el('span', { className: 'skyy-qv__collection', id: 'skyy-qv-collection' })
-    );
-    info.appendChild(
-      el('h2', { className: 'skyy-qv__title', id: 'skyy-qv-title' })
-    );
-    info.appendChild(
-      el('p', { className: 'skyy-qv__price', id: 'skyy-qv-price' })
-    );
-    info.appendChild(
-      el('div', {
-        className: 'skyy-qv__sizes',
-        id: 'skyy-qv-sizes',
-        attrs: { role: 'radiogroup', 'aria-label': 'Select size' },
-      })
-    );
-    info.appendChild(
-      el('button', {
-        className: 'skyy-qv__buy',
-        id: 'skyy-qv-buy',
-        type: 'button',
-      })
-    );
-    info.appendChild(
-      el('a', {
-        className: 'skyy-qv__full-link',
-        id: 'skyy-qv-link',
-        href: '#',
-        text: 'View full details',
-      })
-    );
+    info.appendChild(el('span', {
+      className: 'skyy-qv__collection',
+      id: 'skyy-qv-collection',
+    }));
+    info.appendChild(el('h2', {
+      className: 'skyy-qv__title',
+      id: 'skyy-qv-title',
+    }));
+    info.appendChild(el('p', {
+      className: 'skyy-qv__price',
+      id: 'skyy-qv-price',
+    }));
+    info.appendChild(el('div', {
+      className: 'skyy-qv__sizes',
+      id: 'skyy-qv-sizes',
+      attrs: { role: 'radiogroup', 'aria-label': 'Select size' },
+    }));
+    info.appendChild(el('button', {
+      className: 'skyy-qv__buy',
+      id: 'skyy-qv-buy',
+      type: 'button',
+    }));
+    info.appendChild(el('a', {
+      className: 'skyy-qv__full-link',
+      id: 'skyy-qv-link',
+      href: '#',
+      text: 'View full details',
+    }));
+    return info;
+  }
 
-    panel.appendChild(closeBtn);
-    panel.appendChild(gallery);
-    panel.appendChild(info);
+  function buildShell() {
+    var dialog = el('dialog', {
+      id: DIALOG_ID,
+      attrs: { 'aria-modal': 'true', 'aria-labelledby': 'skyy-qv-title' },
+    });
+
+    var backdrop = el('div', {
+      className: 'skyy-qv__backdrop',
+      attrs: { 'aria-hidden': 'true' },
+    });
+
+    var panel = el('div', {
+      className: 'skyy-qv__panel',
+      attrs: { role: 'document' },
+    });
+    panel.appendChild(buildCloseButton());
+    panel.appendChild(buildGallery());
+    panel.appendChild(buildInfo());
 
     dialog.appendChild(backdrop);
     dialog.appendChild(panel);
