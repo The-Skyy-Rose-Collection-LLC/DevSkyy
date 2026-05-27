@@ -70,6 +70,21 @@ async def lifespan(app: FastAPI):
     except Exception:
         pass
 
+    # Langfuse LLM observability (optional — requires LANGFUSE_PUBLIC_KEY/SECRET_KEY/HOST)
+    app.state.langfuse = None
+    if os.getenv("LANGFUSE_PUBLIC_KEY") and os.getenv("LANGFUSE_SECRET_KEY"):
+        try:
+            from langfuse import get_client
+
+            langfuse_client = get_client()
+            if langfuse_client.auth_check():
+                app.state.langfuse = langfuse_client
+                log.info("langfuse_initialized", host=os.getenv("LANGFUSE_HOST", "default"))
+            else:
+                log.warning("langfuse_auth_check_failed")
+        except Exception as exc:  # noqa: BLE001 — observability is non-critical
+            log.warning("langfuse_init_failed", error=str(exc))
+
     log.info("platform_ready", routes=len([r for r in app.routes if hasattr(r, "path")]))
 
     yield
@@ -83,6 +98,12 @@ async def lifespan(app: FastAPI):
         await close_checkpointer()
     except Exception as exc:  # noqa: BLE001 — non-critical cleanup
         log.warning("creative_checkpointer_close_failed", error=str(exc))
+    # Flush any buffered Langfuse traces before exit
+    if getattr(app.state, "langfuse", None) is not None:
+        try:
+            app.state.langfuse.flush()
+        except Exception as exc:  # noqa: BLE001 — non-critical cleanup
+            log.warning("langfuse_flush_failed", error=str(exc))
     log.info("platform_shutdown_complete")
 
 

@@ -98,7 +98,9 @@ class VideoPipeline:
             VideoState,
             {"sku": sku, "inputs": {}, "outputs": {}, "status": "pending", "errors": []},
         )
-        final = graph.invoke(initial)  # type: ignore[attr-defined]
+        from ..._observability import langfuse_config
+
+        final = graph.invoke(initial, config=langfuse_config())  # type: ignore[attr-defined]
         return PipelineResult(
             venture=MANIFEST.slug,
             status=str(final.get("status", "unknown")),

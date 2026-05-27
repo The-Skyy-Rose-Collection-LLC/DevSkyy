@@ -304,8 +304,14 @@ sdk = [
     "claude-agent-sdk>=0.1.18",
 ]
 
+observability = [
+    # LLM / pipeline tracing — drop-in OpenAI wrapper + LangGraph CallbackHandler.
+    # Optional: code paths fall back to vanilla openai + no-op tracing if absent.
+    "langfuse>=4.6,<5",
+]
+
 all = [
-    "devskyy[dev,api,mcp,ml,worker,deploy,sdk,rag]",
+    "devskyy[dev,api,mcp,ml,worker,deploy,sdk,rag,observability]",
 ]
 
 [project.urls]
