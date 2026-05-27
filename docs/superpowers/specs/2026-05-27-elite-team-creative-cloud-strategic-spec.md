@@ -1,6 +1,7 @@
 ---
-title: Elite Team Creative Cloud — Strategic Spec (Tripo3D + ComfyUI + PhotoRoom for Fashion)
+title: Elite Team — Strategic Spec (Internal Imagery System for SkyyRose, SaaS-Eligible Architecture)
 date: 2026-05-27
+revised: 2026-05-27 (scope re-cut from SaaS-first to internal-first)
 status: draft
 type: strategic (not implementation)
 author: corey + claude (brainstorming session)
@@ -8,23 +9,28 @@ companions:
   - 2026-05-27-mockup-stage-d-and-cost-ceiling-design.md (commit 563f57f27)
   - 2026-05-27-compositor-production-hardening-design.md (commit ab8a3706f)
 verified_sources:
-  - Tripo3D pricing tiers (WebFetch on www.tripo3d.ai/pricing)
-  - PhotoRoom pricing tiers (WebFetch on www.photoroom.com/pricing)
+  - Tripo3D pricing tiers (WebFetch on www.tripo3d.ai/pricing) — used as future-reference benchmark only
+  - PhotoRoom pricing tiers (WebFetch on www.photoroom.com/pricing) — used as future-reference benchmark only
   - ComfyUI GitHub repo + Comfy Cloud commercial layer (WebFetch on github.com/comfyanonymous/ComfyUI)
   - DevSkyy Elite Studio component inventory (Bash `ls skyyrose/elite_studio/agents/`)
-  - DevSkyy billing stack (Bash `find . -path billing/`)
+  - DevSkyy billing stack (Bash `find . -path billing/`) — exists, not yet customer-facing
   - DevSkyy 3D pipeline inventory (Bash `ls ai_3d/`, `ls pipelines/clothing_3d/`, `ls hf-spaces/3d-converter/`)
+  - SkyyRose catalog (33 SKUs, 4 collections per `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv`)
 ---
 
-# Elite Team Creative Cloud — Strategic Spec
+# Elite Team — Strategic Spec
 
-This is a **strategic spec**, not an implementation spec. It defines the product surface, the market position, and the build sequence. Implementation specs for each product surface are listed in §9 (Decomposition) and authored separately as work begins.
+This is a **strategic spec**, not an implementation spec. It defines the product surface, internal SkyyRose outcomes, and the build sequence. **SaaS productization is deferred** until internal outcomes prove the architecture in production for the SkyyRose catalog.
 
 ## 1. Vision
 
-**Elite Team is the Adobe Creative Cloud of fashion imagery.**
+**Phase A (now):** Elite Team is the internal imagery system that ships the SkyyRose catalog. Mockup-first 100% replica composites, garment-aware QA, lookbooks, and 3D try-on — all running against SkyyRose's 33 SKUs across 4 collections.
 
-One subscription. Multi-product. Every product is an agent that already exists inside `skyyrose/elite_studio/agents/`. The competitive frame is not "another image tool" — it is "the suite that fashion brands switch to so they can stop renting Tripo3D, ComfyUI hosts, and PhotoRoom seats separately."
+**Phase B (deferred until Phase A outcomes ship):** Elite Team productizes the same architecture as a public SaaS — "the Adobe Creative Cloud of fashion imagery" — once the SkyyRose catalog proves the agents work at quality.
+
+**Why this order.** A productized SaaS without a proven internal outcome is a marketing budget burning. SkyyRose's own catalog is the truth test. Every agent, every quality bar, every pricing assumption in Phase B is grounded in measured Phase A behavior.
+
+The architecture is built SaaS-eligible from day one (multi-tenant-ready primitives, credit-metered internally even when the only "tenant" is SkyyRose) so that the Phase B switch is a deployment + marketing step, not a rewrite.
 
 The differentiator is not a better model. It is **specialized agents composed into garment-specific workflows**, where Tripo / Comfy / PhotoRoom ship generic primitives.
 
@@ -43,7 +49,9 @@ WebFetch'd `www.tripo3d.ai/pricing` this session.
 
 Per-credit cost (Pro): ~$0.004. API pricing not listed on the public page.
 
-**What we beat them on:** Tripo treats every image the same. Fashion-specific knowledge — UV unwrap conventions for garments, fabric-aware retopology, multi-view consistency on stitched panels — is value Tripo cannot ship without becoming us.
+**Phase A use:** none of this pricing applies internally — we hit Tripo's API today and pay per call via the `tripo_agent`. This table is the Phase B reference point for the day we replace those calls with our own engine and price ourselves against it.
+
+**What we beat them on (Phase B claim, Phase A proof point):** Tripo treats every image the same. Fashion-specific knowledge — UV unwrap conventions for garments, fabric-aware retopology, multi-view consistency on stitched panels — is value Tripo cannot ship without becoming us. **Phase A must measure this delta on SkyyRose's own garments before we make the Phase B claim publicly.**
 
 ### PhotoRoom — background removal + product editing
 
@@ -59,13 +67,17 @@ WebFetch'd `www.photoroom.com/pricing` this session.
 
 API pricing requires a separate subscription. Exact API rates not on the public page.
 
-**What we beat them on:** PhotoRoom ships generic e-commerce product editing. Garment-specific operations (fabric drape correction, label placement, color-accurate fabric swatches, runway-photo cleanup) are workflows, not features they have.
+**Phase A use:** none of this pricing applies internally. PhotoRoom is a reference, not a dependency. We have not integrated PhotoRoom; this table is the Phase B benchmark.
+
+**What we beat them on (Phase B claim, Phase A proof point):** PhotoRoom ships generic e-commerce product editing. Garment-specific operations (fabric drape correction, label placement, color-accurate fabric swatches, runway-photo cleanup) are workflows, not features they have. **Phase A must produce these workflows for SkyyRose's catalog and measure quality before this becomes a public claim.**
 
 ### ComfyUI — node-based image pipeline (OSS) + Comfy Cloud (commercial)
 
 WebFetch'd `github.com/comfyanonymous/ComfyUI` this session. **115,000 stars, 13,400 forks. GPL-3.0.** Comfy Cloud is "our official paid cloud version for those who can't afford local hardware."
 
-**What we beat them on:** ComfyUI exposes 500+ primitive nodes and asks the user to assemble workflows. We ship the same primitives ASSEMBLED into named agents (compositor, color_correction, upscaling, vision_audit, …) that each do one fashion job correctly. Lower ceiling for power users, dramatically higher floor for fashion brands who do not want to learn a node graph.
+**Phase A use:** ComfyUI is a structural reference. We have a ComfyUI-shape already in `skyyrose/elite_studio/creative/` (nodes, edges, router, runner, state, checkpointer). We do not use Comfy directly; we use the pattern.
+
+**What we beat them on (Phase B claim):** ComfyUI exposes 500+ primitive nodes and asks the user to assemble workflows. We ship the same primitives ASSEMBLED into named agents (compositor, color_correction, upscaling, vision_audit, …) that each do one fashion job correctly. Lower ceiling for power users, dramatically higher floor for fashion brands who do not want to learn a node graph.
 
 ## 3. Current state (verified by `ls` this session)
 
@@ -184,75 +196,76 @@ Cross-cutting gaps (one per product, but built once for all):
 - **Multi-tenancy on existing billing** — `billing/entitlements.py` likely single-tenant. Audit needed.
 - **SOC 2 Type 2** — PhotoRoom Enterprise has it; we will be asked for it within the first year. Implementation is a 6-month process; start early.
 
-## 7. Pricing + revenue model (proposed)
+## 7. Pricing — deferred to Phase B
 
-Adobe Creative Cloud charges $54.99/month for the full suite. Tripo3D charges $11.94 just for 3D. PhotoRoom charges separately for editing.
+**Phase A (now): no external pricing. Internal credit metering only.**
 
-**Proposed tiers (anchored to Tripo + PhotoRoom verified numbers):**
+The existing `billing/metering.py` records consumption against the SkyyRose tenant for forensics: every paid API call (FASHN, Replicate, Anthropic, FAL, Gemini, BRIA) is logged with per-call cost and aggregate spend against a notional credit wallet. This produces the cost-per-SKU and cost-per-lookbook telemetry Phase B will price against.
 
-| Tier | Monthly | Credits | Targets |
-|------|---------|---------|---------|
-| Free | $0 | 250 / month | Discovery; convert to Pro after first lookbook |
-| Pro | $19 | 5,000 | Solo brands, 1–10 SKUs / month |
-| Studio | $79 | 25,000 | Multi-SKU brands, 10–100 SKUs / month |
-| Team | $79 / seat (min 3 seats) | 45,000 / seat | Agencies, brand teams |
-| Enterprise | Custom | Custom | 100K+ images / year, dedicated infra, SOC 2 |
+**The unit work in Phase A:** instrument every agent so that running it against a SkyyRose SKU emits one metering event with `{agent_name, sku, paid_api_cost_usd, output_path, latency_ms}`. The `billing/metering.py` schema already supports this; `billing/middleware.py` enforces it on the FastAPI surface.
 
-Per-credit consumption is product-specific:
+**Phase B (deferred):** when SkyyRose-internal outcomes prove the agents work, the metering data informs public pricing. The Tripo + PhotoRoom tiers in §2 are the future benchmark. **No public pricing is set until Phase A measurement is in.**
 
-- 3D model generation: 25 credits (≈ Tripo's per-model effective rate)
-- Compositor render (single SKU): 5 credits
-- PhotoRoom-style background removal: 1 credit
-- Try-on (single garment × model): 10 credits
+## 8. Sequencing (Phase A — build order driven by SkyyRose catalog outcomes)
 
-The point of the credit unit: every product feeds one wallet. The customer does not maintain mental balance sheets for 4 different tools.
+Each phase ships an outcome SkyyRose's own catalog needs. No customer-facing API, no public pricing. The order is dictated by what the SkyyRose brand needs to launch and operate.
 
-## 8. Sequencing (build order)
+| Phase A step | Outcome for SkyyRose | Why this order | Estimate |
+|--------------|---------------------|----------------|----------|
+| A0 | Compositor production hardening | Foundation. Companion specs (Stage D + IC-Light cost gate; preflight + cache + LRU + backoff) land here. Without these, every later phase pays Replicate twice and fails late. | 4–6 weeks |
+| A1 | Mockup-first composites for all 33 SkyyRose SKUs | The launch blocker. Each SKU gets a verified mockup, then deterministic Stage D rasterize produces PDP-ready imagery. | 3–4 weeks (parallel with A0 tail) |
+| A2 | Elite Studio Audit on the 33 outputs | vision_audit + quality + safety agents score each SKU's imagery. Surfaces brand-canon drift, fabric-color drift, logo-placement errors. Internal QA gate before any image lands on skyyrose.co. | 2–3 weeks |
+| A3 | Elite Studio Lookbook for the 4 collections | Compose + variant agent generate brand-canon lookbook spreads. Outputs feed the WP theme's collection pages and pre-order flows. | 3–4 weeks |
+| A4 | Elite Studio Try-On for hero SKUs | tryon_agent + FASHN integration. Limited to the 8–10 hero SKUs that drive conversion. | 3–4 weeks |
+| A5 | Elite Studio 3D for hero SKUs | three_d_agent on self-hosted TRELLIS/Hunyuan3D Space, Tripo fallback. Same 8–10 hero SKUs. Powers AR / 360° viewer on PDP. | 6–8 weeks |
+| A6 | Metering + cost-per-SKU telemetry consolidated | Aggregate `billing/metering.py` data across A1–A5. Produces the dataset Phase B will price against. | 1 week (instrumentation only; data accumulates throughout) |
 
-Each phase ships one product to revenue, then funds the next. Compositor work (the two companion specs) is the foundation under Phase 2.
+**Phase A done = the SkyyRose catalog is shipping imagery, lookbooks, try-ons, and 3D from Elite Team end-to-end, with measured per-SKU costs.**
 
-| Phase | Product | Why this order | Time-to-revenue estimate |
-|-------|---------|----------------|--------------------------|
-| 0 | Compositor production hardening | Foundation for every other product. The two companion specs land here. | 4–6 weeks |
-| 1 | Elite Studio Audit | Cheapest to productize (read-only, no generation cost), highest-trust wedge into brand workflows. Sells SOC-2-friendly. | 6–8 weeks |
-| 2 | Elite Studio Compose | The differentiating product. Showcases 100% replica fidelity. Requires Phase 0 done. | 8–10 weeks |
-| 3 | Elite Studio Edit | PhotoRoom is the easiest competitor to displace; bg removal is solved-tech, brand owns the polish. | 6–8 weeks |
-| 4 | Elite Studio 3D | Highest cost play (self-hosted compute), but the moat once shipped. | 10–14 weeks |
-| 5 | Elite Studio Try-On | Multi-model try-on is the upsell to Studio + Team tiers. | 6–8 weeks |
-| 6 | Elite Studio Lookbook | Bundle product; sells the entire Creative Cloud as one purchase. | 8 weeks |
-| 7 | Elite Studio Reels | Last because video is expensive and the field is moving fast. | 12+ weeks |
+**Phase B gate (deferred — not in this spec's commitment):** when Phase A is producing measured outcomes for ≥6 months, evaluate whether to productize. The Phase B sub-specs (public API, web shell, marketing site, pricing page, multi-tenancy audit, SOC 2) only run after that gate.
 
-Total: ~12 months to all seven products shipping in beta. Phase 0 starts immediately; Phase 1 starts the week Phase 0's preflight pattern lands.
+## 9. Decomposition — Phase A only (Phase B sub-specs deferred)
 
-## 9. Decomposition
+Per the brainstorming skill: "If the project is too large for a single spec, help the user decompose into sub-projects."
 
-Per the brainstorming skill: "If the project is too large for a single spec, help the user decompose into sub-projects." Elite Team Creative Cloud is too large for a single implementation spec. This strategic spec drives separate sub-specs:
+**Phase A sub-specs (the only specs we author now):**
 
-| Sub-spec | Drives implementation of |
-|----------|--------------------------|
-| `2026-XX-XX-elite-team-public-api-spec.md` | Cross-cutting REST/GraphQL gateway, auth, rate limits |
-| `2026-XX-XX-elite-team-credit-wallet-spec.md` | One-wallet credit system, billing/entitlements extensions |
-| `2026-XX-XX-elite-team-web-shell-spec.md` | Customer-facing web app shell (Next.js, separate from admin dashboard) |
-| `2026-XX-XX-elite-studio-audit-product-spec.md` | First product to ship — Phase 1 |
-| `2026-XX-XX-elite-studio-compose-product-spec.md` | Phase 2 product spec, builds on compositor specs |
-| `2026-XX-XX-elite-studio-edit-product-spec.md` | Phase 3 |
-| `2026-XX-XX-elite-studio-3d-product-spec.md` | Phase 4 |
-| `2026-XX-XX-elite-studio-tryon-product-spec.md` | Phase 5 |
-| `2026-XX-XX-elite-studio-lookbook-product-spec.md` | Phase 6 |
-| `2026-XX-XX-elite-studio-reels-product-spec.md` | Phase 7 |
+| Sub-spec | Drives | Phase A step |
+|----------|--------|--------------|
+| (already landed) `2026-05-27-mockup-stage-d-and-cost-ceiling-design.md` | Stage D rasterize + IC-Light cost gate | A0 |
+| (already landed) `2026-05-27-compositor-production-hardening-design.md` | Preflight + stage cache + LRU + async queue + backoff | A0 |
+| `2026-XX-XX-skyyrose-mockup-registration-spec.md` | The per-SKU verified-mockup library that A1 depends on. Defines mockup file format, storage layout, registration process, QA gate. | A1 |
+| `2026-XX-XX-skyyrose-catalog-imagery-spec.md` | Running mockup-first composites for all 33 SkyyRose SKUs end-to-end. Defines the run harness, the audit log per SKU, the human-review gate before publish. | A1 |
+| `2026-XX-XX-elite-studio-audit-internal-spec.md` | vision_audit + quality + safety on each SKU output. Defines scoring rubric, threshold gates, audit trail. | A2 |
+| `2026-XX-XX-elite-studio-lookbook-internal-spec.md` | Lookbook generation for the 4 SkyyRose collections. Defines template + brand-canon constraint set + page layout. | A3 |
+| `2026-XX-XX-elite-studio-tryon-internal-spec.md` | Try-on for the 8–10 hero SKUs. FASHN integration hardening, pose library, output gating. | A4 |
+| `2026-XX-XX-elite-studio-3d-internal-spec.md` | 3D for hero SKUs. Self-hosted TRELLIS/Hunyuan3D on the existing HF Space + Tripo fallback. AR/360° viewer integration with WP theme. | A5 |
+| `2026-XX-XX-elite-team-metering-internal-spec.md` | Consolidated per-SKU cost telemetry across all agents. Defines the schema, retention, dashboard. | A6 |
 
-Ten sub-specs. Each will run its own brainstorm → writing-plans cycle. This strategic spec is the parent.
+**Eight Phase A sub-specs.** Each runs its own brainstorm → writing-plans cycle. Together they get the SkyyRose catalog shipping from Elite Team.
 
-## 10. Risks
+**Phase B sub-specs (deferred — listed for traceability, NOT to be authored yet):**
+
+| Future sub-spec | Drives |
+|-----------------|--------|
+| `elite-team-public-api-spec.md` | Customer-facing REST/GraphQL gateway |
+| `elite-team-multi-tenancy-spec.md` | Tenant isolation audit of `billing/entitlements.py` |
+| `elite-team-web-shell-spec.md` | Customer-facing web app (separate from admin dashboard) |
+| `elite-team-pricing-spec.md` | Public pricing tiers (deferred until Phase A measurement is in) |
+| `elite-team-soc2-readiness-spec.md` | SOC 2 Type 2 evidence collection |
+
+These are NOT authored now. They are listed so future-Corey-and-Claude do not forget the path exists.
+
+## 10. Risks — Phase A only
 
 | Risk | Probability | Mitigation |
 |------|-------------|------------|
-| Self-hosted 3D quality lags Tripo at first | High | Phase 4. Keep Tripo as fallback engine via existing `tripo_agent`. Quality benchmark gate. |
-| Multi-tenant billing audit reveals refactor cost > expected | Medium | Audit `billing/entitlements.py` before Phase 1 sells anything publicly. |
-| SOC 2 Type 2 takes longer than estimated | High | Start vendor selection and evidence collection in Phase 1, not Phase 7. PhotoRoom Enterprise is gated on this — we will be too. |
-| Customer expects ComfyUI-shape power-user surface | Medium | Defer. Ship the higher-floor agent surface first; add a "build-your-own-agent" power surface if revenue justifies. |
-| Tripo, PhotoRoom, or Comfy launches a fashion vertical first | Low–Medium | Watch their pricing pages monthly. Move Phase 2 forward if a competitor announces fashion. |
-| Credit pricing wrong — under or over | Medium | Phase 0 instrument cost-per-call telemetry (already in `infra._gate_budget`). Reprice after first 100 paying customers. |
+| Mockup-first rasterize misses fidelity on textured fabrics (raised embroidery, sequins, mesh) | Medium | A1's per-SKU human-review gate catches this. SKUs that fail review fall back to the kontext FLUX path per the Stage D spec's flag default. |
+| Per-SKU mockup library is laborious to populate (33 SKUs × verified mockups) | High | A1 sub-spec defines the registration process. May require external photoshoot or vendor work — flag in that sub-spec, not here. |
+| IC-Light Replicate quality drifts on dark fabric / heavy print SKUs (Black Rose collection especially) | Medium | A2's vision_audit gate scores per-SKU. Drift cases route to libcom local fallback (per Stage C's existing fallback chain). |
+| Self-hosted 3D quality lags Tripo at first | High | A5 keeps Tripo as fallback engine via existing `tripo_agent`. Quality benchmark gate before disabling Tripo. |
+| Metering data is incomplete — gaps in per-agent cost reporting | Medium | A6 audits every agent for metering coverage. Phase A0's preflight pattern can be extended to assert metering is wired before run. |
+| Phase B drift — feature creep toward SaaS productization before Phase A outcome is proven | High | This spec is the gate. Phase B sub-specs do not run until Phase A delivers measured outcomes for ≥6 months. Founder must say "go" to start any Phase B work. |
 
 ## 11. Verification trail
 
@@ -278,19 +291,21 @@ Any claim not in the table above is a strategic recommendation derived from the 
 
 It does not:
 
-- Specify implementation. That happens in the ten sub-specs in §9.
-- Commit to specific prices. The Pricing in §7 is a proposal anchored to verified competitor data; reprice after measurement.
-- Promise SOC 2 certification timing. That is a multi-quarter process gated on vendor selection.
-- Make decisions about marketing, brand voice, or sales motion. That is a separate workstream.
+- Specify implementation. That happens in the eight Phase A sub-specs in §9.
+- Commit to any public pricing. Public pricing is a Phase B decision gated on Phase A measurement.
+- Commit to SaaS launch. Phase B is deferred and conditional on Phase A outcomes.
+- Promise SOC 2, multi-tenancy, marketing, sales motion, or web shell. All Phase B.
+- Decide vendor selection for self-hosted 3D compute. That is the A5 sub-spec.
 
 It does:
 
-- Lock the vision ("Adobe Creative Cloud of fashion imagery").
-- Lock the seven-product taxonomy.
-- Lock the differentiator thesis (agents > nodes; garment-aware composition; one wallet).
-- Lock the build sequence (Phase 0 → Phase 7).
-- Identify the sub-specs that must each run their own brainstorm cycle.
+- Lock the dual-phase framing: Phase A (internal SkyyRose outcomes) before Phase B (SaaS productization).
+- Lock the seven-product taxonomy as the target architecture (even though Phase A only operates four of them internally: Compose, Audit, Lookbook, Try-On + the start of 3D).
+- Lock the differentiator thesis (agents > nodes; garment-aware composition; one credit wallet).
+- Lock the Phase A build sequence (A0 → A6) driven by SkyyRose catalog needs.
+- Identify the eight Phase A sub-specs that each run their own brainstorm cycle.
+- Make the Phase B option visible without committing to it.
 
 ---
 
-*End of strategic spec. Next implementation spec to author: `elite-team-public-api-spec.md` (the cross-cutting layer that every product depends on), or `elite-studio-audit-product-spec.md` (the first product to ship). Compositor companion specs continue in parallel as Phase 0.*
+*End of strategic spec. Next sub-spec to author: `skyyrose-mockup-registration-spec.md` (the per-SKU verified-mockup library that A1 depends on) — without it, the deterministic Stage D path has nothing to rasterize. Compositor companion specs (A0) continue in parallel via the paused writing-plans flow.*
