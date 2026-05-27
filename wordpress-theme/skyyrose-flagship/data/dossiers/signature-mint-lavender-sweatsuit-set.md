@@ -22,7 +22,10 @@ Authoring rules (from _template.md):
 
 # Mint & Lavender Sweatsuit Set
 
-**Garment type lock:** Two-piece sweatsuit (hoodie + sweatpants). NOT a windbreaker (heavier fabric). Mint top, lavender accents. Components also available individually as sg-006 (hoodie) and sg-014 (sweatpants).
+**Garment type lock:** Two-piece sweatsuit (hoodie + sweatpants), sold as a single
+standalone SKU. NOT a windbreaker (heavier fabric). NOT a bundle of sg-006 hoodie +
+sg-014 sweatpants — this is a distinct product. The Mint & Lavender color palette is
+the only shared trait with other Mint & Lavender catalog items (sg-006, sg-013, sg-014).
 
 ## Branding — exactly what IS on this product
 
@@ -53,4 +56,6 @@ Authoring rules (from _template.md):
 
 ## Notes
 
-Confirm: is the set a third SKU, or just a marketing bundle of sg-006 + sg-014?
+Founder confirmed 2026-05-26: standalone two-piece set SKU. **NOT** a bundle of
+sg-006 hoodie + sg-014 sweatpants — the only relation to other Mint & Lavender
+catalog items is the shared color palette. Sold separately. Distinct product.
