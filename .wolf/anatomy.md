@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-25T23:59:28.241Z
-> Files: 2822 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-27T05:34:43.212Z
+> Files: 2845 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -9,7 +9,7 @@
 - `.dockerignore` — Docker ignore rules (~122 tok)
 - `.eslintrc.cjs` — ESLint configuration (~954 tok)
 - `.gitattributes` — Git attributes (~70 tok)
-- `.gitignore` — Git ignore rules (~2094 tok)
+- `.gitignore` — Git ignore rules (~2119 tok)
 - `.gitignore.pre-optimize-20260424-190053` — /*.min.js (~1580 tok)
 - `.impeccable.md` — Design Context (~487 tok)
 - `.markdownlint.json` (~57 tok)
@@ -39,8 +39,10 @@
 - `G1-BUNDLE.md` — G1 STOP — Phase 0 Review Bundle (~2329 tok)
 - `HANDOFF.md` — Session Handoff — 2026-04-16 (~1575 tok)
 - `init.sql` — DevSkyy Database Initialization (~1088 tok)
+- `INITIAL_EXAMPLE.md` — FEATURE: (~324 tok)
+- `INITIAL.md` — FEATURE: (~117 tok)
 - `lint-staged.config.mjs` — Declares relPaths (~346 tok)
-- `main_enterprise.py` — API: GET (2 endpoints) (~4080 tok)
+- `main_enterprise.py` — API router (~4370 tok)
 - `Makefile` — Make build targets (~2970 tok)
 - `mypy.ini` — Declares of (~475 tok)
 - `nginx-app.devskyy.app.conf` — Nginx configuration for app.devskyy.app (self-hosted alternative) (~1497 tok)
@@ -48,7 +50,7 @@
 - `package.json` — Node.js package manifest (~3008 tok)
 - `pre-build-check.sh` — DevSkyy Pre-Build Verification (~2307 tok)
 - `prometheus.yml` — DevSkyy - Prometheus Configuration (~790 tok)
-- `pyproject.toml` — Python project configuration (~4148 tok)
+- `pyproject.toml` — Python project configuration (~4212 tok)
 - `pyrightconfig.json` (~332 tok)
 - `README.md` — Project documentation (~1442 tok)
 - `requirements-dev.txt` — Development Dependencies (~85 tok)
@@ -123,6 +125,19 @@
 - `session-end.sh` — Stop Hook (Session End) - Persist learnings when session ends (~409 tok)
 - `session-start.sh` — SessionStart Hook - Load previous context on new session (~492 tok)
 
+## .claude/hooks/router/
+
+- `CLAUDE.md` (~11 tok)
+- `README.md` — Project documentation (~936 tok)
+- `router.py` — DevSkyy task-aware resource router. (~1040 tok)
+- `triggers.json` (~1220 tok)
+
+## .claude/hooks/router/helpers/
+
+- `backup-settings.sh` — Timestamped backup of both global and project Claude Code settings. (~121 tok)
+- `CLAUDE.md` (~11 tok)
+- `enable-pack.sh` — Flip a Claude Code plugin's enabled state in ~/.claude/settings.json. (~601 tok)
+
 ## .claude/hooks/strategic-compact/
 
 - `suggest-compact.sh` — Strategic Compact Suggester (~467 tok)
@@ -181,6 +196,15 @@
 - `README.md` — Project documentation (~1690 tok)
 - `rules.tsv` — ZAP Scan Rule Configuration for DevSkyy Platform (~1002 tok)
 - `test-dast-local.sh` — Local DAST Testing Script for DevSkyy (~1740 tok)
+
+## PRPs/
+
+- `.gitkeep` (~0 tok)
+
+## PRPs/templates/
+
+- `CLAUDE.md` (~11 tok)
+- `prp_base.md` — Purpose (~1518 tok)
 
 ## agents/
 
@@ -587,7 +611,7 @@
 ## agents/render_pipeline/learning/
 
 - `__init__.py` — Continuous-improvement subsystem for the RenderPipeline agent. (~714 tok)
-- `CLAUDE.md` — agents/render_pipeline/learning/ — Three adaptive learning loops (~1143 tok)
+- `CLAUDE.md` — agents/render_pipeline/learning/ — Three adaptive learning loops (~1132 tok)
 - `LOOP.md` — Learning Loop (~1242 tok)
 - `proposals.py` — Propose catalog amendments from the learning loops' history. (~1693 tok)
 - `recorder.py` — Append-only structured recorders for the three learning loops. (~857 tok)
@@ -604,8 +628,8 @@
 - `_paths.py` — Shared sys.path setup for tool modules. (~261 tok)
 - `articulate_layer0.py` — Tool 4a (NEW): Sonnet 4.6 articulates Layer 0 rendering directives. (~3002 tok)
 - `build_prompt.py` — Tool 4: Compose Layer 0 + Layer 3 + Layer 2 final prompt. (~1011 tok)
-- `CLAUDE.md` — agents/render_pipeline/tools/ — ADK FunctionTool implementations (9 modules) (~1500 tok)
-- `generate_image.py` — Tool 5: Generate image via routed engine. PAID API CALL. (~3507 tok)
+- `CLAUDE.md` — agents/render_pipeline/tools/ — ADK FunctionTool implementations (9 modules) (~1489 tok)
+- `generate_image.py` — Tool 5: Generate image via routed engine. PAID API CALL. (~2947 tok)
 - `load_dossier.py` — Tool 1: Load the canonical dossier for a SKU. (~693 tok)
 - `qa_tournament.py` — Tool 6: 3-judge QA tournament + learning-loop recorder. PAID API CALLS. (~1794 tok)
 - `refine_image.py` — Tool 7: Refine the candidate using synthesis-aware corrections. PAID API CALL. (~1639 tok)
@@ -1282,7 +1306,7 @@
 - `ARCHITECTURE.md` — Architecture Reference (~4383 tok)
 - `ASSET_EXTRACTION_REPORT.md` — SkyyRose Asset Extraction & Organization Report (~3814 tok)
 - `CATALOG_SYNC.md` — Catalog Consistency & Auto-Sync (~1473 tok)
-- `CLAUDE.md` (~11 tok)
+- `CLAUDE.md` — DevSkyy docs/ — Canonical Index for AI Agents (~905 tok)
 - `CLOTHING_3D_PIPELINE.md` — Clothing 3D Pipeline (~2696 tok)
 - `CLOTHING_3D_PRODUCTION.md` — Clothing 3D — Production Deployment Guide (~2484 tok)
 - `COLAB_TRAINING_GUIDE.md` — ✅ Google Colab LoRA Training Guide (FREE) (~1014 tok)
@@ -1351,7 +1375,7 @@
 - `SETUP_INSTRUCTIONS.md` — DevSkyy - Production Environment Setup Instructions (~1172 tok)
 - `SKIPPED_TESTS_ANALYSIS.md` — Skipped Tests Analysis (~1434 tok)
 - `SKYYROSE_V2_MASTER_PLAN.md` — SKYYROSE V2 — MASTER EXECUTION PLAN (~10309 tok)
-- `SKYYROSE_WORDPRESS_PLAN.md` — SKYYROSE WORDPRESS PLAN — skyyrose.co (~14334 tok)
+- `SKYYROSE_WORDPRESS_PLAN.md` — SKYYROSE WORDPRESS PLAN — skyyrose.co (~14418 tok)
 - `SQLALCHEMY_ORM_IMPLEMENTATION.md` — SQLAlchemy ORM Models and Alembic Integration (~3509 tok)
 - `TEST_SUITE_ANALYSIS.md` — DevSkyy Test Suite Analysis (~3225 tok)
 - `TODOS.md` — TODOS (~2424 tok)
@@ -1406,21 +1430,28 @@
 - `README.md` — Project documentation (~1993 tok)
 - `SYSTEM_ARCHITECTURE.md` — DevSkyy System Architecture (~3118 tok)
 
+## docs/audits/
+
+- `pretest-failures-2026-05-26.md` — Pre-Existing Test Failures — 2026-05-26 Audit (~1487 tok)
+
 ## docs/brand/
 
 - `asset-hierarchy.md` — SkyyRose Brand Asset Hierarchy (~2105 tok)
 - `canon-audit-2026-05-23.md` — SkyyRose Canon Audit — 2026-05-23 (~5363 tok)
 - `CLAUDE.md` — Recent Activity (~66 tok)
-- `collection-design-proposals.md` — SkyyRose Collection Design Proposals (~8199 tok)
-- `collection-stories.md` — SkyyRose Collection Stories (~4374 tok)
+- `collection-design-proposals.md` — SkyyRose Collection Design Proposals (~8216 tok)
+- `collection-stories.md` — SkyyRose Collection Stories (~4426 tok)
 - `collection-ux-architecture.md` — SkyyRose Collection UX Architecture — Proposal (~3463 tok)
 - `corey-questions.md` — Two Questions for Corey (~996 tok)
 - `visual-audit-2026-05-23.md` — SkyyRose.co Visual Audit — 2026-05-23 (~3860 tok)
+- `visual-references.md` — SkyyRose Visual Reference Set — Canonical (~1130 tok)
 
 ## docs/brand/design-mockups/
 
 - `CLAUDE.md` (~11 tok)
-- `collection-designs.html` — SkyyRose — Collection Design Mockups (2026-05-24) (~10996 tok)
+- `collection-designs.html` — SkyyRose — Collection Design Mockups (2026-05-24) (~11153 tok)
+- `README.md` — Project documentation (~418 tok)
+- `v2.html` — SkyyRose — v2 Design Reference (~9114 tok)
 
 ## docs/database/
 
@@ -1586,10 +1617,12 @@
 
 - `2026-04-20-ghost-mannequin-pipeline.md` — Ghost-Mannequin Imagery Pipeline (Phase B2) Implementation Plan (~16427 tok)
 - `2026-04-29-bugfix-gltfloader-brand-colors-renders.md` — Post-Image-Taste Bugfix Sprint Implementation Plan (~3805 tok)
+- `2026-05-25-v2-mockup-design.md` — SkyyRose v2 Mockup Implementation Plan (~12781 tok)
 
 ## docs/superpowers/specs/
 
 - `2026-05-25-footer-logo-swap.md` — Footer Logo Swap to Brand-Primary Monogram (~1323 tok)
+- `2026-05-25-v2-mockup-design.md` — SkyyRose v2 Mockup — Visual Direction Lock (~4332 tok)
 
 ## docs/testing/
 
@@ -2283,13 +2316,13 @@
 ## knowledge-base/
 
 - `CLAUDE.md` (~11 tok)
-- `README.md` — Project documentation (~2499 tok)
+- `README.md` — Project documentation (~2572 tok)
 
 ## knowledge-base/decisions/
 
 - `0001-v2-locked-decisions.md` — V2 Locked Decisions — Page-Level and Architectural (~1783 tok)
 - `0002-cost-cap-hybrid-policy.md` — Cost-Cap Hybrid Policy (~1762 tok)
-- `0003-imagery-as-launch-blocker.md` — ADR 0003 — Imagery as Launch Blocker (~1558 tok)
+- `0003-imagery-as-launch-blocker.md` — ADR 0003 — Imagery as Launch Blocker (~1615 tok)
 
 ## knowledge-base/lessons/
 
@@ -2320,7 +2353,7 @@
 - `CLAUDE.md` (~11 tok)
 - `from-claude-mem.md` — Seed Index: claude-mem Observations (`~/.claude-mem/claude-mem.db`) (~2991 tok)
 - `from-gsd.md` — Seed Index: GSD Artifacts (`.planning/`) (~2520 tok)
-- `from-interview.md` — Interview Capture — Corey, 2026-05-03 (~2665 tok)
+- `from-interview.md` — Interview Capture — Corey, 2026-05-03 (~3014 tok)
 - `from-openwolf.md` — Seed Index: OpenWolf System (`.wolf/`) (~2328 tok)
 - `from-serena.md` — Seed Index: Serena Memories (`.serena/memories/`) (~2633 tok)
 - `press-features.md` — Press Features — SkyyRose Collection (~2252 tok)
@@ -2469,13 +2502,13 @@
 - `docs_context.py` — Lazy RAG context provider for the devskyy_docs vector collection. (~826 tok)
 - `document_ingestion.py` — ", "**/.git/**"] (~4999 tok)
 - `domain_router.py` — URL patterns: 1 routes (~3666 tok)
-- `embedding_engine.py` — View: get, put (~7107 tok)
+- `embedding_engine.py` — View: get, put (~7170 tok)
 - `enterprise_index.py` — Pydantic: EnterpriseIndexConfig (39 fields) (~6929 tok)
 - `feedback_tracker.py` — class: record (~1584 tok)
 - `huggingface_3d_client.py` — Pydantic: HF3DResult (66 fields) (~12549 tok)
 - `huggingface_asset_enhancer.py` — Pydantic: BrandValidationResult (29 fields) (~15334 tok)
 - `langgraph_integration.py` — Pydantic: WorkflowState (26 fields) (~1887 tok)
-- `llm_clients.py` — MessageRole: close, complete, stream, complete + 2 more (~8745 tok)
+- `llm_clients.py` — MessageRole: close, complete, stream, complete + 2 more (~8796 tok)
 - `llm_orchestrator.py` — TaskType: close, select_model (~6825 tok)
 - `llm_registry.py` — Declares import (~8009 tok)
 - `model_config.py` — get_model_id, get_all_model_ids, log_model_configuration, get_claude_sonnet + 3 more (~1958 tok)
@@ -3166,6 +3199,41 @@
 
 - `CLAUDE.md` (~11 tok)
 
+## skyyrose/cli_harnesses/vercel-config/agent-harness/
+
+- `README.md` — Project documentation (~1134 tok)
+- `setup.py` — Python package setup (~238 tok)
+- `VERCEL-CONFIG.md` — VERCEL-CONFIG.md — Gap Analysis & Architecture (~1408 tok)
+
+## skyyrose/cli_harnesses/vercel-config/agent-harness/cli_anything/vercel_config/
+
+- `__init__.py` — cli-anything Vercel Config harness. (~68 tok)
+- `CLAUDE.md` (~11 tok)
+- `vercel_config_cli.py` — cli-anything-vercel-config — CLI harness for Vercel project settings. (~9816 tok)
+
+## skyyrose/cli_harnesses/vercel-config/agent-harness/cli_anything/vercel_config/core/
+
+- `__init__.py` — Core dataclasses and diff engine for the vercel-config CLI harness. (~22 tok)
+- `domains.py` — Domain dataclass and diff helpers for Vercel custom domains. (~1313 tok)
+- `env_vars.py` — EnvVar dataclass and diff helpers for Vercel environment variables. (~2086 tok)
+- `manifest.py` — Manifest model for vercel-config — declarative project settings. (~3354 tok)
+- `project.py` — ProjectRef dataclass — lightweight identity for a Vercel project. (~1144 tok)
+- `session.py` — Session management for cli-anything-vercel-config. (~1973 tok)
+
+## skyyrose/cli_harnesses/vercel-config/agent-harness/cli_anything/vercel_config/tests/
+
+- `__init__.py` — Tests for the vercel-config CLI harness. (~14 tok)
+- `CLAUDE.md` (~11 tok)
+- `test_core.py` — Unit tests for cli-anything-vercel-config core modules. (~7265 tok)
+- `test_full_e2e.py` — End-to-end CLI tests for cli-anything-vercel-config. (~6043 tok)
+- `TEST.md` — TEST.md — cli-anything-vercel-config Test Plan (~897 tok)
+
+## skyyrose/cli_harnesses/vercel-config/agent-harness/cli_anything/vercel_config/utils/
+
+- `__init__.py` — Utilities for the vercel-config CLI harness. (~15 tok)
+- `repl_skin.py` — cli-anything REPL Skin — Unified terminal interface for all CLI harnesses. (~5846 tok)
+- `vercel_backend.py` — Vercel REST API backend client. (~4535 tok)
+
 ## skyyrose/collections/
 
 - `black-rose.html` — BLACK ROSE Collection | SkyyRose Luxury Fashion (~4447 tok)
@@ -3197,20 +3265,21 @@
 
 - `__init__.py` (~690 tok)
 - `__main__.py` — Allow running as: python -m skyyrose.elite_studio (~25 tok)
+- `_observability.py` — Langfuse observability helper for Elite Studio LangGraph pipelines. (~259 tok)
 - `brand.py` — Brand — Single source of truth loader for SkyyRose brand identity. (~1564 tok)
 - `budget.py` — Elite Studio run budget. (~916 tok)
 - `catalog.py` — Catalog — Single source of truth loader for SkyyRose product data. (~5947 tok)
 - `CLAUDE.md` (~11 tok)
 - `cli.py` — build_team, cmd_produce, cmd_batch, cmd_status + 9 more (~5209 tok)
 - `config.py` — get_openai_client, get_anthropic_client, validate_catalog_readers, validate_dossier_readers (~5836 tok)
-- `coordinator.py` — Logger: info, step, ok, fail + 16 more (~4237 tok)
+- `coordinator.py` — Logger: info, step, ok, fail + 13 more (~3208 tok)
 - `fidelity.py` — class: to_dict, check_color, check_text, check_clip_similarity + 1 more (~3254 tok)
 - `forensics.py` — Forensic manifest writer + interactive confirmation gate. (~1715 tok)
-- `gemini_rest.py` — generate_text, analyze_vision, generate_image (~2736 tok)
+- `gemini_rest.py` — generate_text, analyze_vision, generate_image (~1920 tok)
 - `logo_registry.py` — Logo Registry — Canonical loader for SkyyRose logo metadata + path resolution. (~1848 tok)
 - `master_registry.py` — View: get (~3012 tok)
 - `models.py` — ProductData: from_override, provider_count (~1864 tok)
-- `retry.py` — is_transient_error, retry_on_transient (~951 tok)
+- `retry.py` — is_transient_error, retry_on_transient (~521 tok)
 - `sku_resolver.py` — from: sanitize_sku, resolve_sku, verify_tripo_region (~2695 tok)
 - `telemetry.py` — URL configuration (~1651 tok)
 - `upload.py` — Phase 18 — Batch WooCommerce upload of approved ghost-mannequin images. (~8315 tok)
@@ -3222,8 +3291,8 @@
 - `__init__.py` — skyyrose.elite_studio.agents — dual-agent imagery pipeline (Phase B2 rebuild pending). (~412 tok)
 - `CLAUDE.md` (~11 tok)
 - `color_correction_agent.py` — ColorCorrectionAgent: correct (~624 tok)
-- `compositor_agent.py` — CompositorAgent — public entry point (thin re-export shim). (~906 tok)
-- `generator_agent.py` — GeneratorAgent: initialize, generate (~2078 tok)
+- `compositor_agent.py` — CompositorAgent — public entry point (thin re-export shim). (~1282 tok)
+- `generator_agent.py` — GeneratorAgent: initialize, generate (~1609 tok)
 - `prompt_enrichment_agent.py` — Rule-based prompt enrichment for SkyyRose Elite Studio imagery pipeline. (~1548 tok)
 - `quality_agent.py` — of: verify (~2956 tok)
 - `safety_agent.py` — OpenAI moderation + GPT-4o image safety gate for Elite Studio pipeline. (~982 tok)
@@ -3272,7 +3341,7 @@
 - `edges.py` — route_intent, after_render, after_any (~694 tok)
 - `nodes.py` — entry_node, product_render_node, three_d_model_node, social_pack_node + 1 more (~7417 tok)
 - `router.py` — build_creative_graph, get_creative_graph, get_creative_graph_async (~1653 tok)
-- `runner.py` — run_creative, arun_creative, resume_creative (~1130 tok)
+- `runner.py` — run_creative, arun_creative, resume_creative (~1193 tok)
 - `state.py` — CreativeIntent: create_initial_state (~834 tok)
 
 ## skyyrose/elite_studio/fashion/
@@ -3306,7 +3375,7 @@
 - `builder.py` — GraphConfig: build_graph (~3496 tok)
 - `CLAUDE.md` (~11 tok)
 - `edges.py` — after_vision, after_generation, after_quality, after_quality_v2 + 5 more (~1467 tok)
-- `runner.py` — run_single, run_batch (~1275 tok)
+- `runner.py` — run_single, run_batch (~1295 tok)
 - `state.py` — EliteStudioState: create_initial_state, extract_production_result (~1787 tok)
 
 ## skyyrose/elite_studio/graph/nodes/
@@ -3337,7 +3406,7 @@
 - `CLAUDE.md` (~11 tok)
 - `clip_alignment.py` — CLIP text-to-image alignment scoring. (~382 tok)
 - `embedding_gate.py` — Pre-QA embedding gate: cosine similarity vs brand centroid. (~500 tok)
-- `human_review.py` — from: submit_for_review, get_decision (~2968 tok)
+- `human_review.py` — logger: submit_for_review, get_decision (~1822 tok)
 - `load_tester.py` — logger: run (~2370 tok)
 - `ml_classifier.py` — from: predict (~1480 tok)
 - `prompt_simplifier.py` — Prompt simplification for CLIP alignment scoring (advisory utility). (~1492 tok)
@@ -3469,7 +3538,7 @@
 - `CLAUDE.md` (~11 tok)
 - `cli.py` — CLI for the Editorial Photography venture. (~758 tok)
 - `config.py` — Configuration for the Editorial Photography venture. (~253 tok)
-- `pipeline.py` — Editorial Photography venture pipeline. (~1080 tok)
+- `pipeline.py` — Editorial Photography venture pipeline. (~1103 tok)
 - `README.md` — Project documentation (~387 tok)
 - `state.py` — Pipeline state for the Editorial Photography venture. (~147 tok)
 
@@ -3486,7 +3555,7 @@
 - `CLAUDE.md` (~11 tok)
 - `cli.py` — CLI for the 3D / Immersive venture. (~755 tok)
 - `config.py` — Configuration for the 3D / Immersive venture. (~254 tok)
-- `pipeline.py` — 3D / Immersive venture pipeline. (~1030 tok)
+- `pipeline.py` — 3D / Immersive venture pipeline. (~1053 tok)
 - `README.md` — Project documentation (~387 tok)
 - `state.py` — Pipeline state for the 3D / Immersive venture. (~124 tok)
 
@@ -3503,7 +3572,7 @@
 - `CLAUDE.md` (~11 tok)
 - `cli.py` — CLI for the Video & Animation venture. (~756 tok)
 - `config.py` — Configuration for the Video & Animation venture. (~286 tok)
-- `pipeline.py` — Video & Animation venture pipeline. (~1068 tok)
+- `pipeline.py` — Video & Animation venture pipeline. (~1091 tok)
 - `README.md` — Project documentation (~324 tok)
 - `state.py` — Pipeline state for the Video & Animation venture. (~121 tok)
 
@@ -3758,7 +3827,7 @@
 - `test_auth_endpoints.py` — Integration tests for auth API endpoints via ASGI client. (~1976 tok)
 - `test_auth_flow.py` — Tests for JWT/OAuth2 authentication flow. (~3328 tok)
 - `test_brand_context_catalog.py` — Phase 2 tests for collection-aware brand context injection. (~2089 tok)
-- `test_catalog_csv_integrity.py` — Integrity smoke tests for the canonical product catalog CSV. (~2389 tok)
+- `test_catalog_csv_integrity.py` — Integrity smoke tests for the canonical product catalog CSV. (~2409 tok)
 - `test_catalog_retriever.py` — Phase 4 tests for orchestration/catalog_retriever.py. (~1725 tok)
 - `test_catalog_sync.py` — Tests: default_config, custom_config, default_catalog_config, custom_catalog_config + 14 more (~4604 tok)
 - `test_character_system.py` — URL configuration (~4718 tok)
@@ -4001,7 +4070,7 @@
 
 - `__init__.py` (~0 tok)
 - `CLAUDE.md` (~11 tok)
-- `test_brand_centroid.py` — Tests for skyyrose.elite_studio.quality.brand_centroid. (~510 tok)
+- `test_brand_centroid.py` — Tests for skyyrose.elite_studio.quality.brand_centroid. (~573 tok)
 - `test_clip_alignment.py` — Tests for skyyrose.elite_studio.quality.clip_alignment. (~401 tok)
 - `test_clip_embedder.py` — Tests for skyyrose.core.clip_embedder. (~516 tok)
 - `test_compositor_gate_integration.py` — Integration test: compositor invokes embedding gate before Gemini QA. (~729 tok)
@@ -4161,13 +4230,6 @@
 - `test_image_ingestion.py` — Unit tests for ImageIngestionService. (~11333 tok)
 - `test_lighting_normalization.py` — Unit tests for LightingNormalizationService. (~3361 tok)
 - `test_pipeline_orchestrator.py` — Unit tests for PipelineOrchestrator. (~4842 tok)
-- `test_processing_queue.py` — Unit tests for ProcessingQueue. (~6951 tok)
-- `test_r2_client.py` — tests/services/test_r2_client.py (~5425 tok)
-- `test_replicate_client.py` — tests/services/test_replicate_client.py (~4006 tok)
-- `test_three_d_providers.py` — Comprehensive tests for 3D provider implementations. (~15493 tok)
-- `test_upscaling.py` — Unit tests for UpscalingService. (~4507 tok)
-- `test_version_manager.py` — Tests for AssetVersionManager service. (~5558 tok)
-- `test_watermark_service.py` — Unit tests for WatermarkService. (~3535 tok)
 
 ## tests/services/analytics/
 
@@ -4183,18 +4245,3 @@
 - `CLAUDE.md` (~11 tok)
 - `test_gemini_client.py` — Tests for Gemini client (Nano Banana Pro). (~3628 tok)
 - `test_ml_enhancement.py` — tests/services/ml/test_ml_enhancement.py (~20033 tok)
-- `test_ml_services.py` — tests/services/ml/test_ml_services.py (~16599 tok)
-- `test_visual_feature_extractor.py` — Tests for visual feature extraction service. (~3257 tok)
-
-## tests/services/three_d/
-
-- `__init__.py` — Tests for 3D provider abstraction layer. (~24 tok)
-- `test_gemini_provider.py` — Tests for Gemini Image Provider (Nano Banana Pro). (~3902 tok)
-- `test_provider_factory.py` — Tests for 3D provider factory. (~4161 tok)
-- `test_provider_interface.py` — Tests for 3D provider interface and models. (~1926 tok)
-
-## tests/sync/
-
-- `__init__.py` — Sync module tests. (~15 tok)
-- `test_sync_modules.py` — tests/sync/test_sync_modules.py (~16892 tok)
-- `test_wordpress_theme_sync.py` — Tests for WordPress Theme Synchronization. (~5074 tok)
