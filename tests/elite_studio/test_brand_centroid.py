@@ -10,6 +10,11 @@ from PIL import Image
 
 from skyyrose.elite_studio.quality import brand_centroid
 
+# CLIP cold-load exceeds the default 10s pytest-timeout. These tests
+# are correct but slow; opt out of the fast suite via the `slow` marker
+# (excluded by default in pyproject.toml addopts).
+pytestmark = pytest.mark.slow
+
 
 @pytest.fixture
 def approved_dir(tmp_path: Path) -> Path:

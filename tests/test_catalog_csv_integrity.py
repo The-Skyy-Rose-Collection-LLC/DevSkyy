@@ -1,7 +1,7 @@
 """Integrity smoke tests for the canonical product catalog CSV.
 
 Covers the schema, row count, and hard rules that must never regress:
-  - 30 active SKUs
+  - 32 active SKUs (post sg-d04 / sg-017 / sg-018 retirement + sg-001/005 consolidation)
   - No duplicate SKU codes
   - Every product has a name, collection, and price > 0
   - No retired SKU code appears as an active row
@@ -22,7 +22,7 @@ from skyyrose.core.catalog_loader import (
     status_from_row,
 )
 
-EXPECTED_SKU_COUNT = 33
+EXPECTED_SKU_COUNT = 32
 
 EXPECTED_COLUMNS = {
     "sku",
