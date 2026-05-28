@@ -51,6 +51,19 @@ ALLOWED_EXT = {".jpg", ".jpeg", ".png", ".webp"}
 ALLOWED_PIL_FORMATS = {"JPEG", "PNG", "WEBP"}
 PORT = 8765
 
+# Canonical golden angles the pipeline consumes. Mirrors
+# skyyrose.elite_studio.quality.visual_regression.CANONICAL_ANGLES plus the
+# single-shot 'reference' baseline used by the SSIM comparator.
+CANONICAL_ANGLES: tuple[str, ...] = (
+    "front",
+    "back",
+    "three-quarter",
+    "detail-1",
+    "detail-2",
+    "reference",
+)
+DEFAULT_ANGLE = "front"
+
 app = FastAPI(title="SkyyRose Golden Uploader", version="1.0.0")
 
 
@@ -88,27 +101,43 @@ def _load_catalog() -> list[dict[str, str]]:
     return out
 
 
-def _current_front_path(sku: str) -> Path | None:
-    """Return current front.jpg path for a SKU if present."""
+def _current_angle_path(sku: str, angle: str) -> Path | None:
+    """Return the on-disk path for a SKU's angle image if present."""
     try:
-        candidate = golden_path(sku)
+        candidate = golden_path(sku, angle)
     except ValueError:
         return None
     return candidate if candidate.is_file() else None
 
 
-def _safe_target_path(sku: str) -> Path:
-    """Validate SKU directory name and return the canonical front.jpg path.
+def _angles_present(sku: str) -> list[str]:
+    """Return the canonical angles that have an image on disk for this SKU."""
+    return [a for a in CANONICAL_ANGLES if _current_angle_path(sku, a) is not None]
+
+
+def _validate_angle(angle: str) -> str:
+    """Validate an angle against the canonical allowlist."""
+    if angle not in CANONICAL_ANGLES:
+        raise HTTPException(
+            400,
+            f"invalid angle {angle!r} (allowed: {', '.join(CANONICAL_ANGLES)})",
+        )
+    return angle
+
+
+def _safe_target_path(sku: str, angle: str) -> Path:
+    """Validate SKU + angle and return the canonical ``{angle}.jpg`` path.
 
     Defense-in-depth: ``golden_path()`` rejects traversal payloads (``..``,
     ``/``, ``\\``); the extra alphanumeric check below also rejects empty
-    strings and stray punctuation that would otherwise pass the helper's
-    coarser guard. Creates the per-SKU directory as a side effect.
+    strings and stray punctuation. ``angle`` is validated against the
+    canonical allowlist. Creates the per-SKU directory as a side effect.
     """
     if not sku or not sku.replace("-", "").isalnum():
         raise HTTPException(400, f"invalid sku id: {sku!r}")
+    _validate_angle(angle)
     try:
-        target = golden_path(sku)
+        target = golden_path(sku, angle)
     except ValueError as exc:
         raise HTTPException(400, f"invalid sku id: {sku!r}") from exc
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -158,13 +187,16 @@ def list_skus_with_catalog() -> JSONResponse:
     rows = []
     for entry in _load_catalog():
         sku = entry["sku"]
+        angles = _angles_present(sku)
         rows.append(
             {
                 "sku": sku,
                 "name": entry["name"],
                 "collection": entry["collection"],
                 "dossier_slug": entry["dossier_slug"],
-                "has_front": _current_front_path(sku) is not None,
+                "has_front": "front" in angles,
+                "angles": angles,
+                "all_angles": list(CANONICAL_ANGLES),
                 "has_dossier": (
                     (DOSSIER_ROOT / f"{entry['dossier_slug']}.md").is_file()
                     if entry["dossier_slug"]
@@ -187,12 +219,13 @@ def dossier(sku: str) -> Response:
     raise HTTPException(404, f"no dossier for {sku}")
 
 
-@app.get("/api/preview/{sku}")
-def preview(sku: str) -> Response:
-    """Return the current front.jpg for a SKU (or 404)."""
-    path = _current_front_path(sku)
+@app.get("/api/preview/{sku}/{angle}")
+def preview(sku: str, angle: str) -> Response:
+    """Return the current image for a SKU's angle (or 404)."""
+    _validate_angle(angle)
+    path = _current_angle_path(sku, angle)
     if path is None:
-        raise HTTPException(404, f"no front.jpg for {sku}")
+        raise HTTPException(404, f"no {angle}.jpg for {sku}")
     return Response(content=path.read_bytes(), media_type="image/jpeg")
 
 
@@ -200,12 +233,15 @@ def preview(sku: str) -> Response:
 async def upload(
     sku: str = Form(...),
     file: UploadFile = File(...),
+    angle: str = Form(DEFAULT_ANGLE),
 ) -> JSONResponse:
-    """Replace ``golden/{sku}/front.jpg`` with the uploaded image.
+    """Write the uploaded image to ``golden/{sku}/{angle}.jpg``.
 
-    The existing file is moved to ``front.jpg.bak.<unix-ts>`` so the prior
+    ``angle`` defaults to ``front`` and must be one of the canonical angles.
+    The existing file is moved to ``{angle}.jpg.bak.<unix-ts>`` so the prior
     state is recoverable. The upload is normalized to JPEG (quality 95).
     """
+    _validate_angle(angle)
     ext = Path(file.filename or "").suffix.lower()
     if ext and ext not in ALLOWED_EXT:
         raise HTTPException(415, f"unsupported file type: {ext} (allowed: {sorted(ALLOWED_EXT)})")
@@ -216,7 +252,7 @@ async def upload(
     if len(body) > 25 * 1024 * 1024:
         raise HTTPException(413, "file > 25 MB")
 
-    dest = _safe_target_path(sku)
+    dest = _safe_target_path(sku, angle)
     backup = _backup_existing(dest)
     try:
         width, height = _save_as_jpeg(body, dest)
@@ -229,6 +265,7 @@ async def upload(
         {
             "ok": True,
             "sku": sku,
+            "angle": angle,
             "dest": str(dest.relative_to(REPO_ROOT)),
             "backup": str(backup.relative_to(REPO_ROOT)) if backup else None,
             "size_bytes": dest.stat().st_size,
@@ -338,14 +375,36 @@ _INDEX_HTML = """<!doctype html>
   .status { margin-top: 8px; font-size: 11px; min-height: 14px; }
   .status.ok { color: var(--ok); }
   .status.bad { color: var(--bad); }
+  .angles {
+    margin-top: 10px; display: flex; gap: 4px; flex-wrap: wrap;
+  }
+  .angle-btn {
+    position: relative;
+    flex: 1 1 auto; min-width: 34px;
+    padding: 5px 4px; font: inherit; font-size: 10px;
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--muted); border-radius: 4px; cursor: pointer;
+    text-align: center; letter-spacing: 0.02em;
+    transition: border-color .12s, color .12s, background .12s;
+  }
+  .angle-btn:hover { border-color: var(--accent); color: var(--text); }
+  .angle-btn.active { border-color: var(--accent); color: #fff; background: #2a1a1e; }
+  /* coverage dot: filled = on disk, hollow = missing */
+  .angle-btn::after {
+    content: ""; display: block; width: 5px; height: 5px;
+    border-radius: 50%; margin: 3px auto 0;
+    border: 1px solid var(--muted); background: transparent;
+  }
+  .angle-btn.has::after { background: var(--ok); border-color: var(--ok); }
+  .angles-label { font-size: 10px; color: var(--muted); margin-top: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
 </style>
 </head>
 <body>
 <header>
   <h1>SkyyRose Golden Uploader</h1>
   <div class="subtitle">
-    Drop a replacement photo on any tile to overwrite that SKU's <code>front.jpg</code>.
-    Prior file is backed up to <code>front.jpg.bak.&lt;ts&gt;</code>.
+    Pick an angle, then drop a photo to write <code>golden/&lt;sku&gt;/&lt;angle&gt;.jpg</code>.
+    Filled dot = on disk. Prior file is backed up to <code>&lt;angle&gt;.jpg.bak.&lt;ts&gt;</code>.
   </div>
 </header>
 <main>
@@ -360,17 +419,26 @@ let currentFilter = 'all';
 
 const FILTERS = [
   { id: 'all',        label: 'All' },
-  { id: 'no-golden',  label: 'Missing golden' },
+  { id: 'no-golden',  label: 'Missing front' },
+  { id: 'incomplete', label: 'Incomplete angles' },
   { id: 'black-rose', label: 'Black Rose' },
   { id: 'love-hurts', label: 'Love Hurts' },
   { id: 'signature',  label: 'Signature' },
   { id: 'kids-capsule', label: 'Kids' },
 ];
 
+// Short labels for the angle picker buttons.
+const ANGLE_LABELS = {
+  'front': 'F', 'back': 'B', 'three-quarter': '¾',
+  'detail-1': 'D1', 'detail-2': 'D2', 'reference': 'Ref',
+};
+
 function applyFilter() {
   let rows = allRows;
   if (currentFilter === 'no-golden') {
     rows = rows.filter((r) => !r.has_front);
+  } else if (currentFilter === 'incomplete') {
+    rows = rows.filter((r) => (r.angles || []).length < (r.all_angles || []).length);
   } else if (currentFilter !== 'all') {
     rows = rows.filter((r) => r.collection === currentFilter);
   }
@@ -400,11 +468,22 @@ function renderTile(row) {
   const card = document.createElement('div');
   card.className = 'card';
 
+  // Per-tile selected angle + the live set of angles present on disk.
+  let selectedAngle = 'front';
+  const present = new Set(row.angles || []);
+
   const img = document.createElement('div');
-  img.className = 'card-img' + (row.has_front ? '' : ' empty');
-  if (row.has_front) {
-    img.style.backgroundImage = `url('/api/preview/${row.sku}?t=${Date.now()}')`;
-  }
+  const refreshPreview = () => {
+    if (present.has(selectedAngle)) {
+      img.classList.remove('empty');
+      img.style.backgroundImage =
+        `url('/api/preview/${row.sku}/${selectedAngle}?t=${Date.now()}')`;
+    } else {
+      img.classList.add('empty');
+      img.style.backgroundImage = '';
+    }
+  };
+  img.className = 'card-img';
   card.appendChild(img);
 
   const body = document.createElement('div');
@@ -419,15 +498,42 @@ function renderTile(row) {
   const dossierLabel = row.has_dossier
     ? `dossier: ${row.dossier_slug}`
     : 'no dossier';
+  const angleCount = (row.angles || []).length;
+  const totalAngles = (row.all_angles || []).length;
 
   body.innerHTML =
     `<div class="sku-row"><div class="sku">${row.sku}</div>${collBadge}</div>` +
     `<div class="name">${row.name}</div>` +
-    `<a class="dossier-link${dossierClass}" href="${dossierHref}" target="_blank" rel="noopener">${dossierLabel}</a>`;
+    `<a class="dossier-link${dossierClass}" href="${dossierHref}" target="_blank" rel="noopener">${dossierLabel}</a>` +
+    `<div class="angles-label">angles ${angleCount}/${totalAngles}</div>`;
+
+  // Angle picker — one button per canonical angle, dot shows coverage.
+  const angles = document.createElement('div');
+  angles.className = 'angles';
+  const angleButtons = {};
+  (row.all_angles || []).forEach((angle) => {
+    const btn = document.createElement('button');
+    btn.className = 'angle-btn'
+      + (angle === selectedAngle ? ' active' : '')
+      + (present.has(angle) ? ' has' : '');
+    btn.textContent = ANGLE_LABELS[angle] || angle;
+    btn.title = angle + (present.has(angle) ? ' (on disk)' : ' (missing)');
+    btn.onclick = () => {
+      selectedAngle = angle;
+      Object.values(angleButtons).forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      refreshPreview();
+      drop.textContent = `drop image or click → ${angle}`;
+      status.textContent = '';
+      status.className = 'status';
+    };
+    angleButtons[angle] = btn;
+    angles.appendChild(btn);
+  });
 
   const drop = document.createElement('label');
   drop.className = 'drop';
-  drop.textContent = 'drop image or click to upload';
+  drop.textContent = 'drop image or click → front';
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'image/*';
@@ -438,10 +544,11 @@ function renderTile(row) {
 
   const upload = async (file) => {
     if (!file) return;
-    status.textContent = 'uploading…';
+    status.textContent = `uploading ${selectedAngle}…`;
     status.className = 'status';
     const fd = new FormData();
     fd.append('sku', row.sku);
+    fd.append('angle', selectedAngle);
     fd.append('file', file);
     try {
       const resp = await fetch('/api/upload', { method: 'POST', body: fd });
@@ -451,10 +558,14 @@ function renderTile(row) {
         status.className = 'status bad';
         return;
       }
-      status.textContent = `saved (${data.dimensions[0]}×${data.dimensions[1]}, ${(data.size_bytes/1024).toFixed(0)}KB)`;
+      status.textContent =
+        `${data.angle} saved (${data.dimensions[0]}×${data.dimensions[1]}, ${(data.size_bytes/1024).toFixed(0)}KB)`;
       status.className = 'status ok';
-      img.classList.remove('empty');
-      img.style.backgroundImage = `url('/api/preview/${row.sku}?t=${Date.now()}')`;
+      present.add(selectedAngle);
+      if (angleButtons[selectedAngle]) angleButtons[selectedAngle].classList.add('has');
+      const lbl = body.querySelector('.angles-label');
+      if (lbl) lbl.textContent = `angles ${present.size}/${totalAngles}`;
+      refreshPreview();
     } catch (e) {
       status.textContent = 'network error';
       status.className = 'status bad';
@@ -477,10 +588,13 @@ function renderTile(row) {
   );
   drop.addEventListener('drop', (e) => upload(e.dataTransfer.files[0]));
 
+  body.appendChild(angles);
   body.appendChild(drop);
   body.appendChild(status);
   card.appendChild(body);
   grid.appendChild(card);
+
+  refreshPreview();
 }
 
 load();

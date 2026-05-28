@@ -253,9 +253,9 @@
   </tr>
   <tr>
     <td>5</td>
-    <td>Uploader UI writes <code>front.jpg</code> only — no angle picker</td>
-    <td>Cannot upload <code>back</code> / <code>three-quarter</code> / detail / reference angles through the current FastAPI surface.</td>
-    <td>Extend <code>scripts/golden_uploader.py</code>: add <code>angle</code> form field, route to <code>golden_path(sku, angle=&lt;...&gt;)</code>. The helper already supports it.</td>
+    <td style="text-decoration:line-through;">Uploader UI writes <code>front.jpg</code> only</td>
+    <td class="ok">RESOLVED — uploader now has a 6-angle picker (front/back/¾/detail-1/detail-2/reference) with per-angle coverage dots. POST takes an <code>angle</code> form field validated against the canonical allowlist; preview is <code>/api/preview/{sku}/{angle}</code>. Verified end-to-end.</td>
+    <td>Done. Any canonical angle is now uploadable through the same drag-drop UI.</td>
   </tr>
   <tr>
     <td>6</td>
@@ -321,9 +321,9 @@
 
 <ol>
   <li>
-    <strong>Extend uploader to accept angle.</strong> Add an <code>angle</code> form field on the FastAPI POST.
-    The path helper already takes <code>angle</code>; only the FastAPI route + HTML form need the new field.
-    Unblocks reference + back + three-quarter + detail uploads through the same UI.
+    <strong class="ok">DONE — Extend uploader to accept angle.</strong> The FastAPI POST now takes an
+    <code>angle</code> form field; the UI has a 6-angle picker with coverage dots. All canonical
+    angles (front/back/three-quarter/detail-1/detail-2/reference) upload through the same drag-drop tile.
   </li>
   <li>
     <strong>Populate the 7 missing <code>reference.jpg</code> baselines.</strong> Required for visual-regression SSIM scoring.
