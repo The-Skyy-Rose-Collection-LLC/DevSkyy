@@ -286,15 +286,22 @@ COLLECTIONS: dict[str, dict[str, Any]] = {
 def _load_catalog() -> dict[str, dict[str, str]]:
     catalog: dict[str, dict[str, str]] = {}
     csv_path = Path(__file__).resolve().parent.parent / "data" / "product-catalog.csv"
-    with csv_path.open(newline="", encoding="utf-8") as f:
-        for row in csv.DictReader(f):
-            sku = row["sku"].strip()
-            if not sku or row["render_variant_of"].strip():
-                continue
-            catalog[sku] = {
-                "name": row["name"].strip(),
-                "collection": row["collection_slug"].strip(),
-            }
+    try:
+        with csv_path.open(newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                sku = row["sku"].strip()
+                if not sku or row["render_variant_of"].strip():
+                    continue
+                catalog[sku] = {
+                    "name": row["name"].strip(),
+                    "collection": row["collection_slug"].strip(),
+                }
+    except FileNotFoundError:
+        logger.warning(
+            "PRODUCT_CATALOG empty — %s not generated. Run 'make sync-catalog' or "
+            "rely on external product data at skyyrose/assets/data/product-content.json.",
+            csv_path,
+        )
     return catalog
 
 

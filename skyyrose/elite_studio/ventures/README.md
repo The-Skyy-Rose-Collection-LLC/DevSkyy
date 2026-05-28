@@ -16,6 +16,14 @@ and orchestration engines.
 | `photo`   | Editorial Photography | beta  | `skyyrose/elite_studio/ventures/photo/` |
 | `threed`  | 3D / Immersive     | beta     | `skyyrose/elite_studio/ventures/threed/` |
 | `video`   | Video & Animation  | alpha    | `skyyrose/elite_studio/ventures/video/` |
+| `social`  | Social Media       | beta     | `skyyrose/elite_studio/ventures/social/` |
+
+The Social venture is the first **deep-wired** scaffold: its publisher node
+runs the real `SocialMediaAgent` live (free, template-based) on every pass,
+while the graphics (`CreativeAgent`) and strategy (`MarketingAgent`) nodes are
+wired but cost-gated behind `generate_graphics` / `run_strategy` state flags.
+Its operator-facing skills library lives at `.claude/skills/skyyrose-social-*`
+with `skyyrose-content-engine` as the index hub.
 
 The Imagery venture is the original Elite Studio pipeline. It is *not*
 duplicated under `ventures/imagery/` to avoid abstraction collision —

@@ -102,11 +102,18 @@ def _video_manifest() -> VentureManifest:
     return MANIFEST
 
 
+def _social_manifest() -> VentureManifest:
+    from .social import MANIFEST  # noqa: PLC0415
+
+    return MANIFEST
+
+
 _VENTURE_LOADERS: dict[str, object] = {
     "imagery": lambda: IMAGERY_MANIFEST,
     "photo": _photo_manifest,
     "threed": _threed_manifest,
     "video": _video_manifest,
+    "social": _social_manifest,
 }
 
 
