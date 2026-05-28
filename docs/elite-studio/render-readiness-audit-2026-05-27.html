@@ -29,6 +29,32 @@
   Every claim traces to a tool call from this session. No memory-only assertions.
 </p>
 
+<div class="toc" style="border-left-color:#cf222e;">
+  <strong>Investigation addendum (2026-05-27, post-audit)</strong>
+  <p>Two of the three originally-surfaced gaps were FALSE POSITIVES; one is real:</p>
+  <ul>
+    <li><strong class="ok">GAP 3 (sport-patch logos) — RESOLVED, was a scaffolder bug.</strong>
+      All 6 sport-patch files exist. They are <code>co_located_per_sku</code> logos
+      living at <code>products/&lt;sku-folder&gt;/&lt;filename&gt;</code>, not in
+      <code>images/logos/</code>. The scaffolder's <code>_find_logo_file</code> only
+      checked <code>images/logos/</code>; it now resolves co-located patches from the
+      product folders. Re-run added +8 patch symlinks. Zero logo gaps remain.</li>
+    <li><strong class="ok">GAP 2 (sku_folders) — FALSE POSITIVE, audit conflation.</strong>
+      Only the 8 SKUs that USE a co-located sport patch need a <code>sku_folders</code>
+      mapping, and all 8 HAVE it (br-003, br-008, br-009, br-010, br-011, br-012,
+      br-014, br-015). The other 24 SKUs are apparel without patches and do not need
+      a folder mapping. The "FOLDER GAP" verdict in section 2 below is WRONG for every
+      non-jersey SKU — disregard it.</li>
+    <li><strong class="gap">GAP 1 (techflats) — REAL.</strong>
+      18 SKUs have no techflat-front and 30 have no techflat-back in
+      <code>product-references/</code>. But techflats are a prompt-conditioning input,
+      not a hard render blocker — the golden <code>front.jpg</code> is the actual
+      rasterize source. Detail-accuracy gap, not a launch blocker. 18 missing front:
+      br-001, br-002, br-004, br-005, br-006, br-008, br-009, br-010, br-011, br-012,
+      lh-005, lh-006, sg-001, sg-003, sg-009, sg-011, sg-012, sg-014.</li>
+  </ul>
+</div>
+
 <div class="toc">
   <strong>Contents</strong>
   <ol>
@@ -203,9 +229,9 @@
   <tr><th>#</th><th>Blocker</th><th>Impact</th><th>Mitigation path</th></tr>
   <tr>
     <td>1</td>
-    <td>23 SKUs missing <code>sku_folders</code> entry in <code>logo-registry.json</code></td>
-    <td>Any per-SKU patch render raises <code>SkuFolderUnknownError</code>. Renders crash before composite.</td>
-    <td>Add 23 folder mappings to <code>wordpress-theme/skyyrose-flagship/data/logo-registry.json</code>. Each entry: <code>"sku": "&lt;slug&gt;"</code>.</td>
+    <td style="text-decoration:line-through;">23 SKUs missing <code>sku_folders</code> entry</td>
+    <td class="ok">RETRACTED — false positive (see addendum). All 8 SKUs that need a folder mapping have it. The other 24 don't use co-located patches and don't need one.</td>
+    <td>No action. <code>sku_folders</code> coverage is complete for every SKU that requires it.</td>
   </tr>
   <tr>
     <td>2</td>

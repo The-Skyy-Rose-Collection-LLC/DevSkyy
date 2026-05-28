@@ -51,6 +51,7 @@ from skyyrose.core.paths import (  # noqa: E402
     GOLDEN_DIR,
     THEME_ROOT,
     WP_LOGOS_DIR,
+    WP_PRODUCTS_DIR,
 )
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -132,14 +133,29 @@ def _find_real_back_source(sku: str) -> Path | None:
     return candidates[0] if candidates else None
 
 
-def _find_logo_file(logo_id: str, registry: dict) -> Path | None:
-    """Resolve a logo_id to a file under assets/images/logos/.
+def _find_logo_file(logo_id: str, registry: dict, sku: str) -> Path | None:
+    """Resolve a logo_id to a file on disk for a given SKU.
 
-    Prefers the registry's ``filename`` field; falls back to logo_id-derived
-    glob if missing.
+    Two resolution paths:
+    1. ``co_located_per_sku`` logos (sport patches) live at
+       ``products/<sku_folders[sku]>/<filename>`` — NOT in images/logos/.
+       These are SKU-specific, so the resolution needs the SKU's folder
+       mapping from the registry's ``sku_folders`` block.
+    2. Centralized logos live in ``assets/images/logos/`` keyed by
+       ``filename`` (or a logo_id glob fallback).
     """
     logo = (registry.get("logos") or {}).get(logo_id, {})
     filename = logo.get("filename") or logo.get("file") or ""
+
+    if logo.get("co_located_per_sku"):
+        folder = (registry.get("sku_folders") or {}).get(sku)
+        if folder and filename:
+            candidate = WP_PRODUCTS_DIR / folder / filename
+            if candidate.is_file():
+                return candidate
+        # Co-located logo with no folder mapping or missing file — unresolvable.
+        return None
+
     if filename:
         candidate = WP_LOGOS_DIR / filename
         if candidate.is_file():
@@ -275,7 +291,7 @@ def scaffold_sku(
         if not logo_id or logo_id in seen_logo_ids:
             continue
         seen_logo_ids.add(logo_id)
-        logo_file = _find_logo_file(logo_id, registry)
+        logo_file = _find_logo_file(logo_id, registry, sku)
         if not logo_file:
             result.missing.append(f"logo/{logo_id}")
             continue
