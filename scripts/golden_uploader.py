@@ -96,9 +96,41 @@ def _load_catalog() -> list[dict[str, str]]:
                     "name": (row.get("name") or "").strip(),
                     "collection": (row.get("collection") or "").strip(),
                     "dossier_slug": (row.get("dossier_slug") or "").strip(),
+                    "is_preorder": (row.get("is_preorder") or "0").strip(),
                 }
             )
     return out
+
+
+def _set_preorder(sku: str, value: bool) -> None:
+    """Flip the ``is_preorder`` column for one SKU in the canonical CSV.
+
+    Rewrites the whole CSV preserving column order and every other field —
+    only the target SKU's ``is_preorder`` cell changes. The catalog-drift
+    guard hook fires on this write and announces the canonical touch.
+    """
+    import csv
+
+    if not CATALOG_CSV.is_file():
+        raise HTTPException(500, "catalog CSV missing")
+    with CATALOG_CSV.open("r", encoding="utf-8", newline="") as fh:
+        reader = csv.DictReader(fh)
+        fieldnames = list(reader.fieldnames or [])
+        rows = list(reader)
+    if "is_preorder" not in fieldnames:
+        raise HTTPException(500, "is_preorder column not present in catalog")
+    found = False
+    for r in rows:
+        if (r.get("sku") or "").strip() == sku:
+            r["is_preorder"] = "1" if value else "0"
+            found = True
+            break
+    if not found:
+        raise HTTPException(404, f"sku not in catalog: {sku}")
+    with CATALOG_CSV.open("w", encoding="utf-8", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fieldnames, quoting=csv.QUOTE_MINIMAL)
+        writer.writeheader()
+        writer.writerows(rows)
 
 
 def _current_angle_path(sku: str, angle: str) -> Path | None:
@@ -197,6 +229,7 @@ def list_skus_with_catalog() -> JSONResponse:
                 "has_front": "front" in angles,
                 "angles": angles,
                 "all_angles": list(CANONICAL_ANGLES),
+                "is_preorder": entry["is_preorder"] == "1",
                 "has_dossier": (
                     (DOSSIER_ROOT / f"{entry['dossier_slug']}.md").is_file()
                     if entry["dossier_slug"]
@@ -205,6 +238,15 @@ def list_skus_with_catalog() -> JSONResponse:
             }
         )
     return JSONResponse(rows)
+
+
+@app.post("/api/preorder")
+def set_preorder(sku: str = Form(...), is_preorder: int = Form(...)) -> JSONResponse:
+    """Set the pre-order flag for a SKU in the canonical catalog CSV."""
+    if not sku or not sku.replace("-", "").isalnum():
+        raise HTTPException(400, f"invalid sku id: {sku!r}")
+    _set_preorder(sku, bool(is_preorder))
+    return JSONResponse({"ok": True, "sku": sku, "is_preorder": bool(is_preorder)})
 
 
 @app.get("/api/dossier/{sku}")
@@ -397,6 +439,13 @@ _INDEX_HTML = """<!doctype html>
   }
   .angle-btn.has::after { background: var(--ok); border-color: var(--ok); }
   .angles-label { font-size: 10px; color: var(--muted); margin-top: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .preorder {
+    display: flex; align-items: center; gap: 7px; margin-top: 10px;
+    font-size: 12px; color: var(--muted); cursor: pointer; user-select: none;
+  }
+  .preorder input { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; margin: 0; }
+  .preorder.on { color: var(--accent); }
+  .badge.preorder-badge { background: #2a2014; color: #e8c890; }
 </style>
 </head>
 <body>
@@ -421,6 +470,7 @@ const FILTERS = [
   { id: 'all',        label: 'All' },
   { id: 'no-golden',  label: 'Missing front' },
   { id: 'incomplete', label: 'Incomplete angles' },
+  { id: 'preorder',   label: 'Pre-order' },
   { id: 'black-rose', label: 'Black Rose' },
   { id: 'love-hurts', label: 'Love Hurts' },
   { id: 'signature',  label: 'Signature' },
@@ -439,6 +489,8 @@ function applyFilter() {
     rows = rows.filter((r) => !r.has_front);
   } else if (currentFilter === 'incomplete') {
     rows = rows.filter((r) => (r.angles || []).length < (r.all_angles || []).length);
+  } else if (currentFilter === 'preorder') {
+    rows = rows.filter((r) => r.is_preorder);
   } else if (currentFilter !== 'all') {
     rows = rows.filter((r) => r.collection === currentFilter);
   }
@@ -588,7 +640,42 @@ function renderTile(row) {
   );
   drop.addEventListener('drop', (e) => upload(e.dataTransfer.files[0]));
 
+  // Pre-order toggle — writes is_preorder back to the canonical catalog CSV.
+  const pre = document.createElement('label');
+  pre.className = 'preorder' + (row.is_preorder ? ' on' : '');
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.checked = !!row.is_preorder;
+  const preTxt = document.createElement('span');
+  preTxt.textContent = 'Pre-order';
+  pre.appendChild(cb);
+  pre.appendChild(preTxt);
+  cb.addEventListener('change', async () => {
+    const fd = new FormData();
+    fd.append('sku', row.sku);
+    fd.append('is_preorder', cb.checked ? '1' : '0');
+    try {
+      const resp = await fetch('/api/preorder', { method: 'POST', body: fd });
+      const data = await resp.json();
+      if (!resp.ok) {
+        cb.checked = !cb.checked;
+        status.textContent = data.detail || 'pre-order save failed';
+        status.className = 'status bad';
+        return;
+      }
+      row.is_preorder = cb.checked;
+      pre.classList.toggle('on', cb.checked);
+      status.textContent = cb.checked ? 'marked pre-order' : 'pre-order cleared';
+      status.className = 'status ok';
+    } catch (e) {
+      cb.checked = !cb.checked;
+      status.textContent = 'network error';
+      status.className = 'status bad';
+    }
+  });
+
   body.appendChild(angles);
+  body.appendChild(pre);
   body.appendChild(drop);
   body.appendChild(status);
   card.appendChild(body);
