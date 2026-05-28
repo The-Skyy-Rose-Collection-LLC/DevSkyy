@@ -431,3 +431,9 @@ tasks/render-pipeline-cli-*.json
 
 # L5 tidy hook log (per-machine, observe-mode proposals)
 .claude/tidy-log.jsonl
+
+# Golden-photo uploader backups (auto-created by scripts/golden_uploader.py)
+**/front.jpg.bak.*
+**/back.jpg.bak.*
+
+wordpress-theme/skyyrose-flagship/data/product-references/techflat-review.json

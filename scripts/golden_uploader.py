@@ -17,6 +17,7 @@ Stop with Ctrl-C. No external services; pure local FastAPI.
 from __future__ import annotations
 
 import logging
+import re
 import shutil
 import sys
 import time
@@ -40,6 +41,7 @@ from skyyrose.core.paths import (
 from skyyrose.core.paths import DOSSIERS_DIR as DOSSIER_ROOT  # noqa: E402
 from skyyrose.core.paths import GOLDEN_DIR as GOLDEN_ROOT
 from skyyrose.core.paths import (
+    THEME_ROOT,
     golden_path,
 )
 
@@ -50,6 +52,18 @@ REPO_ROOT = _REPO_ROOT
 ALLOWED_EXT = {".jpg", ".jpeg", ".png", ".webp"}
 ALLOWED_PIL_FORMATS = {"JPEG", "PNG", "WEBP"}
 PORT = 8765
+
+PRODUCT_REFERENCES_DIR = THEME_ROOT / "data" / "product-references"
+TECHFLAT_REVIEW_JSON = PRODUCT_REFERENCES_DIR / "techflat-review.json"
+# Layout codes the founder assigns per techflat in the review tab.
+TECHFLAT_LAYOUTS = {
+    "single": "Single garment, one view (front only — no split)",
+    "lr": "Front (left) + Back (right), side by side",
+    "tb": "Front (top) + Back (bottom), stacked",
+    "grid": "2x2 set grid (multiple garments x front/back)",
+    "wrong": "WRONG product / mislabeled — flag for re-upload",
+    "unset": "Not yet reviewed",
+}
 
 # Canonical golden angles the pipeline consumes. Mirrors
 # skyyrose.elite_studio.quality.visual_regression.CANONICAL_ANGLES plus the
@@ -238,6 +252,105 @@ def list_skus_with_catalog() -> JSONResponse:
             }
         )
     return JSONResponse(rows)
+
+
+_SKU_TOKEN_RE = re.compile(r"(?:br|lh|sg|kids)-\d+")
+
+
+def _infer_skus_from_filename(filename: str) -> list[str]:
+    """Pull every SKU-like token from a techflat filename, de-duplicated in order.
+
+    e.g. ``sg-006-and-sg-014-mint-lavender-set-techflat.jpeg`` -> [sg-006, sg-014].
+    """
+    seen: list[str] = []
+    for token in _SKU_TOKEN_RE.findall(filename):
+        if token not in seen:
+            seen.append(token)
+    return seen
+
+
+def _list_techflat_files() -> list[Path]:
+    """Return every ``*-techflat.*`` file in product-references, sorted."""
+    if not PRODUCT_REFERENCES_DIR.is_dir():
+        return []
+    return sorted(PRODUCT_REFERENCES_DIR.glob("*-techflat.*"))
+
+
+def _load_techflat_review() -> dict:
+    """Load the founder's techflat review state (or empty)."""
+    if not TECHFLAT_REVIEW_JSON.is_file():
+        return {}
+    try:
+        import json
+
+        return json.loads(TECHFLAT_REVIEW_JSON.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _save_techflat_review(state: dict) -> None:
+    import json
+
+    TECHFLAT_REVIEW_JSON.write_text(json.dumps(state, indent=2, sort_keys=True), encoding="utf-8")
+
+
+@app.get("/api/techflats")
+def list_techflats() -> JSONResponse:
+    """Return every techflat file with inferred SKUs, catalog names, review state."""
+    catalog = {e["sku"]: e for e in _load_catalog()}
+    review = _load_techflat_review()
+    rows = []
+    for path in _list_techflat_files():
+        fn = path.name
+        skus = _infer_skus_from_filename(fn)
+        names = [catalog[s]["name"] for s in skus if s in catalog]
+        saved = review.get(fn, {})
+        try:
+            with Image.open(path) as im:
+                w, h = im.size
+        except Exception:
+            w = h = 0
+        rows.append(
+            {
+                "filename": fn,
+                "skus": skus,
+                "names": names,
+                "width": w,
+                "height": h,
+                "aspect": round(w / h, 2) if h else 0,
+                "layout": saved.get("layout", "unset"),
+                "note": saved.get("note", ""),
+            }
+        )
+    return JSONResponse({"layouts": TECHFLAT_LAYOUTS, "rows": rows})
+
+
+@app.get("/api/techflat-image/{filename}")
+def techflat_image(filename: str) -> Response:
+    """Serve a techflat image by filename (validated against the known set)."""
+    valid = {p.name for p in _list_techflat_files()}
+    if filename not in valid:
+        raise HTTPException(404, f"no techflat named {filename!r}")
+    path = PRODUCT_REFERENCES_DIR / filename
+    return Response(content=path.read_bytes(), media_type="image/jpeg")
+
+
+@app.post("/api/techflat-review")
+def save_techflat_review(
+    filename: str = Form(...),
+    layout: str = Form(...),
+    note: str = Form(""),
+) -> JSONResponse:
+    """Persist the founder's layout/mismatch call for one techflat."""
+    valid = {p.name for p in _list_techflat_files()}
+    if filename not in valid:
+        raise HTTPException(404, f"no techflat named {filename!r}")
+    if layout not in TECHFLAT_LAYOUTS:
+        raise HTTPException(400, f"invalid layout {layout!r} (allowed: {list(TECHFLAT_LAYOUTS)})")
+    state = _load_techflat_review()
+    state[filename] = {"layout": layout, "note": note.strip()}
+    _save_techflat_review(state)
+    return JSONResponse({"ok": True, "filename": filename, "layout": layout})
 
 
 @app.post("/api/preorder")
@@ -446,6 +559,31 @@ _INDEX_HTML = """<!doctype html>
   .preorder input { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; margin: 0; }
   .preorder.on { color: var(--accent); }
   .badge.preorder-badge { background: #2a2014; color: #e8c890; }
+  .view-toggle { margin-top: 14px; display: flex; gap: 8px; }
+  .view-btn {
+    padding: 7px 16px; background: var(--panel); border: 1px solid var(--border);
+    color: var(--muted); border-radius: 6px; cursor: pointer; font: inherit; font-size: 13px;
+  }
+  .view-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .tf-img {
+    width: 100%; aspect-ratio: 4/3; object-fit: contain;
+    background: #1a1a1a; border-bottom: 1px solid var(--border); display: block;
+  }
+  .tf-meta { padding: 12px 14px; }
+  .tf-file { font-family: ui-monospace, monospace; font-size: 11px; color: var(--muted); word-break: break-all; }
+  .tf-skus { margin-top: 6px; }
+  .tf-skus .sku { font-size: 12px; }
+  .tf-name { font-size: 12px; color: var(--text); margin-top: 4px; }
+  .tf-dims { font-size: 10px; color: var(--muted); margin-top: 4px; }
+  .tf-layout { margin-top: 10px; width: 100%; padding: 7px; font: inherit; font-size: 12px;
+    background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 5px; }
+  .tf-layout.reviewed { border-color: var(--ok); }
+  .tf-layout.wrong { border-color: var(--bad); color: var(--bad); }
+  .tf-note { margin-top: 6px; width: 100%; padding: 6px; font: inherit; font-size: 11px;
+    background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 5px; resize: vertical; min-height: 30px; }
+  .tf-status { font-size: 10px; min-height: 12px; margin-top: 4px; }
+  .tf-status.ok { color: var(--ok); }
+  .tf-status.bad { color: var(--bad); }
 </style>
 </head>
 <body>
@@ -455,10 +593,23 @@ _INDEX_HTML = """<!doctype html>
     Pick an angle, then drop a photo to write <code>golden/&lt;sku&gt;/&lt;angle&gt;.jpg</code>.
     Filled dot = on disk. Prior file is backed up to <code>&lt;angle&gt;.jpg.bak.&lt;ts&gt;</code>.
   </div>
+  <div class="view-toggle">
+    <button class="view-btn active" id="view-goldens">Goldens</button>
+    <button class="view-btn" id="view-techflats">Techflats (layout review)</button>
+  </div>
 </header>
 <main>
-  <div class="filter-bar" id="filter-bar"></div>
-  <div id="grid" class="grid"></div>
+  <div id="goldens-view">
+    <div class="filter-bar" id="filter-bar"></div>
+    <div id="grid" class="grid"></div>
+  </div>
+  <div id="techflats-view" style="display:none;">
+    <div class="subtitle" style="margin-bottom:16px;">
+      Mark each techflat's layout so the splitter knows how to crop it.
+      Flag <strong>WRONG product</strong> if the image doesn't match the SKU — that one gets a re-upload, not a split.
+    </div>
+    <div id="tf-grid" class="grid"></div>
+  </div>
 </main>
 <script>
 const grid = document.getElementById('grid');
@@ -683,6 +834,118 @@ function renderTile(row) {
 
   refreshPreview();
 }
+
+// ── Techflat layout-review view ──────────────────────────────────────
+const tfGrid = document.getElementById('tf-grid');
+let tfLayouts = {};
+let tfLoaded = false;
+
+async function loadTechflats() {
+  const r = await fetch('/api/techflats');
+  const data = await r.json();
+  tfLayouts = data.layouts;
+  tfGrid.innerHTML = '';
+  data.rows.forEach(renderTechflatTile);
+  tfLoaded = true;
+}
+
+function renderTechflatTile(row) {
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const img = document.createElement('img');
+  img.className = 'tf-img';
+  img.loading = 'lazy';
+  img.src = `/api/techflat-image/${encodeURIComponent(row.filename)}`;
+  card.appendChild(img);
+
+  const meta = document.createElement('div');
+  meta.className = 'tf-meta';
+
+  const skuHtml = (row.skus || [])
+    .map((s) => `<span class="sku">${s}</span>`)
+    .join(' ');
+  const namesHtml = (row.names || []).join(' · ') || '<span style="color:var(--bad)">no catalog match</span>';
+
+  meta.innerHTML =
+    `<div class="tf-file">${row.filename}</div>` +
+    `<div class="tf-skus">${skuHtml || '<span style="color:var(--bad)">no SKU in filename</span>'}</div>` +
+    `<div class="tf-name">${namesHtml}</div>` +
+    `<div class="tf-dims">${row.width}×${row.height} · ar ${row.aspect}</div>`;
+
+  const sel = document.createElement('select');
+  sel.className = 'tf-layout';
+  Object.entries(tfLayouts).forEach(([code, label]) => {
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = label;
+    if (code === row.layout) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  const applyClass = () => {
+    sel.classList.toggle('reviewed', sel.value !== 'unset' && sel.value !== 'wrong');
+    sel.classList.toggle('wrong', sel.value === 'wrong');
+  };
+  applyClass();
+
+  const note = document.createElement('textarea');
+  note.className = 'tf-note';
+  note.placeholder = 'note (optional) — e.g. "shows shorts not the bomber"';
+  note.value = row.note || '';
+
+  const tfStatus = document.createElement('div');
+  tfStatus.className = 'tf-status';
+
+  const save = async () => {
+    const fd = new FormData();
+    fd.append('filename', row.filename);
+    fd.append('layout', sel.value);
+    fd.append('note', note.value);
+    try {
+      const resp = await fetch('/api/techflat-review', { method: 'POST', body: fd });
+      const data = await resp.json();
+      if (!resp.ok) {
+        tfStatus.textContent = data.detail || 'save failed';
+        tfStatus.className = 'tf-status bad';
+        return;
+      }
+      applyClass();
+      tfStatus.textContent = 'saved';
+      tfStatus.className = 'tf-status ok';
+    } catch (e) {
+      tfStatus.textContent = 'network error';
+      tfStatus.className = 'tf-status bad';
+    }
+  };
+  sel.addEventListener('change', save);
+  note.addEventListener('blur', save);
+
+  meta.appendChild(sel);
+  meta.appendChild(note);
+  meta.appendChild(tfStatus);
+  card.appendChild(meta);
+  tfGrid.appendChild(card);
+}
+
+// View switching
+const goldensView = document.getElementById('goldens-view');
+const techflatsView = document.getElementById('techflats-view');
+const btnGoldens = document.getElementById('view-goldens');
+const btnTechflats = document.getElementById('view-techflats');
+
+btnGoldens.onclick = () => {
+  goldensView.style.display = '';
+  techflatsView.style.display = 'none';
+  btnGoldens.classList.add('active');
+  btnTechflats.classList.remove('active');
+};
+btnTechflats.onclick = () => {
+  goldensView.style.display = 'none';
+  techflatsView.style.display = '';
+  btnTechflats.classList.add('active');
+  btnGoldens.classList.remove('active');
+  if (!tfLoaded) loadTechflats();
+};
 
 load();
 </script>
