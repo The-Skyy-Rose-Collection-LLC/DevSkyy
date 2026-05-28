@@ -1,7 +1,7 @@
 {
   "$schema": "Canonical logo registry for the SkyyRose imagery pipeline. Logos with `co_located_per_sku: true` are resolved at consumption time via `assets/images/products/<sku-folder>/<filename>` \u2014 the sku-folder is the canonical render_output_slug from skyyrose-catalog.csv. All other logos live in assets/images/logos/. Every SKU's logo placements are defined here, cross-checked with skyyrose-catalog.csv::branding_spec during pre-flight. Edit both files together when adding a logo or reassigning placements.",
-  "version": 4,
-  "updated": "2026-05-25",
+  "version": 5,
+  "updated": "2026-05-27",
   "brand_primary": "sr-monogram-rose-gold",
   "logos": {
     "sr-monogram-rose-gold": {
@@ -33,14 +33,14 @@
     },
     "red-roses-cloud-cluster": {
       "file": "red-roses-cloud-cluster.jpeg",
-      "description": "SIGNATURE COLLECTION LOGO (paired with rose-gold-rose). Cluster of red roses with green thorns emerging from clouds. Used on sg-009 The Sherpa Jacket (Signature) at front chest. Part of Signature logo system \u2014 NOT a Love Hurts asset. Earlier registry versions misclassified this as Love Hurts; corrected 2026-05-25.",
+      "description": "DUAL-COLLECTION RED ROSE CLUSTER. Cluster of red roses with green thorns emerging from clouds. Used on BOTH Signature collection (sg-009 The Sherpa Jacket front chest, paired with rose-gold-rose) AND Love Hurts collection (lh-003 basketball shorts all-over + mesh side panels, lh-004 bomber jacket inside hood). The 2026-05-25 reclassification claiming this was 'Signature only, NOT Love Hurts' was incorrect per founder (re-confirmed 2026-05-27). This logo is the canonical red-rose-cluster across both collections; heart-rose-composite is a separate Love-Hurts-specific composite reserved for the bomber back-center, the Fannie's i-dot, and the LH joggers left thigh.",
       "primary_color": "#DC143C",
       "recolor_allowed": false,
-      "collection": "signature"
+      "collection": "shared_signature_love_hurts"
     },
     "heart-rose-composite": {
       "file": "heart-rose-composite.jpeg",
-      "description": "LOVE HURTS COLLECTION LOGO. Red heart wrapped in thorns with roses emerging from the top, blood splatters. The Love Hurts 'heart-and-rose' composite logo \u2014 used on lh-002 (joggers left thigh), lh-003 (basketball shorts, all-over + mesh panels), lh-004 (bomber jacket inside hood + back center), lh-005 (Fannie pack \u2014 dot of 'i' in lettering).",
+      "description": "LOVE HURTS COLLECTION LOGO. Red heart wrapped in thorns with roses emerging from the top, blood splatters. The Love Hurts 'heart-and-rose' composite logo. Canonical use (per founder 2026-05-27): lh-002 + lh-006 (LH joggers, left thigh), lh-004 (bomber, back centered middle), lh-005 (Fannie, dot of 'i' in 'Fannie' lettering). NOT on lh-003 (basketball shorts) and NOT on lh-004 inside hood \u2014 those use red-roses-cloud-cluster.",
       "primary_color": "#DC143C",
       "recolor_allowed": false,
       "collection": "love_hurts"
@@ -359,11 +359,19 @@
       "colorway_notes": "White colorway of the Baseball Classic jersey."
     },
     "lh-002": {
-      "name": "Love Hurts Joggers",
-      "colorways": [
-        "white_with_black_stripe",
-        "black_with_white_stripe"
-      ],
+      "name": "Love Hurts Joggers (Black)",
+      "colorway_notes": "Black body with white contrast side-panels. Mirror SKU (lh-006) carries the white-body / black-panel colorway. Split from a single multi-colorway SKU on 2026-05-27 per founder.",
+      "placements": [
+        {
+          "logo_id": "heart-rose-composite",
+          "position": "left_thigh",
+          "technique": "embroidered"
+        }
+      ]
+    },
+    "lh-006": {
+      "name": "Love Hurts Joggers (White)",
+      "colorway_notes": "Mirror of lh-002. White body with black contrast side-panels. Same placement geometry, opposite colorway.",
       "placements": [
         {
           "logo_id": "heart-rose-composite",
@@ -376,10 +384,10 @@
       "name": "Love Hurts Basketball Shorts",
       "placements": [
         {
-          "logo_id": "heart-rose-composite",
+          "logo_id": "red-roses-cloud-cluster",
           "position": "all_over",
           "technique": "sublimated",
-          "notes": "Corrected 2026-05-25: was red-roses-cloud-cluster (Signature LOGO, misclassified). Heart-rose-composite is the actual Love Hurts logo."
+          "notes": "Re-corrected 2026-05-27 per founder: red-roses-cloud-cluster IS used on Love Hurts (the 2026-05-25 misclassification correction was itself wrong). Heart-rose-composite is reserved for lh-004 back-center, lh-005 Fannie (i-dot), and the LH joggers left thigh only."
         },
         {
           "logo_id": "love-hurts-full-lettering",
@@ -388,10 +396,10 @@
           "size_inches": 12
         },
         {
-          "logo_id": "heart-rose-composite",
+          "logo_id": "red-roses-cloud-cluster",
           "position": "mesh_side_panels",
           "technique": "stitched",
-          "notes": "Corrected 2026-05-25: was red-roses-cloud-cluster."
+          "notes": "Re-corrected 2026-05-27 per founder: was incorrectly switched to heart-rose-composite on 2026-05-25."
         },
         {
           "logo_id": "love-hurts-full-lettering",
@@ -412,10 +420,10 @@
           "notes": "User-confirmed 2026-04-20: Love Hurts graffiti lettering goes on the front."
         },
         {
-          "logo_id": "heart-rose-composite",
+          "logo_id": "red-roses-cloud-cluster",
           "position": "inside_hood",
           "technique": "sublimated",
-          "notes": "Corrected 2026-05-25: was red-roses-cloud-cluster (Signature LOGO, misclassified). Heart-rose-composite is the actual Love Hurts logo."
+          "notes": "Re-corrected 2026-05-27 per founder: red-roses-cloud-cluster is the correct LH inside-hood pattern. The 2026-05-25 switch to heart-rose-composite was incorrect."
         },
         {
           "logo_id": "heart-rose-composite",
@@ -646,6 +654,17 @@
   },
   "gaps": [],
   "changelog": [
+    {
+      "version": 5,
+      "date": "2026-05-27",
+      "changes": [
+        "Re-corrected lh-003[0] all_over, lh-003[2] mesh_side_panels, and lh-004[1] inside_hood placements back to red-roses-cloud-cluster per founder. The 2026-05-25 'correction' to heart-rose-composite was itself wrong — red-roses-cloud-cluster is used in BOTH Signature (sg-009) and Love Hurts (lh-003, lh-004 inside-hood) contexts.",
+        "Reclassified red-roses-cloud-cluster as dual-collection (signature + love_hurts). Removed the 'NOT a Love Hurts asset' claim that drove the 2026-05-25 misclassification.",
+        "Tightened heart-rose-composite description: canonical use is lh-002 + lh-006 left thigh, lh-004 back-center, lh-005 Fannie i-dot. NOT on lh-003 (all placements use red-roses or love-hurts-full-lettering) and NOT on lh-004 inside-hood.",
+        "Split lh-002 'Love Hurts Joggers' (multi-colorway under one SKU) into lh-002 'Love Hurts Joggers (Black)' + new lh-006 'Love Hurts Joggers (White)'. Each SKU now carries a single colorway. Removed `colorways` array from lh-002 entry; added `lh-006` sku_logos entry with mirrored heart-rose-composite left-thigh placement. Love Hurts now has the canonical 5 SKUs per founder: lh-002 (Joggers Black), lh-003 (Basketball Shorts), lh-004 (Bomber Jacket), lh-005 (The Fannie), lh-006 (Joggers White).",
+        "Corrected lh-002 + lh-006 dossiers: position is LEFT thigh (not front-right-thigh as the pre-split dossier claimed), and the logo is the full heart-rose-composite (not a 'small red rose mini-icon'). Removed the negative-block claim that 'no heart-and-thorns lockup on joggers' — that claim was wrong."
+      ]
+    },
     {
       "version": 4,
       "date": "2026-05-25",
