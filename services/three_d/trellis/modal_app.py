@@ -78,9 +78,17 @@ _trellis_image = (
 # checkpoints; subsequent invocations skip the download.
 _hf_cache_volume = modal.Volume.from_name("trellis-hf-cache", create_if_missing=True)
 
-# HF token comes from a Modal secret; create with:
+# HF token via a Modal secret is OPTIONAL — microsoft/TRELLIS-image-large is a
+# public checkpoint, so it downloads without auth. The token only helps avoid
+# anonymous rate limits. Opt in by creating the secret and setting
+# TRELLIS_USE_HF_SECRET=1 at deploy time:
 #   modal secret create huggingface-secret HF_TOKEN=hf_xxx
-_secrets = [modal.Secret.from_name("huggingface-secret")]
+#   TRELLIS_USE_HF_SECRET=1 modal deploy services/three_d/trellis/modal_app.py
+_secrets = (
+    [modal.Secret.from_name("huggingface-secret")]
+    if os.environ.get("TRELLIS_USE_HF_SECRET", "0") == "1"
+    else []
+)
 
 _MODEL_NAME = os.environ.get("TRELLIS_MODEL", "microsoft/TRELLIS-image-large")
 _GPU = os.environ.get("TRELLIS_MODAL_GPU", "A10")  # A10 verified ap-Y529mA2Ps4cDIH7bKS7EK3
