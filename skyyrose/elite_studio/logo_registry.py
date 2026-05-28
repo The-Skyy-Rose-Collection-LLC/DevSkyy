@@ -42,11 +42,9 @@ from pathlib import Path
 from typing import Any
 
 from skyyrose.core.catalog_loader import CATALOG_CSV
+from skyyrose.core.paths import THEME_ROOT, WP_LOGOS_DIR, WP_PRODUCTS_DIR
 
 REGISTRY_JSON: Path = CATALOG_CSV.parent / "logo-registry.json"
-THEME_ROOT: Path = CATALOG_CSV.parent.parent  # wordpress-theme/skyyrose-flagship/
-LOGOS_DIR_REL: str = "assets/images/logos"
-PRODUCTS_DIR_REL: str = "assets/images/products"
 
 
 class LogoNotFoundError(KeyError):
@@ -135,8 +133,8 @@ class LogoRegistry:
                     f"logo {logo_id!r} requires a per-SKU folder mapping but "
                     f"sku {sku!r} is not in sku_folders. Add it to the registry."
                 )
-            return THEME_ROOT / PRODUCTS_DIR_REL / folder / entry.filename
-        return THEME_ROOT / LOGOS_DIR_REL / entry.filename
+            return WP_PRODUCTS_DIR / folder / entry.filename
+        return WP_LOGOS_DIR / entry.filename
 
     def sku_folder(self, sku: str) -> str | None:
         return self._sku_folders.get(sku)
@@ -168,8 +166,6 @@ def _entry_from_raw(logo_id: str, data: dict[str, Any]) -> LogoEntry:
 
 
 __all__ = [
-    "LOGOS_DIR_REL",
-    "PRODUCTS_DIR_REL",
     "REGISTRY_JSON",
     "THEME_ROOT",
     "LogoEntry",

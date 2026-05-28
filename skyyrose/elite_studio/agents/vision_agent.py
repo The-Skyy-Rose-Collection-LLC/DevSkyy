@@ -28,11 +28,12 @@ from ..models import PreflightResult, SynthesizedVision, VisionAnalysis
 
 logger = logging.getLogger(__name__)
 
+# Products images live under the canonical WP theme products dir.
+# Resolved absolutely via :mod:`skyyrose.core.paths` so the lookup is cwd-stable.
+from skyyrose.core.paths import WP_PRODUCTS_DIR as _PRODUCTS_DIR  # noqa: E402
+
 from ..config import OPENAI_VISION_MODEL as _OPENAI_MODEL
 from ..config import VISION_GEMINI_MODEL as _GEMINI_VISION_MODEL
-
-# Products images live here (relative to project root)
-_PRODUCTS_DIR = Path("wordpress-theme/skyyrose-flagship/assets/images/products")
 
 
 def _reference_path(sku: str) -> str:

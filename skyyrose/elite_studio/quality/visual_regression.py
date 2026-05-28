@@ -8,8 +8,9 @@ diff report on each comparison.
 scikit-image is optional. If not installed, all comparisons return
 passed=True with ssim_score=1.0 and a note in the report.
 
-Golden references live at:
-    skyyrose/elite_studio/assets/golden/{sku}/reference.jpg
+Golden references live under :data:`skyyrose.core.paths.GOLDEN_DIR`
+(``skyyrose/elite_studio/assets/golden/{sku}/{angle}.jpg``). Path resolution
+goes through the canonical helper — do NOT hardcode the golden root here.
 """
 
 from __future__ import annotations
@@ -20,10 +21,11 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
+from skyyrose.core.paths import GOLDEN_DIR as _GOLDEN_BASE
+
 logger = logging.getLogger(__name__)
 
 _SSIM_THRESHOLD = 0.85
-_GOLDEN_BASE = Path(__file__).parent.parent / "assets" / "golden"
 _REPORTS_BASE = Path(__file__).parent.parent / "assets" / "regression_reports"
 
 # Per-angle SSIM thresholds. Detail shots demand stricter pixel-level fidelity

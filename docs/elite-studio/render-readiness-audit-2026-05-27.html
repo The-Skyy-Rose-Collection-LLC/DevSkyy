@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Elite Studio — Render Readiness Audit (2026-05-27)</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 1100px; margin: 0 auto; padding: 24px; line-height: 1.5; color: #1a1a1a; }
+  h1 { color: #B76E79; border-bottom: 2px solid #B76E79; padding-bottom: 6px; }
+  h2 { color: #0A0A0A; margin-top: 32px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+  h3 { color: #444; margin-top: 20px; }
+  code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-size: 0.92em; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 0.9em; }
+  th, td { border: 1px solid #ddd; padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: #fafafa; font-weight: 600; }
+  .ok { color: #1a7f37; font-weight: 600; }
+  .gap { color: #cf222e; font-weight: 600; }
+  .partial { color: #9a6700; font-weight: 600; }
+  .meta { color: #666; font-size: 0.9em; margin-bottom: 24px; }
+  .toc { background: #fafafa; padding: 12px 20px; border-left: 3px solid #B76E79; margin: 16px 0; }
+  .toc ol { margin: 6px 0; }
+  pre { background: #f6f8fa; padding: 12px; border-radius: 4px; overflow-x: auto; font-size: 0.85em; }
+</style>
+</head>
+<body>
+
+<h1>Elite Studio — Render Readiness Audit</h1>
+<p class="meta">
+  Generated <strong>2026-05-27</strong> from live repo state on branch <code>main</code>.
+  Every claim traces to a tool call from this session. No memory-only assertions.
+</p>
+
+<div class="toc">
+  <strong>Contents</strong>
+  <ol>
+    <li><a href="#invocable">What can be invoked</a></li>
+    <li><a href="#metadata">Per-SKU detail-metadata coverage</a></li>
+    <li><a href="#goldens">Golden reference-image coverage matrix</a></li>
+    <li><a href="#gates">What currently blocks renders</a></li>
+    <li><a href="#saas">SaaS-readiness notes</a></li>
+    <li><a href="#actions">Recommended next actions (before render)</a></li>
+  </ol>
+</div>
+
+<section id="invocable">
+<h2>1. What can be invoked</h2>
+
+<h3>1a. Elite Studio CLI — <code>python -m skyyrose.elite_studio</code></h3>
+<p>The canonical render entry point. Twelve sub-commands, all batch-or-single capable.</p>
+<table>
+  <tr><th>Command</th><th>Purpose</th></tr>
+  <tr><td><code>produce</code></td><td>Produce single product render through the multi-agent pipeline.</td></tr>
+  <tr><td><code>produce-batch</code></td><td>Produce many SKUs in one invocation.</td></tr>
+  <tr><td><code>produce-async</code></td><td>Enqueue a single SKU render job for the worker queue.</td></tr>
+  <tr><td><code>composite</code></td><td>Composite a SKU into a pre-built scene (Stage D entry).</td></tr>
+  <tr><td><code>status</code></td><td>Show generation status across runs.</td></tr>
+  <tr><td><code>job-status</code> / <code>job-result</code></td><td>Inspect async queue state.</td></tr>
+  <tr><td><code>dlq-list</code> / <code>dlq-retry</code></td><td>Inspect and replay dead-letter-queue failures.</td></tr>
+  <tr><td><code>worker</code></td><td>Start the Elite Studio queue worker.</td></tr>
+  <tr><td><code>create</code></td><td>Run a creative operation via the Creative Operations Hub.</td></tr>
+  <tr><td><code>catalog</code></td><td>Print the canonical product catalog (sanity check before runs).</td></tr>
+</table>
+
+<h3>1b. Stage-specific scripts (read-only invocable, not pipeline-internal)</h3>
+<table>
+  <tr><th>Script</th><th>Use case</th></tr>
+  <tr><td><code>scripts/golden_uploader.py</code></td><td>FastAPI app on <code>127.0.0.1:8765</code>. Replace per-SKU golden photos. The ONLY supported write path into <code>GOLDEN_DIR</code>.</td></tr>
+  <tr><td><code>scripts/smoke_test_flux_br001.py</code></td><td>End-to-end FLUX pipeline smoke for br-001. Stage 1 → 1.5 → 2 → 3 → 5.</td></tr>
+  <tr><td><code>scripts/generate_3d_http.py</code></td><td>Direct Tripo3D HTTP API client. Garment 3D generation.</td></tr>
+  <tr><td><code>scripts/regen_masks.py</code></td><td>Re-derive Stage 2 decoration masks for specific SKUs in place.</td></tr>
+  <tr><td><code>scripts/regen_phase_e_manifest_auto.py</code></td><td>Re-author the Phase E manifest after asset changes.</td></tr>
+  <tr><td><code>scripts/verify_logo_consistency.py</code></td><td>Pre-render check: every <code>sku_logos</code> entry resolves to a registered logo + a file on disk.</td></tr>
+  <tr><td><code>services/three_d/trellis/modal_app.py</code></td><td>Modal-hosted TRELLIS image-to-3D inference (A10 GPU). Invoked via <code>modal run modal_app.py::smoke_br_001</code>.</td></tr>
+</table>
+
+<h3>1c. Per-venture CLIs</h3>
+<p>Each Elite Studio venture has its own CLI under <code>skyyrose/elite_studio/ventures/{photo,video,threed}/cli.py</code>. These are domain-specific (e.g. video venture exposes timelapse + motion-blur ops); the cross-venture surface is the top-level <code>skyyrose.elite_studio</code> CLI above.</p>
+
+<h3>1d. MCP server</h3>
+<p><code>devskyy_mcp.py</code> is a thin client that forwards to a remote DevSkyy REST API (<code>DEVSKYY_API_URL</code>). No local @mcp.tool decorators — the tool surface is over the wire, not in this repo. Treat as a deployment surface, not a local render path.</p>
+</section>
+
+<section id="metadata">
+<h2>2. Per-SKU detail-metadata coverage</h2>
+<p>Four metadata sources must align for a render to be detail-accurate. Audit below reflects live state at audit time.</p>
+
+<table>
+  <tr>
+    <th>SKU</th>
+    <th>Dossier (.md)</th>
+    <th><code>sku_folders</code><br/>(req'd for per-SKU patches)</th>
+    <th>Logo placements<br/>(count)</th>
+    <th>Verdict</th>
+  </tr>
+  <tr><td>br-001</td><td class="ok">YES</td><td class="gap">NO</td><td>1</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>br-002</td><td class="ok">YES</td><td class="gap">NO</td><td>1</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>br-003</td><td class="ok">YES</td><td class="ok">YES</td><td>2</td><td class="ok">READY</td></tr>
+  <tr><td>br-004</td><td class="ok">YES</td><td class="gap">NO</td><td>1</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>br-005</td><td class="ok">YES</td><td class="gap">NO</td><td>2</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>br-006</td><td class="ok">YES</td><td class="gap">NO</td><td>2</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>br-007</td><td class="ok">YES</td><td class="gap">NO</td><td>4</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>br-008</td><td class="ok">YES</td><td class="ok">YES</td><td>3</td><td class="ok">READY</td></tr>
+  <tr><td>br-009</td><td class="ok">YES</td><td class="ok">YES</td><td>3</td><td class="ok">READY</td></tr>
+  <tr><td>br-010</td><td class="ok">YES</td><td class="ok">YES</td><td>1</td><td class="ok">READY</td></tr>
+  <tr><td>br-011</td><td class="ok">YES</td><td class="ok">YES</td><td>1</td><td class="ok">READY</td></tr>
+  <tr><td>br-012</td><td class="ok">YES</td><td class="ok">YES</td><td>2</td><td class="ok">READY</td></tr>
+  <tr><td>br-014</td><td class="ok">YES</td><td class="ok">YES</td><td>2</td><td class="ok">READY</td></tr>
+  <tr><td>br-015</td><td class="ok">YES</td><td class="ok">YES</td><td>2</td><td class="ok">READY</td></tr>
+  <tr><td>kids-001</td><td class="ok">YES</td><td class="gap">NO</td><td>3</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>kids-002</td><td class="ok">YES</td><td class="gap">NO</td><td>3</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>lh-002</td><td class="ok">YES</td><td class="gap">NO</td><td>1</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>lh-003</td><td class="ok">YES</td><td class="gap">NO</td><td>4</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>lh-004</td><td class="ok">YES</td><td class="gap">NO</td><td>3</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>lh-005</td><td class="ok">YES</td><td class="gap">NO</td><td>1</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>sg-001</td><td class="ok">YES</td><td class="gap">NO</td><td>2</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>sg-002</td><td class="ok">YES</td><td class="gap">NO</td><td>1</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>sg-003</td><td class="ok">YES</td><td class="gap">NO</td><td>2</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>sg-005</td><td class="ok">YES</td><td class="gap">NO</td><td>1</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>sg-006</td><td class="ok">YES</td><td class="gap">NO</td><td>1</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>sg-007</td><td class="ok">YES</td><td class="gap">NO</td><td>1</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>sg-009</td><td class="ok">YES</td><td class="gap">NO</td><td>1</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>sg-011</td><td class="ok">YES</td><td class="gap">NO</td><td class="gap">0</td><td class="gap">NO LOGOS</td></tr>
+  <tr><td>sg-012</td><td class="ok">YES</td><td class="gap">NO</td><td class="gap">0</td><td class="gap">NO LOGOS</td></tr>
+  <tr><td>sg-013</td><td class="ok">YES</td><td class="gap">NO</td><td>2</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>sg-014</td><td class="ok">YES</td><td class="gap">NO</td><td>1</td><td class="partial">FOLDER GAP</td></tr>
+  <tr><td>sg-015</td><td class="ok">YES</td><td class="gap">NO</td><td>2</td><td class="partial">FOLDER GAP</td></tr>
+</table>
+
+<h3>2a. Findings</h3>
+<ul>
+  <li><strong>Dossiers:</strong> <span class="ok">100% (32/32)</span>. Every catalog SKU has a parsed markdown dossier.</li>
+  <li><strong><code>sku_folders</code> mapping:</strong> <span class="gap">28% (9/32)</span>. The other 23 SKUs cannot resolve a co-located per-SKU logo patch through <code>LogoRegistry.image_path()</code> — it raises <code>SkuFolderUnknownError</code>. Every SKU outside Black Rose's first wave is unmapped.</li>
+  <li><strong>Logo placements:</strong> 30/32 SKUs have ≥1. <span class="gap">sg-011 and sg-012 have ZERO</span> — the renderer would apply no logos to those SKUs. Original-Label Tee variants need a placement record before rendering.</li>
+  <li><strong>Typography:</strong> Carried entirely inside dossier <code>brand-mark</code> and <code>typography</code> sections. Verified via <code>get_product_with_dossier()</code> — no separate font-spec file to drift from.</li>
+</ul>
+</section>
+
+<section id="goldens">
+<h2>3. Golden reference-image coverage matrix</h2>
+<p>
+  All goldens live at <code>skyyrose/elite_studio/assets/golden/{sku}/{angle}.jpg</code>. Five canonical angles
+  per <code>visual_regression.CANONICAL_ANGLES</code>: <code>front, back, three-quarter, detail-1, detail-2</code>.
+  <code>reference.jpg</code> (single-canonical aspect) is consumed by the visual-regression module as the baseline.
+</p>
+
+<table>
+  <tr><th>SKU</th><th>front</th><th>back</th><th>three-quarter</th><th>detail-1</th><th>detail-2</th><th>reference</th><th>Have</th></tr>
+  <tr><td>br-001</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>2/6</td></tr>
+  <tr><td>br-002</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>2/6</td></tr>
+  <tr><td>br-003</td><td class="ok">Y</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>3/6</td></tr>
+  <tr><td>br-004</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>2/6</td></tr>
+  <tr><td>br-005</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>2/6</td></tr>
+  <tr><td>br-006</td><td class="ok">Y</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>3/6</td></tr>
+  <tr><td>br-007</td><td class="ok">Y</td><td class="ok">Y</td><td class="ok">Y</td><td class="ok">Y</td><td class="gap">.</td><td class="ok">Y</td><td class="ok">5/6</td></tr>
+  <tr><td>br-008</td><td class="ok">Y</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>3/6</td></tr>
+  <tr><td>br-009</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>2/6</td></tr>
+  <tr><td>br-010</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">1/6</td></tr>
+  <tr><td>br-011</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>2/6</td></tr>
+  <tr><td>br-012</td><td class="ok">Y</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>3/6</td></tr>
+  <tr><td>br-014</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">1/6</td></tr>
+  <tr><td>br-015</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">1/6</td></tr>
+  <tr><td>kids-001</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">1/6</td></tr>
+  <tr><td>kids-002</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">1/6</td></tr>
+  <tr><td>lh-002</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>2/6</td></tr>
+  <tr><td>lh-003</td><td class="ok">Y</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>3/6</td></tr>
+  <tr><td>lh-004</td><td class="ok">Y</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>3/6</td></tr>
+  <tr><td>lh-005</td><td class="ok">Y</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>3/6</td></tr>
+  <tr><td>sg-001</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>2/6</td></tr>
+  <tr><td>sg-002</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>2/6</td></tr>
+  <tr><td>sg-003</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>2/6</td></tr>
+  <tr><td>sg-005</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>2/6</td></tr>
+  <tr><td>sg-006</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>2/6</td></tr>
+  <tr><td>sg-007</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">1/6</td></tr>
+  <tr><td>sg-009</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td class="gap">.</td><td class="ok">Y</td><td>3/6</td></tr>
+  <tr><td>sg-011</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>2/6</td></tr>
+  <tr><td>sg-012</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>2/6</td></tr>
+  <tr><td>sg-013</td><td class="ok">Y</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>3/6</td></tr>
+  <tr><td>sg-014</td><td class="ok">Y</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="ok">Y</td><td>3/6</td></tr>
+  <tr><td>sg-015</td><td class="ok">Y</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">.</td><td class="gap">1/6</td></tr>
+</table>
+
+<h3>3a. Angle-coverage rollup</h3>
+<table>
+  <tr><th>Angle</th><th>SKUs with file</th><th>Coverage</th></tr>
+  <tr><td><code>front</code></td><td>32 / 32</td><td class="ok">100%</td></tr>
+  <tr><td><code>reference</code></td><td>25 / 32</td><td class="partial">78%</td></tr>
+  <tr><td><code>back</code></td><td>10 / 32</td><td class="gap">31%</td></tr>
+  <tr><td><code>detail-1</code></td><td>2 / 32</td><td class="gap">6%</td></tr>
+  <tr><td><code>three-quarter</code></td><td>1 / 32</td><td class="gap">3%</td></tr>
+  <tr><td><code>detail-2</code></td><td>0 / 32</td><td class="gap">0%</td></tr>
+</table>
+
+<p>
+  <strong>SKUs missing <code>reference.jpg</code> (visual-regression baseline):</strong>
+  br-010, br-014, br-015, kids-001, kids-002, sg-007, sg-015. The visual-regression report path
+  will be empty for these SKUs until uploaded.
+</p>
+</section>
+
+<section id="gates">
+<h2>4. What currently blocks renders</h2>
+
+<table>
+  <tr><th>#</th><th>Blocker</th><th>Impact</th><th>Mitigation path</th></tr>
+  <tr>
+    <td>1</td>
+    <td>23 SKUs missing <code>sku_folders</code> entry in <code>logo-registry.json</code></td>
+    <td>Any per-SKU patch render raises <code>SkuFolderUnknownError</code>. Renders crash before composite.</td>
+    <td>Add 23 folder mappings to <code>wordpress-theme/skyyrose-flagship/data/logo-registry.json</code>. Each entry: <code>"sku": "&lt;slug&gt;"</code>.</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>sg-011 and sg-012 have zero logo placements</td>
+    <td>Original-Label Tee variants would render without any branding overlay.</td>
+    <td>Add <code>sku_logos.{sg-011,sg-012}.placements</code> entries with logo_id, anchor, scale.</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>7 SKUs missing <code>reference.jpg</code></td>
+    <td>Visual-regression SSIM check has no baseline; the regression report is empty.</td>
+    <td>Use uploader at <code>http://127.0.0.1:8765</code> with angle=<code>reference</code> (requires uploader update to expose angle picker — currently writes <code>front.jpg</code> only).</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>4 of 6 canonical angles &lt; 50% covered (<code>back</code>, <code>three-quarter</code>, <code>detail-1</code>, <code>detail-2</code>)</td>
+    <td>Multi-angle render outputs degrade to <code>front</code>-only. Detail-shot SSIM threshold (0.92) cannot enforce.</td>
+    <td>Capture additional angles per SKU; uploader needs angle parameter (today is single-endpoint <code>front</code>).</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Uploader UI writes <code>front.jpg</code> only — no angle picker</td>
+    <td>Cannot upload <code>back</code> / <code>three-quarter</code> / detail / reference angles through the current FastAPI surface.</td>
+    <td>Extend <code>scripts/golden_uploader.py</code>: add <code>angle</code> form field, route to <code>golden_path(sku, angle=&lt;...&gt;)</code>. The helper already supports it.</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>scikit-image not installed in <code>.venv</code></td>
+    <td>Visual-regression SSIM degrades to passthrough (<code>ssim_score=1.0</code>). One test asserts this, fails.</td>
+    <td><code>pip install scikit-image</code> inside <code>.venv</code>.</td>
+  </tr>
+</table>
+</section>
+
+<section id="saas">
+<h2>5. SaaS-readiness notes</h2>
+
+<p>Per founder direction: build the SkyyRose imagery system as if it were the SaaS product. Multi-tenant later — single-brand quality first. The audit checks above are the SkyyRose surface; the patterns below are what makes them shippable to other brands without rework.</p>
+
+<table>
+  <tr><th>SaaS dimension</th><th>SkyyRose state</th><th>What scales / what's brand-locked</th></tr>
+  <tr>
+    <td>Catalog source</td>
+    <td>CSV + per-SKU dossier (canonical 2026-05-27 lock).</td>
+    <td><span class="ok">Scales.</span> Both formats are tenant-isolatable — one CSV + one dossier dir per tenant.</td>
+  </tr>
+  <tr>
+    <td>Path resolution</td>
+    <td><code>skyyrose/core/paths.py</code> with <code>golden_path()</code> + <code>wp_product_path()</code> helpers (Phase 1+2 of this session).</td>
+    <td><span class="partial">Mostly scales.</span> The two helpers are pure functions; the constants hardcode the WordPress theme path. Multi-tenant version replaces constants with <code>get_tenant_paths(tenant_id)</code>.</td>
+  </tr>
+  <tr>
+    <td>Golden ingestion</td>
+    <td>Local FastAPI uploader on <code>:8765</code>.</td>
+    <td><span class="gap">Brand-locked.</span> Multi-tenant version needs auth, per-tenant write isolation, and S3/R2 backend instead of local filesystem.</td>
+  </tr>
+  <tr>
+    <td>Render pipeline</td>
+    <td><code>skyyrose.elite_studio</code> CLI + async worker + DLQ.</td>
+    <td><span class="ok">Scales.</span> Queue + DLQ pattern is tenant-agnostic. Per-tenant config injection via <code>TrellisConfig.from_env()</code>-style.</td>
+  </tr>
+  <tr>
+    <td>Brand canon enforcement</td>
+    <td>Per-SKU dossier markdown is the single source. Hard-fail on missing dossier (<code>DossierMissingError</code>).</td>
+    <td><span class="ok">Scales.</span> Each tenant gets its own dossier set + canon validator.</td>
+  </tr>
+  <tr>
+    <td>Logo registry</td>
+    <td>Per-brand <code>logo-registry.json</code>. Today: 14 logos, 9 folder mappings, 32 SKU placements.</td>
+    <td><span class="ok">Scales.</span> Schema is brand-agnostic; multi-tenant just multiplies the file count.</td>
+  </tr>
+  <tr>
+    <td>Compositor stages</td>
+    <td>Seven stages: matte → prompt → relight → composite → cleanup → shadows → QA. Stage D defaults to deterministic rasterize (Phase 2 spec, this session).</td>
+    <td><span class="ok">Scales.</span> Every paid-API call gates on <code>STOP-AND-SHOW</code> + cost preview, which is multi-tenant friendly.</td>
+  </tr>
+  <tr>
+    <td>3D generation</td>
+    <td>Modal TRELLIS (A10, $0.59/hr) + HF Space fallback. Phase A5 committed today (<code>a00c871b9</code>).</td>
+    <td><span class="partial">Mostly scales.</span> Modal namespace is workspace-scoped; multi-tenant requires per-tenant workspace or namespacing inside the function call.</td>
+  </tr>
+</table>
+</section>
+
+<section id="actions">
+<h2>6. Recommended next actions (before render)</h2>
+
+<ol>
+  <li>
+    <strong>Extend uploader to accept angle.</strong> Add an <code>angle</code> form field on the FastAPI POST.
+    The path helper already takes <code>angle</code>; only the FastAPI route + HTML form need the new field.
+    Unblocks reference + back + three-quarter + detail uploads through the same UI.
+  </li>
+  <li>
+    <strong>Populate the 7 missing <code>reference.jpg</code> baselines.</strong> Required for visual-regression SSIM scoring.
+  </li>
+  <li>
+    <strong>Backfill <code>sku_folders</code> for the 23 unmapped SKUs.</strong> One JSON edit unblocks per-SKU patch placement
+    across Love Hurts, Signature, and Kids Capsule entirely. Without it those SKUs cannot render any patch through
+    <code>LogoRegistry.image_path()</code>.
+  </li>
+  <li>
+    <strong>Add logo placements for sg-011 and sg-012.</strong> Otherwise Original-Label Tee variants render unbranded.
+  </li>
+  <li>
+    <strong>Install scikit-image in <code>.venv</code>.</strong> Visual-regression suite gets full SSIM coverage; the
+    skipped test in <code>test_visual_regression_multi_angle.py</code> turns green.
+  </li>
+  <li>
+    <strong>Capture back + detail angles per Black Rose first wave (br-001..br-006).</strong> The collection most
+    likely to ship first; today only br-007 has full detail-1 coverage.
+  </li>
+  <li>
+    <strong>THEN render.</strong> <code>python -m skyyrose.elite_studio produce --sku br-007</code> first
+    (the only SKU with 5/6 angle coverage + full sku_folders mapping). br-007 is the canary for the
+    multi-angle pipeline.
+  </li>
+</ol>
+
+<p>
+  Items 1–6 are pre-render. Item 7 is the actual render trigger. The current top-of-queue is br-007 because
+  it is the single best-covered SKU; everything else needs at least one of the above gaps closed first.
+</p>
+</section>
+
+</body>
+</html>
