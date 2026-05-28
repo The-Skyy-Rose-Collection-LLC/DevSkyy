@@ -22,7 +22,7 @@ from skyyrose.core.catalog_loader import (
     status_from_row,
 )
 
-EXPECTED_SKU_COUNT = 32
+EXPECTED_SKU_COUNT = 33
 
 EXPECTED_COLUMNS = {
     "sku",
