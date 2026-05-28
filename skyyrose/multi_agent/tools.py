@@ -27,36 +27,52 @@ from .config import ASSETS_DIR, PRODUCT_DATA_DIR, REPO_DIR, THEME_DIR
     {"collection": str},
 )
 async def get_product_catalog(args: dict[str, Any]) -> dict[str, Any]:
-    """Load product catalog, optionally filtered by collection."""
+    """Load the canonical SkyyRose product catalog.
+
+    Resolves through ``skyyrose.core.catalog_loader.read_catalog_rows``, which
+    reads ``wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv`` — the
+    only authoritative product data source. Other product-data files were
+    retired 2026-04-19 / 2026-04-25 / 2026-05-27 and are not consulted.
+    """
+    from skyyrose.core.catalog_loader import read_catalog_rows
+
     collection = args.get("collection", "all")
-    catalog_path = PRODUCT_DATA_DIR / "product-content.json"
-
-    if not catalog_path.exists():
-        return _text(f"Product catalog not found at {catalog_path}")
-
-    data = json.loads(catalog_path.read_text())
-    products = data if isinstance(data, list) else data.get("products", [])
+    products = list(read_catalog_rows())
 
     if collection != "all":
-        products = [p for p in products if p.get("collection", "").lower() == collection.lower()]
+        products = [
+            p for p in products if (p.get("collection") or "").lower() == collection.lower()
+        ]
 
-    return _text(json.dumps(products, indent=2))
+    return _text(json.dumps(products, indent=2, default=str))
 
 
 @tool(
     "get_product_overrides",
-    "Get the generation override spec for a specific product SKU",
+    "Get the per-SKU canonical dossier (branding + garment-type-lock spec) for a product",
     {"sku": str},
 )
 async def get_product_overrides(args: dict[str, Any]) -> dict[str, Any]:
-    """Load product override JSON for a specific SKU."""
+    """Load the canonical dossier for a SKU.
+
+    Per the canonical-sources-only rule (locked 2026-05-27), product spec
+    overrides live in ``data/dossiers/{slug}.md`` — Corey-authored garment
+    specs — NOT the retired ``prompts/overrides/{sku}.json`` store. The tool
+    name is kept for back-compat with existing agent prompts; behavior is
+    redirected to the dossier loader.
+    """
+    from skyyrose.core.dossier_loader import get_product_with_dossier
+
     sku = args["sku"].strip().lower()
-    override_path = PRODUCT_DATA_DIR / "prompts" / "overrides" / f"{sku}.json"
+    try:
+        result = get_product_with_dossier(sku)
+    except Exception as exc:  # noqa: BLE001 — surface any loader error to the agent
+        return _text(f"Dossier load failed for SKU {sku!r}: {exc}")
 
-    if not override_path.exists():
-        return _text(f"No override found for SKU: {sku}")
+    if result is None:
+        return _text(f"No dossier found for SKU: {sku}")
 
-    return _text(override_path.read_text())
+    return _text(json.dumps(result, indent=2, default=str))
 
 
 @tool(
