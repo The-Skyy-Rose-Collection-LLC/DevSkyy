@@ -257,21 +257,41 @@ class TrellisInference:
 
 
 # -----------------------------------------------------------------------------
-# Smoke test — `modal run modal_app.py::smoke_br_001`
+# Smoke test — `modal run modal_app.py::smoke --sku br-001`
 # -----------------------------------------------------------------------------
+
+# Canonical golden image layout — one front.jpg per SKU under this root.
+# Stays in lockstep with skyyrose/elite_studio/assets/golden/{sku}/front.jpg.
+_GOLDEN_ROOT = "skyyrose/elite_studio/assets/golden"
+
+
+def _golden_image_path(sku: str) -> Path:
+    """Resolve the canonical golden front.jpg for a SKU.
+
+    Layout: ``skyyrose/elite_studio/assets/golden/{sku}/front.jpg`` — single
+    source of truth for 3D smoke inputs. Per-SKU overrides via --image-path.
+    """
+    return Path(_GOLDEN_ROOT) / sku / "front.jpg"
 
 
 @app.local_entrypoint()
-def smoke_br_001(
-    image_path: str = "skyyrose/elite_studio/assets/golden/br-001/front.jpg",
-    output_path: str = "/tmp/br-001-trellis-modal.glb",
+def smoke(
+    sku: str = "br-001",
+    image_path: str = "",
+    output_path: str = "",
+    seed: int = 42,
 ) -> None:
-    """End-to-end smoke: br-001 golden reference -> .glb saved locally.
+    """End-to-end smoke: golden SKU image -> .glb saved locally.
 
     Usage:
-        modal run services/three_d/trellis/modal_app.py::smoke_br_001
-        modal run services/three_d/trellis/modal_app.py::smoke_br_001 \\
-            --image-path skyyrose/elite_studio/assets/golden/br-003/front.jpg
+        modal run services/three_d/trellis/modal_app.py::smoke
+        modal run services/three_d/trellis/modal_app.py::smoke --sku br-003
+        modal run services/three_d/trellis/modal_app.py::smoke --sku br-003 \\
+            --image-path /custom/path.jpg --output-path /tmp/custom.glb
+
+    Defaults:
+        image_path  -> {_GOLDEN_ROOT}/{sku}/front.jpg
+        output_path -> /tmp/{sku}-trellis-modal.glb
 
     Validates:
         - Container starts on A10 GPU
@@ -279,11 +299,16 @@ def smoke_br_001(
         - generate_from_image returns valid GLB bytes
         - Output is non-empty and saves to local disk
     """
-    src = Path(image_path)
+    src = Path(image_path) if image_path else _golden_image_path(sku)
     if not src.exists():
-        raise FileNotFoundError(f"smoke input image missing: {src} — pass --image-path to override")
+        raise FileNotFoundError(
+            f"smoke input image missing: {src} — drop a front.jpg at "
+            f"{_GOLDEN_ROOT}/{sku}/ or pass --image-path"
+        )
 
-    print(f"[smoke] reading {src} ({src.stat().st_size} bytes)")
+    dest = Path(output_path) if output_path else Path(f"/tmp/{sku}-trellis-modal.glb")
+
+    print(f"[smoke] sku={sku} reading {src} ({src.stat().st_size} bytes)")
     image_bytes = src.read_bytes()
 
     inference = TrellisInference()
@@ -295,7 +320,7 @@ def smoke_br_001(
         raise RuntimeError(f"health probe failed: {health}")
 
     print(f"[smoke] generate_from_image on {_GPU} ...")
-    result = inference.generate_from_image.remote(image_bytes, seed=42)
+    result = inference.generate_from_image.remote(image_bytes, seed=seed)
 
     glb_bytes = result["glb"]
     if not glb_bytes or len(glb_bytes) < 1024:
@@ -303,11 +328,10 @@ def smoke_br_001(
             f"GLB output suspiciously small ({len(glb_bytes) if glb_bytes else 0} bytes)"
         )
 
-    dest = Path(output_path)
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_bytes(glb_bytes)
 
     print(
-        f"[smoke] OK — wrote {len(glb_bytes)} bytes to {dest} "
+        f"[smoke] OK — sku={sku} wrote {len(glb_bytes)} bytes to {dest} "
         f"in {result['duration_seconds']}s (seed={result['seed']})"
     )
