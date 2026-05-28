@@ -106,30 +106,50 @@ def _atomic_symlink(target: Path, link: Path, *, dry_run: bool) -> bool:
 
 
 def _find_techflat_source(sku: str) -> Path | None:
-    """Find the techflat file for a SKU under data/product-references/.
+    """Find the FRONT techflat file for a SKU under data/product-references/.
 
-    Pattern variants observed in the repo:
-        {sku}-techflat.jpeg
-        {sku}-<descriptor>-techflat.jpeg
+    Resolution order:
+        1. {sku}-techflat-front.*   (split output — preferred, view-accurate)
+        2. {sku}*-techflat.*        (combined/single techflat, not yet split)
 
-    Returns the first match (sorted alphabetically for stability).
+    Returns the first match (sorted for stability).
     """
     if not PRODUCT_REFERENCES_DIR.is_dir():
         return None
-    candidates = sorted(PRODUCT_REFERENCES_DIR.glob(f"{sku}*-techflat.*"))
+    front = sorted(PRODUCT_REFERENCES_DIR.glob(f"{sku}-techflat-front.*"))
+    if front:
+        return front[0]
+    # Fall back to a combined/single techflat for SKUs not yet split.
+    # Exclude already-split -front/-back files (handled above / below).
+    candidates = [
+        p
+        for p in sorted(PRODUCT_REFERENCES_DIR.glob(f"{sku}*-techflat.*"))
+        if "-techflat-front" not in p.name and "-techflat-back" not in p.name
+    ]
     return candidates[0] if candidates else None
 
 
 def _find_real_back_source(sku: str) -> Path | None:
-    """Find a real-back photo for a SKU. Used as the techflat/back.* slot
-    until true back-techflats are commissioned.
+    """Find the BACK techflat for a SKU.
+
+    Resolution order:
+        1. {sku}-techflat-back.*    (split output — preferred)
+        2. {sku}*-real-back.*       (real back photo, stand-in)
+        3. {sku}*-back.*            (any back image)
     """
     if not PRODUCT_REFERENCES_DIR.is_dir():
         return None
+    back = sorted(PRODUCT_REFERENCES_DIR.glob(f"{sku}-techflat-back.*"))
+    if back:
+        return back[0]
     candidates = sorted(PRODUCT_REFERENCES_DIR.glob(f"{sku}*-real-back.*"))
     if candidates:
         return candidates[0]
-    candidates = sorted(PRODUCT_REFERENCES_DIR.glob(f"{sku}*-back.*"))
+    candidates = [
+        p
+        for p in sorted(PRODUCT_REFERENCES_DIR.glob(f"{sku}*-back.*"))
+        if "-techflat-back" not in p.name
+    ]
     return candidates[0] if candidates else None
 
 
