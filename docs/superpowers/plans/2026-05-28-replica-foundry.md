@@ -10,6 +10,12 @@
 
 ---
 
+## Spec Deviation (one — read before starting)
+
+**Same-engine (Modal/fal.ai) fallback wiring is deferred out of Phase 1.** Spec §12.8 placed it in Phase 1; this plan moves it to a post-Phase-1 flag-flip, gated on the Phase 0.2 consistency check (Task 2). Rationale: "transparent overflow" requires proof that hosted output matches local within the consistency bar — claiming it before that proof would violate the locked "no silent fallback" rule. Phase 1 ships local-TRELLIS-only; once the Phase 0.2 bar passes, enabling hosted overflow is a config change, not new architecture. **If you want hosted fallback wired inside Phase 1 anyway, add it as a task that routes 100% to local until the bar passes — flag this before execution.**
+
+---
+
 ## Source of Truth & Reuse Map (read before Task 1)
 
 Verified existing interfaces this plan integrates against — **do not reimplement these**:
@@ -1002,7 +1008,7 @@ git commit -m "feat: Blender headless GLB->views renderer + angle-level coverage
 - Create: `skyyrose/elite_studio/platform/fidelity/metrics.py`
 - Test: `tests/elite_studio/platform/test_fidelity_metrics.py`
 
-> Composes existing scorers. Before writing, confirm `dino_embedder`'s exported names: `grep -n "^def \|^__all__" skyyrose/core/dino_embedder.py`. The plan assumes `embed_image` + `cosine_similarity` mirroring `clip_embedder`. If names differ, adapt the import in Step 3 (and only there).
+> Composes existing scorers. Verified: `skyyrose/core/dino_embedder.py` exports `embed_image(source) -> np.ndarray` and `cosine_similarity(a, b) -> float` — exact mirror of `clip_embedder`. The imports in Step 3 are correct as written.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1303,11 +1309,16 @@ class FidelityReport:
         d["violations"] = list(self.violations)
         return d
 
-    def persist(self, base: Path) -> Path:
-        """Write the report to <base>/<tenant>/<sku>/fidelity_report.json."""
+    def persist(self, base: Path, *, suffix: str = "") -> Path:
+        """Write to <base>/<tenant>/<sku>/fidelity_report{suffix}.json.
+
+        `suffix` (e.g. "_attempt2") preserves each regeneration attempt's
+        report instead of clobbering — the audit trail keeps every try's
+        scores, as the spec requires.
+        """
         out_dir = base / self.tenant_id / self.sku
         out_dir.mkdir(parents=True, exist_ok=True)
-        path = out_dir / "fidelity_report.json"
+        path = out_dir / f"fidelity_report{suffix}.json"
         path.write_text(json.dumps(self.to_dict(), indent=2), encoding="utf-8")
         return path
 ```
@@ -1399,7 +1410,7 @@ import logging
 from collections.abc import Sequence
 
 from skyyrose.elite_studio.platform.fidelity.metrics import VisibleScore
-from skyyrose.elite_studio.platform.fidelity.report import FidelityVerdict
+from skyyrose.elite_studio.platform.fidelity.report import FidelityReport, FidelityVerdict
 
 logger = logging.getLogger(__name__)
 
@@ -1421,7 +1432,58 @@ def dispose(
     if inferred_angles or violations:
         return FidelityVerdict.HUMAN_QUEUE
     return FidelityVerdict.PASS_PENDING_HUMAN
+
+
+def evaluate(tenant, sku: str, mesh_path: str, *, attempt: int = 1, renderer=None) -> FidelityReport:
+    """Full dossier-VALIDATE pipeline → FidelityReport.
+
+    GATED-INTEGRATION: touches Blender + CLIP/DINOv2 models, so it is exercised
+    in gated integration (real GLB), never in CI. The pure `dispose` it calls is
+    unit-tested above. render views → score visible (vs golden) → mesh sanity →
+    dispose → report.
+    """
+    from skyyrose.elite_studio.platform.catalog_source import SkyyRoseCatalogSource
+    from skyyrose.elite_studio.platform.fidelity.metrics import score_view
+    from skyyrose.elite_studio.platform.fidelity.render import BlenderRenderer
+    from skyyrose.elite_studio.platform.fidelity.validate import (
+        inspect_glb_geometry,
+        mesh_sanity_ok,
+    )
+
+    source = SkyyRoseCatalogSource(reference_root=tenant.reference_root)
+    references = source.references(sku)
+    renderer = renderer or BlenderRenderer()
+    views = renderer.render(mesh_path, references)
+
+    visible = [
+        score_view(views.angle_paths[a], references[a], sku=sku, angle=a)
+        for a in views.verified_angles()
+    ]
+    composite_by_angle = {vs.angle: vs.composite for vs in visible}
+
+    violations: list[str] = []
+    ok, detail = mesh_sanity_ok(**inspect_glb_geometry(mesh_path))
+    if not ok:
+        violations.append(f"mesh: {detail}")
+    # Inferred views already force HUMAN_QUEUE via dispose — a missing hidden-face
+    # color sample can never grant auto-pass, so brand-palette sampling of
+    # inferred views is an advisory enrichment, added in gated integration.
+
+    verdict = dispose(
+        visible=visible,
+        inferred_angles=views.inferred_angles(),
+        violations=tuple(violations),
+        threshold=tenant.thresholds.visible_composite_min,
+    )
+    return FidelityReport(
+        tenant_id=tenant.id, sku=sku, mesh_path=mesh_path, verdict=verdict,
+        composite_by_angle=composite_by_angle,
+        verified_angles=views.verified_angles(), inferred_angles=views.inferred_angles(),
+        violations=tuple(violations), attempts=attempt,
+    )
 ```
+
+> `dispose` is unit-tested (above). `evaluate` is the integration composition (Blender + models) — verified in gated integration on a real br-001 GLB, not in CI. It is the production `evaluate_fn` consumed by Task 14's `default_replica_runner`.
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -1585,13 +1647,13 @@ git commit -m "feat: file-backed human approval queue"
 - Modify: `skyyrose/elite_studio/platform/__init__.py` (export `generate_3d`, `GenerationResult`)
 - Test: `tests/elite_studio/platform/test_service.py`
 
-> `generate_3d` ties everything together: resolve tenant → probe capability (refuse on red) → (gated) generate → gate → enqueue approval. The test injects a fake engine + fake gate so the orchestration is verified without GPU. The real engine/gate are wired via default factory args.
+> `generate_3d` is the public entry: resolve tenant → probe capability (refuse on red, zero spend) → on green+`generate`, **delegate to the venture replica runner** (Task 14), which does generate → gate → approval. The runner is injected (`replica_runner`) so this task's orchestration is tested with a fake, no GPU; the real runner is resolved lazily by default (no import-time dependency on the venture). Returns a `GenerationResult` envelope (status + report_path + approval_id).
 
 - [ ] **Step 1: Write the failing test**
 
 ```python
 # tests/elite_studio/platform/test_service.py
-import pytest
+from dataclasses import dataclass
 from skyyrose.elite_studio.platform.service import generate_3d, GenerationResult
 from skyyrose.elite_studio.platform.capability import CapabilityMatrix, CapabilityStatus
 from skyyrose.elite_studio.platform.tenancy import TenantRegistry
@@ -1610,12 +1672,19 @@ def _green_matrix(tenant):
     return _FakeMatrix(tenant=tenant, statuses=statuses)
 
 
+@dataclass
+class _FakeOutcome:
+    status: str = "queued_for_human"
+    report_path: str = "/r/skyyrose/br-001/fidelity_report_attempt1.json"
+    approval_id: str = "ap123"
+
+
 def test_refuses_when_required_capability_red():
     tenant = TenantRegistry.default().get("skyyrose")
     red = _FakeMatrix(tenant=tenant, statuses=(CapabilityStatus("engine_local", False, "no gpu"),))
-    res = generate_3d("skyyrose", "br-001", generate=True, matrix=red)
+    res = generate_3d("skyyrose", "br-001", source_image="/g/front.jpg", generate=True, matrix=red)
     assert res.status == "capability_unavailable"
-    assert res.report is None
+    assert res.report_path == ""
 
 
 def test_does_not_generate_when_gate_off():
@@ -1627,6 +1696,30 @@ def test_does_not_generate_when_gate_off():
 def test_unknown_tenant_is_error():
     res = generate_3d("acme", "br-001", generate=True)
     assert res.status == "unknown_tenant"
+
+
+def test_missing_source_image_is_error():
+    tenant = TenantRegistry.default().get("skyyrose")
+    res = generate_3d("skyyrose", "br-001", generate=True, matrix=_green_matrix(tenant))
+    assert res.status == "missing_source_image"
+
+
+def test_delegates_to_replica_runner_on_green():
+    tenant = TenantRegistry.default().get("skyyrose")
+    captured = {}
+
+    def fake_runner(*, tenant, sku, source_image):
+        captured["sku"] = sku
+        return _FakeOutcome()
+
+    res = generate_3d(
+        "skyyrose", "br-001", source_image="/g/front.jpg", generate=True,
+        matrix=_green_matrix(tenant), replica_runner=fake_runner,
+    )
+    assert captured["sku"] == "br-001"
+    assert res.status == "queued_for_human"
+    assert res.approval_id == "ap123"
+    assert res.report_path.endswith("fidelity_report_attempt1.json")
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -1638,24 +1731,37 @@ Expected: FAIL — `ModuleNotFoundError`
 
 ```python
 # skyyrose/elite_studio/platform/service.py
-"""Tenant-scoped 3D generation orchestrator.
+"""Tenant-scoped 3D generation orchestrator (public entry point).
 
-resolve tenant -> probe capability (refuse on red, zero spend) -> [gated]
-generate -> fidelity gate -> enqueue human approval. No silent fallback:
-missing tenant/capability/dossier all produce honest hard-states.
+resolve tenant -> probe capability (refuse on red, zero spend) -> on
+green+generate, delegate to the venture replica runner (generate -> fidelity
+gate -> approval). No silent fallback: unknown tenant, red capability, and
+missing source image all produce honest hard-states. The replica runner is
+injectable for testing; the real one is resolved lazily so this module has no
+import-time dependency on the venture wiring.
 """
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Protocol
 
 from skyyrose.elite_studio.platform.capability import CapabilityMatrix
-from skyyrose.elite_studio.platform.fidelity.report import FidelityReport
-from skyyrose.elite_studio.platform.tenancy import TenantRegistry, UnknownTenantError
+from skyyrose.elite_studio.platform.tenancy import Tenant, TenantRegistry, UnknownTenantError
 
 logger = logging.getLogger(__name__)
 
 REQUIRED_CAPS = ("catalog", "reference_store", "fidelity_scorer", "engine_local")
+
+
+class _Outcome(Protocol):
+    status: str
+    report_path: str
+    approval_id: str
+
+
+ReplicaRunner = Callable[..., _Outcome]
 
 
 @dataclass(frozen=True)
@@ -1663,8 +1769,15 @@ class GenerationResult:
     tenant_id: str
     sku: str
     status: str
-    report: FidelityReport | None = None
+    report_path: str = ""
     approval_id: str = ""
+
+
+def _default_replica_runner(*, tenant: Tenant, sku: str, source_image: str) -> _Outcome:
+    """Lazily resolve the real venture replica runner (avoids import cycle)."""
+    from skyyrose.elite_studio.ventures.threed.service import default_replica_runner
+
+    return default_replica_runner(tenant=tenant, sku=sku, source_image=source_image)
 
 
 def generate_3d(
@@ -1675,6 +1788,7 @@ def generate_3d(
     generate: bool = False,
     registry: TenantRegistry | None = None,
     matrix: CapabilityMatrix | None = None,
+    replica_runner: ReplicaRunner | None = None,
 ) -> GenerationResult:
     registry = registry or TenantRegistry.default()
     try:
@@ -1691,10 +1805,15 @@ def generate_3d(
     if not generate:
         return GenerationResult(tenant_id, sku, status="not_requested")
 
-    # Full generate→gate→approve path runs only with the real engine present.
-    # The heavy path is wired in Task 14 (venture service) + gated integration;
-    # here we hard-state that generation was requested with all caps green.
-    return GenerationResult(tenant_id, sku, status="ready_to_generate")
+    if not source_image:
+        return GenerationResult(tenant_id, sku, status="missing_source_image")
+
+    runner = replica_runner or _default_replica_runner
+    outcome = runner(tenant=tenant, sku=sku, source_image=source_image)
+    return GenerationResult(
+        tenant_id, sku, status=outcome.status,
+        report_path=outcome.report_path, approval_id=outcome.approval_id,
+    )
 ```
 
 ```python
@@ -1707,7 +1826,7 @@ __all__ = ["GenerationResult", "generate_3d"]
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `pytest tests/elite_studio/platform/test_service.py -v`
-Expected: PASS (3 passed)
+Expected: PASS (5 passed)
 
 - [ ] **Step 5: Commit**
 
@@ -1730,8 +1849,11 @@ git commit -m "feat: tenant-scoped generate_3d orchestrator (refuse-on-red, gate
 
 ```python
 # tests/elite_studio/platform/test_threed_service.py
-from skyyrose.elite_studio.ventures.threed.service import run_replica, ReplicaOutcome
+from skyyrose.elite_studio.ventures.threed.service import (
+    run_replica, ReplicaOutcome, default_replica_runner,
+)
 from skyyrose.elite_studio.platform.fidelity.report import FidelityReport, FidelityVerdict
+from skyyrose.elite_studio.platform.tenancy import TenantRegistry
 
 
 def _fake_generate(image_path, product_name):
@@ -1771,6 +1893,17 @@ def test_reject_verdict_does_not_enqueue(tmp_path):
     )
     assert outcome.status == "rejected"
     assert outcome.approval_id == ""
+
+
+def test_default_replica_runner_wires_engine_and_gate_into_run_replica(tmp_path):
+    tenant = TenantRegistry.default().get("skyyrose")
+    outcome = default_replica_runner(
+        tenant=tenant, sku="br-001", source_image="/g/front.jpg",
+        generate_fn=_fake_generate, evaluate_fn=_fake_evaluate,
+        report_base=tmp_path, approval_dir=tmp_path / "ap",
+    )
+    assert outcome.status == "queued_for_human"
+    assert outcome.approval_id
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -1834,7 +1967,7 @@ def run_replica(
             return ReplicaOutcome(tenant_id, sku, status="engine_failed")
 
         report = evaluate_fn(tenant_id, sku, mesh_path)
-        last_report_path = str(report.persist(base=report_base))
+        last_report_path = str(report.persist(base=report_base, suffix=f"_attempt{_attempt}"))
 
         if report.verdict is FidelityVerdict.REJECT:
             # Bounded regen: threshold is FIXED across attempts. Retry is honest
@@ -1850,12 +1983,66 @@ def run_replica(
         )
 
     return ReplicaOutcome(tenant_id, sku, status="rejected", report_path=last_report_path)
+
+
+def _trellis_generate_fn() -> GenerateFn:
+    """Build a generate_fn backed by the local self-hosted TRELLIS engine."""
+    import asyncio
+
+    from agents.trellis_agent import TrellisAgent
+
+    agent = TrellisAgent()
+
+    def _gen(image_path: str, sku: str) -> dict:
+        return asyncio.run(agent.image_to_3d(image_path=image_path, product_name=sku))
+
+    return _gen
+
+
+def _gate_evaluate_fn(tenant) -> EvaluateFn:
+    """Build an evaluate_fn backed by the fidelity gate's full evaluate()."""
+    from skyyrose.elite_studio.platform.fidelity import gate
+
+    def _eval(tenant_id: str, sku: str, mesh_path: str) -> FidelityReport:
+        return gate.evaluate(tenant, sku, mesh_path)
+
+    return _eval
+
+
+def default_replica_runner(
+    *,
+    tenant,
+    sku: str,
+    source_image: str,
+    generate_fn: GenerateFn | None = None,
+    evaluate_fn: EvaluateFn | None = None,
+    report_base: Path | None = None,
+    approval_dir: Path | None = None,
+) -> ReplicaOutcome:
+    """Production runner: real local-TRELLIS engine + fidelity gate via run_replica.
+
+    Resolved lazily by `platform.service.generate_3d`. The seams (generate_fn,
+    evaluate_fn, dirs) are injectable so the wiring is testable without GPU; the
+    defaults use the real engine + gate (gated-integration).
+    """
+    from skyyrose.elite_studio.config import OUTPUT_DIR
+
+    base = report_base or (Path(OUTPUT_DIR) / "fidelity")
+    return run_replica(
+        tenant_id=tenant.id,
+        sku=sku,
+        source_image=source_image,
+        generate_fn=generate_fn or _trellis_generate_fn(),
+        evaluate_fn=evaluate_fn or _gate_evaluate_fn(tenant),
+        report_base=base,
+        approval_dir=approval_dir or (base / "approvals"),
+    )
 ```
 
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `pytest tests/elite_studio/platform/test_threed_service.py -v`
-Expected: PASS (2 passed)
+Expected: PASS (3 passed)
 
 - [ ] **Step 5: Commit**
 
@@ -1866,7 +2053,136 @@ git commit -m "feat: tenant-scoped threed replica service (generate->gate->appro
 
 ---
 
-### Task 15: Full-suite green + lint + capability smoke
+### Task 15: Post-approval delivery to canonical product tree
+
+**Files:**
+- Create: `skyyrose/elite_studio/platform/delivery.py`
+- Test: `tests/elite_studio/platform/test_delivery.py`
+
+> The ONLY path that writes the canonical product tree. Runs solely after a human flips an `ApprovalRecord` to `approved`; copies the approved mesh into `products/<tenant>/<sku>/v{n}/` (next version, never overwriting). Closes the spec §7 "on approve → promote" step.
+
+- [ ] **Step 1: Write the failing test**
+
+```python
+# tests/elite_studio/platform/test_delivery.py
+import json
+import pytest
+from skyyrose.elite_studio.platform.delivery import deliver_approved, NotApprovedError
+from skyyrose.elite_studio.platform.approval import ApprovalQueue
+
+
+def _make_report(tmp_path, mesh):
+    rp = tmp_path / "fidelity_report_attempt1.json"
+    rp.write_text(json.dumps({"mesh_path": str(mesh)}))
+    return rp
+
+
+def test_delivers_approved_mesh_to_versioned_tree(tmp_path):
+    mesh = tmp_path / "m.glb"; mesh.write_bytes(b"glb")
+    q = ApprovalQueue(store_dir=tmp_path / "ap")
+    rec = q.enqueue(tenant_id="skyyrose", sku="br-001", report_path=str(_make_report(tmp_path, mesh)))
+    q.approve(rec.id, reviewer="corey")
+    products = tmp_path / "products"
+    dest = deliver_approved(rec.id, queue=q, products_base=products)
+    assert dest == products / "skyyrose" / "br-001" / "v1" / "m.glb"
+    assert dest.exists()
+
+
+def test_second_delivery_bumps_version(tmp_path):
+    mesh = tmp_path / "m.glb"; mesh.write_bytes(b"glb")
+    q = ApprovalQueue(store_dir=tmp_path / "ap")
+    products = tmp_path / "products"
+    dest = None
+    for _ in range(2):
+        rec = q.enqueue(tenant_id="skyyrose", sku="br-001", report_path=str(_make_report(tmp_path, mesh)))
+        q.approve(rec.id, reviewer="corey")
+        dest = deliver_approved(rec.id, queue=q, products_base=products)
+    assert dest == products / "skyyrose" / "br-001" / "v2" / "m.glb"
+
+
+def test_refuses_unapproved_record(tmp_path):
+    mesh = tmp_path / "m.glb"; mesh.write_bytes(b"glb")
+    q = ApprovalQueue(store_dir=tmp_path / "ap")
+    rec = q.enqueue(tenant_id="skyyrose", sku="br-001", report_path=str(_make_report(tmp_path, mesh)))
+    with pytest.raises(NotApprovedError):
+        deliver_approved(rec.id, queue=q, products_base=tmp_path / "products")
+```
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `pytest tests/elite_studio/platform/test_delivery.py -v`
+Expected: FAIL — `ModuleNotFoundError`
+
+- [ ] **Step 3: Write minimal implementation**
+
+```python
+# skyyrose/elite_studio/platform/delivery.py
+"""Post-approval delivery: promote an approved mesh into the canonical tree.
+
+Runs ONLY after a human approves (ApprovalRecord.status == 'approved'). Copies
+the approved mesh to products/<tenant>/<sku>/v{n}/ (next version, never
+overwriting). This is the only writer of the canonical product tree — no
+unapproved asset can reach it.
+"""
+from __future__ import annotations
+
+import json
+import shutil
+from pathlib import Path
+
+from skyyrose.elite_studio.platform.approval import ApprovalQueue
+from skyyrose.elite_studio.platform.tenancy import TenantRegistry
+
+
+class NotApprovedError(RuntimeError):
+    """Raised when delivery is attempted for a non-approved record."""
+
+
+def _next_version(sku_dir: Path) -> int:
+    if not sku_dir.is_dir():
+        return 1
+    versions = [int(p.name[1:]) for p in sku_dir.glob("v*") if p.name[1:].isdigit()]
+    return (max(versions) + 1) if versions else 1
+
+
+def deliver_approved(
+    approval_id: str,
+    *,
+    queue: ApprovalQueue,
+    products_base: Path,
+    registry: TenantRegistry | None = None,
+) -> Path:
+    """Promote the approved record's mesh into products/<tenant>/<sku>/v{n}/."""
+    registry = registry or TenantRegistry.default()
+    record = queue.get(approval_id)
+    if record.status != "approved":
+        raise NotApprovedError(f"record {approval_id} is {record.status!r}, not approved")
+    tenant = registry.get(record.tenant_id)
+    report = json.loads(Path(record.report_path).read_text())
+    mesh_src = Path(report["mesh_path"])
+    version = _next_version(products_base / tenant.id / record.sku)
+    dest_dir = tenant.product_root(base=products_base, sku=record.sku, version=version)
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    dest = dest_dir / mesh_src.name
+    shutil.copy2(mesh_src, dest)
+    return dest
+```
+
+- [ ] **Step 4: Run test to verify it passes**
+
+Run: `pytest tests/elite_studio/platform/test_delivery.py -v`
+Expected: PASS (3 passed)
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add skyyrose/elite_studio/platform/delivery.py tests/elite_studio/platform/test_delivery.py
+git commit -m "feat: post-approval delivery to canonical product tree (only writer)"
+```
+
+---
+
+### Task 16: Full-suite green + lint + capability smoke
 
 **Files:**
 - Modify: none (verification task)
@@ -1874,7 +2190,7 @@ git commit -m "feat: tenant-scoped threed replica service (generate->gate->appro
 - [ ] **Step 1: Run the whole platform suite**
 
 Run: `pytest tests/elite_studio/platform/ -v`
-Expected: PASS — all tests from Tasks 1-14 green.
+Expected: PASS — all tests from Tasks 1-15 green.
 
 - [ ] **Step 2: Run the existing threed venture suite (no regression)**
 
