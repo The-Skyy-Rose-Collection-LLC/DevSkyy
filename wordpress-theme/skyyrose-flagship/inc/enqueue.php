@@ -739,22 +739,8 @@ function skyyrose_enqueue_template_scripts() {
 			);
 		}
 
-		// Complete the Look — quick-add behavior for PDP cross-sells. Extracted
-		// from inline <script> in template-parts/complete-the-look.php in v1.5.7
-		// so the behavior is versioned, minified, and CSP-nonce-compatible.
-		if ( 'single-product' === $slug ) {
-			$ctl_file = $use_min && file_exists( $base_js_dir . '/complete-the-look.min.js' )
-				? 'complete-the-look.min.js' : 'complete-the-look.js';
-			if ( file_exists( $base_js_dir . '/' . $ctl_file ) ) {
-				wp_enqueue_script(
-					'skyyrose-complete-the-look',
-					$base_js_uri . '/' . $ctl_file,
-					array( 'jquery' ),
-					SKYYROSE_VERSION,
-					true
-				);
-			}
-		}
+		// "Complete the Look" cross-sell removed 2026-05-27 per founder canon.
+		// Enqueue, template, function, and hook all retired in the same commit.
 
 		// Localize immersive scenes + load the WC bridge that wires the
 		// "Pre-Order Now" button to skyyrose_immersive_add_to_cart.

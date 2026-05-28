@@ -526,19 +526,11 @@ add_action( 'wp_ajax_nopriv_skyyrose_get_cart_count', 'skyyrose_ajax_get_cart_co
  * Complete the Look — single product cross-sell
  *--------------------------------------------------------------*/
 
-/**
- * Render the "Complete the Look" cross-sell section on single product pages.
- *
- * Delegates all logic and markup to template-parts/complete-the-look.php,
- * which resolves curated SKU pairs and outputs quick-add cards.
- *
- * @since 5.0.0
- * @return void
+/*
+ * "Complete the Look" cross-sell removed 2026-05-27 per founder canon: no
+ * related products on PDP, garment is the protagonist. Template part,
+ * enqueue, and similarity-fallback wiring removed in the same commit.
  */
-function skyyrose_complete_the_look() {
-	get_template_part( 'template-parts/complete-the-look' );
-}
-add_action( 'woocommerce_single_product_summary', 'skyyrose_complete_the_look', 50 );
 
 /*
 Pre-order meta, notices, pricing, and referral credit logic moved to

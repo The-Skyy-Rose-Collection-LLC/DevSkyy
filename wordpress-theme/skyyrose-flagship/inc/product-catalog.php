@@ -330,9 +330,10 @@ function skyyrose_get_product_dossier( $sku ) {
 /**
  * Get similarity-ranked SKUs for a product from data/product-similarities.json.
  *
- * Used as a fallback by template-parts/complete-the-look.php when the curated
- * cross-sell map has no entry for the current SKU. The JSON is pre-computed
- * from CLIP image embeddings (top-N per product, see file's `model` field).
+ * Originally a fallback for the now-retired complete-the-look cross-sell.
+ * Retained because the CLIP-embedding similarity data is still useful for
+ * future ranking surfaces (search, recommendations, internal QA). Safe to
+ * remove if no consumer materializes.
  *
  * @since 1.5.4
  *

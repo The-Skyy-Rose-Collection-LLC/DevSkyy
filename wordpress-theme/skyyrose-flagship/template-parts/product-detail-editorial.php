@@ -207,14 +207,7 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 		<?php endif; ?>
 	</section>
 
-	<?php // ── Chapter 6: Wears With ───────────────────────────────────── ?>
-	<section class="sr-ed__wears-with rv-clip-up" role="region" aria-labelledby="sr-ed-wears-h">
-		<span class="sr-ed__chapter-num"><?php esc_html_e( '06', 'skyyrose' ); ?></span>
-		<h2 id="sr-ed-wears-h" class="sr-ed__section-title">
-			<?php esc_html_e( 'Wears With', 'skyyrose' ); ?>
-		</h2>
-		<?php get_template_part( 'template-parts/complete-the-look' ); ?>
-	</section>
+	<?php // Chapter 6 "Wears With" retired 2026-05-27 — founder canon: no related products on PDP. ?>
 
 	<?php // ── Chapter 7: Care + Craft ──────────────────────────────────── ?>
 	<section class="sr-ed__care rv-blur" role="region" aria-labelledby="sr-ed-care-h">

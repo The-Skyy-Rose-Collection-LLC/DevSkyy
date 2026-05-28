@@ -85,8 +85,16 @@ if ( class_exists( 'WooCommerce' ) ) {
 // Static fallback when WooCommerce is inactive or no products found.
 // Source from centralized catalog so prices stay in sync.
 if ( empty( $skyyrose_trending_products ) ) {
-	// Only published products — br-001, br-007, and lh-004 are drafts.
-	$skyyrose_404_skus = array( 'br-006', 'lh-002', 'sg-001', 'sg-002' );
+	// First four published products from the canonical catalog — no hardcoded SKU list.
+	$skyyrose_404_skus = array();
+	foreach ( skyyrose_get_product_catalog() as $skyyrose_404_candidate ) {
+		if ( ! empty( $skyyrose_404_candidate['published'] ) ) {
+			$skyyrose_404_skus[] = $skyyrose_404_candidate['sku'];
+			if ( count( $skyyrose_404_skus ) >= 4 ) {
+				break;
+			}
+		}
+	}
 	foreach ( $skyyrose_404_skus as $skyyrose_404_sku ) {
 		$skyyrose_404_product = skyyrose_get_product( $skyyrose_404_sku );
 		if ( $skyyrose_404_product ) {
