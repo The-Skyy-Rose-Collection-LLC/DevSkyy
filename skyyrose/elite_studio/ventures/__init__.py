@@ -13,7 +13,8 @@ Current ventures:
   NOT duplicated into `ventures/imagery/`; it remains the umbrella's
   reference implementation.
 - **photo** — editorial / lifestyle photography direction + generation.
-- **threed** — 3D model generation tournament (Tripo, Meshy, TRELLIS).
+- **threed** — self-hosted 3D replica generation (TRELLIS.2 on our GPU;
+  Tripo/Meshy registered as legacy SaaS but not invoked).
 - **video** — animated / try-on video generation (alpha; least wired).
 
 Each `ventures.<slug>` package exports a `MANIFEST` and a `Pipeline`

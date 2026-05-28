@@ -25,6 +25,17 @@ wired but cost-gated behind `generate_graphics` / `run_strategy` state flags.
 Its operator-facing skills library lives at `.claude/skills/skyyrose-social-*`
 with `skyyrose-content-engine` as the index hub.
 
+The 3D venture is deep-wired **TRELLIS-only / self-hosted** — it *owns* the
+engine rather than referring out to a SaaS vendor. The generation node runs
+`microsoft/TRELLIS.2-4B` on our own GPU via `agents.trellis_agent.TrellisAgent`
+(isolated `trellis2` conda env). A free `verify_capability` node proves the
+self-hosted endpoint is real (conda env, TRELLIS.2 repo, model repo, output
+dir, dossier resolution) on every pass — `python -m
+skyyrose.elite_studio.ventures.threed verify`. Generation is compute-gated
+behind `generate_3d` (default off) so smoke/tests never spin up the model.
+Tripo and Meshy remain registered (`ready=False`) as legacy SaaS providers but
+are not invoked by the venture.
+
 The Imagery venture is the original Elite Studio pipeline. It is *not*
 duplicated under `ventures/imagery/` to avoid abstraction collision —
 its manifest is registered from the registry's `IMAGERY_MANIFEST`

@@ -1,10 +1,11 @@
-"""CLI for the 3D / Immersive venture.
+"""CLI for the 3D / Immersive venture (TRELLIS-only / self-hosted).
 
 Subcommands:
     info     — print the venture manifest as JSON
     agents   — list bound agents and their wiring status
     status   — one-line status summary
-    smoke    — run the compiled pipeline against a synthetic SKU
+    verify   — prove the self-hosted TRELLIS.2 endpoint is ready (free, no gen)
+    smoke    — run the compiled pipeline against a SKU (verify path; gen gated off)
 """
 
 from __future__ import annotations
@@ -33,7 +34,7 @@ def cmd_info(_: argparse.Namespace) -> int:
 def cmd_agents(_: argparse.Namespace) -> int:
     for binding in MANIFEST.agent_bindings:
         wiring = "READY" if binding.ready else "registered"
-        print(f"  [{wiring:>10}] {binding.role:<18} {binding.name:<24} {binding.import_path}")
+        print(f"  [{wiring:>10}] {binding.role:<22} {binding.name:<18} {binding.import_path}")
     return 0
 
 
@@ -47,17 +48,27 @@ def cmd_status(_: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_verify(args: argparse.Namespace) -> int:
+    """Prove the self-hosted endpoint readiness. Free — never generates."""
+    pipeline = ThreeDPipeline()
+    result = pipeline.run_smoke(sku=args.sku)
+    connectivity = result.final_state.get("connectivity", {})
+    print(json.dumps(connectivity, indent=2, default=str))
+    # Exit 0 when the readiness proof ran; non-zero only on a broken pipeline.
+    return 0 if connectivity else 1
+
+
 def cmd_smoke(args: argparse.Namespace) -> int:
     pipeline = ThreeDPipeline()
     result = pipeline.run_smoke(sku=args.sku)
     print(json.dumps(dataclasses.asdict(result), indent=2, default=str))
-    return 0 if result.status == "initialized" else 1
+    return 0 if result.status == "assembled" else 1
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="skyyrose.elite_studio.ventures.threed",
-        description="3D / Immersive venture — Elite Studio.",
+        description="3D / Immersive venture (self-hosted TRELLIS.2) — Elite Studio.",
     )
     subparsers = parser.add_subparsers(dest="cmd", required=True)
 
@@ -67,8 +78,14 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("agents", help="List bound agents.").set_defaults(func=cmd_agents)
     subparsers.add_parser("status", help="One-line venture status.").set_defaults(func=cmd_status)
 
-    smoke = subparsers.add_parser("smoke", help="Run the compiled pipeline against a SKU.")
-    smoke.add_argument("--sku", default="smoke-001", help="Synthetic SKU to feed the pipeline.")
+    verify = subparsers.add_parser("verify", help="Prove TRELLIS.2 self-hosted readiness (free).")
+    verify.add_argument("--sku", default="smoke-001", help="SKU for the dossier-resolution probe.")
+    verify.set_defaults(func=cmd_verify)
+
+    smoke = subparsers.add_parser(
+        "smoke", help="Run the compiled pipeline (verify path) for a SKU."
+    )
+    smoke.add_argument("--sku", default="smoke-001", help="SKU to feed the pipeline.")
     smoke.set_defaults(func=cmd_smoke)
     return parser
 
