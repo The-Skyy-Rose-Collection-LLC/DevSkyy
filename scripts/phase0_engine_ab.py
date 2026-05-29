@@ -210,9 +210,23 @@ def main(argv: list[str] | None = None) -> int:
         help="Actually dispatch (PAID + GPU). Default is a dry-run manifest only.",
     )
     parser.add_argument("--budget", type=float, default=DEFAULT_BUDGET_USD)
+    parser.add_argument(
+        "--env-file",
+        default=None,
+        help="Load env vars from this file via python-dotenv before dispatch "
+        "(robust parsing; keeps secrets out of the shell and logs).",
+    )
     args = parser.parse_args(argv)
     skus = tuple(args.skus)
     engines = tuple(args.engines)
+
+    if args.env_file:
+        try:
+            from dotenv import load_dotenv
+        except ImportError:
+            print("python-dotenv not installed; cannot load --env-file", file=sys.stderr)
+            return 3
+        load_dotenv(args.env_file, override=True)
 
     manifest = build_manifest(skus, engines, _default_source_for)
     print(render_manifest(manifest))
