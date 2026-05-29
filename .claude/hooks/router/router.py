@@ -73,6 +73,7 @@ def _format_context(pat: dict) -> str:
     skills = pat.get("skills", [])
     agents = pat.get("agents", [])
     plugins = pat.get("plugins", [])
+    workflow = pat.get("workflow")
 
     if name == "default" and not skills and not agents and not plugins:
         return ""
@@ -90,6 +91,12 @@ def _format_context(pat: dict) -> str:
         lines.append(f"**Agents:** {', '.join(f'`{a}`' for a in agents)}")
     if plugins:
         lines.append(f"**Plugins:** {', '.join(f'`{p}`' for p in plugins)}")
+    if workflow:
+        lines.append(
+            f"**Dev Team Workflow:** `{workflow}` — for substantive build/fix/design work on this surface, "
+            f'invoke `Workflow({{name: "{workflow}"}}, args=<task>)`. '
+            "Skip for trivial one-liners or pure questions."
+        )
 
     lines.extend(
         [

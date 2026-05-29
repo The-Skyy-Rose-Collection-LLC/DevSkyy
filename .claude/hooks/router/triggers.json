@@ -7,14 +7,16 @@
       "regex": "\\b(wordpress|wp-?theme|woocommerce|skyyrose-flagship|wp-?content|wp-?admin|php|elementor|divi|gutenberg)\\b",
       "skills": ["wp-block-themes", "wp-block-development", "wp-plugin-development", "wp-rest-api", "wp-performance", "wp-phpstan", "wp-playground", "wordpress-plugin-core", "wordpress-router", "wordpress-woocommerce-automation", "woocommerce", "woocommerce-backend-dev", "woocommerce-code-review", "woocommerce-webhooks", "deploy-wp", "wp-simplify"],
       "agents": ["deploy-and-verify", "wp-code-simplifier"],
-      "plugins": []
+      "plugins": [],
+      "workflow": "skyyrose-dev-team"
     },
     {
       "name": "frontend",
       "regex": "\\b(next\\.?js|react|tsx|jsx|tailwind|vercel|dashboard|frontend|component|shadcn|nextjs)\\b",
       "skills": ["nextjs-16-complete-guide", "nextjs-app-router-fundamentals", "nextjs-app-router-patterns", "nextjs-best-practices", "nextjs-performance", "nextjs-turbopack", "frontend-design", "frontend-patterns", "frontend-launchpad", "vercel-react-best-practices", "vercel-composition-patterns", "shadcn", "tdd-workflow"],
       "agents": ["Frontend Developer", "UI Designer", "UX Architect"],
-      "plugins": []
+      "plugins": [],
+      "workflow": "skyyrose-dev-team"
     },
     {
       "name": "python-backend",
