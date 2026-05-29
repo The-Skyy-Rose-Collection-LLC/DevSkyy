@@ -684,6 +684,34 @@ function skyyrose_enqueue_template_scripts() {
 		wp_enqueue_script( 'skyyrose-gsap-st', SKYYROSE_ASSETS_URI . '/js/lib/ScrollTrigger.min.js', array( 'skyyrose-gsap' ), '3.12.2', true );
 	}
 
+	// Phase 1 — Immersive Core: scene intro, lockup, dust canvas.
+	// Loaded on: immersive rooms (4×) + preorder gateway.
+	// Lenis (Phase 2) is intentionally excluded — do NOT add it here.
+	if ( in_array( $slug, array( 'immersive', 'preorder-gateway' ), true ) ) {
+		$ic_css = $use_min && file_exists( $base_css_dir . '/system/immersive-core.min.css' )
+			? 'system/immersive-core.min.css' : 'system/immersive-core.css';
+		if ( file_exists( $base_css_dir . '/' . $ic_css ) ) {
+			wp_enqueue_style(
+				'skyyrose-immersive-core',
+				$base_css_uri . '/' . $ic_css,
+				array( 'skyyrose-design-tokens' ),
+				SKYYROSE_VERSION
+			);
+		}
+
+		$ic_js = $use_min && file_exists( $base_js_dir . '/system/immersive-core.min.js' )
+			? 'system/immersive-core.min.js' : 'system/immersive-core.js';
+		if ( file_exists( $base_js_dir . '/' . $ic_js ) ) {
+			wp_enqueue_script(
+				'skyyrose-immersive-core',
+				$base_js_uri . '/' . $ic_js,
+				array( 'skyyrose-gsap', 'skyyrose-gsap-st' ),
+				SKYYROSE_VERSION,
+				true
+			);
+		}
+	}
+
 	$template_scripts = array(
 		'front-page'       => 'homepage-v2.js',
 		'immersive'        => 'immersive.js',

@@ -18,7 +18,6 @@
  *     @type string $collection_name  Display name (e.g., 'Signature Collection').
  *     @type string $world_name       H1 title (e.g., 'The Golden Gate Runway').
  *     @type string $tagline          Subtitle text.
- *     @type string $accent_color     CSS custom property value (e.g., '#D4AF37').
  *     @type string $collection_url   CTA link to collection page.
  *     @type array  $rooms            Room data — see structure below.
  * }
@@ -41,23 +40,17 @@ $collection_slug = isset( $args['collection_slug'] ) ? sanitize_key( $args['coll
 $collection_name = isset( $args['collection_name'] ) ? $args['collection_name'] : '';
 $world_name      = isset( $args['world_name'] ) ? $args['world_name'] : '';
 $tagline         = isset( $args['tagline'] ) ? $args['tagline'] : '';
-$accent_color    = isset( $args['accent_color'] ) ? $args['accent_color'] : '#B76E79';
 $collection_url  = isset( $args['collection_url'] ) ? $args['collection_url'] : '';
 $rooms           = isset( $args['rooms'] ) && is_array( $args['rooms'] ) ? $args['rooms'] : array();
 $room_count      = count( $rooms );
 $first_room_name = $room_count > 0 && isset( $rooms[0]['name'] ) ? $rooms[0]['name'] : '';
-
-// Validate accent_color is a safe CSS color value (hex only).
-if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
-	$accent_color = '#B76E79';
-}
 ?>
 
 <!-- ═══ Immersive Scene: <?php echo esc_html( $world_name ); ?> ═══ -->
 <div class="immersive-scene immersive-<?php echo esc_attr( $collection_slug ); ?>"
+	data-collection="<?php echo esc_attr( $collection_slug ); ?>"
 	role="region"
-	aria-labelledby="scene-title"
-	style="--accent-color: <?php echo esc_attr( $accent_color ); ?>;">
+	aria-labelledby="scene-title">
 
 	<!-- Loading Screen -->
 	<?php get_template_part( 'template-parts/immersive/loader', null, array( 'world_name' => $world_name ) ); ?>
@@ -73,11 +66,10 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 				$scene_image_path   = get_theme_file_path( 'assets/images/immersive/' . $room_image );
 				$scene_image_exists = ! empty( $room_image ) && file_exists( $scene_image_path );
 			?>
-			<div class="scene-layer<?php echo 0 === $index ? ' active' : ''; ?>"
+			<div class="scene-layer<?php echo 0 === $index ? ' active' : ''; ?><?php echo ! $scene_image_exists ? ' scene-layer--missing' : ''; ?>"
 				data-room-name="<?php echo esc_attr( $room_name ); ?>"
 				<?php if ( ! $scene_image_exists ) : ?>
 					data-missing-scene="<?php echo esc_attr( $room_image ); ?>"
-					style="background: radial-gradient(ellipse at center, <?php echo esc_attr( $accent_color ); ?>22 0%, #0a0a0a 70%);"
 				<?php endif; ?>>
 				<?php if ( $scene_image_exists ) : ?>
 					<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/immersive/' . $room_image ); ?>"
@@ -177,9 +169,59 @@ if ( ! preg_match( '/^#[0-9A-Fa-f]{3,8}$/', $accent_color ) ) {
 		</div>
 	<?php endforeach; ?>
 
+	<?php
+	// Per-collection lockup (hero title is an image, never type-rendered).
+	$lockup_map = array(
+		'black-rose'   => array(
+			'dir'     => 'hero-overlays',
+			'base'    => 'br-brand-script-logotype',
+			'has_png' => true,
+			'alt'     => __( 'Black Rose', 'skyyrose' ),
+		),
+		'love-hurts'   => array(
+			'dir'     => 'hero-overlays',
+			'base'    => 'lh-logo-combined',
+			'has_png' => true,
+			'alt'     => __( 'Love Hurts', 'skyyrose' ),
+		),
+		'signature'    => array(
+			'dir'     => 'hero-overlays',
+			'base'    => 'sig-brand-skyy-rose-gold',
+			'has_png' => true,
+			'alt'     => __( 'Signature', 'skyyrose' ),
+		),
+		'kids-capsule' => array(
+			'dir'     => 'logos',
+			'base'    => 'sr-monogram-rose-gold',
+			'has_png' => false,
+			'alt'     => __( 'Kids Capsule', 'skyyrose' ),
+		),
+	);
+
+	$lockup_info  = isset( $lockup_map[ $collection_slug ] ) ? $lockup_map[ $collection_slug ] : null;
+	$img_base_uri = get_template_directory_uri() . '/assets/images/';
+	?>
+
 	<!-- Scene Title -->
 	<div class="scene-title-overlay">
-		<h1 id="scene-title" class="rv-split-line"><?php echo esc_html( $world_name ); ?></h1>
+		<?php if ( $lockup_info ) : ?>
+			<picture class="scene-lockup">
+				<source srcset="<?php echo esc_url( $img_base_uri . $lockup_info['dir'] . '/' . $lockup_info['base'] . '.avif' ); ?>" type="image/avif">
+				<source srcset="<?php echo esc_url( $img_base_uri . $lockup_info['dir'] . '/' . $lockup_info['base'] . '.webp' ); ?>" type="image/webp">
+				<?php if ( $lockup_info['has_png'] ) : ?>
+					<img src="<?php echo esc_url( $img_base_uri . $lockup_info['dir'] . '/' . $lockup_info['base'] . '.png' ); ?>"
+						alt="<?php echo esc_attr( $lockup_info['alt'] ); ?>" width="480"
+						fetchpriority="high" loading="eager" class="scene-lockup__img">
+				<?php else : ?>
+					<img src="<?php echo esc_url( $img_base_uri . $lockup_info['dir'] . '/' . $lockup_info['base'] . '.webp' ); ?>"
+						alt="<?php echo esc_attr( $lockup_info['alt'] ); ?>" width="480"
+						fetchpriority="high" loading="eager" class="scene-lockup__img">
+				<?php endif; ?>
+			</picture>
+		<?php endif; ?>
+		<!-- Hairline accent rule: JS queries .scene-hairline; CSS sizes it (width:120px) in immersive-core.css. The intro clones it into the overlay and GSAP animates scaleX 0→1 in step 3. -->
+		<div class="scene-hairline" aria-hidden="true"></div>
+		<h1 id="scene-title" class="screen-reader-text"><?php echo esc_html( $collection_name ); ?></h1>
 		<p class="scene-subtitle rv-clip-left"><?php echo esc_html( $collection_name ); ?></p>
 		<?php if ( $tagline ) : ?>
 			<p class="scene-tagline rv-blur"><?php echo esc_html( $tagline ); ?></p>
