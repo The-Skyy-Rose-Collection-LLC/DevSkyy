@@ -23,7 +23,8 @@ BRAND_PALETTE: dict[str, tuple[int, int, int]] = {
 def color_in_brand_palette(rgb: tuple[int, int, int], *, tolerance: int = 24) -> bool:
     """True if rgb is within Chebyshev `tolerance` of any brand color."""
     return any(
-        all(abs(c - b) <= tolerance for c, b in zip(rgb, brand)) for brand in BRAND_PALETTE.values()
+        all(abs(c - b) <= tolerance for c, b in zip(rgb, brand, strict=True))
+        for brand in BRAND_PALETTE.values()
     )
 
 

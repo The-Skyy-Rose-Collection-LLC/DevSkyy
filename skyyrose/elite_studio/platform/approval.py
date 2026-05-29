@@ -25,7 +25,7 @@ class ApprovalRecord:
     reason: str = ""
     created_at: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
 
-    def with_status(self, status: str, *, reviewer: str = "", reason: str = "") -> "ApprovalRecord":
+    def with_status(self, status: str, *, reviewer: str = "", reason: str = "") -> ApprovalRecord:
         return ApprovalRecord(
             id=self.id,
             tenant_id=self.tenant_id,

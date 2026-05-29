@@ -29,7 +29,7 @@ class CapabilityMatrix:
     tenant: Tenant
     statuses: tuple[CapabilityStatus, ...] = ()
 
-    def probe(self) -> "CapabilityMatrix":
+    def probe(self) -> CapabilityMatrix:
         """Run all free probes and return a populated matrix (immutable copy)."""
         statuses = (
             self._probe_catalog(),
