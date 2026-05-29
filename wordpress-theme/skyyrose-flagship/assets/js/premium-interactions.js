@@ -28,7 +28,7 @@
 		'.rv-clip-up,.rv-clip-left,.rv-clip-right,.rv-clip-diagonal,' +
 		'.rv-blur,.rv-blur-down,.stagger-grid,' +
 		'.rv-split-char,.rv-split-word,.rv-split-line,' +
-		'.col-reveal,.lp-rv,.abt-page .rv';
+		'.col-reveal,.lp-rv,.rv';
 
 	if (prefersReduced) {
 		document.querySelectorAll(revealSelectors)
@@ -131,8 +131,11 @@
 	   ══════════════════════════════════════════════════════════════════ */
 
 	if (mInView) {
-		mInView(revealSelectors, function (el) {
-			el.classList.add('is-visible');
+		mInView(revealSelectors, function (entry) {
+			// Motion One v11 passes the IntersectionObserverEntry to the callback,
+			// not the element (v10 passed the element). Dereference .target; the
+			// `|| entry` keeps it safe if the lib is ever pinned back to v10.
+			(entry.target || entry).classList.add('is-visible');
 		}, { amount: 0.12, margin: '0px 0px -40px 0px' });
 	} else {
 		var revealEls = document.querySelectorAll(revealSelectors);

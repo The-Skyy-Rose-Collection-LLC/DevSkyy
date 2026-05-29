@@ -46,6 +46,7 @@
 
 		if ( isIntroDone( ctx.sessionKey ) ) {
 			ensureRoomInteractive( ctx.lockup, ctx.h1 );
+			scheduleTitleHide( ctx.titleOverlay, 4000 );
 			return;
 		}
 
@@ -94,10 +95,11 @@
 			sessionKey:  'skyyrose_intro_seen_' + slug,
 			sceneEl:     sceneEl,
 			isPreorder:  isPreorder,
-			lockup:      document.querySelector( '.scene-lockup' ),
-			taglineEl:   document.querySelector( '.scene-tagline' ),
-			h1:          document.querySelector( '#scene-title' ),
-			hairline:    document.querySelector( '.scene-hairline' ),
+			lockup:       document.querySelector( '.scene-lockup' ),
+			taglineEl:    document.querySelector( '.scene-tagline' ),
+			h1:           document.querySelector( '#scene-title' ),
+			hairline:     document.querySelector( '.scene-hairline' ),
+			titleOverlay: document.querySelector( '.scene-title-overlay' ),
 		};
 	}
 
@@ -415,6 +417,11 @@
 			} ) );
 		} catch ( e ) { /* older env */ }
 
+		// The lockup is now the room title — let it linger, then fade. Anchored
+		// to intro completion (here) so it is reliably seen regardless of how
+		// long the intro took on a heavy page.
+		scheduleTitleHide( document.querySelector( '.scene-title-overlay' ), TITLE_HOLD_MS );
+
 		// Reset module-level state for safety.
 		activeTl         = null;
 		activeOverlay    = null;
@@ -437,6 +444,10 @@
 		overlay.className         = 'ic-overlay';
 		overlay.setAttribute( 'aria-hidden', 'true' );
 		overlay.setAttribute( 'inert', '' );
+		// Opaque from the instant it mounts so the heavy room init beneath is
+		// masked even before the GSAP timeline starts (the timeline can be
+		// delayed by main-thread contention on these script-heavy pages).
+		overlay.style.opacity = '1';
 
 		var canvas    = document.createElement( 'canvas' );
 		canvas.className = 'ic-dust';
@@ -502,6 +513,26 @@
 		if ( ctx.hairline )  tl.set( ctx.hairline,  { scaleX: 1 }, at );
 	}
 
+	/** How long the lockup title lingers (after it is shown) before fading. */
+	var TITLE_HOLD_MS = 3000;
+
+	/**
+	 * Fade the room title (.scene-title-overlay) after a hold, once the lockup
+	 * has actually been shown. Replaces immersive.js's old fixed 4s-from-DOM-ready
+	 * timer, which raced the variable-timing intro (on heavy pages the intro
+	 * finished ~6s but the title was hidden at 4s — so it was never seen). No-op
+	 * when there is no title overlay (e.g. the preorder gateway).
+	 *
+	 * @param {Element|null} titleOverlay
+	 * @param {number}       holdMs
+	 */
+	function scheduleTitleHide( titleOverlay, holdMs ) {
+		if ( ! titleOverlay ) return;
+		window.setTimeout( function () {
+			titleOverlay.classList.add( 'hidden' );
+		}, holdMs );
+	}
+
 	/* ── Lockup error handler ───────────────────────────────────────── */
 
 	/**
@@ -555,8 +586,10 @@
 		var bgColor   = getComputedStyle( tokenEl ).getPropertyValue( '--skyyrose-bg' ).trim()    || 'currentColor';
 		var dustColor = getComputedStyle( tokenEl ).getPropertyValue( '--skyyrose-accent' ).trim() || 'currentColor';
 
-		tl.set( overlay, { backgroundColor: bgColor, opacity: 0 } )
-		  .to( overlay, { opacity: 1, duration: 0.4, ease: 'power2.out' }, 0 );
+		// Overlay is already opaque (masking the room) from buildOverlay; only
+		// apply the per-collection background here. No opacity fade — the mask
+		// must stay solid from mount through the reveal.
+		tl.set( overlay, { backgroundColor: bgColor } );
 
 		// Warm up dust: use requestIdleCallback when available, else setTimeout(0).
 		var warmUp = function () {
@@ -695,6 +728,12 @@
 		var canvas     = domResult.canvas;
 		var sceneEl    = ctx.sceneEl;
 
+		// Apply the per-collection background immediately so the mask matches the
+		// room palette from mount (overlay is already opacity:1 from buildOverlay).
+		var bgEl   = ( sceneEl && sceneEl !== document.body ) ? sceneEl : document.documentElement;
+		var maskBg = getComputedStyle( bgEl ).getPropertyValue( '--skyyrose-bg' ).trim();
+		if ( maskBg ) overlay.style.backgroundColor = maskBg;
+
 		// Clone the title block into the overlay so its reveal animates above
 		// the opaque curtain; the room originals are revealed at the wipe.
 		var clones      = buildIntroComposition( overlay, ctx );
@@ -713,14 +752,34 @@
 		watchLockupError( ctx.lockup, ctx.h1 );  // same guard for the room's real lockup
 		attachSkipListeners();
 
-		var tl = window.gsap.timeline( { onComplete: cleanup } );
+		// Timeline starts PAUSED. Steps that don't depend on the lockup image are
+		// added now; the lockup blur-reveal is added only once the cloned <img>
+		// is decode-ready, then play(). Without this, GSAP animates an undecoded
+		// clone on a contended main thread and it paints solid black. The overlay
+		// stays opaque (masking the room) during the short decode wait.
+		var tl = window.gsap.timeline( { onComplete: cleanup, paused: true } );
 		activeTl = tl;
 
 		addStepConcrete( tl, overlay, canvas, sceneEl );
-		addStepLockup( tl, introLockup );
 		addStepHairlineTagline( tl, clones.hairline, clones.taglineEl );
 		revealRoomTitle( tl, ctx, 2.0 );
 		addStepWipe( tl, overlay, sceneEl );
+
+		// Decode the cloned lockup before revealing it. Race a 600ms timeout so a
+		// hung/slow decode can never leave the overlay stuck (it plays regardless).
+		var cloneImg    = introLockup ? introLockup.querySelector( 'img' ) : null;
+		var decodeReady = ( cloneImg && typeof cloneImg.decode === 'function' )
+			? Promise.race( [
+				cloneImg.decode().catch( function () {} ),
+				new Promise( function ( resolve ) { window.setTimeout( resolve, 600 ); } )
+			] )
+			: Promise.resolve();
+
+		decodeReady.then( function () {
+			if ( cleanupFired ) return;        // user skipped during decode
+			addStepLockup( tl, introLockup );  // inserts the reveal at position 0.4
+			tl.play();
+		} );
 	}
 
 	/* ── Bootstrap ──────────────────────────────────────────────────── */
