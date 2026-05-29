@@ -17,6 +17,7 @@ with injected fakes.
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -236,6 +237,12 @@ def main(argv: list[str] | None = None) -> int:
             print("python-dotenv not installed; cannot load --env-file", file=sys.stderr)
             return 3
         load_dotenv(args.env_file, override=True)
+        # .env.production ships a malformed ENCRYPTION_MASTER_KEY (invalid base64)
+        # that HARD-CRASHES agent init (security/aes256_gcm_encryption.py raises
+        # on a set-but-invalid key; unset falls back to a valid ephemeral key).
+        # This A/B decrypts no at-rest data, so drop it and let the security layer
+        # mint a valid ephemeral key — the plain API-key env vars stay loaded.
+        os.environ.pop("ENCRYPTION_MASTER_KEY", None)
 
     manifest = build_manifest(skus, engines, _default_source_for)
     print(render_manifest(manifest))
