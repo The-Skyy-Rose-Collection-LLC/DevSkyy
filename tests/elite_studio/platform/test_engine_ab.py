@@ -77,3 +77,27 @@ def test_run_ab_halts_on_budget_before_dispatch():
             budget=budget,
         )
     assert dispatched == []  # never dispatched — gated before spend
+
+
+def test_run_ab_records_error_and_continues_when_one_engine_fails():
+    def dispatch(sku, engine, src):
+        if engine == "tripo":
+            raise RuntimeError("tripo: no successful mesh")
+        return f"/tmp/{sku}_{engine}.glb"
+
+    budget = RunBudget(ceiling_usd=100.0)
+    rows = run_ab(
+        skus=("br-001",),
+        engines=("tripo", "meshy"),
+        source_for=lambda s: "/g/front.jpg",
+        dispatch_fn=dispatch,
+        score_fn=lambda sku, mesh: 0.9,
+        budget=budget,
+    )
+    tripo = next(r for r in rows if r.engine == "tripo")
+    meshy = next(r for r in rows if r.engine == "meshy")
+    assert tripo.error  # failure recorded, not raised
+    assert meshy.visible_score == 0.9  # meshy still ran after tripo failed
+    assert budget.spent_usd == pytest.approx(0.20)  # failed tripo not charged
+    assert recommend_threshold(rows, engine="tripo") is None  # error row excluded
+    assert recommend_threshold(rows, engine="meshy") == round(0.9 - 0.03, 4)

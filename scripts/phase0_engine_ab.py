@@ -52,6 +52,7 @@ class ABRow:
     sku: str
     engine: str
     visible_score: float
+    error: str = ""  # non-empty when this engine failed for this SKU
 
 
 @dataclass(frozen=True)
@@ -63,8 +64,12 @@ class ManifestLine:
 
 
 def recommend_threshold(rows: list[ABRow], *, engine: str, margin: float = 0.03) -> float | None:
-    """Lowest passing score for `engine` minus a safety margin, or None."""
-    scores = [r.visible_score for r in rows if r.engine == engine]
+    """Lowest passing score for `engine` minus a safety margin, or None.
+
+    Error rows (failed dispatch/score) are excluded — a failed engine must not
+    drag the threshold to 0.
+    """
+    scores = [r.visible_score for r in rows if r.engine == engine and not r.error]
     if not scores:
         return None
     return round(min(scores) - margin, 4)
@@ -128,10 +133,13 @@ def run_ab(
         src = source_for(sku)
         for engine in engines:
             cost = ENGINE_COST_USD.get(engine, 0.0)
-            budget.ensure_within_budget(cost, stage=f"phase0:{engine}")
-            mesh_path = dispatch_fn(sku, engine, src)
-            budget.spend(cost, stage=f"phase0:{engine}")
-            rows.append(ABRow(sku=sku, engine=engine, visible_score=score_fn(sku, mesh_path)))
+            budget.ensure_within_budget(cost, stage=f"phase0:{engine}")  # breach => halt
+            try:
+                mesh_path = dispatch_fn(sku, engine, src)
+                budget.spend(cost, stage=f"phase0:{engine}")  # charge only after dispatch returns
+                rows.append(ABRow(sku=sku, engine=engine, visible_score=score_fn(sku, mesh_path)))
+            except Exception as exc:  # noqa: BLE001 — one engine failing must not abort the A/B
+                rows.append(ABRow(sku=sku, engine=engine, visible_score=0.0, error=str(exc)[:200]))
     return rows
 
 
@@ -212,15 +220,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--budget", type=float, default=DEFAULT_BUDGET_USD)
     parser.add_argument(
         "--env-file",
-        default=None,
-        help="Load env vars from this file via python-dotenv before dispatch "
-        "(robust parsing; keeps secrets out of the shell and logs).",
+        default=".env.production",
+        help="Load keys from this file via python-dotenv (robust parsing; secrets "
+        "stay in-process). Only read on --execute. Pass '' to disable.",
     )
     args = parser.parse_args(argv)
     skus = tuple(args.skus)
     engines = tuple(args.engines)
 
-    if args.env_file:
+    # Secrets are loaded ONLY for a real dispatch; the dry-run never reads them.
+    if args.execute and args.env_file:
         try:
             from dotenv import load_dotenv
         except ImportError:
@@ -249,7 +258,8 @@ def main(argv: list[str] | None = None) -> int:
 
     print("\n=== A/B fidelity scores ===")
     for r in rows:
-        print(f"{r.sku:<10} {r.engine:<8} {r.visible_score:.4f}")
+        status = f"ERROR: {r.error}" if r.error else f"{r.visible_score:.4f}"
+        print(f"{r.sku:<10} {r.engine:<8} {status}")
     for engine in engines:
         rec = recommend_threshold(rows, engine=engine)
         if rec is not None:
