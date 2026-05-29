@@ -19,7 +19,7 @@ from skyyrose.elite_studio.platform.fidelity.report import FidelityReport, Fidel
 logger = logging.getLogger(__name__)
 
 GenerateFn = Callable[[str, str], dict]  # (image_path, sku) -> result dict
-EvaluateFn = Callable[[str, str, str], FidelityReport]  # (tenant_id, sku, mesh_path) -> report
+EvaluateFn = Callable[..., FidelityReport]  # (tenant_id, sku, mesh_path, attempt) -> report
 
 
 @dataclass(frozen=True)
@@ -50,7 +50,7 @@ def run_replica(
         if not mesh_path or result.get("status") != "completed":
             return ReplicaOutcome(tenant_id, sku, status="engine_failed")
 
-        report = evaluate_fn(tenant_id, sku, mesh_path)
+        report = evaluate_fn(tenant_id, sku, mesh_path, _attempt)
         last_report_path = str(report.persist(base=report_base, suffix=f"_attempt{_attempt}"))
 
         if report.verdict is FidelityVerdict.REJECT:
@@ -73,15 +73,23 @@ def run_replica(
 
 
 def _trellis_generate_fn() -> GenerateFn:
-    """Build a generate_fn backed by the local self-hosted TRELLIS engine."""
+    """Build a generate_fn backed by the local self-hosted TRELLIS engine.
+
+    Bridges the async TrellisAgent into a sync callable safely even when called
+    from a running event loop (FastAPI, async tests): the coroutine runs in a
+    dedicated worker thread, so we never call asyncio.run() on a live loop.
+    """
     import asyncio
+    import concurrent.futures
 
     from agents.trellis_agent import TrellisAgent
 
     agent = TrellisAgent()
 
     def _gen(image_path: str, sku: str) -> dict:
-        return asyncio.run(agent.image_to_3d(image_path=image_path, product_name=sku))
+        coro = agent.image_to_3d(image_path=image_path, product_name=sku)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            return pool.submit(asyncio.run, coro).result()
 
     return _gen
 
@@ -90,8 +98,8 @@ def _gate_evaluate_fn(tenant) -> EvaluateFn:
     """Build an evaluate_fn backed by the fidelity gate's full evaluate()."""
     from skyyrose.elite_studio.platform.fidelity import gate
 
-    def _eval(tenant_id: str, sku: str, mesh_path: str) -> FidelityReport:
-        return gate.evaluate(tenant, sku, mesh_path)
+    def _eval(tenant_id: str, sku: str, mesh_path: str, attempt: int = 1) -> FidelityReport:
+        return gate.evaluate(tenant, sku, mesh_path, attempt=attempt)
 
     return _eval
 

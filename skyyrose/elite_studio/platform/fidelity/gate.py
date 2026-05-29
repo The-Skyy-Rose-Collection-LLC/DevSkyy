@@ -50,7 +50,8 @@ def evaluate(
     unit-tested. render views -> score visible (vs golden) -> mesh sanity ->
     dispose -> report.
     """
-    from skyyrose.elite_studio.platform.catalog_source import SkyyRoseCatalogSource
+    import importlib
+
     from skyyrose.elite_studio.platform.fidelity.metrics import score_view
     from skyyrose.elite_studio.platform.fidelity.render import BlenderRenderer
     from skyyrose.elite_studio.platform.fidelity.validate import (
@@ -58,7 +59,10 @@ def evaluate(
         mesh_sanity_ok,
     )
 
-    source = SkyyRoseCatalogSource(reference_root=tenant.reference_root)
+    # Resolve the tenant's OWN CatalogSource (multi-tenant correct) — not a
+    # hardcoded SkyyRose source. Mirrors capability._resolve_source.
+    module_path, _, attr = tenant.catalog_source.rpartition(".")
+    source = getattr(importlib.import_module(module_path), attr)()
     references = source.references(sku)
     renderer = renderer or BlenderRenderer()
     views = renderer.render(mesh_path, references)

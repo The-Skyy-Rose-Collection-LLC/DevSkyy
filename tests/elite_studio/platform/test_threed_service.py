@@ -11,7 +11,7 @@ def _fake_generate(image_path, sku):
     return {"local_path": "/tmp/mesh.glb", "status": "completed"}
 
 
-def _fake_evaluate(tenant_id, sku, mesh_path):
+def _fake_evaluate(tenant_id, sku, mesh_path, attempt=1):
     return FidelityReport(
         tenant_id=tenant_id,
         sku=sku,
@@ -41,7 +41,7 @@ def test_human_queue_verdict_enqueues_not_delivers(tmp_path):
 
 
 def test_reject_verdict_does_not_enqueue(tmp_path):
-    def _reject_eval(tenant_id, sku, mesh_path):
+    def _reject_eval(tenant_id, sku, mesh_path, attempt=1):
         return FidelityReport(
             tenant_id=tenant_id,
             sku=sku,

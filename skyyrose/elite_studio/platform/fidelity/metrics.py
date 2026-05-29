@@ -44,7 +44,13 @@ def score_view(render_path: Path, reference_path: Path, *, sku: str, angle: str)
     clip = clip_embedder.cosine_similarity(
         clip_embedder.embed_image(render_path), clip_embedder.embed_image(reference_path)
     )
-    ssim = VisualRegressionTester().compare(str(render_path), sku, angle=angle).ssim_score
+    ssim_result = VisualRegressionTester().compare(str(render_path), sku, angle=angle)
+    if not ssim_result.has_reference:
+        raise RuntimeError(
+            f"SSIM: no golden reference resolved for {sku}/{angle} — refusing to "
+            "score on a fabricated 1.0 that would inflate the composite."
+        )
+    ssim = ssim_result.ssim_score
     return VisibleScore(
         angle=angle,
         dino=float(dino),

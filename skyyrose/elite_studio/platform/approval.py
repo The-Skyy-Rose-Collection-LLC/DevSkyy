@@ -8,10 +8,16 @@ record here is 'approved'.
 from __future__ import annotations
 
 import json
+import re
 import uuid
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
+
+# Record IDs are uuid4().hex[:12] (12 lowercase hex). Validate before any
+# filesystem interpolation — record_id can cross an API boundary in later
+# phases, so reject anything that could escape the store dir (path traversal).
+_ID_RE = re.compile(r"^[a-f0-9]{12}$")
 
 
 @dataclass(frozen=True)
@@ -44,6 +50,8 @@ class ApprovalQueue:
         self.store_dir.mkdir(parents=True, exist_ok=True)
 
     def _path(self, record_id: str) -> Path:
+        if not _ID_RE.fullmatch(record_id):
+            raise ValueError(f"invalid record_id: {record_id!r}")
         return self.store_dir / f"{record_id}.json"
 
     def _write(self, rec: ApprovalRecord) -> None:

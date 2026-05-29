@@ -85,10 +85,13 @@ class BlenderRenderer:
             raise BlenderRenderError(
                 f"blender failed (rc={proc.returncode}): {proc.stderr[-1500:]}"
             )
-        return RenderViews(
-            angle_paths=angle_paths,
-            coverage=coverage_from_references(references, tuple(angle_paths.keys())),
-        )
+        # Coverage spans the FULL declared angle set, not just angles that
+        # rendered: an angle is verified only if it has a reference AND rendered.
+        # A render failure therefore surfaces as 'inferred' (-> HUMAN_QUEUE),
+        # never silently dropping out of scope.
+        has_ref = coverage_from_references(references, RENDER_ANGLES)
+        coverage = {a: (has_ref[a] and a in angle_paths) for a in RENDER_ANGLES}
+        return RenderViews(angle_paths=angle_paths, coverage=coverage)
 
     @staticmethod
     def _build_script(glb_path: Path, out_dir: Path) -> str:
