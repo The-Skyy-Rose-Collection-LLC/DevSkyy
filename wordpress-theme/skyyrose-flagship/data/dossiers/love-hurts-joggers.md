@@ -5,7 +5,7 @@ collection: love-hurts
 logo_reference: data/brand-logos/love-hurts-logo.md
 extra_logos:
   - data/brand-logos/heart-rose-composite.md
-reference_image: data/product-references/lh-002-techflat.jpeg
+reference_image: data/product-references/lh-002-techflat-front.jpeg
 ---
 
 # Love Hurts Joggers (Black)
@@ -17,7 +17,7 @@ reference_image: data/product-references/lh-002-techflat.jpeg
 > Logo art canonical references:
 > - Heart-rose composite (Love Hurts heart-and-thorns lockup): `data/brand-logos/heart-rose-composite.md`
 > - Love Hurts wordmark (NOT on this product, listed for canonical reference): `data/brand-logos/love-hurts-logo.md`
-> - Product techflat: `data/product-references/lh-002-techflat.jpeg`
+> - Product techflat: `data/product-references/lh-002-techflat-front.jpeg`
 
 ### Front
 - **front-body** (entire front body — solid black field): Solid black, cotton-fleece. **Technique:** stitched. **Color:** black.
