@@ -591,6 +591,11 @@
 		// must stay solid from mount through the reveal.
 		tl.set( overlay, { backgroundColor: bgColor } );
 
+		// Reveal the concrete-dust canvas with the fill (CSS starts it at
+		// opacity:0 — GSAP owns it). It leaves with the overlay wipe. Without
+		// this tween the canvas drew particles that never showed (dead rAF).
+		tl.fromTo( canvas, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: 'power1.out' }, 0 );
+
 		// Warm up dust: use requestIdleCallback when available, else setTimeout(0).
 		var warmUp = function () {
 			startDust( canvas, bgColor, dustColor );

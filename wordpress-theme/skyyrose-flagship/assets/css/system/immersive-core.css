@@ -16,6 +16,7 @@
  *   .scene-lockup img — targets .scene-lockup__img (BEM element, only child)
  *   .scene-hairline  — accent rule beneath lockup (scene.php, JS queries)
  *   .scene-tagline   — "Luxury Grows from Concrete." display line (scene.php, JS queries)
+ *   .scene-subtitle  — collection name line (scene.php) — styled in immersive.css, not here
  *
  * Token surface: var(--skyyrose-accent), var(--skyyrose-bg),
  *   var(--skyyrose-text), var(--skyyrose-font-display),

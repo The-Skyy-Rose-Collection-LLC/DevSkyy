@@ -705,7 +705,9 @@ function skyyrose_enqueue_template_scripts() {
 			wp_enqueue_script(
 				'skyyrose-immersive-core',
 				$base_js_uri . '/' . $ic_js,
-				array( 'skyyrose-gsap', 'skyyrose-gsap-st' ),
+				// Plain GSAP core only — immersive-core uses gsap.timeline/fromTo/set,
+				// never the ScrollTrigger API, so it must not depend on gsap-st.
+				array( 'skyyrose-gsap' ),
 				SKYYROSE_VERSION,
 				true
 			);

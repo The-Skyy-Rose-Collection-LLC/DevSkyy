@@ -24,7 +24,7 @@
 	var layers        = viewport ? Array.from(viewport.querySelectorAll('.scene-layer')) : [];
 	var hotspotGroups = scene ? Array.from(scene.querySelectorAll('.hotspot-container')) : [];
 	var allHotspots   = scene ? Array.from(scene.querySelectorAll('.hotspot')) : [];
-	var titleOverlay  = document.querySelector('.scene-title-overlay');
+	// .scene-title-overlay is owned by immersive-core.js (reveal + fade); not referenced here.
 
 	// Product panel
 	var panelOverlay  = document.querySelector('.product-panel-overlay');
