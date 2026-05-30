@@ -243,6 +243,15 @@ def main(argv: list[str] | None = None) -> int:
         # This A/B decrypts no at-rest data, so drop it and let the security layer
         # mint a valid ephemeral key — the plain API-key env vars stay loaded.
         os.environ.pop("ENCRYPTION_MASTER_KEY", None)
+        # .env.production sets ENVIRONMENT=production but omits JWT_REFRESH_SECRET_KEY.
+        # jwt_oauth2_auth._require_secret() hard-raises on an unset secret ONLY under
+        # ENVIRONMENT=production; outside production it mints an ephemeral key. This is
+        # a local, report-only mesh-fidelity harness — not a live auth server — so we
+        # downgrade ENVIRONMENT post-load. The plain API-key env vars the engines need
+        # (TRIPO3D/MESHY/etc.) don't gate on ENVIRONMENT, so they stay in effect.
+        # This neutralizes the whole class of strict-prod init crashes in one place
+        # rather than minting an ephemeral per missing secret.
+        os.environ["ENVIRONMENT"] = "development"
 
     manifest = build_manifest(skus, engines, _default_source_for)
     print(render_manifest(manifest))
