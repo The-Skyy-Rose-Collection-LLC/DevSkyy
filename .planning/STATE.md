@@ -53,6 +53,10 @@ Progress: [███████░░░] 70% (7/10 phases — 9, 10, 11, 12, 1
 - **3D-First:** Pipeline now supports high-fidelity 3D replica generation via ThreeDAgent.
 - **v1.1 Verification Suites (NEW):** Regression gates landed for catalog data integrity, A11Y HTML/ARIA, WCAG color contrast, responsive typography clamp tokens, and luxury cursor enqueue. Total: 5 new pytest modules + extended `scripts/verify_live_structure.py` with A11Y + pricing assertions.
 
+### Roadmap Evolution
+
+- Phase 19 added: Launch QA & Visual Regression Sweep
+
 ## Blockers / Concerns
 
 - None for v1.1 phases. All previous regressions (DATA-01, CURS-03) closed via theme 1.1.2 deploy on 2026-05-12.

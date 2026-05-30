@@ -9,6 +9,7 @@
 ## Phases
 
 **Phase Numbering:**
+
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
@@ -27,113 +28,145 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: Deploy Verification & Orchestration** - Health checks, single-command pipeline, and dry-run mode
 
 ### Phase 1: CI Failure Triage & Fix
+
 **Goal**: The CI pipeline produces hard failures on real problems -- no check is silently swallowed
 **Depends on**: Nothing (first phase)
 **Requirements**: CI-01, CI-02
 **Success Criteria** (what must be TRUE):
+
   1. Running the CI pipeline on main with a deliberately broken lint rule causes the workflow to fail (red status), not warn
   2. All existing CI workflow runs on main pass green without any continue-on-error directives present
   3. A commit with a Python type error (mypy) or a JS lint error (ESLint) fails CI within the appropriate job
+
 **Plans:** 2/2 plans complete
 
 Plans:
+
 - [x] 01-01: Fix underlying lint/format/type/test failures
 - [x] 01-02: Remove all 17 continue-on-error directives
 
 ### Phase 2: Husky Foundation
+
 **Goal**: Git hooks infrastructure is installed and functional at the monorepo root
 **Depends on**: Nothing (independent of Phase 1)
 **Requirements**: HOOK-07
 **Success Criteria** (what must be TRUE):
+
   1. Running `git commit` on a staged file triggers a pre-commit hook
   2. The broken Husky v4 `husky.hooks` block is removed from package.json
   3. A `.husky/pre-commit` file exists and is executable
+
 **Plans:** 1/1 plans complete
 
 Plans:
+
 - [x] 02-01: Initialize Husky v9, create hooks and verification script
 
 ### Phase 3: Pre-commit Hook Checks
+
 **Goal**: Every commit is checked for lint, type, syntax, and test errors on staged files before it reaches the remote
 **Depends on**: Phase 2
 **Requirements**: HOOK-01, HOOK-02, HOOK-03, HOOK-04, HOOK-05, HOOK-06, HOOK-08
 **Success Criteria** (what must be TRUE):
+
   1. Committing a staged JS file with an ESLint error blocks the commit
   2. Committing a staged Python file with a Ruff/Black/isort violation blocks the commit
   3. Committing a staged PHP file with a syntax error blocks the commit
   4. Committing a staged TypeScript file with a type error blocks the commit
   5. All pre-commit checks complete in under 30 seconds
+
 **Plans:** 2/2 plans complete
 
 Plans:
+
 - [x] 03-01: Create lint-staged config, PHP lint wrapper, and wire pre-commit hook
 - [x] 03-02: Create verification scripts and validate all HOOK requirements
 
 ### Phase 4: PR Branch Protection
+
 **Goal**: No code reaches main without passing all CI checks via a pull request
 **Depends on**: Phase 1
 **Requirements**: PR-01, PR-02
 **Success Criteria** (what must be TRUE):
+
   1. A PR with a failing CI check cannot be merged
   2. A PR whose branch is behind main cannot be merged until updated
   3. Agents can still create PRs and merge them when CI passes
+
 **Plans:** 1/1 plans complete
 
 Plans:
+
 - [x] 04-01: Configure GitHub branch protection and required status checks
 
 ### Phase 5: WordPress Build Pipeline
+
 **Goal**: All WordPress theme assets are minified from source via a single build command
 **Depends on**: Nothing
 **Requirements**: BUILD-01, BUILD-02, BUILD-03, BUILD-04
 **Success Criteria** (what must be TRUE):
+
   1. `npm run build` produces .min.js files for all 43 JS source files
   2. `npm run build` produces .min.css files for all 55+ CSS source files
   3. Source maps (.map files) are generated alongside minified output
   4. A single `npm run build` command produces all minified output
+
 **Plans:** 1/1 plans complete
 
 Plans:
+
 - [x] 05-01: Rewrite webpack config with dynamic entry discovery
 
 ### Phase 6: WordPress CI Integration
+
 **Goal**: CI catches PHP errors and stale minified files in the WordPress theme before merge
 **Depends on**: Phase 1, Phase 5
 **Requirements**: CI-03, CI-04, CI-05
 **Success Criteria** (what must be TRUE):
+
   1. A PHP syntax error in any theme file causes CI to fail
   2. CI runs `npm run build` and the build step passes
   3. Editing a source file without rebuilding causes CI to fail with drift error
+
 **Plans:** 1/1 plans complete
 
 Plans:
+
 - [x] 06-01: Add wordpress-theme CI job
 
 ### Phase 7: Deploy Core
+
 **Goal**: Built theme files can be transferred to production safely
 **Depends on**: Phase 5
 **Requirements**: DEPLOY-01, DEPLOY-02, DEPLOY-03, DEPLOY-07
 **Success Criteria** (what must be TRUE):
+
   1. Deploy script transfers theme files via rsync over SSH
   2. Live site enters maintenance mode before file transfer
   3. Maintenance mode is disabled and cache flushed after transfer
   4. If deploy fails mid-transfer, maintenance mode is still disabled
+
 **Plans:** 1/1 plans complete
 
 Plans:
+
 - [x] 07-01: Create deploy-theme.sh with rsync/lftp, maintenance mode, and trap safety
 
 ### Phase 8: Deploy Verification & Orchestration
+
 **Goal**: Deploys are verified against the live site and triggered with a single command
 **Depends on**: Phase 7
 **Requirements**: DEPLOY-04, DEPLOY-05, DEPLOY-06
 **Success Criteria** (what must be TRUE):
+
   1. After deploy, script verifies page content -- not just HTTP 200
   2. A single command runs full pipeline: build, transfer, verify
   3. Dry-run mode shows what would be transferred without deploying
+
 **Plans:** 2/2 plans complete
 
 Plans:
+
 - [x] 08-01: Create verify-deploy.sh with deep content verification
 - [x] 08-02: Create deploy-pipeline.sh with --dry-run support
 
@@ -161,96 +194,131 @@ Plans:
 ## Phase Details
 
 ### Phase 9: Collection & Product Data
+
 **Goal**: Every collection page shows its own correct hero banner and only the products that belong to it
 **Depends on**: Nothing (independent quick wins with immediate user-visible impact)
 **Requirements**: DATA-01, DATA-02, DATA-03
 **Success Criteria** (what must be TRUE):
+
   1. The Black Rose collection page displays the Black Rose hero banner (not Love Hurts)
   2. Pre-order products (br-004, br-005, br-006, br-d01-d04, lh-001, sg-001, sg-d01) do not appear on live collection catalog grids
   3. Every product in the catalog grid belongs to the collection it appears under (no cross-collection leaks)
+
 **Plans:** 2/2 plans complete
 
 Plans:
+
 - [x] 09-01-PLAN.md -- Verify pre-order filter and cross-collection integrity via CSV integrity test (DATA-02, DATA-03)
 - [x] 09-02-PLAN.md -- Verify Black Rose hero asset on live + close stale DATA-01 requirement (DATA-01)
 
 ### Phase 10: Accessibility HTML & ARIA
+
 **Goal**: The theme's rendered HTML passes validation with zero ARIA errors and correct semantic structure
 **Depends on**: Phase 9 (correct product data means templates render final HTML for a11y fixes)
 **Requirements**: A11Y-01, A11Y-02, A11Y-03, A11Y-04, A11Y-05, A11Y-06, A11Y-07, A11Y-08, A11Y-09
 **Success Criteria** (what must be TRUE):
+
   1. No duplicate element IDs appear in any page's rendered HTML (verified via Ally plugin or DOM inspection)
   2. Every button element has an explicit type attribute and every empty link has a descriptive aria-label
   3. Skip navigation link at the top of each page scrolls to the main content area when activated
   4. All form inputs (radio buttons, text fields, search) have associated labels or aria-label attributes
   5. Hero images load immediately (loading="eager") and below-fold images defer (loading="lazy")
+
 **Plans:** 2/2 plans complete
 
 Plans:
+
 - [x] 10-01-PLAN.md -- Verify button types, duplicate IDs, and enqueue handle uniqueness via static HTML fixture regression suite (A11Y-01, A11Y-02, A11Y-08)
 - [x] 10-02-PLAN.md -- Verify headings, links, ARIA attributes, form labels, skip nav, and image loading via post-deploy gate assertions (A11Y-03, A11Y-04, A11Y-05, A11Y-06, A11Y-07, A11Y-09)
 
 ### Phase 11: Color Contrast
+
 **Goal**: WCAG AA contrast regression gate — proves all v1.1 color contrast fixes still pass
 **Depends on**: Phase 10 (HTML structure final)
 **Requirements**: CNTR-01, CNTR-02, CNTR-03, CNTR-04
 **Success Criteria** (what must be TRUE):
+
   1. pytest tests/test_color_contrast_wcag.py passes green (all 6 tests, zero skips)
   2. Every text/bg token pair from design-tokens.css asserts >= 4.5:1 contrast ratio
   3. text-muted alpha-blended value (rgba 245,230,211,0.7 on #0A0A0A) asserts >= 4.5:1
   4. No $0.00 or $0 text inside .holo product-price elements on any collection page
+
 **Plans:** 2/2 plans complete
 
 Plans:
+
 - [x] 11-01-PLAN.md -- WCAG AA regression test + CNTR-04 live-page pricing assertion (CNTR-01, CNTR-02, CNTR-03, CNTR-04)
 - [x] 11-02-PLAN.md -- Annotate CNTR requirements with verification evidence, update ROADMAP Phase 11 (CNTR-01, CNTR-02, CNTR-03, CNTR-04)
 
 ### Phase 12: Responsive & Typography
+
 **Goal**: The site looks and works correctly across all screen sizes from 320px mobile to desktop
 **Depends on**: Phase 11 (contrast fixes may adjust font sizes/weights that affect responsive layout)
 **Requirements**: RESP-01, RESP-02, RESP-03, RESP-04
 **Success Criteria** (what must be TRUE):
+
   1. Viewing any page at 320px viewport width shows no horizontal scrollbar and no content overflow
   2. All clickable/tappable elements on mobile are at least 44x44px touch targets
   3. Heading sizes and body text scale smoothly from mobile (320px) through tablet (768px) to desktop (1440px+)
   4. Typography hierarchy (h1 > h2 > h3 > body > small) is visually consistent across all page templates
+
 **Plans:** 2/2 plans complete
 
 Plans:
+
 - [x] 12-01-PLAN.md -- Regression gate: clamp() token assertions + 320px inline-width scan (RESP-01, RESP-02)
 - [x] 12-02-PLAN.md -- Planning artifact closure: annotate RESP-01..04 with v1.1 commits + update ROADMAP (RESP-01..04)
 
 ### Phase 13: Luxury Cursor
+
 **Goal**: The custom luxury cursor works correctly everywhere including above modals and only loads where needed
 **Depends on**: Phase 10 (modal/popup HTML structure must be finalized before z-index fixes)
 **Requirements**: CURS-01, CURS-02, CURS-03
 **Success Criteria** (what must be TRUE):
+
   1. When a modal or popup is open, the luxury cursor renders above it (not hidden behind)
   2. The cursor pauses its animation or adapts its behavior while a modal is active
   3. On immersive pages where the cursor is CSS-hidden, the luxury-cursor JS file is not loaded at all (no wasted bandwidth)
+
 **Status**: CURS-01 [x] CURS-02 [x] CURS-03 [ ] OPEN GAP — immersive slug exclusion missing in enqueue.php
 **Plans:** 2/2 plans executed
 
 Plans:
+
 - [x] 13-01-PLAN.md -- Regression gate: pytest CURS-01 z-index + CURS-03 immersive exclusion (CURS-01 PASSES, CURS-03 FAILS = gap confirmed, commit 818868654)
 - [x] 13-02-PLAN.md -- Annotate REQUIREMENTS.md CURS-01..03 with audit findings, correct CURS-03 to open, update ROADMAP + verify_live_structure.py (CURS-01, CURS-02, CURS-03)
+
+### Phase 19: Launch QA & Visual Regression Sweep
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 18
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (run /gsd:plan-phase 19 to break down)
 
 ---
 
 ### Phase 14: Catalog Foundation
+
 **Goal**: Every imagery pipeline reads from a single, validated CSV adapter and every in-scope SKU has a verified techflat-front before any API call is made
 **Depends on**: Nothing (first phase of v1.2 — zero API calls, zero cost)
 **Requirements**: INFRA-01, INFRA-02, INFRA-03, INFRA-04, INFRA-05, INFRA-06, INFRA-07
 **Success Criteria** (what must be TRUE):
+
   1. `from skyyrose.core.catalog_loader import read_catalog_rows` works in nano-banana, Elite Studio compositor, and FLUX orchestrator without import errors
   2. `python scripts/preflight_audit.py` exits 0 and writes `SKIPPED.json` listing only sg-007 and lh-005 as out-of-scope — all 28 in-scope garment SKUs resolve bundle + techflat-front
   3. `skyyrose-catalog.csv` contains a `garment_type_lock` column with a non-empty value for every in-scope SKU
   4. All techflat source files for in-scope SKUs are single-view images (no compound sheets) and filenames follow the standard before pipeline intake
   5. `/simplify` — code simplification pass after phase implementation
   6. `/verification-loop` — automated verification loop confirming all success criteria pass
+
 **Plans:** 3 plans
 
 Plans:
+
 - [x] 14-01-PLAN.md — Add garment_type_lock CSV column, Wave 0 tests, nano_banana package marker (INFRA-04) — VERIFIED 2026-05-16 (14-VERIFICATION.md)
 - [x] 14-02-PLAN.md — Fix 3 broken readers: nano_banana.catalog shim, renders/config.py, fashion/context.py (INFRA-01, INFRA-02, INFRA-03) — VERIFIED 2026-05-16 after regression repair: nano_banana shim was overwritten (a22074ab3/8737e3714), re-routed through skyyrose.core.catalog_loader + CI regression gate added (bug-102 FIXED). renders/config.py + fashion/context.py confirmed delegating.
 - [x] 14-03-PLAN.md — Preflight audit script + SKIPPED.json (INFRA-05, INFRA-06, INFRA-07) — VERIFIED 2026-05-16 (5 PENDING = INFRA-06 deferred by design)
@@ -263,13 +331,16 @@ Plans:
 **Plans:** 0 plans
 
 Plans:
+
 - [ ] TBD (run /gsd-plan-phase 14.1 to break down)
 
 ### Phase 15: Ghost Mannequin Agent + QA
+
 **Goal**: The ghost mannequin LangGraph agent can generate a validated, white-background front shot for any single in-scope garment SKU without crashing, overspending, or silently returning a broken image
 **Depends on**: Phase 14 (catalog adapter and preflight audit must pass before any generation run)
 **Requirements**: GM-01, GM-02, GM-03, GM-04, GM-05, GM-06, QA-01, QA-02, QA-04
 **Success Criteria** (what must be TRUE):
+
   1. Running `python -m skyyrose.elite_studio.agents.ghost_mannequin_agent --sku sg-001 --dry-run` prints a full cost manifest (SKU, API, per-image cost, total cost) and exits without making any API call
   2. Running the agent against one non-jersey garment SKU produces `renders/ghost-mannequin/{sku}-ghost-front.webp` at 1200x1200px with all four corner pixels within 5 RGB units of (255, 255, 255)
   3. A simulated 429 response triggers exponential backoff retry; a simulated safety block immediately flags the SKU to `failures.json` without retrying
@@ -277,68 +348,84 @@ Plans:
   5. A run that would exceed the configured spend cap halts before the cap-crossing API call and exits with a clear message showing amount spent and amount remaining
   6. `/simplify` — code simplification pass after phase implementation
   7. `/verification-loop` — automated verification loop confirming all success criteria pass
+
 **Plans**: 7 plans across 4 waves
 Plans:
 **Wave 1**
+
 - [ ] 15-01-PLAN.md — Data contracts: GhostMannequinAgentResult, FailureEntry, AuditEntry + EliteStudioState extensions (GM-04, GM-05, QA-02)
 - [ ] 15-02-PLAN.md — SKU resolver module: sanitize_sku, resolve_sku, verify_tripo_region, accessory skip gate (GM-06)
 
 **Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 15-03-PLAN.md — GLB cache manager, TripoDigitizer wrapper, _GHOST_MANNEQUIN_EST_COST_USD constant (GM-02)
 - [ ] 15-04-PLAN.md — Prompt registry, GhostMannequinSynthesizer: BRIA bg-removal, Gemini RAS ensemble, jersey cascade (GM-02, GM-03)
 - [ ] 15-05-PLAN.md — Per-metric QA veto gate: corner_pixel_purity, VetoResult, score_ghost_mannequin (QA-01, QA-04)
 
 **Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 15-06-PLAN.md — GhostMannequinAgent orchestration node + GraphConfig wiring (GM-01, GM-02, GM-04, QA-02)
 
 **Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 15-07-PLAN.md — CLI __main__ entry point + integration test suite (GM-05, GM-06, QA-02)
 
 ### Phase 16: 3D-Replica Architect & Purge ✅ (completed 2026-04-24)
+
 **Goal**: The image generation pipeline produces high-fidelity professional renders by digitizing techflats into 3D (.glb) replicas, scaffolding them via headless Blender, and synthesizing final shots with Gemini 2.0 RAS — and all hallucinated/invalid catalog assets are purged.
 **Depends on**: Nothing (independent architectural upgrade — shipped ahead of Phases 14/15)
 **Requirements**: THREE-01, PURGE-01, CLI-01, VISION-01, ROTATE-01, GRAPH-01 (see `phases/16-3d-replica-architect-purge/16-VALIDATION.md`)
 **Success Criteria** (what was TRUE at sign-off):
+
   1. `ThreeDAgent.generate_replica` produces a `.glb` model + scaffolded render + final synthesized image for any in-scope SKU
   2. The `three_d_node` is wired into the LangGraph builder behind the `enable_3d` flag and replaces the standard generator when active
   3. `purge_hallucinations.py` identifies and removes invalid/hallucinated assets (32 removed in initial run)
   4. Gemini API key rotation handles 429 rate limits without operator intervention
   5. Full UAT (`16-UAT.md`) and validation suite (`16-VALIDATION.md`) run green — 34 tests pass across 6 files
+
 **Plans:** Complete — see `phases/16-3d-replica-architect-purge/16-SUMMARY.md`
 
 > **Note — Original Phase 16 ("Jersey OCR Gate") was dropped.** The original plan to add a Gemini-Vision OCR verification node for jersey SKUs (br-003, br-008, br-009, br-010, br-011, br-012) was superseded by the 3D-Replica architecture, which produces verifiable text/number rendering through scaffold-grounded synthesis rather than post-hoc OCR. **Requirement QA-03 is no longer in scope** for v1.2 — Phase 18's jersey SKU run no longer depends on a separate OCR gate. (`REQUIREMENTS.md` still lists QA-03 as Pending and should be reconciled in a follow-up doc-only pass.)
 
 ### Phase 17: Review & Approval CLI
+
 **Goal**: The user can approve or reject each generated image from the command line, and approved images are atomically committed back to the CSV with zero risk of data corruption
 **Depends on**: Phase 15 (review directory and output files must exist before approval tooling is needed) — implementation does NOT require Phase 15 outputs, only the directory contract
 **Requirements**: REV-01, REV-02, REV-03, REV-04
 **Success Criteria** (what must be TRUE):
+
   1. Running `approve-ghost {sku}` on an image not yet in `renders/ghost-mannequin/approved/` moves it there, updates `front_model_image` in the CSV, and writes an approval timestamp — the CSV row count after update equals the row count before
   2. Running the CSV update tool when `approved/{sku}-ghost-front.webp` does not exist exits with code 1 and a clear error — no CSV modification occurs
   3. Running `reject-ghost {sku} "{reason}"` leaves the file in the review directory, writes the reason to `rejections.json`, and makes no CSV change
   4. Interrupting `approve-ghost` mid-write (simulated via SIGINT after temp file creation) leaves the original CSV intact — the atomic `os.replace()` pattern prevents partial writes
   5. `/simplify` — code simplification pass after phase implementation
   6. `/verification-loop` — automated verification loop confirming all success criteria pass
+
 **Plans**: 4 plans (single wave — no API dependency, can execute serially or in parallel)
 Plans:
+
 - [ ] 17-01-PLAN.md — Core library `skyyrose/core/review.py`: atomic CSV writer via `os.replace()`, approve()/reject() pure functions, audit log helpers (REV-01, REV-04)
 - [ ] 17-02-PLAN.md — `scripts/approve_ghost.py` CLI: argparse entry, structural gate (file must exist in review dir), file move to `approved/`, CSV update, exit codes (REV-01, REV-02)
 - [ ] 17-03-PLAN.md — `scripts/reject_ghost.py` CLI: argparse entry, write to `rejections.json` with reason + timestamp, leave file in place, no CSV touch (REV-03)
 - [ ] 17-04-PLAN.md — Integration test suite `tests/test_review.py`: round-trip approve/reject, SIGINT mid-write safety, CLI exit codes, idempotency (REV-01, REV-02, REV-03, REV-04)
 
 ### Phase 18: Full Batch + WooCommerce Upload
+
 **Goal**: All 28 in-scope garment SKUs have a ghost mannequin front image approved by the user and uploaded to WooCommerce — with an explicit confirmation gate before any production write occurs
 **Depends on**: Phase 15, Phase 17 (agent complete, approval CLI ready). The original Phase 16 jersey OCR-gate dependency was dropped — see Phase 16 note above. Jersey SKU verification is now handled by the 3D-Replica scaffold-grounded synthesis instead of a separate OCR node.
 **Requirements**: UPLOAD-01
 **Success Criteria** (what must be TRUE):
+
   1. Running the batch agent against all 28 in-scope SKUs completes without unhandled exceptions — every SKU either produces an output file or has a logged entry in `failures.json`
   2. Before any WooCommerce API write, a STOP AND SHOW manifest is displayed listing every SKU, target product ID, and image path — the upload does not proceed until the user types "y"
   3. After confirmed upload, each approved product's WooCommerce image field reflects the new ghost mannequin image (verified via WooCommerce REST API GET response)
   4. Any SKU without a corresponding `approved/{sku}-ghost-front.webp` is excluded from the upload manifest entirely — the upload tool cannot be coerced into uploading unapproved files
   5. `/simplify` — code simplification pass after phase implementation
   6. `/verification-loop` — automated verification loop confirming all success criteria pass
+
 **Plans**: 3 plans
 Plans:
+
 - [ ] 18-01-PLAN.md — Batch runner iterates `renders/ghost-mannequin/approved/`, builds WooCommerce upload manifest with target product IDs, image paths, current vs new image diff (UPLOAD-01)
 - [ ] 18-02-PLAN.md — STOP AND SHOW confirmation gate before any WooCommerce API write, WC REST PUT product image, post-upload verification via WC REST GET (UPLOAD-01)
 - [ ] 18-03-PLAN.md — Integration test suite: mock WC REST API, manifest generation tests, gate bypass prevention, only-approved-SKUs gating (UPLOAD-01)
