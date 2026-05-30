@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<!-- spec: self-healing-theme-loop v2 — authored 2026-05-29 -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Self-Healing + Self-Improving + Learning Theme Loop — Contract</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #1a1a1a;
+      background: #fafafa;
+      padding: 2rem 1rem;
+    }
+    .page { max-width: 900px; margin: 0 auto; }
+    h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.25rem; }
+    h2 { font-size: 1.15rem; font-weight: 700; margin: 2.5rem 0 0.75rem; border-bottom: 2px solid #e2e2e2; padding-bottom: 0.35rem; }
+    h3 { font-size: 0.95rem; font-weight: 700; margin: 1.25rem 0 0.4rem; color: #333; }
+    p { margin-bottom: 0.75rem; }
+    ul, ol { margin: 0.5rem 0 0.75rem 1.5rem; }
+    li { margin-bottom: 0.25rem; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-size: 0.85em;
+      background: #efefef;
+      padding: 0.1em 0.35em;
+      border-radius: 3px;
+    }
+    pre {
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-size: 0.82rem;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 1.25rem 1.5rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 0.75rem 0 1rem;
+      line-height: 1.5;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0 1rem;
+      font-size: 0.9rem;
+    }
+    th {
+      background: #f0f0f0;
+      text-align: left;
+      padding: 0.45rem 0.75rem;
+      font-weight: 600;
+      border: 1px solid #d8d8d8;
+    }
+    td {
+      padding: 0.4rem 0.75rem;
+      border: 1px solid #d8d8d8;
+      vertical-align: top;
+    }
+    tr:nth-child(even) td { background: #f9f9f9; }
+    .meta { color: #666; font-size: 0.85rem; margin-bottom: 2rem; }
+    .tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.15em 0.5em;
+      border-radius: 3px;
+      margin-right: 0.3em;
+    }
+    .tag-critical { background: #fee2e2; color: #b91c1c; }
+    .tag-high     { background: #fef3c7; color: #92400e; }
+    .tag-med      { background: #dbeafe; color: #1e40af; }
+    .tag-note     { background: #f3f4f6; color: #374151; }
+    .callout {
+      border-left: 4px solid #b91c1c;
+      background: #fff5f5;
+      padding: 0.65rem 1rem;
+      margin: 0.75rem 0 1rem;
+      font-size: 0.9rem;
+    }
+    .callout-blue {
+      border-left-color: #1d4ed8;
+      background: #eff6ff;
+    }
+    .callout-green {
+      border-left-color: #15803d;
+      background: #f0fdf4;
+    }
+    nav {
+      background: #f5f5f5;
+      border: 1px solid #e2e2e2;
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 2rem;
+      font-size: 0.88rem;
+    }
+    nav a { color: #1d4ed8; text-decoration: none; margin-right: 1.2em; }
+    nav a:hover { text-decoration: underline; }
+    section { margin-bottom: 2.5rem; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Self-Healing + Self-Improving + Learning Theme Loop</h1>
+  <p class="meta">
+    Loop: <code>self-healing-theme-loop</code> &nbsp;|&nbsp;
+    Target: <code>https://skyyrose.co</code> &nbsp;|&nbsp;
+    Cadence: cron every 6 h (configurable) &nbsp;|&nbsp;
+    Theme root: <code>/Users/theceo/DevSkyy/wordpress-theme/skyyrose-flagship</code> &nbsp;|&nbsp;
+    Spec authored: 2026-05-29
+  </p>
+
+  <nav>
+    <strong>Sections:</strong>
+    <a href="#overview">Overview</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#signals">Signals</a>
+    <a href="#learning-model">Learning Model</a>
+    <a href="#heal-vs-improve">Heal vs Improve</a>
+    <a href="#files">Files</a>
+    <a href="#safety">Safety</a>
+    <a href="#runbook">Runbook</a>
+    <a href="#decisions">Decisions</a>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="overview">
+    <h2>Overview</h2>
+    <p>
+      The <code>self-healing-theme-loop</code> is a scheduled, autonomous agent workflow that
+      monitors the live SkyyRose storefront (<code>https://skyyrose.co</code>), detects regressions
+      in HTTP health, brand canon, and asset integrity, heals confirmed regressions in an isolated
+      git worktree, and learns from every cycle so that recurrent failure classes are progressively
+      eliminated rather than repeatedly patched.
+    </p>
+    <p>
+      The loop runs on a 6-hour cron by default (configurable at launch). It is
+      <strong>read-only and dry-run by default</strong> — no deploy occurs unless
+      <code>AUTO_DEPLOY=true</code> is explicitly set by the operator.
+    </p>
+
+    <h3>Design goals</h3>
+    <ul>
+      <li><strong>Self-healing:</strong> restore broken features automatically, gated behind php + phpcs + Playwright.</li>
+      <li><strong>Self-improving:</strong> every fix must be a net improvement — root-cause removal, not symptom patches.</li>
+      <li><strong>Learning:</strong> a persistent knowledge store tracks regression signatures, proven fix patterns, and prevention guards so recurrences trend downward across cycles.</li>
+      <li><strong>Deterministic:</strong> workflow scripts never call <code>time()</code> or random APIs. All timestamps are produced by agents via shell (<code>date +%s</code> for cache-busting, <code>date -u +%FT%TZ</code> for log stamps). Per-item variation is driven by index, not randomness.</li>
+    </ul>
+
+    <div class="callout callout-blue">
+      <strong>Escalation bound:</strong> if a regression is not healed after 2 consecutive cycles,
+      the loop stops attempting it, logs the escalation, and surfaces it for the founder. It never
+      loops forever on an unresolvable regression.
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="architecture">
+    <h2>Architecture</h2>
+    <p>
+      Each execution of <code>self-healing-theme-loop.js</code> runs the following ordered phases.
+      Phases after <strong>Detect</strong> are conditional — they are skipped when no regression is found.
+    </p>
+
+<pre>
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                     self-healing-theme-loop  (every 6 h)                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+  ┌──────────┐
+  │  MONITOR │  curl each page with cache-bust (?cb=$(date +%s))
+  │  S1–S4   │  compare HTTP status, body size, PHP error markers, canon strings, asset ver
+  └────┬─────┘
+       │
+       ▼
+  ┌──────────┐
+  │  DETECT  │  diff against theme-health-baseline.json
+  └────┬─────┘
+       │
+       ├─── no regression ──────────────────────────────────────────────────────┐
+       │                                                                         │
+       ▼ regression found                                                        │
+  ┌────────────┐                                                                 │
+  │ LEARN-FIRST│  READ heal-knowledge.json                                       │
+  │            │  known signature? → apply proven fixPattern                     │
+  │            │  recurrences≥2?   → escalate to root-cause fix                 │
+  └─────┬──────┘                                                                 │
+        │                                                                         │
+        ▼                                                                         │
+  ┌────────────────────────┐                                                     │
+  │  HEAL + IMPROVE        │  theme-heal-doctor agent, isolated git worktree     │
+  │  (a) restore feature   │                                                     │
+  │  (b) fix root cause    │  ← not the symptom                                 │
+  │  (c) improve touched   │  ← align patterns, dedup, add guard/assert/escape  │
+  │      surface (bounded) │                                                     │
+  │  (d) rebuild .min      │  node scripts/build-css.js && build-js.js          │
+  └─────┬──────────────────┘                                                     │
+        │                                                                         │
+        ▼                                                                         │
+  ┌─────────────────────────────────────────┐                                   │
+  │  GATE                                   │                                   │
+  │  php -l (touched PHP)                   │                                   │
+  │  phpcs --standard=.phpcs.xml (errors)   │                                   │
+  │  Playwright harness (best-effort)       │                                   │
+  └─────┬─────────────────────────────────┬─┘                                   │
+        │ GREEN                           │ RED                                  │
+        ▼                                 └──► retry once (root-cause pass)     │
+  ┌─────────────────────────────────────────────────────────────────────────┐   │
+  │  DEPLOY                                                                  │   │
+  │  AUTO_DEPLOY=false (default) → DRY: write manifest, surface for founder  │   │
+  │  AUTO_DEPLOY=true  + gate GREEN + STOPSHOW_ACK=1 deploy-theme.sh        │   │
+  │  NEVER deploy on S4-only regressions                                     │   │
+  └─────┬─────────────────────────────────────────────────────────────────────┘  │
+        │                                                                         │
+        ▼◄──────────────────────────────────────────────────────────────────────┘
+  ┌────────────────┐
+  │  LEARN-AFTER   │  upsert heal-knowledge.json (rootCause, fixPattern,
+  │                │    recurrences++, lastOutcome, preventionAdded)
+  │                │  recurrences≥3 → propose structural fix + new S-signal
+  │                │  append cycle record → tasks/heal-log.jsonl
+  │                │  new failure class → one line → .wolf/memory.md
+  └────────────────┘
+          │
+          └──────────────────────────────────── back to MONITOR (next tick)
+</pre>
+
+    <h3>Heal + Improve — the four obligations (a–d)</h3>
+    <p>
+      The <code>theme-heal-doctor</code> agent must satisfy all four obligations in every healing
+      pass. A fix that satisfies (a) but skips (b) through (d) is sent back once for a root-cause
+      pass before being accepted.
+    </p>
+    <ol type="a">
+      <li><strong>Restore the broken feature</strong> — verified against live HTML (cache-busted curl) and source.</li>
+      <li><strong>Fix the root cause, not the symptom</strong> — remove the bug class so it cannot recur in the same form.</li>
+      <li><strong>Leave touched code better</strong> — align to existing patterns, dedup, add a guard / early-return / assert, tighten escaping, remove dead references. Scope is bounded to the touched surface; no sprawling refactors.</li>
+      <li><strong>Edit source CSS/JS only, then rebuild <code>.min</code></strong> — run <code>node scripts/build-css.js &amp;&amp; node scripts/build-js.js</code>. Prove-absent before deleting. No <code>innerHTML</code>. Escape all PHP output via <code>esc_html()</code> / <code>esc_attr()</code> / <code>esc_url()</code>.</li>
+    </ol>
+
+    <h3>Determinism contract</h3>
+    <p>
+      The workflow script (<code>self-healing-theme-loop.js</code>) is deterministic — it contains
+      no calls to <code>Date.now()</code>, <code>Math.random()</code>, or any non-deterministic API.
+      All timestamps are produced by agents via shell:
+    </p>
+    <ul>
+      <li>Cache-busting: <code>date +%s</code></li>
+      <li>Log stamps: <code>date -u +%FT%TZ</code></li>
+    </ul>
+    <p>Per-item work variation is driven by array index, not randomness.</p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="signals">
+    <h2>Monitor Signals (S1–S4)</h2>
+    <p>
+      All S1–S3 signals are <strong>curl-reliable</strong> — they work headless with no MCP dependency.
+      S4 is best-effort MCP; the loop never fails a cycle on S4 alone.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Signal</th>
+          <th>Name</th>
+          <th>Method</th>
+          <th>Failure = regression?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>S1</code></td>
+          <td>HTTP health</td>
+          <td>curl (headless)</td>
+          <td><span class="tag tag-critical">yes — critical/high</span></td>
+        </tr>
+        <tr>
+          <td><code>S2</code></td>
+          <td>Canon-drift</td>
+          <td>grep on cache-busted HTML</td>
+          <td><span class="tag tag-high">yes — high</span></td>
+        </tr>
+        <tr>
+          <td><code>S3</code></td>
+          <td>Asset version</td>
+          <td>curl (headless)</td>
+          <td><span class="tag tag-high">yes — high</span></td>
+        </tr>
+        <tr>
+          <td><code>S4</code></td>
+          <td>Lighthouse + console errors</td>
+          <td>chrome-devtools MCP (best-effort)</td>
+          <td><span class="tag tag-med">advisory only</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>S1 — HTTP Health</h3>
+    <p>
+      Each page must return the expected HTTP status code, a body size at or above the baseline
+      floor (85% of observed KB), and a body free of the PHP error markers listed below.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Path</th>
+          <th>Expected HTTP</th>
+          <th>Size floor (KB)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>/</code></td><td>200</td><td>184.5</td></tr>
+        <tr><td><code>/shop/</code></td><td>200</td><td>119.1</td></tr>
+        <tr><td><code>/cart/</code></td><td>200</td><td>170.9</td></tr>
+        <tr><td><code>/pre-order/</code></td><td>200</td><td>223.6</td></tr>
+        <tr><td><code>/about/</code></td><td>200</td><td>126.1</td></tr>
+        <tr><td><code>/experience-black-rose/</code></td><td>200</td><td>125.3</td></tr>
+        <tr><td><code>/experience-love-hurts/</code></td><td>200</td><td>122.1</td></tr>
+        <tr><td><code>/experience-signature/</code></td><td>200</td><td>126.7</td></tr>
+        <tr><td><code>/experience-kids-capsule/</code></td><td>200</td><td>120.9</td></tr>
+        <tr><td><code>/this-page-does-not-exist-404check/</code></td><td>404</td><td>124.2 (404 sentinel)</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>PHP error markers</strong> — any of these strings in the body = S1 failure:</p>
+    <ul>
+      <li><code>Fatal error</code></li>
+      <li><code>Parse error</code></li>
+      <li><code>Call to undefined</code></li>
+      <li><code>There has been a critical error</code></li>
+    </ul>
+    <p>Severity: page-down or PHP error = <span class="tag tag-critical">critical</span>; size-floor miss without PHP error = <span class="tag tag-high">high</span>.</p>
+
+    <h3>S2 — Canon-Drift</h3>
+    <p>
+      Grep the cache-busted live HTML (<code>?cb=$(date +%s)</code>) for the following canon strings.
+      Any violation is a regression.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Check</th>
+          <th>Page</th>
+          <th>Healthy state</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Contains <code>Four Collections</code></td>
+          <td><code>/</code></td>
+          <td><span class="tag tag-note">must be present</span></td>
+        </tr>
+        <tr>
+          <td>Does NOT contain <code>Three Worlds</code></td>
+          <td><code>/</code></td>
+          <td><span class="tag tag-note">must be absent (regression marker)</span></td>
+        </tr>
+        <tr>
+          <td>Contains tagline <code>Luxury Grows from Concrete</code></td>
+          <td><code>/</code></td>
+          <td><span class="tag tag-note">must be present</span></td>
+        </tr>
+        <tr>
+          <td>Does NOT contain <code>Complete the Look</code></td>
+          <td><code>/cart/</code></td>
+          <td><span class="tag tag-note">must be absent — founder canon: no related products</span></td>
+        </tr>
+        <tr>
+          <td>Hero uses lockup image (<code>scene-lockup</code> <code>&lt;picture&gt;</code> element)</td>
+          <td><code>/experience-black-rose/</code></td>
+          <td><span class="tag tag-note">must be present — lockup image, never type-only</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>S3 — Asset Version</h3>
+    <p>
+      The homepage HTML must reference the current asset version matching the committed
+      <code>SKYYROSE_VERSION</code> constant (baseline: <code>1.5.25</code>).
+      A minimum of 2–3 <code>.min</code> assets must return HTTP 200.
+    </p>
+    <ul>
+      <li>Theme assets carry <code>?ver=1.5.25</code> (WordPress core/plugin assets may carry <code>?ver=1.0.0</code> — this is not a failure).</li>
+      <li>Checked assets: <code>main.min.css</code>, <code>design-tokens.min.css</code>, <code>premium-interactions.min.js</code>.</li>
+    </ul>
+
+    <h3>S4 — Lighthouse + Console Errors (best-effort)</h3>
+    <p>
+      Invoked via <code>mcp__chrome-devtools</code> when available in the headless environment.
+      Reports Lighthouse performance and accessibility scores, plus console errors.
+      <strong>S4 failures are advisory only</strong> — the loop never fails a cycle, blocks a gate,
+      or triggers a deploy on S4 signals alone. S4 data is logged to <code>tasks/heal-log.jsonl</code>
+      as a <code>medium</code>-severity annotation. If S4 is unavailable, the cycle logs
+      <code>"s4": "skipped - MCP unavailable"</code> and continues.
+    </p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="learning-model">
+    <h2>Learning Model</h2>
+    <p>
+      Two JSON stores persist knowledge across cycles.
+      Both schemas are <strong>flat, typed, and model-ready</strong> (no nested objects deeper than 2 levels)
+      so that a downstream ML ranker can train on them without pre-processing.
+    </p>
+
+    <h3><code>heal-knowledge.json</code> — regression knowledge base</h3>
+    <p>Path: <code>/Users/theceo/DevSkyy/.claude/state/heal-knowledge.json</code></p>
+    <p>
+      Top-level structure: <code>{ version, cycles, signatures: [], preventions: [], metric_recurrence_trend: [] }</code>.
+      Each entry in <code>signatures</code>:
+    </p>
+
+    <table>
+      <thead>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>signature</code></td><td>string</td><td>Canonical regression identifier, e.g. <code>"s1-cart-php-error"</code></td></tr>
+        <tr><td><code>surface</code></td><td>string</td><td>File or subsystem where regression originates, e.g. <code>"inc/woocommerce.php"</code></td></tr>
+        <tr><td><code>rootCause</code></td><td>string</td><td>Human-readable root cause determined by the healing agent</td></tr>
+        <tr><td><code>fixPattern</code></td><td>string</td><td>Proven fix template applied to resolve this signature class</td></tr>
+        <tr><td><code>recurrences</code></td><td>number</td><td>Count of cycles this signature has appeared (starts at 1)</td></tr>
+        <tr><td><code>firstSeen</code></td><td>string (ISO 8601)</td><td>Timestamp of first observation</td></tr>
+        <tr><td><code>lastSeen</code></td><td>string (ISO 8601)</td><td>Timestamp of most recent observation</td></tr>
+        <tr><td><code>lastOutcome</code></td><td>string enum</td><td><code>"healed"</code> | <code>"escalated"</code> | <code>"dry"</code></td></tr>
+        <tr><td><code>preventionAdded</code></td><td>string | null</td><td>Guard or new S-signal added to prevent recurrence, or <code>null</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3><code>heal-log.jsonl</code> — cycle audit trail</h3>
+    <p>Path: <code>/Users/theceo/DevSkyy/tasks/heal-log.jsonl</code></p>
+    <p>One JSON line appended per cycle. Fields:</p>
+
+    <table>
+      <thead>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>ts</code></td><td>string (ISO 8601)</td><td>Cycle start time, from shell <code>date -u +%FT%TZ</code></td></tr>
+        <tr><td><code>cycle</code></td><td>number</td><td>Monotonically incrementing cycle counter</td></tr>
+        <tr><td><code>signalsChecked</code></td><td>string[]</td><td>e.g. <code>["S1","S2","S3","S4"]</code> or <code>["S1","S2","S3"]</code> if S4 skipped</td></tr>
+        <tr><td><code>regressions</code></td><td>string[]</td><td>Signature IDs detected this cycle</td></tr>
+        <tr><td><code>healed</code></td><td>string[]</td><td>Signature IDs successfully healed (gate passed)</td></tr>
+        <tr><td><code>improvements</code></td><td>string[]</td><td>Net-improvement descriptions applied alongside healing</td></tr>
+        <tr><td><code>gate</code></td><td>string enum</td><td><code>"green"</code> | <code>"red"</code> | <code>"skipped"</code></td></tr>
+        <tr><td><code>deployed</code></td><td>boolean</td><td><code>true</code> only when <code>AUTO_DEPLOY=true</code> and gate = green</td></tr>
+        <tr><td><code>dryManifest</code></td><td>object | null</td><td>Deploy manifest surfaced to founder when dry-run mode</td></tr>
+        <tr><td><code>knowledgeUpdated</code></td><td>string[]</td><td>Signature IDs whose knowledge records were upserted</td></tr>
+        <tr><td><code>lessons</code></td><td>string[]</td><td>Free-text lessons captured this cycle</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Self-improvement metric</h3>
+    <p>
+      The primary metric is <strong>recurrence trend</strong>: across cycles, the mean
+      <code>recurrences</code> value per active signature should trend downward as preventions
+      are added. A flat or rising trend signals that fixes are treating symptoms, not root causes.
+    </p>
+    <p>
+      <code>metric_recurrence_trend</code> in <code>heal-knowledge.json</code> is an array of
+      <code>{ cycle, meanRecurrences, signaturesActive }</code> snapshots written at the end of
+      each cycle.
+    </p>
+
+    <h3>Mine step — escalation at recurrences ≥ 3</h3>
+    <p>
+      At the end of <strong>Learn-After</strong>, the loop scans all signatures with
+      <code>recurrences &gt;= 3</code>. For each:
+    </p>
+    <ol>
+      <li>Propose a permanent structural fix (not a per-cycle patch).</li>
+      <li>Propose a new monitor signal (S1–S3) that would catch this class earlier.</li>
+      <li>Log both proposals to the founder via <code>dryManifest</code> in <code>tasks/heal-log.jsonl</code>.</li>
+      <li>Set <code>preventionAdded</code> on the signature record once a proposal is accepted and implemented.</li>
+    </ol>
+
+    <h3>ML upgrade path (document only — do not build)</h3>
+    <p>
+      Once <code>heal-knowledge.json</code> and <code>heal-log.jsonl</code> accumulate sufficient
+      cycles (target: ≥ 20 cycles, ≥ 5 unique signature classes), a lightweight model can be trained
+      offline on the logged outcomes to:
+    </p>
+    <ul>
+      <li>Score regression-risk per surface (e.g., which PHP files are highest-risk post-deploy).</li>
+      <li>Rank fix-patterns by historical success rate per signature class.</li>
+      <li>Predict which S-signal will fire next given recent deployment history.</li>
+    </ul>
+    <p>
+      The JSON schemas are model-ready from day one: flat, typed, no nested objects beyond depth 2,
+      ISO 8601 timestamps, and enum-constrained categorical fields (<code>lastOutcome</code>,
+      <code>gate</code>). No schema migration is expected before ML training begins.
+    </p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="heal-vs-improve">
+    <h2>Heal vs Improve — Two-Axis Review Gate</h2>
+    <p>
+      After the <code>theme-heal-doctor</code> agent produces a candidate fix in the worktree,
+      a code-review gate evaluates the fix on <strong>two independent axes</strong>. Both must pass.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Axis</th>
+          <th>Question</th>
+          <th>Evidence required</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Does it heal?</strong></td>
+          <td>Does the fix resolve the detected regression?</td>
+          <td>
+            Cache-busted curl confirms the S1/S2/S3 condition that triggered the regression
+            is no longer violated. Source diff confirms the broken code path is addressed.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Is it a net improvement?</strong></td>
+          <td>Does the fix leave the touched surface in better shape than it found it?</td>
+          <td>
+            At least one of: root cause removed (not just symptom patched), deduplication,
+            a new guard / early-return / assert added, tighter escaping, dead references removed,
+            alignment with existing theme patterns.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <strong>Patch-only fails axis 2.</strong> A fix that restores the broken feature but
+      only patches the symptom (e.g., adds a try/catch without removing the cause) is sent back
+      to the heal-doctor agent <strong>once</strong> for a root-cause pass. If the root-cause pass
+      also fails axis 2, the fix is accepted on axis 1 alone, the regression is logged as
+      <code>lastOutcome: "healed"</code> with a note, and the signature's <code>recurrences</code>
+      counter is incremented to flag it for the mine step.
+    </div>
+
+    <h3>Rubric applied by the reviewer</h3>
+    <ul>
+      <li><strong>Root cause removed:</strong> the code path that allowed the regression cannot reproduce the same fault without a new code change.</li>
+      <li><strong>No <code>innerHTML</code>:</strong> all DOM construction via <code>createElement</code> + <code>textContent</code> or <code>DOMParser</code>.</li>
+      <li><strong>PHP output escaped:</strong> <code>esc_html()</code>, <code>esc_attr()</code>, <code>esc_url()</code>, <code>wp_kses_post()</code> on every output point touched by the fix.</li>
+      <li><strong>Source + <code>.min</code> in sync:</strong> both CSS/JS source and rebuilt <code>.min</code> files are committed together.</li>
+      <li><strong>PHPCS clean:</strong> no new WPCS errors on touched PHP files.</li>
+      <li><strong>Bounded scope:</strong> diff touches only the surface relevant to the regression, plus any directly related dead code. No exploratory refactors.</li>
+    </ul>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="files">
+    <h2>Canonical Files</h2>
+    <p>All six artifacts use the names defined here. No aliases. No substitutions.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Artifact</th>
+          <th>Canonical path</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Engine</td>
+          <td><code>/Users/theceo/DevSkyy/.claude/workflows/self-healing-theme-loop.js</code></td>
+          <td>Workflow script. Same shape as <code>skyyrose-dev-team.js</code>: <code>export const meta</code> + phase orchestration.</td>
+        </tr>
+        <tr>
+          <td>Heal agent</td>
+          <td><code>/Users/theceo/DevSkyy/.claude/agents/theme-heal-doctor.md</code></td>
+          <td>Subagent definition: YAML frontmatter + system prompt. Invoked per-regression by the engine.</td>
+        </tr>
+        <tr>
+          <td>Spec</td>
+          <td><code>/Users/theceo/DevSkyy/docs/superpowers/specs/self-healing-theme-loop.html</code></td>
+          <td>This document. Authoritative contract. One <code>&lt;section id&gt;</code> per stage.</td>
+        </tr>
+        <tr>
+          <td>Baseline</td>
+          <td><code>/Users/theceo/DevSkyy/.claude/state/theme-health-baseline.json</code></td>
+          <td>Expected canon strings, page size floors, asset version. Read by the engine on every cycle.</td>
+        </tr>
+        <tr>
+          <td>Knowledge store</td>
+          <td><code>/Users/theceo/DevSkyy/.claude/state/heal-knowledge.json</code></td>
+          <td>Learning store: array of regression signatures with fix patterns, recurrences, and prevention records.</td>
+        </tr>
+        <tr>
+          <td>Heal log</td>
+          <td><code>/Users/theceo/DevSkyy/tasks/heal-log.jsonl</code></td>
+          <td>Append-only audit trail. One JSON line per cycle.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="safety">
+    <h2>Safety</h2>
+
+    <h3>Read-only by default</h3>
+    <p>
+      The loop performs only read operations (curl, grep, Read tool) until a regression is detected
+      and gate passes. No file is written to the production theme path within a cycle; all healing
+      work happens in an isolated git worktree branched from HEAD.
+    </p>
+
+    <h3>Worktree isolation</h3>
+    <p>
+      The <code>theme-heal-doctor</code> agent creates a git worktree at
+      <code>/tmp/theme-heal-&lt;cycle&gt;/</code> for each healing attempt.
+      The worktree is removed after the cycle regardless of outcome.
+      The <code>main</code> branch is never modified directly by the agent.
+    </p>
+
+    <h3>Deploy off by default</h3>
+    <p>
+      <code>AUTO_DEPLOY</code> defaults to <code>false</code>. In dry-run mode the loop:
+    </p>
+    <ol>
+      <li>Runs all phases through gate.</li>
+      <li>Writes the deploy manifest (<code>dryManifest</code>) to <code>tasks/heal-log.jsonl</code>.</li>
+      <li>Surfaces the manifest for the founder to review.</li>
+      <li>Does <strong>not</strong> invoke <code>deploy-theme.sh</code>.</li>
+    </ol>
+    <div class="callout callout-green">
+      When <code>AUTO_DEPLOY=true</code>, deploy requires all of: gate = green, S4-only violations
+      excluded, and <code>STOPSHOW_ACK=1</code> accepted by the settings permission layer. The loop
+      never self-grants this permission.
+    </div>
+
+    <h3>Escalate after 2 consecutive failing cycles</h3>
+    <p>
+      If the same regression signature is not healed after 2 consecutive cycles:
+    </p>
+    <ul>
+      <li>Set <code>lastOutcome: "escalated"</code> on the knowledge record.</li>
+      <li>Stop attempting to heal it (do not loop forever).</li>
+      <li>Append an escalation entry to <code>tasks/heal-log.jsonl</code>.</li>
+      <li>Add one line to <code>.wolf/memory.md</code> for session-level visibility.</li>
+      <li>Surface to the founder for manual intervention.</li>
+    </ul>
+
+    <h3>No self-grant</h3>
+    <p>
+      The loop never modifies <code>.claude/settings.json</code>, never adds itself to
+      <code>allowedTools</code>, and never bypasses the <code>STOPSHOW_ACK</code> guard.
+      All permission changes are made by the operator explicitly.
+    </p>
+
+    <h3>Bounded per-cycle budget</h3>
+    <p>
+      Each cycle is bounded: maximum one healing attempt per regression signature per cycle.
+      The total number of healing sub-agent invocations per cycle is capped at the number of
+      distinct regression signatures detected (never fan-out beyond that). S4-only findings
+      produce zero healing attempts.
+    </p>
+
+    <h3>Never deploy on S4-only</h3>
+    <p>
+      If the only regressions detected are S4 advisory signals (Lighthouse perf, console errors),
+      the cycle logs the findings and exits without healing or deploying. S4 findings are surfaced
+      to the founder as advisory notes in the next dry manifest.
+    </p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="runbook">
+    <h2>Runbook</h2>
+
+    <h3>Enable auto-deploy</h3>
+    <p>
+      By default the loop runs in dry-run mode. To enable live deploys, the operator must do
+      both of the following — neither alone is sufficient:
+    </p>
+    <ol>
+      <li>
+        Add the <code>deploy-theme.sh</code> permission line to
+        <code>.claude/settings.json</code> under the project's <code>allowedTools</code>
+        (or equivalent bash permission entry):
+        <pre>// In .claude/settings.json → allowedTools (or bash allow list)
+"bash(scripts/deploy-theme.sh:*)"</pre>
+      </li>
+      <li>
+        Set the environment variable <code>AUTO_DEPLOY=true</code> when launching the cron
+        invocation:
+        <pre>AUTO_DEPLOY=true claude run self-healing-theme-loop</pre>
+      </li>
+    </ol>
+    <div class="callout">
+      <strong>STOPSHOW_ACK=1 is required.</strong> The deploy script enforces the project-wide
+      STOP-AND-SHOW guard. The workflow engine must supply <code>STOPSHOW_ACK=1</code> as a
+      prefix when invoking <code>scripts/deploy-theme.sh</code>:
+      <code>STOPSHOW_ACK=1 bash /Users/theceo/DevSkyy/scripts/deploy-theme.sh</code>
+    </div>
+
+    <h3>Cron cadence</h3>
+    <p>
+      Default: every 6 hours. To adjust, modify the cron schedule at registration time.
+      The schedule is configurable per-environment; the workflow script does not hardcode it.
+      Example crontab entry for every 6 hours:
+    </p>
+    <pre>0 */6 * * *   AUTO_DEPLOY=false claude run self-healing-theme-loop >> /var/log/theme-heal.log 2>&1</pre>
+
+    <h3>Dry-run inspection</h3>
+    <p>
+      In dry-run mode (default), review the last cycle's output:
+    </p>
+    <pre>tail -n 1 /Users/theceo/DevSkyy/tasks/heal-log.jsonl | python3 -m json.tool</pre>
+
+    <h3>Knowledge store inspection</h3>
+    <pre>cat /Users/theceo/DevSkyy/.claude/state/heal-knowledge.json | python3 -m json.tool</pre>
+
+    <h3>Baseline update</h3>
+    <p>
+      If the site legitimately changes (new pages, version bump), re-run the baseline-seeding
+      agent and commit the updated <code>theme-health-baseline.json</code>. Do not manually
+      edit size floors — always re-derive from a live cache-busted capture at 85% of observed.
+    </p>
+
+    <h3>Escalation response</h3>
+    <p>
+      When a regression appears in the heal log with <code>"lastOutcome":"escalated"</code>,
+      it requires manual investigation. Steps:
+    </p>
+    <ol>
+      <li>Read the <code>rootCause</code> and <code>fixPattern</code> fields on the knowledge record.</li>
+      <li>Inspect the last 2–3 cycle records for that signature in <code>tasks/heal-log.jsonl</code>.</li>
+      <li>Apply a manual fix via the normal dev-team workflow (<code>skyyrose-dev-team.js</code>).</li>
+      <li>After the manual fix is deployed and confirmed, reset <code>recurrences</code> to 0 and clear <code>lastOutcome</code> to <code>"healed"</code> on the knowledge record.</li>
+    </ol>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <section id="decisions">
+    <h2>Design Decisions</h2>
+
+    <h3>Decision 1 — curl-core, not MCP-core</h3>
+    <p>
+      <strong>Choice:</strong> S1, S2, and S3 are implemented with plain <code>curl</code> and
+      <code>grep</code>. Only S4 uses the <code>chrome-devtools</code> MCP.
+    </p>
+    <p>
+      <strong>Rationale:</strong> The loop must run reliably in headless, scheduled, and CI
+      environments where MCP servers may not be available. <code>curl</code> is available
+      everywhere. Making the loop's correctness signals MCP-dependent would make every MCP
+      outage a missed regression. S4 is advisory precisely because it cannot be made curl-reliable.
+    </p>
+    <p>
+      <strong>Trade-off accepted:</strong> S4 (Lighthouse perf, console errors) is lower-fidelity
+      in headless mode. This is acceptable because S4 regressions are medium-severity and do not
+      gate deploys.
+    </p>
+
+    <h3>Decision 2 — deploy hard-gated, off by default</h3>
+    <p>
+      <strong>Choice:</strong> <code>AUTO_DEPLOY=false</code> is the default. Three conditions
+      must all be true before a live deploy fires: gate = green, S4-only violations excluded,
+      and <code>STOPSHOW_ACK=1</code> present.
+    </p>
+    <p>
+      <strong>Rationale:</strong> The project's STOP-AND-SHOW protocol (<code>CLAUDE.md</code>)
+      explicitly designates any execution of <code>deploy-theme.sh</code> on <code>skyyrose.co</code>
+      as a production-site action requiring explicit authorization. An autonomous loop must not
+      self-grant this. Deploying on S4-only is forbidden because Lighthouse regressions are
+      advisory and not worth the site-touch risk.
+    </p>
+    <p>
+      <strong>Trade-off accepted:</strong> In dry-run mode, healed fixes sit in a worktree until
+      the founder reviews the manifest and triggers a manual deploy. This adds latency but
+      preserves the production safety contract.
+    </p>
+
+    <h3>Decision 3 — learning loop now, ML model later</h3>
+    <p>
+      <strong>Choice:</strong> The learning mechanism is a deterministic JSON store
+      (<code>heal-knowledge.json</code>) with hand-written upsert logic. No ML model is built
+      in this phase.
+    </p>
+    <p>
+      <strong>Rationale:</strong> The site does not yet have enough regression history to
+      train a meaningful model. The JSON schemas are designed model-ready (flat, typed, enum
+      constraints) so no migration is needed when the ML upgrade path is activated.
+      The recurrence-trend metric gives the operator a human-readable signal that the system
+      is improving without needing a model to interpret it.
+    </p>
+    <p>
+      <strong>Upgrade trigger:</strong> Activate the ML path after ≥ 20 cycles and ≥ 5 unique
+      signature classes are logged. The training set is <code>heal-log.jsonl</code>
+      + <code>heal-knowledge.json</code> signatures with <code>lastOutcome</code> labels.
+    </p>
+  </section>
+
+</div>
+</body>
+</html>
