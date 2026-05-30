@@ -638,6 +638,13 @@ verify_live() {
     # Set STRUCTURE_CHECK_STRICT=1 to promote structural failures into
     # full deploy failures (triggers auto-rollback via cleanup trap).
     structural_verify_live "$public_url"
+
+    # JS-runtime deep verify (Playwright) — sees pageerrors and broken animation
+    # lifecycles that curl/Scrapling cannot. Blocks (→ auto_rollback) when a spec
+    # is provided and a surface regresses. No-op for plain manual deploys.
+    if ! playwright_verify_live; then
+        return 1
+    fi
     return 0
 }
 
@@ -708,6 +715,39 @@ structural_verify_live() {
             log_warn "Structural check exited unexpectedly (rc=$rc) — treating as warning"
             return 0
             ;;
+    esac
+}
+
+# ---------------------------------------------------------------------------
+# JS-runtime deep verify gate (Playwright)
+#
+# The piece curl + Scrapling cannot provide: a real browser loads each surface,
+# counts pageerrors (minus an allowlist of known pre-existing noise), and runs
+# DOM lifecycle assertions. This is the gate that would have caught the v1.5.21
+# black-flash / dead-title / broken-scroll-reveal trio that shipped "green".
+#
+# Only runs when a spec is provided (autopilot/CI set PW_VERIFY_SPEC[_FILE]);
+# plain manual deploys skip it. Exit contract from verify-live-playwright.mjs:
+#   0 - all surfaces clean
+#   1 - a surface regressed  → BLOCKS, returns 1 → main() sets ROLLBACK_REQUESTED
+#   3 - environment problem (playwright/browser missing) → warn-only, never blocks
+# ---------------------------------------------------------------------------
+playwright_verify_live() {
+    if [[ "$DRY_RUN" == "true" ]]; then
+        return 0
+    fi
+    if [[ -z "${PW_VERIFY_SPEC:-}${PW_VERIFY_SPEC_FILE:-}" ]]; then
+        return 0
+    fi
+    local node_bin
+    node_bin="$(command -v node 2>/dev/null || echo node)"
+    log_info "Running JS-runtime deep verify (Playwright)..."
+    local rc=0
+    "$node_bin" "$SCRIPT_DIR/verify-live-playwright.mjs" || rc=$?
+    case "$rc" in
+        0) log_success "Playwright deep verify passed"; return 0 ;;
+        3) log_warn "Playwright deep verify skipped: environment unavailable (exit 3)"; return 0 ;;
+        *) log_error "Playwright deep verify FAILED (rc=$rc) — triggering rollback"; return 1 ;;
     esac
 }
 
