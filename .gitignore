@@ -438,3 +438,6 @@ tasks/render-pipeline-cli-*.json
 
 wordpress-theme/skyyrose-flagship/data/product-references/techflat-review.json
 wordpress-theme/skyyrose-flagship/data/product-references/techflat-vision-analysis.json
+
+# Autonomous coding agent scratch/demo output dir
+my_project/
