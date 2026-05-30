@@ -48,17 +48,16 @@ get_header();
 	<!-- ══════════════════════════════════════════════════════════════
 		2. PRESS BAR
 		══════════════════════════════════════════════════════════════ -->
-	<div class="lp-press lp-rv" aria-label="Featured in">
+	<section class="lp-press lp-rv">
 		<div class="lp__container">
-			<span class="lp-press__label"><?php echo esc_html( 'As Seen In' ); ?></span>
-			<ul class="lp-press__list">
-				<li><?php echo esc_html( 'Maxim' ); ?></li>
-				<li><?php echo esc_html( 'CEO Weekly' ); ?></li>
-				<li><?php echo esc_html( 'SF Post' ); ?></li>
-				<li><?php echo esc_html( 'Best of Best Review' ); ?></li>
-			</ul>
+			<div class="lp-press__row">
+				<span class="lp-press__name">Maxim</span>
+				<span class="lp-press__name">CEO Weekly</span>
+				<span class="lp-press__name">SF Post</span>
+				<span class="lp-press__name">Best of Best Review</span>
+			</div>
 		</div>
-	</div>
+	</section>
 
 	<!-- ══════════════════════════════════════════════════════════════
 		3. STORY
@@ -69,7 +68,7 @@ get_header();
 
 				<div class="lp-story__text lp-rv">
 					<span class="lp-story__label"><?php echo esc_html( 'THE ORIGIN' ); ?></span>
-					<h2 class="lp-story__title"><?php echo esc_html( "Darkness Isn't the Absence of Light" ); ?></h2>
+					<h2 class="lp-story__title"><?php echo esc_html( 'Not a Flower — a Conviction.' ); ?></h2>
 					<p>
 						<?php echo esc_html( 'Corey Foster grew up in Oakland, California — a city that teaches you to build beauty from nothing. Black Rose started as a sketch in a notebook and became something bigger: a collection for people who understand that real luxury comes from adversity, not privilege.' ); ?>
 					</p>
@@ -77,7 +76,7 @@ get_header();
 						<?php echo esc_html( 'Every piece in this collection carries the weight of that story. The monochrome palette. The thorn motifs. The numbered authentication. This is fashion forged in the fire of real life.' ); ?>
 					</p>
 					<blockquote class="lp-story__quote">
-						<p><?php echo esc_html( "If you asked me four years ago, I never would have thought I'd be here." ); ?></p>
+						<p><?php echo esc_html( 'Where I\'m from, black isn\'t a color — it\'s armor. Every kid on my block knew that. Black Rose is that truth made into fabric. You don\'t wear it to stand out. You wear it because you already stood up.' ); ?></p>
 						<cite><?php echo esc_html( '— Corey Foster, Founder' ); ?></cite>
 					</blockquote>
 				</div>
@@ -156,29 +155,33 @@ get_header();
 				$reviews = array(
 					array(
 						'text'   => "The quality is insane. I've washed my hoodie 20+ times and it still looks brand new.",
-						'author' => 'Marcus T., Oakland',
+						'author' => 'Marcus T.',
+						'city'   => 'Oakland',
 					),
 					array(
 						'text'   => "I've never gotten more compliments on a piece of clothing.",
-						'author' => 'Jade W., San Francisco',
+						'author' => 'Jade W.',
+						'city'   => 'San Francisco',
 					),
 					array(
 						'text'   => "This isn't just a brand, it's a movement. The numbered tag makes it feel special.",
-						'author' => 'Devon L., Los Angeles',
+						'author' => 'Devon L.',
+						'city'   => 'Los Angeles',
 					),
 				);
 
-				$delay = 1;
+				$r_delay = 1;
 				foreach ( $reviews as $review ) :
 					?>
-					<div class="lp-reviews__card lp-rv" data-delay="<?php echo esc_attr( $delay ); ?>">
-						<blockquote>
-							<p><?php echo esc_html( $review['text'] ); ?></p>
-						</blockquote>
-						<cite><?php echo esc_html( '— ' . $review['author'] ); ?></cite>
+					<div class="lp-review-card lp-rv" data-delay="<?php echo esc_attr( $r_delay ); ?>">
+						<div class="lp-review-card__stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+						<p class="lp-review-card__text"><?php echo esc_html( $review['text'] ); ?></p>
+						<cite class="lp-review-card__author">
+							<?php echo esc_html( $review['author'] ); ?>, <?php echo esc_html( $review['city'] ); ?>
+						</cite>
 					</div>
 					<?php
-					++$delay;
+					++$r_delay;
 				endforeach;
 				?>
 			</div>

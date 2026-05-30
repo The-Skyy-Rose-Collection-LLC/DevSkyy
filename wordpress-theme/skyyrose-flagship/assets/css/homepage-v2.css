@@ -834,10 +834,18 @@
 }
 .col-card:hover .col-card-cta { border-color: #fff; background: #fff; color: var(--void); }
 
-/* Typography preserved via PHP mapping, but enforce spacing */
-.col-card.br .col-card-name { font-family: 'Cinzel', serif; letter-spacing: 4px; }
-.col-card.lh .col-card-name { font-family: 'Playfair Display', serif; }
-.col-card.sg .col-card-name { font-family: 'Playfair Display', serif; }
+/* Collection name lockup — image replaces type-rendered heading */
+.col-card-name {
+	display: block;
+	margin-bottom: 12px;
+}
+.col-card-name__lockup {
+	width: auto;
+	max-width: 240px;
+	max-height: 72px;
+	object-fit: contain;
+	object-position: left center;
+}
 
 /* ==========================================================================
    KIDS CAPSULE — HEIR APPARENT (ported from design-system .sr-heir)
@@ -1143,14 +1151,17 @@
 	font-size: 11px;
 	letter-spacing: 6px;
 	text-transform: uppercase;
-	opacity: 0;
+	opacity: 1;
 	transition: all .6s var(--ease-luxury);
-	transform: translateY(12px);
+	transform: translateY(0);
 	background: rgba(5,5,5,0.8);
 	padding: 8px 16px;
 	backdrop-filter: blur(8px);
 }
-.lb-img:hover .lb-label { opacity: 1; transform: translateY(0); }
+@media (hover: hover) {
+	.lb-label { opacity: 0; transform: translateY(12px); }
+	.lb-img:hover .lb-label { opacity: 1; transform: translateY(0); }
+}
 
 /* ==========================================================================
    CRAFT (Tactile Concrete)
@@ -1267,7 +1278,7 @@
 	transition: border-color .5s var(--ease-luxury);
 	text-align: center;
 }
-.nl-input::placeholder { color: var(--ghost); letter-spacing: 2px; text-transform: uppercase;}
+.nl-input::placeholder { color: var(--haze); letter-spacing: 2px; text-transform: uppercase; }
 .nl-input:focus { border-color: var(--rose); }
 .nl-submit {
 	padding: 16px 40px;
@@ -1473,7 +1484,7 @@
 	.lb-img { transition: none; filter: contrast(1.04) saturate(0.94) brightness(0.97); }
 
 	/* Marquee scroll */
-	.mq-track { animation: none; }
+	.marquee-track { animation: none; }
 
 	/* Nav transitions */
 	.nav, .nav-link, .nav-link::after, .nav-bag { transition: none; }

@@ -90,6 +90,7 @@
 	/* --- §1.5  Color — Brand aliases (fallback to brand-variables.css) --- */
 	--color-rose-gold: var(--rose-gold, #B76E79);
 	--color-gold:      var(--gold, #D4AF37);
+	--color-gold-rgb:  212, 175, 55;
 	--color-crimson:   var(--crimson, #DC143C);
 	--color-silver:    var(--silver, #C0C0C0);
 	--color-white:     var(--white, #FFF);
@@ -105,6 +106,7 @@
 	--color-text-secondary: #E0E0E0;
 	--color-text-muted:     #B3B3B3;
 	--color-text-dim:       #A0A0A0;
+	--skyyrose-surface-warm: #F5F1EB;
 
 	/* --- §1.7  Color — Semantic state (mapped to brand palette) ---- */
 	--color-success:      var(--color-gold, #D4AF37);

@@ -51,17 +51,16 @@ get_header();
 	<!-- ══════════════════════════════════════════════════════════════
 		2. PRESS BAR
 		══════════════════════════════════════════════════════════════ -->
-	<div class="lp-press lp-rv" aria-label="Featured in">
+	<section class="lp-press lp-rv">
 		<div class="lp__container">
-			<span class="lp-press__label"><?php echo esc_html( 'As Seen In' ); ?></span>
-			<ul class="lp-press__list">
-				<li><?php echo esc_html( 'Maxim' ); ?></li>
-				<li><?php echo esc_html( 'CEO Weekly' ); ?></li>
-				<li><?php echo esc_html( 'SF Post' ); ?></li>
-				<li><?php echo esc_html( 'Best of Best Review' ); ?></li>
-			</ul>
+			<div class="lp-press__row">
+				<span class="lp-press__name">Maxim</span>
+				<span class="lp-press__name">CEO Weekly</span>
+				<span class="lp-press__name">SF Post</span>
+				<span class="lp-press__name">Best of Best Review</span>
+			</div>
 		</div>
-	</div>
+	</section>
 
 	<!-- ══════════════════════════════════════════════════════════════
 		3. STORY
@@ -154,29 +153,33 @@ get_header();
 				$reviews = array(
 					array(
 						'text'   => 'My daughter refuses to take off her hoodie. The quality is insane for kids\' clothes.',
-						'author' => 'Alicia M., Oakland',
+						'author' => 'Alicia M.',
+						'city'   => 'Oakland',
 					),
 					array(
 						'text'   => 'Finally, matching outfits that don\'t look corny. We get stopped every time we go out.',
-						'author' => 'Marcus T., Los Angeles',
+						'author' => 'Marcus T.',
+						'city'   => 'Los Angeles',
 					),
 					array(
 						'text'   => 'The colorblock set survived a whole week of daycare. That\'s the real luxury test.',
-						'author' => 'Jade W., San Francisco',
+						'author' => 'Keisha D.',
+						'city'   => 'Atlanta',
 					),
 				);
 
-				$delay = 1;
+				$r_delay = 1;
 				foreach ( $reviews as $review ) :
 					?>
-					<div class="lp-reviews__card lp-rv" data-delay="<?php echo esc_attr( $delay ); ?>">
-						<blockquote>
-							<p><?php echo esc_html( $review['text'] ); ?></p>
-						</blockquote>
-						<cite><?php echo esc_html( '— ' . $review['author'] ); ?></cite>
+					<div class="lp-review-card lp-rv" data-delay="<?php echo esc_attr( $r_delay ); ?>">
+						<div class="lp-review-card__stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+						<p class="lp-review-card__text"><?php echo esc_html( $review['text'] ); ?></p>
+						<cite class="lp-review-card__author">
+							<?php echo esc_html( $review['author'] ); ?>, <?php echo esc_html( $review['city'] ); ?>
+						</cite>
 					</div>
 					<?php
-					++$delay;
+					++$r_delay;
 				endforeach;
 				?>
 			</div>

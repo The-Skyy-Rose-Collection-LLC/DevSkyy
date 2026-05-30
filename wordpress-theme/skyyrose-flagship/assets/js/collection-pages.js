@@ -13,26 +13,29 @@
 	/* Scroll reveal handled by premium-interactions.js (global) — no duplicate observer here. */
 
 	/* ── Floating Particles ───────────────────────────────────────── */
+	/* Guard is particles-only: .col-floating is not emitted on all collection
+	 * pages, so particle generation is conditional but newsletter is not. */
 	var container = document.querySelector('.col-floating');
-	if (!container) return;
+	if (container) {
+		var page = document.querySelector('.col-page');
+		var collection = page ? page.getAttribute('data-collection') : '';
+		var chars = { 'love-hurts': '♥', 'black-rose': '•', 'signature': '✦', 'kids-capsule': '✦' };
+		var ch = chars[collection] || '✦';
+		var count = collection === 'love-hurts' ? 12 : 6;
 
-	var page = document.querySelector('.col-page');
-	var collection = page ? page.getAttribute('data-collection') : '';
-	var chars = { 'love-hurts': '\u2665', 'black-rose': '\u2022', 'signature': '\u2726', 'kids-capsule': '\u2726' };
-	var ch = chars[collection] || '\u2726';
-	var count = collection === 'love-hurts' ? 12 : 6;
-
-	for (var i = 0; i < count; i++) {
-		var el = document.createElement('div');
-		el.className = 'col-float-particle';
-		el.textContent = ch;
-		el.style.left = Math.random() * 100 + '%';
-		el.style.animationDelay = Math.random() * 20 + 's';
-		el.style.fontSize = (Math.random() * 0.8 + 0.8) + 'rem';
-		container.appendChild(el);
+		for (var i = 0; i < count; i++) {
+			var el = document.createElement('div');
+			el.className = 'col-float-particle';
+			el.textContent = ch;
+			el.style.left = Math.random() * 100 + '%';
+			el.style.animationDelay = Math.random() * 20 + 's';
+			el.style.fontSize = (Math.random() * 0.8 + 0.8) + 'rem';
+			container.appendChild(el);
+		}
 	}
 
 	/* ── Newsletter form handler ──────────────────────────────────── */
+	/* Runs on all collection pages regardless of .col-floating presence. */
 	var form = document.querySelector('.col-newsletter__form');
 	if (form) {
 		form.addEventListener('submit', function (e) {

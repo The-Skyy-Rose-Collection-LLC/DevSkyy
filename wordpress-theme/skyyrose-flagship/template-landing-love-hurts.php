@@ -4,7 +4,7 @@
  * Template Post Type: page
  *
  * Conversion-focused landing page for the Love Hurts collection.
- * "Hurts" is the founder's family name — this collection is deeply personal.
+ * "Hurts" is the bloodline that raised the founder — Foster is the name he carries publicly.
  * Voice: raw, emotional, vulnerability as strength.
  *
  * @package SkyyRose
@@ -44,17 +44,16 @@ get_header();
 	?>
 
 	<?php /* ───── 2. Press Bar ───── */ ?>
-	<div class="lp-press lp-rv" aria-label="Featured in">
+	<section class="lp-press lp-rv">
 		<div class="lp__container">
-			<span class="lp-press__label"><?php echo esc_html( 'As Seen In' ); ?></span>
-			<ul class="lp-press__list">
-				<li><?php echo esc_html( 'Maxim' ); ?></li>
-				<li><?php echo esc_html( 'CEO Weekly' ); ?></li>
-				<li><?php echo esc_html( 'SF Post' ); ?></li>
-				<li><?php echo esc_html( 'Best of Best Review' ); ?></li>
-			</ul>
+			<div class="lp-press__row">
+				<span class="lp-press__name">Maxim</span>
+				<span class="lp-press__name">CEO Weekly</span>
+				<span class="lp-press__name">SF Post</span>
+				<span class="lp-press__name">Best of Best Review</span>
+			</div>
 		</div>
-	</div>
+	</section>
 
 	<?php /* ───── 3. Story ───── */ ?>
 	<section class="lp-story" id="story">
@@ -131,26 +130,20 @@ get_header();
 				<h2><?php echo esc_html( 'What LOVE HURTS Means to People' ); ?></h2>
 			</div>
 			<div class="lp-reviews__grid">
-				<div class="lp-reviews__card lp-rv" data-delay="1">
-					<div class="lp-reviews__stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-					<blockquote class="lp-reviews__quote">
-						<?php echo esc_html( 'I bought this for my daughter. She said it\'s the first brand that feels like it understands her.' ); ?>
-					</blockquote>
-					<cite class="lp-reviews__author">&mdash; Tamika R., Atlanta</cite>
+				<div class="lp-review-card lp-rv" data-delay="1">
+					<div class="lp-review-card__stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+					<p class="lp-review-card__text"><?php echo esc_html( 'I bought this for my daughter. She said it\'s the first brand that feels like it understands her.' ); ?></p>
+					<cite class="lp-review-card__author">Tamika R., Atlanta</cite>
 				</div>
-				<div class="lp-reviews__card lp-rv" data-delay="2">
-					<div class="lp-reviews__stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-					<blockquote class="lp-reviews__quote">
-						<?php echo esc_html( 'The varsity jacket is a piece of art. I wear it every time I need to feel invincible.' ); ?>
-					</blockquote>
-					<cite class="lp-reviews__author">&mdash; Ray C., Oakland</cite>
+				<div class="lp-review-card lp-rv" data-delay="2">
+					<div class="lp-review-card__stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+					<p class="lp-review-card__text"><?php echo esc_html( 'The varsity jacket is a piece of art. I wear it every time I need to feel invincible.' ); ?></p>
+					<cite class="lp-review-card__author">Ray C., Oakland</cite>
 				</div>
-				<div class="lp-reviews__card lp-rv" data-delay="3">
-					<div class="lp-reviews__stars" aria-label="5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-					<blockquote class="lp-reviews__quote">
-						<?php echo esc_html( 'Hurts is more than a name on a tag. When you know the story, it hits different.' ); ?>
-					</blockquote>
-					<cite class="lp-reviews__author">&mdash; Kiera M., Chicago</cite>
+				<div class="lp-review-card lp-rv" data-delay="3">
+					<div class="lp-review-card__stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+					<p class="lp-review-card__text"><?php echo esc_html( 'Hurts is more than a name on a tag. When you know the story, it hits different.' ); ?></p>
+					<cite class="lp-review-card__author">Kiera M., Chicago</cite>
 				</div>
 			</div>
 		</div>
@@ -197,7 +190,7 @@ get_header();
 			'questions' => array(
 				array(
 					'q' => 'What does "Love Hurts" mean?',
-					'a' => '<p>"Hurts" is the founder\'s actual family name. This collection is deeply personal — it\'s a tribute to everything the family has been through, transformed into something you can wear with pride.</p>',
+					'a' => '<p>"Hurts is the bloodline that raised me." That is Corey\'s own framing. Foster is the surname he carries publicly; Hurts is the line that shaped who carries it. This collection is for the second one.</p>',
 				),
 				array(
 					'q' => 'How does sizing run?',

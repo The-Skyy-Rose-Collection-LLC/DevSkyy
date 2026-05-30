@@ -288,7 +288,7 @@ $skyyrose_collections = array_values( skyyrose_get_collections_config() );
 						?>
 						<a href="<?php echo esc_url( $skyyrose_link ); ?>"
 							class="search-results__card"
-							style="--card-accent: <?php echo esc_attr( $skyyrose_collection['accent'] ); ?>; --card-glow: <?php echo esc_attr( $skyyrose_collection['glow'] ); ?>">
+							data-collection="<?php echo esc_attr( $skyyrose_collection['slug'] ); ?>">
 							<span class="search-results__card-border" aria-hidden="true"></span>
 							<span class="search-results__card-label">
 								<?php echo esc_html( $skyyrose_collection['label'] ); ?>

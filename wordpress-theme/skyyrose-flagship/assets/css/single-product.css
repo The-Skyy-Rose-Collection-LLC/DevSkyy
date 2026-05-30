@@ -62,7 +62,7 @@
 }
 
 .sr-thumb:hover, .sr-thumb-active {
-	border-color: var(--color-rose-gold, #B76E79);
+	border-color: var(--skyyrose-accent);
 }
 
 .sr-thumb img {
@@ -76,7 +76,7 @@
 	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 11px;
 	letter-spacing: 6px;
-	color: var(--color-rose-gold, #B76E79);
+	color: var(--skyyrose-accent);
 	margin-bottom: 16px;
 }
 
@@ -124,10 +124,10 @@
 
 .sr-spec-label {
 	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-	font-size: 10px;
+	font-size: 12px;
 	letter-spacing: 2px;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.4);
+	color: rgba(255, 255, 255, 0.6);
 }
 
 .sr-spec-value {
@@ -156,7 +156,7 @@
 }
 
 .single_add_to_cart_button:hover {
-	background: var(--color-rose-gold, #B76E79) !important;
+	background: var(--skyyrose-accent) !important;
 	color: var(--color-white, #fff) !important;
 }
 

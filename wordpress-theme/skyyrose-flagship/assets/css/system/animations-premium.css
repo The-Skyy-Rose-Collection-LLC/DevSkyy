@@ -401,7 +401,7 @@
 .rv-clip-up, .rv-clip-left, .rv-clip-right, .rv-clip-diagonal,
 .rv-blur, .rv-blur-down,
 .stagger-grid > *,
-.col-reveal, .lp-rv {
+.col-reveal, .lp-rv, .rv {
 	animation: srRevealSafety 0.01s linear 0.8s forwards;
 }
 .rv-split-char .sr-char,
@@ -417,7 +417,7 @@
 .rv-clip-right.is-visible, .rv-clip-diagonal.is-visible,
 .rv-blur.is-visible, .rv-blur-down.is-visible,
 .stagger-grid.is-visible > *,
-.col-reveal.is-visible, .lp-rv.is-visible,
+.col-reveal.is-visible, .lp-rv.is-visible, .rv.is-visible,
 .rv-split-char.is-visible .sr-char,
 .rv-split-word.is-visible .sr-word,
 .rv-split-line.is-visible .sr-line {
@@ -435,7 +435,8 @@
 	.stagger-grid > *,
 	.rv-split-char .sr-char,
 	.rv-split-word .sr-word,
-	.rv-split-line .sr-line {
+	.rv-split-line .sr-line,
+	.rv {
 		opacity: 1 !important;
 		transform: none !important;
 		filter: none !important;

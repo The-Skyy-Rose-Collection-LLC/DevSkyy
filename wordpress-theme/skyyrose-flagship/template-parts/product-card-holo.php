@@ -85,11 +85,11 @@ $index = (int) ( $args['index'] ?? 0 );
 		</div>
 
 		<div class="holo__drawer">
-			<div class="holo__sizes">
-				<span class="holo__size-pill" data-size="S">S</span>
-				<span class="holo__size-pill" data-size="M">M</span>
-				<span class="holo__size-pill" data-size="L">L</span>
-				<span class="holo__size-pill" data-size="XL">XL</span>
+			<div class="holo__sizes" role="radiogroup" aria-label="<?php esc_attr_e( 'Select size', 'skyyrose' ); ?>">
+				<button type="button" class="holo__size-pill" data-size="S" role="radio" aria-checked="false">S</button>
+				<button type="button" class="holo__size-pill" data-size="M" role="radio" aria-checked="false">M</button>
+				<button type="button" class="holo__size-pill" data-size="L" role="radio" aria-checked="false">L</button>
+				<button type="button" class="holo__size-pill" data-size="XL" role="radio" aria-checked="false">XL</button>
 			</div>
 			<?php
 			/*
@@ -117,6 +117,8 @@ $index = (int) ( $args['index'] ?? 0 );
 			</button>
 			<button type="button" class="holo__wishlist"
 				data-product-id="<?php echo esc_attr( (int) $product_id ); ?>"
+				data-wishlist-id="<?php echo esc_attr( (int) $product_id ); ?>"
+				aria-pressed="false"
 				aria-label="<?php echo esc_attr( sprintf( /* translators: %s: product name */ __( 'Add %s to wishlist', 'skyyrose' ), $title ) ); ?>">
 				&#9825;
 			</button>

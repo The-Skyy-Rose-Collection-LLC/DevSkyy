@@ -128,6 +128,8 @@
         for (var j = 0; j < allItems.length; j++) {
           if (allItems[j] !== item) {
             allItems[j].classList.remove('open');
+            var otherBtn = allItems[j].querySelector('.lp-faq__question');
+            if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
             var otherAnswer = allItems[j].querySelector('.lp-faq__answer');
             if (otherAnswer) otherAnswer.style.maxHeight = '0';
           }
@@ -136,9 +138,11 @@
         // Toggle current
         if (isOpen) {
           item.classList.remove('open');
+          this.setAttribute('aria-expanded', 'false');
           answer.style.maxHeight = '0';
         } else {
           item.classList.add('open');
+          this.setAttribute('aria-expanded', 'true');
           answer.style.maxHeight = answer.scrollHeight + 'px';
         }
       });

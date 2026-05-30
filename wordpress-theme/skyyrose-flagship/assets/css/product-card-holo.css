@@ -6,14 +6,14 @@
 .holo {
 	position: relative;
 	border: 1px solid rgba(255, 255, 255, 0.08); /* Sharp outer border */
-	background: #050505;
+	background: var(--skyyrose-bg, #050505);
 	display: flex;
 	flex-direction: column;
 	transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .holo:hover {
-	border-color: rgba(183, 110, 121, 0.4); /* Rose gold focus */
+	border-color: rgba(var(--skyyrose-accent-rgb, 183, 110, 121), 0.4); /* Collection accent focus */
 	transform: translateY(-4px);
 }
 
@@ -28,7 +28,7 @@
 	position: relative;
 	aspect-ratio: 3 / 4;
 	overflow: hidden;
-	background: #0a0a0a;
+	background: var(--skyyrose-bg, #0a0a0a);
 	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -70,7 +70,7 @@
 	z-index: 10;
 }
 .holo__badge--soldout { background: rgba(255, 255, 255, 0.1); color: #fff; }
-.holo__badge--preorder { background: #B76E79; color: #fff; }
+.holo__badge--preorder { background: var(--skyyrose-accent, #B76E79); color: #fff; }
 
 /* Product Info */
 .holo__info {
@@ -86,7 +86,7 @@
 	font-size: 10px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, 0.4);
+	color: var(--skyyrose-text-muted, rgba(255, 255, 255, 0.6));
 }
 
 .holo__name {
@@ -111,7 +111,7 @@
 .holo__price {
 	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 13px;
-	color: #B76E79;
+	color: var(--skyyrose-accent, #B76E79);
 }
 
 /* Quick Add Drawer (Technical Hover) */
@@ -120,9 +120,9 @@
 	bottom: 0;
 	left: 0;
 	right: 0;
-	background: rgba(5, 5, 5, 0.95);
+	background: rgba(0, 0, 0, 0.95);
 	backdrop-filter: blur(12px);
-	border-top: 1px solid rgba(183, 110, 121, 0.3);
+	border-top: 1px solid rgba(var(--skyyrose-accent-rgb, 183, 110, 121), 0.3);
 	padding: 16px 24px;
 	transform: translateY(100%);
 	opacity: 0;
@@ -156,7 +156,8 @@
 }
 
 .holo__size-pill:hover,
-.holo__size-pill--active {
+.holo__size-pill--active,
+.holo__size-pill[aria-checked="true"] {
 	border-color: #fff;
 	background: #fff;
 	color: #000;
@@ -179,6 +180,39 @@
 }
 
 .holo__buy:hover {
-	background: #B76E79;
+	background: var(--skyyrose-accent, #B76E79);
 	color: #fff;
+}
+
+/* ── Touch devices (hover:none) — always-visible drawer ──────────────────
+   On touch screens the hover state never fires, so the drawer stays hidden
+   and the quick-add CTA is completely inaccessible. Make it static and
+   visible, and suppress the front→back image crossfade so the product
+   image stays visible (no accidental techflat reveal on tap).
+   ─────────────────────────────────────────────────────────────────────── */
+@media (hover: none) {
+	.holo__drawer {
+		position: static;
+		transform: translateY(0);
+		opacity: 1;
+		background: rgba(0, 0, 0, 0.6);
+		backdrop-filter: none;
+	}
+
+	.holo:hover .holo__img--front { opacity: 1; }
+	.holo:hover .holo__img--back  { opacity: 0; }
+}
+
+/* ── Reduced motion — disable all transitions on affected elements ───────
+   Covers the card entrance, image crossfade, drawer slide, pill and button
+   state changes. Users with vestibular disorders should see instant states.
+   ─────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+	.holo,
+	.holo__img,
+	.holo__drawer,
+	.holo__size-pill,
+	.holo__buy {
+		transition: none;
+	}
 }

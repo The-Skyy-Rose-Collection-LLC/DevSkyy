@@ -195,7 +195,15 @@ function skyyrose_get_collection_content( $slug ) {
 		/* ── Kids Capsule ───────────────────────────────────────── */
 		'kids-capsule' => array(
 			'hero_badge'          => __( 'New Collection', 'skyyrose' ),
-			'hero_title'          => __( 'KIDS CAPSULE', 'skyyrose' ),
+			// Interim hero mark: SR monogram (branding tier, 2048×2048 square) until the
+			// founder creates a custom Kids Capsule lockup. asset-hierarchy.md canon:
+			// assets/branding/ is "USE THIS for theme chrome + page templates"; logos/
+			// is "Not for page chrome." AVIF variant exists only in logos/; <picture>
+			// format-switching deferred to a future template enhancement.
+			'hero_logo'           => '/branding/skyyrose-monogram.webp',
+			'hero_logo_alt'       => __( 'SkyyRose Kids Capsule', 'skyyrose' ),
+			'hero_logo_w'         => 400,
+			'hero_logo_h'         => 400,
 			'hero_tagline'        => __( 'Luxury runs in the family.', 'skyyrose' ),
 			'hero_subtitle'       => __( 'Premium streetwear for the next generation — powerful, elevated, and born into legacy. Because legacy is not inherited. It is worn.', 'skyyrose' ),
 			'hero_scroll_text'    => __( 'Explore', 'skyyrose' ),

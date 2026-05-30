@@ -147,15 +147,15 @@ if ( empty( $skyyrose_trending_products ) ) {
 			Enhanced Message
 			============================ -->
 		<h2 class="error-404-title rv-clip-left">
-			<?php esc_html_e( 'Lost in Style', 'skyyrose' ); ?>
+			<?php esc_html_e( 'Not Here.', 'skyyrose' ); ?>
 		</h2>
 
 		<p class="error-404-subtitle rv-blur">
-			<?php esc_html_e( 'The page you\'re looking for has wandered off the runway', 'skyyrose' ); ?>
+			<?php esc_html_e( 'That page doesn\'t exist. Oakland taught us to keep moving.', 'skyyrose' ); ?>
 		</p>
 
 		<p class="error-404-witty">
-			<?php esc_html_e( 'Even our best pieces go off-grid sometimes', 'skyyrose' ); ?>
+			<?php esc_html_e( 'The concrete\'s still here. So are the collections.', 'skyyrose' ); ?>
 		</p>
 
 		<!-- ============================
@@ -205,7 +205,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 				?>
 				<img
 					src="<?php echo esc_url( $skyyrose_mascot_display ); ?>"
-					alt="<?php esc_attr_e( 'SkyyRose mascot looking lost — Oops! This page wandered off.', 'skyyrose' ); ?>"
+					alt="<?php esc_attr_e( 'Skyy, SkyyRose brand mascot.', 'skyyrose' ); ?>"
 					class="error-404-mascot__image"
 					width="200"
 					height="250"
@@ -218,7 +218,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 				</div>
 			<?php endif; ?>
 			<p class="error-404-mascot__speech">
-				<?php esc_html_e( "Oops! Even I can't find this page. Let's explore something amazing instead!", 'skyyrose' ); ?>
+				<?php esc_html_e( 'Nothing here. The shop still has you covered.', 'skyyrose' ); ?>
 			</p>
 		</div>
 
@@ -257,7 +257,7 @@ if ( empty( $skyyrose_trending_products ) ) {
 					?>
 					<a href="<?php echo esc_url( $skyyrose_link ); ?>"
 						class="error-404-card"
-						style="--card-accent: <?php echo esc_attr( $skyyrose_collection['accent'] ); ?>; --card-glow: <?php echo esc_attr( $skyyrose_collection['glow'] ); ?>">
+						data-collection="<?php echo esc_attr( $skyyrose_collection['slug'] ); ?>">
 						<span class="error-404-card-border" aria-hidden="true"></span>
 						<span class="error-404-card-label">
 							<?php echo esc_html( $skyyrose_collection['label'] ); ?>

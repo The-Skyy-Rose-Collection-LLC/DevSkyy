@@ -39,14 +39,18 @@
 		transform: none;
 		transition: none;
 	}
+	.abt-hero__scroll-line {
+		animation: none;
+		transform: scaleX(1);
+	}
 }
 
 /* ==========================================================================
    Page shell
    ========================================================================== */
 .abt-page {
-	background: #0A0A0A;
-	color: #F5F1EB;
+	background: var(--skyyrose-bg);
+	color: var(--skyyrose-surface-warm);
 	overflow-x: hidden;
 	font-feature-settings: "ss01", "kern";
 	-webkit-font-smoothing: antialiased;
@@ -61,7 +65,7 @@
    HERO — Editorial lookbook header (asymmetric, no full-bleed background)
    ========================================================================== */
 .abt-hero {
-	background: #0A0A0A;
+	background: var(--skyyrose-bg);
 	padding: clamp(96px, 12vw, 200px) clamp(24px, 6vw, 120px) clamp(64px, 8vw, 140px);
 	min-height: 100vh;
 	display: flex;
@@ -81,7 +85,7 @@
 
 /* Lookbook doc-id header */
 .abt-hero__doc {
-	font-family: 'Bebas Neue', 'Helvetica Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 13px;
 	letter-spacing: 0.32em;
 	text-transform: uppercase;
@@ -92,25 +96,25 @@
 	gap: 12px;
 }
 .abt-hero__doc-sep {
-	color: #B76E79;
+	color: var(--skyyrose-accent);
 	font-weight: 400;
 }
 
 /* Massive Cinzel title */
 .abt-hero__title {
-	font-family: 'Cinzel', serif;
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
 	font-weight: 400;
 	font-size: clamp(64px, 14vw, 220px);
 	line-height: 0.92;
 	letter-spacing: 0.02em;
 	text-transform: uppercase;
-	color: #F5F1EB;
+	color: var(--skyyrose-surface-warm);
 	margin: 0 0 clamp(24px, 3vw, 48px);
 }
 .abt-hero__title br { display: block; }
 
 .abt-hero__tag {
-	font-family: 'Cinzel', serif;
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
 	font-style: italic;
 	font-weight: 400;
 	font-size: clamp(16px, 1.6vw, 22px);
@@ -138,16 +142,16 @@
 .abt-hero__meta-row dt,
 .abt-hero__meta-row dd {
 	margin: 0;
-	font-family: 'Bebas Neue', 'Helvetica Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 13px;
 	letter-spacing: 0.24em;
 	text-transform: uppercase;
 }
 .abt-hero__meta-row dt {
-	color: rgba(245, 241, 235, 0.45);
+	color: rgba(245, 241, 235, 0.55); /* raised from 0.45 → 0.55 for AA contrast */
 }
 .abt-hero__meta-row dd {
-	color: #F5F1EB;
+	color: var(--skyyrose-surface-warm);
 }
 
 /* Right column — portrait */
@@ -172,7 +176,7 @@
 	position: absolute;
 	bottom: -28px;
 	left: 0;
-	font-family: 'Bebas Neue', 'Helvetica Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 12px;
 	letter-spacing: 0.28em;
 	text-transform: uppercase;
@@ -187,7 +191,7 @@
 	display: flex;
 	align-items: center;
 	gap: 16px;
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 11px;
 	letter-spacing: 0.32em;
 	text-transform: uppercase;
@@ -210,7 +214,7 @@
    CHAPTER PRIMITIVES — shared across CH. 01 / 03 / 04
    ========================================================================== */
 .abt-chapter {
-	background: #0A0A0A;
+	background: var(--skyyrose-bg);
 	padding: clamp(88px, 12vw, 200px) clamp(24px, 6vw, 120px);
 	border-bottom: 1px solid rgba(245, 241, 235, 0.08);
 }
@@ -232,11 +236,11 @@
 	margin-bottom: clamp(32px, 5vw, 64px);
 }
 .abt-chapter__num {
-	font-family: 'Bebas Neue', 'Helvetica Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 14px;
 	letter-spacing: 0.28em;
 	text-transform: uppercase;
-	color: #B76E79;
+	color: var(--skyyrose-accent);
 	white-space: nowrap;
 }
 .abt-chapter__rule {
@@ -247,7 +251,7 @@
 	max-width: 96px;
 }
 .abt-chapter__label {
-	font-family: 'Bebas Neue', 'Helvetica Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 14px;
 	letter-spacing: 0.28em;
 	text-transform: uppercase;
@@ -255,13 +259,13 @@
 }
 
 .abt-chapter__title {
-	font-family: 'Cinzel', serif;
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
 	font-weight: 400;
 	font-size: clamp(40px, 7vw, 96px);
 	line-height: 0.95;
 	letter-spacing: 0.04em;
 	text-transform: uppercase;
-	color: #F5F1EB;
+	color: var(--skyyrose-surface-warm);
 	margin: 0 0 clamp(48px, 7vw, 96px);
 }
 
@@ -269,7 +273,7 @@
    PROSE — body text with optional drop cap
    ========================================================================== */
 .abt-prose {
-	font-family: 'Cormorant Garamond', 'Georgia', serif;
+	font-family: var(--skyyrose-font-body);
 	font-size: clamp(18px, 1.4vw, 22px);
 	line-height: 1.75;
 	color: rgba(245, 241, 235, 0.86);
@@ -278,26 +282,26 @@
 	margin: 0 0 1.6em;
 }
 .abt-prose strong {
-	color: #F5F1EB;
+	color: var(--skyyrose-surface-warm);
 	font-weight: 500;
-	font-family: 'Cinzel', serif;
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
 	letter-spacing: 0.06em;
 	font-size: 0.85em;
 	text-transform: uppercase;
 }
 .abt-prose em {
-	color: #B76E79;
+	color: var(--skyyrose-accent);
 	font-style: italic;
 }
 
 /* Drop cap on first paragraph */
 .abt-prose--dropcap > p:first-child::first-letter {
-	font-family: 'Cinzel', serif;
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
 	font-size: 5em;
 	line-height: 0.85;
 	float: left;
 	margin: 0.04em 0.16em 0 -0.04em;
-	color: #B76E79;
+	color: var(--skyyrose-accent);
 	font-weight: 400;
 }
 
@@ -305,7 +309,7 @@
    PULL QUOTE — full-bleed editorial breakout
    ========================================================================== */
 .abt-pull {
-	background: #0A0A0A;
+	background: var(--skyyrose-bg);
 	padding: clamp(64px, 10vw, 160px) clamp(24px, 6vw, 120px);
 	margin: 0;
 	display: flex;
@@ -321,18 +325,18 @@
 	margin: 0 auto;
 }
 .abt-pull__text {
-	font-family: 'Cinzel', serif;
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
 	font-style: italic;
 	font-weight: 400;
 	font-size: clamp(28px, 4vw, 56px);
 	line-height: 1.25;
 	letter-spacing: 0.02em;
-	color: #F5F1EB;
+	color: var(--skyyrose-surface-warm);
 	margin: clamp(40px, 5vw, 72px) 0;
 	max-width: 1100px;
 }
 .abt-pull__cite {
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 12px;
 	letter-spacing: 0.32em;
 	text-transform: uppercase;
@@ -364,8 +368,8 @@
    MISSION BANNER — concrete cream ground (inverted)
    ========================================================================== */
 .abt-mission {
-	background: #F5F1EB;
-	color: #0A0A0A;
+	background: var(--skyyrose-surface-warm);
+	color: var(--skyyrose-bg);
 	padding: clamp(120px, 18vw, 280px) clamp(24px, 6vw, 120px);
 	text-align: center;
 	border-bottom: 1px solid rgba(10, 10, 10, 0.08);
@@ -377,17 +381,17 @@
 	text-align: center;
 }
 .abt-mission__tagline {
-	font-family: 'Cinzel', serif;
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
 	font-weight: 400;
 	font-size: clamp(48px, 9vw, 152px);
 	line-height: 0.92;
 	letter-spacing: clamp(0.04em, 1vw, 0.08em);
 	text-transform: uppercase;
-	color: #0A0A0A;
+	color: var(--skyyrose-bg);
 	margin: 0 0 clamp(40px, 5vw, 72px);
 }
 .abt-mission__sub {
-	font-family: 'Bebas Neue', 'Helvetica Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: clamp(14px, 1.4vw, 18px);
 	letter-spacing: 0.28em;
 	text-transform: uppercase;
@@ -398,20 +402,20 @@
 .abt-mission__cta {
 	display: inline-block;
 	padding: 18px 40px;
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 13px;
 	letter-spacing: 0.32em;
 	text-transform: uppercase;
-	color: #F5F1EB;
-	background: #0A0A0A;
+	color: var(--skyyrose-surface-warm);
+	background: var(--skyyrose-bg);
 	text-decoration: none;
 	transition: background 0.3s ease, color 0.3s ease;
-	border: 1px solid #0A0A0A;
+	border: 1px solid var(--skyyrose-bg);
 }
 .abt-mission__cta:hover,
 .abt-mission__cta:focus-visible {
 	background: transparent;
-	color: #0A0A0A;
+	color: var(--skyyrose-bg);
 }
 
 /* ==========================================================================
@@ -452,17 +456,17 @@
 	left: 50%;
 	width: 11px;
 	height: 11px;
-	background: #B76E79;
+	background: var(--skyyrose-accent);
 	border-radius: 50%;
 	transform: translate(-50%, -50%);
-	box-shadow: 0 0 0 4px #0A0A0A;
+	box-shadow: 0 0 0 4px var(--skyyrose-bg);
 }
 .abt-tl__year {
-	font-family: 'Bebas Neue', 'Helvetica Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: clamp(80px, 12vw, 200px);
 	line-height: 0.85;
 	letter-spacing: 0.02em;
-	color: #F5F1EB;
+	color: var(--skyyrose-surface-warm);
 	text-align: right;
 	padding-right: clamp(32px, 4vw, 64px);
 }
@@ -478,16 +482,16 @@
 	white-space: nowrap;
 }
 .abt-tl__event {
-	font-family: 'Cinzel', serif;
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
 	font-weight: 400;
 	font-size: clamp(20px, 2vw, 28px);
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
-	color: #F5F1EB;
+	color: var(--skyyrose-surface-warm);
 	margin: 0 0 16px;
 }
 .abt-tl__desc {
-	font-family: 'Cormorant Garamond', serif;
+	font-family: var(--skyyrose-font-body);
 	font-size: clamp(16px, 1.2vw, 19px);
 	line-height: 1.7;
 	color: rgba(245, 241, 235, 0.7);
@@ -516,8 +520,8 @@
    COMMUNITY — Oakland manifesto stack (cream ground)
    ========================================================================== */
 .abt-community {
-	background: #F5F1EB;
-	color: #0A0A0A;
+	background: var(--skyyrose-surface-warm);
+	color: var(--skyyrose-bg);
 	padding: clamp(96px, 14vw, 220px) clamp(24px, 6vw, 120px);
 	border-bottom: 1px solid rgba(10, 10, 10, 0.08);
 }
@@ -532,11 +536,11 @@
 	margin-bottom: clamp(32px, 5vw, 64px);
 }
 .abt-community__label {
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 14px;
 	letter-spacing: 0.32em;
 	text-transform: uppercase;
-	color: #B76E79;
+	color: var(--skyyrose-accent);
 }
 .abt-community__rule {
 	display: block;
@@ -546,22 +550,22 @@
 	max-width: 96px;
 }
 .abt-community__heading {
-	font-family: 'Cinzel', serif;
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
 	font-weight: 400;
 	font-size: clamp(64px, 14vw, 220px);
 	line-height: 0.9;
 	letter-spacing: 0.04em;
 	text-transform: uppercase;
-	color: #0A0A0A;
+	color: var(--skyyrose-bg);
 	margin: 0 0 clamp(48px, 7vw, 96px);
 }
 .abt-community__manifesto {
-	font-family: 'Bebas Neue', 'Helvetica Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: clamp(20px, 2.4vw, 36px);
 	line-height: 1.4;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
-	color: #0A0A0A;
+	color: var(--skyyrose-bg);
 	margin: 0 0 clamp(48px, 6vw, 80px);
 	max-width: 1100px;
 }
@@ -571,11 +575,11 @@
 .abt-community__dot {
 	display: inline-block;
 	margin: 0 0.6em;
-	color: #B76E79;
+	color: var(--skyyrose-accent);
 	font-weight: 700;
 }
 .abt-community__frame {
-	font-family: 'Cormorant Garamond', serif;
+	font-family: var(--skyyrose-font-body);
 	font-size: clamp(18px, 1.4vw, 22px);
 	font-style: italic;
 	line-height: 1.7;
@@ -588,7 +592,7 @@
 	margin-top: clamp(64px, 8vw, 120px);
 }
 .abt-community__gallery-label {
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 12px;
 	letter-spacing: 0.32em;
 	text-transform: uppercase;
@@ -603,7 +607,7 @@
 .abt-community__photo {
 	margin: 0;
 	overflow: hidden;
-	background: #0A0A0A;
+	background: var(--skyyrose-bg);
 }
 .abt-community__photo img {
 	display: block;
@@ -642,11 +646,11 @@
 	left: 16px;
 	padding: 8px 14px;
 	background: rgba(10, 10, 10, 0.78);
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 11px;
 	letter-spacing: 0.28em;
 	text-transform: uppercase;
-	color: #F5F1EB;
+	color: var(--skyyrose-surface-warm);
 }
 
 .abt-press__video {
@@ -661,12 +665,12 @@
 }
 .abt-press__video-label,
 .abt-press__video-source {
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 12px;
 	letter-spacing: 0.32em;
 	text-transform: uppercase;
 }
-.abt-press__video-label { color: #B76E79; }
+.abt-press__video-label { color: var(--skyyrose-accent); }
 .abt-press__video-source { color: rgba(245, 241, 235, 0.65); }
 .abt-press__video-rule {
 	display: block;
@@ -718,11 +722,11 @@
 }
 .abt-press__col-src {
 	margin: 0;
-	font-family: 'Bebas Neue', 'Helvetica Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 18px;
 	letter-spacing: 0.18em;
 	text-transform: uppercase;
-	color: #F5F1EB;
+	color: var(--skyyrose-surface-warm);
 }
 .abt-press__col-date {
 	margin: 0;
@@ -734,27 +738,27 @@
 }
 .abt-press__col-headline {
 	margin: 0 0 20px;
-	font-family: 'Cinzel', serif;
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
 	font-style: italic;
 	font-weight: 400;
 	font-size: clamp(20px, 1.8vw, 26px);
 	line-height: 1.3;
-	color: #F5F1EB;
+	color: var(--skyyrose-surface-warm);
 }
 .abt-press__col-excerpt {
 	margin: 0 0 32px;
-	font-family: 'Cormorant Garamond', serif;
+	font-family: var(--skyyrose-font-body);
 	font-size: clamp(16px, 1.2vw, 18px);
 	line-height: 1.65;
 	color: rgba(245, 241, 235, 0.72);
 	flex: 1;
 }
 .abt-press__col-link {
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 12px;
 	letter-spacing: 0.32em;
 	text-transform: uppercase;
-	color: #F5F1EB;
+	color: var(--skyyrose-surface-warm);
 	text-decoration: none;
 	display: inline-flex;
 	align-items: center;
@@ -764,7 +768,7 @@
 }
 .abt-press__col-link:hover,
 .abt-press__col-link:focus-visible {
-	color: #B76E79;
+	color: var(--skyyrose-accent);
 	gap: 16px;
 }
 .abt-press__col-link svg {
@@ -776,7 +780,7 @@
    COLLECTIONS — Editorial index row list (CH. 02)
    ========================================================================== */
 .abt-collections {
-	background: #0A0A0A;
+	background: var(--skyyrose-bg);
 	border-bottom: 1px solid rgba(245, 241, 235, 0.08);
 	padding: clamp(96px, 14vw, 220px) clamp(24px, 6vw, 120px);
 }
@@ -815,7 +819,7 @@
 
 /* Index number */
 .abt-coll-row__index {
-	font-family: 'Bebas Neue', 'Helvetica Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: clamp(36px, 4vw, 64px);
 	letter-spacing: 0.04em;
 	color: rgba(245, 241, 235, 0.32);
@@ -823,7 +827,7 @@
 	transition: color 0.4s ease;
 }
 .abt-coll-row:hover .abt-coll-row__index {
-	color: #B76E79;
+	color: var(--color-rose-gold); /* fixed rose-gold; --skyyrose-accent overrides per collection */
 }
 
 /* Hero portrait — small 4:5 left of body */
@@ -854,25 +858,25 @@
 }
 .abt-coll-row__tag {
 	display: block;
-	font-family: 'Bebas Neue', 'Helvetica Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 12px;
 	letter-spacing: 0.32em;
 	text-transform: uppercase;
-	color: #B76E79;
+	color: var(--skyyrose-accent);
 	margin: 0 0 12px;
 }
 .abt-coll-row__title {
-	font-family: 'Cinzel', serif;
+	font-family: 'Cinzel', serif; /* intentional: About page lookbook display typeface, not per-collection */
 	font-weight: 400;
 	font-size: clamp(28px, 3.4vw, 48px);
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
-	color: #F5F1EB;
+	color: var(--skyyrose-surface-warm);
 	margin: 0 0 16px;
 	line-height: 1;
 }
 .abt-coll-row__desc {
-	font-family: 'Cormorant Garamond', serif;
+	font-family: var(--skyyrose-font-body);
 	font-size: clamp(16px, 1.2vw, 19px);
 	line-height: 1.7;
 	color: rgba(245, 241, 235, 0.72);
@@ -881,11 +885,11 @@
 
 /* CTA */
 .abt-coll-row__cta {
-	font-family: 'Bebas Neue', sans-serif;
+	font-family: var(--skyyrose-font-ui);
 	font-size: 13px;
 	letter-spacing: 0.32em;
 	text-transform: uppercase;
-	color: #F5F1EB;
+	color: var(--skyyrose-surface-warm);
 	display: inline-flex;
 	align-items: center;
 	gap: 12px;
@@ -893,7 +897,7 @@
 	white-space: nowrap;
 }
 .abt-coll-row:hover .abt-coll-row__cta {
-	color: #B76E79;
+	color: var(--color-rose-gold); /* fixed rose-gold; --skyyrose-accent overrides per collection */
 	gap: 18px;
 }
 .abt-coll-row__cta svg { width: 14px; height: 10px; }
@@ -902,7 +906,7 @@
 .abt-coll-row[data-collection="black-rose"]   .abt-coll-row__tag { color: #C0C0C0; }
 .abt-coll-row[data-collection="love-hurts"]   .abt-coll-row__tag { color: #DC143C; }
 .abt-coll-row[data-collection="signature"]    .abt-coll-row__tag { color: #D4AF37; }
-.abt-coll-row[data-collection="kids-capsule"] .abt-coll-row__tag { color: #B76E79; }
+.abt-coll-row[data-collection="kids-capsule"] .abt-coll-row__tag { color: var(--skyyrose-accent); }
 
 /* ==========================================================================
    RESPONSIVE

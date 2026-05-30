@@ -228,6 +228,17 @@
 }
 
 /* ==========================================================================
+   Collection Card — Token Bridge
+   Resolve --card-accent from the per-collection [data-collection] cascade
+   so inline hex is not needed. Glow is derived from the accent-rgb token.
+   ========================================================================== */
+
+.error-404-card[data-collection] {
+	--card-accent: var(--skyyrose-accent, #B76E79);
+	--card-glow:   rgba(var(--skyyrose-accent-rgb, 183, 110, 121), 0.2);
+}
+
+/* ==========================================================================
    Collection Quick-Link Cards — Enhanced
    ========================================================================== */
 
@@ -760,7 +771,7 @@
 .error-404-grain {
 	position: fixed;
 	inset: 0;
-	z-index: 9999;
+	z-index: 100;
 	pointer-events: none;
 	opacity: 0.03;
 	mix-blend-mode: overlay;

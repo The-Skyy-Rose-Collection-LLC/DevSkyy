@@ -65,11 +65,11 @@ defined( 'ABSPATH' ) || exit;
 				<div class="footer-grid__col footer-grid__col--brand">
 					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="footer-brand__logo-link" rel="home">
 						<img
-							src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/logos/sr-monogram-rose-gold.webp?v=' . SKYYROSE_VERSION ); ?>"
+							src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/branding/skyyrose-monogram-footer.webp?v=' . SKYYROSE_VERSION ); ?>"
 							alt="<?php esc_attr_e( 'SkyyRose', 'skyyrose' ); ?>"
 							class="footer-brand__monogram"
-							width="40"
-							height="40"
+							width="60"
+							height="60"
 							loading="lazy"
 						>
 						<span class="footer-brand__text navbar__gradient-text"><?php esc_html_e( 'SKYY ROSE', 'skyyrose' ); ?></span>

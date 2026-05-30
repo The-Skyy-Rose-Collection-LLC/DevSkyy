@@ -23,16 +23,18 @@
 
 /* ==========================================================================
    MACRO-WHITESPACE (Breathing Room)
+   Scoped to .double-bezel sections only — global section rhythm is owned
+   by commercial-polish.css and the token scale (--cp-space-*).
    ========================================================================== */
-section {
-    padding-top: 10rem !important;
-    padding-bottom: 10rem !important;
+.double-bezel {
+    padding-top: 10rem;
+    padding-bottom: 10rem;
 }
 
 @media (max-width: 768px) {
-    section {
-        padding-top: 6rem !important;
-        padding-bottom: 6rem !important;
+    .double-bezel {
+        padding-top: 6rem;
+        padding-bottom: 6rem;
     }
 }
 
@@ -89,6 +91,8 @@ section {
 
 /* ==========================================================================
    ISLAND BUTTON ARCHITECTURE (Nested Pill)
+   Arrow-affordance modifier. Does NOT override brand CTA background/color —
+   those are owned by commercial-polish.css (.btn-primary gradient).
    ========================================================================== */
 .hero-cta,
 .col-card-cta,
@@ -99,8 +103,6 @@ section {
     gap: 1.5rem;
     padding: 0.75rem 0.75rem 0.75rem 2rem !important;
     border-radius: 9999px !important;
-    background: #fff !important;
-    color: #000 !important;
     font-weight: 600;
     font-size: 0.875rem;
     letter-spacing: 0.05em;
@@ -143,31 +145,22 @@ section {
 }
 
 /* ==========================================================================
-   MOTION CHOREOGRAPHY
+   BARE .rv REVEAL — homepage press/story/quote/newsletter sections.
+   Canonical motion vocabulary lives in animations-premium.css.
+   rv-clip-*, rv-blur*, stagger-grid, [data-scroll-fade] are NOT redefined
+   here — they are owned by animations-premium.css + premium-interactions.js.
    ========================================================================== */
-.rv, 
-.rv-clip-up,
-.rv-clip-left,
-.rv-clip-right,
-.rv-clip-diagonal,
-.stagger-grid,
-[data-scroll-fade] {
+.rv {
     opacity: 0;
-    transform: translateY(3rem);
-    filter: blur(10px);
-    transition: all 1s var(--ease-vanguard);
+    transform: translateY(1.5rem);
+    transition:
+        opacity 0.8s var(--ease-vanguard),
+        transform 0.8s var(--ease-vanguard);
 }
 
-.rv.is-visible,
-.rv-clip-up.is-visible,
-.rv-clip-left.is-visible,
-.rv-clip-right.is-visible,
-.rv-clip-diagonal.is-visible,
-.stagger-grid.is-visible,
-.is-visible [data-scroll-fade] {
+.rv.is-visible {
     opacity: 1;
     transform: translateY(0);
-    filter: blur(0);
 }
 
 /* Staggered mask reveal for navigation */
@@ -186,15 +179,10 @@ section {
 
 /* ==========================================================================
    HAPTIC DEPTH & OVERLAYS
+   CDN grain (.grain-overlay) removed — self-hosted grain is rendered via
+   .skyyrose-film-grain / .film-grain__inner in components.css (inline SVG,
+   no external request). The header.php .grain-overlay div remains inert.
    ========================================================================== */
-.grain-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    pointer-events: none;
-    opacity: 0.03;
-    background-image: url('https://grainy-gradients.vercel.app/noise.svg');
-}
 
 /* Magnetic Button Hover Physics (simulated via CSS) */
 .magnetic {

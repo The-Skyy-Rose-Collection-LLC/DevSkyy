@@ -382,6 +382,17 @@
 }
 
 /* ==========================================================================
+   Collection Card — Token Bridge
+   Resolve --card-accent from the per-collection [data-collection] cascade
+   so inline hex is not needed. Glow is derived from the accent-rgb token.
+   ========================================================================== */
+
+.search-results__card[data-collection] {
+	--card-accent: var(--skyyrose-accent, #B76E79);
+	--card-glow:   rgba(var(--skyyrose-accent-rgb, 183, 110, 121), 0.2);
+}
+
+/* ==========================================================================
    Collection Cards (matching 404.php card pattern)
    ========================================================================== */
 

@@ -55,9 +55,8 @@ $hero_meta = array(
 );
 
 // Chapter I — origin paragraphs.
-// TODO(corey): re-author with founder-voice rewrite that drops the "Hurts
-// family name" claim (zero press corroboration — see press-features.md).
-$origin_quote      = '"Luxury doesn\'t have to come from privilege. It can grow from concrete."';
+// Quote: verbatim from collection-stories.md § Signature — The founding moment.
+$origin_quote      = '"I drew the first rose on a night I couldn\'t afford dinner. Broke, a baby on the way, every manufacturer I\'d worked with had scammed me. But I sat there sketching that script logo until 4 AM because something in me knew — if I could get this right, everything changes. Signature is that night made permanent."';
 $origin_cite       = 'Corey Foster — Founder & CEO';
 $origin_paragraphs = array(
 	'SkyyRose was never just a clothing brand. It was a promise &mdash; born in Deep East Oakland, forged by a single father who refused to let his circumstances write his daughter\'s story. <strong>Corey Foster</strong> named the brand after his reason for everything: his daughter, <strong>Skyy Rose</strong>.',

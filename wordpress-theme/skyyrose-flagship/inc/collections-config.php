@@ -50,7 +50,7 @@ function skyyrose_get_collections_config(): array {
 			),
 			'front_page'  => array(
 				'title'          => 'Black<br>Rose',
-				'poetic_tagline' => __( 'For those who found power in the dark.', 'skyyrose' ),
+				'poetic_tagline' => __( 'You wear it because you already stood up.', 'skyyrose' ),
 				'label'          => __( 'Limited', 'skyyrose' ),
 				'num'            => __( 'Collection 01', 'skyyrose' ),
 				'image'          => $uri . '/images/lookbook/lb-black-rose-football-960w.webp',
@@ -74,7 +74,7 @@ function skyyrose_get_collections_config(): array {
 			),
 			'front_page'  => array(
 				'title'          => 'Love<br>Hurts',
-				'poetic_tagline' => __( 'Wear your heart. Own your scars.', 'skyyrose' ),
+				'poetic_tagline' => __( 'Wear Your Heart. Own Your Scars.', 'skyyrose' ),
 				'label'          => __( 'Family Legacy', 'skyyrose' ),
 				'num'            => __( 'Collection 02', 'skyyrose' ),
 				'image'          => $uri . '/images/lookbook/lb-love-hurts-varsity-960w.webp',
@@ -98,7 +98,7 @@ function skyyrose_get_collections_config(): array {
 			),
 			'front_page'  => array(
 				'title'          => 'Signature',
-				'poetic_tagline' => __( 'The foundation of any wardrobe worth building.', 'skyyrose' ),
+				'poetic_tagline' => __( 'Not basics. Blueprints.', 'skyyrose' ),
 				'label'          => __( 'Everyday Luxury', 'skyyrose' ),
 				'num'            => __( 'Collection 03', 'skyyrose' ),
 				'image'          => $uri . '/images/lookbook/lb-rose-hoodie-beanie-960w.webp',
@@ -122,7 +122,7 @@ function skyyrose_get_collections_config(): array {
 			),
 			'front_page'  => array(
 				'title'          => 'Kids<br>Capsule',
-				'poetic_tagline' => __( 'For the next generation of legacy.', 'skyyrose' ),
+				'poetic_tagline' => __( 'Luxury runs in the family.', 'skyyrose' ),
 				'label'          => __( 'Kids', 'skyyrose' ),
 				'num'            => __( 'Collection 04', 'skyyrose' ),
 				'show_on_front'  => false,

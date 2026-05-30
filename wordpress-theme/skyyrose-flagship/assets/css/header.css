@@ -199,3 +199,16 @@
 .search-overlay__input { width: 100%; background: transparent; border: none; color: #fff; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 24px; outline: none; text-align: center;}
 .search-overlay__input:focus-visible { outline: 2px solid var(--color-rose-gold, #B76E79); outline-offset: 8px; }
 .search-overlay__close { position: absolute; top: 40px; right: 40px; background: none; border: none; color: #fff; cursor: pointer;}
+
+/* Accessibility: respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+	.site-header,
+	.navbar,
+	.navbar__container,
+	.mobile-menu__panel,
+	.mobile-menu__overlay,
+	.navbar__logo-link,
+	.search-overlay {
+		transition: none;
+	}
+}

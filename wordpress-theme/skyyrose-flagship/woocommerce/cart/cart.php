@@ -297,7 +297,7 @@ do_action( 'woocommerce_before_cart' );
 											apply_filters(
 												'woocommerce_cart_item_remove_link',
 												sprintf(
-													'<a role="button" href="%s" class="skyy-cart__remove-btn" aria-label="%s" data-product_id="%s" data-product_sku="%s">&times;</a>',
+													'<a href="%s" class="skyy-cart__remove-btn" aria-label="%s" data-product_id="%s" data-product_sku="%s">&times;</a>',
 													esc_url( wc_get_cart_remove_url( $cart_item_key ) ),
 													/* translators: %s: product name */
 													esc_attr( sprintf( __( 'Remove %s from cart', 'skyyrose' ), wp_strip_all_tags( $product_name ) ) ),
@@ -379,47 +379,6 @@ do_action( 'woocommerce_before_cart' );
 			</div>
 
 			<?php do_action( 'woocommerce_before_cart_collaterals' ); ?>
-
-			<?php
-			// ── Wears With — single cross-sell suggestion ───────────────────
-			$skyy_cart_skus = array();
-			foreach ( WC()->cart->get_cart() as $skyy_ci ) {
-				$skyy_ci_prod = $skyy_ci['data'];
-				if ( $skyy_ci_prod && method_exists( $skyy_ci_prod, 'get_sku' ) ) {
-					$skyy_cart_skus[] = $skyy_ci_prod->get_sku();
-				}
-			}
-			$skyy_ww = function_exists( 'skyyrose_get_cart_wears_with' )
-				? skyyrose_get_cart_wears_with( $skyy_cart_skus )
-				: null;
-
-			if ( $skyy_ww ) :
-				$skyy_ww_url = function_exists( 'skyyrose_product_url' )
-					? skyyrose_product_url( $skyy_ww['sku'] )
-					: '#';
-				$skyy_ww_img = function_exists( 'skyyrose_product_image_uri' )
-					? skyyrose_product_image_uri( skyyrose_get_product_display_image( $skyy_ww ) )
-					: '';
-				?>
-				<div class="skyy-cart__wears-with">
-					<h3 class="skyy-cart__wears-with-title">
-						<?php esc_html_e( 'Complete the Look', 'skyyrose' ); ?>
-					</h3>
-					<a href="<?php echo esc_url( $skyy_ww_url ); ?>" class="skyy-cart__wears-with-card">
-						<?php if ( $skyy_ww_img ) : ?>
-							<img src="<?php echo esc_url( $skyy_ww_img ); ?>"
-								alt="<?php echo esc_attr( $skyy_ww['name'] ); ?>"
-								class="skyy-cart__wears-with-img" loading="lazy" />
-						<?php endif; ?>
-						<div class="skyy-cart__wears-with-info">
-							<span class="skyy-cart__wears-with-name"><?php echo esc_html( $skyy_ww['name'] ); ?></span>
-							<span class="skyy-cart__wears-with-price">
-								<?php echo esc_html( skyyrose_format_price( $skyy_ww ) ); ?>
-							</span>
-						</div>
-					</a>
-				</div>
-			<?php endif; ?>
 
 			<!-- ORDER SUMMARY SIDEBAR (Sticky, 400px) -->
 			<aside class="skyy-cart__summary rv-clip-right" data-skyy-cart-summary>
@@ -529,21 +488,27 @@ do_action( 'woocommerce_before_cart' );
 					?>
 
 					<!-- Express Pay Buttons (Stripe/Apple Pay/Google Pay slot) -->
+					<?php
+					/**
+					 * Buffer the hook so we only render the wrapper + divider when a
+					 * payment plugin (e.g. Stripe, Apple Pay) actually outputs content.
+					 *
+					 * @since 7.2.0
+					 */
+					ob_start();
+					do_action( 'skyyrose_cart_express_pay_buttons' );
+					$skyy_express_pay = trim( ob_get_clean() );
+					if ( $skyy_express_pay ) :
+						?>
 					<div class="skyy-cart__express-pay">
 						<div class="skyy-cart__express-pay-buttons">
-							<?php
-							/**
-							 * Hook for payment plugins to render Express Pay buttons.
-							 *
-							 * @since 7.2.0
-							 */
-							do_action( 'skyyrose_cart_express_pay_buttons' );
-							?>
+							<?php echo $skyy_express_pay; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Sanitized by payment gateway plugins; buffer output is trusted hook content. ?>
 						</div>
 						<div class="skyy-cart__express-pay-divider">
 							<span><?php esc_html_e( 'or', 'skyyrose' ); ?></span>
 						</div>
 					</div>
+					<?php endif; ?>
 
 					<!-- Proceed to Checkout -->
 					<div class="skyy-cart__summary-checkout">

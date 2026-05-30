@@ -67,7 +67,7 @@
 	font-size: 11px;
 	letter-spacing: 8px;
 	text-transform: uppercase;
-	color: var(--color-rose-gold, #B76E79);
+	color: var(--skyyrose-accent);
 	margin-bottom: 32px;
 }
 
@@ -131,7 +131,7 @@
 	color: #050505;
 	border-color: transparent;
 }
-.col-hero__cta--primary:hover { background: var(--color-rose-gold, #B76E79); color: #fff; }
+.col-hero__cta--primary:hover { background: var(--skyyrose-accent); color: #fff; }
 
 .col-hero__cta--secondary {
 	background: transparent;
@@ -164,7 +164,7 @@
 }
 .col-marquee__track svg {
 	width: 16px; height: 16px;
-	color: var(--color-rose-gold, #B76E79);
+	color: var(--skyyrose-accent);
 }
 
 /* ==========================================================================
@@ -188,7 +188,7 @@
 	font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 	font-size: 11px;
 	letter-spacing: 6px;
-	color: var(--color-rose-gold, #B76E79);
+	color: var(--skyyrose-accent);
 	display: block;
 	margin-bottom: 24px;
 	text-transform: uppercase;
@@ -232,7 +232,7 @@
 	font-family: var(--skyyrose-font-display);
 	font-size: 1.6em;
 	line-height: 1;
-	color: rgba(183, 110, 121, 0.65);
+	color: rgba(var(--skyyrose-accent-rgb), 0.65);
 }
 
 .col-story__visual {
@@ -264,7 +264,7 @@
 	font-size: 10px;
 	letter-spacing: 4px;
 	text-transform: uppercase;
-	color: var(--color-rose-gold, #B76E79);
+	color: var(--skyyrose-accent);
 }
 
 /* ==========================================================================
@@ -275,7 +275,7 @@
 	justify-content: center;
 	padding: 80px 0;
 }
-.col-divider__icon svg { width: 32px; height: 32px; color: var(--color-rose-gold, #B76E79); }
+.col-divider__icon svg { width: 32px; height: 32px; color: var(--skyyrose-accent); }
 
 .col-quote-block {
 	text-align: center;
@@ -346,13 +346,13 @@
 }
 
 .col-features__card:hover {
-	border-color: rgba(183, 110, 121, 0.3);
+	border-color: rgba(var(--skyyrose-accent-rgb), 0.3);
 	background: var(--glass-bg-dark, rgba(10, 10, 10, 0.8));
 	transform: translateY(-4px);
 	box-shadow: var(--depth-3, 0 20px 48px rgba(0, 0, 0, 0.5));
 }
 
-.col-features__icon { color: var(--color-rose-gold, #B76E79); margin-bottom: 24px; }
+.col-features__icon { color: var(--skyyrose-accent); margin-bottom: 24px; }
 .col-features__icon svg { width: 32px; height: 32px; }
 
 .col-features__card h3 {
@@ -487,7 +487,7 @@
 	transition: background 0.3s ease;
 }
 
-.col-newsletter__submit:hover { background: var(--color-rose-gold, #B76E79); color: #fff; }
+.col-newsletter__submit:hover { background: var(--skyyrose-accent); color: #fff; }
 
 @media (max-width: 1024px) {
 	.col-story__grid { grid-template-columns: 1fr; gap: 64px; }

@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 --------------------------------------------------------------
  * Theme Constants
  *--------------------------------------------------------------*/
-define( 'SKYYROSE_VERSION', '1.5.23' );
+define( 'SKYYROSE_VERSION', '1.5.24' );
 define( 'SKYYROSE_DIR', get_template_directory() );
 define( 'SKYYROSE_URI', get_template_directory_uri() );
 

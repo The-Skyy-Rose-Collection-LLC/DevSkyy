@@ -96,6 +96,7 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 				<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . $c['hero_logo'] . '?v=' . SKYYROSE_VERSION ); ?>"
 					alt="<?php echo esc_attr( $c['hero_logo_alt'] ); ?>"
 					class="<?php echo esc_attr( $hero_logo_class ); ?>" width="<?php echo esc_attr( $c['hero_logo_w'] ); ?>" height="<?php echo esc_attr( $c['hero_logo_h'] ); ?>" loading="eager" fetchpriority="high" decoding="async">
+				<h1 class="screen-reader-text"><?php echo esc_html( $c['hero_logo_alt'] ); ?></h1>
 			<?php else : ?>
 				<h1 class="col-hero__title"><span><?php echo esc_html( $c['hero_title'] ); ?></span></h1>
 			<?php endif; ?>

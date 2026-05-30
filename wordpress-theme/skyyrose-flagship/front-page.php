@@ -340,7 +340,7 @@ get_header();
 <section class="collections" id="collections" aria-label="<?php esc_attr_e( 'Our Collections', 'skyyrose' ); ?>">
 	<div class="col-header rv-clip-up">
 		<p class="col-header-eyebrow"><?php esc_html_e( 'The Collections', 'skyyrose' ); ?></p>
-		<h2 class="col-header-title rv-split-word"><?php esc_html_e( 'Three Worlds. One Vision.', 'skyyrose' ); ?></h2>
+		<h2 class="col-header-title rv-split-word"><?php esc_html_e( 'Four Collections. One Vision.', 'skyyrose' ); ?></h2>
 	</div>
 	<div class="col-grid stagger-grid">
 		<?php foreach ( $collections as $idx => $col ) : ?>
@@ -355,7 +355,40 @@ get_header();
 				<div class="col-card-ov"></div>
 				<div class="col-card-content">
 					<p class="col-card-num"><?php echo esc_html( $col['num'] ); ?></p>
-					<h3 class="col-card-name"><?php echo wp_kses( $col['title'], array( 'br' => array() ) ); ?></h3>
+					<?php
+					/* ── Collection name lockup (brand-script image, never type-rendered) ── */
+					$lockups = array(
+						'black-rose' => array(
+							'base' => 'hero-overlays/br-brand-script-logotype',
+							'alt'  => __( 'Black Rose', 'skyyrose' ),
+						),
+						'love-hurts' => array(
+							'base' => 'hero-overlays/lh-logo-combined',
+							'alt'  => __( 'Love Hurts', 'skyyrose' ),
+						),
+						'signature'  => array(
+							'base' => 'hero-overlays/sig-brand-skyy-rose-gold',
+							'alt'  => __( 'Signature', 'skyyrose' ),
+						),
+					);
+					$lk      = $lockups[ $col['slug'] ] ?? null;
+					if ( $lk ) :
+						$lk_uri = SKYYROSE_ASSETS_URI . '/images/' . $lk['base'];
+						?>
+						<picture class="col-card-name">
+							<source srcset="<?php echo esc_url( $lk_uri . '.avif' ); ?>" type="image/avif">
+							<source srcset="<?php echo esc_url( $lk_uri . '.webp' ); ?>" type="image/webp">
+							<img src="<?php echo esc_url( $lk_uri . '.png' ); ?>"
+								alt=""
+								loading="lazy"
+								decoding="async"
+								class="col-card-name__lockup">
+						</picture>
+						<span class="screen-reader-text"><?php echo esc_html( $lk['alt'] ); ?></span>
+					<?php else : ?>
+						<h3 class="col-card-name"><?php echo wp_kses( $col['title'], array( 'br' => array() ) ); ?></h3>
+					<?php endif; ?>
+					<?php /* Kids Capsule (show_on_front=false) never reaches this loop. The h3 fallback covers future edge cases only. */ ?>
 					<p class="col-card-tag"><?php echo esc_html( $col['tagline'] ); ?></p>
 					<div class="col-card-meta">
 						<span><?php echo esc_html( ( $col['count'] ?: '—' ) . ' ' . __( 'Pieces', 'skyyrose' ) ); ?></span>

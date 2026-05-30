@@ -117,8 +117,14 @@ defined( 'ABSPATH' ) || exit;
 		</div>
 
 		<!-- Search Overlay -->
-		<div class="search-overlay" id="search-overlay" aria-hidden="true" inert>
+		<div class="search-overlay" id="search-overlay"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="search-overlay-label"
+			aria-hidden="true"
+			inert>
 			<div class="search-overlay__container">
+				<h2 id="search-overlay-label" class="screen-reader-text"><?php esc_html_e( 'Search the collection', 'skyyrose' ); ?></h2>
 				<form role="search" method="get" class="search-overlay__form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
 					<label class="screen-reader-text" for="search-overlay-input"><?php esc_html_e( 'Search the collection', 'skyyrose' ); ?></label>
 					<input id="search-overlay-input" type="search" class="search-overlay__input" placeholder="SEARCH THE COLLECTION..." name="s" autocomplete="off">

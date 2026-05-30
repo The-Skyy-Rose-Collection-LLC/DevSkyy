@@ -91,7 +91,7 @@ $recall_thumb = $skyy_img_url ?: '';
 		<?php if ( $skyy_img_url ) : ?>
 			<img
 				src="<?php echo esc_url( $skyy_img_url ); ?>"
-				alt="<?php esc_attr_e( 'Skyy, SkyyRose brand mascot — young girl in Love Hurts varsity set', 'skyyrose' ); ?>"
+				alt="<?php esc_attr_e( 'Skyy, SkyyRose brand mascot', 'skyyrose' ); ?>"
 				class="skyyrose-mascot__image"
 				width="220"
 				height="auto"

@@ -338,112 +338,18 @@
 } )();
 
 /* ======================================================================
-   HOMEPAGE V7 — Concrete theme interactions
+   KIDS CAPSULE — mobile tap-to-break-seal
+   Touch devices never fire :hover and rarely :focus-visible on <a>,
+   so the first tap navigates before the seal animation plays. On
+   coarse pointers, first tap toggles .is-open (CSS mirrors the hover
+   state) and suppresses navigation; second tap follows the link.
+   Pointer/hover devices skip this path so mouse + keyboard behavior
+   is unchanged.
    ====================================================================== */
 
 ( function () {
 	'use strict';
 
-	/* ── Animated canvas grain (12fps — materiality signal) ── */
-	( function initGrain() {
-		var canvas = document.getElementById( 'grainCanvas' );
-		if ( ! canvas ) { return; }
-		var ctx = canvas.getContext( '2d' );
-
-		function resize() {
-			canvas.width  = window.innerWidth;
-			canvas.height = window.innerHeight;
-		}
-		resize();
-		window.addEventListener( 'resize', resize );
-
-		function renderGrain() {
-			var w = canvas.width;
-			var h = canvas.height;
-			var imageData = ctx.createImageData( w, h );
-			var data = imageData.data;
-			for ( var i = 0; i < data.length; i += 4 ) {
-				var v = Math.random() * 255 | 0;
-				data[ i ]     = v;
-				data[ i + 1 ] = v;
-				data[ i + 2 ] = v;
-				data[ i + 3 ] = 18; /* ~7% opacity */
-			}
-			ctx.putImageData( imageData, 0, 0 );
-		}
-
-		/* 12fps — intentional flicker matches film grain */
-		var grainTimer;
-		function scheduleGrain() {
-			grainTimer = setTimeout( function () {
-				if ( window.requestAnimationFrame ) {
-					requestAnimationFrame( function () {
-						renderGrain();
-						scheduleGrain();
-					} );
-				}
-			}, 1000 / 12 );
-		}
-
-		if ( ! window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ) {
-			scheduleGrain();
-		}
-	} )();
-
-	/* ── Cursor-trigger collection split ── */
-	( function initCollectionSplit() {
-		var split = document.querySelector( '.collection-split' );
-		if ( ! split ) { return; }
-		var panelBr = split.querySelector( '.split-br' );
-		var panelSg = split.querySelector( '.split-sg' );
-		var divider = split.querySelector( '.split-divider' );
-		if ( ! panelBr || ! panelSg ) { return; }
-
-		split.addEventListener( 'mousemove', function ( e ) {
-			var rect  = split.getBoundingClientRect();
-			var ratio = ( e.clientX - rect.left ) / rect.width;
-
-			/* Dim the non-hovered side */
-			panelBr.style.filter = ratio < 0.5
-				? 'brightness(1.15)'
-				: 'brightness(0.55)';
-			panelSg.style.filter = ratio >= 0.5
-				? 'brightness(1.15)'
-				: 'brightness(0.55)';
-
-			/* Subtle divider shift toward cursor */
-			if ( divider ) {
-				var shift = ( ratio - 0.5 ) * 14;
-				divider.style.transform = 'translateX(calc(-50% + ' + shift + 'px))';
-			}
-		} );
-
-		split.addEventListener( 'mouseleave', function () {
-			panelBr.style.filter = '';
-			panelSg.style.filter = '';
-			if ( divider ) { divider.style.transform = ''; }
-		} );
-	} )();
-
-	/* ── Specimen ticker — pause on hover ── */
-	( function initSpecimenTicker() {
-		var track = document.getElementById( 'specimenTrack' );
-		if ( ! track ) { return; }
-		track.addEventListener( 'mouseenter', function () {
-			track.style.animationPlayState = 'paused';
-		} );
-		track.addEventListener( 'mouseleave', function () {
-			track.style.animationPlayState = 'running';
-		} );
-	} )();
-
-	/* ── Kids Capsule envelope — mobile tap-to-break-seal ──
-	   Touch devices never fire :hover and rarely :focus-visible on
-	   <a>, so the first tap navigates before the seal animation
-	   plays. On coarse pointers, first tap toggles .is-open (CSS
-	   mirrors the hover state) and suppresses navigation; second
-	   tap follows the link. Pointer/hover devices skip this path
-	   so mouse + keyboard behavior is unchanged. */
 	( function initKcHeirTap() {
 		var stage = document.querySelector( '.kc-heir__stage' );
 		if ( ! stage ) { return; }
@@ -453,27 +359,6 @@
 			if ( stage.classList.contains( 'is-open' ) ) { return; }
 			e.preventDefault();
 			stage.classList.add( 'is-open' );
-		} );
-	} )();
-
-	/* ── Hero concrete word — subtle mouse parallax ── */
-	( function initHeroParallax() {
-		var word = document.querySelector( '.hero-concrete-word' );
-		if ( ! word ) { return; }
-		var tick = false;
-		window.addEventListener( 'mousemove', function ( e ) {
-			if ( tick ) { return; }
-			tick = true;
-			requestAnimationFrame( function () {
-				var cx = window.innerWidth  / 2;
-				var cy = window.innerHeight / 2;
-				var dx = ( e.clientX - cx ) / cx;
-				var dy = ( e.clientY - cy ) / cy;
-				word.style.transform =
-					'scaleX(0.62) scaleY(1.08) translate(' +
-					( dx * 8 ) + 'px, ' + ( dy * 4 ) + 'px)';
-				tick = false;
-			} );
 		} );
 	} )();
 

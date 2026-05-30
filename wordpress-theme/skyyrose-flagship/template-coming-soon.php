@@ -41,14 +41,14 @@ $skyyrose_ajax_url    = admin_url( 'admin-ajax.php' );
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 	<meta name="robots" content="noindex, follow">
-	<title><?php echo esc_html( sprintf( '%s — The Skyy Rose Collection', $skyyrose_title ) ); ?></title>
+	<title><?php echo esc_html( sprintf( '%s — %s', $skyyrose_title, get_bloginfo( 'name' ) ) ); ?></title>
 	<meta name="description" content="<?php echo esc_attr( $skyyrose_body_intro ); ?>">
 	<link rel="canonical" href="<?php echo esc_url( home_url( '/' ) ); ?>">
 	<meta name="theme-color" content="#0A0A0A">
 	<meta property="og:type" content="website">
 	<meta property="og:title" content="<?php echo esc_attr( $skyyrose_title ); ?>">
 	<meta property="og:description" content="<?php echo esc_attr( $skyyrose_tagline ); ?>">
-	<meta property="og:site_name" content="The Skyy Rose Collection">
+	<meta property="og:site_name" content="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
 	<meta property="og:url" content="<?php echo esc_url( home_url( '/' ) ); ?>">
 
 	<link rel="preload" as="font" type="font/woff2" href="<?php echo esc_url( $skyyrose_fonts_uri . '/cinzel-latin.woff2' ); ?>" crossorigin>
@@ -82,7 +82,7 @@ $skyyrose_ajax_url    = admin_url( 'admin-ajax.php' );
 			--c-bg-deep:   #060606;
 			--c-ink:       #F5E6D3;
 			--c-ink-soft:  rgba(245, 230, 211, 0.62);
-			--c-ink-faint: rgba(245, 230, 211, 0.32);
+			--c-ink-faint: rgba(245, 230, 211, 0.55);
 			--c-rose-gold: #B76E79;
 			--c-gold:      #D4AF37;
 			--c-rule:      rgba(245, 230, 211, 0.12);
@@ -356,7 +356,7 @@ $skyyrose_ajax_url    = admin_url( 'admin-ajax.php' );
 	<div class="cs-shell">
 
 		<header class="cs-mast" aria-label="<?php esc_attr_e( 'Studio masthead', 'skyyrose' ); ?>">
-			<a class="cs-mast__mark cs-reveal" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php esc_attr_e( 'The Skyy Rose Collection — home', 'skyyrose' ); ?>">
+			<a class="cs-mast__mark cs-reveal" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php echo esc_attr( sprintf( '%s — home', get_bloginfo( 'name' ) ) ); ?>">
 				<?php if ( file_exists( $skyyrose_logo_path ) ) : ?>
 					<img src="<?php echo esc_url( $skyyrose_logo_uri ); ?>" alt="" width="36" height="36" decoding="async" loading="eager">
 				<?php endif; ?>
@@ -412,7 +412,16 @@ $skyyrose_ajax_url    = admin_url( 'admin-ajax.php' );
 
 		<footer class="cs-foot" role="contentinfo">
 			<span class="cs-foot__col cs-reveal" data-delay="4">
-				<?php echo esc_html( sprintf( /* translators: %s: current year */ __( '© %s The Skyy Rose Collection', 'skyyrose' ), gmdate( 'Y' ) ) ); ?>
+				<?php
+				echo esc_html(
+					sprintf(
+						/* translators: 1: current year 2: site name */
+						__( '© %1$s %2$s', 'skyyrose' ),
+						gmdate( 'Y' ),
+						get_bloginfo( 'name' )
+					)
+				);
+				?>
 			</span>
 			<span class="cs-foot__col cs-reveal" data-delay="4">
 				<?php esc_html_e( 'Oakland, California — Est. 2020', 'skyyrose' ); ?>
