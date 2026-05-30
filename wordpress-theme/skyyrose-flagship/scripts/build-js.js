@@ -22,6 +22,7 @@ const SRC_DIR = path.resolve(__dirname, '..', 'assets', 'js');
 const SCAN_DIRS = [
 	{ dir: SRC_DIR, label: '' },
 	{ dir: path.join(SRC_DIR, 'experiences'), label: 'experiences/' },
+	{ dir: path.join(SRC_DIR, 'system'), label: 'system/' },
 ];
 
 async function main() {
