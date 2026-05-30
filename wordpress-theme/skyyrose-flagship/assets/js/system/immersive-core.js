@@ -884,6 +884,12 @@
 	/** ID used for the injected SVG filter element. */
 	var WARP_FILTER_ID = 'ic-warp-filter';
 
+	/** Peak feDisplacementMap scale (px) at full hover. */
+	var WARP_SCALE_PEAK = 5;
+
+	/** Peak per-channel chromatic offset (px) at full hover. R=+peak, B=−peak, G=0 (anchor). */
+	var WARP_CA_PEAK = 0.6;
+
 	/**
 	 * Init the SVG displacement-map warp filter and wire [data-warp] targets.
 	 *
@@ -932,20 +938,43 @@
 	 * Uses createElementNS throughout — createElement produces HTML elements
 	 * that do NOT participate in SVG filter resolution.
 	 *
-	 * Filter: feTurbulence (baseFrequency 0.018 0.022, octaves 2) →
-	 * feDisplacementMap (scale tweened 0→5→0px per hover). Amplitude 5px is
-	 * within the spec-specified 4-8px luxury range.
+	 * Filter graph (in primitive order):
 	 *
-	 * Easing mechanism: CSS cannot interpolate url() filter references (they are
-	 * discrete), so the smoothing is done by tweening the feDisplacementMap
-	 * `scale` SVG attribute via a GSAP gsap.to(). The CSS [data-warp-active]
-	 * selector gates presence of the filter url (added/removed by JS); GSAP
-	 * owns intensity ramp so the warp fades in/out rather than snapping.
-	 * If GSAP is absent the tween block is skipped; the attribute-toggle still
-	 * applies the filter (a snap rather than a ramp — acceptable degradation).
+	 *   feTurbulence (baseFrequency 0.018 0.022, octaves 2)
+	 *     → result="warpNoise"
+	 *   feDisplacementMap in=SourceGraphic in2=warpNoise
+	 *     → result="warped"   (scale tweened 0 → WARP_SCALE_PEAK → 0 by GSAP)
 	 *
-	 * Chromatic offset: a genuine per-channel feOffset split is deferred to a
-	 * later pass. The current filter produces a single-displacement warp only.
+	 *   ── §4C chromatic aberration post-step ───────────────────────────
+	 *   feColorMatrix in="warped"  (isolate R, preserve alpha)
+	 *     → result="caR"
+	 *   feOffset      in="caR"    dx tweened 0 → +WARP_CA_PEAK (co-tween with scale)
+	 *     → result="caRoff"
+	 *
+	 *   feColorMatrix in="warped"  (isolate G, preserve alpha — anchor, no offset)
+	 *     → result="caG"
+	 *
+	 *   feColorMatrix in="warped"  (isolate B, preserve alpha)
+	 *     → result="caB"
+	 *   feOffset      in="caB"    dx tweened 0 → −WARP_CA_PEAK (co-tween with scale)
+	 *     → result="caBoff"
+	 *
+	 *   feBlend in="caRoff" in2="caG"   mode="screen"  → result="caRG"
+	 *   feBlend in="caRG"   in2="caBoff" mode="screen"  (final output)
+	 *
+	 * Why feBlend mode="screen" (not feMerge): feMerge does *over*-compositing —
+	 * on opaque images the top layer fully occludes the others, leaving only one
+	 * channel. Screen blending is additive and channel-exact when channels don't
+	 * overlap (each matrix zeros the other two). At dx=0 the three channels sum
+	 * back to the original pixel, making the filter a visual no-op at rest.
+	 *
+	 * Easing: GSAP tweens scaleProxy.value (0→WARP_SCALE_PEAK); setScale() maps
+	 * that to both the displacement scale and the two feOffset dx values so the
+	 * chroma fringe eases in/out identically with the warp (single proxy, no
+	 * second tween). CSS [data-warp-active] gates the filter url reference.
+	 *
+	 * Guards: reduced-motion and touch/no-hover never reach this function (see
+	 * initWarp). Existing @media blocks in immersive-core.css are untouched.
 	 */
 	function injectWarpFilter() {
 		var NS = 'http://www.w3.org/2000/svg';
@@ -967,11 +996,13 @@
 		var filter = document.createElementNS( NS, 'filter' );
 		filter.setAttribute( 'id',      WARP_FILTER_ID );
 		// Expand filter region so displaced pixels near edges aren't clipped.
+		// The existing ±5% margin comfortably covers the ±0.6px chroma offset.
 		filter.setAttribute( 'x',      '-5%' );
 		filter.setAttribute( 'y',      '-5%' );
 		filter.setAttribute( 'width',  '110%' );
 		filter.setAttribute( 'height', '110%' );
 
+		// ── Step 1: noise source ─────────────────────────────────────────────
 		var turbulence = document.createElementNS( NS, 'feTurbulence' );
 		turbulence.setAttribute( 'type',          'turbulence' );
 		// Low baseFrequency = slow, large-scale organic displacement (not grain).
@@ -980,22 +1011,90 @@
 		turbulence.setAttribute( 'seed',          '3' );
 		turbulence.setAttribute( 'result',        'warpNoise' );
 
+		// ── Step 2: displacement warp ────────────────────────────────────────
 		var displacement = document.createElementNS( NS, 'feDisplacementMap' );
-		displacement.setAttribute( 'in',              'SourceGraphic' );
-		displacement.setAttribute( 'in2',             'warpNoise' );
-		// Start at scale 0; GSAP tweens it up to 5 on hover, back to 0 on leave.
-		displacement.setAttribute( 'scale',           '0' );
+		displacement.setAttribute( 'in',               'SourceGraphic' );
+		displacement.setAttribute( 'in2',              'warpNoise' );
+		// Start at scale 0; GSAP tweens it up to WARP_SCALE_PEAK on hover, back to 0 on leave.
+		displacement.setAttribute( 'scale',            '0' );
 		displacement.setAttribute( 'xChannelSelector', 'R' );
 		displacement.setAttribute( 'yChannelSelector', 'G' );
+		// Named output consumed by the chromatic aberration chain below.
+		displacement.setAttribute( 'result',           'warped' );
 
+		// ── Step 3: chromatic aberration — isolate R channel ─────────────────
+		// Matrix: keep R, zero G+B, keep A. At dx=0 recombines pixel-identically.
+		var cmR = document.createElementNS( NS, 'feColorMatrix' );
+		cmR.setAttribute( 'in',     'warped' );
+		cmR.setAttribute( 'type',   'matrix' );
+		cmR.setAttribute( 'values', '1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0' );
+		cmR.setAttribute( 'result', 'caR' );
+
+		// feOffset for R: positive dx (+WARP_CA_PEAK at peak). Tweened via GSAP.
+		var offsetR = document.createElementNS( NS, 'feOffset' );
+		offsetR.setAttribute( 'in',     'caR' );
+		offsetR.setAttribute( 'dx',     '0' );
+		offsetR.setAttribute( 'dy',     '0' );
+		offsetR.setAttribute( 'result', 'caRoff' );
+
+		// ── Step 4: chromatic aberration — isolate G channel (anchor) ────────
+		// G is the luminance anchor: no offset. Keeps fringe subtle (luxury, not glitch).
+		var cmG = document.createElementNS( NS, 'feColorMatrix' );
+		cmG.setAttribute( 'in',     'warped' );
+		cmG.setAttribute( 'type',   'matrix' );
+		cmG.setAttribute( 'values', '0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0' );
+		cmG.setAttribute( 'result', 'caG' );
+
+		// ── Step 5: chromatic aberration — isolate B channel ─────────────────
+		// Matrix: zero R+G, keep B, keep A.
+		var cmB = document.createElementNS( NS, 'feColorMatrix' );
+		cmB.setAttribute( 'in',     'warped' );
+		cmB.setAttribute( 'type',   'matrix' );
+		cmB.setAttribute( 'values', '0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0' );
+		cmB.setAttribute( 'result', 'caB' );
+
+		// feOffset for B: negative dx (−WARP_CA_PEAK at peak). Tweened via GSAP.
+		var offsetB = document.createElementNS( NS, 'feOffset' );
+		offsetB.setAttribute( 'in',     'caB' );
+		offsetB.setAttribute( 'dx',     '0' );
+		offsetB.setAttribute( 'dy',     '0' );
+		offsetB.setAttribute( 'result', 'caBoff' );
+
+		// ── Step 6: recombine via screen blending ────────────────────────────
+		// feBlend mode="screen" is additive — channel-isolated layers don't overlap
+		// so they reconstruct the original at dx=0, and produce RGB fringe at peak.
+		// First pass: R-offset + G (anchor).
+		var blendRG = document.createElementNS( NS, 'feBlend' );
+		blendRG.setAttribute( 'in',     'caRoff' );
+		blendRG.setAttribute( 'in2',    'caG' );
+		blendRG.setAttribute( 'mode',   'screen' );
+		blendRG.setAttribute( 'result', 'caRG' );
+
+		// Second pass: (R+G) + B-offset → final output.
+		var blendRGB = document.createElementNS( NS, 'feBlend' );
+		blendRGB.setAttribute( 'in',   'caRG' );
+		blendRGB.setAttribute( 'in2',  'caBoff' );
+		blendRGB.setAttribute( 'mode', 'screen' );
+
+		// Assemble filter in DAG order (primitives execute top-to-bottom).
 		filter.appendChild( turbulence );
 		filter.appendChild( displacement );
+		filter.appendChild( cmR );
+		filter.appendChild( offsetR );
+		filter.appendChild( cmG );
+		filter.appendChild( cmB );
+		filter.appendChild( offsetB );
+		filter.appendChild( blendRG );
+		filter.appendChild( blendRGB );
 		defs.appendChild( filter );
 		svg.appendChild( defs );
 		document.body.appendChild( svg );
 
-		// Store reference to the displacement node for GSAP tweening.
+		// Store references for GSAP tweening — displacement scale + chroma offsets
+		// are driven from the same scaleProxy (see setScale).
 		warpDisplacementEl = displacement;
+		warpRedOffsetEl    = offsetR;
+		warpBlueOffsetEl   = offsetB;
 
 		// Wire hover listeners on all [data-warp] targets now present in the DOM.
 		wireWarpTargets();
@@ -1003,6 +1102,12 @@
 
 	/** @type {SVGFEDisplacementMapElement|null} */
 	var warpDisplacementEl = null;
+
+	/** @type {SVGFEOffsetElement|null} Red-channel feOffset (dx tweened +WARP_CA_PEAK). */
+	var warpRedOffsetEl = null;
+
+	/** @type {SVGFEOffsetElement|null} Blue-channel feOffset (dx tweened −WARP_CA_PEAK). */
+	var warpBlueOffsetEl = null;
 
 	/** @type {Function|null} Running tween object (GSAP) for the scale attr. */
 	var warpTween = null;
@@ -1027,6 +1132,17 @@
 			if ( warpDisplacementEl ) {
 				warpDisplacementEl.setAttribute( 'scale', String( Math.round( v * 10 ) / 10 ) );
 			}
+			// Co-animate chromatic offsets with displacement so the RGB fringe
+			// eases in/out with the warp (single proxy, single tween).
+			// R shifts +WARP_CA_PEAK px at peak; B shifts −WARP_CA_PEAK px at peak.
+			if ( warpRedOffsetEl || warpBlueOffsetEl ) {
+				var dx = Math.round( ( v / WARP_SCALE_PEAK ) * WARP_CA_PEAK * 1000 ) / 1000;
+				// Guard against -0 which some engines stringify as "-0" — harmless
+				// as an SVG attribute but noisy; normalize to 0.
+				var ndx = dx === 0 ? 0 : -dx;
+				if ( warpRedOffsetEl )  warpRedOffsetEl.setAttribute( 'dx',  String( dx ) );
+				if ( warpBlueOffsetEl ) warpBlueOffsetEl.setAttribute( 'dx', String( ndx ) );
+			}
 		}
 
 		function onEnter( el ) {
@@ -1035,14 +1151,14 @@
 			if ( hasGsap && warpDisplacementEl ) {
 				if ( warpTween ) warpTween.kill();
 				warpTween = window.gsap.to( scaleProxy, {
-					value:    5,
+					value:    WARP_SCALE_PEAK,
 					duration: 0.45,
 					ease:     'power2.out',
 					onUpdate: function () { setScale( scaleProxy.value ); }
 				} );
 			} else {
 				// GSAP absent — snap to target scale (still correct, not smooth).
-				setScale( 5 );
+				setScale( WARP_SCALE_PEAK );
 			}
 		}
 
