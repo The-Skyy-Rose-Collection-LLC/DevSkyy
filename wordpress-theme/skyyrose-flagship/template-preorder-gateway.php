@@ -60,7 +60,8 @@ $checkout_url = function_exists( 'wc_get_checkout_url' ) ? wc_get_checkout_url()
 get_header();
 ?>
 
-<main id="primary" class="site-main preorder-gateway" role="main" tabindex="-1">
+<main id="primary" class="site-main preorder-gateway" role="main" tabindex="-1"
+	data-collection=""><?php // data-collection wired for immersive-core.js Cap A/C detection; empty = no palette override on this multi-collection page ?>
 
 	<!-- ==================== HERO ==================== -->
 	<section class="hero" id="hero" data-scroll-fade>
@@ -77,6 +78,7 @@ get_header();
 			<?php foreach ( $collections as $slug => $col ) : ?>
 				<button type="button" class="showcase__card showcase__card--<?php echo esc_attr( $slug ); ?> magnetic"
 					data-collection="<?php echo esc_attr( $slug ); ?>"
+					data-warp
 					aria-label="
 					<?php
 						echo esc_attr(

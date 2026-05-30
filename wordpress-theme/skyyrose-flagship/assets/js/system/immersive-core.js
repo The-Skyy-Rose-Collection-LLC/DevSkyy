@@ -1,18 +1,16 @@
 /**
- * Immersive Core — Capability B: Scene Intro
+ * Immersive Core — Capabilities A, B, C
  *
- * Orchestrates the entry sequence for immersive collection rooms and the
- * preorder gateway. Reads collection context from the DOM, gates on
- * sessionStorage and prefers-reduced-motion, then runs a GSAP timeline:
- *   step 1 — palette overlay + dust canvas
- *   step 2 — lockup reveal + pointer parallax
- *   step 3 — hairline rule + tagline fade
- *   step 4 — overlay wipe + room scale push
- *   step 5 — cleanup, sessionStorage write, CustomEvent
+ * A — Lenis smooth-scroll (preorder gateway only, shares GSAP clock via ticker)
+ * B — Scene intro (immersive rooms + preorder gateway, GSAP timeline)
+ * C — Media hover-warp (SVG feTurbulence+feDisplacementMap, opt-in [data-warp])
  *
- * Capabilities A (Lenis smooth scroll) and C (warp transition) are
- * intentionally absent. Add them as sibling guarded functions alongside
- * initSceneIntro() — no refactoring of this file required.
+ * Each capability is an independent guarded function. One failing/not-applying
+ * never blocks the others. A and C are called BEFORE the intro early-return
+ * ladder so they run even on repeat visits / reduced-motion / GSAP-absent paths.
+ *
+ * Lenis source: unpkg.com/lenis@1.3.23/dist/lenis.min.js
+ * Lenis sets globalThis.Lenis (IIFE build); window.Lenis is the access point.
  *
  * @package SkyyRose
  * @since   7.0.0
@@ -25,9 +23,18 @@
 
 	/**
 	 * Entry point. Called on DOMContentLoaded.
-	 * Feature-detects GSAP and resolves page context before delegating.
+	 * Capabilities A and C are self-guarding and run first (before any early
+	 * returns) so they fire even on repeat visits, reduced-motion, and GSAP-
+	 * absent paths. Capability B (scene intro) follows the existing ladder.
 	 */
 	function initImmersiveCore() {
+		// ── Cap A: Lenis smooth-scroll (preorder only, fully self-guarding) ──
+		initLenis();
+
+		// ── Cap C: media hover-warp (both surfaces, fully self-guarding) ─────
+		initWarp();
+
+		// ── Cap B: Scene intro (GSAP-dependent) ──────────────────────────────
 		if ( typeof window.gsap === 'undefined' ) {
 			// .scene-lockup starts at opacity:0 (CSS). Resolve context so we can
 			// reveal the lockup and h1 even when GSAP is absent.
@@ -609,7 +616,7 @@
 	}
 
 	/**
-	 * Step 2 (0.4 – 1.4s): lockup opacity + blur reveal + parallax attach.
+	 * Step 2 (0.35 – 0.95s): lockup opacity + blur reveal + parallax attach.
 	 * Skipped gracefully when lockup is absent.
 	 *
 	 * @param {gsap.core.Timeline} tl
@@ -621,13 +628,13 @@
 		tl.fromTo(
 			lockup,
 			{ opacity: 0, filter: 'blur(12px)' },
-			{ opacity: 1, filter: 'blur(0px)', duration: 1.0, ease: 'power2.out' },
-			0.4
-		).add( function () { attachParallax( lockup ); }, 0.4 );
+			{ opacity: 1, filter: 'blur(0px)', duration: 0.6, ease: 'power2.out' },
+			0.35
+		).add( function () { attachParallax( lockup ); }, 0.35 );
 	}
 
 	/**
-	 * Step 3 (1.4 – 2.0s): hairline scale-in + tagline fade-up.
+	 * Step 3 (0.95 – 1.45s): hairline scale-in + tagline fade-up.
 	 * Both elements are optional — skipped silently if absent.
 	 *
 	 * @param {gsap.core.Timeline} tl
@@ -639,8 +646,8 @@
 			tl.fromTo(
 				hairline,
 				{ scaleX: 0, transformOrigin: 'left center' },
-				{ scaleX: 1, duration: 0.4, ease: 'power2.inOut' },
-				1.4
+				{ scaleX: 1, duration: 0.35, ease: 'power2.inOut' },
+				0.95
 			);
 		}
 
@@ -648,14 +655,14 @@
 			tl.fromTo(
 				taglineEl,
 				{ opacity: 0, y: 14 },
-				{ opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' },
-				1.55
+				{ opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' },
+				1.05
 			);
 		}
 	}
 
 	/**
-	 * Step 4 (2.0 – 2.6s): overlay clip-path wipe upward + room scale push.
+	 * Step 4 (1.5 – 2.0s): overlay clip-path wipe upward + room scale push.
 	 *
 	 * @param {gsap.core.Timeline} tl
 	 * @param {HTMLElement}        overlay
@@ -665,20 +672,20 @@
 		tl.fromTo(
 			overlay,
 			{ clipPath: 'inset(0% 0% 0% 0%)' },
-			{ clipPath: 'inset(100% 0% 0% 0%)', duration: 0.6, ease: 'power3.inOut' },
-			2.0
+			{ clipPath: 'inset(100% 0% 0% 0%)', duration: 0.5, ease: 'power3.inOut' },
+			1.5
 		);
 
 		if ( sceneEl ) {
 			tl.fromTo(
 				sceneEl,
 				{ scale: 1.0 },
-				{ scale: 1.03, duration: 0.6, ease: 'power2.out' },
-				2.0
+				{ scale: 1.03, duration: 0.5, ease: 'power2.out' },
+				1.5
 			).to(
 				sceneEl,
 				{ scale: 1.0, duration: 0.4, ease: 'power2.inOut' },
-				2.6
+				2.0
 			);
 		}
 	}
@@ -718,7 +725,8 @@
 	/* ── Full scene intro ───────────────────────────────────────────── */
 
 	/**
-	 * Full 2.5s intro for immersive collection rooms.
+	 * Full ~2.0s intro for immersive collection rooms (curtain wipe completes at
+	 * 2.0s; the room's scale settle resolves at ~2.4s).
 	 *
 	 * @param {object} ctx
 	 */
@@ -767,7 +775,7 @@
 
 		addStepConcrete( tl, overlay, canvas, sceneEl );
 		addStepHairlineTagline( tl, clones.hairline, clones.taglineEl );
-		revealRoomTitle( tl, ctx, 2.0 );
+		revealRoomTitle( tl, ctx, 1.5 );
 		addStepWipe( tl, overlay, sceneEl );
 
 		// Decode the cloned lockup before revealing it. Race a 600ms timeout so a
@@ -785,6 +793,281 @@
 			addStepLockup( tl, introLockup );  // inserts the reveal at position 0.4
 			tl.play();
 		} );
+	}
+
+	/* ── Capability A: Lenis smooth-scroll (preorder gateway only) ─────── */
+
+	/** @type {import('lenis').default|null} */
+	var lenisInstance = null;
+
+	/**
+	 * Named ticker callback kept in module scope so we can remove it on destroy.
+	 * @type {Function|null}
+	 */
+	var lenisTicker = null;
+
+	/**
+	 * Init Lenis smooth-scroll.
+	 *
+	 * Guards (all must pass):
+	 *   1. Page is NOT an immersive room (.immersive-page with overflow:hidden).
+	 *      Detection: main.preorder-gateway present in DOM.
+	 *   2. window.Lenis constructor available (lenis lib loaded).
+	 *   3. window.gsap available (ticker is the clock).
+	 *   4. prefers-reduced-motion: reduce → native scroll, do NOT init.
+	 *
+	 * Single clock: lenis.raf driven by gsap.ticker; lenis.on('scroll',
+	 * ScrollTrigger.update) if ScrollTrigger is present. No second rAF.
+	 * Destroyed on pagehide.
+	 */
+	function initLenis() {
+		// Guard 1: only on the preorder gateway (long-scroll page)
+		if ( ! document.querySelector( 'main.preorder-gateway' ) ) {
+			return;
+		}
+
+		// Guard 2: Lenis lib must be available
+		if ( typeof window.Lenis !== 'function' ) {
+			return;
+		}
+
+		// Guard 3: GSAP ticker is the clock — no GSAP, no Lenis
+		if ( typeof window.gsap === 'undefined' ) {
+			return;
+		}
+
+		// Guard 4: honour reduced-motion — native scroll
+		if ( prefersReducedMotion() ) {
+			return;
+		}
+
+		// autoRaf: false — GSAP ticker drives raf, not Lenis's internal loop.
+		// This is the single-clock requirement from spec §4A.
+		lenisInstance = new window.Lenis( { autoRaf: false } );
+
+		// Wire scroll events so existing ScrollTrigger-based parallax rides
+		// the Lenis scroll position (one event chain, no double-fire).
+		lenisInstance.on( 'scroll', function () {
+			if ( window.ScrollTrigger ) {
+				window.ScrollTrigger.update();
+			}
+		} );
+
+		// Drive Lenis from GSAP ticker (convert seconds → ms).
+		lenisTicker = function ( time ) {
+			lenisInstance.raf( time * 1000 );
+		};
+		window.gsap.ticker.add( lenisTicker );
+
+		// lagSmoothing(0) prevents GSAP inserting artificial lag-catch frames
+		// that would produce jitter between Lenis scroll and GSAP animations.
+		window.gsap.ticker.lagSmoothing( 0 );
+
+		// Destroy on tab hide / back-forward cache to avoid orphaned tickers.
+		window.addEventListener( 'pagehide', destroyLenis );
+	}
+
+	/** Tear down Lenis instance and remove ticker callback. */
+	function destroyLenis() {
+		if ( lenisTicker && window.gsap ) {
+			window.gsap.ticker.remove( lenisTicker );
+			lenisTicker = null;
+		}
+		if ( lenisInstance ) {
+			lenisInstance.destroy();
+			lenisInstance = null;
+		}
+	}
+
+	/* ── Capability C: media hover-warp ────────────────────────────────── */
+
+	/** ID used for the injected SVG filter element. */
+	var WARP_FILTER_ID = 'ic-warp-filter';
+
+	/**
+	 * Init the SVG displacement-map warp filter and wire [data-warp] targets.
+	 *
+	 * Approach: inject an <svg><filter> block once into <body> using
+	 * createElementNS (HTML createElement does NOT produce usable SVG
+	 * primitives). CSS in immersive-core.css applies `filter:url(#ic-warp-filter)`
+	 * on [data-warp]:hover via @media (hover:hover). JS guards gate on reduced-
+	 * motion and touch so the SVG element itself is never injected on those paths.
+	 *
+	 * Warp targets (spec §4C + §9):
+	 *   scene.php  .scene-layer img         (each scene image)
+	 *   scene.php  .product-panel-thumb img  (product panel thumbnail)
+	 *   preorder   .showcase__card           (collection showcase cards)
+	 *
+	 * data-warp attributes are added by PHP (scene.php + template-preorder-gateway.php).
+	 * This function only injects the filter and wires nothing extra — CSS handles hover.
+	 *
+	 * Guards:
+	 *   prefers-reduced-motion: reduce → do NOT inject (no filter to trigger)
+	 *   hover: none (touch devices)      → do NOT inject
+	 *   Filter already injected           → do NOT inject a second time
+	 */
+	function initWarp() {
+		// Guard: reduced-motion
+		if ( prefersReducedMotion() ) {
+			return;
+		}
+
+		// Guard: touch / no-hover device
+		if ( window.matchMedia( '(hover: none)' ).matches ) {
+			return;
+		}
+
+		// Guard: already injected (idempotent)
+		if ( document.getElementById( WARP_FILTER_ID ) ) {
+			return;
+		}
+
+		injectWarpFilter();
+	}
+
+	/**
+	 * Build and inject the SVG warp filter into <body>, then wire mouseenter/
+	 * mouseleave on every [data-warp] element.
+	 *
+	 * Uses createElementNS throughout — createElement produces HTML elements
+	 * that do NOT participate in SVG filter resolution.
+	 *
+	 * Filter: feTurbulence (baseFrequency 0.018 0.022, octaves 2) →
+	 * feDisplacementMap (scale tweened 0→5→0px per hover). Amplitude 5px is
+	 * within the spec-specified 4-8px luxury range.
+	 *
+	 * Easing mechanism: CSS cannot interpolate url() filter references (they are
+	 * discrete), so the smoothing is done by tweening the feDisplacementMap
+	 * `scale` SVG attribute via a GSAP gsap.to(). The CSS [data-warp-active]
+	 * selector gates presence of the filter url (added/removed by JS); GSAP
+	 * owns intensity ramp so the warp fades in/out rather than snapping.
+	 * If GSAP is absent the tween block is skipped; the attribute-toggle still
+	 * applies the filter (a snap rather than a ramp — acceptable degradation).
+	 *
+	 * Chromatic offset: a genuine per-channel feOffset split is deferred to a
+	 * later pass. The current filter produces a single-displacement warp only.
+	 */
+	function injectWarpFilter() {
+		var NS = 'http://www.w3.org/2000/svg';
+
+		var svg = document.createElementNS( NS, 'svg' );
+		svg.setAttribute( 'xmlns',       NS );
+		svg.setAttribute( 'width',       '0' );
+		svg.setAttribute( 'height',      '0' );
+		svg.setAttribute( 'aria-hidden', 'true' );
+		svg.setAttribute( 'focusable',   'false' );
+		// Position out of flow — zero-size SVG still needs to be in the DOM.
+		svg.style.position = 'absolute';
+		svg.style.width    = '0';
+		svg.style.height   = '0';
+		svg.style.overflow = 'hidden';
+
+		var defs = document.createElementNS( NS, 'defs' );
+
+		var filter = document.createElementNS( NS, 'filter' );
+		filter.setAttribute( 'id',      WARP_FILTER_ID );
+		// Expand filter region so displaced pixels near edges aren't clipped.
+		filter.setAttribute( 'x',      '-5%' );
+		filter.setAttribute( 'y',      '-5%' );
+		filter.setAttribute( 'width',  '110%' );
+		filter.setAttribute( 'height', '110%' );
+
+		var turbulence = document.createElementNS( NS, 'feTurbulence' );
+		turbulence.setAttribute( 'type',          'turbulence' );
+		// Low baseFrequency = slow, large-scale organic displacement (not grain).
+		turbulence.setAttribute( 'baseFrequency', '0.018 0.022' );
+		turbulence.setAttribute( 'numOctaves',    '2' );
+		turbulence.setAttribute( 'seed',          '3' );
+		turbulence.setAttribute( 'result',        'warpNoise' );
+
+		var displacement = document.createElementNS( NS, 'feDisplacementMap' );
+		displacement.setAttribute( 'in',              'SourceGraphic' );
+		displacement.setAttribute( 'in2',             'warpNoise' );
+		// Start at scale 0; GSAP tweens it up to 5 on hover, back to 0 on leave.
+		displacement.setAttribute( 'scale',           '0' );
+		displacement.setAttribute( 'xChannelSelector', 'R' );
+		displacement.setAttribute( 'yChannelSelector', 'G' );
+
+		filter.appendChild( turbulence );
+		filter.appendChild( displacement );
+		defs.appendChild( filter );
+		svg.appendChild( defs );
+		document.body.appendChild( svg );
+
+		// Store reference to the displacement node for GSAP tweening.
+		warpDisplacementEl = displacement;
+
+		// Wire hover listeners on all [data-warp] targets now present in the DOM.
+		wireWarpTargets();
+	}
+
+	/** @type {SVGFEDisplacementMapElement|null} */
+	var warpDisplacementEl = null;
+
+	/** @type {Function|null} Running tween object (GSAP) for the scale attr. */
+	var warpTween = null;
+
+	/**
+	 * Attach mouseenter/mouseleave to every [data-warp] element currently in DOM.
+	 * Toggles [data-warp-active] (gates CSS filter url) and tweens the
+	 * feDisplacementMap scale attribute 0→5→0 so the warp eases in and out.
+	 */
+	function wireWarpTargets() {
+		var targets = document.querySelectorAll( '[data-warp]' );
+		if ( ! targets.length ) return;
+
+		var hasGsap = ( typeof window.gsap !== 'undefined' );
+
+		// Proxy object that GSAP can tween — SVG attributes aren't
+		// directly animatable via gsap.to(el,...) without GSAP's attr plugin.
+		// We use a plain object with an onUpdate callback that writes the attribute.
+		var scaleProxy = { value: 0 };
+
+		function setScale( v ) {
+			if ( warpDisplacementEl ) {
+				warpDisplacementEl.setAttribute( 'scale', String( Math.round( v * 10 ) / 10 ) );
+			}
+		}
+
+		function onEnter( el ) {
+			el.setAttribute( 'data-warp-active', '' );
+
+			if ( hasGsap && warpDisplacementEl ) {
+				if ( warpTween ) warpTween.kill();
+				warpTween = window.gsap.to( scaleProxy, {
+					value:    5,
+					duration: 0.45,
+					ease:     'power2.out',
+					onUpdate: function () { setScale( scaleProxy.value ); }
+				} );
+			} else {
+				// GSAP absent — snap to target scale (still correct, not smooth).
+				setScale( 5 );
+			}
+		}
+
+		function onLeave( el ) {
+			if ( hasGsap && warpDisplacementEl ) {
+				if ( warpTween ) warpTween.kill();
+				warpTween = window.gsap.to( scaleProxy, {
+					value:    0,
+					duration: 0.4,
+					ease:     'power2.in',
+					onUpdate: function () { setScale( scaleProxy.value ); },
+					onComplete: function () { el.removeAttribute( 'data-warp-active' ); }
+				} );
+			} else {
+				setScale( 0 );
+				el.removeAttribute( 'data-warp-active' );
+			}
+		}
+
+		for ( var i = 0; i < targets.length; i++ ) {
+			(function ( el ) {
+				el.addEventListener( 'mouseenter', function () { onEnter( el ); } );
+				el.addEventListener( 'mouseleave', function () { onLeave( el ); } );
+			})( targets[ i ] );
+		}
 	}
 
 	/* ── Bootstrap ──────────────────────────────────────────────────── */

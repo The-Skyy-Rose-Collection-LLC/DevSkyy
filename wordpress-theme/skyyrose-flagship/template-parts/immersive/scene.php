@@ -76,7 +76,8 @@ $first_room_name = $room_count > 0 && isset( $rooms[0]['name'] ) ? $rooms[0]['na
 						alt="<?php echo esc_attr( $room_name ); ?>"
 						width="1344"
 						height="896"
-						<?php echo 0 === $index ? 'fetchpriority="high"' : 'loading="lazy"'; ?>>
+						<?php echo 0 === $index ? 'fetchpriority="high"' : 'loading="lazy"'; ?>
+						data-warp>
 				<?php endif; ?>
 			</div>
 		<?php endforeach; ?>
@@ -253,7 +254,8 @@ $first_room_name = $room_count > 0 && isset( $rooms[0]['name'] ) ? $rooms[0]['na
 				alt="<?php esc_attr_e( 'Product preview', 'skyyrose' ); ?>"
 				width="400"
 				height="533"
-				data-fallback="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>">
+				data-fallback="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>"
+				data-warp>
 		</div>
 		<div class="product-panel-info">
 			<p class="product-panel-collection"></p>

@@ -681,12 +681,34 @@ function skyyrose_enqueue_template_scripts() {
 	$gsap_slugs = array( 'preorder-gateway', 'immersive', 'kc-launch' );
 	if ( in_array( $slug, $gsap_slugs, true ) ) {
 		wp_enqueue_script( 'skyyrose-gsap', SKYYROSE_ASSETS_URI . '/js/lib/gsap.min.js', array(), '3.12.2', true );
+	}
+
+	// ScrollTrigger — only on slugs whose scripts call the ScrollTrigger API.
+	// Immersive rooms animate via gsap.timeline/fromTo/set only (immersive-core.js
+	// + immersive.js, 0 ScrollTrigger refs), so shipping ScrollTrigger there was
+	// ~40KB of dead main-thread parse during the scene intro. preorder-gateway.js
+	// (5 refs) and kids-capsule-launch.js (3 refs) genuinely use it.
+	$gsap_st_slugs = array( 'preorder-gateway', 'kc-launch' );
+	if ( in_array( $slug, $gsap_st_slugs, true ) ) {
 		wp_enqueue_script( 'skyyrose-gsap-st', SKYYROSE_ASSETS_URI . '/js/lib/ScrollTrigger.min.js', array( 'skyyrose-gsap' ), '3.12.2', true );
 	}
 
-	// Phase 1 — Immersive Core: scene intro, lockup, dust canvas.
+	// Phase 2 — Lenis smooth-scroll lib: preorder gateway only.
+	// Immersive rooms are 100vh/overflow:hidden (nothing to scroll) — no dead bytes.
+	// Enqueued before the immersive-core block so window.Lenis is defined when
+	// initLenis() runs. cf. CURS-03 lesson: slug-gated to avoid waste on other templates.
+	if ( 'preorder-gateway' === $slug && file_exists( $base_js_dir . '/lib/lenis.min.js' ) ) {
+		wp_enqueue_script(
+			'skyyrose-lenis',
+			$base_js_uri . '/lib/lenis.min.js',
+			array(),    // Lenis itself has no WP deps.
+			'1.3.23',
+			true
+		);
+	}
+
+	// Phase 1+2 — Immersive Core: scene intro, lockup, dust canvas, Lenis init, warp.
 	// Loaded on: immersive rooms (4×) + preorder gateway.
-	// Lenis (Phase 2) is intentionally excluded — do NOT add it here.
 	if ( in_array( $slug, array( 'immersive', 'preorder-gateway' ), true ) ) {
 		$ic_css = $use_min && file_exists( $base_css_dir . '/system/immersive-core.min.css' )
 			? 'system/immersive-core.min.css' : 'system/immersive-core.css';
@@ -699,15 +721,22 @@ function skyyrose_enqueue_template_scripts() {
 			);
 		}
 
+		// On preorder, add lenis as a dep so WP prints it before immersive-core.
+		// On immersive rooms lenis is not enqueued — omit it from deps there.
+		$ic_js_deps = array( 'skyyrose-gsap' );
+		if ( 'preorder-gateway' === $slug && wp_script_is( 'skyyrose-lenis', 'enqueued' ) ) {
+			$ic_js_deps[] = 'skyyrose-lenis';
+		}
+
 		$ic_js = $use_min && file_exists( $base_js_dir . '/system/immersive-core.min.js' )
 			? 'system/immersive-core.min.js' : 'system/immersive-core.js';
 		if ( file_exists( $base_js_dir . '/' . $ic_js ) ) {
 			wp_enqueue_script(
 				'skyyrose-immersive-core',
 				$base_js_uri . '/' . $ic_js,
-				// Plain GSAP core only — immersive-core uses gsap.timeline/fromTo/set,
-				// never the ScrollTrigger API, so it must not depend on gsap-st.
-				array( 'skyyrose-gsap' ),
+				// GSAP core + optional lenis dep (preorder only).
+				// immersive-core uses gsap.timeline/fromTo/set, not ScrollTrigger API.
+				$ic_js_deps,
 				SKYYROSE_VERSION,
 				true
 			);

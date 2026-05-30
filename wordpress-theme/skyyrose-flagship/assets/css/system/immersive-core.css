@@ -1,22 +1,22 @@
 /**
  * SkyyRose Immersive Core
  *
- * Intro overlay, scene lockup, dust canvas, and tagline states.
- * Phase 1 ONLY — NO warp/filter/SVG definitions (those are Phase 2).
+ * Intro overlay, scene lockup, dust canvas, tagline states, and media
+ * hover-warp (Phase 2 additions: §8 Lenis enqueue, §9 SVG warp filter).
  *
- * All values are GSAP-driven; no CSS transitions here. GSAP sets inline
- * styles per frame and transitions fight it, so this file declares initial
- * states and structural rules only. GSAP owns opacity, clip-path, filter,
- * scaleX, and y via its own timeline.
+ * All GSAP-driven values: no CSS transitions here. GSAP sets inline styles
+ * per frame; transitions fight it. This file declares initial states and
+ * structural rules only. GSAP owns opacity, clip-path, filter, scaleX, y.
  *
  * Class contract (must match immersive-core.js + scene.php exactly):
- *   .ic-overlay      — fullscreen intro curtain (JS-built via createElement)
- *   .ic-dust         — particle canvas layer (JS-built via createElement)
- *   .scene-lockup    — collection identity image block (scene.php)
- *   .scene-lockup img — targets .scene-lockup__img (BEM element, only child)
- *   .scene-hairline  — accent rule beneath lockup (scene.php, JS queries)
- *   .scene-tagline   — "Luxury Grows from Concrete." display line (scene.php, JS queries)
- *   .scene-subtitle  — collection name line (scene.php) — styled in immersive.css, not here
+ *   .ic-overlay        — fullscreen intro curtain (JS-built via createElement)
+ *   .ic-dust           — particle canvas layer (JS-built via createElement)
+ *   .scene-lockup      — collection identity image block (scene.php)
+ *   .scene-lockup img  — targets .scene-lockup__img (BEM element, only child)
+ *   .scene-hairline    — accent rule beneath lockup (scene.php, JS queries)
+ *   .scene-tagline     — "Luxury Grows from Concrete." line (scene.php, JS queries)
+ *   .scene-subtitle    — collection name line (scene.php) — in immersive.css
+ *   [data-warp]        — opt-in hover-warp target; filter injected via JS (Phase 2)
  *
  * Token surface: var(--skyyrose-accent), var(--skyyrose-bg),
  *   var(--skyyrose-text), var(--skyyrose-font-display),
@@ -35,6 +35,7 @@
  *   overlay carries `inert` (overlay-bound clicks never fire).
  *
  * @package SkyyRose
+ * @since   7.0.0
  */
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -149,4 +150,49 @@
 		rgba( var(--skyyrose-accent-rgb), 0.14 ),
 		var(--skyyrose-bg)
 	);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   8. MEDIA HOVER-WARP (Phase 2, Capability C)
+   Opt-in via [data-warp] attribute. SVG feTurbulence+feDisplacementMap
+   filter injected once to <body> by immersive-core.js (id: ic-warp-filter).
+   Displacement scale is tweened 0→5px on mouseenter / 5→0px on mouseleave
+   via a tiny GSAP gsap.to() on the feDisplacementMap DOM attribute.
+   CSS below gates the filter reference on :hover (hover devices only);
+   JS owns the intensity ramp so the transition is smooth, not a snap.
+
+   Note: CSS cannot interpolate url() filter references — `transition:filter`
+   on a url() value is a discrete jump, so no transition property is declared
+   here. Easing is entirely attribute-driven by JS.
+
+   Active only on:
+     - pointer/mouse devices: @media (hover: hover)
+     - full-motion: NOT @media (prefers-reduced-motion: reduce)
+   JS also guards init on these conditions; CSS is defense in depth.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Apply the SVG warp filter when JS sets the active state.
+   JS adds [data-warp-active] on mouseenter, removes on mouseleave,
+   so the filter url is present during the tween window and absent after.
+   @media (hover:hover) prevents the attribute from applying on touch. */
+@media (hover: hover) {
+	[data-warp][data-warp-active] {
+		filter: url(#ic-warp-filter);
+	}
+}
+
+/* Hard-disable on reduced-motion regardless of hover capability */
+@media (prefers-reduced-motion: reduce) {
+	[data-warp],
+	[data-warp][data-warp-active] {
+		filter: none !important;
+	}
+}
+
+/* Hard-disable on touch/no-hover devices — warp is decorative, never functional */
+@media (hover: none) {
+	[data-warp],
+	[data-warp][data-warp-active] {
+		filter: none !important;
+	}
 }
