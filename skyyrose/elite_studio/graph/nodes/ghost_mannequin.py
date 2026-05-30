@@ -136,6 +136,19 @@ def preflight_node(state: EliteStudioState) -> dict:
         cat = Catalog.load()
         product = cat.require(sku)
         expected_garment = product.name
+        # Enrich with the dossier garment_type_lock so the dual-vision gate
+        # verifies against the actual construction rather than the product name
+        # alone. The name can mis-cue the gate: br-006 "Sherpa Jacket" is in fact
+        # a satin-exterior bomber with sherpa *lining*, so a name-only check
+        # false-blocks the correct (satin) source image for not looking "fuzzy".
+        try:
+            from ...catalog import get_product_with_dossier
+
+            _lock = get_product_with_dossier(sku)["dossier"].get("garment_type_lock", "")
+            if _lock:
+                expected_garment = f"{product.name} — {_lock}"
+        except Exception:  # dossier optional at this gate; name-only is an acceptable fallback
+            pass
 
         # Use catalog-defined source image if available, else fallback to rigid SKU lookup
         source_img = product.source_files[0] if product.source_files else ""
