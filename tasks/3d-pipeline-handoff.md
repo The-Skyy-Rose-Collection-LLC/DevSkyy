@@ -1,7 +1,29 @@
 # 3D Ghost-Mannequin Pipeline — Handoff (2026-05-29)
 
-**Goal:** render all 33 products in 3D ghost-mannequin format, integrated into their collections.
-**Decision (locked):** Path A — Full Elite ghost-mannequin (FLUX base render + Meshy 3D + composite). User accepts FLUX is generative (not pixel-identical).
+**Goal:** render all 33 products in 3D format, integrated into their collections.
+
+## 2026-05-30 UPDATE — render half DONE (path changed to Meshy-only)
+- Founder chose **Path 1 (Meshy-only)** after FLUX failed fidelity QC on detailed garments.
+- **ALL 33/33 `renders/3d/<sku>.glb` generated** via `scripts/meshy_only_batch.py`
+  (canonical-source image→3D, no FLUX). ~$14 total Meshy. Driver committed `f87baf1e7`.
+  `renders/3d/` is gitignored (binaries not committed).
+- **REMAINING: integration half (display in collections) — production-gated, NOT started.**
+  Recipe:
+  1. **Compress** GLBs (8MB each, ~264MB total → unusable on web as-is). No tool installed —
+     `npm i -g gltf-pipeline` (Draco) or `brew install gltfpack` (meshopt). Target ~1–2MB/mesh.
+     Keep originals; write compressed to `renders/3d/compressed/<sku>.glb`.
+  2. **Host** — decide: (A) copy to theme `assets/models/<sku>.glb` + deploy (versioned, but
+     +size to theme; check WP.com limits), or (B) upload to WP Media Library (theme stays lean).
+  3. **Set `_product_3d_model` meta** per WC product → the `<model-viewer>` surface at
+     `inc/woocommerce.php:360` renders a "View 3D" button on the PDP. Need SKU→WC-product-ID
+     map (query live store via WC REST, read-only allowed). Setting meta = WC write (gated).
+  4. **Display scope** — current surface is PDP-only. "Collection pages" showing 3D = extra
+     theme work (collection templates show cards, not viewers). Confirm with founder.
+- Original FLUX/ghost-mannequin investigation below is HISTORICAL (path not taken).
+
+---
+
+**Original decision (NOT taken):** Path A — Full Elite ghost-mannequin (FLUX). FLUX is generative; failed fidelity QC.
 
 ## What WORKS (verified this session)
 - **SKU discovery** → canonical catalog (was empty overrides dir). `discover_all_skus()`.
