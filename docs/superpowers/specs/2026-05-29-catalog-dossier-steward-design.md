@@ -1,7 +1,7 @@
 # Catalog & Dossier Steward — Design Spec
 
 **Date:** 2026-05-29
-**Status:** Approved (design) — pending implementation plan
+**Status:** Approved (design, incl. §3/§8 confirmed 2026-05-29) — pending implementation plan
 **Author:** DevSkyy engineering agent (brainstormed with Corey Foster)
 **Supersedes concept of:** `dossier-author` + `catalog-QA` (merged into one steward)
 
@@ -17,13 +17,13 @@ deterministic core**; AI is a pluggable enhancement behind a narrow port; every 
 (CLI, MCP, API, agent) is a thin shell. This makes the company resilient to AI-landscape
 churn — a model/framework/interface pivot costs one small adapter rewrite, not a rebuild.
 
-> **NOTE (pending Corey confirmation):** §3 (hexagonal AI-portability) and §8 (model-routing
-> policy) are the engineering agent's design *proposals* derived from the goal "be in a better
-> position for success" — they were NOT explicitly requested. They do echo existing project
-> rules (`rules/common/performance.md` model-selection; the anti-hallucination canon). Keep,
-> trim, or cut them at spec review. Everything else follows directly from confirmed decisions:
-> scaffold+interrogate authoring, best-practice (deterministic) verification, Steward-first
-> scope, and package layout B.
+> **NOTE (confirmed by Corey 2026-05-29):** §3 (hexagonal AI-portability) and §8 (model-routing
+> policy) originated as the engineering agent's design *proposals* derived from the goal "be in a
+> better position for success" — they were not in the original request. Corey reviewed and
+> **confirmed keeping both**. They also echo existing project rules (`rules/common/performance.md`
+> model-selection; the anti-hallucination canon). All other sections follow directly from the
+> confirmed decisions: scaffold+interrogate authoring, best-practice (deterministic) verification,
+> Steward-first scope, and package layout B.
 
 The "authoring" half is **canon-safe**: the steward never writes dossier prose. It generates
 empty structured skeletons and interrogates the human author. Dossiers stay Corey-authored
