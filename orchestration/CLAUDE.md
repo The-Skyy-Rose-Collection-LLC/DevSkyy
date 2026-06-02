@@ -45,6 +45,7 @@ from orchestration import ProductAssetPipeline   # only imports asset_pipeline s
 | `PromptEngineer`, `PromptChain`, `PromptTemplate`, `PromptTechnique` | `prompt_engineering.py` | Advanced prompting (CoT, ToT, ReAct templates) |
 | `WorkflowState`, `WorkflowStatus`, `WorkflowEdge`, `StateGraph`, `END`, `START`, `add_messages` | `langgraph_integration.py` | LangGraph re-exports + workflow state base |
 | `ToolRegistry`, `ToolDefinition`, `ToolCategory`, `ToolParameter` | (re-export from `core.runtime.tool_registry`) | Tool registration surface |
+| `ModeAgent`, `ModeConfig`, `ReminderTransport` | `orchestration_mode.py` (+ `orchestration_mode_tools.py`) | Standing-consent fan-out loop: mid-conversation mode reminders toggle "fan out to parallel subagents by default" + `effort="xhigh"`. First streaming tool-use feedback loop in the repo. Raw `AsyncAnthropic`; `asyncio.gather`+`Semaphore` fan-out; **local bash, no sandbox**. Spec: `docs/superpowers/specs/2026-06-01-orchestration-mode-design.html` |
 
 ## `ProductAssetPipeline` (canonical entry point)
 
