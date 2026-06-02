@@ -286,12 +286,52 @@ def test_cli_failure_exit_code(tmp_path):
 
 
 @pytest.mark.unit
-def test_load_skipped_tolerates_malformed_json(tmp_path):
+def test_load_skipped_raises_on_malformed_json(tmp_path):
     repo = _repo(tmp_path)
     (repo / "renders" / "ghost-mannequin" / "SKIPPED.json").write_text(
         "{not json", encoding="utf-8"
     )
-    assert sr.load_skipped(repo) == set()
+    with pytest.raises(ReviewError):
+        sr.load_skipped(repo)
+
+
+@pytest.mark.unit
+def test_malformed_skip_list_aborts_all_run_cleanly(tmp_path):
+    repo = _repo(tmp_path)
+    _add_sku(repo, "br-001", "slug")
+    (repo / "renders" / "ghost-mannequin" / "SKIPPED.json").write_text("{bad", encoding="utf-8")
+    code = sr.main(["--all", "--root", str(repo)])
+    assert code == 1  # clean error exit, not a traceback
+
+
+@pytest.mark.unit
+def test_render_override_path_escape_rejected(tmp_path):
+    repo = _repo(tmp_path)
+    _add_sku(repo, "br-001", "slug")
+    result = sr.stage_one("br-001", root=repo, render="../../etc/passwd.png")
+    assert result.status == "error"
+    assert "plain filename" in result.detail
+
+
+@pytest.mark.unit
+def test_render_version_uses_last_token():
+    assert sr._render_version(Path("seedream-probe-v2-v3.png")) == 3
+    assert sr._render_version(Path("seedream-probe.png")) == 1
+    assert sr._render_version(Path("seedream-probe-v4-clean.png")) == 4
+
+
+@pytest.mark.unit
+def test_non_oserror_conversion_failure_is_isolated(tmp_path, monkeypatch):
+    repo = _repo(tmp_path)
+    _add_sku(repo, "br-001", "slug")
+
+    def _boom(*_a, **_k):
+        raise ValueError("simulated PIL ValueError (not an OSError)")
+
+    monkeypatch.setattr(sr, "_convert_to_webp", _boom)
+    result = sr.stage_one("br-001", root=repo)
+    assert result.status == "error"
+    assert "webp conversion failed" in result.detail
 
 
 @pytest.mark.unit

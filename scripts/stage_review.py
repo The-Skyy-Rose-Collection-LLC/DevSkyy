@@ -111,8 +111,10 @@ def resolve_source_folder(root: Path, sku: str) -> Path:
 
 
 def _render_version(path: Path) -> int:
-    match = _VERSION_RE.search(path.name)
-    return int(match.group(1)) if match else 1
+    # findall + last token: a producer-named "seedream-probe-v2-v3.png" scores as
+    # v3 (its intent), not v2 (which .search would return on the first match).
+    nums = _VERSION_RE.findall(path.name)
+    return int(nums[-1]) if nums else 1
 
 
 def select_render(render_dir: Path, *, override: str | None = None) -> Path:
@@ -126,6 +128,11 @@ def select_render(render_dir: Path, *, override: str | None = None) -> Path:
     if not render_dir.is_dir():
         raise ReviewError(f"no renders/ dir: expected {render_dir}")
     if override:
+        # Confine the override to a plain filename inside render_dir — same
+        # path-traversal philosophy as _validate_sku. Without this, a value like
+        # "../other-sku/renders/wrong.png" would stage the wrong garment for review.
+        if "/" in override or os.sep in override or ".." in override:
+            raise ReviewError(f"--render must be a plain filename, not a path: {override!r}")
         chosen = render_dir / override
         if not chosen.is_file():
             raise ReviewError(f"override render not found: {chosen}")
@@ -159,8 +166,10 @@ def load_skipped(root: Path) -> set[str]:
         data = json.loads(path.read_text(encoding="utf-8"))
         return {entry["sku"] for entry in data.get("skipped", []) if "sku" in entry}
     except (json.JSONDecodeError, AttributeError, TypeError) as exc:
-        _log.warning("could not parse %s (%s) — treating skip list as empty", path, exc)
-        return set()
+        # A present-but-broken skip list is a data error: aborting beats silently
+        # un-skipping out-of-scope accessories into a paid batch. (Absent file is
+        # the expected/empty case handled above.)
+        raise ReviewError(f"malformed skip list {path}: {exc}") from exc
 
 
 def discover_skus(root: Path) -> list[str]:
@@ -265,7 +274,9 @@ def stage_one(
 
     try:
         _convert_to_webp(src, dst)
-    except OSError as exc:
+    except Exception as exc:  # noqa: BLE001 — isolate any PIL failure (incl.
+        # DecompressionBombError / ValueError, which are NOT OSError) to this SKU
+        # so one bad image cannot abort a whole --all batch.
         return StageResult(sku, "error", src, dst, f"webp conversion failed: {exc}")
     return StageResult(sku, "staged", src, dst, f"{src.name} -> {rel}")
 
@@ -337,10 +348,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.render and args.all:
         parser.error("--render applies to a single SKU only, not --all")
 
-    if args.all:
-        results = stage_all(root=args.root, force=args.force, dry_run=args.dry_run)
-    else:
-        try:
+    try:
+        if args.all:
+            results = stage_all(root=args.root, force=args.force, dry_run=args.dry_run)
+        else:
             results = [
                 stage_one(
                     args.sku,
@@ -350,9 +361,11 @@ def main(argv: list[str] | None = None) -> int:
                     dry_run=args.dry_run,
                 )
             ]
-        except ReviewError as exc:
-            print(f"error: {exc}", file=sys.stderr)
-            return 1
+    except ReviewError as exc:
+        # Global precondition failures (invalid SKU, malformed skip list) — clean
+        # exit, not a traceback. Per-SKU problems are aggregated as results above.
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
 
     if not results:
         print("no SKUs to stage (no product-source folders found)")
