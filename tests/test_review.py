@@ -108,7 +108,24 @@ class TestApprove:
         root = _make_fake_repo(tmp_path, ["br-001"])
         approve("br-001", root=root)
         row = _row_for(_read_rows(root / CATALOG_REL), "br-001")
-        assert row[FRONT_MODEL_COL] == ("renders/ghost-mannequin/approved/br-001-ghost-front.webp")
+        # Theme-relative path (get_theme_file_uri-resolvable), NOT the repo-local
+        # renders/ path the theme deploy does not ship.
+        assert row[FRONT_MODEL_COL] == "assets/images/products/ghost/br-001-ghost-front.webp"
+
+    def test_copies_approved_render_into_theme_assets(self, tmp_path: Path) -> None:
+        root = _make_fake_repo(tmp_path, ["br-001"])
+        approve("br-001", root=root)
+        theme_copy = (
+            root
+            / "wordpress-theme/skyyrose-flagship/assets/images/products/ghost"
+            / "br-001-ghost-front.webp"
+        )
+        approved = root / GHOST_REL / APPROVED_SUBDIR / "br-001-ghost-front.webp"
+        # Both display paths populated: theme-deployed copy AND the approved/ original
+        # the WooCommerce uploader reads.
+        assert theme_copy.is_file()
+        assert approved.is_file()
+        assert theme_copy.read_bytes() == approved.read_bytes()
 
     def test_preserves_csv_row_count(self, tmp_path: Path) -> None:
         skus = ["br-001", "sg-001", "lh-001"]
@@ -394,7 +411,7 @@ class TestAuditLogFailureModes:
         assert result.sku == "br-001"
         assert (root / GHOST_REL / APPROVED_SUBDIR / "br-001-ghost-front.webp").exists()
         row = _row_for(_read_rows(root / CATALOG_REL), "br-001")
-        assert row[FRONT_MODEL_COL].startswith("renders/ghost-mannequin/approved/")
+        assert row[FRONT_MODEL_COL].startswith("assets/images/products/ghost/")
         # Warning was logged.
         assert any("audit log write failed" in r.message for r in caplog.records)
         # Restore so test isolation holds.
