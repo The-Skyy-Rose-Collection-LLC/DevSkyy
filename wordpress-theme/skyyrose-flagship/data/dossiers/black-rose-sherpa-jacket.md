@@ -2,7 +2,7 @@
 sku: br-006
 name: BLACK Rose Sherpa Jacket
 collection: black-rose
-logo_reference: data/brand-logos/black-rose-logo.md
+logo_reference: data/brand-logos/three-rose-cluster.md
 reference_image: data/product-references/br-006-sherpa-jacket-real-front.jpeg
 extra_references:
   - data/product-references/br-006-sherpa-jacket-real-open.jpeg
@@ -16,7 +16,7 @@ extra_references:
 ## Branding — exactly what IS on this product
 
 > Logo art canonical reference:
-> - Black Rose three-rose-cluster: `data/brand-logos/black-rose-logo.md`
+> - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
 > - Reference photos:               `data/product-references/br-006-sherpa-jacket-real-front.jpeg`,
 >                                   `data/product-references/br-006-sherpa-jacket-real-open.jpeg`,
 >                                   `data/product-references/br-006-sherpa-jacket-real-closeup.jpeg`

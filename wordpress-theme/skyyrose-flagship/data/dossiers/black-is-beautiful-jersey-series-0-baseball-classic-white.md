@@ -2,7 +2,7 @@
 sku: br-015
 name: BLACK is Beautiful Jersey Series — 0. Baseball Classic (White)
 collection: black-rose
-logo_reference: data/brand-logos/black-rose-logo.md
+logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/black-rose-authentic-collection-patch.md
   - data/brand-logos/sr-monogram.md
@@ -17,7 +17,7 @@ inherits_from: black-is-beautiful-jersey-series-0-baseball-classic
 ## Branding — exactly what IS on this product
 
 > Logo art canonical references:
-> - Black Rose three-rose-cluster: `data/brand-logos/black-rose-logo.md`
+> - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
 > - Authentic Collection patch:    `data/brand-logos/black-rose-authentic-collection-patch.md`
 > - SR monogram:                   `data/brand-logos/sr-monogram.md`
 > - Product techflat:              `data/product-references/br-015-techflat.jpeg`

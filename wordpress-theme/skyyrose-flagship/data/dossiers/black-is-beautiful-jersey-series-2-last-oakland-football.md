@@ -3,7 +3,7 @@ sku: br-009
 name: BLACK is Beautiful Jersey Series — 2. Last Oakland (Football)
 collection: black-rose
 preorder: true
-logo_reference: data/brand-logos/black-rose-logo.md
+logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/nfl-authentic-collection-patch.md
   - data/brand-logos/sr-monogram.md
@@ -23,7 +23,7 @@ baseball jersey. **PRE-ORDER product** — design renderings only.
 ## Branding — exactly what IS on this product
 
 > Logo art canonical references:
-> - Black Rose three-rose-cluster: `data/brand-logos/black-rose-logo.md`
+> - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
 > - NFL Authentic Collection patch: `data/brand-logos/nfl-authentic-collection-patch.md`
 > - SR monogram (back-neck):       `data/brand-logos/sr-monogram.md`
 > - Product design render:          `data/product-references/br-009-design-front.jpeg`

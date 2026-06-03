@@ -2,7 +2,7 @@
 sku: kids-001
 name: Kids Colorblock Hoodie Set — Red/Black
 collection: kids-capsule
-logo_reference: data/brand-logos/black-rose-logo.md
+logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/black-rose-authentic-collection-patch.md
 reference_image: data/product-references/kids-001-techflat.jpeg
@@ -17,7 +17,7 @@ extra_references:
 ## Branding — exactly what IS on this product
 
 > Logo art canonical references:
-> - Black Rose three-rose-cluster: `data/brand-logos/black-rose-logo.md`
+> - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
 > - Authentic Collection patch:    `data/brand-logos/black-rose-authentic-collection-patch.md`
 > - Product techflat:              `data/product-references/kids-001-techflat.jpeg`
 > - Real product photo:            `data/product-references/kids-001-real-photo.jpeg`

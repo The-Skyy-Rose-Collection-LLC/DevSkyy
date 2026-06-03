@@ -3,7 +3,7 @@ sku: br-008
 name: BLACK is Beautiful Jersey Series — 1. SF Inspired (Football)
 collection: black-rose
 preorder: true
-logo_reference: data/brand-logos/black-rose-logo.md
+logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/nfl-authentic-collection-patch.md
 reference_image: data/product-references/br-008-design-front.jpeg
@@ -24,7 +24,7 @@ exists yet.
 ## Branding — exactly what IS on this product
 
 > Logo art canonical references:
-> - Black Rose three-rose-cluster: `data/brand-logos/black-rose-logo.md`
+> - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
 > - NFL Authentic Collection patch: `data/brand-logos/nfl-authentic-collection-patch.md`
 > - Product design render:          `data/product-references/br-008-design-front.jpeg`
 >

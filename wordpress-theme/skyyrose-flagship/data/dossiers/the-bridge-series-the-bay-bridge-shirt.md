@@ -2,7 +2,7 @@
 sku: sg-005
 name: The Bridge Series 'The Bay Bridge' Shirt
 collection: signature
-logo_reference: data/brand-logos/black-rose-logo.md
+logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/sr-monogram.md
 reference_image: data/product-references/sg-005-bay-bridge-shirt-techflat.jpeg
@@ -23,7 +23,7 @@ reference_image: data/product-references/sg-005-bay-bridge-shirt-techflat.jpeg
 ## Branding — exactly what IS on this product
 
 > Logo art canonical references:
-> - Black Rose three-rose-cluster (recolored to blue for this SKU): `data/brand-logos/black-rose-logo.md`
+> - Black Rose three-rose-cluster (recolored to blue for this SKU): `data/brand-logos/three-rose-cluster.md`
 > - SR monogram (back-neck):                                         `data/brand-logos/sr-monogram.md`
 > - Product techflat:                                                 `data/product-references/sg-005-bay-bridge-shirt-techflat.jpeg`
 >

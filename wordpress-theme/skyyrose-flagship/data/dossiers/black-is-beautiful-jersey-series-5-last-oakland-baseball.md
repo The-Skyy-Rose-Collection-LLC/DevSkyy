@@ -4,7 +4,7 @@ name: BLACK is Beautiful Jersey Series — 5. Baseball Classic (Last Oakland)
 collection: black-rose
 preorder: true
 inherits_from: black-is-beautiful-jersey-series-0-baseball-classic
-logo_reference: data/brand-logos/black-rose-logo.md
+logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/black-rose-authentic-collection-patch.md
   - data/brand-logos/sr-monogram.md
@@ -20,7 +20,7 @@ This is the OAKLAND colorway (separate SKU from the Classic black br-003 / Giant
 ## Branding — exactly what IS on this product
 
 > Logo art canonical references:
-> - Black Rose three-rose-cluster: `data/brand-logos/black-rose-logo.md`
+> - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
 > - Authentic Collection patch:    `data/brand-logos/black-rose-authentic-collection-patch.md`
 > - SR monogram:                   `data/brand-logos/sr-monogram.md`
 

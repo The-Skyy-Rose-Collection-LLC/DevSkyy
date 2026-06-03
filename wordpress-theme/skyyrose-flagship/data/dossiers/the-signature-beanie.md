@@ -2,7 +2,7 @@
 sku: sg-007
 name: The Signature Beanie
 collection: signature
-logo_reference: data/brand-logos/black-rose-logo.md
+logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/red-roses-cloud-cluster.md
 reference_image: data/product-references/sg-007-techflat.jpeg
@@ -15,7 +15,7 @@ reference_image: data/product-references/sg-007-techflat.jpeg
 ## Branding — exactly what IS on this product
 
 > Logo art canonical references:
-> - Black Rose three-rose-cluster (greyscale): `data/brand-logos/black-rose-logo.md`
+> - Black Rose three-rose-cluster (greyscale): `data/brand-logos/three-rose-cluster.md`
 > - Red Roses Cloud Cluster (LH multi-color):  `data/brand-logos/red-roses-cloud-cluster.md`
 > - Product techflat (4 variants visible):     `data/product-references/sg-007-techflat.jpeg`
 >

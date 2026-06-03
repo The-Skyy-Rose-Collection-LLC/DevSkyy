@@ -2,7 +2,7 @@
 sku: br-003
 name: BLACK is Beautiful Jersey Series — 0. Baseball Classic (Black)
 collection: black-rose
-logo_reference: data/brand-logos/black-rose-logo.md
+logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/black-rose-authentic-collection-patch.md
   - data/brand-logos/sr-monogram.md
@@ -16,7 +16,7 @@ reference_image: data/product-references/br-003-baseball-classic-techflat.jpeg
 ## Branding — exactly what IS on this product
 
 > Logo art for "Black Rose logo" entries below is the canonical
-> three-rose-cluster art at `data/brand-logos/black-rose-logo.md`.
+> three-rose-cluster art at `data/brand-logos/three-rose-cluster.md`.
 > The "Authentic Collection patch" graphic is at
 > `data/brand-logos/black-rose-authentic-collection-patch.md`.
 > The "SR monogram" is the gold lettermark at

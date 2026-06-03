@@ -2,7 +2,7 @@
 sku: br-001
 name: BLACK Rose Crewneck
 collection: black-rose
-logo_reference: data/brand-logos/black-rose-logo.md
+logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/sr-monogram.md
 ---
@@ -14,7 +14,7 @@ extra_logos:
 ## Branding — exactly what IS on this product
 
 > Logo art canonical references:
-> - Black Rose three-rose-cluster: `data/brand-logos/black-rose-logo.md`
+> - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
 > - SR monogram (gold lettermark): `data/brand-logos/sr-monogram.md`
 
 ### Front
@@ -32,7 +32,7 @@ extra_logos:
   between the blooms.
 
   **Art elements** (all preserved from the canonical Black Rose logo at
-  data/brand-logos/black-rose-logo.md):
+  data/brand-logos/three-rose-cluster.md):
   - **Three roses** in illustrated comic-book style with hard ink edges
     and soft tonal shading: one large fully-open bloom dominant in the
     upper portion, one medium three-quarter-angle bloom upper-left, one

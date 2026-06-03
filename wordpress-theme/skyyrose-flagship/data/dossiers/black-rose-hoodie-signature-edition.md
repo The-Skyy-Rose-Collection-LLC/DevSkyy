@@ -2,7 +2,7 @@
 sku: br-005
 name: BLACK Rose Hoodie — Signature Edition
 collection: black-rose
-logo_reference: data/brand-logos/black-rose-logo.md
+logo_reference: data/brand-logos/three-rose-cluster.md
 reference_image: data/product-references/br-005-signature-hoodie-real.jpeg
 ---
 
@@ -13,7 +13,7 @@ reference_image: data/product-references/br-005-signature-hoodie-real.jpeg
 ## Branding — exactly what IS on this product
 
 > Logo art canonical reference:
-> - Black Rose three-rose-cluster: `data/brand-logos/black-rose-logo.md`
+> - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
 > - Reference photo:                `data/product-references/br-005-signature-hoodie-real.jpeg`
 
 ### Front
