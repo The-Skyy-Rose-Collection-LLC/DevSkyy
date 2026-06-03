@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-03T22:25:56.814Z
-> Files: 2496 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-03T22:26:28.357Z
+> Files: 2505 tracked on main ∪ origin/main | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -1241,8 +1241,13 @@
 
 - `skyyrose_lora_training.ipynb` — Declares SkyyRoseDataset (~4138 tok)
 
+## deploy/
+
+- `CLAUDE.md` (~11 tok)
+
 ## deploy/clothing_3d/
 
+- `CLAUDE.md` (~11 tok)
 - `docker-compose.yml` — Docker Compose services (~669 tok)
 - `Dockerfile` — Docker container definition (~518 tok)
 - `k8s.yaml` — Clothing 3D pipeline — Kubernetes manifests. (~1324 tok)
@@ -1491,6 +1496,7 @@
 
 ## docs/elite-studio/
 
+- `CLAUDE.md` (~11 tok)
 - `LAYER_2_PIPELINE_STAGES.md` — Elite Studio Layer 2 — Pipeline Stages (~1455 tok)
 - `LAYER_6_VIRTUAL_TRYON.md` — Layer 6 — Virtual Try-On (~877 tok)
 - `render-readiness-audit-2026-05-27.html` — Elite Studio — Render Readiness Audit (2026-05-27) (~7001 tok)
@@ -1629,6 +1635,10 @@
 
 - `BACKEND_QUICKSTART.md` — Backend Quick Start Guide (~1507 tok)
 
+## docs/superpowers/
+
+- `CLAUDE.md` (~11 tok)
+
 ## docs/superpowers/plans/
 
 - `2026-04-20-ghost-mannequin-pipeline.md` — Ghost-Mannequin Imagery Pipeline (Phase B2) Implementation Plan (~16427 tok)
@@ -1636,6 +1646,7 @@
 - `2026-05-25-v2-mockup-design.md` — SkyyRose v2 Mockup Implementation Plan (~12781 tok)
 - `2026-05-28-replica-foundry.md` — Replica Foundry Implementation Plan (~21121 tok)
 - `2026-05-29-catalog-dossier-steward.md` — Catalog & Dossier Steward Implementation Plan (~21358 tok)
+- `CLAUDE.md` (~11 tok)
 
 ## docs/superpowers/specs/
 
@@ -1644,10 +1655,14 @@
 - `2026-05-27-compositor-production-hardening-design.md` — Compositor Production Hardening — Four Enhancement Patterns (~6102 tok)
 - `2026-05-27-elite-team-creative-cloud-strategic-spec.md` — Elite Team — Strategic Spec (~5711 tok)
 - `2026-05-27-mockup-stage-d-and-cost-ceiling-design.md` — Mockup-First Stage D Landing + IC-Light Cost Gate (~3637 tok)
+- `2026-05-28-immersive-scene-intro-design.md` — Immersive Scene Intro + Premium Motion — Design Spec (~3063 tok)
 - `2026-05-28-replica-foundry-design.md` — Replica Foundry — Multi-Tenant SaaS Imagery Pipeline (Design Spec) (~5392 tok)
 - `2026-05-29-catalog-dossier-steward-design.md` — Catalog & Dossier Steward — Design Spec (~2820 tok)
 - `2026-05-29-replica-foundry-roadmap.md` — Replica Foundry — Milestone Roadmap (~1389 tok)
+- `2026-05-31-elite-team-build-evidence.md` — Elite Team Build — Reproducible Evidence Bundle (~4600 tok)
+- `2026-05-31-pipeline-completion-rollout.md` — Pipeline Completion Rollout — Every DevSkyy Pipeline, Evidence-Verified (~2742 tok)
 - `2026-06-01-orchestration-mode-design.html` — Orchestration Mode — Design Spec (2026-06-01) (~6876 tok)
+- `CLAUDE.md` (~11 tok)
 - `elite-theme-platform.html` — Elite Theme Platform — Provider-Agnostic Autonomous Commercial Theme Agents (~2764 tok)
 - `self-healing-theme-loop.html` — Self-Healing + Self-Improving + Learning Theme Loop — Contract (~10116 tok)
 
