@@ -62,8 +62,18 @@ def build_router(*, api_key: str | None, output_dir: Path) -> Router:
     return Router(adapters, priority=_DEFAULT_PRIORITY)
 
 
-def _confirm(*, sku: str, source: Path, est: dict, interactive: bool) -> bool:
-    """STOP-AND-SHOW gate. Returns True iff allowed to dispatch."""
+def _confirm(*, sku: str, source: Path, est: dict) -> bool:
+    """STOP-AND-SHOW gate. Always prints the banner; returns True iff confirmed.
+
+    A paid dispatch is NEVER silent. The banner prints first, unconditionally,
+    so any run that is about to spend money shows what and how much. Approval is
+    then resolved fail-closed:
+
+      * ``SKYYROSE_AUTO_CONFIRM=1``  -> explicit batch opt-in, proceeds.
+      * no TTY (CI, cron, subprocess, pytest) -> ABORTS. Auto-approving a paid
+        call on a missing TTY would violate the STOP-AND-SHOW money rule.
+      * interactive TTY -> prompts for an explicit ``y``.
+    """
     banner = (
         "\nSTOP — Confirm before proceeding:\n\n"
         f"  Action : 3D pipeline (paid)\n"
@@ -73,12 +83,17 @@ def _confirm(*, sku: str, source: Path, est: dict, interactive: bool) -> bool:
         f"  Total  : ~${est['total_usd']:.2f}\n\n"
         "Proceed? [y/N] "
     )
-    if not interactive:
-        return True
-    if os.getenv("SKYYROSE_AUTO_CONFIRM") == "1" or not sys.stdin.isatty():
-        return True
     sys.stdout.write(banner)
     sys.stdout.flush()
+    if os.getenv("SKYYROSE_AUTO_CONFIRM") == "1":
+        sys.stdout.write("\nauto-confirmed via SKYYROSE_AUTO_CONFIRM=1\n")
+        return True
+    if not sys.stdin.isatty():
+        sys.stdout.write(
+            "\nnon-interactive context — aborting paid dispatch "
+            "(set SKYYROSE_AUTO_CONFIRM=1 to allow)\n"
+        )
+        return False
     try:
         return input().strip().lower() in {"y", "yes"}
     except EOFError:
@@ -107,6 +122,12 @@ async def run(argv: list[str]) -> int:
     stages = parse_stages(args.stages)
     output_dir = Path(args.output_dir)
 
+    if args.api_key:
+        sys.stderr.write(
+            "warning: --api-key is visible in process listings and shell history; "
+            "prefer the TRIPO_API_KEY env var\n"
+        )
+
     try:
         source = resolve_source(sku=args.sku, image=args.image, source_root=args.source_root)
     except PreflightError as exc:
@@ -133,7 +154,17 @@ async def run(argv: list[str]) -> int:
         )
         return 0
 
-    if not _confirm(sku=args.sku, source=source, est=est, interactive=True):
+    # Affordability gate: refuse the whole job up front if the ONE estimate already
+    # exceeds the ceiling, so we never bill stages 1..n-1 before a later stage trips
+    # the per-stage budget check inside run_job.
+    if est["total_usd"] > args.budget:
+        sys.stderr.write(
+            f"estimated cost ${est['total_usd']:.2f} exceeds budget ceiling "
+            f"${args.budget:.2f} — aborting (raise --budget or drop stages)\n"
+        )
+        return 1
+
+    if not _confirm(sku=args.sku, source=source, est=est):
         sys.stdout.write("aborted by user\n")
         return 1
 
@@ -151,6 +182,7 @@ async def run(argv: list[str]) -> int:
 
 
 def main() -> int:
+    """Synchronous CLI entry point. In an async context call ``run()`` directly."""
     return asyncio.run(run(sys.argv[1:]))
 
 

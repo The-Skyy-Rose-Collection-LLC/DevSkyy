@@ -31,6 +31,26 @@ _DEFAULT_COST = {
     Stage.REMESH: float(os.getenv("PIPELINE3D_TRIPO_REMESH_USD", "0.15")),
 }
 _SUPPORTED = (Stage.IMAGE_TO_3D, Stage.TEXTURE, Stage.REMESH)
+#: Extensions that count as a 3D mesh (never a texture/preview PNG).
+_MESH_EXTS = (".glb", ".gltf", ".obj", ".fbx", ".usdz", ".stl")
+
+
+def _pick_mesh(downloaded: dict) -> str | None:
+    """Select the mesh file from a tripo download dict — never a texture/preview.
+
+    The SDK's ``download_task_models`` returns a dict that may include texture
+    PNGs, normal maps, and previews alongside the mesh. Prefer the explicit
+    ``model`` key; otherwise fall back to the first value with a mesh extension.
+    Returns ``None`` if no mesh-like file is present so the caller can fail loud
+    instead of copying a PNG to ``<sku>.glb``.
+    """
+    model = downloaded.get("model")
+    if isinstance(model, str) and model:
+        return model
+    for value in downloaded.values():
+        if isinstance(value, str) and value.lower().endswith(_MESH_EXTS):
+            return value
+    return None
 
 
 class TripoAdapter:
@@ -93,18 +113,23 @@ class TripoAdapter:
 
             task = await client.wait_for_task(task_id, timeout=self._timeout)
             downloaded = await client.download_task_models(task, str(self._output_dir))
-            model_path = downloaded.get("model") or next(iter(downloaded.values()), None)
+            model_path = _pick_mesh(downloaded)
+            if model_path is None:
+                raise RuntimeError(
+                    f"tripo {stage.value} returned no mesh file (download keys={list(downloaded)})"
+                )
             output = getattr(task, "output", None)
             model_url = getattr(output, "model", None) if output is not None else None
 
-        path = Path(model_path) if model_path else None
+        # model_path is guaranteed non-None here — the RuntimeError above fires otherwise.
+        path = Path(model_path)
         return Artifact(
             provider="tripo",
             fmt="glb",
             task_id=task_id,
             model_url=model_url,
             path=path,
-            bytes=path.stat().st_size if path and path.is_file() else None,
+            bytes=path.stat().st_size if path.is_file() else None,
             meta={"tripo_status": str(getattr(task, "status", "")), "stage": stage.value},
         )
 

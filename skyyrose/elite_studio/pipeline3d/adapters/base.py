@@ -16,7 +16,12 @@ from ..models import Artifact, Stage
 
 @dataclass
 class StageContext:
-    """Mutable per-job context threaded through stages."""
+    """Per-job context threaded through stages.
+
+    Intentionally NOT frozen — unlike every other dataclass in the package.
+    ``last_artifact`` is the chaining seam the executor reassigns after each
+    stage. Do not "fix" this to ``frozen=True``; that would break chaining.
+    """
 
     sku: str
     source_image: Path

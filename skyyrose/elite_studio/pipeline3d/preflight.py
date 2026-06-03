@@ -8,10 +8,15 @@ A paid 3D job must never dispatch without a confirmed canonical source. Priority
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 _DEFAULT_SOURCE_ROOT = Path("assets/product-source")
 _IMAGE_EXTS = (".png", ".jpg", ".jpeg", ".webp")
+#: Canonical SKU shape: prefix (br/lh/sg/kids) + 3-digit number, e.g. ``br-001``.
+#: Enforced before any glob or output-path use so ``sku="*"`` / ``"../.."`` can
+#: never widen a glob or escape the output dir into a wrong (paid) product job.
+_SKU_RE = re.compile(r"^[a-z]{2,4}-\d{3}$")
 
 
 class PreflightError(RuntimeError):
@@ -25,6 +30,8 @@ def resolve_source(
     source_root: str | Path | None = None,
 ) -> Path:
     """Return the resolved source image path or raise PreflightError."""
+    if not _SKU_RE.match(sku):
+        raise PreflightError(f"invalid sku format: {sku!r} (expected like 'br-001')")
     if image is not None:
         p = Path(image)
         if not p.is_file():

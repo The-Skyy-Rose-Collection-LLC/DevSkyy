@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from skyyrose.elite_studio.pipeline3d.adapters.base import StageContext
-from skyyrose.elite_studio.pipeline3d.adapters.tripo import TripoAdapter
+from skyyrose.elite_studio.pipeline3d.adapters.tripo import TripoAdapter, _pick_mesh
 from skyyrose.elite_studio.pipeline3d.models import Artifact, Stage
 
 
@@ -100,3 +100,38 @@ async def test_texture_without_prior_task_id_raises(tmp_path):
     a = TripoAdapter(api_key="tsk_test", output_dir=tmp_path / "out")
     with pytest.raises(ValueError):
         await a.run_stage(Stage.TEXTURE, ctx)
+
+
+@pytest.mark.asyncio
+async def test_unsupported_stage_raises(tmp_path):
+    ctx = StageContext(sku="x", source_image=tmp_path / "s.png", output_dir=tmp_path / "out")
+    a = TripoAdapter(api_key="tsk_test", output_dir=tmp_path / "out")
+    with pytest.raises(ValueError, match="does not support"):
+        await a.run_stage(Stage.EXPORT, ctx)
+
+
+def test_pick_mesh_prefers_model_key():
+    assert _pick_mesh({"model": "a.glb", "texture": "t.png"}) == "a.glb"
+
+
+def test_pick_mesh_falls_back_to_mesh_extension_not_texture():
+    # No 'model' key — must pick the mesh by extension, NEVER the texture PNG.
+    picked = _pick_mesh({"base_texture": "t.png", "pbr_model": "out.glb"})
+    assert picked == "out.glb"
+
+
+def test_pick_mesh_returns_none_when_no_mesh():
+    assert _pick_mesh({"texture": "t.png", "preview": "p.jpg"}) is None
+    assert _pick_mesh({}) is None
+
+
+@pytest.mark.asyncio
+async def test_run_stage_raises_when_download_has_no_mesh(tmp_path):
+    cm, client, _ = _mock_client(tmp_path)
+    # Override download to return only a texture — adapter must NOT copy a PNG as .glb.
+    client.download_task_models = AsyncMock(return_value={"texture": str(tmp_path / "t.png")})
+    ctx = StageContext(sku="br-001", source_image=tmp_path / "src.png", output_dir=tmp_path / "out")
+    a = TripoAdapter(api_key="tsk_test", output_dir=tmp_path / "out")
+    with patch("skyyrose.elite_studio.pipeline3d.adapters.tripo.TripoClient", return_value=cm):
+        with pytest.raises(RuntimeError, match="no mesh file"):
+            await a.run_stage(Stage.IMAGE_TO_3D, ctx)

@@ -33,3 +33,16 @@ def test_different_input_hash_is_isolated(tmp_path):
 def test_get_missing_returns_none(tmp_path):
     store = StageStore(tmp_path / "store")
     assert store.get("nope", Stage.REMESH) is None
+
+
+def test_corrupt_record_is_logged_not_swallowed_silently(tmp_path, caplog):
+    import logging
+
+    store_root = tmp_path / "store"
+    store = StageStore(store_root)
+    h = "corrupt"
+    (store_root / f"{h}.json").write_text("{not valid json", encoding="utf-8")
+    with caplog.at_level(logging.WARNING):
+        assert store.has(h, Stage.IMAGE_TO_3D) is False
+        assert store.get(h, Stage.IMAGE_TO_3D) is None
+    assert any("unreadable" in r.message for r in caplog.records)

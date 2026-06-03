@@ -124,3 +124,55 @@ async def test_stage_failure_returns_partial_failed_result(tmp_path):
     assert len(result.results) == 1  # image_to_3d succeeded and is persisted
     # image_to_3d cost charged, texture not
     assert budget.spent_usd == 0.5
+
+
+class _BudgetBombAdapter:
+    """An adapter whose run_stage itself raises BudgetExceededError."""
+
+    name = "tripo"
+
+    def supports(self, stage):
+        return True
+
+    def available(self):
+        return True
+
+    def estimate_cost(self, stage, params):
+        return 0.0
+
+    async def run_stage(self, stage, ctx):
+        raise BudgetExceededError("hard stop inside stage")
+
+
+@pytest.mark.asyncio
+async def test_budget_error_from_within_stage_propagates(tmp_path):
+    # A BudgetExceededError raised DURING run_stage must propagate, not be
+    # swallowed into a soft FAILED result by the generic except.
+    router = Router([_BudgetBombAdapter()], priority=["tripo"])
+    store = StageStore(tmp_path / "store")
+    budget = RunBudget(ceiling_usd=10.0)
+    job = _job(tmp_path, (Stage.IMAGE_TO_3D,))
+    with pytest.raises(BudgetExceededError):
+        await run_job(job, router=router, store=store, budget=budget)
+
+
+@pytest.mark.asyncio
+async def test_present_but_unreadable_cache_record_is_not_skipped(tmp_path):
+    # store.has() True but store.get() None (falsy on-disk record) -> the stage is
+    # re-run rather than silently skipped (executor branch 54->59).
+    adapter = _RecordingAdapter("tripo", [Stage.IMAGE_TO_3D])
+    router = Router([adapter], priority=["tripo"])
+    store_root = tmp_path / "store"
+    store = StageStore(store_root)
+    h = "fixedhash"
+    # Write a record where the stage key exists but maps to a falsy value.
+    (store_root / f"{h}.json").write_text('{"image_to_3d": null}', encoding="utf-8")
+    assert store.has(h, Stage.IMAGE_TO_3D) is True
+    assert store.get(h, Stage.IMAGE_TO_3D) is None
+
+    budget = RunBudget(ceiling_usd=10.0)
+    job = _job(tmp_path, (Stage.IMAGE_TO_3D,))
+    result = await run_job(job, router=router, store=store, budget=budget, input_hash=h)
+
+    assert [s for s, _ in adapter.calls] == [Stage.IMAGE_TO_3D]  # re-ran, not skipped
+    assert result.status is TaskStatus.SUCCEEDED

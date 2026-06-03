@@ -14,6 +14,7 @@ Guarantees:
 
 from __future__ import annotations
 
+import json
 import time
 from pathlib import Path
 
@@ -37,7 +38,15 @@ async def run_job(
 ) -> PipelineResult:
     """Execute all requested stages and return a PipelineResult."""
     run_id = run_id or telemetry.new_run_id()
-    input_hash = input_hash or telemetry.hash_inputs(str(job.source_image), job.sku)
+    # Fold params into the cache key so a re-run with different params (e.g. a new
+    # target_polycount) never returns a stale cached mesh. Conservative by design:
+    # any param change invalidates ALL stages for this input — correctness over
+    # re-bill avoidance. Phase 3's store can refine to per-stage param fingerprints.
+    input_hash = input_hash or telemetry.hash_inputs(
+        str(job.source_image),
+        job.sku,
+        json.dumps(job.params, sort_keys=True, default=str),
+    )
 
     ctx = StageContext(
         sku=job.sku,

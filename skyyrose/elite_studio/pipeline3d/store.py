@@ -11,10 +11,13 @@ the interface (has/get/put) is identical so callers are unaffected.
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import asdict
 from pathlib import Path
 
 from .models import Artifact, Stage, StageResult
+
+log = logging.getLogger(__name__)
 
 
 class StageStore:
@@ -33,7 +36,15 @@ class StageStore:
             return {}
         try:
             return json.loads(p.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError):
+        except (json.JSONDecodeError, OSError) as exc:
+            # Don't crash a resume on a corrupt/half-written record, but never lose
+            # it silently — a swallowed record means already-paid stages re-bill.
+            log.warning(
+                "stage store unreadable at %s (%s) — treating as empty; "
+                "completed stages may re-bill on resume",
+                p,
+                exc,
+            )
             return {}
 
     def has(self, input_hash: str, stage: Stage) -> bool:
