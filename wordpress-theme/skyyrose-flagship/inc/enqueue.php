@@ -215,6 +215,25 @@ function skyyrose_enqueue_global_styles() {
 		array( 'skyyrose-design-tokens', 'skyyrose-components' ),
 		SKYYROSE_VERSION
 	);
+
+	// Cinematic hero (template-parts/hero-cinematic.php): image/video hero with a
+	// collection lockup. Loaded in <head> on content templates so this above-the-fold
+	// part never flashes unstyled. Skipped on lightweight slugs that never host it.
+	$hero_file = $use_min && file_exists( $base_dir . '/hero-cinematic.min.css' )
+		? 'hero-cinematic.min.css' : 'hero-cinematic.css';
+	$hero_skip = in_array(
+		skyyrose_get_current_template_slug(),
+		array( 'cart', 'checkout', 'blog', 'single', 'page', 'contact', '404', 'search', 'default' ),
+		true
+	);
+	if ( ! $hero_skip && file_exists( $base_dir . '/' . $hero_file ) ) {
+		wp_enqueue_style(
+			'skyyrose-hero-cinematic',
+			$base_uri . '/' . $hero_file,
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
 }
 
 /**
