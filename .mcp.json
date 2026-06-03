@@ -3,6 +3,10 @@
     "aidesigner": {
       "type": "http",
       "url": "https://api.aidesigner.ai/api/v1/mcp"
+    },
+    "gemini-api-docs-mcp": {
+      "type": "http",
+      "url": "https://gemini-api-docs-mcp.dev"
     }
   },
   "_disabled_mcpServers__claude_context_needs_milvus": {
