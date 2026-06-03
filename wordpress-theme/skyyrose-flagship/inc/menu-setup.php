@@ -130,6 +130,10 @@ function skyyrose_get_menu_definitions() {
 							'title' => __( 'The Runway', 'skyyrose' ),
 							'url'   => '/experience-signature/',
 						),
+						array(
+							'title' => __( 'Heir Apparent', 'skyyrose' ),
+							'url'   => '/experience-kids-capsule/',
+						),
 					),
 				),
 				array(
@@ -229,6 +233,10 @@ function skyyrose_get_menu_definitions() {
 							'title' => __( 'The Runway', 'skyyrose' ),
 							'url'   => '/experience-signature/',
 						),
+						array(
+							'title' => __( 'Heir Apparent', 'skyyrose' ),
+							'url'   => '/experience-kids-capsule/',
+						),
 					),
 				),
 				array(
@@ -280,6 +288,10 @@ function skyyrose_get_menu_definitions() {
 				array(
 					'title' => __( 'The Runway', 'skyyrose' ),
 					'url'   => '/experience-signature/',
+				),
+				array(
+					'title' => __( 'Heir Apparent', 'skyyrose' ),
+					'url'   => '/experience-kids-capsule/',
 				),
 			),
 		),

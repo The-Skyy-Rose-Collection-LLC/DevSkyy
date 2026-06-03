@@ -28,6 +28,20 @@ $front_url = $wc_product ? wp_get_attachment_image_url( $wc_product->get_image_i
 $back_url  = $args['image_back'] ?? ''; // Passed from catalog as the 'image' (techflat) column
 $permalink = $args['permalink'] ?? '';
 
+// WooCommerce products have no featured image set yet, so the WC path above
+// returns false. Fall back to the catalog's theme-asset render (the same
+// front_model_image the collection/landing cards already use) before the
+// generic placeholder, so /shop + PDP cards resolve from theme assets.
+if ( empty( $front_url ) && '' !== $sku && function_exists( 'skyyrose_get_product' ) ) {
+	$lookup_sku      = function_exists( 'skyyrose_normalize_sku' ) ? skyyrose_normalize_sku( $sku ) : $sku;
+	$catalog_product = skyyrose_get_product( $lookup_sku );
+	if ( $catalog_product ) {
+		$catalog_image = ( $catalog_product['front_model_image'] ?? '' ) ?: ( $catalog_product['image'] ?? '' );
+		if ( '' !== $catalog_image ) {
+			$front_url = skyyrose_product_image_uri( $catalog_image );
+		}
+	}
+}
 if ( empty( $front_url ) ) {
 	$front_url = get_theme_file_uri( 'assets/images/placeholder-product.jpg' );
 }

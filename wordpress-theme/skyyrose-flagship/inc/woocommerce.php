@@ -567,6 +567,60 @@ function skyyrose_wc_inject_product_attrs(): void {
 }
 add_action( 'woocommerce_before_shop_loop_item_title', 'skyyrose_wc_inject_product_attrs', 5 );
 
+/**
+ * Substitute the catalog ghost-mannequin render for WooCommerce products that
+ * have no featured image set, so the classic /shop loop (and any get_image()
+ * consumer) shows the garment instead of the generic WooCommerce placeholder.
+ *
+ * Guarded to act ONLY when the product has no featured image — never overrides
+ * a real featured photo the founder uploaded. Skips wp-admin so the media
+ * library and product-edit thumbnails stay intact. Ghost-first (front_model_image),
+ * byte-parity with skyyrose_catalog_to_static_card() and the holo-card fallback.
+ *
+ * @since 6.7.0
+ *
+ * @param  string     $html    Existing image HTML (placeholder when no featured image).
+ * @param  WC_Product $product Product being rendered.
+ * @param  mixed      $size    Requested image size (unused — render is fixed-size).
+ * @return string               Ghost render markup when available, else original $html.
+ */
+function skyyrose_wc_ghost_loop_image( $html, $product, $size ) {
+	unset( $size );
+	if ( is_admin() || ! $product instanceof WC_Product ) {
+		return $html;
+	}
+	if ( $product->get_image_id() ) {
+		return $html; // Real featured image exists — leave it untouched.
+	}
+	if ( ! function_exists( 'skyyrose_get_product' )
+		|| ! function_exists( 'skyyrose_normalize_sku' )
+		|| ! function_exists( 'skyyrose_product_image_uri' ) ) {
+		return $html;
+	}
+	$sku = $product->get_sku();
+	if ( '' === $sku ) {
+		return $html;
+	}
+	$catalog_product = skyyrose_get_product( skyyrose_normalize_sku( $sku ) );
+	if ( ! $catalog_product ) {
+		return $html;
+	}
+	$render = ( $catalog_product['front_model_image'] ?? '' ) ?: ( $catalog_product['image'] ?? '' );
+	if ( '' === $render ) {
+		return $html;
+	}
+	$url = skyyrose_product_image_uri( $render );
+	if ( '' === $url ) {
+		return $html;
+	}
+	return sprintf(
+		'<img src="%s" alt="%s" class="skyy-ghost-loop-img" loading="lazy" decoding="async" />',
+		esc_url( $url ),
+		esc_attr( $product->get_name() )
+	);
+}
+add_filter( 'woocommerce_product_get_image', 'skyyrose_wc_ghost_loop_image', 10, 3 );
+
 /*
 --------------------------------------------------------------
  * WC 9.9 Product Collection Filters
