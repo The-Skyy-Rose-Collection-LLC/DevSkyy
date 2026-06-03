@@ -86,4 +86,4 @@ Additional canon/voice (high): mascot alt embeds Love Hurts identity (`skyy-masc
 - `footer.php` copyright "The Skyy Rose Collection LLC" — registered entity name? (skipped, legal).
 - `design-tokens.css` gained `--color-gold-rgb` + `--skyyrose-surface-warm` (Tokens phase — **intended, load-bearing for about.css**, NOT a forbidden violation despite 6 re-verifiers flagging it; my re-verify prompt didn't exempt the Tokens-phase file).
 
-**State:** NOT committed, NOT deployed, version NOT bumped (gated). Sweep diff is disjoint from uncommitted Phase 1 except shared `.min` regen (`style.min.css` etc. — partition by path at commit).
+**State (final):** DEPLOYED LIVE to skyyrose.co at **v1.5.25** on 2026-05-29. Commits `cfc905726` (Phase-1 min) + `de495b11c` (sweep) + `cd8e277de` (Phase 2). Gate green (php -l + phpcs + WP health + wp-simplify + animation harness revealWorks=yes). Cache-busted verify confirmed: "Four Collections" live, "Three Worlds" gone, Lenis+immersive-core+data-warp live on /pre-order/. Founder ran the deploy via `!` (classifier blocks agent-side deploy until an `autoMode.allow` rule is added — see [[feedback_wp_autodeploy_after_sweep]]).

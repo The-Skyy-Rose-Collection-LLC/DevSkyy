@@ -1,5 +1,41 @@
 # Current Tasks
 
+## ACTIVE — 3D products on skyyrose.co PDPs (2026-05-31)
+
+**Decisions (founder):** Balanced KTX2+meshopt · Cloudflare R2 hosting · PDP-only · Google `<model-viewer>`.
+**Verified:** 33 GLBs `renders/3d/{sku}.glb`, avg 7.5MB / ~74% textures. No viewer in theme (April mascot stripped). `.glb` not upload-allowed (only AVIF in `inc/performance.php`). PDP = `woocommerce/single-product.php`. No R2 creds / no compression tool yet.
+
+### Phase 1 — Compress (local, no gate)
+- [ ] Install `gltfpack` (meshoptimizer; bundles Basis/KTX2)
+- [ ] Validate on br-003 (smallest): `-cc -tc`, confirm ~1–2MB + integrity
+- [ ] Batch all 33 → `renders/3d/web/{sku}.glb`
+- [ ] Report per-SKU before/after; flag non-shrinkers / degraded
+
+### Phase 2 — Theme integration (local, deploy-gated by sweep)
+- [ ] Self-host `model-viewer.min.js` → `assets/js/vendor/`
+- [ ] `SKYYROSE_3D_CDN_BASE` constant (functions.php), empty = viewer off
+- [ ] Enqueue model-viewer (`is_product()` only, ES module)
+- [ ] Inject `<model-viewer>` in `woocommerce/single-product.php`: SKU→`{CDN_BASE}/{sku}.glb`, poster=product image, lazy, reveal=interaction, camera-controls, ar
+- [ ] Graceful: no GLB for SKU → render nothing
+- [ ] `assets/css/product-3d.css` + build `.min`
+- [ ] Sweep: php -l + phpcs + WP health + /wp-simplify + animation verify
+
+### Phase 3 — R2 hosting (BLOCKED on founder; STOP-AND-SHOW on upload)
+- [ ] **NEEDS FOUNDER:** Cloudflare → R2 bucket `skyyrose-3d` → public (r2.dev or `cdn.skyyrose.co`) → API token
+- [ ] Creds → `.env.secrets` (R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, SKYYROSE_3D_CDN_BASE)
+- [ ] CORS: allow `https://skyyrose.co` GET
+- [ ] Upload script (boto3/rclone), dry-run first → **STOP-AND-SHOW** → real upload
+- [ ] Set `SKYYROSE_3D_CDN_BASE` live → viewers activate
+
+### Phase 4 — Verify live
+- [ ] Cache-busted PDP curl: `<model-viewer>` present + GLB 200 + correct MIME
+- [ ] WebGL renders desktop + mobile; poster pre-interaction
+- [ ] Docs + lessons + memory updated
+
+**Order:** Phase 1+2 now (no creds). Phase 3 waits on R2. Code ships complete; 3D activates when `SKYYROSE_3D_CDN_BASE` set.
+
+---
+
 ## Session Summary (Apr 6, 2026)
 
 ### Completed This Session

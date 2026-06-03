@@ -12,8 +12,8 @@
 <!-- PREFLIGHT-AUTO-START -->
 | Check | Result |
 |-------|--------|
-| Catalog rows | 32 / 32 parse cleanly (24 cols, `csv.reader` handles quoted descriptions) |
-| Source images present | 32 / 32 (every `image` column path resolves under `wordpress-theme/skyyrose-flagship/`) |
+| Catalog rows | 33 / 33 parse cleanly (24 cols, `csv.reader` handles quoted descriptions) |
+| Source images present | 33 / 33 (every `image` column path resolves under `wordpress-theme/skyyrose-flagship/`) |
 | Output collision guard (ADK pipeline) | **DOC (accepted)** — `renders/gated/<sku>/<sku>-<view>-render.webp` deterministic path at `agents/render_pipeline/tools/generate_image.py:264-268`. LoopAgent refine and re-dispatch both overwrite by design (decision 2026-05-12, path-b). Archive `renders/gated/<sku>/` before re-dispatch if history needed. |
 | Round-table import | clean (`python -c "from orchestration.threed_round_table import ThreeDRoundTable"`) |
 | Round-table tests | 36 / 36 passing |
@@ -52,6 +52,7 @@ Source = catalog `image` column. `LOGO` / `EXTRAS` = dossier frontmatter field p
 | lh-003 | love-hurts | OK | OK | OK | love-hurts-basketball-shorts |
 | lh-004 | love-hurts | OK | OK | OK | love-hurts-bomber-jacket |
 | lh-005 | love-hurts | OK | OK | **GAP** | the-fannie |
+| lh-006 | love-hurts | OK | OK | OK | love-hurts-joggers-white |
 | sg-001 | signature | OK | **GAP** | **GAP** | the-bridge-series-the-bay-bridge-shorts |
 | sg-002 | signature | OK | OK | OK | the-bridge-series-stay-golden-shirt |
 | sg-003 | signature | OK | **GAP** | **GAP** | the-bridge-series-stay-golden-shorts |
@@ -69,7 +70,7 @@ Source = catalog `image` column. `LOGO` / `EXTRAS` = dossier frontmatter field p
 | br-014 | black-rose | OK | OK | OK | black-is-beautiful-jersey-series-0-baseball-classic-giants |
 | br-015 | black-rose | OK | OK | OK | black-is-beautiful-jersey-series-0-baseball-classic-white |
 
-**Summary:** 29 / 32 ready for primary-logo render. 21 / 32 fully ready (logo + extras). 3 SKU(s) missing primary `logo_reference`. 11 SKU(s) missing `extra_logos`. 0 dossier file(s) absent.
+**Summary:** 30 / 33 ready for primary-logo render. 22 / 33 fully ready (logo + extras). 3 SKU(s) missing primary `logo_reference`. 11 SKU(s) missing `extra_logos`. 0 dossier file(s) absent.
 <!-- PERSKU-AUTO-END -->
 
 ## Dossier gap remediation options

@@ -40,3 +40,8 @@ These come from `~/.claude/projects/-Users-theceo-DevSkyy/memory/` and apply to 
 ## Conflict policy
 
 If a doc anywhere in this folder conflicts with the canon docs above, **the canon doc wins**. Update the conflicting doc to reference the canon. Do not edit the canon without founder sign-off. New canon decisions get appended to the relevant `docs/brand/*.md` file with a date stamp + founder-locked note.
+
+
+<claude-mem-context>
+
+</claude-mem-context>
