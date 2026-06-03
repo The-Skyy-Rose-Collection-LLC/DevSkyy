@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unified 3D Pipeline Orchestrator — Design Spec</title>
+<style>
+  :root { --rose:#B76E79; --dark:#0A0A0A; --muted:#666; --bg:#fafafa; --code:#f4f4f4; --border:#e0e0e0; }
+  body { font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color:#1a1a1a; max-width:980px; margin:0 auto; padding:2rem 1.5rem; background:var(--bg); }
+  h1 { color:var(--dark); border-bottom:3px solid var(--rose); padding-bottom:.4rem; }
+  h2 { color:var(--rose); margin-top:2.2rem; border-bottom:1px solid var(--border); padding-bottom:.2rem; }
+  h3 { color:var(--dark); margin-top:1.4rem; }
+  code { background:var(--code); padding:.1rem .35rem; border-radius:3px; font-size:.88em; font-family:"SF Mono",Menlo,Consolas,monospace; }
+  pre { background:var(--code); padding:1rem; border-radius:6px; overflow-x:auto; border:1px solid var(--border); font-size:.85em; }
+  table { border-collapse:collapse; width:100%; margin:1rem 0; font-size:.92em; }
+  th,td { border:1px solid var(--border); padding:.5rem .7rem; text-align:left; vertical-align:top; }
+  th { background:#f0e8ea; color:var(--dark); }
+  .meta { color:var(--muted); font-size:.9em; }
+  .tag { display:inline-block; background:var(--rose); color:#fff; padding:.1rem .5rem; border-radius:3px; font-size:.78em; font-weight:600; }
+  .in { color:#1a7f37; font-weight:600; }
+  .out { color:#cf222e; font-weight:600; }
+  .warn { background:#fff8e1; border-left:4px solid #f0ad4e; padding:.7rem 1rem; margin:1rem 0; }
+  .key { background:#eef6ff; border-left:4px solid #3b82f6; padding:.7rem 1rem; margin:1rem 0; }
+  blockquote { border-left:4px solid var(--rose); margin:1rem 0; padding:.4rem 1rem; color:#333; background:#fff; }
+</style>
+</head>
+<body>
+
+<h1>Unified 3D Pipeline Orchestrator</h1>
+<p class="meta"><strong>Tripo3D/Meshy pipeline-orchestration-workflow clone</strong> · DevSkyy · 2026-06-02 ·
+Status: <span class="tag">APPROVED</span> · Layer 2 (orchestration only)</p>
+
+<p>A provider-agnostic <strong>staged 3D pipeline</strong> that mirrors how Tripo3D and Meshy stage async jobs
+(<code>image-to-3D → texture/PBR → remesh → export</code>). New package; existing provider clients become
+adapters behind ports. Engine strategy: <strong>provider router with fashion-tuned stages</strong>.
+Surfaces: <strong>REST API + webhook server + CLI</strong>. Export at launch: <strong>GLB only</strong>.</p>
+
+<h2 id="scope">1. Scope</h2>
+<table>
+<tr><th>In scope</th><th>Out of scope</th></tr>
+<tr>
+<td>
+<ul>
+<li>Orchestration core (ordered stage executor)</li>
+<li>Provider router + fallback (Tripo / Meshy / TRELLIS)</li>
+<li>3 adapters wrapping existing clients</li>
+<li>3 surfaces: REST, webhook, CLI</li>
+<li>Whole-job cost gate + stage-level idempotency</li>
+<li>Telemetry, forensics manifest, async resilience (reused)</li>
+<li>Canonical-source preflight (catalog CSV + dossier)</li>
+</ul>
+</td>
+<td>
+<ul>
+<li>Web UI (that is Layer 1 — separate program)</li>
+<li>Self-hosted generative engine work (Layer 3)</li>
+<li>Auto-rig / animate (garments have no skeleton — YAGNI)</li>
+<li>USDZ / FBX / OBJ export at launch (GLB only)</li>
+<li>Fixing stale clients off the critical path (HF event-loop)</li>
+<li>Multiview-to-3D, stylize, segmentation, mesh-completion</li>
+</ul>
+</td>
+</tr>
+</table>
+
+<div class="warn">
+<strong>Per-stage honesty (from the capability audit).</strong> Only <strong>image-to-3D</strong> is "wrap an
+existing working client." In the current clients: remesh is ABSENT in <code>ai_3d/providers/meshy.py</code>,
+texture is ABSENT in <code>ai_3d/providers/tripo.py</code>, USDZ export is a broken stub
+(<code>services/three_d/trellis/postprocess.py:273-276</code>) and Meshy hardcodes GLB. So the texture and
+remesh adapters wrap <em>new</em> provider calls (Meshy <code>/remesh</code> + <code>/retexture</code>;
+Tripo <code>texture_model</code> / <code>convert_model</code>). This is real implementation work, not wiring —
+the plan must not treat stages 2–4 as glue.
+</div>
+
+<h2 id="layout">2. Module layout</h2>
+<pre>skyyrose/elite_studio/pipeline3d/
+  __init__.py
+  models.py        # frozen dataclasses: Job, JobSpec, StageSpec, Artifact, StageResult, PipelineResult
+  stages.py        # Stage port (Protocol): ImageTo3DStage, TextureStage, RemeshStage, ExportStage + StageContext
+  executor.py      # plain ordered stage runner (depends-on, skip-unrequested) — NO LangGraph
+  router.py        # provider router: capability + priority + availability -> adapter, with fallback
+  estimator.py     # whole-job cost estimate (credits->USD) computed ONCE upfront
+  store.py         # stage-level idempotency: (input_hash, stage, params) -> StageResult; resume skips done
+  poller.py        # unified async poll loop (webhook-or-timeout) over ProviderTask
+  task.py          # ProviderTask: normalized status enum (QUEUED/RUNNING/SUCCEEDED/FAILED/CANCELED)
+  preflight.py     # canonical-source resolve + hallucination guard (ported from tripo_dispatch.classify_skus)
+  adapters/
+    __init__.py
+    base.py        # Adapter Protocol: name, capabilities(), submit(), poll(), download(), estimate_cost()
+    tripo.py       # wraps agents/tripo_agent.py TripoAssetAgent  (Phase 1 primary)
+    meshy.py       # wraps ai_3d/providers/meshy.py MeshyClient (+ new remesh/retexture calls)
+    trellis.py     # wraps services/three_d/trellis TrellisProvider  (lower priority)
+
+api/v1/pipeline3d/
+  __init__.py
+  router.py        # REST: POST/GET jobs (Phase 3)
+  callbacks.py     # inbound provider webhooks + HMAC verify (Phase 3)
+  schemas.py       # Pydantic request/response models
+
+# CLI extends existing skyyrose/elite_studio/cli.py (new gen3d subcommand)</pre>
+
+<h2 id="dataflow">3. Execution spine — synchronous-within-stage</h2>
+<p>Each stage calls a blocking adapter that polls its provider to completion and returns an <code>Artifact</code>.
+Job-level concurrency comes from the <strong>existing Redis worker queue</strong> (many jobs in flight), not
+intra-job event advancement. This matches what the clients already do (TripoAssetAgent SDK polls internally,
+<code>MeshyClient._wait_for_task</code>, TrellisProvider retry loop). There is exactly <strong>one</strong>
+control model — no event-driven DAG advancement (that would race the poller).</p>
+
+<pre>Job(image, stages=[image_to_3d, texture, remesh, export], formats=[glb], budget)
+  -> preflight.resolve(sku)          # canonical source image + hallucination guard
+  -> estimator.estimate(job)         # ONE total cost, credits->USD
+  -> forensics.confirm_prompt(total) # STOP-AND-SHOW once per job (paid dispatch only)
+  -> executor.run(job):
+       for stage in ordered_stages(job.stages):        # topological by depends-on
+         if store.has(input_hash, stage, params):       # idempotent resume
+             ctx.last_artifact = store.get(...).artifact ; continue
+         adapter = router.pick(stage)                    # capability + priority + availability
+         budget.ensure_within_budget(stage_cost, stage) # raises BudgetExceededError BEFORE paid call
+         with telemetry.stage(stage_name=stage, ...) as t:
+             result = adapter.run(ctx)                   # blocking: submit -> poller.wait -> download
+         budget.spend(stage_cost, stage)
+         store.put(input_hash, stage, params, result)
+         ctx.last_artifact = result.artifact             # chain to next stage
+  -> PipelineResult(artifacts, costs, timings, manifest_path)</pre>
+
+<div class="key">
+<strong>Cross-provider chaining — the rule that makes the router real.</strong> Tripo chains by
+<code>original_model_task_id</code>, Meshy by <code>input_task_id</code> — but a Meshy task_id is meaningless
+to Tripo. So the unified <code>Artifact</code> carries <strong>both</strong>:
+<ul>
+<li><code>provider</code> + <code>task_id</code> — cheap same-provider chaining</li>
+<li><code>model_url</code> / local <code>path</code> — cross-provider handoff (both platforms accept
+<code>model_url</code> as the alternative input)</li>
+</ul>
+<strong>Router rule:</strong> if next stage's chosen adapter == producing adapter, pass <code>task_id</code>;
+else hand off the downloadable <code>model_url</code>/path. This same seam is where a self-hosted engine plugs
+in later (Layer 3) with zero workflow change.
+</div>
+
+<h3>Artifact (the chaining handle)</h3>
+<pre>@dataclass(frozen=True)
+class Artifact:
+    provider: str          # "tripo" | "meshy" | "trellis"
+    task_id: str | None    # provider-native; None for self-host/local
+    model_url: str | None  # remote download URL (may have TTL ~24h)
+    path: Path | None      # local file once downloaded
+    fmt: str               # "glb"
+    polycount: int | None
+    bytes: int | None
+    meta: dict</pre>
+
+<h2 id="router">4. Provider router + fallback</h2>
+<p><code>router.pick(stage)</code> filters adapters by <code>capabilities()</code> (supports this stage?),
+orders by configured priority, skips unavailable (missing key / circuit-open via
+<code>ai_3d/resilience.py</code>). On stage failure it tries the next capable adapter (artifact handoff).
+Default priority: <strong>Tripo → Meshy → TRELLIS</strong> (Tripo is the most complete client). Capability map:</p>
+<table>
+<tr><th>Stage</th><th>Tripo</th><th>Meshy</th><th>TRELLIS</th><th>Existing vs new</th></tr>
+<tr><td>image-to-3D</td><td>yes (SDK)</td><td>yes</td><td>yes</td><td><span class="in">wraps existing</span></td></tr>
+<tr><td>texture/PBR</td><td>yes (<code>texture_model</code>)</td><td>yes (<code>/retexture</code>)</td><td>no</td><td><span class="out">new provider calls</span></td></tr>
+<tr><td>remesh</td><td>yes (<code>convert_model</code> face_limit/quad)</td><td>yes (<code>/remesh</code>)</td><td>internal decimation</td><td><span class="out">new provider calls</span></td></tr>
+<tr><td>export GLB</td><td>yes</td><td>yes</td><td>yes</td><td><span class="in">artifact-agnostic</span></td></tr>
+</table>
+
+<h2 id="crosscutting">5. Cross-cutting — reuse, don't rebuild</h2>
+<table>
+<tr><th>Concern</th><th>Reused module</th><th>How</th></tr>
+<tr><td>Cost gate</td><td><code>elite_studio/budget.py</code> <code>RunBudget</code></td><td><code>ensure_within_budget(cost,stage)</code> before paid stage; <code>spend()</code> after; whole-job estimate up front</td></tr>
+<tr><td>STOP-AND-SHOW</td><td><code>elite_studio/forensics.py</code></td><td><code>confirm_prompt</code> once per job w/ total cost; <code>write_manifest(extra=...)</code> per job</td></tr>
+<tr><td>Telemetry</td><td><code>elite_studio/telemetry.py</code> <code>stage()</code></td><td>wrap each stage; accepts any <code>stage_name</code>; <code>hash_inputs()</code> for idempotency keys</td></tr>
+<tr><td>Async resilience</td><td><code>ai_3d/resilience.py</code> <code>ResilientAPIClient</code></td><td>circuit breaker + exp backoff around adapter network calls</td></tr>
+<tr><td>Idempotency</td><td><code>pipelines/clothing_3d</code> <code>IdempotencyCache</code></td><td>stage-level result cache keyed by <code>(input_hash, stage, params)</code></td></tr>
+<tr><td>Canonical source</td><td><code>elite_studio/sku_resolver.py</code> + catalog CSV + dossier</td><td>preflight resolves SKU→source image; ports <code>tripo_dispatch.classify_skus</code> hallucination guard</td></tr>
+<tr><td>Env / config</td><td><code>elite_studio/config.py</code></td><td>5-layer <code>.env</code> chain; model IDs; timeouts</td></tr>
+</table>
+<p><strong>Do NOT reuse:</strong> <code>ai_3d/generation_pipeline.py</code> (monolithic, no budget/telemetry, fixed
+retry) — superseded. <code>elite_studio/coordinator.py</code> Coordinator class (fashion-coupled) — only its
+<code>Logger</code> protocol. <code>platform/capability.py:_probe_engine_local</code> hardcodes TrellisAgent —
+must be made pluggable before multi-engine use.</p>
+
+<h2 id="surfaces">6. Surfaces</h2>
+
+<h3>CLI — Phase 1 driver</h3>
+<pre>python -m skyyrose.elite_studio.cli gen3d \
+    --sku br-001 \
+    --stages image-to-3d,texture,remesh,export \
+    --format glb \
+    [--provider tripo] [--go]      # dry-run by default; --go = paid dispatch</pre>
+<p>Supersedes <code>scripts/meshy_only_batch.py</code>, <code>scripts/tripo_dispatch.py</code>,
+<code>scripts/batch_3d_generation.py</code> (kept until the new path proves out, then deprecated).</p>
+
+<h3>REST API — Phase 3</h3>
+<table>
+<tr><th>Method</th><th>Path</th><th>Body / returns</th></tr>
+<tr><td>POST</td><td><code>/api/v1/3d/jobs</code></td><td>image + stages + formats → <code>job_id</code> (202)</td></tr>
+<tr><td>GET</td><td><code>/api/v1/3d/jobs/{id}</code></td><td>status / progress / artifacts</td></tr>
+<tr><td>GET</td><td><code>/api/v1/3d/jobs</code></td><td>paginated list</td></tr>
+</table>
+<p>Auth: API-key (mirror <code>api/v1/elite_studio.py</code> <code>X-API-Key</code> + dev passthrough).
+Mounts in <code>main_enterprise.py</code> after line 337 (same pattern as <code>pipeline_router</code>).
+Reuses Redis job namespace <code>3d:job:{id}</code> + the existing elite_studio worker queue.</p>
+
+<h3>Webhook — Phase 3</h3>
+<p>Inbound <code>POST /api/v1/3d/callbacks/{provider}</code> with <strong>HMAC verification</strong> — closes the
+no-auth gap on the current port-5555 receiver (<code>scripts/meshy_webhook_server.py</code>). The webhook is an
+<em>accelerator</em>: it can short-circuit a poll, but <code>poller</code> stays the source of truth
+(webhook-or-timeout, whichever fires first — webhooks get dropped). Outbound: extend
+<code>elite_studio_webhooks.py</code> <code>VALID_EVENTS</code> with <code>model.generated</code>,
+<code>model.failed</code>, <code>texture.ready</code>, <code>export.ready</code>.</p>
+
+<h2 id="money">7. Money + idempotency requirements (mandatory)</h2>
+<ul>
+<li><strong>Whole-job estimate ONCE.</strong> <code>estimator</code> sums per-stage credits→USD for the requested
+stages and shows the total via a single <code>confirm_prompt</code> before the job starts — not four prompts
+per job. Per-stage credit costs sourced from provider docs (Meshy: image-to-3D 5–30, retexture 10, remesh 5;
+Tripo: ~$0.40 image + texture/convert surcharges).</li>
+<li><strong>Paid dispatch stays gated.</strong> WordPress auto-deploy standing-auth does NOT cover paid 3D APIs.
+Default dry-run; <code>--go</code> / explicit confirm required.</li>
+<li><strong>Stage-level idempotency.</strong> A job that dies at remesh must NOT re-bill image-to-3D + texture on
+retry. Persist stage results keyed by <code>(input_hash, stage, params)</code> via
+<code>telemetry.hash_inputs()</code> + <code>IdempotencyCache</code>; resumed jobs skip completed stages.</li>
+</ul>
+
+<h2 id="phasing">8. Phasing — one spec, de-risked sequence</h2>
+<table>
+<tr><th>Phase</th><th>Deliverable</th><th>Proves</th></tr>
+<tr><td><strong>P1 — vertical slice</strong></td>
+<td>Tripo-only adapter; full chain image→texture→remesh→export-GLB; driven by <strong>CLI</strong>; wired through
+<code>RunBudget</code> + <code>confirm_prompt</code> + telemetry + stage idempotency. Produces a real GLB for one
+SKU under a cost gate.</td>
+<td>core + chaining rule + cost gate on real artifacts (the smallest end-to-end green path)</td></tr>
+<tr><td><strong>P2 — router + breadth</strong></td>
+<td>Add Meshy + TRELLIS adapters; <code>router.pick</code> fallback; cross-provider artifact handoff; batch over
+the 33-SKU catalog.</td>
+<td>multi-provider fallback + batch</td></tr>
+<tr><td><strong>P3 — service surfaces</strong></td>
+<td>REST API + Redis async worker integration; inbound webhook + HMAC; outbound typed events.</td>
+<td>Tripo/Meshy-style async API parity</td></tr>
+</table>
+
+<h2 id="testing">9. Testing</h2>
+<p>TDD per stage. <strong>Unit</strong> (mock adapters, zero paid calls): executor ordering/skip, router
+pick+fallback, estimator math, idempotency cache hit/miss, status normalization (Meshy UPPERCASE + Tripo
+lowercase → one enum), artifact chaining (same-provider task_id vs cross-provider model_url).
+<strong>Integration</strong>: one real Tripo dispatch behind a <code>--go</code> + env gate (manual,
+cost-confirmed). Target 85%+ coverage on the new package. Every paid path defaults to dry-run.</p>
+
+<h2 id="risks">10. Risks &amp; decisions</h2>
+<table>
+<tr><th>Risk</th><th>Mitigation</th></tr>
+<tr><td>Duplicate Meshy clients (v1 <code>ai_3d</code> vs v2 <code>agents</code>, file-path vs URL input)</td><td>Adapter picks ONE — <code>ai_3d/providers/meshy.py</code> (rate-limit + retexture); document the choice</td></tr>
+<tr><td>Artifact URL TTL ~24h (Tripo)</td><td>Download to local <code>path</code> immediately on stage success; never chain a stale URL</td></tr>
+<tr><td>TRELLIS Modal backend missing, USDZ stub broken</td><td>TRELLIS image-to-3D only at P2; no TRELLIS export-USDZ promise</td></tr>
+<tr><td>Webhook drop</td><td>Poller is source of truth; webhook only accelerates</td></tr>
+<tr><td><code>RunBudget._lock</code> is ClassVar (shared)</td><td>Known low-risk; acceptable for sequential worker; note for later</td></tr>
+</table>
+
+<p class="meta">Decisions locked via brainstorming Q&amp;A: Layer 2 orchestration · provider router + fashion-tuned
+stages · new package wrapping existing clients · REST+webhook+CLI surfaces · GLB-only at launch ·
+synchronous-within-stage spine · no LangGraph · effort=ultracode for the build.</p>
+
+</body>
+</html>
