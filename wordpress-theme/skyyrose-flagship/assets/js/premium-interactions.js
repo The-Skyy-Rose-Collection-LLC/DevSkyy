@@ -281,4 +281,57 @@
 		setTimeout(function () { window.location.href = href; }, 300);
 	});
 
+	/* ══════════════════════════════════════════════════════════════════
+	   8. SCROLL-PINNED NARRATIVE
+	   Drives template-parts/pin-narrative.php. The tall .pin-narrative
+	   section holds a sticky stage; scroll progress through the section
+	   maps to the active beat index. Adds .is-pinned to switch the layout
+	   from readable flow to the cross-fading sticky stage (CSS owns the
+	   transitions). prefersReduced already returned above, so this never
+	   runs for reduced-motion users — they keep the flow layout.
+	   ══════════════════════════════════════════════════════════════════ */
+
+	function setupPinNarrative(section) {
+		var beats = section.querySelectorAll('.pin-beat');
+		var dots  = section.querySelectorAll('.pin-narrative__dot');
+		if (beats.length < 2) return;
+
+		section.classList.add('is-pinned');
+
+		var current = -1;
+		function setActive(idx) {
+			if (idx === current) return;
+			current = idx;
+			for (var b = 0; b < beats.length; b++) {
+				beats[b].classList.toggle('is-active', b === idx);
+			}
+			for (var d = 0; d < dots.length; d++) {
+				dots[d].classList.toggle('is-active', d === idx);
+			}
+		}
+		setActive(0);
+
+		var ticking = false;
+		function onScroll() {
+			if (ticking) return;
+			ticking = true;
+			rAF(function () {
+				var rect  = section.getBoundingClientRect();
+				var vh    = window.innerHeight;
+				var total = section.offsetHeight - vh;
+				if (total <= 0) { setActive(0); ticking = false; return; }
+				var scrolled = Math.min(Math.max(-rect.top, 0), total);
+				var progress = scrolled / total;
+				var idx = Math.min(beats.length - 1, Math.floor(progress * beats.length));
+				setActive(idx < 0 ? 0 : idx);
+				ticking = false;
+			});
+		}
+		window.addEventListener('scroll', onScroll, { passive: true });
+		window.addEventListener('resize', onScroll, { passive: true });
+		onScroll();
+	}
+
+	document.querySelectorAll('.pin-narrative').forEach(setupPinNarrative);
+
 })();

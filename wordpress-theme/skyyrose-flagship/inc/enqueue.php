@@ -573,6 +573,21 @@ function skyyrose_enqueue_template_styles() {
 		}
 	}
 
+	// Scroll-pinned brand narrative — collection pages + landing pages.
+	// Driver lives in the global premium-interactions.js; only the CSS is gated.
+	if ( in_array( $slug, array( 'collection-standalone', 'landing', 'elementor-editorial' ), true ) ) {
+		$pin_css = $use_min && file_exists( $base_css_dir . '/pin-narrative.min.css' )
+			? 'pin-narrative.min.css' : 'pin-narrative.css';
+		if ( file_exists( $base_css_dir . '/' . $pin_css ) ) {
+			wp_enqueue_style(
+				'skyyrose-pin-narrative',
+				$base_css_uri . '/' . $pin_css,
+				array( 'skyyrose-design-tokens' ),
+				SKYYROSE_VERSION
+			);
+		}
+	}
+
 	// WooCommerce page-specific CSS (loaded ON TOP of the base woocommerce.css).
 	$woo_page_styles = array(
 		// single-product.css is the primary stylesheet (replaces woocommerce-single.css).

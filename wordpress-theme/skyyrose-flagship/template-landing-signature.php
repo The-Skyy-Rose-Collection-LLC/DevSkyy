@@ -86,6 +86,12 @@ get_header();
 	<?php
 	/* ── 5. Product Grid ─────────────────────────────────────────── */
 	get_template_part(
+		'template-parts/pin-narrative',
+		null,
+		array( 'slug' => 'signature' )
+	);
+
+	get_template_part(
 		'template-parts/landing/product-grid',
 		null,
 		array(

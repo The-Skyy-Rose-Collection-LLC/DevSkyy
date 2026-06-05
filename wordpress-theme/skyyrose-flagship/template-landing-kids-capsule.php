@@ -111,6 +111,12 @@ get_header();
 	 * 5. PRODUCT GRID
 	 * ══════════════════════════════════════════════════════════════ */
 	get_template_part(
+		'template-parts/pin-narrative',
+		null,
+		array( 'slug' => 'kids-capsule' )
+	);
+
+	get_template_part(
 		'template-parts/landing/product-grid',
 		null,
 		array(

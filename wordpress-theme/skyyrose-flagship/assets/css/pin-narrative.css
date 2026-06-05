@@ -1,0 +1,188 @@
+/**
+ * Scroll-Pinned Brand Narrative
+ *
+ * Sticky, scroll-driven founder-canon sequence. Shared by the 4 collection
+ * pages and the 4 landing pages. All palette/typography pulls from the per-
+ * collection tokens in design-tokens.css (--skyyrose-accent, --skyyrose-bg,
+ * --skyyrose-text, --skyyrose-font-display …) so each collection inherits its
+ * own colourway via the [data-collection] attribute on the page wrapper.
+ *
+ * Two layout modes:
+ *   1. Default (no JS / reduced-motion): beats render in normal flow, every
+ *      line readable, no pinning.
+ *   2. .is-pinned (added by premium-interactions.js on capable devices): the
+ *      stage sticks to the viewport and beats cross-fade one at a time as the
+ *      tall outer section scrolls past.
+ *
+ * @package SkyyRose
+ * @since   1.1.3
+ */
+
+.pin-narrative {
+	position: relative;
+	width: 100%;
+	background: var(--skyyrose-bg, #0a0a0a);
+	color: var(--skyyrose-text, #f5f5f5);
+}
+
+/* ── Default flow mode (no JS): readable stacked beats ───────────────── */
+.pin-narrative__stage {
+	max-width: 72rem;
+	margin: 0 auto;
+	padding: clamp(4rem, 10vw, 8rem) 1.5rem;
+}
+
+.pin-narrative__beats {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+.pin-beat {
+	display: grid;
+	gap: 0.75rem;
+	max-width: 46rem;
+}
+
+.pin-beat__num {
+	font-family: var(--skyyrose-font-ui, "Bebas Neue", sans-serif);
+	font-size: clamp(1rem, 2vw, 1.25rem);
+	letter-spacing: 0.35em;
+	color: var(--skyyrose-accent, #b76e79);
+}
+
+.pin-beat__label {
+	font-family: var(--skyyrose-font-ui, "Bebas Neue", sans-serif);
+	font-size: clamp(0.75rem, 1.4vw, 0.9rem);
+	letter-spacing: 0.3em;
+	text-transform: uppercase;
+	color: var(--skyyrose-text-muted, rgba(245, 245, 245, 0.6));
+}
+
+.pin-beat__text {
+	margin: 0;
+	font-family: var(--skyyrose-font-display, "Playfair Display", serif);
+	font-size: clamp(1.9rem, 5.5vw, 4rem);
+	line-height: 1.08;
+	font-weight: 500;
+	color: var(--skyyrose-text, #f5f5f5);
+}
+
+.pin-narrative__progress {
+	display: none;
+}
+
+/* ── Pinned mode (.is-pinned): sticky stage + cross-fading beats ─────── */
+.pin-narrative.is-pinned {
+	min-height: calc(var(--pin-count, 3) * 88vh);
+}
+
+.pin-narrative.is-pinned .pin-narrative__stage {
+	position: sticky;
+	top: 0;
+	max-width: none;
+	min-height: 100vh;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+}
+
+.pin-narrative.is-pinned .pin-narrative__beats {
+	position: relative;
+	display: block;
+	width: min(90vw, 64rem);
+	padding: 0 1.5rem;
+}
+
+.pin-narrative.is-pinned .pin-beat {
+	position: absolute;
+	inset: 0;
+	margin: auto;
+	max-width: none;
+	height: max-content;
+	align-content: center;
+	opacity: 0;
+	transform: translateY(2.5rem);
+	transition:
+		opacity 0.7s var(--skyyrose-ease, cubic-bezier(0.16, 1, 0.3, 1)),
+		transform 0.7s var(--skyyrose-ease, cubic-bezier(0.16, 1, 0.3, 1));
+	pointer-events: none;
+}
+
+.pin-narrative.is-pinned .pin-beat.is-active {
+	opacity: 1;
+	transform: translateY(0);
+	pointer-events: auto;
+}
+
+.pin-narrative.is-pinned .pin-beat__num {
+	font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+}
+
+/* Progress dots — visible only in pinned mode */
+.pin-narrative.is-pinned .pin-narrative__progress {
+	position: absolute;
+	right: clamp(1.25rem, 4vw, 3rem);
+	top: 50%;
+	transform: translateY(-50%);
+	display: flex;
+	flex-direction: column;
+	gap: 0.85rem;
+}
+
+.pin-narrative__dot {
+	width: 0.5rem;
+	height: 0.5rem;
+	border-radius: 50%;
+	background: var(--skyyrose-text-muted, rgba(245, 245, 245, 0.3));
+	opacity: 0.4;
+	transition:
+		opacity 0.4s ease,
+		transform 0.4s ease,
+		background-color 0.4s ease;
+}
+
+.pin-narrative__dot.is-active {
+	background: var(--skyyrose-accent, #b76e79);
+	opacity: 1;
+	transform: scale(1.5);
+}
+
+/* ── Reduced motion: force flow mode, no transitions ─────────────────── */
+@media (prefers-reduced-motion: reduce) {
+	.pin-narrative.is-pinned {
+		min-height: 0;
+	}
+
+	.pin-narrative.is-pinned .pin-narrative__stage {
+		position: static;
+		min-height: 0;
+		max-width: 72rem;
+		margin: 0 auto;
+		padding: clamp(4rem, 10vw, 8rem) 1.5rem;
+		display: block;
+	}
+
+	.pin-narrative.is-pinned .pin-narrative__beats {
+		display: grid;
+		gap: clamp(2.5rem, 6vw, 4.5rem);
+		width: auto;
+	}
+
+	.pin-narrative.is-pinned .pin-beat {
+		position: static;
+		opacity: 1;
+		transform: none;
+		transition: none;
+		pointer-events: auto;
+	}
+
+	.pin-narrative.is-pinned .pin-narrative__progress {
+		display: none;
+	}
+}

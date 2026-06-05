@@ -160,6 +160,15 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		</div>
 	</section>
 
+	<!-- ════ Pinned Brand Narrative ════ -->
+	<?php
+	get_template_part(
+		'template-parts/pin-narrative',
+		null,
+		array( 'slug' => $slug )
+	);
+	?>
+
 	<!-- ════ CTA ════ -->
 	<section class="col-cta rv-blur">
 		<h2 class="col-cta__title"><?php echo esc_html( $c['cta_title'] ); ?></h2>

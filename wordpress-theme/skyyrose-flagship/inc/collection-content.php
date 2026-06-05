@@ -51,6 +51,23 @@ function skyyrose_get_collection_content( $slug ) {
 			'divider_icon'        => '&#x25C6;',
 			'quote_text'          => __( '"Where I\'m from, black isn\'t a color — it\'s armor. Every kid on my block knew that. Black Rose is that truth made into fabric. You don\'t wear it to stand out. You wear it because you already stood up."', 'skyyrose' ),
 			'quote_cite'          => __( 'Corey Foster, Oakland', 'skyyrose' ),
+			'pin_beats'           => array(
+				array(
+					'num'   => '01',
+					'label' => __( 'The Posture', 'skyyrose' ),
+					'text'  => __( 'A black rose is a posture. Not a flower — a conviction.', 'skyyrose' ),
+				),
+				array(
+					'num'   => '02',
+					'label' => __( 'The Armor', 'skyyrose' ),
+					'text'  => __( 'Where I\'m from, black isn\'t a color — it\'s armor.', 'skyyrose' ),
+				),
+				array(
+					'num'   => '03',
+					'label' => __( 'Stand Up', 'skyyrose' ),
+					'text'  => __( 'You don\'t wear it to stand out. You wear it because you already stood up.', 'skyyrose' ),
+				),
+			),
 			'features_heading'    => __( 'The Philosophy', 'skyyrose' ),
 			'features_subheading' => __( 'Every stitch, every detail is designed to empower you to move through the world on your own terms.', 'skyyrose' ),
 			'features'            => array(
@@ -108,6 +125,23 @@ function skyyrose_get_collection_content( $slug ) {
 			'divider_icon'        => '&#x1F339;',
 			'quote_text'          => __( '"Every petal that falls is a lesson. Every thorn is a boundary. The enchanted rose doesn\'t die — it transforms. Just like us."', 'skyyrose' ),
 			'quote_cite'          => __( 'From Grit to Grace', 'skyyrose' ),
+			'pin_beats'           => array(
+				array(
+					'num'   => '01',
+					'label' => __( 'Grandmother\'s Truth', 'skyyrose' ),
+					'text'  => __( 'Love hurts, baby. That\'s how you know it\'s real.', 'skyyrose' ),
+				),
+				array(
+					'num'   => '02',
+					'label' => __( 'The Rose Under Glass', 'skyyrose' ),
+					'text'  => __( 'Even the Beast kept a rose under glass — protecting the most fragile thing he ever loved.', 'skyyrose' ),
+				),
+				array(
+					'num'   => '03',
+					'label' => __( 'The Transformation', 'skyyrose' ),
+					'text'  => __( 'The enchanted rose doesn\'t die — it transforms. Just like us.', 'skyyrose' ),
+				),
+			),
 			'features_heading'    => __( 'The Emotional Architecture', 'skyyrose' ),
 			'features_subheading' => __( 'Crimson for the blood we share. Deep purple for the bruises that became wisdom. Burgundy for the wine grandmama poured when she said, "Baby, you survived another one."', 'skyyrose' ),
 			'features'            => array(
@@ -165,6 +199,23 @@ function skyyrose_get_collection_content( $slug ) {
 			'divider_icon'        => '&#x2726;',
 			'quote_text'          => __( '"Four years ago I never would have thought I\'d be here. I had no drive, lost it all, a baby on the way, and was broke. But we knew we had to get it by any means necessary. Signature is the proof that your circumstances don\'t define your destination."', 'skyyrose' ),
 			'quote_cite'          => __( 'Corey Foster, Oakland', 'skyyrose' ),
+			'pin_beats'           => array(
+				array(
+					'num'   => '01',
+					'label' => __( 'The First Rose', 'skyyrose' ),
+					'text'  => __( 'I drew the first rose on a night I couldn\'t afford dinner.', 'skyyrose' ),
+				),
+				array(
+					'num'   => '02',
+					'label' => __( 'From Concrete', 'skyyrose' ),
+					'text'  => __( 'Luxury grows from concrete — and I meant that literally.', 'skyyrose' ),
+				),
+				array(
+					'num'   => '03',
+					'label' => __( 'The Proof', 'skyyrose' ),
+					'text'  => __( 'Your circumstances don\'t define your destination.', 'skyyrose' ),
+				),
+			),
 			'features_heading'    => __( 'Built from Nothing', 'skyyrose' ),
 			'features_subheading' => __( 'Every Signature piece carries the same stubbornness that built the brand — failed websites, scammer manufacturers, single parenthood with zero support. We refused to cut corners then. We refuse now.', 'skyyrose' ),
 			'features'            => array(
@@ -222,6 +273,23 @@ function skyyrose_get_collection_content( $slug ) {
 			'divider_icon'        => '&#x2726;',
 			'quote_text'          => __( '"I built SkyyRose so my daughter would never have to wonder if she was enough. Every piece in Kids Capsule carries that — a father\'s promise that she can be anything, wear anything, own any room she walks into."', 'skyyrose' ),
 			'quote_cite'          => __( 'Corey Foster, Father & Founder', 'skyyrose' ),
+			'pin_beats'           => array(
+				array(
+					'num'   => '01',
+					'label' => __( 'Her Name', 'skyyrose' ),
+					'text'  => __( 'The whole brand is named after her — Skyy Rose. My daughter.', 'skyyrose' ),
+				),
+				array(
+					'num'   => '02',
+					'label' => __( 'Scaled Down', 'skyyrose' ),
+					'text'  => __( 'No pastels. No cartoons. Scaled down but never dumbed down.', 'skyyrose' ),
+				),
+				array(
+					'num'   => '03',
+					'label' => __( 'The Seat', 'skyyrose' ),
+					'text'  => __( 'Legacy is not inherited. It is worn.', 'skyyrose' ),
+				),
+			),
 			'features_heading'    => __( 'Built Different', 'skyyrose' ),
 			'features_subheading' => __( 'The same philosophy that built SkyyRose — uncompromising quality, dark luxury DNA, built different.', 'skyyrose' ),
 			'features'            => array(
