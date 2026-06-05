@@ -194,6 +194,17 @@ $arrow_svg = '<svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns=
 		</div>
 	</section>
 
+	<!-- Featured Video — The Blox interview (relocated above Chapter I) -->
+	<?php
+	get_template_part(
+		'template-parts/about/featured-video',
+		null,
+		array(
+			'youtube_embed_id' => $youtube_embed_id,
+		)
+	);
+	?>
+
 	<!-- Chapter I — The Rebrand -->
 	<?php
 	get_template_part(
@@ -255,7 +266,7 @@ $arrow_svg = '<svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns=
 		null,
 		array(
 			'allowed_inline'   => $allowed_inline,
-			'youtube_embed_id' => $youtube_embed_id,
+			'youtube_embed_id' => '', // Relocated to featured-video partial below the hero; press grid keeps the Blox poster.
 			'press_features'   => $press_features,
 			'arrow_svg'        => $arrow_svg,
 		)

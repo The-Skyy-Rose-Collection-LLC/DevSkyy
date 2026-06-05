@@ -96,6 +96,8 @@ get_header();
 	<!-- ══════════════════════════════════════════════════════════════
 		4. PARALLAX BANNER
 		══════════════════════════════════════════════════════════════ -->
+	<?php get_template_part( 'template-parts/pin-narrative', null, array( 'slug' => 'black-rose' ) ); ?>
+
 	<div class="lp-parallax lp-rv">
 		<div class="lp__container">
 			<p class="lp-parallax__text"><?php echo esc_html( '200 Pieces. Numbered. Never Restocked.' ); ?></p>

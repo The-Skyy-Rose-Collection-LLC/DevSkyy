@@ -76,6 +76,26 @@ function skyyrose_get_collection_content( $slug ) {
 			'cta_btn'             => __( 'Shop Black Rose', 'skyyrose' ),
 			'newsletter_text'     => __( 'First access to new drops, behind-the-scenes stories, and the darkness behind each piece.', 'skyyrose' ),
 			'email_id'            => 'br-email',
+			'pin_beats'           => array(
+				array(
+					'label'  => __( '01 — THE POSTURE', 'skyyrose' ),
+					'lead'   => __( 'Not a flower —', 'skyyrose' ),
+					'accent' => __( 'a conviction.', 'skyyrose' ),
+					'sub'    => __( 'Black Rose / Oakland', 'skyyrose' ),
+				),
+				array(
+					'label'  => __( '02 — THE ANSWER', 'skyyrose' ),
+					'lead'   => __( 'Every piece in Black Rose is', 'skyyrose' ),
+					'accent' => __( 'the concrete answering back.', 'skyyrose' ),
+					'sub'    => __( 'Black Rose / The Town', 'skyyrose' ),
+				),
+				array(
+					'label'  => __( '03 — THE STAND', 'skyyrose' ),
+					'lead'   => __( 'You wear it because', 'skyyrose' ),
+					'accent' => __( 'you already stood up.', 'skyyrose' ),
+					'sub'    => __( 'Black Rose / Collection I', 'skyyrose' ),
+				),
+			),
 		),
 
 		/* ── Love Hurts ─────────────────────────────────────────── */
@@ -133,6 +153,26 @@ function skyyrose_get_collection_content( $slug ) {
 			'cta_btn'             => __( 'Shop Love Hurts', 'skyyrose' ),
 			'newsletter_text'     => __( 'First access to new drops and the stories behind every petal.', 'skyyrose' ),
 			'email_id'            => 'lh-email',
+			'pin_beats'           => array(
+				array(
+					'label'  => __( '01 — THE BEAST', 'skyyrose' ),
+					'lead'   => __( 'They called me Beast.', 'skyyrose' ),
+					'accent' => __( 'They were right.', 'skyyrose' ),
+					'sub'    => __( 'Love Hurts / Collection II', 'skyyrose' ),
+				),
+				array(
+					'label'  => __( '02 — THE GLASS', 'skyyrose' ),
+					'lead'   => __( 'even the Beast kept a rose under glass —', 'skyyrose' ),
+					'accent' => __( 'protecting the most fragile thing he ever loved.', 'skyyrose' ),
+					'sub'    => __( 'Love Hurts / The Rose', 'skyyrose' ),
+				),
+				array(
+					'label'  => __( '03 — THE TURN', 'skyyrose' ),
+					'lead'   => __( 'From concrete to runway.', 'skyyrose' ),
+					'accent' => __( 'From grief to grace.', 'skyyrose' ),
+					'sub'    => __( 'Love Hurts / The Bloodline', 'skyyrose' ),
+				),
+			),
 		),
 
 		/* ── Signature ──────────────────────────────────────────── */
@@ -190,6 +230,26 @@ function skyyrose_get_collection_content( $slug ) {
 			'cta_btn'             => __( 'Shop Signature', 'skyyrose' ),
 			'newsletter_text'     => __( 'Early access to new drops, behind-the-scenes stories, and first dibs on each piece.', 'skyyrose' ),
 			'email_id'            => 'sig-email',
+			'pin_beats'           => array(
+				array(
+					'label'  => __( '01 — THE ORIGIN', 'skyyrose' ),
+					'lead'   => __( 'The origin. The main event.', 'skyyrose' ),
+					'accent' => __( 'The birth of it all.', 'skyyrose' ),
+					'sub'    => __( 'Signature / Collection I', 'skyyrose' ),
+				),
+				array(
+					'label'  => __( '02 — PERMANENT', 'skyyrose' ),
+					'lead'   => __( 'Signature is that night', 'skyyrose' ),
+					'accent' => __( 'made permanent.', 'skyyrose' ),
+					'sub'    => __( 'Signature / Oakland', 'skyyrose' ),
+				),
+				array(
+					'label'  => __( '03 — THE CONCRETE', 'skyyrose' ),
+					'lead'   => __( 'luxury grows from concrete —', 'skyyrose' ),
+					'accent' => __( 'and I meant that literally.', 'skyyrose' ),
+					'sub'    => __( 'Signature / The Founder', 'skyyrose' ),
+				),
+			),
 		),
 
 		/* ── Kids Capsule ───────────────────────────────────────── */
@@ -246,6 +306,20 @@ function skyyrose_get_collection_content( $slug ) {
 			'cta_btn'             => __( 'Shop Kids Capsule', 'skyyrose' ),
 			'newsletter_text'     => __( 'Be first to know about new Kids Capsule drops and family previews.', 'skyyrose' ),
 			'email_id'            => 'kc-email',
+			'pin_beats'           => array(
+				array(
+					'label'  => __( '01 — THE LEGACY', 'skyyrose' ),
+					'lead'   => __( 'legacy is not inherited.', 'skyyrose' ),
+					'accent' => __( 'It is worn.', 'skyyrose' ),
+					'sub'    => __( 'Kids Capsule / Family', 'skyyrose' ),
+				),
+				array(
+					'label'  => __( '02 — NO PASTELS', 'skyyrose' ),
+					'lead'   => __( 'No pastels.', 'skyyrose' ),
+					'accent' => __( 'No cartoons.', 'skyyrose' ),
+					'sub'    => __( 'Kids Capsule / Skyy Rose', 'skyyrose' ),
+				),
+			),
 		),
 	);
 

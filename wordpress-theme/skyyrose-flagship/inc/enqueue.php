@@ -523,6 +523,20 @@ function skyyrose_enqueue_template_styles() {
 		}
 	}
 
+	// Scroll-pinned brand-narrative styles — collection + landing templates.
+	if ( in_array( $slug, array( 'collection-standalone', 'landing' ), true ) ) {
+		$pin_css = $use_min && file_exists( $base_css_dir . '/pin-narrative.min.css' )
+			? 'pin-narrative.min.css' : 'pin-narrative.css';
+		if ( file_exists( $base_css_dir . '/' . $pin_css ) ) {
+			wp_enqueue_style(
+				'skyyrose-pin-narrative',
+				$base_css_uri . '/' . $pin_css,
+				array( 'skyyrose-design-tokens' ),
+				SKYYROSE_VERSION
+			);
+		}
+	}
+
 	// Immersive scene images — overlays, tab bar, cinematic toggle, particles.
 	if ( 'immersive' === $slug ) {
 		$scenes_file = $use_min && file_exists( $base_css_dir . '/immersive-scenes.min.css' )

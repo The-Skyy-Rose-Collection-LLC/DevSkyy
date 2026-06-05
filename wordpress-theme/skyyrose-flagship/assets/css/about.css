@@ -653,6 +653,16 @@
 	color: var(--skyyrose-surface-warm);
 }
 
+/* Featured video — Blox interview relocated directly beneath the hero. */
+.abt-featured-video {
+	background: var(--skyyrose-bg);
+	padding: clamp(48px, 7vw, 96px) clamp(24px, 6vw, 120px);
+	border-bottom: 1px solid rgba(245, 241, 235, 0.08);
+}
+.abt-featured-video .abt-press__video {
+	margin-bottom: 0;
+}
+
 .abt-press__video {
 	margin: 0 auto clamp(64px, 8vw, 120px);
 	max-width: 1100px;

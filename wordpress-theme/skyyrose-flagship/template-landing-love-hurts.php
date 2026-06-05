@@ -85,6 +85,8 @@ get_header();
 	</section>
 
 	<?php /* ───── 4. Parallax Banner ───── */ ?>
+	<?php get_template_part( 'template-parts/pin-narrative', null, array( 'slug' => 'love-hurts' ) ); ?>
+
 	<section class="lp-parallax" aria-label="Statement">
 		<div class="lp-parallax__text lp-rv">
 			<p><?php echo esc_html( 'Wear Your Heart. Own Your Scars.' ); ?></p>

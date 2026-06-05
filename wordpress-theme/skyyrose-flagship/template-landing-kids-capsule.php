@@ -99,6 +99,8 @@ get_header();
 	<!-- ══════════════════════════════════════════════════════════════
 		4. PARALLAX BANNER
 		══════════════════════════════════════════════════════════════ -->
+	<?php get_template_part( 'template-parts/pin-narrative', null, array( 'slug' => 'kids-capsule' ) ); ?>
+
 	<div class="lp-parallax lp-rv">
 		<div class="lp__container">
 			<p class="lp-parallax__text"><?php echo esc_html( 'Mini Luxury. Maximum Legacy.' ); ?></p>

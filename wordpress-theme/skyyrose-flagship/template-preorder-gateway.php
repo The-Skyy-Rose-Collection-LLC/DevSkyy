@@ -63,13 +63,26 @@ get_header();
 <main id="primary" class="site-main preorder-gateway" role="main" tabindex="-1"
 	data-collection=""><?php // data-collection wired for immersive-core.js Cap A/C detection; empty = no palette override on this multi-collection page ?>
 
-	<!-- ==================== HERO ==================== -->
-	<section class="hero" id="hero" data-scroll-fade>
-		<span class="hero__badge rv-blur-down"><?php esc_html_e( 'Exclusive Access', 'skyyrose' ); ?></span>
-		<h1 class="hero__title rv-split-char"><?php esc_html_e( 'Pre-Order', 'skyyrose' ); ?></h1>
-		<p class="hero__tagline rv-split-word"><?php esc_html_e( 'Secure Your Pieces Before They Drop', 'skyyrose' ); ?></p>
-		<p class="hero__subtitle rv-blur"><?php esc_html_e( 'Luxury Grows from Concrete.', 'skyyrose' ); ?></p>
-	</section>
+	<!-- ==================== HERO (cinematic video) ==================== -->
+	<?php
+	get_template_part(
+		'template-parts/hero-cinematic',
+		null,
+		array(
+			'collection' => '', // empty → :root rose-gold palette for the multi-collection gateway.
+			'image'      => SKYYROSE_ASSETS_URI . '/images/preorder-hero-poster.jpg',
+			'image_webp' => SKYYROSE_ASSETS_URI . '/images/preorder-hero-poster.webp',
+			'video'      => SKYYROSE_ASSETS_URI . '/video/preorder-hero.mp4',
+			'video_webm' => SKYYROSE_ASSETS_URI . '/video/preorder-hero.webm',
+			'lockup'     => SKYYROSE_ASSETS_URI . '/images/hero-overlays/sig-brand-skyy-rose-gold.webp',
+			'lockup_alt' => esc_html__( 'Skyy Rose', 'skyyrose' ),
+			'eyebrow'    => esc_html__( 'Exclusive Access', 'skyyrose' ),
+			'body'       => __( 'Secure your pieces before they drop. Luxury Grows from Concrete.', 'skyyrose' ),
+			'cta_label'  => __( 'Browse Collections', 'skyyrose' ),
+			'cta_url'    => '#showcase',
+		)
+	);
+	?>
 
 	<!-- ==================== SHOWCASE GRID ==================== -->
 	<section class="showcase" id="showcase"

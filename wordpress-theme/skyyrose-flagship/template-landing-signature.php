@@ -77,6 +77,8 @@ get_header();
 	</section>
 
 	<!-- ── 4. Parallax Banner ────────────────────────────────────── -->
+	<?php get_template_part( 'template-parts/pin-narrative', null, array( 'slug' => 'signature' ) ); ?>
+
 	<section class="lp-parallax lp-rv">
 		<div class="lp-parallax__text">
 			<span><?php echo esc_html( 'Everyday Doesn\'t Mean Ordinary.' ); ?></span>

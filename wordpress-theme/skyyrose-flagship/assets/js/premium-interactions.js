@@ -281,4 +281,61 @@
 		setTimeout(function () { window.location.href = href; }, 300);
 	});
 
+	/* ══════════════════════════════════════════════════════════════════
+	   PIN-NARRATIVE — scroll-pinned brand manifesto
+	   Sticky stage holds while collection beats cross-fade. Data-driven
+	   off the DOM; self-skips under reduced motion (CSS shows beats static).
+	   ══════════════════════════════════════════════════════════════════ */
+	(function () {
+		var track = document.querySelector('.pin-track');
+		if (!track || prefersReduced) { return; }
+		var stage = track.querySelector('.pin-stage');
+		var beats = Array.prototype.slice.call(track.querySelectorAll('.pin-beat'));
+		var pips = Array.prototype.slice.call(track.querySelectorAll('.pin-pip'));
+		var counter = track.querySelector('.pin-counter');
+		var live = track.querySelector('.pin-sr-live');
+		var n = beats.length;
+		if (!n) { return; }
+
+		track.style.setProperty('--pin-track-height', (n * 100) + 'vh');
+
+		function pad(x) { return (x < 10 ? '0' : '') + x; }
+		var current = -1;
+		var pinTicking = false;
+
+		function setBeat(idx) {
+			if (idx === current) { return; }
+			current = idx;
+			for (var i = 0; i < n; i++) {
+				beats[i].classList.toggle('is-active', i === idx);
+				if (pips[i]) { pips[i].classList.toggle('is-active', i === idx); }
+			}
+			if (counter) { counter.textContent = pad(idx + 1) + ' / ' + pad(n); }
+			if (live) {
+				var h = beats[idx].querySelector('.pin-beat__headline');
+				live.textContent = h ? h.textContent.replace(/\s+/g, ' ').trim() : '';
+			}
+		}
+
+		function onPinScroll() {
+			pinTicking = false;
+			var rect = track.getBoundingClientRect();
+			var runway = track.offsetHeight - (stage ? stage.offsetHeight : window.innerHeight);
+			if (runway <= 0) { setBeat(0); return; }
+			var progress = (-rect.top) / runway;
+			progress = progress < 0 ? 0 : (progress > 1 ? 1 : progress);
+			setBeat(Math.min(n - 1, Math.floor(progress * n)));
+		}
+
+		function requestPin() {
+			if (pinTicking) { return; }
+			pinTicking = true;
+			requestAnimationFrame(onPinScroll);
+		}
+
+		window.addEventListener('scroll', requestPin, { passive: true });
+		window.addEventListener('resize', requestPin, { passive: true });
+		onPinScroll();
+	})();
+
 })();

@@ -15,9 +15,10 @@
  *
  * Accepts $args:
  *   collection (string) 'black-rose'|'love-hurts'|'signature'|'kids-capsule' — palette + default lockup.
- *   image      (string) URL of the still background (LCP). Required for a visible hero (or video).
+ *   image      (string) URL of the still background (LCP). Required unless video or video_webm is supplied.
  *   image_webp (string) Optional webp source for the still.
- *   video      (string) Optional self-hosted mp4 URL (progressive enhancement).
+ *   video      (string) Optional self-hosted mp4 URL (progressive enhancement, universal fallback).
+ *   video_webm (string) Optional self-hosted webm/VP9 URL (served first; smaller than mp4 on Chrome/Firefox).
  *   lockup     (string) Optional full URL override for the title lockup image.
  *   lockup_alt (string) Accessible name for the lockup (the collection name).
  *   eyebrow    (string) Optional small uppercase label above the body copy.
@@ -39,6 +40,7 @@ $skyyrose_hero = wp_parse_args(
 		'image'      => '',
 		'image_webp' => '',
 		'video'      => '',
+		'video_webm' => '',
 		'lockup'     => '',
 		'lockup_alt' => '',
 		'eyebrow'    => '',
@@ -89,7 +91,7 @@ $skyyrose_hero_lockup_alt = '' !== $skyyrose_hero['lockup_alt']
 	: $skyyrose_hero_default['alt'];
 
 // A hero with neither still nor video is non-functional — render nothing.
-if ( '' === $skyyrose_hero['image'] && '' === $skyyrose_hero['video'] ) {
+if ( '' === $skyyrose_hero['image'] && '' === $skyyrose_hero['video'] && '' === $skyyrose_hero['video_webm'] ) {
 	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 		echo '<!-- skyyrose hero-cinematic: no image/video supplied; nothing rendered -->';
 	}
@@ -115,7 +117,7 @@ if ( '' === $skyyrose_hero['image'] && '' === $skyyrose_hero['video'] ) {
 			</picture>
 		<?php endif; ?>
 
-		<?php if ( '' !== $skyyrose_hero['video'] ) : ?>
+		<?php if ( '' !== $skyyrose_hero['video'] || '' !== $skyyrose_hero['video_webm'] ) : ?>
 			<video
 				class="cine-hero__video"
 				autoplay
@@ -128,7 +130,12 @@ if ( '' === $skyyrose_hero['image'] && '' === $skyyrose_hero['video'] ) {
 				<?php endif; ?>
 				aria-hidden="true"
 			>
-				<source src="<?php echo esc_url( $skyyrose_hero['video'] ); ?>" type="video/mp4">
+				<?php if ( '' !== $skyyrose_hero['video_webm'] ) : ?>
+					<source src="<?php echo esc_url( $skyyrose_hero['video_webm'] ); ?>" type="video/webm">
+				<?php endif; ?>
+				<?php if ( '' !== $skyyrose_hero['video'] ) : ?>
+					<source src="<?php echo esc_url( $skyyrose_hero['video'] ); ?>" type="video/mp4">
+				<?php endif; ?>
 			</video>
 		<?php endif; ?>
 

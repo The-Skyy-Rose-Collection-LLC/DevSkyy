@@ -112,6 +112,17 @@ $cta_url = $has_wc ? wc_get_cart_url() : ( $is_kids ? $preorder_url : home_url( 
 		<div class="col-hero__scroll" aria-hidden="true"><span><?php echo esc_html( $c['hero_scroll_text'] ); ?></span><span>&#x2193;</span></div>
 	</section>
 
+	<?php
+	get_template_part(
+		'template-parts/pin-narrative',
+		null,
+		array(
+			'slug'  => $slug,
+			'beats' => isset( $c['pin_beats'] ) ? $c['pin_beats'] : array(),
+		)
+	);
+	?>
+
 	<!-- ════ Product Grid (immediately after hero) ════ -->
 	<?php
 	// Build subheading: kids-capsule uses a dynamic piece count, others
