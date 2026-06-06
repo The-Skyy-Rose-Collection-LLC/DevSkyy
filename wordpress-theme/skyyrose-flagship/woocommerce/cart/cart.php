@@ -6,10 +6,15 @@
  * Features: dark #0A0A0A background, 150px product images, quantity controls,
  * sticky order summary sidebar, empty cart state.
  *
+ * Full custom override (not a markup patch of core). Verified against core
+ * cart.php 10.8.0: all required action/filter hooks and the woocommerce-cart
+ * nonce are preserved. The default woocommerce_cart_collaterals hook is
+ * intentionally replaced by the custom sticky order-summary sidebar.
+ *
  * @see     https://woocommerce.com/document/template-structure/
  * @package SkyyRose
  * @since   2.0.0
- * @version 10.1.0
+ * @version 10.8.0
  */
 
 defined( 'ABSPATH' ) || exit;
