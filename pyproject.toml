@@ -178,7 +178,7 @@ mcp = [
     "tenacity==9.1.2",
     "backoff==2.2.1",
     "ratelimit==2.2.1",
-    "cryptography==46.0.5",
+    "cryptography==46.0.7",
     "pyjwt==2.12.1",
     "sqlalchemy==2.0.45",
     "aiosqlite==0.22.1",
@@ -199,7 +199,7 @@ mcp = [
     "chromadb>=0.6.0",
     "faiss-cpu==1.13.1",
     "beautifulsoup4>=4.13.5",  # Fixed: raganything>=1.2.10 requires >=4.13.5 via mineru
-    "requests==2.32.5",
+    "requests==2.33.0",
     "pypdf>=6.6.2",
     "python-docx>=1.1.2",
     "python-pptx>=1.0.2",
@@ -207,7 +207,7 @@ mcp = [
     "soundfile==0.13.1",
     "rich==14.3.3",
     "click>=8.1.8",  # Fixed: raganything>=1.2.10 requires >=8.1.8 via mineru/pdftext
-    "pytest==9.0.2",
+    "pytest==9.0.3",
     "pytest-asyncio==1.3.0",
     "healthcheck==1.3.3",
     "psutil==6.1.0",
