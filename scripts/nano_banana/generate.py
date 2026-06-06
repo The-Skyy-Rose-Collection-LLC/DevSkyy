@@ -14,7 +14,7 @@ from llm.model_ids import (
     NANO_BANANA_2_MODEL,
     NANO_BANANA_MODEL,
     NANO_BANANA_PRO_MODEL,
-    OPENAI_IMAGE_15_MODEL,
+    OPENAI_IMAGE_2_MODEL,
     OPENAI_IMAGE_MINI_MODEL,
 )
 
@@ -31,7 +31,7 @@ GEMINI_PRO = NANO_BANANA_PRO_MODEL  # "gemini-3-pro-image-preview"  — NB Pro, 
 GEMINI_NB1 = NANO_BANANA_MODEL  # "gemini-2.5-flash-image" — NB1 (retired, kept for back-compat)
 FLUX_MODEL = "black-forest-labs/FLUX.2-pro"
 FLUX_FREE = "black-forest-labs/FLUX.1-schnell-Free"
-GPT_IMAGE_MODEL = OPENAI_IMAGE_15_MODEL  # "gpt-image-1.5"
+GPT_IMAGE_MODEL = OPENAI_IMAGE_2_MODEL  # "gpt-image-2" — latest GPT image, synced 2026-06-05
 GPT_IMAGE_MINI = OPENAI_IMAGE_MINI_MODEL  # "gpt-image-1-mini"  — cheap variant
 
 
@@ -245,9 +245,10 @@ def generate_gpt(
     prompt: str,
     source_path: Path | None = None,
 ) -> bytes | None:
-    """Generate an image using GPT-Image-1.5.
+    """Generate an image using the configured GPT image model (GPT_IMAGE_MODEL).
 
-    Uses images.edit() with input_fidelity="high" for reference-based editing.
+    Uses images.edit() for reference-based editing. input_fidelity="high" is
+    passed only for gpt-image-1 / 1.5 — the live gpt-image-2 endpoint rejects it.
     Returns WebP image bytes on success, None on failure.
     """
     from nano_banana.utils import to_webp
@@ -257,13 +258,18 @@ def generate_gpt(
     try:
         if use_edit:
             with open(source_path, "rb") as img_file:
-                response = openai_client.images.edit(
-                    model=GPT_IMAGE_MODEL,
-                    image=img_file,
-                    prompt=prompt,
-                    size="1024x1536",
-                    input_fidelity="high",
-                )
+                edit_kwargs = {
+                    "model": GPT_IMAGE_MODEL,
+                    "image": img_file,
+                    "prompt": prompt,
+                    "size": "1024x1536",
+                }
+                # input_fidelity is accepted only by gpt-image-1 / 1.5. The live
+                # gpt-image-2 API returns 400 invalid_input_fidelity_model despite
+                # the SDK type stub listing it. Pass only where the endpoint accepts.
+                if GPT_IMAGE_MODEL in ("gpt-image-1", "gpt-image-1.5"):
+                    edit_kwargs["input_fidelity"] = "high"
+                response = openai_client.images.edit(**edit_kwargs)
         else:
             response = openai_client.images.generate(
                 model=GPT_IMAGE_MODEL,

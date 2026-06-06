@@ -13,7 +13,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 
-from llm.model_ids import NANO_BANANA_PRO_MODEL, OPENAI_IMAGE_15_MODEL
+from llm.model_ids import NANO_BANANA_PRO_MODEL, OPENAI_IMAGE_2_MODEL
 
 log = logging.getLogger(__name__)
 
@@ -129,7 +129,7 @@ def route_product(
             ),
             RouteDecision(
                 "gpt-image",
-                OPENAI_IMAGE_15_MODEL,
+                OPENAI_IMAGE_2_MODEL,
                 "Fallback for editorial — strong commercial aesthetics",
                 COST_TABLE["gpt-image"],
                 2,
@@ -141,7 +141,7 @@ def route_product(
         return [
             RouteDecision(
                 "gpt-image",
-                OPENAI_IMAGE_15_MODEL,
+                OPENAI_IMAGE_2_MODEL,
                 f"Text/logo product ({sku}) — GPT Image has 96%+ text accuracy",
                 COST_TABLE["gpt-image"],
                 1,

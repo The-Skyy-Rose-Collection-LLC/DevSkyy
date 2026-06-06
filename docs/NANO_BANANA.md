@@ -57,9 +57,10 @@ Each file is under 300 lines. No circular imports. Clean separation.
 ## Setup
 
 ```bash
-# 1. Create isolated venv (keeps imagery deps out of main project venv)
-python3 -m venv .venv-imagery
-source .venv-imagery/bin/activate
+# 1. Activate the shared project venv. Nano Banana uses the root .venv
+#    (Python 3.13, google-genai installed). .venv-imagery was an earlier
+#    design that was never created — do not reference it.
+source .venv/bin/activate
 
 # 2. Install dependencies
 pip install -r requirements-imagery.txt
@@ -131,7 +132,7 @@ Takes an existing AI render + the real product photo, asks Gemini to fix the log
 | `gemini` (default) | `gemini-2.5-flash-image` | Reference-based generation, best overall |
 | `gemini --pro` | `gemini-3-pro-image-preview` | When text rendering matters (jerseys, logos with words) |
 | `flux` | `FLUX.2-pro` via Together | Tech flats → photorealistic conversion (no reference image needed) |
-| `gpt-image` | `gpt-image-1.5` | Alternative with strong text rendering |
+| `gpt-image` | `gpt-image-2` | Best text/logo accuracy — router default for text-bearing garments (Love Hurts, Signature, etc.) |
 | `auto` | Routes FLUX for tech-flat SKUs, Gemini for everything else | Mixed catalog |
 
 ---
@@ -162,7 +163,7 @@ Below threshold = reject, retry up to 3 times. See `nano_banana/utils.py:MIN_FIL
 
 ### "No source image" for many SKUs
 **Cause:** Source files missing from `wordpress-theme/skyyrose-flagship/assets/images/products/`.
-**Fix:** Add the techflats referenced in `data/product-catalog.csv` `render_source_override` column.
+**Fix:** Add the techflats referenced in the `render_source_override` column of `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv` (the canonical catalog). Note: `scripts/nano_banana/source_map.py` is a hardcoded per-SKU source override that **wins over** the CSV — check it too when a SKU resolves to the wrong source.
 
 ---
 
@@ -170,7 +171,8 @@ Below threshold = reject, retry up to 3 times. See `nano_banana/utils.py:MIN_FIL
 
 | Data | File |
 |------|------|
-| Product catalog (SKUs, names, prices, source images) | `data/product-catalog.csv` |
+| Product catalog (SKUs, names, prices, source images) | `wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv` |
+| Per-SKU hardcoded source overrides (wins over the CSV) | `scripts/nano_banana/source_map.py` |
 | Logo treatments (per-SKU branding descriptions) | `scripts/nano_banana/prompts.py` (`LOGO_TREATMENTS` dict) |
 | Prompt templates (front/back/branding/composite) | `scripts/nano_banana/prompts.py` |
 | Brand prompts per collection | `scripts/nano_banana/prompts.py` (`BRANDING_TEMPLATES`) |
@@ -180,6 +182,6 @@ Below threshold = reject, retry up to 3 times. See `nano_banana/utils.py:MIN_FIL
 
 ## Related Files
 
-- `requirements-imagery.txt` — Python deps for `.venv-imagery`
+- `requirements-imagery.txt` — Python deps for the shared root `.venv`
 - `.env.hf` — API keys (gitignored)
 - Output directory: `wordpress-theme/skyyrose-flagship/assets/images/products/`

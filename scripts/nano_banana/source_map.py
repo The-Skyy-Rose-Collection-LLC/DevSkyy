@@ -130,9 +130,12 @@ def get_source_map() -> dict[str, dict[str, Path | None]]:
             "front": S / "love-hurts" / "lh-bomber-front.jpeg",
             "back": S / "love-hurts" / "lh-bomber-back.jpeg",
         },
-        # lh-006: The Fannie (fanny pack)
+        # lh-006: Love Hurts Joggers (White) — white mirror of lh-002.
+        # Was historically a fanny pack; SKU reassigned to the white joggers.
+        # Source is the real white-colorway product flat; no real white back
+        # shot exists, so back generates from the front + dossier.
         "lh-006": {
-            "front": P / "the-fannie-pack-photo.jpg",
+            "front": P / "lh-006-joggers-white.jpeg",
             "back": None,
         },
         # ══════════════════════════════════════════════════════════════

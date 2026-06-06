@@ -21,7 +21,6 @@ from llm.model_ids import (
     NANO_BANANA_MODEL,
     NANO_BANANA_PRO_MODEL,
     OPENAI_IMAGE_2_MODEL,
-    OPENAI_IMAGE_15_MODEL,
     OPENAI_IMAGE_MINI_MODEL,
     OPENAI_VISION_MODEL,
 )
@@ -41,7 +40,7 @@ class PipelineConfig:
     # so callers and the dashboard can pick between generations explicitly.
     nano_banana_2_model: str = NANO_BANANA_2_MODEL
     gemini_vision_model: str = "gemini-2.5-flash"
-    gpt_image_model: str = OPENAI_IMAGE_15_MODEL
+    gpt_image_model: str = OPENAI_IMAGE_2_MODEL
     # OpenAI's cheap mini variant of gpt-image-1 — exposed for cost-tier
     # workflows. The dashboard can route low-priority generation here when
     # prefer_cost_efficiency is set.
