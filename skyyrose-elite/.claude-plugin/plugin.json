@@ -1,0 +1,25 @@
+{
+  "name": "skyyrose-elite",
+  "version": "1.0.0",
+  "description": "SkyyRose Elite — the autonomous luxury-streetwear marketing & commerce team. Bundles brand DNA, product copy, WooCommerce SEO, Klaviyo email flows, paid media, influencer growth, photography briefs, and drop-launch orchestration as one installable unit, each grounded in verified vendor docs and wired to the SkyyRose Elite Studio runtime + dev-team pipeline.",
+  "author": {
+    "name": "SkyyRose / Corey Foster",
+    "email": "skyyroseco@gmail.com"
+  },
+  "license": "UNLICENSED",
+  "homepage": "https://skyyrose.co",
+  "keywords": [
+    "skyyrose",
+    "luxury-streetwear",
+    "marketing",
+    "ecommerce",
+    "woocommerce",
+    "content",
+    "seo",
+    "klaviyo-email",
+    "paid-media",
+    "influencer",
+    "product-copy",
+    "launch"
+  ]
+}
