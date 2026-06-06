@@ -8,7 +8,7 @@
  * Usage:
  *   get_template_part( 'template-parts/components/card-info', null, [
  *       'eyebrow'       => 'Free shipping',
- *       'headline'      => 'On all orders over $150',
+ *       'headline'      => 'On all orders over $200',
  *       'body'          => '',             // wp_kses_post
  *       'icon'          => '',             // raw SVG string (kses'd)
  *       'cta_label'     => '',

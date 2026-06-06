@@ -70,7 +70,7 @@ do_action( 'woocommerce_before_cart' );
 		<?php
 		// ── Free-Shipping Progress Bar ──────────────────────────────────
 		$skyy_cart_total = (float) WC()->cart->get_subtotal();
-		$skyy_threshold  = defined( 'SKYYROSE_FREE_SHIPPING_THRESHOLD' ) ? (float) SKYYROSE_FREE_SHIPPING_THRESHOLD : 150;
+		$skyy_threshold  = defined( 'SKYYROSE_FREE_SHIPPING_THRESHOLD' ) ? (float) SKYYROSE_FREE_SHIPPING_THRESHOLD : 200;
 		$skyy_remaining  = max( 0, $skyy_threshold - $skyy_cart_total );
 		$skyy_progress   = $skyy_threshold > 0 ? min( 100, ( $skyy_cart_total / $skyy_threshold ) * 100 ) : 100;
 		$skyy_qualified  = $skyy_remaining <= 0;
@@ -533,7 +533,7 @@ do_action( 'woocommerce_before_cart' );
 							<span>
 							<?php
 								/* translators: %d: free shipping order minimum in dollars */
-								printf( esc_html__( 'Free Shipping $%d+', 'skyyrose' ), intval( defined( 'SKYYROSE_FREE_SHIPPING_THRESHOLD' ) ? SKYYROSE_FREE_SHIPPING_THRESHOLD : 150 ) );
+								printf( esc_html__( 'Free Shipping $%d+', 'skyyrose' ), intval( defined( 'SKYYROSE_FREE_SHIPPING_THRESHOLD' ) ? SKYYROSE_FREE_SHIPPING_THRESHOLD : 200 ) );
 							?>
 								</span>
 						</div>

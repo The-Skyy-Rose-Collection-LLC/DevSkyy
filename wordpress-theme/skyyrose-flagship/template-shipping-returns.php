@@ -51,12 +51,12 @@ get_header();
 							<tr>
 								<td><?php esc_html_e( 'Standard', 'skyyrose' ); ?></td>
 								<td><?php esc_html_e( '5–7 business days', 'skyyrose' ); ?></td>
-								<td><?php esc_html_e( '$7.95', 'skyyrose' ); ?></td>
+								<td><?php esc_html_e( '$17', 'skyyrose' ); ?></td>
 							</tr>
 							<tr>
 								<td><?php esc_html_e( 'Express', 'skyyrose' ); ?></td>
 								<td><?php esc_html_e( '2–3 business days', 'skyyrose' ); ?></td>
-								<td><?php esc_html_e( '$14.95', 'skyyrose' ); ?></td>
+								<td><?php esc_html_e( '$22', 'skyyrose' ); ?></td>
 							</tr>
 							<tr>
 								<td><?php esc_html_e( 'Free Shipping', 'skyyrose' ); ?></td>
@@ -66,7 +66,7 @@ get_header();
 									/* translators: %d: free shipping order minimum in dollars */
 									printf(
 										esc_html__( 'Orders $%d+', 'skyyrose' ),
-										defined( 'SKYYROSE_FREE_SHIPPING_THRESHOLD' ) ? intval( SKYYROSE_FREE_SHIPPING_THRESHOLD ) : 150
+										defined( 'SKYYROSE_FREE_SHIPPING_THRESHOLD' ) ? intval( SKYYROSE_FREE_SHIPPING_THRESHOLD ) : 200
 									);
 									?>
 									</td>

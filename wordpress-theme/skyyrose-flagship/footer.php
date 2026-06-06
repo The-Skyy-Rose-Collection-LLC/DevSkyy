@@ -195,6 +195,7 @@ defined( 'ABSPATH' ) || exit;
 						<li><a href="<?php echo esc_url( home_url( '/terms-of-service/' ) ); ?>"><?php esc_html_e( 'Terms of Service', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/refund-policy/' ) ); ?>"><?php esc_html_e( 'Refund Policy', 'skyyrose' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/accessibility/' ) ); ?>"><?php esc_html_e( 'Accessibility', 'skyyrose' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/cookie-policy/' ) ); ?>"><?php esc_html_e( 'Cookie Policy', 'skyyrose' ); ?></a></li>
 					</ul>
 				</div>
 
