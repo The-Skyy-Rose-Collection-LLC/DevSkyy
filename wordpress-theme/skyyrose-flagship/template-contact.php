@@ -92,7 +92,7 @@ $referral_options = array( '' => __( 'Pick one', 'skyyrose' ) )
 $faq_items = array(
 	array(
 		'question' => __( 'How long does shipping take?', 'skyyrose' ),
-		'answer'   => __( 'Domestic orders ship within 1-2 business days. Standard shipping (5-7 business days) is free on orders over $150. Express (2-3 days) and overnight options are available at checkout. International orders typically take 7-14 business days depending on your location and customs processing times.', 'skyyrose' ),
+		'answer'   => __( 'Domestic orders ship within 1-2 business days. Standard shipping (5-7 business days) is $17, Express (2-3 days) is $22, and shipping is free on orders over $200. International orders typically take 7-14 business days depending on your location and customs processing times.', 'skyyrose' ),
 	),
 	array(
 		'question' => __( "What's your return policy?", 'skyyrose' ),

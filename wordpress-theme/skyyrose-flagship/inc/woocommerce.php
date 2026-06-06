@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.1.0
  */
 if ( ! defined( 'SKYYROSE_FREE_SHIPPING_THRESHOLD' ) ) {
-	define( 'SKYYROSE_FREE_SHIPPING_THRESHOLD', 150 );
+	define( 'SKYYROSE_FREE_SHIPPING_THRESHOLD', 200 );
 }
 
 /*
