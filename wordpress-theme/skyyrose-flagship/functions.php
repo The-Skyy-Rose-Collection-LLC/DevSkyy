@@ -67,7 +67,6 @@ $skyyrose_core_includes = array(
 	'/inc/collections-config.php',
 	'/inc/enqueue.php',
 	'/inc/enqueue-performance.php',
-	'/inc/enqueue-experiences.php',
 	'/inc/enqueue-phases.php',
 	'/inc/customizer.php',
 	'/inc/template-functions.php',

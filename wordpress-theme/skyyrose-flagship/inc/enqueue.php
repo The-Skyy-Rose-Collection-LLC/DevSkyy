@@ -551,19 +551,7 @@ function skyyrose_enqueue_template_styles() {
 		}
 	}
 
-	// Homepage v7 "Concrete" theme — supplemental styles loaded after homepage-v2.
 	if ( 'front-page' === $slug ) {
-		$v7_css = $use_min && file_exists( $base_css_dir . '/homepage-v7.min.css' )
-			? 'homepage-v7.min.css' : 'homepage-v7.css';
-		if ( file_exists( $base_css_dir . '/' . $v7_css ) ) {
-			wp_enqueue_style(
-				'skyyrose-homepage-v7',
-				$base_css_uri . '/' . $v7_css,
-				array( 'skyyrose-template-homepage-v2' ),
-				SKYYROSE_VERSION
-			);
-		}
-
 		// LCP: preload hero image so the browser prioritises it in the
 		// high-priority fetch queue alongside critical CSS, improving LCP score.
 		//
@@ -932,7 +920,6 @@ function skyyrose_admin_scripts() {
 
 // Hook registration. Priority order: 5 fonts → 10 globals → 15 localize → 20 templates.
 // Phase 2/3/4 + commercial polish (priorities 25/30/40/42) live in inc/enqueue-phases.php.
-// Collection-experience scenes (priority 65) live in inc/enqueue-experiences.php.
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_local_fonts', 5 );
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_global_styles', 10 );
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_global_scripts', 10 );
