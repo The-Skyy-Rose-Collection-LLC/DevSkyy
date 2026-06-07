@@ -21,8 +21,11 @@
 # =============================================================================
 set -uo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$ROOT"
+# ROOT defaults to this script's repo (../). The pre-push hook overrides it with
+# CI_LOCAL_ROOT="$PWD" so a single canonical script can check whichever worktree
+# is being pushed, even on branches that don't have scripts/ci-local.sh yet.
+ROOT="${CI_LOCAL_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+cd "$ROOT" || { echo "ci-local: cannot cd to ROOT=$ROOT" >&2; exit 2; }
 
 PHP_BIN="${PHP_BIN:-php}"
 command -v "$PHP_BIN" >/dev/null 2>&1 || PHP_BIN="/opt/homebrew/bin/php"

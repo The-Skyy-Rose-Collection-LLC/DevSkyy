@@ -59,6 +59,36 @@ may differ from CI's Node 22, producing a *spurious* drift failure. Only run it
 with `WITH_BUILD=1` when you actually changed source CSS/JS, ideally under the
 Node-22 `act`/Docker path below.
 
+## Pre-push hook (stopgap gate)
+
+`.husky/pre-push` routes pushes through a **fast subset** of this mirror so they
+get checked while the cloud pipeline is paused. `core.hooksPath` is an absolute
+path, so the hook is **shared across every worktree** — it fires only when:
+
+1. `.ci-local-gate` exists in the pushing worktree — opt-in, **one `rm` to disable**.
+2. a `ci-local.sh` is resolvable (see below) — else it skips silently.
+
+It runs `php -l` against the **worktree being pushed**, regardless of branch. The
+script is resolved branch-independently: prefer the pushing worktree's own
+`scripts/ci-local.sh`, else fall back to the canonical ci-mirror copy; `CI_LOCAL_ROOT="$PWD"`
+makes the canonical script check *this* worktree, not its own. The fallback stops
+being needed once the tooling reaches `main` (every branch then ships the script)
+— self-healing. The gate file is ignored repo-wide via `.git/info/exclude`.
+
+**Python `lint` is intentionally not push-gated** — `ruff/black/isort` run repo-wide
+and the tree currently has pre-existing drift that would false-block unrelated
+pushes. Run lint on demand instead (`bash scripts/ci-local.sh lint` or `act -j lint`).
+
+```bash
+touch .ci-local-gate    # enable the stopgap in THIS worktree
+rm .ci-local-gate       # disable it
+git push --no-verify    # bypass for a single push
+```
+
+The gate file is gitignored (per-worktree). The hook block lives in `.husky/pre-push`
+and reaches `main` when this branch merges; remove it (or the gate files) once
+GitHub Actions billing is restored.
+
 ## Fidelity ladder
 
 This mirror trades exactness for zero-setup speed. From least to most faithful:

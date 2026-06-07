@@ -1,2 +1,31 @@
-command -v git-lfs >/dev/null 2>&1 || exit 0
-git lfs pre-push "$@"
+# git-lfs (managed by husky) — run if installed; don't short-circuit the rest.
+if command -v git-lfs >/dev/null 2>&1; then
+  git lfs pre-push "$@" || exit $?
+fi
+
+# ── ci-local stopgap: offline CI mirror while GitHub Actions is billing-blocked ──
+# Runs WordPress `php -l` against the WORKTREE BEING PUSHED — a fast, deterministic
+# syntax gate while the cloud pipeline is paused. Safe across every worktree sharing
+# this hook (core.hooksPath is an absolute path), via two gates:
+#   1. .ci-local-gate present in the pushing worktree → opt-in ("one rm" to disable)
+#   2. a ci-local.sh is resolvable                    → else skip
+# The script is resolved branch-independently: prefer the pushing worktree's own
+# copy (present on branches that have merged the CI tooling), else fall back to the
+# canonical ci-mirror worktree. CI_LOCAL_ROOT="$PWD" makes the canonical script
+# check THIS worktree, not its own. The fallback path stops being needed once the
+# tooling reaches main (every branch then has scripts/ci-local.sh) — self-healing.
+# Python lint is intentionally NOT push-gated (repo-wide ruff/black/isort drift
+# would false-block unrelated pushes — run `bash scripts/ci-local.sh lint` on demand).
+# Bypass a single push with `git push --no-verify`. Remove this block (or the gate
+# files) once GitHub Actions billing is restored.
+if [ -f .ci-local-gate ]; then
+  _ci_script="$(git rev-parse --show-toplevel 2>/dev/null)/scripts/ci-local.sh"
+  [ -f "$_ci_script" ] || _ci_script="/Users/theceo/DevSkyy-ci-mirror/scripts/ci-local.sh"
+  if [ -f "$_ci_script" ]; then
+    echo "ci-local stopgap: running fast pre-push checks (rm .ci-local-gate to disable)…"
+    if ! CI_LOCAL_ROOT="$PWD" bash "$_ci_script" wordpress-theme; then
+      echo "✗ ci-local pre-push failed — fix it, or 'git push --no-verify' to bypass, or 'rm .ci-local-gate' to disable."
+      exit 1
+    fi
+  fi
+fi

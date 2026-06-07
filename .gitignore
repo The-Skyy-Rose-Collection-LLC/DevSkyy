@@ -441,3 +441,6 @@ wordpress-theme/skyyrose-flagship/data/product-references/techflat-vision-analys
 
 # Autonomous coding agent scratch/demo output dir
 my_project/
+
+# ci-local stopgap: per-worktree opt-in sentinel (not version-controlled)
+.ci-local-gate
