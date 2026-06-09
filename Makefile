@@ -212,6 +212,16 @@ ci: lint-all test-all
 	@echo "========================"
 
 # ============================================================================
+# OAI IMAGE RENDER (gpt-image-2 product photography)
+# ============================================================================
+
+render-dry: ## Plan + cost manifest, NO API. make render-dry SKUS=br-010,br-001 [STYLE=ghost,on-model] [ALL=1]
+	$(PYTHON) scripts/oai-render-run.py dry-run $(if $(ALL),--all,--skus $(SKUS)) $(if $(STYLE),--style $(STYLE),)
+
+render: ## GENERATE renders (PAID, gated by manifest + cap). make render SKUS=br-010,br-001 [STYLE=...] [ALL=1]
+	$(PYTHON) scripts/oai-render-run.py generate $(if $(ALL),--all,--skus $(SKUS)) $(if $(STYLE),--style $(STYLE),) --yes
+
+# ============================================================================
 # 3D COLLECTION DEMOS
 # ============================================================================
 

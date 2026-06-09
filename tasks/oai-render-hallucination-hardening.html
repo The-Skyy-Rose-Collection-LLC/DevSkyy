@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OAI Render Pipeline — Hallucination Hardening Research &amp; Implementation Spec</title>
+<style>
+body{font:15px/1.55 -apple-system,sans-serif;max-width:980px;margin:0 auto;padding:32px;color:#222}
+h1{font-size:24px;border-bottom:3px solid #B76E79;padding-bottom:8px}
+h2{font-size:19px;margin-top:36px;color:#7a3b46}
+h3{font-size:16px}
+code{background:#f4f1f2;padding:1px 5px;border-radius:3px;font-size:13px}
+pre{background:#f4f1f2;padding:12px;border-radius:6px;overflow-x:auto;font-size:13px}
+table{border-collapse:collapse;width:100%;margin:12px 0}
+th,td{border:1px solid #ddd;padding:7px 10px;text-align:left;font-size:13.5px;vertical-align:top}
+th{background:#faf5f6}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11.5px;font-weight:600}
+.official{background:#d8f0d8}.community{background:#fdf3d0}.single{background:#fbdcd2}.gap{background:#e8e8e8}
+.meta{color:#777;font-size:13px}
+blockquote{border-left:3px solid #B76E79;margin:8px 0;padding:4px 14px;color:#555}
+</style>
+</head>
+<body>
+
+<h1>OAI Render Pipeline — Hallucination Hardening</h1>
+<p class="meta">Generated 2026-06-09 · 4 parallel research lanes (OpenAI official docs, garment-render community techniques, automated QC gating, local pipeline map) · ~35 sources · Confidence: High on QC-gate design, Medium on prompt-level mitigations (image models are probabilistic)</p>
+
+<section id="executive-summary">
+<h2>Executive Summary</h2>
+<p>The pipeline's prompts already carry strong single-image and fidelity language, yet four failure modes survived it in the pilot batch (multi-panel collages, patch drift, mirrored backs, dropped pair garments). Research confirms why: <strong>prompt text alone cannot guarantee output compliance — every production pipeline that got bad-render rates down (one documented case: 15% → &lt;3%) did it with template-locked prompt assembly plus an automated post-generation QC gate with judged retries.</strong> The cost asymmetry is decisive: a GPT-4o-mini vision judge at <code>detail:"low"</code> costs ~$0.000075/check against a $0.40 render — the entire 79-image batch can be judged for under five cents. The Playwright visual sweep of the completed 79-image run found zero structural defects (no collages, no mirrored backs, no dropped pair garments), so hardening targets the <em>next</em> batch's tail risk plus the subtler fidelity drift (material, colorway, patch interiors) that text prompts cannot police.</p>
+</section>
+
+<section id="findings-official">
+<h2>1. Official OpenAI Guidance (gpt-image-2 / images.edit)</h2>
+<table>
+<tr><th>Finding</th><th>Detail</th><th>Confidence</th></tr>
+<tr><td><code>input_fidelity</code> is disabled on gpt-image-2</td><td>Cookbook model-parameter table: <em>"Disabled. input_fidelity does not work for this model because output is already high fidelity by default."</em> (A cookbook code sample contradicts this — treat the prose table as authoritative.) Our config already omits it — correct, keep it that way.</td><td><span class="tag official">Official</span></td></tr>
+<tr><td>Index-label reference images</td><td>For multi-image compositing the documented pattern is explicit indexing: "image 1", "image 2" with each image's role described. Unlabeled multi-image input yields "bizarre" results per community consensus.</td><td><span class="tag official">Official</span></td></tr>
+<tr><td>First image = primary canvas</td><td>Masks apply to image[0]; for gpt-image-1.x the first image "preserves the finest detail and richest texture". Not explicitly re-confirmed for gpt-image-2 — but ordering the view-primary reference first costs nothing.</td><td><span class="tag community">Official for 1.x, extrapolated for 2</span></td></tr>
+<tr><td>Exact text: quotes + ALL CAPS</td><td>Cookbook: put must-reproduce strings in quotes and ALL CAPS; spell letter-by-letter as fallback. Mockup section: <em>"Preserve product geometry and label legibility exactly."</em></td><td><span class="tag official">Official</span></td></tr>
+<tr><td>Negative instructions are the official pattern</td><td>Official try-on prompts use "Do not…" freely. gpt-image-2 respects negatives far better than DALL-E did. Community hybrid: pair each negative with a positive restatement.</td><td><span class="tag official">Official + community</span></td></tr>
+<tr><td>Collage prevention is officially undocumented</td><td>Zero official guidance. Community-verified suppression phrase: <em>"single full-bleed image. No reference sheet. No multiple panels. No collage."</em> Trigger words: "views", "angles", "front and back", "reference sheet" as output-composition nouns — in prompt text OR in reference images that look like spec sheets.</td><td><span class="tag community">Community-verified</span></td></tr>
+<tr><td>Back-view technique is a documented gap</td><td>No official or reliably-verified community fix for mirrored-front hallucination. Best available: back reference first + explicit camera direction + name back-specific elements + "do not mirror the front". Probabilistic — this is precisely what the QC gate must catch.</td><td><span class="tag gap">Gap</span></td></tr>
+</table>
+</section>
+
+<section id="findings-garment">
+<h2>2. Garment-Render Community Techniques</h2>
+<table>
+<tr><th>Failure mode</th><th>Best-available mitigation</th><th>Confidence</th></tr>
+<tr><td>Multi-panel / collage</td><td>(a) Template-locked prompt assembly — injected spec text fills <em>whitelisted fields only</em>; strip view-enumeration ("front view", "back view", "detail view", "shown from", "angles"), availability ("available in", "comes in", "colorways"), and styling-instruction language from any injected doc. (b) Open the prompt with the single shot type before any injected content. (c) Anti-collage suppression phrase in guardrails.</td><td><span class="tag community">Multi-source</span></td></tr>
+<tr><td>Logo/patch drift</td><td>(a) Tight crop of just the patch/logo region as its own indexed reference (we already do this for jerseys). (b) Quotes + ALL CAPS for text. (c) Gold standard for pixel-exact marks is post-generation compositing of the real artwork — keep as the documented patch-method escalation if drift recurs on specific SKUs.</td><td><span class="tag community">Multi-source</span></td></tr>
+<tr><td>Mirrored back views</td><td>Back reference image FIRST in the list; describe back-specific elements explicitly; "Do not mirror or replicate the front." Patent literature confirms mirrored-front is the model-default when back evidence is weak.</td><td><span class="tag community">Medium</span></td></tr>
+<tr><td>Dropped pair garment</td><td>Numeric indexing of both garments ("reference image 1 = crewneck worn on torso, reference image 2 = joggers worn on legs") + body-zone assignment. CVPR 2026 (Garments2Look) confirms multi-garment try-on is an unsolved research problem — QC gate is mandatory for pairs.</td><td><span class="tag community">Medium; research gap confirmed</span></td></tr>
+<tr><td>Spec-doc leakage</td><td>Our "## Scene direction" strip fixed the confirmed trigger. Generalize: sanitize the <em>whole</em> dossier body and the CSV name field against the blocked-phrase list rather than trusting one heading convention.</td><td><span class="tag community">Mechanism well understood</span></td></tr>
+</table>
+</section>
+
+<section id="findings-qc">
+<h2>3. Automated QC Gate (the load-bearing fix)</h2>
+<p>Layered gate, cheapest-first. Judge-call economics: GPT-4o-mini at <code>detail:"low"</code> = 85 image tokens flat ≈ <strong>$0.000075/check</strong>; even GPT-4o high-detail is $0.0038. 240 worst-case checks &lt; $1 against $32 of renders.</p>
+<table>
+<tr><th>Layer</th><th>Check</th><th>Cost</th><th>Catches</th></tr>
+<tr><td>1. Deterministic (Pillow+numpy)</td><td>Valid PNG, expected 1024×1536, white-gutter projection + full-span separator-line detection</td><td>$0, ~20ms</td><td>Corrupt output, collage/grid panels</td></tr>
+<tr><td>2. VLM judge (GPT-4o-mini, <code>detail:"low"</code>, strict JSON schema)</td><td>Single-image, garment present &amp; matches reference, correct view (front/back), patch/text legible &amp; correct, both garments present (pairs)</td><td>~$0.0001</td><td>Mirrored backs, dropped pair garments, patch drift, wrong garment</td></tr>
+<tr><td>3. Judged retry loop</td><td>Fail → re-render same plan, max 2 retries; then quarantine to <code>renders/oai/_rejected/</code> with failure tags for human review. Never infinite-loop.</td><td>≤2× render cost per failure</td><td>Transient model misses (the dominant case)</td></tr>
+<tr><td>4. Runtime budget sentinel</td><td>Accumulated <em>actual</em> spend (renders + retries + judge) checked before every paid call — closes the known gap where the $50 cap guards the manifest estimate but not retry storms (worst case was ~$189).</td><td>$0</td><td>Runaway retry spend</td></tr>
+</table>
+<p>OpenAI's own Image Evals cookbook is the canonical reference for the judge layer: boolean gates fail before any quality scoring, schema enforced with <code>strict:true</code>, a <code>reason</code> field forces chain-of-thought. Deferred as optional future layers (cost/benefit not justified now): FashionCLIP embedding gate (needs torch; VLM judge covers identity), PaddleOCR (VLM reads stylized script better than classical OCR).</p>
+</section>
+
+<section id="visual-sweep">
+<h2>4. Visual Sweep of the 79-Image Batch (2026-06-09)</h2>
+<p>Gallery at <code>renders/oai/_review/index.html</code> (generator: <code>scripts/oai_render/gallery.py</code>), served on localhost, swept via Playwright in 11 viewport screenshots + full-res suspect zoom.</p>
+<ul>
+<li><strong>0 collages, 0 mirrored backs, 0 dropped pair garments, 0 broken files.</strong> All 8 pairs show both garments.</li>
+<li><code>jersey-last-oakland-baseball/ghost.png</code> — thumbnail looked like garbled "BL CK"; full-res confirms correct "BLACK IS BEAUTIFUL" with the A naturally split by the button placket. PASS.</li>
+<li>Founder-judgment flags (fidelity vs techflat, not structural): <code>black-rose-sherpa-jacket</code> + <code>signature-sherpa-jacket</code> render as smooth nylon bombers with sherpa visible only at collar — verify intended material; <code>mint-lavender-hoodie</code> ghost is pink-dominant — verify colorway vs techflat; <code>the-fannie</code> script text styling worth a close look; <code>black-rose-love-hurts-bb-shorts</code> on-model mostly hides the product under the styling tee.</li>
+</ul>
+</section>
+
+<section id="implementation">
+<h2>5. Implementation Plan (scripts/oai_render/)</h2>
+<table>
+<tr><th>#</th><th>Change</th><th>File</th></tr>
+<tr><td>1</td><td>Dossier + CSV-name sanitizer: blocked-phrase strip (view enumeration, availability, styling-instruction language) applied to ALL injected text, on top of the existing Scene-direction strip; length cap on dossier injection</td><td><code>prompt.py</code></td></tr>
+<tr><td>2</td><td>Anti-collage suppression phrase appended to both guardrail blocks; reference list switched to numeric indexing ("image 1: …") with role descriptions; back-view directive names back-specific evidence and gets "single full-bleed image" enforcement</td><td><code>prompt.py</code></td></tr>
+<tr><td>3</td><td>View-primary reference ordering: back source first for ghost-back renders</td><td><code>references.py</code></td></tr>
+<tr><td>4</td><td>New QC module: deterministic checks (PNG/dims/collage) + GPT-4o-mini strict-JSON judge + failure tags</td><td><code>qc.py</code> (new)</td></tr>
+<tr><td>5</td><td>Judged retry loop in <code>render_sku</code> (max 2), quarantine dir <code>_rejected/</code>, runtime spend accumulator enforced before every paid call (render + judge)</td><td><code>pipeline.py</code></td></tr>
+<tr><td>6</td><td>Config: <code>QC_ENABLED</code>, <code>QC_JUDGE_MODEL</code>, <code>QC_MAX_RENDER_RETRIES=2</code>, judge cost estimate, runtime-cap accounting constants</td><td><code>config.py</code></td></tr>
+</table>
+</section>
+
+<section id="sources">
+<h2>Key Sources</h2>
+<ul style="font-size:13px">
+<li>OpenAI Cookbook — image-gen models prompting guide (Apr 2026); high input-fidelity notebook; Image Evals cookbook (developers.openai.com/cookbook)</li>
+<li>OpenAI API reference — /v1/images/edits (16-image limit, mask→image[0], input_fidelity support matrix)</li>
+<li>dev.to — production AI product-photography pipeline (15%→&lt;3% bad-gen via templates + QC retries)</li>
+<li>Garments2Look, CVPR 2026 (arXiv 2603.14153) — multi-garment try-on unsolved; FLUX.1 Kontext paper (arXiv 2506.15742)</li>
+<li>Photta / Photoroom ghost-mannequin guides; WeShop back-view workflow; USPTO 12039668 (mirrored-back default)</li>
+<li>Marqo-FashionCLIP / FashionCLIP (HuggingFace); VQAScore / L-VQAScore; GPT-ImgEval; PaddleOCR benchmarks</li>
+<li>GPT-4o-mini vision pricing — 85 tokens flat at detail:"low" (community-verified; use explicit low detail to avoid token inflation)</li>
+</ul>
+<p class="meta">Single-source claims flagged in lane reports: SafetyKit VLM-accuracy numbers, aifreeapi retry economics, first-image-priority on gpt-image-2 specifically.</p>
+</section>
+
+</body>
+</html>
