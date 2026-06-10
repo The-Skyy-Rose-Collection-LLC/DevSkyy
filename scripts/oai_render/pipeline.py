@@ -368,14 +368,29 @@ def run(
                 if references.has_back_source(s):
                     plans.append(plan_sku(s, catalog, dossier_index, style="ghost", view="back"))
             elif st == "on-model":
-                pairs = references.get_pairs_for_sku(s)
+                # A pair is only renderable when NO member is excluded — an excluded
+                # member's dossier is known-bad and would corrupt the paired look.
+                pairs = [
+                    pr
+                    for pr in references.get_pairs_for_sku(s)
+                    if not any(m in config.EXCLUDED_SKUS for m in pr.skus)
+                ]
+                for pr in references.get_pairs_for_sku(s):
+                    excluded = [m for m in pr.skus if m in config.EXCLUDED_SKUS]
+                    if excluded:
+                        log.warning(
+                            "Skipping paired look %s: member(s) %s excluded (%s)",
+                            pr.pair_id,
+                            ", ".join(excluded),
+                            "; ".join(config.EXCLUDED_SKUS[m] for m in excluded)[:120],
+                        )
                 if pairs:
                     for pr in pairs:  # paired SKU: one paired look per pair, no solo on-model
                         if pr.pair_id in seen_pairs:
                             continue
                         seen_pairs.add(pr.pair_id)
                         plans.append(plan_pair(pr, catalog, dossier_index))
-                else:
+                else:  # no renderable pair → solo on-model so the SKU still gets a hero
                     plans.append(
                         plan_sku(s, catalog, dossier_index, style="on-model", view="front")
                     )

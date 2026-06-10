@@ -362,3 +362,16 @@ def test_qc_schema_gates_flat_renders():
 def test_contaminated_mint_lavender_skus_excluded():
     assert "sg-006" in config.EXCLUDED_SKUS
     assert "sg-014" in config.EXCLUDED_SKUS
+
+
+def test_pair_with_excluded_member_falls_back_to_solo(monkeypatch):
+    from scripts.oai_render import pipeline, references
+
+    monkeypatch.setitem(config.EXCLUDED_SKUS, "sg-014", "test: contaminated dossier")
+    catalog = references.load_catalog()
+    dossiers = references.build_dossier_index()
+    result = pipeline.run(["sg-013"], catalog, dossiers, styles=["on-model"], dry_run=True)
+    plans = [p for p in result["plans"] if p.error is None]
+    assert len(plans) == 1
+    assert plans[0].style == "on-model"
+    assert not plans[0].output_slug.startswith("pair__")
