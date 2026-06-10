@@ -99,7 +99,6 @@ class TestDownloadModelSSRFGuard:
         from services.three_d.replicate_provider import ReplicateProvider
 
         p = ReplicateProvider.__new__(ReplicateProvider)
-        p.name = "replicate"
         p.config = MagicMock()
         p.config.output_dir = "/tmp/replicate_test"
         p._http_client = None
