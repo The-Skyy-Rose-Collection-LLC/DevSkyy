@@ -103,6 +103,48 @@
 	} )();
 
 	/* ======================================================================
+	   STYLE ATELIER — Customer-driven recommendation panel
+	   ====================================================================== */
+	( function initStyleAtelier() {
+		var choices = document.querySelectorAll( '[data-style-option]' );
+		var result = document.querySelector( '.style-atelier__result' );
+		var image = document.getElementById( 'styleAtelierImage' );
+		var kicker = document.getElementById( 'styleAtelierKicker' );
+		var title = document.getElementById( 'styleAtelierTitle' );
+		var copy = document.getElementById( 'styleAtelierCopy' );
+		var link = document.getElementById( 'styleAtelierLink' );
+
+		if ( ! choices.length || ! result || ! image || ! kicker || ! title || ! copy || ! link ) {
+			return;
+		}
+
+		function activateChoice( choice ) {
+			choices.forEach( function ( item ) {
+				var active = item === choice;
+				item.classList.toggle( 'is-active', active );
+				item.setAttribute( 'aria-pressed', active ? 'true' : 'false' );
+			} );
+
+			result.classList.add( 'is-switching' );
+			window.setTimeout( function () {
+				kicker.textContent = choice.dataset.styleKicker || '';
+				title.textContent = choice.dataset.styleTitle || '';
+				copy.textContent = choice.dataset.styleCopy || '';
+				link.setAttribute( 'href', choice.dataset.styleLink || '#' );
+				image.setAttribute( 'src', choice.dataset.styleImage || image.getAttribute( 'src' ) );
+				image.setAttribute( 'alt', choice.dataset.styleAlt || '' );
+				result.classList.remove( 'is-switching' );
+			}, 160 );
+		}
+
+		choices.forEach( function ( choice ) {
+			choice.addEventListener( 'click', function () {
+				activateChoice( choice );
+			} );
+		} );
+	} )();
+
+	/* ======================================================================
 	   SMOOTH SCROLL — Anchor links scroll smoothly
 	   ====================================================================== */
 	( function initSmoothScroll() {
