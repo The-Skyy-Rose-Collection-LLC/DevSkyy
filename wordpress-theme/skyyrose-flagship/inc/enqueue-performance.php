@@ -114,19 +114,9 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		return $tag;
 	}
 
-	// Defer all skyyrose-prefixed scripts, Three.js (heavy 607KB lib on
-	// experience templates), and WC variation scripts loaded in footer.
-	//
-	// 'threejs*' covers all experience handles (threejs, threejs-orbit-controls,
-	// threejs-gltf-loader, threejs-draco-loader, threejs-rgbe-loader,
-	// threejs-effect-composer, threejs-render-pass, threejs-unreal-bloom,
-	// threejs-shader-pass, threejs-copy-shader) — all registered in_footer in
-	// inc/enqueue-experiences.php, so defer is safe. If a future plugin
-	// registers a 'threejs'-prefixed handle expecting sync execution, it
-	// will silently break; convert to an explicit allow-list at that point.
+	// Defer all skyyrose-prefixed scripts and WC variation scripts loaded in footer.
 	$should_defer = (
 		0 === strpos( $handle, 'skyyrose-' ) ||
-		0 === strpos( $handle, 'threejs' ) ||
 		'wc-add-to-cart-variation' === $handle
 	);
 
