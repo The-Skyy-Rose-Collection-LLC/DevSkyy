@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import TypedDict
-
 from skyyrose.elite_studio.ventures._base import VentureState
 
 
