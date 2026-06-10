@@ -572,7 +572,9 @@ class SocialMediaAgent:
         hooks = collection.get("caption_hooks", [])
         if hooks:
             # Deterministic selection based on product name hash
-            hook_idx = int(hashlib.md5(name.encode(), usedforsecurity=False).hexdigest()[:8], 16) % len(hooks)
+            hook_idx = int(
+                hashlib.md5(name.encode(), usedforsecurity=False).hexdigest()[:8], 16
+            ) % len(hooks)
             caption_parts.append(hooks[hook_idx])
 
         # Platform-specific formatting
