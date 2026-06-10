@@ -7,9 +7,11 @@
  * sticky order summary sidebar, empty cart state.
  *
  * Full custom override (not a markup patch of core). Verified against core
- * cart.php 10.8.0: all required action/filter hooks and the woocommerce-cart
- * nonce are preserved. The default woocommerce_cart_collaterals hook is
- * intentionally replaced by the custom sticky order-summary sidebar.
+ * cart.php 10.8.0: action/filter hooks and the woocommerce-cart nonce are
+ * preserved, with one deliberate exception — woocommerce_cart_collaterals is
+ * NOT fired. Core hooks woocommerce_cross_sell_display into it, and brand
+ * canon excludes cross-sells; the custom sticky order-summary sidebar renders
+ * totals directly instead. Plugins targeting that hook will not output here.
  *
  * @see     https://woocommerce.com/document/template-structure/
  * @package SkyyRose
