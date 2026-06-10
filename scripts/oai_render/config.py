@@ -66,12 +66,21 @@ EXPECTED_RENDER_SIZE = (1024, 1536)  # must match SIZE above
 EXCLUDED_SKUS: dict[str, str] = {
     "sg-015": "only reference is a 4-panel composite techflat — needs a clean cropped front "
     "techflat before it can render as a single garment (would otherwise produce a multi-panel).",
+    "sg-006": "dossier describes a different garment (white chevron zip-up ≈ windbreaker set) than "
+    "the mint pullover techflat — 2026-06-08 render produced the wrong product. Founder must "
+    "re-author the dossier from the real mint garment before this SKU renders again.",
+    "sg-014": "dossier describes a different garment (white chevron sweatpants ≈ windbreaker set) "
+    "than the mint sweatpants techflat — same contamination as sg-006. Founder must re-author "
+    "the dossier before this SKU renders again.",
 }
 
 # ── Paths ───────────────────────────────────────────────────────────────────
 THEME_ROOT = PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship"
 CATALOG_CSV = THEME_ROOT / "data" / "skyyrose-catalog.csv"
 DOSSIER_DIR = THEME_ROOT / "data" / "dossiers"
+# Founder's verbatim render-review corrections, injected into prompts per SKU
+# (generated from the 2026-06-09 review board; see the file's _meta block).
+CORRECTIONS_JSON = THEME_ROOT / "data" / "render-corrections.json"
 PRODUCT_REFERENCES_DIR = THEME_ROOT / "data" / "product-references"
 PRODUCTS_DIR = THEME_ROOT / "assets" / "images" / "products"
 SPLIT_DIR = PROJECT_ROOT / "assets" / "techflats" / "split"

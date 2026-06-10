@@ -16,7 +16,9 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from scripts.oai_render import config, qc
+from scripts.oai_render import config
+from scripts.oai_render import prompt as prompt_mod
+from scripts.oai_render import qc
 from scripts.oai_render.cost import SpendTracker
 from scripts.oai_render.pipeline import SkuPlan, render_sku
 from scripts.oai_render.prompt import (
@@ -282,3 +284,81 @@ def test_render_sku_no_gate_accepts_first_render(_tmp_output):
     assert result.status == "rendered"
     assert client.calls == 1
     assert result.output_path is not None and result.output_path.exists()
+
+
+# ── Founder review corrections (2026-06-09 review board) ────────────────────
+def _write_corrections(tmp_path: Path, monkeypatch, corrections: dict) -> None:
+    path = tmp_path / "render-corrections.json"
+    path.write_text(json.dumps({"corrections": corrections}))
+    monkeypatch.setattr(config, "CORRECTIONS_JSON", path)
+    prompt_mod._load_corrections_file.cache_clear()
+
+
+def test_founder_corrections_injected_verbatim(tmp_path: Path, monkeypatch):
+    _write_corrections(
+        tmp_path, monkeypatch, {"sg-007": ["[ghost] logo Is a patch not directly on beanie"]}
+    )
+    p = build_prompt(
+        name="The Signature Beanie",
+        sku="sg-007",
+        collection="signature",
+        reference_labels=[],
+        dossier_text=None,
+        is_patch=False,
+        style="ghost",
+        view="front",
+    )
+    assert "FOUNDER CORRECTIONS" in p
+    assert "logo Is a patch not directly on beanie" in p
+    prompt_mod._load_corrections_file.cache_clear()
+
+
+def test_no_corrections_block_when_sku_has_none(tmp_path: Path, monkeypatch):
+    _write_corrections(tmp_path, monkeypatch, {"sg-007": ["[ghost] note"]})
+    p = build_prompt(
+        name="Other Product",
+        sku="br-001",
+        collection="black-rose",
+        reference_labels=[],
+        dossier_text=None,
+        is_patch=False,
+        style="ghost",
+        view="front",
+    )
+    assert "FOUNDER CORRECTIONS" not in p
+    prompt_mod._load_corrections_file.cache_clear()
+
+
+def test_corrections_missing_file_is_silent(tmp_path: Path, monkeypatch):
+    monkeypatch.setattr(config, "CORRECTIONS_JSON", tmp_path / "absent.json")
+    prompt_mod._load_corrections_file.cache_clear()
+    assert prompt_mod.corrections_for("sg-007") == []
+    prompt_mod._load_corrections_file.cache_clear()
+
+
+def test_base_procedure_carries_material_and_photorealism_directives():
+    p = build_prompt(
+        name="Love Hurts Bomber",
+        sku="lh-004",
+        collection="love-hurts",
+        reference_labels=[],
+        dossier_text=None,
+        is_patch=False,
+        style="ghost",
+        view="front",
+    )
+    assert "MATERIAL:" in p and "satin" in p
+    assert "PHOTOREALISM:" in p and "tech flats" in p
+    assert "BRANDING IS EXHAUSTIVE" in p
+
+
+def test_qc_schema_gates_flat_renders():
+    props = qc._JUDGE_SCHEMA["schema"]["properties"]
+    assert "photorealistic_not_flat" in props
+    assert qc._GATE_TAGS["photorealistic_not_flat"] == "flat_render"
+    assert "photorealistic_not_flat" in qc._JUDGE_SCHEMA["schema"]["required"]
+
+
+def test_contaminated_mint_lavender_skus_excluded():
+    assert "sg-006" in config.EXCLUDED_SKUS
+    assert "sg-014" in config.EXCLUDED_SKUS

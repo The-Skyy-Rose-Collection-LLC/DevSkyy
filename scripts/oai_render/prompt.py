@@ -8,9 +8,13 @@ used ("the pipeline reads this file verbatim into the prompt").
 
 from __future__ import annotations
 
+import functools
+import json
 import logging
 import re
 from pathlib import Path
+
+from . import config
 
 log = logging.getLogger(__name__)
 
@@ -174,6 +178,13 @@ _BASE_PROCEDURE = (
     "FIDELITY: reproduce the garment EXACTLY as shown in the reference images — silhouette, "
     "fabric, color, every graphic, logo, embroidery, label, and sport patch in its exact position "
     "and size. Do NOT invent, omit, resize, recolor, duplicate, or reposition any element.\n"
+    "MATERIAL: render the true surface texture named in the spec — satin must read glossy and "
+    "light-catching, sherpa must show visible pile, nylon must look smooth and technical, fleece "
+    "must look soft and matte. A garment rendered in the wrong material is an invalid result.\n"
+    "PHOTOREALISM: some references are FLAT vector technical drawings (tech flats). They define "
+    "construction and graphics ONLY — the output must be a fully photorealistic photograph of the "
+    "real manufactured garment: dimensional fabric with natural drape, real seams, real texture, "
+    "true studio lighting. A flat, illustrated, or vector-styled output is an invalid result.\n"
     "CONSISTENCY: identical catalog styling across every product in the same presentation style."
 )
 
@@ -181,6 +192,9 @@ NEGATIVE_GUARDRAILS = (
     "DO NOT add text, watermarks, mockup labels, size tags, price tags, multiple garments, "
     "collage panels, or any branding not physically present on the garment. DO NOT crop out any "
     "part of the garment or its graphics.\n"
+    "BRANDING IS EXHAUSTIVE: the references and spec show EVERY logo and graphic this garment "
+    "carries. If a panel (for example the back) shows no logo in its reference, render that panel "
+    "with NO logo — a blank panel is correct; an added logo is an invalid result.\n"
     "OUTPUT FORMAT: one single full-bleed photograph [the entire frame is ONE continuous "
     "photo]. No reference sheet. No multiple panels. No collage. No grid. No split-screen."
 )
@@ -190,6 +204,9 @@ PAIR_NEGATIVE_GUARDRAILS = (
     "DO NOT add text, watermarks, mockup labels, size tags, price tags, collage panels, any extra "
     "garments beyond the two specified, or any branding not physically present on the garments. DO "
     "NOT crop out any part of either garment or its graphics, and do NOT merge the two garments.\n"
+    "BRANDING IS EXHAUSTIVE: the references and specs show EVERY logo and graphic these garments "
+    "carry — render no logo that is not in them; a blank panel is correct when its reference is "
+    "blank.\n"
     "OUTPUT FORMAT: one single full-bleed photograph of one model [the entire frame is ONE "
     "continuous photo]. No reference sheet. No multiple panels. No collage. No grid. No "
     "split-screen."
@@ -242,6 +259,53 @@ def read_dossier(dossier_path: Path | None) -> str | None:
         )
         body = body[:MAX_DOSSIER_CHARS].rsplit("\n", 1)[0]
     return body or None
+
+
+@functools.lru_cache(maxsize=1)
+def _load_corrections_file(path_str: str) -> dict[str, list[str]]:
+    """Load the founder corrections JSON (sku → verbatim correction lines)."""
+    path = Path(path_str)
+    if not path.exists():
+        return {}
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        raw = doc.get("corrections", {})
+        return {
+            sku: [str(line) for line in lines]
+            for sku, lines in raw.items()
+            if isinstance(lines, list)
+        }
+    except (json.JSONDecodeError, OSError) as exc:
+        log.warning("Could not load corrections file %s: %s", path, exc)
+        return {}
+
+
+def corrections_for(sku: str) -> list[str]:
+    """Founder's verbatim review corrections for a SKU (empty when none).
+
+    Lines are prefixed ``[view]`` mechanically; the words after the prefix are
+    the founder's own, written while rejecting a prior render of this product.
+    """
+    return _load_corrections_file(str(config.CORRECTIONS_JSON)).get(sku, [])
+
+
+def _corrections_block(sku: str) -> list[str]:
+    """Prompt lines for the founder-corrections section (empty list when none)."""
+    lines = [
+        sanitize_injected_text(line, source=f"corrections:{sku}") for line in corrections_for(sku)
+    ]
+    lines = [ln for ln in lines if ln]
+    if not lines:
+        return []
+    block = [
+        "FOUNDER CORRECTIONS — the founder rejected a previous render of THIS exact product "
+        "and wrote these notes. They are authoritative and OVERRIDE any conflicting line in "
+        "the spec above ([ghost]/[ghost-back]/[on-model] marks which render the note "
+        "addresses — [ghost-back] notes govern the BACK of the garment, others the front):"
+    ]
+    block.extend(f"  - {ln}" for ln in lines)
+    block.append("")
+    return block
 
 
 def build_prompt(
@@ -298,6 +362,8 @@ def build_prompt(
             "governs WHAT is on the garment, not how it is photographed."
         )
         parts.append("")
+
+    parts.extend(_corrections_block(sku))
 
     if is_patch and view == "front":
         parts.append(
@@ -386,6 +452,9 @@ def build_pair_prompt(
         "at the top; IGNORE any pose/scene/view language inside the specs above."
     )
     parts.append("")
+
+    for g in garments:
+        parts.extend(_corrections_block(g["sku"]))
 
     for i, g in enumerate(garments):
         if g.get("is_patch"):

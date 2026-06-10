@@ -54,7 +54,14 @@ _JUDGE_SCHEMA: dict = {
             "branding_legible_and_correct": {
                 "type": "boolean",
                 "description": "True if visible logos/patches/text match the references — "
-                "no invented, missing, truncated, or garbled marks.",
+                "no invented, missing, truncated, or garbled marks, and NO logo added on a "
+                "panel whose reference shows that panel blank.",
+            },
+            "photorealistic_not_flat": {
+                "type": "boolean",
+                "description": "True only if the garment reads as a photograph of a real "
+                "manufactured garment — dimensional fabric, drape, texture, lighting. A flat "
+                "vector-style technical drawing or illustration look is False.",
             },
             "all_garments_present": {
                 "type": "boolean",
@@ -72,6 +79,7 @@ _JUDGE_SCHEMA: dict = {
             "garment_matches_reference",
             "view_correct",
             "branding_legible_and_correct",
+            "photorealistic_not_flat",
             "all_garments_present",
             "reason",
         ],
@@ -85,6 +93,7 @@ _GATE_TAGS = {
     "garment_matches_reference": "wrong_garment",
     "view_correct": "wrong_view",
     "branding_legible_and_correct": "branding_drift",
+    "photorealistic_not_flat": "flat_render",
     "all_garments_present": "missing_pair_garment",
 }
 
