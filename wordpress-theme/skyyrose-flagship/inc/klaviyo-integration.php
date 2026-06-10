@@ -172,11 +172,11 @@ add_action( 'skyyrose_newsletter_signup', 'skyyrose_klaviyo_on_newsletter_signup
 
 /*
 --------------------------------------------------------------
- * Hook: Incentive Popup Signup → Klaviyo General + VIP Lists
+ * Hook: Incentive Popup Signup → Klaviyo General List
  *--------------------------------------------------------------*/
 
 /**
- * Forward incentive popup signups to Klaviyo (general + VIP lists).
+ * Forward incentive popup signups to Klaviyo (general list).
  *
  * @since 5.0.0
  *
@@ -255,7 +255,7 @@ function skyyrose_ajax_klaviyo_subscribe() {
 
 	// Resolve list ID — default to general.
 	$list_slug     = sanitize_key( wp_unslash( $_POST['list_slug'] ?? 'general' ) );
-	$allowed_slugs = array( 'general', 'black_rose', 'love_hurts', 'signature', 'jersey_vip' );
+	$allowed_slugs = array( 'general', 'black_rose', 'love_hurts', 'signature', 'jersey_vip', 'kids_capsule' );
 	if ( ! in_array( $list_slug, $allowed_slugs, true ) ) {
 		$list_slug = 'general';
 	}

@@ -149,6 +149,75 @@
      (unified observer across the theme — retired local copy in U-1). */
 
   /* ──────────────────────────────────────────────────────────────────
+     4. Email Capture — Klaviyo AJAX
+     ────────────────────────────────────────────────────────────────── */
+  function initEmailCapture() {
+    var form = document.querySelector('.lp-cta__form');
+    if (!form) return;
+
+    var ajaxUrl = (window.skyyRoseData && window.skyyRoseData.ajaxUrl) || '';
+    if (!ajaxUrl) return;
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      var input    = form.querySelector('.lp-cta__input');
+      var btn      = form.querySelector('.lp-cta__submit');
+      var listSlug = form.getAttribute('data-list') || 'general';
+      var nonce    = form.getAttribute('data-nonce') || '';
+      var email    = input ? input.value.trim() : '';
+
+      if (!email || !btn) return;
+
+      btn.disabled = true;
+      btn.textContent = btn.getAttribute('data-loading') || '...';
+
+      var body = new URLSearchParams();
+      body.append('action',    'skyyrose_klaviyo_subscribe');
+      body.append('email',     email);
+      body.append('list_slug', listSlug);
+      body.append('nonce',     nonce);
+
+      fetch(ajaxUrl, {
+        method:      'POST',
+        credentials: 'same-origin',
+        headers:     { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body:        body.toString(),
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data && data.success) {
+            var successP = document.createElement('p');
+            successP.className = 'lp-cta__success';
+            successP.textContent = (data.data && data.data.message) ? data.data.message : 'You\'re in.';
+            while (form.firstChild) { form.removeChild(form.firstChild); }
+            form.appendChild(successP);
+          } else {
+            var msg = (data && data.data && data.data.message) ? data.data.message : 'Something went wrong. Try again.';
+            showFormError(form, btn, msg);
+          }
+        })
+        .catch(function () {
+          showFormError(form, btn, 'Network error. Try again.');
+        });
+    });
+  }
+
+  function showFormError(form, btn, msg) {
+    var existing = form.querySelector('.lp-cta__error');
+    if (!existing) {
+      var err = document.createElement('p');
+      err.className = 'lp-cta__error';
+      err.textContent = msg;
+      form.appendChild(err);
+    } else {
+      existing.textContent = msg;
+    }
+    btn.disabled    = false;
+    btn.textContent = btn.getAttribute('data-label') || 'Join';
+  }
+
+  /* ──────────────────────────────────────────────────────────────────
      5. Smooth Scroll for Anchor Links
      ────────────────────────────────────────────────────────────────── */
   function initSmoothScroll() {
@@ -172,6 +241,7 @@
     initCountdown();
     initParallax();
     initFAQ();
+    initEmailCapture();
     initSmoothScroll();
   }
 

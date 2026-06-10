@@ -328,28 +328,47 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   7. Press Bar
+   7. Stats Bar — brand fact row (replaced fake press logos)
    ═══════════════════════════════════════════════════════════════════ */
-.lp-press {
+.lp-stats {
   padding: 2rem 0;
   border-top: 1px solid rgba(var(--skyyrose-accent-rgb), 0.1);
   border-bottom: 1px solid rgba(var(--skyyrose-accent-rgb), 0.1);
 }
 
-.lp-press__row {
+.lp-stats__row {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: clamp(2rem, 5vw, 4rem);
+  gap: clamp(2rem, 5vw, 5rem);
   flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.lp-press__name {
+.lp-stats__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.lp-stats__value {
   font-family: var(--skyyrose-font-display);
-  font-size: 0.85rem;
+  font-size: clamp(1rem, 2vw, 1.4rem);
+  letter-spacing: 2px;
+  color: var(--skyyrose-accent);
+  white-space: nowrap;
+}
+
+.lp-stats__label {
+  font-family: var(--skyyrose-font-mono);
+  font-size: 0.62rem;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: rgba(var(--skyyrose-accent-rgb), 0.4);
+  color: var(--skyyrose-text-muted);
   white-space: nowrap;
 }
 
@@ -360,11 +379,9 @@
   padding: clamp(4rem, 8vw, 8rem) 0;
 }
 
-.lp-story__grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(3rem, 5vw, 6rem);
-  align-items: center;
+.lp-story__prose {
+  max-width: 780px;
+  margin: 0 auto;
 }
 
 .lp-story__label {
@@ -415,13 +432,6 @@
   opacity: 0.55;
 }
 
-.lp-story__image {
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
-  border: 1px solid rgba(var(--skyyrose-accent-rgb), 0.1);
-}
-
 /* ═══════════════════════════════════════════════════════════════════
    9. Parallax Banner
    ═══════════════════════════════════════════════════════════════════ */
@@ -432,15 +442,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.lp-parallax img {
-  position: absolute;
-  inset: -20% 0;
-  width: 100%;
-  height: 140%;
-  object-fit: cover;
-  will-change: transform;
 }
 
 .lp-parallax__text {
@@ -462,10 +463,6 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .lp-parallax img { position: relative; inset: auto; height: 100%; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -592,18 +589,14 @@
   gap: 1rem;
 }
 
-.lp-editorial__grid--row2 {
-  grid-template-columns: repeat(2, 1fr);
-  margin-top: 1rem;
-}
-
 .lp-editorial__item {
   position: relative;
   overflow: hidden;
   aspect-ratio: 4 / 5;
 }
 
-.lp-editorial__grid--row2 .lp-editorial__item {
+.lp-editorial__item--wide {
+  grid-column: span 2;
   aspect-ratio: 16 / 9;
 }
 
@@ -885,6 +878,26 @@
   color: var(--skyyrose-text-muted);
 }
 
+.lp-cta__success {
+  font-family: var(--skyyrose-font-display);
+  font-size: 1.1rem;
+  color: var(--skyyrose-accent);
+  text-align: center;
+  letter-spacing: 0.05em;
+  margin: 0;
+  padding: 1rem 0;
+}
+
+.lp-cta__error {
+  font-family: var(--skyyrose-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  color: #dc3545;
+  margin-top: 0.75rem;
+  width: 100%;
+  text-align: center;
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    16. Section Dividers
    ═══════════════════════════════════════════════════════════════════ */
@@ -909,18 +922,11 @@
 
 /* Tablet */
 @media (max-width: 1024px) {
-  .lp-story__grid {
-    grid-template-columns: 1fr;
-    gap: 2.5rem;
-  }
   .lp-craft__grid {
     grid-template-columns: repeat(2, 1fr);
   }
   .lp-editorial__grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-  .lp-editorial__grid--row2 {
-    grid-template-columns: 1fr;
   }
   .lp-products__grid {
     grid-template-columns: repeat(2, 1fr);
@@ -957,13 +963,6 @@
     border-right: 1px solid rgba(var(--skyyrose-accent-rgb), 0.2);
     border-bottom: none;
   }
-  .lp-press__row {
-    gap: 1.5rem;
-  }
-  .lp-press__name {
-    font-size: 0.72rem;
-    letter-spacing: 2px;
-  }
 }
 
 /* Mobile portrait */
@@ -990,9 +989,3 @@
   }
 }
 
-/* Max container */
-@media (min-width: 1440px) {
-  .lp__container {
-    max-width: 1200px;
-  }
-}

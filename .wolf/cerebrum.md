@@ -132,3 +132,24 @@ Before writing or modifying ANY code that touches an external library, SDK, or A
 This applies to: google-genai / Gemini SDK, FLUX API clients, httpx, Pydantic, LangGraph, any library not in stdlib.
 Goal: eliminate fix cycles caused by outdated or assumed API knowledge — spend tokens on features, not corrections.
 - **2026-04-29** — Wrote code changes to `audit_filter.py` and `vision_audit_agent.py` WITHOUT first running Context7 to verify the Gemini REST API pattern. The fixes themselves were correct (pure string logic), but the workflow was wrong. **Rule: Context7 `resolve` + `query-docs` is MANDATORY before every task that touches any external library — not just pipeline/workflow tasks. Every task. No exceptions.**
+
+### Landing Page Architecture (2026-05-14)
+
+**Single-source pattern (mirrors collection pages):**
+- 4 thin stubs (`template-landing-{black-rose,love-hurts,signature,kids-capsule}.php`) — each ~18L, call `get_template_part('template-parts/landing/page', null, ['slug' => '...'])` only.
+- `template-parts/landing/page.php` — unified 10-section orchestrator, reads from `inc/landing-content.php`.
+- `inc/landing-content.php` — `skyyrose_get_landing_content($slug)` returns: `hero`, `stats`, `story`, `parallax`, `products`, `editorial`, `reviews`, `craft`, `faq`, `cta`. Null for unknown slug (hard-fail beacon fires).
+- All CSS in `landing-pages.css` only — no per-collection CSS files, no duplication.
+
+**Collection visual identities — ZERO CROSS-CONTAMINATION:**
+- **black-rose** → SPORT/ARMOR. Silver on deep black (#C0C0C0 / #0A0A0A). Football/hockey jersey motifs. Numbered limited run (200 pieces). Thorn + protection iconography. Oakland concrete origin.
+- **love-hurts** → VARSITY/EMOTIONAL. Crimson (#DC143C). Varsity jacket, chain-stitch lettering. Family name "Hurts" — vulnerability=strength. Rose hoodie.
+- **signature** → BLUEPRINT/FOUNDATION. Gold (#D4AF37). 4AM origin sketch, EST. Oakland. Everyday luxury not basics. Monthly colorways.
+- **kids-capsule** → INHERITANCE. Rose Gold (#B76E79, default tokens). Named after daughter Skyy Rose. Dark luxury scaled — not dumbed down. Hero uses brand monogram (`/branding/skyyrose-monogram.webp`), NOT the Signature overlay.
+
+**Content rules enforced:**
+- `stats` replaces old `press` bar. No fake media logos (Maxim/CEO Weekly banned — "Imagery hasn't earned it."). Per-collection honest brand facts only.
+- `editorial.images` is an array of `{src, src_sm, alt, span}` paths. `span='wide'` → `lp-editorial__item--wide` (grid-column: span 2, aspect-ratio: 16/9). Each collection's paths are distinct; no shared lookbook images.
+- `lp-story__prose` (not `lp-story__grid`) — single-column centered prose, avoids 2-col orphan when no story image is present.
+- Klaviyo list slugs: `black_rose`, `love_hurts`, `signature`, `kids_capsule`. All 4 now in `$allowed_slugs` in `inc/klaviyo-integration.php`.
+- AJAX handler in `landing-pages.js` reads `data-list` and `data-nonce` from the `<form>` element (DOM-sourced, no global JS var needed for per-collection config). `skyyRoseData.ajaxUrl` is still required (localized in `inc/enqueue.php`).

@@ -1,0 +1,16 @@
+# Live baseline captured 2026-05-14 before template consolidation refactor
+# All 9 URLs returned HTTP 200
+# Format: URL  size_bytes
+
+https://skyyrose.co/landing-black-rose/        133415
+https://skyyrose.co/landing-love-hurts/        111077
+https://skyyrose.co/landing-signature/         125126
+https://skyyrose.co/landing-kids-capsule/      107960
+https://skyyrose.co/experience-black-rose/     108846
+https://skyyrose.co/experience-love-hurts/     104731
+https://skyyrose.co/experience-signature/      110632
+https://skyyrose.co/experience-kids-capsule/   103749
+https://skyyrose.co/collection-black-rose/     164677
+
+# Post-refactor: re-probe these. Same ±5% = structural refactor only, content preserved.
+# Drop >5% = content lost, investigate before deploy.

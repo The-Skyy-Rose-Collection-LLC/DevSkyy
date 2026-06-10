@@ -67,22 +67,22 @@ $assets_uri    = defined( 'SKYYROSE_ASSETS_URI' ) ? SKYYROSE_ASSETS_URI : '';
 			<div class="lp-hero__countdown lp-countdown" data-countdown="<?php echo esc_attr( $countdown ); ?>">
 				<div class="lp-countdown__unit">
 					<span class="lp-countdown__num" data-cd="d">00</span>
-					<span class="lp-countdown__label">Days</span>
+					<span class="lp-countdown__label"><?php esc_html_e( 'Days', 'skyyrose' ); ?></span>
 				</div>
 				<span class="lp-countdown__sep" aria-hidden="true">:</span>
 				<div class="lp-countdown__unit">
 					<span class="lp-countdown__num" data-cd="h">00</span>
-					<span class="lp-countdown__label">Hours</span>
+					<span class="lp-countdown__label"><?php esc_html_e( 'Hours', 'skyyrose' ); ?></span>
 				</div>
 				<span class="lp-countdown__sep" aria-hidden="true">:</span>
 				<div class="lp-countdown__unit">
 					<span class="lp-countdown__num" data-cd="m">00</span>
-					<span class="lp-countdown__label">Min</span>
+					<span class="lp-countdown__label"><?php esc_html_e( 'Min', 'skyyrose' ); ?></span>
 				</div>
 				<span class="lp-countdown__sep" aria-hidden="true">:</span>
 				<div class="lp-countdown__unit">
 					<span class="lp-countdown__num" data-cd="s">00</span>
-					<span class="lp-countdown__label">Sec</span>
+					<span class="lp-countdown__label"><?php esc_html_e( 'Sec', 'skyyrose' ); ?></span>
 				</div>
 			</div>
 		<?php endif; ?>
