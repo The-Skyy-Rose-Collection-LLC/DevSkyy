@@ -194,7 +194,7 @@ class QueryCache:
     def _make_key(self, query: str, k: int, strategy: RetrievalStrategy) -> str:
         """Create cache key from query parameters."""
         key_str = f"{query}:{k}:{strategy.value}"
-        return hashlib.md5(key_str.encode()).hexdigest()
+        return hashlib.md5(key_str.encode(), usedforsecurity=False).hexdigest()
 
     def get(self, query: str, k: int, strategy: RetrievalStrategy) -> list[RetrievalResult] | None:
         """Get cached result if available."""

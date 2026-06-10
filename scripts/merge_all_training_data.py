@@ -120,7 +120,7 @@ def create_caption(filepath: str, filename: str) -> str:
 def file_hash(filepath: Path) -> str:
     """Get MD5 hash of file for deduplication."""
     with open(filepath, "rb") as f:
-        return hashlib.md5(f.read()).hexdigest()
+        return hashlib.md5(f.read(), usedforsecurity=False).hexdigest()
 
 
 def is_primary_image(filename: str) -> bool:
