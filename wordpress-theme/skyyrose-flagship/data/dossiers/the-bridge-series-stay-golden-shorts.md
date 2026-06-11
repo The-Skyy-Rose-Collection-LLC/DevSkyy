@@ -2,9 +2,9 @@
 sku: sg-003
 name: The Bridge Series 'Stay Golden' Shorts
 collection: signature
-reference_image: data/product-references/sg-001-and-sg-003-bridge-shorts-variants.jpeg
+reference_image: assets/products/references/sg-001-and-sg-003-bridge-shorts-variants.jpeg
 extra_references:
-  - data/product-references/sg-003-sunset-golden-gate-shorts.jpeg
+  - assets/products/references/sg-003-sunset-golden-gate-shorts.jpeg
 ---
 
 # The Bridge Series 'Stay Golden' Shorts
@@ -14,8 +14,8 @@ extra_references:
 ## Branding — exactly what IS on this product
 
 > Reference images:
-> - Bridge Series shorts variants (Bay Bridge top + Stay Golden bottom): `data/product-references/sg-001-and-sg-003-bridge-shorts-variants.jpeg`
-> - Stay Golden shorts standalone techflat: `data/product-references/sg-003-sunset-golden-gate-shorts.jpeg`
+> - Bridge Series shorts variants (Bay Bridge top + Stay Golden bottom): `assets/products/references/sg-001-and-sg-003-bridge-shorts-variants.jpeg`
+> - Stay Golden shorts standalone techflat: `assets/products/references/sg-003-sunset-golden-gate-shorts.jpeg`
 
 ### Front
 - **front-body** (entire body — front and back continuous): All-over sublimated photographic print of the **Golden Gate Bridge at sunset / golden-hour twilight** — purple-and-orange sky filling the upper third (deep purple-violet at top transitioning to orange near the horizon), the iconic **orange-red suspension Golden Gate Bridge** silhouetted across the middle (the bridge color reads orange-red against the dusk sky), and rippling water at the lower portion with **vertical light reflections** (orange + yellow + pink + white streaks running vertically downward) reflecting the city lights and bridge against the water. Photographic, hyper-realistic, NOT illustrated. The print wraps continuously front-to-back. **Technique:** sublimated. **Color:** photographic full-color (purple-violet + orange + red + yellow + pink reflections on dark water).

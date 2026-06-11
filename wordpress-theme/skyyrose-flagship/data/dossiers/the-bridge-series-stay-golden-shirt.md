@@ -5,7 +5,7 @@ collection: signature
 logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/sr-monogram.md
-reference_image: data/product-references/sg-002-stay-golden-shirt-techflat.jpeg
+reference_image: assets/products/references/sg-002-stay-golden-shirt-techflat.jpeg
 ---
 
 # The Bridge Series 'Stay Golden' Shirt
@@ -17,7 +17,7 @@ reference_image: data/product-references/sg-002-stay-golden-shirt-techflat.jpeg
 > Logo art canonical references:
 > - Black Rose three-rose-cluster (recolored to purple for this SKU): `data/brand-logos/three-rose-cluster.md`
 > - SR monogram (back-neck):                                          `data/brand-logos/sr-monogram.md`
-> - Product techflat:                                                  `data/product-references/sg-002-stay-golden-shirt-techflat.jpeg`
+> - Product techflat:                                                  `assets/products/references/sg-002-stay-golden-shirt-techflat.jpeg`
 >
 > ### COLORWAY OVERRIDE — read this BEFORE rendering
 >

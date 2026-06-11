@@ -6,7 +6,7 @@ logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/black-rose-authentic-collection-patch.md
   - data/brand-logos/sr-monogram.md
-reference_image: data/product-references/br-003-baseball-classic-techflat.jpeg
+reference_image: assets/products/references/br-003-baseball-classic-techflat.jpeg
 ---
 
 # BLACK is Beautiful Jersey Series — 0. Baseball Classic
@@ -22,7 +22,7 @@ reference_image: data/product-references/br-003-baseball-classic-techflat.jpeg
 > The "SR monogram" is the gold lettermark at
 > `data/brand-logos/sr-monogram.md`.
 > A reference techflat for the assembled product (front + back) is at
-> `data/product-references/br-003-baseball-classic-techflat.jpeg`.
+> `assets/products/references/br-003-baseball-classic-techflat.jpeg`.
 
 ### Front
 - **front-chest** (large, arched, ~9in wide): The phrase **"BLACK IS BEAUTIFUL"**

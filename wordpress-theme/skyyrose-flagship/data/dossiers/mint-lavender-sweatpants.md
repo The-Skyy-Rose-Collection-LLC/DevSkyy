@@ -3,14 +3,14 @@ sku: sg-014
 name: Mint & Lavender Sweatpants
 collection: signature
 logo_reference: data/brand-logos/three-rose-cluster.md
-reference_image: assets/techflats/split/signature/sg-mint-lav-sweats-front.jpeg
+reference_image: assets/products/techflats/split/signature/sg-mint-lav-sweats-front.jpeg
 ---
 
 <!--
 Re-authored 2026-06-10 to clear bug-119 contamination (previous dossier
 described white chevron sweatpants from the windbreaker-set design — a
 different garment entirely). Every claim below traces to one of: the front
-and back techflats (assets/techflats/split/signature/sg-mint-lav-sweats-{front,back}.jpeg),
+and back techflats (assets/products/techflats/split/signature/sg-mint-lav-sweats-{front,back}.jpeg),
 the catalog CSV row ("Embroidered rose logo on the left thigh"), or the
 founder's 2026-06-09 review-board comments.
 -->
@@ -35,8 +35,8 @@ different product).
 >   **lavender colorway**: lavender/purple blooms, grey-green stems and
 >   leaves, grey-and-white cloud at the base.
 > - Product techflats (front + back):
->   `assets/techflats/split/signature/sg-mint-lav-sweats-front.jpeg`
->   `assets/techflats/split/signature/sg-mint-lav-sweats-back.jpeg`
+>   `assets/products/techflats/split/signature/sg-mint-lav-sweats-front.jpeg`
+>   `assets/products/techflats/split/signature/sg-mint-lav-sweats-back.jpeg`
 >
 > ### COLORWAY — Mint & Lavender
 >

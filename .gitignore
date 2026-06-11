@@ -214,7 +214,7 @@ generated_3d_models/
 # Exclude ALL contents of /assets/ by default (images, scenes, renders, etc).
 # Source-of-truth registries (small text YAML/JSON) are re-included below.
 /assets/*
-!/assets/product-masters/
+!/assets/products/
 !/assets/prompts/
 !/assets/brand/
 datasets/

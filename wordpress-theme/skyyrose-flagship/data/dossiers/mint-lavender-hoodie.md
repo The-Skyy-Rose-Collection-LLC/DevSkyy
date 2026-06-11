@@ -3,14 +3,14 @@ sku: sg-006
 name: Mint & Lavender Hoodie
 collection: signature
 logo_reference: data/brand-logos/three-rose-cluster.md
-reference_image: assets/techflats/split/signature/sg-mint-lav-hoodie-front.jpeg
+reference_image: assets/products/techflats/split/signature/sg-mint-lav-hoodie-front.jpeg
 ---
 
 <!--
 Re-authored 2026-06-10 to clear bug-119 contamination (previous dossier
 described the windbreaker-set design — white body + rainbow chevron zip-up —
 which is a different garment entirely). Every claim below traces to one of:
-the front techflat (assets/techflats/split/signature/sg-mint-lav-hoodie-front.jpeg),
+the front techflat (assets/products/techflats/split/signature/sg-mint-lav-hoodie-front.jpeg),
 the back model photo (assets/images/products/mint-lavender-hoodie-back-model.webp),
 the catalog CSV row, or the founder's 2026-06-09 review-board comments.
 Print-technique fields are conservative defaults pending founder confirmation.
@@ -37,7 +37,7 @@ different product).
 >   **lavender colorway**: lavender/purple rose blooms with white highlights,
 >   grey-green thorny stems and leaves, grey-and-white cloud at the base.
 > - Product techflat (front):
->   `assets/techflats/split/signature/sg-mint-lav-hoodie-front.jpeg`
+>   `assets/products/techflats/split/signature/sg-mint-lav-hoodie-front.jpeg`
 >
 > ### COLORWAY — Mint & Lavender
 >

@@ -5,9 +5,9 @@ collection: kids-capsule
 logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/black-rose-authentic-collection-patch.md
-reference_image: data/product-references/kids-001-techflat.jpeg
+reference_image: assets/products/references/kids-001-techflat.jpeg
 extra_references:
-  - data/product-references/kids-001-real-photo.jpeg
+  - assets/products/references/kids-001-real-photo.jpeg
 ---
 
 # Kids Colorblock Hoodie Set — Red/Black
@@ -19,8 +19,8 @@ extra_references:
 > Logo art canonical references:
 > - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
 > - Authentic Collection patch:    `data/brand-logos/black-rose-authentic-collection-patch.md`
-> - Product techflat:              `data/product-references/kids-001-techflat.jpeg`
-> - Real product photo:            `data/product-references/kids-001-real-photo.jpeg`
+> - Product techflat:              `assets/products/references/kids-001-techflat.jpeg`
+> - Real product photo:            `assets/products/references/kids-001-real-photo.jpeg`
 
 ### Hoodie — Front
 - **front-body color-block** (entire front body): Angular geometric color-block construction — the body is divided into three colorway panels by diagonal seams. **Upper-left panel** (from top-left descending diagonally toward center): solid **black**. **Upper-right panel** (from top-right descending diagonally toward center): solid **white**. **Lower body** (from the diagonal meeting points down to the hem, including the kangaroo pocket area): solid **red**. The diagonals create an angular chevron pointing down toward the kangaroo pocket. **Technique:** stitched. **Color:** black + white + red.

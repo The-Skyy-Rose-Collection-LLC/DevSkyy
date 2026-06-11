@@ -2,9 +2,9 @@
 sku: sg-001
 name: The Bridge Series 'The Bay Bridge' Shorts
 collection: signature
-reference_image: data/product-references/sg-001-and-sg-003-bridge-shorts-variants.jpeg
+reference_image: assets/products/references/sg-001-and-sg-003-bridge-shorts-variants.jpeg
 extra_references:
-  - data/product-references/sg-001-day-bay-bridge-shorts.jpeg
+  - assets/products/references/sg-001-day-bay-bridge-shorts.jpeg
 ---
 
 # The Bridge Series 'The Bay Bridge' Shorts
@@ -14,8 +14,8 @@ extra_references:
 ## Branding — exactly what IS on this product
 
 > Reference images:
-> - Bridge Series shorts variants (Bay Bridge top + Stay Golden bottom): `data/product-references/sg-001-and-sg-003-bridge-shorts-variants.jpeg`
-> - Bay Bridge shorts standalone techflat: `data/product-references/sg-001-day-bay-bridge-shorts.jpeg`
+> - Bridge Series shorts variants (Bay Bridge top + Stay Golden bottom): `assets/products/references/sg-001-and-sg-003-bridge-shorts-variants.jpeg`
+> - Bay Bridge shorts standalone techflat: `assets/products/references/sg-001-day-bay-bridge-shorts.jpeg`
 
 ### Front
 - **front-body** (entire body — front and back continuous): All-over sublimated photographic print of the **San Francisco-Oakland Bay Bridge in daytime daylight** — clear blue sky filling the upper third, the steel-truss Bay Bridge spanning across the middle (center-aligned, with the cantilever section visible), the SF skyline (downtown buildings) visible behind/beside the bridge, and water at the lower portion with reflections of the bridge. Photographic, hyper-realistic, NOT illustrated. The print wraps continuously front-to-back. **Technique:** sublimated. **Color:** photographic full-color (blue sky + grey-and-white bridge steel + tan/grey building skyline + blue water with reflections).

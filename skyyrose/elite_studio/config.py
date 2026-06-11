@@ -375,7 +375,7 @@ def verify_no_orphans(*, raise_on_orphan: bool = False) -> dict[str, list[str]]:
     """Audit production image dirs — flag any SKU-prefixed file whose SKU
     is not in the canonical CSV.
 
-    Walks wordpress-theme/.../products/, skyyrose/assets/images/source-products/,
+    Walks wordpress-theme/.../products/, assets/products/source-photos/,
     skyyrose/assets/images/products/. For every file matching SKU_RE, asserts
     the SKU prefix is in canonical OR explicitly retired. Files in neither set
     are orphans (the dress-mislabel class of bug).

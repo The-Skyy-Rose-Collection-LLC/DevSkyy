@@ -70,21 +70,23 @@ EXCLUDED_SKUS: dict[str, str] = {
     # garments (bug-119 contamination cleared) — both SKUs render again.
 }
 
-# ── Paths ───────────────────────────────────────────────────────────────────
-THEME_ROOT = PROJECT_ROOT / "wordpress-theme" / "skyyrose-flagship"
-CATALOG_CSV = THEME_ROOT / "data" / "skyyrose-catalog.csv"
-DOSSIER_DIR = THEME_ROOT / "data" / "dossiers"
+# ── Paths (single authority: skyyrose/core/asset_paths.py) ──────────────────
+from skyyrose.core import asset_paths as _ap  # noqa: E402
+
+THEME_ROOT = _ap.THEME_ROOT
+CATALOG_CSV = _ap.CATALOG_CSV
+DOSSIER_DIR = _ap.DOSSIER_DIR
 # Founder's verbatim render-review corrections, injected into prompts per SKU
 # (generated from the 2026-06-09 review board; see the file's _meta block).
 CORRECTIONS_JSON = THEME_ROOT / "data" / "render-corrections.json"
 # Founder-approved surviving assets (tasks/mockup-render-inventory.md keep pass):
 # each entry skips one (sku, style, view) plan in batches; explicit --sku overrides.
 KEEPERS_JSON = THEME_ROOT / "data" / "render-keepers.json"
-PRODUCT_REFERENCES_DIR = THEME_ROOT / "data" / "product-references"
-PRODUCTS_DIR = THEME_ROOT / "assets" / "images" / "products"
-SPLIT_DIR = PROJECT_ROOT / "assets" / "techflats" / "split"
-OVERLAYS_DIR = PROJECT_ROOT / "assets" / "techflats" / "hero-overlays"
-TECHFLATS_DIR = PROJECT_ROOT / "assets" / "techflats"
+PRODUCT_REFERENCES_DIR = _ap.PRODUCT_REFERENCES
+PRODUCTS_DIR = _ap.THEME_PRODUCT_IMAGES
+SPLIT_DIR = _ap.PRODUCT_TECHFLATS / "split"
+OVERLAYS_DIR = _ap.PRODUCT_TECHFLATS / "hero-overlays"
+TECHFLATS_DIR = _ap.PRODUCT_TECHFLATS
 OUTPUT_DIR = PROJECT_ROOT / "renders" / "oai"
 REJECTED_DIR = OUTPUT_DIR / "_rejected"  # QC-failed renders quarantined for human review
 

@@ -7,8 +7,8 @@ A "master" is the immutable, locked image that represents a product exactly. All
 renders (compositor scene variants, marketing derivatives) MUST derive from a master — never
 from a generated variant. This module enforces that by hash-pinning.
 
-Masters live at `assets/product-masters/` at the repo root; the manifest is
-`assets/product-masters/manifest.json`. Override the manifest location via the
+Masters live at `assets/products/masters/` at the repo root; the manifest is
+`assets/products/masters/manifest.json`. Override the manifest location via the
 `SKYYROSE_MASTER_MANIFEST_PATH` environment variable (used by tests).
 
 Master sources (`master_source` field):
@@ -37,7 +37,7 @@ MasterSource = Literal["photograph", "cad_render", "3d_model", "generative_locke
 MasterStatus = Literal["pending", "locked", "retired"]
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-_DEFAULT_MASTERS_DIR = _REPO_ROOT / "assets" / "product-masters"
+_DEFAULT_MASTERS_DIR = _REPO_ROOT / "assets" / "products" / "masters"
 _MANIFEST_FILENAME = "manifest.json"
 
 

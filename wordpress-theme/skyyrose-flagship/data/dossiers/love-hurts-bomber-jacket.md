@@ -5,7 +5,7 @@ collection: love-hurts
 logo_reference: data/brand-logos/love-hurts-logo.md
 extra_logos:
   - data/brand-logos/red-roses-cloud-cluster.md
-reference_image: data/product-references/lh-004-techflat-front.jpeg
+reference_image: assets/products/references/lh-004-techflat-front.jpeg
 ---
 
 # Love Hurts Bomber Jacket
@@ -17,7 +17,7 @@ reference_image: data/product-references/lh-004-techflat-front.jpeg
 > Logo art canonical references:
 > - Love Hurts logo (wordmark + heart-and-thorns): `data/brand-logos/love-hurts-logo.md`
 > - Red Roses Cloud Cluster (LH variant): `data/brand-logos/red-roses-cloud-cluster.md`
-> - Product techflat: `data/product-references/lh-004-techflat-front.jpeg`
+> - Product techflat: `assets/products/references/lh-004-techflat-front.jpeg`
 
 ### Front
 - **front-body** (entire white field, between the raglan sleeve seams and excluding the placket): Solid **white** fabric. **Technique:** stitched. **Color:** white.

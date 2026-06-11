@@ -87,7 +87,7 @@ async def list_product_images(args: dict[str, Any]) -> dict[str, Any]:
 
     search_dirs = [
         REPO_DIR / "skyyrose" / "assets" / "images" / "products" / sku,
-        REPO_DIR / "skyyrose" / "assets" / "images" / "source-products",
+        REPO_DIR / "assets" / "products" / "source-photos",
         THEME_DIR / "assets" / "images" / "products",
     ]
 

@@ -1,0 +1,926 @@
+{
+  "version": "1.0.0",
+  "generated_by": "scripts/audit_source_photos.py",
+  "required_angles_by_garment_type": {
+    "tee": [
+      "front",
+      "back",
+      "three-quarter",
+      "detail-graphic"
+    ],
+    "hoodie": [
+      "front",
+      "back",
+      "three-quarter",
+      "detail-hood",
+      "detail-pocket"
+    ],
+    "crewneck": [
+      "front",
+      "back",
+      "three-quarter",
+      "detail-graphic"
+    ],
+    "jersey": [
+      "front",
+      "back",
+      "three-quarter",
+      "detail-patch",
+      "detail-stitching"
+    ],
+    "shorts": [
+      "front",
+      "back",
+      "side",
+      "detail-pocket"
+    ],
+    "joggers": [
+      "front",
+      "back",
+      "side",
+      "detail-pocket"
+    ],
+    "set": [
+      "combined-front",
+      "top-only",
+      "bottom-only",
+      "back",
+      "detail"
+    ],
+    "jacket": [
+      "front",
+      "back",
+      "three-quarter",
+      "detail-hood",
+      "detail-pocket"
+    ],
+    "accessory": [
+      "front",
+      "back",
+      "in-context"
+    ]
+  },
+  "minimum_for_compositor": [
+    "front",
+    "back"
+  ],
+  "summary": {
+    "total_active_skus": 33,
+    "compositor_ready": 10,
+    "compositor_blocked": 23,
+    "full_required_coverage": 0,
+    "by_source_type": {
+      "photography": 7,
+      "techflat": 3,
+      "missing": 23
+    }
+  },
+  "skus": {
+    "br-001": {
+      "sku": "br-001",
+      "name": "BLACK Rose Crewneck",
+      "collection": "black-rose",
+      "garment_type": "crewneck",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-graphic"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-graphic"
+      ],
+      "photo_paths": {
+        "front": "skyyrose/assets/images/source-products/black-rose/br-001-crewneck-front.jpeg"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "br-002": {
+      "sku": "br-002",
+      "name": "BLACK Rose Joggers",
+      "collection": "black-rose",
+      "garment_type": "crewneck",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-graphic"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-graphic"
+      ],
+      "photo_paths": {
+        "front": "skyyrose/assets/images/source-products/black-rose/br-002-joggers-front.jpeg"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "br-003": {
+      "sku": "br-003",
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic",
+      "collection": "black-rose",
+      "garment_type": "hoodie",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "photo_paths": {
+        "front": "skyyrose/assets/images/source-products/black-rose/br-003-jersey-white-front.jpeg"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "br-004": {
+      "sku": "br-004",
+      "name": "BLACK Rose Hoodie",
+      "collection": "black-rose",
+      "garment_type": "crewneck",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-graphic"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-graphic"
+      ],
+      "photo_paths": {
+        "front": "skyyrose/assets/images/source-products/black-rose/br-004-hoodie-front.jpeg"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "br-005": {
+      "sku": "br-005",
+      "name": "BLACK Rose Hoodie \u2014 Signature Edition",
+      "collection": "black-rose",
+      "garment_type": "crewneck",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-graphic"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-graphic"
+      ],
+      "photo_paths": {
+        "front": "wordpress-theme/skyyrose-flagship/assets/images/products/br-005-composite-front.webp"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "br-006": {
+      "sku": "br-006",
+      "name": "BLACK Rose Sherpa Jacket",
+      "collection": "black-rose",
+      "garment_type": "hoodie",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "present_angles": [
+        "front",
+        "back"
+      ],
+      "missing_angles": [
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "photo_paths": {
+        "front": "skyyrose/assets/images/source-products/black-rose/br-006-sherpa-jacket-front.jpeg",
+        "back": "skyyrose/assets/images/source-products/black-rose/br-006-sherpa-jacket-back.jpeg"
+      },
+      "has_minimum_for_compositor": true,
+      "source_type": "photography"
+    },
+    "br-007": {
+      "sku": "br-007",
+      "name": "BLACK Rose x Love Hurts Basketball Shorts",
+      "collection": "black-rose",
+      "garment_type": "jersey",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "present_angles": [
+        "front",
+        "back"
+      ],
+      "missing_angles": [
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "photo_paths": {
+        "front": "skyyrose/assets/images/source-products/black-rose/br-007-shorts-front.jpeg",
+        "side": "skyyrose/assets/images/source-products/black-rose/br-007-shorts-side.jpeg",
+        "detail": "skyyrose/assets/images/source-products/black-rose/br-007-shorts-back-detail.jpeg",
+        "hanger": "skyyrose/assets/images/source-products/black-rose/br-007-shorts-back-hanger.jpeg",
+        "back": "wordpress-theme/skyyrose-flagship/assets/images/products/br-007-real-back.jpg",
+        "techflat": "wordpress-theme/skyyrose-flagship/assets/images/products/br-007-techflat.jpeg"
+      },
+      "has_minimum_for_compositor": true,
+      "source_type": "photography"
+    },
+    "br-008": {
+      "sku": "br-008",
+      "name": "BLACK is Beautiful Jersey Series: 1. SF Inspired (Football)",
+      "collection": "black-rose",
+      "garment_type": "hoodie",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "present_angles": [
+        "front",
+        "back"
+      ],
+      "missing_angles": [
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "photo_paths": {
+        "front": "skyyrose/assets/images/source-products/black-rose/br-008-sf-inspired-jersey-front.jpg",
+        "back": "skyyrose/assets/images/source-products/black-rose/br-008-football-jersey-back.jpeg"
+      },
+      "has_minimum_for_compositor": true,
+      "source_type": "photography"
+    },
+    "br-009": {
+      "sku": "br-009",
+      "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
+      "collection": "black-rose",
+      "garment_type": "hoodie",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "photo_paths": {
+        "front": "skyyrose/assets/images/source-products/black-rose/br-009-last-oakland-jersey-front.jpg"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "br-010": {
+      "sku": "br-010",
+      "name": "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)",
+      "collection": "black-rose",
+      "garment_type": "jersey",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "present_angles": [],
+      "missing_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "photo_paths": {},
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "br-011": {
+      "sku": "br-011",
+      "name": "BLACK is Beautiful Jersey Series: 4. The Rose (Hockey)",
+      "collection": "black-rose",
+      "garment_type": "hoodie",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "photo_paths": {
+        "front": "skyyrose/assets/images/source-products/black-rose/br-011-sharks-edition-jersey-front.png"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "br-012": {
+      "sku": "br-012",
+      "name": "BLACK is Beautiful Jersey Series: 5. Last Oakland (Baseball)",
+      "collection": "black-rose",
+      "garment_type": "hoodie",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "present_angles": [
+        "front",
+        "back"
+      ],
+      "missing_angles": [
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "photo_paths": {
+        "front": "wordpress-theme/skyyrose-flagship/assets/images/products/br-012-last-oakland-baseball-front.jpeg",
+        "back": "wordpress-theme/skyyrose-flagship/assets/images/products/br-012-last-oakland-baseball-back.jpeg"
+      },
+      "has_minimum_for_compositor": true,
+      "source_type": "photography"
+    },
+    "lh-002": {
+      "sku": "lh-002",
+      "name": "Love Hurts Joggers",
+      "collection": "love-hurts",
+      "garment_type": "jersey",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "photo_paths": {
+        "front": "wordpress-theme/skyyrose-flagship/assets/images/products/lh-002-composite-front.webp"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "lh-003": {
+      "sku": "lh-003",
+      "name": "Love Hurts Basketball Shorts",
+      "collection": "love-hurts",
+      "garment_type": "jersey",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "present_angles": [
+        "front",
+        "back"
+      ],
+      "missing_angles": [
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "photo_paths": {
+        "back": "skyyrose/assets/images/source-products/love-hurts/lh-003-shorts-techflat-v1-back.jpg",
+        "front": "skyyrose/assets/images/source-products/love-hurts/lh-003-shorts-techflat-allover-front.jpg"
+      },
+      "has_minimum_for_compositor": true,
+      "source_type": "techflat"
+    },
+    "lh-004": {
+      "sku": "lh-004",
+      "name": "Love Hurts Bomber Jacket",
+      "collection": "love-hurts",
+      "garment_type": "hoodie",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "present_angles": [
+        "front",
+        "back"
+      ],
+      "missing_angles": [
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "photo_paths": {
+        "front": "skyyrose/assets/images/source-products/love-hurts/lh-004-bomber-front.jpg",
+        "back": "skyyrose/assets/images/source-products/love-hurts/lh-004-bomber-back.png"
+      },
+      "has_minimum_for_compositor": true,
+      "source_type": "photography"
+    },
+    "lh-005": {
+      "sku": "lh-005",
+      "name": "The Fannie",
+      "collection": "love-hurts",
+      "garment_type": "accessory",
+      "required_angles": [
+        "front",
+        "back",
+        "in-context"
+      ],
+      "present_angles": [
+        "front",
+        "back"
+      ],
+      "missing_angles": [
+        "in-context"
+      ],
+      "photo_paths": {
+        "techflat": "skyyrose/assets/images/source-products/love-hurts/lh-005-varsity-jacket-white-techflat.jpg",
+        "front": "skyyrose/assets/images/source-products/love-hurts/lh-005-varsity-jacket-techflat-front.jpg",
+        "back": "skyyrose/assets/images/source-products/love-hurts/lh-005-varsity-jacket-white-techflat-back.jpg"
+      },
+      "has_minimum_for_compositor": true,
+      "source_type": "techflat"
+    },
+    "sg-001": {
+      "sku": "sg-001",
+      "name": "The Bridge Series 'The Bay Bridge' Shorts",
+      "collection": "signature",
+      "garment_type": "jersey",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "photo_paths": {
+        "front": "skyyrose/assets/images/source-products/signature/sg-001-bay-bridge-shorts-front.jpeg"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "sg-002": {
+      "sku": "sg-002",
+      "name": "The Bridge Series 'Stay Golden' Shirt",
+      "collection": "signature",
+      "garment_type": "hoodie",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "photo_paths": {
+        "front": "skyyrose/assets/images/source-products/signature/sg-002-mint-tee-front.jpg"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "sg-003": {
+      "sku": "sg-003",
+      "name": "The Bridge Series 'Stay Golden' Shorts",
+      "collection": "signature",
+      "garment_type": "jersey",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "photo_paths": {
+        "front": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-003-composite-front.webp"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "sg-005": {
+      "sku": "sg-005",
+      "name": "The Bridge Series 'The Bay Bridge' Shirt",
+      "collection": "signature",
+      "garment_type": "hoodie",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "photo_paths": {
+        "techflat": "skyyrose/assets/images/source-products/signature/sg-005-bay-rose-set-techflat.jpg",
+        "front": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-005-composite-front.webp"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "sg-006": {
+      "sku": "sg-006",
+      "name": "Mint & Lavender Hoodie",
+      "collection": "signature",
+      "garment_type": "crewneck",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-graphic"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-graphic"
+      ],
+      "photo_paths": {
+        "front": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-006-composite-front.webp"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "sg-007": {
+      "sku": "sg-007",
+      "name": "The Signature Beanie",
+      "collection": "signature",
+      "garment_type": "jersey",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "present_angles": [],
+      "missing_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "photo_paths": {},
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "sg-009": {
+      "sku": "sg-009",
+      "name": "The Sherpa Jacket",
+      "collection": "signature",
+      "garment_type": "hoodie",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "photo_paths": {
+        "detail": "skyyrose/assets/images/source-products/signature/sg-009-sherpa-jacket-lining-detail.jpeg",
+        "front": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-009-composite-front.webp"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "sg-011": {
+      "sku": "sg-011",
+      "name": "Original Label Tee (White)",
+      "collection": "signature",
+      "garment_type": "crewneck",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-graphic"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-graphic"
+      ],
+      "photo_paths": {
+        "front": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-011-composite-front.webp"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "sg-012": {
+      "sku": "sg-012",
+      "name": "Original Label Tee (Orchid)",
+      "collection": "signature",
+      "garment_type": "crewneck",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-graphic"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-graphic"
+      ],
+      "photo_paths": {
+        "front": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-012-composite-front.webp"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "sg-013": {
+      "sku": "sg-013",
+      "name": "Mint & Lavender Crewneck",
+      "collection": "signature",
+      "garment_type": "crewneck",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-graphic"
+      ],
+      "present_angles": [
+        "front",
+        "back"
+      ],
+      "missing_angles": [
+        "three-quarter",
+        "detail-graphic"
+      ],
+      "photo_paths": {
+        "techflat": "skyyrose/assets/images/source-products/signature/sg-013-cycling-jersey-gold-techflat.jpg",
+        "back": "skyyrose/assets/images/source-products/signature/sg-013-mint-lavender-crewneck-back.jpeg",
+        "front": "skyyrose/assets/images/source-products/signature/sg-013-mint-lavender-crewneck-front.jpeg"
+      },
+      "has_minimum_for_compositor": true,
+      "source_type": "photography"
+    },
+    "sg-014": {
+      "sku": "sg-014",
+      "name": "Mint & Lavender Sweatpants",
+      "collection": "signature",
+      "garment_type": "hoodie",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "present_angles": [
+        "front",
+        "back"
+      ],
+      "missing_angles": [
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "photo_paths": {
+        "back": "skyyrose/assets/images/source-products/signature/sg-014-mint-lavender-sweatpants-back.jpeg",
+        "front": "skyyrose/assets/images/source-products/signature/sg-014-mint-lavender-sweatpants-front.jpeg"
+      },
+      "has_minimum_for_compositor": true,
+      "source_type": "photography"
+    },
+    "sg-015": {
+      "sku": "sg-015",
+      "name": "The Windbreaker Set",
+      "collection": "signature",
+      "garment_type": "hoodie",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "present_angles": [],
+      "missing_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "photo_paths": {},
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "kids-001": {
+      "sku": "kids-001",
+      "name": "Kids Colorblock Hoodie Set \u2014 Red/Black",
+      "collection": "kids-capsule",
+      "garment_type": "hoodie",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "photo_paths": {
+        "techflat": "skyyrose/assets/images/source-products/kids/kids-001-techflat.jpeg"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "kids-002": {
+      "sku": "kids-002",
+      "name": "Kids Colorblock Hoodie Set \u2014 Purple/Black",
+      "collection": "kids-capsule",
+      "garment_type": "hoodie",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "present_angles": [
+        "front"
+      ],
+      "missing_angles": [
+        "back",
+        "three-quarter",
+        "detail-hood",
+        "detail-pocket"
+      ],
+      "photo_paths": {
+        "techflat": "skyyrose/assets/images/source-products/kids/kids-002-techflat.jpeg"
+      },
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "br-014": {
+      "sku": "br-014",
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants Edition)",
+      "collection": "black-rose",
+      "garment_type": "jersey",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "present_angles": [],
+      "missing_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "photo_paths": {},
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    },
+    "br-015": {
+      "sku": "br-015",
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White Edition)",
+      "collection": "black-rose",
+      "garment_type": "jersey",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "present_angles": [],
+      "missing_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "photo_paths": {},
+      "has_minimum_for_compositor": false,
+      "source_type": "missing"
+    }
+  }
+}

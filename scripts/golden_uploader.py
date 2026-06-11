@@ -53,7 +53,9 @@ ALLOWED_EXT = {".jpg", ".jpeg", ".png", ".webp"}
 ALLOWED_PIL_FORMATS = {"JPEG", "PNG", "WEBP"}
 PORT = 8765
 
-PRODUCT_REFERENCES_DIR = THEME_ROOT / "data" / "product-references"
+from skyyrose.core import asset_paths as _ap
+
+PRODUCT_REFERENCES_DIR = _ap.PRODUCT_REFERENCES
 TECHFLAT_REVIEW_JSON = PRODUCT_REFERENCES_DIR / "techflat-review.json"
 # Layout codes the founder assigns per techflat in the review tab.
 TECHFLAT_LAYOUTS = {

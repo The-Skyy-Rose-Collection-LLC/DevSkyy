@@ -293,7 +293,7 @@ def get_logo_reference(sku: str, collection: str) -> Path | None:
 def find_flatlay_photo(sku: str) -> Path | None:
     """Find a real product photo for a SKU (ground truth) in product-references/.
 
-    Searches the curated ``data/product-references/`` first, then the theme
+    Searches the curated ``assets/products/references/`` first, then the theme
     products dir, excluding generated renders.
     """
     # Sibling SKUs that extend this one (e.g. kids-001 → kids-001-joggers); their

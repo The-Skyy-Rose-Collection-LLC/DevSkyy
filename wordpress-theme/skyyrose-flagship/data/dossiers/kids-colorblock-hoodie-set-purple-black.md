@@ -5,9 +5,9 @@ collection: kids-capsule
 logo_reference: data/brand-logos/three-rose-cluster.md
 extra_logos:
   - data/brand-logos/black-rose-authentic-collection-patch.md
-reference_image: data/product-references/kids-002-techflat.jpeg
+reference_image: assets/products/references/kids-002-techflat.jpeg
 extra_references:
-  - data/product-references/kids-002-real-photo.jpeg
+  - assets/products/references/kids-002-real-photo.jpeg
 ---
 
 # Kids Colorblock Hoodie Set — Purple/Black
@@ -21,8 +21,8 @@ extra_references:
 > Logo art canonical references:
 > - Black Rose three-rose-cluster: `data/brand-logos/three-rose-cluster.md`
 > - Authentic Collection patch:    `data/brand-logos/black-rose-authentic-collection-patch.md`
-> - Product techflat:              `data/product-references/kids-002-techflat.jpeg`
-> - Real product photo:            `data/product-references/kids-002-real-photo.jpeg`
+> - Product techflat:              `assets/products/references/kids-002-techflat.jpeg`
+> - Real product photo:            `assets/products/references/kids-002-real-photo.jpeg`
 
 ### Hoodie — Front
 - **front-body color-block** (entire front body): Angular geometric color-block construction with diagonal seams. **Upper-left panel** (descending from top-left toward center): **lavender / light pink-purple**. **Upper-right panel** (descending from top-right toward center): **medium purple**. **Lower body** (from the diagonal meeting points down to the hem, including the kangaroo pocket area): **deep / dark purple**. **Technique:** stitched. **Color:** lavender + medium purple + deep purple.

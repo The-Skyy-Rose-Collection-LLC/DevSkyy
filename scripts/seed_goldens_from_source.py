@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Seed golden references from existing source-product photography.
 
-Walks ``skyyrose/assets/images/source-products/`` and ``wordpress-theme/.../products/``,
+Walks ``assets/products/source-photos/`` and ``wordpress-theme/.../products/``,
 maps each photo to a SKU + angle, and copies it into the canonical goldens path.
 Intended as a one-time backfill so the visual-regression test has SOMETHING to
 score against on day one.
@@ -33,7 +33,7 @@ from skyyrose.elite_studio.quality.visual_regression import (  # noqa: E402
     VisualRegressionTester,
 )
 
-SOURCE_ROOT = ROOT / "skyyrose" / "assets" / "images" / "source-products"
+SOURCE_ROOT = ROOT / "assets" / "products" / "source-photos"
 THEME_PRODUCTS = ROOT / "wordpress-theme" / "skyyrose-flagship" / "assets" / "images" / "products"
 
 # Filename pattern → angle slug mapping. Matches conservatively — only files

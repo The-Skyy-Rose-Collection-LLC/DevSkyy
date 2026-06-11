@@ -5,7 +5,7 @@ collection: signature
 logo_reference: data/brand-logos/sr-monogram.md
 extra_logos:
   - data/brand-logos/red-roses-cloud-cluster.md
-reference_image: data/product-references/sg-015-windbreaker-set-techflat.jpeg
+reference_image: assets/products/references/sg-015-windbreaker-set-techflat.jpeg
 ---
 
 # The Windbreaker Set
@@ -18,7 +18,7 @@ reference_image: data/product-references/sg-015-windbreaker-set-techflat.jpeg
 > - SR monogram (large back-yoke logo on the jacket): `data/brand-logos/sr-monogram.md`
 > - Canonical rose-cluster art (recolored to pink per COLORWAY OVERRIDE — small chest accent): `data/brand-logos/red-roses-cloud-cluster.md`
 > - Product reference techflat (jacket front-and-back + pants front-and-back, all four views visible):
->   `data/product-references/sg-015-windbreaker-set-techflat.jpeg`
+>   `assets/products/references/sg-015-windbreaker-set-techflat.jpeg`
 >
 > ### COLORWAY — rainbow chevron palette in nylon
 >
