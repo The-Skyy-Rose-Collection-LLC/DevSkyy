@@ -1805,6 +1805,26 @@
       ],
       "occurrences": 1,
       "last_seen": "2026-06-10"
+    },
+    {
+      "id": "bug-124",
+      "timestamp": "2026-06-10T20:10:00-07:00",
+      "error_message": "QC judge failed br-001/br-002 back-view renders [branding_drift]: 'logo not visible... inconsistent with references' — ~9 paid rejects in first 3 SKUs of re-render batch",
+      "file": "scripts/oai_render/qc.py",
+      "root_cause": "Judge compared every render against ALL reference images (front techflats + standalone logo art) with 'be strict, uncertain=False'. It had no per-view branding spec, so back views were held to front-branding evidence: blank-or-small-mark backs auto-failed.",
+      "fix": "extract_view_branding() pulls the dossier's ### Front/### Back bullets; SkuPlan.branding_spec → RenderExpectation.branding_spec → DOSSIER GROUND TRUTH block in _judge_instructions, with explicit 'absence of branding on a spec-blank panel is CORRECT'. Regression tests added.",
+      "tags": [
+        "oai-render",
+        "qc-judge",
+        "vision-judge",
+        "false-positive",
+        "back-view"
+      ],
+      "related_bugs": [
+        "bug-119"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-10"
     }
   ]
 }
