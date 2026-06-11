@@ -57,9 +57,9 @@ from skyyrose.core.paths import (  # noqa: E402
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
-from skyyrose.core import asset_paths as _ap
+from skyyrose.core import paths
 
-PRODUCT_REFERENCES_DIR = _ap.PRODUCT_REFERENCES
+PRODUCT_REFERENCES_DIR = paths.PRODUCT_REFERENCES
 LOGO_REGISTRY_JSON = THEME_ROOT / "data" / "logo-registry.json"
 
 SUBDIRS = ("flatlays", "techflat", "logos")

@@ -40,10 +40,7 @@ from skyyrose.core.paths import (
 )
 from skyyrose.core.paths import DOSSIERS_DIR as DOSSIER_ROOT  # noqa: E402
 from skyyrose.core.paths import GOLDEN_DIR as GOLDEN_ROOT
-from skyyrose.core.paths import (
-    THEME_ROOT,
-    golden_path,
-)
+from skyyrose.core.paths import PRODUCT_REFERENCES, golden_path
 
 logger = logging.getLogger(__name__)
 
@@ -53,9 +50,7 @@ ALLOWED_EXT = {".jpg", ".jpeg", ".png", ".webp"}
 ALLOWED_PIL_FORMATS = {"JPEG", "PNG", "WEBP"}
 PORT = 8765
 
-from skyyrose.core import asset_paths as _ap
-
-PRODUCT_REFERENCES_DIR = _ap.PRODUCT_REFERENCES
+PRODUCT_REFERENCES_DIR = PRODUCT_REFERENCES
 TECHFLAT_REVIEW_JSON = PRODUCT_REFERENCES_DIR / "techflat-review.json"
 # Layout codes the founder assigns per techflat in the review tab.
 TECHFLAT_LAYOUTS = {

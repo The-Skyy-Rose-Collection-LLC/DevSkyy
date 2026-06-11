@@ -70,12 +70,12 @@ EXCLUDED_SKUS: dict[str, str] = {
     # garments (bug-119 contamination cleared) — both SKUs render again.
 }
 
-# ── Paths (single authority: skyyrose/core/asset_paths.py) ──────────────────
-from skyyrose.core import asset_paths as _ap  # noqa: E402
+# ── Paths (single authority: skyyrose/core/paths.py) ────────────────────────
+from skyyrose.core import paths as _ap  # noqa: E402
 
 THEME_ROOT = _ap.THEME_ROOT
 CATALOG_CSV = _ap.CATALOG_CSV
-DOSSIER_DIR = _ap.DOSSIER_DIR
+DOSSIER_DIR = _ap.DOSSIERS_DIR
 # Founder's verbatim render-review corrections, injected into prompts per SKU
 # (generated from the 2026-06-09 review board; see the file's _meta block).
 CORRECTIONS_JSON = THEME_ROOT / "data" / "render-corrections.json"
@@ -83,7 +83,7 @@ CORRECTIONS_JSON = THEME_ROOT / "data" / "render-corrections.json"
 # each entry skips one (sku, style, view) plan in batches; explicit --sku overrides.
 KEEPERS_JSON = THEME_ROOT / "data" / "render-keepers.json"
 PRODUCT_REFERENCES_DIR = _ap.PRODUCT_REFERENCES
-PRODUCTS_DIR = _ap.THEME_PRODUCT_IMAGES
+PRODUCTS_DIR = _ap.WP_PRODUCTS_DIR
 SPLIT_DIR = _ap.PRODUCT_TECHFLATS / "split"
 OVERLAYS_DIR = _ap.PRODUCT_TECHFLATS / "hero-overlays"
 TECHFLATS_DIR = _ap.PRODUCT_TECHFLATS
