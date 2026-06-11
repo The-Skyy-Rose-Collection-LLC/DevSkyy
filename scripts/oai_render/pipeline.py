@@ -1,0 +1,425 @@
+"""Pipeline orchestration — resolve, plan, manifest, and render SKUs.
+
+Dry-run by default: planning resolves references + builds prompts + a cost
+manifest with ZERO API calls. Live generation requires an explicit caller
+(cli `generate --yes`) and passes the hard cost cap.
+"""
+
+from __future__ import annotations
+
+import json
+import logging
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+from . import config, cost, references
+from .cost import CostManifest, ManifestEntry
+from .prompt import SceneError, build_pair_prompt, build_prompt, read_dossier
+from .references import MissingReferenceError, Pair, ReferenceImage
+
+if TYPE_CHECKING:
+    from .client import RenderClient
+    from .cost import SpendTracker
+    from .qc import QCGate
+
+log = logging.getLogger(__name__)
+
+
+@dataclass
+class SkuPlan:
+    """Everything needed to render one SKU (or the reason it cannot be rendered)."""
+
+    sku: str
+    name: str
+    collection: str
+    output_slug: str
+    style: str = "ghost"  # presentation: "ghost" | "on-model" | "flatlay"
+    view: str = "front"  # "front" | "back"; back is ghost-only, when a back source exists
+    references: list[ReferenceImage] = field(default_factory=list)
+    prompt: str = ""
+    is_patch: bool = False
+    is_pair: bool = False  # True for a paired-look on-model (two garments, one model)
+    pair_id: str | None = None
+    pair_skus: tuple[str, ...] | None = None
+    error: str | None = None  # set when the SKU is unrenderable (missing refs)
+
+    @property
+    def renderable(self) -> bool:
+        return self.error is None and bool(self.references)
+
+
+@dataclass
+class RenderResult:
+    sku: str
+    status: str  # "rendered" | "skipped" | "error"
+    reason: str = ""
+    output_path: Path | None = None
+
+
+def resolve_targets(
+    catalog: dict[str, dict],
+    *,
+    sku: str | None = None,
+    skus: list[str] | None = None,
+    collection: str | None = None,
+    all_skus: bool = False,
+) -> list[str]:
+    """Resolve the requested SKU set from the catalog."""
+    if sku:
+        if sku not in catalog:
+            raise KeyError(f"SKU {sku} not in catalog.")
+        return [sku]
+    if skus:
+        missing = [s for s in skus if s not in catalog]
+        if missing:
+            raise KeyError(f"SKU(s) not in catalog: {', '.join(missing)}")
+        return list(skus)
+    if collection:
+        return _drop_excluded(
+            [s for s, info in sorted(catalog.items()) if info["collection"] == collection]
+        )
+    if all_skus:
+        return _drop_excluded(sorted(catalog.keys()))
+    return []
+
+
+def _drop_excluded(skus: list[str]) -> list[str]:
+    """Filter known-bad-source SKUs from a batch, logging each skip + reason."""
+    kept: list[str] = []
+    for s in skus:
+        reason = config.EXCLUDED_SKUS.get(s)
+        if reason:
+            log.warning("Excluding %s from batch: %s", s, reason)
+        else:
+            kept.append(s)
+    return kept
+
+
+def plan_sku(
+    sku: str,
+    catalog: dict[str, dict],
+    dossier_index: dict[str, Path],
+    *,
+    style: str = "ghost",
+    view: str = "front",
+) -> SkuPlan:
+    """Resolve references + dossier + prompt for a (SKU, style, view). Never raises for missing refs."""
+    info = catalog.get(sku, {})
+    name = info.get("name", sku)
+    collection = info.get("collection", "")
+    slug = info.get("output_slug", sku)
+
+    try:
+        refs = references.build_references(sku, collection, view=view)
+        is_patch = references.requires_patch(sku)
+        prompt = build_prompt(
+            name=name,
+            sku=sku,
+            collection=collection,
+            reference_labels=[r.label for r in refs],
+            dossier_text=read_dossier(dossier_index.get(sku)),
+            is_patch=is_patch,
+            style=style,
+            view=view,
+        )
+    except (MissingReferenceError, SceneError) as exc:
+        return SkuPlan(
+            sku=sku,
+            name=name,
+            collection=collection,
+            output_slug=slug,
+            style=style,
+            view=view,
+            error=str(exc),
+        )
+
+    return SkuPlan(
+        sku=sku,
+        name=name,
+        collection=collection,
+        output_slug=slug,
+        style=style,
+        view=view,
+        references=refs,
+        prompt=prompt,
+        is_patch=is_patch,
+    )
+
+
+def plan_pair(pair: Pair, catalog: dict[str, dict], dossier_index: dict[str, Path]) -> SkuPlan:
+    """Plan a paired-look on-model render (two garments, one model). Front-only refs per garment."""
+    slug = "pair__" + "__".join(pair.skus)
+    per_garment_cap = max(1, config.MAX_REFERENCE_IMAGES // len(pair.skus))
+    garments: list[dict] = []
+    combined: list[ReferenceImage] = []
+    try:
+        for member in pair.skus:
+            mname = catalog.get(member, {}).get("name", member)
+            refs = references.build_references(member, pair.collection, include_back=False)
+            refs = refs[:per_garment_cap]
+            combined.extend(refs)
+            garments.append(
+                {
+                    "name": mname,
+                    "sku": member,
+                    "reference_labels": [r.label for r in refs],
+                    "dossier_text": read_dossier(dossier_index.get(member)),
+                    "is_patch": references.requires_patch(member),
+                }
+            )
+        prompt = build_pair_prompt(
+            pair_label=pair.label, collection=pair.collection, garments=garments
+        )
+    except (MissingReferenceError, SceneError) as exc:
+        return SkuPlan(
+            sku=pair.skus[0],
+            name=pair.label,
+            collection=pair.collection,
+            output_slug=slug,
+            style="on-model",
+            view="front",
+            is_pair=True,
+            pair_id=pair.pair_id,
+            pair_skus=pair.skus,
+            error=str(exc),
+        )
+
+    return SkuPlan(
+        sku=pair.skus[0],
+        name=pair.label,
+        collection=pair.collection,
+        output_slug=slug,
+        style="on-model",
+        view="front",
+        is_pair=True,
+        pair_id=pair.pair_id,
+        pair_skus=pair.skus,
+        references=combined,
+        prompt=prompt,
+        is_patch=any(g["is_patch"] for g in garments),
+    )
+
+
+def build_manifest(plans: list[SkuPlan]) -> CostManifest:
+    """Build the cost manifest. Renderable SKUs cost 1 image; skipped show 0 + reason."""
+    entries: list[ManifestEntry] = []
+    for p in plans:
+        if p.is_pair:
+            label = f"{p.name} · on-model (paired)"
+        else:
+            view_tag = "" if p.view == "front" else " (back)"
+            label = f"{p.name} · {p.style}{view_tag}"
+        if p.renderable:
+            entries.append(
+                ManifestEntry(sku=p.sku, name=label, n_images=config.N, ref_count=len(p.references))
+            )
+        else:
+            short = (p.error or "no references").split(";")[0][:48]
+            entries.append(
+                ManifestEntry(sku=p.sku, name=label, n_images=0, ref_count=0, note=f"SKIP: {short}")
+            )
+    return CostManifest(entries=entries)
+
+
+def _output_filename(plan: SkuPlan) -> str:
+    if plan.is_pair:
+        return "on-model.png"
+    suffix = "" if plan.view == "front" else "-back"
+    return f"{plan.style}{suffix}.png"
+
+
+def _quarantine(plan: SkuPlan, data: bytes, attempt: int, verdict) -> Path:
+    """Write a QC-rejected render + its verdict to the quarantine dir for review."""
+    qdir = config.REJECTED_DIR / plan.output_slug
+    qdir.mkdir(parents=True, exist_ok=True)
+    stem = _output_filename(plan).removesuffix(".png")
+    img_path = qdir / f"{stem}.attempt{attempt}.png"
+    img_path.write_bytes(data)
+    meta = {
+        "sku": plan.sku,
+        "style": plan.style,
+        "view": plan.view,
+        "is_pair": plan.is_pair,
+        "attempt": attempt,
+        "failure_tags": list(verdict.failure_tags),
+        "reason": verdict.reason,
+    }
+    (qdir / f"{stem}.attempt{attempt}.json").write_text(
+        json.dumps(meta, indent=2), encoding="utf-8"
+    )
+    return img_path
+
+
+def render_sku(
+    plan: SkuPlan,
+    client: RenderClient,
+    *,
+    gate: QCGate | None = None,
+    spend: SpendTracker | None = None,
+) -> RenderResult:
+    """Render one renderable SKU; QC-gate the output before accepting it.
+
+    Loop: budget check → paid render → QC verdict. A failing verdict quarantines
+    the attempt and re-renders, up to ``config.QC_MAX_RENDER_RETRIES`` extra
+    attempts; exhaustion returns status ``qc_failed`` (needs human review) — the
+    batch continues. Without a gate the first successful render is accepted
+    (legacy behavior, used by tests and judge-disabled runs).
+    """
+    if not plan.renderable:
+        return RenderResult(sku=plan.sku, status="skipped", reason=plan.error or "no references")
+
+    last_verdict = None
+    for attempt in range(1 + config.QC_MAX_RENDER_RETRIES):
+        if spend is not None and not spend.can_afford(config.EST_COST_PER_IMAGE_USD):
+            return RenderResult(
+                sku=plan.sku,
+                status="error",
+                reason=f"budget: ${spend.spent_usd:.2f} spent, cap ${spend.cap_usd:.2f} — "
+                "refusing further paid calls",
+            )
+        try:
+            data = client.edit(prompt=plan.prompt, image_paths=[r.path for r in plan.references])
+        except Exception as exc:  # surfaced, never swallowed
+            log.error("Render failed for %s: %s", plan.sku, exc)
+            return RenderResult(sku=plan.sku, status="error", reason=str(exc))
+        if spend is not None:
+            spend.add(config.EST_COST_PER_IMAGE_USD)
+
+        if gate is None:
+            verdict = None
+        else:
+            verdict = gate.check(data, _expectation_for(plan))
+            if spend is not None and verdict.judge_cost_usd:
+                spend.add(verdict.judge_cost_usd)
+
+        if verdict is None or verdict.passed:
+            try:
+                out_dir = config.OUTPUT_DIR / plan.output_slug
+                out_dir.mkdir(parents=True, exist_ok=True)
+                out_path = out_dir / _output_filename(plan)
+                out_path.write_bytes(data)
+            except OSError as exc:  # disk error after a paid call — capture, don't abort
+                log.error("Disk write failed for %s: %s", plan.sku, exc)
+                return RenderResult(sku=plan.sku, status="error", reason=f"disk: {exc}")
+            log.info("Rendered %s → %s (%d bytes)", plan.sku, out_path, len(data))
+            return RenderResult(sku=plan.sku, status="rendered", output_path=out_path)
+
+        last_verdict = verdict
+        try:
+            _quarantine(plan, data, attempt + 1, verdict)
+        except OSError as exc:
+            log.error("Quarantine write failed for %s: %s", plan.sku, exc)
+        log.warning(
+            "QC rejected %s attempt %d/%d [%s] — %s",
+            plan.sku,
+            attempt + 1,
+            1 + config.QC_MAX_RENDER_RETRIES,
+            ",".join(verdict.failure_tags),
+            verdict.reason,
+        )
+
+    return RenderResult(
+        sku=plan.sku,
+        status="qc_failed",
+        reason=last_verdict.summary if last_verdict else "qc failed",
+    )
+
+
+def _expectation_for(plan: SkuPlan):
+    from .qc import RenderExpectation
+
+    return RenderExpectation(
+        sku=plan.sku,
+        name=plan.name,
+        style=plan.style,
+        view=plan.view,
+        is_pair=plan.is_pair,
+        is_patch=plan.is_patch,
+        reference_paths=tuple(r.path for r in plan.references),
+    )
+
+
+def run(
+    targets: list[str],
+    catalog: dict[str, dict],
+    dossier_index: dict[str, Path],
+    *,
+    styles: list[str] | None = None,
+    dry_run: bool = True,
+    client=None,
+) -> dict:
+    """Plan the render matrix for all targets; render them when not dry-run (client required).
+
+    Matrix rules (founder-locked):
+      - ghost-front:  always (feeds the product card)
+      - ghost-back:   only when the SKU has a dedicated back source (also a product-card image)
+      - on-model:     if the SKU is in a pair → ONE paired-look render per unique pair (two
+                      garments, one model), deduped; else a solo on-model. Front only, with a
+                      collection-specific scene background (hero image).
+    """
+    use_styles = styles or ["ghost"]
+    plans: list[SkuPlan] = []
+    seen_pairs: set[str] = set()
+    for s in targets:
+        for st in use_styles:
+            if st == "ghost":
+                plans.append(plan_sku(s, catalog, dossier_index, style="ghost", view="front"))
+                if references.has_back_source(s):
+                    plans.append(plan_sku(s, catalog, dossier_index, style="ghost", view="back"))
+            elif st == "on-model":
+                # A pair is only renderable when NO member is excluded — an excluded
+                # member's dossier is known-bad and would corrupt the paired look.
+                pairs = [
+                    pr
+                    for pr in references.get_pairs_for_sku(s)
+                    if not any(m in config.EXCLUDED_SKUS for m in pr.skus)
+                ]
+                for pr in references.get_pairs_for_sku(s):
+                    excluded = [m for m in pr.skus if m in config.EXCLUDED_SKUS]
+                    if excluded:
+                        log.warning(
+                            "Skipping paired look %s: member(s) %s excluded (%s)",
+                            pr.pair_id,
+                            ", ".join(excluded),
+                            "; ".join(config.EXCLUDED_SKUS[m] for m in excluded)[:120],
+                        )
+                if pairs:
+                    for pr in pairs:  # paired SKU: one paired look per pair, no solo on-model
+                        if pr.pair_id in seen_pairs:
+                            continue
+                        seen_pairs.add(pr.pair_id)
+                        plans.append(plan_pair(pr, catalog, dossier_index))
+                else:  # no renderable pair → solo on-model so the SKU still gets a hero
+                    plans.append(
+                        plan_sku(s, catalog, dossier_index, style="on-model", view="front")
+                    )
+            else:  # flatlay or any other explicit style
+                plans.append(plan_sku(s, catalog, dossier_index, style=st, view="front"))
+    manifest = build_manifest(plans)
+
+    if dry_run:
+        return {"plans": plans, "manifest": manifest, "results": []}
+
+    cost.enforce_cap(manifest)  # defense-in-depth (cli also enforces before --yes)
+    if client is None:
+        raise ValueError("Live run requires an image client.")
+
+    results = render_all(plans, client)
+    return {"plans": plans, "manifest": manifest, "results": results}
+
+
+def render_all(plans: list[SkuPlan], client: RenderClient) -> list[RenderResult]:
+    """Render every plan in order; per-SKU skips/errors are captured, not raised.
+
+    One QC gate + one runtime spend tracker per batch: every paid call (render,
+    judged retry, judge) draws from the same HARD_COST_CAP_USD budget.
+    """
+    from .cost import SpendTracker
+    from .qc import QCGate
+
+    gate = QCGate() if config.QC_ENABLED else None
+    spend = SpendTracker()
+    results = [render_sku(p, client, gate=gate, spend=spend) for p in plans]
+    log.info("Batch spend (estimated): $%.2f of $%.2f cap", spend.spent_usd, spend.cap_usd)
+    return results

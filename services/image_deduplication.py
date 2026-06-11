@@ -109,7 +109,7 @@ class ImageDeduplicator:
         if algo == HashAlgorithm.SHA256:
             content_hash = hashlib.sha256(content).hexdigest()
         elif algo == HashAlgorithm.MD5:
-            content_hash = hashlib.md5(content).hexdigest()
+            content_hash = hashlib.md5(content, usedforsecurity=False).hexdigest()
         elif algo == HashAlgorithm.PHASH:
             content_hash = self._compute_phash(content)
         else:

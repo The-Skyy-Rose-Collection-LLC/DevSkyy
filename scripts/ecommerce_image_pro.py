@@ -381,7 +381,7 @@ class EcommerceImageProcessor:
 
         # Truncate and add hash for uniqueness
         if len(clean) > 25:
-            hash_suffix = hashlib.md5(name.encode()).hexdigest()[:6].upper()
+            hash_suffix = hashlib.md5(name.encode(), usedforsecurity=False).hexdigest()[:6].upper()
             clean = f"{clean[:20]}_{hash_suffix}"
 
         return f"{prefix}_{clean}".upper()

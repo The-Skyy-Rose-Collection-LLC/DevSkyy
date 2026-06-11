@@ -1767,6 +1767,44 @@
       "status": "FIXED",
       "fixed_at": "2026-05-19T19:50:00-07:00",
       "fixed_in_commit": "TBD-this-session"
+    },
+    {
+      "id": "bug-106",
+      "timestamp": "2026-06-09T19:05:00-07:00",
+      "error_message": "AttributeError: property 'name' of 'ReplicateProvider' object has no setter (tests/test_p0_ssrf_replicate.py fixture)",
+      "file": "tests/test_p0_ssrf_replicate.py",
+      "root_cause": "Fixture used ReplicateProvider.__new__ then assigned p.name, but name is a read-only @property returning a constant \u2014 assignment never worked; tests were committed without a green run",
+      "fix": "Removed the p.name assignment (property already returns 'replicate'); 20/20 pass",
+      "tags": [
+        "pytest",
+        "fixture",
+        "property",
+        "ssrf",
+        "worktree-sweep"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-09"
+    },
+    {
+      "id": "bug-119",
+      "timestamp": "2026-06-09T19:30:00-07:00",
+      "error_message": "Founder review: sg-006/sg-014 renders showed 'WRONG PRODUCT \u2014 rendered the signature windbreaker outfit'; 41 of 79 renders flagged total",
+      "file": "wordpress-theme/skyyrose-flagship/data/dossiers/mint-lavender-hoodie.md",
+      "root_cause": "sg-006/sg-014 dossiers describe a white chevron zip-up garment (the windbreaker-set design) instead of the mint pullover/sweats shown in their techflats \u2014 dossier was Claude-authored (cmem #11235) from wrong reference photos; its reference_image field points at a mislabeled file that is actually the black sherpa jacket. gpt-image-2 obeyed dossier text over the reference image.",
+      "fix": "sg-006/sg-014 added to config.EXCLUDED_SKUS until founder re-authors dossiers; founder verbatim corrections from review board injected into prompts via data/render-corrections.json; new photorealistic_not_flat QC gate; MATERIAL/PHOTOREALISM/BRANDING-IS-EXHAUSTIVE prompt directives",
+      "tags": [
+        "oai-render",
+        "dossier-contamination",
+        "wrong-product",
+        "canonical-sources",
+        "ml-drafted-dossier"
+      ],
+      "related_bugs": [
+        "bug-118"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-09T19:30:00-07:00"
     }
   ]
 }

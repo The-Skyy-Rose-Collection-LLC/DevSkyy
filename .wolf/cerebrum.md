@@ -151,3 +151,15 @@ Before writing or modifying ANY code that touches an external library, SDK, or A
 This applies to: google-genai / Gemini SDK, FLUX API clients, httpx, Pydantic, LangGraph, any library not in stdlib.
 Goal: eliminate fix cycles caused by outdated or assumed API knowledge — spend tokens on features, not corrections.
 - **2026-04-29** — Wrote code changes to `audit_filter.py` and `vision_audit_agent.py` WITHOUT first running Context7 to verify the Gemini REST API pattern. The fixes themselves were correct (pure string logic), but the workflow was wrong. **Rule: Context7 `resolve` + `query-docs` is MANDATORY before every task that touches any external library — not just pipeline/workflow tasks. Every task. No exceptions.**
+
+### 2026-06-09 — Worktree sweep learnings
+- **Commits landed on a feature branch AFTER its PR merges are stranded** — `2b0d245df` (oai_render pipeline) sat on `feat/legal-policies-shipping-sync` a day after PR #532 merged; main never got it. After any PR merges, new work goes on a NEW branch off fresh main.
+- **`git cherry` patch-equivalence is useless against squash-merged history** — showed 0 equiv even for fully-landed work. Verify "is X in main" by grepping for the actual fix content, not by commit graph.
+- **Branches that never get a PR rot silently** — both genuinely-lost items (SSRF fix, pipeline3d) were worktree-local branches with no PR. Everything that entered the PR pipeline survived even with red CI. Push + PR immediately, draft if undecided.
+
+### 2026-06-09 — Render review board session
+- **Do-Not-Repeat:** sg-006/sg-014 dossiers were ML-drafted from wrong photos (cmem #11235) → rendered the wrong product entirely. Dossier rule is absolute: founder-authored only. Before ANY render run, spot-check that each dossier's garment-type lock matches its techflat.
+- **Key Learning:** `data/product-references/sg-006-and-sg-014-mint-lavender-set-techflat.jpeg` is MISLABELED — it's actually the black sherpa jacket photo. Don't trust product-reference filenames; verify content.
+- **Key Learning:** Founder review annotations live in `renders/oai/_review/review-state.json` (review board: `scripts/oai-render-review.py`, port 8944) and flow into prompts via `data/render-corrections.json` → FOUNDER CORRECTIONS block in prompt.py. Keyed by SKU, lines verbatim.
+- **Key Learning:** Split techflats (assets/techflats/split/) are FLAT vector drawings — SKUs whose only garment ref is a split techflat (bridge shorts, kids sets) rendered flat/vector-looking. PHOTOREALISM directive + photorealistic_not_flat QC gate added; if still failing, those SKUs need real photos.
+- **Key Learning:** renders/oai PNGs were deleted from disk ~2-4PM 2026-06-09 (culprit unknown; not mac-cleanup.sh). Paid render outputs must be backed up off-tree immediately after a run — evidence sheets + annotations now committed to the branch for durability.

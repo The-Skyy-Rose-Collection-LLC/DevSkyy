@@ -114,19 +114,9 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		return $tag;
 	}
 
-	// Defer all skyyrose-prefixed scripts, Three.js (heavy 607KB lib on
-	// experience templates), and WC variation scripts loaded in footer.
-	//
-	// 'threejs*' covers all experience handles (threejs, threejs-orbit-controls,
-	// threejs-gltf-loader, threejs-draco-loader, threejs-rgbe-loader,
-	// threejs-effect-composer, threejs-render-pass, threejs-unreal-bloom,
-	// threejs-shader-pass, threejs-copy-shader) — all registered in_footer in
-	// inc/enqueue-experiences.php, so defer is safe. If a future plugin
-	// registers a 'threejs'-prefixed handle expecting sync execution, it
-	// will silently break; convert to an explicit allow-list at that point.
+	// Defer all skyyrose-prefixed scripts and WC variation scripts loaded in footer.
 	$should_defer = (
 		0 === strpos( $handle, 'skyyrose-' ) ||
-		0 === strpos( $handle, 'threejs' ) ||
 		'wc-add-to-cart-variation' === $handle
 	);
 
@@ -201,7 +191,13 @@ function skyyrose_preload_hero_image() {
 			}
 		}
 		if ( $product instanceof WC_Product && $product->get_image_id() ) {
-			$image_url = wp_get_attachment_url( $product->get_image_id() );
+			// Use WC's "woocommerce_single" sized variant (~300-600KB) instead
+			// of wp_get_attachment_url() which returns the raw original
+			// (often 2-3MB). Cuts PDP preload payload ~80%. (audit 2026-05-23)
+			$image_url = wp_get_attachment_image_url( $product->get_image_id(), 'woocommerce_single' );
+			if ( ! $image_url ) {
+				$image_url = wp_get_attachment_url( $product->get_image_id() );
+			}
 		}
 	} elseif ( is_page() ) {
 		// Collection and immersive pages: preload featured image if set.

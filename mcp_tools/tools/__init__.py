@@ -12,6 +12,7 @@ from mcp_tools.tools import (  # noqa: F401
     marketing,
     ml,
     monitoring,
+    oai_render,
     resources,
     threed,
     virtual_tryon,

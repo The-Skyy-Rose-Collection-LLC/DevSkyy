@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SkyyRose OAI Render Pipeline — Production Spec</title>
+<style>
+  body { font: 15px/1.6 -apple-system, system-ui, sans-serif; max-width: 920px; margin: 2rem auto; padding: 0 1.2rem; color: #1a1a1a; }
+  h1 { border-bottom: 3px solid #B76E79; padding-bottom: .3rem; }
+  h2 { margin-top: 2rem; color: #8a4a55; border-bottom: 1px solid #ddd; padding-bottom: .2rem; }
+  code { background: #f4f0f1; padding: 1px 5px; border-radius: 3px; font: 13px ui-monospace, monospace; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+  th, td { border: 1px solid #ddd; padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: #faf6f7; }
+  .blk { background: #fff4f4; border-left: 4px solid #DC143C; padding: .5rem .9rem; margin: 1rem 0; }
+  .ok { background: #f2fbf4; border-left: 4px solid #2e9e4f; padding: .5rem .9rem; margin: 1rem 0; }
+  .gate { background: #fffaf0; border-left: 4px solid #D4AF37; padding: .5rem .9rem; margin: 1rem 0; }
+</style>
+</head>
+<body>
+<h1>SkyyRose Product Render Pipeline — OpenAI gpt-image-2 (Production Spec)</h1>
+<p><strong>Date:</strong> 2026-06-08 · <strong>Status:</strong> blueprint (pre-build) · <strong>Replaces:</strong> nano-banana (Gemini) build at <code>scripts/nano_banana/</code></p>
+
+<h2 id="goal">1. Goal</h2>
+<p>Render every SkyyRose product as a <strong>100%-replicated, high-fidelity, on-brand image</strong> via <strong>OpenAI <code>gpt-image-2</code></strong>, using one <strong>identical, deterministic procedure</strong> so every SKU is visually consistent. Every real design element — jersey league patch, embroidery, logo — must be present. Then erase the old Gemini/nano-banana build and all old AI-produced product assets, but <em>only after</em> validated replacements exist.</p>
+
+<h2 id="model">2. Model decision (Context7-verified 2026-06-08)</h2>
+<table>
+<tr><th>Setting</th><th>Value</th><th>Source / rationale</th></tr>
+<tr><td>Model</td><td><code>gpt-image-2</code> (pin <code>gpt-image-2-2026-04-21</code> for reproducibility)</td><td>Founder's "OpenAI Image 2" = literal SDK model id. Newest tier.</td></tr>
+<tr><td>Endpoint</td><td><code>client.images.edit()</code> → <code>/v1/images/edits</code></td><td>Edit-mode w/ reference images is the only reliable replication path.</td></tr>
+<tr><td><code>input_fidelity</code></td><td><strong>OMIT</strong></td><td>Context7: for gpt-image-2 it's auto-high and cannot be set.</td></tr>
+<tr><td><code>quality</code></td><td><code>high</code></td><td>Highest fidelity tier.</td></tr>
+<tr><td><code>size</code></td><td><code>1024x1536</code> (portrait)</td><td>Feeds the 4:5 holo card crop.</td></tr>
+<tr><td><code>output_format</code></td><td><code>png</code></td><td>Lossless; transparent-capable.</td></tr>
+<tr><td><code>background</code></td><td>configurable (<code>transparent</code> default for clean cards; <code>opaque</code> studio option)</td><td></td></tr>
+<tr><td>reference images</td><td>up to <strong>16</strong> per call</td><td>garment front + back/detail + logo + sport patch.</td></tr>
+<tr><td>output</td><td><code>data[0].b64_json</code> → decode → save</td><td>GPT image models always return base64.</td></tr>
+</table>
+
+<h2 id="method">3. The replication method (patches = method, not engine)</h2>
+<p>Plain text-to-image cannot reproduce a specific patch. The procedure feeds labeled references to the edit call:</p>
+<ul>
+<li><strong>IMAGE 1</strong> — garment front (real photo / techflat) → shape, color, construction</li>
+<li><strong>IMAGE 2</strong> — garment back or detail → secondary views</li>
+<li><strong>IMAGE 3</strong> — collection logo close-up → exact graphic</li>
+<li><strong>IMAGE 4</strong> — sport <strong>patch</strong> PNG (<code>br-patch-{mlb-baseball,nba-basketball,nfl-football,hockey}.png</code>) → exact patch, only for jersey SKUs</li>
+</ul>
+<p>Prompt labels each image and instructs exact placement. Optional <code>mask</code> (transparent zone on IMAGE 1) localizes the patch region — note GPT-image masking is prompt-guided, not pixel-exact, so the patch reference image is the primary fidelity lever. <strong>Fallback for guaranteed-exact patch:</strong> deterministic PNG composite onto the render (Pillow) if the model's patch rendering ever drifts — keeps the rule's "100% replicated" bar absolute.</p>
+
+<h2 id="arch">4. Architecture — <code>scripts/oai_render/</code> (mirrors nano_banana)</h2>
+<table>
+<tr><th>Module</th><th>Responsibility</th><th>Source</th></tr>
+<tr><td><code>config.py</code></td><td>model id, params, sizes, output dir, cost constants, env-key load + validation</td><td>new</td></tr>
+<tr><td><code>references.py</code></td><td>SKU → {front, back, logo, patch} reference paths; hard-fail if required refs missing</td><td><strong>port</strong> nano_banana <code>source_map.py</code> + <code>logo_refs.py</code></td></tr>
+<tr><td><code>prompt.py</code></td><td>fixed "identical procedure" template + per-SKU specifics from <code>data/dossiers/</code></td><td>new (+ dossier reader)</td></tr>
+<tr><td><code>client.py</code></td><td><code>images.edit</code> call; 429/5xx retry w/ exp backoff; timeout; b64 decode; reuse <code>llm/providers/openai.py</code> key</td><td>new</td></tr>
+<tr><td><code>cost.py</code></td><td>per-image cost estimate, batch manifest builder, STOP-AND-SHOW gate, hard $ cap</td><td>new</td></tr>
+<tr><td><code>pipeline.py</code></td><td>per-SKU orchestration: resolve refs → build prompt → gate → edit → save → record metrics</td><td>new</td></tr>
+<tr><td><code>cli.py</code> + <code>scripts/oai-render-run.py</code></td><td>executable entrypoint: <code>dry-run</code>, <code>--sku</code>, <code>--batch</code>, <code>--all</code>, <code>--cost-manifest</code></td><td>new</td></tr>
+</table>
+
+<h2 id="hardening">5. Hardening (production bar)</h2>
+<ul>
+<li><strong>Env-key validation</strong> at startup — fail fast with a clear message if <code>OPENAI_API_KEY</code> absent. No silent fallback.</li>
+<li><strong>No silent fallback</strong> (project rule): if a required reference (garment / patch for a jersey) is missing, the SKU <em>hard-fails</em> and is reported — never renders an incomplete image.</li>
+<li><strong>Retry/backoff</strong> on 429 + 5xx (exponential, capped attempts); explicit timeout per call.</li>
+<li><strong>Cost cap</strong>: hard ceiling per run; abort if manifest exceeds it.</li>
+<li><strong>Dry-run</strong> mode: resolves refs + builds prompts + prints the manifest with ZERO API calls.</li>
+<li><strong>Idempotent output</strong>: deterministic filenames under <code>renders/oai/{sku}/</code>; never overwrites without a flag.</li>
+<li><strong>Structured logging</strong> + per-SKU metrics JSON (tokens, cost, latency, status).</li>
+</ul>
+
+<h2 id="gating">6. Gating (NON-NEGOTIABLE)</h2>
+<div class="gate"><strong>Every generation is paid → STOP-AND-SHOW.</strong> No API call runs without: (1) a per-image cost manifest (SKU list × cost), and (2) explicit <code>y</code>. Every WC media upload of a finished render is a separate STOP-AND-SHOW. The pipeline defaults to <code>dry-run</code>; live generation requires an explicit flag <em>and</em> the gate.</div>
+
+<h2 id="flow">7. Validation → scale → erase (sequencing)</h2>
+<ol>
+<li>Build pipeline (free).</li>
+<li><strong>Validation batch</strong> ~3 SKUs (a jersey w/ patch, the windbreaker that was a flatlay, one plain) → cost manifest → <code>y</code> → generate → <strong>founder judges fidelity</strong>.</li>
+<li>On approval → scale to all 33 (full manifest → <code>y</code>).</li>
+<li>Replace WC media / catalog images with new renders (gated uploads).</li>
+<li><strong>Only then</strong> erase <code>scripts/nano_banana/</code> + old AI product assets. (Do not destroy the working render path before the replacement is validated.)</li>
+</ol>
+
+<h2 id="blockers">8. Prerequisites / blockers</h2>
+<div class="blk">
+<ul>
+<li><strong>OPENAI_API_KEY</strong> — not found in <code>.env</code> / <code>.env.secrets</code>. Must be added before any generation.</li>
+<li><strong>gpt-image-2 account access</strong> — confirm the key's org has gpt-image-2 enabled.</li>
+<li><strong>Exact pricing</strong> — verify gpt-image-2 high-quality per-image cost before the manifest (drives the cost gate).</li>
+</ul>
+</div>
+
+<div class="ok"><strong>Engine-independent work already shipped (v1.5.30, live + Playwright-verified):</strong> luxury cursor removed entirely; Kith 3-up / 4:5 product grid sitewide (home + collections), pages ~halved in height. This pipeline is the imagery layer on top of that.</div>
+</body>
+</html>
