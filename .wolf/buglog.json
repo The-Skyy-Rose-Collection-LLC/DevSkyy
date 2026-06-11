@@ -1805,6 +1805,158 @@
       ],
       "occurrences": 1,
       "last_seen": "2026-06-09T19:30:00-07:00"
+    },
+    {
+      "id": "bug-124",
+      "timestamp": "2026-06-11T00:40:00Z",
+      "error_message": "PR #540 merged missing its branch tip: push used 409187921:feat/oai-render-pipeline assuming 2b2ab382a was the parent, but 2b2ab382a (paired-looks skip fix) was the CHILD/tip \u2014 stranded after merge",
+      "file": "scripts/oai_render/ (paired-looks logic)",
+      "root_cause": "Commit order assumption inverted: standup notes listed '409187921 + 2b2ab382a' and executor verified the range existed but not the parent-child direction; pushing the older SHA silently excluded the tip",
+      "fix": "Recovery PR #544 pushed 2b2ab382a as fix/oai-render-paired-looks-skip, 52/52 pipeline tests green, merged 0f0ea0c43. Lesson: push BRANCH TIPS or verify with `git log -1 --format=%P <sha>` before sha:branch pushes; post-merge gate `merge-base --is-ancestor <every-sha> origin/main` caught it",
+      "tags": [
+        "git",
+        "stranded-commit",
+        "push-order",
+        "oai-render",
+        "consolidation-sweep"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-11T00:40:00Z"
+    },
+    {
+      "id": "bug-109",
+      "timestamp": "2026-06-10",
+      "error_message": "Uncaught SyntaxError: Identifier 'ASSET_PREFIX' has already been declared \u2014 all v2 JS dead, dock/grid never populated",
+      "file": "prototypes/landing-collections/v2-shop-rail/{catalog-adapter,app}.js",
+      "root_cause": "Two top-level scripts on one page both declared const ASSET_PREFIX in shared global scope",
+      "fix": "Wrapped both files in IIFEs; skill updated to require IIFE wrapping in multi-script briefs",
+      "tags": [
+        "prototype",
+        "js",
+        "global-scope",
+        "parallel-builders"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-10"
+    },
+    {
+      "id": "bug-110",
+      "timestamp": "2026-06-10",
+      "error_message": "v2 dock rendered default rose-gold accent instead of Black Rose silver",
+      "file": "prototypes/landing-collections/v2-shop-rail/index.html",
+      "root_cause": "data-collection attribute on <main> but dock element sits after </main> \u2014 token override never reached it",
+      "fix": "Moved data-collection to <body> so all descendants inherit collection tokens",
+      "tags": [
+        "css-tokens",
+        "data-collection",
+        "scope"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-10"
+    },
+    {
+      "id": "bug-111",
+      "timestamp": "2026-06-10",
+      "error_message": "Black Rose script logotype invisible on #0A0A0A background (v2 + v5 heroes)",
+      "file": "prototypes/landing-collections/{v2-shop-rail,v5-collection-morph}/styles.css",
+      "root_cause": "br-brand-script-logotype is black lettering; brightness filters cannot lift pure black pixels",
+      "fix": "Scoped [data-collection=black-rose] .lp-hero__lockup { filter: invert(1) grayscale(1) } \u2014 silver-white matches BR register",
+      "tags": [
+        "design",
+        "lockup",
+        "black-rose",
+        "contrast"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-10"
+    },
+    {
+      "id": "bug-112",
+      "timestamp": "2026-06-10",
+      "error_message": "v5 announcement bar showed internal canon text 'No countdown timers. No fake scarcity.' as customer-facing copy",
+      "file": "prototypes/landing-collections/v5-collection-morph/index.html",
+      "root_cause": "Builder agent leaked founder-canon guardrail instructions into UI copy",
+      "fix": "Stripped to shipping fact only; skill updated: internal guardrails never appear as customer copy",
+      "tags": [
+        "canon-leak",
+        "copy",
+        "agent-instruction-bleed"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-10"
+    },
+    {
+      "id": "bug-113",
+      "timestamp": "2026-06-10",
+      "error_message": "Delivered prototype HTML files rendered unstyled skeletons when downloaded \u2014 all assets referenced via relative paths escaping into the repo tree",
+      "file": "prototypes/landing-collections/v*/index.html",
+      "root_cause": "Skill output contract allowed multi-file pages with cross-tree relative asset paths; 'verified in place' hid the escape",
+      "fix": "build-standalone.py inlines CSS/JS + embeds all images/fonts as data URIs + MutationObserver shim resolves adapter-built paths; skill now mandates single-file locked-and-loaded delivery + isolated-copy verification",
+      "tags": [
+        "prototype",
+        "delivery",
+        "self-contained",
+        "skill-gap"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-10"
+    },
+    {
+      "id": "bug-114",
+      "timestamp": "2026-06-10",
+      "error_message": "v2 referenced images/products/jersey-last-oakland-baseball/<file> \u2014 subdirectory holds only collection-card images, front-model file is flat",
+      "file": "prototypes/landing-collections/v2-shop-rail/catalog-adapter.js",
+      "root_cause": "Builder invented per-product-subdir paths instead of using brief's verified flat paths",
+      "fix": "Normalized 3 subdir refs to flat verified filenames; rebuilt standalone",
+      "tags": [
+        "asset-paths",
+        "builder-deviation"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-10"
+    },
+    {
+      "id": "bug-115",
+      "timestamp": "2026-06-10",
+      "error_message": "Signature Sherpa render (red-rose closed jacket) mis-filed as black-rose-sherpa-jacket/black-rose-sherpa-jacket-front-model.webp \u2014 surfaced as 'Signature Sherpa in the Black Rose Collection' on v2 mockup; founder flagged",
+      "file": "wordpress-theme/skyyrose-flagship/assets/images/products/",
+      "root_cause": "Render output saved under wrong product's subdir during earlier render pipeline runs; filename treated as identity without pixel verification",
+      "fix": "git mv to signature-sherpa-jacket-front-closed.{webp,avif}; CSV sg-009 front_model_image -> new file (upgrade from ghost); br-006 confirmed correct on flat hooded render; CLAUDE.md learning + cerebrum entries added",
+      "tags": [
+        "render-identity",
+        "catalog",
+        "sherpa",
+        "sg-009",
+        "br-006",
+        "mislabeled-asset"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-10"
+    },
+    {
+      "id": "bug-116",
+      "timestamp": "2026-06-10",
+      "error_message": "Flagship builder shipped 'Free shipping over $100' (canon: $200+), type-rendered collection names on gateway panels, raw white-diamond seal",
+      "file": "prototypes/preorder-page/flagship-full-throttle/",
+      "root_cause": "Shipping threshold not in dispatch brief's canon block; panel name rule ambiguity; patch art has white square background",
+      "fix": "Taste-gate caught all three: $200+ corrected, po-panel__name removed (lockup IS the name), seal circle-cropped. Skill Art Direction Standard + taste gate now codified",
+      "tags": [
+        "taste-gate",
+        "canon",
+        "shipping-threshold",
+        "lockup-rule"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-10"
     }
   ]
 }
