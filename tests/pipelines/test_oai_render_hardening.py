@@ -380,6 +380,40 @@ def test_mint_lavender_skus_render_again_with_clean_dossiers():
         assert "zip-up hoodie" not in lock.lower()
 
 
+def test_extract_view_branding_returns_per_view_sections():
+    from scripts.oai_render.prompt import extract_view_branding
+
+    dossier = (
+        "# X\n## Branding\n### Front\n- **front-chest**: rose art. Color: red.\n"
+        "### Back\n- **back-body**: Solid, no decoration.\n"
+        "## Negative\n- NO stripes\n"
+    )
+    front = extract_view_branding(dossier, "front")
+    back = extract_view_branding(dossier, "back")
+    assert "front-chest" in front and "back-body" not in front
+    assert "no decoration" in back and "rose art" not in back
+    assert "NO stripes" not in back  # stops at the next ## section
+    assert extract_view_branding(None, "front") == ""
+    assert extract_view_branding(dossier, "sideways") == ""
+
+
+def test_qc_judge_receives_dossier_branding_ground_truth():
+    # bug: blank-back garments were failed for "missing branding" because the
+    # judge only saw front/logo references. The judge must receive the
+    # dossier's per-view spec and be told blank panels are correct.
+    from scripts.oai_render import pipeline, references
+    from scripts.oai_render.qc import _judge_instructions
+
+    catalog = references.load_catalog()
+    dossiers = references.build_dossier_index()
+    plan = pipeline.plan_sku("sg-006", catalog, dossiers, style="ghost", view="front")
+    exp = pipeline._expectation_for(plan)
+    assert exp.branding_spec  # flowed from the dossier
+    text = _judge_instructions(exp)
+    assert "DOSSIER GROUND TRUTH" in text
+    assert "ABSENCE of branding" in text
+
+
 def test_pair_with_excluded_member_falls_back_to_solo(monkeypatch):
     from scripts.oai_render import pipeline, references
 

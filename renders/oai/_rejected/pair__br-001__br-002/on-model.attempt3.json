@@ -1,0 +1,11 @@
+{
+  "sku": "br-001",
+  "style": "on-model",
+  "view": "front",
+  "is_pair": true,
+  "attempt": 3,
+  "failure_tags": [
+    "branding_drift"
+  ],
+  "reason": "The branding on the garment does not match the references; the logos or graphics do not show the correct and complete branding as indicated in the reference images."
+}

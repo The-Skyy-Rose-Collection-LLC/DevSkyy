@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING
 
 from . import config, cost, references
 from .cost import CostManifest, ManifestEntry
-from .prompt import SceneError, build_pair_prompt, build_prompt, read_dossier
+from .prompt import SceneError, build_pair_prompt, build_prompt, extract_view_branding, read_dossier
 from .references import MissingReferenceError, Pair, ReferenceImage
 
 if TYPE_CHECKING:
@@ -39,6 +39,7 @@ class SkuPlan:
     references: list[ReferenceImage] = field(default_factory=list)
     prompt: str = ""
     is_patch: bool = False
+    branding_spec: str = ""  # dossier's per-view branding bullets, ground truth for the QC judge
     is_pair: bool = False  # True for a paired-look on-model (two garments, one model)
     pair_id: str | None = None
     pair_skus: tuple[str, ...] | None = None
@@ -113,12 +114,13 @@ def plan_sku(
     try:
         refs = references.build_references(sku, collection, view=view)
         is_patch = references.requires_patch(sku)
+        dossier_text = read_dossier(dossier_index.get(sku))
         prompt = build_prompt(
             name=name,
             sku=sku,
             collection=collection,
             reference_labels=[r.label for r in refs],
-            dossier_text=read_dossier(dossier_index.get(sku)),
+            dossier_text=dossier_text,
             is_patch=is_patch,
             style=style,
             view=view,
@@ -144,6 +146,7 @@ def plan_sku(
         references=refs,
         prompt=prompt,
         is_patch=is_patch,
+        branding_spec=extract_view_branding(dossier_text, view),
     )
 
 
@@ -168,6 +171,11 @@ def plan_pair(pair: Pair, catalog: dict[str, dict], dossier_index: dict[str, Pat
                     "is_patch": references.requires_patch(member),
                 }
             )
+        pair_branding = "\n".join(
+            f"{g['name']} ({g['sku']}) FRONT:\n{spec}"
+            for g in garments
+            if (spec := extract_view_branding(g["dossier_text"], "front"))
+        )
         prompt = build_pair_prompt(
             pair_label=pair.label, collection=pair.collection, garments=garments
         )
@@ -198,6 +206,7 @@ def plan_pair(pair: Pair, catalog: dict[str, dict], dossier_index: dict[str, Pat
         references=combined,
         prompt=prompt,
         is_patch=any(g["is_patch"] for g in garments),
+        branding_spec=pair_branding,
     )
 
 
@@ -336,6 +345,7 @@ def _expectation_for(plan: SkuPlan):
         view=plan.view,
         is_pair=plan.is_pair,
         is_patch=plan.is_patch,
+        branding_spec=plan.branding_spec,
         reference_paths=tuple(r.path for r in plan.references),
     )
 

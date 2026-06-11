@@ -1,0 +1,12 @@
+{
+  "sku": "br-001",
+  "style": "ghost",
+  "view": "back",
+  "is_pair": false,
+  "attempt": 1,
+  "failure_tags": [
+    "wrong_garment",
+    "branding_drift"
+  ],
+  "reason": "The garment does not match the reference images due to the absence of the rose graphic on the back of the crewneck, which is expected based on the references. Additionally, the branding at the neckline is incorrect."
+}

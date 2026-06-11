@@ -261,6 +261,31 @@ def read_dossier(dossier_path: Path | None) -> str | None:
     return body or None
 
 
+_VIEW_SECTION_HEADER = {"front": "### Front", "back": "### Back"}
+
+
+def extract_view_branding(dossier_text: str | None, view: str) -> str:
+    """Return the dossier's branding bullets for one view ("front"/"back"), or "".
+
+    Feeds the QC judge per-view ground truth so a deliberately blank panel
+    (e.g. "back-body: no decoration") is not failed for "missing branding".
+    The text is repo-controlled dossier markdown, not user input.
+    """
+    if not dossier_text:
+        return ""
+    header = _VIEW_SECTION_HEADER.get(view)
+    if header is None:
+        return ""
+    idx = dossier_text.find(header)
+    if idx == -1:
+        return ""
+    section = dossier_text[idx + len(header) :]
+    cuts = [c for c in (section.find("\n### "), section.find("\n## ")) if c != -1]
+    if cuts:
+        section = section[: min(cuts)]
+    return section.strip()
+
+
 @functools.lru_cache(maxsize=1)
 def _load_corrections_file(path_str: str) -> dict[str, list[str]]:
     """Load the founder corrections JSON (sku → verbatim correction lines)."""

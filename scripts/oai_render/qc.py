@@ -123,6 +123,7 @@ class RenderExpectation:
     view: str  # "front" | "back"
     is_pair: bool
     is_patch: bool
+    branding_spec: str = ""  # dossier's per-view branding bullets (ground truth)
     reference_paths: tuple[Path, ...] = field(default_factory=tuple)
 
 
@@ -223,6 +224,17 @@ def _judge_instructions(exp: RenderExpectation) -> str:
         if exp.is_patch
         else ""
     )
+    branding_line = (
+        "DOSSIER GROUND TRUTH for this view — the visible side of the garment carries "
+        f"exactly this and nothing else:\n{exp.branding_spec}\n"
+        "Judge the branding gate against THIS spec, not against the reference images "
+        "alone: the references may show other views or standalone logo art. If the spec "
+        "shows a panel as blank / 'no decoration', the ABSENCE of branding there is "
+        "CORRECT — do not fail the branding gate for a logo that is not supposed to "
+        "be on this side."
+        if exp.branding_spec
+        else ""
+    )
     return "\n".join(
         line
         for line in (
@@ -231,6 +243,7 @@ def _judge_instructions(exp: RenderExpectation) -> str:
             "after it are the ground-truth references for the same product.",
             style_line,
             view_line,
+            branding_line,
             pair_line,
             patch_line,
             "Judge ONLY against the schema gates. Be strict: when uncertain on a gate, "

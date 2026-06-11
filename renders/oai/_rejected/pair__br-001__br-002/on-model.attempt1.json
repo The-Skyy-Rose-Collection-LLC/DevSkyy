@@ -1,0 +1,11 @@
+{
+  "sku": "br-001",
+  "style": "on-model",
+  "view": "front",
+  "is_pair": true,
+  "attempt": 1,
+  "failure_tags": [
+    "branding_drift"
+  ],
+  "reason": "The branding on the joggers is not fully visible or clear; it does not match the references which may include identifiable logos/text."
+}

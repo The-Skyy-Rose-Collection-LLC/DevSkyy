@@ -1,0 +1,11 @@
+{
+  "sku": "br-001",
+  "style": "on-model",
+  "view": "front",
+  "is_pair": true,
+  "attempt": 2,
+  "failure_tags": [
+    "branding_drift"
+  ],
+  "reason": "The logo/text on the garment is not visible; the branding is not legible in the render."
+}

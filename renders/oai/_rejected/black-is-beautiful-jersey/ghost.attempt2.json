@@ -1,0 +1,11 @@
+{
+  "sku": "br-003",
+  "style": "ghost",
+  "view": "front",
+  "is_pair": false,
+  "attempt": 2,
+  "failure_tags": [
+    "branding_drift"
+  ],
+  "reason": "The branding on the render is not legible and does not match the reference exactly; specifically, the embroidered sports patch is incomplete or not accurately depicted."
+}
