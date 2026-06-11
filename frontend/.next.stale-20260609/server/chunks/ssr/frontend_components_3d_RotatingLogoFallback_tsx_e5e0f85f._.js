@@ -1,0 +1,3 @@
+module.exports=[912115,a=>{"use strict";var b=a.i(957850),c=a.i(650813);function d({text:a,color:d,className:e=""}){return(0,b.jsx)("div",{className:`w-full h-[200px] flex items-center justify-center ${e}`,children:(0,b.jsx)(c.motion.div,{animate:{rotateY:360},transition:{duration:8,repeat:1/0,ease:"linear"},style:{perspective:800},children:(0,b.jsx)("h3",{className:"text-4xl md:text-5xl font-display tracking-[0.15em]",style:{color:d,textShadow:`0 0 40px ${d}40, 0 0 80px ${d}20`},children:a})})})}a.s(["default",()=>d])}];
+
+//# sourceMappingURL=frontend_components_3d_RotatingLogoFallback_tsx_e5e0f85f._.js.map

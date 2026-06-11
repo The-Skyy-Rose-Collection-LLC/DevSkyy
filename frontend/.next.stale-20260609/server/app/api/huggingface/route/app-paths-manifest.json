@@ -1,0 +1,3 @@
+{
+  "/api/huggingface/route": "app/api/huggingface/route.js"
+}
