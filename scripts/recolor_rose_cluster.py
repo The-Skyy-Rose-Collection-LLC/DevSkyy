@@ -43,25 +43,45 @@ COLORWAYS = [
 ]
 
 
+# Petal-mask tuning thresholds (all in 0-255 uint8 space).
+_CHROMA_ACHROMATIC_CEIL = (
+    30  # max chroma to count a pixel as grey (rose petal); green stems exceed it
+)
+_VALUE_INK_FLOOR = 25  # below this = black ink outline → skip
+_VALUE_GROUND_CEIL = 240  # above this = white ground / cloud highlight → skip
+_CLOUD_BLUE_OFFSET = 12  # min (B − max(R,G)) to count as pale-blue cloud shading → skip
+
+
 def _rose_mask(rgb: np.ndarray) -> np.ndarray:
     """True for rose-petal pixels: achromatic (grey), mid value, not blue cloud."""
     r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
-    chroma = rgb.max(-1) - rgb.min(-1)
+    chroma = rgb.max(-1) - rgb.min(-1)  # uint8, always ≥0 (max≥min) → no underflow
     value = rgb.max(-1)
-    grey = chroma < 30  # achromatic → rose petals (green stems have high chroma)
-    midval = (value > 25) & (value < 240)  # exclude black outlines + white ground
-    bluey = (b.astype(int) - np.maximum(r, g)) > 12  # exclude pale-blue cloud shading
+    grey = chroma < _CHROMA_ACHROMATIC_CEIL
+    midval = (value > _VALUE_INK_FLOOR) & (value < _VALUE_GROUND_CEIL)
+    bluey = (b.astype(int) - np.maximum(r, g)) > _CLOUD_BLUE_OFFSET
     return grey & midval & ~bluey
 
 
-def recolor(target_h: int, target_s: int) -> Image.Image:
-    im = Image.open(BASE).convert("RGB")
-    rgb = np.asarray(im)
-    mask = _rose_mask(rgb)
-    hsv = np.asarray(im.convert("HSV")).astype(np.uint8).copy()
+def recolor(base_rgb: np.ndarray, mask: np.ndarray, target_h: int, target_s: int) -> Image.Image:
+    """Tint the masked (rose-petal) pixels to a colorway, preserving value (shading)."""
+    hsv = np.asarray(Image.fromarray(base_rgb, "RGB").convert("HSV")).astype(np.uint8).copy()
     hsv[..., 0][mask] = target_h  # hue → colorway
     hsv[..., 1][mask] = target_s  # saturation → colorway (value preserved = shading)
     return Image.fromarray(hsv, "HSV").convert("RGB")
+
+
+def _label_font(size: int = 18) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    """First available system font, else PIL's default (keeps the sheet OS-portable)."""
+    for path in (
+        "/System/Library/Fonts/Helvetica.ttc",  # macOS
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",  # Linux/CI
+    ):
+        try:
+            return ImageFont.truetype(path, size)
+        except OSError:
+            continue
+    return ImageFont.load_default()
 
 
 def contact_sheet(base: Image.Image, variants: list[tuple[str, Image.Image]]) -> Image.Image:
@@ -71,10 +91,7 @@ def contact_sheet(base: Image.Image, variants: list[tuple[str, Image.Image]]) ->
     sheet_w = len(tiles) * (cell_w + pad) + pad
     sheet = Image.new("RGB", (sheet_w, cell_h + label_h + 2 * pad), "white")
     draw = ImageDraw.Draw(sheet)
-    try:
-        font = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 18)
-    except OSError:
-        font = ImageFont.load_default()
+    font = _label_font()
     for i, (name, img) in enumerate(tiles):
         x = pad + i * (cell_w + pad)
         thumb = img.copy()
@@ -89,14 +106,18 @@ def main() -> int:
         print(f"base art not found: {BASE}", file=sys.stderr)
         return 1
     OUT_DIR.mkdir(parents=True, exist_ok=True)
+    # Load the base + compute the petal mask ONCE; reuse across every colorway.
+    base_im = Image.open(BASE).convert("RGB")
+    base_rgb = np.asarray(base_im)
+    mask = _rose_mask(base_rgb)
     variants: list[tuple[str, Image.Image]] = []
     for name, h, s in COLORWAYS:
-        img = recolor(h, s)
+        img = recolor(base_rgb, mask, h, s)
         out = OUT_DIR / f"three-rose-cluster-{name}.png"
         img.save(out)
         variants.append((name, img))
         print(f"  wrote {out.relative_to(REPO_ROOT)}")
-    sheet = contact_sheet(Image.open(BASE).convert("RGB"), variants)
+    sheet = contact_sheet(base_im, variants)
     sheet_path = OUT_DIR / "colorway-contact-sheet.png"
     sheet.save(sheet_path)
     print(f"  wrote {sheet_path.relative_to(REPO_ROOT)}")

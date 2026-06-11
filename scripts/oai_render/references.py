@@ -186,6 +186,9 @@ def _collection_logos() -> dict[str, Path]:
 
 
 def _sku_logo_refs() -> dict[str, Path]:
+    # RUNTIME SOURCE OF TRUTH for SKU→logo. The colorway assignments below mirror
+    # logo-registry.json::three_rose_cluster_colorways (documentation). Keep in
+    # sync: adding a colorway SKU here means updating the registry's variants too.
     o = config.OVERLAYS_DIR
     t = config.TECHFLATS_DIR
     cw = config.LOGOS_DIR  # colorway-correct three-rose-cluster references
