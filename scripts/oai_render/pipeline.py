@@ -86,18 +86,36 @@ def resolve_targets(
 
 
 def _keeper_skips() -> dict[tuple[str, str, str], str]:
-    """(sku, style, view) -> founder note, from render-keepers.json. Empty when absent."""
+    """(sku, style, view) -> founder note, from render-keepers.json. Empty when absent.
+
+    A keeper only suppresses its render plan if the surviving asset it names
+    still exists on disk. If the file was renamed or deleted, the keeper is
+    IGNORED (the plan re-renders) and a warning is logged — otherwise the
+    keeper would silently block the re-render of a product whose "kept" image
+    is gone.
+    """
     import json
 
     try:
         data = json.loads(config.KEEPERS_JSON.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return {}
+    repo_root = config.PROJECT_ROOT
     out: dict[tuple[str, str, str], str] = {}
     for k in data.get("keepers", []):
         sku, style = k.get("sku"), k.get("style")
-        if sku and style:
-            out[(sku, style, k.get("view", "front"))] = k.get("founder_note", "keeper")
+        if not (sku and style):
+            continue
+        asset = k.get("asset")
+        if asset and not (repo_root / asset).exists():
+            log.warning(
+                "Keeper for %s %s ignored — asset no longer on disk (%s); will re-render.",
+                sku,
+                style,
+                asset,
+            )
+            continue
+        out[(sku, style, k.get("view", "front"))] = k.get("founder_note", "keeper")
     return out
 
 

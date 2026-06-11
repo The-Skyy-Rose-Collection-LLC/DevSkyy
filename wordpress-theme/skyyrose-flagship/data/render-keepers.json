@@ -16,8 +16,8 @@
       "sku": "sg-009",
       "style": "on-model",
       "view": "front",
-      "asset": "wordpress-theme/skyyrose-flagship/assets/images/products/signature-sherpa-jacket/signature-sherpa-jacket-front-closed.webp",
-      "founder_note": "good render, save it — approved 2026-06-10"
+      "asset": "wordpress-theme/skyyrose-flagship/assets/images/products/signature-sherpa-jacket-front-model.webp",
+      "founder_note": "good render, save it — approved 2026-06-10 (same image briefly named front-closed in a1f84aa2e)"
     }
   ]
 }

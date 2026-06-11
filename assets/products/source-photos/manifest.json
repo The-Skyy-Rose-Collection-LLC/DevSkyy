@@ -66,13 +66,13 @@
   ],
   "summary": {
     "total_active_skus": 33,
-    "compositor_ready": 10,
-    "compositor_blocked": 23,
+    "compositor_ready": 11,
+    "compositor_blocked": 22,
     "full_required_coverage": 0,
     "by_source_type": {
-      "photography": 7,
-      "techflat": 3,
-      "missing": 23
+      "photography": 9,
+      "techflat": 2,
+      "missing": 22
     }
   },
   "skus": {
@@ -96,7 +96,7 @@
         "detail-graphic"
       ],
       "photo_paths": {
-        "front": "skyyrose/assets/images/source-products/black-rose/br-001-crewneck-front.jpeg"
+        "front": "assets/products/source-photos/black-rose/br-001-crewneck-front.jpeg"
       },
       "has_minimum_for_compositor": false,
       "source_type": "missing"
@@ -121,14 +121,14 @@
         "detail-graphic"
       ],
       "photo_paths": {
-        "front": "skyyrose/assets/images/source-products/black-rose/br-002-joggers-front.jpeg"
+        "front": "assets/products/source-photos/black-rose/br-002-joggers-front.jpeg"
       },
       "has_minimum_for_compositor": false,
       "source_type": "missing"
     },
     "br-003": {
       "sku": "br-003",
-      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic",
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)",
       "collection": "black-rose",
       "garment_type": "hoodie",
       "required_angles": [
@@ -148,7 +148,7 @@
         "detail-pocket"
       ],
       "photo_paths": {
-        "front": "skyyrose/assets/images/source-products/black-rose/br-003-jersey-white-front.jpeg"
+        "front": "assets/products/source-photos/black-rose/br-003-jersey-white-front.jpeg"
       },
       "has_minimum_for_compositor": false,
       "source_type": "missing"
@@ -173,7 +173,7 @@
         "detail-graphic"
       ],
       "photo_paths": {
-        "front": "skyyrose/assets/images/source-products/black-rose/br-004-hoodie-front.jpeg"
+        "front": "assets/products/source-photos/black-rose/br-004-hoodie-front.jpeg"
       },
       "has_minimum_for_compositor": false,
       "source_type": "missing"
@@ -225,8 +225,8 @@
         "detail-pocket"
       ],
       "photo_paths": {
-        "front": "skyyrose/assets/images/source-products/black-rose/br-006-sherpa-jacket-front.jpeg",
-        "back": "skyyrose/assets/images/source-products/black-rose/br-006-sherpa-jacket-back.jpeg"
+        "front": "assets/products/source-photos/black-rose/br-006-sherpa-jacket-front.jpeg",
+        "back": "assets/products/source-photos/black-rose/br-006-sherpa-jacket-back.jpeg"
       },
       "has_minimum_for_compositor": true,
       "source_type": "photography"
@@ -253,10 +253,10 @@
         "detail-stitching"
       ],
       "photo_paths": {
-        "front": "skyyrose/assets/images/source-products/black-rose/br-007-shorts-front.jpeg",
-        "side": "skyyrose/assets/images/source-products/black-rose/br-007-shorts-side.jpeg",
-        "detail": "skyyrose/assets/images/source-products/black-rose/br-007-shorts-back-detail.jpeg",
-        "hanger": "skyyrose/assets/images/source-products/black-rose/br-007-shorts-back-hanger.jpeg",
+        "front": "assets/products/source-photos/black-rose/br-007-shorts-front.jpeg",
+        "side": "assets/products/source-photos/black-rose/br-007-shorts-side.jpeg",
+        "detail": "assets/products/source-photos/black-rose/br-007-shorts-back-detail.jpeg",
+        "hanger": "assets/products/source-photos/black-rose/br-007-shorts-back-hanger.jpeg",
         "back": "wordpress-theme/skyyrose-flagship/assets/images/products/br-007-real-back.jpg",
         "techflat": "wordpress-theme/skyyrose-flagship/assets/images/products/br-007-techflat.jpeg"
       },
@@ -285,8 +285,8 @@
         "detail-pocket"
       ],
       "photo_paths": {
-        "front": "skyyrose/assets/images/source-products/black-rose/br-008-sf-inspired-jersey-front.jpg",
-        "back": "skyyrose/assets/images/source-products/black-rose/br-008-football-jersey-back.jpeg"
+        "front": "assets/products/source-photos/black-rose/br-008-sf-inspired-jersey-front.jpg",
+        "back": "assets/products/source-photos/black-rose/br-008-football-jersey-back.jpeg"
       },
       "has_minimum_for_compositor": true,
       "source_type": "photography"
@@ -313,7 +313,7 @@
         "detail-pocket"
       ],
       "photo_paths": {
-        "front": "skyyrose/assets/images/source-products/black-rose/br-009-last-oakland-jersey-front.jpg"
+        "front": "assets/products/source-photos/black-rose/br-009-last-oakland-jersey-front.jpg"
       },
       "has_minimum_for_compositor": false,
       "source_type": "missing"
@@ -355,23 +355,24 @@
         "detail-pocket"
       ],
       "present_angles": [
-        "front"
+        "front",
+        "back"
       ],
       "missing_angles": [
-        "back",
         "three-quarter",
         "detail-hood",
         "detail-pocket"
       ],
       "photo_paths": {
-        "front": "skyyrose/assets/images/source-products/black-rose/br-011-sharks-edition-jersey-front.png"
+        "front": "assets/products/source-photos/black-rose/br-011-sharks-edition-jersey-front.png",
+        "back": "wordpress-theme/skyyrose-flagship/assets/images/products/br-011-the-rose-hockey-back.png"
       },
-      "has_minimum_for_compositor": false,
-      "source_type": "missing"
+      "has_minimum_for_compositor": true,
+      "source_type": "photography"
     },
     "br-012": {
       "sku": "br-012",
-      "name": "BLACK is Beautiful Jersey Series: 5. Last Oakland (Baseball)",
+      "name": "BLACK is Beautiful Jersey Series: 5. Baseball Classic (Last Oakland)",
       "collection": "black-rose",
       "garment_type": "hoodie",
       "required_angles": [
@@ -391,15 +392,15 @@
         "detail-pocket"
       ],
       "photo_paths": {
-        "front": "wordpress-theme/skyyrose-flagship/assets/images/products/br-012-last-oakland-baseball-front.jpeg",
-        "back": "wordpress-theme/skyyrose-flagship/assets/images/products/br-012-last-oakland-baseball-back.jpeg"
+        "front": "assets/products/source-photos/black-rose/br-012-last-oakland-baseball-front.jpeg",
+        "back": "assets/products/source-photos/black-rose/br-012-last-oakland-baseball-back.jpeg"
       },
       "has_minimum_for_compositor": true,
       "source_type": "photography"
     },
     "lh-002": {
       "sku": "lh-002",
-      "name": "Love Hurts Joggers",
+      "name": "Love Hurts Joggers (Black)",
       "collection": "love-hurts",
       "garment_type": "jersey",
       "required_angles": [
@@ -446,8 +447,8 @@
         "detail-stitching"
       ],
       "photo_paths": {
-        "back": "skyyrose/assets/images/source-products/love-hurts/lh-003-shorts-techflat-v1-back.jpg",
-        "front": "skyyrose/assets/images/source-products/love-hurts/lh-003-shorts-techflat-allover-front.jpg"
+        "back": "assets/products/source-photos/love-hurts/lh-003-shorts-techflat-v1-back.jpg",
+        "front": "assets/products/source-photos/love-hurts/lh-003-shorts-techflat-allover-front.jpg"
       },
       "has_minimum_for_compositor": true,
       "source_type": "techflat"
@@ -474,8 +475,8 @@
         "detail-pocket"
       ],
       "photo_paths": {
-        "front": "skyyrose/assets/images/source-products/love-hurts/lh-004-bomber-front.jpg",
-        "back": "skyyrose/assets/images/source-products/love-hurts/lh-004-bomber-back.png"
+        "front": "assets/products/source-photos/love-hurts/lh-004-bomber-front.jpg",
+        "back": "assets/products/source-photos/love-hurts/lh-004-bomber-back.png"
       },
       "has_minimum_for_compositor": true,
       "source_type": "photography"
@@ -498,17 +499,17 @@
         "in-context"
       ],
       "photo_paths": {
-        "techflat": "skyyrose/assets/images/source-products/love-hurts/lh-005-varsity-jacket-white-techflat.jpg",
-        "front": "skyyrose/assets/images/source-products/love-hurts/lh-005-varsity-jacket-techflat-front.jpg",
-        "back": "skyyrose/assets/images/source-products/love-hurts/lh-005-varsity-jacket-white-techflat-back.jpg"
+        "techflat": "assets/products/source-photos/love-hurts/lh-005-varsity-jacket-white-techflat.jpg",
+        "front": "assets/products/source-photos/love-hurts/lh-005-varsity-jacket-techflat-front.jpg",
+        "back": "assets/products/source-photos/love-hurts/lh-005-varsity-jacket-white-techflat-back.jpg"
       },
       "has_minimum_for_compositor": true,
       "source_type": "techflat"
     },
-    "sg-001": {
-      "sku": "sg-001",
-      "name": "The Bridge Series 'The Bay Bridge' Shorts",
-      "collection": "signature",
+    "lh-006": {
+      "sku": "lh-006",
+      "name": "Love Hurts Joggers (White)",
+      "collection": "love-hurts",
       "garment_type": "jersey",
       "required_angles": [
         "front",
@@ -527,10 +528,38 @@
         "detail-stitching"
       ],
       "photo_paths": {
-        "front": "skyyrose/assets/images/source-products/signature/sg-001-bay-bridge-shorts-front.jpeg"
+        "front": "wordpress-theme/skyyrose-flagship/assets/images/products/ghost/lh-006-ghost-front.webp"
       },
       "has_minimum_for_compositor": false,
       "source_type": "missing"
+    },
+    "sg-001": {
+      "sku": "sg-001",
+      "name": "The Bridge Series 'The Bay Bridge' Shorts",
+      "collection": "signature",
+      "garment_type": "jersey",
+      "required_angles": [
+        "front",
+        "back",
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "present_angles": [
+        "front",
+        "back"
+      ],
+      "missing_angles": [
+        "three-quarter",
+        "detail-patch",
+        "detail-stitching"
+      ],
+      "photo_paths": {
+        "front": "assets/products/source-photos/signature/sg-001-bay-bridge-shorts-front.jpeg",
+        "back": "assets/products/source-photos/signature/sg-001-bay-bridge-set-techflat-back.jpeg"
+      },
+      "has_minimum_for_compositor": true,
+      "source_type": "photography"
     },
     "sg-002": {
       "sku": "sg-002",
@@ -554,7 +583,7 @@
         "detail-pocket"
       ],
       "photo_paths": {
-        "front": "skyyrose/assets/images/source-products/signature/sg-002-mint-tee-front.jpg"
+        "front": "assets/products/source-photos/signature/sg-002-mint-tee-front.jpg"
       },
       "has_minimum_for_compositor": false,
       "source_type": "missing"
@@ -608,7 +637,7 @@
         "detail-pocket"
       ],
       "photo_paths": {
-        "techflat": "skyyrose/assets/images/source-products/signature/sg-005-bay-rose-set-techflat.jpg",
+        "techflat": "assets/products/source-photos/signature/sg-005-bay-rose-set-techflat.jpg",
         "front": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-005-composite-front.webp"
       },
       "has_minimum_for_compositor": false,
@@ -685,7 +714,7 @@
         "detail-pocket"
       ],
       "photo_paths": {
-        "detail": "skyyrose/assets/images/source-products/signature/sg-009-sherpa-jacket-lining-detail.jpeg",
+        "detail": "assets/products/source-photos/signature/sg-009-sherpa-jacket-lining-detail.jpeg",
         "front": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-009-composite-front.webp"
       },
       "has_minimum_for_compositor": false,
@@ -761,9 +790,9 @@
         "detail-graphic"
       ],
       "photo_paths": {
-        "techflat": "skyyrose/assets/images/source-products/signature/sg-013-cycling-jersey-gold-techflat.jpg",
-        "back": "skyyrose/assets/images/source-products/signature/sg-013-mint-lavender-crewneck-back.jpeg",
-        "front": "skyyrose/assets/images/source-products/signature/sg-013-mint-lavender-crewneck-front.jpeg"
+        "techflat": "assets/products/source-photos/signature/sg-013-cycling-jersey-gold-techflat.jpg",
+        "back": "assets/products/source-photos/signature/sg-013-mint-lavender-crewneck-back.jpeg",
+        "front": "assets/products/source-photos/signature/sg-013-mint-lavender-crewneck-front.jpeg"
       },
       "has_minimum_for_compositor": true,
       "source_type": "photography"
@@ -790,8 +819,8 @@
         "detail-pocket"
       ],
       "photo_paths": {
-        "back": "skyyrose/assets/images/source-products/signature/sg-014-mint-lavender-sweatpants-back.jpeg",
-        "front": "skyyrose/assets/images/source-products/signature/sg-014-mint-lavender-sweatpants-front.jpeg"
+        "back": "assets/products/source-photos/signature/sg-014-mint-lavender-sweatpants-back.jpeg",
+        "front": "assets/products/source-photos/signature/sg-014-mint-lavender-sweatpants-front.jpeg"
       },
       "has_minimum_for_compositor": true,
       "source_type": "photography"
@@ -808,15 +837,19 @@
         "detail-hood",
         "detail-pocket"
       ],
-      "present_angles": [],
+      "present_angles": [
+        "front"
+      ],
       "missing_angles": [
-        "front",
         "back",
         "three-quarter",
         "detail-hood",
         "detail-pocket"
       ],
-      "photo_paths": {},
+      "photo_paths": {
+        "front": "assets/products/source-photos/signature/sg-015-windbreaker-set-retro-front.jpg",
+        "detail": "assets/products/source-photos/signature/sg-015-windbreaker-set-techflat-detail.jpeg"
+      },
       "has_minimum_for_compositor": false,
       "source_type": "missing"
     },
@@ -842,7 +875,8 @@
         "detail-pocket"
       ],
       "photo_paths": {
-        "techflat": "skyyrose/assets/images/source-products/kids/kids-001-techflat.jpeg"
+        "techflat": "assets/products/source-photos/kids/kids-001-techflat.jpeg",
+        "front": "wordpress-theme/skyyrose-flagship/assets/images/products/ghost/kids-001-ghost-front.webp"
       },
       "has_minimum_for_compositor": false,
       "source_type": "missing"
@@ -869,14 +903,15 @@
         "detail-pocket"
       ],
       "photo_paths": {
-        "techflat": "skyyrose/assets/images/source-products/kids/kids-002-techflat.jpeg"
+        "techflat": "assets/products/source-photos/kids/kids-002-techflat.jpeg",
+        "front": "wordpress-theme/skyyrose-flagship/assets/images/products/ghost/kids-002-ghost-front.webp"
       },
       "has_minimum_for_compositor": false,
       "source_type": "missing"
     },
     "br-014": {
       "sku": "br-014",
-      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants Edition)",
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants)",
       "collection": "black-rose",
       "garment_type": "jersey",
       "required_angles": [
@@ -886,21 +921,24 @@
         "detail-patch",
         "detail-stitching"
       ],
-      "present_angles": [],
+      "present_angles": [
+        "front"
+      ],
       "missing_angles": [
-        "front",
         "back",
         "three-quarter",
         "detail-patch",
         "detail-stitching"
       ],
-      "photo_paths": {},
+      "photo_paths": {
+        "front": "wordpress-theme/skyyrose-flagship/assets/images/products/ghost/br-014-ghost-front.webp"
+      },
       "has_minimum_for_compositor": false,
       "source_type": "missing"
     },
     "br-015": {
       "sku": "br-015",
-      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White Edition)",
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)",
       "collection": "black-rose",
       "garment_type": "jersey",
       "required_angles": [
@@ -910,15 +948,18 @@
         "detail-patch",
         "detail-stitching"
       ],
-      "present_angles": [],
+      "present_angles": [
+        "front"
+      ],
       "missing_angles": [
-        "front",
         "back",
         "three-quarter",
         "detail-patch",
         "detail-stitching"
       ],
-      "photo_paths": {},
+      "photo_paths": {
+        "front": "wordpress-theme/skyyrose-flagship/assets/images/products/ghost/br-015-ghost-front.webp"
+      },
       "has_minimum_for_compositor": false,
       "source_type": "missing"
     }

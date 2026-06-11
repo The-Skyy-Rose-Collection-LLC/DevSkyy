@@ -1825,6 +1825,42 @@
       ],
       "occurrences": 1,
       "last_seen": "2026-06-10"
+    },
+    {
+      "id": "bug-125",
+      "timestamp": "2026-06-11T00:00:00-07:00",
+      "error_message": "render-keepers.json sg-009 keeper named signature-sherpa-jacket/signature-sherpa-jacket-front-closed.webp — file does not exist; keeper silently suppressed sg-009 re-render while its 'kept' image was absent",
+      "file": "wordpress-theme/skyyrose-flagship/data/render-keepers.json",
+      "root_cause": "Keeper path was copied verbatim from tasks/mockup-render-inventory.md (which used a transient filename from commit a1f84aa2e that was later renamed back to -front-model) without verifying the file existed. _keeper_skips() did not check existence, so a keeper pointing at a missing file still skipped the plan.",
+      "fix": "_keeper_skips() now skips only keepers whose asset exists on disk (else logs + re-renders). Fixed the sg-009 path to the real on-disk signature-sherpa-jacket-front-model.webp (same founder-approved image, verified via git).",
+      "tags": [
+        "render-keepers",
+        "asset-path",
+        "silent-blocker",
+        "oai-render"
+      ],
+      "related_bugs": [
+        "bug-124"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-11"
+    },
+    {
+      "id": "bug-126",
+      "timestamp": "2026-06-11T00:05:00-07:00",
+      "error_message": "assets/products/source-photos/manifest.json photo_paths all prefixed skyyrose/assets/images/source-products/ — a path that no longer exists after the 2026-06-10 asset consolidation (32 SKUs, lh-006 absent)",
+      "file": "assets/products/source-photos/manifest.json",
+      "root_cause": "The manifest is a generated artifact that was not regenerated after the source-photos tree moved to assets/products/source-photos/. Stale until a consumer dereferenced a path.",
+      "fix": "Regenerated via scripts/audit_source_photos.py (already swept to the new tree) — 33 SKUs, lh-006 present, zero stale paths.",
+      "tags": [
+        "source-photos",
+        "manifest",
+        "stale-path",
+        "asset-consolidation"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-11"
     }
   ]
 }

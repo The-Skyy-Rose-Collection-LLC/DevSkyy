@@ -1,0 +1,1153 @@
+{
+  "version": 1,
+  "generated_at": "2026-06-11T09:57:20+00:00",
+  "catalog_sha": "sha256:6f090ec4f526a6e22cd423646fc1ff0203be6448f0ec117648e32f980bc743be",
+  "skus": {
+    "br-001": {
+      "sku": "br-001",
+      "name": "BLACK Rose Crewneck",
+      "collection": "black-rose",
+      "garment_type": "crewneck",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/br-001-crewneck.png",
+          "sha256": "sha256:c9cd0614f52f8c9a6f8bcfb098acd89bcca15ea612cb62a48bba5d48697123c2",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/black-rose/br-crewneck-front.jpeg",
+          "sha256": "sha256:03161d4a429ffbe6e2198dd440be58aabae9af2464c6272640d6fae55e28f4d2",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/black-rose/br-crewneck-back.jpeg",
+          "sha256": "sha256:a26d1ca003880a0ea6535262ad64ee8a249354d3ddb05ebed16a89579cf2b173",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/br-brand-script.png",
+          "sha256": "sha256:abaa013616928564debc6bc5d126ee4fd306773a7e82885b30ba1fcb744feafb",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-crewneck.md",
+          "sha256": "sha256:c3443d005f8d9d06e59420f4631c8e6a58657abda30d43620de450b9db64e03c",
+          "exists": true
+        }
+      ]
+    },
+    "br-002": {
+      "sku": "br-002",
+      "name": "BLACK Rose Joggers",
+      "collection": "black-rose",
+      "garment_type": "joggers",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/br-002-joggers.png",
+          "sha256": "sha256:f7596bbcee6a189aac561b60261bb313ff063cc62722a8f13fe721f0ac7a9928",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/black-rose/br-joggers-front.jpeg",
+          "sha256": "sha256:85b45d850e99ee3c7975d56d95d384cf04c70a792a8d402b1e250057c9c9e8ae",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/black-rose/br-joggers-back.jpeg",
+          "sha256": "sha256:a11b350ced1813ef1b5af2556a660d1f19dcae4788e544f41d1b401793776d3c",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/br-brand-script.png",
+          "sha256": "sha256:abaa013616928564debc6bc5d126ee4fd306773a7e82885b30ba1fcb744feafb",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-joggers.md",
+          "sha256": "sha256:9d27c9a273c4b5ecd483be26f4aaba02d6c5358be5585668b29e2cefd5a7d1e4",
+          "exists": true
+        }
+      ]
+    },
+    "br-003": {
+      "sku": "br-003",
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Black)",
+      "collection": "black-rose",
+      "garment_type": "jersey",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/br-003-classic-real-front.jpeg",
+          "sha256": "sha256:7d9a483b189be454fa9c28622493f2aa6828217b6f6d9002b14e2c38d6e4b73b",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/black-rose/br-jersey-baseball-black-front.jpeg",
+          "sha256": "sha256:587e32037e881d730faf1e6535f2d86c35f91d5fc66804d2303727933fd23a94",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/black-rose/br-jersey-baseball-black-back.jpeg",
+          "sha256": "sha256:eea72e0d827446c8827ccfcd6a7be308501a0ffe0b16cad2c37a3deca6b6466e",
+          "exists": true
+        },
+        {
+          "role": "patch",
+          "path": "assets/products/techflats/hero-overlays/br-patch-mlb-baseball.png",
+          "sha256": "sha256:e4a4e161222a9eb4c3365e27dabecbe346f9d3bfab1db4b0b4c62fd1ed3230b5",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-0-baseball-classic.md",
+          "sha256": "sha256:270932b90c048e0eff087cf56bcf87d8f399cc4b4a2d2cf8aef57a2ba2ab950a",
+          "exists": true
+        }
+      ]
+    },
+    "br-004": {
+      "sku": "br-004",
+      "name": "BLACK Rose Hoodie",
+      "collection": "black-rose",
+      "garment_type": "hoodie",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/br-004-hoodie-real-front.jpeg",
+          "sha256": "sha256:bf34e9283fe404e14a0d0ce4cfc3aeb5e51689de695685b3365662335e095699",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-hoodie-source.jpg",
+          "sha256": "sha256:d75878bc6980710d686039054c5be9429ac13d7d91a39c5e925415e3992f664e",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/br-brand-script.png",
+          "sha256": "sha256:abaa013616928564debc6bc5d126ee4fd306773a7e82885b30ba1fcb744feafb",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-hoodie.md",
+          "sha256": "sha256:c997adef784bb4b8e3c9be7cda7da05db5214a5bc30975274f78df1052c3cb7d",
+          "exists": true
+        }
+      ]
+    },
+    "br-005": {
+      "sku": "br-005",
+      "name": "BLACK Rose Hoodie — Signature Edition",
+      "collection": "black-rose",
+      "garment_type": "hoodie",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/br-005-signature-hoodie-real.jpeg",
+          "sha256": "sha256:26e37c6897ef47a870e89e89adf2188595de27e26033cc4cfedf491df91bdaa4",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-hoodie-signature-edition-hoodie-ltd-source.jpg",
+          "sha256": "sha256:40117ab01b79d9b5e9a4f3aba78c1c0a728b80fe0df5582cdcee684a2e099ed8",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/br-brand-script.png",
+          "sha256": "sha256:abaa013616928564debc6bc5d126ee4fd306773a7e82885b30ba1fcb744feafb",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-hoodie-signature-edition.md",
+          "sha256": "sha256:55a09ad64b4a0a9fa9ac03b7fb8c370378327bcbc4acafa5bcd466d7d90e0532",
+          "exists": true
+        }
+      ]
+    },
+    "br-006": {
+      "sku": "br-006",
+      "name": "BLACK Rose Sherpa Jacket",
+      "collection": "black-rose",
+      "garment_type": "jacket",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/br-006-sherpa-jacket-real-front.jpeg",
+          "sha256": "sha256:8d36bb2d462f4e2145667021f06e9cad4150f9da886dda81488f6f78a1fd6793",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/black-rose-sherpa-jacket-sherpa-product.jpg",
+          "sha256": "sha256:b7c3d91431884e2b3f40dd8e4fab84dba4981864ce39e2fd1a0250cc3fa79a79",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/br-brand-script.png",
+          "sha256": "sha256:abaa013616928564debc6bc5d126ee4fd306773a7e82885b30ba1fcb744feafb",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-sherpa-jacket.md",
+          "sha256": "sha256:0428bd9add76f6ae7c199285eb663bf3b7a8d59d8097d880552bca8a66d5091e",
+          "exists": true
+        }
+      ]
+    },
+    "br-007": {
+      "sku": "br-007",
+      "name": "BLACK Rose x Love Hurts Basketball Shorts",
+      "collection": "black-rose",
+      "garment_type": "shorts",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/br-007-shorts-real-front.jpeg",
+          "sha256": "sha256:2da1309689439041ce8a53a23a7c5d6eeac1b80ecbf8822efbb796361a37c285",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/br-007-real-back.jpg",
+          "sha256": "sha256:f1245ae31b688f0e1a830da7e9eaa09411219caeede13569d3a9cb90d8f286b9",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/br-brand-script.png",
+          "sha256": "sha256:abaa013616928564debc6bc5d126ee4fd306773a7e82885b30ba1fcb744feafb",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-rose-x-love-hurts-basketball-shorts.md",
+          "sha256": "sha256:dec60e3d018ffde9ec26339c89f42a699e0a5a6302671e8152e3cc55fd4e22fb",
+          "exists": true
+        }
+      ]
+    },
+    "br-008": {
+      "sku": "br-008",
+      "name": "BLACK is Beautiful Jersey Series: 1. SF Inspired (Football)",
+      "collection": "black-rose",
+      "garment_type": "jersey",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/br-008-design-front.jpeg",
+          "sha256": "sha256:568e3607b2559bc037e9a0f7c8e4a066fc3a6b8476cf59849721c095e8e200c3",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/black-rose/br-jersey-football-sf-front.jpeg",
+          "sha256": "sha256:e62155dc5c26b179691f8a0b184f8e33791e4da819c304334dbf132824124521",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/black-rose/br-jersey-football-sf-back.jpeg",
+          "sha256": "sha256:eb4d8930afb6432ce2304d29a4618a746b0b212216a820e1e99b55a6e2f05b2b",
+          "exists": true
+        },
+        {
+          "role": "patch",
+          "path": "assets/products/techflats/hero-overlays/br-patch-nfl-football.png",
+          "sha256": "sha256:5440e22f86c7b503368bed69c9e3755e60a3fdf63b8e547af5905dc49e52781b",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-1-sf-inspired-football.md",
+          "sha256": "sha256:91c0310c874d56e66c1473d39e5bf7d47ffb038d6569bf6befa44aaf5a7b9b4c",
+          "exists": true
+        }
+      ]
+    },
+    "br-009": {
+      "sku": "br-009",
+      "name": "BLACK is Beautiful Jersey Series: 2. Last Oakland (Football)",
+      "collection": "black-rose",
+      "garment_type": "jersey",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/br-009-design-front.jpeg",
+          "sha256": "sha256:65a506dea4ea8a7f97fd35e30e5be56e068d081ad69973b61470ecd2cfef35ef",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/black-rose/br-jersey-football-oakland-front.jpeg",
+          "sha256": "sha256:0aa327d1874a5bf08e665d81ea6b1b9cb0cf1203372433cab68c91919b77c673",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/black-rose/br-jersey-football-oakland-back.jpeg",
+          "sha256": "sha256:27c73d72b2ba6220af30edaca9074316e67331fdfebc1789afdeea359d2c7caf",
+          "exists": true
+        },
+        {
+          "role": "patch",
+          "path": "assets/products/techflats/hero-overlays/br-patch-nfl-football.png",
+          "sha256": "sha256:5440e22f86c7b503368bed69c9e3755e60a3fdf63b8e547af5905dc49e52781b",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-2-last-oakland-football.md",
+          "sha256": "sha256:f778d351a4cebcc9b331f37529a13223fff1510dbae2aa7a979dd3aae9254854",
+          "exists": true
+        }
+      ]
+    },
+    "br-010": {
+      "sku": "br-010",
+      "name": "BLACK is Beautiful Jersey Series: 3. The Bay (Basketball)",
+      "collection": "black-rose",
+      "garment_type": "jersey",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/br-010-design-front.jpeg",
+          "sha256": "sha256:72e948eb13f99c1c4b5786c536b19bc881937e2e67bcb6ad46d7e272ec435bae",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/black-rose/br-jersey-basketball-front.jpeg",
+          "sha256": "sha256:e370a22db66a7e7a14d1be473f8774cd059e3be792e42275bf7a00418c500899",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/black-rose/br-jersey-basketball-back.jpeg",
+          "sha256": "sha256:cbe72f79d431bf11a04e848f94302de5316d37e9701a9f252b5f165fffad38c0",
+          "exists": true
+        },
+        {
+          "role": "patch",
+          "path": "assets/products/techflats/hero-overlays/br-patch-nba-basketball.png",
+          "sha256": "sha256:991988f3b1b3568c4ba3740612c2a98f8b8cda7b2cb405aba39e462b887a5dc9",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-3-the-bay-basketball.md",
+          "sha256": "sha256:c259ea02457085440bcf217fa22644f23d43a9e74a14a67d2501ac97501270b5",
+          "exists": true
+        }
+      ]
+    },
+    "br-011": {
+      "sku": "br-011",
+      "name": "BLACK is Beautiful Jersey Series: 4. The Rose (Hockey)",
+      "collection": "black-rose",
+      "garment_type": "hoodie",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/br-011-design-front.jpeg",
+          "sha256": "sha256:5a5f2faf8da4997953229e69e0dfce748f4fe935d83c36de3f28a2f143aa6b4d",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/black-rose/br-jersey-hockey-front.jpeg",
+          "sha256": "sha256:0e9548b3cadcf39aae24dac098ea56a91b5943bad82fd4577c61cff4df93331d",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/black-rose/br-jersey-hockey-back.jpeg",
+          "sha256": "sha256:771662ad37d2b3c76028ff9c6c83e73efa1a5afa4978d056cfb502564c695814",
+          "exists": true
+        },
+        {
+          "role": "patch",
+          "path": "assets/products/techflats/hero-overlays/br-patch-hockey.png",
+          "sha256": "sha256:d3f3850834e3c89a72dcf402ca70e1e0f00cdad06d74303dabed94f7fefd8261",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-4-the-rose-hockey.md",
+          "sha256": "sha256:3869098ef12abc2d0f29628b3588ea768e7cb4829ecf69af70e92545a0bc824e",
+          "exists": true
+        }
+      ]
+    },
+    "br-012": {
+      "sku": "br-012",
+      "name": "BLACK is Beautiful Jersey Series: 5. Baseball Classic (Last Oakland)",
+      "collection": "black-rose",
+      "garment_type": "jersey",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/br-012-techflat.jpeg",
+          "sha256": "sha256:4a9f47e7a08f9b5aef43d721a442534d3938aff356b2e6738633adc2e8a6befb",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/last-oakland-baseball-jersey-front.jpeg",
+          "sha256": "sha256:1749fbf270ac2b040446c2f94c63e0175f675157a4a9c6e46c59dae199fbaa2a",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/br-012-last-oakland-baseball-back.jpeg",
+          "sha256": "sha256:a5121d4275d493ab6ebb0e22fed896cbbcc2ca355856c4aca9fb33c0bf7dbb85",
+          "exists": true
+        },
+        {
+          "role": "patch",
+          "path": "assets/products/techflats/hero-overlays/br-patch-mlb-baseball.png",
+          "sha256": "sha256:e4a4e161222a9eb4c3365e27dabecbe346f9d3bfab1db4b0b4c62fd1ed3230b5",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-5-last-oakland-baseball.md",
+          "sha256": "sha256:567695304955aa5cd03e8bb531759951b1f9a3478b7b25c291362cc95e82569d",
+          "exists": true
+        }
+      ]
+    },
+    "br-014": {
+      "sku": "br-014",
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (Giants)",
+      "collection": "black-rose",
+      "garment_type": "jersey",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/br-014-real-front.jpeg",
+          "sha256": "sha256:a3ad7d6778a6111f41fb5e0003e952badf58235ecc4c914eb54502b5c687dbd9",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/black-rose/br-jersey-baseball-giants-front.jpeg",
+          "sha256": "sha256:2e38c44e0bcfe4bf4b79dc48a625d86f0f8e6f9065bbe196e45f24bf1962a570",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/black-rose/br-jersey-baseball-giants-back.jpeg",
+          "sha256": "sha256:7504a86f8b6002b9df8f3c38ef92927b24c761f0ceee511b4656b4e3f655912a",
+          "exists": true
+        },
+        {
+          "role": "patch",
+          "path": "assets/products/techflats/hero-overlays/br-patch-mlb-baseball.png",
+          "sha256": "sha256:e4a4e161222a9eb4c3365e27dabecbe346f9d3bfab1db4b0b4c62fd1ed3230b5",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-0-baseball-classic-giants.md",
+          "sha256": "sha256:668a3c733a6f81a94d7d7a8dfdf0fc4c99db2cc8cb395ae8b65857036c671251",
+          "exists": true
+        }
+      ]
+    },
+    "br-015": {
+      "sku": "br-015",
+      "name": "BLACK is Beautiful Jersey Series: 0. Baseball Classic (White)",
+      "collection": "black-rose",
+      "garment_type": "jersey",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/br-015-techflat.jpeg",
+          "sha256": "sha256:7e419ef8285b3f07b9afe10c1e64220dcdba12f3f8441a842af4d973ecffa0ef",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/black-rose/br-jersey-baseball-white-front.jpeg",
+          "sha256": "sha256:46a7edac0ff5744d23ba93967fde7a6a3de909b79f25e844b81fe2bbbbc94042",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/black-rose/br-jersey-baseball-white-back.jpeg",
+          "sha256": "sha256:d741a72cb27dfa272f1ec27421501632be72a8dbfc1422ce6172dd34c2be7e4a",
+          "exists": true
+        },
+        {
+          "role": "patch",
+          "path": "assets/products/techflats/hero-overlays/br-patch-mlb-baseball.png",
+          "sha256": "sha256:e4a4e161222a9eb4c3365e27dabecbe346f9d3bfab1db4b0b4c62fd1ed3230b5",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/black-is-beautiful-jersey-series-0-baseball-classic-white.md",
+          "sha256": "sha256:8de09558baf3c484ebffe9d6acf342c6b9a01023e68a0daf49bc4c9913d48147",
+          "exists": true
+        }
+      ]
+    },
+    "kids-001": {
+      "sku": "kids-001",
+      "name": "Kids Colorblock Hoodie Set — Red/Black",
+      "collection": "kids-capsule",
+      "garment_type": "hoodie",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/kids-001-real-photo.jpeg",
+          "sha256": "sha256:9f73606eff0438378f2f669c6fde2977720a3c18e9577f68b27aed32f2dd4e08",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/kids-capsule/kids-red-hoodie-front.jpeg",
+          "sha256": "sha256:eb6a4b431772d0a07159d5afbdabbb45d327820a32317049314f7be880dee482",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/kids-capsule/kids-red-hoodie-back.jpeg",
+          "sha256": "sha256:32b1ea6046170a347a864693f99a818ab239dd6b5584248d926dbd89542ca42f",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/kids-colorblock-hoodie-set-red-black.md",
+          "sha256": "sha256:5e0d041a269b8f58f8880eb1598f5d38eca572ca201cd5099f6a6eb9c9c9b43b",
+          "exists": true
+        }
+      ]
+    },
+    "kids-002": {
+      "sku": "kids-002",
+      "name": "Kids Colorblock Hoodie Set — Purple/Black",
+      "collection": "kids-capsule",
+      "garment_type": "hoodie",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/kids-002-real-photo.jpeg",
+          "sha256": "sha256:5aa52b25e375873d7bf8c073dec26ba1b901ac1f99e743dc549fbd4ec88c0a3d",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/kids-capsule/kids-purple-hoodie-front.jpeg",
+          "sha256": "sha256:0186a9f9b085075d48918b1d5e157ed07c1d6e01c8520ea67b9583b0e97b203f",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/kids-capsule/kids-purple-hoodie-back.jpeg",
+          "sha256": "sha256:ebe474c10631c0b7a0a832b8ec7693da91d828f5676e344770974228dcfea940",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/kids-colorblock-hoodie-set-purple-black.md",
+          "sha256": "sha256:e795477182194ae0cb50997aad0c74e6bc1a6332ec1471a88574fe1836ee7f29",
+          "exists": true
+        }
+      ]
+    },
+    "lh-002": {
+      "sku": "lh-002",
+      "name": "Love Hurts Joggers (Black)",
+      "collection": "love-hurts",
+      "garment_type": "joggers",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/lh-002-techflat-front.jpeg",
+          "sha256": "sha256:1a5ad59e099bacf048261949ed316954723bfc7c6efb3918ea3f41631b62ca0c",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/love-hurts/lh-joggers-front.jpeg",
+          "sha256": "sha256:792de5770a1f04512a6bd55dda513dc96c80225f614fd7c252b7f43dfc51edcd",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/lh-logo-combined.png",
+          "sha256": "sha256:9a4732278be213a52f81af6688c5c7469a23ff1e88d9f05ac6b414143a5aac0d",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/love-hurts-joggers.md",
+          "sha256": "sha256:796f623b0de1006b10f4259ed5ab29427af7453de1f998029734a142a194ab33",
+          "exists": true
+        }
+      ]
+    },
+    "lh-003": {
+      "sku": "lh-003",
+      "name": "Love Hurts Basketball Shorts",
+      "collection": "love-hurts",
+      "garment_type": "shorts",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/lh-003-techflat-front.jpeg",
+          "sha256": "sha256:81b0490dbaffa22d5b2236eae800a2cff4d60eb4fd34e6a07433c9937f0a4447",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/lh-003-real-front.jpg",
+          "sha256": "sha256:2d33ddf6e9747049f7b6580f613a59818dc65ec6a953fa307d16c7434bf7d8ab",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/lh-003-real-back.jpg",
+          "sha256": "sha256:0a2b6b2a09634ff88affa644b880b949af4ad926d4f39fc09e75aaae67151030",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/lh-logo-combined.png",
+          "sha256": "sha256:9a4732278be213a52f81af6688c5c7469a23ff1e88d9f05ac6b414143a5aac0d",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/love-hurts-basketball-shorts.md",
+          "sha256": "sha256:5340a30adaa2507c51adbb4d06e2bd52f0e21d2d82a2dbe8e5826160871b1e9d",
+          "exists": true
+        }
+      ]
+    },
+    "lh-004": {
+      "sku": "lh-004",
+      "name": "Love Hurts Bomber Jacket",
+      "collection": "love-hurts",
+      "garment_type": "bomber jacket",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/lh-004-techflat-front.jpeg",
+          "sha256": "sha256:a80570de81d5443fd0452a835cc662cf43ec969238789523ec7f83148306e506",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/love-hurts/lh-bomber-front.jpeg",
+          "sha256": "sha256:38f80494d16668d9e248104f48b23370bdb8b72752a8dc02b5f89480c81d7e32",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/love-hurts/lh-bomber-back.jpeg",
+          "sha256": "sha256:87e4815d27fda4d9a07fbf1134ca269bc780252d523d77d4a82d4cb8e87202b1",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/love-hurts/logo-love.jpeg",
+          "sha256": "sha256:658821b347d87c00c93d5cbb3745b8f7db93a8c63f470c4ca895b3cd3ff61200",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/love-hurts-bomber-jacket.md",
+          "sha256": "sha256:c432e4e0ab28987abaaee60d7223db1813e48c5e3c35a6ab10b809fad3b43765",
+          "exists": true
+        }
+      ]
+    },
+    "lh-005": {
+      "sku": "lh-005",
+      "name": "The Fannie",
+      "collection": "love-hurts",
+      "garment_type": "",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/lh-005-fannie-mockup.jpeg",
+          "sha256": "sha256:a81ea0ddde232a07253ba53168580bc36fba6b0c61622e172b65e8b161c36213",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/lh-logo-combined.png",
+          "sha256": "sha256:9a4732278be213a52f81af6688c5c7469a23ff1e88d9f05ac6b414143a5aac0d",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-fannie.md",
+          "sha256": "sha256:016770b3c8d1b5389549c3c3830e7dc44d19c55542630bd855eed40c7cbe62c6",
+          "exists": true
+        }
+      ]
+    },
+    "lh-006": {
+      "sku": "lh-006",
+      "name": "Love Hurts Joggers (White)",
+      "collection": "love-hurts",
+      "garment_type": "joggers",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/lh-006-techflat-front.jpeg",
+          "sha256": "sha256:a85fbed9da1d7cc1dd8b7ce913b97b50c1f85274f328def457386abc40c97649",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/lh-006-joggers-white.jpeg",
+          "sha256": "sha256:c48bd2e8e764859dee048e3c8f4af955e32bce041fd2975e5948ec700fcc0417",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/lh-logo-combined.png",
+          "sha256": "sha256:9a4732278be213a52f81af6688c5c7469a23ff1e88d9f05ac6b414143a5aac0d",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/love-hurts-joggers-white.md",
+          "sha256": "sha256:5e0d549dbbc8cb184c86d85b6c56b52a51e5023af0c9b64205a15658621157c1",
+          "exists": true
+        }
+      ]
+    },
+    "sg-001": {
+      "sku": "sg-001",
+      "name": "The Bridge Series 'The Bay Bridge' Shorts",
+      "collection": "signature",
+      "garment_type": "shorts",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/sg-001-day-bay-bridge-shorts.jpeg",
+          "sha256": "sha256:6e6349d2ffecfd944d8102c47cc167703a1a3dde4dcc4fd0389693c4746221a8",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/signature/sg-bridge-shorts-bay-front.jpeg",
+          "sha256": "sha256:8ea96aff6ad50eb4a8abf2d85165157c584148d52045a2976a1524bd520a1331",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/signature/sg-bridge-shorts-bay-back.jpeg",
+          "sha256": "sha256:f2e8f228f90818ebc69da523ea96f7599ac56ced7fc42ac986d9a3573199a288",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
+          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-bridge-series-the-bay-bridge-shorts.md",
+          "sha256": "sha256:7723ebeafd0d9dd027b9b670395d0fca2b64974ee8ebbd06950784e661cf5a4b",
+          "exists": true
+        }
+      ]
+    },
+    "sg-002": {
+      "sku": "sg-002",
+      "name": "The Bridge Series 'Stay Golden' Shirt",
+      "collection": "signature",
+      "garment_type": "shirt",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/sg-002-stay-golden-shirt-techflat.jpeg",
+          "sha256": "sha256:652826e525ae261bed597dc7952f42005ac723b417fe77e434ddb2ded7f4148f",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/signature/sg-bridge-tee-golden-front.jpeg",
+          "sha256": "sha256:0f0b31184f3654c8dd4dca6e94def91af04eeabfde3763b536a532eb89d83b0d",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/signature/sg-bridge-tee-golden-back.jpeg",
+          "sha256": "sha256:1bc4a6deb13b59b68a251646b876f8165c095ec6dae5a56aaf03dd96a6cd3f3b",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
+          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-bridge-series-stay-golden-shirt.md",
+          "sha256": "sha256:59c76429f29cc9ec7f363928b7d3d5037c218ef3dd17f0c4fec4bc3fba857b85",
+          "exists": true
+        }
+      ]
+    },
+    "sg-003": {
+      "sku": "sg-003",
+      "name": "The Bridge Series 'Stay Golden' Shorts",
+      "collection": "signature",
+      "garment_type": "shorts",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/sg-003-sunset-golden-gate-shorts.jpeg",
+          "sha256": "sha256:a1191068850ff760ee31057d876fde88b7b9ee8845e72eaeeaeda1a2a7b107d2",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/signature/sg-bridge-shorts-golden-front.jpeg",
+          "sha256": "sha256:4b2bc1bb366ce8d60b6076ce62adab527a1edf81bcfc10162e8bfb2bfa18b3ac",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/signature/sg-bridge-shorts-golden-back.jpeg",
+          "sha256": "sha256:dc199547e50155e17fddb8572e9564c11ae56b523e1a3b393ffe6b8effc71376",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
+          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-bridge-series-stay-golden-shorts.md",
+          "sha256": "sha256:f8af8ac39e082c8efa7c7cb93de19c1531aa60ae08927202d1c1fa645def668e",
+          "exists": true
+        }
+      ]
+    },
+    "sg-005": {
+      "sku": "sg-005",
+      "name": "The Bridge Series 'The Bay Bridge' Shirt",
+      "collection": "signature",
+      "garment_type": "shirt",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/sg-005-bay-bridge-shirt-techflat.jpeg",
+          "sha256": "sha256:e5b88ecfcbd6889987d4fcf6c421d60010120fdc15d2c70315a94eb136fafcbc",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/bay-bridge-shirt-front.jpg",
+          "sha256": "sha256:11118381362081c6d62f33121469529baab175d22b2e18f78ecd79499be02a75",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
+          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-bridge-series-the-bay-bridge-shirt.md",
+          "sha256": "sha256:5a7cb951bc73a04b8fb94c5cfcedbc4e78bce816f75a3833576218f50d585f3c",
+          "exists": true
+        }
+      ]
+    },
+    "sg-006": {
+      "sku": "sg-006",
+      "name": "Mint & Lavender Hoodie",
+      "collection": "signature",
+      "garment_type": "hoodie",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-006-mint-lavender-hoodie.png",
+          "sha256": "sha256:0f47125187736a1089a42fa5f2f92987cbae5ac00c77bd41225697160afac4ea",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/signature/sg-mint-lav-hoodie-front.jpeg",
+          "sha256": "sha256:a1a7fcc38870766c8dbe55b30e9f86cc5d15f9ac24a01e777ebec2ce0868ee13",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
+          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/mint-lavender-hoodie.md",
+          "sha256": "sha256:04cdd10dde63036f52990027a6e51b0cc7907c799543c4dfc6ad7d5216ee8529",
+          "exists": true
+        }
+      ]
+    },
+    "sg-007": {
+      "sku": "sg-007",
+      "name": "The Signature Beanie",
+      "collection": "signature",
+      "garment_type": "",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/sg-007-techflat.jpeg",
+          "sha256": "sha256:b50a98043429d5097edbbafc603812c4ff22e60bf0528ce4aa270d1a565f381a",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/signature/sg-beanie-purple.jpeg",
+          "sha256": "sha256:a6c5e8dd73784d5442fed4e10763dcc219d43796c20b4e3e92c9b1d4f9d00ecd",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
+          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-signature-beanie.md",
+          "sha256": "sha256:98842ce4880b4734b210f389dbbce01b378e8354a0d6e8f6e62f8131aa133228",
+          "exists": true
+        }
+      ]
+    },
+    "sg-009": {
+      "sku": "sg-009",
+      "name": "The Sherpa Jacket",
+      "collection": "signature",
+      "garment_type": "jacket",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/sg-009-sherpa-front.jpeg",
+          "sha256": "sha256:d19b59e25007817a2a95300ca632c58e7c0206647f74ab758fde60b60fd14de6",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/sherpa-jacket-front.jpg",
+          "sha256": "sha256:ac5343f88b6a1ac3513d14d8a81aa06f77abf583feea71365609a1e3e89b7cc7",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
+          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-sherpa-jacket.md",
+          "sha256": "sha256:358c11e77f353575f26d6c1569cf0ae8f6d5d20b2e10727f548f39a549d3cd41",
+          "exists": true
+        }
+      ]
+    },
+    "sg-011": {
+      "sku": "sg-011",
+      "name": "Original Label Tee (White)",
+      "collection": "signature",
+      "garment_type": "shirt",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-011-original-label-tee-white.jpeg",
+          "sha256": "sha256:9e80fd8e297d6e5da548d39569301b2f032f1bb73949db2bc7a1c2b41f231ab1",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/original-label-tee-white-front.webp",
+          "sha256": "sha256:87a41b8ad37c9214d2b52be933c96f0b9d5fdeeca769eedd0f0087c5daeade75",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/signature/brand-skyy-rose-collection-gold.jpeg",
+          "sha256": "sha256:7b60b0e50f0a4b2e91c1a5ac6d07691e86e734cd6f9125d52a685448eed67d60",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/original-label-tee-white.md",
+          "sha256": "sha256:8f4b6d97066f5599c6fda67698a2280b7b70e80578fe5904b0e0e8894499031f",
+          "exists": true
+        }
+      ]
+    },
+    "sg-012": {
+      "sku": "sg-012",
+      "name": "Original Label Tee (Orchid)",
+      "collection": "signature",
+      "garment_type": "shirt",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/sg-012-original-label-tee-orchid.jpeg",
+          "sha256": "sha256:ebbe6620d6781d128c7da811e7febad138dbbccb91fb8f760df98c6749fd8fb5",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "wordpress-theme/skyyrose-flagship/assets/images/products/original-label-tee-orchid-front.webp",
+          "sha256": "sha256:c2b7b172a6c459652343da31ad96fa9c6598f56e10b763219a84b6c70776f46b",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/signature/brand-skyy-rose-collection-gold.jpeg",
+          "sha256": "sha256:7b60b0e50f0a4b2e91c1a5ac6d07691e86e734cd6f9125d52a685448eed67d60",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/original-label-tee-orchid.md",
+          "sha256": "sha256:e3a8d1519be8dadc9acc697302fab8e0f10759dc5ff172d7d531286bbf3f7aa0",
+          "exists": true
+        }
+      ]
+    },
+    "sg-013": {
+      "sku": "sg-013",
+      "name": "Mint & Lavender Crewneck",
+      "collection": "signature",
+      "garment_type": "crewneck",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/sg-013-techflat-front.jpeg",
+          "sha256": "sha256:05c665c0462700ec3cce7ce9dffec77c055a989d841a2cc128fba75b02f63ddc",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/signature/sg-mint-lav-crewneck-front.jpeg",
+          "sha256": "sha256:fb03d5411524d6174ed803f3a763849066e4e33e9d2a7bc912638b6b2f5398ec",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/signature/sg-mint-lav-crewneck-back.jpeg",
+          "sha256": "sha256:f559d64730013edb39001152a791ad030ca15b6d72e5a1b112dd652d3e04ef1c",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
+          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/mint-lavender-crewneck.md",
+          "sha256": "sha256:21054a52111606871fb164d3e90c4cc26bb0406be704091d992df74f2730b559",
+          "exists": true
+        }
+      ]
+    },
+    "sg-014": {
+      "sku": "sg-014",
+      "name": "Mint & Lavender Sweatpants",
+      "collection": "signature",
+      "garment_type": "sweatpants",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/sg-014-techflat-front.jpeg",
+          "sha256": "sha256:d36d340377c86804e2e163c2e3c073e58638569e9f92246cc57b76e65822682f",
+          "exists": true
+        },
+        {
+          "role": "garment",
+          "path": "assets/products/techflats/split/signature/sg-mint-lav-sweats-front.jpeg",
+          "sha256": "sha256:5d641401d0d8c4043448a9eea15ded2d90c2c8ddd0192d196868296dc1cdaa18",
+          "exists": true
+        },
+        {
+          "role": "garment-back",
+          "path": "assets/products/techflats/split/signature/sg-mint-lav-sweats-back.jpeg",
+          "sha256": "sha256:67ff2d292cafc5d0d09d09ee07fff833b0e0980f7f6d45254340f7d418687311",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
+          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/mint-lavender-sweatpants.md",
+          "sha256": "sha256:361ab61cdd47cb5bf84784a201b70bb4da9605749043053cb57025644d84de47",
+          "exists": true
+        }
+      ]
+    },
+    "sg-015": {
+      "sku": "sg-015",
+      "name": "The Windbreaker Set",
+      "collection": "signature",
+      "garment_type": "set",
+      "assets": [
+        {
+          "role": "garment",
+          "path": "assets/products/references/sg-015-windbreaker-set-techflat.jpeg",
+          "sha256": "sha256:f05187dff58eaa626c68442636a0ef9648dc31d619609c927b79e2890dcf8db4",
+          "exists": true
+        },
+        {
+          "role": "logo",
+          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
+          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c",
+          "exists": true
+        },
+        {
+          "role": "dossier",
+          "path": "wordpress-theme/skyyrose-flagship/data/dossiers/the-windbreaker-set.md",
+          "sha256": "sha256:cd1f0678c09312983907e55698f406adf264e77855691795f4e582b5a9f4875d",
+          "exists": true
+        }
+      ]
+    }
+  }
+}
