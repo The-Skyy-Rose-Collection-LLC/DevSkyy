@@ -188,6 +188,7 @@ def _collection_logos() -> dict[str, Path]:
 def _sku_logo_refs() -> dict[str, Path]:
     o = config.OVERLAYS_DIR
     t = config.TECHFLATS_DIR
+    cw = config.LOGOS_DIR  # colorway-correct three-rose-cluster references
     return {
         # Black Rose jerseys → sport patches (the elements that were going missing)
         "br-008": o / "br-patch-nfl-football.png",
@@ -203,6 +204,14 @@ def _sku_logo_refs() -> dict[str, Path]:
         # Signature — gold script
         "sg-011": t / "signature" / "brand-skyy-rose-collection-gold.jpeg",
         "sg-012": t / "signature" / "brand-skyy-rose-collection-gold.jpeg",
+        # Signature — three-rose-cluster recolored per the founder-approved
+        # colorway (2026-06-11). Attaching a colorway-correct reference makes the
+        # model copy the right rose color instead of inferring it from text.
+        "sg-002": cw / "three-rose-cluster-purple.png",  # 'Stay Golden' Shirt
+        "sg-005": cw / "three-rose-cluster-blue-cyan.png",  # 'Bay Bridge' Shirt
+        "sg-006": cw / "three-rose-cluster-lavender.png",  # Mint & Lavender Hoodie
+        "sg-014": cw / "three-rose-cluster-lavender.png",  # Mint & Lavender Sweatpants
+        "sg-007": cw / "three-rose-cluster-greyscale.png",  # Signature Beanie
     }
 
 

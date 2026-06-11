@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-06-11T12:26:07+00:00",
+  "generated_at": "2026-06-11T20:13:17+00:00",
   "catalog_sha": "sha256:6f090ec4f526a6e22cd423646fc1ff0203be6448f0ec117648e32f980bc743be",
   "skus": {
     "br-001": {
@@ -702,8 +702,8 @@
         },
         {
           "role": "logo",
-          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
-          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c"
+          "path": "assets/products/logos/three-rose-cluster-purple.png",
+          "sha256": "sha256:fd316770c9e40902c8ac286b6325042bc265495bdd3495c768f6035c645f479a"
         },
         {
           "role": "dossier",
@@ -763,8 +763,8 @@
         },
         {
           "role": "logo",
-          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
-          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c"
+          "path": "assets/products/logos/three-rose-cluster-blue-cyan.png",
+          "sha256": "sha256:236e93936bbc7b600456a2c7f323be622ee828868449738aeb89fdbe92776b6a"
         },
         {
           "role": "dossier",
@@ -791,8 +791,8 @@
         },
         {
           "role": "logo",
-          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
-          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c"
+          "path": "assets/products/logos/three-rose-cluster-lavender.png",
+          "sha256": "sha256:1c31c6729bfab2345491302ef278a7a44f4fea285c67d8fb9465b2427ad85f1e"
         },
         {
           "role": "dossier",
@@ -819,8 +819,8 @@
         },
         {
           "role": "logo",
-          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
-          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c"
+          "path": "assets/products/logos/three-rose-cluster-greyscale.png",
+          "sha256": "sha256:be36471c855395cf0ef8d84ac2acc524fe0516d3101df24ae1020b97a40d1f36"
         },
         {
           "role": "dossier",
@@ -969,8 +969,8 @@
         },
         {
           "role": "logo",
-          "path": "assets/products/techflats/hero-overlays/sig-brand-skyy-rose-gold.png",
-          "sha256": "sha256:e6cc08e6a8de501efb6cf6bcc800ece417adae08e8e0ef48a24e0bb22ceeba7c"
+          "path": "assets/products/logos/three-rose-cluster-lavender.png",
+          "sha256": "sha256:1c31c6729bfab2345491302ef278a7a44f4fea285c67d8fb9465b2427ad85f1e"
         },
         {
           "role": "dossier",

@@ -50,6 +50,7 @@ PRODUCT_TECHFLATS: Path = PRODUCT_ASSETS / "techflats"  # split/, hero-overlays/
 PRODUCT_REFERENCES: Path = PRODUCT_ASSETS / "references"
 PRODUCT_SOURCE_PHOTOS: Path = PRODUCT_ASSETS / "source-photos"
 PRODUCT_MASTERS: Path = PRODUCT_ASSETS / "masters"  # locked master registry
+PRODUCT_LOGOS: Path = PRODUCT_ASSETS / "logos"  # colorway-correct logo render references
 
 # ─── Elite Studio canonical inputs ─────────────────────────────────────
 ELITE_STUDIO_ROOT: Path = REPO_ROOT / "skyyrose" / "elite_studio"
@@ -110,6 +111,7 @@ def wp_product_path(filename: str) -> Path:
 __all__ = [
     "CATALOG_CSV",
     "PRODUCT_ASSETS",
+    "PRODUCT_LOGOS",
     "PRODUCT_MASTERS",
     "PRODUCT_REFERENCES",
     "PRODUCT_SOURCE_PHOTOS",

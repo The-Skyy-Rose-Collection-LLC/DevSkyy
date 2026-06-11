@@ -87,6 +87,7 @@ PRODUCTS_DIR = _ap.WP_PRODUCTS_DIR
 SPLIT_DIR = _ap.PRODUCT_TECHFLATS / "split"
 OVERLAYS_DIR = _ap.PRODUCT_TECHFLATS / "hero-overlays"
 TECHFLATS_DIR = _ap.PRODUCT_TECHFLATS
+LOGOS_DIR = _ap.PRODUCT_LOGOS  # colorway-correct three-rose-cluster render references
 OUTPUT_DIR = PROJECT_ROOT / "renders" / "oai"
 REJECTED_DIR = OUTPUT_DIR / "_rejected"  # QC-failed renders quarantined for human review
 

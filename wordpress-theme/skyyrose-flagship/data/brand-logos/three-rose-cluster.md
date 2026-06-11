@@ -51,8 +51,15 @@ specifies the recolor):
 - **Signature 'Stay Golden' Shirt (sg-002)** — recolored to **purple**.
 - **Signature 'Bay Bridge' Shirt (sg-005)** — recolored to **blue/cyan**.
 - **Signature Beanie (sg-007)** — **greyscale** cluster (cuff face).
-- **Mint & Lavender (sg-006 hoodie, sg-014 sweatpants)** — small **pink**
-  rose-cluster recolor.
+- **Mint & Lavender (sg-006 hoodie, sg-014 sweatpants)** — small **lavender**
+  rose-cluster recolor (founder-confirmed 2026-06-11 from the techflat; the
+  earlier 'pink' note was stale — the real garment shows lavender/purple roses).
+
+
+Colorway-correct render references (selective recolor of this base art, used
+as attached references so the image model copies the right rose color) live
+at `assets/products/logos/three-rose-cluster-{greyscale,lavender,pink,purple,
+blue-cyan}.png` and are wired per SKU in `scripts/oai_render/references.py`.
 
 ## What this logo IS NOT
 
