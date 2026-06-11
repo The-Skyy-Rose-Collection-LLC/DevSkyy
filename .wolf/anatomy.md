@@ -1471,7 +1471,6 @@
 - `CLAUDE.md` (~11 tok)
 - `collection-designs.html` — SkyyRose — Collection Design Mockups (2026-05-24) (~11153 tok)
 - `README.md` — Project documentation (~418 tok)
-- `v2.html` — SkyyRose — v2 Design Reference (~9114 tok)
 
 ## docs/database/
 
