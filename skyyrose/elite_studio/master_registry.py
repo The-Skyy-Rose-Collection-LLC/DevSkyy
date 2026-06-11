@@ -23,15 +23,15 @@ manifest is populated for all live SKUs.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import tempfile
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass, field
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal
+
+from skyyrose.core.hashing import now_iso, sha256_of_file
 
 MasterSource = Literal["photograph", "cad_render", "3d_model", "generative_locked", "pending"]
 MasterStatus = Literal["pending", "locked", "retired"]
@@ -55,13 +55,7 @@ def manifest_path() -> Path:
     return _DEFAULT_MASTERS_DIR / _MANIFEST_FILENAME
 
 
-def sha256_of_file(path: str | Path) -> str:
-    """Full SHA-256 digest of a file — the hash pin. Format: 'sha256:<hex>'."""
-    h = hashlib.sha256()
-    with open(path, "rb") as f:
-        for chunk in iter(lambda: f.read(1 << 20), b""):
-            h.update(chunk)
-    return "sha256:" + h.hexdigest()
+# sha256_of_file is re-exported from skyyrose.core.hashing (one hash fn).
 
 
 @dataclass(frozen=True)
@@ -284,5 +278,4 @@ class Manifest:
         return entry
 
 
-def _now_iso() -> str:
-    return datetime.now(UTC).isoformat(timespec="seconds")
+_now_iso = now_iso  # delegate to the shared helper

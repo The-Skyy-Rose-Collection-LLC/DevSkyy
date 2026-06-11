@@ -421,6 +421,11 @@ def test_founder_keeper_assets_skip_their_plan(tmp_path, monkeypatch):
 
     from scripts.oai_render import pipeline, references
 
+    # A keeper must name an asset that exists on disk to be honored (else it
+    # would silently block the re-render of a product whose "kept" image is gone).
+    keeper_asset = tmp_path / "sg-009-keeper.webp"
+    keeper_asset.write_bytes(b"fake-image")
+    monkeypatch.setattr(config, "PROJECT_ROOT", tmp_path)
     kj = tmp_path / "render-keepers.json"
     kj.write_text(
         json.dumps(
@@ -430,6 +435,7 @@ def test_founder_keeper_assets_skip_their_plan(tmp_path, monkeypatch):
                         "sku": "sg-009",
                         "style": "on-model",
                         "view": "front",
+                        "asset": "sg-009-keeper.webp",
                         "founder_note": "good render, save it",
                     }
                 ]

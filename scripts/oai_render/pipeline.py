@@ -107,7 +107,17 @@ def _keeper_skips() -> dict[tuple[str, str, str], str]:
         if not (sku and style):
             continue
         asset = k.get("asset")
-        if asset and not (repo_root / asset).exists():
+        if not asset:
+            # A keeper with no asset path cannot be existence-checked; honoring
+            # it blind re-creates the silent-block bug. Skip + warn so the SKU
+            # re-renders rather than being suppressed by an unverifiable claim.
+            log.warning(
+                "Keeper for %s %s has no 'asset' path — cannot verify; will re-render.",
+                sku,
+                style,
+            )
+            continue
+        if not (repo_root / asset).exists():
             log.warning(
                 "Keeper for %s %s ignored — asset no longer on disk (%s); will re-render.",
                 sku,
@@ -392,6 +402,7 @@ def run(
     styles: list[str] | None = None,
     dry_run: bool = True,
     client=None,
+    verify_assets: bool = True,
 ) -> dict:
     """Plan the render matrix for all targets; render them when not dry-run (client required).
 
@@ -466,16 +477,51 @@ def run(
     if client is None:
         raise ValueError("Live run requires an image client.")
 
-    results = render_all(plans, client)
+    results = render_all(plans, client, verify_assets=verify_assets)
     return {"plans": plans, "manifest": manifest, "results": results}
 
 
-def render_all(plans: list[SkuPlan], client: RenderClient) -> list[RenderResult]:
+class AssetIntegrityError(RuntimeError):
+    """A planned SKU's source asset drifted from the committed manifest.
+
+    Carries the drift findings so the caller can report which files changed.
+    Raised before any paid API call — the bug-119 wrong-product prevention.
+    """
+
+    def __init__(self, findings: list):
+        self.findings = findings
+        super().__init__(f"{len(findings)} asset(s) drifted from the manifest")
+
+
+def verify_plan_assets(plans: list[SkuPlan]) -> list:
+    """Return manifest-drift findings for every SKU the plans will render."""
+    from skyyrose.core.asset_manifest import AssetManifest
+
+    skus: set[str] = set()
+    for p in plans:
+        skus.add(p.sku)
+        skus.update(p.pair_skus or ())
+    return AssetManifest.load().verify(sorted(skus))
+
+
+def render_all(
+    plans: list[SkuPlan], client: RenderClient, *, verify_assets: bool = True
+) -> list[RenderResult]:
     """Render every plan in order; per-SKU skips/errors are captured, not raised.
+
+    Before any paid call, every planned SKU's source assets are verified against
+    the committed manifest (unless ``verify_assets=False``); drift raises
+    :class:`AssetIntegrityError`. This guard lives here — the single choke point
+    every paid caller routes through — so no entry point can bypass it.
 
     One QC gate + one runtime spend tracker per batch: every paid call (render,
     judged retry, judge) draws from the same HARD_COST_CAP_USD budget.
     """
+    if verify_assets:
+        drift = verify_plan_assets(plans)
+        if drift:
+            raise AssetIntegrityError(drift)
+
     from .cost import SpendTracker
     from .qc import QCGate
 

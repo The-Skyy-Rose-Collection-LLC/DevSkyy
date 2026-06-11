@@ -57,26 +57,6 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _asset_drift(plans) -> list:
-    """Verify every planned SKU's assets against the committed asset manifest.
-
-    Returns a list of DriftFinding (empty == clean). A source file that is
-    missing or whose content hash changed since the manifest was committed is
-    the bug-119 signature — block the paid run rather than render against a
-    possibly-wrong input.
-    """
-    try:
-        from skyyrose.core.asset_manifest import AssetManifest
-    except Exception:  # pragma: no cover - core import wiring
-        return []
-    skus: set[str] = set()
-    for p in plans:
-        skus.add(p.sku)
-        for s in getattr(p, "pair_skus", None) or ():
-            skus.add(s)
-    return AssetManifest.load().verify(sorted(skus))
-
-
 def _print_skips(plans) -> None:
     for plan in plans:
         if not plan.renderable:
@@ -138,25 +118,27 @@ def main(argv: list[str] | None = None) -> int:
         print("\nPaid generation is gated. Re-run with --yes to proceed.")
         return 2
 
-    if not getattr(args, "skip_asset_verify", False):
-        drift = _asset_drift(renderable)
-        if drift:
-            print("\nABORT: asset integrity check failed before paid generation.")
-            print("  A source file changed or vanished since the manifest was committed —")
-            print("  rendering against it risks the bug-119 wrong-product class. Findings:")
-            for d in drift:
-                print(f"    {d.sku:<14} {d.role:<13} {d.kind:<14} {d.path}")
-            print(
-                "\n  Resolve the file, regenerate with `python scripts/build_asset_manifest.py`,\n"
-                "  confirm the change is intended, then re-run. Override with --skip-asset-verify."
-            )
-            return 4
-
     from .client import OAIImageClient
 
     client = OAIImageClient()  # validates the API key
     # Render the EXACT plans the manifest was built from (no re-plan → no TOCTOU).
-    results = pipeline.render_all(dry["plans"], client)
+    # render_all runs the asset-integrity gate before any paid call; drift on a
+    # source file (missing or hash-changed) raises rather than spending.
+    try:
+        results = pipeline.render_all(
+            dry["plans"], client, verify_assets=not args.skip_asset_verify
+        )
+    except pipeline.AssetIntegrityError as exc:
+        print("\nABORT: asset integrity check failed before paid generation.")
+        print("  A source file changed or vanished since the manifest was committed —")
+        print("  rendering against it risks the bug-119 wrong-product class. Findings:")
+        for d in exc.findings:
+            print(f"    {d.sku:<14} {d.role:<13} {d.kind:<14} {d.path}")
+        print(
+            "\n  Resolve the file, regenerate with `python scripts/build_asset_manifest.py`,\n"
+            "  confirm the change is intended, then re-run. Override with --skip-asset-verify."
+        )
+        return 4
 
     rendered = [r for r in results if r.status == "rendered"]
     errored = [r for r in results if r.status == "error"]

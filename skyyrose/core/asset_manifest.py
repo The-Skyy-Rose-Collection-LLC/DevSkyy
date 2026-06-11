@@ -23,8 +23,8 @@ This module is *pure*: it knows how to hash, serialize, and verify asset
 records, but not where SKUs come from. The generator
 (``scripts/build_asset_manifest.py``) owns the SKU→path resolution and feeds
 records in, keeping ``skyyrose.core`` free of any dependency on the render
-scripts. Hashing is delegated to :func:`master_registry.sha256_of_file` so the
-project has exactly one hash function.
+scripts. Hashing is delegated to :func:`skyyrose.core.hashing.sha256_of_file`
+so the project has exactly one hash function.
 """
 
 from __future__ import annotations
@@ -33,31 +33,30 @@ import json
 import os
 import tempfile
 from dataclasses import asdict, dataclass, field
-from datetime import UTC, datetime
 from pathlib import Path
 
+from skyyrose.core.hashing import now_iso, sha256_of_file
 from skyyrose.core.paths import PRODUCT_ASSETS, REPO_ROOT
-from skyyrose.elite_studio.master_registry import sha256_of_file
 
 MANIFEST_PATH = PRODUCT_ASSETS / "manifest.json"
-
-# Asset roles a SKU can reference. "front"/"back" are garment techflats or real
-# product photos; "logo" is the logo or sport-patch close-up; "dossier" is the
-# markdown brand contract the prompt is built from.
-AssetRole = str  # "front" | "back" | "logo" | "dossier" | "keeper"
 
 
 @dataclass(frozen=True)
 class AssetRecord:
-    """One asset a SKU consumes, pinned to its content hash at generation time."""
+    """One asset a SKU consumes, pinned to its content hash at generation time.
 
-    role: AssetRole
+    Roles mirror the render pipeline's reference kinds — "garment",
+    "garment-back", "logo", "patch" — plus "dossier".
+    """
+
+    role: str
     path: str  # repo-root-relative POSIX path
-    sha256: str | None  # "sha256:<hex>" when the file exists; None when missing
-    exists: bool
+    sha256: str | None  # "sha256:<hex>" when the file existed at generation; None when absent
 
-    def resolved(self, base: Path | None = None) -> Path:
-        return (base or REPO_ROOT) / self.path
+    @property
+    def exists(self) -> bool:
+        """An asset is present iff it was hashable at generation time."""
+        return self.sha256 is not None
 
 
 @dataclass(frozen=True)
@@ -70,7 +69,7 @@ class SkuAssets:
     garment_type: str
     assets: list[AssetRecord] = field(default_factory=list)
 
-    def by_role(self, role: AssetRole) -> AssetRecord | None:
+    def by_role(self, role: str) -> AssetRecord | None:
         for a in self.assets:
             if a.role == role:
                 return a
@@ -82,7 +81,7 @@ class DriftFinding:
     """A single way a SKU's assets diverged from the committed manifest."""
 
     sku: str
-    role: AssetRole
+    role: str
     path: str
     kind: str  # "missing" | "hash_mismatch"
     detail: str
@@ -110,7 +109,10 @@ class AssetManifest:
                 name=entry.get("name", ""),
                 collection=entry.get("collection", ""),
                 garment_type=entry.get("garment_type", ""),
-                assets=[AssetRecord(**a) for a in entry.get("assets", [])],
+                assets=[
+                    AssetRecord(role=a["role"], path=a["path"], sha256=a.get("sha256"))
+                    for a in entry.get("assets", [])
+                ],
             )
             for sku, entry in raw.get("skus", {}).items()
         }
@@ -142,7 +144,7 @@ class AssetManifest:
         """Atomic write; stamps ``generated_at``."""
         p = path or MANIFEST_PATH
         p.parent.mkdir(parents=True, exist_ok=True)
-        self.generated_at = datetime.now(UTC).isoformat(timespec="seconds")
+        self.generated_at = now_iso()
         with tempfile.NamedTemporaryFile(
             "w", dir=p.parent, prefix=".manifest-", suffix=".tmp", delete=False, encoding="utf-8"
         ) as f:
@@ -191,17 +193,14 @@ class AssetManifest:
         return findings
 
 
-def hash_if_present(path: Path, base: Path | None = None) -> tuple[str | None, bool]:
-    """Return ``(sha256_or_None, exists)`` for an asset path. No exception on absence."""
-    if not path.exists():
-        return None, False
-    return sha256_of_file(path), True
+def hash_if_present(path: Path) -> str | None:
+    """SHA-256 of ``path``, or None if it does not exist. No exception on absence."""
+    return sha256_of_file(path) if path.exists() else None
 
 
-def to_repo_relative(path: Path, base: Path | None = None) -> str:
+def to_repo_relative(path: Path) -> str:
     """POSIX path relative to the repo root, for stable cross-machine storage."""
-    base = base or REPO_ROOT
     try:
-        return path.resolve().relative_to(base.resolve()).as_posix()
+        return path.resolve().relative_to(REPO_ROOT.resolve()).as_posix()
     except ValueError:
         return path.as_posix()

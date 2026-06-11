@@ -17,7 +17,6 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
-
 from skyyrose.core.asset_manifest import AssetManifest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -36,9 +35,9 @@ def _load_builder():
 
 
 def test_manifest_exists_and_loads():
-    assert (
-        MANIFEST.exists()
-    ), "assets/products/manifest.json missing — run scripts/build_asset_manifest.py"
+    assert MANIFEST.exists(), (
+        "assets/products/manifest.json missing — run scripts/build_asset_manifest.py"
+    )
     m = AssetManifest.load()
     assert m.skus, "manifest registered zero SKUs"
 
@@ -82,7 +81,6 @@ def test_verify_detects_a_missing_file(tmp_path):
                 role="front",
                 path="assets/products/_does_not_exist.png",
                 sha256="sha256:dead",
-                exists=True,
             )
         ],
     )

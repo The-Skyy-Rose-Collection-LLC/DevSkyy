@@ -38,33 +38,28 @@ from skyyrose.core.asset_manifest import (  # noqa: E402
     hash_if_present,
     to_repo_relative,
 )
-from skyyrose.elite_studio.master_registry import sha256_of_file  # noqa: E402
+from skyyrose.core.catalog_loader import read_catalog_rows  # noqa: E402
+from skyyrose.core.hashing import sha256_of_file  # noqa: E402
 
 
 def _catalog_rows() -> dict[str, dict]:
-    """SKU → {name, collection, garment_type} from the canonical catalog CSV."""
-    import csv
-
-    rows: dict[str, dict] = {}
-    with paths.CATALOG_CSV.open(newline="", encoding="utf-8") as fh:
-        for row in csv.DictReader(fh):
-            sku = (row.get("sku") or "").strip()
-            if not sku:
-                continue
-            rows[sku] = {
-                "name": (row.get("name") or "").strip(),
-                "collection": (row.get("collection") or "").strip(),
-                "garment_type": (row.get("garment_type_lock") or "").strip(),
-            }
-    return rows
+    """SKU → {name, collection, garment_type} via the shared catalog loader."""
+    return {
+        row["sku"].strip(): {
+            "name": (row.get("name") or "").strip(),
+            "collection": (row.get("collection") or "").strip(),
+            "garment_type": (row.get("garment_type_lock") or "").strip(),
+        }
+        for row in read_catalog_rows()
+        if (row.get("sku") or "").strip()
+    }
 
 
 def _record(role: str, path: Path | None) -> AssetRecord | None:
     """Hash an optional asset path into an AssetRecord (None when no path given)."""
     if path is None:
         return None
-    sha, exists = hash_if_present(path)
-    return AssetRecord(role=role, path=to_repo_relative(path), sha256=sha, exists=exists)
+    return AssetRecord(role=role, path=to_repo_relative(path), sha256=hash_if_present(path))
 
 
 def build() -> AssetManifest:

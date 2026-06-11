@@ -14,6 +14,7 @@ skipped, never rendered as an incomplete image.
 from __future__ import annotations
 
 import csv
+import functools
 import logging
 from dataclasses import dataclass
 from pathlib import Path
@@ -59,8 +60,14 @@ def load_catalog() -> dict[str, dict]:
 # ── Authoritative SKU → {front, back} garment source map ────────────────────
 # Ported verbatim from nano_banana/source_map.py. ``S`` = split techflats,
 # ``P`` = original product photos.
+@functools.lru_cache(maxsize=1)
 def get_source_map() -> dict[str, dict[str, Path | None]]:
-    """Return the complete SKU → {front, back} garment image mapping."""
+    """Return the complete SKU → {front, back} garment image mapping.
+
+    Memoized: the map is built from static ``config`` path constants, so it is
+    reconstructed once per process rather than on every ``build_references`` /
+    ``requires_patch`` / ``find_flatlay_photo`` call (was ~3x per SKU per batch).
+    """
     s = config.SPLIT_DIR
     p = config.PRODUCTS_DIR
     return {
