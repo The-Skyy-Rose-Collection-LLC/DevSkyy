@@ -6,10 +6,17 @@
  * Features: dark #0A0A0A background, 150px product images, quantity controls,
  * sticky order summary sidebar, empty cart state.
  *
+ * Full custom override (not a markup patch of core). Verified against core
+ * cart.php 10.8.0: action/filter hooks and the woocommerce-cart nonce are
+ * preserved, with one deliberate exception — woocommerce_cart_collaterals is
+ * NOT fired. Core hooks woocommerce_cross_sell_display into it, and brand
+ * canon excludes cross-sells; the custom sticky order-summary sidebar renders
+ * totals directly instead. Plugins targeting that hook will not output here.
+ *
  * @see     https://woocommerce.com/document/template-structure/
  * @package SkyyRose
  * @since   2.0.0
- * @version 10.1.0
+ * @version 10.8.0
  */
 
 defined( 'ABSPATH' ) || exit;
