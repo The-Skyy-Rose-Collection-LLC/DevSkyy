@@ -137,6 +137,11 @@ dev = [
     "pytest-asyncio>=0.23",
     "pytest-cov>=4.1",
     "pytest-mock>=3.12",
+    # Test-only deps for tests/test_elite_*.py and tests/test_a11y_html_integrity.py.
+    # bs4 also appears in [mcp] as a transitive runtime constraint; included here so
+    # `pip install -e .[dev]` alone is enough to collect the test suite.
+    "fakeredis>=2.20",
+    "beautifulsoup4>=4.13.5",
     "mypy>=1.8",
     "ruff>=0.1",
     "black>=24.1",

@@ -55,6 +55,138 @@
     });
 
     /* ════════════════════════════════════════
+       Editorial Size Chip → WC Variation Form Binding
+       Wires the decorative .sr-ed__size buttons to the WooCommerce variations
+       form's size <select>. Without this, customers see selectable-looking
+       chips but cannot actually pick a size. (P0 fix, audit 2026-05-23)
+       ════════════════════════════════════════ */
+    var sizeChips = document.querySelectorAll('.sr-ed__sizes .sr-ed__size');
+    if (sizeChips.length) {
+        function getSizeSelect() {
+            return document.querySelector('.variations_form select[name="attribute_pa_size"]')
+                || document.querySelector('.variations_form select[name="attribute_size"]');
+        }
+        function syncChipsToSelectValue(value) {
+            var current = (value || '').toLowerCase();
+            sizeChips.forEach(function(c) {
+                var isMatch = current && c.dataset.size && c.dataset.size.toLowerCase() === current;
+                c.classList.toggle('is-selected', isMatch);
+                c.setAttribute('aria-pressed', isMatch ? 'true' : 'false');
+            });
+        }
+        sizeChips.forEach(function(chip) {
+            chip.addEventListener('click', function() {
+                var size = chip.dataset.size;
+                if (!size) return;
+                var sizeSelect = getSizeSelect();
+                if (sizeSelect) {
+                    var matched = false;
+                    Array.prototype.forEach.call(sizeSelect.options, function(opt) {
+                        if (opt.value && opt.value.toLowerCase() === size.toLowerCase()) {
+                            sizeSelect.value = opt.value;
+                            matched = true;
+                        }
+                    });
+                    if (matched) {
+                        $(sizeSelect).trigger('change');
+                    }
+                }
+                syncChipsToSelectValue(size);
+            });
+        });
+        // Mirror WC variation form state back to chips when WC resolves a
+        // variation (fires AFTER WC validates stock/availability, so the
+        // select value at this point is the confirmed selection — not the
+        // in-flight user pick that WC may later clear). Matches the
+        // found_variation / reset_data event pair used by the image-swap
+        // handler at line 61 of this file.
+        $(document).on('found_variation', '.variations_form', function() {
+            var sizeSelect = getSizeSelect();
+            if (sizeSelect) syncChipsToSelectValue(sizeSelect.value);
+        });
+        $(document).on('reset_data', '.variations_form', function() {
+            syncChipsToSelectValue('');
+        });
+        // Initial sync — WC may set the select via URL query string or
+        // persisted variation choice before this handler binds.
+        var initialSelect = getSizeSelect();
+        if (initialSelect && initialSelect.value) {
+            syncChipsToSelectValue(initialSelect.value);
+        }
+    }
+
+    /* ════════════════════════════════════════
+       Product Details Accordion
+       ════════════════════════════════════════ */
+    document.querySelectorAll('[data-accordion]').forEach(function(acc) {
+        var trigger = acc.querySelector('.sr-accordion-trigger');
+        var content = acc.querySelector('.sr-accordion-content');
+        var icon = acc.querySelector('.sr-accordion-icon');
+        if (!trigger || !content) return;
+
+        trigger.addEventListener('click', function() {
+            var isOpen = content.classList.contains('sr-accordion-open');
+            if (isOpen) {
+                content.classList.remove('sr-accordion-open');
+                content.style.maxHeight = '0';
+                content.style.paddingBottom = '0';
+                if (icon) icon.textContent = '+';
+                trigger.setAttribute('aria-expanded', 'false');
+            } else {
+                content.classList.add('sr-accordion-open');
+                content.style.maxHeight = content.scrollHeight + 'px';
+                content.style.paddingBottom = '28px';
+                if (icon) icon.textContent = '\u2212';
+                trigger.setAttribute('aria-expanded', 'true');
+            }
+        });
+
+        // Initialize already-open accordions (Description).
+        if (content.classList.contains('sr-accordion-open')) {
+            content.style.maxHeight = content.scrollHeight + 'px';
+            content.style.paddingBottom = '28px';
+        }
+    });
+
+    /* ════════════════════════════════════════
+       Sticky Add-to-Cart Bar
+       ════════════════════════════════════════ */
+    var stickyBar = document.getElementById('srStickyATC');
+    var atcWrap = document.querySelector('.sr-atc-wrap');
+
+    if (stickyBar && atcWrap) {
+        var ticking = false;
+        window.addEventListener('scroll', function() {
+            if (!ticking) {
+                requestAnimationFrame(function() {
+                    var show = atcWrap.getBoundingClientRect().bottom < 0;
+                    stickyBar.classList.toggle('visible', show);
+                    stickyBar.setAttribute('aria-hidden', show ? 'false' : 'true');
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }, { passive: true });
+    }
+
+    // Sticky bar "Add to Bag" scrolls to the real form.
+    var stickyBtn = document.querySelector('.sr-sticky-btn');
+    if (stickyBtn) {
+        stickyBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var form = document.querySelector('.sr-atc-wrap');
+            if (form) {
+                form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                var btn = form.querySelector('.single_add_to_cart_button');
+                if (btn) {
+                    btn.style.transform = 'scale(1.02)';
+                    setTimeout(function() { btn.style.transform = ''; }, 800);
+                }
+            }
+        });
+    }
+
+    /* ════════════════════════════════════════
        AJAX Add-to-Cart Feedback
        ════════════════════════════════════════ */
     $(document.body).on('added_to_cart', function() {

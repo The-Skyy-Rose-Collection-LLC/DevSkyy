@@ -173,10 +173,11 @@ $sizes_raw    = $catalog_entry['sizes'] ?? '';
 		<p class="sr-ed__price"><?php echo wp_kses_post( $price_html ); ?></p>
 
 		<?php if ( $sizes_raw ) : ?>
-			<p class="sr-ed__sizes-label"><?php esc_html_e( 'Available Sizes', 'skyyrose' ); ?></p>
-			<div class="sr-ed__sizes">
+			<p class="sr-ed__sizes-label" id="sr-ed-sizes-label"><?php esc_html_e( 'Select Size', 'skyyrose' ); ?></p>
+			<div class="sr-ed__sizes" role="group" aria-labelledby="sr-ed-sizes-label">
 				<?php foreach ( explode( '|', $sizes_raw ) as $size ) : ?>
-					<span class="sr-ed__size"><?php echo esc_html( trim( $size ) ); ?></span>
+					<?php $size_clean = trim( $size ); ?>
+						<button type="button" class="sr-ed__size" aria-pressed="false" data-size="<?php echo esc_attr( $size_clean ); ?>"><?php echo esc_html( $size_clean ); ?></button>
 				<?php endforeach; ?>
 			</div>
 		<?php endif; ?>
