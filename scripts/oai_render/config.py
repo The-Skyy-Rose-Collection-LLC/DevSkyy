@@ -77,6 +77,9 @@ DOSSIER_DIR = THEME_ROOT / "data" / "dossiers"
 # Founder's verbatim render-review corrections, injected into prompts per SKU
 # (generated from the 2026-06-09 review board; see the file's _meta block).
 CORRECTIONS_JSON = THEME_ROOT / "data" / "render-corrections.json"
+# Founder-approved surviving assets (tasks/mockup-render-inventory.md keep pass):
+# each entry skips one (sku, style, view) plan in batches; explicit --sku overrides.
+KEEPERS_JSON = THEME_ROOT / "data" / "render-keepers.json"
 PRODUCT_REFERENCES_DIR = THEME_ROOT / "data" / "product-references"
 PRODUCTS_DIR = THEME_ROOT / "assets" / "images" / "products"
 SPLIT_DIR = PROJECT_ROOT / "assets" / "techflats" / "split"

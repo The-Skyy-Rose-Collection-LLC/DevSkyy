@@ -414,6 +414,37 @@ def test_qc_judge_receives_dossier_branding_ground_truth():
     assert "ABSENCE of branding" in text
 
 
+def test_founder_keeper_assets_skip_their_plan(tmp_path, monkeypatch):
+    # tasks/mockup-render-inventory.md keep pass: a checked keeper drops its
+    # exact (sku, style, view) plan from the batch — direct cost savings.
+    import json
+
+    from scripts.oai_render import pipeline, references
+
+    kj = tmp_path / "render-keepers.json"
+    kj.write_text(
+        json.dumps(
+            {
+                "keepers": [
+                    {
+                        "sku": "sg-009",
+                        "style": "on-model",
+                        "view": "front",
+                        "founder_note": "good render, save it",
+                    }
+                ]
+            }
+        )
+    )
+    monkeypatch.setattr(config, "KEEPERS_JSON", kj)
+    catalog = references.load_catalog()
+    dossiers = references.build_dossier_index()
+    result = pipeline.run(["sg-009"], catalog, dossiers, styles=["ghost", "on-model"], dry_run=True)
+    combos = {(p.sku, p.style, p.view) for p in result["plans"]}
+    assert ("sg-009", "on-model", "front") not in combos
+    assert ("sg-009", "ghost", "front") in combos  # only the keeper plan drops
+
+
 def test_pair_with_excluded_member_falls_back_to_solo(monkeypatch):
     from scripts.oai_render import pipeline, references
 

@@ -85,6 +85,22 @@ def resolve_targets(
     return []
 
 
+def _keeper_skips() -> dict[tuple[str, str, str], str]:
+    """(sku, style, view) -> founder note, from render-keepers.json. Empty when absent."""
+    import json
+
+    try:
+        data = json.loads(config.KEEPERS_JSON.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    out: dict[tuple[str, str, str], str] = {}
+    for k in data.get("keepers", []):
+        sku, style = k.get("sku"), k.get("style")
+        if sku and style:
+            out[(sku, style, k.get("view", "front"))] = k.get("founder_note", "keeper")
+    return out
+
+
 def _drop_excluded(skus: list[str]) -> list[str]:
     """Filter known-bad-source SKUs from a batch, logging each skip + reason."""
     kept: list[str] = []
@@ -406,6 +422,23 @@ def run(
                     )
             else:  # flatlay or any other explicit style
                 plans.append(plan_sku(s, catalog, dossier_index, style=st, view="front"))
+
+    keepers = _keeper_skips()
+    if keepers:
+        kept_plans: list[SkuPlan] = []
+        for pl in plans:
+            note = None if pl.is_pair else keepers.get((pl.sku, pl.style, pl.view))
+            if note:
+                log.info(
+                    "Skipping %s %s/%s — founder keeper asset exists (%s)",
+                    pl.sku,
+                    pl.style,
+                    pl.view,
+                    note,
+                )
+            else:
+                kept_plans.append(pl)
+        plans = kept_plans
     manifest = build_manifest(plans)
 
     if dry_run:
