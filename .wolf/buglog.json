@@ -1957,6 +1957,25 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-10"
+    },
+    {
+      "id": "bug-125",
+      "timestamp": "2026-06-11T07:30:00Z",
+      "error_message": "AssertionError: Status code 204 must not have a response body \u2014 app import crashed at api/v1/rag_anything.py:201, collected by new Stop-hook pytest run",
+      "file": "api/v1/rag_anything.py",
+      "root_cause": "PEP 563 (`from __future__ import annotations`) stringifies the handler's `-> None` return annotation; FastAPI 0.115 get_type_hints resolves it to the NoneType CLASS, which is truthy as response_model, tripping the 204-no-body assert at route registration. Only route in repo combining future-import + `-> None` + 204.",
+      "fix": "Explicit `response_model=None` on the @router.delete decorator. 4 sibling 204 routes (elite_studio, v2/assets, v2/creative, v2/webhooks) have future-import but UNannotated handlers \u2014 dormant; adding `-> None` to them without response_model=None will re-trigger this.",
+      "tags": [
+        "fastapi",
+        "pep563",
+        "204",
+        "response_model",
+        "import-crash",
+        "stop-hook-catch"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-11T07:30:00Z"
     }
   ]
 }
