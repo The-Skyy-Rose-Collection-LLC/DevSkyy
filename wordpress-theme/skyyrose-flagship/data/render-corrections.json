@@ -2,8 +2,8 @@
   "_meta": {
     "source": "founder review board annotations, 2026-06-09 (renders/oai/_review/review-state.json)",
     "authorship": "every correction line is the founder's verbatim comment; [view] prefix added mechanically",
-    "consumed_by": "scripts/oai_render/prompt.py \u2014 injected as FOUNDER CORRECTIONS block",
-    "excluded_skus_note": "sg-006/sg-014 corrections intentionally omitted: SKUs excluded from batches until founder re-authors their dossiers (wrong-garment contamination)"
+    "consumed_by": "scripts/oai_render/prompt.py — injected as FOUNDER CORRECTIONS block",
+    "excluded_skus_note": "sg-006/sg-014 corrections intentionally omitted: their 2026-06-09 flags were wholesale wrong-product (bug-119 dossier contamination), not zone-level fixes. Dossiers re-authored 2026-06-10 from the real mint garments; both SKUs render again."
   },
   "corrections": {
     "br-005": [

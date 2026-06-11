@@ -359,9 +359,25 @@ def test_qc_schema_gates_flat_renders():
     assert "photorealistic_not_flat" in qc._JUDGE_SCHEMA["schema"]["required"]
 
 
-def test_contaminated_mint_lavender_skus_excluded():
-    assert "sg-006" in config.EXCLUDED_SKUS
-    assert "sg-014" in config.EXCLUDED_SKUS
+def test_mint_lavender_skus_render_again_with_clean_dossiers():
+    # bug-119 regression guard: the contamination was cleared 2026-06-10 by
+    # re-authoring both dossiers from the real mint garments. These SKUs must
+    # stay renderable, and their dossiers must never drift back to the
+    # windbreaker-set design (white body + rainbow chevron zip-up).
+    assert "sg-006" not in config.EXCLUDED_SKUS
+    assert "sg-014" not in config.EXCLUDED_SKUS
+    for slug, garment in (
+        ("mint-lavender-hoodie", "PULLOVER"),
+        ("mint-lavender-sweatpants", "sweatpants"),
+    ):
+        text = (config.DOSSIER_DIR / f"{slug}.md").read_text(encoding="utf-8")
+        lock = text.split("**Garment type lock:**", 1)[1].split("##", 1)[0]
+        assert garment in lock
+        assert "mint green" in lock
+        # exact phrasing the contaminated dossiers used for the wrong garment
+        assert "solid **white**" not in lock
+        assert "rainbow chevron color-block" not in lock
+        assert "zip-up hoodie" not in lock.lower()
 
 
 def test_pair_with_excluded_member_falls_back_to_solo(monkeypatch):

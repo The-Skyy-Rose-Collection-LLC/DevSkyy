@@ -260,7 +260,7 @@ _SKU_TOKEN_RE = re.compile(r"(?:br|lh|sg|kids)-\d+")
 def _infer_skus_from_filename(filename: str) -> list[str]:
     """Pull every SKU-like token from a techflat filename, de-duplicated in order.
 
-    e.g. ``sg-006-and-sg-014-mint-lavender-set-techflat.jpeg`` -> [sg-006, sg-014].
+    e.g. ``sg-001-and-sg-003-bridge-shorts-techflat.jpeg`` -> [sg-001, sg-003].
     """
     seen: list[str] = []
     for token in _SKU_TOKEN_RE.findall(filename):

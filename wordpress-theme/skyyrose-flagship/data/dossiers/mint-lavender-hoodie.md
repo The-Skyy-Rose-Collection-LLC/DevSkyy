@@ -2,72 +2,88 @@
 sku: sg-006
 name: Mint & Lavender Hoodie
 collection: signature
-logo_reference: data/brand-logos/sr-monogram.md
-reference_image: data/product-references/sg-006-and-sg-014-mint-lavender-set-techflat.jpeg
+logo_reference: data/brand-logos/three-rose-cluster.md
+reference_image: assets/techflats/split/signature/sg-mint-lav-hoodie-front.jpeg
 ---
+
+<!--
+Re-authored 2026-06-10 to clear bug-119 contamination (previous dossier
+described the windbreaker-set design — white body + rainbow chevron zip-up —
+which is a different garment entirely). Every claim below traces to one of:
+the front techflat (assets/techflats/split/signature/sg-mint-lav-hoodie-front.jpeg),
+the back model photo (assets/images/products/mint-lavender-hoodie-back-model.webp),
+the catalog CSV row, or the founder's 2026-06-09 review-board comments.
+Print-technique fields are conservative defaults pending founder confirmation.
+-->
 
 # Mint & Lavender Hoodie
 
-**Garment type lock:** Zip-up hoodie (full-length center-front zipper closure, NOT a pullover) — solid **white** body fabric with a **multi-color V-shape rainbow chevron color-block detail** at the upper chest fanning out toward the shoulders + matching V-shape rainbow chevron at each cuff and at the bottom hem waistband. **Pink** hood (solid pink/light pink hood — contrasting against the white body), drawstring at hood opening, slash hand pockets at the lower body, ribbed cuffs and waistband with the multi-color stripe pattern. Mid-weight cotton-fleece fabric. Pairs with the Mint & Lavender Sweatpants (sg-014) as a matching set. **Sold as the hoodie SKU only — the matching sweatpants are sg-014, separate SKU.** NOT a pullover. NOT a crewneck (that's sg-013 Mint & Lavender Crewneck — separate SKU). NOT a sherpa or windbreaker.
+**Garment type lock:** PULLOVER hoodie (kangaroo pouch pocket, NO zipper of any
+kind) — solid **mint green** body, hood, and sleeves, all one mint color.
+**Lavender/purple drawstrings** at the hood opening (the only contrast hardware).
+Large lavender rose-cluster graphic centered on the chest. Ribbed cuffs and
+bottom hem in self-color mint. Mid-weight cotton-fleece fabric. Pairs with the
+Mint & Lavender Sweatpants (sg-014) as a matching set. **Sold as the hoodie SKU
+only — the matching sweatpants are sg-014, separate SKU.** NOT a zip-up. NOT a
+crewneck (that's sg-013 Mint & Lavender Crewneck — separate SKU). NOT a
+windbreaker (the white-body rainbow-chevron zip-up set is sg-015 — a completely
+different product).
 
 ## Branding — exactly what IS on this product
 
-> Logo art canonical references:
-> - SR monogram (back-neck cursive script): `data/brand-logos/sr-monogram.md`
-> - Product techflat (hoodie + matching pants visible together):
->   `data/product-references/sg-006-and-sg-014-mint-lavender-set-techflat.jpeg`
+> Logo art canonical reference:
+> - Rose-cluster composition (three roses, thorny vines, cloud at base):
+>   `data/brand-logos/three-rose-cluster.md` — rendered here in the
+>   **lavender colorway**: lavender/purple rose blooms with white highlights,
+>   grey-green thorny stems and leaves, grey-and-white cloud at the base.
+> - Product techflat (front):
+>   `assets/techflats/split/signature/sg-mint-lav-hoodie-front.jpeg`
 >
-> ### COLORWAY — Mint & Lavender chevron palette
+> ### COLORWAY — Mint & Lavender
 >
-> The "Mint & Lavender" colorway is a multi-color rainbow chevron stripe
-> band consisting of (from outside-to-inside): **PINK + GREEN (mint) +
-> LAVENDER (purple) + YELLOW** stripes arranged in a V/chevron formation.
-> The catalog name "Mint & Lavender" refers to the mint-green and lavender
-> stripes within the broader rainbow band — NOT to a solid mint or solid
-> lavender body color. The body color is WHITE.
+> "Mint & Lavender" means exactly what the techflat shows: a solid **mint
+> green** garment body with the **lavender** rose-cluster as the chest art.
+> No stripes, no chevrons, no color-blocking — the colorway lives in the
+> mint body + lavender artwork pairing.
 
 ### Front
-- **front-body** (entire white field, between the hood and the bottom hem): Solid **white** cotton-fleece body fabric. **Technique:** stitched. **Color:** white.
-- **front-chevron** (large, V-shaped, ~10in wide, fanning from the upper chest outward toward both shoulders and up to the hood opening): Multi-color V-shape **rainbow chevron stripe color-block panel** — alternating pink + green + lavender + yellow stripes (~5–8 stripes total, each ~0.5–1in wide) arranged in a V/chevron pattern that meets at the center-front of the upper chest and fans up-and-out toward each shoulder. **Technique:** sublimated. **Color:** alternating pink + green + lavender + yellow stripes on white ground.
-- **front-center-chest** (small, ~2in tall, just below the V-chevron meeting point on the white body field): A small **light pink rose-cluster** decoration — canonical rose-cluster art recolored to a pink-on-white tonal palette (light pink petals + dark pink-grey outlines). **Technique:** embroidered. **Color:** light pink + dark pink-grey thread on white.
-- **front-zipper** (vertical center-front, full body length): Standard YKK-style center-front zipper running the full length of the body from the V-neck opening to the bottom of the ribbed waistband. **Technique:** patch (sewn-on zipper hardware). **Color:** body-tone (white teeth or near-white).
-- **front-left-pocket** (vertical slash hand pocket at the lower-left body, with **pink contrast piping** along the welt edge): Slash hand pocket. **Technique:** stitched. **Color:** white body with pink piping accent.
-- **front-right-pocket** (vertical slash hand pocket at the lower-right body, mirror of left): Slash hand pocket with pink contrast piping. **Technique:** stitched. **Color:** white body with pink piping.
+- **front-center-chest** (large, ~10in tall, centered on the chest between the hood opening and the kangaroo pocket): The canonical rose-cluster composition in the lavender colorway — lavender/purple roses with white petal highlights, grey-green thorny stems and leaves, rising from a grey-and-white cloud at the base. **Technique:** printed. **Color:** lavender + white + grey-green + grey on mint.
+- **front-body** (everything outside the chest art): Solid **mint green** cotton-fleece. **Technique:** stitched. **Color:** mint green.
+- **front-kangaroo-pocket** (lower front, full-width pouch pocket): Standard kangaroo pouch, self-color mint, no decoration. **Technique:** stitched. **Color:** mint green.
+- **hood-drawstrings** (two cords at the hood opening): **Lavender/purple** drawstrings with metal or self-tipped ends. **Technique:** stitched. **Color:** lavender/purple.
 
 ### Back
-- **back-neck** (small, ~1.5in wide, top-center just below the hood seam): The SR monogram embroidered onto the jersey in **dark grey / black cursive script**. **Technique:** embroidered. **Color:** dark grey / black thread on white.
-- **back-body** (entire back field, between the hood seam and the waistband): Solid **white**, no decoration. **Technique:** stitched. **Color:** white.
+- **back-body** (entire back field, hood seam to hem): Solid **mint green**, no decoration of any kind. **Technique:** stitched. **Color:** mint green.
 
 ### Sleeves / Hood / Hem / Other
-- **hood** (full hood, ~10in tall when laid flat): Solid **pink / light pink** hood (contrast against the white body). **Technique:** stitched. **Color:** pink / light pink.
-- **hood-drawstring**: White flat drawstring threaded through the hood opening. **Technique:** stitched. **Color:** white.
-- **left-sleeve** (long sleeve): Solid **white** body, with a small V-shape rainbow chevron stripe panel at the upper-cuff area mirroring the front chevron. **Technique:** sublimated. **Color:** white body with chevron accent.
-- **right-sleeve** (long sleeve): Mirror of left. **Technique:** sublimated. **Color:** white body with chevron accent.
-- **left-cuff** (~1.5in tall ribbed cuff at wrist): Multi-color rainbow stripe band (alternating pink + green + lavender + yellow + pink stripes wrapping the cuff, ~5 stripes total). **Technique:** sublimated. **Color:** alternating pink + green + lavender + yellow.
-- **right-cuff** (~1.5in tall ribbed cuff at wrist, mirror of left-cuff): Multi-color rainbow stripe band (alternating pink + green + lavender + yellow stripes wrapping the cuff, ~5 stripes total). **Technique:** sublimated. **Color:** alternating pink + green + lavender + yellow.
-- **waistband** (~2in tall ribbed waistband at the bottom hem): Multi-color rainbow stripe band matching the cuff treatment, wrapping the body front-and-back at the hem. **Technique:** sublimated. **Color:** alternating pink + green + lavender + yellow.
+- **hood**: Solid mint green inside and out, matching the body. **Technique:** stitched. **Color:** mint green.
+- **left-sleeve / right-sleeve** (long sleeves): Solid mint green, no decoration. **Technique:** stitched. **Color:** mint green.
+- **cuffs** (ribbed, at each wrist): Self-color mint ribbing. **Technique:** stitched. **Color:** mint green.
+- **hem** (ribbed bottom band): Self-color mint ribbing. **Technique:** stitched. **Color:** mint green.
 - **collar-inside** (~1.5in × 0.5in interior tag): Branded woven size tag. **Technique:** woven-label. **Color:** brand-label palette.
 
 ## Negative — what is NOT on this product (DO NOT render)
 
-- NO pullover construction — this is a ZIP-UP hoodie with a full center-front zipper.
-- NO solid mint or solid lavender body — the body is WHITE; the mint-green and lavender stripes are part of the multi-color chevron stripe band only.
-- NO white hood — the hood is PINK / light pink (the only solid-pink major color block on the garment).
-- NO single-color hood drawstring matching the hood — drawstring is WHITE on the pink hood.
-- NO solid-color cuffs or waistband — cuffs and waistband carry the multi-color rainbow stripe band.
-- NO contrast piping on the cuffs or waistband — those areas have the stripe band; only the slash pockets have pink piping.
-- NO Black Rose three-rose-cluster as a chest emblem — the front-center chest rose is a small pink-tonal canonical rose-cluster (LIGHT PINK), not the canonical greyscale or canonical multi-color version.
-- NO Love Hurts canonical roses (red multi-color cluster) — this is a Signature collection product with a pink-tonal rose treatment.
+- NO zipper anywhere — this is a PULLOVER with a kangaroo pocket. NOT a zip-up.
+- NO white body — the body is SOLID MINT GREEN.
+- NO rainbow chevron, NO multi-color stripe bands, NO color-block panels — that
+  is the sg-015 windbreaker set, a different product.
+- NO pink hood — hood is mint, same as the body.
+- NO slash hand pockets, NO pink piping — single kangaroo pouch only.
+- NO decoration on the back — back is blank mint (no SR monogram, no art).
+- NO decoration on the sleeves, cuffs, hood, or hem.
+- NO red Love Hurts roses — the rose-cluster here is LAVENDER (Signature collection).
+- NO greyscale Black Rose treatment — roses are lavender/purple, not silver/grey.
 - NO Authentic Collection patch.
-- NO Bridge Series photo print on the body.
-- NO printed graphics other than the sublimated chevron stripes and small pink rose.
-- NO half-zip placket — the zipper runs the FULL body length.
+- NO Bridge Series photo print.
+- NO chest text or wordmark — the chest carries artwork only.
 - NO embossed/debossed decoration.
-- NO additional pockets on the back or on the sleeves — only the two front slash hand pockets.
-- NO chest text or wordmark.
-- NO contrast-color sleeve seam.
 
 ## Scene direction
 
-- **Pose:** Front view straight-on showing the white body + pink hood + V-chevron upper-chest stripes + small pink rose + cuff stripe bands + waistband stripe band + zipper. Three-quarter view shows the chevron wrapping toward the shoulders. For the back: back view straight-on showing the small SR monogram at back-neck and the matching waistband stripe band.
-- **Setting:** Pure white studio backdrop, soft directional studio lighting from front-left, subtle natural drop shadow on the floor.
+- **Pose:** Front view straight-on showing the solid mint body, lavender
+  drawstrings, centered lavender rose-cluster chest art, and kangaroo pocket.
+  Three-quarter view shows the clean mint sleeves. For the back: back view
+  straight-on showing the blank mint back panel and hood.
+- **Setting:** Pure white studio backdrop, soft directional studio lighting
+  from front-left, subtle natural drop shadow on the floor.

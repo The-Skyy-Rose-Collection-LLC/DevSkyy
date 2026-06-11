@@ -66,12 +66,8 @@ EXPECTED_RENDER_SIZE = (1024, 1536)  # must match SIZE above
 EXCLUDED_SKUS: dict[str, str] = {
     "sg-015": "only reference is a 4-panel composite techflat — needs a clean cropped front "
     "techflat before it can render as a single garment (would otherwise produce a multi-panel).",
-    "sg-006": "dossier describes a different garment (white chevron zip-up ≈ windbreaker set) than "
-    "the mint pullover techflat — 2026-06-08 render produced the wrong product. Founder must "
-    "re-author the dossier from the real mint garment before this SKU renders again.",
-    "sg-014": "dossier describes a different garment (white chevron sweatpants ≈ windbreaker set) "
-    "than the mint sweatpants techflat — same contamination as sg-006. Founder must re-author "
-    "the dossier before this SKU renders again.",
+    # sg-006 / sg-014 removed 2026-06-10: dossiers re-authored from the real mint
+    # garments (bug-119 contamination cleared) — both SKUs render again.
 }
 
 # ── Paths ───────────────────────────────────────────────────────────────────
