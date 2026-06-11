@@ -4,7 +4,13 @@
  *
  * Technical Garment Lock + Techflat-First Visuals.
  *
+ * Fully custom PDP — intentionally replaces WooCommerce core's single-product
+ * structure (no woocommerce_single_product_summary hook scaffold). @version is
+ * tracked against core single-product.php (last core change: 1.6.4) so the
+ * WooCommerce status scanner does not flag this deliberate override as outdated.
+ *
  * @package SkyyRose
+ * @version 1.6.4
  */
 
 defined( 'ABSPATH' ) || exit;

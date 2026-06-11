@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WooCommerce ↔ Catalog Drift Audit — skyyrose.co</title>
+<style>
+  body{font:15px/1.5 -apple-system,system-ui,sans-serif;max-width:1100px;margin:2rem auto;padding:0 1.25rem;color:#111}
+  h1{border-bottom:2px solid #B76E79;padding-bottom:.3rem}
+  h2{margin-top:2rem;color:#0A0A0A;border-left:4px solid #B76E79;padding-left:.6rem}
+  table{border-collapse:collapse;width:100%;margin:.75rem 0;font-size:14px}
+  th,td{border:1px solid #ddd;padding:.4rem .6rem;text-align:left;vertical-align:top}
+  th{background:#0A0A0A;color:#fff}
+  code{background:#f4f4f4;padding:.1rem .3rem;border-radius:3px;font-size:13px}
+  .crit{color:#DC143C;font-weight:600}
+  .warn{color:#B76E79;font-weight:600}
+  .ok{color:#137333}
+  .muted{color:#777}
+  .decision{background:#fff7f8;border:1px solid #B76E79;border-radius:6px;padding:.75rem 1rem;margin:.6rem 0}
+</style>
+</head>
+<body>
+<h1>WooCommerce ↔ Catalog Drift Audit</h1>
+<p><strong>Date:</strong> 2026-06-06 · <strong>Source of truth:</strong> <code>wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv</code> (33 SKUs) · <strong>Live store:</strong> skyyrose.co (35 WC products) · <strong>Method:</strong> read-only WC REST <code>/wp-json/wc/v3/products</code> vs catalog CSV. No writes performed.</p>
+<p><strong>Headline:</strong> 24/33 catalog SKUs have a correctly-named WC product. Remaining 9 + 4 orphan WC products carry SKU collisions, scheme mismatches, retired SKUs, and missing imagery.</p>
+
+<h2 id="false-positives">0. False positives (no action)</h2>
+<p>These flagged as name mismatches but differ <em>only</em> by HTML-entity encoding (<code>&amp;amp;</code> vs <code>&amp;</code>) returned by the WC REST API. Live display is correct.</p>
+<table>
+<tr><th>SKU</th><th>WC name (API-encoded)</th><th>Catalog</th></tr>
+<tr><td>sg-006</td><td>Mint &amp;amp; Lavender Hoodie</td><td>Mint &amp; Lavender Hoodie</td></tr>
+<tr><td>sg-013</td><td>Mint &amp;amp; Lavender Crewneck</td><td>Mint &amp; Lavender Crewneck</td></tr>
+<tr><td>sg-014</td><td>Mint &amp;amp; Lavender Sweatpants</td><td>Mint &amp; Lavender Sweatpants</td></tr>
+</table>
+
+<h2 id="sku-collisions">1. SKU collisions / reassignments — FOUNDER DECISION</h2>
+<p class="crit">These cannot be auto-resolved: they require a business call on which SKU belongs to which product. No write until decided.</p>
+
+<div class="decision">
+<strong>1a. lh-006 — "The Fannie" squats on the white joggers' SKU</strong>
+<ul>
+<li>WC product <code>#9879</code> has <code>sku=lh-006</code>, <code>name="The Fannie"</code> (a fanny pack), 0 images.</li>
+<li>Canonical catalog says <code>lh-006 = "Love Hurts Joggers (White)"</code>.</li>
+<li>Founder confirmed: <em>"the fannie sku is something different."</em> → The Fannie is a real, separate product that needs its OWN SKU.</li>
+<li><strong>Needs decision:</strong> (a) what SKU does The Fannie get? (b) Is The Fannie in the catalog at all, or a legacy/standalone product? (c) The white joggers (catalog lh-006) then need a correct WC product — repurpose #9879 after re-SKUing The Fannie, or create new.</li>
+<li>The gpt-image-2 white-joggers renders are created + deployed + live-served; they cannot be attached to a product until lh-006 points at the joggers.</li>
+</ul>
+</div>
+
+<div class="decision">
+<strong>1b. br-003 jersey editions — SKU scheme mismatch</strong>
+<table>
+<tr><th>WC product</th><th>WC SKU</th><th>Catalog equivalent</th><th>Catalog SKU</th></tr>
+<tr><td>#9927 Baseball Classic (Giants Edition)</td><td>br-003-giants</td><td>...Baseball Classic (Giants)</td><td>br-014</td></tr>
+<tr><td>#9928 Baseball Classic (White Edition)</td><td>br-003-white</td><td>...Baseball Classic (White)</td><td>br-015</td></tr>
+<tr><td>#9945 Baseball Classic (Oakland Edition)</td><td>br-003-oakland</td><td>(no catalog SKU)</td><td>—</td></tr>
+</table>
+<p>Same garments, different SKU schemes. Catalog uses <code>br-014</code>/<code>br-015</code>; WC uses <code>br-003-giants</code>/<code>br-003-white</code>. <code>br-003-oakland</code> has no catalog SKU at all.</p>
+<p><strong>Needs decision:</strong> align on one scheme. Either re-SKU the WC products to <code>br-014</code>/<code>br-015</code> (match catalog), or add <code>br-003-*</code> rows to the catalog. Decide fate of <code>br-003-oakland</code> (add to catalog or retire).</p>
+</div>
+
+<h2 id="orphans">2. Orphan WC products (SKU not in catalog)</h2>
+<table>
+<tr><th>WC#</th><th>SKU</th><th>Name</th><th>Status</th><th>Img</th><th>Note</th></tr>
+<tr><td>9927</td><td>br-003-giants</td><td>Baseball Classic (Giants Edition)</td><td>publish</td><td>1</td><td>= catalog br-014 (see 1b)</td></tr>
+<tr><td>9928</td><td>br-003-white</td><td>Baseball Classic (White Edition)</td><td>publish</td><td>0</td><td>= catalog br-015 (see 1b)</td></tr>
+<tr><td>9945</td><td>br-003-oakland</td><td>Baseball Classic (Oakland Edition)</td><td>publish</td><td>0</td><td>no catalog SKU</td></tr>
+<tr><td>9887</td><td>sg-004</td><td>The Signature Hoodie</td><td class="crit">publish</td><td>0</td><td><strong>RETIRED SKU</strong> per CLAUDE.md — should be unpublished/deleted</td></tr>
+</table>
+
+<h2 id="missing">3. Catalog SKUs with no WC product</h2>
+<table>
+<tr><th>SKU</th><th>Catalog name</th><th>Note</th></tr>
+<tr><td>br-014</td><td>Baseball Classic (Giants)</td><td>exists in WC as br-003-giants #9927 (SKU mismatch, 1b)</td></tr>
+<tr><td>br-015</td><td>Baseball Classic (White)</td><td>exists in WC as br-003-white #9928 (SKU mismatch, 1b)</td></tr>
+</table>
+
+<h2 id="safe-renames">4. Safe name fixes (low-risk WC writes, no SKU change)</h2>
+<table>
+<tr><th>SKU</th><th>WC#</th><th>Current WC name</th><th>→ Catalog name</th></tr>
+<tr><td>lh-002</td><td>9875</td><td>Love Hurts Joggers</td><td>Love Hurts Joggers (Black)</td></tr>
+<tr><td>br-003</td><td>9866</td><td>...Baseball Classic</td><td>...Baseball Classic (Black)</td></tr>
+<tr><td>br-012</td><td>10065</td><td>...5. Last Oakland (Baseball)</td><td>...5. Baseball Classic (Last Oakland)</td></tr>
+</table>
+
+<h2 id="missing-images">5. Missing imagery (img=0 → blank/fallback cards)</h2>
+<p>WC products with zero images (card falls back to theme asset or placeholder): <code>lh-002</code>, <code>lh-006</code> (after SKU fix), <code>br-003-white</code>, <code>br-003-oakland</code>, <code>sg-004</code>. The Mint &amp; Lavender trio (sg-006/13/14) also show img=0 and need renders.</p>
+
+<h2 id="next">Recommended order</h2>
+<ol>
+<li><strong>Founder decides 1a + 1b</strong> (SKU assignments for The Fannie, white joggers, jersey editions).</li>
+<li>Unpublish retired <code>sg-004</code>.</li>
+<li>Apply safe renames (§4) — batched WC write, no SKU change.</li>
+<li>Re-SKU / create products per the 1a/1b decisions.</li>
+<li>Attach renders (lh-006 white joggers ready; others need generation).</li>
+<li>Re-run this audit to confirm 33/33 clean.</li>
+</ol>
+</body>
+</html>

@@ -1805,6 +1805,93 @@
       ],
       "occurrences": 1,
       "last_seen": "2026-06-09T19:30:00-07:00"
+    },
+    {
+      "id": "bug-120",
+      "timestamp": "2026-06-05",
+      "error_message": "lh-006 (Love Hurts Joggers White) product card front_model_image pointed at assets/images/products/love-hurts-joggers-white-front-model.webp which does not exist on disk -> 404 / placeholder on the live card.",
+      "file": "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv",
+      "root_cause": "White colorway has no ghost-mannequin/model render yet; CSV forward-declared the -white- model filenames (front/back) but the renders were never produced. The only same-named files (love-hurts-joggers-front-model.webp / -back-model.webp) are lh-002's BLACK colorway, so repointing to them would have shipped a wrong-color image. The resolver skyyrose_product_image_uri() never stat()s the path and the display-layer Elvis (front_model_image ?: image) only falls through on EMPTY, not on missing-file, so a non-empty dead path bypassed the card's own fallback chain.",
+      "fix": "Blanked lh-006 front_model_image, back_image, back_model_image in the catalog CSV. Card now resolves front via the designed fallback to the real white flat (lh-006-joggers-white.jpeg, col 'image') and back degrades to the bundled placeholder. Reconcile: 33/33 effective front images resolve; CSV column width unchanged (24).",
+      "tags": [
+        "catalog",
+        "imagery",
+        "go-live",
+        "colorway",
+        "fallback-chain",
+        "wordpress-theme",
+        "lh-006"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-05"
+    },
+    {
+      "id": "bug-121",
+      "timestamp": "2026-06-05",
+      "error_message": "Nano Banana dry-run for lh-006 (Love Hurts Joggers White) resolved SOURCE: the-fannie-pack-photo.jpg \u2014 wrong product. A paid generate would have rendered a fanny pack labeled as white joggers.",
+      "file": "scripts/nano_banana/source_map.py",
+      "root_cause": "source_map.py hardcoded lh-006 -> the-fannie-pack-photo.jpg from when lh-006 was a fanny pack. SKU was reassigned to the white joggers in the catalog, but the shadow source_map was never updated. catalog.py find_source() checks source_map (step 2) BEFORE the CSV render_source_override (step 3), so the stale .jpg won.",
+      "fix": "Repointed source_map.py lh-006 front -> P/'lh-006-joggers-white.jpeg' (the real white flat), back None. Free dry-run re-verified SOURCE: lh-006-joggers-white.jpeg. Same dual-source-of-truth trap as the catalog image fix (bug-001).",
+      "tags": [
+        "nano-banana",
+        "imagery",
+        "source-map",
+        "canonical-sources",
+        "lh-006",
+        "fanny-pack",
+        "go-live",
+        "money-risk"
+      ],
+      "related_bugs": [
+        "bug-106"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-05"
+    },
+    {
+      "id": "bug-122",
+      "timestamp": "2026-06-05",
+      "error_message": "400 - The model 'gpt-image-2' does not support the 'input_fidelity' parameter. (code invalid_input_fidelity_model). All 6 attempts failed, 0 images produced.",
+      "file": "scripts/nano_banana/generate.py",
+      "root_cause": "After migrating GPT_IMAGE_MODEL gpt-image-1.5 -> gpt-image-2, generate_gpt() still passed input_fidelity='high' to images.edit(). The live gpt-image-2 endpoint rejects input_fidelity even though the OpenAI SDK type stub lists it as supported for 'gpt-image-1, 1.5 and later' (stub ahead of endpoint).",
+      "fix": "Gated input_fidelity to pass only for ('gpt-image-1','gpt-image-1.5'); omitted for gpt-image-2. Verified via OpenAI docs (Context7): size=1024x1536 valid for gpt-image-2, b64_json auto-returned. Re-ran: 1/1 success, both views QA-PASS.",
+      "tags": [
+        "nano-banana",
+        "gpt-image-2",
+        "openai",
+        "api-drift",
+        "input_fidelity",
+        "lh-006"
+      ],
+      "related_bugs": [
+        "bug-107"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-05"
+    },
+    {
+      "id": "bug-123",
+      "timestamp": "2026-06-06",
+      "error_message": "Appended a duplicate lh-007 'The Fannie' row to the catalog CSV \u2014 The Fannie was already canonical at lh-005.",
+      "file": "wordpress-theme/skyyrose-flagship/data/skyyrose-catalog.csv",
+      "root_cause": "Trusted the conversation ('the fannie needs to be added') over the CSV source of truth; did not grep the full catalog first, so missed that lh-005 = The Fannie already. WC also had two Fannie products (correct lh-005/#10077 + stray lh-006/#9879) which reinforced the wrong mental model.",
+      "fix": "Reverted lh-007 row. Conformed WC to the CSV instead: lh-006/#9879 (stray Fannie) -> Love Hurts Joggers (White); real Fannie left untouched at lh-005/#10077. Lesson: before adding ANY product, grep the full catalog CSV for the name/SKU.",
+      "tags": [
+        "catalog",
+        "canonical-sources",
+        "duplicate",
+        "the-fannie",
+        "lh-005",
+        "lh-007",
+        "woocommerce"
+      ],
+      "related_bugs": [
+        "bug-106",
+        "bug-107"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-06"
     }
   ]
 }
