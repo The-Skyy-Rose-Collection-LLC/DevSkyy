@@ -494,9 +494,25 @@ class AssetIntegrityError(RuntimeError):
 
 
 def verify_plan_assets(plans: list[SkuPlan]) -> list:
-    """Return manifest-drift findings for every SKU the plans will render."""
-    from skyyrose.core.asset_manifest import AssetManifest
+    """Return manifest-drift findings for every SKU the plans will render.
 
+    Fail-closed: if the committed manifest is ABSENT, the gate has no oracle and
+    cannot tell "assets OK" from "no idea" — it returns a ``manifest_missing``
+    finding so a paid run blocks rather than proceeding with zero protection
+    (the same silent pass-through that caused bug-119).
+    """
+    from skyyrose.core.asset_manifest import MANIFEST_PATH, AssetManifest, DriftFinding
+
+    if not MANIFEST_PATH.exists():
+        return [
+            DriftFinding(
+                sku="*",
+                role="-",
+                path=str(MANIFEST_PATH),
+                kind="manifest_missing",
+                detail="asset manifest not found — run scripts/build_asset_manifest.py",
+            )
+        ]
     skus: set[str] = set()
     for p in plans:
         skus.add(p.sku)

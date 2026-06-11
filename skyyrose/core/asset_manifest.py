@@ -102,7 +102,13 @@ class AssetManifest:
         p = path or MANIFEST_PATH
         if not p.exists():
             return cls()
-        raw = json.loads(p.read_text(encoding="utf-8"))
+        try:
+            raw = json.loads(p.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise ValueError(
+                f"Asset manifest is corrupt (invalid JSON) at {p}: {exc}\n"
+                "Delete it and run `python scripts/build_asset_manifest.py` to regenerate."
+            ) from exc
         skus = {
             sku: SkuAssets(
                 sku=entry["sku"],

@@ -118,27 +118,29 @@ def main(argv: list[str] | None = None) -> int:
         print("\nPaid generation is gated. Re-run with --yes to proceed.")
         return 2
 
+    # Asset-integrity gate BEFORE constructing the client — so a drifted-source
+    # run reports the actionable drift rather than a confusing "API key missing"
+    # if the key happens to be absent. render_all re-runs the same gate for any
+    # non-CLI caller; here we've already checked, so it renders with it off.
+    if not args.skip_asset_verify:
+        drift = pipeline.verify_plan_assets(dry["plans"])
+        if drift:
+            print("\nABORT: asset integrity check failed before paid generation.")
+            print("  A source file changed or vanished since the manifest was committed —")
+            print("  rendering against it risks the bug-119 wrong-product class. Findings:")
+            for d in drift:
+                print(f"    {d.sku:<14} {d.role:<13} {d.kind:<14} {d.path}")
+            print(
+                "\n  Resolve the file, regenerate with `python scripts/build_asset_manifest.py`,\n"
+                "  confirm the change is intended, then re-run. Override with --skip-asset-verify."
+            )
+            return 4
+
     from .client import OAIImageClient
 
     client = OAIImageClient()  # validates the API key
     # Render the EXACT plans the manifest was built from (no re-plan → no TOCTOU).
-    # render_all runs the asset-integrity gate before any paid call; drift on a
-    # source file (missing or hash-changed) raises rather than spending.
-    try:
-        results = pipeline.render_all(
-            dry["plans"], client, verify_assets=not args.skip_asset_verify
-        )
-    except pipeline.AssetIntegrityError as exc:
-        print("\nABORT: asset integrity check failed before paid generation.")
-        print("  A source file changed or vanished since the manifest was committed —")
-        print("  rendering against it risks the bug-119 wrong-product class. Findings:")
-        for d in exc.findings:
-            print(f"    {d.sku:<14} {d.role:<13} {d.kind:<14} {d.path}")
-        print(
-            "\n  Resolve the file, regenerate with `python scripts/build_asset_manifest.py`,\n"
-            "  confirm the change is intended, then re-run. Override with --skip-asset-verify."
-        )
-        return 4
+    results = pipeline.render_all(dry["plans"], client, verify_assets=False)
 
     rendered = [r for r in results if r.status == "rendered"]
     errored = [r for r in results if r.status == "error"]

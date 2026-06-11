@@ -17,6 +17,8 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
+import pytest
+
 from skyyrose.core.asset_manifest import AssetManifest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -35,9 +37,9 @@ def _load_builder():
 
 
 def test_manifest_exists_and_loads():
-    assert MANIFEST.exists(), (
-        "assets/products/manifest.json missing — run scripts/build_asset_manifest.py"
-    )
+    assert (
+        MANIFEST.exists()
+    ), "assets/products/manifest.json missing — run scripts/build_asset_manifest.py"
     m = AssetManifest.load()
     assert m.skus, "manifest registered zero SKUs"
 
@@ -112,3 +114,20 @@ def test_keeper_with_missing_asset_is_ignored(tmp_path, monkeypatch):
     monkeypatch.setattr(config, "KEEPERS_JSON", kj)
     skips = pipeline._keeper_skips()
     assert ("sg-009", "on-model", "front") not in skips  # asset missing → not skipped
+
+
+def test_gate_fails_closed_when_manifest_missing(tmp_path, monkeypatch):
+    """A missing manifest must BLOCK a paid run, not pass with zero protection."""
+    from scripts.oai_render import pipeline
+    from skyyrose.core import asset_manifest
+
+    monkeypatch.setattr(asset_manifest, "MANIFEST_PATH", tmp_path / "no_manifest.json")
+    findings = pipeline.verify_plan_assets([])  # plans irrelevant — file is absent
+    assert len(findings) == 1 and findings[0].kind == "manifest_missing"
+
+
+def test_corrupt_manifest_raises_actionable_error(tmp_path):
+    bad = tmp_path / "manifest.json"
+    bad.write_text("{ not valid json", encoding="utf-8")
+    with pytest.raises(ValueError, match="corrupt"):
+        AssetManifest.load(bad)

@@ -1861,6 +1861,27 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-11"
+    },
+    {
+      "id": "bug-127",
+      "timestamp": "2026-06-11T01:00:00-07:00",
+      "error_message": "Asset-integrity gate fails OPEN when assets/products/manifest.json is absent (fresh clone or deleted): AssetManifest.load() returns an empty manifest, verify() finds nothing, paid render proceeds with ZERO source-asset protection",
+      "file": "scripts/oai_render/pipeline.py",
+      "root_cause": "verify_plan_assets() called AssetManifest.load().verify() directly; load() returns an empty manifest on a missing file (lenient, correct for readers/--check), and verify() silently skips SKUs not in the manifest — so missing-manifest == clean.",
+      "fix": "verify_plan_assets() now fail-closes: if MANIFEST_PATH is absent it returns a manifest_missing DriftFinding so render_all raises AssetIntegrityError before any paid call. Also: load() wraps corrupt JSON in an actionable ValueError; CLI runs the gate BEFORE constructing OAIImageClient so a drifted run reports drift, not a confusing 'API key missing'. Found by /code-review (3-agent) on the Tier 1 diff.",
+      "tags": [
+        "oai-render",
+        "asset-manifest",
+        "fail-open",
+        "paid-run-gate",
+        "code-review"
+      ],
+      "related_bugs": [
+        "bug-119",
+        "bug-124"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-11"
     }
   ]
 }
