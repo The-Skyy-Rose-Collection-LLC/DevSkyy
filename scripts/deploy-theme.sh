@@ -265,6 +265,12 @@ auto_rollback() {
 # ---------------------------------------------------------------------------
 SSH_STRICT="${SSH_STRICT_HOST:-accept-new}"
 
+# Extract the "Version:" header value from a WP style.css on stdin.
+# Shared by the local-tree and live-site reads in verify_live().
+extract_theme_version() {
+    grep -m1 -iE "^[[:space:]]*Version:" | awk '{print $2}'
+}
+
 # Build an SSH command array with auth resolved once.
 # Usage: "${SSH_CMD[@]}" user@host "command"
 build_ssh_cmd() {
@@ -478,9 +484,34 @@ try_rsync() {
         export SSHPASS="$SSH_PASS"
     fi
 
+    # try_rsync is invoked as an `if` condition, which suppresses errexit for
+    # the whole function body — every failure below MUST be checked explicitly
+    # or the script sails past it (bug-086: scp died mid-transfer, the
+    # truncated tar failed to extract, and the deploy still reported success).
     phase_start upload
     log_info "Uploading via scp..."
-    "${SCP_CMD[@]}" "$tmpzip" "${SSH_USER}@${SSH_HOST}:/tmp/${remote_tar_name}"
+    local local_size remote_size attempt upload_ok=0
+    local_size=$(stat -f%z "$tmpzip" 2>/dev/null || stat -c%s "$tmpzip")
+    for attempt in 1 2 3; do
+        if "${SCP_CMD[@]}" "$tmpzip" "${SSH_USER}@${SSH_HOST}:/tmp/${remote_tar_name}"; then
+            remote_size=$("${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" \
+                "stat -c%s /tmp/${remote_tar_name} 2>/dev/null || wc -c < /tmp/${remote_tar_name}" \
+                2>/dev/null | tr -d '[:space:]')
+            if [[ "$remote_size" == "$local_size" ]]; then
+                upload_ok=1
+                break
+            fi
+            log_warn "Upload size mismatch (local=$local_size remote=${remote_size:-unknown}) — attempt $attempt/3"
+        else
+            log_warn "scp transfer failed — attempt $attempt/3"
+        fi
+    done
+    if (( ! upload_ok )); then
+        log_error "Upload failed after 3 attempts — aborting before extract (live theme untouched)"
+        rm -f "$tmpzip"
+        phase_end upload
+        return 1
+    fi
     phase_end upload
 
     phase_start swap
@@ -496,13 +527,21 @@ try_rsync() {
     # the 2 most recent generations (see trim step below).
     local swap_id
     swap_id="$(date +%s)-$$"
-    REMOTE_SWAP_ID="$swap_id"
     # Swap + prune old backups (keep most recent 2) in one remote round-trip.
     # Retention is load-bearing for auto_rollback: zero backups → no anchor.
     local parent_dir theme_name
     parent_dir="$(dirname "$WP_THEME_PATH")"
     theme_name="$(basename "$WP_THEME_PATH")"
-    "${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" "set -e; cd /tmp && tar ${zstd_flag} -xf ${remote_tar_name} && (if [ -d '${WP_THEME_PATH}' ]; then mv '${WP_THEME_PATH}' '${WP_THEME_PATH}.old.${swap_id}'; fi) && mv skyyrose-flagship '${WP_THEME_PATH}' && rm -f ${remote_tar_name} && (cd '${parent_dir}' && ls -1dt '${theme_name}.old.'* 2>/dev/null | tail -n +3 | xargs -I {} rm -rf {} 2>/dev/null; true)"
+    if ! "${SSH_CMD[@]}" "${SSH_USER}@${SSH_HOST}" "set -e; cd /tmp && tar ${zstd_flag} -xf ${remote_tar_name} && (if [ -d '${WP_THEME_PATH}' ]; then mv '${WP_THEME_PATH}' '${WP_THEME_PATH}.old.${swap_id}'; fi) && mv skyyrose-flagship '${WP_THEME_PATH}' && rm -f ${remote_tar_name} && (cd '${parent_dir}' && ls -1dt '${theme_name}.old.'* 2>/dev/null | tail -n +3 | xargs -I {} rm -rf {} 2>/dev/null; true)"; then
+        log_error "Remote extract/swap FAILED — live theme was not swapped"
+        rm -f "$tmpzip"
+        phase_end swap
+        return 1
+    fi
+    # Only record the swap ID once the swap actually happened — auto_rollback
+    # uses it as the anchor, and a pre-swap failure must not trigger a bogus
+    # rollback against a backup dir that was never created.
+    REMOTE_SWAP_ID="$swap_id"
     phase_end swap
 
     # SSHPASS stays in env until cleanup(); subsequent wp_remote calls
@@ -619,6 +658,23 @@ verify_live() {
         grep -oE "(Fatal error|Parse error|Call to undefined|There has been a critical error)[^<]{0,100}" "$tmpfile" | head -3 >&2
         return 1
     fi
+
+    # Version-stamp assertion (bug-086): the live theme's style.css must carry
+    # the same Version: as the local tree. A 200-OK homepage proves nothing
+    # about the swap — WP serves the OLD theme just fine when the transfer
+    # died before the rename. style.css is fetched directly from the theme
+    # path, bypassing page caches via the query param.
+    local base_url local_version live_version
+    base_url="${public_url%%\?*}"
+    local_version=$(extract_theme_version < "$THEME_DIR/style.css")
+    live_version=$(curl -sS --max-time 15 \
+        "${base_url%/}/wp-content/themes/$(basename "$WP_THEME_PATH")/style.css?deploy_verify=$(date +%s)" \
+        2>/dev/null | extract_theme_version)
+    if [[ -n "$local_version" && "$live_version" != "$local_version" ]]; then
+        log_error "Verification FAILED: live theme version '${live_version:-unreadable}' != local '$local_version' — deploy did not land"
+        return 1
+    fi
+    log_success "Version stamp verified: live style.css reports $local_version"
 
     # Deep per-page + content-marker verification lives in verify-deploy.sh
     # (called by deploy-pipeline.sh). Keep this function's scope narrow:

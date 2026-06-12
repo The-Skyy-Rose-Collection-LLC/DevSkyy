@@ -337,7 +337,7 @@ get_header();
 			null,
 			array(
 				'collection' => 'love-hurts',
-				'skus'       => array_keys( $lh_products ),
+				'skus'       => wp_list_pluck( $lh_products, 'sku' ),
 			)
 		);
 		?>

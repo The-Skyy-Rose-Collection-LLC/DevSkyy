@@ -278,7 +278,7 @@ get_header();
 		null,
 		array(
 			'collection' => 'signature',
-			'skus'       => array_keys( $all_products ),
+			'skus'       => wp_list_pluck( $all_products, 'sku' ),
 		)
 	);
 	?>

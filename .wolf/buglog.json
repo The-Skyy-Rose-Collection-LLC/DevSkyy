@@ -2090,6 +2090,89 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-12T09:30:00Z"
+    },
+    {
+      "id": "bug-107",
+      "timestamp": "2026-06-12T09:15:00-07:00",
+      "error_message": "deploy-theme.sh reported 'Deploy complete (verified live)' but live site still served pre-deploy theme v1.5.30; scp died mid-upload (Connection reset by peer), remote tar hit 'Unexpected EOF in archive', swap never ran",
+      "file": "scripts/deploy-theme.sh",
+      "root_cause": "try_rsync() is called as `if try_rsync` \u2014 bash suppresses errexit inside any function invoked as a condition, so the failed scp and failed remote extract fell through to log_success. verify_live() only checked the homepage (HTTP 200 + size), which the OLD theme passes identically.",
+      "fix": "Three layers: (1) scp retry loop x3 with local-vs-remote byte-size verification before extract; (2) explicit failure check on the remote extract/swap SSH command, REMOTE_SWAP_ID now set only after a successful swap; (3) verify_live() version-stamp gate \u2014 live style.css 'Version:' must equal local THEME_DIR/style.css or the script fails and auto-rollback fires.",
+      "tags": [
+        "deploy",
+        "bash",
+        "errexit",
+        "set-e",
+        "false-success",
+        "scp",
+        "wordpress",
+        "verification"
+      ],
+      "related_bugs": [
+        "bug-059",
+        "bug-060",
+        "bug-062"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-12"
+    },
+    {
+      "id": "bug-108",
+      "timestamp": "2026-06-12T09:15:00-07:00",
+      "error_message": "Post-release verification falsely concluded 'pre-order page IS live with new markup' \u2014 combined grep 'po-gateway|preorder-hero.mp4' matched on preorder-hero.mp4 which the OLD pre-port template also references via hero-cinematic",
+      "file": "(verification procedure, not code)",
+      "root_cause": "Combined-alternation grep where one alternative exists in BOTH old and new code proves nothing. preorder-hero.mp4 predates the port; only po-* classes are unique to the new template.",
+      "fix": "Verify releases with markers unique to the NEW code only (po-gateway, lp-split), one pattern per grep, plus the version-stamp gate which is implementation-independent.",
+      "tags": [
+        "verification",
+        "grep",
+        "false-positive"
+      ],
+      "related_bugs": [
+        "bug-107"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-12"
+    },
+    {
+      "id": "bug-109",
+      "timestamp": "2026-06-12T14:10:00-07:00",
+      "error_message": "Every page has 400px of phantom horizontal scroll (docWidth 1840 at 1440 viewport); landing-page narrative text clipped at left edge after scrollIntoView scrolled horizontally",
+      "file": "wordpress-theme/skyyrose-flagship/assets/css/header.css",
+      "root_cause": ".mobile-menu__panel parks off-canvas via translateX(100%) inside a position:fixed inset:0 container with overflow:visible \u2014 browsers include transformed descendants in scrollWidth, so the parked panel widens the document on every page. Old landing-pages.css had an overflow-x clamp on its own wrapper that masked it locally.",
+      "fix": "overflow:hidden added to .mobile-menu (the fixed full-viewport container) \u2014 clips the parked panel at the source for every template. Off-canvas drawers must live inside an overflow-clipping container.",
+      "tags": [
+        "css",
+        "overflow",
+        "mobile-menu",
+        "horizontal-scroll",
+        "transform",
+        "wordpress"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-12"
+    },
+    {
+      "id": "bug-110",
+      "timestamp": "2026-06-12T14:10:00-07:00",
+      "error_message": "Landing page product grids empty on live (BR/LH/SIG) and BR scrollytell panes empty after round-2 deploy: 'skus' => array_keys($all_products) passed [0,1,2...] because skyyrose_get_collection_products() returns a NUMERICALLY indexed array; isset($all_products['br-006']) always false",
+      "file": "wordpress-theme/skyyrose-flagship/template-landing-{black-rose,love-hurts,signature}.php",
+      "root_cause": "Assumed skyyrose_get_collection_products() is SKU-keyed without reading it \u2014 it builds $products[] = $product (numeric). Only skyyrose_get_product_catalog() is SKU-keyed ($catalog[$sku] = ...). The sweep fixer and I both coded against the imagined shape.",
+      "fix": "Featured-SKU pinning resolves via skyyrose_get_product_catalog() (the SIG template's existing pattern); grid 'skus' args use wp_list_pluck($products, 'sku'). Shipped in v1.6.1.",
+      "tags": [
+        "php",
+        "wordpress",
+        "array-keys",
+        "catalog",
+        "landing-pages",
+        "verification"
+      ],
+      "related_bugs": [
+        "bug-107"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-12"
     }
   ]
 }

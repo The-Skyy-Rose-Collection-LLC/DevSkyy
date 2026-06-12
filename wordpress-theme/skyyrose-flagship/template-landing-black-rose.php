@@ -15,8 +15,19 @@ defined( 'ABSPATH' ) || exit;
 $assets       = trailingslashit( SKYYROSE_ASSETS_URI );
 $all_products = skyyrose_get_collection_products( 'black-rose' );
 
-// Featured panes — first 5 products in collection order.
-$featured = array_slice( array_values( $all_products ), 0, 5 );
+// Featured panes — SKUs pinned to the pane copy below. The copy names
+// specific garments (Sherpa, Oakland baseball, football, basketball,
+// hockey); slicing collection order would pair copy with the wrong product.
+// Resolved via the catalog (SKU-keyed); skyyrose_get_collection_products()
+// returns a numerically indexed array.
+$featured_skus = array( 'br-006', 'br-012', 'br-009', 'br-010', 'br-011' );
+$catalog       = skyyrose_get_product_catalog();
+$featured      = array();
+foreach ( $featured_skus as $featured_sku ) {
+	if ( isset( $catalog[ $featured_sku ] ) ) {
+		$featured[] = $catalog[ $featured_sku ];
+	}
+}
 
 // Pane copy — BR armor register.
 $pane_copy = array(
@@ -266,7 +277,7 @@ get_header();
 		null,
 		array(
 			'collection' => 'black-rose',
-			'skus'       => array_keys( $all_products ),
+			'skus'       => wp_list_pluck( $all_products, 'sku' ),
 		)
 	);
 	?>
