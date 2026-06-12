@@ -22,7 +22,7 @@ scipy==1.17.0
 scikit-image==0.26.0
 
 # ── AI model inference ─────────────────────────────────────────────────────
-onnxruntime==1.24.1
+onnxruntime==1.26.0
 
 # ── File system watcher ────────────────────────────────────────────────────
 watchdog==6.0.0
